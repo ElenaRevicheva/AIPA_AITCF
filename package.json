@@ -1,0 +1,26 @@
+{
+  "name": "cto-aipa",
+  "version": "1.0.0",
+  "main": "dist/cto-aipa.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cto-aipa.js",
+    "dev": "tsc && node dist/cto-aipa.js"
+  },
+  "keywords": [],
+  "author": "Elena Revicheva",
+  "license": "ISC",
+  "description": "CTO AIPA - AI Technical Co-Founder on Oracle Cloud",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "dotenv": "^16.4.7",
+    "groq-sdk": "^0.8.0",
+    "oracledb": "^6.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/oracledb": "^6.10.0",
+    "typescript": "^5.7.2"
+  }
+}
