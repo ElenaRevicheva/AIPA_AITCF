@@ -1,2 +1,0 @@
-WALLET_LOCATION = (SOURCE = (METHOD = file) (METHOD_DATA = (DIRECTORY="/home/ubuntu/cto-aipa/wallet")))
-SSL_SERVER_DN_MATCH=yes
