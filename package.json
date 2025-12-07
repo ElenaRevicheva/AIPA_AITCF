@@ -14,7 +14,10 @@
   "description": "CTO AIPA - AI Technical Co-Founder on Oracle Cloud",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
+    "@octokit/rest": "^22.0.1",
+    "@types/express": "^5.0.6",
     "dotenv": "^16.4.7",
+    "express": "^5.2.1",
     "groq-sdk": "^0.8.0",
     "oracledb": "^6.7.0"
   },

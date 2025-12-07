@@ -3,10 +3,16 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+// Set TNS_ADMIN BEFORE initializing Oracle Client
+process.env.TNS_ADMIN = '/home/ubuntu/cto-aipa/wallet';
+
 // Use thick mode with Oracle Instant Client for better wallet support
 try {
-  oracledb.initOracleClient({ libDir: '/opt/instantclient_23_4' });
+  oracledb.initOracleClient({ 
+    libDir: '/opt/instantclient_23_4'
+  });
   console.log('✅ Oracle Thick Mode initialized');
+  console.log(`📁 TNS_ADMIN: ${process.env.TNS_ADMIN}`);
 } catch (err: any) {
   if (err.message.includes('already been initialized')) {
     console.log('✅ Oracle Thick Mode already initialized');
@@ -14,9 +20,6 @@ try {
     console.error('❌ Oracle Thick Mode error:', err);
   }
 }
-
-// Set TNS_ADMIN environment variable to point to wallet directory
-process.env.TNS_ADMIN = '/home/ubuntu/cto-aipa/wallet';
 
 interface DBConfig {
   user: string;

@@ -2,11 +2,14 @@ import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { initializeDatabase, saveMemory, getRelevantMemory } from './database';
 import * as dotenv from 'dotenv';
+import express from 'express';
+import { Octokit } from '@octokit/rest';
 
 dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 interface CodeReviewRequest {
   repo: string;
@@ -15,50 +18,275 @@ interface CodeReviewRequest {
   useClaudeForCritical?: boolean;
 }
 
+interface SecurityIssue {
+  type: string;
+  severity: 'high' | 'medium' | 'low';
+  line: string;
+  description: string;
+}
+
+// Helper function to notify CMO about tech updates
+async function notifyCMO(prData: {
+  pr_number: number;
+  repo: string;
+  title: string;
+  description: string;
+  type: string;
+  security_issues: number;
+  complexity_issues: number;
+}): Promise<boolean> {
+  try {
+    const CMO_WEBHOOK = 'https://vibejobhunter-production.up.railway.app/api/tech-update';
+    
+    console.log(`📢 Notifying CMO AIPA about PR #${prData.pr_number}...`);
+    
+    const response = await fetch(CMO_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(prData)
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log(`✅ CMO will announce PR #${prData.pr_number} at 4:30 PM Panama tomorrow!`);
+      console.log(`   CMO said: ${result.message}`);
+      return true;
+    } else {
+      console.log(`⚠️ CMO notification failed: ${response.status}`);
+      return false;
+    }
+  } catch (error) {
+    console.error(`❌ Error notifying CMO: ${error}`);
+    return false;
+  }
+}
+
+// Advanced code analysis functions
+function analyzeSecurityIssues(diff: string): SecurityIssue[] {
+  const issues: SecurityIssue[] = [];
+  const lines = diff.split('\n');
+  
+  lines.forEach((line) => {
+    if (line.includes('SELECT') && (line.includes('${') || line.includes('+') || line.includes('concat'))) {
+      issues.push({
+        type: 'SQL Injection Risk',
+        severity: 'high',
+        line: line.trim(),
+        description: 'Potential SQL injection vulnerability. Use parameterized queries.'
+      });
+    }
+    
+    if (/(password|secret|api[_-]?key|token)\s*=\s*['"][^'"]+['"]/i.test(line)) {
+      issues.push({
+        type: 'Hardcoded Secret',
+        severity: 'high',
+        line: line.trim(),
+        description: 'Hardcoded credentials detected. Use environment variables.'
+      });
+    }
+    
+    if ((line.includes('innerHTML') || line.includes('dangerouslySetInnerHTML')) && !line.includes('sanitize')) {
+      issues.push({
+        type: 'XSS Vulnerability',
+        severity: 'high',
+        line: line.trim(),
+        description: 'Potential XSS vulnerability. Sanitize user input before rendering.'
+      });
+    }
+    
+    if (line.includes('eval(')) {
+      issues.push({
+        type: 'Dangerous Function',
+        severity: 'high',
+        line: line.trim(),
+        description: 'Use of eval() is dangerous. Consider safer alternatives.'
+      });
+    }
+    
+    if (line.includes('console.log') && line.startsWith('+')) {
+      issues.push({
+        type: 'Debug Code',
+        severity: 'low',
+        line: line.trim(),
+        description: 'console.log() found. Remove debug statements before production.'
+      });
+    }
+  });
+  
+  return issues;
+}
+
+function analyzeCodeComplexity(diff: string): string[] {
+  const issues: string[] = [];
+  const lines = diff.split('\n');
+  
+  let functionLength = 0;
+  let nestingLevel = 0;
+  
+  lines.forEach((line) => {
+    if (line.startsWith('+')) {
+      if (line.includes('function') || line.includes('=>')) {
+        functionLength = 0;
+      }
+      functionLength++;
+      
+      const openBraces = (line.match(/{/g) || []).length;
+      const closeBraces = (line.match(/}/g) || []).length;
+      nestingLevel += openBraces - closeBraces;
+      
+      if (functionLength > 50) {
+        issues.push('⚠️ Function exceeds 50 lines. Consider breaking it into smaller functions.');
+        functionLength = 0;
+      }
+      
+      if (nestingLevel > 4) {
+        issues.push('⚠️ Deep nesting detected (>4 levels). Consider refactoring for better readability.');
+      }
+    }
+  });
+  
+  return [...new Set(issues)];
+}
+
+function detectArchitecturePatterns(diff: string): string[] {
+  const patterns: string[] = [];
+  
+  if (diff.includes('class') && diff.includes('extends')) {
+    patterns.push('✅ Object-Oriented Programming pattern detected');
+  }
+  
+  if (diff.includes('async') && diff.includes('await')) {
+    patterns.push('✅ Async/Await pattern for asynchronous operations');
+  }
+  
+  if (diff.includes('try') && diff.includes('catch')) {
+    patterns.push('✅ Proper error handling with try-catch blocks');
+  }
+  
+  if (diff.includes('interface') || diff.includes('type')) {
+    patterns.push('✅ TypeScript type definitions for type safety');
+  }
+  
+  if (!diff.includes('catch') && diff.includes('await')) {
+    patterns.push('⚠️ Missing error handling for async operations');
+  }
+  
+  return patterns;
+}
+
+function checkPerformanceIssues(diff: string): string[] {
+  const issues: string[] = [];
+  
+  if (diff.includes('for') && diff.includes('for')) {
+    issues.push('⚠️ Nested loops detected. Consider optimizing for O(n²) complexity.');
+  }
+  
+  if (diff.includes('.map(') && diff.includes('.filter(') && diff.includes('.map(')) {
+    issues.push('⚠️ Multiple array iterations. Consider combining operations.');
+  }
+  
+  if (diff.includes('JSON.parse(JSON.stringify(')) {
+    issues.push('⚠️ Deep clone using JSON.parse/stringify is inefficient. Use structuredClone() or lodash cloneDeep().');
+  }
+  
+  return issues;
+}
+
 async function reviewCode(request: CodeReviewRequest) {
   console.log(`🤖 CTO AIPA: Reviewing PR #${request.pr_number} in ${request.repo}...`);
-  
+
   const context = await getRelevantMemory('CTO', 'code_review', 3);
   
-  const useClaude = request.useClaudeForCritical || 
-                    request.diff.includes('security') || 
-                    request.diff.includes('payment');
-  
+  const securityIssues = analyzeSecurityIssues(request.diff);
+  const complexityIssues = analyzeCodeComplexity(request.diff);
+  const architecturePatterns = detectArchitecturePatterns(request.diff);
+  const performanceIssues = checkPerformanceIssues(request.diff);
+
+  const hasCriticalIssues = securityIssues.some(i => i.severity === 'high') ||
+                             request.diff.includes('security') ||
+                             request.diff.includes('payment') ||
+                             request.useClaudeForCritical;
+
+  const analysisSummary = `
+Security Issues Found: ${securityIssues.length}
+${securityIssues.map(i => `- [${i.severity.toUpperCase()}] ${i.type}: ${i.description}`).join('\n')}
+
+Code Complexity Issues: ${complexityIssues.length}
+${complexityIssues.join('\n')}
+
+Architecture Patterns: ${architecturePatterns.length}
+${architecturePatterns.join('\n')}
+
+Performance Concerns: ${performanceIssues.length}
+${performanceIssues.join('\n')}
+`;
+
+  const aiPrompt = `You are CTO AIPA, an AI Technical Co-Founder with expertise in software architecture, security, and best practices.
+
+Analyze this code change and provide a comprehensive review:
+
+AUTOMATED ANALYSIS RESULTS:
+${analysisSummary}
+
+CODE DIFF:
+${request.diff}
+
+PREVIOUS REVIEW CONTEXT:
+${JSON.stringify(context)}
+
+Provide a professional code review covering:
+1. Critical security or architectural concerns (if any)
+2. Code quality and best practices
+3. Suggestions for improvement
+4. Positive feedback on good practices
+
+Keep the review constructive, specific, and actionable.`;
+
   let review: string;
-  
-  if (useClaude) {
+
+  if (hasCriticalIssues) {
+    console.log('🔐 Using Claude for critical code review...');
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-5-sonnet-latest',
       max_tokens: 4096,
       messages: [{
         role: 'user',
-        content: `Review this code change:\n\n${request.diff}\n\nPrevious context: ${JSON.stringify(context)}`
+        content: aiPrompt
       }]
     });
     const firstContent = response.content[0];
     review = firstContent && firstContent.type === 'text' ? firstContent.text : '';
   } else {
+    console.log('⚡ Using Groq for standard code review...');
     const response = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [{
         role: 'user',
-        content: `Review this code change:\n\n${request.diff}\n\nPrevious context: ${JSON.stringify(context)}`
+        content: aiPrompt
       }]
     });
     review = response.choices[0]?.message?.content || '';
   }
-  
+
   await saveMemory('CTO', 'code_review', {
     repo: request.repo,
-    pr_number: request.pr_number
+    pr_number: request.pr_number,
+    security_issues: securityIssues.length,
+    complexity_issues: complexityIssues.length,
+    performance_issues: performanceIssues.length
   }, review, {
-    model_used: useClaude ? 'claude' : 'groq',
+    model_used: hasCriticalIssues ? 'claude' : 'groq',
+    critical_issues: hasCriticalIssues,
     timestamp: new Date().toISOString()
   });
-  
+
   console.log(`✅ CTO AIPA: Review complete!`);
-  console.log(review);
-  return review;
+  
+  return {
+    review,
+    securityIssues,
+    complexityIssues
+  };
 }
 
 async function startCTOAIPA() {
@@ -68,8 +296,107 @@ async function startCTOAIPA() {
   
   console.log('✅ CTO AIPA ready and running on Oracle Cloud Infrastructure!');
   console.log('💰 Cost: $0 (using Oracle credits)');
+  console.log('🔍 Enhanced with: Security Scanning, Complexity Analysis, Architecture Detection');
+  console.log('🤝 Integrated with: CMO AIPA on Railway (tech update announcements)');
   
-  // TODO: Set up webhook listener for GitHub events
+  const app = express();
+  app.use(express.json());
+  
+  app.get('/', (req, res) => {
+    res.json({ 
+      status: 'running', 
+      service: 'CTO AIPA',
+      version: '2.1.0',
+      features: [
+        'Security Vulnerability Scanning',
+        'Code Complexity Analysis',
+        'Architecture Pattern Detection',
+        'Performance Issue Detection',
+        'AI-Powered Reviews (Groq + Claude)',
+        'CMO Integration (LinkedIn Announcements)'
+      ],
+      integrations: {
+        cmo_aipa: 'https://vibejobhunter-production.up.railway.app'
+      },
+      uptime: process.uptime()
+    });
+  });
+  
+  app.post('/webhook/github', async (req, res) => {
+    const event = req.headers['x-github-event'];
+    
+    if (event === 'pull_request') {
+      const pr = req.body.pull_request;
+      const action = req.body.action;
+      const repo = req.body.repository;
+      
+      if (action === 'opened' || action === 'synchronize') {
+        console.log(`📥 New PR received: #${pr.number} - ${pr.title}`);
+        console.log(`   Repository: ${repo.full_name}`);
+        
+        res.json({ status: 'processing', pr_number: pr.number });
+        
+        try {
+          const [owner, repoName] = repo.full_name.split('/');
+          const { data: prData } = await octokit.pulls.get({
+            owner,
+            repo: repoName,
+            pull_number: pr.number,
+            mediaType: { format: 'diff' }
+          });
+          
+          console.log(`📄 Fetched diff for PR #${pr.number}`);
+          
+          const reviewResult = await reviewCode({
+            repo: repo.full_name,
+            pr_number: pr.number,
+            diff: prData as unknown as string,
+            useClaudeForCritical: false
+          });
+          
+          await octokit.issues.createComment({
+            owner,
+            repo: repoName,
+            issue_number: pr.number,
+            body: `## 🤖 CTO AIPA Code Review (v2.1 - Enhanced)\n\n${reviewResult.review}\n\n---\n*Powered by AI on Oracle Cloud | Security Scanning | Complexity Analysis | Architecture Detection*`
+          });
+          
+          console.log(`✅ Posted review comment on PR #${pr.number}`);
+          
+          // Notify CMO about this tech update
+          const updateType = reviewResult.securityIssues.length > 0 ? 'security' : 
+                           reviewResult.complexityIssues.length > 2 ? 'refactor' : 
+                           'feature';
+          
+          await notifyCMO({
+            pr_number: pr.number,
+            repo: repo.full_name,
+            title: pr.title,
+            description: `CTO AIPA reviewed ${pr.changed_files || 'code'} changes. ${reviewResult.securityIssues.length > 0 ? `Found ${reviewResult.securityIssues.length} security improvements.` : ''} ${reviewResult.complexityIssues.length > 0 ? `Made ${reviewResult.complexityIssues.length} code quality enhancements.` : 'Code quality approved!'}`,
+            type: updateType,
+            security_issues: reviewResult.securityIssues.length,
+            complexity_issues: reviewResult.complexityIssues.length
+          });
+          
+        } catch (error) {
+          console.error(`❌ Error processing PR #${pr.number}:`, error);
+        }
+        
+      } else {
+        res.json({ status: 'ignored', action });
+      }
+    } else {
+      res.json({ status: 'ignored', event });
+    }
+  });
+  
+  const PORT = 3000;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🎧 CTO AIPA listening on http://163.192.99.45:${PORT}`);
+    console.log(`📡 Webhook endpoint: http://163.192.99.45:${PORT}/webhook/github`);
+    console.log(`🏥 Health check: http://163.192.99.45:3000/`);
+    console.log(`🤝 CMO Integration: https://vibejobhunter-production.up.railway.app/api/tech-update`);
+  });
 }
 
 startCTOAIPA().catch(console.error);
