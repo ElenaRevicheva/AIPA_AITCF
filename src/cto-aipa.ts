@@ -108,8 +108,8 @@ interface SecurityIssue {
 
 interface AskCTORequest {
   question: string;
-  context?: string;
-  repo?: string;
+  context?: string | undefined;
+  repo?: string | undefined;
 }
 
 // =============================================================================
