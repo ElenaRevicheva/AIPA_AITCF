@@ -378,10 +378,10 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
   let review: string;
 
   if (hasCriticalIssues) {
-    console.log('🔐 Using Claude for critical code review...');
+    console.log('🔐 Using Claude Opus 4 for critical code review...');
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
+      model: 'claude-opus-4-20250514',
+      max_tokens: 8192,
       messages: [{ role: 'user', content: aiPrompt }]
     });
     const firstContent = response.content[0];
@@ -403,7 +403,7 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
     complexity_issues: complexityIssues.length,
     performance_issues: performanceIssues.length
   }, review, {
-    model_used: hasCriticalIssues ? 'claude' : 'groq',
+    model_used: hasCriticalIssues ? 'claude-opus-4' : 'groq',
     critical_issues: hasCriticalIssues,
     timestamp: new Date().toISOString()
   });
@@ -447,9 +447,10 @@ Respond as a supportive technical co-founder would:
 - If you don't know something, say so honestly
 - Suggest next steps when appropriate`;
 
+  console.log('🧠 Using Claude Opus 4 for strategic thinking...');
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
+    model: 'claude-opus-4-20250514',
+    max_tokens: 8192,
     messages: [{ role: 'user', content: prompt }]
   });
 
