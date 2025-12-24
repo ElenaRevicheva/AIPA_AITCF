@@ -2,6 +2,7 @@ import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { initializeDatabase, saveMemory, getRelevantMemory } from './database';
 import { initTelegramBot } from './telegram-bot';
+import { initAtuonaBot } from './atuona-creative-ai';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import { Octokit } from '@octokit/rest';
@@ -514,7 +515,7 @@ async function startCTOAIPA() {
     res.json({ 
       status: 'running', 
       service: 'CTO AIPA',
-      version: '3.3.0',
+      version: '3.4.0',
       role: 'AI Technical Co-Founder',
       ecosystem: 'AIdeazz',
       features: [
@@ -753,15 +754,26 @@ async function startCTOAIPA() {
     console.log(`🏥 Health: http://163.192.99.45:${PORT}/`);
     console.log(`🤝 CMO Integration: https://vibejobhunter-production.up.railway.app/api/tech-update`);
     
-    // Initialize Telegram Bot
+    // Initialize Telegram Bot (CTO AIPA)
     const telegramBot = initTelegramBot();
     if (telegramBot) {
-      console.log(`📱 Telegram: Bot starting...`);
+      console.log(`📱 Telegram: CTO Bot starting...`);
     } else {
-      console.log(`📱 Telegram: Not configured (add TELEGRAM_BOT_TOKEN to .env)`);
+      console.log(`📱 Telegram: CTO Bot not configured (add TELEGRAM_BOT_TOKEN to .env)`);
+    }
+    
+    // Initialize Atuona Creative AI Bot
+    const atuonaBot = initAtuonaBot();
+    if (atuonaBot) {
+      console.log(`🎭 Telegram: Atuona Creative AI starting...`);
+    } else {
+      console.log(`🎭 Telegram: Atuona not configured (add ATUONA_BOT_TOKEN to .env)`);
     }
     
     console.log(`\n🤝 Ready to be your Technical Co-Founder!`);
+    if (atuonaBot) {
+      console.log(`🎭 Ready to create with your Creative Co-Founder!`);
+    }
   });
 }
 

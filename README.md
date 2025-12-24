@@ -1,9 +1,9 @@
-# 🤖 CTO AIPA v3.3 - AI Technical Co-Founder + Coding Teacher
+# 🤖 CTO AIPA v3.4 - AI Technical Co-Founder + Creative Co-Founder
 
-**Your Autonomous AI CTO that CODES and TEACHES on Oracle Cloud Infrastructure**
+**Your Autonomous AI CTO + ATUONA Creative AI on Oracle Cloud Infrastructure**
 
 [![Status](https://img.shields.io/badge/status-live-brightgreen)](http://163.192.99.45:3000)
-[![Version](https://img.shields.io/badge/version-3.3.0-blue)]()
+[![Version](https://img.shields.io/badge/version-3.4.0-blue)]()
 [![Cost](https://img.shields.io/badge/cost-%240%2Fmonth-success)]()
 [![AI](https://img.shields.io/badge/AI-Claude%20Opus%204-purple)]()
 [![Oracle Cloud](https://img.shields.io/badge/Oracle%20Cloud-Production-red)]()
@@ -31,21 +31,20 @@ CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder**
 
 ---
 
-## 🆕 What's New in v3.3
+## 🆕 What's New in v3.4
 
 | Feature | Description |
 |---------|-------------|
+| **🎭 ATUONA Creative AI** | NEW! AI Creative Co-Founder for your book project |
+| **📖 Daily Book Pages** | `/create` - Atuona generates 1-2 pages of "Finding Paradise" |
+| **🚀 Auto-Publish** | `/publish` - Push book pages directly to atuona.xyz |
+| **🤝 AI Collaboration** | CTO AIPA + Atuona work together seamlessly |
 | **🎓 Learn to Code** | `/learn <topic>` - Structured coding lessons |
 | **💻 CTO Writes Code** | `/code <repo> <task>` - CTO creates PRs with real code! |
 | **🔧 CTO Fixes Bugs** | `/fix <repo> <issue>` - CTO fixes issues automatically! |
-| **📚 Explain Concepts** | `/explain <concept>` - Understand any coding concept |
-| **🏋️ Coding Exercises** | `/exercise` - Daily coding challenges |
 | **📸 Screenshot Analysis** | Send any image - errors, UI, diagrams - get AI analysis! |
-| **💡 Idea Capture** | `/idea <text>` - Save startup ideas with AI feedback |
-| **📊 Ecosystem Stats** | `/stats` - Weekly commits, most active repos, metrics |
-| **☀️ Daily Briefings** | Morning summary at 8 AM Panama time with today's focus |
 | **🎤 Voice Messages** | Send voice notes - Whisper transcribes, Claude responds |
-| **🚀 Claude Opus 4** | Best AI model for coding + vision analysis |
+| **🚀 Claude Opus 4** | Best AI model for coding + creative writing |
 
 ---
 
@@ -226,6 +225,58 @@ Alerts run every 4 hours automatically.
 
 ---
 
+## 🎭 ATUONA Creative AI - Your Creative Co-Founder (NEW!)
+
+Atuona is your AI Creative Co-Founder that writes your book daily!
+
+### About the Book
+
+**"Finding Paradise on Earth through Vibe Coding"**
+- Written by Elena Revicheva & Atuona AI
+- Raw, confessional poetry/prose in Russian
+- Themes: Tech meets soul, AI companionship, Panama paradise
+- Each page becomes an NFT on atuona.xyz
+
+### Telegram Bot: @Atuona_AI_CCF_AIdeazz_bot
+
+| Command | Description |
+|---------|-------------|
+| `/create` | 📝 Generate next book page |
+| `/continue` | 📖 Continue from last page |
+| `/preview` | 👁️ See page before publishing |
+| `/publish` | 🚀 Push to GitHub → atuona.xyz |
+| `/status` | 📊 Current book progress |
+| `/style` | 🎨 Atuona's writing style |
+| `/inspire` | ✨ Get creative inspiration |
+| `/cto` | 💬 Send message to CTO AIPA |
+| `/menu` | 📋 Show all commands |
+
+### How It Works
+
+```
+Elena ──► /create ──► Atuona AI writes page ──► /preview
+                                                    │
+                                                    ▼
+GitHub ◄── /publish ◄── Elena approves ◄── Review
+   │
+   ▼
+atuona.xyz auto-deploys via Fleek
+   │
+   ▼
+NFT page live! 🎉
+```
+
+### Setup
+
+Add to `.env` on Oracle Cloud:
+```bash
+ATUONA_BOT_TOKEN=8236294926:AAGglv_SbslYAFF3PJ1kxJ-FCUNic_-TEZw
+```
+
+Restart: `pm2 restart cto-aipa`
+
+---
+
 ## 🤝 CMO Integration
 
 CTO AIPA automatically notifies CMO AIPA when:
@@ -247,31 +298,40 @@ curl http://163.192.99.45:3000/cmo-updates
 ## 🏗️ Technical Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         CTO AIPA v3.2                           │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   GitHub Webhook ────► Express Server ────► AI Analysis         │
-│        │                    │                   │               │
-│        ▼                    ▼                   ▼               │
-│   [PR or Push]        [Oracle ATP]      [Claude Opus 4]         │
-│        │                    │            [Groq Llama/Whisper]   │
-│        ▼                    ▼                   │               │
-│   GitHub Comment      Memory Storage            │               │
-│        │                                        ▼               │
-│        └──────────────► CMO AIPA ──────► LinkedIn Post          │
-│                                                                 │
-│   ┌─────────────────────────────────────────────────────────┐   │
-│   │               Telegram Bot v3.2                         │   │
-│   │   📸 Photos ──► Claude Vision ──► Analysis              │   │
-│   │   🎤 Voice ──► Whisper ──► Claude ──► Response          │   │
-│   │   💡 Ideas ──► Database ──► AI Feedback                 │   │
-│   │   📊 Stats ──► GitHub API ──► Metrics Dashboard         │   │
-│   │   ☀️ Daily Briefings (8 AM Panama via node-cron)        │   │
-│   │   🔔 Proactive Alerts (every 4 hours)                   │   │
-│   └─────────────────────────────────────────────────────────┘   │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           AIdeazz AIPA Suite v3.4                       │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌──────────────────────────────────────────────────────────────┐      │
+│   │                  🤖 CTO AIPA (Tech Co-Founder)                │      │
+│   │   GitHub Webhook ────► Express Server ────► AI Analysis       │      │
+│   │        │                    │                   │             │      │
+│   │        ▼                    ▼                   ▼             │      │
+│   │   [PR or Push]        [Oracle ATP]      [Claude Opus 4]       │      │
+│   │        │                    │            [Groq Llama/Whisper] │      │
+│   │        ▼                    ▼                   │             │      │
+│   │   GitHub Comment      Memory Storage            ▼             │      │
+│   │        └──────────────► CMO AIPA ──────► LinkedIn Post        │      │
+│   │                                                               │      │
+│   │   Telegram: @aitcf_aideazz_bot                                │      │
+│   │   📸 Photos │ 🎤 Voice │ 💡 Ideas │ 💻 Code │ 🎓 Learn        │      │
+│   └──────────────────────────────────────────────────────────────┘      │
+│                              │                                          │
+│                              ▼                                          │
+│   ┌──────────────────────────────────────────────────────────────┐      │
+│   │                🎭 ATUONA (Creative Co-Founder)                │      │
+│   │                                                               │      │
+│   │   /create ──► AI writes page ──► /publish ──► GitHub          │      │
+│   │                    │                              │           │      │
+│   │                    ▼                              ▼           │      │
+│   │             [Oracle ATP]                    [atuona repo]     │      │
+│   │             Book Memory                          │            │      │
+│   │                                                  ▼            │      │
+│   │   Telegram: @Atuona_AI_CCF_AIdeazz_bot     atuona.xyz         │      │
+│   │   📝 Create │ 📖 Continue │ 🚀 Publish │ ✨ Inspire            │      │
+│   └──────────────────────────────────────────────────────────────┘      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Stack:**
@@ -319,7 +379,8 @@ curl http://163.192.99.45:3000/cmo-updates
 - [x] **Phase 3:** Push monitoring + Ask CTO + Opus 4
 - [x] **Phase 3.1:** Daily briefings + Proactive alerts + Voice messages
 - [x] **Phase 3.2:** Screenshot analysis + Idea capture + Ecosystem stats
-- [x] **Phase 3.3:** Learn to code + CTO writes code + CTO fixes bugs 🆕
+- [x] **Phase 3.3:** Learn to code + CTO writes code + CTO fixes bugs
+- [x] **Phase 3.4:** 🎭 ATUONA Creative AI - Creative Co-Founder 🆕
 - [ ] **Phase 4:** Multi-repo learning, custom coding standards
 - [ ] **Phase 5:** CFO AIPA, CPO AIPA, CEO AIPA
 
@@ -379,4 +440,4 @@ Built in 2 days | 700+ lines of TypeScript | Zero infrastructure cost | Live in 
 
 **This is capital-efficient AI development at scale.** 🚀
 
-**Version 3.3.0 | December 24, 2025 | 🟢 Production**
+**Version 3.4.0 | December 24, 2025 | 🟢 Production | 🎄 Merry Christmas!**
