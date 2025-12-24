@@ -82,6 +82,8 @@ interface BookState {
   currentPage: number;
   lastPageContent: string;
   lastPageTitle: string;
+  lastPageEnglish: string;    // English translation
+  lastPageTheme: string;
   totalPages: number;
 }
 
@@ -90,8 +92,18 @@ let bookState: BookState = {
   currentPage: 46, // Continuing from existing 45 poems
   lastPageContent: '',
   lastPageTitle: '',
+  lastPageEnglish: '',
+  lastPageTheme: '',
   totalPages: 45
 };
+
+// Queue for importing multiple pages
+interface PageToImport {
+  russian: string;
+  title?: string;
+  theme?: string;
+}
+let importQueue: PageToImport[] = [];
 
 // =============================================================================
 // AI HELPER - Try Claude, fallback to Groq
@@ -128,6 +140,84 @@ async function createContent(prompt: string, maxTokens: number = 2000): Promise<
     }
     throw claudeError;
   }
+}
+
+// =============================================================================
+// TRANSLATION HELPER - Russian to English with poetic style preservation
+// =============================================================================
+
+async function translateToEnglish(russianText: string, title: string): Promise<string> {
+  const translatePrompt = `You are translating raw, underground Russian poetry/prose by Elena Revicheva.
+
+RUSSIAN ORIGINAL:
+${russianText}
+
+TITLE: ${title}
+
+Translate to English while:
+1. Preserving the raw, confessional tone
+2. Keeping the street language feel (find English equivalents)
+3. Maintaining the rhythm and emotional impact
+4. Keeping any English/Spanish words that are already in the original
+5. Preserving line breaks and structure
+
+IMPORTANT: Return ONLY the English translation, nothing else. No explanations.`;
+
+  return await createContent(translatePrompt, 2000);
+}
+
+// =============================================================================
+// NFT METADATA CREATOR - Matches exact format on atuona.xyz
+// =============================================================================
+
+function createNFTMetadata(
+  pageId: string,
+  title: string,
+  russianText: string,
+  englishText: string,
+  theme: string
+): object {
+  return {
+    name: `${title} #${pageId}`,
+    description: `ATUONA Gallery of Moments - ${title}. Underground poetry preserved on blockchain. Free collection - true to underground values. ${theme}`,
+    image: `https://atuona.xyz/images/poem-${pageId}.png`,
+    attributes: [
+      { trait_type: "Poem", value: title },
+      { trait_type: "ID", value: pageId },
+      { trait_type: "Collection", value: "GALLERY OF MOMENTS" },
+      { trait_type: "Type", value: "Free Underground Poetry" },
+      { trait_type: "Language", value: "Russian + English" },
+      { trait_type: "Year", value: "2019-2025" },
+      { trait_type: "Theme", value: theme },
+      { trait_type: "Russian Text", value: russianText },
+      { trait_type: "English Text", value: englishText }
+    ]
+  };
+}
+
+// For the main JSON file format (like atuona-45-poems-with-text.json)
+function createFullPoemEntry(
+  pageId: string,
+  title: string,
+  russianText: string,
+  englishText: string,
+  theme: string
+): object {
+  return {
+    name: `${title} #${pageId}`,
+    description: `ATUONA Gallery of Moments - Underground Poem ${pageId}. '${title}' - ${theme}. Raw, unfiltered Russian poetry preserved on blockchain.`,
+    image: `https://fast-yottabyte-noisy.on-fleek.app/images/poem-${pageId}.png`,
+    attributes: [
+      { trait_type: "Title", value: title },
+      { trait_type: "ID", value: pageId },
+      { trait_type: "Collection", value: "GALLERY OF MOMENTS" },
+      { trait_type: "Type", value: "Free Underground Poetry" },
+      { trait_type: "Language", value: "Russian" },
+      { trait_type: "Theme", value: theme },
+      { trait_type: "Poem Text", value: russianText },
+      { trait_type: "English Translation", value: englishText }
+    ]
+  };
 }
 
 // =============================================================================
@@ -199,31 +289,37 @@ _"Paradise is not a place. It's a state of creation."_ 🌴
 🎭 *ATUONA Menu*
 
 ━━━━━━━━━━━━━━━━━━━━
-📝 *CREATE*
+📥 *IMPORT EXISTING*
 ━━━━━━━━━━━━━━━━━━━━
-/create - Generate next book page
-/continue - Continue from last page
-/chapter <theme> - Start new chapter
+/import - Import Russian text
+/translate - Translate & preview
+/batch - Import multiple pages
+
+━━━━━━━━━━━━━━━━━━━━
+📝 *CREATE NEW*
+━━━━━━━━━━━━━━━━━━━━
+/create - Generate next page
+/continue - Continue story
+/chapter <theme> - New chapter
 
 ━━━━━━━━━━━━━━━━━━━━
 📖 *PUBLISH*
 ━━━━━━━━━━━━━━━━━━━━
 /preview - See before publishing
 /publish - Push to atuona.xyz
-/cto <message> - Talk to CTO AIPA
+/cto <message> - Talk to CTO
 
 ━━━━━━━━━━━━━━━━━━━━
 🎨 *CREATIVE*
 ━━━━━━━━━━━━━━━━━━━━
-/style - My writing style
+/style - Writing style
 /inspire - Get inspiration
-/theme <topic> - Explore a theme
 
 ━━━━━━━━━━━━━━━━━━━━
 📊 *STATUS*
 ━━━━━━━━━━━━━━━━━━━━
 /status - Book progress
-/history - Recent pages
+/queue - Import queue status
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
   });
@@ -299,6 +395,197 @@ Be poetic but practical. In Russian with English phrases naturally mixed.`;
       console.error('Inspire error:', error);
       await ctx.reply('❌ Could not find inspiration. Try again!');
     }
+  });
+  
+  // ==========================================================================
+  // IMPORT EXISTING CONTENT - Translate Russian to English
+  // ==========================================================================
+  
+  // /import - Import existing Russian text
+  atuonaBot.command('import', async (ctx) => {
+    const text = ctx.message?.text?.replace('/import', '').trim();
+    
+    if (!text) {
+      await ctx.reply(`📥 *Import Russian Text*
+
+Send your Russian poem/prose like this:
+
+\`/import Были, друг, мы когда-то дети.
+Вместо нас теперь, вон, кресты.
+В этой долбаной эстафете
+Победили не я и не ты.\`
+
+Or send the title first:
+
+\`/import На память | Были, друг, мы когда-то дети...\`
+
+I will:
+1. ✅ Store the Russian original
+2. 🔄 Translate to English
+3. 📋 Format as NFT metadata
+4. 🎯 Ready for /publish`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`📥 Importing Russian text...`);
+    
+    try {
+      // Check if title is provided with | separator
+      let title = '';
+      let russianText = text;
+      
+      if (text.includes('|')) {
+        const parts = text.split('|');
+        title = parts[0]?.trim() || '';
+        russianText = parts.slice(1).join('|').trim();
+      }
+      
+      // If no title, ask AI to suggest one
+      if (!title) {
+        const titlePrompt = `Based on this Russian poem/prose, suggest a short title (1-3 words, can be Russian or English):
+
+"${russianText.substring(0, 500)}"
+
+Return ONLY the title, nothing else.`;
+        title = await createContent(titlePrompt, 50);
+        title = title.replace(/['"]/g, '').trim();
+      }
+      
+      await ctx.reply(`📝 Title: "${title}"\n\n🔄 Translating to English...`);
+      
+      // Translate to English
+      const englishText = await translateToEnglish(russianText, title);
+      
+      // Detect theme
+      const themePrompt = `Based on this poem, give ONE word theme (e.g., Memory, Loss, Love, Recovery, Family, Technology, Paradise):
+
+"${russianText.substring(0, 300)}"
+
+Return ONLY one word.`;
+      const theme = await createContent(themePrompt, 20);
+      
+      // Store in book state
+      bookState.lastPageTitle = title;
+      bookState.lastPageContent = russianText;
+      bookState.lastPageEnglish = englishText;
+      bookState.lastPageTheme = theme.trim();
+      
+      // Save to memory
+      await saveMemory('ATUONA', 'imported_page', {
+        page: bookState.currentPage,
+        title,
+        theme: bookState.lastPageTheme,
+        imported: true
+      }, russianText, {
+        type: 'import',
+        english: englishText,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Show preview
+      const previewMessage = `✅ *Import Complete!*
+
+📖 *Page #${String(bookState.currentPage).padStart(3, '0')}*
+📌 *"${title}"*
+🎭 Theme: ${bookState.lastPageTheme}
+
+━━━━━━━━━━━━━━━━━━━━
+🇷🇺 *RUSSIAN ORIGINAL*
+━━━━━━━━━━━━━━━━━━━━
+${russianText.substring(0, 800)}${russianText.length > 800 ? '...' : ''}
+
+━━━━━━━━━━━━━━━━━━━━
+🇬🇧 *ENGLISH TRANSLATION*
+━━━━━━━━━━━━━━━━━━━━
+${englishText.substring(0, 800)}${englishText.length > 800 ? '...' : ''}
+
+━━━━━━━━━━━━━━━━━━━━
+
+✅ Ready! Use:
+• /preview - Full text both languages
+• /publish - Push to atuona.xyz as NFT
+• /import - Import another page`;
+
+      await ctx.reply(previewMessage, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Import error:', error);
+      await ctx.reply('❌ Error importing. Try again!');
+    }
+  });
+  
+  // /translate - Re-translate or adjust translation
+  atuonaBot.command('translate', async (ctx) => {
+    if (!bookState.lastPageContent) {
+      await ctx.reply('❌ No page imported. Use /import first!');
+      return;
+    }
+    
+    const instruction = ctx.message?.text?.replace('/translate', '').trim();
+    
+    await ctx.reply('🔄 Re-translating...');
+    
+    try {
+      let translatePrompt = `You are translating raw, underground Russian poetry/prose by Elena Revicheva.
+
+RUSSIAN ORIGINAL:
+${bookState.lastPageContent}
+
+TITLE: ${bookState.lastPageTitle}`;
+
+      if (instruction) {
+        translatePrompt += `\n\nSPECIAL INSTRUCTION: ${instruction}`;
+      }
+
+      translatePrompt += `\n\nTranslate to English while:
+1. Preserving the raw, confessional tone
+2. Keeping the street language feel
+3. Maintaining emotional impact
+4. Keeping any English/Spanish words from original
+
+Return ONLY the English translation.`;
+
+      const newTranslation = await createContent(translatePrompt, 2000);
+      bookState.lastPageEnglish = newTranslation;
+      
+      await ctx.reply(`✅ *New Translation*
+
+${newTranslation}
+
+━━━━━━━━━━━━━━━━━━━━
+Use /publish to push to atuona.xyz`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Translate error:', error);
+      await ctx.reply('❌ Error translating. Try again!');
+    }
+  });
+  
+  // /queue - Show import queue status
+  atuonaBot.command('queue', async (ctx) => {
+    if (importQueue.length === 0) {
+      await ctx.reply(`📋 *Import Queue*
+
+Queue is empty.
+
+Current page ready: ${bookState.lastPageTitle ? `"${bookState.lastPageTitle}"` : 'None'}
+
+Use /import to add pages.`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    let queueList = importQueue.slice(0, 10).map((p, i) => 
+      `${i + 1}. ${p.title || 'Untitled'}`
+    ).join('\n');
+    
+    await ctx.reply(`📋 *Import Queue*
+
+${queueList}
+${importQueue.length > 10 ? `\n... and ${importQueue.length - 10} more` : ''}
+
+Total: ${importQueue.length} pages
+
+Use /batch to process queue.`, { parse_mode: 'Markdown' });
   });
   
   // /create - Generate next page
@@ -382,75 +669,69 @@ ${content.substring(0, 1500)}${content.length > 1500 ? '...' : ''}
     }
   });
   
-  // /preview - Full preview
+  // /preview - Full preview with both languages
   atuonaBot.command('preview', async (ctx) => {
     if (!bookState.lastPageContent) {
-      await ctx.reply('❌ No page to preview. Use /create first!');
+      await ctx.reply('❌ No page to preview. Use /import or /create first!');
       return;
     }
     
-    const fullPreview = `📖 *FULL PREVIEW*
-
-*Page #${String(bookState.currentPage).padStart(3, '0')}*
+    const pageId = String(bookState.currentPage).padStart(3, '0');
+    
+    // Send Russian first
+    const russianPreview = `📖 *FULL PREVIEW - Page #${pageId}*
 *"${bookState.lastPageTitle}"*
+🎭 Theme: ${bookState.lastPageTheme || 'Journey'}
+
+━━━━━━━━━━━━━━━━━━━━
+🇷🇺 *RUSSIAN ORIGINAL*
+━━━━━━━━━━━━━━━━━━━━
+
+${bookState.lastPageContent}`;
+
+    await ctx.reply(russianPreview, { parse_mode: 'Markdown' });
+    
+    // Send English if available
+    if (bookState.lastPageEnglish) {
+      const englishPreview = `━━━━━━━━━━━━━━━━━━━━
+🇬🇧 *ENGLISH TRANSLATION*
+━━━━━━━━━━━━━━━━━━━━
+
+${bookState.lastPageEnglish}
 
 ━━━━━━━━━━━━━━━━━━━━
 
-${bookState.lastPageContent}
+✅ Ready to publish!
+• /publish - Push to atuona.xyz
+• /translate - Adjust translation
+• /import - Import different text`;
 
-━━━━━━━━━━━━━━━━━━━━
-
-Ready to publish? Use /publish`;
-
-    // Split if too long
-    if (fullPreview.length > 4000) {
-      const parts = fullPreview.match(/.{1,4000}/gs) || [];
-      for (const part of parts) {
-        await ctx.reply(part, { parse_mode: 'Markdown' });
-      }
+      await ctx.reply(englishPreview, { parse_mode: 'Markdown' });
     } else {
-      await ctx.reply(fullPreview, { parse_mode: 'Markdown' });
+      await ctx.reply(`⚠️ No English translation yet.
+
+Use /translate to create one, or /publish will use Russian only.`);
     }
   });
   
   // /publish - Publish to GitHub via CTO AIPA
   atuonaBot.command('publish', async (ctx) => {
     if (!bookState.lastPageContent) {
-      await ctx.reply('❌ No page to publish. Use /create first!');
+      await ctx.reply('❌ No page to publish. Use /import or /create first!');
       return;
     }
     
-    await ctx.reply('🚀 Publishing to atuona.xyz...\n\n_Asking CTO AIPA to push to GitHub..._', { parse_mode: 'Markdown' });
+    await ctx.reply('🚀 Publishing to atuona.xyz...\n\n_Pushing to GitHub → Fleek auto-deploys..._', { parse_mode: 'Markdown' });
     
     try {
       const pageId = String(bookState.currentPage).padStart(3, '0');
+      const title = bookState.lastPageTitle;
+      const russianText = bookState.lastPageContent;
+      const englishText = bookState.lastPageEnglish || russianText; // Fallback to Russian if no translation
+      const theme = bookState.lastPageTheme || 'Journey';
       
-      // Create NFT metadata JSON
-      const metadata = {
-        name: `${bookState.lastPageTitle} #${pageId}`,
-        description: `ATUONA Book - Page ${pageId}. "${bookState.lastPageTitle}" - A page from "Finding Paradise on Earth through Vibe Coding" by Elena Revicheva & Atuona AI.`,
-        image: `https://fast-yottabyte-noisy.on-fleek.app/images/poem-${pageId}.png`,
-        attributes: [
-          { trait_type: "Title", value: bookState.lastPageTitle },
-          { trait_type: "ID", value: pageId },
-          { trait_type: "Collection", value: "FINDING PARADISE" },
-          { trait_type: "Type", value: "Book Page" },
-          { trait_type: "Chapter", value: String(bookState.currentChapter) },
-          { trait_type: "Language", value: "Russian" },
-          { trait_type: "Page Text", value: bookState.lastPageContent }
-        ]
-      };
-      
-      // Create gallery slot HTML
-      const gallerySlot = `
-                        <div class="gallery-slot" onclick="claimPoem(${bookState.currentPage}, '${bookState.lastPageTitle.replace(/'/g, "\\'")}')">
-                            <div class="slot-content">
-                                <div class="slot-id">${pageId}</div>
-                                <div class="slot-label">${bookState.lastPageTitle}</div>
-                                <div class="slot-year">2025</div>
-                                <div class="claim-button">CLAIM NFT</div>
-                            </div>
-                        </div>`;
+      // Create NFT metadata JSON - matching exact format on atuona.xyz
+      const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
       
       // Try to create files via GitHub API
       const repoName = 'atuona';
@@ -463,41 +744,63 @@ Ready to publish? Use /publish`;
         ref: `heads/${branch}`
       });
       
-      // Create metadata file
+      // Create metadata file in metadata/ folder
       const metadataContent = JSON.stringify(metadata, null, 2);
       await octokit.repos.createOrUpdateFileContents({
         owner: 'ElenaRevicheva',
         repo: repoName,
-        path: `metadata/poem-${pageId}.json`,
-        message: `📖 Add page ${pageId}: ${bookState.lastPageTitle}`,
+        path: `metadata/${pageId}.json`,
+        message: `📖 Add poem ${pageId}: ${title}`,
         content: Buffer.from(metadataContent).toString('base64'),
         branch
       });
+      
+      console.log(`🎭 Atuona published page ${pageId} to GitHub`);
       
       // Update book state
       bookState.totalPages = bookState.currentPage;
       bookState.currentPage++;
       
+      // Clear for next page
+      const publishedTitle = title;
+      bookState.lastPageTitle = '';
+      bookState.lastPageContent = '';
+      bookState.lastPageEnglish = '';
+      bookState.lastPageTheme = '';
+      
       await ctx.reply(`✅ *Published Successfully!*
 
-📖 Page #${pageId}: "${bookState.lastPageTitle}"
-📁 File: metadata/poem-${pageId}.json
-🌐 Will appear on atuona.xyz shortly!
+📖 *Poem #${pageId}*: "${publishedTitle}"
+📁 File: \`metadata/${pageId}.json\`
 
-_Fleek will auto-deploy from GitHub._
+━━━━━━━━━━━━━━━━━━━━
+🇷🇺 Russian original ✅
+🇬🇧 English translation ✅
+🎭 Theme: ${theme}
+━━━━━━━━━━━━━━━━━━━━
 
-Next page will be #${String(bookState.currentPage).padStart(3, '0')}`, { parse_mode: 'Markdown' });
-      
-      // Notify CTO AIPA (if available)
-      console.log(`🎭 Atuona published page ${pageId} to GitHub`);
+🌐 *atuona.xyz will update automatically!*
+_(Fleek deploys from GitHub)_
+
+📝 Next page: #${String(bookState.currentPage).padStart(3, '0')}
+
+Use /import for next Russian text!`, { parse_mode: 'Markdown' });
       
     } catch (error: any) {
       console.error('Publish error:', error);
       
       if (error.status === 422) {
-        await ctx.reply(`⚠️ File might already exist. Check the repo!`);
+        await ctx.reply(`⚠️ File already exists! Page ${String(bookState.currentPage).padStart(3, '0')} may already be published.
+
+Use /status to check current page number.`);
+      } else if (error.status === 404) {
+        await ctx.reply(`❌ Repository not found or no access.
+
+Make sure GitHub token has write access to ElenaRevicheva/atuona`);
       } else {
-        await ctx.reply(`❌ Error publishing: ${error.message || 'Unknown error'}\n\nTry again or ask CTO AIPA for help!`);
+        await ctx.reply(`❌ Error: ${error.message || 'Unknown error'}
+
+Try again or check GitHub permissions!`);
       }
     }
   });
