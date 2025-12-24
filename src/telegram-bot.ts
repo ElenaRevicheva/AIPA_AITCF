@@ -297,15 +297,18 @@ Give a quick review with:
       const firstContent = response.content[0];
       const review = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not generate review.';
       
-      const reviewMessage = `
-🔍 *Review: ${repoName}*
-📝 Commit: \`${commitSha}\`
-💬 "${commitMessage}"
-
-${review}
-      `;
+      // Escape special characters for Telegram
+      const safeCommitMessage = commitMessage.replace(/[_*`\[\]()~>#+\-=|{}.!]/g, '\\$&');
+      const safeRepoName = repoName.replace(/[_*`\[\]()~>#+\-=|{}.!]/g, '\\$&');
       
-      await ctx.reply(reviewMessage, { parse_mode: 'Markdown' });
+      const reviewMessage = `🔍 Review: ${safeRepoName}
+📝 Commit: ${commitSha}
+💬 "${safeCommitMessage.substring(0, 100)}"
+
+${review}`;
+      
+      // Send without Markdown to avoid parsing issues with AI-generated content
+      await ctx.reply(reviewMessage);
       
     } catch (error: any) {
       if (error.status === 404) {
