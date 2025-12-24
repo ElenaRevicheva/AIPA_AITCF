@@ -751,6 +751,7 @@ async function startCTOAIPA() {
     console.log(`💬 Ask CTO: http://163.192.99.45:${PORT}/ask-cto`);
     console.log(`📋 CMO Updates: http://163.192.99.45:${PORT}/cmo-updates`);
     console.log(`🏥 Health: http://163.192.99.45:${PORT}/`);
+    console.log(`🤝 CMO Integration: https://vibejobhunter-production.up.railway.app/api/tech-update`);
     
     // Initialize Telegram Bot
     const telegramBot = initTelegramBot();
