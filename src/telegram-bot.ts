@@ -74,6 +74,48 @@ const AIDEAZZ_REPOS = [
 let bot: Bot | null = null;
 let cronJobs: cron.ScheduledTask[] = [];
 
+// =============================================================================
+// AI HELPER: Try Claude first, fallback to Groq if credits exhausted
+// =============================================================================
+
+async function askAI(prompt: string, maxTokens: number = 1500): Promise<string> {
+  // Try Claude first (better quality)
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-opus-4-20250514',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: prompt }]
+    });
+    
+    const firstContent = response.content[0];
+    return firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not generate response.';
+  } catch (claudeError: any) {
+    // Check if it's a credit/billing error
+    const errorMessage = claudeError?.error?.error?.message || claudeError?.message || '';
+    if (errorMessage.includes('credit') || errorMessage.includes('billing') || claudeError?.status === 400) {
+      console.log('⚠️ Claude credits low, falling back to Groq...');
+      
+      // Fallback to Groq (free!)
+      try {
+        const groqResponse = await groq.chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: maxTokens,
+          temperature: 0.7
+        });
+        
+        return groqResponse.choices[0]?.message?.content || 'Could not generate response.';
+      } catch (groqError) {
+        console.error('Groq fallback error:', groqError);
+        throw groqError;
+      }
+    }
+    
+    // Re-throw other errors
+    throw claudeError;
+  }
+}
+
 export function initTelegramBot(): Bot | null {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   
@@ -354,18 +396,8 @@ Use */review* <repo-name> to review latest commit!
         timestamp: new Date().toISOString()
       });
       
-      // Get AI quick reaction
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 300,
-        messages: [{ 
-          role: 'user', 
-          content: `${AIDEAZZ_CONTEXT}\n\nElena just captured this startup idea: "${ideaText}"\n\nGive a VERY brief reaction (2-3 sentences max): Is it good? One quick suggestion to make it better. Use emojis. Be encouraging!`
-        }]
-      });
-      
-      const firstContent = response.content[0];
-      const reaction = firstContent && firstContent.type === 'text' ? firstContent.text : '💡 Great idea!';
+      // Get AI quick reaction (with Groq fallback)
+      const reaction = await askAI(`${AIDEAZZ_CONTEXT}\n\nElena just captured this startup idea: "${ideaText}"\n\nGive a VERY brief reaction (2-3 sentences max): Is it good? One quick suggestion to make it better. Use emojis. Be encouraging!`, 300);
       
       await ctx.reply(`💡 *Idea Captured!*\n\n"${ideaText.substring(0, 200)}${ideaText.length > 200 ? '...' : ''}"\n\n${reaction}\n\n_Use /ideas to view all saved ideas_`, { parse_mode: 'Markdown' });
       
@@ -551,14 +583,8 @@ Format for Telegram (no markdown that might break):
 
 Remember: She uses Cursor AI Agents, so the exercise should work there.`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 2000,
-        messages: [{ role: 'user', content: lessonPrompt }]
-      });
-      
-      const firstContent = response.content[0];
-      const lesson = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not generate lesson.';
+      // Use askAI with Groq fallback
+      const lesson = await askAI(lessonPrompt, 2000);
       
       // Save progress
       await saveMemory('CTO', 'learning_progress', { 
@@ -620,14 +646,8 @@ Format for Telegram (no complex markdown):
 
 Be specific and practical!`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: exercisePrompt }]
-      });
-      
-      const firstContent = response.content[0];
-      const exercise = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not generate exercise.';
+      // Use askAI with Groq fallback
+      const exercise = await askAI(exercisePrompt, 1500);
       
       await ctx.reply(exercise);
       
@@ -661,14 +681,8 @@ She's transitioning from "vibe coder" to real coder. Explain this concept:
 
 Keep it concise for Telegram. Use emojis. Be encouraging!`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: explainPrompt }]
-      });
-      
-      const firstContent = response.content[0];
-      const explanation = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not explain.';
+      // Use askAI with Groq fallback
+      const explanation = await askAI(explainPrompt, 1500);
       
       await ctx.reply(explanation);
       
@@ -768,14 +782,8 @@ Important:
 - Keep it practical and simple
 - This is for a real PR that will be reviewed`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 4000,
-        messages: [{ role: 'user', content: codePrompt }]
-      });
-      
-      const firstContent = response.content[0];
-      const codeResponse = firstContent && firstContent.type === 'text' ? firstContent.text : '';
+      // Use askAI with Groq fallback
+      const codeResponse = await askAI(codePrompt, 4000);
       
       // Parse the response
       const filenameMatch = codeResponse.match(/FILENAME:\s*(.+)/);
@@ -971,14 +979,8 @@ PR_BODY: <2-3 sentence description of the fix>
 
 Be practical and create working code.`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 4000,
-        messages: [{ role: 'user', content: fixPrompt }]
-      });
-      
-      const firstContent = response.content[0];
-      const fixResponse = firstContent && firstContent.type === 'text' ? firstContent.text : '';
+      // Use askAI with Groq fallback
+      const fixResponse = await askAI(fixPrompt, 4000);
       
       // Parse response
       const filenameMatch = fixResponse.match(/FILENAME:\s*(.+)/);
@@ -1124,14 +1126,8 @@ Give a quick review with:
 • One suggestion
 • Overall verdict (👍 or ⚠️ or ❌)`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: reviewPrompt }]
-      });
-      
-      const firstContent = response.content[0];
-      const review = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not generate review.';
+      // Use askAI with Groq fallback
+      const review = await askAI(reviewPrompt, 1000);
       
       // Escape special characters for Telegram
       const safeCommitMessage = commitMessage.replace(/[_*`\[\]()~>#+\-=|{}.!]/g, '\\$&');
@@ -1272,30 +1268,43 @@ ${review}`;
 
 Keep response concise for Telegram. Use emojis.`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 1500,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: 'image/jpeg',
-                data: base64Image
-              }
-            },
-            {
-              type: 'text',
-              text: `${AIDEAZZ_CONTEXT}\n\n${analysisPrompt}`
-            }
-          ]
-        }]
-      });
+      let analysis: string;
       
-      const firstContent = response.content[0];
-      const analysis = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not analyze image.';
+      try {
+        // Try Claude Vision (requires credits)
+        const response = await anthropic.messages.create({
+          model: 'claude-opus-4-20250514',
+          max_tokens: 1500,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: 'image/jpeg',
+                  data: base64Image
+                }
+              },
+              {
+                type: 'text',
+                text: `${AIDEAZZ_CONTEXT}\n\n${analysisPrompt}`
+              }
+            ]
+          }]
+        });
+        
+        const firstContent = response.content[0];
+        analysis = firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not analyze image.';
+      } catch (visionError: any) {
+        // If Claude credits exhausted, ask user to describe instead
+        const errorMsg = visionError?.error?.error?.message || '';
+        if (errorMsg.includes('credit') || errorMsg.includes('billing')) {
+          await ctx.reply('⚠️ Image analysis temporarily unavailable (API credits). Please describe what you see in the image and I\'ll help!\n\nExample: "I see an error message saying TypeError in my code"');
+          return;
+        }
+        throw visionError;
+      }
       
       // Save to memory
       await saveMemory('CTO', 'image_analysis', { 
@@ -1350,14 +1359,8 @@ Previous context: ${JSON.stringify(context)}
 
 Respond naturally as her CTO co-founder would. If she asks something complex, give the key points first, then offer to elaborate.`;
 
-      const response = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: prompt }]
-      });
-      
-      const firstContent = response.content[0];
-      const answer = firstContent && firstContent.type === 'text' ? firstContent.text : 'Sorry, I could not process that.';
+      // Use askAI with automatic Claude->Groq fallback
+      const answer = await askAI(prompt, 1500);
       
       // Save to memory
       await saveMemory('CTO', 'telegram_qa', { question }, answer, {
@@ -1508,14 +1511,8 @@ Generate a brief (2-3 sentences) morning motivation and ONE specific technical t
 
 Be concise, motivating, and actionable. This is Telegram mobile - keep it short!`;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-opus-4-20250514',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: suggestionPrompt }]
-    });
-    
-    const firstContent = response.content[0];
-    const suggestion = firstContent && firstContent.type === 'text' ? firstContent.text : 'Focus on your highest-value task!';
+    // Use askAI with Groq fallback
+    const suggestion = await askAI(suggestionPrompt, 500);
     
     // 4. Format briefing
     const activityLines = recentActivity.slice(0, 4).map(r => 
@@ -1665,14 +1662,9 @@ function startScheduledTasks(bot: Bot): void {
           } catch {}
         }
         
-        // Get AI suggestion
-        const suggestionPrompt = `Give Elena one specific, actionable task for today in 1-2 sentences. Be motivating!`;
-        const response = await anthropic.messages.create({
-          model: 'claude-opus-4-20250514',
-          max_tokens: 200,
-          messages: [{ role: 'user', content: `${AIDEAZZ_CONTEXT}\n\n${suggestionPrompt}` }]
-        });
-        const suggestion = response.content[0]?.type === 'text' ? response.content[0].text : 'Ship something today! 🚀';
+        // Get AI suggestion (with Groq fallback)
+        const suggestionPrompt = `${AIDEAZZ_CONTEXT}\n\nGive Elena one specific, actionable task for today in 1-2 sentences. Be motivating!`;
+        const suggestion = await askAI(suggestionPrompt, 200);
         
         const briefing = `${greeting}
 
