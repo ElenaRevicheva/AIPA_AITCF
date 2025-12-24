@@ -117,53 +117,78 @@ export function initTelegramBot(): Bot | null {
 🤖 *CTO AIPA v3.2*
 Your AI Technical Co-Founder
 
-Hey Elena! I'm your CTO. Here's what I can do:
+Hey Elena! I'm your CTO. Quick start:
 
-☀️ */daily* - Your morning briefing
-📊 */stats* - Ecosystem metrics & activity
-💡 */idea* <text> - Capture startup ideas
-📸 *Send a photo* - I'll analyze it!
-🎤 *Voice note* - Talk naturally!
+📊 /stats - See your productivity
+💡 /idea - Capture startup ideas
+📸 Send photo - I analyze it!
+🎤 Voice note - Just talk!
+💬 Chat - Ask me anything!
 
-💬 */ask* <question> - Ask me anything
-🔍 */review* <repo> - Review latest commit
-🔔 */alerts* - Toggle proactive alerts
-📋 */repos* - List all 11 repositories
+Type /menu for all commands!
 
-🔔 You're registered for daily briefings at 8 AM Panama!
-
-Or just chat naturally - I'm here to help! 🚀
+🔔 Daily briefings at 8 AM Panama enabled!
     `;
     await ctx.reply(welcomeMessage, { parse_mode: 'Markdown' });
   });
   
   // /help - Show commands
   bot.command('help', async (ctx) => {
-    const helpMessage = `
-🆘 *CTO AIPA Commands*
-
-📊 */stats* - Ecosystem metrics & weekly activity
-💡 */idea* <text> - Capture startup ideas
-☀️ */daily* - Morning briefing & today's focus
-📋 */status* - Check service health
-💬 */ask* <question> - Ask any question
-🔍 */review* <repo> - Review latest commit
-🔔 */alerts* - Toggle proactive alerts
-📋 */repos* - List all 11 repositories
-💡 */suggest* - Get today's suggestion
-🛣️ */roadmap* - See technical roadmap
-💾 */ideas* - View saved ideas
-
-📸 *Screenshots & Photos*
-Send any image - error, UI, diagram - I'll analyze!
-
-🎤 *Voice Messages*
-Hold mic and talk - I'll transcribe & respond!
-
-💬 *Or just chat naturally!*
-    `;
-    await ctx.reply(helpMessage, { parse_mode: 'Markdown' });
+    await showMenu(ctx);
   });
+  
+  // /menu - Show organized menu
+  bot.command('menu', async (ctx) => {
+    await showMenu(ctx);
+  });
+  
+  async function showMenu(ctx: Context) {
+    const menuMessage = `
+🤖 *CTO AIPA v3.2 - Menu*
+
+━━━━━━━━━━━━━━━━━━━━
+📊 *INSIGHTS*
+━━━━━━━━━━━━━━━━━━━━
+/stats - Weekly ecosystem metrics
+/daily - Morning briefing & focus
+/status - Service health check
+
+━━━━━━━━━━━━━━━━━━━━
+💡 *IDEAS & NOTES*
+━━━━━━━━━━━━━━━━━━━━
+/idea <text> - Save a startup idea
+/ideas - View all saved ideas
+
+━━━━━━━━━━━━━━━━━━━━
+🔍 *CODE & REPOS*
+━━━━━━━━━━━━━━━━━━━━
+/review <repo> - Review latest commit
+/repos - List all 11 repositories
+
+━━━━━━━━━━━━━━━━━━━━
+💬 *ASK & CHAT*
+━━━━━━━━━━━━━━━━━━━━
+/ask <question> - Ask any question
+/suggest - Get today's suggestion
+Just type anything - I'll respond!
+
+━━━━━━━━━━━━━━━━━━━━
+⚙️ *SETTINGS*
+━━━━━━━━━━━━━━━━━━━━
+/alerts - Toggle daily alerts
+/roadmap - See feature roadmap
+
+━━━━━━━━━━━━━━━━━━━━
+🎤📸 *MEDIA*
+━━━━━━━━━━━━━━━━━━━━
+🎤 Voice note → I transcribe & respond
+📸 Send photo → I analyze it!
+
+━━━━━━━━━━━━━━━━━━━━
+Type /menu anytime to see this!
+    `;
+    await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
+  }
   
   // /status - Ecosystem status
   bot.command('status', async (ctx) => {
