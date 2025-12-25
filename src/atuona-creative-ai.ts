@@ -82,9 +82,10 @@ interface BookState {
   currentPage: number;
   lastPageContent: string;
   lastPageTitle: string;
-  lastPageEnglish: string;    // English translation
+  lastPageTitleEnglish: string; // English title translation
+  lastPageEnglish: string;      // English translation of poem
   lastPageTheme: string;
-  lastPageDescription: string; // AI-generated poetic description
+  lastPageDescription: string;  // AI-generated poetic description
   totalPages: number;
 }
 
@@ -93,6 +94,7 @@ let bookState: BookState = {
   currentPage: 46, // Continuing from existing 45 poems
   lastPageContent: '',
   lastPageTitle: '',
+  lastPageTitleEnglish: '',
   lastPageEnglish: '',
   lastPageTheme: '',
   lastPageDescription: '',
@@ -252,11 +254,11 @@ function createFullPoemEntry(
 }
 
 // Create NFT card HTML for VAULT section (main page with English translation)
-// Matches exact style of card #001
+// Matches exact style of card #001 but with English title and text
 function createNFTCardHtml(
   pageId: string,
   pageNum: number,
-  title: string,
+  englishTitle: string,
   englishText: string,
   theme: string,
   description?: string
@@ -282,7 +284,7 @@ function createNFTCardHtml(
                             <div class="nft-status live">LIVE</div>
                         </div>
                         <div class="nft-content">
-                            <h2 class="nft-title">${title}</h2>
+                            <h2 class="nft-title">${englishTitle}</h2>
                             <div class="nft-verse">
                                 ${formattedEnglish}
                             </div>
@@ -294,7 +296,7 @@ function createNFTCardHtml(
                             </p>
                             <div class="nft-meta">
                                 <div class="nft-price">FREE - GAS Only!</div>
-                                <button class="nft-action" onclick="claimPoem('${pageId}', '${title.replace(/'/g, "\\'")}')">COLLECT SOUL</button>
+                                <button class="nft-action" onclick="claimPoem('${pageId}', '${englishTitle.replace(/'/g, "\\'")}')">COLLECT SOUL</button>
                                 <small style="color: var(--silver-grey); font-size: 0.7rem; margin-top: 0.5rem; display: block; font-family: 'JetBrains Mono', monospace;">Minimal fee covers blockchain preservation costs</small>
                             </div>
                         </div>
@@ -537,8 +539,16 @@ Return ONLY the title, nothing else.`;
       
       await ctx.reply(`📝 Title: "${title}"\n\n🔄 Translating to English...`);
       
-      // Translate to English
+      // Translate poem to English
       const englishText = await translateToEnglish(russianText, title);
+      
+      // Translate title to English
+      const titlePromptEn = `Translate this Russian poem title to English. Keep it poetic and evocative:
+
+"${title}"
+
+Return ONLY the English title, nothing else. No quotes.`;
+      const englishTitle = await createContent(titlePromptEn, 50);
       
       // Detect theme
       const themePrompt = `Based on this poem, give ONE word theme (e.g., Memory, Loss, Love, Recovery, Family, Technology, Paradise):
@@ -559,6 +569,7 @@ Return ONLY the description, no quotes, no intro. Maximum 150 characters.`;
       
       // Store in book state
       bookState.lastPageTitle = title;
+      bookState.lastPageTitleEnglish = englishTitle.trim();
       bookState.lastPageContent = russianText;
       bookState.lastPageEnglish = englishText;
       bookState.lastPageTheme = theme.trim();
@@ -580,7 +591,8 @@ Return ONLY the description, no quotes, no intro. Maximum 150 characters.`;
       const previewMessage = `✅ *Import Complete!*
 
 📖 *Page #${String(bookState.currentPage).padStart(3, '0')}*
-📌 *"${title}"*
+📌 *"${bookState.lastPageTitleEnglish}"*
+🇷🇺 Original: ${title}
 🎭 Theme: ${bookState.lastPageTheme}
 📝 Description: ${bookState.lastPageDescription}
 
@@ -854,6 +866,7 @@ Use /translate to create one, or /publish will use Russian only.`);
       
       const pageId = String(pageNum).padStart(3, '0');
       const title = bookState.lastPageTitle;
+      const englishTitle = bookState.lastPageTitleEnglish || title;
       const russianText = bookState.lastPageContent;
       const englishText = bookState.lastPageEnglish || russianText;
       const theme = bookState.lastPageTheme || 'Journey';
@@ -931,7 +944,7 @@ Use /translate to create one, or /publish will use Russian only.`);
           // ============================================================
           // STEP 1: Add NFT card with English translation to VAULT section
           // ============================================================
-          const nftCardHtml = createNFTCardHtml(pageId, pageNum, title, englishText, theme, description);
+          const nftCardHtml = createNFTCardHtml(pageId, pageNum, englishTitle, englishText, theme, description);
           
           // Check if this card already exists
           if (!htmlContent.includes(`nft-id">#${pageId}`)) {
@@ -973,12 +986,12 @@ Use /translate to create one, or /publish will use Russian only.`);
           }
           
           // ============================================================
-          // STEP 2: Add gallery slot to MINT section
+          // STEP 2: Add gallery slot to MINT section (with English title)
           // ============================================================
-          const newSlotHtml = `                        <div class="gallery-slot" onclick="claimPoem(${pageNum}, '${title.replace(/'/g, "\\'")}')">
+          const newSlotHtml = `                        <div class="gallery-slot" onclick="claimPoem(${pageNum}, '${englishTitle.replace(/'/g, "\\'")}')">
                             <div class="slot-content">
                                 <div class="slot-id">${pageId}</div>
-                                <div class="slot-label">${title}</div>
+                                <div class="slot-label">${englishTitle}</div>
                                 <div class="slot-year">2025</div>
                                 <div class="claim-button">CLAIM RANDOM POEM</div>
                             </div>
@@ -1031,6 +1044,7 @@ Use /translate to create one, or /publish will use Russian only.`);
       // Clear for next page
       const publishedTitle = title;
       bookState.lastPageTitle = '';
+      bookState.lastPageTitleEnglish = '';
       bookState.lastPageContent = '';
       bookState.lastPageEnglish = '';
       bookState.lastPageTheme = '';
