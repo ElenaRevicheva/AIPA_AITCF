@@ -252,6 +252,7 @@ function createFullPoemEntry(
 }
 
 // Create NFT card HTML for VAULT section (main page with English translation)
+// Matches exact style of card #001
 function createNFTCardHtml(
   pageId: string,
   pageNum: number,
@@ -260,7 +261,7 @@ function createNFTCardHtml(
   theme: string,
   description?: string
 ): string {
-  // Format English text with line breaks for HTML display
+  // Format English text with line breaks for HTML display (each line ends with <br>)
   const formattedEnglish = englishText
     .split('\n')
     .map(line => line.trim())
@@ -269,6 +270,10 @@ function createNFTCardHtml(
   
   // Use AI-generated description or fallback to generic
   const nftDescription = description || `Underground poetry preserved forever on blockchain. Theme: ${theme}.`;
+  
+  // Format date as DD-MM-YYYY for blockchain badge
+  const now = new Date();
+  const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
   
   return `
                     <div class="nft-card">
@@ -279,10 +284,10 @@ function createNFTCardHtml(
                         <div class="nft-content">
                             <h2 class="nft-title">${title}</h2>
                             <div class="nft-verse">
-                                ${formattedEnglish} ●
+                                ${formattedEnglish}
                             </div>
                             <div class="blockchain-badge">
-                                <span>●</span> PRESERVED ON BLOCKCHAIN - ${new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
+                                <span>●</span> принято к публикации at ATUONA ${dateStr}
                             </div>
                             <p class="nft-description">
                                 ${nftDescription}
@@ -290,6 +295,7 @@ function createNFTCardHtml(
                             <div class="nft-meta">
                                 <div class="nft-price">FREE - GAS Only!</div>
                                 <button class="nft-action" onclick="claimPoem('${pageId}', '${title.replace(/'/g, "\\'")}')">COLLECT SOUL</button>
+                                <small style="color: var(--silver-grey); font-size: 0.7rem; margin-top: 0.5rem; display: block; font-family: 'JetBrains Mono', monospace;">Minimal fee covers blockchain preservation costs</small>
                             </div>
                         </div>
                     </div>
