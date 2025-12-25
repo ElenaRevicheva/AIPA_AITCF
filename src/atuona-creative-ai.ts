@@ -913,21 +913,36 @@ Use /translate to create one, or /publish will use Russian only.`);
           // Check if this card already exists
           if (!htmlContent.includes(`nft-id">#${pageId}`)) {
             // Find the last nft-card in the home section (VAULT)
-            // Pattern: find </section> for home and go back to find last nft-card
             const aboutSection = htmlContent.indexOf('<section id="about"');
             if (aboutSection > 0) {
               const homeSection = htmlContent.slice(0, aboutSection);
               
-              // Find the closing of the nft-grid (last </div> before </section>)
-              // The structure is: </div></div></section> where inner </div> closes nft-grid
-              const gridClosePattern = '</div>\n                </div>\n            </section>';
-              const gridCloseIndex = homeSection.lastIndexOf(gridClosePattern);
+              // The HTML structure has 3-4 closing </div> tags before </section>:
+              //     </div> (nft-meta), </div> (nft-content), </div> (nft-card), </div> (nft-grid), </section>
+              // Find the last nft-card closing and insert after it
               
-              if (gridCloseIndex > 0) {
-                // Insert the NFT card just before the grid closes
-                htmlContent = htmlContent.slice(0, gridCloseIndex) + nftCardHtml + '                    ' + htmlContent.slice(gridCloseIndex);
+              // Strategy: Find the last </div>\n                    </div> pattern (closes nft-card)
+              // then insert new card after it
+              const cardClosePattern = '</div>\n                    </div>';
+              const lastCardClose = homeSection.lastIndexOf(cardClosePattern);
+              
+              if (lastCardClose > 0) {
+                const insertPoint = lastCardClose + cardClosePattern.length;
+                htmlContent = htmlContent.slice(0, insertPoint) + '\n' + nftCardHtml + htmlContent.slice(insertPoint);
                 htmlModified = true;
                 console.log(`🎭 Atuona added NFT card #${pageId} to VAULT section`);
+              } else {
+                // Fallback: insert before </section>
+                const sectionClose = homeSection.lastIndexOf('</section>');
+                if (sectionClose > 0) {
+                  // Go back to find safe insertion point
+                  const safePoint = homeSection.lastIndexOf('</div>\n                </div>\n            </section>');
+                  if (safePoint > 0) {
+                    htmlContent = htmlContent.slice(0, safePoint) + nftCardHtml + '                    ' + htmlContent.slice(safePoint);
+                    htmlModified = true;
+                    console.log(`🎭 Atuona added NFT card #${pageId} to VAULT section (fallback)`);
+                  }
+                }
               }
             }
           } else {
