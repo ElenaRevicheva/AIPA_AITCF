@@ -873,14 +873,21 @@ Use /translate to create one, or /publish will use Russian only.`);
                         </div>
 `;
           
-          // Find the closing of gallery-grid and insert before it
-          // Look for the pattern after the last gallery-slot
-          const insertPoint = htmlContent.lastIndexOf('</div>\n                    </div>\n                </div>\n            </section>');
+          // Find the correct insertion point - after the last complete gallery-slot
+          // Look for the last </div> that closes a gallery-slot before the gallery-grid closes
+          const galleryGridEnd = htmlContent.indexOf('</div>\n                    </div>\n                </div>\n            </section>');
           
-          if (insertPoint > 0) {
-            htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
+          if (galleryGridEnd > 0) {
+            // Find the last gallery-slot closing tag before gallery-grid ends
+            const searchArea = htmlContent.slice(0, galleryGridEnd);
+            const lastSlotEnd = searchArea.lastIndexOf('                        </div>\n');
             
-            await octokit.repos.createOrUpdateFileContents({
+            if (lastSlotEnd > 0) {
+              // Insert after the last complete gallery-slot
+              const insertPoint = lastSlotEnd + '                        </div>\n'.length;
+              htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
+              
+              await octokit.repos.createOrUpdateFileContents({
               owner,
               repo: repoName,
               path: 'index.html',
@@ -891,6 +898,7 @@ Use /translate to create one, or /publish will use Russian only.`);
             });
             
             console.log(`🎭 Atuona added gallery slot for ${pageId} to index.html`);
+            }
           }
         }
       } catch (htmlError) {
@@ -965,6 +973,28 @@ Try again or check GitHub permissions!`);
       }
       
       let htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
+      
+      // STEP 1: Fix broken HTML structure (nested slots)
+      // The bug: slot 046 was inserted INSIDE slot 045 instead of after it
+      const brokenPattern = `                            </div>
+                                                <div class="gallery-slot" onclick="claimPoem(46`;
+      const fixedPattern = `                            </div>
+                        </div>
+                        <div class="gallery-slot" onclick="claimPoem(46`;
+      
+      if (htmlContent.includes(brokenPattern)) {
+        htmlContent = htmlContent.replace(brokenPattern, fixedPattern);
+        await ctx.reply('🔧 Fixed nested slot structure (046 was inside 045)');
+      }
+      
+      // Also fix any general nested slot issues
+      // Pattern: slot-content closes but gallery-slot doesn't before next gallery-slot opens
+      const nestedSlotRegex = /(                            <\/div>)\s*(<div class="gallery-slot")/g;
+      const nestedMatches = htmlContent.match(nestedSlotRegex);
+      if (nestedMatches && nestedMatches.length > 0) {
+        htmlContent = htmlContent.replace(nestedSlotRegex, '$1\n                        </div>\n                        $2');
+        await ctx.reply(`🔧 Fixed ${nestedMatches.length} nested slot(s)`);
+      }
       
       // Count existing slots
       const existingSlots = (htmlContent.match(/gallery-slot/g) || []).length;
