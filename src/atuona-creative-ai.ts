@@ -147,21 +147,50 @@ async function createContent(prompt: string, maxTokens: number = 2000): Promise<
 // =============================================================================
 
 async function translateToEnglish(russianText: string, title: string): Promise<string> {
-  const translatePrompt = `You are translating raw, underground Russian poetry/prose by Elena Revicheva.
+  const translatePrompt = `You are a PROFESSIONAL LITERARY TRANSLATOR specializing in Russian underground poetry.
+
+Your approach is like the best translators of Brodsky, Vysotsky, and Bukowski - capturing SOUL, not just words.
 
 RUSSIAN ORIGINAL:
 ${russianText}
 
 TITLE: ${title}
 
-Translate to English while:
-1. Preserving the raw, confessional tone
-2. Keeping the street language feel (find English equivalents)
-3. Maintaining the rhythm and emotional impact
-4. Keeping any English/Spanish words that are already in the original
-5. Preserving line breaks and structure
+TRANSLATION PRINCIPLES:
 
-IMPORTANT: Return ONLY the English translation, nothing else. No explanations.`;
+1. **SOUL-FOR-SOUL, NOT WORD-FOR-WORD**
+   - Capture the emotional truth, even if words change
+   - A "блять" might become "fucking" or "damn" or silence - whatever hits hardest
+   
+2. **PRESERVE THE MUSIC**
+   - Russian poetry has rhythm - find English rhythm that FEELS similar
+   - Internal rhymes, alliteration, sound patterns matter
+   - Line breaks are intentional - respect them
+   
+3. **STREET LANGUAGE = STREET LANGUAGE**
+   - Russian мат (swearing) → English equivalents with same punch
+   - "долбаная" = "fucking" not "darned"
+   - Slang stays slang, raw stays raw
+   
+4. **CULTURAL BRIDGES**
+   - "Высоцкий" stays "Vysotsky" 
+   - "инста" = "Insta" (Instagram)
+   - "крипта" = "crypto"
+   - Keep Russian words that have no English equivalent
+   
+5. **EMOTIONAL TRUTH**
+   - If a line punches you in Russian, it must punch in English
+   - Despair, hope, dark humor - these cross languages
+   - The ending must land with same impact
+
+6. **ELENA'S VOICE**
+   - She's an ex-CEO turned vibe coder in Panama
+   - Addiction recovery, family distance, building AI
+   - Raw honesty about struggle and beauty
+   - Mix of street and philosophy
+
+Return ONLY the English translation. No notes, no explanations. 
+Make it publishable. Make it hit.`;
 
   return await createContent(translatePrompt, 2000);
 }
