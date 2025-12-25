@@ -973,6 +973,8 @@ Try again or check GitHub permissions!`);
       }
       
       let htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
+      const originalHtml = htmlContent; // Save original to detect changes
+      let structureFixed = false;
       
       // STEP 1: Fix broken HTML structure (nested slots)
       // The bug: slot 046 was inserted INSIDE slot 045 instead of after it
@@ -985,6 +987,7 @@ Try again or check GitHub permissions!`);
       if (htmlContent.includes(brokenPattern)) {
         htmlContent = htmlContent.replace(brokenPattern, fixedPattern);
         await ctx.reply('🔧 Fixed nested slot structure (046 was inside 045)');
+        structureFixed = true;
       }
       
       // Also fix any general nested slot issues
@@ -994,6 +997,7 @@ Try again or check GitHub permissions!`);
       if (nestedMatches && nestedMatches.length > 0) {
         htmlContent = htmlContent.replace(nestedSlotRegex, '$1\n                        </div>\n                        $2');
         await ctx.reply(`🔧 Fixed ${nestedMatches.length} nested slot(s)`);
+        structureFixed = true;
       }
       
       // Count existing slots
@@ -1044,8 +1048,29 @@ Try again or check GitHub permissions!`);
         }
       }
       
-      if (poemsToAdd.length === 0) {
-        await ctx.reply('✅ All poems already have gallery slots!');
+      if (poemsToAdd.length === 0 && !structureFixed) {
+        await ctx.reply('✅ All poems already have gallery slots and HTML is correct!');
+        return;
+      }
+      
+      // If structure was fixed but no new poems, still push the fix
+      if (poemsToAdd.length === 0 && structureFixed) {
+        await octokit.repos.createOrUpdateFileContents({
+          owner,
+          repo: repoName,
+          path: 'index.html',
+          message: '🔧 Fix gallery HTML structure (repair nested slots)',
+          content: Buffer.from(htmlContent).toString('base64'),
+          sha: htmlFile.sha,
+          branch
+        });
+        
+        await ctx.reply(`✅ *HTML Structure Fixed!*
+
+🔧 Repaired nested gallery slots
+📊 Total slots: ${existingSlots}
+
+🌐 Fleek will auto-deploy. Check atuona.xyz in 1-2 minutes!`, { parse_mode: 'Markdown' });
         return;
       }
       
