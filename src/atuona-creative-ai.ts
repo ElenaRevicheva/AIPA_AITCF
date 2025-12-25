@@ -349,6 +349,7 @@ _"Paradise is not a place. It's a state of creation."_ 🌴
 ━━━━━━━━━━━━━━━━━━━━
 /status - Book progress
 /queue - Import queue status
+/setpage <num> - Set page number
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
   });
