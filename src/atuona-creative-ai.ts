@@ -941,6 +941,132 @@ Try again or check GitHub permissions!`);
     }
   });
   
+  // /fixgallery - One-time fix to add missing gallery slots
+  atuonaBot.command('fixgallery', async (ctx) => {
+    await ctx.reply('🔧 Fixing gallery - adding missing poem slots...');
+    
+    try {
+      const repoName = 'atuona';
+      const branch = 'main';
+      const owner = 'ElenaRevicheva';
+      
+      // Get current index.html
+      const { data: htmlFile } = await octokit.repos.getContent({
+        owner,
+        repo: repoName,
+        path: 'index.html',
+        ref: branch
+      });
+      
+      if (!('content' in htmlFile) || !('sha' in htmlFile)) {
+        await ctx.reply('❌ Could not read index.html');
+        return;
+      }
+      
+      let htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
+      
+      // Count existing slots
+      const existingSlots = (htmlContent.match(/gallery-slot/g) || []).length;
+      await ctx.reply(`📊 Current gallery slots: ${existingSlots}`);
+      
+      // Check what metadata files exist
+      const { data: metadataFiles } = await octokit.repos.getContent({
+        owner,
+        repo: repoName,
+        path: 'metadata',
+        ref: branch
+      });
+      
+      if (!Array.isArray(metadataFiles)) {
+        await ctx.reply('❌ Could not read metadata folder');
+        return;
+      }
+      
+      // Find poems that need gallery slots
+      const poemsToAdd: { id: string; title: string }[] = [];
+      
+      for (const file of metadataFiles) {
+        if (file.name.endsWith('.json')) {
+          const poemId = file.name.replace('.json', '');
+          const poemNum = parseInt(poemId);
+          
+          // Check if slot exists
+          if (!htmlContent.includes(`claimPoem(${poemNum},`)) {
+            // Get poem title from metadata
+            try {
+              const { data: metaFile } = await octokit.repos.getContent({
+                owner,
+                repo: repoName,
+                path: `metadata/${file.name}`,
+                ref: branch
+              });
+              
+              if ('content' in metaFile) {
+                const metaContent = JSON.parse(Buffer.from(metaFile.content, 'base64').toString('utf-8'));
+                const title = metaContent.attributes?.find((a: any) => a.trait_type === 'Poem')?.value || `Poem ${poemId}`;
+                poemsToAdd.push({ id: poemId, title });
+              }
+            } catch (e) {
+              poemsToAdd.push({ id: poemId, title: `Poem ${poemId}` });
+            }
+          }
+        }
+      }
+      
+      if (poemsToAdd.length === 0) {
+        await ctx.reply('✅ All poems already have gallery slots!');
+        return;
+      }
+      
+      await ctx.reply(`📝 Adding ${poemsToAdd.length} missing slots: ${poemsToAdd.map(p => p.id).join(', ')}`);
+      
+      // Add slots
+      const insertPoint = htmlContent.lastIndexOf('</div>\n                    </div>\n                </div>\n            </section>');
+      
+      if (insertPoint < 0) {
+        await ctx.reply('❌ Could not find insertion point in HTML');
+        return;
+      }
+      
+      let newSlots = '';
+      for (const poem of poemsToAdd) {
+        newSlots += `                        <div class="gallery-slot" onclick="claimPoem(${parseInt(poem.id)}, '${poem.title.replace(/'/g, "\\'")}')">
+                            <div class="slot-content">
+                                <div class="slot-id">${poem.id}</div>
+                                <div class="slot-label">${poem.title}</div>
+                                <div class="slot-year">2025</div>
+                                <div class="claim-button">CLAIM RANDOM POEM</div>
+                            </div>
+                        </div>
+`;
+      }
+      
+      htmlContent = htmlContent.slice(0, insertPoint) + newSlots + htmlContent.slice(insertPoint);
+      
+      // Push updated HTML
+      await octokit.repos.createOrUpdateFileContents({
+        owner,
+        repo: repoName,
+        path: 'index.html',
+        message: `🎭 Add gallery slots for poems: ${poemsToAdd.map(p => p.id).join(', ')}`,
+        content: Buffer.from(htmlContent).toString('base64'),
+        sha: htmlFile.sha,
+        branch
+      });
+      
+      await ctx.reply(`✅ *Gallery Fixed!*
+
+Added ${poemsToAdd.length} new slots:
+${poemsToAdd.map(p => `• ${p.id}: ${p.title}`).join('\n')}
+
+🌐 Fleek will auto-deploy. Check atuona.xyz in 1-2 minutes!`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Fix gallery error:', error);
+      await ctx.reply(`❌ Error: ${error.message || 'Unknown error'}`);
+    }
+  });
+
   // /setpage - Manually set the current page number
   atuonaBot.command('setpage', async (ctx) => {
     const numStr = ctx.message?.text?.replace('/setpage', '').trim();
