@@ -91,14 +91,14 @@ interface BookState {
 
 let bookState: BookState = {
   currentChapter: 1,
-  currentPage: 46, // Continuing from existing 45 poems
+  currentPage: 48, // Current: 048 exists, next will be 049
   lastPageContent: '',
   lastPageTitle: '',
   lastPageTitleEnglish: '',
   lastPageEnglish: '',
   lastPageTheme: '',
   lastPageDescription: '',
-  totalPages: 45
+  totalPages: 48
 };
 
 // Queue for importing multiple pages
@@ -979,52 +979,43 @@ Use /translate to create one, or /publish will use Russian only.`);
           
           // Check if this card already exists
           if (!htmlContent.includes(`nft-id">#${pageId}`)) {
-            // ROBUST APPROACH: Find the last nft-card by looking for the last "nft-card" class
-            // Then find where that card ends and insert after it
-            
-            // Find section boundaries first
+            // Find section boundaries
             const aboutSection = htmlContent.indexOf('<section id="about"');
             if (aboutSection > 0) {
               const homeSection = htmlContent.slice(0, aboutSection);
               
-              // Find the last occurrence of '<div class="nft-card">' in home section
+              // Find the last nft-card in VAULT section
               const lastCardStart = homeSection.lastIndexOf('<div class="nft-card">');
               
               if (lastCardStart > 0) {
-                // From that card, find its closing </div> (the nft-card div)
-                // An nft-card has structure: <div class="nft-card">...<div class="nft-content">...</div></div>
-                // We need to find the matching closing </div> for nft-card
-                
-                // Simple approach: find "</div>\n                    </div>" after last card
-                // This closes nft-content then nft-card
+                // EXACT PATTERN from working HTML:
+                // Card ends with: </div> (nft-meta), </div> (nft-content), </div> (nft-card)
+                // Pattern: "            </div>\n                        </div>\n                    </div>"
                 const afterLastCard = homeSection.slice(lastCardStart);
                 
-                // Look for the pattern that closes an nft-card (after nft-meta closes)
-                // Structure: </div> (nft-meta) </div> (nft-content) </div> (nft-card)
-                const closingPattern = '</div>\n                        </div>\n                    </div>';
-                let cardEndIdx = afterLastCard.indexOf(closingPattern);
-                
-                if (cardEndIdx > 0) {
-                  const insertPoint = lastCardStart + cardEndIdx + closingPattern.length;
-                  htmlContent = htmlContent.slice(0, insertPoint) + nftCardHtml + htmlContent.slice(insertPoint);
-                  htmlModified = true;
-                  console.log(`🎭 Atuona added NFT card #${pageId} to VAULT section`);
-                } else {
-                  // Try alternative pattern (different whitespace)
-                  const altPattern = '</div>\n                    </div>\n                </div>';
-                  cardEndIdx = afterLastCard.indexOf(altPattern);
-                  if (cardEndIdx > 0) {
-                    // Insert before the last </div> (nft-grid closing)
-                    const insertPoint = lastCardStart + cardEndIdx + '</div>\n                    </div>'.length;
-                    htmlContent = htmlContent.slice(0, insertPoint) + nftCardHtml + htmlContent.slice(insertPoint);
+                // Find the COLLECT SOUL button first, then find the closing divs after it
+                const collectButton = afterLastCard.indexOf('COLLECT SOUL</button>');
+                if (collectButton > 0) {
+                  // After button there might be <small> tag, then </div></div></div>
+                  const afterButton = afterLastCard.slice(collectButton);
+                  // Find closing pattern: </div> (nft-meta) + </div> (nft-content) + </div> (nft-card)
+                  const closePattern = '</div>\n                        </div>\n                    </div>';
+                  const closeIdx = afterButton.indexOf(closePattern);
+                  
+                  if (closeIdx > 0) {
+                    const insertPoint = lastCardStart + collectButton + closeIdx + closePattern.length;
+                    // Add blank line before new card (matching existing structure)
+                    htmlContent = htmlContent.slice(0, insertPoint) + '\n' + nftCardHtml + htmlContent.slice(insertPoint);
                     htmlModified = true;
-                    console.log(`🎭 Atuona added NFT card #${pageId} to VAULT section (alt pattern)`);
+                    console.log(`🎭 Atuona added NFT card #${pageId} to VAULT section`);
                   } else {
-                    console.log(`❌ Could not find NFT card closing pattern. Last card starts at ${lastCardStart}`);
+                    console.log(`❌ Could not find card closing pattern after COLLECT SOUL button`);
                   }
+                } else {
+                  console.log(`❌ Could not find COLLECT SOUL button in last card`);
                 }
               } else {
-                console.log(`❌ Could not find any nft-card in home section`);
+                console.log(`❌ Could not find any nft-card in VAULT section`);
               }
             }
           } else {
@@ -1034,6 +1025,7 @@ Use /translate to create one, or /publish will use Russian only.`);
           // ============================================================
           // STEP 2: Add gallery slot to MINT section (with English title)
           // ============================================================
+          // EXACT format matching working HTML
           const newSlotHtml = `
                         <div class="gallery-slot" onclick="claimPoem(${pageNum}, '${englishTitle.replace(/'/g, "\\'")}')">
                             <div class="slot-content">
@@ -1044,37 +1036,29 @@ Use /translate to create one, or /publish will use Russian only.`);
                             </div>
                         </div>`;
           
-          // Check if slot already exists in MINT section specifically
-          const gallerySection = htmlContent.indexOf('<section id="gallery"');
-          const galleryEnd = htmlContent.indexOf('</section>', gallerySection);
-          const mintSection = htmlContent.slice(gallerySection, galleryEnd);
+          // Find MINT section (gallery)
+          const galleryStart = htmlContent.indexOf('<section id="gallery"');
+          const gallerySectionEnd = htmlContent.indexOf('</section>', galleryStart);
+          const mintSection = htmlContent.slice(galleryStart, gallerySectionEnd);
           
+          // Check if slot already exists
           if (!mintSection.includes(`claimPoem(${pageNum},`)) {
-            // ROBUST APPROACH: Find the last gallery-slot in MINT section
-            const lastSlotInMint = mintSection.lastIndexOf('<div class="gallery-slot"');
+            // Find last gallery-slot in MINT
+            const lastSlotStart = mintSection.lastIndexOf('<div class="gallery-slot"');
             
-            if (lastSlotInMint > 0) {
-              // Find where this slot closes: </div>\n                        </div>
-              const afterLastSlot = mintSection.slice(lastSlotInMint);
+            if (lastSlotStart > 0) {
+              // EXACT PATTERN: slot ends with </div> (slot-content) + </div> (gallery-slot)
+              const afterLastSlot = mintSection.slice(lastSlotStart);
               const slotClosePattern = '</div>\n                        </div>';
-              const slotEndIdx = afterLastSlot.indexOf(slotClosePattern);
+              const slotCloseIdx = afterLastSlot.indexOf(slotClosePattern);
               
-              if (slotEndIdx > 0) {
-                const insertPoint = gallerySection + lastSlotInMint + slotEndIdx + slotClosePattern.length;
+              if (slotCloseIdx > 0) {
+                const insertPoint = galleryStart + lastSlotStart + slotCloseIdx + slotClosePattern.length;
                 htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
                 htmlModified = true;
                 console.log(`🎭 Atuona added gallery slot #${pageId} to MINT section`);
               } else {
-                // Try finding by looking for the closing of gallery-grid
-                const gridClose = mintSection.lastIndexOf('</div>\n                    </div>');
-                if (gridClose > 0) {
-                  const insertPoint = gallerySection + gridClose;
-                  htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
-                  htmlModified = true;
-                  console.log(`🎭 Atuona added gallery slot #${pageId} to MINT section (grid pattern)`);
-                } else {
-                  console.log(`❌ Could not find slot closing pattern in MINT`);
-                }
+                console.log(`❌ Could not find slot closing pattern in MINT`);
               }
             } else {
               console.log(`❌ Could not find any gallery-slot in MINT section`);
