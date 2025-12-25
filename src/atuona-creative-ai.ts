@@ -750,33 +750,55 @@ Use /translate to create one, or /publish will use Russian only.`);
       return;
     }
     
-    await ctx.reply('🚀 Publishing to atuona.xyz...\n\n_Pushing to GitHub → Fleek auto-deploys..._', { parse_mode: 'Markdown' });
+    await ctx.reply('🚀 Publishing to atuona.xyz...\n\n_Checking GitHub & pushing..._', { parse_mode: 'Markdown' });
     
     try {
-      const pageId = String(bookState.currentPage).padStart(3, '0');
-      const title = bookState.lastPageTitle;
-      const russianText = bookState.lastPageContent;
-      const englishText = bookState.lastPageEnglish || russianText; // Fallback to Russian if no translation
-      const theme = bookState.lastPageTheme || 'Journey';
-      
-      // Create NFT metadata JSON - matching exact format on atuona.xyz
-      const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
-      
-      // Try to create files via GitHub API
       const repoName = 'atuona';
       const branch = 'main';
+      const owner = 'ElenaRevicheva';
       
-      // Get current SHA
-      const { data: refData } = await octokit.git.getRef({
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        ref: `heads/${branch}`
-      });
+      // Find next available page number
+      let pageNum = bookState.currentPage;
+      let fileSha: string | undefined;
+      let fileExists = true;
       
-      // Create metadata file in metadata/ folder
+      // Check if current page exists, if so find next available
+      while (fileExists) {
+        const pageId = String(pageNum).padStart(3, '0');
+        try {
+          const { data: existingFile } = await octokit.repos.getContent({
+            owner,
+            repo: repoName,
+            path: `metadata/${pageId}.json`,
+            ref: branch
+          });
+          
+          // File exists, try next number
+          console.log(`📄 Page ${pageId} exists, trying next...`);
+          pageNum++;
+        } catch (e: any) {
+          if (e.status === 404) {
+            // File doesn't exist - this is our slot!
+            fileExists = false;
+          } else {
+            throw e;
+          }
+        }
+      }
+      
+      const pageId = String(pageNum).padStart(3, '0');
+      const title = bookState.lastPageTitle;
+      const russianText = bookState.lastPageContent;
+      const englishText = bookState.lastPageEnglish || russianText;
+      const theme = bookState.lastPageTheme || 'Journey';
+      
+      // Create NFT metadata JSON
+      const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
       const metadataContent = JSON.stringify(metadata, null, 2);
+      
+      // Create the file
       await octokit.repos.createOrUpdateFileContents({
-        owner: 'ElenaRevicheva',
+        owner,
         repo: repoName,
         path: `metadata/${pageId}.json`,
         message: `📖 Add poem ${pageId}: ${title}`,
@@ -787,8 +809,8 @@ Use /translate to create one, or /publish will use Russian only.`);
       console.log(`🎭 Atuona published page ${pageId} to GitHub`);
       
       // Update book state
-      bookState.totalPages = bookState.currentPage;
-      bookState.currentPage++;
+      bookState.totalPages = pageNum;
+      bookState.currentPage = pageNum + 1;
       
       // Clear for next page
       const publishedTitle = title;
@@ -818,11 +840,7 @@ Use /import for next Russian text!`, { parse_mode: 'Markdown' });
     } catch (error: any) {
       console.error('Publish error:', error);
       
-      if (error.status === 422) {
-        await ctx.reply(`⚠️ File already exists! Page ${String(bookState.currentPage).padStart(3, '0')} may already be published.
-
-Use /status to check current page number.`);
-      } else if (error.status === 404) {
+      if (error.status === 404) {
         await ctx.reply(`❌ Repository not found or no access.
 
 Make sure GitHub token has write access to ElenaRevicheva/atuona`);
@@ -832,6 +850,26 @@ Make sure GitHub token has write access to ElenaRevicheva/atuona`);
 Try again or check GitHub permissions!`);
       }
     }
+  });
+  
+  // /setpage - Manually set the current page number
+  atuonaBot.command('setpage', async (ctx) => {
+    const numStr = ctx.message?.text?.replace('/setpage', '').trim();
+    const num = parseInt(numStr || '');
+    
+    if (isNaN(num) || num < 1) {
+      await ctx.reply(`📄 *Set Page Number*
+
+Current: #${String(bookState.currentPage).padStart(3, '0')}
+
+Usage: \`/setpage 47\` to start from page 047`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    bookState.currentPage = num;
+    await ctx.reply(`✅ Page number set to #${String(num).padStart(3, '0')}
+
+Next /publish will create this page.`);
   });
   
   // /cto - Send message to CTO AIPA
