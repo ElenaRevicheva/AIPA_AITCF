@@ -849,6 +849,54 @@ Use /translate to create one, or /publish will use Russian only.`);
         // Continue anyway - metadata file was created
       }
       
+      // Also update index.html to add gallery slot
+      try {
+        const { data: htmlFile } = await octokit.repos.getContent({
+          owner,
+          repo: repoName,
+          path: 'index.html',
+          ref: branch
+        });
+        
+        if ('content' in htmlFile && 'sha' in htmlFile) {
+          let htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
+          
+          // Create new gallery slot HTML
+          const newSlotHtml = `                        <div class="gallery-slot" onclick="claimPoem(${pageNum}, '${title.replace(/'/g, "\\'")}')">
+                            <div class="slot-content">
+                                <div class="slot-id">${pageId}</div>
+                                <div class="slot-label">${title}</div>
+                                <div class="slot-year">2025</div>
+                                <div class="claim-button">CLAIM RANDOM POEM</div>
+                            </div>
+                        </div>
+`;
+          
+          // Find the closing of gallery-grid and insert before it
+          // Look for the pattern after the last gallery-slot
+          const insertPoint = htmlContent.lastIndexOf('</div>\n                    </div>\n                </div>\n            </section>');
+          
+          if (insertPoint > 0) {
+            htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
+            
+            await octokit.repos.createOrUpdateFileContents({
+              owner,
+              repo: repoName,
+              path: 'index.html',
+              message: `🎭 Add gallery slot for poem ${pageId}: ${title}`,
+              content: Buffer.from(htmlContent).toString('base64'),
+              sha: htmlFile.sha,
+              branch
+            });
+            
+            console.log(`🎭 Atuona added gallery slot for ${pageId} to index.html`);
+          }
+        }
+      } catch (htmlError) {
+        console.error('Could not update index.html:', htmlError);
+        // Continue anyway - metadata was created
+      }
+      
       // Update book state
       bookState.totalPages = pageNum;
       bookState.currentPage = pageNum + 1;
