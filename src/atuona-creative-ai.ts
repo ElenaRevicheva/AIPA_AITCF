@@ -110,14 +110,39 @@ interface PageToImport {
 let importQueue: PageToImport[] = [];
 
 // =============================================================================
-// AI HELPER - Try Claude, fallback to Groq
+// AI MODELS - Using the BEST for underground poetry translation
 // =============================================================================
 
-async function createContent(prompt: string, maxTokens: number = 2000): Promise<string> {
+// Primary: Claude Opus 4 - Best for nuanced literary translation
+// Fallback: Llama 3.3 70B via Groq - Fast and free
+const AI_CONFIG = {
+  // Claude Opus 4 - latest and best for creative writing
+  primaryModel: 'claude-opus-4-20250514',
+  // Llama 3.3 70B - excellent fallback via Groq (free!)
+  fallbackModel: 'llama-3.3-70b-versatile',
+  // Higher temperature for more creative/poetic output
+  poetryTemperature: 0.9,
+  // Standard temperature for descriptions/themes
+  standardTemperature: 0.7
+};
+
+console.log('🎭 Atuona AI Config:');
+console.log(`   Primary: ${AI_CONFIG.primaryModel} (Claude Opus 4 - BEST)`);
+console.log(`   Fallback: ${AI_CONFIG.fallbackModel} (Llama 3.3 70B)`);
+console.log(`   Poetry temp: ${AI_CONFIG.poetryTemperature} (high creativity)`);
+
+// =============================================================================
+// AI HELPER - Creative content with optimal settings
+// =============================================================================
+
+async function createContent(prompt: string, maxTokens: number = 2000, isPoetry: boolean = false): Promise<string> {
+  const temperature = isPoetry ? AI_CONFIG.poetryTemperature : AI_CONFIG.standardTemperature;
+  
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-opus-4-20250514',
+      model: AI_CONFIG.primaryModel,
       max_tokens: maxTokens,
+      temperature: temperature,
       messages: [{ role: 'user', content: prompt }]
     });
     
@@ -126,14 +151,14 @@ async function createContent(prompt: string, maxTokens: number = 2000): Promise<
   } catch (claudeError: any) {
     const errorMessage = claudeError?.error?.error?.message || claudeError?.message || '';
     if (errorMessage.includes('credit') || errorMessage.includes('billing') || claudeError?.status === 400) {
-      console.log('⚠️ Atuona: Claude credits low, using Groq...');
+      console.log('⚠️ Atuona: Claude credits low, using Groq Llama 3.3...');
       
       try {
         const groqResponse = await groq.chat.completions.create({
-          model: 'llama-3.3-70b-versatile',
+          model: AI_CONFIG.fallbackModel,
           messages: [{ role: 'user', content: prompt }],
           max_tokens: maxTokens,
-          temperature: 0.8 // More creative for writing
+          temperature: temperature
         });
         
         return groqResponse.choices[0]?.message?.content || 'Could not generate content.';
@@ -196,7 +221,8 @@ TRANSLATION PRINCIPLES:
 Return ONLY the English translation. No notes, no explanations. 
 Make it publishable. Make it hit.`;
 
-  return await createContent(translatePrompt, 2000);
+  // Use poetry mode (high temperature) for maximum creativity
+  return await createContent(translatePrompt, 2000, true);
 }
 
 // =============================================================================
@@ -474,7 +500,8 @@ Include:
 
 Be poetic but practical. In Russian with English phrases naturally mixed.`;
 
-      const inspiration = await createContent(inspirePrompt, 500);
+      // Use poetry mode for creative inspiration
+      const inspiration = await createContent(inspirePrompt, 500, true);
       await ctx.reply(`✨ *Today's Inspiration*\n\n${inspiration}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
@@ -548,15 +575,16 @@ Return ONLY the title, nothing else.`;
 "${title}"
 
 Return ONLY the English title, nothing else. No quotes.`;
-      const englishTitle = await createContent(titlePromptEn, 50);
+      // Use poetry mode for creative title translation
+      const englishTitle = await createContent(titlePromptEn, 50, true);
       
-      // Detect theme
+      // Detect theme (standard mode, just need one word)
       const themePrompt = `Based on this poem, give ONE word theme (e.g., Memory, Loss, Love, Recovery, Family, Technology, Paradise):
 
 "${russianText.substring(0, 300)}"
 
 Return ONLY one word.`;
-      const theme = await createContent(themePrompt, 20);
+      const theme = await createContent(themePrompt, 20, false);
       
       // Generate poetic description for NFT
       await ctx.reply(`🎭 Generating poetic description...`);
@@ -565,7 +593,8 @@ Return ONLY one word.`;
 "${englishText.substring(0, 500)}"
 
 Return ONLY the description, no quotes, no intro. Maximum 150 characters.`;
-      const description = await createContent(descriptionPrompt, 100);
+      // Use poetry mode for creative description
+      const description = await createContent(descriptionPrompt, 100, true);
       
       // Store in book state
       bookState.lastPageTitle = title;
@@ -652,7 +681,8 @@ TITLE: ${bookState.lastPageTitle}`;
 
 Return ONLY the English translation.`;
 
-      const newTranslation = await createContent(translatePrompt, 2000);
+      // Use poetry mode for maximum creativity
+      const newTranslation = await createContent(translatePrompt, 2000, true);
       bookState.lastPageEnglish = newTranslation;
       
       await ctx.reply(`✅ *New Translation*
@@ -725,7 +755,8 @@ THEME: [One word theme]
 
 Remember: Raw, honest, personal. Mix Russian with English naturally. End with hope.`;
 
-      const pageContent = await createContent(createPrompt, 2000);
+      // Use poetry mode for creative writing
+      const pageContent = await createContent(createPrompt, 2000, true);
       
       // Parse the response
       const titleMatch = pageContent.match(/TITLE:\s*(.+)/);
