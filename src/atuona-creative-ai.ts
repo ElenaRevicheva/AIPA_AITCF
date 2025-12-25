@@ -249,6 +249,48 @@ function createFullPoemEntry(
   };
 }
 
+// Create NFT card HTML for VAULT section (main page with English translation)
+function createNFTCardHtml(
+  pageId: string,
+  pageNum: number,
+  title: string,
+  englishText: string,
+  theme: string
+): string {
+  // Format English text with line breaks for HTML display
+  const formattedEnglish = englishText
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .join('<br>\n                                ');
+  
+  return `
+                    <div class="nft-card">
+                        <div class="nft-header">
+                            <div class="nft-id">#${pageId}</div>
+                            <div class="nft-status live">LIVE</div>
+                        </div>
+                        <div class="nft-content">
+                            <h2 class="nft-title">${title}</h2>
+                            <div class="nft-verse">
+                                ${formattedEnglish} ●
+                            </div>
+                            <div class="blockchain-badge">
+                                <span>●</span> PRESERVED ON BLOCKCHAIN - ${new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
+                            </div>
+                            <p class="nft-description">
+                                Underground poetry preserved forever on blockchain. Theme: ${theme}. 
+                                Raw, unfiltered Russian poetry with English translation.
+                            </p>
+                            <div class="nft-meta">
+                                <div class="nft-price">FREE - GAS Only!</div>
+                                <button class="nft-action" onclick="claimPoem('${pageId}', '${title.replace(/'/g, "\\'")}')">COLLECT SOUL</button>
+                            </div>
+                        </div>
+                    </div>
+`;
+}
+
 // =============================================================================
 // INITIALIZE ATUONA BOT
 // =============================================================================
@@ -850,7 +892,7 @@ Use /translate to create one, or /publish will use Russian only.`);
         // Continue anyway - metadata file was created
       }
       
-      // Also update index.html to add gallery slot
+      // Update index.html: add NFT card to VAULT + gallery slot to MINT
       try {
         const { data: htmlFile } = await octokit.repos.getContent({
           owner,
@@ -861,8 +903,40 @@ Use /translate to create one, or /publish will use Russian only.`);
         
         if ('content' in htmlFile && 'sha' in htmlFile) {
           let htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
+          let htmlModified = false;
           
-          // Create new gallery slot HTML
+          // ============================================================
+          // STEP 1: Add NFT card with English translation to VAULT section
+          // ============================================================
+          const nftCardHtml = createNFTCardHtml(pageId, pageNum, title, englishText, theme);
+          
+          // Check if this card already exists
+          if (!htmlContent.includes(`nft-id">#${pageId}`)) {
+            // Find the last nft-card in the home section (VAULT)
+            // Pattern: find </section> for home and go back to find last nft-card
+            const aboutSection = htmlContent.indexOf('<section id="about"');
+            if (aboutSection > 0) {
+              const homeSection = htmlContent.slice(0, aboutSection);
+              
+              // Find the closing of the nft-grid (last </div> before </section>)
+              // The structure is: </div></div></section> where inner </div> closes nft-grid
+              const gridClosePattern = '</div>\n                </div>\n            </section>';
+              const gridCloseIndex = homeSection.lastIndexOf(gridClosePattern);
+              
+              if (gridCloseIndex > 0) {
+                // Insert the NFT card just before the grid closes
+                htmlContent = htmlContent.slice(0, gridCloseIndex) + nftCardHtml + '                    ' + htmlContent.slice(gridCloseIndex);
+                htmlModified = true;
+                console.log(`🎭 Atuona added NFT card #${pageId} to VAULT section`);
+              }
+            }
+          } else {
+            console.log(`⏭️ NFT card #${pageId} already exists in VAULT`);
+          }
+          
+          // ============================================================
+          // STEP 2: Add gallery slot to MINT section
+          // ============================================================
           const newSlotHtml = `                        <div class="gallery-slot" onclick="claimPoem(${pageNum}, '${title.replace(/'/g, "\\'")}')">
                             <div class="slot-content">
                                 <div class="slot-id">${pageId}</div>
@@ -873,32 +947,38 @@ Use /translate to create one, or /publish will use Russian only.`);
                         </div>
 `;
           
-          // Find the correct insertion point - after the last complete gallery-slot
-          // Look for the last </div> that closes a gallery-slot before the gallery-grid closes
-          const galleryGridEnd = htmlContent.indexOf('</div>\n                    </div>\n                </div>\n            </section>');
-          
-          if (galleryGridEnd > 0) {
-            // Find the last gallery-slot closing tag before gallery-grid ends
-            const searchArea = htmlContent.slice(0, galleryGridEnd);
-            const lastSlotEnd = searchArea.lastIndexOf('                        </div>\n');
-            
-            if (lastSlotEnd > 0) {
-              // Insert after the last complete gallery-slot
-              const insertPoint = lastSlotEnd + '                        </div>\n'.length;
-              htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
+          // Check if slot already exists
+          if (!htmlContent.includes(`claimPoem(${pageNum},`)) {
+            // Find the gallery section (MINT) and add slot there
+            const gallerySection = htmlContent.indexOf('<section id="gallery"');
+            if (gallerySection > 0) {
+              // Find the end of gallery-grid in the gallery section
+              const afterGallery = htmlContent.slice(gallerySection);
+              const galleryEnd = afterGallery.indexOf('</div>\n                    </div>\n                </div>\n            </section>');
               
-              await octokit.repos.createOrUpdateFileContents({
+              if (galleryEnd > 0) {
+                const insertPoint = gallerySection + galleryEnd;
+                htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
+                htmlModified = true;
+                console.log(`🎭 Atuona added gallery slot #${pageId} to MINT section`);
+              }
+            }
+          } else {
+            console.log(`⏭️ Gallery slot #${pageId} already exists in MINT`);
+          }
+          
+          // Save changes if any modifications were made
+          if (htmlModified) {
+            await octokit.repos.createOrUpdateFileContents({
               owner,
               repo: repoName,
               path: 'index.html',
-              message: `🎭 Add gallery slot for poem ${pageId}: ${title}`,
+              message: `📖 Add poem #${pageId} "${title}" - NFT card + gallery slot`,
               content: Buffer.from(htmlContent).toString('base64'),
               sha: htmlFile.sha,
               branch
             });
-            
-            console.log(`🎭 Atuona added gallery slot for ${pageId} to index.html`);
-            }
+            console.log(`✅ Atuona updated index.html with poem #${pageId}`);
           }
         }
       } catch (htmlError) {
@@ -920,16 +1000,20 @@ Use /translate to create one, or /publish will use Russian only.`);
       await ctx.reply(`✅ *Published Successfully!*
 
 📖 *Poem #${pageId}*: "${publishedTitle}"
-📁 File: \`metadata/${pageId}.json\`
 
+━━━━━━━━━━━━━━━━━━━━
+✅ metadata/${pageId}.json
+✅ NFT card in VAULT (English)
+✅ Gallery slot in MINT
+✅ Poems JSON updated
 ━━━━━━━━━━━━━━━━━━━━
 🇷🇺 Russian original ✅
 🇬🇧 English translation ✅
 🎭 Theme: ${theme}
 ━━━━━━━━━━━━━━━━━━━━
 
-🌐 *atuona.xyz will update automatically!*
-_(Fleek deploys from GitHub)_
+🌐 *atuona.xyz updates in 1-2 min!*
+_(Fleek auto-deploys from GitHub)_
 
 📝 Next page: #${String(bookState.currentPage).padStart(3, '0')}
 
