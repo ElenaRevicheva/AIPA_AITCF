@@ -345,11 +345,12 @@ _"Paradise is not a place. It's a state of creation."_ 🌴
 /inspire - Get inspiration
 
 ━━━━━━━━━━━━━━━━━━━━
-📊 *STATUS*
+📊 *STATUS & FIX*
 ━━━━━━━━━━━━━━━━━━━━
 /status - Book progress
 /queue - Import queue status
 /setpage <num> - Set page number
+/fixgallery - Fix missing gallery slots
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
   });
