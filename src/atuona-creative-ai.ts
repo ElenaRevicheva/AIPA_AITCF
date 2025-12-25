@@ -797,7 +797,7 @@ Use /translate to create one, or /publish will use Russian only.`);
       const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
       const metadataContent = JSON.stringify(metadata, null, 2);
       
-      // Create the file
+      // Create the individual metadata file
       await octokit.repos.createOrUpdateFileContents({
         owner,
         repo: repoName,
@@ -807,7 +807,47 @@ Use /translate to create one, or /publish will use Russian only.`);
         branch
       });
       
-      console.log(`🎭 Atuona published page ${pageId} to GitHub`);
+      console.log(`🎭 Atuona published metadata/${pageId}.json`);
+      
+      // Also update the main poems JSON file so website shows it
+      try {
+        // Get current poems file
+        const { data: poemsFile } = await octokit.repos.getContent({
+          owner,
+          repo: repoName,
+          path: 'atuona-45-poems-with-text.json',
+          ref: branch
+        });
+        
+        if ('content' in poemsFile && 'sha' in poemsFile) {
+          // Decode and parse existing poems
+          const existingContent = Buffer.from(poemsFile.content, 'base64').toString('utf-8');
+          const poems = JSON.parse(existingContent);
+          
+          // Create the full poem entry for the array
+          const fullPoemEntry = createFullPoemEntry(pageId, title, russianText, englishText, theme);
+          
+          // Add new poem to array
+          poems.push(fullPoemEntry);
+          
+          // Update the file
+          const updatedContent = JSON.stringify(poems, null, 2);
+          await octokit.repos.createOrUpdateFileContents({
+            owner,
+            repo: repoName,
+            path: 'atuona-45-poems-with-text.json',
+            message: `📖 Add poem ${pageId} to gallery: ${title}`,
+            content: Buffer.from(updatedContent).toString('base64'),
+            sha: poemsFile.sha,
+            branch
+          });
+          
+          console.log(`🎭 Atuona updated main poems JSON with ${pageId}`);
+        }
+      } catch (jsonError) {
+        console.error('Could not update main poems JSON:', jsonError);
+        // Continue anyway - metadata file was created
+      }
       
       // Update book state
       bookState.totalPages = pageNum;
