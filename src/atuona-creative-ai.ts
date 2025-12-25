@@ -84,6 +84,7 @@ interface BookState {
   lastPageTitle: string;
   lastPageEnglish: string;    // English translation
   lastPageTheme: string;
+  lastPageDescription: string; // AI-generated poetic description
   totalPages: number;
 }
 
@@ -94,6 +95,7 @@ let bookState: BookState = {
   lastPageTitle: '',
   lastPageEnglish: '',
   lastPageTheme: '',
+  lastPageDescription: '',
   totalPages: 45
 };
 
@@ -255,7 +257,8 @@ function createNFTCardHtml(
   pageNum: number,
   title: string,
   englishText: string,
-  theme: string
+  theme: string,
+  description?: string
 ): string {
   // Format English text with line breaks for HTML display
   const formattedEnglish = englishText
@@ -263,6 +266,9 @@ function createNFTCardHtml(
     .map(line => line.trim())
     .filter(line => line.length > 0)
     .join('<br>\n                                ');
+  
+  // Use AI-generated description or fallback to generic
+  const nftDescription = description || `Underground poetry preserved forever on blockchain. Theme: ${theme}.`;
   
   return `
                     <div class="nft-card">
@@ -279,8 +285,7 @@ function createNFTCardHtml(
                                 <span>●</span> PRESERVED ON BLOCKCHAIN - ${new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
                             </div>
                             <p class="nft-description">
-                                Underground poetry preserved forever on blockchain. Theme: ${theme}. 
-                                Raw, unfiltered Russian poetry with English translation.
+                                ${nftDescription}
                             </p>
                             <div class="nft-meta">
                                 <div class="nft-price">FREE - GAS Only!</div>
@@ -537,11 +542,21 @@ Return ONLY the title, nothing else.`;
 Return ONLY one word.`;
       const theme = await createContent(themePrompt, 20);
       
+      // Generate poetic description for NFT
+      await ctx.reply(`🎭 Generating poetic description...`);
+      const descriptionPrompt = `Based on this poem translation, write a 1-2 sentence poetic description for an NFT listing. Be evocative, mysterious, and brief. Capture the essence without explaining:
+
+"${englishText.substring(0, 500)}"
+
+Return ONLY the description, no quotes, no intro. Maximum 150 characters.`;
+      const description = await createContent(descriptionPrompt, 100);
+      
       // Store in book state
       bookState.lastPageTitle = title;
       bookState.lastPageContent = russianText;
       bookState.lastPageEnglish = englishText;
       bookState.lastPageTheme = theme.trim();
+      bookState.lastPageDescription = description.trim();
       
       // Save to memory
       await saveMemory('ATUONA', 'imported_page', {
@@ -561,6 +576,7 @@ Return ONLY one word.`;
 📖 *Page #${String(bookState.currentPage).padStart(3, '0')}*
 📌 *"${title}"*
 🎭 Theme: ${bookState.lastPageTheme}
+📝 Description: ${bookState.lastPageDescription}
 
 ━━━━━━━━━━━━━━━━━━━━
 🇷🇺 *RUSSIAN ORIGINAL*
@@ -835,6 +851,7 @@ Use /translate to create one, or /publish will use Russian only.`);
       const russianText = bookState.lastPageContent;
       const englishText = bookState.lastPageEnglish || russianText;
       const theme = bookState.lastPageTheme || 'Journey';
+      const description = bookState.lastPageDescription || '';
       
       // Create NFT metadata JSON
       const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
@@ -908,7 +925,7 @@ Use /translate to create one, or /publish will use Russian only.`);
           // ============================================================
           // STEP 1: Add NFT card with English translation to VAULT section
           // ============================================================
-          const nftCardHtml = createNFTCardHtml(pageId, pageNum, title, englishText, theme);
+          const nftCardHtml = createNFTCardHtml(pageId, pageNum, title, englishText, theme, description);
           
           // Check if this card already exists
           if (!htmlContent.includes(`nft-id">#${pageId}`)) {
@@ -1011,6 +1028,7 @@ Use /translate to create one, or /publish will use Russian only.`);
       bookState.lastPageContent = '';
       bookState.lastPageEnglish = '';
       bookState.lastPageTheme = '';
+      bookState.lastPageDescription = '';
       
       await ctx.reply(`✅ *Published Successfully!*
 
