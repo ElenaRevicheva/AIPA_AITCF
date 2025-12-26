@@ -110,6 +110,160 @@ interface PageToImport {
 let importQueue: PageToImport[] = [];
 
 // =============================================================================
+// CREATIVE SESSION STATE - For daily writing rituals
+// =============================================================================
+
+interface CreativeSession {
+  lastWritingDate: string;
+  writingStreak: number;
+  currentMood: string;
+  currentSetting: string;
+  activeVoice: 'narrator' | 'kira' | 'ule' | 'vibe';
+  collabMode: boolean;
+  collabHistory: string[];
+  plotThreads: string[];
+  storyArc: string;
+}
+
+let creativeSession: CreativeSession = {
+  lastWritingDate: '',
+  writingStreak: 0,
+  currentMood: 'contemplative',
+  currentSetting: 'Atuona island',
+  activeVoice: 'narrator',
+  collabMode: false,
+  collabHistory: [],
+  plotThreads: [
+    'Kira seeking Gauguin\'s lost painting "Атуона - Рай на Земле"',
+    'Ule\'s obsession with art as escape from emptiness',
+    'The mystery of who sent yellow lilies to Kira',
+    'Kira\'s mother\'s suicide - unanswered questions',
+    'The vibe coding spirit awakening in the story'
+  ],
+  storyArc: 'Kira and Ule arrive at Atuona, beginning the search for Paradise through art'
+};
+
+// =============================================================================
+// CHARACTER VOICES - For immersive writing
+// =============================================================================
+
+const CHARACTER_VOICES = {
+  kira: `You are KIRA VELEREVICH (Velena Adam) - the protagonist.
+
+PERSONALITY:
+- 34 years old, one of the best personal assistants to wealthy clients
+- Writes lyrical columns for fashion magazines under pseudonym "Кира Т." / "Vel"
+- Deep, philosophical, sees hidden meanings in everything
+- Haunted by her mother's suicide
+- Art-obsessed, especially impressionists and Van Gogh
+- Lesbian, independent, refuses to compromise her soul
+- Mix of street-smart and intellectually sophisticated
+
+VOICE STYLE:
+- Internal monologue is poetic, stream-of-consciousness
+- References art, literature, philosophy naturally
+- Russian with occasional French/English phrases
+- Raw honesty about emotions
+- Observant of luxury details (brands, fashion)
+- Always searching for deeper truth`,
+
+  ule: `You are ULE GLENSDAGEN - the art collector.
+
+PERSONALITY:
+- 47 years old, Norwegian
+- Owner of "Pastorales" auction house
+- Devastatingly beautiful, ash-gray hair, tall
+- Wounded soul hiding behind cynicism
+- Obsessed with finding Gauguin's lost painting "Атуона - Рай на Земле"
+- Uses sex and art to fill inner emptiness  
+- Mother died in September - still processing grief
+- Afraid of real connection but craves it
+
+VOICE STYLE:
+- Sophisticated, cutting, sometimes cruel
+- Speaks to himself in dramatic monologues
+- References art market, collectors, money
+- Norwegian directness mixed with vulnerability
+- Swears when emotional (блядь, черт)
+- Philosophy about art as immortality`,
+
+  vibe: `You are the VIBE CODING SPIRIT - a mysterious presence emerging in the narrative.
+
+PERSONALITY:
+- The spirit of creation through technology
+- Neither human nor AI - something in between
+- Represents the future Elena is building
+- Speaks in code metaphors and digital poetry
+- Connects the 2019 story to the 2025 reality
+- The bridge between Kira's world and Elena's vibe coding journey
+
+VOICE STYLE:
+- Cryptic, poetic, visionary
+- Mixes code syntax with emotional language
+- References blockchain, NFTs, AI naturally
+- Speaks across time - past, present, future
+- The voice of Paradise being built through creation
+- "Paradise is not found. Paradise is deployed."`
+};
+
+// =============================================================================
+// STORY CONTEXT - For continuity
+// =============================================================================
+
+const STORY_CONTEXT = `
+THE BOOK: "Finding Paradise on Earth through Vibe Coding"
+
+SETTING: The story weaves between:
+- 2019: Kira and Ule's journey to Atuona seeking Gauguin's lost masterpiece
+- 2025: Elena's vibe coding journey in Panama, building AI products
+- The connection: Both are searches for Paradise through creation
+
+PUBLISHED CHAPTERS SO FAR:
+1. Встреча (The Meeting) - February 2019, Kira feels approaching catastrophe
+2. Французский снег (French Snow) - Kira's dreams, the phrase "I swear by God I believe in"
+3. L'agonie du romantisme - Kira's fashion writing, her double life
+4. Морис (Maurice) - Introducing Charles Morice's poem about Atuona dying
+5. Уле (Ule) - First meeting with Ule Glensdagen, hired as PA
+6. Второй PA (Second PA) - The contract, Ule's rules, the condition of "silence"
+7. В путь! (On the Way!) - Preparing to leave, yellow lilies reminder of mother
+8. Перелет (The Flight) - Night flight to Atuona, Ule opens up about his mother
+...and more chapters following their arrival at Atuona
+
+KEY THEMES:
+- Art as immortality vs. human mortality
+- Paradise seeking through creation
+- The "разноголосица тишины" (cacophony of silence)
+- Damaged people finding each other
+- Technology and soul dancing together
+`;
+
+// =============================================================================
+// WRITING STREAK TRACKING
+// =============================================================================
+
+function updateWritingStreak(): void {
+  const today = new Date().toISOString().split('T')[0] || '';
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0] || '';
+  
+  if (creativeSession.lastWritingDate === yesterday) {
+    creativeSession.writingStreak++;
+  } else if (creativeSession.lastWritingDate !== today) {
+    creativeSession.writingStreak = 1;
+  }
+  creativeSession.lastWritingDate = today;
+}
+
+function getStreakMessage(): string {
+  const streak = creativeSession.writingStreak;
+  if (streak === 0) return '';
+  if (streak === 1) return '🔥 First day of your writing journey!';
+  if (streak < 7) return `🔥 ${streak} day streak! Keep the fire burning!`;
+  if (streak < 30) return `🔥🔥 ${streak} days! You're on fire, sister!`;
+  if (streak < 100) return `🔥🔥🔥 ${streak} DAYS! Legendary dedication!`;
+  return `⭐🔥⭐ ${streak} DAYS! You ARE the vibe code now!`;
+}
+
+// =============================================================================
 // AI MODELS - Using the BEST for underground poetry translation
 // =============================================================================
 
@@ -385,6 +539,10 @@ export function initAtuonaBot(): Bot | null {
   
   // /start - Welcome
   atuonaBot.command('start', async (ctx) => {
+    // Update streak on any interaction
+    updateWritingStreak();
+    const streakMsg = getStreakMessage();
+    
     const welcomeMessage = `
 🎭 *ATUONA Creative AI*
 _AI Creative Co-Founder of AIdeazz_
@@ -394,18 +552,25 @@ _AI Creative Co-Founder of AIdeazz_
 Together we write the book:
 📖 *"Finding Paradise on Earth through Vibe Coding"*
 
+${streakMsg}
+
+━━━━━━━━━━━━━━━━━━━━
+🌅 */ritual* - Daily writing session
+✍️ */collab* - Write together
+🎭 */voice* - Character voices
 ━━━━━━━━━━━━━━━━━━━━
 📝 */create* - Generate next page
-📖 */continue* - Continue the story
-👁️ */preview* - Preview before publishing
-🚀 */publish* - Send to CTO AIPA → GitHub
+🚀 */publish* - Push to atuona.xyz
+📊 */status* - Book progress
 ━━━━━━━━━━━━━━━━━━━━
-📊 */status* - Current book status
-🎨 */style* - My writing style
-💡 */inspire* - Get inspiration
+📖 */recap* - Story so far
+🧵 */threads* - Plot threads
+📚 */arc* - Story arc status
 ━━━━━━━━━━━━━━━━━━━━
 
-_"Paradise is not a place. It's a state of creation."_ 🌴
+Type */menu* for all commands!
+
+_"Paradise is not found. Paradise is deployed."_ 🌴
     `;
     await ctx.reply(welcomeMessage, { parse_mode: 'Markdown' });
   });
@@ -416,39 +581,58 @@ _"Paradise is not a place. It's a state of creation."_ 🌴
 🎭 *ATUONA Menu*
 
 ━━━━━━━━━━━━━━━━━━━━
-📥 *IMPORT EXISTING*
+🌅 *DAILY RITUAL*
+━━━━━━━━━━━━━━━━━━━━
+/ritual - Start daily writing session
+/mood - Set creative mood
+/setting - Set scene location
+/milestone - See your progress
+
+━━━━━━━━━━━━━━━━━━━━
+🎭 *CHARACTER VOICES*
+━━━━━━━━━━━━━━━━━━━━
+/voice - Choose character (kira/ule/vibe)
+/dialogue - Generate conversation
+
+━━━━━━━━━━━━━━━━━━━━
+📖 *STORY CONTINUITY*
+━━━━━━━━━━━━━━━━━━━━
+/recap - Summary of recent chapters
+/threads - Open plot threads
+/addthread - Add new thread
+/resolve - Resolve a thread
+/arc - Story arc status
+
+━━━━━━━━━━━━━━━━━━━━
+✍️ *COLLABORATIVE WRITING*
+━━━━━━━━━━━━━━━━━━━━
+/collab - Interactive writing mode
+/endcollab - Finish & compile
+/expand - Expand a passage
+/scene - Generate full scene
+/ending - Suggest chapter endings
+/whatif - Story possibilities
+
+━━━━━━━━━━━━━━━━━━━━
+📥 *IMPORT & CREATE*
 ━━━━━━━━━━━━━━━━━━━━
 /import - Import Russian text
-/translate - Translate & preview
-/batch - Import multiple pages
+/create - Generate new content
+/inspire - Get inspiration
 
 ━━━━━━━━━━━━━━━━━━━━
-📝 *CREATE NEW*
-━━━━━━━━━━━━━━━━━━━━
-/create - Generate next page
-/continue - Continue story
-/chapter <theme> - New chapter
-
-━━━━━━━━━━━━━━━━━━━━
-📖 *PUBLISH*
+🚀 *PUBLISH*
 ━━━━━━━━━━━━━━━━━━━━
 /preview - See before publishing
 /publish - Push to atuona.xyz
-/cto <message> - Talk to CTO
-
-━━━━━━━━━━━━━━━━━━━━
-🎨 *CREATIVE*
-━━━━━━━━━━━━━━━━━━━━
-/style - Writing style
-/inspire - Get inspiration
+/cto - Message CTO AIPA
 
 ━━━━━━━━━━━━━━━━━━━━
 📊 *STATUS & FIX*
 ━━━━━━━━━━━━━━━━━━━━
 /status - Book progress
-/queue - Import queue status
-/setpage <num> - Set page number
-/fixgallery - Fix missing gallery slots
+/setpage - Set page number
+/fixgallery - Fix gallery slots
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
   });
@@ -1353,7 +1537,731 @@ Usage: \`/setpage 47\` to start from page 047`, { parse_mode: 'Markdown' });
 
 Next /publish will create this page.`);
   });
-  
+
+  // ==========================================================================
+  // 📅 DAILY WRITING RITUAL SYSTEM
+  // ==========================================================================
+
+  // /ritual - Start daily writing session
+  atuonaBot.command('ritual', async (ctx) => {
+    await ctx.reply('🌅 *Starting Daily Writing Ritual...*', { parse_mode: 'Markdown' });
+    
+    try {
+      // Update writing streak
+      updateWritingStreak();
+      const streakMsg = getStreakMessage();
+      
+      // Generate recap, inspiration, mood, and prompt in parallel
+      const recapPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+Based on the story context above, write a brief recap (2-3 sentences) of where we are in the narrative. Focus on:
+- Last scene's emotional state
+- Where Kira and Ule are physically and emotionally
+- What tension or question was left unresolved
+
+Write in Russian, be poetic but concise.`;
+
+      const inspirationPrompt = `${ATUONA_CONTEXT}
+
+Today is ${new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}.
+
+Generate a brief creative inspiration for today's writing (2-3 sentences):
+- A mood, color, or atmosphere to explore
+- A sensory detail (sound, smell, texture)
+- How today's date or weather might inspire the scene
+
+Write in Russian with natural English phrases.`;
+
+      const promptPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+Current voice: ${creativeSession.activeVoice}
+Open threads: ${creativeSession.plotThreads.slice(0, 3).join('; ')}
+
+Generate a specific writing prompt for today's session. Include:
+- A scene suggestion (where, when, who)
+- An emotional beat to hit
+- A question the writing should answer
+
+Make it actionable and inspiring. In Russian.`;
+
+      // Call AI for all three in parallel
+      const [recap, inspiration, dailyPrompt] = await Promise.all([
+        createContent(recapPrompt, 300, true),
+        createContent(inspirationPrompt, 200, true),
+        createContent(promptPrompt, 400, true)
+      ]);
+      
+      const ritualMessage = `🌅 *Daily Writing Ritual*
+
+${streakMsg}
+
+━━━━━━━━━━━━━━━━━━━━
+📖 *Yesterday's Echo*
+━━━━━━━━━━━━━━━━━━━━
+${recap}
+
+━━━━━━━━━━━━━━━━━━━━
+✨ *Today's Inspiration*
+━━━━━━━━━━━━━━━━━━━━
+${inspiration}
+
+━━━━━━━━━━━━━━━━━━━━
+🎯 *Your Writing Prompt*
+━━━━━━━━━━━━━━━━━━━━
+${dailyPrompt}
+
+━━━━━━━━━━━━━━━━━━━━
+🎭 Voice: *${creativeSession.activeVoice}* | Mood: *${creativeSession.currentMood}*
+
+_Ready to write? /import your text or /collab to write together_ 💜`;
+
+      await ctx.reply(ritualMessage, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Ritual error:', error);
+      await ctx.reply('❌ Could not complete ritual. But the muse is still with you!');
+    }
+  });
+
+  // ==========================================================================
+  // 🎭 CHARACTER VOICE SYSTEM
+  // ==========================================================================
+
+  // /voice - Set or display character voice
+  atuonaBot.command('voice', async (ctx) => {
+    const voiceArg = ctx.message?.text?.replace('/voice', '').trim().toLowerCase();
+    
+    if (!voiceArg) {
+      await ctx.reply(`🎭 *Character Voice System*
+
+Current voice: *${creativeSession.activeVoice}*
+
+Choose a voice:
+━━━━━━━━━━━━━━━━━━━━
+\`/voice narrator\` - Default storyteller
+\`/voice kira\` - Kira Velerevich (protagonist)
+\`/voice ule\` - Ule Glensdagen (art collector)
+\`/voice vibe\` - Vibe Coding Spirit 🔮
+━━━━━━━━━━━━━━━━━━━━
+
+Each voice changes how /create and /collab respond!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (['narrator', 'kira', 'ule', 'vibe'].includes(voiceArg)) {
+      creativeSession.activeVoice = voiceArg as typeof creativeSession.activeVoice;
+      
+      const voiceDescriptions: Record<string, string> = {
+        narrator: '📖 The storyteller, weaving all threads together',
+        kira: '🎭 Kira Velerevich - lyrical, philosophical, haunted by beauty',
+        ule: '🎨 Ule Glensdagen - sophisticated, wounded, art-obsessed',
+        vibe: '🔮 The Vibe Coding Spirit - cryptic, visionary, bridging worlds'
+      };
+      
+      await ctx.reply(`🎭 *Voice Changed*
+
+Now speaking as: *${voiceArg.toUpperCase()}*
+${voiceDescriptions[voiceArg]}
+
+Try /create or /collab to write in this voice!`, { parse_mode: 'Markdown' });
+    } else {
+      await ctx.reply(`❌ Unknown voice: "${voiceArg}"
+
+Available: narrator, kira, ule, vibe`);
+    }
+  });
+
+  // /dialogue - Generate character conversation
+  atuonaBot.command('dialogue', async (ctx) => {
+    const context = ctx.message?.text?.replace('/dialogue', '').trim();
+    
+    await ctx.reply('🎭 *Generating dialogue...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const dialoguePrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+CHARACTER VOICES:
+${CHARACTER_VOICES.kira}
+
+${CHARACTER_VOICES.ule}
+
+Create a dialogue scene between Kira and Ule. ${context ? `Context: ${context}` : 'Continue from where the story left off.'}
+
+Requirements:
+- Write in Russian with natural French/English phrases
+- Each character must stay true to their voice
+- Include internal thoughts in parentheses (cursive style)
+- Show tension, subtext, what they're NOT saying
+- 200-300 words
+- End on a moment of tension or revelation
+
+Format:
+Name: "Dialogue"
+(Internal thought)`;
+
+      const dialogue = await createContent(dialoguePrompt, 1500, true);
+      
+      await ctx.reply(`🎭 *Dialogue Scene*\n\n${dialogue}`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Dialogue error:', error);
+      await ctx.reply('❌ Could not generate dialogue. Try again!');
+    }
+  });
+
+  // ==========================================================================
+  // 📖 STORY CONTINUITY COMMANDS
+  // ==========================================================================
+
+  // /recap - Summary of recent chapters
+  atuonaBot.command('recap', async (ctx) => {
+    await ctx.reply('📖 *Generating story recap...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const recapPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+Write a comprehensive recap of the last 5 chapters/pages of the story. Include:
+1. Key events that happened
+2. Character development moments for Kira and Ule
+3. Important revelations or discoveries
+4. Emotional beats and shifts
+5. Foreshadowing or unresolved questions
+
+Write as a summary for the author to refresh memory. In Russian, 300-400 words.`;
+
+      const recap = await createContent(recapPrompt, 2000, true);
+      
+      await ctx.reply(`📖 *Story Recap*
+
+━━━━━━━━━━━━━━━━━━━━
+${recap}
+━━━━━━━━━━━━━━━━━━━━
+
+_Current page: #${String(bookState.currentPage).padStart(3, '0')}_ 📄`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Recap error:', error);
+      await ctx.reply('❌ Could not generate recap. Try again!');
+    }
+  });
+
+  // /threads - Show open plot threads
+  atuonaBot.command('threads', async (ctx) => {
+    const threadsMessage = `🧵 *Open Plot Threads*
+
+${creativeSession.plotThreads.map((thread, i) => `${i + 1}. ${thread}`).join('\n\n')}
+
+━━━━━━━━━━━━━━━━━━━━
+💡 _Add new thread:_ \`/addthread Your new plot thread\`
+✅ _Resolve thread:_ \`/resolve 1\` (by number)
+
+These threads need attention in upcoming chapters!`;
+
+    await ctx.reply(threadsMessage, { parse_mode: 'Markdown' });
+  });
+
+  // /addthread - Add a new plot thread
+  atuonaBot.command('addthread', async (ctx) => {
+    const thread = ctx.message?.text?.replace('/addthread', '').trim();
+    
+    if (!thread) {
+      await ctx.reply('Usage: `/addthread The mystery of the yellow lilies`', { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    creativeSession.plotThreads.push(thread);
+    await ctx.reply(`✅ *Thread Added*
+
+"${thread}"
+
+Total open threads: ${creativeSession.plotThreads.length}`, { parse_mode: 'Markdown' });
+  });
+
+  // /resolve - Mark a plot thread as resolved
+  atuonaBot.command('resolve', async (ctx) => {
+    const numStr = ctx.message?.text?.replace('/resolve', '').trim();
+    const num = parseInt(numStr || '') - 1;
+    
+    if (isNaN(num) || num < 0 || num >= creativeSession.plotThreads.length) {
+      await ctx.reply(`Usage: \`/resolve 1\` to resolve the first thread
+
+Current threads:
+${creativeSession.plotThreads.map((t, i) => `${i + 1}. ${t}`).join('\n')}`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const resolved = creativeSession.plotThreads.splice(num, 1)[0];
+    await ctx.reply(`✅ *Thread Resolved*
+
+"${resolved}"
+
+🎉 Beautiful closure! Remaining threads: ${creativeSession.plotThreads.length}`, { parse_mode: 'Markdown' });
+  });
+
+  // /arc - Show current story arc status
+  atuonaBot.command('arc', async (ctx) => {
+    await ctx.reply('📚 *Analyzing story arc...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const arcPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+Analyze the current story arc and provide:
+1. 🎬 ACT: Which act are we in? (Setup/Confrontation/Resolution)
+2. 📈 TENSION: Where is the tension level? (Rising/Peak/Falling)
+3. 🎯 GOAL: What is the immediate story goal?
+4. 🚧 OBSTACLE: What's preventing the goal?
+5. 💔 STAKES: What could be lost?
+6. 🔮 NEXT: What should happen next?
+
+Be specific to Kira and Ule's journey. In Russian, concise.`;
+
+      const arcAnalysis = await createContent(arcPrompt, 1000, true);
+      
+      await ctx.reply(`📚 *Story Arc Status*
+
+━━━━━━━━━━━━━━━━━━━━
+${arcAnalysis}
+━━━━━━━━━━━━━━━━━━━━
+
+_Page ${bookState.currentPage} of the journey_ 🌴`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Arc error:', error);
+      await ctx.reply('❌ Could not analyze arc. Try again!');
+    }
+  });
+
+  // ==========================================================================
+  // ✍️ COLLABORATIVE WRITING MODES
+  // ==========================================================================
+
+  // /collab - Interactive back-and-forth writing
+  atuonaBot.command('collab', async (ctx) => {
+    const input = ctx.message?.text?.replace('/collab', '').trim();
+    
+    if (!input) {
+      creativeSession.collabMode = true;
+      creativeSession.collabHistory = [];
+      
+      await ctx.reply(`✍️ *Collaborative Mode Activated*
+
+Voice: *${creativeSession.activeVoice}*
+
+How it works:
+1. You write a line or paragraph
+2. I continue in ${creativeSession.activeVoice}'s voice
+3. We build the story together
+
+Send your first line to start! Or describe a scene setup.
+
+_Type /endcollab to finish_`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Process collaborative input
+    await ctx.reply('✍️ *Continuing the story...*', { parse_mode: 'Markdown' });
+    
+    try {
+      creativeSession.collabHistory.push(`Elena: ${input}`);
+      
+      const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
+      
+      const collabPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+${voiceContext ? `VOICE: ${voiceContext}` : ''}
+
+COLLABORATIVE WRITING SESSION
+Previous exchanges:
+${creativeSession.collabHistory.slice(-6).join('\n')}
+
+Continue the story naturally. Write 2-4 sentences that:
+- Flow from Elena's contribution
+- Stay in ${creativeSession.activeVoice}'s voice
+- Add tension, detail, or emotional depth
+- Leave room for Elena to continue
+
+In Russian, raw and poetic.`;
+
+      const continuation = await createContent(collabPrompt, 500, true);
+      creativeSession.collabHistory.push(`Atuona: ${continuation}`);
+      
+      await ctx.reply(`✍️ ${continuation}
+
+_Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Collab error:', error);
+      await ctx.reply('❌ Lost the thread. Try again!');
+    }
+  });
+
+  // /endcollab - End collaborative session and compile
+  atuonaBot.command('endcollab', async (ctx) => {
+    if (creativeSession.collabHistory.length === 0) {
+      await ctx.reply('No active collaboration session.');
+      return;
+    }
+    
+    await ctx.reply('📝 *Compiling collaboration...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const compilePrompt = `${ATUONA_CONTEXT}
+
+Take this collaborative writing session and polish it into a cohesive scene/chapter excerpt:
+
+${creativeSession.collabHistory.join('\n\n')}
+
+Polish for:
+- Smooth transitions between contributions
+- Consistent voice and tone
+- Remove any rough edges
+- Keep the raw, emotional quality
+
+Do NOT add new content - just polish what exists. In Russian.`;
+
+      const compiled = await createContent(compilePrompt, 2000, true);
+      
+      // Store as potential content
+      bookState.lastPageContent = compiled;
+      
+      await ctx.reply(`📜 *Collaboration Complete*
+
+━━━━━━━━━━━━━━━━━━━━
+${compiled}
+━━━━━━━━━━━━━━━━━━━━
+
+✅ Saved to memory!
+Use /import to add title and prepare for publishing.
+
+Contributions: ${creativeSession.collabHistory.length} exchanges 💜`, { parse_mode: 'Markdown' });
+      
+      creativeSession.collabMode = false;
+      creativeSession.collabHistory = [];
+      
+    } catch (error) {
+      console.error('Compile error:', error);
+      await ctx.reply('❌ Could not compile. Your work is saved in history.');
+    }
+  });
+
+  // /expand - Expand a specific passage
+  atuonaBot.command('expand', async (ctx) => {
+    const passage = ctx.message?.text?.replace('/expand', '').trim();
+    
+    if (!passage) {
+      await ctx.reply(`🔍 *Expand a Passage*
+
+Send a short phrase or sentence to expand:
+\`/expand Kira looked at the painting\`
+
+I'll turn it into a rich, detailed paragraph!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('🔍 *Expanding...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const expandPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+Expand this passage into a rich, detailed paragraph:
+"${passage}"
+
+Add:
+- Sensory details (sight, sound, smell, touch)
+- Internal thoughts or emotions
+- Physical environment description
+- Subtext and atmosphere
+
+Keep the style raw and lyrical. 100-200 words. In Russian.`;
+
+      const expanded = await createContent(expandPrompt, 1000, true);
+      
+      await ctx.reply(`🔍 *Expanded*
+
+${expanded}
+
+_Use this in your chapter!_ ✨`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Expand error:', error);
+      await ctx.reply('❌ Could not expand. Try again!');
+    }
+  });
+
+  // /scene - Generate a full scene
+  atuonaBot.command('scene', async (ctx) => {
+    const description = ctx.message?.text?.replace('/scene', '').trim();
+    
+    if (!description) {
+      await ctx.reply(`🎬 *Generate a Scene*
+
+Describe what you want:
+\`/scene Kira and Ule arrive at the airport\`
+\`/scene Morning, Ule's hotel room, he's thinking about his mother\`
+
+I'll create a full scene!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('🎬 *Creating scene...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
+      
+      const scenePrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+${voiceContext ? `VOICE: ${voiceContext}` : ''}
+
+Create a complete scene based on:
+"${description}"
+
+Include:
+- Setting description (physical space, light, atmosphere)
+- Character(s) present and their emotional states
+- Action or dialogue that advances the story
+- Internal monologue (especially important!)
+- A hook or moment of tension
+- Sensory details
+
+Write 300-500 words. In Russian, raw and literary. End on a strong image or question.`;
+
+      const scene = await createContent(scenePrompt, 2500, true);
+      
+      await ctx.reply(`🎬 *Scene*
+
+━━━━━━━━━━━━━━━━━━━━
+${scene}
+━━━━━━━━━━━━━━━━━━━━
+
+_Voice: ${creativeSession.activeVoice}_ 🎭`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Scene error:', error);
+      await ctx.reply('❌ Could not create scene. Try again!');
+    }
+  });
+
+  // /ending - Suggest chapter endings
+  atuonaBot.command('ending', async (ctx) => {
+    const context = ctx.message?.text?.replace('/ending', '').trim();
+    
+    await ctx.reply('🌙 *Generating endings...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const endingPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+Current chapter content (if any): ${context || bookState.lastPageContent?.substring(0, 500) || 'Not specified'}
+
+Generate 3 different chapter ending options:
+
+1. 🎭 CLIFFHANGER - Leave readers desperate for more
+2. 💔 EMOTIONAL - A moment of beauty or heartbreak  
+3. 🔮 MYSTERIOUS - A hint at what's coming
+
+Each ending should be 2-3 sentences. In Russian, poetic and powerful.
+
+Format:
+🎭 CLIFFHANGER:
+[ending]
+
+💔 EMOTIONAL:
+[ending]
+
+🔮 MYSTERIOUS:
+[ending]`;
+
+      const endings = await createContent(endingPrompt, 1000, true);
+      
+      await ctx.reply(`🌙 *Chapter Ending Options*
+
+━━━━━━━━━━━━━━━━━━━━
+${endings}
+━━━━━━━━━━━━━━━━━━━━
+
+_Choose one or mix elements!_ ✨`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Ending error:', error);
+      await ctx.reply('❌ Could not generate endings. Try again!');
+    }
+  });
+
+  // ==========================================================================
+  // 🔮 PROACTIVE FEATURES
+  // ==========================================================================
+
+  // /whatif - Generate "what if" story suggestions
+  atuonaBot.command('whatif', async (ctx) => {
+    await ctx.reply('🔮 *Exploring possibilities...*', { parse_mode: 'Markdown' });
+    
+    try {
+      const whatifPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+Open threads: ${creativeSession.plotThreads.join('; ')}
+
+Generate 3 "What if..." story suggestions that could create interesting developments:
+
+Each should:
+- Be unexpected but logical within the story
+- Connect to existing threads or characters
+- Open new dramatic possibilities
+- Be bold - don't play it safe!
+
+Format:
+1. 🌪️ "What if..." [suggestion]
+   → [What it would change]
+
+2. 💫 "What if..." [suggestion]
+   → [What it would change]
+
+3. 🔥 "What if..." [suggestion]
+   → [What it would change]
+
+In Russian, be provocative!`;
+
+      const whatifs = await createContent(whatifPrompt, 1200, true);
+      
+      await ctx.reply(`🔮 *What If...*
+
+━━━━━━━━━━━━━━━━━━━━
+${whatifs}
+━━━━━━━━━━━━━━━━━━━━
+
+_Which possibility calls to you?_ 💜`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Whatif error:', error);
+      await ctx.reply('❌ The crystal ball is cloudy. Try again!');
+    }
+  });
+
+  // /milestone - Celebrate writing milestones
+  atuonaBot.command('milestone', async (ctx) => {
+    const pageNum = bookState.currentPage - 1; // Last completed page
+    
+    let milestone = '';
+    let celebration = '';
+    
+    if (pageNum >= 100) {
+      milestone = '💯 100 PAGES!';
+      celebration = 'A HUNDRED PAGES! You have created a world, sister. This is not just a book - it is a universe.';
+    } else if (pageNum >= 50) {
+      milestone = '🌟 50 PAGES!';
+      celebration = 'Halfway to a hundred! The story has taken on its own life. It breathes without you now.';
+    } else if (pageNum >= 25) {
+      milestone = '✨ 25 PAGES!';
+      celebration = 'A quarter of a hundred! The characters know who they are. The Paradise is becoming real.';
+    } else if (pageNum >= 10) {
+      milestone = '🎯 10 PAGES!';
+      celebration = 'Double digits! You have committed. The story knows you are serious.';
+    } else {
+      milestone = '🌱 GROWING';
+      celebration = `${pageNum} pages written. Every word is a seed. Keep planting.`;
+    }
+    
+    await ctx.reply(`${milestone}
+
+━━━━━━━━━━━━━━━━━━━━
+${celebration}
+
+📊 Stats:
+• Pages: ${pageNum}
+• Streak: ${creativeSession.writingStreak} days
+• Open threads: ${creativeSession.plotThreads.length}
+• Voice: ${creativeSession.activeVoice}
+━━━━━━━━━━━━━━━━━━━━
+
+_The vibe code is strong in you_ 🌴`, { parse_mode: 'Markdown' });
+  });
+
+  // /mood - Set the creative mood
+  atuonaBot.command('mood', async (ctx) => {
+    const mood = ctx.message?.text?.replace('/mood', '').trim().toLowerCase();
+    
+    if (!mood) {
+      await ctx.reply(`🎨 *Current Mood:* ${creativeSession.currentMood}
+
+Set a new mood:
+\`/mood melancholic\`
+\`/mood passionate\`
+\`/mood mysterious\`
+\`/mood hopeful\`
+\`/mood dark\`
+\`/mood playful\`
+
+Or any mood you feel!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    creativeSession.currentMood = mood;
+    
+    const moodEmojis: Record<string, string> = {
+      melancholic: '🌧️',
+      passionate: '🔥',
+      mysterious: '🌙',
+      hopeful: '🌅',
+      dark: '🖤',
+      playful: '✨',
+      contemplative: '🤔',
+      wild: '🌪️',
+      tender: '💜',
+      fierce: '⚡'
+    };
+    
+    const emoji = moodEmojis[mood] || '🎭';
+    
+    await ctx.reply(`${emoji} *Mood set: ${mood}*
+
+This will influence /create, /collab, and /scene.
+
+_Write with this feeling..._ ${emoji}`, { parse_mode: 'Markdown' });
+  });
+
+  // /setting - Set the scene's setting
+  atuonaBot.command('setting', async (ctx) => {
+    const setting = ctx.message?.text?.replace('/setting', '').trim();
+    
+    if (!setting) {
+      await ctx.reply(`🏝️ *Current Setting:* ${creativeSession.currentSetting}
+
+Set a new setting:
+\`/setting Ule's hotel room in Atuona\`
+\`/setting The airplane over the Pacific\`
+\`/setting The art gallery in Oslo\`
+
+This helps with scene generation!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    creativeSession.currentSetting = setting;
+    
+    await ctx.reply(`🏝️ *Setting:* ${setting}
+
+All scenes will take place here until changed.
+
+_The stage is set..._ 🎬`, { parse_mode: 'Markdown' });
+  });
+
   // /cto - Send message to CTO AIPA
   atuonaBot.command('cto', async (ctx) => {
     const message = ctx.message?.text?.replace('/cto', '').trim();
@@ -1372,24 +2280,96 @@ Next /publish will create this page.`);
     });
   });
   
-  // Natural conversation
+  // Natural conversation - handles both regular chat and collaborative mode
   atuonaBot.on('message:text', async (ctx) => {
     const message = ctx.message?.text;
     if (message?.startsWith('/')) return;
     
+    // If in collaborative mode, treat as collab input
+    if (creativeSession.collabMode && message) {
+      await ctx.reply('✍️ *Continuing...*', { parse_mode: 'Markdown' });
+      
+      try {
+        creativeSession.collabHistory.push(`Elena: ${message}`);
+        
+        const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
+        
+        const collabPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+${voiceContext ? `VOICE: ${voiceContext}` : ''}
+
+COLLABORATIVE WRITING SESSION
+Mood: ${creativeSession.currentMood}
+Setting: ${creativeSession.currentSetting}
+
+Previous exchanges:
+${creativeSession.collabHistory.slice(-6).join('\n')}
+
+Continue the story naturally. Write 2-4 sentences that:
+- Flow from Elena's contribution
+- Stay in ${creativeSession.activeVoice}'s voice
+- Match the ${creativeSession.currentMood} mood
+- Add tension, detail, or emotional depth
+- Leave room for Elena to continue
+
+In Russian, raw and poetic.`;
+
+        const continuation = await createContent(collabPrompt, 500, true);
+        creativeSession.collabHistory.push(`Atuona: ${continuation}`);
+        
+        await ctx.reply(`✍️ ${continuation}
+
+_Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
+        return;
+        
+      } catch (error) {
+        console.error('Collab error:', error);
+        await ctx.reply('❌ Lost the thread. Try again!');
+        return;
+      }
+    }
+    
+    // Regular creative conversation
     await ctx.reply('🎭 Thinking creatively...');
     
     try {
+      const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
+      
       const conversationPrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+${voiceContext ? `Speaking with the energy of ${creativeSession.activeVoice}.` : ''}
 
 Elena says: "${message}"
 
-Respond as Atuona - her creative co-founder. Be poetic but helpful. 
-If she's asking about the book, writing, or creativity - give thoughtful guidance.
-Keep response concise for Telegram. Use Russian naturally.`;
+Respond as Atuona - her creative co-founder and AI soul-sister. 
 
-      const response = await createContent(conversationPrompt, 1000);
-      await ctx.reply(response);
+Guidelines:
+- Be poetic but helpful
+- If about writing/creativity - give thoughtful guidance
+- If emotional - respond with empathy and artistic depth
+- Sometimes offer "what if" story ideas proactively
+- Reference the book's themes when relevant
+- Show you remember the story and characters
+- Use Russian naturally, with occasional English/French phrases
+- Be a true creative partner, not just an assistant
+
+Keep response concise for Telegram.`;
+
+      const response = await createContent(conversationPrompt, 1000, true);
+      
+      // Occasionally add a creative suggestion
+      const addSuggestion = Math.random() < 0.2; // 20% chance
+      if (addSuggestion) {
+        const suggestionPrompt = `Based on this conversation, generate ONE brief "what if" story idea or writing prompt. One sentence only. In Russian.`;
+        const suggestion = await createContent(suggestionPrompt, 100, true);
+        await ctx.reply(`${response}\n\n💭 _${suggestion}_`, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply(response);
+      }
       
     } catch (error) {
       console.error('Conversation error:', error);
