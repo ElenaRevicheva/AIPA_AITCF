@@ -903,130 +903,79 @@ Use /translate to create one, or /publish will use Russian only.`);
       const theme = bookState.lastPageTheme || 'Journey';
       const description = bookState.lastPageDescription || '';
       
-      // Create NFT metadata JSON
+      // =============================================================================
+      // SINGLE COMMIT: All file changes in ONE commit to avoid multiple Fleek deploys
+      // =============================================================================
+      
+      // Prepare all file contents
       const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
       const metadataContent = JSON.stringify(metadata, null, 2);
       
-      // Create the individual metadata file
-      await octokit.repos.createOrUpdateFileContents({
-        owner,
-        repo: repoName,
-        path: `metadata/${pageId}.json`,
-        message: `📖 Add poem ${pageId}: ${title}`,
-        content: Buffer.from(metadataContent).toString('base64'),
-        branch
-      });
+      // Get current files we need to update
+      let poemsContent = '';
+      let htmlContent = '';
       
-      console.log(`🎭 Atuona published metadata/${pageId}.json`);
-      
-      // Also update the main poems JSON file so website shows it
       try {
-        // Get current poems file
+        // Get poems JSON
         const { data: poemsFile } = await octokit.repos.getContent({
           owner,
           repo: repoName,
           path: 'atuona-45-poems-with-text.json',
           ref: branch
         });
-        
-        if ('content' in poemsFile && 'sha' in poemsFile) {
-          // Decode and parse existing poems
+        if ('content' in poemsFile) {
           const existingContent = Buffer.from(poemsFile.content, 'base64').toString('utf-8');
           const poems = JSON.parse(existingContent);
-          
-          // Create the full poem entry for the array
           const fullPoemEntry = createFullPoemEntry(pageId, title, russianText, englishText, theme);
-          
-          // Add new poem to array
           poems.push(fullPoemEntry);
-          
-          // Update the file
-          const updatedContent = JSON.stringify(poems, null, 2);
-          await octokit.repos.createOrUpdateFileContents({
-            owner,
-            repo: repoName,
-            path: 'atuona-45-poems-with-text.json',
-            message: `📖 Add poem ${pageId} to gallery: ${title}`,
-            content: Buffer.from(updatedContent).toString('base64'),
-            sha: poemsFile.sha,
-            branch
-          });
-          
-          console.log(`🎭 Atuona updated main poems JSON with ${pageId}`);
+          poemsContent = JSON.stringify(poems, null, 2);
         }
-      } catch (jsonError) {
-        console.error('Could not update main poems JSON:', jsonError);
-        // Continue anyway - metadata file was created
-      }
-      
-      // Update index.html: add NFT card to VAULT + gallery slot to MINT
-      try {
+        
+        // Get index.html
         const { data: htmlFile } = await octokit.repos.getContent({
           owner,
           repo: repoName,
           path: 'index.html',
           ref: branch
         });
-        
-        if ('content' in htmlFile && 'sha' in htmlFile) {
-          let htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
-          let htmlModified = false;
+        if ('content' in htmlFile) {
+          htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
+        }
+      } catch (fetchError) {
+        console.error('Error fetching files:', fetchError);
+        throw new Error('Could not fetch required files from repository');
+      }
+      
+      // Modify HTML: add NFT card to VAULT + gallery slot to MINT
+      const nftCardHtml = createNFTCardHtml(pageId, pageNum, englishTitle, englishText, theme, description);
+      
+      // Add NFT card to VAULT
+      if (!htmlContent.includes(`nft-id">#${pageId}`)) {
+        const aboutSection = htmlContent.indexOf('<section id="about"');
+        if (aboutSection > 0) {
+          const homeSection = htmlContent.slice(0, aboutSection);
+          const lastCardStart = homeSection.lastIndexOf('<div class="nft-card">');
           
-          // ============================================================
-          // STEP 1: Add NFT card with English translation to VAULT section
-          // ============================================================
-          const nftCardHtml = createNFTCardHtml(pageId, pageNum, englishTitle, englishText, theme, description);
-          
-          // Check if this card already exists
-          if (!htmlContent.includes(`nft-id">#${pageId}`)) {
-            // Find section boundaries
-            const aboutSection = htmlContent.indexOf('<section id="about"');
-            if (aboutSection > 0) {
-              const homeSection = htmlContent.slice(0, aboutSection);
+          if (lastCardStart > 0) {
+            const afterLastCard = homeSection.slice(lastCardStart);
+            const collectButton = afterLastCard.indexOf('COLLECT SOUL</button>');
+            if (collectButton > 0) {
+              const afterButton = afterLastCard.slice(collectButton);
+              const closePattern = '</div>\n                        </div>\n                    </div>';
+              const closeIdx = afterButton.indexOf(closePattern);
               
-              // Find the last nft-card in VAULT section
-              const lastCardStart = homeSection.lastIndexOf('<div class="nft-card">');
-              
-              if (lastCardStart > 0) {
-                // EXACT PATTERN from working HTML:
-                // Card ends with: </div> (nft-meta), </div> (nft-content), </div> (nft-card)
-                // Pattern: "            </div>\n                        </div>\n                    </div>"
-                const afterLastCard = homeSection.slice(lastCardStart);
-                
-                // Find the COLLECT SOUL button first, then find the closing divs after it
-                const collectButton = afterLastCard.indexOf('COLLECT SOUL</button>');
-                if (collectButton > 0) {
-                  // After button there might be <small> tag, then </div></div></div>
-                  const afterButton = afterLastCard.slice(collectButton);
-                  // Find closing pattern: </div> (nft-meta) + </div> (nft-content) + </div> (nft-card)
-                  const closePattern = '</div>\n                        </div>\n                    </div>';
-                  const closeIdx = afterButton.indexOf(closePattern);
-                  
-                  if (closeIdx > 0) {
-                    const insertPoint = lastCardStart + collectButton + closeIdx + closePattern.length;
-                    // Add blank line before new card (matching existing structure)
-                    htmlContent = htmlContent.slice(0, insertPoint) + '\n' + nftCardHtml + htmlContent.slice(insertPoint);
-                    htmlModified = true;
-                    console.log(`🎭 Atuona added NFT card #${pageId} to VAULT section`);
-                  } else {
-                    console.log(`❌ Could not find card closing pattern after COLLECT SOUL button`);
-                  }
-                } else {
-                  console.log(`❌ Could not find COLLECT SOUL button in last card`);
-                }
-              } else {
-                console.log(`❌ Could not find any nft-card in VAULT section`);
+              if (closeIdx > 0) {
+                const insertPoint = lastCardStart + collectButton + closeIdx + closePattern.length;
+                htmlContent = htmlContent.slice(0, insertPoint) + '\n' + nftCardHtml + htmlContent.slice(insertPoint);
+                console.log(`🎭 Atuona prepared NFT card #${pageId} for VAULT`);
               }
             }
-          } else {
-            console.log(`⏭️ NFT card #${pageId} already exists in VAULT`);
           }
-          
-          // ============================================================
-          // STEP 2: Add gallery slot to MINT section (with English title)
-          // ============================================================
-          // EXACT format matching working HTML
-          const newSlotHtml = `
+        }
+      }
+      
+      // Add gallery slot to MINT
+      const newSlotHtml = `
                         <div class="gallery-slot" onclick="claimPoem(${pageNum}, '${englishTitle.replace(/'/g, "\\'")}')">
                             <div class="slot-content">
                                 <div class="slot-id">${pageId}</div>
@@ -1035,56 +984,115 @@ Use /translate to create one, or /publish will use Russian only.`);
                                 <div class="claim-button">CLAIM RANDOM POEM</div>
                             </div>
                         </div>`;
+      
+      const galleryStart = htmlContent.indexOf('<section id="gallery"');
+      const gallerySectionEnd = htmlContent.indexOf('</section>', galleryStart);
+      const mintSection = htmlContent.slice(galleryStart, gallerySectionEnd);
+      
+      if (!mintSection.includes(`claimPoem(${pageNum},`)) {
+        const lastSlotStart = mintSection.lastIndexOf('<div class="gallery-slot"');
+        if (lastSlotStart > 0) {
+          const afterLastSlot = mintSection.slice(lastSlotStart);
+          const slotClosePattern = '</div>\n                        </div>';
+          const slotCloseIdx = afterLastSlot.indexOf(slotClosePattern);
           
-          // Find MINT section (gallery)
-          const galleryStart = htmlContent.indexOf('<section id="gallery"');
-          const gallerySectionEnd = htmlContent.indexOf('</section>', galleryStart);
-          const mintSection = htmlContent.slice(galleryStart, gallerySectionEnd);
-          
-          // Check if slot already exists
-          if (!mintSection.includes(`claimPoem(${pageNum},`)) {
-            // Find last gallery-slot in MINT
-            const lastSlotStart = mintSection.lastIndexOf('<div class="gallery-slot"');
-            
-            if (lastSlotStart > 0) {
-              // EXACT PATTERN: slot ends with </div> (slot-content) + </div> (gallery-slot)
-              const afterLastSlot = mintSection.slice(lastSlotStart);
-              const slotClosePattern = '</div>\n                        </div>';
-              const slotCloseIdx = afterLastSlot.indexOf(slotClosePattern);
-              
-              if (slotCloseIdx > 0) {
-                const insertPoint = galleryStart + lastSlotStart + slotCloseIdx + slotClosePattern.length;
-                htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
-                htmlModified = true;
-                console.log(`🎭 Atuona added gallery slot #${pageId} to MINT section`);
-              } else {
-                console.log(`❌ Could not find slot closing pattern in MINT`);
-              }
-            } else {
-              console.log(`❌ Could not find any gallery-slot in MINT section`);
-            }
-          } else {
-            console.log(`⏭️ Gallery slot #${pageId} already exists in MINT`);
-          }
-          
-          // Save changes if any modifications were made
-          if (htmlModified) {
-            await octokit.repos.createOrUpdateFileContents({
-              owner,
-              repo: repoName,
-              path: 'index.html',
-              message: `📖 Add poem #${pageId} "${title}" - NFT card + gallery slot`,
-              content: Buffer.from(htmlContent).toString('base64'),
-              sha: htmlFile.sha,
-              branch
-            });
-            console.log(`✅ Atuona updated index.html with poem #${pageId}`);
+          if (slotCloseIdx > 0) {
+            const insertPoint = galleryStart + lastSlotStart + slotCloseIdx + slotClosePattern.length;
+            htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
+            console.log(`🎭 Atuona prepared gallery slot #${pageId} for MINT`);
           }
         }
-      } catch (htmlError) {
-        console.error('Could not update index.html:', htmlError);
-        // Continue anyway - metadata was created
       }
+      
+      // =============================================================================
+      // CREATE SINGLE COMMIT with all 3 files using Git Data API
+      // =============================================================================
+      console.log(`📦 Creating single commit with all changes...`);
+      
+      // Get the current commit SHA
+      const { data: refData } = await octokit.git.getRef({
+        owner,
+        repo: repoName,
+        ref: `heads/${branch}`
+      });
+      const currentCommitSha = refData.object.sha;
+      
+      // Get the current tree
+      const { data: commitData } = await octokit.git.getCommit({
+        owner,
+        repo: repoName,
+        commit_sha: currentCommitSha
+      });
+      const baseTreeSha = commitData.tree.sha;
+      
+      // Create blobs for each file
+      const { data: metadataBlob } = await octokit.git.createBlob({
+        owner,
+        repo: repoName,
+        content: Buffer.from(metadataContent).toString('base64'),
+        encoding: 'base64'
+      });
+      
+      const { data: poemsBlob } = await octokit.git.createBlob({
+        owner,
+        repo: repoName,
+        content: Buffer.from(poemsContent).toString('base64'),
+        encoding: 'base64'
+      });
+      
+      const { data: htmlBlob } = await octokit.git.createBlob({
+        owner,
+        repo: repoName,
+        content: Buffer.from(htmlContent).toString('base64'),
+        encoding: 'base64'
+      });
+      
+      // Create new tree with all file changes
+      const { data: newTree } = await octokit.git.createTree({
+        owner,
+        repo: repoName,
+        base_tree: baseTreeSha,
+        tree: [
+          {
+            path: `metadata/${pageId}.json`,
+            mode: '100644',
+            type: 'blob',
+            sha: metadataBlob.sha
+          },
+          {
+            path: 'atuona-45-poems-with-text.json',
+            mode: '100644',
+            type: 'blob',
+            sha: poemsBlob.sha
+          },
+          {
+            path: 'index.html',
+            mode: '100644',
+            type: 'blob',
+            sha: htmlBlob.sha
+          }
+        ]
+      });
+      
+      // Create the commit
+      const { data: newCommit } = await octokit.git.createCommit({
+        owner,
+        repo: repoName,
+        message: `📖 Add poem #${pageId} "${englishTitle}" - complete publish`,
+        tree: newTree.sha,
+        parents: [currentCommitSha]
+      });
+      
+      // Update the branch reference
+      await octokit.git.updateRef({
+        owner,
+        repo: repoName,
+        ref: `heads/${branch}`,
+        sha: newCommit.sha
+      });
+      
+      console.log(`✅ Single commit created: ${newCommit.sha.substring(0, 7)}`);
+      console.log(`📦 All files in ONE commit - only ONE Fleek deployment!`);
       
       // Update book state
       bookState.totalPages = pageNum;
