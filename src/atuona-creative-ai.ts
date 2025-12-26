@@ -1,10 +1,14 @@
 import { Bot, Context, InputFile } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
+import OpenAI from 'openai';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import * as fs from 'fs';
 import * as path from 'path';
+
+// OpenAI client for DALL-E and Whisper (optional)
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 
 // =============================================================================
 // PERSISTENCE - State survives restarts
@@ -3185,25 +3189,41 @@ Return ONLY the optimized prompt, no explanation. Format for DALL-E 3.`;
       const imagePrompt = await createContent(promptOptimizer, 300, true);
       
       // Check if DALL-E is available
-      const hasOpenAI = !!process.env.OPENAI_API_KEY;
-      
-      if (hasOpenAI) {
+      if (openai) {
         await ctx.reply(`🎨 *Image Prompt Ready*
 
 ${imagePrompt}
 
-_Generating image... (This may take 30-60 seconds)_`);
+_Generating image with DALL-E 3... (30-60 seconds)_`, { parse_mode: 'Markdown' });
         
-        // TODO: Add actual DALL-E call here when API key is available
-        // For now, just show the prompt
-        await ctx.reply(`⚠️ DALL-E integration coming soon!
+        try {
+          // Call DALL-E 3
+          const response = await openai.images.generate({
+            model: 'dall-e-3',
+            prompt: imagePrompt,
+            n: 1,
+            size: '1024x1024',
+            quality: 'standard'
+          });
+          
+          const imageUrl = response.data?.[0]?.url;
+          
+          if (imageUrl) {
+            // Send the generated image
+            await ctx.replyWithPhoto(imageUrl, {
+              caption: `🎨 *Generated for ATUONA*\n\n_"${description}"_\n\nPrompt: ${imagePrompt.substring(0, 200)}...`,
+              parse_mode: 'Markdown'
+            });
+          } else {
+            await ctx.reply('❌ Image generated but URL not returned. Try again!');
+          }
+        } catch (dalleError: any) {
+          console.error('DALL-E error:', dalleError);
+          await ctx.reply(`❌ DALL-E Error: ${dalleError.message || 'Unknown error'}
 
-For now, use this prompt in:
-• ChatGPT with DALL-E
-• Midjourney
-• Stable Diffusion
-
+Use this prompt manually:
 \`${imagePrompt}\``, { parse_mode: 'Markdown' });
+        }
       } else {
         await ctx.reply(`🎨 *Optimized Image Prompt*
 
@@ -3228,20 +3248,77 @@ _Set OPENAI_API_KEY for automatic generation!_`, { parse_mode: 'Markdown' });
   // 🎤 VOICE NOTES (Placeholder for whisper integration)  
   // ==========================================================================
 
-  // Handle voice messages
+  // Handle voice messages with Whisper transcription
   atuonaBot.on('message:voice', async (ctx) => {
-    const hasWhisper = !!process.env.OPENAI_API_KEY;
-    
-    if (hasWhisper) {
-      await ctx.reply('🎤 *Voice message received!*\n\n_Transcription coming soon..._\n\nSet OPENAI_API_KEY for Whisper integration.', { parse_mode: 'Markdown' });
-    } else {
+    if (!openai) {
       await ctx.reply(`🎤 *Voice Message*
 
 I heard you! To enable voice transcription:
-1. Set OPENAI_API_KEY in environment
-2. Voice messages will be transcribed automatically
+Set OPENAI_API_KEY in environment.
 
 _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('🎤 *Transcribing voice message...*', { parse_mode: 'Markdown' });
+    
+    try {
+      // Get the voice file
+      const voice = ctx.message?.voice;
+      if (!voice) {
+        await ctx.reply('❌ Could not read voice message');
+        return;
+      }
+      
+      // Download the voice file
+      const file = await ctx.api.getFile(voice.file_id);
+      const fileUrl = `https://api.telegram.org/file/bot${process.env.ATUONA_BOT_TOKEN}/${file.file_path}`;
+      
+      // Fetch the audio file
+      const response = await fetch(fileUrl);
+      const audioBuffer = Buffer.from(await response.arrayBuffer());
+      
+      // Create a File object for OpenAI
+      const audioFile = new File([audioBuffer], 'voice.ogg', { type: 'audio/ogg' });
+      
+      // Transcribe with Whisper
+      const transcription = await openai.audio.transcriptions.create({
+        file: audioFile,
+        model: 'whisper-1',
+        language: 'ru' // Default to Russian, Whisper auto-detects anyway
+      });
+      
+      const text = transcription.text;
+      
+      await ctx.reply(`🎤 *Transcription:*
+
+"${text}"
+
+_Responding to your voice..._`, { parse_mode: 'Markdown' });
+      
+      // Now respond to the transcribed message as if it was typed
+      const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
+      
+      const responsePrompt = `${ATUONA_CONTEXT}
+
+${STORY_CONTEXT}
+
+${voiceContext ? `Speaking with the energy of ${creativeSession.activeVoice}.` : ''}
+
+Elena sent a VOICE MESSAGE saying: "${text}"
+
+This is more intimate than text - respond with extra warmth and connection.
+Be ATUONA - her creative soul-sister. Reference the book, characters, vibe coding.
+In Russian with natural English phrases. Be poetic but personal.`;
+
+      const aiResponse = await createContent(responsePrompt, 1000, true);
+      await ctx.reply(aiResponse);
+      
+    } catch (error: any) {
+      console.error('Whisper error:', error);
+      await ctx.reply(`❌ Transcription error: ${error.message || 'Unknown error'}
+
+Please type your message instead 💜`);
     }
   });
 
