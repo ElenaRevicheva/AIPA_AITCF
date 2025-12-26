@@ -1,8 +1,131 @@
-import { Bot, Context } from 'grammy';
+import { Bot, Context, InputFile } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// =============================================================================
+// PERSISTENCE - State survives restarts
+// =============================================================================
+
+const STATE_FILE = process.env.ATUONA_STATE_FILE || './atuona-state.json';
+
+interface PersistedState {
+  bookState: BookState;
+  creativeSession: CreativeSession;
+  characterMemories: Record<string, string[]>;
+  drafts: Draft[];
+  proactiveHistory: ProactiveMessage[];
+  elenaChatId: number | null;
+  lastProactiveDate: string;
+}
+
+interface Draft {
+  id: string;
+  title: string;
+  content: string;
+  englishContent?: string;
+  createdAt: string;
+  updatedAt: string;
+  status: 'draft' | 'ready' | 'published';
+}
+
+interface ProactiveMessage {
+  date: string;
+  message: string;
+  mood?: string;
+}
+
+// Character memories - things learned about each character
+let characterMemories: Record<string, string[]> = {
+  kira: [
+    'Kira Velerevich (Velena Adam), 34, one of the best personal assistants',
+    'Writes lyrical columns under pseudonym "Кира Т." / "Vel"',
+    'Mother committed suicide - still haunted by it',
+    'Lesbian, independent, art-obsessed especially Van Gogh',
+    'Has panic attacks, knows the "Зверь" (beast) intimately'
+  ],
+  ule: [
+    'Ule Glensdagen, 47, Norwegian art collector',
+    'Owner of "Pastorales" auction house',
+    'Mother died in September - processing grief',
+    'Obsessed with finding Gauguin\'s lost painting "Атуона - Рай на Земле"',
+    'Uses art and relationships to fill inner emptiness'
+  ],
+  vibe: [
+    'The Vibe Coding Spirit - emerging presence in the narrative',
+    'Bridge between 2019 story and 2025 reality',
+    'Speaks in code metaphors: "Paradise is not found. Paradise is deployed."',
+    'Neither human nor AI - something in between'
+  ]
+};
+
+// Drafts storage
+let drafts: Draft[] = [];
+
+// Proactive message history
+let proactiveHistory: ProactiveMessage[] = [];
+
+function saveState(): void {
+  try {
+    const state: PersistedState = {
+      bookState,
+      creativeSession,
+      characterMemories,
+      drafts,
+      proactiveHistory,
+      elenaChatId,
+      lastProactiveDate
+    };
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+    console.log('💾 State saved');
+  } catch (error) {
+    console.error('Error saving state:', error);
+  }
+}
+
+function loadState(): void {
+  try {
+    if (fs.existsSync(STATE_FILE)) {
+      const data = fs.readFileSync(STATE_FILE, 'utf-8');
+      const state: PersistedState = JSON.parse(data);
+      
+      // Restore all state
+      if (state.bookState) Object.assign(bookState, state.bookState);
+      if (state.creativeSession) Object.assign(creativeSession, state.creativeSession);
+      if (state.characterMemories) characterMemories = state.characterMemories;
+      if (state.drafts) drafts = state.drafts;
+      if (state.proactiveHistory) proactiveHistory = state.proactiveHistory;
+      if (state.elenaChatId) elenaChatId = state.elenaChatId;
+      if (state.lastProactiveDate) lastProactiveDate = state.lastProactiveDate;
+      
+      console.log('📂 State loaded from', STATE_FILE);
+      console.log(`   📄 Page: ${bookState.currentPage}, 🔥 Streak: ${creativeSession.writingStreak}, 📝 Drafts: ${drafts.length}`);
+    } else {
+      console.log('📂 No saved state found, starting fresh');
+    }
+  } catch (error) {
+    console.error('Error loading state:', error);
+  }
+}
+
+// Auto-save every 5 minutes
+let autoSaveInterval: NodeJS.Timeout | null = null;
+
+function startAutoSave(): void {
+  if (autoSaveInterval) clearInterval(autoSaveInterval);
+  autoSaveInterval = setInterval(saveState, 5 * 60 * 1000);
+  console.log('💾 Auto-save enabled (every 5 min)');
+}
+
+function stopAutoSave(): void {
+  if (autoSaveInterval) {
+    clearInterval(autoSaveInterval);
+    autoSaveInterval = null;
+  }
+}
 
 // =============================================================================
 // ATUONA CREATIVE AI - AI Creative Co-Founder
@@ -251,6 +374,9 @@ function updateWritingStreak(): void {
     creativeSession.writingStreak = 1;
   }
   creativeSession.lastWritingDate = today;
+  
+  // Save state after streak update
+  saveState();
 }
 
 function getStreakMessage(): string {
@@ -267,10 +393,13 @@ function getStreakMessage(): string {
 // 🔮 PROACTIVE DAILY INSPIRATION SYSTEM
 // =============================================================================
 
-// Store Elena's chat ID for proactive messages
+// Store Elena's chat ID for proactive messages (loaded from persistence)
 let elenaChatId: number | null = null;
 let lastProactiveDate: string = '';
 let proactiveInterval: NodeJS.Timeout | null = null;
+
+// Load persisted state on module initialization
+loadState();
 
 // Proactive message prompts - soulful, mixing Russian/English, connected to the journey
 const PROACTIVE_STYLE = `
@@ -368,7 +497,22 @@ async function sendProactiveInspiration(bot: Bot): Promise<void> {
       lastProactiveDate = today;
       console.log('🎭 Proactive inspiration sent!');
       
-      // Save to memory
+      // Save to proactive history
+      proactiveHistory.push({
+        date: today,
+        message: message,
+        mood: creativeSession.currentMood
+      });
+      
+      // Keep last 100 messages
+      if (proactiveHistory.length > 100) {
+        proactiveHistory = proactiveHistory.slice(-100);
+      }
+      
+      // Save state
+      saveState();
+      
+      // Also save to database memory
       await saveMemory('ATUONA', 'proactive_inspiration', {
         date: today,
         type: 'daily_inspiration'
@@ -798,6 +942,26 @@ _"Paradise is not found. Paradise is deployed."_ 🌴
 ━━━━━━━━━━━━━━━━━━━━
 /proactive - Auto-inspiration settings
 /dailyinspire - Get inspiration NOW
+/history - Message archive
+
+━━━━━━━━━━━━━━━━━━━━
+📝 *DRAFTS & CHAPTERS*
+━━━━━━━━━━━━━━━━━━━━
+/draft - Save/load drafts
+/read 048 - Read published chapter
+/character - Character memories
+
+━━━━━━━━━━━━━━━━━━━━
+💾 *BACKUP & EXPORT*
+━━━━━━━━━━━━━━━━━━━━
+/export - Backup all content
+/import\\_backup - Restore from backup
+
+━━━━━━━━━━━━━━━━━━━━
+🌍 *CREATIVE TOOLS*
+━━━━━━━━━━━━━━━━━━━━
+/spanish - Write in Spanish
+/imagine - Generate image prompt
 
 ━━━━━━━━━━━━━━━━━━━━
 📊 *STATUS & FIX*
@@ -2504,6 +2668,583 @@ _I want to be your creative companion, not just wait for commands_ 💜`, { pars
     }
   });
 
+  // ==========================================================================
+  // 📝 DRAFT SYSTEM - Save work-in-progress
+  // ==========================================================================
+
+  // /draft - Save current content as draft
+  atuonaBot.command('draft', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/draft', '').trim();
+    
+    if (!arg) {
+      // Show draft help
+      await ctx.reply(`📝 *Draft System*
+
+Save your work-in-progress:
+
+\`/draft save <title>\` - Save current content as draft
+\`/draft list\` - Show all drafts
+\`/draft load <id>\` - Load a draft
+\`/draft delete <id>\` - Delete a draft
+\`/draft publish <id>\` - Publish a draft
+
+Current content: ${bookState.lastPageContent ? `"${bookState.lastPageTitle}" (${bookState.lastPageContent.length} chars)` : 'None'}
+Total drafts: ${drafts.length}`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = arg.split(' ');
+    const action = parts[0]?.toLowerCase();
+    const param = parts.slice(1).join(' ');
+    
+    if (action === 'save') {
+      if (!bookState.lastPageContent) {
+        await ctx.reply('❌ No content to save. Use /import or /collab first!');
+        return;
+      }
+      
+      const title = param || bookState.lastPageTitle || `Draft ${Date.now()}`;
+      const draft: Draft = {
+        id: `draft_${Date.now()}`,
+        title,
+        content: bookState.lastPageContent,
+        englishContent: bookState.lastPageEnglish,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'draft'
+      };
+      
+      drafts.push(draft);
+      saveState();
+      
+      await ctx.reply(`✅ *Draft Saved!*
+
+📝 "${title}"
+🆔 ${draft.id}
+📏 ${draft.content.length} characters
+
+Use \`/draft list\` to see all drafts.`, { parse_mode: 'Markdown' });
+      
+    } else if (action === 'list') {
+      if (drafts.length === 0) {
+        await ctx.reply('📝 No drafts yet. Use `/draft save <title>` to save your work!', { parse_mode: 'Markdown' });
+        return;
+      }
+      
+      const draftList = drafts.map((d, i) => {
+        const status = d.status === 'published' ? '✅' : d.status === 'ready' ? '🟢' : '📝';
+        const date = new Date(d.createdAt).toLocaleDateString('ru-RU');
+        return `${i + 1}. ${status} *${d.title}*\n   ID: \`${d.id}\`\n   ${date} | ${d.content.length} chars`;
+      }).join('\n\n');
+      
+      await ctx.reply(`📝 *Your Drafts*\n\n${draftList}`, { parse_mode: 'Markdown' });
+      
+    } else if (action === 'load') {
+      const draft = drafts.find(d => d.id === param || d.title.toLowerCase().includes(param.toLowerCase()));
+      
+      if (!draft) {
+        await ctx.reply(`❌ Draft not found: "${param}"\nUse \`/draft list\` to see all drafts.`, { parse_mode: 'Markdown' });
+        return;
+      }
+      
+      bookState.lastPageTitle = draft.title;
+      bookState.lastPageContent = draft.content;
+      bookState.lastPageEnglish = draft.englishContent || '';
+      saveState();
+      
+      await ctx.reply(`✅ *Draft Loaded!*
+
+📝 "${draft.title}"
+📏 ${draft.content.length} characters
+
+Preview:
+${draft.content.substring(0, 300)}...
+
+Use /preview or /publish to continue!`, { parse_mode: 'Markdown' });
+      
+    } else if (action === 'delete') {
+      const idx = drafts.findIndex(d => d.id === param || d.title.toLowerCase().includes(param.toLowerCase()));
+      
+      if (idx === -1) {
+        await ctx.reply(`❌ Draft not found: "${param}"`, { parse_mode: 'Markdown' });
+        return;
+      }
+      
+      const deleted = drafts.splice(idx, 1)[0];
+      saveState();
+      
+      await ctx.reply(`🗑️ Draft deleted: "${deleted?.title}"`, { parse_mode: 'Markdown' });
+      
+    } else if (action === 'publish') {
+      const draft = drafts.find(d => d.id === param || d.title.toLowerCase().includes(param.toLowerCase()));
+      
+      if (!draft) {
+        await ctx.reply(`❌ Draft not found: "${param}"`, { parse_mode: 'Markdown' });
+        return;
+      }
+      
+      // Load and mark ready for publish
+      bookState.lastPageTitle = draft.title;
+      bookState.lastPageContent = draft.content;
+      bookState.lastPageEnglish = draft.englishContent || '';
+      draft.status = 'ready';
+      saveState();
+      
+      await ctx.reply(`✅ Draft "${draft.title}" loaded and ready!
+
+Use /publish to push to atuona.xyz`, { parse_mode: 'Markdown' });
+    }
+  });
+
+  // ==========================================================================
+  // 📖 READ PUBLISHED CHAPTERS
+  // ==========================================================================
+
+  // /read - Read a published chapter from atuona.xyz
+  atuonaBot.command('read', async (ctx) => {
+    const numStr = ctx.message?.text?.replace('/read', '').trim();
+    
+    if (!numStr) {
+      await ctx.reply(`📖 *Read Published Chapters*
+
+Usage: \`/read 048\` or \`/read 48\`
+
+This fetches the chapter from atuona.xyz!
+
+Current book: ${bookState.totalPages} pages published.`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const num = parseInt(numStr);
+    if (isNaN(num) || num < 1) {
+      await ctx.reply('❌ Please provide a valid chapter number');
+      return;
+    }
+    
+    const pageId = String(num).padStart(3, '0');
+    await ctx.reply(`📖 Fetching chapter #${pageId}...`);
+    
+    try {
+      // Fetch from GitHub
+      const { data: metaFile } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: 'atuona',
+        path: `metadata/${pageId}.json`,
+        ref: 'main'
+      });
+      
+      if (!('content' in metaFile)) {
+        await ctx.reply(`❌ Chapter #${pageId} not found`);
+        return;
+      }
+      
+      const metadata = JSON.parse(Buffer.from(metaFile.content, 'base64').toString('utf-8'));
+      const title = metadata.attributes?.find((a: any) => a.trait_type === 'Poem' || a.trait_type === 'Title')?.value || 'Unknown';
+      const theme = metadata.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
+      const russianText = metadata.attributes?.find((a: any) => a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text')?.value || '';
+      const englishText = metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
+      
+      await ctx.reply(`📖 *Chapter #${pageId}: ${title}*
+
+🎭 Theme: ${theme}
+
+━━━━━━━━━━━━━━━━━━━━
+🇷🇺 *RUSSIAN*
+━━━━━━━━━━━━━━━━━━━━
+${russianText.substring(0, 1500)}${russianText.length > 1500 ? '...' : ''}
+
+━━━━━━━━━━━━━━━━━━━━
+🇬🇧 *ENGLISH*
+━━━━━━━━━━━━━━━━━━━━
+${englishText.substring(0, 1500)}${englishText.length > 1500 ? '...' : ''}`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      if (error.status === 404) {
+        await ctx.reply(`❌ Chapter #${pageId} not found. Maybe not published yet?`);
+      } else {
+        await ctx.reply(`❌ Error fetching chapter: ${error.message}`);
+      }
+    }
+  });
+
+  // ==========================================================================
+  // 📜 PROACTIVE HISTORY - Archive of soul messages
+  // ==========================================================================
+
+  // /history - View proactive message archive
+  atuonaBot.command('history', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/history', '').trim();
+    
+    if (proactiveHistory.length === 0) {
+      await ctx.reply(`📜 *Message History*
+
+No proactive messages yet!
+Enable with \`/proactive on\` and I'll reach out daily.
+
+_The archive will fill with soulful conversations..._ 💜`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Show specific message by index
+    if (arg && !isNaN(parseInt(arg))) {
+      const idx = parseInt(arg) - 1;
+      const msg = proactiveHistory[idx];
+      if (idx >= 0 && idx < proactiveHistory.length && msg) {
+        await ctx.reply(`📜 *Message from ${msg.date}*
+
+${msg.message}`, { parse_mode: 'Markdown' });
+        return;
+      }
+    }
+    
+    // Show list of recent messages
+    const recent = proactiveHistory.slice(-10).reverse();
+    const list = recent.map((msg, i) => {
+      const preview = msg.message.substring(0, 80).replace(/\n/g, ' ');
+      return `${proactiveHistory.length - i}. *${msg.date}*\n   ${preview}...`;
+    }).join('\n\n');
+    
+    await ctx.reply(`📜 *Proactive Message History*
+
+Total messages: ${proactiveHistory.length}
+
+Recent (newest first):
+${list}
+
+Use \`/history <number>\` to read full message`, { parse_mode: 'Markdown' });
+  });
+
+  // ==========================================================================
+  // 🎭 CHARACTER MEMORY SYSTEM
+  // ==========================================================================
+
+  // /character - Add/view character details
+  atuonaBot.command('character', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/character', '').trim();
+    
+    if (!arg) {
+      // Show all characters
+      const charList = Object.entries(characterMemories).map(([name, memories]) => {
+        return `*${name.toUpperCase()}*\n${memories.map(m => `• ${m}`).join('\n')}`;
+      }).join('\n\n');
+      
+      await ctx.reply(`🎭 *Character Memories*
+
+${charList}
+
+━━━━━━━━━━━━━━━━━━━━
+Add new memory:
+\`/character kira add She has a scar on her left wrist\`
+
+View one character:
+\`/character ule\``, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = arg.split(' ');
+    const charName = parts[0]?.toLowerCase() || '';
+    const action = parts[1]?.toLowerCase() || '';
+    const detail = parts.slice(2).join(' ');
+    
+    // Valid characters
+    const validChars = ['kira', 'ule', 'vibe', 'narrator'];
+    
+    if (!charName || !validChars.includes(charName)) {
+      await ctx.reply(`❌ Unknown character: "${charName}"
+
+Valid: kira, ule, vibe, narrator`);
+      return;
+    }
+    
+    if (action === 'add' && detail) {
+      if (!characterMemories[charName]) {
+        characterMemories[charName] = [];
+      }
+      characterMemories[charName]!.push(detail);
+      saveState();
+      
+      await ctx.reply(`✅ *Memory Added to ${charName.toUpperCase()}*
+
+"${detail}"
+
+Total memories for ${charName}: ${characterMemories[charName]!.length}`, { parse_mode: 'Markdown' });
+      
+    } else if (action === 'remove' || action === 'delete') {
+      const idx = parseInt(detail) - 1;
+      const charMems = characterMemories[charName];
+      if (!isNaN(idx) && charMems && idx >= 0 && idx < charMems.length) {
+        const removed = charMems.splice(idx, 1)[0];
+        saveState();
+        await ctx.reply(`🗑️ Removed from ${charName}: "${removed}"`);
+      } else {
+        await ctx.reply(`❌ Invalid index. Use \`/character ${charName}\` to see numbered list.`, { parse_mode: 'Markdown' });
+      }
+      
+    } else {
+      // Just show one character
+      const memories = characterMemories[charName] || [];
+      const list = memories.map((m: string, i: number) => `${i + 1}. ${m}`).join('\n');
+      
+      await ctx.reply(`🎭 *${charName.toUpperCase()}*
+
+${list || 'No memories yet'}
+
+Add: \`/character ${charName} add <detail>\`
+Remove: \`/character ${charName} remove <number>\``, { parse_mode: 'Markdown' });
+    }
+  });
+
+  // ==========================================================================
+  // 💾 EXPORT - Backup all creative content
+  // ==========================================================================
+
+  // /export - Export all data
+  atuonaBot.command('export', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/export', '').trim().toLowerCase();
+    
+    await ctx.reply('💾 *Preparing export...*', { parse_mode: 'Markdown' });
+    
+    try {
+      if (arg === 'json' || !arg) {
+        // Export as JSON
+        const exportData = {
+          exportDate: new Date().toISOString(),
+          bookState,
+          creativeSession,
+          characterMemories,
+          drafts,
+          proactiveHistory,
+          plotThreads: creativeSession.plotThreads
+        };
+        
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        const filename = `atuona-backup-${new Date().toISOString().split('T')[0]}.json`;
+        
+        // Send as document - grammy uses InputFile
+        await ctx.replyWithDocument(
+          new InputFile(Buffer.from(jsonStr), filename)
+        );
+        
+        await ctx.reply(`✅ *Export Complete!*
+
+📊 Included:
+• Book state (page ${bookState.currentPage})
+• ${drafts.length} drafts
+• ${proactiveHistory.length} proactive messages
+• ${Object.keys(characterMemories).length} characters
+• ${creativeSession.plotThreads.length} plot threads
+• Writing streak: ${creativeSession.writingStreak} days
+
+Keep this file safe! 💜`, { parse_mode: 'Markdown' });
+        
+      } else if (arg === 'threads') {
+        // Export just plot threads
+        const threadList = creativeSession.plotThreads.map((t, i) => `${i + 1}. ${t}`).join('\n');
+        await ctx.reply(`🧵 *Plot Threads Export*\n\n${threadList}`, { parse_mode: 'Markdown' });
+        
+      } else if (arg === 'characters') {
+        // Export characters
+        const charExport = Object.entries(characterMemories).map(([name, memories]) => {
+          return `## ${name.toUpperCase()}\n${memories.map(m => `- ${m}`).join('\n')}`;
+        }).join('\n\n');
+        await ctx.reply(`🎭 *Characters Export*\n\n${charExport}`, { parse_mode: 'Markdown' });
+        
+      } else if (arg === 'history') {
+        // Export proactive history
+        const historyExport = proactiveHistory.map(msg => {
+          return `## ${msg.date}\n${msg.message}`;
+        }).join('\n\n---\n\n');
+        
+        const histFilename = `atuona-messages-${new Date().toISOString().split('T')[0]}.md`;
+        await ctx.replyWithDocument(
+          new InputFile(Buffer.from(historyExport), histFilename)
+        );
+      }
+      
+    } catch (error) {
+      console.error('Export error:', error);
+      await ctx.reply('❌ Export failed. Try again!');
+    }
+  });
+
+  // /import_backup - Import from backup file
+  atuonaBot.command('import_backup', async (ctx) => {
+    await ctx.reply(`📥 *Import Backup*
+
+To restore from backup:
+1. Reply to a JSON backup file with \`/restore\`
+
+⚠️ This will overwrite current state!`, { parse_mode: 'Markdown' });
+  });
+
+  // ==========================================================================
+  // 🌍 MULTI-LANGUAGE SUPPORT
+  // ==========================================================================
+
+  // /spanish - Generate content in Spanish
+  atuonaBot.command('spanish', async (ctx) => {
+    const text = ctx.message?.text?.replace('/spanish', '').trim();
+    
+    if (!text) {
+      await ctx.reply(`🇪🇸 *Spanish Mode*
+
+Generate or translate to Spanish:
+
+\`/spanish translate <text>\` - Translate to Spanish
+\`/spanish scene <description>\` - Write scene in Spanish
+\`/spanish inspire\` - Get inspiration in Spanish
+
+_Panama vibes, añoranza tropical..._ 🌴`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = text.split(' ');
+    const action = parts[0]?.toLowerCase();
+    const content = parts.slice(1).join(' ');
+    
+    await ctx.reply('🇪🇸 *Escribiendo...*', { parse_mode: 'Markdown' });
+    
+    try {
+      let prompt = '';
+      
+      if (action === 'translate') {
+        prompt = `Translate this text to Spanish. Keep the emotional, poetic quality. This is underground literary prose:
+
+"${content}"
+
+Return ONLY the Spanish translation. Be poetic, raw, evocative.`;
+      } else if (action === 'scene') {
+        prompt = `${ATUONA_CONTEXT}
+
+Write a scene in SPANISH based on: "${content}"
+
+This is for a book about finding Paradise through vibe coding. The protagonist is in Panama.
+Write raw, emotional prose. Mix Spanish with occasional English tech terms naturally.
+200-300 words.`;
+      } else if (action === 'inspire') {
+        prompt = `${ATUONA_CONTEXT}
+
+Generate a brief creative inspiration in SPANISH.
+Connect vibe coding, Panama, finding paradise, tropical storms, the search for meaning.
+3-4 sentences. Raw, poetic, with some English tech terms mixed naturally.`;
+      } else {
+        // Default: translate
+        prompt = `Translate this to Spanish, keeping the emotional quality:
+
+"${text}"`;
+      }
+      
+      const result = await createContent(prompt, 1000, true);
+      await ctx.reply(`🇪🇸 ${result}`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Spanish error:', error);
+      await ctx.reply('❌ Could not generate Spanish content. Try again!');
+    }
+  });
+
+  // ==========================================================================
+  // 🎨 IMAGE GENERATION (Placeholder for future DALL-E integration)
+  // ==========================================================================
+
+  // /imagine - Generate image for chapter (placeholder)
+  atuonaBot.command('imagine', async (ctx) => {
+    const description = ctx.message?.text?.replace('/imagine', '').trim();
+    
+    if (!description) {
+      await ctx.reply(`🎨 *Image Generation*
+
+Generate NFT artwork for chapters:
+
+\`/imagine A woman looking at a Gauguin painting in a dark gallery\`
+
+⚠️ *Note:* Full image generation requires DALL-E API key.
+Currently: Generates image prompts only.
+
+Set OPENAI_API_KEY for full functionality.`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('🎨 *Creating image prompt...*', { parse_mode: 'Markdown' });
+    
+    try {
+      // Generate optimized prompt for image generation
+      const promptOptimizer = `You are an expert at creating prompts for AI image generation (DALL-E, Midjourney).
+
+Based on this description, create an optimized image generation prompt:
+"${description}"
+
+Context: This is for NFT artwork for an underground poetry/prose book about finding Paradise through vibe coding. Style should be:
+- Impressionist influences (Gauguin, Van Gogh)
+- Dark, moody, emotional
+- Mix of tropical and urban elements
+- Hint of technology/digital aesthetic
+
+Return ONLY the optimized prompt, no explanation. Format for DALL-E 3.`;
+
+      const imagePrompt = await createContent(promptOptimizer, 300, true);
+      
+      // Check if DALL-E is available
+      const hasOpenAI = !!process.env.OPENAI_API_KEY;
+      
+      if (hasOpenAI) {
+        await ctx.reply(`🎨 *Image Prompt Ready*
+
+${imagePrompt}
+
+_Generating image... (This may take 30-60 seconds)_`);
+        
+        // TODO: Add actual DALL-E call here when API key is available
+        // For now, just show the prompt
+        await ctx.reply(`⚠️ DALL-E integration coming soon!
+
+For now, use this prompt in:
+• ChatGPT with DALL-E
+• Midjourney
+• Stable Diffusion
+
+\`${imagePrompt}\``, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply(`🎨 *Optimized Image Prompt*
+
+\`${imagePrompt}\`
+
+━━━━━━━━━━━━━━━━━━━━
+Use this prompt in:
+• ChatGPT with DALL-E
+• Midjourney: /imagine ${imagePrompt}
+• Stable Diffusion
+
+_Set OPENAI_API_KEY for automatic generation!_`, { parse_mode: 'Markdown' });
+      }
+      
+    } catch (error) {
+      console.error('Imagine error:', error);
+      await ctx.reply('❌ Could not generate prompt. Try again!');
+    }
+  });
+
+  // ==========================================================================
+  // 🎤 VOICE NOTES (Placeholder for whisper integration)  
+  // ==========================================================================
+
+  // Handle voice messages
+  atuonaBot.on('message:voice', async (ctx) => {
+    const hasWhisper = !!process.env.OPENAI_API_KEY;
+    
+    if (hasWhisper) {
+      await ctx.reply('🎤 *Voice message received!*\n\n_Transcription coming soon..._\n\nSet OPENAI_API_KEY for Whisper integration.', { parse_mode: 'Markdown' });
+    } else {
+      await ctx.reply(`🎤 *Voice Message*
+
+I heard you! To enable voice transcription:
+1. Set OPENAI_API_KEY in environment
+2. Voice messages will be transcribed automatically
+
+_For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
+    }
+  });
+
   // /cto - Send message to CTO AIPA
   atuonaBot.command('cto', async (ctx) => {
     const message = ctx.message?.text?.replace('/cto', '').trim();
@@ -2630,6 +3371,9 @@ Keep response concise for Telegram.`;
       
       // Start proactive inspiration scheduler
       startProactiveScheduler(atuonaBot!);
+      
+      // Start auto-save
+      startAutoSave();
     }
   });
   
@@ -2642,7 +3386,11 @@ Keep response concise for Telegram.`;
 
 export function stopAtuonaBot() {
   if (atuonaBot) {
+    // Save state before stopping
+    saveState();
+    
     stopProactiveScheduler();
+    stopAutoSave();
     atuonaBot.stop();
     console.log('🛑 Atuona Creative AI stopped');
   }
