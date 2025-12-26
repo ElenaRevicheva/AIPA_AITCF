@@ -218,11 +218,28 @@ TRANSLATION PRINCIPLES:
    - Raw honesty about struggle and beauty
    - Mix of street and philosophy
 
+CRITICAL FORMAT RULES:
+- Return ONLY plain text - NO markdown formatting
+- NO asterisks like **bold** or *italic*
+- NO headers, NO bullet points
+- Just pure flowing prose or poetry
+- The text will be displayed on a website as-is
+
 Return ONLY the English translation. No notes, no explanations. 
 Make it publishable. Make it hit.`;
 
   // Use poetry mode (high temperature) for maximum creativity
-  return await createContent(translatePrompt, 2000, true);
+  let translation = await createContent(translatePrompt, 2000, true);
+  
+  // Strip any markdown formatting that AI might have added
+  translation = translation
+    .replace(/\*\*([^*]+)\*\*/g, '$1')  // Remove **bold**
+    .replace(/\*([^*]+)\*/g, '$1')       // Remove *italic*
+    .replace(/^#+\s*/gm, '')             // Remove # headers
+    .replace(/^[-*]\s+/gm, '')           // Remove bullet points
+    .trim();
+  
+  return translation;
 }
 
 // =============================================================================
