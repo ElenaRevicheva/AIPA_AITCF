@@ -3459,6 +3459,8 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
         const runFluxWithRetry = async (aspectRatio: string, maxRetries = 3): Promise<string | null> => {
           for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
+              console.log(`Flux attempt ${attempt}/${maxRetries} for ${aspectRatio}`);
+              
               const output = await replicate.run(
                 "black-forest-labs/flux-1.1-pro",
                 {
@@ -3473,12 +3475,30 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
                 }
               );
               
-              if (output && typeof output === 'string') {
-                return output;
+              console.log('Replicate raw output:', JSON.stringify(output).substring(0, 500));
+              
+              // Handle different output formats
+              if (output) {
+                // If it's a string URL directly
+                if (typeof output === 'string') {
+                  return output;
+                }
+                // If it's an array with URL
+                if (Array.isArray(output) && output[0]) {
+                  return typeof output[0] === 'string' ? output[0] : null;
+                }
+                // If it's an object with output/url property
+                if (typeof output === 'object') {
+                  const obj = output as any;
+                  return obj.output || obj.url || obj[0] || null;
+                }
               }
+              
+              console.log('Unexpected Flux output format:', typeof output);
               return null;
             } catch (error: any) {
-              const isRateLimit = error.message?.includes('429') || error.message?.includes('rate limit');
+              console.error(`Flux attempt ${attempt} error:`, error.message);
+              const isRateLimit = error.message?.includes('429') || error.message?.includes('rate limit') || error.message?.includes('throttled');
               if (isRateLimit && attempt < maxRetries) {
                 const waitTime = attempt * 5; // 5, 10, 15 seconds
                 console.log(`Rate limited, waiting ${waitTime}s before retry ${attempt + 1}/${maxRetries}`);
@@ -3495,6 +3515,8 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
           // Flux Pro via Replicate - 16:9 for YouTube
           const output = await runFluxWithRetry("16:9");
           
+          console.log('Flux output (16:9):', output, typeof output);
+          
           if (output) {
             visualization.imageUrlHorizontal = output;
             visualization.status = 'image_done';
@@ -3504,6 +3526,9 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
               caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube Format (16:9)\n\n_${caption}_`,
               parse_mode: 'Markdown'
             });
+          } else {
+            // Flux returned null - trigger fallback
+            throw new Error('Flux returned empty result');
           }
           
           // Wait a moment before next request to avoid rate limits
@@ -3513,6 +3538,8 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
           await ctx.reply('📱 *Generating Instagram vertical (9:16)...*', { parse_mode: 'Markdown' });
           
           const outputVertical = await runFluxWithRetry("9:16");
+          
+          console.log('Flux output (9:16):', outputVertical, typeof outputVertical);
           
           if (outputVertical) {
             visualization.imageUrlVertical = outputVertical;
