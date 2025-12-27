@@ -14,9 +14,28 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPE
 // Replicate client for Flux Pro (best realistic images)
 const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({ auth: process.env.REPLICATE_API_TOKEN }) : null;
 
-// Runway API base URL (Gen-3 Alpha Turbo)
+// Runway API base URL (Gen-3 Alpha Turbo - best video API available)
 const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
+
+// =============================================================================
+// 🎨 AI MODEL CONFIGURATION - LATEST & BEST (Dec 2024)
+// =============================================================================
+// Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro > DALL-E 3
+// Video: Runway Gen-3 Alpha Turbo (best API), Kling/Luma coming soon
+// Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
+// Voice: Whisper-1 (best transcription)
+// =============================================================================
+const IMAGE_MODELS = {
+  // Flux Pro - Best photorealistic images, try Ultra first then Pro
+  fluxUltra: 'black-forest-labs/flux-1.1-pro-ultra',  // Highest quality
+  fluxPro: 'black-forest-labs/flux-1.1-pro',          // Excellent fallback
+  fluxDev: 'black-forest-labs/flux-dev',              // Free tier option
+};
+
+const VIDEO_MODELS = {
+  runwayGen3: 'gen3a_turbo',  // Best video API available
+};
 
 // =============================================================================
 // PERSISTENCE - State survives restarts
@@ -971,10 +990,10 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 \`/visualize last\` → Last published page
 
 *What it creates:*
-🎨 Flux Pro image (16:9 for YouTube)
-📱 Flux Pro image (9:16 for Instagram)
-🎬 Runway video (5-10 seconds)
-📝 Caption + hashtags
+🎨 Flux 1.1 Pro Ultra image (16:9 YouTube) - BEST quality!
+📱 Flux 1.1 Pro Ultra image (9:16 Instagram)
+🎬 Runway Gen-3 Alpha video (5-10 sec cinematic)
+📝 Caption + hashtags auto-generated
 
 *View your gallery:*
 \`/gallery\` → All visualizations
@@ -3542,15 +3561,18 @@ Create stunning visuals for your book pages:
 \`/visualize all\` - Queue all pages for visualization
 
 Each visualization creates:
-🎨 Flux Pro image (ultra-realistic)
-🎬 Runway Gen-3 video (5-10 sec)
-📱 Instagram format (9:16)
-📺 YouTube format (16:9)
+🎨 Flux 1.1 Pro Ultra image (BEST photorealistic!)
+🎬 Runway Gen-3 Alpha video (cinematic 5-10 sec)
+📱 Instagram format (9:16 vertical)
+📺 YouTube format (16:9 horizontal)
 
 ━━━━━━━━━━━━━━━━━━━━
-Status: ${visualizations.length} pages visualized
-Replicate: ${replicate ? '✅ Ready' : '❌ Set REPLICATE_API_TOKEN'}
-Runway: ${runwayApiKey ? '✅ Ready' : '❌ Set RUNWAY_API_KEY'}`, { parse_mode: 'Markdown' });
+📊 *Status*
+Visualizations: ${visualizations.length} pages
+🎨 Flux: ${replicate ? '✅ Ultra/Pro Ready' : '❌ Set REPLICATE_API_TOKEN'}
+🎬 Runway: ${runwayApiKey ? '✅ Gen-3 Ready' : '❌ Set RUNWAY_API_KEY'}
+
+_Using latest AI models (Dec 2024)_ 🚀`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -3655,25 +3677,60 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
       if (replicate) {
         await ctx.reply('🎨 *Generating image with Flux Pro...*\n\n_This takes 30-60 seconds..._', { parse_mode: 'Markdown' });
         
+        // Track which model was used for display
+        let lastModelUsed = 'Flux Pro';
+        
         // Helper function with retry for rate limits
         const runFluxWithRetry = async (aspectRatio: string, maxRetries = 3): Promise<string | null> => {
           for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
               console.log(`Flux attempt ${attempt}/${maxRetries} for ${aspectRatio}`);
               
-              const output = await replicate.run(
-                "black-forest-labs/flux-1.1-pro",
-                {
-                  input: {
-                    prompt: imagePrompt,
-                    aspect_ratio: aspectRatio,
-                    output_format: "webp",
-                    output_quality: 90,
-                    safety_tolerance: 2,
-                    prompt_upsampling: true
+              // Try Flux Ultra first (best quality), fall back to Pro
+              let output: any = null;
+              let modelUsed = '';
+              
+              // Try Flux 1.1 Pro Ultra first (highest quality)
+              try {
+                console.log('Trying Flux 1.1 Pro Ultra...');
+                output = await replicate.run(
+                  IMAGE_MODELS.fluxUltra as `${string}/${string}`,
+                  {
+                    input: {
+                      prompt: imagePrompt,
+                      aspect_ratio: aspectRatio,
+                      output_format: "webp",
+                      output_quality: 95,  // Higher quality for Ultra
+                      safety_tolerance: 2,
+                      prompt_upsampling: true,
+                      raw: false  // Ultra-specific: photorealistic mode
+                    }
                   }
-                }
-              );
+                );
+                modelUsed = 'Flux 1.1 Pro Ultra';
+                lastModelUsed = modelUsed;
+              } catch (ultraError: any) {
+                console.log('Flux Ultra not available, trying Flux Pro...', ultraError.message);
+                
+                // Fall back to Flux 1.1 Pro
+                output = await replicate.run(
+                  IMAGE_MODELS.fluxPro as `${string}/${string}`,
+                  {
+                    input: {
+                      prompt: imagePrompt,
+                      aspect_ratio: aspectRatio,
+                      output_format: "webp",
+                      output_quality: 90,
+                      safety_tolerance: 2,
+                      prompt_upsampling: true
+                    }
+                  }
+                );
+                modelUsed = 'Flux 1.1 Pro';
+                lastModelUsed = modelUsed;
+              }
+              
+              console.log(`Image generated with ${modelUsed}`);
               
               console.log('Replicate raw output type:', typeof output);
               
@@ -3734,9 +3791,9 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
             visualization.imageUrlHorizontal = output;
             visualization.status = 'image_done';
             
-            // Send the image
+            // Send the image with model info
             await ctx.replyWithPhoto(output, {
-              caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube Format (16:9)\n\n_${caption}_`,
+              caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube Format (16:9)\n🎨 Generated with ${lastModelUsed}\n\n_${caption}_`,
               parse_mode: 'Markdown'
             });
           } else {
@@ -3811,7 +3868,7 @@ Free tier limit reached. Options:
       
       // Generate video with Runway Gen-3 Alpha Turbo
       if (runwayApiKey && visualization.imageUrlHorizontal) {
-        await ctx.reply('🎬 *Generating video with Runway Gen-3 Alpha Turbo...*\n\n_This takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+        await ctx.reply('🎬 *Generating cinematic video with Runway Gen-3 Alpha Turbo...*\n\n_Best AI video model available! Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
         
         try {
           // Runway Gen-3 Alpha Turbo API call
