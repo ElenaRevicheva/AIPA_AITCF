@@ -3475,26 +3475,39 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
                 }
               );
               
-              console.log('Replicate raw output:', JSON.stringify(output).substring(0, 500));
+              console.log('Replicate raw output type:', typeof output);
               
-              // Handle different output formats
-              if (output) {
-                // If it's a string URL directly
-                if (typeof output === 'string') {
-                  return output;
-                }
-                // If it's an array with URL
-                if (Array.isArray(output) && output[0]) {
-                  return typeof output[0] === 'string' ? output[0] : null;
-                }
-                // If it's an object with output/url property
-                if (typeof output === 'object') {
-                  const obj = output as any;
-                  return obj.output || obj.url || obj[0] || null;
+              // Handle different output formats from Replicate
+              if (!output) {
+                console.log('Flux returned empty output');
+                return null;
+              }
+              
+              // Convert to string - Replicate FileOutput has toString() that returns URL
+              const outputStr = String(output);
+              console.log('Replicate output as string:', outputStr.substring(0, 200));
+              
+              if (outputStr.startsWith('http')) {
+                return outputStr;
+              }
+              
+              // Try parsing as array
+              if (Array.isArray(output) && output.length > 0) {
+                const first = String(output[0]);
+                if (first.startsWith('http')) return first;
+              }
+              
+              // Try as object with url property
+              const obj = output as any;
+              if (obj && typeof obj === 'object') {
+                const possibleUrl = obj.url || obj.output || obj.uri;
+                if (possibleUrl) {
+                  const urlStr = String(possibleUrl);
+                  if (urlStr.startsWith('http')) return urlStr;
                 }
               }
               
-              console.log('Unexpected Flux output format:', typeof output);
+              console.log('Could not extract URL from Flux output');
               return null;
             } catch (error: any) {
               console.error(`Flux attempt ${attempt} error:`, error.message);
@@ -3609,7 +3622,7 @@ Free tier limit reached. Options:
             promptText: `Cinematic slow movement, atmospheric, ${imagePrompt.substring(0, 150)}. Gentle camera drift. Film grain. Moody lighting.`,
             duration: 5,
             watermark: false,
-            ratio: '16:9'
+            ratio: '1280:768'  // Runway format: 1280:768 (landscape) or 768:1280 (portrait)
           };
           
           console.log('Runway request:', JSON.stringify(runwayBody, null, 2));
