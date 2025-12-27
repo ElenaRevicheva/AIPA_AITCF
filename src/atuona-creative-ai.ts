@@ -1002,6 +1002,13 @@ _"Paradise is not found. Paradise is deployed."_ 🌴
 /videostatus - Check video progress
 
 ━━━━━━━━━━━━━━━━━━━━
+📱 *SOCIAL MEDIA*
+━━━━━━━━━━━━━━━━━━━━
+/post insta 048 - Post to Instagram
+/post youtube 048 - Upload to YouTube
+/post all 048 - Post everywhere
+
+━━━━━━━━━━━━━━━━━━━━
 🌍 *CREATIVE TOOLS*
 ━━━━━━━━━━━━━━━━━━━━
 /spanish - Write in Spanish
@@ -3922,6 +3929,242 @@ In Russian with natural English phrases. Be poetic but personal.`;
 Please type your message instead 💜`);
     }
   });
+
+  // ==========================================================================
+  // 📱 SOCIAL MEDIA AUTO-POSTING
+  // ==========================================================================
+
+  // /post - Auto-post to social media platforms
+  atuonaBot.command('post', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/post', '').trim().toLowerCase();
+    
+    if (!arg) {
+      const hasInstagram = !!process.env.INSTAGRAM_ACCESS_TOKEN;
+      const hasYouTube = !!process.env.YOUTUBE_API_KEY;
+      
+      await ctx.reply(`📱 *Social Media Auto-Posting*
+
+Post your visualizations directly to social media!
+
+\`/post insta <pageId>\` - Post to Instagram
+\`/post youtube <pageId>\` - Upload to YouTube
+\`/post all <pageId>\` - Post to all platforms
+
+━━━━━━━━━━━━━━━━━━━━
+📊 *Platform Status*
+━━━━━━━━━━━━━━━━━━━━
+📸 Instagram: ${hasInstagram ? '✅ Connected' : '❌ Not configured'}
+📺 YouTube: ${hasYouTube ? '✅ Connected' : '❌ Not configured'}
+
+━━━━━━━━━━━━━━━━━━━━
+📖 *Setup Guide*
+━━━━━━━━━━━━━━━━━━━━
+See: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/ATUONA-BOOK-ROADMAP.md
+
+_Auto-posting requires API credentials for each platform._`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = arg.split(' ');
+    const platform = parts[0];
+    const pageIdArg = parts[1] || 'last';
+    
+    // Get page ID
+    let pageId = pageIdArg;
+    if (pageIdArg === 'last') {
+      pageId = String(bookState.currentPage - 1).padStart(3, '0');
+    } else {
+      pageId = String(parseInt(pageIdArg)).padStart(3, '0');
+    }
+    
+    // Find visualization
+    const viz = visualizations.find(v => v.pageId === pageId);
+    if (!viz || !viz.imageUrlHorizontal) {
+      await ctx.reply(`❌ No visualization found for page #${pageId}\n\nUse \`/visualize ${pageId}\` first!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (platform === 'insta' || platform === 'instagram') {
+      await postToInstagram(ctx, viz);
+    } else if (platform === 'youtube' || platform === 'yt') {
+      await postToYouTube(ctx, viz);
+    } else if (platform === 'all') {
+      await postToInstagram(ctx, viz);
+      await postToYouTube(ctx, viz);
+    } else {
+      await ctx.reply(`❌ Unknown platform: "${platform}"\n\nUse: insta, youtube, or all`);
+    }
+  });
+
+  // Instagram posting function
+  async function postToInstagram(ctx: Context, viz: PageVisualization): Promise<void> {
+    const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const accountId = process.env.INSTAGRAM_ACCOUNT_ID;
+    
+    if (!accessToken || !accountId) {
+      await ctx.reply(`📸 *Instagram Not Configured*
+
+To enable auto-posting to Instagram:
+
+1. Create Meta Developer App
+2. Set up Instagram Graph API
+3. Get Access Token & Account ID
+4. Add to environment:
+   \`INSTAGRAM_ACCESS_TOKEN=your_token\`
+   \`INSTAGRAM_ACCOUNT_ID=your_id\`
+
+📖 Full guide: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/ATUONA-BOOK-ROADMAP.md#instagram-setup
+
+_For now, download and post manually!_`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('📸 *Posting to Instagram...*', { parse_mode: 'Markdown' });
+    
+    try {
+      // Use vertical image for Instagram if available
+      const imageUrl = viz.imageUrlVertical || viz.imageUrlHorizontal;
+      const caption = `${viz.caption}\n\n${viz.hashtags.join(' ')}`;
+      
+      // Step 1: Create media container
+      const createResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${accountId}/media`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_url: imageUrl,
+            caption: caption,
+            access_token: accessToken
+          })
+        }
+      );
+      
+      const createData = await createResponse.json() as any;
+      
+      if (!createData.id) {
+        throw new Error(createData.error?.message || 'Failed to create media container');
+      }
+      
+      // Step 2: Publish media
+      const publishResponse = await fetch(
+        `https://graph.facebook.com/v18.0/${accountId}/media_publish`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            creation_id: createData.id,
+            access_token: accessToken
+          })
+        }
+      );
+      
+      const publishData = await publishResponse.json() as any;
+      
+      if (publishData.id) {
+        await ctx.reply(`✅ *Posted to Instagram!*
+
+📸 Post ID: ${publishData.id}
+📄 Page: #${viz.pageId} - ${viz.pageTitle}
+
+_Check your Instagram profile!_ 💜`, { parse_mode: 'Markdown' });
+      } else {
+        throw new Error(publishData.error?.message || 'Failed to publish');
+      }
+      
+    } catch (error: any) {
+      console.error('Instagram post error:', error);
+      await ctx.reply(`❌ Instagram error: ${error.message}\n\n_Download and post manually for now._`);
+    }
+  }
+
+  // YouTube posting function
+  async function postToYouTube(ctx: Context, viz: PageVisualization): Promise<void> {
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    const clientId = process.env.YOUTUBE_CLIENT_ID;
+    const clientSecret = process.env.YOUTUBE_CLIENT_SECRET;
+    const refreshToken = process.env.YOUTUBE_REFRESH_TOKEN;
+    
+    if (!apiKey || !refreshToken) {
+      await ctx.reply(`📺 *YouTube Not Configured*
+
+To enable auto-uploading to YouTube:
+
+1. Create Google Cloud Project
+2. Enable YouTube Data API v3
+3. Create OAuth 2.0 credentials
+4. Get refresh token via OAuth flow
+5. Add to environment:
+   \`YOUTUBE_API_KEY=your_key\`
+   \`YOUTUBE_CLIENT_ID=your_client_id\`
+   \`YOUTUBE_CLIENT_SECRET=your_secret\`
+   \`YOUTUBE_REFRESH_TOKEN=your_refresh_token\`
+
+📖 Full guide: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/ATUONA-BOOK-ROADMAP.md#youtube-setup
+
+_For now, download and upload manually!_`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (!viz.videoUrlHorizontal) {
+      await ctx.reply(`⚠️ No video available for page #${viz.pageId}\n\nRun \`/visualize ${viz.pageId}\` to generate video first!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('📺 *Uploading to YouTube...*\n\n_This requires video download & re-upload. May take a few minutes..._', { parse_mode: 'Markdown' });
+    
+    try {
+      // Get fresh access token using refresh token
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: clientId || '',
+          client_secret: clientSecret || '',
+          refresh_token: refreshToken,
+          grant_type: 'refresh_token'
+        })
+      });
+      
+      const tokenData = await tokenResponse.json() as any;
+      
+      if (!tokenData.access_token) {
+        throw new Error('Failed to get access token: ' + (tokenData.error_description || tokenData.error));
+      }
+      
+      // Download video from Runway
+      const videoResponse = await fetch(viz.videoUrlHorizontal);
+      const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+      
+      // YouTube upload is complex - requires resumable upload
+      // For now, provide guidance
+      await ctx.reply(`📺 *YouTube Upload Ready*
+
+⚠️ Full YouTube upload requires resumable upload API implementation.
+
+For now:
+1. Download video: ${viz.videoUrlHorizontal}
+2. Upload manually to YouTube
+3. Use this metadata:
+
+*Title:* ATUONA #${viz.pageId}: ${viz.pageTitle}
+*Description:*
+${viz.caption}
+
+From the book "Finding Paradise on Earth through Vibe Coding"
+by Elena Revicheva
+
+${viz.hashtags.map(h => h.replace('#', '')).join(', ')}
+
+#Shorts #AIFilm #VibeCoding
+
+_Full auto-upload coming in next update!_ 💜`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('YouTube upload error:', error);
+      await ctx.reply(`❌ YouTube error: ${error.message}\n\n_Download and upload manually for now._`);
+    }
+  }
 
   // /cto - Send message to CTO AIPA
   atuonaBot.command('cto', async (ctx) => {
