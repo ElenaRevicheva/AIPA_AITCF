@@ -213,47 +213,87 @@ Type /menu for all commands! 🚀
 🤖 *CTO AIPA v4.0 - Menu*
 
 ━━━━━━━━━━━━━━━━━━━━
-🧠 *STRATEGIC CTO* 🆕
+🧠 *STRATEGIC CTO*
 ━━━━━━━━━━━━━━━━━━━━
-/strategy - Full ecosystem analysis
-/priorities - What to do TODAY
-/think <question> - Deep strategic thinking
+/strategy - Ecosystem analysis
+/priorities - Today's focus
+/think - Deep thinking
+/suggest - Quick suggestion
 
 ━━━━━━━━━━━━━━━━━━━━
-🏥 *PRODUCTION MONITORING* 🆕
+🏥 *MONITORING*
 ━━━━━━━━━━━━━━━━━━━━
-/health - Check all services
-/logs <paste> - Analyze any logs
+/health - Check services
+/logs - Analyze logs
 
 ━━━━━━━━━━━━━━━━━━━━
-📚 *LEARNING SYSTEM* 🆕
+📚 *LEARNING*
 ━━━━━━━━━━━━━━━━━━━━
-/feedback success|fail - Teach me!
-/lessons - What I've learned
+/feedback - Teach me!
+/lessons - What I learned
 
 ━━━━━━━━━━━━━━━━━━━━
-🖥️ *CURSOR AGENT MODE*
+🖥️ *CURSOR AGENT*
 ━━━━━━━━━━━━━━━━━━━━
-/cursor <task> - Step-by-step guide
-/build <feature> - Multi-step plan
-/diff <file> <change> - Before/after
+/cursor - Step-by-step guide
+/build - Multi-step plan
+/diff - Before/after code
 
 ━━━━━━━━━━━━━━━━━━━━
-📚 *LEARN YOUR CODE*
+📖 *LEARN CODE*
 ━━━━━━━━━━━━━━━━━━━━
-/study | /explainfile | /architecture
-/error | /howto | /cmd
+/study - Quiz on your code
+/explainfile - Explain a file
+/architecture - Repo structure
+/error - Debug errors
+/howto - How-to guides
+/cmd - Command cheatsheet
 
 ━━━━━━━━━━━━━━━━━━━━
-💻 *CODE & DECISIONS*
+🎓 *LEARN CONCEPTS*
 ━━━━━━━━━━━━━━━━━━━━
-/code → /approve | /fix → /approve
-/decision | /debt | /review
+/learn - Pick a topic
+/exercise - Coding challenge
+/explain - Explain anything
 
 ━━━━━━━━━━━━━━━━━━━━
-📊 /stats | /daily | /status
-🔍 /repos | /idea | /ideas
-💬 /ask | 🎤 Voice | 📸 Photo
+💻 *CODE GENERATION*
+━━━━━━━━━━━━━━━━━━━━
+/code - Generate code
+/fix - Fix bugs
+/approve - Create PR
+/reject - Discard code
+/pending - Check pending
+
+━━━━━━━━━━━━━━━━━━━━
+🏛️ *DECISIONS*
+━━━━━━━━━━━━━━━━━━━━
+/decision - Record decision
+/debt - Track tech debt
+/review - Review commits
+
+━━━━━━━━━━━━━━━━━━━━
+📊 *INSIGHTS*
+━━━━━━━━━━━━━━━━━━━━
+/stats - Weekly metrics
+/daily - Morning briefing
+/status - System status
+
+━━━━━━━━━━━━━━━━━━━━
+🔍 *REPOS & IDEAS*
+━━━━━━━━━━━━━━━━━━━━
+/repos - List repositories
+/idea - Save idea
+/ideas - View ideas
+
+━━━━━━━━━━━━━━━━━━━━
+💬 *CHAT*
+━━━━━━━━━━━━━━━━━━━━
+/ask - Ask anything
+🎤 Voice - Send voice note
+📸 Photo - Send screenshot
+
+━━━━━━━━━━━━━━━━━━━━
 ⚙️ /alerts | /roadmap
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
