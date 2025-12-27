@@ -1,7 +1,21 @@
 import { Bot, Context } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
-import { getRelevantMemory, saveMemory } from './database';
+import { 
+  getRelevantMemory, 
+  saveMemory,
+  addTechDebt,
+  getTechDebt,
+  resolveTechDebt,
+  addDecision,
+  getDecisions,
+  savePendingCode,
+  getPendingCode,
+  clearPendingCode,
+  getAlertPreferences,
+  setAlertPreferences,
+  getAllAlertChatIds
+} from './database';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -185,52 +199,61 @@ Type /menu for all commands! 🚀
   
   async function showMenu(ctx: Context) {
     const menuMessage = `
-🤖 *CTO AIPA v3.3 - Menu*
+🤖 *CTO AIPA v3.4 - Menu*
 
 ━━━━━━━━━━━━━━━━━━━━
-🎓 *LEARN TO CODE* 🆕
+🎓 *LEARN TO CODE*
 ━━━━━━━━━━━━━━━━━━━━
 /learn - Pick a coding topic
-/learn typescript - Learn TS
 /exercise - Get coding challenge
 /explain <concept> - Explain anything
 
 ━━━━━━━━━━━━━━━━━━━━
-💻 *CTO WRITES CODE* 🆕
+💻 *CTO WRITES CODE*
 ━━━━━━━━━━━━━━━━━━━━
-/code <repo> <task> - I create PR!
-/fix <repo> <issue> - I fix bugs!
+/code <repo> <task> - Generate code
+/fix <repo> <issue> - Generate fix
+/approve - Create PR (after review!)
+/reject - Discard code
+/pending - Check pending code
+
+━━━━━━━━━━━━━━━━━━━━
+🏛️ *CTO DECISIONS* 🆕
+━━━━━━━━━━━━━━━━━━━━
+/decision - Record arch decision
+/debt - Track technical debt
+/debt list - View all tech debt
 
 ━━━━━━━━━━━━━━━━━━━━
 📊 *INSIGHTS*
 ━━━━━━━━━━━━━━━━━━━━
 /stats - Weekly ecosystem metrics
-/daily - Morning briefing & focus
+/daily - Morning briefing
 /status - Service health check
 
 ━━━━━━━━━━━━━━━━━━━━
 💡 *IDEAS & NOTES*
 ━━━━━━━━━━━━━━━━━━━━
-/idea <text> - Save a startup idea
-/ideas - View all saved ideas
+/idea <text> - Save startup idea
+/ideas - View all ideas
 
 ━━━━━━━━━━━━━━━━━━━━
 🔍 *CODE & REPOS*
 ━━━━━━━━━━━━━━━━━━━━
-/review <repo> - Review latest commit
-/repos - List all 11 repositories
+/review <repo> - Review with context!
+/repos - List all repositories
 
 ━━━━━━━━━━━━━━━━━━━━
 💬 *ASK & CHAT*
 ━━━━━━━━━━━━━━━━━━━━
-/ask <question> - Ask any question
-/suggest - Get today's suggestion
+/ask <question> - Ask anything
+/suggest - Get suggestion
 
 ━━━━━━━━━━━━━━━━━━━━
 🎤📸 *MEDIA*
 ━━━━━━━━━━━━━━━━━━━━
-🎤 Voice note → I listen & respond
-📸 Send photo → I analyze it!
+🎤 Voice note → Transcribe + respond
+📸 Photo → Analyze it!
 
 ━━━━━━━━━━━━━━━━━━━━
 ⚙️ /alerts /roadmap
@@ -365,12 +388,21 @@ Use */review* <repo-name> to review latest commit!
     const chatId = ctx.chat?.id;
     if (!chatId) return;
     
-    if (alertChatIds.has(chatId)) {
-      alertChatIds.delete(chatId);
-      await ctx.reply('🔕 Proactive alerts *disabled*. You won\'t receive automatic notifications.\n\nUse /alerts again to re-enable.', { parse_mode: 'Markdown' });
-    } else {
+    // Check current preference from database (persistent!)
+    const prefs = await getAlertPreferences(chatId);
+    const currentlyEnabled = prefs?.alertsEnabled ?? false;
+    
+    // Toggle and save to database
+    const newEnabled = !currentlyEnabled;
+    await setAlertPreferences(chatId, newEnabled, true);
+    
+    // Also update in-memory set for current session
+    if (newEnabled) {
       alertChatIds.add(chatId);
-      await ctx.reply('🔔 Proactive alerts *enabled*! You\'ll receive:\n\n• ☀️ Morning briefing (8 AM Panama)\n• ⚠️ Stale repo warnings\n• 🚨 Service down alerts\n\nUse /alerts again to disable.', { parse_mode: 'Markdown' });
+      await ctx.reply('🔔 Proactive alerts *enabled*! You\'ll receive:\n\n• ☀️ Morning briefing (8 AM Panama)\n• ⚠️ Stale repo warnings\n• 🚨 Service down alerts\n\n✅ _Preference saved to database - persists across restarts!_\n\nUse /alerts again to disable.', { parse_mode: 'Markdown' });
+    } else {
+      alertChatIds.delete(chatId);
+      await ctx.reply('🔕 Proactive alerts *disabled*. You won\'t receive automatic notifications.\n\n✅ _Preference saved to database - persists across restarts!_\n\nUse /alerts again to re-enable.', { parse_mode: 'Markdown' });
     }
   });
   
@@ -428,6 +460,184 @@ Use */review* <repo-name> to review latest commit!
     } catch (error) {
       console.error('Ideas list error:', error);
       await ctx.reply('❌ Error loading ideas. Try again!');
+    }
+  });
+  
+  // ==========================================================================
+  // TECHNICAL DEBT TRACKING - Real CTOs track tech debt!
+  // ==========================================================================
+  
+  // /debt - Add or list technical debt
+  bot.command('debt', async (ctx) => {
+    const input = ctx.message?.text?.replace('/debt', '').trim();
+    
+    // If no input, show menu
+    if (!input) {
+      await ctx.reply(`📋 *Technical Debt Tracker*
+
+Track issues that need fixing later.
+
+*Commands:*
+/debt <repo> <description> - Add new debt
+/debt list - Show all open debt
+/debt list <repo> - Show debt for repo
+/debt done <id> - Mark debt as resolved
+
+*Examples:*
+/debt EspaLuz Needs better error handling in API calls
+/debt aideazz Refactor homepage component
+/debt list
+/debt done ABC123
+
+_A real CTO tracks technical debt!_`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Handle subcommands
+    if (input.startsWith('list')) {
+      const repo = input.replace('list', '').trim() || undefined;
+      const debts = await getTechDebt(repo);
+      
+      if (!debts || debts.length === 0) {
+        await ctx.reply(repo 
+          ? `✨ No open tech debt for ${repo}!`
+          : '✨ No open tech debt! (Or use /debt list <repo>)');
+        return;
+      }
+      
+      const debtList = debts.map((d: any, i: number) => {
+        const [id, repoName, desc, severity] = d;
+        const shortId = id?.substring(0, 8) || '?';
+        const shortDesc = desc?.substring(0, 60) || 'No description';
+        return `${i + 1}. [${shortId}] *${repoName}*\n   ${shortDesc}${desc?.length > 60 ? '...' : ''}\n   ⚠️ ${severity || 'medium'}`;
+      }).join('\n\n');
+      
+      await ctx.reply(`📋 *Open Technical Debt*\n\n${debtList}\n\n_Use /debt done <id> to resolve_`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (input.startsWith('done ')) {
+      const debtId = input.replace('done ', '').trim();
+      const success = await resolveTechDebt(debtId);
+      
+      if (success) {
+        await ctx.reply(`✅ Tech debt ${debtId.substring(0, 8)} marked as resolved!`);
+      } else {
+        await ctx.reply('❌ Could not resolve debt. Check the ID and try again.');
+      }
+      return;
+    }
+    
+    // Otherwise, add new debt: /debt <repo> <description>
+    const parts = input.split(' ');
+    const repo = parts[0];
+    const description = parts.slice(1).join(' ');
+    
+    if (!repo || !description) {
+      await ctx.reply('❌ Please provide repo and description.\n\nExample: /debt EspaLuz Needs error handling');
+      return;
+    }
+    
+    // Detect severity from keywords
+    let severity = 'medium';
+    if (description.toLowerCase().includes('critical') || description.toLowerCase().includes('urgent')) {
+      severity = 'high';
+    } else if (description.toLowerCase().includes('minor') || description.toLowerCase().includes('nice to have')) {
+      severity = 'low';
+    }
+    
+    const debtId = await addTechDebt(repo, description, severity);
+    
+    if (debtId) {
+      await ctx.reply(`📋 *Tech Debt Added*
+
+📦 Repo: ${repo}
+📝 ${description}
+⚠️ Severity: ${severity}
+🔖 ID: ${debtId.substring(0, 8)}
+
+_Use /debt list to see all debt_`, { parse_mode: 'Markdown' });
+    } else {
+      await ctx.reply('❌ Error adding tech debt. Try again!');
+    }
+  });
+  
+  // ==========================================================================
+  // ARCHITECTURAL DECISIONS - Real CTOs document decisions!
+  // ==========================================================================
+  
+  // /decision - Record architectural decisions
+  bot.command('decision', async (ctx) => {
+    const input = ctx.message?.text?.replace('/decision', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`🏛️ *Architectural Decision Record*
+
+Document important technical decisions.
+
+*Commands:*
+/decision <title> | <description> | <rationale>
+/decision list - Show recent decisions
+/decision list <repo> - Decisions for repo
+
+*Examples:*
+/decision Use PostgreSQL | For EspaLuz user data | Better JSON support than MySQL
+/decision Oracle Cloud | For CTO AIPA hosting | Free tier is generous
+/decision list
+
+_A real CTO documents why, not just what!_`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (input.startsWith('list')) {
+      const repo = input.replace('list', '').trim() || undefined;
+      const decisions = await getDecisions(repo);
+      
+      if (!decisions || decisions.length === 0) {
+        await ctx.reply('📭 No decisions recorded yet.\n\nUse /decision to add one!');
+        return;
+      }
+      
+      const decisionList = decisions.map((d: any, i: number) => {
+        const [id, repoName, title, desc, rationale, createdAt] = d;
+        const date = createdAt ? new Date(createdAt).toLocaleDateString() : '';
+        return `${i + 1}. *${title}*${repoName ? ` (${repoName})` : ''}\n   ${desc?.substring(0, 80) || ''}\n   📅 ${date}`;
+      }).join('\n\n');
+      
+      await ctx.reply(`🏛️ *Architectural Decisions*\n\n${decisionList}`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Parse: title | description | rationale (optional repo prefix)
+    const parts = input.split('|').map(s => s.trim());
+    
+    if (parts.length < 2) {
+      await ctx.reply('❌ Please use format:\n/decision Title | Description | Rationale\n\nExample:\n/decision Use Redis | For caching API responses | Faster than DB queries');
+      return;
+    }
+    
+    const title = parts[0] || '';
+    const description = parts[1] || '';
+    const rationale = parts[2] || 'No rationale provided';
+    
+    // Check if first word of title is a repo name
+    const firstWord = title.split(' ')[0] || '';
+    const isRepo = firstWord && AIDEAZZ_REPOS.includes(firstWord);
+    const repo = isRepo ? firstWord : undefined;
+    const finalTitle = isRepo ? title.split(' ').slice(1).join(' ') : title;
+    
+    const decisionId = await addDecision(finalTitle, description, rationale, repo);
+    
+    if (decisionId) {
+      await ctx.reply(`🏛️ *Decision Recorded*
+
+📌 *${finalTitle}*
+${repo ? `📦 Repo: ${repo}\n` : ''}📝 ${description}
+💡 Rationale: ${rationale}
+
+_Use /decision list to see all decisions_`, { parse_mode: 'Markdown' });
+    } else {
+      await ctx.reply('❌ Error recording decision. Try again!');
     }
   });
   
@@ -803,85 +1013,56 @@ Important:
       const prTitle = (prTitleMatch && prTitleMatch[1]) ? prTitleMatch[1].trim() : `CTO AIPA: ${task}`;
       const prBody = (prBodyMatch && prBodyMatch[1]) ? prBodyMatch[1].trim() : `Automated PR by CTO AIPA.\n\nTask: ${task}`;
       
-      // 4. Create a new branch
-      const branchName = `cto-aipa/${Date.now()}`;
-      
-      // Get the SHA of the default branch
-      const { data: refData } = await octokit.git.getRef({
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        ref: `heads/${defaultBranch}`
-      });
-      
-      // Create new branch
-      await octokit.git.createRef({
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        ref: `refs/heads/${branchName}`,
-        sha: refData.object.sha
-      });
-      
-      // 5. Create or update the file
-      let fileSha: string | undefined;
-      try {
-        const { data: existingFile } = await octokit.repos.getContent({
-          owner: 'ElenaRevicheva',
-          repo: repoName,
-          path: filename,
-          ref: defaultBranch
-        });
-        if (!Array.isArray(existingFile)) {
-          fileSha = existingFile.sha;
-        }
-      } catch {
-        // File doesn't exist, that's fine
+      // 4. SAFE MODE: Save pending code for review instead of auto-commit
+      const chatId = ctx.chat?.id;
+      if (!chatId) {
+        await ctx.reply('❌ Could not identify chat. Try again.');
+        return;
       }
       
-      const createFileParams: any = {
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        path: filename,
-        message: commitMessage,
-        content: Buffer.from(code).toString('base64'),
-        branch: branchName
-      };
-      
-      if (fileSha) {
-        createFileParams.sha = fileSha;
-      }
-      
-      await octokit.repos.createOrUpdateFileContents(createFileParams);
-      
-      // 6. Create PR
-      const { data: pr } = await octokit.pulls.create({
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        title: prTitle,
-        body: `${prBody}\n\n---\n🤖 *Generated by CTO AIPA*\nRequested via Telegram`,
-        head: branchName,
-        base: defaultBranch
-      });
-      
-      await ctx.reply(`✅ *PR Created!*
-
-📁 File: ${filename}
-🔀 Branch: ${branchName}
-📝 PR: #${pr.number}
-
-🔗 Review it here:
-${pr.html_url}
-
-Check the code and merge when ready! 🚀`, { parse_mode: 'Markdown' });
-      
-      // Save to memory
-      await saveMemory('CTO', 'code_generation', {
-        repo: repoName,
+      await savePendingCode(
+        chatId,
+        repoName,
         task,
         filename,
-        pr_number: pr.number
-      }, `Created PR #${pr.number}`, {
+        code,
+        commitMessage,
+        prTitle,
+        prBody
+      );
+      
+      // Show preview with code snippet
+      const codePreview = code.length > 1500 ? code.substring(0, 1500) + '\n... (truncated)' : code;
+      
+      await ctx.reply(`📝 *CODE PREVIEW*
+
+📁 *File:* ${filename}
+📦 *Repo:* ${repoName}
+💬 *Commit:* ${commitMessage}
+
+━━━━━━━━━━━━━━━━━━━━
+\`\`\`
+${codePreview}
+\`\`\`
+━━━━━━━━━━━━━━━━━━━━
+
+⚠️ *This code has NOT been committed yet!*
+
+Review the code above, then:
+✅ /approve - Create PR with this code
+❌ /reject - Discard this code
+📝 /code again - Generate different code
+
+_A real CTO reviews before committing!_`, { parse_mode: 'Markdown' });
+      
+      // Save to memory
+      await saveMemory('CTO', 'code_preview', {
+        repo: repoName,
+        task,
+        filename
+      }, 'Code generated, awaiting approval', {
         platform: 'telegram',
-        type: 'code_generation',
+        type: 'code_preview',
         timestamp: new Date().toISOString()
       });
       
@@ -896,6 +1077,158 @@ Check the code and merge when ready! 🚀`, { parse_mode: 'Markdown' });
         await ctx.reply(`❌ Error creating code: ${error.message || 'Unknown error'}\n\nTry again or use Cursor for complex tasks!`);
       }
     }
+  });
+  
+  // /approve - Actually create PR from pending code
+  bot.command('approve', async (ctx) => {
+    const chatId = ctx.chat?.id;
+    if (!chatId) {
+      await ctx.reply('❌ Could not identify chat.');
+      return;
+    }
+    
+    const pending = await getPendingCode(chatId);
+    if (!pending) {
+      await ctx.reply('❌ No pending code to approve.\n\nUse /code first to generate code.');
+      return;
+    }
+    
+    await ctx.reply('✅ Approving code and creating PR...');
+    
+    try {
+      // Extract pending code data
+      const [id, repoName, task, filename, code, commitMessage, prTitle, prBody] = pending as any[];
+      
+      // Get default branch
+      const { data: repoData } = await octokit.repos.get({
+        owner: 'ElenaRevicheva',
+        repo: repoName
+      });
+      const defaultBranch = repoData.default_branch;
+      
+      // Create branch
+      const branchName = `cto-aipa/${Date.now()}`;
+      const { data: refData } = await octokit.git.getRef({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        ref: `heads/${defaultBranch}`
+      });
+      
+      await octokit.git.createRef({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        ref: `refs/heads/${branchName}`,
+        sha: refData.object.sha
+      });
+      
+      // Check if file exists
+      let fileSha: string | undefined;
+      try {
+        const { data: existingFile } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: filename,
+          ref: defaultBranch
+        });
+        if (!Array.isArray(existingFile)) {
+          fileSha = existingFile.sha;
+        }
+      } catch {
+        // File doesn't exist
+      }
+      
+      // Create/update file
+      const createFileParams: any = {
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filename,
+        message: commitMessage,
+        content: Buffer.from(code).toString('base64'),
+        branch: branchName
+      };
+      if (fileSha) createFileParams.sha = fileSha;
+      
+      await octokit.repos.createOrUpdateFileContents(createFileParams);
+      
+      // Create PR
+      const { data: pr } = await octokit.pulls.create({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        title: prTitle,
+        body: `${prBody}\n\n---\n🤖 *Generated by CTO AIPA*\n✅ *Approved by human before commit*`,
+        head: branchName,
+        base: defaultBranch
+      });
+      
+      // Clear pending code
+      await clearPendingCode(chatId, 'approved');
+      
+      await ctx.reply(`✅ *PR Created!*
+
+📁 File: ${filename}
+🔀 Branch: ${branchName}
+📝 PR: #${pr.number}
+
+🔗 ${pr.html_url}
+
+_Human-approved code is better code!_ 🎯`, { parse_mode: 'Markdown' });
+      
+      await saveMemory('CTO', 'code_approved', {
+        repo: repoName,
+        task,
+        filename,
+        pr_number: pr.number
+      }, `PR #${pr.number} created after approval`, {
+        platform: 'telegram',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Approve error:', error);
+      await ctx.reply(`❌ Error creating PR: ${error.message || 'Unknown error'}`);
+    }
+  });
+  
+  // /reject - Discard pending code
+  bot.command('reject', async (ctx) => {
+    const chatId = ctx.chat?.id;
+    if (!chatId) {
+      await ctx.reply('❌ Could not identify chat.');
+      return;
+    }
+    
+    const pending = await getPendingCode(chatId);
+    if (!pending) {
+      await ctx.reply('❌ No pending code to reject.');
+      return;
+    }
+    
+    await clearPendingCode(chatId, 'rejected');
+    await ctx.reply('🗑️ Code rejected and discarded.\n\nUse /code to generate new code.');
+  });
+  
+  // /pending - Show pending code status
+  bot.command('pending', async (ctx) => {
+    const chatId = ctx.chat?.id;
+    if (!chatId) {
+      await ctx.reply('❌ Could not identify chat.');
+      return;
+    }
+    
+    const pending = await getPendingCode(chatId);
+    if (!pending) {
+      await ctx.reply('📭 No pending code awaiting approval.\n\nUse /code to generate code.');
+      return;
+    }
+    
+    const [id, repoName, task, filename] = pending as any[];
+    await ctx.reply(`📋 *Pending Code*
+
+📦 Repo: ${repoName}
+📁 File: ${filename}
+📝 Task: ${task}
+
+Use /approve to create PR or /reject to discard.`, { parse_mode: 'Markdown' });
   });
   
   // /fix - Fix an issue and create PR
@@ -995,72 +1328,50 @@ Be practical and create working code.`;
       const filename = filenameMatch[1].trim();
       const code = codeMatch[1];
       const commitMessage = (commitMatch && commitMatch[1]) ? commitMatch[1].trim() : `fix: ${issue}`;
+      const prTitle = `🔧 Fix: ${issue}`;
+      const prBody = `Fix for: ${issue}\n\nGenerated by CTO AIPA`;
       
-      // Create branch
-      const branchName = `cto-fix/${Date.now()}`;
-      
-      const { data: refData } = await octokit.git.getRef({
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        ref: `heads/${defaultBranch}`
-      });
-      
-      await octokit.git.createRef({
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        ref: `refs/heads/${branchName}`,
-        sha: refData.object.sha
-      });
-      
-      // Check if file exists
-      let fileSha: string | undefined;
-      try {
-        const { data: existingFile } = await octokit.repos.getContent({
-          owner: 'ElenaRevicheva',
-          repo: repoName,
-          path: filename,
-          ref: defaultBranch
-        });
-        if (!Array.isArray(existingFile)) {
-          fileSha = existingFile.sha;
-        }
-      } catch {}
-      
-      // Create/update file
-      const createFileParams: any = {
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        path: filename,
-        message: commitMessage,
-        content: Buffer.from(code).toString('base64'),
-        branch: branchName
-      };
-      
-      if (fileSha) {
-        createFileParams.sha = fileSha;
+      // SAFE MODE: Save pending code for review instead of auto-commit
+      const chatId = ctx.chat?.id;
+      if (!chatId) {
+        await ctx.reply('❌ Could not identify chat. Try again.');
+        return;
       }
       
-      await octokit.repos.createOrUpdateFileContents(createFileParams);
+      await savePendingCode(
+        chatId,
+        repoName,
+        `Fix: ${issue}`,
+        filename,
+        code,
+        commitMessage,
+        prTitle,
+        prBody
+      );
       
-      // Create PR
-      const { data: pr } = await octokit.pulls.create({
-        owner: 'ElenaRevicheva',
-        repo: repoName,
-        title: `🔧 Fix: ${issue}`,
-        body: `Automated fix by CTO AIPA\n\n**Issue:** ${issue}\n\n---\n🤖 Generated via Telegram`,
-        head: branchName,
-        base: defaultBranch
-      });
+      // Show preview with code snippet
+      const codePreview = code.length > 1500 ? code.substring(0, 1500) + '\n... (truncated)' : code;
       
-      await ctx.reply(`✅ *Fix PR Created!*
+      await ctx.reply(`🔧 *FIX PREVIEW*
 
-🔧 Issue: ${issue}
-📁 File: ${filename}
-📝 PR: #${pr.number}
+📁 *File:* ${filename}
+📦 *Repo:* ${repoName}
+🐛 *Issue:* ${issue}
 
-🔗 Review: ${pr.html_url}
+━━━━━━━━━━━━━━━━━━━━
+\`\`\`
+${codePreview}
+\`\`\`
+━━━━━━━━━━━━━━━━━━━━
 
-Check and merge when ready! 🚀`, { parse_mode: 'Markdown' });
+⚠️ *This fix has NOT been committed yet!*
+
+Review the code above, then:
+✅ /approve - Create PR with this fix
+❌ /reject - Discard this fix
+🔧 /fix again - Generate different fix
+
+_A real CTO reviews fixes before deploying!_`, { parse_mode: 'Markdown' });
       
     } catch (error: any) {
       console.error('Fix error:', error);
@@ -1077,7 +1388,7 @@ Check and merge when ready! 🚀`, { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply(`🔍 Reviewing latest commit in ${repoName}...`);
+    await ctx.reply(`🔍 Reviewing latest commit in ${repoName}...\n\n_Fetching codebase context..._`, { parse_mode: 'Markdown' });
     
     try {
       // Get latest commit
@@ -1107,27 +1418,88 @@ Check and merge when ready! 🚀`, { parse_mode: 'Markdown' });
       
       const diff = (commitData as unknown as string).substring(0, 3000); // Limit diff size
       
-      // Ask CTO to review
+      // ==========================================================================
+      // ENHANCED CONTEXT: Fetch actual codebase info for better review
+      // ==========================================================================
+      
+      let packageJson = '';
+      let techStack = '';
+      let repoDescription = '';
+      
+      // Try to fetch package.json for tech stack context
+      try {
+        const { data: pkgFile } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: 'package.json'
+        });
+        if (!Array.isArray(pkgFile) && pkgFile.type === 'file' && 'content' in pkgFile) {
+          packageJson = Buffer.from(pkgFile.content, 'base64').toString('utf-8');
+          const pkg = JSON.parse(packageJson);
+          const deps = Object.keys(pkg.dependencies || {}).slice(0, 10).join(', ');
+          techStack = `Dependencies: ${deps}`;
+        }
+      } catch {
+        // No package.json
+      }
+      
+      // Get repo description
+      try {
+        const { data: repoInfo } = await octokit.repos.get({
+          owner: 'ElenaRevicheva',
+          repo: repoName
+        });
+        repoDescription = repoInfo.description || '';
+      } catch {}
+      
+      // Fetch relevant architectural decisions for this repo
+      const decisions = await getDecisions(repoName, 3);
+      let decisionsContext = '';
+      if (decisions && decisions.length > 0) {
+        decisionsContext = '\n\nRELEVANT ARCHITECTURAL DECISIONS:\n' + 
+          decisions.map((d: any) => `- ${d[2]}: ${d[3]}`).join('\n');
+      }
+      
+      // Fetch open tech debt for this repo
+      const techDebt = await getTechDebt(repoName, 'open');
+      let techDebtContext = '';
+      if (techDebt && techDebt.length > 0) {
+        techDebtContext = '\n\nKNOWN TECH DEBT:\n' + 
+          techDebt.slice(0, 3).map((d: any) => `- ${d[2]}`).join('\n');
+      }
+      
+      // Ask CTO to review with enhanced context
       const reviewPrompt = `${AIDEAZZ_CONTEXT}
 
-Review this commit briefly (for Telegram, keep it concise - max 3-4 bullet points):
+Review this commit with REAL CODEBASE CONTEXT:
 
 Repo: ${repoName}
+Description: ${repoDescription || 'No description'}
+${techStack ? `Tech Stack: ${techStack}` : ''}
 Commit: ${commitSha}
 Message: ${commitMessage}
 Date: ${commitDate}
+${decisionsContext}
+${techDebtContext}
 
 Diff (truncated):
 ${diff}
 
-Give a quick review with:
-• What changed (1 line)
-• Any issues spotted
-• One suggestion
-• Overall verdict (👍 or ⚠️ or ❌)`;
+As a TRUE Technical Co-Founder, give a review that:
+• Understands the context of this specific repo
+• References past decisions if relevant
+• Notes if this addresses known tech debt
+• Spots real issues (not generic advice)
+• Gives ONE specific, actionable suggestion
+
+Format for Telegram (keep concise):
+📝 What changed
+⚠️ Issues (if any)
+💡 Suggestion
+✅ or ⚠️ or ❌ Verdict`;
 
       // Use askAI with Groq fallback
-      const review = await askAI(reviewPrompt, 1000);
+      const review = await askAI(reviewPrompt, 1200);
       
       // Escape special characters for Telegram
       const safeCommitMessage = commitMessage.replace(/[_*`\[\]()~>#+\-=|{}.!]/g, '\\$&');
@@ -1136,6 +1508,7 @@ Give a quick review with:
       const reviewMessage = `🔍 Review: ${safeRepoName}
 📝 Commit: ${commitSha}
 💬 "${safeCommitMessage.substring(0, 100)}"
+${techStack ? `\n📦 ${techStack.substring(0, 100)}` : ''}
 
 ${review}`;
       
@@ -1390,12 +1763,20 @@ Respond naturally as her CTO co-founder would. If she asks something complex, gi
   // ==========================================================================
   
   bot.start({
-    onStart: (botInfo) => {
+    onStart: async (botInfo) => {
       console.log(`🤖 Telegram bot started: @${botInfo.username}`);
       console.log(`   Chat with your CTO at: https://t.me/${botInfo.username}`);
       console.log(`   📅 Daily briefing: 8 AM Panama time`);
-      console.log(`   🔔 Proactive alerts: Enabled`);
       console.log(`   🎤 Voice messages: Enabled`);
+      
+      // Load alert preferences from database (persistent!)
+      try {
+        const savedChatIds = await getAllAlertChatIds();
+        savedChatIds.forEach(id => alertChatIds.add(id));
+        console.log(`   🔔 Loaded ${savedChatIds.length} alert subscribers from database`);
+      } catch (err) {
+        console.log(`   ⚠️ Could not load alert preferences: ${err}`);
+      }
       
       // Start scheduled tasks
       startScheduledTasks(bot!);
