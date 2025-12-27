@@ -2,6 +2,7 @@ import { Bot, Context, InputFile } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
 import OpenAI from 'openai';
+import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import * as fs from 'fs';
@@ -10,11 +11,36 @@ import * as path from 'path';
 // OpenAI client for DALL-E and Whisper (optional)
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 
+// Replicate client for Flux Pro (best realistic images)
+const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({ auth: process.env.REPLICATE_API_TOKEN }) : null;
+
+// Runway API base URL
+const RUNWAY_API_URL = 'https://api.runwayml.com/v1';
+const runwayApiKey = process.env.RUNWAY_API_KEY || null;
+
 // =============================================================================
 // PERSISTENCE - State survives restarts
 // =============================================================================
 
 const STATE_FILE = process.env.ATUONA_STATE_FILE || './atuona-state.json';
+
+// Visualization storage for AI Film
+interface PageVisualization {
+  pageId: string;
+  pageTitle: string;
+  imagePrompt: string;
+  imageUrl?: string;
+  imageUrlSquare?: string;    // 1:1 for Instagram feed
+  imageUrlVertical?: string;  // 9:16 for Reels/Stories
+  imageUrlHorizontal?: string; // 16:9 for YouTube
+  videoUrl?: string;
+  videoUrlVertical?: string;  // 9:16 for Reels
+  videoUrlHorizontal?: string; // 16:9 for YouTube
+  caption: string;
+  hashtags: string[];
+  createdAt: string;
+  status: 'pending' | 'image_done' | 'video_done' | 'complete';
+}
 
 interface PersistedState {
   bookState: BookState;
@@ -22,6 +48,7 @@ interface PersistedState {
   characterMemories: Record<string, string[]>;
   drafts: Draft[];
   proactiveHistory: ProactiveMessage[];
+  visualizations: PageVisualization[];
   elenaChatId: number | null;
   lastProactiveDate: string;
 }
@@ -41,6 +68,9 @@ interface ProactiveMessage {
   message: string;
   mood?: string;
 }
+
+// Visualizations storage
+let visualizations: PageVisualization[] = [];
 
 // Character memories - things learned about each character
 let characterMemories: Record<string, string[]> = {
@@ -80,6 +110,7 @@ function saveState(): void {
       characterMemories,
       drafts,
       proactiveHistory,
+      visualizations,
       elenaChatId,
       lastProactiveDate
     };
@@ -102,11 +133,12 @@ function loadState(): void {
       if (state.characterMemories) characterMemories = state.characterMemories;
       if (state.drafts) drafts = state.drafts;
       if (state.proactiveHistory) proactiveHistory = state.proactiveHistory;
+      if (state.visualizations) visualizations = state.visualizations;
       if (state.elenaChatId) elenaChatId = state.elenaChatId;
       if (state.lastProactiveDate) lastProactiveDate = state.lastProactiveDate;
       
       console.log('📂 State loaded from', STATE_FILE);
-      console.log(`   📄 Page: ${bookState.currentPage}, 🔥 Streak: ${creativeSession.writingStreak}, 📝 Drafts: ${drafts.length}`);
+      console.log(`   📄 Page: ${bookState.currentPage}, 🔥 Streak: ${creativeSession.writingStreak}, 🎬 Visualizations: ${visualizations.length}`);
     } else {
       console.log('📂 No saved state found, starting fresh');
     }
@@ -960,6 +992,14 @@ _"Paradise is not found. Paradise is deployed."_ 🌴
 ━━━━━━━━━━━━━━━━━━━━
 /export - Backup all content
 /import\\_backup - Restore from backup
+
+━━━━━━━━━━━━━━━━━━━━
+🎬 *AI FILM STUDIO*
+━━━━━━━━━━━━━━━━━━━━
+/visualize 048 - Create image+video
+/gallery - View all visualizations
+/film - Film compilation status
+/videostatus - Check video progress
 
 ━━━━━━━━━━━━━━━━━━━━
 🌍 *CREATIVE TOOLS*
@@ -3063,6 +3103,44 @@ Keep this file safe! 💜`, { parse_mode: 'Markdown' });
         await ctx.replyWithDocument(
           new InputFile(Buffer.from(historyExport), histFilename)
         );
+        
+      } else if (arg === 'film') {
+        // Export film visualizations
+        if (visualizations.length === 0) {
+          await ctx.reply('🎬 No visualizations yet! Use `/visualize 048` to create some.', { parse_mode: 'Markdown' });
+          return;
+        }
+        
+        const filmExport = visualizations.map(v => {
+          return `## Page #${v.pageId}: ${v.pageTitle}
+
+**Status:** ${v.status}
+**Created:** ${v.createdAt}
+
+### Image Prompt
+${v.imagePrompt}
+
+### URLs
+- Horizontal (YouTube): ${v.imageUrlHorizontal || 'Not generated'}
+- Vertical (Instagram): ${v.imageUrlVertical || 'Not generated'}
+- Video (Horizontal): ${v.videoUrlHorizontal || 'Not generated'}
+- Video (Vertical): ${v.videoUrlVertical || 'Not generated'}
+
+### Social Media
+**Caption:** ${v.caption}
+**Hashtags:** ${v.hashtags.join(' ')}
+`;
+        }).join('\n\n---\n\n');
+        
+        const filmFilename = `atuona-film-${new Date().toISOString().split('T')[0]}.md`;
+        await ctx.replyWithDocument(
+          new InputFile(Buffer.from(filmExport), filmFilename)
+        );
+        
+        await ctx.reply(`🎬 *Film Export Complete!*
+
+${visualizations.length} visualizations exported.
+Download the file and use URLs in your video editor!`, { parse_mode: 'Markdown' });
       }
       
     } catch (error) {
@@ -3246,6 +3324,421 @@ _Set OPENAI_API_KEY for automatic generation!_`, { parse_mode: 'Markdown' });
 
   // ==========================================================================
   // 🎤 VOICE NOTES (Placeholder for whisper integration)  
+  // ==========================================================================
+  // 🎬 AI FILM VISUALIZATION SYSTEM
+  // ==========================================================================
+
+  // /visualize - Generate image and video for a page
+  atuonaBot.command('visualize', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/visualize', '').trim();
+    
+    if (!arg) {
+      await ctx.reply(`🎬 *AI Film Visualization*
+
+Create stunning visuals for your book pages:
+
+\`/visualize 048\` - Visualize specific page
+\`/visualize last\` - Visualize last published page
+\`/visualize all\` - Queue all pages for visualization
+
+Each visualization creates:
+🎨 Flux Pro image (ultra-realistic)
+🎬 Runway Gen-3 video (5-10 sec)
+📱 Instagram format (9:16)
+📺 YouTube format (16:9)
+
+━━━━━━━━━━━━━━━━━━━━
+Status: ${visualizations.length} pages visualized
+Replicate: ${replicate ? '✅ Ready' : '❌ Set REPLICATE_API_TOKEN'}
+Runway: ${runwayApiKey ? '✅ Ready' : '❌ Set RUNWAY_API_KEY'}`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Determine which page to visualize
+    let pageId = arg;
+    if (arg === 'last') {
+      pageId = String(bookState.currentPage - 1).padStart(3, '0');
+    }
+    
+    if (arg === 'all') {
+      await ctx.reply('🎬 *Batch visualization coming soon!*\n\nFor now, visualize one page at a time.', { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Normalize page ID
+    const pageNum = parseInt(pageId);
+    if (isNaN(pageNum)) {
+      await ctx.reply('❌ Invalid page number. Use `/visualize 048` or `/visualize last`', { parse_mode: 'Markdown' });
+      return;
+    }
+    pageId = String(pageNum).padStart(3, '0');
+    
+    await ctx.reply(`🎬 *Starting Visualization for Page #${pageId}*\n\n_Fetching page content..._`, { parse_mode: 'Markdown' });
+    
+    try {
+      // Fetch page content from GitHub
+      const { data: metaFile } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: 'atuona',
+        path: `metadata/${pageId}.json`,
+        ref: 'main'
+      });
+      
+      if (!('content' in metaFile)) {
+        await ctx.reply(`❌ Page #${pageId} not found`);
+        return;
+      }
+      
+      const metadata = JSON.parse(Buffer.from(metaFile.content, 'base64').toString('utf-8'));
+      const title = metadata.attributes?.find((a: any) => a.trait_type === 'Poem' || a.trait_type === 'Title')?.value || 'Unknown';
+      const theme = metadata.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
+      const englishText = metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
+      
+      // Generate cinematic prompt
+      await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
+      
+      const cinematicPrompt = `You are a world-class cinematographer and visual artist.
+
+Based on this literary excerpt, create a detailed visual prompt for an ultra-realistic, cinematic image:
+
+TITLE: "${title}"
+THEME: ${theme}
+TEXT: "${englishText.substring(0, 800)}"
+
+STYLE REQUIREMENTS:
+- Cinematic, film-quality realism
+- Impressionist/Post-impressionist lighting influences (Gauguin, Van Gogh)
+- Moody, atmospheric, emotional
+- Mix of tropical paradise and urban/tech elements
+- Rich color palette: deep purples, ocean blues, tropical greens, golden hour warmth
+- Should feel like a frame from an art house film
+
+OUTPUT: A detailed image prompt (150-200 words) describing:
+- Main subject/character (if any)
+- Setting and environment
+- Lighting and atmosphere
+- Color palette
+- Mood and emotion
+- Camera angle/composition
+
+Return ONLY the prompt, no explanation.`;
+
+      const imagePrompt = await createContent(cinematicPrompt, 500, true);
+      
+      await ctx.reply(`🎨 *Cinematic Prompt:*\n\n_${imagePrompt.substring(0, 300)}..._`, { parse_mode: 'Markdown' });
+      
+      // Generate caption for social media
+      const captionPrompt = `Create a short, evocative Instagram caption (max 150 chars) for this book page:
+Title: "${title}"
+Theme: ${theme}
+Text excerpt: "${englishText.substring(0, 200)}"
+
+Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
+      
+      const caption = await createContent(captionPrompt, 100, true);
+      
+      // Generate hashtags
+      const hashtags = ['#ATUONA', '#AIFilm', '#VibeCoding', '#UndergroundArt', '#ParadiseFound', '#AIGenerated', '#DigitalArt', '#BookToFilm'];
+      
+      // Create visualization record
+      const visualization: PageVisualization = {
+        pageId,
+        pageTitle: title,
+        imagePrompt,
+        caption,
+        hashtags,
+        createdAt: new Date().toISOString(),
+        status: 'pending'
+      };
+      
+      // Generate image with Flux Pro via Replicate
+      if (replicate) {
+        await ctx.reply('🎨 *Generating image with Flux Pro...*\n\n_This takes 30-60 seconds..._', { parse_mode: 'Markdown' });
+        
+        try {
+          // Flux Pro via Replicate - 16:9 for YouTube
+          const output = await replicate.run(
+            "black-forest-labs/flux-1.1-pro",
+            {
+              input: {
+                prompt: imagePrompt,
+                aspect_ratio: "16:9",
+                output_format: "webp",
+                output_quality: 90,
+                safety_tolerance: 2,
+                prompt_upsampling: true
+              }
+            }
+          );
+          
+          if (output && typeof output === 'string') {
+            visualization.imageUrlHorizontal = output;
+            visualization.status = 'image_done';
+            
+            // Send the image
+            await ctx.replyWithPhoto(output, {
+              caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube Format (16:9)\n\n_${caption}_`,
+              parse_mode: 'Markdown'
+            });
+          }
+          
+          // Generate vertical version for Instagram
+          await ctx.reply('📱 *Generating Instagram vertical (9:16)...*', { parse_mode: 'Markdown' });
+          
+          const outputVertical = await replicate.run(
+            "black-forest-labs/flux-1.1-pro",
+            {
+              input: {
+                prompt: imagePrompt,
+                aspect_ratio: "9:16",
+                output_format: "webp",
+                output_quality: 90,
+                safety_tolerance: 2,
+                prompt_upsampling: true
+              }
+            }
+          );
+          
+          if (outputVertical && typeof outputVertical === 'string') {
+            visualization.imageUrlVertical = outputVertical;
+            
+            await ctx.replyWithPhoto(outputVertical, {
+              caption: `📱 *Instagram Reel Format (9:16)*\n\n_${caption}_\n\n${hashtags.join(' ')}`,
+              parse_mode: 'Markdown'
+            });
+          }
+          
+        } catch (fluxError: any) {
+          console.error('Flux error:', fluxError);
+          await ctx.reply(`⚠️ Flux image generation error: ${fluxError.message}\n\nTrying DALL-E fallback...`);
+          
+          // Fallback to DALL-E if available
+          if (openai) {
+            const dalleResponse = await openai.images.generate({
+              model: 'dall-e-3',
+              prompt: imagePrompt,
+              n: 1,
+              size: '1792x1024',
+              quality: 'hd'
+            });
+            
+            const dalleUrl = dalleResponse.data?.[0]?.url;
+            if (dalleUrl) {
+              visualization.imageUrlHorizontal = dalleUrl;
+              visualization.status = 'image_done';
+              
+              await ctx.replyWithPhoto(dalleUrl, {
+                caption: `🎬 *Page #${pageId}: ${title}* (DALL-E)\n\n_${caption}_`,
+                parse_mode: 'Markdown'
+              });
+            }
+          }
+        }
+      } else {
+        await ctx.reply(`⚠️ *Flux Pro not configured*\n\nSet REPLICATE_API_TOKEN for best quality images.\n\n🎨 *Generated Prompt:*\n\`${imagePrompt}\`\n\nUse this in Midjourney or other tools!`, { parse_mode: 'Markdown' });
+      }
+      
+      // Generate video with Runway
+      if (runwayApiKey && visualization.imageUrlHorizontal) {
+        await ctx.reply('🎬 *Generating video with Runway Gen-3...*\n\n_This takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+        
+        try {
+          // Runway Gen-3 Alpha API call
+          const runwayResponse = await fetch(`${RUNWAY_API_URL}/image_to_video`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${runwayApiKey}`,
+              'Content-Type': 'application/json',
+              'X-Runway-Version': '2024-11-06'
+            },
+            body: JSON.stringify({
+              promptImage: visualization.imageUrlHorizontal,
+              promptText: `Cinematic movement: ${imagePrompt.substring(0, 200)}. Slow, atmospheric camera movement. Film grain. Moody lighting.`,
+              duration: 5,
+              ratio: '16:9'
+            })
+          });
+          
+          if (runwayResponse.ok) {
+            const runwayData = await runwayResponse.json() as any;
+            const taskId = runwayData.id;
+            
+            await ctx.reply(`🎬 Video generation started!\nTask ID: ${taskId}\n\n_Checking status in 60 seconds..._`);
+            
+            // Poll for completion (simplified - in production use webhooks)
+            setTimeout(async () => {
+              try {
+                const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
+                  headers: { 'Authorization': `Bearer ${runwayApiKey}` }
+                });
+                
+                if (statusResponse.ok) {
+                  const statusData = await statusResponse.json() as any;
+                  if (statusData.status === 'SUCCEEDED' && statusData.output?.[0]) {
+                    visualization.videoUrlHorizontal = statusData.output[0];
+                    visualization.status = 'complete';
+                    saveState();
+                    
+                    await ctx.reply(`✅ *Video Ready!*\n\n🎬 ${statusData.output[0]}\n\n_Download and upload to Instagram/YouTube!_`);
+                  } else {
+                    await ctx.reply(`⏳ Video still processing...\nStatus: ${statusData.status}\n\nUse \`/videostatus ${taskId}\` to check later.`, { parse_mode: 'Markdown' });
+                  }
+                }
+              } catch (pollError) {
+                console.error('Runway poll error:', pollError);
+              }
+            }, 60000);
+            
+          } else {
+            const errorText = await runwayResponse.text();
+            console.error('Runway error:', errorText);
+            await ctx.reply(`⚠️ Runway error: ${runwayResponse.status}\n\nVideo generation skipped. Image saved!`);
+          }
+          
+        } catch (runwayError: any) {
+          console.error('Runway error:', runwayError);
+          await ctx.reply(`⚠️ Runway video error: ${runwayError.message}\n\nImage saved! Video skipped.`);
+        }
+      } else if (!runwayApiKey) {
+        await ctx.reply(`⚠️ *Runway not configured*\n\nSet RUNWAY_API_KEY for video generation.\n\nImage saved! Use the image in CapCut or other video tools.`, { parse_mode: 'Markdown' });
+      }
+      
+      // Save visualization
+      const existingIdx = visualizations.findIndex(v => v.pageId === pageId);
+      if (existingIdx >= 0) {
+        visualizations[existingIdx] = visualization;
+      } else {
+        visualizations.push(visualization);
+      }
+      saveState();
+      
+      await ctx.reply(`✅ *Visualization Complete for #${pageId}!*
+
+📄 Title: ${title}
+🎨 Image: ${visualization.imageUrlHorizontal ? '✅' : '❌'}
+📱 Vertical: ${visualization.imageUrlVertical ? '✅' : '❌'}
+🎬 Video: ${visualization.videoUrlHorizontal ? '✅' : '⏳'}
+
+📝 Caption:
+"${caption}"
+
+#️⃣ ${hashtags.slice(0, 5).join(' ')}
+
+Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Visualize error:', error);
+      await ctx.reply(`❌ Error: ${error.message || 'Unknown error'}`);
+    }
+  });
+
+  // /gallery - View all visualizations
+  atuonaBot.command('gallery', async (ctx) => {
+    if (visualizations.length === 0) {
+      await ctx.reply(`🎬 *AI Film Gallery*
+
+No visualizations yet!
+
+Use \`/visualize 048\` to create your first one.`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const galleryList = visualizations.slice(-10).map(v => {
+      const status = v.status === 'complete' ? '✅' : v.status === 'image_done' ? '🎨' : '⏳';
+      return `${status} *#${v.pageId}* - ${v.pageTitle}\n   🎨 ${v.imageUrlHorizontal ? 'Image ✓' : 'No image'} | 🎬 ${v.videoUrlHorizontal ? 'Video ✓' : 'No video'}`;
+    }).join('\n\n');
+    
+    await ctx.reply(`🎬 *AI Film Gallery*
+
+${galleryList}
+
+━━━━━━━━━━━━━━━━━━━━
+Total: ${visualizations.length} pages visualized
+Complete: ${visualizations.filter(v => v.status === 'complete').length}
+
+\`/visualize <page>\` - Add more
+\`/film\` - Compile into film`, { parse_mode: 'Markdown' });
+  });
+
+  // /film - Film compilation status and info
+  atuonaBot.command('film', async (ctx) => {
+    const completeViz = visualizations.filter(v => v.videoUrlHorizontal);
+    const imageOnly = visualizations.filter(v => v.imageUrlHorizontal && !v.videoUrlHorizontal);
+    
+    await ctx.reply(`🎬 *AI Film: "Finding Paradise"*
+
+Based on the book by Elena Revicheva
+Visualized by ATUONA AI
+
+━━━━━━━━━━━━━━━━━━━━
+📊 *Progress*
+━━━━━━━━━━━━━━━━━━━━
+📄 Total pages: ${bookState.totalPages}
+🎨 Images created: ${visualizations.filter(v => v.imageUrlHorizontal).length}
+🎬 Videos created: ${completeViz.length}
+⏳ Images only: ${imageOnly.length}
+
+━━━━━━━━━━━━━━━━━━━━
+📱 *For Instagram*
+━━━━━━━━━━━━━━━━━━━━
+${visualizations.filter(v => v.imageUrlVertical).length} vertical images ready
+${visualizations.filter(v => v.videoUrlVertical).length} vertical videos ready
+
+━━━━━━━━━━━━━━━━━━━━
+📺 *For YouTube*
+━━━━━━━━━━━━━━━━━━━━
+${visualizations.filter(v => v.imageUrlHorizontal).length} horizontal images ready
+${completeViz.length} horizontal videos ready
+
+━━━━━━━━━━━━━━━━━━━━
+🎬 *Compilation*
+━━━━━━━━━━━━━━━━━━━━
+_Export all videos and compile in:_
+• DaVinci Resolve (free, pro)
+• CapCut (easy, mobile)
+• Adobe Premiere
+
+\`/export film\` - Get all video URLs
+\`/visualize <page>\` - Add more scenes`, { parse_mode: 'Markdown' });
+  });
+
+  // /videostatus - Check Runway video status
+  atuonaBot.command('videostatus', async (ctx) => {
+    const taskId = ctx.message?.text?.replace('/videostatus', '').trim();
+    
+    if (!taskId) {
+      await ctx.reply('Usage: `/videostatus <task_id>`', { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (!runwayApiKey) {
+      await ctx.reply('❌ Runway API not configured');
+      return;
+    }
+    
+    try {
+      const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
+        headers: { 'Authorization': `Bearer ${runwayApiKey}` }
+      });
+      
+      if (statusResponse.ok) {
+        const data = await statusResponse.json() as any;
+        
+        if (data.status === 'SUCCEEDED' && data.output?.[0]) {
+          await ctx.reply(`✅ *Video Complete!*\n\n🎬 ${data.output[0]}\n\n_Right-click to download!_`);
+        } else {
+          await ctx.reply(`⏳ Status: ${data.status}\n\nCheck again in a minute...`);
+        }
+      } else {
+        await ctx.reply(`❌ Could not check status: ${statusResponse.status}`);
+      }
+    } catch (error: any) {
+      await ctx.reply(`❌ Error: ${error.message}`);
+    }
+  });
+
+  // ==========================================================================
+  // 🎤 VOICE NOTES (Whisper transcription)
   // ==========================================================================
 
   // Handle voice messages with Whisper transcription
