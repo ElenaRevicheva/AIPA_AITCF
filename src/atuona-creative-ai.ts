@@ -883,6 +883,189 @@ export function initAtuonaBot(): Bot | null {
   // COMMANDS
   // ==========================================================================
   
+  // /help - Vibe coder friendly guide
+  atuonaBot.command('help', async (ctx) => {
+    const topic = ctx.message?.text?.replace('/help', '').trim().toLowerCase();
+    
+    if (!topic) {
+      await ctx.reply(`🎭 *ATUONA Help - Vibe Coder Edition*
+
+_No coding needed! Just use these commands:_
+
+━━━━━━━━━━━━━━━━━━━━
+🚀 *QUICK START*
+━━━━━━━━━━━━━━━━━━━━
+1️⃣ \`/ritual\` - Start your daily writing
+2️⃣ \`/import <paste your text>\` - Add content  
+3️⃣ \`/publish\` - Send to website
+4️⃣ \`/visualize last\` - Create image+video
+
+━━━━━━━━━━━━━━━━━━━━
+❓ *DETAILED HELP*
+━━━━━━━━━━━━━━━━━━━━
+\`/help writing\` - How to write/import
+\`/help publish\` - How to publish
+\`/help film\` - How to create visuals
+\`/help social\` - How to post to Instagram/YouTube
+\`/help voices\` - Character voice system
+\`/help all\` - Full command list
+
+━━━━━━━━━━━━━━━━━━━━
+💡 *TIP*
+━━━━━━━━━━━━━━━━━━━━
+Just type any command without arguments to see what it does!
+
+Example: \`/visualize\` → shows help
+Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (topic === 'writing' || topic === 'write') {
+      await ctx.reply(`✍️ *Writing Help*
+
+*Import existing text:*
+\`/import Ваш текст на русском...\`
+→ Paste your Russian text after /import
+→ Bot translates to English automatically
+
+*Write together:*
+\`/collab\` → Start interactive mode
+→ You write a line, bot continues
+→ \`/endcollab\` to finish
+
+*Generate new content:*
+\`/scene описание сцены\` → Creates full scene
+\`/expand короткая фраза\` → Expands into paragraph
+\`/dialogue\` → Creates character conversation
+
+*Character voices:*
+\`/voice kira\` → Write as Kira
+\`/voice ule\` → Write as Ule
+\`/voice vibe\` → Write as Vibe Spirit`, { parse_mode: 'Markdown' });
+      
+    } else if (topic === 'publish') {
+      await ctx.reply(`🚀 *Publishing Help*
+
+*Step 1: Import your text*
+\`/import Ваш русский текст здесь...\`
+
+*Step 2: Preview before publishing*
+\`/preview\`
+→ See how it will look
+
+*Step 3: Publish to website*
+\`/publish\`
+→ Goes live on atuona.xyz in ~2 minutes
+
+*If wrong page number:*
+\`/setpage 53\` → Sets next page to 053
+
+*Check what's published:*
+\`/read 052\` → Read any published page`, { parse_mode: 'Markdown' });
+      
+    } else if (topic === 'film' || topic === 'visual' || topic === 'video') {
+      await ctx.reply(`🎬 *AI Film Studio Help*
+
+*Create visuals for a page:*
+\`/visualize 052\` → Specific page
+\`/visualize last\` → Last published page
+
+*What it creates:*
+🎨 Flux Pro image (16:9 for YouTube)
+📱 Flux Pro image (9:16 for Instagram)
+🎬 Runway video (5-10 seconds)
+📝 Caption + hashtags
+
+*View your gallery:*
+\`/gallery\` → All visualizations
+
+*Check video status:*
+\`/videostatus <task-id>\`
+→ Bot gives you the ID when video starts
+
+*Download:*
+→ Long-press/right-click images to save
+→ Click video link to download`, { parse_mode: 'Markdown' });
+      
+    } else if (topic === 'social' || topic === 'instagram' || topic === 'youtube') {
+      await ctx.reply(`📱 *Social Media Help*
+
+*Post to Instagram:*
+\`/post insta 052\`
+
+*Post to YouTube:*
+\`/post youtube 052\`
+
+*Post everywhere:*
+\`/post all 052\`
+
+⚠️ *Setup Required:*
+Need API keys for auto-posting.
+See: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/ATUONA-BOOK-ROADMAP.md
+
+*Manual posting (for now):*
+1. Download image/video from bot
+2. Copy caption from bot message
+3. Upload to Instagram/YouTube manually`, { parse_mode: 'Markdown' });
+      
+    } else if (topic === 'voices' || topic === 'voice' || topic === 'characters') {
+      await ctx.reply(`🎭 *Character Voices Help*
+
+*Available voices:*
+\`/voice kira\` → Kira Velerevich (protagonist)
+  - 34 years old, poetic, philosophical
+  - Haunted by mother's death
+  - Art-obsessed, especially Van Gogh
+
+\`/voice ule\` → Ule Glensdagen (art collector)
+  - 47 years old, Norwegian
+  - Sophisticated, wounded soul
+  - Searching for Gauguin's lost painting
+
+\`/voice vibe\` → Vibe Coding Spirit
+  - Mysterious, cryptic
+  - Bridges past and future
+  - "Paradise is not found. Paradise is deployed."
+
+\`/voice narrator\` → Default storyteller
+
+*Add character memories:*
+\`/character kira add She has a scar on her wrist\`
+
+*View character info:*
+\`/character kira\``, { parse_mode: 'Markdown' });
+      
+    } else if (topic === 'all' || topic === 'commands') {
+      await ctx.reply(`📋 *All Commands*
+
+*Daily Ritual:* /ritual, /mood, /setting, /milestone
+*Voices:* /voice, /dialogue, /character
+*Story:* /recap, /threads, /addthread, /resolve, /arc
+*Writing:* /collab, /endcollab, /expand, /scene, /ending, /whatif
+*Import:* /import, /create, /inspire
+*Publish:* /preview, /publish, /setpage
+*Drafts:* /draft, /read
+*Proactive:* /proactive, /dailyinspire, /history
+*Film:* /visualize, /gallery, /film, /videostatus
+*Social:* /post
+*Export:* /export, /import_backup
+*Tools:* /spanish, /imagine
+*Status:* /status, /fixgallery
+*Other:* /menu, /help, /cto, /start`, { parse_mode: 'Markdown' });
+      
+    } else {
+      await ctx.reply(`❓ Unknown topic: "${topic}"
+
+Try:
+\`/help writing\`
+\`/help publish\`
+\`/help film\`
+\`/help social\`
+\`/help voices\`
+\`/help all\``, { parse_mode: 'Markdown' });
+    }
+  });
+
   // /start - Welcome
   atuonaBot.command('start', async (ctx) => {
     // Update streak on any interaction
@@ -926,100 +1109,110 @@ _"Paradise is not found. Paradise is deployed."_ 🌴
     const menuMessage = `
 🎭 *ATUONA Menu*
 
+_Just click any command to see what it does!_
+
+━━━━━━━━━━━━━━━━━━━━
+❓ *HELP* (start here!)
+━━━━━━━━━━━━━━━━━━━━
+/help - 📖 Vibe coder guide
+
 ━━━━━━━━━━━━━━━━━━━━
 🌅 *DAILY RITUAL*
 ━━━━━━━━━━━━━━━━━━━━
-/ritual - Start daily writing session
-/mood - Set creative mood
-/setting - Set scene location
-/milestone - See your progress
+/ritual - 🔄 Begin daily writing flow
+/mood - 🎨 Set tone (melancholic/hopeful...)
+/setting - 📍 Set location (Paris/gallery...)
+/milestone - 🏆 Your writing achievements
 
 ━━━━━━━━━━━━━━━━━━━━
 🎭 *CHARACTER VOICES*
 ━━━━━━━━━━━━━━━━━━━━
-/voice - Choose character (kira/ule/vibe)
-/dialogue - Generate conversation
+/voice - 🗣 Switch speaker (kira/ule/vibe)
+/dialogue - 💬 AI creates conversation
+/character - 📝 Add/view character details
 
 ━━━━━━━━━━━━━━━━━━━━
 📖 *STORY CONTINUITY*
 ━━━━━━━━━━━━━━━━━━━━
-/recap - Summary of recent chapters
-/threads - Open plot threads
-/addthread - Add new thread
-/resolve - Resolve a thread
-/arc - Story arc status
+/recap - 📚 AI summarizes chapters
+/threads - 🧵 Open story questions
+/addthread - ➕ Create new mystery
+/resolve - ✅ Close a thread
+/arc - 📈 Story progress analysis
 
 ━━━━━━━━━━━━━━━━━━━━
-✍️ *COLLABORATIVE WRITING*
+✍️ *WRITE TOGETHER*
 ━━━━━━━━━━━━━━━━━━━━
-/collab - Interactive writing mode
-/endcollab - Finish & compile
-/expand - Expand a passage
-/scene - Generate full scene
-/ending - Suggest chapter endings
-/whatif - Story possibilities
+/collab - 🤝 Ping-pong writing mode
+/endcollab - ✨ Finish collab session
+/expand - 🔍 Phrase → paragraph
+/scene - 🎬 AI generates full scene
+/ending - 🌅 Chapter ending ideas
+/whatif - 🔮 Explore alternate paths
 
 ━━━━━━━━━━━━━━━━━━━━
 📥 *IMPORT & CREATE*
 ━━━━━━━━━━━━━━━━━━━━
-/import - Import Russian text
-/create - Generate new content
-/inspire - Get inspiration
+/import - 📝 Russian text → English
+/translate - 🔄 Adjust translation
+/queue - 📋 Check import queue
+/create - 🎨 AI generates new content
+/inspire - 💡 Random creative spark
 
 ━━━━━━━━━━━━━━━━━━━━
 🚀 *PUBLISH*
 ━━━━━━━━━━━━━━━━━━━━
-/preview - See before publishing
-/publish - Push to atuona.xyz
-/cto - Message CTO AIPA
+/preview - 👁 See before publishing
+/publish - 🌐 Push to atuona.xyz
+/read 048 - 📖 Read published page
+/setpage - 🔢 Fix page numbering
+/cto - 📧 Message tech support
 
 ━━━━━━━━━━━━━━━━━━━━
 🔮 *PROACTIVE SOUL*
 ━━━━━━━━━━━━━━━━━━━━
-/proactive - Auto-inspiration settings
-/dailyinspire - Get inspiration NOW
-/history - Message archive
+/proactive - ⚙️ Configure auto-inspire
+/dailyinspire - ✨ Get inspiration NOW
+/history - 📜 Past inspirations
 
 ━━━━━━━━━━━━━━━━━━━━
-📝 *DRAFTS & CHAPTERS*
+📝 *DRAFTS*
 ━━━━━━━━━━━━━━━━━━━━
-/draft - Save/load drafts
-/read 048 - Read published chapter
-/character - Character memories
+/draft - 💾 Save/load/delete drafts
 
 ━━━━━━━━━━━━━━━━━━━━
-💾 *BACKUP & EXPORT*
+💾 *BACKUP*
 ━━━━━━━━━━━━━━━━━━━━
-/export - Backup all content
-/import\\_backup - Restore from backup
+/export - 📤 Download all content
+/import\\_backup - 📥 Restore backup
 
 ━━━━━━━━━━━━━━━━━━━━
 🎬 *AI FILM STUDIO*
 ━━━━━━━━━━━━━━━━━━━━
-/visualize 048 - Create image+video
-/gallery - View all visualizations
-/film - Film compilation status
-/videostatus - Check video progress
+/visualize 048 - 🎥 Image+video for page
+/gallery - 🖼 All visualizations
+/film - 🎬 Film compilation status
+/videostatus - ⏳ Video progress
 
 ━━━━━━━━━━━━━━━━━━━━
 📱 *SOCIAL MEDIA*
 ━━━━━━━━━━━━━━━━━━━━
-/post insta 048 - Post to Instagram
-/post youtube 048 - Upload to YouTube
-/post all 048 - Post everywhere
+/post insta 048 - 📸 Post to Instagram
+/post youtube 048 - 📺 Upload to YouTube
+/post all 048 - 🌐 Post everywhere
 
 ━━━━━━━━━━━━━━━━━━━━
 🌍 *CREATIVE TOOLS*
 ━━━━━━━━━━━━━━━━━━━━
-/spanish - Write in Spanish
-/imagine - Generate image prompt
+/spanish - 🇪🇸 Content in Spanish
+/imagine - 🎨 Create AI image
 
 ━━━━━━━━━━━━━━━━━━━━
 📊 *STATUS & FIX*
 ━━━━━━━━━━━━━━━━━━━━
-/status - Book progress
-/setpage - Set page number
-/fixgallery - Fix gallery slots
+/status - 📈 Book & API status
+/style - 🎨 My writing style guide
+/fixgallery - 🔧 Fix gallery issues
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
   });
