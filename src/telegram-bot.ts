@@ -331,7 +331,21 @@ Use */review* <repo-name> to review latest commit!
     const question = ctx.message?.text?.replace('/ask', '').trim();
     
     if (!question) {
-      await ctx.reply('❓ Please provide a question!\n\nExample: `/ask Should I use Redis for caching?`', { parse_mode: 'Markdown' });
+      await ctx.reply(`💬 *ASK ME ANYTHING*
+
+*What is this?*
+Ask any technical question - about coding, architecture, your products, or anything else!
+
+*Examples (copy and edit):*
+\`/ask Should I use PostgreSQL or MongoDB for EspaLuz?\`
+\`/ask How do I handle errors in async functions?\`
+\`/ask What's the best way to structure my Telegram bot?\`
+\`/ask How does OAuth work?\`
+
+*Or just chat!*
+You can also just send a message without /ask and I'll respond.
+
+👉 *Try now:* Ask any question!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -340,6 +354,7 @@ Use */review* <repo-name> to review latest commit!
   
   // /suggest - Get a suggestion
   bot.command('suggest', async (ctx) => {
+    await ctx.reply(`💡 *Getting today's suggestion...*`, { parse_mode: 'Markdown' });
     await handleQuestion(ctx, 'Give me one actionable suggestion for today that would have the highest impact on AIdeazz. Be specific and concise.');
   });
   
@@ -2492,31 +2507,37 @@ _Keep shipping! Use /daily for focus._`;
     const topic = ctx.message?.text?.replace('/learn', '').trim().toLowerCase();
     
     if (!topic) {
-      const topicsMessage = `🎓 *Learn to Code with CTO AIPA*
+      const topicsMessage = `🎓 *LEARN TO CODE*
 
-Choose a topic to start learning:
+*What is this?*
+I teach you coding concepts with simple explanations and examples. Like having a patient teacher!
 
-*Beginner*
-/learn typescript - Modern JavaScript
-/learn python - AI/ML favorite
-/learn git - Version control basics
+*Pick a topic (just click one):*
 
-*Intermediate*
-/learn api - Build REST APIs
-/learn database - SQL & NoSQL
-/learn testing - Write tests
+📗 *Beginner*
+/learn typescript
+/learn git
+/learn api
 
-*Advanced*
-/learn architecture - System design
-/learn security - Secure coding
-/learn ai - AI/ML integration
+📘 *Intermediate*  
+/learn database
+/learn testing
 
-*AIdeazz Specific*
-/learn cursor - Master Cursor AI
-/learn whatsapp - WhatsApp bot dev
-/learn oracle - Oracle Cloud basics
+📕 *Advanced*
+/learn architecture
+/learn security
 
-Pick one and let's start! 🚀`;
+🎯 *For YOUR projects*
+/learn cursor - Master local Cursor
+/learn whatsapp - WhatsApp bots
+/learn oracle - Oracle Cloud
+
+*What will I give you?*
+📝 Simple explanation
+💡 Real examples
+🎯 Practice exercise
+
+👉 *Try now:* /learn typescript`;
       await ctx.reply(topicsMessage, { parse_mode: 'Markdown' });
       return;
     }
@@ -2996,19 +3017,26 @@ Use /approve to create PR or /reject to discard.`, { parse_mode: 'Markdown' });
     const input = ctx.message?.text?.replace('/fix', '').trim();
     
     if (!input) {
-      await ctx.reply(`🔧 *CTO Bug Fixer*
+      await ctx.reply(`🔧 *FIX BUGS*
 
-I'll fix issues and create a PR!
+*What is this?*
+Tell me what's broken and I'll generate a fix! Like /code but specifically for fixing problems.
 
-Usage:
-/fix <repo> <issue to fix>
+*What do I need from you?*
+Tell me which product and what's wrong - in your own words!
 
-Examples:
-/fix EspaLuzWhatsApp Fix the timeout error in API calls
-/fix atuona Add missing error handling
-/fix AIPA_AITCF Fix TypeScript compilation warnings
+*Examples (copy and edit):*
+\`/fix EspaLuzWhatsApp the bot stops responding after 5 minutes\`
+\`/fix atuona images load too slowly\`
+\`/fix AIPA_AITCF error when sending voice messages\`
 
-I'll analyze the code, fix the issue, and open a PR! 🚀`, { parse_mode: 'Markdown' });
+*What happens next?*
+1️⃣ I analyze your code
+2️⃣ I generate a fix
+3️⃣ You review it
+4️⃣ /approve to create PR or /reject
+
+👉 *Try now:* Describe what's broken!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -3144,7 +3172,26 @@ _A real CTO reviews fixes before deploying!_`, { parse_mode: 'Markdown' });
     const repoName = ctx.message?.text?.replace('/review', '').trim();
     
     if (!repoName) {
-      await ctx.reply('❓ Please provide a repo name!\n\nExample: `/review EspaLuzWhatsApp`', { parse_mode: 'Markdown' });
+      await ctx.reply(`🔍 *CODE REVIEW*
+
+*What is this?*
+I review the latest changes in any of your repos - like having a senior developer check your code!
+
+*What do I need from you?*
+Just tell me which product to review.
+
+*Examples:*
+\`/review EspaLuzWhatsApp\`
+\`/review atuona\`
+\`/review AIPA_AITCF\`
+
+*What will I give you?*
+📝 What changed
+⚠️ Any issues I spot
+💡 Suggestions to improve
+✅ or ❌ Overall verdict
+
+👉 *Try now:* /review EspaLuzWhatsApp`, { parse_mode: 'Markdown' });
       return;
     }
     
