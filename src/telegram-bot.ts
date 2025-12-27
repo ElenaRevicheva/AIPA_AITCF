@@ -199,57 +199,47 @@ Type /menu for all commands! 🚀
   
   async function showMenu(ctx: Context) {
     const menuMessage = `
-🤖 *CTO AIPA v3.5 - Menu*
+🤖 *CTO AIPA v3.6 - Menu*
 
 ━━━━━━━━━━━━━━━━━━━━
-📚 *BECOME A REAL DEV* 🆕
+🖥️ *CURSOR AGENT MODE* 🆕
+━━━━━━━━━━━━━━━━━━━━
+/cursor <repo> <task> - Step-by-step!
+/build <repo> <feature> - Multi-step plan
+/diff <repo> <file> <change> - Before/after
+
+━━━━━━━━━━━━━━━━━━━━
+📚 *LEARN YOUR CODE*
 ━━━━━━━━━━━━━━━━━━━━
 /study - Quiz on YOUR code
 /explainfile <repo> <file> - Explain file
 /architecture <repo> - Repo structure
-/error <msg> - Debug any error
-/howto <task> - Step-by-step guides
-/cmd - Command cheat sheets
+/error <msg> - Debug errors
+/howto - Guides | /cmd - Cheat sheets
 
 ━━━━━━━━━━━━━━━━━━━━
 🎓 *LEARN CONCEPTS*
 ━━━━━━━━━━━━━━━━━━━━
-/learn - Pick coding topic
-/exercise - Coding challenge
-/explain <concept> - Explain anything
+/learn - Coding topics
+/exercise - Challenges
+/explain - Explain anything
 
 ━━━━━━━━━━━━━━━━━━━━
 💻 *CTO WRITES CODE*
 ━━━━━━━━━━━━━━━━━━━━
-/code <repo> <task> - Generate code
-/fix <repo> <issue> - Generate fix
-/approve - Create PR (review first!)
-/reject - Discard code
+/code <repo> <task> - Generate → /approve
+/fix <repo> <issue> - Fix → /approve
 
 ━━━━━━━━━━━━━━━━━━━━
-🏛️ *CTO DECISIONS*
+🏛️ *DECISIONS*
 ━━━━━━━━━━━━━━━━━━━━
-/decision - Record decision
-/debt - Track tech debt
+/decision | /debt | /review
 
 ━━━━━━━━━━━━━━━━━━━━
-📊 *INSIGHTS*
-━━━━━━━━━━━━━━━━━━━━
-/stats - Ecosystem metrics
-/daily - Morning briefing
-/status - Health check
-
-━━━━━━━━━━━━━━━━━━━━
-🔍 *CODE & REPOS*
-━━━━━━━━━━━━━━━━━━━━
-/review <repo> - Review commit
-/repos - List repositories
-/idea - Save idea | /ideas - View
-
-━━━━━━━━━━━━━━━━━━━━
+📊 /stats | /daily | /status
+🔍 /repos | /idea | /ideas
 💬 /ask | 🎤 Voice | 📸 Photo
-━━━━━━━━━━━━━━━━━━━━
-⚙️ /alerts /roadmap
+⚙️ /alerts | /roadmap
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
   }
@@ -630,6 +620,401 @@ ${repo ? `📦 Repo: ${repo}\n` : ''}📝 ${description}
 _Use /decision list to see all decisions_`, { parse_mode: 'Markdown' });
     } else {
       await ctx.reply('❌ Error recording decision. Try again!');
+    }
+  });
+  
+  // ==========================================================================
+  // CURSOR AGENT SIMULATOR - Be your own Cursor Agent!
+  // ==========================================================================
+  
+  // /cursor - Get step-by-step Cursor instructions for any task
+  bot.command('cursor', async (ctx) => {
+    const input = ctx.message?.text?.replace('/cursor', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`🖥️ *Cursor Agent Simulator*
+
+Tell me what you want to build/edit, and I'll give you:
+1. Which file(s) to open
+2. What to select
+3. Exact Cmd+K prompts to use
+4. Code to copy/paste
+
+*Usage:*
+/cursor <repo> <what you want to do>
+
+*Examples:*
+/cursor AIPA_AITCF add a /ping command that replies pong
+/cursor EspaLuzWhatsApp add error handling to the API calls
+/cursor atuona add a loading spinner to the gallery
+
+I'll guide you step-by-step like a Cursor Agent! 🎯`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Parse repo and task
+    const parts = input.split(' ');
+    const firstWord = parts[0] || '';
+    
+    // Check if first word is a repo name
+    let repoName: string;
+    let task: string;
+    
+    if (AIDEAZZ_REPOS.includes(firstWord)) {
+      repoName = firstWord;
+      task = parts.slice(1).join(' ');
+    } else {
+      // No repo specified, try to guess from task or use default
+      repoName = 'AIPA_AITCF';
+      task = input;
+    }
+    
+    if (!task) {
+      await ctx.reply('❌ Please describe what you want to do!\n\nExample: /cursor AIPA_AITCF add a /ping command');
+      return;
+    }
+    
+    await ctx.reply(`🔍 Analyzing ${repoName} to guide you...\n\n⏳ Fetching codebase context...`);
+    
+    try {
+      // Fetch repo structure for context
+      let fileList = '';
+      let relevantFiles: string[] = [];
+      
+      try {
+        const { data: contents } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: ''
+        });
+        
+        if (Array.isArray(contents)) {
+          fileList = contents.map((f: any) => `${f.type === 'dir' ? '📁' : '📄'} ${f.name}`).join('\n');
+          relevantFiles = contents.filter((f: any) => 
+            f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
+          ).map((f: any) => f.name);
+        }
+      } catch {}
+      
+      // Try to get src folder
+      let srcFiles: string[] = [];
+      try {
+        const { data: srcContents } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: 'src'
+        });
+        if (Array.isArray(srcContents)) {
+          srcFiles = srcContents.filter((f: any) => 
+            f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
+          ).map((f: any) => `src/${f.name}`);
+          fileList += '\n📁 src/\n' + srcContents.map((f: any) => `   📄 ${f.name}`).join('\n');
+        }
+      } catch {}
+      
+      const allCodeFiles = [...relevantFiles, ...srcFiles];
+      
+      // Fetch a key file for context (like the main bot file or index)
+      let sampleCode = '';
+      const mainFile = srcFiles.find(f => f.includes('telegram-bot') || f.includes('index')) 
+                    || relevantFiles.find(f => f.includes('index'))
+                    || allCodeFiles[0];
+      
+      if (mainFile) {
+        try {
+          const { data: fileData } = await octokit.repos.getContent({
+            owner: 'ElenaRevicheva',
+            repo: repoName,
+            path: mainFile
+          });
+          if (!Array.isArray(fileData) && 'content' in fileData) {
+            const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+            // Get first 100 lines for context
+            sampleCode = content.split('\n').slice(0, 100).join('\n');
+          }
+        } catch {}
+      }
+      
+      // Generate Cursor instructions using AI
+      const cursorPrompt = `You are helping a vibe coder use LOCAL Cursor (without paid agents) to edit their code.
+
+TASK: "${task}"
+REPO: ${repoName}
+
+FILES IN REPO:
+${fileList}
+
+CODE FILES: ${allCodeFiles.join(', ')}
+
+${sampleCode ? `SAMPLE FROM ${mainFile}:\n\`\`\`\n${sampleCode.substring(0, 2000)}\n\`\`\`` : ''}
+
+Generate STEP-BY-STEP instructions for LOCAL Cursor. Format EXACTLY like this:
+
+📂 *STEP 1: Open the project*
+\`\`\`
+cd ~/path-to/${repoName}
+cursor .
+\`\`\`
+
+📄 *STEP 2: Open file*
+Open: \`<filename>\`
+
+✂️ *STEP 3: Select code*
+Find and select this section:
+\`\`\`
+<code to select>
+\`\`\`
+
+⌨️ *STEP 4: Cmd+K prompt*
+Select the code above, press Cmd+K, and type:
+\`\`\`
+<exact prompt to type>
+\`\`\`
+
+📋 *STEP 5: Or copy this code*
+If Cmd+K doesn't work well, copy this and paste:
+\`\`\`typescript
+<complete code to add/replace>
+\`\`\`
+
+💾 *STEP 6: Save and test*
+- Save: Cmd+S
+- Build: \`npm run build\`
+- Test: <how to test>
+
+IMPORTANT:
+- Give SPECIFIC file names from the repo
+- Give COMPLETE, working code (not pseudocode)
+- Explain WHERE in the file to add/edit
+- Use simple Cmd+K prompts (Cursor free tier works with these)
+- If adding new code, say "add after line X" or "add at the end of the file"`;
+
+      const instructions = await askAI(cursorPrompt, 3500);
+      
+      // Split into multiple messages if too long
+      if (instructions.length > 4000) {
+        const msgParts = instructions.split(/(?=📂|📄|✂️|⌨️|📋|💾)/);
+        for (const part of msgParts) {
+          if (part && part.trim()) {
+            await ctx.reply(part.trim(), { parse_mode: 'Markdown' });
+          }
+        }
+      } else {
+        await ctx.reply(`🖥️ *Cursor Instructions for: ${task}*\n\n${instructions}`, { parse_mode: 'Markdown' });
+      }
+      
+      await ctx.reply(`━━━━━━━━━━━━━━━━━━━━
+💡 *Tips for Local Cursor:*
+• Cmd+K = Edit selected code (FREE)
+• Cmd+L = Chat about code
+• Tab = Accept AI suggestions (FREE)
+• @ = Reference files in chat
+
+Need more help? Just ask! 🎯`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Cursor guide error:', error);
+      await ctx.reply('❌ Error generating instructions. Try again or be more specific!');
+    }
+  });
+  
+  // /build - Multi-step project guidance (like a real Cursor Agent)
+  bot.command('build', async (ctx) => {
+    const input = ctx.message?.text?.replace('/build', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`🏗️ *Build Mode - Multi-Step Guidance*
+
+For complex features that need multiple files/steps.
+
+*Usage:*
+/build <repo> <feature description>
+
+*Examples:*
+/build AIPA_AITCF add user authentication with login command
+/build EspaLuzWhatsApp add a scoring system for quizzes
+/build atuona add dark mode to the gallery
+
+I'll break it into steps and guide you through each one! 🎯`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Parse repo and feature
+    const parts = input.split(' ');
+    const firstWord = parts[0] || '';
+    
+    let repoName: string;
+    let feature: string;
+    
+    if (AIDEAZZ_REPOS.includes(firstWord)) {
+      repoName = firstWord;
+      feature = parts.slice(1).join(' ');
+    } else {
+      repoName = 'AIPA_AITCF';
+      feature = input;
+    }
+    
+    if (!feature) {
+      await ctx.reply('❌ Please describe what you want to build!');
+      return;
+    }
+    
+    await ctx.reply(`🏗️ Planning "${feature}" for ${repoName}...\n\n⏳ Breaking into steps...`);
+    
+    try {
+      // Get repo context
+      let fileList = '';
+      try {
+        const { data: contents } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: ''
+        });
+        if (Array.isArray(contents)) {
+          fileList = contents.map((f: any) => f.name).join(', ');
+        }
+      } catch {}
+      
+      // Generate build plan
+      const buildPrompt = `You are a senior developer helping a vibe coder build a feature using LOCAL Cursor.
+
+FEATURE: "${feature}"
+REPO: ${repoName}
+FILES: ${fileList}
+
+Create a BUILD PLAN with numbered steps. For each step:
+1. What file to edit/create
+2. Brief description of changes
+3. The /cursor command to get detailed instructions
+
+Format EXACTLY like this:
+
+🏗️ *Build Plan: ${feature}*
+
+*Overview:* (1-2 sentences what we're building)
+
+━━━━━━━━━━━━━━━━━━━━
+
+📌 *Step 1: <title>*
+File: \`<filename>\`
+What: <brief description>
+Command: \`/cursor ${repoName} <specific task for this step>\`
+
+📌 *Step 2: <title>*
+File: \`<filename>\`
+What: <brief description>
+Command: \`/cursor ${repoName} <specific task for this step>\`
+
+(continue for all steps needed)
+
+━━━━━━━━━━━━━━━━━━━━
+
+⏱️ *Estimated time:* X minutes
+🎯 *Difficulty:* Easy/Medium/Hard
+
+Start with Step 1 when ready!
+
+Keep it to 3-6 steps maximum. Be practical.`;
+
+      const buildPlan = await askAI(buildPrompt, 2000);
+      
+      await ctx.reply(buildPlan, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Build plan error:', error);
+      await ctx.reply('❌ Error creating build plan. Try again!');
+    }
+  });
+  
+  // /diff - Show what code to change (before/after)
+  bot.command('diff', async (ctx) => {
+    const input = ctx.message?.text?.replace('/diff', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📝 *Diff Mode - Before/After Code*
+
+See exactly what to change in your code.
+
+*Usage:*
+/diff <repo> <file> <what to change>
+
+*Examples:*
+/diff AIPA_AITCF src/telegram-bot.ts add error logging
+/diff EspaLuzWhatsApp index.ts improve the welcome message
+
+I'll show you the BEFORE and AFTER! 🎯`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    const repoName: string = parts[0] || 'AIPA_AITCF';
+    const filePath: string = parts[1] || '';
+    const change: string = parts.slice(2).join(' ');
+    
+    if (!filePath || !change) {
+      await ctx.reply('❌ Please provide repo, file, and what to change.\n\nExample: /diff AIPA_AITCF src/telegram-bot.ts add logging');
+      return;
+    }
+    
+    await ctx.reply(`📝 Analyzing ${filePath} in ${repoName}...`);
+    
+    try {
+      // Fetch the file
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ Could not read file.');
+        return;
+      }
+      
+      const fileContent = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      const truncated = fileContent.substring(0, 4000);
+      
+      const diffPrompt = `Show the exact code change needed.
+
+FILE: ${filePath}
+CHANGE: "${change}"
+
+CURRENT CODE:
+\`\`\`
+${truncated}
+\`\`\`
+
+Format your response EXACTLY like this:
+
+📍 *Location:* Line X (or "after function Y")
+
+❌ *BEFORE (find this code):*
+\`\`\`typescript
+<exact current code to find, 3-10 lines>
+\`\`\`
+
+✅ *AFTER (replace with this):*
+\`\`\`typescript
+<new code to replace it with>
+\`\`\`
+
+💡 *In Cursor:*
+1. Select the BEFORE code
+2. Press Cmd+K
+3. Type: "<simple prompt>"
+
+Keep it focused on ONE specific change.`;
+
+      const diff = await askAI(diffPrompt, 2000);
+      
+      await ctx.reply(`📝 *Changes for ${filePath}*\n\n${diff}`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      if (error.status === 404) {
+        await ctx.reply(`❌ File not found: ${filePath}\n\nUse /architecture ${repoName} to see files.`);
+      } else {
+        await ctx.reply('❌ Error analyzing file.');
+      }
     }
   });
   
