@@ -14,8 +14,8 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPE
 // Replicate client for Flux Pro (best realistic images)
 const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({ auth: process.env.REPLICATE_API_TOKEN }) : null;
 
-// Runway API base URL
-const RUNWAY_API_URL = 'https://api.runwayml.com/v1';
+// Runway API base URL (Gen-3 Alpha Turbo)
+const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 
 // =============================================================================
@@ -3451,27 +3451,51 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
         status: 'pending'
       };
       
-      // Generate image with Flux Pro via Replicate
+      // Generate image with Flux Pro via Replicate (with retry for rate limits)
       if (replicate) {
         await ctx.reply('🎨 *Generating image with Flux Pro...*\n\n_This takes 30-60 seconds..._', { parse_mode: 'Markdown' });
         
-        try {
-          // Flux Pro via Replicate - 16:9 for YouTube
-          const output = await replicate.run(
-            "black-forest-labs/flux-1.1-pro",
-            {
-              input: {
-                prompt: imagePrompt,
-                aspect_ratio: "16:9",
-                output_format: "webp",
-                output_quality: 90,
-                safety_tolerance: 2,
-                prompt_upsampling: true
+        // Helper function with retry for rate limits
+        const runFluxWithRetry = async (aspectRatio: string, maxRetries = 3): Promise<string | null> => {
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+              const output = await replicate.run(
+                "black-forest-labs/flux-1.1-pro",
+                {
+                  input: {
+                    prompt: imagePrompt,
+                    aspect_ratio: aspectRatio,
+                    output_format: "webp",
+                    output_quality: 90,
+                    safety_tolerance: 2,
+                    prompt_upsampling: true
+                  }
+                }
+              );
+              
+              if (output && typeof output === 'string') {
+                return output;
+              }
+              return null;
+            } catch (error: any) {
+              const isRateLimit = error.message?.includes('429') || error.message?.includes('rate limit');
+              if (isRateLimit && attempt < maxRetries) {
+                const waitTime = attempt * 5; // 5, 10, 15 seconds
+                console.log(`Rate limited, waiting ${waitTime}s before retry ${attempt + 1}/${maxRetries}`);
+                await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+              } else {
+                throw error;
               }
             }
-          );
+          }
+          return null;
+        };
+        
+        try {
+          // Flux Pro via Replicate - 16:9 for YouTube
+          const output = await runFluxWithRetry("16:9");
           
-          if (output && typeof output === 'string') {
+          if (output) {
             visualization.imageUrlHorizontal = output;
             visualization.status = 'image_done';
             
@@ -3482,24 +3506,15 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
             });
           }
           
+          // Wait a moment before next request to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
           // Generate vertical version for Instagram
           await ctx.reply('📱 *Generating Instagram vertical (9:16)...*', { parse_mode: 'Markdown' });
           
-          const outputVertical = await replicate.run(
-            "black-forest-labs/flux-1.1-pro",
-            {
-              input: {
-                prompt: imagePrompt,
-                aspect_ratio: "9:16",
-                output_format: "webp",
-                output_quality: 90,
-                safety_tolerance: 2,
-                prompt_upsampling: true
-              }
-            }
-          );
+          const outputVertical = await runFluxWithRetry("9:16");
           
-          if (outputVertical && typeof outputVertical === 'string') {
+          if (outputVertical) {
             visualization.imageUrlVertical = outputVertical;
             
             await ctx.replyWithPhoto(outputVertical, {
@@ -3510,27 +3525,43 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
           
         } catch (fluxError: any) {
           console.error('Flux error:', fluxError);
-          await ctx.reply(`⚠️ Flux image generation error: ${fluxError.message}\n\nTrying DALL-E fallback...`);
+          
+          const isRateLimit = fluxError.message?.includes('429') || fluxError.message?.includes('rate limit');
+          if (isRateLimit) {
+            await ctx.reply(`⚠️ *Replicate Rate Limit*
+
+Free tier limit reached. Options:
+1. Add payment method at replicate.com
+2. Wait a few minutes and try again
+3. Using DALL-E fallback...`, { parse_mode: 'Markdown' });
+          } else {
+            await ctx.reply(`⚠️ Flux error: ${fluxError.message}\n\nTrying DALL-E fallback...`);
+          }
           
           // Fallback to DALL-E if available
           if (openai) {
-            const dalleResponse = await openai.images.generate({
-              model: 'dall-e-3',
-              prompt: imagePrompt,
-              n: 1,
-              size: '1792x1024',
-              quality: 'hd'
-            });
-            
-            const dalleUrl = dalleResponse.data?.[0]?.url;
-            if (dalleUrl) {
-              visualization.imageUrlHorizontal = dalleUrl;
-              visualization.status = 'image_done';
-              
-              await ctx.replyWithPhoto(dalleUrl, {
-                caption: `🎬 *Page #${pageId}: ${title}* (DALL-E)\n\n_${caption}_`,
-                parse_mode: 'Markdown'
+            try {
+              const dalleResponse = await openai.images.generate({
+                model: 'dall-e-3',
+                prompt: imagePrompt,
+                n: 1,
+                size: '1792x1024',
+                quality: 'hd'
               });
+              
+              const dalleUrl = dalleResponse.data?.[0]?.url;
+              if (dalleUrl) {
+                visualization.imageUrlHorizontal = dalleUrl;
+                visualization.status = 'image_done';
+                
+                await ctx.replyWithPhoto(dalleUrl, {
+                  caption: `🎬 *Page #${pageId}: ${title}* (DALL-E HD)\n\n_${caption}_`,
+                  parse_mode: 'Markdown'
+                });
+              }
+            } catch (dalleError: any) {
+              console.error('DALL-E fallback error:', dalleError);
+              await ctx.reply(`❌ Both Flux and DALL-E failed.\n\nPrompt saved - try again later or use manually:\n\`${imagePrompt.substring(0, 300)}...\``, { parse_mode: 'Markdown' });
             }
           }
         }
@@ -3538,12 +3569,24 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
         await ctx.reply(`⚠️ *Flux Pro not configured*\n\nSet REPLICATE_API_TOKEN for best quality images.\n\n🎨 *Generated Prompt:*\n\`${imagePrompt}\`\n\nUse this in Midjourney or other tools!`, { parse_mode: 'Markdown' });
       }
       
-      // Generate video with Runway
+      // Generate video with Runway Gen-3 Alpha Turbo
       if (runwayApiKey && visualization.imageUrlHorizontal) {
-        await ctx.reply('🎬 *Generating video with Runway Gen-3...*\n\n_This takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+        await ctx.reply('🎬 *Generating video with Runway Gen-3 Alpha Turbo...*\n\n_This takes 1-3 minutes..._', { parse_mode: 'Markdown' });
         
         try {
-          // Runway Gen-3 Alpha API call
+          // Runway Gen-3 Alpha Turbo API call
+          // Using the image_to_video endpoint
+          const runwayBody = {
+            model: 'gen3a_turbo',
+            promptImage: visualization.imageUrlHorizontal,
+            promptText: `Cinematic slow movement, atmospheric, ${imagePrompt.substring(0, 150)}. Gentle camera drift. Film grain. Moody lighting.`,
+            duration: 5,
+            watermark: false,
+            ratio: '16:9'
+          };
+          
+          console.log('Runway request:', JSON.stringify(runwayBody, null, 2));
+          
           const runwayResponse = await fetch(`${RUNWAY_API_URL}/image_to_video`, {
             method: 'POST',
             headers: {
@@ -3551,25 +3594,26 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
               'Content-Type': 'application/json',
               'X-Runway-Version': '2024-11-06'
             },
-            body: JSON.stringify({
-              promptImage: visualization.imageUrlHorizontal,
-              promptText: `Cinematic movement: ${imagePrompt.substring(0, 200)}. Slow, atmospheric camera movement. Film grain. Moody lighting.`,
-              duration: 5,
-              ratio: '16:9'
-            })
+            body: JSON.stringify(runwayBody)
           });
           
+          const responseText = await runwayResponse.text();
+          console.log('Runway response:', runwayResponse.status, responseText);
+          
           if (runwayResponse.ok) {
-            const runwayData = await runwayResponse.json() as any;
+            const runwayData = JSON.parse(responseText);
             const taskId = runwayData.id;
             
-            await ctx.reply(`🎬 Video generation started!\nTask ID: ${taskId}\n\n_Checking status in 60 seconds..._`);
+            await ctx.reply(`🎬 Video generation started!\nTask ID: \`${taskId}\`\n\n_Checking status in 90 seconds..._\n\nOr check manually: \`/videostatus ${taskId}\``, { parse_mode: 'Markdown' });
             
-            // Poll for completion (simplified - in production use webhooks)
+            // Poll for completion after 90 seconds
             setTimeout(async () => {
               try {
                 const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
-                  headers: { 'Authorization': `Bearer ${runwayApiKey}` }
+                  headers: { 
+                    'Authorization': `Bearer ${runwayApiKey}`,
+                    'X-Runway-Version': '2024-11-06'
+                  }
                 });
                 
                 if (statusResponse.ok) {
@@ -3579,7 +3623,9 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
                     visualization.status = 'complete';
                     saveState();
                     
-                    await ctx.reply(`✅ *Video Ready!*\n\n🎬 ${statusData.output[0]}\n\n_Download and upload to Instagram/YouTube!_`);
+                    await ctx.reply(`✅ *Video Ready!*\n\n🎬 ${statusData.output[0]}\n\n_Right-click/long-press to download!_`);
+                  } else if (statusData.status === 'FAILED') {
+                    await ctx.reply(`❌ Video generation failed.\nReason: ${statusData.failure || 'Unknown'}`);
                   } else {
                     await ctx.reply(`⏳ Video still processing...\nStatus: ${statusData.status}\n\nUse \`/videostatus ${taskId}\` to check later.`, { parse_mode: 'Markdown' });
                   }
@@ -3587,12 +3633,34 @@ Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
               } catch (pollError) {
                 console.error('Runway poll error:', pollError);
               }
-            }, 60000);
+            }, 90000); // Check after 90 seconds
             
           } else {
-            const errorText = await runwayResponse.text();
-            console.error('Runway error:', errorText);
-            await ctx.reply(`⚠️ Runway error: ${runwayResponse.status}\n\nVideo generation skipped. Image saved!`);
+            // Parse error message
+            let errorMsg = `Status ${runwayResponse.status}`;
+            try {
+              const errorData = JSON.parse(responseText);
+              errorMsg = errorData.error || errorData.message || errorData.detail || responseText;
+            } catch (e) {
+              errorMsg = responseText.substring(0, 200);
+            }
+            
+            console.error('Runway error:', errorMsg);
+            
+            if (runwayResponse.status === 401) {
+              await ctx.reply(`⚠️ *Runway Authentication Error*
+
+Your API key might be:
+• Invalid or expired
+• Not activated for API access
+• Wrong format
+
+Please verify at: https://app.runwayml.com/settings/api-keys
+
+Image saved! Use in CapCut/Premiere for video.`, { parse_mode: 'Markdown' });
+            } else {
+              await ctx.reply(`⚠️ Runway error: ${errorMsg}\n\nImage saved! Video skipped.`);
+            }
           }
           
         } catch (runwayError: any) {
