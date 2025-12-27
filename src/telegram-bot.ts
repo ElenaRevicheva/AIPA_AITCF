@@ -14,7 +14,18 @@ import {
   clearPendingCode,
   getAlertPreferences,
   setAlertPreferences,
-  getAllAlertChatIds
+  getAllAlertChatIds,
+  // Learning system
+  saveLesson,
+  getLessons,
+  getSuccessPatterns,
+  // Strategic
+  saveInsight,
+  getActiveInsights,
+  resolveInsight,
+  // Health monitoring
+  saveHealthCheck,
+  getHealthHistory
 } from './database';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
@@ -199,40 +210,44 @@ Type /menu for all commands! 🚀
   
   async function showMenu(ctx: Context) {
     const menuMessage = `
-🤖 *CTO AIPA v3.6 - Menu*
+🤖 *CTO AIPA v4.0 - Menu*
 
 ━━━━━━━━━━━━━━━━━━━━
-🖥️ *CURSOR AGENT MODE* 🆕
+🧠 *STRATEGIC CTO* 🆕
 ━━━━━━━━━━━━━━━━━━━━
-/cursor <repo> <task> - Step-by-step!
-/build <repo> <feature> - Multi-step plan
-/diff <repo> <file> <change> - Before/after
+/strategy - Full ecosystem analysis
+/priorities - What to do TODAY
+/think <question> - Deep strategic thinking
+
+━━━━━━━━━━━━━━━━━━━━
+🏥 *PRODUCTION MONITORING* 🆕
+━━━━━━━━━━━━━━━━━━━━
+/health - Check all services
+/logs <paste> - Analyze any logs
+
+━━━━━━━━━━━━━━━━━━━━
+📚 *LEARNING SYSTEM* 🆕
+━━━━━━━━━━━━━━━━━━━━
+/feedback success|fail - Teach me!
+/lessons - What I've learned
+
+━━━━━━━━━━━━━━━━━━━━
+🖥️ *CURSOR AGENT MODE*
+━━━━━━━━━━━━━━━━━━━━
+/cursor <task> - Step-by-step guide
+/build <feature> - Multi-step plan
+/diff <file> <change> - Before/after
 
 ━━━━━━━━━━━━━━━━━━━━
 📚 *LEARN YOUR CODE*
 ━━━━━━━━━━━━━━━━━━━━
-/study - Quiz on YOUR code
-/explainfile <repo> <file> - Explain file
-/architecture <repo> - Repo structure
-/error <msg> - Debug errors
-/howto - Guides | /cmd - Cheat sheets
+/study | /explainfile | /architecture
+/error | /howto | /cmd
 
 ━━━━━━━━━━━━━━━━━━━━
-🎓 *LEARN CONCEPTS*
+💻 *CODE & DECISIONS*
 ━━━━━━━━━━━━━━━━━━━━
-/learn - Coding topics
-/exercise - Challenges
-/explain - Explain anything
-
-━━━━━━━━━━━━━━━━━━━━
-💻 *CTO WRITES CODE*
-━━━━━━━━━━━━━━━━━━━━
-/code <repo> <task> - Generate → /approve
-/fix <repo> <issue> - Fix → /approve
-
-━━━━━━━━━━━━━━━━━━━━
-🏛️ *DECISIONS*
-━━━━━━━━━━━━━━━━━━━━
+/code → /approve | /fix → /approve
 /decision | /debt | /review
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -1824,6 +1839,555 @@ Print and keep near your desk! 📋`, { parse_mode: 'Markdown' });
     } else {
       await ctx.reply('Unknown category. Use /cmd to see options.');
     }
+  });
+  
+  // ==========================================================================
+  // PRODUCTION MONITORING - Know your system health!
+  // ==========================================================================
+  
+  // /health - Check production services
+  bot.command('health', async (ctx) => {
+    await ctx.reply(`🏥 *HEALTH CHECK*
+
+*What is this?*
+I check if your services are running and responding. Like a doctor checkup for your apps!
+
+Checking services now...`, { parse_mode: 'Markdown' });
+    
+    const services = [
+      { name: 'GitHub API', url: 'https://api.github.com/users/ElenaRevicheva' },
+      { name: 'CTO AIPA Bot', url: null, check: 'self' },
+    ];
+    
+    let results = '';
+    
+    // Check GitHub API
+    try {
+      const start = Date.now();
+      await octokit.users.getByUsername({ username: 'ElenaRevicheva' });
+      const responseTime = Date.now() - start;
+      results += `✅ *GitHub API* - Healthy (${responseTime}ms)\n`;
+      await saveHealthCheck('GitHub API', 'healthy', responseTime);
+    } catch (err: any) {
+      results += `❌ *GitHub API* - Down\n   ${err.message}\n`;
+      await saveHealthCheck('GitHub API', 'down', undefined, err.message);
+    }
+    
+    // Check Claude API
+    try {
+      const start = Date.now();
+      await anthropic.messages.create({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'ping' }]
+      });
+      const responseTime = Date.now() - start;
+      results += `✅ *Claude API* - Healthy (${responseTime}ms)\n`;
+      await saveHealthCheck('Claude API', 'healthy', responseTime);
+    } catch (err: any) {
+      results += `⚠️ *Claude API* - Issue\n   ${err.message?.substring(0, 50)}\n`;
+      await saveHealthCheck('Claude API', 'degraded', undefined, err.message);
+    }
+    
+    // Check Groq API  
+    try {
+      const start = Date.now();
+      await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'ping' }]
+      });
+      const responseTime = Date.now() - start;
+      results += `✅ *Groq API* - Healthy (${responseTime}ms)\n`;
+      await saveHealthCheck('Groq API', 'healthy', responseTime);
+    } catch (err: any) {
+      results += `⚠️ *Groq API* - Issue\n   ${err.message?.substring(0, 50)}\n`;
+      await saveHealthCheck('Groq API', 'degraded', undefined, err.message);
+    }
+    
+    // Self check (if we got here, bot is running)
+    results += `✅ *CTO AIPA Bot* - Running\n`;
+    await saveHealthCheck('CTO AIPA Bot', 'healthy');
+    
+    // Get recent health history
+    const history = await getHealthHistory(undefined, 24);
+    const downCount = history.filter((h: any) => h[1] === 'down').length;
+    
+    await ctx.reply(`🏥 *Health Check Results*
+
+${results}
+━━━━━━━━━━━━━━━━━━━━
+📊 *Last 24 hours:*
+• Total checks: ${history.length}
+• Issues detected: ${downCount}
+
+${downCount > 0 ? '⚠️ Some issues detected recently. Use /logs to investigate.' : '✅ All systems stable!'}`, { parse_mode: 'Markdown' });
+  });
+  
+  // /logs - Analyze pasted logs
+  bot.command('logs', async (ctx) => {
+    const logText = ctx.message?.text?.replace('/logs', '').trim();
+    
+    if (!logText) {
+      await ctx.reply(`📋 *LOG ANALYZER*
+
+*What is this?*
+Paste your PM2 logs, error logs, or any log output and I'll analyze what's happening and suggest fixes.
+
+*How to get logs from Oracle:*
+\`\`\`
+pm2 logs --lines 50
+\`\`\`
+
+Then copy the output and:
+\`/logs <paste logs here>\`
+
+*What will I give you?*
+🔍 What's happening in the logs
+⚠️ Any errors or warnings
+🔧 Suggested fixes
+📈 Patterns I notice
+
+👉 *Try now:* Get logs from your server and paste them!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('📋 Analyzing logs...');
+    
+    const logPrompt = `You are a DevOps expert analyzing production logs.
+
+LOGS:
+${logText.substring(0, 4000)}
+
+Analyze these logs and provide:
+
+1. 📊 *SUMMARY* - What's happening overall (1-2 sentences)
+
+2. ⚠️ *ISSUES FOUND* - List any errors, warnings, or concerns
+   - What the error means
+   - Likely cause
+
+3. 🔧 *RECOMMENDED ACTIONS* - Specific steps to fix issues
+
+4. 📈 *PATTERNS* - Any recurring issues or trends
+
+5. ✅ *HEALTH VERDICT* - Is the system healthy, degraded, or critical?
+
+Be specific and actionable. This person is learning, so explain simply.`;
+
+    const analysis = await askAI(logPrompt, 2000);
+    await ctx.reply(`📋 *Log Analysis*\n\n${analysis}`, { parse_mode: 'Markdown' });
+  });
+  
+  // ==========================================================================
+  // LEARNING SYSTEM - CTO learns from experience!
+  // ==========================================================================
+  
+  // /feedback - Tell CTO if something worked or not
+  bot.command('feedback', async (ctx) => {
+    const input = ctx.message?.text?.replace('/feedback', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📝 *FEEDBACK - Help Me Learn!*
+
+*What is this?*
+Tell me if my suggestions worked or not. I'll remember and get smarter over time!
+
+*Usage:*
+\`/feedback success <what worked>\`
+\`/feedback fail <what didn't work>\`
+\`/feedback partial <what kind of worked>\`
+
+*Examples:*
+\`/feedback success The /cursor instructions for adding voice feature worked perfectly!\`
+
+\`/feedback fail The code you generated had a syntax error on line 5\`
+
+\`/feedback partial The approach was right but I had to modify the database query\`
+
+*Why does this matter?*
+I save these lessons and use them to give you better advice next time!
+
+👉 *Try now:* After trying my suggestions, tell me how it went!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Parse outcome and description
+    const words = input.split(' ');
+    const outcome = (words[0] || '').toLowerCase();
+    const description = words.slice(1).join(' ');
+    
+    if (!outcome || !['success', 'fail', 'failure', 'partial'].includes(outcome) || !description) {
+      await ctx.reply('❌ Please use format:\n/feedback success|fail|partial <description>\n\nExample: /feedback success The code worked great!');
+      return;
+    }
+    
+    const normalizedOutcome = outcome === 'fail' || outcome === 'failure' ? 'failure' : outcome as 'success' | 'failure' | 'partial';
+    
+    // Generate lesson from feedback
+    const lessonPrompt = `Based on this user feedback, extract a concise lesson learned:
+
+Outcome: ${normalizedOutcome}
+Description: ${description}
+
+Generate a short lesson (1-2 sentences) that I can remember for future similar situations.
+Format: Just the lesson, no preamble.`;
+
+    const lesson = await askAI(lessonPrompt, 200);
+    
+    await saveLesson(
+      'user_feedback',
+      description.substring(0, 500),
+      'AI suggestion',
+      normalizedOutcome,
+      lesson
+    );
+    
+    const emoji = normalizedOutcome === 'success' ? '✅' : normalizedOutcome === 'failure' ? '❌' : '⚠️';
+    
+    await ctx.reply(`${emoji} *Feedback Recorded!*
+
+*Outcome:* ${normalizedOutcome}
+*What happened:* ${description.substring(0, 200)}
+
+*Lesson I learned:*
+${lesson}
+
+I'll remember this for next time! 🧠
+
+Use /lessons to see what I've learned.`, { parse_mode: 'Markdown' });
+  });
+  
+  // /lessons - See what CTO has learned
+  bot.command('lessons', async (ctx) => {
+    const category = ctx.message?.text?.replace('/lessons', '').trim();
+    
+    if (!category) {
+      await ctx.reply(`📚 *LESSONS LEARNED*
+
+*What is this?*
+I show you everything I've learned from our interactions. Use this to see how I'm improving!
+
+*Options:*
+\`/lessons\` - Show all recent lessons
+\`/lessons success\` - Only successful patterns
+\`/lessons failures\` - What didn't work (so we avoid it)
+
+Fetching lessons...`, { parse_mode: 'Markdown' });
+    }
+    
+    let lessons;
+    if (category === 'success') {
+      lessons = await getSuccessPatterns();
+    } else {
+      lessons = await getLessons(undefined, 15);
+    }
+    
+    if (!lessons || lessons.length === 0) {
+      await ctx.reply(`📚 No lessons recorded yet!
+
+Start teaching me by using /feedback after trying my suggestions:
+• /feedback success <what worked>
+• /feedback fail <what didn't work>
+
+The more feedback you give, the smarter I become! 🧠`);
+      return;
+    }
+    
+    const lessonList = lessons.map((l: any, i: number) => {
+      const [id, cat, context, action, outcome, lesson] = l;
+      const emoji = outcome === 'success' ? '✅' : outcome === 'failure' ? '❌' : '⚠️';
+      return `${i + 1}. ${emoji} *${outcome}*\n   ${lesson || context?.substring(0, 100)}`;
+    }).join('\n\n');
+    
+    await ctx.reply(`📚 *What I've Learned*
+
+${lessonList}
+
+━━━━━━━━━━━━━━━━━━━━
+🧠 Total lessons: ${lessons.length}
+✅ Successes: ${lessons.filter((l: any) => l[4] === 'success').length}
+❌ Failures: ${lessons.filter((l: any) => l[4] === 'failure').length}
+
+_Keep giving feedback to make me smarter!_`, { parse_mode: 'Markdown' });
+  });
+  
+  // ==========================================================================
+  // STRATEGIC INTELLIGENCE - Think like a CTO!
+  // ==========================================================================
+  
+  // /strategy - Get strategic analysis of your ecosystem
+  bot.command('strategy', async (ctx) => {
+    const focus = ctx.message?.text?.replace('/strategy', '').trim();
+    
+    if (!focus) {
+      await ctx.reply(`🎯 *STRATEGIC ANALYSIS*
+
+*What is this?*
+I analyze your entire ecosystem and give you strategic advice - like a real CTO thinking about the big picture!
+
+*Options:*
+\`/strategy\` - Full ecosystem analysis
+\`/strategy EspaLuzWhatsApp\` - Focus on one product
+\`/strategy growth\` - Growth opportunities
+\`/strategy risks\` - Risk assessment
+\`/strategy tech\` - Technical priorities
+
+Analyzing your ecosystem...`, { parse_mode: 'Markdown' });
+    }
+    
+    await ctx.reply('🎯 Analyzing ecosystem strategically...\n\n⏳ Gathering data from all sources...');
+    
+    try {
+      // Gather ecosystem data
+      let repoData: { name: string; commits: number; lastUpdate: string; issues: number }[] = [];
+      
+      for (const repo of AIDEAZZ_REPOS.slice(0, 6)) {
+        try {
+          const [commitsRes, repoInfo] = await Promise.all([
+            octokit.repos.listCommits({
+              owner: 'ElenaRevicheva',
+              repo,
+              per_page: 10
+            }),
+            octokit.repos.get({
+              owner: 'ElenaRevicheva',
+              repo
+            })
+          ]);
+          
+          const lastCommit = commitsRes.data[0];
+          const daysSinceUpdate = lastCommit 
+            ? Math.floor((Date.now() - new Date(lastCommit.commit.author?.date || '').getTime()) / (1000 * 60 * 60 * 24))
+            : 999;
+          
+          repoData.push({
+            name: repo,
+            commits: commitsRes.data.length,
+            lastUpdate: daysSinceUpdate === 0 ? 'today' : `${daysSinceUpdate}d ago`,
+            issues: repoInfo.data.open_issues_count
+          });
+        } catch {}
+      }
+      
+      // Get tech debt
+      const techDebt = await getTechDebt();
+      const decisions = await getDecisions(undefined, 10);
+      const lessons = await getLessons(undefined, 10);
+      const insights = await getActiveInsights();
+      
+      // Build strategic context
+      const repoSummary = repoData.map(r => 
+        `${r.name}: ${r.commits} recent commits, updated ${r.lastUpdate}, ${r.issues} issues`
+      ).join('\n');
+      
+      const debtSummary = techDebt.slice(0, 5).map((d: any) => d[2]).join('; ');
+      const decisionSummary = decisions.slice(0, 5).map((d: any) => d[2]).join('; ');
+      const lessonSummary = lessons.slice(0, 5).map((l: any) => l[5] || l[2]).join('; ');
+      
+      const strategyPrompt = `You are CTO of AIdeazz, a startup with these products:
+
+ECOSYSTEM STATUS:
+${repoSummary}
+
+KNOWN TECH DEBT:
+${debtSummary || 'None recorded'}
+
+RECENT DECISIONS:
+${decisionSummary || 'None recorded'}
+
+LESSONS LEARNED:
+${lessonSummary || 'None recorded'}
+
+${focus ? `FOCUS AREA: ${focus}` : 'FULL STRATEGIC ANALYSIS'}
+
+As CTO, provide strategic analysis:
+
+1. 📊 *ECOSYSTEM HEALTH* (1-2 sentences)
+
+2. 🎯 *TOP 3 PRIORITIES* - What to focus on this week
+   - Priority 1: ...
+   - Priority 2: ...
+   - Priority 3: ...
+
+3. ⚠️ *RISKS* - What could go wrong if ignored
+
+4. 🚀 *OPPORTUNITIES* - Quick wins available now
+
+5. 💡 *STRATEGIC RECOMMENDATION* - One key insight
+
+Be specific, actionable, and think like a startup CTO who needs to ship fast but sustainably.
+Consider: What would make this ecosystem more attractive to investors? What would help the founder become a stronger developer?`;
+
+      const strategy = await askAI(strategyPrompt, 2500);
+      
+      await ctx.reply(`🎯 *Strategic Analysis*\n\n${strategy}`, { parse_mode: 'Markdown' });
+      
+      // Save key insights
+      await saveInsight('strategic_review', 'Weekly strategic review completed', 3);
+      
+    } catch (error) {
+      console.error('Strategy error:', error);
+      await ctx.reply('❌ Error generating strategic analysis. Try again!');
+    }
+  });
+  
+  // /priorities - What should I work on today?
+  bot.command('priorities', async (ctx) => {
+    await ctx.reply(`🎯 *TODAY'S PRIORITIES*
+
+*What is this?*
+I analyze your tech debt, recent activity, and lessons learned to tell you what's most important to work on TODAY.
+
+Analyzing...`, { parse_mode: 'Markdown' });
+    
+    try {
+      // Gather priority data
+      const techDebt = await getTechDebt();
+      const insights = await getActiveInsights();
+      const lessons = await getSuccessPatterns();
+      
+      // Check which repos need attention
+      let staleRepos: string[] = [];
+      for (const repo of AIDEAZZ_REPOS.slice(0, 6)) {
+        try {
+          const commits = await octokit.repos.listCommits({
+            owner: 'ElenaRevicheva',
+            repo,
+            per_page: 1
+          });
+          const lastCommit = commits.data[0];
+          if (lastCommit) {
+            const daysSince = Math.floor((Date.now() - new Date(lastCommit.commit.author?.date || '').getTime()) / (1000 * 60 * 60 * 24));
+            if (daysSince > 7) {
+              staleRepos.push(`${repo} (${daysSince}d)`);
+            }
+          }
+        } catch {}
+      }
+      
+      const priorityPrompt = `Based on this data, give me 3 specific priorities for TODAY:
+
+OPEN TECH DEBT (${techDebt.length} items):
+${techDebt.slice(0, 5).map((d: any) => `- ${d[1]}: ${d[2]}`).join('\n') || 'None'}
+
+STALE REPOS (no commits in 7+ days):
+${staleRepos.join(', ') || 'None - all active!'}
+
+SUCCESSFUL PATTERNS TO REPEAT:
+${lessons.slice(0, 3).map((l: any) => l[3]).join('\n') || 'None yet'}
+
+Give exactly 3 priorities with:
+1. 🥇 *MUST DO* - Most critical
+   What: ...
+   Why: ...
+   Time: X minutes
+   Command: /cursor ... (or other command to start)
+
+2. 🥈 *SHOULD DO* - Important
+   What: ...
+   Why: ...
+   Time: X minutes
+   Command: ...
+
+3. 🥉 *COULD DO* - Nice to have
+   What: ...
+   Why: ...
+   Time: X minutes
+   Command: ...
+
+Be specific! Reference actual repos and tasks.`;
+
+      const priorities = await askAI(priorityPrompt, 1500);
+      
+      await ctx.reply(`🎯 *Today's Priorities*\n\n${priorities}\n\n━━━━━━━━━━━━━━━━━━━━\n💡 After completing a task, use /feedback to help me learn!`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Priorities error:', error);
+      await ctx.reply('❌ Error calculating priorities. Try /strategy for full analysis.');
+    }
+  });
+  
+  // /think - Deep strategic thinking on a topic
+  bot.command('think', async (ctx) => {
+    const topic = ctx.message?.text?.replace('/think', '').trim();
+    
+    if (!topic) {
+      await ctx.reply(`🧠 *DEEP THINKING MODE*
+
+*What is this?*
+I think deeply about a strategic question - product direction, technical architecture, business model, etc. Like brainstorming with a CTO!
+
+*Examples:*
+\`/think Should I add payments to EspaLuz or focus on growth first?\`
+
+\`/think What's the best way to monetize ATUONA NFT gallery?\`
+
+\`/think How should I position AIdeazz for investors?\`
+
+\`/think Should I use microservices or keep it monolithic?\`
+
+*What will I give you?*
+🔍 Analysis of the question
+⚖️ Pros and cons
+🎯 Recommendation
+📋 Next steps
+
+👉 *Try now:* Ask a strategic question!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('🧠 Thinking deeply...\n\n⏳ Analyzing from multiple angles...');
+    
+    // Gather context
+    const decisions = await getDecisions(undefined, 5);
+    const lessons = await getLessons(undefined, 5);
+    
+    const thinkPrompt = `You are a seasoned startup CTO thinking deeply about this question:
+
+"${topic}"
+
+CONTEXT - Previous decisions:
+${decisions.map((d: any) => d[2] + ': ' + d[3]).join('\n') || 'None recorded'}
+
+CONTEXT - Lessons learned:
+${lessons.map((l: any) => l[5] || l[2]).join('\n') || 'None recorded'}
+
+Think like a CTO who:
+- Has been through multiple startups
+- Understands both technical and business tradeoffs
+- Knows the founder is solo and resource-constrained
+- Wants sustainable growth, not hype
+
+Provide:
+
+🔍 *ANALYSIS*
+(Break down the key factors, 3-4 points)
+
+⚖️ *TRADEOFFS*
+| Option A | Option B |
+| Pros | Pros |
+| Cons | Cons |
+
+🎯 *MY RECOMMENDATION*
+(Clear stance with reasoning)
+
+📋 *NEXT STEPS*
+1. ...
+2. ...
+3. ...
+
+💭 *CONTRARIAN VIEW*
+(What if I'm wrong? Alternative perspective)
+
+Be thoughtful, specific, and actionable.`;
+
+    const thinking = await askAI(thinkPrompt, 2500);
+    
+    await ctx.reply(`🧠 *Deep Thinking: ${topic.substring(0, 50)}...*\n\n${thinking}`, { parse_mode: 'Markdown' });
+    
+    // Save as insight
+    await saveInsight('strategic_thinking', `Analyzed: ${topic.substring(0, 200)}`, 2);
   });
   
   // /stats - Ecosystem statistics
