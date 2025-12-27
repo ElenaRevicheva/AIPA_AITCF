@@ -199,13 +199,23 @@ Type /menu for all commands! 🚀
   
   async function showMenu(ctx: Context) {
     const menuMessage = `
-🤖 *CTO AIPA v3.4 - Menu*
+🤖 *CTO AIPA v3.5 - Menu*
 
 ━━━━━━━━━━━━━━━━━━━━
-🎓 *LEARN TO CODE*
+📚 *BECOME A REAL DEV* 🆕
 ━━━━━━━━━━━━━━━━━━━━
-/learn - Pick a coding topic
-/exercise - Get coding challenge
+/study - Quiz on YOUR code
+/explainfile <repo> <file> - Explain file
+/architecture <repo> - Repo structure
+/error <msg> - Debug any error
+/howto <task> - Step-by-step guides
+/cmd - Command cheat sheets
+
+━━━━━━━━━━━━━━━━━━━━
+🎓 *LEARN CONCEPTS*
+━━━━━━━━━━━━━━━━━━━━
+/learn - Pick coding topic
+/exercise - Coding challenge
 /explain <concept> - Explain anything
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -213,51 +223,33 @@ Type /menu for all commands! 🚀
 ━━━━━━━━━━━━━━━━━━━━
 /code <repo> <task> - Generate code
 /fix <repo> <issue> - Generate fix
-/approve - Create PR (after review!)
+/approve - Create PR (review first!)
 /reject - Discard code
-/pending - Check pending code
 
 ━━━━━━━━━━━━━━━━━━━━
-🏛️ *CTO DECISIONS* 🆕
+🏛️ *CTO DECISIONS*
 ━━━━━━━━━━━━━━━━━━━━
-/decision - Record arch decision
-/debt - Track technical debt
-/debt list - View all tech debt
+/decision - Record decision
+/debt - Track tech debt
 
 ━━━━━━━━━━━━━━━━━━━━
 📊 *INSIGHTS*
 ━━━━━━━━━━━━━━━━━━━━
-/stats - Weekly ecosystem metrics
+/stats - Ecosystem metrics
 /daily - Morning briefing
-/status - Service health check
-
-━━━━━━━━━━━━━━━━━━━━
-💡 *IDEAS & NOTES*
-━━━━━━━━━━━━━━━━━━━━
-/idea <text> - Save startup idea
-/ideas - View all ideas
+/status - Health check
 
 ━━━━━━━━━━━━━━━━━━━━
 🔍 *CODE & REPOS*
 ━━━━━━━━━━━━━━━━━━━━
-/review <repo> - Review with context!
-/repos - List all repositories
+/review <repo> - Review commit
+/repos - List repositories
+/idea - Save idea | /ideas - View
 
 ━━━━━━━━━━━━━━━━━━━━
-💬 *ASK & CHAT*
-━━━━━━━━━━━━━━━━━━━━
-/ask <question> - Ask anything
-/suggest - Get suggestion
-
-━━━━━━━━━━━━━━━━━━━━
-🎤📸 *MEDIA*
-━━━━━━━━━━━━━━━━━━━━
-🎤 Voice note → Transcribe + respond
-📸 Photo → Analyze it!
-
+💬 /ask | 🎤 Voice | 📸 Photo
 ━━━━━━━━━━━━━━━━━━━━
 ⚙️ /alerts /roadmap
-━━━━━━━━━━━━━━━━━━━━
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
   }
@@ -638,6 +630,716 @@ ${repo ? `📦 Repo: ${repo}\n` : ''}📝 ${description}
 _Use /decision list to see all decisions_`, { parse_mode: 'Markdown' });
     } else {
       await ctx.reply('❌ Error recording decision. Try again!');
+    }
+  });
+  
+  // ==========================================================================
+  // SELF-LEARNING SECTION - Become a real developer!
+  // ==========================================================================
+  
+  // /study - Quiz yourself on your own codebase
+  bot.command('study', async (ctx) => {
+    const input = ctx.message?.text?.replace('/study', '').trim();
+    
+    await ctx.reply('📚 Fetching a code snippet from your repos...');
+    
+    try {
+      // Pick a random repo or use specified one
+      const repoName: string = input || AIDEAZZ_REPOS[Math.floor(Math.random() * AIDEAZZ_REPOS.length)] || 'AIPA_AITCF';
+      
+      // Get file list from repo
+      const { data: contents } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: ''
+      });
+      
+      if (!Array.isArray(contents)) {
+        await ctx.reply('Could not read repo contents.');
+        return;
+      }
+      
+      // Find code files (ts, js, tsx, jsx)
+      const codeFiles = contents.filter((f: any) => 
+        f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
+      );
+      
+      // Also check src folder
+      let srcFiles: any[] = [];
+      try {
+        const { data: srcContents } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: 'src'
+        });
+        if (Array.isArray(srcContents)) {
+          srcFiles = srcContents.filter((f: any) => 
+            f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
+          ).map((f: any) => ({ ...f, path: `src/${f.name}` }));
+        }
+      } catch {}
+      
+      const allFiles = [...codeFiles, ...srcFiles];
+      
+      if (allFiles.length === 0) {
+        await ctx.reply(`No code files found in ${repoName}. Try /study AIPA_AITCF`);
+        return;
+      }
+      
+      // Pick random file
+      const randomFile = allFiles[Math.floor(Math.random() * allFiles.length)];
+      
+      // Fetch file content
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: randomFile.path || randomFile.name
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('Could not read file.');
+        return;
+      }
+      
+      const fileContent = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      
+      // Extract a random function or section (look for function/const/export patterns)
+      const lines = fileContent.split('\n');
+      const functionStarts: number[] = [];
+      
+      lines.forEach((line, i) => {
+        if (/^(export )?(async )?(function |const \w+ = |class )/.test(line.trim())) {
+          functionStarts.push(i);
+        }
+      });
+      
+      let codeSnippet = '';
+      let snippetStart = 0;
+      
+      if (functionStarts.length > 0) {
+        // Pick a random function
+        snippetStart = functionStarts[Math.floor(Math.random() * functionStarts.length)] || 0;
+        const snippetEnd = Math.min(snippetStart + 15, lines.length);
+        codeSnippet = lines.slice(snippetStart, snippetEnd).join('\n');
+      } else {
+        // Just take first 15 lines
+        codeSnippet = lines.slice(0, 15).join('\n');
+      }
+      
+      // Truncate if too long
+      if (codeSnippet.length > 1500) {
+        codeSnippet = codeSnippet.substring(0, 1500) + '\n...';
+      }
+      
+      await ctx.reply(`📚 *STUDY TIME*
+
+📦 Repo: ${repoName}
+📄 File: ${randomFile.path || randomFile.name}
+📍 Line: ${snippetStart + 1}
+
+\`\`\`
+${codeSnippet}
+\`\`\`
+
+━━━━━━━━━━━━━━━━━━━━
+❓ *YOUR TASK:*
+
+1. What does this code do?
+2. What would happen if you removed line ${snippetStart + 3}?
+3. Can you spot any potential issues?
+
+Reply with your answer, then use:
+/explain-file ${repoName} ${randomFile.path || randomFile.name}
+to check your understanding!`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Study error:', error);
+      await ctx.reply('❌ Error fetching code. Try /study AIPA_AITCF');
+    }
+  });
+  
+  // /explain-file - Explain any file from your repos
+  bot.command('explain', async (ctx) => {
+    // This might conflict with existing /explain for concepts
+    // Keep the existing behavior for concepts, add file explanation
+    const input = ctx.message?.text?.replace('/explain', '').trim();
+    
+    // Check if it looks like a file path (contains / or ends with extension)
+    if (!input || (!input.includes('/') && !input.includes('.'))) {
+      // Fall through to concept explanation (existing behavior)
+      // This is handled elsewhere, so just return
+      return;
+    }
+  });
+  
+  // /explain-file - Dedicated file explanation
+  bot.command('explainfile', async (ctx) => {
+    const input = ctx.message?.text?.replace('/explainfile', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📖 *Explain Any File*
+
+Usage: /explainfile <repo> <filepath>
+
+Examples:
+/explainfile AIPA_AITCF src/telegram-bot.ts
+/explainfile EspaLuzWhatsApp index.ts
+/explainfile atuona src/atuona-creative-ai.ts
+
+I'll fetch the file and explain what every part does!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    const repoName: string = parts[0] || 'AIPA_AITCF';
+    const filePath: string = parts.slice(1).join(' ') || 'index.ts';
+    
+    await ctx.reply(`📖 Fetching ${filePath} from ${repoName}...`);
+    
+    try {
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ Could not read file. Make sure path is correct.');
+        return;
+      }
+      
+      const fileContent = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      
+      // Truncate for API limits
+      const truncatedContent = fileContent.length > 6000 
+        ? fileContent.substring(0, 6000) + '\n... (truncated)'
+        : fileContent;
+      
+      const explainPrompt = `You are teaching a vibe coder to become a real developer.
+
+Explain this file in simple terms. For EACH section:
+1. What it does (in plain English)
+2. WHY it's written that way
+3. What would break if you removed it
+
+File: ${filePath}
+Repo: ${repoName}
+
+\`\`\`
+${truncatedContent}
+\`\`\`
+
+Format for Telegram (use simple language, no jargon without explaining it):
+📦 IMPORTS - what libraries and why
+🔧 SETUP - configuration and initialization  
+⚡ FUNCTIONS - what each function does
+🔗 EXPORTS - what other files can use
+
+Be encouraging! This person built this but wants to understand it deeply.`;
+
+      const explanation = await askAI(explainPrompt, 3000);
+      
+      // Split into multiple messages if too long
+      if (explanation.length > 4000) {
+        const mid = explanation.lastIndexOf('\n', 2000);
+        await ctx.reply(`📖 *${filePath}* (Part 1)\n\n${explanation.substring(0, mid)}`);
+        await ctx.reply(`📖 *${filePath}* (Part 2)\n\n${explanation.substring(mid)}`);
+      } else {
+        await ctx.reply(`📖 *${filePath}*\n\n${explanation}`);
+      }
+      
+    } catch (error: any) {
+      if (error.status === 404) {
+        await ctx.reply(`❌ File not found: ${filePath}\n\nUse /architecture ${repoName} to see available files.`);
+      } else {
+        await ctx.reply('❌ Error fetching file. Check repo and path.');
+      }
+    }
+  });
+  
+  // /architecture - Show and explain repo structure
+  bot.command('architecture', async (ctx) => {
+    const repoName = ctx.message?.text?.replace('/architecture', '').trim();
+    
+    if (!repoName) {
+      await ctx.reply(`🏗️ *Understand Repo Architecture*
+
+Usage: /architecture <repo>
+
+Examples:
+/architecture AIPA_AITCF
+/architecture EspaLuzWhatsApp
+/architecture atuona
+
+I'll show you the structure and explain what each part does!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`🏗️ Analyzing ${repoName} structure...`);
+    
+    try {
+      // Get root contents
+      const { data: rootContents } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: ''
+      });
+      
+      if (!Array.isArray(rootContents)) {
+        await ctx.reply('Could not read repo.');
+        return;
+      }
+      
+      // Build tree structure
+      let tree = '';
+      const folders: string[] = [];
+      const files: string[] = [];
+      
+      for (const item of rootContents) {
+        if (item.type === 'dir') {
+          folders.push(item.name);
+          tree += `📁 ${item.name}/\n`;
+        } else {
+          files.push(item.name);
+          tree += `📄 ${item.name}\n`;
+        }
+      }
+      
+      // Try to get src folder contents
+      let srcTree = '';
+      try {
+        const { data: srcContents } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: 'src'
+        });
+        if (Array.isArray(srcContents)) {
+          srcTree = srcContents.map((f: any) => `   📄 ${f.name}`).join('\n');
+        }
+      } catch {}
+      
+      // Get package.json for dependencies
+      let deps = '';
+      try {
+        const { data: pkgFile } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: 'package.json'
+        });
+        if (!Array.isArray(pkgFile) && 'content' in pkgFile) {
+          const pkg = JSON.parse(Buffer.from(pkgFile.content, 'base64').toString('utf-8'));
+          deps = Object.keys(pkg.dependencies || {}).join(', ');
+        }
+      } catch {}
+      
+      // Ask AI to explain the architecture
+      const archPrompt = `Explain this repo structure to someone learning to code:
+
+Repo: ${repoName}
+Structure:
+${tree}
+${srcTree ? `\nsrc/ folder:\n${srcTree}` : ''}
+${deps ? `\nDependencies: ${deps}` : ''}
+
+Explain in simple terms:
+1. What is the PURPOSE of this repo?
+2. What does each KEY FILE do?
+3. How do the pieces connect?
+4. Where should someone look first to understand it?
+
+Keep it SHORT and practical for Telegram.`;
+
+      const archExplanation = await askAI(archPrompt, 1500);
+      
+      await ctx.reply(`🏗️ *${repoName} Architecture*
+
+${tree}${srcTree ? `\n📁 src/\n${srcTree}\n` : ''}
+${deps ? `\n📦 *Dependencies:* ${deps.substring(0, 200)}${deps.length > 200 ? '...' : ''}\n` : ''}
+━━━━━━━━━━━━━━━━━━━━
+
+${archExplanation}
+
+━━━━━━━━━━━━━━━━━━━━
+💡 *Next steps:*
+/explainfile ${repoName} <filename>
+/study ${repoName}`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      if (error.status === 404) {
+        await ctx.reply(`❌ Repo "${repoName}" not found. Use /repos to see available repos.`);
+      } else {
+        await ctx.reply('❌ Error reading repo structure.');
+      }
+    }
+  });
+  
+  // /error - Paste an error, get explanation and fix
+  bot.command('error', async (ctx) => {
+    const errorText = ctx.message?.text?.replace('/error', '').trim();
+    
+    if (!errorText) {
+      await ctx.reply(`🐛 *Error Explainer*
+
+Paste your error message and I'll explain:
+- What went wrong
+- Why it happened  
+- How to fix it
+
+Usage: /error <paste your error here>
+
+Example:
+/error TypeError: Cannot read property 'map' of undefined
+
+Or just paste a long error and I'll analyze it!`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('🔍 Analyzing error...');
+    
+    const errorPrompt = `You are helping a vibe coder understand and fix an error.
+
+Error message:
+${errorText}
+
+Explain in SIMPLE terms:
+1. 🐛 WHAT: What does this error mean? (plain English)
+2. 🤔 WHY: What usually causes this?
+3. 🔧 FIX: Step-by-step how to fix it
+4. 🛡️ PREVENT: How to avoid this in the future
+
+Use simple language. This person is learning.
+If it's a TypeScript error, explain the type system simply.
+If it's a runtime error, explain where to add console.log to debug.`;
+
+    const explanation = await askAI(errorPrompt, 1500);
+    
+    await ctx.reply(`🐛 *Error Analysis*\n\n${explanation}`);
+  });
+  
+  // /howto - Step-by-step guides for common tasks
+  bot.command('howto', async (ctx) => {
+    const task = ctx.message?.text?.replace('/howto', '').trim().toLowerCase();
+    
+    const guides: { [key: string]: string } = {
+      'deploy': `🚀 *How to Deploy to Oracle*
+
+1️⃣ *SSH into your server:*
+\`\`\`
+ssh ubuntu@your-oracle-ip
+\`\`\`
+
+2️⃣ *Go to your project:*
+\`\`\`
+cd ~/cto-aipa
+\`\`\`
+
+3️⃣ *Pull latest code:*
+\`\`\`
+git pull origin main
+\`\`\`
+
+4️⃣ *Install dependencies (if changed):*
+\`\`\`
+npm install
+\`\`\`
+
+5️⃣ *Build TypeScript:*
+\`\`\`
+npm run build
+\`\`\`
+
+6️⃣ *Restart PM2:*
+\`\`\`
+pm2 restart all
+\`\`\`
+
+7️⃣ *Check logs:*
+\`\`\`
+pm2 logs --lines 20
+\`\`\`
+
+✅ Done! Test your bot.`,
+
+      'git': `📚 *Git Basics*
+
+*Save your changes:*
+\`\`\`
+git add .
+git commit -m "describe what you changed"
+git push origin main
+\`\`\`
+
+*Get latest code:*
+\`\`\`
+git pull origin main
+\`\`\`
+
+*Create a branch:*
+\`\`\`
+git checkout -b my-feature
+\`\`\`
+
+*Switch branches:*
+\`\`\`
+git checkout main
+\`\`\`
+
+*See what changed:*
+\`\`\`
+git status
+git diff
+\`\`\`
+
+*Undo last commit (keep changes):*
+\`\`\`
+git reset --soft HEAD~1
+\`\`\``,
+
+      'pm2': `⚙️ *PM2 Commands*
+
+*Start app:*
+\`\`\`
+pm2 start dist/index.js --name myapp
+\`\`\`
+
+*Restart:*
+\`\`\`
+pm2 restart all
+\`\`\`
+
+*Stop:*
+\`\`\`
+pm2 stop all
+\`\`\`
+
+*View logs:*
+\`\`\`
+pm2 logs
+pm2 logs --lines 50
+\`\`\`
+
+*List running apps:*
+\`\`\`
+pm2 list
+\`\`\`
+
+*Save config (survives reboot):*
+\`\`\`
+pm2 save
+pm2 startup
+\`\`\``,
+
+      'npm': `📦 *NPM Commands*
+
+*Install all dependencies:*
+\`\`\`
+npm install
+\`\`\`
+
+*Add a package:*
+\`\`\`
+npm install package-name
+\`\`\`
+
+*Add dev dependency:*
+\`\`\`
+npm install -D package-name
+\`\`\`
+
+*Run scripts:*
+\`\`\`
+npm run build
+npm run start
+npm run dev
+\`\`\`
+
+*See installed packages:*
+\`\`\`
+npm list --depth=0
+\`\`\``,
+
+      'typescript': `📘 *TypeScript Basics*
+
+*Compile once:*
+\`\`\`
+npx tsc
+\`\`\`
+
+*Watch mode (auto-compile):*
+\`\`\`
+npx tsc --watch
+\`\`\`
+
+*Check errors without compiling:*
+\`\`\`
+npx tsc --noEmit
+\`\`\`
+
+*Common types:*
+\`\`\`typescript
+const name: string = "Elena";
+const age: number = 30;
+const active: boolean = true;
+const items: string[] = ["a", "b"];
+\`\`\`
+
+*Function types:*
+\`\`\`typescript
+function greet(name: string): string {
+  return "Hello " + name;
+}
+\`\`\``,
+
+      'cursor': `🖥️ *Local Cursor Tips*
+
+*Without paid agents, use:*
+
+1️⃣ *Cmd+K* - Edit selected code
+   Select code → Cmd+K → describe change
+
+2️⃣ *Cmd+L* - Chat about code
+   Ask questions about your codebase
+
+3️⃣ *Tab completion* - Accept suggestions
+   Free AI completions as you type
+
+4️⃣ *@file* - Reference files in chat
+   "Explain @src/index.ts"
+
+5️⃣ *Cmd+Shift+E* - Explain selected code
+
+*Best free workflow:*
+- Use Tab completions (free)
+- Use Cmd+K for small edits
+- Ask CTO AIPA for guidance
+- Copy explanations to Cursor chat`
+    };
+    
+    if (!task) {
+      await ctx.reply(`📖 *How-To Guides*
+
+Available guides:
+/howto deploy - Deploy to Oracle
+/howto git - Git basics
+/howto pm2 - PM2 process manager
+/howto npm - NPM package manager
+/howto typescript - TypeScript basics
+/howto cursor - Local Cursor tips
+
+Or ask anything:
+/howto add a new telegram command`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Check for predefined guide
+    for (const [key, guide] of Object.entries(guides)) {
+      if (task.includes(key)) {
+        await ctx.reply(guide, { parse_mode: 'Markdown' });
+        return;
+      }
+    }
+    
+    // Custom question - use AI
+    const howtoPrompt = `Give a step-by-step guide for: "${task}"
+
+Context: This is for a solo developer working with:
+- TypeScript/Node.js
+- Telegram bots (grammy)
+- Oracle Cloud VM
+- GitHub repos
+- PM2 for process management
+
+Format as numbered steps with code blocks where needed.
+Keep it practical and copy-pasteable.`;
+
+    const guide = await askAI(howtoPrompt, 2000);
+    await ctx.reply(`📖 *How to: ${task}*\n\n${guide}`, { parse_mode: 'Markdown' });
+  });
+  
+  // /cmd - Quick command reference
+  bot.command('cmd', async (ctx) => {
+    const category = ctx.message?.text?.replace('/cmd', '').trim().toLowerCase();
+    
+    if (!category) {
+      await ctx.reply(`⌨️ *Quick Commands*
+
+/cmd git - Git commands
+/cmd npm - NPM commands
+/cmd pm2 - PM2 commands
+/cmd ssh - SSH/server commands
+/cmd debug - Debugging commands
+
+Print and keep near your desk! 📋`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const commands: { [key: string]: string } = {
+      'git': `📋 *Git Cheat Sheet*
+
+\`git status\` - See changes
+\`git add .\` - Stage all
+\`git commit -m "msg"\` - Commit
+\`git push\` - Push to remote
+\`git pull\` - Get latest
+\`git log --oneline -5\` - Recent commits
+\`git diff\` - See changes
+\`git checkout -b name\` - New branch
+\`git checkout main\` - Switch branch
+\`git stash\` - Save changes aside
+\`git stash pop\` - Restore stashed`,
+
+      'npm': `📋 *NPM Cheat Sheet*
+
+\`npm install\` - Install deps
+\`npm i package\` - Add package
+\`npm i -D package\` - Dev dependency
+\`npm run build\` - Build project
+\`npm run start\` - Start app
+\`npm list --depth=0\` - Show deps
+\`npm outdated\` - Check updates
+\`npm update\` - Update packages`,
+
+      'pm2': `📋 *PM2 Cheat Sheet*
+
+\`pm2 list\` - Show apps
+\`pm2 start app.js\` - Start
+\`pm2 restart all\` - Restart
+\`pm2 stop all\` - Stop
+\`pm2 logs\` - View logs
+\`pm2 logs -f\` - Follow logs
+\`pm2 monit\` - Monitor
+\`pm2 save\` - Save config
+\`pm2 delete all\` - Remove all`,
+
+      'ssh': `📋 *SSH Cheat Sheet*
+
+\`ssh user@ip\` - Connect
+\`scp file user@ip:path\` - Copy to server
+\`scp user@ip:path file\` - Copy from server
+\`exit\` - Disconnect
+\`pwd\` - Current directory
+\`ls -la\` - List files
+\`cat file\` - View file
+\`nano file\` - Edit file
+\`tail -f file\` - Watch file`,
+
+      'debug': `📋 *Debug Cheat Sheet*
+
+\`console.log(variable)\` - Print value
+\`console.log({variable})\` - Print with name
+\`console.table(array)\` - Pretty print
+\`JSON.stringify(obj, null, 2)\` - Format JSON
+\`typeof variable\` - Check type
+\`pm2 logs --lines 100\` - Recent logs
+\`npx tsc --noEmit\` - Check types
+\`node --inspect app.js\` - Debug mode`
+    };
+    
+    const cmd = commands[category];
+    if (cmd) {
+      await ctx.reply(cmd, { parse_mode: 'Markdown' });
+    } else {
+      await ctx.reply('Unknown category. Use /cmd to see options.');
     }
   });
   
