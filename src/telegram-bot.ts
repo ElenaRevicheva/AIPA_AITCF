@@ -632,23 +632,28 @@ _Use /decision list to see all decisions_`, { parse_mode: 'Markdown' });
     const input = ctx.message?.text?.replace('/cursor', '').trim();
     
     if (!input) {
-      await ctx.reply(`🖥️ *Cursor Agent Simulator*
+      await ctx.reply(`🖥️ *CURSOR AGENT MODE*
 
-Tell me what you want to build/edit, and I'll give you:
-1. Which file(s) to open
-2. What to select
-3. Exact Cmd+K prompts to use
-4. Code to copy/paste
+*What is this?*
+I become your Cursor Agent! Tell me what you want to change in your product - in YOUR words, like you're talking to a human - and I'll give you step-by-step instructions to do it yourself in local Cursor.
 
-*Usage:*
-/cursor <repo> <what you want to do>
+*What do I need from you?*
+Just tell me which product and what you want. Use your own words!
 
-*Examples:*
-/cursor AIPA_AITCF add a /ping command that replies pong
-/cursor EspaLuzWhatsApp add error handling to the API calls
-/cursor atuona add a loading spinner to the gallery
+*Examples (just copy one and edit):*
+\`/cursor EspaLuzWhatsApp make the AI tutor more friendly and patient with beginners\`
 
-I'll guide you step-by-step like a Cursor Agent! 🎯`, { parse_mode: 'Markdown' });
+\`/cursor atuona add beautiful animations when poems load\`
+
+\`/cursor AIPA_AITCF improve how the bot responds to voice messages\`
+
+*What will I give you?*
+📂 Which file to open
+✂️ What code to select  
+⌨️ What to type in Cmd+K
+📋 Code to copy/paste if needed
+
+👉 *Try now:* Just type /cursor and then describe what you want!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -823,19 +828,27 @@ Need more help? Just ask! 🎯`, { parse_mode: 'Markdown' });
     const input = ctx.message?.text?.replace('/build', '').trim();
     
     if (!input) {
-      await ctx.reply(`🏗️ *Build Mode - Multi-Step Guidance*
+      await ctx.reply(`🏗️ *BUILD MODE*
 
-For complex features that need multiple files/steps.
+*What is this?*
+For BIG features that need multiple steps. I'll create a plan and break it into small, doable pieces. Like having a senior developer plan your work!
 
-*Usage:*
-/build <repo> <feature description>
+*What do I need from you?*
+Tell me which product and what big feature you want to add.
 
-*Examples:*
-/build AIPA_AITCF add user authentication with login command
-/build EspaLuzWhatsApp add a scoring system for quizzes
-/build atuona add dark mode to the gallery
+*Examples (copy and edit):*
+\`/build EspaLuzWhatsApp add a progress tracking system so students can see how they're improving\`
 
-I'll break it into steps and guide you through each one! 🎯`, { parse_mode: 'Markdown' });
+\`/build atuona create a favorites feature so visitors can save poems they like\`
+
+\`/build AIPA_AITCF add daily coding tips that get sent automatically\`
+
+*What will I give you?*
+📋 A numbered plan with steps
+🎯 Each step has a /cursor command to get details
+⏱️ Time estimate for the whole feature
+
+👉 *Try now:* Type /build and describe what you want to create!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -931,18 +944,28 @@ Keep it to 3-6 steps maximum. Be practical.`;
     const input = ctx.message?.text?.replace('/diff', '').trim();
     
     if (!input) {
-      await ctx.reply(`📝 *Diff Mode - Before/After Code*
+      await ctx.reply(`📝 *DIFF MODE - Before/After*
 
-See exactly what to change in your code.
+*What is this?*
+I show you exactly what code to find and what to replace it with. Like a "find and replace" guide!
 
-*Usage:*
-/diff <repo> <file> <what to change>
+*What do I need from you?*
+Tell me the product, the file name, and what you want to change.
 
-*Examples:*
-/diff AIPA_AITCF src/telegram-bot.ts add error logging
-/diff EspaLuzWhatsApp index.ts improve the welcome message
+*How to find file names?*
+Use \`/architecture EspaLuzWhatsApp\` to see all files first!
 
-I'll show you the BEFORE and AFTER! 🎯`, { parse_mode: 'Markdown' });
+*Examples (copy and edit):*
+\`/diff EspaLuzWhatsApp index.ts make the welcome message more warm and friendly\`
+
+\`/diff atuona src/gallery.ts add smooth fade-in animation\`
+
+*What will I give you?*
+❌ BEFORE: The exact code to find
+✅ AFTER: What to replace it with
+💡 How to do it in Cursor
+
+👉 *Tip:* First use /architecture to see file names!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -1025,6 +1048,29 @@ Keep it focused on ONE specific change.`;
   // /study - Quiz yourself on your own codebase
   bot.command('study', async (ctx) => {
     const input = ctx.message?.text?.replace('/study', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📚 *STUDY MODE*
+
+*What is this?*
+I pick a random piece of YOUR code and quiz you on it. This helps you understand what you've built - super important for interviews and becoming a real developer!
+
+*What do I need from you?*
+Nothing! Or tell me which product to quiz you on.
+
+*Examples:*
+\`/study\` - Random quiz from any repo
+\`/study EspaLuzWhatsApp\` - Quiz from EspaLuz
+\`/study AIPA_AITCF\` - Quiz from CTO AIPA
+
+*What will I give you?*
+📄 A code snippet from your project
+❓ Questions about what it does
+🎯 Help you understand YOUR code
+
+👉 *Try now:* Just type /study and I'll quiz you!`, { parse_mode: 'Markdown' });
+      return;
+    }
     
     await ctx.reply('📚 Fetching a code snippet from your repos...');
     
@@ -1162,16 +1208,27 @@ to check your understanding!`, { parse_mode: 'Markdown' });
     const input = ctx.message?.text?.replace('/explainfile', '').trim();
     
     if (!input) {
-      await ctx.reply(`📖 *Explain Any File*
+      await ctx.reply(`📖 *EXPLAIN FILE*
 
-Usage: /explainfile <repo> <filepath>
+*What is this?*
+I read any file from your projects and explain what every part does in simple words. Like having a teacher go through your code!
 
-Examples:
-/explainfile AIPA_AITCF src/telegram-bot.ts
-/explainfile EspaLuzWhatsApp index.ts
-/explainfile atuona src/atuona-creative-ai.ts
+*What do I need from you?*
+Tell me which product and which file.
 
-I'll fetch the file and explain what every part does!`, { parse_mode: 'Markdown' });
+*How to find file names?*
+Use \`/architecture EspaLuzWhatsApp\` first!
+
+*Examples (copy and edit):*
+\`/explainfile EspaLuzWhatsApp index.ts\`
+\`/explainfile AIPA_AITCF src/telegram-bot.ts\`
+
+*What will I give you?*
+📦 What each import does
+🔧 What each function does
+🔗 How pieces connect
+
+👉 *Tip:* Use /architecture first to see file names!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -1247,16 +1304,26 @@ Be encouraging! This person built this but wants to understand it deeply.`;
     const repoName = ctx.message?.text?.replace('/architecture', '').trim();
     
     if (!repoName) {
-      await ctx.reply(`🏗️ *Understand Repo Architecture*
+      await ctx.reply(`🏗️ *ARCHITECTURE - See Your Project Structure*
 
-Usage: /architecture <repo>
+*What is this?*
+I show you all files in your project and explain what each one does. Like a map of your codebase!
 
-Examples:
-/architecture AIPA_AITCF
-/architecture EspaLuzWhatsApp
-/architecture atuona
+*What do I need from you?*
+Just tell me which product to explore.
 
-I'll show you the structure and explain what each part does!`, { parse_mode: 'Markdown' });
+*Your products:*
+• \`/architecture EspaLuzWhatsApp\` - AI Spanish Tutor
+• \`/architecture AIPA_AITCF\` - CTO AIPA (this bot!)
+• \`/architecture atuona\` - NFT Poetry Gallery
+• \`/architecture aideazz\` - Main Website
+
+*What will I give you?*
+📁 All folders and files
+📦 What libraries you're using
+🗺️ Explanation of each part
+
+👉 *Try now:* /architecture EspaLuzWhatsApp`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -1363,19 +1430,27 @@ ${archExplanation}
     const errorText = ctx.message?.text?.replace('/error', '').trim();
     
     if (!errorText) {
-      await ctx.reply(`🐛 *Error Explainer*
+      await ctx.reply(`🐛 *ERROR HELPER*
 
-Paste your error message and I'll explain:
-- What went wrong
-- Why it happened  
-- How to fix it
+*What is this?*
+When you see a scary red error message, paste it here and I'll explain what went wrong in simple words + how to fix it!
 
-Usage: /error <paste your error here>
+*What do I need from you?*
+Just copy the error message and paste it after /error
 
-Example:
-/error TypeError: Cannot read property 'map' of undefined
+*Example:*
+\`/error TypeError: Cannot read property 'map' of undefined\`
 
-Or just paste a long error and I'll analyze it!`, { parse_mode: 'Markdown' });
+Or paste a long error:
+\`/error npm ERR! code ENOENT npm ERR! syscall open...\`
+
+*What will I give you?*
+🐛 What the error means (simple words!)
+🤔 Why it probably happened
+🔧 Step-by-step how to fix it
+🛡️ How to avoid it next time
+
+👉 *Try now:* Next time you see an error, paste it here!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -1404,6 +1479,29 @@ If it's a runtime error, explain where to add console.log to debug.`;
   // /howto - Step-by-step guides for common tasks
   bot.command('howto', async (ctx) => {
     const task = ctx.message?.text?.replace('/howto', '').trim().toLowerCase();
+    
+    if (!task) {
+      await ctx.reply(`📖 *HOW-TO GUIDES*
+
+*What is this?*
+Step-by-step instructions for common tasks. Like a cookbook for coding!
+
+*Ready-made guides:*
+\`/howto deploy\` - Deploy to Oracle server
+\`/howto git\` - Save and share your code
+\`/howto pm2\` - Manage running apps
+\`/howto npm\` - Install packages
+\`/howto typescript\` - TypeScript basics
+\`/howto cursor\` - Local Cursor tips
+
+*Or ask anything:*
+\`/howto connect to my database\`
+\`/howto add a new telegram command\`
+\`/howto fix permission denied error\`
+
+👉 *Try now:* /howto deploy`, { parse_mode: 'Markdown' });
+      return;
+    }
     
     const guides: { [key: string]: string } = {
       'deploy': `🚀 *How to Deploy to Oracle*
@@ -1998,19 +2096,30 @@ Keep it concise for Telegram. Use emojis. Be encouraging!`;
     const input = ctx.message?.text?.replace('/code', '').trim();
     
     if (!input) {
-      await ctx.reply(`💻 *CTO Code Generator*
+      await ctx.reply(`💻 *CODE GENERATOR*
 
-I'll write code and create a PR for you!
+*What is this?*
+I write code for you and prepare it as a GitHub Pull Request. But I show you first so you can approve before it goes live!
 
-Usage:
-/code <repo> <what to build>
+*What do I need from you?*
+Tell me which product and what you want me to create.
 
-Examples:
-/code atuona Add a beautiful README
-/code EspaLuzWhatsApp Add error handling to API calls
-/code AIPA_AITCF Add /ping command to Telegram bot
+*Examples (copy and edit):*
+\`/code EspaLuzWhatsApp add a welcome message for new students\`
+\`/code atuona add a share button for poems\`
+\`/code AIPA_AITCF add a /hello command\`
 
-I'll create a branch, write the code, and open a PR! 🚀`, { parse_mode: 'Markdown' });
+*What happens next?*
+1️⃣ I generate the code
+2️⃣ I show it to you for review
+3️⃣ You type /approve to create PR
+4️⃣ Or /reject to throw it away
+
+*Difference from /cursor:*
+• /code = I write, you approve
+• /cursor = I guide, you write in Cursor
+
+👉 *Try now:* /code and describe what you want!`, { parse_mode: 'Markdown' });
       return;
     }
     
