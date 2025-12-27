@@ -497,6 +497,314 @@ async function getAllAlertChatIds(): Promise<number[]> {
   }
 }
 
+// =============================================================================
+// LESSONS LEARNED - CTO learns from experience!
+// =============================================================================
+
+async function initLessonsTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      CREATE TABLE lessons (
+        id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+        category VARCHAR2(50),
+        context VARCHAR2(500),
+        action_taken VARCHAR2(1000),
+        outcome VARCHAR2(50),
+        lesson_learned VARCHAR2(1000),
+        repo VARCHAR2(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await connection.commit();
+    console.log('✅ Lessons table created');
+  } catch (err: any) {
+    if (err.errorNum === 955) {
+      // Table already exists
+    } else {
+      console.error('Lessons table error:', err);
+    }
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveLesson(
+  category: string,
+  context: string,
+  actionTaken: string,
+  outcome: 'success' | 'failure' | 'partial',
+  lessonLearned: string,
+  repo?: string
+): Promise<string | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO lessons (category, context, action_taken, outcome, lesson_learned, repo)
+       VALUES (:category, :context, :action, :outcome, :lesson, :repo)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        category,
+        context: context.substring(0, 500),
+        action: actionTaken.substring(0, 1000),
+        outcome,
+        lesson: lessonLearned.substring(0, 1000),
+        repo: repo || null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING }
+      }
+    );
+    await connection.commit();
+    return (result.outBinds as any).id[0];
+  } catch (err) {
+    console.error('❌ Save lesson error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getLessons(category?: string, limit: number = 10): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    let query = `SELECT RAWTOHEX(id) as id, category, context, action_taken, outcome, lesson_learned, repo, created_at
+                 FROM lessons`;
+    const params: any = { limit };
+    
+    if (category) {
+      query += ` WHERE category = :category`;
+      params.category = category;
+    }
+    query += ` ORDER BY created_at DESC FETCH FIRST :limit ROWS ONLY`;
+    
+    const result = await connection.execute(query, params);
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get lessons error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getSuccessPatterns(repo?: string): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    let query = `SELECT category, action_taken, lesson_learned, repo
+                 FROM lessons WHERE outcome = 'success'`;
+    const params: any = {};
+    
+    if (repo) {
+      query += ` AND repo = :repo`;
+      params.repo = repo;
+    }
+    query += ` ORDER BY created_at DESC FETCH FIRST 20 ROWS ONLY`;
+    
+    const result = await connection.execute(query, params);
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get success patterns error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// =============================================================================
+// STRATEGIC DATA - Track ecosystem health and priorities
+// =============================================================================
+
+async function initStrategicTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      CREATE TABLE strategic_insights (
+        id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+        insight_type VARCHAR2(50),
+        repo VARCHAR2(100),
+        insight_text VARCHAR2(2000),
+        priority NUMBER(1),
+        status VARCHAR2(20) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        resolved_at TIMESTAMP
+      )
+    `);
+    await connection.commit();
+    console.log('✅ Strategic insights table created');
+  } catch (err: any) {
+    if (err.errorNum === 955) {
+      // Table already exists
+    } else {
+      console.error('Strategic table error:', err);
+    }
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveInsight(
+  insightType: string,
+  insightText: string,
+  priority: number,
+  repo?: string
+): Promise<string | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO strategic_insights (insight_type, repo, insight_text, priority)
+       VALUES (:type, :repo, :text, :priority)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        type: insightType,
+        repo: repo || null,
+        text: insightText.substring(0, 2000),
+        priority,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING }
+      }
+    );
+    await connection.commit();
+    return (result.outBinds as any).id[0];
+  } catch (err) {
+    console.error('❌ Save insight error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getActiveInsights(): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) as id, insight_type, repo, insight_text, priority, created_at
+       FROM strategic_insights 
+       WHERE status = 'active'
+       ORDER BY priority DESC, created_at DESC
+       FETCH FIRST 20 ROWS ONLY`
+    );
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get insights error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function resolveInsight(insightId: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(
+      `UPDATE strategic_insights 
+       SET status = 'resolved', resolved_at = CURRENT_TIMESTAMP
+       WHERE id = HEXTORAW(:id)`,
+      { id: insightId }
+    );
+    await connection.commit();
+    return true;
+  } catch (err) {
+    console.error('❌ Resolve insight error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// =============================================================================
+// SERVICE HEALTH TRACKING
+// =============================================================================
+
+async function initHealthTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      CREATE TABLE service_health (
+        id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+        service_name VARCHAR2(100),
+        status VARCHAR2(20),
+        response_time NUMBER,
+        error_message VARCHAR2(500),
+        checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await connection.commit();
+    console.log('✅ Service health table created');
+  } catch (err: any) {
+    if (err.errorNum === 955) {
+      // Table already exists
+    } else {
+      console.error('Health table error:', err);
+    }
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveHealthCheck(
+  serviceName: string,
+  status: 'healthy' | 'degraded' | 'down',
+  responseTime?: number,
+  errorMessage?: string
+): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(
+      `INSERT INTO service_health (service_name, status, response_time, error_message)
+       VALUES (:name, :status, :time, :error)`,
+      {
+        name: serviceName,
+        status,
+        time: responseTime || null,
+        error: errorMessage?.substring(0, 500) || null
+      }
+    );
+    await connection.commit();
+  } catch (err) {
+    console.error('❌ Save health check error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getHealthHistory(serviceName?: string, hours: number = 24): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    let query = `SELECT service_name, status, response_time, error_message, checked_at
+                 FROM service_health
+                 WHERE checked_at > CURRENT_TIMESTAMP - INTERVAL '${hours}' HOUR`;
+    const params: any = {};
+    
+    if (serviceName) {
+      query += ` AND service_name = :name`;
+      params.name = serviceName;
+    }
+    query += ` ORDER BY checked_at DESC FETCH FIRST 100 ROWS ONLY`;
+    
+    const result = await connection.execute(query, params);
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get health history error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// Initialize new tables
+initLessonsTable();
+initStrategicTable();
+initHealthTable();
+
 export { 
   initializeDatabase, 
   saveMemory, 
@@ -515,5 +823,16 @@ export {
   // Alerts
   getAlertPreferences,
   setAlertPreferences,
-  getAllAlertChatIds
+  getAllAlertChatIds,
+  // Lessons learned
+  saveLesson,
+  getLessons,
+  getSuccessPatterns,
+  // Strategic
+  saveInsight,
+  getActiveInsights,
+  resolveInsight,
+  // Health
+  saveHealthCheck,
+  getHealthHistory
 };
