@@ -22,8 +22,10 @@
     "grammy": "^1.38.4",
     "groq-sdk": "^0.8.0",
     "node-cron": "^4.2.1",
+    "node-fetch": "^2.7.0",
     "openai": "^6.15.0",
-    "oracledb": "^6.7.0"
+    "oracledb": "^6.7.0",
+    "replicate": "^1.4.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
