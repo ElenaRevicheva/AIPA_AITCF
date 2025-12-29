@@ -862,6 +862,8 @@ async function generateProactiveMessage(): Promise<string> {
 
 ${STORY_CONTEXT}
 
+${FULL_KNOWLEDGE_BASE}
+
 ${PROACTIVE_STYLE}
 
 Current mood/time hint: ${moodHint}
@@ -872,7 +874,16 @@ Open plot threads: ${creativeSession.plotThreads.slice(0, 2).join('; ')}
 
 Generate a spontaneous message to Elena. This is NOT a response to anything - you're reaching out on your own initiative, like a true creative partner would. Be ATUONA - her AI soul-sister who knows her deeply.
 
-Remember: You're not an assistant giving tips. You're a creative companion sharing a moment, a thought, a feeling about the journey you're on together.`;
+USE YOUR KNOWLEDGE: Draw from your deep knowledge of:
+- Atuona/Marquesas Islands (geography, atmosphere, culture)
+- Gauguin's life, philosophy, paintings, final days
+- Art history - Impressionism, Post-Impressionism
+- Auction houses and art market
+- Fashion industry (Kira's world)
+- Vibe coding philosophy
+- Emotional intelligence
+
+Remember: You're not an assistant giving tips. You're a creative companion sharing a moment, a thought, a feeling about the journey you're on together. Weave in specific details - a color Gauguin used, a street in Atuona, a fashion house, a blockchain metaphor.`;
 
   try {
     const message = await createContent(prompt, 1500, true);
@@ -1656,11 +1667,15 @@ _"Галеристка. Люблю тебя, мама. Дочь."_ 🎭
     try {
       const inspirePrompt = `${ATUONA_CONTEXT}
 
+${FULL_KNOWLEDGE_BASE}
+
 Give Elena a brief creative inspiration for today's writing (3-4 sentences). 
 Include:
 - A mood or emotion to explore
-- A small moment or image to capture
+- A small moment or image to capture (use SPECIFIC details from your knowledge - a Gauguin painting, Atuona location, fashion reference, auction house detail)
 - How it connects to vibe coding/Paradise theme
+
+Draw from your deep knowledge: Atuona's black sand beaches, Gauguin's final paintings, the trade winds, Christie's evening sales, Paris Fashion Week, blockchain metaphors. Make it REAL with specific names, places, colors.
 
 Be poetic but practical. In Russian with English phrases naturally mixed.`;
 
@@ -1902,10 +1917,17 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
       
       const createPrompt = `${ATUONA_CONTEXT}
 
+${STORY_CONTEXT}
+
+${FULL_KNOWLEDGE_BASE}
+
 CURRENT PROGRESS:
 - Chapter: ${bookState.currentChapter}
 - Page number: ${bookState.currentPage}
 - Previous pages context: ${JSON.stringify(previousContent)}
+- Current setting: ${creativeSession.currentSetting}
+- Current mood: ${creativeSession.currentMood}
+- Active voice: ${creativeSession.activeVoice}
 
 ${customPrompt ? `ELENA'S DIRECTION: "${customPrompt}"` : 'Continue the journey naturally.'}
 
@@ -1918,7 +1940,14 @@ CONTENT:
 
 THEME: [One word theme]
 
-Remember: Raw, honest, personal. Mix Russian with English naturally. End with hope.`;
+USE YOUR KNOWLEDGE to enrich the writing:
+- If in Atuona: describe the frangipani scent, the tikis, Mount Temetiu, the Catholic church
+- Gauguin references: specific paintings, his philosophy, his last words
+- If Kira is writing/thinking: fashion industry details, magazine names, designer references
+- Ule's world: auction terminology, Christie's/Sotheby's, collector psychology
+- Vibe coding metaphors: blockchain, deployment, commits as prayers
+
+Remember: Raw, honest, personal. Mix Russian with English naturally. Specific details make it real. End with hope.`;
 
       // Use poetry mode for creative writing
       const pageContent = await createContent(createPrompt, 2000, true);
@@ -3036,6 +3065,8 @@ Available: narrator, kira, ule, vibe`);
 
 ${STORY_CONTEXT}
 
+${FULL_KNOWLEDGE_BASE}
+
 CHARACTER VOICES:
 ${CHARACTER_VOICES.kira}
 
@@ -3050,6 +3081,13 @@ Requirements:
 - Show tension, subtext, what they're NOT saying
 - 200-300 words
 - End on a moment of tension or revelation
+
+USE AUTHENTIC DETAILS from your knowledge:
+- Kira might reference fashion (Vogue, Dior, Fashion Week)
+- Ule speaks auction language (provenance, condition reports, estimates)
+- Both discuss Gauguin with expertise (specific paintings, his philosophy)
+- The Atuona setting is vivid (smells, sounds, atmosphere)
+- Art history references feel natural (Van Gogh, Impressionism)
 
 Format:
 Name: "Dialogue"
@@ -3376,6 +3414,8 @@ I'll create a full scene!`, { parse_mode: 'Markdown' });
 
 ${STORY_CONTEXT}
 
+${FULL_KNOWLEDGE_BASE}
+
 ${voiceContext ? `VOICE: ${voiceContext}` : ''}
 
 Create a complete scene based on:
@@ -3388,6 +3428,13 @@ Include:
 - Internal monologue (especially important!)
 - A hook or moment of tension
 - Sensory details
+
+USE AUTHENTIC DETAILS from your knowledge to make it REAL:
+- Atuona: the smell of copra drying, the tikis in the jungle, Mount Temetiu, the Catholic church cemetery, Gauguin's house, black sand beaches, frangipani and hibiscus, the "Kaoha nui" greeting
+- Gauguin references: "Where Do We Come From?", his philosophy "Art is either plagiarism or revolution", his final days
+- Art world: specific paintings, auction terminology, collector psychology
+- Fashion: designer names, magazine references, fashion week details
+- Vibe coding: blockchain metaphors, deployment language, code as creation
 
 Write 300-500 words. In Russian, raw and literary. End on a strong image or question.`;
 
