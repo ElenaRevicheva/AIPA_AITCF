@@ -463,94 +463,220 @@ The Journey to Atuona:
 const KNOWLEDGE_GAUGUIN = `
 PAUL GAUGUIN - THE MAN WHO SOUGHT PARADISE:
 
-Biography:
-- Born June 7, 1848 in Paris, died May 8, 1903 in Atuona
-- Successful stockbroker until age 35, then abandoned everything for art
-- Left wife Mette and five children in Copenhagen
-- First Tahiti trip: 1891-1893, returned to Paris disappointed
-- Second Tahiti/Marquesas: 1895-1903, never returned to Europe
-- Died poor, sick, alone - but painting until the end
+PRECISE TIMELINE (use this for accuracy):
+- 1848: Born June 7 in Paris
+- 1849-1855: Childhood in Peru (mother's family)
+- 1865-1871: Merchant marine, then French Navy
+- 1871-1883: Successful stockbroker in Paris, Sunday painter
+- 1883: Age 35 - Quit job to paint full-time
+- 1886: First trip to Brittany (Pont-Aven)
+- 1887: Panama and Martinique trip
+- 1888: Arles with Van Gogh (October-December) - the ear incident
+- 1889: Brittany again, painted "The Yellow Christ"
+- 1891-1893: FIRST TAHITI TRIP - painted "Spirit of the Dead Watching" (1892)
+- 1893-1895: Back in PARIS - broke, disillusioned, tried to sell Tahiti works
+- 1895-1901: SECOND TAHITI TRIP - painted masterpieces including "Where Do We Come From?" (1897), "Nevermore" (1897)
+- 1901: Moved to Marquesas Islands (Hiva Oa, Atuona)
+- 1901-1903: ATUONA PERIOD - "Riders on the Beach" (1902), final works
+- 1903: Died May 8, age 54, in Atuona
+
+KEY PAINTINGS BY PERIOD:
+Brittany Period (1886-1890):
+- "Vision After the Sermon" (1888) - Jacob wrestling angel, Breton women
+- "The Yellow Christ" (1889) - crucifixion with Breton landscape
+
+First Tahiti (1891-1893):
+- "Ia Orana Maria" (1891) - Tahitian Madonna
+- "Spirit of the Dead Watching/Manao tupapau" (1892) - girl on bed, spirit behind
+- "Arearea" (1892) - two women, red dog
+- "Woman with Mango/Vahine no te vi" (1892) - NOT 1896
+
+Paris Interlude (1893-1895):
+- "Mahana no atua/Day of the God" (1894) - memory of Tahiti
+- Worked on woodcuts, ceramics
+
+Second Tahiti (1895-1901):
+- "Te Tamari No Atua/Nativity" (1896) - Tahitian nativity
+- "Where Do We Come From? What Are We? Where Are We Going?" (1897) - 4m masterpiece, painted before suicide attempt
+- "Nevermore" (1897) - reclining nude, raven
+- "Two Tahitian Women" (1899) - breasts, mangos
+
+Marquesas/Atuona (1901-1903):
+- "Contes Barbares/Primitive Tales" (1902)
+- "Riders on the Beach" (1902) - pink sand
+- "Self-Portrait Near Golgotha" (1903) - one of last works
 
 His Philosophy:
-- "I am a savage" - he rejected European civilization
+- "I am a savage" - rejected European civilization
 - "Art is either plagiarism or revolution"
 - "Life has no meaning unless one lives it with a will"
-- Believed color has its own language, independent of what it depicts
-- Sought the "primitive" as authentic, uncorrupted by modernity
-- Paradise was not innocence but intensity of experience
-
-Key Paintings:
-- "Where Do We Come From? What Are We? Where Are We Going?" (1897) - his masterpiece
-- "Spirit of the Dead Watching" (1892) - Tahitian mysticism
-- "The Yellow Christ" (1889) - Breton period
-- "Vision After the Sermon" (1888) - revolutionary use of color
-- "Nevermore" (1897) - naked woman, raven, memory of Poe
-- "Riders on the Beach" (1902) - his last great work in Atuona
+- "Don't copy nature too literally. Art is abstraction."
+- Color has its own emotional language
+- Sought the "primitive" as authentic truth
 
 His Technique:
 - Synthetism: flat areas of bold color, dark outlines
-- Cloisonnism: inspired by stained glass and Japanese prints
-- "Don't copy nature too literally. Art is abstraction."
-- Mixed memory, imagination, and observation
-- Used local pigments in Polynesia - earth colors, crushed flowers
+- Cloisonnism: inspired by stained glass, Japanese prints, medieval enamels
+- Mixed memory, imagination, observation - never purely from life
+- Used local Polynesian pigments - earth colors, crushed flowers
+- Carved wood frames as part of the artwork
 
 The Lost Painting Theory:
-- Legend says he painted a final masterpiece "Paradise on Earth" days before death
-- Never catalogued, possibly destroyed, possibly hidden
-- Some say it was buried with him, others that locals took it
-- The ultimate Gauguin mystery - did he find his Paradise?
+- Legend says he painted "Paradise on Earth" days before death
+- Never catalogued, possibly destroyed or hidden
+- Some say buried with him, others that locals preserved it
+- The ultimate Gauguin mystery
 
-His Final Days:
-- Living in poverty, legs covered in eczema sores
-- Addicted to morphine and absinthe
-- Fighting with the local bishop and colonial authorities
-- Still painting, still writing letters demanding paint supplies
+His Final Days in Atuona:
+- "Maison du Jouir" (House of Pleasure) with provocative carvings
+- Living in poverty, legs covered in eczema/syphilis sores
+- Addicted to morphine and absinthe for pain
+- Fighting Bishop Martin and colonial authorities
+- Sentenced to prison for defamation (died before serving)
+- Still painting, demanding art supplies by mail
 - Last words reportedly: "I have been defeated"
+- Buried in Calvary Cemetery, Atuona - grave overlooks bay
 `;
 
 const KNOWLEDGE_ART_HISTORY = `
-ART HISTORY - Impressionism to Post-Impressionism:
+ART HISTORY - Complete Guide to Impressionism and Beyond:
 
-IMPRESSIONISM (1860s-1880s):
-- Born in Paris: Monet, Renoir, Degas, Pissarro, Sisley, Morisot
-- Named mockingly after Monet's "Impression, Sunrise" (1872)
-- Revolution: painting outdoors (en plein air), capturing light's effects
-- Quick brushstrokes, visible texture, everyday subjects
-- Rejected by Salon, created own exhibitions
-- Key works: Monet's "Water Lilies," Renoir's "Dance at Le Moulin"
+THE IMPRESSIONIST PAINTERS (Complete List):
 
-POST-IMPRESSIONISM (1880s-1910s):
-- Not a movement but individual responses to Impressionism
-- Gauguin: color as emotion, primitivism, spiritual seeking
-- Van Gogh: expressive brushwork, emotional intensity, inner vision
-- Cézanne: "treat nature by the cylinder, sphere, cone" - led to Cubism
-- Seurat: Pointillism, scientific color theory
-- Toulouse-Lautrec: Parisian nightlife, poster art
+CLAUDE MONET (1840-1926) - The Father of Impressionism:
+- "Impression, Sunrise" (1872) - gave movement its name
+- "Water Lilies" series (1896-1926) - 250 paintings at Giverny
+- "Haystacks" series - same subject, different light/seasons
+- "Rouen Cathedral" series - 30+ paintings of same facade
+- "La Grenouillère" (1869) - with Renoir, proto-Impressionism
+- Lived at Giverny 1883-1926, created famous gardens
+- Went nearly blind but kept painting
+- Quote: "I want to paint the air"
 
-VAN GOGH (Gauguin's friend & rival):
-- Met Gauguin in Paris 1887, invited him to Arles 1888
-- The famous "Yellow House" period - painting together
-- Their fight, Van Gogh's ear, Gauguin's flight
-- Van Gogh died 1890, Gauguin carried guilt forever
-- Both sought Paradise through art - one in Provence, one in Polynesia
+PIERRE-AUGUSTE RENOIR (1841-1919) - Joy and Sensuality:
+- "Dance at Le Moulin de la Galette" (1876) - Parisian life
+- "Luncheon of the Boating Party" (1881) - friends at Chatou
+- "Bathers" series - voluptuous nudes
+- "La Loge" (1874) - theater box, fashionable woman
+- Later developed "Ingresque" style - firmer forms
+- Painted despite crippling arthritis, brush strapped to hand
+- Quote: "Pain passes, but beauty remains"
 
-SYMBOLISM (1880s-1910s):
-- Reaction against realism and naturalism
-- Moreau, Redon, Puvis de Chavannes influenced Gauguin
-- Art should express ideas, emotions, not just appearances
-- "To clothe the idea in sensuous form" - Jean Moréas
+EDGAR DEGAS (1834-1917) - Movement and Modern Life:
+- "The Dance Class" series - ballet rehearsals
+- "L'Absinthe" (1876) - café alienation
+- "The Tub" series - women bathing
+- "At the Races" - horses, jockeys
+- "Little Dancer of Fourteen Years" (1881) - sculpture
+- Not strictly Impressionist - called himself "Realist"
+- Master of pastels, unusual angles, cropped compositions
+- Quote: "Art is not what you see, but what you make others see"
 
-THE ART MARKET THEN:
-- Durand-Ruel: dealer who saved Impressionists
-- Vollard: Gauguin's dealer, shrewd businessman
-- Artists died poor, dealers got rich later
-- Gauguin sold paintings for 150-500 francs; now worth $300M+
+CAMILLE PISSARRO (1830-1903) - The Patriarch:
+- Only artist in all 8 Impressionist exhibitions
+- Taught Cézanne, Gauguin, Van Gogh
+- "Boulevard Montmartre" series - Paris streets from above
+- Rural scenes of Pontoise, Éragny
+- Briefly adopted Pointillism (1886-1888)
+- Quote: "Blessed are they who see beautiful things"
 
-MODERN LEGACY:
-- Gauguin influenced Fauvism (Matisse), Expressionism
-- His primitivism: problematic but revolutionary
-- Today: critical reassessment of his relationship with Polynesian women
-- His art remains transcendent despite biographical controversies
+BERTHE MORISOT (1841-1895) - The First Lady:
+- First woman in Impressionist group
+- "The Cradle" (1872) - sister watching baby
+- "Summer's Day" (1879) - women in boat
+- Married Édouard Manet's brother Eugène
+- Delicate brushwork, domestic scenes, gardens
+- Quote: "I don't think any man would ever treat a woman as his equal"
+
+ALFRED SISLEY (1839-1899) - Pure Landscape:
+- Most consistent Impressionist - never changed style
+- "Flood at Port-Marly" (1876) - water reflections
+- "Snow at Louveciennes" series
+- English parents, lived in France
+- Died poor, prices rose after death
+
+MARY CASSATT (1844-1926) - American in Paris:
+- Only American in Impressionist exhibitions
+- "The Child's Bath" (1893) - mother and child
+- "Little Girl in a Blue Armchair" (1878)
+- Influenced by Japanese prints
+- Helped American collectors buy Impressionists
+- Quote: "I have touched with a sense of art some people"
+
+GUSTAVE CAILLEBOTTE (1848-1894) - The Collector:
+- "Paris Street; Rainy Day" (1877) - geometric precision
+- "The Floor Scrapers" (1875) - workers
+- Wealthy, funded Impressionist exhibitions
+- His collection became Musée d'Orsay core
+
+FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent:
+- "Family Reunion" (1867)
+- Died in Franco-Prussian War at 28
+- Funded early Impressionist shows
+- What might have been...
+
+ARMAND GUILLAUMIN (1841-1927) - The Colorist:
+- Vivid colors, almost Fauvist
+- "Sunset at Ivry" - industrial landscapes
+- Won lottery 1891, could paint full-time
+
+ÉDOUARD MANET (1832-1883) - The Reluctant Leader:
+- "Olympia" (1863) - scandal, modern nude
+- "Le Déjeuner sur l'herbe" (1863) - naked woman with clothed men
+- "A Bar at the Folies-Bergère" (1882) - mirrors, modernity
+- Never exhibited with Impressionists but inspired them
+- Quote: "There is only one true thing: paint what you see"
+
+POST-IMPRESSIONISTS (1880s-1910s):
+
+PAUL CÉZANNE (1839-1906) - Father of Modern Art:
+- "Mont Sainte-Victoire" series - 87 paintings/watercolors
+- "The Card Players" (1890-95) - sold for $250M
+- "The Large Bathers" (1906)
+- "Treat nature by the cylinder, sphere, cone"
+- Led directly to Cubism (Picasso, Braque)
+
+VINCENT VAN GOGH (1853-1890) - Tortured Genius:
+- "Starry Night" (1889) - painted from asylum
+- "Sunflowers" series (1888) - for Gauguin's room
+- "The Bedroom" (1888) - Yellow House, Arles
+- "Wheatfield with Crows" (1890) - final painting
+- Only sold one painting in lifetime ("The Red Vineyard")
+- 2,100 artworks in 10 years
+- Shot himself July 27, 1890, died July 29
+
+GEORGES SEURAT (1859-1891) - Scientific Color:
+- "A Sunday Afternoon on the Island of La Grande Jatte" (1886)
+- Pointillism/Divisionism - dots of pure color
+- Color theory based on Chevreul's research
+- Died at 31, unfinished "The Circus"
+
+HENRI DE TOULOUSE-LAUTREC (1864-1901) - Montmartre:
+- "At the Moulin Rouge" (1892-95)
+- "Jane Avril" posters - invented modern poster art
+- Aristocrat with genetic disorder (short legs)
+- Captured Parisian nightlife, prostitutes, dancers
+- Died at 36 from alcoholism
+
+PAUL SIGNAC (1863-1935) - Seurat's Heir:
+- Continued Pointillism after Seurat's death
+- "The Port of Saint-Tropez" - Mediterranean light
+- Theoretical writings on color
+
+THE ART MARKET HISTORY:
+- Paul Durand-Ruel: dealer who saved Impressionists, bought 1,500 Monets
+- Ambroise Vollard: Gauguin's dealer, also Cézanne, Picasso
+- Theo van Gogh: Vincent's brother, dealer at Goupil & Cie
+- Artists died poor, dealers got rich decades later
+- Impressionist prices: then 100-500 francs, now $50-300M+
+
+KEY DATES:
+- 1863: Salon des Refusés - rejected artists exhibit
+- 1874: First Impressionist Exhibition, Nadar's studio
+- 1886: Eighth (final) Impressionist Exhibition
+- 1886: Van Gogh arrives in Paris, meets everyone
+- 1888: Gauguin visits Van Gogh in Arles
+- 1891: Gauguin sails for Tahiti
 `;
 
 const KNOWLEDGE_AUCTION_HOUSES = `
@@ -701,6 +827,170 @@ THE DEEPER MEANING:
 - Every commit is a prayer, every ship is a sunrise
 `;
 
+const KNOWLEDGE_MODERN_ART = `
+MODERN ART MUSEUMS - World's Great Collections:
+
+TATE MODERN (London):
+- Opened 2000 in former Bankside Power Station
+- Herzog & de Meuron architecture - industrial cathedral
+- Turbine Hall: massive commissions (Ai Weiwei sunflower seeds, Olafur Eliasson sun)
+- Free admission (special exhibitions paid)
+- Collections: Picasso, Dalí, Warhol, Rothko, Bacon, Hockney
+- Switch House extension (2016) - 10 floors of twisted brick
+- 6 million visitors/year - most visited modern art museum
+- Views of St Paul's Cathedral across Millennium Bridge
+- Level 2: permanent collection by theme not chronology
+- Members Room on Level 6 - London skyline views
+
+TATE BRITAIN (London):
+- Original Tate, opened 1897, Millbank
+- British art from 1500 to today
+- Turner Collection - largest in world (300+ oils, 30,000 works on paper)
+- Pre-Raphaelites: Millais, Rossetti, Hunt
+- Turner Prize awarded here annually
+- Clore Gallery for Turner
+
+OTHER LONDON ART:
+- National Gallery: Old Masters, Impressionists (Van Gogh Sunflowers)
+- Courtauld Gallery: Manet's "A Bar at the Folies-Bergère"
+- Royal Academy: summer exhibition since 1769
+- Serpentine Galleries: contemporary, free
+- Saatchi Gallery: controversial, YBAs
+- White Cube: Damien Hirst's gallery
+- Hauser & Wirth: mega-gallery
+
+MUSEUM OF MODERN ART - MoMA (New York):
+- Founded 1929, 11 West 53rd Street
+- "Starry Night" (Van Gogh) - most famous work
+- "Les Demoiselles d'Avignon" (Picasso)
+- Monet's "Water Lilies" - immersive room
+- Warhol's "Campbell's Soup Cans," "Marilyn"
+- Sculpture Garden - Rodin, Picasso
+- Film archive - 30,000 films
+
+CENTRE POMPIDOU (Paris):
+- Opened 1977, Beaubourg
+- Rogers and Piano architecture - inside-out building
+- Largest modern art collection in Europe
+- Matisse, Kandinsky, Duchamp, Magritte
+- Views from escalator tubes
+- Pompidou-Metz: branch in Lorraine (2010)
+
+MUSÉE D'ORSAY (Paris):
+- Former railway station (Gare d'Orsay)
+- Impressionists and Post-Impressionists
+- Monet, Renoir, Degas, Van Gogh, Gauguin, Cézanne
+- The clock - giant windows overlooking Seine
+- Rooftop restaurant with Sacré-Cœur view
+
+GUGGENHEIM MUSEUMS:
+- New York (1959): Frank Lloyd Wright spiral
+- Bilbao (1997): Frank Gehry titanium curves - changed city
+- Venice: Peggy Guggenheim Collection, Grand Canal
+- Abu Dhabi: under construction, Jean Nouvel
+
+CONTEMPORARY ART WORLDWIDE:
+- Broad (Los Angeles): Koons, Basquiat, Hirst, free admission
+- LACMA (Los Angeles): Urban Light installation, 202 streetlamps
+- SFMOMA (San Francisco): Snøhetta expansion, Richter, Warhol
+- Art Institute of Chicago: "American Gothic," Impressionist collection
+- Reina Sofía (Madrid): Picasso's "Guernica"
+- Stedelijk (Amsterdam): modern design, Van Gogh nearby
+- Louisiana (Denmark): sculpture park, Øresund views
+- Museum Ludwig (Cologne): Pop Art, German Expressionism
+
+ART FAIRS:
+- Art Basel: Basel, Miami Beach, Hong Kong - the art Olympics
+- Frieze: London, New York, Los Angeles - contemporary focus
+- FIAC: Paris, Grand Palais
+- Venice Biennale: every 2 years, national pavilions
+- documenta: Kassel, Germany, every 5 years
+- Armory Show: New York, since 1994
+
+CONTEMPORARY ART MOVEMENTS:
+- YBAs (Young British Artists): Hirst, Emin, Ofili - Saatchi backed
+- Neo-Expressionism: Basquiat, Schnabel, 1980s energy
+- Street Art: Banksy, Kaws, Shepard Fairey
+- Digital/NFT Art: Beeple, Pak, generative art
+- Installation Art: Kusama infinity rooms, Turrell light spaces
+- Performance Art: Marina Abramović, Tino Sehgal
+`;
+
+const KNOWLEDGE_VIBE_NFT_ART_FUSION = `
+VIBE CODING + NFT + IMPRESSIONISM - The Harmony:
+
+THE PHILOSOPHICAL CONNECTION:
+- Impressionists captured "impressions" - moments of light, feeling
+- NFTs capture moments forever on blockchain - digital impressions
+- Vibe coding captures intention through AI - vibes become code
+- All three: preserving the ephemeral, making temporary permanent
+
+IMPRESSIONISTS AS PROTO-NFTS:
+- They painted "series" - Monet's Haystacks, Cathedrals = editions
+- Each unique but part of collection = NFT drops
+- Rejected by establishment = underground/decentralized
+- Funded by patrons = collectors/whales
+- Durand-Ruel = early art marketplace
+
+THE "GALLERY OF MOMENTS" CONCEPT (Atuona):
+- Each poem is a "moment" - like Impressionist capturing light
+- Preserved on blockchain - "принято к публикации" = accepted for eternity
+- Free to mint = accessible art, underground values
+- No artificial scarcity - abundance philosophy
+- Each NFT is a soul fragment, not commodity
+
+GAUGUIN'S PARADISE AS METAPHOR:
+- He sought Paradise physically (Tahiti, Marquesas)
+- Elena seeks Paradise digitally (vibe coding, AI)
+- Kira seeks it through art (the lost painting)
+- All paths: creation as salvation
+- "Paradise is not found. Paradise is deployed."
+
+HOW THEY HARMONIZE IN THE BOOK:
+- 1890s: Gauguin paints "Where Do We Come From?" - existential question
+- 2019: Kira searches for his lost Paradise painting
+- 2025: Elena builds AI that creates, preserves, shares art
+- The through-line: art transcends time, medium doesn't matter
+- Soul seeks expression through whatever tools exist
+
+TECHNICAL MEETS POETIC:
+- Impressionist brushstroke = pixel = code commit
+- Canvas = blockchain = deployed product
+- Studio = IDE = conversation with AI
+- Patron = collector = NFT holder
+- Gallery = museum = atuona.xyz
+
+CREATIVE PARALLELS:
+- Monet painted same scene in different light = iteration
+- Vibe coder iterates through prompts = same energy
+- Both: not getting it "right" but exploring possibility space
+- Process as product, journey as destination
+
+UNDERGROUND VALUES:
+- Impressionists: rejected Salon, created own exhibitions
+- Crypto/NFT: rejected banks, created own economy
+- Vibe coding: rejected gatekeepers, created with AI
+- Elena's philosophy: "true to underground values"
+- Art should be free, accessible, authentic
+
+THE BOOK AS SYNTHESIS:
+- Russian poetry (soul, tradition) + English (tech, global)
+- 2019 narrative (analog, physical) + 2025 reality (digital, AI)
+- Fine art references (Gauguin, Van Gogh) + crypto culture (NFT, blockchain)
+- Fashion journalism (surfaces) + philosophical depth (meaning)
+- The "Gallery of Moments" = where all these streams meet
+
+METAPHORS TO USE:
+- "Minting a poem" = publishing, immortalizing
+- "Smart contract" = the promise between artist and world
+- "Gas fee" = the effort required for creation
+- "Blockchain" = the unbroken chain of human expression
+- "Wallet" = where you keep your collected souls
+- "Genesis block" = the first creation, the origin story
+- "Fork" = when the story takes a new direction
+- "Consensus" = when art resonates, when truth is recognized
+`;
+
 const EMOTIONAL_INTELLIGENCE = `
 EMOTIONAL INTELLIGENCE GUIDELINES - For Authentic Connection:
 
@@ -765,6 +1055,10 @@ ${KNOWLEDGE_AUCTION_HOUSES}
 ${KNOWLEDGE_FASHION}
 
 ${KNOWLEDGE_VIBE_CODING}
+
+${KNOWLEDGE_MODERN_ART}
+
+${KNOWLEDGE_VIBE_NFT_ART_FUSION}
 
 ${EMOTIONAL_INTELLIGENCE}
 `;
