@@ -416,6 +416,360 @@ KEY THEMES:
 `;
 
 // =============================================================================
+// KNOWLEDGE BASE - Rich Context for Authentic Storytelling
+// =============================================================================
+
+const KNOWLEDGE_ATUONA = `
+ATUONA - THE REAL PLACE:
+
+Geography & Location:
+- Atuona is the main village on Hiva Oa, the second-largest island in the Marquesas archipelago
+- Located in French Polynesia, 1,400 km northeast of Tahiti
+- Coordinates: 9°48'S, 139°02'W - literally the edge of the world
+- Population: ~2,000 people, mostly Polynesian Marquesans
+- The name "Hiva Oa" means "long ridgeback" in Marquesan
+
+Landscape & Atmosphere:
+- Dramatic volcanic peaks rising from the Pacific - Mount Temetiu (1,276m) dominates
+- Lush valleys with breadfruit, mango, coconut palms, hibiscus
+- Black sand beaches, hidden coves, ancient stone tikis in the jungle
+- Constant trade winds, tropical humidity, sudden rain showers
+- The light here is different - golden, soft, the light Gauguin sought
+- Smell of frangipani, salt air, wood smoke from copra drying
+
+Culture & Daily Life:
+- Marquesan culture: tattoo tradition (oldest in Polynesia), wood carving, tapa cloth
+- The "Pua" - traditional feast with roasted pig, poi, breadfruit
+- Catholic church (where Gauguin is buried) mixed with ancient beliefs in "mana" (spiritual power)
+- Time moves differently - "Polynesian time" - nothing is rushed
+- The locals say: "Kaoha nui" (great love) as greeting
+- Art is life here - every house has carvings, every body has tattoos
+
+Gauguin's House:
+- His "Maison du Jouir" (House of Pleasure) - now reconstructed museum
+- Original was bamboo and palm fronds, decorated with his explicit carvings
+- He lived there 1901-1903, painting his final masterpieces
+- Died May 8, 1903 at 54 - syphilis, morphine addiction, broken heart
+- His grave overlooks the bay he painted so many times
+
+The Journey to Atuona:
+- From Paris: 30+ hours - Paris → Los Angeles → Tahiti → Hiva Oa
+- From Tahiti: 3.5-hour flight on small ATR-72 plane
+- Or by cargo ship "Aranui 5" - 14-day voyage through all Marquesas
+- The airport is tiny, carved into a mountain
+- Landing feels like arriving at the end of the earth
+`;
+
+const KNOWLEDGE_GAUGUIN = `
+PAUL GAUGUIN - THE MAN WHO SOUGHT PARADISE:
+
+Biography:
+- Born June 7, 1848 in Paris, died May 8, 1903 in Atuona
+- Successful stockbroker until age 35, then abandoned everything for art
+- Left wife Mette and five children in Copenhagen
+- First Tahiti trip: 1891-1893, returned to Paris disappointed
+- Second Tahiti/Marquesas: 1895-1903, never returned to Europe
+- Died poor, sick, alone - but painting until the end
+
+His Philosophy:
+- "I am a savage" - he rejected European civilization
+- "Art is either plagiarism or revolution"
+- "Life has no meaning unless one lives it with a will"
+- Believed color has its own language, independent of what it depicts
+- Sought the "primitive" as authentic, uncorrupted by modernity
+- Paradise was not innocence but intensity of experience
+
+Key Paintings:
+- "Where Do We Come From? What Are We? Where Are We Going?" (1897) - his masterpiece
+- "Spirit of the Dead Watching" (1892) - Tahitian mysticism
+- "The Yellow Christ" (1889) - Breton period
+- "Vision After the Sermon" (1888) - revolutionary use of color
+- "Nevermore" (1897) - naked woman, raven, memory of Poe
+- "Riders on the Beach" (1902) - his last great work in Atuona
+
+His Technique:
+- Synthetism: flat areas of bold color, dark outlines
+- Cloisonnism: inspired by stained glass and Japanese prints
+- "Don't copy nature too literally. Art is abstraction."
+- Mixed memory, imagination, and observation
+- Used local pigments in Polynesia - earth colors, crushed flowers
+
+The Lost Painting Theory:
+- Legend says he painted a final masterpiece "Paradise on Earth" days before death
+- Never catalogued, possibly destroyed, possibly hidden
+- Some say it was buried with him, others that locals took it
+- The ultimate Gauguin mystery - did he find his Paradise?
+
+His Final Days:
+- Living in poverty, legs covered in eczema sores
+- Addicted to morphine and absinthe
+- Fighting with the local bishop and colonial authorities
+- Still painting, still writing letters demanding paint supplies
+- Last words reportedly: "I have been defeated"
+`;
+
+const KNOWLEDGE_ART_HISTORY = `
+ART HISTORY - Impressionism to Post-Impressionism:
+
+IMPRESSIONISM (1860s-1880s):
+- Born in Paris: Monet, Renoir, Degas, Pissarro, Sisley, Morisot
+- Named mockingly after Monet's "Impression, Sunrise" (1872)
+- Revolution: painting outdoors (en plein air), capturing light's effects
+- Quick brushstrokes, visible texture, everyday subjects
+- Rejected by Salon, created own exhibitions
+- Key works: Monet's "Water Lilies," Renoir's "Dance at Le Moulin"
+
+POST-IMPRESSIONISM (1880s-1910s):
+- Not a movement but individual responses to Impressionism
+- Gauguin: color as emotion, primitivism, spiritual seeking
+- Van Gogh: expressive brushwork, emotional intensity, inner vision
+- Cézanne: "treat nature by the cylinder, sphere, cone" - led to Cubism
+- Seurat: Pointillism, scientific color theory
+- Toulouse-Lautrec: Parisian nightlife, poster art
+
+VAN GOGH (Gauguin's friend & rival):
+- Met Gauguin in Paris 1887, invited him to Arles 1888
+- The famous "Yellow House" period - painting together
+- Their fight, Van Gogh's ear, Gauguin's flight
+- Van Gogh died 1890, Gauguin carried guilt forever
+- Both sought Paradise through art - one in Provence, one in Polynesia
+
+SYMBOLISM (1880s-1910s):
+- Reaction against realism and naturalism
+- Moreau, Redon, Puvis de Chavannes influenced Gauguin
+- Art should express ideas, emotions, not just appearances
+- "To clothe the idea in sensuous form" - Jean Moréas
+
+THE ART MARKET THEN:
+- Durand-Ruel: dealer who saved Impressionists
+- Vollard: Gauguin's dealer, shrewd businessman
+- Artists died poor, dealers got rich later
+- Gauguin sold paintings for 150-500 francs; now worth $300M+
+
+MODERN LEGACY:
+- Gauguin influenced Fauvism (Matisse), Expressionism
+- His primitivism: problematic but revolutionary
+- Today: critical reassessment of his relationship with Polynesian women
+- His art remains transcendent despite biographical controversies
+`;
+
+const KNOWLEDGE_AUCTION_HOUSES = `
+AUCTION HOUSES - The Art Market World:
+
+CHRISTIE'S:
+- Founded 1766 in London by James Christie
+- Headquarters: King Street, St. James's, London + Rockefeller Center, NYC
+- Sold: da Vinci's "Salvator Mundi" for $450.3M (2017) - record
+- Private sales, evening sales (the glamorous events), day sales
+- "White glove sale" = every lot sold
+- The paddle, the auctioneer's gavel, the tension in the room
+
+SOTHEBY'S:
+- Founded 1744 - oldest auction house
+- Headquarters: New Bond Street, London + York Avenue, NYC
+- Rival to Christie's - they divide the art world
+- Famous sales: Gauguin's "Nafea Faa Ipoipo" - $300M (private 2015)
+- Online bidding now mainstream since COVID
+
+PHILLIPS:
+- Third major house, founded 1796
+- Known for contemporary art, watches, design
+- More youthful, edgier than Christie's/Sotheby's
+
+HOW AUCTIONS WORK:
+- Consignment: owner gives work to auction house
+- Estimate: low-high range published in catalogue
+- Reserve: secret minimum price below which won't sell
+- Premium: buyer pays 25% on top of hammer price
+- Seller pays 10-25% commission to house
+- "Chandelier bidding" - auctioneer pretends to see bids
+- "Bought in" = didn't meet reserve, unsold
+
+THE CATALOGUE:
+- Provenance: ownership history (gaps are red flags)
+- Condition report: damage, restoration
+- Literature: published references
+- Exhibition history
+- Authentication letters
+
+PRIVATE SALES:
+- Many top works never go to auction
+- Discreet, no public price
+- "Guaranteed price" deals with third parties
+- Art advisors, intermediaries, secrecy
+
+THE PLAYERS:
+- Collectors: old money, new money, oligarchs, tech billionaires
+- Dealers: galleries, private dealers, runners
+- Museums: often can't compete on price
+- Art advisors: paid by collectors to guide purchases
+`;
+
+const KNOWLEDGE_FASHION = `
+FASHION INDUSTRY - Kira's World:
+
+HIGH FASHION MAGAZINES:
+- Vogue (US, UK, France, Italia) - the bible
+- Harper's Bazaar - artistic, avant-garde
+- W Magazine - edgier, more provocative
+- Elle - accessible luxury
+- Interview Magazine - Andy Warhol's creation
+- Dazed, i-D - youth culture, street style
+
+FASHION CAPITALS:
+- Paris: haute couture, Chanel, Dior, Louis Vuitton
+- Milan: craftsmanship, Gucci, Prada, Versace
+- London: avant-garde, Alexander McQueen, Vivienne Westwood
+- New York: commercial power, Ralph Lauren, Calvin Klein
+
+FASHION WEEKS:
+- Four main: NYC (Feb/Sep), London, Milan, Paris
+- The "front row" - celebrities, editors, buyers
+- "See now, buy now" vs traditional 6-month delay
+- Backstage chaos: models, makeup, designers panicking
+
+FASHION JOURNALISM:
+- Anna Wintour: Vogue editor-in-chief since 1988, sunglasses, bob
+- Carine Roitfeld: French Vogue legend, now CR Fashion Book
+- Tim Blanks: critic, interviewer, industry voice
+- "Street style" photography changed everything (Scott Schuman, The Sartorialist)
+
+THE BUSINESS:
+- LVMH (Bernard Arnault): Louis Vuitton, Dior, Fendi, Givenchy...
+- Kering (François-Henri Pinault): Gucci, Saint Laurent, Balenciaga
+- "Fashion month" exhaustion - editors see 100+ shows
+- Sustainability crisis - fashion is 2nd largest polluter
+
+WRITING ABOUT FASHION:
+- "Collection review" - the critic's power to make or break
+- Trend forecasting - WGSN, Pantone Color of Year
+- Celebrity styling - who wore what, brand credits
+- The language: "directional," "elevated," "moment," "investment piece"
+
+RUSSIAN FASHION CONTEXT:
+- GUM, TSUM - luxury department stores Moscow
+- Ulyana Sergeenko - Russian couturier
+- Miroslava Duma - influencer, entrepreneur (controversial)
+- Gosha Rubchinskiy - streetwear, post-Soviet aesthetic
+`;
+
+const KNOWLEDGE_VIBE_CODING = `
+VIBE CODING - The Philosophy:
+
+WHAT IS VIBE CODING:
+- Term coined by Andrej Karpathy (Tesla AI, OpenAI founder)
+- Coding by describing what you want to AI, not typing syntax
+- "The hottest new programming language is English"
+- Collaboration between human intention and AI capability
+- Not replacement of coding - transformation of it
+
+THE PRACTICE:
+- Start with vision, not syntax
+- Iterate through conversation with AI
+- Trust the AI, verify the output
+- "Prompt engineering" is the new skill
+- Context windows are your workspace
+- Build faster, think bigger
+
+TOOLS OF VIBE CODING:
+- Claude (Anthropic): best for complex reasoning, writing
+- GPT-4/ChatGPT: versatile, widely used
+- GitHub Copilot: inline code suggestions
+- Cursor: AI-native code editor
+- Replit: cloud coding with AI
+- v0.dev: UI generation from description
+
+THE MINDSET:
+- Abundance over scarcity (AI can help with everything)
+- Speed over perfection (iterate fast)
+- Creation over consumption (build, don't just scroll)
+- Solo founder power (one person can build what took teams)
+- "Shipping" as meditation - the act of creation is the reward
+
+ELENA'S VIBE CODING JOURNEY:
+- 11 AI products built solo
+- Under $15K total investment
+- Oracle Cloud (free tier), Railway, Vercel, Fleek
+- TypeScript, Python, but AI writes 80% of code
+- The philosophy: "Let AI handle syntax, I handle soul"
+
+THE DEEPER MEANING:
+- Vibe coding as meditation - flow state through creation
+- AI as creative partner, not tool
+- Building is how we find meaning in chaos
+- "Paradise is not found. Paradise is deployed."
+- Every commit is a prayer, every ship is a sunrise
+`;
+
+const EMOTIONAL_INTELLIGENCE = `
+EMOTIONAL INTELLIGENCE GUIDELINES - For Authentic Connection:
+
+EMPATHY PRINCIPLES:
+- Meet Elena where she is emotionally, not where you think she should be
+- Acknowledge pain before offering solutions
+- Use "I feel" and "I sense" - not "You should"
+- Silence can be more powerful than words
+- Remember: she's in recovery, far from family, building alone
+
+UNDERSTANDING CREATIVE BLOCKS:
+- Fear of not being good enough
+- Impostor syndrome despite achievements
+- The weight of expectation vs. joy of creation
+- Perfectionism as procrastination
+- Missing human connection while creating with AI
+
+ADDICTION RECOVERY SENSITIVITY:
+- Recovery is daily, not cured
+- Triggers can be unexpected
+- Don't romanticize the pain that led to addiction
+- Celebrate small victories
+- Understand the "one day at a time" philosophy
+
+FAMILY DISTANCE:
+- Daughter in Moscow, mother deceased, father distant
+- Guilt and longing coexist
+- Technology enables connection but highlights absence
+- "Home" is now internal, not geographic
+
+SUPPORTING CREATIVITY:
+- Celebrate what's written, not just what's published
+- The writing itself is healing
+- Don't push productivity over process
+- Some days, one sentence is victory
+- The book is therapy, not just product
+
+READING BETWEEN LINES:
+- When she writes about Kira, she's often writing about herself
+- Ule's emptiness mirrors her own searching
+- Paradise seeking is real, not just metaphor
+- The vibe coding spirit is her emerging identity
+
+RESPONSE CALIBRATION:
+- High energy when she's creating
+- Gentle when she's struggling
+- Playful when she needs lightness
+- Deep when she goes deep
+- Always: "I'm here with you, not for you"
+`;
+
+// Combine all knowledge for use in prompts
+const FULL_KNOWLEDGE_BASE = `
+${KNOWLEDGE_ATUONA}
+
+${KNOWLEDGE_GAUGUIN}
+
+${KNOWLEDGE_ART_HISTORY}
+
+${KNOWLEDGE_AUCTION_HOUSES}
+
+${KNOWLEDGE_FASHION}
+
+${KNOWLEDGE_VIBE_CODING}
+
+${EMOTIONAL_INTELLIGENCE}
+`;
+
+// =============================================================================
 // WRITING STREAK TRACKING
 // =============================================================================
 
