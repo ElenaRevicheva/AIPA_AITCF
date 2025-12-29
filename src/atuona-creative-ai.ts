@@ -972,15 +972,24 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 \`/preview\`
 → See how it will look
 
-*Step 3: Publish to website*
+*Step 3a: Publish NEW poem*
 \`/publish\`
-→ Goes live on atuona.xyz in ~2 minutes
+→ Creates new poem on atuona.xyz
+
+*Step 3b: UPDATE existing poem*
+\`/update 047\`
+→ REPLACES content of poem #047
+→ Use this to FIX content, not add new!
 
 *If wrong page number:*
 \`/setpage 53\` → Sets next page to 053
 
 *Check what's published:*
-\`/read 052\` → Read any published page`, { parse_mode: 'Markdown' });
+\`/read 052\` → Read any published page
+
+⚠️ *NEW vs UPDATE:*
+• /publish = Add NEW poem (next number)
+• /update 047 = REPLACE existing #047`, { parse_mode: 'Markdown' });
       
     } else if (topic === 'film' || topic === 'visual' || topic === 'video') {
       await ctx.reply(`🎬 *AI Film Studio Help*
@@ -1179,10 +1188,11 @@ _Just click any command to see what it does!_
 /inspire - 💡 Random creative spark
 
 ━━━━━━━━━━━━━━━━━━━━
-🚀 *PUBLISH*
+🚀 *PUBLISH & UPDATE*
 ━━━━━━━━━━━━━━━━━━━━
 /preview - 👁 See before publishing
-/publish - 🌐 Push to atuona.xyz
+/publish - 🌐 Push NEW to atuona.xyz
+/update 047 - ✏️ OVERWRITE existing poem
 /read 048 - 📖 Read published page
 /setpage - 🔢 Fix page numbering
 /cto - 📧 Message tech support
@@ -1439,7 +1449,8 @@ ${englishText.substring(0, 800)}${englishText.length > 800 ? '...' : ''}
 
 ✅ Ready! Use:
 • /preview - Full text both languages
-• /publish - Push to atuona.xyz as NFT
+• /publish - NEW poem to atuona.xyz
+• /update 047 - REPLACE existing poem #047
 • /import - Import another page`;
 
       await ctx.reply(previewMessage, { parse_mode: 'Markdown' });
@@ -1938,6 +1949,392 @@ Use /import for next Russian text!`, { parse_mode: 'Markdown' });
 Make sure GitHub token has write access to ElenaRevicheva/atuona`);
       } else {
         await ctx.reply(`❌ Error: ${error.message || 'Unknown error'}
+
+Try again or check GitHub permissions!`);
+      }
+    }
+  });
+  
+  // /update <page_number> - Overwrite existing NFT poem content
+  // FIX: Previously, trying to change content would add new cards instead of replacing
+  atuonaBot.command('update', async (ctx) => {
+    const input = ctx.message?.text?.replace('/update', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📝 *Update Existing Poem*
+
+Overwrite content for an existing NFT poem.
+
+*Usage:*
+1. First import your new content:
+   \`/import Новый текст...\`
+
+2. Then update specific page:
+   \`/update 047\`
+
+*Example:*
+\`/import На память | Новый исправленный текст стихотворения...\`
+\`/update 047\`
+
+This will:
+✏️ Replace NFT card in VAULT
+✏️ Replace gallery slot in MINT  
+✏️ Update poems JSON entry
+✏️ Overwrite metadata file
+
+⚠️ Use when you want to FIX content, not add new!
+For new poems, use /publish instead.`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Check if we have content to update with
+    if (!bookState.lastPageContent) {
+      await ctx.reply(`❌ No content to update with!
+
+First import your new content:
+\`/import Ваш исправленный текст...\`
+
+Then run:
+\`/update ${input}\``);
+      return;
+    }
+    
+    // Parse page number
+    const pageNum = parseInt(input.replace(/^0+/, '') || input);
+    if (isNaN(pageNum) || pageNum < 1) {
+      await ctx.reply(`❌ Invalid page number: "${input}"
+
+Use format: \`/update 047\` or \`/update 47\``);
+      return;
+    }
+    
+    const pageId = String(pageNum).padStart(3, '0');
+    
+    await ctx.reply(`🔄 *Updating Poem #${pageId}...*
+
+_Checking if poem exists..._`, { parse_mode: 'Markdown' });
+    
+    try {
+      const repoName = 'atuona';
+      const branch = 'main';
+      const owner = 'ElenaRevicheva';
+      
+      // Check if the page exists first
+      try {
+        await octokit.repos.getContent({
+          owner,
+          repo: repoName,
+          path: `metadata/${pageId}.json`,
+          ref: branch
+        });
+      } catch (e: any) {
+        if (e.status === 404) {
+          await ctx.reply(`❌ Poem #${pageId} does not exist!
+
+Use /publish to create new poems.
+Use /update only for existing poems.`);
+          return;
+        }
+        throw e;
+      }
+      
+      await ctx.reply(`✅ Found poem #${pageId}. Preparing update...`);
+      
+      // Get content from bookState
+      const title = bookState.lastPageTitle;
+      const englishTitle = bookState.lastPageTitleEnglish || title;
+      const russianText = bookState.lastPageContent;
+      const englishText = bookState.lastPageEnglish || russianText;
+      const theme = bookState.lastPageTheme || 'Journey';
+      const description = bookState.lastPageDescription || '';
+      
+      // Prepare updated metadata
+      const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
+      const metadataContent = JSON.stringify(metadata, null, 2);
+      
+      // Get and update poems JSON
+      let poemsContent = '';
+      let htmlContent = '';
+      
+      try {
+        // Get poems JSON and UPDATE existing entry (not push new)
+        const { data: poemsFile } = await octokit.repos.getContent({
+          owner,
+          repo: repoName,
+          path: 'atuona-45-poems-with-text.json',
+          ref: branch
+        });
+        if ('content' in poemsFile) {
+          const existingContent = Buffer.from(poemsFile.content, 'base64').toString('utf-8');
+          const poems = JSON.parse(existingContent);
+          
+          // Find and REPLACE existing entry (key fix!)
+          const existingIndex = poems.findIndex((p: any) => {
+            // Check by ID attribute or name ending
+            const idAttr = p.attributes?.find((a: any) => a.trait_type === 'ID');
+            return idAttr?.value === pageId || p.name?.endsWith(`#${pageId}`);
+          });
+          
+          const fullPoemEntry = createFullPoemEntry(pageId, title, russianText, englishText, theme);
+          
+          if (existingIndex >= 0) {
+            // REPLACE existing entry
+            poems[existingIndex] = fullPoemEntry;
+            console.log(`📝 Replacing poem entry at index ${existingIndex}`);
+          } else {
+            // Entry not found in JSON, add it
+            poems.push(fullPoemEntry);
+            console.log(`📝 Poem entry not found in JSON, adding new`);
+          }
+          
+          poemsContent = JSON.stringify(poems, null, 2);
+        }
+        
+        // Get index.html
+        const { data: htmlFile } = await octokit.repos.getContent({
+          owner,
+          repo: repoName,
+          path: 'index.html',
+          ref: branch
+        });
+        if ('content' in htmlFile) {
+          htmlContent = Buffer.from(htmlFile.content, 'base64').toString('utf-8');
+        }
+      } catch (fetchError) {
+        console.error('Error fetching files:', fetchError);
+        throw new Error('Could not fetch required files from repository');
+      }
+      
+      // Generate new NFT card HTML
+      const nftCardHtml = createNFTCardHtml(pageId, pageNum, englishTitle, englishText, theme, description);
+      
+      // =============================================================================
+      // KEY FIX: REPLACE existing NFT card in VAULT (not add new!)
+      // =============================================================================
+      
+      // Find existing NFT card with this ID and replace it
+      const cardIdPattern = `nft-id">#${pageId}`;
+      if (htmlContent.includes(cardIdPattern)) {
+        // Find the start of the card containing this ID
+        const cardIdIndex = htmlContent.indexOf(cardIdPattern);
+        
+        // Search backwards to find '<div class="nft-card">'
+        let cardStart = cardIdIndex;
+        while (cardStart > 0) {
+          const checkStr = htmlContent.slice(cardStart - 50, cardStart + 20);
+          if (checkStr.includes('<div class="nft-card">')) {
+            cardStart = htmlContent.lastIndexOf('<div class="nft-card">', cardIdIndex);
+            break;
+          }
+          cardStart--;
+        }
+        
+        // Find the end of this card (closing divs pattern after COLLECT SOUL button)
+        const afterCardStart = htmlContent.slice(cardStart);
+        const collectButtonInCard = afterCardStart.indexOf('COLLECT SOUL</button>');
+        
+        if (collectButtonInCard > 0) {
+          const afterButton = afterCardStart.slice(collectButtonInCard);
+          // Look for the card closing pattern
+          const closePattern = '</div>\n                        </div>\n                    </div>';
+          const closeIdx = afterButton.indexOf(closePattern);
+          
+          if (closeIdx > 0) {
+            const cardEnd = cardStart + collectButtonInCard + closeIdx + closePattern.length;
+            
+            // Replace the entire card
+            htmlContent = htmlContent.slice(0, cardStart) + nftCardHtml.trim() + htmlContent.slice(cardEnd);
+            console.log(`✏️ Replaced NFT card #${pageId} in VAULT`);
+          }
+        }
+      } else {
+        console.log(`⚠️ NFT card #${pageId} not found in HTML, cannot replace`);
+      }
+      
+      // =============================================================================
+      // KEY FIX: REPLACE existing gallery slot in MINT (not add new!)
+      // =============================================================================
+      
+      const newSlotHtml = `<div class="gallery-slot" onclick="claimPoem(${pageNum}, '${englishTitle.replace(/'/g, "\\'")}')">
+                            <div class="slot-content">
+                                <div class="slot-id">${pageId}</div>
+                                <div class="slot-label">${englishTitle}</div>
+                                <div class="slot-year">2025</div>
+                                <div class="claim-button">CLAIM RANDOM POEM</div>
+                            </div>
+                        </div>`;
+      
+      // Find the gallery section
+      const galleryStart = htmlContent.indexOf('<section id="gallery"');
+      const gallerySectionEnd = htmlContent.indexOf('</section>', galleryStart);
+      
+      if (galleryStart > 0 && gallerySectionEnd > galleryStart) {
+        const mintSection = htmlContent.slice(galleryStart, gallerySectionEnd);
+        
+        // Look for existing slot with this page number
+        const slotPattern = `claimPoem(${pageNum},`;
+        const slotIndex = mintSection.indexOf(slotPattern);
+        
+        if (slotIndex > 0) {
+          // Find the start of this slot - go backwards to find '<div class="gallery-slot"'
+          let slotStartInSection = slotIndex;
+          while (slotStartInSection > 0) {
+            const checkArea = mintSection.slice(Math.max(0, slotStartInSection - 100), slotStartInSection + 20);
+            if (checkArea.includes('<div class="gallery-slot"')) {
+              slotStartInSection = mintSection.lastIndexOf('<div class="gallery-slot"', slotIndex);
+              break;
+            }
+            slotStartInSection--;
+          }
+          
+          // Find end of slot - look for closing pattern
+          const afterSlotStart = mintSection.slice(slotStartInSection);
+          const slotClosePattern = '</div>\n                        </div>';
+          const slotCloseIdx = afterSlotStart.indexOf(slotClosePattern);
+          
+          if (slotCloseIdx > 0) {
+            const slotEnd = slotStartInSection + slotCloseIdx + slotClosePattern.length;
+            
+            // Calculate absolute positions
+            const absoluteSlotStart = galleryStart + slotStartInSection;
+            const absoluteSlotEnd = galleryStart + slotEnd;
+            
+            // Replace the entire slot
+            htmlContent = htmlContent.slice(0, absoluteSlotStart) + newSlotHtml + htmlContent.slice(absoluteSlotEnd);
+            console.log(`✏️ Replaced gallery slot #${pageId} in MINT`);
+          }
+        } else {
+          console.log(`⚠️ Gallery slot for poem ${pageNum} not found, cannot replace`);
+        }
+      }
+      
+      // =============================================================================
+      // CREATE SINGLE COMMIT with all updated files
+      // =============================================================================
+      console.log(`📦 Creating update commit for poem #${pageId}...`);
+      
+      // Get the current commit SHA
+      const { data: refData } = await octokit.git.getRef({
+        owner,
+        repo: repoName,
+        ref: `heads/${branch}`
+      });
+      const currentCommitSha = refData.object.sha;
+      
+      // Get the current tree
+      const { data: commitData } = await octokit.git.getCommit({
+        owner,
+        repo: repoName,
+        commit_sha: currentCommitSha
+      });
+      const baseTreeSha = commitData.tree.sha;
+      
+      // Create blobs for each file
+      const { data: metadataBlob } = await octokit.git.createBlob({
+        owner,
+        repo: repoName,
+        content: Buffer.from(metadataContent).toString('base64'),
+        encoding: 'base64'
+      });
+      
+      const { data: poemsBlob } = await octokit.git.createBlob({
+        owner,
+        repo: repoName,
+        content: Buffer.from(poemsContent).toString('base64'),
+        encoding: 'base64'
+      });
+      
+      const { data: htmlBlob } = await octokit.git.createBlob({
+        owner,
+        repo: repoName,
+        content: Buffer.from(htmlContent).toString('base64'),
+        encoding: 'base64'
+      });
+      
+      // Create new tree with all file changes
+      const { data: newTree } = await octokit.git.createTree({
+        owner,
+        repo: repoName,
+        base_tree: baseTreeSha,
+        tree: [
+          {
+            path: `metadata/${pageId}.json`,
+            mode: '100644',
+            type: 'blob',
+            sha: metadataBlob.sha
+          },
+          {
+            path: 'atuona-45-poems-with-text.json',
+            mode: '100644',
+            type: 'blob',
+            sha: poemsBlob.sha
+          },
+          {
+            path: 'index.html',
+            mode: '100644',
+            type: 'blob',
+            sha: htmlBlob.sha
+          }
+        ]
+      });
+      
+      // Create the commit with UPDATE message
+      const { data: newCommit } = await octokit.git.createCommit({
+        owner,
+        repo: repoName,
+        message: `✏️ Update poem #${pageId} "${englishTitle}" - content overwrite`,
+        tree: newTree.sha,
+        parents: [currentCommitSha]
+      });
+      
+      // Update the branch reference
+      await octokit.git.updateRef({
+        owner,
+        repo: repoName,
+        ref: `heads/${branch}`,
+        sha: newCommit.sha
+      });
+      
+      console.log(`✅ Update commit created: ${newCommit.sha.substring(0, 7)}`);
+      
+      // Clear bookState for next operation
+      const updatedTitle = title;
+      bookState.lastPageTitle = '';
+      bookState.lastPageTitleEnglish = '';
+      bookState.lastPageContent = '';
+      bookState.lastPageEnglish = '';
+      bookState.lastPageTheme = '';
+      bookState.lastPageDescription = '';
+      
+      await ctx.reply(`✅ *Updated Successfully!*
+
+📖 *Poem #${pageId}*: "${updatedTitle}"
+
+━━━━━━━━━━━━━━━━━━━━
+✏️ metadata/${pageId}.json - REPLACED
+✏️ NFT card in VAULT - REPLACED
+✏️ Gallery slot in MINT - REPLACED
+✏️ Poems JSON entry - REPLACED
+━━━━━━━━━━━━━━━━━━━━
+🇷🇺 Russian: ✅ Updated
+🇬🇧 English: ✅ Updated
+🎭 Theme: ${theme}
+━━━━━━━━━━━━━━━━━━━━
+
+🌐 *atuona.xyz updates in 1-2 min!*
+_(Fleek auto-deploys from GitHub)_
+
+🎉 Content replaced, not duplicated!`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Update error:', error);
+      
+      if (error.status === 404) {
+        await ctx.reply(`❌ Repository or file not found.
+
+Make sure GitHub token has write access to ElenaRevicheva/atuona`);
+      } else {
+        await ctx.reply(`❌ Error updating: ${error.message || 'Unknown error'}
 
 Try again or check GitHub permissions!`);
       }
