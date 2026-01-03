@@ -19,10 +19,10 @@ const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 
 // =============================================================================
-// 🎨 AI MODEL CONFIGURATION - LATEST & BEST (Dec 2024)
+// 🎨 AI MODEL CONFIGURATION - LATEST & BEST (Jan 2026)
 // =============================================================================
 // Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro > DALL-E 3
-// Video: Runway Gen-3 Alpha Turbo (best API), Kling/Luma coming soon
+// Video: Luma Dream Machine (primary) > Runway Gen-3 (fallback)
 // Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
 // Voice: Whisper-1 (best transcription)
 // =============================================================================
@@ -34,7 +34,8 @@ const IMAGE_MODELS = {
 };
 
 const VIDEO_MODELS = {
-  runwayGen3: 'gen3a_turbo',  // Best video API available
+  lumaDream: 'luma/dream-machine',     // Primary - cinematic, artistic (via Replicate)
+  runwayGen3: 'gen3a_turbo',           // Fallback - reliable (direct API)
 };
 
 // =============================================================================
@@ -1417,6 +1418,127 @@ Make it publishable. Make it hit.`;
     .trim();
   
   return translation;
+}
+
+// =============================================================================
+// VIDEO GENERATION - Luma Dream Machine (primary) with Runway Gen-3 fallback
+// =============================================================================
+
+interface VideoGenerationResult {
+  success: boolean;
+  videoUrl?: string;
+  taskId?: string;
+  provider: 'luma' | 'runway' | 'none';
+  error?: string;
+  needsPolling?: boolean;
+}
+
+async function generateVideo(
+  imageUrl: string, 
+  prompt: string,
+  ctx: Context
+): Promise<VideoGenerationResult> {
+  
+  // ========== TRY LUMA DREAM MACHINE FIRST (via Replicate) ==========
+  if (replicate) {
+    try {
+      console.log('🎬 Trying Luma Dream Machine via Replicate...');
+      await ctx.reply('🎬 *Generating video with Luma Dream Machine...*\n\n_Cinematic AI video generation. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      
+      const lumaOutput = await replicate.run(
+        VIDEO_MODELS.lumaDream as `${string}/${string}`,
+        {
+          input: {
+            prompt: `Cinematic slow movement, atmospheric. ${prompt.substring(0, 200)}. Gentle camera drift. Film grain. Moody lighting.`,
+            start_image_url: imageUrl,
+            aspect_ratio: "16:9",
+            loop: false
+          }
+        }
+      );
+      
+      // Luma returns a URL directly or in an array
+      const videoUrl = typeof lumaOutput === 'string' 
+        ? lumaOutput 
+        : Array.isArray(lumaOutput) && lumaOutput[0] 
+          ? String(lumaOutput[0]) 
+          : null;
+      
+      if (videoUrl && videoUrl.startsWith('http')) {
+        console.log('✅ Luma Dream Machine succeeded!');
+        return {
+          success: true,
+          videoUrl,
+          provider: 'luma',
+          needsPolling: false
+        };
+      } else {
+        throw new Error('Luma returned invalid output');
+      }
+      
+    } catch (lumaError: any) {
+      console.log('⚠️ Luma Dream Machine failed, trying Runway fallback...');
+      console.error('Luma error:', lumaError.message);
+      await ctx.reply(`⚠️ Luma unavailable, trying Runway Gen-3 as fallback...`);
+    }
+  }
+  
+  // ========== FALLBACK TO RUNWAY GEN-3 ==========
+  if (runwayApiKey) {
+    try {
+      console.log('🎬 Using Runway Gen-3 Alpha Turbo (fallback)...');
+      await ctx.reply('🎬 *Generating video with Runway Gen-3 Alpha Turbo...*\n\n_Fallback provider. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      
+      const runwayBody = {
+        model: VIDEO_MODELS.runwayGen3,
+        promptImage: imageUrl,
+        promptText: `Cinematic slow movement, atmospheric, ${prompt.substring(0, 150)}. Gentle camera drift. Film grain. Moody lighting.`,
+        duration: 5,
+        watermark: false,
+        ratio: '1280:768'
+      };
+      
+      const runwayResponse = await fetch(`${RUNWAY_API_URL}/image_to_video`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${runwayApiKey}`,
+          'Content-Type': 'application/json',
+          'X-Runway-Version': '2024-11-06'
+        },
+        body: JSON.stringify(runwayBody)
+      });
+      
+      const responseText = await runwayResponse.text();
+      
+      if (runwayResponse.ok) {
+        const runwayData = JSON.parse(responseText);
+        console.log('✅ Runway Gen-3 job started, task ID:', runwayData.id);
+        return {
+          success: true,
+          taskId: runwayData.id,
+          provider: 'runway',
+          needsPolling: true  // Runway needs polling for result
+        };
+      } else {
+        throw new Error(`Runway error: ${responseText.substring(0, 200)}`);
+      }
+      
+    } catch (runwayError: any) {
+      console.error('Runway fallback error:', runwayError.message);
+      return {
+        success: false,
+        provider: 'none',
+        error: `Both Luma and Runway failed: ${runwayError.message}`
+      };
+    }
+  }
+  
+  // No video providers available
+  return {
+    success: false,
+    provider: 'none',
+    error: 'No video generation providers configured (need REPLICATE_API_TOKEN for Luma or RUNWAY_API_KEY for Runway)'
+  };
 }
 
 // =============================================================================
@@ -4670,9 +4792,10 @@ Each visualization creates:
 📊 *Status*
 Visualizations: ${visualizations.length} pages
 🎨 Flux: ${replicate ? '✅ Ultra/Pro Ready' : '❌ Set REPLICATE_API_TOKEN'}
-🎬 Runway: ${runwayApiKey ? '✅ Gen-3 Ready' : '❌ Set RUNWAY_API_KEY'}
+🎬 Luma: ${replicate ? '✅ Dream Machine Ready' : '❌ Set REPLICATE_API_TOKEN'}
+🎬 Runway: ${runwayApiKey ? '✅ Gen-3 (fallback)' : '⚪ Not configured'}
 
-_Using latest AI models (Dec 2024)_ 🚀`, { parse_mode: 'Markdown' });
+_Using latest AI models (Jan 2026)_ 🚀`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -4966,42 +5089,27 @@ Free tier limit reached. Options:
         await ctx.reply(`⚠️ *Flux Pro not configured*\n\nSet REPLICATE_API_TOKEN for best quality images.\n\n🎨 *Generated Prompt:*\n\`${imagePrompt}\`\n\nUse this in Midjourney or other tools!`, { parse_mode: 'Markdown' });
       }
       
-      // Generate video with Runway Gen-3 Alpha Turbo
-      if (runwayApiKey && visualization.imageUrlHorizontal) {
-        await ctx.reply('🎬 *Generating cinematic video with Runway Gen-3 Alpha Turbo...*\n\n_Best AI video model available! Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      // Generate video with Luma Dream Machine (primary) or Runway Gen-3 (fallback)
+      if (visualization.imageUrlHorizontal && (replicate || runwayApiKey)) {
+        const videoResult = await generateVideo(
+          visualization.imageUrlHorizontal,
+          imagePrompt,
+          ctx
+        );
         
-        try {
-          // Runway Gen-3 Alpha Turbo API call
-          // Using the image_to_video endpoint
-          const runwayBody = {
-            model: 'gen3a_turbo',
-            promptImage: visualization.imageUrlHorizontal,
-            promptText: `Cinematic slow movement, atmospheric, ${imagePrompt.substring(0, 150)}. Gentle camera drift. Film grain. Moody lighting.`,
-            duration: 5,
-            watermark: false,
-            ratio: '1280:768'  // Runway format: 1280:768 (landscape) or 768:1280 (portrait)
-          };
-          
-          console.log('Runway request:', JSON.stringify(runwayBody, null, 2));
-          
-          const runwayResponse = await fetch(`${RUNWAY_API_URL}/image_to_video`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${runwayApiKey}`,
-              'Content-Type': 'application/json',
-              'X-Runway-Version': '2024-11-06'
-            },
-            body: JSON.stringify(runwayBody)
-          });
-          
-          const responseText = await runwayResponse.text();
-          console.log('Runway response:', runwayResponse.status, responseText);
-          
-          if (runwayResponse.ok) {
-            const runwayData = JSON.parse(responseText);
-            const taskId = runwayData.id;
+        if (videoResult.success) {
+          if (videoResult.provider === 'luma' && videoResult.videoUrl) {
+            // Luma returns video URL directly
+            visualization.videoUrlHorizontal = videoResult.videoUrl;
+            visualization.status = 'complete';
+            saveState();
             
-            await ctx.reply(`🎬 Video generation started!\nTask ID: \`${taskId}\`\n\n_Checking status in 90 seconds..._\n\nOr check manually: \`/videostatus ${taskId}\``, { parse_mode: 'Markdown' });
+            await ctx.reply(`✅ *Video Ready!* (Luma Dream Machine)\n\n🎬 ${videoResult.videoUrl}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
+            
+          } else if (videoResult.provider === 'runway' && videoResult.taskId) {
+            // Runway needs polling
+            const taskId = videoResult.taskId;
+            await ctx.reply(`🎬 Video generation started! (Runway Gen-3)\nTask ID: \`${taskId}\`\n\n_Checking status in 90 seconds..._\n\nOr check manually: \`/videostatus ${taskId}\``, { parse_mode: 'Markdown' });
             
             // Poll for completion after 90 seconds
             setTimeout(async () => {
@@ -5031,41 +5139,12 @@ Free tier limit reached. Options:
                 console.error('Runway poll error:', pollError);
               }
             }, 90000); // Check after 90 seconds
-            
-          } else {
-            // Parse error message
-            let errorMsg = `Status ${runwayResponse.status}`;
-            try {
-              const errorData = JSON.parse(responseText);
-              errorMsg = errorData.error || errorData.message || errorData.detail || responseText;
-            } catch (e) {
-              errorMsg = responseText.substring(0, 200);
-            }
-            
-            console.error('Runway error:', errorMsg);
-            
-            if (runwayResponse.status === 401) {
-              await ctx.reply(`⚠️ *Runway Authentication Error*
-
-Your API key might be:
-• Invalid or expired
-• Not activated for API access
-• Wrong format
-
-Please verify at: https://app.runwayml.com/settings/api-keys
-
-Image saved! Use in CapCut/Premiere for video.`, { parse_mode: 'Markdown' });
-            } else {
-              await ctx.reply(`⚠️ Runway error: ${errorMsg}\n\nImage saved! Video skipped.`);
-            }
           }
-          
-        } catch (runwayError: any) {
-          console.error('Runway error:', runwayError);
-          await ctx.reply(`⚠️ Runway video error: ${runwayError.message}\n\nImage saved! Video skipped.`);
+        } else {
+          await ctx.reply(`⚠️ *Video generation unavailable*\n\n${videoResult.error}\n\nImage saved! Use in CapCut/Premiere for video.`, { parse_mode: 'Markdown' });
         }
-      } else if (!runwayApiKey) {
-        await ctx.reply(`⚠️ *Runway not configured*\n\nSet RUNWAY_API_KEY for video generation.\n\nImage saved! Use the image in CapCut or other video tools.`, { parse_mode: 'Markdown' });
+      } else if (!replicate && !runwayApiKey) {
+        await ctx.reply(`⚠️ *No video providers configured*\n\nSet REPLICATE_API_TOKEN for Luma Dream Machine\nor RUNWAY_API_KEY for Runway Gen-3.\n\nImage saved! Use the image in CapCut or other video tools.`, { parse_mode: 'Markdown' });
       }
       
       // Save visualization
