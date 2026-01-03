@@ -198,6 +198,14 @@ const AUTHORIZED_USERS = process.env.TELEGRAM_AUTHORIZED_USERS?.split(',').map(i
 let atuonaBot: Bot | null = null;
 
 // =============================================================================
+// HELPER: Escape Markdown special characters for Telegram
+// =============================================================================
+
+function escapeMarkdown(text: string): string {
+  return text.replace(/[_*[\]()~`>#+=|{}.!\\-]/g, '\\$&');
+}
+
+// =============================================================================
 // ATUONA'S CREATIVE CONTEXT - The Soul of the Book
 // =============================================================================
 
@@ -3462,7 +3470,7 @@ These threads need attention in upcoming chapters!`;
     creativeSession.plotThreads.push(thread);
     await ctx.reply(`✅ *Thread Added*
 
-"${thread}"
+"${escapeMarkdown(thread)}"
 
 Total open threads: ${creativeSession.plotThreads.length}`, { parse_mode: 'Markdown' });
   });
@@ -3476,7 +3484,7 @@ Total open threads: ${creativeSession.plotThreads.length}`, { parse_mode: 'Markd
       await ctx.reply(`Usage: \`/resolve 1\` to resolve the first thread
 
 Current threads:
-${creativeSession.plotThreads.map((t, i) => `${i + 1}. ${t}`).join('\n')}`, { parse_mode: 'Markdown' });
+${creativeSession.plotThreads.map((t, i) => `${i + 1}. ${escapeMarkdown(t)}`).join('\n')}`, { parse_mode: 'Markdown' });
       return;
     }
     
