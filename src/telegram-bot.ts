@@ -96,8 +96,69 @@ const AIDEAZZ_REPOS = [
   'aideazz-pitch-deck'
 ];
 
+// Repo aliases for easier typing
+const REPO_ALIASES: Record<string, string> = {
+  // CTO AIPA aliases
+  'cto': 'AIPA_AITCF',
+  'aitcf': 'AIPA_AITCF',
+  'aipa': 'AIPA_AITCF',
+  'cto-aipa': 'AIPA_AITCF',
+  // CMO AIPA aliases
+  'cmo': 'VibeJobHunterAIPA_AIMCF',
+  'aimcf': 'VibeJobHunterAIPA_AIMCF',
+  'vibejobhunter': 'VibeJobHunterAIPA_AIMCF',
+  'jobhunter': 'VibeJobHunterAIPA_AIMCF',
+  // EspaLuz aliases
+  'espaluz': 'EspaLuzWhatsApp',
+  'spanish': 'EspaLuzWhatsApp',
+  'tutor': 'EspaLuzWhatsApp',
+  'influencer': 'EspaLuz_Influencer',
+  'familybot': 'EspaLuzFamilybot',
+  'family': 'EspaLuzFamilybot',
+  // Other aliases
+  'dragon': 'dragontrade-agent',
+  'trade': 'dragontrade-agent',
+  'saas': 'ascent-saas-builder',
+  'ascent': 'ascent-saas-builder',
+  'docs': 'aideazz-private-docs',
+  'pitch': 'aideazz-pitch-deck',
+  'deck': 'aideazz-pitch-deck',
+};
+
+// Helper to resolve repo name (supports aliases and case-insensitive matching)
+function resolveRepoName(input: string): string | null {
+  const normalized = input.toLowerCase().trim();
+  
+  // Check aliases first
+  if (REPO_ALIASES[normalized]) {
+    return REPO_ALIASES[normalized];
+  }
+  
+  // Check exact match (case-insensitive)
+  const exactMatch = AIDEAZZ_REPOS.find(r => r.toLowerCase() === normalized);
+  if (exactMatch) return exactMatch;
+  
+  // Check partial match (starts with or contains)
+  const partialMatch = AIDEAZZ_REPOS.find(r => 
+    r.toLowerCase().startsWith(normalized) || 
+    r.toLowerCase().includes(normalized)
+  );
+  if (partialMatch) return partialMatch;
+  
+  return null;
+}
+
 let bot: Bot | null = null;
 let cronJobs: cron.ScheduledTask[] = [];
+
+// =============================================================================
+// HELPER: Escape Markdown special characters for Telegram
+// =============================================================================
+
+function escapeMarkdown(text: string): string {
+  // Escape special characters: _ * [ ] ( ) ~ ` > # + - = | { } . !
+  return text.replace(/[_*[\]()~`>#+=|{}.!\\-]/g, '\\$&');
+}
 
 // =============================================================================
 // AI HELPER: Try Claude first, fallback to Groq if credits exhausted
@@ -561,7 +622,7 @@ _A real CTO tracks technical debt!_`, { parse_mode: 'Markdown' });
         const [id, repoName, desc, severity] = d;
         const shortId = id?.substring(0, 8) || '?';
         const shortDesc = desc?.substring(0, 60) || 'No description';
-        return `${i + 1}. [${shortId}] *${repoName}*\n   ${shortDesc}${desc?.length > 60 ? '...' : ''}\n   ⚠️ ${severity || 'medium'}`;
+        return `${i + 1}. [${shortId}] *${escapeMarkdown(repoName || '')}*\n   ${shortDesc}${desc?.length > 60 ? '...' : ''}\n   ⚠️ ${severity || 'medium'}`;
       }).join('\n\n');
       
       await ctx.reply(`📋 *Open Technical Debt*\n\n${debtList}\n\n_Use /debt done <id> to resolve_`, { parse_mode: 'Markdown' });
@@ -603,7 +664,7 @@ _A real CTO tracks technical debt!_`, { parse_mode: 'Markdown' });
     if (debtId) {
       await ctx.reply(`📋 *Tech Debt Added*
 
-📦 Repo: ${repo}
+📦 Repo: ${escapeMarkdown(repo)}
 📝 ${description}
 ⚠️ Severity: ${severity}
 🔖 ID: ${debtId.substring(0, 8)}
@@ -653,7 +714,7 @@ _A real CTO documents why, not just what!_`, { parse_mode: 'Markdown' });
       const decisionList = decisions.map((d: any, i: number) => {
         const [id, repoName, title, desc, rationale, createdAt] = d;
         const date = createdAt ? new Date(createdAt).toLocaleDateString() : '';
-        return `${i + 1}. *${title}*${repoName ? ` (${repoName})` : ''}\n   ${desc?.substring(0, 80) || ''}\n   📅 ${date}`;
+        return `${i + 1}. *${escapeMarkdown(title || '')}*${repoName ? ` (${escapeMarkdown(repoName)})` : ''}\n   ${desc?.substring(0, 80) || ''}\n   📅 ${date}`;
       }).join('\n\n');
       
       await ctx.reply(`🏛️ *Architectural Decisions*\n\n${decisionList}`, { parse_mode: 'Markdown' });
@@ -683,8 +744,8 @@ _A real CTO documents why, not just what!_`, { parse_mode: 'Markdown' });
     if (decisionId) {
       await ctx.reply(`🏛️ *Decision Recorded*
 
-📌 *${finalTitle}*
-${repo ? `📦 Repo: ${repo}\n` : ''}📝 ${description}
+📌 *${escapeMarkdown(finalTitle)}*
+${repo ? `📦 Repo: ${escapeMarkdown(repo)}\n` : ''}📝 ${description}
 💡 Rationale: ${rationale}
 
 _Use /decision list to see all decisions_`, { parse_mode: 'Markdown' });
@@ -1371,9 +1432,9 @@ Be encouraging! This person built this but wants to understand it deeply.`;
   
   // /architecture - Show and explain repo structure
   bot.command('architecture', async (ctx) => {
-    const repoName = ctx.message?.text?.replace('/architecture', '').trim();
+    const repoInput = ctx.message?.text?.replace('/architecture', '').trim();
     
-    if (!repoName) {
+    if (!repoInput) {
       await ctx.reply(`🏗️ *ARCHITECTURE - See Your Project Structure*
 
 *What is this?*
@@ -1382,22 +1443,26 @@ I show you all files in your project and explain what each one does. Like a map 
 *What do I need from you?*
 Just tell me which product to explore.
 
-*Your products:*
-• \`/architecture EspaLuzWhatsApp\` - AI Spanish Tutor
-• \`/architecture AIPA_AITCF\` - CTO AIPA (this bot!)
+*Examples:*
+• \`/architecture espaluz\` - AI Spanish Tutor
+• \`/architecture cto\` - CTO AIPA (this bot!)
 • \`/architecture atuona\` - NFT Poetry Gallery
-• \`/architecture aideazz\` - Main Website
 
-*What will I give you?*
-📁 All folders and files
-📦 What libraries you're using
-🗺️ Explanation of each part
+*Shortcuts:* cto, cmo, espaluz, atuona, dragon, saas, docs, pitch
 
-👉 *Try now:* /architecture EspaLuzWhatsApp`, { parse_mode: 'Markdown' });
+👉 *Try now:* /architecture cto`, { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply(`🏗️ Analyzing ${repoName} structure...`);
+    // Resolve repo name (supports aliases)
+    const repoName = resolveRepoName(repoInput);
+    
+    if (!repoName) {
+      await ctx.reply(`❌ Repo "${repoInput}" not found.\n\n*Shortcuts:* cto, cmo, espaluz, atuona, dragon`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`🏗️ Analyzing ${escapeMarkdown(repoName)} structure...`);
     
     try {
       // Get root contents
@@ -1473,7 +1538,7 @@ Keep it SHORT and practical for Telegram.`;
 
       const archExplanation = await askAI(archPrompt, 1500);
       
-      await ctx.reply(`🏗️ *${repoName} Architecture*
+      await ctx.reply(`🏗️ *${escapeMarkdown(repoName)} Architecture*
 
 ${tree}${srcTree ? `\n📁 src/\n${srcTree}\n` : ''}
 ${deps ? `\n📦 *Dependencies:* ${deps.substring(0, 200)}${deps.length > 200 ? '...' : ''}\n` : ''}
@@ -1483,8 +1548,8 @@ ${archExplanation}
 
 ━━━━━━━━━━━━━━━━━━━━
 💡 *Next steps:*
-/explainfile ${repoName} <filename>
-/study ${repoName}`, { parse_mode: 'Markdown' });
+/explainfile ${escapeMarkdown(repoName)} <filename>
+/study ${escapeMarkdown(repoName)}`, { parse_mode: 'Markdown' });
       
     } catch (error: any) {
       if (error.status === 404) {
@@ -2750,15 +2815,23 @@ Tell me which product and what you want me to create.
     
     // Parse repo and task
     const parts = input.split(' ');
-    const repoName = parts[0];
+    const repoInput = parts[0];
     const task = parts.slice(1).join(' ');
     
-    if (!repoName || !task) {
-      await ctx.reply('❌ Please provide both repo and task!\n\nExample: /code atuona Add README with project description');
+    if (!repoInput || !task) {
+      await ctx.reply('❌ Please provide both repo and task!\n\nExample: /code atuona Add README with project description\n\n*Shortcuts:* cto, cmo, espaluz, atuona, dragon', { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply(`💻 Working on "${task}" for ${repoName}...\n\n⏳ This may take a minute...`);
+    // Resolve repo name (supports aliases)
+    const repoName = resolveRepoName(repoInput);
+    
+    if (!repoName) {
+      await ctx.reply(`❌ Repo "${repoInput}" not found.\n\n*Shortcuts:* cto, cmo, espaluz, atuona, dragon`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`💻 Working on "${task}" for ${escapeMarkdown(repoName)}...\n\n⏳ This may take a minute...`);
     
     try {
       // 1. Check if repo exists and get default branch
@@ -3082,18 +3155,26 @@ Tell me which product and what's wrong - in your own words!
     
     // Parse repo and issue
     const parts = input.split(' ');
-    const repoName = parts[0];
+    const repoInput = parts[0];
     const issue = parts.slice(1).join(' ');
     
-    if (!repoName || !issue) {
-      await ctx.reply('❌ Please provide both repo and issue!\n\nExample: /fix EspaLuzWhatsApp Fix timeout errors');
+    if (!repoInput || !issue) {
+      await ctx.reply('❌ Please provide both repo and issue!\n\nExample: /fix espaluz Fix timeout errors\n\n*Shortcuts:* cto, cmo, espaluz, atuona, dragon', { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply(`🔧 Analyzing "${issue}" in ${repoName}...\n\n⏳ Looking at the code...`);
+    // Resolve repo name (supports aliases)
+    const repoName = resolveRepoName(repoInput);
+    
+    if (!repoName) {
+      await ctx.reply(`❌ Repo "${repoInput}" not found.\n\n*Shortcuts:* cto, cmo, espaluz, atuona, dragon`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`🔧 Analyzing "${issue}" in ${escapeMarkdown(repoName)}...\n\n⏳ Looking at the code...`);
     
     // Reuse the /code logic with fix context
-    await ctx.reply(`🔧 Working on fixing "${issue}" in ${repoName}...\n\n⏳ Analyzing code and creating fix...`);
+    await ctx.reply(`🔧 Working on fixing "${issue}" in ${escapeMarkdown(repoName)}...\n\n⏳ Analyzing code and creating fix...`);
     
     try {
       // Get repo info
@@ -3209,9 +3290,9 @@ _A real CTO reviews fixes before deploying!_`, { parse_mode: 'Markdown' });
   
   // /review - Review latest commit
   bot.command('review', async (ctx) => {
-    const repoName = ctx.message?.text?.replace('/review', '').trim();
+    const repoInput = ctx.message?.text?.replace('/review', '').trim();
     
-    if (!repoName) {
+    if (!repoInput) {
       await ctx.reply(`🔍 *CODE REVIEW*
 
 *What is this?*
@@ -3221,9 +3302,11 @@ I review the latest changes in any of your repos - like having a senior develope
 Just tell me which product to review.
 
 *Examples:*
-\`/review EspaLuzWhatsApp\`
+\`/review cto\` or \`/review AIPA_AITCF\`
+\`/review espaluz\` or \`/review EspaLuzWhatsApp\`
 \`/review atuona\`
-\`/review AIPA_AITCF\`
+
+*Shortcuts:* cto, cmo, espaluz, atuona, dragon, saas, docs, pitch
 
 *What will I give you?*
 📝 What changed
@@ -3231,11 +3314,19 @@ Just tell me which product to review.
 💡 Suggestions to improve
 ✅ or ❌ Overall verdict
 
-👉 *Try now:* /review EspaLuzWhatsApp`, { parse_mode: 'Markdown' });
+👉 *Try now:* /review cto`, { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply(`🔍 Reviewing latest commit in ${repoName}...\n\n_Fetching codebase context..._`, { parse_mode: 'Markdown' });
+    // Resolve repo name (supports aliases)
+    const repoName = resolveRepoName(repoInput);
+    
+    if (!repoName) {
+      await ctx.reply(`❌ Repo "${repoInput}" not found.\n\n*Available repos:* ${AIDEAZZ_REPOS.slice(0, 5).map(r => escapeMarkdown(r)).join(', ')}...\n\n*Shortcuts:* cto, cmo, espaluz, atuona, dragon`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`🔍 Reviewing latest commit in ${escapeMarkdown(repoName)}...\n\n_Fetching codebase context..._`, { parse_mode: 'Markdown' });
     
     try {
       // Get latest commit
@@ -3744,11 +3835,11 @@ Be concise, motivating, and actionable. This is Telegram mobile - keep it short!
     
     // 4. Format briefing
     const activityLines = recentActivity.slice(0, 4).map(r => 
-      `• ${r.repo}: ${r.days === 0 ? 'Today' : r.days === 1 ? 'Yesterday' : `${r.days}d ago`}`
+      `• ${escapeMarkdown(r.repo)}: ${r.days === 0 ? 'Today' : r.days === 1 ? 'Yesterday' : `${r.days}d ago`}`
     ).join('\n');
     
     const alertsSection = staleRepos.length > 0 
-      ? `\n⚠️ *Needs Attention*\n${staleRepos.map(r => `• ${r} (>7 days)`).join('\n')}\n` 
+      ? `\n⚠️ *Needs Attention*\n${staleRepos.map(r => `• ${escapeMarkdown(r)} (>7 days)`).join('\n')}\n` 
       : '';
     
     const briefing = `☀️ *Good Morning, Elena!*
@@ -3820,7 +3911,7 @@ async function checkEcosystemHealth(bot: Bot): Promise<void> {
         const daysAgo = Math.floor((now.getTime() - commitDate.getTime()) / (1000 * 60 * 60 * 24));
         
         if (daysAgo > 5) {
-          staleRepos.push(`${repo} (${daysAgo} days)`);
+          staleRepos.push(`${escapeMarkdown(repo)} (${daysAgo} days)`);
         }
       }
     } catch {}
@@ -3885,7 +3976,7 @@ function startScheduledTasks(bot: Bot): void {
             if (latestCommit) {
               const date = new Date(latestCommit.commit.author?.date || '');
               const daysAgo = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-              recentRepos.push(`• ${repo}: ${daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}`);
+              recentRepos.push(`• ${escapeMarkdown(repo)}: ${daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}`);
             }
           } catch {}
         }
