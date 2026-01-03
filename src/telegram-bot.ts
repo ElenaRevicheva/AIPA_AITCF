@@ -405,24 +405,26 @@ ${recentRepos}
     }
   });
   
-  // /repos - List repositories
+  // /repos - List repositories with aliases
   bot.command('repos', async (ctx) => {
+    // Build list with aliases for each repo
+    const repoList = AIDEAZZ_REPOS.map((repo, i) => {
+      const aliases = Object.entries(REPO_ALIASES)
+        .filter(([_, v]) => v === repo)
+        .map(([k]) => k);
+      const aliasText = aliases.length > 0 ? ` → \`${aliases[0]}\`` : '';
+      const num = i < 9 ? `${i + 1}️⃣` : i === 9 ? '🔟' : '1️⃣1️⃣';
+      return `${num} ${escapeMarkdown(repo)}${aliasText}`;
+    }).join('\n');
+    
     const reposMessage = `
 📦 *AIdeazz Repositories (11)*
 
-1️⃣ *AIPA\\_AITCF* - CTO AIPA (You're talking to me!)
-2️⃣ *VibeJobHunterAIPA\\_AIMCF* - CMO AIPA
-3️⃣ *EspaLuzWhatsApp* - Spanish Tutor 💰
-4️⃣ *EspaLuz\\_Influencer* - Marketing
-5️⃣ *EspaLuzFamilybot* - Family Bot
-6️⃣ *aideazz* - Main Website
-7️⃣ *dragontrade-agent* - Trading Bot
-8️⃣ *atuona* - NFT Gallery
-9️⃣ *ascent-saas-builder* - SaaS Tool
-🔟 *aideazz-private-docs* - Docs
-1️⃣1️⃣ *aideazz-pitch-deck* - Pitch
+${repoList}
 
-Use */review* <repo-name> to review latest commit!
+*Shortcuts:* cto, cmo, espaluz, atuona, dragon, saas, docs, pitch
+
+👉 Try: \`/review cto\` or \`/architecture espaluz\`
     `;
     await ctx.reply(reposMessage, { parse_mode: 'Markdown' });
   });
