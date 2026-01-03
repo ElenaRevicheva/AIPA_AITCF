@@ -5183,11 +5183,12 @@ Free tier limit reached. Options:
             }
             
           } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
-            // Luma Direct API needs polling
+            // Luma Direct API needs polling - keep polling until done (max 5 min)
             const taskId = videoResult.taskId;
             
-            // Poll for completion after 60 seconds
-            setTimeout(async () => {
+            const pollLumaVideo = async (attempt: number = 1) => {
+              const maxAttempts = 10; // 10 attempts x 30 sec = 5 minutes max
+              
               try {
                 const statusResponse = await fetch(`${LUMA_API_URL}/generations/${taskId}`, {
                   headers: { 
@@ -5198,6 +5199,7 @@ Free tier limit reached. Options:
                 
                 if (statusResponse.ok) {
                   const statusData = await statusResponse.json() as any;
+                  
                   if (statusData.state === 'completed' && statusData.assets?.video) {
                     visualization.videoUrlHorizontal = statusData.assets.video;
                     visualization.status = 'complete';
@@ -5210,26 +5212,42 @@ Free tier limit reached. Options:
                         parse_mode: 'Markdown'
                       });
                     } catch (videoSendError) {
-                      // Fallback to URL if video send fails
                       await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${statusData.assets.video}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
                     }
+                    return; // Done!
+                    
                   } else if (statusData.state === 'failed') {
                     await ctx.reply(`❌ Luma video failed.\nReason: ${statusData.failure_reason || 'Unknown'}`);
+                    return; // Done (failed)
+                    
+                  } else if (attempt < maxAttempts) {
+                    // Still processing - poll again in 30 seconds
+                    console.log(`Luma video ${taskId} still ${statusData.state}, polling again (${attempt}/${maxAttempts})...`);
+                    setTimeout(() => pollLumaVideo(attempt + 1), 30000);
+                    
                   } else {
-                    await ctx.reply(`⏳ Video still processing...\nStatus: ${statusData.state}\n\nUse \`/videostatus ${taskId}\` to check later.`, { parse_mode: 'Markdown' });
+                    // Max attempts reached
+                    await ctx.reply(`⏳ Video taking longer than expected.\nUse \`/videostatus ${taskId}\` to check manually.`, { parse_mode: 'Markdown' });
                   }
                 }
               } catch (pollError) {
                 console.error('Luma poll error:', pollError);
+                if (attempt < maxAttempts) {
+                  setTimeout(() => pollLumaVideo(attempt + 1), 30000);
+                }
               }
-            }, 60000); // Check after 60 seconds
+            };
+            
+            // Start polling after 45 seconds (Luma typically takes 60-120 sec)
+            setTimeout(() => pollLumaVideo(1), 45000);
             
           } else if (videoResult.provider === 'runway' && videoResult.taskId) {
-            // Runway needs polling
+            // Runway needs polling - keep polling until done (max 5 min)
             const taskId = videoResult.taskId;
             
-            // Poll for completion after 90 seconds
-            setTimeout(async () => {
+            const pollRunwayVideo = async (attempt: number = 1) => {
+              const maxAttempts = 8; // 8 attempts x 40 sec = ~5 minutes max
+              
               try {
                 const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
                   headers: { 
@@ -5240,6 +5258,7 @@ Free tier limit reached. Options:
                 
                 if (statusResponse.ok) {
                   const statusData = await statusResponse.json() as any;
+                  
                   if (statusData.status === 'SUCCEEDED' && statusData.output?.[0]) {
                     visualization.videoUrlHorizontal = statusData.output[0];
                     visualization.status = 'complete';
@@ -5252,19 +5271,34 @@ Free tier limit reached. Options:
                         parse_mode: 'Markdown'
                       });
                     } catch (videoSendError) {
-                      // Fallback to URL if video send fails
                       await ctx.reply(`✅ *Video Ready!* (Runway)\n\n🎬 ${statusData.output[0]}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
                     }
+                    return; // Done!
+                    
                   } else if (statusData.status === 'FAILED') {
                     await ctx.reply(`❌ Runway video failed.\nReason: ${statusData.failure || 'Unknown'}`);
+                    return; // Done (failed)
+                    
+                  } else if (attempt < maxAttempts) {
+                    // Still processing - poll again in 40 seconds
+                    console.log(`Runway video ${taskId} still ${statusData.status}, polling again (${attempt}/${maxAttempts})...`);
+                    setTimeout(() => pollRunwayVideo(attempt + 1), 40000);
+                    
                   } else {
-                    await ctx.reply(`⏳ Video still processing...\nStatus: ${statusData.status}\n\nUse \`/videostatus ${taskId}\` to check later.`, { parse_mode: 'Markdown' });
+                    // Max attempts reached
+                    await ctx.reply(`⏳ Video taking longer than expected.\nUse \`/videostatus ${taskId}\` to check manually.`, { parse_mode: 'Markdown' });
                   }
                 }
               } catch (pollError) {
                 console.error('Runway poll error:', pollError);
+                if (attempt < maxAttempts) {
+                  setTimeout(() => pollRunwayVideo(attempt + 1), 40000);
+                }
               }
-            }, 90000); // Check after 90 seconds
+            };
+            
+            // Start polling after 60 seconds (Runway typically takes 60-90 sec)
+            setTimeout(() => pollRunwayVideo(1), 60000);
           }
         } else {
           await ctx.reply(`⚠️ *Video generation unavailable*\n\n${videoResult.error}\n\nImage saved! Use in CapCut/Premiere for video.`, { parse_mode: 'Markdown' });
