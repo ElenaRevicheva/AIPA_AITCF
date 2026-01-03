@@ -4905,8 +4905,55 @@ _Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode:
       
       const metadata = JSON.parse(Buffer.from(metaFile.content, 'base64').toString('utf-8'));
       const title = metadata.attributes?.find((a: any) => a.trait_type === 'Poem' || a.trait_type === 'Title')?.value || 'Unknown';
-      const theme = metadata.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
-      const englishText = metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
+      let theme = metadata.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
+      let englishText = metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
+      let russianText = metadata.attributes?.find((a: any) => a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text')?.value || '';
+      
+      // FALLBACK: For older pages (001-046) that don't have English/Russian text in metadata,
+      // fetch from the full poems JSON file which contains all text
+      if (!englishText && !russianText) {
+        console.log(`📖 Page #${pageId} missing text in metadata, fetching from poems JSON...`);
+        try {
+          const { data: poemsFile } = await octokit.repos.getContent({
+            owner: 'ElenaRevicheva',
+            repo: 'atuona',
+            path: 'atuona-45-poems-with-text.json',
+            ref: 'main'
+          });
+          
+          if ('content' in poemsFile) {
+            const poemsData = JSON.parse(Buffer.from(poemsFile.content, 'base64').toString('utf-8'));
+            const poemEntry = poemsData.find((p: any) => {
+              const idAttr = p.attributes?.find((a: any) => a.trait_type === 'ID');
+              return idAttr?.value === pageId || p.name?.includes(`#${pageId}`);
+            });
+            
+            if (poemEntry) {
+              russianText = poemEntry.attributes?.find((a: any) => a.trait_type === 'Poem Text')?.value || '';
+              theme = theme || poemEntry.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
+              // Use description as fallback for English context
+              if (!englishText && poemEntry.description) {
+                englishText = poemEntry.description;
+              }
+              console.log(`✅ Found poem text for #${pageId}: ${russianText.substring(0, 50)}...`);
+            }
+          }
+        } catch (fallbackError) {
+          console.error('Failed to fetch poems fallback:', fallbackError);
+        }
+      }
+      
+      // If still no text, translate Russian on the fly
+      if (!englishText && russianText) {
+        console.log(`🔄 Translating Russian text for #${pageId}...`);
+        const translationPrompt = `Translate this Russian poem to English. Keep it poetic, raw, and underground:\n\n${russianText.substring(0, 1000)}\n\nReturn ONLY the translation.`;
+        try {
+          englishText = await createContent(translationPrompt, 800, true);
+        } catch (transError) {
+          console.error('Translation failed:', transError);
+          englishText = russianText; // Use Russian as fallback
+        }
+      }
       
       // Generate cinematic prompt with ATUONA's unique vision & character context
       await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
