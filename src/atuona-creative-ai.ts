@@ -5172,7 +5172,15 @@ Free tier limit reached. Options:
             visualization.status = 'complete';
             saveState();
             
-            await ctx.reply(`✅ *Video Ready!* (Luma via Replicate)\n\n🎬 ${videoResult.videoUrl}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
+            // Send video directly so user can view/download in Telegram
+            try {
+              await ctx.replyWithVideo(videoResult.videoUrl, {
+                caption: `✅ *Video Ready!* (Luma via Replicate)\n\n_Tap to play, long-press to save!_`,
+                parse_mode: 'Markdown'
+              });
+            } catch (videoSendError) {
+              await ctx.reply(`✅ *Video Ready!* (Luma via Replicate)\n\n🎬 ${videoResult.videoUrl}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
+            }
             
           } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
             // Luma Direct API needs polling
@@ -5195,7 +5203,16 @@ Free tier limit reached. Options:
                     visualization.status = 'complete';
                     saveState();
                     
-                    await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${statusData.assets.video}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
+                    // Send video directly so user can view/download in Telegram
+                    try {
+                      await ctx.replyWithVideo(statusData.assets.video, {
+                        caption: `✅ *Video Ready!* (Luma Direct)\n\n_Tap to play, long-press to save!_`,
+                        parse_mode: 'Markdown'
+                      });
+                    } catch (videoSendError) {
+                      // Fallback to URL if video send fails
+                      await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${statusData.assets.video}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
+                    }
                   } else if (statusData.state === 'failed') {
                     await ctx.reply(`❌ Luma video failed.\nReason: ${statusData.failure_reason || 'Unknown'}`);
                   } else {
@@ -5228,7 +5245,16 @@ Free tier limit reached. Options:
                     visualization.status = 'complete';
                     saveState();
                     
-                    await ctx.reply(`✅ *Video Ready!* (Runway)\n\n🎬 ${statusData.output[0]}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
+                    // Send video directly so user can view/download in Telegram
+                    try {
+                      await ctx.replyWithVideo(statusData.output[0], {
+                        caption: `✅ *Video Ready!* (Runway)\n\n_Tap to play, long-press to save!_`,
+                        parse_mode: 'Markdown'
+                      });
+                    } catch (videoSendError) {
+                      // Fallback to URL if video send fails
+                      await ctx.reply(`✅ *Video Ready!* (Runway)\n\n🎬 ${statusData.output[0]}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
+                    }
                   } else if (statusData.status === 'FAILED') {
                     await ctx.reply(`❌ Runway video failed.\nReason: ${statusData.failure || 'Unknown'}`);
                   } else {
@@ -5369,7 +5395,15 @@ _Export all videos and compile in:_
           const data = await lumaResponse.json() as any;
           
           if (data.state === 'completed' && data.assets?.video) {
-            await ctx.reply(`✅ *Video Complete!* (Luma Direct)\n\n🎬 ${data.assets.video}\n\n_Right-click to download!_`, { parse_mode: 'Markdown' });
+            // Send video directly so user can view/download in Telegram
+            try {
+              await ctx.replyWithVideo(data.assets.video, {
+                caption: `✅ *Video Complete!* (Luma Direct)\n\n_Tap to play, long-press to save!_`,
+                parse_mode: 'Markdown'
+              });
+            } catch (videoSendError) {
+              await ctx.reply(`✅ *Video Complete!* (Luma Direct)\n\n🎬 ${data.assets.video}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
+            }
             return;
           } else if (data.state === 'failed') {
             await ctx.reply(`❌ Luma failed: ${data.failure_reason || 'Unknown'}`);
@@ -5398,7 +5432,15 @@ _Export all videos and compile in:_
           const data = await statusResponse.json() as any;
           
           if (data.status === 'SUCCEEDED' && data.output?.[0]) {
-            await ctx.reply(`✅ *Video Complete!* (Runway)\n\n🎬 ${data.output[0]}\n\n_Right-click to download!_`, { parse_mode: 'Markdown' });
+            // Send video directly so user can view/download in Telegram
+            try {
+              await ctx.replyWithVideo(data.output[0], {
+                caption: `✅ *Video Complete!* (Runway)\n\n_Tap to play, long-press to save!_`,
+                parse_mode: 'Markdown'
+              });
+            } catch (videoSendError) {
+              await ctx.reply(`✅ *Video Complete!* (Runway)\n\n🎬 ${data.output[0]}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
+            }
           } else if (data.status === 'FAILED') {
             await ctx.reply(`❌ Runway failed: ${data.failure || 'Unknown'}`);
           } else {
