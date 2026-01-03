@@ -1450,10 +1450,10 @@ async function generateVideo(
       console.log('🎬 Trying Luma Dream Machine (Direct API)...');
       await ctx.reply('🎬 *Generating video with Luma Dream Machine...*\n\n_Direct API - Best quality! Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
       
-      // Create generation request - Luma Ray 2 model
+      // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
       const lumaBody = {
         model: 'ray-2',  // Required field - Luma's latest model
-        prompt: `Cinematic slow movement, atmospheric. ${prompt.substring(0, 200)}. Gentle camera drift. Film grain. Moody lighting.`,
+        prompt: `Cinematic slow movement, atmospheric art house film. ${prompt.substring(0, 180)}. Gentle camera drift through tropical noir. Film grain, golden hour. Tarkovsky-like contemplation.`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -1461,6 +1461,7 @@ async function generateVideo(
           }
         },
         aspect_ratio: '16:9',
+        duration: '9s',  // Request longer duration (Ray-2 supports up to 10s)
         loop: false
       };
       
@@ -1516,7 +1517,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `Cinematic slow movement, atmospheric. ${prompt.substring(0, 200)}. Gentle camera drift. Film grain. Moody lighting.`,
+            prompt: `Cinematic slow movement, atmospheric art house film. ${prompt.substring(0, 180)}. Gentle camera drift, tropical noir aesthetic. Film grain, golden hour light. Tarkovsky-like contemplation.`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -1559,8 +1560,8 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
         promptImage: imageUrl,
-        promptText: `Cinematic slow movement, atmospheric, ${prompt.substring(0, 150)}. Gentle camera drift. Film grain. Moody lighting.`,
-        duration: 5,
+        promptText: `Cinematic slow movement, atmospheric art house film. ${prompt.substring(0, 140)}. Gentle camera drift, tropical noir. Film grain, golden hour. Contemplative motion.`,
+        duration: 10,  // 10 seconds for immersive clips
         watermark: false,
         ratio: '1280:768'
       };
@@ -4907,33 +4908,47 @@ _Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode:
       const theme = metadata.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
       const englishText = metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
       
-      // Generate cinematic prompt
+      // Generate cinematic prompt with ATUONA's unique vision & character context
       await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
       
-      const cinematicPrompt = `You are a world-class cinematographer and visual artist.
+      // Get character memories and plot threads for context
+      const characterContext = characterMemories ? 
+        `CHARACTERS:\n- Kira: ${characterMemories.kira?.slice(0, 3).join('; ') || 'Russian PA, art-obsessed, seeking meaning'}\n- Ule: ${characterMemories.ule?.slice(0, 3).join('; ') || 'Norwegian art collector, searching for lost Gauguin painting'}` : '';
+      
+      const plotContext = creativeSession?.plotThreads?.length ? 
+        `CURRENT PLOT THREADS: ${creativeSession.plotThreads.slice(0, 3).join('; ')}` : '';
+      
+      const cinematicPrompt = `You are a visionary cinematographer creating visuals for ATUONA - an underground poetry NFT gallery meets vibe coding book. 
 
-Based on this literary excerpt, create a detailed visual prompt for an ultra-realistic, cinematic image:
+This is NOT commercial art. This is raw, emotional, literary cinema - think Tarkovsky meets Wong Kar-wai meets tropical noir.
 
+BOOK PAGE:
 TITLE: "${title}"
 THEME: ${theme}
 TEXT: "${englishText.substring(0, 800)}"
 
-STYLE REQUIREMENTS:
-- Cinematic, film-quality realism
-- Impressionist/Post-impressionist lighting influences (Gauguin, Van Gogh)
-- Moody, atmospheric, emotional
-- Mix of tropical paradise and urban/tech elements
-- Rich color palette: deep purples, ocean blues, tropical greens, golden hour warmth
-- Should feel like a frame from an art house film
+${characterContext}
+${plotContext}
 
-OUTPUT: A detailed image prompt (150-200 words) describing:
-- Main subject/character (if any)
-- Setting and environment
-- Lighting and atmosphere
-- Color palette
-- Mood and emotion
-- Camera angle/composition
+ATUONA VISUAL IDENTITY - CRITICAL:
+- NEVER generic stock photo aesthetics
+- Post-impressionist influence: Gauguin's Tahitian palette, Van Gogh's emotional brushwork
+- Underground/raw feeling - like a frame from an art house film about loss and beauty
+- Marquesas Islands atmosphere: tropical humidity, volcanic black sand, frangipanis
+- Tech-mysticism: subtle hints of code/blockchain as spiritual elements
+- Color palette: deep ocean blues, golden hour warmth, volcanic purples, tropical greens
+- Lighting: always golden hour, dusk, or mysterious dawn - never harsh daylight
+- Mood: contemplative, melancholic beauty, the ache of searching for paradise
+- Characters should look Eastern European/Nordic, elegant but weathered by grief
 
+OUTPUT: A detailed, evocative image prompt (180-220 words) describing:
+- Subject/character positioning and emotion (if applicable to text)
+- Environment with ATUONA's unique tropical-tech-art aesthetic  
+- Lighting that creates atmosphere and meaning
+- Camera angle that creates intimacy or drama
+- Specific visual details that honor the literary source
+
+This image will be minted as an NFT. Make it hauntingly beautiful and utterly unique.
 Return ONLY the prompt, no explanation.`;
 
       const imagePrompt = await createContent(cinematicPrompt, 500, true);
