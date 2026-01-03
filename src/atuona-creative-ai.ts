@@ -14,7 +14,11 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPE
 // Replicate client for Flux Pro (best realistic images)
 const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({ auth: process.env.REPLICATE_API_TOKEN }) : null;
 
-// Runway API base URL (Gen-3 Alpha Turbo - best video API available)
+// Luma Labs Direct API (Dream Machine)
+const LUMA_API_URL = 'https://api.lumalabs.ai/dream-machine/v1';
+const lumaApiKey = process.env.LUMA_API_KEY || null;
+
+// Runway API base URL (Gen-3 Alpha Turbo - fallback)
 const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 
@@ -22,7 +26,7 @@ const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 // 🎨 AI MODEL CONFIGURATION - LATEST & BEST (Jan 2026)
 // =============================================================================
 // Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro > DALL-E 3
-// Video: Luma Dream Machine (primary) > Runway Gen-3 (fallback)
+// Video: Luma Direct API (primary) > Luma via Replicate > Runway Gen-3 (fallback)
 // Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
 // Voice: Whisper-1 (best transcription)
 // =============================================================================
@@ -34,7 +38,8 @@ const IMAGE_MODELS = {
 };
 
 const VIDEO_MODELS = {
-  lumaDream: 'luma/dream-machine',     // Primary - cinematic, artistic (via Replicate)
+  lumaDirect: 'ray-2',                 // Primary - Luma Direct API (your API key)
+  lumaReplicate: 'luma/dream-machine', // Secondary - via Replicate
   runwayGen3: 'gen3a_turbo',           // Fallback - reliable (direct API)
 };
 
@@ -1421,14 +1426,14 @@ Make it publishable. Make it hit.`;
 }
 
 // =============================================================================
-// VIDEO GENERATION - Luma Dream Machine (primary) with Runway Gen-3 fallback
+// VIDEO GENERATION - Luma Direct (primary) > Luma Replicate > Runway (fallback)
 // =============================================================================
 
 interface VideoGenerationResult {
   success: boolean;
   videoUrl?: string;
   taskId?: string;
-  provider: 'luma' | 'runway' | 'none';
+  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
@@ -1439,14 +1444,75 @@ async function generateVideo(
   ctx: Context
 ): Promise<VideoGenerationResult> {
   
-  // ========== TRY LUMA DREAM MACHINE FIRST (via Replicate) ==========
+  // ========== 1. TRY LUMA DIRECT API FIRST (your Luma API key) ==========
+  if (lumaApiKey) {
+    try {
+      console.log('🎬 Trying Luma Dream Machine (Direct API)...');
+      await ctx.reply('🎬 *Generating video with Luma Dream Machine...*\n\n_Direct API - Best quality! Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      
+      // Create generation request
+      const lumaBody = {
+        prompt: `Cinematic slow movement, atmospheric. ${prompt.substring(0, 200)}. Gentle camera drift. Film grain. Moody lighting.`,
+        keyframes: {
+          frame0: {
+            type: 'image',
+            url: imageUrl
+          }
+        },
+        aspect_ratio: '16:9',
+        loop: false
+      };
+      
+      console.log('Luma request:', JSON.stringify(lumaBody, null, 2));
+      
+      const lumaResponse = await fetch(`${LUMA_API_URL}/generations`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${lumaApiKey}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(lumaBody)
+      });
+      
+      const responseText = await lumaResponse.text();
+      console.log('Luma response:', lumaResponse.status, responseText);
+      
+      if (lumaResponse.ok) {
+        const lumaData = JSON.parse(responseText);
+        const generationId = lumaData.id;
+        
+        // Poll for completion (Luma Direct API needs polling)
+        await ctx.reply(`🎬 Luma generation started!\nID: \`${generationId}\`\n\n_Checking status in 60 seconds..._`, { parse_mode: 'Markdown' });
+        
+        // Return with polling flag - we'll poll in the calling code
+        return {
+          success: true,
+          taskId: generationId,
+          provider: 'luma-direct',
+          needsPolling: true
+        };
+      } else {
+        const errorMsg = responseText.substring(0, 200);
+        console.error('Luma Direct error:', errorMsg);
+        throw new Error(`Luma Direct API error: ${errorMsg}`);
+      }
+      
+    } catch (lumaDirectError: any) {
+      console.log('⚠️ Luma Direct API failed, trying Replicate...');
+      console.error('Luma Direct error:', lumaDirectError.message);
+      await ctx.reply(`⚠️ Luma Direct unavailable, trying Luma via Replicate...`);
+    }
+  }
+  
+  // ========== 2. TRY LUMA VIA REPLICATE ==========
   if (replicate) {
     try {
       console.log('🎬 Trying Luma Dream Machine via Replicate...');
-      await ctx.reply('🎬 *Generating video with Luma Dream Machine...*\n\n_Cinematic AI video generation. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      await ctx.reply('🎬 *Trying Luma via Replicate...*\n\n_Alternative provider..._', { parse_mode: 'Markdown' });
       
       const lumaOutput = await replicate.run(
-        VIDEO_MODELS.lumaDream as `${string}/${string}`,
+        VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
             prompt: `Cinematic slow movement, atmospheric. ${prompt.substring(0, 200)}. Gentle camera drift. Film grain. Moody lighting.`,
@@ -1465,29 +1531,29 @@ async function generateVideo(
           : null;
       
       if (videoUrl && videoUrl.startsWith('http')) {
-        console.log('✅ Luma Dream Machine succeeded!');
+        console.log('✅ Luma via Replicate succeeded!');
         return {
           success: true,
           videoUrl,
-          provider: 'luma',
+          provider: 'luma-replicate',
           needsPolling: false
         };
       } else {
-        throw new Error('Luma returned invalid output');
+        throw new Error('Luma Replicate returned invalid output');
       }
       
-    } catch (lumaError: any) {
-      console.log('⚠️ Luma Dream Machine failed, trying Runway fallback...');
-      console.error('Luma error:', lumaError.message);
-      await ctx.reply(`⚠️ Luma unavailable, trying Runway Gen-3 as fallback...`);
+    } catch (lumaReplicateError: any) {
+      console.log('⚠️ Luma Replicate failed, trying Runway fallback...');
+      console.error('Luma Replicate error:', lumaReplicateError.message);
+      await ctx.reply(`⚠️ Luma Replicate unavailable, trying Runway Gen-3...`);
     }
   }
   
-  // ========== FALLBACK TO RUNWAY GEN-3 ==========
+  // ========== 3. FALLBACK TO RUNWAY GEN-3 ==========
   if (runwayApiKey) {
     try {
-      console.log('🎬 Using Runway Gen-3 Alpha Turbo (fallback)...');
-      await ctx.reply('🎬 *Generating video with Runway Gen-3 Alpha Turbo...*\n\n_Fallback provider. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      console.log('🎬 Using Runway Gen-3 Alpha Turbo (final fallback)...');
+      await ctx.reply('🎬 *Generating video with Runway Gen-3 Alpha Turbo...*\n\n_Final fallback. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
       
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
@@ -1517,7 +1583,7 @@ async function generateVideo(
           success: true,
           taskId: runwayData.id,
           provider: 'runway',
-          needsPolling: true  // Runway needs polling for result
+          needsPolling: true
         };
       } else {
         throw new Error(`Runway error: ${responseText.substring(0, 200)}`);
@@ -1528,7 +1594,7 @@ async function generateVideo(
       return {
         success: false,
         provider: 'none',
-        error: `Both Luma and Runway failed: ${runwayError.message}`
+        error: `All providers failed. Last error: ${runwayError.message}`
       };
     }
   }
@@ -4792,10 +4858,11 @@ Each visualization creates:
 📊 *Status*
 Visualizations: ${visualizations.length} pages
 🎨 Flux: ${replicate ? '✅ Ultra/Pro Ready' : '❌ Set REPLICATE_API_TOKEN'}
-🎬 Luma: ${replicate ? '✅ Dream Machine Ready' : '❌ Set REPLICATE_API_TOKEN'}
+🎬 Luma Direct: ${lumaApiKey ? '✅ Dream Machine Ready' : '⚪ Set LUMA_API_KEY'}
+🎬 Luma Replicate: ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
 🎬 Runway: ${runwayApiKey ? '✅ Gen-3 (fallback)' : '⚪ Not configured'}
 
-_Using latest AI models (Jan 2026)_ 🚀`, { parse_mode: 'Markdown' });
+_Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -5089,8 +5156,8 @@ Free tier limit reached. Options:
         await ctx.reply(`⚠️ *Flux Pro not configured*\n\nSet REPLICATE_API_TOKEN for best quality images.\n\n🎨 *Generated Prompt:*\n\`${imagePrompt}\`\n\nUse this in Midjourney or other tools!`, { parse_mode: 'Markdown' });
       }
       
-      // Generate video with Luma Dream Machine (primary) or Runway Gen-3 (fallback)
-      if (visualization.imageUrlHorizontal && (replicate || runwayApiKey)) {
+      // Generate video with Luma Direct (primary) > Luma Replicate > Runway (fallback)
+      if (visualization.imageUrlHorizontal && (lumaApiKey || replicate || runwayApiKey)) {
         const videoResult = await generateVideo(
           visualization.imageUrlHorizontal,
           imagePrompt,
@@ -5098,18 +5165,50 @@ Free tier limit reached. Options:
         );
         
         if (videoResult.success) {
-          if (videoResult.provider === 'luma' && videoResult.videoUrl) {
-            // Luma returns video URL directly
+          if (videoResult.provider === 'luma-replicate' && videoResult.videoUrl) {
+            // Luma via Replicate returns video URL directly
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
             saveState();
             
-            await ctx.reply(`✅ *Video Ready!* (Luma Dream Machine)\n\n🎬 ${videoResult.videoUrl}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
+            await ctx.reply(`✅ *Video Ready!* (Luma via Replicate)\n\n🎬 ${videoResult.videoUrl}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
+            
+          } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
+            // Luma Direct API needs polling
+            const taskId = videoResult.taskId;
+            
+            // Poll for completion after 60 seconds
+            setTimeout(async () => {
+              try {
+                const statusResponse = await fetch(`${LUMA_API_URL}/generations/${taskId}`, {
+                  headers: { 
+                    'Authorization': `Bearer ${lumaApiKey}`,
+                    'Accept': 'application/json'
+                  }
+                });
+                
+                if (statusResponse.ok) {
+                  const statusData = await statusResponse.json() as any;
+                  if (statusData.state === 'completed' && statusData.assets?.video) {
+                    visualization.videoUrlHorizontal = statusData.assets.video;
+                    visualization.status = 'complete';
+                    saveState();
+                    
+                    await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${statusData.assets.video}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
+                  } else if (statusData.state === 'failed') {
+                    await ctx.reply(`❌ Luma video failed.\nReason: ${statusData.failure_reason || 'Unknown'}`);
+                  } else {
+                    await ctx.reply(`⏳ Video still processing...\nStatus: ${statusData.state}\n\nUse \`/videostatus ${taskId}\` to check later.`, { parse_mode: 'Markdown' });
+                  }
+                }
+              } catch (pollError) {
+                console.error('Luma poll error:', pollError);
+              }
+            }, 60000); // Check after 60 seconds
             
           } else if (videoResult.provider === 'runway' && videoResult.taskId) {
             // Runway needs polling
             const taskId = videoResult.taskId;
-            await ctx.reply(`🎬 Video generation started! (Runway Gen-3)\nTask ID: \`${taskId}\`\n\n_Checking status in 90 seconds..._\n\nOr check manually: \`/videostatus ${taskId}\``, { parse_mode: 'Markdown' });
             
             // Poll for completion after 90 seconds
             setTimeout(async () => {
@@ -5128,9 +5227,9 @@ Free tier limit reached. Options:
                     visualization.status = 'complete';
                     saveState();
                     
-                    await ctx.reply(`✅ *Video Ready!*\n\n🎬 ${statusData.output[0]}\n\n_Right-click/long-press to download!_`);
+                    await ctx.reply(`✅ *Video Ready!* (Runway)\n\n🎬 ${statusData.output[0]}\n\n_Right-click/long-press to download!_`, { parse_mode: 'Markdown' });
                   } else if (statusData.status === 'FAILED') {
-                    await ctx.reply(`❌ Video generation failed.\nReason: ${statusData.failure || 'Unknown'}`);
+                    await ctx.reply(`❌ Runway video failed.\nReason: ${statusData.failure || 'Unknown'}`);
                   } else {
                     await ctx.reply(`⏳ Video still processing...\nStatus: ${statusData.status}\n\nUse \`/videostatus ${taskId}\` to check later.`, { parse_mode: 'Markdown' });
                   }
@@ -5143,8 +5242,8 @@ Free tier limit reached. Options:
         } else {
           await ctx.reply(`⚠️ *Video generation unavailable*\n\n${videoResult.error}\n\nImage saved! Use in CapCut/Premiere for video.`, { parse_mode: 'Markdown' });
         }
-      } else if (!replicate && !runwayApiKey) {
-        await ctx.reply(`⚠️ *No video providers configured*\n\nSet REPLICATE_API_TOKEN for Luma Dream Machine\nor RUNWAY_API_KEY for Runway Gen-3.\n\nImage saved! Use the image in CapCut or other video tools.`, { parse_mode: 'Markdown' });
+      } else if (!lumaApiKey && !replicate && !runwayApiKey) {
+        await ctx.reply(`⚠️ *No video providers configured*\n\nSet LUMA_API_KEY for Luma Direct\nor REPLICATE_API_TOKEN for Luma/Replicate\nor RUNWAY_API_KEY for Runway Gen-3.\n\nImage saved! Use the image in CapCut or other video tools.`, { parse_mode: 'Markdown' });
       }
       
       // Save visualization
@@ -5255,30 +5354,64 @@ _Export all videos and compile in:_
       return;
     }
     
-    if (!runwayApiKey) {
-      await ctx.reply('❌ Runway API not configured');
-      return;
+    // Try Luma Direct first
+    if (lumaApiKey) {
+      try {
+        const lumaResponse = await fetch(`${LUMA_API_URL}/generations/${taskId}`, {
+          headers: { 
+            'Authorization': `Bearer ${lumaApiKey}`,
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (lumaResponse.ok) {
+          const data = await lumaResponse.json() as any;
+          
+          if (data.state === 'completed' && data.assets?.video) {
+            await ctx.reply(`✅ *Video Complete!* (Luma Direct)\n\n🎬 ${data.assets.video}\n\n_Right-click to download!_`, { parse_mode: 'Markdown' });
+            return;
+          } else if (data.state === 'failed') {
+            await ctx.reply(`❌ Luma failed: ${data.failure_reason || 'Unknown'}`);
+            return;
+          } else if (data.state) {
+            await ctx.reply(`⏳ Luma Status: ${data.state}\n\nCheck again in a minute...`);
+            return;
+          }
+        }
+      } catch (lumaError) {
+        // Not a Luma task, try Runway
+      }
     }
     
-    try {
-      const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
-        headers: { 'Authorization': `Bearer ${runwayApiKey}` }
-      });
-      
-      if (statusResponse.ok) {
-        const data = await statusResponse.json() as any;
+    // Try Runway
+    if (runwayApiKey) {
+      try {
+        const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
+          headers: { 
+            'Authorization': `Bearer ${runwayApiKey}`,
+            'X-Runway-Version': '2024-11-06'
+          }
+        });
         
-        if (data.status === 'SUCCEEDED' && data.output?.[0]) {
-          await ctx.reply(`✅ *Video Complete!*\n\n🎬 ${data.output[0]}\n\n_Right-click to download!_`);
-        } else {
-          await ctx.reply(`⏳ Status: ${data.status}\n\nCheck again in a minute...`);
+        if (statusResponse.ok) {
+          const data = await statusResponse.json() as any;
+          
+          if (data.status === 'SUCCEEDED' && data.output?.[0]) {
+            await ctx.reply(`✅ *Video Complete!* (Runway)\n\n🎬 ${data.output[0]}\n\n_Right-click to download!_`, { parse_mode: 'Markdown' });
+          } else if (data.status === 'FAILED') {
+            await ctx.reply(`❌ Runway failed: ${data.failure || 'Unknown'}`);
+          } else {
+            await ctx.reply(`⏳ Runway Status: ${data.status}\n\nCheck again in a minute...`);
+          }
+          return;
         }
-      } else {
-        await ctx.reply(`❌ Could not check status: ${statusResponse.status}`);
+      } catch (runwayError: any) {
+        await ctx.reply(`❌ Error checking status: ${runwayError.message}`);
+        return;
       }
-    } catch (error: any) {
-      await ctx.reply(`❌ Error: ${error.message}`);
     }
+    
+    await ctx.reply('❌ No video API configured (need LUMA_API_KEY or RUNWAY_API_KEY)');
   });
 
   // ==========================================================================
