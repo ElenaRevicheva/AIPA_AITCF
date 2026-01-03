@@ -1450,8 +1450,9 @@ async function generateVideo(
       console.log('🎬 Trying Luma Dream Machine (Direct API)...');
       await ctx.reply('🎬 *Generating video with Luma Dream Machine...*\n\n_Direct API - Best quality! Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
       
-      // Create generation request
+      // Create generation request - Luma Ray 2 model
       const lumaBody = {
+        model: 'ray-2',  // Required field - Luma's latest model
         prompt: `Cinematic slow movement, atmospheric. ${prompt.substring(0, 200)}. Gentle camera drift. Film grain. Moody lighting.`,
         keyframes: {
           frame0: {
