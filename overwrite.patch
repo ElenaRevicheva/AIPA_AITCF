@@ -1,0 +1,58 @@
+--- a/src/atuona-creative-ai.ts
++++ b/src/atuona-creative-ai.ts
+@@ -917,33 +917,24 @@
+       const owner = 'ElenaRevicheva';
+       
+-      // Find next available page number
++      // Overwrite mode: use current page number directly
+       let pageNum = bookState.currentPage;
+       let fileSha: string | undefined;
+-      let fileExists = true;
+       
+-      // Check if current page exists, if so find next available
+-      while (fileExists) {
+-        const pageId = String(pageNum).padStart(3, '0');
+-        try {
+-          const { data: existingFile } = await octokit.repos.getContent({
+-            owner,
+-            repo: repoName,
+-            path: `metadata/${pageId}.json`,
+-            ref: branch
+-          });
+-          
+-          // File exists, try next number
+-          console.log(`📄 Page ${pageId} exists, trying next...`);
+-          pageNum++;
+-        } catch (e: any) {
+-          if (e.status === 404) {
+-            // File doesn't exist - this is our slot!
+-            fileExists = false;
+-          } else {
+-            throw e;
+-          }
++      const pageId = String(pageNum).padStart(3, '0');
++      
++      // Check if file exists to get SHA for overwrite
++      try {
++        const { data: existingFile } = await octokit.repos.getContent({
++          owner,
++          repo: repoName,
++          path: `metadata/${pageId}.json`,
++          ref: branch
++        });
++        
++        if ('sha' in existingFile) {
++          fileSha = existingFile.sha;
++          await ctx.reply(`⚠️ Page ${pageId} exists - OVERWRITING...`);
++          console.log(`⚠️ Overwriting existing page ${pageId} with new content`);
++        }
++      } catch (e: any) {
++        if (e.status === 404) {
++          console.log(`📄 Page ${pageId} is new - creating...`);
++        } else {
++          throw e;
+         }
+       }
+-      
+-      const pageId = String(pageNum).padStart(3, '0');
+       const title = bookState.lastPageTitle;
