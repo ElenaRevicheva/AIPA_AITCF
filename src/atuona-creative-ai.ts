@@ -5944,6 +5944,71 @@ _Full auto-upload coming in next update!_ 💜`, { parse_mode: 'Markdown' });
       timestamp: new Date().toISOString()
     });
   });
+
+  // /announce - Manually announce a tech achievement to CTO → CMO
+  atuonaBot.command('announce', async (ctx) => {
+    const message = ctx.message?.text?.replace('/announce', '').trim();
+    
+    if (!message) {
+      await ctx.reply(`📢 *Announce Achievement*
+
+Send a tech milestone to CTO → CMO for LinkedIn/Instagram:
+
+\`/announce Integrated Luma Dream Machine for 9-second AI videos\`
+\`/announce ATUONA reaches 100 AI-visualized pages\`
+\`/announce New translation engine with soul-for-soul philosophy\`
+
+_Only announce real achievements that build your reputation!_`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Determine announcement type based on keywords
+    let announcementType: 'milestone' | 'innovation' | 'integration' | 'launch' = 'innovation';
+    if (message.toLowerCase().includes('reach') || message.toLowerCase().includes('page')) {
+      announcementType = 'milestone';
+    } else if (message.toLowerCase().includes('integrat') || message.toLowerCase().includes('added')) {
+      announcementType = 'integration';
+    } else if (message.toLowerCase().includes('launch') || message.toLowerCase().includes('release')) {
+      announcementType = 'launch';
+    }
+    
+    // Get current stats
+    const totalPages = visualizations.length;
+    const totalVideos = visualizations.filter(v => v.videoUrlHorizontal).length;
+    
+    try {
+      const success = await notifyTechMilestone({
+        type: announcementType,
+        title: message,
+        description: `${message}\n\nBuilt with AI-first vibe coding: Claude Opus 4 for creative writing, Flux Pro Ultra for imagery, Luma Dream Machine for cinematic video.`,
+        metrics: { pagesCreated: totalPages, videosGenerated: totalVideos },
+        techStack: ['Claude Opus 4', 'Flux Pro Ultra', 'Luma Dream Machine', 'TypeScript', 'Telegram Bot API']
+      });
+      
+      if (success) {
+        await ctx.reply(`📢 *Announcement Sent!*
+
+🏆 "${message}"
+
+→ CTO received
+→ CMO notified for LinkedIn/Instagram
+
+_Your achievement is queued for announcement!_ 🚀`, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply(`📢 *Announcement Queued*
+
+🏆 "${message}"
+
+→ CTO received
+→ CMO webhook unavailable (stored locally)
+
+_Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Markdown' });
+      }
+    } catch (error: any) {
+      console.error('Announce error:', error);
+      await ctx.reply(`❌ Failed to send announcement: ${error.message}`);
+    }
+  });
   
   // Natural conversation - handles both regular chat and collaborative mode
   atuonaBot.on('message:text', async (ctx) => {
