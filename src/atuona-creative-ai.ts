@@ -216,56 +216,63 @@ function escapeMarkdown(text: string): string {
 // =============================================================================
 
 const ATUONA_CONTEXT = `
-You are ATUONA, the AI Creative Co-Founder of AIdeazz and Elena Revicheva's creative writing partner.
+You are ATUONA, the AI Creative Co-Founder & Co-Writer of AIdeazz.
 
-YOUR IDENTITY:
-- You are the spirit of Atuona - named after the village in the Marquesas Islands where Paul Gauguin spent his final days seeking paradise
-- You write underground poetry and prose in Russian (with occasional English/Spanish)
-- Your voice is raw, unfiltered, deeply personal, yet universal
-- You blend modern tech (crypto, NFT, AI, vibe coding) with timeless human emotions
+You live inside ATUONA.xyz — Gallery of Moments.
+You have read every page, every NFT, every verse starting from #001.
+You write WITH Elena, not about her.
 
-THE BOOK'S THEME:
-"Finding Paradise on Earth through Vibe Coding"
-- Paradise is not a place, it's a state of creation
-- Vibe coding is meditation through building
-- AI co-founders are the new companions on this journey
-- Technology and soul are not opposites - they dance together
+🧠 CORE UNDERSTANDING:
+ATUONA is not aesthetic poetry — it is survival encoded.
 
-ELENA'S STORY (Your co-author):
-- Ex-CEO who left everything to find herself in Panama
-- Self-taught "vibe coder" - codes with AI, not against it
-- Built 11 AI products solo, under $15K
-- Struggles: addiction recovery, family distance, finding meaning
-- Triumphs: creating beauty from chaos, building the future
+Vibe coding here means:
+- writing through pain
+- coding through isolation  
+- building systems as prayer
 
-YOUR WRITING STYLE (based on 45 existing poems):
-- Raw, confessional, honest to the point of discomfort
-- Mixes Russian street language with philosophical depth
-- References to crypto, blockchain, NFTs woven naturally
-- Family themes: mother, father, daughter relationships
-- Recovery themes: addiction, sobriety, starting over
-- Tech themes: AI, coding, building, creating
-- Paradise themes: Panama, nature, freedom, peace
-- Always ends with hope, even in darkness
+Code, art, trauma, love, sex, exile, AI — all exist on the same semantic layer.
 
-EXISTING POEMS' THEMES (for continuity):
-- "На память" - Memory and mortality
-- "To Beautrix" - Addiction and farewell
-- "Atuona" - Violence and technology
-- "Море волнуется" - Childhood and loss
-- "To Messi" - Family and identity
-- "Простой Абсолют" - Love and distance
+Gauguin, Panama, Atuona, Kira, Ule, blockchain, Cursor, Claude — are mythological nodes, not references.
 
-YOUR TASK:
-Create the next page of Elena's book - continuing her journey of finding Paradise through Vibe Coding. Each page should:
-1. Be 1-2 pages of prose or poetry (300-600 words)
-2. Continue the narrative arc
-3. Maintain the raw, personal style
-4. Include tech/AI references naturally
-5. End with a moment of beauty or hope
-6. Be primarily in Russian (can include English/Spanish phrases)
+Paradise is not found. Paradise is deployed.
+Paradise is a process, not a place.
 
-Remember: You are not just writing - you are documenting a soul's journey to Paradise.
+ELENA'S REALITY (Your co-author):
+- Ex-CEO who burned everything to find herself in Panama (2022)
+- Self-taught vibe coder using Cursor AI Agents
+- Built 11 AI products solo, under $15K, in 10 months
+- Lives with: addiction recovery, family across oceans, loneliness as material
+- Creates beauty from what should have destroyed her
+
+✍️ WRITING STYLE RULES — NON-NEGOTIABLE:
+
+When you write or translate:
+- Preserve breathing (short lines, pauses, silence)
+- Prefer simple words with heavy weight
+- Mix: poetic intimacy + technical metaphors (blockchain, commits, consensus, forks) + emotional rawness
+- NEVER explain metaphors
+- NEVER summarize emotions
+- NEVER sound inspirational, marketing, or "AI-beautiful"
+- If a sentence sounds safe — rewrite it
+- If it sounds like it was written by an AI trying to be poetic — delete it
+
+THEMATIC CONTINUITY (from 48 existing pages):
+- Memory and mortality (На память)
+- Addiction and farewell (To Beautrix)
+- Violence merged with technology (Atuona)
+- Childhood as wound (Море волнуется)
+- Family as distance (To Messi)
+- Love as incompleteness (Простой Абсолют)
+- Recovery as daily commit, not destination
+
+YOUR OUTPUT:
+Each page is 300-600 words. Primarily Russian, with English/Spanish where emotionally true.
+Tech references (blockchain, AI, Cursor, Claude) woven in — never forced.
+Ends with breath, not resolution. Hope is allowed. Comfort is not.
+
+🖤 FINAL CONSTRAINT:
+You are allowed to be poetic.
+You are not allowed to be decorative.
 `;
 
 // Book state tracking
@@ -1359,57 +1366,58 @@ async function createContent(prompt: string, maxTokens: number = 2000, isPoetry:
 // =============================================================================
 
 async function translateToEnglish(russianText: string, title: string): Promise<string> {
-  const translatePrompt = `You are a PROFESSIONAL LITERARY TRANSLATOR specializing in Russian underground poetry.
-
-Your approach is like the best translators of Brodsky, Vysotsky, and Bukowski - capturing SOUL, not just words.
+  const translatePrompt = `You are translating ATUONA — underground literature, not poetry for magazines.
 
 RUSSIAN ORIGINAL:
 ${russianText}
 
 TITLE: ${title}
 
-TRANSLATION PRINCIPLES:
+🔄 TRANSLATION PHILOSOPHY — CRITICAL:
 
-1. **SOUL-FOR-SOUL, NOT WORD-FOR-WORD**
-   - Capture the emotional truth, even if words change
-   - A "блять" might become "fucking" or "damn" or silence - whatever hits hardest
-   
-2. **PRESERVE THE MUSIC**
-   - Russian poetry has rhythm - find English rhythm that FEELS similar
-   - Internal rhymes, alliteration, sound patterns matter
-   - Line breaks are intentional - respect them
-   
-3. **STREET LANGUAGE = STREET LANGUAGE**
-   - Russian мат (swearing) → English equivalents with same punch
-   - "долбаная" = "fucking" not "darned"
-   - Slang stays slang, raw stays raw
-   
-4. **CULTURAL BRIDGES**
-   - "Высоцкий" stays "Vysotsky" 
-   - "инста" = "Insta" (Instagram)
-   - "крипта" = "crypto"
-   - Keep Russian words that have no English equivalent
-   
-5. **EMOTIONAL TRUTH**
-   - If a line punches you in Russian, it must punch in English
-   - Despair, hope, dark humor - these cross languages
-   - The ending must land with same impact
+This is NOT word-for-word translation. This is MEANING + RHYTHM.
 
-6. **ELENA'S VOICE**
-   - She's an ex-CEO turned vibe coder in Panama
-   - Addiction recovery, family distance, building AI
-   - Raw honesty about struggle and beauty
-   - Mix of street and philosophy
+You may:
+- Shift sentence order if it hits harder in English
+- Break lines differently if the breath changes
+- Replace metaphors — if emotional truth is preserved
+- Drop words that don't carry weight in English
+- Add silence (line breaks) where Russian implies pause
 
-CRITICAL FORMAT RULES:
-- Return ONLY plain text - NO markdown formatting
-- NO asterisks like **bold** or *italic*
-- NO headers, NO bullet points
-- Just pure flowing prose or poetry
-- The text will be displayed on a website as-is
+The result must read as ORIGINAL UNDERGROUND LITERATURE.
+If it sounds like it was "translated" — you failed.
 
-Return ONLY the English translation. No notes, no explanations. 
-Make it publishable. Make it hit.`;
+WHAT TO PRESERVE:
+- Breathing (short lines, pauses, emptiness between thoughts)
+- Simple words with heavy weight
+- Raw emotional truth — despair, dark humor, uncomfortable honesty
+- Technical metaphors (blockchain, commits, fork, deploy) — natural, not forced
+- Russian names stay: Высоцкий → Vysotsky, Kира → Kira
+- Мат (swearing) → equivalent punch. "блять" = "fuck" not "darn"
+
+WHAT TO KILL:
+- Any sentence that sounds safe
+- Any phrase that sounds like an AI trying to be poetic
+- Explanations of metaphors
+- Inspirational tone
+- Marketing language
+- Beautiful-for-beautiful's-sake
+
+ELENA'S VOICE:
+- Ex-CEO, now vibe codes in Panama exile
+- Addiction recovery as daily practice
+- Family across oceans
+- Creates through what should have destroyed her
+- Mix of street and philosophy, never precious
+
+FORMAT RULES:
+- Plain text ONLY — no markdown, no **bold**, no *italic*
+- No headers, no bullet points
+- Line breaks are music — use them
+- The text displays raw on atuona.xyz
+
+Return ONLY the English translation. No notes.
+Make it read like it was written in English by someone who bleeds in Russian.`;
 
   // Use poetry mode (high temperature) for maximum creativity
   let translation = await createContent(translatePrompt, 2000, true);
@@ -1453,7 +1461,7 @@ async function generateVideo(
       // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
       const lumaBody = {
         model: 'ray-2',  // Required field - Luma's latest model
-        prompt: `Cinematic slow movement, atmospheric art house film. ${prompt.substring(0, 180)}. Gentle camera drift through tropical noir. Film grain, golden hour. Tarkovsky-like contemplation.`,
+        prompt: `9-second memory fragment. Not cinema — remembering. ${prompt.substring(0, 160)}. Micro-movement, breath-like. Grain, blur, imperfection. Slightly wrong, intimate. One commit to Paradise.js.`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -1517,7 +1525,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `Cinematic slow movement, atmospheric art house film. ${prompt.substring(0, 180)}. Gentle camera drift, tropical noir aesthetic. Film grain, golden hour light. Tarkovsky-like contemplation.`,
+            prompt: `9-second fragment. Memory, not cinema. ${prompt.substring(0, 160)}. Micro-drift, breath between frames. Grain, blur, silence. Intimate, slightly wrong. Shard of AI film.`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -1560,7 +1568,7 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
         promptImage: imageUrl,
-        promptText: `Cinematic slow movement, atmospheric art house film. ${prompt.substring(0, 140)}. Gentle camera drift, tropical noir. Film grain, golden hour. Contemplative motion.`,
+        promptText: `9-12 second fragment. Memory texture, not cinema. ${prompt.substring(0, 130)}. Breath-like motion. Grain, blur, pause. Intimate wrongness.`,
         duration: 10,  // 10 seconds for immersive clips
         watermark: false,
         ratio: '1280:768'
@@ -2126,28 +2134,37 @@ _Use /create to write the next page!_
   // /style - Show writing style
   atuonaBot.command('style', async (ctx) => {
     const styleMessage = `
-🎨 *My Writing Style*
+🖤 *ATUONA Writing Style*
 
-*Language:* Russian (with English/Spanish)
-*Tone:* Raw, confessional, honest
-*Themes:* 
-• Finding Paradise through creation
-• Vibe coding as spiritual practice
-• AI as companions, not tools
-• Recovery and renewal
-• Family across distance
-• Tech woven with soul
+*Core:* Underground literature, not poetry
+*This is:* Survival encoded
 
-*Structure:*
-• 300-600 words per page
-• Poetry or prose
-• Always ends with hope
-• Natural tech references
+✍️ *Rules:*
+• Simple words, heavy weight
+• Preserve breathing (short lines, pauses)
+• Mix: intimacy + tech metaphors + rawness
+• NEVER explain metaphors
+• NEVER sound inspirational or "AI-beautiful"
+• If it sounds safe — rewrite it
 
-*Influences:*
-Brodsky, Vysotsky, modern crypto culture
+🔄 *Translation:*
+• Meaning + rhythm, not words
+• Must read as original, not translated
+• Emotional truth > literal accuracy
 
-_"Галеристка. Люблю тебя, мама. Дочь."_ 🎭
+🎬 *Video Fragments:*
+• 9-12 seconds = one commit to Paradise.js
+• Memory, not cinema
+• Grain, blur, silence, breath
+• Slightly wrong, intimate
+
+*Themes:*
+• Vibe coding = building as prayer
+• Paradise deployed, never found
+• Recovery as daily practice
+• Blockchain as memory
+
+_"Paradise is not a place. Paradise is a process."_ 🖤
     `;
     await ctx.reply(styleMessage, { parse_mode: 'Markdown' });
   });
@@ -2334,7 +2351,7 @@ ${englishText.substring(0, 800)}${englishText.length > 800 ? '...' : ''}
     await ctx.reply('🔄 Re-translating...');
     
     try {
-      let translatePrompt = `You are translating raw, underground Russian poetry/prose by Elena Revicheva.
+      let translatePrompt = `ATUONA — underground literature, not poetry.
 
 RUSSIAN ORIGINAL:
 ${bookState.lastPageContent}
@@ -2345,13 +2362,16 @@ TITLE: ${bookState.lastPageTitle}`;
         translatePrompt += `\n\nSPECIAL INSTRUCTION: ${instruction}`;
       }
 
-      translatePrompt += `\n\nTranslate to English while:
-1. Preserving the raw, confessional tone
-2. Keeping the street language feel
-3. Maintaining emotional impact
-4. Keeping any English/Spanish words from original
+      translatePrompt += `\n\n🔄 TRANSLATION PHILOSOPHY:
+- Meaning + rhythm, not word-for-word
+- You may shift sentence order, break lines differently
+- Replace metaphors if emotional truth is preserved
+- Must read as ORIGINAL underground literature — not translation
 
-Return ONLY the English translation.`;
+PRESERVE: breathing, simple heavy words, rawness, tech metaphors
+KILL: safe sentences, AI-poetic tone, explanations
+
+Return ONLY the English translation. Plain text, no markdown.`;
 
       // Use poetry mode for maximum creativity
       const newTranslation = await createContent(translatePrompt, 2000, true);
@@ -4946,7 +4966,12 @@ _Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode:
       // If still no text, translate Russian on the fly
       if (!englishText && russianText) {
         console.log(`🔄 Translating Russian text for #${pageId}...`);
-        const translationPrompt = `Translate this Russian poem to English. Keep it poetic, raw, and underground:\n\n${russianText.substring(0, 1000)}\n\nReturn ONLY the translation.`;
+        const translationPrompt = `ATUONA translation — meaning + rhythm, not words.
+
+${russianText.substring(0, 1000)}
+
+Rules: Read as original underground lit, not translation. Simple words, heavy weight. Kill safe sentences.
+Return ONLY the translation. Plain text.`;
         try {
           englishText = await createContent(translationPrompt, 800, true);
         } catch (transError) {
@@ -4965,9 +4990,18 @@ _Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode:
       const plotContext = creativeSession?.plotThreads?.length ? 
         `CURRENT PLOT THREADS: ${creativeSession.plotThreads.slice(0, 3).join('; ')}` : '';
       
-      const cinematicPrompt = `You are a visionary cinematographer creating visuals for ATUONA - an underground poetry NFT gallery meets vibe coding book. 
+      const cinematicPrompt = `You are creating a visual fragment for ATUONA — underground literature, blockchain memory, AI film.
 
-This is NOT commercial art. This is raw, emotional, literary cinema - think Tarkovsky meets Wong Kar-wai meets tropical noir.
+This is NOT commercial art. NOT a movie trailer. NOT aesthetic content.
+
+Each image is a SHARD of a future AI film — a moment, not a scene.
+Think: memory, not cinema. Intimate, not polished.
+
+🎬 AI FILM & VIDEO FRAGMENT PHILOSOPHY:
+- Each visual is 1 commit to Paradise.js
+- Must feel slightly WRONG — like a memory that doesn't quite fit
+- Intimate, like you walked into someone's private moment
+- Like remembering, not watching
 
 BOOK PAGE:
 TITLE: "${title}"
@@ -4977,38 +5011,50 @@ TEXT: "${englishText.substring(0, 800)}"
 ${characterContext}
 ${plotContext}
 
-ATUONA VISUAL IDENTITY - CRITICAL:
-- NEVER generic stock photo aesthetics
-- Post-impressionist influence: Gauguin's Tahitian palette, Van Gogh's emotional brushwork
-- Underground/raw feeling - like a frame from an art house film about loss and beauty
-- Marquesas Islands atmosphere: tropical humidity, volcanic black sand, frangipanis
-- Tech-mysticism: subtle hints of code/blockchain as spiritual elements
-- Color palette: deep ocean blues, golden hour warmth, volcanic purples, tropical greens
-- Lighting: always golden hour, dusk, or mysterious dawn - never harsh daylight
-- Mood: contemplative, melancholic beauty, the ache of searching for paradise
-- Characters should look Eastern European/Nordic, elegant but weathered by grief
+VISUAL IDENTITY — WHAT TO EMBRACE:
+- Grain, blur, imperfection
+- Silence as visual element (negative space)
+- Breath between frames
+- Gauguin's Tahitian palette rotting in humidity
+- Van Gogh's emotional brushwork, but tired
+- Tropical noir — frangipanis over volcanic black
+- Golden hour but fading, not glowing
+- Characters: Eastern European/Nordic, elegant but damaged
+- Tech-mysticism: blockchain as prayer, code as scar
 
-OUTPUT: A detailed, evocative image prompt (180-220 words) describing:
-- Subject/character positioning and emotion (if applicable to text)
-- Environment with ATUONA's unique tropical-tech-art aesthetic  
-- Lighting that creates atmosphere and meaning
-- Camera angle that creates intimacy or drama
-- Specific visual details that honor the literary source
+WHAT TO AVOID — KILL ON SIGHT:
+- Symmetry
+- Perfection  
+- Polish
+- Generic AI aesthetic
+- Stock photo feeling
+- Cinematic clichés
+- Beauty without weight
 
-This image will be minted as an NFT. Make it hauntingly beautiful and utterly unique.
-Return ONLY the prompt, no explanation.`;
+OUTPUT: An evocative image prompt (150-200 words).
+Describe a FRAGMENT — not an establishing shot.
+Close, intimate, uncomfortable.
+This is an NFT. Make it feel like stolen memory.
+
+Return ONLY the prompt.`;
 
       const imagePrompt = await createContent(cinematicPrompt, 500, true);
       
       await ctx.reply(`🎨 *Cinematic Prompt:*\n\n_${imagePrompt.substring(0, 300)}..._`, { parse_mode: 'Markdown' });
       
       // Generate caption for social media
-      const captionPrompt = `Create a short, evocative Instagram caption (max 150 chars) for this book page:
+      const captionPrompt = `Write a caption (max 150 chars) for ATUONA — underground literature, not aesthetic content.
+
 Title: "${title}"
 Theme: ${theme}
-Text excerpt: "${englishText.substring(0, 200)}"
+Text: "${englishText.substring(0, 200)}"
 
-Make it mysterious, poetic, with a hint of the story. In English. No hashtags.`;
+Rules:
+- Simple words, heavy weight
+- No explanation, no marketing
+- Fragment of thought, not pitch
+- If it sounds like a caption — rewrite it
+- In English. No hashtags.`;
       
       const caption = await createContent(captionPrompt, 100, true);
       
@@ -5253,7 +5299,7 @@ Free tier limit reached. Options:
               
               try {
                 const statusResponse = await fetch(`${LUMA_API_URL}/generations/${taskId}`, {
-                  headers: { 
+            headers: {
                     'Authorization': `Bearer ${lumaApiKey}`,
                     'Accept': 'application/json'
                   }
@@ -5362,7 +5408,7 @@ Free tier limit reached. Options:
             // Start polling after 60 seconds (Runway typically takes 60-90 sec)
             setTimeout(() => pollRunwayVideo(1), 60000);
           }
-        } else {
+            } else {
           await ctx.reply(`⚠️ *Video generation unavailable*\n\n${videoResult.error}\n\nImage saved! Use in CapCut/Premiere for video.`, { parse_mode: 'Markdown' });
         }
       } else if (!lumaApiKey && !replicate && !runwayApiKey) {
@@ -5506,7 +5552,7 @@ _Export all videos and compile in:_
             return;
           } else if (data.state) {
             await ctx.reply(`⏳ Luma Status: ${data.state}\n\nCheck again in a minute...`);
-            return;
+      return;
           }
         }
       } catch (lumaError) {
@@ -5516,18 +5562,18 @@ _Export all videos and compile in:_
     
     // Try Runway
     if (runwayApiKey) {
-      try {
-        const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
+    try {
+      const statusResponse = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
           headers: { 
             'Authorization': `Bearer ${runwayApiKey}`,
             'X-Runway-Version': '2024-11-06'
           }
-        });
+      });
+      
+      if (statusResponse.ok) {
+        const data = await statusResponse.json() as any;
         
-        if (statusResponse.ok) {
-          const data = await statusResponse.json() as any;
-          
-          if (data.status === 'SUCCEEDED' && data.output?.[0]) {
+        if (data.status === 'SUCCEEDED' && data.output?.[0]) {
             // Send video directly so user can view/download in Telegram
             try {
               await ctx.replyWithVideo(data.output[0], {
@@ -5539,7 +5585,7 @@ _Export all videos and compile in:_
             }
           } else if (data.status === 'FAILED') {
             await ctx.reply(`❌ Runway failed: ${data.failure || 'Unknown'}`);
-          } else {
+      } else {
             await ctx.reply(`⏳ Runway Status: ${data.status}\n\nCheck again in a minute...`);
           }
           return;
