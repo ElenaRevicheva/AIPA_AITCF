@@ -1,9 +1,9 @@
-# 🤖 CTO AIPA v3.4 - AI Technical Co-Founder + Creative Co-Founder
+# 🤖 CTO AIPA v3.5 - AI Technical Co-Founder + Creative Co-Founder
 
 **Your Autonomous AI CTO + ATUONA Creative AI on Oracle Cloud Infrastructure**
 
-[![Status](https://img.shields.io/badge/status-live-brightgreen)](http://163.192.99.45:3000)
-[![Version](https://img.shields.io/badge/version-3.4.0-blue)]()
+[![Status](https://img.shields.io/badge/status-live-brightgreen)]()
+[![Version](https://img.shields.io/badge/version-3.5.0-blue)]()
 [![Cost](https://img.shields.io/badge/cost-%240%2Fmonth-success)]()
 [![AI](https://img.shields.io/badge/AI-Claude%20Opus%204-purple)]()
 [![Oracle Cloud](https://img.shields.io/badge/Oracle%20Cloud-Production-red)]()
@@ -31,11 +31,12 @@ CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder**
 
 ---
 
-## 🆕 What's New in v3.4
+## 🆕 What's New in v3.5
 
 | Feature | Description |
 |---------|-------------|
-| **🎭 ATUONA Creative AI** | NEW! AI Creative Co-Founder for your book project |
+| **☁️ Oracle Cloud Migration** | Migrated to new Oracle Cloud instance with startup credits |
+| **🎭 ATUONA Creative AI** | AI Creative Co-Founder for your book project |
 | **📖 Daily Book Pages** | `/create` - Atuona generates 1-2 pages of "Finding Paradise" |
 | **🚀 Auto-Publish** | `/publish` - Push book pages directly to atuona.xyz |
 | **🤝 AI Collaboration** | CTO AIPA + Atuona work together seamlessly |
@@ -44,7 +45,7 @@ CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder**
 | **🔧 CTO Fixes Bugs** | `/fix <repo> <issue>` - CTO fixes issues automatically! |
 | **📸 Screenshot Analysis** | Send any image - errors, UI, diagrams - get AI analysis! |
 | **🎤 Voice Messages** | Send voice notes - Whisper transcribes, Claude responds |
-| **🚀 Claude Opus 4** | Best AI model for coding + creative writing |
+| **📢 /announce Command** | Manual tech milestone announcements |
 
 ---
 
@@ -58,33 +59,28 @@ CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder**
 | `/ask-cto` | POST | Ask any technical question |
 | `/webhook/github` | POST | Receives GitHub webhooks |
 | `/cmo-updates` | GET | View pending CMO updates |
+| `/tech-milestones` | GET | View tech milestones |
 | **Telegram Bot** | - | Chat with CTO from your phone! |
 
 ### 💬 Ask CTO - Get Technical Advice Anytime
 
 **From any terminal:**
 ```bash
-curl -X POST http://163.192.99.45:3000/ask-cto \
+curl -X POST http://<your-server-ip>:3000/ask-cto \
   -H "Content-Type: application/json" \
-  -d '{"question":"Should I use MongoDB or PostgreSQL for EspaLuz?"}'
+  -d '{"question":"Should I use MongoDB or PostgreSQL for my project?"}'
 ```
 
 **With context:**
 ```bash
-curl -X POST http://163.192.99.45:3000/ask-cto \
+curl -X POST http://<your-server-ip>:3000/ask-cto \
   -H "Content-Type: application/json" \
   -d '{
     "question": "How should I structure the authentication?",
-    "repo": "EspaLuzWhatsApp",
+    "repo": "MyProject",
     "context": "Currently using JWT tokens"
   }'
 ```
-
-**Example questions:**
-- "What should I focus on next for AIdeazz?"
-- "Review the architecture of my ecosystem"
-- "How do I improve performance of EspaLuz?"
-- "Should I add Redis caching to VibeJobHunter?"
 
 ### 🔍 Automatic Code Reviews
 
@@ -98,15 +94,6 @@ curl -X POST http://163.192.99.45:3000/ask-cto \
 2. CTO AIPA reviews the commits
 3. Review comment appears on the commit
 
-### 📊 Check CTO Status
-
-**Browser:** http://163.192.99.45:3000
-
-**Terminal:**
-```bash
-curl http://163.192.99.45:3000/
-```
-
 ---
 
 ## 🤖 AI Models
@@ -118,10 +105,11 @@ CTO AIPA uses the **best AI models** for each task:
 | Critical Reviews | Claude Opus 4 | Best for security & architecture |
 | Ask CTO Questions | Claude Opus 4 | Best for strategic thinking |
 | Standard Reviews | Llama 3.3 70B | Fast & free via Groq |
+| Voice Transcription | Whisper (Groq) | Fast & accurate |
 
-### Change Models (Optional)
+### Configuration
 
-Edit `.env` on Oracle Cloud:
+Edit `.env` on your server:
 ```bash
 CRITICAL_MODEL=claude-opus-4-20250514
 STRATEGIC_MODEL=claude-opus-4-20250514
@@ -139,7 +127,7 @@ CTO AIPA knows and monitors **11 repositories**:
 |---|------|------|
 | 1 | **AIPA_AITCF** | CTO AIPA (this repo) |
 | 2 | **VibeJobHunterAIPA_AIMCF** | CMO AIPA + Job Hunter |
-| 3 | **EspaLuzWhatsApp** | AI Spanish Tutor (Revenue!) |
+| 3 | **EspaLuzWhatsApp** | AI Spanish Tutor |
 | 4 | **EspaLuz_Influencer** | EspaLuz Marketing |
 | 5 | **EspaLuzFamilybot** | Family Bot Version |
 | 6 | **aideazz** | Main Website |
@@ -158,10 +146,10 @@ Chat with your CTO from your phone — now with voice messages!
 ### Setup
 
 1. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram
-2. Add to `.env` on Oracle Cloud:
+2. Add to `.env` on your server:
    ```
-   TELEGRAM_BOT_TOKEN=your_token_here
-   TELEGRAM_AUTHORIZED_USERS=your_telegram_user_id
+   TELEGRAM_BOT_TOKEN=<your-bot-token>
+   TELEGRAM_AUTHORIZED_USERS=<your-telegram-user-id>
    ```
 3. Restart: `pm2 restart cto-aipa`
 
@@ -181,11 +169,12 @@ Chat with your CTO from your phone — now with voice messages!
 | `/ideas` | 💾 View all saved ideas |
 | `/ask <question>` | 💬 Ask any technical question |
 | `/review <repo>` | 🔍 Review latest commit |
-| `/repos` | 📋 List all 11 repositories |
+| `/repos` | 📋 List all repositories |
 | `/alerts` | 🔔 Toggle proactive alerts |
 | `/status` | 🏥 Service health check |
+| `/announce` | 📢 Announce tech milestone |
 
-### 📸 Screenshot Analysis (NEW!)
+### 📸 Screenshot Analysis
 
 Send any image and get instant AI analysis:
 - **Error screenshots** → Identify bug and suggest fix
@@ -195,16 +184,16 @@ Send any image and get instant AI analysis:
 
 Just send a photo - no command needed!
 
-### 🎤 Voice Messages (NEW!)
+### 🎤 Voice Messages
 
 Just hold the mic button and talk naturally:
 - "What should I focus on today?"
-- "How do I add caching to EspaLuz?"
+- "How do I add caching to my project?"
 - "Review my architecture decisions"
 
 Your voice is transcribed by Whisper (Groq) and processed by Claude Opus 4.
 
-### ☀️ Daily Briefings (NEW!)
+### ☀️ Daily Briefings
 
 Every day at **8 AM Panama time**, you'll receive:
 - Ecosystem health status
@@ -214,7 +203,7 @@ Every day at **8 AM Panama time**, you'll receive:
 
 Use `/alerts` to toggle on/off.
 
-### 🔔 Proactive Alerts (NEW!)
+### 🔔 Proactive Alerts
 
 CTO AIPA monitors your ecosystem and alerts you about:
 - ⚠️ Repos with no commits in 5+ days
@@ -225,7 +214,7 @@ Alerts run every 4 hours automatically.
 
 ---
 
-## 🎭 ATUONA Creative AI - Your Creative Co-Founder (NEW!)
+## 🎭 ATUONA Creative AI - Your Creative Co-Founder
 
 Atuona is your AI Creative Co-Founder that writes your book daily!
 
@@ -237,7 +226,7 @@ Atuona is your AI Creative Co-Founder that writes your book daily!
 - Themes: Tech meets soul, AI companionship, Panama paradise
 - Each page becomes an NFT on atuona.xyz
 
-### Telegram Bot: @Atuona_AI_CCF_AIdeazz_bot
+### Commands
 
 | Command | Description |
 |---------|-------------|
@@ -254,10 +243,10 @@ Atuona is your AI Creative Co-Founder that writes your book daily!
 ### How It Works
 
 ```
-Elena ──► /create ──► Atuona AI writes page ──► /preview
-                                                    │
-                                                    ▼
-GitHub ◄── /publish ◄── Elena approves ◄── Review
+User ──► /create ──► Atuona AI writes page ──► /preview
+                                                   │
+                                                   ▼
+GitHub ◄── /publish ◄── User approves ◄── Review
    │
    ▼
 atuona.xyz auto-deploys via Fleek
@@ -268,9 +257,9 @@ NFT page live! 🎉
 
 ### Setup
 
-Add to `.env` on Oracle Cloud:
+Add to `.env` on your server:
 ```bash
-ATUONA_BOT_TOKEN=8236294926:AAGglv_SbslYAFF3PJ1kxJ-FCUNic_-TEZw
+ATUONA_BOT_TOKEN=<your-atuona-bot-token>
 ```
 
 Restart: `pm2 restart cto-aipa`
@@ -286,12 +275,7 @@ CTO AIPA automatically notifies CMO AIPA when:
 
 **CMO then:**
 - Posts about tech updates on LinkedIn
-- Schedules announcements at 4:30 PM Panama
-
-**Check pending CMO updates:**
-```bash
-curl http://163.192.99.45:3000/cmo-updates
-```
+- Schedules announcements at optimal times
 
 ---
 
@@ -299,7 +283,7 @@ curl http://163.192.99.45:3000/cmo-updates
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           AIdeazz AIPA Suite v3.4                       │
+│                           AIdeazz AIPA Suite v3.5                       │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │   ┌──────────────────────────────────────────────────────────────┐      │
@@ -313,7 +297,7 @@ curl http://163.192.99.45:3000/cmo-updates
 │   │   GitHub Comment      Memory Storage            ▼             │      │
 │   │        └──────────────► CMO AIPA ──────► LinkedIn Post        │      │
 │   │                                                               │      │
-│   │   Telegram: @aitcf_aideazz_bot                                │      │
+│   │   Telegram Bot                                                │      │
 │   │   📸 Photos │ 🎤 Voice │ 💡 Ideas │ 💻 Code │ 🎓 Learn        │      │
 │   └──────────────────────────────────────────────────────────────┘      │
 │                              │                                          │
@@ -327,7 +311,7 @@ curl http://163.192.99.45:3000/cmo-updates
 │   │             [Oracle ATP]                    [atuona repo]     │      │
 │   │             Book Memory                          │            │      │
 │   │                                                  ▼            │      │
-│   │   Telegram: @Atuona_AI_CCF_AIdeazz_bot     atuona.xyz         │      │
+│   │   Telegram Bot                             atuona.xyz         │      │
 │   │   📝 Create │ 📖 Continue │ 🚀 Publish │ ✨ Inspire            │      │
 │   └──────────────────────────────────────────────────────────────┘      │
 │                                                                         │
@@ -337,8 +321,8 @@ curl http://163.192.99.45:3000/cmo-updates
 **Stack:**
 - **Backend:** TypeScript 5.7, Node.js 20, Express.js
 - **AI:** Claude Opus 4 (critical), Groq Llama 3.3 70B (fast), Groq Whisper (voice)
-- **Database:** Oracle Autonomous Database 26ai (mTLS encrypted)
-- **Infrastructure:** Oracle Cloud VM.Standard.E5.Flex, Ubuntu 22.04, PM2
+- **Database:** Oracle Autonomous Database 26ai (mTLS encrypted, Always Free)
+- **Infrastructure:** Oracle Cloud VM.Standard.E5.Flex, Ubuntu 24.04, PM2
 - **Integrations:** GitHub API, CMO AIPA (Railway), Telegram Bot API
 - **Scheduling:** node-cron for daily briefings and health checks
 
@@ -353,6 +337,7 @@ curl http://163.192.99.45:3000/cmo-updates
 - ✅ Debug code detection (console.log)
 - ✅ Code complexity analysis
 - ✅ Architecture pattern recognition
+- ✅ mTLS database encryption with wallet
 
 ---
 
@@ -360,7 +345,7 @@ curl http://163.192.99.45:3000/cmo-updates
 
 | Component | Service | Monthly Cost |
 |-----------|---------|--------------|
-| Compute (1 OCPU, 8GB RAM) | Oracle Cloud | $0 (Credits) |
+| Compute (1 OCPU, 12GB RAM) | Oracle Cloud | $0 (Startup Credits) |
 | Database (26ai, Always Free) | Oracle ATP | $0 |
 | Storage (50GB) | Oracle Block Storage | $0 |
 | AI - Standard Reviews | Groq (free tier) | $0 |
@@ -380,7 +365,8 @@ curl http://163.192.99.45:3000/cmo-updates
 - [x] **Phase 3.1:** Daily briefings + Proactive alerts + Voice messages
 - [x] **Phase 3.2:** Screenshot analysis + Idea capture + Ecosystem stats
 - [x] **Phase 3.3:** Learn to code + CTO writes code + CTO fixes bugs
-- [x] **Phase 3.4:** 🎭 ATUONA Creative AI - Creative Co-Founder 🆕
+- [x] **Phase 3.4:** 🎭 ATUONA Creative AI - Creative Co-Founder
+- [x] **Phase 3.5:** ☁️ Oracle Cloud migration with startup credits
 - [ ] **Phase 4:** Multi-repo learning, custom coding standards
 - [ ] **Phase 5:** CFO AIPA, CPO AIPA, CEO AIPA
 
@@ -389,11 +375,6 @@ curl http://163.192.99.45:3000/cmo-updates
 ---
 
 ## 🔧 Server Management
-
-**SSH into Oracle Cloud:**
-```bash
-ssh ubuntu@163.192.99.45
-```
 
 **Check status:**
 ```bash
@@ -412,10 +393,42 @@ pm2 restart cto-aipa
 
 **Update code:**
 ```bash
-cd /home/ubuntu/cto-aipa
+cd ~/cto-aipa
 git pull origin main
 npm run build
 pm2 restart cto-aipa
+```
+
+---
+
+## 📋 Environment Variables
+
+Create a `.env` file with these variables (do not commit to git!):
+
+```bash
+# Oracle Database (mTLS with Wallet)
+DB_USER=<your-db-user>
+DB_PASSWORD=<your-db-password>
+DB_SERVICE_NAME=<your-service-name>
+WALLET_PASSWORD=<your-wallet-password>
+
+# AI APIs
+GROQ_API_KEY=<your-groq-api-key>
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
+OPENAI_API_KEY=<your-openai-api-key>
+
+# GitHub
+GITHUB_TOKEN=<your-github-token>
+
+# Telegram Bots
+TELEGRAM_BOT_TOKEN=<your-cto-bot-token>
+TELEGRAM_AUTHORIZED_USERS=<your-telegram-user-id>
+ATUONA_BOT_TOKEN=<your-atuona-bot-token>
+
+# Optional: AI Image/Video Generation
+REPLICATE_API_TOKEN=<your-replicate-token>
+RUNWAY_API_KEY=<your-runway-key>
+LUMA_API_KEY=<your-luma-key>
 ```
 
 ---
@@ -428,16 +441,23 @@ Founder & CEO, AIdeazz
 - 📧 Email: aipa@aideazz.xyz
 - 🌐 Website: [aideazz.xyz](https://aideazz.xyz)
 - 💼 LinkedIn: [linkedin.com/in/elenarevicheva](https://linkedin.com/in/elenarevicheva)
-- 📱 WhatsApp: +507 616 66 716
 
 ---
 
 ## 🎉 Key Achievements
 
-Built in 2 days | 700+ lines of TypeScript | Zero infrastructure cost | Live in production | Processing real code | Integrated with CMO AIPA | Claude Opus 4 powered | < $1/month to operate
+- ✅ Built in 2 days
+- ✅ 6000+ lines of TypeScript
+- ✅ Zero infrastructure cost
+- ✅ Live in production
+- ✅ Processing real code
+- ✅ Integrated with CMO AIPA
+- ✅ Claude Opus 4 powered
+- ✅ < $1/month to operate
+- ✅ Migrated to Oracle Cloud with startup credits
 
 ---
 
 **This is capital-efficient AI development at scale.** 🚀
 
-**Version 3.4.0 | December 24, 2025 | 🟢 Production | 🎄 Merry Christmas!**
+**Version 3.5.0 | January 7, 2026 | 🟢 Production**
