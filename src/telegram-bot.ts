@@ -4281,6 +4281,138 @@ Keep response concise for Telegram. Use emojis.`;
       return;
     }
     
+    const lowerQ = question.toLowerCase();
+    
+    // ==========================================================================
+    // CURSOR-LIKE INTENT DETECTION - Understand natural language requests
+    // ==========================================================================
+    
+    // Detect: "show me the code in...", "read file...", "what's in..."
+    const readFilePatterns = [
+      /(?:show|read|open|see|view|look at|what'?s in|check)\s+(?:the\s+)?(?:file|code)?\s*(?:in\s+)?([a-z]+)[\s\/]+(.+)/i,
+      /(?:show|read|open)\s+([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of readFilePatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const repo = match[1];
+        const filePath = match[2].trim();
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`📖 I'll read that file for you...`);
+          // Simulate the /readfile command
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/readfile ${repo} ${filePath}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "edit the...", "change...", "modify...", "update..."
+    const editFilePatterns = [
+      /(?:edit|change|modify|update|fix)\s+(?:the\s+)?(?:file\s+)?([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of editFilePatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const repo = match[1];
+        const filePath = match[2].trim().split(/\s+/)[0]; // Get just the path
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`✏️ Opening that file for editing...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/editfile ${repo} ${filePath}` } };
+          // @ts-ignore  
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "search for...", "find...", "where is...", "grep..."
+    const searchPatterns = [
+      /(?:search|find|grep|look for|where is|where's)\s+(?:for\s+)?['"]?([^'"]+)['"]?(?:\s+in\s+([a-z]+))?/i,
+    ];
+    
+    for (const pattern of searchPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[1].length > 2) {
+        const searchTerm = match[1].trim();
+        const repo = match[2];
+        // Only auto-search if it looks like code search (not general questions)
+        if (searchTerm.includes('function') || searchTerm.includes('const ') || 
+            searchTerm.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/) || searchTerm.includes('(')) {
+          await ctx.reply(`🔍 Searching for "${searchTerm}"...`);
+          const searchCmd = repo ? `/search ${repo} ${searchTerm}` : `/search ${searchTerm}`;
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: searchCmd } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "create file...", "make a new file...", "add file..."
+    const createPatterns = [
+      /(?:create|make|add)\s+(?:a\s+)?(?:new\s+)?file\s+([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of createPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const repo = match[1];
+        const filePath = match[2].trim();
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`📝 Creating new file...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/createfile ${repo} ${filePath}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "list files in...", "show directory...", "what files..."
+    const treePatterns = [
+      /(?:list|show|what)\s+(?:files?|directory|folder|structure)\s+(?:in\s+)?([a-z]+)(?:[\s\/]+(.+))?/i,
+    ];
+    
+    for (const pattern of treePatterns) {
+      const match = question.match(pattern);
+      if (match && match[1]) {
+        const repo = match[1];
+        const dir = match[2] || '';
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`🌳 Listing directory...`);
+          const treeCmd = dir ? `/tree ${repo} ${dir}` : `/tree ${repo}`;
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: treeCmd } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "run build...", "deploy...", "run tests..."
+    const runPatterns = [
+      /(?:run|trigger|start|execute)\s+(?:the\s+)?(\w+)\s+(?:on|in|for)\s+([a-z]+)/i,
+      /deploy\s+([a-z]+)/i,
+    ];
+    
+    for (const pattern of runPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1]) {
+        const workflow = match[1];
+        const repo = match[2] || match[1];
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`▶️ Triggering workflow...`);
+          const runCmd = `/run ${repo} ${workflow !== repo ? workflow : 'build'}`;
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: runCmd } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // ==========================================================================
+    // DEFAULT: Smart CTO conversation with action suggestions
+    // ==========================================================================
+    
     await ctx.reply('🧠 Thinking...');
     
     try {
@@ -4288,25 +4420,38 @@ Keep response concise for Telegram. Use emojis.`;
       
       const prompt = `${AIDEAZZ_CONTEXT}
 
-Elena is messaging you on Telegram. Keep your response concise and chat-friendly (not too long - this is mobile!). Use emojis. Be helpful but brief.
+You are CTO AIPA v5.0 - the CURSOR TWIN. You can now DO things, not just advise!
+
+YOUR NEW CAPABILITIES (use these when relevant):
+- /readfile <repo> <path> - Read any file from any repo
+- /tree <repo> [path] - List directory structure  
+- /search <term> - Search code across all repos
+- /editfile <repo> <path> - Edit files directly via GitHub API
+- /createfile <repo> <path> - Create new files
+- /commit <message> - Commit pending changes
+- /run <repo> <workflow> - Trigger GitHub Actions
+
+Elena is chatting with you. Respond naturally but:
+1. If she asks to see code → suggest: "I can show you that! Try: /readfile cto src/file.ts"
+2. If she asks to change something → suggest: "I can edit that directly! Try: /editfile cto src/file.ts"
+3. If she's looking for something → suggest: "Let me search! Try: /search functionName"
+4. Be concise - this is mobile chat!
+5. Use emojis 🚀
 
 Her message: "${question}"
 
 Previous context: ${JSON.stringify(context)}
 
-Respond naturally as her CTO co-founder would. If she asks something complex, give the key points first, then offer to elaborate.`;
+If her request sounds like something you can DO with your new capabilities, tell her the exact command. Otherwise, give strategic CTO advice.`;
 
-      // Use askAI with automatic Claude->Groq fallback
       const answer = await askAI(prompt, 1500);
       
-      // Save to memory
       await saveMemory('CTO', 'telegram_qa', { question }, answer, {
         platform: 'telegram',
         user_id: ctx.from?.id,
         timestamp: new Date().toISOString()
       });
       
-      // Split long messages (Telegram has 4096 char limit)
       if (answer.length > 4000) {
         const parts = answer.match(/.{1,4000}/g) || [];
         for (const part of parts) {
