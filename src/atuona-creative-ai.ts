@@ -2141,7 +2141,7 @@ async function generateVideo(
       // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
       const lumaBody = {
         model: 'ray-2',  // Required field - Luma's latest model
-        prompt: `9-second memory fragment. Not cinema — remembering. ${prompt.substring(0, 160)}. Micro-movement, breath-like. Grain, blur, imperfection. Slightly wrong, intimate. One commit to Paradise.js.`,
+        prompt: `9-second memory fragment. Not cinema — remembering. ${prompt.substring(0, 160)}. Micro-movement, breath-like. Grain, blur, imperfection. Slightly wrong, intimate. Silk catching light. Bare shoulder. Luxury decaying beautifully. One commit to Paradise.js.`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -2205,7 +2205,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `9-second fragment. Memory, not cinema. ${prompt.substring(0, 160)}. Micro-drift, breath between frames. Grain, blur, silence. Intimate, slightly wrong. Shard of AI film.`,
+            prompt: `9-second fragment. Memory, not cinema. ${prompt.substring(0, 160)}. Micro-drift, breath between frames. Grain, blur, silence. Intimate, slightly wrong. Hermès leather worn soft. 3AM elegance. Shard of AI film.`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -2248,7 +2248,7 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
         promptImage: imageUrl,
-        promptText: `9-12 second fragment. Memory texture, not cinema. ${prompt.substring(0, 130)}. Breath-like motion. Grain, blur, pause. Intimate wrongness.`,
+        promptText: `9-12 second fragment. Memory texture, not cinema. ${prompt.substring(0, 130)}. Breath-like motion. Grain, blur, pause. Intimate wrongness. Couture against skin. Sensual restraint.`,
         duration: 10,  // 10 seconds for immersive clips
         watermark: false,
         ratio: '1280:768'
@@ -6013,6 +6013,17 @@ Context: This is for NFT artwork for an underground poetry/prose book about find
 - Mix of tropical and urban elements
 - Hint of technology/digital aesthetic
 
+LUXURY FASHION LAYER — weave in naturally:
+- High fashion editorial sensibility (Vogue, Harper's Bazaar)
+- Hermès, Birkin, Chanel, Saint Laurent, Bottega Veneta, Valentino, The Row
+- Luxury fabrics: silk, cashmere, worn leather, vintage velvet
+- Sensuality without vulgarity: bare shoulder, untucked silk, 3AM elegance
+- Jewelry: Cartier, Bvlgari, Van Cleef — real, never new
+- Intimacy: tangled sheets, champagne, smudged eyeliner, borrowed shirt
+- Bodies: beautiful but real, athletic but weary
+- Fashion as armor, fashion as wound
+- Luxury decaying beautifully
+
 Return ONLY the optimized prompt, no explanation. Format for DALL-E 3.`;
 
       const imagePrompt = await createContent(promptOptimizer, 300, true);
@@ -6243,6 +6254,29 @@ VISUAL IDENTITY — WHAT TO EMBRACE:
 - Golden hour but fading, not glowing
 - Characters: Eastern European/Nordic, elegant but damaged
 - Tech-mysticism: blockchain as prayer, code as scar
+
+LUXURY FASHION & SENSUALITY — LAYER ONTO THE RAW:
+- Hermès Birkin casually dropped on volcanic sand
+- Galliano's theatrical drama meets island decay
+- Chanel tweed against weathered skin
+- Saint Laurent sharp shoulders, soft surrender
+- Bottega Veneta intrecciato leather catching last light
+- The Row quiet luxury: cashmere, silk, nothing screams
+- Alaïa second-skin silhouettes, power in restraint
+- Valentino red like a wound, like desire
+- Tom Ford sunglasses hiding everything
+- Loro Piana whispers of old money
+- Brunello Cucinelli: wealth that doesn't need to prove
+- Kiton tailoring on bodies that have lived
+- Sensuality: bare shoulder, untucked silk, half-dressed elegance
+- Intimacy: sheets tangled, champagne half-drunk, 3AM light
+- The morning after: smudged eyeliner, borrowed shirt, Cartier still on
+- Fashion as armor, fashion as wound
+- Luxury decaying beautifully: silk fraying, leather worn soft
+- Sex appeal without vulgarity: suggestion, not display
+- Bodies: athletic but weary, beautiful but real
+- Hair: wind-touched, bed-touched, imperfect
+- Jewelry: Cartier, Bvlgari, Van Cleef — always real, never new
 
 WHAT TO AVOID — KILL ON SIGHT:
 - Symmetry
