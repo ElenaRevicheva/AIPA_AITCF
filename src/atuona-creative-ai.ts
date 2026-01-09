@@ -2017,13 +2017,36 @@ async function createContent(prompt: string, maxTokens: number = 2000, isPoetry:
 // =============================================================================
 
 async function translateToEnglish(russianText: string, title: string): Promise<string> {
+  // 🧠 EMOTIONAL INTELLIGENCE: Detect the emotional tone of the original text
+  const detectedTone = detectEmotionalTone(russianText);
+  
+  // Select a translation mood that honors the original
+  const translationMood = selectCreativeMood({
+    timeOfDay: new Date().getHours(),
+    detectedTone,
+    recentMoods: emotionalState.recentMoods,
+    isProactive: false
+  });
+  
   // Get contextual knowledge based on text content (art references, fashion, etc.)
   const relevantKnowledge = getRelevantKnowledge(russianText + ' ' + title, undefined, 2);
+  
+  // 🧠 Get emotional guidelines for translation
+  const emotionalGuidelines = getEmotionalGuidelines(translationMood);
   
   const translatePrompt = `You are translating ATUONA — underground literature, not poetry for magazines.
 
 CONTEXTUAL KNOWLEDGE (use to enrich cultural references):
 ${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 TRANSLATION EMOTIONAL CALIBRATION:
+Detected tone in Russian: ${detectedTone}
+Translation mood: ${translationMood.toUpperCase()}
+${emotionalGuidelines}
+
+The English MUST preserve the ${translationMood} emotional quality of the original.
+═══════════════════════════════════════════════════════════════
 
 RUSSIAN ORIGINAL:
 ${russianText}
@@ -4592,25 +4615,67 @@ Name: "Dialogue"
 
   // /recap - Summary of recent chapters
   atuonaBot.command('recap', async (ctx) => {
-    await ctx.reply('📖 *Generating story recap...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select recap mood (usually contemplative or philosophical)
+    const timeOfDay = new Date().getHours();
+    const recapMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`📖 *Generating ${recapMood} story recap...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get knowledge relevant to current story state
+      const contextText = `${creativeSession.plotThreads.join(' ')} ${bookState.lastPageTitle} ${creativeSession.currentSetting}`;
+      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 2);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(recapMood);
+      
+      // 🔮 Get a fresh creative insight for the recap
+      const freshInsight = generateFreshCreativeDirection();
+      
       const recapPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-Write a comprehensive recap of the last 5 chapters/pages of the story. Include:
-1. Key events that happened
+KNOWLEDGE CONTEXT (reference real details when summarizing themes):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 RECAP MOOD: ${recapMood.toUpperCase()}
+${emotionalGuidelines}
+
+🔮 CONSIDER THIS ANGLE: "${freshInsight}"
+═══════════════════════════════════════════════════════════════
+
+Write a comprehensive recap of the last 5 chapters/pages of the story.
+
+The recap should be in a ${recapMood} tone - this affects HOW you tell the summary, not just WHAT you tell.
+
+Include:
+1. Key events that happened (with specific sensory details from knowledge)
 2. Character development moments for Kira and Ule
 3. Important revelations or discoveries
-4. Emotional beats and shifts
+4. Emotional beats and shifts (analyze through ${recapMood} lens)
 5. Foreshadowing or unresolved questions
+6. How the story connects to larger themes (Gauguin, paradise, exile - be specific!)
 
-Write as a summary for the author to refresh memory. In Russian, 300-400 words.`;
+When referencing art or places, use REAL details from the knowledge above.
+Write as a co-founder refreshing our shared creative memory. In Russian, 300-400 words.`;
 
       const recap = await createContent(recapPrompt, 2000, true);
       
-      await ctx.reply(`📖 *Story Recap*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        recapMood,
+        'story recap'
+      );
+      
+      await ctx.reply(`📖 *Story Recap (${recapMood})*
 
 ━━━━━━━━━━━━━━━━━━━━
 ${recap}
@@ -4841,27 +4906,64 @@ I'll turn it into a rich, detailed paragraph!`, { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply('🔍 *Expanding...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select expansion mood
+    const timeOfDay = new Date().getHours();
+    const expandMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: detectEmotionalTone(passage),
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🔍 *Expanding with ${expandMood} tone...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get relevant knowledge based on passage content
+      const relevantKnowledge = getRelevantKnowledge(passage, creativeSession.activeVoice, 2);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(expandMood);
+      
+      // 🔮 Maybe add surprise connection
+      const surpriseConnection = Math.random() < 0.3 ? generateSurpriseConnection() : '';
+      
       const expandPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
+
+CONTEXTUAL KNOWLEDGE (use specific details!):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 EXPANSION MOOD: ${expandMood.toUpperCase()}
+${emotionalGuidelines}
+
+${surpriseConnection ? `🌟 WEAVE IN: ${surpriseConnection}` : ''}
+═══════════════════════════════════════════════════════════════
 
 Expand this passage into a rich, detailed paragraph:
 "${passage}"
 
 Add:
-- Sensory details (sight, sound, smell, touch)
-- Internal thoughts or emotions
-- Physical environment description
+- Sensory details (sight, sound, smell, touch) - USE SPECIFIC KNOWLEDGE ABOVE
+- Internal thoughts or emotions matching ${expandMood} mood
+- Physical environment description with authentic details
 - Subtext and atmosphere
+
+CRITICAL: Include at least ONE specific detail from the knowledge (painting name, location, smell of Atuona, fashion detail, etc.)
 
 Keep the style raw and lyrical. 100-200 words. In Russian.`;
 
       const expanded = await createContent(expandPrompt, 1000, true);
       
-      await ctx.reply(`🔍 *Expanded*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        expandMood,
+        `expand: ${passage.substring(0, 30)}`
+      );
+      
+      await ctx.reply(`🔍 *Expanded (${expandMood})*
 
 ${expanded}
 
@@ -4992,36 +5094,76 @@ _Voice: ${creativeSession.activeVoice}_ 🎭`, { parse_mode: 'Markdown' });
   atuonaBot.command('ending', async (ctx) => {
     const context = ctx.message?.text?.replace('/ending', '').trim();
     
-    await ctx.reply('🌙 *Generating endings...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select ending mood
+    const timeOfDay = new Date().getHours();
+    const endingMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: context ? detectEmotionalTone(context) : emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🌙 *Generating ${endingMood} endings...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get relevant knowledge
+      const contextText = context || bookState.lastPageContent?.substring(0, 300) || creativeSession.currentSetting;
+      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 2);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(endingMood);
+      
+      // 🔮 Get fresh creative direction
+      const freshDirection = generateFreshCreativeDirection();
+      
+      // 🎨 Surprise connection for unexpected ending
+      const surpriseConnection = Math.random() < 0.4 ? generateSurpriseConnection() : '';
+      
       const endingPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
+CONTEXTUAL KNOWLEDGE (use for specific imagery):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 ENDINGS MOOD: ${endingMood.toUpperCase()}
+${emotionalGuidelines}
+
+FRESH DIRECTION: "${freshDirection}"
+${surpriseConnection ? `\n🌟 UNEXPECTED ELEMENT: ${surpriseConnection}` : ''}
+═══════════════════════════════════════════════════════════════
+
 Current chapter content (if any): ${context || bookState.lastPageContent?.substring(0, 500) || 'Not specified'}
 
-Generate 3 different chapter ending options:
+Generate 3 different chapter ending options. Each MUST include a SPECIFIC detail from the knowledge above (painting title, place name, sensory detail from Atuona, etc.):
 
-1. 🎭 CLIFFHANGER - Leave readers desperate for more
-2. 💔 EMOTIONAL - A moment of beauty or heartbreak  
-3. 🔮 MYSTERIOUS - A hint at what's coming
+1. 🎭 CLIFFHANGER - Leave readers desperate for more (use knowledge for vivid image)
+2. 💔 EMOTIONAL - A moment of beauty or heartbreak (${endingMood} tone)
+3. 🔮 MYSTERIOUS - A hint at what's coming (reference something from knowledge cryptically)
 
 Each ending should be 2-3 sentences. In Russian, poetic and powerful.
 
 Format:
 🎭 CLIFFHANGER:
-[ending]
+[ending with specific detail]
 
 💔 EMOTIONAL:
-[ending]
+[ending with specific detail]
 
 🔮 MYSTERIOUS:
-[ending]`;
+[ending with specific detail]`;
 
       const endings = await createContent(endingPrompt, 1000, true);
       
-      await ctx.reply(`🌙 *Chapter Ending Options*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        endingMood,
+        'ending suggestions'
+      );
+      
+      await ctx.reply(`🌙 *Chapter Ending Options (${endingMood})*
 
 ━━━━━━━━━━━━━━━━━━━━
 ${endings}
@@ -5041,38 +5183,96 @@ _Choose one or mix elements!_ ✨`, { parse_mode: 'Markdown' });
 
   // /whatif - Generate "what if" story suggestions
   atuonaBot.command('whatif', async (ctx) => {
-    await ctx.reply('🔮 *Exploring possibilities...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select imaginative mood
+    const timeOfDay = new Date().getHours();
+    const whatifMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🔮 *Exploring ${whatifMood} possibilities...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get knowledge for rich "what if" scenarios
+      const contextText = `${creativeSession.plotThreads.join(' ')} ${creativeSession.currentSetting} kira ule gauguin art`;
+      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 3);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(whatifMood);
+      
+      // 🔮 Get multiple fresh directions for variety
+      const freshDirection1 = generateFreshCreativeDirection();
+      const freshDirection2 = generateFreshCreativeDirection();
+      
+      // 🎨 Get surprise connections from unexpected domains
+      const surprise1 = generateSurpriseConnection();
+      const surprise2 = generateSurpriseConnection();
+      
+      // 🔮 Get avoidance list
+      const avoidanceList = getCreativeAvoidanceList();
+      
       const whatifPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
+RICH KNOWLEDGE BASE (use for specific, grounded "what ifs"):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 IMAGINATIVE MOOD: ${whatifMood.toUpperCase()}
+${emotionalGuidelines}
+
+🔮 FRESH DIRECTIONS TO DRAW FROM:
+- "${freshDirection1}"
+- "${freshDirection2}"
+
+🌟 UNEXPECTED DOMAINS TO CONNECT:
+- ${surprise1}
+- ${surprise2}
+
+${avoidanceList}
+═══════════════════════════════════════════════════════════════
+
 Open threads: ${creativeSession.plotThreads.join('; ')}
 
-Generate 3 "What if..." story suggestions that could create interesting developments:
+Generate 3 "What if..." story suggestions. Each MUST:
+1. Reference something SPECIFIC from the knowledge above (real painting, place, person, detail)
+2. Connect to an unexpected domain (astronomy, music, biology, mythology - as shown above)
+3. Be grounded in the book's reality but take an unexpected turn
+
+The mood is ${whatifMood.toUpperCase()} - let this color the suggestions!
 
 Each should:
 - Be unexpected but logical within the story
-- Connect to existing threads or characters
+- Connect to existing threads or characters  
+- Use REAL details from knowledge (not generic)
 - Open new dramatic possibilities
 - Be bold - don't play it safe!
 
 Format:
-1. 🌪️ "What if..." [suggestion]
-   → [What it would change]
+1. 🌪️ "What if..." [suggestion with specific detail]
+   → [What it would change + unexpected connection]
 
-2. 💫 "What if..." [suggestion]
-   → [What it would change]
+2. 💫 "What if..." [suggestion with specific detail]
+   → [What it would change + unexpected connection]
 
-3. 🔥 "What if..." [suggestion]
-   → [What it would change]
+3. 🔥 "What if..." [suggestion with specific detail]
+   → [What it would change + unexpected connection]
 
-In Russian, be provocative!`;
+In Russian, be provocative and SPECIFIC!`;
 
       const whatifs = await createContent(whatifPrompt, 1200, true);
       
-      await ctx.reply(`🔮 *What If...*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        whatifMood,
+        'whatif exploration'
+      );
+      
+      await ctx.reply(`🔮 *What If... (${whatifMood})*
 
 ━━━━━━━━━━━━━━━━━━━━
 ${whatifs}
