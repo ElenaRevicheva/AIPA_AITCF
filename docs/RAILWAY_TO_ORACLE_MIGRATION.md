@@ -1,407 +1,378 @@
 # 🚀 Railway → Oracle Cloud Migration Plan
 
-**Document Version:** 1.0  
+**Document Version:** 2.0  
 **Created:** January 8, 2026  
+**Updated:** January 9, 2026  
 **Author:** CTO AIPA (AI Technical Co-Founder)  
-**Status:** Active Migration Planning
+**Status:** Active Migration - Phase 2 Complete
 
 ---
 
-## Executive Summary
+## ⚠️ CRITICAL: Server Information
 
-This document outlines the strategic migration plan for moving AIdeazz's production services from Railway to Oracle Cloud Infrastructure (OCI) with startup credits. The migration prioritizes cost reduction while maintaining 24/7 uptime for all AI agents.
+### 🟢 NEW Oracle (PRODUCTION) - USE THIS ONE
+| Field | Value |
+|-------|-------|
+| **Public IP** | `170.9.242.90` |
+| **Private IP** | `10.0.0.35` |
+| **Hostname** | `instance-20260107-1316` |
+| **Account** | Startup Credits (aideazz) |
+| **SSH Key** | `ssh-key-2026-01-07private.key` |
 
-### Why Migrate?
-
-| Factor | Railway | Oracle Cloud |
-|--------|---------|--------------|
-| **Monthly Cost** | ~$50-100/month | **$0/month** (startup credits) |
-| **Database** | PostgreSQL (separate cost) | Oracle ATP included |
-| **Compute** | Shared containers | Dedicated VM (E5.Flex) |
-| **Uptime** | Good | Enterprise-grade |
-
----
-
-## Migration Priority Matrix
-
-### ✅ Already Migrated
-
-| Service | Status | Date | Notes |
-|---------|--------|------|-------|
-| **CTO AIPA** | ✅ Complete | Jan 7, 2026 | Running on Oracle VM + ATP database |
-| **Atuona Creative AI** | ✅ Complete | Jan 7, 2026 | Bundled with CTO AIPA |
-
-### 📋 Migration Queue (Priority Order)
-
-| # | Service | Complexity | Est. Time | Dependencies |
-|---|---------|------------|-----------|--------------|
-| **1** | EspaLuz_Influencer | ⭐ Easy | 15 min | Telegram, Make.com |
-| **2** | EspaLuzFamilybot | ⭐⭐ Medium | 30 min | Telegram, OpenAI, Claude, FFmpeg |
-| **3** | dragontrade-agent | ⭐⭐⭐ Hard | 1 hour | Twitter API, PostgreSQL, CCXT |
-| **4** | EspaLuzWhatsApp | ⭐⭐⭐⭐ Complex | 2-3 hours | WhatsApp/Twilio, PostgreSQL |
-| **5** | VibeJobHunter + CMO | ⭐⭐⭐⭐⭐ Most Complex | 3-4 hours | Playwright, SQLite, Make.com |
+### 🔴 OLD Oracle (BACKUP ONLY) - DO NOT DEPLOY HERE
+| Field | Value |
+|-------|-------|
+| **Public IP** | `163.192.99.45` |
+| **Private IP** | `10.0.0.244` |
+| **Hostname** | `cto-aipa-prod` |
+| **Account** | Free Tier (old account) |
+| **Status** | Backup only, nothing running |
 
 ---
 
-## Detailed Analysis Per Service
+## 🔑 SSH Connection Commands
 
-### 1. EspaLuz_Influencer 🏆 **START HERE**
+### Connect via Oracle Cloud Shell
+\`\`\`bash
+# Upload your SSH key to Cloud Shell first, then:
+ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
+\`\`\`
 
-**Repository:** [github.com/ElenaRevicheva/EspaLuz_Influencer](https://github.com/ElenaRevicheva/EspaLuz_Influencer)
+### Cursor SSH Config (Add to ~/.ssh/config)
+\`\`\`
+Host oracle-new
+    HostName 170.9.242.90
+    User ubuntu
+    IdentityFile C:\Users\YourName\.ssh\ssh-key-2026-01-07private.key
 
-**Why Easiest:**
-- ✅ Only **678 lines** of Python (single `main.py`)
-- ✅ **No database** required
-- ✅ **4 simple dependencies**: `pyTelegramBotAPI`, `schedule`, `pytz`, `requests`
-- ✅ Already familiar pattern (Telegram bot)
+# OLD - DO NOT USE FOR DEPLOYMENT
+Host oracle-old-backup
+    HostName 163.192.99.45
+    User ubuntu
+    IdentityFile C:\Users\YourName\.ssh\your-old-key.key
+\`\`\`
 
-**What It Does:**
-- Daily automated social media posts to @EspaLuz Telegram channel
-- Scheduled posting at 4:55 PM Panama time (21:55 UTC)
-- Sends content to Make.com webhook for LinkedIn/Instagram distribution
-- Emotional AI content templates for multiple audience segments
+### Quick Connect from Windows PowerShell
+\`\`\`powershell
+ssh -i \$HOME\.ssh\ssh-key-2026-01-07private.key ubuntu@170.9.242.90
+\`\`\`
 
-**Architecture:**
-```
-EspaLuz_Influencer
-├── main.py              # Single entry point (678 lines)
-├── requirements.txt     # 4 dependencies
-├── image1-5.jpg        # Marketing images
-└── espaluz_qr_4x5.jpg  # QR code image
-```
+---
 
-**Environment Variables Needed:**
-```bash
-TELEGRAM_BOT_TOKEN=<influencer_bot_token>
-```
+## 🔄 The Golden Workflow: Local → GitHub → Oracle
 
-**Migration Commands:**
-```bash
-cd /home/ubuntu
+**ALWAYS follow this workflow to keep everything in sync:**
+
+\`\`\`
+┌─────────────────┐     git push     ┌─────────────────┐     git pull     ┌─────────────────┐
+│  LOCAL CURSOR   │ ───────────────► │     GITHUB      │ ◄─────────────── │  ORACLE SERVER  │
+│  D:\aideazz\*   │                  │   Main Branch   │                  │  ~/ProjectName  │
+└─────────────────┘                  └─────────────────┘                  └─────────────────┘
+        │                                                                          │
+        │                         Your Single Source of Truth                      │
+        └──────────────────────────────────────────────────────────────────────────┘
+\`\`\`
+
+### Step-by-Step Workflow
+
+#### 1️⃣ Make Changes Locally (Cursor)
+\`\`\`powershell
+# Your local projects are at:
+D:\aideazz\EspaLuz_Influencer
+D:\aideazz\AIPA_AITCF
+D:\aideazz\EspaLuzFamilybot
+# etc.
+
+# Edit code in Cursor, then:
+cd D:\aideazz\ProjectName
+git add .
+git commit -m "Your change description"
+git push
+\`\`\`
+
+#### 2️⃣ Deploy to Oracle
+\`\`\`bash
+# SSH to NEW Oracle
+ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
+
+# Pull and restart the service
+cd ~/ProjectName
+git pull origin main
+
+# Restart the service (depends on which one)
+sudo systemctl restart servicename
+# OR
+pm2 restart processname
+\`\`\`
+
+#### 3️⃣ Verify Deployment
+\`\`\`bash
+# Check service status
+sudo systemctl status servicename
+# OR
+pm2 logs processname --lines 20
+\`\`\`
+
+---
+
+## 📊 Migration Status
+
+### ✅ Phase 1 & 2 Complete (January 7-9, 2026)
+
+| Service | Status | Server | Process Manager | Port |
+|---------|--------|--------|-----------------|------|
+| **CTO AIPA** | ✅ Running | 170.9.242.90 | PM2 | - |
+| **Atuona Creative AI** | ✅ Running | 170.9.242.90 | PM2 (bundled) | - |
+| **EspaLuz_Influencer** | ✅ Running | 170.9.242.90 | systemd | - |
+
+### 📋 Migration Queue (Remaining)
+
+| # | Service | Complexity | Est. Time | Status |
+|---|---------|------------|-----------|--------|
+| **1** | EspaLuzFamilybot | ⭐⭐ Medium | 30 min | 🟡 Next |
+| **2** | dragontrade-agent | ⭐⭐⭐ Hard | 1 hour | ⏳ Pending |
+| **3** | EspaLuzWhatsApp | ⭐⭐⭐⭐ Complex | 2-3 hours | ⏳ Pending |
+| **4** | VibeJobHunter + CMO | ⭐⭐⭐⭐⭐ Most Complex | 3-4 hours | ⏳ Pending |
+
+---
+
+## 🖥️ Oracle Server Current State
+
+### Check Running Services
+\`\`\`bash
+# SSH to NEW Oracle first!
+ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
+
+# View PM2 processes
+pm2 list
+
+# View systemd services
+sudo systemctl status espaluz-influencer
+
+# View all custom services
+systemctl list-units --type=service --state=running | grep -E "(cto|espa|bot)"
+\`\`\`
+
+### Directory Structure on NEW Oracle
+\`\`\`
+/home/ubuntu/
+├── cto-aipa/                    # CTO AIPA + Atuona (PM2)
+│   ├── dist/
+│   ├── src/
+│   ├── wallet/                  # Oracle ATP credentials
+│   ├── .env
+│   └── ecosystem.config.js
+│
+├── EspaLuz_Influencer/          # Marketing Co-Founder v3.0 (systemd)
+│   ├── main.py
+│   ├── venv/
+│   ├── .env
+│   └── requirements.txt
+│
+└── [future projects]/           # To be migrated
+\`\`\`
+
+---
+
+## 🔧 Service Management Commands
+
+### CTO AIPA (PM2)
+\`\`\`bash
+pm2 status cto-aipa          # Check status
+pm2 logs cto-aipa            # View logs
+pm2 restart cto-aipa         # Restart
+pm2 stop cto-aipa            # Stop
+\`\`\`
+
+### EspaLuz Influencer (systemd)
+\`\`\`bash
+sudo systemctl status espaluz-influencer    # Check status
+sudo journalctl -u espaluz-influencer -f    # View live logs
+sudo systemctl restart espaluz-influencer   # Restart
+sudo systemctl stop espaluz-influencer      # Stop
+\`\`\`
+
+---
+
+## 📁 Local Project Setup (Windows)
+
+### Initial Clone (One-time)
+\`\`\`powershell
+# Create your workspace
+mkdir D:\aideazz
+cd D:\aideazz
+
+# Clone all your repositories
 git clone https://github.com/ElenaRevicheva/EspaLuz_Influencer.git
-cd EspaLuz_Influencer
-pip3 install -r requirements.txt
-# Create .env with TELEGRAM_BOT_TOKEN
-pm2 start main.py --name espaluz-influencer --interpreter python3
-pm2 save
-```
+git clone https://github.com/ElenaRevicheva/AIPA_AITCF.git
+git clone https://github.com/ElenaRevicheva/EspaLuzFamilybot.git
+git clone https://github.com/ElenaRevicheva/dragontrade-agent.git
+git clone https://github.com/ElenaRevicheva/EspaLuzWhatsApp.git
+git clone https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF.git
+\`\`\`
+
+### Open in Cursor
+\`\`\`powershell
+cursor D:\aideazz\EspaLuz_Influencer
+# OR open the whole workspace
+cursor D:\aideazz
+\`\`\`
 
 ---
 
-### 2. EspaLuzFamilybot
+## 🚀 Migration Template for New Services
 
-**Repository:** [github.com/ElenaRevicheva/EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot)
+Use this template when migrating the next service:
 
-**Complexity:** Medium
-
-**What It Does:**
-- Telegram AI tutor bot (`@EspaLuzFamily_bot`)
-- Voice message processing with transcription
-- OCR for image text extraction
-- TTS (Text-to-Speech) responses
-- Video generation for motivational content
-
-**Architecture:**
-```
-EspaLuzFamilybot
-├── main.py              # Main bot logic (2,912 lines)
-├── requirements.txt     # ~7 dependencies
-├── poll_subscriptions.py
-├── webhook_cleaner.py
-└── bot-killer.py       # Webhook conflict resolver
-```
-
-**Dependencies:**
-- `openai` - GPT API for responses
-- `telebot` - Telegram Bot API
-- `gtts` - Google Text-to-Speech
-- `pytesseract` - OCR engine
-- `pillow` - Image processing
-
-**System Requirements:**
-```bash
-# Install FFmpeg for video/audio processing
-sudo apt install ffmpeg
-
-# Install Tesseract for OCR
-sudo apt install tesseract-ocr
-```
-
-**Environment Variables:**
-```bash
-TELEGRAM_BOT_TOKEN=<familybot_token>
-CLAUDE_API_KEY=<anthropic_key>
-OPENAI_API_KEY=<openai_key>
-```
-
----
-
-### 3. dragontrade-agent (ALGOM Alpha)
-
-**Repository:** [github.com/ElenaRevicheva/dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent)
-
-**Complexity:** Hard
-
-**What It Does:**
-- Autonomous X/Twitter trading education bot (@reviceva)
-- Paper trading simulation with real market data
-- Crypto education content generation
-- Market analysis via CoinGecko API
-- Scam detection alerts
-
-**Architecture:**
-```
-dragontrade-agent
-├── index.js                    # Main entry (ElizaOS framework)
-├── package.json               # Node.js dependencies
-├── educational-mcp-simple.js  # MCP educational content
-├── coingecko-mcp-client.js   # Market data
-├── mcp-trading-simulator.js  # Paper trading
-├── mcp-scam-detection.js     # Scam alerts
-└── post-logger.js            # Tweet tracking
-```
-
-**Key Dependencies:**
-- `@elizaos/core` - AI agent framework
-- `@elizaos/plugin-twitter` - Twitter integration
-- `twitter-api-v2` - Twitter API client
-- `ccxt` - Crypto exchange APIs
-- `pg` - PostgreSQL client
-
-**Database Required:**
-- PostgreSQL for trade history and user data
-- Can use Oracle ATP or external PostgreSQL
-
-**Environment Variables:**
-```bash
-TWITTER_API_KEY=<key>
-TWITTER_API_SECRET=<secret>
-TWITTER_ACCESS_TOKEN=<token>
-TWITTER_ACCESS_SECRET=<secret>
-TWITTER_BEARER_TOKEN=<bearer>
-DATABASE_URL=<postgres_connection_string>
-GROQ_API_KEY=<groq_key>
-```
-
----
-
-### 4. EspaLuzWhatsApp
-
-**Repository:** [github.com/ElenaRevicheva/EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp)
-
-**Complexity:** High
-
-**What It Does:**
-- WhatsApp AI tutor (`wa.me/50766623757`)
-- Multi-turn conversation management
-- Subscription system with PayPal integration
-- Voice message processing
-- Emotional intelligence engine (82,000+ lines!)
-
-**Architecture:**
-```
-EspaLuzWhatsApp
-├── app.py                      # Flask web server
-├── main.py                     # Telegram fallback
-├── emotional_intelligence.py   # EI engine (82K lines)
-├── conversation_mode.py        # Multi-turn conversations
-├── user_trial_system.py       # Free trial logic
-├── admin_routes.py            # Admin dashboard
-├── Dockerfile                 # Container config
-└── requirements.txt           # 13 dependencies
-```
-
-**Key Dependencies:**
-- `flask` - Web framework
-- `anthropic` - Claude API
-- `openai` - GPT API
-- `psycopg2-binary` - PostgreSQL
-- `gunicorn` - Production server
-
-**Database Required:**
-- PostgreSQL for user data, subscriptions, conversation history
-
-**Environment Variables:**
-```bash
-TELEGRAM_BOT_TOKEN=<token>
-CLAUDE_API_KEY=<key>
-OPENAI_API_KEY=<key>
-DATABASE_URL=<postgres_url>
-PAYPAL_CLIENT_ID=<id>
-PAYPAL_CLIENT_SECRET=<secret>
-```
-
----
-
-### 5. VibeJobHunter + CMO AIPA
-
-**Repository:** [github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF)
-
-**Complexity:** Most Complex
-
-**What It Does:**
-- Autonomous job hunting engine (hourly cycles)
-- LinkedIn CMO v5.2 (daily AI-generated posts)
-- ATS form submission via Playwright browser automation
-- Email verification via IMAP
-- CTO-CMO integration bridge
-
-**Architecture:**
-```
-VibeJobHunterAIPA_AIMCF
-├── src/
-│   ├── autonomous/
-│   │   ├── orchestrator.py    # Main brain
-│   │   ├── ats_submitter.py   # Greenhouse automation
-│   │   └── job_monitor.py     # Job scraping
-│   ├── notifications/
-│   │   ├── linkedin_cmo_v4.py # CMO AI
-│   │   └── telegram_notifier.py
-│   └── database/
-│       └── database_models.py # SQLAlchemy
-├── web_server.py              # FastAPI dashboard
-├── railway-entrypoint.sh      # Startup script
-├── Dockerfile                 # Container config
-└── requirements.txt           # 35+ dependencies
-```
-
-**Special Requirements:**
-- **Playwright + Chromium** for browser automation
-- SQLite database (local file)
-- Make.com webhook for LinkedIn posting
-
-**System Requirements:**
-```bash
-# Playwright browser dependencies
-sudo apt install libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 \
-  libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
-  libxfixes3 libxrandr2 libgbm1 libasound2 libpango-1.0-0 libcairo2
-
-# Install Playwright
-pip install playwright
-playwright install chromium
-```
-
----
-
-## Oracle Cloud Infrastructure Setup
-
-### Current Configuration
-
-**VM Instance:**
-- Shape: VM.Standard.E5.Flex
-- OCPUs: 1 (burstable)
-- Memory: 6 GB
-- OS: Ubuntu 24.04 LTS
-- Public IP: Assigned
-
-**Database:**
-- Oracle Autonomous Database 26ai
-- mTLS encryption
-- Wallet-based authentication
-
-### Process Manager (PM2)
-
-All services managed via PM2:
-```bash
-pm2 list                    # View all services
-pm2 logs <service>          # View logs
-pm2 restart <service>       # Restart service
-pm2 monit                   # Real-time monitoring
-```
-
----
-
-## Migration Checklist Template
-
-Use this checklist for each service migration:
-
-```markdown
-## [Service Name] Migration Checklist
-
-### Pre-Migration
-- [ ] Document current Railway environment variables
-- [ ] Export any database data if applicable
-- [ ] Test service locally first
-- [ ] Verify API keys are still valid
+### Pre-Migration Checklist
+- [ ] Get environment variables from Railway dashboard
+- [ ] Export database if applicable
+- [ ] Verify local code matches GitHub main branch
+- [ ] Document any Railway-specific configurations
 
 ### Migration Steps
-- [ ] Clone repository to Oracle VM
-- [ ] Install system dependencies
-- [ ] Install Python/Node.js dependencies
-- [ ] Create .env file with credentials
-- [ ] Test run manually first
-- [ ] Configure PM2 process
-- [ ] Verify service is responding
+\`\`\`bash
+# 1. SSH to NEW Oracle (170.9.242.90)
+ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
+
+# 2. Clone repository
+cd ~
+git clone https://github.com/ElenaRevicheva/SERVICE_NAME.git
+cd SERVICE_NAME
+
+# 3. Set up Python environment (if Python)
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 4. Create .env file
+nano .env
+# Add all environment variables
+
+# 5. Test manually first
+python main.py  # or npm start, etc.
+
+# 6. Create systemd service (for Python bots)
+sudo nano /etc/systemd/system/servicename.service
+
+# 7. Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable servicename
+sudo systemctl start servicename
+sudo systemctl status servicename
+
+# 8. Verify working
+sudo journalctl -u servicename -f
+\`\`\`
 
 ### Post-Migration
 - [ ] Monitor logs for 24 hours
-- [ ] Verify scheduled tasks work
-- [ ] Update DNS/webhooks if needed
-- [ ] Stop Railway service
-- [ ] Document any issues encountered
-```
+- [ ] Verify scheduled tasks execute correctly
+- [ ] Test all bot commands
+- [ ] Stop Railway deployment
+- [ ] Update this document
 
 ---
 
-## Cost Savings Projection
+## ⚙️ Systemd Service Template
 
-| Service | Railway Cost | Oracle Cost | Monthly Savings |
-|---------|--------------|-------------|-----------------|
-| CTO AIPA | ~$20/month | $0 | $20 |
-| EspaLuz Influencer | ~$7/month | $0 | $7 |
-| EspaLuz Familybot | ~$10/month | $0 | $10 |
-| ALGOM Alpha | ~$15/month | $0 | $15 |
-| EspaLuz WhatsApp | ~$25/month | $0 | $25 |
-| VibeJobHunter + CMO | ~$20/month | $0 | $20 |
-| **TOTAL** | **~$97/month** | **$0** | **$97/month** |
+\`\`\`ini
+[Unit]
+Description=Your Service Description
+After=network.target
 
-**Annual Savings: ~$1,164**
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/SERVICE_NAME
+ExecStart=/home/ubuntu/SERVICE_NAME/venv/bin/python -u main.py
+Restart=always
+RestartSec=10
+Environment=PATH=/home/ubuntu/SERVICE_NAME/venv/bin:/usr/bin
 
----
-
-## Risk Mitigation
-
-### Rollback Strategy
-1. Keep Railway services running during migration testing
-2. Only stop Railway after 48 hours of stable Oracle operation
-3. Maintain Railway environment variables documentation for quick restore
-
-### Monitoring
-- PM2 provides automatic restart on crash
-- Telegram notifications for critical errors
-- Daily health checks via `/health` endpoints
-
-### Known Issues & Solutions
-
-| Issue | Solution |
-|-------|----------|
-| Telegram webhook conflicts | Use webhook killer threads |
-| Oracle ATP connection | Requires mTLS wallet + TNS_ADMIN |
-| Python path issues | Use `--interpreter python3` in PM2 |
-| Port conflicts | Each service on unique port |
+[Install]
+WantedBy=multi-user.target
+\`\`\`
 
 ---
 
-## Timeline
+## 💰 Cost Savings
 
-| Week | Tasks |
-|------|-------|
-| **Week 1** | ✅ CTO AIPA migrated |
-| **Week 2** | EspaLuz Influencer + Familybot |
-| **Week 3** | ALGOM Alpha (database setup) |
-| **Week 4** | EspaLuz WhatsApp |
-| **Week 5** | VibeJobHunter + CMO (most complex) |
-| **Week 6** | Testing, optimization, Railway shutdown |
+| Service | Railway Cost | Oracle Cost | Status |
+|---------|--------------|-------------|--------|
+| CTO AIPA | ~\$20/month | \$0 | ✅ Migrated |
+| EspaLuz Influencer | ~\$7/month | \$0 | ✅ Migrated |
+| EspaLuz Familybot | ~\$10/month | \$0 | 🟡 Next |
+| ALGOM Alpha | ~\$15/month | \$0 | ⏳ Pending |
+| EspaLuz WhatsApp | ~\$25/month | \$0 | ⏳ Pending |
+| VibeJobHunter + CMO | ~\$20/month | \$0 | ⏳ Pending |
+| **TOTAL** | **~\$97/month** | **\$0** | **\$27 saved so far** |
 
----
-
-## Support & Documentation
-
-- **CTO AIPA Repository:** [github.com/ElenaRevicheva/AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)
-- **Oracle Cloud Console:** [cloud.oracle.com](https://cloud.oracle.com)
-- **PM2 Documentation:** [pm2.keymetrics.io](https://pm2.keymetrics.io)
+**Projected Annual Savings: ~\$1,164**
 
 ---
 
-*This document is maintained by CTO AIPA and updated with each migration milestone.*
+## 🆘 Troubleshooting
+
+### "Which server am I on?"
+\`\`\`bash
+hostname && ip addr show | grep "inet " | grep -v 127.0.0.1
+# NEW Oracle: instance-20260107-1316, 10.0.0.35
+# OLD Oracle: cto-aipa-prod, 10.0.0.244
+\`\`\`
+
+### "Telegram bot conflict (409 error)"
+\`\`\`bash
+# Stop the bot on Railway FIRST
+# Then restart on Oracle
+sudo systemctl restart servicename
+\`\`\`
+
+### "Service won't start"
+\`\`\`bash
+# Check logs
+sudo journalctl -u servicename -n 50
+
+# Check if port is in use
+sudo lsof -i :PORT
+
+# Check Python path
+which python3
+\`\`\`
+
+### "Changes not reflecting"
+\`\`\`bash
+# Did you push to GitHub?
+git status
+git push
+
+# Did you pull on Oracle?
+cd ~/ProjectName
+git pull origin main
+sudo systemctl restart servicename
+\`\`\`
+
+---
+
+## 📞 Quick Reference Card
+
+\`\`\`
+┌──────────────────────────────────────────────────────────────┐
+│                    ORACLE MIGRATION QUICK REF                 │
+├──────────────────────────────────────────────────────────────┤
+│ NEW ORACLE (USE THIS): 170.9.242.90                          │
+│ OLD ORACLE (BACKUP):   163.192.99.45 ❌ DON'T DEPLOY         │
+├──────────────────────────────────────────────────────────────┤
+│ SSH:  ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90│
+├──────────────────────────────────────────────────────────────┤
+│ WORKFLOW: Edit Local → git push → SSH → git pull → restart   │
+├──────────────────────────────────────────────────────────────┤
+│ PM2:     pm2 list | pm2 logs NAME | pm2 restart NAME         │
+│ SYSTEMD: systemctl status|restart|stop NAME                  │
+└──────────────────────────────────────────────────────────────┘
+\`\`\`
+
+---
+
+*Last updated: January 9, 2026 by CTO AIPA*
+*Document location: [AIPA_AITCF/docs](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/docs/docs/RAILWAY_TO_ORACLE_MIGRATION.md)*
