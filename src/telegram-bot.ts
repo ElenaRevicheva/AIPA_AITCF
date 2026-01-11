@@ -827,16 +827,28 @@ Just tell me which product and what you want. Use your own words!
     const parts = input.split(' ');
     const firstWord = parts[0] || '';
     
-    // Check if first word is a repo name
+    // Check if first word is a repo name (use resolveRepoName for aliases!)
     let repoName: string;
     let task: string;
     
-    if (AIDEAZZ_REPOS.includes(firstWord)) {
-      repoName = firstWord;
+    const resolvedRepo = resolveRepoName(firstWord);
+    if (resolvedRepo) {
+      repoName = resolvedRepo;
       task = parts.slice(1).join(' ');
     } else {
-      // No repo specified, try to guess from task or use default
-      repoName = 'AIPA_AITCF';
+      // No repo specified - try to guess from task keywords
+      const taskLower = input.toLowerCase();
+      if (taskLower.includes('family') || taskLower.includes('familybot') || taskLower.includes('telegram tutor')) {
+        repoName = 'EspaLuzFamilybot';
+      } else if (taskLower.includes('espaluz') || taskLower.includes('spanish') || taskLower.includes('whatsapp')) {
+        repoName = 'EspaLuzWhatsApp';
+      } else if (taskLower.includes('atuona') || taskLower.includes('poem') || taskLower.includes('creative')) {
+        repoName = 'AIPA_AITCF'; // atuona-creative-ai is in this repo
+      } else if (taskLower.includes('cmo') || taskLower.includes('job') || taskLower.includes('marketing')) {
+        repoName = 'VibeJobHunterAIPA_AIMCF';
+      } else {
+        repoName = 'AIPA_AITCF';
+      }
       task = input;
     }
     
@@ -851,6 +863,8 @@ Just tell me which product and what you want. Use your own words!
       // Fetch repo structure for context
       let fileList = '';
       let relevantFiles: string[] = [];
+      let projectLang: 'typescript' | 'python' | 'javascript' = 'typescript';
+      let rootContents: any[] = [];
       
       try {
         const { data: contents } = await octokit.repos.getContent({
@@ -860,36 +874,65 @@ Just tell me which product and what you want. Use your own words!
         });
         
         if (Array.isArray(contents)) {
+          rootContents = contents;
           fileList = contents.map((f: any) => `${f.type === 'dir' ? '📁' : '📄'} ${f.name}`).join('\n');
           relevantFiles = contents.filter((f: any) => 
             f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
           ).map((f: any) => f.name);
+          
+          // Detect project language from root files
+          const hasPythonFiles = contents.some((f: any) => f.name.endsWith('.py'));
+          const hasPackageJson = contents.some((f: any) => f.name === 'package.json');
+          const hasRequirementsTxt = contents.some((f: any) => f.name === 'requirements.txt');
+          
+          if (hasPythonFiles || hasRequirementsTxt) {
+            projectLang = 'python';
+            // For Python, relevant files are .py files in root
+            relevantFiles = contents.filter((f: any) => 
+              f.type === 'file' && f.name.endsWith('.py')
+            ).map((f: any) => f.name);
+          } else if (hasPackageJson) {
+            const hasTsFiles = contents.some((f: any) => f.name.endsWith('.ts') || f.name.endsWith('.tsx'));
+            projectLang = hasTsFiles ? 'typescript' : 'javascript';
+          }
         }
       } catch {}
       
-      // Try to get src folder
+      // Try to get src folder (for TS/JS projects only)
       let srcFiles: string[] = [];
-      try {
-        const { data: srcContents } = await octokit.repos.getContent({
-          owner: 'ElenaRevicheva',
-          repo: repoName,
-          path: 'src'
-        });
-        if (Array.isArray(srcContents)) {
-          srcFiles = srcContents.filter((f: any) => 
-            f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
-          ).map((f: any) => `src/${f.name}`);
-          fileList += '\n📁 src/\n' + srcContents.map((f: any) => `   📄 ${f.name}`).join('\n');
-        }
-      } catch {}
+      if (projectLang !== 'python') {
+        try {
+          const { data: srcContents } = await octokit.repos.getContent({
+            owner: 'ElenaRevicheva',
+            repo: repoName,
+            path: 'src'
+          });
+          if (Array.isArray(srcContents)) {
+            srcFiles = srcContents.filter((f: any) => 
+              f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
+            ).map((f: any) => `src/${f.name}`);
+            fileList += '\n📁 src/\n' + srcContents.map((f: any) => `   📄 ${f.name}`).join('\n');
+          }
+        } catch {}
+      }
       
       const allCodeFiles = [...relevantFiles, ...srcFiles];
       
-      // Fetch a key file for context (like the main bot file or index)
+      // Fetch a key file for context (language-aware!)
       let sampleCode = '';
-      const mainFile = srcFiles.find(f => f.includes('telegram-bot') || f.includes('index')) 
-                    || relevantFiles.find(f => f.includes('index'))
-                    || allCodeFiles[0];
+      let mainFile: string | undefined;
+      
+      if (projectLang === 'python') {
+        // For Python, main.py or bot.py or first .py file
+        mainFile = relevantFiles.find(f => f === 'main.py') 
+                || relevantFiles.find(f => f.includes('bot'))
+                || relevantFiles[0];
+      } else {
+        // For TS/JS, look for telegram-bot, index, or first code file
+        mainFile = srcFiles.find(f => f.includes('telegram-bot') || f.includes('index')) 
+                || relevantFiles.find(f => f.includes('index'))
+                || allCodeFiles[0];
+      }
       
       if (mainFile) {
         try {
@@ -906,8 +949,28 @@ Just tell me which product and what you want. Use your own words!
         } catch {}
       }
       
+      // Generate language-specific instructions
+      const langConfig = projectLang === 'python' ? {
+        codeBlock: 'python',
+        buildCmd: 'python main.py',
+        testCmd: 'python -c "import main; print(\'OK\')"',
+        framework: 'telebot/pyTelegramBotAPI for Telegram, Flask for web',
+        mainFile: 'main.py',
+        note: 'This is a PYTHON project using telebot. Use @bot.message_handler() for commands, NOT bot.command().'
+      } : {
+        codeBlock: 'typescript',
+        buildCmd: 'npm run build',
+        testCmd: 'npm start',
+        framework: 'grammy for Telegram bots',
+        mainFile: 'src/telegram-bot.ts',
+        note: 'This is a TypeScript project using grammy. Use bot.command() for commands.'
+      };
+      
       // Generate Cursor instructions using AI
       const cursorPrompt = `You are helping a vibe coder use LOCAL Cursor (without paid agents) to edit their code.
+
+PROJECT LANGUAGE: **${projectLang.toUpperCase()}**
+${langConfig.note}
 
 TASK: "${task}"
 REPO: ${repoName}
@@ -917,7 +980,7 @@ ${fileList}
 
 CODE FILES: ${allCodeFiles.join(', ')}
 
-${sampleCode ? `SAMPLE FROM ${mainFile}:\n\`\`\`\n${sampleCode.substring(0, 2000)}\n\`\`\`` : ''}
+${sampleCode ? `SAMPLE FROM ${mainFile}:\n\`\`\`${langConfig.codeBlock}\n${sampleCode.substring(0, 2000)}\n\`\`\`` : ''}
 
 Generate STEP-BY-STEP instructions for LOCAL Cursor. Format EXACTLY like this:
 
@@ -928,11 +991,11 @@ cursor .
 \`\`\`
 
 📄 *STEP 2: Open file*
-Open: \`<filename>\`
+Open: \`${langConfig.mainFile}\` (or the relevant file)
 
 ✂️ *STEP 3: Select code*
 Find and select this section:
-\`\`\`
+\`\`\`${langConfig.codeBlock}
 <code to select>
 \`\`\`
 
@@ -944,20 +1007,23 @@ Select the code above, press Cmd+K, and type:
 
 📋 *STEP 5: Or copy this code*
 If Cmd+K doesn't work well, copy this and paste:
-\`\`\`typescript
-<complete code to add/replace>
+\`\`\`${langConfig.codeBlock}
+<complete ${projectLang} code to add/replace>
 \`\`\`
 
 💾 *STEP 6: Save and test*
 - Save: Cmd+S
-- Build: \`npm run build\`
-- Test: <how to test>
+- Run: \`${langConfig.buildCmd}\`
+- Test: ${langConfig.testCmd}
 
-IMPORTANT:
-- Give SPECIFIC file names from the repo
-- Give COMPLETE, working code (not pseudocode)
+CRITICAL RULES FOR ${projectLang.toUpperCase()} PROJECT:
+- Give SPECIFIC file names from the repo (${allCodeFiles.slice(0, 3).join(', ')})
+- Give COMPLETE, working ${projectLang} code (not pseudocode)
 - Explain WHERE in the file to add/edit
-- Use simple Cmd+K prompts (Cursor free tier works with these)
+- Use the correct framework: ${langConfig.framework}
+${projectLang === 'python' ? `- Use @bot.message_handler(commands=['name']) syntax
+- Import with: from telebot import types
+- The bot already uses gTTS for text-to-speech` : `- Use bot.command('name', async (ctx) => {...}) syntax`}
 - If adding new code, say "add after line X" or "add at the end of the file"`;
 
       const instructions = await askAI(cursorPrompt, 3500);
@@ -1018,18 +1084,27 @@ Tell me which product and what big feature you want to add.
       return;
     }
     
-    // Parse repo and feature
+    // Parse repo and feature (use resolveRepoName for aliases!)
     const parts = input.split(' ');
     const firstWord = parts[0] || '';
     
     let repoName: string;
     let feature: string;
     
-    if (AIDEAZZ_REPOS.includes(firstWord)) {
-      repoName = firstWord;
+    const resolvedRepo = resolveRepoName(firstWord);
+    if (resolvedRepo) {
+      repoName = resolvedRepo;
       feature = parts.slice(1).join(' ');
     } else {
-      repoName = 'AIPA_AITCF';
+      // Smart detection from keywords
+      const inputLower = input.toLowerCase();
+      if (inputLower.includes('family') || inputLower.includes('familybot')) {
+        repoName = 'EspaLuzFamilybot';
+      } else if (inputLower.includes('espaluz') || inputLower.includes('spanish') || inputLower.includes('whatsapp')) {
+        repoName = 'EspaLuzWhatsApp';
+      } else {
+        repoName = 'AIPA_AITCF';
+      }
       feature = input;
     }
     
