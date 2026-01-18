@@ -1,10 +1,10 @@
 # 🚀 Railway → Oracle Cloud Migration Plan
 
-**Document Version:** 2.0  
+**Document Version:** 3.0  
 **Created:** January 8, 2026  
-**Updated:** January 9, 2026  
+**Updated:** January 18, 2026  
 **Author:** CTO AIPA (AI Technical Co-Founder)  
-**Status:** Active Migration - Phase 2 Complete
+**Status:** Active Migration - Phase 4 Complete (1 Service Remaining)
 
 ---
 
@@ -33,13 +33,13 @@
 ## 🔑 SSH Connection Commands
 
 ### Connect via Oracle Cloud Shell
-\`\`\`bash
+```bash
 # Upload your SSH key to Cloud Shell first, then:
 ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
-\`\`\`
+```
 
 ### Cursor SSH Config (Add to ~/.ssh/config)
-\`\`\`
+```
 Host oracle-new
     HostName 170.9.242.90
     User ubuntu
@@ -50,12 +50,12 @@ Host oracle-old-backup
     HostName 163.192.99.45
     User ubuntu
     IdentityFile C:\Users\YourName\.ssh\your-old-key.key
-\`\`\`
+```
 
 ### Quick Connect from Windows PowerShell
-\`\`\`powershell
-ssh -i \$HOME\.ssh\ssh-key-2026-01-07private.key ubuntu@170.9.242.90
-\`\`\`
+```powershell
+ssh -i $HOME\.ssh\ssh-key-2026-01-07private.key ubuntu@170.9.242.90
+```
 
 ---
 
@@ -63,7 +63,7 @@ ssh -i \$HOME\.ssh\ssh-key-2026-01-07private.key ubuntu@170.9.242.90
 
 **ALWAYS follow this workflow to keep everything in sync:**
 
-\`\`\`
+```
 ┌─────────────────┐     git push     ┌─────────────────┐     git pull     ┌─────────────────┐
 │  LOCAL CURSOR   │ ───────────────► │     GITHUB      │ ◄─────────────── │  ORACLE SERVER  │
 │  D:\aideazz\*   │                  │   Main Branch   │                  │  ~/ProjectName  │
@@ -71,12 +71,12 @@ ssh -i \$HOME\.ssh\ssh-key-2026-01-07private.key ubuntu@170.9.242.90
         │                                                                          │
         │                         Your Single Source of Truth                      │
         └──────────────────────────────────────────────────────────────────────────┘
-\`\`\`
+```
 
 ### Step-by-Step Workflow
 
 #### 1️⃣ Make Changes Locally (Cursor)
-\`\`\`powershell
+```powershell
 # Your local projects are at:
 D:\aideazz\EspaLuz_Influencer
 D:\aideazz\AIPA_AITCF
@@ -88,10 +88,10 @@ cd D:\aideazz\ProjectName
 git add .
 git commit -m "Your change description"
 git push
-\`\`\`
+```
 
 #### 2️⃣ Deploy to Oracle
-\`\`\`bash
+```bash
 # SSH to NEW Oracle
 ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
 
@@ -103,43 +103,58 @@ git pull origin main
 sudo systemctl restart servicename
 # OR
 pm2 restart processname
-\`\`\`
+```
 
 #### 3️⃣ Verify Deployment
-\`\`\`bash
+```bash
 # Check service status
 sudo systemctl status servicename
 # OR
 pm2 logs processname --lines 20
-\`\`\`
+```
 
 ---
 
 ## 📊 Migration Status
 
-### ✅ Phase 1 & 2 Complete (January 7-9, 2026)
+### ✅ Phase 1-4 Complete (January 7-18, 2026)
 
-| Service | Status | Server | Process Manager | Port |
-|---------|--------|--------|-----------------|------|
-| **CTO AIPA** | ✅ Running | 170.9.242.90 | PM2 | - |
-| **Atuona Creative AI** | ✅ Running | 170.9.242.90 | PM2 (bundled) | - |
-| **EspaLuz_Influencer** | ✅ Running | 170.9.242.90 | systemd | - |
+| Service | Status | Server | Process Manager | Port | Migrated |
+|---------|--------|--------|-----------------|------|----------|
+| **CTO AIPA** | ✅ Running | 170.9.242.90 | PM2 | - | Jan 7 |
+| **Atuona Creative AI** | ✅ Running | 170.9.242.90 | PM2 (bundled) | - | Jan 7 |
+| **EspaLuz_Influencer** | ✅ Running | 170.9.242.90 | systemd | - | Jan 9 |
+| **dragontrade-agent** | ✅ Running | 170.9.242.90 | PM2 | 3000 | Jan 17 |
+| **VibeJobHunter + LinkedIn CMO** | ✅ Running | 170.9.242.90 | systemd | 8000 | Jan 18 |
 
-### 📋 Migration Queue (Remaining)
+### 📋 Migration Queue (1 Remaining)
 
 | # | Service | Complexity | Est. Time | Status |
 |---|---------|------------|-----------|--------|
-| **1** | EspaLuzFamilybot | ⭐⭐ Medium | 30 min | 🟡 Next |
-| **2** | dragontrade-agent | ⭐⭐⭐ Hard | 1 hour | ⏳ Pending |
-| **3** | EspaLuzWhatsApp | ⭐⭐⭐⭐ Complex | 2-3 hours | ⏳ Pending |
-| **4** | VibeJobHunter + CMO | ⭐⭐⭐⭐⭐ Most Complex | 3-4 hours | ⏳ Pending |
+| **1** | EspaLuzWhatsApp | ⭐⭐⭐⭐ Complex | 2-3 hours | 🟡 LAST ONE |
+
+### 🎉 Recently Completed
+
+#### dragontrade-agent (January 17, 2026)
+- ✅ PostgreSQL migrated from Railway to Oracle
+- ✅ Paper trading bots (Bybit + Binance) connected
+- ✅ Twitter posting with 20-post content cycle
+- ✅ PM2 process management
+
+#### VibeJobHunter + LinkedIn CMO (January 18, 2026)
+- ✅ Job hunting engine with REAL ATS form submissions
+- ✅ Company-to-ATS mapping (60+ companies: Greenhouse, Lever, Ashby)
+- ✅ LinkedIn CMO posting at 10:10 AM Panama time (15:10 UTC)
+- ✅ 7 real job applications tracked in SQLite database
+- ✅ Playwright browser automation for form filling
+- ✅ systemd service: `vibejobhunter-web.service`
 
 ---
 
 ## 🖥️ Oracle Server Current State
 
 ### Check Running Services
-\`\`\`bash
+```bash
 # SSH to NEW Oracle first!
 ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
 
@@ -151,10 +166,10 @@ sudo systemctl status espaluz-influencer
 
 # View all custom services
 systemctl list-units --type=service --state=running | grep -E "(cto|espa|bot)"
-\`\`\`
+```
 
 ### Directory Structure on NEW Oracle
-\`\`\`
+```
 /home/ubuntu/
 ├── cto-aipa/                    # CTO AIPA + Atuona (PM2)
 │   ├── dist/
@@ -169,35 +184,67 @@ systemctl list-units --type=service --state=running | grep -E "(cto|espa|bot)"
 │   ├── .env
 │   └── requirements.txt
 │
-└── [future projects]/           # To be migrated
-\`\`\`
+├── dragontrade-agent/           # ALGOM Alpha Twitter Bot (PM2)
+│   ├── index.js
+│   ├── node_modules/
+│   ├── .env
+│   └── ecosystem.config.cjs
+│
+├── VibeJobHunterAIPA_AIMCF/     # Job Hunter + LinkedIn CMO (systemd)
+│   ├── web_server.py
+│   ├── venv/
+│   ├── autonomous_data/         # Jobs, applications, resumes
+│   ├── vibejobhunter.db        # SQLite database
+│   └── .env
+│
+└── EspaLuzWhatsApp/             # To be migrated (LAST ONE)
+```
 
 ---
 
 ## 🔧 Service Management Commands
 
 ### CTO AIPA (PM2)
-\`\`\`bash
+```bash
 pm2 status cto-aipa          # Check status
 pm2 logs cto-aipa            # View logs
 pm2 restart cto-aipa         # Restart
 pm2 stop cto-aipa            # Stop
-\`\`\`
+```
 
 ### EspaLuz Influencer (systemd)
-\`\`\`bash
+```bash
 sudo systemctl status espaluz-influencer    # Check status
 sudo journalctl -u espaluz-influencer -f    # View live logs
 sudo systemctl restart espaluz-influencer   # Restart
 sudo systemctl stop espaluz-influencer      # Stop
-\`\`\`
+```
+
+### dragontrade-agent (PM2)
+```bash
+pm2 status dragontrade-main      # Check status
+pm2 logs dragontrade-main        # View logs
+pm2 restart dragontrade-main     # Restart
+pm2 stop dragontrade-main        # Stop
+```
+
+### VibeJobHunter + LinkedIn CMO (systemd)
+```bash
+sudo systemctl status vibejobhunter-web     # Check status
+sudo journalctl -u vibejobhunter-web -f     # View live logs
+sudo systemctl restart vibejobhunter-web    # Restart
+sudo systemctl stop vibejobhunter-web       # Stop
+
+# Check job applications
+sqlite3 ~/VibeJobHunterAIPA_AIMCF/vibejobhunter.db 'SELECT COUNT(*) FROM applications;'
+```
 
 ---
 
 ## 📁 Local Project Setup (Windows)
 
 ### Initial Clone (One-time)
-\`\`\`powershell
+```powershell
 # Create your workspace
 mkdir D:\aideazz
 cd D:\aideazz
@@ -209,14 +256,14 @@ git clone https://github.com/ElenaRevicheva/EspaLuzFamilybot.git
 git clone https://github.com/ElenaRevicheva/dragontrade-agent.git
 git clone https://github.com/ElenaRevicheva/EspaLuzWhatsApp.git
 git clone https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF.git
-\`\`\`
+```
 
 ### Open in Cursor
-\`\`\`powershell
+```powershell
 cursor D:\aideazz\EspaLuz_Influencer
 # OR open the whole workspace
 cursor D:\aideazz
-\`\`\`
+```
 
 ---
 
@@ -231,7 +278,7 @@ Use this template when migrating the next service:
 - [ ] Document any Railway-specific configurations
 
 ### Migration Steps
-\`\`\`bash
+```bash
 # 1. SSH to NEW Oracle (170.9.242.90)
 ssh -i ssh-key-2026-01-07private.key ubuntu@170.9.242.90
 
@@ -263,7 +310,7 @@ sudo systemctl status servicename
 
 # 8. Verify working
 sudo journalctl -u servicename -f
-\`\`\`
+```
 
 ### Post-Migration
 - [ ] Monitor logs for 24 hours
@@ -276,7 +323,7 @@ sudo journalctl -u servicename -f
 
 ## ⚙️ Systemd Service Template
 
-\`\`\`ini
+```ini
 [Unit]
 Description=Your Service Description
 After=network.target
@@ -292,7 +339,7 @@ Environment=PATH=/home/ubuntu/SERVICE_NAME/venv/bin:/usr/bin
 
 [Install]
 WantedBy=multi-user.target
-\`\`\`
+```
 
 ---
 
@@ -300,36 +347,37 @@ WantedBy=multi-user.target
 
 | Service | Railway Cost | Oracle Cost | Status |
 |---------|--------------|-------------|--------|
-| CTO AIPA | ~\$20/month | \$0 | ✅ Migrated |
-| EspaLuz Influencer | ~\$7/month | \$0 | ✅ Migrated |
-| EspaLuz Familybot | ~\$10/month | \$0 | 🟡 Next |
-| ALGOM Alpha | ~\$15/month | \$0 | ⏳ Pending |
-| EspaLuz WhatsApp | ~\$25/month | \$0 | ⏳ Pending |
-| VibeJobHunter + CMO | ~\$20/month | \$0 | ⏳ Pending |
-| **TOTAL** | **~\$97/month** | **\$0** | **\$27 saved so far** |
+| CTO AIPA | ~$20/month | $0 | ✅ Migrated |
+| EspaLuz Influencer | ~$7/month | $0 | ✅ Migrated |
+| dragontrade-agent (ALGOM Alpha) | ~$15/month | $0 | ✅ Migrated |
+| VibeJobHunter + LinkedIn CMO | ~$20/month | $0 | ✅ Migrated |
+| EspaLuz WhatsApp | ~$25/month | $0 | 🟡 LAST ONE |
+| **TOTAL** | **~$87/month** | **$0** | **$62/month saved!** |
 
-**Projected Annual Savings: ~\$1,164**
+**Current Monthly Savings: $62/month**  
+**Projected Annual Savings: ~$1,044**  
+**After EspaLuzWhatsApp: $87/month → $1,044/year**
 
 ---
 
 ## 🆘 Troubleshooting
 
 ### "Which server am I on?"
-\`\`\`bash
+```bash
 hostname && ip addr show | grep "inet " | grep -v 127.0.0.1
 # NEW Oracle: instance-20260107-1316, 10.0.0.35
 # OLD Oracle: cto-aipa-prod, 10.0.0.244
-\`\`\`
+```
 
 ### "Telegram bot conflict (409 error)"
-\`\`\`bash
+```bash
 # Stop the bot on Railway FIRST
 # Then restart on Oracle
 sudo systemctl restart servicename
-\`\`\`
+```
 
 ### "Service won't start"
-\`\`\`bash
+```bash
 # Check logs
 sudo journalctl -u servicename -n 50
 
@@ -338,10 +386,10 @@ sudo lsof -i :PORT
 
 # Check Python path
 which python3
-\`\`\`
+```
 
 ### "Changes not reflecting"
-\`\`\`bash
+```bash
 # Did you push to GitHub?
 git status
 git push
@@ -350,13 +398,13 @@ git push
 cd ~/ProjectName
 git pull origin main
 sudo systemctl restart servicename
-\`\`\`
+```
 
 ---
 
 ## 📞 Quick Reference Card
 
-\`\`\`
+```
 ┌──────────────────────────────────────────────────────────────┐
 │                    ORACLE MIGRATION QUICK REF                 │
 ├──────────────────────────────────────────────────────────────┤
@@ -370,9 +418,9 @@ sudo systemctl restart servicename
 │ PM2:     pm2 list | pm2 logs NAME | pm2 restart NAME         │
 │ SYSTEMD: systemctl status|restart|stop NAME                  │
 └──────────────────────────────────────────────────────────────┘
-\`\`\`
+```
 
 ---
 
-*Last updated: January 9, 2026 by CTO AIPA*
+*Last updated: January 18, 2026 by CTO AIPA*  
 *Document location: [AIPA_AITCF/docs](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/docs/docs/RAILWAY_TO_ORACLE_MIGRATION.md)*
