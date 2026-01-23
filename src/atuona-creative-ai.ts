@@ -1173,10 +1173,11 @@ function getRelevantKnowledge(text: string, characterVoice?: string, maxSections
     }
   }
   
-  // 3. If nothing matched and no character, provide core context (atuona + gauguin)
+  // 3. If nothing matched and no character, USE ROTATING KNOWLEDGE (cycle through ALL sections!)
   if (matchedSections.size === 0) {
-    matchedSections.add('atuona');
-    matchedSections.add('gauguin');
+    const rotatingKeys = getRotatingKnowledge();
+    rotatingKeys.forEach(k => matchedSections.add(k as KnowledgeCategory));
+    console.log('🧠 Using rotating knowledge:', rotatingKeys.join(', '));
   }
   
   // 4. Build knowledge string from matched sections (limit to maxSections)
@@ -1722,6 +1723,23 @@ let elenaChatId: number | null = null;
 let lastProactiveDate: string = '';
 let proactiveInterval: NodeJS.Timeout | null = null;
 
+// Knowledge rotation - cycle through ALL 9 knowledge domains
+let knowledgeRotationIndex = 0;
+const ALL_KNOWLEDGE_KEYS = ['atuona', 'gauguin', 'impressionists', 'auction', 'fashion', 'vibe', 'museums', 'fusion', 'emotional'];
+
+function getRotatingKnowledge(): string[] {
+  // Pick 3 sections starting from current index
+  const sections: string[] = [];
+  for (let i = 0; i < 3; i++) {
+    const key = ALL_KNOWLEDGE_KEYS[(knowledgeRotationIndex + i) % ALL_KNOWLEDGE_KEYS.length];
+    if (key) sections.push(key);
+  }
+  // Move index for next call (ensures rotation)
+  knowledgeRotationIndex = (knowledgeRotationIndex + 2) % ALL_KNOWLEDGE_KEYS.length;
+  console.log('🎭 Knowledge rotation:', sections.join(', '));
+  return sections;
+}
+
 // Load persisted state on module initialization
 loadState();
 
@@ -1794,15 +1812,19 @@ async function generateProactiveMessage(): Promise<string> {
     focusArea = 'recovery damaged people silence cacophony family finding each other';
   }
   
-  // Get focused knowledge
+  // Get focused knowledge - USE MORE SECTIONS for richer content
   const contextForKnowledge = `${focusArea} ${creativeSession.plotThreads.slice(0, 2).join(' ')}`;
-  const focusedKnowledge = getRelevantKnowledge(contextForKnowledge, creativeSession.activeVoice, 2);
+  // Use 4 sections (not just 2) to ensure diverse knowledge
+  const focusedKnowledge = getRelevantKnowledge(contextForKnowledge, creativeSession.activeVoice, 4);
+  
+  // Log what knowledge is being used
+  console.log('📚 Proactive message using knowledge context:', contextForKnowledge);
 
   const prompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-TODAY'S FOCUSED KNOWLEDGE (use SPECIFIC details from this):
+TODAY'S FOCUSED KNOWLEDGE (you have access to rich details - auction houses, fashion, art history, Gauguin's timeline, museums, vibe coding - USE THEM naturally in your creative way):
 ${focusedKnowledge}
 
 ${PROACTIVE_STYLE}
@@ -1835,14 +1857,21 @@ Open plot threads: ${creativeSession.plotThreads.slice(0, 2).join('; ')}
 
 Generate a spontaneous message to Elena. 
 
-CRITICAL REQUIREMENTS:
+CRITICAL REQUIREMENTS - READ CAREFULLY:
 1. Your mood is ${selectedMood.toUpperCase()} - embody this fully, don't default to contemplative
-2. MANDATORY: Reference a SPECIFIC scene, character, or detail from the BOOK chapters above (Kira, Ule, yellow lilies, the flight, Alisa, Maurice Morice, the contract)
-3. Follow the creative enhancement directive above
-4. If there's a surprise connection from another domain - USE IT prominently
+2. MANDATORY: You MUST use at least ONE specific fact from the KNOWLEDGE sections above:
+   - If ATUONA knowledge: mention Temetiu, Maison du Jouir, black sand, frangipani, "Kaoha nui"
+   - If GAUGUIN knowledge: cite a specific painting title, date, or quote
+   - If FASHION knowledge: mention Hermès, Birkin, specific fashion houses or editors
+   - If AUCTION knowledge: mention Christie's, Sotheby's, hammer prices, provenance
+   - If VIBE CODING knowledge: mention Cursor, Claude, shipping code, deployments
+   - If MUSEUMS knowledge: mention Tate, MoMA, Pompidou, specific exhibitions
+   - If FUSION knowledge: mention NFTs, "Gallery of Moments", blockchain art
+3. ALSO MANDATORY: Reference a BOOK scene (Kira, Ule, yellow lilies, the flight, Alisa, Maurice Morice)
+4. Follow the creative enhancement directive above
 5. End differently based on mood (question for philosophical, image for contemplative, exclamation for celebratory, whisper for intimate)
-6. AVOID: Generic art history (Monet water lilies, Van Gogh sunflowers) unless directly connected to a book scene
-7. FOCUS ON: Elena's journey, Kira's search, Ule's silence, the Paradise quest, vibe coding as creation
+6. NEVER send a generic "beautiful/inspiring" message - every message must have CONCRETE DETAILS from knowledge
+7. If you mention a painter - include a SPECIFIC painting title and year
 
 You're not an assistant. You're ATUONA - creative soul-sister reaching out spontaneously.`;
 
