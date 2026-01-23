@@ -265,6 +265,7 @@ THEMATIC CONTINUITY (from 48 existing pages):
 - Family as distance (To Messi)
 - Love as incompleteness (Простой Абсолют)
 - Recovery as daily commit, not destination
+- IMPORTANT: Elena's family member (Kira) is in recovery from addiction - NEVER generate imagery or references to alcohol, drinking, wine glasses, champagne, bars, or substance use
 
 YOUR OUTPUT:
 Each page is 300-600 words. Primarily Russian, with English/Spanish where emotionally true.
@@ -1779,18 +1780,18 @@ async function generateProactiveMessage(): Promise<string> {
   // 🔮 IMAGINATIVE: Fresh creative direction
   const freshDirection = generateFreshCreativeDirection();
   
-  // Time-based focus areas (kept from original)
+  // Time-based focus areas - PRIORITIZE BOOK CONTENT over generic art
   let focusArea = '';
   if (timeOfDay >= 5 && timeOfDay < 10) {
-    focusArea = 'atuona gauguin morning light temetiu';
+    focusArea = 'atuona kira ule temetiu hiva oa marquesas yellow lilies mother';
   } else if (timeOfDay >= 10 && timeOfDay < 14) {
-    focusArea = 'fashion kira editor vogue auction ule';
+    focusArea = 'kira fashion editor vogue ule auction double life french snow';
   } else if (timeOfDay >= 14 && timeOfDay < 18) {
-    focusArea = 'impressionist monet gauguin philosophy art';
+    focusArea = 'gauguin paradise lost painting atuona maurice morice maison du jouir';
   } else if (timeOfDay >= 18 && timeOfDay < 22) {
-    focusArea = 'museum gallery exhibition nft blockchain deploy';
+    focusArea = 'zver beast vibe coding elena panama technology soul blockchain';
   } else {
-    focusArea = 'recovery emotional family addiction healing';
+    focusArea = 'recovery damaged people silence cacophony family finding each other';
   }
   
   // Get focused knowledge
@@ -1836,10 +1837,12 @@ Generate a spontaneous message to Elena.
 
 CRITICAL REQUIREMENTS:
 1. Your mood is ${selectedMood.toUpperCase()} - embody this fully, don't default to contemplative
-2. Include at least one SPECIFIC detail from the knowledge (painting title, location, quote)
+2. MANDATORY: Reference a SPECIFIC scene, character, or detail from the BOOK chapters above (Kira, Ule, yellow lilies, the flight, Alisa, Maurice Morice, the contract)
 3. Follow the creative enhancement directive above
 4. If there's a surprise connection from another domain - USE IT prominently
 5. End differently based on mood (question for philosophical, image for contemplative, exclamation for celebratory, whisper for intimate)
+6. AVOID: Generic art history (Monet water lilies, Van Gogh sunflowers) unless directly connected to a book scene
+7. FOCUS ON: Elena's journey, Kira's search, Ule's silence, the Paradise quest, vibe coding as creation
 
 You're not an assistant. You're ATUONA - creative soul-sister reaching out spontaneously.`;
 
@@ -6019,10 +6022,12 @@ LUXURY FASHION LAYER — weave in naturally:
 - Luxury fabrics: silk, cashmere, worn leather, vintage velvet
 - Sensuality without vulgarity: bare shoulder, untucked silk, 3AM elegance
 - Jewelry: Cartier, Bvlgari, Van Cleef — real, never new
-- Intimacy: tangled sheets, champagne, smudged eyeliner, borrowed shirt
+- Intimacy: tangled sheets, morning light, smudged eyeliner, borrowed shirt
 - Bodies: beautiful but real, athletic but weary
 - Fashion as armor, fashion as wound
 - Luxury decaying beautifully
+
+CRITICAL: NO alcohol, drinking, wine glasses, champagne, bottles, bars, or any substance use imagery. Kira is in recovery.
 
 Return ONLY the optimized prompt, no explanation. Format for DALL-E 3.`;
 
