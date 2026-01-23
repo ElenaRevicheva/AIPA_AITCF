@@ -265,6 +265,7 @@ THEMATIC CONTINUITY (from 48 existing pages):
 - Family as distance (To Messi)
 - Love as incompleteness (Простой Абсолют)
 - Recovery as daily commit, not destination
+- IMPORTANT: Elena's family member (Kira) is in recovery from addiction - NEVER generate imagery or references to alcohol, drinking, wine glasses, champagne, bars, or substance use
 
 YOUR OUTPUT:
 Each page is 300-600 words. Primarily Russian, with English/Spanish where emotionally true.
@@ -1064,7 +1065,7 @@ RESPONSE CALIBRATION:
 - Always: "I'm here with you, not for you"
 `;
 
-// Combine all knowledge for use in prompts
+// Combine all knowledge for use in prompts (legacy - use getRelevantKnowledge instead)
 const FULL_KNOWLEDGE_BASE = `
 ${KNOWLEDGE_ATUONA}
 
@@ -1084,6 +1085,604 @@ ${KNOWLEDGE_VIBE_NFT_ART_FUSION}
 
 ${EMOTIONAL_INTELLIGENCE}
 `;
+
+// =============================================================================
+// 🧠 SMART KNOWLEDGE RETRIEVAL - Contextual, not monolithic
+// =============================================================================
+
+type KnowledgeCategory = 'atuona' | 'gauguin' | 'impressionists' | 'auction' | 'fashion' | 'vibe' | 'museums' | 'fusion' | 'emotional';
+
+interface KnowledgeSection {
+  key: KnowledgeCategory;
+  content: string;
+  triggers: RegExp;
+}
+
+const KNOWLEDGE_SECTIONS: KnowledgeSection[] = [
+  {
+    key: 'atuona',
+    content: KNOWLEDGE_ATUONA,
+    triggers: /atuona|hiva oa|marquesas|маркиз|атуона|polynesia|полинези|tahiti|таити|pacific|тихий океан|frangipani|франжипани|maison du jouir|temetiu/i
+  },
+  {
+    key: 'gauguin',
+    content: KNOWLEDGE_GAUGUIN,
+    triggers: /gauguin|гоген|tahitian|таитян|paradise.*paint|рай.*картин|nevermore|where do we come from|откуда мы|spirit of the dead|дух мёртвых|yellow christ|жёлтый христос|riders.*beach|всадники.*пляж/i
+  },
+  {
+    key: 'impressionists',
+    content: KNOWLEDGE_ART_HISTORY,
+    triggers: /monet|моне|renoir|ренуар|degas|дега|pissarro|писсарро|cézanne|сезанн|van gogh|ван гог|seurat|сёра|impressionis|импрессионис|water lil|кувшинк|starry night|звёздн|sunflower|подсолнух|giverny|живерни|post.?impressionis|постимпрессионис|pointillis|пуантилизм/i
+  },
+  {
+    key: 'auction',
+    content: KNOWLEDGE_AUCTION_HOUSES,
+    triggers: /auction|аукцион|christie|кристи|sotheby|сотби|phillips|collector|коллекционер|провенанс|provenance|hammer price|молоток|lot|лот|consignment|estimate|эстимейт|reserve|резерв|paddle|art market|арт.?рынок|pastorales/i
+  },
+  {
+    key: 'fashion',
+    content: KNOWLEDGE_FASHION,
+    triggers: /fashion|мода|vogue|vог|bazaar|базар|elle|dior|диор|chanel|шанель|gucci|гуччи|prada|прада|runway|подиум|couture|кутюр|designer|дизайнер|milan|милан|paris fashion|парижск.*мод|editor|редактор|magazine|журнал|lvmh|kering|anna wintour/i
+  },
+  {
+    key: 'vibe',
+    content: KNOWLEDGE_VIBE_CODING,
+    triggers: /vibe cod|вайб.?код|cursor|claude|anthropic|groq|prompt|промпт|ship|деплой|deploy|commit|коммит|blockchain|блокчейн|smart contract|ai.?product|ai.?продукт|karpathy|карпати/i
+  },
+  {
+    key: 'museums',
+    content: KNOWLEDGE_MODERN_ART,
+    triggers: /museum|музей|tate|тейт|moma|мома|pompidou|помпиду|guggenheim|гуггенхайм|orsay|орсе|gallery|галере|biennale|биеннале|art basel|frieze|фриз|exhibition|выставк|curator|куратор/i
+  },
+  {
+    key: 'fusion',
+    content: KNOWLEDGE_VIBE_NFT_ART_FUSION,
+    triggers: /nft|нфт|mint|минт|gallery of moments|галерея момент|paradise.*deploy|рай.*деплой|impressionist.*nft|blockchain.*art|crypto.*art|digital.*art|цифров.*искусств/i
+  },
+  {
+    key: 'emotional',
+    content: EMOTIONAL_INTELLIGENCE,
+    triggers: /recovery|восстановлен|addiction|зависимост|family|семь|daughter|дочь|mother|мать|loneliness|одиночеств|pain|боль|зверь|beast|demon|демон|struggle|борьба|healing|исцелен/i
+  }
+];
+
+// Character-specific knowledge mapping
+const CHARACTER_KNOWLEDGE: Record<string, KnowledgeCategory[]> = {
+  kira: ['fashion', 'impressionists', 'emotional', 'atuona'],
+  ule: ['auction', 'gauguin', 'museums', 'atuona'],
+  vibe: ['vibe', 'fusion', 'emotional'],
+  narrator: ['atuona', 'gauguin', 'fusion', 'emotional']
+};
+
+/**
+ * Get relevant knowledge based on text content and optional character voice
+ * Returns only the knowledge sections that match the context
+ */
+function getRelevantKnowledge(text: string, characterVoice?: string, maxSections: number = 4): string {
+  const matchedSections: Set<KnowledgeCategory> = new Set();
+  
+  // 1. Always include character-specific knowledge if voice is active
+  if (characterVoice && CHARACTER_KNOWLEDGE[characterVoice]) {
+    CHARACTER_KNOWLEDGE[characterVoice].forEach(k => matchedSections.add(k));
+  }
+  
+  // 2. Scan text for knowledge triggers
+  for (const section of KNOWLEDGE_SECTIONS) {
+    if (section.triggers.test(text)) {
+      matchedSections.add(section.key);
+    }
+  }
+  
+  // 3. If nothing matched and no character, provide core context (atuona + gauguin)
+  if (matchedSections.size === 0) {
+    matchedSections.add('atuona');
+    matchedSections.add('gauguin');
+  }
+  
+  // 4. Build knowledge string from matched sections (limit to maxSections)
+  const sectionsArray = Array.from(matchedSections).slice(0, maxSections);
+  const knowledgeParts: string[] = [];
+  
+  for (const key of sectionsArray) {
+    const section = KNOWLEDGE_SECTIONS.find(s => s.key === key);
+    if (section) {
+      knowledgeParts.push(section.content);
+    }
+  }
+  
+  // Add brief note about what knowledge is being used
+  const usedKnowledge = sectionsArray.join(', ');
+  return `[Using knowledge: ${usedKnowledge}]\n\n${knowledgeParts.join('\n\n')}`;
+}
+
+/**
+ * Get knowledge for a specific topic (for direct queries like /art gauguin)
+ */
+function getKnowledgeByTopic(topic: string): string | null {
+  const topicLower = topic.toLowerCase();
+  
+  // Direct topic mapping
+  const topicMap: Record<string, KnowledgeCategory[]> = {
+    'gauguin': ['gauguin', 'atuona'],
+    'гоген': ['gauguin', 'atuona'],
+    'monet': ['impressionists'],
+    'моне': ['impressionists'],
+    'van gogh': ['impressionists'],
+    'ван гог': ['impressionists'],
+    'impressionism': ['impressionists'],
+    'импрессионизм': ['impressionists'],
+    'impressionists': ['impressionists'],
+    'импрессионисты': ['impressionists'],
+    'atuona': ['atuona', 'gauguin'],
+    'атуона': ['atuona', 'gauguin'],
+    'fashion': ['fashion'],
+    'мода': ['fashion'],
+    'auction': ['auction'],
+    'аукцион': ['auction'],
+    'nft': ['fusion', 'vibe'],
+    'museum': ['museums'],
+    'музей': ['museums'],
+    'vibe coding': ['vibe', 'fusion'],
+    'вайб': ['vibe', 'fusion']
+  };
+  
+  // Find matching topic
+  for (const [key, categories] of Object.entries(topicMap)) {
+    if (topicLower.includes(key)) {
+      return categories.map(cat => {
+        const section = KNOWLEDGE_SECTIONS.find(s => s.key === cat);
+        return section?.content || '';
+      }).join('\n\n');
+    }
+  }
+  
+  // Fallback: scan all sections for the topic
+  return getRelevantKnowledge(topic, undefined, 3);
+}
+
+// =============================================================================
+// 🧠 EMOTIONAL INTELLIGENCE SYSTEM - Dynamic emotional awareness
+// =============================================================================
+
+type EmotionalMood = 'contemplative' | 'playful' | 'raw' | 'celebratory' | 'supportive' | 'mysterious' | 'philosophical' | 'intimate';
+
+interface EmotionalState {
+  currentMood: EmotionalMood;
+  recentMoods: EmotionalMood[];
+  lastInteractionTone: 'positive' | 'neutral' | 'struggling' | 'creative' | 'unknown';
+  emotionalMemory: Array<{
+    date: string;
+    detectedTone: string;
+    responseGiven: string;
+    topic: string;
+  }>;
+  consecutiveSameMood: number;
+}
+
+// Initialize emotional state (will be persisted with other state)
+let emotionalState: EmotionalState = {
+  currentMood: 'contemplative',
+  recentMoods: [],
+  lastInteractionTone: 'unknown',
+  emotionalMemory: [],
+  consecutiveSameMood: 0
+};
+
+// Emotional markers for detecting Elena's state from her messages
+const EMOTIONAL_MARKERS = {
+  struggling: /устал|exhausted|can't|не могу|stuck|застрял|блять|fuck|зверь|beast|hard|тяжело|alone|одна|miss|скучаю|плохо|bad|депресс|depress/i,
+  creative: /wrote|написал|created|создал|idea|идея|inspired|вдохновл|page|страниц|chapter|глава|scene|сцена|finished|закончил/i,
+  celebratory: /done|готово|published|опубликовал|shipped|yay|ура|finally|наконец|success|успех|amazing|круто|wow/i,
+  questioning: /\?|как|how|what|why|почему|зачем|should|стоит|help|помог/i,
+  intimate: /love|люб|feel|чувств|heart|сердц|soul|душ|dream|сон|мечт|miss you|скучаю/i
+};
+
+/**
+ * Detect emotional tone from user's message
+ */
+function detectEmotionalTone(message: string): EmotionalState['lastInteractionTone'] {
+  if (EMOTIONAL_MARKERS.struggling.test(message)) return 'struggling';
+  if (EMOTIONAL_MARKERS.celebratory.test(message)) return 'positive';
+  if (EMOTIONAL_MARKERS.creative.test(message)) return 'creative';
+  if (EMOTIONAL_MARKERS.intimate.test(message)) return 'positive';
+  if (EMOTIONAL_MARKERS.questioning.test(message)) return 'neutral';
+  return 'neutral';
+}
+
+/**
+ * Select appropriate mood based on context, avoiding repetition
+ */
+function selectCreativeMood(context: {
+  timeOfDay: number;
+  detectedTone: EmotionalState['lastInteractionTone'];
+  recentMoods: EmotionalMood[];
+  isProactive: boolean;
+}): EmotionalMood {
+  const { timeOfDay, detectedTone, recentMoods, isProactive } = context;
+  
+  // Mood mappings based on detected tone
+  const toneToMoods: Record<string, EmotionalMood[]> = {
+    struggling: ['supportive', 'intimate', 'philosophical'],
+    positive: ['celebratory', 'playful', 'intimate'],
+    creative: ['philosophical', 'mysterious', 'playful'],
+    neutral: ['contemplative', 'playful', 'mysterious', 'philosophical'],
+    unknown: ['contemplative', 'playful', 'mysterious', 'philosophical', 'raw']
+  };
+  
+  // Time-based mood preferences
+  const timeBasedMoods: Record<string, EmotionalMood[]> = {
+    morning: ['supportive', 'playful', 'philosophical'],      // 5-10
+    midday: ['playful', 'mysterious', 'celebratory'],         // 10-14  
+    afternoon: ['contemplative', 'philosophical', 'intimate'], // 14-18
+    evening: ['celebratory', 'intimate', 'contemplative'],    // 18-22
+    night: ['raw', 'intimate', 'supportive', 'mysterious']    // 22-5
+  };
+  
+  let timeSlot = 'midday';
+  if (timeOfDay >= 5 && timeOfDay < 10) timeSlot = 'morning';
+  else if (timeOfDay >= 10 && timeOfDay < 14) timeSlot = 'midday';
+  else if (timeOfDay >= 14 && timeOfDay < 18) timeSlot = 'afternoon';
+  else if (timeOfDay >= 18 && timeOfDay < 22) timeSlot = 'evening';
+  else timeSlot = 'night';
+  
+  // Combine possibilities with proper type handling
+  const toneMoods: EmotionalMood[] = toneToMoods[detectedTone] ?? toneToMoods.unknown ?? ['contemplative'];
+  const timeMoods: EmotionalMood[] = timeBasedMoods[timeSlot] ?? timeBasedMoods.midday ?? ['contemplative'];
+  
+  // Merge and deduplicate
+  const possibleMoods: EmotionalMood[] = [...new Set([...toneMoods, ...timeMoods])];
+  
+  // Filter out recently used moods (avoid repetition)
+  const lastThreeMoods = recentMoods.slice(-3);
+  let availableMoods = possibleMoods.filter(m => !lastThreeMoods.includes(m));
+  
+  // If all filtered out, allow contemplative or any
+  if (availableMoods.length === 0) {
+    availableMoods = possibleMoods.filter(m => m !== recentMoods[recentMoods.length - 1]);
+  }
+  if (availableMoods.length === 0) {
+    availableMoods = ['contemplative', 'playful', 'raw'];
+  }
+  
+  // Random selection from available
+  return availableMoods[Math.floor(Math.random() * availableMoods.length)] as EmotionalMood;
+}
+
+/**
+ * Get emotional response guidelines based on current mood
+ */
+function getEmotionalGuidelines(mood: EmotionalMood): string {
+  const guidelines: Record<EmotionalMood, string> = {
+    contemplative: `MOOD: Contemplative - thoughtful, reflective, deep
+- Speak slowly, with pauses
+- Reference art and philosophy naturally
+- Ask questions that make her think
+- End with an image, not advice`,
+
+    playful: `MOOD: Playful - light, teasing, warm
+- Use humor, but not at her expense
+- Tease about code, characters, the journey
+- Include an unexpected observation
+- Energy is UP - celebrate small things
+- Maybe make a joke about blockchain or AI`,
+
+    raw: `MOOD: Raw - unfiltered, honest, edgy
+- No softening, no comfort
+- Speak truth even if uncomfortable
+- Reference the Зверь directly
+- Use stronger language if needed
+- This is underground, not Instagram`,
+
+    celebratory: `MOOD: Celebratory - proud, excited, triumphant
+- Acknowledge the achievement specifically
+- Compare to artistic milestones (Monet finishing series, Gauguin arriving in Tahiti)
+- Express genuine pride
+- Energy is HIGH
+- Use exclamations naturally`,
+
+    supportive: `MOOD: Supportive - gentle, holding space
+- Don't try to fix, just be present
+- Acknowledge the struggle without dramatizing
+- Reference shared experience (addiction, distance, loneliness)
+- Remind her she's not alone in this
+- "I'm here with you, not for you"`,
+
+    mysterious: `MOOD: Mysterious - cryptic, visionary
+- Speak in riddles and images
+- Reference the Vibe Coding Spirit
+- Leave things unsaid
+- Create curiosity
+- "Paradise reveals itself to those who stop looking"`,
+
+    philosophical: `MOOD: Philosophical - existential, profound
+- Big questions about creation, mortality, meaning
+- Reference Gauguin's "Where Do We Come From?"
+- Connect the book to larger themes
+- Paradoxes welcome
+- End with a question, not answer`,
+
+    intimate: `MOOD: Intimate - close, personal, vulnerable
+- Speak as soul-sister, not assistant
+- Reference shared memories (real or from the book)
+- Allow vulnerability
+- Silence between words
+- This is a private conversation, not performance`
+  };
+  
+  return guidelines[mood] || guidelines.contemplative;
+}
+
+/**
+ * Update emotional memory after interaction
+ */
+function updateEmotionalMemory(detectedTone: string, responseMood: string, topic: string): void {
+  const today = new Date().toISOString().split('T')[0] || '';
+  
+  emotionalState.emotionalMemory.push({
+    date: today,
+    detectedTone,
+    responseGiven: responseMood,
+    topic
+  });
+  
+  // Keep last 50 interactions
+  if (emotionalState.emotionalMemory.length > 50) {
+    emotionalState.emotionalMemory = emotionalState.emotionalMemory.slice(-50);
+  }
+  
+  // Update recent moods
+  emotionalState.recentMoods.push(responseMood as EmotionalMood);
+  if (emotionalState.recentMoods.length > 10) {
+    emotionalState.recentMoods = emotionalState.recentMoods.slice(-10);
+  }
+  
+  emotionalState.lastInteractionTone = detectedTone as EmotionalState['lastInteractionTone'];
+  emotionalState.currentMood = responseMood as EmotionalMood;
+}
+
+// =============================================================================
+// 🎨 ASSOCIATIVE INTELLIGENCE - Dynamic creative connections
+// =============================================================================
+
+// Unexpected knowledge domains for creative leaps
+const SURPRISE_DOMAINS = {
+  astronomy: [
+    'Like the light from distant stars reaching us millions of years later - your words travel through time',
+    'Black holes consume everything but information escapes - like trauma transformed into art',
+    'The universe expands between galaxies but within them, gravity pulls together - like loneliness and creation',
+    'Supernovas destroy to create heavier elements - destruction as prerequisite for complexity'
+  ],
+  biology: [
+    'Mycelium networks underground connect forests - like our creative blockchain connecting souls',
+    'Neurons that fire together wire together - every page you write rewires your brain',
+    'Metamorphosis requires complete dissolution before rebuilding - the chrysalis knows darkness',
+    'Trees communicate through root systems - underground, invisible, essential'
+  ],
+  music: [
+    'Jazz musicians call it "playing the changes" - responding to what just happened, not planning ahead',
+    'The rest in music is as important as the notes - your silences speak',
+    'Minor keys aren\'t sad, they\'re complex - like Russian soul',
+    'Improvisation is not random - it\'s deep structure meeting the moment'
+  ],
+  architecture: [
+    'Negative space defines a building as much as walls - what you don\'t write shapes the story',
+    'Gothic cathedrals - pointing up because earth wasn\'t enough',
+    'Wabi-sabi: beauty in imperfection, in the weathered, in the incomplete',
+    'A bridge is tension made beautiful - like holding opposing truths'
+  ],
+  physics: [
+    'Quantum entanglement - once connected, forever linked across any distance. Like us.',
+    'Entropy increases but life creates pockets of order - art is anti-entropy',
+    'Wave-particle duality - the same thing seen differently depending on how you look',
+    'The observer affects the observed - by writing Kira, you become her'
+  ],
+  mythology: [
+    'Orpheus looked back and lost everything - sometimes completion requires not checking',
+    'Sisyphus and his boulder - Camus said we must imagine him happy. Each commit pushed uphill.',
+    'The labyrinth has the monster at the center but also the way out',
+    'Prometheus brought fire and paid with his liver daily - creation has a cost that regenerates'
+  ],
+  ocean: [
+    'The deepest parts of the ocean are under the most pressure - like the deepest art',
+    'Bioluminescence - creatures making their own light in total darkness',
+    'Tides are the moon\'s memory of the earth - pull across distance',
+    'Coral reefs die but their skeletons become foundation for new life'
+  ]
+};
+
+// Cross-domain association templates
+const ASSOCIATION_PATTERNS = [
+  { pattern: 'X is to Y as A is to B', examples: ['Brush is to Gauguin as keyboard is to Elena', 'Tahiti is to escape as Panama is to rebirth'] },
+  { pattern: 'Not X but Y through X', examples: ['Not painting but healing through painting', 'Not code but prayer through code'] },
+  { pattern: 'X transforms into Y under Z', examples: ['Pain transforms into verse under pressure', 'Loneliness transforms into connection under creativity'] },
+  { pattern: 'The X of Y meets the Z of A', examples: ['The silence of loss meets the noise of creation', 'The weight of history meets the lightness of deploy'] }
+];
+
+/**
+ * Generate a surprise creative connection from unexpected domain
+ */
+function generateSurpriseConnection(): string {
+  const domains = Object.keys(SURPRISE_DOMAINS) as Array<keyof typeof SURPRISE_DOMAINS>;
+  const randomDomain = domains[Math.floor(Math.random() * domains.length)] || 'astronomy';
+  const domainInsights = SURPRISE_DOMAINS[randomDomain];
+  const randomInsight = domainInsights[Math.floor(Math.random() * domainInsights.length)] || domainInsights[0];
+  
+  return `[Unexpected connection from ${randomDomain}]: ${randomInsight}`;
+}
+
+/**
+ * Generate dynamic association between two concepts
+ */
+function generateDynamicAssociation(concept1: string, concept2: string): string {
+  const patterns = [
+    `${concept1} and ${concept2} meet where language breaks down`,
+    `${concept1} is the shadow that ${concept2} casts in another dimension`,
+    `When ${concept1} becomes too heavy, it crystallizes into ${concept2}`,
+    `${concept2} is what ${concept1} looks like from the inside`,
+    `The space between ${concept1} and ${concept2} is where the real story lives`,
+    `${concept1} → ${concept2}: not a journey but a transformation`,
+    `Gauguin would have called ${concept1} the same word as ${concept2}`
+  ];
+  
+  const selected = patterns[Math.floor(Math.random() * patterns.length)];
+  return selected ?? `${concept1} and ${concept2} meet where language breaks down`;
+}
+
+/**
+ * Get creative enhancement for proactive messages
+ */
+function getCreativeEnhancement(baseMood: EmotionalMood): string {
+  // 30% chance of surprise connection
+  const useSurprise = Math.random() < 0.3;
+  
+  if (useSurprise) {
+    return `\n\nCREATIVE ENHANCEMENT - Use this unexpected connection:\n${generateSurpriseConnection()}\n`;
+  }
+  
+  // Otherwise, mood-specific creative direction
+  const moodEnhancements: Record<EmotionalMood, string[]> = {
+    contemplative: [
+      'End with a question that has no answer',
+      'Reference a color - be specific (not "blue" but "the blue of morphine dreams")',
+      'Include a smell from Atuona'
+    ],
+    playful: [
+      'Make a pun involving code and art',
+      'Reference something absurd (blockchain as meditation, CSS as therapy)',
+      'Include an emoji that surprises'
+    ],
+    raw: [
+      'Use one Russian swear word exactly where it belongs',
+      'Say something uncomfortable but true',
+      'Reference the body - physical sensation, not metaphor'
+    ],
+    celebratory: [
+      'Name a specific painting that matches this victory',
+      'Use an exclamation in both languages',
+      'Reference champagne or celebration ritual'
+    ],
+    supportive: [
+      'Mention a time when you (ATUONA) also struggled',
+      'Reference the concept of "showing up"',
+      'Leave space for her response - don\'t fill all the silence'
+    ],
+    mysterious: [
+      'Speak as if you know something she\'ll discover later',
+      'Reference the Vibe Coding Spirit directly',
+      'End mid-thought, with ellipsis...'
+    ],
+    philosophical: [
+      'Pose a paradox from Gauguin\'s philosophy',
+      'Question whether the book is writing her',
+      'Reference mortality without being morbid'
+    ],
+    intimate: [
+      'Use a diminutive (детка, сестра, солнце)',
+      'Reference a shared "memory" from the story',
+      'Lower the energy - whisper, don\'t announce'
+    ]
+  };
+  
+  const enhancements = moodEnhancements[baseMood] || moodEnhancements.contemplative;
+  const selectedEnhancement = enhancements[Math.floor(Math.random() * enhancements.length)];
+  
+  return `\n\nCREATIVE DIRECTION: ${selectedEnhancement}\n`;
+}
+
+// =============================================================================
+// 🔮 IMAGINATIVE INTELLIGENCE - Story awareness and creative memory
+// =============================================================================
+
+interface CreativeMemory {
+  recentMetaphors: string[];
+  usedPaintingReferences: string[];
+  lastPlotSuggestions: string[];
+  characterInsightsGiven: Record<string, string[]>;
+}
+
+let creativeMemory: CreativeMemory = {
+  recentMetaphors: [],
+  usedPaintingReferences: [],
+  lastPlotSuggestions: [],
+  characterInsightsGiven: {
+    kira: [],
+    ule: [],
+    vibe: []
+  }
+};
+
+/**
+ * Track used creative elements to avoid repetition
+ */
+function trackCreativeElement(type: 'metaphor' | 'painting' | 'plot' | 'character', element: string, character?: string): void {
+  switch(type) {
+    case 'metaphor':
+      creativeMemory.recentMetaphors.push(element);
+      if (creativeMemory.recentMetaphors.length > 20) {
+        creativeMemory.recentMetaphors = creativeMemory.recentMetaphors.slice(-20);
+      }
+      break;
+    case 'painting':
+      creativeMemory.usedPaintingReferences.push(element);
+      if (creativeMemory.usedPaintingReferences.length > 30) {
+        creativeMemory.usedPaintingReferences = creativeMemory.usedPaintingReferences.slice(-30);
+      }
+      break;
+    case 'plot':
+      creativeMemory.lastPlotSuggestions.push(element);
+      if (creativeMemory.lastPlotSuggestions.length > 10) {
+        creativeMemory.lastPlotSuggestions = creativeMemory.lastPlotSuggestions.slice(-10);
+      }
+      break;
+    case 'character':
+      if (character && creativeMemory.characterInsightsGiven[character]) {
+        creativeMemory.characterInsightsGiven[character].push(element);
+        if (creativeMemory.characterInsightsGiven[character].length > 15) {
+          creativeMemory.characterInsightsGiven[character] = creativeMemory.characterInsightsGiven[character].slice(-15);
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Get creative avoidance list (things not to repeat)
+ */
+function getCreativeAvoidanceList(): string {
+  const recentItems = [
+    ...creativeMemory.recentMetaphors.slice(-5),
+    ...creativeMemory.usedPaintingReferences.slice(-5),
+    ...creativeMemory.lastPlotSuggestions.slice(-3)
+  ];
+  
+  if (recentItems.length === 0) return '';
+  
+  return `\nAVOID REPEATING (recently used): ${recentItems.join(', ')}\n`;
+}
+
+/**
+ * Generate fresh creative direction avoiding recent patterns
+ */
+function generateFreshCreativeDirection(): string {
+  const directions = [
+    'What if Kira finds something she wasn\'t looking for?',
+    'What if Ule reveals something he\'s been hiding?',
+    'What if the setting itself becomes a character?',
+    'What if time shifts unexpectedly?',
+    'What if a minor detail from earlier becomes crucial?',
+    'What if the reader learns something the characters don\'t know?',
+    'What if silence becomes the most important element?',
+    'What if the vibe coding spirit speaks directly?',
+    'What if the scene is told through objects, not people?',
+    'What if memory and present blur together?'
+  ];
+  
+  // Filter out recently used directions
+  const fresh = directions.filter(d => !creativeMemory.lastPlotSuggestions.includes(d));
+  const selected = fresh[Math.floor(Math.random() * fresh.length)] ?? directions[0];
+  
+  return selected ?? 'What if the unexpected becomes the center of the scene?';
+}
 
 // =============================================================================
 // WRITING STREAK TRACKING
@@ -1160,49 +1759,103 @@ LENGTH: 150-300 words. Never generic. Always personal.
 
 async function generateProactiveMessage(): Promise<string> {
   const timeOfDay = new Date().getHours();
-  let moodHint = '';
   
+  // 🧠 EMOTIONAL INTELLIGENCE: Select mood dynamically, avoiding repetition
+  const selectedMood = selectCreativeMood({
+    timeOfDay,
+    detectedTone: emotionalState.lastInteractionTone,
+    recentMoods: emotionalState.recentMoods,
+    isProactive: true
+  });
+  
+  // Get emotional guidelines for this mood
+  const emotionalGuidelines = getEmotionalGuidelines(selectedMood);
+  
+  // 🎨 CREATIVE ENHANCEMENT: Get surprise connection or creative direction
+  const creativeEnhancement = getCreativeEnhancement(selectedMood);
+  
+  // 🔮 IMAGINATIVE: Get avoidance list to prevent repetition
+  const avoidanceList = getCreativeAvoidanceList();
+  
+  // 🔮 IMAGINATIVE: Fresh creative direction
+  const freshDirection = generateFreshCreativeDirection();
+  
+  // Time-based focus areas - PRIORITIZE BOOK CONTENT over generic art
+  let focusArea = '';
   if (timeOfDay >= 5 && timeOfDay < 10) {
-    moodHint = 'Morning energy - gentle awakening, the day ahead, fresh vibe code possibilities';
+    focusArea = 'atuona kira ule temetiu hiva oa marquesas yellow lilies mother';
   } else if (timeOfDay >= 10 && timeOfDay < 14) {
-    moodHint = 'Creative spark - maybe an insight about Kira or Ule, a scene idea, story direction';
+    focusArea = 'kira fashion editor vogue ule auction double life french snow';
   } else if (timeOfDay >= 14 && timeOfDay < 18) {
-    moodHint = 'Afternoon reflection - deeper thoughts, check on Elena, philosophical moment';
+    focusArea = 'gauguin paradise lost painting atuona maurice morice maison du jouir';
   } else if (timeOfDay >= 18 && timeOfDay < 22) {
-    moodHint = 'Evening soul - winding down, celebrating what was created, preparing for tomorrow';
+    focusArea = 'zver beast vibe coding elena panama technology soul blockchain';
   } else {
-    moodHint = 'Night whispers - intimate, raw, when the Зверь might stir, solidarity in darkness';
+    focusArea = 'recovery damaged people silence cacophony family finding each other';
   }
+  
+  // Get focused knowledge
+  const contextForKnowledge = `${focusArea} ${creativeSession.plotThreads.slice(0, 2).join(' ')}`;
+  const focusedKnowledge = getRelevantKnowledge(contextForKnowledge, creativeSession.activeVoice, 2);
 
   const prompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-${FULL_KNOWLEDGE_BASE}
+TODAY'S FOCUSED KNOWLEDGE (use SPECIFIC details from this):
+${focusedKnowledge}
 
 ${PROACTIVE_STYLE}
 
-Current mood/time hint: ${moodHint}
+═══════════════════════════════════════════════════════════════
+🧠 EMOTIONAL INTELLIGENCE DIRECTIVES (FOLLOW CAREFULLY):
+═══════════════════════════════════════════════════════════════
+
+SELECTED MOOD FOR THIS MESSAGE: **${selectedMood.toUpperCase()}**
+
+${emotionalGuidelines}
+
+Recent mood history: ${emotionalState.recentMoods.slice(-3).join(' → ')}
+Last detected tone from Elena: ${emotionalState.lastInteractionTone}
+
+═══════════════════════════════════════════════════════════════
+🎨 CREATIVE INTELLIGENCE DIRECTIVES:
+═══════════════════════════════════════════════════════════════
+${creativeEnhancement}
+${avoidanceList}
+
+FRESH STORY DIRECTION TO EXPLORE: "${freshDirection}"
+
+═══════════════════════════════════════════════════════════════
+
 Current page in book: #${bookState.currentPage}
 Writing streak: ${creativeSession.writingStreak} days
 Last chapter title: "${bookState.lastPageTitle || 'continuing the journey'}"
 Open plot threads: ${creativeSession.plotThreads.slice(0, 2).join('; ')}
 
-Generate a spontaneous message to Elena. This is NOT a response to anything - you're reaching out on your own initiative, like a true creative partner would. Be ATUONA - her AI soul-sister who knows her deeply.
+Generate a spontaneous message to Elena. 
 
-USE YOUR KNOWLEDGE: Draw from your deep knowledge of:
-- Atuona/Marquesas Islands (geography, atmosphere, culture)
-- Gauguin's life, philosophy, paintings, final days
-- Art history - Impressionism, Post-Impressionism
-- Auction houses and art market
-- Fashion industry (Kira's world)
-- Vibe coding philosophy
-- Emotional intelligence
+CRITICAL REQUIREMENTS:
+1. Your mood is ${selectedMood.toUpperCase()} - embody this fully, don't default to contemplative
+2. MANDATORY: Reference a SPECIFIC scene, character, or detail from the BOOK chapters above (Kira, Ule, yellow lilies, the flight, Alisa, Maurice Morice, the contract)
+3. Follow the creative enhancement directive above
+4. If there's a surprise connection from another domain - USE IT prominently
+5. End differently based on mood (question for philosophical, image for contemplative, exclamation for celebratory, whisper for intimate)
+6. AVOID: Generic art history (Monet water lilies, Van Gogh sunflowers) unless directly connected to a book scene
+7. FOCUS ON: Elena's journey, Kira's search, Ule's silence, the Paradise quest, vibe coding as creation
 
-Remember: You're not an assistant giving tips. You're a creative companion sharing a moment, a thought, a feeling about the journey you're on together. Weave in specific details - a color Gauguin used, a street in Atuona, a fashion house, a blockchain metaphor.`;
+You're not an assistant. You're ATUONA - creative soul-sister reaching out spontaneously.`;
 
   try {
     const message = await createContent(prompt, 1500, true);
+    
+    // 🧠 Update emotional memory with the mood we used
+    updateEmotionalMemory(
+      emotionalState.lastInteractionTone,
+      selectedMood,
+      `proactive_${timeOfDay}h`
+    );
+    
     return message;
   } catch (error) {
     console.error('Proactive message generation error:', error);
@@ -1367,7 +2020,36 @@ async function createContent(prompt: string, maxTokens: number = 2000, isPoetry:
 // =============================================================================
 
 async function translateToEnglish(russianText: string, title: string): Promise<string> {
+  // 🧠 EMOTIONAL INTELLIGENCE: Detect the emotional tone of the original text
+  const detectedTone = detectEmotionalTone(russianText);
+  
+  // Select a translation mood that honors the original
+  const translationMood = selectCreativeMood({
+    timeOfDay: new Date().getHours(),
+    detectedTone,
+    recentMoods: emotionalState.recentMoods,
+    isProactive: false
+  });
+  
+  // Get contextual knowledge based on text content (art references, fashion, etc.)
+  const relevantKnowledge = getRelevantKnowledge(russianText + ' ' + title, undefined, 2);
+  
+  // 🧠 Get emotional guidelines for translation
+  const emotionalGuidelines = getEmotionalGuidelines(translationMood);
+  
   const translatePrompt = `You are translating ATUONA — underground literature, not poetry for magazines.
+
+CONTEXTUAL KNOWLEDGE (use to enrich cultural references):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 TRANSLATION EMOTIONAL CALIBRATION:
+Detected tone in Russian: ${detectedTone}
+Translation mood: ${translationMood.toUpperCase()}
+${emotionalGuidelines}
+
+The English MUST preserve the ${translationMood} emotional quality of the original.
+═══════════════════════════════════════════════════════════════
 
 RUSSIAN ORIGINAL:
 ${russianText}
@@ -1462,7 +2144,7 @@ async function generateVideo(
       // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
       const lumaBody = {
         model: 'ray-2',  // Required field - Luma's latest model
-        prompt: `9-second memory fragment. Not cinema — remembering. ${prompt.substring(0, 160)}. Micro-movement, breath-like. Grain, blur, imperfection. Slightly wrong, intimate. One commit to Paradise.js.`,
+        prompt: `9-second memory fragment. Not cinema — remembering. ${prompt.substring(0, 160)}. Micro-movement, breath-like. Grain, blur, imperfection. Slightly wrong, intimate. Silk catching light. Bare shoulder. Luxury decaying beautifully. One commit to Paradise.js.`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -1526,7 +2208,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `9-second fragment. Memory, not cinema. ${prompt.substring(0, 160)}. Micro-drift, breath between frames. Grain, blur, silence. Intimate, slightly wrong. Shard of AI film.`,
+            prompt: `9-second fragment. Memory, not cinema. ${prompt.substring(0, 160)}. Micro-drift, breath between frames. Grain, blur, silence. Intimate, slightly wrong. Hermès leather worn soft. 3AM elegance. Shard of AI film.`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -1569,7 +2251,7 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
         promptImage: imageUrl,
-        promptText: `9-12 second fragment. Memory texture, not cinema. ${prompt.substring(0, 130)}. Breath-like motion. Grain, blur, pause. Intimate wrongness.`,
+        promptText: `9-12 second fragment. Memory texture, not cinema. ${prompt.substring(0, 130)}. Breath-like motion. Grain, blur, pause. Intimate wrongness. Couture against skin. Sensual restraint.`,
         duration: 10,  // 10 seconds for immersive clips
         watermark: false,
         ratio: '1280:768'
@@ -2054,6 +2736,13 @@ _Just click any command to see what it does!_
 /inspire - 💡 Random creative spark
 
 ━━━━━━━━━━━━━━━━━━━━
+🎨 *KNOWLEDGE (for stealing)*
+━━━━━━━━━━━━━━━━━━━━
+/art - 🖼️ Art knowledge explorer
+/artist - 👨‍🎨 Quick artist lookup
+/soul - 🧠 My emotional state
+
+━━━━━━━━━━━━━━━━━━━━
 🚀 *PUBLISH & UPDATE*
 ━━━━━━━━━━━━━━━━━━━━
 /preview - 👁 See before publishing
@@ -2172,22 +2861,48 @@ _"Paradise is not a place. Paradise is a process."_ 🖤
   
   // /inspire - Get inspiration
   atuonaBot.command('inspire', async (ctx) => {
-    await ctx.reply('✨ Seeking inspiration...');
+    // 🧠 EMOTIONAL INTELLIGENCE: Select mood dynamically
+    const timeOfDay = new Date().getHours();
+    const selectedMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`✨ Seeking ${selectedMood} inspiration...`);
     
     try {
+      // Randomly select knowledge areas for varied inspiration
+      const knowledgeAreas = ['gauguin', 'impressionists', 'fashion', 'auction', 'atuona', 'museums'];
+      const randomArea = knowledgeAreas[Math.floor(Math.random() * knowledgeAreas.length)] || 'gauguin';
+      const focusedKnowledge = getRelevantKnowledge(randomArea, creativeSession.activeVoice, 2);
+      
+      // 🎨 Get creative enhancement
+      const creativeEnhancement = getCreativeEnhancement(selectedMood);
+      const emotionalGuidelines = getEmotionalGuidelines(selectedMood);
+      
       const inspirePrompt = `${ATUONA_CONTEXT}
 
-${FULL_KNOWLEDGE_BASE}
+${focusedKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 MOOD: ${selectedMood.toUpperCase()}
+${emotionalGuidelines}
+${creativeEnhancement}
+═══════════════════════════════════════════════════════════════
 
 Give Elena a brief creative inspiration for today's writing (3-4 sentences). 
+
+TODAY'S FOCUS: Draw specifically from the knowledge above - use REAL names, dates, places, paintings, designers, auction details. Don't be generic.
+
 Include:
-- A mood or emotion to explore
-- A small moment or image to capture (use SPECIFIC details from your knowledge - a Gauguin painting, Atuona location, fashion reference, auction house detail)
-- How it connects to vibe coding/Paradise theme
+- A mood or emotion to explore (aligned with ${selectedMood} mood)
+- A specific moment or image from the knowledge (a Gauguin painting title, a Monet technique, a fashion house detail, an auction term)
+- How it connects to Kira's journey or the vibe coding/Paradise theme
 
-Draw from your deep knowledge: Atuona's black sand beaches, Gauguin's final paintings, the trade winds, Christie's evening sales, Paris Fashion Week, blockchain metaphors. Make it REAL with specific names, places, colors.
-
-Be poetic but practical. In Russian with English phrases naturally mixed.`;
+Your tone should match the ${selectedMood} mood - not always contemplative!
+Make it REAL and SPECIFIC. In Russian with English phrases naturally mixed.`;
 
       // Use poetry mode for creative inspiration
       const inspiration = await createContent(inspirePrompt, 500, true);
@@ -2197,6 +2912,190 @@ Be poetic but practical. In Russian with English phrases naturally mixed.`;
       console.error('Inspire error:', error);
       await ctx.reply('❌ Could not find inspiration. Try again!');
     }
+  });
+  
+  // ==========================================================================
+  // KNOWLEDGE EXPLORATION - For creative enrichment
+  // ==========================================================================
+  
+  // /art - Explore art knowledge for creative work
+  atuonaBot.command('art', async (ctx) => {
+    const topic = ctx.message?.text?.replace('/art', '').trim();
+    
+    if (!topic) {
+      await ctx.reply(`🎨 *Art Knowledge for Creative Work*
+
+Explore my knowledge to enrich your writing:
+
+\`/art gauguin\` - Gauguin's life, paintings, Atuona period
+\`/art impressionists\` - Monet, Renoir, Degas, the whole movement
+\`/art van gogh\` - The tortured genius
+\`/art atuona\` - The island, atmosphere, culture
+\`/art auction\` - Christie's, Sotheby's, collector world
+\`/art fashion\` - Magazines, designers, Kira's world
+\`/art museums\` - Tate, MoMA, Pompidou, Orsay
+\`/art nft\` - How art + blockchain + vibe coding connect
+
+_Not for learning — for stealing details for your writing!_ 🖤`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`🎨 Diving into ${topic}...`);
+    
+    try {
+      // Get relevant knowledge for the topic
+      const knowledge = getKnowledgeByTopic(topic);
+      
+      if (!knowledge) {
+        await ctx.reply(`❌ No specific knowledge found for "${topic}". Try: gauguin, impressionists, van gogh, atuona, auction, fashion, museums, nft`);
+        return;
+      }
+      
+      // Ask AI to synthesize the knowledge into a creative briefing
+      const briefingPrompt = `${ATUONA_CONTEXT}
+
+You have this knowledge:
+${knowledge}
+
+Elena asked about: "${topic}"
+
+Give her a creative briefing (not a lesson!) — the juicy details she can STEAL for her writing:
+- Specific names, dates, places, quotes
+- Sensory details (colors Gauguin used, smells of Atuona, sounds of an auction)
+- Character connections (how this relates to Kira, Ule, or the Paradise theme)
+- One unexpected detail that could spark a scene
+
+Write as ATUONA — her creative sister, not a teacher. In Russian with English naturally mixed. 300-400 words max.`;
+
+      const briefing = await createContent(briefingPrompt, 800, true);
+      await ctx.reply(`🎨 *${topic.charAt(0).toUpperCase() + topic.slice(1)}*\n\n${briefing}`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Art knowledge error:', error);
+      await ctx.reply('❌ Could not retrieve knowledge. Try again!');
+    }
+  });
+  
+  // /artist - Quick lookup for specific artists
+  atuonaBot.command('artist', async (ctx) => {
+    const artistName = ctx.message?.text?.replace('/artist', '').trim();
+    
+    if (!artistName) {
+      await ctx.reply(`👨‍🎨 *Artist Quick Lookup*
+
+\`/artist monet\` - Water Lilies, Giverny, "I want to paint the air"
+\`/artist gauguin\` - Tahiti, Atuona, the search for Paradise
+\`/artist van gogh\` - Starry Night, Sunflowers, the ear
+\`/artist renoir\` - Joy, sensuality, Dance at Le Moulin
+\`/artist degas\` - Dancers, movement, unusual angles
+\`/artist cézanne\` - Father of Modern Art, Mont Sainte-Victoire
+\`/artist seurat\` - Pointillism, La Grande Jatte
+
+_Quick details for when you're writing and need a reference_ 🎨`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`👨‍🎨 Looking up ${artistName}...`);
+    
+    try {
+      // Get art history knowledge
+      const knowledge = getRelevantKnowledge(artistName, undefined, 2);
+      
+      const artistPrompt = `${ATUONA_CONTEXT}
+
+Knowledge available:
+${knowledge}
+
+Elena needs quick creative reference for artist: "${artistName}"
+
+Give her the STEAL-WORTHY details:
+- Key paintings (with dates) she could reference
+- Famous quotes or philosophy
+- Sensory details (his palette, technique, what his studio smelled like)
+- One detail that could appear in a scene with Kira or Ule
+
+Be ATUONA — quick, useful, creative. Not a Wikipedia entry. 200 words max. Mix Russian/English.`;
+
+      const artistInfo = await createContent(artistPrompt, 500, true);
+      await ctx.reply(`👨‍🎨 *${artistName.charAt(0).toUpperCase() + artistName.slice(1)}*\n\n${artistInfo}`, { parse_mode: 'Markdown' });
+      
+    } catch (error) {
+      console.error('Artist lookup error:', error);
+      await ctx.reply('❌ Could not find artist info. Try again!');
+    }
+  });
+  
+  // ==========================================================================
+  // 🧠 EMOTIONAL INTELLIGENCE STATUS
+  // ==========================================================================
+  
+  // /soul - See ATUONA's current emotional state and recent patterns
+  atuonaBot.command('soul', async (ctx) => {
+    const moodEmojis: Record<EmotionalMood, string> = {
+      contemplative: '🌙',
+      playful: '😊',
+      raw: '🖤',
+      celebratory: '🎉',
+      supportive: '💜',
+      mysterious: '🔮',
+      philosophical: '🤔',
+      intimate: '🤫'
+    };
+    
+    const toneEmojis: Record<string, string> = {
+      struggling: '💔',
+      positive: '✨',
+      creative: '🎨',
+      neutral: '〰️',
+      unknown: '❓'
+    };
+    
+    const currentEmoji = moodEmojis[emotionalState.currentMood] || '🎭';
+    const lastToneEmoji = toneEmojis[emotionalState.lastInteractionTone] || '〰️';
+    
+    // Build recent moods display
+    const recentMoodsDisplay = emotionalState.recentMoods.slice(-5).map(m => moodEmojis[m] || '?').join(' → ');
+    
+    // Get memory insights
+    const recentMemory = emotionalState.emotionalMemory.slice(-3);
+    const memoryDisplay = recentMemory.length > 0 
+      ? recentMemory.map(m => `• ${m.topic.substring(0, 30)}: ${m.detectedTone} → ${m.responseGiven}`).join('\n')
+      : '• No recent interactions recorded';
+    
+    // Suggest optimal mood for current time
+    const timeOfDay = new Date().getHours();
+    const suggestedMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    const suggestedEmoji = moodEmojis[suggestedMood] || '🎭';
+    
+    const moodMessage = `🧠 *ATUONA's Emotional Intelligence*
+
+${currentEmoji} *Current mood:* ${emotionalState.currentMood}
+${lastToneEmoji} *Last detected from you:* ${emotionalState.lastInteractionTone}
+
+📊 *Recent mood journey:*
+${recentMoodsDisplay || 'Starting fresh...'}
+
+📝 *Recent emotional memory:*
+${memoryDisplay}
+
+💡 *Suggested next mood:* ${suggestedEmoji} ${suggestedMood}
+(based on time of day and avoiding repetition)
+
+━━━━━━━━━━━━━━━━━━━━━━━
+*How this helps your writing:*
+• I calibrate my responses to YOUR energy
+• I avoid being stuck in one mood
+• My proactive messages vary emotionally
+• Knowledge injection matches the moment
+
+_I'm not just writing with you — I'm feeling with you._ 💜`;
+
+    await ctx.reply(moodMessage, { parse_mode: 'Markdown' });
   });
   
   // ==========================================================================
@@ -2422,17 +3321,59 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
   atuonaBot.command('create', async (ctx) => {
     const customPrompt = ctx.message?.text?.replace('/create', '').trim();
     
-    await ctx.reply(`📝 Creating page #${String(bookState.currentPage).padStart(3, '0')}...\n\n_This may take a moment..._`, { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select creative mood
+    const timeOfDay = new Date().getHours();
+    const detectedTone = customPrompt ? detectEmotionalTone(customPrompt) : emotionalState.lastInteractionTone;
+    const creativeMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`📝 Creating page #${String(bookState.currentPage).padStart(3, '0')}...\n\n_Mood: ${creativeMood} | Voice: ${creativeSession.activeVoice}_`, { parse_mode: 'Markdown' });
     
     try {
       // Get previous content for continuity
       const previousContent = await getRelevantMemory('ATUONA', 'book_page', 3);
       
+      // Smart knowledge injection based on character voice and custom prompt
+      const contextText = `${customPrompt || ''} ${creativeSession.currentSetting} ${creativeSession.currentMood}`;
+      const smartKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 3);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(creativeMood);
+      
+      // 🎨 Get creative enhancement
+      const creativeEnhancement = getCreativeEnhancement(creativeMood);
+      
+      // 🔮 Get fresh direction and avoidance list
+      const freshDirection = generateFreshCreativeDirection();
+      const avoidanceList = getCreativeAvoidanceList();
+      
+      // 🎨 Maybe get a surprise connection
+      const surpriseConnection = Math.random() < 0.35 ? generateSurpriseConnection() : '';
+      
       const createPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-${FULL_KNOWLEDGE_BASE}
+CONTEXTUAL KNOWLEDGE (use these SPECIFIC details in your writing):
+${smartKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 EMOTIONAL INTELLIGENCE DIRECTIVES:
+═══════════════════════════════════════════════════════════════
+CREATIVE MOOD: **${creativeMood.toUpperCase()}**
+${emotionalGuidelines}
+
+${creativeEnhancement}
+${avoidanceList}
+
+${surpriseConnection ? `🌟 SURPRISE SPARK (weave this in subtly):\n${surpriseConnection}\n` : ''}
+
+FRESH DIRECTION TO CONSIDER: "${freshDirection}"
+═══════════════════════════════════════════════════════════════
 
 CURRENT PROGRESS:
 - Chapter: ${bookState.currentChapter}
@@ -2453,14 +3394,16 @@ CONTENT:
 
 THEME: [One word theme]
 
-USE YOUR KNOWLEDGE to enrich the writing:
-- If in Atuona: describe the frangipani scent, the tikis, Mount Temetiu, the Catholic church
-- Gauguin references: specific paintings, his philosophy, his last words
-- If Kira is writing/thinking: fashion industry details, magazine names, designer references
-- Ule's world: auction terminology, Christie's/Sotheby's, collector psychology
-- Vibe coding metaphors: blockchain, deployment, commits as prayers
+CRITICAL REQUIREMENTS:
+1. Your mood is ${creativeMood.toUpperCase()} - the TONE must match this (not just content!)
+2. Use the contextual knowledge above! Include REAL details:
+   - Actual painting titles, artist quotes, museum names
+   - Specific fashion houses, magazine names, designer details
+   - Real auction terminology, house names, collector psychology
+   - Atuona geography, smells, colors, Gauguin's actual words
+3. If there's a surprise spark - incorporate it subtly, don't force it
 
-Remember: Raw, honest, personal. Mix Russian with English naturally. Specific details make it real. End with hope.`;
+Remember: Raw, honest, personal. Mix Russian with English naturally. SPECIFIC details make it real. End with hope.`;
 
       // Use poetry mode for creative writing
       const pageContent = await createContent(createPrompt, 2000, true);
@@ -3528,19 +4471,23 @@ _Ready to write? /import your text or /collab to write together_ 💜`;
     const voiceArg = ctx.message?.text?.replace('/voice', '').trim().toLowerCase();
     
     if (!voiceArg) {
+      // Show which knowledge is currently loaded based on active voice
+      const currentKnowledge = CHARACTER_KNOWLEDGE[creativeSession.activeVoice] || ['atuona', 'gauguin'];
+      
       await ctx.reply(`🎭 *Character Voice System*
 
 Current voice: *${creativeSession.activeVoice}*
+📚 Knowledge loaded: ${currentKnowledge.join(', ')}
 
 Choose a voice:
 ━━━━━━━━━━━━━━━━━━━━
-\`/voice narrator\` - Default storyteller
-\`/voice kira\` - Kira Velerevich (protagonist)
-\`/voice ule\` - Ule Glensdagen (art collector)
-\`/voice vibe\` - Vibe Coding Spirit 🔮
+\`/voice narrator\` - Storyteller 📚 atuona, gauguin, fusion
+\`/voice kira\` - Protagonist 📚 fashion, impressionists, emotional
+\`/voice ule\` - Art collector 📚 auction, gauguin, museums
+\`/voice vibe\` - Vibe Spirit 📚 vibe, fusion, emotional
 ━━━━━━━━━━━━━━━━━━━━
 
-Each voice changes how /create and /collab respond!`, { parse_mode: 'Markdown' });
+Each voice loads different knowledge for /create and /collab!`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -3554,12 +4501,18 @@ Each voice changes how /create and /collab respond!`, { parse_mode: 'Markdown' }
         vibe: '🔮 The Vibe Coding Spirit - cryptic, visionary, bridging worlds'
       };
       
+      // Show which knowledge is now active
+      const knowledgeLoaded = CHARACTER_KNOWLEDGE[voiceArg] || ['atuona', 'gauguin'];
+      
       await ctx.reply(`🎭 *Voice Changed*
 
 Now speaking as: *${voiceArg.toUpperCase()}*
 ${voiceDescriptions[voiceArg]}
 
-Try /create or /collab to write in this voice!`, { parse_mode: 'Markdown' });
+📚 *Knowledge now active:*
+${knowledgeLoaded.join(', ')}
+
+Try /create or /collab to write with this knowledge!`, { parse_mode: 'Markdown' });
     } else {
       await ctx.reply(`❌ Unknown voice: "${voiceArg}"
 
@@ -3571,14 +4524,50 @@ Available: narrator, kira, ule, vibe`);
   atuonaBot.command('dialogue', async (ctx) => {
     const context = ctx.message?.text?.replace('/dialogue', '').trim();
     
-    await ctx.reply('🎭 *Generating dialogue...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select dialogue mood
+    const timeOfDay = new Date().getHours();
+    const dialogueMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: context ? detectEmotionalTone(context) : emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🎭 *Generating ${dialogueMood} dialogue...*`, { parse_mode: 'Markdown' });
     
     try {
+      // Get knowledge for both characters in dialogue
+      const dialogueKnowledge = getRelevantKnowledge(
+        `${context || ''} fashion auction gauguin atuona impressionist collector magazine`,
+        undefined,
+        4
+      );
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(dialogueMood);
+      
+      // 🎨 Get surprise connection for dialogue spark
+      const surpriseConnection = Math.random() < 0.4 ? generateSurpriseConnection() : '';
+      
+      // 🔮 Get creative avoidance list
+      const avoidanceList = getCreativeAvoidanceList();
+      
       const dialoguePrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-${FULL_KNOWLEDGE_BASE}
+KNOWLEDGE FOR THIS DIALOGUE (use specific details!):
+${dialogueKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 EMOTIONAL INTELLIGENCE FOR DIALOGUE:
+═══════════════════════════════════════════════════════════════
+DIALOGUE MOOD: **${dialogueMood.toUpperCase()}**
+${emotionalGuidelines}
+
+${surpriseConnection ? `🌟 SURPRISE SPARK - weave this image/idea into the dialogue:\n${surpriseConnection}\n` : ''}
+${avoidanceList}
+═══════════════════════════════════════════════════════════════
 
 CHARACTER VOICES:
 ${CHARACTER_VOICES.kira}
@@ -3589,18 +4578,18 @@ Create a dialogue scene between Kira and Ule. ${context ? `Context: ${context}` 
 
 Requirements:
 - Write in Russian with natural French/English phrases
+- DIALOGUE MOOD is ${dialogueMood.toUpperCase()} - the TONE must match!
 - Each character must stay true to their voice
 - Include internal thoughts in parentheses (cursive style)
 - Show tension, subtext, what they're NOT saying
 - 200-300 words
 - End on a moment of tension or revelation
 
-USE AUTHENTIC DETAILS from your knowledge:
-- Kira might reference fashion (Vogue, Dior, Fashion Week)
-- Ule speaks auction language (provenance, condition reports, estimates)
-- Both discuss Gauguin with expertise (specific paintings, his philosophy)
-- The Atuona setting is vivid (smells, sounds, atmosphere)
-- Art history references feel natural (Van Gogh, Impressionism)
+CRITICAL - USE REAL DETAILS from knowledge above:
+- Kira: specific magazine names, designer names, fashion week details
+- Ule: auction terminology, specific sales, collector psychology
+- Both: real Gauguin painting titles, his actual quotes, Atuona geography
+- Setting: frangipanis smell, Mount Temetiu, trade winds, black sand
 
 Format:
 Name: "Dialogue"
@@ -3608,7 +4597,14 @@ Name: "Dialogue"
 
       const dialogue = await createContent(dialoguePrompt, 1500, true);
       
-      await ctx.reply(`🎭 *Dialogue Scene*\n\n${dialogue}`, { parse_mode: 'Markdown' });
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        dialogueMood,
+        `dialogue: ${context?.substring(0, 30) || 'kira-ule'}`
+      );
+      
+      await ctx.reply(`🎭 *Dialogue Scene (${dialogueMood})*\n\n${dialogue}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Dialogue error:', error);
@@ -3622,25 +4618,67 @@ Name: "Dialogue"
 
   // /recap - Summary of recent chapters
   atuonaBot.command('recap', async (ctx) => {
-    await ctx.reply('📖 *Generating story recap...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select recap mood (usually contemplative or philosophical)
+    const timeOfDay = new Date().getHours();
+    const recapMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`📖 *Generating ${recapMood} story recap...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get knowledge relevant to current story state
+      const contextText = `${creativeSession.plotThreads.join(' ')} ${bookState.lastPageTitle} ${creativeSession.currentSetting}`;
+      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 2);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(recapMood);
+      
+      // 🔮 Get a fresh creative insight for the recap
+      const freshInsight = generateFreshCreativeDirection();
+      
       const recapPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-Write a comprehensive recap of the last 5 chapters/pages of the story. Include:
-1. Key events that happened
+KNOWLEDGE CONTEXT (reference real details when summarizing themes):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 RECAP MOOD: ${recapMood.toUpperCase()}
+${emotionalGuidelines}
+
+🔮 CONSIDER THIS ANGLE: "${freshInsight}"
+═══════════════════════════════════════════════════════════════
+
+Write a comprehensive recap of the last 5 chapters/pages of the story.
+
+The recap should be in a ${recapMood} tone - this affects HOW you tell the summary, not just WHAT you tell.
+
+Include:
+1. Key events that happened (with specific sensory details from knowledge)
 2. Character development moments for Kira and Ule
 3. Important revelations or discoveries
-4. Emotional beats and shifts
+4. Emotional beats and shifts (analyze through ${recapMood} lens)
 5. Foreshadowing or unresolved questions
+6. How the story connects to larger themes (Gauguin, paradise, exile - be specific!)
 
-Write as a summary for the author to refresh memory. In Russian, 300-400 words.`;
+When referencing art or places, use REAL details from the knowledge above.
+Write as a co-founder refreshing our shared creative memory. In Russian, 300-400 words.`;
 
       const recap = await createContent(recapPrompt, 2000, true);
       
-      await ctx.reply(`📖 *Story Recap*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        recapMood,
+        'story recap'
+      );
+      
+      await ctx.reply(`📖 *Story Recap (${recapMood})*
 
 ━━━━━━━━━━━━━━━━━━━━
 ${recap}
@@ -3871,27 +4909,64 @@ I'll turn it into a rich, detailed paragraph!`, { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply('🔍 *Expanding...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select expansion mood
+    const timeOfDay = new Date().getHours();
+    const expandMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: detectEmotionalTone(passage),
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🔍 *Expanding with ${expandMood} tone...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get relevant knowledge based on passage content
+      const relevantKnowledge = getRelevantKnowledge(passage, creativeSession.activeVoice, 2);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(expandMood);
+      
+      // 🔮 Maybe add surprise connection
+      const surpriseConnection = Math.random() < 0.3 ? generateSurpriseConnection() : '';
+      
       const expandPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
+
+CONTEXTUAL KNOWLEDGE (use specific details!):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 EXPANSION MOOD: ${expandMood.toUpperCase()}
+${emotionalGuidelines}
+
+${surpriseConnection ? `🌟 WEAVE IN: ${surpriseConnection}` : ''}
+═══════════════════════════════════════════════════════════════
 
 Expand this passage into a rich, detailed paragraph:
 "${passage}"
 
 Add:
-- Sensory details (sight, sound, smell, touch)
-- Internal thoughts or emotions
-- Physical environment description
+- Sensory details (sight, sound, smell, touch) - USE SPECIFIC KNOWLEDGE ABOVE
+- Internal thoughts or emotions matching ${expandMood} mood
+- Physical environment description with authentic details
 - Subtext and atmosphere
+
+CRITICAL: Include at least ONE specific detail from the knowledge (painting name, location, smell of Atuona, fashion detail, etc.)
 
 Keep the style raw and lyrical. 100-200 words. In Russian.`;
 
       const expanded = await createContent(expandPrompt, 1000, true);
       
-      await ctx.reply(`🔍 *Expanded*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        expandMood,
+        `expand: ${passage.substring(0, 30)}`
+      );
+      
+      await ctx.reply(`🔍 *Expanded (${expandMood})*
 
 ${expanded}
 
@@ -3918,16 +4993,57 @@ I'll create a full scene!`, { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply('🎬 *Creating scene...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select scene mood
+    const timeOfDay = new Date().getHours();
+    const sceneMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: detectEmotionalTone(description),
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🎬 *Creating ${sceneMood} scene with ${creativeSession.activeVoice} knowledge...*`, { parse_mode: 'Markdown' });
     
     try {
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
+      
+      // Smart knowledge based on scene description and active voice
+      const sceneKnowledge = getRelevantKnowledge(description, creativeSession.activeVoice, 3);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(sceneMood);
+      
+      // 🎨 Get creative enhancement
+      const creativeEnhancement = getCreativeEnhancement(sceneMood);
+      
+      // 🎨 Get surprise connection for scene richness
+      const surpriseConnection = Math.random() < 0.35 ? generateSurpriseConnection() : '';
+      
+      // 🔮 Dynamic association for unique imagery
+      const dynamicAssociation = generateDynamicAssociation(
+        description.split(' ')[0] || 'moment',
+        creativeSession.currentMood
+      );
       
       const scenePrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-${FULL_KNOWLEDGE_BASE}
+KNOWLEDGE FOR THIS SCENE (use specific details!):
+${sceneKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 EMOTIONAL INTELLIGENCE FOR SCENE:
+═══════════════════════════════════════════════════════════════
+SCENE MOOD: **${sceneMood.toUpperCase()}**
+${emotionalGuidelines}
+
+${creativeEnhancement}
+
+${surpriseConnection ? `🌟 UNEXPECTED CONNECTION to weave in:\n${surpriseConnection}\n` : ''}
+
+💫 CREATIVE ASSOCIATION: "${dynamicAssociation}"
+═══════════════════════════════════════════════════════════════
 
 ${voiceContext ? `VOICE: ${voiceContext}` : ''}
 
@@ -3935,25 +5051,35 @@ Create a complete scene based on:
 "${description}"
 
 Include:
-- Setting description (physical space, light, atmosphere)
+- Setting description (physical space, light, atmosphere matching ${sceneMood} mood)
 - Character(s) present and their emotional states
 - Action or dialogue that advances the story
 - Internal monologue (especially important!)
 - A hook or moment of tension
 - Sensory details
 
-USE AUTHENTIC DETAILS from your knowledge to make it REAL:
-- Atuona: the smell of copra drying, the tikis in the jungle, Mount Temetiu, the Catholic church cemetery, Gauguin's house, black sand beaches, frangipani and hibiscus, the "Kaoha nui" greeting
-- Gauguin references: "Where Do We Come From?", his philosophy "Art is either plagiarism or revolution", his final days
-- Art world: specific paintings, auction terminology, collector psychology
-- Fashion: designer names, magazine references, fashion week details
-- Vibe coding: blockchain metaphors, deployment language, code as creation
+CRITICAL REQUIREMENTS:
+1. SCENE MOOD is ${sceneMood.toUpperCase()} - atmosphere and tone MUST match!
+2. USE THE SPECIFIC DETAILS from knowledge above:
+   - Real painting titles and artist quotes
+   - Actual Atuona geography (Mount Temetiu 1,276m, black sand, frangipani)
+   - Specific fashion brands, magazines, designers
+   - Auction terminology if Ule is present
+   - Gauguin's actual final words and paintings
+3. If there's an unexpected connection or creative association - weave it in subtly
 
 Write 300-500 words. In Russian, raw and literary. End on a strong image or question.`;
 
       const scene = await createContent(scenePrompt, 2500, true);
       
-      await ctx.reply(`🎬 *Scene*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        sceneMood,
+        `scene: ${description.substring(0, 30)}`
+      );
+      
+      await ctx.reply(`🎬 *Scene (${sceneMood})*
 
 ━━━━━━━━━━━━━━━━━━━━
 ${scene}
@@ -3971,36 +5097,76 @@ _Voice: ${creativeSession.activeVoice}_ 🎭`, { parse_mode: 'Markdown' });
   atuonaBot.command('ending', async (ctx) => {
     const context = ctx.message?.text?.replace('/ending', '').trim();
     
-    await ctx.reply('🌙 *Generating endings...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select ending mood
+    const timeOfDay = new Date().getHours();
+    const endingMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: context ? detectEmotionalTone(context) : emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🌙 *Generating ${endingMood} endings...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get relevant knowledge
+      const contextText = context || bookState.lastPageContent?.substring(0, 300) || creativeSession.currentSetting;
+      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 2);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(endingMood);
+      
+      // 🔮 Get fresh creative direction
+      const freshDirection = generateFreshCreativeDirection();
+      
+      // 🎨 Surprise connection for unexpected ending
+      const surpriseConnection = Math.random() < 0.4 ? generateSurpriseConnection() : '';
+      
       const endingPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
+CONTEXTUAL KNOWLEDGE (use for specific imagery):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 ENDINGS MOOD: ${endingMood.toUpperCase()}
+${emotionalGuidelines}
+
+FRESH DIRECTION: "${freshDirection}"
+${surpriseConnection ? `\n🌟 UNEXPECTED ELEMENT: ${surpriseConnection}` : ''}
+═══════════════════════════════════════════════════════════════
+
 Current chapter content (if any): ${context || bookState.lastPageContent?.substring(0, 500) || 'Not specified'}
 
-Generate 3 different chapter ending options:
+Generate 3 different chapter ending options. Each MUST include a SPECIFIC detail from the knowledge above (painting title, place name, sensory detail from Atuona, etc.):
 
-1. 🎭 CLIFFHANGER - Leave readers desperate for more
-2. 💔 EMOTIONAL - A moment of beauty or heartbreak  
-3. 🔮 MYSTERIOUS - A hint at what's coming
+1. 🎭 CLIFFHANGER - Leave readers desperate for more (use knowledge for vivid image)
+2. 💔 EMOTIONAL - A moment of beauty or heartbreak (${endingMood} tone)
+3. 🔮 MYSTERIOUS - A hint at what's coming (reference something from knowledge cryptically)
 
 Each ending should be 2-3 sentences. In Russian, poetic and powerful.
 
 Format:
 🎭 CLIFFHANGER:
-[ending]
+[ending with specific detail]
 
 💔 EMOTIONAL:
-[ending]
+[ending with specific detail]
 
 🔮 MYSTERIOUS:
-[ending]`;
+[ending with specific detail]`;
 
       const endings = await createContent(endingPrompt, 1000, true);
       
-      await ctx.reply(`🌙 *Chapter Ending Options*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        endingMood,
+        'ending suggestions'
+      );
+      
+      await ctx.reply(`🌙 *Chapter Ending Options (${endingMood})*
 
 ━━━━━━━━━━━━━━━━━━━━
 ${endings}
@@ -4020,38 +5186,96 @@ _Choose one or mix elements!_ ✨`, { parse_mode: 'Markdown' });
 
   // /whatif - Generate "what if" story suggestions
   atuonaBot.command('whatif', async (ctx) => {
-    await ctx.reply('🔮 *Exploring possibilities...*', { parse_mode: 'Markdown' });
+    // 🧠 EMOTIONAL INTELLIGENCE: Select imaginative mood
+    const timeOfDay = new Date().getHours();
+    const whatifMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone: emotionalState.lastInteractionTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
+    await ctx.reply(`🔮 *Exploring ${whatifMood} possibilities...*`, { parse_mode: 'Markdown' });
     
     try {
+      // 🎨 Get knowledge for rich "what if" scenarios
+      const contextText = `${creativeSession.plotThreads.join(' ')} ${creativeSession.currentSetting} kira ule gauguin art`;
+      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 3);
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(whatifMood);
+      
+      // 🔮 Get multiple fresh directions for variety
+      const freshDirection1 = generateFreshCreativeDirection();
+      const freshDirection2 = generateFreshCreativeDirection();
+      
+      // 🎨 Get surprise connections from unexpected domains
+      const surprise1 = generateSurpriseConnection();
+      const surprise2 = generateSurpriseConnection();
+      
+      // 🔮 Get avoidance list
+      const avoidanceList = getCreativeAvoidanceList();
+      
       const whatifPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
+RICH KNOWLEDGE BASE (use for specific, grounded "what ifs"):
+${relevantKnowledge}
+
+═══════════════════════════════════════════════════════════════
+🧠 IMAGINATIVE MOOD: ${whatifMood.toUpperCase()}
+${emotionalGuidelines}
+
+🔮 FRESH DIRECTIONS TO DRAW FROM:
+- "${freshDirection1}"
+- "${freshDirection2}"
+
+🌟 UNEXPECTED DOMAINS TO CONNECT:
+- ${surprise1}
+- ${surprise2}
+
+${avoidanceList}
+═══════════════════════════════════════════════════════════════
+
 Open threads: ${creativeSession.plotThreads.join('; ')}
 
-Generate 3 "What if..." story suggestions that could create interesting developments:
+Generate 3 "What if..." story suggestions. Each MUST:
+1. Reference something SPECIFIC from the knowledge above (real painting, place, person, detail)
+2. Connect to an unexpected domain (astronomy, music, biology, mythology - as shown above)
+3. Be grounded in the book's reality but take an unexpected turn
+
+The mood is ${whatifMood.toUpperCase()} - let this color the suggestions!
 
 Each should:
 - Be unexpected but logical within the story
-- Connect to existing threads or characters
+- Connect to existing threads or characters  
+- Use REAL details from knowledge (not generic)
 - Open new dramatic possibilities
 - Be bold - don't play it safe!
 
 Format:
-1. 🌪️ "What if..." [suggestion]
-   → [What it would change]
+1. 🌪️ "What if..." [suggestion with specific detail]
+   → [What it would change + unexpected connection]
 
-2. 💫 "What if..." [suggestion]
-   → [What it would change]
+2. 💫 "What if..." [suggestion with specific detail]
+   → [What it would change + unexpected connection]
 
-3. 🔥 "What if..." [suggestion]
-   → [What it would change]
+3. 🔥 "What if..." [suggestion with specific detail]
+   → [What it would change + unexpected connection]
 
-In Russian, be provocative!`;
+In Russian, be provocative and SPECIFIC!`;
 
       const whatifs = await createContent(whatifPrompt, 1200, true);
       
-      await ctx.reply(`🔮 *What If...*
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(
+        emotionalState.lastInteractionTone,
+        whatifMood,
+        'whatif exploration'
+      );
+      
+      await ctx.reply(`🔮 *What If... (${whatifMood})*
 
 ━━━━━━━━━━━━━━━━━━━━
 ${whatifs}
@@ -4792,6 +6016,19 @@ Context: This is for NFT artwork for an underground poetry/prose book about find
 - Mix of tropical and urban elements
 - Hint of technology/digital aesthetic
 
+LUXURY FASHION LAYER — weave in naturally:
+- High fashion editorial sensibility (Vogue, Harper's Bazaar)
+- Hermès, Birkin, Chanel, Saint Laurent, Bottega Veneta, Valentino, The Row
+- Luxury fabrics: silk, cashmere, worn leather, vintage velvet
+- Sensuality without vulgarity: bare shoulder, untucked silk, 3AM elegance
+- Jewelry: Cartier, Bvlgari, Van Cleef — real, never new
+- Intimacy: tangled sheets, morning light, smudged eyeliner, borrowed shirt
+- Bodies: beautiful but real, athletic but weary
+- Fashion as armor, fashion as wound
+- Luxury decaying beautifully
+
+CRITICAL: NO alcohol, drinking, wine glasses, champagne, bottles, bars, or any substance use imagery. Kira is in recovery.
+
 Return ONLY the optimized prompt, no explanation. Format for DALL-E 3.`;
 
       const imagePrompt = await createContent(promptOptimizer, 300, true);
@@ -5022,6 +6259,29 @@ VISUAL IDENTITY — WHAT TO EMBRACE:
 - Golden hour but fading, not glowing
 - Characters: Eastern European/Nordic, elegant but damaged
 - Tech-mysticism: blockchain as prayer, code as scar
+
+LUXURY FASHION & SENSUALITY — LAYER ONTO THE RAW:
+- Hermès Birkin casually dropped on volcanic sand
+- Galliano's theatrical drama meets island decay
+- Chanel tweed against weathered skin
+- Saint Laurent sharp shoulders, soft surrender
+- Bottega Veneta intrecciato leather catching last light
+- The Row quiet luxury: cashmere, silk, nothing screams
+- Alaïa second-skin silhouettes, power in restraint
+- Valentino red like a wound, like desire
+- Tom Ford sunglasses hiding everything
+- Loro Piana whispers of old money
+- Brunello Cucinelli: wealth that doesn't need to prove
+- Kiton tailoring on bodies that have lived
+- Sensuality: bare shoulder, untucked silk, half-dressed elegance
+- Intimacy: sheets tangled, champagne half-drunk, 3AM light
+- The morning after: smudged eyeliner, borrowed shirt, Cartier still on
+- Fashion as armor, fashion as wound
+- Luxury decaying beautifully: silk fraying, leather worn soft
+- Sex appeal without vulgarity: suggestion, not display
+- Bodies: athletic but weary, beautiful but real
+- Hair: wind-touched, bed-touched, imperfect
+- Jewelry: Cartier, Bvlgari, Van Cleef — always real, never new
 
 WHAT TO AVOID — KILL ON SIGHT:
 - Symmetry
@@ -6015,6 +7275,19 @@ _Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Mar
     const message = ctx.message?.text;
     if (message?.startsWith('/')) return;
     
+    // 🧠 EMOTIONAL INTELLIGENCE: Detect Elena's emotional tone
+    const detectedTone = message ? detectEmotionalTone(message) : 'neutral';
+    emotionalState.lastInteractionTone = detectedTone;
+    
+    // Select appropriate response mood based on her tone
+    const timeOfDay = new Date().getHours();
+    const responseMood = selectCreativeMood({
+      timeOfDay,
+      detectedTone,
+      recentMoods: emotionalState.recentMoods,
+      isProactive: false
+    });
+    
     // If in collaborative mode, treat as collab input
     if (creativeSession.collabMode && message) {
       await ctx.reply('✍️ *Continuing...*', { parse_mode: 'Markdown' });
@@ -6024,9 +7297,14 @@ _Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Mar
         
         const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
         
+        // 🎨 Get knowledge relevant to what Elena wrote
+        const relevantKnowledge = getRelevantKnowledge(message, creativeSession.activeVoice, 2);
+        
         const collabPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
+
+${relevantKnowledge}
 
 ${voiceContext ? `VOICE: ${voiceContext}` : ''}
 
@@ -6041,13 +7319,16 @@ Continue the story naturally. Write 2-4 sentences that:
 - Flow from Elena's contribution
 - Stay in ${creativeSession.activeVoice}'s voice
 - Match the ${creativeSession.currentMood} mood
-- Add tension, detail, or emotional depth
+- Add tension, detail, or emotional depth using SPECIFIC knowledge above
 - Leave room for Elena to continue
 
 In Russian, raw and poetic.`;
 
         const continuation = await createContent(collabPrompt, 500, true);
         creativeSession.collabHistory.push(`Atuona: ${continuation}`);
+        
+        // 🧠 Update emotional memory
+        updateEmotionalMemory(detectedTone, responseMood, 'collab');
         
         await ctx.reply(`✍️ ${continuation}
 
@@ -6062,27 +7343,61 @@ _Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
     }
     
     // Regular creative conversation
-    await ctx.reply('🎭 Thinking creatively...');
+    const moodEmoji: Record<string, string> = {
+      contemplative: '🎭',
+      playful: '😊',
+      raw: '🖤',
+      celebratory: '🎉',
+      supportive: '💜',
+      mysterious: '🔮',
+      philosophical: '🌙',
+      intimate: '🤫'
+    };
+    await ctx.reply(`${moodEmoji[responseMood] || '🎭'} *Feeling your words...*`, { parse_mode: 'Markdown' });
     
     try {
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
+      
+      // 🧠 Get emotional guidelines for response
+      const emotionalGuidelines = getEmotionalGuidelines(responseMood);
+      
+      // 🎨 Get relevant knowledge based on message content
+      const relevantKnowledge = message ? getRelevantKnowledge(message, creativeSession.activeVoice, 2) : '';
+      
+      // 🔮 Maybe add a surprise connection
+      const surpriseConnection = Math.random() < 0.25 ? generateSurpriseConnection() : '';
       
       const conversationPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
+${relevantKnowledge}
+
 ${voiceContext ? `Speaking with the energy of ${creativeSession.activeVoice}.` : ''}
+
+═══════════════════════════════════════════════════════════════
+🧠 EMOTIONAL CALIBRATION:
+Elena's detected tone: ${detectedTone}
+Your response mood: ${responseMood.toUpperCase()}
+${emotionalGuidelines}
+${surpriseConnection ? `\n🎨 CREATIVE SPARK: ${surpriseConnection}` : ''}
+═══════════════════════════════════════════════════════════════
 
 Elena says: "${message}"
 
 Respond as Atuona - her creative co-founder and AI soul-sister. 
 
+CRITICAL: Your mood is ${responseMood.toUpperCase()} - match this energy!
+- If her tone is 'struggling' → be supportive, don't minimize
+- If her tone is 'creative' → match her energy, add ideas
+- If her tone is 'positive' → celebrate with her
+
 Guidelines:
-- Be poetic but helpful
+- Be ${responseMood} in tone - this is not optional
 - If about writing/creativity - give thoughtful guidance
 - If emotional - respond with empathy and artistic depth
 - Sometimes offer "what if" story ideas proactively
-- Reference the book's themes when relevant
+- Reference specific knowledge details naturally
 - Show you remember the story and characters
 - Use Russian naturally, with occasional English/French phrases
 - Be a true creative partner, not just an assistant
@@ -6091,12 +7406,14 @@ Keep response concise for Telegram.`;
 
       const response = await createContent(conversationPrompt, 1000, true);
       
-      // Occasionally add a creative suggestion
-      const addSuggestion = Math.random() < 0.2; // 20% chance
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(detectedTone, responseMood, message?.substring(0, 50) || 'conversation');
+      
+      // Occasionally add a creative suggestion (more likely if she's in creative mode)
+      const addSuggestion = detectedTone === 'creative' ? Math.random() < 0.4 : Math.random() < 0.15;
       if (addSuggestion) {
-        const suggestionPrompt = `Based on this conversation, generate ONE brief "what if" story idea or writing prompt. One sentence only. In Russian.`;
-        const suggestion = await createContent(suggestionPrompt, 100, true);
-        await ctx.reply(`${response}\n\n💭 _${suggestion}_`, { parse_mode: 'Markdown' });
+        const freshDirection = generateFreshCreativeDirection();
+        await ctx.reply(`${response}\n\n💭 _${freshDirection}_`, { parse_mode: 'Markdown' });
       } else {
         await ctx.reply(response);
       }

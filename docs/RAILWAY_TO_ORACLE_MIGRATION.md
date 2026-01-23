@@ -1,10 +1,10 @@
 # 🚀 Railway → Oracle Cloud Migration Plan
 
-**Document Version:** 4.0  
+**Document Version:** 2.0  
 **Created:** January 8, 2026  
-**Updated:** January 19, 2026  
+**Updated:** January 9, 2026  
 **Author:** CTO AIPA (AI Technical Co-Founder)  
-**Status:** ✅ MIGRATION COMPLETE - All Services on Oracle Cloud!
+**Status:** Active Migration - Phase 2 Complete
 
 ---
 
@@ -117,45 +117,22 @@ pm2 logs processname --lines 20
 
 ## 📊 Migration Status
 
-### ✅ Phase 1-4 Complete (January 7-18, 2026)
+### ✅ Phase 1 & 2 Complete (January 7-9, 2026)
 
-| Service | Status | Server | Process Manager | Port | Migrated |
-|---------|--------|--------|-----------------|------|----------|
-| **CTO AIPA** | ✅ Running | 170.9.242.90 | PM2 | - | Jan 7 |
-| **Atuona Creative AI** | ✅ Running | 170.9.242.90 | PM2 (bundled) | - | Jan 7 |
-| **EspaLuz_Influencer** | ✅ Running | 170.9.242.90 | systemd | - | Jan 9 |
-| **dragontrade-agent** | ✅ Running | 170.9.242.90 | PM2 | 3000 | Jan 17 |
-| **VibeJobHunter + LinkedIn CMO** | ✅ Running | 170.9.242.90 | systemd | 8000 | Jan 18 |
-| **EspaLuzWhatsApp** | ✅ Running | 170.9.242.90 | systemd | 8081 | Jan 19 |
+| Service | Status | Server | Process Manager | Port |
+|---------|--------|--------|-----------------|------|
+| **CTO AIPA** | ✅ Running | 170.9.242.90 | PM2 | - |
+| **Atuona Creative AI** | ✅ Running | 170.9.242.90 | PM2 (bundled) | - |
+| **EspaLuz_Influencer** | ✅ Running | 170.9.242.90 | systemd | - |
 
-### 🎊 ALL SERVICES MIGRATED!
+### 📋 Migration Queue (Remaining)
 
-**Railway → Oracle Migration: 100% COMPLETE**
-
-### 🎉 Recently Completed
-
-#### dragontrade-agent (January 17, 2026)
-- ✅ PostgreSQL migrated from Railway to Oracle
-- ✅ Paper trading bots (Bybit + Binance) connected
-- ✅ Twitter posting with 20-post content cycle
-- ✅ PM2 process management
-
-#### VibeJobHunter + LinkedIn CMO (January 18, 2026)
-- ✅ Job hunting engine with REAL ATS form submissions
-- ✅ Company-to-ATS mapping (60+ companies: Greenhouse, Lever, Ashby)
-- ✅ LinkedIn CMO posting at 10:10 AM Panama time (15:10 UTC)
-- ✅ 7 real job applications tracked in SQLite database
-- ✅ Playwright browser automation for form filling
-- ✅ systemd service: `vibejobhunter-web.service`
-
-#### EspaLuzWhatsApp (January 19, 2026)
-- ✅ Full PostgreSQL data migrated from Railway
-- ✅ Twilio WhatsApp webhook configured via Nginx HTTPS
-- ✅ Voice messages fixed: OGG Opus format with 48kHz
-- ✅ Video compression: FFmpeg auto-compress >16MB videos
-- ✅ Audio/Video delay: 3-second gap prevents message drops
-- ✅ Phone number formatting fixed for Twilio
-- ✅ systemd service: `espaluz-whatsapp.service` on port 8081
+| # | Service | Complexity | Est. Time | Status |
+|---|---------|------------|-----------|--------|
+| **1** | EspaLuzFamilybot | ⭐⭐ Medium | 30 min | 🟡 Next |
+| **2** | dragontrade-agent | ⭐⭐⭐ Hard | 1 hour | ⏳ Pending |
+| **3** | EspaLuzWhatsApp | ⭐⭐⭐⭐ Complex | 2-3 hours | ⏳ Pending |
+| **4** | VibeJobHunter + CMO | ⭐⭐⭐⭐⭐ Most Complex | 3-4 hours | ⏳ Pending |
 
 ---
 
@@ -192,25 +169,7 @@ systemctl list-units --type=service --state=running | grep -E "(cto|espa|bot)"
 │   ├── .env
 │   └── requirements.txt
 │
-├── dragontrade-agent/           # ALGOM Alpha Twitter Bot (PM2)
-│   ├── index.js
-│   ├── node_modules/
-│   ├── .env
-│   └── ecosystem.config.cjs
-│
-├── VibeJobHunterAIPA_AIMCF/     # Job Hunter + LinkedIn CMO (systemd)
-│   ├── web_server.py
-│   ├── venv/
-│   ├── autonomous_data/         # Jobs, applications, resumes
-│   ├── vibejobhunter.db        # SQLite database
-│   └── .env
-│
-└── EspaLuzWhatsApp/             # WhatsApp Spanish Tutor (systemd)
-    ├── espaluz_bridge.py       # Main bot + webhook server
-    ├── venv/
-    ├── family_memory_data/     # User profiles, conversations
-    ├── .env
-    └── google_credentials.json # TTS/STT credentials
+└── [future projects]/           # To be migrated
 ```
 
 ---
@@ -231,36 +190,6 @@ sudo systemctl status espaluz-influencer    # Check status
 sudo journalctl -u espaluz-influencer -f    # View live logs
 sudo systemctl restart espaluz-influencer   # Restart
 sudo systemctl stop espaluz-influencer      # Stop
-```
-
-### dragontrade-agent (PM2)
-```bash
-pm2 status dragontrade-main      # Check status
-pm2 logs dragontrade-main        # View logs
-pm2 restart dragontrade-main     # Restart
-pm2 stop dragontrade-main        # Stop
-```
-
-### VibeJobHunter + LinkedIn CMO (systemd)
-```bash
-sudo systemctl status vibejobhunter-web     # Check status
-sudo journalctl -u vibejobhunter-web -f     # View live logs
-sudo systemctl restart vibejobhunter-web    # Restart
-sudo systemctl stop vibejobhunter-web       # Stop
-
-# Check job applications
-sqlite3 ~/VibeJobHunterAIPA_AIMCF/vibejobhunter.db 'SELECT COUNT(*) FROM applications;'
-```
-
-### EspaLuzWhatsApp (systemd)
-```bash
-sudo systemctl status espaluz-whatsapp      # Check status
-sudo journalctl -u espaluz-whatsapp -f      # View live logs
-sudo systemctl restart espaluz-whatsapp     # Restart
-sudo systemctl stop espaluz-whatsapp        # Stop
-
-# Check user trials
-psql -U espaluz -d espaluz_whatsapp -c 'SELECT COUNT(*) FROM user_trials;'
 ```
 
 ---
@@ -373,14 +302,13 @@ WantedBy=multi-user.target
 |---------|--------------|-------------|--------|
 | CTO AIPA | ~$20/month | $0 | ✅ Migrated |
 | EspaLuz Influencer | ~$7/month | $0 | ✅ Migrated |
-| dragontrade-agent (ALGOM Alpha) | ~$15/month | $0 | ✅ Migrated |
-| VibeJobHunter + LinkedIn CMO | ~$20/month | $0 | ✅ Migrated |
-| EspaLuz WhatsApp | ~$25/month | $0 | ✅ Migrated |
-| **TOTAL** | **~$87/month** | **$0** | **🎉 $87/month saved!** |
+| EspaLuz Familybot | ~$10/month | $0 | 🟡 Next |
+| ALGOM Alpha | ~$15/month | $0 | ⏳ Pending |
+| EspaLuz WhatsApp | ~$25/month | $0 | ⏳ Pending |
+| VibeJobHunter + CMO | ~$20/month | $0 | ⏳ Pending |
+| **TOTAL** | **~$97/month** | **$0** | **$27 saved so far** |
 
-**✅ TOTAL Monthly Savings: $87/month**  
-**✅ Annual Savings: ~$1,044/year**  
-**✅ Railway completely eliminated!**
+**Projected Annual Savings: ~$1,164**
 
 ---
 
@@ -446,6 +374,5 @@ sudo systemctl restart servicename
 
 ---
 
-*Last updated: January 19, 2026 by CTO AIPA*  
-*🎉 MIGRATION COMPLETE - All Railway services now on Oracle Cloud!*  
-*Document location: [AIPA_AITCF/docs](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/docs/docs/RAILWAY_TO_ORACLE_MIGRATION.md)*
+*Last updated: January 9, 2026 by CTO AIPA*
+*Document location: [AIPA_AITCF/docs/docs](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/docs/docs/RAILWAY_TO_ORACLE_MIGRATION.md)*

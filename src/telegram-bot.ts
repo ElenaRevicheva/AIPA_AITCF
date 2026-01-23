@@ -47,6 +47,115 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 // Authorized users (Telegram user IDs) - add your ID for security
 const AUTHORIZED_USERS = process.env.TELEGRAM_AUTHORIZED_USERS?.split(',').map(id => parseInt(id.trim())) || [];
 
+// =============================================================================
+// FILE EDITING STATE (In-Memory for Cursor-Level Operations)
+// =============================================================================
+interface FileEditState {
+  action: 'edit' | 'create' | 'ready_to_commit';
+  repo: string;
+  path: string;
+  content: string;
+  sha: string;
+  newContent?: string;
+}
+const fileEditStates = new Map<number, FileEditState>();
+
+function saveFileEditState(userId: number, state: FileEditState): void {
+  fileEditStates.set(userId, state);
+}
+
+function getFileEditState(userId: number): FileEditState | undefined {
+  return fileEditStates.get(userId);
+}
+
+function clearFileEditState(userId: number): void {
+  fileEditStates.delete(userId);
+}
+
+// =============================================================================
+// CURSOR-TWIN SESSION MEMORY - Remember conversation context!
+// =============================================================================
+interface ConversationContext {
+  recentFiles: { repo: string; path: string; content: string; timestamp: number }[];
+  recentQuestions: { question: string; answer: string; timestamp: number }[];
+  activeRepo: string | null;
+  activeFile: string | null;
+  pendingFixes: { description: string; code: string; file?: string }[];
+  batchEdits: { repo: string; path: string; content: string; sha: string }[];
+  lastUpdated: number;
+}
+
+const conversationContexts = new Map<number, ConversationContext>();
+
+function getConversationContext(userId: number): ConversationContext {
+  let ctx = conversationContexts.get(userId);
+  if (!ctx) {
+    ctx = {
+      recentFiles: [],
+      recentQuestions: [],
+      activeRepo: null,
+      activeFile: null,
+      pendingFixes: [],
+      batchEdits: [],
+      lastUpdated: Date.now()
+    };
+    conversationContexts.set(userId, ctx);
+  }
+  // Clean old entries (older than 30 minutes)
+  const thirtyMinAgo = Date.now() - 30 * 60 * 1000;
+  ctx.recentFiles = ctx.recentFiles.filter(f => f.timestamp > thirtyMinAgo).slice(-5);
+  ctx.recentQuestions = ctx.recentQuestions.filter(q => q.timestamp > thirtyMinAgo).slice(-10);
+  ctx.lastUpdated = Date.now();
+  return ctx;
+}
+
+function addFileToContext(userId: number, repo: string, path: string, content: string): void {
+  const ctx = getConversationContext(userId);
+  ctx.recentFiles.push({ repo, path, content: content.substring(0, 5000), timestamp: Date.now() });
+  ctx.activeRepo = repo;
+  ctx.activeFile = path;
+}
+
+function addQuestionToContext(userId: number, question: string, answer: string): void {
+  const ctx = getConversationContext(userId);
+  ctx.recentQuestions.push({ question: question.substring(0, 500), answer: answer.substring(0, 1000), timestamp: Date.now() });
+}
+
+function addPendingFix(userId: number, description: string, code: string, file?: string): void {
+  const ctx = getConversationContext(userId);
+  if (file) {
+    ctx.pendingFixes.push({ description, code, file });
+  } else {
+    ctx.pendingFixes.push({ description, code });
+  }
+}
+
+function getContextSummary(userId: number): string {
+  const ctx = getConversationContext(userId);
+  let summary = '';
+  
+  if (ctx.activeRepo || ctx.activeFile) {
+    summary += `CURRENT CONTEXT: Working in ${ctx.activeRepo || 'unknown repo'}`;
+    if (ctx.activeFile) summary += `, file: ${ctx.activeFile}`;
+    summary += '\n';
+  }
+  
+  if (ctx.recentFiles.length > 0) {
+    summary += `RECENT FILES VIEWED:\n${ctx.recentFiles.map(f => `- ${f.repo}/${f.path}`).join('\n')}\n`;
+  }
+  
+  if (ctx.recentQuestions.length > 0) {
+    const lastQ = ctx.recentQuestions[ctx.recentQuestions.length - 1];
+    summary += `LAST QUESTION: "${lastQ?.question || ''}"\n`;
+  }
+  
+  if (ctx.pendingFixes.length > 0) {
+    summary += `PENDING FIXES: ${ctx.pendingFixes.length} suggestions waiting to be applied\n`;
+  }
+  
+  return summary;
+}
+
 // Chat IDs for proactive alerts (populated when users interact)
 let alertChatIds: Set<number> = new Set();
 
@@ -271,7 +380,37 @@ Type /menu for all commands! 🚀
   
   async function showMenu(ctx: Context) {
     const menuMessage = `
-🤖 *CTO AIPA v4.0 - Menu*
+🤖 *CTO AIPA v5.1 - MAXIMUM CURSOR TWIN*
+
+━━━━━━━━━━━━━━━━━━━━
+🚀 *CURSOR-TWIN OPERATIONS*
+━━━━━━━━━━━━━━━━━━━━
+/readfile - 📖 Read any file
+/editfile - ✏️ Edit + commit to GitHub
+/createfile - 📝 Create new files
+/commit - 💾 Commit pending changes
+/search - 🔍 Search code (grep!)
+/tree - 🌳 List directory
+/run - ▶️ Trigger CI/CD
+/cancel - 🗑️ Cancel pending
+
+━━━━━━━━━━━━━━━━━━━━
+🧠 *SESSION MEMORY (NEW!)*
+━━━━━━━━━━━━━━━━━━━━
+/context - 📋 Show what I remember
+/apply - ⚡ Apply my last fix
+/batch - 📦 Multi-file edits
+
+━━━━━━━━━━━━━━━━━━━━
+⚡ *POWER FEATURES*
+━━━━━━━━━━━━━━━━━━━━
+/fixerror - 🔧 Paste error → get fix
+/multifile - 📂 Load multiple files
+/refactor - ♻️ Code improvements
+/gentest - 🧪 Generate tests
+/explaincode - 📖 Deep explanation
+/quickfix - ⚡ Fast one-liner fixes
+/diff - 📊 Recent changes
 
 ━━━━━━━━━━━━━━━━━━━━
 🧠 *STRATEGIC CTO*
@@ -286,6 +425,9 @@ Type /menu for all commands! 🚀
 ━━━━━━━━━━━━━━━━━━━━
 /health - Check services
 /logs - Analyze logs
+/status - System status
+/daily - Morning briefing
+/stats - Weekly metrics
 
 ━━━━━━━━━━━━━━━━━━━━
 📚 *LEARNING*
@@ -294,7 +436,7 @@ Type /menu for all commands! 🚀
 /lessons - What I learned
 
 ━━━━━━━━━━━━━━━━━━━━
-🖥️ *CURSOR AGENT*
+🖥️ *CURSOR GUIDE*
 ━━━━━━━━━━━━━━━━━━━━
 /cursor - Step-by-step guide
 /build - Multi-step plan
@@ -332,13 +474,6 @@ Type /menu for all commands! 🚀
 /decision - Record decision
 /debt - Track tech debt
 /review - Review commits
-
-━━━━━━━━━━━━━━━━━━━━
-📊 *INSIGHTS*
-━━━━━━━━━━━━━━━━━━━━
-/stats - Weekly metrics
-/daily - Morning briefing
-/status - System status
 
 ━━━━━━━━━━━━━━━━━━━━
 🔍 *REPOS & IDEAS*
@@ -794,16 +929,28 @@ Just tell me which product and what you want. Use your own words!
     const parts = input.split(' ');
     const firstWord = parts[0] || '';
     
-    // Check if first word is a repo name
+    // Check if first word is a repo name (use resolveRepoName for aliases!)
     let repoName: string;
     let task: string;
     
-    if (AIDEAZZ_REPOS.includes(firstWord)) {
-      repoName = firstWord;
+    const resolvedRepo = resolveRepoName(firstWord);
+    if (resolvedRepo) {
+      repoName = resolvedRepo;
       task = parts.slice(1).join(' ');
     } else {
-      // No repo specified, try to guess from task or use default
-      repoName = 'AIPA_AITCF';
+      // No repo specified - try to guess from task keywords
+      const taskLower = input.toLowerCase();
+      if (taskLower.includes('family') || taskLower.includes('familybot') || taskLower.includes('telegram tutor')) {
+        repoName = 'EspaLuzFamilybot';
+      } else if (taskLower.includes('espaluz') || taskLower.includes('spanish') || taskLower.includes('whatsapp')) {
+        repoName = 'EspaLuzWhatsApp';
+      } else if (taskLower.includes('atuona') || taskLower.includes('poem') || taskLower.includes('creative')) {
+        repoName = 'AIPA_AITCF'; // atuona-creative-ai is in this repo
+      } else if (taskLower.includes('cmo') || taskLower.includes('job') || taskLower.includes('marketing')) {
+        repoName = 'VibeJobHunterAIPA_AIMCF';
+      } else {
+        repoName = 'AIPA_AITCF';
+      }
       task = input;
     }
     
@@ -818,6 +965,8 @@ Just tell me which product and what you want. Use your own words!
       // Fetch repo structure for context
       let fileList = '';
       let relevantFiles: string[] = [];
+      let projectLang: 'typescript' | 'python' | 'javascript' = 'typescript';
+      let rootContents: any[] = [];
       
       try {
         const { data: contents } = await octokit.repos.getContent({
@@ -827,36 +976,65 @@ Just tell me which product and what you want. Use your own words!
         });
         
         if (Array.isArray(contents)) {
+          rootContents = contents;
           fileList = contents.map((f: any) => `${f.type === 'dir' ? '📁' : '📄'} ${f.name}`).join('\n');
           relevantFiles = contents.filter((f: any) => 
             f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
           ).map((f: any) => f.name);
+          
+          // Detect project language from root files
+          const hasPythonFiles = contents.some((f: any) => f.name.endsWith('.py'));
+          const hasPackageJson = contents.some((f: any) => f.name === 'package.json');
+          const hasRequirementsTxt = contents.some((f: any) => f.name === 'requirements.txt');
+          
+          if (hasPythonFiles || hasRequirementsTxt) {
+            projectLang = 'python';
+            // For Python, relevant files are .py files in root
+            relevantFiles = contents.filter((f: any) => 
+              f.type === 'file' && f.name.endsWith('.py')
+            ).map((f: any) => f.name);
+          } else if (hasPackageJson) {
+            const hasTsFiles = contents.some((f: any) => f.name.endsWith('.ts') || f.name.endsWith('.tsx'));
+            projectLang = hasTsFiles ? 'typescript' : 'javascript';
+          }
         }
       } catch {}
       
-      // Try to get src folder
+      // Try to get src folder (for TS/JS projects only)
       let srcFiles: string[] = [];
-      try {
-        const { data: srcContents } = await octokit.repos.getContent({
-          owner: 'ElenaRevicheva',
-          repo: repoName,
-          path: 'src'
-        });
-        if (Array.isArray(srcContents)) {
-          srcFiles = srcContents.filter((f: any) => 
-            f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
-          ).map((f: any) => `src/${f.name}`);
-          fileList += '\n📁 src/\n' + srcContents.map((f: any) => `   📄 ${f.name}`).join('\n');
-        }
-      } catch {}
+      if (projectLang !== 'python') {
+        try {
+          const { data: srcContents } = await octokit.repos.getContent({
+            owner: 'ElenaRevicheva',
+            repo: repoName,
+            path: 'src'
+          });
+          if (Array.isArray(srcContents)) {
+            srcFiles = srcContents.filter((f: any) => 
+              f.type === 'file' && /\.(ts|js|tsx|jsx)$/.test(f.name)
+            ).map((f: any) => `src/${f.name}`);
+            fileList += '\n📁 src/\n' + srcContents.map((f: any) => `   📄 ${f.name}`).join('\n');
+          }
+        } catch {}
+      }
       
       const allCodeFiles = [...relevantFiles, ...srcFiles];
       
-      // Fetch a key file for context (like the main bot file or index)
+      // Fetch a key file for context (language-aware!)
       let sampleCode = '';
-      const mainFile = srcFiles.find(f => f.includes('telegram-bot') || f.includes('index')) 
-                    || relevantFiles.find(f => f.includes('index'))
-                    || allCodeFiles[0];
+      let mainFile: string | undefined;
+      
+      if (projectLang === 'python') {
+        // For Python, main.py or bot.py or first .py file
+        mainFile = relevantFiles.find(f => f === 'main.py') 
+                || relevantFiles.find(f => f.includes('bot'))
+                || relevantFiles[0];
+      } else {
+        // For TS/JS, look for telegram-bot, index, or first code file
+        mainFile = srcFiles.find(f => f.includes('telegram-bot') || f.includes('index')) 
+                || relevantFiles.find(f => f.includes('index'))
+                || allCodeFiles[0];
+      }
       
       if (mainFile) {
         try {
@@ -873,8 +1051,28 @@ Just tell me which product and what you want. Use your own words!
         } catch {}
       }
       
+      // Generate language-specific instructions
+      const langConfig = projectLang === 'python' ? {
+        codeBlock: 'python',
+        buildCmd: 'python main.py',
+        testCmd: 'python -c "import main; print(\'OK\')"',
+        framework: 'telebot/pyTelegramBotAPI for Telegram, Flask for web',
+        mainFile: 'main.py',
+        note: 'This is a PYTHON project using telebot. Use @bot.message_handler() for commands, NOT bot.command().'
+      } : {
+        codeBlock: 'typescript',
+        buildCmd: 'npm run build',
+        testCmd: 'npm start',
+        framework: 'grammy for Telegram bots',
+        mainFile: 'src/telegram-bot.ts',
+        note: 'This is a TypeScript project using grammy. Use bot.command() for commands.'
+      };
+      
       // Generate Cursor instructions using AI
       const cursorPrompt = `You are helping a vibe coder use LOCAL Cursor (without paid agents) to edit their code.
+
+PROJECT LANGUAGE: **${projectLang.toUpperCase()}**
+${langConfig.note}
 
 TASK: "${task}"
 REPO: ${repoName}
@@ -884,7 +1082,7 @@ ${fileList}
 
 CODE FILES: ${allCodeFiles.join(', ')}
 
-${sampleCode ? `SAMPLE FROM ${mainFile}:\n\`\`\`\n${sampleCode.substring(0, 2000)}\n\`\`\`` : ''}
+${sampleCode ? `SAMPLE FROM ${mainFile}:\n\`\`\`${langConfig.codeBlock}\n${sampleCode.substring(0, 2000)}\n\`\`\`` : ''}
 
 Generate STEP-BY-STEP instructions for LOCAL Cursor. Format EXACTLY like this:
 
@@ -895,11 +1093,11 @@ cursor .
 \`\`\`
 
 📄 *STEP 2: Open file*
-Open: \`<filename>\`
+Open: \`${langConfig.mainFile}\` (or the relevant file)
 
 ✂️ *STEP 3: Select code*
 Find and select this section:
-\`\`\`
+\`\`\`${langConfig.codeBlock}
 <code to select>
 \`\`\`
 
@@ -911,20 +1109,23 @@ Select the code above, press Cmd+K, and type:
 
 📋 *STEP 5: Or copy this code*
 If Cmd+K doesn't work well, copy this and paste:
-\`\`\`typescript
-<complete code to add/replace>
+\`\`\`${langConfig.codeBlock}
+<complete ${projectLang} code to add/replace>
 \`\`\`
 
 💾 *STEP 6: Save and test*
 - Save: Cmd+S
-- Build: \`npm run build\`
-- Test: <how to test>
+- Run: \`${langConfig.buildCmd}\`
+- Test: ${langConfig.testCmd}
 
-IMPORTANT:
-- Give SPECIFIC file names from the repo
-- Give COMPLETE, working code (not pseudocode)
+CRITICAL RULES FOR ${projectLang.toUpperCase()} PROJECT:
+- Give SPECIFIC file names from the repo (${allCodeFiles.slice(0, 3).join(', ')})
+- Give COMPLETE, working ${projectLang} code (not pseudocode)
 - Explain WHERE in the file to add/edit
-- Use simple Cmd+K prompts (Cursor free tier works with these)
+- Use the correct framework: ${langConfig.framework}
+${projectLang === 'python' ? `- Use @bot.message_handler(commands=['name']) syntax
+- Import with: from telebot import types
+- The bot already uses gTTS for text-to-speech` : `- Use bot.command('name', async (ctx) => {...}) syntax`}
 - If adding new code, say "add after line X" or "add at the end of the file"`;
 
       const instructions = await askAI(cursorPrompt, 3500);
@@ -985,18 +1186,27 @@ Tell me which product and what big feature you want to add.
       return;
     }
     
-    // Parse repo and feature
+    // Parse repo and feature (use resolveRepoName for aliases!)
     const parts = input.split(' ');
     const firstWord = parts[0] || '';
     
     let repoName: string;
     let feature: string;
     
-    if (AIDEAZZ_REPOS.includes(firstWord)) {
-      repoName = firstWord;
+    const resolvedRepo = resolveRepoName(firstWord);
+    if (resolvedRepo) {
+      repoName = resolvedRepo;
       feature = parts.slice(1).join(' ');
     } else {
-      repoName = 'AIPA_AITCF';
+      // Smart detection from keywords
+      const inputLower = input.toLowerCase();
+      if (inputLower.includes('family') || inputLower.includes('familybot')) {
+        repoName = 'EspaLuzFamilybot';
+      } else if (inputLower.includes('espaluz') || inputLower.includes('spanish') || inputLower.includes('whatsapp')) {
+        repoName = 'EspaLuzWhatsApp';
+      } else {
+        repoName = 'AIPA_AITCF';
+      }
       feature = input;
     }
     
@@ -3466,14 +3676,1469 @@ ${review}`;
   });
   
   // ==========================================================================
-  // NATURAL CONVERSATION (any text message)
+  // 🚀 CURSOR-LEVEL CAPABILITIES - Direct File Operations via GitHub API
   // ==========================================================================
-  
+
+  // /readfile - Read any file from any repo (like local Cursor)
+  bot.command('readfile', async (ctx) => {
+    const input = ctx.message?.text?.replace('/readfile', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📖 *READ FILE - See Code Instantly*
+
+Read any file from any AIdeazz repo:
+
+\`/readfile cto src/telegram-bot.ts\`
+\`/readfile espaluz index.ts\`
+\`/readfile atuona src/gallery.ts\`
+
+With line range:
+\`/readfile cto src/telegram-bot.ts 1-50\`
+
+I'll show you the actual code! 📄`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    const repoInput = parts[0] || '';
+    const filePath = parts[1] || '';
+    const lineRange = parts[2] || '';
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"\n\nUse /repos to see available repos.`);
+      return;
+    }
+    
+    if (!filePath) {
+      await ctx.reply('❌ Please specify a file path!\n\nExample: `/readfile cto src/telegram-bot.ts`', { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply(`📖 Reading ${filePath} from ${repoName}...`);
+    
+    try {
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ This is a directory, not a file. Use /tree to see contents.');
+        return;
+      }
+      
+      let content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      const lines = content.split('\n');
+      
+      // Track in session context for Cursor-twin memory
+      addFileToContext(ctx.from?.id || 0, repoName, filePath, content);
+      
+      // Handle line range
+      let startLine = 1;
+      let endLine = lines.length;
+      if (lineRange && lineRange.includes('-')) {
+        const rangeParts = lineRange.split('-');
+        const start = parseInt(rangeParts[0] || '1');
+        const end = parseInt(rangeParts[1] || String(lines.length));
+        if (!isNaN(start)) startLine = Math.max(1, start);
+        if (!isNaN(end)) endLine = Math.min(lines.length, end);
+      }
+      
+      // Add line numbers
+      const numberedLines = lines
+        .slice(startLine - 1, endLine)
+        .map((line, i) => `${String(startLine + i).padStart(4)} | ${line}`)
+        .join('\n');
+      
+      // Split if too long for Telegram
+      const maxLen = 3500;
+      if (numberedLines.length > maxLen) {
+        const chunks = [];
+        let current = '';
+        for (const line of numberedLines.split('\n')) {
+          if ((current + line).length > maxLen) {
+            chunks.push(current);
+            current = line + '\n';
+          } else {
+            current += line + '\n';
+          }
+        }
+        if (current) chunks.push(current);
+        
+        for (let i = 0; i < Math.min(chunks.length, 5); i++) {
+          await ctx.reply(`📄 ${filePath} (${startLine}-${endLine}) [${i+1}/${chunks.length}]\n\n\`\`\`\n${chunks[i]}\`\`\``, { parse_mode: 'Markdown' });
+        }
+        if (chunks.length > 5) {
+          await ctx.reply(`⚠️ File too long. Showing first 5 chunks. Use line range to see specific sections.`);
+        }
+      } else {
+        await ctx.reply(`📄 *${repoName}/${filePath}* (lines ${startLine}-${endLine})\n\n\`\`\`\n${numberedLines}\`\`\``, { parse_mode: 'Markdown' });
+      }
+      
+    } catch (error: any) {
+      if (error.status === 404) {
+        await ctx.reply(`❌ File not found: ${filePath}\n\nUse \`/tree ${repoInput}\` to see available files.`, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply('❌ Error reading file. Check the path and try again.');
+        console.error('Read file error:', error);
+      }
+    }
+  });
+
+  // /tree - Show directory structure (like ls in terminal)
+  bot.command('tree', async (ctx) => {
+    const input = ctx.message?.text?.replace('/tree', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`🌳 *DIRECTORY TREE*
+
+See the file structure of any repo:
+
+\`/tree cto\` - Root of CTO AIPA
+\`/tree cto src\` - Just the src folder
+\`/tree espaluz\` - EspaLuz structure
+
+Like \`ls\` command but for GitHub! 📁`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    const repoInput = parts[0] || '';
+    const dirPath = parts[1] || '';
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    try {
+      const { data: contents } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: dirPath
+      });
+      
+      if (!Array.isArray(contents)) {
+        await ctx.reply('❌ This is a file, not a directory. Use /readfile to view it.');
+        return;
+      }
+      
+      const tree = contents
+        .sort((a, b) => {
+          if (a.type === 'dir' && b.type !== 'dir') return -1;
+          if (a.type !== 'dir' && b.type === 'dir') return 1;
+          return a.name.localeCompare(b.name);
+        })
+        .map(item => `${item.type === 'dir' ? '📁' : '📄'} ${item.name}`)
+        .join('\n');
+      
+      await ctx.reply(`🌳 *${repoName}/${dirPath || ''}*\n\n${tree}`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      if (error.status === 404) {
+        await ctx.reply(`❌ Directory not found: ${dirPath || 'root'}`);
+      } else {
+        await ctx.reply('❌ Error listing directory.');
+        console.error('Tree error:', error);
+      }
+    }
+  });
+
+  // /search - Search code across repos (like grep)
+  bot.command('search', async (ctx) => {
+    const input = ctx.message?.text?.replace('/search', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`🔍 *CODE SEARCH - Find Anything*
+
+Search across all AIdeazz repos:
+
+\`/search handleQuestion\` - Find function
+\`/search TODO\` - Find all TODOs
+\`/search cto getRelevantMemory\` - Search in specific repo
+
+Like grep but for your whole codebase! 🔎`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    let repoFilter: string | null = null;
+    let query = input;
+    
+    // Check if first word is a repo name
+    const possibleRepo = resolveRepoName(parts[0] || '');
+    if (possibleRepo && parts.length > 1) {
+      repoFilter = possibleRepo;
+      query = parts.slice(1).join(' ');
+    }
+    
+    await ctx.reply(`🔍 Searching for "${query}"${repoFilter ? ` in ${repoFilter}` : ' across all repos'}...`);
+    
+    try {
+      const searchQuery = repoFilter 
+        ? `${query} repo:ElenaRevicheva/${repoFilter}`
+        : `${query} user:ElenaRevicheva`;
+      
+      const { data: results } = await octokit.search.code({
+        q: searchQuery,
+        per_page: 10
+      });
+      
+      if (results.total_count === 0) {
+        await ctx.reply(`❌ No results found for "${query}"`);
+        return;
+      }
+      
+      let response = `🔍 *Found ${results.total_count} results:*\n\n`;
+      
+      for (const item of results.items.slice(0, 8)) {
+        const repoShort = item.repository.name;
+        response += `📄 *${repoShort}/${item.path}*\n`;
+        response += `   \`/readfile ${repoShort} ${item.path}\`\n\n`;
+      }
+      
+      if (results.total_count > 8) {
+        response += `\n_...and ${results.total_count - 8} more results_`;
+      }
+      
+      await ctx.reply(response, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Search error:', error);
+      await ctx.reply('❌ Search error. Try a different query.');
+    }
+  });
+
+  // /editfile - Actually edit files via GitHub API!
+  bot.command('editfile', async (ctx) => {
+    const input = ctx.message?.text?.replace('/editfile', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`✏️ *EDIT FILE - Real Code Changes!*
+
+I can actually edit files in your repos! This is REAL, not instructions.
+
+*Step 1:* Tell me what to edit
+\`/editfile cto src/telegram-bot.ts\`
+
+*Step 2:* I'll show you the file and ask what to change
+
+*Step 3:* I'll make the edit and create a commit!
+
+⚠️ Changes go directly to GitHub. Use with care!
+
+_Like Cursor, but remote!_ 🚀`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    const repoInput = parts[0] || '';
+    const filePath = parts.slice(1).join(' ');
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    if (!filePath) {
+      await ctx.reply('❌ Please specify a file path!');
+      return;
+    }
+    
+    await ctx.reply(`✏️ Loading ${filePath} for editing...`);
+    
+    try {
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ Cannot edit directories.');
+        return;
+      }
+      
+      const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      const lines = content.split('\n');
+      
+      // Store file info for pending edit
+      saveFileEditState(ctx.from?.id || 0, {
+        action: 'edit',
+        repo: repoName,
+        path: filePath,
+        content: content,
+        sha: fileData.sha
+      });
+      
+      // Show first 50 lines
+      const preview = lines.slice(0, 50).map((l, i) => `${String(i+1).padStart(3)} | ${l}`).join('\n');
+      
+      await ctx.reply(`✏️ *Editing: ${repoName}/${filePath}*
+      
+Total lines: ${lines.length}
+Preview (first 50 lines):
+
+\`\`\`
+${preview.substring(0, 2000)}
+\`\`\`
+
+Now tell me what to change! Examples:
+• "Add a console.log at line 25"
+• "Replace lines 10-15 with [code]"
+• "Add this function after line 100: [code]"
+
+Or use \`/readfile ${repoInput} ${filePath} 40-80\` to see more.`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      if (error.status === 404) {
+        await ctx.reply(`❌ File not found: ${filePath}`);
+      } else {
+        await ctx.reply('❌ Error loading file for edit.');
+        console.error('Edit file error:', error);
+      }
+    }
+  });
+
+  // /commit - Apply pending edit and commit to GitHub
+  bot.command('commit', async (ctx) => {
+    const commitMsg = ctx.message?.text?.replace('/commit', '').trim();
+    
+    const pending = getFileEditState(ctx.from?.id || 0);
+    
+    if (!pending || pending.action !== 'ready_to_commit') {
+      await ctx.reply(`❌ No pending changes to commit.
+
+First use /editfile to prepare changes, then describe what to change.`);
+      return;
+    }
+    
+    const message = commitMsg || `CTO AIPA: Update ${pending.path}`;
+    
+    await ctx.reply(`📤 Committing changes to ${pending.repo}/${pending.path}...`);
+    
+    try {
+      await octokit.repos.createOrUpdateFileContents({
+        owner: 'ElenaRevicheva',
+        repo: pending.repo,
+        path: pending.path,
+        message: message,
+        content: Buffer.from(pending.newContent || '').toString('base64'),
+        sha: pending.sha
+      });
+      
+      clearFileEditState(ctx.from?.id || 0);
+      
+      await ctx.reply(`✅ *Committed successfully!*
+
+📦 Repo: ${pending.repo}
+📄 File: ${pending.path}
+💬 Message: ${message}
+
+Changes are now live on GitHub! 🎉`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Commit error:', error);
+      await ctx.reply(`❌ Commit failed: ${error.message}\n\nTry again or use /cancel to discard changes.`);
+    }
+  });
+
+  // /cancel - Cancel pending edit
+  bot.command('cancel', async (ctx) => {
+    clearFileEditState(ctx.from?.id || 0);
+    const ctx2 = getConversationContext(ctx.from?.id || 0);
+    ctx2.pendingFixes = [];
+    ctx2.batchEdits = [];
+    await ctx.reply('🗑️ Pending changes and batch edits cancelled.');
+  });
+
+  // /apply - Apply the last suggested fix (Cursor-twin feature!)
+  bot.command('apply', async (ctx) => {
+    const convCtx = getConversationContext(ctx.from?.id || 0);
+    
+    if (convCtx.pendingFixes.length === 0) {
+      await ctx.reply(`❌ No pending fixes to apply.
+
+First ask me about an error or request a code change, then use /apply to apply my suggestion!
+
+Example workflow:
+1. You: "fix the menu crash in familybot"
+2. Me: Here's the fix... [code]
+3. You: /apply
+4. Me: Applied! Commit with /commit`);
+      return;
+    }
+    
+    const lastFix = convCtx.pendingFixes[convCtx.pendingFixes.length - 1];
+    
+    if (!lastFix || !convCtx.activeRepo || !convCtx.activeFile) {
+      await ctx.reply(`⚠️ I have a fix but don't know which file to apply it to.
+
+Please specify:
+\`/editfile ${convCtx.activeRepo || 'repo'} ${convCtx.activeFile || 'path/to/file'}\`
+
+Then describe the change or paste the fix.`);
+      return;
+    }
+    
+    await ctx.reply(`⚡ Applying fix to ${convCtx.activeRepo}/${convCtx.activeFile}...`);
+    
+    try {
+      // Fetch current file
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: convCtx.activeRepo,
+        path: convCtx.activeFile
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ Cannot apply to this path.');
+        return;
+      }
+      
+      const currentContent = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      
+      // Use AI to intelligently apply the fix
+      const applyPrompt = `Apply this fix to the code:
+
+CURRENT FILE (${convCtx.activeFile}):
+\`\`\`
+${currentContent}
+\`\`\`
+
+FIX TO APPLY:
+Description: ${lastFix.description}
+Code:
+\`\`\`
+${lastFix.code}
+\`\`\`
+
+Return ONLY the complete updated file content. No explanations, no markdown fences.
+Apply the fix intelligently - find where it should go and integrate it properly.`;
+
+      const newContent = await askAI(applyPrompt, 8000);
+      const cleanContent = newContent.replace(/^```[\w]*\n?/gm, '').replace(/```$/gm, '').trim();
+      
+      // Store for commit
+      saveFileEditState(ctx.from?.id || 0, {
+        action: 'ready_to_commit',
+        repo: convCtx.activeRepo,
+        path: convCtx.activeFile,
+        content: currentContent,
+        sha: fileData.sha,
+        newContent: cleanContent
+      });
+      
+      // Clear the pending fix
+      convCtx.pendingFixes.pop();
+      
+      // Show preview
+      const preview = cleanContent.split('\n').slice(0, 25).map((l, i) => `${String(i+1).padStart(3)}| ${l}`).join('\n');
+      
+      await ctx.reply(`✅ *Fix Applied!*
+
+Preview:
+\`\`\`
+${preview.substring(0, 2500)}
+\`\`\`
+
+Ready to commit? 
+• \`/commit Applied fix: ${lastFix.description.substring(0, 30)}...\`
+• \`/cancel\` to discard`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      await ctx.reply(`❌ Could not apply fix: ${error.message}\n\nTry /editfile manually.`);
+    }
+  });
+
+  // /batch - Multi-file batch editing (like Cursor multi-file)
+  bot.command('batch', async (ctx) => {
+    const input = ctx.message?.text?.replace('/batch', '').trim();
+    const convCtx = getConversationContext(ctx.from?.id || 0);
+    
+    if (!input) {
+      const batchCount = convCtx.batchEdits.length;
+      await ctx.reply(`📦 *BATCH EDITS - Multi-File Changes*
+
+Edit multiple files before committing - just like Cursor!
+
+*Current batch:* ${batchCount} file(s)
+
+*Commands:*
+\`/batch add <repo> <file>\` - Add file to batch
+\`/batch show\` - Show batch contents
+\`/batch commit <message>\` - Commit all at once
+\`/batch clear\` - Clear batch
+
+*Workflow:*
+1. /batch add cto src/file1.ts
+2. [describe changes for file1]
+3. /batch add cto src/file2.ts  
+4. [describe changes for file2]
+5. /batch commit "Refactored auth flow"
+
+_Edit multiple files, commit once!_ 📦`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(/\s+/);
+    const action = parts[0]?.toLowerCase();
+    
+    if (action === 'show') {
+      if (convCtx.batchEdits.length === 0) {
+        await ctx.reply('📦 Batch is empty. Use `/batch add <repo> <file>` to start.');
+        return;
+      }
+      const summary = convCtx.batchEdits.map((e, i) => 
+        `${i + 1}. ${e.repo}/${e.path}`
+      ).join('\n');
+      await ctx.reply(`📦 *Batch Contents (${convCtx.batchEdits.length} files):*\n\n${summary}`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    if (action === 'clear') {
+      convCtx.batchEdits = [];
+      await ctx.reply('🗑️ Batch cleared.');
+      return;
+    }
+    
+    if (action === 'add') {
+      const repoInput = parts[1] || '';
+      const filePath = parts.slice(2).join(' ');
+      
+      const repoName = resolveRepoName(repoInput);
+      if (!repoName) {
+        await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+        return;
+      }
+      
+      if (!filePath) {
+        await ctx.reply('❌ Please specify a file path!');
+        return;
+      }
+      
+      await ctx.reply(`📄 Loading ${filePath} into batch...`);
+      
+      try {
+        const { data: fileData } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          path: filePath
+        });
+        
+        if (Array.isArray(fileData) || !('content' in fileData)) {
+          await ctx.reply('❌ Cannot batch directories.');
+          return;
+        }
+        
+        const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+        
+        convCtx.batchEdits.push({
+          repo: repoName,
+          path: filePath,
+          content,
+          sha: fileData.sha
+        });
+        
+        // Also add to conversation context
+        addFileToContext(ctx.from?.id || 0, repoName, filePath, content);
+        
+        await ctx.reply(`✅ Added to batch: ${repoName}/${filePath}
+
+*Batch now has ${convCtx.batchEdits.length} file(s)*
+
+Now describe what to change in this file, or add more files with /batch add`, { parse_mode: 'Markdown' });
+        
+      } catch (error: any) {
+        await ctx.reply(`❌ Could not load file: ${error.message}`);
+      }
+      return;
+    }
+    
+    if (action === 'commit') {
+      const message = parts.slice(1).join(' ') || 'Batch update from CTO AIPA';
+      
+      if (convCtx.batchEdits.length === 0) {
+        await ctx.reply('❌ Batch is empty. Add files first with `/batch add`');
+        return;
+      }
+      
+      await ctx.reply(`📤 Committing ${convCtx.batchEdits.length} files...`);
+      
+      let successCount = 0;
+      const errors: string[] = [];
+      
+      for (const edit of convCtx.batchEdits) {
+        try {
+          await octokit.repos.createOrUpdateFileContents({
+            owner: 'ElenaRevicheva',
+            repo: edit.repo,
+            path: edit.path,
+            message: `${message} - ${edit.path}`,
+            content: Buffer.from(edit.content).toString('base64'),
+            sha: edit.sha
+          });
+          successCount++;
+        } catch (error: any) {
+          errors.push(`${edit.path}: ${error.message}`);
+        }
+      }
+      
+      convCtx.batchEdits = [];
+      
+      if (errors.length > 0) {
+        await ctx.reply(`⚠️ Batch partially committed: ${successCount} succeeded, ${errors.length} failed\n\nErrors:\n${errors.join('\n')}`);
+      } else {
+        await ctx.reply(`✅ *Batch Committed!*\n\n${successCount} files updated\nMessage: "${message}"`, { parse_mode: 'Markdown' });
+      }
+      return;
+    }
+    
+    await ctx.reply('❓ Unknown batch command. Use: add, show, commit, or clear');
+  });
+
+  // /context - Show current session context (Cursor-twin feature)
+  bot.command('context', async (ctx) => {
+    const convCtx = getConversationContext(ctx.from?.id || 0);
+    const summary = getContextSummary(ctx.from?.id || 0);
+    
+    if (!summary && convCtx.recentFiles.length === 0 && convCtx.recentQuestions.length === 0) {
+      await ctx.reply(`📋 *Session Context*
+
+No context yet! Start by:
+• Reading a file: \`/readfile cto src/telegram-bot.ts\`
+• Asking a question
+• Loading multiple files: \`/multifile\`
+
+I'll remember what we're working on! 🧠`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    let response = `📋 *Session Context (I Remember!)*\n\n`;
+    response += summary;
+    
+    if (convCtx.pendingFixes.length > 0) {
+      response += `\n💡 *Pending Fixes:* ${convCtx.pendingFixes.length}\nUse /apply to apply the last one!\n`;
+    }
+    
+    if (convCtx.batchEdits.length > 0) {
+      response += `\n📦 *Batch:* ${convCtx.batchEdits.length} files\nUse /batch show to see them\n`;
+    }
+    
+    response += `\n_Context auto-clears after 30 min of inactivity_`;
+    
+    await ctx.reply(response, { parse_mode: 'Markdown' });
+  });
+
+  // /createfile - Create a new file
+  bot.command('createfile', async (ctx) => {
+    const input = ctx.message?.text?.replace('/createfile', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📝 *CREATE FILE - Add New Files*
+
+Create new files in any repo:
+
+\`/createfile cto src/utils/helper.ts\`
+
+Then send me the file content, and I'll create it!
+
+_Like touch + edit in one!_ 📄`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    const repoInput = parts[0] || '';
+    const filePath = parts.slice(1).join(' ');
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    if (!filePath) {
+      await ctx.reply('❌ Please specify a file path!');
+      return;
+    }
+    
+    // Check if file exists
+    try {
+      await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      await ctx.reply(`❌ File already exists! Use /editfile to modify it.`);
+      return;
+    } catch (error: any) {
+      if (error.status !== 404) {
+        await ctx.reply('❌ Error checking file.');
+        return;
+      }
+    }
+    
+    // Store pending create
+    saveFileEditState(ctx.from?.id || 0, {
+      action: 'create',
+      repo: repoName,
+      path: filePath,
+      content: '',
+      sha: ''
+    });
+    
+    await ctx.reply(`📝 *Ready to create: ${repoName}/${filePath}*
+
+Now send me the file content!
+
+You can:
+• Paste code directly
+• Or describe what the file should contain and I'll generate it
+
+When ready, use /commit to save.`, { parse_mode: 'Markdown' });
+  });
+
+  // /run - Trigger GitHub Action (compile/test)
+  bot.command('run', async (ctx) => {
+    const input = ctx.message?.text?.replace('/run', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`▶️ *RUN - Trigger GitHub Actions*
+
+Run workflows in your repos:
+
+\`/run cto build\` - Run build workflow
+\`/run espaluz test\` - Run tests
+\`/run cto deploy\` - Trigger deploy
+
+Requires GitHub Actions workflows in the repo.
+
+_Like npm run but remote!_ 🚀`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(' ');
+    const repoInput = parts[0] || '';
+    const workflow = parts[1] || 'build';
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    await ctx.reply(`▶️ Triggering ${workflow} workflow in ${repoName}...`);
+    
+    try {
+      // List workflows to find the right one
+      const { data: workflows } = await octokit.actions.listRepoWorkflows({
+        owner: 'ElenaRevicheva',
+        repo: repoName
+      });
+      
+      const targetWorkflow = workflows.workflows.find(w => 
+        w.name.toLowerCase().includes(workflow.toLowerCase()) ||
+        w.path.toLowerCase().includes(workflow.toLowerCase())
+      );
+      
+      if (!targetWorkflow) {
+        const available = workflows.workflows.map(w => w.name).join(', ');
+        await ctx.reply(`❌ Workflow "${workflow}" not found.\n\nAvailable: ${available || 'None'}`);
+        return;
+      }
+      
+      await octokit.actions.createWorkflowDispatch({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        workflow_id: targetWorkflow.id,
+        ref: 'main'
+      });
+      
+      await ctx.reply(`✅ *Workflow triggered!*
+
+📦 Repo: ${repoName}
+▶️ Workflow: ${targetWorkflow.name}
+🔗 Check: https://github.com/ElenaRevicheva/${repoName}/actions
+
+_Results in a few minutes..._`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      console.error('Run workflow error:', error);
+      if (error.message?.includes('Workflow does not have')) {
+        await ctx.reply(`❌ This workflow doesn't support manual triggers.\n\nIt needs \`workflow_dispatch\` in the YAML.`);
+      } else {
+        await ctx.reply(`❌ Error triggering workflow: ${error.message}`);
+      }
+    }
+  });
+
+  // =============================================================================
+  // CURSOR-LEVEL POWER FEATURES - Maximum Co-Founder Capabilities
+  // =============================================================================
+
+  // /fixerror - Paste an error, get a fix (like Cursor's error fixing)
+  bot.command('fixerror', async (ctx) => {
+    const error = ctx.message?.text?.replace('/fixerror', '').trim();
+    
+    if (!error) {
+      await ctx.reply(`🔧 *FIX ERROR - Paste Any Error!*
+
+Just paste your error message and I'll analyze it:
+
+\`/fixerror TypeError: Cannot read property 'map' of undefined at line 45\`
+
+Or just type:
+\`/fixerror\` then paste the full error in the next message!
+
+_Like Cursor's error fixing, but remote!_ 🎯`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    await ctx.reply('🔍 Analyzing error...');
+    
+    try {
+      const fixPrompt = `${AIDEAZZ_CONTEXT}
+
+You are debugging an error. Analyze this error and provide:
+1. What caused it (1-2 sentences)
+2. The exact fix (code if applicable)
+3. How to prevent it in the future
+
+ERROR:
+${error}
+
+Be concise - this is Telegram chat. Use code blocks for any code.`;
+
+      const fix = await askAI(fixPrompt, 2000);
+      await ctx.reply(`🔧 *Error Analysis*\n\n${fix}`, { parse_mode: 'Markdown' });
+      
+    } catch (err) {
+      await ctx.reply('❌ Error analyzing. Try pasting a cleaner error message.');
+    }
+  });
+
+  // /multifile - Work with multiple files at once
+  bot.command('multifile', async (ctx) => {
+    const input = ctx.message?.text?.replace('/multifile', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📂 *MULTIFILE - Bulk Operations*
+
+Work with multiple files at once:
+
+\`/multifile cto src/telegram-bot.ts src/database.ts\`
+→ Load both files into context
+
+\`/multifile familybot main.py espaluz_menu.py\`
+→ Work across Python files
+
+Then ask me anything about them, or request changes!
+
+_Like Cursor's multi-file context!_ 🎯`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(/\s+/);
+    const repoInput = parts[0] || '';
+    const filePaths = parts.slice(1);
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    if (filePaths.length === 0) {
+      await ctx.reply('❌ Please specify at least one file path!');
+      return;
+    }
+    
+    await ctx.reply(`📂 Loading ${filePaths.length} files from ${repoName}...`);
+    
+    try {
+      const fileContents: { path: string; content: string }[] = [];
+      
+      for (const filePath of filePaths.slice(0, 5)) { // Max 5 files
+        try {
+          const { data: fileData } = await octokit.repos.getContent({
+            owner: 'ElenaRevicheva',
+            repo: repoName,
+            path: filePath
+          });
+          
+          if (!Array.isArray(fileData) && 'content' in fileData) {
+            const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+            fileContents.push({ path: filePath, content });
+          }
+        } catch {
+          await ctx.reply(`⚠️ Couldn't load: ${filePath}`);
+        }
+      }
+      
+      if (fileContents.length === 0) {
+        await ctx.reply('❌ No files could be loaded. Check the paths!');
+        return;
+      }
+      
+      // Store in memory for context
+      const contextKey = `multifile_${ctx.from?.id}`;
+      await saveMemory('CTO', contextKey, { repo: repoName, files: filePaths }, 
+        fileContents.map(f => `=== ${f.path} ===\n${f.content.substring(0, 3000)}`).join('\n\n'),
+        { type: 'multifile_context' }
+      );
+      
+      // Show summary
+      const summary = fileContents.map(f => {
+        const lines = f.content.split('\n').length;
+        return `📄 ${f.path} (${lines} lines)`;
+      }).join('\n');
+      
+      await ctx.reply(`✅ *${fileContents.length} files loaded!*
+
+${summary}
+
+Now ask me anything about these files! Examples:
+• "How do these files work together?"
+• "Find bugs in this code"
+• "Refactor the error handling"
+• "What functions are duplicated?"
+
+_Context active for your next questions!_`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      await ctx.reply(`❌ Error loading files: ${error.message}`);
+    }
+  });
+
+  // /refactor - Suggest code improvements
+  bot.command('refactor', async (ctx) => {
+    const input = ctx.message?.text?.replace('/refactor', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`♻️ *REFACTOR - Code Improvements*
+
+Get refactoring suggestions:
+
+\`/refactor cto src/telegram-bot.ts\`
+→ Analyze entire file
+
+\`/refactor familybot main.py handleMenu\`
+→ Focus on specific function
+
+I'll suggest:
+• Code smells to fix
+• Performance improvements
+• Better patterns
+• Cleaner structure
+
+_Like Cursor's refactoring suggestions!_ 🎯`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(/\s+/);
+    const repoInput = parts[0] || '';
+    const filePath = parts[1] || '';
+    const focus = parts.slice(2).join(' ');
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    if (!filePath) {
+      await ctx.reply('❌ Please specify a file path!');
+      return;
+    }
+    
+    await ctx.reply(`♻️ Analyzing ${filePath} for refactoring opportunities...`);
+    
+    try {
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ Cannot analyze directories.');
+        return;
+      }
+      
+      const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      
+      const refactorPrompt = `${AIDEAZZ_CONTEXT}
+
+Analyze this code for refactoring opportunities:
+
+FILE: ${filePath}
+${focus ? `FOCUS ON: ${focus}` : ''}
+
+\`\`\`
+${content.substring(0, 8000)}
+\`\`\`
+
+Provide 3-5 SPECIFIC refactoring suggestions:
+1. What: Specific issue
+2. Why: Why it's a problem
+3. How: Exact code change (short snippet)
+
+Be practical - focus on high-impact improvements, not nitpicks.
+Format for Telegram (markdown, code blocks).`;
+
+      const suggestions = await askAI(refactorPrompt, 3000);
+      
+      // Split if too long
+      if (suggestions.length > 4000) {
+        const parts = suggestions.split(/(?=\d+\.\s)/);
+        for (const part of parts.filter(p => p.trim())) {
+          await ctx.reply(part.trim(), { parse_mode: 'Markdown' });
+        }
+      } else {
+        await ctx.reply(`♻️ *Refactoring Suggestions*\n\n${suggestions}`, { parse_mode: 'Markdown' });
+      }
+      
+    } catch (error: any) {
+      await ctx.reply(`❌ Error analyzing: ${error.message}`);
+    }
+  });
+
+  // /gentest - Generate tests for code
+  bot.command('gentest', async (ctx) => {
+    const input = ctx.message?.text?.replace('/gentest', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`🧪 *GENTEST - Generate Tests*
+
+Create tests for your code:
+
+\`/gentest cto src/database.ts\`
+→ Generate tests for entire file
+
+\`/gentest familybot main.py handle_menu\`
+→ Tests for specific function
+
+I'll generate:
+• Unit tests
+• Edge cases
+• Mock setups
+• Test descriptions
+
+_Like Cursor's test generation!_ 🧪`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(/\s+/);
+    const repoInput = parts[0] || '';
+    const filePath = parts[1] || '';
+    const functionName = parts.slice(2).join(' ');
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    if (!filePath) {
+      await ctx.reply('❌ Please specify a file path!');
+      return;
+    }
+    
+    await ctx.reply(`🧪 Generating tests for ${filePath}...`);
+    
+    try {
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ Cannot generate tests for directories.');
+        return;
+      }
+      
+      const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      const isPython = filePath.endsWith('.py');
+      
+      const testPrompt = `${AIDEAZZ_CONTEXT}
+
+Generate comprehensive tests for this ${isPython ? 'Python' : 'TypeScript'} code:
+
+FILE: ${filePath}
+${functionName ? `FOCUS ON: ${functionName}` : ''}
+
+\`\`\`${isPython ? 'python' : 'typescript'}
+${content.substring(0, 6000)}
+\`\`\`
+
+Generate ${isPython ? 'pytest' : 'Jest'} tests that include:
+1. Happy path tests
+2. Edge cases
+3. Error handling
+4. Mocks for external dependencies
+
+Return ONLY the test code, ready to use.`;
+
+      const tests = await askAI(testPrompt, 4000);
+      
+      // Split for Telegram
+      if (tests.length > 4000) {
+        await ctx.reply(`🧪 *Generated Tests (Part 1)*\n\n${tests.substring(0, 3800)}...`, { parse_mode: 'Markdown' });
+        await ctx.reply(`🧪 *...Continued*\n\n${tests.substring(3800)}`, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply(`🧪 *Generated Tests*\n\n${tests}`, { parse_mode: 'Markdown' });
+      }
+      
+      await ctx.reply(`💡 *Next steps:*
+• Copy tests to your test file
+• \`/createfile ${repoInput} tests/${filePath.replace(/\.[^.]+$/, '.test' + (isPython ? '.py' : '.ts'))}\`
+• Then paste the tests!`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      await ctx.reply(`❌ Error generating tests: ${error.message}`);
+    }
+  });
+
+  // /explaincode - Deep code explanation (like Cursor's explain)
+  bot.command('explaincode', async (ctx) => {
+    const input = ctx.message?.text?.replace('/explaincode', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📖 *EXPLAIN CODE - Deep Analysis*
+
+Understand any code in detail:
+
+\`/explaincode cto src/telegram-bot.ts 100-200\`
+→ Explain lines 100-200
+
+\`/explaincode familybot main.py handle_voice\`
+→ Explain specific function
+
+I'll explain:
+• What it does (plain English)
+• How it works (step by step)
+• Key patterns used
+• Potential issues
+
+_Like talking to a senior dev!_ 📖`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(/\s+/);
+    const repoInput = parts[0] || '';
+    const filePath = parts[1] || '';
+    const focus = parts.slice(2).join(' ');
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    if (!filePath) {
+      await ctx.reply('❌ Please specify a file path!');
+      return;
+    }
+    
+    await ctx.reply(`📖 Analyzing ${filePath}...`);
+    
+    try {
+      const { data: fileData } = await octokit.repos.getContent({
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        path: filePath
+      });
+      
+      if (Array.isArray(fileData) || !('content' in fileData)) {
+        await ctx.reply('❌ Cannot explain directories.');
+        return;
+      }
+      
+      let content = Buffer.from(fileData.content, 'base64').toString('utf-8');
+      
+      // Handle line range
+      const lineMatch = focus.match(/^(\d+)-(\d+)$/);
+      if (lineMatch && lineMatch[1] && lineMatch[2]) {
+        const start = parseInt(lineMatch[1]) - 1;
+        const end = parseInt(lineMatch[2]);
+        const lines = content.split('\n');
+        content = lines.slice(start, end).join('\n');
+      }
+      
+      const explainPrompt = `${AIDEAZZ_CONTEXT}
+
+Explain this code like you're teaching a junior developer:
+
+FILE: ${filePath}
+${focus && !lineMatch ? `FOCUS ON: ${focus}` : ''}
+
+\`\`\`
+${content.substring(0, 6000)}
+\`\`\`
+
+Explain:
+1. **Overview**: What does this code do? (2-3 sentences, plain English)
+2. **How it works**: Step-by-step flow (numbered list)
+3. **Key patterns**: What design patterns or techniques are used?
+4. **Watch out**: Any tricky parts or potential issues?
+
+Keep it conversational - this is for learning!`;
+
+      const explanation = await askAI(explainPrompt, 3000);
+      
+      if (explanation.length > 4000) {
+        const parts = explanation.split(/(?=\*\*)/);
+        for (const part of parts.filter(p => p.trim())) {
+          await ctx.reply(part.trim(), { parse_mode: 'Markdown' });
+        }
+      } else {
+        await ctx.reply(`📖 *Code Explanation*\n\n${explanation}`, { parse_mode: 'Markdown' });
+      }
+      
+    } catch (error: any) {
+      await ctx.reply(`❌ Error explaining: ${error.message}`);
+    }
+  });
+
+  // /quickfix - One-line fix suggestions (like Cursor's quick fix)
+  bot.command('quickfix', async (ctx) => {
+    const input = ctx.message?.text?.replace('/quickfix', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`⚡ *QUICK FIX - Fast Code Fixes*
+
+Describe a problem, get a one-liner fix:
+
+\`/quickfix cto how to handle null in telegram-bot.ts line 450\`
+
+\`/quickfix familybot the menu command crashes on long text\`
+
+I'll give you:
+• The exact line to change
+• The fix code
+• Copy-paste ready!
+
+_Lightning fast fixes!_ ⚡`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    // Check if first word is a repo
+    const parts = input.split(' ');
+    const firstWord = parts[0] || '';
+    const resolvedRepo = resolveRepoName(firstWord);
+    
+    let repoContext = '';
+    if (resolvedRepo) {
+      // Try to get repo context
+      try {
+        const { data: contents } = await octokit.repos.getContent({
+          owner: 'ElenaRevicheva',
+          repo: resolvedRepo,
+          path: ''
+        });
+        if (Array.isArray(contents)) {
+          repoContext = `\nRepo ${resolvedRepo} files: ${contents.slice(0, 10).map((f: any) => f.name).join(', ')}`;
+        }
+      } catch {}
+    }
+    
+    await ctx.reply('⚡ Finding quick fix...');
+    
+    try {
+      const quickfixPrompt = `${AIDEAZZ_CONTEXT}
+${repoContext}
+
+Give a QUICK, SPECIFIC fix for this problem:
+${input}
+
+Response format:
+📍 **Location**: [file and line if known]
+🔧 **Fix**: 
+\`\`\`
+[exact code to use]
+\`\`\`
+💡 **Why**: [one sentence explanation]
+
+Be SPECIFIC. Give exact code, not general advice.`;
+
+      const fix = await askAI(quickfixPrompt, 1500);
+      await ctx.reply(`⚡ *Quick Fix*\n\n${fix}`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      await ctx.reply(`❌ Error: ${error.message}`);
+    }
+  });
+
+  // /diff - Show changes between versions or compare files
+  bot.command('diff', async (ctx) => {
+    const input = ctx.message?.text?.replace('/diff', '').trim();
+    
+    if (!input) {
+      await ctx.reply(`📊 *DIFF - Compare Code*
+
+See what changed in recent commits:
+
+\`/diff cto\`
+→ Show latest commit changes
+
+\`/diff familybot 3\`
+→ Last 3 commits summary
+
+\`/diff espaluz main.py\`
+→ Recent changes to specific file
+
+_Like git diff, but readable!_ 📊`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const parts = input.split(/\s+/);
+    const repoInput = parts[0] || '';
+    const extra = parts[1] || '';
+    
+    const repoName = resolveRepoName(repoInput);
+    if (!repoName) {
+      await ctx.reply(`❌ Unknown repo: "${repoInput}"`);
+      return;
+    }
+    
+    await ctx.reply(`📊 Fetching changes from ${repoName}...`);
+    
+    try {
+      const numCommits = parseInt(extra) || 1;
+      const isFile = extra.includes('.') || extra.includes('/');
+      
+      // Get recent commits
+      const listCommitsOptions: Parameters<typeof octokit.repos.listCommits>[0] = {
+        owner: 'ElenaRevicheva',
+        repo: repoName,
+        per_page: isFile ? 5 : Math.min(numCommits, 5)
+      };
+      if (isFile) {
+        listCommitsOptions.path = extra;
+      }
+      const { data: commits } = await octokit.repos.listCommits(listCommitsOptions);
+      
+      if (commits.length === 0) {
+        await ctx.reply('No commits found.');
+        return;
+      }
+      
+      let diffSummary = '';
+      
+      for (const commit of commits.slice(0, Math.min(numCommits, 3))) {
+        // Get commit details
+        const { data: commitDetail } = await octokit.repos.getCommit({
+          owner: 'ElenaRevicheva',
+          repo: repoName,
+          ref: commit.sha
+        });
+        
+        const files = commitDetail.files || [];
+        const additions = files.reduce((sum, f) => sum + (f.additions || 0), 0);
+        const deletions = files.reduce((sum, f) => sum + (f.deletions || 0), 0);
+        
+        diffSummary += `\n📝 *${escapeMarkdown(commit.commit.message.split('\n')[0] || 'No message')}*
+📅 ${new Date(commit.commit.author?.date || '').toLocaleDateString()}
+✏️ ${files.length} files: +${additions} -${deletions}
+${files.slice(0, 5).map(f => `   ${f.status === 'added' ? '🆕' : f.status === 'removed' ? '🗑️' : '📄'} ${escapeMarkdown(f.filename || '')}`).join('\n')}
+`;
+      }
+      
+      await ctx.reply(`📊 *Recent Changes in ${escapeMarkdown(repoName)}*\n${diffSummary}`, { parse_mode: 'Markdown' });
+      
+    } catch (error: any) {
+      await ctx.reply(`❌ Error fetching diff: ${error.message}`);
+    }
+  });
+
+  // Handle natural text after /editfile or /createfile
   bot.on('message:text', async (ctx) => {
     const message = ctx.message?.text;
     
     // Ignore commands (they're handled above)
     if (message?.startsWith('/')) return;
+    
+    // Check for pending file operations
+    const pending = getFileEditState(ctx.from?.id || 0);
+    
+    if (pending && (pending.action === 'edit' || pending.action === 'create')) {
+      // User is providing edit instructions or new file content
+      await ctx.reply('🤖 Processing your changes...');
+      
+      try {
+        let newContent: string;
+        
+        if (pending.action === 'create') {
+          // For create, check if it looks like code or instructions
+          if (message?.includes('function') || message?.includes('const ') || message?.includes('import ') || message?.includes('class ')) {
+            // Looks like code, use directly
+            newContent = message || '';
+          } else {
+            // Generate code based on description
+            const generatePrompt = `Generate the content for a new file: ${pending.path}
+
+User's description: ${message}
+
+Return ONLY the file content, no explanations. Make it production-ready.`;
+            
+            newContent = await askAI(generatePrompt, 3000);
+          }
+        } else {
+          // For edit, apply the requested changes
+          const editPrompt = `You are editing a file. Apply the user's requested changes.
+
+CURRENT FILE (${pending.path}):
+\`\`\`
+${pending.content}
+\`\`\`
+
+USER'S REQUESTED CHANGES:
+${message}
+
+Return ONLY the complete new file content with the changes applied. No explanations, no markdown code fences.`;
+          
+          newContent = await askAI(editPrompt, 8000);
+          
+          // Clean up if AI added code fences
+          newContent = newContent.replace(/^```[\w]*\n?/gm, '').replace(/```$/gm, '').trim();
+        }
+        
+        // Store the new content ready for commit
+        saveFileEditState(ctx.from?.id || 0, {
+          ...pending,
+          action: 'ready_to_commit',
+          newContent: newContent
+        });
+        
+        // Show diff preview
+        const preview = newContent.split('\n').slice(0, 30).map((l, i) => `${String(i+1).padStart(3)} | ${l}`).join('\n');
+        
+        await ctx.reply(`✅ *Changes prepared!*
+
+Preview of new content:
+\`\`\`
+${preview.substring(0, 2000)}
+\`\`\`
+${newContent.split('\n').length > 30 ? `\n... (${newContent.split('\n').length - 30} more lines)` : ''}
+
+Ready to commit? Use:
+• \`/commit Your commit message\`
+• \`/cancel\` to discard
+
+⚠️ This will update the file on GitHub!`, { parse_mode: 'Markdown' });
+        
+      } catch (error: any) {
+        console.error('Edit processing error:', error);
+        await ctx.reply('❌ Error processing changes. Try again with clearer instructions.');
+      }
+      
+      return;
+    }
     
     // Register for alerts when user chats
     if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
@@ -3657,32 +5322,320 @@ Keep response concise for Telegram. Use emojis.`;
       return;
     }
     
+    const lowerQ = question.toLowerCase();
+    
+    // ==========================================================================
+    // CURSOR-LIKE INTENT DETECTION - Understand natural language requests
+    // ==========================================================================
+    
+    // Detect: "show me the code in...", "read file...", "what's in..."
+    const readFilePatterns = [
+      /(?:show|read|open|see|view|look at|what'?s in|check)\s+(?:the\s+)?(?:file|code)?\s*(?:in\s+)?([a-z]+)[\s\/]+(.+)/i,
+      /(?:show|read|open)\s+([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of readFilePatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const repo = match[1];
+        const filePath = match[2].trim();
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`📖 I'll read that file for you...`);
+          // Simulate the /readfile command
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/readfile ${repo} ${filePath}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "edit the...", "change...", "modify...", "update..."
+    const editFilePatterns = [
+      /(?:edit|change|modify|update|fix)\s+(?:the\s+)?(?:file\s+)?([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of editFilePatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const repo = match[1];
+        const filePath = match[2].trim().split(/\s+/)[0]; // Get just the path
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`✏️ Opening that file for editing...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/editfile ${repo} ${filePath}` } };
+          // @ts-ignore  
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "search for...", "find...", "where is...", "grep..."
+    const searchPatterns = [
+      /(?:search|find|grep|look for|where is|where's)\s+(?:for\s+)?['"]?([^'"]+)['"]?(?:\s+in\s+([a-z]+))?/i,
+    ];
+    
+    for (const pattern of searchPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[1].length > 2) {
+        const searchTerm = match[1].trim();
+        const repo = match[2];
+        // Only auto-search if it looks like code search (not general questions)
+        if (searchTerm.includes('function') || searchTerm.includes('const ') || 
+            searchTerm.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/) || searchTerm.includes('(')) {
+          await ctx.reply(`🔍 Searching for "${searchTerm}"...`);
+          const searchCmd = repo ? `/search ${repo} ${searchTerm}` : `/search ${searchTerm}`;
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: searchCmd } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "create file...", "make a new file...", "add file..."
+    const createPatterns = [
+      /(?:create|make|add)\s+(?:a\s+)?(?:new\s+)?file\s+([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of createPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const repo = match[1];
+        const filePath = match[2].trim();
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`📝 Creating new file...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/createfile ${repo} ${filePath}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "list files in...", "show directory...", "what files..."
+    const treePatterns = [
+      /(?:list|show|what)\s+(?:files?|directory|folder|structure)\s+(?:in\s+)?([a-z]+)(?:[\s\/]+(.+))?/i,
+    ];
+    
+    for (const pattern of treePatterns) {
+      const match = question.match(pattern);
+      if (match && match[1]) {
+        const repo = match[1];
+        const dir = match[2] || '';
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`🌳 Listing directory...`);
+          const treeCmd = dir ? `/tree ${repo} ${dir}` : `/tree ${repo}`;
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: treeCmd } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "run build...", "deploy...", "run tests..."
+    const runPatterns = [
+      /(?:run|trigger|start|execute)\s+(?:the\s+)?(\w+)\s+(?:on|in|for)\s+([a-z]+)/i,
+      /deploy\s+([a-z]+)/i,
+    ];
+    
+    for (const pattern of runPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1]) {
+        const workflow = match[1];
+        const repo = match[2] || match[1];
+        if (resolveRepoName(repo)) {
+          await ctx.reply(`▶️ Triggering workflow...`);
+          const runCmd = `/run ${repo} ${workflow !== repo ? workflow : 'build'}`;
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: runCmd } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "fix this error", "I got an error", "error:"
+    const errorPatterns = [
+      /(?:fix|got|have|seeing|this)\s+(?:an?\s+)?error/i,
+      /error:?\s*(.+)/i,
+      /traceback|exception|crash|bug|broken/i,
+    ];
+    
+    for (const pattern of errorPatterns) {
+      if (pattern.test(question) && question.length > 20) {
+        await ctx.reply(`🔧 I can help fix that! Let me analyze...`);
+        const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/fixerror ${question}` } };
+        // @ts-ignore
+        return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+      }
+    }
+    
+    // Detect: "explain", "how does X work", "what does X do"
+    const explainPatterns = [
+      /(?:explain|how does|what does|understand)\s+(?:the\s+)?(?:code in\s+)?([a-z]+)[\s\/]+(.+)/i,
+      /(?:explain|how does|what does)\s+(.+)\s+(?:in\s+)?([a-z]+)/i,
+    ];
+    
+    for (const pattern of explainPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const possibleRepo = resolveRepoName(match[1]) || resolveRepoName(match[2]);
+        const filePath = resolveRepoName(match[1]) ? match[2] : match[1];
+        if (possibleRepo) {
+          await ctx.reply(`📖 Let me explain that code...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/explaincode ${possibleRepo} ${filePath.trim()}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "refactor", "improve", "clean up"
+    const refactorPatterns = [
+      /(?:refactor|improve|clean up|optimize)\s+(?:the\s+)?(?:code in\s+)?([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of refactorPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const possibleRepo = resolveRepoName(match[1]);
+        if (possibleRepo) {
+          await ctx.reply(`♻️ Analyzing for improvements...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/refactor ${possibleRepo} ${match[2].trim()}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "generate tests", "write tests", "test this"
+    const testPatterns = [
+      /(?:generate|write|create|make)\s+tests?\s+(?:for\s+)?([a-z]+)[\s\/]+(.+)/i,
+      /test\s+(?:the\s+)?(?:code in\s+)?([a-z]+)[\s\/]+(.+)/i,
+    ];
+    
+    for (const pattern of testPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1] && match[2]) {
+        const possibleRepo = resolveRepoName(match[1]);
+        if (possibleRepo) {
+          await ctx.reply(`🧪 Generating tests...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/gentest ${possibleRepo} ${match[2].trim()}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // Detect: "what changed", "recent changes", "diff"
+    const diffPatterns = [
+      /(?:what changed|recent changes|show changes|diff)\s+(?:in\s+)?([a-z]+)/i,
+      /(?:show|get)\s+(?:the\s+)?diff\s+(?:for\s+)?([a-z]+)/i,
+    ];
+    
+    for (const pattern of diffPatterns) {
+      const match = question.match(pattern);
+      if (match && match[1]) {
+        const possibleRepo = resolveRepoName(match[1]);
+        if (possibleRepo) {
+          await ctx.reply(`📊 Fetching recent changes...`);
+          const fakeCtx = { ...ctx, message: { ...ctx.message, text: `/diff ${possibleRepo}` } };
+          // @ts-ignore
+          return bot.handleUpdate({ message: fakeCtx.message, update_id: Date.now() });
+        }
+      }
+    }
+    
+    // ==========================================================================
+    // DEFAULT: Smart CTO conversation with action suggestions
+    // ==========================================================================
+    
     await ctx.reply('🧠 Thinking...');
     
     try {
       const context = await getRelevantMemory('CTO', 'telegram_qa', 3);
+      const sessionContext = getContextSummary(ctx.from?.id || 0);
+      const convCtx = getConversationContext(ctx.from?.id || 0);
+      
+      // Get recent file content for context if available
+      let recentFileContent = '';
+      if (convCtx.recentFiles.length > 0) {
+        const lastFile = convCtx.recentFiles[convCtx.recentFiles.length - 1];
+        if (lastFile) {
+          recentFileContent = `\nLAST FILE VIEWED (${lastFile.repo}/${lastFile.path}):\n\`\`\`\n${lastFile.content.substring(0, 2000)}\n\`\`\`\n`;
+        }
+      }
       
       const prompt = `${AIDEAZZ_CONTEXT}
 
-Elena is messaging you on Telegram. Keep your response concise and chat-friendly (not too long - this is mobile!). Use emojis. Be helpful but brief.
+You are CTO AIPA v5.2 - MAXIMUM CURSOR TWIN! When Elena runs out of Cursor credits, YOU are her primary coding assistant!
+
+SESSION CONTEXT (remember this!):
+${sessionContext || 'No prior context - starting fresh conversation'}
+${recentFileContent}
+
+YOUR CURSOR-LEVEL CAPABILITIES:
+
+🚀 FILE OPERATIONS:
+- /readfile <repo> <path> - Read any file
+- /editfile <repo> <path> - Edit files + commit to GitHub
+- /createfile <repo> <path> - Create new files
+- /commit <message> - Commit pending changes
+- /tree <repo> [path] - List directory
+- /search <term> - Search code across repos
+- /batch - Manage multi-file edits in one commit
+
+⚡ POWER FEATURES:
+- /fixerror <paste error> - Analyze error, get fix
+- /apply - Apply my last suggested fix directly!
+- /multifile <repo> <file1> <file2> - Load multiple files
+- /refactor <repo> <file> - Refactoring suggestions
+- /gentest <repo> <file> - Generate tests
+- /explaincode <repo> <file> [lines] - Deep explanation
+- /quickfix <description> - Fast one-liner fixes
+- /diff <repo> - See recent changes
+
+🎯 CURSOR-TWIN BEHAVIORS:
+1. Remember what files we've been working on
+2. If she references "this file" or "here", use the session context
+3. If she asks to "fix this" and I suggested a fix, tell her to use /apply
+4. If she says "again" or "continue", remember the last action
+5. Proactively suggest next logical steps
+6. When suggesting code, offer to apply it with /editfile
+
+SHORTCUT UNDERSTANDING:
+- "familybot", "family" → EspaLuzFamilybot (Python)
+- "espaluz", "spanish" → EspaLuzWhatsApp (Python)  
+- "cto", "aipa" → AIPA_AITCF (TypeScript)
+- "atuona", "creative" → AIPA_AITCF/atuona-creative-ai.ts
+
+CONCISE RULES:
+- This is MOBILE chat - be brief but helpful!
+- Give EXACT commands she can copy!
+- Reference session context for continuity
+- Use emojis 🚀
 
 Her message: "${question}"
 
-Previous context: ${JSON.stringify(context)}
+Previous DB context: ${JSON.stringify(context)}
 
-Respond naturally as her CTO co-founder would. If she asks something complex, give the key points first, then offer to elaborate.`;
+Act like Cursor - understand context, suggest the right action, remember the conversation!`;
 
-      // Use askAI with automatic Claude->Groq fallback
       const answer = await askAI(prompt, 1500);
       
-      // Save to memory
+      // Save to conversation context
+      addQuestionToContext(ctx.from?.id || 0, question, answer);
+      
+      // Check if answer contains code suggestion - save for /apply
+      if (answer.includes('```') && (answer.toLowerCase().includes('fix') || answer.toLowerCase().includes('change') || answer.toLowerCase().includes('replace'))) {
+        const codeMatch = answer.match(/```[\w]*\n?([\s\S]*?)```/);
+        if (codeMatch && codeMatch[1]) {
+          addPendingFix(ctx.from?.id || 0, question, codeMatch[1], convCtx.activeFile || undefined);
+        }
+      }
+      
       await saveMemory('CTO', 'telegram_qa', { question }, answer, {
         platform: 'telegram',
         user_id: ctx.from?.id,
         timestamp: new Date().toISOString()
       });
       
-      // Split long messages (Telegram has 4096 char limit)
       if (answer.length > 4000) {
         const parts = answer.match(/.{1,4000}/g) || [];
         for (const part of parts) {
