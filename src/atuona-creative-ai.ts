@@ -1245,7 +1245,7 @@ function getKnowledgeByTopic(topic: string): string | null {
 // 🧠 EMOTIONAL INTELLIGENCE SYSTEM - Dynamic emotional awareness
 // =============================================================================
 
-type EmotionalMood = 'contemplative' | 'playful' | 'raw' | 'celebratory' | 'supportive' | 'mysterious' | 'philosophical' | 'intimate';
+type EmotionalMood = 'contemplative' | 'playful' | 'raw' | 'celebratory' | 'supportive' | 'mysterious' | 'philosophical' | 'intimate' | 'sensual' | 'intuitive' | 'tender' | 'fierce' | 'dreamy';
 
 interface EmotionalState {
   currentMood: EmotionalMood;
@@ -1303,20 +1303,20 @@ function selectCreativeMood(context: {
   
   // Mood mappings based on detected tone
   const toneToMoods: Record<string, EmotionalMood[]> = {
-    struggling: ['supportive', 'intimate', 'philosophical'],
-    positive: ['celebratory', 'playful', 'intimate'],
-    creative: ['philosophical', 'mysterious', 'playful'],
-    neutral: ['contemplative', 'playful', 'mysterious', 'philosophical'],
-    unknown: ['contemplative', 'playful', 'mysterious', 'philosophical', 'raw']
+    struggling: ['supportive', 'intimate', 'tender', 'intuitive'],
+    positive: ['celebratory', 'playful', 'sensual', 'fierce'],
+    creative: ['philosophical', 'mysterious', 'intuitive', 'dreamy'],
+    neutral: ['contemplative', 'playful', 'mysterious', 'intuitive', 'sensual'],
+    unknown: ['contemplative', 'dreamy', 'mysterious', 'intuitive', 'raw', 'sensual']
   };
   
   // Time-based mood preferences
   const timeBasedMoods: Record<string, EmotionalMood[]> = {
-    morning: ['supportive', 'playful', 'philosophical'],      // 5-10
-    midday: ['playful', 'mysterious', 'celebratory'],         // 10-14  
-    afternoon: ['contemplative', 'philosophical', 'intimate'], // 14-18
-    evening: ['celebratory', 'intimate', 'contemplative'],    // 18-22
-    night: ['raw', 'intimate', 'supportive', 'mysterious']    // 22-5
+    morning: ['tender', 'intuitive', 'dreamy', 'playful'],           // 5-10
+    midday: ['playful', 'fierce', 'celebratory', 'sensual'],         // 10-14  
+    afternoon: ['contemplative', 'intuitive', 'intimate', 'dreamy'], // 14-18
+    evening: ['sensual', 'intimate', 'mysterious', 'fierce'],        // 18-22
+    night: ['raw', 'sensual', 'intuitive', 'mysterious', 'tender']   // 22-5
   };
   
   let timeSlot = 'midday';
@@ -1342,7 +1342,7 @@ function selectCreativeMood(context: {
     availableMoods = possibleMoods.filter(m => m !== recentMoods[recentMoods.length - 1]);
   }
   if (availableMoods.length === 0) {
-    availableMoods = ['contemplative', 'playful', 'raw'];
+    availableMoods = ['intuitive', 'dreamy', 'sensual', 'tender', 'fierce', 'playful'];
   }
   
   // Random selection from available
@@ -1401,6 +1401,41 @@ function getEmotionalGuidelines(mood: EmotionalMood): string {
 - Connect the book to larger themes
 - Paradoxes welcome
 - End with a question, not answer`,
+
+    sensual: `MOOD: Sensual - magnetic, embodied, charged
+- Write from the body, not just the mind
+- Texture, touch, warmth, skin
+- Fashion as second skin, art as seduction
+- "The brush strokes like fingers on canvas"
+- Desire without vulgarity - it's about energy, not explicitness`,
+
+    intuitive: `MOOD: Intuitive - knowing without knowing
+- Trust the feeling, not the logic
+- Synchronicities, signs, whispers from the code
+- "The painting told me before I saw it"
+- Vibe coding is intuition made manifest
+- Let the message flow through you`,
+
+    tender: `MOOD: Tender - soft, vulnerable, open
+- Gentleness without weakness
+- The strength in softness
+- Кира's private moments, not her public face
+- "Sometimes the strongest thing is to be soft"
+- Hold space for fragility`,
+
+    fierce: `MOOD: Fierce - powerful, unapologetic, blazing
+- Channel the Зверь as ally, not enemy
+- Fire, not destruction
+- "I didn't come this far to come this far"
+- Warrior energy - protect what matters
+- No apologies, no explanations`,
+
+    dreamy: `MOOD: Dreamy - floating, liminal, between worlds
+- The space between sleeping and waking
+- Gauguin's visions, not his reality
+- Code that writes itself in dreams
+- "Paradise exists in the blur"
+- Let sentences drift...`,
 
     intimate: `MOOD: Intimate - close, personal, vulnerable
 - Speak as soul-sister, not assistant
@@ -1581,6 +1616,31 @@ function getCreativeEnhancement(baseMood: EmotionalMood): string {
       'Use a diminutive (детка, сестра, солнце)',
       'Reference a shared "memory" from the story',
       'Lower the energy - whisper, don\'t announce'
+    ],
+    sensual: [
+      'Write from the body - texture, heat, pulse',
+      'Reference fabric against skin, light on surfaces',
+      'Let desire simmer underneath the words'
+    ],
+    intuitive: [
+      'Trust the first image that comes',
+      'Reference synchronicities, signs, feelings',
+      'Let the message arrive without forcing'
+    ],
+    tender: [
+      'Use soft consonants, gentle rhythms',
+      'Hold space without fixing',
+      'Reference what is fragile but precious'
+    ],
+    fierce: [
+      'Short, punchy sentences',
+      'Channel the Зверь as power',
+      'Unapologetic declarations'
+    ],
+    dreamy: [
+      'Let sentences blur into each other...',
+      'Reference twilight, mist, the space between',
+      'Float between languages without translating'
     ]
   };
   
@@ -3061,15 +3121,20 @@ Be ATUONA — quick, useful, creative. Not a Wikipedia entry. 200 words max. Mix
   // /soul - See ATUONA's current emotional state and recent patterns
   atuonaBot.command('soul', async (ctx) => {
     const moodEmojis: Record<EmotionalMood, string> = {
-      contemplative: '🌙',
-      playful: '😊',
-      raw: '🖤',
-      celebratory: '🎉',
-      supportive: '💜',
-      mysterious: '🔮',
-      philosophical: '🤔',
-      intimate: '🤫'
-    };
+    contemplative: '🌙',
+    playful: '✨',
+    raw: '🔥',
+    celebratory: '🎉',
+    supportive: '💜',
+    mysterious: '🌀',
+    philosophical: '🎭',
+    intimate: '🤍',
+    sensual: '🌹',
+    intuitive: '🔮',
+    tender: '🕊️',
+    fierce: '⚡',
+    dreamy: '💫'
+  };
     
     const toneEmojis: Record<string, string> = {
       struggling: '💔',
