@@ -34,6 +34,7 @@ import {
   saveKnowledge,
   searchKnowledge,
   getKnowledgeByCategory,
+  getKnowledgeByProject,
   getRecentKnowledge
 } from './database';
 import { Octokit } from '@octokit/rest';
@@ -404,134 +405,241 @@ Type /menu for all commands! 🚀
     await showMenu(ctx);
   });
   
+  // ==========================================================================
+  // INTERACTIVE MENU SYSTEM - Tap sections to see details!
+  // ==========================================================================
+  
+  const MENU_SECTIONS: Record<string, { title: string; commands: { cmd: string; desc: string; usage: string }[] }> = {
+    'cursor_twin': {
+      title: '🚀 CURSOR-TWIN OPERATIONS',
+      commands: [
+        { cmd: '/readfile', desc: 'Read any file from your repos', usage: '/readfile cto src/telegram-bot.ts\n/readfile espaluz main.py 1-50' },
+        { cmd: '/editfile', desc: 'Edit files and commit to GitHub', usage: '/editfile cto src/database.ts\nThen describe your change' },
+        { cmd: '/createfile', desc: 'Create new files', usage: '/createfile cto src/newfile.ts\nThen paste the content' },
+        { cmd: '/commit', desc: 'Commit pending changes', usage: '/commit Fixed login bug' },
+        { cmd: '/search', desc: 'Search code across repos (grep)', usage: '/search cto handleQuestion\n/search espaluz async def' },
+        { cmd: '/tree', desc: 'List directory structure', usage: '/tree cto src/\n/tree espaluz' },
+        { cmd: '/run', desc: 'Trigger GitHub Actions CI/CD', usage: '/run cto\n/run espaluz deploy' },
+        { cmd: '/cancel', desc: 'Cancel pending edits', usage: '/cancel' },
+      ]
+    },
+    'session_memory': {
+      title: '🧠 SESSION MEMORY',
+      commands: [
+        { cmd: '/context', desc: 'Show what I remember from our session', usage: '/context\nSee active project, recent files, pending fixes' },
+        { cmd: '/apply', desc: 'Apply my last suggested fix', usage: 'Ask me to fix something → I suggest code → /apply → /commit' },
+        { cmd: '/batch', desc: 'Multi-file batch editing', usage: '/batch add cto src/file1.ts\n/batch add cto src/file2.ts\n/batch commit "Updated both"' },
+      ]
+    },
+    'power': {
+      title: '⚡ POWER FEATURES',
+      commands: [
+        { cmd: '/fixerror', desc: 'Paste an error, get a fix', usage: '/fixerror TypeError: Cannot read property...' },
+        { cmd: '/multifile', desc: 'Load multiple files at once', usage: '/multifile cto src/telegram-bot.ts src/database.ts' },
+        { cmd: '/refactor', desc: 'Get code improvement suggestions', usage: '/refactor cto src/telegram-bot.ts' },
+        { cmd: '/gentest', desc: 'Generate tests for your code', usage: '/gentest cto src/database.ts' },
+        { cmd: '/explaincode', desc: 'Deep code explanation', usage: '/explaincode cto src/cto-aipa.ts 100-200' },
+        { cmd: '/quickfix', desc: 'Fast one-liner fixes', usage: '/quickfix add error handling to fetch' },
+        { cmd: '/diff', desc: 'Show recent changes in a repo', usage: '/diff cto\n/diff espaluz 7' },
+      ]
+    },
+    'strategic': {
+      title: '🧠 STRATEGIC CTO',
+      commands: [
+        { cmd: '/strategy', desc: 'Ecosystem analysis and planning', usage: '/strategy\nGet AIdeazz ecosystem overview' },
+        { cmd: '/priorities', desc: 'What to work on today', usage: '/priorities\nBased on your recent work' },
+        { cmd: '/think', desc: 'Deep strategic thinking', usage: '/think Should I add payments to EspaLuz?' },
+        { cmd: '/suggest', desc: 'Quick actionable suggestion', usage: '/suggest improve onboarding' },
+      ]
+    },
+    'monitoring': {
+      title: '🏥 MONITORING',
+      commands: [
+        { cmd: '/health', desc: 'Check production services', usage: '/health\nCheck all AIdeazz services' },
+        { cmd: '/logs', desc: 'Analyze pasted logs', usage: '/logs\nThen paste error logs' },
+        { cmd: '/status', desc: 'Ecosystem status overview', usage: '/status' },
+        { cmd: '/daily', desc: 'Morning briefing', usage: '/daily\nGets sent at 8 AM automatically' },
+        { cmd: '/stats', desc: 'Weekly metrics and stats', usage: '/stats' },
+      ]
+    },
+    'learning': {
+      title: '📚 LEARNING & TEACHING',
+      commands: [
+        { cmd: '/feedback', desc: 'Teach me what worked/failed', usage: '/feedback That fix worked great!' },
+        { cmd: '/lessons', desc: 'See what I learned from you', usage: '/lessons' },
+        { cmd: '/learn', desc: 'Pick a coding topic', usage: '/learn typescript\n/learn react hooks' },
+        { cmd: '/exercise', desc: 'Get a coding challenge', usage: '/exercise python\n/exercise javascript' },
+        { cmd: '/explain', desc: 'Explain any concept', usage: '/explain async await\n/explain dependency injection' },
+      ]
+    },
+    'code_gen': {
+      title: '💻 CODE GENERATION',
+      commands: [
+        { cmd: '/code', desc: 'Generate code', usage: '/code cto Add rate limiting middleware' },
+        { cmd: '/fix', desc: 'Fix a bug', usage: '/fix cto The menu shows wrong count' },
+        { cmd: '/approve', desc: 'Create PR for pending code', usage: '/approve' },
+        { cmd: '/reject', desc: 'Discard pending code', usage: '/reject' },
+        { cmd: '/pending', desc: 'Check pending code status', usage: '/pending' },
+      ]
+    },
+    'decisions': {
+      title: '🏛️ DECISIONS & DEBT',
+      commands: [
+        { cmd: '/decision', desc: 'Record architectural decision', usage: '/decision Use PostgreSQL for EspaLuz memory' },
+        { cmd: '/debt', desc: 'Track technical debt', usage: '/debt cto Need to refactor voice handler' },
+        { cmd: '/review', desc: 'Review latest commits', usage: '/review cto\n/review espaluz 5' },
+      ]
+    },
+    'repos': {
+      title: '🔍 REPOS & IDEAS',
+      commands: [
+        { cmd: '/repos', desc: 'List all repositories', usage: '/repos' },
+        { cmd: '/idea', desc: 'Save a startup idea', usage: '/idea Add AI voice coaching to EspaLuz' },
+        { cmd: '/ideas', desc: 'View saved ideas', usage: '/ideas' },
+      ]
+    },
+    'personal_ai': {
+      title: '🧠 PERSONAL AI (NEW!)',
+      commands: [
+        { cmd: '/project', desc: 'Set active project (no need to specify repo)', usage: '/project espaluz\nNow /readfile main.py works!' },
+        { cmd: '/know', desc: 'Search your knowledge base', usage: '/know pricing strategy\n/know EspaLuz features' },
+        { cmd: '/diary', desc: 'Quick diary entry', usage: '/diary Today I launched the new feature...' },
+        { cmd: '/tasks', desc: 'Show your pending tasks', usage: '/tasks' },
+        { cmd: '/research', desc: 'Save research notes', usage: '/research Competitor X charges $20/mo' },
+        { cmd: '/rules', desc: 'Show CLAUDE.md for current project', usage: '/rules' },
+        { cmd: '/resume', desc: 'Restore your last session', usage: '/resume\nLoads your context from database' },
+        { cmd: '/forget', desc: 'Clear conversation memory', usage: '/forget\nStart fresh (keeps knowledge base)' },
+      ]
+    },
+    'chat': {
+      title: '💬 CHAT & MEDIA',
+      commands: [
+        { cmd: '/ask', desc: 'Ask me anything', usage: '/ask How do I fix this error?' },
+        { cmd: '🎤 Voice', desc: 'Send a voice message', usage: 'Just record and send! I transcribe and understand.' },
+        { cmd: '📸 Photo', desc: 'Send a screenshot', usage: 'Send any image - I\'ll analyze it!' },
+      ]
+    },
+  };
+  
   async function showMenu(ctx: Context) {
-    const menuMessage = `
-🤖 *CTO AIPA v6.0 - PERSONAL AI CO-FOUNDER*
+    const menuMessage = `🤖 *CTO AIPA v6.0 - PERSONAL AI CO-FOUNDER*
 
-━━━━━━━━━━━━━━━━━━━━
-🚀 *CURSOR-TWIN OPERATIONS*
-━━━━━━━━━━━━━━━━━━━━
-/readfile - 📖 Read any file
-/editfile - ✏️ Edit + commit to GitHub
-/createfile - 📝 Create new files
-/commit - 💾 Commit pending changes
-/search - 🔍 Search code (grep!)
-/tree - 🌳 List directory
-/run - ▶️ Trigger CI/CD
-/cancel - 🗑️ Cancel pending
+_Tap a section below to see commands and usage examples!_
 
-━━━━━━━━━━━━━━━━━━━━
-🧠 *SESSION MEMORY (NEW!)*
-━━━━━━━━━━━━━━━━━━━━
-/context - 📋 Show what I remember
-/apply - ⚡ Apply my last fix
-/batch - 📦 Multi-file edits
-
-━━━━━━━━━━━━━━━━━━━━
-⚡ *POWER FEATURES*
-━━━━━━━━━━━━━━━━━━━━
-/fixerror - 🔧 Paste error → get fix
-/multifile - 📂 Load multiple files
-/refactor - ♻️ Code improvements
-/gentest - 🧪 Generate tests
-/explaincode - 📖 Deep explanation
-/quickfix - ⚡ Fast one-liner fixes
-/diff - 📊 Recent changes
-
-━━━━━━━━━━━━━━━━━━━━
-🧠 *STRATEGIC CTO*
-━━━━━━━━━━━━━━━━━━━━
-/strategy - Ecosystem analysis
-/priorities - Today's focus
-/think - Deep thinking
-/suggest - Quick suggestion
-
-━━━━━━━━━━━━━━━━━━━━
-🏥 *MONITORING*
-━━━━━━━━━━━━━━━━━━━━
-/health - Check services
-/logs - Analyze logs
-/status - System status
-/daily - Morning briefing
-/stats - Weekly metrics
-
-━━━━━━━━━━━━━━━━━━━━
-📚 *LEARNING*
-━━━━━━━━━━━━━━━━━━━━
-/feedback - Teach me!
-/lessons - What I learned
-
-━━━━━━━━━━━━━━━━━━━━
-🖥️ *CURSOR GUIDE*
-━━━━━━━━━━━━━━━━━━━━
-/cursor - Step-by-step guide
-/build - Multi-step plan
-/diff - Before/after code
-
-━━━━━━━━━━━━━━━━━━━━
-📖 *LEARN CODE*
-━━━━━━━━━━━━━━━━━━━━
-/study - Quiz on your code
-/explainfile - Explain a file
-/architecture - Repo structure
-/error - Debug errors
-/howto - How-to guides
-/cmd - Command cheatsheet
-
-━━━━━━━━━━━━━━━━━━━━
-🎓 *LEARN CONCEPTS*
-━━━━━━━━━━━━━━━━━━━━
-/learn - Pick a topic
-/exercise - Coding challenge
-/explain - Explain anything
-
-━━━━━━━━━━━━━━━━━━━━
-💻 *CODE GENERATION*
-━━━━━━━━━━━━━━━━━━━━
-/code - Generate code
-/fix - Fix bugs
-/approve - Create PR
-/reject - Discard code
-/pending - Check pending
-
-━━━━━━━━━━━━━━━━━━━━
-🏛️ *DECISIONS*
-━━━━━━━━━━━━━━━━━━━━
-/decision - Record decision
-/debt - Track tech debt
-/review - Review commits
-
-━━━━━━━━━━━━━━━━━━━━
-🔍 *REPOS & IDEAS*
-━━━━━━━━━━━━━━━━━━━━
-/repos - List repositories
-/idea - Save idea
-/ideas - View ideas
-
-━━━━━━━━━━━━━━━━━━━━
-💬 *CHAT*
-━━━━━━━━━━━━━━━━━━━━
-/ask - Ask anything
-🎤 Voice - Send voice note
-📸 Photo - Send screenshot
-
-━━━━━━━━━━━━━━━━━━━━
-🧠 *PERSONAL AI (NEW!)*
-━━━━━━━━━━━━━━━━━━━━
-/project - 📁 Set active project
-/know - 🔍 Search knowledge base
-/diary - 📔 Quick diary entry
-/tasks - ✅ Your pending tasks
-/research - 🔬 Save research note
-/rules - 📋 Show CLAUDE.md
-/resume - 🔄 Restore last session
-/forget - 🧹 Clear memory
-
-━━━━━━━━━━━━━━━━━━━━
-⚙️ /alerts | /roadmap
-    `;
-    await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
+Or just ask me anything - I understand natural language!`;
+    
+    await ctx.reply(menuMessage, { 
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🚀 Cursor-Twin', callback_data: 'menu:cursor_twin' },
+            { text: '🧠 Session Memory', callback_data: 'menu:session_memory' },
+          ],
+          [
+            { text: '⚡ Power Features', callback_data: 'menu:power' },
+            { text: '🧠 Strategic', callback_data: 'menu:strategic' },
+          ],
+          [
+            { text: '🏥 Monitoring', callback_data: 'menu:monitoring' },
+            { text: '📚 Learning', callback_data: 'menu:learning' },
+          ],
+          [
+            { text: '💻 Code Gen', callback_data: 'menu:code_gen' },
+            { text: '🏛️ Decisions', callback_data: 'menu:decisions' },
+          ],
+          [
+            { text: '🔍 Repos & Ideas', callback_data: 'menu:repos' },
+            { text: '🧠 Personal AI ✨', callback_data: 'menu:personal_ai' },
+          ],
+          [
+            { text: '💬 Chat & Media', callback_data: 'menu:chat' },
+            { text: '⚙️ Settings', callback_data: 'menu:settings' },
+          ],
+        ]
+      }
+    });
   }
+  
+  // Handle menu section callbacks
+  bot.on('callback_query:data', async (ctx) => {
+    const data = ctx.callbackQuery?.data || '';
+    
+    if (data.startsWith('menu:')) {
+      const section = data.replace('menu:', '');
+      
+      if (section === 'settings') {
+        await ctx.answerCallbackQuery();
+        await ctx.reply(`⚙️ *Settings*
+
+/alerts - Toggle daily proactive alerts
+/roadmap - View CTO AIPA roadmap
+/forget - Clear my memory of our conversations
+/resume - Restore last session`, { parse_mode: 'Markdown' });
+        return;
+      }
+      
+      if (section === 'main') {
+        await ctx.answerCallbackQuery();
+        await showMenu(ctx);
+        return;
+      }
+      
+      const sectionData = MENU_SECTIONS[section];
+      if (!sectionData) {
+        await ctx.answerCallbackQuery({ text: 'Unknown section' });
+        return;
+      }
+      
+      await ctx.answerCallbackQuery();
+      
+      let response = `*${sectionData.title}*\n\n`;
+      
+      for (const cmd of sectionData.commands) {
+        response += `*${cmd.cmd}*\n`;
+        response += `${cmd.desc}\n`;
+        response += `\`${cmd.usage.split('\n')[0]}\`\n\n`;
+      }
+      
+      await ctx.reply(response, {
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '📋 Back to Menu', callback_data: 'menu:main' }]
+          ]
+        }
+      });
+      return;
+    }
+    
+    // Handle command detail callbacks (cmd:commandname)
+    if (data.startsWith('cmd:')) {
+      const cmdName = data.replace('cmd:', '');
+      await ctx.answerCallbackQuery();
+      
+      // Find the command in sections
+      for (const [sectionKey, section] of Object.entries(MENU_SECTIONS)) {
+        const cmd = section.commands.find(c => c.cmd === '/' + cmdName || c.cmd === cmdName);
+        if (cmd) {
+          await ctx.reply(`*${cmd.cmd}*
+
+📝 *What it does:*
+${cmd.desc}
+
+💡 *Usage:*
+\`\`\`
+${cmd.usage}
+\`\`\`
+
+_Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
+          return;
+        }
+      }
+      
+      await ctx.reply(`Command /${cmdName} not found in help.`);
+      return;
+    }
+  });
   
   // /status - Ecosystem status
   bot.command('status', async (ctx) => {

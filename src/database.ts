@@ -1083,6 +1083,30 @@ async function getRecentKnowledge(
   }
 }
 
+async function getKnowledgeByProject(
+  userId: number,
+  project: string,
+  limit: number = 20
+): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) as id, category, title, content, tags, project, source, created_at
+       FROM knowledge_base 
+       WHERE user_id = :userId AND project = :project
+       ORDER BY created_at DESC FETCH FIRST :limit ROWS ONLY`,
+      { userId, project, limit }
+    );
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get knowledge by project error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 // Initialize new tables (including Personal AI tables)
 initLessonsTable();
 initStrategicTable();
@@ -1128,5 +1152,6 @@ export {
   saveKnowledge,
   searchKnowledge,
   getKnowledgeByCategory,
+  getKnowledgeByProject,
   getRecentKnowledge
 };
