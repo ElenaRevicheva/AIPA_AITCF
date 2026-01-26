@@ -5718,6 +5718,93 @@ Act like Cursor - understand context, suggest the right action, remember the con
       console.log(`   📅 Daily briefing: 8 AM Panama time`);
       console.log(`   🎤 Voice messages: Enabled`);
       
+      // Register commands with descriptions for Telegram's command menu
+      try {
+        await bot!.api.setMyCommands([
+          // CURSOR-TWIN OPERATIONS
+          { command: 'readfile', description: '📖 Read any file from your repos' },
+          { command: 'editfile', description: '✏️ Edit files and commit to GitHub' },
+          { command: 'createfile', description: '📝 Create new files in your repos' },
+          { command: 'commit', description: '💾 Commit pending changes' },
+          { command: 'search', description: '🔍 Search code across repos (like grep)' },
+          { command: 'tree', description: '🌳 List directory structure' },
+          { command: 'run', description: '▶️ Trigger GitHub Actions (CI/CD)' },
+          { command: 'cancel', description: '🗑️ Cancel pending edits' },
+          // SESSION MEMORY
+          { command: 'context', description: '📋 Show what I remember from our session' },
+          { command: 'apply', description: '⚡ Apply my last suggested fix' },
+          { command: 'batch', description: '📦 Multi-file batch editing' },
+          // POWER FEATURES
+          { command: 'fixerror', description: '🔧 Paste an error, get a fix' },
+          { command: 'multifile', description: '📂 Load multiple files at once' },
+          { command: 'refactor', description: '♻️ Get code improvement suggestions' },
+          { command: 'gentest', description: '🧪 Generate tests for your code' },
+          { command: 'explaincode', description: '📖 Deep code explanation' },
+          { command: 'quickfix', description: '⚡ Fast one-liner fixes' },
+          { command: 'diff', description: '📊 Show recent changes in a repo' },
+          // STRATEGIC CTO
+          { command: 'strategy', description: '🎯 Ecosystem analysis and strategy' },
+          { command: 'priorities', description: '📌 What to work on today' },
+          { command: 'think', description: '🧠 Deep strategic thinking' },
+          { command: 'suggest', description: '💡 Quick actionable suggestion' },
+          // MONITORING
+          { command: 'health', description: '🏥 Check production services' },
+          { command: 'logs', description: '📋 Analyze pasted logs' },
+          { command: 'status', description: '📊 Ecosystem status overview' },
+          { command: 'daily', description: '☀️ Morning briefing' },
+          { command: 'stats', description: '📈 Weekly metrics and stats' },
+          // CODE GENERATION
+          { command: 'code', description: '💻 Generate code and create PR' },
+          { command: 'fix', description: '🔧 Fix a bug and create PR' },
+          { command: 'approve', description: '✅ Approve and create PR' },
+          { command: 'reject', description: '❌ Discard pending code' },
+          { command: 'pending', description: '⏳ Check pending code status' },
+          // DECISIONS & LEARNING
+          { command: 'decision', description: '🏛️ Record architectural decision' },
+          { command: 'debt', description: '📋 Track technical debt' },
+          { command: 'review', description: '🔍 Review latest commits' },
+          { command: 'feedback', description: '📝 Teach me what worked' },
+          { command: 'lessons', description: '📚 See what I learned' },
+          // CURSOR GUIDE
+          { command: 'cursor', description: '🖥️ Step-by-step Cursor instructions' },
+          { command: 'build', description: '🏗️ Multi-step project guidance' },
+          // LEARN CODE
+          { command: 'study', description: '📚 Quiz yourself on your code' },
+          { command: 'explainfile', description: '📖 Explain any file' },
+          { command: 'architecture', description: '🏗️ Show repo structure' },
+          { command: 'error', description: '🐛 Debug an error' },
+          { command: 'howto', description: '📖 How-to guides' },
+          { command: 'cmd', description: '⌨️ Command cheatsheet' },
+          // LEARN CONCEPTS
+          { command: 'learn', description: '🎓 Pick a coding topic to learn' },
+          { command: 'exercise', description: '🏋️ Get a coding challenge' },
+          { command: 'explain', description: '🤔 Explain any concept' },
+          // REPOS & IDEAS
+          { command: 'repos', description: '📂 List all repositories' },
+          { command: 'idea', description: '💡 Save a startup idea' },
+          { command: 'ideas', description: '💡 View saved ideas' },
+          // CHAT
+          { command: 'ask', description: '💬 Ask me anything' },
+          { command: 'menu', description: '📋 Show full command menu' },
+          { command: 'help', description: '❓ Get help' },
+          // PERSONAL AI
+          { command: 'project', description: '📁 Set/show active project' },
+          { command: 'know', description: '🧠 Search your knowledge base' },
+          { command: 'diary', description: '📔 Quick diary entry' },
+          { command: 'tasks', description: '✅ Show your pending tasks' },
+          { command: 'research', description: '🔬 Save research note' },
+          { command: 'rules', description: '📋 Show CLAUDE.md for project' },
+          { command: 'resume', description: '🔄 Restore last session' },
+          { command: 'forget', description: '🧹 Clear conversation memory' },
+          // SETTINGS
+          { command: 'alerts', description: '🔔 Toggle proactive alerts' },
+          { command: 'roadmap', description: '🛣️ View CTO AIPA roadmap' },
+        ]);
+        console.log(`   📋 Registered ${82} commands with Telegram`);
+      } catch (err) {
+        console.log(`   ⚠️ Could not register commands: ${err}`);
+      }
+      
       // Load alert preferences from database (persistent!)
       try {
         const savedChatIds = await getAllAlertChatIds();
