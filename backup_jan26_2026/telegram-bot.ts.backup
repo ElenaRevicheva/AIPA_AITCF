@@ -109,13 +109,11 @@ function getConversationContext(userId: number): ConversationContext {
       lastUpdated: Date.now()
     };
     conversationContexts.set(userId, ctx);
-    // PERSONAL AI UPGRADE: Load from DB asynchronously (fire and forget)
-    loadContextFromDbForUser(userId);
   }
-  // UPGRADED: Extended retention from 30 min to 7 days (context now persists to DB)
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  ctx.recentFiles = ctx.recentFiles.filter(f => f.timestamp > sevenDaysAgo).slice(-10);
-  ctx.recentQuestions = ctx.recentQuestions.filter(q => q.timestamp > sevenDaysAgo).slice(-20);
+  // Clean old entries (older than 30 minutes)
+  const thirtyMinAgo = Date.now() - 30 * 60 * 1000;
+  ctx.recentFiles = ctx.recentFiles.filter(f => f.timestamp > thirtyMinAgo).slice(-5);
+  ctx.recentQuestions = ctx.recentQuestions.filter(q => q.timestamp > thirtyMinAgo).slice(-10);
   ctx.lastUpdated = Date.now();
   return ctx;
 }
@@ -125,15 +123,11 @@ function addFileToContext(userId: number, repo: string, path: string, content: s
   ctx.recentFiles.push({ repo, path, content: content.substring(0, 5000), timestamp: Date.now() });
   ctx.activeRepo = repo;
   ctx.activeFile = path;
-  // PERSONAL AI UPGRADE: Sync to DB (fire and forget)
-  syncContextToDb(userId);
 }
 
 function addQuestionToContext(userId: number, question: string, answer: string): void {
   const ctx = getConversationContext(userId);
   ctx.recentQuestions.push({ question: question.substring(0, 500), answer: answer.substring(0, 1000), timestamp: Date.now() });
-  // PERSONAL AI UPGRADE: Sync to DB (fire and forget)
-  syncContextToDb(userId);
 }
 
 function addPendingFix(userId: number, description: string, code: string, file?: string): void {
@@ -4367,7 +4361,7 @@ I'll remember what we're working on! 🧠`, { parse_mode: 'Markdown' });
       response += `\n📦 *Batch:* ${convCtx.batchEdits.length} files\nUse /batch show to see them\n`;
     }
     
-    response += `\n_Context persists to DB and survives restarts (7-day retention)_`;
+    response += `\n_Context auto-clears after 30 min of inactivity_`;
     
     await ctx.reply(response, { parse_mode: 'Markdown' });
   });
@@ -5223,26 +5217,8 @@ Ready to commit? Use:
       // Show what was heard
       await ctx.reply(`🎤 I heard: "${transcription.substring(0, 200)}${transcription.length > 200 ? '...' : ''}"`);
       
-      // PERSONAL AI UPGRADE: Detect intent from voice message
-      const intent = await detectPersonalAIIntent(transcription);
-      
-      // Try to handle as Personal AI action first (idea, diary, task, research)
-      if (intent.type !== 'question' && intent.type !== 'conversation' && intent.type !== 'command') {
-        const handled = await handlePersonalAIAction(ctx, transcription, intent, 'voice');
-        if (handled) {
-          // Sync context to DB
-          const userId = ctx.from?.id || 0;
-          syncContextToDb(userId);
-          return;
-        }
-      }
-      
-      // Fall through to normal question handling
+      // Process the transcribed message
       await handleQuestion(ctx, transcription);
-      
-      // Sync context to DB after conversation
-      const userId = ctx.from?.id || 0;
-      syncContextToDb(userId);
       
     } catch (error) {
       console.error('Voice message error:', error);
