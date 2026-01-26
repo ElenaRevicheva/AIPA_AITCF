@@ -564,6 +564,7 @@ Or just ask me anything - I understand natural language!`;
   // Handle menu section callbacks
   bot.on('callback_query:data', async (ctx) => {
     const data = ctx.callbackQuery?.data || '';
+    console.log(`📲 Callback received: ${data}`);
     
     if (data.startsWith('menu:')) {
       const section = data.replace('menu:', '');
