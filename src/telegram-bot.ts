@@ -5821,6 +5821,7 @@ Act like Cursor - understand context, suggest the right action, remember the con
 
   // /project - Set or show active project
   bot.command('project', async (ctx) => {
+    console.log('📁 /project command received from user:', ctx.from?.id);
     const input = ctx.message?.text?.replace('/project', '').trim();
     const userId = ctx.from?.id || 0;
     const convCtx = getConversationContext(userId);
@@ -5965,6 +5966,7 @@ Or send a voice message starting with "Today I..." or "I'm feeling..."`, { parse
 
   // /tasks - Show pending tasks
   bot.command('tasks', async (ctx) => {
+    console.log('✅ /tasks command received from user:', ctx.from?.id);
     const userId = ctx.from?.id || 0;
     const tasks = await getKnowledgeByCategory(userId, 'task', 20);
     
@@ -5994,6 +5996,7 @@ Or: \`/idea TODO: fix the login bug\``, { parse_mode: 'Markdown' });
 
   // /research - Save research note
   bot.command('research', async (ctx) => {
+    console.log('🔬 /research command received from user:', ctx.from?.id);
     const note = ctx.message?.text?.replace('/research', '').trim();
     const userId = ctx.from?.id || 0;
     
@@ -6047,6 +6050,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
 
   // /resume - Reload context from database (recovery)
   bot.command('resume', async (ctx) => {
+    console.log('🔄 /resume command received from user:', ctx.from?.id);
     const userId = ctx.from?.id || 0;
     
     await ctx.reply('🔄 Loading your last session...');
