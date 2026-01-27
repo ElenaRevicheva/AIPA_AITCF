@@ -348,32 +348,20 @@ export function initTelegramBot(): Bot | null {
   
   bot = new Bot(token);
   
-  // DEBUG: Log ALL incoming updates
-  bot.use(async (ctx, next) => {
-    const updateType = ctx.update ? Object.keys(ctx.update).filter(k => k !== 'update_id').join(', ') : 'unknown';
-    const text = ctx.message?.text || ctx.callbackQuery?.data || '';
-    console.log(`📨 UPDATE: type=[${updateType}] text=[${text}] from=[${ctx.from?.id}]`);
-    await next();
-  });
-  
   // Middleware: Check authorization
   bot.use(async (ctx, next) => {
     const userId = ctx.from?.id;
-    console.log(`🔐 AUTH CHECK: userId=${userId}, authorizedUsers=${JSON.stringify(AUTHORIZED_USERS)}`);
     
     // If no authorized users configured, allow all (for initial setup)
     if (AUTHORIZED_USERS.length === 0) {
       console.log(`⚠️ No authorized users configured. User ${userId} accessing bot.`);
       console.log(`   Add TELEGRAM_AUTHORIZED_USERS=${userId} to .env to restrict access.`);
       await next();
-      console.log(`✅ AUTH: next() completed (no auth configured)`);
       return;
     }
     
     if (userId && AUTHORIZED_USERS.includes(userId)) {
-      console.log(`✅ AUTH PASSED for user ${userId}, calling next()...`);
       await next();
-      console.log(`✅ AUTH: next() completed for user ${userId}`);
     } else {
       console.log(`🚫 Unauthorized access attempt from user ${userId}`);
       await ctx.reply('⛔ Sorry, you are not authorized to use this bot.');
@@ -5833,7 +5821,6 @@ Act like Cursor - understand context, suggest the right action, remember the con
 
   // /project - Set or show active project
   bot.command('project', async (ctx) => {
-    console.log('📁 /project command received from user:', ctx.from?.id);
     const input = ctx.message?.text?.replace('/project', '').trim();
     const userId = ctx.from?.id || 0;
     const convCtx = getConversationContext(userId);
@@ -5978,7 +5965,6 @@ Or send a voice message starting with "Today I..." or "I'm feeling..."`, { parse
 
   // /tasks - Show pending tasks
   bot.command('tasks', async (ctx) => {
-    console.log('✅ /tasks command received from user:', ctx.from?.id);
     const userId = ctx.from?.id || 0;
     const tasks = await getKnowledgeByCategory(userId, 'task', 20);
     
@@ -6008,7 +5994,6 @@ Or: \`/idea TODO: fix the login bug\``, { parse_mode: 'Markdown' });
 
   // /research - Save research note
   bot.command('research', async (ctx) => {
-    console.log('🔬 /research command received from user:', ctx.from?.id);
     const note = ctx.message?.text?.replace('/research', '').trim();
     const userId = ctx.from?.id || 0;
     
@@ -6062,7 +6047,6 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
 
   // /resume - Reload context from database (recovery)
   bot.command('resume', async (ctx) => {
-    console.log('🔄 /resume command received from user:', ctx.from?.id);
     const userId = ctx.from?.id || 0;
     
     await ctx.reply('🔄 Loading your last session...');
