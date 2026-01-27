@@ -1,8 +1,8 @@
 # CTO AIPA - Cursor Twin & Personal AI Upgrade Roadmap
 
-**Version:** 2.0  
+**Version:** 2.1  
 **Created:** January 26, 2026  
-**Last Updated:** January 26, 2026  
+**Last Updated:** January 27, 2026  
 **Research Sources:** takopi (banteg/takopi), Obsidian, Personal AI Assistant patterns  
 **Purpose:** Upgrade CTO AIPA from "code reviewer" to "true AI co-founder you can talk to anywhere"
 
@@ -10,7 +10,15 @@
 
 ## 🎉 IMPLEMENTATION STATUS: v6.0 "Personal AI Co-Founder" COMPLETE
 
-### What Was Accomplished (January 26, 2026)
+### Current Status Summary (January 27, 2026)
+
+| Document | Progress | Description |
+|----------|----------|-------------|
+| **CTO AIPA v6.0 Upgrade** | **85% DONE** | Personal AI features - SHIPPED & WORKING |
+| **Takopi Integration** | **0% - NOT STARTED** | Separate future project (requires new bot) |
+| **Operational Guidelines** | **N/A** | Behavioral guidelines (being followed) |
+
+### What Was Accomplished (January 26-27, 2026)
 
 | Phase | Feature | Status | Implementation |
 |-------|---------|--------|----------------|
@@ -449,6 +457,25 @@ The end goal is not just a "code reviewer" but a **true AI co-founder**:
 
 ## Changelog
 
+### January 27, 2026 - v2.1 (CRITICAL BUG FIX)
+**Bug Fix Release**
+
+**Critical Fix:**
+- Fixed: ALL `/commands` were being silently dropped due to `bot.on('message:text')` using `return` instead of `return next()`. Commands now properly pass through to their handlers.
+
+**Documentation Updates:**
+- Added current status summary table
+- Added related documentation status section
+- Clarified that Takopi Integration is a SEPARATE project (0% complete)
+- Added "Verified Working" section with tested commands
+- Updated technical notes about grammY middleware chain
+
+**Commits:**
+- `5c9f7f9` cleanup: Remove debug logging after fixing command handler bug
+- `1572ea5` fix: Call next() for commands in text handler - commands were being silently dropped
+
+---
+
 ### January 26, 2026 - v2.0 (IMPLEMENTATION COMPLETE)
 **Major Release: Personal AI Co-Founder**
 
@@ -477,9 +504,11 @@ The end goal is not just a "code reviewer" but a **true AI co-founder**:
 **Bug Fixes:**
 - Fixed: Commands registered after `bot.start()` now work (moved before)
 - Fixed: Menu callback buttons now respond (grammY `callbackQuery` filter)
+- Fixed (Jan 27): `bot.on('message:text')` was using `return` instead of `return next()` for commands, silently dropping ALL `/commands` before they reached handlers
 
 **Technical Notes:**
 - Commands MUST be registered before `bot.start()` in grammY
+- In `bot.on()` handlers, use `return next()` not `return` to pass control to subsequent handlers
 - DB sync is fire-and-forget (non-blocking)
 - In-memory context still works, DB is backup for persistence
 
@@ -491,12 +520,55 @@ The end goal is not just a "code reviewer" but a **true AI co-founder**:
 
 ---
 
+## Related Documentation Status
+
+| Document | Location | Status | Description |
+|----------|----------|--------|-------------|
+| **This doc** | `main` branch | ✅ ACTIVE | v6.0 Personal AI - 85% complete |
+| **TAKOPI_INTEGRATION_ROADMAP.md** | `docs` branch | ⏸️ PLANNING | Separate project, NOT STARTED |
+| **CTO_AIPA_OPERATIONAL_GUIDELINES.md** | `main` branch | ✅ ACTIVE | Guidelines being followed |
+
+### Takopi Integration - NOT PART OF v6.0
+
+The Takopi integration is a **separate, future project** that would add:
+- A second Telegram bot for CLI coding agents
+- Real file editing via Claude Code/Codex
+- Worktree support for parallel branches
+
+**Why it's separate:**
+- Requires Python 3.14+ and new tooling
+- Needs a new Telegram bot (not the existing CTO AIPA bot)
+- Different purpose: CLI bridge vs. GitHub API operations
+
+**Current Takopi status:** 0% - All checkboxes unchecked in roadmap
+
+---
+
 ## Next Steps (Future Roadmap)
 
-1. **Takopi Integration** - Separate bot for real CLI access
-2. **Streaming Responses** - Edit messages as AI generates
+1. **Takopi Integration** - Separate bot for real CLI access (NOT STARTED)
+2. **Streaming Responses** - Edit messages as AI generates (DEFERRED)
 3. **pgvector Integration** - Semantic search for knowledge base
 4. **LangChain Memory** - Better conversation memory with PostgreSQL
+
+---
+
+## Verified Working (January 27, 2026)
+
+All Personal AI commands tested and confirmed working:
+
+```
+/tasks           ✅ Shows pending tasks
+/project cto     ✅ Switches to AIPA_AITCF project  
+/research [note] ✅ Saves research notes
+/diary [entry]   ✅ Saves diary entries
+/know [query]    ✅ Searches knowledge base
+/resume          ✅ Restores session from DB
+/rules           ✅ Shows CLAUDE.md for project
+/forget          ✅ Clears conversation memory
+Menu buttons     ✅ Expand to show command details
+Voice messages   ✅ Auto-detect intent and route
+```
 
 ---
 
