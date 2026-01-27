@@ -348,6 +348,14 @@ export function initTelegramBot(): Bot | null {
   
   bot = new Bot(token);
   
+  // DEBUG: Log ALL incoming updates
+  bot.use(async (ctx, next) => {
+    const updateType = ctx.update ? Object.keys(ctx.update).filter(k => k !== 'update_id').join(', ') : 'unknown';
+    const text = ctx.message?.text || ctx.callbackQuery?.data || '';
+    console.log(`📨 UPDATE: type=[${updateType}] text=[${text}] from=[${ctx.from?.id}]`);
+    await next();
+  });
+  
   // Middleware: Check authorization
   bot.use(async (ctx, next) => {
     const userId = ctx.from?.id;
