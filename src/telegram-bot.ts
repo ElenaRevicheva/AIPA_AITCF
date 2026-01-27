@@ -561,68 +561,68 @@ Or just ask me anything - I understand natural language!`;
     });
   }
   
-  // Handle menu section callbacks
-  bot.on('callback_query:data', async (ctx) => {
+  // Handle menu section callbacks - using callbackQuery filter for better grammY compatibility
+  bot.callbackQuery(/^menu:/, async (ctx) => {
     const data = ctx.callbackQuery?.data || '';
-    console.log(`📲 Callback received: ${data}`);
+    console.log(`📲 Menu callback received: ${data}`);
     
-    if (data.startsWith('menu:')) {
-      const section = data.replace('menu:', '');
-      
-      if (section === 'settings') {
-        await ctx.answerCallbackQuery();
-        await ctx.reply(`⚙️ *Settings*
+    const section = data.replace('menu:', '');
+    
+    if (section === 'settings') {
+      await ctx.answerCallbackQuery();
+      await ctx.reply(`⚙️ *Settings*
 
 /alerts - Toggle daily proactive alerts
 /roadmap - View CTO AIPA roadmap
 /forget - Clear my memory of our conversations
 /resume - Restore last session`, { parse_mode: 'Markdown' });
-        return;
-      }
-      
-      if (section === 'main') {
-        await ctx.answerCallbackQuery();
-        await showMenu(ctx);
-        return;
-      }
-      
-      const sectionData = MENU_SECTIONS[section];
-      if (!sectionData) {
-        await ctx.answerCallbackQuery({ text: 'Unknown section' });
-        return;
-      }
-      
-      await ctx.answerCallbackQuery();
-      
-      let response = `*${sectionData.title}*\n\n`;
-      
-      for (const cmd of sectionData.commands) {
-        response += `*${cmd.cmd}*\n`;
-        response += `${cmd.desc}\n`;
-        response += `\`${cmd.usage.split('\n')[0]}\`\n\n`;
-      }
-      
-      await ctx.reply(response, {
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '📋 Back to Menu', callback_data: 'menu:main' }]
-          ]
-        }
-      });
       return;
     }
     
-    // Handle command detail callbacks (cmd:commandname)
-    if (data.startsWith('cmd:')) {
-      const cmdName = data.replace('cmd:', '');
+    if (section === 'main') {
       await ctx.answerCallbackQuery();
-      
-      // Find the command in sections
-      for (const [sectionKey, section] of Object.entries(MENU_SECTIONS)) {
-        const cmd = section.commands.find(c => c.cmd === '/' + cmdName || c.cmd === cmdName);
-        if (cmd) {
-          await ctx.reply(`*${cmd.cmd}*
+      await showMenu(ctx);
+      return;
+    }
+    
+    const sectionData = MENU_SECTIONS[section];
+    if (!sectionData) {
+      await ctx.answerCallbackQuery({ text: 'Unknown section' });
+      return;
+    }
+    
+    await ctx.answerCallbackQuery();
+    
+    let response = `*${sectionData.title}*\n\n`;
+    
+    for (const cmd of sectionData.commands) {
+      response += `*${cmd.cmd}*\n`;
+      response += `${cmd.desc}\n`;
+      response += `\`${cmd.usage.split('\n')[0]}\`\n\n`;
+    }
+    
+    await ctx.reply(response, {
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '📋 Back to Menu', callback_data: 'menu:main' }]
+        ]
+      }
+    });
+  });
+  
+  // Handle command detail callbacks
+  bot.callbackQuery(/^cmd:/, async (ctx) => {
+    const data = ctx.callbackQuery?.data || '';
+    const cmdName = data.replace('cmd:', '');
+    console.log(`📲 Command callback received: ${cmdName}`);
+    await ctx.answerCallbackQuery();
+    
+    // Find the command in sections
+    for (const [sectionKey, section] of Object.entries(MENU_SECTIONS)) {
+      const cmd = section.commands.find(c => c.cmd === '/' + cmdName || c.cmd === cmdName);
+      if (cmd) {
+        await ctx.reply(`*${cmd.cmd}*
 
 📝 *What it does:*
 ${cmd.desc}
@@ -633,13 +633,11 @@ ${cmd.usage}
 \`\`\`
 
 _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
-          return;
-        }
+        return;
       }
-      
-      await ctx.reply(`Command /${cmdName} not found in help.`);
-      return;
     }
+    
+    await ctx.reply(`Command /${cmdName} not found in help.`);
   });
   
   // /status - Ecosystem status
