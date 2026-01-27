@@ -5214,11 +5214,11 @@ ${files.slice(0, 5).map(f => `   ${f.status === 'added' ? '🆕' : f.status === 
   });
 
   // Handle natural text after /editfile or /createfile
-  bot.on('message:text', async (ctx) => {
+  bot.on('message:text', async (ctx, next) => {
     const message = ctx.message?.text;
     
-    // Ignore commands (they're handled above)
-    if (message?.startsWith('/')) return;
+    // Pass commands to their specific handlers
+    if (message?.startsWith('/')) return next();
     
     // Check for pending file operations
     const pending = getFileEditState(ctx.from?.id || 0);
