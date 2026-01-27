@@ -359,17 +359,21 @@ export function initTelegramBot(): Bot | null {
   // Middleware: Check authorization
   bot.use(async (ctx, next) => {
     const userId = ctx.from?.id;
+    console.log(`🔐 AUTH CHECK: userId=${userId}, authorizedUsers=${JSON.stringify(AUTHORIZED_USERS)}`);
     
     // If no authorized users configured, allow all (for initial setup)
     if (AUTHORIZED_USERS.length === 0) {
       console.log(`⚠️ No authorized users configured. User ${userId} accessing bot.`);
       console.log(`   Add TELEGRAM_AUTHORIZED_USERS=${userId} to .env to restrict access.`);
       await next();
+      console.log(`✅ AUTH: next() completed (no auth configured)`);
       return;
     }
     
     if (userId && AUTHORIZED_USERS.includes(userId)) {
+      console.log(`✅ AUTH PASSED for user ${userId}, calling next()...`);
       await next();
+      console.log(`✅ AUTH: next() completed for user ${userId}`);
     } else {
       console.log(`🚫 Unauthorized access attempt from user ${userId}`);
       await ctx.reply('⛔ Sorry, you are not authorized to use this bot.');
