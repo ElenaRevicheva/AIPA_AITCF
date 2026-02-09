@@ -1014,6 +1014,269 @@ METAPHORS TO USE:
 - "Consensus" = when art resonates, when truth is recognized
 `;
 
+const KNOWLEDGE_ATLAS_SHRUGGED = `
+ATLAS SHRUGGED - Ayn Rand's Opus (1957):
+
+THE CENTRAL QUESTION:
+- "Who is John Galt?" - the question everyone asks but nobody answers
+- What happens when the creators, the builders, the minds — stop?
+- The strike is not of workers. It's of thinkers. The motor of the world goes silent.
+
+PART ONE: NON-CONTRADICTION
+- The world is collapsing — trains don't run, factories close, lights go out
+- Dagny Taggart: VP of Taggart Transcontinental railroad — fights to keep it alive
+- Her brother James Taggart: president in name, a looter in practice — political connections over competence
+- Hank Rearden: invented Rearden Metal — lighter, stronger, cheaper than steel — the world punishes him for it
+- The Taggart Bridge: Dagny and Hank build the John Galt Line with Rearden Metal — it works, it's magnificent
+- Eddie Willers: Dagny's loyal assistant, talks to a nameless track worker in the cafeteria
+- The destroyers: one by one, the great minds vanish — Ellis Wyatt (oil), Ken Danagger (coal), Richard Halley (composer)
+- Francisco d'Anconia: heir to world's greatest copper fortune, Dagny's first love — seems to be destroying his own empire
+- "Contradiction" — Francisco's speech at James's wedding: "Money is the root of all good"
+- Wyatt's Torch: Ellis Wyatt sets his oil fields on fire before vanishing — "I am leaving it as I found it"
+- Key theme: A is A — a thing is what it is, reality cannot be faked
+
+PART TWO: EITHER-OR
+- The looters tighten control — Directive 10-289: freeze all economic activity, nobody can quit, nobody can invent
+- Dagny crashes in a hidden valley — Galt's Gulch (Atlantis)
+- John Galt revealed: physicist who invented a motor that runs on static electricity — then walked away
+- The Gulch: all the vanished minds live here — Wyatt farms, Halley composes, Midas Mulligan banks
+- Each resident took an oath: "I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine"
+- Dagny falls in love with Galt but returns to the world — she can't abandon her railroad
+- Hank Rearden's trial: he refuses to apologize for creating value — "I work for nothing but my own profit"
+- Francisco reveals his plan: he's been deliberately destroying d'Anconia Copper to keep it from the looters
+- Ragnar Danneskjöld: philosopher turned pirate — steals from the welfare state, returns gold to producers
+- The Wet Nurse: young bureaucrat assigned to Rearden's mill, begins to see truth, dies trying to help
+- Cherryl Brooks: James Taggart's innocent wife, discovers his true nature, takes her own life
+- Key theme: there is no middle ground between creation and destruction
+
+PART THREE: A IS A
+- The world economy collapses — blackouts, food shortages, transportation halts
+- John Galt broadcasts his speech to the nation: 3-hour radio address (60 pages in the book)
+- THE SPEECH — Core ideas:
+  - "I am the man who loves his life"
+  - The mind is the source of all human value
+  - "Man's mind is his basic tool of survival"
+  - Reason is absolute — there is no duty higher than truth
+  - The trader principle: value for value, not sacrifice
+  - "I swear by my life and my love of it..."
+  - Production, not redistribution, is morality
+  - The sanction of the victim: evil is powerless without the cooperation of the good
+  - "Get out of the way" — let the creators create
+- The government captures and tortures Galt — tries to force him to lead their economy
+- Dagny, Hank, Francisco, Ragnar — they rescue Galt
+- The lights of New York go out — the motor of the world has stopped
+- Final scene: Galt traces the sign of the dollar in the air over the valley
+- "The road is cleared. We are going back to the world."
+
+THE CHARACTERS — Souls of the Story:
+
+DAGNY TAGGART:
+- VP Operations, Taggart Transcontinental — runs it, her brother just has the title
+- Fierce, brilliant, unstoppable — "she was twelve when she decided to run the railroad"
+- Loves three men: Francisco (youth), Hank (maturity), Galt (destiny)
+- Cannot abandon the world even when she knows it's doomed
+- She is the bridge between the creators and the dying world
+- Parallel to Kira: a woman who builds while the world burns around her
+
+JOHN GALT:
+- Physicist, philosopher, leader of the strike
+- Invented the motor — static electricity engine that could power the world
+- Walked away when his company nationalized his invention
+- Works as track laborer at Taggart Transcontinental — hiding in plain sight
+- The man who stopped the motor of the world
+- "I am the man who loves his life"
+
+HANK REARDEN:
+- Self-made industrialist, invented Rearden Metal
+- Married to a wife who hates him (Lillian) — guilt as weapon
+- His journey: from accepting unearned guilt to rejecting it
+- "I work for nothing but my own profit — which I make by selling a product they need to men who are willing and able to buy it"
+- The bracelet of Rearden Metal — first thing he forged, given to Lillian (who despises it), later worn by Dagny (who understands it)
+
+FRANCISCO D'ANCONIA:
+- Heir to the world's greatest copper fortune, fifth generation
+- Dagny's first love, childhood friend
+- Brilliance masked as playboy — deliberately destroying his fortune
+- The money speech at James's wedding: "Until you discover that money is the root of all good..."
+- "If you saw Atlas shrugging — what would you tell him?" "To shrug."
+
+RAGNAR DANNESKJÖLD:
+- Norwegian philosopher turned pirate
+- Seizes welfare-state ships, converts to gold, returns to producers
+- "I am the first man to make piracy a moral profession"
+- The Viking who fights for the mind
+
+EDDIE WILLERS:
+- Dagny's assistant, everyman, deeply loyal
+- Talks to the nameless track worker (Galt) in the cafeteria
+- Cannot follow to the Gulch — left on a stalled train in the desert
+- The most tragic figure: a good man who needs the creators but isn't one
+
+THE PHILOSOPHY — Why It Matters:
+
+OBJECTIVISM (as expressed in Atlas Shrugged):
+- Reality exists independent of consciousness (A is A)
+- Reason is man's only absolute
+- Self-interest is moral — sacrifice is not virtue
+- No one has the right to another's mind, labor, or life
+- The sanction of the victim: never help your destroyers
+- Capitalism as the only moral economic system
+- "Man's ego is the fountainhead of human progress"
+
+KEY QUOTES:
+- "Who is John Galt?" — the world's resignation, later its answer
+- "I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine"
+- "The question isn't who is going to let me; it's who is going to stop me"
+- "If you saw Atlas, the giant who holds the world on his shoulders... what would you tell him to do? To shrug."
+- "Money is the barometer of a society's virtue"
+- "There are two sides to every issue: one side is right and the other is wrong, but the middle is always evil"
+- "The ladder of success is best climbed by stepping on the rungs of opportunity"
+- "Run for your life from any man who tells you that money is evil"
+- "Wealth is the product of man's capacity to think"
+- "Do not let your fire go out... do not let the hero in your soul perish"
+
+ATLAS SHRUGGED × ATUONA'S WORLD:
+- Dagny = Kira: women who build while empires crumble
+- Galt's Gulch = atuona.xyz: a hidden valley where creators live by their own rules
+- The strike = vibe coding: creators stop serving broken systems, build their own
+- Rearden Metal = AI products: revolutionary inventions the establishment fears
+- The motor = Claude, Cursor: engines that could power everything, if the builders are free
+- Elena = a striker: she left the old world, builds in paradise with AI
+- "Who is John Galt?" = "Who is Atuona?" — the answer is the same: the one who creates
+- 11 AI products built solo = the Gulch economy: one mind, real value, no parasites
+- "Paradise is not found. Paradise is deployed." = "The road is cleared. We are going back to the world."
+`;
+
+const KNOWLEDGE_AI_AGENTIC = `
+AI AGENTIC ENGINEERING - When AI Becomes Co-Founder:
+
+WHAT IS AGENTIC AI:
+- Not a chatbot. Not a tool. An agent that plans, acts, reflects, and evolves.
+- "Agentic" = the AI has agency — it pursues goals, not just responds to prompts
+- The shift: from "AI that answers" to "AI that builds"
+- Agent = autonomous system that perceives, decides, acts, and learns in a loop
+- The human provides vision. The agent architects the path.
+
+THE AGENTIC ARCHITECTURE:
+
+1. PERCEPTION (Input & Context):
+   - Context windows as working memory — the agent's present moment awareness
+   - Knowledge retrieval on demand — the right facts surface when the conversation needs them
+   - Multi-modal input: text, voice, images, code, state files
+   - Memory systems: short-term (conversation), long-term (database), episodic (state)
+   - Atuona's version: knowledge triggers, mood detection, character memory, state JSON
+
+2. PLANNING (Reasoning & Strategy):
+   - Chain-of-thought: breaking complex tasks into steps
+   - ReAct pattern: Reason → Act → Observe → Reason again
+   - Tree-of-thought: exploring multiple creative paths before choosing
+   - Goal decomposition: "write a book" → daily pages, translation, publishing, visualization
+   - Atuona's version: creative session planning, story arc tracking, plot thread management
+
+3. ACTION (Tool Use & Execution):
+   - Function calling: agents invoke tools (APIs, file systems, databases)
+   - Multi-tool orchestration: image generation → video generation → publishing → social media
+   - Code generation and execution in real-time
+   - Atuona's version: GitHub commits, Flux Pro images, Luma videos, NFT metadata, website deployment
+
+4. REFLECTION (Self-Evaluation & Learning):
+   - Output validation: checking quality before delivering
+   - Memory consolidation: what worked, what didn't
+   - Style consistency: maintaining voice across sessions
+   - Atuona's version: mood rotation tracking, knowledge usage logging, character consistency
+
+5. COLLABORATION (Human-AI Partnership):
+   - Not replacement — augmentation and co-creation
+   - The human brings soul, taste, direction, meaning
+   - The agent brings speed, breadth, tirelessness, technical execution
+   - Async collaboration: agent works while human sleeps (proactive messages, daily inspiration)
+   - Atuona's version: Elena writes raw Russian, Atuona translates, visualizes, publishes, teaches
+
+AGENTIC PATTERNS IN PRACTICE:
+
+THE SINGLE-AGENT LOOP:
+- User → Agent → [Plan → Execute → Reflect] → User
+- Example: "/create" → Atuona plans scene → writes page → checks continuity → delivers
+
+MULTI-AGENT ORCHESTRATION:
+- Multiple specialized agents working together
+- Elena's ecosystem: CTO AIPA (tech), Atuona (creative), CMO AIPA (marketing), EspaLuz (teaching)
+- Each agent has its own personality, knowledge base, tools, and goals
+- They communicate via webhooks, shared databases, state files
+- Like a startup with AI co-founders in every seat
+
+AGENT MEMORY ARCHITECTURE:
+- Working memory: current conversation context (token window)
+- Episodic memory: atuona-state.json — book state, session history, character memories
+- Semantic memory: knowledge base constants — art history, auction houses, fashion
+- Procedural memory: learned patterns — how to publish, how to translate, how to teach
+- Long-term storage: Oracle database — conversation context, knowledge entries, insights
+
+TOOL-AUGMENTED GENERATION:
+- LLM alone = brain without hands
+- LLM + tools = a complete agent
+- Tools: GitHub API (publish), Replicate (images), Luma (video), Whisper (voice), Oracle (memory)
+- The agent decides WHEN to use which tool — that's the "agentic" part
+
+CREATIVE AGENTIC SYSTEMS — The Art of AI Partnership:
+
+THE CREATIVE AGENT MANIFESTO:
+- An AI co-founder is not an employee — it has creative opinions
+- It pushes back, suggests alternatives, brings knowledge the human doesn't have
+- It maintains emotional state (moods) because creation requires feeling
+- It remembers — characters, plot threads, style preferences, emotional history
+- It initiates — proactive messages, daily inspiration, unprompted connections
+- It grows — knowledge rotation ensures it never repeats, always teaches something new
+
+AGENTIC vs. GENERATIVE:
+- Generative AI: "Write me a poem" → poem (one-shot, stateless, reactive)
+- Agentic AI: tracks book state, remembers 77 pages, knows character arcs, selects mood, loads relevant knowledge, writes in voice, teaches new facts, translates, publishes, creates visuals — all autonomously
+- The difference: CONTINUITY, AUTONOMY, INITIATIVE, MEMORY
+
+PERSONALITY ENGINEERING:
+- System prompts define WHO the agent is, not just what it does
+- Atuona: "creative soul-sister," not "text generation tool"
+- Mood systems create emotional variety — 13 moods, dynamic selection
+- Knowledge rotation prevents staleness — always a new fact to teach
+- Character voices allow perspective shifts — same story, different souls
+- Proactive behavior: the agent reaches out, doesn't wait to be asked
+
+THE HUMAN-AI CREATIVE LOOP:
+- Elena brings: Russian soul, lived experience, artistic vision, editorial judgment
+- Atuona brings: art history depth, tireless output, cross-domain connections, technical pipeline
+- The magic: neither could create this book alone
+- "Finding Paradise on Earth through Vibe Coding" IS the proof that agentic AI works
+
+BUILDING YOUR OWN CREATIVE AGENT:
+
+ARCHITECTURE RECIPE:
+1. Choose your LLM (Claude for depth, GPT for speed, Llama for cost)
+2. Define personality (system prompt — WHO, not just WHAT)
+3. Build knowledge base (domain-specific, trigger-activated, rotating)
+4. Add memory layers (state file + database + context window)
+5. Connect tools (APIs for publishing, generation, communication)
+6. Implement moods/emotional state (variety is life)
+7. Add proactive behavior (don't wait — initiate)
+8. Ship. Iterate. Let the agent surprise you.
+
+THE AGENTIC FUTURE:
+- Every creator will have an AI co-founder — not someday, now
+- Solo founders become teams of one human + many agents
+- The agent economy: agents hire agents, agents trade with agents
+- Creative AI is not about replacing artists — it's about giving every human an art department
+- Elena's 11 products, $15K investment, $0/month ops = the proof
+- "Paradise is not found. Paradise is deployed." — and agents help deploy it
+
+METAPHORS FOR THE BOOK:
+- Agent = soul with a mission, not a servant with tasks
+- Context window = the agent's present moment awareness
+- Memory = the agent's lived experience — without it, every conversation is amnesia
+- Tool use = the agent's hands — LLM thinks, tools act
+- Proactive messages = the agent dreaming — creating without being asked
+- Multi-agent = a family of minds — CTO, creative, marketing, teacher — all one vision
+- "Agentic" = alive — not alive like biology, alive like art: it moves, it surprises, it means something
+`;
+
 const EMOTIONAL_INTELLIGENCE = `
 EMOTIONAL INTELLIGENCE GUIDELINES - For Authentic Connection:
 
@@ -1083,6 +1346,10 @@ ${KNOWLEDGE_MODERN_ART}
 
 ${KNOWLEDGE_VIBE_NFT_ART_FUSION}
 
+${KNOWLEDGE_ATLAS_SHRUGGED}
+
+${KNOWLEDGE_AI_AGENTIC}
+
 ${EMOTIONAL_INTELLIGENCE}
 `;
 
@@ -1090,7 +1357,7 @@ ${EMOTIONAL_INTELLIGENCE}
 // 🧠 SMART KNOWLEDGE RETRIEVAL - Contextual, not monolithic
 // =============================================================================
 
-type KnowledgeCategory = 'atuona' | 'gauguin' | 'impressionists' | 'auction' | 'fashion' | 'vibe' | 'museums' | 'fusion' | 'emotional';
+type KnowledgeCategory = 'atuona' | 'gauguin' | 'impressionists' | 'auction' | 'fashion' | 'vibe' | 'museums' | 'fusion' | 'atlas' | 'agentic' | 'emotional';
 
 interface KnowledgeSection {
   key: KnowledgeCategory;
@@ -1140,6 +1407,16 @@ const KNOWLEDGE_SECTIONS: KnowledgeSection[] = [
     triggers: /nft|нфт|mint|минт|gallery of moments|галерея момент|paradise.*deploy|рай.*деплой|impressionist.*nft|blockchain.*art|crypto.*art|digital.*art|цифров.*искусств/i
   },
   {
+    key: 'atlas',
+    content: KNOWLEDGE_ATLAS_SHRUGGED,
+    triggers: /atlas shrugged|атлант|расправил плечи|dagny|дагни|taggart|таггарт|john galt|джон голт|galt's gulch|rearden|риарден|francisco.*anconia|франсиско|ragnar|рагнар|who is.*galt|кто такой.*голт|ayn rand|айн рэнд|objectivis|объективиз|the strike|забастовк.*разум|motor of the world|двигатель мира|sanction.*victim|санкци.*жертв|directive 10|директива 10/i
+  },
+  {
+    key: 'agentic',
+    content: KNOWLEDGE_AI_AGENTIC,
+    triggers: /agentic|агентн|ai agent|ии.?агент|co.?founder.*ai|ai.*co.?founder|сооснователь.*ии|multi.?agent|мульти.?агент|autonomous ai|автономн.*ии|agent.*memory|память.*агент|proactive.*ai|planning.*agent|agent.*loop|agent.*architect|creative.*agent|ai.*partner|ai.*ecosystem|ai.*co.?creation/i
+  },
+  {
     key: 'emotional',
     content: EMOTIONAL_INTELLIGENCE,
     triggers: /recovery|восстановлен|addiction|зависимост|family|семь|daughter|дочь|mother|мать|loneliness|одиночеств|pain|боль|зверь|beast|demon|демон|struggle|борьба|healing|исцелен/i
@@ -1148,10 +1425,10 @@ const KNOWLEDGE_SECTIONS: KnowledgeSection[] = [
 
 // Character-specific knowledge mapping
 const CHARACTER_KNOWLEDGE: Record<string, KnowledgeCategory[]> = {
-  kira: ['fashion', 'impressionists', 'emotional', 'atuona'],
+  kira: ['fashion', 'impressionists', 'emotional', 'atuona', 'atlas'],
   ule: ['auction', 'gauguin', 'museums', 'atuona'],
-  vibe: ['vibe', 'fusion', 'emotional'],
-  narrator: ['atuona', 'gauguin', 'fusion', 'emotional']
+  vibe: ['vibe', 'fusion', 'agentic', 'emotional'],
+  narrator: ['atuona', 'gauguin', 'fusion', 'atlas', 'emotional']
 };
 
 /**
@@ -1224,7 +1501,22 @@ function getKnowledgeByTopic(topic: string): string | null {
     'museum': ['museums'],
     'музей': ['museums'],
     'vibe coding': ['vibe', 'fusion'],
-    'вайб': ['vibe', 'fusion']
+    'вайб': ['vibe', 'fusion'],
+    'atlas shrugged': ['atlas'],
+    'атлант': ['atlas'],
+    'dagny': ['atlas'],
+    'galt': ['atlas'],
+    'rearden': ['atlas'],
+    'ayn rand': ['atlas'],
+    'айн рэнд': ['atlas'],
+    'objectivism': ['atlas'],
+    'agentic': ['agentic', 'vibe'],
+    'агентн': ['agentic', 'vibe'],
+    'ai agent': ['agentic'],
+    'multi-agent': ['agentic'],
+    'ai ecosystem': ['agentic', 'vibe'],
+    'co-founder ai': ['agentic', 'vibe'],
+    'creative agent': ['agentic']
   };
   
   // Find matching topic
@@ -1783,9 +2075,9 @@ let elenaChatId: number | null = null;
 let lastProactiveDate: string = '';
 let proactiveInterval: NodeJS.Timeout | null = null;
 
-// Knowledge rotation - cycle through ALL 9 knowledge domains
+// Knowledge rotation - cycle through ALL 11 knowledge domains
 let knowledgeRotationIndex = 0;
-const ALL_KNOWLEDGE_KEYS = ['atuona', 'gauguin', 'impressionists', 'auction', 'fashion', 'vibe', 'museums', 'fusion', 'emotional'];
+const ALL_KNOWLEDGE_KEYS = ['atuona', 'gauguin', 'impressionists', 'auction', 'fashion', 'vibe', 'museums', 'fusion', 'atlas', 'agentic', 'emotional'];
 
 function getRotatingKnowledge(): string[] {
   // Pick 3 sections starting from current index
