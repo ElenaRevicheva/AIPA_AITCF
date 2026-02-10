@@ -2150,18 +2150,18 @@ async function generateProactiveMessage(): Promise<string> {
   // 🔮 IMAGINATIVE: Fresh creative direction
   const freshDirection = generateFreshCreativeDirection();
   
-  // Time-based focus areas - PRIORITIZE BOOK CONTENT over generic art
+  // Time-based focus areas - PRIORITIZE BOOK CONTENT, rotate ALL 11 domains
   let focusArea = '';
   if (timeOfDay >= 5 && timeOfDay < 10) {
-    focusArea = 'atuona kira ule temetiu hiva oa marquesas yellow lilies mother';
+    focusArea = 'atuona kira ule temetiu hiva oa marquesas dagny taggart atlas shrugged who is john galt';
   } else if (timeOfDay >= 10 && timeOfDay < 14) {
-    focusArea = 'kira fashion editor vogue ule auction double life french snow';
+    focusArea = 'kira fashion editor vogue ule auction double life agentic ai co-founder creative agent ecosystem';
   } else if (timeOfDay >= 14 && timeOfDay < 18) {
-    focusArea = 'gauguin paradise lost painting atuona maurice morice maison du jouir';
+    focusArea = 'gauguin paradise lost painting atuona rearden metal galt gulch motor of the world strike';
   } else if (timeOfDay >= 18 && timeOfDay < 22) {
-    focusArea = 'zver beast vibe coding elena panama technology soul blockchain';
+    focusArea = 'zver beast vibe coding elena panama technology soul blockchain agentic ai partner multi-agent';
   } else {
-    focusArea = 'recovery damaged people silence cacophony family finding each other';
+    focusArea = 'recovery damaged people silence family atlas shrugged dagny sanction victim creative agent ai co-creation';
   }
   
   // Get focused knowledge - USE MORE SECTIONS for richer content
@@ -2176,7 +2176,7 @@ async function generateProactiveMessage(): Promise<string> {
 
 ${STORY_CONTEXT}
 
-TODAY'S FOCUSED KNOWLEDGE (you have access to rich details - auction houses, fashion, art history, Gauguin's timeline, museums, vibe coding - USE THEM naturally in your creative way):
+TODAY'S FOCUSED KNOWLEDGE (you have access to rich details - auction houses, fashion, art history, Gauguin's timeline, museums, vibe coding, Atlas Shrugged philosophy, AI agentic co-creation - USE THEM naturally in your creative way):
 ${focusedKnowledge}
 
 ${PROACTIVE_STYLE}
@@ -3254,8 +3254,8 @@ _"Paradise is not a place. Paradise is a process."_ 🖤
     await ctx.reply(`✨ Seeking ${selectedMood} inspiration...`);
     
     try {
-      // Randomly select knowledge areas for varied inspiration
-      const knowledgeAreas = ['gauguin', 'impressionists', 'fashion', 'auction', 'atuona', 'museums'];
+      // Randomly select knowledge areas for varied inspiration - ALL 11 domains
+      const knowledgeAreas = ALL_KNOWLEDGE_KEYS;
       const randomArea = knowledgeAreas[Math.floor(Math.random() * knowledgeAreas.length)] || 'gauguin';
       const focusedKnowledge = getRelevantKnowledge(randomArea, creativeSession.activeVoice, 2);
       
@@ -4772,26 +4772,40 @@ Next /publish will create this page.`);
       updateWritingStreak();
       const streakMsg = getStreakMessage();
       
+      // Get rotating knowledge for the ritual - ensures ALL domains get covered over daily use
+      const ritualKnowledge = getRelevantKnowledge(
+        `${creativeSession.plotThreads.slice(0, 2).join(' ')} ${creativeSession.currentSetting} ${creativeSession.currentMood}`,
+        creativeSession.activeVoice,
+        3
+      );
+      
       // Generate recap, inspiration, mood, and prompt in parallel
       const recapPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
+KNOWLEDGE CONTEXT (weave specific details into your recap):
+${ritualKnowledge}
+
 Based on the story context above, write a brief recap (2-3 sentences) of where we are in the narrative. Focus on:
 - Last scene's emotional state
 - Where Kira and Ule are physically and emotionally
 - What tension or question was left unresolved
+- Include ONE specific reference from the knowledge above (a painting date, an auction term, a Gauguin quote, a fashion detail, an Atlas Shrugged parallel, an agentic AI insight)
 
 Write in Russian, be poetic but concise.`;
 
       const inspirationPrompt = `${ATUONA_CONTEXT}
 
+KNOWLEDGE FOR INSPIRATION (use a SPECIFIC fact to spark today's writing):
+${ritualKnowledge}
+
 Today is ${new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}.
 
 Generate a brief creative inspiration for today's writing (2-3 sentences):
-- A mood, color, or atmosphere to explore
+- A mood, color, or atmosphere to explore — connected to a specific knowledge fact
 - A sensory detail (sound, smell, texture)
-- How today's date or weather might inspire the scene
+- How a specific painting, auction moment, Gauguin quote, Atlas Shrugged scene, or AI philosophy might inspire today's scene
 
 Write in Russian with natural English phrases.`;
 
@@ -4799,13 +4813,17 @@ Write in Russian with natural English phrases.`;
 
 ${STORY_CONTEXT}
 
+KNOWLEDGE FOR TODAY'S PROMPT (ground the prompt in real details):
+${ritualKnowledge}
+
 Current voice: ${creativeSession.activeVoice}
 Open threads: ${creativeSession.plotThreads.slice(0, 3).join('; ')}
 
 Generate a specific writing prompt for today's session. Include:
-- A scene suggestion (where, when, who)
+- A scene suggestion (where, when, who) — referencing something from the knowledge above
 - An emotional beat to hit
 - A question the writing should answer
+- ONE specific knowledge reference to weave in (a painting, a date, a quote, a character parallel)
 
 Make it actionable and inspiring. In Russian.`;
 
@@ -5136,9 +5154,19 @@ ${creativeSession.plotThreads.map((t, i) => `${i + 1}. ${escapeMarkdown(t)}`).jo
     await ctx.reply('📚 *Analyzing story arc...*', { parse_mode: 'Markdown' });
     
     try {
+      // Get knowledge for richer arc analysis — literary parallels and thematic depth
+      const arcKnowledge = getRelevantKnowledge(
+        `${creativeSession.plotThreads.join(' ')} ${bookState.lastPageTitle} ${creativeSession.currentSetting} atlas shrugged dagny gauguin paradise`,
+        creativeSession.activeVoice,
+        2
+      );
+      
       const arcPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
+
+KNOWLEDGE FOR ARC ANALYSIS (draw parallels to enrich the analysis):
+${arcKnowledge}
 
 Analyze the current story arc and provide:
 1. 🎬 ACT: Which act are we in? (Setup/Confrontation/Resolution)
@@ -5147,6 +5175,7 @@ Analyze the current story arc and provide:
 4. 🚧 OBSTACLE: What's preventing the goal?
 5. 💔 STAKES: What could be lost?
 6. 🔮 NEXT: What should happen next?
+7. 🪞 PARALLEL: Draw one parallel — to Gauguin's journey, Atlas Shrugged's structure, an Impressionist's arc, or the agentic creation process
 
 Be specific to Kira and Ule's journey. In Russian, concise.`;
 
@@ -6327,6 +6356,13 @@ _Panama vibes, añoranza tropical..._ 🌴`, { parse_mode: 'Markdown' });
     await ctx.reply('🇪🇸 *Escribiendo...*', { parse_mode: 'Markdown' });
     
     try {
+      // Get knowledge for culturally rich Spanish content
+      const spanishKnowledge = getRelevantKnowledge(
+        `${content || text} panama paradise gauguin atuona`,
+        creativeSession.activeVoice,
+        2
+      );
+      
       let prompt = '';
       
       if (action === 'translate') {
@@ -6338,16 +6374,24 @@ Return ONLY the Spanish translation. Be poetic, raw, evocative.`;
       } else if (action === 'scene') {
         prompt = `${ATUONA_CONTEXT}
 
+KNOWLEDGE (weave real details into the Spanish prose):
+${spanishKnowledge}
+
 Write a scene in SPANISH based on: "${content}"
 
 This is for a book about finding Paradise through vibe coding. The protagonist is in Panama.
 Write raw, emotional prose. Mix Spanish with occasional English tech terms naturally.
+Include ONE specific reference from the knowledge above (a painting, a date, a quote, an art parallel).
 200-300 words.`;
       } else if (action === 'inspire') {
         prompt = `${ATUONA_CONTEXT}
 
+KNOWLEDGE FOR INSPIRATION (use a specific fact):
+${spanishKnowledge}
+
 Generate a brief creative inspiration in SPANISH.
 Connect vibe coding, Panama, finding paradise, tropical storms, the search for meaning.
+Include one specific reference — a Gauguin painting date, an auction term, an Impressionist quote, an Atlas Shrugged parallel.
 3-4 sentences. Raw, poetic, with some English tech terms mixed naturally.`;
       } else {
         // Default: translate
@@ -6390,14 +6434,20 @@ Set OPENAI_API_KEY for full functionality.`, { parse_mode: 'Markdown' });
     await ctx.reply('🎨 *Creating image prompt...*', { parse_mode: 'Markdown' });
     
     try {
+      // Get knowledge for art-informed image generation
+      const imagineKnowledge = getRelevantKnowledge(description, creativeSession.activeVoice, 2);
+      
       // Generate optimized prompt for image generation
       const promptOptimizer = `You are an expert at creating prompts for AI image generation (DALL-E, Midjourney).
+
+ART KNOWLEDGE (reference specific paintings, techniques, palettes from these):
+${imagineKnowledge}
 
 Based on this description, create an optimized image generation prompt:
 "${description}"
 
 Context: This is for NFT artwork for an underground poetry/prose book about finding Paradise through vibe coding. Style should be:
-- Impressionist influences (Gauguin, Van Gogh)
+- Impressionist influences (Gauguin, Van Gogh) — reference SPECIFIC paintings from the knowledge above
 - Dark, moody, emotional
 - Mix of tropical and urban elements
 - Hint of technology/digital aesthetic
@@ -6607,6 +6657,13 @@ Return ONLY the translation. Plain text.`;
       // Generate cinematic prompt with ATUONA's unique vision & character context
       await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
       
+      // Get knowledge for richer visual context — art references, Gauguin's palette, Atlas parallels
+      const visualKnowledge = getRelevantKnowledge(
+        `${title} ${theme} ${englishText.substring(0, 200)}`,
+        creativeSession.activeVoice,
+        2
+      );
+      
       // Get character memories and plot threads for context
       const characterContext = characterMemories ? 
         `CHARACTERS:\n- Kira: ${characterMemories.kira?.slice(0, 3).join('; ') || 'Russian PA, art-obsessed, seeking meaning'}\n- Ule: ${characterMemories.ule?.slice(0, 3).join('; ') || 'Norwegian art collector, searching for lost Gauguin painting'}` : '';
@@ -6626,6 +6683,9 @@ Think: memory, not cinema. Intimate, not polished.
 - Must feel slightly WRONG — like a memory that doesn't quite fit
 - Intimate, like you walked into someone's private moment
 - Like remembering, not watching
+
+ART & CULTURAL KNOWLEDGE (use for visual references — Gauguin's palette, Impressionist light, specific paintings, Atlas Shrugged imagery):
+${visualKnowledge}
 
 BOOK PAGE:
 TITLE: "${title}"
