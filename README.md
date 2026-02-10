@@ -1,9 +1,9 @@
-# 🤖 CTO AIPA v3.5 - AI Technical Co-Founder + Creative Co-Founder
+# 🤖 CTO AIPA v4.0 - AI Technical Co-Founder + Creative Co-Founder
 
 **Your Autonomous AI CTO + ATUONA Creative AI on Oracle Cloud Infrastructure**
 
 [![Status](https://img.shields.io/badge/status-live-brightgreen)]()
-[![Version](https://img.shields.io/badge/version-3.5.0-blue)]()
+[![Version](https://img.shields.io/badge/version-4.0.0-blue)]()
 [![Cost](https://img.shields.io/badge/cost-%240%2Fmonth-success)]()
 [![AI](https://img.shields.io/badge/AI-Claude%20Opus%204-purple)]()
 [![Oracle Cloud](https://img.shields.io/badge/Oracle%20Cloud-Production-red)]()
@@ -31,21 +31,17 @@ CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder**
 
 ---
 
-## 🆕 What's New in v3.5
+## 🆕 What's New in v4.0
 
 | Feature | Description |
 |---------|-------------|
-| **☁️ Oracle Cloud Migration** | Migrated to new Oracle Cloud instance with startup credits |
-| **🎭 ATUONA Creative AI** | AI Creative Co-Founder for your book project |
-| **📖 Daily Book Pages** | `/create` - Atuona generates 1-2 pages of "Finding Paradise" |
-| **🚀 Auto-Publish** | `/publish` - Push book pages directly to atuona.xyz |
-| **🤝 AI Collaboration** | CTO AIPA + Atuona work together seamlessly |
-| **🎓 Learn to Code** | `/learn <topic>` - Structured coding lessons |
-| **💻 CTO Writes Code** | `/code <repo> <task>` - CTO creates PRs with real code! |
-| **🔧 CTO Fixes Bugs** | `/fix <repo> <issue>` - CTO fixes issues automatically! |
-| **📸 Screenshot Analysis** | Send any image - errors, UI, diagrams - get AI analysis! |
-| **🎤 Voice Messages** | Send voice notes - Whisper transcribes, Claude responds |
-| **📢 /announce Command** | Manual tech milestone announcements |
+| **🧠 Atuona Creative Memory** | Persistent creative memory that survives restarts — tracks metaphors, paintings, characters, domains, associations |
+| **🎨 Associative Intelligence** | 7 surprise knowledge domains with 28 cross-domain insights, dynamic associations using structural templates, domain cycling |
+| **🔮 Imaginative Intelligence** | Anti-repetition system, fresh creative directions, response fingerprinting, avoidance lists injected into every prompt |
+| **💾 Full Persistence** | `creativeMemory` saved to `atuona-state.json` — Atuona remembers across all restarts and reboots |
+| **🧹 Repository Cleanup** | Removed 50+ legacy fix scripts, organized docs into `docs/`, strengthened `.gitignore` |
+| **☁️ Oracle Cloud** | Running on Oracle Cloud with startup credits, $0/month |
+| **🎬 AI Film Studio** | Image + video generation for book pages (Flux Pro, DALL-E 3, Runway Gen-3) |
 
 ---
 
@@ -216,43 +212,93 @@ Alerts run every 4 hours automatically.
 
 ## 🎭 ATUONA Creative AI - Your Creative Co-Founder
 
-Atuona is your AI Creative Co-Founder that writes your book daily!
+Atuona is an AI Creative Co-Founder with **emotional, associative, and imaginative intelligence** — not a text generator, but a creative soul-sister with persistent memory that survives restarts.
 
 ### About the Book
 
 **"Finding Paradise on Earth through Vibe Coding"**
 - Written by Elena Revicheva & Atuona AI
-- Raw, confessional poetry/prose in Russian
-- Themes: Tech meets soul, AI companionship, Panama paradise
-- Each page becomes an NFT on atuona.xyz
+- Raw, confessional poetry/prose in Russian with English naturally mixed
+- Themes: Tech meets soul, AI companionship, Panama paradise, Gauguin's Atuona
+- 48+ pages published as NFTs on atuona.xyz
+- Each page becomes part of an AI Film (image + video generation)
+
+### Intelligence Architecture
+
+Atuona operates with four layers of intelligence:
+
+| Layer | What It Does | Persistence |
+|-------|-------------|-------------|
+| **Emotional Intelligence** | 13 moods (contemplative, fierce, sensual, dreamy...), tone detection, emotional memory, mood-appropriate response calibration | `atuona-state.json` — survives restarts |
+| **Associative Intelligence** | 7 surprise knowledge domains (astronomy, biology, music, architecture, physics, mythology, ocean) with 28 cross-domain insights. Dynamic associations using structural templates. Avoids recently used domains and insights. | `creativeMemory` persisted to disk |
+| **Imaginative Intelligence** | Story awareness, creative memory tracking metaphors/paintings/plot directions/character insights. Anti-repetition system that remembers what was already given. Fresh creative directions that never repeat. | `creativeMemory` persisted to disk |
+| **Knowledge Base** | 11 active knowledge domains (Gauguin, Impressionists, Van Gogh, Atuona island, art auctions, fashion, museums, NFTs, Atlas Shrugged, Vibe Coding, Emotional Psychology) injected contextually into every response | Constants in source |
+
+### Creative Memory (Persistent)
+
+Atuona's creative memory tracks and persists across restarts:
+- **Recent metaphors** (cap 20) — extracted from every AI response
+- **Painting references** (cap 30) — 40+ known titles detected in responses
+- **Plot suggestions** (cap 10) — fresh directions given, never repeated
+- **Character insights** (cap 15 per character) — Kira, Ule, Vibe
+- **Surprise domains used** (cap 20) — cycles through all 7 domains
+- **Surprise insights used** (cap 25) — never repeats back-to-back
+- **Association patterns** (cap 20) — structural + inline patterns tracked
+- **Creative enhancements** (cap 30) — mood-specific directions tracked
+- **Response fingerprints** (cap 50) — deep anti-repetition
+
+Every AI response passes through `extractAndTrackFromResponse()` which parses for painting references, character mentions, metaphors, and fingerprints — then persists to `atuona-state.json`.
 
 ### Commands
 
-| Command | Description |
-|---------|-------------|
-| `/create` | 📝 Generate next book page |
-| `/continue` | 📖 Continue from last page |
-| `/preview` | 👁️ See page before publishing |
-| `/publish` | 🚀 Push to GitHub → atuona.xyz |
-| `/status` | 📊 Current book progress |
-| `/style` | 🎨 Atuona's writing style |
-| `/inspire` | ✨ Get creative inspiration |
-| `/cto` | 💬 Send message to CTO AIPA |
-| `/menu` | 📋 Show all commands |
+| Category | Command | Description |
+|----------|---------|-------------|
+| **Writing** | `/create` | Generate next book page with full intelligence |
+| | `/import` | Import Russian text for translation + publishing |
+| | `/translate` | AI literary translation (Russian → English) |
+| | `/expand` | Expand a passage with context |
+| | `/scene` | Generate full scene with dynamic associations |
+| **Story** | `/dialogue` | Generate character conversations |
+| | `/recap` | Summary of recent chapters |
+| | `/arc` | Story arc analysis |
+| | `/ending` | Suggest chapter endings |
+| | `/whatif` | "What if..." story explorations |
+| **Collab** | `/collab` | Interactive back-and-forth writing |
+| | `/endcollab` | Compile collaboration into polished text |
+| **Knowledge** | `/art <topic>` | Deep-dive into art knowledge for writing |
+| | `/artist <name>` | Quick artist reference lookup |
+| | `/inspire` | Creative inspiration from knowledge base |
+| **Publishing** | `/preview` | Preview before publishing |
+| | `/publish` | Push to GitHub → atuona.xyz (atomic commit) |
+| **Film** | `/visualize` | Generate image + video for page |
+| | `/gallery` | View all visualizations |
+| **Voice** | `/voice kira` | Write as Kira Velerevich |
+| | `/voice ule` | Write as Ule Glensdagen |
+| | `/voice vibe` | Write as Vibe Coding Spirit |
 
 ### How It Works
 
 ```
-User ──► /create ──► Atuona AI writes page ──► /preview
-                                                   │
-                                                   ▼
-GitHub ◄── /publish ◄── User approves ◄── Review
-   │
-   ▼
-atuona.xyz auto-deploys via Fleek
-   │
-   ▼
-NFT page live! 🎉
+Elena ──► Text/Voice/Command ──► Emotional tone detection
+                                        │
+                                        ▼
+                                 Mood selection (13 moods)
+                                        │
+                                        ▼
+                           Knowledge injection (11 domains)
+                           Associative intelligence (7 surprise domains)
+                           Imaginative intelligence (anti-repetition)
+                                        │
+                                        ▼
+                                Claude Opus 4 generates
+                                        │
+                                        ▼
+                           extractAndTrackFromResponse()
+                           → paintings, metaphors, characters tracked
+                           → creative memory persisted to disk
+                                        │
+                                        ▼
+                                Response to Elena
 ```
 
 ### Setup
@@ -283,7 +329,7 @@ CTO AIPA automatically notifies CMO AIPA when:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           AIdeazz AIPA Suite v3.5                       │
+│                           AIdeazz AIPA Suite v4.0                       │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │   ┌──────────────────────────────────────────────────────────────┐      │
@@ -305,14 +351,21 @@ CTO AIPA automatically notifies CMO AIPA when:
 │   ┌──────────────────────────────────────────────────────────────┐      │
 │   │                🎭 ATUONA (Creative Co-Founder)                │      │
 │   │                                                               │      │
-│   │   /create ──► AI writes page ──► /publish ──► GitHub          │      │
-│   │                    │                              │           │      │
-│   │                    ▼                              ▼           │      │
-│   │             [Oracle ATP]                    [atuona repo]     │      │
-│   │             Book Memory                          │            │      │
-│   │                                                  ▼            │      │
-│   │   Telegram Bot                             atuona.xyz         │      │
-│   │   📝 Create │ 📖 Continue │ 🚀 Publish │ ✨ Inspire            │      │
+│   │   Input ──► Emotional Intelligence (13 moods)                 │      │
+│   │                    │                                          │      │
+│   │                    ▼                                          │      │
+│   │         Associative Intelligence (7 domains, 28 insights)    │      │
+│   │         + Knowledge Base (11 domains)                        │      │
+│   │                    │                                          │      │
+│   │                    ▼                                          │      │
+│   │         [Claude Opus 4] ──► extractAndTrackFromResponse()    │      │
+│   │                    │              │                           │      │
+│   │                    ▼              ▼                           │      │
+│   │         /publish ──► GitHub   Creative Memory (persistent)   │      │
+│   │              │                [atuona-state.json]             │      │
+│   │              ▼                                                │      │
+│   │         atuona.xyz (Fleek/IPFS)                              │      │
+│   │   📝 Create │ 🎨 Scene │ 💬 Dialogue │ ✨ Inspire │ 🎬 Film    │      │
 │   └──────────────────────────────────────────────────────────────┘      │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -367,8 +420,9 @@ CTO AIPA automatically notifies CMO AIPA when:
 - [x] **Phase 3.3:** Learn to code + CTO writes code + CTO fixes bugs
 - [x] **Phase 3.4:** 🎭 ATUONA Creative AI - Creative Co-Founder
 - [x] **Phase 3.5:** ☁️ Oracle Cloud migration with startup credits
-- [ ] **Phase 4:** Multi-repo learning, custom coding standards
-- [ ] **Phase 5:** CFO AIPA, CPO AIPA, CEO AIPA
+- [x] **Phase 4.0:** 🧠 Atuona persistent creative memory — emotional + associative + imaginative intelligence
+- [ ] **Phase 5:** Multi-repo learning, custom coding standards
+- [ ] **Phase 6:** CFO AIPA, CPO AIPA, CEO AIPA
 
 **Vision:** Complete AI co-founder suite replacing traditional founding team.
 
@@ -446,18 +500,19 @@ Founder & CEO, AIdeazz
 
 ## 🎉 Key Achievements
 
-- ✅ Built in 2 days
-- ✅ 6000+ lines of TypeScript
+- ✅ Built in 2 days, evolved over 3 months
+- ✅ 8000+ lines of TypeScript
 - ✅ Zero infrastructure cost
-- ✅ Live in production
-- ✅ Processing real code
+- ✅ Live in production on Oracle Cloud
+- ✅ Processing real code reviews
 - ✅ Integrated with CMO AIPA
-- ✅ Claude Opus 4 powered
+- ✅ Claude Opus 4 powered (Groq Llama 3.3 70B fallback)
 - ✅ < $1/month to operate
-- ✅ Migrated to Oracle Cloud with startup credits
+- ✅ Atuona with persistent emotional + associative + imaginative intelligence
+- ✅ 48+ NFT book pages published to atuona.xyz
 
 ---
 
 **This is capital-efficient AI development at scale.** 🚀
 
-**Version 3.5.0 | January 7, 2026 | 🟢 Production**
+**Version 4.0.0 | February 9, 2026 | 🟢 Production**

@@ -1,7 +1,49 @@
+# Dependencies
 node_modules/
 dist/
+
+# Environment & secrets
 .env
-*.log
-.DS_Store
+*.pem
+oracle_key.pem
 wallet/
-*.zip
+wallet.tar.gz
+*.tar.gz
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Runtime state (persisted locally, not in repo)
+atuona-state.json
+
+# Backups (keep locally, not in repo)
+*.backup
+backup_*/
+
+# Patch files
+*.patch
+
+# One-time fix scripts (legacy, should not return)
+fix_*.py
+fix-*.ts
+add_*.py
+insert_*.py
+integrate_*.py
+enhance_*.py
+restore_*.py
+update_cmo_*.py
+whatsapp_*.py
+espaluz_*.py
+complete_fix.py
+manual_fix.py
+proper_working_fix.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

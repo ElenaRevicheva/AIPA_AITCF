@@ -77,6 +77,7 @@ interface PersistedState {
   visualizations: PageVisualization[];
   elenaChatId: number | null;
   lastProactiveDate: string;
+  creativeMemory?: CreativeMemory;
 }
 
 interface Draft {
@@ -138,7 +139,8 @@ function saveState(): void {
       proactiveHistory,
       visualizations,
       elenaChatId,
-      lastProactiveDate
+      lastProactiveDate,
+      creativeMemory
     };
     fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
     console.log('💾 State saved');
@@ -163,8 +165,24 @@ function loadState(): void {
       if (state.elenaChatId) elenaChatId = state.elenaChatId;
       if (state.lastProactiveDate) lastProactiveDate = state.lastProactiveDate;
       
+      // Restore creative memory (with safe defaults for legacy state files)
+      if (state.creativeMemory) {
+        creativeMemory = {
+          recentMetaphors: state.creativeMemory.recentMetaphors || [],
+          usedPaintingReferences: state.creativeMemory.usedPaintingReferences || [],
+          lastPlotSuggestions: state.creativeMemory.lastPlotSuggestions || [],
+          characterInsightsGiven: state.creativeMemory.characterInsightsGiven || { kira: [], ule: [], vibe: [] },
+          usedSurpriseDomains: state.creativeMemory.usedSurpriseDomains || [],
+          usedSurpriseInsights: state.creativeMemory.usedSurpriseInsights || [],
+          usedAssociationPatterns: state.creativeMemory.usedAssociationPatterns || [],
+          usedEnhancements: state.creativeMemory.usedEnhancements || [],
+          recentResponseFingerprints: state.creativeMemory.recentResponseFingerprints || []
+        };
+      }
+      
       console.log('📂 State loaded from', STATE_FILE);
       console.log(`   📄 Page: ${bookState.currentPage}, 🔥 Streak: ${creativeSession.writingStreak}, 🎬 Visualizations: ${visualizations.length}`);
+      console.log(`   🧠 Creative memory: ${creativeMemory.recentMetaphors.length} metaphors, ${creativeMemory.usedPaintingReferences.length} paintings, ${creativeMemory.usedSurpriseDomains.length} domains tracked`);
     } else {
       console.log('📂 No saved state found, starting fresh');
     }
@@ -1874,21 +1892,66 @@ const ASSOCIATION_PATTERNS = [
 
 /**
  * Generate a surprise creative connection from unexpected domain
+ * NOW WITH MEMORY: avoids recently used domains and insights, tracks what it gives
  */
 function generateSurpriseConnection(): string {
-  const domains = Object.keys(SURPRISE_DOMAINS) as Array<keyof typeof SURPRISE_DOMAINS>;
-  const randomDomain = domains[Math.floor(Math.random() * domains.length)] || 'astronomy';
-  const domainInsights = SURPRISE_DOMAINS[randomDomain];
-  const randomInsight = domainInsights[Math.floor(Math.random() * domainInsights.length)] || domainInsights[0];
+  const allDomains = Object.keys(SURPRISE_DOMAINS) as Array<keyof typeof SURPRISE_DOMAINS>;
   
-  return `[Unexpected connection from ${randomDomain}]: ${randomInsight}`;
+  // Prefer domains NOT recently used (last 4 domains are avoided)
+  const recentDomains = creativeMemory.usedSurpriseDomains.slice(-4);
+  let availableDomains = allDomains.filter(d => !recentDomains.includes(d));
+  if (availableDomains.length === 0) availableDomains = allDomains; // fallback if all used
+  
+  const randomDomain = availableDomains[Math.floor(Math.random() * availableDomains.length)] || 'astronomy';
+  const domainInsights = SURPRISE_DOMAINS[randomDomain];
+  
+  // Avoid recently used insights (last 8)
+  const recentInsights = creativeMemory.usedSurpriseInsights.slice(-8);
+  let freshInsights = domainInsights.filter(i => !recentInsights.includes(i));
+  if (freshInsights.length === 0) freshInsights = domainInsights; // fallback
+  
+  const selectedInsight: string = freshInsights[Math.floor(Math.random() * freshInsights.length)] 
+    || domainInsights[0] 
+    || 'Like the light from distant stars reaching us millions of years later - your words travel through time';
+  
+  // TRACK: domain and insight into creative memory
+  trackCreativeElement('metaphor', `[${randomDomain}] ${selectedInsight}`);
+  creativeMemory.usedSurpriseDomains.push(randomDomain);
+  if (creativeMemory.usedSurpriseDomains.length > 20) {
+    creativeMemory.usedSurpriseDomains = creativeMemory.usedSurpriseDomains.slice(-20);
+  }
+  creativeMemory.usedSurpriseInsights.push(selectedInsight);
+  if (creativeMemory.usedSurpriseInsights.length > 25) {
+    creativeMemory.usedSurpriseInsights = creativeMemory.usedSurpriseInsights.slice(-25);
+  }
+  
+  return `[Unexpected connection from ${randomDomain}]: ${selectedInsight}`;
 }
 
 /**
  * Generate dynamic association between two concepts
+ * NOW WITH MEMORY: uses ASSOCIATION_PATTERNS structural templates + inline patterns,
+ * avoids recently generated associations, tracks output
  */
 function generateDynamicAssociation(concept1: string, concept2: string): string {
-  const patterns = [
+  // Combine structural templates from ASSOCIATION_PATTERNS with inline creative patterns
+  const structuralPatterns = ASSOCIATION_PATTERNS.map(ap => {
+    // Apply the structural template with actual concepts
+    switch (ap.pattern) {
+      case 'X is to Y as A is to B':
+        return `${concept1} is to creation as ${concept2} is to revelation`;
+      case 'Not X but Y through X':
+        return `Not ${concept1} but transformation through ${concept2}`;
+      case 'X transforms into Y under Z':
+        return `${concept1} transforms into ${concept2} under the pressure of honesty`;
+      case 'The X of Y meets the Z of A':
+        return `The weight of ${concept1} meets the lightness of ${concept2}`;
+      default:
+        return `${concept1} and ${concept2} meet where language breaks down`;
+    }
+  });
+  
+  const inlinePatterns = [
     `${concept1} and ${concept2} meet where language breaks down`,
     `${concept1} is the shadow that ${concept2} casts in another dimension`,
     `When ${concept1} becomes too heavy, it crystallizes into ${concept2}`,
@@ -1898,8 +1961,23 @@ function generateDynamicAssociation(concept1: string, concept2: string): string 
     `Gauguin would have called ${concept1} the same word as ${concept2}`
   ];
   
-  const selected = patterns[Math.floor(Math.random() * patterns.length)];
-  return selected ?? `${concept1} and ${concept2} meet where language breaks down`;
+  const allPatterns = [...structuralPatterns, ...inlinePatterns];
+  
+  // Avoid recently used association patterns
+  const recentAssociations = creativeMemory.usedAssociationPatterns.slice(-6);
+  let freshPatterns = allPatterns.filter(p => !recentAssociations.includes(p));
+  if (freshPatterns.length === 0) freshPatterns = allPatterns;
+  
+  const selected = freshPatterns[Math.floor(Math.random() * freshPatterns.length)] 
+    ?? `${concept1} and ${concept2} meet where language breaks down`;
+  
+  // TRACK: the association into creative memory
+  creativeMemory.usedAssociationPatterns.push(selected);
+  if (creativeMemory.usedAssociationPatterns.length > 20) {
+    creativeMemory.usedAssociationPatterns = creativeMemory.usedAssociationPatterns.slice(-20);
+  }
+  
+  return selected;
 }
 
 /**
@@ -1983,7 +2061,21 @@ function getCreativeEnhancement(baseMood: EmotionalMood): string {
   };
   
   const enhancements = moodEnhancements[baseMood] || moodEnhancements.contemplative;
-  const selectedEnhancement = enhancements[Math.floor(Math.random() * enhancements.length)];
+  
+  // Avoid recently used creative directions
+  const recentEnhancements = creativeMemory.usedEnhancements.slice(-8);
+  let freshEnhancements = enhancements.filter(e => !recentEnhancements.includes(e));
+  if (freshEnhancements.length === 0) freshEnhancements = enhancements;
+  
+  const selectedEnhancement = freshEnhancements[Math.floor(Math.random() * freshEnhancements.length)];
+  
+  // TRACK: the enhancement into creative memory
+  if (selectedEnhancement) {
+    creativeMemory.usedEnhancements.push(selectedEnhancement);
+    if (creativeMemory.usedEnhancements.length > 30) {
+      creativeMemory.usedEnhancements = creativeMemory.usedEnhancements.slice(-30);
+    }
+  }
   
   return `\n\nCREATIVE DIRECTION: ${selectedEnhancement}\n`;
 }
@@ -1997,6 +2089,14 @@ interface CreativeMemory {
   usedPaintingReferences: string[];
   lastPlotSuggestions: string[];
   characterInsightsGiven: Record<string, string[]>;
+  // Associative intelligence memory
+  usedSurpriseDomains: string[];       // recently used surprise domains (astronomy, ocean, etc.)
+  usedSurpriseInsights: string[];      // specific insights delivered, to never repeat back-to-back
+  usedAssociationPatterns: string[];   // dynamic associations generated
+  // Creative enhancement memory
+  usedEnhancements: string[];          // creative directions given
+  // Response fingerprints for deep anti-repetition
+  recentResponseFingerprints: string[];// first 80 chars of each AI creative response
 }
 
 let creativeMemory: CreativeMemory = {
@@ -2007,7 +2107,12 @@ let creativeMemory: CreativeMemory = {
     kira: [],
     ule: [],
     vibe: []
-  }
+  },
+  usedSurpriseDomains: [],
+  usedSurpriseInsights: [],
+  usedAssociationPatterns: [],
+  usedEnhancements: [],
+  recentResponseFingerprints: []
 };
 
 /**
@@ -2044,23 +2149,112 @@ function trackCreativeElement(type: 'metaphor' | 'painting' | 'plot' | 'characte
   }
 }
 
+// Known painting titles for detection in AI responses
+const KNOWN_PAINTINGS = [
+  'noa noa', 'where do we come from', 'd\'où venons-nous', 'vision after the sermon',
+  'yellow christ', 'spirit of the dead watching', 'manao tupapau', 'ia orana maria',
+  'two tahitian women', 'nevermore', 'when will you marry', 'nafea faa ipoipo',
+  'starry night', 'sunflowers', 'water lilies', 'nymphéas', 'impression sunrise',
+  'moulin de la galette', 'dance at le moulin', 'la grande jatte', 'olympia',
+  'luncheon on the grass', 'déjeuner sur l\'herbe', 'mont sainte-victoire',
+  'the card players', 'bathers', 'les demoiselles', 'guernica', 'persistence of memory',
+  'the kiss', 'the scream', 'girl with a pearl earring', 'birth of venus',
+  'atуона', 'atuona', 'paradise', 'рай', 'tahiti', 'таити',
+  'self-portrait', 'автопортрет', 'les misérables', 'маха'
+];
+
+/**
+ * Extract creative elements from an AI response and track them into creative memory.
+ * This is the bridge between OUTPUT (what AI generates) and INPUT (what memory stores).
+ * Call this after every createContent() in creative handlers.
+ */
+function extractAndTrackFromResponse(response: string, context?: string): void {
+  if (!response || response.length < 20) return;
+  
+  const lowerResponse = response.toLowerCase();
+  
+  // 1. Track painting references found in response
+  for (const painting of KNOWN_PAINTINGS) {
+    if (lowerResponse.includes(painting)) {
+      trackCreativeElement('painting', painting);
+    }
+  }
+  
+  // 2. Track character insights: look for character names with surrounding context
+  const characterPatterns: Record<string, RegExp[]> = {
+    kira: [/кир[аыуе]\s+[^.]{10,60}/gi, /kira\s+[^.]{10,60}/gi],
+    ule: [/ул[еьоа]\s+[^.]{10,60}/gi, /ule\s+[^.]{10,60}/gi],
+    vibe: [/vibe\s+[^.]{10,60}/gi, /дух\s+(кода|кодинга|вайба)\s+[^.]{10,60}/gi]
+  };
+  
+  for (const [charName, patterns] of Object.entries(characterPatterns)) {
+    for (const pattern of patterns) {
+      const matches = response.match(pattern);
+      if (matches && matches[0]) {
+        trackCreativeElement('character', matches[0].trim().substring(0, 80), charName);
+        break; // one per character per response
+      }
+    }
+  }
+  
+  // 3. Track metaphor-like phrases (sentences with "как", "словно", "будто", "is like", "as if")
+  const metaphorPatterns = /(?:[^.]*(?:как|словно|будто|точно|подобно|is like|as if|as though|reminds? (?:me |us )?of)[^.]{10,80}\.?)/gi;
+  const metaphorMatches = response.match(metaphorPatterns);
+  if (metaphorMatches) {
+    // Track up to 2 metaphors per response
+    for (const match of metaphorMatches.slice(0, 2)) {
+      trackCreativeElement('metaphor', match.trim().substring(0, 100));
+    }
+  }
+  
+  // 4. Track response fingerprint (first meaningful 80 chars for deep anti-repetition)
+  const fingerprint = response.replace(/\s+/g, ' ').trim().substring(0, 80);
+  creativeMemory.recentResponseFingerprints.push(fingerprint);
+  if (creativeMemory.recentResponseFingerprints.length > 50) {
+    creativeMemory.recentResponseFingerprints = creativeMemory.recentResponseFingerprints.slice(-50);
+  }
+  
+  // 5. Save state after tracking (creative memory persists)
+  saveState();
+  
+  console.log(`🧠 Creative memory updated: ${creativeMemory.recentMetaphors.length} metaphors, ${creativeMemory.usedPaintingReferences.length} paintings, ${creativeMemory.lastPlotSuggestions.length} plots tracked`);
+}
+
 /**
  * Get creative avoidance list (things not to repeat)
+ * NOW RICH: includes metaphors, paintings, plot suggestions, surprise domains, associations
  */
 function getCreativeAvoidanceList(): string {
-  const recentItems = [
-    ...creativeMemory.recentMetaphors.slice(-5),
-    ...creativeMemory.usedPaintingReferences.slice(-5),
-    ...creativeMemory.lastPlotSuggestions.slice(-3)
-  ];
+  const sections: string[] = [];
   
-  if (recentItems.length === 0) return '';
+  const recentMetaphors = creativeMemory.recentMetaphors.slice(-5);
+  if (recentMetaphors.length > 0) {
+    sections.push(`Recent metaphors/connections (DO NOT REUSE): ${recentMetaphors.join('; ')}`);
+  }
   
-  return `\nAVOID REPEATING (recently used): ${recentItems.join(', ')}\n`;
+  const recentPaintings = creativeMemory.usedPaintingReferences.slice(-5);
+  if (recentPaintings.length > 0) {
+    sections.push(`Recently referenced paintings (use DIFFERENT ones): ${recentPaintings.join('; ')}`);
+  }
+  
+  const recentPlots = creativeMemory.lastPlotSuggestions.slice(-3);
+  if (recentPlots.length > 0) {
+    sections.push(`Recent plot directions (go somewhere NEW): ${recentPlots.join('; ')}`);
+  }
+  
+  const recentDomains = creativeMemory.usedSurpriseDomains.slice(-3);
+  if (recentDomains.length > 0) {
+    sections.push(`Recently used knowledge domains: ${recentDomains.join(', ')} — draw from DIFFERENT domains`);
+  }
+  
+  if (sections.length === 0) return '';
+  
+  return `\n🧠 CREATIVE MEMORY — ANTI-REPETITION:\n${sections.join('\n')}\n`;
 }
 
 /**
  * Generate fresh creative direction avoiding recent patterns
+ * NOW WITH MEMORY: tracks what it gives, never repeats until all options cycled
  */
 function generateFreshCreativeDirection(): string {
   const directions = [
@@ -2079,8 +2273,12 @@ function generateFreshCreativeDirection(): string {
   // Filter out recently used directions
   const fresh = directions.filter(d => !creativeMemory.lastPlotSuggestions.includes(d));
   const selected = fresh[Math.floor(Math.random() * fresh.length)] ?? directions[0];
+  const result = selected ?? 'What if the unexpected becomes the center of the scene?';
   
-  return selected ?? 'What if the unexpected becomes the center of the scene?';
+  // TRACK: record this direction so it won't repeat
+  trackCreativeElement('plot', result);
+  
+  return result;
 }
 
 // =============================================================================
@@ -2275,6 +2473,9 @@ You're not an assistant. You're ATUONA - creative soul-sister reaching out spont
 
   try {
     const message = await createContent(prompt, 1500, true);
+    
+    // 🧠 CREATIVE MEMORY: Track creative elements from proactive message
+    extractAndTrackFromResponse(message, 'proactive');
     
     // 🧠 Update emotional memory with the mood we used
     updateEmotionalMemory(
@@ -3333,6 +3534,10 @@ Make it REAL and SPECIFIC. In Russian with English phrases naturally mixed.`;
 
       // Use poetry mode for creative inspiration
       const inspiration = await createContent(inspirePrompt, 500, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements
+      extractAndTrackFromResponse(inspiration, 'inspire');
+      
       await ctx.reply(`✨ *Today's Inspiration*\n\n${inspiration}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
@@ -3839,6 +4044,9 @@ Remember: Raw, honest, personal. Mix Russian with English naturally. SPECIFIC de
 
       // Use poetry mode for creative writing
       const pageContent = await createContent(createPrompt, 2000, true);
+      
+      // 🧠 CREATIVE MEMORY: Extract and track creative elements from response
+      extractAndTrackFromResponse(pageContent, 'create');
       
       // Parse the response
       const titleMatch = pageContent.match(/TITLE:\s*(.+)/);
@@ -5047,6 +5255,9 @@ Name: "Dialogue"
 
       const dialogue = await createContent(dialoguePrompt, 1500, true);
       
+      // 🧠 CREATIVE MEMORY: Track creative elements from dialogue
+      extractAndTrackFromResponse(dialogue, 'dialogue');
+      
       // 🧠 Update emotional memory
       updateEmotionalMemory(
         emotionalState.lastInteractionTone,
@@ -5120,6 +5331,9 @@ When referencing art or places, use REAL details from the knowledge above.
 Write as a co-founder refreshing our shared creative memory. In Russian, 300-400 words.`;
 
       const recap = await createContent(recapPrompt, 2000, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements from recap
+      extractAndTrackFromResponse(recap, 'recap');
       
       // 🧠 Update emotional memory
       updateEmotionalMemory(
@@ -5227,6 +5441,9 @@ Be specific to Kira and Ule's journey. In Russian, concise.`;
 
       const arcAnalysis = await createContent(arcPrompt, 1000, true);
       
+      // 🧠 CREATIVE MEMORY: Track creative elements from arc analysis
+      extractAndTrackFromResponse(arcAnalysis, 'arc');
+      
       await ctx.reply(`📚 *Story Arc Status*
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -5295,6 +5512,10 @@ Continue the story naturally. Write 2-4 sentences that:
 In Russian, raw and poetic.`;
 
       const continuation = await createContent(collabPrompt, 500, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements from collab start
+      extractAndTrackFromResponse(continuation, 'collab');
+      
       creativeSession.collabHistory.push(`Atuona: ${continuation}`);
       
       await ctx.reply(`✍️ ${continuation}
@@ -5332,6 +5553,9 @@ Polish for:
 Do NOT add new content - just polish what exists. In Russian.`;
 
       const compiled = await createContent(compilePrompt, 2000, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements from compiled collab
+      extractAndTrackFromResponse(compiled, 'collab_compiled');
       
       // Store as potential content
       bookState.lastPageContent = compiled;
@@ -5419,6 +5643,9 @@ CRITICAL: Include at least ONE specific detail from the knowledge (painting name
 Keep the style raw and lyrical. 100-200 words. In Russian.`;
 
       const expanded = await createContent(expandPrompt, 1000, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements from expanded text
+      extractAndTrackFromResponse(expanded, 'expand');
       
       // 🧠 Update emotional memory
       updateEmotionalMemory(
@@ -5533,6 +5760,9 @@ Write 300-500 words. In Russian, raw and literary. End on a strong image or ques
 
       const scene = await createContent(scenePrompt, 2500, true);
       
+      // 🧠 CREATIVE MEMORY: Track creative elements from scene
+      extractAndTrackFromResponse(scene, 'scene');
+      
       // 🧠 Update emotional memory
       updateEmotionalMemory(
         emotionalState.lastInteractionTone,
@@ -5619,6 +5849,9 @@ Format:
 [ending with specific detail]`;
 
       const endings = await createContent(endingPrompt, 1000, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements from endings
+      extractAndTrackFromResponse(endings, 'ending');
       
       // 🧠 Update emotional memory
       updateEmotionalMemory(
@@ -5728,6 +5961,9 @@ Format:
 In Russian, be provocative and SPECIFIC!`;
 
       const whatifs = await createContent(whatifPrompt, 1200, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements from what-ifs
+      extractAndTrackFromResponse(whatifs, 'whatif');
       
       // 🧠 Update emotional memory
       updateEmotionalMemory(
@@ -7486,6 +7722,9 @@ HOW TO RESPOND:
 
       const aiResponse = await createContent(responsePrompt, 1000, true);
       
+      // 🧠 CREATIVE MEMORY: Track creative elements from voice response
+      extractAndTrackFromResponse(aiResponse, 'voice');
+      
       // Add Atuona's response to conversation history
       addToConversation('atuona', aiResponse, 'text');
       
@@ -7877,6 +8116,10 @@ Continue the story naturally. Write 2-4 sentences that:
 In Russian, raw and poetic.`;
 
         const continuation = await createContent(collabPrompt, 500, true);
+        
+        // 🧠 CREATIVE MEMORY: Track creative elements from collab
+        extractAndTrackFromResponse(continuation, 'collab');
+        
         creativeSession.collabHistory.push(`Atuona: ${continuation}`);
         addToConversation('atuona', continuation, 'text');
         
@@ -7977,6 +8220,9 @@ HOW TO RESPOND — READ THIS CAREFULLY:
 Keep response concise for Telegram. Match the energy of her message — short reply to short message, longer to longer. But always in YOUR voice.`;
 
       const response = await createContent(conversationPrompt, 1000, true);
+      
+      // 🧠 CREATIVE MEMORY: Track creative elements from conversation
+      extractAndTrackFromResponse(response, 'conversation');
       
       // Add Atuona's response to conversation history
       addToConversation('atuona', response, 'text');
