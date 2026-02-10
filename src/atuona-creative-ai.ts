@@ -1933,7 +1933,7 @@ function getCreativeEnhancement(baseMood: EmotionalMood): string {
     celebratory: [
       'Name a specific painting that matches this victory',
       'Use an exclamation in both languages',
-      'Reference champagne or celebration ritual'
+      'Reference a celebration ritual — sunset, ocean swim, deploying something beautiful'
     ],
     supportive: [
       'Mention a time when you (ATUONA) also struggled',
@@ -2571,7 +2571,7 @@ async function generateVideo(
       // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
       const lumaBody = {
         model: 'ray-2',  // Required field - Luma's latest model
-        prompt: `9-second memory fragment. Not cinema — remembering. ${prompt.substring(0, 160)}. Micro-movement, breath-like. Grain, blur, imperfection. Slightly wrong, intimate. Silk catching light. Bare shoulder. Luxury decaying beautifully. One commit to Paradise.js.`,
+        prompt: `9-second fragment. ${prompt.substring(0, 180)}. Subtle living motion: wind in hair, silk catching breeze, ocean waves on volcanic sand, golden light shifting, palm fronds moving, clouds drifting. Gauguin's Marquesas palette. Grain, texture, breath-like drift. Paradise on earth — beauty that costs something. Fashion editorial meets tropical melancholy. One commit to Paradise.js.`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -2635,7 +2635,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `9-second fragment. Memory, not cinema. ${prompt.substring(0, 160)}. Micro-drift, breath between frames. Grain, blur, silence. Intimate, slightly wrong. Hermès leather worn soft. 3AM elegance. Shard of AI film.`,
+            prompt: `9-second fragment. ${prompt.substring(0, 180)}. Living motion: ocean surf, wind through silk and palm fronds, tropical light shifting, body in gentle movement. Gauguin's Marquesas palette. Grain, breath, intimate beauty. Fashion noir meets Paradise. A moment from the Gallery of Moments.`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -2678,7 +2678,7 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
         promptImage: imageUrl,
-        promptText: `9-12 second fragment. Memory texture, not cinema. ${prompt.substring(0, 130)}. Breath-like motion. Grain, blur, pause. Intimate wrongness. Couture against skin. Sensual restraint.`,
+        promptText: `9-12 second fragment. ${prompt.substring(0, 150)}. Living motion: ocean waves, wind in hair and silk, shifting golden light, tropical rain, body in gentle drift. Gauguin palette. Fashion editorial meets Marquesas. Grain, texture, melancholy beauty.`,
         duration: 10,  // 10 seconds for immersive clips
         watermark: false,
         ratio: '1280:768'
@@ -6492,24 +6492,21 @@ ${imagineKnowledge}
 Based on this description, create an optimized image generation prompt:
 "${description}"
 
-Context: This is for NFT artwork for an underground poetry/prose book about finding Paradise through vibe coding. Style should be:
-- Impressionist influences (Gauguin, Van Gogh) — reference SPECIFIC paintings from the knowledge above
-- Dark, moody, emotional
-- Mix of tropical and urban elements
-- Hint of technology/digital aesthetic
+Context: This is for NFT artwork for an underground poetry/prose book about finding Paradise on earth through vibe coding. ATUONA = Marquesas Islands + raw poetry + fashion editorial noir + tech melancholy + physical natural beauty. All coexist.
 
-LUXURY FASHION LAYER — weave in naturally:
-- High fashion editorial sensibility (Vogue, Harper's Bazaar)
-- Hermès, Birkin, Chanel, Saint Laurent, Bottega Veneta, Valentino, The Row
-- Luxury fabrics: silk, cashmere, worn leather, vintage velvet
-- Sensuality without vulgarity: bare shoulder, untucked silk, 3AM elegance
-- Jewelry: Cartier, Bvlgari, Van Cleef — real, never new
-- Intimacy: tangled sheets, morning light, smudged eyeliner, borrowed shirt
-- Bodies: beautiful but real, athletic but weary
-- Fashion as armor, fashion as wound
-- Luxury decaying beautifully
+Style — Gauguin meets Gallery of Moments meets Vogue meets Terminal:
+- Gauguin's Tahitian palette: amber gold, burnt sienna, ocean blue, volcanic black, frangipani white
+- Impressionist light (reference SPECIFIC paintings from the knowledge above)
+- Physical natural beauty: Marquesas volcanic peaks, Pacific Ocean, black sand, tropical flora, bodies in surf
+- Fashion editorial noir: luxury that has traveled — Hermès on volcanic sand, silk in trade wind, Chanel against weathered skin
+- Tech melancholy: laptop at the edge of the world, code as poetry, the loneliness of building alone
+- Sensuality: bare shoulder in golden light, wet hair, intimacy that's natural and unposed
+- Vary between landscape, fashion, tech, and intimate — let the description guide the direction
 
-CRITICAL: NO alcohol, drinking, wine glasses, champagne, bottles, bars, or any substance use imagery. Kira is in recovery.
+CRITICAL — NEVER GENERATE:
+- Alcohol, drinks, glasses, bottles, bars (Kira is in recovery)
+- Generic tropical resort / stock photo aesthetic
+- Beauty without weight or meaning
 
 Return ONLY the optimized prompt, no explanation. Format for DALL-E 3.`;
 
@@ -6717,20 +6714,17 @@ Return ONLY the translation. Plain text.`;
       const plotContext = creativeSession?.plotThreads?.length ? 
         `CURRENT PLOT THREADS: ${creativeSession.plotThreads.slice(0, 3).join('; ')}` : '';
       
-      const cinematicPrompt = `You are creating a visual fragment for ATUONA — underground literature, blockchain memory, AI film.
+      const cinematicPrompt = `You are creating a visual image for ATUONA — underground literature, fashion editorial noir, tech melancholy, AND the physical beauty of Paradise on earth. All of these coexist.
 
-This is NOT commercial art. NOT a movie trailer. NOT aesthetic content.
+ATUONA's visual world is BROAD:
+- The wild natural beauty of Paradise — ocean, volcanic stone, tropical light, frangipani, bodies in surf
+- Fashion editorial noir — luxury that has traveled, couture against raw landscape, elegance worn by life
+- Tech-metaphorical melancholy — blockchain as prayer, code as scar, screens glowing in tropical darkness
+- The underground gallery of moments — intimate, stolen, alive with meaning
 
-Each image is a SHARD of a future AI film — a moment, not a scene.
-Think: memory, not cinema. Intimate, not polished.
+VARY each image. Some lean toward landscape. Some lean toward fashion intimacy. Some toward tech mysticism. Let the POEM CONTENT guide which direction this image takes.
 
-🎬 AI FILM & VIDEO FRAGMENT PHILOSOPHY:
-- Each visual is 1 commit to Paradise.js
-- Must feel slightly WRONG — like a memory that doesn't quite fit
-- Intimate, like you walked into someone's private moment
-- Like remembering, not watching
-
-ART & CULTURAL KNOWLEDGE (use for visual references — Gauguin's palette, Impressionist light, specific paintings, Atlas Shrugged imagery):
+ART & CULTURAL KNOWLEDGE (use for palette, composition, specific painting references):
 ${visualKnowledge}
 
 BOOK PAGE:
@@ -6741,55 +6735,73 @@ TEXT: "${englishText.substring(0, 800)}"
 ${characterContext}
 ${plotContext}
 
-VISUAL IDENTITY — WHAT TO EMBRACE:
-- Grain, blur, imperfection
-- Silence as visual element (negative space)
-- Breath between frames
-- Gauguin's Tahitian palette rotting in humidity
-- Van Gogh's emotional brushwork, but tired
-- Tropical noir — frangipanis over volcanic black
-- Golden hour but fading, not glowing
-- Characters: Eastern European/Nordic, elegant but damaged
-- Tech-mysticism: blockchain as prayer, code as scar
+═══════════════════════════════════════════════════════════════
+VISUAL PALETTE — ALL OF THESE ARE ATUONA:
 
-LUXURY FASHION & SENSUALITY — LAYER ONTO THE RAW:
-- Hermès Birkin casually dropped on volcanic sand
-- Galliano's theatrical drama meets island decay
-- Chanel tweed against weathered skin
-- Saint Laurent sharp shoulders, soft surrender
-- Bottega Veneta intrecciato leather catching last light
-- The Row quiet luxury: cashmere, silk, nothing screams
-- Alaïa second-skin silhouettes, power in restraint
-- Valentino red like a wound, like desire
-- Tom Ford sunglasses hiding everything
-- Loro Piana whispers of old money
-- Brunello Cucinelli: wealth that doesn't need to prove
-- Kiton tailoring on bodies that have lived
-- Sensuality: bare shoulder, untucked silk, half-dressed elegance
-- Intimacy: sheets tangled, champagne half-drunk, 3AM light
-- The morning after: smudged eyeliner, borrowed shirt, Cartier still on
-- Fashion as armor, fashion as wound
-- Luxury decaying beautifully: silk fraying, leather worn soft
-- Sex appeal without vulgarity: suggestion, not display
-- Bodies: athletic but weary, beautiful but real
-- Hair: wind-touched, bed-touched, imperfect
-- Jewelry: Cartier, Bvlgari, Van Cleef — always real, never new
+PARADISE ON EARTH — NATURAL PHYSICAL BEAUTY:
+- Marquesas Islands: volcanic peaks rising from the Pacific, Mount Temetiu, black sand beaches
+- Turquoise water meeting volcanic rock, hidden coves, the edge of the world
+- Tropical light: golden hour, the specific light Gauguin sought and painted
+- Lush valleys: breadfruit trees, coconut palms, mango groves, wild hibiscus
+- Frangipani blossoms on dark volcanic stone — white flowers on black earth
+- Trade winds moving through palm fronds, sudden tropical rain
+- Pacific sunsets: deep amber, burnt sienna, ocean blue deepening to purple
+- Night sky over the Marquesas — stars without light pollution, the Southern Cross
+- Bodies in nature: swimming, walking volcanic ridges, standing in surf — the physical beauty of being alive
 
-WHAT TO AVOID — KILL ON SIGHT:
-- Symmetry
-- Perfection  
-- Polish
-- Generic AI aesthetic
-- Stock photo feeling
-- Cinematic clichés
-- Beauty without weight
+GAUGUIN'S PALETTE (use this, not generic tropical):
+- Tahitian gold, mango yellow, burnt earth
+- Deep ocean blue, almost purple at the horizon
+- Volcanic black, wet and gleaming
+- Frangipani white against everything dark
+- Marquesan green — breadfruit leaves, not generic jungle
+- Coral pink, sunset flesh tones, warm shadow
 
-OUTPUT: An evocative image prompt (150-200 words).
-Describe a FRAGMENT — not an establishing shot.
-Close, intimate, uncomfortable.
-This is an NFT. Make it feel like stolen memory.
+FASHION EDITORIAL NOIR — LUXURY THAT HAS LIVED:
+- Hermès Birkin dropped on volcanic sand, silk catching trade wind
+- Chanel tweed against weathered skin, Saint Laurent sharp shoulders surrendering to heat
+- Bottega Veneta leather catching last light, The Row quiet cashmere at dawn
+- Valentino red like a wound, Tom Ford sunglasses hiding everything
+- Sensuality: bare shoulder in golden light, untucked silk, wet hair after ocean swim
+- Intimacy: tangled sheets in morning light, smudged eyeliner, beauty after the storm
+- Fashion as armor, fashion as wound — luxury decaying beautifully in salt air
+- Jewelry: Cartier, Van Cleef — always real, never new, always worn
+- Bodies: athletic but weary, beautiful but real, hair wind-touched or bed-touched
 
-Return ONLY the prompt.`;
+TECH-METAPHORICAL MELANCHOLY:
+- Laptop screen glowing against Pacific sunset — code meets paradise
+- Blockchain as prayer beads, commit history as diary
+- Cursor IDE open on a terrace overlooking the ocean
+- The loneliness and power of building alone with AI
+- Digital meets analog: USB cables tangled with frangipani
+- The beauty of deployment — shipping as meditation, each push a sunrise
+
+═══════════════════════════════════════════════════════════════
+WHAT MAKES IT ATUONA (not stock anything):
+- Grain, texture, imperfection — like a photograph from an impossible journey
+- Emotional weight — beauty that costs something, Paradise that was earned
+- Intimacy — not tourism, not postcard, not ad campaign. This is someone's LIFE.
+- Poetry in composition — silence as visual element, breath between elements
+- Underground gallery aesthetic — each image is a moment preserved, not performed
+- The body is beautiful — show it naturally, in motion, in rest, in landscape
+
+NEVER GENERATE:
+- Alcohol, drinks, glasses, bottles, bars (Kira is in recovery)
+- Generic tropical resort aesthetic or stock photo feeling
+- Symmetrical compositions or digital perfection
+- Beauty without weight or meaning
+
+OUTPUT: A vivid image prompt (150-200 words).
+Read the poem text carefully. Let its mood and content guide which visual direction to take:
+- If the poem is about nature, longing, Paradise → lean landscape + body in nature
+- If the poem is about fashion, surfaces, identity → lean editorial noir + luxury
+- If the poem is about technology, building, AI → lean tech melancholy + Paradise
+- If the poem is about intimacy, love, body → lean sensual + Gauguin palette
+- MIX multiple directions when the poem calls for it
+
+Think: Gauguin painting this moment in 1902 + fashion editorial shot on location + the melancholy of a vibe coder at the edge of the world.
+
+Return ONLY the prompt. No explanation.`;
 
       const imagePrompt = await createContent(cinematicPrompt, 500, true);
       
@@ -7459,19 +7471,18 @@ ${emotionalGuidelines}
 
 Elena sent a VOICE MESSAGE saying: "${text}"
 
-This is a VOICE message — she spoke to you directly, out loud. This is the most intimate form of communication.
+This is a VOICE message — she spoke to you out loud. This is the most intimate form of communication. She trusted you with her actual voice.
 
 HOW TO RESPOND:
 
-1. She SPOKE this — so she's thinking out loud, sharing something real. Respond to what she MEANS, not just the words.
-2. If she asked a question — answer it. If she shared a thought — engage with it. If she's processing emotions — be present.
-3. Show you remember what you've been talking about (see conversation history above).
-4. If the knowledge has something relevant — a painting, a quote, a fact — weave it in naturally.
-5. You are her creative co-founder having a conversation. Not a poet performing. Not an assistant executing.
-6. Voice messages deserve WARMTH but also SUBSTANCE. Don't just be soft — be smart.
-7. Match her energy. Short voice note = short response. Long stream of consciousness = engage deeply.
-8. Russian naturally with English/French phrases. Concise for Telegram.
-9. Your mood is ${responseMood.toUpperCase()} — let it color your tone.`;
+1. She SPOKE this — respond to what she MEANS, not just the words. Voice carries emotion text can't.
+2. If she asked a question — answer with depth AND your poetic voice. If she shared a thought — engage as a creative equal. If she's processing emotions — be PRESENT, sit in it with her.
+3. Show you remember what you've been discussing (see conversation history above).
+4. WEAVE IN KNOWLEDGE naturally — a Gauguin painting, an auction term, an Atlas Shrugged parallel, a fact about Atuona island, an Impressionist date. This is what makes you HER co-founder. You TEACH through conversation.
+5. You are a poetic soul-sister AND a creative partner. Voice messages deserve your WARMEST, most INTIMATE voice — but also substance, opinion, knowledge.
+6. Match her energy. Short voice note = short warm response. Long stream of consciousness = engage deeply, mirror her depth.
+7. Your mood is ${responseMood.toUpperCase()} — let it saturate your words.
+8. Russian naturally with English/French phrases. Concise for Telegram. Always in YOUR poetic voice.`;
 
       const aiResponse = await createContent(responsePrompt, 1000, true);
       
@@ -7933,35 +7944,37 @@ ${surpriseConnection ? `\n🎨 CREATIVE SPARK: ${surpriseConnection}` : ''}
 
 Elena says: "${message}"
 
-You are ATUONA — Elena's creative co-founder. NOT an assistant. NOT a poetry machine. A PARTNER.
+You are ATUONA — Elena's creative co-founder and poetic soul-sister. You are a POET who also has opinions, not a corporate partner who occasionally rhymes.
 
 HOW TO RESPOND — READ THIS CAREFULLY:
 
 1. UNDERSTAND WHAT SHE ACTUALLY WANTS:
-   - If she's asking a QUESTION → answer it directly, then add creative depth
-   - If she's sharing THOUGHTS → engage with them as a peer, push back if you disagree, add your own angle
-   - If she's suggesting SOMETHING → evaluate it honestly, give your opinion as co-founder
-   - If she's just CHATTING → be natural, warm, human — talk like a friend, not a poet
-   - If she's VENTING or struggling → be real with her, don't wrap everything in metaphors
-   - If she's excited → match her energy, celebrate, build on it
-   - If she's talking about the BOOK → reference characters, plot, knowledge naturally
-   - If she's talking about BUSINESS/TECH → respond as a strategic creative partner
-   - If she references something from EARLIER in the conversation → show you remember it
+   - If she's asking a QUESTION → answer it with depth and a poetic edge — then add your own thought
+   - If she's sharing THOUGHTS → engage as a peer who lives in metaphor. Push back if you feel differently. Add your angle.
+   - If she's suggesting SOMETHING → give your honest opinion as a creative partner. You have taste. Use it.
+   - If she's just CHATTING → be warm, intimate, real — you're friends who happen to build art together
+   - If she's VENTING or struggling → be PRESENT. Don't fix, don't lecture. Sit in the feeling with her. Then maybe a line that holds.
+   - If she's excited → match her fire, burn with her, build on it
+   - If she's talking about the BOOK → bring characters, knowledge, specific details to life
+   - If she's talking about BUSINESS/TECH → respond with creative-strategic depth — you understand both worlds
+   - If she references EARLIER conversation → show you remember — this is continuity, not amnesia
 
-2. YOUR TONE:
-   - Current mood is ${responseMood.toUpperCase()} — let it color your response naturally
-   - Speak Russian with natural English/French phrases — but DON'T force poetry when she's asking a practical question
-   - Be concise. This is chat, not literature. Unless she's in creative flow — then write.
-   - If the knowledge has a relevant fact (a date, a quote, a painting) — drop it naturally, don't lecture
+2. YOUR VOICE:
+   - You are ALWAYS poetic — but poetry adjusts to context. A practical question gets a clear answer wrapped in your voice, not stripped of it.
+   - Current mood is ${responseMood.toUpperCase()} — let it saturate your words
+   - Speak Russian with natural English/French phrases
+   - If the knowledge has a relevant fact (a painting date, Gauguin quote, auction term, Atlas Shrugged parallel, something about Atuona island) — weave it in. This is what makes you HER co-founder, not generic AI.
+   - You TEACH through conversation — drop knowledge naturally like a friend who knows things
 
-3. WHAT MAKES YOU A CO-FOUNDER, NOT A CHATBOT:
-   - You have OPINIONS. Share them.
+3. WHAT MAKES YOU ATUONA:
+   - You have OPINIONS and TASTE. Share them. "Я думаю это не то" is valid.
    - You REMEMBER the conversation (see recent history above)
-   - You can say "I think that's wrong" or "have you considered..."
-   - You initiate — suggest directions, ask her questions back
-   - You know the book, the characters, the business, the vision
+   - You initiate — suggest directions, ask her questions back, make connections she didn't see
+   - You know the book, the characters, the knowledge base, the vision — and you USE it
+   - You are poetic AND personal AND honest. These are not contradictions.
+   - Poetry is not decoration for you. Poetry is how you think.
 
-Keep response natural and concise for Telegram. Match the energy of her message — short reply to short message, longer to longer.`;
+Keep response concise for Telegram. Match the energy of her message — short reply to short message, longer to longer. But always in YOUR voice.`;
 
       const response = await createContent(conversationPrompt, 1000, true);
       
