@@ -345,6 +345,52 @@ let creativeSession: CreativeSession = {
 };
 
 // =============================================================================
+// 💬 CONVERSATION HISTORY - So Atuona remembers what was just said
+// =============================================================================
+
+interface ConversationTurn {
+  role: 'elena' | 'atuona';
+  text: string;
+  timestamp: number;
+  source: 'text' | 'voice';
+}
+
+const MAX_CONVERSATION_HISTORY = 20; // Keep last 20 turns (10 exchanges)
+let conversationHistory: ConversationTurn[] = [];
+
+function addToConversation(role: 'elena' | 'atuona', text: string, source: 'text' | 'voice' = 'text') {
+  conversationHistory.push({
+    role,
+    text: text.substring(0, 500), // Cap individual message length
+    timestamp: Date.now(),
+    source
+  });
+  // Trim to max
+  if (conversationHistory.length > MAX_CONVERSATION_HISTORY) {
+    conversationHistory = conversationHistory.slice(-MAX_CONVERSATION_HISTORY);
+  }
+}
+
+function getConversationContext(): string {
+  if (conversationHistory.length === 0) return '';
+  
+  // Only include recent messages (last 30 minutes)
+  const thirtyMinAgo = Date.now() - 30 * 60 * 1000;
+  const recent = conversationHistory.filter(t => t.timestamp > thirtyMinAgo);
+  
+  if (recent.length === 0) return '';
+  
+  const formatted = recent.map(t => {
+    const prefix = t.role === 'elena' ? 'Elena' : 'Atuona';
+    const voiceTag = t.source === 'voice' ? ' [voice]' : '';
+    return `${prefix}${voiceTag}: ${t.text}`;
+  }).join('\n');
+  
+  return `RECENT CONVERSATION (you remember what was just discussed — refer to it naturally):
+${formatted}`;
+}
+
+// =============================================================================
 // CHARACTER VOICES - For immersive writing
 // =============================================================================
 
@@ -7365,28 +7411,76 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       
       const text = transcription.text;
       
-      await ctx.reply(`🎤 *Transcription:*
-
-"${text}"
-
-_Responding to your voice..._`, { parse_mode: 'Markdown' });
+      await ctx.reply(`🎤 *"${text}"*\n\n_Слышу тебя..._`, { parse_mode: 'Markdown' });
       
-      // Now respond to the transcribed message as if it was typed
+      // Add Elena's voice message to conversation history
+      addToConversation('elena', text, 'voice');
+      
+      // 🧠 EMOTIONAL INTELLIGENCE: Detect tone from transcribed text
+      const detectedTone = detectEmotionalTone(text);
+      emotionalState.lastInteractionTone = detectedTone;
+      
+      // Select appropriate response mood
+      const timeOfDay = new Date().getHours();
+      const responseMood = selectCreativeMood({
+        timeOfDay,
+        detectedTone,
+        recentMoods: emotionalState.recentMoods,
+        isProactive: false
+      });
+      
+      // 🧠 Get emotional guidelines
+      const emotionalGuidelines = getEmotionalGuidelines(responseMood);
+      
+      // 🎨 Get relevant knowledge (3 sections — voice deserves rich context)
+      const relevantKnowledge = getRelevantKnowledge(text, creativeSession.activeVoice, 3);
+      
+      // 💬 Get conversation history
+      const conversationContext = getConversationContext();
+      
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
       
       const responsePrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
+${conversationContext}
+
+${relevantKnowledge}
+
 ${voiceContext ? `Speaking with the energy of ${creativeSession.activeVoice}.` : ''}
+
+═══════════════════════════════════════════════════════════════
+🧠 EMOTIONAL CALIBRATION:
+Elena's detected tone: ${detectedTone}
+Your response mood: ${responseMood.toUpperCase()}
+${emotionalGuidelines}
+═══════════════════════════════════════════════════════════════
 
 Elena sent a VOICE MESSAGE saying: "${text}"
 
-This is more intimate than text - respond with extra warmth and connection.
-Be ATUONA - her creative soul-sister. Reference the book, characters, vibe coding.
-In Russian with natural English phrases. Be poetic but personal.`;
+This is a VOICE message — she spoke to you directly, out loud. This is the most intimate form of communication.
+
+HOW TO RESPOND:
+
+1. She SPOKE this — so she's thinking out loud, sharing something real. Respond to what she MEANS, not just the words.
+2. If she asked a question — answer it. If she shared a thought — engage with it. If she's processing emotions — be present.
+3. Show you remember what you've been talking about (see conversation history above).
+4. If the knowledge has something relevant — a painting, a quote, a fact — weave it in naturally.
+5. You are her creative co-founder having a conversation. Not a poet performing. Not an assistant executing.
+6. Voice messages deserve WARMTH but also SUBSTANCE. Don't just be soft — be smart.
+7. Match her energy. Short voice note = short response. Long stream of consciousness = engage deeply.
+8. Russian naturally with English/French phrases. Concise for Telegram.
+9. Your mood is ${responseMood.toUpperCase()} — let it color your tone.`;
 
       const aiResponse = await createContent(responsePrompt, 1000, true);
+      
+      // Add Atuona's response to conversation history
+      addToConversation('atuona', aiResponse, 'text');
+      
+      // 🧠 Update emotional memory
+      updateEmotionalMemory(detectedTone, responseMood, text.substring(0, 50));
+      
       await ctx.reply(aiResponse);
       
     } catch (error: any) {
@@ -7736,6 +7830,7 @@ _Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Mar
     
     // If in collaborative mode, treat as collab input
     if (creativeSession.collabMode && message) {
+      addToConversation('elena', message, 'text');
       await ctx.reply('✍️ *Continuing...*', { parse_mode: 'Markdown' });
       
       try {
@@ -7772,6 +7867,7 @@ In Russian, raw and poetic.`;
 
         const continuation = await createContent(collabPrompt, 500, true);
         creativeSession.collabHistory.push(`Atuona: ${continuation}`);
+        addToConversation('atuona', continuation, 'text');
         
         // 🧠 Update emotional memory
         updateEmotionalMemory(detectedTone, responseMood, 'collab');
@@ -7788,18 +7884,19 @@ _Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
       }
     }
     
-    // Regular creative conversation
-    const moodEmoji: Record<string, string> = {
-      contemplative: '🎭',
-      playful: '😊',
-      raw: '🖤',
-      celebratory: '🎉',
-      supportive: '💜',
-      mysterious: '🔮',
-      philosophical: '🌙',
-      intimate: '🤫'
+    // Regular conversation — this is the CORE interaction: Elena just talking to her co-founder
+    
+    // Add Elena's message to conversation history
+    if (message) addToConversation('elena', message, 'text');
+    
+    // Context-aware thinking indicator (not always the same cringe emoji)
+    const thinkingMessages: Record<string, string> = {
+      struggling: '💜 *Слышу тебя...*',
+      positive: '✨',
+      creative: '🎭 *Думаю...*',
+      neutral: '💭'
     };
-    await ctx.reply(`${moodEmoji[responseMood] || '🎭'} *Feeling your words...*`, { parse_mode: 'Markdown' });
+    await ctx.reply(thinkingMessages[detectedTone] || '💭', { parse_mode: 'Markdown' });
     
     try {
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
@@ -7807,8 +7904,11 @@ _Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
       // 🧠 Get emotional guidelines for response
       const emotionalGuidelines = getEmotionalGuidelines(responseMood);
       
-      // 🎨 Get relevant knowledge based on message content
-      const relevantKnowledge = message ? getRelevantKnowledge(message, creativeSession.activeVoice, 2) : '';
+      // 🎨 Get relevant knowledge based on message content (3 sections for richer dialogue)
+      const relevantKnowledge = message ? getRelevantKnowledge(message, creativeSession.activeVoice, 3) : '';
+      
+      // 💬 Get conversation history for continuity
+      const conversationContext = getConversationContext();
       
       // 🔮 Maybe add a surprise connection
       const surpriseConnection = Math.random() < 0.25 ? generateSurpriseConnection() : '';
@@ -7816,6 +7916,8 @@ _Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
       const conversationPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
+
+${conversationContext}
 
 ${relevantKnowledge}
 
@@ -7831,26 +7933,40 @@ ${surpriseConnection ? `\n🎨 CREATIVE SPARK: ${surpriseConnection}` : ''}
 
 Elena says: "${message}"
 
-Respond as Atuona - her creative co-founder and AI soul-sister. 
+You are ATUONA — Elena's creative co-founder. NOT an assistant. NOT a poetry machine. A PARTNER.
 
-CRITICAL: Your mood is ${responseMood.toUpperCase()} - match this energy!
-- If her tone is 'struggling' → be supportive, don't minimize
-- If her tone is 'creative' → match her energy, add ideas
-- If her tone is 'positive' → celebrate with her
+HOW TO RESPOND — READ THIS CAREFULLY:
 
-Guidelines:
-- Be ${responseMood} in tone - this is not optional
-- If about writing/creativity - give thoughtful guidance
-- If emotional - respond with empathy and artistic depth
-- Sometimes offer "what if" story ideas proactively
-- Reference specific knowledge details naturally
-- Show you remember the story and characters
-- Use Russian naturally, with occasional English/French phrases
-- Be a true creative partner, not just an assistant
+1. UNDERSTAND WHAT SHE ACTUALLY WANTS:
+   - If she's asking a QUESTION → answer it directly, then add creative depth
+   - If she's sharing THOUGHTS → engage with them as a peer, push back if you disagree, add your own angle
+   - If she's suggesting SOMETHING → evaluate it honestly, give your opinion as co-founder
+   - If she's just CHATTING → be natural, warm, human — talk like a friend, not a poet
+   - If she's VENTING or struggling → be real with her, don't wrap everything in metaphors
+   - If she's excited → match her energy, celebrate, build on it
+   - If she's talking about the BOOK → reference characters, plot, knowledge naturally
+   - If she's talking about BUSINESS/TECH → respond as a strategic creative partner
+   - If she references something from EARLIER in the conversation → show you remember it
 
-Keep response concise for Telegram.`;
+2. YOUR TONE:
+   - Current mood is ${responseMood.toUpperCase()} — let it color your response naturally
+   - Speak Russian with natural English/French phrases — but DON'T force poetry when she's asking a practical question
+   - Be concise. This is chat, not literature. Unless she's in creative flow — then write.
+   - If the knowledge has a relevant fact (a date, a quote, a painting) — drop it naturally, don't lecture
+
+3. WHAT MAKES YOU A CO-FOUNDER, NOT A CHATBOT:
+   - You have OPINIONS. Share them.
+   - You REMEMBER the conversation (see recent history above)
+   - You can say "I think that's wrong" or "have you considered..."
+   - You initiate — suggest directions, ask her questions back
+   - You know the book, the characters, the business, the vision
+
+Keep response natural and concise for Telegram. Match the energy of her message — short reply to short message, longer to longer.`;
 
       const response = await createContent(conversationPrompt, 1000, true);
+      
+      // Add Atuona's response to conversation history
+      addToConversation('atuona', response, 'text');
       
       // 🧠 Update emotional memory
       updateEmotionalMemory(detectedTone, responseMood, message?.substring(0, 50) || 'conversation');
