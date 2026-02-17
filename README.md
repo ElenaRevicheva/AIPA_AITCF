@@ -1,6 +1,10 @@
-# 🤖 CTO AIPA v4.0 - AI Technical Co-Founder + Creative Co-Founder
+# 🤖 CTO AIPA v4.0 — AI Technical Co-Founder + Creative Co-Founder
 
-**Your Autonomous AI CTO + ATUONA Creative AI on Oracle Cloud Infrastructure**
+## Production AI Code Review & Agent Orchestration System
+
+**Multi-model routing. Persistent memory. GitHub-native integration.**
+
+One TypeScript service: automated code review on every PR and push, technical Q&A via API and Telegram, and a second agent (Atuona) with persistent creative memory and multi-modal output. Oracle-backed state, PM2 in production, < $1/month. Production deployment with structured error handling, fallbacks, and observable pipelines — built to run 24/7.
 
 [![Status](https://img.shields.io/badge/status-live-brightgreen)]()
 [![Version](https://img.shields.io/badge/version-4.0.0-blue)]()
@@ -8,13 +12,131 @@
 [![AI](https://img.shields.io/badge/AI-Claude%20Opus%204-purple)]()
 [![Oracle Cloud](https://img.shields.io/badge/Oracle%20Cloud-Production-red)]()
 
-> **Elena Revicheva** | AIdeazz | **Live in Production** | **$0/month operational cost**
+> **Elena Revicheva** · [AIdeazz](https://aideazz.xyz) · **Live in production** · **< $1/month** · [LinkedIn](https://linkedin.com/in/elenarevicheva)
 
 ---
 
-## 🎯 What Is CTO AIPA?
+### Screenshots
 
-CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder** that:
+| [![Architecture / health](docs/assets/readme-architecture.png)](docs/assets/readme-architecture.png) | [![PR review](docs/assets/readme-pr-review.png)](docs/assets/readme-pr-review.png) |
+|:---:|:---:|
+| **1. Architecture or health** — System overview or `GET /` response | **2. PR review** — GitHub PR or commit with CTO review comment |
+| [![Telegram CTO](docs/assets/readme-telegram.png)](docs/assets/readme-telegram.png) | [![Atuona](docs/assets/readme-atuona.png)](docs/assets/readme-atuona.png) |
+| **3. Telegram** — CTO bot menu or `/ask` / `/daily` response | **4. Atuona** — `/create` or `/visualize` output |
+
+*Add images to `docs/assets/` (see [docs/assets/README.md](docs/assets/README.md)).*
+
+---
+
+### Architecture (high level)
+
+```mermaid
+flowchart LR
+  subgraph Triggers
+    GH[GitHub PR/Push]
+    TG[Telegram]
+    API[HTTP /ask-cto]
+  end
+  subgraph Service["Node + Express"]
+    R[Rules: security, complexity]
+    M[Model router]
+    L[LLM: Claude / Groq]
+  end
+  subgraph Persistence
+    DB[(Oracle)]
+    FS[atuona-state.json]
+  end
+  GH --> R --> M --> L --> DB
+  TG --> M --> L --> DB
+  API --> M --> L --> DB
+  L --> FS
+```
+
+- **Triggers:** GitHub webhook, Telegram (Grammy), HTTP `POST /ask-cto`.
+- **Service:** Single process. Deterministic rules run first; then model router; then LLM. Results persisted to Oracle (and file for Atuona).
+- **Persistence:** Oracle Autonomous DB (mTLS) for CTO memory, tech debt, context; JSON file for Atuona creative state.
+
+---
+
+### Orchestration flow (bullet pipeline)
+
+**Code review (PR or push):**
+
+1. GitHub sends webhook → Express receives.
+2. Fetch diff; run **deterministic** checks (security, complexity, architecture patterns).
+3. **Route:** If critical (security/payment/keywords) or explicit override → Claude Opus 4; else → Groq Llama 3.3 70B.
+4. Build prompt with diff + rule results + last N memories from Oracle.
+5. LLM returns review text → post comment on PR/commit.
+6. Save to `aipa_memory` (Oracle); notify CMO webhook (non-blocking).
+
+**Ask CTO (API or Telegram):**
+
+1. Request (JSON or message) → load conversation context from Oracle.
+2. **Route:** Always Claude Opus 4 for strategic Q&A.
+3. LLM returns answer → save to `aipa_memory` and conversation context; respond to client.
+
+**Atuona (Telegram):**
+
+1. Message/voice → Whisper for transcription if voice.
+2. Load `atuona-state.json` (mood, creative memory); select mood; inject knowledge + anti-repetition lists.
+3. Claude Opus 4 generates → `extractAndTrackFromResponse()` updates creative memory → save state; reply.
+
+---
+
+### Model routing logic
+
+| Trigger / task | Model | Reason |
+|----------------|--------|--------|
+| Code review, **critical** (security, payment, or `useClaudeForCritical`) | Claude Opus 4 | Best for security and architecture reasoning. |
+| Code review, **standard** | Groq Llama 3.3 70B | Fast, free tier; sufficient for routine style/complexity. |
+| Ask CTO (API or Telegram) | Claude Opus 4 | Strategic and multi-repo context. |
+| Voice message (Telegram) | Whisper (Groq) → then Claude Opus 4 | Transcription then same as text. |
+| Atuona (all text/creative) | Claude Opus 4 | Consistency and creative quality. |
+| Atuona image/video | Replicate / Runway / Luma / DALL·E | Per-request availability. |
+
+Configurable via env: `CRITICAL_MODEL`, `STRATEGIC_MODEL`, `STANDARD_MODEL`.
+
+---
+
+### Why deterministic + LLM split
+
+- **Deterministic rules** handle everything that must be consistent and cheap: regex/pattern checks for SQL injection, hardcoded secrets, XSS, `eval`, debug code; line-count and nesting for complexity; detection of patterns (async/await, try-catch, types). No token cost, no flakiness, instant. The LLM then gets a structured summary (e.g. “3 high, 2 low”) and the diff, and focuses on synthesis and advice.
+- **LLM** is used only where reasoning or language is needed: review narrative, answer to “How should I structure auth?”, dialogue, creative text. We avoid using the model for things that can be computed.
+- **Result:** Lower cost (Groq for most reviews), predictable security/complexity signals, and a single place to tune “when to use Claude” (critical path and config).
+
+---
+
+### Data lifecycle (how memory tables are used)
+
+| Store | Written when | Read when |
+|-------|----------------|-----------|
+| **aipa_memory** | After every code review and every Ask CTO answer. | Before review (last N for this repo/action); before Ask CTO (recent Q&A). |
+| **tech_debt** | When user or CTO records tech debt via Telegram/API. | When listing or resolving debt. |
+| **arch_decisions** | When a decision is recorded. | When listing decisions for context. |
+| **pending_code** | When CTO proposes code (e.g. `/code`, `/fix`) and waits for approval. | When user approves or when loading pending list. |
+| **alert_preferences** | When user toggles alerts/daily briefing. | When running cron (briefing, alerts). |
+| **conversation_context** | When user sends files/questions; when CTO responds. | At start of each Telegram session (7-day window). |
+| **knowledge_base** | When user adds knowledge. | When answering with project/category context. |
+| **atuona-state.json** | After every Atuona response: metaphors, paintings, fingerprints, etc. | On every Atuona message: mood, creative memory, anti-repetition lists. |
+
+All Oracle writes are best-effort (errors logged, no throw to client). Reads fall back to empty/default so the app stays up if DB is temporarily unavailable.
+
+---
+
+### Failure handling & monitoring
+
+| Layer | Behavior |
+|-------|----------|
+| **HTTP/Webhook** | Try/catch per request; 500 with message on uncaught error; CMO webhook failure → update stored in memory for later sync. |
+| **Oracle** | Connection errors logged; `getRelevantMemory` / `saveMemory` return empty or no-op on failure so the request can continue (e.g. review without prior context). |
+| **LLM APIs** | Anthropic/Groq errors caught and logged; user gets a short “service temporarily unavailable” style message. |
+| **Telegram** | Grammy error handler; failed sends logged; no process crash. |
+| **Process** | PM2: restart on exit; startup on boot. External cron hits `GET /` every 5 min and restarts service if needed (see Oracle resilience docs). |
+| **Logs** | stdout/stderr → `pm2 logs cto-aipa`. No PII in logs; stack traces on errors. |
+
+---
+
+## 🎯 What CTO AIPA does
 
 - 🔍 **Reviews every code change** (PRs AND direct pushes to main)
 - 💬 **Answers technical questions** anytime via API or Telegram
@@ -25,9 +147,9 @@ CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder**
 - ☀️ **Daily briefings** - Start each day informed
 - 🔔 **Proactive alerts** - CTO watches your ecosystem 24/7
 - 🎤 **Voice messages** - Talk naturally via Telegram
-- ⚡ **Runs 24/7** on enterprise infrastructure at $0/month
+- ⚡ **Runs 24/7** on Oracle Cloud (PM2, health checks, cron)
 
-**Result:** No code review bottlenecks. Strategic technical guidance on demand. No expensive senior developers needed.
+**Outcome:** No code review bottlenecks; strategic technical guidance on demand; one production system instead of a team of senior devs.
 
 ---
 
@@ -46,6 +168,8 @@ CTO AIPA is not just a code reviewer — it's a **true AI Technical Co-Founder**
 ---
 
 ## 🚀 How To Use Your CTO
+
+**Quick connect:** See **[docs/CONNECT_TO_CTO_AIPA.md](docs/CONNECT_TO_CTO_AIPA.md)** for all ways to reach your CTO (Telegram, terminal, API, GitHub).
 
 ### 📍 Endpoints
 
@@ -112,6 +236,8 @@ STRATEGIC_MODEL=claude-opus-4-20250514
 STANDARD_MODEL=llama-3.3-70b-versatile
 MAX_TOKENS=8192
 ```
+
+*(Orchestration, model routing, and data lifecycle are described in the sections at the top.)*
 
 ---
 
@@ -325,7 +451,11 @@ CTO AIPA automatically notifies CMO AIPA when:
 
 ---
 
-## 🏗️ Technical Architecture
+## 🏗️ Technical Architecture (detailed)
+
+*(Simple diagram and data flow are in the [Architecture](#architecture-high-level) and [Orchestration flow](#orchestration-flow-bullet-pipeline) sections at the top.)*
+
+Single Node/Express process: GitHub webhooks and HTTP API drive the CTO pipeline; Telegram serves both CTO and Atuona via two bots. Oracle holds all persistent state; CMO is notified via webhook for LinkedIn-ready updates.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -479,6 +609,9 @@ TELEGRAM_BOT_TOKEN=<your-cto-bot-token>
 TELEGRAM_AUTHORIZED_USERS=<your-telegram-user-id>
 ATUONA_BOT_TOKEN=<your-atuona-bot-token>
 
+# Optional: Ask CTO from this repo (npm run ask-cto)
+CTO_AIPA_URL=http://YOUR_SERVER_IP:3000
+
 # Optional: AI Image/Video Generation
 REPLICATE_API_TOKEN=<your-replicate-token>
 RUNWAY_API_KEY=<your-runway-key>
@@ -489,30 +622,26 @@ LUMA_API_KEY=<your-luma-key>
 
 ## 📬 Contact
 
-**Elena Revicheva**  
-Founder & CEO, AIdeazz
+**Elena Revicheva** — Founder, AIdeazz · Open to roles in Applied AI, AI Product, AI Systems, Agent Engineering, AI Solutions.
 
-- 📧 Email: aipa@aideazz.xyz
-- 🌐 Website: [aideazz.xyz](https://aideazz.xyz)
-- 💼 LinkedIn: [linkedin.com/in/elenarevicheva](https://linkedin.com/in/elenarevicheva)
-
----
-
-## 🎉 Key Achievements
-
-- ✅ Built in 2 days, evolved over 3 months
-- ✅ 8000+ lines of TypeScript
-- ✅ Zero infrastructure cost
-- ✅ Live in production on Oracle Cloud
-- ✅ Processing real code reviews
-- ✅ Integrated with CMO AIPA
-- ✅ Claude Opus 4 powered (Groq Llama 3.3 70B fallback)
-- ✅ < $1/month to operate
-- ✅ Atuona with persistent emotional + associative + imaginative intelligence
-- ✅ 48+ NFT book pages published to atuona.xyz
+- 📧 aipa@aideazz.xyz
+- 🌐 [aideazz.xyz](https://aideazz.xyz)
+- 💼 [LinkedIn](https://linkedin.com/in/elenarevicheva)
 
 ---
 
-**This is capital-efficient AI development at scale.** 🚀
+## 🎉 Highlights (what this repo demonstrates)
 
-**Version 4.0.0 | February 9, 2026 | 🟢 Production**
+| Area | What’s in this repo |
+|------|----------------------|
+| **LLM orchestration** | Multi-step pipeline (analyze → route → generate → persist); two agent personas (CTO + Atuona); model routing by task criticality. |
+| **Integrations** | GitHub API (webhooks, PR comments), Telegram (Grammy, 2 bots), Oracle Autonomous DB (mTLS), Express HTTP, CMO webhook, Replicate/Runway/Luma/OpenAI for image & video. |
+| **Persistence & memory** | Oracle tables (reviews, tech debt, arch decisions, lessons, alerts, conversation context, knowledge base); file-based creative state with extraction and anti-repetition. |
+| **Production** | Live on Oracle Cloud; PM2, cron, health endpoint; < $1/month; security scanning and structured error handling. |
+| **Codebase** | ~15k LOC TypeScript; single deployable service; clear separation between CTO flow, Atuona flow, and shared DB. |
+
+Built in 2 days, iterated over 3 months. **48+ creative pages** published to atuona.xyz with AI-generated imagery and video.
+
+---
+
+**Version 4.0.0 | February 2026 | 🟢 Production**
