@@ -836,14 +836,15 @@ async function startCTOAIPA() {
   });
   
   const PORT = 3000;
+  const baseUrl = process.env.CTO_AIPA_PUBLIC_URL || `http://0.0.0.0:${PORT}`;
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n🎧 CTO AIPA v3.0 listening on http://163.192.99.45:${PORT}`);
-    console.log(`📡 Webhook: http://163.192.99.45:${PORT}/webhook/github`);
-    console.log(`💬 Ask CTO: http://163.192.99.45:${PORT}/ask-cto`);
-    console.log(`📋 CMO Updates: http://163.192.99.45:${PORT}/cmo-updates`);
-    console.log(`🏆 Tech Milestones: http://163.192.99.45:${PORT}/tech-milestones`);
-    console.log(`🏥 Health: http://163.192.99.45:${PORT}/`);
-    console.log(`🤝 CMO Integration: https://vibejobhunter-production.up.railway.app/api/tech-update`);
+    console.log(`\n🎧 CTO AIPA listening on port ${PORT}`);
+    console.log(`📡 Webhook: ${baseUrl}/webhook/github`);
+    console.log(`💬 Ask CTO: ${baseUrl}/ask-cto`);
+    console.log(`📋 CMO Updates: ${baseUrl}/cmo-updates`);
+    console.log(`🏆 Tech Milestones: ${baseUrl}/tech-milestones`);
+    console.log(`🏥 Health: ${baseUrl}/`);
+    if (process.env.CMO_WEBHOOK_URL) console.log(`🤝 CMO: ${process.env.CMO_WEBHOOK_URL}`);
     
     // Initialize Telegram Bot (CTO AIPA)
     const telegramBot = initTelegramBot();

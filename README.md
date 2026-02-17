@@ -1,10 +1,13 @@
-# 🤖 CTO AIPA v4.0 — AI Technical Co-Founder + Creative Co-Founder
+# CTO AIPA — Production AI Code Review & Agent Orchestration System
 
-## Production AI Code Review & Agent Orchestration System
+Single TypeScript service that:
 
-**Multi-model routing. Persistent memory. GitHub-native integration.**
+- Automatically reviews every PR and push
+- Routes between LLMs based on criticality
+- Persists technical memory in Oracle Autonomous DB
+- Exposes technical Q&A via API and Telegram
 
-One TypeScript service: automated code review on every PR and push, technical Q&A via API and Telegram, and a second agent (Atuona) with persistent creative memory and multi-modal output. Oracle-backed state, PM2 in production, < $1/month. Production deployment with structured error handling, fallbacks, and observable pipelines — built to run 24/7.
+Deployed on Oracle Cloud. PM2-managed. <$1/month operational cost.
 
 [![Status](https://img.shields.io/badge/status-live-brightgreen)]()
 [![Version](https://img.shields.io/badge/version-4.0.0-blue)]()
@@ -12,7 +15,7 @@ One TypeScript service: automated code review on every PR and push, technical Q&
 [![AI](https://img.shields.io/badge/AI-Claude%20Opus%204-purple)]()
 [![Oracle Cloud](https://img.shields.io/badge/Oracle%20Cloud-Production-red)]()
 
-> **Elena Revicheva** · [AIdeazz](https://aideazz.xyz) · **Live in production** · **< $1/month** · [LinkedIn](https://linkedin.com/in/elenarevicheva)
+> **Elena Revicheva** · [AIdeazz](https://aideazz.xyz) · [LinkedIn](https://linkedin.com/in/elenarevicheva)
 
 ---
 
@@ -149,21 +152,15 @@ All Oracle writes are best-effort (errors logged, no throw to client). Reads fal
 - 🎤 **Voice messages** - Talk naturally via Telegram
 - ⚡ **Runs 24/7** on Oracle Cloud (PM2, health checks, cron)
 
-**Outcome:** No code review bottlenecks; strategic technical guidance on demand; one production system instead of a team of senior devs.
+No code review bottlenecks; strategic technical guidance on demand.
 
 ---
 
-## 🆕 What's New in v4.0
+## What's in v4.0
 
-| Feature | Description |
-|---------|-------------|
-| **🧠 Atuona Creative Memory** | Persistent creative memory that survives restarts — tracks metaphors, paintings, characters, domains, associations |
-| **🎨 Associative Intelligence** | 7 surprise knowledge domains with 28 cross-domain insights, dynamic associations using structural templates, domain cycling |
-| **🔮 Imaginative Intelligence** | Anti-repetition system, fresh creative directions, response fingerprinting, avoidance lists injected into every prompt |
-| **💾 Full Persistence** | `creativeMemory` saved to `atuona-state.json` — Atuona remembers across all restarts and reboots |
-| **🧹 Repository Cleanup** | Removed 50+ legacy fix scripts, organized docs into `docs/`, strengthened `.gitignore` |
-| **☁️ Oracle Cloud** | Running on Oracle Cloud with startup credits, $0/month |
-| **🎬 AI Film Studio** | Image + video generation for book pages (Flux Pro, DALL-E 3, Runway Gen-3) |
+- Oracle Cloud deployment (PM2, startup credits)
+- Atuona: persistent creative memory, anti-repetition, multi-modal (text + image + video via Replicate/Runway/Luma)
+- Repository cleanup: docs in `docs/`, strengthened `.gitignore`
 
 ---
 
@@ -336,105 +333,9 @@ Alerts run every 4 hours automatically.
 
 ---
 
-## 🎭 ATUONA Creative AI - Your Creative Co-Founder
+## Atuona (second agent in same process)
 
-Atuona is an AI Creative Co-Founder with **emotional, associative, and imaginative intelligence** — not a text generator, but a creative soul-sister with persistent memory that survives restarts.
-
-### About the Book
-
-**"Finding Paradise on Earth through Vibe Coding"**
-- Written by Elena Revicheva & Atuona AI
-- Raw, confessional poetry/prose in Russian with English naturally mixed
-- Themes: Tech meets soul, AI companionship, Panama paradise, Gauguin's Atuona
-- 48+ pages published as NFTs on atuona.xyz
-- Each page becomes part of an AI Film (image + video generation)
-
-### Intelligence Architecture
-
-Atuona operates with four layers of intelligence:
-
-| Layer | What It Does | Persistence |
-|-------|-------------|-------------|
-| **Emotional Intelligence** | 13 moods (contemplative, fierce, sensual, dreamy...), tone detection, emotional memory, mood-appropriate response calibration | `atuona-state.json` — survives restarts |
-| **Associative Intelligence** | 7 surprise knowledge domains (astronomy, biology, music, architecture, physics, mythology, ocean) with 28 cross-domain insights. Dynamic associations using structural templates. Avoids recently used domains and insights. | `creativeMemory` persisted to disk |
-| **Imaginative Intelligence** | Story awareness, creative memory tracking metaphors/paintings/plot directions/character insights. Anti-repetition system that remembers what was already given. Fresh creative directions that never repeat. | `creativeMemory` persisted to disk |
-| **Knowledge Base** | 11 active knowledge domains (Gauguin, Impressionists, Van Gogh, Atuona island, art auctions, fashion, museums, NFTs, Atlas Shrugged, Vibe Coding, Emotional Psychology) injected contextually into every response | Constants in source |
-
-### Creative Memory (Persistent)
-
-Atuona's creative memory tracks and persists across restarts:
-- **Recent metaphors** (cap 20) — extracted from every AI response
-- **Painting references** (cap 30) — 40+ known titles detected in responses
-- **Plot suggestions** (cap 10) — fresh directions given, never repeated
-- **Character insights** (cap 15 per character) — Kira, Ule, Vibe
-- **Surprise domains used** (cap 20) — cycles through all 7 domains
-- **Surprise insights used** (cap 25) — never repeats back-to-back
-- **Association patterns** (cap 20) — structural + inline patterns tracked
-- **Creative enhancements** (cap 30) — mood-specific directions tracked
-- **Response fingerprints** (cap 50) — deep anti-repetition
-
-Every AI response passes through `extractAndTrackFromResponse()` which parses for painting references, character mentions, metaphors, and fingerprints — then persists to `atuona-state.json`.
-
-### Commands
-
-| Category | Command | Description |
-|----------|---------|-------------|
-| **Writing** | `/create` | Generate next book page with full intelligence |
-| | `/import` | Import Russian text for translation + publishing |
-| | `/translate` | AI literary translation (Russian → English) |
-| | `/expand` | Expand a passage with context |
-| | `/scene` | Generate full scene with dynamic associations |
-| **Story** | `/dialogue` | Generate character conversations |
-| | `/recap` | Summary of recent chapters |
-| | `/arc` | Story arc analysis |
-| | `/ending` | Suggest chapter endings |
-| | `/whatif` | "What if..." story explorations |
-| **Collab** | `/collab` | Interactive back-and-forth writing |
-| | `/endcollab` | Compile collaboration into polished text |
-| **Knowledge** | `/art <topic>` | Deep-dive into art knowledge for writing |
-| | `/artist <name>` | Quick artist reference lookup |
-| | `/inspire` | Creative inspiration from knowledge base |
-| **Publishing** | `/preview` | Preview before publishing |
-| | `/publish` | Push to GitHub → atuona.xyz (atomic commit) |
-| **Film** | `/visualize` | Generate image + video for page |
-| | `/gallery` | View all visualizations |
-| **Voice** | `/voice kira` | Write as Kira Velerevich |
-| | `/voice ule` | Write as Ule Glensdagen |
-| | `/voice vibe` | Write as Vibe Coding Spirit |
-
-### How It Works
-
-```
-Elena ──► Text/Voice/Command ──► Emotional tone detection
-                                        │
-                                        ▼
-                                 Mood selection (13 moods)
-                                        │
-                                        ▼
-                           Knowledge injection (11 domains)
-                           Associative intelligence (7 surprise domains)
-                           Imaginative intelligence (anti-repetition)
-                                        │
-                                        ▼
-                                Claude Opus 4 generates
-                                        │
-                                        ▼
-                           extractAndTrackFromResponse()
-                           → paintings, metaphors, characters tracked
-                           → creative memory persisted to disk
-                                        │
-                                        ▼
-                                Response to Elena
-```
-
-### Setup
-
-Add to `.env` on your server:
-```bash
-ATUONA_BOT_TOKEN=<your-atuona-bot-token>
-```
-
-Restart: `pm2 restart cto-aipa`
+Second Telegram bot in this repo: **persistent creative memory**, **anti-repetition** (response fingerprints, used metaphors/paintings/insights tracked), **multi-modal orchestration** (text via Claude Opus 4; image/video via Replicate, Runway, Luma, DALL·E). State in `atuona-state.json` (local file, not in repo); every response runs through `extractAndTrackFromResponse()` and persists. Commands: `/create`, `/scene`, `/dialogue`, `/visualize`, `/publish`, etc. Set `ATUONA_BOT_TOKEN` in `.env` and restart PM2.
 
 ---
 
@@ -533,28 +434,14 @@ Single Node/Express process: GitHub webhooks and HTTP API drive the CTO pipeline
 | Storage (50GB) | Oracle Block Storage | $0 |
 | AI - Standard Reviews | Groq (free tier) | $0 |
 | AI - Critical Reviews | Anthropic Claude | ~$0.50 |
-| **Total** | | **< $1/month** 🎉 |
-
-**Traditional alternative:** Hiring a senior developer = $120K/year  
-**Savings:** 99.999% cost reduction
+| **Total** | | **< $1/month** |
 
 ---
 
-## 🛣️ Roadmap
+## Roadmap
 
-- [x] **Phase 1:** Core PR review automation
-- [x] **Phase 2:** CMO integration
-- [x] **Phase 3:** Push monitoring + Ask CTO + Opus 4
-- [x] **Phase 3.1:** Daily briefings + Proactive alerts + Voice messages
-- [x] **Phase 3.2:** Screenshot analysis + Idea capture + Ecosystem stats
-- [x] **Phase 3.3:** Learn to code + CTO writes code + CTO fixes bugs
-- [x] **Phase 3.4:** 🎭 ATUONA Creative AI - Creative Co-Founder
-- [x] **Phase 3.5:** ☁️ Oracle Cloud migration with startup credits
-- [x] **Phase 4.0:** 🧠 Atuona persistent creative memory — emotional + associative + imaginative intelligence
-- [ ] **Phase 5:** Multi-repo learning, custom coding standards
-- [ ] **Phase 6:** CFO AIPA, CPO AIPA, CEO AIPA
-
-**Vision:** Complete AI co-founder suite replacing traditional founding team.
+- [x] v4.0: Code review pipeline, Ask CTO, Oracle persistence, Atuona (persistent creative memory, multi-modal).
+- [ ] Next: Multi-repo learning, custom coding standards.
 
 ---
 
@@ -611,6 +498,8 @@ ATUONA_BOT_TOKEN=<your-atuona-bot-token>
 
 # Optional: Ask CTO from this repo (npm run ask-cto)
 CTO_AIPA_URL=http://YOUR_SERVER_IP:3000
+# Optional: URL shown in server startup logs (no hardcoded IPs in code)
+CTO_AIPA_PUBLIC_URL=http://YOUR_SERVER_IP:3000
 
 # Optional: AI Image/Video Generation
 REPLICATE_API_TOKEN=<your-replicate-token>
@@ -640,8 +529,6 @@ LUMA_API_KEY=<your-luma-key>
 | **Production** | Live on Oracle Cloud; PM2, cron, health endpoint; < $1/month; security scanning and structured error handling. |
 | **Codebase** | ~15k LOC TypeScript; single deployable service; clear separation between CTO flow, Atuona flow, and shared DB. |
 
-Built in 2 days, iterated over 3 months. **48+ creative pages** published to atuona.xyz with AI-generated imagery and video.
-
 ---
 
-**Version 4.0.0 | February 2026 | 🟢 Production**
+**Version 4.0.0 | February 2026 | Production**
