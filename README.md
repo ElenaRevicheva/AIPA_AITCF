@@ -27,7 +27,8 @@ Deployed on Oracle Cloud. PM2-managed. <$1/month operational cost.
 | [![Telegram CTO](docs/assets/readme-telegram.png)](docs/assets/readme-telegram.png) | [![Atuona](docs/assets/readme-atuona.png)](docs/assets/readme-atuona.png) |
 | **3. Telegram** — CTO bot menu or `/ask` / `/daily` response | **4. Atuona** — `/create` or `/visualize` output |
 
-*Add images to `docs/assets/` (see [docs/assets/README.md](docs/assets/README.md)).*
+*Add images to `docs/assets/` (see [docs/assets/README.md](docs/assets/README.md)).*  
+Trigger CTO AIPA review: open a PR or push to main — webhook posts the comment.
 
 ---
 
