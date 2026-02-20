@@ -5538,11 +5538,20 @@ _Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
     await ctx.reply('📝 *Compiling collaboration...*', { parse_mode: 'Markdown' });
     
     try {
+      // Truncate long collabs to avoid token limit / API errors (keep most recent)
+      const MAX_COLLAB_ENTRIES = 20;
+      const collabToCompile = creativeSession.collabHistory.length > MAX_COLLAB_ENTRIES
+        ? creativeSession.collabHistory.slice(-MAX_COLLAB_ENTRIES)
+        : creativeSession.collabHistory;
+      if (creativeSession.collabHistory.length > MAX_COLLAB_ENTRIES) {
+        console.log(`Collab truncated from ${creativeSession.collabHistory.length} to ${MAX_COLLAB_ENTRIES} entries for compile`);
+      }
+
       const compilePrompt = `${ATUONA_CONTEXT}
 
 Take this collaborative writing session and polish it into a cohesive scene/chapter excerpt:
 
-${creativeSession.collabHistory.join('\n\n')}
+${collabToCompile.join('\n\n')}
 
 Polish for:
 - Smooth transitions between contributions
@@ -5569,7 +5578,7 @@ ${compiled}
 ✅ Saved to memory!
 Use /import to add title and prepare for publishing.
 
-Contributions: ${creativeSession.collabHistory.length} exchanges 💜`, { parse_mode: 'Markdown' });
+Contributions: ${creativeSession.collabHistory.length} exchanges${creativeSession.collabHistory.length > MAX_COLLAB_ENTRIES ? ` (compiled last ${MAX_COLLAB_ENTRIES})` : ''} 💜`, { parse_mode: 'Markdown' });
       
       creativeSession.collabMode = false;
       creativeSession.collabHistory = [];
