@@ -230,6 +230,27 @@ function escapeMarkdown(text: string): string {
   return text.replace(/[_*[\]()~`>#+=|{}.!\\-]/g, '\\$&');
 }
 
+// Telegram message limit is 4096 chars. Chunk long text for safe sending.
+const TELEGRAM_MAX_MESSAGE_LENGTH = 4000;
+
+function chunkForTelegram(text: string, maxLen: number = TELEGRAM_MAX_MESSAGE_LENGTH): string[] {
+  if (text.length <= maxLen) return [text];
+  const chunks: string[] = [];
+  let remaining = text;
+  while (remaining.length > 0) {
+    if (remaining.length <= maxLen) {
+      chunks.push(remaining);
+      break;
+    }
+    const slice = remaining.slice(0, maxLen);
+    const lastBreak = Math.max(slice.lastIndexOf('\n\n'), slice.lastIndexOf('\n'), maxLen / 2);
+    const cutAt = lastBreak > maxLen / 2 ? lastBreak + 1 : maxLen;
+    chunks.push(remaining.slice(0, cutAt).trimEnd());
+    remaining = remaining.slice(cutAt).trimStart();
+  }
+  return chunks.filter((c) => c.length > 0);
+}
+
 // =============================================================================
 // ATUONA'S CREATIVE CONTEXT - The Soul of the Book
 // =============================================================================
@@ -5568,17 +5589,14 @@ Do NOT add new content - just polish what exists. In Russian.`;
       
       // Store as potential content
       bookState.lastPageContent = compiled;
-      
-      await ctx.reply(`📜 *Collaboration Complete*
 
-━━━━━━━━━━━━━━━━━━━━
-${compiled}
-━━━━━━━━━━━━━━━━━━━━
-
-✅ Saved to memory!
-Use /import to add title and prepare for publishing.
-
-Contributions: ${creativeSession.collabHistory.length} exchanges${creativeSession.collabHistory.length > MAX_COLLAB_ENTRIES ? ` (compiled last ${MAX_COLLAB_ENTRIES})` : ''} 💜`, { parse_mode: 'Markdown' });
+      // Telegram limit 4096 chars — send in chunks to avoid "message is too long"
+      const footer = `✅ Saved to memory!\nUse /import to add title and prepare for publishing.\n\nContributions: ${creativeSession.collabHistory.length} exchanges${creativeSession.collabHistory.length > MAX_COLLAB_ENTRIES ? ` (compiled last ${MAX_COLLAB_ENTRIES})` : ''} 💜`;
+      await ctx.reply('📜 *Collaboration Complete*\n\n━━━━━━━━━━━━━━━━━━━━', { parse_mode: 'Markdown' });
+      for (const chunk of chunkForTelegram(compiled)) {
+        await ctx.reply(chunk);
+      }
+      await ctx.reply(`━━━━━━━━━━━━━━━━━━━━\n\n${footer}`, { parse_mode: 'Markdown' });
       
       creativeSession.collabMode = false;
       creativeSession.collabHistory = [];
