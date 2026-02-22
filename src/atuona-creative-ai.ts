@@ -2793,7 +2793,7 @@ async function generateVideo(
       // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
       const lumaBody = {
         model: 'ray-2',  // Required field - Luma's latest model
-        prompt: `9-second fragment. ${prompt.substring(0, 180)}. Subtle living motion: wind in hair, silk catching breeze, ocean waves on volcanic sand, golden light shifting, palm fronds moving, clouds drifting. Gauguin's Marquesas palette. Grain, texture, breath-like drift. Paradise on earth — beauty that costs something. Fashion editorial meets tropical melancholy. One commit to Paradise.js.`,
+        prompt: `9-second cinematic fragment. ${prompt.substring(0, 400)}. Grain, texture, Gauguin palette.`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -2857,7 +2857,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `9-second fragment. ${prompt.substring(0, 180)}. Living motion: ocean surf, wind through silk and palm fronds, tropical light shifting, body in gentle movement. Gauguin's Marquesas palette. Grain, breath, intimate beauty. Fashion noir meets Paradise. A moment from the Gallery of Moments.`,
+            prompt: `9-second cinematic fragment. ${prompt.substring(0, 400)}. Grain, texture, Gauguin palette.`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -2900,7 +2900,7 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
         promptImage: imageUrl,
-        promptText: `9-12 second fragment. ${prompt.substring(0, 150)}. Living motion: ocean waves, wind in hair and silk, shifting golden light, tropical rain, body in gentle drift. Gauguin palette. Fashion editorial meets Marquesas. Grain, texture, melancholy beauty.`,
+        promptText: `9-12 second cinematic fragment. ${prompt.substring(0, 350)}. Grain, Gauguin palette.`,
         duration: 10,  // 10 seconds for immersive clips
         watermark: false,
         ratio: '1280:768'
@@ -7086,6 +7086,20 @@ Rules:
       
       const caption = await createContent(captionPrompt, 100, true);
       
+      // Generate page-specific MOTION prompt for video (avoids generic hands/laptops/flowers)
+      const motionPromptInput = `TITLE: "${title}"
+THEME: ${theme}
+TEXT: "${englishText.substring(0, 500)}"
+
+Write a SHORT motion direction (2-3 sentences, max 80 words) for a 9-second video that animates a still image of this scene.
+Rules: Describe WHAT moves and HOW, specific to this poem's mood and imagery. Let the content drive the motion.
+- Nature/Paradise → landscape motion (waves, light, wind through foliage, clouds)
+- Fashion/intimacy → fabric, hair, subtle body movement, light on skin
+- Tech/code → screen glow, cursor blink, code reflection, distant horizon
+AVOID generic clichés: hands typing, laptop close-ups, flower close-ups — unless the poem explicitly demands them.
+Return ONLY the motion direction. No preamble.`;
+      const motionPrompt = await createContent(motionPromptInput, 120, true);
+      
       // Generate hashtags
       const hashtags = ['#ATUONA', '#AIFilm', '#VibeCoding', '#UndergroundArt', '#ParadiseFound', '#AIGenerated', '#DigitalArt', '#BookToFilm'];
       
@@ -7297,7 +7311,7 @@ Free tier limit reached. Options:
       if (visualization.imageUrlHorizontal && (lumaApiKey || replicate || runwayApiKey)) {
         const videoResult = await generateVideo(
           visualization.imageUrlHorizontal,
-          imagePrompt,
+          motionPrompt,  // Page-specific motion, not truncated image prompt
           ctx
         );
         
