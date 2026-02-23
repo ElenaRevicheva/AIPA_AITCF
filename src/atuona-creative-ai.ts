@@ -3186,7 +3186,8 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 
 ⚠️ *NEW vs UPDATE:*
 • /publish = Add NEW poem (next number)
-• /update 047 = REPLACE existing #047`, { parse_mode: 'Markdown' });
+• /update 047 = REPLACE #047 in English
+• /update 047 ru = REPLACE #047 in Russian (original)`, { parse_mode: 'Markdown' });
       
     } else if (topic === 'film' || topic === 'visual' || topic === 'video') {
       await ctx.reply(`🎬 *AI Film Studio Help*
@@ -3396,7 +3397,7 @@ _Just click any command to see what it does!_
 ━━━━━━━━━━━━━━━━━━━━
 /preview - 👁 See before publishing
 /publish - 🌐 Push NEW to atuona.xyz
-/update 047 - ✏️ OVERWRITE existing poem
+/update 047 [ru] - ✏️ OVERWRITE poem (ru = Russian)
 /read 048 - 📖 Read published page
 /setpage - 🔢 Fix page numbering
 /cto - 📧 Message tech support
@@ -3886,7 +3887,7 @@ ${englishText.substring(0, 800)}${englishText.length > 800 ? '...' : ''}
 ✅ Ready! Use:
 • /preview - Full text both languages
 • /publish - NEW poem to atuona.xyz
-• /update 047 - REPLACE existing poem #047
+• /update 047 - REPLACE #047 (English) | /update 047 ru - REPLACE #047 (Russian)
 • /import - Import another page`;
 
       await ctx.reply(previewMessage, { parse_mode: 'Markdown' });
@@ -4455,8 +4456,8 @@ Try again or check GitHub permissions!`);
     }
   });
   
-  // /update <page_number> - Overwrite existing NFT poem content
-  // FIX: Previously, trying to change content would add new cards instead of replacing
+  // /update <page_number> [ru|en] - Overwrite existing NFT poem content
+  // Option: ru = keep original (Russian), en = translate to English (default)
   atuonaBot.command('update', async (ctx) => {
     const input = ctx.message?.text?.replace('/update', '').trim();
     
@@ -4470,11 +4471,13 @@ Overwrite content for an existing NFT poem.
    \`/import Новый текст...\`
 
 2. Then update specific page:
-   \`/update 047\`
+   \`/update 047\` — publish in *English* (translated)
+   \`/update 047 ru\` — publish in *Russian* (original, no translation)
 
 *Example:*
 \`/import На память | Новый исправленный текст стихотворения...\`
-\`/update 047\`
+\`/update 047\` — English
+\`/update 047 ru\` — Russian (as imported)
 
 This will:
 ✏️ Replace NFT card in VAULT
@@ -4499,12 +4502,17 @@ Then run:
       return;
     }
     
-    // Parse page number
-    const pageNum = parseInt(input.replace(/^0+/, '') || input);
+    // Parse page number and optional language: "047", "047 ru", "047 russian", "047 en"
+    const parts = input.split(/\s+/);
+    const pageInput = parts[0] || input;
+    const langHint = (parts[1] || '').toLowerCase();
+    const useRussian = langHint === 'ru' || langHint === 'russian';
+    
+    const pageNum = parseInt(pageInput.replace(/^0+/, '') || pageInput);
     if (isNaN(pageNum) || pageNum < 1) {
-      await ctx.reply(`❌ Invalid page number: "${input}"
+      await ctx.reply(`❌ Invalid page number: "${pageInput}"
 
-Use format: \`/update 047\` or \`/update 47\``);
+Use format: \`/update 047\`, \`/update 047 ru\`, or \`/update 47\``);
       return;
     }
     
@@ -4538,7 +4546,7 @@ Use /update only for existing poems.`);
         throw e;
       }
       
-      await ctx.reply(`✅ Found poem #${pageId}. Preparing update...`);
+      await ctx.reply(`✅ Found poem #${pageId}. Preparing update...${useRussian ? '\n\n_Language: Russian (original)_' : ''}`);
       
       // Get content from bookState
       const title = bookState.lastPageTitle;
@@ -4548,8 +4556,13 @@ Use /update only for existing poems.`);
       const theme = bookState.lastPageTheme || 'Journey';
       const description = bookState.lastPageDescription || '';
       
+      // When useRussian: display and metadata use Russian (no translation)
+      const displayTitle = useRussian ? title : englishTitle;
+      const displayText = useRussian ? russianText : englishText;
+      const metaEnglish = useRussian ? russianText : englishText; // metadata "English" field
+      
       // Prepare updated metadata
-      const metadata = createNFTMetadata(pageId, title, russianText, englishText, theme);
+      const metadata = createNFTMetadata(pageId, title, russianText, metaEnglish, theme);
       const metadataContent = JSON.stringify(metadata, null, 2);
       
       // Get and update poems JSON
@@ -4575,7 +4588,7 @@ Use /update only for existing poems.`);
             return idAttr?.value === pageId || p.name?.endsWith(`#${pageId}`);
           });
           
-          const fullPoemEntry = createFullPoemEntry(pageId, title, russianText, englishText, theme);
+          const fullPoemEntry = createFullPoemEntry(pageId, title, russianText, metaEnglish, theme);
           
           if (existingIndex >= 0) {
             // REPLACE existing entry
@@ -4605,8 +4618,8 @@ Use /update only for existing poems.`);
         throw new Error('Could not fetch required files from repository');
       }
       
-      // Generate new NFT card HTML
-      const nftCardHtml = createNFTCardHtml(pageId, pageNum, englishTitle, englishText, theme, description);
+      // Generate new NFT card HTML (displayTitle/displayText = Russian or English per user choice)
+      const nftCardHtml = createNFTCardHtml(pageId, pageNum, displayTitle, displayText, theme, description);
       
       // =============================================================================
       // KEY FIX: REPLACE existing NFT card in VAULT (not add new!)
@@ -4655,10 +4668,10 @@ Use /update only for existing poems.`);
       // KEY FIX: REPLACE existing gallery slot in MINT (not add new!)
       // =============================================================================
       
-      const newSlotHtml = `<div class="gallery-slot" onclick="claimPoem(${pageNum}, '${englishTitle.replace(/'/g, "\\'")}')">
+      const newSlotHtml = `<div class="gallery-slot" onclick="claimPoem(${pageNum}, '${displayTitle.replace(/'/g, "\\'")}')">
                             <div class="slot-content">
                                 <div class="slot-id">${pageId}</div>
-                                <div class="slot-label">${englishTitle}</div>
+                                <div class="slot-label">${displayTitle}</div>
                                 <div class="slot-year">2025</div>
                                 <div class="claim-button">CLAIM RANDOM POEM</div>
                             </div>
@@ -4782,7 +4795,7 @@ Use /update only for existing poems.`);
       const { data: newCommit } = await octokit.git.createCommit({
         owner,
         repo: repoName,
-        message: `✏️ Update poem #${pageId} "${englishTitle}" - content overwrite`,
+        message: `✏️ Update poem #${pageId} "${displayTitle}" - content overwrite (${useRussian ? 'RU' : 'EN'})`,
         tree: newTree.sha,
         parents: [currentCommitSha]
       });
@@ -4809,6 +4822,7 @@ Use /update only for existing poems.`);
       await ctx.reply(`✅ *Updated Successfully!*
 
 📖 *Poem #${pageId}*: "${updatedTitle}"
+📝 *Display:* ${useRussian ? 'Russian (original)' : 'English (translated)'}
 
 ━━━━━━━━━━━━━━━━━━━━
 ✏️ metadata/${pageId}.json - REPLACED
@@ -4816,8 +4830,6 @@ Use /update only for existing poems.`);
 ✏️ Gallery slot in MINT - REPLACED
 ✏️ Poems JSON entry - REPLACED
 ━━━━━━━━━━━━━━━━━━━━
-🇷🇺 Russian: ✅ Updated
-🇬🇧 English: ✅ Updated
 🎭 Theme: ${theme}
 ━━━━━━━━━━━━━━━━━━━━
 
