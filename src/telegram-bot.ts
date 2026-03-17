@@ -97,6 +97,9 @@ interface ConversationContext {
 
 const conversationContexts = new Map<number, ConversationContext>();
 
+// Track whether the last voice interaction for a user was a JOB_SEARCH intent
+const recentJobSearchVoice = new Map<number, number>(); // userId -> timestamp (ms)
+
 function getConversationContext(userId: number): ConversationContext {
   let ctx = conversationContexts.get(userId);
   if (!ctx) {
@@ -5377,6 +5380,8 @@ Ready to commit? Use:
         lower.includes('job engine')
       ) {
         await handleJobSearchVoiceIntent(ctx, transcription);
+        const userId = ctx.from?.id || 0;
+        recentJobSearchVoice.set(userId, Date.now());
         // We deliberately STOP here: no automatic file/path guessing or edits.
         // Any concrete code work will be done later in Cursor with your confirmation.
         return;
@@ -5538,6 +5543,22 @@ Keep response concise for Telegram. Use emojis.`;
     }
     
     const lowerQ = question.toLowerCase();
+
+    // If a JOB_SEARCH voice intent was detected very recently, avoid auto-mapping
+    // natural language into /readfile or /editfile. Keep answers high-level.
+    const userId = ctx.from?.id || 0;
+    const lastJobVoice = recentJobSearchVoice.get(userId);
+    const withinJobVoiceWindow = lastJobVoice && (Date.now() - lastJobVoice < 5 * 60 * 1000); // 5 minutes
+    if (withinJobVoiceWindow) {
+      await ctx.reply(
+`🧠 I’m keeping this in JOB_SEARCH planning mode.
+
+I won’t guess file paths or run /readfile or /editfile from this question.
+Use this time to clarify what you want to improve, and we’ll do the concrete code edits together later in Cursor.`,
+      );
+      // Do NOT fall through to the auto-command detection below.
+      return;
+    }
     
     // ==========================================================================
     // CURSOR-LIKE INTENT DETECTION - Understand natural language requests
