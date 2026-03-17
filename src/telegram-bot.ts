@@ -591,7 +591,34 @@ Or just ask me anything - I understand natural language!`;
       await showMenu(ctx);
       return;
     }
-    
+
+    // Special-case: Personal AI menu, keep response very small & robust
+    if (section === 'personal_ai') {
+      await ctx.answerCallbackQuery();
+      await ctx.reply(`*🧠 PERSONAL AI (JOB + PROJECTS)*
+
+*/project* - Set active project or job search mode
+  \`/project job\` → JOB_SEARCH umbrella (VibeJob Hunter + YC shortlist)
+
+*/rules* - Show project rules
+  In JOB_SEARCH mode this shows JOB_SEARCH.md summary
+
+*/know* - Search your knowledge base
+*/diary* - Save diary entry (job search or project)
+*/tasks* - Show your pending tasks
+*/research* - Save research / market notes
+*/resume* - Restore last session
+*/forget* - Clear conversation context (keeps knowledge base)`, {
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '📋 Back to Menu', callback_data: 'menu:main' }]
+          ]
+        }
+      });
+      return;
+    }
+
     const sectionData = MENU_SECTIONS[section];
     if (!sectionData) {
       await ctx.answerCallbackQuery({ text: 'Unknown section' });
