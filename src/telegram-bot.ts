@@ -592,24 +592,25 @@ Or just ask me anything - I understand natural language!`;
       return;
     }
 
-    // Special-case: Personal AI menu, keep response very small & robust
+    // Special-case: Personal AI menu, keep response very small & robust (no Markdown to avoid parse errors)
     if (section === 'personal_ai') {
       await ctx.answerCallbackQuery();
-      await ctx.reply(`*🧠 PERSONAL AI (JOB + PROJECTS)*
+      await ctx.reply(
+`🧠 PERSONAL AI (JOB + PROJECTS)
 
-*/project* - Set active project or job search mode
-  \`/project job\` → JOB_SEARCH umbrella (VibeJob Hunter + YC shortlist)
+/project  - Set active project or job search mode
+  Example: /project job  (JOB_SEARCH umbrella: VibeJob Hunter + YC shortlist)
 
-*/rules* - Show project rules
+/rules    - Show project rules
   In JOB_SEARCH mode this shows JOB_SEARCH.md summary
 
-*/know* - Search your knowledge base
-*/diary* - Save diary entry (job search or project)
-*/tasks* - Show your pending tasks
-*/research* - Save research / market notes
-*/resume* - Restore last session
-*/forget* - Clear conversation context (keeps knowledge base)`, {
-        parse_mode: 'Markdown',
+/know     - Search your knowledge base
+/diary    - Save diary entry (job search or project)
+/tasks    - Show your pending tasks
+/research - Save research / market notes
+/resume   - Restore last session
+/forget   - Clear conversation context (keeps knowledge base)`,
+      {
         reply_markup: {
           inline_keyboard: [
             [{ text: '📋 Back to Menu', callback_data: 'menu:main' }]
