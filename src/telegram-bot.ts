@@ -259,11 +259,18 @@ const REPO_ALIASES: Record<string, string> = {
   'docs': 'aideazz-private-docs',
   'pitch': 'aideazz-pitch-deck',
   'deck': 'aideazz-pitch-deck',
+  // Pseudo-project for job search umbrella (no actual repo)
+  'job': 'JOB_SEARCH',
 };
 
 // Helper to resolve repo name (supports aliases and case-insensitive matching)
 function resolveRepoName(input: string): string | null {
   const normalized = input.toLowerCase().trim();
+
+  // Special case: JOB_SEARCH is a pseudo-project, not a GitHub repo
+  if (normalized === 'job' || normalized === 'job_search' || normalized === 'job-search') {
+    return 'JOB_SEARCH';
+  }
   
   // Check aliases first
   if (REPO_ALIASES[normalized]) {
@@ -5827,7 +5834,9 @@ Act like Cursor - understand context, suggest the right action, remember the con
     
     if (!input) {
       const currentProject = convCtx.activeRepo || 'None set';
-      const claudeMd = convCtx.activeRepo ? await loadClaudeMd(convCtx.activeRepo) : null;
+      const claudeMd = convCtx.activeRepo === 'JOB_SEARCH'
+        ? JOB_SEARCH_DOC_SNIPPET
+        : (convCtx.activeRepo ? await loadClaudeMd(convCtx.activeRepo) : null);
       
       await ctx.reply(`📁 *Active Project*
 
@@ -5839,13 +5848,31 @@ ${claudeMd ? '✅ CLAUDE.md found' : '❌ No CLAUDE.md'}
 \`/project whatsapp\` - EspaLuzWhatsApp
 \`/project cto\` - CTO AIPA
 \`/project atuona\` - Atuona book
+\`/project job\` - Job search umbrella (VibeJob Hunter + YC shortlist)
 
 Or use any repo alias!`, { parse_mode: 'Markdown' });
       return;
     }
     
+    // Pseudo-project: JOB_SEARCH (job search umbrella)
+    if (input.toLowerCase() === 'job') {
+      convCtx.activeRepo = 'JOB_SEARCH';
+      convCtx.lastUpdated = Date.now();
+      syncContextToDb(userId);
+
+      await ctx.reply(`✅ *Switched to JOB_SEARCH*
+
+📋 *Job search rules (JOB_SEARCH.md):*
+\`\`\`
+${JOB_SEARCH_DOC_SNIPPET}
+\`\`\`
+
+Now I will treat your questions and notes as part of your job search system (VibeJob Hunter + YC shortlist).`, { parse_mode: 'Markdown' });
+      return;
+    }
+
     const repoName = resolveRepoName(input);
-    if (!repoName) {
+    if (!repoName || repoName === 'JOB_SEARCH') {
       await ctx.reply(`❌ Unknown project: "${input}"\n\nUse /repos to see available projects.`);
       return;
     }
@@ -6017,7 +6044,7 @@ Or send a voice note: "I found out that..." or "Research: ..."`, { parse_mode: '
     }
   });
 
-  // /rules - Show CLAUDE.md for current project
+  // /rules - Show CLAUDE.md for current project (or JOB_SEARCH.md for job search)
   bot.command('rules', async (ctx) => {
     const userId = ctx.from?.id || 0;
     const convCtx = getConversationContext(userId);
@@ -6027,6 +6054,18 @@ Or send a voice note: "I found out that..." or "Research: ..."`, { parse_mode: '
       return;
     }
     
+    // Special: JOB_SEARCH pseudo-project reads local JOB_SEARCH.md
+    if (convCtx.activeRepo === 'JOB_SEARCH') {
+      await ctx.reply(`📋 *JOB_SEARCH — Job Search Rules*
+
+\`\`\`
+${JOB_SEARCH_DOC_SNIPPET}
+\`\`\`
+
+Use \`/project job\` to keep CTO AIPA in job-search mode while we plan applications, outreach, and improvements to VibeJob Hunter + YC shortlist.`, { parse_mode: 'Markdown' });
+      return;
+    }
+
     const claudeMd = await loadClaudeMd(convCtx.activeRepo);
     
     if (!claudeMd) {
@@ -6532,6 +6571,13 @@ async function handlePersonalAIAction(
   
   return false;
 }
+
+// Small cached snippet of JOB_SEARCH rules for quick display (loaded from local docs)
+const JOB_SEARCH_DOC_SNIPPET = `JOB_SEARCH — umbrella for job search:
+- Target: remote, AI-systems roles paying ≥ $3.5K/month net.
+- Focus: AI agents, automation, internal tools (no WordPress/ads/random tech help).
+- Use existing agents: VibeJob Hunter + YC/OpenClaw shortlist.
+- Roles: Applied AI / AI Systems / Agent Engineer / Internal AI Tools.`;
 
 // Load CLAUDE.md from a repo (for project-specific instructions)
 async function loadClaudeMd(repoAlias: string): Promise<string | null> {
