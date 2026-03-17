@@ -5364,6 +5364,23 @@ Ready to commit? Use:
       
       // Show what was heard
       await ctx.reply(`🎤 I heard: "${transcription.substring(0, 200)}${transcription.length > 200 ? '...' : ''}"`);
+
+      // SPECIAL CASE: Job-search / VibeJob Hunter intents from voice
+      const lower = transcription.toLowerCase();
+      if (
+        lower.includes('vibejobhunter') ||
+        lower.includes('vibe job hunter') ||
+        lower.includes('job matcher') ||
+        lower.includes('job matching') ||
+        lower.includes('job search') ||
+        lower.includes('improve my job') ||
+        lower.includes('job engine')
+      ) {
+        await handleJobSearchVoiceIntent(ctx, transcription);
+        // We deliberately STOP here: no automatic file/path guessing or edits.
+        // Any concrete code work will be done later in Cursor with your confirmation.
+        return;
+      }
       
       // PERSONAL AI UPGRADE: Detect intent from voice message
       const intent = await detectPersonalAIIntent(transcription);
@@ -6549,6 +6566,36 @@ async function detectPersonalAIIntent(text: string): Promise<{
   
   // Default to conversation
   return { type: 'conversation' };
+}
+
+// Handle high-level JOB_SEARCH voice intents without touching code directly
+async function handleJobSearchVoiceIntent(ctx: Context, text: string): Promise<void> {
+  const userId = ctx.from?.id || 0;
+
+  // Save as a JOB_SEARCH task so it shows up in /tasks
+  await saveKnowledge(
+    userId,
+    'task',
+    'Improve VibeJob Hunter job matching accuracy',
+    text,
+    'pending',
+    'JOB_SEARCH',
+    'voice'
+  );
+
+  await ctx.reply(
+`🧠 JOB_SEARCH intent detected.
+
+Here is how I will handle this:
+1) Treat this as a JOB_SEARCH task: "Improve VibeJob Hunter job matching accuracy".
+2) When you are in Cursor, we will:
+   - Inspect the real matching logic files in VibeJobHunterAIPA_AIMCF.
+   - Propose specific scoring/filter changes aligned with JOB_SEARCH.md.
+   - Draft a small, reviewable patch instead of changing code blindly from Telegram.
+
+Nothing has been changed in code yet.
+When you are ready at the laptop, tell me in Cursor and we will implement the patch together.`,
+  );
 }
 
 // Handle Personal AI actions (called from voice handler or text)
