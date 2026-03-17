@@ -508,12 +508,12 @@ Type /menu for all commands! 🚀
     'personal_ai': {
       title: '🧠 PERSONAL AI (NEW!)',
       commands: [
-        { cmd: '/project', desc: 'Set active project (no need to specify repo)', usage: '/project espaluz\nNow /readfile main.py works!' },
+        { cmd: '/project', desc: 'Set active project (repos or job search)', usage: '/project espaluz\n/project job\nNow /readfile main.py or job-focused commands work without specifying repo.' },
         { cmd: '/know', desc: 'Search your knowledge base', usage: '/know pricing strategy\n/know EspaLuz features' },
         { cmd: '/diary', desc: 'Quick diary entry', usage: '/diary Today I launched the new feature...' },
         { cmd: '/tasks', desc: 'Show your pending tasks', usage: '/tasks' },
         { cmd: '/research', desc: 'Save research notes', usage: '/research Competitor X charges $20/mo' },
-        { cmd: '/rules', desc: 'Show CLAUDE.md for current project', usage: '/rules' },
+        { cmd: '/rules', desc: 'Show project rules (CLAUDE.md or JOB_SEARCH.md)', usage: '/rules\nIn /project job, this shows JOB_SEARCH rules.' },
         { cmd: '/resume', desc: 'Restore your last session', usage: '/resume\nLoads your context from database' },
         { cmd: '/forget', desc: 'Clear conversation memory', usage: '/forget\nStart fresh (keeps knowledge base)' },
       ]

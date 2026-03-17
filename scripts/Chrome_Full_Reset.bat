@@ -18,13 +18,14 @@ echo    - Bookmarks, saved passwords, extensions
 echo    - All profiles, cache, cookies, history
 echo    - Chrome will start as if freshly installed
 echo.
+if /i "%1"=="/Y" goto :do_reset
 set /p confirm="Type YES to continue: "
 if /i not "%confirm%"=="YES" (
     echo Aborted.
     pause
     exit /b 0
 )
-
+:do_reset
 echo.
 echo [1/3] Closing Chrome...
 taskkill /F /IM chrome.exe >nul 2>&1
