@@ -79,5 +79,5 @@ So the process was “dying” repeatedly; from the outside it looked like “no
 
 ## References
 
-- **Resilience and health script:** `docs/ORACLE_ALL_PRODUCTS_RESILIENCE.md`, `scripts/oracle-resilience/check_oracle_health.sh`  
+- **Resilience and health script:** `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md`, `scripts/oracle-resilience/check_oracle_health.sh`
 - **DragonTrade repo:** [ElenaRevicheva/dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent)

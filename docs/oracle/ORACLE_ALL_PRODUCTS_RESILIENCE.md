@@ -184,6 +184,6 @@ Do this once on the server (SSH as above).
 ## References
 
 - Plan (EspaLuz-focused): `.cursor/plans/oracle_instance_resilience_d6cfcf8b.plan.md`
-- CTO review (WatchdogSec, all products): `docs/ORACLE_RESILIENCE_PLAN_REVIEW.md`
+- CTO review (WatchdogSec, all products): `docs/oracle/ORACLE_RESILIENCE_PLAN_REVIEW.md`
 - Migration/ports: `docs/RAILWAY_TO_ORACLE_MIGRATION.md`
 - Private infra docs (may not list all products): [aideazz-private-docs / oracle-infrastructure](https://github.com/ElenaRevicheva/aideazz-private-docs/tree/docs/docs/plans/oracle-infrastructure)
