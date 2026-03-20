@@ -16,7 +16,7 @@
 
 ---
 
-## All 8 AI Agents on Oracle (Canonical List)
+## All 9 AI Agents on Oracle (Canonical List)
 
 Every agent on this instance **must** have: (1) restart hardening, (2) a health-check (HTTP or process liveness) that restarts if unhealthy, (3) included in OCI keep-alive.
 
@@ -30,8 +30,9 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 | 6 | **AI Marketing Co-Founder** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | Same process as 5 when on Oracle | (same as 5) | (same as 5) |
 | 7 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` |
 | 8 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 7) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 7) | `cto-aipa` | `http://127.0.0.1:3000/` |
+| 9 | **AELA** | [AELA](https://github.com/ElenaRevicheva/AELA) |  |  |  |  |
 
-**Repos (4):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, AIPA_AITCF (6 repos for 8 agents; 7+8 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF).
+**Repos (4):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, AIPA_AITCF, AELA (7 repos for 9 agents; 7+8 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF).
 
 **Action:** On the server run `pm2 list` and `systemctl list-units --type=service --all | grep -E 'espaluz|cto|vibe|dragon|algom'` and set the exact service/PM2 names and ports in the health script. Add a simple HTTP health endpoint in any bot that doesn’t have one (e.g. `/health` returning 200) so the cron can detect hangs, not only crashes.
 
@@ -169,14 +170,14 @@ Do this once on the server (SSH as above).
 
 - [ ] **Verify**  
   - [ ] `sudo systemctl status espaluz-whatsapp espaluz-influencer` (and any other systemd bots)  
-  - [ ] `pm2 list` (all 8 agents: 7+8 = cto-aipa; 5+6 = one app if on Oracle; 4 = dragontrade/algom if PM2)  
+- [ ] `pm2 list` (all 9 agents: 7+8 = cto-aipa; 5+6 = one app if on Oracle; 4 = dragontrade/algom if PM2; 9 = AELA)  
   - [ ] Wait 5 minutes and `tail -50 /var/log/oracle-health.log`
 
 ---
 
 ## 6. When You Add or Change Agents
 
-- Keep the "All 8 AI Agents" table updated with exact service names and health URLs.- In `check_oracle_health.sh`: add or uncomment a block for that agent (curl health URL then restart if non-200, or systemctl/pm2 restart if process check only).
+- Keep the "All 9 AI Agents" table updated with exact service names and health URLs.- In `check_oracle_health.sh`: add or uncomment a block for that agent (curl health URL then restart if non-200, or systemctl/pm2 restart if process check only).
 - In `oci_keepalive.sh`: add a curl to each agent's health URL so keep-alive touches every service that has HTTP.
 
 ---
