@@ -1,6 +1,8 @@
 # AIPA Architecture Document
 ## Claude Opus 4.6 analysis — March 21, 2026
 
+**See also:** `AIPA_NLU_AUDIT.md` — codebase audit of intent routing, regex vs LLM behavior, and gaps (text vs voice).
+
 ---
 
 ## Overview
