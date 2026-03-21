@@ -42,6 +42,10 @@ import * as cron from 'node-cron';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+
+const execFileAsync = promisify(execFile);
 
 // =============================================================================
 // TELEGRAM BOT FOR CTO AIPA v3.2
@@ -348,6 +352,117 @@ async function askAI(prompt: string, maxTokens: number = 1500): Promise<string> 
   }
 }
 
+// =============================================================================
+// ON-THE-GO OPS (PM2 / systemd) — allowlist only, runs on the host running CTO AIPA
+// =============================================================================
+
+const OPS_EXEC_TIMEOUT_MS = 28000;
+const OPS_LOGS_MAX_CHARS = 12000;
+
+type OpsBackend =
+  | { kind: 'pm2'; app: string }
+  | { kind: 'systemd'; unit: string };
+
+/** Telegram-facing alias → backend. Never pass user text as shell; only these keys match. */
+const OPS_AGENT_ALIASES: Record<string, OpsBackend> = {
+  'cto-aipa': { kind: 'pm2', app: 'cto-aipa' },
+  'dragon-main': { kind: 'pm2', app: 'dragontrade-main' },
+  'dragon-dash': { kind: 'pm2', app: 'dragontrade-dashboard' },
+  'dragon-binance': { kind: 'pm2', app: 'dragontrade-binance' },
+  'dragon-bybit': { kind: 'pm2', app: 'dragontrade-bybit' },
+};
+
+function resolveOpsBackend(token: string): OpsBackend | null {
+  const key = token.trim().toLowerCase();
+  if (!key || key.length > 64) return null;
+  if (OPS_AGENT_ALIASES[key]) return OPS_AGENT_ALIASES[key];
+  for (const def of Object.values(OPS_AGENT_ALIASES)) {
+    if (def.kind === 'pm2' && def.app === key) return def;
+    if (def.kind === 'systemd') {
+      const base = def.unit.replace(/\.service$/i, '');
+      if (base === key || def.unit.toLowerCase() === key) return def;
+    }
+  }
+  return null;
+}
+
+function listOpsAgentKeysForHelp(): string {
+  return Object.keys(OPS_AGENT_ALIASES)
+    .sort()
+    .map((k) => `\`${k}\``)
+    .join(', ');
+}
+
+async function execOpsCapture(cmd: string, args: string[]): Promise<{ ok: boolean; out: string }> {
+  try {
+    const { stdout, stderr } = await execFileAsync(cmd, args, {
+      maxBuffer: 4 * 1024 * 1024,
+      timeout: OPS_EXEC_TIMEOUT_MS,
+      windowsHide: true
+    });
+    const out = `${stdout || ''}${stderr ? `\n${stderr}` : ''}`.trim();
+    return { ok: true, out: out || '(no output)' };
+  } catch (e: unknown) {
+    const err = e as { stdout?: string; stderr?: string; message?: string };
+    const out = [err.stdout, err.stderr, err.message].filter(Boolean).join('\n').trim();
+    return { ok: false, out: out || 'command failed' };
+  }
+}
+
+async function fetchLogsForAgent(backend: OpsBackend): Promise<string> {
+  if (backend.kind === 'pm2') {
+    const r = await execOpsCapture('pm2', ['logs', backend.app, '--lines', '50', '--nostream']);
+    return r.out;
+  }
+  const unit = backend.unit.endsWith('.service') ? backend.unit : `${backend.unit}.service`;
+  const r = await execOpsCapture('journalctl', ['-u', unit, '-n', '50', '--no-pager']);
+  return r.out;
+}
+
+async function restartAgent(backend: OpsBackend): Promise<{ ok: boolean; message: string }> {
+  if (backend.kind === 'pm2') {
+    const r = await execOpsCapture('pm2', ['restart', backend.app]);
+    return {
+      ok: r.ok,
+      message: r.ok ? `✅ PM2 restarted \`${backend.app}\`\n${r.out.slice(0, 1500)}` : `❌ PM2 restart failed\n${r.out.slice(0, 1500)}`
+    };
+  }
+  const unit = backend.unit.endsWith('.service') ? backend.unit : `${backend.unit}.service`;
+  const r = await execOpsCapture('sudo', ['-n', 'systemctl', 'restart', unit]);
+  return {
+    ok: r.ok,
+    message: r.ok
+      ? `✅ systemctl restarted \`${unit}\`\n${r.out.slice(0, 1500)}`
+      : `❌ systemctl restart failed (often needs NOPASSWD sudo for this unit)\n${r.out.slice(0, 1500)}`
+  };
+}
+
+async function buildHostStatusSummary(): Promise<string> {
+  const pm2j = await execOpsCapture('pm2', ['jlist']);
+  if (!pm2j.ok) {
+    return `⚠️ *Host / PM2*\nCould not run \`pm2 jlist\` on this machine:\n\`${escapeMarkdown(pm2j.out.slice(0, 400))}\``;
+  }
+  try {
+    const apps = JSON.parse(pm2j.out) as Array<{
+      name?: string;
+      pm2_env?: { status?: string };
+      monit?: { memory?: number; cpu?: number };
+    }>;
+    const lines = apps.map((a) => {
+      const name = a.name || '?';
+      const st = a.pm2_env?.status || '?';
+      const mem =
+        typeof a.monit?.memory === 'number' ? `${Math.round(a.monit.memory / 1048576)}MB` : '—';
+      const cpu = typeof a.monit?.cpu === 'number' ? `${Math.round(a.monit.cpu * 10) / 10}%` : '—';
+      return `• *${escapeMarkdown(name)}* — ${escapeMarkdown(String(st))} — RAM ${mem} — CPU ${cpu}`;
+    });
+    const body = lines.length ? lines.join('\n') : '_(no PM2 processes)_';
+    return `🖥️ *PM2 on this server*\n\n${body}`;
+  } catch {
+    return `⚠️ *Host / PM2*\nCould not parse \`pm2 jlist\` output.`;
+  }
+}
+
 export function initTelegramBot(): Bot | null {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   
@@ -466,7 +581,9 @@ Type /menu for all commands! 🚀
       title: '🏥 MONITORING',
       commands: [
         { cmd: '/health', desc: 'Check production services', usage: '/health\nCheck all AIdeazz services' },
-        { cmd: '/logs', desc: 'Analyze pasted logs', usage: '/logs\nThen paste error logs' },
+        { cmd: '/hoststatus', desc: 'PM2 list on this Oracle server', usage: '/hoststatus' },
+        { cmd: '/logs', desc: 'Paste logs OR fetch by agent', usage: '/logs cto-aipa\nor paste after /logs' },
+        { cmd: '/restart', desc: 'Restart allowlisted PM2/systemd agent', usage: '/restart cto-aipa' },
         { cmd: '/status', desc: 'Ecosystem status overview', usage: '/status' },
         { cmd: '/daily', desc: 'Morning briefing', usage: '/daily\nGets sent at 8 AM automatically' },
         { cmd: '/stats', desc: 'Weekly metrics and stats', usage: '/stats' },
@@ -714,12 +831,29 @@ ${recentRepos}
 • Llama 3.3 70B (fast reviews)
 
 💰 *Cost This Month*: ~$0.50
+
+💡 *This Oracle host:* \`/hoststatus\` · \`/logs <agent>\` · \`/restart <agent>\`
+_(Agents: ${listOpsAgentKeysForHelp()})_
       `;
       
       await ctx.reply(statusMessage, { parse_mode: 'Markdown' });
     } catch (error) {
       await ctx.reply('❌ Error checking status. Try again later.');
       console.error('Status check error:', error);
+    }
+  });
+
+  // /hoststatus — PM2 summary on the machine running this bot (additive; does not replace /status)
+  bot.command('hoststatus', async (ctx) => {
+    await ctx.reply('🖥️ Gathering PM2 status on this server...');
+    try {
+      const summary = await buildHostStatusSummary();
+      await ctx.reply(`${summary}
+
+_Agents for logs/restart:_ ${listOpsAgentKeysForHelp()}`, { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('hoststatus error:', error);
+      await ctx.reply('❌ Could not read host status. Is PM2 installed and in PATH?');
     }
   });
   
@@ -2439,40 +2573,73 @@ ${results}
 ${downCount > 0 ? '⚠️ Some issues detected recently. Use /logs to investigate.' : '✅ All systems stable!'}`, { parse_mode: 'Markdown' });
   });
   
-  // /logs - Analyze pasted logs
+  // /logs — pasted log analysis (original) OR fetch logs for an allowlisted agent (additive)
   bot.command('logs', async (ctx) => {
-    const logText = ctx.message?.text?.replace('/logs', '').trim();
-    
-    if (!logText) {
+    const full = ctx.message?.text?.replace(/^\/logs\s*/i, '').trim() ?? '';
+    const firstToken = full.split(/\s+/)[0] || '';
+    const backend = resolveOpsBackend(firstToken);
+    const isAgentOnlyFetch =
+      backend &&
+      full.length === firstToken.length &&
+      firstToken.length > 0 &&
+      firstToken.length < 64 &&
+      !full.includes('\n');
+
+    if (!full) {
       await ctx.reply(`📋 *LOG ANALYZER*
 
-*What is this?*
-Paste your PM2 logs, error logs, or any log output and I'll analyze what's happening and suggest fixes.
+*1) Paste logs (unchanged behavior)*
+Paste PM2 / app logs after the command:
+\`/logs\` _(then send, or same line)_ your log text…
 
-*How to get logs from Oracle:*
+*2) Fetch logs on this server (allowlisted)*
+\`/logs cto-aipa\` — pulls last lines via PM2/systemd, then AI summary.
+
+*Agents:* ${listOpsAgentKeysForHelp()}
+
+*Manual copy from Oracle:*
 \`\`\`
-pm2 logs --lines 50
-\`\`\`
-
-Then copy the output and:
-\`/logs <paste logs here>\`
-
-*What will I give you?*
-🔍 What's happening in the logs
-⚠️ Any errors or warnings
-🔧 Suggested fixes
-📈 Patterns I notice
-
-👉 *Try now:* Get logs from your server and paste them!`, { parse_mode: 'Markdown' });
+pm2 logs cto-aipa --lines 50 --nostream
+\`\`\``, { parse_mode: 'Markdown' });
       return;
     }
-    
-    await ctx.reply('📋 Analyzing logs...');
-    
+
+    if (isAgentOnlyFetch) {
+      await ctx.reply(`📋 Fetching logs for \`${escapeMarkdown(firstToken)}\`…`, {
+        parse_mode: 'Markdown'
+      });
+      try {
+        const raw = await fetchLogsForAgent(backend);
+        const clipped = raw.length > OPS_LOGS_MAX_CHARS ? raw.slice(0, OPS_LOGS_MAX_CHARS) + '\n…(truncated)' : raw;
+        const logPrompt = `You are a DevOps expert. Summarize these SERVER logs for someone on a phone. Be concise.
+
+AGENT: ${firstToken}
+RAW LOGS:
+${clipped}
+
+Return:
+1) One-line summary
+2) Issues / errors (short bullets)
+3) What to do next (short bullets)
+4) Health: healthy / degraded / critical`;
+
+        const analysis = await askAI(logPrompt, 2000);
+        await ctx.reply(`📋 *Log summary — ${escapeMarkdown(firstToken)}*\n\n${analysis}`, {
+          parse_mode: 'Markdown'
+        });
+      } catch (e) {
+        console.error('logs agent fetch error:', e);
+        await ctx.reply('❌ Could not fetch logs for that agent. Is PM2/journalctl available on this host?');
+      }
+      return;
+    }
+
+    await ctx.reply('📋 Analyzing pasted logs...');
+
     const logPrompt = `You are a DevOps expert analyzing production logs.
 
 LOGS:
-${logText.substring(0, 4000)}
+${full.substring(0, 4000)}
 
 Analyze these logs and provide:
 
@@ -2492,6 +2659,43 @@ Be specific and actionable. This person is learning, so explain simply.`;
 
     const analysis = await askAI(logPrompt, 2000);
     await ctx.reply(`📋 *Log Analysis*\n\n${analysis}`, { parse_mode: 'Markdown' });
+  });
+
+  // /restart — allowlisted PM2 app or systemd unit only (no free-form shell)
+  bot.command('restart', async (ctx) => {
+    const arg = ctx.message?.text?.replace(/^\/restart\s*/i, '').trim() ?? '';
+    if (!arg || arg.includes('\n') || arg.split(/\s+/).length !== 1) {
+      await ctx.reply(
+        `🔁 *RESTART*
+
+Usage: \`/restart <agent>\`
+
+Allowlisted agents: ${listOpsAgentKeysForHelp()}
+
+_PM2 restarts use \`pm2 restart\`. systemd uses \`sudo -n systemctl restart\` (needs NOPASSWD on server)._`,
+        { parse_mode: 'Markdown' }
+      );
+      return;
+    }
+    const backend = resolveOpsBackend(arg);
+    if (!backend) {
+      await ctx.reply(
+        `⛔ Unknown agent \`${escapeMarkdown(arg)}\`.\n\nUse: ${listOpsAgentKeysForHelp()}`,
+        { parse_mode: 'Markdown' }
+      );
+      return;
+    }
+    await ctx.reply('🔁 Restarting…');
+    try {
+      const { ok, message } = await restartAgent(backend);
+      await ctx.reply(message, { parse_mode: 'Markdown' });
+      if (ok) {
+        await ctx.reply('_Tip: run /hoststatus or /logs <agent> to verify._', { parse_mode: 'Markdown' });
+      }
+    } catch (e) {
+      console.error('restart error:', e);
+      await ctx.reply('❌ Restart command failed unexpectedly.');
+    }
   });
   
   // ==========================================================================
@@ -6223,7 +6427,9 @@ _I remember what we were working on!_`, { parse_mode: 'Markdown' });
           { command: 'suggest', description: '💡 Quick actionable suggestion' },
           // MONITORING
           { command: 'health', description: '🏥 Check production services' },
-          { command: 'logs', description: '📋 Analyze pasted logs' },
+          { command: 'hoststatus', description: '🖥️ PM2 status on this server' },
+          { command: 'logs', description: '📋 Paste logs or /logs <agent>' },
+          { command: 'restart', description: '🔁 Restart allowlisted PM2/systemd' },
           { command: 'status', description: '📊 Ecosystem status overview' },
           { command: 'daily', description: '☀️ Morning briefing' },
           { command: 'stats', description: '📈 Weekly metrics and stats' },
@@ -6274,7 +6480,7 @@ _I remember what we were working on!_`, { parse_mode: 'Markdown' });
           { command: 'alerts', description: '🔔 Toggle proactive alerts' },
           { command: 'roadmap', description: '🛣️ View CTO AIPA roadmap' },
         ]);
-        console.log(`   📋 Registered ${82} commands with Telegram`);
+        console.log(`   📋 Registered ${84} commands with Telegram`);
       } catch (err) {
         console.log(`   ⚠️ Could not register commands: ${err}`);
       }
