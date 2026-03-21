@@ -363,13 +363,48 @@ type OpsBackend =
   | { kind: 'pm2'; app: string }
   | { kind: 'systemd'; unit: string };
 
-/** Telegram-facing alias → backend. Never pass user text as shell; only these keys match. */
+/**
+ * Telegram-facing alias → backend. Allowlist only (no user-controlled process names).
+ * Canonical inventory: docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md (+ oracle-resilience scripts).
+ */
 const OPS_AGENT_ALIASES: Record<string, OpsBackend> = {
-  'cto-aipa': { kind: 'pm2', app: 'cto-aipa' },
+  // --- 1 EspaLuz WhatsApp (systemd) ---
+  'espaluz-whatsapp': { kind: 'systemd', unit: 'espaluz-whatsapp' },
+  'espaluz-wa': { kind: 'systemd', unit: 'espaluz-whatsapp' },
+  // --- 2 EspaLuz Telegram / Familybot (systemd) ---
+  'espaluz-familybot': { kind: 'systemd', unit: 'espaluz-familybot' },
+  'espaluz-tg': { kind: 'systemd', unit: 'espaluz-familybot' },
+  'familybot': { kind: 'systemd', unit: 'espaluz-familybot' },
+  // --- 3 EspaLuz Influencer (systemd) ---
+  'espaluz-influencer': { kind: 'systemd', unit: 'espaluz-influencer' },
+  'influencer': { kind: 'systemd', unit: 'espaluz-influencer' },
+  // Often deployed alongside EspaLuz (health scripts)
+  'espaluz-webhook': { kind: 'systemd', unit: 'espaluz-webhook' },
+  // --- 4 Algom Alpha / DragonTrade (PM2 on Oracle) ---
+  'dragontrade-main': { kind: 'pm2', app: 'dragontrade-main' },
+  'dragontrade-dashboard': { kind: 'pm2', app: 'dragontrade-dashboard' },
+  'dragontrade-bybit': { kind: 'pm2', app: 'dragontrade-bybit' },
+  'dragontrade-binance': { kind: 'pm2', app: 'dragontrade-binance' },
   'dragon-main': { kind: 'pm2', app: 'dragontrade-main' },
   'dragon-dash': { kind: 'pm2', app: 'dragontrade-dashboard' },
   'dragon-binance': { kind: 'pm2', app: 'dragontrade-binance' },
   'dragon-bybit': { kind: 'pm2', app: 'dragontrade-bybit' },
+  'algom': { kind: 'pm2', app: 'dragontrade-main' },
+  'algom-alpha': { kind: 'pm2', app: 'dragontrade-main' },
+  // --- 5+6 VibeJob Hunter + AI Marketing / CMO (systemd on Oracle per check_oracle_health.sh) ---
+  'vibejobhunter-web': { kind: 'systemd', unit: 'vibejobhunter-web' },
+  'vibejobhunter': { kind: 'systemd', unit: 'vibejobhunter' },
+  'vibejob': { kind: 'systemd', unit: 'vibejobhunter-web' },
+  'vibejob-hunter': { kind: 'systemd', unit: 'vibejobhunter-web' },
+  'cmo': { kind: 'systemd', unit: 'vibejobhunter-web' },
+  // --- 7+8 CTO AIPA + Atuona (same PM2 process) ---
+  'cto-aipa': { kind: 'pm2', app: 'cto-aipa' },
+  'cto': { kind: 'pm2', app: 'cto-aipa' },
+  'tech-cofounder': { kind: 'pm2', app: 'cto-aipa' },
+  'atuona': { kind: 'pm2', app: 'cto-aipa' },
+  'creative-cofounder': { kind: 'pm2', app: 'cto-aipa' },
+  // --- 9 AELA (unit name TBD on server — adjust if your unit differs) ---
+  'aela': { kind: 'systemd', unit: 'aela' }
 };
 
 function resolveOpsBackend(token: string): OpsBackend | null {
@@ -386,11 +421,55 @@ function resolveOpsBackend(token: string): OpsBackend | null {
   return null;
 }
 
+/** Short hint for footers; full matrix is `/agents` (many aliases exist). */
 function listOpsAgentKeysForHelp(): string {
-  return Object.keys(OPS_AGENT_ALIASES)
-    .sort()
-    .map((k) => `\`${k}\``)
-    .join(', ');
+  const primary = [
+    'cto-aipa',
+    'atuona',
+    'vibejob',
+    'cmo',
+    'espaluz-whatsapp',
+    'espaluz-familybot',
+    'espaluz-influencer',
+    'dragon-main',
+    'dragon-dash',
+    'dragon-binance',
+    'dragon-bybit',
+    'aela'
+  ];
+  return `Quick keys: ${primary.map((k) => `\`${k}\``).join(', ')}\nFull list: /agents`;
+}
+
+function getUniqueSystemdUnits(): string[] {
+  const set = new Set<string>();
+  for (const b of Object.values(OPS_AGENT_ALIASES)) {
+    if (b.kind === 'systemd') {
+      const u = b.unit.endsWith('.service') ? b.unit : `${b.unit}.service`;
+      set.add(u);
+    }
+  }
+  return [...set].sort();
+}
+
+async function buildSystemdOracleStatusAppendix(): Promise<string> {
+  const units = getUniqueSystemdUnits();
+  const lines: string[] = [];
+  for (const unit of units) {
+    const short = unit.replace(/\.service$/i, '');
+    try {
+      const { stdout } = await execFileAsync('systemctl', ['show', '-p', 'ActiveState', '--value', short], {
+        timeout: 8000,
+        windowsHide: true,
+        maxBuffer: 1024 * 1024
+      });
+      const state = (stdout || '').trim() || '?';
+      lines.push(`• *${escapeMarkdown(short)}* — ${escapeMarkdown(state)}`);
+    } catch {
+      lines.push(`• *${escapeMarkdown(short)}* — _(could not query)_`);
+    }
+  }
+  if (!lines.length) return '';
+  return `\n\n📦 *systemd (Oracle inventory)*\n\n${lines.join('\n')}`;
 }
 
 async function execOpsCapture(cmd: string, args: string[]): Promise<{ ok: boolean; out: string }> {
@@ -438,9 +517,10 @@ async function restartAgent(backend: OpsBackend): Promise<{ ok: boolean; message
 }
 
 async function buildHostStatusSummary(): Promise<string> {
+  const systemdAppx = await buildSystemdOracleStatusAppendix();
   const pm2j = await execOpsCapture('pm2', ['jlist']);
   if (!pm2j.ok) {
-    return `⚠️ *Host / PM2*\nCould not run \`pm2 jlist\` on this machine:\n\`${escapeMarkdown(pm2j.out.slice(0, 400))}\``;
+    return `⚠️ *Host / PM2*\nCould not run \`pm2 jlist\` on this machine:\n\`${escapeMarkdown(pm2j.out.slice(0, 400))}\`${systemdAppx}`;
   }
   try {
     const apps = JSON.parse(pm2j.out) as Array<{
@@ -457,9 +537,9 @@ async function buildHostStatusSummary(): Promise<string> {
       return `• *${escapeMarkdown(name)}* — ${escapeMarkdown(String(st))} — RAM ${mem} — CPU ${cpu}`;
     });
     const body = lines.length ? lines.join('\n') : '_(no PM2 processes)_';
-    return `🖥️ *PM2 on this server*\n\n${body}`;
+    return `🖥️ *PM2 on this server*\n\n${body}${systemdAppx}`;
   } catch {
-    return `⚠️ *Host / PM2*\nCould not parse \`pm2 jlist\` output.`;
+    return `⚠️ *Host / PM2*\nCould not parse \`pm2 jlist\` output.${systemdAppx}`;
   }
 }
 
@@ -534,7 +614,10 @@ Type /menu for all commands! 🚀
   // INTERACTIVE MENU SYSTEM - Tap sections to see details!
   // ==========================================================================
   
-  const MENU_SECTIONS: Record<string, { title: string; commands: { cmd: string; desc: string; usage: string }[] }> = {
+  const MENU_SECTIONS: Record<
+    string,
+    { title: string; intro?: string; commands: { cmd: string; desc: string; usage: string }[] }
+  > = {
     'cursor_twin': {
       title: '🚀 CURSOR-TWIN OPERATIONS',
       commands: [
@@ -578,13 +661,16 @@ Type /menu for all commands! 🚀
       ]
     },
     'monitoring': {
-      title: '🏥 MONITORING',
+      title: '🖥️ MONITORING',
+      intro:
+        '📡 *Ecosystem and APIs:* /status, /health, /daily, /stats\n🖥 *Oracle host (9 agents):* /hoststatus, /agents, /logs, /restart — details in /agents',
       commands: [
-        { cmd: '/health', desc: 'Check production services', usage: '/health\nCheck all AIdeazz services' },
-        { cmd: '/hoststatus', desc: 'PM2 list on this Oracle server', usage: '/hoststatus' },
-        { cmd: '/logs', desc: 'Paste logs OR fetch by agent', usage: '/logs cto-aipa\nor paste after /logs' },
-        { cmd: '/restart', desc: 'Restart allowlisted PM2/systemd agent', usage: '/restart cto-aipa' },
-        { cmd: '/status', desc: 'Ecosystem status overview', usage: '/status' },
+        { cmd: '/status', desc: 'Ecosystem status (repos, CMO, models)', usage: '/status' },
+        { cmd: '/health', desc: 'Ping GitHub, Claude, Groq + history', usage: '/health\nCheck all AIdeazz services' },
+        { cmd: '/hoststatus', desc: 'PM2 + systemd on this Oracle server', usage: '/hoststatus' },
+        { cmd: '/agents', desc: 'All 9 Oracle agents — keys for /logs & /restart', usage: '/agents' },
+        { cmd: '/logs', desc: 'Paste logs to analyze, or fetch: /logs <agent>', usage: '/logs cto-aipa\nor paste log text after /logs' },
+        { cmd: '/restart', desc: 'Restart allowlisted PM2 or systemd unit', usage: '/restart cto-aipa' },
         { cmd: '/daily', desc: 'Morning briefing', usage: '/daily\nGets sent at 8 AM automatically' },
         { cmd: '/stats', desc: 'Weekly metrics and stats', usage: '/stats' },
       ]
@@ -668,7 +754,7 @@ Or just ask me anything - I understand natural language!`;
             { text: '🧠 Strategic', callback_data: 'menu:strategic' },
           ],
           [
-            { text: '🏥 Monitoring', callback_data: 'menu:monitoring' },
+            { text: '🖥️ Monitoring', callback_data: 'menu:monitoring' },
             { text: '📚 Learning', callback_data: 'menu:learning' },
           ],
           [
@@ -749,6 +835,9 @@ Or just ask me anything - I understand natural language!`;
     await ctx.answerCallbackQuery();
     
     let response = `*${sectionData.title}*\n\n`;
+    if (sectionData.intro) {
+      response += `${sectionData.intro}\n\n`;
+    }
     
     for (const cmd of sectionData.commands) {
       response += `*${cmd.cmd}*\n`;
@@ -832,8 +921,8 @@ ${recentRepos}
 
 💰 *Cost This Month*: ~$0.50
 
-💡 *This Oracle host:* \`/hoststatus\` · \`/logs <agent>\` · \`/restart <agent>\`
-_(Agents: ${listOpsAgentKeysForHelp()})_
+💡 *This Oracle host:* \`/hoststatus\` · \`/agents\` · \`/logs <agent>\` · \`/restart <agent>\`
+${listOpsAgentKeysForHelp()}
       `;
       
       await ctx.reply(statusMessage, { parse_mode: 'Markdown' });
@@ -845,18 +934,45 @@ _(Agents: ${listOpsAgentKeysForHelp()})_
 
   // /hoststatus — PM2 summary on the machine running this bot (additive; does not replace /status)
   bot.command('hoststatus', async (ctx) => {
-    await ctx.reply('🖥️ Gathering PM2 status on this server...');
+    await ctx.reply('🖥️ Gathering PM2 + systemd status on this server...');
     try {
       const summary = await buildHostStatusSummary();
       await ctx.reply(`${summary}
 
-_Agents for logs/restart:_ ${listOpsAgentKeysForHelp()}`, { parse_mode: 'Markdown' });
+_Common keys for /logs & /restart:_ 
+${listOpsAgentKeysForHelp()}`, { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('hoststatus error:', error);
       await ctx.reply('❌ Could not read host status. Is PM2 installed and in PATH?');
     }
   });
-  
+
+  // /agents — full Oracle agent / alias matrix (see docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md)
+  bot.command('agents', async (ctx) => {
+    await ctx.reply(
+      `🤖 *Oracle agents — keys for /logs and /restart*
+
+Allowlist only. Inventory matches *ORACLE_ALL_PRODUCTS_RESILIENCE.md* (9 agents on 170.9.242.90).
+
+*1 EspaLuz WhatsApp* — \`espaluz-whatsapp\` · \`espaluz-wa\`
+*2 EspaLuz Telegram* — \`espaluz-familybot\` · \`espaluz-tg\` · \`familybot\`
+*3 EspaLuz Influencer* — \`espaluz-influencer\` · \`influencer\`
+*Extra* — \`espaluz-webhook\` _(if deployed)_
+
+*4 DragonTrade / Algom* — \`dragon-main\` \`dragon-dash\` \`dragon-binance\` \`dragon-bybit\`
+Full PM2 names: \`dragontrade-main\` … \`dragontrade-binance\` · \`algom\` \`algom-alpha\`
+
+*5–6 VibeJob + CMO* — \`vibejob\` \`cmo\` \`vibejob-hunter\` \`vibejobhunter-web\` \`vibejobhunter\`
+
+*7–8 CTO + Atuona* _(same process)_ — \`cto-aipa\` \`cto\` \`atuona\` \`tech-cofounder\` \`creative-cofounder\`
+
+*9 AELA* — \`aela\` _(systemd; change unit in code if yours differs)_
+
+_PM2_ uses \`pm2 logs\` / \`pm2 restart\` · _systemd_ uses \`journalctl\` / \`sudo -n systemctl restart\` (NOPASSWD).`,
+      { parse_mode: 'Markdown' }
+    );
+  });
+
   // /repos - List repositories with aliases
   bot.command('repos', async (ctx) => {
     // Build list with aliases for each repo
@@ -6427,7 +6543,8 @@ _I remember what we were working on!_`, { parse_mode: 'Markdown' });
           { command: 'suggest', description: '💡 Quick actionable suggestion' },
           // MONITORING
           { command: 'health', description: '🏥 Check production services' },
-          { command: 'hoststatus', description: '🖥️ PM2 status on this server' },
+          { command: 'hoststatus', description: '🖥️ PM2 + systemd on this server' },
+          { command: 'agents', description: '🤖 Oracle agent keys for /logs /restart' },
           { command: 'logs', description: '📋 Paste logs or /logs <agent>' },
           { command: 'restart', description: '🔁 Restart allowlisted PM2/systemd' },
           { command: 'status', description: '📊 Ecosystem status overview' },
@@ -6480,7 +6597,7 @@ _I remember what we were working on!_`, { parse_mode: 'Markdown' });
           { command: 'alerts', description: '🔔 Toggle proactive alerts' },
           { command: 'roadmap', description: '🛣️ View CTO AIPA roadmap' },
         ]);
-        console.log(`   📋 Registered ${84} commands with Telegram`);
+        console.log(`   📋 Registered ${85} commands with Telegram`);
       } catch (err) {
         console.log(`   ⚠️ Could not register commands: ${err}`);
       }
