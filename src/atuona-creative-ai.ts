@@ -215,7 +215,36 @@ function stopAutoSave(): void {
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_PAT || '';
+const octokit = githubToken ? new Octokit({ auth: githubToken }) : new Octokit();
+const octokitPublic = new Octokit();
+
+function isBadCredentialsError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const status = (error as { status?: number }).status;
+  const message = String((error as { message?: string }).message || '');
+  return status === 401 || message.toLowerCase().includes('bad credentials');
+}
+
+async function getRepoContentWithAuthFallback(params: {
+  owner: string;
+  repo: string;
+  path: string;
+  ref?: string;
+}) {
+  try {
+    return await octokit.repos.getContent(params);
+  } catch (error) {
+    if (!isBadCredentialsError(error)) {
+      throw error;
+    }
+
+    // Public fallback keeps read-only features like /visualize working
+    // even when the write token is missing/expired.
+    console.warn(`⚠️ GitHub auth failed for ${params.path}, retrying as public request`);
+    return octokitPublic.repos.getContent(params);
+  }
+}
 
 // Authorized users (same as CTO AIPA)
 const AUTHORIZED_USERS = process.env.TELEGRAM_AUTHORIZED_USERS?.split(',').map(id => parseInt(id.trim())) || [];
@@ -6360,7 +6389,7 @@ Current book: ${bookState.totalPages} pages published.`, { parse_mode: 'Markdown
     
     try {
       // Fetch from GitHub
-      const { data: metaFile } = await octokit.repos.getContent({
+      const { data: metaFile } = await getRepoContentWithAuthFallback({
         owner: 'ElenaRevicheva',
         repo: 'atuona',
         path: `metadata/${pageId}.json`,
@@ -6903,7 +6932,7 @@ _Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode:
     
     try {
       // Fetch page content from GitHub
-      const { data: metaFile } = await octokit.repos.getContent({
+      const { data: metaFile } = await getRepoContentWithAuthFallback({
         owner: 'ElenaRevicheva',
         repo: 'atuona',
         path: `metadata/${pageId}.json`,
@@ -6926,7 +6955,7 @@ _Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode:
       if (!englishText && !russianText) {
         console.log(`📖 Page #${pageId} missing text in metadata, fetching from poems JSON...`);
         try {
-          const { data: poemsFile } = await octokit.repos.getContent({
+          const { data: poemsFile } = await getRepoContentWithAuthFallback({
             owner: 'ElenaRevicheva',
             repo: 'atuona',
             path: 'atuona-45-poems-with-text.json',
