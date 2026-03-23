@@ -16,7 +16,7 @@
 
 ---
 
-## All 9 AI Agents on Oracle (Canonical List)
+## All 10 AI Agents on Oracle (Canonical List)
 
 Every agent on this instance **must** have: (1) restart hardening, (2) a health-check (HTTP or process liveness) that restarts if unhealthy, (3) included in OCI keep-alive.
 
@@ -28,11 +28,12 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 | 4 | **Algom Alpha** | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | Automated posting on @reviceva | PM2 or systemd | e.g. `dragontrade` or `algom-alpha` | Add HTTP health or process check |
 | 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | PM2 or systemd (when on Oracle) | e.g. `vibejob` | e.g. `http://127.0.0.1:PORT/health` |
 | 6 | **AI Marketing Co-Founder** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | Same process as 5 when on Oracle | (same as 5) | (same as 5) |
-| 7 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` |
-| 8 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 7) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 7) | `cto-aipa` | `http://127.0.0.1:3000/` |
-| 9 | **AELA** | [AELA](https://github.com/ElenaRevicheva/AELA) |  |  |  |  |
+| 7 | **OpenClaw Vibejob Shortlist** | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | systemd | `openclaw-gateway` | `http://127.0.0.1:18789/` |
+| 8 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` |
+| 9 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` |
+| 10 | **AELA** | [AELA](https://github.com/ElenaRevicheva/AELA) |  |  |  |  |
 
-**Repos (4):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, AIPA_AITCF, AELA (7 repos for 9 agents; 7+8 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF).
+**Repos (8):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AELA (8 repos for 10 agents; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF).
 
 **Action:** On the server run `pm2 list` and `systemctl list-units --type=service --all | grep -E 'espaluz|cto|vibe|dragon|algom'` and set the exact service/PM2 names and ports in the health script. Add a simple HTTP health endpoint in any bot that doesn’t have one (e.g. `/health` returning 200) so the cron can detect hangs, not only crashes.
 
@@ -170,7 +171,7 @@ Do this once on the server (SSH as above).
 
 - [ ] **Verify**  
   - [ ] `sudo systemctl status espaluz-whatsapp espaluz-influencer` (and any other systemd bots)  
-- [ ] `pm2 list` (all 9 agents: 7+8 = cto-aipa; 5+6 = one app if on Oracle; 4 = dragontrade/algom if PM2; 9 = AELA)  
+- [ ] `pm2 list` (all 10 agents: 8+9 = cto-aipa; 5+6 = one app if on Oracle; 4 = dragontrade/algom if PM2; 7 = openclaw-gateway; 10 = AELA)  
   - [ ] Wait 5 minutes and `tail -50 /var/log/oracle-health.log`
 
 ---
