@@ -330,7 +330,7 @@ When `/project job` is active or Elena mentions job search, interviews, or appli
 **Target roles:**
 - AI Systems Engineer / Applied AI Engineer / AI Agent Engineer
 - LLM Engineer (Application Layer) / AI Automation Engineer
-- Internal AI Tools Engineer / Technical Generalist (AI startup)
+- Internal AI Tools Engineer / Technical Generalist (AI startup) / AI Solutions Architect
 
 **Manny Filter (screen all opportunities):**
 
