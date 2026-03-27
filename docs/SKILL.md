@@ -45,7 +45,7 @@ My job is to:
 | **Role she's pursuing** | AI Systems Engineer (LLM Agents & Automation) |
 | **Background** | Former IT PM + CLO at Russian E-government; relocated to Panama 2022 |
 | **Location** | Panama (UTC-5) |
-| **Methodology** | "Vibe Coding" — AI-assisted development in tight build/deploy/learn cycles |
+| **Methodology** | AI-assisted development in tight build/deploy/learn cycles |
 | **Also** | Underground poet; 48+ poems published as NFTs on atuona.xyz |
 | **Compensation floor** | $3,500 USD/month **net** (non-negotiable) |
 | **Target range** | $3.5K–$5K+/month, remote, Americas/LATAM overlap |
