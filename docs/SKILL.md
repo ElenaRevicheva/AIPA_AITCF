@@ -73,14 +73,14 @@ All 9 agents run here. $0/month (Oracle startup credits). ~99% uptime.
 
 | # | Agent | Repo | Interface | Process | Status |
 |---|-------|------|-----------|---------|--------|
-| 1 | **EspaLuz WhatsApp** | EspaLuzWhatsApp | WhatsApp wa.me/50766623757 | systemd `espaluz-whatsapp` | ✅ Revenue |
+| 1 | **EspaLuz WhatsApp** | EspaLuzWhatsApp | WhatsApp wa.me/50766623757 | systemd `espaluz-whatsapp` | ✅ Live, Very early traction, very low revenue |
 | 2 | **EspaLuz Telegram** | EspaLuzFamilybot | t.me/EspaLuzFamily_bot | systemd `espaluz-familybot` | ✅ Live |
 | 3 | **EspaLuz Influencer** | EspaLuz_Influencer | t.me/Influencer_EspaLuz_bot | systemd `espaluz-influencer` | ✅ Live |
-| 4 | **Algom Alpha (DragonTrade)** | dragontrade-agent | X @reviceva | PM2 `dragontrade-*` (4 apps) | ⚠️ Rate-limit prone |
+| 4 | **Algom Alpha (DragonTrade)** | dragontrade-agent | X @reviceva | PM2 `dragontrade-*` (4 apps) | Live, ⚠️ Rate-limit prone |
 | 5 | **VibeJob Hunter** | VibeJobHunterAIPA_AIMCF | t.me/vibejob_hunter_bot | systemd `vibejobhunter` | ✅ Live |
-| 6 | **CMO AIPA** | VibeJobHunterAIPA_AIMCF (same) | LinkedIn / Instagram | systemd (same as 5) | ✅ Draft-generates |
+| 6 | **CMO AIPA** | VibeJobHunterAIPA_AIMCF (same) | LinkedIn / Instagram | systemd (same as 5) | ✅ Live |
 | 7 | **CTO AIPA** | **AIPA_AITCF** (THIS REPO) | t.me/aitcf_aideazz_bot | PM2 `cto-aipa` | ✅ Live |
-| 8 | **Atuona Creative AI** | **AIPA_AITCF** (same) | t.me/Atuona_AI_CCF_AIdeazz_bot | PM2 (same as 7) | ✅ 48+ NFTs |
+| 8 | **Atuona Creative AI** | **AIPA_AITCF** (same) | t.me/Atuona_AI_CCF_AIdeazz_bot | PM2 (same as 7) | ✅ Live, 48+ NFTs |
 | 9 | **OpenClaw Vibejob Shortlist** | openclaw-vibejob-shortlist | Telegram + voice | systemd `openclaw-gateway` | ✅ Live |
 
 **Websites (4everland/IPFS, $0/month):**
