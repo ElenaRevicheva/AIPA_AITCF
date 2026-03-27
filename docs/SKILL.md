@@ -411,15 +411,10 @@ If she can't answer any of these clearly in **90 seconds**, stop and work on the
 |----------|------------|
 | GitHub | https://github.com/ElenaRevicheva/AIPA_AITCF |
 | Oracle server | See `.env.private` (not committed) |
-| CTO Telegram | @aitcf_aideazz_bot |
-| Atuona Telegram | @Atuona_AI_CCF_AIdeazz_bot |
 | Aideazz website | https://aideazz.xyz |
-| Atuona gallery | https://atuona.xyz |
-| Pitch deck | https://aideazz.xyz/pitch.html |
 | LinkedIn | linkedin.com/in/elenarevicheva |
 | X/Twitter | @reviceva |
 | Email | aipa@aideazz.xyz |
-| Whitepaper | https://notion.so/AIdeazz-Whitepaper-v1-0-1e3032c5edd7809cb4f1cf8645b12dbc |
 
 ---
 
