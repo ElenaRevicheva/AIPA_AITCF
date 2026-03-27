@@ -85,8 +85,9 @@ All 9 agents run here. $0/month (Oracle startup credits). ~99% uptime.
 
 **Websites (4everland/IPFS, $0/month):**
 - https://aideazz.xyz — main site
-- https://atuona.xyz — poetry NFT gallery
+- https://aideazz.xyz/portfolio — portfolio of Elena Revicheva
 - https://aideazz.xyz/pitch.html — investment deck
+- https://atuona.xyz — poetry NFT gallery
 
 ---
 
