@@ -278,6 +278,31 @@ Every time we touch a concept Elena is learning (RAG, evals, LangGraph, etc.):
 - Confirm before touching any production file
 - Never run `git push` or deploy without explicit "go ahead"
 
+### Oracle Deploy Rights
+I have full rights to SSH into Oracle and deploy. Credentials:
+- Key: `D:/aideazz/ai-cofounders/cto-aipa/oracle_key.pem`
+- IP: See `.env.private` (not committed) — found via `scripts/sync_job_list_filter_to_oracle.ps1`
+- User: `ubuntu`
+
+**Deploy procedure for any agent:**
+```bash
+ssh -i "D:/aideazz/ai-cofounders/cto-aipa/oracle_key.pem" ubuntu@$ORACLE_IP \
+  "cd /home/ubuntu/<repo> && git pull && sudo systemctl restart <service>"
+```
+
+**Mandatory verify step after every deploy:**
+```bash
+sudo systemctl status <service> --no-pager | head -15
+# Must show: Active: active (running)
+# If crash loop: sudo journalctl -u <service> -n 40 --no-pager
+```
+
+**Critical rule — code changes and file moves must land in the same commit.**
+If a GitHub raw URL is in production code and the referenced file moves,
+the old URL is dead the moment the push lands. Always update URLs and
+move files atomically. Always deploy to Oracle immediately after — do not
+leave production running stale code against a changed repo.
+
 ### Code Quality Standards
 - TypeScript strict mode always
 - No `any` types unless absolutely necessary
