@@ -65,6 +65,7 @@ interface PageVisualization {
   videoUrl?: string;
   videoUrlVertical?: string;  // 9:16 for Reels
   videoUrlHorizontal?: string; // 16:9 for YouTube
+  directorsCutVideoUrl?: string; // Fashion/editorial modify pass
   caption: string;
   hashtags: string[];
   createdAt: string;
@@ -3154,6 +3155,225 @@ async function generateVideo(
     provider: 'none',
     error: 'No video generation providers configured (need REPLICATE_API_TOKEN for Luma or RUNWAY_API_KEY for Runway)'
   };
+}
+
+// =============================================================================
+// FILM DIRECTOR AGENT — Modify Video (fashion / editorial layer)
+// =============================================================================
+
+const MODIFY_VIDEO_MODE = 'flex_1';
+
+interface ModifyVideoResult {
+  success: boolean;
+  generationId?: string;
+  videoUrl?: string;
+  error?: string;
+}
+
+/**
+ * Build a fashion/editorial modify prompt driven by the poem's content.
+ * The LLM reads the poem and decides *what kind* of beauty/fashion treatment
+ * fits — not a generic "make it pretty" blanket.
+ */
+async function buildFashionEditorialPrompt(opts: {
+  title: string;
+  theme: string;
+  englishExcerpt: string;
+  knowledgeKeys: string[];
+}): Promise<string> {
+  const { title, theme, englishExcerpt, knowledgeKeys } = opts;
+
+  const systemPrompt = `You are a fashion-film director for ATUONA, an underground poetry film project.
+You will receive a poem's title, theme, excerpt, and knowledge modules that were used.
+Your job: write a SHORT Modify Video prompt (40-80 words) that adds a fashion/editorial beauty layer to an EXISTING cinematic video of this poem.
+
+RULES:
+- You are NOT re-describing the scene. The video already exists. You are directing a RESTYLE pass.
+- Focus on: skin luminosity, fabric texture, editorial lighting, silhouette elegance, color grading, couture details.
+- Root the fashion direction in the poem's mood: a dark Moscow poem gets sharp tailoring and cold-light beauty; a Polynesian exile poem gets warm bronzed skin and draped linen; an abstract digital poem gets glass/metallic surfaces and neon rim-light.
+- Never add new characters, animals, objects, or locations.
+- Never mention cartoon, 3D, Pixar, or toy styles.
+- Return ONLY the modify prompt. No quotes, no preamble, no explanation.`;
+
+  const userMsg = `TITLE: "${title}"
+THEME: ${theme}
+POEM EXCERPT: ${englishExcerpt.substring(0, 800)}
+KNOWLEDGE MODULES ACTIVE: ${knowledgeKeys.join(', ')}
+
+Write the fashion/editorial modify-video prompt.`;
+
+  try {
+    const result = await createContent(`${systemPrompt}\n\n---\n\n${userMsg}`, 120, true);
+    return result.trim();
+  } catch (err) {
+    return 'Editorial fashion film grade: luminous skin with soft diffused beauty lighting, luxurious fabric textures with subtle sheen, haute couture silhouette framing, cinematic color grade with rich tonal depth. Preserve all motion and scene composition.';
+  }
+}
+
+/**
+ * Call Luma Modify Video API to add a fashion/editorial layer to a base video.
+ * Returns the generation ID for polling, or null on failure.
+ */
+async function startModifyVideo(
+  baseVideoUrl: string,
+  firstFrameImageUrl: string,
+  fashionPrompt: string
+): Promise<ModifyVideoResult> {
+  if (!lumaApiKey) {
+    return { success: false, error: 'No LUMA_API_KEY — modify pass skipped' };
+  }
+
+  const body = {
+    generation_type: 'modify_video',
+    model: 'ray-2',
+    mode: MODIFY_VIDEO_MODE,
+    prompt: fashionPrompt,
+    media: { url: baseVideoUrl },
+    first_frame: { url: firstFrameImageUrl }
+  };
+
+  console.log('🎬✨ Starting Modify Video (fashion/editorial pass)...');
+  console.log('Modify request:', JSON.stringify(body, null, 2));
+
+  try {
+    const resp = await fetch(`${LUMA_API_URL}/generations/video/modify`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lumaApiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const text = await resp.text();
+    console.log('Modify response:', resp.status, text);
+
+    if (resp.ok) {
+      const data = JSON.parse(text);
+      return { success: true, generationId: data.id };
+    }
+    return { success: false, error: `Luma Modify API ${resp.status}: ${text.substring(0, 200)}` };
+  } catch (err: any) {
+    console.error('Modify Video network error:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Poll a Luma generation until completed, then deliver the result to Telegram.
+ * Used for the Modify Video "Director's Cut" pass.
+ */
+function pollAndDeliverDirectorsCut(
+  generationId: string,
+  ctx: Context,
+  visualization: PageVisualization,
+  fashionPrompt: string
+): void {
+  const maxAttempts = 12;
+  const intervalMs = 30_000;
+
+  const poll = async (attempt: number) => {
+    try {
+      const resp = await fetch(`${LUMA_API_URL}/generations/${generationId}`, {
+        headers: {
+          'Authorization': `Bearer ${lumaApiKey}`,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!resp.ok) {
+        console.error(`Director's Cut poll HTTP ${resp.status}`);
+        if (attempt < maxAttempts) setTimeout(() => poll(attempt + 1), intervalMs);
+        return;
+      }
+
+      const data = await resp.json() as any;
+
+      if (data.state === 'completed' && data.assets?.video) {
+        console.log(`✅ Director's Cut ready: ${data.assets.video}`);
+        visualization.directorsCutVideoUrl = data.assets.video;
+        saveState();
+
+        try {
+          await ctx.replyWithVideo(data.assets.video, {
+            caption: `🎬✨ *Director's Cut Ready!*\n\n_Fashion/editorial layer applied (${MODIFY_VIDEO_MODE})_\n\n💡 _${fashionPrompt.substring(0, 120)}..._`,
+            parse_mode: 'Markdown'
+          });
+        } catch {
+          await ctx.reply(
+            `🎬✨ *Director's Cut Ready!*\n\n🎬 ${data.assets.video}\n\n_Fashion/editorial layer — open link to view_`,
+            { parse_mode: 'Markdown' }
+          );
+        }
+        return;
+      }
+
+      if (data.state === 'failed') {
+        console.error(`Director's Cut failed: ${data.failure_reason || 'unknown'}`);
+        await ctx.reply(`⚠️ Director's Cut generation failed — base video was already delivered.\n_Reason: ${data.failure_reason || 'unknown'}_`);
+        return;
+      }
+
+      if (attempt < maxAttempts) {
+        console.log(`Director's Cut ${generationId} still ${data.state} (${attempt}/${maxAttempts})...`);
+        setTimeout(() => poll(attempt + 1), intervalMs);
+      } else {
+        console.log(`Director's Cut polling timed out for ${generationId}`);
+        await ctx.reply(`⏳ Director's Cut taking too long — base video was already delivered.`);
+      }
+    } catch (err: any) {
+      console.error('Director\'s Cut poll error:', err.message);
+      if (attempt < maxAttempts) setTimeout(() => poll(attempt + 1), intervalMs);
+    }
+  };
+
+  setTimeout(() => poll(1), 50_000);
+}
+
+/**
+ * Entry point: generate the fashion/editorial prompt, start modify, begin polling.
+ * Fire-and-forget — base video is already delivered when this runs.
+ */
+async function startDirectorsCutPipeline(opts: {
+  baseVideoUrl: string;
+  firstFrameImageUrl: string;
+  title: string;
+  theme: string;
+  englishExcerpt: string;
+  knowledgeKeys: string[];
+  ctx: Context;
+  visualization: PageVisualization;
+}): Promise<void> {
+  const { baseVideoUrl, firstFrameImageUrl, title, theme, englishExcerpt, knowledgeKeys, ctx, visualization } = opts;
+
+  if (!lumaApiKey) return;
+
+  try {
+    await ctx.reply(
+      `🎬✨ *Film Director Agent:* starting fashion/editorial pass on the base video...\n_Mode: ${MODIFY_VIDEO_MODE} — this takes 1-3 minutes_`,
+      { parse_mode: 'Markdown' }
+    );
+
+    const fashionPrompt = await buildFashionEditorialPrompt({ title, theme, englishExcerpt, knowledgeKeys });
+    console.log('Fashion/editorial prompt:', fashionPrompt);
+    await ctx.reply(`🎬 *Fashion direction:*\n\n_${fashionPrompt.substring(0, 280)}_`, { parse_mode: 'Markdown' });
+
+    const result = await startModifyVideo(baseVideoUrl, firstFrameImageUrl, fashionPrompt);
+
+    if (result.success && result.generationId) {
+      await ctx.reply(
+        `🎬 Director's Cut started!\nID: \`${result.generationId}\`\n\n_Checking in ~50 seconds..._`,
+        { parse_mode: 'Markdown' }
+      );
+      pollAndDeliverDirectorsCut(result.generationId, ctx, visualization, fashionPrompt);
+    } else {
+      console.log('Modify Video skipped:', result.error);
+      await ctx.reply(`⚠️ Director's Cut skipped — ${result.error}\n\n_Base video was already delivered._`);
+    }
+  } catch (err: any) {
+    console.error('Director\'s Cut pipeline error:', err.message);
+  }
 }
 
 // =============================================================================
@@ -7074,7 +7294,8 @@ Create stunning visuals for your book pages:
 
 Each visualization creates:
 🎨 Flux 1.1 Pro Ultra image (BEST photorealistic!)
-🎬 Runway Gen-3 Alpha video (cinematic 5-10 sec)
+🎬 Luma Dream Machine video (cinematic 9 sec)
+🎬✨ Director's Cut (fashion/editorial layer via Modify Video)
 📱 Instagram format (9:16 vertical)
 📺 YouTube format (16:9 horizontal)
 
@@ -7086,7 +7307,8 @@ Visualizations: ${visualizations.length} pages
 🎬 Luma Replicate: ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
 🎬 Runway: ${runwayApiKey ? '✅ Gen-3 (fallback)' : '⚪ Not configured'}
 
-_Video priority: Luma Direct → Luma Replicate → Runway_ 🚀`, { parse_mode: 'Markdown' });
+_Video priority: Luma Direct → Luma Replicate → Runway_
+_Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ 🚀`, { parse_mode: 'Markdown' });
       return;
     }
     
@@ -7531,6 +7753,14 @@ Free tier limit reached. Options:
               await ctx.reply(`✅ *Video Ready!* (Luma via Replicate)\n\n🎬 ${videoResult.videoUrl}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
             }
             await sendKnowledgeAuditAfterVideo();
+
+            startDirectorsCutPipeline({
+              baseVideoUrl: videoResult.videoUrl,
+              firstFrameImageUrl: visualization.imageUrlHorizontal!,
+              title, theme, englishExcerpt,
+              knowledgeKeys: deepKb.mergedKeys as string[],
+              ctx, visualization
+            }).catch(err => console.error('Director\'s Cut error (Replicate path):', err));
             
           } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
             // Luma Direct API needs polling - keep polling until done (max 5 min)
@@ -7565,6 +7795,14 @@ Free tier limit reached. Options:
                       await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${statusData.assets.video}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
                     }
                     await sendKnowledgeAuditAfterVideo();
+
+                    startDirectorsCutPipeline({
+                      baseVideoUrl: statusData.assets.video,
+                      firstFrameImageUrl: visualization.imageUrlHorizontal!,
+                      title, theme, englishExcerpt,
+                      knowledgeKeys: deepKb.mergedKeys as string[],
+                      ctx, visualization
+                    }).catch(err => console.error('Director\'s Cut error (Luma Direct path):', err));
                     return; // Done!
                     
                   } else if (statusData.state === 'failed') {
@@ -7625,6 +7863,14 @@ Free tier limit reached. Options:
                       await ctx.reply(`✅ *Video Ready!* (Runway)\n\n🎬 ${statusData.output[0]}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
                     }
                     await sendKnowledgeAuditAfterVideo();
+
+                    startDirectorsCutPipeline({
+                      baseVideoUrl: statusData.output[0],
+                      firstFrameImageUrl: visualization.imageUrlHorizontal!,
+                      title, theme, englishExcerpt,
+                      knowledgeKeys: deepKb.mergedKeys as string[],
+                      ctx, visualization
+                    }).catch(err => console.error('Director\'s Cut error (Runway path):', err));
                     return; // Done!
                     
                   } else if (statusData.status === 'FAILED') {
@@ -7687,6 +7933,7 @@ Free tier limit reached. Options:
 🎨 Image: ${visualization.imageUrlHorizontal ? '✅' : '❌'}
 📱 Vertical: ${visualization.imageUrlVertical ? '✅' : '❌'}
 🎬 Video: ${visualization.videoUrlHorizontal ? '✅' : '⏳'}
+🎬✨ Director's Cut: ${visualization.directorsCutVideoUrl ? '✅' : '⏳ after base video'}
 
 📝 Caption:
 "${caption}"
