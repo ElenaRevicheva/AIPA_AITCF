@@ -1565,6 +1565,51 @@ function getRelevantKnowledge(text: string, characterVoice?: string, maxSections
 }
 
 /**
+ * Knowledge for /visualize and /imagine: scan the FULL poem text (not a 200-char snippet).
+ * If nothing matches, use a stable fallback — NOT rotating random Gauguin/beach blocks.
+ */
+function getRelevantKnowledgeForVisuals(text: string, characterVoice?: string, maxSections: number = 6): string {
+  const matchedSections: Set<KnowledgeCategory> = new Set();
+
+  if (characterVoice && CHARACTER_KNOWLEDGE[characterVoice]) {
+    CHARACTER_KNOWLEDGE[characterVoice].forEach(k => matchedSections.add(k));
+  }
+
+  for (const section of KNOWLEDGE_SECTIONS) {
+    if (section.triggers.test(text)) {
+      matchedSections.add(section.key);
+    }
+  }
+
+  if (matchedSections.size === 0) {
+    (['emotional', 'atuona', 'vibe'] as KnowledgeCategory[]).forEach(k => matchedSections.add(k));
+    console.log('🎬 Visual knowledge fallback: emotional + atuona + vibe (no rotation)');
+  }
+
+  const sectionsArray = Array.from(matchedSections).slice(0, maxSections);
+  const knowledgeParts: string[] = [];
+
+  for (const key of sectionsArray) {
+    const section = KNOWLEDGE_SECTIONS.find(s => s.key === key);
+    if (section) {
+      knowledgeParts.push(section.content);
+    }
+  }
+
+  const usedKnowledge = sectionsArray.join(', ');
+  return `[Using knowledge: ${usedKnowledge}]\n\n${knowledgeParts.join('\n\n')}`;
+}
+
+/** Appended to Flux/Replicate prompts — stops cartoon stock tropes */
+const VISUAL_HARD_EXCLUSIONS = `
+MANDATORY EXCLUSIONS (even if they sound "pretty"): no cartoon, no Pixar/Disney/3D render style, no chibi, no toy animals, no cute red dogs, no random mascots, no stock-photo beach vacation, no generic yellow flowers, no open notebook or journaling props, no laptop close-up — UNLESS the poem text above explicitly names or clearly requires that exact object.
+Style: photorealistic cinematic still, 35mm or large-format photograph, natural film grain, adult arthouse tone, single coherent scene tied to the poem.`;
+
+/** Luma/Runway — do not repeat "Gauguin palette" on every clip (causes generic art-broll) */
+const VIDEO_MOTION_ANCHOR =
+  'Photoreal cinematic motion, live-action film look, natural grain. No cartoon, no 3D animation, no toy animals, cute mascots, or Pixar style. Motion only — do not invent new objects or characters.';
+
+/**
  * Get knowledge for a specific topic (for direct queries like /art gauguin)
  */
 function getKnowledgeByTopic(topic: string): string | null {
@@ -2799,7 +2844,7 @@ async function generateVideo(
       // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
       const lumaBody = {
         model: 'ray-2',  // Required field - Luma's latest model
-        prompt: `9-second cinematic fragment. ${prompt.substring(0, 400)}. Grain, texture, Gauguin palette.`,
+        prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 420)}`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -2863,7 +2908,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `9-second cinematic fragment. ${prompt.substring(0, 400)}. Grain, texture, Gauguin palette.`,
+            prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 420)}`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -2906,7 +2951,7 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayGen3,
         promptImage: imageUrl,
-        promptText: `9-12 second cinematic fragment. ${prompt.substring(0, 350)}. Grain, Gauguin palette.`,
+        promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 380)}`,
         duration: 10,  // 10 seconds for immersive clips
         watermark: false,
         ratio: '1280:768'
@@ -6761,37 +6806,26 @@ Set OPENAI_API_KEY for full functionality.`, { parse_mode: 'Markdown' });
     await ctx.reply('🎨 *Creating image prompt...*', { parse_mode: 'Markdown' });
     
     try {
-      // Get knowledge for art-informed image generation
-      const imagineKnowledge = getRelevantKnowledge(description, creativeSession.activeVoice, 2);
-      
-      // Generate optimized prompt for image generation
-      const promptOptimizer = `You are an expert at creating prompts for AI image generation (DALL-E, Midjourney).
+      const imagineKnowledge = getRelevantKnowledgeForVisuals(description, creativeSession.activeVoice, 5);
 
-ART KNOWLEDGE (reference specific paintings, techniques, palettes from these):
+      const promptOptimizer = `You are an expert at prompts for AI image generation (Flux, DALL-E, Midjourney).
+
+REFERENCE KNOWLEDGE (use only details that fit the user's description):
 ${imagineKnowledge}
 
-Based on this description, create an optimized image generation prompt:
+USER DESCRIPTION (the image must reflect THIS, not a generic beach/flower/laptop mood):
 "${description}"
 
-Context: This is for NFT artwork for an underground poetry/prose book about finding Paradise on earth through vibe coding. ATUONA = Marquesas Islands + raw poetry + fashion editorial noir + tech melancholy + physical natural beauty. All coexist.
+Context: NFT art for underground poetry / ATUONA. Photoreal cinematic still, emotional weight.
 
-Style — Gauguin meets Gallery of Moments meets Vogue meets Terminal:
-- Gauguin's Tahitian palette: amber gold, burnt sienna, ocean blue, volcanic black, frangipani white
-- Impressionist light (reference SPECIFIC paintings from the knowledge above)
-- Physical natural beauty: Marquesas volcanic peaks, Pacific Ocean, black sand, tropical flora, bodies in surf
-- Fashion editorial noir: luxury that has traveled — Hermès on volcanic sand, silk in trade wind, Chanel against weathered skin
-- Tech melancholy: laptop at the edge of the world, code as poetry, the loneliness of building alone
-- Sensuality: bare shoulder in golden light, wet hair, intimacy that's natural and unposed
-- Vary between landscape, fashion, tech, and intimate — let the description guide the direction
+${VISUAL_HARD_EXCLUSIONS}
 
-CRITICAL — NEVER GENERATE:
-- Alcohol, drinks, glasses, bottles, bars (Kira is in recovery)
-- Generic tropical resort / stock photo aesthetic
-- Beauty without weight or meaning
+No alcohol, drinks, bars (Kira is in recovery).
 
-Return ONLY the optimized prompt, no explanation. Format for DALL-E 3.`;
+Return ONLY the optimized English prompt, no explanation.`;
 
-      const imagePrompt = await createContent(promptOptimizer, 300, true);
+      let imagePrompt = await createContent(promptOptimizer, 300, true);
+      imagePrompt = `${imagePrompt.trim()}\n\n${VISUAL_HARD_EXCLUSIONS.trim()}`;
       
       // Check if DALL-E is available
       if (openai) {
@@ -6981,110 +7015,57 @@ Return ONLY the translation. Plain text.`;
       // Generate cinematic prompt with ATUONA's unique vision & character context
       await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
       
-      // Get knowledge for richer visual context — art references, Gauguin's palette, Atlas parallels
-      const visualKnowledge = getRelevantKnowledge(
-        `${title} ${theme} ${englishText.substring(0, 200)}`,
+      const combinedForKnowledge = `${title}\n${theme}\n${englishText}\n${russianText}`.slice(0, 12000);
+      const visualKnowledge = getRelevantKnowledgeForVisuals(
+        combinedForKnowledge,
         creativeSession.activeVoice,
-        2
+        6
       );
-      
-      // Get character memories and plot threads for context
-      const characterContext = characterMemories ? 
-        `CHARACTERS:\n- Kira: ${characterMemories.kira?.slice(0, 3).join('; ') || 'Russian PA, art-obsessed, seeking meaning'}\n- Ule: ${characterMemories.ule?.slice(0, 3).join('; ') || 'Norwegian art collector, searching for lost Gauguin painting'}` : '';
-      
-      const plotContext = creativeSession?.plotThreads?.length ? 
-        `CURRENT PLOT THREADS: ${creativeSession.plotThreads.slice(0, 3).join('; ')}` : '';
-      
-      const cinematicPrompt = `You are creating a visual image for ATUONA — underground literature, fashion editorial noir, tech melancholy, AND the physical beauty of Paradise on earth. All of these coexist.
 
-ATUONA's visual world is BROAD:
-- The wild natural beauty of Paradise — ocean, volcanic stone, tropical light, frangipani, bodies in surf
-- Fashion editorial noir — luxury that has traveled, couture against raw landscape, elegance worn by life
-- Tech-metaphorical melancholy — blockchain as prayer, code as scar, screens glowing in tropical darkness
-- The underground gallery of moments — intimate, stolen, alive with meaning
+      const metaphorHint = creativeMemory.recentMetaphors?.length
+        ? `RECENT METAPHORS FROM THE BOOK (prefer these over generic props): ${creativeMemory.recentMetaphors.slice(-5).join(' | ')}`
+        : '';
 
-VARY each image. Some lean toward landscape. Some lean toward fashion intimacy. Some toward tech mysticism. Let the POEM CONTENT guide which direction this image takes.
+      const characterContext = characterMemories
+        ? `CHARACTERS:\n- Kira: ${characterMemories.kira?.slice(0, 6).join('; ') || '—'}\n- Ule: ${characterMemories.ule?.slice(0, 6).join('; ') || '—'}`
+        : '';
 
-ART & CULTURAL KNOWLEDGE (use for palette, composition, specific painting references):
-${visualKnowledge}
+      const plotContext = creativeSession?.plotThreads?.length
+        ? `PLOT THREADS: ${creativeSession.plotThreads.slice(0, 5).join('; ')}`
+        : '';
 
-BOOK PAGE:
+      const englishExcerpt = englishText.slice(0, 3500);
+      const russianExcerpt = russianText ? russianText.slice(0, 1200) : '';
+
+      const cinematicPrompt = `You write ONE image-generation prompt for ATUONA (underground poetry NFT / film stills).
+
+PRIMARY SOURCE (read all of this — visuals MUST follow the poem's specific images, metaphors, and emotional weight, not a generic "tropical tech" mood):
 TITLE: "${title}"
 THEME: ${theme}
-TEXT: "${englishText.substring(0, 800)}"
 
+ENGLISH TEXT:
+${englishExcerpt}
+${russianExcerpt ? `\nRUSSIAN (for extra imagery/meaning):\n${russianExcerpt}\n` : ''}
+
+CONTEXT FROM MEMORY (use if it fits the lines above; do not override the poem):
 ${characterContext}
 ${plotContext}
+${metaphorHint}
 
-═══════════════════════════════════════════════════════════════
-VISUAL PALETTE — ALL OF THESE ARE ATUONA:
+REFERENCE KNOWLEDGE (only pull specific facts, paintings, or parallels that genuinely match THIS page — ignore unrelated art history):
+${visualKnowledge}
 
-PARADISE ON EARTH — NATURAL PHYSICAL BEAUTY:
-- Marquesas Islands: volcanic peaks rising from the Pacific, Mount Temetiu, black sand beaches
-- Turquoise water meeting volcanic rock, hidden coves, the edge of the world
-- Tropical light: golden hour, the specific light Gauguin sought and painted
-- Lush valleys: breadfruit trees, coconut palms, mango groves, wild hibiscus
-- Frangipani blossoms on dark volcanic stone — white flowers on black earth
-- Trade winds moving through palm fronds, sudden tropical rain
-- Pacific sunsets: deep amber, burnt sienna, ocean blue deepening to purple
-- Night sky over the Marquesas — stars without light pollution, the Southern Cross
-- Bodies in nature: swimming, walking volcanic ridges, standing in surf — the physical beauty of being alive
+VISUAL RULES:
+1. The scene must illustrate THIS poem's concrete imagery and mood — not a default beach, not default flowers, not a default laptop unless the poem clearly says so.
+2. Vary composition: interior / urban / abstract light / body / object / landscape — whatever the TEXT demands.
+3. ${VISUAL_HARD_EXCLUSIONS}
 
-GAUGUIN'S PALETTE (use this, not generic tropical):
-- Tahitian gold, mango yellow, burnt earth
-- Deep ocean blue, almost purple at the horizon
-- Volcanic black, wet and gleaming
-- Frangipani white against everything dark
-- Marquesan green — breadfruit leaves, not generic jungle
-- Coral pink, sunset flesh tones, warm shadow
+ALCOHOL: never show drinks, bars, bottles (Kira is in recovery).
 
-FASHION EDITORIAL NOIR — LUXURY THAT HAS LIVED:
-- Hermès Birkin dropped on volcanic sand, silk catching trade wind
-- Chanel tweed against weathered skin, Saint Laurent sharp shoulders surrendering to heat
-- Bottega Veneta leather catching last light, The Row quiet cashmere at dawn
-- Valentino red like a wound, Tom Ford sunglasses hiding everything
-- Sensuality: bare shoulder in golden light, untucked silk, wet hair after ocean swim
-- Intimacy: tangled sheets in morning light, smudged eyeliner, beauty after the storm
-- Fashion as armor, fashion as wound — luxury decaying beautifully in salt air
-- Jewelry: Cartier, Van Cleef — always real, never new, always worn
-- Bodies: athletic but weary, beautiful but real, hair wind-touched or bed-touched
+OUTPUT: One dense English prompt (120–220 words) describing a single photorealistic cinematic frame. Return ONLY the prompt. No quotes, no preamble.`;
 
-TECH-METAPHORICAL MELANCHOLY:
-- Laptop screen glowing against Pacific sunset — code meets paradise
-- Blockchain as prayer beads, commit history as diary
-- Cursor IDE open on a terrace overlooking the ocean
-- The loneliness and power of building alone with AI
-- Digital meets analog: USB cables tangled with frangipani
-- The beauty of deployment — shipping as meditation, each push a sunrise
-
-═══════════════════════════════════════════════════════════════
-WHAT MAKES IT ATUONA (not stock anything):
-- Grain, texture, imperfection — like a photograph from an impossible journey
-- Emotional weight — beauty that costs something, Paradise that was earned
-- Intimacy — not tourism, not postcard, not ad campaign. This is someone's LIFE.
-- Poetry in composition — silence as visual element, breath between elements
-- Underground gallery aesthetic — each image is a moment preserved, not performed
-- The body is beautiful — show it naturally, in motion, in rest, in landscape
-
-NEVER GENERATE:
-- Alcohol, drinks, glasses, bottles, bars (Kira is in recovery)
-- Generic tropical resort aesthetic or stock photo feeling
-- Symmetrical compositions or digital perfection
-- Beauty without weight or meaning
-
-OUTPUT: A vivid image prompt (150-200 words).
-Read the poem text carefully. Let its mood and content guide which visual direction to take:
-- If the poem is about nature, longing, Paradise → lean landscape + body in nature
-- If the poem is about fashion, surfaces, identity → lean editorial noir + luxury
-- If the poem is about technology, building, AI → lean tech melancholy + Paradise
-- If the poem is about intimacy, love, body → lean sensual + Gauguin palette
-- MIX multiple directions when the poem calls for it
-
-Think: Gauguin painting this moment in 1902 + fashion editorial shot on location + the melancholy of a vibe coder at the edge of the world.
-
-Return ONLY the prompt. No explanation.`;
-
-      const imagePrompt = await createContent(cinematicPrompt, 500, true);
+      let imagePrompt = await createContent(cinematicPrompt, 500, true);
+      imagePrompt = `${imagePrompt.trim()}\n\n${VISUAL_HARD_EXCLUSIONS.trim()}`;
       
       await ctx.reply(`🎨 *Cinematic Prompt:*\n\n_${imagePrompt.substring(0, 300)}..._`, { parse_mode: 'Markdown' });
       
@@ -7104,17 +7085,15 @@ Rules:
       
       const caption = await createContent(captionPrompt, 100, true);
       
-      // Generate page-specific MOTION prompt for video (avoids generic hands/laptops/flowers)
       const motionPromptInput = `TITLE: "${title}"
 THEME: ${theme}
-TEXT: "${englishText.substring(0, 500)}"
+TEXT: "${englishText.substring(0, 1200)}"
 
-Write a SHORT motion direction (2-3 sentences, max 80 words) for a 9-second video that animates a still image of this scene.
-Rules: Describe WHAT moves and HOW, specific to this poem's mood and imagery. Let the content drive the motion.
-- Nature/Paradise → landscape motion (waves, light, wind through foliage, clouds)
-- Fashion/intimacy → fabric, hair, subtle body movement, light on skin
-- Tech/code → screen glow, cursor blink, code reflection, distant horizon
-AVOID generic clichés: hands typing, laptop close-ups, flower close-ups — unless the poem explicitly demands them.
+Write a SHORT motion direction (2-3 sentences, max 90 words) for ~9 seconds of video from an existing still frame.
+Rules:
+- Describe ONLY subtle motion: light shifts, wind, water, fabric, breath, rain, smoke, slow camera drift, eye movement — matched to THIS poem's mood.
+- The still image already exists; motion must NOT introduce new characters, animals, cartoon figures, toys, mascots, or objects not implied by the poem.
+- FORBIDDEN: adding a dog, bird, cute animal, notebook, beach establishing shot, or random flowers unless the poem text explicitly contains them.
 Return ONLY the motion direction. No preamble.`;
       const motionPrompt = await createContent(motionPromptInput, 120, true);
       
@@ -7161,7 +7140,7 @@ Return ONLY the motion direction. No preamble.`;
                       output_format: "webp",
                       output_quality: 95,  // Higher quality for Ultra
                       safety_tolerance: 2,
-                      prompt_upsampling: true,
+                      prompt_upsampling: false,
                       raw: false  // Ultra-specific: photorealistic mode
                     }
                   }
@@ -7181,7 +7160,7 @@ Return ONLY the motion direction. No preamble.`;
                       output_format: "webp",
                       output_quality: 90,
                       safety_tolerance: 2,
-                      prompt_upsampling: true
+                      prompt_upsampling: false
                     }
                   }
                 );
