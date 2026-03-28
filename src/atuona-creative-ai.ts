@@ -3163,6 +3163,10 @@ async function generateVideo(
 
 const MODIFY_VIDEO_MODE = 'flex_1';
 
+function escapeMd(s: string): string {
+  return s.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$1');
+}
+
 interface ModifyVideoResult {
   success: boolean;
   generationId?: string;
@@ -3297,7 +3301,7 @@ function pollAndDeliverDirectorsCut(
 
         try {
           await ctx.replyWithVideo(data.assets.video, {
-            caption: `🎬✨ *Director's Cut Ready!*\n\n_Fashion/editorial layer applied (${MODIFY_VIDEO_MODE})_\n\n💡 _${fashionPrompt.substring(0, 120)}..._`,
+            caption: `🎬✨ *Director's Cut Ready!*\n\nFashion/editorial layer applied (\`${MODIFY_VIDEO_MODE}\`)\n\n💡 ${escapeMd(fashionPrompt.substring(0, 120))}`,
             parse_mode: 'Markdown'
           });
         } catch {
@@ -3351,13 +3355,13 @@ async function startDirectorsCutPipeline(opts: {
 
   try {
     await ctx.reply(
-      `🎬✨ *Film Director Agent:* starting fashion/editorial pass on the base video...\n_Mode: ${MODIFY_VIDEO_MODE} — this takes 1-3 minutes_`,
+      `🎬✨ *Film Director Agent:* starting fashion/editorial pass on the base video...\nMode: \`${MODIFY_VIDEO_MODE}\` — _this takes 1-3 minutes_`,
       { parse_mode: 'Markdown' }
     );
 
     const fashionPrompt = await buildFashionEditorialPrompt({ title, theme, englishExcerpt, knowledgeKeys });
     console.log('Fashion/editorial prompt:', fashionPrompt);
-    await ctx.reply(`🎬 *Fashion direction:*\n\n_${fashionPrompt.substring(0, 280)}_`, { parse_mode: 'Markdown' });
+    await ctx.reply(`🎬 *Fashion direction:*\n\n${escapeMd(fashionPrompt.substring(0, 280))}`, { parse_mode: 'Markdown' });
 
     const result = await startModifyVideo(baseVideoUrl, firstFrameImageUrl, fashionPrompt);
 
