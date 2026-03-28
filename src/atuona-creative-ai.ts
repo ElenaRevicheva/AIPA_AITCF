@@ -1564,12 +1564,9 @@ function getRelevantKnowledge(text: string, characterVoice?: string, maxSections
   return `[Using knowledge: ${usedKnowledge}]\n\n${knowledgeParts.join('\n\n')}`;
 }
 
-/**
- * Knowledge for /visualize and /imagine: scan the FULL poem text (not a 200-char snippet).
- * If nothing matches, use a stable fallback — NOT rotating random Gauguin/beach blocks.
- */
-function getRelevantKnowledgeForVisuals(text: string, characterVoice?: string, maxSections: number = 6): string {
-  const matchedSections: Set<KnowledgeCategory> = new Set();
+/** Sync scan: character voice + regex triggers on full text */
+function collectTriggerKnowledgeKeys(text: string, characterVoice?: string): KnowledgeCategory[] {
+  const matchedSections = new Set<KnowledgeCategory>();
 
   if (characterVoice && CHARACTER_KNOWLEDGE[characterVoice]) {
     CHARACTER_KNOWLEDGE[characterVoice].forEach(k => matchedSections.add(k));
@@ -1581,23 +1578,34 @@ function getRelevantKnowledgeForVisuals(text: string, characterVoice?: string, m
     }
   }
 
-  if (matchedSections.size === 0) {
-    (['emotional', 'atuona', 'vibe'] as KnowledgeCategory[]).forEach(k => matchedSections.add(k));
-    console.log('🎬 Visual knowledge fallback: emotional + atuona + vibe (no rotation)');
-  }
+  return Array.from(matchedSections);
+}
 
-  const sectionsArray = Array.from(matchedSections).slice(0, maxSections);
+function formatKnowledgeFromKeys(keys: KnowledgeCategory[]): string {
   const knowledgeParts: string[] = [];
-
-  for (const key of sectionsArray) {
+  for (const key of keys) {
     const section = KNOWLEDGE_SECTIONS.find(s => s.key === key);
     if (section) {
       knowledgeParts.push(section.content);
     }
   }
+  return `[Using knowledge: ${keys.join(', ')}]\n\n${knowledgeParts.join('\n\n')}`;
+}
 
-  const usedKnowledge = sectionsArray.join(', ');
-  return `[Using knowledge: ${usedKnowledge}]\n\n${knowledgeParts.join('\n\n')}`;
+/**
+ * Knowledge for /visualize and /imagine: scan the FULL poem text (not a 200-char snippet).
+ * If nothing matches, use a stable fallback — NOT rotating random Gauguin/beach blocks.
+ * For deeper routing after content analysis, use getDeepKnowledgeForVisuals (async).
+ */
+function getRelevantKnowledgeForVisuals(text: string, characterVoice?: string, maxSections: number = 6): string {
+  let keys = collectTriggerKnowledgeKeys(text, characterVoice);
+
+  if (keys.length === 0) {
+    keys = ['emotional', 'atuona', 'vibe'];
+    console.log('🎬 Visual knowledge fallback: emotional + atuona + vibe (no rotation)');
+  }
+
+  return formatKnowledgeFromKeys(keys.slice(0, maxSections));
 }
 
 /** Appended to Flux/Replicate prompts — stops cartoon stock tropes */
@@ -2713,6 +2721,127 @@ async function createContent(prompt: string, maxTokens: number = 2000, isPoetry:
     }
     throw claudeError;
   }
+}
+
+const VALID_KNOWLEDGE_KEYS = new Set<KnowledgeCategory>([
+  'atuona', 'gauguin', 'impressionists', 'auction', 'fashion', 'vibe', 'museums', 'fusion', 'atlas', 'agentic', 'emotional'
+]);
+
+function parseKnowledgeKeysFromLlm(raw: string): KnowledgeCategory[] {
+  const cleaned = raw.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').trim();
+  const firstLine = (cleaned.split('\n').find(l => l.trim().length > 0) || cleaned).trim();
+  const parts = firstLine
+    .toLowerCase()
+    .split(/[,\s;|]+/)
+    .map(p => p.replace(/[^a-z]/g, ''))
+    .filter(Boolean);
+  const out: KnowledgeCategory[] = [];
+  for (const p of parts) {
+    if (VALID_KNOWLEDGE_KEYS.has(p as KnowledgeCategory)) {
+      out.push(p as KnowledgeCategory);
+    }
+  }
+  return [...new Set(out)];
+}
+
+function mergeKnowledgeKeys(
+  triggerKeys: KnowledgeCategory[],
+  llmKeys: KnowledgeCategory[],
+  maxSections: number
+): KnowledgeCategory[] {
+  const seen = new Set<KnowledgeCategory>();
+  const out: KnowledgeCategory[] = [];
+  for (const k of [...triggerKeys, ...llmKeys]) {
+    if (!seen.has(k)) {
+      seen.add(k);
+      out.push(k);
+      if (out.length >= maxSections) {
+        break;
+      }
+    }
+  }
+  if (out.length === 0) {
+    return (['emotional', 'atuona', 'vibe'] as KnowledgeCategory[]).slice(0, maxSections);
+  }
+  return out;
+}
+
+/**
+ * After reading the exact page content, ask the model which knowledge modules earn a place
+ * for this image — then merge with regex trigger scan (triggers stay as ground truth).
+ */
+async function analyzePoemForKnowledgeModules(params: {
+  title: string;
+  theme: string;
+  englishExcerpt: string;
+  russianExcerpt: string;
+  triggerKeys: KnowledgeCategory[];
+}): Promise<KnowledgeCategory[]> {
+  const { title, theme, englishExcerpt, russianExcerpt, triggerKeys } = params;
+  const prompt = `You are the ATUONA knowledge router. The codebase embeds 11 knowledge modules (full context on art, fashion, museums, NFT, vibe coding, Atlas Shrugged, recovery, Polynesia, etc.) used to enrich AI image/video prompts.
+
+VALID MODULE KEYS (use ONLY these exact words, comma-separated on ONE line):
+atuona, gauguin, impressionists, auction, fashion, vibe, museums, fusion, atlas, agentic, emotional
+
+TITLE: ${title}
+THEME: ${theme}
+
+ENGLISH TEXT:
+${englishExcerpt}
+
+RUSSIAN TEXT:
+${russianExcerpt || '(none)'}
+
+REGEX PRE-SCAN (explicit keywords in text — keep any that fit; you may ADD modules the poem implies but regex missed): ${triggerKeys.length ? triggerKeys.join(', ') : 'none'}
+
+TASK:
+1. Read the entire poem — themes, metaphors, characters, art/market/tech/crypto/recovery/political undertones.
+2. Pick 5–10 module keys that genuinely deepen visuals for THIS page only. Each key must be justified by the text (explicit or clear implicit theme).
+3. emotional = family, grief, addiction/recovery, loneliness, healing, inner struggle.
+4. atuona / gauguin = Polynesia, Paradise, exile, painterly myth (only when the poem’s atmosphere supports it).
+5. vibe / agentic / fusion = building with AI, shipping, agents, NFT/blockchain-as-metaphor when the poem touches tech.
+6. atlas = individualism, strike, Galt-adjacent ideas, systemic critique when present.
+7. Do NOT pad with unrelated art history — precision over volume.
+
+Return ONE LINE ONLY: comma-separated keys, no other words.
+Example: emotional,atuona,vibe,gauguin,fashion`;
+
+  const raw = await createContent(prompt, 220, false);
+  return parseKnowledgeKeysFromLlm(raw);
+}
+
+/**
+ * Full visual pipeline: exact content + trigger scan + LLM module selection → full KB excerpts.
+ */
+async function getDeepKnowledgeForVisuals(opts: {
+  combinedText: string;
+  title: string;
+  theme: string;
+  englishExcerpt: string;
+  russianExcerpt: string;
+  characterVoice?: string;
+  maxSections: number;
+}): Promise<string> {
+  const { combinedText, title, theme, englishExcerpt, russianExcerpt, characterVoice, maxSections } = opts;
+  const triggerKeys = collectTriggerKnowledgeKeys(combinedText, characterVoice);
+
+  let llmKeys: KnowledgeCategory[] = [];
+  try {
+    llmKeys = await analyzePoemForKnowledgeModules({
+      title,
+      theme,
+      englishExcerpt: englishExcerpt.slice(0, 4000),
+      russianExcerpt: russianExcerpt.slice(0, 2500),
+      triggerKeys
+    });
+  } catch (e) {
+    console.error('🎬 Knowledge module analysis failed, using triggers only:', e);
+  }
+
+  const merged = mergeKnowledgeKeys(triggerKeys, llmKeys, maxSections);
+  console.log(`🎬 Deep knowledge keys (triggers: ${triggerKeys.join(', ') || '—'} | LLM: ${llmKeys.join(', ') || '—'} | merged: ${merged.join(', ')})`);
+
+  return formatKnowledgeFromKeys(merged);
 }
 
 // =============================================================================
@@ -6803,10 +6932,23 @@ Set OPENAI_API_KEY for full functionality.`, { parse_mode: 'Markdown' });
       return;
     }
     
-    await ctx.reply('🎨 *Creating image prompt...*', { parse_mode: 'Markdown' });
-    
     try {
-      const imagineKnowledge = getRelevantKnowledgeForVisuals(description, creativeSession.activeVoice, 5);
+      await ctx.reply(
+        '🧠 *Knowledge pass:* mapping your description to the embedded base (scan + analysis)...',
+        { parse_mode: 'Markdown' }
+      );
+
+      const imagineKnowledge = await getDeepKnowledgeForVisuals({
+        combinedText: description,
+        title: 'Imagine',
+        theme: 'user-provided scene',
+        englishExcerpt: description.slice(0, 4000),
+        russianExcerpt: '',
+        characterVoice: creativeSession.activeVoice,
+        maxSections: 8
+      });
+
+      await ctx.reply('🎨 *Creating image prompt...*', { parse_mode: 'Markdown' });
 
       const promptOptimizer = `You are an expert at prompts for AI image generation (Flux, DALL-E, Midjourney).
 
@@ -7012,15 +7154,26 @@ Return ONLY the translation. Plain text.`;
         }
       }
       
-      // Generate cinematic prompt with ATUONA's unique vision & character context
-      await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
-      
       const combinedForKnowledge = `${title}\n${theme}\n${englishText}\n${russianText}`.slice(0, 12000);
-      const visualKnowledge = getRelevantKnowledgeForVisuals(
-        combinedForKnowledge,
-        creativeSession.activeVoice,
-        6
+      const englishExcerpt = englishText.slice(0, 3500);
+      const russianExcerpt = russianText ? russianText.slice(0, 1200) : '';
+
+      await ctx.reply(
+        '🧠 *Knowledge pass:* reading this page and selecting which modules from the embedded base apply (regex + analysis)...',
+        { parse_mode: 'Markdown' }
       );
+
+      const visualKnowledge = await getDeepKnowledgeForVisuals({
+        combinedText: combinedForKnowledge,
+        title,
+        theme,
+        englishExcerpt,
+        russianExcerpt,
+        characterVoice: creativeSession.activeVoice,
+        maxSections: 10
+      });
+
+      await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
 
       const metaphorHint = creativeMemory.recentMetaphors?.length
         ? `RECENT METAPHORS FROM THE BOOK (prefer these over generic props): ${creativeMemory.recentMetaphors.slice(-5).join(' | ')}`
@@ -7033,9 +7186,6 @@ Return ONLY the translation. Plain text.`;
       const plotContext = creativeSession?.plotThreads?.length
         ? `PLOT THREADS: ${creativeSession.plotThreads.slice(0, 5).join('; ')}`
         : '';
-
-      const englishExcerpt = englishText.slice(0, 3500);
-      const russianExcerpt = russianText ? russianText.slice(0, 1200) : '';
 
       const cinematicPrompt = `You write ONE image-generation prompt for ATUONA (underground poetry NFT / film stills).
 
@@ -7052,7 +7202,7 @@ ${characterContext}
 ${plotContext}
 ${metaphorHint}
 
-REFERENCE KNOWLEDGE (only pull specific facts, paintings, or parallels that genuinely match THIS page — ignore unrelated art history):
+REFERENCE KNOWLEDGE (modules were chosen for THIS page after a full-text read + trigger scan — use concrete facts, names, and parallels from these excerpts; do not drift into generic stock imagery):
 ${visualKnowledge}
 
 VISUAL RULES:
