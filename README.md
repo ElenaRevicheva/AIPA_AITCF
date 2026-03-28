@@ -491,6 +491,9 @@ OPENAI_API_KEY=<your-openai-api-key>
 
 # GitHub
 GITHUB_TOKEN=<your-github-token>
+# Optional aliases (any one works):
+# GITHUB_PAT=<your-github-token>
+# GH_TOKEN=<your-github-token>
 
 # Telegram Bots
 TELEGRAM_BOT_TOKEN=<your-cto-bot-token>

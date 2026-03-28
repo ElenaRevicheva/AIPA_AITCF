@@ -47,3 +47,6 @@ proper_working_fix.py
 .idea/
 *.swp
 *.swo
+
+# Claude Code worktrees (local only)
+.claude/worktrees/

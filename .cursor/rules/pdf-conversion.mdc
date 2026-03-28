@@ -1,0 +1,31 @@
+---
+description: Fast Markdown-to-PDF conversion without Puppeteer
+alwaysApply: false
+globs: "**/*.md"
+---
+
+# PDF Conversion — Fast Method (No Puppeteer)
+
+**Problem:** `md-to-pdf` (Puppeteer) often times out or hangs. Avoid it for quick conversions.
+
+**Solution:** Use `pdf-lib` with a simple Node script. No browser, no timeout.
+
+## In handy_manny-s
+
+```bash
+cd handy_manny-s
+node docs/convert-both-pdfs.js
+```
+
+Creates: `docs/ROADMAP_AND_PLAN.pdf`, `docs/CONTENT_AUDIT_SUMMARY_FOR_MANNY.pdf`
+
+## Key pattern
+
+1. **Install:** `npm install pdf-lib`
+2. **Sanitize text:** pdf-lib WinAnsi cannot encode Unicode (→, —, ", etc.). Use `toAscii()` to replace: `→`→`->`, `—`→`-`, `[^\x00-\x7F]`→`''`
+3. **Simple flow:** Read MD → strip formatting → wrap text → `page.drawText(toAscii(line))` → save
+4. **No Puppeteer** = fast, reliable, no loop
+
+## For other projects
+
+Copy `docs/convert-both-pdfs.js` pattern: FILES array, toAscii(), mdToLines(), wrapText(), convertFile().

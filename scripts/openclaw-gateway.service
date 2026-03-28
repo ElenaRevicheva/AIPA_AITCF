@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenClaw Gateway (job shortlist bot)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/home/ubuntu/.openclaw/.env
+ExecStart=/usr/bin/env openclaw gateway --port 18789 --token ${OPENCLAW_GATEWAY_TOKEN}
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Install]
+WantedBy=default.target
