@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { Bot, Context, InputFile } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
@@ -215,7 +218,10 @@ function stopAutoSave(): void {
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || process.env.GH_TOKEN || '')
+  .replace(/^['"]|['"]$/g, '')
+  .trim();
+const octokit = new Octokit({ auth: githubToken || undefined });
 
 // Authorized users (same as CTO AIPA)
 const AUTHORIZED_USERS = process.env.TELEGRAM_AUTHORIZED_USERS?.split(',').map(id => parseInt(id.trim())) || [];

@@ -11,7 +11,10 @@ dotenv.config();
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || process.env.GH_TOKEN || '')
+  .replace(/^['"]|['"]$/g, '')
+  .trim();
+const octokit = new Octokit({ auth: githubToken || undefined });
 
 // =============================================================================
 // AI MODEL CONFIGURATION - Change models via environment variables!
