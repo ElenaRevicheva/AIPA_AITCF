@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import { Octokit } from '@octokit/rest';
 
-dotenv.config();
+dotenv.config({ override: true });
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
