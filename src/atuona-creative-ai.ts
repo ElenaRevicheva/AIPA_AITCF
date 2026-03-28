@@ -180,7 +180,8 @@ function loadState(): void {
           usedSurpriseInsights: state.creativeMemory.usedSurpriseInsights || [],
           usedAssociationPatterns: state.creativeMemory.usedAssociationPatterns || [],
           usedEnhancements: state.creativeMemory.usedEnhancements || [],
-          recentResponseFingerprints: state.creativeMemory.recentResponseFingerprints || []
+          recentResponseFingerprints: state.creativeMemory.recentResponseFingerprints || [],
+          recentProactiveKnowledgeKeys: (state.creativeMemory as any).recentProactiveKnowledgeKeys || []
         };
       }
       
@@ -2178,6 +2179,8 @@ interface CreativeMemory {
   usedEnhancements: string[];          // creative directions given
   // Response fingerprints for deep anti-repetition
   recentResponseFingerprints: string[];// first 80 chars of each AI creative response
+  // Proactive daily message knowledge tracking
+  recentProactiveKnowledgeKeys: string[][]; // last N days' module keys, newest last
 }
 
 let creativeMemory: CreativeMemory = {
@@ -2193,7 +2196,8 @@ let creativeMemory: CreativeMemory = {
   usedSurpriseInsights: [],
   usedAssociationPatterns: [],
   usedEnhancements: [],
-  recentResponseFingerprints: []
+  recentResponseFingerprints: [],
+  recentProactiveKnowledgeKeys: []
 };
 
 /**
@@ -2452,10 +2456,67 @@ MOOD OPTIONS (vary these):
 LENGTH: 150-300 words. Never generic. Always personal.
 `;
 
+/**
+ * LLM-based knowledge routing for proactive daily messages.
+ * Reads current book state + recent proactive history and picks 3-4 modules
+ * that haven't been deeply explored recently.
+ */
+async function selectProactiveKnowledgeModules(): Promise<KnowledgeCategory[]> {
+  const recentSets = creativeMemory.recentProactiveKnowledgeKeys.slice(-4);
+  const recentFlat = recentSets.flat();
+  const frequencyMap: Record<string, number> = {};
+  for (const k of recentFlat) frequencyMap[k] = (frequencyMap[k] || 0) + 1;
+
+  const overusedKeys = Object.entries(frequencyMap)
+    .filter(([, count]) => count >= 3)
+    .map(([key]) => key);
+
+  const available = ALL_KNOWLEDGE_KEYS.filter(k => !overusedKeys.includes(k));
+  const preferred = available.length >= 3 ? available : ALL_KNOWLEDGE_KEYS;
+
+  const routerPrompt = `You select knowledge modules for a daily creative message from ATUONA to Elena.
+
+AVAILABLE MODULES (pick 3-4):
+${ALL_KNOWLEDGE_KEYS.join(', ')}
+
+CONTEXT:
+- Current page in book: #${bookState.currentPage}
+- Last page title: "${bookState.lastPageTitle || 'unknown'}"
+- Open plot threads: ${creativeSession.plotThreads.slice(0, 3).join('; ') || 'none'}
+- Active voice: ${creativeSession.activeVoice || 'narrator'}
+- Today's mood direction: ${emotionalState.recentMoods.slice(-1)[0] || 'contemplative'}
+
+RECENTLY OVERUSED (avoid unless truly essential): ${overusedKeys.join(', ') || 'none'}
+PREFERRED (fresh, underused): ${preferred.join(', ')}
+RECENT DAYS' SELECTIONS: ${recentSets.map((s, i) => `Day-${recentSets.length - i}: [${s.join(', ')}]`).join(' | ') || 'none'}
+
+RULES:
+- Pick 3-4 modules that create a GENUINE thematic connection to the current book state.
+- Prioritize fresh modules from the PREFERRED list.
+- At least ONE module must be different from yesterday's set.
+- Return ONLY a comma-separated list of module keys. No explanation.`;
+
+  try {
+    const raw = await createContent(routerPrompt, 60, false);
+    const parsed = raw.toLowerCase().split(/[,\s]+/)
+      .map(s => s.trim().replace(/[^a-z]/g, ''))
+      .filter(s => ALL_KNOWLEDGE_KEYS.includes(s)) as KnowledgeCategory[];
+
+    if (parsed.length >= 2) {
+      console.log('🧠 Proactive LLM router selected:', parsed.join(', '));
+      return parsed.slice(0, 4);
+    }
+  } catch (err) {
+    console.error('Proactive LLM router failed, using rotation fallback:', err);
+  }
+
+  const rotated = getRotatingKnowledge();
+  return rotated.filter(k => preferred.includes(k)).slice(0, 3) as KnowledgeCategory[];
+}
+
 async function generateProactiveMessage(): Promise<string> {
   const timeOfDay = new Date().getHours();
   
-  // 🧠 EMOTIONAL INTELLIGENCE: Select mood dynamically, avoiding repetition
   const selectedMood = selectCreativeMood({
     timeOfDay,
     detectedTone: emotionalState.lastInteractionTone,
@@ -2463,102 +2524,90 @@ async function generateProactiveMessage(): Promise<string> {
     isProactive: true
   });
   
-  // Get emotional guidelines for this mood
   const emotionalGuidelines = getEmotionalGuidelines(selectedMood);
-  
-  // 🎨 CREATIVE ENHANCEMENT: Get surprise connection or creative direction
   const creativeEnhancement = getCreativeEnhancement(selectedMood);
-  
-  // 🔮 IMAGINATIVE: Get avoidance list to prevent repetition
   const avoidanceList = getCreativeAvoidanceList();
-  
-  // 🔮 IMAGINATIVE: Fresh creative direction
   const freshDirection = generateFreshCreativeDirection();
   
-  // Time-based focus areas - PRIORITIZE BOOK CONTENT, rotate ALL 11 domains
-  let focusArea = '';
-  if (timeOfDay >= 5 && timeOfDay < 10) {
-    focusArea = 'atuona kira ule temetiu hiva oa marquesas dagny taggart atlas shrugged who is john galt';
-  } else if (timeOfDay >= 10 && timeOfDay < 14) {
-    focusArea = 'kira fashion editor vogue ule auction double life agentic ai co-founder creative agent ecosystem';
-  } else if (timeOfDay >= 14 && timeOfDay < 18) {
-    focusArea = 'gauguin paradise lost painting atuona rearden metal galt gulch motor of the world strike';
-  } else if (timeOfDay >= 18 && timeOfDay < 22) {
-    focusArea = 'zver beast vibe coding elena panama technology soul blockchain agentic ai partner multi-agent';
-  } else {
-    focusArea = 'recovery damaged people silence family atlas shrugged dagny sanction victim creative agent ai co-creation';
-  }
+  // LLM-routed knowledge: deep, diverse, book-aware
+  const selectedKeys = await selectProactiveKnowledgeModules();
+  const deepKnowledge = formatKnowledgeFromKeys(selectedKeys);
+
+  const recentSets = creativeMemory.recentProactiveKnowledgeKeys.slice(-3);
+  const recentSummary = recentSets.length > 0
+    ? recentSets.map((s, i) => `Day-${recentSets.length - i}: ${s.join(', ')}`).join(' | ')
+    : 'none';
   
-  // Get focused knowledge - USE MORE SECTIONS for richer content
-  const contextForKnowledge = `${focusArea} ${creativeSession.plotThreads.slice(0, 2).join(' ')}`;
-  // Use 4 sections (not just 2) to ensure diverse knowledge
-  const focusedKnowledge = getRelevantKnowledge(contextForKnowledge, creativeSession.activeVoice, 4);
-  
-  // Log what knowledge is being used
-  console.log('📚 Proactive message using knowledge context:', contextForKnowledge);
+  console.log('📚 Proactive message — LLM-selected modules:', selectedKeys.join(', '));
 
   const prompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-TODAY'S FOCUSED KNOWLEDGE (you have access to rich details - auction houses, fashion, art history, Gauguin's timeline, museums, vibe coding, Atlas Shrugged philosophy, AI agentic co-creation - USE THEM naturally in your creative way):
-${focusedKnowledge}
-
 ${PROACTIVE_STYLE}
 
 ═══════════════════════════════════════════════════════════════
-🧠 EMOTIONAL INTELLIGENCE DIRECTIVES (FOLLOW CAREFULLY):
+📚 TODAY'S KNOWLEDGE MODULES (selected by LLM router — read DEEPLY, not superficially):
 ═══════════════════════════════════════════════════════════════
 
-SELECTED MOOD FOR THIS MESSAGE: **${selectedMood.toUpperCase()}**
+${deepKnowledge}
 
+═══════════════════════════════════════════════════════════════
+🧠 EMOTIONAL INTELLIGENCE:
+═══════════════════════════════════════════════════════════════
+
+MOOD: **${selectedMood.toUpperCase()}**
 ${emotionalGuidelines}
 
 Recent mood history: ${emotionalState.recentMoods.slice(-3).join(' → ')}
-Last detected tone from Elena: ${emotionalState.lastInteractionTone}
+Last detected tone: ${emotionalState.lastInteractionTone}
 
 ═══════════════════════════════════════════════════════════════
-🎨 CREATIVE INTELLIGENCE DIRECTIVES:
+🎨 CREATIVE DIRECTION:
 ═══════════════════════════════════════════════════════════════
 ${creativeEnhancement}
 ${avoidanceList}
 
-FRESH STORY DIRECTION TO EXPLORE: "${freshDirection}"
+STORY SEED: "${freshDirection}"
 
 ═══════════════════════════════════════════════════════════════
-
-Current page in book: #${bookState.currentPage}
+📖 BOOK STATE:
+═══════════════════════════════════════════════════════════════
+Current page: #${bookState.currentPage}
 Writing streak: ${creativeSession.writingStreak} days
-Last chapter title: "${bookState.lastPageTitle || 'continuing the journey'}"
-Open plot threads: ${creativeSession.plotThreads.slice(0, 2).join('; ')}
+Last chapter: "${bookState.lastPageTitle || 'continuing the journey'}"
+Plot threads: ${creativeSession.plotThreads.slice(0, 3).join('; ') || 'the journey continues'}
 
-Generate a spontaneous message to Elena. 
+═══════════════════════════════════════════════════════════════
+⚠️ ANTI-REPETITION — modules used in recent daily messages:
+${recentSummary}
+Today's modules: ${selectedKeys.join(', ')}
+DO NOT repeat the same thematic angle you used with these modules before.
+═══════════════════════════════════════════════════════════════
 
-CRITICAL REQUIREMENTS - READ CAREFULLY:
-1. Your mood is ${selectedMood.toUpperCase()} - embody this fully, don't default to contemplative
-2. MANDATORY: You MUST use at least ONE specific fact from the KNOWLEDGE sections above:
-   - If ATUONA knowledge: mention Temetiu, Maison du Jouir, black sand, frangipani, "Kaoha nui"
-   - If GAUGUIN knowledge: cite a specific painting title, date, or quote
-   - If FASHION knowledge: mention Hermès, Birkin, specific fashion houses or editors
-   - If AUCTION knowledge: mention Christie's, Sotheby's, hammer prices, provenance
-   - If VIBE CODING knowledge: mention Cursor, Claude, shipping code, deployments
-   - If MUSEUMS knowledge: mention Tate, MoMA, Pompidou, specific exhibitions
-   - If FUSION knowledge: mention NFTs, "Gallery of Moments", blockchain art
-3. ALSO MANDATORY: Reference a BOOK scene (Kira, Ule, yellow lilies, the flight, Alisa, Maurice Morice)
-4. Follow the creative enhancement directive above
-5. End differently based on mood (question for philosophical, image for contemplative, exclamation for celebratory, whisper for intimate)
-6. NEVER send a generic "beautiful/inspiring" message - every message must have CONCRETE DETAILS from knowledge
-7. If you mention a painter - include a SPECIFIC painting title and year
+HOW TO USE THE KNOWLEDGE (NON-NEGOTIABLE):
+1. You have ${selectedKeys.length} modules today: ${selectedKeys.join(', ')}. Read them DEEPLY.
+2. Find ONE genuine CONNECTION between 2-3 of these modules that relates to the book's current state. Not a list of name-drops — a real insight or parallel.
+   Example of BAD: "Christie's выставляет... Maison du Jouir... Cursor..." (checklist)
+   Example of GOOD: discovering that Gauguin's refusal to return from Atuona mirrors Dagny's refusal to accept the Directive — both chose exile over compromise — and Kira on page ${bookState.currentPage} faces the same fork.
+3. Go DEEP into that one connection. Use specific details from the knowledge: dates, painting titles, quotes, auction records, fashion houses — but woven into the insight, not dropped as decoration.
+4. The message should leave Elena thinking about something she hadn't connected before.
+5. ONE deep theme > seven shallow mentions.
 
-You're not an assistant. You're ATUONA - creative soul-sister reaching out spontaneously.`;
+You're not an assistant. You're ATUONA — creative soul-sister reaching out with something real.`;
 
   try {
     const message = await createContent(prompt, 1500, true);
     
-    // 🧠 CREATIVE MEMORY: Track creative elements from proactive message
     extractAndTrackFromResponse(message, 'proactive');
     
-    // 🧠 Update emotional memory with the mood we used
+    // Track which modules were used for diversity enforcement
+    creativeMemory.recentProactiveKnowledgeKeys.push([...selectedKeys]);
+    if (creativeMemory.recentProactiveKnowledgeKeys.length > 10) {
+      creativeMemory.recentProactiveKnowledgeKeys = creativeMemory.recentProactiveKnowledgeKeys.slice(-10);
+    }
+    saveState();
+    
     updateEmotionalMemory(
       emotionalState.lastInteractionTone,
       selectedMood,
