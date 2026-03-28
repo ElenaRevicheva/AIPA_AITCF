@@ -2815,6 +2815,16 @@ Example: emotional,vibe,gauguin,atuona`;
   return parseKnowledgeKeysFromLlm(raw);
 }
 
+interface DeepKnowledgeForVisualsResult {
+  formatted: string;
+  mergedKeys: KnowledgeCategory[];
+  triggerKeys: KnowledgeCategory[];
+  /** Keys from the router model before empty fallback */
+  llmKeysRaw: KnowledgeCategory[];
+  /** Keys actually used in merge (after fallback if model returned none) */
+  llmKeysForMerge: KnowledgeCategory[];
+}
+
 /**
  * Full visual pipeline: exact content + trigger scan + LLM module selection → full KB excerpts.
  */
@@ -2826,13 +2836,13 @@ async function getDeepKnowledgeForVisuals(opts: {
   russianExcerpt: string;
   characterVoice?: string;
   maxSections: number;
-}): Promise<string> {
+}): Promise<DeepKnowledgeForVisualsResult> {
   const { combinedText, title, theme, englishExcerpt, russianExcerpt, characterVoice, maxSections } = opts;
   const triggerKeys = collectTriggerKnowledgeKeys(combinedText, characterVoice);
 
-  let llmKeys: KnowledgeCategory[] = [];
+  let llmKeysRaw: KnowledgeCategory[] = [];
   try {
-    llmKeys = await analyzePoemForKnowledgeModules({
+    llmKeysRaw = await analyzePoemForKnowledgeModules({
       title,
       theme,
       englishExcerpt: englishExcerpt.slice(0, 4000),
@@ -2843,15 +2853,22 @@ async function getDeepKnowledgeForVisuals(opts: {
     console.error('🎬 Knowledge module analysis failed, using triggers only:', e);
   }
 
-  if (llmKeys.length === 0) {
+  let llmKeysForMerge = llmKeysRaw;
+  if (llmKeysForMerge.length === 0) {
     console.warn('🎬 LLM returned no module keys — using minimal fallback so regex does not flood the prompt');
-    llmKeys = ['emotional', 'vibe'];
+    llmKeysForMerge = ['emotional', 'vibe'];
   }
 
-  const merged = mergeKnowledgeKeys(triggerKeys, llmKeys, maxSections);
-  console.log(`🎬 Deep knowledge keys (triggers: ${triggerKeys.join(', ') || '—'} | LLM: ${llmKeys.join(', ') || '—'} | merged LLM-first: ${merged.join(', ')})`);
+  const merged = mergeKnowledgeKeys(triggerKeys, llmKeysForMerge, maxSections);
+  console.log(`🎬 Deep knowledge keys (triggers: ${triggerKeys.join(', ') || '—'} | LLM: ${llmKeysForMerge.join(', ') || '—'} | merged LLM-first: ${merged.join(', ')})`);
 
-  return formatKnowledgeFromKeys(merged);
+  return {
+    formatted: formatKnowledgeFromKeys(merged),
+    mergedKeys: merged,
+    triggerKeys,
+    llmKeysRaw,
+    llmKeysForMerge
+  };
 }
 
 // =============================================================================
@@ -6948,7 +6965,7 @@ Set OPENAI_API_KEY for full functionality.`, { parse_mode: 'Markdown' });
         { parse_mode: 'Markdown' }
       );
 
-      const imagineKnowledge = await getDeepKnowledgeForVisuals({
+      const deepImagineKb = await getDeepKnowledgeForVisuals({
         combinedText: description,
         title: 'Imagine',
         theme: 'user-provided scene',
@@ -6957,6 +6974,7 @@ Set OPENAI_API_KEY for full functionality.`, { parse_mode: 'Markdown' });
         characterVoice: creativeSession.activeVoice,
         maxSections: 8
       });
+      const imagineKnowledge = deepImagineKb.formatted;
 
       await ctx.reply('🎨 *Creating image prompt...*', { parse_mode: 'Markdown' });
 
@@ -7173,7 +7191,7 @@ Return ONLY the translation. Plain text.`;
         { parse_mode: 'Markdown' }
       );
 
-      const visualKnowledge = await getDeepKnowledgeForVisuals({
+      const deepKb = await getDeepKnowledgeForVisuals({
         combinedText: combinedForKnowledge,
         title,
         theme,
@@ -7182,6 +7200,23 @@ Return ONLY the translation. Plain text.`;
         characterVoice: creativeSession.activeVoice,
         maxSections: 7
       });
+      const visualKnowledge = deepKb.formatted;
+
+      const sendKnowledgeAuditAfterVideo = async () => {
+        const mergedLine = deepKb.mergedKeys.join(', ');
+        const llmLine =
+          deepKb.llmKeysRaw.length > 0
+            ? deepKb.llmKeysRaw.join(', ')
+            : `${deepKb.llmKeysForMerge.join(', ')} _(empty model output — fallback)_`;
+        await ctx.reply(
+          `🧠 *Knowledge base — modules used (after video)*
+
+*Merged (LLM-first, then regex):* \`${mergedLine}\`
+*LLM router:* ${llmLine}
+*Regex scan:* \`${deepKb.triggerKeys.join(', ') || '—'}\``,
+          { parse_mode: 'Markdown' }
+        );
+      };
 
       await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
 
@@ -7495,6 +7530,7 @@ Free tier limit reached. Options:
             } catch (videoSendError) {
               await ctx.reply(`✅ *Video Ready!* (Luma via Replicate)\n\n🎬 ${videoResult.videoUrl}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
             }
+            await sendKnowledgeAuditAfterVideo();
             
           } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
             // Luma Direct API needs polling - keep polling until done (max 5 min)
@@ -7528,6 +7564,7 @@ Free tier limit reached. Options:
                     } catch (videoSendError) {
                       await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${statusData.assets.video}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
                     }
+                    await sendKnowledgeAuditAfterVideo();
                     return; // Done!
                     
                   } else if (statusData.state === 'failed') {
@@ -7587,6 +7624,7 @@ Free tier limit reached. Options:
                     } catch (videoSendError) {
                       await ctx.reply(`✅ *Video Ready!* (Runway)\n\n🎬 ${statusData.output[0]}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
                     }
+                    await sendKnowledgeAuditAfterVideo();
                     return; // Done!
                     
                   } else if (statusData.status === 'FAILED') {
