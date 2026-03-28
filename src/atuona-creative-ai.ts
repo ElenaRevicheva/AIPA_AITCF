@@ -2744,6 +2744,10 @@ function parseKnowledgeKeysFromLlm(raw: string): KnowledgeCategory[] {
   return [...new Set(out)];
 }
 
+/**
+ * LLM-curated keys FIRST — regex often fires on single words (false positives).
+ * Triggers fill remaining slots only so "mindful pick" is not drowned by 8 auto-hits.
+ */
 function mergeKnowledgeKeys(
   triggerKeys: KnowledgeCategory[],
   llmKeys: KnowledgeCategory[],
@@ -2751,7 +2755,7 @@ function mergeKnowledgeKeys(
 ): KnowledgeCategory[] {
   const seen = new Set<KnowledgeCategory>();
   const out: KnowledgeCategory[] = [];
-  for (const k of [...triggerKeys, ...llmKeys]) {
+  for (const k of [...llmKeys, ...triggerKeys]) {
     if (!seen.has(k)) {
       seen.add(k);
       out.push(k);
@@ -2792,19 +2796,20 @@ ${englishExcerpt}
 RUSSIAN TEXT:
 ${russianExcerpt || '(none)'}
 
-REGEX PRE-SCAN (explicit keywords in text — keep any that fit; you may ADD modules the poem implies but regex missed): ${triggerKeys.length ? triggerKeys.join(', ') : 'none'}
+REGEX PRE-SCAN (may include FALSE POSITIVES — one word can match auction/museums/gauguin without the poem being "about" that): ${triggerKeys.length ? triggerKeys.join(', ') : 'none'}
 
 TASK:
-1. Read the entire poem — themes, metaphors, characters, art/market/tech/crypto/recovery/political undertones.
-2. Pick 5–10 module keys that genuinely deepen visuals for THIS page only. Each key must be justified by the text (explicit or clear implicit theme).
-3. emotional = family, grief, addiction/recovery, loneliness, healing, inner struggle.
-4. atuona / gauguin = Polynesia, Paradise, exile, painterly myth (only when the poem’s atmosphere supports it).
-5. vibe / agentic / fusion = building with AI, shipping, agents, NFT/blockchain-as-metaphor when the poem touches tech.
-6. atlas = individualism, strike, Galt-adjacent ideas, systemic critique when present.
-7. Do NOT pad with unrelated art history — precision over volume.
+1. Read title + full poem. Decide what THIS page is actually about (setting, metaphor, emotional core).
+2. Pick ONLY 4–7 module keys. EXCLUDE any pre-scan hit that is not central to meaning (do not keep auction/museums/impressionists just because one word appeared).
+3. If the poem is urban, digital, Moscow/interior, Telegram/screen — lean vibe/emotional/fusion/atlas; do NOT default to gauguin/atuona/Polynesia unless the text clearly weaves in exile/Paradise/painterly myth.
+4. emotional = family, grief, recovery, loneliness, healing, inner struggle.
+5. gauguin / atuona = only when Polynesia, painterly exile, or Marquesas myth is a real layer in the text, not wallpaper.
+6. vibe / agentic / fusion = tech, shipping, AI, NFT metaphor when the poem touches them.
+7. atlas = strike, Galt-adjacent ideas, systemic critique when present.
+8. Order keys: strongest fit first.
 
 Return ONE LINE ONLY: comma-separated keys, no other words.
-Example: emotional,atuona,vibe,gauguin,fashion`;
+Example: emotional,vibe,gauguin,atuona`;
 
   const raw = await createContent(prompt, 220, false);
   return parseKnowledgeKeysFromLlm(raw);
@@ -2838,8 +2843,13 @@ async function getDeepKnowledgeForVisuals(opts: {
     console.error('🎬 Knowledge module analysis failed, using triggers only:', e);
   }
 
+  if (llmKeys.length === 0) {
+    console.warn('🎬 LLM returned no module keys — using minimal fallback so regex does not flood the prompt');
+    llmKeys = ['emotional', 'vibe'];
+  }
+
   const merged = mergeKnowledgeKeys(triggerKeys, llmKeys, maxSections);
-  console.log(`🎬 Deep knowledge keys (triggers: ${triggerKeys.join(', ') || '—'} | LLM: ${llmKeys.join(', ') || '—'} | merged: ${merged.join(', ')})`);
+  console.log(`🎬 Deep knowledge keys (triggers: ${triggerKeys.join(', ') || '—'} | LLM: ${llmKeys.join(', ') || '—'} | merged LLM-first: ${merged.join(', ')})`);
 
   return formatKnowledgeFromKeys(merged);
 }
@@ -7156,7 +7166,7 @@ Return ONLY the translation. Plain text.`;
       
       const combinedForKnowledge = `${title}\n${theme}\n${englishText}\n${russianText}`.slice(0, 12000);
       const englishExcerpt = englishText.slice(0, 3500);
-      const russianExcerpt = russianText ? russianText.slice(0, 1200) : '';
+      const russianExcerpt = russianText ? russianText.slice(0, 2200) : '';
 
       await ctx.reply(
         '🧠 *Knowledge pass:* reading this page and selecting which modules from the embedded base apply (regex + analysis)...',
@@ -7170,7 +7180,7 @@ Return ONLY the translation. Plain text.`;
         englishExcerpt,
         russianExcerpt,
         characterVoice: creativeSession.activeVoice,
-        maxSections: 10
+        maxSections: 7
       });
 
       await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
@@ -7202,8 +7212,14 @@ ${characterContext}
 ${plotContext}
 ${metaphorHint}
 
-REFERENCE KNOWLEDGE (modules were chosen for THIS page after a full-text read + trigger scan — use concrete facts, names, and parallels from these excerpts; do not drift into generic stock imagery):
+REFERENCE KNOWLEDGE (subtext only — pick at most ONE echo from these excerpts, e.g. a color plane, compositional idea, or named parallel; do not build a second scene from art history):
 ${visualKnowledge}
+
+BALANCE (non-negotiable):
+- At least ~70% of the visual must be anchored in the poem's title + lines (who, where, what happens, dominant mood). Knowledge base is seasoning, not a replacement setting.
+- Do not lead with Tahiti, Paradise, or Gauguin's palette unless the poem text clearly centers Polynesia/exile/painting. Urban/digital/Moscow/interior poems stay in that world.
+- If the TITLE names an animal or object (e.g. dog / собака / red dog), treat it as metaphor or symbol unless the poem literally describes a real animal — never default to a cute, toy, or cartoon animal.
+- One coherent photoreal frame — not collage, not "wall becomes Gauguin" unless the poem says so.
 
 VISUAL RULES:
 1. The scene must illustrate THIS poem's concrete imagery and mood — not a default beach, not default flowers, not a default laptop unless the poem clearly says so.
@@ -7224,9 +7240,10 @@ OUTPUT: One dense English prompt (120–220 words) describing a single photoreal
 
 Title: "${title}"
 Theme: ${theme}
-Text: "${englishText.substring(0, 200)}"
+Text: "${englishText.substring(0, 600)}"
 
 Rules:
+- Grow from THIS title and lines — not generic Tahiti/Paradise/Telegram tropes unless they are the poem's core.
 - Simple words, heavy weight
 - No explanation, no marketing
 - Fragment of thought, not pitch
