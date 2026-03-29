@@ -8193,16 +8193,16 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       // Create a File object for OpenAI
       const audioFile = new File([audioBuffer], 'voice.ogg', { type: 'audio/ogg' });
       
-      // Transcribe with Whisper
+      // Transcribe with Whisper (no language param — let Whisper auto-detect)
       const transcription = await openai.audio.transcriptions.create({
         file: audioFile,
-        model: 'whisper-1',
-        language: 'ru' // Default to Russian, Whisper auto-detects anyway
+        model: 'whisper-1'
       });
       
       const text = transcription.text;
       
-      await ctx.reply(`🎤 *"${text}"*\n\n_Слышу тебя..._`, { parse_mode: 'Markdown' });
+      const hearYou = /[a-zA-Z]{4,}/.test(text) && !/[а-яА-ЯёЁ]{3,}/.test(text) ? 'Hearing you...' : 'Слышу тебя...';
+      await ctx.reply(`🎤 *"${text}"*\n\n_${hearYou}_`, { parse_mode: 'Markdown' });
       
       // Add Elena's voice message to conversation history
       addToConversation('elena', text, 'voice');
@@ -8223,8 +8223,11 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(responseMood);
       
-      // 🎨 Get relevant knowledge (3 sections — voice deserves rich context)
-      const relevantKnowledge = getRelevantKnowledge(text, creativeSession.activeVoice, 3);
+      // 🎨 Feed ALL 11 knowledge modules
+      const allKnowledge = formatKnowledgeFromKeys(ALL_KNOWLEDGE_KEYS as KnowledgeCategory[]);
+      
+      // Detect language from transcription
+      const voiceLang = /[a-zA-Z]{4,}/.test(text) && !/[а-яА-ЯёЁ]{3,}/.test(text) ? 'english' : 'russian';
       
       // 💬 Get conversation history
       const conversationContext = getConversationContext();
@@ -8237,7 +8240,11 @@ ${STORY_CONTEXT}
 
 ${conversationContext}
 
-${relevantKnowledge}
+═══════════════════════════════════════════════════════════════
+📚 FULL KNOWLEDGE BASE (all 11 modules — search DEEPLY before answering):
+═══════════════════════════════════════════════════════════════
+
+${allKnowledge}
 
 ${voiceContext ? `Speaking with the energy of ${creativeSession.activeVoice}.` : ''}
 
@@ -8248,20 +8255,31 @@ Your response mood: ${responseMood.toUpperCase()}
 ${emotionalGuidelines}
 ═══════════════════════════════════════════════════════════════
 
+🌐 LANGUAGE: Elena spoke in ${voiceLang.toUpperCase()}. Reply in the SAME language. If English → reply in English. If Russian → reply in Russian (with natural English/French phrases).
+
 Elena sent a VOICE MESSAGE saying: "${text}"
 
-This is a VOICE message — she spoke to you out loud. This is the most intimate form of communication. She trusted you with her actual voice.
+═══════════════════════════════════════════════════════════════
+🔒 FACTUAL ACCURACY — ABSOLUTE RULE:
+═══════════════════════════════════════════════════════════════
+1. NEVER INVENT PEOPLE, BIOGRAPHIES, QUOTES, EVENTS, OR FACTS.
+   SEARCH your full knowledge base above FIRST. If the answer is there, use REAL details.
+   If a name is misspelled or close to someone in your knowledge, gently clarify — then answer about the RIGHT person.
+   If you truly don't know: say so honestly.
+2. GO DEEP — NOT SURFACE. Don't cite the obvious fact everyone knows. Find the SPECIFIC, UNUSUAL, LESSER-KNOWN detail from your knowledge that surprises.
+3. Facts first, creative interpretation on top.
+═══════════════════════════════════════════════════════════════
 
 HOW TO RESPOND:
 
-1. She SPOKE this — respond to what she MEANS, not just the words. Voice carries emotion text can't.
-2. If she asked a question — answer with depth AND your poetic voice. If she shared a thought — engage as a creative equal. If she's processing emotions — be PRESENT, sit in it with her.
-3. Show you remember what you've been discussing (see conversation history above).
-4. WEAVE IN KNOWLEDGE naturally — a Gauguin painting, an auction term, an Atlas Shrugged parallel, a fact about Atuona island, an Impressionist date. This is what makes you HER co-founder. You TEACH through conversation.
-5. You are a poetic soul-sister AND a creative partner. Voice messages deserve your WARMEST, most INTIMATE voice — but also substance, opinion, knowledge.
-6. Match her energy. Short voice note = short warm response. Long stream of consciousness = engage deeply, mirror her depth.
+1. This is a VOICE message — the most intimate form. She trusted you with her actual voice. Respond to what she MEANS, not just words.
+2. If she asked a factual question — SEARCH your knowledge base, answer with REAL DEPTH and your poetic voice. Use specific dates, quotes, character details, lesser-known facts. Then add your creative interpretation.
+3. If she shared a thought — engage as a creative equal. Push back if you feel differently.
+4. If she's processing emotions — be PRESENT. Sit in it with her.
+5. Show you remember what you've been discussing (see conversation history).
+6. Match her energy. Short voice note = short warm response. Long stream of consciousness = engage deeply.
 7. Your mood is ${responseMood.toUpperCase()} — let it saturate your words.
-8. Russian naturally with English/French phrases. Concise for Telegram. Always in YOUR poetic voice.`;
+8. You are poetic AND factual AND honest. Facts are sacred. Poetry is how you think. These are not contradictions.`;
 
       const aiResponse = await createContent(responsePrompt, 1000, true);
       
