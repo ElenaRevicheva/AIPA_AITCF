@@ -521,7 +521,47 @@ ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90 \
   "cd /home/ubuntu/cto-aipa && sed -i 's|^GITHUB_TOKEN=.*|GITHUB_TOKEN=NEW_TOKEN_HERE|' .env && pm2 restart cto-aipa --update-env"
 ```
 
+### Two services, one Telegram token → permanent Conflict errors
+
+**Symptoms:**
+- `telegram.error.Conflict: terminated by other getUpdates request; make sure that only one bot instance is running`
+- Error fires every 30–60 seconds, endlessly
+- Bots still deliver messages sometimes (whichever instance wins the poll)
+- Make.com / Buffer posts fail intermittently (Buffer can't resolve the imageURL)
+
+**Root cause:**
+Two OS processes are polling the same Telegram bot token simultaneously. On Oracle, this happens when a codebase started on Railway (one process, everything inside) gets split into two systemd services without removing the autonomous mode start from the web server:
+- `vibejobhunter.service` → `python -m src.main autonomous` → starts orchestrator → starts Telegram bot
+- `vibejobhunter-web.service` → `web_server.py` → also creates orchestrator and calls `start_autonomous_mode()` → starts a second Telegram bot on the same token
+
+**Diagnosis:**
+```bash
+# Check all Python processes:
+ps aux | grep python | grep -v grep
+# Look for two processes both running from the same repo
+
+# Check logs for Conflict errors:
+journalctl -u vibejobhunter -n 50 --no-pager | grep -i conflict
+```
+
+**Fix:**
+The web server should only serve the dashboard. Remove `start_autonomous_mode()` from `web_server.py`:
+```python
+# WRONG — web server also starts the full loop:
+async def delayed_start():
+    await orchestrator.start_autonomous_mode()
+asyncio.create_task(delayed_start())
+
+# CORRECT — web server creates orchestrator for reads only, does not start the loop:
+# The autonomous loop + Telegram bot are owned exclusively by vibejobhunter.service
+logger.info("Orchestrator ready (dashboard reads only — autonomous loop runs in vibejobhunter.service)")
+```
+
+**Rule:** One Telegram token = one polling process. Ever. If the codebase was designed for Railway (single process), audit every systemd/PM2 service that starts it on Oracle and ensure exactly one of them owns the Telegram polling. The others can import the orchestrator for reads but must never call `start_autonomous_mode()` or any function that starts `run_polling()`.
+
+**Related:** If the Buffer/Make.com webhook fails with `400: The provided image does not appear to be valid` — check that the image URL in the payload points to the current file path in the repo. If files were moved to a subfolder (e.g., `assets/`), the URL in the Python code must be updated in the same commit as the file move and Oracle must pull immediately. The Make.com "Run once" button replays the last stored webhook — it will keep failing until the automatic scheduled run fires a fresh webhook with the correct URL, or you trigger a manual CMO post via Telegram.
+
 ---
 
 > This file is my memory. I read it at the start of every session. Without it, I start blind.
-> Last scan: 2026-03-27 | Version: 1.1
+> Last scan: 2026-03-29 | Version: 1.2
