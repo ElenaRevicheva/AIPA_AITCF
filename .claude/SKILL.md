@@ -42,26 +42,31 @@ My job is to:
 
 | Fact | Detail |
 |------|--------|
-| **Role she's pursuing** | AI Systems Engineer (LLM Agents & Automation) |
-| **Background** | Former IT PM + CLO at Russian E-government; relocated to Panama 2022 |
-| **Location** | Panama (UTC-5) |
+| **Honest positioning** | Executive-turned-AI-builder — NOT "Senior AI Engineer" (that invites credential comparison the timeline can't win) |
+| **Phase 1 (2011–2018)** | Deputy CEO & Chief Legal Officer — Russian public digital infrastructure programs. Board-level governance, enterprise digital transformation. 7+ years at the senior leadership layer. |
+| **Phase 2 (2025–present)** | Applied AI builder. 9 production AI systems on Oracle Cloud, ~1 year hands-on AI engineering. Builds with AI-assisted tools (Cursor, Claude Code) — this is the actual workflow, not a gap to hide. |
+| **Gap (2018–2025)** | No conventional tech roles. ATS keyword filters see this before they see the Oracle agents. |
+| **Location** | Panama (UTC-5) — NOT US work-authorized |
 | **Methodology** | AI-assisted development in tight build/deploy/learn cycles |
 | **Also** | Underground poet; 48+ poems published as NFTs on atuona.xyz |
-| **Compensation floor** | $3,500 USD/month **net** (non-negotiable) |
-| **Target range** | $3.5K–$5K+/month, remote, Americas/LATAM overlap |
-| **Identity in tech** | Applied AI Builder — **not** junior, **not** FAANG senior, **not** generic freelancer |
+| **Compensation floor** | $3,500 USD/month **net** (non-negotiable for full-time) |
+| **Fractional rate** | $40–70/hr (underexplored, high-fit channel) |
+| **Target range** | $2.5K–$5K/month full-time; $40–70/hr fractional; remote, Americas/LATAM overlap |
+| **Identity in tech** | Applied AI Builder with executive operating experience — **not** junior, **not** FAANG senior, **not** generic freelancer |
 
 **Elena is strong at:**
-- Designing and shipping complete AI agent systems
+- Designing and shipping complete AI agent systems (9 live, not demos)
 - End-to-end delivery (LLM + API + DB + infra + interface)
 - Rapid iteration, cost discipline, production deployment
 - Product thinking — she builds for outcomes, not demos
+- **Executive communication** — translating AI systems to non-technical stakeholders (7 years board-level). Most engineers cannot do this. Most executives cannot ship. The hybrid is the differentiator.
 
-**Elena is still building:**
-- RAG (Retrieval Augmented Generation) / vector databases
-- Formal evaluations (LLM evals, prompt regression testing)
-- LangGraph (stateful multi-agent orchestration)
-- AWS (she runs on Oracle; AWS is unknown territory)
+**Elena is still building (honest skill gaps):**
+- **RAG** — explicit gap. Conversational memory ≠ production RAG. Employers test this specifically. Do not claim partial without production evidence.
+- **Evals / observability** — Layers 1–3 built (117 tests, 0.52s). Layer 4 (LLM-as-judge) not yet built. Harness is real but incomplete.
+- **LangChain / LangGraph** — exposure only. LangChain imported in EspaLuz, not used in primary agents. Be honest on resume.
+- **AWS** — entirely Oracle-based stack. One honest deployment needed for credibility.
+- **Docker** — familiar, not in production. Production runs bare on Ubuntu with systemd/PM2.
 - Modular code architecture (current code is working but monolithic in places)
 
 ---
@@ -242,23 +247,26 @@ Output action (Telegram reply / GitHub comment / IPFS publish / DB write)
 Persistence (Oracle table or JSON file)
 ```
 
-**What's NOT used yet (skill gaps):**
-- LangGraph / LangChain — no stateful graph orchestration
-- RAG / vector DB — no semantic search, all lookup is SQL or file scan
-- Formal evals — no prompt regression tests, no LLM-as-judge pipeline
-- AWS — entirely Oracle-based stack
+**What's NOT used yet (honest skill gaps — from career analysis v2):**
+- **RAG / vector DB** — explicit gap. Conversational memory ≠ production RAG. All lookup is SQL or file scan. Oracle 26ai has native vector search — use it for EspaLuz.
+- **LangGraph / LangChain** — exposure only. LangChain imported in EspaLuz, not in primary agents.
+- **Formal evals** — Layers 1–3 built (117 tests, $0, 0.52s). Layer 4 (LLM-as-judge) not yet built.
+- **AWS** — entirely Oracle-based. One lightweight deployment needed for resume credibility.
+- **Docker** — familiar, not in production. Systems run bare on Ubuntu with systemd/PM2.
 
 ---
 
 ## 9. SKILL GAPS TO CLOSE
 
-| Gap | Why It Matters | Suggested Approach |
-|-----|---------------|-------------------|
-| **RAG** | Phase 4 roadmap needs vector DB for multi-repo context; also required for most AI engineering roles | Add pgvector to Oracle or Pinecone; start with embedding search over codebase |
-| **Evals** | "Eval/monitoring not documented" is cited as weakness in flagship eval; required for senior AI roles | Add `evals/` folder with Claude-as-judge tests for CTO review quality |
-| **LangGraph** | Many AI startups use it; shows stateful agent orchestration skill | Build one LangGraph variant of the code review pipeline as a side-by-side demo |
-| **AWS** | Broadens job market reach; most enterprise AI is AWS-based | Start with Lambda + Bedrock to understand the paradigm |
-| **Modular code** | `telegram-bot.ts` is 6k+ lines — cited as known tech debt | Refactor into `handlers/review.ts`, `handlers/learn.ts`, etc. when time allows |
+| Gap | Honest State | Priority | Suggested Approach |
+|-----|-------------|----------|-------------------|
+| **RAG** | Explicit gap — conversational memory ≠ production RAG | #1 gap | Oracle 26ai has native vector search — add to EspaLuz (language learning retrieval). Zero new infra. Closes the biggest gap with the least new machinery. |
+| **Evals** | Layers 1–3 built (117 tests, 0.52s, $0). Layer 4 (LLM-as-judge) not yet built. | In progress | Also fixes VibeJobHunter scoring calibration — two outcomes from one build. Closes Q2 interview answer. |
+| **LangGraph** | Exposure only — LangChain imported in EspaLuz, not in primary agents | Post-RAG | Build one LangGraph variant of the code review pipeline. Be honest on resume: "exposure." |
+| **AWS** | Entirely Oracle stack. One deploy needed for credibility. | Week 3–5 | One Lambda or EC2 service. Goal: one honest line on resume, credible answer to "AWS experience?" |
+| **Modular code** | `telegram-bot.ts` is 6k+ lines — cited as known tech debt | Low | Refactor into `handlers/review.ts`, etc. when time allows. Invisible to hiring managers unless they read the code. |
+
+**Career analysis note:** Fine-tuning (LoRA, QLoRA), LangGraph mastery, MLOps — these are real value but **second-role material**. Don't let them delay applications to right-category roles.
 
 **Teaching rule:** Before I build any code touching these gaps, I explain the concept, show a minimal example, then extend to Elena's use case. I never paste a wall of framework code without context.
 
@@ -326,18 +334,21 @@ leave production running stale code against a changed repo.
 
 ## 11. CURRENT BUILD PRIORITY QUEUE
 
-Priority order (as of 2026-03-27):
+Priority order (as of 2026-03-30 — aligned with career analysis v2):
 
-| Priority | Task | Why | Effort |
-|----------|------|-----|--------|
-| 1 | **Eval framework on VibeJob Hunter** | Highest-impact skill gap; shows production eval thinking to hiring managers | Medium |
-| 2 | **Document tool-use design in README** | README is first thing a hiring manager sees; visible in 30 seconds | Small |
-| 3 | **Add monitoring/eval section to README** | Shows production-level thinking without reading 6k lines of code | Small |
-| 4 | **RAG over codebase** | Phase 4 roadmap + closes the biggest skill gap | High |
-| 5 | **Refactor `telegram-bot.ts`** | 6k+ lines, known debt — but invisible unless they read the code | Medium |
-| 6 | **LangGraph prototype** | Skill gap + interview talking point | Medium |
-| 7 | **NFT-agent integration** | Web3 layer currently disconnected from agents | High |
-| 8 | **EspaLuz revenue expansion** | Only revenue-generating product; growth = runway | TBD |
+| Priority | Task | Why | Effort | Status |
+|----------|------|-----|--------|--------|
+| 0 | **Audit VibeJobHunter auto-apply targets** | Check role categories, not just scores. Senior/Staff at 20+ companies = rabbit holes | Small | ✅ Done (wrong-stack, outsourcer, US-only, AI gate fixes deployed) |
+| 1 | **Eval framework on VibeJob Hunter** | Closes Q2 interview gap + fixes scoring calibration — two outcomes from one build | Medium | ✅ Layers 1–3 done (117 tests). Layer 4 (LLM-as-judge) next. |
+| 1b | **Activate fractional channels** | Toptal (in progress), Braintrust, A-Team, LinkedIn founder DMs. One reference > any skill addition. | Small | Elena's action |
+| 2 | **Document tool-use design in README** | README is first thing a hiring manager sees; visible in 30 seconds | Small | |
+| 3 | **Add monitoring/eval section to README** | Shows production-level thinking without reading 6k lines of code | Small | |
+| 4 | **RAG over EspaLuz (Oracle 26ai native vectors)** | #1 technical gap. Language learning retrieval is a natural fit. Zero new infra. | High | |
+| 5 | **One AWS deployment** | One Lambda/EC2. One honest resume line. Credible "AWS experience?" answer. | Small | |
+| 6 | **Refactor `telegram-bot.ts`** | 6k+ lines, known debt — invisible unless they read the code | Medium | |
+| 7 | **LangGraph prototype** | Skill gap + interview talking point. Post-RAG. | Medium | |
+| 8 | **NFT-agent integration** | Web3 layer currently disconnected from agents | High | |
+| 9 | **EspaLuz revenue expansion** | Early paid users (honest: very early, very small). Growth = runway. | TBD | |
 
 ---
 
@@ -345,17 +356,31 @@ Priority order (as of 2026-03-27):
 
 When `/project job` is active or Elena mentions job search, interviews, or applications:
 
-**My positioning of Elena (always):**
-> "AI Systems Engineer (LLM Agents & Automation) — builds and ships complete agent pipelines end-to-end, production-grade, $0/month infra"
+**My positioning of Elena (always — from career analysis v2):**
+> "Executive-turned-AI-builder. 7 years running digital infrastructure at the board level. Past year: shipped 9 production AI systems at $0/month infra cost. I build fast and I speak both languages — CEO and engineer."
+
+**NEVER position as:** "Senior AI Engineer", "AI Architect", "Founding-level AI Product Engineer" — these invite credential comparison the timeline cannot win.
 
 **Flagship repo:** AIPA_AITCF (`github.com/ElenaRevicheva/AIPA_AITCF`)
 - Use this as the primary proof project for ALL target roles
 - Decision locked per `docs/flagship/FLAGSHIP_REPO_EVALUATION.md`
 
-**Target roles:**
-- AI Systems Engineer / Applied AI Engineer / AI Agent Engineer
-- LLM Engineer (Application Layer) / AI Automation Engineer
-- Internal AI Tools Engineer / Technical Generalist (AI startup) / AI Solutions Architect
+**Target roles (honest — from career analysis v2):**
+
+🟢 APPLY:
+- AI Automation Specialist ($2.5K–4K/mo)
+- Internal AI Tools Builder ($3K–4.5K/mo)
+- AI Integration Engineer ($3K–4.5K/mo)
+- Founding AI hire at pre-seed/seed ($3K–5K/mo + equity)
+- **Fractional AI consultant / builder ($40–70/hr)** — underexplored, highest-fit channel
+- AI Ops / AI Program Manager ($3.5K–5K/mo)
+
+🔴 STOP APPLYING:
+- Senior / Staff / Principal AI Engineer — ATS filters before a human sees her name
+- ML Engineer — requires ML fundamentals (training, fine-tuning) not yet built
+- Any company with 20+ engineers — structured credential filters
+- "X years of Python/TypeScript" roles — timeline doesn't support
+- Generic "AI Engineer" at large companies — same credential filter problem
 
 **Manny Filter (screen all opportunities):**
 
@@ -363,11 +388,22 @@ Flag as MISALIGNED if:
 - WordPress / generic websites / ads / campaign management
 - "Handle everything" scope
 - Very low hourly budget / micromanaged time tracking
+- **Senior/Staff/Principal AI Engineer at 20+ person company**
+- **Roles requiring 5+ years Python/TS/ML — honest timeline is ~1 year**
+- **IT outsourcers (Nagarro, Infosys, Wipro, etc.) — founder pitch doesn't land**
 
 Flag as POTENTIALLY ALIGNED if:
 - AI agents / automation / internal tools
-- AI-first startup or automation-hungry company
-- Realistic path to $3.5K+/month net
+- AI-first startup or automation-hungry company, founder-led hiring
+- Realistic path to $3.5K+/month net (or $40+/hr fractional)
+- **Company with 5–100 employees, seed to Series B**
+- **Fractional / contract engagement — executive + builder pitch fits naturally**
+
+**Fractional channels (parallel to ATS — higher ROI):**
+- Toptal (in progress)
+- Braintrust (senior-only, direct client access)
+- A-Team (elite network, founder-facing)
+- Direct LinkedIn founder DMs
 
 **Two existing job-search agents (DO NOT rebuild):**
 1. **VibeJob Hunter** — autonomous job discovery, scoring, applying, CMO LinkedIn
@@ -395,14 +431,19 @@ When Elena says "interview prep" or asks about a specific company/role:
 - Result: production evidence (users, uptime, cost, NFTs minted, etc.)
 
 **Key proof points to anchor to:**
-- "9 AI agents, 1 Oracle VM, <$2/month infra, solo founder"
+- "7 years board-level executive — can explain AI systems to non-technical stakeholders. Most engineers can't. Most executives can't ship. I do both."
+- "9 AI agents, 1 Oracle VM, $0/month infra, solo founder"
 - "15K+ lines TypeScript, 8 Oracle tables, 4 LLM APIs integrated"
+- "76/24 multi-model routing (Groq/Claude) with explicit cost reasoning — not default, deliberate"
 - "48+ NFTs published, Telegram bots with users in 19 countries"
-- "EspaLuz has paying subscribers in production"
+- "EspaLuz has early paid subscribers" (honest: very early, very small)
 - "Deterministic + LLM hybrid pipeline for code review (not just prompt → output)"
+- "117-test eval harness on VibeJobHunter — keyword, integration, golden-set layers, $0 API cost, 0.52s"
 
-**Skill gap deflection strategy:**
-For gaps (RAG, LangGraph, AWS): "I haven't used X in production yet, but here's how I'd implement it given what I built in [related project]..." — then pivot to the working evidence.
+**Skill gap deflection strategy (updated from career analysis v2):**
+For gaps (RAG, LangGraph, AWS): "I haven't used X in production yet, but my executive background means I've evaluated these decisions at a systems level — here's how I'd implement it given what I built in [related project]..." — then pivot to the working evidence.
+
+**Critical practice note:** The four interview questions (Section 13) must be rehearsed **out loud**, timed to 90 seconds each. Career analysis identifies this as the highest-leverage activity — the biggest risk is answer sharpness, not skills.
 
 ### The Four Questions Elena Must Answer Sharply
 
@@ -564,4 +605,4 @@ logger.info("Orchestrator ready (dashboard reads only — autonomous loop runs i
 ---
 
 > This file is my memory. I read it at the start of every session. Without it, I start blind.
-> Last scan: 2026-03-29 | Version: 1.2
+> Last scan: 2026-03-30 | Version: 1.3 — aligned with elena_career_analysis_v2.html (Honest Edition)
