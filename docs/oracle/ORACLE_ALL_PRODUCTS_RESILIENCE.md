@@ -31,9 +31,11 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 | 7 | **OpenClaw Vibejob Shortlist** | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | systemd | `openclaw-gateway` | `http://127.0.0.1:18789/` |
 | 8 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` |
 | 9 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` |
-| 10 | **AELA** | [AELA](https://github.com/ElenaRevicheva/AELA) |  |  |  |  |
+| 10 | **AILA** (Adaptive Intelligent Life Assistant) | [AILA](https://github.com/ElenaRevicheva/AILA) | *Not deployed as its own process on Oracle yet* — repo holds architecture, blueprint, Hive integration notes | — | — | — |
 
-**Repos (8):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AELA (8 repos for 10 agents; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF).
+**Repos (8):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AILA (8 repos for 10 agents; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF).
+
+**Note on #10:** The [AILA](https://github.com/ElenaRevicheva/AILA) product is listed as the tenth *agent slot* in the canonical inventory (longitudinal personal assistant). There is no separate systemd/PM2 service or health URL until AILA is deployed; add `check_oracle_health.sh` / `oci_keepalive.sh` hooks when a runnable service exists.
 
 **Action:** On the server run `pm2 list` and `systemctl list-units --type=service --all | grep -E 'espaluz|cto|vibe|dragon|algom'` and set the exact service/PM2 names and ports in the health script. Add a simple HTTP health endpoint in any bot that doesn’t have one (e.g. `/health` returning 200) so the cron can detect hangs, not only crashes.
 
@@ -171,14 +173,15 @@ Do this once on the server (SSH as above).
 
 - [ ] **Verify**  
   - [ ] `sudo systemctl status espaluz-whatsapp espaluz-influencer` (and any other systemd bots)  
-- [ ] `pm2 list` (all 10 agents: 8+9 = cto-aipa; 5+6 = one app if on Oracle; 4 = dragontrade/algom if PM2; 7 = openclaw-gateway; 10 = AELA)  
+- [ ] `pm2 list` (all 10 agents: 8+9 = cto-aipa; 5+6 = one app if on Oracle; 4 = dragontrade/algom if PM2; 7 = openclaw-gateway; 10 = AILA when deployed)  
   - [ ] Wait 5 minutes and `tail -50 /var/log/oracle-health.log`
 
 ---
 
 ## 6. When You Add or Change Agents
 
-- Keep the "All 9 AI Agents" table updated with exact service names and health URLs.- In `check_oracle_health.sh`: add or uncomment a block for that agent (curl health URL then restart if non-200, or systemctl/pm2 restart if process check only).
+- Keep the "All 10 AI Agents" table updated with exact service names and health URLs.
+- In `check_oracle_health.sh`: add or uncomment a block for that agent (curl health URL then restart if non-200, or systemctl/pm2 restart if process check only).
 - In `oci_keepalive.sh`: add a curl to each agent's health URL so keep-alive touches every service that has HTTP.
 
 ---
