@@ -6196,18 +6196,46 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
     await ctx.reply('🔄 Loading your last session...');
     await loadContextFromDbForUser(userId);
     
-    const convCtx = getConversationContext(userId);
     const summary = getContextSummary(userId);
     
-    if (summary) {
-      await ctx.reply(`✅ *Session Restored!*
-
-${summary}
-
-_I remember what we were working on!_`, { parse_mode: 'Markdown' });
-    } else {
+    // Also load recent knowledge (tasks, ideas) even if conversation context is empty
+    const recentTasks  = await getKnowledgeByCategory(userId, 'task', 5);
+    const recentIdeas  = await getKnowledgeByCategory(userId, 'idea', 3);
+    
+    const hasConvContext = !!summary;
+    const hasKnowledge   = recentTasks.length > 0 || recentIdeas.length > 0;
+    
+    if (!hasConvContext && !hasKnowledge) {
       await ctx.reply(`ℹ️ No previous session found.\n\nStart fresh! I'll remember our conversation.`);
+      return;
     }
+    
+    let response = `✅ *Session Restored!*\n\n`;
+    
+    if (summary) {
+      response += `${summary}\n`;
+    }
+    
+    if (recentTasks.length > 0) {
+      response += `*Pending tasks:*\n`;
+      recentTasks.forEach((item: any[], i: number) => {
+        const title = item[2]?.substring(0, 60) || item[3]?.substring(0, 60) || 'task';
+        response += `${i + 1}. ${title}\n`;
+      });
+      response += '\n';
+    }
+    
+    if (recentIdeas.length > 0) {
+      response += `*Recent ideas:*\n`;
+      recentIdeas.forEach((item: any[], i: number) => {
+        const title = item[2]?.substring(0, 60) || item[3]?.substring(0, 60) || 'idea';
+        response += `• ${title}\n`;
+      });
+    }
+    
+    response += `\n_I remember what we were working on!_`;
+    
+    await ctx.reply(response, { parse_mode: 'Markdown' });
   });
 
   // /forget - Clear conversation context
@@ -6705,6 +6733,8 @@ async function handlePersonalAIAction(
       const taskId = await saveKnowledge(userId, 'task', intent.title || text.substring(0, 100), text, 'pending', intent.project, source);
       if (taskId) {
         await ctx.reply(`✅ *Task saved!*\n\n"${(intent.title || text).substring(0, 100)}"\n\n_Use /tasks to see your pending tasks_`, { parse_mode: 'Markdown' });
+        // Update conversation context so /resume shows this activity
+        addQuestionToContext(userId, `[task saved] ${intent.title || text.substring(0, 100)}`, 'Task saved to knowledge base.');
         return true;
       }
       break;
