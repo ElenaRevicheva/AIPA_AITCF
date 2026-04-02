@@ -6091,17 +6091,21 @@ Or: \`/idea TODO: fix the login bug\``, { parse_mode: 'Markdown' });
       return;
     }
     
-    let response = `✅ *Your Tasks*\n\n`;
+    // Escape special Markdown characters to prevent parse failures
+    const escapeMd = (s: string) => s.replace(/[_*[\]()~`>#+=|{}.!\\-]/g, '\\$&');
+    
+    let response = `✅ Your Tasks\n\n`;
     let i = 1;
     for (const item of tasks) {
       const [id, category, title, content, tags, project, source, createdAt] = item as any[];
-      response += `${i}. ${title?.substring(0, 60) || (content as string)?.substring(0, 60)}\n`;
+      const label = (title?.substring(0, 60) || (content as string)?.substring(0, 60) || '?');
+      response += `${i}. ${label}\n`;
       if (project) response += `   📁 ${project}\n`;
       i++;
     }
-    response += `\n_${tasks.length} task(s) total_`;
+    response += `\n${tasks.length} task(s) total`;
     
-    await ctx.reply(response, { parse_mode: 'Markdown' });
+    await ctx.reply(response);
   });
 
   // /task - Save a task directly
@@ -6634,6 +6638,8 @@ async function detectPersonalAIIntent(text: string): Promise<{
   if (lowerText.startsWith('/')) {
     return { type: 'command' };
   }
+  
+  // TASK triggers
   if (
     lowerText.includes('remind me') ||
     lowerText.includes('todo') ||
@@ -6654,22 +6660,58 @@ async function detectPersonalAIIntent(text: string): Promise<{
     const title = text.substring(0, 100).replace(/remind me to |i need to |todo:? |write (down )?(the tasks?[: ]*)?|write it down[: ]*|note this[: ]?|save this tasks?[: ]?|add (a )?tasks?[: ]?|log this tasks?[: ]?|create (a )?tasks?[: ]?|put (it )?in tasks[: ]?/gi, '').trim();
     return { type: 'task', title: title || text.substring(0, 100) };
   }
-  if (lowerText.includes('idea about') || lowerText.includes('i was thinking') || lowerText.includes('what if we')) {
-    const title = text.substring(0, 100);
-    return { type: 'idea', title };
+  
+  // IDEA triggers
+  if (lowerText.includes('idea about') || lowerText.includes('i was thinking') || lowerText.includes('what if we') ||
+      lowerText.includes('startup idea') || lowerText.includes('product idea') || lowerText.includes('what if i')) {
+    return { type: 'idea', title: text.substring(0, 100) };
   }
-  if (lowerText.includes('today i') || lowerText.includes('feeling') || lowerText.includes('i realized')) {
-    return { type: 'diary', title: `Diary ${new Date().toLocaleDateString()}` };
+  
+  // DIARY / NOTE triggers
+  if (
+    lowerText.includes('today i') || lowerText.includes('feeling') || lowerText.includes('i realized') ||
+    lowerText.includes('record a') || lowerText.includes('record this') || lowerText.includes('note down') ||
+    lowerText.includes('make a note') || lowerText.includes('remember this') || lowerText.includes('met someone') ||
+    lowerText.includes('met a') || lowerText.includes('i met') || lowerText.includes('contact:') ||
+    lowerText.includes('save a note') || lowerText.includes('log this')
+  ) {
+    const title = text.replace(/^(record a?|record this|note down|make a note|remember this|log this)[: ]*/i, '').substring(0, 100);
+    return { type: 'diary', title: title || `Note ${new Date().toLocaleDateString()}` };
   }
-  if (lowerText.includes('research') || lowerText.includes('look into') || lowerText.includes('find out about')) {
-    const title = text.substring(0, 100);
-    return { type: 'research', title };
+  
+  // RESEARCH triggers
+  if (lowerText.includes('research') || lowerText.includes('look into') || lowerText.includes('find out about') ||
+      lowerText.includes('check out') || lowerText.includes('investigate')) {
+    return { type: 'research', title: text.substring(0, 100) };
   }
+  
   if (text.endsWith('?')) {
     return { type: 'question' };
   }
   
-  // Default to conversation
+  // AI-powered fallback for voice messages that don't match keywords
+  // Use a fast Groq call to classify intent
+  if (text.length > 5 && text.length < 400) {
+    try {
+      const classifyResponse = await groq.chat.completions.create({
+        model: 'llama-3.1-8b-instant',
+        max_tokens: 30,
+        messages: [{
+          role: 'user',
+          content: `Classify this voice note into exactly ONE word: task, diary, idea, research, or question.
+Voice note: "${text}"
+Reply with ONLY one word.`
+        }]
+      });
+      const classification = (classifyResponse.choices[0]?.message?.content || '').trim().toLowerCase().replace(/[^a-z]/g, '');
+      if (['task', 'diary', 'idea', 'research', 'question'].includes(classification)) {
+        return { type: classification as any, title: text.substring(0, 100) };
+      }
+    } catch {
+      // Groq fallback failed — fall through to conversation
+    }
+  }
+  
   return { type: 'conversation' };
 }
 
