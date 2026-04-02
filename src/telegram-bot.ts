@@ -6619,9 +6619,11 @@ async function detectPersonalAIIntent(text: string): Promise<{
     lowerText.includes('log this task') ||
     lowerText.includes('create a task') ||
     lowerText.includes('put it in tasks') ||
-    lowerText.includes('put in tasks')
+    lowerText.includes('put in tasks') ||
+    lowerText.includes('write the task') ||
+    lowerText.includes('write the tasks')
   ) {
-    const title = text.substring(0, 100).replace(/remind me to |i need to |todo:? |write down (the task)?|write it down|note this[: ]?|save this task[: ]?|add (a )?task[: ]?|log this task[: ]?|create (a )?task[: ]?|put (it )?in tasks[: ]?/gi, '').trim();
+    const title = text.substring(0, 100).replace(/remind me to |i need to |todo:? |write (down )?(the tasks?[: ]*)?|write it down[: ]*|note this[: ]?|save this tasks?[: ]?|add (a )?tasks?[: ]?|log this tasks?[: ]?|create (a )?tasks?[: ]?|put (it )?in tasks[: ]?/gi, '').trim();
     return { type: 'task', title: title || text.substring(0, 100) };
   }
   if (lowerText.includes('idea about') || lowerText.includes('i was thinking') || lowerText.includes('what if we')) {
