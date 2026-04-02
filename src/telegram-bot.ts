@@ -520,6 +520,7 @@ Type /menu for all commands! 🚀
         { cmd: '/project', desc: 'Set active project (repos or job search)', usage: '/project espaluz\n/project job\nNow /readfile main.py or job-focused commands work without specifying repo.' },
         { cmd: '/know', desc: 'Search your knowledge base', usage: '/know pricing strategy\n/know EspaLuz features' },
         { cmd: '/diary', desc: 'Quick diary entry', usage: '/diary Today I launched the new feature...' },
+        { cmd: '/task', desc: 'Save a task directly', usage: '/task Build combinator for Aiden, Tora and AILA' },
         { cmd: '/tasks', desc: 'Show your pending tasks', usage: '/tasks' },
         { cmd: '/research', desc: 'Save research notes', usage: '/research Competitor X charges $20/mo' },
         { cmd: '/rules', desc: 'Show project rules (CLAUDE.md or JOB_SEARCH.md)', usage: '/rules\nIn /project job, this shows JOB_SEARCH rules.' },
@@ -615,6 +616,7 @@ Or just ask me anything - I understand natural language!`;
 
 /know     - Search your knowledge base
 /diary    - Save diary entry (job search or project)
+/task     - Save a task directly
 /tasks    - Show your pending tasks
 /research - Save research / market notes
 /resume   - Restore last session
@@ -5332,6 +5334,17 @@ Ready to commit? Use:
     // Register for alerts when user chats
     if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
     
+    // Run intent detection for text messages too (same as voice pipeline)
+    const textIntent = await detectPersonalAIIntent(message || '');
+    if (textIntent.type !== 'question' && textIntent.type !== 'conversation' && textIntent.type !== 'command') {
+      const handled = await handlePersonalAIAction(ctx, message || '', textIntent, 'text');
+      if (handled) {
+        const userId = ctx.from?.id || 0;
+        syncContextToDb(userId);
+        return;
+      }
+    }
+    
     await handleQuestion(ctx, message || '');
   });
   
@@ -6091,6 +6104,26 @@ Or: \`/idea TODO: fix the login bug\``, { parse_mode: 'Markdown' });
     await ctx.reply(response, { parse_mode: 'Markdown' });
   });
 
+  // /task - Save a task directly
+  bot.command('task', async (ctx) => {
+    const taskText = ctx.message?.text?.replace('/task', '').trim();
+    const userId = ctx.from?.id || 0;
+    
+    if (!taskText) {
+      await ctx.reply(`✅ *Add a Task*\n\nExample: \`/task Build combinator for Aiden, Tora and AILA\`\n\nOr just say "Write down the task..." in a voice or text message.`, { parse_mode: 'Markdown' });
+      return;
+    }
+    
+    const title = taskText.split('.')[0]?.substring(0, 100) || taskText.substring(0, 100);
+    const id = await saveKnowledge(userId, 'task', title, taskText, 'pending', undefined, 'text');
+    
+    if (id) {
+      await ctx.reply(`✅ *Task saved!*\n\n"${title}"\n\n_Use /tasks to see all pending tasks_`, { parse_mode: 'Markdown' });
+    } else {
+      await ctx.reply('❌ Failed to save task. Try again?');
+    }
+  });
+
   // /research - Save research note
   bot.command('research', async (ctx) => {
     const note = ctx.message?.text?.replace('/research', '').trim();
@@ -6271,6 +6304,7 @@ _I remember what we were working on!_`, { parse_mode: 'Markdown' });
           { command: 'project', description: '📁 Set/show active project' },
           { command: 'know', description: '🧠 Search your knowledge base' },
           { command: 'diary', description: '📔 Quick diary entry' },
+          { command: 'task', description: '✅ Save a task directly' },
           { command: 'tasks', description: '✅ Show your pending tasks' },
           { command: 'research', description: '🔬 Save research note' },
           { command: 'rules', description: '📋 Show CLAUDE.md for project' },
@@ -6572,9 +6606,23 @@ async function detectPersonalAIIntent(text: string): Promise<{
   if (lowerText.startsWith('/')) {
     return { type: 'command' };
   }
-  if (lowerText.includes('remind me') || lowerText.includes('todo') || lowerText.includes('need to')) {
-    const title = text.substring(0, 100).replace(/remind me to |i need to |todo:? /gi, '');
-    return { type: 'task', title };
+  if (
+    lowerText.includes('remind me') ||
+    lowerText.includes('todo') ||
+    lowerText.includes('need to') ||
+    lowerText.includes('write down') ||
+    lowerText.includes('write it down') ||
+    lowerText.includes('note this') ||
+    lowerText.includes('save this task') ||
+    lowerText.includes('add a task') ||
+    lowerText.includes('add task') ||
+    lowerText.includes('log this task') ||
+    lowerText.includes('create a task') ||
+    lowerText.includes('put it in tasks') ||
+    lowerText.includes('put in tasks')
+  ) {
+    const title = text.substring(0, 100).replace(/remind me to |i need to |todo:? |write down (the task)?|write it down|note this[: ]?|save this task[: ]?|add (a )?task[: ]?|log this task[: ]?|create (a )?task[: ]?|put (it )?in tasks[: ]?/gi, '').trim();
+    return { type: 'task', title: title || text.substring(0, 100) };
   }
   if (lowerText.includes('idea about') || lowerText.includes('i was thinking') || lowerText.includes('what if we')) {
     const title = text.substring(0, 100);
