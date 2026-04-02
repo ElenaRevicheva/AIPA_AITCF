@@ -888,17 +888,33 @@ async function loadConversationContext(userId: number): Promise<ConversationCont
     const result = await connection.execute(
       `SELECT active_project, active_file, recent_files, recent_questions, pending_fixes, batch_edits, last_updated
        FROM conversation_context WHERE user_id = :userId`,
-      { userId }
+      { userId },
+      {
+        fetchInfo: {
+          RECENT_FILES:     { type: oracledb.STRING },
+          RECENT_QUESTIONS: { type: oracledb.STRING },
+          PENDING_FIXES:    { type: oracledb.STRING },
+          BATCH_EDITS:      { type: oracledb.STRING }
+        }
+      }
     );
     if (result.rows && result.rows.length > 0) {
       const row = result.rows[0] as any[];
+      const safeJson = (val: any, fallback: string): any => {
+        try {
+          const str = typeof val === 'string' ? val : String(val ?? fallback);
+          return JSON.parse(str || fallback);
+        } catch {
+          return JSON.parse(fallback);
+        }
+      };
       return {
         activeProject: row[0],
         activeFile: row[1],
-        recentFiles: JSON.parse(row[2] || '[]'),
-        recentQuestions: JSON.parse(row[3] || '[]'),
-        pendingFixes: JSON.parse(row[4] || '[]'),
-        batchEdits: JSON.parse(row[5] || '[]'),
+        recentFiles:      safeJson(row[2], '[]'),
+        recentQuestions:  safeJson(row[3], '[]'),
+        pendingFixes:     safeJson(row[4], '[]'),
+        batchEdits:       safeJson(row[5], '[]'),
         lastUpdated: row[6] ? new Date(row[6]).getTime() : Date.now()
       };
     }
