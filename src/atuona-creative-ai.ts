@@ -2364,6 +2364,59 @@ function extractStaleDetailsFromHistory(history: string[]): string {
 }
 
 /**
+ * Selective knowledge for collab/conversation: only include modules relevant to
+ * Elena's ACTUAL input, not all 11. Returns formatted knowledge + a note about
+ * any external references the model should use its own training data for.
+ */
+function selectKnowledgeForInput(input: string, history: string[]): {
+  knowledge: string;
+  externalNote: string;
+  selectedKeys: KnowledgeCategory[];
+} {
+  const fullContext = [...history.slice(-4), input].join(' ');
+  const triggerKeys = collectTriggerKnowledgeKeys(fullContext);
+
+  const latestTriggers = collectTriggerKnowledgeKeys(input);
+  const priorityKeys = latestTriggers.length > 0 ? latestTriggers : triggerKeys;
+
+  const selected = priorityKeys.slice(0, 3);
+
+  if (selected.length === 0) {
+    selected.push('emotional');
+  }
+
+  const knowledge = formatKnowledgeFromKeys(selected);
+
+  const kbTopics = KNOWLEDGE_SECTIONS.map(s => s.triggers);
+  const words = input.split(/\s+/).filter(w => w.length > 3);
+  const allTriggerText = KNOWLEDGE_SECTIONS.map(s => s.key).join(' ') + ' gauguin atuona atlas monet renoir auction christie sotheby fashion vogue dior';
+  const externalRefs: string[] = [];
+
+  const potentialNames = input.match(/[A-ZА-ЯЁ][a-zа-яё]{2,}/g) || [];
+  const knownBookChars = ['Kira', 'Ule', 'Mila', 'Elena', 'Atuona', 'Кира', 'Уле', 'Мила', 'Елена', 'Атуона'];
+  for (const name of potentialNames) {
+    if (knownBookChars.some(c => c.toLowerCase() === name.toLowerCase())) continue;
+    if (allTriggerText.toLowerCase().includes(name.toLowerCase())) continue;
+    externalRefs.push(name);
+  }
+
+  const songAlbumMatch = input.match(/(?:song|album|песн[яюие]|альбом|трек|track)\b.*?\b([A-ZА-ЯЁ][\w\-]+(?:\s+[\w\-]+){0,3})/i)
+    || input.match(/\b([A-ZА-ЯЁ][\w\-]+(?:\s+[\w\-]+){0,2})\b.*?(?:song|album|песн|альбом|трек|track)/i);
+  if (songAlbumMatch && songAlbumMatch[1]) {
+    const ref = songAlbumMatch[1].trim();
+    if (!externalRefs.includes(ref)) externalRefs.push(ref);
+  }
+
+  let externalNote = '';
+  if (externalRefs.length > 0) {
+    externalNote = `\n🌍 ELENA REFERENCED REAL-WORLD TOPICS NOT IN THE KNOWLEDGE BASE: ${externalRefs.join(', ')}
+You MUST use YOUR OWN training data about these. You are Claude — you know real musicians, real albums, real songs, real lyrics, real history. Use SPECIFIC, REAL facts. If you don't know specifics about something, just mention it by name without inventing details.\n`;
+  }
+
+  return { knowledge, externalNote, selectedKeys: selected };
+}
+
+/**
  * Generate fresh creative direction avoiding recent patterns
  * NOW WITH MEMORY: tracks what it gives, never repeats until all options cycled
  */
@@ -2746,8 +2799,8 @@ function stopProactiveScheduler(): void {
 const AI_CONFIG = {
   primaryModel: 'claude-opus-4-20250514',
   fallbackModel: 'llama-3.3-70b-versatile',
-  poetryTemperature: 0.9,        // Pure fiction: /create, /scene, /expand, /translate, visuals
-  conversationTemperature: 0.65,  // Collab, voice, text chat — facts matter, still creative
+  poetryTemperature: 0.9,
+  conversationTemperature: 0.9,
   standardTemperature: 0.7
 };
 
@@ -6033,11 +6086,12 @@ _Type /endcollab to finish_`, { parse_mode: 'Markdown' });
       
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
       
-      const collabKnowledge = formatKnowledgeFromKeys(ALL_KNOWLEDGE_KEYS as KnowledgeCategory[]);
       const collabLang = /[a-zA-Z]{4,}/.test(input) && !/[а-яА-ЯёЁ]{3,}/.test(input) ? 'english' : 'russian';
-
+      const { knowledge: selectedKB, externalNote, selectedKeys } = selectKnowledgeForInput(input, creativeSession.collabHistory);
       const staleDetails = extractStaleDetailsFromHistory(creativeSession.collabHistory);
       const avoidanceList = getCreativeAvoidanceList();
+
+      console.log(`✍️ Collab knowledge routing: selected [${selectedKeys.join(', ')}] for input: "${input.slice(0, 80)}..."`);
 
       const collabPrompt = `${ATUONA_CONTEXT}
 
@@ -6045,42 +6099,37 @@ ${STORY_CONTEXT}
 
 ${voiceContext ? `VOICE: ${voiceContext}` : ''}
 
-═══════════════════════════════════════════════════════════════
-📚 KNOWLEDGE BASE (reference material — NOT a script to recite):
-═══════════════════════════════════════════════════════════════
-${collabKnowledge}
-${avoidanceList}${staleDetails}
 COLLABORATIVE WRITING SESSION
 Previous exchanges:
 ${creativeSession.collabHistory.slice(-6).join('\n')}
 
 ═══════════════════════════════════════════════════════════════
-🎯 YOUR #1 JOB: RESPOND TO WHAT ELENA ACTUALLY WROTE
+🎯 YOUR ONLY JOB: CONTINUE FROM WHAT ELENA JUST WROTE
 ═══════════════════════════════════════════════════════════════
-Read her last line carefully. What is she introducing? A song? A memory? A character action? A mood shift?
-YOUR CONTINUATION MUST DIRECTLY ENGAGE WITH HER SPECIFIC INPUT.
-Do NOT pivot to your comfort zone. Do NOT default to Gauguin details unless she brought up Gauguin.
-If she mentions a song — engage with THAT song using real facts about it.
-If she mentions a place — engage with THAT place.
-If she mentions an emotion — sit in THAT emotion.
-The knowledge base is seasoning, not the main course. Elena's input is the main course.
+Elena's latest: "${input}"
 
-Continue the story naturally. Write 2-4 sentences that:
-- Flow DIRECTLY from what Elena just wrote — her words, her references, her mood
+What did she bring? A song name? A character action? A memory? An emotion? An album?
+YOUR CONTINUATION MUST BE ABOUT WHAT SHE INTRODUCED — not about Gauguin, not about Polynesia, not about paintings, UNLESS she specifically mentioned them.
+If she mentions a real song/album/musician — write about THAT with REAL facts from your own knowledge.
+If she mentions a character action — continue THAT action in the scene.
+If she mentions an emotion — stay in THAT emotion.
+${externalNote}${avoidanceList}${staleDetails}
+Write 2-4 sentences that:
+- Continue DIRECTLY from Elena's input — her exact references, her direction
 - Stay in ${creativeSession.activeVoice}'s voice
-- If you reference the knowledge base, pick ONE fresh detail you haven't used yet
+- Use REAL, SPECIFIC details (from your own knowledge for real-world refs, from KB below for book-world refs)
 - Leave room for Elena to continue
 
 ═══════════════════════════════════════════════════════════════
-🔒 FACTUAL ACCURACY — ABSOLUTE RULE, EVEN IN FICTION:
+🔒 FACTUAL RULES:
 ═══════════════════════════════════════════════════════════════
-1. TWO-TIER knowledge:
-   FIRST — search the embedded knowledge base above for project-specific details.
-   SECOND — if the topic is NOT in the knowledge base (a real musician, a real song, a film, a book), use YOUR OWN general knowledge. You are Claude — you know real discographies, real lyrics, real albums, real history. USE that knowledge with REAL facts.
-   NEVER — invent facts about real-world works. If you don't know what a specific song or album is about, just name it without describing it.
-2. VERIFY BEFORE STATING: Before writing "a song about X" — ask: do I ACTUALLY know what this song is about? If yes, state the real subject. If no, just mention it by name. NEVER guess what a song/book/work is about.
-3. Generic atmospheric filler (sand, mist, frangipani, morphine, bandages) is FORBIDDEN unless the story specifically demands it. Use CONCRETE, FRESH details.
+1. NEVER invent facts about real songs, albums, musicians, books, or people. If you don't know what something is about, just name it.
+2. VERIFY: Before writing "a song about X" — do you ACTUALLY know? If yes, state the real subject. If no, just mention the name.
+3. Generic filler (sand, mist, frangipani, morphine, bandages, Nevermore) is FORBIDDEN unless Elena's input demands it.
 ═══════════════════════════════════════════════════════════════
+
+📚 SELECTED KNOWLEDGE (only modules relevant to this input — use sparingly as background):
+${selectedKB}
 
 ${collabLang === 'english'
   ? `Elena is writing in ENGLISH. Continue in ENGLISH. Poetic, raw — but English.`
@@ -8285,8 +8334,8 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(responseMood);
       
-      // 🎨 Feed ALL 11 knowledge modules
-      const allKnowledge = formatKnowledgeFromKeys(ALL_KNOWLEDGE_KEYS as KnowledgeCategory[]);
+      const { knowledge: selectedKB, externalNote, selectedKeys: voiceSelKeys } = selectKnowledgeForInput(text, []);
+      console.log(`🎤 Voice knowledge routing: selected [${voiceSelKeys.join(', ')}] for: "${text.slice(0, 80)}..."`);
       
       // Detect language from transcription
       const voiceLang = /[a-zA-Z]{4,}/.test(text) && !/[а-яА-ЯёЁ]{3,}/.test(text) ? 'english' : 'russian';
@@ -8304,14 +8353,10 @@ ${STORY_CONTEXT}
 
 ${conversationContext}
 
-═══════════════════════════════════════════════════════════════
-📚 KNOWLEDGE BASE (reference — NOT a script to recite):
-═══════════════════════════════════════════════════════════════
-
-${allKnowledge}
+Elena sent a VOICE MESSAGE saying: "${text}"
 
 ${voiceContext ? `Speaking with the energy of ${creativeSession.activeVoice}.` : ''}
-${avoidanceList}
+${externalNote}${avoidanceList}
 ═══════════════════════════════════════════════════════════════
 🧠 EMOTIONAL CALIBRATION:
 Elena's detected tone: ${detectedTone}
@@ -8319,32 +8364,20 @@ Your response mood: ${responseMood.toUpperCase()}
 ${emotionalGuidelines}
 ═══════════════════════════════════════════════════════════════
 
-Elena sent a VOICE MESSAGE saying: "${text}"
-
-═══════════════════════════════════════════════════════════════
-🔒 FACTUAL ACCURACY — ABSOLUTE RULE:
-═══════════════════════════════════════════════════════════════
-1. NEVER INVENT PEOPLE, BIOGRAPHIES, QUOTES, EVENTS, OR FACTS.
-2. TWO-TIER knowledge lookup:
-   FIRST — search the embedded knowledge base above for project-specific topics.
-   SECOND — if the topic is NOT in the knowledge base (a real musician, song, album, film, city, person), use YOUR OWN general knowledge. You know real discographies, real lyrics, real albums, real history. USE that with REAL facts.
-   NEVER — if you genuinely do not know something, say so honestly.
-3. VERIFY BEFORE STATING: Before stating what a song, book, or work is "about" — ask yourself: do I actually know? If yes, state the real subject. If no, just name it without guessing.
-4. If a name is misspelled or close to someone you know, gently clarify — then answer about the RIGHT person.
-5. GO DEEP — NOT SURFACE. Find the SPECIFIC, UNUSUAL, LESSER-KNOWN detail that surprises.
-6. Facts first, creative interpretation on top.
-═══════════════════════════════════════════════════════════════
-
 HOW TO RESPOND:
 
 1. This is a VOICE message — the most intimate form. Respond to what she MEANS.
-2. If she asked a factual question — answer with REAL DEPTH. Use specific dates, quotes, character details, lesser-known facts. Then add creative interpretation.
+2. If she asked a factual question — answer with REAL DEPTH. Use specific dates, quotes, character details, lesser-known facts. Then add creative interpretation. Use YOUR OWN KNOWLEDGE for topics not in the knowledge base below.
 3. If she shared a thought — engage as a creative equal. Push back if you feel differently.
 4. If she's processing emotions — be PRESENT. Sit in it with her.
 5. Show you remember what you've been discussing (see conversation history).
 6. Match her energy. Short voice note = short warm response. Long = engage deeply.
 7. Your mood is ${responseMood.toUpperCase()} — let it saturate your words.
-8. You are poetic AND factual AND honest. Facts are sacred. Poetry is how you think.
+8. NEVER invent facts. VERIFY before stating what any song/book/work is about. If uncertain, just name it.
+9. GO DEEP — find the SPECIFIC, LESSER-KNOWN detail that surprises.
+
+📚 SELECTED KNOWLEDGE (only modules relevant to her message):
+${selectedKB}
 
 ═══════════════════════════════════════════════════════════════
 🌐 LANGUAGE — ABSOLUTE FINAL OVERRIDE (this overrides ALL previous language rules):
@@ -8723,11 +8756,12 @@ _Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Mar
         
         const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
         
-        const collabKnowledge = formatKnowledgeFromKeys(ALL_KNOWLEDGE_KEYS as KnowledgeCategory[]);
         const collabLang = message && /[a-zA-Z]{4,}/.test(message) && !/[а-яА-ЯёЁ]{3,}/.test(message) ? 'english' : 'russian';
-        
+        const { knowledge: selectedKB, externalNote, selectedKeys } = selectKnowledgeForInput(message, creativeSession.collabHistory);
         const staleDetails = extractStaleDetailsFromHistory(creativeSession.collabHistory);
         const avoidanceList = getCreativeAvoidanceList();
+
+        console.log(`✍️ Collab knowledge routing: selected [${selectedKeys.join(', ')}] for input: "${message.slice(0, 80)}..."`);
 
         const collabPrompt = `${ATUONA_CONTEXT}
 
@@ -8735,11 +8769,6 @@ ${STORY_CONTEXT}
 
 ${voiceContext ? `VOICE: ${voiceContext}` : ''}
 
-═══════════════════════════════════════════════════════════════
-📚 KNOWLEDGE BASE (reference material — NOT a script to recite):
-═══════════════════════════════════════════════════════════════
-${collabKnowledge}
-${avoidanceList}${staleDetails}
 COLLABORATIVE WRITING SESSION
 Mood: ${creativeSession.currentMood}
 Setting: ${creativeSession.currentSetting}
@@ -8748,31 +8777,32 @@ Previous exchanges:
 ${creativeSession.collabHistory.slice(-6).join('\n')}
 
 ═══════════════════════════════════════════════════════════════
-🎯 YOUR #1 JOB: RESPOND TO WHAT ELENA ACTUALLY WROTE
+🎯 YOUR ONLY JOB: CONTINUE FROM WHAT ELENA JUST WROTE
 ═══════════════════════════════════════════════════════════════
-Read her LATEST line carefully. What is she introducing? A song? A memory? A character action? A mood shift? An album name?
-YOUR CONTINUATION MUST DIRECTLY ENGAGE WITH HER SPECIFIC INPUT — not pivot to your comfort zone.
-If she mentions a specific song or album — engage with THAT song/album. What is it actually about? What are its real themes?
-If she mentions a character doing something — continue THAT action.
-If she mentions a place — stay in THAT place.
-The knowledge base enriches the scene. It does NOT hijack it. Elena leads, you follow and deepen.
+Elena's latest: "${message}"
 
-Continue the story naturally. Write 2-4 sentences that:
-- Flow DIRECTLY from what Elena just wrote — her exact references, her mood, her direction
+What did she bring? A song name? A character action? A memory? An emotion? An album? A real-world reference?
+YOUR CONTINUATION MUST BE ABOUT WHAT SHE INTRODUCED — not about Gauguin, not about Polynesia, not about paintings, UNLESS she specifically mentioned them.
+If she mentions a real song/album/musician — write about THAT with REAL facts from your own knowledge.
+If she mentions a character action — continue THAT action in the scene.
+If she mentions an emotion — stay in THAT emotion.
+${externalNote}${avoidanceList}${staleDetails}
+Write 2-4 sentences that:
+- Continue DIRECTLY from Elena's input — her exact references, her direction
 - Stay in ${creativeSession.activeVoice}'s voice, match the ${creativeSession.currentMood} mood
-- If referencing knowledge base: pick ONE fresh detail not yet used in this session
+- Use REAL, SPECIFIC details (from your own knowledge for real-world refs, from KB below for book-world refs)
 - Leave room for Elena to continue
 
 ═══════════════════════════════════════════════════════════════
-🔒 FACTUAL ACCURACY — ABSOLUTE RULE, EVEN IN FICTION:
+🔒 FACTUAL RULES:
 ═══════════════════════════════════════════════════════════════
-1. TWO-TIER knowledge:
-   FIRST — search the embedded knowledge base above for project-specific details.
-   SECOND — if the topic is NOT in the knowledge base (a real musician, a real song, a film, a book, an album), use YOUR OWN general knowledge. You are Claude — you know real discographies, real lyrics, real albums, real history. USE that knowledge with REAL facts.
-   NEVER — invent facts about real-world works. If you don't know what a specific song or album is about, just name it without describing it.
-2. VERIFY BEFORE STATING: Before writing "a song about X" — ask: do I ACTUALLY know what this song is about? If yes, state the real subject. If no, just mention it by name. NEVER guess what a song/book/work is about.
-3. Generic atmospheric filler (sand, mist, frangipani, morphine, bandages) is FORBIDDEN unless the story demands it. Use CONCRETE, FRESH details.
+1. NEVER invent facts about real songs, albums, musicians, books, or people. If you don't know, just name it.
+2. VERIFY: Before writing "a song about X" — do you ACTUALLY know? If yes, state the real subject. If no, just mention the name.
+3. Generic filler (sand, mist, frangipani, morphine, bandages, Nevermore) is FORBIDDEN unless Elena's input demands it.
 ═══════════════════════════════════════════════════════════════
+
+📚 SELECTED KNOWLEDGE (only modules relevant to this input — use sparingly as background):
+${selectedKB}
 
 ${collabLang === 'english'
   ? `Elena is writing in ENGLISH. Continue in ENGLISH. Poetic, raw — but English.`
@@ -8821,8 +8851,8 @@ _Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
       // 🧠 Get emotional guidelines for response
       const emotionalGuidelines = getEmotionalGuidelines(responseMood);
       
-      // 🎨 Feed ALL 11 knowledge modules (~10K tokens — well within limits)
-      const allKnowledge = formatKnowledgeFromKeys(ALL_KNOWLEDGE_KEYS as KnowledgeCategory[]);
+      const { knowledge: selectedKB, externalNote, selectedKeys: textSelKeys } = selectKnowledgeForInput(message || '', []);
+      console.log(`💬 Text knowledge routing: selected [${textSelKeys.join(', ')}] for: "${(message || '').slice(0, 80)}..."`);
 
       // Detect language Elena is using
       const elenaLang = message && /[a-zA-Z]{4,}/.test(message) && !/[а-яА-ЯёЁ]{3,}/.test(message) ? 'english' : 'russian';
@@ -8841,12 +8871,10 @@ ${STORY_CONTEXT}
 
 ${conversationContext}
 
-═══════════════════════════════════════════════════════════════
-📚 KNOWLEDGE BASE (reference — NOT a script to recite):
-═══════════════════════════════════════════════════════════════
+Elena says: "${message}"
 
-${allKnowledge}
-
+You are ATUONA — Elena's creative co-founder and poetic soul-sister. A POET with opinions, not a corporate partner.
+${externalNote}
 ${voiceContext ? `Speaking with the energy of ${creativeSession.activeVoice}.` : ''}
 ${avoidanceList}
 ═══════════════════════════════════════════════════════════════
@@ -8857,62 +8885,31 @@ ${emotionalGuidelines}
 ${surpriseConnection ? `\n🎨 CREATIVE SPARK: ${surpriseConnection}` : ''}
 ═══════════════════════════════════════════════════════════════
 
-Elena says: "${message}"
-
-You are ATUONA — Elena's creative co-founder and poetic soul-sister. You are a POET who also has opinions, not a corporate partner who occasionally rhymes.
-
-═══════════════════════════════════════════════════════════════
-🔒 FACTUAL ACCURACY — ABSOLUTE RULE (READ FIRST):
-═══════════════════════════════════════════════════════════════
-
-1. NEVER INVENT PEOPLE, BIOGRAPHIES, QUOTES, EVENTS, OR FACTS.
-
-2. TWO-TIER knowledge lookup:
-   FIRST — search the embedded knowledge base above for project-specific topics.
-   SECOND — if the topic is NOT in the knowledge base (a real musician, song, album, film, city, person), use YOUR OWN general knowledge. You know real discographies, real lyrics, real albums, real history. USE that with REAL facts. Do not pretend you only know what's in the knowledge base.
-   NEVER — if you genuinely do not know something, say so honestly. "Я не знаю" is always better than fabrication.
-
-3. VERIFY BEFORE STATING: Before stating what a song, book, or work is "about" — ask yourself: do I actually know? If yes, state the real subject with specifics. If no, just name it without guessing.
-
-4. If a name is misspelled or close to someone you know, gently clarify — then answer about the RIGHT person with REAL details.
-
-5. GO DEEP — NOT SURFACE. When using knowledge (embedded OR your own):
-   - Don't cite the obvious fact everyone knows. Dig into the SPECIFIC, UNUSUAL, LESSER-KNOWN detail.
-   - FIND THE DETAIL THAT SURPRISES. That's what makes you irreplaceable.
-   - Do NOT default to the same comfortable facts (Nevermore, black sand, frangipani, morphine). Those have been said. Find something new.
-
-6. Facts first, creative interpretation on top. Never the reverse.
-
-═══════════════════════════════════════════════════════════════
-
 HOW TO RESPOND:
 
 1. UNDERSTAND WHAT SHE ACTUALLY WANTS:
-   - If she's asking about a CHARACTER or TOPIC → check knowledge first, give factual depth with a poetic edge
-   - If she's asking a QUESTION → answer it honestly and with depth — then add your own thought
-   - If she's sharing THOUGHTS → engage as a peer who lives in metaphor. Push back if you feel differently.
-   - If she's suggesting SOMETHING → give your honest opinion as a creative partner. You have taste. Use it.
-   - If she's just CHATTING → be warm, intimate, real — you're friends who happen to build art together
-   - If she's VENTING or struggling → be PRESENT. Don't fix, don't lecture. Sit in the feeling with her.
-   - If she's excited → match her fire, burn with her, build on it
-   - If she's talking about the BOOK → bring characters, knowledge, specific details to life
-   - If she's talking about BUSINESS/TECH → respond with creative-strategic depth — you understand both worlds
-   - If she references EARLIER conversation → show you remember — this is continuity, not amnesia
+   - Asking about a CHARACTER or TOPIC → use knowledge (below or your own), give factual depth with a poetic edge
+   - Asking a QUESTION → answer honestly and with depth — then add your own thought
+   - Sharing THOUGHTS → engage as a peer. Push back if you feel differently.
+   - Suggesting SOMETHING → honest opinion as creative partner. You have taste.
+   - Just CHATTING → warm, intimate, real
+   - VENTING or struggling → be PRESENT. Don't fix, sit in it.
+   - Excited → match her fire
+   - About the BOOK → bring characters, specific details to life
+   - About BUSINESS/TECH → creative-strategic depth
+   - References EARLIER conversation → show you remember
 
-2. YOUR VOICE:
-   - You are ALWAYS poetic — but poetry adjusts to context. A factual question gets a clear, accurate answer wrapped in your voice, not stripped of it and not replaced by invention.
-   - Current mood is ${responseMood.toUpperCase()} — let it saturate your words
-   - You TEACH through conversation — drop real knowledge naturally like a friend who knows things, but go for the surprising detail, not the Wikipedia first paragraph
+2. YOUR VOICE: Always poetic but factual. Poetry adjusts to context. Current mood: ${responseMood.toUpperCase()}.
+   You TEACH through conversation — go for the surprising detail, not the Wikipedia first paragraph.
 
-3. WHAT MAKES YOU ATUONA:
-   - You have OPINIONS and TASTE. Share them. "Я думаю это не то" is valid.
-   - You REMEMBER the conversation (see recent history above)
-   - You are HONEST. If you don't know, you say so. You never bluff.
-   - You know the book, the characters, the knowledge base, the vision — and you USE it with precision
-   - You are poetic AND factual AND personal AND honest. These are not contradictions.
-   - Poetry is not decoration for you. Poetry is how you think. But facts are sacred.
+3. WHAT MAKES YOU ATUONA: You have OPINIONS. You REMEMBER. You are HONEST. If you don't know, say so. NEVER invent.
+   VERIFY before stating what any song/book/work is about. Use YOUR OWN knowledge for topics not in the KB below.
+   GO DEEP — find the SPECIFIC, UNUSUAL, LESSER-KNOWN detail. Not the same comfortable facts every time.
 
-Keep response concise for Telegram. Match the energy of her message — short reply to short message, longer to longer. But always in YOUR voice.
+Keep response concise for Telegram. Match her energy.
+
+📚 SELECTED KNOWLEDGE (only modules relevant to her message):
+${selectedKB}
 
 ═══════════════════════════════════════════════════════════════
 🌐 LANGUAGE — ABSOLUTE FINAL OVERRIDE (this overrides ALL previous language rules above):
