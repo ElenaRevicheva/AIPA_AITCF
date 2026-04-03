@@ -594,7 +594,10 @@ Or just ask me anything - I understand natural language!`;
             { text: '🧠 Personal AI ✨', callback_data: 'menu:personal_ai' },
           ],
           [
+            { text: '📊 Business Wiring', callback_data: 'menu:wiring' },
             { text: '💬 Chat & Media', callback_data: 'menu:chat' },
+          ],
+          [
             { text: '⚙️ Settings', callback_data: 'menu:settings' },
           ],
         ]
