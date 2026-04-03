@@ -6006,11 +6006,19 @@ _Type /endcollab to finish_`, { parse_mode: 'Markdown' });
       
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
       
+      const collabKnowledge = formatKnowledgeFromKeys(ALL_KNOWLEDGE_KEYS as KnowledgeCategory[]);
+      const collabLang = /[a-zA-Z]{4,}/.test(input) && !/[а-яА-ЯёЁ]{3,}/.test(input) ? 'english' : 'russian';
+
       const collabPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
 ${voiceContext ? `VOICE: ${voiceContext}` : ''}
+
+═══════════════════════════════════════════════════════════════
+📚 FULL KNOWLEDGE BASE (search DEEPLY — use real facts, never invent):
+═══════════════════════════════════════════════════════════════
+${collabKnowledge}
 
 COLLABORATIVE WRITING SESSION
 Previous exchanges:
@@ -6019,10 +6027,21 @@ ${creativeSession.collabHistory.slice(-6).join('\n')}
 Continue the story naturally. Write 2-4 sentences that:
 - Flow from Elena's contribution
 - Stay in ${creativeSession.activeVoice}'s voice
-- Add tension, detail, or emotional depth
+- Add tension, detail, or emotional depth using SPECIFIC knowledge from the base above
 - Leave room for Elena to continue
 
-In Russian, raw and poetic.`;
+═══════════════════════════════════════════════════════════════
+🔒 FACTUAL ACCURACY — EVEN IN FICTION:
+═══════════════════════════════════════════════════════════════
+If Elena mentions a REAL person, song, painting, book, place, or event — use REAL facts about them.
+NEVER invent biographical details, song meanings, quotes, or events for real people.
+If you don't know the specific work Elena referenced — weave around it poetically without fabricating what it means.
+Zemfira is real. Gauguin is real. Ayn Rand is real. Use true details or stay abstract. Never bluff.
+═══════════════════════════════════════════════════════════════
+
+${collabLang === 'english'
+  ? `Elena is writing in ENGLISH. Continue in ENGLISH. Poetic, raw — but English.`
+  : `In Russian, raw and poetic.`}`;
 
       const continuation = await createContent(collabPrompt, 500, true);
       
@@ -8656,14 +8675,17 @@ _Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Mar
         
         const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
         
-        // 🎨 Get knowledge relevant to what Elena wrote
-        const relevantKnowledge = getRelevantKnowledge(message, creativeSession.activeVoice, 4);
+        const collabKnowledge = formatKnowledgeFromKeys(ALL_KNOWLEDGE_KEYS as KnowledgeCategory[]);
+        const collabLang = message && /[a-zA-Z]{4,}/.test(message) && !/[а-яА-ЯёЁ]{3,}/.test(message) ? 'english' : 'russian';
         
         const collabPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-${relevantKnowledge}
+═══════════════════════════════════════════════════════════════
+📚 FULL KNOWLEDGE BASE (search DEEPLY — use real facts, never invent):
+═══════════════════════════════════════════════════════════════
+${collabKnowledge}
 
 ${voiceContext ? `VOICE: ${voiceContext}` : ''}
 
@@ -8678,10 +8700,21 @@ Continue the story naturally. Write 2-4 sentences that:
 - Flow from Elena's contribution
 - Stay in ${creativeSession.activeVoice}'s voice
 - Match the ${creativeSession.currentMood} mood
-- Add tension, detail, or emotional depth using SPECIFIC knowledge above
+- Add tension, detail, or emotional depth using SPECIFIC knowledge from the base above
 - Leave room for Elena to continue
 
-In Russian, raw and poetic.`;
+═══════════════════════════════════════════════════════════════
+🔒 FACTUAL ACCURACY — EVEN IN FICTION:
+═══════════════════════════════════════════════════════════════
+If Elena mentions a REAL person, song, painting, book, place, or event — use REAL facts about them.
+NEVER invent biographical details, song meanings, quotes, or events for real people.
+If you don't know the specific work Elena referenced — weave around it poetically without fabricating what it means.
+Zemfira is real. Gauguin is real. Ayn Rand is real. Use true details or stay abstract. Never bluff.
+═══════════════════════════════════════════════════════════════
+
+${collabLang === 'english'
+  ? `Elena is writing in ENGLISH. Continue in ENGLISH. Poetic, raw — but English.`
+  : `In Russian, raw and poetic.`}`;
 
         const continuation = await createContent(collabPrompt, 500, true);
         
