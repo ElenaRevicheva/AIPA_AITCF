@@ -1068,8 +1068,8 @@ Paid: ${summary.active_paid}
 Churned: ${summary.churned}
 Conversion rate: ${convRate}%${expiringSection}
 
-_Data from espaluz\\_funnel table in Oracle DB_
-_EspaLuz repos must emit events to keep this current_`;
+Data source: espaluz-funnel table (Oracle DB)
+Note: EspaLuz repos must emit events to keep this current`;
 
       await ctx.reply(report, { parse_mode: 'Markdown' });
     } catch (error) {
