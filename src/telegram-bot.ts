@@ -38,7 +38,20 @@ import {
   searchKnowledge,
   getKnowledgeByCategory,
   getKnowledgeByProject,
-  getRecentKnowledge
+  getRecentKnowledge,
+  // Wiring Build (Week 1) - Outcome tracking
+  saveAgentOutcome,
+  verifyAgentOutcome,
+  getAgentOutcomes,
+  getOutcomeSummary,
+  // Wiring Build (Week 1) - Business leads
+  saveLead,
+  updateLead,
+  getLeads,
+  // Wiring Build (Week 1) - EspaLuz funnel
+  upsertEspaluzUser,
+  getEspaluzExpiringTrials,
+  getEspaluzFunnelSummary
 } from './database';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
@@ -528,6 +541,17 @@ Type /menu for all commands! 🚀
         { cmd: '/forget', desc: 'Clear conversation memory', usage: '/forget\nStart fresh (keeps knowledge base)' },
       ]
     },
+    'wiring': {
+      title: '📊 BUSINESS WIRING',
+      commands: [
+        { cmd: '/briefing', desc: 'Unified business briefing (outcomes + leads + revenue)', usage: '/briefing\nFull picture: agent outcomes, leads, EspaLuz revenue, system health' },
+        { cmd: '/outcomes', desc: 'Agent outcome tracking', usage: '/outcomes\n/outcomes cmo\nShows what each agent did and whether it worked' },
+        { cmd: '/leads', desc: 'Business lead tracker', usage: '/leads\n/leads new\nSignals from LinkedIn, social, inbound' },
+        { cmd: '/lead', desc: 'Add or update a lead', usage: '/lead add linkedin John Contractor commented on automation post\n/lead update <id> contacted' },
+        { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
+        { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
+      ]
+    },
     'chat': {
       title: '💬 CHAT & MEDIA',
       commands: [
@@ -823,7 +847,237 @@ You can also just send a message without /ask and I'll respond.
     if (ctx.chat?.id) alertChatIds.add(ctx.chat.id);
     await sendDailyBriefing(ctx);
   });
-  
+
+  // =============================================================================
+  // BUSINESS WIRING COMMANDS (Week 1 Build)
+  // =============================================================================
+
+  // /briefing - Unified business briefing (the core wiring product)
+  bot.command('briefing', async (ctx) => {
+    await ctx.reply('📊 Generating unified business briefing...');
+    try {
+      // Pull from all three new tables in parallel
+      const [outcomeSummary, leads, espaluzSummary, expiringTrials] = await Promise.all([
+        getOutcomeSummary(24),
+        getLeads(undefined, 10),
+        getEspaluzFunnelSummary(),
+        getEspaluzExpiringTrials(2)
+      ]);
+
+      // Format outcomes section
+      const conversionRate = outcomeSummary.total > 0
+        ? Math.round((outcomeSummary.positive / outcomeSummary.total) * 100)
+        : 0;
+      const outcomesSection = `📈 *OUTCOMES (last 24h)*
+Actions taken: ${outcomeSummary.total}
+Verified delivered: ${outcomeSummary.verified_delivered} ✅
+Verified failed: ${outcomeSummary.verified_failed}${outcomeSummary.verified_failed > 0 ? ' ⚠️' : ''}
+Pending verification: ${outcomeSummary.pending}
+Positive outcomes: ${outcomeSummary.positive}
+Activity→Outcome rate: ${conversionRate}%${Object.keys(outcomeSummary.by_agent).length > 0
+  ? '\n\nBy agent: ' + Object.entries(outcomeSummary.by_agent).map(([a, c]) => `${a}: ${c}`).join(', ')
+  : ''}`;
+
+      // Format revenue section
+      const revenueSection = `💰 *REVENUE (EspaLuz)*
+Active subscribers: ${espaluzSummary.active_paid} ($${espaluzSummary.monthly_revenue.toFixed(2)}/mo)
+Active trials: ${espaluzSummary.active_trials}
+Expiring soon: ${espaluzSummary.expiring_soon}${espaluzSummary.expiring_soon > 0 ? ' ⚠️' : ''}
+Churned: ${espaluzSummary.churned}
+Total users tracked: ${espaluzSummary.total_users}`;
+
+      // Format leads section
+      const highLeads = (leads as any[]).filter((l: any) => l[3] === 'high' || l[4] === 'high');
+      const newLeads = (leads as any[]).filter((l: any) => l[5] === 'new' || l[4] === 'new');
+      const leadsSection = `🎯 *LEADS*
+Total tracked: ${(leads as any[]).length}
+High signal: ${highLeads.length}
+New (uncontacted): ${newLeads.length}${highLeads.length > 0
+  ? '\n\n⚡ High\\-signal leads:\n' + highLeads.slice(0, 3).map((l: any) =>
+    `• ${l[2] || l[1] || 'unknown'} (${l[1] || l[0]})`).join('\n')
+  : ''}`;
+
+      // Format expiring trials
+      const trialSection = expiringTrials.length > 0
+        ? `\n\n⏰ *EXPIRING TRIALS*\n${(expiringTrials as any[]).map((t: any) =>
+          `• ${t[1] || t[0]} (${t[2] || t[1]}) — expires ${t[4] || 'soon'}`).join('\n')}\n_Send retention message?_`
+        : '';
+
+      const briefing = `📊 *AIdeazz Business Briefing*
+_${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}_
+
+${outcomesSection}
+
+${revenueSection}
+
+${leadsSection}${trialSection}
+
+_/outcomes — detailed agent view_
+_/leads — full lead list_
+_/espaluz — funnel details_`;
+
+      await ctx.reply(briefing, { parse_mode: 'Markdown' });
+
+      // Log this briefing as an outcome
+      await saveAgentOutcome('cto_aipa', 'briefing_generated', {
+        outcomes: outcomeSummary,
+        revenue: espaluzSummary.monthly_revenue,
+        leads_count: (leads as any[]).length
+      }, 'verified_delivered');
+
+    } catch (error) {
+      console.error('Briefing error:', error);
+      await ctx.reply('❌ Error generating briefing. Individual commands still work: /outcomes, /leads, /espaluz');
+    }
+  });
+
+  // /outcomes - View agent outcomes
+  bot.command('outcomes', async (ctx) => {
+    const agentFilter = ctx.message?.text?.replace('/outcomes', '').trim() || undefined;
+    try {
+      const outcomes = await getAgentOutcomes(agentFilter, 48, 15);
+      if (!outcomes || (outcomes as any[]).length === 0) {
+        await ctx.reply(`📈 No outcomes recorded${agentFilter ? ` for ${agentFilter}` : ''} in last 48h.\n\nUse /outcome to log one:\n\`/outcome cmo post\\_published \\{"platform":"linkedin"\\}\``, { parse_mode: 'Markdown' });
+        return;
+      }
+      const lines = (outcomes as any[]).map((o: any) => {
+        const agent = o[1] || o[0];
+        const action = o[2] || o[1];
+        const status = o[4] || o[3];
+        const statusIcon = status === 'outcome_positive' ? '✅' :
+                          status === 'verified_delivered' ? '📨' :
+                          status === 'verified_failed' ? '❌' :
+                          status === 'pending_verification' ? '⏳' : '❓';
+        return `${statusIcon} *${agent}*: ${action} — ${status}`;
+      });
+      await ctx.reply(`📈 *Agent Outcomes (48h)*${agentFilter ? ` — ${agentFilter}` : ''}\n\n${lines.join('\n')}`, { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('Outcomes error:', error);
+      await ctx.reply('❌ Error fetching outcomes.');
+    }
+  });
+
+  // /outcome - Log an agent outcome manually
+  bot.command('outcome', async (ctx) => {
+    const parts = ctx.message?.text?.replace('/outcome', '').trim().split(/\s+/, 3) || [];
+    if (parts.length < 2) {
+      await ctx.reply('📝 *Log an outcome:*\n\n`/outcome <agent> <action_type> [detail_json]`\n\nExamples:\n`/outcome cmo post_published {"platform":"linkedin"}`\n`/outcome vjh application_sent {"company":"TechCorp"}`\n`/outcome espaluz user_signup {"channel":"whatsapp"}`', { parse_mode: 'Markdown' });
+      return;
+    }
+    const agentName = parts[0] || 'unknown';
+    const actionType = parts[1] || 'unknown';
+    const detailRaw = ctx.message?.text?.replace('/outcome', '').trim().substring(agentName.length + actionType.length + 2);
+    let detail: any = {};
+    try { detail = detailRaw ? JSON.parse(detailRaw) : {}; } catch { detail = { raw: detailRaw }; }
+
+    const id = await saveAgentOutcome(agentName, actionType, detail);
+    if (id) {
+      await ctx.reply(`✅ Outcome logged: *${agentName}* → ${actionType}\nID: \`${id.substring(0, 8)}...\`\n\n_Status: pending\\_verification. Use /briefing to see summary._`, { parse_mode: 'Markdown' });
+    } else {
+      await ctx.reply('❌ Failed to save outcome.');
+    }
+  });
+
+  // /leads - View business leads
+  bot.command('leads', async (ctx) => {
+    const statusFilter = ctx.message?.text?.replace('/leads', '').trim() || undefined;
+    try {
+      const leads = await getLeads(statusFilter, 20);
+      if (!leads || (leads as any[]).length === 0) {
+        await ctx.reply(`🎯 No leads${statusFilter ? ` with status "${statusFilter}"` : ''} yet.\n\nAdd one:\n\`/lead add linkedin John\\_Doe commented on automation post\``, { parse_mode: 'Markdown' });
+        return;
+      }
+      const lines = (leads as any[]).map((l: any) => {
+        const name = l[2] || l[1] || 'unknown';
+        const source = l[1] || l[0];
+        const signal = l[3] || l[4] || 'low';
+        const status = l[5] || l[4] || 'new';
+        const signalIcon = signal === 'high' ? '🔥' : signal === 'medium' ? '⚡' : '·';
+        return `${signalIcon} *${name}* (${source}) — ${status}`;
+      });
+      await ctx.reply(`🎯 *Business Leads*${statusFilter ? ` — ${statusFilter}` : ''}\n\n${lines.join('\n')}\n\n_/lead add <source> <name> <context>_\n_/lead update <id> <status>_`, { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('Leads error:', error);
+      await ctx.reply('❌ Error fetching leads.');
+    }
+  });
+
+  // /lead - Add or update a lead
+  bot.command('lead', async (ctx) => {
+    const text = ctx.message?.text?.replace('/lead', '').trim() || '';
+    const parts = text.split(/\s+/);
+
+    if (parts[0] === 'add' && parts.length >= 3) {
+      const source = parts[1] || 'unknown';
+      const name = parts[2] || 'unknown';
+      const context = parts.slice(3).join(' ') || '';
+      const signal = context.toLowerCase().includes('dm') || context.toLowerCase().includes('comment') ? 'high' :
+                     context.toLowerCase().includes('like') ? 'medium' : 'low';
+      const id = await saveLead(source, name, context, signal);
+      if (id) {
+        await ctx.reply(`✅ Lead added: *${name}* from ${source}\nSignal: ${signal === 'high' ? '🔥 high' : signal === 'medium' ? '⚡ medium' : '· low'}\nID: \`${id.substring(0, 8)}...\``, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply('❌ Failed to save lead.');
+      }
+    } else if (parts[0] === 'update' && parts.length >= 3) {
+      const leadId = parts[1] || '';
+      const status = parts[2] || 'new';
+      const nextAction = parts.slice(3).join(' ') || undefined;
+      const success = await updateLead(leadId, status, nextAction);
+      if (success) {
+        await ctx.reply(`✅ Lead updated to: *${status}*${nextAction ? `\nNext: ${nextAction}` : ''}`, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply('❌ Failed to update lead. Check the ID.');
+      }
+    } else {
+      await ctx.reply('🎯 *Lead management:*\n\n*Add:*\n`/lead add <source> <name> <context>`\nExample: `/lead add linkedin John_Doe commented on wiring post`\n\n*Update:*\n`/lead update <id> <status> [next action]`\nStatuses: new, contacted, in\\_conversation, converted, lost', { parse_mode: 'Markdown' });
+    }
+  });
+
+  // /espaluz - EspaLuz funnel status
+  bot.command('espaluz', async (ctx) => {
+    try {
+      const [summary, expiring] = await Promise.all([
+        getEspaluzFunnelSummary(),
+        getEspaluzExpiringTrials(3)
+      ]);
+
+      const expiringSection = (expiring as any[]).length > 0
+        ? `\n\n⏰ *Expiring Trials (next 3 days)*\n${(expiring as any[]).map((t: any) => {
+          const userId = t[1] || t[0];
+          const channel = t[2] || t[1];
+          return `• ${userId} (${channel})`;
+        }).join('\n')}\n_These users need a retention message\\!_`
+        : '\n\n✅ No trials expiring in next 3 days\\.';
+
+      const report = `🇪🇸 *EspaLuz Funnel Report*
+
+💰 *Revenue*
+Active paid: ${summary.active_paid} subscribers
+Monthly: $${summary.monthly_revenue.toFixed(2)}/mo
+Price: $7\\.77/user/mo
+
+📊 *Funnel*
+Total users: ${summary.total_users}
+Active trials: ${summary.active_trials}
+Paid: ${summary.active_paid}
+Churned: ${summary.churned}
+Conversion rate: ${summary.total_users > 0 ? Math.round((summary.active_paid / summary.total_users) * 100) : 0}%${expiringSection}
+
+_Data from espaluz\\_funnel table in Oracle DB_
+_EspaLuz repos must call emit\\_event\\(\\) to keep this current_`;
+
+      await ctx.reply(report, { parse_mode: 'MarkdownV2' });
+    } catch (error) {
+      console.error('EspaLuz funnel error:', error);
+      await ctx.reply('❌ Error fetching EspaLuz data.');
+    }
+  });
+
+  // =============================================================================
+  // END BUSINESS WIRING COMMANDS
+  // =============================================================================
+
   // /alerts - Toggle proactive alerts
   bot.command('alerts', async (ctx) => {
     const chatId = ctx.chat?.id;
@@ -6477,28 +6731,57 @@ Be concise, motivating, and actionable. This is Telegram mobile - keep it short!
     // Use askAI with Groq fallback
     const suggestion = await askAI(suggestionPrompt, 500);
     
-    // 4. Format briefing
-    const activityLines = recentActivity.slice(0, 4).map(r => 
+    // 4. Pull wiring data (outcomes, revenue, leads)
+    let wiringSection = '';
+    try {
+      const [outcomeSummary, espaluzSummary, leads, expiringTrials] = await Promise.all([
+        getOutcomeSummary(24),
+        getEspaluzFunnelSummary(),
+        getLeads(undefined, 5),
+        getEspaluzExpiringTrials(2)
+      ]);
+
+      const convRate = outcomeSummary.total > 0
+        ? Math.round((outcomeSummary.positive / outcomeSummary.total) * 100)
+        : 0;
+
+      wiringSection = `
+💰 *Revenue*
+EspaLuz: ${espaluzSummary.active_paid} paid ($${espaluzSummary.monthly_revenue.toFixed(2)}/mo) | ${espaluzSummary.active_trials} trials${espaluzSummary.expiring_soon > 0 ? ` | ⚠️ ${espaluzSummary.expiring_soon} expiring` : ''}
+
+📈 *Outcomes (24h)*
+${outcomeSummary.total} actions | ${outcomeSummary.positive} positive | ${convRate}% conversion${outcomeSummary.verified_failed > 0 ? ` | ⚠️ ${outcomeSummary.verified_failed} failed` : ''}
+
+🎯 *Leads*
+${(leads as any[]).length} tracked${(leads as any[]).filter((l: any) => (l[3] === 'high' || l[4] === 'high')).length > 0 ? ' | 🔥 ' + (leads as any[]).filter((l: any) => (l[3] === 'high' || l[4] === 'high')).length + ' high-signal' : ''}
+`;
+    } catch (err) {
+      console.error('Wiring data error in daily briefing:', err);
+      wiringSection = '\n_⚠️ Wiring data unavailable — use /briefing for details_\n';
+    }
+
+    // 5. Format briefing
+    const activityLines = recentActivity.slice(0, 4).map(r =>
       `• ${escapeMarkdown(r.repo)}: ${r.days === 0 ? 'Today' : r.days === 1 ? 'Yesterday' : `${r.days}d ago`}`
     ).join('\n');
-    
-    const alertsSection = staleRepos.length > 0 
-      ? `\n⚠️ *Needs Attention*\n${staleRepos.map(r => `• ${escapeMarkdown(r)} (>7 days)`).join('\n')}\n` 
+
+    const alertsSection = staleRepos.length > 0
+      ? `\n⚠️ *Needs Attention*\n${staleRepos.map(r => `• ${escapeMarkdown(r)} (>7 days)`).join('\n')}\n`
       : '';
-    
+
     const briefing = `☀️ *Good Morning, Elena!*
 
 📊 *Ecosystem Status*
 CTO AIPA: ${ctoStatus}
 CMO AIPA: ${cmoStatus}
-
+${wiringSection}
 📁 *Recent Activity*
 ${activityLines}
 ${alertsSection}
 💡 *Today's Focus*
 ${suggestion}
 
-_Use /daily anytime for an update!_`;
+_/briefing for full business view | /daily anytime for update_`;
 
     await ctx.reply(briefing, { parse_mode: 'Markdown' });
     

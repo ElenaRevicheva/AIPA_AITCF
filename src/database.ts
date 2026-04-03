@@ -1123,16 +1123,489 @@ async function getKnowledgeByProject(
   }
 }
 
-// Initialize new tables (including Personal AI tables)
+// =============================================================================
+// AGENT OUTCOMES — Cross-agent outcome tracking (Week 1 Wiring Build)
+// Every agent writes what it did + whether it worked.
+// CTO AIPA briefing reads from here. AILA inherits this table.
+// =============================================================================
+
+async function initAgentOutcomesTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE agent_outcomes (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          agent_name VARCHAR2(50) NOT NULL,
+          action_type VARCHAR2(100) NOT NULL,
+          action_detail CLOB,
+          outcome_status VARCHAR2(50) DEFAULT ''pending_verification'',
+          outcome_detail CLOB,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          verified_at TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ agent_outcomes table ready');
+  } catch (err) {
+    console.error('agent_outcomes table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveAgentOutcome(
+  agentName: string,
+  actionType: string,
+  actionDetail: any,
+  outcomeStatus: string = 'pending_verification',
+  outcomeDetail?: any
+): Promise<string | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO agent_outcomes (agent_name, action_type, action_detail, outcome_status, outcome_detail)
+       VALUES (:agentName, :actionType, :actionDetail, :outcomeStatus, :outcomeDetail)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        agentName,
+        actionType,
+        actionDetail: JSON.stringify(actionDetail),
+        outcomeStatus,
+        outcomeDetail: outcomeDetail ? JSON.stringify(outcomeDetail) : null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 }
+      },
+      { autoCommit: true }
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds.id[0] || null;
+  } catch (err) {
+    console.error('❌ Save agent outcome error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function verifyAgentOutcome(
+  outcomeId: string,
+  outcomeStatus: string,
+  outcomeDetail?: any
+): Promise<boolean> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(
+      `UPDATE agent_outcomes
+       SET outcome_status = :outcomeStatus,
+           outcome_detail = :outcomeDetail,
+           verified_at = CURRENT_TIMESTAMP
+       WHERE id = HEXTORAW(:outcomeId)`,
+      {
+        outcomeStatus,
+        outcomeDetail: outcomeDetail ? JSON.stringify(outcomeDetail) : null,
+        outcomeId
+      },
+      { autoCommit: true }
+    );
+    return true;
+  } catch (err) {
+    console.error('❌ Verify agent outcome error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getAgentOutcomes(
+  agentName?: string,
+  hoursBack: number = 24,
+  limit: number = 50
+): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    let query = `SELECT RAWTOHEX(id) as id, agent_name, action_type, action_detail,
+                        outcome_status, outcome_detail, created_at, verified_at
+                 FROM agent_outcomes
+                 WHERE created_at > CURRENT_TIMESTAMP - INTERVAL '1' HOUR * :hoursBack`;
+    const params: any = { hoursBack, limit };
+
+    if (agentName) {
+      query += ` AND agent_name = :agentName`;
+      params.agentName = agentName;
+    }
+    query += ` ORDER BY created_at DESC FETCH FIRST :limit ROWS ONLY`;
+
+    const result = await connection.execute(query, params);
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get agent outcomes error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getOutcomeSummary(hoursBack: number = 24): Promise<{
+  total: number;
+  verified_delivered: number;
+  verified_failed: number;
+  pending: number;
+  positive: number;
+  negative: number;
+  by_agent: Record<string, number>;
+}> {
+  let connection;
+  const summary = {
+    total: 0, verified_delivered: 0, verified_failed: 0,
+    pending: 0, positive: 0, negative: 0, by_agent: {} as Record<string, number>
+  };
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT agent_name, outcome_status, COUNT(*) as cnt
+       FROM agent_outcomes
+       WHERE created_at > CURRENT_TIMESTAMP - INTERVAL '1' HOUR * :hoursBack
+       GROUP BY agent_name, outcome_status`,
+      { hoursBack }
+    );
+    if (result.rows) {
+      for (const row of result.rows as any[]) {
+        const [agent, status, count] = row;
+        const cnt = Number(count);
+        summary.total += cnt;
+        if (status === 'verified_delivered') summary.verified_delivered += cnt;
+        else if (status === 'verified_failed') summary.verified_failed += cnt;
+        else if (status === 'pending_verification') summary.pending += cnt;
+        else if (status === 'outcome_positive') summary.positive += cnt;
+        else if (status === 'outcome_negative') summary.negative += cnt;
+        summary.by_agent[agent] = (summary.by_agent[agent] || 0) + cnt;
+      }
+    }
+    return summary;
+  } catch (err) {
+    console.error('❌ Get outcome summary error:', err);
+    return summary;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// =============================================================================
+// BUSINESS LEADS — Track engagement signals from LinkedIn/social/inbound
+// =============================================================================
+
+async function initBusinessLeadsTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE business_leads (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          source VARCHAR2(100) NOT NULL,
+          name VARCHAR2(500),
+          context CLOB,
+          signal_strength VARCHAR2(20) DEFAULT ''low'',
+          status VARCHAR2(50) DEFAULT ''new'',
+          next_action VARCHAR2(1000),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ business_leads table ready');
+  } catch (err) {
+    console.error('business_leads table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveLead(
+  source: string,
+  name: string,
+  context: string,
+  signalStrength: string = 'low',
+  nextAction?: string
+): Promise<string | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO business_leads (source, name, context, signal_strength, next_action)
+       VALUES (:source, :name, :context, :signalStrength, :nextAction)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        source,
+        name: name || 'unknown',
+        context,
+        signalStrength,
+        nextAction: nextAction || null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 }
+      },
+      { autoCommit: true }
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds.id[0] || null;
+  } catch (err) {
+    console.error('❌ Save lead error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function updateLead(
+  leadId: string,
+  status: string,
+  nextAction?: string
+): Promise<boolean> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(
+      `UPDATE business_leads
+       SET status = :status,
+           next_action = :nextAction,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = HEXTORAW(:leadId)`,
+      {
+        status,
+        nextAction: nextAction || null,
+        leadId
+      },
+      { autoCommit: true }
+    );
+    return true;
+  } catch (err) {
+    console.error('❌ Update lead error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getLeads(
+  status?: string,
+  limit: number = 20
+): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    let query = `SELECT RAWTOHEX(id) as id, source, name, context, signal_strength,
+                        status, next_action, created_at, updated_at
+                 FROM business_leads`;
+    const params: any = { limit };
+
+    if (status) {
+      query += ` WHERE status = :status`;
+      params.status = status;
+    }
+    query += ` ORDER BY
+      CASE signal_strength WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END,
+      created_at DESC
+      FETCH FIRST :limit ROWS ONLY`;
+
+    const result = await connection.execute(query, params);
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get leads error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// =============================================================================
+// ESPALUZ FUNNEL — Track every user from trial → paid → churned
+// =============================================================================
+
+async function initEspaluzFunnelTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE espaluz_funnel (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          user_id VARCHAR2(100) NOT NULL,
+          channel VARCHAR2(50) NOT NULL,
+          trial_start TIMESTAMP,
+          trial_end TIMESTAMP,
+          messages_sent NUMBER DEFAULT 0,
+          last_active TIMESTAMP,
+          converted NUMBER(1) DEFAULT 0,
+          payment_status VARCHAR2(50) DEFAULT ''trial'',
+          paypal_subscription_id VARCHAR2(100),
+          retention_message_sent NUMBER(1) DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ espaluz_funnel table ready');
+  } catch (err) {
+    console.error('espaluz_funnel table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function upsertEspaluzUser(
+  userId: string,
+  channel: string,
+  data: {
+    trialStart?: Date;
+    trialEnd?: Date;
+    messagesSent?: number;
+    lastActive?: Date;
+    converted?: boolean;
+    paymentStatus?: string;
+    paypalSubscriptionId?: string;
+    retentionMessageSent?: boolean;
+  }
+): Promise<boolean> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(
+      `MERGE INTO espaluz_funnel ef
+       USING (SELECT :userId as user_id, :channel as channel FROM dual) src
+       ON (ef.user_id = src.user_id AND ef.channel = src.channel)
+       WHEN MATCHED THEN UPDATE SET
+         messages_sent = NVL(:messagesSent, ef.messages_sent),
+         last_active = NVL(:lastActive, ef.last_active),
+         converted = NVL(:converted, ef.converted),
+         payment_status = NVL(:paymentStatus, ef.payment_status),
+         paypal_subscription_id = NVL(:paypalSubId, ef.paypal_subscription_id),
+         retention_message_sent = NVL(:retentionSent, ef.retention_message_sent),
+         updated_at = CURRENT_TIMESTAMP
+       WHEN NOT MATCHED THEN INSERT
+         (user_id, channel, trial_start, trial_end, messages_sent, last_active,
+          converted, payment_status, paypal_subscription_id, retention_message_sent)
+       VALUES (:userId, :channel, :trialStart, :trialEnd, :messagesSent, :lastActive,
+               :converted, :paymentStatus, :paypalSubId, :retentionSent)`,
+      {
+        userId,
+        channel,
+        trialStart: data.trialStart || null,
+        trialEnd: data.trialEnd || null,
+        messagesSent: data.messagesSent ?? null,
+        lastActive: data.lastActive || new Date(),
+        converted: data.converted !== undefined ? (data.converted ? 1 : 0) : null,
+        paymentStatus: data.paymentStatus || null,
+        paypalSubId: data.paypalSubscriptionId || null,
+        retentionSent: data.retentionMessageSent !== undefined ? (data.retentionMessageSent ? 1 : 0) : null
+      },
+      { autoCommit: true }
+    );
+    return true;
+  } catch (err) {
+    console.error('❌ Upsert EspaLuz user error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getEspaluzExpiringTrials(daysAhead: number = 2): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) as id, user_id, channel, trial_start, trial_end,
+              messages_sent, last_active, payment_status, retention_message_sent
+       FROM espaluz_funnel
+       WHERE payment_status = 'trial'
+         AND trial_end IS NOT NULL
+         AND trial_end BETWEEN CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP + INTERVAL '1' DAY * :daysAhead
+         AND retention_message_sent = 0
+       ORDER BY trial_end ASC`,
+      { daysAhead }
+    );
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ Get expiring trials error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getEspaluzFunnelSummary(): Promise<{
+  total_users: number;
+  active_trials: number;
+  active_paid: number;
+  churned: number;
+  monthly_revenue: number;
+  expiring_soon: number;
+}> {
+  let connection;
+  const summary = {
+    total_users: 0, active_trials: 0, active_paid: 0,
+    churned: 0, monthly_revenue: 0, expiring_soon: 0
+  };
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT payment_status, COUNT(*) as cnt
+       FROM espaluz_funnel
+       GROUP BY payment_status`
+    );
+    if (result.rows) {
+      for (const row of result.rows as any[]) {
+        const [status, count] = row;
+        const cnt = Number(count);
+        summary.total_users += cnt;
+        if (status === 'trial') summary.active_trials += cnt;
+        else if (status === 'active') { summary.active_paid += cnt; summary.monthly_revenue += cnt * 7.77; }
+        else if (status === 'churned' || status === 'cancelled') summary.churned += cnt;
+      }
+    }
+    // Count expiring in next 2 days
+    const expiring = await connection.execute(
+      `SELECT COUNT(*) FROM espaluz_funnel
+       WHERE payment_status = 'trial'
+         AND trial_end BETWEEN CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP + INTERVAL '2' DAY`
+    );
+    if (expiring.rows && expiring.rows.length > 0) {
+      summary.expiring_soon = Number((expiring.rows[0] as any[])[0]);
+    }
+    return summary;
+  } catch (err) {
+    console.error('❌ Get EspaLuz funnel summary error:', err);
+    return summary;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// Initialize all tables (including new Wiring Build tables)
 initLessonsTable();
 initStrategicTable();
 initHealthTable();
 initConversationContextTable();
 initKnowledgeBaseTable();
+initAgentOutcomesTable();
+initBusinessLeadsTable();
+initEspaluzFunnelTable();
 
-export { 
-  initializeDatabase, 
-  saveMemory, 
+export {
+  initializeDatabase,
+  saveMemory,
   getRelevantMemory,
   // Tech debt
   addTechDebt,
@@ -1169,5 +1642,19 @@ export {
   searchKnowledge,
   getKnowledgeByCategory,
   getKnowledgeByProject,
-  getRecentKnowledge
+  getRecentKnowledge,
+  // === WIRING BUILD (Week 1) ===
+  // Agent Outcomes — cross-agent outcome tracking
+  saveAgentOutcome,
+  verifyAgentOutcome,
+  getAgentOutcomes,
+  getOutcomeSummary,
+  // Business Leads — engagement signal tracking
+  saveLead,
+  updateLead,
+  getLeads,
+  // EspaLuz Funnel — trial → paid → churned tracking
+  upsertEspaluzUser,
+  getEspaluzExpiringTrials,
+  getEspaluzFunnelSummary
 };
