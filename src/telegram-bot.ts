@@ -1050,27 +1050,28 @@ _/espaluz — funnel details_`;
           const userId = t[1] || t[0];
           const channel = t[2] || t[1];
           return `• ${userId} (${channel})`;
-        }).join('\n')}\n_These users need a retention message\\!_`
-        : '\n\n✅ No trials expiring in next 3 days\\.';
+        }).join('\n')}\n_These users need a retention message!_`
+        : '\n\n✅ No trials expiring in next 3 days.';
 
+      const convRate = summary.total_users > 0 ? Math.round((summary.active_paid / summary.total_users) * 100) : 0;
       const report = `🇪🇸 *EspaLuz Funnel Report*
 
 💰 *Revenue*
 Active paid: ${summary.active_paid} subscribers
 Monthly: $${summary.monthly_revenue.toFixed(2)}/mo
-Price: $7\\.77/user/mo
+Price: $7.77/user/mo
 
 📊 *Funnel*
 Total users: ${summary.total_users}
 Active trials: ${summary.active_trials}
 Paid: ${summary.active_paid}
 Churned: ${summary.churned}
-Conversion rate: ${summary.total_users > 0 ? Math.round((summary.active_paid / summary.total_users) * 100) : 0}%${expiringSection}
+Conversion rate: ${convRate}%${expiringSection}
 
 _Data from espaluz\\_funnel table in Oracle DB_
-_EspaLuz repos must call emit\\_event\\(\\) to keep this current_`;
+_EspaLuz repos must emit events to keep this current_`;
 
-      await ctx.reply(report, { parse_mode: 'MarkdownV2' });
+      await ctx.reply(report, { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('EspaLuz funnel error:', error);
       await ctx.reply('❌ Error fetching EspaLuz data.');
