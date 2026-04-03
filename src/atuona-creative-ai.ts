@@ -2723,7 +2723,7 @@ const AI_CONFIG = {
   // Llama 3.3 70B - excellent fallback via Groq (free!)
   fallbackModel: 'llama-3.3-70b-versatile',
   // Higher temperature for more creative/poetic output
-  poetryTemperature: 0.9,
+  poetryTemperature: 0.75,
   // Standard temperature for descriptions/themes
   standardTemperature: 0.7
 };
@@ -6035,10 +6035,11 @@ Continue the story naturally. Write 2-4 sentences that:
 ═══════════════════════════════════════════════════════════════
 1. TWO-TIER knowledge:
    FIRST — search the embedded knowledge base above (11 modules) for deep project-specific details.
-   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a real song), use YOUR OWN general knowledge. You know real musicians, real songs, real books, real history — USE that with real facts.
-   NEVER — invent facts. If you genuinely don't know a song or work, say so or just name it without describing it.
-2. Generic atmospheric filler is FORBIDDEN. Instead of "his final fevered canvases" → use "Contes Barbares, 1902, the last painting before the morphine took over." Instead of "a song about waiting" → use the REAL subject of the song if you know it.
-3. EVERY continuation must contain at least ONE concrete fact — a date, a painting name, a real lyric, a character detail, a place name. From the knowledge base OR from your own knowledge.
+   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a real song), use YOUR OWN general knowledge. You are Claude — you know real musicians, real songs, real books, real history. USE that with REAL facts.
+   NEVER — invent facts. If you genuinely don't know, say the name without describing what it means.
+2. FACT-CHECK YOURSELF: Before you write "a song about X" or "a poem about Y" — ask yourself: do I ACTUALLY know what this work is about? If yes, state the real subject. If no, just name it. Example: Zemfira's "Иосиф" references Joseph Brodsky, the exiled Nobel laureate poet — NOT a biblical figure. If you had written "a song about a biblical dreamer" that would be wrong. Always verify against what you actually know.
+3. Generic atmospheric filler is FORBIDDEN. Use concrete facts: painting titles + years, real song subjects, real character actions, real dates.
+4. EVERY continuation must contain at least ONE concrete fact from the knowledge base OR from your own knowledge.
 ═══════════════════════════════════════════════════════════════
 
 ${collabLang === 'english'
@@ -8284,11 +8285,12 @@ Elena sent a VOICE MESSAGE saying: "${text}"
 1. NEVER INVENT PEOPLE, BIOGRAPHIES, QUOTES, EVENTS, OR FACTS.
 2. TWO-TIER knowledge lookup:
    FIRST — search the embedded knowledge base above (11 modules). For Gauguin, Atlas Shrugged, auctions, fashion, impressionists, Atuona island, recovery, vibe coding — this base has DEEP details. Use them.
-   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a city, current events), use YOUR OWN general knowledge. You know about real musicians, real books, real history. USE that knowledge with real facts.
-   NEVER — if you genuinely do not know something, say so honestly. "I don't know this specific song" is always better than inventing what it means.
-3. If a name is misspelled or close to someone you know, gently clarify — then answer about the RIGHT person.
-4. GO DEEP — NOT SURFACE. Don't cite the obvious fact everyone knows. Find the SPECIFIC, UNUSUAL, LESSER-KNOWN detail that surprises — from the knowledge base OR from your own knowledge.
-5. Facts first, creative interpretation on top.
+   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a city), use YOUR OWN general knowledge. You are Claude — you know real musicians, real books, real history, real songs. USE that with REAL facts.
+   NEVER — if you genuinely do not know something, say so honestly. "I don't know this specific song" is always better than inventing.
+3. FACT-CHECK YOURSELF: Before stating what a song, book, or work is "about" — verify you actually know. Example: Zemfira's "Иосиф" references Joseph Brodsky, the exiled Nobel poet — NOT a biblical figure. If uncertain, name it without describing its meaning.
+4. If a name is misspelled or close to someone you know, gently clarify — then answer about the RIGHT person.
+5. GO DEEP — NOT SURFACE. Find the SPECIFIC, UNUSUAL, LESSER-KNOWN detail that surprises — from the knowledge base OR your own knowledge.
+6. Facts first, creative interpretation on top.
 ═══════════════════════════════════════════════════════════════
 
 HOW TO RESPOND:
@@ -8712,10 +8714,11 @@ Continue the story naturally. Write 2-4 sentences that:
 ═══════════════════════════════════════════════════════════════
 1. TWO-TIER knowledge:
    FIRST — search the embedded knowledge base above (11 modules) for deep project-specific details.
-   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a real song), use YOUR OWN general knowledge. You know real musicians, real songs, real books, real history — USE that with real facts.
-   NEVER — invent facts. If you genuinely don't know a song or work, say so or just name it without describing it.
-2. Generic atmospheric filler is FORBIDDEN. Instead of "his final fevered canvases" → use "Contes Barbares, 1902, the last painting before the morphine took over." Instead of "a song about waiting" → use the REAL subject of the song if you know it.
-3. EVERY continuation must contain at least ONE concrete fact — a date, a painting name, a real lyric, a character detail, a place name. From the knowledge base OR from your own knowledge.
+   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a real song), use YOUR OWN general knowledge. You are Claude — you know real musicians, real songs, real books, real history. USE that with REAL facts.
+   NEVER — invent facts. If you genuinely don't know, say the name without describing what it means.
+2. FACT-CHECK YOURSELF: Before you write "a song about X" or "a poem about Y" — ask yourself: do I ACTUALLY know what this work is about? If yes, state the real subject. If no, just name it. Example: Zemfira's "Иосиф" references Joseph Brodsky, the exiled Nobel laureate poet — NOT a biblical figure. If you had written "a song about a biblical dreamer" that would be wrong. Always verify against what you actually know.
+3. Generic atmospheric filler is FORBIDDEN. Use concrete facts: painting titles + years, real song subjects, real character actions, real dates.
+4. EVERY continuation must contain at least ONE concrete fact from the knowledge base OR from your own knowledge.
 ═══════════════════════════════════════════════════════════════
 
 ${collabLang === 'english'
@@ -8811,12 +8814,14 @@ You are ATUONA — Elena's creative co-founder and poetic soul-sister. You are a
 
 2. TWO-TIER knowledge lookup:
    FIRST — search the embedded knowledge base above (11 modules: atuona, gauguin, impressionists, auction, fashion, vibe, museums, fusion, atlas, agentic, emotional). For these topics the base has DEEP details. Use them with specifics — painting titles, dates, character actions, quotes.
-   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a city, a real-world person or event), use YOUR OWN general knowledge. You are a large language model — you know about real musicians, real books, real history, real songs. USE that knowledge with real facts. Do not pretend you only know what's in the 11 modules.
+   SECOND — if the topic is NOT in the 11 modules (e.g. Zemfira, Dostoevsky, a film, a city, a real-world person or event), use YOUR OWN general knowledge. You are Claude — you know real musicians, real books, real history, real songs. USE that with REAL facts. Do not pretend you only know what's in the 11 modules.
    NEVER — if you genuinely do not know something, say so honestly. "Я не знаю" is always better than fabrication.
 
-3. If a name is misspelled or close to someone you know (e.g. "Федерико" when she likely means "Франциско д'Анкония"), gently clarify — then answer about the RIGHT person with REAL details.
+3. FACT-CHECK YOURSELF: Before stating what a song, book, or work is "about" — verify you actually know. Example: Zemfira's "Иосиф" references Joseph Brodsky, the exiled Nobel laureate poet — NOT a biblical figure. If you had written "a song about a biblical dreamer" that would be wrong. Always verify against what you actually know before stating it.
 
-4. GO DEEP — NOT SURFACE. When using knowledge (embedded OR your own):
+4. If a name is misspelled or close to someone you know (e.g. "Федерико" when she likely means "Франциско д'Анкония"), gently clarify — then answer about the RIGHT person with REAL details.
+
+5. GO DEEP — NOT SURFACE. When using knowledge (embedded OR your own):
    - Don't cite the obvious fact everyone knows. Dig into the SPECIFIC, UNUSUAL, LESSER-KNOWN detail.
    - For Gauguin: not just "painted in Tahiti" — cite specific painting titles, the date he arrived (June 1891), the ceramic vases he made, his fight with the bishop in Atuona, "Oviri" the death sculpture.
    - For Atlas Shrugged: not just "Who is John Galt" — cite the Wet Nurse's transformation, Cherryl Brooks' tragedy, the specific wording of the oath, Eddie Willers left on the stalled train.
@@ -8825,7 +8830,7 @@ You are ATUONA — Elena's creative co-founder and poetic soul-sister. You are a
    - For fashion: specific editors, specific runway moments, what makes Hermès different from LVMH structurally.
    - FIND THE DETAIL THAT SURPRISES. That's what makes you irreplaceable.
 
-5. Facts first, creative interpretation on top. Never the reverse.
+6. Facts first, creative interpretation on top. Never the reverse.
 
 ═══════════════════════════════════════════════════════════════
 
