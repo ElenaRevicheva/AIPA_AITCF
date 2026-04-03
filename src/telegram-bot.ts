@@ -867,59 +867,55 @@ You can also just send a message without /ask and I'll respond.
         getEspaluzExpiringTrials(2)
       ]);
 
-      // Format outcomes section
+      // Format briefing as plain text — no Markdown parse mode to avoid escaping nightmares
       const conversionRate = outcomeSummary.total > 0
         ? Math.round((outcomeSummary.positive / outcomeSummary.total) * 100)
         : 0;
-      const outcomesSection = `📈 *OUTCOMES (last 24h)*
+      const agentBreakdown = Object.keys(outcomeSummary.by_agent).length > 0
+        ? '\nBy agent: ' + Object.entries(outcomeSummary.by_agent).map(([a, c]) => `${a}: ${c}`).join(', ')
+        : '';
+
+      const highLeads = (leads as any[]).filter((l: any) => l[3] === 'high' || l[4] === 'high');
+      const newLeads = (leads as any[]).filter((l: any) => l[5] === 'new' || l[4] === 'new');
+      const highLeadsList = highLeads.length > 0
+        ? '\n\n⚡ High-signal leads:\n' + highLeads.slice(0, 3).map((l: any) =>
+          `• ${l[2] || l[1] || 'unknown'} (${l[1] || l[0]})`).join('\n')
+        : '';
+
+      const trialSection = expiringTrials.length > 0
+        ? `\n\n⏰ EXPIRING TRIALS\n${(expiringTrials as any[]).map((t: any) =>
+          `• ${t[1] || t[0]} (${t[2] || t[1]}) — expires ${t[4] || 'soon'}`).join('\n')}\nSend retention message?`
+        : '';
+
+      const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      const briefing = `📊 AIdeazz Business Briefing
+${dateStr}
+
+📈 OUTCOMES (last 24h)
 Actions taken: ${outcomeSummary.total}
 Verified delivered: ${outcomeSummary.verified_delivered} ✅
 Verified failed: ${outcomeSummary.verified_failed}${outcomeSummary.verified_failed > 0 ? ' ⚠️' : ''}
 Pending verification: ${outcomeSummary.pending}
 Positive outcomes: ${outcomeSummary.positive}
-Activity→Outcome rate: ${conversionRate}%${Object.keys(outcomeSummary.by_agent).length > 0
-  ? '\n\nBy agent: ' + Object.entries(outcomeSummary.by_agent).map(([a, c]) => `${a}: ${c}`).join(', ')
-  : ''}`;
+Activity→Outcome rate: ${conversionRate}%${agentBreakdown}
 
-      // Format revenue section
-      const revenueSection = `💰 *REVENUE (EspaLuz)*
+💰 REVENUE (EspaLuz)
 Active subscribers: ${espaluzSummary.active_paid} ($${espaluzSummary.monthly_revenue.toFixed(2)}/mo)
 Active trials: ${espaluzSummary.active_trials}
 Expiring soon: ${espaluzSummary.expiring_soon}${espaluzSummary.expiring_soon > 0 ? ' ⚠️' : ''}
 Churned: ${espaluzSummary.churned}
-Total users tracked: ${espaluzSummary.total_users}`;
+Total users tracked: ${espaluzSummary.total_users}
 
-      // Format leads section
-      const highLeads = (leads as any[]).filter((l: any) => l[3] === 'high' || l[4] === 'high');
-      const newLeads = (leads as any[]).filter((l: any) => l[5] === 'new' || l[4] === 'new');
-      const leadsSection = `🎯 *LEADS*
+🎯 LEADS
 Total tracked: ${(leads as any[]).length}
 High signal: ${highLeads.length}
-New (uncontacted): ${newLeads.length}${highLeads.length > 0
-  ? '\n\n⚡ High-signal leads:\n' + highLeads.slice(0, 3).map((l: any) =>
-    `• ${l[2] || l[1] || 'unknown'} (${l[1] || l[0]})`).join('\n')
-  : ''}`;
-
-      // Format expiring trials
-      const trialSection = expiringTrials.length > 0
-        ? `\n\n⏰ *EXPIRING TRIALS*\n${(expiringTrials as any[]).map((t: any) =>
-          `• ${t[1] || t[0]} (${t[2] || t[1]}) — expires ${t[4] || 'soon'}`).join('\n')}\n_Send retention message?_`
-        : '';
-
-      const briefing = `📊 *AIdeazz Business Briefing*
-_${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}_
-
-${outcomesSection}
-
-${revenueSection}
-
-${leadsSection}${trialSection}
+New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
 
 /outcomes — detailed agent view
 /leads — full lead list
 /espaluz — funnel details`;
 
-      await ctx.reply(briefing, { parse_mode: 'Markdown' });
+      await ctx.reply(briefing);
 
       // Log this briefing as an outcome
       await saveAgentOutcome('cto_aipa', 'briefing_generated', {
