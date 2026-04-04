@@ -954,13 +954,22 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
         try {
           const d = typeof detailRaw === 'string' ? JSON.parse(detailRaw) : (detailRaw || {});
           const parts: string[] = [];
+          // User lessons
           if (d.user_id) parts.push(`user: ${String(d.user_id).slice(-6)}`);
-          if (d.repo) parts.push(`repo: ${String(d.repo).split('/')[1] || d.repo}`);
           if (d.topic) parts.push(`"${String(d.topic).slice(0, 30)}"`);
           if (d.lesson_type) parts.push(d.lesson_type);
-          if (d.platform) parts.push(d.platform);
+          // GitHub push reviews
+          if (d.repo) parts.push(`repo: ${String(d.repo).split('/')[1] || d.repo}`);
           if (d.commits_count) parts.push(`${d.commits_count} commit${d.commits_count !== 1 ? 's' : ''}`);
-          if (d.security_issues !== undefined) parts.push(`${d.security_issues} sec issues`);
+          if (d.security_issues !== undefined && d.security_issues > 0) parts.push(`⚠️ ${d.security_issues} sec`);
+          if (d.commit_messages) parts.push(`"${String(d.commit_messages).slice(0, 40)}"`);
+          // Briefings
+          if (d.revenue !== undefined) parts.push(`$${Number(d.revenue).toFixed(2)} MRR`);
+          if (d.leads_count !== undefined) parts.push(`${d.leads_count} leads`);
+          if (d.outcomes?.total !== undefined) parts.push(`${d.outcomes.total} prior outcomes`);
+          // Generic
+          if (d.platform) parts.push(d.platform);
+          if (d.channel) parts.push(d.channel);
           if (parts.length > 0) detail = ` · ${parts.join(', ')}`;
         } catch {}
         // Format timestamp as HH:MM
