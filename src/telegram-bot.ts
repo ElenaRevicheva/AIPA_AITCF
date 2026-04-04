@@ -1217,6 +1217,7 @@ _A real CTO tracks technical debt!_`, { parse_mode: 'Markdown' });
       
       if (success) {
         await ctx.reply(`✅ Tech debt ${debtId.substring(0, 8)} marked as resolved!`);
+        await saveAgentOutcome('cto_aipa', 'tech_debt_resolved', { debt_id: debtId.substring(0, 8) }, 'verified_delivered').catch(() => {});
       } else {
         await ctx.reply('❌ Could not resolve debt. Check the ID and try again.');
       }
@@ -1252,6 +1253,7 @@ _A real CTO tracks technical debt!_`, { parse_mode: 'Markdown' });
 🔖 ID: ${debtId.substring(0, 8)}
 
 _Use /debt list to see all debt_`, { parse_mode: 'Markdown' });
+        await saveAgentOutcome('cto_aipa', 'tech_debt_recorded', { repo, severity, description: description.substring(0, 200) }, 'verified_delivered').catch(() => {});
     } else {
       await ctx.reply('❌ Error adding tech debt. Try again!');
     }
@@ -2699,6 +2701,11 @@ ${results}
 • Issues detected: ${downCount}
 
 ${downCount > 0 ? '⚠️ Some issues detected recently. Use /logs to investigate.' : '✅ All systems stable!'}`, { parse_mode: 'Markdown' });
+
+      await saveAgentOutcome('cto_aipa', 'health_check_completed', {
+        issues_detected: downCount,
+        checks_24h: history.length
+      }, 'verified_delivered').catch(() => {});
   });
   
   // /logs - Analyze pasted logs
@@ -2999,7 +3006,11 @@ Consider: What would make this ecosystem more attractive to investors? What woul
       const strategy = await askAI(strategyPrompt, 2500);
       
       await ctx.reply(`🎯 *Strategic Analysis*\n\n${strategy}`, { parse_mode: 'Markdown' });
-      
+
+      await saveAgentOutcome('cto_aipa', 'strategy_analysis_completed', {
+        type: 'ecosystem_review'
+      }, 'verified_delivered').catch(() => {});
+
       // Save key insights
       await saveInsight('strategic_review', 'Weekly strategic review completed', 3);
       
@@ -3162,7 +3173,11 @@ Be thoughtful, specific, and actionable.`;
     const thinking = await askAI(thinkPrompt, 2500);
     
     await ctx.reply(`🧠 *Deep Thinking: ${topic.substring(0, 50)}...*\n\n${thinking}`, { parse_mode: 'Markdown' });
-    
+
+    await saveAgentOutcome('cto_aipa', 'strategic_thinking_completed', {
+      topic: topic.substring(0, 200)
+    }, 'verified_delivered').catch(() => {});
+
     // Save as insight
     await saveInsight('strategic_thinking', `Analyzed: ${topic.substring(0, 200)}`, 2);
   });
@@ -3347,7 +3362,11 @@ Remember: She uses Cursor AI Agents, so the exercise should work there.`;
       } else {
         await ctx.reply(lesson);
       }
-      
+
+      await saveAgentOutcome('cto_aipa', 'lesson_delivered', {
+        topic: topic
+      }, 'verified_delivered').catch(() => {});
+
     } catch (error) {
       console.error('Learn error:', error);
       await ctx.reply('❌ Error generating lesson. Try again!');
@@ -3390,9 +3409,13 @@ Be specific and practical!`;
 
       // Use askAI with Groq fallback
       const exercise = await askAI(exercisePrompt, 1500);
-      
+
       await ctx.reply(exercise);
-      
+
+      await saveAgentOutcome('cto_aipa', 'exercise_delivered', {
+        difficulty
+      }, 'verified_delivered').catch(() => {});
+
     } catch (error) {
       console.error('Exercise error:', error);
       await ctx.reply('❌ Error generating exercise. Try again!');
@@ -3723,7 +3746,14 @@ _A real CTO reviews before committing!_`, { parse_mode: 'Markdown' });
 🔗 ${pr.html_url}
 
 _Human-approved code is better code!_ 🎯`, { parse_mode: 'Markdown' });
-      
+
+      await saveAgentOutcome('cto_aipa', 'code_approved_pr_created', {
+        repo: repoName,
+        filename,
+        pr_number: pr.number,
+        task: task?.substring(0, 200)
+      }, 'verified_delivered').catch(() => {});
+
       await saveMemory('CTO', 'code_approved', {
         repo: repoName,
         task,
@@ -4109,7 +4139,12 @@ ${review}`;
       
       // Send without Markdown to avoid parsing issues with AI-generated content
       await ctx.reply(reviewMessage);
-      
+
+      await saveAgentOutcome('cto_aipa', 'code_review_completed', {
+        repo: repoName,
+        commit_sha: commitSha
+      }, 'verified_delivered').catch(() => {});
+
     } catch (error: any) {
       if (error.status === 404) {
         await ctx.reply(`❌ Repo "${repoName}" not found. Use /repos to see available repos.`);
@@ -4485,7 +4520,13 @@ First use /editfile to prepare changes, then describe what to change.`);
 💬 Message: ${message}
 
 Changes are now live on GitHub! 🎉`, { parse_mode: 'Markdown' });
-      
+
+      await saveAgentOutcome('cto_aipa', 'file_committed', {
+        repo: pending.repo,
+        file: pending.path,
+        commit_message: message.substring(0, 200)
+      }, 'verified_delivered').catch(() => {});
+
     } catch (error: any) {
       console.error('Commit error:', error);
       await ctx.reply(`❌ Commit failed: ${error.message}\n\nTry again or use /cancel to discard changes.`);
@@ -6784,7 +6825,11 @@ ${suggestion}
 _/briefing for full business view | /daily anytime for update_`;
 
     await ctx.reply(briefing, { parse_mode: 'Markdown' });
-    
+
+    await saveAgentOutcome('cto_aipa', 'daily_briefing_sent', {
+      type: 'auto_scheduled'
+    }, 'verified_delivered').catch(() => {});
+
     // Save to memory
     await saveMemory('CTO', 'daily_briefing', { date: now.toISOString() }, briefing, {
       platform: 'telegram',

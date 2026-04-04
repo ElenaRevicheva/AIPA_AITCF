@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
-import { initializeDatabase, saveMemory, getRelevantMemory } from './database';
+import { initializeDatabase, saveMemory, getRelevantMemory, saveAgentOutcome } from './database';
 import { initTelegramBot } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
 import * as dotenv from 'dotenv';
@@ -740,7 +740,15 @@ async function startCTOAIPA() {
           });
           
           console.log(`✅ Posted review on PR #${pr.number}`);
-          
+
+          await saveAgentOutcome('cto_aipa', 'pr_review_completed', {
+            repo: repo.full_name,
+            pr_number: pr.number,
+            pr_title: pr.title,
+            security_issues: reviewResult.securityIssues.length,
+            complexity_issues: reviewResult.complexityIssues.length
+          }, 'verified_delivered').catch(e => console.error('Outcome logging failed:', e));
+
           await notifyCMO({
             pr_number: pr.number,
             repo: repo.full_name,
@@ -817,7 +825,16 @@ async function startCTOAIPA() {
         });
         
         console.log(`✅ Posted review on commit ${req.body.after.substring(0, 7)}`);
-        
+
+        await saveAgentOutcome('cto_aipa', 'push_review_completed', {
+          repo: repo.full_name,
+          commit_sha: req.body.after.substring(0, 7),
+          commits_count: commits.length,
+          commit_messages: commitMessages.substring(0, 200),
+          security_issues: reviewResult.securityIssues.length,
+          complexity_issues: reviewResult.complexityIssues.length
+        }, 'verified_delivered').catch(e => console.error('Outcome logging failed:', e));
+
         await notifyCMO({
           commit_sha: req.body.after,
           repo: repo.full_name,
