@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
-import { initializeDatabase, saveMemory, getRelevantMemory, saveAgentOutcome } from './database';
+import { initializeDatabase, saveMemory, getRelevantMemory, saveAgentOutcome, upsertEspaluzUser, saveLead } from './database';
 import { initTelegramBot } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
 import * as dotenv from 'dotenv';
@@ -694,6 +694,110 @@ async function startCTOAIPA() {
     }
   });
   
+  // ==========================================================================
+  // WIRING EVENT ENDPOINT - Other agents emit events here
+  // ==========================================================================
+
+  app.post('/wiring/event', async (req, res) => {
+    try {
+      const { agent, action, data } = req.body;
+
+      if (!agent || !action) {
+        res.status(400).json({ error: 'Missing agent or action' });
+        return;
+      }
+
+      console.log(`📡 Wiring event: ${agent} → ${action}`);
+
+      // Route to appropriate handler based on agent + action
+      if (agent === 'espaluz_whatsapp' || agent === 'espaluz_telegram') {
+        const channel = agent === 'espaluz_whatsapp' ? 'whatsapp' : 'telegram';
+
+        if (action === 'user_signup' || action === 'trial_started') {
+          await upsertEspaluzUser(data?.user_id || 'unknown', channel, {
+            paymentStatus: 'trial',
+            trialStart: data?.timestamp ? new Date(data.timestamp) : new Date(),
+            ...(data?.trial_end ? { trialEnd: new Date(data.trial_end) } : {}),
+            lastActive: new Date()
+          });
+          await saveAgentOutcome(agent, action, data, 'verified_delivered');
+          res.json({ ok: true, action: 'user_upserted_as_trial' });
+
+        } else if (action === 'payment_received' || action === 'subscription_activated') {
+          await upsertEspaluzUser(data?.user_id || data?.email || 'unknown', channel, {
+            paymentStatus: 'active',
+            converted: true,
+            paypalSubscriptionId: data?.subscription_id || undefined,
+            lastActive: new Date()
+          });
+          await saveAgentOutcome(agent, action, data, 'verified_delivered', { revenue: true });
+          res.json({ ok: true, action: 'user_upgraded_to_paid' });
+
+        } else if (action === 'subscription_cancelled' || action === 'subscription_suspended') {
+          await upsertEspaluzUser(data?.user_id || data?.email || 'unknown', channel, {
+            paymentStatus: 'cancelled',
+            converted: false
+          });
+          await saveAgentOutcome(agent, action, data, 'verified_delivered', { churned: true });
+          res.json({ ok: true, action: 'user_marked_churned' });
+
+        } else if (action === 'lesson_sent' || action === 'message_processed') {
+          // Don't upsert user for every message — just log the outcome
+          await saveAgentOutcome(agent, action, {
+            user_id: data?.user_id,
+            lesson_type: data?.lesson_type || 'text',
+            topic: data?.topic
+          }, 'verified_delivered');
+          res.json({ ok: true, action: 'lesson_logged' });
+
+        } else if (action === 'trial_expired') {
+          await upsertEspaluzUser(data?.user_id || 'unknown', channel, {
+            paymentStatus: 'expired',
+            converted: false
+          });
+          await saveAgentOutcome(agent, action, data, 'verified_delivered');
+          res.json({ ok: true, action: 'trial_expired_logged' });
+
+        } else {
+          // Generic: just log it as an outcome
+          await saveAgentOutcome(agent, action, data, 'pending_verification');
+          res.json({ ok: true, action: 'generic_event_logged' });
+        }
+
+      } else if (agent === 'cmo_aipa') {
+        // CMO posts, engagement tracking
+        await saveAgentOutcome(agent, action, data, 'verified_delivered');
+        if (action === 'lead_signal' && data?.name) {
+          await saveLead(data.source || 'linkedin', data.name, data.context || '', data.signal || 'medium');
+        }
+        res.json({ ok: true, action: 'cmo_event_logged' });
+
+      } else {
+        // Any other agent
+        await saveAgentOutcome(agent, action, data, 'pending_verification');
+        res.json({ ok: true, action: 'event_logged' });
+      }
+
+    } catch (error) {
+      console.error('Wiring event error:', error);
+      res.status(500).json({ error: 'Failed to process event' });
+    }
+  });
+
+  // GET endpoint to check wiring status
+  app.get('/wiring/status', async (_req, res) => {
+    res.json({
+      status: 'online',
+      endpoints: ['/wiring/event'],
+      accepts: ['espaluz_whatsapp', 'espaluz_telegram', 'cmo_aipa', 'any_agent'],
+      actions: {
+        espaluz: ['user_signup', 'trial_started', 'payment_received', 'subscription_activated', 'subscription_cancelled', 'lesson_sent', 'trial_expired'],
+        cmo: ['post_published', 'engagement_received', 'lead_signal'],
+        generic: ['any action — logged as pending_verification']
+      }
+    });
+  });
+
   // ==========================================================================
   // GITHUB WEBHOOK - Handles both PRs and Pushes
   // ==========================================================================
