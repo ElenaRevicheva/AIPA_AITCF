@@ -22,7 +22,7 @@ const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({ auth: proces
 const LUMA_API_URL = 'https://api.lumalabs.ai/dream-machine/v1';
 const lumaApiKey = process.env.LUMA_API_KEY || null;
 
-// Runway API base URL (Gen-3 Alpha Turbo - fallback)
+// Runway API base URL (image_to_video fallback — see VIDEO_MODELS.runwayImageToVideo)
 const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 
@@ -30,7 +30,7 @@ const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 // 🎨 AI MODEL CONFIGURATION - LATEST & BEST (Jan 2026)
 // =============================================================================
 // Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro > DALL-E 3
-// Video: Luma Direct API (primary) > Luma via Replicate > Runway Gen-3 (fallback)
+// Video: Luma Direct API (primary) > Luma via Replicate > Runway Gen-4.5 (fallback)
 // Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
 // Voice: Whisper-1 (best transcription)
 // =============================================================================
@@ -44,7 +44,8 @@ const IMAGE_MODELS = {
 const VIDEO_MODELS = {
   lumaDirect: 'ray-2',                 // Primary - Luma Direct API (your API key)
   lumaReplicate: 'luma/dream-machine', // Secondary - via Replicate
-  runwayGen3: 'gen3a_turbo',           // Fallback - reliable (direct API)
+  /** Runway image→video fallback — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
+  runwayImageToVideo: 'gen4.5',
 };
 
 // =============================================================================
@@ -3224,23 +3225,23 @@ async function generateVideo(
     } catch (lumaReplicateError: any) {
       console.log('⚠️ Luma Replicate failed, trying Runway fallback...');
       console.error('Luma Replicate error:', lumaReplicateError.message);
-      await ctx.reply(`⚠️ Luma Replicate unavailable, trying Runway Gen-3...`);
+      await ctx.reply(`⚠️ Luma Replicate unavailable, trying Runway Gen-4.5...`);
     }
   }
   
-  // ========== 3. FALLBACK TO RUNWAY GEN-3 ==========
+  // ========== 3. FALLBACK TO RUNWAY GEN-4.5 (image_to_video) ==========
   if (runwayApiKey) {
     try {
-      console.log('🎬 Using Runway Gen-3 Alpha Turbo (final fallback)...');
-      await ctx.reply('🎬 *Generating video with Runway Gen-3 Alpha Turbo...*\n\n_Final fallback. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      console.log('🎬 Using Runway Gen-4.5 (final fallback)...');
+      await ctx.reply('🎬 *Generating video with Runway Gen-4.5...*\n\n_Final fallback. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
       
       const runwayBody = {
-        model: VIDEO_MODELS.runwayGen3,
+        model: VIDEO_MODELS.runwayImageToVideo,
         promptImage: imageUrl,
         promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 380)}`,
-        duration: 10,  // 10 seconds for immersive clips
+        duration: 10,  // 5 / 8 / 10 supported — keep immersive 10s
         watermark: false,
-        ratio: '1280:768'
+        ratio: '1280:720' // 16:9 — Runway gen4.5 expects documented ratios (not legacy 1280:768)
       };
       
       const runwayResponse = await fetch(`${RUNWAY_API_URL}/image_to_video`, {
@@ -3257,7 +3258,7 @@ async function generateVideo(
       
       if (runwayResponse.ok) {
         const runwayData = JSON.parse(responseText);
-        console.log('✅ Runway Gen-3 job started, task ID:', runwayData.id);
+        console.log('✅ Runway Gen-4.5 job started, task ID:', runwayData.id);
         return {
           success: true,
           taskId: runwayData.id,
@@ -3759,7 +3760,7 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 *What it creates:*
 🎨 Flux 1.1 Pro Ultra image (16:9 YouTube) - BEST quality!
 📱 Flux 1.1 Pro Ultra image (9:16 Instagram)
-🎬 Runway Gen-3 Alpha video (5-10 sec cinematic)
+🎬 Runway Gen-4.5 video (5-10 sec cinematic)
 📝 Caption + hashtags auto-generated
 
 *View your gallery:*
@@ -7469,7 +7470,7 @@ Visualizations: ${visualizations.length} pages
 🎨 Flux: ${replicate ? '✅ Ultra/Pro Ready' : '❌ Set REPLICATE_API_TOKEN'}
 🎬 Luma Direct: ${lumaApiKey ? '✅ Dream Machine Ready' : '⚪ Set LUMA_API_KEY'}
 🎬 Luma Replicate: ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
-🎬 Runway: ${runwayApiKey ? '✅ Gen-3 (fallback)' : '⚪ Not configured'}
+🎬 Runway: ${runwayApiKey ? '✅ Gen-4.5 (fallback)' : '⚪ Not configured'}
 
 _Video priority: Luma Direct → Luma Replicate → Runway_
 _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ 🚀`, { parse_mode: 'Markdown' });
@@ -8066,7 +8067,7 @@ Free tier limit reached. Options:
           await ctx.reply(`⚠️ *Video generation unavailable*\n\n${videoResult.error}\n\nImage saved! Use in CapCut/Premiere for video.`, { parse_mode: 'Markdown' });
         }
       } else if (!lumaApiKey && !replicate && !runwayApiKey) {
-        await ctx.reply(`⚠️ *No video providers configured*\n\nSet LUMA_API_KEY for Luma Direct\nor REPLICATE_API_TOKEN for Luma/Replicate\nor RUNWAY_API_KEY for Runway Gen-3.\n\nImage saved! Use the image in CapCut or other video tools.`, { parse_mode: 'Markdown' });
+        await ctx.reply(`⚠️ *No video providers configured*\n\nSet LUMA_API_KEY for Luma Direct\nor REPLICATE_API_TOKEN for Luma/Replicate\nor RUNWAY_API_KEY for Runway Gen-4.5.\n\nImage saved! Use the image in CapCut or other video tools.`, { parse_mode: 'Markdown' });
       }
       
       // Save visualization
