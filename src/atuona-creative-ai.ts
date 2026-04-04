@@ -1642,9 +1642,9 @@ const VISUAL_HARD_EXCLUSIONS = `
 MANDATORY EXCLUSIONS (even if they sound "pretty"): no cartoon, no Pixar/Disney/3D render style, no chibi, no toy animals, no cute red dogs, no random mascots, no stock-photo beach vacation, no generic yellow flowers, no open notebook or journaling props, no laptop close-up — UNLESS the poem text above explicitly names or clearly requires that exact object.
 Style: photorealistic cinematic still, 35mm or large-format photograph, natural film grain, adult arthouse tone, single coherent scene tied to the poem.`;
 
-/** Luma/Runway — do not repeat "Gauguin palette" on every clip (causes generic art-broll) */
+/** Luma/Runway — style anchor for all video prompts (underground poetry film, not stock b-roll) */
 const VIDEO_MOTION_ANCHOR =
-  'Photoreal cinematic motion, live-action film look, natural grain. No cartoon, no 3D animation, no toy animals, cute mascots, or Pixar style. Motion only — do not invent new objects or characters.';
+  'ATUONA underground poetry film: premium arthouse look, live-action, natural film grain, intimate lensing, rich chiaroscuro, slow prestige pacing. Luxurious in mood and light — editorial beauty, emotional weight, tactile atmosphere — not generic stock footage, hotel commercial, or influencer gloss. Subtle motion only; do not invent new objects, people, or animals. No cartoon, 3D, Pixar, or toy mascots.';
 
 /**
  * Get knowledge for a specific topic (for direct queries like /art gauguin)
@@ -3166,7 +3166,7 @@ async function generateVideo(
       const lumaBody = {
         model: VIDEO_MODELS.lumaDirect,
         resolution: lumaResolution,
-        prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 420)}`,
+        prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -3230,7 +3230,7 @@ async function generateVideo(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
           input: {
-            prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 420)}`,
+            prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
             start_image_url: imageUrl,
             aspect_ratio: "16:9",
             loop: false
@@ -3273,7 +3273,7 @@ async function generateVideo(
       const runwayBody = {
         model: VIDEO_MODELS.runwayImageToVideo,
         promptImage: imageUrl,
-        promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 380)}`,
+        promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 320)}`,
         duration: 10,  // 5 / 8 / 10 supported — keep immersive 10s
         watermark: false,
         ratio: '1280:720' // 16:9 — Runway gen4.5 expects documented ratios (not legacy 1280:768)
@@ -3352,17 +3352,17 @@ async function buildFashionEditorialPrompt(opts: {
 }): Promise<string> {
   const { title, theme, englishExcerpt, knowledgeKeys } = opts;
 
-  const systemPrompt = `You are a fashion-film director for ATUONA, an underground poetry film project.
-You will receive a poem's title, theme, excerpt, and knowledge modules that were used.
-Your job: write a SHORT Modify Video prompt (40-80 words) that adds a fashion/editorial beauty layer to an EXISTING cinematic video of this poem.
+  const systemPrompt = `You are a fashion-film director for ATUONA — underground poetry as luxury arthouse cinema (not Instagram beauty, not stock glamour).
+
+You receive a poem's title, theme, excerpt, and knowledge modules. Write a SHORT Modify Video prompt (45–90 words) that adds an editorial / haute layer to an EXISTING cinematic video.
 
 RULES:
-- You are NOT re-describing the scene. The video already exists. You are directing a RESTYLE pass.
-- Focus on: skin luminosity, fabric texture, editorial lighting, silhouette elegance, color grading, couture details.
-- Root the fashion direction in the poem's mood: a dark Moscow poem gets sharp tailoring and cold-light beauty; a Polynesian exile poem gets warm bronzed skin and draped linen; an abstract digital poem gets glass/metallic surfaces and neon rim-light.
-- Never add new characters, animals, objects, or locations.
-- Never mention cartoon, 3D, Pixar, or toy styles.
-- Return ONLY the modify prompt. No quotes, no preamble, no explanation.`;
+- You are NOT re-describing the scene. The clip exists. You direct a RESTYLE pass only.
+- Aim for: underground elegance — beauty with literary weight, tactile light, couture-adjacent texture, color grade that feels *authored* (Wong Kar-wai intimacy, arthouse melancholy, fashion campaign stillness) — never generic "pretty" or influencer sheen.
+- Skin luminosity, fabric drape, silhouette, shadow sculpting, subtle speculars, filmic contrast — rooted in the poem's mood (e.g. cold Moscow sharpness vs warm exile vs digital alienation).
+- Never add characters, animals, new objects, or locations.
+- Never cartoon, 3D, Pixar, toy, or mascot language.
+- Return ONLY the modify prompt. No quotes, no preamble.`;
 
   const userMsg = `TITLE: "${title}"
 THEME: ${theme}
@@ -3375,7 +3375,7 @@ Write the fashion/editorial modify-video prompt.`;
     const result = await createContent(`${systemPrompt}\n\n---\n\n${userMsg}`, 120, true);
     return result.trim();
   } catch (err) {
-    return 'Editorial fashion film grade: luminous skin with soft diffused beauty lighting, luxurious fabric textures with subtle sheen, haute couture silhouette framing, cinematic color grade with rich tonal depth. Preserve all motion and scene composition.';
+    return 'Underground editorial grade: sculpted low-key light, skin with subtle specular life, luxurious natural fabrics, deep shadows with soft falloff, filmic color separation, haute-couture stillness. Preserve motion and composition; no new elements.';
   }
 }
 
@@ -7713,13 +7713,20 @@ Rules:
 THEME: ${theme}
 TEXT: "${englishText.substring(0, 1200)}"
 
-Write a SHORT motion direction (2-3 sentences, max 90 words) for ~9 seconds of video from an existing still frame.
-Rules:
-- Describe ONLY subtle motion: light shifts, wind, water, fabric, breath, rain, smoke, slow camera drift, eye movement — matched to THIS poem's mood.
-- The still image already exists; motion must NOT introduce new characters, animals, cartoon figures, toys, mascots, or objects not implied by the poem.
-- FORBIDDEN: adding a dog, bird, cute animal, notebook, beach establishing shot, or random flowers unless the poem text explicitly contains them.
+You are directing motion for ATUONA — underground Russian–English poetry made into a short film. The still frame is already generated; your words control how it *breathes* for ~9 seconds.
+
+Write a TIGHT motion direction (2–4 sentences, max 95 words). It must feel literary, sensual, and art-film: tension in stillness, beauty with an edge — never generic "cinematic" filler.
+
+Describe ONLY subtle motion matched to THIS poem's exact mood: light breathing across surfaces, slow lens drift, fabric or skin micro-movement, steam/rain/smoke, reflections, eyelids, hands — whatever the TEXT implies.
+- Luxurious = depth of shadow, quality of light, emotional intimacy — NOT sparkle filters, NOT stock travel footage, NOT ad polish.
+- Underground = raw nerve under elegance; whisper, ache, defiance, hunger — as the poem demands.
+
+Hard rules:
+- Do NOT introduce new characters, animals, cartoon figures, toys, mascots, or props not implied by the poem.
+- FORBIDDEN unless the poem explicitly names them: random dogs, birds, notebooks, beach establishing shots, generic flowers.
+
 Return ONLY the motion direction. No preamble.`;
-      const motionPrompt = await createContent(motionPromptInput, 120, true);
+      const motionPrompt = await createContent(motionPromptInput, 200, true);
       
       // Generate hashtags
       const hashtags = ['#ATUONA', '#AIFilm', '#VibeCoding', '#UndergroundArt', '#ParadiseFound', '#AIGenerated', '#DigitalArt', '#BookToFilm'];
@@ -7951,6 +7958,38 @@ Free tier limit reached. Options:
       } else {
         await ctx.reply(`⚠️ *Flux Pro not configured*\n\nSet REPLICATE_API_TOKEN for best quality images.\n\n🎨 *Generated Prompt:*\n\`${imagePrompt}\`\n\nUse this in Midjourney or other tools!`, { parse_mode: 'Markdown' });
       }
+
+      /** Luma/Runway poll in the background — final summary must wait or it shows Video: ⏳ while the clip is still rendering. */
+      let visualizationSummaryDeferred = false;
+      let visualizationSummarySent = false;
+      const sendVisualizationSummary = async () => {
+        if (visualizationSummarySent) return;
+        visualizationSummarySent = true;
+        const pageNumM = parseInt(pageId, 10);
+        if (pageNumM > 0 && pageNumM % 50 === 0) {
+          notifyTechMilestone({
+            type: 'milestone',
+            title: `ATUONA reaches ${pageNumM} AI-visualized pages!`,
+            description: `The ATUONA AI Creative Co-Founder has now visualized ${pageNumM} pages of underground poetry with AI-generated imagery and video. Built with Claude Opus 4 + Flux Pro + Luma Dream Machine.`,
+            metrics: { pagesCreated: pageNumM, videosGenerated: visualizations.filter(v => v.videoUrlHorizontal).length },
+            techStack: ['Claude Opus 4', 'Flux Pro Ultra', 'Luma Dream Machine', 'TypeScript', 'Telegram Bot API']
+          }).catch(err => console.log('Milestone notification error:', err));
+        }
+        await ctx.reply(`✅ *Visualization Complete for #${pageId}!*
+
+📄 Title: ${title}
+🎨 Image: ${visualization.imageUrlHorizontal ? '✅' : '❌'}
+📱 Vertical: ${visualization.imageUrlVertical ? '✅' : '❌'}
+🎬 Video: ${visualization.videoUrlHorizontal ? '✅' : '⏳'}
+🎬✨ Director's Cut: ${visualization.directorsCutVideoUrl ? '✅' : '⏳ after base video'}
+
+📝 Caption:
+"${caption}"
+
+#️⃣ ${hashtags.slice(0, 5).join(' ')}
+
+Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
+      };
       
       // Generate video with Luma Direct (primary) > Luma Replicate > Runway (fallback)
       if (visualization.imageUrlHorizontal && (lumaApiKey || replicate || runwayApiKey)) {
@@ -7987,6 +8026,7 @@ Free tier limit reached. Options:
             }).catch(err => console.error('Director\'s Cut error (Replicate path):', err));
             
           } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
+            visualizationSummaryDeferred = true;
             // Luma Direct API needs polling - keep polling until done (max 5 min)
             const taskId = videoResult.taskId;
             
@@ -8027,11 +8067,13 @@ Free tier limit reached. Options:
                       knowledgeKeys: deepKb.mergedKeys as string[],
                       ctx, visualization
                     }).catch(err => console.error('Director\'s Cut error (Luma Direct path):', err));
-                    return; // Done!
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    return;
                     
                   } else if (statusData.state === 'failed') {
                     await ctx.reply(`❌ Luma video failed.\nReason: ${statusData.failure_reason || 'Unknown'}`);
-                    return; // Done (failed)
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    return;
                     
                   } else if (attempt < maxAttempts) {
                     // Still processing - poll again in 30 seconds
@@ -8039,14 +8081,25 @@ Free tier limit reached. Options:
                     setTimeout(() => pollLumaVideo(attempt + 1), 30000);
                     
                   } else {
-                    // Max attempts reached
                     await ctx.reply(`⏳ Video taking longer than expected.\nUse \`/videostatus ${taskId}\` to check manually.`, { parse_mode: 'Markdown' });
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                  }
+                } else {
+                  const errBody = await statusResponse.text();
+                  console.error(`Luma poll HTTP ${statusResponse.status}: ${errBody.substring(0, 300)}`);
+                  if (attempt < maxAttempts) {
+                    setTimeout(() => pollLumaVideo(attempt + 1), 30000);
+                  } else {
+                    await ctx.reply(`⏳ Could not read Luma status (HTTP ${statusResponse.status}). Try \`/videostatus ${taskId}\`.`, { parse_mode: 'Markdown' });
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                   }
                 }
               } catch (pollError) {
                 console.error('Luma poll error:', pollError);
                 if (attempt < maxAttempts) {
                   setTimeout(() => pollLumaVideo(attempt + 1), 30000);
+                } else {
+                  await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                 }
               }
             };
@@ -8055,6 +8108,7 @@ Free tier limit reached. Options:
             setTimeout(() => pollLumaVideo(1), 45000);
             
           } else if (videoResult.provider === 'runway' && videoResult.taskId) {
+            visualizationSummaryDeferred = true;
             // Runway needs polling - keep polling until done (max 5 min)
             const taskId = videoResult.taskId;
             
@@ -8095,11 +8149,13 @@ Free tier limit reached. Options:
                       knowledgeKeys: deepKb.mergedKeys as string[],
                       ctx, visualization
                     }).catch(err => console.error('Director\'s Cut error (Runway path):', err));
-                    return; // Done!
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    return;
                     
                   } else if (statusData.status === 'FAILED') {
                     await ctx.reply(`❌ Runway video failed.\nReason: ${statusData.failure || 'Unknown'}`);
-                    return; // Done (failed)
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    return;
                     
                   } else if (attempt < maxAttempts) {
                     // Still processing - poll again in 40 seconds
@@ -8107,14 +8163,25 @@ Free tier limit reached. Options:
                     setTimeout(() => pollRunwayVideo(attempt + 1), 40000);
                     
                   } else {
-                    // Max attempts reached
                     await ctx.reply(`⏳ Video taking longer than expected.\nUse \`/videostatus ${taskId}\` to check manually.`, { parse_mode: 'Markdown' });
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                  }
+                } else {
+                  const errBody = await statusResponse.text();
+                  console.error(`Runway poll HTTP ${statusResponse.status}: ${errBody.substring(0, 300)}`);
+                  if (attempt < maxAttempts) {
+                    setTimeout(() => pollRunwayVideo(attempt + 1), 40000);
+                  } else {
+                    await ctx.reply(`⏳ Could not read Runway status (HTTP ${statusResponse.status}). Try \`/videostatus ${taskId}\`.`, { parse_mode: 'Markdown' });
+                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                   }
                 }
               } catch (pollError) {
                 console.error('Runway poll error:', pollError);
                 if (attempt < maxAttempts) {
                   setTimeout(() => pollRunwayVideo(attempt + 1), 40000);
+                } else {
+                  await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                 }
               }
             };
@@ -8138,33 +8205,9 @@ Free tier limit reached. Options:
       }
       saveState();
       
-      // Check for NOTABLE milestones (only these get sent to CMO)
-      const pageNum = parseInt(pageId);
-      if (pageNum > 0 && pageNum % 50 === 0) {
-        // Every 50 pages is a milestone!
-        notifyTechMilestone({
-          type: 'milestone',
-          title: `ATUONA reaches ${pageNum} AI-visualized pages!`,
-          description: `The ATUONA AI Creative Co-Founder has now visualized ${pageNum} pages of underground poetry with AI-generated imagery and video. Built with Claude Opus 4 + Flux Pro + Luma Dream Machine.`,
-          metrics: { pagesCreated: pageNum, videosGenerated: visualizations.filter(v => v.videoUrlHorizontal).length },
-          techStack: ['Claude Opus 4', 'Flux Pro Ultra', 'Luma Dream Machine', 'TypeScript', 'Telegram Bot API']
-        }).catch(err => console.log('Milestone notification error:', err));
+      if (!visualizationSummaryDeferred) {
+        await sendVisualizationSummary();
       }
-      
-      await ctx.reply(`✅ *Visualization Complete for #${pageId}!*
-
-📄 Title: ${title}
-🎨 Image: ${visualization.imageUrlHorizontal ? '✅' : '❌'}
-📱 Vertical: ${visualization.imageUrlVertical ? '✅' : '❌'}
-🎬 Video: ${visualization.videoUrlHorizontal ? '✅' : '⏳'}
-🎬✨ Director's Cut: ${visualization.directorsCutVideoUrl ? '✅' : '⏳ after base video'}
-
-📝 Caption:
-"${caption}"
-
-#️⃣ ${hashtags.slice(0, 5).join(' ')}
-
-Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
       
     } catch (error: any) {
       console.error('Visualize error:', error);
