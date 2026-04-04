@@ -942,14 +942,36 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       const lines = (outcomes as any[]).map((o: any) => {
         const agent = o[1] || o[0];
         const action = o[2] || o[1];
+        const detailRaw = o[3];
         const status = o[4] || o[3];
+        const createdAt = o[6];
         const statusIcon = status === 'outcome_positive' ? '✅' :
                           status === 'verified_delivered' ? '📨' :
                           status === 'verified_failed' ? '❌' :
                           status === 'pending_verification' ? '⏳' : '❓';
-        return `${statusIcon} ${agent}: ${action} — ${status}`;
+        // Parse detail JSON for key facts
+        let detail = '';
+        try {
+          const d = typeof detailRaw === 'string' ? JSON.parse(detailRaw) : (detailRaw || {});
+          const parts: string[] = [];
+          if (d.user_id) parts.push(`user: ${String(d.user_id).slice(-6)}`);
+          if (d.repo) parts.push(`repo: ${String(d.repo).split('/')[1] || d.repo}`);
+          if (d.topic) parts.push(`"${String(d.topic).slice(0, 30)}"`);
+          if (d.lesson_type) parts.push(d.lesson_type);
+          if (d.platform) parts.push(d.platform);
+          if (d.commits_count) parts.push(`${d.commits_count} commit${d.commits_count !== 1 ? 's' : ''}`);
+          if (d.security_issues !== undefined) parts.push(`${d.security_issues} sec issues`);
+          if (parts.length > 0) detail = ` · ${parts.join(', ')}`;
+        } catch {}
+        // Format timestamp as HH:MM
+        let timeStr = '';
+        try {
+          const t = new Date(createdAt);
+          timeStr = ` [${t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Panama' })}]`;
+        } catch {}
+        return `${statusIcon} ${agent}: ${action}${timeStr}${detail}`;
       });
-      await ctx.reply(`📈 Agent Outcomes (48h)${agentFilter ? ` — ${agentFilter}` : ''}\n\n${lines.join('\n')}`);
+      await ctx.reply(`📈 Agent Outcomes (48h) — ${(outcomes as any[]).length} events${agentFilter ? ` [${agentFilter}]` : ''}\n\n${lines.join('\n')}`);
     } catch (error) {
       console.error('Outcomes error:', error);
       await ctx.reply('❌ Error fetching outcomes.');
