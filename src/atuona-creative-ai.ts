@@ -43,7 +43,10 @@ const IMAGE_MODELS = {
 };
 
 const VIDEO_MODELS = {
-  lumaDirect: 'ray-2',                 // Primary - Luma Direct API (your API key)
+  /** Full-quality tier (vs ray-flash-2 = faster). API: docs.lumalabs.ai — VideoModel */
+  lumaDirect: 'ray-2',
+  /** Max output resolution for I2V (540p | 720p | 1080p | 4k). 1080p = best default; 4k = slower/more credits */
+  lumaResolution: '1080p' as const,
   lumaReplicate: 'luma/dream-machine', // Secondary - via Replicate
   /** Runway image→video fallback — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
   runwayImageToVideo: 'gen4.5',
@@ -3149,11 +3152,20 @@ async function generateVideo(
   if (lumaApiKey) {
     try {
       console.log('🎬 Trying Luma Dream Machine (Direct API)...');
-      await ctx.reply('🎬 *Generating video with Luma Dream Machine...*\n\n_Direct API - Best quality! Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+      const allowedLumaRes = ['540p', '720p', '1080p', '4k'] as const;
+      const lumaResolution =
+        (allowedLumaRes as readonly string[]).includes(process.env.LUMA_VIDEO_RESOLUTION || '')
+          ? (process.env.LUMA_VIDEO_RESOLUTION as (typeof allowedLumaRes)[number])
+          : VIDEO_MODELS.lumaResolution;
+      await ctx.reply(
+        `🎬 *Generating video with Luma Dream Machine...*\n\n_Ray 2 · ${lumaResolution} · Direct API — takes 1–3 minutes..._`,
+        { parse_mode: 'Markdown' }
+      );
       
-      // Create generation request - Luma Ray 2 model (supports up to 10 seconds)
+      // Ray-2 = full-quality model (ray-flash-2 = faster). Default 1080p (was implicit 720p). Override: LUMA_VIDEO_RESOLUTION=4k|1080p|720p|540p
       const lumaBody = {
-        model: 'ray-2',  // Required field - Luma's latest model
+        model: VIDEO_MODELS.lumaDirect,
+        resolution: lumaResolution,
         prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 420)}`,
         keyframes: {
           frame0: {
@@ -3162,7 +3174,7 @@ async function generateVideo(
           }
         },
         aspect_ratio: '16:9',
-        duration: '9s',  // Request longer duration (Ray-2 supports up to 10s)
+        duration: '9s',
         loop: false
       };
       
@@ -7754,11 +7766,12 @@ Return ONLY the motion direction. No preamble.`;
                     input: {
                       prompt: imagePrompt,
                       aspect_ratio: aspectRatio,
-                      output_format: "webp",
-                      output_quality: 95,  // Higher quality for Ultra
+                      // Replicate Ultra rejects webp — must be jpg or png (see API 422)
+                      output_format: 'jpg',
+                      output_quality: 95,
                       safety_tolerance: tol,
                       prompt_upsampling: false,
-                      raw: false  // Ultra-specific: photorealistic mode
+                      raw: false
                     }
                   }
                 );
