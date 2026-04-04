@@ -1242,7 +1242,12 @@ async function getAgentOutcomes(
     }
     query += ` ORDER BY created_at DESC FETCH FIRST :limit ROWS ONLY`;
 
-    const result = await connection.execute(query, params);
+    const result = await connection.execute(query, params, {
+      fetchInfo: {
+        'ACTION_DETAIL': { type: oracledb.STRING },
+        'OUTCOME_DETAIL': { type: oracledb.STRING }
+      }
+    });
     return result.rows || [];
   } catch (err) {
     console.error('❌ Get agent outcomes error:', err);
