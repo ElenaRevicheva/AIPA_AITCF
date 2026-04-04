@@ -936,7 +936,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     try {
       const outcomes = await getAgentOutcomes(agentFilter, 48, 15);
       if (!outcomes || (outcomes as any[]).length === 0) {
-        await ctx.reply(`📈 No outcomes recorded${agentFilter ? ` for ${agentFilter}` : ''} in last 48h.\n\nUse /outcome to log one:\n\`/outcome cmo post_published {"platform":"linkedin"}\``, { parse_mode: 'Markdown' });
+        await ctx.reply(`📈 No outcomes recorded${agentFilter ? ` for ${agentFilter}` : ''} in last 48h.\n\nUse /outcome to log one:\n/outcome cmo post_published {"platform":"linkedin"}`);
         return;
       }
       const lines = (outcomes as any[]).map((o: any) => {
@@ -947,9 +947,9 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
                           status === 'verified_delivered' ? '📨' :
                           status === 'verified_failed' ? '❌' :
                           status === 'pending_verification' ? '⏳' : '❓';
-        return `${statusIcon} *${agent}*: ${action} — ${status}`;
+        return `${statusIcon} ${agent}: ${action} — ${status}`;
       });
-      await ctx.reply(`📈 *Agent Outcomes (48h)*${agentFilter ? ` — ${agentFilter}` : ''}\n\n${lines.join('\n')}`, { parse_mode: 'Markdown' });
+      await ctx.reply(`📈 Agent Outcomes (48h)${agentFilter ? ` — ${agentFilter}` : ''}\n\n${lines.join('\n')}`);
     } catch (error) {
       console.error('Outcomes error:', error);
       await ctx.reply('❌ Error fetching outcomes.');
@@ -960,7 +960,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
   bot.command('outcome', async (ctx) => {
     const parts = ctx.message?.text?.replace('/outcome', '').trim().split(/\s+/, 3) || [];
     if (parts.length < 2) {
-      await ctx.reply('📝 *Log an outcome:*\n\n`/outcome <agent> <action_type> [detail_json]`\n\nExamples:\n`/outcome cmo post_published {"platform":"linkedin"}`\n`/outcome vjh application_sent {"company":"TechCorp"}`\n`/outcome espaluz user_signup {"channel":"whatsapp"}`', { parse_mode: 'Markdown' });
+      await ctx.reply('📝 Log an outcome:\n\n/outcome <agent> <action_type> [detail_json]\n\nExamples:\n/outcome cmo post_published {"platform":"linkedin"}\n/outcome vjh application_sent {"company":"TechCorp"}\n/outcome espaluz user_signup {"channel":"whatsapp"}');
       return;
     }
     const agentName = parts[0] || 'unknown';
@@ -971,7 +971,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
 
     const id = await saveAgentOutcome(agentName, actionType, detail);
     if (id) {
-      await ctx.reply(`✅ Outcome logged: *${agentName}* → ${actionType}\nID: \`${id.substring(0, 8)}...\`\n\nStatus: pending verification. Use /briefing to see summary.`, { parse_mode: 'Markdown' });
+      await ctx.reply(`✅ Outcome logged: ${agentName} → ${actionType}\nID: ${id.substring(0, 8)}...\n\nStatus: pending verification. Use /briefing to see summary.`);
     } else {
       await ctx.reply('❌ Failed to save outcome.');
     }
@@ -983,7 +983,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     try {
       const leads = await getLeads(statusFilter, 20);
       if (!leads || (leads as any[]).length === 0) {
-        await ctx.reply(`🎯 No leads${statusFilter ? ` with status "${statusFilter}"` : ''} yet.\n\nAdd one:\n\`/lead add linkedin John_Doe commented on automation post\``, { parse_mode: 'Markdown' });
+        await ctx.reply(`🎯 No leads${statusFilter ? ` with status "${statusFilter}"` : ''} yet.\n\nAdd one:\n/lead add linkedin John_Doe commented on automation post`);
         return;
       }
       const lines = (leads as any[]).map((l: any) => {
@@ -992,9 +992,9 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
         const signal = l[3] || l[4] || 'low';
         const status = l[5] || l[4] || 'new';
         const signalIcon = signal === 'high' ? '🔥' : signal === 'medium' ? '⚡' : '·';
-        return `${signalIcon} *${name}* (${source}) — ${status}`;
+        return `${signalIcon} ${name} (${source}) — ${status}`;
       });
-      await ctx.reply(`🎯 *Business Leads*${statusFilter ? ` — ${statusFilter}` : ''}\n\n${lines.join('\n')}\n\n_/lead add <source> <name> <context>_\n_/lead update <id> <status>_`, { parse_mode: 'Markdown' });
+      await ctx.reply(`🎯 Business Leads${statusFilter ? ` — ${statusFilter}` : ''}\n\n${lines.join('\n')}\n\n/lead add <source> <name> <context>\n/lead update <id> <status>`);
     } catch (error) {
       console.error('Leads error:', error);
       await ctx.reply('❌ Error fetching leads.');
@@ -1014,7 +1014,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
                      context.toLowerCase().includes('like') ? 'medium' : 'low';
       const id = await saveLead(source, name, context, signal);
       if (id) {
-        await ctx.reply(`✅ Lead added: *${name}* from ${source}\nSignal: ${signal === 'high' ? '🔥 high' : signal === 'medium' ? '⚡ medium' : '· low'}\nID: \`${id.substring(0, 8)}...\``, { parse_mode: 'Markdown' });
+        await ctx.reply(`✅ Lead added: ${name} from ${source}\nSignal: ${signal === 'high' ? '🔥 high' : signal === 'medium' ? '⚡ medium' : '· low'}\nID: ${id.substring(0, 8)}...`);
       } else {
         await ctx.reply('❌ Failed to save lead.');
       }
@@ -1024,12 +1024,12 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       const nextAction = parts.slice(3).join(' ') || undefined;
       const success = await updateLead(leadId, status, nextAction);
       if (success) {
-        await ctx.reply(`✅ Lead updated to: *${status}*${nextAction ? `\nNext: ${nextAction}` : ''}`, { parse_mode: 'Markdown' });
+        await ctx.reply(`✅ Lead updated to: ${status}${nextAction ? `\nNext: ${nextAction}` : ''}`);
       } else {
         await ctx.reply('❌ Failed to update lead. Check the ID.');
       }
     } else {
-      await ctx.reply('🎯 *Lead management:*\n\n*Add:*\n`/lead add <source> <name> <context>`\nExample: `/lead add linkedin John_Doe commented on wiring post`\n\n*Update:*\n`/lead update <id> <status> [next action]`\nStatuses: new, contacted, in-conversation, converted, lost', { parse_mode: 'Markdown' });
+      await ctx.reply('🎯 Lead management:\n\nAdd:\n/lead add <source> <name> <context>\nExample: /lead add linkedin John_Doe commented on wiring post\n\nUpdate:\n/lead update <id> <status> [next action]\nStatuses: new, contacted, in-conversation, converted, lost');
     }
   });
 
