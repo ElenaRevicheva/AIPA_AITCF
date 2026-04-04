@@ -11,8 +11,9 @@ import { Octokit } from '@octokit/rest';
 import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
+import sharp from 'sharp';
 
-// OpenAI client for DALL-E and Whisper (optional)
+// OpenAI client for Whisper (optional); DALL-E not used for /visualize — Flux + crop only
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 
 // Replicate client for Flux Pro (best realistic images)
@@ -29,7 +30,7 @@ const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 // =============================================================================
 // 🎨 AI MODEL CONFIGURATION - LATEST & BEST (Jan 2026)
 // =============================================================================
-// Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro > DALL-E 3
+// Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro; Reels 9:16 = Flux or center-crop from 16:9 (photoreal, no DALL-E)
 // Video: Luma Direct API (primary) > Luma via Replicate > Runway Gen-4.5 (fallback)
 // Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
 // Voice: Whisper-1 (best transcription)
@@ -47,6 +48,28 @@ const VIDEO_MODELS = {
   /** Runway image→video fallback — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
   runwayImageToVideo: 'gen4.5',
 };
+
+/**
+ * Center-crop a landscape Flux still to 9:16 for Reels — same photoreal pixels, no second model.
+ */
+async function cropLandscapeStillTo916Center(imageUrl: string): Promise<Buffer> {
+  const res = await fetch(imageUrl);
+  if (!res.ok) throw new Error(`Fetch image failed: ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  const meta = await sharp(buf).metadata();
+  const w = meta.width ?? 0;
+  const h = meta.height ?? 0;
+  if (!w || !h) throw new Error('Could not read image dimensions');
+  const cropW = Math.round((h * 9) / 16);
+  if (cropW > w) {
+    throw new Error('Image too narrow for 9:16 center crop');
+  }
+  const left = Math.max(0, Math.floor((w - cropW) / 2));
+  return sharp(buf)
+    .extract({ left, top: 0, width: cropW, height: h })
+    .jpeg({ quality: 92, mozjpeg: true })
+    .toBuffer();
+}
 
 // =============================================================================
 // PERSISTENCE - State survives restarts
@@ -7707,11 +7730,16 @@ Return ONLY the motion direction. No preamble.`;
         // Track which model was used for display
         let lastModelUsed = 'Flux Pro';
         
-        // Helper function with retry for rate limits
-        const runFluxWithRetry = async (aspectRatio: string, maxRetries = 3): Promise<string | null> => {
+        // Helper: safety_tolerance 1=strict … 6=most permissive (Replicate Flux). Vertical 9:16 often false-positives at 2.
+        const runFluxWithRetry = async (
+          aspectRatio: string,
+          safetyTolerance: number = 2,
+          maxRetries = 3
+        ): Promise<string | null> => {
+          const tol = Math.min(6, Math.max(1, Math.round(safetyTolerance)));
           for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-              console.log(`Flux attempt ${attempt}/${maxRetries} for ${aspectRatio}`);
+              console.log(`Flux attempt ${attempt}/${maxRetries} for ${aspectRatio} (safety_tolerance=${tol})`);
               
               // Try Flux Ultra first (best quality), fall back to Pro
               let output: any = null;
@@ -7728,7 +7756,7 @@ Return ONLY the motion direction. No preamble.`;
                       aspect_ratio: aspectRatio,
                       output_format: "webp",
                       output_quality: 95,  // Higher quality for Ultra
-                      safety_tolerance: 2,
+                      safety_tolerance: tol,
                       prompt_upsampling: false,
                       raw: false  // Ultra-specific: photorealistic mode
                     }
@@ -7748,7 +7776,7 @@ Return ONLY the motion direction. No preamble.`;
                       aspect_ratio: aspectRatio,
                       output_format: "webp",
                       output_quality: 90,
-                      safety_tolerance: 2,
+                      safety_tolerance: tol,
                       prompt_upsampling: false
                     }
                   }
@@ -7807,10 +7835,45 @@ Return ONLY the motion direction. No preamble.`;
           }
           return null;
         };
+
+        /** 9:16 Reels: Flux first; if moderation fails — center-crop the 16:9 Flux still (same realism). */
+        const generateVerticalForReels = async (): Promise<void> => {
+          await ctx.reply('📱 *Generating Instagram vertical (9:16)...*', { parse_mode: 'Markdown' });
+          try {
+            const outputVertical = await runFluxWithRetry('9:16', 6);
+            console.log('Flux output (9:16):', outputVertical, typeof outputVertical);
+            if (outputVertical) {
+              visualization.imageUrlVertical = outputVertical;
+              await ctx.replyWithPhoto(outputVertical, {
+                caption: `📱 *Instagram Reel Format (9:16)*\n\n_${caption}_\n\n${hashtags.join(' ')}`,
+                parse_mode: 'Markdown'
+              });
+            }
+          } catch (verticalFluxError: any) {
+            console.error('Flux vertical (9:16) error:', verticalFluxError.message);
+            if (!visualization.imageUrlHorizontal) return;
+            await ctx.reply(
+              `⚠️ Flux 9:16 didn’t pass — using **center crop** from your Flux 16:9 still (same shot, photoreal, no DALL-E).`,
+              { parse_mode: 'Markdown' }
+            );
+            try {
+              const cropBuf = await cropLandscapeStillTo916Center(visualization.imageUrlHorizontal);
+              await ctx.replyWithPhoto(new InputFile(cropBuf, `atuona-reel-${pageId}.jpg`), {
+                caption: `📱 *Reels 9:16* — cropped from Flux 16:9\n\n_${caption}_\n\n${hashtags.join(' ')}`,
+                parse_mode: 'Markdown'
+              });
+            } catch (cropErr: any) {
+              console.error('Reels crop error:', cropErr);
+              await ctx.reply(
+                `⚠️ Reels vertical skipped (Flux + crop failed). Your **16:9 Flux still above** is unchanged.\n_${String(cropErr.message || 'unknown').slice(0, 160)}_`,
+                { parse_mode: 'Markdown' }
+              );
+            }
+          }
+        };
         
         try {
-          // Flux Pro via Replicate - 16:9 for YouTube
-          const output = await runFluxWithRetry("16:9");
+          const output = await runFluxWithRetry('16:9', 2);
           
           console.log('Flux output (16:9):', output, typeof output);
           
@@ -7818,37 +7881,19 @@ Return ONLY the motion direction. No preamble.`;
             visualization.imageUrlHorizontal = output;
             visualization.status = 'image_done';
             
-            // Send the image with model info
             await ctx.replyWithPhoto(output, {
               caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube Format (16:9)\n🎨 Generated with ${lastModelUsed}\n\n_${caption}_`,
               parse_mode: 'Markdown'
             });
           } else {
-            // Flux returned null - trigger fallback
             throw new Error('Flux returned empty result');
           }
           
-          // Wait a moment before next request to avoid rate limits
           await new Promise(resolve => setTimeout(resolve, 3000));
-          
-          // Generate vertical version for Instagram
-          await ctx.reply('📱 *Generating Instagram vertical (9:16)...*', { parse_mode: 'Markdown' });
-          
-          const outputVertical = await runFluxWithRetry("9:16");
-          
-          console.log('Flux output (9:16):', outputVertical, typeof outputVertical);
-          
-          if (outputVertical) {
-            visualization.imageUrlVertical = outputVertical;
-            
-            await ctx.replyWithPhoto(outputVertical, {
-              caption: `📱 *Instagram Reel Format (9:16)*\n\n_${caption}_\n\n${hashtags.join(' ')}`,
-              parse_mode: 'Markdown'
-            });
-          }
+          await generateVerticalForReels();
           
         } catch (fluxError: any) {
-          console.error('Flux error:', fluxError);
+          console.error('Flux error (horizontal or fatal):', fluxError);
           
           const isRateLimit = fluxError.message?.includes('429') || fluxError.message?.includes('rate limit');
           if (isRateLimit) {
@@ -7857,36 +7902,37 @@ Return ONLY the motion direction. No preamble.`;
 Free tier limit reached. Options:
 1. Add payment method at replicate.com
 2. Wait a few minutes and try again
-3. Using DALL-E fallback...`, { parse_mode: 'Markdown' });
+3. Retrying Flux with backoff...`, { parse_mode: 'Markdown' });
           } else {
-            await ctx.reply(`⚠️ Flux error: ${fluxError.message}\n\nTrying DALL-E fallback...`);
+            await ctx.reply(
+              `⚠️ Flux error: ${fluxError.message}\n\n_Retrying 16:9 once at max safety tolerance (still photoreal Flux)..._`,
+              { parse_mode: 'Markdown' }
+            );
           }
           
-          // Fallback to DALL-E if available
-          if (openai) {
-            try {
-              const dalleResponse = await openai.images.generate({
-                model: 'dall-e-3',
-                prompt: imagePrompt,
-                n: 1,
-                size: '1792x1024',
-                quality: 'hd'
+          try {
+            const retry = await runFluxWithRetry('16:9', 6);
+            if (retry) {
+              visualization.imageUrlHorizontal = retry;
+              visualization.status = 'image_done';
+              await ctx.replyWithPhoto(retry, {
+                caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9 (Flux retry)\n🎨 ${lastModelUsed}\n\n_${caption}_`,
+                parse_mode: 'Markdown'
               });
-              
-              const dalleUrl = dalleResponse.data?.[0]?.url;
-              if (dalleUrl) {
-                visualization.imageUrlHorizontal = dalleUrl;
-                visualization.status = 'image_done';
-                
-                await ctx.replyWithPhoto(dalleUrl, {
-                  caption: `🎬 *Page #${pageId}: ${title}* (DALL-E HD)\n\n_${caption}_`,
-                  parse_mode: 'Markdown'
-                });
-              }
-            } catch (dalleError: any) {
-              console.error('DALL-E fallback error:', dalleError);
-              await ctx.reply(`❌ Both Flux and DALL-E failed.\n\nPrompt saved - try again later or use manually:\n\`${imagePrompt.substring(0, 300)}...\``, { parse_mode: 'Markdown' });
+              await new Promise(resolve => setTimeout(resolve, 3000));
+              await generateVerticalForReels();
+            } else {
+              await ctx.reply(
+                `❌ Flux failed after retry.\n\n_Prompt saved — try again or use in an external tool:_\n\`${imagePrompt.substring(0, 400)}...\``,
+                { parse_mode: 'Markdown' }
+              );
             }
+          } catch (retryErr: any) {
+            console.error('Flux horizontal retry error:', retryErr);
+            await ctx.reply(
+              `❌ Flux failed (including retry).\n\n_${String(retryErr.message || fluxError.message).slice(0, 200)}_\n\n_Prompt:_ \`${imagePrompt.substring(0, 350)}...\``,
+              { parse_mode: 'Markdown' }
+            );
           }
         }
       } else {

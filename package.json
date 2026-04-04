@@ -25,7 +25,8 @@
     "node-fetch": "^2.7.0",
     "openai": "^6.15.0",
     "oracledb": "^6.7.0",
-    "replicate": "^1.4.0"
+    "replicate": "^1.4.0",
+    "sharp": "^0.34.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
