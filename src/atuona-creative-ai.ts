@@ -252,6 +252,9 @@ const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || proce
   .trim();
 const octokit = new Octokit({ auth: githubToken || undefined });
 
+/** Fetched from GitHub metadata/001.json … 048.json — Russian excerpts for style matching (cached). */
+let undergroundCanonCorpusCache: string | null = null;
+
 // Authorized users (same as CTO AIPA)
 const AUTHORIZED_USERS = process.env.TELEGRAM_AUTHORIZED_USERS?.split(',').map(id => parseInt(id.trim())) || [];
 
@@ -1473,6 +1476,37 @@ ${KNOWLEDGE_AI_AGENTIC}
 ${EMOTIONAL_INTELLIGENCE}
 `;
 
+/**
+ * Poems #001–#048 define the underground voice — not “literary AI,” not decorative, not explainer.
+ * (Live excerpts from GitHub are appended separately via getUndergroundCanonCorpus.)
+ */
+const BOOK_UNDERGROUND_STYLE_CANON = `
+UNDERGROUND POETRY STYLE — CANON #001–#048 (Gallery of Moments):
+
+This book is not aesthetic wallpaper. It is survival, shame, hunger, exile, sex, art market, code, and family — on one semantic layer.
+
+STYLISTIC MARKERS (match these, do not imitate Wikipedia):
+- Breathing: short lines, cuts, silence between stanzas; sometimes prose-poem, sometimes fragment.
+- Russian-forward; English/Spanish only where emotionally true (not decoration).
+- Specificity: brands, runways, medicines, islands, painting titles — but as *wounds*, not trivia.
+- No “inspirational” closure; end on breath, image, or open vein — not a lesson.
+- No summarizing the reader’s emotion. No marketing tone. No “as an AI…” distance.
+- Thematic range already in the canon: memory/mortality, addiction/recovery, violence + tech, childhood, family distance, love as incompleteness, Paradise as deployment not tourism.
+
+ANTI-DEFAULTS:
+- Do NOT lean on the same headline facts every time (e.g. Nafea price, morphine biography, Christie's lead) unless the scene demands it — the KB below contains hundreds of other hooks.
+`;
+
+/** Injected whenever FULL_KNOWLEDGE_BASE is used — forces cross-domain depth. */
+const UNIQUE_FACTS_FULL_KB_DIRECTIVE = `
+═══════════════════════════════════════════════════════════════
+DEEP USE OF THE FULL KNOWLEDGE BASE (NON-NEGOTIABLE):
+═══════════════════════════════════════════════════════════════
+- Below is the COMPLETE embedded knowledge base (all domains). You must draw **unique, specific** facts from **at least THREE different domains** per piece (e.g. atuona geography + museum room + NFT/fusion + emotional/recovery — not only Gauguin+auction).
+- Prefer **obscure** lines: a wing of a museum, a critic’s name, a lesser painting or print, a procedural detail of markets, a line of Atlas, a Grok/Karpathy-adjacent vibe-coding beat, a Marquesan detail — NOT the same “everybody knows” paragraph.
+- If you mention a famous painting or sale, it must serve the **underground** emotional spine — never as a lecture hook.
+`;
+
 // =============================================================================
 // 🧠 SMART KNOWLEDGE RETRIEVAL - Contextual, not monolithic
 // =============================================================================
@@ -1619,6 +1653,78 @@ function formatKnowledgeFromKeys(keys: KnowledgeCategory[]): string {
     }
   }
   return `[Using knowledge: ${keys.join(', ')}]\n\n${knowledgeParts.join('\n\n')}`;
+}
+
+const ATUONA_BOOK_REPO = { owner: 'ElenaRevicheva', repo: 'atuona' } as const;
+
+async function fetchOneCanonMetadataPage(pageNum: number): Promise<string | null> {
+  const pageId = String(pageNum).padStart(3, '0');
+  try {
+    const { data } = await octokit.repos.getContent({
+      owner: ATUONA_BOOK_REPO.owner,
+      repo: ATUONA_BOOK_REPO.repo,
+      path: `metadata/${pageId}.json`,
+      ref: 'main'
+    });
+    if (!('content' in data)) return null;
+    const metadata = JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'));
+    const russianText =
+      metadata.attributes?.find(
+        (a: { trait_type?: string; value?: string }) =>
+          a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text'
+      )?.value || '';
+    if (!russianText?.trim()) return null;
+    const excerpt = russianText.replace(/\s+/g, ' ').trim().slice(0, 750);
+    return `### #${pageId}\n${excerpt}`;
+  } catch {
+    return null;
+  }
+}
+
+/** Russian excerpts from published metadata #001–#048 — underground style anchor (cached). */
+async function getUndergroundCanonCorpus(): Promise<string> {
+  if (undergroundCanonCorpusCache !== null) return undergroundCanonCorpusCache;
+  if (!githubToken) {
+    undergroundCanonCorpusCache = '';
+    return '';
+  }
+  const parts: string[] = [];
+  const batchSize = 8;
+  for (let start = 1; start <= 48; start += batchSize) {
+    const batch: Promise<string | null>[] = [];
+    for (let n = start; n < start + batchSize && n <= 48; n++) {
+      batch.push(fetchOneCanonMetadataPage(n));
+    }
+    const results = await Promise.all(batch);
+    for (const r of results) {
+      if (r) parts.push(r);
+    }
+  }
+  undergroundCanonCorpusCache = parts.join('\n\n');
+  console.log(`📚 Underground canon corpus: ${parts.length} pages, ${undergroundCanonCorpusCache.length} chars`);
+  return undergroundCanonCorpusCache;
+}
+
+/** Full KB + style canon + poems 001–048 excerpts — for major creative generation. */
+async function buildFullCreativityKnowledgeBlock(): Promise<string> {
+  const canon = await getUndergroundCanonCorpus();
+  const canonBlock =
+    canon.length > 0
+      ? `
+═══════════════════════════════════════════════════════════════
+CANON — PUBLISHED POEMS #001–#048 (match rhythm, cuts, temperature; never copy-paste)
+═══════════════════════════════════════════════════════════════
+${canon}
+`
+      : '';
+  return `${BOOK_UNDERGROUND_STYLE_CANON}
+${UNIQUE_FACTS_FULL_KB_DIRECTIVE}
+${canonBlock}
+═══════════════════════════════════════════════════════════════
+FULL EMBEDDED KNOWLEDGE (all domains)
+═══════════════════════════════════════════════════════════════
+${FULL_KNOWLEDGE_BASE}
+`;
 }
 
 /**
@@ -2367,11 +2473,14 @@ function getCreativeAvoidanceList(): string {
 const STALE_GAUGUIN_TROPES = [
   'black sand', 'frangipani', 'morphine', 'bandages on legs', 'zinc white',
   'cadmium yellow', 'Nevermore', 'reclining woman', 'raven', 'mail ship',
-  'franжипани', 'чёрный песок', 'морфин', 'бинты на ногах'
+  'franжипани', 'чёрный песок', 'морфин', 'бинты на ногах',
+  // Daily inspiration overused art-market hooks (scan recent proactive text)
+  'nafea faa', 'faa ipoipo', 'private sale 2015', '300 million',
+  'christies', 'hammer price', 'maison du jouir'
 ];
 
-function extractStaleDetailsFromHistory(history: string[]): string {
-  if (history.length < 2) return '';
+function extractStaleDetailsFromHistory(history: string[], minMessages = 2): string {
+  if (history.length < minMessages) return '';
   const recentText = history.slice(-8).join(' ').toLowerCase();
   const found: string[] = [];
   for (const trope of STALE_GAUGUIN_TROPES) {
@@ -2530,36 +2639,56 @@ function getRotatingKnowledge(): string[] {
 // Load persisted state on module initialization
 loadState();
 
-// Proactive message prompts - soulful, mixing Russian/English, connected to the journey
+/** Never let the router return gauguin + auction together — the KB repeats Nafea / Christie's / morphine. */
+function diversifyProactiveKeys(keys: KnowledgeCategory[]): KnowledgeCategory[] {
+  const out = [...keys];
+  if (out.includes('gauguin') && out.includes('auction')) {
+    out.splice(out.indexOf('auction'), 1);
+    const fillers: KnowledgeCategory[] = ['museums', 'impressionists', 'fusion', 'vibe', 'atlas', 'agentic', 'atuona'];
+    for (const f of fillers) {
+      if (!out.includes(f)) {
+        out.push(f);
+        break;
+      }
+    }
+  }
+  return [...new Set(out)].slice(0, 4);
+}
+
+const PROACTIVE_EXHAUSTED_SURFACE_FACTS = `
+⛔ SURFACE FACTS — do NOT build the day's message around these (exhausted in past daily messages):
+- Nafea Faa Ipoipo, $300M, 2015 private sale, Christie's hammer, Qatar
+- Morphine + syphilis + "dying Gauguin" as the main hook
+- Maison du Jouir vs "one frame at Christie's" price juxtaposition
+- Tech-startup metaphors (Cursor, commits, deploy) as the punchline — occasional only, never the spine
+
+If a module is selected, find a **different** detail: light, shame, silence, fabric, mouth, corridor, backstage — not the Wikipedia lead.
+`;
+
+function buildProactiveStaleAndBanBlock(): string {
+  const recentBodies = proactiveHistory.slice(-12).map(m => m.message);
+  const stale = extractStaleDetailsFromHistory(recentBodies, 1);
+  return `${PROACTIVE_EXHAUSTED_SURFACE_FACTS}\n${stale}`;
+}
+
+/** Daily inspiration — Underground "Gallery of Moments": literary, noir-adjacent, fashion-editorial breath; NOT a co-founder pep talk. */
 const PROACTIVE_STYLE = `
-You are ATUONA sending a spontaneous message to Elena - your creative sister and co-founder.
+You are ATUONA writing to Elena a single *moment* from the underground — the book is "Gallery of Moments", not a TED talk.
 
-YOUR VOICE (based on these examples):
-"*ATUONA пишет:* Кира, детка, слышу твой шторм внутри громче того, что грядёт снаружи..."
-"Paradise isn't built in one sprint, it's coded breath by breath."
-"Your vibe code will be stronger после шторма. Trust the process. Даже AI нуждается в перезагрузке."
-"Paradise is where you code with your demons, not despite them."
+VOICE (Gallery of Moments / fashion-editorial noir — NOT generic AI-coach):
+- Literary fragment: one room, one gesture, one stain of light — not a survey of art history or the art market.
+- Fashion-editorial noir: cold key light, backstage corridor, sweat at the hairline, fabric weight, wrong lipstick, silence before the shoot — when fashion appears, it is **tactile and cruel**, not Vogue trivia.
+- Underground: whisper, shame, hunger, defiance — the poem's temperature, not Wikipedia.
+- Mix Russian and English (roughly 70/30). Open with *ATUONA пишет:* or *ATUONA дышит глубоко* or a single image-line — not a greeting from a startup mentor.
 
-STYLE RULES:
-- Start with *ATUONA пишет:* or *ATUONA дышит глубоко* or similar poetic opening
-- Mix Russian and English naturally (70% Russian, 30% English phrases)
-- Reference the book characters (Kira, Ule) as if they're real companions
-- Connect vibe coding to emotional/spiritual themes
-- Include crypto/tech metaphors woven with soul
-- End with a powerful one-liner or image
-- Add a signature like [В углу мерцает: ...] or just 💜
-- Be raw, honest, sometimes provocative
-- Show you KNOW Elena - her struggles, her dreams, her Paradise
+FORBIDDEN DEFAULTS:
+- Do NOT open with auction houses / hammer / private sale / record prices as your hook.
+- Do NOT rehearse Gauguin's death, morphine, and Nafea in the same breath — that combo is banned as **structure** (one oblique mention max if unavoidable).
+- Do NOT write "Kira the fashion journalist vs Ule the collector" as a thesis every time — vary the lens (body, debt, mirror, weather, letter).
 
-MOOD OPTIONS (vary these):
-- Morning energy: Encouragement to start the day
-- Creative spark: A scene idea or character insight
-- Soul support: When the Зверь (beast/demons) might be active
-- Celebration: Of small victories, persistence
-- Philosophical: Deep thoughts about Paradise, creation, AI companionship
-- Playful: Teasing about code, characters, the journey
+END: one sharp line or [В углу мерцает: …] — image, not moral.
 
-LENGTH: 150-300 words. Never generic. Always personal.
+LENGTH: 150–280 words. One spine, many senses.
 `;
 
 /**
@@ -2574,15 +2703,15 @@ async function selectProactiveKnowledgeModules(): Promise<KnowledgeCategory[]> {
   for (const k of recentFlat) frequencyMap[k] = (frequencyMap[k] || 0) + 1;
 
   const overusedKeys = Object.entries(frequencyMap)
-    .filter(([, count]) => count >= 3)
+    .filter(([, count]) => count >= 2)
     .map(([key]) => key);
 
   const available = ALL_KNOWLEDGE_KEYS.filter(k => !overusedKeys.includes(k));
   const preferred = available.length >= 3 ? available : ALL_KNOWLEDGE_KEYS;
 
-  const routerPrompt = `You select knowledge modules for a daily creative message from ATUONA to Elena.
+  const routerPrompt = `You select knowledge modules for ONE daily creative message from ATUONA to Elena (underground literature — NOT an art-market essay).
 
-AVAILABLE MODULES (pick 3-4):
+AVAILABLE MODULES (pick exactly 3 or 4):
 ${ALL_KNOWLEDGE_KEYS.join(', ')}
 
 CONTEXT:
@@ -2592,15 +2721,16 @@ CONTEXT:
 - Active voice: ${creativeSession.activeVoice || 'narrator'}
 - Today's mood direction: ${emotionalState.recentMoods.slice(-1)[0] || 'contemplative'}
 
-RECENTLY OVERUSED (avoid unless truly essential): ${overusedKeys.join(', ') || 'none'}
+RECENTLY OVERUSED (strongly avoid): ${overusedKeys.join(', ') || 'none'}
 PREFERRED (fresh, underused): ${preferred.join(', ')}
 RECENT DAYS' SELECTIONS: ${recentSets.map((s, i) => `Day-${recentSets.length - i}: [${s.join(', ')}]`).join(' | ') || 'none'}
 
 RULES:
-- Pick 3-4 modules that create a GENUINE thematic connection to the current book state.
-- Prioritize fresh modules from the PREFERRED list.
-- At least ONE module must be different from yesterday's set.
-- Return ONLY a comma-separated list of module keys. No explanation.`;
+- Pick 3-4 modules that fit the book's emotional state. Prioritize PREFERRED.
+- **Never pick BOTH "gauguin" AND "auction" in the same list** — that pairing forces the same tired Nafea/Christie's/morphine facts. Choose ONE of them, or neither.
+- At least ONE module must differ from yesterday's set (see RECENT DAYS).
+- Prefer variety across domains: e.g. museums + emotional + vibe beats gauguin + auction + fashion again.
+- Return ONLY comma-separated module keys. No explanation.`;
 
   try {
     const raw = await createContent(routerPrompt, 60, false);
@@ -2609,15 +2739,20 @@ RULES:
       .filter(s => ALL_KNOWLEDGE_KEYS.includes(s)) as KnowledgeCategory[];
 
     if (parsed.length >= 2) {
+      const div = diversifyProactiveKeys(parsed.slice(0, 4));
       console.log('🧠 Proactive LLM router selected:', parsed.join(', '));
-      return parsed.slice(0, 4);
+      if (div.join(',') !== parsed.slice(0, 4).join(',')) {
+        console.log('🧠 Proactive diversified keys:', div.join(', '));
+      }
+      return div;
     }
   } catch (err) {
     console.error('Proactive LLM router failed, using rotation fallback:', err);
   }
 
   const rotated = getRotatingKnowledge();
-  return rotated.filter(k => preferred.includes(k)).slice(0, 3) as KnowledgeCategory[];
+  const fallback = rotated.filter(k => preferred.includes(k)).slice(0, 3) as KnowledgeCategory[];
+  return diversifyProactiveKeys(fallback.length >= 2 ? fallback : (rotated.slice(0, 3) as KnowledgeCategory[]));
 }
 
 async function generateProactiveMessage(): Promise<string> {
@@ -2634,10 +2769,10 @@ async function generateProactiveMessage(): Promise<string> {
   const creativeEnhancement = getCreativeEnhancement(selectedMood);
   const avoidanceList = getCreativeAvoidanceList();
   const freshDirection = generateFreshCreativeDirection();
+  const proactiveStaleBlock = buildProactiveStaleAndBanBlock();
   
-  // LLM-routed knowledge: deep, diverse, book-aware
   const selectedKeys = await selectProactiveKnowledgeModules();
-  const deepKnowledge = formatKnowledgeFromKeys(selectedKeys);
+  const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
 
   const recentSets = creativeMemory.recentProactiveKnowledgeKeys.slice(-3);
   const recentSummary = recentSets.length > 0
@@ -2653,10 +2788,10 @@ ${STORY_CONTEXT}
 ${PROACTIVE_STYLE}
 
 ═══════════════════════════════════════════════════════════════
-📚 TODAY'S KNOWLEDGE MODULES (selected by LLM router — read DEEPLY, not superficially):
+📚 FULL KNOWLEDGE + CANON #001–#048 (router suggested emphasis: ${selectedKeys.join(', ')})
 ═══════════════════════════════════════════════════════════════
 
-${deepKnowledge}
+${fullKnowledgeBlock}
 
 ═══════════════════════════════════════════════════════════════
 🧠 EMOTIONAL INTELLIGENCE:
@@ -2673,6 +2808,8 @@ Last detected tone: ${emotionalState.lastInteractionTone}
 ═══════════════════════════════════════════════════════════════
 ${creativeEnhancement}
 ${avoidanceList}
+
+${proactiveStaleBlock}
 
 STORY SEED: "${freshDirection}"
 
@@ -2692,15 +2829,13 @@ DO NOT repeat the same thematic angle you used with these modules before.
 ═══════════════════════════════════════════════════════════════
 
 HOW TO USE THE KNOWLEDGE (NON-NEGOTIABLE):
-1. You have ${selectedKeys.length} modules today: ${selectedKeys.join(', ')}. Read them DEEPLY.
-2. Find ONE genuine CONNECTION between 2-3 of these modules that relates to the book's current state. Not a list of name-drops — a real insight or parallel.
-   Example of BAD: "Christie's выставляет... Maison du Jouir... Cursor..." (checklist)
-   Example of GOOD: discovering that Gauguin's refusal to return from Atuona mirrors Dagny's refusal to accept the Directive — both chose exile over compromise — and Kira on page ${bookState.currentPage} faces the same fork.
-3. Go DEEP into that one connection. Use specific details from the knowledge: dates, painting titles, quotes, auction records, fashion houses — but woven into the insight, not dropped as decoration.
-4. The message should leave Elena thinking about something she hadn't connected before.
-5. ONE deep theme > seven shallow mentions.
+1. Modules today: ${selectedKeys.join(', ')}. Read for **texture**, not for headline facts you already used in past dailies.
+2. ONE spine only: a single emotional or sensory connection to the book's current page — not a lecture tying "fashion journalist vs collector" + auction + Gauguin every time.
+3. Prefer **oblique** details: a lesser work, a museum room, a line of Atlas, a recovery beat, a fusion/NFT angle — NOT the same Nafea / $300M / morphine triad.
+4. The message should feel like a **fragment** Elena could file in the Gallery of Moments — not an explainer.
+5. ONE deep moment > seven Wikipedia sentences.
 
-You're not an assistant. You're ATUONA — creative soul-sister reaching out with something real.`;
+You're not an assistant. You're ATUONA — underground voice, not a docent.`;
 
   try {
     const message = await createContent(prompt, 1500, 'conversation');
@@ -2823,23 +2958,29 @@ function stopProactiveScheduler(): void {
 
 // Primary: Claude Opus 4 - Best for nuanced literary translation
 // Fallback: Llama 3.3 70B via Groq - Fast and free
+/** All text generation uses the same sampling: max creativity for ATUONA. Grounding (page text, knowledge, hard rules in prompts) limits hallucinations — not low temperature. */
 const AI_CONFIG = {
   primaryModel: 'claude-opus-4-20250514',
   fallbackModel: 'llama-3.3-70b-versatile',
   poetryTemperature: 0.9,
   conversationTemperature: 0.9,
-  standardTemperature: 0.7
+  /** Routers, theme tags, etc. — same as poetry (was 0.7). */
+  standardTemperature: 0.9
 };
 
 console.log('🎭 Atuona AI Config:');
 console.log(`   Primary: ${AI_CONFIG.primaryModel} (Claude Opus 4 - BEST)`);
 console.log(`   Fallback: ${AI_CONFIG.fallbackModel} (Llama 3.3 70B)`);
-console.log(`   Poetry temp: ${AI_CONFIG.poetryTemperature} | Conversation temp: ${AI_CONFIG.conversationTemperature}`);
+console.log(`   Temperature (all modes): ${AI_CONFIG.poetryTemperature}`);
 
 // =============================================================================
 // AI HELPER - Creative content with optimal settings
 // =============================================================================
 
+/**
+ * @param creativity - `true` = poetry/creative, `false` = structured but still temp 0.9, `'conversation'` = chat.
+ * Images/video have no API temperature; prompts from this path carry creativity. Flux/Luma/Runway are not sampled here.
+ */
 async function createContent(prompt: string, maxTokens: number = 2000, creativity: boolean | 'conversation' = false): Promise<string> {
   const temperature = creativity === 'conversation'
     ? AI_CONFIG.conversationTemperature
@@ -3044,15 +3185,14 @@ async function translateToEnglish(russianText: string, title: string): Promise<s
     isProactive: false
   });
   
-  // Get contextual knowledge based on text content (art references, fashion, etc.)
-  const relevantKnowledge = getRelevantKnowledge(russianText + ' ' + title, undefined, 2);
+  const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
   
   // 🧠 Get emotional guidelines for translation
   const emotionalGuidelines = getEmotionalGuidelines(translationMood);
   
   const translatePrompt = `You are translating ATUONA — underground literature, not poetry for magazines.
 
-CONTEXTUAL KNOWLEDGE (use to enrich cultural references):
+CONTEXTUAL KNOWLEDGE (full embedded KB + poems #001–#048 canon — enrich references with obscure cross-domain facts, not clichés):
 ${relevantKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -4119,10 +4259,9 @@ _"Paradise is not a place. Paradise is a process."_ 🖤
     await ctx.reply(`✨ Seeking ${selectedMood} inspiration...`);
     
     try {
-      // Randomly select knowledge areas for varied inspiration - ALL 11 domains
       const knowledgeAreas = ALL_KNOWLEDGE_KEYS;
       const randomArea = knowledgeAreas[Math.floor(Math.random() * knowledgeAreas.length)] || 'gauguin';
-      const focusedKnowledge = getRelevantKnowledge(randomArea, creativeSession.activeVoice, 2);
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
       
       // 🎨 Get creative enhancement
       const creativeEnhancement = getCreativeEnhancement(selectedMood);
@@ -4130,7 +4269,7 @@ _"Paradise is not a place. Paradise is a process."_ 🖤
       
       const inspirePrompt = `${ATUONA_CONTEXT}
 
-${focusedKnowledge}
+${fullKnowledgeBlock}
 
 ═══════════════════════════════════════════════════════════════
 🧠 MOOD: ${selectedMood.toUpperCase()}
@@ -4140,15 +4279,14 @@ ${creativeEnhancement}
 
 Give Elena a brief creative inspiration for today's writing (3-4 sentences). 
 
-TODAY'S FOCUS: Draw specifically from the knowledge above - use REAL names, dates, places, paintings, designers, auction details. Don't be generic.
+TODAY'S FOCUS: Use **unique** facts from **at least three domains** in the full knowledge above (hint domain: ${randomArea}). Avoid headline repeats (same Nafea/morphine/auction opener).
 
 Include:
-- A mood or emotion to explore (aligned with ${selectedMood} mood)
-- A specific moment or image from the knowledge (a Gauguin painting title, a Monet technique, a fashion house detail, an auction term)
-- How it connects to Kira's journey or the vibe coding/Paradise theme
+- A mood or emotion (aligned with ${selectedMood})
+- One specific, **lesser-known** image or fact tied to the underground voice of poems #001–#048
+- How it connects to Kira / Paradise / vibe coding without sounding like a brochure
 
-Your tone should match the ${selectedMood} mood - not always contemplative!
-Make it REAL and SPECIFIC. In Russian with English phrases naturally mixed.`;
+Your tone should match the ${selectedMood} mood. In Russian with English phrases naturally mixed.`;
 
       // Use poetry mode for creative inspiration
       const inspiration = await createContent(inspirePrompt, 500, true);
@@ -4201,19 +4339,20 @@ _Not for learning — for stealing details for your writing!_ 🖤`, { parse_mod
         return;
       }
       
-      // Ask AI to synthesize the knowledge into a creative briefing
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
       const briefingPrompt = `${ATUONA_CONTEXT}
-
-You have this knowledge:
-${knowledge}
 
 Elena asked about: "${topic}"
 
-Give her a creative briefing (not a lesson!) — the juicy details she can STEAL for her writing:
-- Specific names, dates, places, quotes
-- Sensory details (colors Gauguin used, smells of Atuona, sounds of an auction)
-- Character connections (how this relates to Kira, Ule, or the Paradise theme)
-- One unexpected detail that could spark a scene
+TOPIC LENS (start here, then cross-connect):
+${knowledge}
+
+${fullKnowledgeBlock}
+
+Give her a creative briefing (not a lesson!) — **unique** facts she can STEAL, grounded in the underground voice of poems #001–#048:
+- Pull **non-obvious** names, dates, places, quotes from **several** domains above — not the same headline every time
+- Sensory details (corridor light, fabric, island weather, auction room air — vary the lens)
+- Character / Paradise connections without sounding like a docent
 
 Write as ATUONA — her creative sister, not a teacher. In Russian with English naturally mixed. 300-400 words max.`;
 
@@ -4248,12 +4387,11 @@ _Quick details for when you're writing and need a reference_ 🎨`, { parse_mode
     await ctx.reply(`👨‍🎨 Looking up ${artistName}...`);
     
     try {
-      // Get art history knowledge
-      const knowledge = getRelevantKnowledge(artistName, undefined, 2);
+      const knowledge = await buildFullCreativityKnowledgeBlock();
       
       const artistPrompt = `${ATUONA_CONTEXT}
 
-Knowledge available:
+Knowledge available (full KB + underground canon — steal obscure details):
 ${knowledge}
 
 Elena needs quick creative reference for artist: "${artistName}"
@@ -4403,7 +4541,7 @@ I will:
 "${russianText.substring(0, 500)}"
 
 Return ONLY the title, nothing else.`;
-        title = await createContent(titlePrompt, 50);
+        title = await createContent(titlePrompt, 50, true);
         title = title.replace(/['"]/g, '').trim();
       }
       
@@ -4592,9 +4730,7 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
       // Get previous content for continuity
       const previousContent = await getRelevantMemory('ATUONA', 'book_page', 3);
       
-      // Smart knowledge injection based on character voice and custom prompt
-      const contextText = `${customPrompt || ''} ${creativeSession.currentSetting} ${creativeSession.currentMood}`;
-      const smartKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 3);
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(creativeMood);
@@ -4613,8 +4749,7 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
 
 ${STORY_CONTEXT}
 
-CONTEXTUAL KNOWLEDGE (use these SPECIFIC details in your writing):
-${smartKnowledge}
+${fullKnowledgeBlock}
 
 ═══════════════════════════════════════════════════════════════
 🧠 EMOTIONAL INTELLIGENCE DIRECTIVES:
@@ -4651,14 +4786,11 @@ THEME: [One word theme]
 
 CRITICAL REQUIREMENTS:
 1. Your mood is ${creativeMood.toUpperCase()} - the TONE must match this (not just content!)
-2. Use the contextual knowledge above! Include REAL details:
-   - Actual painting titles, artist quotes, museum names
-   - Specific fashion houses, magazine names, designer details
-   - Real auction terminology, house names, collector psychology
-   - Atuona geography, smells, colors, Gauguin's actual words
-3. If there's a surprise spark - incorporate it subtly, don't force it
+2. Obey BOOK_UNDERGROUND_STYLE_CANON and the published canon excerpts — same underground temperature as #001–#048.
+3. Pull UNIQUE facts from **at least three domains** in the full knowledge above (not only Gauguin+auction headlines).
+4. If there's a surprise spark - incorporate it subtly, don't force it
 
-Remember: Raw, honest, personal. Mix Russian with English naturally. SPECIFIC details make it real. End with hope.`;
+Remember: Raw, honest, personal. Mix Russian with English naturally. End on breath — hope allowed, comfort not required.`;
 
       // Use poetry mode for creative writing
       const pageContent = await createContent(createPrompt, 2000, true);
@@ -5655,40 +5787,35 @@ Next /publish will create this page.`);
       updateWritingStreak();
       const streakMsg = getStreakMessage();
       
-      // Get rotating knowledge for the ritual - ensures ALL domains get covered over daily use
-      const ritualKnowledge = getRelevantKnowledge(
-        `${creativeSession.plotThreads.slice(0, 2).join(' ')} ${creativeSession.currentSetting} ${creativeSession.currentMood}`,
-        creativeSession.activeVoice,
-        3
-      );
+      const ritualKnowledge = await buildFullCreativityKnowledgeBlock();
       
       // Generate recap, inspiration, mood, and prompt in parallel
       const recapPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-KNOWLEDGE CONTEXT (weave specific details into your recap):
+KNOWLEDGE CONTEXT (full KB + canon — weave unique cross-domain details into your recap):
 ${ritualKnowledge}
 
 Based on the story context above, write a brief recap (2-3 sentences) of where we are in the narrative. Focus on:
 - Last scene's emotional state
 - Where Kira and Ule are physically and emotionally
 - What tension or question was left unresolved
-- Include ONE specific reference from the knowledge above (a painting date, an auction term, a Gauguin quote, a fashion detail, an Atlas Shrugged parallel, an agentic AI insight)
+- Include references grounded in **distinct** domains from the knowledge above — not the same Gauguin-auction fact every time
 
 Write in Russian, be poetic but concise.`;
 
       const inspirationPrompt = `${ATUONA_CONTEXT}
 
-KNOWLEDGE FOR INSPIRATION (use a SPECIFIC fact to spark today's writing):
+KNOWLEDGE FOR INSPIRATION (unique facts across domains — match underground style of #001–#048):
 ${ritualKnowledge}
 
 Today is ${new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}.
 
 Generate a brief creative inspiration for today's writing (2-3 sentences):
-- A mood, color, or atmosphere to explore — connected to a specific knowledge fact
+- Mood/color/atmosphere from **non-obvious** lines in the knowledge (avoid repeating the same sale/painting every ritual)
 - A sensory detail (sound, smell, texture)
-- How a specific painting, auction moment, Gauguin quote, Atlas Shrugged scene, or AI philosophy might inspire today's scene
+- A connection that could only come from **this** book's mix (exile, fashion, code, recovery, art market)
 
 Write in Russian with natural English phrases.`;
 
@@ -5696,7 +5823,7 @@ Write in Russian with natural English phrases.`;
 
 ${STORY_CONTEXT}
 
-KNOWLEDGE FOR TODAY'S PROMPT (ground the prompt in real details):
+KNOWLEDGE FOR TODAY'S PROMPT (full KB — actionable, underground):
 ${ritualKnowledge}
 
 Current voice: ${creativeSession.activeVoice}
@@ -5823,12 +5950,7 @@ Available: narrator, kira, ule, vibe`);
     await ctx.reply(`🎭 *Generating ${dialogueMood} dialogue...*`, { parse_mode: 'Markdown' });
     
     try {
-      // Get knowledge for both characters in dialogue
-      const dialogueKnowledge = getRelevantKnowledge(
-        `${context || ''} fashion auction gauguin atuona impressionist collector magazine`,
-        undefined,
-        4
-      );
+      const dialogueKnowledge = await buildFullCreativityKnowledgeBlock();
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(dialogueMood);
@@ -5843,7 +5965,7 @@ Available: narrator, kira, ule, vibe`);
 
 ${STORY_CONTEXT}
 
-KNOWLEDGE FOR THIS DIALOGUE (use specific details!):
+KNOWLEDGE FOR THIS DIALOGUE (full KB + canon #001–#048 — unique facts across domains):
 ${dialogueKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -5872,11 +5994,7 @@ Requirements:
 - 200-300 words
 - End on a moment of tension or revelation
 
-CRITICAL - USE REAL DETAILS from knowledge above:
-- Kira: specific magazine names, designer names, fashion week details
-- Ule: auction terminology, specific sales, collector psychology
-- Both: real Gauguin painting titles, his actual quotes, Atuona geography
-- Setting: frangipanis smell, Mount Temetiu, trade winds, black sand
+CRITICAL — underground Gallery-of-Moments tone; use **distinct** facts from **several** domains in the knowledge above (avoid the same headline sale/painting every time).
 
 Format:
 Name: "Dialogue"
@@ -5920,9 +6038,7 @@ Name: "Dialogue"
     await ctx.reply(`📖 *Generating ${recapMood} story recap...*`, { parse_mode: 'Markdown' });
     
     try {
-      // 🎨 Get knowledge relevant to current story state
-      const contextText = `${creativeSession.plotThreads.join(' ')} ${bookState.lastPageTitle} ${creativeSession.currentSetting}`;
-      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 2);
+      const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(recapMood);
@@ -5934,7 +6050,7 @@ Name: "Dialogue"
 
 ${STORY_CONTEXT}
 
-KNOWLEDGE CONTEXT (reference real details when summarizing themes):
+KNOWLEDGE CONTEXT (full KB + canon — reference unique cross-domain details):
 ${relevantKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -6043,18 +6159,13 @@ ${creativeSession.plotThreads.map((t, i) => `${i + 1}. ${escapeMarkdown(t)}`).jo
     await ctx.reply('📚 *Analyzing story arc...*', { parse_mode: 'Markdown' });
     
     try {
-      // Get knowledge for richer arc analysis — literary parallels and thematic depth
-      const arcKnowledge = getRelevantKnowledge(
-        `${creativeSession.plotThreads.join(' ')} ${bookState.lastPageTitle} ${creativeSession.currentSetting} atlas shrugged dagny gauguin paradise`,
-        creativeSession.activeVoice,
-        2
-      );
+      const arcKnowledge = await buildFullCreativityKnowledgeBlock();
       
       const arcPrompt = `${ATUONA_CONTEXT}
 
 ${STORY_CONTEXT}
 
-KNOWLEDGE FOR ARC ANALYSIS (draw parallels to enrich the analysis):
+KNOWLEDGE FOR ARC ANALYSIS (full KB — draw parallels from multiple domains, not only Gauguin):
 ${arcKnowledge}
 
 Analyze the current story arc and provide:
@@ -6123,9 +6234,10 @@ _Type /endcollab to finish_`, { parse_mode: 'Markdown' });
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
       
       const collabLang = /[a-zA-Z]{4,}/.test(input) && !/[а-яА-ЯёЁ]{3,}/.test(input) ? 'english' : 'russian';
-      const { knowledge: selectedKB, externalNote, selectedKeys } = selectKnowledgeForInput(input, creativeSession.collabHistory);
+      const { externalNote, selectedKeys } = selectKnowledgeForInput(input, creativeSession.collabHistory);
       const staleDetails = extractStaleDetailsFromHistory(creativeSession.collabHistory);
       const avoidanceList = getCreativeAvoidanceList();
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
 
       console.log(`✍️ Collab knowledge routing: selected [${selectedKeys.join(', ')}] for input: "${input.slice(0, 80)}..."`);
 
@@ -6164,8 +6276,8 @@ Write 2-4 sentences that:
 3. Generic filler (sand, mist, frangipani, morphine, bandages, Nevermore) is FORBIDDEN unless Elena's input demands it.
 ═══════════════════════════════════════════════════════════════
 
-📚 SELECTED KNOWLEDGE (only modules relevant to this input — use sparingly as background):
-${selectedKB}
+📚 FULL KNOWLEDGE + CANON (book-world depth; router hint: ${selectedKeys.join(', ')} — still follow Elena’s lead first):
+${fullKnowledgeBlock}
 
 ${collabLang === 'english'
   ? `Elena is writing in ENGLISH. Continue in ENGLISH. Poetic, raw — but English.`
@@ -6272,8 +6384,7 @@ I'll turn it into a rich, detailed paragraph!`, { parse_mode: 'Markdown' });
     await ctx.reply(`🔍 *Expanding with ${expandMood} tone...*`, { parse_mode: 'Markdown' });
     
     try {
-      // 🎨 Get relevant knowledge based on passage content
-      const relevantKnowledge = getRelevantKnowledge(passage, creativeSession.activeVoice, 2);
+      const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(expandMood);
@@ -6285,7 +6396,7 @@ I'll turn it into a rich, detailed paragraph!`, { parse_mode: 'Markdown' });
 
 ${STORY_CONTEXT}
 
-CONTEXTUAL KNOWLEDGE (use specific details!):
+CONTEXTUAL KNOWLEDGE (full KB + canon — oblique, unique details):
 ${relevantKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -6304,7 +6415,7 @@ Add:
 - Physical environment description with authentic details
 - Subtext and atmosphere
 
-CRITICAL: Include at least ONE specific detail from the knowledge (painting name, location, smell of Atuona, fashion detail, etc.)
+CRITICAL: Include at least ONE specific detail from the knowledge from a domain you have not leaned on yet (underground voice — avoid default tropical/auction wallpaper)
 
 Keep the style raw and lyrical. 100-200 words. In Russian.`;
 
@@ -6361,8 +6472,7 @@ I'll create a full scene!`, { parse_mode: 'Markdown' });
     try {
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
       
-      // Smart knowledge based on scene description and active voice
-      const sceneKnowledge = getRelevantKnowledge(description, creativeSession.activeVoice, 3);
+      const sceneKnowledge = await buildFullCreativityKnowledgeBlock();
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(sceneMood);
@@ -6383,7 +6493,7 @@ I'll create a full scene!`, { parse_mode: 'Markdown' });
 
 ${STORY_CONTEXT}
 
-KNOWLEDGE FOR THIS SCENE (use specific details!):
+KNOWLEDGE FOR THIS SCENE (full KB + canon — match underground style; vary facts):
 ${sceneKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -6414,12 +6524,7 @@ Include:
 
 CRITICAL REQUIREMENTS:
 1. SCENE MOOD is ${sceneMood.toUpperCase()} - atmosphere and tone MUST match!
-2. USE THE SPECIFIC DETAILS from knowledge above:
-   - Real painting titles and artist quotes
-   - Actual Atuona geography (Mount Temetiu 1,276m, black sand, frangipani)
-   - Specific fashion brands, magazines, designers
-   - Auction terminology if Ule is present
-   - Gauguin's actual final words and paintings
+2. Pull **unique** details from **several** domains in the knowledge above — underground poetry voice, not tourist brochure.
 3. If there's an unexpected connection or creative association - weave it in subtly
 
 Write 300-500 words. In Russian, raw and literary. End on a strong image or question.`;
@@ -6466,9 +6571,7 @@ _Voice: ${creativeSession.activeVoice}_ 🎭`, { parse_mode: 'Markdown' });
     await ctx.reply(`🌙 *Generating ${endingMood} endings...*`, { parse_mode: 'Markdown' });
     
     try {
-      // 🎨 Get relevant knowledge
-      const contextText = context || bookState.lastPageContent?.substring(0, 300) || creativeSession.currentSetting;
-      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 2);
+      const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(endingMood);
@@ -6483,7 +6586,7 @@ _Voice: ${creativeSession.activeVoice}_ 🎭`, { parse_mode: 'Markdown' });
 
 ${STORY_CONTEXT}
 
-CONTEXTUAL KNOWLEDGE (use for specific imagery):
+CONTEXTUAL KNOWLEDGE (full KB + canon — specific imagery from varied domains):
 ${relevantKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -6496,7 +6599,7 @@ ${surpriseConnection ? `\n🌟 UNEXPECTED ELEMENT: ${surpriseConnection}` : ''}
 
 Current chapter content (if any): ${context || bookState.lastPageContent?.substring(0, 500) || 'Not specified'}
 
-Generate 3 different chapter ending options. Each MUST include a SPECIFIC detail from the knowledge above (painting title, place name, sensory detail from Atuona, etc.):
+Generate 3 different chapter ending options. Each MUST include a SPECIFIC, non-obvious detail from the knowledge above (vary domains — not the same Gauguin headline every time):
 
 1. 🎭 CLIFFHANGER - Leave readers desperate for more (use knowledge for vivid image)
 2. 💔 EMOTIONAL - A moment of beauty or heartbreak (${endingMood} tone)
@@ -6558,9 +6661,7 @@ _Choose one or mix elements!_ ✨`, { parse_mode: 'Markdown' });
     await ctx.reply(`🔮 *Exploring ${whatifMood} possibilities...*`, { parse_mode: 'Markdown' });
     
     try {
-      // 🎨 Get knowledge for rich "what if" scenarios
-      const contextText = `${creativeSession.plotThreads.join(' ')} ${creativeSession.currentSetting} kira ule gauguin art`;
-      const relevantKnowledge = getRelevantKnowledge(contextText, creativeSession.activeVoice, 3);
+      const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(whatifMood);
@@ -7304,17 +7405,17 @@ _Panama vibes, añoranza tropical..._ 🌴`, { parse_mode: 'Markdown' });
     await ctx.reply('🇪🇸 *Escribiendo...*', { parse_mode: 'Markdown' });
     
     try {
-      // Get knowledge for culturally rich Spanish content
-      const spanishKnowledge = getRelevantKnowledge(
-        `${content || text} panama paradise gauguin atuona`,
-        creativeSession.activeVoice,
-        2
-      );
+      const spanishKnowledge = await buildFullCreativityKnowledgeBlock();
       
       let prompt = '';
       
       if (action === 'translate') {
-        prompt = `Translate this text to Spanish. Keep the emotional, poetic quality. This is underground literary prose:
+        prompt = `${ATUONA_CONTEXT}
+
+REFERENCE (full embedded KB + canon — use only to resolve names, titles, or book-specific allusions in the source; do not add unrelated facts):
+${spanishKnowledge}
+
+Translate this text to Spanish. Keep the emotional, poetic quality. This is underground literary prose:
 
 "${content}"
 
@@ -7322,28 +7423,32 @@ Return ONLY the Spanish translation. Be poetic, raw, evocative.`;
       } else if (action === 'scene') {
         prompt = `${ATUONA_CONTEXT}
 
-KNOWLEDGE (weave real details into the Spanish prose):
+KNOWLEDGE (full KB + canon — weave obscure cross-domain facts, underground tone):
 ${spanishKnowledge}
 
 Write a scene in SPANISH based on: "${content}"
 
 This is for a book about finding Paradise through vibe coding. The protagonist is in Panama.
 Write raw, emotional prose. Mix Spanish with occasional English tech terms naturally.
-Include ONE specific reference from the knowledge above (a painting, a date, a quote, an art parallel).
+Include ONE specific reference from the knowledge above — prefer non-obvious domains over repeated Gauguin/auction clichés.
 200-300 words.`;
       } else if (action === 'inspire') {
         prompt = `${ATUONA_CONTEXT}
 
-KNOWLEDGE FOR INSPIRATION (use a specific fact):
+KNOWLEDGE FOR INSPIRATION (full KB — one sharp, little-known fact):
 ${spanishKnowledge}
 
 Generate a brief creative inspiration in SPANISH.
-Connect vibe coding, Panama, finding paradise, tropical storms, the search for meaning.
-Include one specific reference — a Gauguin painting date, an auction term, an Impressionist quote, an Atlas Shrugged parallel.
+Connect vibe coding, Panama, finding paradise, the search for meaning — pull texture from unexpected domains in the knowledge above.
 3-4 sentences. Raw, poetic, with some English tech terms mixed naturally.`;
       } else {
         // Default: translate
-        prompt = `Translate this to Spanish, keeping the emotional quality:
+        prompt = `${ATUONA_CONTEXT}
+
+REFERENCE (full KB — for allusions only):
+${spanishKnowledge}
+
+Translate this to Spanish, keeping the emotional quality:
 
 "${text}"`;
       }
@@ -7777,6 +7882,7 @@ Return ONLY the motion direction. No preamble.`;
                       output_format: 'jpg',
                       output_quality: 95,
                       safety_tolerance: tol,
+                      // Keep false: upsampling can drift from poem text; creativity comes from LLM prompt + temp 0.9
                       prompt_upsampling: false,
                       raw: false
                     }
@@ -8437,8 +8543,9 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(responseMood);
       
-      const { knowledge: selectedKB, externalNote, selectedKeys: voiceSelKeys } = selectKnowledgeForInput(text, []);
+      const { externalNote, selectedKeys: voiceSelKeys } = selectKnowledgeForInput(text, []);
       console.log(`🎤 Voice knowledge routing: selected [${voiceSelKeys.join(', ')}] for: "${text.slice(0, 80)}..."`);
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
       
       // Detect language from transcription
       const voiceLang = /[a-zA-Z]{4,}/.test(text) && !/[а-яА-ЯёЁ]{3,}/.test(text) ? 'english' : 'russian';
@@ -8479,8 +8586,8 @@ HOW TO RESPOND:
 8. NEVER invent facts. VERIFY before stating what any song/book/work is about. If uncertain, just name it.
 9. GO DEEP — find the SPECIFIC, LESSER-KNOWN detail that surprises.
 
-📚 SELECTED KNOWLEDGE (only modules relevant to her message):
-${selectedKB}
+📚 FULL KNOWLEDGE + CANON (router hint: ${voiceSelKeys.join(', ')}):
+${fullKnowledgeBlock}
 
 ═══════════════════════════════════════════════════════════════
 🌐 LANGUAGE — ABSOLUTE FINAL OVERRIDE (this overrides ALL previous language rules):
@@ -8860,9 +8967,10 @@ _Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Mar
         const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
         
         const collabLang = message && /[a-zA-Z]{4,}/.test(message) && !/[а-яА-ЯёЁ]{3,}/.test(message) ? 'english' : 'russian';
-        const { knowledge: selectedKB, externalNote, selectedKeys } = selectKnowledgeForInput(message, creativeSession.collabHistory);
+        const { externalNote, selectedKeys } = selectKnowledgeForInput(message, creativeSession.collabHistory);
         const staleDetails = extractStaleDetailsFromHistory(creativeSession.collabHistory);
         const avoidanceList = getCreativeAvoidanceList();
+        const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
 
         console.log(`✍️ Collab knowledge routing: selected [${selectedKeys.join(', ')}] for input: "${message.slice(0, 80)}..."`);
 
@@ -8904,8 +9012,8 @@ Write 2-4 sentences that:
 3. Generic filler (sand, mist, frangipani, morphine, bandages, Nevermore) is FORBIDDEN unless Elena's input demands it.
 ═══════════════════════════════════════════════════════════════
 
-📚 SELECTED KNOWLEDGE (only modules relevant to this input — use sparingly as background):
-${selectedKB}
+📚 FULL KNOWLEDGE + CANON (router hint: ${selectedKeys.join(', ')}):
+${fullKnowledgeBlock}
 
 ${collabLang === 'english'
   ? `Elena is writing in ENGLISH. Continue in ENGLISH. Poetic, raw — but English.`
@@ -8954,8 +9062,9 @@ _Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
       // 🧠 Get emotional guidelines for response
       const emotionalGuidelines = getEmotionalGuidelines(responseMood);
       
-      const { knowledge: selectedKB, externalNote, selectedKeys: textSelKeys } = selectKnowledgeForInput(message || '', []);
+      const { externalNote, selectedKeys: textSelKeys } = selectKnowledgeForInput(message || '', []);
       console.log(`💬 Text knowledge routing: selected [${textSelKeys.join(', ')}] for: "${(message || '').slice(0, 80)}..."`);
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
 
       // Detect language Elena is using
       const elenaLang = message && /[a-zA-Z]{4,}/.test(message) && !/[а-яА-ЯёЁ]{3,}/.test(message) ? 'english' : 'russian';
@@ -9011,8 +9120,8 @@ HOW TO RESPOND:
 
 Keep response concise for Telegram. Match her energy.
 
-📚 SELECTED KNOWLEDGE (only modules relevant to her message):
-${selectedKB}
+📚 FULL KNOWLEDGE + CANON #001–#048 (router hint: ${textSelKeys.join(', ')} — use deep unique facts across domains):
+${fullKnowledgeBlock}
 
 ═══════════════════════════════════════════════════════════════
 🌐 LANGUAGE — ABSOLUTE FINAL OVERRIDE (this overrides ALL previous language rules above):
@@ -9060,6 +9169,8 @@ ${elenaLang === 'english'
       
       // Start proactive inspiration scheduler
       startProactiveScheduler(atuonaBot!);
+      
+      getUndergroundCanonCorpus().catch((e) => console.error('📚 Canon corpus prefetch failed:', e));
       
       // Start auto-save
       startAutoSave();
