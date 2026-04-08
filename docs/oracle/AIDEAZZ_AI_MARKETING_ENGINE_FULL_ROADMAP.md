@@ -64,6 +64,33 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | noscript content block | DONE | Full static HTML in index.html for AI crawlers that don't execute JavaScript — all 9 agents described, tech stack, metrics, FAQs |
 | Positioning update (EN + ES) | DONE | "Executive-Turned-AI-Builder" in both languages |
 
+### Phase 1c: OG Image & Social Sharing Fix — DONE
+
+| Task | Status | Details |
+|---|---|---|
+| OG image optimized | DONE | Created `elena-og.jpg` (1200x630, 133KB) from original (2688x3840, 2.1MB) — fixes WhatsApp/LinkedIn/Twitter sharing |
+| All og:image refs updated | DONE | index.html, BusinessCard.tsx, About.tsx — all point to optimized image |
+| Team nav link added | DONE | "Team" (EN) / "Equipo" (ES) links to `#team` anchor on homepage |
+| Founder section enriched | DONE | Career phases (Executive 2011-2018 + AI Builder 2025-Present) + stats grid (9 agents, $0/month, 76/24%, 12 months) added to VisionSection |
+| Social sharing validated | DONE | opengraph.xyz shows correct title, description, image for aideazz.xyz and /portfolio |
+
+### Phase 1d: GA4 Analytics — CONFIRMED WORKING
+
+| Task | Status | Details |
+|---|---|---|
+| GA4 measurement tag on website | DONE | `G-TL5S8V23LT` in index.html `<head>` — tracks all pages (SPA) |
+| GA4 Property ID configured | DONE | `515154124` — set in Oracle server `.env` |
+| Service account credentials | DONE | `aideazz-analytics-reader@vaulted-circle-368018` — active, authenticated |
+| GA4 Data API backend | DONE | `performance_tracker.py` in VJH — pulls users, sessions, pageviews, traffic sources |
+| GA4 dashboard routes | DONE | FastAPI `/analytics/dashboard` and `/analytics/metrics` endpoints built |
+| Live data confirmed | DONE | API returns real data: 189 users, 215 sessions, 242 pageviews (7-day window, April 8, 2026) |
+
+### GSC Indexing Status — NORMAL
+
+| Item | Status | Details |
+|---|---|---|
+| "Redirect page" warning | NORMAL | `/card` → `/portfolio` 301 redirect — Google correctly indexes /portfolio as canonical, marks /card as redirect. Not an error. |
+
 ### Phases 2-6: NOT STARTED
 
 | Phase | Status | Next Action |
@@ -522,7 +549,7 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 7, 2026 (v2 — added competitive positioning + Phase 1 implementation status)
+> Document version: April 8, 2026 (v3 — Phase 1 fully complete, GA4 confirmed, OG fixed)
 > Aligned with: CAREER_FOCUS.md v3 (Honest Edition), SKILL.md v1.3
-> Phase 1 status: COMPLETE (GEO foundation + sitemap + GSC verified)
-> Next review: After Phase 2 completion
+> Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
+> Next: Phase 2 — Blog Auto-Publisher
