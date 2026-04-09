@@ -672,8 +672,9 @@ async function startCTOAIPA() {
   app.get('/hashnode/daily-status', (_req, res) => {
     res.json({
       enabled: process.env.HASHNODE_DAILY_ENABLED === 'true',
-      cronUtc: process.env.HASHNODE_DAILY_CRON || '0 13 * * *',
-      timezone: process.env.HASHNODE_DAILY_TZ || 'UTC',
+      cron: process.env.HASHNODE_DAILY_CRON || '30 9 * * *',
+      timezone: process.env.HASHNODE_DAILY_TZ || 'America/Panama',
+      note: 'Default 09:30 Panama City (UTC−5); override HASHNODE_DAILY_CRON / HASHNODE_DAILY_TZ',
       publicFeed: process.env.HASHNODE_DAILY_PUBLIC === 'true',
       topicCount: HASHNODE_TOPIC_BRIEFS.length,
       manualTriggerConfigured: !!process.env.HASHNODE_DAILY_TRIGGER_SECRET,

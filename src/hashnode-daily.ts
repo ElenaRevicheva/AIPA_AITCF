@@ -290,7 +290,9 @@ export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model:
     console.log("📰 Hashnode daily: off (set HASHNODE_DAILY_ENABLED=true to schedule)");
     return null;
   }
-  const cronExpr = process.env.HASHNODE_DAILY_CRON || "0 13 * * *";
+  // Default: 09:30 every day, America/Panama (UTC−5, Panama City — no DST)
+  const cronExpr = process.env.HASHNODE_DAILY_CRON || "30 9 * * *";
+  const tz = process.env.HASHNODE_DAILY_TZ || "America/Panama";
   const job = cron.schedule(
     cronExpr,
     async () => {
@@ -300,8 +302,10 @@ export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model:
         console.error("📰 Hashnode daily error:", e);
       }
     },
-    { timezone: process.env.HASHNODE_DAILY_TZ || "UTC" }
+    { timezone: tz }
   );
-  console.log(`📰 Hashnode daily: scheduled ${cronExpr} (${process.env.HASHNODE_DAILY_TZ || "UTC"}) — public feed: ${process.env.HASHNODE_DAILY_PUBLIC === "true" ? "yes" : "no (delisted)"}`);
+  console.log(
+    `📰 Hashnode daily: scheduled ${cronExpr} (${tz}) — public feed: ${process.env.HASHNODE_DAILY_PUBLIC === "true" ? "yes" : "no (delisted)"}`
+  );
   return job;
 }
