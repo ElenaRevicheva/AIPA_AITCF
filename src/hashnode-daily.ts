@@ -6,8 +6,33 @@ import * as cron from "node-cron";
 import * as fs from "fs";
 import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
+import { saveContentLog } from "./database";
 
 const GQL = "https://gql.hashnode.com/";
+
+/** Optional: set TELEGRAM_HASHNODE_NOTIFY_CHAT_ID + TELEGRAM_BOT_TOKEN for post alerts */
+async function notifyTelegramHashnodePublished(title: string, url: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const chatId = process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim();
+  if (!token || !chatId) return;
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: `📰 Hashnode published\n\n${title}\n${url}`,
+        disable_web_page_preview: false,
+      }),
+    });
+    if (!r.ok) {
+      const t = await r.text();
+      console.error("📰 Telegram notify failed:", r.status, t);
+    }
+  } catch (e) {
+    console.error("📰 Telegram notify error:", e);
+  }
+}
 
 /** Rotating briefs — aligned with marketing roadmap; one per calendar day when enabled. */
 export const HASHNODE_TOPIC_BRIEFS: Array<{ keyword: string; brief: string }> = [
@@ -282,6 +307,17 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   writeTopicIndex(index);
   console.log(`📰 Hashnode daily: published — ${post.url} (${delisted ? "delisted" : "public feed"})`);
+
+  await saveContentLog({
+    channel: "hashnode_daily",
+    keyword,
+    title: post.title,
+    url: post.url,
+    status: "published",
+    topicIndex: index,
+  });
+  await notifyTelegramHashnodePublished(post.title, post.url);
+
   return { title: post.title, url: post.url, topicIndex: index };
 }
 

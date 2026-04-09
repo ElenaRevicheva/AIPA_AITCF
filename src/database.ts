@@ -1303,6 +1303,108 @@ async function getOutcomeSummary(hoursBack: number = 24): Promise<{
 }
 
 // =============================================================================
+// CONTENT LOG — Marketing engine (Hashnode daily + future channels)
+// Roadmap: AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md Phase 2
+// =============================================================================
+
+async function initContentLogTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE content_log (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          channel VARCHAR2(40) NOT NULL,
+          keyword VARCHAR2(500),
+          title VARCHAR2(500) NOT NULL,
+          url VARCHAR2(1000) NOT NULL,
+          status VARCHAR2(40) DEFAULT ''published'',
+          topic_index NUMBER,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ content_log table ready');
+  } catch (err) {
+    console.error('content_log table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveContentLog(params: {
+  channel: string;
+  keyword?: string;
+  title: string;
+  url: string;
+  status?: string;
+  topicIndex?: number;
+}): Promise<string | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO content_log (channel, keyword, title, url, status, topic_index)
+       VALUES (:channel, :keyword, :title, :url, :status, :topicIndex)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        channel: params.channel,
+        keyword: params.keyword ?? null,
+        title: params.title,
+        url: params.url,
+        status: params.status ?? 'published',
+        topicIndex: params.topicIndex ?? null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 }
+      },
+      { autoCommit: true }
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds.id[0] || null;
+  } catch (err) {
+    console.error('❌ saveContentLog error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getRecentContentLogs(limit: number = 30): Promise<
+  Array<{
+    id: string;
+    channel: string;
+    keyword: string | null;
+    title: string;
+    url: string;
+    status: string;
+    topic_index: number | null;
+    created_at: Date;
+  }>
+> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) as id, channel, keyword, title, url, status, topic_index, created_at
+       FROM content_log
+       ORDER BY created_at DESC
+       FETCH FIRST :limit ROWS ONLY`,
+      { limit },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    return (result.rows as any[]) || [];
+  } catch (err) {
+    console.error('❌ getRecentContentLogs error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+// =============================================================================
 // BUSINESS LEADS — Track engagement signals from LinkedIn/social/inbound
 // =============================================================================
 
@@ -1605,6 +1707,7 @@ initHealthTable();
 initConversationContextTable();
 initKnowledgeBaseTable();
 initAgentOutcomesTable();
+initContentLogTable();
 initBusinessLeadsTable();
 initEspaluzFunnelTable();
 
@@ -1654,6 +1757,9 @@ export {
   verifyAgentOutcome,
   getAgentOutcomes,
   getOutcomeSummary,
+  // Content log — marketing publishes (Hashnode, etc.)
+  saveContentLog,
+  getRecentContentLogs,
   // Business Leads — engagement signal tracking
   saveLead,
   updateLead,

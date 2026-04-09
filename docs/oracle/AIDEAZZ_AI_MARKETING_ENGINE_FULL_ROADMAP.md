@@ -33,9 +33,9 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
-## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 STARTED
+## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE
 
-> Updated: April 9, 2026
+> Updated: April 10, 2026
 
 ### Phase 1a: SEO Health Audit — DONE
 
@@ -91,27 +91,26 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 |---|---|---|
 | "Redirect page" warning | NORMAL | `/card` → `/portfolio` 301 redirect — Google correctly indexes /portfolio as canonical, marks /card as redirect. Not an error. |
 
-### Phase 2: Blog & distribution (Hashnode) — IN PROGRESS
+### Phase 2: Blog & distribution (Hashnode + aideazz.xyz) — MOSTLY COMPLETE
 
 | Task | Status | Details |
 |---|---|---|
-| Platform decision | DONE | **Hashnode** (GraphQL API). **Medium** closed off API access for new integrations — not viable for automation. |
-| Hashnode blog created | DONE | **AIdeazz — Applied AI & Agents** · [aideazz.hashnode.dev](https://aideazz.hashnode.dev) · subdomain `aideazz` |
-| Personal Access Token | DONE | Generated at [hashnode.com/settings/developer](https://hashnode.com/settings/developer); stored only in **`.env`** as `HASHNODE_ACCESS_TOKEN` on machines that publish (**never commit**). |
-| Publish tooling (this repo) | DONE | `scripts/hashnode-publish.mjs` — `publishPost` via `gql.hashnode.com`; `--public` for main feed; `--file path/to.md` (optional first line `# Title`); raw `Authorization` header per Hashnode API examples. |
-| Debug listing | DONE | `scripts/hashnode-list.mjs` — `npm run hashnode:list` prints `me.publications`. |
-| npm shortcuts | DONE | `hashnode:publish`, `hashnode:list`, `hashnode:publish:article` (wired to the long-form markdown below). |
-| API smoke test post | DONE | Delisted test post — validates token + publication id; optional cleanup in Hashnode dashboard. |
-| First public long-form essay | DONE | **From Boardroom to Build: What Running Nine Production AI Agents Actually Means** — live: [hashnode.dev/.../from-boardroom-to-build-...](https://aideazz.hashnode.dev/from-boardroom-to-build-what-running-nine-production-ai-agents-actually-means) · source in repo: `scripts/hashnode-posts/from-executive-to-ai-builder.md` · **April 9, 2026**. |
-| Self-hosted blog on **aideazz.xyz** (`/blog`, `/blog/:slug`) | DONE | **Marketing site repo** (Vite/React): Markdown in `src/content/blog/`, Article JSON-LD, sitemap entries, portfolio CTA strip. **Hashnode kept** as linked syndication (`hashnodeUrl` frontmatter), not deprecated. |
-| LLM assembly line + Oracle `content_log` + Telegram draft queue | NOT STARTED | Next: generate markdown from topic briefs, then call the same publish script (or `createDraft` + review). Roadmap template below still applies; **replace “WordPress REST API” with “Hashnode GraphQL”** for this stack. |
+| Platform decision | DONE | **Hashnode** (GraphQL API). **Medium** not viable for new integrations. |
+| Hashnode blog + PAT + publish scripts | DONE | `scripts/hashnode-publish.mjs`, `hashnode-list.mjs`, npm scripts; token in `.env` only. |
+| **Daily automated Hashnode publisher** | DONE | **AIPA_AITCF** `src/hashnode-daily.ts` — Claude long-form → `publishPost`; cron **09:30 `America/Panama`**; opt-in `HASHNODE_DAILY_ENABLED=true`; runs on Oracle **PM2 `cto-aipa`**. |
+| Manual trigger | DONE | `POST /hashnode/daily-run` with `Authorization: Bearer <HASHNODE_DAILY_TRIGGER_SECRET>`. |
+| First public long-form essay | DONE | **From Boardroom to Build…** — [on Hashnode](https://aideazz.hashnode.dev/from-boardroom-to-build-what-running-nine-production-ai-agents-actually-means); source `scripts/hashnode-posts/from-executive-to-ai-builder.md`. |
+| **Portfolio blog + live Hashnode sync** | DONE | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** repo: `/blog`, `/blog/:slug`, public GraphQL sync (no `gray-matter` in browser — fixed **Buffer** error), portfolio CTA; deploy **4everland** from `main` (not Fleek). |
+| **Oracle `content_log`** | DONE | Table `content_log` in **AIPA_AITCF** `src/database.ts`; each successful daily publish writes `channel=hashnode_daily`, keyword, title, url, topic_index. `getRecentContentLogs()` for future dashboards. |
+| **Telegram notify on publish** | DONE (optional) | `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` + `TELEGRAM_BOT_TOKEN` — sends one message with title + URL after publish. |
+| **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule; optional: `createDraft` + Telegram approval — same roadmap prompts, Hashnode GraphQL instead of WordPress. |
 
-### Phases 3-6: NOT STARTED
+### Phase 3: UTM Attribution — NEXT
 
 | Phase | Status | Next Action |
 |---|---|---|
-| Phase 3: UTM Attribution | NOT STARTED | Add contact form + UTM capture to aideazz.xyz |
-| Phase 4: Founder Outreach Pipeline | NOT STARTED | 8 outreach messages drafted, ready to send |
+| Phase 3: UTM Attribution | **NEXT** | Contact/inquiry form on **aideazz.xyz** with hidden UTM fields → webhook POST to **CTO AIPA** → Oracle `leads` or extend `business_leads` with UTM columns; weekly digest via Telegram (Monday 09:00 UTC). |
+| Phase 4: Founder Outreach Pipeline | NOT STARTED | After Phase 3; Resend + dedicated domain; cap volume. |
 | Phase 5: Lead Triage Dashboard | NOT STARTED | Depends on Phase 3 + 4 data |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
 
@@ -565,7 +564,7 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 9, 2026 (v4 — Phase 2 started: Hashnode blog live + publish scripts + first long-form essay)
+> Document version: April 10, 2026 (v5 — Phase 2 mostly complete: daily Hashnode + portfolio live sync + Oracle `content_log` + optional Telegram notify; **Phase 3 UTM next**)
 > Aligned with: CAREER_FOCUS.md v3 (Honest Edition), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
 > Phase 2 status: IN PROGRESS — Hashnode at aideazz.hashnode.dev; AIPA_AITCF: `scripts/hashnode-publish.mjs`, `scripts/hashnode-posts/from-executive-to-ai-builder.md`; LLM+Oracle assembly line still to wire
