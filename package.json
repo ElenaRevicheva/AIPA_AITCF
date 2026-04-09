@@ -8,7 +8,8 @@
     "start": "node dist/cto-aipa.js",
     "dev": "tsc && node dist/cto-aipa.js",
     "hashnode:publish": "node scripts/hashnode-publish.mjs",
-    "hashnode:list": "node scripts/hashnode-list.mjs"
+    "hashnode:list": "node scripts/hashnode-list.mjs",
+    "hashnode:publish:article": "node scripts/hashnode-publish.mjs --public --file scripts/hashnode-posts/from-executive-to-ai-builder.md"
   },
   "keywords": [],
   "author": "Elena Revicheva",

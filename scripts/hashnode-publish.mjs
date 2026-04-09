@@ -3,10 +3,13 @@
  * Secrets: HASHNODE_ACCESS_TOKEN in .env only (never commit .env).
  *
  * Usage:
- *   node scripts/hashnode-publish.mjs              # delisted smoke post
- *   node scripts/hashnode-publish.mjs --public       # same post, visible in feed
+ *   node scripts/hashnode-publish.mjs                    # delisted smoke post
+ *   node scripts/hashnode-publish.mjs --public --file scripts/hashnode-posts/article.md
+ *   HASHNODE_POST_FILE=... HASHNODE_POST_TITLE=... node scripts/hashnode-publish.mjs --public
+ * First line of markdown file may be "# Title" (title stripped from body for Hashnode).
  * Docs: https://apidocs.hashnode.com/
  */
+import fs from "fs";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -122,6 +125,22 @@ function pickPublication(me, publicationId, subdomainHint) {
   );
 }
 
+/** @param {string} filePath relative to repo root or absolute */
+function loadMarkdownFile(filePath) {
+  const abs = path.isAbsolute(filePath)
+    ? filePath
+    : path.join(path.dirname(fileURLToPath(import.meta.url)), "..", filePath);
+  const raw = fs.readFileSync(abs, "utf8");
+  const lines = raw.split(/\r?\n/);
+  let title = null;
+  let body = raw.trim();
+  if (lines[0]?.startsWith("# ")) {
+    title = lines[0].slice(2).trim();
+    body = lines.slice(1).join("\n").replace(/^\s+/, "").trim();
+  }
+  return { title, body, abs };
+}
+
 async function main() {
   const token = process.env.HASHNODE_ACCESS_TOKEN;
   if (!token) {
@@ -129,7 +148,14 @@ async function main() {
     process.exit(1);
   }
 
-  const wantPublic = process.argv.includes("--public");
+  const argv = process.argv;
+  const wantPublic = argv.includes("--public");
+  let fileArg = null;
+  const fi = argv.indexOf("--file");
+  if (fi >= 0 && argv[fi + 1]) fileArg = argv[fi + 1];
+  if (!fileArg && process.env.HASHNODE_POST_FILE?.trim()) {
+    fileArg = process.env.HASHNODE_POST_FILE.trim();
+  }
   const data = await gql(ME, {}, token);
   const me = data.me;
   if (!me) throw new Error("me: null — check token at https://hashnode.com/settings/developer");
@@ -153,11 +179,19 @@ async function main() {
     console.log("Using publication (by host):", host, "→", pub.id);
   }
 
-  const title =
-    process.env.HASHNODE_POST_TITLE?.trim() ||
+  let title = process.env.HASHNODE_POST_TITLE?.trim() || null;
+  let body = process.env.HASHNODE_POST_MARKDOWN?.trim() || null;
+  if (fileArg) {
+    const loaded = loadMarkdownFile(fileArg);
+    title = title || loaded.title;
+    body = body || loaded.body;
+    console.log("Post file:", loaded.abs);
+  }
+  title =
+    title ||
     `CTO AIPA — Hashnode API smoke test (${new Date().toISOString().slice(0, 16)} UTC)`;
-  const body =
-    process.env.HASHNODE_POST_MARKDOWN?.trim() ||
+  body =
+    body ||
     [
       "This is an **automated smoke test** from the CTO AIPA repo (`scripts/hashnode-publish.mjs`).",
       "",
@@ -173,7 +207,9 @@ async function main() {
     contentMarkdown: body,
     tags: [
       { slug: "ai", name: "AI" },
+      { slug: "machine-learning", name: "Machine Learning" },
       { slug: "programming", name: "Programming" },
+      { slug: "startup", name: "Startup" },
     ],
     settings: {
       delisted: !wantPublic,
