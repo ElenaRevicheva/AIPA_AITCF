@@ -609,6 +609,7 @@ async function startCTOAIPA() {
   console.log('🔍 Features: Code Review, Push Monitoring, Ask CTO, CMO Integration');
   
   const app = express();
+  app.set('trust proxy', 1); // behind nginx (webhook.aideazz.xyz → /cto/)
   app.use(express.json());
   
   // Health check & status
