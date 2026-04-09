@@ -41,14 +41,19 @@ export async function verifyRecaptchaV3Token(
       'error-codes'?: string[];
     };
     if (!data.success) {
+      const codes = data['error-codes']?.join(',') ?? 'none';
+      console.warn('verifyRecaptchaV3Token: success=false', { 'error-codes': codes });
       return { ok: false, reason: 'captcha_failed' };
     }
-    const minScore = Number(process.env.RECAPTCHA_MIN_SCORE ?? 0.35);
+    // v3 scores ~0.1 for risky traffic; Incognito/VPN often land 0.2–0.4. Default 0.2 avoids false blocks.
+    const minScore = Number(process.env.RECAPTCHA_MIN_SCORE ?? 0.2);
     const score = data.score ?? 0;
     if (score < minScore) {
+      console.warn('verifyRecaptchaV3Token: low score', { score, minScore, action: data.action });
       return { ok: false, reason: 'captcha_low_score' };
     }
     if (data.action && data.action !== 'inquiry') {
+      console.warn('verifyRecaptchaV3Token: bad action', { action: data.action });
       return { ok: false, reason: 'captcha_bad_action' };
     }
     return { ok: true };
