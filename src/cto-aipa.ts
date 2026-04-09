@@ -13,6 +13,11 @@ import { initTelegramBot } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
 import { startHashnodeDailyPublisher, runDailyHashnodePost, HASHNODE_TOPIC_BRIEFS } from './hashnode-daily';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
+import {
+  getResendApiKey,
+  scheduleMarketingInquiryEmails,
+  verifyRecaptchaV3Token,
+} from './marketing-notify';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
@@ -792,8 +797,10 @@ async function startCTOAIPA() {
       ok: true,
       inquiryEndpointConfigured: !!process.env.MARKETING_INQUIRY_SECRET?.trim(),
       inquiryProxyUrl: base ? `${base}/marketing/inquiry-proxy` : null,
+      emailNotifyConfigured: !!getResendApiKey(),
+      captchaConfigured: !!process.env.RECAPTCHA_SECRET_KEY?.trim(),
       note:
-        'aideazz.xyz: POST /marketing/inquiry-proxy (CORS + origin check; no secret in browser). Server automation: POST /marketing/inquiry with Bearer.',
+        'Emails via Resend (RESEND_API_KEY or RESEND_KEY). Optional reCAPTCHA v3: RECAPTCHA_SECRET_KEY + aideazz VITE_RECAPTCHA_SITE_KEY.',
     });
   });
 
@@ -841,6 +848,15 @@ async function startCTOAIPA() {
       res.status(500).json({ error: 'Failed to save inquiry' });
       return;
     }
+    const emailFields: Parameters<typeof scheduleMarketingInquiryEmails>[1] = {};
+    if (name !== undefined) emailFields.name = name;
+    if (contactEmail !== undefined) emailFields.contactEmail = contactEmail;
+    if (message !== undefined) emailFields.message = message;
+    if (utm_source !== undefined) emailFields.utm_source = utm_source;
+    if (utm_medium !== undefined) emailFields.utm_medium = utm_medium;
+    if (utm_campaign !== undefined) emailFields.utm_campaign = utm_campaign;
+    if (page_url !== undefined) emailFields.page_url = page_url;
+    scheduleMarketingInquiryEmails(id, emailFields);
     res.json({ ok: true, id });
   });
 
@@ -884,6 +900,12 @@ async function startCTOAIPA() {
       res.status(400).json({ error: 'Bad request' });
       return;
     }
+    const recaptcha_token = typeof b.recaptcha_token === 'string' ? b.recaptcha_token : undefined;
+    const captcha = await verifyRecaptchaV3Token(recaptcha_token, getMarketingClientIp(req));
+    if (!captcha.ok) {
+      res.status(400).json({ error: 'Verification failed', code: captcha.reason });
+      return;
+    }
     const name = typeof b.name === 'string' ? b.name : undefined;
     const contactEmail =
       typeof b.email === 'string' ? b.email : typeof b.contactEmail === 'string' ? b.contactEmail : undefined;
@@ -916,6 +938,15 @@ async function startCTOAIPA() {
       res.status(500).json({ error: 'Failed to save inquiry' });
       return;
     }
+    const proxyEmailFields: Parameters<typeof scheduleMarketingInquiryEmails>[1] = {};
+    if (name !== undefined) proxyEmailFields.name = name;
+    if (contactEmail !== undefined) proxyEmailFields.contactEmail = contactEmail;
+    if (message !== undefined) proxyEmailFields.message = message;
+    if (utm_source !== undefined) proxyEmailFields.utm_source = utm_source;
+    if (utm_medium !== undefined) proxyEmailFields.utm_medium = utm_medium;
+    if (utm_campaign !== undefined) proxyEmailFields.utm_campaign = utm_campaign;
+    if (page_url !== undefined) proxyEmailFields.page_url = page_url;
+    scheduleMarketingInquiryEmails(id, proxyEmailFields);
     res.json({ ok: true, id });
   });
 
