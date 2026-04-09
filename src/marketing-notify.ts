@@ -16,18 +16,20 @@ export async function verifyRecaptchaV3Token(
   remoteIp: string | undefined
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
   const secret = process.env.RECAPTCHA_SECRET_KEY?.trim();
-  if (!secret) {
+  const enterpriseProjectId = process.env.RECAPTCHA_ENTERPRISE_PROJECT_ID?.trim();
+  const enterpriseApiKey = process.env.RECAPTCHA_ENTERPRISE_API_KEY?.trim();
+  const siteKey = process.env.RECAPTCHA_SITE_KEY?.trim();
+  const enterpriseReady = !!(enterpriseProjectId && enterpriseApiKey && siteKey);
+
+  // Skip verification only when nothing is configured (no classic secret and no full Enterprise triple).
+  if (!secret && !enterpriseReady) {
     return { ok: true };
   }
   if (!token?.trim()) {
     return { ok: false, reason: 'captcha_required' };
   }
 
-  const enterpriseProjectId = process.env.RECAPTCHA_ENTERPRISE_PROJECT_ID?.trim();
-  const enterpriseApiKey = process.env.RECAPTCHA_ENTERPRISE_API_KEY?.trim();
-  const siteKey = process.env.RECAPTCHA_SITE_KEY?.trim();
-
-  if (enterpriseProjectId && enterpriseApiKey && siteKey) {
+  if (enterpriseReady) {
     const ent = await verifyRecaptchaEnterprise(
       token,
       siteKey,
@@ -36,11 +38,17 @@ export async function verifyRecaptchaV3Token(
       remoteIp
     );
     if (ent.ok) return ent;
-    // Wrong GCP project or API key → Enterprise fails; classic siteverify may still work for non-Enterprise keys.
+    if (!secret) {
+      return { ok: false, reason: ent.reason };
+    }
     console.warn(
       'verifyRecaptchaV3Token: Enterprise verification failed, falling back to classic siteverify:',
       ent.reason
     );
+  }
+
+  if (!secret) {
+    return { ok: false, reason: 'captcha_error' };
   }
 
   const body = new URLSearchParams();
