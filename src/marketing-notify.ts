@@ -74,7 +74,11 @@ export async function sendMarketingInquiryEmails(params: {
     return;
   }
 
-  const teamTo = process.env.MARKETING_INQUIRY_NOTIFY_TO?.trim() || 'aipa@aideazz.xyz';
+  const teamToRaw = process.env.MARKETING_INQUIRY_NOTIFY_TO?.trim() || 'aipa@aideazz.xyz';
+  const teamRecipients = teamToRaw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const from = process.env.MARKETING_INQUIRY_FROM?.trim() || 'AIdeazz <onboarding@resend.dev>';
   const sendConfirmation = process.env.MARKETING_INQUIRY_SEND_CONFIRMATION !== 'false';
 
@@ -113,33 +117,56 @@ export async function sendMarketingInquiryEmails(params: {
     });
     if (!r.ok) {
       const t = await r.text();
-      throw new Error(`Resend ${r.status}: ${t}`);
+      const err = new Error(`Resend ${r.status}: ${t}`);
+      if (r.status === 403 && t.includes('verify a domain')) {
+        console.error(
+          '📧 Resend: unverified sender — verify aideazz.xyz at https://resend.com/domains and set MARKETING_INQUIRY_FROM to an address on that domain. Until then, Resend test mode only delivers to your Resend account email.'
+        );
+      }
+      throw err;
     }
   };
 
-  await sendOne({
-    to: [teamTo],
-    subject: `[AIdeazz] Inquiry — ${params.name || params.contactEmail || 'contact'}`,
-    html: teamHtml,
-    ...(params.contactEmail?.includes('@') ? { reply_to: params.contactEmail } : {}),
-  });
+  let teamError: unknown;
+  try {
+    await sendOne({
+      to: teamRecipients,
+      subject: `[AIdeazz] Inquiry — ${params.name || params.contactEmail || 'contact'}`,
+      html: teamHtml,
+      ...(params.contactEmail?.includes('@') ? { reply_to: params.contactEmail } : {}),
+    });
+  } catch (e) {
+    teamError = e;
+    console.error('📧 marketing inquiry team email failed:', e);
+  }
 
   if (
     sendConfirmation &&
     params.contactEmail?.trim() &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(params.contactEmail.trim())
   ) {
-    const confirmHtml = `
+    try {
+      const confirmHtml = `
       <p>Hi${params.name ? ` ${esc(params.name)}` : ''},</p>
-      <p>We received your message on <strong>aideazz.xyz</strong>. Our team will review it and get back to you.</p>
-      <p style="color:#666;font-size:14px;">This is an automated confirmation — please reply if you need to add details.</p>
+      <p>Your message was <strong>submitted successfully</strong>. We received it from <strong>aideazz.xyz</strong>.</p>
+      <p>Our team will review it and get back to you at this email address when relevant.</p>
+      <p style="color:#666;font-size:14px;">This is an automated confirmation — you do not need to reply unless you want to add more details.</p>
       <p>— AIdeazz</p>
     `;
-    await sendOne({
-      to: [params.contactEmail.trim()],
-      subject: 'We received your inquiry — AIdeazz',
-      html: confirmHtml,
-    });
+      await sendOne({
+        to: [params.contactEmail.trim()],
+        subject: 'We received your inquiry — AIdeazz',
+        html: confirmHtml,
+      });
+    } catch (e) {
+      console.error('📧 marketing inquiry confirmation email failed:', e);
+    }
+  }
+
+  if (teamError) {
+    console.error(
+      '📧 Team inbox notify did not send; fix Resend domain / MARKETING_INQUIRY_FROM (see logs above). Client confirmation may still have been sent.'
+    );
   }
 }
 

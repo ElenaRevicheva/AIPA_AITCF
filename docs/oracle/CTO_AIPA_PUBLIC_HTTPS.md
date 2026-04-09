@@ -47,6 +47,13 @@ Use `npm ci` (not `npm ci --omit=dev`) so `typescript` / `tsc` is available for 
 
 ### Inquiry emails (Resend)
 
+Each successful form submission triggers **two** emails (via Resend), when your sender/domain allows it:
+
+1. **Team** — `MARKETING_INQUIRY_NOTIFY_TO` (default `aipa@aideazz.xyz`).
+2. **Client confirmation** — the address they typed in the form (unless `MARKETING_INQUIRY_SEND_CONFIRMATION=false`).
+
+With Resend’s **test** sender (`onboarding@resend.dev`), delivery to arbitrary addresses is blocked until you **verify `aideazz.xyz`** at [resend.com/domains](https://resend.com/domains) and set `MARKETING_INQUIRY_FROM` to an address on that domain (e.g. `AIdeazz <noreply@aideazz.xyz>`). Then both team and client notifications work.
+
 `GET …/marketing/inquiry-status` shows `emailNotifyConfigured: true` when `RESEND_API_KEY` (or `RESEND_KEY`) is set in `.env`.
 
 From Windows, after setting the key in your shell (never commit it):
