@@ -31,6 +31,33 @@ CTO_AIPA_PUBLIC_URL=https://webhook.aideazz.xyz/cto
 
 Then: `pm2 restart cto-aipa --update-env`
 
+### Deploy code updates on Oracle
+
+SSH: `ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90`
+
+```bash
+cd ~/cto-aipa
+git pull
+npm ci
+npm run build
+pm2 restart cto-aipa --update-env
+```
+
+Use `npm ci` (not `npm ci --omit=dev`) so `typescript` / `tsc` is available for the build.
+
+### Inquiry emails (Resend)
+
+`GET …/marketing/inquiry-status` shows `emailNotifyConfigured: true` when `RESEND_API_KEY` (or `RESEND_KEY`) is set in `.env`.
+
+From Windows, after setting the key in your shell (never commit it):
+
+```powershell
+$env:RESEND_API_KEY = "re_..."
+# Optional verified sender in Resend:
+# $env:MARKETING_INQUIRY_FROM = "AIdeazz <noreply@aideazz.xyz>"
+.\scripts\oracle-resilience\set_resend_on_oracle.ps1
+```
+
 ## How it works (one picture)
 
 ```mermaid
