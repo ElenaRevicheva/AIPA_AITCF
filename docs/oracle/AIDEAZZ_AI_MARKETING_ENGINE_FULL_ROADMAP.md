@@ -35,7 +35,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE
 
-> Updated: April 10, 2026
+> Updated: April 9, 2026
 
 ### Phase 1a: SEO Health Audit — DONE
 
@@ -105,11 +105,13 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | **Telegram notify on publish** | DONE (optional) | `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` + `TELEGRAM_BOT_TOKEN` — sends one message with title + URL after publish. |
 | **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule; optional: `createDraft` + Telegram approval — same roadmap prompts, Hashnode GraphQL instead of WordPress. |
 
-### Phase 3: UTM Attribution — COMPLETE (end-to-end)
+### Phase 3: UTM Attribution — COMPLETE (end-to-end, production)
 
-| Phase | Status | Next Action |
+| Phase | Status | What shipped |
 |---|---|---|
-| Phase 3: UTM Attribution | **COMPLETE** | **aideazz** repo: `InquiryForm` + UTM from URL → `POST …/marketing/inquiry-proxy` (no secret in browser). **CTO AIPA:** `business_leads` + UTM; `POST /marketing/inquiry` (Bearer) for automation; `POST /marketing/inquiry-proxy` (Origin allowlist + honeypot + rate limit) for the public site; weekly Telegram digest. **Public:** `https://webhook.aideazz.xyz/cto` — see `docs/oracle/CTO_AIPA_PUBLIC_HTTPS.md`. **Deploy:** push aideazz → 4everland; Oracle already runs CTO + nginx. |
+| Phase 3: UTM + inquiry pipeline | **COMPLETE** | **aideazz:** `InquiryForm` — UTM from URL → `POST https://webhook.aideazz.xyz/cto/marketing/inquiry-proxy` (no Bearer in browser). **CTO AIPA (Oracle):** `business_leads` in Oracle; `POST /marketing/inquiry` (Bearer) for automation; `POST /marketing/inquiry-proxy` (Origin allowlist for `aideazz.xyz` / `www`, honeypot `company`, per-IP rate limit). **Weekly Telegram digest** of new leads (optional env). **Docs:** `docs/oracle/CTO_AIPA_PUBLIC_HTTPS.md`. |
+| Phase 3b: Email notifications | **COMPLETE** | **Resend** via `RESEND_API_KEY`. Team inbox: `MARKETING_INQUIRY_NOTIFY_TO` (default `aipa@aideazz.xyz`). Submitter gets confirmation email when address is valid. **Sender:** `MARKETING_INQUIRY_FROM` — production uses verified **`AIdeazz <aipa@aideazz.xyz>`** (same domain pattern as VibeJobHunter). Implementation: `src/marketing-notify.ts`. |
+| Phase 3c: reCAPTCHA v3 (invisible) | **COMPLETE (code)** | **aideazz:** `src/lib/recaptcha.ts` + `VITE_RECAPTCHA_SITE_KEY` (build env); `InquiryForm` sends `recaptcha_token` with action `inquiry`. **CTO AIPA:** `verifyRecaptchaV3Token` + `RECAPTCHA_SECRET_KEY` on Oracle; optional `RECAPTCHA_MIN_SCORE` (default 0.35). If the secret is **unset**, verification is skipped (backward compatible). **Rollout order:** (1) Create v3 keys at [Google reCAPTCHA admin](https://www.google.com/recaptcha/admin) for `aideazz.xyz`. (2) Add **`VITE_RECAPTCHA_SITE_KEY`** to the static host build (4everland). (3) Add **`RECAPTCHA_SECRET_KEY`** to `~/cto-aipa/.env` and `pm2 restart cto-aipa --update-env`. Do **not** enable the secret on the server until the site ships the site key, or submissions will fail with `captcha_required`. |
 | Phase 4: Founder Outreach Pipeline | NOT STARTED | After Phase 3 site wiring; Resend + dedicated domain; cap volume. |
 | Phase 5: Lead Triage Dashboard | NOT STARTED | Depends on Phase 3 + 4 data |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |

@@ -65,6 +65,14 @@ $env:RESEND_API_KEY = "re_..."
 .\scripts\oracle-resilience\set_resend_on_oracle.ps1
 ```
 
+### reCAPTCHA v3 (invisible)
+
+1. Create a **v3** key for `aideazz.xyz` in [Google reCAPTCHA admin](https://www.google.com/recaptcha/admin).
+2. **aideazz** build: set **`VITE_RECAPTCHA_SITE_KEY`** (public site key).
+3. **Oracle** `~/cto-aipa/.env`: set **`RECAPTCHA_SECRET_KEY`**, then `pm2 restart cto-aipa --update-env`.
+
+Ship the site key in the frontend **before** turning on the secret on the server, or submissions return `captcha_required`. See Phase 3c in `docs/oracle/AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md`.
+
 ## How it works (one picture)
 
 ```mermaid
