@@ -15,7 +15,8 @@ After nginx is configured (see repo `scripts/oracle-resilience/nginx-webhook-wit
 
 - **Base URL:** `https://webhook.aideazz.xyz/cto`
 - **Health / marketing status:** `GET https://webhook.aideazz.xyz/cto/marketing/inquiry-status`
-- **Marketing inquiry (Bearer secret):** `POST https://webhook.aideazz.xyz/cto/marketing/inquiry`
+- **Marketing inquiry from aideazz.xyz (browser, no secret):** `POST https://webhook.aideazz.xyz/cto/marketing/inquiry-proxy` — CORS + Origin/Referer allowlist, honeypot, rate limit.
+- **Marketing inquiry (Bearer, for automation):** `POST https://webhook.aideazz.xyz/cto/marketing/inquiry`
 - **GitHub webhook (if you point GitHub here):** `POST https://webhook.aideazz.xyz/cto/webhook/github`
 
 The `/cto/` prefix is stripped by nginx; Express still sees paths like `/marketing/inquiry-status`.

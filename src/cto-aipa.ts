@@ -574,14 +574,59 @@ Respond as a supportive technical co-founder would:
 // MARKETING — Phase 3 UTM / aideazz inquiry (CORS for static site → server proxy)
 // =============================================================================
 
+const MARKETING_AIDEAZZ_ORIGINS = new Set([
+  'https://aideazz.xyz',
+  'https://www.aideazz.xyz',
+  ...(process.env.MARKETING_CORS_ORIGINS?.split(',').map((s) => s.trim()).filter(Boolean) ?? []),
+]);
+
+/** In-memory rate limit for public inquiry-proxy (browser-safe path, no Bearer). */
+const inquiryProxyHits = new Map<string, number[]>();
+const INQUIRY_PROXY_WINDOW_MS = 15 * 60 * 1000;
+const INQUIRY_PROXY_MAX = Number(process.env.MARKETING_INQUIRY_PROXY_MAX_PER_WINDOW ?? 12);
+
+function getMarketingClientIp(req: Request): string {
+  const xff = req.headers['x-forwarded-for'];
+  if (typeof xff === 'string' && xff.trim()) {
+    const first = xff.split(',')[0];
+    return (first ?? xff).trim();
+  }
+  return req.socket.remoteAddress ?? 'unknown';
+}
+
+function allowInquiryProxyRate(ip: string): boolean {
+  const now = Date.now();
+  const windowStart = now - INQUIRY_PROXY_WINDOW_MS;
+  const prev = inquiryProxyHits.get(ip) ?? [];
+  const kept = prev.filter((t) => t > windowStart);
+  if (kept.length >= INQUIRY_PROXY_MAX) {
+    return false;
+  }
+  kept.push(now);
+  inquiryProxyHits.set(ip, kept);
+  return true;
+}
+
+function isAllowedAideazzSiteRequest(req: Request): boolean {
+  const origin = req.headers.origin;
+  if (origin && MARKETING_AIDEAZZ_ORIGINS.has(origin)) {
+    return true;
+  }
+  const referer = req.headers.referer ?? req.headers.referrer;
+  if (typeof referer === 'string') {
+    return (
+      referer.startsWith('https://aideazz.xyz/') ||
+      referer.startsWith('https://www.aideazz.xyz/') ||
+      referer === 'https://aideazz.xyz' ||
+      referer === 'https://www.aideazz.xyz'
+    );
+  }
+  return false;
+}
+
 function marketingInquiryCors(req: Request, res: Response, next: NextFunction) {
   const origin = req.headers.origin;
-  const allowed = new Set([
-    'https://aideazz.xyz',
-    'https://www.aideazz.xyz',
-    ...(process.env.MARKETING_CORS_ORIGINS?.split(',').map((s) => s.trim()).filter(Boolean) ?? []),
-  ]);
-  if (origin && allowed.has(origin)) {
+  if (origin && MARKETING_AIDEAZZ_ORIGINS.has(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -742,10 +787,13 @@ async function startCTOAIPA() {
   // ==========================================================================
 
   app.get('/marketing/inquiry-status', (_req, res) => {
+    const base = process.env.CTO_AIPA_PUBLIC_URL?.replace(/\/$/, '') || '';
     res.json({
       ok: true,
       inquiryEndpointConfigured: !!process.env.MARKETING_INQUIRY_SECRET?.trim(),
-      note: 'POST /marketing/inquiry with Authorization: Bearer <MARKETING_INQUIRY_SECRET> from a server-side proxy (do not put the secret in the browser).',
+      inquiryProxyUrl: base ? `${base}/marketing/inquiry-proxy` : null,
+      note:
+        'aideazz.xyz: POST /marketing/inquiry-proxy (CORS + origin check; no secret in browser). Server automation: POST /marketing/inquiry with Bearer.',
     });
   });
 
@@ -812,6 +860,63 @@ async function startCTOAIPA() {
       console.error('marketing/digest-run:', e);
       res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
+  });
+
+  // Public form endpoint: aideazz.xyz only (Origin/Referer), honeypot, rate limit — no Bearer in browser.
+  app.options('/marketing/inquiry-proxy', marketingInquiryCors);
+  app.post('/marketing/inquiry-proxy', marketingInquiryCors, async (req, res) => {
+    if (process.env.MARKETING_INQUIRY_PROXY_ENABLED === 'false') {
+      res.status(503).json({ error: 'Public inquiry proxy disabled' });
+      return;
+    }
+    if (!isAllowedAideazzSiteRequest(req)) {
+      res.status(403).json({ error: 'Forbidden' });
+      return;
+    }
+    const ip = getMarketingClientIp(req);
+    if (!allowInquiryProxyRate(ip)) {
+      res.status(429).json({ error: 'Too many requests' });
+      return;
+    }
+    const b = req.body as Record<string, unknown>;
+    const hp = typeof b.company === 'string' ? b.company : '';
+    if (hp.trim() !== '') {
+      res.status(400).json({ error: 'Bad request' });
+      return;
+    }
+    const name = typeof b.name === 'string' ? b.name : undefined;
+    const contactEmail =
+      typeof b.email === 'string' ? b.email : typeof b.contactEmail === 'string' ? b.contactEmail : undefined;
+    const message = typeof b.message === 'string' ? b.message : undefined;
+    const utm_source = typeof b.utm_source === 'string' ? b.utm_source : undefined;
+    const utm_medium = typeof b.utm_medium === 'string' ? b.utm_medium : undefined;
+    const utm_campaign = typeof b.utm_campaign === 'string' ? b.utm_campaign : undefined;
+    const utm_term = typeof b.utm_term === 'string' ? b.utm_term : undefined;
+    const utm_content = typeof b.utm_content === 'string' ? b.utm_content : undefined;
+    const page_url = typeof b.page_url === 'string' ? b.page_url : undefined;
+
+    if (!message?.trim() && !contactEmail?.trim() && !name?.trim()) {
+      res.status(400).json({ error: 'Provide at least name, email, or message' });
+      return;
+    }
+
+    const inquiry: Parameters<typeof saveMarketingInquiry>[0] = {};
+    if (name) inquiry.name = name;
+    if (contactEmail) inquiry.contactEmail = contactEmail;
+    if (message) inquiry.message = message;
+    if (utm_source) inquiry.utm_source = utm_source;
+    if (utm_medium) inquiry.utm_medium = utm_medium;
+    if (utm_campaign) inquiry.utm_campaign = utm_campaign;
+    if (utm_term) inquiry.utm_term = utm_term;
+    if (utm_content) inquiry.utm_content = utm_content;
+    if (page_url) inquiry.page_url = page_url;
+
+    const id = await saveMarketingInquiry(inquiry);
+    if (!id) {
+      res.status(500).json({ error: 'Failed to save inquiry' });
+      return;
+    }
+    res.json({ ok: true, id });
   });
 
   // ==========================================================================

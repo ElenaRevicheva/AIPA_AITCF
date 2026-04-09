@@ -33,7 +33,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
-## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 BACKEND LIVE
+## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE
 
 > Updated: April 10, 2026
 
@@ -105,11 +105,11 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | **Telegram notify on publish** | DONE (optional) | `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` + `TELEGRAM_BOT_TOKEN` — sends one message with title + URL after publish. |
 | **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule; optional: `createDraft` + Telegram approval — same roadmap prompts, Hashnode GraphQL instead of WordPress. |
 
-### Phase 3: UTM Attribution — BACKEND DONE · SITE WIRING NEXT
+### Phase 3: UTM Attribution — COMPLETE (end-to-end)
 
 | Phase | Status | Next Action |
 |---|---|---|
-| Phase 3: UTM Attribution | **BACKEND + HTTPS LIVE** | **Public base (Oracle nginx):** `https://webhook.aideazz.xyz/cto` — e.g. `GET /marketing/inquiry-status` → `https://webhook.aideazz.xyz/cto/marketing/inquiry-status`. Env: `CTO_AIPA_PUBLIC_URL=https://webhook.aideazz.xyz/cto`. See `docs/oracle/CTO_AIPA_PUBLIC_HTTPS.md`. **CTO AIPA:** `business_leads` + UTM; `POST /marketing/inquiry` (Bearer `MARKETING_INQUIRY_SECRET`) + CORS for aideazz.xyz; weekly Telegram digest `src/marketing-weekly-digest.ts`. **Still to do:** contact form on **aideazz** posting via **server-side proxy** to that HTTPS URL (secret stays on the server). |
+| Phase 3: UTM Attribution | **COMPLETE** | **aideazz** repo: `InquiryForm` + UTM from URL → `POST …/marketing/inquiry-proxy` (no secret in browser). **CTO AIPA:** `business_leads` + UTM; `POST /marketing/inquiry` (Bearer) for automation; `POST /marketing/inquiry-proxy` (Origin allowlist + honeypot + rate limit) for the public site; weekly Telegram digest. **Public:** `https://webhook.aideazz.xyz/cto` — see `docs/oracle/CTO_AIPA_PUBLIC_HTTPS.md`. **Deploy:** push aideazz → 4everland; Oracle already runs CTO + nginx. |
 | Phase 4: Founder Outreach Pipeline | NOT STARTED | After Phase 3 site wiring; Resend + dedicated domain; cap volume. |
 | Phase 5: Lead Triage Dashboard | NOT STARTED | Depends on Phase 3 + 4 data |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
@@ -564,7 +564,7 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 10, 2026 (v7 — Phase 3 HTTPS: `https://webhook.aideazz.xyz/cto` via nginx; **aideazz contact proxy next**)
+> Document version: April 10, 2026 (v8 — Phase 3 E2E: aideazz `InquiryForm` + UTM → Oracle + `inquiry-proxy` on HTTPS)
 > Aligned with: CAREER_FOCUS.md v3 (Honest Edition), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
 > Phase 2 status: IN PROGRESS — Hashnode at aideazz.hashnode.dev; AIPA_AITCF: `scripts/hashnode-publish.mjs`, `scripts/hashnode-posts/from-executive-to-ai-builder.md`; LLM+Oracle assembly line still to wire
