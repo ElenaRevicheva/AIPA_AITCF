@@ -16,12 +16,20 @@ dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 const GQL = "https://gql.hashnode.com/";
 
+/** Hashnode expects the PAT as the raw Authorization value (see hashnode.com blog API guide). */
+function authHeader(token) {
+  const t = (token || "").trim();
+  if (!t) return "";
+  return t.replace(/^Bearer\s+/i, "");
+}
+
 async function gql(query, variables, token) {
   const res = await fetch(GQL, {
     method: "POST",
     headers: {
+      Accept: "application/json",
       "Content-Type": "application/json",
-      Authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}`,
+      Authorization: authHeader(token),
     },
     body: JSON.stringify({ query, variables }),
   });

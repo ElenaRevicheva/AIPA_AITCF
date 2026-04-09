@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/cto-aipa.js",
     "dev": "tsc && node dist/cto-aipa.js",
-    "hashnode:publish": "node scripts/hashnode-publish.mjs"
+    "hashnode:publish": "node scripts/hashnode-publish.mjs",
+    "hashnode:list": "node scripts/hashnode-list.mjs"
   },
   "keywords": [],
   "author": "Elena Revicheva",
