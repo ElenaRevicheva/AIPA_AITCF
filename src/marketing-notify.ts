@@ -22,6 +22,27 @@ export async function verifyRecaptchaV3Token(
   if (!token?.trim()) {
     return { ok: false, reason: 'captcha_required' };
   }
+
+  const enterpriseProjectId = process.env.RECAPTCHA_ENTERPRISE_PROJECT_ID?.trim();
+  const enterpriseApiKey = process.env.RECAPTCHA_ENTERPRISE_API_KEY?.trim();
+  const siteKey = process.env.RECAPTCHA_SITE_KEY?.trim();
+
+  if (enterpriseProjectId && enterpriseApiKey && siteKey) {
+    const ent = await verifyRecaptchaEnterprise(
+      token,
+      siteKey,
+      enterpriseProjectId,
+      enterpriseApiKey,
+      remoteIp
+    );
+    if (ent.ok) return ent;
+    // Wrong GCP project or API key → Enterprise fails; classic siteverify may still work for non-Enterprise keys.
+    console.warn(
+      'verifyRecaptchaV3Token: Enterprise verification failed, falling back to classic siteverify:',
+      ent.reason
+    );
+  }
+
   const body = new URLSearchParams();
   body.set('secret', secret);
   body.set('response', token);
@@ -39,11 +60,13 @@ export async function verifyRecaptchaV3Token(
       success: boolean;
       score?: number;
       action?: string;
+      hostname?: string;
       'error-codes'?: string[];
     };
+    console.log('verifyRecaptchaV3Token: siteverify full response', JSON.stringify(data));
     if (!data.success) {
       const codes = data['error-codes']?.join(',') ?? 'none';
-      console.error('verifyRecaptchaV3Token: success=false', { 'error-codes': codes });
+      console.error('verifyRecaptchaV3Token: success=false', { 'error-codes': codes, hostname: data.hostname });
       return { ok: false, reason: 'captcha_failed' };
     }
     // v3: very low scores in privacy mode; default 0.1 avoids blocking real users.
@@ -59,6 +82,62 @@ export async function verifyRecaptchaV3Token(
     return { ok: true };
   } catch (e) {
     console.error('verifyRecaptchaV3Token:', e);
+    return { ok: false, reason: 'captcha_error' };
+  }
+}
+
+async function verifyRecaptchaEnterprise(
+  token: string,
+  siteKey: string,
+  projectId: string,
+  apiKey: string,
+  remoteIp: string | undefined
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  try {
+    const url = `https://recaptchaenterprise.googleapis.com/v1/projects/${projectId}/assessments?key=${apiKey}`;
+    const event: Record<string, string> = { token, siteKey, expectedAction: 'inquiry' };
+    if (remoteIp && remoteIp !== 'unknown') {
+      event.userIpAddress = remoteIp;
+    }
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event }),
+    });
+    const rawText = await r.text();
+    let data: {
+      tokenProperties?: { valid: boolean; hostname?: string; action?: string; invalidReason?: string };
+      riskAnalysis?: { score?: number; reasons?: string[] };
+      error?: { code: number; message: string; status?: string; details?: unknown[] };
+    };
+    try {
+      data = JSON.parse(rawText) as typeof data;
+    } catch {
+      console.error('verifyRecaptchaEnterprise: non-JSON response', r.status, rawText.slice(0, 500));
+      return { ok: false, reason: 'captcha_error' };
+    }
+    if (!r.ok) {
+      console.error('verifyRecaptchaEnterprise: HTTP', r.status, rawText.slice(0, 800));
+      return { ok: false, reason: 'captcha_error' };
+    }
+    console.log('verifyRecaptchaEnterprise: response', JSON.stringify(data));
+    if (data.error) {
+      console.error('verifyRecaptchaEnterprise: API error', data.error);
+      return { ok: false, reason: 'captcha_error' };
+    }
+    if (!data.tokenProperties?.valid) {
+      console.error('verifyRecaptchaEnterprise: invalid token', { invalidReason: data.tokenProperties?.invalidReason });
+      return { ok: false, reason: 'captcha_failed' };
+    }
+    const minScore = Number(process.env.RECAPTCHA_MIN_SCORE ?? 0.1);
+    const score = data.riskAnalysis?.score ?? 0;
+    if (score < minScore) {
+      console.error('verifyRecaptchaEnterprise: low score', { score, minScore });
+      return { ok: false, reason: 'captcha_low_score' };
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error('verifyRecaptchaEnterprise:', e);
     return { ok: false, reason: 'captcha_error' };
   }
 }
