@@ -3,6 +3,7 @@ import { Anthropic } from '@anthropic-ai/sdk';
 import { initializeDatabase, saveMemory, getRelevantMemory, saveAgentOutcome, upsertEspaluzUser, saveLead } from './database';
 import { initTelegramBot } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
+import { startHashnodeDailyPublisher, runDailyHashnodePost, HASHNODE_TOPIC_BRIEFS } from './hashnode-daily';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import { Octokit } from '@octokit/rest';
@@ -581,7 +582,7 @@ async function startCTOAIPA() {
     res.json({ 
       status: 'running', 
       service: 'CTO AIPA',
-      version: '3.4.0',
+      version: '3.5.0',
       role: 'AI Technical Co-Founder',
       ecosystem: 'AIdeazz',
       features: [
@@ -595,7 +596,8 @@ async function startCTOAIPA() {
         'AI-Powered Reviews (Configurable Models)',
         'CMO Integration (LinkedIn Announcements)',
         'AIdeazz Ecosystem Awareness (NEW!)',
-        'Telegram Bot (Chat from phone!)'
+        'Telegram Bot (Chat from phone!)',
+        'Hashnode daily article (opt-in, HASHNODE_DAILY_ENABLED)'
       ],
       endpoints: {
         health: 'GET /',
@@ -661,6 +663,42 @@ async function startCTOAIPA() {
         launches: milestones.filter(m => m.type === 'launch').length
       }
     });
+  });
+
+  // ==========================================================================
+  // HASHNODE DAILY — long-form article generation + publish (opt-in)
+  // ==========================================================================
+
+  app.get('/hashnode/daily-status', (_req, res) => {
+    res.json({
+      enabled: process.env.HASHNODE_DAILY_ENABLED === 'true',
+      cronUtc: process.env.HASHNODE_DAILY_CRON || '0 13 * * *',
+      timezone: process.env.HASHNODE_DAILY_TZ || 'UTC',
+      publicFeed: process.env.HASHNODE_DAILY_PUBLIC === 'true',
+      topicCount: HASHNODE_TOPIC_BRIEFS.length,
+      manualTriggerConfigured: !!process.env.HASHNODE_DAILY_TRIGGER_SECRET,
+      articleModel: process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic,
+    });
+  });
+
+  app.post('/hashnode/daily-run', async (req, res) => {
+    const secret = process.env.HASHNODE_DAILY_TRIGGER_SECRET;
+    if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        hint: 'Set HASHNODE_DAILY_TRIGGER_SECRET in .env and POST with header Authorization: Bearer <secret>',
+      });
+      return;
+    }
+    try {
+      const model = process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic;
+      const maxTok = Math.min(AI_MODELS.maxTokens, 8192);
+      const out = await runDailyHashnodePost({ anthropic, model, maxTokens: maxTok });
+      res.json({ ok: true, ...out });
+    } catch (e) {
+      console.error('hashnode/daily-run:', e);
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
   });
 
   // ==========================================================================
@@ -989,6 +1027,17 @@ async function startCTOAIPA() {
     console.log(`\n🤝 Ready to be your Technical Co-Founder!`);
     if (atuonaBot) {
       console.log(`🎭 Ready to create with your Creative Co-Founder!`);
+    }
+
+    const articleModel = process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic;
+    const maxArticleTokens = Math.min(AI_MODELS.maxTokens, 8192);
+    startHashnodeDailyPublisher({
+      anthropic,
+      model: articleModel,
+      maxTokens: maxArticleTokens,
+    });
+    if (process.env.HASHNODE_DAILY_TRIGGER_SECRET) {
+      console.log(`📰 Hashnode manual: POST ${baseUrl}/hashnode/daily-run with Bearer secret`);
     }
   });
 }
