@@ -141,6 +141,9 @@ async function initializeDatabase() {
     `);
 
     console.log('✅ Database schema initialized (5 tables)');
+
+    await initBusinessLeadsTable();
+    await ensureBusinessLeadsUtmColumns();
   } catch (err) {
     console.error('❌ Database initialization error:', err);
     throw err;
@@ -1418,10 +1421,17 @@ async function initBusinessLeadsTable(): Promise<void> {
           id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
           source VARCHAR2(100) NOT NULL,
           name VARCHAR2(500),
+          contact_email VARCHAR2(500),
           context CLOB,
           signal_strength VARCHAR2(20) DEFAULT ''low'',
           status VARCHAR2(50) DEFAULT ''new'',
           next_action VARCHAR2(1000),
+          utm_source VARCHAR2(200),
+          utm_medium VARCHAR2(200),
+          utm_campaign VARCHAR2(500),
+          utm_term VARCHAR2(500),
+          utm_content VARCHAR2(500),
+          page_url VARCHAR2(2000),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )';
@@ -1433,6 +1443,42 @@ async function initBusinessLeadsTable(): Promise<void> {
     console.log('✅ business_leads table ready');
   } catch (err) {
     console.error('business_leads table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+/** Adds UTM + email columns on existing DBs (CREATE may have skipped if table already existed). */
+async function ensureBusinessLeadsUtmColumns(): Promise<void> {
+  const columns: Array<{ name: string; def: string }> = [
+    { name: 'contact_email', def: 'VARCHAR2(500)' },
+    { name: 'utm_source', def: 'VARCHAR2(200)' },
+    { name: 'utm_medium', def: 'VARCHAR2(200)' },
+    { name: 'utm_campaign', def: 'VARCHAR2(500)' },
+    { name: 'utm_term', def: 'VARCHAR2(500)' },
+    { name: 'utm_content', def: 'VARCHAR2(500)' },
+    { name: 'page_url', def: 'VARCHAR2(2000)' },
+  ];
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    for (const col of columns) {
+      await connection.execute(
+        `
+        BEGIN
+          EXECUTE IMMEDIATE 'ALTER TABLE business_leads ADD (${col.name} ${col.def})';
+        EXCEPTION
+          WHEN OTHERS THEN
+            IF SQLCODE != -1430 THEN RAISE; END IF;
+        END;
+        `,
+        {},
+        { autoCommit: true }
+      );
+    }
+    console.log('✅ business_leads UTM columns ready');
+  } catch (err) {
+    console.error('business_leads UTM migration error:', err);
   } finally {
     if (connection) await connection.close();
   }
@@ -1502,6 +1548,114 @@ async function updateLead(
   }
 }
 
+async function saveMarketingInquiry(params: {
+  name?: string;
+  contactEmail?: string;
+  message?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+  utm_content?: string;
+  page_url?: string;
+}): Promise<string | null> {
+  const source = 'aideazz_inquiry';
+  const name = (params.name || '').trim() || 'unknown';
+  const contactEmail = (params.contactEmail || '').trim() || null;
+  const message = (params.message || '').trim();
+  const context = message || '(no message)';
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO business_leads (
+         source, name, contact_email, context, signal_strength, status,
+         utm_source, utm_medium, utm_campaign, utm_term, utm_content, page_url
+       )
+       VALUES (
+         :source, :name, :contactEmail, :context, :signalStrength, 'new',
+         :utm_source, :utm_medium, :utm_campaign, :utm_term, :utm_content, :page_url
+       )
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        source,
+        name,
+        contactEmail,
+        context,
+        signalStrength: 'medium',
+        utm_source: params.utm_source?.trim() || null,
+        utm_medium: params.utm_medium?.trim() || null,
+        utm_campaign: params.utm_campaign?.trim() || null,
+        utm_term: params.utm_term?.trim() || null,
+        utm_content: params.utm_content?.trim() || null,
+        page_url: params.page_url?.trim()?.slice(0, 2000) || null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 },
+      },
+      { autoCommit: true }
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds.id[0] || null;
+  } catch (err) {
+    console.error('❌ saveMarketingInquiry error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getLeadsSinceForDigest(
+  since: Date,
+  sourceFilter: string = 'aideazz_inquiry'
+): Promise<
+  Array<{
+    id: string;
+    source: string;
+    name: string | null;
+    contact_email: string | null;
+    context: string | null;
+    utm_source: string | null;
+    utm_medium: string | null;
+    utm_campaign: string | null;
+    page_url: string | null;
+    created_at: Date;
+  }>
+> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) as id, source, name, contact_email, context,
+              utm_source, utm_medium, utm_campaign, page_url, created_at
+       FROM business_leads
+       WHERE source = :sourceFilter AND created_at >= :since
+       ORDER BY created_at DESC`,
+      { sourceFilter, since },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+        fetchInfo: { CONTEXT: { type: oracledb.STRING } },
+      }
+    );
+    const raw = (result.rows as any[]) || [];
+    return raw.map((row) => ({
+      id: row.ID ?? row.id,
+      source: row.SOURCE ?? row.source,
+      name: row.NAME ?? row.name ?? null,
+      contact_email: row.CONTACT_EMAIL ?? row.contact_email ?? null,
+      context: row.CONTEXT ?? row.context ?? null,
+      utm_source: row.UTM_SOURCE ?? row.utm_source ?? null,
+      utm_medium: row.UTM_MEDIUM ?? row.utm_medium ?? null,
+      utm_campaign: row.UTM_CAMPAIGN ?? row.utm_campaign ?? null,
+      page_url: row.PAGE_URL ?? row.page_url ?? null,
+      created_at: row.CREATED_AT ?? row.created_at,
+    }));
+  } catch (err) {
+    console.error('❌ getLeadsSinceForDigest error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getLeads(
   status?: string,
   limit: number = 20
@@ -1509,8 +1663,9 @@ async function getLeads(
   let connection;
   try {
     connection = await oracledb.getConnection(dbConfig);
-    let query = `SELECT RAWTOHEX(id) as id, source, name, context, signal_strength,
-                        status, next_action, created_at, updated_at
+    let query = `SELECT RAWTOHEX(id) as id, source, name, contact_email, context, signal_strength,
+                        status, next_action, utm_source, utm_medium, utm_campaign,
+                        utm_term, utm_content, page_url, created_at, updated_at
                  FROM business_leads`;
     const params: any = { limit };
 
@@ -1708,7 +1863,6 @@ initConversationContextTable();
 initKnowledgeBaseTable();
 initAgentOutcomesTable();
 initContentLogTable();
-initBusinessLeadsTable();
 initEspaluzFunnelTable();
 
 export {
@@ -1762,8 +1916,10 @@ export {
   getRecentContentLogs,
   // Business Leads — engagement signal tracking
   saveLead,
+  saveMarketingInquiry,
   updateLead,
   getLeads,
+  getLeadsSinceForDigest,
   // EspaLuz Funnel — trial → paid → churned tracking
   upsertEspaluzUser,
   getEspaluzExpiringTrials,

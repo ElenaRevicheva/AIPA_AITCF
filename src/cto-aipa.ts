@@ -1,11 +1,21 @@
 import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
-import { initializeDatabase, saveMemory, getRelevantMemory, saveAgentOutcome, upsertEspaluzUser, saveLead } from './database';
+import {
+  initializeDatabase,
+  saveMemory,
+  getRelevantMemory,
+  saveAgentOutcome,
+  upsertEspaluzUser,
+  saveLead,
+  saveMarketingInquiry,
+} from './database';
 import { initTelegramBot } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
 import { startHashnodeDailyPublisher, runDailyHashnodePost, HASHNODE_TOPIC_BRIEFS } from './hashnode-daily';
+import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
 import * as dotenv from 'dotenv';
 import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Octokit } from '@octokit/rest';
 
 dotenv.config({ override: true });
@@ -561,6 +571,30 @@ Respond as a supportive technical co-founder would:
 }
 
 // =============================================================================
+// MARKETING — Phase 3 UTM / aideazz inquiry (CORS for static site → server proxy)
+// =============================================================================
+
+function marketingInquiryCors(req: Request, res: Response, next: NextFunction) {
+  const origin = req.headers.origin;
+  const allowed = new Set([
+    'https://aideazz.xyz',
+    'https://www.aideazz.xyz',
+    ...(process.env.MARKETING_CORS_ORIGINS?.split(',').map((s) => s.trim()).filter(Boolean) ?? []),
+  ]);
+  if (origin && allowed.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+  next();
+}
+
+// =============================================================================
 // MAIN SERVER
 // =============================================================================
 
@@ -698,6 +732,83 @@ async function startCTOAIPA() {
       res.json({ ok: true, ...out });
     } catch (e) {
       console.error('hashnode/daily-run:', e);
+      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  // ==========================================================================
+  // MARKETING — UTM inbound (aideazz.xyz contact form → Oracle business_leads)
+  // ==========================================================================
+
+  app.get('/marketing/inquiry-status', (_req, res) => {
+    res.json({
+      ok: true,
+      inquiryEndpointConfigured: !!process.env.MARKETING_INQUIRY_SECRET?.trim(),
+      note: 'POST /marketing/inquiry with Authorization: Bearer <MARKETING_INQUIRY_SECRET> from a server-side proxy (do not put the secret in the browser).',
+    });
+  });
+
+  app.options('/marketing/inquiry', marketingInquiryCors);
+  app.post('/marketing/inquiry', marketingInquiryCors, async (req, res) => {
+    const secret = process.env.MARKETING_INQUIRY_SECRET?.trim();
+    if (!secret) {
+      res.status(503).json({ error: 'Marketing inquiry endpoint not configured' });
+      return;
+    }
+    if (req.headers.authorization !== `Bearer ${secret}`) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    const b = req.body as Record<string, unknown>;
+    const name = typeof b.name === 'string' ? b.name : undefined;
+    const contactEmail =
+      typeof b.email === 'string' ? b.email : typeof b.contactEmail === 'string' ? b.contactEmail : undefined;
+    const message = typeof b.message === 'string' ? b.message : undefined;
+    const utm_source = typeof b.utm_source === 'string' ? b.utm_source : undefined;
+    const utm_medium = typeof b.utm_medium === 'string' ? b.utm_medium : undefined;
+    const utm_campaign = typeof b.utm_campaign === 'string' ? b.utm_campaign : undefined;
+    const utm_term = typeof b.utm_term === 'string' ? b.utm_term : undefined;
+    const utm_content = typeof b.utm_content === 'string' ? b.utm_content : undefined;
+    const page_url = typeof b.page_url === 'string' ? b.page_url : undefined;
+
+    if (!message?.trim() && !contactEmail?.trim() && !name?.trim()) {
+      res.status(400).json({ error: 'Provide at least name, email, or message' });
+      return;
+    }
+
+    const inquiry: Parameters<typeof saveMarketingInquiry>[0] = {};
+    if (name) inquiry.name = name;
+    if (contactEmail) inquiry.contactEmail = contactEmail;
+    if (message) inquiry.message = message;
+    if (utm_source) inquiry.utm_source = utm_source;
+    if (utm_medium) inquiry.utm_medium = utm_medium;
+    if (utm_campaign) inquiry.utm_campaign = utm_campaign;
+    if (utm_term) inquiry.utm_term = utm_term;
+    if (utm_content) inquiry.utm_content = utm_content;
+    if (page_url) inquiry.page_url = page_url;
+
+    const id = await saveMarketingInquiry(inquiry);
+    if (!id) {
+      res.status(500).json({ error: 'Failed to save inquiry' });
+      return;
+    }
+    res.json({ ok: true, id });
+  });
+
+  app.post('/marketing/digest-run', async (req, res) => {
+    const secret = process.env.MARKETING_INQUIRY_SECRET?.trim();
+    if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        hint: 'Same secret as MARKETING_INQUIRY_SECRET — manual weekly digest test',
+      });
+      return;
+    }
+    try {
+      await runWeeklyMarketingDigest();
+      res.json({ ok: true });
+    } catch (e) {
+      console.error('marketing/digest-run:', e);
       res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
   });
@@ -1040,6 +1151,10 @@ async function startCTOAIPA() {
     if (process.env.HASHNODE_DAILY_TRIGGER_SECRET) {
       console.log(`📰 Hashnode manual: POST ${baseUrl}/hashnode/daily-run with Bearer secret`);
     }
+    if (process.env.MARKETING_INQUIRY_SECRET?.trim()) {
+      console.log(`📣 Marketing inquiry: POST ${baseUrl}/marketing/inquiry (Bearer secret); digest ${baseUrl}/marketing/digest-run`);
+    }
+    startMarketingWeeklyDigest();
   });
 }
 

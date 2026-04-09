@@ -33,7 +33,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
-## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE
+## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 BACKEND LIVE
 
 > Updated: April 10, 2026
 
@@ -105,12 +105,12 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | **Telegram notify on publish** | DONE (optional) | `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` + `TELEGRAM_BOT_TOKEN` — sends one message with title + URL after publish. |
 | **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule; optional: `createDraft` + Telegram approval — same roadmap prompts, Hashnode GraphQL instead of WordPress. |
 
-### Phase 3: UTM Attribution — NEXT
+### Phase 3: UTM Attribution — BACKEND DONE · SITE WIRING NEXT
 
 | Phase | Status | Next Action |
 |---|---|---|
-| Phase 3: UTM Attribution | **NEXT** | Contact/inquiry form on **aideazz.xyz** with hidden UTM fields → webhook POST to **CTO AIPA** → Oracle `leads` or extend `business_leads` with UTM columns; weekly digest via Telegram (Monday 09:00 UTC). |
-| Phase 4: Founder Outreach Pipeline | NOT STARTED | After Phase 3; Resend + dedicated domain; cap volume. |
+| Phase 3: UTM Attribution | **BACKEND DONE** | **CTO AIPA (AIPA_AITCF):** `business_leads` extended with `contact_email`, UTM columns, `page_url`. `POST /marketing/inquiry` (Bearer `MARKETING_INQUIRY_SECRET`) + CORS for aideazz.xyz; `GET /marketing/inquiry-status`. Weekly Telegram digest `src/marketing-weekly-digest.ts` — Monday **09:00 UTC** (override `MARKETING_LEADS_DIGEST_CRON` / `MARKETING_LEADS_DIGEST_TZ`); chat `TELEGRAM_LEADS_DIGEST_CHAT_ID` or fallback to `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID`. Manual: `POST /marketing/digest-run` with same Bearer secret. **Still to do:** contact form on **aideazz** repo posting via a **server-side proxy** (secret must not ship to the browser). |
+| Phase 4: Founder Outreach Pipeline | NOT STARTED | After Phase 3 site wiring; Resend + dedicated domain; cap volume. |
 | Phase 5: Lead Triage Dashboard | NOT STARTED | Depends on Phase 3 + 4 data |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
 
@@ -564,7 +564,7 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 10, 2026 (v5 — Phase 2 mostly complete: daily Hashnode + portfolio live sync + Oracle `content_log` + optional Telegram notify; **Phase 3 UTM next**)
+> Document version: April 10, 2026 (v6 — Phase 3 backend: `business_leads` UTM + `POST /marketing/inquiry` + weekly Telegram digest; **aideazz contact proxy next**)
 > Aligned with: CAREER_FOCUS.md v3 (Honest Edition), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
 > Phase 2 status: IN PROGRESS — Hashnode at aideazz.hashnode.dev; AIPA_AITCF: `scripts/hashnode-publish.mjs`, `scripts/hashnode-posts/from-executive-to-ai-builder.md`; LLM+Oracle assembly line still to wire
