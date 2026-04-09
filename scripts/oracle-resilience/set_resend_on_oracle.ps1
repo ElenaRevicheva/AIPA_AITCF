@@ -33,7 +33,7 @@ if (-not (Test-Path $Py)) {
 $tmpKey = [System.IO.Path]::GetTempFileName()
 $tmpFrom = $null
 try {
-  Set-Content -LiteralPath $tmpKey -Value $Resend -Encoding utf8NoBOM -NoNewline
+  [System.IO.File]::WriteAllText($tmpKey, $Resend)
   $RemoteKey = "/tmp/.resend_key_aipa_$(Get-Random)"
   & scp -i $KeyPath -o StrictHostKeyChecking=accept-new $tmpKey "${User}@${HostAddr}:${RemoteKey}"
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -42,7 +42,7 @@ try {
   $RemoteFrom = ""
   if ($from) {
     $tmpFrom = [System.IO.Path]::GetTempFileName()
-    Set-Content -LiteralPath $tmpFrom -Value $from -Encoding utf8NoBOM -NoNewline
+    [System.IO.File]::WriteAllText($tmpFrom, $from)
     $RemoteFrom = "/tmp/.from_aipa_$(Get-Random)"
     & scp -i $KeyPath -o StrictHostKeyChecking=accept-new $tmpFrom "${User}@${HostAddr}:${RemoteFrom}"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
