@@ -25,7 +25,8 @@ export async function verifyRecaptchaV3Token(
   const body = new URLSearchParams();
   body.set('secret', secret);
   body.set('response', token);
-  if (remoteIp && remoteIp !== 'unknown') {
+  // Optional remoteip — wrong X-Forwarded-For behind nginx can hurt verification; off by default.
+  if (process.env.RECAPTCHA_SEND_REMOTEIP === 'true' && remoteIp && remoteIp !== 'unknown') {
     body.set('remoteip', remoteIp);
   }
   try {
@@ -42,19 +43,18 @@ export async function verifyRecaptchaV3Token(
     };
     if (!data.success) {
       const codes = data['error-codes']?.join(',') ?? 'none';
-      console.warn('verifyRecaptchaV3Token: success=false', { 'error-codes': codes });
+      console.error('verifyRecaptchaV3Token: success=false', { 'error-codes': codes });
       return { ok: false, reason: 'captcha_failed' };
     }
-    // v3 scores ~0.1 for risky traffic; Incognito/VPN often land 0.2–0.4. Default 0.2 avoids false blocks.
-    const minScore = Number(process.env.RECAPTCHA_MIN_SCORE ?? 0.2);
+    // v3: very low scores in privacy mode; default 0.1 avoids blocking real users.
+    const minScore = Number(process.env.RECAPTCHA_MIN_SCORE ?? 0.1);
     const score = data.score ?? 0;
     if (score < minScore) {
-      console.warn('verifyRecaptchaV3Token: low score', { score, minScore, action: data.action });
+      console.error('verifyRecaptchaV3Token: low score', { score, minScore, action: data.action });
       return { ok: false, reason: 'captcha_low_score' };
     }
     if (data.action && data.action !== 'inquiry') {
-      console.warn('verifyRecaptchaV3Token: bad action', { action: data.action });
-      return { ok: false, reason: 'captcha_bad_action' };
+      console.error('verifyRecaptchaV3Token: unexpected action (allowing)', { action: data.action });
     }
     return { ok: true };
   } catch (e) {
