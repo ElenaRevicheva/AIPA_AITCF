@@ -79,7 +79,9 @@ export async function sendMarketingInquiryEmails(params: {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  const from = process.env.MARKETING_INQUIRY_FROM?.trim() || 'AIdeazz <onboarding@resend.dev>';
+  /** Default matches verified aideazz.xyz in Resend; override for local/testing. */
+  const from =
+    process.env.MARKETING_INQUIRY_FROM?.trim() || 'AIdeazz <aipa@aideazz.xyz>';
   const sendConfirmation = process.env.MARKETING_INQUIRY_SEND_CONFIRMATION !== 'false';
 
   const esc = (s: string) =>
