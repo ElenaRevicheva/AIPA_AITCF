@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 7, 2026 | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 9, 2026 | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 ---
@@ -33,9 +33,9 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
-## IMPLEMENTATION STATUS — PHASE 1 COMPLETE
+## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 STARTED
 
-> Updated: April 7, 2026
+> Updated: April 9, 2026
 
 ### Phase 1a: SEO Health Audit — DONE
 
@@ -91,11 +91,24 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 |---|---|---|
 | "Redirect page" warning | NORMAL | `/card` → `/portfolio` 301 redirect — Google correctly indexes /portfolio as canonical, marks /card as redirect. Not an error. |
 
-### Phases 2-6: NOT STARTED
+### Phase 2: Blog & distribution (Hashnode) — IN PROGRESS
+
+| Task | Status | Details |
+|---|---|---|
+| Platform decision | DONE | **Hashnode** (GraphQL API). **Medium** closed off API access for new integrations — not viable for automation. |
+| Hashnode blog created | DONE | **AIdeazz — Applied AI & Agents** · [aideazz.hashnode.dev](https://aideazz.hashnode.dev) · subdomain `aideazz` |
+| Personal Access Token | DONE | Generated at [hashnode.com/settings/developer](https://hashnode.com/settings/developer); stored only in **`.env`** as `HASHNODE_ACCESS_TOKEN` on machines that publish (**never commit**). |
+| Publish tooling (this repo) | DONE | `scripts/hashnode-publish.mjs` — `publishPost` via `gql.hashnode.com`; `--public` for main feed; `--file path/to.md` (optional first line `# Title`); raw `Authorization` header per Hashnode API examples. |
+| Debug listing | DONE | `scripts/hashnode-list.mjs` — `npm run hashnode:list` prints `me.publications`. |
+| npm shortcuts | DONE | `hashnode:publish`, `hashnode:list`, `hashnode:publish:article` (wired to the long-form markdown below). |
+| API smoke test post | DONE | Delisted test post — validates token + publication id; optional cleanup in Hashnode dashboard. |
+| First public long-form essay | DONE | **From Boardroom to Build: What Running Nine Production AI Agents Actually Means** — live: [hashnode.dev/.../from-boardroom-to-build-...](https://aideazz.hashnode.dev/from-boardroom-to-build-what-running-nine-production-ai-agents-actually-means) · source in repo: `scripts/hashnode-posts/from-executive-to-ai-builder.md` · **April 9, 2026**. |
+| LLM assembly line + Oracle `content_log` + Telegram draft queue | NOT STARTED | Next: generate markdown from topic briefs, then call the same publish script (or `createDraft` + review). Roadmap template below still applies; **replace “WordPress REST API” with “Hashnode GraphQL”** for this stack. |
+
+### Phases 3-6: NOT STARTED
 
 | Phase | Status | Next Action |
 |---|---|---|
-| Phase 2: Blog Auto-Publisher | NOT STARTED | Build content assembly line |
 | Phase 3: UTM Attribution | NOT STARTED | Add contact form + UTM capture to aideazz.xyz |
 | Phase 4: Founder Outreach Pipeline | NOT STARTED | 8 outreach messages drafted, ready to send |
 | Phase 5: Lead Triage Dashboard | NOT STARTED | Depends on Phase 3 + 4 data |
@@ -259,6 +272,8 @@ This is what AI tools like ChatGPT and Google look for to establish
 ### PHASE 2 — CONTENT ENGINE (Week 2–3)
 *Build the automated content assembly line for AIdeazz. This becomes your showcase.*
 
+**Implementation note (April 2026):** The **live blog** is on **Hashnode** ([aideazz.hashnode.dev](https://aideazz.hashnode.dev)), published via **GraphQL** from `scripts/hashnode-publish.mjs` in the **AIPA_AITCF** repo. Personal Access Token: [Developer settings](https://hashnode.com/settings/developer). The original prompt below referenced **WordPress** — for this stack, treat the publishing target as **Hashnode** (`publishPost` / optional `createDraft`) plus Oracle logging, not WordPress REST.
+
 **System: Blog Auto-Publisher**
 
 This is the core product AutoSEO sells. Build yours better.
@@ -290,19 +305,19 @@ PROCESS:
    - Article schema (headline, author, datePublished, dateModified)
    - FAQPage schema for the FAQ section
 
-3. Post as DRAFT to WordPress via REST API
-   - Assign to category matching the topic
-   - Do not auto-publish — queue for my review
+3. Post to Hashnode via GraphQL API (`createDraft` or `publishPost` — match current `scripts/hashnode-publish.mjs` patterns)
+   - Tags aligned with topic; optional delisted draft for review
+   - Or: generate Markdown file and invoke publish script with `--file`
 
 OUTPUT:
-- Draft article in WordPress
+- Draft or published article on Hashnode (blog: aideazz.hashnode.dev)
 - Telegram notification to me: 
   "New draft ready: [title] | Keyword: [keyword] | Preview: [link]"
 - Append to content_log table in Oracle: 
   topic, keyword, status, date_created
 
 Stack: TypeScript, Express, Claude Sonnet for generation, 
-WordPress REST API, Oracle for logging.
+Hashnode GraphQL API (`https://gql.hashnode.com/`), Oracle for logging.
 Do NOT use AutoSEO or any third-party content service.
 ```
 
@@ -549,7 +564,8 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 8, 2026 (v3 — Phase 1 fully complete, GA4 confirmed, OG fixed)
+> Document version: April 9, 2026 (v4 — Phase 2 started: Hashnode blog live + publish scripts + first long-form essay)
 > Aligned with: CAREER_FOCUS.md v3 (Honest Edition), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
-> Next: Phase 2 — Blog Auto-Publisher
+> Phase 2 status: IN PROGRESS — Hashnode at aideazz.hashnode.dev; AIPA_AITCF: `scripts/hashnode-publish.mjs`, `scripts/hashnode-posts/from-executive-to-ai-builder.md`; LLM+Oracle assembly line still to wire
+> Next review: After first automated (LLM→Hashnode) publish or Phase 3 kickoff
