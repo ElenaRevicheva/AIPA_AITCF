@@ -103,6 +103,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | npm shortcuts | DONE | `hashnode:publish`, `hashnode:list`, `hashnode:publish:article` (wired to the long-form markdown below). |
 | API smoke test post | DONE | Delisted test post — validates token + publication id; optional cleanup in Hashnode dashboard. |
 | First public long-form essay | DONE | **From Boardroom to Build: What Running Nine Production AI Agents Actually Means** — live: [hashnode.dev/.../from-boardroom-to-build-...](https://aideazz.hashnode.dev/from-boardroom-to-build-what-running-nine-production-ai-agents-actually-means) · source in repo: `scripts/hashnode-posts/from-executive-to-ai-builder.md` · **April 9, 2026**. |
+| Self-hosted blog on **aideazz.xyz** (`/blog`, `/blog/:slug`) | DONE | **Marketing site repo** (Vite/React): Markdown in `src/content/blog/`, Article JSON-LD, sitemap entries, portfolio CTA strip. **Hashnode kept** as linked syndication (`hashnodeUrl` frontmatter), not deprecated. |
 | LLM assembly line + Oracle `content_log` + Telegram draft queue | NOT STARTED | Next: generate markdown from topic briefs, then call the same publish script (or `createDraft` + review). Roadmap template below still applies; **replace “WordPress REST API” with “Hashnode GraphQL”** for this stack. |
 
 ### Phases 3-6: NOT STARTED
