@@ -220,37 +220,50 @@ Write a personalized cold email with these constraints:
 Return ONLY valid JSON: {"subject": "...", "body": "..."}
 The body should use plain text with \\n for line breaks.`;
 
-  try {
-    const response = await anthropic.messages.create({
-      model: process.env.OUTREACH_MODEL || 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
-    });
+  const maxRetries = 3;
+  const retryCodes = new Set([529, 503, 429]);
 
-    const firstBlock = response.content[0];
-    const text = firstBlock && 'text' in firstBlock ? firstBlock.text : '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('outreach: Claude returned non-JSON:', text.slice(0, 200));
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await anthropic.messages.create({
+        model: process.env.OUTREACH_MODEL || 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const firstBlock = response.content[0];
+      const text = firstBlock && 'text' in firstBlock ? firstBlock.text : '';
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.error('outreach: Claude returned non-JSON:', text.slice(0, 200));
+        return null;
+      }
+      const parsed = JSON.parse(jsonMatch[0]) as {
+        subject: string;
+        body: string;
+      };
+
+      const emailId = await saveOutreachEmail({
+        targetId: target.targetId,
+        subject: parsed.subject,
+        body: parsed.body,
+        status: 'draft',
+      });
+
+      return { subject: parsed.subject, body: parsed.body, emailId };
+    } catch (e: any) {
+      const status = e?.status ?? e?.statusCode;
+      if (retryCodes.has(status) && attempt < maxRetries - 1) {
+        const wait = 2000 * (attempt + 1);
+        console.warn(`outreach: Claude ${status} (attempt ${attempt + 1}/${maxRetries}), retrying in ${wait}ms`);
+        await new Promise(r => setTimeout(r, wait));
+        continue;
+      }
+      console.error('outreach: email generation error:', e);
       return null;
     }
-    const parsed = JSON.parse(jsonMatch[0]) as {
-      subject: string;
-      body: string;
-    };
-
-    const emailId = await saveOutreachEmail({
-      targetId: target.targetId,
-      subject: parsed.subject,
-      body: parsed.body,
-      status: 'draft',
-    });
-
-    return { subject: parsed.subject, body: parsed.body, emailId };
-  } catch (e) {
-    console.error('outreach: email generation error:', e);
-    return null;
   }
+  return null;
 }
 
 export async function generateBatchDrafts(
