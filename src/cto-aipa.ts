@@ -8,6 +8,10 @@ import {
   upsertEspaluzUser,
   saveLead,
   saveMarketingInquiry,
+  getOutreachTargets,
+  getOutreachStats,
+  getOutreachDrafts,
+  markOutreachReply,
 } from './database';
 import { initTelegramBot } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
@@ -18,6 +22,15 @@ import {
   scheduleMarketingInquiryEmails,
   verifyRecaptchaV3Token,
 } from './marketing-notify';
+import {
+  importTargets,
+  verifyTargetEmails,
+  generateBatchDrafts,
+  sendApprovedDrafts,
+  sendOutreachEmail,
+  formatOutreachStatsMessage,
+  formatDraftPreview,
+} from './outreach';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
@@ -878,6 +891,98 @@ async function startCTOAIPA() {
     }
   });
 
+  // ==========================================================================
+  // PHASE 4 — OUTREACH PIPELINE (Bearer OUTREACH_SECRET)
+  // ==========================================================================
+
+  const outreachAuth = (req: Request, res: Response, next: NextFunction) => {
+    const secret = process.env.OUTREACH_SECRET?.trim();
+    if (!secret) { res.status(503).json({ error: 'Outreach not configured (set OUTREACH_SECRET)' }); return; }
+    if (req.headers.authorization !== `Bearer ${secret}`) { res.status(401).json({ error: 'Unauthorized' }); return; }
+    next();
+  };
+
+  app.get('/outreach/stats', outreachAuth, async (_req, res) => {
+    try {
+      const stats = await getOutreachStats();
+      res.json({ ok: true, ...stats });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.get('/outreach/targets', outreachAuth, async (req, res) => {
+    try {
+      const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+      const limit = typeof req.query.limit === 'string' ? Number(req.query.limit) : 50;
+      const params: { status?: string; limit?: number } = { limit };
+      if (status) params.status = status;
+      const targets = await getOutreachTargets(params);
+      res.json({ ok: true, count: targets.length, targets });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.post('/outreach/targets/import', outreachAuth, async (req, res) => {
+    try {
+      const body = req.body;
+      const targets = Array.isArray(body) ? body : Array.isArray(body.targets) ? body.targets : [body];
+      const result = await importTargets(targets);
+      res.json({ ok: true, ...result });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.post('/outreach/targets/verify', outreachAuth, async (_req, res) => {
+    try {
+      const result = await verifyTargetEmails();
+      res.json({ ok: true, ...result });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.post('/outreach/drafts/generate', outreachAuth, async (req, res) => {
+    try {
+      const limit = typeof req.body.limit === 'number' ? req.body.limit : 5;
+      const result = await generateBatchDrafts(anthropic, limit);
+      res.json({ ok: true, ...result });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.get('/outreach/drafts', outreachAuth, async (_req, res) => {
+    try {
+      const drafts = await getOutreachDrafts();
+      res.json({ ok: true, count: drafts.length, drafts });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.post('/outreach/send', outreachAuth, async (_req, res) => {
+    try {
+      const result = await sendApprovedDrafts();
+      res.json({ ok: true, ...result });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
+  app.post('/outreach/reply', outreachAuth, async (req, res) => {
+    try {
+      const { emailId, snippet } = req.body as { emailId: string; snippet: string };
+      if (!emailId || !snippet) { res.status(400).json({ error: 'emailId and snippet required' }); return; }
+      const ok = await markOutreachReply(emailId, snippet);
+      res.json({ ok });
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  });
+
   // Public form endpoint: aideazz.xyz only (Origin/Referer), honeypot, rate limit — no Bearer in browser.
   app.options('/marketing/inquiry-proxy', marketingInquiryCors);
   app.post('/marketing/inquiry-proxy', marketingInquiryCors, async (req, res) => {
@@ -1292,6 +1397,9 @@ async function startCTOAIPA() {
       console.log(`📣 Marketing inquiry: POST ${baseUrl}/marketing/inquiry (Bearer secret); digest ${baseUrl}/marketing/digest-run`);
     }
     startMarketingWeeklyDigest();
+    if (process.env.OUTREACH_SECRET?.trim()) {
+      console.log(`📧 Outreach pipeline: ${baseUrl}/outreach/* (Bearer OUTREACH_SECRET)`);
+    }
   });
 }
 

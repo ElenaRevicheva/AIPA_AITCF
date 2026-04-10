@@ -1855,6 +1855,328 @@ async function getEspaluzFunnelSummary(): Promise<{
   }
 }
 
+// =============================================================================
+// OUTREACH — Phase 4: Founder Cold Email Pipeline
+// =============================================================================
+
+async function initOutreachTargetsTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE outreach_targets (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          name VARCHAR2(500) NOT NULL,
+          company VARCHAR2(500),
+          email VARCHAR2(500),
+          email_status VARCHAR2(50) DEFAULT ''unverified'',
+          linkedin_url VARCHAR2(2000),
+          source VARCHAR2(200),
+          pain_point CLOB,
+          matched_system VARCHAR2(200),
+          status VARCHAR2(50) DEFAULT ''new'',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ outreach_targets table ready');
+  } catch (err) {
+    console.error('outreach_targets table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function initOutreachLogTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE outreach_log (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          target_id RAW(16) NOT NULL,
+          subject VARCHAR2(1000),
+          body CLOB,
+          sent_at TIMESTAMP,
+          status VARCHAR2(50) DEFAULT ''draft'',
+          opened NUMBER(1) DEFAULT 0,
+          replied NUMBER(1) DEFAULT 0,
+          reply_snippet VARCHAR2(2000),
+          replied_at TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ outreach_log table ready');
+  } catch (err) {
+    console.error('outreach_log table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveOutreachTarget(target: {
+  name: string;
+  company?: string;
+  email?: string;
+  emailStatus?: string;
+  linkedinUrl?: string;
+  source?: string;
+  painPoint?: string;
+  matchedSystem?: string;
+}): Promise<string | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO outreach_targets
+         (name, company, email, email_status, linkedin_url, source, pain_point, matched_system)
+       VALUES (:name, :company, :email, :emailStatus, :linkedinUrl, :source, :painPoint, :matchedSystem)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        name: target.name,
+        company: target.company || null,
+        email: target.email || null,
+        emailStatus: target.emailStatus || 'unverified',
+        linkedinUrl: target.linkedinUrl || null,
+        source: target.source || null,
+        painPoint: target.painPoint || null,
+        matchedSystem: target.matchedSystem || null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 }
+      },
+      { autoCommit: true }
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds.id[0] || null;
+  } catch (err) {
+    console.error('❌ saveOutreachTarget error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function updateOutreachTargetStatus(
+  targetId: string,
+  status: string,
+  emailStatus?: string
+): Promise<boolean> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const sets = ['status = :status', 'updated_at = CURRENT_TIMESTAMP'];
+    const binds: Record<string, string> = { targetId, status };
+    if (emailStatus !== undefined) {
+      sets.push('email_status = :emailStatus');
+      binds.emailStatus = emailStatus;
+    }
+    await connection.execute(
+      `UPDATE outreach_targets SET ${sets.join(', ')} WHERE RAWTOHEX(id) = :targetId`,
+      binds as unknown as Record<string, oracledb.BindParameter>,
+      { autoCommit: true }
+    );
+    return true;
+  } catch (err) {
+    console.error('❌ updateOutreachTargetStatus error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getOutreachTargets(params?: {
+  status?: string;
+  limit?: number;
+}): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    let sql = `SELECT RAWTOHEX(id) as id, name, company, email, email_status,
+                      linkedin_url, source, pain_point, matched_system, status,
+                      created_at, updated_at
+               FROM outreach_targets`;
+    const binds: Record<string, string | number> = {};
+    if (params?.status) {
+      sql += ' WHERE status = :status';
+      binds.status = params.status;
+    }
+    sql += ' ORDER BY created_at DESC';
+    if (params?.limit) {
+      sql += ' FETCH FIRST :lim ROWS ONLY';
+      binds.lim = params.limit;
+    }
+    const result = await connection.execute(sql, binds as unknown as Record<string, oracledb.BindParameter>);
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ getOutreachTargets error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveOutreachEmail(params: {
+  targetId: string;
+  subject: string;
+  body: string;
+  status?: string;
+}): Promise<string | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `INSERT INTO outreach_log (target_id, subject, body, status, sent_at)
+       VALUES (HEXTORAW(:targetId), :subject, :body, :status,
+               CASE WHEN :status = 'sent' THEN CURRENT_TIMESTAMP ELSE NULL END)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        targetId: params.targetId,
+        subject: params.subject,
+        body: params.body,
+        status: params.status || 'draft',
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 }
+      },
+      { autoCommit: true }
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds.id[0] || null;
+  } catch (err) {
+    console.error('❌ saveOutreachEmail error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function markOutreachSent(emailId: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(
+      `UPDATE outreach_log SET status = 'sent', sent_at = CURRENT_TIMESTAMP
+       WHERE RAWTOHEX(id) = :emailId`,
+      { emailId },
+      { autoCommit: true }
+    );
+    return true;
+  } catch (err) {
+    console.error('❌ markOutreachSent error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function markOutreachReply(emailId: string, snippet: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    await connection.execute(
+      `UPDATE outreach_log SET replied = 1, reply_snippet = :snippet, replied_at = CURRENT_TIMESTAMP
+       WHERE RAWTOHEX(id) = :emailId`,
+      { emailId, snippet: snippet.slice(0, 2000) },
+      { autoCommit: true }
+    );
+    return true;
+  } catch (err) {
+    console.error('❌ markOutreachReply error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getOutreachSentToday(): Promise<number> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT COUNT(*) FROM outreach_log
+       WHERE status = 'sent' AND sent_at >= TRUNC(CURRENT_TIMESTAMP)`,
+      {}
+    );
+    return result.rows ? Number((result.rows[0] as any[])[0]) : 0;
+  } catch (err) {
+    console.error('❌ getOutreachSentToday error:', err);
+    return 0;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getOutreachStats(): Promise<{
+  total_targets: number;
+  total_sent: number;
+  total_replies: number;
+  sent_today: number;
+  reply_rate: string;
+}> {
+  let connection;
+  const stats = { total_targets: 0, total_sent: 0, total_replies: 0, sent_today: 0, reply_rate: '0%' };
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const tgt = await connection.execute('SELECT COUNT(*) FROM outreach_targets');
+    stats.total_targets = tgt.rows ? Number((tgt.rows[0] as any[])[0]) : 0;
+
+    const sent = await connection.execute(
+      `SELECT COUNT(*) FROM outreach_log WHERE status = 'sent'`
+    );
+    stats.total_sent = sent.rows ? Number((sent.rows[0] as any[])[0]) : 0;
+
+    const replies = await connection.execute(
+      'SELECT COUNT(*) FROM outreach_log WHERE replied = 1'
+    );
+    stats.total_replies = replies.rows ? Number((replies.rows[0] as any[])[0]) : 0;
+
+    const today = await connection.execute(
+      `SELECT COUNT(*) FROM outreach_log
+       WHERE status = 'sent' AND sent_at >= TRUNC(CURRENT_TIMESTAMP)`
+    );
+    stats.sent_today = today.rows ? Number((today.rows[0] as any[])[0]) : 0;
+
+    if (stats.total_sent > 0) {
+      stats.reply_rate = ((stats.total_replies / stats.total_sent) * 100).toFixed(1) + '%';
+    }
+    return stats;
+  } catch (err) {
+    console.error('❌ getOutreachStats error:', err);
+    return stats;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getOutreachDrafts(): Promise<any[]> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(ol.id) as email_id, RAWTOHEX(ol.target_id) as target_id,
+              ol.subject, ol.body, ol.status,
+              ot.name, ot.company, ot.email
+       FROM outreach_log ol
+       JOIN outreach_targets ot ON ol.target_id = ot.id
+       WHERE ol.status = 'draft'
+       ORDER BY ol.created_at DESC`
+    );
+    return result.rows || [];
+  } catch (err) {
+    console.error('❌ getOutreachDrafts error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 // Initialize all tables (including new Wiring Build tables)
 initLessonsTable();
 initStrategicTable();
@@ -1864,6 +2186,8 @@ initKnowledgeBaseTable();
 initAgentOutcomesTable();
 initContentLogTable();
 initEspaluzFunnelTable();
+initOutreachTargetsTable();
+initOutreachLogTable();
 
 export {
   initializeDatabase,
@@ -1923,5 +2247,15 @@ export {
   // EspaLuz Funnel — trial → paid → churned tracking
   upsertEspaluzUser,
   getEspaluzExpiringTrials,
-  getEspaluzFunnelSummary
+  getEspaluzFunnelSummary,
+  // === PHASE 4 — Founder Outreach Pipeline ===
+  saveOutreachTarget,
+  updateOutreachTargetStatus,
+  getOutreachTargets,
+  saveOutreachEmail,
+  markOutreachSent,
+  markOutreachReply,
+  getOutreachSentToday,
+  getOutreachStats,
+  getOutreachDrafts
 };

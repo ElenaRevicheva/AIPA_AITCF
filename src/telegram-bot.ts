@@ -51,8 +51,20 @@ import {
   // Wiring Build (Week 1) - EspaLuz funnel
   upsertEspaluzUser,
   getEspaluzExpiringTrials,
-  getEspaluzFunnelSummary
+  getEspaluzFunnelSummary,
+  // Phase 4 - Outreach
+  getOutreachStats,
+  getOutreachDrafts,
 } from './database';
+import {
+  importTargets,
+  verifyTargetEmails,
+  generateBatchDrafts,
+  sendApprovedDrafts,
+  formatOutreachStatsMessage,
+  formatDraftPreview,
+  type OutreachTargetInput,
+} from './outreach';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -548,6 +560,8 @@ Type /menu for all commands! 🚀
         { cmd: '/outcomes', desc: 'Agent outcome tracking', usage: '/outcomes\n/outcomes cmo\nShows what each agent did and whether it worked' },
         { cmd: '/leads', desc: 'Business lead tracker', usage: '/leads\n/leads new\nSignals from LinkedIn, social, inbound' },
         { cmd: '/lead', desc: 'Add or update a lead', usage: '/lead add linkedin John Contractor commented on automation post\n/lead update <id> contacted' },
+        { cmd: '/outreach', desc: 'Outreach pipeline stats (targets, sent, replies)', usage: '/outreach\nSent today, reply rate, pipeline totals' },
+        { cmd: '/outreach_drafts', desc: 'Review pending outreach drafts', usage: '/outreach_drafts\nPreview emails before sending' },
         { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
         { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
       ]
@@ -1061,6 +1075,48 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       }
     } else {
       await ctx.reply('🎯 Lead management:\n\nAdd:\n/lead add <source> <name> <context>\nExample: /lead add linkedin John_Doe commented on wiring post\n\nUpdate:\n/lead update <id> <status> [next action]\nStatuses: new, contacted, in-conversation, converted, lost');
+    }
+  });
+
+  // /outreach - Outreach pipeline stats
+  bot.command('outreach', async (ctx) => {
+    try {
+      const stats = await getOutreachStats();
+      const msg = [
+        `📧 *Outreach Pipeline — Phase 4*`,
+        ``,
+        `Targets: ${stats.total_targets}`,
+        `Emails sent: ${stats.total_sent} (today: ${stats.sent_today}/10)`,
+        `Replies: ${stats.total_replies}`,
+        `Reply rate: ${stats.reply_rate}`,
+        ``,
+        `Commands:`,
+        `/outreach_drafts — View pending drafts`,
+        `/outreach_stats — Full pipeline stats`,
+      ].join('\n');
+      await ctx.reply(msg, { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('Outreach stats error:', error);
+      await ctx.reply('❌ Error fetching outreach stats.');
+    }
+  });
+
+  // /outreach_drafts - Show draft emails ready for review
+  bot.command('outreach_drafts', async (ctx) => {
+    try {
+      const rawDrafts = await getOutreachDrafts();
+      if (!rawDrafts || rawDrafts.length === 0) {
+        await ctx.reply('📝 No outreach drafts pending.\n\nImport targets via POST /outreach/targets/import, then generate drafts via POST /outreach/drafts/generate.');
+        return;
+      }
+      const lines = (rawDrafts as any[]).slice(0, 5).map((row: any, i: number) => {
+        const [, , subject, body, , name, company] = row;
+        return `*${i + 1}. ${name || 'Unknown'} (${company || '?'})*\nSubject: ${subject || '—'}\nPreview: ${(body || '').slice(0, 100)}…`;
+      });
+      await ctx.reply(`📝 *Outreach Drafts* (${rawDrafts.length} total)\n\n${lines.join('\n\n')}\n\nApprove all: POST /outreach/send`, { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('Outreach drafts error:', error);
+      await ctx.reply('❌ Error fetching drafts.');
     }
   });
 
