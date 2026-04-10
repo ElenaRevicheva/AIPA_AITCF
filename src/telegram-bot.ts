@@ -7334,3 +7334,14 @@ export function stopTelegramBot() {
     console.log('🛑 Telegram bot stopped');
   }
 }
+
+export async function sendTelegramBroadcast(message: string): Promise<void> {
+  if (!bot || alertChatIds.size === 0) return;
+  for (const chatId of alertChatIds) {
+    try {
+      await bot.api.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+    } catch (e) {
+      console.error(`Broadcast to ${chatId} failed:`, e);
+    }
+  }
+}

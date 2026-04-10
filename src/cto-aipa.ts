@@ -13,7 +13,7 @@ import {
   getOutreachDrafts,
   markOutreachReply,
 } from './database';
-import { initTelegramBot } from './telegram-bot';
+import { initTelegramBot, sendTelegramBroadcast } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
 import { startHashnodeDailyPublisher, runDailyHashnodePost, HASHNODE_TOPIC_BRIEFS } from './hashnode-daily';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
@@ -28,6 +28,7 @@ import {
   generateBatchDrafts,
   sendApprovedDrafts,
   sendOutreachEmail,
+  runDailyOutreachCycle,
   formatOutreachStatsMessage,
   formatDraftPreview,
 } from './outreach';
@@ -35,6 +36,7 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { Octokit } from '@octokit/rest';
+import * as cron from 'node-cron';
 
 dotenv.config({ override: true });
 
@@ -1399,6 +1401,16 @@ async function startCTOAIPA() {
     startMarketingWeeklyDigest();
     if (process.env.OUTREACH_SECRET?.trim()) {
       console.log(`📧 Outreach pipeline: ${baseUrl}/outreach/* (Bearer OUTREACH_SECRET)`);
+
+      const outreachCronExpr = process.env.OUTREACH_CRON || '0 15 * * *';
+      const outreachTz = process.env.OUTREACH_TZ || 'America/Panama';
+      cron.schedule(outreachCronExpr, () => {
+        console.log('📧 [cron] Running daily outreach cycle…');
+        runDailyOutreachCycle(anthropic, sendTelegramBroadcast).catch(e =>
+          console.error('📧 [cron] Outreach cycle error:', e)
+        );
+      }, { timezone: outreachTz });
+      console.log(`📧 Outreach cron: "${outreachCronExpr}" (${outreachTz}) — auto generate + send`);
     }
   });
 }

@@ -383,6 +383,52 @@ export async function sendApprovedDrafts(): Promise<{
 }
 
 // ---------------------------------------------------------------------------
+// Fully automatic daily outreach cycle
+// ---------------------------------------------------------------------------
+
+export async function runDailyOutreachCycle(
+  anthropic: Anthropic,
+  sendTelegram?: (msg: string) => Promise<void>
+): Promise<void> {
+  const tag = 'outreach-auto';
+  console.log(`[${tag}] Daily outreach cycle starting…`);
+
+  try {
+    // Step 1: generate drafts for all verified targets
+    const gen = await generateBatchDrafts(anthropic, 10);
+    console.log(`[${tag}] Generated ${gen.generated} drafts`);
+
+    // Step 2: immediately send all drafts
+    const send = await sendApprovedDrafts();
+    console.log(`[${tag}] Sent ${send.sent}, skipped ${send.skipped}, errors ${send.errors.length}`);
+
+    // Step 3: get stats for Telegram summary
+    const stats = await getOutreachStats();
+
+    const lines = [
+      `📧 *Daily Outreach Cycle Complete*`,
+      ``,
+      `Drafts generated: ${gen.generated}`,
+      `Emails sent: ${send.sent}`,
+      send.skipped ? `Skipped (no email): ${send.skipped}` : '',
+      send.errors.length ? `Errors: ${send.errors.join(', ')}` : '',
+      ``,
+      `Pipeline: ${stats.total_targets} targets, ${stats.total_sent} total sent, ${stats.sent_today}/${DAILY_CAP} today`,
+      `Reply rate: ${stats.reply_rate}`,
+    ].filter(Boolean).join('\n');
+
+    if (sendTelegram) {
+      await sendTelegram(lines);
+    }
+  } catch (e) {
+    console.error(`[${tag}] Cycle error:`, e);
+    if (sendTelegram) {
+      await sendTelegram(`❌ Outreach cycle failed: ${String(e).slice(0, 200)}`);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Telegram notification helpers
 // ---------------------------------------------------------------------------
 
