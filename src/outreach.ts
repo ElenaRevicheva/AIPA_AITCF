@@ -243,7 +243,9 @@ export async function verifyTargetEmails(): Promise<{
     if (result.status === 'invalid') {
       await updateOutreachTargetStatus(targetId, 'invalid_email', 'invalid');
       invalid++;
-    } else if (result.status === 'valid' || result.status === 'accept_all') {
+    } else {
+      // 'valid', 'accept_all', OR 'unknown' (Hunter free tier can't verify all)
+      // — proceed to send; bounces are acceptable over silent non-delivery
       await updateOutreachTargetStatus(targetId, 'verified', result.status);
       verified++;
     }
@@ -336,7 +338,13 @@ export async function generateBatchDrafts(
   anthropic: Anthropic,
   limit: number = 5
 ): Promise<{ generated: number; drafts: Array<{ targetId: string; subject: string }> }> {
-  const targets = await getOutreachTargets({ status: 'verified' });
+  // Pick verified targets first, then 'new' ones that have an email
+  const verified = await getOutreachTargets({ status: 'verified' });
+  const fresh = await getOutreachTargets({ status: 'new' });
+  const targets = [
+    ...verified,
+    ...fresh.filter((row: any[]) => row[3]),  // row[3] = email column
+  ];
   const drafts: Array<{ targetId: string; subject: string }> = [];
   const cap = Math.min(limit, targets.length);
 
@@ -460,7 +468,11 @@ export async function runDailyOutreachCycle(
   console.log(`[${tag}] Daily outreach cycle starting…`);
 
   try {
-    // Step 1: generate drafts for all verified targets
+    // Step 0: verify any 'new' targets → moves them to 'verified' or 'invalid_email'
+    const verify = await verifyTargetEmails();
+    console.log(`[${tag}] Verified ${verify.verified} targets, rejected ${verify.invalid}`);
+
+    // Step 1: generate drafts for verified + new-with-email targets
     const gen = await generateBatchDrafts(anthropic, 10);
     console.log(`[${tag}] Generated ${gen.generated} drafts`);
 
