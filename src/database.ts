@@ -2155,6 +2155,26 @@ async function getOutreachStats(): Promise<{
   }
 }
 
+async function getOutreachTargetByCompany(company: string): Promise<any | null> {
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) as id, name, company, email, status
+       FROM outreach_targets
+       WHERE LOWER(company) = :company
+       FETCH FIRST 1 ROWS ONLY`,
+      { company: company.toLowerCase() }
+    );
+    return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+  } catch (err) {
+    console.error('❌ getOutreachTargetByCompany error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getOutreachDrafts(): Promise<any[]> {
   let connection;
   try {
@@ -2252,6 +2272,7 @@ export {
   saveOutreachTarget,
   updateOutreachTargetStatus,
   getOutreachTargets,
+  getOutreachTargetByCompany,
   saveOutreachEmail,
   markOutreachSent,
   markOutreachReply,

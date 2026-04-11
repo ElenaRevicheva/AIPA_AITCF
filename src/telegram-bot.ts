@@ -65,6 +65,7 @@ import {
   formatDraftPreview,
   type OutreachTargetInput,
 } from './outreach';
+import { runProspectIngestion } from './prospect-ingest';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -561,6 +562,7 @@ Type /menu for all commands! 🚀
         { cmd: '/leads', desc: 'Business lead tracker', usage: '/leads\n/leads new\nSignals from LinkedIn, social, inbound' },
         { cmd: '/lead', desc: 'Add or update a lead', usage: '/lead add linkedin John Contractor commented on automation post\n/lead update <id> contacted' },
         { cmd: '/outreach', desc: 'Outreach pipeline stats (targets, sent, replies)', usage: '/outreach\nSent today, reply rate, pipeline totals' },
+        { cmd: '/outreach_ingest', desc: 'Discover YC prospects + Hunter.io emails', usage: '/outreach_ingest\nFetch YC companies, find founder emails, import to pipeline' },
         { cmd: '/outreach_drafts', desc: 'Review pending outreach drafts', usage: '/outreach_drafts\nPreview emails before sending' },
         { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
         { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
@@ -1083,7 +1085,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     try {
       const stats = await getOutreachStats();
       const msg = [
-        `📧 *Outreach Pipeline — Phase 4*`,
+        `📧 *Outreach Pipeline — Phase 4b*`,
         ``,
         `Targets: ${stats.total_targets}`,
         `Emails sent: ${stats.total_sent} (today: ${stats.sent_today}/10)`,
@@ -1091,6 +1093,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
         `Reply rate: ${stats.reply_rate}`,
         ``,
         `Commands:`,
+        `/outreach_ingest — Discover YC companies + Hunter.io emails`,
         `/outreach_drafts — View pending drafts`,
         `/outreach_stats — Full pipeline stats`,
       ].join('\n');
@@ -1106,7 +1109,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     try {
       const rawDrafts = await getOutreachDrafts();
       if (!rawDrafts || rawDrafts.length === 0) {
-        await ctx.reply('📝 No outreach drafts pending.\n\nImport targets via POST /outreach/targets/import, then generate drafts via POST /outreach/drafts/generate.');
+        await ctx.reply('📝 No outreach drafts pending.\n\nRun /outreach_ingest to discover YC companies, or import targets via POST /outreach/targets/import.');
         return;
       }
       const lines = (rawDrafts as any[]).slice(0, 5).map((row: any, i: number) => {
@@ -1117,6 +1120,22 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     } catch (error) {
       console.error('Outreach drafts error:', error);
       await ctx.reply('❌ Error fetching drafts.');
+    }
+  });
+
+  // /outreach_ingest - Manually trigger prospect ingestion
+  bot.command('outreach_ingest', async (ctx) => {
+    try {
+      await ctx.reply('🔍 Starting prospect ingestion (YC companies → Hunter.io → Oracle)…\nThis may take 1-2 minutes.');
+      const result = await runProspectIngestion(anthropic, async (msg) => {
+        await ctx.reply(msg, { parse_mode: 'Markdown' });
+      });
+      if (!result.ingested && !result.skipped) {
+        await ctx.reply('⚠️ No companies found to ingest. Check YC JSON path or API.');
+      }
+    } catch (error) {
+      console.error('Outreach ingest error:', error);
+      await ctx.reply('❌ Error running prospect ingestion.');
     }
   });
 

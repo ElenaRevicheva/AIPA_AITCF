@@ -124,6 +124,72 @@ function matchPainToSystem(text: string): string {
 }
 
 // ---------------------------------------------------------------------------
+// Hunter.io — free tier: 25 searches + 50 verifications + 25 finders / month
+// ---------------------------------------------------------------------------
+
+export async function hunterDomainSearch(domain: string, limit = 5): Promise<{
+  emails: Array<{ email: string; name: string; position: string; confidence: number }>;
+  found: number;
+}> {
+  const apiKey = process.env.HUNTER_API_KEY?.trim();
+  if (!apiKey) return { emails: [], found: 0 };
+  try {
+    const r = await fetch(
+      `https://api.hunter.io/v2/domain-search?domain=${encodeURIComponent(domain)}&limit=${limit}&api_key=${apiKey}`
+    );
+    if (!r.ok) {
+      console.error('Hunter.io domain-search HTTP', r.status);
+      return { emails: [], found: 0 };
+    }
+    const data = (await r.json()) as { data: { emails: any[] } };
+    const priorityTitles = ['founder', 'ceo', 'cto', 'vp', 'director', 'head', 'co-founder'];
+    const emails = (data.data.emails || []).map((e: any) => ({
+      email: e.value as string,
+      name: `${e.first_name || ''} ${e.last_name || ''}`.trim(),
+      position: (e.position || '') as string,
+      confidence: (e.confidence || 0) as number,
+    }));
+    emails.sort((a: { position: string }, b: { position: string }) => {
+      const aP = priorityTitles.findIndex((t) => a.position.toLowerCase().includes(t));
+      const bP = priorityTitles.findIndex((t) => b.position.toLowerCase().includes(t));
+      return (aP === -1 ? 99 : aP) - (bP === -1 ? 99 : bP);
+    });
+    return { emails, found: emails.length };
+  } catch (e) {
+    console.error('Hunter.io domain-search error:', e);
+    return { emails: [], found: 0 };
+  }
+}
+
+export async function hunterEmailFinder(
+  domain: string,
+  firstName: string,
+  lastName: string
+): Promise<{ email: string | null; score: number }> {
+  const apiKey = process.env.HUNTER_API_KEY?.trim();
+  if (!apiKey) return { email: null, score: 0 };
+  try {
+    const params = new URLSearchParams({
+      domain,
+      first_name: firstName,
+      last_name: lastName,
+      api_key: apiKey,
+    });
+    const r = await fetch(`https://api.hunter.io/v2/email-finder?${params}`);
+    if (!r.ok) {
+      console.error('Hunter.io email-finder HTTP', r.status);
+      return { email: null, score: 0 };
+    }
+    const data = (await r.json()) as { data: { email: string; score: number } };
+    const score = data.data.score || 0;
+    return { email: score >= 60 ? data.data.email : null, score };
+  } catch (e) {
+    console.error('Hunter.io email-finder error:', e);
+    return { email: null, score: 0 };
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Hunter.io email verification (optional — skipped if HUNTER_API_KEY not set)
 // ---------------------------------------------------------------------------
 

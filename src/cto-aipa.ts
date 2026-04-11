@@ -32,6 +32,7 @@ import {
   formatOutreachStatsMessage,
   formatDraftPreview,
 } from './outreach';
+import { runProspectIngestion } from './prospect-ingest';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
@@ -1401,6 +1402,17 @@ async function startCTOAIPA() {
     startMarketingWeeklyDigest();
     if (process.env.OUTREACH_SECRET?.trim()) {
       console.log(`📧 Outreach pipeline: ${baseUrl}/outreach/* (Bearer OUTREACH_SECRET)`);
+
+      // Prospect ingestion: 2 PM Panama (before outreach send at 3 PM)
+      const ingestCronExpr = process.env.INGEST_CRON || '0 14 * * *';
+      const ingestTz = process.env.INGEST_TZ || process.env.OUTREACH_TZ || 'America/Panama';
+      cron.schedule(ingestCronExpr, () => {
+        console.log('🔍 [cron] Running prospect ingestion cycle…');
+        runProspectIngestion(anthropic, sendTelegramBroadcast).catch(e =>
+          console.error('🔍 [cron] Prospect ingestion error:', e)
+        );
+      }, { timezone: ingestTz });
+      console.log(`🔍 Ingest cron: "${ingestCronExpr}" (${ingestTz}) — YC companies → Hunter → Oracle`);
 
       const outreachCronExpr = process.env.OUTREACH_CRON || '0 15 * * *';
       const outreachTz = process.env.OUTREACH_TZ || 'America/Panama';
