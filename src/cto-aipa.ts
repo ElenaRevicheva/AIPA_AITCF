@@ -1003,7 +1003,7 @@ async function startCTOAIPA() {
       res.status(429).json({ error: 'Too many requests' });
       return;
     }
-    const b = req.body as Record<string, unknown>;
+    const b = (req.body || {}) as Record<string, unknown>;
     const hp = typeof b.company === 'string' ? b.company : '';
     if (hp.trim() !== '') {
       res.status(400).json({ error: 'Bad request' });
