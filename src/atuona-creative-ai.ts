@@ -1657,6 +1657,46 @@ function formatKnowledgeFromKeys(keys: KnowledgeCategory[]): string {
 
 const ATUONA_BOOK_REPO = { owner: 'ElenaRevicheva', repo: 'atuona' } as const;
 
+/** Public GitHub metadata often omits full poem body; strip boilerplate from description for theme/title anchor. */
+function stripCanonDescriptionBoilerplate(description: string): string {
+  if (!description?.trim()) return '';
+  return description
+    .replace(/^ATUONA Gallery of Moments\s*-\s*[^.]+\.\s*/i, '')
+    .replace(/\s*Underground poetry preserved on blockchain\.\s*/gi, ' ')
+    .replace(/\s*Free collection\s*-\s*true to underground values\.\s*/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Prefer full on-chain text when present; otherwise title + Poem trait + cleaned description
+ * (matches what is actually published on GitHub for #001–#048).
+ */
+function buildCanonExcerptFromMetadata(
+  pageId: string,
+  metadata: {
+    name?: string;
+    description?: string;
+    attributes?: { trait_type?: string; value?: string }[];
+  }
+): string | null {
+  const fullText =
+    metadata.attributes?.find(
+      (a) => a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text'
+    )?.value || '';
+  if (fullText?.trim()) {
+    return fullText.replace(/\s+/g, ' ').trim().slice(0, 750);
+  }
+  const poemTitle =
+    metadata.attributes?.find((a) => a.trait_type === 'Poem')?.value?.trim() || '';
+  const name = (metadata.name || '').replace(/\s*#\d+\s*$/, '').trim();
+  const theme = stripCanonDescriptionBoilerplate(metadata.description || '');
+  const bits = [poemTitle || name, theme].filter(Boolean);
+  if (bits.length === 0) return null;
+  const excerpt = bits.join(' — ').replace(/\s+/g, ' ').trim().slice(0, 750);
+  return excerpt || null;
+}
+
 async function fetchOneCanonMetadataPage(pageNum: number): Promise<string | null> {
   const pageId = String(pageNum).padStart(3, '0');
   try {
@@ -1668,13 +1708,8 @@ async function fetchOneCanonMetadataPage(pageNum: number): Promise<string | null
     });
     if (!('content' in data)) return null;
     const metadata = JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'));
-    const russianText =
-      metadata.attributes?.find(
-        (a: { trait_type?: string; value?: string }) =>
-          a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text'
-      )?.value || '';
-    if (!russianText?.trim()) return null;
-    const excerpt = russianText.replace(/\s+/g, ' ').trim().slice(0, 750);
+    const excerpt = buildCanonExcerptFromMetadata(pageId, metadata);
+    if (!excerpt) return null;
     return `### #${pageId}\n${excerpt}`;
   } catch {
     return null;
@@ -1701,7 +1736,9 @@ async function getUndergroundCanonCorpus(): Promise<string> {
     }
   }
   undergroundCanonCorpusCache = parts.join('\n\n');
-  console.log(`📚 Underground canon corpus: ${parts.length} pages, ${undergroundCanonCorpusCache.length} chars`);
+  console.log(
+    `📚 Underground canon corpus: ${parts.length}/48 pages, ${undergroundCanonCorpusCache.length} chars (full poem text when trait present; else title + theme from metadata)`
+  );
   return undergroundCanonCorpusCache;
 }
 
