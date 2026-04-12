@@ -123,10 +123,10 @@ async function classifyLead(
 
   let parsed: TriageResult;
 
-  // Skip Groq entirely when daily rate limit is hit — go straight to Claude Haiku
-  const skipGroq = !process.env.GROQ_API_KEY?.trim() || !!_groqDailyLimitHit;
+  // Skip Groq: env override, no key, or daily limit already hit this cycle
+  const skipGroq = !!process.env.TRIAGE_SKIP_GROQ || !process.env.GROQ_API_KEY?.trim() || !!_groqDailyLimitHit;
   if (skipGroq) {
-    console.log(`🎯 [triage] Using Claude Haiku (${!process.env.GROQ_API_KEY?.trim() ? 'no GROQ key' : 'Groq daily limit hit'})`);
+    console.log(`🎯 [triage] Using Claude Haiku (${process.env.TRIAGE_SKIP_GROQ ? 'TRIAGE_SKIP_GROQ' : !process.env.GROQ_API_KEY?.trim() ? 'no GROQ key' : 'Groq daily limit hit'})`);
     try {
       parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
     } catch (e: any) {
