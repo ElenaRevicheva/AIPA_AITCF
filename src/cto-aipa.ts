@@ -88,6 +88,20 @@ console.log(
   `🎯 Phase 5 triage: ANTHROPIC_API_KEY ${_ak > 0 ? `set (${_ak} chars)` : 'MISSING'} · GROQ_API_KEY ${_gk > 0 ? `set (${_gk} chars)` : 'MISSING'} · ready=${_p5.ready} · cron ${_p5.cron}`
 );
 
+/** When Groq 429/rate-limit would crash the cluster worker, fall back to Haiku (same pattern as lead-triage). */
+const CODE_REVIEW_FALLBACK_MODEL =
+  process.env.CODE_REVIEW_FALLBACK_MODEL || 'claude-3-5-haiku-20241022';
+
+async function anthropicTextReview(model: string, prompt: string, maxTokens: number): Promise<string> {
+  const response = await anthropic.messages.create({
+    model,
+    max_tokens: maxTokens,
+    messages: [{ role: 'user', content: prompt }],
+  });
+  const firstContent = response.content[0];
+  return firstContent && firstContent.type === 'text' ? firstContent.text : '';
+}
+
 // =============================================================================
 // AIdeazz ECOSYSTEM CONTEXT - CTO AIPA knows the entire startup
 // =============================================================================
@@ -516,23 +530,59 @@ Provide a review that:
 Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
 
   let review: string;
+  let modelUsed: string;
 
   if (hasCriticalIssues) {
-    console.log(`🔐 Using ${AI_MODELS.critical} for critical code review...`);
-    const response = await anthropic.messages.create({
-      model: AI_MODELS.critical,
-      max_tokens: AI_MODELS.maxTokens,
-      messages: [{ role: 'user', content: aiPrompt }]
-    });
-    const firstContent = response.content[0];
-    review = firstContent && firstContent.type === 'text' ? firstContent.text : '';
+    try {
+      console.log(`🔐 Using ${AI_MODELS.critical} for critical code review...`);
+      review = await anthropicTextReview(AI_MODELS.critical, aiPrompt, AI_MODELS.maxTokens);
+      modelUsed = AI_MODELS.critical;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`🔐 Critical review failed, Haiku fallback: ${msg.slice(0, 220)}`);
+      try {
+        review = await anthropicTextReview(
+          CODE_REVIEW_FALLBACK_MODEL,
+          aiPrompt,
+          Math.min(AI_MODELS.maxTokens, 8192)
+        );
+        modelUsed = `${CODE_REVIEW_FALLBACK_MODEL} (critical fallback)`;
+      } catch (err2: unknown) {
+        const m2 = err2 instanceof Error ? err2.message : String(err2);
+        console.error(`🔐 Haiku fallback failed: ${m2.slice(0, 220)}`);
+        review = `_(Review generation failed. Static analysis below.)_\n\n${analysisSummary}`;
+        modelUsed = 'unavailable';
+      }
+    }
   } else {
-    console.log(`⚡ Using ${AI_MODELS.standard} for standard code review...`);
-    const response = await groq.chat.completions.create({
-      model: AI_MODELS.standard,
-      messages: [{ role: 'user', content: aiPrompt }]
-    });
-    review = response.choices[0]?.message?.content || '';
+    try {
+      console.log(`⚡ Using ${AI_MODELS.standard} for standard code review...`);
+      const response = await groq.chat.completions.create(
+        {
+          model: AI_MODELS.standard,
+          messages: [{ role: 'user', content: aiPrompt }],
+        },
+        { timeout: 120_000, maxRetries: 0 }
+      );
+      review = response.choices[0]?.message?.content || '';
+      modelUsed = AI_MODELS.standard;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`⚡ Groq review failed (${msg.slice(0, 160)}), using Claude Haiku fallback...`);
+      try {
+        review = await anthropicTextReview(
+          CODE_REVIEW_FALLBACK_MODEL,
+          aiPrompt,
+          Math.min(AI_MODELS.maxTokens, 8192)
+        );
+        modelUsed = `${CODE_REVIEW_FALLBACK_MODEL} (Groq fallback)`;
+      } catch (err2: unknown) {
+        const m2 = err2 instanceof Error ? err2.message : String(err2);
+        console.error(`❌ Haiku fallback failed: ${m2.slice(0, 220)}`);
+        review = `_(Automated review unavailable: ${msg.slice(0, 280)})_\n\n**Static analysis:**\n${analysisSummary}`;
+        modelUsed = 'unavailable';
+      }
+    }
   }
 
   await saveMemory('CTO', 'code_review', {
@@ -543,7 +593,7 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
     complexity_issues: complexityIssues.length,
     performance_issues: performanceIssues.length
   }, review, {
-    model_used: hasCriticalIssues ? AI_MODELS.critical : AI_MODELS.standard,
+    model_used: modelUsed,
     critical_issues: hasCriticalIssues,
     timestamp: new Date().toISOString()
   });
