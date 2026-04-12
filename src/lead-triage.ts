@@ -22,6 +22,9 @@ const TRIAGE_CONTEXT_MAX_CHARS = 3600;
 const TRIAGE_FALLBACK_MODEL = process.env.TRIAGE_FALLBACK_MODEL || 'claude-3-5-haiku-20241022';
 const TRIAGE_INTER_LEAD_DELAY_MS = Math.max(0, parseInt(process.env.TRIAGE_INTER_LEAD_DELAY_MS || '350', 10) || 0);
 
+/** Flip to true when Groq returns 429 daily limit — skip Groq for rest of cycle */
+let _groqDailyLimitHit = false;
+
 interface TriageResult {
   signal_type: 'job_opportunity' | 'client_lead' | 'partnership' | 'irrelevant' | 'unknown';
   urgency: number; // 1-5
@@ -120,9 +123,16 @@ async function classifyLead(
 
   let parsed: TriageResult;
 
-  if (!process.env.GROQ_API_KEY?.trim()) {
-    console.log('🎯 [triage] GROQ_API_KEY unset — classifying with Claude Haiku only');
-    parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
+  // Skip Groq entirely when daily rate limit is hit — go straight to Claude Haiku
+  const skipGroq = !process.env.GROQ_API_KEY?.trim() || !!_groqDailyLimitHit;
+  if (skipGroq) {
+    console.log(`🎯 [triage] Using Claude Haiku (${!process.env.GROQ_API_KEY?.trim() ? 'no GROQ key' : 'Groq daily limit hit'})`);
+    try {
+      parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
+    } catch (e: any) {
+      console.error('🎯 [triage] Haiku fallback failed:', String(e?.message || e).slice(0, 200));
+      return defaultTriage();
+    }
   } else {
     try {
       const groqResponse = await groq.chat.completions.create(
@@ -138,12 +148,16 @@ async function classifyLead(
       parsed = parseTriageJson(raw) || defaultTriage();
     } catch (err: any) {
       const msg = String(err?.message || err || '');
-      const is413 = msg.includes('413') || msg.includes('too large') || msg.includes('rate_limit');
-      console.warn(`🎯 [triage] Groq classify failed (${is413 ? 'size/rate' : 'error'}), using Claude fallback:`, msg.slice(0, 160));
+      if (msg.includes('429') || msg.includes('rate_limit') || msg.includes('Rate limit')) {
+        _groqDailyLimitHit = true;
+        console.warn('🎯 [triage] Groq daily limit hit — switching all remaining leads to Claude Haiku');
+      } else {
+        console.warn(`🎯 [triage] Groq error, fallback to Haiku:`, msg.slice(0, 160));
+      }
       try {
         parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
-      } catch (e2) {
-        console.error('🎯 [triage] Claude fallback failed:', e2);
+      } catch (e2: any) {
+        console.error('🎯 [triage] Claude fallback failed:', String(e2?.message || e2).slice(0, 200));
         return defaultTriage();
       }
     }
@@ -228,6 +242,7 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
     };
   }
 
+  _groqDailyLimitHit = false; // Reset for this cycle
   const maxBiz = Math.min(80, Math.max(5, parseInt(process.env.TRIAGE_MAX_BUSINESS_LEADS || '20', 10) || 20));
   const maxOut = Math.min(40, Math.max(3, parseInt(process.env.TRIAGE_MAX_OUTREACH || '10', 10) || 10));
 
