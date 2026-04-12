@@ -1390,6 +1390,8 @@ async function startCTOAIPA() {
   });
 
   // Manual triage trigger (for Cursor agent / automation)
+  // Default: 202 + background run (long Groq/Claude loops — avoids proxy/client socket hang-up).
+  // Sync result in HTTP response: POST /leads/triage-run?wait=1 (can take many minutes).
   app.post('/leads/triage-run', async (req: Request, res: Response) => {
     const secret = process.env.LEAD_TRIAGE_SECRET;
     const auth = req.headers.authorization?.replace('Bearer ', '');
@@ -1405,15 +1407,39 @@ async function startCTOAIPA() {
       });
       return;
     }
-    console.log('🎯 [triage-run] Starting...');
-    try {
-      const result = await runTriageCycle(groq, anthropic);
-      console.log('🎯 [triage-run] Complete:', result.processed, 'processed,', result.urgent, 'urgent');
-      res.json({ ok: true, ...result });
-    } catch (err) {
-      console.error('🎯 [triage-run] Error:', err);
-      if (!res.headersSent) res.status(500).json({ error: 'Triage failed' });
+    const wait = req.query.wait === '1' || req.query.sync === '1';
+    console.log(`🎯 [triage-run] Starting (background=${!wait})...`);
+
+    const run = async () => {
+      try {
+        const result = await runTriageCycle(groq, anthropic);
+        console.log('🎯 [triage-run] Complete:', result.processed, 'processed,', result.urgent, 'urgent');
+        return result;
+      } catch (err) {
+        console.error('🎯 [triage-run] Error:', err);
+        throw err;
+      }
+    };
+
+    if (wait) {
+      try {
+        const result = await run();
+        res.json({ ok: true, ...result });
+      } catch {
+        if (!res.headersSent) res.status(500).json({ error: 'Triage failed' });
+      }
+      return;
     }
+
+    res.status(202).json({
+      ok: true,
+      accepted: true,
+      message:
+        'Triage running in background. Watch PM2 logs for 🎯 [triage-run] Complete, or open /leads/dashboard.',
+    });
+    setImmediate(() => {
+      run().catch(() => undefined);
+    });
   });
 
   const PORT = 3000;
