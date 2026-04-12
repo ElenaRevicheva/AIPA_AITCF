@@ -23,6 +23,25 @@ const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({ auth: proces
 const LUMA_API_URL = 'https://api.lumalabs.ai/dream-machine/v1';
 const lumaApiKey = process.env.LUMA_API_KEY || null;
 
+/** Luma HTTP must not hang forever (stalled TCP); otherwise Telegram shows no further updates. */
+const LUMA_POLL_HTTP_TIMEOUT_MS = 55_000;
+const LUMA_CREATE_HTTP_TIMEOUT_MS = 120_000;
+
+function lumaPollSignal(): AbortSignal {
+  return AbortSignal.timeout(LUMA_POLL_HTTP_TIMEOUT_MS);
+}
+
+function lumaCreateSignal(): AbortSignal {
+  return AbortSignal.timeout(LUMA_CREATE_HTTP_TIMEOUT_MS);
+}
+
+/** MP4 URL from GET /generations/:id (handles API shape drift). */
+function extractLumaVideoUrl(statusData: any): string | null {
+  const v = statusData?.assets?.video;
+  if (typeof v === 'string' && /^https?:\/\//i.test(v)) return v.trim();
+  return null;
+}
+
 // Runway API base URL (image_to_video fallback — see VIDEO_MODELS.runwayImageToVideo)
 const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
@@ -3364,7 +3383,8 @@ async function generateVideo(
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(lumaBody)
+        body: JSON.stringify(lumaBody),
+        signal: lumaCreateSignal()
       });
       
       const responseText = await lumaResponse.text();
@@ -3589,7 +3609,8 @@ async function startModifyVideo(
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: lumaCreateSignal()
     });
 
     const text = await resp.text();
@@ -3625,7 +3646,8 @@ function pollAndDeliverDirectorsCut(
         headers: {
           'Authorization': `Bearer ${lumaApiKey}`,
           'Accept': 'application/json'
-        }
+        },
+        signal: lumaPollSignal()
       });
 
       if (!resp.ok) {
@@ -3635,22 +3657,31 @@ function pollAndDeliverDirectorsCut(
       }
 
       const data = await resp.json() as any;
+      const dcUrl = extractLumaVideoUrl(data);
 
-      if (data.state === 'completed' && data.assets?.video) {
-        console.log(`✅ Director's Cut ready: ${data.assets.video}`);
-        visualization.directorsCutVideoUrl = data.assets.video;
+      if (data.state === 'completed' && dcUrl) {
+        console.log(`✅ Director's Cut ready: ${dcUrl}`);
+        visualization.directorsCutVideoUrl = dcUrl;
         saveState();
 
         try {
-          await ctx.replyWithVideo(data.assets.video, {
+          await ctx.replyWithVideo(dcUrl, {
             caption: `🎬✨ *Director's Cut Ready!*\n\nFashion/editorial layer applied (\`${MODIFY_VIDEO_MODE}\`)\n\n💡 ${escapeMd(fashionPrompt.substring(0, 120))}`,
             parse_mode: 'Markdown'
           });
         } catch {
           await ctx.reply(
-            `🎬✨ *Director's Cut Ready!*\n\n🎬 ${data.assets.video}\n\n_Fashion/editorial layer — open link to view_`,
+            `🎬✨ *Director's Cut Ready!*\n\n🎬 ${dcUrl}\n\n_Fashion/editorial layer — open link to view_`,
             { parse_mode: 'Markdown' }
           );
+        }
+        return;
+      }
+
+      if (data.state === 'completed' && !dcUrl) {
+        if (attempt < maxAttempts) {
+          console.log(`Director's Cut completed but no video URL yet; retry (${attempt}/${maxAttempts})`);
+          setTimeout(() => poll(attempt + 1), 10_000);
         }
         return;
       }
@@ -8170,41 +8201,42 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
             
           } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
             visualizationSummaryDeferred = true;
-            // Luma Direct API needs polling - keep polling until done (max 5 min)
+            // Luma Direct: poll until done. Ray-2 1080p can exceed 5 min; fetch must time out or TCP stalls look like a "hang".
             const taskId = videoResult.taskId;
-            
+            const pollIntervalMs = 30_000;
+            const maxAttempts = 20; // ~10 min after first poll + 60s initial wait
+
             const pollLumaVideo = async (attempt: number = 1) => {
-              const maxAttempts = 10; // 10 attempts x 30 sec = 5 minutes max
-              
               try {
                 const statusResponse = await fetch(`${LUMA_API_URL}/generations/${taskId}`, {
-            headers: {
+                  headers: {
                     'Authorization': `Bearer ${lumaApiKey}`,
                     'Accept': 'application/json'
-                  }
+                  },
+                  signal: lumaPollSignal()
                 });
-                
+
                 if (statusResponse.ok) {
                   const statusData = await statusResponse.json() as any;
-                  
-                  if (statusData.state === 'completed' && statusData.assets?.video) {
-                    visualization.videoUrlHorizontal = statusData.assets.video;
+                  const videoUrl = extractLumaVideoUrl(statusData);
+
+                  if (statusData.state === 'completed' && videoUrl) {
+                    visualization.videoUrlHorizontal = videoUrl;
                     visualization.status = 'complete';
                     saveState();
-                    
-                    // Send video directly so user can view/download in Telegram
+
                     try {
-                      await ctx.replyWithVideo(statusData.assets.video, {
+                      await ctx.replyWithVideo(videoUrl, {
                         caption: `✅ *Video Ready!* (Luma Direct)\n\n_Tap to play, long-press to save!_`,
                         parse_mode: 'Markdown'
                       });
                     } catch (videoSendError) {
-                      await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${statusData.assets.video}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
+                      await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${videoUrl}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
                     }
                     await sendKnowledgeAuditAfterVideo();
 
                     startDirectorsCutPipeline({
-                      baseVideoUrl: statusData.assets.video,
+                      baseVideoUrl: videoUrl,
                       firstFrameImageUrl: visualization.imageUrlHorizontal!,
                       title, theme, englishExcerpt,
                       knowledgeKeys: deepKb.mergedKeys as string[],
@@ -8212,17 +8244,34 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                     }).catch(err => console.error('Director\'s Cut error (Luma Direct path):', err));
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                     return;
-                    
-                  } else if (statusData.state === 'failed') {
+                  }
+
+                  if (statusData.state === 'completed' && !videoUrl) {
+                    console.log(`Luma ${taskId} completed but no video URL yet; polling again (${attempt}/${maxAttempts})`);
+                    if (attempt < maxAttempts) {
+                      setTimeout(() => pollLumaVideo(attempt + 1), 10_000);
+                    } else {
+                      await ctx.reply(`⏳ Luma marked complete but no video URL yet.\nTry \`/videostatus ${taskId}\` in a moment.`, { parse_mode: 'Markdown' });
+                      await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    }
+                    return;
+                  }
+
+                  if (statusData.state === 'failed') {
                     await ctx.reply(`❌ Luma video failed.\nReason: ${statusData.failure_reason || 'Unknown'}`);
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                     return;
-                    
-                  } else if (attempt < maxAttempts) {
-                    // Still processing - poll again in 30 seconds
+                  }
+
+                  if (attempt < maxAttempts) {
                     console.log(`Luma video ${taskId} still ${statusData.state}, polling again (${attempt}/${maxAttempts})...`);
-                    setTimeout(() => pollLumaVideo(attempt + 1), 30000);
-                    
+                    if (attempt >= 4 && attempt % 4 === 0) {
+                      await ctx.reply(
+                        `⏳ *Luma still rendering…* (${attempt}/${maxAttempts})\n_State: ${statusData.state}_\n\nIf this finishes, the video will appear here. You can also try \`/videostatus ${taskId}\`.`,
+                        { parse_mode: 'Markdown' }
+                      ).catch(() => undefined);
+                    }
+                    setTimeout(() => pollLumaVideo(attempt + 1), pollIntervalMs);
                   } else {
                     await ctx.reply(`⏳ Video taking longer than expected.\nUse \`/videostatus ${taskId}\` to check manually.`, { parse_mode: 'Markdown' });
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
@@ -8231,24 +8280,32 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   const errBody = await statusResponse.text();
                   console.error(`Luma poll HTTP ${statusResponse.status}: ${errBody.substring(0, 300)}`);
                   if (attempt < maxAttempts) {
-                    setTimeout(() => pollLumaVideo(attempt + 1), 30000);
+                    setTimeout(() => pollLumaVideo(attempt + 1), pollIntervalMs);
                   } else {
                     await ctx.reply(`⏳ Could not read Luma status (HTTP ${statusResponse.status}). Try \`/videostatus ${taskId}\`.`, { parse_mode: 'Markdown' });
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                   }
                 }
-              } catch (pollError) {
-                console.error('Luma poll error:', pollError);
+              } catch (pollError: any) {
+                const isTimeout =
+                  pollError?.name === 'AbortError' ||
+                  pollError?.name === 'TimeoutError' ||
+                  /aborted|timeout/i.test(String(pollError?.message || ''));
+                console.error('Luma poll error:', isTimeout ? 'timeout/abort (will retry)' : pollError);
                 if (attempt < maxAttempts) {
-                  setTimeout(() => pollLumaVideo(attempt + 1), 30000);
+                  setTimeout(() => pollLumaVideo(attempt + 1), pollIntervalMs);
                 } else {
+                  await ctx.reply(
+                    `⏳ Luma status checks stopped after ${maxAttempts} tries.\nUse \`/videostatus ${taskId}\` or try again later.`,
+                    { parse_mode: 'Markdown' }
+                  );
                   await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
                 }
               }
             };
-            
-            // Start polling after 45 seconds (Luma typically takes 60-120 sec)
-            setTimeout(() => pollLumaVideo(1), 45000);
+
+            // First status check after 60s (matches the "Checking status in 60 seconds" message)
+            setTimeout(() => pollLumaVideo(1), 60_000);
             
           } else if (videoResult.provider === 'runway' && videoResult.taskId) {
             visualizationSummaryDeferred = true;
@@ -8441,36 +8498,43 @@ _Export all videos and compile in:_
     if (lumaApiKey) {
       try {
         const lumaResponse = await fetch(`${LUMA_API_URL}/generations/${taskId}`, {
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${lumaApiKey}`,
             'Accept': 'application/json'
-          }
+          },
+          signal: lumaPollSignal()
         });
-        
+
         if (lumaResponse.ok) {
           const data = await lumaResponse.json() as any;
-          
-          if (data.state === 'completed' && data.assets?.video) {
-            // Send video directly so user can view/download in Telegram
+          const vUrl = extractLumaVideoUrl(data);
+
+          if (data.state === 'completed' && vUrl) {
             try {
-              await ctx.replyWithVideo(data.assets.video, {
+              await ctx.replyWithVideo(vUrl, {
                 caption: `✅ *Video Complete!* (Luma Direct)\n\n_Tap to play, long-press to save!_`,
                 parse_mode: 'Markdown'
               });
             } catch (videoSendError) {
-              await ctx.reply(`✅ *Video Complete!* (Luma Direct)\n\n🎬 ${data.assets.video}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
+              await ctx.reply(`✅ *Video Complete!* (Luma Direct)\n\n🎬 ${vUrl}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
             }
             return;
-          } else if (data.state === 'failed') {
+          }
+          if (data.state === 'completed' && !vUrl) {
+            await ctx.reply(`⏳ Luma status: completed — video URL not ready yet.\n\nTry again in ~30 seconds.`);
+            return;
+          }
+          if (data.state === 'failed') {
             await ctx.reply(`❌ Luma failed: ${data.failure_reason || 'Unknown'}`);
             return;
-          } else if (data.state) {
+          }
+          if (data.state) {
             await ctx.reply(`⏳ Luma Status: ${data.state}\n\nCheck again in a minute...`);
-      return;
+            return;
           }
         }
       } catch (lumaError) {
-        // Not a Luma task, try Runway
+        // Timeout or not a Luma task — try Runway below
       }
     }
     
