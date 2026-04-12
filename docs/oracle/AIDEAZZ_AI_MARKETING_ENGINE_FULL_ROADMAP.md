@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 12, 2026 | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 13, 2026 | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 ---
@@ -17,6 +17,24 @@ This section is the honest answer to “is it an empty gun?” **The code paths 
 **Oracle verification (repeatable):** `cd ~/cto-aipa && npm run check:phase4` — prints **lengths only** for `RESEND_*`, `OUTREACH_SECRET`, `HUNTER_API_KEY`. Crons for ingest + daily send are registered only when `OUTREACH_SECRET` is non-empty (see PM2 logs: ingest `0 14 * * *`, outreach `0 15 * * *` Panama by default).
 
 **Why you might still see “nothing happened today”:** (1) **No new jobs** in VJH (dedupe / seen list) — pipeline is idle by design. (2) **CTO AIPA** — all companies already ingested (dedupe) or daily cap / zero drafts. (3) **ATS integration** sometimes times out — jobs still appear from other sources, but ATS-specific jobs may be 0 that cycle.
+
+---
+
+## Handoff — what actually shipped (April 13, 2026)
+
+This block is for the **next engineer** (Claude Code, Cursor, human): **verifiable facts**, not marketing copy.
+
+| Area | Where | What we did | Why it matters |
+|------|--------|---------------|----------------|
+| **GitHub webhook + Groq** | **AIPA_AITCF** `src/cto-aipa.ts` — `reviewCode()` | **Standard reviews** use Groq inside **try/catch** with **`timeout: 120s`**, **`maxRetries: 0`**. On any failure (including **429** / rate limit), **fallback to Claude Haiku** via `CODE_REVIEW_FALLBACK_MODEL` (default `claude-3-5-haiku-20241022`, overridable in `.env`). **Critical (Opus) path** also wrapped: try Opus → Haiku → **static-analysis-only stub** so the handler never leaves an unhandled rejection that kills a **PM2 cluster worker**. | Previously, Groq errors from **push/PR webhooks** could take down the same Node process as **lead triage** (shared Groq quota). **Atuona / `atuona-creative-ai.ts` was not modified** — surgical change only in code review. |
+| **Env** | `.env.example` | Documented optional **`CODE_REVIEW_FALLBACK_MODEL`**. | Same Haiku default as triage fallback — predictable ops. |
+| **Phase 5 HTTP + ops** | AIPA_AITCF | Already shipped: **`POST /leads/triage-run`** default **202** + background triage; **`npm run triage:fire`**; wait for **:3000** after PM2 restart before firing. On Oracle, **`TRIAGE_SKIP_GROQ`** can be set so triage uses **Haiku only** and leaves Groq budget for Hashnode / other features. | Avoids socket hang-up and reduces **Groq contention** across modules. |
+| **GSC “duplicate canonical”** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** repo (not AIPA_AITCF) | Removed the **static** `<link rel="canonical" href="https://aideazz.xyz/" />` from root **`index.html`** (it made every crawled URL look like `https://aideazz.xyz/` before JS ran). **Homepage** now sets canonical in **`src/pages/Index.tsx`** via `useEffect`, same pattern as `/about`, `/blog`, `/portfolio`. | Fixes Search Console confusion when Google reads HTML first on SPA deploys (IPFS/4everland). Deploy **4everland** from `main` after pull. |
+| **Oracle deploy** | `ubuntu@` Oracle, `~/cto-aipa` | **`git pull` → `npm run build` → `pm2 restart cto-aipa --update-env`**. Then **`npm run triage:fire`** once **`curl` to `127.0.0.1:3000/`** succeeds. | **HTTP 202** + triage start in PM2 logs is the smoke test. |
+
+**Production signals observed after deploy (example):** `🎯 [triage-run] Starting (background=true)...`, **`[triage] Raw leads: 7`**, **`[triage] Classifying lead 1/7: …`**, **`Using Claude Haiku (TRIAGE_SKIP_GROQ)`** — triage **is entering** the per-lead loop. **Still confirm:** `🎯 [triage-run] Complete:` and rows in **`lead_triage`** for a full batch (optional: **`TRIAGE_FIRE_WAIT=1 npm run triage:fire`** for synchronous JSON).
+
+**What we did *not* claim:** Atuona creative engine untouched; Hashnode daily unchanged in this handoff; no broad refactors.
 
 ---
 
@@ -73,9 +91,9 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
-## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE · PHASE 4 SHIPPED & VERIFIED · PHASE 5 WIRED ON ORACLE (E2E COMPLETION NOT YET VERIFIED)
+## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE · PHASE 4 SHIPPED & VERIFIED · PHASE 5 WIRED ON ORACLE + WEBHOOK HARDENED (E2E BATCH STILL NEEDS LOG/DB CONFIRMATION)
 
-> Updated: April 12, 2026 — Phase 4 outreach is operationally verified (real sends + bookkeeping). **Phase 5** classification pipeline, HTTP triggers, and DB layer are **deployed**; **full triage cycles completing in production logs are not yet confirmed** (see Phase 5 honesty block below — likely LLM stall; fix pending).
+> Updated: April 13, 2026 — Phase 4 outreach verified. **Phase 5** triage + **GitHub webhook Groq fallback** deployed on Oracle (`reviewCode` no longer lets Groq 429 take down the worker). **aideazz** canonical fix is in the **aideazz** repo (see “Handoff” above). **Confirm** `[triage-run] Complete` + `lead_triage` rows after a full 7-lead-style run when you pick this up.
 
 ### Phase 1a: SEO Health Audit — DONE
 
@@ -98,7 +116,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | JSON-LD FAQPage schema | DONE | 5 Q&As on index.html — "What is AIdeazz?", "What is multi-model LLM routing?", "How do you run 9 AI agents at $0/month?", etc. |
 | Open Graph meta tags | DONE | All pages — og:type, og:title, og:description, og:image, og:url |
 | Twitter Card meta tags | DONE | summary_large_image on all pages |
-| Canonical URLs | DONE | All pages |
+| Canonical URLs | DONE | Per-route in React (`Index`, `About`, `Blog*`, `BusinessCard`); **Apr 2026:** removed static homepage canonical from `index.html` in **[aideazz](https://github.com/ElenaRevicheva/aideazz)** to stop GSC “duplicate canonical” / wrong default for all URLs |
 | /about page (Author Authority) | DONE | Full bio, Phase 1 + Phase 2 credentials, photo, stats grid, JSON-LD Person schema, CTA |
 | /portfolio page GEO | DONE | ProfilePage JSON-LD, dynamic OG tags, makesOffer |
 | noscript content block | DONE | Full static HTML in index.html for AI crawlers that don't execute JavaScript — all 9 agents described, tech stack, metrics, FAQs |
@@ -153,7 +171,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | Phase 3b: Email notifications | **COMPLETE** | **Resend** via `RESEND_API_KEY`. Team inbox: `MARKETING_INQUIRY_NOTIFY_TO` (default `aipa@aideazz.xyz`). Submitter gets confirmation email when address is valid. **Sender:** `MARKETING_INQUIRY_FROM` — production uses verified **`AIdeazz <aipa@aideazz.xyz>`** (same domain pattern as VibeJobHunter). Implementation: `src/marketing-notify.ts`. |
 | Phase 3c: reCAPTCHA Enterprise + inquiry | **COMPLETE (production)** | **Verified Apr 2026:** end-to-end form submit on `https://aideazz.xyz` → Oracle `POST /marketing/inquiry-proxy` → `business_leads` + Resend team email (`[AIdeazz] Inquiry — …`). **Why it was hard:** initial key lived in GCP project `aideazz-177575763145287` (no console access); API key was created in **`aideazz-1775763145287`** — Enterprise **CreateAssessment** must use the **same** project as the reCAPTCHA **site key** + an API key from that project. Classic `siteverify` + `api.js` also failed for Enterprise-only keys. **What we did:** (1) Registered a **new** reCAPTCHA Enterprise key in **`aideazz-1775763145287`** (domains `aideazz.xyz`, `www.aideazz.xyz`; site key id `6LcHda8sAAAAAAGwl5alB2xdX_6Dqve5a5vifoHj`). (2) **Credentials** in that project: API key restricted to **reCAPTCHA Enterprise API**. (3) **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/recaptcha.ts`: load **`https://www.google.com/recaptcha/enterprise.js?render=…`**, **`grecaptcha.enterprise.execute`** with action **`inquiry`** (not classic `api.js` / `grecaptcha.execute`). **`VITE_RECAPTCHA_SITE_KEY`** in `.env.production` + deploy **4everland** from `main`. (4) **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** `src/marketing-notify.ts`: **`verifyRecaptchaEnterprise`** → `recaptchaenterprise.googleapis.com/.../assessments?key=…`; optional fallback to classic **`siteverify`**; verification can run with **Enterprise-only** env (no legacy secret required when `RECAPTCHA_ENTERPRISE_PROJECT_ID` + `RECAPTCHA_ENTERPRISE_API_KEY` + `RECAPTCHA_SITE_KEY` are set). **Oracle** `~/cto-aipa/.env`: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_ENTERPRISE_PROJECT_ID=aideazz-1775763145287`, `RECAPTCHA_ENTERPRISE_API_KEY`; optional `RECAPTCHA_SECRET_KEY`; optional `RECAPTCHA_MIN_SCORE` (default **0.1** in code). **`pm2 restart cto-aipa --update-env`**. **Docs:** `.env.example` in both repos. |
 | Phase 4: Founder Outreach Pipeline | **COMPLETE (verified send path)** | Real Resend + Oracle; see “Phase 4 outreach — what is actually working” and Phase 4 section below. |
-| Phase 5: Lead Triage | **WIRED & DEPLOYED (Apr 2026) — completion TBD** | Same as below: Oracle `lead_triage`, Groq + Haiku + Sonnet refine, Telegram + dashboard + cron. **`/leads/triage-status`** shows **`ready: true`** on Oracle; **`POST /leads/triage-run`** returns **202** (background) or sync with **`?wait=1`**; **`npm run triage:fire`** for ops. **Gap:** production logs often show **start** (`Raw leads: N`) without **`[triage-run] Complete`** — triage **may stall** on long LLM calls; **do not claim “fully working” until cycles log Complete and rows land in `lead_triage`.** |
+| Phase 5: Lead Triage | **WIRED & DEPLOYED (Apr 2026) — confirm Complete + DB** | Oracle `lead_triage`, Groq + Haiku + Sonnet refine, Telegram + dashboard + cron. **`/leads/triage-status`** → **`ready: true`**; **`POST /leads/triage-run`** → **202** or **`?wait=1`**; **`npm run triage:fire`**. **`TRIAGE_SKIP_GROQ`** on server = Haiku-only triage (saves Groq for other features). **Webhook hardening (Apr 13):** `reviewCode` Groq → Haiku fallback so pushes don’t crash PM2. **Next:** verify **`[triage-run] Complete`** and **`lead_triage`** rows for a full batch. |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
 
 ### Phase 4: Founder Cold Email Pipeline — SHIPPED & VERIFIED (not a stub)
@@ -190,25 +208,26 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 **What needs to happen next for more conversations (product, not wiring):**
 - Refresh or widen **target sources** (CTO: more companies; VJH: job sources when ATS times out).
-### Phase 5: Lead Triage — WIRED ON ORACLE (end-to-end “done” not verified)
+### Phase 5: Lead Triage — WIRED ON ORACLE (webhook noise fixed; confirm full batch)
 
 | Task | Status | Details |
 |---|---|---|
 | Oracle `lead_triage` + indexes | DONE | `src/database.ts` — `saveTriagedLead`, `getUntriagedLeads`, `getRepliedOutreach`, `getTriagedLeads`; dedupe by `source_ref_id` + `source_table`. |
-| Classification | DONE (code) | Groq `llama-3.3-70b-versatile` (12s timeout, no SDK retries); **Claude Haiku** fallback same JSON schema; **Sonnet** optional refine for urgency ≥4. **Note:** Anthropic fallback path has **no explicit request timeout** — a stuck API call can block a full cycle. |
+| Classification | DONE (code) | Groq `llama-3.3-70b-versatile` (12s timeout, no SDK retries); **Claude Haiku** fallback same JSON schema; **Sonnet** optional refine for urgency ≥4. Optional **`TRIAGE_SKIP_GROQ`** on Oracle → Haiku-only (observed in logs: `Using Claude Haiku (TRIAGE_SKIP_GROQ)`). **Note:** Anthropic triage calls still benefit from **hard timeouts** if you see rare stalls. |
 | Groq TPM / huge inquiries | DONE | **Context clipped to 3600 chars** in prompts; batch caps default **20** business + **10** outreach; **350ms** delay between leads (spreads TPM). |
 | Telegram | DONE | `/triage`, `/triage_urgent` in `telegram-bot.ts`; daily brief after cron if `TELEGRAM_LEADS_DIGEST_CHAT_ID` set. |
-| HTTP | DONE | `POST /leads/triage-run` (Bearer `LEAD_TRIAGE_SECRET`): **default 202** + background run (`setImmediate`) so clients/proxies do not socket hang-up on long runs; **`?wait=1`** or **`?sync=1`** for synchronous JSON result. `GET /leads/triage-status` (no secret). `GET /leads/dashboard?token=…`. |
+| HTTP | DONE | `POST /leads/triage-run` (Bearer `LEAD_TRIAGE_SECRET`): **default 202** + background run (`setImmediate`) so clients/proxies do not socket hang-up on long runs; **`?wait=1`** or **`?sync=1`** for synchronous JSON result. `GET /leads/triage-status` (no secret). `GET /leads/dashboard?secret=<LEAD_TRIAGE_SECRET>`. |
 | Ops script | DONE | **`npm run triage:fire`** → `scripts/triage-fire.cjs` (reads `~/cto-aipa/.env`, optional **`TRIAGE_FIRE_WAIT=1`** for sync). Run **on Oracle** so it hits `127.0.0.1:3000` after PM2 is listening. |
 | Cron | DONE | `TRIAGE_CRON` default `0 8 * * *` `America/Panama`. |
+| **Related (not triage.ts)** — GitHub webhook | DONE (Apr 2026) | **`reviewCode()`** Groq path: try/catch + Haiku fallback — reduces **PM2 worker death** from Groq 429 during **push/PR** reviews; does **not** touch Atuona. |
 
-**What is actually true in production (April 2026):**
+**What is actually true in production (April 2026 → 13):**
 
-- **Confirmed:** Triage **module** is deployed; **`/leads/triage-status`** returns **`ok`/`ready: true`** when keys and secret are set; **manual fire** returns **HTTP 202** with **`accepted: true`**; PM2 logs show **`[triage-run] Starting (background=true)...`**, **`[triage] Raw leads: N`**, **`Replied outreach: 0`** (example run).
-- **Not confirmed:** Logs **do not reliably show** **`🎯 [triage-run] Complete:`** after those starts, and **untriaged counts** have **not** been observed dropping in the same check — so **classification + `saveTriagedLead` completing for the batch** is **unproven** until logging shows Complete **or** `lead_triage` rows increase for those sources. **Hypothesis:** stall on **Claude** (or rare DB wait), not missing code paths.
-- **Next engineering step (before claiming Phase 5 “green”):** add **hard timeouts** / retries on Anthropic triage calls, re-run **`triage:fire`** or **`?wait=1`**, confirm **`[triage-run] Complete`** and dashboard rows.
+- **Confirmed:** Triage **module** + **webhook hardening** deployed on Oracle; **`/leads/triage-status`** → **`ready: true`**; **`npm run triage:fire`** → **HTTP 202**; PM2 logs show **`[triage-run] Starting (background=true)...`**, **`Raw leads: N`**, **`Classifying lead 1/N`**, **`Using Claude Haiku (TRIAGE_SKIP_GROQ)`** when that env is set — the **per-lead loop is running**, not only “starting.”
+- **Still confirm for a green check:** **`🎯 [triage-run] Complete:`** for a full batch and matching **`lead_triage`** / dashboard — use **`TRIAGE_FIRE_WAIT=1`** once if you want a single JSON response with **`processed` / `urgent`**.
+- **Cross-module lesson:** Shared **Groq** quota across Code Review webhook, Hashnode, Atuona, triage — **`TRIAGE_SKIP_GROQ`** + **webhook fallback** are the operational levers until quota or routing is split.
 
-**Phase 6 (showcase package / pitch docs)** remains optional product work — not blocking triage fixes.
+**Phase 6 (showcase package / pitch docs)** remains optional product work — not blocking triage verification.
 
 ---
 
@@ -660,11 +679,11 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 12, 2026 (v12 — Phase 5: honest prod status — wired + 202 fire; E2E Complete not verified)
+> Document version: April 13, 2026 (v13 — handoff: webhook Groq→Haiku, aideazz canonical, Oracle deploy + triage classify logs)
 > Aligned with: CAREER_FOCUS.md v4 (April 2026 — outreach operational), SKILL.md v1.3
-> Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
+> Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4); **canonical SPA fix** in **aideazz** repo Apr 2026
 > Phase 2 status: MOSTLY COMPLETE — Hashnode daily publisher live; LLM draft queue optional
 > Phase 3 status: COMPLETE — UTM + inquiry + reCAPTCHA Enterprise
 > Phase 4 status: COMPLETE & VERIFIED — client sends via CTO AIPA (Resend+Oracle); employer sends via VJH only when email delivers; applications counted only on real ATS or email delivery
-> Phase 5 status: DEPLOYED — triage code + Oracle schema + HTTP/Telegram/cron + **`triage:fire`**; **full cycle completion in prod not yet verified** (timeouts / logging next)
-> Next: Prove Phase 5 end-to-end (Complete in logs + `lead_triage` rows); then Phase 6 (showcase package); optional more outreach sources
+> Phase 5 status: DEPLOYED + **webhook hardened** — triage + **`triage:fire`** + optional **`TRIAGE_SKIP_GROQ`**; **`reviewCode`** Groq failures fall back to Haiku (no Atuona change); **confirm** `[triage-run] Complete` + DB for full batch
+> Next: Verify Phase 5 batch completion (logs + `lead_triage`); Phase 6 (showcase package); optional more outreach sources
