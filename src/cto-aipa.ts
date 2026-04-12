@@ -42,6 +42,11 @@ import * as cron from 'node-cron';
 
 dotenv.config({ override: true });
 
+// Prevent unhandled rejections from crashing PM2 cluster worker
+process.on('unhandledRejection', (reason: any) => {
+  console.error('⚠️ Unhandled rejection (caught):', String(reason?.message || reason).slice(0, 300));
+});
+
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || process.env.GH_TOKEN || '')

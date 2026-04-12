@@ -270,7 +270,14 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
       if (i > 0 && TRIAGE_INTER_LEAD_DELAY_MS > 0) {
         await new Promise((r) => setTimeout(r, TRIAGE_INTER_LEAD_DELAY_MS));
       }
-      const result = await classifyLead(lead, groq, anthropic);
+      console.log(`🎯 [triage] Classifying lead ${i + 1}/${inputs.length}: ${lead.name || lead.id}`);
+      let result: TriageResult;
+      try {
+        result = await classifyLead(lead, groq, anthropic);
+      } catch (classifyErr: any) {
+        console.error(`🎯 [triage] classifyLead crashed for ${lead.id}:`, String(classifyErr?.message || classifyErr).slice(0, 200));
+        result = defaultTriage();
+      }
       await saveTriagedLead({
         source_table: lead.source_table,
         source_ref_id: lead.id,
@@ -284,8 +291,9 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
       });
       processed++;
       if (result.urgency >= 4) urgent++;
-    } catch (err) {
-      console.error(`Triage failed for lead ${lead.id}:`, err);
+      console.log(`🎯 [triage] Lead ${i + 1} done: urgency=${result.urgency} type=${result.signal_type}`);
+    } catch (err: any) {
+      console.error(`🎯 [triage] Failed for lead ${lead.id}:`, String(err?.message || err).slice(0, 200));
     }
   }
 
