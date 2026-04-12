@@ -19,7 +19,7 @@ const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = 'claude-sonnet-4-5';
 /** Groq free tier TPM ~12k — huge inquiry bodies must be clipped or requests fail with 413. */
 const TRIAGE_CONTEXT_MAX_CHARS = 3600;
-const TRIAGE_FALLBACK_MODEL = process.env.TRIAGE_FALLBACK_MODEL || 'claude-3-5-haiku-20241022';
+const TRIAGE_FALLBACK_MODEL = process.env.TRIAGE_FALLBACK_MODEL || 'claude-haiku-4-5-20250414';
 const TRIAGE_INTER_LEAD_DELAY_MS = Math.max(0, parseInt(process.env.TRIAGE_INTER_LEAD_DELAY_MS || '350', 10) || 0);
 
 /** Flip to true when Groq returns 429 daily limit — skip Groq for rest of cycle */
