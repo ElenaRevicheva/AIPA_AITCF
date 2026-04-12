@@ -133,8 +133,11 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
   summary: string;
 }> {
   // Sequential queries to avoid concurrent Oracle connection issues
+  console.log('🎯 [triage] Querying untriaged leads...');
   const rawLeads = await getUntriagedLeads(50);
+  console.log(`🎯 [triage] Raw leads: ${rawLeads.length}`);
   const repliedOutreach = await getRepliedOutreach(20);
+  console.log(`🎯 [triage] Replied outreach: ${repliedOutreach.length}`);
 
   const inputs: LeadInput[] = [
     ...(rawLeads as any[]).map((r: any) => ({

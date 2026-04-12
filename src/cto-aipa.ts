@@ -1383,12 +1383,14 @@ async function startCTOAIPA() {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
+    console.log('🎯 [triage-run] Starting...');
     try {
       const result = await runTriageCycle(groq, anthropic);
+      console.log('🎯 [triage-run] Complete:', result.processed, 'processed,', result.urgent, 'urgent');
       res.json({ ok: true, ...result });
     } catch (err) {
-      console.error('Triage run error:', err);
-      res.status(500).json({ error: 'Triage failed' });
+      console.error('🎯 [triage-run] Error:', err);
+      if (!res.headersSent) res.status(500).json({ error: 'Triage failed' });
     }
   });
 
