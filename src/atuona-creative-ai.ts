@@ -4743,24 +4743,23 @@ ${englishText.substring(0, 800)}${englishText.length > 800 ? '...' : ''}
       await ctx.reply('❌ No page imported. Use /import first!');
       return;
     }
-    
+
     const instruction = ctx.message?.text?.replace('/translate', '').trim();
-    
+
     await ctx.reply('🔄 Re-translating...');
-    
-    try {
-      let translatePrompt = `ATUONA — underground literature, not poetry.
+
+    let translatePrompt = `ATUONA — underground literature, not poetry.
 
 RUSSIAN ORIGINAL:
 ${bookState.lastPageContent}
 
 TITLE: ${bookState.lastPageTitle}`;
 
-      if (instruction) {
-        translatePrompt += `\n\nSPECIAL INSTRUCTION: ${instruction}`;
-      }
+    if (instruction) {
+      translatePrompt += `\n\nSPECIAL INSTRUCTION: ${instruction}`;
+    }
 
-      translatePrompt += `\n\n🔄 TRANSLATION PHILOSOPHY:
+    translatePrompt += `\n\n🔄 TRANSLATION PHILOSOPHY:
 - Meaning + rhythm, not word-for-word
 - You may shift sentence order, break lines differently
 - Replace metaphors if emotional truth is preserved
@@ -4771,20 +4770,41 @@ KILL: safe sentences, AI-poetic tone, explanations
 
 Return ONLY the English translation. Plain text, no markdown.`;
 
-      // Use poetry mode for maximum creativity
-      const newTranslation = await createContent(translatePrompt, 2000, true);
+    const sendTranslationChunks = async (newTranslation: string) => {
       bookState.lastPageEnglish = newTranslation;
-      
-      await ctx.reply(`✅ *New Translation*
+      const chunks = chunkForTelegram(newTranslation);
+      await ctx.reply(`✅ New translation${chunks.length > 1 ? ` (${chunks.length} messages)` : ''}`);
+      for (let i = 0; i < chunks.length; i++) {
+        const prefix = chunks.length > 1 ? `[${i + 1}/${chunks.length}]\n\n` : '';
+        await ctx.reply(prefix + chunks[i]);
+      }
+      await ctx.reply('━━━━━━━━━━━━━━━━━━━━\nUse /publish to push to atuona.xyz');
+    };
 
-${newTranslation}
-
-━━━━━━━━━━━━━━━━━━━━
-Use /publish to push to atuona.xyz`, { parse_mode: 'Markdown' });
-      
-    } catch (error) {
-      console.error('Translate error:', error);
-      await ctx.reply('❌ Error translating. Try again!');
+    try {
+      const newTranslation = await createContent(translatePrompt, 8192, true);
+      await sendTranslationChunks(newTranslation.trim());
+    } catch (error: any) {
+      console.error('Translate error (Claude):', error);
+      try {
+        const groqResponse = await groq.chat.completions.create({
+          model: AI_CONFIG.fallbackModel,
+          messages: [{ role: 'user', content: translatePrompt }],
+          max_tokens: 8192,
+          temperature: AI_CONFIG.poetryTemperature
+        });
+        const groqText = groqResponse.choices[0]?.message?.content?.trim();
+        if (groqText) {
+          await sendTranslationChunks(groqText);
+          return;
+        }
+      } catch (groqErr) {
+        console.error('Translate Groq fallback error:', groqErr);
+      }
+      const hint = String(error?.message || error || 'unknown').slice(0, 220);
+      await ctx.reply(
+        `❌ Translation failed after Claude + Groq fallback.\n\n${hint}\n\nIf the chapter is very long, try again or split the source.`
+      );
     }
   });
   
