@@ -49,6 +49,30 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
+## WORDPRESS CLIENTS — ENGINE COMPATIBILITY
+
+> Elena's site runs on IPFS/4everland (React SPA). The majority of her potential clients run WordPress. The engine is not only compatible — it works **easier** on WordPress than on her own custom stack.
+
+| Phase | Elena's Site (IPFS/React) | WordPress Client | Verdict |
+|---|---|---|---|
+| **Phase 1: GEO** | Had to hand-code JSON-LD, noscript, sitemap, OG tags | Yoast / RankMath plugin installs in 5 min, handles all of it | **Easier for client** |
+| **Phase 2: Blog Auto-Publisher** | Built Hashnode GraphQL publisher | WordPress REST API: `POST /wp-json/wp/v2/posts` — same CTO AIPA code, swap endpoint + auth | **~2h adaptation** |
+| **Phase 3: UTM Attribution** | Custom React contact form + honeypot + reCAPTCHA Enterprise | Gravity Forms / CF7 already capture UTMs natively — just hook the webhook | **Easier for client** |
+| **Phase 4: Outreach Pipeline** | Platform-agnostic — Resend + Oracle | Platform-agnostic — identical | **Identical** |
+| **Phase 5: Lead Triage** | Platform-agnostic — Oracle + Telegram | Platform-agnostic — identical | **Identical** |
+
+**Key insight:** Elena's engine differentiator is NOT the CMS — it is the AI automation layer on top. WordPress is just the publishing endpoint, not the intelligence. The client brings WordPress. Elena wires it to decisions.
+
+**The pitch for WordPress clients:**
+> "You have WordPress. I wire AI to it: automated content generation that publishes on schedule, UTM-tracked contact forms that log every lead to a database, personalized founder outreach that sends itself, and a dashboard that ranks your leads by urgency. You bring the domain. I make it intelligent. 4–6 weeks. Here's mine running live."
+
+**What Elena does NOT do (from Manny Blueprint, ROADMAP Part 3):**
+- WordPress install, theme setup, DNS — decline or $150/hr minimum (zero AI, zero leverage)
+- Anything that's pure IT admin work
+- What she builds: the intelligence layer that sits on top of whatever CMS the client already has
+
+---
+
 ## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE · PHASE 4 SHIPPED & VERIFIED (NOT A STUB)
 
 > Updated: April 12, 2026 — Phase 4: real Resend + Oracle paths; metrics aligned with delivery (see “Phase 4 outreach — what is actually working” above).
