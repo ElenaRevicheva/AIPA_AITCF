@@ -3701,16 +3701,12 @@ function pollAndDeliverDirectorsCut(
         visualization.directorsCutVideoUrl = dcUrl;
         saveState();
 
+        // Plain caption only — Luma CDN URLs contain "_" which breaks Telegram Markdown entities.
+        const cap = `Director's Cut ready (${MODIFY_VIDEO_MODE})\n\n${fashionPrompt.substring(0, 200).trim()}${fashionPrompt.length > 200 ? '…' : ''}`;
         try {
-          await ctx.replyWithVideo(dcUrl, {
-            caption: `🎬✨ *Director's Cut Ready!*\n\nFashion/editorial layer applied (\`${MODIFY_VIDEO_MODE}\`)\n\n💡 ${escapeMd(fashionPrompt.substring(0, 120))}`,
-            parse_mode: 'Markdown'
-          });
+          await ctx.replyWithVideo(dcUrl, { caption: cap });
         } catch {
-          await ctx.reply(
-            `🎬✨ *Director's Cut Ready!*\n\n🎬 ${dcUrl}\n\n_Fashion/editorial layer — open link to view_`,
-            { parse_mode: 'Markdown' }
-          );
+          await ctx.reply(`Director's Cut ready (open link):\n${dcUrl}`);
         }
         return;
       }
@@ -3724,8 +3720,11 @@ function pollAndDeliverDirectorsCut(
       }
 
       if (data.state === 'failed') {
-        console.error(`Director's Cut failed: ${data.failure_reason || 'unknown'}`);
-        await ctx.reply(`⚠️ Director's Cut generation failed — base video was already delivered.\n_Reason: ${data.failure_reason || 'unknown'}_`);
+        const reason = String(data.failure_reason || 'unknown');
+        console.error(`Director's Cut failed: ${reason}`);
+        await ctx.reply(
+          `⚠️ Director's Cut generation failed — base video was already delivered.\nReason: ${reason}`
+        );
         return;
       }
 
@@ -3734,7 +3733,9 @@ function pollAndDeliverDirectorsCut(
         setTimeout(() => poll(attempt + 1), intervalMs);
       } else {
         console.log(`Director's Cut polling timed out for ${generationId}`);
-        await ctx.reply(`⏳ Director's Cut taking too long — base video was already delivered.`);
+        await ctx.reply(
+          `⏳ Director's Cut taking too long — base video was already delivered.\nJob ID: ${generationId}\nCheck Luma dashboard or /videostatus ${generationId}`
+        );
       }
     } catch (err: any) {
       console.error('Director\'s Cut poll error:', err.message);
@@ -3771,7 +3772,12 @@ async function startDirectorsCutPipeline(opts: {
 
     const fashionPrompt = await buildFashionEditorialPrompt({ title, theme, englishExcerpt, knowledgeKeys });
     console.log('Fashion/editorial prompt:', fashionPrompt);
-    await ctx.reply(`🎬 *Fashion direction:*\n\n${escapeMd(fashionPrompt.substring(0, 280))}`, { parse_mode: 'Markdown' });
+    const dirSnippet = fashionPrompt.substring(0, 280);
+    try {
+      await ctx.reply(`🎬 *Fashion direction:*\n\n${escapeMd(dirSnippet)}`, { parse_mode: 'Markdown' });
+    } catch {
+      await ctx.reply(`🎬 Fashion direction:\n\n${dirSnippet}`);
+    }
 
     const result = await startModifyVideo(baseVideoUrl, firstFrameImageUrl, fashionPrompt);
 
@@ -3787,6 +3793,11 @@ async function startDirectorsCutPipeline(opts: {
     }
   } catch (err: any) {
     console.error('Director\'s Cut pipeline error:', err.message);
+    try {
+      await ctx.reply(`⚠️ Director's Cut pipeline error: ${String(err?.message || err).slice(0, 400)}`);
+    } catch {
+      /* ignore */
+    }
   }
 }
 
