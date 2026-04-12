@@ -2221,7 +2221,7 @@ initOutreachLogTable();
 async function initLeadTriageTable() {
   let connection;
   try {
-    connection = await getConnection();
+    connection = await oracledb.getConnection(dbConfig);
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE lead_triage (
@@ -2259,7 +2259,7 @@ async function initLeadTriageTable() {
   }
 }
 
-export async function saveTriagedLead(data: {
+async function saveTriagedLead(data: {
   source_table: string;
   source_ref_id: string;
   signal_type: string;
@@ -2272,7 +2272,7 @@ export async function saveTriagedLead(data: {
 }): Promise<void> {
   let connection;
   try {
-    connection = await getConnection();
+    connection = await oracledb.getConnection(dbConfig);
     // Avoid duplicate triage of same source_ref_id
     const existing = await connection.execute(
       `SELECT COUNT(*) FROM lead_triage WHERE source_ref_id = HEXTORAW(:1) AND source_table = :2`,
@@ -2304,10 +2304,10 @@ export async function saveTriagedLead(data: {
   }
 }
 
-export async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
+async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
   let connection;
   try {
-    connection = await getConnection();
+    connection = await oracledb.getConnection(dbConfig);
     const where = status ? `AND status = :2` : '';
     const params: any[] = status ? [limit, status] : [limit];
     const result = await connection.execute(
@@ -2329,10 +2329,10 @@ export async function getTriagedLeads(status?: string, limit = 50): Promise<any[
   }
 }
 
-export async function getUntriagedLeads(limit = 50): Promise<any[]> {
+async function getUntriagedLeads(limit = 50): Promise<any[]> {
   let connection;
   try {
-    connection = await getConnection();
+    connection = await oracledb.getConnection(dbConfig);
     // Pull business_leads not yet in lead_triage
     const result = await connection.execute(
       `SELECT RAWTOHEX(bl.id), bl.name, bl.contact_email, bl.context, bl.utm_source
@@ -2354,10 +2354,10 @@ export async function getUntriagedLeads(limit = 50): Promise<any[]> {
   }
 }
 
-export async function getRepliedOutreach(limit = 20): Promise<any[]> {
+async function getRepliedOutreach(limit = 20): Promise<any[]> {
   let connection;
   try {
-    connection = await getConnection();
+    connection = await oracledb.getConnection(dbConfig);
     // Pull outreach replies not yet triaged
     const result = await connection.execute(
       `SELECT RAWTOHEX(ol.id), ot.name, ot.email, ol.subject, ol.reply_snippet
