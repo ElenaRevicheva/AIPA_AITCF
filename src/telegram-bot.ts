@@ -1084,23 +1084,26 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
   bot.command('outreach', async (ctx) => {
     try {
       const stats = await getOutreachStats();
+      // Plain text only — legacy Telegram Markdown breaks on e.g. "0/10" (slash + digits).
       const msg = [
-        `📧 *Outreach Pipeline — Phase 4b*`,
+        `📧 Outreach Pipeline — Phase 4`,
         ``,
         `Targets: ${stats.total_targets}`,
-        `Emails sent: ${stats.total_sent} (today: ${stats.sent_today}/10)`,
+        `Emails sent: ${stats.total_sent} (today: ${stats.sent_today} of 10 cap)`,
         `Replies: ${stats.total_replies}`,
         `Reply rate: ${stats.reply_rate}`,
         ``,
         `Commands:`,
-        `/outreach_ingest — Discover YC companies + Hunter.io emails`,
-        `/outreach_drafts — View pending drafts`,
-        `/outreach_stats — Full pipeline stats`,
+        `/outreach_ingest — YC + Hunter.io → Oracle`,
+        `/outreach_drafts — Pending drafts`,
+        `/outreach_stats — Full stats (HTTP)`,
       ].join('\n');
-      await ctx.reply(msg, { parse_mode: 'Markdown' });
+      await ctx.reply(msg);
     } catch (error) {
       console.error('Outreach stats error:', error);
-      await ctx.reply('❌ Error fetching outreach stats.');
+      await ctx.reply(
+        `❌ Error fetching outreach stats: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   });
 
@@ -7354,11 +7357,19 @@ export function stopTelegramBot() {
   }
 }
 
-export async function sendTelegramBroadcast(message: string): Promise<void> {
+export async function sendTelegramBroadcast(
+  message: string,
+  opts?: { parseMode?: 'Markdown' | 'HTML' | false }
+): Promise<void> {
   if (!bot || alertChatIds.size === 0) return;
+  const parseMode = opts?.parseMode === false ? undefined : opts?.parseMode ?? 'Markdown';
   for (const chatId of alertChatIds) {
     try {
-      await bot.api.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+      await bot.api.sendMessage(
+        chatId,
+        message,
+        parseMode ? { parse_mode: parseMode } : {}
+      );
     } catch (e) {
       console.error(`Broadcast to ${chatId} failed:`, e);
     }

@@ -1406,9 +1406,10 @@ async function startCTOAIPA() {
       // Prospect ingestion: 2 PM Panama (before outreach send at 3 PM)
       const ingestCronExpr = process.env.INGEST_CRON || '0 14 * * *';
       const ingestTz = process.env.INGEST_TZ || process.env.OUTREACH_TZ || 'America/Panama';
+      const broadcastPlain = (msg: string) => sendTelegramBroadcast(msg, { parseMode: false });
       cron.schedule(ingestCronExpr, () => {
         console.log('🔍 [cron] Running prospect ingestion cycle…');
-        runProspectIngestion(anthropic, sendTelegramBroadcast).catch(e =>
+        runProspectIngestion(anthropic, broadcastPlain).catch(e =>
           console.error('🔍 [cron] Prospect ingestion error:', e)
         );
       }, { timezone: ingestTz });
@@ -1418,7 +1419,7 @@ async function startCTOAIPA() {
       const outreachTz = process.env.OUTREACH_TZ || 'America/Panama';
       cron.schedule(outreachCronExpr, () => {
         console.log('📧 [cron] Running daily outreach cycle…');
-        runDailyOutreachCycle(anthropic, sendTelegramBroadcast).catch(e =>
+        runDailyOutreachCycle(anthropic, broadcastPlain).catch(e =>
           console.error('📧 [cron] Outreach cycle error:', e)
         );
       }, { timezone: outreachTz });

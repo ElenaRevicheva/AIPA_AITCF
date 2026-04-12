@@ -348,15 +348,15 @@ export async function runProspectIngestion(
     const hunterUsed = hunterCallsThisMonth - startHunter;
 
     const summary = [
-      `🔍 *Prospect Ingestion Complete*`,
+      `Prospect ingestion complete`,
       ``,
       `New targets imported: ${ingested}`,
       `Already in pipeline: ${skipped}`,
       errors ? `Errors: ${errors}` : '',
-      `Hunter.io calls used: ${hunterUsed}/${HUNTER_MONTHLY_BUDGET} monthly budget`,
+      `Hunter.io calls used: ${hunterUsed} of ${HUNTER_MONTHLY_BUDGET} monthly budget`,
       ``,
       `Sources: YC AI Assistant companies`,
-      `Next step: outreach cron will generate emails + send`,
+      `Next: outreach cron generates drafts and sends via Resend (if configured)`,
     ]
       .filter(Boolean)
       .join('\n');

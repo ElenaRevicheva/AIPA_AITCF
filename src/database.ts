@@ -2061,13 +2061,18 @@ async function markOutreachSent(emailId: string): Promise<boolean> {
   let connection;
   try {
     connection = await oracledb.getConnection(dbConfig);
-    await connection.execute(
+    const result = await connection.execute(
       `UPDATE outreach_log SET status = 'sent', sent_at = CURRENT_TIMESTAMP
        WHERE RAWTOHEX(id) = :emailId`,
       { emailId },
       { autoCommit: true }
     );
-    return true;
+    const n = result.rowsAffected;
+    const ok = typeof n === 'number' ? n > 0 : true;
+    if (!ok) {
+      console.error('❌ markOutreachSent: no row updated for emailId', emailId);
+    }
+    return ok;
   } catch (err) {
     console.error('❌ markOutreachSent error:', err);
     return false;

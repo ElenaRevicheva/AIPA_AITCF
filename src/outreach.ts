@@ -378,7 +378,7 @@ export async function sendOutreachEmail(params: {
   toEmail: string;
   subject: string;
   body: string;
-}): Promise<{ sent: boolean; reason?: string }> {
+}): Promise<{ sent: boolean; reason?: string; resendId?: string }> {
   const apiKey = getResendApiKey();
   if (!apiKey) {
     return { sent: false, reason: 'RESEND_API_KEY not configured' };
@@ -412,8 +412,24 @@ export async function sendOutreachEmail(params: {
       return { sent: false, reason: `Resend ${r.status}: ${t.slice(0, 200)}` };
     }
 
-    await markOutreachSent(params.emailId);
-    return { sent: true };
+    let resendId: string | undefined;
+    try {
+      const j = (await r.json()) as { id?: string };
+      resendId = j?.id;
+      console.log(`[outreach] Resend accepted id=${resendId ?? '(no id in body)'}`);
+    } catch {
+      console.warn('[outreach] Resend 200 but body was not JSON — still attempting DB mark sent');
+    }
+
+    const marked = await markOutreachSent(params.emailId);
+    if (!marked) {
+      return {
+        sent: false,
+        reason:
+          'Resend accepted but outreach_log was not updated (check email row id / Oracle)',
+      };
+    }
+    return resendId ? { sent: true, resendId } : { sent: true };
   } catch (e) {
     console.error('outreach: send error', e);
     return { sent: false, reason: String(e) };
@@ -482,18 +498,26 @@ export async function runDailyOutreachCycle(
 
     // Step 3: get stats for Telegram summary
     const stats = await getOutreachStats();
+    const resendConfigured = Boolean(getResendApiKey());
 
     const lines = [
-      `📧 *Daily Outreach Cycle Complete*`,
+      `Phase 4 — client outreach (honest summary)`,
+      resendConfigured ? `Resend: configured` : `Resend: NOT configured — no real sends (set RESEND_API_KEY or RESEND_KEY)`,
       ``,
-      `Drafts generated: ${gen.generated}`,
-      `Emails sent: ${send.sent}`,
-      send.skipped ? `Skipped (no email): ${send.skipped}` : '',
-      send.errors.length ? `Errors: ${send.errors.join(', ')}` : '',
+      `Targets verified: ${verify.verified}, invalid: ${verify.invalid}`,
+      `Draft rows created (Claude): ${gen.generated}`,
+      `Emails accepted by Resend + DB: ${send.sent}`,
+      send.skipped ? `Skipped (no address on target): ${send.skipped}` : '',
+      send.errors.length ? `Send failures: ${send.errors.join('; ')}` : '',
+      gen.generated > 0 && send.sent === 0 && resendConfigured
+        ? `Note: drafts exist but 0 sends — check errors above or daily cap.`
+        : '',
       ``,
-      `Pipeline: ${stats.total_targets} targets, ${stats.total_sent} total sent, ${stats.sent_today}/${DAILY_CAP} today`,
-      `Reply rate: ${stats.reply_rate}`,
-    ].filter(Boolean).join('\n');
+      `Pipeline: ${stats.total_targets} targets, ${stats.total_sent} total sent ever`,
+      `Today: ${stats.sent_today} of ${DAILY_CAP} cap — reply rate ${stats.reply_rate}`,
+    ]
+      .filter(Boolean)
+      .join('\n');
 
     if (sendTelegram) {
       await sendTelegram(lines);
@@ -501,7 +525,7 @@ export async function runDailyOutreachCycle(
   } catch (e) {
     console.error(`[${tag}] Cycle error:`, e);
     if (sendTelegram) {
-      await sendTelegram(`❌ Outreach cycle failed: ${String(e).slice(0, 200)}`);
+      await sendTelegram(`Outreach cycle failed: ${String(e).slice(0, 400)}`);
     }
   }
 }
@@ -512,9 +536,9 @@ export async function runDailyOutreachCycle(
 
 export function formatOutreachStatsMessage(stats: Awaited<ReturnType<typeof getOutreachStats>>): string {
   return [
-    `📧 *Outreach Pipeline*`,
+    `Outreach pipeline`,
     `Targets: ${stats.total_targets}`,
-    `Sent: ${stats.total_sent} (today: ${stats.sent_today}/${DAILY_CAP})`,
+    `Sent: ${stats.total_sent} (today ${stats.sent_today} of ${DAILY_CAP} cap)`,
     `Replies: ${stats.total_replies}`,
     `Reply rate: ${stats.reply_rate}`,
   ].join('\n');
