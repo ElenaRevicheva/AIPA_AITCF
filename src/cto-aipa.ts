@@ -42,9 +42,13 @@ import * as cron from 'node-cron';
 
 dotenv.config({ override: true });
 
-// Prevent unhandled rejections from crashing PM2 cluster worker
+// Prevent unhandled errors from crashing PM2 cluster worker
 process.on('unhandledRejection', (reason: any) => {
   console.error('⚠️ Unhandled rejection (caught):', String(reason?.message || reason).slice(0, 300));
+});
+process.on('uncaughtException', (err: Error) => {
+  console.error('⚠️ Uncaught exception (caught):', err.message?.slice(0, 300));
+  // Don't exit — PM2 will restart on crash, but we want to survive recoverable errors
 });
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
