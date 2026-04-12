@@ -1,6 +1,22 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 10, 2026 | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 12, 2026 | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
+
+---
+
+## Phase 4 outreach — what is *actually* working (April 2026)
+
+This section is the honest answer to “is it an empty gun?” **The code paths are real; volume depends on data and deliverability.**
+
+| System | Automated email that leaves Resend? | How we know it is not simulated |
+|--------|-------------------------------------|----------------------------------|
+| **CTO AIPA (client / “hire us”)** | **Yes**, when `RESEND_API_KEY` (or `RESEND_KEY`) is set and targets have addresses | Sends go through **Resend HTTP API**; `outreach_log` is only marked `sent` after HTTP success **and** an Oracle `UPDATE` that affects a row. Logs include **Resend message id**. Daily cap enforced in code. |
+| **VJH (employer / “hire me”)** | **Yes**, for **founder outreach** when a personal email is found and passes Resend rules | **`success` is true only for email delivered via Resend**, not for LinkedIn/Twitter manual copy queues (those may still notify Telegram but **do not** increment “outreach sent”). |
+| **VJH job applications** | **Sometimes** | **Live ATS form** when Greenhouse/Lever/Ashby is detected **and** Playwright succeeds; **else** application email to a **Hunter-discovered** address that passes validation — not `careers@`. “Materials only” is **not** counted as applied. |
+
+**Oracle verification (repeatable):** `cd ~/cto-aipa && npm run check:phase4` — prints **lengths only** for `RESEND_*`, `OUTREACH_SECRET`, `HUNTER_API_KEY`. Crons for ingest + daily send are registered only when `OUTREACH_SECRET` is non-empty (see PM2 logs: ingest `0 14 * * *`, outreach `0 15 * * *` Panama by default).
+
+**Why you might still see “nothing happened today”:** (1) **No new jobs** in VJH (dedupe / seen list) — pipeline is idle by design. (2) **CTO AIPA** — all companies already ingested (dedupe) or daily cap / zero drafts. (3) **ATS integration** sometimes times out — jobs still appear from other sources, but ATS-specific jobs may be 0 that cycle.
 
 ---
 
@@ -33,9 +49,9 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
-## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE · PHASE 4 COMPLETE
+## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE · PHASE 4 SHIPPED & VERIFIED (NOT A STUB)
 
-> Updated: April 10, 2026
+> Updated: April 12, 2026 — Phase 4: real Resend + Oracle paths; metrics aligned with delivery (see “Phase 4 outreach — what is actually working” above).
 
 ### Phase 1a: SEO Health Audit — DONE
 
@@ -112,41 +128,45 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | Phase 3: UTM + inquiry pipeline | **COMPLETE** | **aideazz:** `InquiryForm` — UTM from URL → `POST https://webhook.aideazz.xyz/cto/marketing/inquiry-proxy` (no Bearer in browser). **CTO AIPA (Oracle):** `business_leads` in Oracle; `POST /marketing/inquiry` (Bearer) for automation; `POST /marketing/inquiry-proxy` (Origin allowlist for `aideazz.xyz` / `www`, honeypot `company`, per-IP rate limit). **Weekly Telegram digest** of new leads (optional env). **Docs:** `docs/oracle/CTO_AIPA_PUBLIC_HTTPS.md`. |
 | Phase 3b: Email notifications | **COMPLETE** | **Resend** via `RESEND_API_KEY`. Team inbox: `MARKETING_INQUIRY_NOTIFY_TO` (default `aipa@aideazz.xyz`). Submitter gets confirmation email when address is valid. **Sender:** `MARKETING_INQUIRY_FROM` — production uses verified **`AIdeazz <aipa@aideazz.xyz>`** (same domain pattern as VibeJobHunter). Implementation: `src/marketing-notify.ts`. |
 | Phase 3c: reCAPTCHA Enterprise + inquiry | **COMPLETE (production)** | **Verified Apr 2026:** end-to-end form submit on `https://aideazz.xyz` → Oracle `POST /marketing/inquiry-proxy` → `business_leads` + Resend team email (`[AIdeazz] Inquiry — …`). **Why it was hard:** initial key lived in GCP project `aideazz-177575763145287` (no console access); API key was created in **`aideazz-1775763145287`** — Enterprise **CreateAssessment** must use the **same** project as the reCAPTCHA **site key** + an API key from that project. Classic `siteverify` + `api.js` also failed for Enterprise-only keys. **What we did:** (1) Registered a **new** reCAPTCHA Enterprise key in **`aideazz-1775763145287`** (domains `aideazz.xyz`, `www.aideazz.xyz`; site key id `6LcHda8sAAAAAAGwl5alB2xdX_6Dqve5a5vifoHj`). (2) **Credentials** in that project: API key restricted to **reCAPTCHA Enterprise API**. (3) **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/recaptcha.ts`: load **`https://www.google.com/recaptcha/enterprise.js?render=…`**, **`grecaptcha.enterprise.execute`** with action **`inquiry`** (not classic `api.js` / `grecaptcha.execute`). **`VITE_RECAPTCHA_SITE_KEY`** in `.env.production` + deploy **4everland** from `main`. (4) **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** `src/marketing-notify.ts`: **`verifyRecaptchaEnterprise`** → `recaptchaenterprise.googleapis.com/.../assessments?key=…`; optional fallback to classic **`siteverify`**; verification can run with **Enterprise-only** env (no legacy secret required when `RECAPTCHA_ENTERPRISE_PROJECT_ID` + `RECAPTCHA_ENTERPRISE_API_KEY` + `RECAPTCHA_SITE_KEY` are set). **Oracle** `~/cto-aipa/.env`: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_ENTERPRISE_PROJECT_ID=aideazz-1775763145287`, `RECAPTCHA_ENTERPRISE_API_KEY`; optional `RECAPTCHA_SECRET_KEY`; optional `RECAPTCHA_MIN_SCORE` (default **0.1** in code). **`pm2 restart cto-aipa --update-env`**. **Docs:** `.env.example` in both repos. |
-| Phase 4: Founder Outreach Pipeline | **COMPLETE** | See Phase 4 section below. |
+| Phase 4: Founder Outreach Pipeline | **COMPLETE (verified send path)** | Real Resend + Oracle; see “Phase 4 outreach — what is actually working” and Phase 4 section below. |
 | Phase 5: Lead Triage Dashboard | NOT STARTED | Depends on Phase 3 + 4 data |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
 
-### Phase 4: Founder Cold Email Pipeline — COMPLETE (production, auto-scheduled)
+### Phase 4: Founder Cold Email Pipeline — SHIPPED & VERIFIED (not a stub)
 
-> **Shipped: April 10, 2026** | Dual-system: CTO AIPA (client outreach) + VibeJobHunter (employer outreach)
+> **Last verified: April 12, 2026** | Dual-system: **CTO AIPA** (client / “hire us”) + **VibeJobHunter** (employer / “hire me”)
 
-**CTO AIPA — Client Outreach Pipeline:**
-
-| Task | Status | Details |
-|---|---|---|
-| Oracle tables (`outreach_targets`, `outreach_log`) | DONE | `src/database.ts` — target import, email log, status tracking, daily cap counter, reply detection. 9 new CRUD functions. |
-| Target import + pain-to-system matching | DONE | `src/outreach.ts` — `importTargets()` maps prospect pain points to AIdeazz production systems (CTO AIPA, EspaLuz, DragonTrade, etc.) for hyper-personalized emails. |
-| Claude-powered email generation | DONE | `generateOutreachEmail()` — Claude writes personalized subject + body per target, referencing their specific pain point and the matching AIdeazz system. 3x retry with exponential backoff for 529/503/429 transient errors. |
-| Resend sending with daily cap | DONE | `sendOutreachEmail()` / `sendApprovedDrafts()` — sends via `OUTREACH_FROM` (default `AIdeazz <elena@aideazz.xyz>`), respects `OUTREACH_DAILY_CAP` (default 10/day). |
-| Express API (8 endpoints) | DONE | `GET /outreach/stats`, `GET /outreach/targets`, `POST /outreach/targets/import`, `POST /outreach/targets/verify`, `POST /outreach/drafts/generate`, `GET /outreach/drafts`, `POST /outreach/send`, `POST /outreach/reply` — all Bearer `OUTREACH_SECRET` authenticated. |
-| Telegram commands | DONE | `/outreach` — pipeline stats. `/outreach_drafts` — preview pending emails. Both in Business Wiring section of `/menu`. |
-| **Fully automatic daily cron** | DONE | `runDailyOutreachCycle()` — cron at `OUTREACH_CRON` (default `0 15 * * *` = 3 PM Panama). Auto-generates drafts for verified targets → auto-sends → Telegram summary. No manual approval needed. |
-| Hunter.io email verification | DONE | Optional `verifyTargetEmails()` — validates emails before sending. |
-| `.env.example` updated | DONE | `OUTREACH_SECRET`, `OUTREACH_FROM`, `OUTREACH_DAILY_CAP`, `OUTREACH_MODEL`, `OUTREACH_CRON`, `OUTREACH_TZ`, `HUNTER_API_KEY`. |
-
-**VibeJobHunter — Employer Outreach (fixes shipped alongside Phase 4):**
+**CTO AIPA — Client outreach (production):**
 
 | Task | Status | Details |
 |---|---|---|
-| `founder_finder_v2.py` — email sending fix | DONE | Fixed `_send_email_message` TypeError (`from_name` param removed), corrected `FROM_EMAIL` to `aipa@aideazz.xyz` (was hardcoded wrong domain). |
-| `_extract_email` — ATS fallback fix | DONE | Never returns `careers@`/`jobs@`/`hr@` as founder email — prevents bouncing on ATS inboxes. |
-| `job_gate.py` — sr./sr exclusions | DONE | Added `sr. engineer`, `sr. software`, `sr. ai`, `sr. ml`, `sr. dev`, `sr gen ai` + space variants + `senior developer`, `senior dev` to `ROLE_EXCLUDE_KEYWORDS`. |
-| `job_gate.py` — salary floor recalibration | DONE | Adjusted from unrealistic $150K to $30K–$42K annual (aligned with CAREER_FOCUS $2.5K–5K/mo). |
-| Claude 529/503/429 retry (shared utility) | DONE | `src/utils/claude_helper.py` — `call_claude_sync`, `call_claude_async`, `acall_claude` with 3x retry + exponential backoff. Wired into `message_generator.py` (5 call sites), `auto_applicator.py`, `company_researcher.py`, `job_matcher.py`. |
+| Oracle tables (`outreach_targets`, `outreach_log`) | DONE | `src/database.ts` — import, drafts, send tracking, replies. |
+| Prospect ingestion | DONE | `src/prospect-ingest.ts` — YC AI companies (JSON or API) → Hunter.io (budget-aware) → pain classification → `importTargets` with dedupe by company. |
+| Claude email generation + retry | DONE | `src/outreach.ts` — 529/503/429 retries on generation. |
+| **Resend send + honest bookkeeping** | DONE | `sendOutreachEmail()` — **no** `sent` status unless Resend returns success **and** `markOutreachSent` updates a row (`rowsAffected`). Logs Resend **message id** when present. |
+| Daily cap | DONE | `OUTREACH_DAILY_CAP` (default 10). |
+| Crons (ingest + send) | DONE | Registered only if `OUTREACH_SECRET` is set: default **ingest 2 PM**, **send 3 PM** `America/Panama`. |
+| Telegram | DONE | Cycle summaries use **plain text** broadcasts (no fragile Markdown). `/outreach`, `/outreach_ingest`, `/outreach_drafts` in Business Wiring. |
+| Ops check | DONE | `npm run check:phase4` / `scripts/check-phase4-env.cjs` — confirms `RESEND_*`, `OUTREACH_SECRET`, Hunter key **presence** (lengths only). |
 
-**What needs to happen next for Phase 4 to generate real value:**
-- **Target ingestion**: CTO AIPA has the pipeline but needs real prospect data. Build a scraper or import CSV of target founders.
-- **VJH founder outreach**: Already automatic (runs hourly, capped at 2/day). Needs quality founder email discovery to improve hit rate.
+**VibeJobHunter — Employer outreach & applications:**
+
+| Task | Status | Details |
+|---|---|---|
+| Founder email outreach | DONE | Resend sends only to validated personal-style addresses; **LinkedIn/Twitter “manual queue” does not count as `success`** — stats match real automated email. |
+| Company URL for Hunter | DONE | `founder_finder_v2._resolve_company_url` — derives real domain from ATS URLs. |
+| Applications | DONE | `application_delivered` = **live ATS submit** OR **application email** (e.g. Hunter contact), **not** “cover letter file saved only”. |
+| Claude retries | DONE | `claude_helper.py` + call sites as deployed. |
+| Role / gate tuning | DONE | `job_gate.py` etc. as in repo. |
+
+**What still limits volume (not the same as “broken”):**
+- **VJH:** If **0 new jobs** pass the seen filter in a cycle, there is nothing to apply to or message — the engine is waiting on **fresh listings**.
+- **CTO AIPA:** Ingest may log **0 new** when all YC rows are already in `outreach_targets` (dedupe). **Hunter** monthly budget caps discovery.
+- **ATS:** Aggregated job boards may not expose a supported ATS URL → automation falls back to email when a valid contact exists.
+
+**What needs to happen next for more conversations (product, not wiring):**
+- Refresh or widen **target sources** (CTO: more companies; VJH: job sources when ATS times out).
+- Optional: Phase 5 lead triage UI — wiring above already feeds Oracle / logs.
 
 ---
 
@@ -598,10 +618,10 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 10, 2026 (v9 — Phase 4 COMPLETE: dual outreach pipeline CTO AIPA + VJH, auto cron, Claude retry)
+> Document version: April 12, 2026 (v10 — Phase 4: dual outreach verified — Resend/Oracle truth table, VJH success ≠ manual LinkedIn queue, plain Telegram summaries)
 > Aligned with: CAREER_FOCUS.md v4 (April 2026 — outreach operational), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
 > Phase 2 status: MOSTLY COMPLETE — Hashnode daily publisher live; LLM draft queue optional
 > Phase 3 status: COMPLETE — UTM + inquiry + reCAPTCHA Enterprise
-> Phase 4 status: COMPLETE — CTO AIPA auto outreach cron + VJH employer outreach fixed
-> Next: Phase 5 (Lead Triage Dashboard) or target ingestion for Phase 4
+> Phase 4 status: COMPLETE & VERIFIED — client sends via CTO AIPA (Resend+Oracle); employer sends via VJH only when email delivers; applications counted only on real ATS or email delivery
+> Next: Phase 5 (Lead Triage Dashboard); optional new target sources to increase outreach volume
