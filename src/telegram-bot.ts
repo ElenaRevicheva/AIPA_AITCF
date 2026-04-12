@@ -56,6 +56,7 @@ import {
   getOutreachStats,
   getOutreachDrafts,
 } from './database';
+import { runTriageCycle, buildDailyBrief } from './lead-triage';
 import {
   importTargets,
   verifyTargetEmails,
@@ -1139,6 +1140,33 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     } catch (error) {
       console.error('Outreach ingest error:', error);
       await ctx.reply('❌ Error running prospect ingestion.');
+    }
+  });
+
+  // /triage — Phase 5: Run lead triage cycle manually
+  bot.command('triage', async (ctx) => {
+    await ctx.reply('🔍 Running lead triage cycle...');
+    try {
+      const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+      const result = await runTriageCycle(groq, anthropic);
+      const brief = await buildDailyBrief();
+      await ctx.reply(
+        `✅ Triage complete\n\nProcessed: ${result.processed}\nUrgent (4-5): ${result.urgent}\n\n${brief}`
+      );
+    } catch (error) {
+      console.error('Triage error:', error);
+      await ctx.reply('❌ Triage error. Check server logs.');
+    }
+  });
+
+  // /triage_urgent — Show only urgency 4-5 leads
+  bot.command('triage_urgent', async (ctx) => {
+    try {
+      const brief = await buildDailyBrief();
+      await ctx.reply(brief);
+    } catch (error) {
+      await ctx.reply('❌ Error fetching lead brief.');
     }
   });
 

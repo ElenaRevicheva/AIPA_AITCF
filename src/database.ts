@@ -2214,6 +2214,175 @@ initEspaluzFunnelTable();
 initOutreachTargetsTable();
 initOutreachLogTable();
 
+// ============================================================
+// PHASE 5 — Lead Triage
+// ============================================================
+
+async function initLeadTriageTable() {
+  let connection;
+  try {
+    connection = await getConnection();
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE lead_triage (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          source_table VARCHAR2(50) NOT NULL,
+          source_ref_id RAW(16),
+          signal_type VARCHAR2(50) DEFAULT ''unknown'',
+          urgency NUMBER(1) DEFAULT 1,
+          deal_value VARCHAR2(50) DEFAULT ''unknown'',
+          one_line_summary VARCHAR2(500),
+          raw_context CLOB,
+          source_name VARCHAR2(500),
+          source_email VARCHAR2(500),
+          status VARCHAR2(50) DEFAULT ''new'',
+          classified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION WHEN OTHERS THEN
+        IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE INDEX idx_lead_triage_urgency ON lead_triage(urgency DESC)';
+      EXCEPTION WHEN OTHERS THEN
+        IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    await connection.commit();
+    console.log('✅ lead_triage table ready');
+  } catch (err) {
+    console.error('lead_triage table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+export async function saveTriagedLead(data: {
+  source_table: string;
+  source_ref_id: string;
+  signal_type: string;
+  urgency: number;
+  deal_value: string;
+  one_line_summary: string;
+  raw_context: string;
+  source_name: string;
+  source_email: string;
+}): Promise<void> {
+  let connection;
+  try {
+    connection = await getConnection();
+    // Avoid duplicate triage of same source_ref_id
+    const existing = await connection.execute(
+      `SELECT COUNT(*) FROM lead_triage WHERE source_ref_id = HEXTORAW(:1) AND source_table = :2`,
+      [data.source_ref_id.replace(/-/g, ''), data.source_table]
+    );
+    const count = (existing.rows as any[])[0]?.[0] || 0;
+    if (count > 0) return;
+
+    await connection.execute(
+      `INSERT INTO lead_triage (source_table, source_ref_id, signal_type, urgency, deal_value, one_line_summary, raw_context, source_name, source_email)
+       VALUES (:1, HEXTORAW(:2), :3, :4, :5, :6, :7, :8, :9)`,
+      [
+        data.source_table,
+        data.source_ref_id.replace(/-/g, ''),
+        data.signal_type,
+        data.urgency,
+        data.deal_value,
+        data.one_line_summary.substring(0, 500),
+        data.raw_context,
+        (data.source_name || '').substring(0, 500),
+        (data.source_email || '').substring(0, 500),
+      ]
+    );
+    await connection.commit();
+  } catch (err) {
+    console.error('saveTriagedLead error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+export async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
+  let connection;
+  try {
+    connection = await getConnection();
+    const where = status ? `AND status = :2` : '';
+    const params: any[] = status ? [limit, status] : [limit];
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id), source_table, source_ref_id, signal_type, urgency,
+              deal_value, status, one_line_summary, source_name, source_email,
+              classified_at
+       FROM lead_triage
+       WHERE 1=1 ${where}
+       ORDER BY urgency DESC, classified_at DESC
+       FETCH FIRST :1 ROWS ONLY`,
+      params
+    );
+    return (result.rows as any[]) || [];
+  } catch (err) {
+    console.error('getTriagedLeads error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+export async function getUntriagedLeads(limit = 50): Promise<any[]> {
+  let connection;
+  try {
+    connection = await getConnection();
+    // Pull business_leads not yet in lead_triage
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(bl.id), bl.name, bl.contact_email, bl.context, bl.utm_source
+       FROM business_leads bl
+       WHERE NOT EXISTS (
+         SELECT 1 FROM lead_triage lt
+         WHERE lt.source_ref_id = bl.id AND lt.source_table = 'business_leads'
+       )
+       ORDER BY bl.created_at DESC
+       FETCH FIRST :1 ROWS ONLY`,
+      [limit]
+    );
+    return (result.rows as any[]) || [];
+  } catch (err) {
+    console.error('getUntriagedLeads error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+export async function getRepliedOutreach(limit = 20): Promise<any[]> {
+  let connection;
+  try {
+    connection = await getConnection();
+    // Pull outreach replies not yet triaged
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(ol.id), ot.name, ot.email, ol.subject, ol.reply_snippet
+       FROM outreach_log ol
+       JOIN outreach_targets ot ON ot.id = ol.target_id
+       WHERE ol.replied = 1
+       AND NOT EXISTS (
+         SELECT 1 FROM lead_triage lt
+         WHERE lt.source_ref_id = ol.id AND lt.source_table = 'outreach_log'
+       )
+       ORDER BY ol.replied_at DESC
+       FETCH FIRST :1 ROWS ONLY`,
+      [limit]
+    );
+    return (result.rows as any[]) || [];
+  } catch (err) {
+    console.error('getRepliedOutreach error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+initLeadTriageTable();
+
 export {
   initializeDatabase,
   saveMemory,
@@ -2283,5 +2452,10 @@ export {
   markOutreachReply,
   getOutreachSentToday,
   getOutreachStats,
-  getOutreachDrafts
+  getOutreachDrafts,
+  // === PHASE 5 — Lead Triage ===
+  saveTriagedLead,
+  getTriagedLeads,
+  getUntriagedLeads,
+  getRepliedOutreach,
 };

@@ -33,6 +33,7 @@ import {
   formatDraftPreview,
 } from './outreach';
 import { runProspectIngestion } from './prospect-ingest';
+import { runTriageCycle, buildDailyBrief, buildDashboardHtml } from './lead-triage';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
@@ -1353,7 +1354,44 @@ async function startCTOAIPA() {
     // ---------- OTHER EVENTS ----------
     res.json({ status: 'ignored', event });
   });
-  
+
+  // ============================================================
+  // PHASE 5 — Lead Triage Dashboard
+  // GET /leads/dashboard?secret=<LEAD_TRIAGE_SECRET>
+  // ============================================================
+  app.get('/leads/dashboard', async (req: Request, res: Response) => {
+    const secret = process.env.LEAD_TRIAGE_SECRET;
+    if (secret && req.query.secret !== secret) {
+      res.status(401).send('<h1 style="font-family:sans-serif;color:#ef4444">Unauthorized</h1>');
+      return;
+    }
+    try {
+      const html = await buildDashboardHtml();
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(html);
+    } catch (err) {
+      console.error('Dashboard error:', err);
+      res.status(500).send('Dashboard error — check logs');
+    }
+  });
+
+  // Manual triage trigger (for Cursor agent / automation)
+  app.post('/leads/triage-run', async (req: Request, res: Response) => {
+    const secret = process.env.LEAD_TRIAGE_SECRET;
+    const auth = req.headers.authorization?.replace('Bearer ', '');
+    if (secret && auth !== secret) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    try {
+      const result = await runTriageCycle(groq, anthropic);
+      res.json({ ok: true, ...result });
+    } catch (err) {
+      console.error('Triage run error:', err);
+      res.status(500).json({ error: 'Triage failed' });
+    }
+  });
+
   const PORT = 3000;
   const baseUrl = process.env.CTO_AIPA_PUBLIC_URL || `http://0.0.0.0:${PORT}`;
   app.listen(PORT, '0.0.0.0', () => {
@@ -1425,6 +1463,20 @@ async function startCTOAIPA() {
       }, { timezone: outreachTz });
       console.log(`📧 Outreach cron: "${outreachCronExpr}" (${outreachTz}) — auto generate + send`);
     }
+
+    // Phase 5: Lead triage daily brief — 08:00 America/Panama
+    const triageCronExpr = process.env.TRIAGE_CRON || '0 8 * * *';
+    const triageTz = 'America/Panama';
+    cron.schedule(triageCronExpr, async () => {
+      console.log('🎯 [cron] Running daily lead triage...');
+      try {
+        await runTriageCycle(groq, anthropic);
+        const brief = await buildDailyBrief();
+        const chatId = process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID;
+        if (chatId) await sendTelegramBroadcast(brief, { parseMode: false });
+      } catch (e) { console.error('🎯 [cron] Triage error:', e); }
+    }, { timezone: triageTz });
+    console.log(`🎯 Triage cron: "${triageCronExpr}" (${triageTz}) — daily lead brief`);
   });
 }
 
