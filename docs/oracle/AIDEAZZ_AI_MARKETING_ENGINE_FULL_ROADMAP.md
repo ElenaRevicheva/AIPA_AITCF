@@ -73,9 +73,9 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 ---
 
-## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE · PHASE 4 SHIPPED & VERIFIED (NOT A STUB)
+## IMPLEMENTATION STATUS — PHASE 1 COMPLETE · PHASE 2 MOSTLY COMPLETE · PHASE 3 COMPLETE · PHASE 4 SHIPPED & VERIFIED · PHASE 5 SHIPPED (LEAD TRIAGE)
 
-> Updated: April 12, 2026 — Phase 4: real Resend + Oracle paths; metrics aligned with delivery (see “Phase 4 outreach — what is actually working” above).
+> Updated: April 12, 2026 — Phase 4–5: outreach + triage paths live on Oracle; Phase 5 uses Groq with Claude Haiku fallback when Groq TPM/limits hit (see Phase 5 table below).
 
 ### Phase 1a: SEO Health Audit — DONE
 
@@ -153,7 +153,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | Phase 3b: Email notifications | **COMPLETE** | **Resend** via `RESEND_API_KEY`. Team inbox: `MARKETING_INQUIRY_NOTIFY_TO` (default `aipa@aideazz.xyz`). Submitter gets confirmation email when address is valid. **Sender:** `MARKETING_INQUIRY_FROM` — production uses verified **`AIdeazz <aipa@aideazz.xyz>`** (same domain pattern as VibeJobHunter). Implementation: `src/marketing-notify.ts`. |
 | Phase 3c: reCAPTCHA Enterprise + inquiry | **COMPLETE (production)** | **Verified Apr 2026:** end-to-end form submit on `https://aideazz.xyz` → Oracle `POST /marketing/inquiry-proxy` → `business_leads` + Resend team email (`[AIdeazz] Inquiry — …`). **Why it was hard:** initial key lived in GCP project `aideazz-177575763145287` (no console access); API key was created in **`aideazz-1775763145287`** — Enterprise **CreateAssessment** must use the **same** project as the reCAPTCHA **site key** + an API key from that project. Classic `siteverify` + `api.js` also failed for Enterprise-only keys. **What we did:** (1) Registered a **new** reCAPTCHA Enterprise key in **`aideazz-1775763145287`** (domains `aideazz.xyz`, `www.aideazz.xyz`; site key id `6LcHda8sAAAAAAGwl5alB2xdX_6Dqve5a5vifoHj`). (2) **Credentials** in that project: API key restricted to **reCAPTCHA Enterprise API**. (3) **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/recaptcha.ts`: load **`https://www.google.com/recaptcha/enterprise.js?render=…`**, **`grecaptcha.enterprise.execute`** with action **`inquiry`** (not classic `api.js` / `grecaptcha.execute`). **`VITE_RECAPTCHA_SITE_KEY`** in `.env.production` + deploy **4everland** from `main`. (4) **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** `src/marketing-notify.ts`: **`verifyRecaptchaEnterprise`** → `recaptchaenterprise.googleapis.com/.../assessments?key=…`; optional fallback to classic **`siteverify`**; verification can run with **Enterprise-only** env (no legacy secret required when `RECAPTCHA_ENTERPRISE_PROJECT_ID` + `RECAPTCHA_ENTERPRISE_API_KEY` + `RECAPTCHA_SITE_KEY` are set). **Oracle** `~/cto-aipa/.env`: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_ENTERPRISE_PROJECT_ID=aideazz-1775763145287`, `RECAPTCHA_ENTERPRISE_API_KEY`; optional `RECAPTCHA_SECRET_KEY`; optional `RECAPTCHA_MIN_SCORE` (default **0.1** in code). **`pm2 restart cto-aipa --update-env`**. **Docs:** `.env.example` in both repos. |
 | Phase 4: Founder Outreach Pipeline | **COMPLETE (verified send path)** | Real Resend + Oracle; see “Phase 4 outreach — what is actually working” and Phase 4 section below. |
-| Phase 5: Lead Triage Dashboard | NOT STARTED | Depends on Phase 3 + 4 data |
+| Phase 5: Lead Triage | **SHIPPED (Apr 2026)** | Oracle `lead_triage`; `src/lead-triage.ts` — Groq bulk classify, **Claude Haiku** if Groq hits TPM/size limits, **Sonnet** one-line refine for urgency ≥4; inquiry **context truncated ~3.6k chars** for Groq; `/triage`, `POST /leads/triage-run`, `GET /leads/dashboard` (HTML), daily cron **`TRIAGE_CRON`** + optional `TELEGRAM_LEADS_DIGEST_CHAT_ID`. Env: `TRIAGE_MAX_BUSINESS_LEADS`, `TRIAGE_MAX_OUTREACH`, `TRIAGE_INTER_LEAD_DELAY_MS`, `TRIAGE_FALLBACK_MODEL`. |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
 
 ### Phase 4: Founder Cold Email Pipeline — SHIPPED & VERIFIED (not a stub)
@@ -190,7 +190,18 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 **What needs to happen next for more conversations (product, not wiring):**
 - Refresh or widen **target sources** (CTO: more companies; VJH: job sources when ATS times out).
-- Optional: Phase 5 lead triage UI — wiring above already feeds Oracle / logs.
+### Phase 5: Lead Triage — SHIPPED (production)
+
+| Task | Status | Details |
+|---|---|---|
+| Oracle `lead_triage` + indexes | DONE | `src/database.ts` — `saveTriagedLead`, `getUntriagedLeads`, `getRepliedOutreach`, `getTriagedLeads`; dedupe by `source_ref_id` + `source_table`. |
+| Classification | DONE | Groq `llama-3.3-70b-versatile` (12s timeout, no SDK retries); **Claude Haiku** fallback same JSON schema; **Sonnet** optional refine for urgency ≥4. |
+| Groq TPM / huge inquiries | DONE | **Context clipped to 3600 chars** in prompts; batch caps default **20** business + **10** outreach; **350ms** delay between leads (spreads TPM). |
+| Telegram | DONE | `/triage`, `/triage_urgent` in `telegram-bot.ts`; daily brief after cron if `TELEGRAM_LEADS_DIGEST_CHAT_ID` set. |
+| HTTP | DONE | `POST /leads/triage-run` (Bearer `LEAD_TRIAGE_SECRET`); `GET /leads/dashboard?token=…`. |
+| Cron | DONE | `TRIAGE_CRON` default `0 8 * * *` `America/Panama`. |
+
+**Phase 6 (showcase package / pitch docs)** remains optional product work — not blocking triage.
 
 ---
 
@@ -642,10 +653,11 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 12, 2026 (v10 — Phase 4: dual outreach verified — Resend/Oracle truth table, VJH success ≠ manual LinkedIn queue, plain Telegram summaries)
+> Document version: April 12, 2026 (v11 — Phase 5 triage: Groq + Haiku fallback, context cap, batch limits)
 > Aligned with: CAREER_FOCUS.md v4 (April 2026 — outreach operational), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4 all verified working)
 > Phase 2 status: MOSTLY COMPLETE — Hashnode daily publisher live; LLM draft queue optional
 > Phase 3 status: COMPLETE — UTM + inquiry + reCAPTCHA Enterprise
 > Phase 4 status: COMPLETE & VERIFIED — client sends via CTO AIPA (Resend+Oracle); employer sends via VJH only when email delivers; applications counted only on real ATS or email delivery
-> Next: Phase 5 (Lead Triage Dashboard); optional new target sources to increase outreach volume
+> Phase 5 status: SHIPPED — lead triage in Oracle; Groq + Claude Haiku fallback; dashboard + Telegram + cron
+> Next: Phase 6 (showcase package); optional more outreach sources

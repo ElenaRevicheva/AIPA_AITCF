@@ -832,7 +832,7 @@ async function startCTOAIPA() {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    const b = req.body as Record<string, unknown>;
+    const b = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, unknown>;
     const name = typeof b.name === 'string' ? b.name : undefined;
     const contactEmail =
       typeof b.email === 'string' ? b.email : typeof b.contactEmail === 'string' ? b.contactEmail : undefined;

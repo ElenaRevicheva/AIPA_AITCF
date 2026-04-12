@@ -17,6 +17,10 @@ import {
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = 'claude-sonnet-4-5';
+/** Groq free tier TPM ~12k — huge inquiry bodies must be clipped or requests fail with 413. */
+const TRIAGE_CONTEXT_MAX_CHARS = 3600;
+const TRIAGE_FALLBACK_MODEL = process.env.TRIAGE_FALLBACK_MODEL || 'claude-3-5-haiku-20241022';
+const TRIAGE_INTER_LEAD_DELAY_MS = Math.max(0, parseInt(process.env.TRIAGE_INTER_LEAD_DELAY_MS || '350', 10) || 0);
 
 interface TriageResult {
   signal_type: 'job_opportunity' | 'client_lead' | 'partnership' | 'irrelevant' | 'unknown';
@@ -34,16 +38,24 @@ interface LeadInput {
   utm_source?: string;
 }
 
-/**
- * Classify a single lead using Groq (fast, free).
- * Falls back to Claude Sonnet if Groq fails or urgency >= 4 for refinement.
- */
-async function classifyLead(
-  lead: LeadInput,
-  groq: Groq,
-  anthropic: Anthropic
-): Promise<TriageResult> {
-  const prompt = `You are a lead triage AI for an AI systems builder / fractional AI consultant.
+function truncateTriageContext(text: string): string {
+  const t = text || '';
+  if (t.length <= TRIAGE_CONTEXT_MAX_CHARS) return t;
+  return `${t.slice(0, TRIAGE_CONTEXT_MAX_CHARS)}\n…[truncated for triage — full text in Oracle]`;
+}
+
+function parseTriageJson(raw: string): TriageResult | null {
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) return null;
+  try {
+    return JSON.parse(jsonMatch[0]) as TriageResult;
+  } catch {
+    return null;
+  }
+}
+
+function buildTriagePrompt(lead: LeadInput, contextForModel: string): string {
+  return `You are a lead triage AI for an AI systems builder / fractional AI consultant.
 
 Classify this inbound signal and respond with ONLY valid JSON, no explanation.
 
@@ -51,7 +63,7 @@ Signal source: ${lead.source_table}
 Name: ${lead.name || 'unknown'}
 Email: ${lead.email || 'unknown'}
 UTM source: ${lead.utm_source || 'direct'}
-Context: ${lead.context || 'no context'}
+Context: ${contextForModel || 'no context'}
 
 Respond with JSON exactly like this:
 {
@@ -67,53 +79,102 @@ Urgency scale:
 3 = Reply this week — moderate interest, needs nurturing
 2 = Monitor — passive signal, no clear intent yet
 1 = Low — generic, no useful signal`;
+}
+
+/**
+ * Claude when Groq rejects (413 TPM) or times out — same JSON contract.
+ */
+async function classifyLeadAnthropic(
+  lead: LeadInput,
+  prompt: string,
+  anthropic: Anthropic
+): Promise<TriageResult> {
+  const response = await anthropic.messages.create({
+    model: TRIAGE_FALLBACK_MODEL,
+    max_tokens: 350,
+    temperature: 0.1,
+    messages: [{ role: 'user', content: prompt }],
+  });
+  const raw =
+    response.content[0]?.type === 'text' ? response.content[0].text.trim() : '{}';
+  const parsed = parseTriageJson(raw) || defaultTriage();
+  parsed.urgency = Math.max(1, Math.min(5, Math.round(parsed.urgency || 1)));
+  parsed.signal_type = parsed.signal_type || 'unknown';
+  parsed.deal_value = parsed.deal_value || 'unknown';
+  parsed.one_line_summary = (parsed.one_line_summary || 'No summary').substring(0, 500);
+  return parsed;
+}
+
+/**
+ * Classify a single lead using Groq (fast, free).
+ * Falls back to Claude Haiku if Groq fails (rate limit / request too large).
+ * Refines urgency ≥4 with Claude Sonnet when context exists.
+ */
+async function classifyLead(
+  lead: LeadInput,
+  groq: Groq,
+  anthropic: Anthropic
+): Promise<TriageResult> {
+  const contextShort = truncateTriageContext(lead.context);
+  const prompt = buildTriagePrompt(lead, contextShort);
+
+  let parsed: TriageResult;
 
   try {
-    const groqResponse = await groq.chat.completions.create({
-      model: GROQ_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 200,
-      temperature: 0.1,
-    }, { timeout: 8000, maxRetries: 0 });
+    const groqResponse = await groq.chat.completions.create(
+      {
+        model: GROQ_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 220,
+        temperature: 0.1,
+      },
+      { timeout: 12_000, maxRetries: 0 }
+    );
     const raw = groqResponse.choices[0]?.message?.content?.trim() || '{}';
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    const parsed: TriageResult = jsonMatch ? JSON.parse(jsonMatch[0]) : defaultTriage();
+    parsed = parseTriageJson(raw) || defaultTriage();
+  } catch (err: any) {
+    const msg = String(err?.message || err || '');
+    const is413 = msg.includes('413') || msg.includes('too large') || msg.includes('rate_limit');
+    console.warn(`🎯 [triage] Groq classify failed (${is413 ? 'size/rate' : 'error'}), using Claude fallback:`, msg.slice(0, 160));
+    try {
+      parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
+    } catch (e2) {
+      console.error('🎯 [triage] Claude fallback failed:', e2);
+      return defaultTriage();
+    }
+  }
 
-    // Refine high-urgency leads with Claude for better summary
-    if (parsed.urgency >= 4 && lead.context) {
-      try {
-        const claudeResponse = await anthropic.messages.create({
-          model: CLAUDE_MODEL,
-          max_tokens: 150,
-          messages: [{
+  // Refine high-urgency leads with Claude Sonnet (short context only)
+  if (parsed.urgency >= 4 && contextShort) {
+    try {
+      const refineCtx = truncateTriageContext(lead.context).slice(0, 2500);
+      const claudeResponse = await anthropic.messages.create({
+        model: CLAUDE_MODEL,
+        max_tokens: 150,
+        messages: [
+          {
             role: 'user',
             content: `Refine this lead summary to be maximally actionable in one sentence.
-Context: ${lead.context}
+Context: ${refineCtx}
 Current summary: ${parsed.one_line_summary}
 Name: ${lead.name}, Source: ${lead.utm_source || lead.source_table}
-Reply with ONLY the improved one-sentence summary, nothing else.`
-          }]
-        }, { timeout: 10000 } as any);
-        const refinedSummary = claudeResponse.content[0]?.type === 'text'
-          ? claudeResponse.content[0].text.trim()
-          : parsed.one_line_summary;
-        parsed.one_line_summary = refinedSummary.substring(0, 500);
-      } catch {
-        // Keep Groq summary if Claude fails
-      }
+Reply with ONLY the improved one-sentence summary, nothing else.`,
+          },
+        ],
+      });
+      const refinedSummary =
+        claudeResponse.content[0]?.type === 'text' ? claudeResponse.content[0].text.trim() : parsed.one_line_summary;
+      parsed.one_line_summary = refinedSummary.substring(0, 500);
+    } catch {
+      // Keep prior summary
     }
-
-    // Sanitize
-    parsed.urgency = Math.max(1, Math.min(5, Math.round(parsed.urgency || 1)));
-    parsed.signal_type = parsed.signal_type || 'unknown';
-    parsed.deal_value = parsed.deal_value || 'unknown';
-    parsed.one_line_summary = (parsed.one_line_summary || 'No summary').substring(0, 500);
-    return parsed;
-
-  } catch (err) {
-    console.error('Lead classification error:', err);
-    return defaultTriage();
   }
+
+  parsed.urgency = Math.max(1, Math.min(5, Math.round(parsed.urgency || 1)));
+  parsed.signal_type = parsed.signal_type || 'unknown';
+  parsed.deal_value = parsed.deal_value || 'unknown';
+  parsed.one_line_summary = (parsed.one_line_summary || 'No summary').substring(0, 500);
+  return parsed;
 }
 
 function defaultTriage(): TriageResult {
@@ -132,11 +193,14 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
   urgent: number;
   summary: string;
 }> {
+  const maxBiz = Math.min(80, Math.max(5, parseInt(process.env.TRIAGE_MAX_BUSINESS_LEADS || '20', 10) || 20));
+  const maxOut = Math.min(40, Math.max(3, parseInt(process.env.TRIAGE_MAX_OUTREACH || '10', 10) || 10));
+
   // Sequential queries to avoid concurrent Oracle connection issues
   console.log('🎯 [triage] Querying untriaged leads...');
-  const rawLeads = await getUntriagedLeads(50);
+  const rawLeads = await getUntriagedLeads(maxBiz);
   console.log(`🎯 [triage] Raw leads: ${rawLeads.length}`);
-  const repliedOutreach = await getRepliedOutreach(20);
+  const repliedOutreach = await getRepliedOutreach(maxOut);
   console.log(`🎯 [triage] Replied outreach: ${repliedOutreach.length}`);
 
   const inputs: LeadInput[] = [
@@ -165,8 +229,12 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
   let processed = 0;
   let urgent = 0;
 
-  for (const lead of inputs) {
+  for (let i = 0; i < inputs.length; i++) {
+    const lead = inputs[i]!;
     try {
+      if (i > 0 && TRIAGE_INTER_LEAD_DELAY_MS > 0) {
+        await new Promise((r) => setTimeout(r, TRIAGE_INTER_LEAD_DELAY_MS));
+      }
       const result = await classifyLead(lead, groq, anthropic);
       await saveTriagedLead({
         source_table: lead.source_table,
