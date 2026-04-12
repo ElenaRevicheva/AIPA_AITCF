@@ -42,6 +42,40 @@ function extractLumaVideoUrl(statusData: any): string | null {
   return null;
 }
 
+/** Telegram often fails sendVideo(URL) when its servers cannot fetch the CDN; upload bytes instead. */
+const TELEGRAM_VIDEO_UPLOAD_MAX_BYTES = 49 * 1024 * 1024;
+
+async function replyWithVideoFromUrlReliable(
+  ctx: Context,
+  videoUrl: string,
+  opts: { caption: string; parse_mode?: 'Markdown' }
+): Promise<void> {
+  try {
+    const res = await fetch(videoUrl, {
+      signal: AbortSignal.timeout(180_000),
+      headers: { 'User-Agent': 'AtuonaCreativeAI/1.0 (video upload)' }
+    });
+    if (!res.ok) throw new Error(`GET video ${res.status}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    if (buf.length > 0 && buf.length <= TELEGRAM_VIDEO_UPLOAD_MAX_BYTES) {
+      await ctx.replyWithVideo(new InputFile(buf, 'atuona-base.mp4'), opts);
+      return;
+    }
+    console.warn(
+      `Video size ${(buf.length / (1024 * 1024)).toFixed(1)}MB — trying URL send (may fail on Telegram side)`
+    );
+    await ctx.replyWithVideo(videoUrl, opts);
+  } catch (e) {
+    console.error('replyWithVideoFromUrlReliable primary failed:', e);
+    try {
+      await ctx.replyWithVideo(videoUrl, opts);
+    } catch (e2) {
+      console.error('replyWithVideoFromUrlReliable URL fallback failed:', e2);
+      await ctx.reply(`${opts.caption}\n\n${videoUrl}`, opts.parse_mode ? { parse_mode: opts.parse_mode } : undefined);
+    }
+  }
+}
+
 // Runway API base URL (image_to_video fallback — see VIDEO_MODELS.runwayImageToVideo)
 const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
@@ -148,6 +182,9 @@ interface ProactiveMessage {
 
 // Visualizations storage
 let visualizations: PageVisualization[] = [];
+
+/** One active /visualize per chat + page (avoids duplicate Luma jobs and repeated “Starting…” spam). */
+const visualizeInFlight = new Set<string>();
 
 // Character memories - things learned about each character
 let characterMemories: Record<string, string[]> = {
@@ -7703,9 +7740,20 @@ _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ �
       return;
     }
     pageId = String(pageNum).padStart(3, '0');
-    
+
+    const vizLockKey = `${ctx.chat?.id ?? 'na'}:${pageId}`;
+    if (visualizeInFlight.has(vizLockKey)) {
+      await ctx.reply(
+        `⏳ *Visualization already running* for page #${pageId}.\n\n_Wait for the current run to finish (or for the video step). Sending /visualize again only duplicates work and repeats these messages._`,
+        { parse_mode: 'Markdown' }
+      );
+      return;
+    }
+    visualizeInFlight.add(vizLockKey);
+    let vizDeferred = false;
+
     await ctx.reply(`🎬 *Starting Visualization for Page #${pageId}*\n\n_Fetching page content..._`, { parse_mode: 'Markdown' });
-    
+
     try {
       // Fetch page content from GitHub
       const { data: metaFile } = await octokit.repos.getContent({
@@ -8179,16 +8227,11 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
             saveState();
-            
-            // Send video directly so user can view/download in Telegram
-            try {
-              await ctx.replyWithVideo(videoResult.videoUrl, {
-                caption: `✅ *Video Ready!* (Luma via Replicate)\n\n_Tap to play, long-press to save!_`,
-                parse_mode: 'Markdown'
-              });
-            } catch (videoSendError) {
-              await ctx.reply(`✅ *Video Ready!* (Luma via Replicate)\n\n🎬 ${videoResult.videoUrl}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
-            }
+
+            await replyWithVideoFromUrlReliable(ctx, videoResult.videoUrl, {
+              caption: `✅ *Video Ready!* (Luma via Replicate — base cut)\n\n_Tap to play, long-press to save!_`,
+              parse_mode: 'Markdown'
+            });
             await sendKnowledgeAuditAfterVideo();
 
             startDirectorsCutPipeline({
@@ -8201,6 +8244,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
             
           } else if (videoResult.provider === 'luma-direct' && videoResult.taskId) {
             visualizationSummaryDeferred = true;
+            vizDeferred = true;
             // Luma Direct: poll until done. Ray-2 1080p can exceed 5 min; fetch must time out or TCP stalls look like a "hang".
             const taskId = videoResult.taskId;
             const pollIntervalMs = 30_000;
@@ -8225,14 +8269,10 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                     visualization.status = 'complete';
                     saveState();
 
-                    try {
-                      await ctx.replyWithVideo(videoUrl, {
-                        caption: `✅ *Video Ready!* (Luma Direct)\n\n_Tap to play, long-press to save!_`,
-                        parse_mode: 'Markdown'
-                      });
-                    } catch (videoSendError) {
-                      await ctx.reply(`✅ *Video Ready!* (Luma Direct)\n\n🎬 ${videoUrl}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
-                    }
+                    await replyWithVideoFromUrlReliable(ctx, videoUrl, {
+                      caption: `✅ *Video Ready!* (Luma Direct — base cut)\n\n_Tap to play, long-press to save!_`,
+                      parse_mode: 'Markdown'
+                    });
                     await sendKnowledgeAuditAfterVideo();
 
                     startDirectorsCutPipeline({
@@ -8243,6 +8283,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                       ctx, visualization
                     }).catch(err => console.error('Director\'s Cut error (Luma Direct path):', err));
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                     return;
                   }
 
@@ -8253,6 +8294,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                     } else {
                       await ctx.reply(`⏳ Luma marked complete but no video URL yet.\nTry \`/videostatus ${taskId}\` in a moment.`, { parse_mode: 'Markdown' });
                       await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                      visualizeInFlight.delete(vizLockKey);
                     }
                     return;
                   }
@@ -8260,6 +8302,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   if (statusData.state === 'failed') {
                     await ctx.reply(`❌ Luma video failed.\nReason: ${statusData.failure_reason || 'Unknown'}`);
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                     return;
                   }
 
@@ -8275,6 +8318,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   } else {
                     await ctx.reply(`⏳ Video taking longer than expected.\nUse \`/videostatus ${taskId}\` to check manually.`, { parse_mode: 'Markdown' });
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                   }
                 } else {
                   const errBody = await statusResponse.text();
@@ -8284,6 +8328,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   } else {
                     await ctx.reply(`⏳ Could not read Luma status (HTTP ${statusResponse.status}). Try \`/videostatus ${taskId}\`.`, { parse_mode: 'Markdown' });
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                   }
                 }
               } catch (pollError: any) {
@@ -8300,6 +8345,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                     { parse_mode: 'Markdown' }
                   );
                   await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                  visualizeInFlight.delete(vizLockKey);
                 }
               }
             };
@@ -8309,6 +8355,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
             
           } else if (videoResult.provider === 'runway' && videoResult.taskId) {
             visualizationSummaryDeferred = true;
+            vizDeferred = true;
             // Runway needs polling - keep polling until done (max 5 min)
             const taskId = videoResult.taskId;
             
@@ -8327,34 +8374,32 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   const statusData = await statusResponse.json() as any;
                   
                   if (statusData.status === 'SUCCEEDED' && statusData.output?.[0]) {
-                    visualization.videoUrlHorizontal = statusData.output[0];
+                    const vUrl = String(statusData.output[0]);
+                    visualization.videoUrlHorizontal = vUrl;
                     visualization.status = 'complete';
                     saveState();
-                    
-                    // Send video directly so user can view/download in Telegram
-                    try {
-                      await ctx.replyWithVideo(statusData.output[0], {
-                        caption: `✅ *Video Ready!* (Runway)\n\n_Tap to play, long-press to save!_`,
-                        parse_mode: 'Markdown'
-                      });
-                    } catch (videoSendError) {
-                      await ctx.reply(`✅ *Video Ready!* (Runway)\n\n🎬 ${statusData.output[0]}\n\n_Open link to download_`, { parse_mode: 'Markdown' });
-                    }
+
+                    await replyWithVideoFromUrlReliable(ctx, vUrl, {
+                      caption: `✅ *Video Ready!* (Runway — base cut)\n\n_Tap to play, long-press to save!_`,
+                      parse_mode: 'Markdown'
+                    });
                     await sendKnowledgeAuditAfterVideo();
 
                     startDirectorsCutPipeline({
-                      baseVideoUrl: statusData.output[0],
+                      baseVideoUrl: vUrl,
                       firstFrameImageUrl: visualization.imageUrlHorizontal!,
                       title, theme, englishExcerpt,
                       knowledgeKeys: deepKb.mergedKeys as string[],
                       ctx, visualization
                     }).catch(err => console.error('Director\'s Cut error (Runway path):', err));
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                     return;
                     
                   } else if (statusData.status === 'FAILED') {
                     await ctx.reply(`❌ Runway video failed.\nReason: ${statusData.failure || 'Unknown'}`);
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                     return;
                     
                   } else if (attempt < maxAttempts) {
@@ -8365,6 +8410,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   } else {
                     await ctx.reply(`⏳ Video taking longer than expected.\nUse \`/videostatus ${taskId}\` to check manually.`, { parse_mode: 'Markdown' });
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                   }
                 } else {
                   const errBody = await statusResponse.text();
@@ -8374,6 +8420,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   } else {
                     await ctx.reply(`⏳ Could not read Runway status (HTTP ${statusResponse.status}). Try \`/videostatus ${taskId}\`.`, { parse_mode: 'Markdown' });
                     await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                    visualizeInFlight.delete(vizLockKey);
                   }
                 }
               } catch (pollError) {
@@ -8382,6 +8429,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   setTimeout(() => pollRunwayVideo(attempt + 1), 40000);
                 } else {
                   await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+                  visualizeInFlight.delete(vizLockKey);
                 }
               }
             };
@@ -8408,10 +8456,14 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
       if (!visualizationSummaryDeferred) {
         await sendVisualizationSummary();
       }
-      
     } catch (error: any) {
       console.error('Visualize error:', error);
+      visualizeInFlight.delete(vizLockKey);
       await ctx.reply(`❌ Error: ${error.message || 'Unknown error'}`);
+    } finally {
+      if (!vizDeferred) {
+        visualizeInFlight.delete(vizLockKey);
+      }
     }
   });
 
