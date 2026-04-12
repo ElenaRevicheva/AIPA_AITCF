@@ -74,7 +74,7 @@ Urgency scale:
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 200,
       temperature: 0.1,
-    });
+    }, { timeout: 8000, maxRetries: 0 });
     const raw = groqResponse.choices[0]?.message?.content?.trim() || '{}';
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     const parsed: TriageResult = jsonMatch ? JSON.parse(jsonMatch[0]) : defaultTriage();
@@ -93,7 +93,7 @@ Current summary: ${parsed.one_line_summary}
 Name: ${lead.name}, Source: ${lead.utm_source || lead.source_table}
 Reply with ONLY the improved one-sentence summary, nothing else.`
           }]
-        });
+        }, { timeout: 10000 } as any);
         const refinedSummary = claudeResponse.content[0]?.type === 'text'
           ? claudeResponse.content[0].text.trim()
           : parsed.one_line_summary;
