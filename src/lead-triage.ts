@@ -120,27 +120,32 @@ async function classifyLead(
 
   let parsed: TriageResult;
 
-  try {
-    const groqResponse = await groq.chat.completions.create(
-      {
-        model: GROQ_MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 220,
-        temperature: 0.1,
-      },
-      { timeout: 12_000, maxRetries: 0 }
-    );
-    const raw = groqResponse.choices[0]?.message?.content?.trim() || '{}';
-    parsed = parseTriageJson(raw) || defaultTriage();
-  } catch (err: any) {
-    const msg = String(err?.message || err || '');
-    const is413 = msg.includes('413') || msg.includes('too large') || msg.includes('rate_limit');
-    console.warn(`🎯 [triage] Groq classify failed (${is413 ? 'size/rate' : 'error'}), using Claude fallback:`, msg.slice(0, 160));
+  if (!process.env.GROQ_API_KEY?.trim()) {
+    console.log('🎯 [triage] GROQ_API_KEY unset — classifying with Claude Haiku only');
+    parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
+  } else {
     try {
-      parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
-    } catch (e2) {
-      console.error('🎯 [triage] Claude fallback failed:', e2);
-      return defaultTriage();
+      const groqResponse = await groq.chat.completions.create(
+        {
+          model: GROQ_MODEL,
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 220,
+          temperature: 0.1,
+        },
+        { timeout: 12_000, maxRetries: 0 }
+      );
+      const raw = groqResponse.choices[0]?.message?.content?.trim() || '{}';
+      parsed = parseTriageJson(raw) || defaultTriage();
+    } catch (err: any) {
+      const msg = String(err?.message || err || '');
+      const is413 = msg.includes('413') || msg.includes('too large') || msg.includes('rate_limit');
+      console.warn(`🎯 [triage] Groq classify failed (${is413 ? 'size/rate' : 'error'}), using Claude fallback:`, msg.slice(0, 160));
+      try {
+        parsed = await classifyLeadAnthropic(lead, prompt, anthropic);
+      } catch (e2) {
+        console.error('🎯 [triage] Claude fallback failed:', e2);
+        return defaultTriage();
+      }
     }
   }
 
@@ -188,11 +193,41 @@ function defaultTriage(): TriageResult {
  * 3. Save to lead_triage
  * 4. Log to agent_outcomes
  */
+/** Non-secret status for `/leads/triage-status` and startup logs. */
+export function getPhase5TriageStatus(): {
+  groq: boolean;
+  anthropic: boolean;
+  ready: boolean;
+  digestChatConfigured: boolean;
+  triageSecretConfigured: boolean;
+  cron: string;
+} {
+  const groq = !!process.env.GROQ_API_KEY?.trim();
+  const anthropic = !!process.env.ANTHROPIC_API_KEY?.trim();
+  return {
+    groq,
+    anthropic,
+    ready: anthropic,
+    digestChatConfigured: !!process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID?.trim(),
+    triageSecretConfigured: !!process.env.LEAD_TRIAGE_SECRET?.trim(),
+    cron: process.env.TRIAGE_CRON || '0 8 * * *',
+  };
+}
+
 export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<{
   processed: number;
   urgent: number;
   summary: string;
 }> {
+  if (!process.env.ANTHROPIC_API_KEY?.trim()) {
+    console.error('🎯 [triage] ANTHROPIC_API_KEY missing — cannot classify (set in .env, pm2 restart)');
+    return {
+      processed: 0,
+      urgent: 0,
+      summary: 'Triage inactive: add ANTHROPIC_API_KEY to ~/cto-aipa/.env and restart PM2.',
+    };
+  }
+
   const maxBiz = Math.min(80, Math.max(5, parseInt(process.env.TRIAGE_MAX_BUSINESS_LEADS || '20', 10) || 20));
   const maxOut = Math.min(40, Math.max(3, parseInt(process.env.TRIAGE_MAX_OUTREACH || '10', 10) || 10));
 

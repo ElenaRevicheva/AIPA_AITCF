@@ -1145,6 +1145,12 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
 
   // /triage — Phase 5: Run lead triage cycle manually
   bot.command('triage', async (ctx) => {
+    if (!process.env.ANTHROPIC_API_KEY?.trim()) {
+      await ctx.reply(
+        '❌ Phase 5 triage needs ANTHROPIC_API_KEY in Oracle ~/cto-aipa/.env — then `pm2 restart cto-aipa --update-env`.'
+      );
+      return;
+    }
     await ctx.reply('🔍 Running lead triage cycle...');
     try {
       const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });

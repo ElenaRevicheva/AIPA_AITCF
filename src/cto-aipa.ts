@@ -33,7 +33,7 @@ import {
   formatDraftPreview,
 } from './outreach';
 import { runProspectIngestion } from './prospect-ingest';
-import { runTriageCycle, buildDailyBrief, buildDashboardHtml } from './lead-triage';
+import { runTriageCycle, buildDailyBrief, buildDashboardHtml, getPhase5TriageStatus } from './lead-triage';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
@@ -71,6 +71,13 @@ console.log('🤖 AI Models configured:');
 console.log(`   Critical reviews: ${AI_MODELS.critical}`);
 console.log(`   Strategic (Ask CTO): ${AI_MODELS.strategic}`);
 console.log(`   Standard reviews: ${AI_MODELS.standard}`);
+
+const _p5 = getPhase5TriageStatus();
+const _gk = process.env.GROQ_API_KEY?.trim()?.length ?? 0;
+const _ak = process.env.ANTHROPIC_API_KEY?.trim()?.length ?? 0;
+console.log(
+  `🎯 Phase 5 triage: ANTHROPIC_API_KEY ${_ak > 0 ? `set (${_ak} chars)` : 'MISSING'} · GROQ_API_KEY ${_gk > 0 ? `set (${_gk} chars)` : 'MISSING'} · ready=${_p5.ready} · cron ${_p5.cron}`
+);
 
 // =============================================================================
 // AIdeazz ECOSYSTEM CONTEXT - CTO AIPA knows the entire startup
@@ -1356,6 +1363,13 @@ async function startCTOAIPA() {
   });
 
   // ============================================================
+  // PHASE 5 — Triage status (no secrets)
+  // ============================================================
+  app.get('/leads/triage-status', (_req: Request, res: Response) => {
+    res.json({ ok: true, ...getPhase5TriageStatus() });
+  });
+
+  // ============================================================
   // PHASE 5 — Lead Triage Dashboard
   // GET /leads/dashboard?secret=<LEAD_TRIAGE_SECRET>
   // ============================================================
@@ -1383,6 +1397,14 @@ async function startCTOAIPA() {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
+    if (!getPhase5TriageStatus().ready) {
+      res.status(503).json({
+        ok: false,
+        error: 'Phase 5 triage not configured — set ANTHROPIC_API_KEY in .env and pm2 restart cto-aipa',
+        ...getPhase5TriageStatus(),
+      });
+      return;
+    }
     console.log('🎯 [triage-run] Starting...');
     try {
       const result = await runTriageCycle(groq, anthropic);
@@ -1403,6 +1425,7 @@ async function startCTOAIPA() {
     console.log(`📋 CMO Updates: ${baseUrl}/cmo-updates`);
     console.log(`🏆 Tech Milestones: ${baseUrl}/tech-milestones`);
     console.log(`🏥 Health: ${baseUrl}/`);
+    console.log(`🎯 Phase 5: GET ${baseUrl}/leads/triage-status · POST ${baseUrl}/leads/triage-run`);
     if (process.env.CMO_WEBHOOK_URL) console.log(`🤝 CMO: ${process.env.CMO_WEBHOOK_URL}`);
     
     // Initialize Telegram Bot (CTO AIPA)
@@ -1471,6 +1494,10 @@ async function startCTOAIPA() {
     const triageTz = 'America/Panama';
     cron.schedule(triageCronExpr, async () => {
       console.log('🎯 [cron] Running daily lead triage...');
+      if (!getPhase5TriageStatus().ready) {
+        console.error('🎯 [cron] Triage skipped — ANTHROPIC_API_KEY not set');
+        return;
+      }
       try {
         await runTriageCycle(groq, anthropic);
         const brief = await buildDailyBrief();
