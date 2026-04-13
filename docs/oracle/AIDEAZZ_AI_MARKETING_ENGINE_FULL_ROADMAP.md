@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 13, 2026 (v15.1 — phase spine + restored Phase 4 “empty gun” honesty table) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 13, 2026 (v15.2 — Phase 2 complete: Dev.to cross-post + GSC gap topic selection) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -13,7 +13,7 @@ This file is organized around **six phases**. Everything else (AutoSEO critique,
 | Phase | Name | What it is (one line) | Status (Apr 2026) |
 |------:|------|----------------------|-------------------|
 | **1** | Foundation (GEO + SEO health) | Google and AI assistants can **find** and **trust** your site — structured data, sitemap, GSC, analytics. | **Complete** |
-| **2** | Content engine | Automated **long-form publishing** (Hashnode) + Oracle **`content_log`** — compound visibility. | **Mostly complete** (optional draft queue) |
+| **2** | Content engine | Automated **long-form publishing** (Hashnode) + Oracle **`content_log`** — compound visibility. | **Complete** (Dev.to cross-post + GSC gap topic selection live) |
 | **3** | Attribution | **UTM** + inquiry → Oracle **`business_leads`** — know which channel sent the lead. | **Complete** |
 | **4** | Outbound | **Cold email** (CTO AIPA “hire us” + VJH “hire me”) — Resend, Hunter, caps, honest **`outreach_log`**. | **Shipped & verified** |
 | **5** | Lead triage | **AI classification** → **`lead_triage`** + dashboard + Telegram — respond to the right signal first. | **Operational** |
@@ -160,7 +160,7 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 |---|---|---|
 | "Redirect page" warning | NORMAL | `/card` → `/portfolio` 301 redirect — Google correctly indexes /portfolio as canonical, marks /card as redirect. Not an error. |
 
-### Phase 2: Blog & distribution (Hashnode + aideazz.xyz) — MOSTLY COMPLETE
+### Phase 2: Blog & distribution (Hashnode + aideazz.xyz) — COMPLETE
 
 | Task | Status | Details |
 |---|---|---|
@@ -172,6 +172,8 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | **Portfolio blog + live Hashnode sync** | DONE | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** repo: `/blog`, `/blog/:slug`, public GraphQL sync (no `gray-matter` in browser — fixed **Buffer** error), portfolio CTA; deploy **4everland** from `main` (not Fleek). |
 | **Oracle `content_log`** | DONE | Table `content_log` in **AIPA_AITCF** `src/database.ts`; each successful daily publish writes `channel=hashnode_daily`, keyword, title, url, topic_index. `getRecentContentLogs()` for future dashboards. |
 | **Telegram notify on publish** | DONE (optional) | `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` + `TELEGRAM_BOT_TOKEN` — sends one message with title + URL after publish. |
+| **GSC gap topic selection** | DONE | `fetchGscTopQueries()` (JWT service account, `GOOGLE_ANALYTICS_CREDENTIALS`) + `pickTopicWithGscGap()` — Claude Haiku picks the topic with least current traffic before each daily post; falls back to round-robin rotation if GSC unavailable. `GSC_SITE_URL=sc-domain:aideazz.xyz` in Oracle `.env`. |
+| **Dev.to cross-posting** | DONE | `crossPostToDevTo()` — fires after Hashnode publish; sets `canonical_url` → Hashnode URL (genuine DA 90+ backlink pointing to aideazz.xyz); `DEVTO_API_KEY` in Oracle `.env`. Telegram notify includes both URLs. Skipped silently if key absent. |
 | **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule; optional: `createDraft` + Telegram approval — same roadmap prompts, Hashnode GraphQL instead of WordPress. |
 
 ### Phase 3: UTM Attribution — COMPLETE (end-to-end, production)
@@ -741,7 +743,7 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 > Document version: April 13, 2026 (v15.1 — document map + full Phase 4 “actually working” / empty-gun table preserved)
 > Aligned with: CAREER_FOCUS.md v4 (April 2026 — outreach operational), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4); **canonical SPA fix** in **aideazz** repo Apr 2026
-> Phase 2 status: MOSTLY COMPLETE — Hashnode daily publisher live; LLM draft queue optional
+> Phase 2 status: COMPLETE — Hashnode daily publisher live; Dev.to cross-post (DA 90+ backlink, `canonical_url` → Hashnode) live; GSC gap topic selection live (`GOOGLE_ANALYTICS_CREDENTIALS` JWT, no extra API key)
 > Phase 3 status: COMPLETE — UTM + inquiry + reCAPTCHA Enterprise
 > Phase 4 status: COMPLETE & VERIFIED — client sends via CTO AIPA (Resend+Oracle); employer sends via VJH only when email delivers; applications counted only on real ATS or email delivery
 > Phase 5 status: OPERATIONAL — **`lead_triage`** + **`agent_outcomes`**; **`/leads/dashboard`** unlock form; **`triage-run`** 202/ sync; **`TRIAGE_SKIP_GROQ`**; **`reviewCode`** Groq→Haiku (**`CODE_REVIEW_FALLBACK_MODEL`**)

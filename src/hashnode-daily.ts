@@ -251,32 +251,65 @@ Hard rules:
 // GSC: pull top queries so Claude can find gaps
 // ─────────────────────────────────────────────
 
-async function fetchGscTopQueries(): Promise<string[]> {
-  const key = process.env.GA4_API_KEY?.trim() || process.env.GSC_API_KEY?.trim();
-  const siteUrl = process.env.GSC_SITE_URL?.trim() || "sc-domain:aideazz.xyz";
-  if (!key) return [];
+/** Minimal JWT builder for Google service account — no external lib needed */
+async function buildGoogleJwt(sa: { client_email: string; private_key: string }, scope: string): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({
+    iss: sa.client_email, sub: sa.client_email, scope, aud: "https://oauth2.googleapis.com/token",
+    iat: now, exp: now + 3600,
+  })).toString("base64url");
+  const unsigned = `${header}.${payload}`;
+  // Use Node crypto to sign — no external dep
+  const { createSign } = await import("crypto");
+  const sign = createSign("RSA-SHA256");
+  sign.update(unsigned);
+  const sig = sign.sign(sa.private_key, "base64url");
+  return `${unsigned}.${sig}`;
+}
+
+async function getGoogleAccessToken(scope: string): Promise<string | null> {
+  const raw = process.env.GOOGLE_ANALYTICS_CREDENTIALS?.trim();
+  if (!raw) return null;
   try {
+    const sa = JSON.parse(raw) as { client_email: string; private_key: string };
+    const jwt = await buildGoogleJwt(sa, scope);
+    const res = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
+    });
+    const data = (await res.json()) as { access_token?: string };
+    return data.access_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchGscTopQueries(): Promise<string[]> {
+  const siteUrl = process.env.GSC_SITE_URL?.trim() || "sc-domain:aideazz.xyz";
+  try {
+    const token = await getGoogleAccessToken("https://www.googleapis.com/auth/webmasters.readonly");
+    if (!token) return [];
     const end = new Date();
     const start = new Date(end);
     start.setDate(end.getDate() - 28);
     const fmt = (d: Date) => d.toISOString().slice(0, 10);
     const res = await fetch(
-      `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query?key=${key}`,
+      `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          startDate: fmt(start),
-          endDate: fmt(end),
-          dimensions: ["query"],
-          rowLimit: 25,
-        }),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ startDate: fmt(start), endDate: fmt(end), dimensions: ["query"], rowLimit: 25 }),
       }
     );
-    if (!res.ok) return [];
+    if (!res.ok) { console.warn(`📰 GSC fetch failed: ${res.status}`); return []; }
     const data = (await res.json()) as { rows?: { keys: string[]; clicks: number }[] };
-    return (data.rows || []).map((r) => r.keys[0] ?? "").filter(Boolean);
-  } catch {
+    const queries = (data.rows || []).map((r) => r.keys[0] ?? "").filter(Boolean);
+    console.log(`📰 GSC: ${queries.length} queries fetched for gap analysis`);
+    return queries;
+  } catch (e) {
+    console.warn("📰 GSC fetch error:", e);
     return [];
   }
 }
