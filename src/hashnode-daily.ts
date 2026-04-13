@@ -11,17 +11,19 @@ import { saveContentLog } from "./database";
 const GQL = "https://gql.hashnode.com/";
 
 /** Optional: set TELEGRAM_HASHNODE_NOTIFY_CHAT_ID + TELEGRAM_BOT_TOKEN for post alerts */
-async function notifyTelegramHashnodePublished(title: string, url: string): Promise<void> {
+async function notifyTelegramHashnodePublished(title: string, urlOrMessage: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim();
   if (!token || !chatId) return;
+  // If urlOrMessage already contains newlines it's a pre-built message, else build one
+  const text = urlOrMessage.includes("\n") ? urlOrMessage : `📰 Hashnode published\n\n${title}\n${urlOrMessage}`;
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: chatId,
-        text: `📰 Hashnode published\n\n${title}\n${url}`,
+        text,
         disable_web_page_preview: false,
       }),
     });
@@ -245,15 +247,127 @@ Hard rules:
 ... full markdown ...
 </MARKDOWN>`;
 
+// ─────────────────────────────────────────────
+// GSC: pull top queries so Claude can find gaps
+// ─────────────────────────────────────────────
+
+async function fetchGscTopQueries(): Promise<string[]> {
+  const key = process.env.GA4_API_KEY?.trim() || process.env.GSC_API_KEY?.trim();
+  const siteUrl = process.env.GSC_SITE_URL?.trim() || "sc-domain:aideazz.xyz";
+  if (!key) return [];
+  try {
+    const end = new Date();
+    const start = new Date(end);
+    start.setDate(end.getDate() - 28);
+    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+    const res = await fetch(
+      `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query?key=${key}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          startDate: fmt(start),
+          endDate: fmt(end),
+          dimensions: ["query"],
+          rowLimit: 25,
+        }),
+      }
+    );
+    if (!res.ok) return [];
+    const data = (await res.json()) as { rows?: { keys: string[]; clicks: number }[] };
+    return (data.rows || []).map((r) => r.keys[0] ?? "").filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+/** Ask Claude which topic from the rotation is least covered by current GSC queries. */
+async function pickTopicWithGscGap(
+  anthropic: Anthropic,
+  gscQueries: string[]
+): Promise<{ index: number; keyword: string; brief: string }> {
+  const fallback = pickNextTopic();
+  if (!gscQueries.length) return fallback;
+  try {
+    const topics = HASHNODE_TOPIC_BRIEFS.map((t, i) => `${i}: ${t.keyword}`).join("\n");
+    const resp = await anthropic.messages.create({
+      model: "claude-3-haiku-20240307",
+      max_tokens: 64,
+      messages: [{
+        role: "user",
+        content: `These are the search queries already bringing traffic to aideazz.xyz:\n${gscQueries.slice(0, 20).join(", ")}\n\nThese are available article topics (index: keyword):\n${topics}\n\nWhich single index number has the biggest gap — i.e. is least represented in the current traffic? Reply with only the integer index.`,
+      }],
+    });
+    const raw = resp.content[0]?.type === "text" ? resp.content[0].text.trim() : "";
+    const idx = parseInt(raw, 10);
+    if (!isNaN(idx) && idx >= 0 && idx < HASHNODE_TOPIC_BRIEFS.length) {
+      const t = HASHNODE_TOPIC_BRIEFS[idx]!;
+      console.log(`📰 GSC gap analysis: picked topic #${idx} (${t.keyword})`);
+      return { index: idx, keyword: t.keyword, brief: t.brief };
+    }
+  } catch (e) {
+    console.warn("📰 GSC gap pick failed, using rotation:", e);
+  }
+  return fallback;
+}
+
+// ─────────────────────────────────────────────
+// Dev.to cross-posting — DA 90+, canonical back
+// ─────────────────────────────────────────────
+
+async function crossPostToDevTo(
+  title: string,
+  markdown: string,
+  canonicalUrl: string
+): Promise<string | null> {
+  const apiKey = process.env.DEVTO_API_KEY?.trim();
+  if (!apiKey) return null;
+  try {
+    // Prepend authorship line Dev.to readers see before hitting canonical
+    const body = `*Originally published on [AIdeazz](${canonicalUrl}) — cross-posted here with canonical link.*\n\n${markdown}`;
+    const res = await fetch("https://dev.to/api/articles", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey,
+      },
+      body: JSON.stringify({
+        article: {
+          title,
+          body_markdown: body,
+          published: true,
+          canonical_url: canonicalUrl,
+          tags: ["ai", "programming", "machinelearning"],
+        },
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.warn(`📰 Dev.to cross-post failed (${res.status}): ${err.slice(0, 200)}`);
+      return null;
+    }
+    const data = (await res.json()) as { url?: string };
+    console.log(`📰 Dev.to cross-posted: ${data.url}`);
+    return data.url ?? null;
+  } catch (e) {
+    console.warn("📰 Dev.to cross-post error:", e);
+    return null;
+  }
+}
+
 export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: string; maxTokens: number }): Promise<{
   title: string;
   url: string;
   topicIndex: number;
+  devtoUrl?: string | undefined;
 }> {
   const token = process.env.HASHNODE_ACCESS_TOKEN?.trim();
   if (!token) throw new Error("HASHNODE_ACCESS_TOKEN missing");
 
-  const { index, keyword, brief } = pickNextTopic();
+  // Pull GSC queries (best-effort) and let Claude pick the gap topic
+  const gscQueries = await fetchGscTopQueries();
+  const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries);
+
   const userPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
 
 Topic brief:
@@ -308,6 +422,9 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   writeTopicIndex(index);
   console.log(`📰 Hashnode daily: published — ${post.url} (${delisted ? "delisted" : "public feed"})`);
 
+  // Cross-post to Dev.to with canonical pointing back — genuine DA 90+ backlink
+  const devtoUrl = await crossPostToDevTo(post.title, parsed.markdown, post.url);
+
   await saveContentLog({
     channel: "hashnode_daily",
     keyword,
@@ -316,9 +433,13 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     status: "published",
     topicIndex: index,
   });
-  await notifyTelegramHashnodePublished(post.title, post.url);
 
-  return { title: post.title, url: post.url, topicIndex: index };
+  const telegramMsg = devtoUrl
+    ? `📰 Published + cross-posted\n\n${post.title}\n🔗 Hashnode: ${post.url}\n🔗 Dev.to: ${devtoUrl}`
+    : `📰 Published\n\n${post.title}\n${post.url}`;
+  await notifyTelegramHashnodePublished(post.title, telegramMsg.includes("Dev.to") ? telegramMsg : post.url);
+
+  return { title: post.title, url: post.url, topicIndex: index, devtoUrl: devtoUrl ?? undefined };
 }
 
 export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model: string; maxTokens: number }): cron.ScheduledTask | null {
