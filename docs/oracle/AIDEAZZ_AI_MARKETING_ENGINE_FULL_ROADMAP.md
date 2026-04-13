@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 13, 2026 (v15.2 — Phase 2 complete: Dev.to cross-post + GSC gap topic selection) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 13, 2026 (v15.3 — Manny Santos Blueprint cross-reference + 3 client gaps identified) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -97,6 +97,41 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 - WordPress install, theme setup, DNS — decline or $150/hr minimum (zero AI, zero leverage)
 - Anything that's pure IT admin work
 - What she builds: the intelligence layer that sits on top of whatever CMS the client already has
+
+---
+
+## MANNY SANTOS BLUEPRINT — CROSS-REFERENCE (Client Implementation Template)
+
+> Source: *Manny Santos Implementation Blueprint* (Eddie Irvin, 22pp) — a remodeling/construction business in Lexington, KY. Same problem pattern as every client: **data flowing through the business that nobody is processing intelligently.**
+
+**The thesis:** Every system Elena built for AIdeazz is what she would wire for a client like Manny. The 7 systems in his blueprint map directly to AIdeazz Phases 1–5. AIdeazz is the proof-of-concept. Phase 6 packages it as the pitch.
+
+### System-by-system mapping
+
+| Manny's System | AIdeazz Phase | Coverage | Gap / Adaptation |
+|---|---|---|---|
+| **Website Rebuild + Domain Control** — own your hosting, exit vendor lock-in | Phase 1 GEO | ✅ **Covered** — aideazz.xyz on owned infra, GSC verified, sitemap, canonical fix | For client: ~5min with Yoast/RankMath on WordPress vs Elena's hand-coded JSON-LD |
+| **SEO + AI Content Assembly Line** — raw inputs → blog drafts → social | Phase 2 Blog Engine | ✅ **Covered** — Hashnode daily auto-publisher, GSC gap topic selection, Dev.to cross-post | ⚠️ **Gap:** Manny needs **draft queue + human approval** before publish. Elena auto-publishes. `createDraft` + Telegram approval flow = NOT STARTED (Phase 2 table). For client: swap to `POST /wp-json/wp/v2/posts?status=draft` + Telegram notify. |
+| **Attribution Capture + Monthly Review** — UTM/form → spreadsheet | Phase 3 UTM | ✅ **Covered** — Elena's is more complete: Oracle `business_leads`, reCAPTCHA Enterprise, inquiry pipeline | For client: Gravity Forms / CF7 hook to same Oracle endpoint. Manny's version needs a monthly spreadsheet export — `getRecentContentLogs()` already exists, add CSV export route. |
+| **Outbound List Builder** — Google Places API + Hunter.io validation → email | Phase 4 Outreach | ⚠️ **Partially covered** — Hunter.io validation ✅, Resend sending ✅, but **source is YC companies JSON** not Google Places API | ❌ **Gap:** Google Places API scraping not in engine. For construction/local clients, the list source is Places API (architects, realtors, public works) not YC. Add as a prospect ingest module. |
+| **Outbound Email Sending (Instantly.ai)** — centralized cold send | Phase 4 Outreach | ✅ **Covered** — Resend is the functional equivalent; same deliverability best practices | Manny uses Instantly.ai (separate domain warmup); Elena uses Resend. Both protect main domain. Swap is ~1h config. |
+| **Lead Triage Dashboard** — call emails → AI score → Lexington vs rest | Phase 5 Lead Triage | ✅ **Covered** — same pattern, Elena's is more advanced: Groq + Haiku fallback + Sonnet for high urgency | Manny's input is **Smith.ai call summary emails**; Elena's is web inquiries + outreach replies. **Ingestion adapter** = add email webhook → `business_leads` insert. ~2h. |
+| **Subcontractor Sourcing from Takeoff** — parse job docs → trade-specific outreach | **NOT IN ROADMAP** | ❌ **Gap** | Elena's analog: "client brief → agent roles → specialist sourcing." The pattern is: **ingest structured business doc → extract entities → targeted outreach → per-job dashboard**. This is Phase 4 applied to operational documents, not marketing lists. Add as client-side module in Phase 6 showcase. |
+
+### The three gaps that need to exist before the first client engagement
+
+1. **Draft queue + Telegram approval** — clients will not let AI auto-publish to their site. Add `createDraft` mode to `hashnode-daily.ts` (WordPress: `status=draft`). Telegram message with approve/reject button.
+2. **Google Places API prospect ingest** — replace or supplement YC JSON source with Places API for local/industry clients (construction → architects, realtors, public works; retail → property managers, etc.).
+3. **Document ingestion → outreach** — takeoff sheet, RFP, or job description → extract entities (city, trade, scope) → generate targeted outreach. This is the highest-value differentiation for operations-heavy clients.
+
+### The data flow insight (client pitch core)
+
+Every client Elena will ever have is running one of these three broken loops:
+- **Data comes in** (calls, inquiries, project docs, invoices) → **sits in email / file folders** → Manny manually decides what to act on
+- **Marketing happens** (posts, ads, outreach) → **no attribution** → guessing which channel works
+- **Leads arrive** → **no priority ranking** → biggest opportunities buried under the noise
+
+Elena's engine breaks all three loops. She built it for herself. Now she wires it for clients.
 
 ---
 
