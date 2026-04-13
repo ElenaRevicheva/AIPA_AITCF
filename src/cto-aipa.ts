@@ -90,7 +90,7 @@ console.log(
 
 /** When Groq 429/rate-limit would crash the cluster worker, fall back to Haiku (same pattern as lead-triage). */
 const CODE_REVIEW_FALLBACK_MODEL =
-  process.env.CODE_REVIEW_FALLBACK_MODEL || 'claude-3-5-haiku-20241022';
+  process.env.CODE_REVIEW_FALLBACK_MODEL || 'claude-3-haiku-20240307';
 
 async function anthropicTextReview(model: string, prompt: string, maxTokens: number): Promise<string> {
   const response = await anthropic.messages.create({
