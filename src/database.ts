@@ -24,20 +24,26 @@ const dbConfig: DBConfig = {
 };
 
 // Connection pool — thin mode needs managed concurrency (Oracle ADB free tier ~3 sessions)
-let _pool: oracledb.Pool | null = null;
+let _poolPromise: Promise<oracledb.Pool> | null = null;
 
-async function getPool(): Promise<oracledb.Pool> {
-  if (_pool) return _pool;
-  _pool = await oracledb.createPool({
-    ...dbConfig,
-    poolMin: 1,
-    poolMax: 3,
-    poolIncrement: 1,
-    poolTimeout: 60,
-    queueTimeout: 30000,
-  });
-  console.log('🔗 Oracle connection pool created (thin mode, max=3)');
-  return _pool;
+function getPool(): Promise<oracledb.Pool> {
+  if (!_poolPromise) {
+    _poolPromise = oracledb.createPool({
+      ...dbConfig,
+      poolMin: 1,
+      poolMax: 3,
+      poolIncrement: 1,
+      poolTimeout: 60,
+      queueTimeout: 60000,
+    }).then(pool => {
+      console.log('🔗 Oracle connection pool created (thin mode, max=3)');
+      return pool;
+    }).catch(err => {
+      _poolPromise = null; // allow retry on next call
+      throw err;
+    });
+  }
+  return _poolPromise;
 }
 
 /** Get a connection from the pool with retry */
@@ -47,9 +53,9 @@ async function getPoolConnection(retries = 3): Promise<oracledb.Connection> {
       const pool = await getPool();
       return await pool.getConnection();
     } catch (e: any) {
-      if (i < retries - 1 && (e.code === 'NJS-511' || e.message?.includes('ORA-12506'))) {
+      if (i < retries - 1 && (e.code === 'NJS-511' || e.code === 'NJS-040' || e.message?.includes('ORA-12506'))) {
         console.warn(`⏳ Oracle connection retry ${i + 1}/${retries}...`);
-        await new Promise(r => setTimeout(r, 2000 * (i + 1)));
+        await new Promise(r => setTimeout(r, 3000 * (i + 1)));
         continue;
       }
       throw e;
@@ -169,9 +175,9 @@ async function initializeDatabase() {
 
     await initBusinessLeadsTable();
     await ensureBusinessLeadsUtmColumns();
-  } catch (err) {
-    console.error('❌ Database initialization error:', err);
-    throw err;
+  } catch (err: any) {
+    console.error('❌ Database initialization error:', err?.message?.slice(0, 200));
+    // Don't throw — let the server start; tables will be created on first use
   } finally {
     if (connection) {
       await connection.close();
