@@ -93,9 +93,11 @@ const CODE_REVIEW_FALLBACK_MODEL =
   process.env.CODE_REVIEW_FALLBACK_MODEL || 'claude-3-haiku-20240307';
 
 async function anthropicTextReview(model: string, prompt: string, maxTokens: number): Promise<string> {
+  // claude-3-haiku-20240307 hard limit is 4096
+  const effectiveMax = model.includes('haiku') ? Math.min(maxTokens, 4096) : maxTokens;
   const response = await anthropic.messages.create({
     model,
-    max_tokens: maxTokens,
+    max_tokens: effectiveMax,
     messages: [{ role: 'user', content: prompt }],
   });
   const firstContent = response.content[0];

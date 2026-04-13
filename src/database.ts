@@ -2192,17 +2192,23 @@ async function getOutreachDrafts(): Promise<any[]> {
   }
 }
 
-// Initialize all tables (including new Wiring Build tables)
-initLessonsTable();
-initStrategicTable();
-initHealthTable();
-initConversationContextTable();
-initKnowledgeBaseTable();
-initAgentOutcomesTable();
-initContentLogTable();
-initEspaluzFunnelTable();
-initOutreachTargetsTable();
-initOutreachLogTable();
+// Initialize all tables sequentially (thin mode can't handle 10+ concurrent connections)
+(async () => {
+  try {
+    await initLessonsTable();
+    await initStrategicTable();
+    await initHealthTable();
+    await initConversationContextTable();
+    await initKnowledgeBaseTable();
+    await initAgentOutcomesTable();
+    await initContentLogTable();
+    await initEspaluzFunnelTable();
+    await initOutreachTargetsTable();
+    await initOutreachLogTable();
+  } catch (e: any) {
+    console.error('❌ Table init error:', e?.message?.slice(0, 200));
+  }
+})();
 
 // ============================================================
 // PHASE 5 — Lead Triage
@@ -2371,7 +2377,7 @@ async function getRepliedOutreach(limit = 20): Promise<any[]> {
   }
 }
 
-initLeadTriageTable();
+initLeadTriageTable().catch((e: any) => console.error('❌ Lead triage table init error:', e?.message?.slice(0, 200)));
 
 export {
   initializeDatabase,
