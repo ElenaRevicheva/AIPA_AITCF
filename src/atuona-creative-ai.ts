@@ -3458,9 +3458,9 @@ async function generateVideo(
   // ========== 2. TRY LUMA VIA REPLICATE ==========
   if (replicate) {
     try {
-      console.log('🎬 Trying Luma Dream Machine via Replicate...');
+      console.log(`🎬 Trying Luma via Replicate (model=${VIDEO_MODELS.lumaReplicate})...`);
       await ctx.reply('🎬 *Trying Luma via Replicate...*\n\n_Alternative provider..._', { parse_mode: 'Markdown' });
-      
+
       const lumaOutput = await replicate.run(
         VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
         {
@@ -3477,7 +3477,7 @@ async function generateVideo(
       // Replicate: string URL, array of URLs, or { output: ... } depending on model/version
       let videoUrl: string | null = null;
       if (typeof lumaOutput === 'string' && (lumaOutput as string).startsWith('http')) {
-        videoUrl = lumaOutput;
+        videoUrl = lumaOutput as string;
       } else if (Array.isArray(lumaOutput) && lumaOutput[0]) {
         videoUrl = String(lumaOutput[0]);
       } else if (lumaOutput && typeof lumaOutput === 'object') {
