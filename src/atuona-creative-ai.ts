@@ -100,7 +100,8 @@ const VIDEO_MODELS = {
   lumaDirect: 'ray-2',
   /** Max output resolution for I2V (540p | 720p | 1080p | 4k). 1080p = best default; 4k = slower/more credits */
   lumaResolution: '1080p' as const,
-  lumaReplicate: 'luma/dream-machine', // Secondary - via Replicate
+  /** Replicate-hosted Luma Ray 2 (720p). `luma/dream-machine` was retired → API 404/500 — use ray-2-720p. Override: REPLICATE_LUMA_MODEL */
+  lumaReplicate: (process.env.REPLICATE_LUMA_MODEL || 'luma/ray-2-720p').trim(),
   /** Runway image→video fallback — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
   runwayImageToVideo: 'gen4.5',
 };
@@ -3466,18 +3467,25 @@ async function generateVideo(
           input: {
             prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
             start_image_url: imageUrl,
-            aspect_ratio: "16:9",
-            loop: false
-          }
+            aspect_ratio: '16:9',
+            loop: false,
+            duration: 9,
+          },
         }
       );
-      
-      // Luma returns a URL directly or in an array
-      const videoUrl = typeof lumaOutput === 'string' 
-        ? lumaOutput 
-        : Array.isArray(lumaOutput) && lumaOutput[0] 
-          ? String(lumaOutput[0]) 
-          : null;
+
+      // Replicate: string URL, array of URLs, or { output: ... } depending on model/version
+      let videoUrl: string | null = null;
+      if (typeof lumaOutput === 'string' && (lumaOutput as string).startsWith('http')) {
+        videoUrl = lumaOutput;
+      } else if (Array.isArray(lumaOutput) && lumaOutput[0]) {
+        videoUrl = String(lumaOutput[0]);
+      } else if (lumaOutput && typeof lumaOutput === 'object') {
+        const o = lumaOutput as Record<string, unknown>;
+        const out = o.output;
+        if (typeof out === 'string' && out.startsWith('http')) videoUrl = out;
+        else if (Array.isArray(out) && out[0]) videoUrl = String(out[0]);
+      }
       
       if (videoUrl && videoUrl.startsWith('http')) {
         console.log('✅ Luma via Replicate succeeded!');
