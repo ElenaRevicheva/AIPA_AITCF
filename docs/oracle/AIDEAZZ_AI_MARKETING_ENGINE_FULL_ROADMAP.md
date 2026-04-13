@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 13, 2026 (v15.3 — Manny Santos Blueprint cross-reference + 3 client gaps identified) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 13, 2026 (v15.4 — Manny mapping verified in repo: Places + doc-ingest shipped; draft-queue noted) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -40,6 +40,7 @@ This block is for the **next engineer** (Claude Code, Cursor, human): **verifiab
 | **Phase 5 HTTP + ops** | AIPA_AITCF | **`POST /leads/triage-run`** — default **202** + background triage; sync JSON with **`?wait=1`** or **`npm run triage:fire`** + **`TRIAGE_FIRE_WAIT=1`**. **`GET /leads/dashboard`** — if `LEAD_TRIAGE_SECRET` is set, opening the URL **without** `?secret=` shows a small **HTML unlock form** (not a bare 401); bookmark **`?secret=…`** or use Bearer automation. On Oracle, **`TRIAGE_SKIP_GROQ`** → Haiku-only triage (saves **Groq** quota for Hashnode / code review). | Avoids proxy socket hang-up; humans can open the dashboard from a phone without hand-building query strings. |
 | **GSC “duplicate canonical”** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** repo (not AIPA_AITCF) | Removed the **static** `<link rel="canonical" href="https://aideazz.xyz/" />` from root **`index.html`** (it made every crawled URL look like `https://aideazz.xyz/` before JS ran). **Homepage** now sets canonical in **`src/pages/Index.tsx`** via `useEffect`, same pattern as `/about`, `/blog`, `/portfolio`. | Fixes Search Console confusion when Google reads HTML first on SPA deploys (IPFS/4everland). Deploy **4everland** from `main` after pull. |
 | **Oracle deploy** | `ubuntu@` Oracle, `~/cto-aipa` | **`git pull` → `npm run build` → `pm2 restart cto-aipa --update-env`**. Then **`npm run triage:fire`** once **`curl` to `127.0.0.1:3000/`** succeeds. | **HTTP 202** + triage start in PM2 logs is the smoke test. |
+| **Phase 4c–4d ingest (Manny-style sources)** | `prospect-places.ts`, `doc-ingest.ts`, `cto-aipa.ts`, `telegram-bot.ts` | **Places:** local/industry prospect lists via **Google Places API** (requires **`GOOGLE_PLACES_API_KEY`**). **Doc:** operational documents → entities → same **`outreach_targets`** pipeline. Telegram **`/places_ingest`**, **`/doc_ingest`**. | Confirms blueprint “list builder” + “takeoff/RFP” paths exist in code — not only YC JSON. |
 
 **Production signals (Phase 5 accomplishments):** `🎯 [triage-run] Starting (background=true)...` → per-lead **`[triage] Classifying lead…`** → **`🎯 [triage-run] Complete: N processed, M urgent`** in PM2 logs; Oracle **`lead_triage`** rows from **`business_leads`** + **`outreach_log`**; **`agent_outcomes`** records the **`triage_cycle`** run. **`GET /leads/triage-status`** exposes **`ready: true`** when **`ANTHROPIC_API_KEY`** is configured. **Optional deep check:** **`TRIAGE_FIRE_WAIT=1 npm run triage:fire`** returns one JSON payload with **`processed` / `urgent`** without tailing logs.
 
@@ -104,7 +105,9 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 
 > Source: *Manny Santos Implementation Blueprint* (Eddie Irvin, 22pp) — a remodeling/construction business in Lexington, KY. Same problem pattern as every client: **data flowing through the business that nobody is processing intelligently.**
 
-**The thesis:** Every system Elena built for AIdeazz is what she would wire for a client like Manny. The 7 systems in his blueprint map directly to AIdeazz Phases 1–5. AIdeazz is the proof-of-concept. Phase 6 packages it as the pitch.
+**The thesis:** Every system Elena built for AIdeazz is what she would wire for a client like Manny. **Five of the seven** blueprint rows below map cleanly to **Phases 1–5** (foundation → content → attribution → outbound → triage); the other two are **list-building and job-document workflows** that extend Phase 4 (now implemented as **Places** + **document ingest** — see verification below). AIdeazz is the proof-of-concept. Phase 6 packages it as the pitch.
+
+**Code verification (AIPA_AITCF):** Google **Places** prospecting and **document → outreach** are implemented in-tree — `src/prospect-places.ts` (`runPlacesIngestion`), `src/doc-ingest.ts` (`runDocIngestion`), wired in `src/cto-aipa.ts` (`POST /outreach/ingest-places`, `POST /outreach/ingest-doc`, `GET /outreach/ingest-places/presets`) and Telegram **`/places_ingest`**, **`/doc_ingest`**. Same **`outreach_targets`** + Hunter + Resend path as YC ingest. Places requires **`GOOGLE_PLACES_API_KEY`** (see `.env.example`).
 
 ### System-by-system mapping
 
@@ -113,16 +116,22 @@ Almost nobody in the AI services space is doing GEO + structured funnels yet. Th
 | **Website Rebuild + Domain Control** — own your hosting, exit vendor lock-in | Phase 1 GEO | ✅ **Covered** — aideazz.xyz on owned infra, GSC verified, sitemap, canonical fix | For client: ~5min with Yoast/RankMath on WordPress vs Elena's hand-coded JSON-LD |
 | **SEO + AI Content Assembly Line** — raw inputs → blog drafts → social | Phase 2 Blog Engine | ✅ **Covered** — Hashnode daily auto-publisher, GSC gap topic selection, Dev.to cross-post | ⚠️ **Gap:** Manny needs **draft queue + human approval** before publish. Elena auto-publishes. `createDraft` + Telegram approval flow = NOT STARTED (Phase 2 table). For client: swap to `POST /wp-json/wp/v2/posts?status=draft` + Telegram notify. |
 | **Attribution Capture + Monthly Review** — UTM/form → spreadsheet | Phase 3 UTM | ✅ **Covered** — Elena's is more complete: Oracle `business_leads`, reCAPTCHA Enterprise, inquiry pipeline | For client: Gravity Forms / CF7 hook to same Oracle endpoint. Manny's version needs a monthly spreadsheet export — `getRecentContentLogs()` already exists, add CSV export route. |
-| **Outbound List Builder** — Google Places API + Hunter.io validation → email | Phase 4 Outreach | ⚠️ **Partially covered** — Hunter.io validation ✅, Resend sending ✅, but **source is YC companies JSON** not Google Places API | ❌ **Gap:** Google Places API scraping not in engine. For construction/local clients, the list source is Places API (architects, realtors, public works) not YC. Add as a prospect ingest module. |
+| **Outbound List Builder** — Google Places API + Hunter.io validation → email | Phase 4 Outreach | ✅ **Complete** — `src/prospect-places.ts`: `runPlacesIngestion(city, industry)` → Places API v1 text search → Hunter.io → `outreach_targets`. HTTP: `POST /outreach/ingest-places`. Telegram: `/places_ingest architects Lexington KY`. Requires `GOOGLE_PLACES_API_KEY`. | Industry presets: construction, saas, retail, healthcare. Claude Haiku classifies pain point per place. |
 | **Outbound Email Sending (Instantly.ai)** — centralized cold send | Phase 4 Outreach | ✅ **Covered** — Resend is the functional equivalent; same deliverability best practices | Manny uses Instantly.ai (separate domain warmup); Elena uses Resend. Both protect main domain. Swap is ~1h config. |
 | **Lead Triage Dashboard** — call emails → AI score → Lexington vs rest | Phase 5 Lead Triage | ✅ **Covered** — same pattern, Elena's is more advanced: Groq + Haiku fallback + Sonnet for high urgency | Manny's input is **Smith.ai call summary emails**; Elena's is web inquiries + outreach replies. **Ingestion adapter** = add email webhook → `business_leads` insert. ~2h. |
-| **Subcontractor Sourcing from Takeoff** — parse job docs → trade-specific outreach | **NOT IN ROADMAP** | ❌ **Gap** | Elena's analog: "client brief → agent roles → specialist sourcing." The pattern is: **ingest structured business doc → extract entities → targeted outreach → per-job dashboard**. This is Phase 4 applied to operational documents, not marketing lists. Add as client-side module in Phase 6 showcase. |
+| **Subcontractor Sourcing from Takeoff** — parse job docs → trade-specific outreach | Phase 4 extension | ✅ **Shipped** — `src/doc-ingest.ts`: Claude extracts prospect entities from pasted text (RFP, takeoff, call log, client list) → Hunter.io → **`importTargets`** → same pipeline as YC/Places. HTTP: **`POST /outreach/ingest-doc`** (Bearer **`OUTREACH_SECRET`**). Telegram: **`/doc_ingest`**. Optional per-job dashboard UI = future polish; **core loop is in the engine.** |
 
-### The three gaps that need to exist before the first client engagement
+<a id="client-ready-gaps"></a>
 
-1. **Draft queue + Telegram approval** — clients will not let AI auto-publish to their site. Add `createDraft` mode to `hashnode-daily.ts` (WordPress: `status=draft`). Telegram message with approve/reject button.
-2. **Google Places API prospect ingest** — replace or supplement YC JSON source with Places API for local/industry clients (construction → architects, realtors, public works; retail → property managers, etc.).
-3. **Document ingestion → outreach** — takeoff sheet, RFP, or job description → extract entities (city, trade, scope) → generate targeted outreach. This is the highest-value differentiation for operations-heavy clients.
+### Client-ready gaps (what is left vs. what shipped)
+
+| Gap (from Manny-style engagements) | Status | Notes |
+|---|---|---|
+| **Draft queue + Telegram approval** (~4h) | **Not started** | Many clients will **not** allow AI to auto-publish live. Needs **`createDraft`** on Hashnode (or WordPress `status=draft`) + Telegram approve/reject. **Elena is satisfied with automated Hashnode publishing for her own blog today** — track this for white-label / client sites. |
+| **Google Places API as lead source** (~1 day was the estimate) | **Implemented** | Supplements (does not replace) YC JSON ingest. See **`prospect-places.ts`**, **`GOOGLE_PLACES_API_KEY`**, **`/places_ingest`**. |
+| **Document ingestion → outreach** (highest-value for ops-heavy clients) | **Implemented** | Takeoff / RFP / logs → entities → **`outreach_targets`**. See **`doc-ingest.ts`**, **`/doc_ingest`**. |
+
+**Previously listed as “three gaps” — two are now covered in code; the draft/approval workflow remains the main product gap for client deployments.**
 
 ### The data flow insight (client pitch core)
 
@@ -209,7 +218,7 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | **Telegram notify on publish** | DONE (optional) | `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` + `TELEGRAM_BOT_TOKEN` — sends one message with title + URL after publish. |
 | **GSC gap topic selection** | DONE | `fetchGscTopQueries()` (JWT service account, `GOOGLE_ANALYTICS_CREDENTIALS`) + `pickTopicWithGscGap()` — Claude Haiku picks the topic with least current traffic before each daily post; falls back to round-robin rotation if GSC unavailable. `GSC_SITE_URL=sc-domain:aideazz.xyz` in Oracle `.env`. |
 | **Dev.to cross-posting** | DONE | `crossPostToDevTo()` — fires after Hashnode publish; sets `canonical_url` → Hashnode URL (genuine DA 90+ backlink pointing to aideazz.xyz); `DEVTO_API_KEY` in Oracle `.env`. Telegram notify includes both URLs. Skipped silently if key absent. |
-| **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule; optional: `createDraft` + Telegram approval — same roadmap prompts, Hashnode GraphQL instead of WordPress. |
+| **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule (Elena’s preference for her own Hashnode). **Client deployments** will usually need **`createDraft`** + Telegram approve/reject — see [Client-ready gaps](#client-ready-gaps). |
 
 ### Phase 3: UTM Attribution — COMPLETE (end-to-end, production)
 
@@ -250,6 +259,8 @@ This subsection is the honest answer to “is it an empty gun?” **The code pat
 |---|---|---|
 | Oracle tables (`outreach_targets`, `outreach_log`) | DONE | `src/database.ts` — import, drafts, send tracking, replies. |
 | Prospect ingestion | DONE | `src/prospect-ingest.ts` — YC AI companies (JSON or API) → Hunter.io (budget-aware) → pain classification → `importTargets` with dedupe by company. |
+| **Google Places ingest (Phase 4c)** | DONE | `src/prospect-places.ts` — Text Search (New) by city + industry → websites → Hunter → **`outreach_targets`**. **`POST /outreach/ingest-places`**, **`GET /outreach/ingest-places/presets`**, Telegram **`/places_ingest`**. Env: **`GOOGLE_PLACES_API_KEY`**. |
+| **Document → outreach (Phase 4d)** | DONE | `src/doc-ingest.ts` — paste RFP / takeoff / call log → Claude extracts prospects → Hunter → **`importTargets`**. **`POST /outreach/ingest-doc`**, Telegram **`/doc_ingest`**. Same Resend send path as YC/Places rows. |
 | Claude email generation + retry | DONE | `src/outreach.ts` — 529/503/429 retries on generation. |
 | **Resend send + honest bookkeeping** | DONE | `sendOutreachEmail()` — **no** `sent` status unless Resend returns success **and** `markOutreachSent` updates a row (`rowsAffected`). Logs Resend **message id** when present. |
 | Daily cap | DONE | `OUTREACH_DAILY_CAP` (default 10). |
@@ -775,7 +786,7 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 13, 2026 (v15.1 — document map + full Phase 4 “actually working” / empty-gun table preserved)
+> Document version: April 13, 2026 (v15.4 — Manny table: doc-ingest shipped; Places shipped; draft-queue deferred; `.env.example` Phase 4c–4d)
 > Aligned with: CAREER_FOCUS.md v4 (April 2026 — outreach operational), SKILL.md v1.3
 > Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4); **canonical SPA fix** in **aideazz** repo Apr 2026
 > Phase 2 status: COMPLETE — Hashnode daily publisher live; Dev.to cross-post (DA 90+ backlink, `canonical_url` → Hashnode) live; GSC gap topic selection live (`GOOGLE_ANALYTICS_CREDENTIALS` JWT, no extra API key)
