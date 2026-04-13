@@ -23,11 +23,46 @@ const dbConfig: DBConfig = {
   connectionString: process.env.DB_SERVICE_NAME!
 };
 
+// Connection pool — thin mode needs managed concurrency (Oracle ADB free tier ~3 sessions)
+let _pool: oracledb.Pool | null = null;
+
+async function getPool(): Promise<oracledb.Pool> {
+  if (_pool) return _pool;
+  _pool = await oracledb.createPool({
+    ...dbConfig,
+    poolMin: 1,
+    poolMax: 3,
+    poolIncrement: 1,
+    poolTimeout: 60,
+    queueTimeout: 30000,
+  });
+  console.log('🔗 Oracle connection pool created (thin mode, max=3)');
+  return _pool;
+}
+
+/** Get a connection from the pool with retry */
+async function getPoolConnection(retries = 3): Promise<oracledb.Connection> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const pool = await getPool();
+      return await pool.getConnection();
+    } catch (e: any) {
+      if (i < retries - 1 && (e.code === 'NJS-511' || e.message?.includes('ORA-12506'))) {
+        console.warn(`⏳ Oracle connection retry ${i + 1}/${retries}...`);
+        await new Promise(r => setTimeout(r, 2000 * (i + 1)));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error('Failed to get Oracle connection after retries');
+}
+
 async function initializeDatabase() {
   let connection;
   try {
     console.log(`🔌 Connecting to ${dbConfig.connectionString}...`);
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     console.log('🔗 Connected to Oracle Autonomous Database (mTLS)');
 
     // Original memory table
@@ -147,7 +182,7 @@ async function initializeDatabase() {
 async function saveMemory(aipaType: string, action: string, context: any, result: any, metadata: any) {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `INSERT INTO aipa_memory (aipa_type, action, context, result, metadata)
        VALUES (:aipaType, :action, :context, :result, :metadata)`,
@@ -173,7 +208,7 @@ async function saveMemory(aipaType: string, action: string, context: any, result
 async function getRelevantMemory(aipaType: string, action: string, limit: number = 5) {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT context, result, metadata, created_at
        FROM aipa_memory
@@ -200,7 +235,7 @@ async function getRelevantMemory(aipaType: string, action: string, limit: number
 async function addTechDebt(repo: string, description: string, severity: string = 'medium'): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO tech_debt (repo, description, severity) 
        VALUES (:repo, :description, :severity)
@@ -227,7 +262,7 @@ async function addTechDebt(repo: string, description: string, severity: string =
 async function getTechDebt(repo?: string, status: string = 'open'): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let query = `SELECT RAWTOHEX(id) as id, repo, description, severity, status, created_at 
                  FROM tech_debt WHERE status = :status`;
     const params: any = { status };
@@ -251,7 +286,7 @@ async function getTechDebt(repo?: string, status: string = 'open'): Promise<any[
 async function resolveTechDebt(debtId: string): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `UPDATE tech_debt SET status = 'resolved', resolved_at = CURRENT_TIMESTAMP 
        WHERE id = HEXTORAW(:debtId)`,
@@ -275,7 +310,7 @@ async function resolveTechDebt(debtId: string): Promise<boolean> {
 async function addDecision(title: string, description: string, rationale: string, repo?: string): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO arch_decisions (repo, title, description, rationale) 
        VALUES (:repo, :title, :description, :rationale)
@@ -303,7 +338,7 @@ async function addDecision(title: string, description: string, rationale: string
 async function getDecisions(repo?: string, limit: number = 10): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let query = `SELECT RAWTOHEX(id) as id, repo, title, description, rationale, created_at 
                  FROM arch_decisions`;
     const params: any = { limit };
@@ -340,7 +375,7 @@ async function savePendingCode(
 ): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     // Clear any existing pending code for this chat
     await connection.execute(
       `DELETE FROM pending_code WHERE chat_id = :chatId AND status = 'pending'`,
@@ -379,7 +414,7 @@ async function savePendingCode(
 async function getPendingCode(chatId: number): Promise<any | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, repo, task, filename, code, commit_message, pr_title, pr_body, created_at
        FROM pending_code 
@@ -402,7 +437,7 @@ async function getPendingCode(chatId: number): Promise<any | null> {
 async function clearPendingCode(chatId: number, status: string = 'approved'): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `UPDATE pending_code SET status = :status WHERE chat_id = :chatId AND status = 'pending'`,
       { chatId, status },
@@ -424,7 +459,7 @@ async function clearPendingCode(chatId: number, status: string = 'approved'): Pr
 async function getAlertPreferences(chatId: number): Promise<{ alertsEnabled: boolean; dailyBriefing: boolean } | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT alerts_enabled, daily_briefing FROM alert_preferences WHERE chat_id = :chatId`,
       { chatId }
@@ -448,7 +483,7 @@ async function getAlertPreferences(chatId: number): Promise<{ alertsEnabled: boo
 async function setAlertPreferences(chatId: number, alertsEnabled: boolean, dailyBriefing: boolean = true): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `MERGE INTO alert_preferences ap
        USING (SELECT :chatId as chat_id FROM dual) src
@@ -474,7 +509,7 @@ async function setAlertPreferences(chatId: number, alertsEnabled: boolean, daily
 async function getAllAlertChatIds(): Promise<number[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT chat_id FROM alert_preferences WHERE alerts_enabled = 1`
     );
@@ -497,7 +532,7 @@ async function getAllAlertChatIds(): Promise<number[]> {
 async function initLessonsTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       CREATE TABLE lessons (
         id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
@@ -533,7 +568,7 @@ async function saveLesson(
 ): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO lessons (category, context, action_taken, outcome, lesson_learned, repo)
        VALUES (:category, :context, :action, :outcome, :lesson, :repo)
@@ -561,7 +596,7 @@ async function saveLesson(
 async function getLessons(category?: string, limit: number = 10): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let query = `SELECT RAWTOHEX(id) as id, category, context, action_taken, outcome, lesson_learned, repo, created_at
                  FROM lessons`;
     const params: any = { limit };
@@ -585,7 +620,7 @@ async function getLessons(category?: string, limit: number = 10): Promise<any[]>
 async function getSuccessPatterns(repo?: string): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let query = `SELECT category, action_taken, lesson_learned, repo
                  FROM lessons WHERE outcome = 'success'`;
     const params: any = {};
@@ -613,7 +648,7 @@ async function getSuccessPatterns(repo?: string): Promise<any[]> {
 async function initStrategicTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       CREATE TABLE strategic_insights (
         id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
@@ -647,7 +682,7 @@ async function saveInsight(
 ): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO strategic_insights (insight_type, repo, insight_text, priority)
        VALUES (:type, :repo, :text, :priority)
@@ -673,7 +708,7 @@ async function saveInsight(
 async function getActiveInsights(): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, insight_type, repo, insight_text, priority, created_at
        FROM strategic_insights 
@@ -693,7 +728,7 @@ async function getActiveInsights(): Promise<any[]> {
 async function resolveInsight(insightId: string): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `UPDATE strategic_insights 
        SET status = 'resolved', resolved_at = CURRENT_TIMESTAMP
@@ -717,7 +752,7 @@ async function resolveInsight(insightId: string): Promise<boolean> {
 async function initHealthTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       CREATE TABLE service_health (
         id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
@@ -749,7 +784,7 @@ async function saveHealthCheck(
 ): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `INSERT INTO service_health (service_name, status, response_time, error_message)
        VALUES (:name, :status, :time, :error)`,
@@ -771,7 +806,7 @@ async function saveHealthCheck(
 async function getHealthHistory(serviceName?: string, hours: number = 24): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let query = `SELECT service_name, status, response_time, error_message, checked_at
                  FROM service_health
                  WHERE checked_at > CURRENT_TIMESTAMP - INTERVAL '${hours}' HOUR`;
@@ -800,7 +835,7 @@ async function getHealthHistory(serviceName?: string, hours: number = 24): Promi
 async function initConversationContextTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       CREATE TABLE conversation_context (
         user_id NUMBER PRIMARY KEY,
@@ -839,7 +874,7 @@ interface ConversationContextData {
 async function saveConversationContext(userId: number, context: ConversationContextData): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `MERGE INTO conversation_context cc
        USING (SELECT :userId as user_id FROM dual) src
@@ -877,7 +912,7 @@ async function saveConversationContext(userId: number, context: ConversationCont
 async function loadConversationContext(userId: number): Promise<ConversationContextData | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT active_project, active_file, recent_files, recent_questions, pending_fixes, batch_edits, last_updated
        FROM conversation_context WHERE user_id = :userId`,
@@ -923,7 +958,7 @@ async function loadConversationContext(userId: number): Promise<ConversationCont
 async function clearConversationContext(userId: number): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `DELETE FROM conversation_context WHERE user_id = :userId`,
       { userId },
@@ -945,7 +980,7 @@ async function clearConversationContext(userId: number): Promise<boolean> {
 async function initKnowledgeBaseTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       CREATE TABLE knowledge_base (
         id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
@@ -984,7 +1019,7 @@ async function saveKnowledge(
 ): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO knowledge_base (user_id, category, title, content, tags, project, source)
        VALUES (:userId, :category, :title, :content, :tags, :project, :source)
@@ -1020,7 +1055,7 @@ async function searchKnowledge(
 ): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let sql = `SELECT RAWTOHEX(id) as id, category, title, content, tags, project, source, created_at
                FROM knowledge_base 
                WHERE user_id = :userId 
@@ -1050,7 +1085,7 @@ async function getKnowledgeByCategory(
 ): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, category, title, content, tags, project, source, created_at
        FROM knowledge_base 
@@ -1074,7 +1109,7 @@ async function getRecentKnowledge(
 ): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, category, title, content, tags, project, source, created_at
        FROM knowledge_base 
@@ -1099,7 +1134,7 @@ async function getKnowledgeByProject(
 ): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, category, title, content, tags, project, source, created_at
        FROM knowledge_base 
@@ -1125,7 +1160,7 @@ async function getKnowledgeByProject(
 async function initAgentOutcomesTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE agent_outcomes (
@@ -1160,7 +1195,7 @@ async function saveAgentOutcome(
 ): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO agent_outcomes (agent_name, action_type, action_detail, outcome_status, outcome_detail)
        VALUES (:agentName, :actionType, :actionDetail, :outcomeStatus, :outcomeDetail)
@@ -1192,7 +1227,7 @@ async function verifyAgentOutcome(
 ): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `UPDATE agent_outcomes
        SET outcome_status = :outcomeStatus,
@@ -1222,7 +1257,7 @@ async function getAgentOutcomes(
 ): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let query = `SELECT RAWTOHEX(id) as id, agent_name, action_type, action_detail,
                         outcome_status, outcome_detail, created_at, verified_at
                  FROM agent_outcomes
@@ -1265,7 +1300,7 @@ async function getOutcomeSummary(hoursBack: number = 24): Promise<{
     pending: 0, positive: 0, negative: 0, by_agent: {} as Record<string, number>
   };
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT agent_name, outcome_status, COUNT(*) as cnt
        FROM agent_outcomes
@@ -1303,7 +1338,7 @@ async function getOutcomeSummary(hoursBack: number = 24): Promise<{
 async function initContentLogTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE content_log (
@@ -1339,7 +1374,7 @@ async function saveContentLog(params: {
 }): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO content_log (channel, keyword, title, url, status, topic_index)
        VALUES (:channel, :keyword, :title, :url, :status, :topicIndex)
@@ -1379,7 +1414,7 @@ async function getRecentContentLogs(limit: number = 30): Promise<
 > {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, channel, keyword, title, url, status, topic_index, created_at
        FROM content_log
@@ -1404,7 +1439,7 @@ async function getRecentContentLogs(limit: number = 30): Promise<
 async function initBusinessLeadsTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE business_leads (
@@ -1451,7 +1486,7 @@ async function ensureBusinessLeadsUtmColumns(): Promise<void> {
   ];
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     for (const col of columns) {
       await connection.execute(
         `
@@ -1483,7 +1518,7 @@ async function saveLead(
 ): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO business_leads (source, name, context, signal_strength, next_action)
        VALUES (:source, :name, :context, :signalStrength, :nextAction)
@@ -1515,7 +1550,7 @@ async function updateLead(
 ): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `UPDATE business_leads
        SET status = :status,
@@ -1556,7 +1591,7 @@ async function saveMarketingInquiry(params: {
   const context = message || '(no message)';
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO business_leads (
          source, name, contact_email, context, signal_strength, status,
@@ -1612,7 +1647,7 @@ async function getLeadsSinceForDigest(
 > {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, source, name, contact_email, context,
               utm_source, utm_medium, utm_campaign, page_url, created_at
@@ -1652,7 +1687,7 @@ async function getLeads(
 ): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let query = `SELECT RAWTOHEX(id) as id, source, name, contact_email, context, signal_strength,
                         status, next_action, utm_source, utm_medium, utm_campaign,
                         utm_term, utm_content, page_url, created_at, updated_at
@@ -1685,7 +1720,7 @@ async function getLeads(
 async function initEspaluzFunnelTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE espaluz_funnel (
@@ -1732,7 +1767,7 @@ async function upsertEspaluzUser(
 ): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `MERGE INTO espaluz_funnel ef
        USING (SELECT :userId as user_id, :channel as channel FROM dual) src
@@ -1776,7 +1811,7 @@ async function upsertEspaluzUser(
 async function getEspaluzExpiringTrials(daysAhead: number = 2): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, user_id, channel, trial_start, trial_end,
               messages_sent, last_active, payment_status, retention_message_sent
@@ -1811,7 +1846,7 @@ async function getEspaluzFunnelSummary(): Promise<{
     churned: 0, monthly_revenue: 0, expiring_soon: 0
   };
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT payment_status, COUNT(*) as cnt
        FROM espaluz_funnel
@@ -1852,7 +1887,7 @@ async function getEspaluzFunnelSummary(): Promise<{
 async function initOutreachTargetsTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE outreach_targets (
@@ -1885,7 +1920,7 @@ async function initOutreachTargetsTable(): Promise<void> {
 async function initOutreachLogTable(): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE outreach_log (
@@ -1926,7 +1961,7 @@ async function saveOutreachTarget(target: {
 }): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO outreach_targets
          (name, company, email, email_status, linkedin_url, source, pain_point, matched_system)
@@ -1962,7 +1997,7 @@ async function updateOutreachTargetStatus(
 ): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const sets = ['status = :status', 'updated_at = CURRENT_TIMESTAMP'];
     const binds: Record<string, string> = { targetId, status };
     if (emailStatus !== undefined) {
@@ -1989,7 +2024,7 @@ async function getOutreachTargets(params?: {
 }): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     let sql = `SELECT RAWTOHEX(id) as id, name, company, email, email_status,
                       linkedin_url, source, pain_point, matched_system, status,
                       created_at, updated_at
@@ -2022,7 +2057,7 @@ async function saveOutreachEmail(params: {
 }): Promise<string | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `INSERT INTO outreach_log (target_id, subject, body, status, sent_at)
        VALUES (HEXTORAW(:targetId), :subject, :body, :status,
@@ -2050,7 +2085,7 @@ async function saveOutreachEmail(params: {
 async function markOutreachSent(emailId: string): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `UPDATE outreach_log SET status = 'sent', sent_at = CURRENT_TIMESTAMP
        WHERE RAWTOHEX(id) = :emailId`,
@@ -2074,7 +2109,7 @@ async function markOutreachSent(emailId: string): Promise<boolean> {
 async function markOutreachReply(emailId: string, snippet: string): Promise<boolean> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(
       `UPDATE outreach_log SET replied = 1, reply_snippet = :snippet, replied_at = CURRENT_TIMESTAMP
        WHERE RAWTOHEX(id) = :emailId`,
@@ -2093,7 +2128,7 @@ async function markOutreachReply(emailId: string, snippet: string): Promise<bool
 async function getOutreachSentToday(): Promise<number> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT COUNT(*) FROM outreach_log
        WHERE status = 'sent' AND sent_at >= TRUNC(CURRENT_TIMESTAMP)`,
@@ -2118,7 +2153,7 @@ async function getOutreachStats(): Promise<{
   let connection;
   const stats = { total_targets: 0, total_sent: 0, total_replies: 0, sent_today: 0, reply_rate: '0%' };
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const tgt = await connection.execute('SELECT COUNT(*) FROM outreach_targets');
     stats.total_targets = tgt.rows ? Number((tgt.rows[0] as any[])[0]) : 0;
 
@@ -2153,7 +2188,7 @@ async function getOutreachStats(): Promise<{
 async function getOutreachTargetByCompany(company: string): Promise<any | null> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) as id, name, company, email, status
        FROM outreach_targets
@@ -2173,7 +2208,7 @@ async function getOutreachTargetByCompany(company: string): Promise<any | null> 
 async function getOutreachDrafts(): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(ol.id) as email_id, RAWTOHEX(ol.target_id) as target_id,
               ol.subject, ol.body, ol.status,
@@ -2217,7 +2252,7 @@ async function getOutreachDrafts(): Promise<any[]> {
 async function initLeadTriageTable() {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     await connection.execute(`
       BEGIN
         EXECUTE IMMEDIATE 'CREATE TABLE lead_triage (
@@ -2268,7 +2303,7 @@ async function saveTriagedLead(data: {
 }): Promise<void> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     // Avoid duplicate triage of same source_ref_id
     const existing = await connection.execute(
       `SELECT COUNT(*) FROM lead_triage WHERE source_ref_id = HEXTORAW(:1) AND source_table = :2`,
@@ -2303,7 +2338,7 @@ async function saveTriagedLead(data: {
 async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     const where = status ? `AND status = :2` : '';
     const params: any[] = status ? [limit, status] : [limit];
     const result = await connection.execute(
@@ -2328,7 +2363,7 @@ async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
 async function getUntriagedLeads(limit = 50): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     // Pull business_leads not yet in lead_triage
     const result = await connection.execute(
       `SELECT RAWTOHEX(bl.id), bl.name, bl.contact_email, bl.context, bl.utm_source
@@ -2353,7 +2388,7 @@ async function getUntriagedLeads(limit = 50): Promise<any[]> {
 async function getRepliedOutreach(limit = 20): Promise<any[]> {
   let connection;
   try {
-    connection = await oracledb.getConnection(dbConfig);
+    connection = await getPoolConnection();
     // Pull outreach replies not yet triaged
     const result = await connection.execute(
       `SELECT RAWTOHEX(ol.id), ot.name, ot.email, ol.subject, ol.reply_snippet
