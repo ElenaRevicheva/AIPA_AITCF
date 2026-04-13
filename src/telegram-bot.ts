@@ -67,6 +67,8 @@ import {
   type OutreachTargetInput,
 } from './outreach';
 import { runProspectIngestion } from './prospect-ingest';
+import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
+import { runDocIngestion } from './doc-ingest';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -564,6 +566,8 @@ Type /menu for all commands! 🚀
         { cmd: '/lead', desc: 'Add or update a lead', usage: '/lead add linkedin John Contractor commented on automation post\n/lead update <id> contacted' },
         { cmd: '/outreach', desc: 'Outreach pipeline stats (targets, sent, replies)', usage: '/outreach\nSent today, reply rate, pipeline totals' },
         { cmd: '/outreach_ingest', desc: 'Discover YC prospects + Hunter.io emails', usage: '/outreach_ingest\nFetch YC companies, find founder emails, import to pipeline' },
+        { cmd: '/places_ingest', desc: 'Google Places → outreach targets by city + industry', usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City\n/places_ingest realtors Louisville KY\nPresets: construction, saas, retail, healthcare' },
+        { cmd: '/doc_ingest', desc: 'Paste any business doc → extract prospects → outreach', usage: '/doc_ingest RFP\n[paste RFP, takeoff sheet, call log, client list below]\nExtracts contacts → Hunter.io → outreach pipeline' },
         { cmd: '/outreach_drafts', desc: 'Review pending outreach drafts', usage: '/outreach_drafts\nPreview emails before sending' },
         { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
         { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
@@ -1140,6 +1144,73 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     } catch (error) {
       console.error('Outreach ingest error:', error);
       await ctx.reply('❌ Error running prospect ingestion.');
+    }
+  });
+
+  // /places_ingest <industry> <city> — Google Places → outreach targets
+  // Usage: /places_ingest construction Lexington KY
+  //        /places_ingest architects Panama City
+  bot.command('places_ingest', async (ctx) => {
+    const args = ctx.message?.text?.replace('/places_ingest', '').trim() || '';
+    if (!args) {
+      const presetList = Object.keys(INDUSTRY_PRESETS).join(', ');
+      await ctx.reply(
+        `📍 Usage: /places_ingest <industry> <city>\n\nExamples:\n/places_ingest construction Lexington KY\n/places_ingest architects Panama City\n/places_ingest realtors Louisville KY\n\nIndustry presets: ${presetList}\n\nOr use any free-text industry name.`
+      );
+      return;
+    }
+    // Parse: last word(s) after first word = city, first word = industry
+    // Simple heuristic: everything up to first comma or "in" is industry, rest is city
+    const inMatch = args.match(/^(.+?)\s+(?:in\s+)?([A-Z].+)$/i);
+    let industry = args;
+    let city = '';
+    if (inMatch) {
+      industry = inMatch[1]!.trim();
+      city = inMatch[2]!.trim();
+    } else {
+      await ctx.reply('❌ Please specify both industry and city.\nExample: /places_ingest architects Lexington KY');
+      return;
+    }
+    await ctx.reply(`📍 Searching Google Places: "${industry}" in "${city}"…\nThis may take 1-2 minutes.`);
+    try {
+      await runPlacesIngestion(anthropic, { city, industry }, async (msg) => {
+        await ctx.reply(msg);
+      });
+    } catch (e) {
+      console.error('places_ingest error:', e);
+      await ctx.reply(`❌ Places ingest failed: ${String(e).slice(0, 200)}`);
+    }
+  });
+
+  // /doc_ingest [docType] — paste document text, extract prospects → outreach
+  // Usage: /doc_ingest RFP\n<paste document text>
+  //        /doc_ingest takeoff sheet\n<paste content>
+  bot.command('doc_ingest', async (ctx) => {
+    const raw = ctx.message?.text?.replace('/doc_ingest', '').trim() || '';
+    if (!raw || raw.length < 20) {
+      await ctx.reply(
+        `📄 Paste a business document to extract prospects.\n\nUsage:\n/doc_ingest RFP\n[paste your RFP, takeoff sheet, call log, or client list here]\n\nWorks with: RFPs, takeoff sheets, call logs, client lists, contractor directories, email threads.`
+      );
+      return;
+    }
+    // First line = docType hint (optional), rest = document text
+    const lines = raw.split('\n');
+    const firstLine = lines[0]!.trim();
+    const isDocTypeHint = firstLine.length < 60 && !/\s{3,}/.test(firstLine);
+    const docType = isDocTypeHint ? firstLine : 'pasted document';
+    const text = isDocTypeHint ? lines.slice(1).join('\n').trim() : raw;
+    if (!text || text.length < 10) {
+      await ctx.reply('❌ No document text found after the doc type. Paste the full content.');
+      return;
+    }
+    await ctx.reply(`📄 Processing ${docType} (${text.length} chars)…\nExtracting prospects…`);
+    try {
+      await runDocIngestion(anthropic, { text, docType }, async (msg) => {
+        await ctx.reply(msg);
+      });
+    } catch (e) {
+      console.error('doc_ingest error:', e);
+      await ctx.reply(`❌ Doc ingest failed: ${String(e).slice(0, 200)}`);
     }
   });
 

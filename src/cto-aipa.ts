@@ -33,6 +33,8 @@ import {
   formatDraftPreview,
 } from './outreach';
 import { runProspectIngestion } from './prospect-ingest';
+import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
+import { runDocIngestion } from './doc-ingest';
 import { runTriageCycle, buildDailyBrief, buildDashboardHtml, getPhase5TriageStatus } from './lead-triage';
 import * as dotenv from 'dotenv';
 import express from 'express';
@@ -1013,6 +1015,53 @@ async function startCTOAIPA() {
       res.json({ ok: true, ...result });
     } catch (e) {
       res.status(500).json({ error: String(e) });
+    }
+  });
+
+  // ── Phase 4c: Google Places ingest ──────────────────────────────────────
+  // POST /outreach/ingest-places { city, industry, maxResults?, clientContext? }
+  app.post('/outreach/ingest-places', outreachAuth, async (req, res) => {
+    try {
+      const { city, industry, maxResults, clientContext } = req.body as {
+        city?: string; industry?: string; maxResults?: number; clientContext?: string;
+      };
+      if (!city || !industry) {
+        res.status(400).json({ ok: false, error: 'city and industry are required' });
+        return;
+      }
+      const placesOpts = { city, industry, ...(maxResults !== undefined && { maxResults }), ...(clientContext !== undefined && { clientContext }) };
+      const result = await runPlacesIngestion(anthropic, placesOpts);
+      res.json({ ok: true, ...result });
+    } catch (e) {
+      console.error('outreach/ingest-places:', e);
+      res.status(500).json({ ok: false, error: String(e) });
+    }
+  });
+
+  // GET /outreach/ingest-places/presets — return available industry presets
+  app.get('/outreach/ingest-places/presets', outreachAuth, (_req, res) => {
+    res.json({ ok: true, presets: INDUSTRY_PRESETS });
+  });
+
+  // ── Document → outreach ingest ───────────────────────────────────────────
+  // POST /outreach/ingest-doc { text, docType?, clientContext?, maxProspects? }
+  app.post('/outreach/ingest-doc', outreachAuth, async (req, res) => {
+    try {
+      const { text, docType, clientContext, maxProspects } = req.body as {
+        text?: string; docType?: string; clientContext?: string; maxProspects?: number;
+      };
+      if (!text?.trim()) {
+        res.status(400).json({ ok: false, error: 'text is required' });
+        return;
+      }
+      const docOpts = { text, ...(docType !== undefined && { docType }), ...(clientContext !== undefined && { clientContext }), ...(maxProspects !== undefined && { maxProspects }) };
+      const result = await runDocIngestion(anthropic, docOpts);
+      res.json({ ok: true, ingested: result.ingested, skipped: result.skipped,
+        errors: result.errors, prospectsFound: result.prospects.length,
+        prospects: result.prospects.slice(0, 10) });
+    } catch (e) {
+      console.error('outreach/ingest-doc:', e);
+      res.status(500).json({ ok: false, error: String(e) });
     }
   });
 
