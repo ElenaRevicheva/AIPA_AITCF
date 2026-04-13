@@ -6,9 +6,15 @@ dotenv.config();
 // Set TNS_ADMIN BEFORE initializing Oracle Client
 process.env.TNS_ADMIN = '/home/ubuntu/cto-aipa/wallet';
 
-// Thin mode (default in oracledb 6.x) — no native Instant Client needed
-// Wallet PEM + TNS_ADMIN handles mTLS automatically
-console.log(`📁 TNS_ADMIN: ${process.env.TNS_ADMIN} (thin mode — no native client)`);
+// Thick mode with Oracle Instant Client — stable connections with wallet
+try {
+  oracledb.initOracleClient({ libDir: '/opt/instantclient_23_4' });
+  console.log(`📁 TNS_ADMIN: ${process.env.TNS_ADMIN} (thick mode — Instant Client)`);
+} catch (err: any) {
+  if (!err.message?.includes('already been initialized')) {
+    console.error('❌ Oracle Thick Mode error:', err.message?.slice(0, 200));
+  }
+}
 oracledb.fetchAsString = [oracledb.CLOB];
 
 interface DBConfig {
