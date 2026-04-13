@@ -3469,24 +3469,44 @@ async function generateVideo(
             start_image_url: imageUrl,
             aspect_ratio: '16:9',
             loop: false,
+            // Ray-2 on Replicate: 5 or 9 seconds (see model schema)
             duration: 9,
           },
         }
       );
 
-      // Replicate: string URL, array of URLs, or { output: ... } depending on model/version
+      /**
+       * Replicate SDK wraps https URLs in FileOutput (ReadableStream) with url() + toString() → URL string.
+       * Same pattern as Flux image path above — do not only check typeof === 'string'.
+       */
       let videoUrl: string | null = null;
-      if (typeof lumaOutput === 'string' && (lumaOutput as string).startsWith('http')) {
-        videoUrl = lumaOutput as string;
-      } else if (Array.isArray(lumaOutput) && lumaOutput[0]) {
-        videoUrl = String(lumaOutput[0]);
-      } else if (lumaOutput && typeof lumaOutput === 'object') {
-        const o = lumaOutput as Record<string, unknown>;
-        const out = o.output;
-        if (typeof out === 'string' && out.startsWith('http')) videoUrl = out;
-        else if (Array.isArray(out) && out[0]) videoUrl = String(out[0]);
+      if (lumaOutput != null) {
+        if (Array.isArray(lumaOutput) && lumaOutput[0] != null) {
+          const s = String(lumaOutput[0]);
+          if (s.startsWith('http')) videoUrl = s;
+        } else {
+          const s = String(lumaOutput);
+          if (s.startsWith('http')) videoUrl = s;
+        }
+        if (!videoUrl && typeof lumaOutput === 'object' && lumaOutput !== null) {
+          const o = lumaOutput as { url?: () => URL };
+          if (typeof o.url === 'function') {
+            try {
+              videoUrl = o.url().href;
+            } catch {
+              /* ignore */
+            }
+          }
+        }
       }
-      
+      console.log(
+        'Luma Replicate output resolved:',
+        videoUrl ? videoUrl.substring(0, 80) + '…' : 'none',
+        '(raw type:',
+        typeof lumaOutput,
+        ')'
+      );
+
       if (videoUrl && videoUrl.startsWith('http')) {
         console.log('✅ Luma via Replicate succeeded!');
         return {
