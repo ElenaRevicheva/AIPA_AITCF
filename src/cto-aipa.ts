@@ -1433,13 +1433,59 @@ async function startCTOAIPA() {
   // ============================================================
   // PHASE 5 — Lead Triage Dashboard
   // GET /leads/dashboard?secret=<LEAD_TRIAGE_SECRET>
+  // If secret is configured but missing/wrong: HTML unlock form (not a bare 401 — browsers often open URL without ?secret=)
   // ============================================================
+  function parseDashboardSecretQuery(req: Request): string {
+    const q = req.query.secret;
+    if (typeof q === 'string') return q.trim();
+    if (Array.isArray(q) && q[0] != null) return String(q[0]).trim();
+    return '';
+  }
+
+  function sendLeadDashboardUnlockPage(res: Response, opts: { invalidAttempt: boolean }): void {
+    const { invalidAttempt } = opts;
+    const msg = invalidAttempt
+      ? '<p style="color:#dc2626;font-size:0.95rem">That key did not match. Try again.</p>'
+      : '<p style="color:#475569;font-size:0.95rem">Enter the same value as <code>LEAD_TRIAGE_SECRET</code> on the Oracle server (Settings → bookmark the URL after unlock).</p>';
+    res.status(200);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>Lead triage — unlock</title>
+</head>
+<body style="font-family:system-ui,-apple-system,sans-serif;max-width:440px;margin:48px auto;padding:0 20px;color:#0f172a">
+  <h1 style="font-size:1.35rem;margin-bottom:8px">Lead triage dashboard</h1>
+  ${msg}
+  <form method="get" action="" style="margin-top:20px">
+    <label for="lead-dash-secret" style="display:block;font-weight:600;margin-bottom:8px">Dashboard key</label>
+    <input id="lead-dash-secret" name="secret" type="password" autocomplete="current-password" required
+      style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:1rem"/>
+    <button type="submit" style="margin-top:16px;padding:10px 20px;border:0;border-radius:8px;background:#4f46e5;color:#fff;font-weight:600;cursor:pointer">View triage</button>
+  </form>
+  <p style="color:#94a3b8;font-size:0.8rem;margin-top:20px">GET with <code>?secret=…</code> still works for automation.</p>
+</body>
+</html>`);
+  }
+
   app.get('/leads/dashboard', async (req: Request, res: Response) => {
-    const secret = process.env.LEAD_TRIAGE_SECRET;
-    if (secret && req.query.secret !== secret) {
-      res.status(401).send('<h1 style="font-family:sans-serif;color:#ef4444">Unauthorized</h1>');
-      return;
+    const secret = process.env.LEAD_TRIAGE_SECRET?.trim();
+    const provided = parseDashboardSecretQuery(req);
+
+    if (secret) {
+      if (!provided) {
+        sendLeadDashboardUnlockPage(res, { invalidAttempt: false });
+        return;
+      }
+      if (provided !== secret) {
+        sendLeadDashboardUnlockPage(res, { invalidAttempt: true });
+        return;
+      }
     }
+
     try {
       const html = await buildDashboardHtml();
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
