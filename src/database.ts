@@ -29,8 +29,9 @@ const dbConfig: DBConfig = {
   connectionString: process.env.DB_SERVICE_NAME!
 };
 
-// Connection pool — thin mode needs managed concurrency (Oracle ADB free tier ~3 sessions)
+// Connection pool — Oracle ADB free tier ~3 sessions max
 let _poolPromise: Promise<oracledb.Pool> | null = null;
+let _pool: oracledb.Pool | null = null;
 
 function getPool(): Promise<oracledb.Pool> {
   if (!_poolPromise) {
@@ -42,26 +43,45 @@ function getPool(): Promise<oracledb.Pool> {
       poolTimeout: 60,
       queueTimeout: 60000,
     }).then(pool => {
-      console.log('🔗 Oracle connection pool created (thin mode, max=3)');
+      _pool = pool;
+      console.log('🔗 Oracle connection pool created (thick mode, max=3)');
       return pool;
     }).catch(err => {
       _poolPromise = null; // allow retry on next call
+      _pool = null;
       throw err;
     });
   }
   return _poolPromise;
 }
 
-/** Get a connection from the pool with retry */
-async function getPoolConnection(retries = 3): Promise<oracledb.Connection> {
+/** Tear down pool so it gets recreated fresh on next call */
+async function resetPool(): Promise<void> {
+  const p = _pool;
+  _poolPromise = null;
+  _pool = null;
+  if (p) {
+    try { await p.close(0); } catch { /* ignore close errors */ }
+  }
+}
+
+/** Get a connection from the pool with retry.
+ *  ORA-29024 (cert validation) = Oracle refreshed TLS cert; tear down pool + retry.
+ *  ORA-12506 / NJS-511 / NJS-040 = transient listener errors; retry with back-off.
+ */
+async function getPoolConnection(retries = 4): Promise<oracledb.Connection> {
   for (let i = 0; i < retries; i++) {
     try {
       const pool = await getPool();
       return await pool.getConnection();
     } catch (e: any) {
-      if (i < retries - 1 && (e.code === 'NJS-511' || e.code === 'NJS-040' || e.message?.includes('ORA-12506'))) {
-        console.warn(`⏳ Oracle connection retry ${i + 1}/${retries}...`);
-        await new Promise(r => setTimeout(r, 3000 * (i + 1)));
+      const isCert = e.message?.includes('ORA-29024') || e.code === 'ORA-29024';
+      const isTransient = e.code === 'NJS-511' || e.code === 'NJS-040' || e.message?.includes('ORA-12506');
+      if (i < retries - 1 && (isCert || isTransient)) {
+        const delay = isCert ? 5000 * (i + 1) : 3000 * (i + 1);
+        console.warn(`⏳ Oracle connection retry ${i + 1}/${retries} (${isCert ? 'cert-reset' : 'transient'})…`);
+        if (isCert) await resetPool(); // force fresh pool on cert errors
+        await new Promise(r => setTimeout(r, delay));
         continue;
       }
       throw e;
