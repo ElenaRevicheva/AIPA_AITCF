@@ -3,8 +3,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-// Set TNS_ADMIN BEFORE initializing Oracle Client
-process.env.TNS_ADMIN = '/home/ubuntu/cto-aipa/wallet';
+// Set TNS_ADMIN BEFORE initializing Oracle Client (override in .env if wallet path differs)
+process.env.TNS_ADMIN = process.env.TNS_ADMIN || '/home/ubuntu/cto-aipa/wallet';
 
 // Thick mode with Oracle Instant Client — stable connections with wallet
 try {
@@ -29,20 +29,32 @@ const dbConfig: DBConfig = {
   connectionString: process.env.DB_SERVICE_NAME!
 };
 
+/** ADB client wallet password (set when downloading wallet from OCI) — not the same as DB_USER password. */
+function poolAttributes(): oracledb.PoolAttributes {
+  const base: oracledb.PoolAttributes = {
+    ...dbConfig,
+    poolMin: 1,
+    poolMax: 3,
+    poolIncrement: 1,
+    poolTimeout: 60,
+    // Avoid minute-long silent waits when TLS is broken (Telegram looks "dead")
+    queueTimeout: 15000,
+  };
+  const wp = process.env.WALLET_PASSWORD;
+  if (wp) {
+    // Encrypted ewallet.p12 — required or thick client returns ORA-28759 failure to open file
+    (base as oracledb.PoolAttributes & { walletPassword?: string }).walletPassword = wp;
+  }
+  return base;
+}
+
 // Connection pool — Oracle ADB free tier ~3 sessions max
 let _poolPromise: Promise<oracledb.Pool> | null = null;
 let _pool: oracledb.Pool | null = null;
 
 function getPool(): Promise<oracledb.Pool> {
   if (!_poolPromise) {
-    _poolPromise = oracledb.createPool({
-      ...dbConfig,
-      poolMin: 1,
-      poolMax: 3,
-      poolIncrement: 1,
-      poolTimeout: 60,
-      queueTimeout: 60000,
-    }).then(pool => {
+    _poolPromise = oracledb.createPool(poolAttributes()).then(pool => {
       _pool = pool;
       console.log('🔗 Oracle connection pool created (thick mode, max=3)');
       return pool;
@@ -55,10 +67,50 @@ function getPool(): Promise<oracledb.Pool> {
   return _poolPromise;
 }
 
-/** One connection from the pool — no ORA-specific retry/reset (keeps startup and Telegram responsive). */
-async function getPoolConnection(): Promise<oracledb.Connection> {
-  const pool = await getPool();
-  return pool.getConnection();
+/** Tear down pool so it gets recreated fresh on next call (used after ORA-29024). */
+async function resetPool(): Promise<void> {
+  const p = _pool;
+  _poolPromise = null;
+  _pool = null;
+  if (p) {
+    try {
+      await p.close(0);
+    } catch {
+      /* ignore close errors */
+    }
+  }
+}
+
+/**
+ * Connection from pool with retries. ORA-29024 often clears after pool reset (wallet/TLS refresh).
+ * NJS-040 / NJS-511 / ORA-12506: transient listener or pool exhaustion — short back-off.
+ * (This was removed during Places work; restoring avoids noisy failures when ADB rotates material.)
+ */
+async function getPoolConnection(retries = 4): Promise<oracledb.Connection> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const pool = await getPool();
+      return await pool.getConnection();
+    } catch (e: unknown) {
+      const err = e as { message?: string; code?: string };
+      const isCert = err.message?.includes('ORA-29024') || err.code === 'ORA-29024';
+      const isTransient =
+        err.code === 'NJS-511' ||
+        err.code === 'NJS-040' ||
+        err.message?.includes('ORA-12506');
+      if (i < retries - 1 && (isCert || isTransient)) {
+        const delay = isCert ? 5000 * (i + 1) : 3000 * (i + 1);
+        console.warn(
+          `⏳ Oracle connection retry ${i + 1}/${retries} (${isCert ? 'cert/TLS' : 'transient'})…`
+        );
+        if (isCert) await resetPool();
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error('Failed to get Oracle connection after retries');
 }
 
 async function initializeDatabase() {

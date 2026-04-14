@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 13, 2026 (v15.7 — GEO gap closed: FAQPage 5→12 client-intent questions, live on aideazz.xyz) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 14, 2026 (v15.8 — postmortem: Oracle wallet + `database.ts` resilience; Places ingest verified end-to-end) | Prior: April 13, 2026 (v15.7 — GEO FAQPage, live on aideazz.xyz) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -45,6 +45,38 @@ This block is for the **next engineer** (Claude Code, Cursor, human): **verifiab
 **Production signals (Phase 5 accomplishments):** `🎯 [triage-run] Starting (background=true)...` → per-lead **`[triage] Classifying lead…`** → **`🎯 [triage-run] Complete: N processed, M urgent`** in PM2 logs; Oracle **`lead_triage`** rows from **`business_leads`** + **`outreach_log`**; **`agent_outcomes`** records the **`triage_cycle`** run. **`GET /leads/triage-status`** exposes **`ready: true`** when **`ANTHROPIC_API_KEY`** is configured. **Optional deep check:** **`TRIAGE_FIRE_WAIT=1 npm run triage:fire`** returns one JSON payload with **`processed` / `urgent`** without tailing logs.
 
 **What we did *not* claim:** Atuona creative engine untouched; Hashnode daily unchanged in this handoff; no broad refactors.
+
+---
+
+## Postmortem — April 14, 2026 (why it looked like “Google API encoding broke Oracle,” and how it was fixed)
+
+### Why the incident lined up with the Google Places / Phase 4c deploy
+
+- **Same deployment, two unrelated layers.** The change that added **Phase 4c** (`src/prospect-places.ts`, `/places_ingest`, Google Places API request shape and region/bias) **shipped in the same window** as edits to **`src/database.ts`** (Oracle pool: shorter **`queueTimeout`**, removal of **ORA-29024** pool-reset/retry). That is **coincidence in time**, not proof that “Places encoding” altered Oracle TLS or the wallet.
+- **Google Places does not modify Oracle wire security.** `prospect-places.ts` calls **Google** over HTTPS and uses Oracle only for **dedup** (`getOutreachExistingCompaniesLowercase`) and **`importTargets`**. There is **no** shared “encoding” path that could corrupt **`TNS_ADMIN`**, mTLS, or **`sqlnet.ora`**.
+- **What actually hurt reliability:** **ADB client configuration on the VM** — wallet files stale or mis-pointed (**`sqlnet.ora`** default `DIRECTORY="?/network/admin"` vs real wallet dir), missing **`WALLET_PASSWORD`** for **`ewallet.p12`**, and/or **ORA-29024** when trust material did not match the service. Symptoms: **ORA-28759** (“failure to open file”), connection hangs, **NJS-040** timeouts, Telegram feeling “dead” while the pool waits.
+
+### aideazz vs aipa (no mystery)
+
+- The **compute** VM can be in the **aideazz** tenancy; **Autonomous AI Database** `cto-aipa-db` (internal **`ctoaipadb2025`**) remains in the **aipa** compartment. **Not having an ADB in aideazz** is expected for this stack: the app connects with **wallet + `.env`**, not “VM account = DB account.”
+
+### Fix summary (operations + code)
+
+| Step | Action |
+|------|--------|
+| 1 | In **aipa** OCI → **`cto-aipa-db`** → **Database connection** → download **new client credentials (wallet)**. |
+| 2 | On the server: replace **`~/cto-aipa/wallet/`** with unzipped files; **`tnsnames.ora`** / **`cwallet.sso`** etc. must live **directly** in that folder (flatten any nested `wallet/` directory). |
+| 3 | Set **`sqlnet.ora`** **`WALLET_LOCATION`** to the **absolute** path, e.g. `"/home/ubuntu/cto-aipa/wallet"` (OCI’s default **`?/network/admin`** targets Instant Client’s admin dir, not PM2’s wallet). File must use **LF** line endings. |
+| 4 | **`~/cto-aipa/.env`:** **`DB_SERVICE_NAME`** = TNS alias from **`tnsnames.ora`** (e.g. **`ctoaipadb2025_high`**); **`DB_USER`** / **`DB_PASSWORD`** = database user (e.g. ADMIN); **`WALLET_PASSWORD`** = password from the wallet download (**not** the same as **`DB_PASSWORD`**). Optional **`TNS_ADMIN`** if the wallet path differs. |
+| 5 | **Code (AIPA_AITCF):** `database.ts` — pass **`walletPassword`** when **`WALLET_PASSWORD`** is set; allow **`TNS_ADMIN`** override; restore **retry + `resetPool()`** on **ORA-29024** / transient pool errors. |
+| 6 | **`git pull` → `npm run build` → `pm2 restart cto-aipa --update-env`**. |
+
+### Proof it works
+
+- PM2 / stdout: **`🔗 Connected to Oracle Autonomous Database (mTLS)`** without **ORA-29024** / **ORA-28759** loops.
+- Telegram **`/places_ingest …`** returns a completion block with **“New targets imported: N”** — that requires **both** Google Places **and** Oracle **`outreach_targets`** inserts.
+
+**Related:** [ORACLE_ALL_PRODUCTS_RESILIENCE.md](./ORACLE_ALL_PRODUCTS_RESILIENCE.md) — instance-wide PM2/systemd health checks and **CTO AIPA + ADB** note.
 
 ---
 
