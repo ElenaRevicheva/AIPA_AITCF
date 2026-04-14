@@ -569,6 +569,7 @@ Type /menu for all commands! 🚀
         { cmd: '/places_ingest', desc: 'Google Places → outreach targets by city + industry', usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City\n/places_ingest realtors Louisville KY\nPresets: construction, saas, retail, healthcare' },
         { cmd: '/doc_ingest', desc: 'Paste any business doc → extract prospects → outreach', usage: '/doc_ingest RFP\n[paste RFP, takeoff sheet, call log, client list below]\nExtracts contacts → Hunter.io → outreach pipeline' },
         { cmd: '/outreach_drafts', desc: 'Review pending outreach drafts', usage: '/outreach_drafts\nPreview emails before sending' },
+        { cmd: '/triage', desc: 'Phase 5: run AI lead triage (site + outreach replies → dashboard)', usage: '/triage\nClassifies business_leads + replied outreach; see /leads/dashboard with secret' },
         { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
         { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
       ]
@@ -695,13 +696,39 @@ Or just ask me anything - I understand natural language!`;
       response += `\`${cmd.usage.split('\n')[0]}\`\n\n`;
     }
     
+    /** Extra taps for GEO/marketing engine commands (full detail via \`cmd:\` handler). */
+    const wiringQuick =
+      section === 'wiring'
+        ? [
+            [
+              {
+                text: '📍 Google Places → /places_ingest',
+                callback_data: 'cmd:places_ingest',
+              },
+            ],
+            [
+              {
+                text: '📄 Doc → outreach /doc_ingest',
+                callback_data: 'cmd:doc_ingest',
+              },
+            ],
+            [
+              {
+                text: '🧭 Lead triage /triage',
+                callback_data: 'cmd:triage',
+              },
+            ],
+          ]
+        : [];
+
     await ctx.reply(response, {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
-          [{ text: '📋 Back to Menu', callback_data: 'menu:main' }]
-        ]
-      }
+          ...wiringQuick,
+          [{ text: '📋 Back to Menu', callback_data: 'menu:main' }],
+        ],
+      },
     });
   });
   
