@@ -69,7 +69,7 @@ async function resetPool(): Promise<void> {
  *  ORA-29024 (cert validation) = Oracle refreshed TLS cert; tear down pool + retry.
  *  ORA-12506 / NJS-511 / NJS-040 = transient listener errors; retry with back-off.
  */
-async function getPoolConnection(retries = 4): Promise<oracledb.Connection> {
+async function getPoolConnection(retries = 3): Promise<oracledb.Connection> {
   for (let i = 0; i < retries; i++) {
     try {
       const pool = await getPool();
@@ -78,7 +78,8 @@ async function getPoolConnection(retries = 4): Promise<oracledb.Connection> {
       const isCert = e.message?.includes('ORA-29024') || e.code === 'ORA-29024';
       const isTransient = e.code === 'NJS-511' || e.code === 'NJS-040' || e.message?.includes('ORA-12506');
       if (i < retries - 1 && (isCert || isTransient)) {
-        const delay = isCert ? 5000 * (i + 1) : 3000 * (i + 1);
+        // Shorter backoff so one bad TLS situation does not block Telegram for minutes
+        const delay = isCert ? Math.min(2000 * (i + 1), 8000) : 2000 * (i + 1);
         console.warn(`⏳ Oracle connection retry ${i + 1}/${retries} (${isCert ? 'cert-reset' : 'transient'})…`);
         if (isCert) await resetPool(); // force fresh pool on cert errors
         await new Promise(r => setTimeout(r, delay));
@@ -2237,6 +2238,94 @@ async function getOutreachTargetByCompany(company: string): Promise<any | null> 
   }
 }
 
+/** Single round-trip dedup for Places ingest (avoids N× Oracle connection storms). */
+async function getOutreachExistingCompaniesLowercase(companies: string[]): Promise<Set<string>> {
+  const uniq = [...new Set(companies.map((c) => c.trim().toLowerCase()).filter(Boolean))];
+  if (uniq.length === 0) return new Set();
+
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const binds: Record<string, string> = {};
+    const placeholders = uniq.map((c, i) => {
+      const k = `c${i}`;
+      binds[k] = c;
+      return `:${k}`;
+    });
+    const result = await connection.execute(
+      `SELECT LOWER(company) AS lc FROM outreach_targets WHERE LOWER(company) IN (${placeholders.join(',')})`,
+      binds
+    );
+    const set = new Set<string>();
+    for (const row of (result.rows || []) as unknown[][]) {
+      const v = row?.[0];
+      if (v != null) set.add(String(v).toLowerCase());
+    }
+    return set;
+  } catch (err) {
+    console.error('❌ getOutreachExistingCompaniesLowercase error:', err);
+    throw err;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+/** One connection, one commit — avoids N separate pool acquisitions per import. */
+async function saveOutreachTargetsBulk(
+  targets: Array<{
+    name: string;
+    company?: string | null;
+    email?: string | null;
+    emailStatus?: string;
+    linkedinUrl?: string | null;
+    source?: string | null;
+    painPoint?: string | null;
+    matchedSystem?: string | null;
+  }>
+): Promise<{ imported: number; ids: string[] }> {
+  const ids: string[] = [];
+  if (targets.length === 0) return { imported: 0, ids };
+
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    for (const target of targets) {
+      const result = await connection.execute(
+        `INSERT INTO outreach_targets
+           (name, company, email, email_status, linkedin_url, source, pain_point, matched_system)
+         VALUES (:name, :company, :email, :emailStatus, :linkedinUrl, :source, :painPoint, :matchedSystem)
+         RETURNING RAWTOHEX(id) INTO :id`,
+        {
+          name: target.name,
+          company: target.company ?? null,
+          email: target.email ?? null,
+          emailStatus: target.emailStatus || 'unverified',
+          linkedinUrl: target.linkedinUrl ?? null,
+          source: target.source ?? null,
+          painPoint: target.painPoint ?? null,
+          matchedSystem: target.matchedSystem ?? null,
+          id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 },
+        },
+        { autoCommit: false }
+      );
+      const outBinds = result.outBinds as { id: string[] };
+      if (outBinds?.id?.[0]) ids.push(outBinds.id[0]!);
+    }
+    await connection.commit();
+    return { imported: ids.length, ids };
+  } catch (err) {
+    console.error('❌ saveOutreachTargetsBulk error:', err);
+    try {
+      await connection?.rollback();
+    } catch {
+      /* ignore */
+    }
+    return { imported: 0, ids: [] };
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getOutreachDrafts(): Promise<any[]> {
   let connection;
   try {
@@ -2510,6 +2599,8 @@ export {
   updateOutreachTargetStatus,
   getOutreachTargets,
   getOutreachTargetByCompany,
+  getOutreachExistingCompaniesLowercase,
+  saveOutreachTargetsBulk,
   saveOutreachEmail,
   markOutreachSent,
   markOutreachReply,

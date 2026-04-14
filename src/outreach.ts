@@ -7,7 +7,7 @@
 
 import { Anthropic } from '@anthropic-ai/sdk';
 import {
-  saveOutreachTarget,
+  saveOutreachTargetsBulk,
   updateOutreachTargetStatus,
   getOutreachTargets,
   saveOutreachEmail,
@@ -90,23 +90,21 @@ export interface OutreachTargetInput {
 export async function importTargets(
   targets: OutreachTargetInput[]
 ): Promise<{ imported: number; ids: string[] }> {
-  const ids: string[] = [];
-  for (const t of targets) {
+  if (targets.length === 0) return { imported: 0, ids: [] };
+  const rows = targets.map((t) => {
     const matchedSystem = matchPainToSystem(t.painPoint || t.company || '');
-    const target: Parameters<typeof saveOutreachTarget>[0] = {
+    return {
       name: t.name,
+      company: t.company || null,
+      email: t.email || null,
       emailStatus: t.email ? 'unverified' : 'missing',
+      linkedinUrl: t.linkedinUrl || null,
       source: t.source || 'manual',
+      painPoint: t.painPoint || null,
       matchedSystem,
     };
-    if (t.company) target.company = t.company;
-    if (t.email) target.email = t.email;
-    if (t.linkedinUrl) target.linkedinUrl = t.linkedinUrl;
-    if (t.painPoint) target.painPoint = t.painPoint;
-    const id = await saveOutreachTarget(target);
-    if (id) ids.push(id);
-  }
-  return { imported: ids.length, ids };
+  });
+  return saveOutreachTargetsBulk(rows);
 }
 
 function matchPainToSystem(text: string): string {

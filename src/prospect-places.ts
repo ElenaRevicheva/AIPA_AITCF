@@ -21,7 +21,7 @@ import {
   verifyEmailHunter,
   type OutreachTargetInput,
 } from './outreach';
-import { getOutreachTargetByCompany } from './database';
+import { getOutreachExistingCompaniesLowercase } from './database';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -258,13 +258,23 @@ export async function runPlacesIngestion(
     `[${tag}] After Details: ${withWebsite.length} with websiteUri, ${stillNoWebsite} without (will still import for manual follow-up)`
   );
 
-  // Dedup against existing DB — include places without websites (outreach_targets allows missing email)
+  // Dedup in one Oracle round-trip (avoids blocking both Telegram bots on TLS retry storms)
+  const names = places.map((p) => p.displayName?.text || '').filter(Boolean);
+  let existingSet: Set<string>;
+  try {
+    existingSet = await getOutreachExistingCompaniesLowercase(names);
+  } catch (e: any) {
+    const msg = `❌ Database unavailable (cannot dedupe/import). Check Oracle wallet/TLS, then retry.\n${String(e?.message || e).slice(0, 200)}`;
+    console.error(`[${tag}]`, e);
+    if (sendTelegram) await sendTelegram(msg);
+    return { ingested: 0, skipped: 0, errors: 1 };
+  }
+
   const newPlaces: PlaceResult[] = [];
   for (const p of places) {
     const name = p.displayName?.text || '';
     if (!name) continue;
-    const existing = await getOutreachTargetByCompany(name);
-    if (existing) {
+    if (existingSet.has(name.trim().toLowerCase())) {
       skipped++;
       continue;
     }
