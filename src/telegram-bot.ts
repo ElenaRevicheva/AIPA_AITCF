@@ -1159,17 +1159,30 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       );
       return;
     }
-    // Parse: last word(s) after first word = city, first word = industry
-    // Simple heuristic: everything up to first comma or "in" is industry, rest is city
-    const inMatch = args.match(/^(.+?)\s+(?:in\s+)?([A-Z].+)$/i);
+    // Parse city + industry from args.
+    // Priority 1: explicit "in" separator  → /places_ingest AI agencies in Panama City
+    // Priority 2: last 2 words = city      → /places_ingest AI agencies Panama City
+    // Priority 3: last word = city (2-word input) → /places_ingest architects London
     let industry = args;
     let city = '';
-    if (inMatch) {
-      industry = inMatch[1]!.trim();
-      city = inMatch[2]!.trim();
+
+    const inSepMatch = args.match(/^(.+?)\s+in\s+(.+)$/i);
+    if (inSepMatch) {
+      industry = inSepMatch[1]!.trim();
+      city = inSepMatch[2]!.trim();
     } else {
-      await ctx.reply('❌ Please specify both industry and city.\nExample: /places_ingest architects Lexington KY');
-      return;
+      const words = args.split(/\s+/);
+      if (words.length >= 3) {
+        // Take last 2 words as city (e.g. "Panama City", "Lexington KY", "New York")
+        city = words.slice(-2).join(' ');
+        industry = words.slice(0, -2).join(' ');
+      } else if (words.length === 2) {
+        industry = words[0]!;
+        city = words[1]!;
+      } else {
+        await ctx.reply('❌ Please specify both industry and city.\nExamples:\n/places_ingest AI automation agencies Panama City\n/places_ingest architects in Lexington KY\n/places_ingest construction Louisville KY');
+        return;
+      }
     }
     await ctx.reply(`📍 Searching Google Places: "${industry}" in "${city}"…\nThis may take 1-2 minutes.`);
     try {
