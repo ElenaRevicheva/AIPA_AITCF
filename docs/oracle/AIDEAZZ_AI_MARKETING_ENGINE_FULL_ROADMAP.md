@@ -410,6 +410,54 @@ The API provider temporarily refuses requests (**too many** in a short window). 
 
 ---
 
+### Technical Stack Terms — "How the engine actually works" (for client conversations)
+
+*These are the words that separate a real system from a demo. When you can explain them, a technical founder knows you built something.*
+
+**Cron / Cron job**
+A scheduled task that fires automatically at a set time — like an alarm clock for code. "Daily blog cron at 09:30 Panama time" means at 9:30 AM every day, a function runs automatically, generates an article, and publishes it. No human clicks anything. This is what "automated" actually means — not a button you press, but a timer that runs whether you're awake or not.
+
+**GraphQL**
+A way to ask an API for exactly the data you need, nothing more. Hashnode uses GraphQL: instead of getting a whole page of data, the engine sends one specific query — `publishPost(input: {...})` — and gets back exactly the new post's URL. More precise and faster than traditional REST APIs for complex publishing operations.
+
+**Canonical URL**
+The "official" version of a page when the same content exists in multiple places. When the engine cross-posts an article to Dev.to, it sets `canonical_url` pointing back to the Hashnode original. This tells Google: "the real version lives here, give SEO credit to Hashnode, not to this copy." A canonical backlink from Dev.to (DA 90+) is a genuine authority signal — Google trusts Dev.to, so a link from it with your canonical URL tells Google your site is worth trusting too. This is the opposite of fake backlinks — it's a real platform pointing to real content.
+
+**GSC (Google Search Console)**
+Google's free tool that shows which search queries bring people to your site, which pages are indexed, and what errors exist. The engine pulls the top 25 queries from the last 28 days via the GSC API — then Claude Haiku picks which blog topic has the biggest gap vs. current traffic. This means content is written to fill real search holes, not guessed randomly.
+
+**Groq**
+A hardware-accelerated inference provider that runs open-weight LLMs (like Llama 3.3 70B) extremely fast — typically 10-50x faster than standard API calls. The engine uses Groq for speed-critical paths (lead triage, code review). When Groq hits a rate limit, it falls back to Claude Haiku. Clients care because fast inference = faster triage = faster response to leads.
+
+**Claude Haiku / Multi-model routing**
+Claude Haiku is Anthropic's fastest, cheapest model — used for classification tasks where speed and cost matter more than maximum intelligence (e.g., "is this lead urgent?", "which topic has the biggest SEO gap?"). The engine routes ~76% of tasks to fast models (Groq/Haiku) and reserves frontier models (Claude Opus) for high-stakes decisions like client email drafts. This is why the engine costs ~$0/month to run instead of $500/month — intelligent routing, not just "use the best model for everything."
+
+**Resend**
+A developer-focused transactional email service. Every cold outreach email, lead notification, and confirmation email goes through Resend's API. Critical distinction: an email is only counted as "sent" in the Oracle `outreach_log` after Resend returns HTTP 200 **and** the database row updates with `rowsAffected > 0`. This is honest bookkeeping — no fake send counts.
+
+**Hunter.io**
+A service that finds and verifies business email addresses from a company domain. Give it `acme.com`, it returns `john.doe@acme.com` with a confidence score. The engine uses it to enrich both YC company prospects and Google Places results before sending outreach. "Validated email" means Hunter confirmed the address likely delivers — protecting sender reputation.
+
+**GA4 (Google Analytics 4)**
+Google's current analytics platform. Tracks users, sessions, pageviews, and traffic sources on aideazz.xyz. The engine pulls live GA4 data via the Data API using a service account — so "189 users, 215 sessions" are real numbers from Google's servers, not made up. This data informs content decisions and proves the site has real traffic.
+
+**JWT (JSON Web Token)**
+A secure, self-contained token used to authenticate API calls without storing passwords. The engine uses JWT to authenticate with Google Search Console: it takes the service account credentials (a private key), builds a JWT signed with RSA-256, exchanges it for a short-lived access token, then calls the GSC API. This is enterprise-grade auth — same pattern used by Google, Stripe, and every serious API.
+
+**reCAPTCHA Enterprise**
+Google's advanced bot-detection system for forms. When someone submits the inquiry form on aideazz.xyz, an invisible reCAPTCHA check runs and returns a score (0.0 = bot, 1.0 = human). The Oracle backend verifies this score before accepting the lead. This means `business_leads` contains only real humans — the pipeline never wastes Resend quota on bot submissions.
+
+**Google Places API**
+Google's API for searching local businesses by type and location. "Architects in Lexington KY" returns real business names, addresses, websites, and phone numbers. The engine uses this to build outreach lists for local/industry clients — same Hunter.io enrichment and Resend pipeline as YC companies, but now pointing at any city and any industry. This is what makes the engine work for a Manny-style construction client, not just AI startups.
+
+**Dev.to**
+A large developer community platform (Domain Authority ~90+) where technical articles are published. The engine cross-posts every Hashnode article to Dev.to automatically, with `canonical_url` pointing back to Hashnode. Result: a genuine high-authority backlink to aideazz.xyz every day a post publishes — without buying links or using link farms. This is the correct way to build domain authority.
+
+**Oracle `content_log` / `business_leads` / `lead_triage` / `outreach_log`**
+The four core tables in Oracle Autonomous Database that prove the engine is running. `content_log` — every article published, when, on which platform. `business_leads` — every form inquiry from aideazz.xyz, with UTM source. `outreach_log` — every cold email attempt, with Resend message ID and delivery status. `lead_triage` — every lead classified by urgency, with the model that classified it and timestamp. These tables are the difference between "I have an AI system" and "I can show you a database of 8 classified leads, 3 confirmed email sends, and 15 published articles." Verifiable, not claimable.
+
+---
+
 ## PART 1 — WHAT AUTOSEO IS ACTUALLY SELLING (And What's Real)
 
 The 5-question framework from their ad is solid and honest. Apply it to AIdeazz:
