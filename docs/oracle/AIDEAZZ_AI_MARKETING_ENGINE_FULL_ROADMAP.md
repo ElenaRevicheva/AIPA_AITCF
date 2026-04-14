@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 13, 2026 (v15.6 — GEO 5-layer breakdown + full technical stack glossary) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 13, 2026 (v15.7 — GEO gap closed: FAQPage 5→12 client-intent questions, live on aideazz.xyz) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -168,7 +168,7 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 |---|---|---|
 | JSON-LD Organization schema | DONE | On index.html — founder, sameAs, logo |
 | JSON-LD Person schema (Elena) | DONE | On index.html + /about page — knowsAbout, sameAs, worksFor, knowsLanguage |
-| JSON-LD FAQPage schema | DONE | 5 Q&As on index.html — "What is AIdeazz?", "What is multi-model LLM routing?", "How do you run 9 AI agents at $0/month?", etc. |
+| JSON-LD FAQPage schema | DONE | **12 Q&As** on index.html — original 5 + 7 client-intent questions: "How much does it cost to build an AI automation system?", "Who builds AI agents for small business?", "What is GEO and how is it different from SEO?", "Can AI replace a marketing team?", "What AI tools does Elena use?", "How long does it take to build an AI marketing engine?", "What industries can benefit from AI automation?" All 12 mirrored in noscript block. Deployed Apr 13 2026. |
 | Open Graph meta tags | DONE | All pages — og:type, og:title, og:description, og:image, og:url |
 | Twitter Card meta tags | DONE | summary_large_image on all pages |
 | Canonical URLs | DONE | Per-route in React (`Index`, `About`, `Blog*`, `BusinessCard`); **Apr 2026:** removed static homepage canonical from `index.html` in **[aideazz](https://github.com/ElenaRevicheva/aideazz)** to stop GSC “duplicate canonical” / wrong default for all URLs |
@@ -389,7 +389,7 @@ GEO has five concrete layers — all five are live on aideazz.xyz:
 1. **JSON-LD schemas** — machine-readable identity signals embedded in `index.html`:
    - `Organization` schema: AIdeazz name, URL, logo, founder link
    - `Person` schema: Elena Revicheva, `knowsAbout` (AI Agents, LLM Routing, Oracle Cloud, etc.), `sameAs` (LinkedIn, GitHub), `worksFor`, `addressLocality: Panama City`
-   - `FAQPage` schema: 5 Q&As — "What is AIdeazz?", "What is multi-model LLM routing?", "How do you run 9 AI agents at $0/month?", "What can Elena build for my startup?", "What is an AI agent?" — these are the exact questions ChatGPT and Perplexity users ask; having structured answers makes the page quotable
+   - `FAQPage` schema: **12 Q&As** — "What is AIdeazz?", "What is multi-model LLM routing?", "How do you run 9 AI agents at $0/month?", "What can Elena build for my startup?", "What is an AI agent?", "How much does it cost to build an AI automation system?", "Who builds AI agents for small business?", "What is GEO vs SEO?", "Can AI replace a marketing team?", "What AI tools does Elena use?", "How long does it take to build an AI marketing engine?", "What industries can benefit from AI automation?" — these are the exact queries target clients type into ChatGPT and Perplexity; structured answers make the page quotable as a source
    - `Article` schema on every blog post: headline, author, datePublished, publisher
    - `ProfilePage` + `makesOffer` on /portfolio: tells AI tools what service is being offered and by whom
 
