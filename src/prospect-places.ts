@@ -28,10 +28,13 @@ import { getOutreachTargetByCompany } from './database';
 // ---------------------------------------------------------------------------
 
 interface PlaceResult {
+  /** Resource name, e.g. `places/ChIJ...` — required for Place Details enrichment */
+  name?: string;
   displayName?: { text?: string };
   formattedAddress?: string;
   websiteUri?: string;
   nationalPhoneNumber?: string;
+  googleMapsUri?: string;
 }
 
 interface PlacesResponse {
@@ -95,7 +98,8 @@ async function searchPlaces(query: string, maxResults: number): Promise<PlaceRes
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber',
+        'X-Goog-FieldMask':
+          'places.name,places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber,places.googleMapsUri',
       },
       body: JSON.stringify({
         textQuery: query,
@@ -116,6 +120,51 @@ async function searchPlaces(query: string, maxResults: number): Promise<PlaceRes
     console.error('[prospect-places] Places fetch error:', e);
     return [];
   }
+}
+
+/** Text Search often omits websiteUri; Details frequently has it (needed for Hunter). */
+async function fetchPlaceDetails(
+  apiKey: string,
+  placeName: string
+): Promise<Pick<PlaceResult, 'websiteUri' | 'nationalPhoneNumber' | 'googleMapsUri'>> {
+  if (!placeName) return {};
+  try {
+    const res = await fetch(`https://places.googleapis.com/v1/${placeName}`, {
+      headers: {
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'websiteUri,nationalPhoneNumber,googleMapsUri',
+      },
+    });
+    if (!res.ok) return {};
+    return (await res.json()) as Pick<PlaceResult, 'websiteUri' | 'nationalPhoneNumber' | 'googleMapsUri'>;
+  } catch (e) {
+    console.warn('[prospect-places] Place Details error:', e);
+    return {};
+  }
+}
+
+async function enrichPlacesFromDetails(places: PlaceResult[]): Promise<PlaceResult[]> {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY?.trim();
+  if (!apiKey) return places;
+
+  const out: PlaceResult[] = [];
+  let filled = 0;
+  for (const p of places) {
+    if (p.websiteUri || !p.name) {
+      out.push(p);
+      continue;
+    }
+    const d = await fetchPlaceDetails(apiKey, p.name);
+    if (d.websiteUri) filled++;
+    const merged: PlaceResult = { ...p };
+    if (d.websiteUri) merged.websiteUri = d.websiteUri;
+    if (d.nationalPhoneNumber) merged.nationalPhoneNumber = d.nationalPhoneNumber;
+    if (d.googleMapsUri) merged.googleMapsUri = d.googleMapsUri;
+    out.push(merged);
+    await new Promise((r) => setTimeout(r, 120));
+  }
+  if (filled) console.log(`[prospect-places] Place Details filled websiteUri for ${filled} result(s)`);
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -191,28 +240,34 @@ export async function runPlacesIngestion(
 
   console.log(`[${tag}] Searching: "${query}"`);
 
-  const places = await searchPlaces(query, maxResults);
+  let places = await searchPlaces(query, maxResults);
   if (!places.length) {
     if (sendTelegram) await sendTelegram(`📍 Places ingest: no results for "${query}"`);
     return { ingested: 0, skipped: 0, errors: 0 };
   }
 
+  places = await enrichPlacesFromDetails(places);
+
   let ingested = 0;
   let skipped = 0;
   let errors = 0;
 
-  // Filter places that have a website (needed for Hunter.io)
-  const withWebsite = places.filter(p => p.websiteUri);
-  const withoutWebsite = places.length - withWebsite.length;
-  console.log(`[${tag}] ${withWebsite.length} have websites, ${withoutWebsite} skipped (no website)`);
+  const withWebsite = places.filter((p) => p.websiteUri);
+  const stillNoWebsite = places.filter((p) => !p.websiteUri).length;
+  console.log(
+    `[${tag}] After Details: ${withWebsite.length} with websiteUri, ${stillNoWebsite} without (will still import for manual follow-up)`
+  );
 
-  // Dedup against existing DB
-  const newPlaces: typeof withWebsite = [];
-  for (const p of withWebsite) {
+  // Dedup against existing DB — include places without websites (outreach_targets allows missing email)
+  const newPlaces: PlaceResult[] = [];
+  for (const p of places) {
     const name = p.displayName?.text || '';
     if (!name) continue;
     const existing = await getOutreachTargetByCompany(name);
-    if (existing) { skipped++; continue; }
+    if (existing) {
+      skipped++;
+      continue;
+    }
     newPlaces.push(p);
   }
 
@@ -223,10 +278,12 @@ export async function runPlacesIngestion(
     return { ingested: 0, skipped, errors: 0 };
   }
 
+  const noWebNew = newPlaces.filter((p) => !p.websiteUri).length;
+
   // Classify pain points (batch Haiku call)
   const painMap = await classifyPlacesPain(
     anthropic,
-    newPlaces.map(p => ({
+    newPlaces.map((p) => ({
       name: p.displayName?.text || '',
       address: p.formattedAddress || city,
       industry,
@@ -234,12 +291,37 @@ export async function runPlacesIngestion(
     context
   );
 
-  // Discover emails + build targets
+  const src = `places_${industry.replace(/\s+/g, '_').toLowerCase()}`;
   const targets: OutreachTargetInput[] = [];
+
   for (const place of newPlaces) {
     const name = place.displayName?.text || '';
-    const domain = extractDomain(place.websiteUri!);
-    if (!domain) { errors++; continue; }
+    const basePain =
+      painMap.get(name) || `${industry} business in ${city} — likely needs AI automation`;
+
+    if (!place.websiteUri) {
+      const extras = [
+        place.googleMapsUri ? `Google Maps: ${place.googleMapsUri}` : '',
+        place.nationalPhoneNumber ? `Phone: ${place.nationalPhoneNumber}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n');
+      targets.push({
+        name: `Contact @ ${name}`,
+        company: name,
+        source: src,
+        painPoint: extras
+          ? `${basePain}\n${extras}\n(No website in Google Places — add email manually.)`
+          : `${basePain}\n(No website in Google Places — add email manually.)`,
+      });
+      continue;
+    }
+
+    const domain = extractDomain(place.websiteUri);
+    if (!domain) {
+      errors++;
+      continue;
+    }
 
     try {
       let email: string | null = null;
@@ -252,18 +334,16 @@ export async function runPlacesIngestion(
           email = search.emails[0]!.email;
           founderName = search.emails[0]!.name || null;
         }
-        // Rate limit: free tier
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise((r) => setTimeout(r, 2000));
       }
 
-      const tgt: OutreachTargetInput = {
+      targets.push({
         name: founderName || `Manager @ ${name}`,
         company: name,
-        source: `places_${industry.replace(/\s+/g, '_').toLowerCase()}`,
-        painPoint: painMap.get(name) || `${industry} business in ${city} — likely needs AI automation`,
-      };
-      if (email) tgt.email = email;
-      targets.push(tgt);
+        source: src,
+        painPoint: basePain,
+        ...(email ? { email } : {}),
+      });
     } catch (e) {
       console.error(`[${tag}] Error processing ${name}:`, e);
       errors++;
@@ -274,10 +354,13 @@ export async function runPlacesIngestion(
     const result = await importTargets(targets);
     ingested = result.imported;
 
-    // Verify emails (non-fatal)
     for (const t of targets) {
       if (t.email) {
-        try { await verifyEmailHunter(t.email); } catch { /* non-fatal */ }
+        try {
+          await verifyEmailHunter(t.email);
+        } catch {
+          /* non-fatal */
+        }
       }
     }
   }
@@ -288,7 +371,8 @@ export async function runPlacesIngestion(
     ``,
     `New targets imported: ${ingested}`,
     `Already in pipeline: ${skipped}`,
-    `No website (skipped): ${withoutWebsite}`,
+    noWebNew ? `Imported without website/email (manual follow-up): ${noWebNew}` : '',
+    `Places in result set with no listing website: ${stillNoWebsite}`,
     errors ? `Errors: ${errors}` : '',
     ``,
     `Next: outreach cron generates drafts and sends via Resend`,
