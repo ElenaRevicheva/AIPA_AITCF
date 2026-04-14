@@ -55,40 +55,10 @@ function getPool(): Promise<oracledb.Pool> {
   return _poolPromise;
 }
 
-/** Tear down pool so it gets recreated fresh on next call */
-async function resetPool(): Promise<void> {
-  const p = _pool;
-  _poolPromise = null;
-  _pool = null;
-  if (p) {
-    try { await p.close(0); } catch { /* ignore close errors */ }
-  }
-}
-
-/** Get a connection from the pool with retry.
- *  ORA-29024 (cert validation) = Oracle refreshed TLS cert; tear down pool + retry.
- *  ORA-12506 / NJS-511 / NJS-040 = transient listener errors; retry with back-off.
- */
-async function getPoolConnection(retries = 3): Promise<oracledb.Connection> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const pool = await getPool();
-      return await pool.getConnection();
-    } catch (e: any) {
-      const isCert = e.message?.includes('ORA-29024') || e.code === 'ORA-29024';
-      const isTransient = e.code === 'NJS-511' || e.code === 'NJS-040' || e.message?.includes('ORA-12506');
-      if (i < retries - 1 && (isCert || isTransient)) {
-        // Shorter backoff so one bad TLS situation does not block Telegram for minutes
-        const delay = isCert ? Math.min(2000 * (i + 1), 8000) : 2000 * (i + 1);
-        console.warn(`⏳ Oracle connection retry ${i + 1}/${retries} (${isCert ? 'cert-reset' : 'transient'})…`);
-        if (isCert) await resetPool(); // force fresh pool on cert errors
-        await new Promise(r => setTimeout(r, delay));
-        continue;
-      }
-      throw e;
-    }
-  }
-  throw new Error('Failed to get Oracle connection after retries');
+/** One connection from the pool — no ORA-specific retry/reset (keeps startup and Telegram responsive). */
+async function getPoolConnection(): Promise<oracledb.Connection> {
+  const pool = await getPool();
+  return pool.getConnection();
 }
 
 async function initializeDatabase() {

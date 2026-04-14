@@ -1133,31 +1133,18 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
 
   // /outreach_ingest - Manually trigger prospect ingestion
   bot.command('outreach_ingest', async (ctx) => {
-    await ctx.reply('🔍 Starting prospect ingestion (YC companies → Hunter.io → Oracle)…\nThis may take 1-2 minutes.');
-    void runProspectIngestion(anthropic, async (msg) => {
-      try {
+    try {
+      await ctx.reply('🔍 Starting prospect ingestion (YC companies → Hunter.io → Oracle)…\nThis may take 1-2 minutes.');
+      const result = await runProspectIngestion(anthropic, async (msg) => {
         await ctx.reply(msg, { parse_mode: 'Markdown' });
-      } catch (e) {
-        console.error('outreach_ingest telegram reply:', e);
-      }
-    })
-      .then(async (result) => {
-        if (!result.ingested && !result.skipped) {
-          try {
-            await ctx.reply('⚠️ No companies found to ingest. Check YC JSON path or API.');
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      })
-      .catch(async (error) => {
-        console.error('Outreach ingest error:', error);
-        try {
-          await ctx.reply('❌ Error running prospect ingestion.');
-        } catch (e) {
-          console.error(e);
-        }
       });
+      if (!result.ingested && !result.skipped) {
+        await ctx.reply('⚠️ No companies found to ingest. Check YC JSON path or API.');
+      }
+    } catch (error) {
+      console.error('Outreach ingest error:', error);
+      await ctx.reply('❌ Error running prospect ingestion.');
+    }
   });
 
   // /places_ingest <industry> <city> — Google Places → outreach targets
@@ -1198,20 +1185,14 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       }
     }
     await ctx.reply(`📍 Searching Google Places: "${industry}" in "${city}"…\nThis may take 1-2 minutes.`);
-    void runPlacesIngestion(anthropic, { city, industry }, async (msg) => {
-      try {
+    try {
+      await runPlacesIngestion(anthropic, { city, industry }, async (msg) => {
         await ctx.reply(msg);
-      } catch (e) {
-        console.error('places_ingest telegram reply:', e);
-      }
-    }).catch(async (e) => {
+      });
+    } catch (e) {
       console.error('places_ingest error:', e);
-      try {
-        await ctx.reply(`❌ Places ingest failed: ${String(e).slice(0, 200)}`);
-      } catch (err) {
-        console.error(err);
-      }
-    });
+      await ctx.reply(`❌ Places ingest failed: ${String(e).slice(0, 200)}`);
+    }
   });
 
   // /doc_ingest [docType] — paste document text, extract prospects → outreach
@@ -1236,20 +1217,14 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       return;
     }
     await ctx.reply(`📄 Processing ${docType} (${text.length} chars)…\nExtracting prospects…`);
-    void runDocIngestion(anthropic, { text, docType }, async (msg) => {
-      try {
+    try {
+      await runDocIngestion(anthropic, { text, docType }, async (msg) => {
         await ctx.reply(msg);
-      } catch (err) {
-        console.error('doc_ingest telegram reply:', err);
-      }
-    }).catch(async (e) => {
+      });
+    } catch (e) {
       console.error('doc_ingest error:', e);
-      try {
-        await ctx.reply(`❌ Doc ingest failed: ${String(e).slice(0, 200)}`);
-      } catch (err) {
-        console.error(err);
-      }
-    });
+      await ctx.reply(`❌ Doc ingest failed: ${String(e).slice(0, 200)}`);
+    }
   });
 
   // /triage — Phase 5: Run lead triage cycle manually

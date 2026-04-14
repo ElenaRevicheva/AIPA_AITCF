@@ -47,6 +47,8 @@ export interface PlacesIngestOptions {
   industry: string;
   /** Max Places results to fetch (1–20, API cap per request) */
   maxResults?: number;
+  /** ISO 3166-1 alpha-2 (e.g. PA for Panama). Falls back to GOOGLE_PLACES_REGION env. */
+  regionCode?: string;
   /** Context sentence for pain-point classification, e.g. "construction renovation contractor looking for referral partners" */
   clientContext?: string;
 }
@@ -82,15 +84,50 @@ export const INDUSTRY_PRESETS: Record<string, string[]> = {
 };
 
 // ---------------------------------------------------------------------------
-// Step 1: Search Google Places Text Search (New API v1)
+// Step 1: Search Google Places — Text Search (New)  POST places:searchText
+// https://developers.google.com/maps/documentation/places/web-service/text-search
 // ---------------------------------------------------------------------------
 
-async function searchPlaces(query: string, maxResults: number): Promise<PlaceResult[]> {
+function buildLocationBiasFromEnv(): { circle: { center: { latitude: number; longitude: number }; radius: number } } | undefined {
+  const lat = parseFloat(process.env.GOOGLE_PLACES_BIAS_LAT || '');
+  const lng = parseFloat(process.env.GOOGLE_PLACES_BIAS_LNG || '');
+  const radius = parseFloat(process.env.GOOGLE_PLACES_BIAS_RADIUS_M || '');
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(radius) || radius <= 0) return undefined;
+  return { circle: { center: { latitude: lat, longitude: lng }, radius: Math.min(radius, 50000) } };
+}
+
+/** Resource name is e.g. places/ChIJ… — encode each path segment (IDs can contain + etc.). */
+function placeResourceUrl(placeName: string): string {
+  const path = placeName
+    .split('/')
+    .filter(Boolean)
+    .map((seg) => encodeURIComponent(seg))
+    .join('/');
+  return `https://places.googleapis.com/v1/${path}`;
+}
+
+async function searchPlaces(
+  query: string,
+  maxResults: number,
+  searchOpts?: { regionCode?: string; languageCode?: string }
+): Promise<PlaceResult[]> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY?.trim();
   if (!apiKey) {
     console.warn('[prospect-places] GOOGLE_PLACES_API_KEY not set — skipping Places search');
     return [];
   }
+
+  const languageCode = searchOpts?.languageCode || process.env.GOOGLE_PLACES_LANGUAGE?.trim() || 'en';
+  const regionCode = searchOpts?.regionCode || process.env.GOOGLE_PLACES_REGION?.trim();
+  const locationBias = buildLocationBiasFromEnv();
+
+  const body: Record<string, unknown> = {
+    textQuery: query,
+    maxResultCount: Math.min(maxResults, 20),
+    languageCode,
+  };
+  if (regionCode) body.regionCode = regionCode;
+  if (locationBias) body.locationBias = locationBias;
 
   try {
     const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
@@ -101,10 +138,7 @@ async function searchPlaces(query: string, maxResults: number): Promise<PlaceRes
         'X-Goog-FieldMask':
           'places.name,places.displayName,places.formattedAddress,places.websiteUri,places.nationalPhoneNumber,places.googleMapsUri',
       },
-      body: JSON.stringify({
-        textQuery: query,
-        maxResultCount: Math.min(maxResults, 20),
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
@@ -129,7 +163,7 @@ async function fetchPlaceDetails(
 ): Promise<Pick<PlaceResult, 'websiteUri' | 'nationalPhoneNumber' | 'googleMapsUri'>> {
   if (!placeName) return {};
   try {
-    const res = await fetch(`https://places.googleapis.com/v1/${placeName}`, {
+    const res = await fetch(placeResourceUrl(placeName), {
       headers: {
         'X-Goog-Api-Key': apiKey,
         'X-Goog-FieldMask': 'websiteUri,nationalPhoneNumber,googleMapsUri',
@@ -233,14 +267,23 @@ export async function runPlacesIngestion(
   opts: PlacesIngestOptions,
   sendTelegram?: (msg: string) => Promise<void>
 ): Promise<{ ingested: number; skipped: number; errors: number }> {
-  const { city, industry, maxResults = 20, clientContext } = opts;
+  const { city, industry, maxResults = 20, clientContext, regionCode: regionOpt } = opts;
   const tag = 'prospect-places';
   const query = `${industry} in ${city}`;
   const context = clientContext || `AI automation and workflow consultant looking to partner with ${industry} businesses`;
 
-  console.log(`[${tag}] Searching: "${query}"`);
+  const regionCode =
+    regionOpt ||
+    (/\bpanama\b/i.test(city) ? 'PA' : undefined) ||
+    process.env.GOOGLE_PLACES_REGION?.trim();
 
-  let places = await searchPlaces(query, maxResults);
+  console.log(`[${tag}] Searching: "${query}"${regionCode ? ` (region=${regionCode})` : ''}`);
+
+  const searchOpts: { regionCode?: string; languageCode: string } = {
+    languageCode: process.env.GOOGLE_PLACES_LANGUAGE?.trim() || 'en',
+  };
+  if (regionCode) searchOpts.regionCode = regionCode;
+  let places = await searchPlaces(query, maxResults, searchOpts);
   if (!places.length) {
     if (sendTelegram) await sendTelegram(`📍 Places ingest: no results for "${query}"`);
     return { ingested: 0, skipped: 0, errors: 0 };

@@ -737,10 +737,13 @@ function marketingInquiryCors(req: Request, res: Response, next: NextFunction) {
 
 async function startCTOAIPA() {
   console.log('🚀 Starting CTO AIPA v3.0 - AI Technical Co-Founder...');
-  
-  await initializeDatabase();
-  
-  console.log('✅ CTO AIPA v3.0 ready!');
+
+  // Do not block HTTP/Telegram on Oracle — wallet/TLS issues were starving both bots for minutes
+  void initializeDatabase().catch((e) =>
+    console.error('❌ Database init (background):', String((e as Error)?.message || e).slice(0, 400))
+  );
+
+  console.log('✅ CTO AIPA v3.0 ready (DB init in background)!');
   console.log('🧠 Ecosystem: AIdeazz (11 repositories)');
   console.log('💰 Cost: $0 (Oracle Cloud credits)');
   console.log('🔍 Features: Code Review, Push Monitoring, Ask CTO, CMO Integration');
@@ -1019,17 +1022,27 @@ async function startCTOAIPA() {
   });
 
   // ── Phase 4c: Google Places ingest ──────────────────────────────────────
-  // POST /outreach/ingest-places { city, industry, maxResults?, clientContext? }
+  // POST /outreach/ingest-places { city, industry, maxResults?, clientContext?, regionCode? }
   app.post('/outreach/ingest-places', outreachAuth, async (req, res) => {
     try {
-      const { city, industry, maxResults, clientContext } = req.body as {
-        city?: string; industry?: string; maxResults?: number; clientContext?: string;
+      const { city, industry, maxResults, clientContext, regionCode } = req.body as {
+        city?: string;
+        industry?: string;
+        maxResults?: number;
+        clientContext?: string;
+        regionCode?: string;
       };
       if (!city || !industry) {
         res.status(400).json({ ok: false, error: 'city and industry are required' });
         return;
       }
-      const placesOpts = { city, industry, ...(maxResults !== undefined && { maxResults }), ...(clientContext !== undefined && { clientContext }) };
+      const placesOpts = {
+        city,
+        industry,
+        ...(maxResults !== undefined && { maxResults }),
+        ...(clientContext !== undefined && { clientContext }),
+        ...(regionCode !== undefined && regionCode !== '' && { regionCode }),
+      };
       const result = await runPlacesIngestion(anthropic, placesOpts);
       res.json({ ok: true, ...result });
     } catch (e) {
