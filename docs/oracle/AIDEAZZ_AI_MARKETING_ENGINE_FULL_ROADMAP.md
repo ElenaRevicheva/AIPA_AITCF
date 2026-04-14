@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 13, 2026 (v15.4 — Manny mapping verified in repo: Places + doc-ingest shipped; draft-queue noted) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 13, 2026 (v15.6 — GEO 5-layer breakdown + full technical stack glossary) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -383,6 +383,25 @@ The Manny blueprint builds both. The AutoSEO product is purely inbound. The Inst
 
 **GEO (Generative Engine Optimization)**
 New term, 2025-onwards. The practice of making your content get cited and recommended by AI tools like ChatGPT and Perplexity — not just traditional Google. This is what AutoSEO's homepage headline ("Get Found & Recommended by ChatGPT, Perplexity AND Google") is selling. The technical secret: structured data, authority signals, clear authorship, and quotable factual content.
+
+GEO has five concrete layers — all five are live on aideazz.xyz:
+
+1. **JSON-LD schemas** — machine-readable identity signals embedded in `index.html`:
+   - `Organization` schema: AIdeazz name, URL, logo, founder link
+   - `Person` schema: Elena Revicheva, `knowsAbout` (AI Agents, LLM Routing, Oracle Cloud, etc.), `sameAs` (LinkedIn, GitHub), `worksFor`, `addressLocality: Panama City`
+   - `FAQPage` schema: 5 Q&As — "What is AIdeazz?", "What is multi-model LLM routing?", "How do you run 9 AI agents at $0/month?", "What can Elena build for my startup?", "What is an AI agent?" — these are the exact questions ChatGPT and Perplexity users ask; having structured answers makes the page quotable
+   - `Article` schema on every blog post: headline, author, datePublished, publisher
+   - `ProfilePage` + `makesOffer` on /portfolio: tells AI tools what service is being offered and by whom
+
+2. **noscript static content block** — 66 lines of plain HTML inside `<noscript>` in index.html. AI crawlers (ChatGPT, Perplexity, ClaudeBot) often do not execute JavaScript. Without this block, they would see a blank page. With it, they see Elena's full bio, all 9 agents described, tech stack, real metrics — fully readable without JS.
+
+3. **robots.txt AI bot permissions** — explicit `Allow: /` for `ChatGPT-User`, `GPTBot`, `PerplexityBot`, `ClaudeBot`, `CCBot`. These bots crawl the web to train and update their knowledge. Without explicit permission, they may skip your site. With it, they are invited in.
+
+4. **Canonical URL per route** — every page (homepage, /about, /blog/:slug, /portfolio) sets its own canonical tag via React `useEffect`. Prevents GSC "duplicate canonical" confusion on the IPFS/4everland SPA deployment. Google and AI tools trust pages with clean canonical signals.
+
+5. **Compound content + authority signals** — daily Hashnode articles (1400+ words, structured headers, real technical detail) + Dev.to cross-posts with canonical backlinks + /about page with real credentials (Deputy CEO, 9 production agents, $0/month infra) + /portfolio with ProfilePage schema. GEO compounds: each article adds another quotable surface; each Dev.to backlink adds authority; each schema update sharpens the AI's picture of who Elena is.
+
+**What GEO produces over time:** When someone asks ChatGPT "who can build me an AI marketing engine?" or Perplexity "fractional CTO for AI startups in Latin America" — these five layers are what make Elena's name appear in the answer. Not a paid placement. Not a KOL tweet that expires in 48 hours. A structural authority signal that compounds with every article published.
 
 **CMO (Chief Marketing Officer)**
 The executive responsible for marketing strategy. In your context, CMO AIPA = your AI agent that handles automated marketing output (LinkedIn posts, content publishing). This is already live in your stack.
