@@ -13,6 +13,8 @@ import {
   saveTriagedLead,
   getTriagedLeads,
   saveAgentOutcome,
+  getPlacesPipelineSnapshot,
+  type PlacesPipelineSnapshot,
 } from './database';
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
@@ -364,12 +366,51 @@ export async function buildDailyBrief(): Promise<string> {
   ].filter(l => l !== undefined).join('\n');
 }
 
+function escapeHtmlLite(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Google Places imports — same page as triage, different table (`outreach_targets`). */
+function renderPlacesPipelineSection(snap: PlacesPipelineSnapshot): string {
+  const rows = snap.recent
+    .map(r => {
+      const when = r.createdAt
+        ? new Date(r.createdAt).toLocaleString('en-US', { timeZone: 'America/Panama' })
+        : '—';
+      return `<tr><td style="padding:8px;border-bottom:1px solid #334155;">${escapeHtmlLite(r.label)}</td><td style="padding:8px;border-bottom:1px solid #334155;font-size:11px;color:#94a3b8;">${escapeHtmlLite(r.source)}</td><td style="padding:8px;border-bottom:1px solid #334155;font-size:12px;color:#cbd5e1;">${escapeHtmlLite(when)}</td></tr>`;
+    })
+    .join('');
+  return `
+    <div style="background:#0c4a6e;border:1px solid #0ea5e9;border-radius:12px;padding:16px;margin-bottom:24px;">
+      <h2 style="color:#38bdf8;font-size:16px;margin:0 0 8px;">📍 Google Places → outreach pipeline</h2>
+      <p style="color:#94a3b8;font-size:12px;margin:0 0 12px;line-height:1.5;">
+        Shown from <code style="color:#7dd3fc;">outreach_targets</code> where <code>source</code> starts with <code>places_</code> (not the AI triage queue).
+        Updated every time you open this page. Run <code>/places_ingest</code> or cron to add rows. When cold email gets replies, triage can pick them up below.
+      </p>
+      <p style="color:#e2e8f0;font-size:13px;margin-bottom:12px;">
+        <strong>${snap.totalFromPlaces}</strong> total from Places · <strong>${snap.importedLast24h}</strong> last 24h · <strong>${snap.importedLast7d}</strong> last 7 days
+      </p>
+      ${
+        snap.recent.length === 0
+          ? '<p style="color:#64748b;font-size:13px;">No Places imports yet.</p>'
+          : `<table style="width:100%;border-collapse:collapse;font-size:13px;"><thead><tr><th style="text-align:left;padding:8px;color:#94a3b8;">Company / label</th><th style="text-align:left;padding:8px;color:#94a3b8;">source</th><th style="text-align:left;padding:8px;color:#94a3b8;">Imported (Panama)</th></tr></thead><tbody>${rows}</tbody></table>`
+      }
+    </div>`;
+}
+
 /**
  * Build the HTML dashboard for /leads/dashboard
  * Server-rendered, password protected via query param
  */
 export async function buildDashboardHtml(): Promise<string> {
-  const leads = await getTriagedLeads(undefined, 100);
+  const [leads, placesSnap] = await Promise.all([
+    getTriagedLeads(undefined, 100),
+    getPlacesPipelineSnapshot(),
+  ]);
   const rows = leads as any[];
 
   const urgent = rows.filter((r: any) => r[4] >= 4);
@@ -424,6 +465,7 @@ export async function buildDashboardHtml(): Promise<string> {
         · updated ${new Date().toLocaleString('en-US', { timeZone: 'America/Panama' })} Panama
       </p>
     </div>
+    ${renderPlacesPipelineSection(placesSnap)}
     ${section('🔴 Act Today', urgent, '#ef4444')}
     ${section('🟡 This Week', thisWeek, '#f59e0b')}
     ${section('⚪ Monitor', monitor, '#6b7280')}

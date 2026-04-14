@@ -2478,6 +2478,66 @@ async function saveTriagedLead(data: {
   }
 }
 
+/** Snapshot for /leads/dashboard — Google Places → outreach_targets (separate from lead_triage). */
+export interface PlacesPipelineSnapshot {
+  totalFromPlaces: number;
+  importedLast24h: number;
+  importedLast7d: number;
+  /** Newest first */
+  recent: Array<{ label: string; source: string; createdAt: string }>;
+}
+
+async function getPlacesPipelineSnapshot(): Promise<PlacesPipelineSnapshot> {
+  const empty: PlacesPipelineSnapshot = {
+    totalFromPlaces: 0,
+    importedLast24h: 0,
+    importedLast7d: 0,
+    recent: [],
+  };
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const countPlaces = `FROM outreach_targets WHERE REGEXP_LIKE(NVL(source,' '), '^places_')`;
+    const t = await connection.execute(`SELECT COUNT(*) ${countPlaces}`);
+    const t24 = await connection.execute(
+      `SELECT COUNT(*) ${countPlaces} AND created_at >= CURRENT_TIMESTAMP - NUMTODSINTERVAL(1, 'DAY')`
+    );
+    const t7 = await connection.execute(
+      `SELECT COUNT(*) ${countPlaces} AND created_at >= CURRENT_TIMESTAMP - NUMTODSINTERVAL(7, 'DAY')`
+    );
+    const num = (rows: oracledb.Result<any> | undefined) =>
+      rows?.rows?.length ? Number((rows.rows[0] as unknown[])[0]) : 0;
+    empty.totalFromPlaces = num(t);
+    empty.importedLast24h = num(t24);
+    empty.importedLast7d = num(t7);
+
+    const rec = await connection.execute(
+      `SELECT NVL(company, name) AS label, source, created_at
+       FROM outreach_targets
+       WHERE REGEXP_LIKE(NVL(source,' '), '^places_')
+       ORDER BY created_at DESC
+       FETCH FIRST 25 ROWS ONLY`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    const rows = (rec.rows || []) as Array<{ LABEL?: string; SOURCE?: string; CREATED_AT?: Date }>;
+    for (const row of rows) {
+      const ts = row.CREATED_AT;
+      empty.recent.push({
+        label: String(row.LABEL ?? '—'),
+        source: String(row.SOURCE ?? '—'),
+        createdAt: ts instanceof Date ? ts.toISOString() : String(ts ?? ''),
+      });
+    }
+    return empty;
+  } catch (err) {
+    console.error('getPlacesPipelineSnapshot error:', err);
+    return empty;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
   let connection;
   try {
@@ -2634,4 +2694,5 @@ export {
   getTriagedLeads,
   getUntriagedLeads,
   getRepliedOutreach,
+  getPlacesPipelineSnapshot,
 };

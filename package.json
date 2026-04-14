@@ -11,6 +11,7 @@
     "hashnode:list": "node scripts/hashnode-list.mjs",
     "check:phase4": "node scripts/check-phase4-env.cjs",
     "triage:fire": "node scripts/triage-fire.cjs",
+    "test:places": "node scripts/test-google-places.mjs",
     "hashnode:publish:article": "node scripts/hashnode-publish.mjs --public --file scripts/hashnode-posts/from-executive-to-ai-builder.md"
   },
   "keywords": [],
