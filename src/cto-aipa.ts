@@ -15,7 +15,12 @@ import {
 } from './database';
 import { initTelegramBot, sendTelegramBroadcast } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
-import { startHashnodeDailyPublisher, runDailyHashnodePost, HASHNODE_TOPIC_BRIEFS } from './hashnode-daily';
+import {
+  startHashnodeDailyPublisher,
+  runDailyHashnodePost,
+  HASHNODE_TOPIC_BRIEFS,
+  hashnodeDailyIsDelisted,
+} from './hashnode-daily';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
 import {
   getResendApiKey,
@@ -847,10 +852,12 @@ async function startCTOAIPA() {
   app.get('/hashnode/daily-status', (_req, res) => {
     res.json({
       enabled: process.env.HASHNODE_DAILY_ENABLED === 'true',
-      cron: process.env.HASHNODE_DAILY_CRON || '30 9 * * *',
+      cron: process.env.HASHNODE_DAILY_CRON || '0 15 * * *',
       timezone: process.env.HASHNODE_DAILY_TZ || 'America/Panama',
-      note: 'Default 09:30 Panama City (UTC−5); override HASHNODE_DAILY_CRON / HASHNODE_DAILY_TZ',
-      publicFeed: process.env.HASHNODE_DAILY_PUBLIC === 'true',
+      note: 'Default 15:00 Panama City (UTC−5); override HASHNODE_DAILY_CRON / HASHNODE_DAILY_TZ',
+      publicFeed: !hashnodeDailyIsDelisted(),
+      delistedNote:
+        'When delisted, Hashnode hides posts from public GraphQL — aideazz.xyz/blog will not list them. Default is listed.',
       topicCount: HASHNODE_TOPIC_BRIEFS.length,
       manualTriggerConfigured: !!process.env.HASHNODE_DAILY_TRIGGER_SECRET,
       articleModel: process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic,

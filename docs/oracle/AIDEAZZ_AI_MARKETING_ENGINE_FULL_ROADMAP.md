@@ -242,7 +242,7 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 |---|---|---|
 | Platform decision | DONE | **Hashnode** (GraphQL API). **Medium** not viable for new integrations. |
 | Hashnode blog + PAT + publish scripts | DONE | `scripts/hashnode-publish.mjs`, `hashnode-list.mjs`, npm scripts; token in `.env` only. |
-| **Daily automated Hashnode publisher** | DONE | **AIPA_AITCF** `src/hashnode-daily.ts` — Claude long-form → `publishPost`; cron **09:30 `America/Panama`**; opt-in `HASHNODE_DAILY_ENABLED=true`; runs on Oracle **PM2 `cto-aipa`**. |
+| **Daily automated Hashnode publisher** | DONE | **AIPA_AITCF** `src/hashnode-daily.ts` — Claude long-form → `publishPost`; cron **15:00 `America/Panama`**; opt-in `HASHNODE_DAILY_ENABLED=true`; runs on Oracle **PM2 `cto-aipa`**. |
 | Manual trigger | DONE | `POST /hashnode/daily-run` with `Authorization: Bearer <HASHNODE_DAILY_TRIGGER_SECRET>`. |
 | First public long-form essay | DONE | **From Boardroom to Build…** — [on Hashnode](https://aideazz.hashnode.dev/from-boardroom-to-build-what-running-nine-production-ai-agents-actually-means); source `scripts/hashnode-posts/from-executive-to-ai-builder.md`. |
 | **Portfolio blog + live Hashnode sync** | DONE | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** repo: `/blog`, `/blog/:slug`, public GraphQL sync (no `gray-matter` in browser — fixed **Buffer** error), portfolio CTA; deploy **4everland** from `main` (not Fleek). |
@@ -466,7 +466,7 @@ The API provider temporarily refuses requests (**too many** in a short window). 
 *These are the words that separate a real system from a demo. When you can explain them, a technical founder knows you built something.*
 
 **Cron / Cron job**
-A scheduled task that fires automatically at a set time — like an alarm clock for code. "Daily blog cron at 09:30 Panama time" means at 9:30 AM every day, a function runs automatically, generates an article, and publishes it. No human clicks anything. This is what "automated" actually means — not a button you press, but a timer that runs whether you're awake or not.
+A scheduled task that fires automatically at a set time — like an alarm clock for code. "Daily blog cron at 15:00 Panama time" means at 3:00 PM every day, a function runs automatically, generates an article, and publishes it. No human clicks anything. This is what "automated" actually means — not a button you press, but a timer that runs whether you're awake or not.
 
 **GraphQL**
 A way to ask an API for exactly the data you need, nothing more. Hashnode uses GraphQL: instead of getting a whole page of data, the engine sends one specific query — `publishPost(input: {...})` — and gets back exactly the new post's URL. More precise and faster than traditional REST APIs for complex publishing operations.

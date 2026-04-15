@@ -12,7 +12,7 @@ SECRET=$(openssl rand -hex 16)
   echo "# Hashnode daily (deploy 2026-04-09)"
   echo "HASHNODE_DAILY_ENABLED=true"
   echo "HASHNODE_DAILY_PUBLIC=true"
-  echo "HASHNODE_DAILY_CRON=30 9 * * *"
+  echo "HASHNODE_DAILY_CRON=0 15 * * *"
   echo "HASHNODE_DAILY_TZ=America/Panama"
   echo "HASHNODE_DAILY_TRIGGER_SECRET=${SECRET}"
 } >> .env

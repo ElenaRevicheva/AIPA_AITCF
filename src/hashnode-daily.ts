@@ -1,6 +1,10 @@
 /**
  * Daily Hashnode publisher: Claude long-form → GraphQL publishPost.
  * Opt-in via HASHNODE_DAILY_ENABLED=true. Token + publication from env (same as scripts/hashnode-publish.mjs).
+ *
+ * Listed vs delisted: aideazz.xyz/blog loads posts via Hashnode *public* GraphQL (`publication.posts`).
+ * Delisted posts are hidden from that feed and often 404 for logged-out visitors — so daily posts default
+ * to **listed** (public). Opt into stealth with HASHNODE_DAILY_DELISTED=true or HASHNODE_DAILY_PUBLIC=false.
  */
 import * as cron from "node-cron";
 import * as fs from "fs";
@@ -9,6 +13,33 @@ import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
 
 const GQL = "https://gql.hashnode.com/";
+
+/** Base site where /blog mirrors Hashnode via public GraphQL (see aideazz repo `src/lib/hashnode-public.ts`). */
+const AIDEAZZ_SITE = (process.env.AIDEAZZ_SITE_URL || "https://aideazz.xyz").replace(/\/$/, "");
+
+/** True if posts are delisted (hidden from public feed + aideazz blog sync). Default: false = listed. */
+export function hashnodeDailyIsDelisted(): boolean {
+  if (process.env.HASHNODE_DAILY_DELISTED === "true") return true;
+  if (process.env.HASHNODE_DAILY_PUBLIC === "false") return true;
+  return false;
+}
+
+/** Best-effort: confirm the Hashnode URL responds (may 403 from datacenter IPs — ignore then). */
+async function verifyHashnodeUrlReachable(url: string): Promise<{ ok: boolean; status: number }> {
+  try {
+    const r = await fetch(url, {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        Accept: "text/html",
+        "User-Agent": "Mozilla/5.0 (compatible; CTO-AIPA/1.0; +https://aideazz.xyz)",
+      },
+    });
+    return { ok: r.ok, status: r.status };
+  } catch {
+    return { ok: false, status: 0 };
+  }
+}
 
 /** Optional: set TELEGRAM_HASHNODE_NOTIFY_CHAT_ID + TELEGRAM_BOT_TOKEN for post alerts */
 async function notifyTelegramHashnodePublished(title: string, urlOrMessage: string): Promise<void> {
@@ -391,8 +422,11 @@ async function crossPostToDevTo(
 export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: string; maxTokens: number }): Promise<{
   title: string;
   url: string;
+  slug?: string;
+  aideazzBlogUrl: string;
   topicIndex: number;
   devtoUrl?: string | undefined;
+  delisted: boolean;
 }> {
   const token = process.env.HASHNODE_ACCESS_TOKEN?.trim();
   if (!token) throw new Error("HASHNODE_ACCESS_TOKEN missing");
@@ -431,7 +465,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   }
 
   const publicationId = await resolvePublicationId(token);
-  const delisted = process.env.HASHNODE_DAILY_PUBLIC !== "true";
+  const delisted = hashnodeDailyIsDelisted();
   const input = {
     publicationId,
     title: parsed.title.slice(0, 200),
@@ -448,12 +482,25 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     },
   };
 
-  const out = await gql<{ publishPost: { post: { title: string; url: string } } }>(PUBLISH_MUTATION, { input }, token);
+  const out = await gql<{ publishPost: { post: { title: string; url: string; slug: string } } }>(
+    PUBLISH_MUTATION,
+    { input },
+    token
+  );
   const post = out.publishPost?.post;
   if (!post?.url) throw new Error("publishPost returned no URL");
 
   writeTopicIndex(index);
-  console.log(`📰 Hashnode daily: published — ${post.url} (${delisted ? "delisted" : "public feed"})`);
+  console.log(`📰 Hashnode daily: published — ${post.url} (${delisted ? "delisted" : "listed — aideazz/blog sync"})`);
+
+  const reach = await verifyHashnodeUrlReachable(post.url);
+  if (!reach.ok && reach.status === 404) {
+    console.warn(
+      `📰 Hashnode URL returned HTTP ${reach.status} — if delisted was unintentional, set HASHNODE_DAILY_DELISTED=false and HASHNODE_DAILY_PUBLIC=true on Oracle.`
+    );
+  } else if (!reach.ok && reach.status && reach.status !== 403) {
+    console.warn(`📰 Hashnode URL check: HTTP ${reach.status} (may be bot-filter; verify in browser).`);
+  }
 
   // Cross-post to Dev.to with canonical pointing back — genuine DA 90+ backlink
   const devtoUrl = await crossPostToDevTo(post.title, parsed.markdown, post.url);
@@ -467,12 +514,36 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     topicIndex: index,
   });
 
-  const telegramMsg = devtoUrl
-    ? `📰 Published + cross-posted\n\n${post.title}\n🔗 Hashnode: ${post.url}\n🔗 Dev.to: ${devtoUrl}`
-    : `📰 Published\n\n${post.title}\n${post.url}`;
-  await notifyTelegramHashnodePublished(post.title, telegramMsg.includes("Dev.to") ? telegramMsg : post.url);
+  const slug = post.slug?.trim() || "";
+  const aideazzBlogUrl = slug ? `${AIDEAZZ_SITE}/blog/${encodeURIComponent(slug)}` : `${AIDEAZZ_SITE}/blog`;
+  const lines = [
+    devtoUrl ? "📰 Published + cross-posted (Hashnode + Dev.to + aideazz blog feed)" : "📰 Published (Hashnode + aideazz blog feed)",
+    "",
+    post.title,
+    `🔗 Hashnode: ${post.url}`,
+    `🔗 Site: ${aideazzBlogUrl}`,
+  ];
+  if (devtoUrl) lines.push(`🔗 Dev.to: ${devtoUrl}`);
+  if (delisted) {
+    lines.push("");
+    lines.push("⚠️ Delisted: hidden from public Hashnode feed — aideazz.xyz/blog may not list this post.");
+  }
+  if (!reach.ok && reach.status === 404) {
+    lines.push("");
+    lines.push("⚠️ URL check returned 404 — confirm post is listed in Hashnode dashboard.");
+  }
+  const telegramMsg = lines.join("\n");
+  await notifyTelegramHashnodePublished(post.title, telegramMsg);
 
-  return { title: post.title, url: post.url, topicIndex: index, devtoUrl: devtoUrl ?? undefined };
+  return {
+    title: post.title,
+    url: post.url,
+    aideazzBlogUrl,
+    topicIndex: index,
+    delisted,
+    ...(slug ? { slug } : {}),
+    ...(devtoUrl ? { devtoUrl } : {}),
+  };
 }
 
 export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model: string; maxTokens: number }): cron.ScheduledTask | null {
@@ -480,8 +551,8 @@ export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model:
     console.log("📰 Hashnode daily: off (set HASHNODE_DAILY_ENABLED=true to schedule)");
     return null;
   }
-  // Default: 09:30 every day, America/Panama (UTC−5, Panama City — no DST)
-  const cronExpr = process.env.HASHNODE_DAILY_CRON || "30 9 * * *";
+  // Default: 15:00 (3:00 PM) every day, America/Panama (UTC−5, Panama City — no DST)
+  const cronExpr = process.env.HASHNODE_DAILY_CRON || "0 15 * * *";
   const tz = process.env.HASHNODE_DAILY_TZ || "America/Panama";
   const job = cron.schedule(
     cronExpr,
@@ -495,7 +566,7 @@ export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model:
     { timezone: tz }
   );
   console.log(
-    `📰 Hashnode daily: scheduled ${cronExpr} (${tz}) — public feed: ${process.env.HASHNODE_DAILY_PUBLIC === "true" ? "yes" : "no (delisted)"}`
+    `📰 Hashnode daily: scheduled ${cronExpr} (${tz}) — listed (aideazz sync): ${hashnodeDailyIsDelisted() ? "no (DELISTED)" : "yes"}`
   );
   return job;
 }
