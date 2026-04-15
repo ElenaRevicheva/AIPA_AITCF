@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 14, 2026 (v15.8 — postmortem: Oracle wallet + `database.ts` resilience; Places ingest verified end-to-end) | Prior: April 13, 2026 (v15.7 — GEO FAQPage, live on aideazz.xyz) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 16, 2026 (v15.9 — **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/seo.ts`: single `applyPageSeo` / `applyHomePageSeo`; portfolio meta fix; see [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026)) | Prior: April 14, 2026 (v15.8 — Oracle wallet + `database.ts` resilience; Places ingest) | April 13, 2026 (v15.7 — GEO FAQPage) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -39,6 +39,7 @@ This block is for the **next engineer** (Claude Code, Cursor, human): **verifiab
 | **Env** | `.env.example` | Documented optional **`CODE_REVIEW_FALLBACK_MODEL`**. | Same Haiku default as triage fallback — predictable ops. |
 | **Phase 5 HTTP + ops** | AIPA_AITCF | **`POST /leads/triage-run`** — default **202** + background triage; sync JSON with **`?wait=1`** or **`npm run triage:fire`** + **`TRIAGE_FIRE_WAIT=1`**. **`GET /leads/dashboard`** — if `LEAD_TRIAGE_SECRET` is set, opening the URL **without** `?secret=` shows a small **HTML unlock form** (not a bare 401); bookmark **`?secret=…`** or use Bearer automation. On Oracle, **`TRIAGE_SKIP_GROQ`** → Haiku-only triage (saves **Groq** quota for Hashnode / code review). | Avoids proxy socket hang-up; humans can open the dashboard from a phone without hand-building query strings. |
 | **GSC “duplicate canonical”** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** repo (not AIPA_AITCF) | Removed the **static** `<link rel="canonical" href="https://aideazz.xyz/" />` from root **`index.html`** (it made every crawled URL look like `https://aideazz.xyz/` before JS ran). **Homepage** now sets canonical in **`src/pages/Index.tsx`** via `useEffect`, same pattern as `/about`, `/blog`, `/portfolio`. | Fixes Search Console confusion when Google reads HTML first on SPA deploys (IPFS/4everland). Deploy **4everland** from `main` after pull. |
+| **SPA meta — one module (Apr 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/seo.ts` + pages | **`applyPageSeo()`** sets `document.title`, `meta[name=description]`, OG + Twitter, canonical, `og:site_name`, optional `robots`. **`applyHomePageSeo()`** reapplies strings matching **`index.html`** when **`/`** mounts — fixes meta staying on **portfolio** copy after client-side navigation home. **`BusinessCard`** previously only updated description if a tag existed; now always ensured. **`NotFound`**: `noindex, follow` + short description. Commit on `main`: centralize; **no duplicate** `setMeta` blocks across `About` / `Blog*` / `Portfolio`. | Audits that only read static HTML still see **`index.html`** for first paint; after JS, **DevTools → Elements → `<head>`** or **[opengraph.xyz](https://www.opengraph.xyz/)** on the full URL proves per-route tags. Deploy **4everland** from `main`. Details: [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026). |
 | **Oracle deploy** | `ubuntu@` Oracle, `~/cto-aipa` | **`git pull` → `npm run build` → `pm2 restart cto-aipa --update-env`**. Then **`npm run triage:fire`** once **`curl` to `127.0.0.1:3000/`** succeeds. | **HTTP 202** + triage start in PM2 logs is the smoke test. |
 | **Phase 4c–4d ingest (Manny-style sources)** | `prospect-places.ts`, `doc-ingest.ts`, `cto-aipa.ts`, `telegram-bot.ts` | **Places:** local/industry prospect lists via **Google Places API** (requires **`GOOGLE_PLACES_API_KEY`**). **Doc:** operational documents → entities → same **`outreach_targets`** pipeline. Telegram **`/places_ingest`**, **`/doc_ingest`**. | Confirms blueprint “list builder” + “takeoff/RFP” paths exist in code — not only YC JSON. |
 
@@ -218,6 +219,21 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | Team nav link added | DONE | "Team" (EN) / "Equipo" (ES) links to `#team` anchor on homepage |
 | Founder section enriched | DONE | Career phases (Executive 2011-2018 + AI Builder 2025-Present) + stats grid (9 agents, $0/month, 76/24%, 12 months) added to VisionSection |
 | Social sharing validated | DONE | opengraph.xyz shows correct title, description, image for aideazz.xyz and /portfolio |
+
+<a id="phase-1c-addendum-centralized-spa-meta--april-2026"></a>
+
+### Phase 1c addendum: Centralized SPA meta — April 2026
+
+> **Code lives in the [aideazz](https://github.com/ElenaRevicheva/aideazz) repo** (not AIPA_AITCF). This addendum records what shipped so the marketing doc stays the single source of truth.
+
+| Task | Status | Details |
+|---|---|---|
+| **`src/lib/seo.ts`** | DONE | Exports **`SITE_ORIGIN`**, **`DEFAULT_OG_IMAGE`**, **`HOME_SEO`** (same copy as root **`index.html`**), **`applyPageSeo(opts)`** (title, description, canonical URL, `og:type`, optional Twitter overrides, optional **`robots`**), **`applyHomePageSeo()`** for **`/`**. |
+| **`Index.tsx`** | DONE | On mount, calls **`applyHomePageSeo()`** so returning from **`/portfolio`** (or any route) **restores** homepage title + description + OG/Twitter — not leftover portfolio text. |
+| **`BusinessCard.tsx` (`/portfolio`)** | DONE | Replaced ad-hoc meta helpers with **`applyPageSeo`**; **fix:** description is **created or updated** (previously only **`setAttribute`** if `meta[name=description]` already existed). EN/ES title + description unchanged in meaning. |
+| **`About`, `BlogIndex`, `BlogPost`** | DONE | Same helper — no duplicated **`setMeta`** loops; **`BlogPost`** truncates description for long briefs (**`slice(0, 320)`**). |
+| **`NotFound`** | DONE | **`applyPageSeo`** with **`robots: noindex, follow`** and a short 404 description; canonical uses current path. |
+| **How to prove (manual QA)** | — | **After deploy:** open **`https://aideazz.xyz`**, **`/portfolio`**, **`/about`**, **`/blog`** → **DevTools → Elements → `<head>`** — confirm **`meta name=description`** and **`og:*`** match the route. **[opengraph.xyz](https://www.opengraph.xyz/)** paste full URL for a **card preview**. **Limitation (unchanged):** “View Page Source” on a deep link still shows the **built `index.html`** until JS runs — same SPA caveat as the canonical fix above. |
 
 ### Phase 1d: GA4 Analytics — CONFIRMED WORKING
 
