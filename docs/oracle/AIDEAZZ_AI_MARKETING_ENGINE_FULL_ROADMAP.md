@@ -197,6 +197,12 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | CDN warming workflow | DONE | GitHub Actions cron every 2h — pre-fetches sitemap/robots to keep IPFS CDN edges warm |
 | Build-time SEO verification | DONE | **`node scripts/generate-sitemap.mjs`** (Hashnode + static routes → `public/sitemap.*`) then **`vite build`** then **`scripts/verify-seo.mjs`** — fails build if sitemap.xml, sitemap.txt, or robots.txt missing from dist/ |
 
+**How to check (non-dev guide):**
+1. Open **https://aideazz.xyz/sitemap.xml** in your browser — you should see a list of 11 URLs. If it loads, the sitemap works.
+2. Open **https://aideazz.xyz/robots.txt** — you should see lines like `User-agent: GPTBot` and `Allow: /`. If you see it, robots.txt works.
+3. Go to **[Google Search Console](https://search.google.com/search-console)** → select `sc-domain:aideazz.xyz` → left sidebar **Sitemaps** — status should say "Success" with 11 discovered URLs.
+4. In GSC → left sidebar **Pages** — see how many pages are indexed. This number should grow over the next days.
+
 ### Phase 1b: GEO Foundation — DONE
 
 | Task | Status | Details |
@@ -212,6 +218,12 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | noscript content block | DONE | Full static HTML in index.html for AI crawlers that don't execute JavaScript — all 9 agents described, tech stack, metrics, FAQs |
 | Positioning update (EN + ES) | DONE | "Executive-Turned-AI-Builder" in both languages |
 
+**How to check (non-dev guide):**
+1. Open **https://aideazz.xyz** → right-click → **View Page Source** → press Ctrl+F and search `application/ld+json` — you should find 3 JSON blocks (Organization, Person, FAQPage). If you see them, the schemas are live.
+2. Ask **ChatGPT** or **Perplexity**: "Who is Elena Revicheva?" or "Who builds AI agents in Panama?" — if she appears in the answer, GEO is working. (This may take weeks/months to build up.)
+3. Go to **https://search.google.com/test/rich-results** → paste `https://aideazz.xyz` → click **Test URL**. It should show "FAQ" and "Organization" as detected structured data.
+4. Open **https://aideazz.xyz** → View Page Source → search `noscript` — you should see a large block of static HTML text describing all 9 agents. This is what AI crawlers read.
+
 ### Phase 1c: OG Image & Social Sharing Fix — DONE
 
 | Task | Status | Details |
@@ -221,6 +233,11 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | Team nav link added | DONE | "Team" (EN) / "Equipo" (ES) links to `#team` anchor on homepage |
 | Founder section enriched | DONE | Career phases (Executive 2011-2018 + AI Builder 2025-Present) + stats grid (9 agents, $0/month, 76/24%, 12 months) added to VisionSection |
 | Social sharing validated | DONE | opengraph.xyz shows correct title, description, image for aideazz.xyz and /portfolio |
+
+**How to check (non-dev guide):**
+1. Go to **https://www.opengraph.xyz** → paste `https://aideazz.xyz` → you should see Elena's photo, the title "AIdeazz", and a description. This is exactly what WhatsApp/LinkedIn/Twitter show when someone shares the link.
+2. Paste `https://aideazz.xyz/portfolio` too — should show a different title and description specific to the portfolio page.
+3. Copy the link `https://aideazz.xyz` and paste it into a WhatsApp chat (to yourself) — the preview card should show the photo and title.
 
 <a id="phase-1c-addendum-centralized-spa-meta--april-2026"></a>
 
@@ -264,7 +281,14 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | **`_redirects` `.gitignore` seal** | DONE | `public/_redirects`: added `/.gitignore / 301` rule **before** the `/* /index.html 200` catch-all. Root cause: catch-all was serving the React app at HTTP 200 for `/.gitignore` — Google indexed it. `robots.txt Disallow` only prevents crawling, does not block serving. GSC URL removal also submitted. |
 | **404 noindex fix** | DONE | `src/App.tsx`: `<Route path="*">` was a bare `<div>404 - Page Not Found</div>` that never invoked `NotFound.tsx`. Imported `NotFound` and wired it. `NotFound.tsx` already had `applyPageSeo({ robots: "noindex, follow" })` — it just wasn't being used. |
 | **hreflang EN/ES** | DONE | `index.html`: added three `<link rel="alternate" hreflang="...">` tags — `en`, `es`, `x-default` all pointing to `https://aideazz.xyz/`. Site serves both languages at same URLs via i18next browser/localStorage detection; hreflang signals both to Google and avoids duplicate-content penalty for the bilingual content. |
-| **Cloudflare HTTP 301 www→apex** | PENDING | JS redirect is live but HTTP 301 at the DNS/CDN layer is still needed for SEO (bots that read only response headers, link equity). Instructions: `dash.cloudflare.com → aideazz.xyz → Rules → Redirect Rules → create: Hostname = www.aideazz.xyz → Static 301 → https://aideazz.xyz/ (preserve path + query)`. Requires www CNAME to be orange-cloud (proxied). |
+| **Cloudflare HTTP 301 www→apex** | DONE (Apr 18) | Cloudflare Redirect Rules: `www.aideazz.xyz*` → `https://aideazz.xyz/$1`, 301 Permanent, preserve query string. www CNAME added (proxied/orange cloud). Verified via httpstatus.io and browser. |
+
+**How to check (non-dev guide) — all of Phase 1 redirects + hreflang:**
+1. Go to **https://httpstatus.io** → type `www.aideazz.xyz` → click **Check status**. Should show **301** → **200**. That means www redirects permanently to apex.
+2. Type `https://www.aideazz.xyz` in your browser — you should land on `https://aideazz.xyz` (no "www" in the address bar).
+3. Open `https://aideazz.xyz` → View Page Source → Ctrl+F search `hreflang` — you should see three `<link>` tags for `en`, `es`, and `x-default`.
+4. Type `https://aideazz.xyz/.gitignore` in your browser — should redirect you to the homepage (not show file contents).
+5. Type `https://aideazz.xyz/some-random-page-that-doesnt-exist` — should show the 404 page (not a blank white page).
 
 ### Phase 1d: GA4 Analytics — CONFIRMED WORKING
 
@@ -277,13 +301,18 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | GA4 dashboard routes | DONE | FastAPI `/analytics/dashboard` and `/analytics/metrics` endpoints built |
 | Live data confirmed | DONE | API returns real data: 189 users, 215 sessions, 242 pageviews (7-day window, April 8, 2026) |
 
+**How to check (non-dev guide):**
+1. Go to **https://analytics.google.com** → select the AIdeazz property (ID `515154124`) → you should see real-time visitors, page views, traffic sources. If you see numbers, GA4 is working.
+2. Click **Reports** → **Acquisition** → **Traffic acquisition** — this shows WHERE your visitors come from (Google, direct, social, etc.).
+3. Click **Reports** → **Engagement** → **Pages and screens** — this shows WHICH pages people visit most.
+
 ### GSC Indexing Status — NORMAL
 
 | Item | Status | Details |
 |---|---|---|
 | "Redirect page" warning | NORMAL | `/card` → `/portfolio` 301 redirect — Google correctly indexes /portfolio as canonical, marks /card as redirect. Not an error. |
 | `/.gitignore` indexed | RESOLVED | URL removal submitted Apr 17, 2026. Root cause: `_redirects` catch-all `/* /index.html 200` served React app at HTTP 200 for this path. Fixed: added `/.gitignore / 301` rule before the catch-all in `_redirects`. |
-| www homepage indexed, apex not | IN PROGRESS | GSC showed "Duplicate, Google chose different canonical than user" for apex. www was crawled first, became Google's preferred canonical. JS redirect deployed (`main.tsx`). Indexing request submitted for `https://aideazz.xyz/`. Resolves in 2–7 days. **Pending:** Cloudflare HTTP 301 www→apex. |
+| www homepage indexed, apex not | IN PROGRESS | GSC showed "Duplicate, Google chose different canonical than user" for apex. www was crawled first, became Google's preferred canonical. JS redirect deployed (`main.tsx`) + **Cloudflare HTTP 301 deployed Apr 18** (verified via httpstatus.io + browser). Indexing request submitted for `https://aideazz.xyz/`. Resolves in 2–7 days as Google re-crawls. |
 | Apex `/portfolio` indexing | IN PROGRESS | Indexing request submitted Apr 17, 2026 via GSC URL Inspection. |
 | Apex `/blog` indexing | IN PROGRESS | Indexing request submitted Apr 17, 2026 via GSC URL Inspection. |
 
@@ -304,6 +333,14 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | **Dev.to cross-posting** | DONE | `crossPostToDevTo()` — fires after Hashnode publish; sets `canonical_url` → Hashnode URL (genuine DA 90+ backlink pointing to aideazz.xyz); `DEVTO_API_KEY` in Oracle `.env`. Telegram notify includes both URLs. Skipped silently if key absent. |
 | **LLM pipeline extras** (draft queue, human review before publish) | NOT STARTED | Current path is **publish** on schedule (Elena’s preference for her own Hashnode). **Client deployments** will usually need **`createDraft`** + Telegram approve/reject — see [Client-ready gaps](#client-ready-gaps). |
 
+**How to check (non-dev guide):**
+1. Open **https://aideazz.xyz/blog** — you should see a list of blog posts. If posts appear, the Hashnode sync is working.
+2. Click any post — it should open with full content on `aideazz.xyz/blog/the-post-title`.
+3. Open **https://aideazz.hashnode.dev** — same posts should appear here (this is where they are originally published).
+4. Open **https://dev.to/elenarevicheva** (or search Elena Revicheva on dev.to) — cross-posted articles should appear with a "Originally published at" link pointing back to Hashnode.
+5. Check Telegram: the CTO AIPA bot should send you a notification every day around 3 PM Panama time with the title + link of the new post. If you got a message today, the daily publisher is alive.
+6. To verify the publishing is truly automatic: check your Hashnode dashboard — posts should appear every day without you doing anything. If a day is missing, something went wrong on Oracle.
+
 ### Phase 3: UTM Attribution — COMPLETE (end-to-end, production)
 
 The first three rows are Phase 3 only. The last three rows are a **cross-phase summary** (same facts repeated under Phase 4–6 sections below).
@@ -313,6 +350,13 @@ The first three rows are Phase 3 only. The last three rows are a **cross-phase s
 | Phase 3: UTM + inquiry pipeline | **COMPLETE** | **aideazz:** `InquiryForm` — UTM from URL → `POST https://webhook.aideazz.xyz/cto/marketing/inquiry-proxy` (no Bearer in browser). **CTO AIPA (Oracle):** `business_leads` in Oracle; `POST /marketing/inquiry` (Bearer) for automation; `POST /marketing/inquiry-proxy` (Origin allowlist for `aideazz.xyz` / `www`, honeypot `company`, per-IP rate limit). **Weekly Telegram digest** of new leads (optional env). **Docs:** `docs/oracle/CTO_AIPA_PUBLIC_HTTPS.md`. |
 | Phase 3b: Email notifications | **COMPLETE** | **Resend** via `RESEND_API_KEY`. Team inbox: `MARKETING_INQUIRY_NOTIFY_TO` (default `aipa@aideazz.xyz`). Submitter gets confirmation email when address is valid. **Sender:** `MARKETING_INQUIRY_FROM` — production uses verified **`AIdeazz <aipa@aideazz.xyz>`** (same domain pattern as VibeJobHunter). Implementation: `src/marketing-notify.ts`. |
 | Phase 3c: reCAPTCHA Enterprise + inquiry | **COMPLETE (production)** | **Verified Apr 2026:** end-to-end form submit on `https://aideazz.xyz` → Oracle `POST /marketing/inquiry-proxy` → `business_leads` + Resend team email (`[AIdeazz] Inquiry — …`). **Why it was hard:** initial key lived in GCP project `aideazz-177575763145287` (no console access); API key was created in **`aideazz-1775763145287`** — Enterprise **CreateAssessment** must use the **same** project as the reCAPTCHA **site key** + an API key from that project. Classic `siteverify` + `api.js` also failed for Enterprise-only keys. **What we did:** (1) Registered a **new** reCAPTCHA Enterprise key in **`aideazz-1775763145287`** (domains `aideazz.xyz`, `www.aideazz.xyz`; site key id `6LcHda8sAAAAAAGwl5alB2xdX_6Dqve5a5vifoHj`). (2) **Credentials** in that project: API key restricted to **reCAPTCHA Enterprise API**. (3) **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/recaptcha.ts`: load **`https://www.google.com/recaptcha/enterprise.js?render=…`**, **`grecaptcha.enterprise.execute`** with action **`inquiry`** (not classic `api.js` / `grecaptcha.execute`). **`VITE_RECAPTCHA_SITE_KEY`** in `.env.production` + deploy **4everland** from `main`. (4) **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** `src/marketing-notify.ts`: **`verifyRecaptchaEnterprise`** → `recaptchaenterprise.googleapis.com/.../assessments?key=…`; optional fallback to classic **`siteverify`**; verification can run with **Enterprise-only** env (no legacy secret required when `RECAPTCHA_ENTERPRISE_PROJECT_ID` + `RECAPTCHA_ENTERPRISE_API_KEY` + `RECAPTCHA_SITE_KEY` are set). **Oracle** `~/cto-aipa/.env`: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_ENTERPRISE_PROJECT_ID=aideazz-1775763145287`, `RECAPTCHA_ENTERPRISE_API_KEY`; optional `RECAPTCHA_SECRET_KEY`; optional `RECAPTCHA_MIN_SCORE` (default **0.1** in code). **`pm2 restart cto-aipa --update-env`**. **Docs:** `.env.example` in both repos. |
+**How to check Phase 3 (non-dev guide):**
+1. Open **https://aideazz.xyz** → scroll to the bottom → find the **contact/inquiry form** → fill it out with YOUR OWN email as a test. Put “TEST from Elena” in the message.
+2. Check your email inbox — you should receive a confirmation email from `AIdeazz <aipa@aideazz.xyz>` within 1–2 minutes. If you got it, the email notification works.
+3. Check the CTO AIPA Telegram bot — you should also get a Telegram notification about the new inquiry.
+4. To verify UTM tracking: add `?utm_source=test&utm_campaign=selfcheck` to the URL before visiting the form. Example: `https://aideazz.xyz?utm_source=test&utm_campaign=selfcheck` → then fill the form. The inquiry in Oracle should capture those UTM values.
+5. To see ALL leads: open **https://webhook.aideazz.xyz/cto/leads/dashboard** → enter your secret to unlock → any form submissions (including your test) should appear in the list.
+
 | Phase 4: Founder Outreach Pipeline | **COMPLETE (verified send path)** | Real Resend + Oracle; see “Phase 4 outreach — what is actually working” and Phase 4 section below. |
 | Phase 5: Lead Triage | **OPERATIONAL (Apr 2026)** | Oracle **`lead_triage`** + **`agent_outcomes`**; sources **`business_leads`** (site inquiries) + **`outreach_log`** (replies). Classification: **Groq** `llama-3.3-70b-versatile` → **Claude Haiku** fallback (**`TRIAGE_FALLBACK_MODEL`** / **`TRIAGE_SKIP_GROQ`**); **Sonnet** optional refine for high urgency. **`/leads/triage-status`**, **`POST /leads/triage-run`** (202 async or **`?wait=1`** sync), **`GET /leads/dashboard`** (unlock form or **`?secret=`**), Telegram **`/triage`**, cron **`TRIAGE_CRON`**. **Webhook hardening:** **`reviewCode`** → Haiku on Groq failure — shared process with triage. |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
@@ -370,6 +414,14 @@ This subsection is the honest answer to “is it an empty gun?” **The code pat
 **What needs to happen next for more conversations (product, not wiring):**
 - Refresh or widen **target sources** (CTO: more companies; VJH: job sources when ATS times out).
 
+**How to check Phase 4 (non-dev guide):**
+1. Open Telegram → find the **CTO AIPA bot** (`@aitcf_aideazz_bot`) → type `/outreach` — it should reply with a summary of how many outreach emails were sent, how many targets exist, recent activity.
+2. Type `/outreach_drafts` — shows any email drafts waiting to be sent.
+3. Type `/outreach_ingest` — shows the last ingestion cycle results (how many new companies were found).
+4. Check your **aipa@aideazz.xyz** email (or wherever Resend sends from) — look for delivery receipts or bounces. Real emails going out = the outreach pipeline is alive.
+5. For VibeJobHunter: open Telegram → find `@vibejob_hunter_bot` → it should be sending you daily digests of jobs found, applications sent, and founder outreach. If you see today's digest, VJH is running.
+6. Quick health check: if both bots are responding to commands in Telegram, the Oracle server is alive and both systems are operational.
+
 ### Phase 5: Lead Triage — OPERATIONAL ON ORACLE (E2E + dashboard UX + webhook stability)
 
 | Task | Status | Details |
@@ -392,7 +444,25 @@ This subsection is the honest answer to “is it an empty gun?” **The code pat
 
 **Cross-module note:** **Groq** quota is shared (code review, Hashnode, Atuona creative paths, triage). Levers: **`TRIAGE_SKIP_GROQ`**, **`CODE_REVIEW_FALLBACK_MODEL`**, or raising Groq limits.
 
-**Phase 6 (showcase package / pitch docs)** — optional product packaging on top of live Phase 1–5 systems.
+**How to check Phase 5 (non-dev guide):**
+1. Open your browser → go to **https://webhook.aideazz.xyz/cto/leads/dashboard** — you should see either an unlock form (enter your secret) or the dashboard directly if you bookmarked it with `?secret=...`. This is the live lead triage dashboard.
+2. On the dashboard: you should see leads ranked by urgency (1–5 scale). Each lead shows its source (form inquiry or outreach reply), classification, and recommended action.
+3. In Telegram → CTO AIPA bot → type `/triage` — it should reply with the latest triage results (how many processed, how many urgent).
+4. Type `/triage_urgent` — shows only the high-urgency leads that need immediate attention.
+5. If the dashboard is empty or shows no leads: that means no inquiries have come through the form AND no outreach replies have been received. The triage engine works — it just has nothing to triage yet. Submit a test inquiry (see Phase 3 check) and then wait for the next triage cycle (daily at 8 AM Panama) or type `/triage` to trigger it manually.
+
+**Phase 6 (showcase package / pitch docs)** — NOT STARTED. Product packaging on top of live Phase 1–5 systems.
+
+**How to check Phase 6 (non-dev guide):**
+Phase 6 is NOT YET BUILT. When it's ready, here's what you should be able to do:
+1. Send a client a single link (e.g. `https://aideazz.xyz/showcase` or a pitch page) where they can see all 5 phases running live — blog publishing, inquiry form, lead triage dashboard, outreach stats, analytics.
+2. Have a 10-minute demo script you can walk through in person or on a Zoom call showing: "Here's a lead coming in → here's the AI triaging it → here's the dashboard showing priority → here's the outreach going out → here's the blog publishing every day."
+3. A shareable pitch deck or PDF (already partially exists at `https://aideazz.xyz/pitch.html` and `/pitch-es.html`) that connects the live systems to the client value proposition.
+
+**What's needed to complete Phase 6:**
+- A walkthrough page or video showing Phases 1–5 in action
+- A client-facing "here's what I'd wire for you" template
+- Connection between the pitch pages and the live proof (links to dashboard, blog, GSC stats)
 
 ---
 
