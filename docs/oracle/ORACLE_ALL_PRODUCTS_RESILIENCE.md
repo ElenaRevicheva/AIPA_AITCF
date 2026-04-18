@@ -217,3 +217,18 @@ Do this once on the server (SSH as above).
 - Migration/ports: `docs/RAILWAY_TO_ORACLE_MIGRATION.md`
 - **CTO AIPA + Places + Oracle (April 2026):** [AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md#postmortem--april-14-2026-why-it-looked-like-google-api-encoding-broke-oracle-and-how-it-was-fixed)
 - Private infra docs (may not list all products): [aideazz-private-docs / oracle-infrastructure](https://github.com/ElenaRevicheva/aideazz-private-docs/tree/docs/docs/plans/oracle-infrastructure)
+
+---
+
+## Last Verified (April 18, 2026)
+
+| Agent | Status | Notes |
+|-------|--------|-------|
+| CTO AIPA + Atuona | ✅ Running | Oracle wallet fixed Apr 14. GEO+SEO Marketing Engine Phases 1-5 operational. |
+| EspaLuz WhatsApp | ✅ Running | PayPal webhook signature verification still disabled — free/paid user detection unreliable. |
+| VibeJob Hunter | ✅ Running | Hard gate recalibrated Apr 10. 131-test eval harness complete. ATS_DRY_RUN status needs server verification. |
+| AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
+
+**Critical items needing server verification:**
+- `grep ATS_DRY_RUN /home/ubuntu/VibeJobHunterAIPA_AIMCF/.env` — is VJH actually submitting applications or just generating local artifacts?
+- EspaLuz PayPal signature verification — still disabled per WIRING_CONDUCTOR_WEEK1 audit.

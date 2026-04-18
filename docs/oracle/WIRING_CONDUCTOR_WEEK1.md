@@ -189,4 +189,22 @@ CREATE TABLE espaluz_funnel (
 
 ---
 
-**Version:** 1.0 — Build started 2026-04-02
+---
+
+## Updates Since Week 1 (April 2026)
+
+| Item | Status (Apr 18) | Detail |
+|------|-----------------|--------|
+| **VJH eval framework** | ✅ Complete (Mar 30) | 131 tests, 4 layers (keyword, bias, golden-set, LLM-as-judge). All green. Verified from actual code in `evals/`. |
+| **VJH founder outreach email** | ✅ Fixed (Apr 10) | `FROM_EMAIL` corrected to `aipa@aideazz.xyz`, `_send_email_message` TypeError fixed, `_extract_email` no longer returns `careers@` addresses. Claude retry resilience added. |
+| **VJH hard gate recalibration** | ✅ Done (Apr 10) | Senior/Staff/Principal excluded, IT outsourcers penalized, career gate pass rate tightened to ~20.7%. |
+| **VJH ATS_DRY_RUN** | ⚠️ NEEDS VERIFICATION | Was `true` on Apr 2. Needs server-side check: `grep ATS_DRY_RUN /home/ubuntu/VibeJobHunterAIPA_AIMCF/.env` |
+| **EspaLuz PayPal webhook** | ❌ Still broken | Signature verification still disabled. Free/paid user detection unreliable. |
+| **`agent_outcomes` table** | ✅ Deployed | Table exists in Oracle, `saveAgentOutcome` used by lead triage (`triage_cycle`). |
+| **`business_leads` table** | ✅ Deployed | Table exists, receives inquiry form submissions via `/marketing/inquiry-proxy`. |
+| **`espaluz_funnel` table** | ✅ Deployed | Table created. EspaLuz repos not yet wiring writes to it. |
+| **Unified briefing** | ⏳ Partial | `/daily` exists but doesn't pull from all 3 tables yet. |
+| **GEO+SEO Marketing Engine** | ✅ Complete (Apr 17-18) | Phases 1-5 shipped: JSON-LD, sitemap (11 URLs), daily blog publishing, UTM attribution, outreach, lead triage. Phase 1f: www→apex 301, hreflang, 404 noindex. |
+| **Oracle wallet** | ✅ Fixed (Apr 14) | Fresh wallet, correct WALLET_LOCATION, WALLET_PASSWORD in .env. |
+
+**Version:** 1.1 — Updated 2026-04-18 (original build started 2026-04-02)
