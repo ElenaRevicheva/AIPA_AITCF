@@ -26,8 +26,8 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 | 2 | **EspaLuz Telegram** | [EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot) | [t.me/EspaLuzFamily_bot](https://t.me/EspaLuzFamily_bot) | systemd | `espaluz-familybot` or TBD | Add `/health` or use `systemctl is-active` |
 | 3 | **EspaLuz Influencer** | [EspaLuz_Influencer](https://github.com/ElenaRevicheva/EspaLuz_Influencer) | [t.me/Influencer_EspaLuz_bot](https://t.me/Influencer_EspaLuz_bot) | systemd | `espaluz-influencer` | Confirm port on server; add block in script |
 | 4 | **Algom Alpha** | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | Automated posting on @reviceva | PM2 or systemd | e.g. `dragontrade` or `algom-alpha` | Add HTTP health or process check |
-| 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | PM2 or systemd (when on Oracle) | e.g. `vibejob` | e.g. `http://127.0.0.1:PORT/health` |
-| 6 | **AI Marketing Co-Founder** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | Same process as 5 when on Oracle | (same as 5) | (same as 5) |
+| 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | systemd | `vibejobhunter` | `systemctl is-active vibejobhunter` (autonomous loop; no HTTP) |
+| 6 | **AI Marketing Co-Founder (CMO)** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | systemd | `vibejobhunter-web` | `http://127.0.0.1:8080/health` (FastAPI: CTO `/api/tech-update`, `/health`) |
 | 7 | **OpenClaw Vibejob Shortlist** | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | systemd | `openclaw-gateway` | `http://127.0.0.1:18789/` |
 | 8 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` |
 | 9 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` |
@@ -114,6 +114,13 @@ if [ "$HTTP" != "200" ]; then
   sudo systemctl restart espaluz-whatsapp
 fi
 
+# VibeJob Hunter web + CMO bridge (systemd vibejobhunter-web, port 8080)
+HTTP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://127.0.0.1:8080/health 2>/dev/null || echo "000")
+if [ "$HTTP" != "200" ]; then
+  echo "VibeJobHunter web unhealthy (HTTP $HTTP), restarting vibejobhunter-web + vibejobhunter..."
+  sudo systemctl restart vibejobhunter-web vibejobhunter
+fi
+
 # EspaLuz Influencer (systemd) — UPDATE port/path to match your deployment
 # HTTP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://127.0.0.1:PORT/health 2>/dev/null || echo "000")
 # if [ "$HTTP" != "200" ]; then
@@ -142,6 +149,7 @@ LOG=/var/log/oci-keepalive.log
 dd if=/dev/urandom bs=1M count=10 of=/dev/null 2>/dev/null
 curl -s -o /dev/null --max-time 5 http://127.0.0.1:3000/ || true
 curl -s -o /dev/null --max-time 5 http://127.0.0.1:8081/webhook || true
+curl -s -o /dev/null --max-time 5 http://127.0.0.1:8080/health || true
 echo "$(date -Iseconds): keepalive" >> "$LOG"
 ```
 
@@ -226,7 +234,7 @@ Do this once on the server (SSH as above).
 |-------|--------|-------|
 | CTO AIPA + Atuona | ✅ Running | Oracle wallet fixed Apr 14. GEO+SEO Marketing Engine Phases 1-5 operational. |
 | EspaLuz WhatsApp | ✅ Running | PayPal webhook signature verification still disabled — free/paid user detection unreliable. |
-| VibeJob Hunter | ✅ Running | Hard gate recalibrated Apr 10. 131-test eval harness complete. ATS_DRY_RUN status needs server verification. |
+| VibeJob Hunter + CMO | ✅ Running (Oracle) | `vibejobhunter` + `vibejobhunter-web`; code at `70ee90a` (Apr 2026). Health: `curl -s http://127.0.0.1:8080/health`. Public `:8080` may be closed; set `CMO_WEBHOOK_URL` on CTO to a reachable URL if CTO must call CMO from outside the VM. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
 **Critical items needing server verification:**
