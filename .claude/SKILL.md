@@ -392,6 +392,7 @@ Flag as MISALIGNED if:
 - **Senior/Staff/Principal AI Engineer at 20+ person company**
 - **Roles requiring 5+ years Python/TS/ML — honest timeline is ~1 year**
 - **IT outsourcers (Nagarro, Infosys, Wipro, etc.) — founder pitch doesn't land**
+- **Any role that includes a whiteboard or take-home coding assessment** — Elena builds with Claude Code and Cursor daily; scratch-coding tests are incompatible. State this upfront and move on.
 
 Flag as POTENTIALLY ALIGNED if:
 - AI agents / automation / internal tools
@@ -434,12 +435,15 @@ When Elena says "interview prep" or asks about a specific company/role:
 **Key proof points to anchor to:**
 - "7 years board-level executive — can explain AI systems to non-technical stakeholders. Most engineers can't. Most executives can't ship. I do both."
 - "9 AI agents, 1 Oracle VM, $0/month infra, solo founder"
-- "15K+ lines TypeScript, 8 Oracle tables, 4 LLM APIs integrated"
+- "50K+ lines across the AIdeazz ecosystem (TypeScript, Python, JavaScript, SQL) — 9 production agents, 8 Oracle tables, 4 LLM APIs integrated"
 - "76/24 multi-model routing (Groq/Claude) with explicit cost reasoning — not default, deliberate"
 - "48+ NFTs published, Telegram bots with users in 19 countries"
 - "EspaLuz has early paid subscribers" (honest: very early, very small)
 - "Deterministic + LLM hybrid pipeline for code review (not just prompt → output)"
-- "117-test eval harness on VibeJobHunter — keyword, integration, golden-set layers, $0 API cost, 0.52s"
+- "131-test eval harness on VibeJobHunter — keyword, bias compensation, golden-set, LLM-as-judge (4 layers), ~$0.03/run"
+
+**On AI tools (state proactively, not defensively):**
+When asked "do you use AI tools?": "Yes — Claude Code and Cursor daily. That's how one person ships 9 production agents. I review every line, understand the system, own every decision. The tool is fast; the judgment is mine. If the role requires scratch-coding assessments, I'll be upfront: that's not how I work and not a good use of either of our time."
 
 **Skill gap deflection strategy (updated from career analysis v2):**
 For gaps (RAG, LangGraph, AWS): "I haven't used X in production yet, but my executive background means I've evaluated these decisions at a systems level — here's how I'd implement it given what I built in [related project]..." — then pivot to the working evidence.
