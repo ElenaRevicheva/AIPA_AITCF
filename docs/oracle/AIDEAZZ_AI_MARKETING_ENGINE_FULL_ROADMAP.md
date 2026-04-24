@@ -17,7 +17,7 @@ This file is organized around **six phases**. Everything else (AutoSEO critique,
 | **3** | Attribution | **UTM** + inquiry → Oracle **`business_leads`** — know which channel sent the lead. | **Complete** |
 | **4** | Outbound | **Cold email** (CTO AIPA “hire us” + VJH “hire me”) — Resend, Hunter, caps, honest **`outreach_log`**. | **Shipped & verified** |
 | **5** | Lead triage | **AI classification** → **`lead_triage`** + dashboard + Telegram — respond to the right signal first. | **Operational** |
-| **6** | Showcase | **Pitch package** — README + live demo proving Phases 1–5 (packaged doc / walkthrough). | **Not started** |
+| **6** | Showcase | **Pitch package** — README + live demo proving Phases 1–5 (packaged doc / walkthrough). | **Not started — ⚡ highest priority for hiring mission: this is the "show don't tell" asset every interview needs** |
 
 **Where to scroll:** **[Implementation (Phases 1–6)](#impl-phases-16)** — what actually shipped · **[PART 2 — build prompts](#part-2--the-full-roadmap-aideazz-first)** — Phase 1→6 copy-paste prompts for CTO AIPA · **[Phase 4 honesty check](#phase-4-honesty)** — “is the gun loaded?” (email volume reality).
 
