@@ -253,6 +253,7 @@ Persistence (Oracle table or JSON file)
 - **Formal evals** — ✅ **Complete (Mar 30, 2026).** 131 tests, 4 layers (keyword, bias, golden-set, LLM-as-judge). Not a gap anymore.
 - **AWS** — entirely Oracle-based. One lightweight deployment needed for resume credibility.
 - **Docker** — familiar, not in production. Systems run bare on Ubuntu with systemd/PM2.
+- **Fine-tuning** - need somehow to learn step by step.
 
 ---
 
