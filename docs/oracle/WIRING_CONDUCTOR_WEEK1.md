@@ -208,5 +208,6 @@ CREATE TABLE espaluz_funnel (
 | **Oracle wallet** | ✅ Fixed (Apr 14) | Fresh wallet, correct WALLET_LOCATION, WALLET_PASSWORD in .env. |
 
 | **EspaLuz Telegram — 2-layer RAG memory** | ✅ **Done (Apr 25, 2026)** | LangChain retrieval wired (`chat_history.messages[-5:]`) + pgvector semantic RAG (`espaluz_rag.py`, `espaluz_embeddings` table, OpenAI `text-embedding-3-small`, cosine sim > 0.75, top_k=3). Both layers injected into Claude system prompt via `format_mcp_request()`. Save wired after every turn. Confirmed in prod logs: "✅ RAG embeddings saved for session 8c6fd9e0..." |
+| **EspaLuz WhatsApp — 2-layer RAG memory** | ✅ **Done (Apr 25, 2026)** | Same `espaluz_rag.py` deployed to WhatsApp repo. Retrieval appended to `personalized_db_context` (existing personalization layer preserved). Two save blocks wired: voice/Spanish path (`spanish_input`) + text path (`message_text`). Session namespace: `whatsapp_*`. Confirmed in prod logs: "📚 LangChain: 5 recent turns retrieved" + "✅ RAG embeddings saved for session 51e064f5..." Pre-existing bug noted: `Enhancement error: slice(None, 5, None)` — non-critical. |
 
 **Version:** 1.2 — Updated 2026-04-25 (EspaLuz Telegram RAG + LangChain retrieval confirmed live)

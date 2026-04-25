@@ -62,7 +62,7 @@ My job is to:
 - **Executive communication** — translating AI systems to non-technical stakeholders (7 years board-level). Most engineers cannot do this. Most executives cannot ship. The hybrid is the differentiator.
 
 **Elena is still building (honest skill gaps):**
-- **RAG** — ✅ **Complete (Apr 25, 2026).** Production RAG shipped in EspaLuz Telegram. OpenAI `text-embedding-3-small` (1536 dims) → `espaluz_embeddings` table (PostgreSQL + pgvector, ivfflat index, cosine similarity). 2-layer memory: Layer 1 = LangChain exact last 5 turns; Layer 2 = semantic search over full history (similarity > 0.75, top_k=3). Injected into Claude system prompt before every reply. Confirmed live in prod logs. Cost ~$0.00002/message. Not a gap anymore.
+- **RAG** — ✅ **Complete (Apr 25, 2026).** Production RAG shipped in **both EspaLuz Telegram and WhatsApp**. Shared `espaluz_rag.py` module: OpenAI `text-embedding-3-small` (1536 dims) → `espaluz_embeddings` table (PostgreSQL + pgvector, ivfflat index, cosine similarity). 2-layer memory: Layer 1 = LangChain exact last 5 turns; Layer 2 = semantic search over full history (similarity > 0.75, top_k=3). Injected into Claude system prompt before every reply. Separate session namespaces per platform (`telegram_*` vs `whatsapp_*`). Confirmed live in prod logs on both bots. Cost ~$0.00002/message. Not a gap anymore.
 - **Evals / observability** — ✅ **Complete (Mar 30, 2026).** 131 tests, 4 layers: keyword scoring (L1), bias compensation (L2), golden-set routing (L3), LLM-as-judge consistency (L4). Layer 4 uses Claude Haiku against 22 golden-set jobs, ≥75% agreement threshold enforced, ~$0.03/run. Verified from actual code in `evals/`. Not a gap anymore.
 - **LangChain / LangGraph** — LangChain **wired and live** in EspaLuz Telegram: `PostgresChatMessageHistory` stores all turns (UUID5 session IDs), retrieval wired via `chat_history.messages[-5:]`. Not used in primary agents (CTO AIPA, VibeJobHunter). Be honest: "production use in EspaLuz, exposure in primary agents."
 - **AWS** — entirely Oracle-based stack. One honest deployment needed for credibility.
@@ -78,8 +78,8 @@ All 9 agents run here. $0/month (Oracle startup credits). ~99% uptime.
 
 | # | Agent | Repo | Interface | Process | Status |
 |---|-------|------|-----------|---------|--------|
-| 1 | **EspaLuz WhatsApp** | EspaLuzWhatsApp | WhatsApp wa.me/50766623757 | systemd `espaluz-whatsapp` | ✅ Live, Very early traction, very low revenue |
-| 2 | **EspaLuz Telegram** | EspaLuzFamilybot | t.me/EspaLuzFamily_bot | systemd `espaluz-familybot` | ✅ Live |
+| 1 | **EspaLuz WhatsApp** | EspaLuzWhatsApp | WhatsApp wa.me/50766623757 | systemd `espaluz-whatsapp` | ✅ Live. **2-layer memory live (Apr 25):** LangChain + pgvector RAG. Very early traction, very low revenue. |
+| 2 | **EspaLuz Telegram** | EspaLuzFamilybot | t.me/EspaLuzFamily_bot | systemd `espaluz-familybot` | ✅ Live. **2-layer memory live (Apr 25):** LangChain + pgvector RAG. |
 | 3 | **EspaLuz Influencer** | EspaLuz_Influencer | t.me/Influencer_EspaLuz_bot | systemd `espaluz-influencer` | ✅ Live |
 | 4 | **Algom Alpha (DragonTrade)** | dragontrade-agent | X @reviceva | PM2 `dragontrade-*` (4 apps) | Live, ⚠️ Rate-limit prone |
 | 5 | **VibeJob Hunter** | VibeJobHunterAIPA_AIMCF | t.me/vibejob_hunter_bot | systemd `vibejobhunter` | ✅ Live |
@@ -248,7 +248,7 @@ Persistence (Oracle table or JSON file)
 ```
 
 **What's NOT used yet (honest skill gaps — from career analysis v2):**
-- **RAG / vector DB** — ✅ **Done (Apr 25, 2026).** Production RAG in EspaLuz Telegram: pgvector + OpenAI embeddings + semantic retrieval injected into Claude system prompt. See `EspaLuzFamilybot/espaluz_rag.py`.
+- **RAG / vector DB** — ✅ **Done (Apr 25, 2026).** Production RAG in both EspaLuz Telegram and WhatsApp: pgvector + OpenAI embeddings + semantic retrieval injected into Claude system prompt. Shared `espaluz_rag.py` deployed to both repos. See `EspaLuzFamilybot/espaluz_rag.py` and `EspaLuzWhatsApp/espaluz_rag.py`.
 - **LangGraph / LangChain** — LangChain **production use** in EspaLuz Telegram (`PostgresChatMessageHistory` + retrieval wired). LangGraph: not yet built. Primary agents still SQL/file-based.
 - **Formal evals** — ✅ **Complete (Mar 30, 2026).** 131 tests, 4 layers (keyword, bias, golden-set, LLM-as-judge). Not a gap anymore.
 - **AWS** — entirely Oracle-based. One lightweight deployment needed for resume credibility.
@@ -261,7 +261,7 @@ Persistence (Oracle table or JSON file)
 
 | Gap | Honest State | Priority | Suggested Approach |
 |-----|-------------|----------|-------------------|
-| **RAG** | ✅ **Done (Apr 25, 2026)** — EspaLuz Telegram: pgvector + OpenAI embeddings, 2-layer memory (LangChain exact + semantic), injected into system prompt every reply. `espaluz_rag.py` + `espaluz_embeddings` table. | ✅ Closed | Interview answer: "I built a 2-layer memory system — LangChain for exact recent history, pgvector for semantic retrieval over full history. Both injected into Claude's system prompt before every reply. Similarity threshold 0.75, indexed with ivfflat. ~$0.00002/message." |
+| **RAG** | ✅ **Done (Apr 25, 2026)** — Both EspaLuz Telegram AND WhatsApp: shared `espaluz_rag.py`, pgvector + OpenAI embeddings, 2-layer memory (LangChain exact + semantic), injected into system prompt every reply. Separate session namespaces per platform. `espaluz_embeddings` table. | ✅ Closed | Interview answer: "I built a 2-layer memory system deployed across two production bots — LangChain for exact recent history, pgvector for semantic retrieval over full history. Both injected into Claude's system prompt before every reply. Similarity threshold 0.75, indexed with ivfflat. ~$0.00002/message. Same module, two platforms, one shared vector table." |
 | **Evals** | ✅ **Complete (Mar 30).** 131 tests, 4 layers (keyword scoring, bias compensation, golden-set routing, LLM-as-judge consistency). Layer 4 uses Claude Haiku, ≥75% agreement on 22 golden-set jobs. ~$0.03/run. Verified from actual code. | ✅ Done | Interview Q2 answer is now strong: "I built a 4-layer eval harness — 131 tests. Layer 4 uses Claude as independent judge against my deterministic engine. 75% threshold — below 100% deliberately because edge cases have legitimate ambiguity." |
 | **LangGraph** | Exposure only — LangChain imported in EspaLuz, not in primary agents | Post-RAG | Build one LangGraph variant of the code review pipeline. Be honest on resume: "exposure." |
 | **AWS** | Entirely Oracle stack. One deploy needed for credibility. | Week 3–5 | One Lambda or EC2 service. Goal: one honest line on resume, credible answer to "AWS experience?" |

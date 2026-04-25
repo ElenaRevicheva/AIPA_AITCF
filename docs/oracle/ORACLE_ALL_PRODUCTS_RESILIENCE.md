@@ -234,7 +234,7 @@ Do this once on the server (SSH as above).
 |-------|--------|-------|
 | CTO AIPA + Atuona | ✅ Running | Oracle wallet fixed Apr 14. GEO+SEO Marketing Engine Phases 1-5 operational. |
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
-| EspaLuz WhatsApp | ✅ Running | PayPal webhook signature verification still disabled — free/paid user detection unreliable. |
+| EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
 | VibeJob Hunter + CMO | ✅ Running (Oracle) | `vibejobhunter` + `vibejobhunter-web`; code at `70ee90a` (Apr 2026). Health: `curl -s http://127.0.0.1:8080/health`. Public `:8080` may be closed; set `CMO_WEBHOOK_URL` on CTO to a reachable URL if CTO must call CMO from outside the VM. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
