@@ -207,4 +207,6 @@ CREATE TABLE espaluz_funnel (
 | **GEO+SEO Marketing Engine** | ✅ Complete (Apr 17-18) | Phases 1-5 shipped: JSON-LD, sitemap (11 URLs), daily blog publishing, UTM attribution, outreach, lead triage. Phase 1f: www→apex 301, hreflang, 404 noindex. |
 | **Oracle wallet** | ✅ Fixed (Apr 14) | Fresh wallet, correct WALLET_LOCATION, WALLET_PASSWORD in .env. |
 
-**Version:** 1.1 — Updated 2026-04-18 (original build started 2026-04-02)
+| **EspaLuz Telegram — 2-layer RAG memory** | ✅ **Done (Apr 25, 2026)** | LangChain retrieval wired (`chat_history.messages[-5:]`) + pgvector semantic RAG (`espaluz_rag.py`, `espaluz_embeddings` table, OpenAI `text-embedding-3-small`, cosine sim > 0.75, top_k=3). Both layers injected into Claude system prompt via `format_mcp_request()`. Save wired after every turn. Confirmed in prod logs: "✅ RAG embeddings saved for session 8c6fd9e0..." |
+
+**Version:** 1.2 — Updated 2026-04-25 (EspaLuz Telegram RAG + LangChain retrieval confirmed live)

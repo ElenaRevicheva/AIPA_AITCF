@@ -62,9 +62,9 @@ My job is to:
 - **Executive communication** — translating AI systems to non-technical stakeholders (7 years board-level). Most engineers cannot do this. Most executives cannot ship. The hybrid is the differentiator.
 
 **Elena is still building (honest skill gaps):**
-- **RAG** — explicit gap. Conversational memory ≠ production RAG. Employers test this specifically. Do not claim partial without production evidence.
+- **RAG** — ✅ **Complete (Apr 25, 2026).** Production RAG shipped in EspaLuz Telegram. OpenAI `text-embedding-3-small` (1536 dims) → `espaluz_embeddings` table (PostgreSQL + pgvector, ivfflat index, cosine similarity). 2-layer memory: Layer 1 = LangChain exact last 5 turns; Layer 2 = semantic search over full history (similarity > 0.75, top_k=3). Injected into Claude system prompt before every reply. Confirmed live in prod logs. Cost ~$0.00002/message. Not a gap anymore.
 - **Evals / observability** — ✅ **Complete (Mar 30, 2026).** 131 tests, 4 layers: keyword scoring (L1), bias compensation (L2), golden-set routing (L3), LLM-as-judge consistency (L4). Layer 4 uses Claude Haiku against 22 golden-set jobs, ≥75% agreement threshold enforced, ~$0.03/run. Verified from actual code in `evals/`. Not a gap anymore.
-- **LangChain / LangGraph** — exposure only. LangChain imported in EspaLuz, not used in primary agents. Be honest on resume.
+- **LangChain / LangGraph** — LangChain **wired and live** in EspaLuz Telegram: `PostgresChatMessageHistory` stores all turns (UUID5 session IDs), retrieval wired via `chat_history.messages[-5:]`. Not used in primary agents (CTO AIPA, VibeJobHunter). Be honest: "production use in EspaLuz, exposure in primary agents."
 - **AWS** — entirely Oracle-based stack. One honest deployment needed for credibility.
 - **Docker** — familiar, not in production. Production runs bare on Ubuntu with systemd/PM2.
 - Modular code architecture (current code is working but monolithic in places)
@@ -248,8 +248,8 @@ Persistence (Oracle table or JSON file)
 ```
 
 **What's NOT used yet (honest skill gaps — from career analysis v2):**
-- **RAG / vector DB** — explicit gap. Conversational memory ≠ production RAG. All lookup is SQL or file scan. Oracle 26ai has native vector search — use it for EspaLuz.
-- **LangGraph / LangChain** — exposure only. LangChain imported in EspaLuz, not in primary agents.
+- **RAG / vector DB** — ✅ **Done (Apr 25, 2026).** Production RAG in EspaLuz Telegram: pgvector + OpenAI embeddings + semantic retrieval injected into Claude system prompt. See `EspaLuzFamilybot/espaluz_rag.py`.
+- **LangGraph / LangChain** — LangChain **production use** in EspaLuz Telegram (`PostgresChatMessageHistory` + retrieval wired). LangGraph: not yet built. Primary agents still SQL/file-based.
 - **Formal evals** — ✅ **Complete (Mar 30, 2026).** 131 tests, 4 layers (keyword, bias, golden-set, LLM-as-judge). Not a gap anymore.
 - **AWS** — entirely Oracle-based. One lightweight deployment needed for resume credibility.
 - **Docker** — familiar, not in production. Systems run bare on Ubuntu with systemd/PM2.
@@ -261,7 +261,7 @@ Persistence (Oracle table or JSON file)
 
 | Gap | Honest State | Priority | Suggested Approach |
 |-----|-------------|----------|-------------------|
-| **RAG** | Explicit gap — conversational memory ≠ production RAG | #1 gap | Oracle 26ai has native vector search — add to EspaLuz (language learning retrieval). Zero new infra. Closes the biggest gap with the least new machinery. |
+| **RAG** | ✅ **Done (Apr 25, 2026)** — EspaLuz Telegram: pgvector + OpenAI embeddings, 2-layer memory (LangChain exact + semantic), injected into system prompt every reply. `espaluz_rag.py` + `espaluz_embeddings` table. | ✅ Closed | Interview answer: "I built a 2-layer memory system — LangChain for exact recent history, pgvector for semantic retrieval over full history. Both injected into Claude's system prompt before every reply. Similarity threshold 0.75, indexed with ivfflat. ~$0.00002/message." |
 | **Evals** | ✅ **Complete (Mar 30).** 131 tests, 4 layers (keyword scoring, bias compensation, golden-set routing, LLM-as-judge consistency). Layer 4 uses Claude Haiku, ≥75% agreement on 22 golden-set jobs. ~$0.03/run. Verified from actual code. | ✅ Done | Interview Q2 answer is now strong: "I built a 4-layer eval harness — 131 tests. Layer 4 uses Claude as independent judge against my deterministic engine. 75% threshold — below 100% deliberately because edge cases have legitimate ambiguity." |
 | **LangGraph** | Exposure only — LangChain imported in EspaLuz, not in primary agents | Post-RAG | Build one LangGraph variant of the code review pipeline. Be honest on resume: "exposure." |
 | **AWS** | Entirely Oracle stack. One deploy needed for credibility. | Week 3–5 | One Lambda or EC2 service. Goal: one honest line on resume, credible answer to "AWS experience?" |
@@ -345,7 +345,7 @@ Priority order (as of 2026-04-18 — aligned with career analysis v2 + Apr 2026 
 | 1b | **Activate fractional channels** | Toptal (in progress), Braintrust, A-Team, LinkedIn founder DMs. One reference > any skill addition. | Small | Elena's action |
 | 2 | **Document tool-use design in README** | README is first thing a hiring manager sees; visible in 30 seconds | Small | |
 | 3 | **Add monitoring/eval section to README** | Shows production-level thinking without reading 6k lines of code | Small | |
-| 4 | **RAG over EspaLuz (Oracle 26ai native vectors)** | #1 technical gap. Language learning retrieval is a natural fit. Zero new infra. | High | |
+| 4 | **RAG over EspaLuz (pgvector + OpenAI embeddings)** | #1 technical gap — now closed. 2-layer memory: LangChain last-5-turns + pgvector semantic search. Injected into Claude system prompt. | High | ✅ **Done (Apr 25, 2026)** — `espaluz_rag.py`, `espaluz_embeddings` table, confirmed live in prod logs. |
 | 5 | **One AWS deployment** | One Lambda/EC2. One honest resume line. Credible "AWS experience?" answer. | Small | |
 | 6 | **Refactor `telegram-bot.ts`** | 6k+ lines, known debt — invisible unless they read the code | Medium | |
 | 7 | **LangGraph prototype** | Skill gap + interview talking point. Post-RAG. | Medium | |
@@ -611,4 +611,4 @@ logger.info("Orchestrator ready (dashboard reads only — autonomous loop runs i
 ---
 
 > This file is my memory. I read it at the start of every session. Without it, I start blind.
-> Last scan: 2026-04-18 | Version: 1.4 — eval framework verified complete (131 tests, 4 layers), GEO+SEO Marketing Engine Phases 1-5 shipped, resume updated to match
+> Last scan: 2026-04-25 | Version: 1.5 — RAG shipped in EspaLuz Telegram (pgvector + LangChain 2-layer memory, confirmed live). RAG gap closed.
