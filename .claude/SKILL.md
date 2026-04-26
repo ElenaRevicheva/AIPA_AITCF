@@ -64,7 +64,7 @@ My job is to:
 **Elena is still building (honest skill gaps):**
 - **RAG** — ✅ **Complete (Apr 25, 2026).** Production RAG shipped in **both EspaLuz Telegram and WhatsApp**. Shared `espaluz_rag.py` module: OpenAI `text-embedding-3-small` (1536 dims) → `espaluz_embeddings` table (PostgreSQL + pgvector, ivfflat index, cosine similarity). 2-layer memory: Layer 1 = LangChain exact last 5 turns; Layer 2 = semantic search over full history (similarity > 0.75, top_k=3). Injected into Claude system prompt before every reply. Separate session namespaces per platform (`telegram_*` vs `whatsapp_*`). Confirmed live in prod logs on both bots. Cost ~$0.00002/message. Not a gap anymore.
 - **Evals / observability** — ✅ **Complete (Mar 30, 2026).** 131 tests, 4 layers: keyword scoring (L1), bias compensation (L2), golden-set routing (L3), LLM-as-judge consistency (L4). Layer 4 uses Claude Haiku against 22 golden-set jobs, ≥75% agreement threshold enforced, ~$0.03/run. Verified from actual code in `evals/`. Not a gap anymore.
-- **LangChain / LangGraph** — LangChain **wired and live** in EspaLuz Telegram: `PostgresChatMessageHistory` stores all turns (UUID5 session IDs), retrieval wired via `chat_history.messages[-5:]`. Not used in primary agents (CTO AIPA, VibeJobHunter). Be honest: "production use in EspaLuz, exposure in primary agents."
+- **LangChain / LangGraph** — LangChain **wired and live** in EspaLuz Telegram + WhatsApp: `PostgresChatMessageHistory` + retrieval wired. **LangGraph production use in VJH (Apr 26, 2026):** full StateGraph pipeline (gate → score → route → submit/outreach/discard → notify), SQLite checkpointer (`vjh_checkpoint.db`), `thread_id=vjh_{job_id}` for deduplication, `interrupt_before=["submit_node"]` for human approval on score 60–69. Confirmed live on Oracle — first cycle processed 8 jobs, zero errors. Honest: "LangChain + LangGraph both in production. LangGraph is new — one real cycle confirmed."
 - **AWS** — entirely Oracle-based stack. One honest deployment needed for credibility.
 - **Docker** — familiar, not in production. Production runs bare on Ubuntu with systemd/PM2.
 - Modular code architecture (current code is working but monolithic in places)
@@ -82,7 +82,7 @@ All 9 agents run here. $0/month (Oracle startup credits). ~99% uptime.
 | 2 | **EspaLuz Telegram** | EspaLuzFamilybot | t.me/EspaLuzFamily_bot | systemd `espaluz-familybot` | ✅ Live. **2-layer memory live (Apr 25):** LangChain + pgvector RAG. |
 | 3 | **EspaLuz Influencer** | EspaLuz_Influencer | t.me/Influencer_EspaLuz_bot | systemd `espaluz-influencer` | ✅ Live |
 | 4 | **Algom Alpha (DragonTrade)** | dragontrade-agent | X @reviceva | PM2 `dragontrade-*` (4 apps) | Live, ⚠️ Rate-limit prone |
-| 5 | **VibeJob Hunter** | VibeJobHunterAIPA_AIMCF | t.me/vibejob_hunter_bot | systemd `vibejobhunter` | ✅ Live |
+| 5 | **VibeJob Hunter** | VibeJobHunterAIPA_AIMCF | t.me/vibejob_hunter_bot | systemd `vibejobhunter` | ✅ Live. **LangGraph pipeline live (Apr 26):** stateful graph replaces raw for-loop; SQLite deduplication (thread_id per job); human-approval interrupt for score 60–69. Resume updated Apr 26 (Claude Code explicit, pgvector, expanded target roles). |
 | 6 | **CMO AIPA** | VibeJobHunterAIPA_AIMCF (same) | LinkedIn / Instagram | systemd (same as 5) | ✅ Live |
 | 7 | **CTO AIPA** | **AIPA_AITCF** (THIS REPO) | t.me/aitcf_aideazz_bot | PM2 `cto-aipa` | ✅ Live |
 | 8 | **Atuona Creative AI** | **AIPA_AITCF** (same) | t.me/Atuona_AI_CCF_AIdeazz_bot | PM2 (same as 7) | ✅ Live, 48+ NFTs |
