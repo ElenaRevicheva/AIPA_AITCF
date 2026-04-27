@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 17, 2026 (v16.1 — **[aideazz](https://github.com/ElenaRevicheva/aideazz)** www→apex JS redirect + `_redirects` `.gitignore` seal + 404 noindex + hreflang EN/ES; [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) · prior v16.0 build-time **`scripts/generate-sitemap.mjs`** + apex URL hygiene + **`robots.txt`** `Disallow` for `/.gitignore`; [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · prior v15.9 `src/lib/seo.ts` [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026)) | Prior: April 14, 2026 (v15.8 — Oracle wallet) | April 13, 2026 (v15.7 — GEO FAQPage) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: April 26, 2026 (v17.0 — **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -25,13 +25,15 @@ This file is organized around **six phases**. Everything else (AutoSEO critique,
 
 - **Clients / founders:** This table → [Why this engine exists](#why-this-engine-exists--competitive-positioning) → [WordPress clients](#wordpress-clients--engine-compatibility) → [Jargon cheat sheet](#part-4--jargon-cheat-sheet-for-client-conversations).
 - **Vibe coders:** This table → [Implementation](#impl-phases-16) → [PART 2 prompts](#part-2--the-full-roadmap-aideazz-first).
-- **Professional devs:** [Implementation](#impl-phases-16) → [Handoff](#handoff--what-actually-shipped-april-13-2026) → [PART 0 jargon](#part-0--jargon-dictionary).
+- **Professional devs:** [Implementation](#impl-phases-16) → [Handoff](#handoff--what-actually-shipped) → [PART 0 jargon](#part-0--jargon-dictionary).
 
 ---
 
-## Handoff — what actually shipped (April 13, 2026)
+## Handoff — what actually shipped
 
-This block is for the **next engineer** (Claude Code, Cursor, human): **verifiable facts**, not marketing copy.
+This block is for the **next engineer** (Claude Code, Cursor, human): **verifiable facts**, not marketing copy. *(Started April 13, 2026 — updated April 26, 2026.)*
+
+<a id="handoff--what-actually-shipped"></a>
 
 | Area | Where | What we did | Why it matters |
 |------|--------|---------------|----------------|
@@ -44,6 +46,10 @@ This block is for the **next engineer** (Claude Code, Cursor, human): **verifiab
 | **Oracle deploy** | `ubuntu@` Oracle, `~/cto-aipa` | **`git pull` → `npm run build` → `pm2 restart cto-aipa --update-env`**. Then **`npm run triage:fire`** once **`curl` to `127.0.0.1:3000/`** succeeds. | **HTTP 202** + triage start in PM2 logs is the smoke test. |
 | **www→apex redirect + .gitignore seal + 404 noindex + hreflang (Apr 17, 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/main.tsx`, `public/_redirects`, `src/App.tsx`, `index.html` | **`main.tsx`**: JS www→apex redirect fires before React mounts (`window.location.replace`). **`_redirects`**: `/.gitignore / 301` rule added *before* the `/* /index.html 200` catch-all — seals the file from being served and re-indexed. **`App.tsx`**: imported and wired `NotFound` component on `path="*"` (was a bare `<div>` with no noindex). **`index.html`**: hreflang EN/ES/x-default added (site serves both languages at same URLs via i18next). **GSC**: URL removal submitted for `/.gitignore`; indexing requested for apex homepage, `/portfolio`, `/blog`. Two commits: `25e0918` + `31b0f48`. | `.gitignore` was publicly accessible at HTTP 200 (catch-all served React app) and had been indexed by Google. www homepage was indexed but apex was not. 404 pages were not noindexed. Cloudflare HTTP 301 still pending (JS redirect is live in the meantime). |
 | **Phase 4c–4d ingest (Manny-style sources)** | `prospect-places.ts`, `doc-ingest.ts`, `cto-aipa.ts`, `telegram-bot.ts` | **Places:** local/industry prospect lists via **Google Places API** (requires **`GOOGLE_PLACES_API_KEY`**). **Doc:** operational documents → entities → same **`outreach_targets`** pipeline. Telegram **`/places_ingest`**, **`/doc_ingest`**. | Confirms blueprint “list builder” + “takeoff/RFP” paths exist in code — not only YC JSON. |
+| **Canonical marketing copy (Apr 26, 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `main` | Homepage + static SEO + EN/ES i18n + About + portfolio card + `seo.ts` aligned with **portfolio** + **`/pitch.html`**: **10-agent ecosystem (9 in production, AILA in design)**, **LangGraph + pgvector RAG**, **~13 months** timeline, CTO **10 repos**, CMO/VJH LangGraph + eval harness copy, EspaLuz **2-layer memory**, Vision Panama line through **April 2026**. **`public/pitch.html`**: VJH section = LangGraph pipeline / verified delivery narrative. | One story across site, pitch deck, and portfolio — reduces assistant hallucinations and investor drift. |
+| **GEO “maximum” stack (Apr 26, 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `public/` + `index.html` | **`robots.txt`**: explicit **`Allow`** for **Google-Extended**, **Applebot-Extended**, **OAI-SearchBot**, **GPTBot**, **ChatGPT-User**, **ClaudeBot**, **PerplexityBot**, **Meta-ExternalAgent**, **FacebookBot**, **CCBot**, **Amazonbot**, **cohere-ai**, **Diffbot**, **Bytespider**, catch-all **`*`**. **`llms.txt`** + **`/.well-known/llms.txt`**. **`geo-manifest.json`** (`AIdeazz-GEO/v4-iron`): endpoints, preferred citation, founder **sameAs** (incl. **Dev.to** + **Hashnode**), agent inventory + **`geoLayersDeployed`**. **`humans.txt`**, **`CITATION.cff`** (no fake ORCID). **`index.html`**: **ItemList** + **WebPage** JSON-LD; **FAQ** GEO answer lists stack; `<link rel="alternate">` to manifest + CFF; **`rel="author"`** → **`humans.txt`**; noscript **GEO machine-readable** link row. | Redundant machine-readable surfaces + crawler invitations beyond “JSON-LD only.” Deploy **4everland** from `main`. Details: [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026). |
+| **Sitemap + verify-seo (Apr 26, 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `scripts/` | **`generate-sitemap.mjs`** adds GEO URLs (`/llms.txt`, `/.well-known/llms.txt`, `/geo-manifest.json`, `/humans.txt`, `/CITATION.cff`, `/robots.txt`). **`verify-seo.mjs`** requires those artifacts in **`dist/`** after build (in addition to sitemap + robots). Total sitemap URL count **~30** with Hashnode + Dev.to-only slugs (varies as posts change). | Crawlers discover GEO files from sitemap; CI/build fails if GEO assets missing from static output. |
+| **GitHub → CTO webhooks (Apr 2026, ops)** | **GitHub** org/repos + **`webhook.aideazz.xyz`** | Reported wiring: **push** + **pull_request** → **`https://webhook.aideazz.xyz/cto/webhook/github`** on **10** repos (verify per repo **Settings → Webhooks**). | Code review + automation triggers aligned with “10 repos” site truth. |
 
 **Production signals (Phase 5 accomplishments):** `🎯 [triage-run] Starting (background=true)...` → per-lead **`[triage] Classifying lead…`** → **`🎯 [triage-run] Complete: N processed, M urgent`** in PM2 logs; Oracle **`lead_triage`** rows from **`business_leads`** + **`outreach_log`**; **`agent_outcomes`** records the **`triage_cycle`** run. **`GET /leads/triage-status`** exposes **`ready: true`** when **`ANTHROPIC_API_KEY`** is configured. **Optional deep check:** **`TRIAGE_FIRE_WAIT=1 npm run triage:fire`** returns one JSON payload with **`processed` / `urgent`** without tailing logs.
 
@@ -96,7 +102,7 @@ The AI services space is getting super competitive. Most projects rely only on K
 | "DM me for AI services" | Automated outreach pipeline hitting founders with **specific pain + proof** |
 | Portfolio = Notion page | Production site with JSON-LD, structured data, crawlable by ChatGPT/Perplexity/Claude |
 | One launch, then silence | Blog auto-publisher = **compound SEO** that grows while you sleep |
-| "I built a chatbot" (demo) | 9 agents running 24/7 with $0 infra — **verifiable, not claimable** |
+| "I built a chatbot" (demo) | **10-agent ecosystem** (nine production + AILA in design) on Oracle Always Free — **verifiable, not claimable** |
 
 ### The Strategic Logic
 
@@ -190,17 +196,17 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | Task | Status | Details |
 |---|---|---|
 | Google Search Console verified | DONE | Domain property `sc-domain:aideazz.xyz` active |
-| sitemap.xml created & validated | DONE | 11 URLs (static routes + live Hashnode blog slugs), valid XML, no BOM, LF line endings |
+| sitemap.xml created & validated | DONE | **~30 URLs** (static routes + GEO surfaces + live Hashnode + Dev.to-only blog slugs — count varies with posts), valid XML, no BOM, LF line endings |
 | sitemap.txt created (plain text fallback) | DONE | Google accepted this format immediately — bypassed IPFS/CDN XML parsing issues |
-| GSC sitemap submission | DONE | **"Successfully" — 11 URLs** (sitemap regenerated Apr 2026 with blog slugs via Hashnode GraphQL) |
+| GSC sitemap submission | DONE | **"Successfully"** — discovered URL count tracks build output (static + blog + GEO paths; **~30** as of Apr 2026) |
 | robots.txt updated | DONE | AI bot permissions (GPTBot, ChatGPT-User, PerplexityBot, ClaudeBot) + dual sitemap references |
 | CDN warming workflow | DONE | GitHub Actions cron every 2h — pre-fetches sitemap/robots to keep IPFS CDN edges warm |
-| Build-time SEO verification | DONE | **`node scripts/generate-sitemap.mjs`** (Hashnode + static routes → `public/sitemap.*`) then **`vite build`** then **`scripts/verify-seo.mjs`** — fails build if sitemap.xml, sitemap.txt, or robots.txt missing from dist/ |
+| Build-time SEO verification | DONE | **`node scripts/generate-sitemap.mjs`** (Hashnode + static routes → `public/sitemap.*`) then **`vite build`** then **`scripts/verify-seo.mjs`** — fails build if **`sitemap.xml`**, **`sitemap.txt`**, **`robots.txt`**, **`llms.txt`**, **`.well-known/llms.txt`**, **`geo-manifest.json`**, **`humans.txt`**, **`CITATION.cff`** missing from **`dist/`** (Apr 2026). |
 
 **How to check (non-dev guide):**
-1. Open **https://aideazz.xyz/sitemap.xml** in your browser — you should see a list of 11 URLs. If it loads, the sitemap works.
-2. Open **https://aideazz.xyz/robots.txt** — you should see lines like `User-agent: GPTBot` and `Allow: /`. If you see it, robots.txt works.
-3. Go to **[Google Search Console](https://search.google.com/search-console)** → select `sc-domain:aideazz.xyz` → left sidebar **Sitemaps** — status should say "Success" with 11 discovered URLs.
+1. Open **https://aideazz.xyz/sitemap.xml** — you should see **many** `<url>` entries (static pages + blog posts + GEO files). If it loads, the sitemap works.
+2. Open **https://aideazz.xyz/robots.txt** — you should see **`User-agent:`** lines including **`GPTBot`**, **`Google-Extended`**, **`ClaudeBot`**, **`Allow: /`**. If you see them, robots.txt works.
+3. Go to **[Google Search Console](https://search.google.com/search-console)** → select `sc-domain:aideazz.xyz` → left sidebar **Sitemaps** — status should say **Success**; discovered URL count should track sitemap size (not a fixed 11).
 4. In GSC → left sidebar **Pages** — see how many pages are indexed. This number should grow over the next days.
 
 ### Phase 1b: GEO Foundation — DONE
@@ -215,14 +221,14 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | Canonical URLs | DONE | Per-route in React (`Index`, `About`, `Blog*`, `BusinessCard`); **Apr 2026:** removed static homepage canonical from `index.html` in **[aideazz](https://github.com/ElenaRevicheva/aideazz)** to stop GSC “duplicate canonical” / wrong default for all URLs |
 | /about page (Author Authority) | DONE | Full bio, Phase 1 + Phase 2 credentials, photo, stats grid, JSON-LD Person schema, CTA |
 | /portfolio page GEO | DONE | ProfilePage JSON-LD, dynamic OG tags, makesOffer |
-| noscript content block | DONE | Full static HTML in index.html for AI crawlers that don't execute JavaScript — all 9 agents described, tech stack, metrics, FAQs |
+| noscript content block | DONE | Full static HTML in **`index.html`** for AI crawlers that don't execute JavaScript — **10-agent ecosystem** narrative, product blurbs, tech stack, metrics, FAQs; **Apr 2026:** row of links to **`geo-manifest.json`**, **`llms.txt`**, **`.well-known/llms.txt`**, **`humans.txt`**, **`CITATION.cff`**, **`robots.txt`** |
 | Positioning update (EN + ES) | DONE | "Executive-Turned-AI-Builder" in both languages |
 
 **How to check (non-dev guide):**
-1. Open **https://aideazz.xyz** → right-click → **View Page Source** → press Ctrl+F and search `application/ld+json` — you should find 3 JSON blocks (Organization, Person, FAQPage). If you see them, the schemas are live.
+1. Open **https://aideazz.xyz** → right-click → **View Page Source** → press Ctrl+F and search `application/ld+json` — you should find **multiple** JSON-LD scripts (Organization, WebSite, Person, FAQPage, **ItemList**, **WebPage** — Apr 2026). If you see them, the schemas are live.
 2. Ask **ChatGPT** or **Perplexity**: "Who is Elena Revicheva?" or "Who builds AI agents in Panama?" — if she appears in the answer, GEO is working. (This may take weeks/months to build up.)
 3. Go to **https://search.google.com/test/rich-results** → paste `https://aideazz.xyz` → click **Test URL**. It should show "FAQ" and "Organization" as detected structured data.
-4. Open **https://aideazz.xyz** → View Page Source → search `noscript` — you should see a large block of static HTML text describing all 9 agents. This is what AI crawlers read.
+4. Open **https://aideazz.xyz** → View Page Source → search `noscript` — you should see static HTML describing the **ecosystem**, products, FAQs, and **GEO machine-readable** links. This is what many AI crawlers read without executing JS.
 
 ### Phase 1c: OG Image & Social Sharing Fix — DONE
 
@@ -231,7 +237,7 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | OG image optimized | DONE | Created `elena-og.jpg` (1200x630, 133KB) from original (2688x3840, 2.1MB) — fixes WhatsApp/LinkedIn/Twitter sharing |
 | All og:image refs updated | DONE | index.html, BusinessCard.tsx, About.tsx — all point to optimized image |
 | Team nav link added | DONE | "Team" (EN) / "Equipo" (ES) links to `#team` anchor on homepage |
-| Founder section enriched | DONE | Career phases (Executive 2011-2018 + AI Builder 2025-Present) + stats grid (9 agents, $0/month, 76/24%, 12 months) added to VisionSection |
+| Founder section enriched | DONE | Career phases (Executive 2011-2018 + AI Builder 2025-Present) + stats grid (**10-agent ecosystem** framing, $0/month, 76/24%, **~13 months**) added to VisionSection (Apr 2026) |
 | Social sharing validated | DONE | opengraph.xyz shows correct title, description, image for aideazz.xyz and /portfolio |
 
 **How to check (non-dev guide):**
@@ -265,9 +271,9 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | **`scripts/generate-sitemap.mjs`** | DONE | Runs **before** Vite build. Fetches **`publication.posts`** from **`gql.hashnode.com`** for host **`aideazz.hashnode.dev`** (override `VITE_HASHNODE_HOST` if needed). Merges **static routes** (`/`, `/about`, `/portfolio`, `/blog`, `/pitch.html`, `/pitch-es.html`) + **`https://aideazz.xyz/blog/{slug}`** for each post (excludes smoke-test slug). Writes **pretty-printed** `public/sitemap.xml` and `public/sitemap.txt`. On GraphQL failure: logs warning, static URLs only — build still succeeds. |
 | **`package.json` `build`** | DONE | `"node scripts/generate-sitemap.mjs && vite build && node scripts/verify-seo.mjs"`. |
 | **Apex vs `www`** | DONE (content) | Replaced **`https://www.aideazz.xyz`** with **`https://aideazz.xyz`** across TSX + pitch HTML; button labels **`aideazz.xyz`**. **`index.html`** comment: prefer apex; configure **`www` → apex 301** at DNS/host + GSC preferred domain. |
-| **`robots.txt`** | DONE | Leading comment on canonical host; **`Disallow: /.gitignore`** and **`/gitignore`**; sitemap lines unchanged (**`https://aideazz.xyz/...`**). |
+| **`robots.txt`** | DONE | Leading comment on canonical host; **`Disallow: /.gitignore`** and **`/gitignore`**; sitemap lines (**`https://aideazz.xyz/...`**). **Apr 2026:** expanded explicit **`Allow`** blocks for AI/search crawlers — see [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026). |
 | **Blog images (a11y / SEO)** | DONE | **`BlogPost.tsx`**: ReactMarkdown **`img`** component — default **`alt`** when missing; **`loading="lazy"`**. |
-| **GSC / ops follow-up** | DONE | Sitemap returns **200** with 11 URLs. **`/.gitignore`** removal submitted in GSC (Apr 17, 2026). Indexing requested for `https://aideazz.xyz/`, `/portfolio`, `/blog`. www canonical issue confirmed and addressed (see [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026)). |
+| **GSC / ops follow-up** | DONE | Sitemap returns **200** with **many** URLs (static + blog + GEO — **~30** as of Apr 2026). **`/.gitignore`** removal submitted in GSC (Apr 17, 2026). Indexing requested for `https://aideazz.xyz/`, `/portfolio`, `/blog`. www canonical issue confirmed and addressed (see [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026)). |
 
 <a id="phase-1f-redirect-hygiene--hreflang--april-17-2026"></a>
 
@@ -289,6 +295,25 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 3. Open `https://aideazz.xyz` → View Page Source → Ctrl+F search `hreflang` — you should see three `<link>` tags for `en`, `es`, and `x-default`.
 4. Type `https://aideazz.xyz/.gitignore` in your browser — should redirect you to the homepage (not show file contents).
 5. Type `https://aideazz.xyz/some-random-page-that-doesnt-exist` — should show the 404 page (not a blank white page).
+
+<a id="phase-1g-canonical-truth--geo-v4-iron--april-26-2026"></a>
+
+### Phase 1g: Canonical truth + GEO v4 iron — April 26, 2026
+
+> **[aideazz](https://github.com/ElenaRevicheva/aideazz)** only (not AIPA_AITCF). Phase **1** stays **Complete** — this addendum records **copy alignment** with **`/portfolio`** + **`/pitch.html`** and **redundant GEO surfaces** shipped on `main`.
+
+| Task | Status | Details |
+|---|---|---|
+| **Marketing copy parity** | DONE | EN/ES **`en.json` / `es.json`**, root **`index.html`** meta + JSON-LD + **`noscript`**, **`src/lib/seo.ts`** defaults, **`About`**, **`BusinessCard`**, **`VisionSection`** — consistent **10-agent ecosystem (9 production + AILA in design)**, **LangGraph + pgvector RAG**, **~13 months**, CTO **10 repos**, CMO/VJH pipeline + eval copy, EspaLuz memory wording. **`public/pitch.html`** updated for VJH LangGraph / delivery narrative. |
+| **`robots.txt` (AI crawlers)** | DONE | Explicit **`Allow: /`** per major vendor token where documented: **Google-Extended**, **Applebot-Extended**, **OAI-SearchBot**, **GPTBot**, **ChatGPT-User**, **ClaudeBot**, **PerplexityBot**, **Meta-ExternalAgent**, **FacebookBot**, plus **CCBot**, **Amazonbot**, **cohere-ai**, **Diffbot**, **Bytespider**, catch-all **`*`**. |
+| **`llms.txt` mirrors** | DONE | **`/llms.txt`** and **`/.well-known/llms.txt`** — GEO package header + endpoint table + canonical URLs. |
+| **`geo-manifest.json`** | DONE | Label **`AIdeazz-GEO/v4-iron`** — **`endpoints`**, **`preferredCitation`**, **`founder.sameAs`** (LinkedIn, GitHub, X, **Dev.to**, **Hashnode**), **`factsGroundTruth`**, **`agentInventory`**, **`geoLayersDeployed`**, **`ecosystemNote`**. |
+| **`humans.txt` + `CITATION.cff`** | DONE | Human-readable GEO/contact line; **Citation File Format** for research tooling (**no fabricated ORCID**). |
+| **JSON-LD + `<head>` hints** | DONE | **WebSite** schema retained; **ItemList** (named inventory rows); **WebPage** (homepage); Organization/WebSite/Person **`sameAs`** extended; FAQ answer **“What is GEO…”** lists full stack; **`<link rel="alternate">`** for **`geo-manifest.json`** + **`CITATION.cff`**; **`rel="author"`** → **`humans.txt`**. |
+| **Sitemap + build gate** | DONE | **`generate-sitemap.mjs`** emits GEO URLs; **`verify-seo.mjs`** fails **`npm run build`** if GEO artifacts missing from **`dist/`**. |
+| **GitHub webhooks (ops)** | DONE | Reported: **10** repos → **`https://webhook.aideazz.xyz/cto/webhook/github`** (**push** + **pull_request**) — verify in GitHub **Settings → Webhooks**. |
+
+**Quick verify:** `curl -sI https://aideazz.xyz/geo-manifest.json` → **200**; View Source on **`/`** → multiple **`application/ld+json`** blocks + **`noscript`** GEO links.
 
 ### Phase 1d: GA4 Analytics — CONFIRMED WORKING
 
@@ -538,24 +563,27 @@ The Manny blueprint builds both. The AutoSEO product is purely inbound. The Inst
 **GEO (Generative Engine Optimization)**
 New term, 2025-onwards. The practice of making your content get cited and recommended by AI tools like ChatGPT and Perplexity — not just traditional Google. This is what AutoSEO's homepage headline ("Get Found & Recommended by ChatGPT, Perplexity AND Google") is selling. The technical secret: structured data, authority signals, clear authorship, and quotable factual content.
 
-GEO has five concrete layers — all five are live on aideazz.xyz:
+GEO on aideazz.xyz is a **stack of overlapping signals** (Apr 2026 — not a single checkbox):
 
-1. **JSON-LD schemas** — machine-readable identity signals embedded in `index.html`:
-   - `Organization` schema: AIdeazz name, URL, logo, founder link
-   - `Person` schema: Elena Revicheva, `knowsAbout` (AI Agents, LLM Routing, Oracle Cloud, etc.), `sameAs` (LinkedIn, GitHub), `worksFor`, `addressLocality: Panama City`
-   - `FAQPage` schema: **12 Q&As** — "What is AIdeazz?", "What is multi-model LLM routing?", "How do you run 9 AI agents at $0/month?", "What can Elena build for my startup?", "What is an AI agent?", "How much does it cost to build an AI automation system?", "Who builds AI agents for small business?", "What is GEO vs SEO?", "Can AI replace a marketing team?", "What AI tools does Elena use?", "How long does it take to build an AI marketing engine?", "What industries can benefit from AI automation?" — these are the exact queries target clients type into ChatGPT and Perplexity; structured answers make the page quotable as a source
-   - `Article` schema on every blog post: headline, author, datePublished, publisher
-   - `ProfilePage` + `makesOffer` on /portfolio: tells AI tools what service is being offered and by whom
+1. **JSON-LD** — `Organization`, `WebSite`, `Person`, `FAQPage`, **`ItemList`** (named product/agent inventory), **`WebPage`** (homepage anchor), plus blog **`Article`** and **`ProfilePage`** + **`makesOffer`** on **`/portfolio`**. FAQ includes client-intent questions; GEO FAQ answer lists **`geo-manifest`**, **`llms.txt`**, crawler **`robots`** tokens, sitemaps, **hreflang**, syndication.
 
-2. **noscript static content block** — 66 lines of plain HTML inside `<noscript>` in index.html. AI crawlers (ChatGPT, Perplexity, ClaudeBot) often do not execute JavaScript. Without this block, they would see a blank page. With it, they see Elena's full bio, all 9 agents described, tech stack, real metrics — fully readable without JS.
+2. **noscript article** — Plain HTML in **`<noscript>`** for crawlers that skip JS; includes **GEO machine-readable** links (**`geo-manifest.json`**, **`llms.txt`**, **`.well-known`**, **`humans.txt`**, **`CITATION.cff`**, **`robots.txt`**).
 
-3. **robots.txt AI bot permissions** — explicit `Allow: /` for `ChatGPT-User`, `GPTBot`, `PerplexityBot`, `ClaudeBot`, `CCBot`. These bots crawl the web to train and update their knowledge. Without explicit permission, they may skip your site. With it, they are invited in.
+3. **`robots.txt`** — Explicit **`Allow: /`** for major AI-related **`User-agent`** tokens (e.g. **GPTBot**, **ChatGPT-User**, **OAI-SearchBot**, **ClaudeBot**, **PerplexityBot**, **Google-Extended**, **Applebot-Extended**, **Meta-ExternalAgent**, **FacebookBot**, **CCBot**, etc.) plus **`*`** fallback — see [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026).
 
-4. **Canonical URL per route** — every page (homepage, /about, /blog/:slug, /portfolio) sets its own canonical tag via React `useEffect`. Prevents GSC "duplicate canonical" confusion on the IPFS/4everland SPA deployment. Google and AI tools trust pages with clean canonical signals.
+4. **`llms.txt`** (+ **`/.well-known/llms.txt`**) — Short assistant-facing summary + endpoint table.
 
-5. **Compound content + authority signals** — daily Hashnode articles (1400+ words, structured headers, real technical detail) + Dev.to cross-posts with canonical backlinks + /about page with real credentials (Deputy CEO, 9 production agents, $0/month infra) + /portfolio with ProfilePage schema. GEO compounds: each article adds another quotable surface; each Dev.to backlink adds authority; each schema update sharpens the AI's picture of who Elena is.
+5. **`geo-manifest.json`** — Versioned **`AIdeazz-GEO/v4-iron`** manifest: canonical **`endpoints`**, **`preferredCitation`**, **`factsGroundTruth`**, **`agentInventory`**.
 
-**What GEO produces over time:** When someone asks ChatGPT "who can build me an AI marketing engine?" or Perplexity "fractional CTO for AI startups in Latin America" — these five layers are what make Elena's name appear in the answer. Not a paid placement. Not a KOL tweet that expires in 48 hours. A structural authority signal that compounds with every article published.
+6. **`humans.txt`** + **`CITATION.cff`** — Human contact surface + citation-file hook for research tooling.
+
+7. **Canonical URLs + hreflang** — Per-route SPA **`applyPageSeo`** + apex **`hreflang`** links on **`index.html`**.
+
+8. **Sitemaps** — **`sitemap.xml`** / **`sitemap.txt`** include static routes, blog slugs, and **GEO file URLs** (~**30** URLs as of Apr 2026 — varies with post count).
+
+9. **Compound content + authority** — Hashnode + Dev.to + **`sameAs`** on Dev.to/Hashnode profiles + **`/about`** credentials (**10-agent ecosystem** narrative, **$0/month** infra on Oracle Always Free).
+
+**What GEO produces over time:** When someone asks ChatGPT or Perplexity for a fractional AI builder or production agent operator — structured identity + redundant crawl paths + consistent facts (**portfolio / pitch / site**) reduce wrong summaries and strengthen quotability. Not a paid placement; a maintained technical footprint.
 
 **CMO (Chief Marketing Officer)**
 The executive responsible for marketing strategy. In your context, CMO AIPA = your AI agent that handles automated marketing output (LinkedIn posts, content publishing). This is already live in your stack.
@@ -1009,7 +1037,7 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 > Document version: April 13, 2026 (v15.4 — Manny table: doc-ingest shipped; Places shipped; draft-queue deferred; `.env.example` Phase 4c–4d)
 > Aligned with: CAREER_FOCUS.md v4 (April 2026 — outreach operational), SKILL.md v1.3
-> Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4); **canonical SPA fix** in **aideazz** repo Apr 2026
+> Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4); **canonical SPA fix** + **GEO v4 iron** (`geo-manifest`, `llms.txt`, expanded **`robots.txt`**, ItemList/WebPage JSON-LD) in **[aideazz](https://github.com/ElenaRevicheva/aideazz)** Apr 2026 — see [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026)
 > Phase 2 status: COMPLETE — Hashnode daily publisher live; Dev.to cross-post (DA 90+ backlink, `canonical_url` → Hashnode) live; GSC gap topic selection live (`GOOGLE_ANALYTICS_CREDENTIALS` JWT, no extra API key)
 > Phase 3 status: COMPLETE — UTM + inquiry + reCAPTCHA Enterprise
 > Phase 4 status: COMPLETE & VERIFIED — client sends via CTO AIPA (Resend+Oracle); employer sends via VJH only when email delivers; applications counted only on real ATS or email delivery
