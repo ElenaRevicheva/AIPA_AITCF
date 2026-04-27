@@ -7,7 +7,7 @@ import * as path from "path";
 import { Anthropic } from "@anthropic-ai/sdk";
 
 const GQL = "https://gql.hashnode.com/";
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 
 export type BlogEsBundle = {
   v: number;
@@ -168,8 +168,11 @@ function anthropicClient(): Anthropic {
 }
 
 async function translateToSpanish(src: EnglishSource): Promise<{ title: string; brief: string; markdown: string }> {
-  const model = process.env.BLOG_ES_TRANSLATE_MODEL?.trim() || "claude-3-5-haiku-20241022";
+  /** Default matches working IDs elsewhere in repo; override BLOG_ES_TRANSLATE_MODEL for Sonnet/long posts. */
+  const model =
+    process.env.BLOG_ES_TRANSLATE_MODEL?.trim() || "claude-3-haiku-20240307";
   const client = anthropicClient();
+  const maxTokens = model.includes("haiku") ? 4096 : 8192;
   const payload = JSON.stringify(
     {
       title: src.title,
@@ -182,7 +185,7 @@ async function translateToSpanish(src: EnglishSource): Promise<{ title: string; 
 
   const resp = await client.messages.create({
     model,
-    max_tokens: 8192,
+    max_tokens: maxTokens,
     messages: [
       {
         role: "user",
