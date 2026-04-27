@@ -7,7 +7,7 @@ import * as path from "path";
 import { Anthropic } from "@anthropic-ai/sdk";
 
 const GQL = "https://gql.hashnode.com/";
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
 
 export type BlogEsBundle = {
   v: number;
@@ -168,9 +168,11 @@ function anthropicClient(): Anthropic {
 }
 
 async function translateToSpanish(src: EnglishSource): Promise<{ title: string; brief: string; markdown: string }> {
-  /** Default matches working IDs elsewhere in repo; override BLOG_ES_TRANSLATE_MODEL for Sonnet/long posts. */
+  /** Prefer HASHNODE_ARTICLE_MODEL then Sonnet — Haiku 3/3.5 IDs often return not_found on newer Anthropic keys. */
   const model =
-    process.env.BLOG_ES_TRANSLATE_MODEL?.trim() || "claude-3-haiku-20240307";
+    process.env.BLOG_ES_TRANSLATE_MODEL?.trim() ||
+    process.env.HASHNODE_ARTICLE_MODEL?.trim() ||
+    "claude-sonnet-4-20250514";
   const client = anthropicClient();
   const maxTokens = model.includes("haiku") ? 4096 : 8192;
   const payload = JSON.stringify(
