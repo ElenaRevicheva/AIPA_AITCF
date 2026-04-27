@@ -5,6 +5,12 @@
  * Listed vs delisted: aideazz.xyz/blog loads posts via Hashnode *public* GraphQL (`publication.posts`).
  * Delisted posts are hidden from that feed and often 404 for logged-out visitors — so daily posts default
  * to **listed** (public). Opt into stealth with HASHNODE_DAILY_DELISTED=true or HASHNODE_DAILY_PUBLIC=false.
+ *
+ * **Pipeline (listed):** After publishPost, we poll the *same* unauthenticated GQL the portfolio uses
+ * (`HASHNODE_HOST`, default aideazz.hashnode.dev) until `publication.post(slug)` returns — then we Dev.to
+ * cross-post. If the post never appears in public GQ, we throw (Telegram failure, no Dev.to), so you do not
+ * get a “success” when aideazz /blog would stay empty.
+ * Set HASHNODE_HOST on the server to the same host as the site’s VITE_HASHNODE_HOST.
  */
 import * as cron from "node-cron";
 import * as fs from "fs";
@@ -16,6 +22,16 @@ const GQL = "https://gql.hashnode.com/";
 
 /** Base site where /blog mirrors Hashnode via public GraphQL (see aideazz repo `src/lib/hashnode-public.ts`). */
 const AIDEAZZ_SITE = (process.env.AIDEAZZ_SITE_URL || "https://aideazz.xyz").replace(/\/$/, "");
+
+/**
+ * Host for public, unauthenticated GraphQL — same as aideazz VITE_HASHNODE_HOST / `hashnode-public.ts`.
+ * Portfolio lists posts only if this API returns the post.
+ */
+const HASHNODE_PUBLIC_HOST = (process.env.HASHNODE_HOST || "aideazz.hashnode.dev")
+  .replace(/^https?:\/\//, "")
+  .split("/")
+  .at(0)
+  ?.trim() || "aideazz.hashnode.dev";
 
 /** True if posts are delisted (hidden from public feed + aideazz blog sync). Default: false = listed. */
 export function hashnodeDailyIsDelisted(): boolean {
@@ -41,6 +57,74 @@ async function verifyHashnodeUrlReachable(url: string): Promise<{ ok: boolean; s
   }
 }
 
+/** Public GraphQL (no token) — same query aideazz blog uses. If this fails, the portfolio will not list the post. */
+async function publicGql<T>(query: string, variables: Record<string, unknown>): Promise<T> {
+  const res = await fetch(GQL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, variables }),
+  });
+  const json = (await res.json()) as { data?: T; errors?: { message: string }[] };
+  if (json.errors?.length) {
+    throw new Error(`Public Hashnode GQL: ${json.errors.map((e) => e.message).join("; ")}`);
+  }
+  if (!json.data) throw new Error("Empty public Hashnode GQL data");
+  return json.data;
+}
+
+/** True if the post is visible in the public publication (required for aideazz /blog + sitemap). */
+export async function verifyPostInPublicHashnodeFeed(host: string, slug: string): Promise<boolean> {
+  if (!slug) return false;
+  const query = `
+    query($host: String!, $slug: String!) {
+      publication(host: $host) {
+        post(slug: $slug) { id }
+      }
+    }
+  `;
+  try {
+    const data = await publicGql<{
+      publication: { post: { id: string } | null } | null;
+    }>(query, { host, slug });
+    return !!data?.publication?.post?.id;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * After publishPost, the public API can lag. Poll until the post is listable the same way aideazz fetches
+ * the blog, or time out. Dev.to is only cross-posted after this passes (for listed posts).
+ */
+async function waitForPostInPublicHashnodeFeed(
+  slug: string,
+  maxAttempts: number,
+  delayMs: number
+): Promise<boolean> {
+  for (let i = 0; i < maxAttempts; i++) {
+    if (i > 0) await new Promise((r) => setTimeout(r, delayMs));
+    const ok = await verifyPostInPublicHashnodeFeed(HASHNODE_PUBLIC_HOST, slug);
+    if (ok) {
+      console.log(`📰 Public feed: post available for aideazz (attempt ${i + 1}/${maxAttempts})`);
+      return true;
+    }
+  }
+  return false;
+}
+
+async function verifyUrlReachableWithRetries(
+  url: string,
+  opts: { maxAttempts: number; delayMs: number }
+): Promise<{ ok: boolean; status: number }> {
+  for (let i = 0; i < opts.maxAttempts; i++) {
+    if (i > 0) await new Promise((r) => setTimeout(r, opts.delayMs));
+    const r = await verifyHashnodeUrlReachable(url);
+    if (r.ok || r.status === 403) return r;
+    if (r.status !== 404) return r;
+  }
+  return verifyHashnodeUrlReachable(url);
+}
+
 /** Optional: set TELEGRAM_HASHNODE_NOTIFY_CHAT_ID + TELEGRAM_BOT_TOKEN for post alerts */
 async function notifyTelegramHashnodePublished(title: string, urlOrMessage: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
@@ -64,6 +148,30 @@ async function notifyTelegramHashnodePublished(title: string, urlOrMessage: stri
     }
   } catch (e) {
     console.error("📰 Telegram notify error:", e);
+  }
+}
+
+async function notifyTelegramHashnodeFailure(message: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const chatId = process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim();
+  if (!token || !chatId) return;
+  const text = `🚨 Hashnode daily FAILED (no Dev.to cross-post until fixed)\n\n${message}`;
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        disable_web_page_preview: true,
+      }),
+    });
+    if (!r.ok) {
+      const t = await r.text();
+      console.error("📰 Telegram failure notify failed:", r.status, t);
+    }
+  } catch (e) {
+    console.error("📰 Telegram failure notify error:", e);
   }
 }
 
@@ -490,21 +598,55 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   const post = out.publishPost?.post;
   if (!post?.url) throw new Error("publishPost returned no URL");
 
-  writeTopicIndex(index);
-  console.log(`📰 Hashnode daily: published — ${post.url} (${delisted ? "delisted" : "listed — aideazz/blog sync"})`);
-
-  const reach = await verifyHashnodeUrlReachable(post.url);
-  if (!reach.ok && reach.status === 404) {
-    console.warn(
-      `📰 Hashnode URL returned HTTP ${reach.status} — if delisted was unintentional, set HASHNODE_DAILY_DELISTED=false and HASHNODE_DAILY_PUBLIC=true on Oracle.`
-    );
-  } else if (!reach.ok && reach.status && reach.status !== 403) {
-    console.warn(`📰 Hashnode URL check: HTTP ${reach.status} (may be bot-filter; verify in browser).`);
+  const slug = post.slug?.trim() || "";
+  if (!slug) {
+    const err = "Hashnode returned no post slug; cannot verify public feed (aideazz /blog).";
+    await notifyTelegramHashnodeFailure(`${err}\n${post.url}`);
+    throw new Error(err);
   }
 
-  // Cross-post to Dev.to with canonical pointing back — genuine DA 90+ backlink
-  const devtoUrl = await crossPostToDevTo(post.title, parsed.markdown, post.url);
+  console.log(`📰 Hashnode publishPost OK: ${post.url} (${delisted ? "delisted" : "listed"}) — verifying public API (aideazz uses same)…`);
 
+  if (!delisted) {
+    const inFeed = await waitForPostInPublicHashnodeFeed(
+      slug,
+      Number(process.env.HASHNODE_FEED_WAIT_ATTEMPTS || "15"),
+      Number(process.env.HASHNODE_FEED_WAIT_MS || "4000")
+    );
+    if (!inFeed) {
+      const err =
+        "Post not visible in public Hashnode GraphQL after repeated checks — aideazz /blog and sitemap will NOT list it. " +
+        `Confirm HASHNODE_HOST=${HASHNODE_PUBLIC_HOST} matches the publication, publicationId is correct, and HASHNODE_DAILY_DELISTED is not true.`;
+      await notifyTelegramHashnodeFailure(`${err}\nSlug: ${slug}\n${post.url}`);
+      throw new Error(err);
+    }
+  } else {
+    console.warn(
+      "📰 HASHNODE_DAILY_DELISTED: post is not in public GQL — aideazz /blog will not list it. Remove delist for full pipeline."
+    );
+  }
+
+  const reach = await verifyUrlReachableWithRetries(post.url, {
+    maxAttempts: 6,
+    delayMs: 3000,
+  });
+  if (!reach.ok && reach.status === 404) {
+    console.warn(
+      "📰 Direct URL check: HTTP 404 (browser/server); public GQL already passed for aideazz — optional to verify in browser."
+    );
+  } else if (!reach.ok && reach.status && reach.status !== 403) {
+    console.warn(
+      `📰 Direct URL: HTTP ${reach.status} (datacenter or bot filter); portfolio uses GQL, not this fetch.`
+    );
+  }
+
+  // Cross-post to Dev.to only after listed posts are confirmed in the same public API as aideazz
+  const devtoUrl = await crossPostToDevTo(post.title, parsed.markdown, post.url);
+  if (!devtoUrl && process.env.DEVTO_API_KEY?.trim()) {
+    console.warn("📰 Dev.to API returned no URL (check key / rate); Hashnode + aideazz are still OK.");
+  }
+
+  writeTopicIndex(index);
   await saveContentLog({
     channel: "hashnode_daily",
     keyword,
@@ -514,10 +656,12 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     topicIndex: index,
   });
 
-  const slug = post.slug?.trim() || "";
-  const aideazzBlogUrl = slug ? `${AIDEAZZ_SITE}/blog/${encodeURIComponent(slug)}` : `${AIDEAZZ_SITE}/blog`;
+  const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${encodeURIComponent(slug)}`;
+  const gqOk = !delisted;
   const lines = [
-    devtoUrl ? "📰 Published + cross-posted (Hashnode + Dev.to + aideazz blog feed)" : "📰 Published (Hashnode + aideazz blog feed)",
+    gqOk
+      ? "📰 OK: Hashnode public feed + aideazz /blog + sitemap (same GQL). Dev.to cross-posted when API succeeds."
+      : "📰 Hashnode published (delisted — not in public GQL; aideazz /blog will not list).",
     "",
     post.title,
     `🔗 Hashnode: ${post.url}`,
@@ -526,11 +670,11 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   if (devtoUrl) lines.push(`🔗 Dev.to: ${devtoUrl}`);
   if (delisted) {
     lines.push("");
-    lines.push("⚠️ Delisted: hidden from public Hashnode feed — aideazz.xyz/blog may not list this post.");
+    lines.push("⚠️ Delisted: set HASHNODE_DAILY_DELISTED=false (and HASHNODE_DAILY_PUBLIC=true) for portfolio + feed sync.");
   }
-  if (!reach.ok && reach.status === 404) {
+  if (!devtoUrl && process.env.DEVTO_API_KEY?.trim()) {
     lines.push("");
-    lines.push("⚠️ URL check returned 404 — confirm post is listed in Hashnode dashboard.");
+    lines.push("⚠️ Dev.to cross-post failed or skipped — see logs.");
   }
   const telegramMsg = lines.join("\n");
   await notifyTelegramHashnodePublished(post.title, telegramMsg);
