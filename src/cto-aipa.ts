@@ -852,9 +852,9 @@ async function startCTOAIPA() {
   app.get('/hashnode/daily-status', (_req, res) => {
     res.json({
       enabled: process.env.HASHNODE_DAILY_ENABLED === 'true',
-      cron: process.env.HASHNODE_DAILY_CRON || '0 15 * * *',
+      cron: process.env.HASHNODE_DAILY_CRON || '30 14 * * *',
       timezone: process.env.HASHNODE_DAILY_TZ || 'America/Panama',
-      note: 'Default 15:00 Panama City (UTC−5); override HASHNODE_DAILY_CRON / HASHNODE_DAILY_TZ',
+      note: 'Default 14:30 Panama City (UTC−5); override HASHNODE_DAILY_CRON / HASHNODE_DAILY_TZ',
       publicFeed: !hashnodeDailyIsDelisted(),
       delistedNote:
         'When delisted, Hashnode hides posts from public GraphQL — aideazz.xyz/blog will not list them. Default is listed.',

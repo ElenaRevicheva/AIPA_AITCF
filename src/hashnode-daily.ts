@@ -125,10 +125,17 @@ async function verifyUrlReachableWithRetries(
   return verifyHashnodeUrlReachable(url);
 }
 
-/** Optional: set TELEGRAM_HASHNODE_NOTIFY_CHAT_ID + TELEGRAM_BOT_TOKEN for post alerts */
+/** Same bot as CTO AIPA; prefers HASHNODE-specific chat, else digest chat (so one ID works). */
+function resolveTelegramNotifyChatId(): string | undefined {
+  return (
+    process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim() ||
+    process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID?.trim()
+  );
+}
+
 async function notifyTelegramHashnodePublished(title: string, urlOrMessage: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
-  const chatId = process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim();
+  const chatId = resolveTelegramNotifyChatId();
   if (!token || !chatId) return;
   // If urlOrMessage already contains newlines it's a pre-built message, else build one
   const text = urlOrMessage.includes("\n") ? urlOrMessage : `📰 Hashnode published\n\n${title}\n${urlOrMessage}`;
@@ -153,7 +160,7 @@ async function notifyTelegramHashnodePublished(title: string, urlOrMessage: stri
 
 async function notifyTelegramHashnodeFailure(message: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
-  const chatId = process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim();
+  const chatId = resolveTelegramNotifyChatId();
   if (!token || !chatId) return;
   const text = `🚨 Hashnode daily FAILED (no Dev.to cross-post until fixed)\n\n${message}`;
   try {
@@ -657,24 +664,36 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   });
 
   const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${encodeURIComponent(slug)}`;
+  /** Same page with Spanish UI + localized titles/bodies where bundled (`?lng=es`). */
+  const aideazzSpanishUiUrl = `${aideazzBlogUrl}?lng=es`;
   const gqOk = !delisted;
   const lines = [
     gqOk
-      ? "📰 OK: Hashnode public feed + aideazz /blog + sitemap (same GQL). Dev.to cross-posted when API succeeds."
+      ? "📰 OK — English article live on all three surfaces below (API URLs, not placeholders)."
       : "📰 Hashnode published (delisted — not in public GQL; aideazz /blog will not list).",
     "",
     post.title,
-    `🔗 Hashnode: ${post.url}`,
-    `🔗 Site: ${aideazzBlogUrl}`,
+    "",
+    "1) Hashnode (canonical, English):",
+    post.url,
+    "",
+    "2) aideazz /blog (mirrors Hashnode; add ?lng=es for Spanish chrome + overrides):",
+    aideazzSpanishUiUrl,
+    "",
+    devtoUrl
+      ? "3) Dev.to (cross-post, English):"
+      : process.env.DEVTO_API_KEY?.trim()
+        ? "3) Dev.to: (cross-post failed — check logs / DEVTO_API_KEY)"
+        : "3) Dev.to: (skipped — DEVTO_API_KEY not set)",
   ];
-  if (devtoUrl) lines.push(`🔗 Dev.to: ${devtoUrl}`);
+  if (devtoUrl) lines.push(devtoUrl);
   if (delisted) {
     lines.push("");
     lines.push("⚠️ Delisted: set HASHNODE_DAILY_DELISTED=false (and HASHNODE_DAILY_PUBLIC=true) for portfolio + feed sync.");
   }
   if (!devtoUrl && process.env.DEVTO_API_KEY?.trim()) {
     lines.push("");
-    lines.push("⚠️ Dev.to cross-post failed or skipped — see logs.");
+    lines.push("⚠️ Dev.to cross-post failed or skipped — see PM2 logs.");
   }
   const telegramMsg = lines.join("\n");
   await notifyTelegramHashnodePublished(post.title, telegramMsg);
@@ -695,8 +714,8 @@ export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model:
     console.log("📰 Hashnode daily: off (set HASHNODE_DAILY_ENABLED=true to schedule)");
     return null;
   }
-  // Default: 15:00 (3:00 PM) every day, America/Panama (UTC−5, Panama City — no DST)
-  const cronExpr = process.env.HASHNODE_DAILY_CRON || "0 15 * * *";
+  // Default: 14:30 (2:30 PM) every day, America/Panama (UTC−5, Panama City — no DST)
+  const cronExpr = process.env.HASHNODE_DAILY_CRON || "30 14 * * *";
   const tz = process.env.HASHNODE_DAILY_TZ || "America/Panama";
   const job = cron.schedule(
     cronExpr,
