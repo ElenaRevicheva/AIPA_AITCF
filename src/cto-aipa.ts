@@ -21,6 +21,7 @@ import {
   HASHNODE_TOPIC_BRIEFS,
   hashnodeDailyIsDelisted,
 } from './hashnode-daily';
+import { getOrCreateSpanishBundle, readCachedSpanishMeta } from './blog-es-bundle';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
 import {
   getResendApiKey,
@@ -882,6 +883,83 @@ async function startCTOAIPA() {
       console.error('hashnode/daily-run:', e);
       res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
     }
+  });
+
+  // ==========================================================================
+  // BLOG — Spanish bundles for aideazz.xyz (cached Claude translation)
+  // ==========================================================================
+
+  const blogEsOrigins = new Set([
+    'https://aideazz.xyz',
+    'https://www.aideazz.xyz',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+  ]);
+
+  function blogEsCors(req: Request, res: Response): void {
+    const o = req.headers.origin;
+    if (o && blogEsOrigins.has(o)) {
+      res.setHeader('Access-Control-Allow-Origin', o);
+      res.setHeader('Vary', 'Origin');
+    }
+  }
+
+  app.options('/blog/es-bundle/:slug', (req: Request, res: Response) => {
+    blogEsCors(req, res);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).end();
+  });
+
+  app.options('/blog/es-meta/:slug', (req: Request, res: Response) => {
+    blogEsCors(req, res);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).end();
+  });
+
+  app.get('/blog/es-bundle/:slug', async (req: Request, res: Response) => {
+    blogEsCors(req, res);
+    if (process.env.BLOG_ES_TRANSLATE_ENABLED === 'false') {
+      res.status(503).json({ error: 'Spanish blog bundle disabled (BLOG_ES_TRANSLATE_ENABLED=false)' });
+      return;
+    }
+    const raw = typeof req.params.slug === 'string' ? req.params.slug : '';
+    const slug = decodeURIComponent(raw).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 180);
+    if (!slug) {
+      res.status(400).json({ error: 'Invalid slug' });
+      return;
+    }
+    try {
+      const bundle = await getOrCreateSpanishBundle(slug);
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.json(bundle);
+    } catch (e) {
+      console.error('GET /blog/es-bundle:', e);
+      const msg = e instanceof Error ? e.message : String(e);
+      res.status(msg.includes('not found') ? 404 : 502).json({ error: msg });
+    }
+  });
+
+  app.get('/blog/es-meta/:slug', (req: Request, res: Response) => {
+    blogEsCors(req, res);
+    if (process.env.BLOG_ES_TRANSLATE_ENABLED === 'false') {
+      res.status(503).json({ error: 'disabled' });
+      return;
+    }
+    const raw = typeof req.params.slug === 'string' ? req.params.slug : '';
+    const slug = decodeURIComponent(raw).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 180);
+    if (!slug) {
+      res.status(400).json({ error: 'Invalid slug' });
+      return;
+    }
+    const meta = readCachedSpanishMeta(slug);
+    if (!meta) {
+      res.status(404).json({ error: 'not_cached' });
+      return;
+    }
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.json(meta);
   });
 
   // ==========================================================================

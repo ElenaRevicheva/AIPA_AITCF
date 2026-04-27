@@ -20,6 +20,7 @@ Thumbs.db
 # Runtime state (persisted locally, not in repo)
 atuona-state.json
 data/hashnode-last-topic.json
+data/blog-es-cache/
 # Local Places smoke-test output (real API responses)
 data/places-live-test.html
 data/places-live-test.json
