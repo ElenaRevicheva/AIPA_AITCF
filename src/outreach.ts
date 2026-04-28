@@ -16,6 +16,9 @@ import {
   getOutreachSentToday,
   getOutreachStats,
   getOutreachDrafts,
+  getFirstOutreachSendDate,
+  getPendingLeads,
+  updateTargetEmail,
 } from './database';
 import { getResendApiKey } from './marketing-notify';
 
@@ -29,7 +32,7 @@ const AIDEAZZ_SYSTEMS: Array<{
 }> = [
   {
     name: 'CTO AIPA',
-    description: 'AI Technical Co-Founder — automated code review, architecture guidance, deployment orchestration across 11 repos',
+    description: 'AI Technical Co-Founder — automated code review, architecture guidance, deployment orchestration across 10 repos',
     painKeywords: ['code review', 'technical debt', 'architecture', 'deployment', 'devops', 'engineering management'],
   },
   {
@@ -366,10 +369,40 @@ export async function generateBatchDrafts(
 }
 
 // ---------------------------------------------------------------------------
-// Send via Resend with daily cap
+// Warmup ramp — protects sending domain reputation
+// Starts at OUTREACH_WARMUP_BASE (default 3), adds OUTREACH_WARMUP_INCREMENT
+// (default 2) each week, up to OUTREACH_DAILY_CAP (default 10).
+// Set OUTREACH_WARMUP_ENABLED=false to disable (flat cap).
 // ---------------------------------------------------------------------------
 
-const DAILY_CAP = Number(process.env.OUTREACH_DAILY_CAP || 10);
+const DAILY_CAP_MAX = Number(process.env.OUTREACH_DAILY_CAP || 10);
+const WARMUP_BASE = Number(process.env.OUTREACH_WARMUP_BASE || 3);
+const WARMUP_INCREMENT = Number(process.env.OUTREACH_WARMUP_INCREMENT || 2);
+const WARMUP_ENABLED = (process.env.OUTREACH_WARMUP_ENABLED ?? 'true') !== 'false';
+
+export async function getWarmupDailyCap(): Promise<number> {
+  if (!WARMUP_ENABLED) return DAILY_CAP_MAX;
+  try {
+    const firstSend = await getFirstOutreachSendDate();
+    if (!firstSend) {
+      // No sends yet — start at warmup base
+      return WARMUP_BASE;
+    }
+    const daysSinceFirst = Math.floor((Date.now() - firstSend.getTime()) / 86_400_000);
+    const week = Math.floor(daysSinceFirst / 7); // 0-indexed week
+    const cap = WARMUP_BASE + week * WARMUP_INCREMENT;
+    return Math.min(cap, DAILY_CAP_MAX);
+  } catch {
+    return WARMUP_BASE; // safe fallback
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Send via Resend with warmup-aware daily cap
+// ---------------------------------------------------------------------------
+
+/** @deprecated Use getWarmupDailyCap() for the effective cap. Left for backward compat. */
+const DAILY_CAP = DAILY_CAP_MAX;
 
 export async function sendOutreachEmail(params: {
   emailId: string;
@@ -383,8 +416,9 @@ export async function sendOutreachEmail(params: {
   }
 
   const sentToday = await getOutreachSentToday();
-  if (sentToday >= DAILY_CAP) {
-    return { sent: false, reason: `Daily cap reached (${sentToday}/${DAILY_CAP})` };
+  const effectiveCap = await getWarmupDailyCap();
+  if (sentToday >= effectiveCap) {
+    return { sent: false, reason: `Daily cap reached (${sentToday}/${effectiveCap} — warmup week)` };
   }
 
   const from = process.env.OUTREACH_FROM?.trim() || process.env.MARKETING_INQUIRY_FROM?.trim() || 'AIdeazz <elena@aideazz.xyz>';
@@ -497,10 +531,12 @@ export async function runDailyOutreachCycle(
     // Step 3: get stats for Telegram summary
     const stats = await getOutreachStats();
     const resendConfigured = Boolean(getResendApiKey());
+    const warmupCap = await getWarmupDailyCap();
 
     const lines = [
       `Phase 4 — client outreach (honest summary)`,
       resendConfigured ? `Resend: configured` : `Resend: NOT configured — no real sends (set RESEND_API_KEY or RESEND_KEY)`,
+      WARMUP_ENABLED ? `Warmup ramp: ENABLED (cap today=${warmupCap}/${DAILY_CAP_MAX})` : `Warmup ramp: disabled (flat cap ${DAILY_CAP_MAX})`,
       ``,
       `Targets verified: ${verify.verified}, invalid: ${verify.invalid}`,
       `Draft rows created (Claude): ${gen.generated}`,
@@ -512,7 +548,7 @@ export async function runDailyOutreachCycle(
         : '',
       ``,
       `Pipeline: ${stats.total_targets} targets, ${stats.total_sent} total sent ever`,
-      `Today: ${stats.sent_today} of ${DAILY_CAP} cap — reply rate ${stats.reply_rate}`,
+      `Today: ${stats.sent_today} of ${warmupCap} cap — reply rate ${stats.reply_rate}`,
     ]
       .filter(Boolean)
       .join('\n');
@@ -531,6 +567,9 @@ export async function runDailyOutreachCycle(
 // ---------------------------------------------------------------------------
 // Telegram notification helpers
 // ---------------------------------------------------------------------------
+
+// Re-export DB helpers so callers only need to import from outreach
+export { getPendingLeads, updateTargetEmail } from './database';
 
 export function formatOutreachStatsMessage(stats: Awaited<ReturnType<typeof getOutreachStats>>): string {
   return [

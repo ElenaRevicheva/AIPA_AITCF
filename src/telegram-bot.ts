@@ -64,6 +64,9 @@ import {
   sendApprovedDrafts,
   formatOutreachStatsMessage,
   formatDraftPreview,
+  getWarmupDailyCap,
+  getPendingLeads,
+  updateTargetEmail,
   type OutreachTargetInput,
 } from './outreach';
 import { runProspectIngestion } from './prospect-ingest';
@@ -569,6 +572,9 @@ Type /menu for all commands! 🚀
         { cmd: '/places_ingest', desc: 'Google Places → outreach targets by city + industry', usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City\n/places_ingest realtors Louisville KY\nPresets: construction, saas, retail, healthcare' },
         { cmd: '/doc_ingest', desc: 'Paste any business doc → extract prospects → outreach', usage: '/doc_ingest RFP\n[paste RFP, takeoff sheet, call log, client list below]\nExtracts contacts → Hunter.io → outreach pipeline' },
         { cmd: '/outreach_drafts', desc: 'Review pending outreach drafts', usage: '/outreach_drafts\nPreview emails before sending' },
+        { cmd: '/pending_leads', desc: 'Leads with no email (stuck) — show + add manually', usage: '/pending_leads\nShows targets with no email. Use /add_email <id> <email> to unblock.' },
+        { cmd: '/add_email', desc: 'Manually set email on a pending lead', usage: '/add_email <id-prefix> user@company.com' },
+        { cmd: '/linkedin_draft', desc: 'Generate LinkedIn connection message + search link', usage: '/linkedin_draft Chili Panama\nAI drafts a 300-char LinkedIn DM + opens people search' },
         { cmd: '/triage', desc: 'Phase 5: run AI lead triage (site + outreach replies → dashboard)', usage: '/triage\nClassifies business_leads + replied outreach; see /leads/dashboard with secret' },
         { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
         { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
@@ -1155,6 +1161,107 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
     } catch (error) {
       console.error('Outreach drafts error:', error);
       await ctx.reply('❌ Error fetching drafts.');
+    }
+  });
+
+  // /pending_leads — show targets with no email (stuck in pipeline)
+  bot.command('pending_leads', async (ctx) => {
+    try {
+      const leads = await getPendingLeads(15);
+      if (!leads || leads.length === 0) {
+        await ctx.reply('✅ No pending leads — all targets have emails.');
+        return;
+      }
+      const lines = leads.map((r: any, i: number) => {
+        const id = (r.ID || r.id || '').toString().slice(0, 8);
+        const company = r.COMPANY || r.company || '?';
+        const pain = (r.PAIN_POINT || r.pain_point || '').slice(0, 80);
+        // Extract website from pain_point if stored there
+        const webMatch = pain.match(/https?:\/\/[^\s,)]+/);
+        const website = webMatch ? webMatch[0] : null;
+        return `${i + 1}. *${company}* [${id}]\n${website ? `🌐 ${website}\n` : ''}📝 ${pain.slice(0, 60)}`;
+      });
+      const msg = `📭 *${leads.length} leads with no email*\n\nTo add email:\n/add_email <8-char-id> <email>\n\n${lines.join('\n\n')}`;
+      await ctx.reply(msg, { parse_mode: 'Markdown' });
+    } catch (e) {
+      await ctx.reply(`❌ Error: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  });
+
+  // /add_email <id> <email> — manually add email to a pending lead
+  bot.command('add_email', async (ctx) => {
+    try {
+      const args = ctx.message?.text?.split(/\s+/).slice(1) ?? [];
+      if (args.length < 2) {
+        await ctx.reply('Usage: /add_email <target-id-prefix> <email>\nGet IDs from /pending_leads');
+        return;
+      }
+      const [idPrefix, email] = args;
+      if (!idPrefix || !email || !email.includes('@')) {
+        await ctx.reply('❌ Invalid args. Usage: /add_email <id> user@company.com');
+        return;
+      }
+      // Query the full ID from prefix
+      const leads = await getPendingLeads(50);
+      const match = leads.find((r: any) => {
+        const id = (r.ID || r.id || '').toString();
+        return id.startsWith(idPrefix.toUpperCase()) || id.toLowerCase().startsWith(idPrefix.toLowerCase());
+      });
+      if (!match) {
+        await ctx.reply(`❌ No pending lead found with id starting "${idPrefix}". Run /pending_leads to get IDs.`);
+        return;
+      }
+      const fullId = (match.ID || match.id || '').toString();
+      const company = match.COMPANY || match.company || '?';
+      const ok = await updateTargetEmail(fullId, email);
+      if (ok) {
+        await ctx.reply(`✅ Email set for *${company}*\n${email}\n\nLead will be included in next outreach cycle.`, { parse_mode: 'Markdown' });
+      } else {
+        await ctx.reply('❌ DB update failed. Check Oracle connection.');
+      }
+    } catch (e) {
+      await ctx.reply(`❌ Error: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  });
+
+  // /linkedin_draft <company name> — generate LinkedIn message + search link
+  bot.command('linkedin_draft', async (ctx) => {
+    try {
+      const company = ctx.message?.text?.replace(/^\/linkedin_draft\s*/i, '').trim();
+      if (!company) {
+        await ctx.reply('Usage: /linkedin_draft <company name>\nExample: /linkedin_draft Chili Panama');
+        return;
+      }
+      await ctx.reply(`✍️ Generating LinkedIn outreach for *${company}*…`, { parse_mode: 'Markdown' });
+
+      const prompt = `Write a short, direct LinkedIn connection request message (300 chars max) from Elena Revicheva, AI automation builder, to a founder/CEO at "${company}".
+
+Context: Elena builds AI automations — Telegram/WhatsApp bots, outreach pipelines, LLM integrations — on Oracle at $0/month infra cost. She wants to connect, not pitch immediately.
+
+Return ONLY the message text. No subject line. No "Hi [Name]" opener that requires a name. Start with a hook about their company or industry.`;
+
+      const resp = await anthropic.messages.create({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      const draft = resp.content[0]?.type === 'text' ? resp.content[0].text.trim() : 'Could not generate draft.';
+
+      const searchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(company + ' founder CEO')}&origin=GLOBAL_SEARCH_HEADER`;
+
+      await ctx.reply(
+        `🔗 *LinkedIn draft for ${company}*\n\n${draft}\n\n---\n📋 Copy the message above, then open LinkedIn to find the right person:`,
+        {
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [[
+              { text: '🔍 Find on LinkedIn →', url: searchUrl },
+            ]],
+          },
+        }
+      );
+    } catch (e) {
+      await ctx.reply(`❌ Error: ${e instanceof Error ? e.message : String(e)}`);
     }
   });
 

@@ -2260,6 +2260,69 @@ async function getOutreachTargetByCompany(company: string): Promise<any | null> 
   }
 }
 
+/** Earliest sent_at in outreach_log — used to calculate warmup ramp week number. */
+async function getFirstOutreachSendDate(): Promise<Date | null> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const r = await connection.execute(
+      `SELECT MIN(sent_at) FROM outreach_log WHERE status = 'sent'`
+    );
+    const val = r.rows ? (r.rows[0] as any[])[0] : null;
+    return val ? new Date(val) : null;
+  } catch (err) {
+    console.error('❌ getFirstOutreachSendDate error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+/** Leads with no email set — shown in /pending_leads Telegram command. */
+async function getPendingLeads(limit = 20): Promise<any[]> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) as id, name, company, email_status, source, pain_point, created_at
+       FROM outreach_targets
+       WHERE (email IS NULL OR email_status = 'missing')
+         AND status NOT IN ('invalid_email', 'emailed')
+       ORDER BY created_at DESC
+       FETCH FIRST :limit ROWS ONLY`,
+      { limit },
+      { outFormat: 4002 /* OUT_FORMAT_OBJECT */ }
+    );
+    return (result.rows as any[]) || [];
+  } catch (err) {
+    console.error('❌ getPendingLeads error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+/** Set email on a target so it enters the send pipeline. */
+async function updateTargetEmail(targetId: string, email: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    await connection.execute(
+      `UPDATE outreach_targets
+       SET email = :email, email_status = 'unverified', updated_at = CURRENT_TIMESTAMP
+       WHERE RAWTOHEX(id) = :id`,
+      { email, id: targetId },
+      { autoCommit: true }
+    );
+    return true;
+  } catch (err) {
+    console.error('❌ updateTargetEmail error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 /** Single round-trip dedup for Places ingest (avoids N× Oracle connection storms). */
 async function getOutreachExistingCompaniesLowercase(companies: string[]): Promise<Set<string>> {
   const uniq = [...new Set(companies.map((c) => c.trim().toLowerCase()).filter(Boolean))];
@@ -2689,6 +2752,9 @@ export {
   getOutreachSentToday,
   getOutreachStats,
   getOutreachDrafts,
+  getFirstOutreachSendDate,
+  getPendingLeads,
+  updateTargetEmail,
   // === PHASE 5 — Lead Triage ===
   saveTriagedLead,
   getTriagedLeads,
