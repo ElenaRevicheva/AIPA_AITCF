@@ -1,8 +1,21 @@
-import { getKnowledgeByCategory } from '../database';
-
-/** Reuse CTO Personal AI: diary + tasks give "what Elena already said" — dream-workflow alignment. */
+/**
+ * Loads personal context (diary + tasks) from Oracle.
+ *
+ * Two paths:
+ *  - Lambda (ORACLE_WALLET_S3_BUCKET set): thin-mode connection, wallet from S3
+ *  - Oracle server (default): thick-mode via existing database.ts pool
+ */
 export async function loadPersonalKnowledgeContext(userIds: number[]): Promise<string> {
   if (userIds.length === 0) return '';
+
+  // Lambda path — wallet lives in S3, use thin-mode connector
+  if (process.env.ORACLE_WALLET_S3_BUCKET) {
+    const { loadKnowledgeFromOracle } = await import('./oracle-thin');
+    return loadKnowledgeFromOracle(userIds);
+  }
+
+  // Oracle server path — thick-mode pool already initialised by database.ts
+  const { getKnowledgeByCategory } = await import('../database');
   const lines: string[] = ['### Personal context (Oracle knowledge_base)'];
   for (const uid of userIds) {
     try {
