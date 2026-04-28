@@ -42,6 +42,7 @@ import { runProspectIngestion } from './prospect-ingest';
 import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
 import { runDocIngestion } from './doc-ingest';
 import { runTriageCycle, buildDailyBrief, buildDashboardHtml, getPhase5TriageStatus } from './lead-triage';
+import { runSprintBriefing, deliverBriefingToTelegram } from './sprint-briefing/run';
 import * as dotenv from 'dotenv';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
@@ -1696,6 +1697,61 @@ async function startCTOAIPA() {
     });
   });
 
+  // Sprint Briefing Agent (opt-in — no route unless SPRINT_BRIEFING_SECRET set; zero impact on existing stacks)
+  if (process.env.SPRINT_BRIEFING_SECRET?.trim()) {
+    app.post('/sprint-briefing/run', async (req: Request, res: Response) => {
+      const secret = process.env.SPRINT_BRIEFING_SECRET!.trim();
+      const auth = req.headers.authorization?.replace('Bearer ', '') ?? '';
+      if (auth !== secret) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+      const wait = req.query.wait === '1' || req.query.sync === '1';
+      const uidRaw =
+        process.env.SPRINT_BRIEFING_KNOWLEDGE_USER_IDS?.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !Number.isNaN(n)) ??
+        [];
+      const deps = {
+        githubRepos: (process.env.SPRINT_BRIEFING_GITHUB_REPOS || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean),
+        linearTeamId: process.env.LINEAR_TEAM_ID?.trim(),
+        knowledgeUserIds: uidRaw.length ? uidRaw : undefined,
+      };
+
+      const exec = async () => {
+        const result = await runSprintBriefing({ groq, anthropic, octokit }, deps);
+        await deliverBriefingToTelegram(result);
+        return result;
+      };
+
+      if (wait) {
+        try {
+          const result = await exec();
+          res.json({
+            ok: true,
+            chars: result.narrativeText.length,
+            audioBytes: result.audioMp3?.length ?? 0,
+            skipped: result.audioSkippedReason,
+          });
+        } catch (err: unknown) {
+          console.error('Sprint briefing error:', err);
+          if (!res.headersSent) res.status(500).json({ error: String((err as Error)?.message || err) });
+        }
+        return;
+      }
+
+      res.status(202).json({
+        ok: true,
+        accepted: true,
+        message: 'Sprint briefing running — watch Telegram and PM2 logs.',
+      });
+      setImmediate(() => {
+        exec().catch(e => console.error('Sprint briefing background error:', e));
+      });
+    });
+  }
+
   const PORT = 3000;
   const baseUrl = process.env.CTO_AIPA_PUBLIC_URL || `http://0.0.0.0:${PORT}`;
   app.listen(PORT, '0.0.0.0', () => {
@@ -1706,6 +1762,9 @@ async function startCTOAIPA() {
     console.log(`🏆 Tech Milestones: ${baseUrl}/tech-milestones`);
     console.log(`🏥 Health: ${baseUrl}/`);
     console.log(`🎯 Phase 5: GET ${baseUrl}/leads/triage-status · POST ${baseUrl}/leads/triage-run`);
+    if (process.env.SPRINT_BRIEFING_SECRET?.trim()) {
+      console.log(`☀️ Sprint Briefing: POST ${baseUrl}/sprint-briefing/run (Bearer SPRINT_BRIEFING_SECRET)`);
+    }
     if (process.env.CMO_WEBHOOK_URL) console.log(`🤝 CMO: ${process.env.CMO_WEBHOOK_URL}`);
     
     // Initialize Telegram Bot (CTO AIPA)
@@ -1786,6 +1845,28 @@ async function startCTOAIPA() {
       } catch (e) { console.error('🎯 [cron] Triage error:', e); }
     }, { timezone: triageTz });
     console.log(`🎯 Triage cron: "${triageCronExpr}" (${triageTz}) — daily lead brief`);
+
+    const sprintCronExpr = process.env.SPRINT_BRIEFING_CRON?.trim();
+    if (sprintCronExpr && process.env.SPRINT_BRIEFING_SECRET?.trim()) {
+      cron.schedule(
+        sprintCronExpr,
+        () => {
+          console.log('☀️ [cron] Sprint briefing starting…');
+          const kRaw =
+            process.env.SPRINT_BRIEFING_KNOWLEDGE_USER_IDS?.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !Number.isNaN(n)) ??
+            [];
+          runSprintBriefing({ groq, anthropic, octokit }, {
+            githubRepos: (process.env.SPRINT_BRIEFING_GITHUB_REPOS || '').split(',').map(s => s.trim()).filter(Boolean),
+            linearTeamId: process.env.LINEAR_TEAM_ID?.trim(),
+            knowledgeUserIds: kRaw.length ? kRaw : undefined,
+          })
+            .then(r => deliverBriefingToTelegram(r))
+            .catch(e => console.error('☀️ [cron] Sprint briefing error:', e));
+        },
+        { timezone: triageTz },
+      );
+      console.log(`☀️ Sprint briefing cron: "${sprintCronExpr}" (${triageTz})`);
+    }
   });
 }
 

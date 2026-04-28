@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sprint Briefing Agent — EventBridge → Lambda → Telegram (Groq + Claude + OpenAI TTS)
+
+Parameters:
+  CronExpression:
+    Type: String
+    Default: cron(0 13 * * ? *)
+    Description: 08:00 America/Panama = 13:00 UTC (no DST in Panama) — verify in EventBridge console.
+
+Resources:
+  SprintBriefingFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.handler
+      Runtime: nodejs20.x
+      Timeout: 300
+      MemorySize: 1024
+      Environment:
+        Variables:
+          SPRINT_BRIEFING_SKIP_ORACLE: '1'
+          # Set secrets via console or AWS Secrets Manager extension — do not commit keys.
+      Events:
+        MorningSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: !Ref CronExpression
+            Enabled: true
+
+Outputs:
+  FunctionArn:
+    Value: !GetAtt SprintBriefingFn.Arn
