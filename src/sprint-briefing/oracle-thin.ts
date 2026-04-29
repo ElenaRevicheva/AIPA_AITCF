@@ -98,7 +98,7 @@ export async function loadKnowledgeFromOracle(
     for (const uid of userIds) {
       // Last 5 diary entries
       const diary = await conn.execute<[string, string]>(
-        `SELECT title, body FROM knowledge_base
+        `SELECT title, content FROM knowledge_base
          WHERE user_id = :uid AND category = 'diary'
          ORDER BY created_at DESC FETCH FIRST 5 ROWS ONLY`,
         { uid },
@@ -107,7 +107,7 @@ export async function loadKnowledgeFromOracle(
 
       // Up to 15 pending tasks
       const tasks = await conn.execute<[string, string]>(
-        `SELECT title, body FROM knowledge_base
+        `SELECT title, content FROM knowledge_base
          WHERE user_id = :uid AND category = 'task' AND (status IS NULL OR status = 'pending')
          ORDER BY created_at DESC FETCH FIRST 15 ROWS ONLY`,
         { uid },
