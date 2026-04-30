@@ -266,6 +266,77 @@ Do this once on the server (SSH as above).
 
 ---
 
+## 8. Sprinter (Sprint Briefing Lambda) — Oracle Wallet & Knowledge Access (April 2026)
+
+**Context:** Sprinter runs as **AWS Lambda** (`sprint-briefing-agent`), not on the Oracle VM. It needs to read voice-note tasks and diary entries from `knowledge_base` in Oracle Autonomous DB to include them in the morning briefing. Two approaches were tried; only the REST proxy works reliably.
+
+### Wallet files (for reference)
+
+Oracle wallet for CTO AIPA lives at **`/home/ubuntu/cto-aipa/wallet/`** on the Oracle VM (9 files):
+
+| File | Purpose |
+|------|---------|
+| `cwallet.sso` | Auto-login wallet — thick mode only (no password needed). Works on the Oracle VM via Instant Client. |
+| `ewallet.p12` | PKCS12 encrypted wallet — thin mode (Lambda). **Requires wallet password.** |
+| `ewallet.pem` | PEM-encoded wallet — thin mode (Lambda). **Requires wallet password.** |
+| `sqlnet.ora` | Connection config — `WALLET_LOCATION` must point to absolute path (e.g. `/home/ubuntu/cto-aipa/wallet`). |
+| `tnsnames.ora` | TNS aliases (e.g. `ctoaipadb2025_high`). |
+| Others | `keystore.jks`, `truststore.jks`, `ojdbc.properties`, `README` |
+
+**Critical:** `ewallet.p12` and `ewallet.pem` are encrypted with a wallet password. The server `.env` has `#WALLET_PASSWORD=disabled` — the thick-mode Oracle server uses `cwallet.sso` (auto-login, no password). The wallet password for PKCS12 files is **not stored anywhere** and was never set in `.env`. Do NOT attempt thin-mode from Lambda using these files.
+
+### Why thin-mode from Lambda doesn't work
+
+- Lambda uses **oracledb v6 thin mode** (pure JS, no Instant Client) — requires `ewallet.p12` with a password.
+- `cwallet.sso` is thick-mode only and cannot be used in Lambda.
+- The wallet password is unknown/lost — attempts to use an empty string or `DB_PASSWORD` both fail with `NJS-505: bad decrypt`.
+
+### Solution: REST proxy endpoint on CTO AIPA server
+
+Lambda calls the Oracle server **directly via HTTPS** instead of connecting to Oracle. The CTO AIPA server already has a working thick-mode Oracle connection (via `cwallet.sso`, no password needed).
+
+**Endpoint:** `GET https://webhook.aideazz.xyz/cto/sprint-knowledge?userIds=<id1>,<id2>`  
+**Auth:** `Authorization: Bearer <OUTREACH_SECRET>`  
+**Response:** `{ ok: true, context: "### Personal context (Oracle knowledge_base)\nUser ... pending tasks:\n- ..." }`
+
+Returns last 5 diary entries + up to 15 pending tasks per user from `knowledge_base`.
+
+**Lambda env vars required:**
+
+| Var | Value |
+|-----|-------|
+| `SPRINT_KNOWLEDGE_API_URL` | `https://webhook.aideazz.xyz/cto/sprint-knowledge` |
+| `OUTREACH_SECRET` | (see server `.env` — the shared outreach auth secret) |
+
+**Code path:** `src/sprint-briefing/knowledge-context.ts` — checks `SPRINT_KNOWLEDGE_API_URL` first (HTTP proxy), then falls back to `ORACLE_WALLET_S3_BUCKET` (oracle-thin, disabled in practice), then thick-mode pool (server only).
+
+### Row format in `knowledge_base`
+
+Oracle thick mode returns rows as **arrays**, not objects. `getKnowledgeByCategory` returns:
+
+```
+row[0] = id (hex string)
+row[1] = category  
+row[2] = title
+row[3] = content
+row[4] = status
+row[5] = project
+row[6] = source  ('voice', 'telegram', etc.)
+row[7] = created_at (ISO string)
+```
+
+Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endpoint — NOT `row.title` / `row.TITLE` (those return undefined).
+
+### Voice notes → briefing flow
+
+1. User sends voice message to CTO AIPA Telegram bot
+2. Whisper transcribes → `detectPersonalAIIntent` → `handlePersonalAIAction` → `saveKnowledge(userId, 'task'|'diary', title, content, 'pending', ...)`
+3. Knowledge saved to Oracle `knowledge_base` with `source='voice'`
+4. Next morning: Lambda Sprinter fires (EventBridge `cron(0 13 * * ? *)` = 8AM Panama / UTC-5)
+5. Lambda calls `/sprint-knowledge` → gets tasks → includes in briefing prompt → Claude generates script → OpenAI TTS → audio sent to Telegram
+
+---
+
 ## References
 
 - Plan (EspaLuz-focused): `.cursor/plans/oracle_instance_resilience_d6cfcf8b.plan.md`
@@ -277,7 +348,7 @@ Do this once on the server (SSH as above).
 
 ---
 
-## Last Verified (April 29, 2026)
+## Last Verified (April 30, 2026)
 
 | Agent | Status | Notes |
 |-------|--------|-------|
@@ -285,7 +356,7 @@ Do this once on the server (SSH as above).
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
 | EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
 | VibeJob Hunter + CMO | ✅ Running (Oracle) | `vibejobhunter` + `vibejobhunter-web`; code at `70ee90a` (Apr 2026). Health: `curl -s http://127.0.0.1:8080/health`. Public `:8080` may be closed; set `CMO_WEBHOOK_URL` on CTO to a reachable URL if CTO must call CMO from outside the VM. **[aideazz.xyz](https://aideazz.xyz)** front-end: 4everland + **`main`**. |
-| Sprint Briefing (Sprinter) | ⚠️ AWS Lambda | Documented §8.1 symphony + row **8.1** above — verify Lambda/EventBridge in AWS console; not Oracle PM2. |
+| Sprint Briefing (Sprinter) | ✅ AWS Lambda — voice notes working (Apr 30) | Fixed Apr 30 2026. Knowledge loaded via REST proxy `GET /cto/sprint-knowledge` on CTO AIPA server. Lambda env: `SPRINT_KNOWLEDGE_API_URL` + `OUTREACH_SECRET` set. Voice notes from prior day now included in morning briefing. See §8 for wallet/architecture details. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
 **Critical items needing server verification:**
