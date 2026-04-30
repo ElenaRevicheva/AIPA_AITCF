@@ -1760,17 +1760,27 @@ async function startCTOAIPA() {
       const userIds = raw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !Number.isNaN(n));
       if (!userIds.length) { res.status(400).json({ error: 'userIds required' }); return; }
       const { getKnowledgeByCategory } = await import('./database');
+      // Oracle thick mode returns UPPERCASE column names
+      type KbRow = Record<string, string | null>;
       const lines: string[] = ['### Personal context (Oracle knowledge_base)'];
       for (const uid of userIds) {
-        const diary = await getKnowledgeByCategory(uid, 'diary', 5) as { title?: string; content?: string }[];
-        const tasks = await getKnowledgeByCategory(uid, 'task', 15) as { title?: string; content?: string; status?: string }[];
+        const diary = await getKnowledgeByCategory(uid, 'diary', 5) as KbRow[];
+        const tasks = await getKnowledgeByCategory(uid, 'task', 15) as KbRow[];
         if (diary?.length) {
           lines.push(`User ${uid} recent diary:`);
-          for (const row of diary) lines.push(`- ${(row.title || '').slice(0, 80)}: ${(row.content || '').slice(0, 200)}`);
+          for (const row of diary) {
+            const t = (row.TITLE || row.title || '').slice(0, 80);
+            const c = (row.CONTENT || row.content || '').slice(0, 200);
+            lines.push(`- ${t}: ${c}`);
+          }
         }
         if (tasks?.length) {
           lines.push(`User ${uid} pending tasks:`);
-          for (const row of tasks) lines.push(`- ${(row.title || '').slice(0, 120)}`);
+          for (const row of tasks) {
+            const t = (row.TITLE || row.title || '').slice(0, 120);
+            const c = (row.CONTENT || row.content || '').slice(0, 200);
+            lines.push(`- ${t}${c ? ': ' + c : ''}`);
+          }
         }
       }
       res.json({ ok: true, context: lines.join('\n') });
