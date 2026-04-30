@@ -89,7 +89,7 @@ export async function loadKnowledgeFromOracle(
     password: process.env.DB_PASSWORD,
     connectString: CONNECT_STRING,
     walletLocation: WALLET_LOCAL,
-    walletPassword: process.env.WALLET_PASSWORD || undefined,
+    walletPassword: process.env.WALLET_PASSWORD || '',  // '' = no-password wallet (ewallet.p12 with empty pwd)
   });
 
   try {

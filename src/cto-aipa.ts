@@ -1752,6 +1752,34 @@ async function startCTOAIPA() {
     });
   }
 
+  // SPRINT BRIEFING — internal knowledge endpoint (used by Lambda Sprinter)
+  // GET /sprint-knowledge?userIds=123,456  Authorization: Bearer OUTREACH_SECRET
+  app.get('/sprint-knowledge', outreachAuth, async (req: Request, res: Response) => {
+    try {
+      const raw = String(req.query.userIds || '');
+      const userIds = raw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !Number.isNaN(n));
+      if (!userIds.length) { res.status(400).json({ error: 'userIds required' }); return; }
+      const { getKnowledgeByCategory } = await import('./database');
+      const lines: string[] = ['### Personal context (Oracle knowledge_base)'];
+      for (const uid of userIds) {
+        const diary = await getKnowledgeByCategory(uid, 'diary', 5) as { title?: string; content?: string }[];
+        const tasks = await getKnowledgeByCategory(uid, 'task', 15) as { title?: string; content?: string; status?: string }[];
+        if (diary?.length) {
+          lines.push(`User ${uid} recent diary:`);
+          for (const row of diary) lines.push(`- ${(row.title || '').slice(0, 80)}: ${(row.content || '').slice(0, 200)}`);
+        }
+        if (tasks?.length) {
+          lines.push(`User ${uid} pending tasks:`);
+          for (const row of tasks) lines.push(`- ${(row.title || '').slice(0, 120)}`);
+        }
+      }
+      res.json({ ok: true, context: lines.join('\n') });
+    } catch (e: unknown) {
+      console.error('[sprint-knowledge] error:', e);
+      res.status(500).json({ error: String((e as Error)?.message || e) });
+    }
+  });
+
   const PORT = 3000;
   const baseUrl = process.env.CTO_AIPA_PUBLIC_URL || `http://0.0.0.0:${PORT}`;
   app.listen(PORT, '0.0.0.0', () => {
