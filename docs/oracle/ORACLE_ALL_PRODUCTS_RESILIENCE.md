@@ -61,6 +61,8 @@ Each **GitHub repo** has **one** working tree on the VM — **no duplicate clone
 
 ### Canonical local folders + Git remotes (development machine)
 
+> **⚠️ AI ASSISTANT RULE:** This section is the **single source of truth** for all local folder paths and GitHub repos. **Never ask Elena where a repo lives — look here first.** Never create duplicate checkouts. If a path below says "no local checkout", that means no local folder exists — work from GitHub directly.
+
 This doc is the **single map**: **Oracle VM paths** (above) + **where your authoritative clones live locally** + **which GitHub repo each tracks**. **One clone per repo** — never two working trees with the same `origin` (e.g. do **not** duplicate **VJH** under `ai-cofounders` if `D:\aideazz\VibeJobHunterAIPA_AIMCF` already exists).
 
 | GitHub repo | Canonical local path (Windows) | Notes |
@@ -73,8 +75,8 @@ This doc is the **single map**: **Oracle VM paths** (above) + **where your autho
 | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | `D:\aideazz\dragontrade-agent` | Same. |
 | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | `D:\aideazz\openclaw-vibejob-shortlist` | Same. |
 | [AILA](https://github.com/ElenaRevicheva/AILA) | `D:\aideazz\AILA` | Repo-only until deployed on Oracle; symphony inventory source on branch **`docs`**: [`AILA_SYMPHONY_ANALYSIS.md`](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md). |
-| [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` | **[aideazz.xyz](https://aideazz.xyz)** — **4everland** hosting, deploy from GitHub **`main`** (ties to CMO / brand surface). |
-| [atuona](https://github.com/ElenaRevicheva/atuona) | *No local checkout maintained* | **[atuona.xyz](https://atuona.xyz)** — **4everland**, **`main`** only from repo (no `D:\…\atuona` workspace). |
+| [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` | **[aideazz.xyz](https://aideazz.xyz)** — **4everland** hosting, deploy from GitHub **`main`**. Pages: [`/portfolio`](https://aideazz.xyz/portfolio) (AI products portfolio card), [`/pitch.html`](https://aideazz.xyz/pitch.html) (pitch page). i18n content in `src/i18n/locales/en.json` + `es.json`. Static assets / PDFs in `public/`. |
+| [atuona](https://github.com/ElenaRevicheva/atuona) | **No local checkout** | **[atuona.xyz](https://atuona.xyz)** — **4everland**, deploy from GitHub `main` **only**. No `D:\aideazz\atuona` folder exists — edit via GitHub or clone fresh if needed. |
 | **Sprinter** (Lambda workspace; pairs with AIPA_AITCF) | `D:\aideazz\SprintBriefingAgent` | AWS SAM/Lambda packaging for Sprint Briefing — mirrors **`src/sprint-briefing/`** in AIPA_AITCF (see §8.1 in symphony doc). |
 
 **Verify anytime:** `git remote -v` should show `ElenaRevicheva/<repo>` — if two folders point at the same remote, delete or repurpose the duplicate spare checkout.
