@@ -18,22 +18,25 @@
 
 ## All 10 AI Agents on Oracle (Canonical List)
 
-Every agent on this instance **must** have: (1) restart hardening, (2) a health-check (HTTP or process liveness) that restarts if unhealthy, (3) included in OCI keep-alive.
+Every agent on this instance **must** have: (1) restart hardening, (2) a health-check (HTTP or process liveness) that restarts if unhealthy, (3) included in OCI keep-alive — **except AWS-only modules** (Sprinter), which use CloudWatch + EventBridge instead.
 
-| # | Name | Repo | Try it / See it | Process manager | Service / PM2 name | Health URL or check |
-|---|------|------|------------------|------------------|--------------------|----------------------|
-| 1 | **EspaLuz WhatsApp** | [EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp) | [wa.me/50766623757](http://wa.me/50766623757) | systemd | `espaluz-whatsapp` | `http://127.0.0.1:8081/webhook` |
-| 2 | **EspaLuz Telegram** | [EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot) | [t.me/EspaLuzFamily_bot](https://t.me/EspaLuzFamily_bot) | systemd | `espaluz-familybot` or TBD | Add `/health` or use `systemctl is-active` |
-| 3 | **EspaLuz Influencer** | [EspaLuz_Influencer](https://github.com/ElenaRevicheva/EspaLuz_Influencer) | [t.me/Influencer_EspaLuz_bot](https://t.me/Influencer_EspaLuz_bot) | systemd | `espaluz-influencer` | Confirm port on server; add block in script |
-| 4 | **Algom Alpha** | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | Automated posting on @reviceva | PM2 or systemd | e.g. `dragontrade` or `algom-alpha` | Add HTTP health or process check |
-| 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | systemd | `vibejobhunter` | `systemctl is-active vibejobhunter` (autonomous loop; no HTTP) |
-| 6 | **AI Marketing Co-Founder (CMO)** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | systemd | `vibejobhunter-web` | `http://127.0.0.1:8080/health` (FastAPI: CTO `/api/tech-update`, `/health`) |
-| 7 | **OpenClaw Vibejob Shortlist** | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | systemd | `openclaw-gateway` | `http://127.0.0.1:18789/` |
-| 8 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` |
-| 9 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` |
-| 10 | **AILA** (Adaptive Intelligent Life Assistant) | [AILA](https://github.com/ElenaRevicheva/AILA) | *Not deployed as its own process on Oracle yet* — repo holds architecture, blueprint, Hive integration notes | — | — | — |
+| # | Name | Repo | Try it / See it | Process manager | Service / PM2 name | Health URL or check | Public web (4everland) | Web repo (`main` deploy) | Local checkout note |
+|---|------|------|------------------|------------------|--------------------|----------------------|--------------------------|---------------------------|---------------------|
+| 1 | **EspaLuz WhatsApp** | [EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp) | [wa.me/50766623757](http://wa.me/50766623757) | systemd | `espaluz-whatsapp` | `http://127.0.0.1:8081/webhook` | — | — | — |
+| 2 | **EspaLuz Telegram** | [EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot) | [t.me/EspaLuzFamily_bot](https://t.me/EspaLuzFamily_bot) | systemd | `espaluz-familybot` or TBD | Add `/health` or use `systemctl is-active` | — | — | — |
+| 3 | **EspaLuz Influencer** | [EspaLuz_Influencer](https://github.com/ElenaRevicheva/EspaLuz_Influencer) | [t.me/Influencer_EspaLuz_bot](https://t.me/Influencer_EspaLuz_bot) | systemd | `espaluz-influencer` | Confirm port on server; add block in script | — | — | — |
+| 4 | **Algom Alpha** | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | Automated posting on @reviceva | PM2 or systemd | e.g. `dragontrade` or `algom-alpha` | Add HTTP health or process check | — | — | — |
+| 5 | **VibeJob Hunter** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | [t.me/vibejob_hunter_bot](https://t.me/vibejob_hunter_bot) | systemd | `vibejobhunter` | `systemctl is-active vibejobhunter` (autonomous loop; no HTTP) | — | — | — |
+| 6 | **AI Marketing Co-Founder (CMO)** | [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) (same repo as 5) | [LinkedIn](https://linkedin.com/in/elenarevicheva), [Instagram](https://instagram.com/elena_revicheva) | systemd | `vibejobhunter-web` | `http://127.0.0.1:8080/health` (FastAPI: CTO `/api/tech-update`, `/health`) | [aideazz.xyz](https://aideazz.xyz) | [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` |
+| 7 | **OpenClaw Vibejob Shortlist** | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | [t.me/OpenClaw_VibeJobsList_bot](https://t.me/OpenClaw_VibeJobsList_bot) | systemd | `openclaw-gateway` | `http://127.0.0.1:18789/` | — | — | — |
+| 8 | **Tech Co-Founder (CTO AIPA)** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) | PM2 | `cto-aipa` | `http://127.0.0.1:3000/` | — | — | — |
+| 8.1 | **Sprint Briefing (Sprinter)** *(CTO AIPA — AWS)* | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (`src/sprint-briefing/`); packaging workspace `D:\aideazz\SprintBriefingAgent` | Private Telegram (Sprint Briefing audio) | AWS Lambda | `sprint-briefing-agent` | CloudWatch `/aws/lambda/sprint-briefing-agent` · EventBridge schedule `cron(0 13 * * ? *)` (~8:00 America/Panama) | — | — | **Sprinter:** Lambda/SAM workspace — not an Oracle systemd/PM2 process (see [AILA symphony §8.1](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md)) |
+| 9 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` | [atuona.xyz](https://atuona.xyz) | [atuona](https://github.com/ElenaRevicheva/atuona) | *No local web checkout — deploy site from GitHub `main` only (4everland)* |
+| 10 | **AILA** (Adaptive Intelligent Life Assistant) | [AILA](https://github.com/ElenaRevicheva/AILA) | *Not deployed as its own process on Oracle yet* — repo holds architecture, blueprint, Hive integration notes | — | — | — | — | — | `D:\aideazz\AILA` (planning repo) |
 
-**Repos (8):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AILA (8 repos for 10 agents; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF).
+**Repos (8 on Oracle VM):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AILA (8 repos for agents **on the VM**; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF). **Sprinter** uses the same **AIPA_AITCF** codebase path plus optional **`D:\aideazz\SprintBriefingAgent`** workspace for AWS packaging — runtime on **AWS Lambda**, not under `/home/ubuntu/` PM2/systemd.
+
+**Public sites:** [aideazz.xyz](https://aideazz.xyz) and [atuona.xyz](https://atuona.xyz) — **4everland** hosting, deploy from GitHub **`main`**. Not Oracle processes; columns above tie each site to its owning agent narrative.
 
 ### Canonical deploy directories on Oracle (`ubuntu@170.9.242.90`)
 
@@ -52,6 +55,8 @@ Each **GitHub repo** has **one** working tree on the VM — **no duplicate clone
 
 **Same repo, two agents (still one clone):** **#8 + #9** → one checkout **`/home/ubuntu/cto-aipa`**, one PM2 app `cto-aipa`. **#5 + #6** → one checkout **`/home/ubuntu/VibeJobHunterAIPA_AIMCF`**, two units (`vibejobhunter`, `vibejobhunter-web`).
 
+**Sprinter (#8.1):** Runs on **AWS Lambda** (`sprint-briefing-agent`), **not** under systemd/PM2 on this VM. Product narrative and architecture match **[AILA — `AILA_SYMPHONY_ANALYSIS.md` §8.1](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md)**. Ship pipeline code from **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** `src/sprint-briefing/`; optional local packaging folder **`D:\aideazz\SprintBriefingAgent`**.
+
 **Wallet / DB (CTO only):** Autonomous DB wallet for CTO AIPA lives under **`/home/ubuntu/cto-aipa/wallet/`** (see §7).
 
 ### Canonical local folders + Git remotes (development machine)
@@ -67,11 +72,14 @@ This doc is the **single map**: **Oracle VM paths** (above) + **where your autho
 | [EspaLuz_Influencer](https://github.com/ElenaRevicheva/EspaLuz_Influencer) | `D:\aideazz\EspaLuz_Influencer` | Same. |
 | [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | `D:\aideazz\dragontrade-agent` | Same. |
 | [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | `D:\aideazz\openclaw-vibejob-shortlist` | Same. |
-| [AILA](https://github.com/ElenaRevicheva/AILA) | `D:\aideazz\AILA` | Repo-only until deployed on Oracle. |
+| [AILA](https://github.com/ElenaRevicheva/AILA) | `D:\aideazz\AILA` | Repo-only until deployed on Oracle; symphony inventory source on branch **`docs`**: [`AILA_SYMPHONY_ANALYSIS.md`](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md). |
+| [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` | **[aideazz.xyz](https://aideazz.xyz)** — **4everland** hosting, deploy from GitHub **`main`** (ties to CMO / brand surface). |
+| [atuona](https://github.com/ElenaRevicheva/atuona) | *No local checkout maintained* | **[atuona.xyz](https://atuona.xyz)** — **4everland**, **`main`** only from repo (no `D:\…\atuona` workspace). |
+| **Sprinter** (Lambda workspace; pairs with AIPA_AITCF) | `D:\aideazz\SprintBriefingAgent` | AWS SAM/Lambda packaging for Sprint Briefing — mirrors **`src/sprint-briefing/`** in AIPA_AITCF (see §8.1 in symphony doc). |
 
 **Verify anytime:** `git remote -v` should show `ElenaRevicheva/<repo>` — if two folders point at the same remote, delete or repurpose the duplicate spare checkout.
 
-**Canonical doc:** [AIPA_AITCF — `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md`](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md) — keep this file in sync across repos that mirror it.
+**Cross-links:** Planning inventory — [AILA `AILA_SYMPHONY_ANALYSIS.md`](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md). Ops / health — this file on **[AIPA_AITCF `main`](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md)**.
 
 ---
 
@@ -265,17 +273,19 @@ Do this once on the server (SSH as above).
 - Migration/ports: `docs/RAILWAY_TO_ORACLE_MIGRATION.md`
 - **CTO AIPA + Places + Oracle (April 2026):** [AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md#postmortem--april-14-2026-why-it-looked-like-google-api-encoding-broke-oracle-and-how-it-was-fixed)
 - Private infra docs (may not list all products): [aideazz-private-docs / oracle-infrastructure](https://github.com/ElenaRevicheva/aideazz-private-docs/tree/docs/docs/plans/oracle-infrastructure)
+- **Symphony inventory (planning source):** [AILA — `AILA_SYMPHONY_ANALYSIS.md` (`docs` branch)](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md)
 
 ---
 
-## Last Verified (April 25, 2026)
+## Last Verified (April 29, 2026)
 
 | Agent | Status | Notes |
 |-------|--------|-------|
 | CTO AIPA + Atuona | ✅ Running | Oracle wallet fixed Apr 14. GEO+SEO Marketing Engine Phases 1-5 operational. |
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
 | EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
-| VibeJob Hunter + CMO | ✅ Running (Oracle) | `vibejobhunter` + `vibejobhunter-web`; code at `70ee90a` (Apr 2026). Health: `curl -s http://127.0.0.1:8080/health`. Public `:8080` may be closed; set `CMO_WEBHOOK_URL` on CTO to a reachable URL if CTO must call CMO from outside the VM. |
+| VibeJob Hunter + CMO | ✅ Running (Oracle) | `vibejobhunter` + `vibejobhunter-web`; code at `70ee90a` (Apr 2026). Health: `curl -s http://127.0.0.1:8080/health`. Public `:8080` may be closed; set `CMO_WEBHOOK_URL` on CTO to a reachable URL if CTO must call CMO from outside the VM. **[aideazz.xyz](https://aideazz.xyz)** front-end: 4everland + **`main`**. |
+| Sprint Briefing (Sprinter) | ⚠️ AWS Lambda | Documented §8.1 symphony + row **8.1** above — verify Lambda/EventBridge in AWS console; not Oracle PM2. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
 **Critical items needing server verification:**
