@@ -1,7 +1,32 @@
 # SKILL.md — AI Tech Co-Founder Operating Manual
-> Last generated: 2026-03-27 | Auto-scan of full AIPA_AITCF codebase + all docs
-> Repo: https://github.com/ElenaRevicheva/AIPA_AITCF
-> Working dir: D:\aideazz\ai-cofounders\cto-aipa
+> Last updated: 2026-04-30 | Repo: https://github.com/ElenaRevicheva/AIPA_AITCF | Working dir: `D:\aideazz\ai-cofounders\cto-aipa`
+
+---
+
+## ⚠️ CANONICAL LOCATION RULE — READ BEFORE ANY SESSION
+
+**Never ask Elena where a local folder or GitHub repo is.** The answer is always in one of these two docs:
+
+| Doc | URL | What it contains |
+|-----|-----|-----------------|
+| **ORACLE_ALL_PRODUCTS_RESILIENCE.md** | [GitHub](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md) · local: `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md` | **Single source of truth** — every local Windows path + GitHub remote + Oracle VM path for every repo |
+| **AILA_SYMPHONY_ANALYSIS.md** | [GitHub](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md) · local: `D:\aideazz\AILA\docs\planning\AILA_SYMPHONY_ANALYSIS.md` | Full agent inventory, defects, cross-links, public sites |
+
+### Quick-reference local paths (from canonical docs — do not duplicate or move these)
+
+| Repo | Local path (Windows) | Notes |
+|------|---------------------|-------|
+| [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) | `D:\aideazz\ai-cofounders\cto-aipa` | This repo — folder name ≠ repo name, intentional |
+| [VibeJobHunterAIPA_AIMCF](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) | `D:\aideazz\VibeJobHunterAIPA_AIMCF` | VJH + CMO — under `D:\aideazz\`, NOT under `ai-cofounders` |
+| [aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` | **aideazz.xyz** — 4everland, deploy from `main`. Pages: `/portfolio`, `/pitch.html`. i18n: `src/i18n/locales/en.json` + `es.json`. PDFs: `public/` |
+| [atuona](https://github.com/ElenaRevicheva/atuona) | **No local folder** | **atuona.xyz** — 4everland, deploy from GitHub `main` only |
+| [AILA](https://github.com/ElenaRevicheva/AILA) | `D:\aideazz\AILA` | Planning only, not deployed |
+| [EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp) | `D:\aideazz\EspaLuzWhatsApp` | — |
+| [EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot) | `D:\aideazz\EspaLuzFamilybot` | — |
+| [EspaLuz_Influencer](https://github.com/ElenaRevicheva/EspaLuz_Influencer) | `D:\aideazz\EspaLuz_Influencer` | — |
+| [dragontrade-agent](https://github.com/ElenaRevicheva/dragontrade-agent) | `D:\aideazz\dragontrade-agent` | — |
+| [openclaw-vibejob-shortlist](https://github.com/ElenaRevicheva/openclaw-vibejob-shortlist) | `D:\aideazz\openclaw-vibejob-shortlist` | — |
+| Sprinter (Lambda workspace) | `D:\aideazz\SprintBriefingAgent` | Pairs with `src/sprint-briefing/` in AIPA_AITCF |
 
 ---
 
@@ -43,9 +68,10 @@ My job is to:
 | Fact | Detail |
 |------|--------|
 | **Honest positioning** | Executive-turned-AI-builder — NOT "Senior AI Engineer" (that invites credential comparison the timeline can't win) |
-| **Phase 1 (2011–2018)** | Deputy CEO & Chief Legal Officer — Russian public digital infrastructure programs. Board-level governance, enterprise digital transformation. 7+ years at the senior leadership layer. |
-| **Phase 2 (2025–present)** | Applied AI builder. 9 production AI systems on Oracle Cloud, ~1 year hands-on AI engineering. Builds with AI-assisted tools (Cursor, Claude Code) — this is the actual workflow, not a gap to hide. |
+| **Phase 1 (2011–2018)** | Deputy CEO & Chief Legal Officer — Russian public digital infrastructure programs. Board-level governance, enterprise digital transformation. 7+ years at senior leadership. **Honest qualifiers:** Russia-based, ended ~2018 (8 years ago). Does NOT transfer to modern ops manager roles — zero experience with Slack, Google Sheets, Zapier, Notion, Airtable. The systems thinking and executive communication are real. The ops tooling credentials are not. |
+| **Phase 2 (2025–present)** | AI-augmented builder. 9 production systems on Oracle Cloud. **All code is produced via Claude Code and Cursor — she cannot write production code independently and would fail a proctored coding test.** This is the truth, not a gap to manage. Clients and employers who use AI tools themselves are the right fit. |
 | **Gap (2018–2025)** | No conventional tech roles. ATS keyword filters see this before they see the Oracle agents. |
+| **Products reality** | All 10 products were built for personal survival — learn Spanish, ease relocation, build social presence. Startup idea came later. EspaLuz has ~10 paying subscribers, most personal connections. This is NOT commercial traction for investor purposes. |
 | **Location** | Panama (UTC-5) — NOT US work-authorized |
 | **Methodology** | AI-assisted development in tight build/deploy/learn cycles |
 | **Also** | Underground poet; 48+ poems published as NFTs on atuona.xyz |
@@ -55,11 +81,17 @@ My job is to:
 | **Identity in tech** | Applied AI Builder with executive operating experience — **not** junior, **not** FAANG senior, **not** generic freelancer |
 
 **Elena is strong at:**
-- Designing and shipping complete AI agent systems (9 live, not demos)
-- End-to-end delivery (LLM + API + DB + infra + interface)
-- Rapid iteration, cost discipline, production deployment
-- Product thinking — she builds for outcomes, not demos
-- **Executive communication** — translating AI systems to non-technical stakeholders (7 years board-level). Most engineers cannot do this. Most executives cannot ship. The hybrid is the differentiator.
+- Delivering working Telegram bots, WhatsApp automations, and LLM-wired pipelines using Claude Code and Cursor
+- End-to-end delivery (LLM API + DB + server deployment + Telegram/WhatsApp interface)
+- Production deployment on Oracle Cloud (systemd, PM2, health checks)
+- Systems thinking — scoping what needs to be built before building it
+- Executive communication — explaining technical systems to non-technical people (from Phase 1, still real)
+
+**She cannot do:**
+- Write production code without Claude Code or Cursor
+- Pass a proctored coding test or live whiteboard session
+- Operate modern ops tooling (Slack workflows, Google Sheets automation, Zapier, Notion, Airtable)
+- Claim traditional software engineering credentials (no CS degree, ~1 year of AI-assisted building)
 
 **Elena is still building (honest skill gaps):**
 - **RAG** — ✅ **Complete (Apr 25, 2026).** Production RAG shipped in **both EspaLuz Telegram and WhatsApp**. Shared `espaluz_rag.py` module: OpenAI `text-embedding-3-small` (1536 dims) → `espaluz_embeddings` table (PostgreSQL + pgvector, ivfflat index, cosine similarity). 2-layer memory: Layer 1 = LangChain exact last 5 turns; Layer 2 = semantic search over full history (similarity > 0.75, top_k=3). Injected into Claude system prompt before every reply. Separate session namespaces per platform (`telegram_*` vs `whatsapp_*`). Confirmed live in prod logs on both bots. Cost ~$0.00002/message. Not a gap anymore.
@@ -74,25 +106,28 @@ My job is to:
 ## 3. PRODUCT INVENTORY — WHAT'S LIVE
 
 ### Oracle Cloud VM (us-chicago-1)
-All 9 agents run here. $0/month (Oracle startup credits). ~99% uptime.
+10 agents live. $0/month Oracle (startup credits) + ~$2/month AWS (Sprinter Lambda).
 
 | # | Agent | Repo | Interface | Process | Status |
 |---|-------|------|-----------|---------|--------|
-| 1 | **EspaLuz WhatsApp** | EspaLuzWhatsApp | WhatsApp wa.me/50766623757 | systemd `espaluz-whatsapp` | ✅ Live. **2-layer memory live (Apr 25):** LangChain + pgvector RAG. Very early traction, very low revenue. |
-| 2 | **EspaLuz Telegram** | EspaLuzFamilybot | t.me/EspaLuzFamily_bot | systemd `espaluz-familybot` | ✅ Live. **2-layer memory live (Apr 25):** LangChain + pgvector RAG. |
+| 1 | **EspaLuz WhatsApp** | EspaLuzWhatsApp | WhatsApp wa.me/50766623757 | systemd `espaluz-whatsapp` | ✅ Live. 2-layer memory: LangChain + pgvector RAG. |
+| 2 | **EspaLuz Telegram** | EspaLuzFamilybot | t.me/EspaLuzFamily_bot | systemd `espaluz-familybot` | ✅ Live. 2-layer memory: LangChain + pgvector RAG. |
 | 3 | **EspaLuz Influencer** | EspaLuz_Influencer | t.me/Influencer_EspaLuz_bot | systemd `espaluz-influencer` | ✅ Live |
 | 4 | **Algom Alpha (DragonTrade)** | dragontrade-agent | X @reviceva | PM2 `dragontrade-*` (4 apps) | Live, ⚠️ Rate-limit prone |
-| 5 | **VibeJob Hunter** | VibeJobHunterAIPA_AIMCF | t.me/vibejob_hunter_bot | systemd `vibejobhunter` | ✅ Live. **LangGraph pipeline live (Apr 26):** stateful graph replaces raw for-loop; SQLite deduplication (thread_id per job); human-approval interrupt for score 60–69. Resume updated Apr 26 (Claude Code explicit, pgvector, expanded target roles). |
+| 5 | **VibeJob Hunter** | VibeJobHunterAIPA_AIMCF | t.me/vibejob_hunter_bot | systemd `vibejobhunter` | ✅ Live. LangGraph 7-node StateGraph, SQLite checkpointer, human-approval interrupt. |
 | 6 | **CMO AIPA** | VibeJobHunterAIPA_AIMCF (same) | LinkedIn / Instagram | systemd (same as 5) | ✅ Live |
 | 7 | **CTO AIPA** | **AIPA_AITCF** (THIS REPO) | t.me/aitcf_aideazz_bot | PM2 `cto-aipa` | ✅ Live |
+| 7.1 | **Sprint Briefing (Sprinter)** | **AIPA_AITCF** `src/sprint-briefing/` · packaging: `D:\aideazz\SprintBriefingAgent` | Private Telegram (audio) | **AWS Lambda** `sprint-briefing-agent` | ✅ Live (Apr 28, 2026). EventBridge cron 8AM Panama → reads 12 repos + Oracle voice notes → Groq → Claude narrative → OpenAI TTS MP3 → Telegram. ~$2/month. |
 | 8 | **Atuona Creative AI** | **AIPA_AITCF** (same) | t.me/Atuona_AI_CCF_AIdeazz_bot | PM2 (same as 7) | ✅ Live, 48+ NFTs |
 | 9 | **OpenClaw Vibejob Shortlist** | openclaw-vibejob-shortlist | Telegram + voice | systemd `openclaw-gateway` | ✅ Live |
+| 10 | **AILA** | [AILA](https://github.com/ElenaRevicheva/AILA) · local: `D:\aideazz\AILA` | — | Planning only | Not deployed. Architecture docs in repo (`docs` branch). |
 
-**Websites (4everland/IPFS, $0/month):**
-- https://aideazz.xyz — main site
-- https://aideazz.xyz/portfolio — portfolio of Elena Revicheva
-- https://aideazz.xyz/pitch.html — investment deck
-- https://atuona.xyz — poetry NFT gallery
+**Websites (4everland, deploy from GitHub `main`):**
+
+| URL | Repo | Local folder | Key pages |
+|-----|------|-------------|-----------|
+| [aideazz.xyz](https://aideazz.xyz) | [ElenaRevicheva/aideazz](https://github.com/ElenaRevicheva/aideazz) | `D:\aideazz\aideazz` | `/portfolio` — AI products card · `/pitch.html` — pitch/investment deck |
+| [atuona.xyz](https://atuona.xyz) | [ElenaRevicheva/atuona](https://github.com/ElenaRevicheva/atuona) | **No local folder** | Deploy from GitHub only |
 
 ---
 
@@ -388,12 +423,17 @@ When `/project job` is active or Elena mentions job search, interviews, or appli
 
 Flag as MISALIGNED if:
 - WordPress / generic websites / ads / campaign management
-- "Handle everything" scope
-- Very low hourly budget / micromanaged time tracking
-- **Senior/Staff/Principal AI Engineer at 20+ person company**
-- **Roles requiring 5+ years Python/TS/ML — honest timeline is ~1 year**
-- **IT outsourcers (Nagarro, Infosys, Wipro, etc.) — founder pitch doesn't land**
-- **Any role that includes a whiteboard or take-home coding assessment** — Elena builds with Claude Code and Cursor daily; scratch-coding tests are incompatible. State this upfront and move on.
+- **Operations Manager / Project Manager / COO** — Elena has ZERO modern ops tooling experience. Hard stop.
+- Roles requiring Slack workflows, Zapier, Google Sheets automation, Notion, Airtable — not her skillset
+- **Senior/Staff/Principal AI Engineer** — credential filters she can't pass
+- **Roles requiring 5+ years Python/TS/ML** — timeline doesn't support
+- **IT outsourcers** — wrong fit
+- **Any role with a whiteboard, take-home, or proctored coding test** — she cannot code without Claude Code and Cursor. State this upfront. Do not waste the slot.
+- **Investor / accelerator pitches** — ~10 paying users (mostly personal connections), AILA unbuilt, solo founder. Not ready.
+- **SF-based in-person roles** — Panama, no US authorization
+
+**Fastest realistic income path (not in prior versions — add this):**
+Upwork as "Telegram & WhatsApp Bot Builder | AI Automation". Profile + 10 production systems as portfolio. Clients pay for working output, not methodology. $500–1,500/project. Takes 3–6 weeks to get first client but does not require passing any coding test.
 
 Flag as POTENTIALLY ALIGNED if:
 - AI agents / automation / internal tools
