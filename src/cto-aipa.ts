@@ -1752,6 +1752,36 @@ async function startCTOAIPA() {
     });
   }
 
+  // SPRINT BRIEFING — dedup endpoints (used by Lambda Sprinter to prevent duplicate daily briefings)
+  // GET /sprint-briefing/dedup-check   → { ok, alreadySent, date, lastSent }
+  // POST /sprint-briefing/dedup-mark   → { ok, markedDate }
+  // Panama = UTC-5; date stored as YYYY-MM-DD in knowledge_base category='sprint_dedup'
+  app.get('/sprint-briefing/dedup-check', outreachAuth, async (_req: Request, res: Response) => {
+    try {
+      const { getKnowledgeByCategory } = await import('./database');
+      type KbRow = string[];
+      const rows = await getKnowledgeByCategory(1, 'sprint_dedup', 1) as KbRow[];
+      const lastSent = rows?.[0]?.[3] ?? ''; // content column = stored date string
+      const todayPanama = new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      res.json({ ok: true, alreadySent: lastSent === todayPanama, date: todayPanama, lastSent });
+    } catch (e: unknown) {
+      console.error('[dedup-check] error:', e);
+      res.status(500).json({ ok: false, error: String((e as Error)?.message || e) });
+    }
+  });
+
+  app.post('/sprint-briefing/dedup-mark', outreachAuth, async (_req: Request, res: Response) => {
+    try {
+      const { saveKnowledge } = await import('./database');
+      const todayPanama = new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      await saveKnowledge(1, 'sprint_dedup', 'last_sent', todayPanama, undefined, 'sprint_briefing', 'lambda');
+      res.json({ ok: true, markedDate: todayPanama });
+    } catch (e: unknown) {
+      console.error('[dedup-mark] error:', e);
+      res.status(500).json({ ok: false, error: String((e as Error)?.message || e) });
+    }
+  });
+
   // SPRINT BRIEFING — internal knowledge endpoint (used by Lambda Sprinter)
   // GET /sprint-knowledge?userIds=123,456  Authorization: Bearer OUTREACH_SECRET
   app.get('/sprint-knowledge', outreachAuth, async (req: Request, res: Response) => {

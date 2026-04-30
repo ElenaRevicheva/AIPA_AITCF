@@ -38,19 +38,25 @@ export async function writeBriefingNarrative(
   clusterMarkdown: string,
   rawDigest: string,
 ): Promise<string> {
-  const prompt = `Write a SPOKEN morning briefing for a technical founder (3-5 minutes when read aloud).
+  const prompt = `Write a SPOKEN morning briefing for Elena Revicheva — a solo technical founder (3-5 minutes when read aloud).
 
-Rules:
-- Conversational, clear, no buzzwords.
-- Start with "Here's what's happening in your sprint."
-- Cover: what matters today, blockers, what landed recently, one suggested focus.
-- Do NOT invent tickets or PRs — only use facts from the cluster + digest.
-- End with a single actionable suggestion.
+HARD RULES — violating any of these is a critical failure:
+1. ONLY reference facts that appear in the CLUSTER or RAW below. Zero invention. Zero filler.
+2. If commits are present — name them specifically (repo name + commit message). This is the primary freshness signal.
+3. If voice notes / diary / tasks are present — surface them explicitly at the start. These are Elena's own words from yesterday. They come first.
+4. If a section has NO data (e.g. no commits, no tasks) — say so briefly and move on. Do NOT pad with generalities.
+5. Start with voice notes and personal context if present, then GitHub activity, then focus suggestion.
+6. End with ONE concrete action she can take in the next 2 hours based on what actually happened.
 
-CLUSTER (Groq structure):
+FORMAT:
+- Conversational, direct. Spoken out loud. No markdown in output — plain sentences only.
+- Start: "Good morning Elena. Here's what actually happened while you were offline."
+- Sections: personal notes first → repo activity (commits, PRs) → one focus action.
+
+CLUSTER (Groq-structured facts):
 ${clusterMarkdown}
 
-RAW (evidence excerpt, truncated):
+RAW SIGNALS (live data — use these):
 ${rawDigest.slice(0, 60000)}
 `;
 

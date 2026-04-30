@@ -19,26 +19,53 @@ export async function fetchGithubSprintSignals(octokit: Octokit, repos: string[]
         }),
       ]);
 
+      const window26h = Date.now() - 26 * 60 * 60 * 1000;
+      const since26hIso = new Date(window26h).toISOString();
+
       const mergedRecent = mergedSince.data.filter(p => {
         if (!p.merged_at) return false;
-        const t = new Date(p.merged_at).getTime();
-        return Date.now() - t < 26 * 60 * 60 * 1000;
+        return new Date(p.merged_at).getTime() > window26h;
       });
 
       chunks.push(`### GitHub ${owner}/${repo}`);
+
+      // Recent commits — primary signal for daily activity (pushes, not just PR merges)
+      try {
+        const commitsRes = await octokit.rest.repos.listCommits({
+          owner, repo, per_page: 15, since: since26hIso,
+        });
+        const commits = commitsRes.data.filter(c => c.commit.author?.date);
+        chunks.push(
+          `Recent commits (last 26h, ${commits.length} total):`,
+          ...(commits.length
+            ? commits.slice(0, 10).map(c => {
+                const author = c.commit?.author;
+                const d = (author?.date ?? '').slice(0, 16);
+                const m = ((c.commit?.message ?? '').split('\n')[0] ?? '').slice(0, 90);
+                const a = author?.name ?? 'unknown';
+                return `- [${d}] ${m} (${a})`;
+              })
+            : ['- (no commits in window)']),
+        );
+      } catch {
+        chunks.push('Recent commits: (fetch failed)');
+      }
+
       chunks.push(
-        `Open issues (${openIssues.data.length} shown):`,
-        ...openIssues.data.slice(0, 15).map(i => `- #${i.number} ${i.title} [${i.state}]`),
+        `Open PRs (${openPrs.data.length}):`,
+        ...openPrs.data.slice(0, 8).map(p => `- PR#${p.number} ${p.title} (${p.head.ref})`),
       );
       chunks.push(
-        `Open PRs:`,
-        ...openPrs.data.slice(0, 12).map(p => `- PR#${p.number} ${p.title} (${p.head.ref})`),
-      );
-      chunks.push(
-        `Merged last ~24h:`,
+        `Merged last ~26h:`,
         ...(mergedRecent.length
           ? mergedRecent.map(p => `- PR#${p.number} ${p.title}`)
-          : ['- (none in window)']),
+          : ['- (none)']),
+      );
+      chunks.push(
+        `Open issues (${openIssues.data.length} shown, most recently updated):`,
+        ...openIssues.data.slice(0, 8).map(i =>
+          `- #${i.number} ${i.title} [updated ${(i.updated_at || '').slice(0, 10)}]`
+        ),
       );
 
       try {
