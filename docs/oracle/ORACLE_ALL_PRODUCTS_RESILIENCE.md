@@ -375,7 +375,7 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 | 4 | **LinkedIn** — CMO picks it up at 20:00 Panama, generates post via Claude, sends via Make.com | `linkedin_cmo_v4.py`, `vibejobhunter-web` |
 | 5 | **Hashnode + dev.to** — blog crosspost fires after LinkedIn, fire-and-forget | `blog_publisher.py` |
 | 6 | **X @reviceva** — dragontrade posts tweet on next 5th-post slot | `x-tech-updater.js`, `dragontrade-main` PM2 |
-| 7 | **Instagram** — EspaLuz Influencer uses milestone on next even day at 23:00 Panama | `cto_milestone_module.py`, `espaluz-influencer` systemd |
+| 7 | **Instagram** — EspaLuz Influencer uses milestone on next even day at 18:00 Panama (23:00 UTC) | `cto_milestone_module.py`, `espaluz-influencer` systemd |
 
 **Guard: only real milestones post.** Maintenance commits (image uploads, config tweaks, integration scaffolding) are suppressed in `pending_tech_updates.json` with `suppressed_reason: maintenance_commit_not_milestone`. Currently 4 real milestones queued for automated posting: 131-test eval harness, AWS Lambda Sprinter, LangGraph 7-node pipeline, pgvector RAG 2-layer memory.
 
