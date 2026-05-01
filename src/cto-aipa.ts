@@ -317,7 +317,7 @@ export async function notifyCMO(updateData: {
   }
   
   try {
-    const CMO_WEBHOOK = process.env.CMO_WEBHOOK_URL || 'https://vibejobhunter-production.up.railway.app/api/tech-update';
+    const CMO_WEBHOOK = process.env.CMO_WEBHOOK_URL || 'http://127.0.0.1:8080/api/tech-update';
     
     console.log(`📢 Notifying CMO AIPA about changes in ${updateData.repo}...`);
     
