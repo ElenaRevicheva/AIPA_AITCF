@@ -34,6 +34,11 @@ export async function loadPersonalKnowledgeContext(userIds: number[]): Promise<s
     throw new Error(json.error || 'sprint-knowledge API returned no context');
   }
 
+  // Paths 2 & 3 require Oracle — not available in Lambda
+  if (process.env.SPRINT_BRIEFING_SKIP_ORACLE === '1') {
+    throw new Error('SPRINT_BRIEFING_SKIP_ORACLE=1 and SPRINT_KNOWLEDGE_API_URL is not configured — personal context unavailable');
+  }
+
   // Path 2: Lambda oracle-thin (direct Oracle connection via S3 wallet — requires wallet password)
   if (process.env.ORACLE_WALLET_S3_BUCKET) {
     const { loadKnowledgeFromOracle } = await import('./oracle-thin');

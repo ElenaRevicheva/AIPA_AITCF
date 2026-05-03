@@ -35,11 +35,12 @@ export async function runSprintBriefing(
   const ids = deps.knowledgeUserIds?.length
     ? deps.knowledgeUserIds
     : parseUserIdsEnv();
-  if (ids.length > 0 && process.env.SPRINT_BRIEFING_SKIP_ORACLE !== '1') {
+  if (ids.length > 0) {
     try {
       const { loadPersonalKnowledgeContext } = await import('./knowledge-context');
       personal = await loadPersonalKnowledgeContext(ids);
-    } catch {
+    } catch (e: unknown) {
+      console.warn('[sprint] personal context skipped:', (e as Error)?.message || e);
       personal = '(personal knowledge skipped)';
     }
   }
