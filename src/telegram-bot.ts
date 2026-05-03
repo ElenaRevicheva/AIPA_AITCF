@@ -675,7 +675,8 @@ Or just ask me anything - I understand natural language!`;
 /tasks    - Show your pending tasks
 /research - Save research / market notes
 /resume   - Restore last session
-/forget   - Clear conversation context (keeps knowledge base)`,
+/forget   - Clear conversation context (keeps knowledge base)
+/trello_analyze - Full Kanban analysis of all Trello boards`,
       {
         reply_markup: {
           inline_keyboard: [
