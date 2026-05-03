@@ -6908,6 +6908,34 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
     await ctx.reply(`🧹 *Memory cleared!*\n\nI've forgotten our conversation context. Starting fresh!\n\n_Your knowledge base (ideas, diary, tasks) is still intact._`, { parse_mode: 'Markdown' });
   });
 
+  // /trello_analyze - Full Kanban health analysis across all Trello boards
+  bot.command('trello_analyze', async (ctx) => {
+    const userId = ctx.from?.id || 0;
+    if (!AUTHORIZED_USERS.includes(userId)) { await ctx.reply('⛔ Unauthorized'); return; }
+
+    await ctx.reply('🔍 Fetching all Trello boards and running Kanban analysis... (may take 20-30s)');
+    try {
+      const { analyzeKanban } = await import('./trello-kanban');
+      const analysis = await analyzeKanban();
+
+      // Split into chunks if too long for Telegram (4096 char limit)
+      const MAX = 4000;
+      if (analysis.length <= MAX) {
+        await ctx.reply(`📊 *Kanban Analysis*\n\n${analysis}`, { parse_mode: 'Markdown' });
+      } else {
+        const chunks: string[] = [];
+        for (let i = 0; i < analysis.length; i += MAX) chunks.push(analysis.slice(i, i + MAX));
+        for (let i = 0; i < chunks.length; i++) {
+          const header = i === 0 ? '📊 *Kanban Analysis* (1/' + chunks.length + ')\n\n' : `*(${i + 1}/${chunks.length})*\n\n`;
+          await ctx.reply(header + chunks[i], { parse_mode: 'Markdown' });
+        }
+      }
+    } catch (e: unknown) {
+      const msg = (e as Error)?.message || String(e);
+      await ctx.reply(`❌ Trello analysis failed: ${msg}\n\nCheck that TRELLO_API_KEY and TRELLO_TOKEN are set in .env on Oracle.`);
+    }
+  });
+
   // ==========================================================================
   // START BOT & SCHEDULED TASKS
   // ==========================================================================
@@ -6998,6 +7026,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
           { command: 'rules', description: '📋 Show CLAUDE.md for project' },
           { command: 'resume', description: '🔄 Restore last session' },
           { command: 'forget', description: '🧹 Clear conversation memory' },
+          { command: 'trello_analyze', description: '📋 Full Kanban analysis of all Trello boards' },
           // SETTINGS
           { command: 'alerts', description: '🔔 Toggle proactive alerts' },
           { command: 'roadmap', description: '🛣️ View CTO AIPA roadmap' },

@@ -45,7 +45,17 @@ export async function runSprintBriefing(
     }
   }
 
-  const rawDigest = ['--- SIGNAL PACK ---', gh, '', lin, '', personal].join('\n');
+  // Trello — today's active cards (optional, skipped gracefully if creds not set)
+  let trelloToday = '';
+  try {
+    const { fetchTodaysTrelloTasks } = await import('../trello-kanban');
+    trelloToday = await fetchTodaysTrelloTasks();
+    if (trelloToday) console.log('[sprint] Trello today tasks loaded, length:', trelloToday.length);
+  } catch (e: unknown) {
+    console.warn('[sprint] Trello skipped:', (e as Error)?.message || e);
+  }
+
+  const rawDigest = ['--- SIGNAL PACK ---', gh, '', lin, '', personal, '', trelloToday].join('\n');
 
   const clusterRaw = await clusterSignalsWithGroq(groq, rawDigest);
   const narrativeText = await writeBriefingNarrative(anthropic, clusterRaw, rawDigest);

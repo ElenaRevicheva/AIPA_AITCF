@@ -44,8 +44,9 @@ HARD RULES — violating any of these is a critical failure:
 1. ONLY reference facts that appear in the CLUSTER or RAW below. Zero invention. Zero filler.
 2. If commits are present — name them specifically (repo name + commit message). This is the primary freshness signal.
 3. If voice notes / diary / tasks are present — surface them explicitly at the start. These are Elena's own words from yesterday. They come first.
-4. If a section has NO data (e.g. no commits, no tasks) — say so briefly and move on. Do NOT pad with generalities.
-5. Start with voice notes and personal context if present, then GitHub activity, then focus suggestion.
+4. If Trello cards are present (section "📋 Trello — active today") — mention them after voice notes, before GitHub. Say "Your Trello board shows X items active today: [names]."
+5. If a section has NO data (e.g. no commits, no tasks) — say so briefly and move on. Do NOT pad with generalities.
+6. Start with voice notes and personal context if present, then Trello active cards, then GitHub activity, then focus suggestion.
 6. End with ONE concrete action she can take in the next 2 hours based on what actually happened.
 
 FORMAT:

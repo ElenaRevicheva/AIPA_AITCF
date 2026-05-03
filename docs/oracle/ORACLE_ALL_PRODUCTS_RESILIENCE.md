@@ -309,6 +309,9 @@ Returns last 5 diary entries + up to 15 pending tasks per user from `knowledge_b
 |-----|-------|
 | `SPRINT_KNOWLEDGE_API_URL` | `https://webhook.aideazz.xyz/cto/sprint-knowledge` |
 | `OUTREACH_SECRET` | (see server `.env` — the shared outreach auth secret) |
+| `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS` | `5481526862` (Elena's Telegram user ID — **required** so `parseUserIdsEnv()` returns a non-empty array) |
+
+**⚠️ Critical: `SPRINT_BRIEFING_SKIP_ORACLE=1` is set in the Lambda handler code (`src/lambda/sprint-briefing-aws.ts` line 19) to prevent direct Oracle connections from Lambda. The flag must NOT be used to gate the HTTP proxy path.** Fixed May 3, 2026: `SKIP_ORACLE` gate moved inside `knowledge-context.ts` so it only blocks paths 2 & 3 (Oracle direct), leaving path 1 (HTTP proxy) always reachable. Without this fix, voice notes were always missing from the briefing even though they were saved correctly in Oracle.
 
 **Code path:** `src/sprint-briefing/knowledge-context.ts` — checks `SPRINT_KNOWLEDGE_API_URL` first (HTTP proxy), then falls back to `ORACLE_WALLET_S3_BUCKET` (oracle-thin, disabled in practice), then thick-mode pool (server only).
 
@@ -350,7 +353,7 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
-## Last Verified (May 1, 2026)
+## Last Verified (May 3, 2026)
 
 | Agent | Status | Notes |
 |-------|--------|-------|
@@ -360,7 +363,7 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 | EspaLuz Influencer | ✅ Running + **CTO milestone posts live (May 1)** | On even calendar days, checks for pending CTO milestone before AI Marketing Engine. If found: generates Instagram caption (zero jargon, HR/founder tone, Groq), posts with `sprinter.jpg` via Make.com → Instagram. Falls through to regular content if no milestone. `cto_milestone_module.py` — additive, never breaks existing schedule. |
 | VibeJob Hunter + CMO | ✅ Running (Oracle) + **CTO collab live (May 1)** | `vibejobhunter-web` (port 8080). CMO now picks up pending CTO milestones at daily 20:00 Panama post — generates LinkedIn post, then fires Hashnode + dev.to blog crosspost (`blog_publisher.py`, fire-and-forget). 4 real milestones queued: eval harness, Sprinter, LangGraph, pgvector RAG — will post on schedule. `sprinter.jpg` added to image rotation pool. |
 | Algom Alpha (dragontrade @reviceva) | ✅ Running (PM2) + **X tech posts live (May 1)** | Every 5th tweet, `x-tech-updater.js` checks `/api/x-updates` for a pending CTO milestone and tweets it (≤280 chars). Safe fallback: if no milestone or error, regular content runs. Credentials: `TWITTER_API_KEY` + `TWITTER_ACCESS_TOKEN_SECRET` in `/home/ubuntu/dragontrade-agent/.env`. |
-| Sprint Briefing (Sprinter) | ✅ AWS Lambda — voice notes working (Apr 30) | Fixed Apr 30 2026. Knowledge loaded via REST proxy `GET /cto/sprint-knowledge` on CTO AIPA server. Lambda env: `SPRINT_KNOWLEDGE_API_URL` + `OUTREACH_SECRET` set. Voice notes from prior day now included in morning briefing. See §8 for wallet/architecture details. |
+| Sprint Briefing (Sprinter) | ✅ AWS Lambda — **voice notes fixed May 3** | Bug: `SPRINT_BRIEFING_SKIP_ORACLE=1` in Lambda handler was gating the ENTIRE personal-context load (including HTTP proxy). Fix: gate moved to `knowledge-context.ts` paths 2/3 only. `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS=5481526862` confirmed set in Lambda. Code + Lambda bundle redeployed May 3. Voice notes from prior day will appear in next 8AM briefing. See §8 for full architecture. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
 ### CTO AIPA → All Posting Channels Pipeline (live May 1, 2026)
