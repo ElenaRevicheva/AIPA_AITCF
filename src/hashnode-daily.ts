@@ -550,7 +550,7 @@ export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: 
   const gscQueries = await fetchGscTopQueries();
   const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries);
 
-  const userPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
+  const baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
 
 Topic brief:
 ${brief}
@@ -559,25 +559,43 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   console.log(`📰 Hashnode daily: generating topic #${index} (${keyword})…`);
 
-  const resp = await deps.anthropic.messages.create({
-    model: deps.model,
-    max_tokens: deps.maxTokens,
-    system: ARTICLE_SYSTEM,
-    messages: [{ role: "user", content: userPrompt }],
-  });
-  const block = resp.content[0];
-  const rawText = block && block.type === "text" ? block.text : "";
-  if (!rawText) throw new Error("Empty model response");
+  const MAX_GENERATION_ATTEMPTS = 3;
+  let parsed: ReturnType<typeof parseArticle> | null = null;
+  let lastValidationError = "";
 
-  const parsed = parseArticle(rawText);
-  if (!parsed) {
-    throw new Error("Could not parse TITLE/MARKDOWN from model output");
+  for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
+    const forbiddenNote = lastValidationError
+      ? `\n\nCRITICAL: The previous attempt failed quality gate — ${lastValidationError}. Do NOT use that phrase anywhere in the article.`
+      : "";
+    const userPrompt = baseUserPrompt + forbiddenNote;
+
+    if (attempt > 1) console.log(`📰 Hashnode daily: retry attempt ${attempt}/${MAX_GENERATION_ATTEMPTS} (quality gate failure: ${lastValidationError})`);
+
+    const resp = await deps.anthropic.messages.create({
+      model: deps.model,
+      max_tokens: deps.maxTokens,
+      system: ARTICLE_SYSTEM,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+    const block = resp.content[0];
+    const rawText = block && block.type === "text" ? block.text : "";
+    if (!rawText) throw new Error("Empty model response");
+
+    parsed = parseArticle(rawText);
+    if (!parsed) {
+      throw new Error("Could not parse TITLE/MARKDOWN from model output");
+    }
+
+    const v = validateArticle(parsed.markdown);
+    if (v.ok) break;
+
+    lastValidationError = v.reason;
+    if (attempt === MAX_GENERATION_ATTEMPTS) {
+      throw new Error(`Quality gate: ${v.reason} (failed after ${MAX_GENERATION_ATTEMPTS} attempts)`);
+    }
   }
 
-  const v = validateArticle(parsed.markdown);
-  if (!v.ok) {
-    throw new Error(`Quality gate: ${v.reason}`);
-  }
+  if (!parsed) throw new Error("Article generation produced no output");
 
   const publicationId = await resolvePublicationId(token);
   const delisted = hashnodeDailyIsDelisted();
