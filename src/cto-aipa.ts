@@ -99,11 +99,11 @@ console.log(
 
 /** When Groq 429/rate-limit would crash the cluster worker, fall back to Haiku (same pattern as lead-triage). */
 const CODE_REVIEW_FALLBACK_MODEL =
-  process.env.CODE_REVIEW_FALLBACK_MODEL || 'claude-3-haiku-20240307';
+  process.env.CODE_REVIEW_FALLBACK_MODEL || 'claude-haiku-4-5-20251001';
 
 async function anthropicTextReview(model: string, prompt: string, maxTokens: number): Promise<string> {
-  // claude-3-haiku-20240307 hard limit is 4096
-  const effectiveMax = model.includes('haiku') ? Math.min(maxTokens, 4096) : maxTokens;
+  // claude-haiku-4-5 supports up to 8192 output tokens
+  const effectiveMax = model.includes('haiku') ? Math.min(maxTokens, 8192) : maxTokens;
   const response = await anthropic.messages.create({
     model,
     max_tokens: effectiveMax,

@@ -1242,7 +1242,7 @@ Context: Elena builds AI automations — Telegram/WhatsApp bots, outreach pipeli
 Return ONLY the message text. No subject line. No "Hi [Name]" opener that requires a name. Start with a hook about their company or industry.`;
 
       const resp = await anthropic.messages.create({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 200,
         messages: [{ role: 'user', content: prompt }],
       });
@@ -3018,7 +3018,7 @@ Checking services now...`, { parse_mode: 'Markdown' });
     try {
       const start = Date.now();
       await anthropic.messages.create({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 10,
         messages: [{ role: 'user', content: 'ping' }]
       });
