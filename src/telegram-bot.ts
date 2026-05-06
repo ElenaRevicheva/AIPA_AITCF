@@ -7562,7 +7562,7 @@ function startScheduledTasks(bot: Bot): void {
         // Generate briefing content
         let cmoStatus = '❓';
         try {
-          const cmoResponse = await fetch('https://vibejobhunter-production.up.railway.app/health');
+          const cmoResponse = await fetch('http://127.0.0.1:8080/health');
           cmoStatus = cmoResponse.ok ? '✅' : '⚠️';
         } catch {
           cmoStatus = '❌';

@@ -32,7 +32,7 @@ Keep under 1200 words. Be factual — no invention.`;
   return typeof text === 'string' ? text : '';
 }
 
-/** Narrative briefing script — Claude Sonnet (same family as CMO/VJH narrative quality path). */
+/** Narrative briefing script — Claude Sonnet with Groq fallback on credit exhaustion (400). */
 export async function writeBriefingNarrative(
   anthropic: Anthropic,
   clusterMarkdown: string,
@@ -61,11 +61,34 @@ RAW SIGNALS (live data — use these):
 ${rawDigest.slice(0, 60000)}
 `;
 
-  const msg = await anthropic.messages.create({
-    model: CLAUDE_MODEL,
-    max_tokens: 8192,
-    messages: [{ role: 'user', content: prompt }],
+  // Try Claude first
+  try {
+    const msg = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
+      max_tokens: 8192,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const block = msg.content[0];
+    return block && block.type === 'text' ? block.text : '';
+  } catch (err: unknown) {
+    const status = (err as { status?: number })?.status;
+    if (status !== 400 && status !== 529 && status !== 503) throw err;
+    console.warn(`[sprint] Claude narrative failed (${status}) — falling back to Groq`);
+  }
+
+  // Groq fallback — llama-3.3-70b-versatile, same model as clustering
+  const groqKey = process.env.GROQ_API_KEY?.trim();
+  if (!groqKey) throw new Error('Claude narrative failed and GROQ_API_KEY not set — no fallback available');
+
+  const { default: Groq } = await import('groq-sdk');
+  const groq = new Groq({ apiKey: groqKey });
+  const completion = await groq.chat.completions.create({
+    model: GROQ_MODEL,
+    messages: [{ role: 'user', content: prompt.slice(0, 28000) }],
+    temperature: 0.3,
+    max_tokens: 4096,
   });
-  const block = msg.content[0];
-  return block && block.type === 'text' ? block.text : '';
+  const text = completion.choices[0]?.message?.content;
+  console.log('[sprint] Groq narrative fallback succeeded');
+  return typeof text === 'string' ? text : '';
 }
