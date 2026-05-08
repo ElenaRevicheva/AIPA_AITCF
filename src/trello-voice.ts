@@ -34,6 +34,7 @@ interface CardClassification {
   listTarget: ListTarget;
   labelColor: TrelloColor;
   dueDate: string | null;  // ISO date YYYY-MM-DD extracted from speech ("by Friday", "end of May") or null
+  subtasks: string[] | null; // 2-5 subtask titles if task naturally decomposes; null for single-step tasks
   confidence: number;      // 0-1, how certain the AI is
   reasoning: string;       // AI explanation for routing decision
 }
@@ -385,6 +386,40 @@ function removeTriggerPhrase(transcript: string): string {
   return cleaned;
 }
 
+// ─── Urgency Reconciliation ───────────────────────────────────────────────────
+
+/**
+ * Post-NLP correction: align listTarget with dueDate so they never contradict.
+ * - dueDate is today or tomorrow → just_for_today (urgent)
+ * - dueDate is set but list isn't urgent/dated → correct to 'dated'
+ * - no dueDate, listTarget is 'dated' → correct to 'todo_flow'
+ */
+function reconcileUrgency(c: CardClassification): CardClassification {
+  if (!c.dueDate) {
+    // If NLP said 'dated' but there's no extracted date, push to todo_flow
+    if (c.listTarget === 'dated') {
+      return { ...c, listTarget: 'todo_flow', urgency: 'soon' };
+    }
+    return c;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(`${c.dueDate}T00:00:00`);
+  const daysAway = Math.round((due.getTime() - today.getTime()) / 86_400_000);
+
+  if (daysAway <= 1) {
+    // Due today or tomorrow → urgent
+    return { ...c, listTarget: 'just_for_today', urgency: 'urgent_today' };
+  }
+  if (daysAway <= 7) {
+    // Due this week → dated list (specific appointment/deadline)
+    return { ...c, listTarget: 'dated', urgency: 'dated' };
+  }
+  // Due further out → dated list, urgency soon
+  return { ...c, listTarget: 'dated', urgency: 'dated' };
+}
+
 // ─── Claude Haiku NLP Classification ─────────────────────────────────────────
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -455,10 +490,15 @@ For dueDate: extract any date mentioned in the text.
 - No date mentioned → null
 Return date as YYYY-MM-DD string, or null.
 
+For subtasks: does this voice note describe a MULTI-STEP task with 2-5 clearly distinct actions?
+- YES → list each as a short imperative title in "subtasks" (e.g. ["Design slides", "Set up demo env", "Send invites"])
+- NO → "subtasks": null
+Only decompose when steps are explicitly enumerated OR naturally distinct (not just one task rephrased). Atomic tasks like "call the doctor" or "buy groceries" → null.
+
 Return JSON exactly like this (no markdown, no backticks, raw JSON only):
 {
   "isTask": true,
-  "title": "Clean actionable card title (3-8 words, imperative verb)",
+  "title": "Parent task title (used when subtasks is null)",
   "description": "Any extra detail from the speech, or empty string",
   "category": "family|business|spiritual|health|hobby",
   "urgency": "urgent_today|soon|dated|not_sure|done",
@@ -466,6 +506,7 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "listTarget": "just_for_today|todo_flow|in_process_me|in_process_them|not_sure|dated|rules|done",
   "labelColor": "red|orange|purple|green|lime",
   "dueDate": "2026-05-31",
+  "subtasks": null,
   "confidence": 0.90,
   "reasoning": "One sentence: why this board + list + color"
 }
@@ -474,7 +515,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
 
   const response = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 512,
+    max_tokens: 768,
     system: systemPrompt,
     messages: [{ role: 'user', content: userPrompt }],
   });
@@ -484,7 +525,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
 
   try {
     const parsed = JSON.parse(text.replace(/```json|```/g, '').trim()) as CardClassification;
-    return parsed;
+    return reconcileUrgency(parsed);
   } catch {
     // Fallback classification if parsing fails
     console.error('[TrelloVoice] Haiku parse failed, using fallback. Raw:', text);
@@ -498,6 +539,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
       listTarget: 'todo_flow',
       labelColor: 'lime',
       dueDate: null,
+      subtasks: null,
       confidence: 0.3,
       reasoning: 'Fallback classification — parsing failed',
     };
@@ -550,14 +592,15 @@ export interface VoiceTrelloResult {
   success: boolean;
   transcript?: string;
   classification?: CardClassification;
-  card?: TrelloCard;
+  card?: TrelloCard;          // single card (when no subtasks)
+  cards?: TrelloCard[];       // multiple cards (when subtasks were decomposed)
   boardName?: string;
   listName?: string;
   error?: string;
-  noTrigger?: boolean;      // true = voice had no trigger phrase (handleVoiceToTrello path)
-  notATask?: boolean;       // true = NLP decided this is not a Trello task — fall through
-  duplicate?: boolean;      // true = a similar card already exists on the target list
-  existingCard?: TrelloCard; // the card that was found as a duplicate
+  noTrigger?: boolean;        // true = voice had no trigger phrase (handleVoiceToTrello path)
+  notATask?: boolean;         // true = NLP decided this is not a Trello task — fall through
+  duplicate?: boolean;        // true = a similar card already exists on the target list
+  existingCard?: TrelloCard;  // the card that was found as a duplicate
 }
 
 /**
@@ -745,16 +788,43 @@ export async function createTrelloCardFromTranscript(
   // Step 5: Resolve label color
   const labelId = await resolveOrCreateLabel(board.id, classification.labelColor, classification.category);
 
-  // Step 6: Create the card (with due date if extracted)
+  const descBase = classification.description || `Voice note: ${new Date().toLocaleString('en-US', { timeZone: 'America/Panama' })}`;
+  const labels = labelId ? [labelId] : [];
+
+  // Step 6: Create card(s) — subtask decomposition or single card
+  const subtasks = Array.isArray(classification.subtasks) && classification.subtasks.length >= 2
+    ? classification.subtasks
+    : null;
+
+  if (subtasks) {
+    // Create one card per subtask — same board/list/label/due date
+    const createdCards: TrelloCard[] = [];
+    for (const subtaskTitle of subtasks) {
+      try {
+        const c = await createCard(targetList.id, subtaskTitle, descBase, labels, classification.dueDate);
+        createdCards.push(c);
+        console.log(`[TrelloVoice] ✅ Subtask card: "${c.name}"`);
+      } catch (err) {
+        console.error(`[TrelloVoice] Subtask card failed for "${subtaskTitle}":`, err);
+      }
+    }
+    if (createdCards.length === 0) {
+      return { success: false, transcript, classification, error: 'All subtask card creations failed' };
+    }
+    return {
+      success: true,
+      transcript,
+      classification,
+      cards: createdCards,
+      boardName: board.name,
+      listName: targetList.name,
+    };
+  }
+
+  // Single card
   let card: TrelloCard;
   try {
-    card = await createCard(
-      targetList.id,
-      classification.title,
-      classification.description || `Voice note: ${new Date().toLocaleString('en-US', { timeZone: 'America/Panama' })}`,
-      labelId ? [labelId] : [],
-      classification.dueDate,
-    );
+    card = await createCard(targetList.id, classification.title, descBase, labels, classification.dueDate);
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
   }
@@ -811,14 +881,14 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
     ].join('\n');
   }
 
-  if (!result.success || !result.card || !result.classification) {
+  if (!result.success || !result.classification) {
     if (result.error) {
       return `❌ Could not create Trello card\n\n${result.error}`;
     }
     return '❌ Something went wrong creating the card.';
   }
 
-  const { classification, card, boardName, listName } = result;
+  const { classification, boardName, listName } = result;
   const colorEmoji = COLOR_EMOJI[classification.labelColor] ?? '⬜';
   const colorSphere = COLOR_LABEL[classification.labelColor] ?? classification.category;
 
@@ -832,6 +902,29 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
       dueLine = `📅 Due: ${classification.dueDate}`;
     }
   }
+
+  // Multiple cards (subtask decomposition)
+  if (result.cards && result.cards.length > 0) {
+    const cardLines = result.cards.map((c, i) => `${i + 1}. [${c.name}](${c.shortUrl})`);
+    return [
+      `✅ *${result.cards.length} Trello cards created!*`,
+      ``,
+      `${colorEmoji} *${classification.title || 'Subtasks'}*`,
+      ``,
+      `📋 Board: ${boardName}`,
+      `📌 List: ${listName}`,
+      `🎨 Sphere: ${colorSphere}`,
+      dueLine,
+      ``,
+      ...cardLines,
+      ``,
+      `_"${result.transcript?.slice(0, 80)}${(result.transcript?.length ?? 0) > 80 ? '...' : ''}"_`,
+    ].filter(Boolean).join('\n');
+  }
+
+  // Single card
+  const card = result.card;
+  if (!card) return '❌ Something went wrong creating the card.';
 
   return [
     `✅ *Trello card created!*`,
