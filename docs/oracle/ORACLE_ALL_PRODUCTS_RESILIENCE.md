@@ -368,16 +368,16 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
-## Last Verified (May 3, 2026)
+## Last Verified (May 8, 2026)
 
 | Agent | Status | Notes |
 |-------|--------|-------|
-| CTO AIPA + Atuona | ✅ Running | Oracle wallet fixed Apr 14. GEO+SEO Marketing Engine Phases 1-5 operational. **CTO→CMO pipeline fixed May 1** — dead Railway URL replaced with `http://127.0.0.1:8080/api/tech-update` (same VM, localhost). Milestones now flow to all posting channels automatically. |
+| CTO AIPA + Atuona | ✅ Running | Oracle wallet fixed Apr 14. GEO+SEO Marketing Engine Phases 1-5 operational. **CTO→CMO pipeline fixed May 1** — dead Railway URL replaced with `http://127.0.0.1:8080/api/tech-update` (same VM, localhost). **X spam fix May 8** — `notifyCMO()` now filters to `feat:/launch:/release:` commits only; `fix:/docs:/chore:` commits are suppressed. Tweet content now AI-generated (Claude Haiku → Groq fallback) — plain language, not raw commit syntax. Spam queue cleared. |
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
 | EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
 | EspaLuz Influencer | ✅ Running + **CTO milestone posts live (May 1)** | On even calendar days, checks for pending CTO milestone before AI Marketing Engine. If found: generates Instagram caption (zero jargon, HR/founder tone, Groq), posts with `sprinter.jpg` via Make.com → Instagram. Falls through to regular content if no milestone. `cto_milestone_module.py` — additive, never breaks existing schedule. |
 | VibeJob Hunter + CMO | ✅ Running (Oracle) + **CTO collab live (May 1)** | `vibejobhunter-web` (port 8080). CMO now picks up pending CTO milestones at daily 20:00 Panama post — generates LinkedIn post, then fires Hashnode + dev.to blog crosspost (`blog_publisher.py`, fire-and-forget). 4 real milestones queued: eval harness, Sprinter, LangGraph, pgvector RAG — will post on schedule. `sprinter.jpg` added to image rotation pool. |
-| Algom Alpha (dragontrade @reviceva) | ✅ Running (PM2) + **X tech posts live (May 1)** | Every 5th tweet, `x-tech-updater.js` checks `/api/x-updates` for a pending CTO milestone and tweets it (≤280 chars). Safe fallback: if no milestone or error, regular content runs. Credentials: `TWITTER_API_KEY` + `TWITTER_ACCESS_TOKEN_SECRET` in `/home/ubuntu/dragontrade-agent/.env`. |
+| Algom Alpha (dragontrade @reviceva) | ✅ Running (PM2) + **X tech posts fixed May 8** | Every 5th tweet, `x-tech-updater.js` checks `/api/x-updates` for a pending CTO milestone and tweets it (≤280 chars). **Fixed May 8**: tweet content is now AI-generated in plain English (Claude Haiku → Groq fallback) — not raw commit messages. Filter: only `feat:` commits trigger X posts. Safe fallback: if no milestone or error, regular content runs. Credentials: `TWITTER_API_KEY` + `TWITTER_ACCESS_TOKEN_SECRET` in `/home/ubuntu/dragontrade-agent/.env`. |
 | Sprint Briefing (Sprinter) | ✅ AWS Lambda — **voice notes fixed May 3** | Bug: `SPRINT_BRIEFING_SKIP_ORACLE=1` in Lambda handler was gating the ENTIRE personal-context load (including HTTP proxy). Fix: gate moved to `knowledge-context.ts` paths 2/3 only. `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS=5481526862` confirmed set in Lambda. Code + Lambda bundle redeployed May 3. Voice notes from prior day will appear in next 8AM briefing. See §8 for full architecture. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
@@ -395,7 +395,7 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 | 6 | **X @reviceva** — dragontrade posts tweet on next 5th-post slot | `x-tech-updater.js`, `dragontrade-main` PM2 |
 | 7 | **Instagram** — EspaLuz Influencer uses milestone on next even day at 18:00 Panama (23:00 UTC) | `cto_milestone_module.py`, `espaluz-influencer` systemd |
 
-**Guard: only real milestones post.** Maintenance commits (image uploads, config tweaks, integration scaffolding) are suppressed in `pending_tech_updates.json` with `suppressed_reason: maintenance_commit_not_milestone`. Currently 4 real milestones queued for automated posting: 131-test eval harness, AWS Lambda Sprinter, LangGraph 7-node pipeline, pgvector RAG 2-layer memory.
+**Guard: only real milestones post.** Only commits prefixed `feat:`, `launch:`, or `release:` trigger CMO notification. `fix:`, `docs:`, `chore:`, `refactor:` commits are silently skipped — they are internal developer work, not audience-facing announcements. When a milestone does post, the tweet is written in plain language by Claude Haiku (Groq fallback) — no commit syntax, no jargon, no raw technical details.
 
 **Critical items needing server verification:**
 - `grep ATS_DRY_RUN /home/ubuntu/VibeJobHunterAIPA_AIMCF/.env` — is VJH actually submitting applications or just generating local artifacts?
