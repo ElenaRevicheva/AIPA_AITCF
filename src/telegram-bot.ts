@@ -75,10 +75,8 @@ import { runDocIngestion } from './doc-ingest';
 import {
   createTrelloCardFromTranscript,
   formatVoiceTrelloReply,
-  detectRelocationIntent,
-  relocateCardsToBoard,
-  archiveCards,
-  formatRelocationReply,
+  processMultiAction,
+  formatMultiActionReply,
 } from './trello-voice';
 import type { TrelloCard } from './trello-voice';
 import { Octokit } from '@octokit/rest';
@@ -6090,42 +6088,26 @@ Ready to commit? Use:
       }
 
       // ── Trello Voice Card Creator ──────────────────────────────────────────
-      // ── Card relocation / archive pre-check ─────────────────────────────
-      // Check before NLP so natural commands like "move those to Kira Junio"
-      // or "archive those cards" are handled without creating a new task.
+      // ── Multi-action pre-check (move / archive / mixed commands) ──────────
+      // If the transcript contains management vocabulary, ask Claude Haiku to
+      // decompose it into typed actions (create / move / archive) and execute
+      // all of them.  Falls through when the LLM says it is a pure task.
       {
         const uid = ctx.from?.id || 0;
-        const intent = await detectRelocationIntent(transcription);
+        const session = lastTrelloSession.get(uid);
+        const recentCards = (session && Date.now() - session.ts <= TRELLO_SESSION_TTL_MS)
+          ? session.cards : [];
 
-        if (intent.isArchive) {
-          const session = lastTrelloSession.get(uid);
-          if (!session || Date.now() - session.ts > TRELLO_SESSION_TTL_MS) {
-            await ctx.reply('❌ No recent cards to archive. Create cards first, then say "archive those".');
-          } else {
-            const result = await archiveCards(session.cards.map(c => c.id));
-            await ctx.reply(formatRelocationReply(result, session.cards.length, 'archive'), { parse_mode: 'Markdown' });
-            if (result.success) lastTrelloSession.delete(uid);
+        const multiResult = await processMultiAction(transcription, recentCards);
+        if (multiResult.handled) {
+          // Keep session updated with any newly created cards
+          const newlyCreated = multiResult.results
+            .filter(r => r.type === 'create' && r.success)
+            .flatMap(r => r.cards ?? []);
+          if (newlyCreated.length > 0) {
+            lastTrelloSession.set(uid, { cards: newlyCreated, listTarget: 'todo_flow', ts: Date.now() });
           }
-          return;
-        }
-
-        if (intent.isRelocate) {
-          const session = lastTrelloSession.get(uid);
-          if (!session || Date.now() - session.ts > TRELLO_SESSION_TTL_MS) {
-            await ctx.reply('❌ No recent cards to move. Create cards first, then say "move those to [board name]".');
-            return;
-          }
-          if (!intent.targetBoard) {
-            await ctx.reply('❌ Please mention the target board. For example: "Move those to Kira Junio 2026"');
-            return;
-          }
-          const result = await relocateCardsToBoard(
-            session.cards.map(c => c.id),
-            intent.targetBoard,
-            session.listTarget as import('./trello-voice').ListTarget,
-          );
-          await ctx.reply(formatRelocationReply(result, session.cards.length, 'move', intent.targetBoard), { parse_mode: 'Markdown' });
-          if (result.success) lastTrelloSession.set(uid, { ...session, cards: [] }); // clear after move
+          await ctx.reply(formatMultiActionReply(multiResult.results), { parse_mode: 'Markdown' });
           return;
         }
       }
@@ -6136,9 +6118,9 @@ Ready to commit? Use:
       // we return. If not a task (question, command, chat), we fall through.
       const trelloResult = await createTrelloCardFromTranscript(transcription);
       if (trelloResult.success) {
-        // Store session for potential relocation/archive follow-up
+        // Store session for "those cards" references in follow-up commands
         const uid = ctx.from?.id || 0;
-        const createdCards = trelloResult.cards || (trelloResult.card ? [trelloResult.card] : []);
+        const createdCards = trelloResult.cards ?? (trelloResult.card ? [trelloResult.card] : []);
         if (createdCards.length > 0) {
           lastTrelloSession.set(uid, {
             cards: createdCards,

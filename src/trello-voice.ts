@@ -121,6 +121,8 @@ export interface TrelloCard {
   url: string;
   shortUrl: string;
   due?: string | null;
+  idBoard?: string;
+  idList?: string;
 }
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -1009,167 +1011,251 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
  * // ... your existing code continues here ...
  */
 
-// ─── Card Relocation & Archive ────────────────────────────────────────────────
+// ─── Multi-Action: Create / Move / Archive ───────────────────────────────────
+//
+// Triggered when the transcript contains management vocabulary.
+// Claude Haiku classifies the full message into an array of typed actions,
+// then each action is executed independently.  A single voice message can
+// combine creation, relocation and archiving across any boards.
 
-// Must contain BOTH a move verb AND a demonstrative reference to previously created cards.
-// This prevents "transfer the document" / "move to a new city" from triggering.
-const RELOCATION_RE = /\b(move|relocat|перенеси|переместить|перемести|перенести)\b/i;
-const RELOCATION_DEMO_RE = /\b(those|them|these|те\s+карточки|те\s+задачи|их|эти|тех|the\s+(last\s+)?(card|cards|task|tasks))\b/i;
-const ARCHIVE_RE    = /\b(archiv|заархивируй|убери\s+(те|эти)|скрой|archive)\b/i;
+/** Keyword pre-check — avoids the LLM call for purely-task messages. */
+const MGMT_RE = /\b(move|relocat|archive|archiv|перенеси|переместить|перемести|перенести|заархивируй|убери|скрой)\b/i;
 
-export interface RelocationResult {
+export interface MultiActionItem {
+  type: 'create' | 'move' | 'archive';
   success: boolean;
-  boardName?: string;
-  listName?: string;
-  movedCount?: number;
-  error?: string;
+  description?: string | undefined;
+  cardQuery?: string | undefined;
+  cards?: TrelloCard[] | undefined;
+  boardName?: string | undefined;
+  listName?: string | undefined;
+  movedCount?: number | undefined;
+  archivedCount?: number | undefined;
+  error?: string | undefined;
 }
 
-export async function detectRelocationIntent(
-  transcript: string,
-): Promise<{ isRelocate: boolean; isArchive: boolean; targetBoard: string | null }> {
-  // Require both a move verb AND a reference to previously created cards ("those", "them", etc.)
-  const maybeRelocate = RELOCATION_RE.test(transcript) && RELOCATION_DEMO_RE.test(transcript);
-  const maybeArchive  = ARCHIVE_RE.test(transcript);
+interface _RawAction {
+  type: 'create' | 'move' | 'archive';
+  description?: string;
+  cardQuery?: string;
+  sourceBoardHint?: string;
+  targetBoard?: string;
+}
 
-  if (!maybeRelocate && !maybeArchive) {
-    return { isRelocate: false, isArchive: false, targetBoard: null };
-  }
+/** Search Trello cards by text, optionally restricted to a board. */
+async function searchTrelloCards(query: string, boardHint?: string): Promise<TrelloCard[]> {
+  const data = await trelloGet<{ cards?: TrelloCard[] }>('/search', {
+    query,
+    modelTypes: 'cards',
+    card_fields: 'name,id,shortUrl,idList,idBoard,due',
+    cards_limit: '15',
+  });
+  const cards = data?.cards ?? [];
+  if (!boardHint || cards.length === 0) return cards;
 
-  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
-  if (!ANTHROPIC_API_KEY) {
-    return { isRelocate: maybeRelocate, isArchive: maybeArchive, targetBoard: null };
-  }
+  const boards = await getAllBoards();
+  const hintWords = boardHint.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  const matchIds = new Set(
+    boards
+      .filter(b => hintWords.some(w => b.name.toLowerCase().includes(w)))
+      .map(b => b.id),
+  );
+  const filtered = matchIds.size > 0 ? cards.filter(c => matchIds.has(c.idBoard ?? '')) : cards;
+  return filtered.length > 0 ? filtered : cards; // fall back to unfiltered if hint yielded nothing
+}
+
+/** Ask Claude Haiku to decompose the transcript into typed actions. */
+async function classifyMultiAction(transcript: string): Promise<_RawAction[]> {
+  const key = process.env.ANTHROPIC_API_KEY || '';
+  if (!key) return [];
 
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 120,
+        max_tokens: 500,
         messages: [{
           role: 'user',
-          content: `Is this message a command to manage previously created Trello cards? Reply with ONLY JSON — no explanation.
+          content: `You manage Trello boards for Elena Revicheva (AI entrepreneur, Panama).
 
-Message: "${transcript}"
+Analyze this voice message and extract ALL Trello card management actions.
+Return ONLY a JSON array — no explanation, no markdown.
 
-{"isRelocate": boolean, "isArchive": boolean, "targetBoard": "board name or null"}
+Action schema:
+[
+  {"type":"create","description":"full task description to create as a new card"},
+  {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"destination board name"},
+  {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"}
+]
 
-isRelocate = true ONLY if the user explicitly asks to move/relocate PREVIOUSLY CREATED cards (uses "those", "them", "those cards", or equivalent pronoun referring to prior cards)
-isArchive  = true ONLY if the user explicitly asks to archive/hide PREVIOUSLY CREATED cards
-targetBoard = destination board name if isRelocate, otherwise null
+Rules:
+- Return [] if no Trello card management is requested (e.g. "transfer the hospital card to another clinic" is NOT a Trello action)
+- "move" / "archive" when the user refers to EXISTING cards by name, topic, or vague pronoun ("those", "them", "those cards")
+- "create" for new tasks
+- One message can contain multiple actions of different types
+- For vague pronouns ("those", "them"), set cardQuery to "__recent__"
 
-IMPORTANT: If the message describes a new task (even if it contains words like "move", "transfer", "relocate" in a real-world context), set both to false.`,
+Message: "${transcript}"`,
         }],
       }),
     });
+
     if (resp.ok) {
       const data = await resp.json() as { content?: Array<{ text?: string }> };
-      const text = (data?.content?.[0]?.text || '').trim().replace(/```json\n?|\n?```/g, '');
-      const parsed = JSON.parse(text) as { isRelocate?: boolean; isArchive?: boolean; targetBoard?: string | null };
-      return {
-        isRelocate: !!parsed.isRelocate,
-        isArchive:  !!parsed.isArchive,
-        targetBoard: parsed.targetBoard || null,
-      };
+      const raw = (data?.content?.[0]?.text || '').trim().replace(/```json\n?|\n?```/g, '');
+      return JSON.parse(raw) as _RawAction[];
     }
   } catch (e) {
-    console.warn('[TrelloVoice] Relocation/archive intent detection failed:', e);
+    console.warn('[TrelloVoice] Multi-action classify failed:', e);
   }
-  return { isRelocate: maybeRelocate, isArchive: maybeArchive, targetBoard: null };
+  return [];
 }
 
-export async function relocateCardsToBoard(
-  cardIds: string[],
-  targetBoardHint: string,
-  listTarget: ListTarget = 'todo_flow',
-): Promise<RelocationResult> {
-  try {
-    const boards = await getAllBoards();
+/**
+ * Main entry point for voice management commands.
+ * Returns `{ handled: false }` when the transcript is not a management command
+ * so the caller can fall through to normal task creation.
+ */
+export async function processMultiAction(
+  transcript: string,
+  recentCards: TrelloCard[] = [],
+): Promise<{ handled: boolean; results: MultiActionItem[] }> {
+  if (!MGMT_RE.test(transcript)) return { handled: false, results: [] };
 
-    // Fuzzy-match the hint against board names
-    const hintWords = targetBoardHint.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-    const targetBoard = boards.find(b => {
-      const lower = b.name.toLowerCase();
-      return hintWords.some(w => lower.includes(w));
-    });
+  const rawActions = await classifyMultiAction(transcript);
+  if (!rawActions.length) return { handled: false, results: [] };
 
-    if (!targetBoard) {
-      return { success: false, error: `No board found matching "${targetBoardHint}"` };
+  const results: MultiActionItem[] = [];
+
+  for (const action of rawActions) {
+    // ── CREATE ──────────────────────────────────────────────────────────────
+    if (action.type === 'create' && action.description) {
+      const r = await createTrelloCardFromTranscript(action.description);
+      results.push({
+        type: 'create',
+        success: r.success,
+        description: r.classification?.title || action.description,
+        cards: r.cards ?? (r.card ? [r.card] : []),
+        boardName: r.boardName,
+        listName: r.listName,
+        error: r.error,
+      });
+      continue;
     }
 
-    const lists = await getBoardLists(targetBoard.id);
-    const targetList = resolveList(lists, listTarget) ?? lists[0];
-
-    if (!targetList) {
-      return { success: false, error: `No lists found on board "${targetBoard.name}"` };
-    }
-
-    let movedCount = 0;
-    for (const cardId of cardIds) {
+    // ── MOVE ────────────────────────────────────────────────────────────────
+    if (action.type === 'move' && action.cardQuery && action.targetBoard) {
       try {
-        await moveCard(cardId, targetList.id);
-        movedCount++;
-      } catch (err) {
-        console.error(`[TrelloVoice] Move card ${cardId} failed:`, err);
+        const cards = action.cardQuery === '__recent__'
+          ? recentCards
+          : await searchTrelloCards(action.cardQuery, action.sourceBoardHint ?? undefined);
+
+        if (cards.length === 0) {
+          results.push({ type: 'move', success: false, cardQuery: action.cardQuery,
+            error: `No cards found matching "${action.cardQuery}"` });
+          continue;
+        }
+
+        const boards = await getAllBoards();
+        const hint = action.targetBoard.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+        const dest = boards.find(b => hint.some(w => b.name.toLowerCase().includes(w)));
+        if (!dest) {
+          results.push({ type: 'move', success: false, cardQuery: action.cardQuery,
+            error: `Board not found: "${action.targetBoard}"` });
+          continue;
+        }
+
+        const lists = await getBoardLists(dest.id);
+        const destList = resolveList(lists, 'todo_flow') ?? lists[0];
+        if (!destList) {
+          results.push({ type: 'move', success: false, error: `No lists on "${dest.name}"` });
+          continue;
+        }
+
+        let moved = 0;
+        for (const c of cards) {
+          try { await moveCard(c.id, destList.id); moved++; } catch { /* skip */ }
+        }
+
+        results.push({
+          type: 'move', success: moved > 0, cardQuery: action.cardQuery,
+          cards: cards.slice(0, moved), boardName: dest.name, listName: destList.name, movedCount: moved,
+        });
+      } catch (err: unknown) {
+        results.push({ type: 'move', success: false,
+          error: err instanceof Error ? err.message : String(err) });
+      }
+      continue;
+    }
+
+    // ── ARCHIVE ─────────────────────────────────────────────────────────────
+    if (action.type === 'archive' && action.cardQuery) {
+      try {
+        const cards = action.cardQuery === '__recent__'
+          ? recentCards
+          : await searchTrelloCards(action.cardQuery, action.sourceBoardHint ?? undefined);
+
+        if (cards.length === 0) {
+          results.push({ type: 'archive', success: false, cardQuery: action.cardQuery,
+            error: `No cards found matching "${action.cardQuery}"` });
+          continue;
+        }
+
+        let archived = 0;
+        for (const c of cards) {
+          try { await trelloPut<TrelloCard>(`/cards/${c.id}`, { closed: 'true' }); archived++; } catch { /* skip */ }
+        }
+
+        results.push({
+          type: 'archive', success: archived > 0, cardQuery: action.cardQuery,
+          cards: cards.slice(0, archived), archivedCount: archived,
+        });
+      } catch (err: unknown) {
+        results.push({ type: 'archive', success: false,
+          error: err instanceof Error ? err.message : String(err) });
       }
     }
-
-    if (movedCount === 0) return { success: false, error: 'Failed to move any cards' };
-
-    return { success: true, boardName: targetBoard.name, listName: targetList.name, movedCount };
-  } catch (err: unknown) {
-    return { success: false, error: err instanceof Error ? err.message : String(err) };
   }
+
+  return { handled: results.length > 0, results };
 }
 
-export async function archiveCards(cardIds: string[]): Promise<RelocationResult> {
-  try {
-    let archivedCount = 0;
-    for (const cardId of cardIds) {
-      try {
-        await trelloPut<TrelloCard>(`/cards/${cardId}`, { closed: 'true' });
-        archivedCount++;
-      } catch (err) {
-        console.error(`[TrelloVoice] Archive card ${cardId} failed:`, err);
+export function formatMultiActionReply(results: MultiActionItem[]): string {
+  if (results.length === 0) return '❌ No actions were executed.';
+
+  const lines: string[] = [];
+  const anyFail = results.some(r => !r.success);
+
+  for (const r of results) {
+    if (r.type === 'create') {
+      if (r.success) {
+        const n = r.cards?.length || 1;
+        lines.push(`✅ *${n} card${n > 1 ? 's' : ''} created* on *${r.boardName}* (${r.listName})`);
+        r.cards?.forEach(c => lines.push(`  • [${c.name}](${c.shortUrl})`));
+      } else {
+        lines.push(`❌ Create failed: ${r.error}`);
+      }
+    } else if (r.type === 'move') {
+      if (r.success) {
+        const n = r.movedCount ?? 0;
+        lines.push(`🔀 *${n} card${n > 1 ? 's' : ''} moved* → *${r.boardName}* (${r.listName})`);
+        r.cards?.forEach(c => lines.push(`  • [${c.name}](${c.shortUrl})`));
+      } else {
+        lines.push(`❌ Move failed${r.cardQuery ? ` ("${r.cardQuery}")` : ''}: ${r.error}`);
+      }
+    } else if (r.type === 'archive') {
+      if (r.success) {
+        const n = r.archivedCount ?? 0;
+        lines.push(`🗑️ *${n} card${n > 1 ? 's' : ''} archived*`);
+        r.cards?.forEach(c => lines.push(`  • ${c.name}`));
+      } else {
+        lines.push(`❌ Archive failed${r.cardQuery ? ` ("${r.cardQuery}")` : ''}: ${r.error}`);
       }
     }
-    if (archivedCount === 0) return { success: false, error: 'Failed to archive any cards' };
-    return { success: true, movedCount: archivedCount };
-  } catch (err: unknown) {
-    return { success: false, error: err instanceof Error ? err.message : String(err) };
-  }
-}
-
-export function formatRelocationReply(
-  result: RelocationResult,
-  cardCount: number,
-  action: 'move' | 'archive',
-  targetHint?: string,
-): string {
-  const n = result.movedCount ?? cardCount;
-  const cardWord = n === 1 ? 'card' : 'cards';
-
-  if (!result.success) {
-    const hint = action === 'move'
-      ? `\n\nMake sure to mention the exact board name (e.g., "Move those to Kira Junio 2026").`
-      : '';
-    return `❌ Could not ${action} cards: ${result.error || 'Unknown error'}${hint}`;
   }
 
-  if (action === 'archive') {
-    return `✅ *${n} ${cardWord} archived!*\n\n_Cards hidden from board. You can restore them from Trello's archived items._`;
-  }
-
-  return [
-    `✅ *${n} ${cardWord} moved!*`,
-    ``,
-    `📋 Board: ${result.boardName}`,
-    `📌 List: ${result.listName}`,
-  ].join('\n');
+  const header = anyFail ? '⚠️ *Partial success*' : '✅ *Done!*';
+  return [header, '', ...lines].filter(l => l !== undefined).join('\n');
 }
