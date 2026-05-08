@@ -311,22 +311,36 @@ function fuzzyMatch(name: string, keywords: string[]): boolean {
   return keywords.some((kw) => lower.includes(kw.toLowerCase()));
 }
 
-function resolveBoard(boards: TrelloBoard[], target: BoardTarget): TrelloBoard | undefined {
-  // Special case: current month board — detect the current month name
-  if (target === 'kira_current_month') {
-    const monthNames = [
-      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
-    ];
-    const currentMonth = monthNames[new Date().getMonth()] as string;
-    const currentYear = new Date().getFullYear().toString();
+function resolveBoard(boards: TrelloBoard[], target: BoardTarget, dueDate?: string | null): TrelloBoard | undefined {
+  const MONTH_NAMES = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+  ];
 
-    // Try to find current month board first
-    const currentMonthBoard = boards.find((b) => {
-      const lower = b.name.toLowerCase();
-      return lower.includes(currentMonth) && lower.includes(currentYear) && lower.includes('kira');
-    });
-    if (currentMonthBoard) return currentMonthBoard;
+  if (target === 'kira_current_month') {
+    // If we have a specific due date, try to match that month's board first.
+    // Elena keeps rolling month boards (Mayo, Junio, Julio...) — free plan limit.
+    // Fall back to current month, then to any kira board.
+    const candidates: string[] = [];
+
+    if (dueDate) {
+      const d = new Date(`${dueDate}T00:00:00`);
+      candidates.push(`${MONTH_NAMES[d.getMonth()]}|${d.getFullYear()}`);
+    }
+    // Always add current month as fallback
+    const now = new Date();
+    candidates.push(`${MONTH_NAMES[now.getMonth()]}|${now.getFullYear()}`);
+
+    for (const candidate of candidates) {
+      const parts = candidate.split('|');
+      const month = parts[0] ?? '';
+      const year = parts[1] ?? '';
+      const found = boards.find((b) => {
+        const lower = b.name.toLowerCase();
+        return lower.includes(month) && lower.includes(year) && lower.includes('kira');
+      });
+      if (found) return found;
+    }
   }
 
   const keywords = BOARD_KEYWORDS[target];
@@ -431,9 +445,14 @@ async function classifyCard(rawTranscript: string): Promise<CardClassification> 
 You classify voice notes into Trello card metadata using HER EXACT system.
 
 ═══ ELENA'S BOARDS (exact real names) ═══
-- "Kira Mayo 2026" (current month, May 2026) — personal life this month: family, health, home, visa, admin, appointments, errands
-- "Kira Junio 2026" / "Kira Julio 2026" — next months (use kira_current_month for ALL month boards)
-- "Kira Ano 2026 и дальше" — long-term personal goals, multi-year life plans, big future projects
+IMPORTANT — month board rule: Elena is on a FREE Trello plan, so she keeps only ~3 rolling month boards
+at a time (e.g. "Kira Mayo 2026", "Kira Junio 2026", "Kira Julio 2026"). She does NOT have boards for
+all 12 months. Use boardTarget "kira_current_month" for ANY personal task within the next 3 months —
+the routing code will find the correct month board automatically. Use "kira_future" ONLY for tasks
+that are 4+ months away or have no specific month at all.
+
+- "Kira Mayo 2026" / "Kira Junio 2026" / "Kira Julio 2026" — rolling month boards (→ kira_current_month)
+- "Kira Ano 2026 и дальше" — tasks 4+ months away, no specific month, or multi-year goals (→ kira_future)
 - "Kira Horario del dia / Habits" — daily schedule, recurring routines, day-of-week habits
 - "Kira FIN Discipline / Shopping / Expenses" — finance, budget, purchases, payments, expenses (use kira_finance)
 - "VibeJob AI Hunter" — job search, applications, LinkedIn outreach, interviews, recruiters
@@ -655,7 +674,7 @@ export async function handleVoiceToTrello(
     return { success: false, transcript, classification, error: `Trello board fetch failed: ${String(err)}` };
   }
 
-  const targetBoard = resolveBoard(boards, classification.boardTarget);
+  const targetBoard = resolveBoard(boards, classification.boardTarget, classification.dueDate);
   if (!targetBoard) {
     // Fallback: use Kira current month board
     const fallbackBoard = boards.find((b) => b.name.toLowerCase().includes('kira'));
@@ -740,7 +759,7 @@ export async function createTrelloCardFromTranscript(
     return { success: false, transcript, classification, error: `Trello board fetch failed: ${String(err)}` };
   }
 
-  const targetBoard = resolveBoard(boards, classification.boardTarget);
+  const targetBoard = resolveBoard(boards, classification.boardTarget, classification.dueDate);
   if (!targetBoard) {
     const fallbackBoard = boards.find((b) => b.name.toLowerCase().includes('kira'));
     if (!fallbackBoard) {
