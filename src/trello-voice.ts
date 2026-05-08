@@ -25,6 +25,7 @@ import * as https from 'https';
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface CardClassification {
+  isTask: boolean;         // false = question/command/casual speech, not a Trello card
   title: string;           // Clean card title (no trigger phrase)
   description: string;     // Additional detail extracted from speech
   category: CardCategory;
@@ -413,11 +414,16 @@ List routing logic:
 - Unsure if needed → "not_sure"
 - Standing rule/habit → "rules"`;
 
-  const userPrompt = `Classify this voice note into a Trello card:
+  const userPrompt = `Classify this voice note:
 "${cleanedText}"
+
+First decide: is this an actionable to-do item that belongs on a Kanban board?
+- isTask: true  → it describes something that needs to be done (task, errand, appointment, goal, reminder, project step)
+- isTask: false → it's a question TO the bot, a command ("show my tasks"), casual chat, or a statement with no action
 
 Return JSON exactly like this (no markdown, no backticks, raw JSON only):
 {
+  "isTask": true,
   "title": "Clean actionable card title (3-8 words, imperative verb)",
   "description": "Any extra detail from the speech, or empty string",
   "category": "family|business|spiritual|health|hobby",
@@ -427,7 +433,9 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "labelColor": "red|orange|purple|green|lime",
   "confidence": 0.90,
   "reasoning": "One sentence: why this board + list + color"
-}`;
+}
+
+If isTask is false, still return the full JSON but the other fields can be empty/default.`;
 
   const response = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
@@ -446,6 +454,7 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
     // Fallback classification if parsing fails
     console.error('[TrelloVoice] Haiku parse failed, using fallback. Raw:', text);
     return {
+      isTask: true,
       title: cleanedText.slice(0, 60),
       description: '',
       category: 'hobby',
@@ -509,7 +518,8 @@ export interface VoiceTrelloResult {
   boardName?: string;
   listName?: string;
   error?: string;
-  noTrigger?: boolean; // true = voice had no trigger phrase, handle normally
+  noTrigger?: boolean; // true = voice had no trigger phrase (handleVoiceToTrello path)
+  notATask?: boolean;  // true = NLP decided this is not a Trello task — fall through
 }
 
 /**
@@ -633,6 +643,12 @@ export async function createTrelloCardFromTranscript(
     console.log(`[TrelloVoice] Classification:`, classification);
   } catch (err) {
     return { success: false, transcript, error: `Classification failed: ${String(err)}` };
+  }
+
+  // If NLP says this is not an actionable task, signal caller to fall through
+  if (!classification.isTask) {
+    console.log(`[TrelloVoice] Not a task — falling through to regular handler`);
+    return { success: false, notATask: true, transcript, classification };
   }
 
   // Step 2: Resolve boards
