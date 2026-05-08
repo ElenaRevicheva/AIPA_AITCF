@@ -6052,18 +6052,8 @@ Ready to commit? Use:
       // Show what was heard
       await ctx.reply(`🎤 I heard: "${transcription.substring(0, 200)}${transcription.length > 200 ? '...' : ''}"`);
 
-      // ── Trello Voice Card Creator ──────────────────────────────────────────
-      // NLP classifies every voice message — no trigger phrase required.
-      // If the message is an actionable task, a Trello card is created and
-      // we return. If not a task (question, command, chat), we fall through.
-      const trelloResult = await createTrelloCardFromTranscript(transcription);
-      if (trelloResult.success) {
-        await ctx.reply(formatVoiceTrelloReply(trelloResult), { parse_mode: 'Markdown' });
-        return;
-      }
-      // ──────────────────────────────────────────────────────────────────────
-
       // SPECIAL CASE: Job-search / VibeJob Hunter intents from voice
+      // Must run BEFORE Trello NLP so these specific commands reach their handler.
       const lower = transcription.toLowerCase();
       if (
         lower.includes('vibejobhunter') ||
@@ -6081,6 +6071,17 @@ Ready to commit? Use:
         // Any concrete code work will be done later in Cursor with your confirmation.
         return;
       }
+
+      // ── Trello Voice Card Creator ──────────────────────────────────────────
+      // NLP classifies every voice message — no trigger phrase required.
+      // If the message is an actionable task, a Trello card is created and
+      // we return. If not a task (question, command, chat), we fall through.
+      const trelloResult = await createTrelloCardFromTranscript(transcription);
+      if (trelloResult.success) {
+        await ctx.reply(formatVoiceTrelloReply(trelloResult), { parse_mode: 'Markdown' });
+        return;
+      }
+      // ──────────────────────────────────────────────────────────────────────
       
       // PERSONAL AI UPGRADE: Detect intent from voice message
       const intent = await detectPersonalAIIntent(transcription);
