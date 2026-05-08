@@ -79,6 +79,7 @@ import {
   formatMultiActionReply,
 } from './trello-voice';
 import type { TrelloCard } from './trello-voice';
+import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -7673,9 +7674,20 @@ ${suggestion}
 
 _/daily for full briefing_`;
 
+        // Trello board briefing
+        let trelloBriefing = '';
+        try {
+          trelloBriefing = await generateDailyBriefing();
+        } catch (err) {
+          console.error('[BoardBriefing] Daily briefing error:', err);
+        }
+
         await bot.api.sendMessage(chatId, briefing, { parse_mode: 'Markdown' });
+        if (trelloBriefing) {
+          await bot.api.sendMessage(chatId, trelloBriefing, { parse_mode: 'Markdown' });
+        }
         console.log(`   Sent daily briefing to ${chatId}`);
-        
+
       } catch (error) {
         console.error(`Failed to send daily briefing to ${chatId}:`, error);
       }
@@ -7683,9 +7695,27 @@ _/daily for full briefing_`;
   }, {
     timezone: 'America/Panama'
   });
-  
+
   cronJobs.push(dailyBriefing);
-  
+
+  // Weekly Trello digest — Monday 9 AM Panama time
+  const weeklyDigest = cron.schedule('0 9 * * 1', async () => {
+    console.log('📊 Sending weekly Trello digest...');
+    for (const chatId of alertChatIds) {
+      try {
+        const digest = await generateWeeklyDigest();
+        if (digest) {
+          await bot.api.sendMessage(chatId, digest, { parse_mode: 'Markdown' });
+          console.log(`   Sent weekly digest to ${chatId}`);
+        }
+      } catch (err) {
+        console.error(`Failed to send weekly digest to ${chatId}:`, err);
+      }
+    }
+  }, { timezone: 'America/Panama' });
+
+  cronJobs.push(weeklyDigest);
+
   // Health check every 4 hours
   const healthCheck = cron.schedule('0 */4 * * *', () => {
     checkEcosystemHealth(bot);
