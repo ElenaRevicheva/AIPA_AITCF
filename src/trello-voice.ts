@@ -1011,8 +1011,11 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
 
 // ─── Card Relocation & Archive ────────────────────────────────────────────────
 
-const RELOCATION_RE = /\b(move|relocat|transfer|перенеси|переместить|перемести|перенести)\b/i;
-const ARCHIVE_RE    = /\b(archiv|закрой|заархивируй|убери|скрой|archive)\b/i;
+// Must contain BOTH a move verb AND a demonstrative reference to previously created cards.
+// This prevents "transfer the document" / "move to a new city" from triggering.
+const RELOCATION_RE = /\b(move|relocat|перенеси|переместить|перемести|перенести)\b/i;
+const RELOCATION_DEMO_RE = /\b(those|them|these|те\s+карточки|те\s+задачи|их|эти|тех|the\s+(last\s+)?(card|cards|task|tasks))\b/i;
+const ARCHIVE_RE    = /\b(archiv|заархивируй|убери\s+(те|эти)|скрой|archive)\b/i;
 
 export interface RelocationResult {
   success: boolean;
@@ -1025,7 +1028,8 @@ export interface RelocationResult {
 export async function detectRelocationIntent(
   transcript: string,
 ): Promise<{ isRelocate: boolean; isArchive: boolean; targetBoard: string | null }> {
-  const maybeRelocate = RELOCATION_RE.test(transcript);
+  // Require both a move verb AND a reference to previously created cards ("those", "them", etc.)
+  const maybeRelocate = RELOCATION_RE.test(transcript) && RELOCATION_DEMO_RE.test(transcript);
   const maybeArchive  = ARCHIVE_RE.test(transcript);
 
   if (!maybeRelocate && !maybeArchive) {
@@ -1050,15 +1054,17 @@ export async function detectRelocationIntent(
         max_tokens: 120,
         messages: [{
           role: 'user',
-          content: `Classify this message about Trello cards. Reply with ONLY JSON — no explanation.
+          content: `Is this message a command to manage previously created Trello cards? Reply with ONLY JSON — no explanation.
 
 Message: "${transcript}"
 
 {"isRelocate": boolean, "isArchive": boolean, "targetBoard": "board name or null"}
 
-isRelocate = user wants to move cards to a different board
-isArchive  = user wants to archive/hide/close the recent cards
-targetBoard = board name if isRelocate is true, otherwise null`,
+isRelocate = true ONLY if the user explicitly asks to move/relocate PREVIOUSLY CREATED cards (uses "those", "them", "those cards", or equivalent pronoun referring to prior cards)
+isArchive  = true ONLY if the user explicitly asks to archive/hide PREVIOUSLY CREATED cards
+targetBoard = destination board name if isRelocate, otherwise null
+
+IMPORTANT: If the message describes a new task (even if it contains words like "move", "transfer", "relocate" in a real-world context), set both to false.`,
         }],
       }),
     });
