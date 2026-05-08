@@ -162,27 +162,62 @@ const CATEGORY_COLOR_MAP: Record<CardCategory, TrelloColor> = {
 };
 
 // Board name substrings for fuzzy matching (case-insensitive)
+// Verified against actual board names fetched from Trello API (May 2026)
 const BOARD_KEYWORDS: Record<BoardTarget, string[]> = {
-  kira_current_month: ['mayo 2026', 'june 2026', 'junio 2026', 'kira mayo', 'kira junio'],
-  kira_future: ['ano 2026', 'año 2026', 'дальше', 'future', 'kira ano'],
+  // "Kira Mayo 2026" / "Kira Junio 2026" / "Kira Julio 2026" — month boards
+  kira_current_month: ['mayo 2026', 'junio 2026', 'julio 2026', 'kira mayo', 'kira junio', 'kira julio', 'june 2026', 'july 2026'],
+  // "Kira Ano 2026 и дальше"
+  kira_future: ['ano 2026', 'año 2026', 'дальше', 'future', 'kira ano', 'and beyond', '2026 and'],
+  // "VibeJob AI Hunter"
   vibejob: ['vibejob', 'vibe job', 'job hunter', 'job hunt'],
-  aldeazz: ['aldeazz', 'web3', 'ecosystem'],
-  espaluz: ['espaluz', 'espa luz', 'tutor', 'family tutor'],
-  algom: ['algom', 'crypto coach', 'alpha'],
-  kira_habits: ['horario', 'habits', 'hábitos'],
-  kira_finance: ['фин', 'дисциплина', 'финансы', 'finance discipline'],
+  // "AIdeazz Web3 Ecosystem" — note: board name is AIdeazz not Aldeazz
+  aldeazz: ['aideazz', 'aldeazz', 'web3', 'ecosystem', 'nft', 'blockchain'],
+  // "EspaLuz AI Family Tutor"
+  espaluz: ['espaluz', 'espa luz', 'tutor', 'family tutor', 'spanish tutor'],
+  // "Algom Alpha Crypto Coach"
+  algom: ['algom', 'crypto coach', 'alpha', 'crypto', 'trading', 'defi'],
+  // "Kira Horario del dia / Habits"
+  kira_habits: ['horario', 'habits', 'hábitos', 'horario del dia', 'schedule'],
+  // "Kira FIN Discipline / Shopping / Expenses" — board name is Latin not Cyrillic!
+  kira_finance: ['fin discipline', 'fin disci', 'shopping', 'expenses', 'фин дисц', 'финансы', 'бюджет', 'budget'],
 };
 
-// List name substrings for fuzzy matching — exact names from Elena's boards
+// List name substrings for fuzzy matching — verified against all 10 actual boards (May 2026)
+//
+// Boards with standard lists: Kira Mayo/Junio/Julio, VibeJob, Algom, Web3, EspaLuz
+// Boards with variant lists:
+//   - Algom / Web3 / EspaLuz: "In process. Does NOT depend on Me." → in_process_them
+//   - Kira FIN Discipline: "Купить / Оплатить СРОЧНО!!!" → just_for_today; "Купить / оплатить..." → todo_flow
+//   - Kira Horario del dia: day-of-week lists only (no standard mapping — fallback to lists[0])
+//   - Kira Ano 2026: two "Надо сделать" lists, no in_process/rules
 const LIST_KEYWORDS: Record<ListTarget, string[]> = {
-  just_for_today:   ['just for today', 'в приоритете', 'приоритете', '1st things', 'first things'],
-  todo_flow:        ['надо сделать', 'поток', 'надо', 'нужно', 'todo', 'to do', 'flow'],
-  in_process_me:    ['мяч на моей', 'на моей стороне', 'depends on me', 'in process', 'в процессе'],
-  in_process_them:  ['мяч на стороне контрагента', 'контрагента', 'waiting on', 'depends on them'],
-  not_sure:         ["not sure", 'to-do or not', 'maybe', 'не уверена'],
-  dated:            ['датировано', 'cita', 'dated', 'appointment', 'scheduled'],
-  rules:            ['reglas', 'rules', 'nb', 'правила', 'nota bene'],
-  done:             ['сделано', 'gane', 'done', 'completed', 'выполнено'],
+  just_for_today: [
+    'just for today', 'в приоритете', 'приоритете', '1st things', 'first things',
+    'срочно',                            // "Купить / Оплатить СРОЧНО!!!" on FIN board
+  ],
+  todo_flow: [
+    'надо сделать', 'поток', 'надо', 'нужно', 'todo', 'to do', 'flow',
+    'купить',                            // "Купить / оплатить..." on FIN board
+  ],
+  in_process_me: [
+    'мяч на моей', 'на моей стороне', 'depends on me', 'в процессе',
+  ],
+  in_process_them: [
+    'мяч на стороне контрагента', 'контрагента', 'waiting on', 'depends on them',
+    'does not depend', 'not depend on me', // "In process. Does NOT depend on Me." on Web3/Algom/EspaLuz
+  ],
+  not_sure: [
+    'not sure', 'to-do or not', 'maybe', 'не уверена', 'под вопросом',
+  ],
+  dated: [
+    'датировано', 'cita', 'dated', 'appointment', 'scheduled', 'appointed',
+  ],
+  rules: [
+    'reglas', 'rules', 'nb', 'правила', 'nota bene', 'регулярные',  // "Покупки / Расходы регулярные" on FIN board
+  ],
+  done: [
+    'сделано', 'gane', 'done', 'completed', 'выполнено', 'performed',
+  ],
 };
 
 // ─── Trello API Helpers ───────────────────────────────────────────────────────
@@ -339,15 +374,16 @@ async function classifyCard(rawTranscript: string): Promise<CardClassification> 
   const systemPrompt = `You are a personal assistant for Elena Revicheva — AI builder, executive, and mother in Panama.
 You classify voice notes into Trello card metadata using HER EXACT system.
 
-═══ ELENA'S BOARDS ═══
-- "Kira Mayo 2026" (current month) — personal life: family, health, home, visa, admin, appointments
-- "Kira Ano 2026 и дальше" — future personal goals, long-term life plans
-- "Kira Horario del dia / Habits" — daily routines, recurring habits
-- "Kira ФИН Дисциплина" — finance, budget, expenses, payments
-- "VibeJob AI Hunter" — job search, applications, LinkedIn, interviews
-- "Aldeazz Web3 Ecosystem" — Web3, NFTs, blockchain, Atuona poetry
-- "EspaLuz AI Family Tutor" — Spanish tutoring business, students
-- "Algom Alpha Crypto Coach" — crypto, trading, DeFi
+═══ ELENA'S BOARDS (exact real names) ═══
+- "Kira Mayo 2026" (current month, May 2026) — personal life this month: family, health, home, visa, admin, appointments, errands
+- "Kira Junio 2026" / "Kira Julio 2026" — next months (use kira_current_month for ALL month boards)
+- "Kira Ano 2026 и дальше" — long-term personal goals, multi-year life plans, big future projects
+- "Kira Horario del dia / Habits" — daily schedule, recurring routines, day-of-week habits
+- "Kira FIN Discipline / Shopping / Expenses" — finance, budget, purchases, payments, expenses (use kira_finance)
+- "VibeJob AI Hunter" — job search, applications, LinkedIn outreach, interviews, recruiters
+- "AIdeazz Web3 Ecosystem" — Web3, NFTs, blockchain, Atuona poetry, AI film, creative projects (use aldeazz)
+- "EspaLuz AI Family Tutor" — Spanish tutoring business, EspaLuz app, students, revenue, WhatsApp bot
+- "Algom Alpha Crypto Coach" — crypto signals, trading, DeFi, Algom Alpha agent, market analysis
 
 ═══ ELENA'S LIST STRUCTURE (same across all boards) ═══
 - "just_for_today"   = "Just for Today / «В приоритете»" → urgent, do today
