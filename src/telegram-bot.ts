@@ -677,7 +677,14 @@ Or just ask me anything - I understand natural language!`;
 /research - Save research / market notes
 /resume   - Restore last session
 /forget   - Clear conversation context (keeps knowledge base)
-/trello_analyze - Full Kanban analysis of all Trello boards`,
+/trello_analyze - Full Kanban analysis of all Trello boards
+
+🎤 Voice → Trello (say in EN/ES/RU):
+  "Add card — [task description]"
+  "Create task — [what to do]"
+  "Agregar tarea — [descripción]"
+  "Добавить задачу — [описание]"
+  → Card created instantly in the right board + color`,
       {
         reply_markup: {
           inline_keyboard: [
