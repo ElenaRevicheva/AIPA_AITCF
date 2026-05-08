@@ -72,6 +72,7 @@ import {
 import { runProspectIngestion } from './prospect-ingest';
 import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
 import { runDocIngestion } from './doc-ingest';
+import { detectTrelloTrigger, createTrelloCardFromTranscript, formatVoiceTrelloReply } from './trello-voice';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -6043,6 +6044,15 @@ Ready to commit? Use:
       
       // Show what was heard
       await ctx.reply(`🎤 I heard: "${transcription.substring(0, 200)}${transcription.length > 200 ? '...' : ''}"`);
+
+      // ── Trello Voice Card Creator ──────────────────────────────────────────
+      // Uses already-transcribed text — no second Whisper call.
+      if (detectTrelloTrigger(transcription)) {
+        const trelloResult = await createTrelloCardFromTranscript(transcription);
+        await ctx.reply(formatVoiceTrelloReply(trelloResult), { parse_mode: 'Markdown' });
+        return;
+      }
+      // ──────────────────────────────────────────────────────────────────────
 
       // SPECIAL CASE: Job-search / VibeJob Hunter intents from voice
       const lower = transcription.toLowerCase();

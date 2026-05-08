@@ -81,6 +81,21 @@ This doc is the **single map**: **Oracle VM paths** (above) + **where your autho
 
 **Verify anytime:** `git remote -v` should show `ElenaRevicheva/<repo>` — if two folders point at the same remote, delete or repurpose the duplicate spare checkout.
 
+#### How CTO AIPA accesses all repos — including private ones
+
+Every repo (public **and** private) is already cloned at the canonical path in the table above. Git credentials are configured on this machine — `git pull` and `git push` work without additional login on all repos.
+
+**Operating rule:** Never clone a fresh copy or create a new folder. Go directly to the canonical local path and work there. Private repos are treated identically to public — same paths, same git operations, no extra steps.
+
+| What you need | Where to go |
+|---------------|-------------|
+| Any repo file | `cd /d/aideazz/<canonical-path>` (see table above) |
+| AILA (private docs branch) | `cd /d/aideazz/AILA` — already on branch `docs` |
+| CTO AIPA / Atuona / Sprinter | `D:\aideazz\ai-cofounders\cto-aipa` |
+| atuona.xyz site (no local checkout) | Push changes via GitHub directly — no local folder |
+
+If a path says **"no local checkout"** in the table → use GitHub API or browser only, do **not** create a new local clone.
+
 **Cross-links:** Planning inventory — [AILA `AILA_SYMPHONY_ANALYSIS.md`](https://github.com/ElenaRevicheva/AILA/blob/docs/docs/planning/AILA_SYMPHONY_ANALYSIS.md). Ops / health — this file on **[AIPA_AITCF `main`](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md)**.
 
 ---

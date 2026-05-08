@@ -7,6 +7,17 @@
 
 **Never ask Elena where a local folder or GitHub repo is.** The answer is always in one of these two docs:
 
+### How CTO AIPA accesses all repos — including private ones
+
+Every repo (public **and** private) is already cloned at the canonical path listed in `ORACLE_ALL_PRODUCTS_RESILIENCE.md`. Git credentials are configured — no extra login, no fresh clone needed.
+
+**Operating rule:** Go directly to the canonical local path. Never create a duplicate folder. Private repos are treated identically to public — same canonical paths, same git operations.
+
+- CTO AIPA session working dir: `D:\aideazz\ai-cofounders\cto-aipa`
+- Any other repo: `cd /d/aideazz/<repo-name>` using the table below
+- AILA (private docs branch): `/d/aideazz/AILA` — already checked out on branch `docs`
+- No local checkout listed? → use GitHub API/browser only, **do not clone**
+
 | Doc | URL | What it contains |
 |-----|-----|-----------------|
 | **ORACLE_ALL_PRODUCTS_RESILIENCE.md** | [GitHub](https://github.com/ElenaRevicheva/AIPA_AITCF/blob/main/docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md) · local: `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md` | **Single source of truth** — every local Windows path + GitHub remote + Oracle VM path for every repo |
