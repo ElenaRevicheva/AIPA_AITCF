@@ -1551,15 +1551,28 @@ async function startCTOAIPA() {
           complexity_issues: reviewResult.complexityIssues.length
         }, 'verified_delivered').catch(e => console.error('Outcome logging failed:', e));
 
-        await notifyCMO({
-          commit_sha: req.body.after,
-          repo: repo.full_name,
-          title: commitMessages,
-          description: `CTO reviewed push: ${commitMessages}`,
-          type: 'feature',
-          security_issues: reviewResult.securityIssues.length,
-          complexity_issues: reviewResult.complexityIssues.length
-        });
+        // Only notify CMO (→ X post) for genuine new features — not fixes, docs, or chores.
+        // Raw commit messages are for developers, not the public audience.
+        const featCommits = commits.filter((c: { message: string }) =>
+          /^feat[:(]/.test(c.message) ||
+          /^launch[:(]/.test(c.message) ||
+          /^release[:(]/.test(c.message)
+        );
+        if (featCommits.length > 0) {
+          const featMessages = featCommits.map((c: { message: string }) => c.message).join(', ');
+          await notifyCMO({
+            commit_sha: req.body.after,
+            repo: repo.full_name,
+            title: featMessages,
+            description: featMessages,
+            type: 'feature',
+            security_issues: reviewResult.securityIssues.length,
+            complexity_issues: reviewResult.complexityIssues.length
+          });
+          console.log(`📢 CMO notified — feat commit(s): ${featMessages.substring(0, 100)}`);
+        } else {
+          console.log(`⏭️ CMO skip — no feat: commits in this push (${commitMessages.substring(0, 80)})`);
+        }
         
       } catch (error) {
         console.error(`❌ Error processing push:`, error);
