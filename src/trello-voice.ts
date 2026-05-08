@@ -33,6 +33,7 @@ interface CardClassification {
   boardTarget: BoardTarget;
   listTarget: ListTarget;
   labelColor: TrelloColor;
+  dueDate: string | null;  // ISO date YYYY-MM-DD extracted from speech ("by Friday", "end of May") or null
   confidence: number;      // 0-1, how certain the AI is
   reasoning: string;       // AI explanation for routing decision
 }
@@ -118,6 +119,7 @@ interface TrelloCard {
   name: string;
   url: string;
   shortUrl: string;
+  due?: string | null;
 }
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -273,14 +275,32 @@ async function createCard(
   name: string,
   description: string,
   labelIds: string[],
+  dueDate?: string | null,
 ): Promise<TrelloCard> {
-  return trelloPost<TrelloCard>('/cards', {
+  const body: Record<string, string> = {
     idList: listId,
     name,
     desc: description,
     idLabels: labelIds.join(','),
-    pos: 'top', // new urgent cards go to top
-  });
+    pos: 'top',
+  };
+  if (dueDate) body.due = dueDate;
+  return trelloPost<TrelloCard>('/cards', body);
+}
+
+async function getListCards(listId: string): Promise<TrelloCard[]> {
+  return trelloGet<TrelloCard[]>(`/lists/${listId}/cards`, { fields: 'name,id,shortUrl,due' });
+}
+
+/** Word-overlap similarity 0–1. Ignores short stop-words (≤2 chars). */
+function titleSimilarity(a: string, b: string): number {
+  const words = (s: string) =>
+    new Set(s.toLowerCase().split(/\s+/).filter((w) => w.length > 2));
+  const wa = words(a);
+  const wb = words(b);
+  if (wa.size === 0 || wb.size === 0) return 0;
+  const overlap = [...wa].filter((w) => wb.has(w)).length;
+  return overlap / Math.max(wa.size, wb.size);
 }
 
 // ─── Board & List Resolution ──────────────────────────────────────────────────
@@ -414,12 +434,26 @@ List routing logic:
 - Unsure if needed → "not_sure"
 - Standing rule/habit → "rules"`;
 
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD Panama time reference
+
   const userPrompt = `Classify this voice note:
 "${cleanedText}"
+
+Today's date: ${today} (Panama timezone, America/Panama).
 
 First decide: is this an actionable to-do item that belongs on a Kanban board?
 - isTask: true  → it describes something that needs to be done (task, errand, appointment, goal, reminder, project step)
 - isTask: false → it's a question TO the bot, a command ("show my tasks"), casual chat, or a statement with no action
+
+For dueDate: extract any date mentioned in the text.
+- "by end of May" → "${today.slice(0, 4)}-05-31"
+- "by end of June" → "${today.slice(0, 4)}-06-30"
+- "by Friday" → the upcoming Friday's date
+- "tomorrow" → the day after today
+- "next week" → 7 days from today
+- "by Monday" → the upcoming Monday's date
+- No date mentioned → null
+Return date as YYYY-MM-DD string, or null.
 
 Return JSON exactly like this (no markdown, no backticks, raw JSON only):
 {
@@ -431,6 +465,7 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "boardTarget": "kira_current_month|kira_future|vibejob|aldeazz|espaluz|algom|kira_habits|kira_finance",
   "listTarget": "just_for_today|todo_flow|in_process_me|in_process_them|not_sure|dated|rules|done",
   "labelColor": "red|orange|purple|green|lime",
+  "dueDate": "2026-05-31",
   "confidence": 0.90,
   "reasoning": "One sentence: why this board + list + color"
 }
@@ -462,6 +497,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
       boardTarget: 'kira_current_month',
       listTarget: 'todo_flow',
       labelColor: 'lime',
+      dueDate: null,
       confidence: 0.3,
       reasoning: 'Fallback classification — parsing failed',
     };
@@ -518,8 +554,10 @@ export interface VoiceTrelloResult {
   boardName?: string;
   listName?: string;
   error?: string;
-  noTrigger?: boolean; // true = voice had no trigger phrase (handleVoiceToTrello path)
-  notATask?: boolean;  // true = NLP decided this is not a Trello task — fall through
+  noTrigger?: boolean;      // true = voice had no trigger phrase (handleVoiceToTrello path)
+  notATask?: boolean;       // true = NLP decided this is not a Trello task — fall through
+  duplicate?: boolean;      // true = a similar card already exists on the target list
+  existingCard?: TrelloCard; // the card that was found as a duplicate
 }
 
 /**
@@ -683,10 +721,31 @@ export async function createTrelloCardFromTranscript(
     return { success: false, transcript, classification, error: 'No suitable list found on board' };
   }
 
-  // Step 4: Resolve label color
+  // Step 4: Duplicate detection — check existing cards on this list
+  try {
+    const existingCards = await getListCards(targetList.id);
+    const dup = existingCards.find((c) => titleSimilarity(c.name, classification.title) >= 0.5);
+    if (dup) {
+      console.log(`[TrelloVoice] Duplicate detected: "${dup.name}" ~ "${classification.title}"`);
+      return {
+        success: false,
+        duplicate: true,
+        existingCard: dup,
+        transcript,
+        classification,
+        boardName: board.name,
+        listName: targetList.name,
+      };
+    }
+  } catch (err) {
+    // Non-fatal — if we can't check, proceed with creation
+    console.warn('[TrelloVoice] Duplicate check failed (proceeding):', err);
+  }
+
+  // Step 5: Resolve label color
   const labelId = await resolveOrCreateLabel(board.id, classification.labelColor, classification.category);
 
-  // Step 5: Create the card
+  // Step 6: Create the card (with due date if extracted)
   let card: TrelloCard;
   try {
     card = await createCard(
@@ -694,12 +753,13 @@ export async function createTrelloCardFromTranscript(
       classification.title,
       classification.description || `Voice note: ${new Date().toLocaleString('en-US', { timeZone: 'America/Panama' })}`,
       labelId ? [labelId] : [],
+      classification.dueDate,
     );
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
   }
 
-  console.log(`[TrelloVoice] ✅ Card created: "${card.name}" → ${board.name} / ${targetList.name}`);
+  console.log(`[TrelloVoice] ✅ Card created: "${card.name}" → ${board.name} / ${targetList.name}${classification.dueDate ? ` (due: ${classification.dueDate})` : ''}`);
 
   return {
     success: true,
@@ -738,6 +798,19 @@ const URGENCY_LABEL: Record<Urgency, string> = {
 };
 
 export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
+  // Duplicate found — don't create, inform user
+  if (result.duplicate && result.existingCard && result.classification) {
+    return [
+      `⚠️ *Card already exists*`,
+      ``,
+      `A similar card is already on *${result.listName}*:`,
+      `📌 "${result.existingCard.name}"`,
+      `🔗 [Open existing card](${result.existingCard.shortUrl})`,
+      ``,
+      `_Skipped creating: "${result.classification.title}"_`,
+    ].join('\n');
+  }
+
   if (!result.success || !result.card || !result.classification) {
     if (result.error) {
       return `❌ Could not create Trello card\n\n${result.error}`;
@@ -749,6 +822,17 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
   const colorEmoji = COLOR_EMOJI[classification.labelColor] ?? '⬜';
   const colorSphere = COLOR_LABEL[classification.labelColor] ?? classification.category;
 
+  // Format due date for display (YYYY-MM-DD → "May 31")
+  let dueLine = '';
+  if (classification.dueDate) {
+    try {
+      const d = new Date(`${classification.dueDate}T12:00:00`);
+      dueLine = `📅 Due: ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
+    } catch {
+      dueLine = `📅 Due: ${classification.dueDate}`;
+    }
+  }
+
   return [
     `✅ *Trello card created!*`,
     ``,
@@ -757,6 +841,7 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
     `📋 Board: ${boardName}`,
     `📌 List: ${listName}`,
     `🎨 Sphere: ${colorSphere}`,
+    dueLine,
     classification.description ? `📝 Note: ${classification.description}` : '',
     ``,
     `🔗 [Open card](${card.shortUrl})`,
