@@ -72,7 +72,15 @@ import {
 import { runProspectIngestion } from './prospect-ingest';
 import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
 import { runDocIngestion } from './doc-ingest';
-import { createTrelloCardFromTranscript, formatVoiceTrelloReply } from './trello-voice';
+import {
+  createTrelloCardFromTranscript,
+  formatVoiceTrelloReply,
+  detectRelocationIntent,
+  relocateCardsToBoard,
+  archiveCards,
+  formatRelocationReply,
+} from './trello-voice';
+import type { TrelloCard } from './trello-voice';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -138,6 +146,15 @@ const conversationContexts = new Map<number, ConversationContext>();
 
 // Track whether the last voice interaction for a user was a JOB_SEARCH intent
 const recentJobSearchVoice = new Map<number, number>(); // userId -> timestamp (ms)
+
+// Last Trello cards created per user — used for relocation and archive commands
+interface LastTrelloSession {
+  cards: TrelloCard[];
+  listTarget: string;
+  ts: number;
+}
+const lastTrelloSession = new Map<number, LastTrelloSession>();
+const TRELLO_SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 function getConversationContext(userId: number): ConversationContext {
   let ctx = conversationContexts.get(userId);
@@ -6073,11 +6090,62 @@ Ready to commit? Use:
       }
 
       // ── Trello Voice Card Creator ──────────────────────────────────────────
+      // ── Card relocation / archive pre-check ─────────────────────────────
+      // Check before NLP so natural commands like "move those to Kira Junio"
+      // or "archive those cards" are handled without creating a new task.
+      {
+        const uid = ctx.from?.id || 0;
+        const intent = await detectRelocationIntent(transcription);
+
+        if (intent.isArchive) {
+          const session = lastTrelloSession.get(uid);
+          if (!session || Date.now() - session.ts > TRELLO_SESSION_TTL_MS) {
+            await ctx.reply('❌ No recent cards to archive. Create cards first, then say "archive those".');
+          } else {
+            const result = await archiveCards(session.cards.map(c => c.id));
+            await ctx.reply(formatRelocationReply(result, session.cards.length, 'archive'), { parse_mode: 'Markdown' });
+            if (result.success) lastTrelloSession.delete(uid);
+          }
+          return;
+        }
+
+        if (intent.isRelocate) {
+          const session = lastTrelloSession.get(uid);
+          if (!session || Date.now() - session.ts > TRELLO_SESSION_TTL_MS) {
+            await ctx.reply('❌ No recent cards to move. Create cards first, then say "move those to [board name]".');
+            return;
+          }
+          if (!intent.targetBoard) {
+            await ctx.reply('❌ Please mention the target board. For example: "Move those to Kira Junio 2026"');
+            return;
+          }
+          const result = await relocateCardsToBoard(
+            session.cards.map(c => c.id),
+            intent.targetBoard,
+            session.listTarget as import('./trello-voice').ListTarget,
+          );
+          await ctx.reply(formatRelocationReply(result, session.cards.length, 'move', intent.targetBoard), { parse_mode: 'Markdown' });
+          if (result.success) lastTrelloSession.set(uid, { ...session, cards: [] }); // clear after move
+          return;
+        }
+      }
+      // ────────────────────────────────────────────────────────────────────
+
       // NLP classifies every voice message — no trigger phrase required.
       // If the message is an actionable task, a Trello card is created and
       // we return. If not a task (question, command, chat), we fall through.
       const trelloResult = await createTrelloCardFromTranscript(transcription);
       if (trelloResult.success) {
+        // Store session for potential relocation/archive follow-up
+        const uid = ctx.from?.id || 0;
+        const createdCards = trelloResult.cards || (trelloResult.card ? [trelloResult.card] : []);
+        if (createdCards.length > 0) {
+          lastTrelloSession.set(uid, {
+            cards: createdCards,
+            listTarget: trelloResult.classification?.listTarget ?? 'todo_flow',
+            ts: Date.now(),
+          });
+        }
         await ctx.reply(formatVoiceTrelloReply(trelloResult), { parse_mode: 'Markdown' });
         return;
       }
