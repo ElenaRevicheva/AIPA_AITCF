@@ -126,22 +126,23 @@ const TRELLO_TOKEN = process.env.TRELLO_TOKEN!;
 const TRELLO_BASE = 'https://api.trello.com/1';
 
 // Trigger phrases that activate voice-to-Trello (multilingual)
+// Include article variants ("add a card", "create a task") — Whisper often inserts "a"
 const TRIGGER_PHRASES_EN = [
-  'add card', 'create card', 'new card',
-  'add task', 'create task', 'new task',
-  'add to trello', 'trello card', 'trello task',
-  'add item', 'create item',
+  'add card', 'add a card', 'create card', 'create a card', 'new card',
+  'add task', 'add a task', 'create task', 'create a task', 'new task',
+  'add to trello', 'add it to trello', 'trello card', 'trello task',
+  'add item', 'create item', 'add to kanban', 'add a card to',
 ];
 const TRIGGER_PHRASES_ES = [
-  'agregar tarjeta', 'crear tarjeta', 'nueva tarjeta',
-  'agregar tarea', 'crear tarea', 'nueva tarea',
-  'añadir tarea', 'añadir tarjeta',
-  'agregar a trello', 'trello nueva',
+  'agregar tarjeta', 'agregar una tarjeta', 'crear tarjeta', 'crear una tarjeta', 'nueva tarjeta',
+  'agregar tarea', 'agregar una tarea', 'crear tarea', 'crear una tarea', 'nueva tarea',
+  'añadir tarea', 'añadir una tarea', 'añadir tarjeta',
+  'agregar a trello', 'agregar al kanban', 'trello nueva',
 ];
 const TRIGGER_PHRASES_RU = [
   'добавить карточку', 'создать карточку', 'новая карточка',
   'добавить задачу', 'создать задачу', 'новая задача',
-  'добавить в trello', 'добавить в треллo',
+  'добавить в trello', 'добавить в треллo', 'добавить в канбан',
   'создать задание', 'добавить задание',
 ];
 
