@@ -277,13 +277,14 @@ async function createCard(
   description: string,
   labelIds: string[],
   dueDate?: string | null,
+  pos: 'top' | 'bottom' = 'top',
 ): Promise<TrelloCard> {
   const body: Record<string, string> = {
     idList: listId,
     name,
     desc: description,
     idLabels: labelIds.join(','),
-    pos: 'top',
+    pos,
   };
   if (dueDate) body.due = dueDate;
   return trelloPost<TrelloCard>('/cards', body);
@@ -820,7 +821,7 @@ export async function createTrelloCardFromTranscript(
     const createdCards: TrelloCard[] = [];
     for (const subtaskTitle of subtasks) {
       try {
-        const c = await createCard(targetList.id, subtaskTitle, descBase, labels, classification.dueDate);
+        const c = await createCard(targetList.id, subtaskTitle, descBase, labels, classification.dueDate, 'bottom');
         createdCards.push(c);
         console.log(`[TrelloVoice] ✅ Subtask card: "${c.name}"`);
       } catch (err) {
