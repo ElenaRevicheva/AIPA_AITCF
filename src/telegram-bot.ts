@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config({ override: true });
 
-import { Bot, Context } from 'grammy';
+import { Bot, Context, InputFile } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
 import { 
@@ -58,6 +58,7 @@ import {
   getOutreachStats,
   getOutreachDrafts,
   getOutreachTargets,
+  deleteTestBusinessLeads,
 } from './database';
 import { runTriageCycle, buildDailyBrief } from './lead-triage';
 import {
@@ -1181,6 +1182,82 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       await ctx.reply(
         `❌ Error fetching outreach stats: ${error instanceof Error ? error.message : String(error)}`
       );
+    }
+  });
+
+  // /xlsx — export outreach pipeline to CSV and send as file
+  bot.command('xlsx', async (ctx) => {
+    try {
+      await ctx.reply('📊 Building pipeline export...');
+      const rows = await getOutreachTargets({ limit: 500 }) as any[];
+      if (rows.length === 0) {
+        await ctx.reply('📭 No targets in pipeline yet. Run /fresh_leads first.');
+        return;
+      }
+
+      // Build CSV — columns match getOutreachTargets query order:
+      // id, name, company, email, email_status, linkedin_url, source, pain_point, matched_system, status, created_at, updated_at
+      const header = 'Company,Contact Name,Email,Email Status,Source,Pain Point,Matched AIdeazz System,Pipeline Status,Added';
+      const lines = rows.map((r: any) => {
+        const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const date = r[10] ? new Date(r[10]).toLocaleDateString('en-US') : '';
+        return [esc(r[2]), esc(r[1]), esc(r[3]), esc(r[4]), esc(r[6]), esc(r[7]), esc(r[8]), esc(r[9]), esc(date)].join(',');
+      });
+
+      const csv = [header, ...lines].join('\n');
+      const buf = Buffer.from(csv, 'utf-8');
+
+      // Count real emails vs pattern
+      const withEmail = rows.filter((r: any) => r[3] && !String(r[3]).startsWith('founder@')).length;
+      const bySource: Record<string, number> = {};
+      for (const r of rows) {
+        const s = String(r[6] || 'unknown').split('_')[0] || 'unknown';
+        bySource[s] = (bySource[s] || 0) + 1;
+      }
+
+      await ctx.replyWithDocument(
+        new InputFile(buf, `pipeline_${new Date().toISOString().slice(0, 10)}.csv`),
+        { caption: `📊 Pipeline export — ${rows.length} companies\n✉️ With real email: ${withEmail}\nSources: ${Object.entries(bySource).map(([k,v]) => `${k}:${v}`).join(' · ')}\n\nOpen in Excel — File → Import → CSV` }
+      );
+    } catch (error) {
+      console.error('/xlsx error:', error);
+      await ctx.reply(`❌ Export error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  });
+
+  // /cleanbiz — remove test/fake entries from business_leads and lead_triage
+  bot.command('cleanbiz', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/cleanbiz', '').trim().toLowerCase() || '';
+    if (arg !== 'confirm') {
+      // Show what will be deleted first
+      try {
+        const leads = await getLeads() as any[];
+        const testEntries = leads.filter((r: any) => {
+          const name = String(r[1] || '').toLowerCase();
+          return /^(e2e|test|demo|sample|fake|typo|tytjyt|katarinar)/.test(name) ||
+                 ['hope','kate','irina','maya','katya','marina','katerina'].includes(name);
+        });
+        if (testEntries.length === 0) {
+          await ctx.reply('✅ No test entries found in business_leads — already clean.');
+          return;
+        }
+        const list = testEntries.map((r: any) => `• ${r[1] || 'unknown'} (${r[0] || 'no source'})`).join('\n');
+        await ctx.reply(`🧹 Found ${testEntries.length} test entries to remove:\n\n${list}\n\nReply /cleanbiz confirm to delete.`);
+      } catch (e) {
+        await ctx.reply(`❌ Error: ${e instanceof Error ? e.message : String(e)}`);
+      }
+      return;
+    }
+
+    // Confirmed — delete via proper DB function
+    try {
+      const testNames = ['E2E','E2E2','typo','tytjyt','katarinar','hope','kate','Elena Revicheva','irina','Maya','Katya','Marina','Katerina'];
+      const result = await deleteTestBusinessLeads(testNames);
+      await ctx.reply(
+        `✅ Cleaned:\n• business_leads removed: ${result.blDeleted}\n• lead_triage rows removed: ${result.trDeleted}\n\nRun /triage to classify real leads only.`
+      );
+    } catch (e) {
+      await ctx.reply(`❌ Error: ${e instanceof Error ? e.message : String(e)}`);
     }
   });
 

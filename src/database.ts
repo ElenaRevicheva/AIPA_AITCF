@@ -2662,6 +2662,41 @@ async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
   }
 }
 
+/** Delete test/fake entries from business_leads and their lead_triage rows. */
+async function deleteTestBusinessLeads(names: string[]): Promise<{ blDeleted: number; trDeleted: number }> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    let blDeleted = 0;
+    for (const name of names) {
+      const r = await connection.execute(
+        `DELETE FROM business_leads WHERE LOWER(name) = :n`,
+        [name.toLowerCase()],
+        { autoCommit: false }
+      );
+      blDeleted += (r.rowsAffected || 0);
+    }
+    // Remove their triage rows by name (source_name column)
+    const placeholders = names.map((_, i) => `:n${i}`).join(',');
+    const binds: Record<string, string> = {};
+    names.forEach((n, i) => { binds[`n${i}`] = n; });
+    const r2 = await connection.execute(
+      `DELETE FROM lead_triage WHERE source_table = 'business_leads' AND LOWER(source_name) IN (${names.map(n => `'${n.toLowerCase().replace(/'/g, "''")}'`).join(',')})`,
+      [],
+      { autoCommit: false }
+    );
+    const trDeleted = r2.rowsAffected || 0;
+    await connection.commit();
+    return { blDeleted, trDeleted };
+  } catch (err) {
+    if (connection) await (connection as any).rollback?.();
+    console.error('❌ deleteTestBusinessLeads error:', err);
+    return { blDeleted: 0, trDeleted: 0 };
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getUntriagedLeads(limit = 50): Promise<any[]> {
   let connection;
   try {
@@ -2793,6 +2828,7 @@ export {
   getFirstOutreachSendDate,
   getPendingLeads,
   updateTargetEmail,
+  deleteTestBusinessLeads,
   // === PHASE 5 — Lead Triage ===
   saveTriagedLead,
   getTriagedLeads,
