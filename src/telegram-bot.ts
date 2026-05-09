@@ -735,45 +735,21 @@ Or just ask me anything - I understand natural language!`;
     }
     
     await ctx.answerCallbackQuery();
-    
-    let response = `*${sectionData.title}*\n\n`;
-    
+
+    // Use HTML — Markdown v1 chokes on underscores inside bold (**/fresh_leads**)
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    let response = `<b>${esc(sectionData.title)}</b>\n\n`;
+
     for (const cmd of sectionData.commands) {
-      response += `*${cmd.cmd}*\n`;
-      response += `${cmd.desc}\n`;
-      response += `\`${cmd.usage.split('\n')[0]}\`\n\n`;
+      response += `<b>${esc(cmd.cmd)}</b>\n`;
+      response += `${esc(cmd.desc)}\n`;
+      response += `<code>${esc((cmd.usage || '').split('\n')[0] || '')}</code>\n\n`;
     }
-    
-    /** Extra taps for GEO/marketing engine commands (full detail via \`cmd:\` handler). */
-    const wiringQuick =
-      section === 'wiring'
-        ? [
-            [
-              {
-                text: '📍 Google Places → /places_ingest',
-                callback_data: 'cmd:places_ingest',
-              },
-            ],
-            [
-              {
-                text: '📄 Doc → outreach /doc_ingest',
-                callback_data: 'cmd:doc_ingest',
-              },
-            ],
-            [
-              {
-                text: '🧭 Lead triage /triage',
-                callback_data: 'cmd:triage',
-              },
-            ],
-          ]
-        : [];
 
     await ctx.reply(response, {
-      parse_mode: 'Markdown',
+      parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
-          ...wiringQuick,
           [{ text: '📋 Back to Menu', callback_data: 'menu:main' }],
         ],
       },
