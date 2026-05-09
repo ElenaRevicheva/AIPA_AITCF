@@ -692,17 +692,24 @@ Or just ask me anything - I understand natural language!`;
 /diary    - Save diary entry (job search or project)
 /task     - Save a task directly
 /tasks    - Show your pending tasks
+/done N   - Mark task #N as done (removes it)
+/cleartasks auto - AI cleans up stale tasks
 /research - Save research / market notes
 /resume   - Restore last session
 /forget   - Clear conversation context (keeps knowledge base)
 /trello_analyze - Full Kanban analysis of all Trello boards
 
-🎤 Voice → Trello (say in EN/ES/RU):
-  "Add card — [task description]"
-  "Create task — [what to do]"
-  "Agregar tarea — [descripción]"
-  "Добавить задачу — [описание]"
-  → Card created instantly in the right board + color`,
+🎤 Voice → Trello — just speak naturally, no trigger phrase needed:
+  "Until June 20, call the car inspection and find the counteragent address"
+  → AI creates cards on the right board, right list, with due date
+
+  "Move the court cards to Kira Junio"
+  → Finds cards by name and moves them
+
+  "Archive those cards" / "Заархивируй те карточки"
+  → Archives the last created cards
+
+  One voice message can create + move + archive at once`,
       {
         reply_markup: {
           inline_keyboard: [
