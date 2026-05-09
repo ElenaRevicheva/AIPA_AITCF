@@ -290,20 +290,25 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
   }
 
   try {
-    // 1. Contact
+    // 1. Contact — skip if no email AND no name (nothing to identify by)
+    //    When email is absent HubSpot still creates a contact by name (useful for
+    //    company-sourced prospects where we don't yet have a personal email).
     const [firstName, ...rest] = lead.name.trim().split(' ');
-    const contactId = await upsertContact({
-      email:        lead.email,
-      firstName:    firstName ?? lead.name,
-      lastName:     rest.join(' ') || undefined,
-      company:      lead.company,
-      linkedinUrl:  lead.linkedinUrl,
-      source:       lead.source ?? 'AI Marketing Engine',
-    });
+    const contactId = lead.email || lead.name
+      ? await upsertContact({
+          email:        lead.email,
+          firstName:    firstName ?? lead.name,
+          lastName:     rest.join(' ') || undefined,
+          company:      lead.company,
+          linkedinUrl:  lead.linkedinUrl,
+          source:       lead.source ?? 'AI Marketing Engine',
+        })
+      : null;
 
-    // 2. Company
-    const companyId = lead.company
-      ? await upsertCompany({ name: lead.company })
+    // 2. Company — use explicit company field, fallback to name for company-sourced leads
+    const companyName = lead.company || (lead.email ? undefined : lead.name);
+    const companyId = companyName
+      ? await upsertCompany({ name: companyName })
       : null;
 
     // 3. Deal

@@ -331,15 +331,17 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
       // Gates:
       //  - Never test/demo entries
       //  - business_leads / outreach_log: need real email + urgency ≥ 3 + right signal type
-      //  - outreach_targets (fresh prospects): we actively sourced them, so push
-      //    urgency ≥ 2 if they have a real email (lower bar = more HubSpot visibility)
+      //  - outreach_targets (fresh prospects): push by company name alone — HubSpot can
+      //    hold Company + Deal without a contact email. Email added if verified.
       const isTestEntry = /^e2e|^test|^demo|^sample|^fake/i.test(lead.name || '');
-      const hasRealEmail = lead.email && !lead.email.startsWith('founder@') && lead.email.includes('@');
+      const hasRealEmail = !!(lead.email && !lead.email.startsWith('founder@') && lead.email.includes('@'));
       const isFreshProspect = lead.source_table === 'outreach_targets';
       const urgencyBar = isFreshProspect ? 2 : 3;
+      // Fresh prospects: company name alone is enough identifier for HubSpot
+      const hasIdentifier = isFreshProspect ? lead.name.trim().length > 0 : hasRealEmail;
       const hsEligible =
         !isTestEntry &&
-        hasRealEmail &&
+        hasIdentifier &&
         result.urgency >= urgencyBar &&
         (result.signal_type === 'client_lead' || result.signal_type === 'partnership' ||
          (isFreshProspect && result.signal_type !== 'irrelevant'));
@@ -350,11 +352,14 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
                       : HS_STAGES.prospected;
         pushLeadToHubSpot({
           name:      lead.name || 'Unknown',
-          email:     lead.email || undefined,
+          // For outreach_targets the "name" column holds the company name —
+          // pass it explicitly as company so HubSpot creates a Company record
+          company:   isFreshProspect ? lead.name : undefined,
+          email:     hasRealEmail ? lead.email : undefined,
           source:    lead.utm_source || lead.source_table,
           painPoint: result.one_line_summary,
           stage:     hsStage,
-        }).catch(() => { /* non-fatal */ });
+        }).catch((e) => { console.warn('[triage→HS] push failed:', e?.message || e); });
       }
 
       processed++;
