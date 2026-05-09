@@ -1444,13 +1444,12 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
         return;
       }
       await ctx.reply(
-        `🟠 *HubSpot CRM — aipa@aideazz.xyz*\n\n` +
-        `👤 Contacts: *${stats.contacts}*\n` +
-        `🏢 Companies: *${stats.companies}*\n` +
-        `💼 Deals: *${stats.deals}*\n\n` +
-        `Leads auto-push: via /outreach_ingest + /triage\n` +
-        `Dashboard: app.hubspot.com`,
-        { parse_mode: 'Markdown' }
+        `🟠 HubSpot CRM — aipa@aideazz.xyz\n\n` +
+        `👤 Contacts:  ${stats.contacts}\n` +
+        `🏢 Companies: ${stats.companies}\n` +
+        `💼 Deals:     ${stats.deals}\n\n` +
+        `Leads auto-push via /outreach_ingest + /triage\n` +
+        `Dashboard: app.hubspot.com`
       );
     } catch (error) {
       console.error('HubSpot stats error:', error);
