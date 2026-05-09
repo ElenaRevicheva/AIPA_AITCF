@@ -586,25 +586,101 @@ Type /menu for all commands! 🚀
     'wiring': {
       title: '📊 BUSINESS WIRING',
       commands: [
-        { cmd: '/briefing', desc: 'Unified business briefing (outcomes + leads + revenue)', usage: '/briefing\nFull picture: agent outcomes, leads, EspaLuz revenue, system health' },
-        { cmd: '/outcomes', desc: 'Agent outcome tracking', usage: '/outcomes\n/outcomes cmo\nShows what each agent did and whether it worked' },
-        { cmd: '/leads', desc: 'Business lead tracker', usage: '/leads\n/leads new\nSignals from LinkedIn, social, inbound' },
-        { cmd: '/lead', desc: 'Add or update a lead', usage: '/lead add linkedin John Contractor commented on automation post\n/lead update <id> contacted' },
-        { cmd: '/outreach', desc: 'Outreach pipeline stats (targets, sent, replies)', usage: '/outreach\nSent today, reply rate, pipeline totals' },
-        { cmd: '/fresh_leads', desc: 'Multi-source fresh prospects (HN Who is Hiring + GitHub + Product Hunt)', usage: '/fresh_leads\n/fresh_leads all — include Product Hunt (needs PRODUCT_HUNT_TOKEN)\n/fresh_leads gh — GitHub only\nFetches 100-300 real companies, deduplicates, classifies pain points, pushes to HubSpot' },
-        { cmd: '/outreach_ingest', desc: 'Discover YC prospects + Hunter.io emails', usage: '/outreach_ingest\nFetch YC companies, find founder emails, import to pipeline' },
-        { cmd: '/places_ingest', desc: 'Google Places → outreach targets by city + industry', usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City\n/places_ingest realtors Louisville KY\nPresets: construction, saas, retail, healthcare' },
-        { cmd: '/doc_ingest', desc: 'Paste any business doc → extract prospects → outreach', usage: '/doc_ingest RFP\n[paste RFP, takeoff sheet, call log, client list below]\nExtracts contacts → Hunter.io → outreach pipeline' },
-        { cmd: '/outreach_drafts', desc: 'Review pending outreach drafts', usage: '/outreach_drafts\nPreview emails before sending' },
-        { cmd: '/pending_leads', desc: 'Leads with no email (stuck) — show + add manually', usage: '/pending_leads\nShows targets with no email. Use /add_email <id> <email> to unblock.' },
-        { cmd: '/add_email', desc: 'Manually set email on a pending lead', usage: '/add_email <id-prefix> user@company.com' },
-        { cmd: '/linkedin_draft', desc: 'Generate LinkedIn connection message + search link', usage: '/linkedin_draft Chili Panama\nAI drafts a 300-char LinkedIn DM + opens people search' },
-        { cmd: '/triage', desc: 'Phase 5: run AI lead triage (site + outreach replies → dashboard)', usage: '/triage\nClassifies business_leads + replied outreach; see /leads/dashboard with secret' },
-        { cmd: '/hubspot', desc: 'HubSpot CRM stats (contacts · companies · deals)', usage: '/hubspot\n/hubspot sync — backfill existing pipeline to HubSpot\nShows live counts. Leads auto-push from /outreach_ingest + /triage' },
-        { cmd: '/xlsx', desc: 'Export pipeline to CSV file', usage: '/xlsx\nDownloads full outreach_targets pipeline as CSV — open in Excel' },
-        { cmd: '/cleanbiz', desc: 'Remove test/fake entries from lead database', usage: '/cleanbiz — preview what will be deleted\n/cleanbiz confirm — permanently delete test entries (E2E, Marina, etc.)' },
-        { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
-        { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
+        {
+          cmd: '/briefing',
+          desc: '📋 Your full business snapshot in one message — what your AI agents did today, who reached out, how EspaLuz is performing, and whether everything is running. Start here every morning.',
+          usage: '/briefing',
+        },
+        {
+          cmd: '/outcomes',
+          desc: '✅ See what your AI agents actually accomplished — posts published, leads found, emails sent, revenue logged. Answers "did anything actually happen today?"\n\n/outcomes — all agents\n/outcomes cmo — CMO agent only',
+          usage: '/outcomes\n/outcomes cmo',
+        },
+        {
+          cmd: '/leads',
+          desc: '👥 All people and companies that have shown interest in working with you — inbound inquiries, LinkedIn signals, anyone you\'ve manually added. Your live client opportunity list.\n\n/leads — full list\n/leads new — only new ones',
+          usage: '/leads\n/leads new',
+        },
+        {
+          cmd: '/lead',
+          desc: '➕ Manually add someone you met, noticed on LinkedIn, or heard about. Use this whenever you spot a potential client and don\'t want to lose them.\n\nExample: /lead add linkedin John at TechCorp asked about AI agents',
+          usage: '/lead add linkedin John at TechCorp asked about AI agents',
+        },
+        {
+          cmd: '/outreach',
+          desc: '📬 How your outreach campaign is going — how many companies are targeted, how many emails went out, who replied. Your sales pipeline health at a glance.',
+          usage: '/outreach',
+        },
+        {
+          cmd: '/fresh_leads',
+          desc: '🔍 Finds new companies actively hiring or building RIGHT NOW — scans Hacker News "Who Is Hiring", GitHub, and Product Hunt for real companies with real problems. Runs automatically Tue + Fri at 7am.\n\n/fresh_leads — HN + GitHub\n/fresh_leads all — add Product Hunt too',
+          usage: '/fresh_leads\n/fresh_leads all',
+        },
+        {
+          cmd: '/outreach_ingest',
+          desc: '🚀 Discovers YC-backed startups and finds their founder contact emails automatically. Good for finding well-funded companies that can afford your services.',
+          usage: '/outreach_ingest',
+        },
+        {
+          cmd: '/places_ingest',
+          desc: '📍 Finds local businesses by industry and city — construction companies, SaaS firms, healthcare clinics, real estate agencies. Tell it what and where, it builds your local prospect list.\n\nExamples:\n/places_ingest construction Lexington KY\n/places_ingest architects Panama City',
+          usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City',
+        },
+        {
+          cmd: '/doc_ingest',
+          desc: '📄 Paste any document — an RFP, an email thread, a contractor list, a call log — and AI extracts every potential client or contact from it and adds them to your pipeline.\n\nExample: /doc_ingest\n[paste your document below]',
+          usage: '/doc_ingest\n[paste your document text here]',
+        },
+        {
+          cmd: '/outreach_drafts',
+          desc: '✉️ Shows outreach emails that are written and ready but waiting for you to review before sending. Your drafts queue.',
+          usage: '/outreach_drafts',
+        },
+        {
+          cmd: '/pending_leads',
+          desc: '🔒 Companies in your pipeline that are stuck because we don\'t have their email yet. Shows who they are so you can find and add the email manually.',
+          usage: '/pending_leads',
+        },
+        {
+          cmd: '/add_email',
+          desc: '📧 Add an email address to a stuck lead so outreach can proceed. Get the lead ID from /pending_leads first.\n\nExample: /add_email abc123 ceo@company.com',
+          usage: '/add_email <lead-id> ceo@company.com',
+        },
+        {
+          cmd: '/linkedin_draft',
+          desc: '💼 AI writes you a personalised 300-character LinkedIn connection message for a specific type of person or company. Ready to copy-paste.\n\nExample: /linkedin_draft fintech startup Panama',
+          usage: '/linkedin_draft fintech startup Panama\n/linkedin_draft construction company Kentucky',
+        },
+        {
+          cmd: '/triage',
+          desc: '🎯 AI reads every lead and prospect, scores them 1–5 by urgency, and tells you who to contact TODAY vs who to watch. Best ones go to HubSpot automatically. Run this after /fresh_leads.\n\nRun up to 3 times — processes 30 prospects per run.',
+          usage: '/triage',
+        },
+        {
+          cmd: '/hubspot',
+          desc: '🟠 Shows what\'s in your HubSpot CRM right now — contacts, companies, deals. /hubspot sync pushes your entire pipeline there in one go.\n\n/hubspot — view stats\n/hubspot sync — sync all pipeline to HubSpot',
+          usage: '/hubspot\n/hubspot sync',
+        },
+        {
+          cmd: '/xlsx',
+          desc: '📊 Downloads your entire outreach pipeline as a spreadsheet file — all companies, emails, pain points, pipeline status. Open in Excel or Google Sheets.',
+          usage: '/xlsx',
+        },
+        {
+          cmd: '/cleanbiz',
+          desc: '🧹 Removes test and fake entries from your lead database so your triage and HubSpot only work with real companies. Run once after setup.\n\n/cleanbiz — preview what will be deleted\n/cleanbiz confirm — delete permanently',
+          usage: '/cleanbiz\n/cleanbiz confirm',
+        },
+        {
+          cmd: '/espaluz',
+          desc: '🌟 EspaLuz AI tutoring business dashboard — active trials, paying subscribers, expiring soon, and revenue. Your tutoring business pulse.',
+          usage: '/espaluz',
+        },
+        {
+          cmd: '/outcome',
+          desc: '📝 Logs what an AI agent just did — used automatically by your agents (CMO, CTO, etc.) to track their work. You can also log manually.\n\nExample: /outcome cmo post_published linkedin',
+          usage: '/outcome cmo post_published linkedin',
+        },
       ]
     },
     'chat': {
