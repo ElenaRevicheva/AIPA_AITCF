@@ -7315,9 +7315,12 @@ async function checkEcosystemHealth(bot: Bot): Promise<void> {
   
   const alerts: string[] = [];
   
-  // Check CMO AIPA
+  // Check CMO AIPA (Oracle-local — same VM, port 8080)
+  const CMO_HEALTH_URL = process.env.CMO_API_URL
+    ? `${process.env.CMO_API_URL.replace(/\/$/, '')}/health`
+    : 'http://127.0.0.1:8080/health';
   try {
-    const cmoResponse = await fetch('https://vibejobhunter-production.up.railway.app/health', {
+    const cmoResponse = await fetch(CMO_HEALTH_URL, {
       signal: AbortSignal.timeout(10000)
     });
     if (!cmoResponse.ok) {
