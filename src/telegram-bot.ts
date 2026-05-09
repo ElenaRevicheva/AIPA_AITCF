@@ -39,6 +39,8 @@ import {
   getKnowledgeByCategory,
   getKnowledgeByProject,
   getRecentKnowledge,
+  deleteKnowledgeById,
+  clearKnowledgeByCategory,
   // Wiring Build (Week 1) - Outcome tracking
   saveAgentOutcome,
   verifyAgentOutcome,
@@ -6834,6 +6836,101 @@ Or: \`/idea TODO: fix the login bug\``, { parse_mode: 'Markdown' });
     response += `\n${tasks.length} task(s) total`;
     
     await ctx.reply(response);
+  });
+
+  // /done N[,M,...] — delete task(s) by number from /tasks list
+  bot.command('done', async (ctx) => {
+    const userId = ctx.from?.id || 0;
+    const arg = ctx.message?.text?.replace('/done', '').trim() || '';
+    if (!arg) {
+      await ctx.reply('Usage: `/done 3` or `/done 1,4,7` — delete tasks by their number from /tasks', { parse_mode: 'Markdown' });
+      return;
+    }
+    const nums = arg.split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0);
+    if (nums.length === 0) {
+      await ctx.reply('Please provide task numbers, e.g. `/done 2,5`', { parse_mode: 'Markdown' });
+      return;
+    }
+    const tasks = await getKnowledgeByCategory(userId, 'task', 50);
+    const toDelete = nums.map(n => tasks[n - 1]).filter(Boolean);
+    if (toDelete.length === 0) {
+      await ctx.reply('❌ No matching tasks found. Run /tasks to see current numbers.');
+      return;
+    }
+    let deleted = 0;
+    for (const t of toDelete) {
+      const id = (t as any[])[0] as string;
+      if (await deleteKnowledgeById(userId, id)) deleted++;
+    }
+    await ctx.reply(`✅ *${deleted} task${deleted !== 1 ? 's' : ''} removed.*\n\nRun /tasks to see what's left.`, { parse_mode: 'Markdown' });
+  });
+
+  // /cleartasks — wipe all tasks or run Claude auto-cleanup
+  bot.command('cleartasks', async (ctx) => {
+    const userId = ctx.from?.id || 0;
+    const arg = ctx.message?.text?.replace('/cleartasks', '').trim().toLowerCase() || '';
+
+    // /cleartasks auto — Claude reads every task and marks stale ones
+    if (arg === 'auto') {
+      const tasks = await getKnowledgeByCategory(userId, 'task', 50);
+      if (tasks.length === 0) { await ctx.reply('✅ No tasks to clean up.'); return; }
+
+      await ctx.reply('🤖 Analyzing your tasks...');
+
+      const numbered = tasks.map((t: any[], i: number) => `${i + 1}. ${(t[2] || t[3] || '?').toString().substring(0, 120)}`).join('\n');
+      const key = process.env.ANTHROPIC_API_KEY || '';
+      let staleNums: number[] = [];
+
+      if (key) {
+        try {
+          const resp = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+            body: JSON.stringify({
+              model: 'claude-haiku-4-5-20251001',
+              max_tokens: 200,
+              messages: [{ role: 'user', content: `These are Elena's pending tasks. Today is ${new Date().toDateString()}.
+Identify which are likely DONE, STALE, DUPLICATE, or TEST entries that can be safely deleted.
+Reply with ONLY a JSON array of task numbers to delete (e.g. [1,2,5]). Empty array if none.
+
+Tasks:
+${numbered}` }],
+            }),
+          });
+          if (resp.ok) {
+            const data = await resp.json() as { content?: Array<{ text?: string }> };
+            const text = (data?.content?.[0]?.text || '').trim().replace(/```json\n?|\n?```/g, '');
+            staleNums = JSON.parse(text) as number[];
+          }
+        } catch { /* fall through */ }
+      }
+
+      if (staleNums.length === 0) {
+        await ctx.reply('✅ Claude found nothing obviously stale — all tasks look relevant.\n\nUse `/done N` to delete specific ones manually.');
+        return;
+      }
+
+      const staleList = staleNums.map(n => `${n}. ${((tasks[n - 1] as any[])?.[2] || '?').toString().substring(0, 80)}`).join('\n');
+      await ctx.reply(`🗑️ *Claude suggests deleting ${staleNums.length} tasks:*\n\n${staleList}\n\nReply \`/cleartasks confirm ${staleNums.join(',')}\` to delete them, or \`/done N\` for individual ones.`, { parse_mode: 'Markdown' });
+      return;
+    }
+
+    // /cleartasks confirm 1,3,5 — delete the specific numbers Claude suggested
+    if (arg.startsWith('confirm ')) {
+      const nums = arg.replace('confirm ', '').split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+      const tasks = await getKnowledgeByCategory(userId, 'task', 50);
+      let deleted = 0;
+      for (const n of nums) {
+        const t = tasks[n - 1] as any[];
+        if (t && await deleteKnowledgeById(userId, t[0] as string)) deleted++;
+      }
+      await ctx.reply(`✅ *${deleted} tasks removed.*\n\nRun /tasks to see what's left.`, { parse_mode: 'Markdown' });
+      return;
+    }
+
+    // /cleartasks — delete ALL tasks
+    const count = await clearKnowledgeByCategory(userId, 'task');
+    await ctx.reply(`🗑️ *All ${count} tasks cleared.*\n\nFresh start! Add new ones with /task or via voice.`, { parse_mode: 'Markdown' });
   });
 
   // /task - Save a task directly

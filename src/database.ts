@@ -1157,6 +1157,42 @@ async function getKnowledgeByCategory(
   }
 }
 
+async function deleteKnowledgeById(userId: number, id: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `DELETE FROM knowledge_base WHERE RAWTOHEX(id) = :id AND user_id = :userId`,
+      { id: id.toUpperCase(), userId }
+    );
+    await connection.commit();
+    return (result.rowsAffected ?? 0) > 0;
+  } catch (err) {
+    console.error('❌ Delete knowledge error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function clearKnowledgeByCategory(userId: number, category: string): Promise<number> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `DELETE FROM knowledge_base WHERE user_id = :userId AND category = :category`,
+      { userId, category }
+    );
+    await connection.commit();
+    return result.rowsAffected ?? 0;
+  } catch (err) {
+    console.error('❌ Clear knowledge error:', err);
+    return 0;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getRecentKnowledge(
   userId: number,
   days: number = 7,
@@ -2720,6 +2756,8 @@ export {
   getKnowledgeByCategory,
   getKnowledgeByProject,
   getRecentKnowledge,
+  deleteKnowledgeById,
+  clearKnowledgeByCategory,
   // === WIRING BUILD (Week 1) ===
   // Agent Outcomes — cross-agent outcome tracking
   saveAgentOutcome,
