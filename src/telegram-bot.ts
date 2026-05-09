@@ -586,101 +586,25 @@ Type /menu for all commands! 🚀
     'wiring': {
       title: '📊 BUSINESS WIRING',
       commands: [
-        {
-          cmd: '/briefing',
-          desc: '📋 Your full business snapshot in one message — what your AI agents did today, who reached out, how EspaLuz is performing, and whether everything is running. Start here every morning.',
-          usage: '/briefing',
-        },
-        {
-          cmd: '/outcomes',
-          desc: '✅ See what your AI agents actually accomplished — posts published, leads found, emails sent, revenue logged. Answers "did anything actually happen today?"\n\n/outcomes — all agents\n/outcomes cmo — CMO agent only',
-          usage: '/outcomes\n/outcomes cmo',
-        },
-        {
-          cmd: '/leads',
-          desc: '👥 All people and companies that have shown interest in working with you — inbound inquiries, LinkedIn signals, anyone you\'ve manually added. Your live client opportunity list.\n\n/leads — full list\n/leads new — only new ones',
-          usage: '/leads\n/leads new',
-        },
-        {
-          cmd: '/lead',
-          desc: '➕ Manually add someone you met, noticed on LinkedIn, or heard about. Use this whenever you spot a potential client and don\'t want to lose them.\n\nExample: /lead add linkedin John at TechCorp asked about AI agents',
-          usage: '/lead add linkedin John at TechCorp asked about AI agents',
-        },
-        {
-          cmd: '/outreach',
-          desc: '📬 How your outreach campaign is going — how many companies are targeted, how many emails went out, who replied. Your sales pipeline health at a glance.',
-          usage: '/outreach',
-        },
-        {
-          cmd: '/fresh_leads',
-          desc: '🔍 Finds new companies actively hiring or building RIGHT NOW — scans Hacker News "Who Is Hiring", GitHub, and Product Hunt for real companies with real problems. Runs automatically Tue + Fri at 7am.\n\n/fresh_leads — HN + GitHub\n/fresh_leads all — add Product Hunt too',
-          usage: '/fresh_leads\n/fresh_leads all',
-        },
-        {
-          cmd: '/outreach_ingest',
-          desc: '🚀 Discovers YC-backed startups and finds their founder contact emails automatically. Good for finding well-funded companies that can afford your services.',
-          usage: '/outreach_ingest',
-        },
-        {
-          cmd: '/places_ingest',
-          desc: '📍 Finds local businesses by industry and city — construction companies, SaaS firms, healthcare clinics, real estate agencies. Tell it what and where, it builds your local prospect list.\n\nExamples:\n/places_ingest construction Lexington KY\n/places_ingest architects Panama City',
-          usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City',
-        },
-        {
-          cmd: '/doc_ingest',
-          desc: '📄 Paste any document — an RFP, an email thread, a contractor list, a call log — and AI extracts every potential client or contact from it and adds them to your pipeline.\n\nExample: /doc_ingest\n[paste your document below]',
-          usage: '/doc_ingest\n[paste your document text here]',
-        },
-        {
-          cmd: '/outreach_drafts',
-          desc: '✉️ Shows outreach emails that are written and ready but waiting for you to review before sending. Your drafts queue.',
-          usage: '/outreach_drafts',
-        },
-        {
-          cmd: '/pending_leads',
-          desc: '🔒 Companies in your pipeline that are stuck because we don\'t have their email yet. Shows who they are so you can find and add the email manually.',
-          usage: '/pending_leads',
-        },
-        {
-          cmd: '/add_email',
-          desc: '📧 Add an email address to a stuck lead so outreach can proceed. Get the lead ID from /pending_leads first.\n\nExample: /add_email abc123 ceo@company.com',
-          usage: '/add_email <lead-id> ceo@company.com',
-        },
-        {
-          cmd: '/linkedin_draft',
-          desc: '💼 AI writes you a personalised 300-character LinkedIn connection message for a specific type of person or company. Ready to copy-paste.\n\nExample: /linkedin_draft fintech startup Panama',
-          usage: '/linkedin_draft fintech startup Panama\n/linkedin_draft construction company Kentucky',
-        },
-        {
-          cmd: '/triage',
-          desc: '🎯 AI reads every lead and prospect, scores them 1–5 by urgency, and tells you who to contact TODAY vs who to watch. Best ones go to HubSpot automatically. Run this after /fresh_leads.\n\nRun up to 3 times — processes 30 prospects per run.',
-          usage: '/triage',
-        },
-        {
-          cmd: '/hubspot',
-          desc: '🟠 Shows what\'s in your HubSpot CRM right now — contacts, companies, deals. /hubspot sync pushes your entire pipeline there in one go.\n\n/hubspot — view stats\n/hubspot sync — sync all pipeline to HubSpot',
-          usage: '/hubspot\n/hubspot sync',
-        },
-        {
-          cmd: '/xlsx',
-          desc: '📊 Downloads your entire outreach pipeline as a spreadsheet file — all companies, emails, pain points, pipeline status. Open in Excel or Google Sheets.',
-          usage: '/xlsx',
-        },
-        {
-          cmd: '/cleanbiz',
-          desc: '🧹 Removes test and fake entries from your lead database so your triage and HubSpot only work with real companies. Run once after setup.\n\n/cleanbiz — preview what will be deleted\n/cleanbiz confirm — delete permanently',
-          usage: '/cleanbiz\n/cleanbiz confirm',
-        },
-        {
-          cmd: '/espaluz',
-          desc: '🌟 EspaLuz AI tutoring business dashboard — active trials, paying subscribers, expiring soon, and revenue. Your tutoring business pulse.',
-          usage: '/espaluz',
-        },
-        {
-          cmd: '/outcome',
-          desc: '📝 Logs what an AI agent just did — used automatically by your agents (CMO, CTO, etc.) to track their work. You can also log manually.\n\nExample: /outcome cmo post_published linkedin',
-          usage: '/outcome cmo post_published linkedin',
-        },
+        { cmd: '/briefing',       desc: '📋 Full business snapshot — agents, leads, EspaLuz, health. Start here every morning.', usage: '/briefing' },
+        { cmd: '/outcomes',       desc: '✅ What your AI agents actually did today — posts, leads, emails, revenue.', usage: '/outcomes\n/outcomes cmo' },
+        { cmd: '/leads',          desc: '👥 Everyone who has shown interest in working with you — your live client list.', usage: '/leads\n/leads new' },
+        { cmd: '/lead',           desc: '➕ Manually add someone you spotted — so you never lose a potential client.', usage: '/lead add linkedin John at TechCorp asked about AI agents' },
+        { cmd: '/outreach',       desc: '📬 Sales pipeline health — companies targeted, emails sent, who replied.', usage: '/outreach' },
+        { cmd: '/fresh_leads',    desc: '🔍 Finds companies hiring/building RIGHT NOW on HN, GitHub, Product Hunt. Auto-runs Tue + Fri 7am.', usage: '/fresh_leads\n/fresh_leads all — include Product Hunt' },
+        { cmd: '/outreach_ingest',desc: '🚀 Discovers YC-backed startups and finds their founder emails automatically.', usage: '/outreach_ingest' },
+        { cmd: '/places_ingest',  desc: '📍 Local businesses by industry + city — builds your local prospect list.', usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City' },
+        { cmd: '/doc_ingest',     desc: '📄 Paste any doc (RFP, email, list) — AI pulls every potential client from it.', usage: '/doc_ingest\n[paste document text below]' },
+        { cmd: '/outreach_drafts',desc: '✉️ Outreach emails written and waiting for your review before sending.', usage: '/outreach_drafts' },
+        { cmd: '/pending_leads',  desc: '🔒 Pipeline companies stuck because we have no email yet — shows who needs unblocking.', usage: '/pending_leads' },
+        { cmd: '/add_email',      desc: '📧 Unblock a stuck lead by adding their email so outreach can proceed.', usage: '/add_email <lead-id> ceo@company.com' },
+        { cmd: '/linkedin_draft', desc: '💼 AI writes your 300-char LinkedIn connection message — copy-paste ready.', usage: '/linkedin_draft fintech startup Panama' },
+        { cmd: '/triage',         desc: '🎯 AI scores every prospect 1–5, tells you who to contact TODAY, pushes best to HubSpot. Run after /fresh_leads.', usage: '/triage' },
+        { cmd: '/hubspot',        desc: '🟠 Your HubSpot CRM live — view contacts/deals or sync your full pipeline there.', usage: '/hubspot\n/hubspot sync — push all pipeline to HubSpot' },
+        { cmd: '/xlsx',           desc: '📊 Download full pipeline as a spreadsheet — open in Excel or Google Sheets.', usage: '/xlsx' },
+        { cmd: '/cleanbiz',       desc: '🧹 Remove test/fake entries so triage and HubSpot work on real data only.', usage: '/cleanbiz\n/cleanbiz confirm — delete permanently' },
+        { cmd: '/espaluz',        desc: '🌟 EspaLuz tutoring business pulse — trials, paying subscribers, revenue.', usage: '/espaluz' },
+        { cmd: '/outcome',        desc: '📝 Log what an AI agent just did. Used automatically — you can also log manually.', usage: '/outcome cmo post_published linkedin' },
       ]
     },
     'chat': {
