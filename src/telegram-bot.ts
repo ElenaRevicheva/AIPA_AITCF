@@ -73,6 +73,7 @@ import {
   type OutreachTargetInput,
 } from './outreach';
 import { runProspectIngestion } from './prospect-ingest';
+import { runFreshLeadsIngestion } from './fresh-leads-ingest';
 import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
 import { runDocIngestion } from './doc-ingest';
 import {
@@ -589,6 +590,7 @@ Type /menu for all commands! 🚀
         { cmd: '/leads', desc: 'Business lead tracker', usage: '/leads\n/leads new\nSignals from LinkedIn, social, inbound' },
         { cmd: '/lead', desc: 'Add or update a lead', usage: '/lead add linkedin John Contractor commented on automation post\n/lead update <id> contacted' },
         { cmd: '/outreach', desc: 'Outreach pipeline stats (targets, sent, replies)', usage: '/outreach\nSent today, reply rate, pipeline totals' },
+        { cmd: '/fresh_leads', desc: 'Multi-source fresh prospects (HN Who is Hiring + GitHub + Product Hunt)', usage: '/fresh_leads\n/fresh_leads all — include Product Hunt (needs PRODUCT_HUNT_TOKEN)\n/fresh_leads gh — GitHub only\nFetches 100-300 real companies, deduplicates, classifies pain points, pushes to HubSpot' },
         { cmd: '/outreach_ingest', desc: 'Discover YC prospects + Hunter.io emails', usage: '/outreach_ingest\nFetch YC companies, find founder emails, import to pipeline' },
         { cmd: '/places_ingest', desc: 'Google Places → outreach targets by city + industry', usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City\n/places_ingest realtors Louisville KY\nPresets: construction, saas, retail, healthcare' },
         { cmd: '/doc_ingest', desc: 'Paste any business doc → extract prospects → outreach', usage: '/doc_ingest RFP\n[paste RFP, takeoff sheet, call log, client list below]\nExtracts contacts → Hunter.io → outreach pipeline' },
@@ -1315,6 +1317,36 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
     } catch (error) {
       console.error('Outreach ingest error:', error);
       await ctx.reply('❌ Error running prospect ingestion.');
+    }
+  });
+
+  // /fresh_leads — multi-source fresh prospect ingestion (HN + GitHub + Product Hunt)
+  bot.command('fresh_leads', async (ctx) => {
+    const arg = ctx.message?.text?.replace('/fresh_leads', '').trim().toLowerCase() || '';
+    const sources = arg === 'all' ? ['hn', 'ph', 'github'] as const
+                  : arg === 'ph'  ? ['ph'] as const
+                  : arg === 'gh'  ? ['github'] as const
+                  : ['hn', 'github'] as const; // default: HN + GitHub (no PH token needed)
+
+    await ctx.reply(
+      `🔎 Searching fresh prospects...\nSources: ${sources.join(' + ').toUpperCase()}\n\nThis may take 2-3 minutes — fetching, deduplicating, classifying pain points.`
+    );
+
+    try {
+      const result = await runFreshLeadsIngestion(
+        anthropic,
+        sources as any,
+        async (msg) => { try { await ctx.reply(msg); } catch {} }
+      );
+      if (result.ingested === 0 && result.skipped === 0) {
+        await ctx.reply('⚠️ No new leads found. All companies may already be in pipeline, or source APIs returned empty. Try /fresh_leads all to include Product Hunt.');
+      } else {
+        // Trigger triage immediately on the fresh batch
+        await ctx.reply(`✅ ${result.ingested} new prospects imported.\n\n💡 Run /triage to classify them and push qualified leads to HubSpot.`);
+      }
+    } catch (error) {
+      console.error('Fresh leads error:', error);
+      await ctx.reply('❌ Error during fresh leads ingestion. Check server logs.');
     }
   });
 
@@ -7927,9 +7959,29 @@ _/daily for full briefing_`;
   const healthCheck = cron.schedule('0 */4 * * *', () => {
     checkEcosystemHealth(bot);
   });
-  
   cronJobs.push(healthCheck);
-  
+
+  // Fresh leads ingestion — Tuesday + Friday 7 AM Panama time
+  // Pulls HN "Who is Hiring" + GitHub repos, deduplicates, classifies, imports
+  const freshLeadsCron = cron.schedule('0 7 * * 2,5', async () => {
+    console.log('[cron] Running fresh leads ingestion (HN + GitHub)...');
+    try {
+      const result = await runFreshLeadsIngestion(
+        anthropic,
+        ['hn', 'github'],
+        async (msg) => {
+          for (const id of AUTHORIZED_USERS) {
+            try { await bot.api.sendMessage(id, `📬 Fresh leads cron:\n\n${msg}`); } catch {}
+          }
+        }
+      );
+      console.log(`[cron] Fresh leads done: ${result.ingested} ingested, ${result.skipped} skipped`);
+    } catch (e) {
+      console.error('[cron] Fresh leads error:', e);
+    }
+  }, { timezone: 'America/Panama' });
+  cronJobs.push(freshLeadsCron);
+
   console.log('📅 Scheduled tasks started');
 }
 
