@@ -16,6 +16,7 @@ import {
   getPlacesPipelineSnapshot,
   type PlacesPipelineSnapshot,
 } from './database';
+import { pushLeadToHubSpot, HS_STAGES } from './hubspot-client';
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = 'claude-sonnet-4-5';
@@ -306,6 +307,21 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
         source_name: lead.name,
         source_email: lead.email,
       });
+
+      // Push qualified leads (client_lead / partnership, urgency ≥ 3) to HubSpot
+      const hsEligible = result.urgency >= 3 &&
+        (result.signal_type === 'client_lead' || result.signal_type === 'partnership');
+      if (hsEligible) {
+        const hsStage = result.urgency >= 4 ? HS_STAGES.engaged : HS_STAGES.contacted;
+        pushLeadToHubSpot({
+          name:       lead.name || 'Unknown',
+          email:      lead.email || undefined,
+          source:     lead.utm_source || lead.source_table,
+          painPoint:  result.one_line_summary,
+          stage:      hsStage,
+        }).catch(() => { /* non-fatal */ });
+      }
+
       processed++;
       if (result.urgency >= 4) urgent++;
       console.log(`🎯 [triage] Lead ${i + 1} done: urgency=${result.urgency} type=${result.signal_type}`);

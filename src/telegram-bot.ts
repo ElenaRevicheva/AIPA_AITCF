@@ -82,6 +82,7 @@ import {
 } from './trello-voice';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
+import { getHubSpotStats } from './hubspot-client';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -595,6 +596,7 @@ Type /menu for all commands! 🚀
         { cmd: '/add_email', desc: 'Manually set email on a pending lead', usage: '/add_email <id-prefix> user@company.com' },
         { cmd: '/linkedin_draft', desc: 'Generate LinkedIn connection message + search link', usage: '/linkedin_draft Chili Panama\nAI drafts a 300-char LinkedIn DM + opens people search' },
         { cmd: '/triage', desc: 'Phase 5: run AI lead triage (site + outreach replies → dashboard)', usage: '/triage\nClassifies business_leads + replied outreach; see /leads/dashboard with secret' },
+        { cmd: '/hubspot', desc: 'HubSpot CRM stats (contacts · companies · deals)', usage: '/hubspot\nShows live counts. Leads auto-push from /outreach_ingest + /triage' },
         { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
         { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
       ]
@@ -1425,6 +1427,34 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
       await ctx.reply(brief);
     } catch (error) {
       await ctx.reply('❌ Error fetching lead brief.');
+    }
+  });
+
+  // /hubspot — CRM stats
+  bot.command('hubspot', async (ctx) => {
+    if (!process.env.HUBSPOT_API_KEY?.trim()) {
+      await ctx.reply('❌ HUBSPOT_API_KEY not set in .env. Add it and `pm2 restart cto-aipa --update-env`.');
+      return;
+    }
+    await ctx.reply('📊 Fetching HubSpot CRM stats...');
+    try {
+      const stats = await getHubSpotStats();
+      if (!stats) {
+        await ctx.reply('❌ Could not reach HubSpot API. Check key scopes and network.');
+        return;
+      }
+      await ctx.reply(
+        `🟠 *HubSpot CRM — aipa@aideazz.xyz*\n\n` +
+        `👤 Contacts: *${stats.contacts}*\n` +
+        `🏢 Companies: *${stats.companies}*\n` +
+        `💼 Deals: *${stats.deals}*\n\n` +
+        `Leads auto-push: via /outreach_ingest + /triage\n` +
+        `Dashboard: app.hubspot.com`,
+        { parse_mode: 'Markdown' }
+      );
+    } catch (error) {
+      console.error('HubSpot stats error:', error);
+      await ctx.reply('❌ HubSpot stats error. Check server logs.');
     }
   });
 

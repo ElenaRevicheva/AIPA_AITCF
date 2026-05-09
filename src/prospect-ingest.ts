@@ -21,6 +21,7 @@ import {
   verifyEmailHunter,
   type OutreachTargetInput,
 } from './outreach';
+import { pushLeadToHubSpot } from './hubspot-client';
 
 // ---------------------------------------------------------------------------
 // YC company shape (matches job-list-filter output)
@@ -332,7 +333,24 @@ export async function runProspectIngestion(
       ingested = result.imported;
       console.log(`[${tag}] Imported ${ingested} targets`);
 
-      // 6. Verify emails for newly imported targets (uses free verification quota)
+      // 6. Push to HubSpot CRM (fire-and-forget, non-fatal)
+      for (const t of targets) {
+        try {
+          const pain = t.painPoint ? painMap.get(t.company || '') : undefined;
+          await pushLeadToHubSpot({
+            name:          t.name,
+            email:         t.email,
+            company:       t.company,
+            source:        t.source || 'YC Prospect Ingestion',
+            painPoint:     t.painPoint,
+            matchedSystem: pain?.matchedSystem,
+          });
+        } catch {
+          // Non-fatal — HubSpot push failure never blocks Oracle import
+        }
+      }
+
+      // 7. Verify emails for newly imported targets (uses free verification quota)
       for (const t of targets) {
         if (t.email && t.email !== `founder@${extractDomain(t.company || '')}`) {
           try {
