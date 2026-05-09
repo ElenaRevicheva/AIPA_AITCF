@@ -368,11 +368,11 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
-## Last Verified (May 8, 2026)
+## Last Verified (May 9, 2026)
 
 | Agent | Status | Notes |
 |-------|--------|-------|
-| CTO AIPA + Atuona | ✅ Running | Oracle wallet fixed Apr 14. GEO+SEO Marketing Engine Phases 1-5 operational. **CTO→CMO pipeline fixed May 1** — dead Railway URL replaced with `http://127.0.0.1:8080/api/tech-update` (same VM, localhost). **X spam fix May 8** — `notifyCMO()` now filters to `feat:/launch:/release:` commits only; `fix:/docs:/chore:` commits are suppressed. Tweet content now AI-generated (Claude Haiku → Groq fallback) — plain language, not raw commit syntax. Spam queue cleared. |
+| CTO AIPA + Atuona | ✅ Running | **HubSpot CRM + multi-source fresh leads engine live May 9** (see §9 below). Board Trello briefing + task management live May 8–9. X spam fix May 8. CTO→CMO pipeline May 1. |
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
 | EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
 | EspaLuz Influencer | ✅ Running + **CTO milestone posts live (May 1)** | On even calendar days, checks for pending CTO milestone before AI Marketing Engine. If found: generates Instagram caption (zero jargon, HR/founder tone, Groq), posts with `sprinter.jpg` via Make.com → Instagram. Falls through to regular content if no milestone. `cto_milestone_module.py` — additive, never breaks existing schedule. |
@@ -400,3 +400,59 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 **Critical items needing server verification:**
 - `grep ATS_DRY_RUN /home/ubuntu/VibeJobHunterAIPA_AIMCF/.env` — is VJH actually submitting applications or just generating local artifacts?
 - EspaLuz PayPal signature verification — still disabled per WIRING_CONDUCTOR_WEEK1 audit.
+
+---
+
+## 9. HubSpot CRM + Multi-Source Fresh Leads Engine (May 9, 2026)
+
+### What shipped
+
+| File | Role |
+|------|------|
+| `src/hubspot-client.ts` | HubSpot CRM API v3 wrapper — `upsertContact`, `upsertCompany`, `createDeal`, v4 associations (contact↔company, deal↔contact, deal↔company), `addNoteToContact`, `pushLeadToHubSpot()` full pipeline, `getHubSpotStats()` |
+| `src/fresh-leads-ingest.ts` | Multi-source prospecting engine — 3 live sources, pain-point classification via Claude Haiku, dedup vs Oracle, HubSpot push for verified emails only |
+| `src/prospect-ingest.ts` | Updated — only pushes to HubSpot if Hunter.io found a real email (not pattern `founder@domain`) |
+| `src/lead-triage.ts` | Updated — pushes `client_lead`/`partnership` signals with urgency ≥3 to HubSpot; urgency 4-5 → stage `engaged`, urgency 3 → stage `contacted` |
+
+### Fresh leads sources (all free, no paid API)
+
+| Source | How it works | Volume |
+|--------|-------------|--------|
+| **Hacker News "Who is Hiring"** | Monthly thread — Algolia API, no key needed. Parses company name, email, website, description from top-level comments. | ~150–250 companies/month |
+| **GitHub repo search** | Searches repos tagged `ai-agent`, `automation`, `llm` with contact email in README. GitHub token (free, already have it) for higher rate limits. | ~20–30/run |
+| **Product Hunt AI launches** | GraphQL API, personal developer token. Fetches recent AI-category launches, extracts maker name + website. Token: `JqSMu_wrfci5Anxe1RV7QcaJyO9EfIWIw7QBLk305Eg` (env: `PRODUCT_HUNT_TOKEN`, added May 9). | ~30–50/run |
+
+### Filters — real data only
+- Pattern emails (`founder@domain.com`) never pushed to HubSpot — company record still created
+- Test entries (E2E, demo, fake) skipped entirely
+- `/hubspot sync` reports pushed vs skipped counts explicitly
+
+### Telegram commands
+| Command | Action |
+|---------|--------|
+| `/fresh_leads` | HN + GitHub (default, no extra token needed) |
+| `/fresh_leads all` | HN + GitHub + Product Hunt |
+| `/hubspot` | Live CRM stats (contacts · companies · deals) |
+| `/hubspot sync` | Backfill all existing Oracle outreach_targets → HubSpot |
+
+### Cron schedule
+- **Tue + Fri 7:00 AM Panama** — automatic fresh leads pull (HN + GitHub)
+- After each run: `/triage` classifies new signals → qualified leads auto-push to HubSpot
+
+### HubSpot account
+- Account: `aipa@aideazz.xyz`
+- Service Key: stored in Oracle `.env` as `HUBSPOT_API_KEY` (pat-na1-… format, never commit in plaintext)
+- Scopes: `crm.objects.contacts`, `crm.objects.companies`, `crm.objects.deals` read+write
+- Free tier: 1M contacts, unlimited companies/deals, 100 req/10s rate limit
+
+---
+
+## 10. Board Briefing + Task Management (May 8–9, 2026)
+
+| Feature | File | What it does |
+|---------|------|-------------|
+| Daily Trello briefing | `src/board-briefing.ts` | Every morning (13:00 UTC = 8AM Panama): fetches Kira* + VibeJob boards, categorises cards (overdue/today/dueSoon/dueWeek/undated), Claude Haiku generates one actionable suggestion. Sent as a separate Telegram message after Sprinter. |
+| Weekly Trello digest | `src/board-briefing.ts` | Every Monday 9AM Panama: full board snapshot + Claude Haiku insight paragraph (patterns, bottlenecks, what to tackle first). |
+| `/done N` | `telegram-bot.ts` | Delete task(s) by number from `/tasks` list. `/done 1,4,7` removes three at once. |
+| `/cleartasks auto` | `telegram-bot.ts` | Claude reads all tasks, identifies stale ones, proposes a list to delete. |
+| `/cleartasks confirm N,M` | `telegram-bot.ts` | Executes Claude's suggestion. |
