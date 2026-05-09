@@ -349,12 +349,25 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
  * Build the Telegram daily brief message.
  * Called by cron at 08:00 America/Panama.
  */
+/** Names that indicate test / demo entries — never show in the live brief. */
+const TEST_NAMES = new Set([
+  'e2e','e2e2','typo','tytjyt','katarinar','hope','kate',
+  'irina','maya','katya','marina','katerina','test','demo',
+  'sample','fake','elena revicheva',
+]);
+
+function isTestRow(r: any): boolean {
+  const name = String(r[8] || r[1] || '').toLowerCase().trim();
+  return TEST_NAMES.has(name) || /^(e2e|test|demo|sample|fake)/i.test(name);
+}
+
 export async function buildDailyBrief(): Promise<string> {
-  const leads = await getTriagedLeads(undefined, 50);
-  const rows = leads as any[];
+  const leads = await getTriagedLeads(undefined, 100);
+  // Filter out test/demo entries that slipped in from form testing
+  const rows = (leads as any[]).filter(r => !isTestRow(r));
 
   if (rows.length === 0) {
-    return `📥 Lead Brief — No signals yet.\n\nAdd signals via /lead add or the aideazz.xyz inquiry form.`;
+    return `📥 Lead Brief — No real signals yet.\n\nAdd signals via /lead add or the aideazz.xyz inquiry form.\nTip: run /cleanbiz confirm to wipe test entries from the database.`;
   }
 
   const urgent = rows.filter((r: any) => r[4] >= 4);    // urgency

@@ -2649,6 +2649,12 @@ async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
               classified_at
        FROM lead_triage
        WHERE 1=1 ${where}
+       AND LOWER(source_name) NOT IN (
+         'e2e','e2e2','typo','tytjyt','katarinar','hope','kate',
+         'irina','maya','katya','marina','katerina','test','demo',
+         'sample','fake','elena revicheva'
+       )
+       AND NOT REGEXP_LIKE(source_name, '^(e2e|test|demo|sample|fake)', 'i')
        ORDER BY urgency DESC, classified_at DESC
        FETCH FIRST :1 ROWS ONLY`,
       params
@@ -2702,6 +2708,8 @@ async function getUntriagedLeads(limit = 50): Promise<any[]> {
   try {
     connection = await getPoolConnection();
     // Pull business_leads not yet in lead_triage
+    // Exclude obvious test / demo entries by name pattern so they never surface in triage
+    // even if /cleanbiz confirm has not been run yet.
     const result = await connection.execute(
       `SELECT RAWTOHEX(bl.id), bl.name, bl.contact_email, bl.context, bl.utm_source
        FROM business_leads bl
@@ -2709,6 +2717,12 @@ async function getUntriagedLeads(limit = 50): Promise<any[]> {
          SELECT 1 FROM lead_triage lt
          WHERE lt.source_ref_id = bl.id AND lt.source_table = 'business_leads'
        )
+       AND LOWER(bl.name) NOT IN (
+         'e2e','e2e2','typo','tytjyt','katarinar','hope','kate',
+         'irina','maya','katya','marina','katerina','test','demo',
+         'sample','fake','elena revicheva'
+       )
+       AND REGEXP_LIKE(bl.name, '^[A-Za-z0-9]', 'i')
        ORDER BY bl.created_at DESC
        FETCH FIRST :1 ROWS ONLY`,
       [limit]
