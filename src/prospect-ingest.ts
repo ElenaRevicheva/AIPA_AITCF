@@ -333,10 +333,12 @@ export async function runProspectIngestion(
       ingested = result.imported;
       console.log(`[${tag}] Imported ${ingested} targets`);
 
-      // 6. Push to HubSpot CRM (fire-and-forget, non-fatal)
+      // 6. Push to HubSpot CRM — only Hunter.io-verified emails (skip pattern guesses)
       for (const t of targets) {
+        const isPatternEmail = !t.email || t.email.startsWith('founder@') || (t.source || '').endsWith('_pattern');
+        if (isPatternEmail) continue; // don't pollute CRM with guessed emails
         try {
-          const pain = t.painPoint ? painMap.get(t.company || '') : undefined;
+          const pain = painMap.get(t.company || '');
           await pushLeadToHubSpot({
             name:          t.name,
             email:         t.email,

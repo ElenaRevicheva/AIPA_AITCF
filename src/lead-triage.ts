@@ -308,17 +308,20 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
         source_email: lead.email,
       });
 
-      // Push qualified leads (client_lead / partnership, urgency ≥ 3) to HubSpot
-      const hsEligible = result.urgency >= 3 &&
+      // Push real qualified leads (client_lead / partnership, urgency ≥ 3) to HubSpot
+      // Skip: test entries, missing name/email, pattern emails
+      const isTestEntry = /^e2e|^test|^demo|^sample|^fake/i.test(lead.name || '');
+      const hasRealEmail = lead.email && !lead.email.startsWith('founder@') && lead.email.includes('@');
+      const hsEligible = !isTestEntry && hasRealEmail && result.urgency >= 3 &&
         (result.signal_type === 'client_lead' || result.signal_type === 'partnership');
       if (hsEligible) {
         const hsStage = result.urgency >= 4 ? HS_STAGES.engaged : HS_STAGES.contacted;
         pushLeadToHubSpot({
-          name:       lead.name || 'Unknown',
-          email:      lead.email || undefined,
-          source:     lead.utm_source || lead.source_table,
-          painPoint:  result.one_line_summary,
-          stage:      hsStage,
+          name:      lead.name || 'Unknown',
+          email:     lead.email || undefined,
+          source:    lead.utm_source || lead.source_table,
+          painPoint: result.one_line_summary,
+          stage:     hsStage,
         }).catch(() => { /* non-fatal */ });
       }
 

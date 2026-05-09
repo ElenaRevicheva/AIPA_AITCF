@@ -1450,30 +1450,50 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
           return;
         }
         let pushed = 0;
+        let skipped = 0;
         let failed = 0;
         for (const r of rows) {
           // columns: id, name, company, email, email_status, linkedin_url, source, pain_point, matched_system, status, created_at, updated_at
-          const name          = r[1] || r[2] || 'Unknown';
-          const company       = r[2] || undefined;
-          const email         = r[3] || undefined;
-          const linkedinUrl   = r[5] || undefined;
-          const source        = r[6] || 'Oracle outreach_targets';
-          const painPoint     = r[7] || undefined;
-          const matchedSystem = r[8] || undefined;
+          const name          = (r[1] || r[2] || '') as string;
+          const company       = (r[2] || undefined) as string | undefined;
+          const email         = (r[3] || undefined) as string | undefined;
+          const linkedinUrl   = (r[5] || undefined) as string | undefined;
+          const source        = (r[6] || 'Oracle outreach_targets') as string;
+          const painPoint     = (r[7] || undefined) as string | undefined;
+          const matchedSystem = (r[8] || undefined) as string | undefined;
+
+          // Skip test/simulated entries
+          const isTestName  = /^e2e|^test|^demo|^sample|^fake|^founder @/i.test(name);
+          const isPatternEmail = !email || email.startsWith('founder@') || source.endsWith('_pattern');
+
+          // Need at least a real company name or a real email to be worth pushing
+          if (isTestName || (!company && isPatternEmail)) { skipped++; continue; }
+
+          // Push without fake email — HubSpot contact will just have name + company
           try {
-            await pushLeadToHubSpot({ name, email, company, linkedinUrl, source, painPoint, matchedSystem });
+            await pushLeadToHubSpot({
+              name:          name || company || 'Unknown',
+              email:         isPatternEmail ? undefined : email,
+              company,
+              linkedinUrl,
+              source,
+              painPoint,
+              matchedSystem,
+            });
             pushed++;
           } catch {
             failed++;
           }
-          // Respect HubSpot free-tier 100 req/10s — small delay between records
+          // Respect HubSpot free-tier 100 req/10s
           await new Promise(res => setTimeout(res, 120));
         }
         const stats = await getHubSpotStats();
         await ctx.reply(
           `✅ HubSpot sync complete\n\n` +
-          `Pushed: ${pushed}${failed ? `  Failed: ${failed}` : ''}\n\n` +
-          `🟠 CRM totals now:\n` +
+          `Pushed:   ${pushed}\n` +
+          `Skipped:  ${skipped} (test/pattern data — not real)\n` +
+          `${failed ? `Failed:   ${failed}\n` : ''}` +
+          `\n🟠 CRM totals now:\n` +
           `👤 Contacts:  ${stats?.contacts ?? '?'}\n` +
           `🏢 Companies: ${stats?.companies ?? '?'}\n` +
           `💼 Deals:     ${stats?.deals ?? '?'}`
