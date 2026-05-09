@@ -1027,8 +1027,17 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
 // then each action is executed independently.  A single voice message can
 // combine creation, relocation and archiving across any boards.
 
-/** Keyword pre-check — avoids the LLM call for purely-task messages. */
-const MGMT_RE = /\b(move|relocat|archive|archiv|перенеси|переместить|перемести|перенести|заархивируй|убери|скрой)\b/i;
+/**
+ * Keyword pre-check — fires the multi-action LLM path for management commands.
+ * Broad on purpose: better to call Haiku unnecessarily than to silently create
+ * a new card when the user wanted to MOVE an existing one.
+ *
+ * EN:  move, relocate, transfer, put it to, send it to, take it to, archive
+ * ES:  mueve, muévelo, mover, trasladar, pasar, poner, enviar, archivar
+ * RU:  перенеси, переместить, перемести, перенести, передвинь, положи,
+ *      заархивируй, убери, скрой, отправь
+ */
+const MGMT_RE = /\b(move|relocat|transfer|archive|archiv|mueve|muévelo|mover|trasladar|pasar|archivar|перенеси|переместить|перемести|перенести|передвинь|положи|заархивируй|убери|скрой|отправь)\b/i;
 
 export interface MultiActionItem {
   type: 'create' | 'move' | 'archive';
