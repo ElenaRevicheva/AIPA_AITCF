@@ -9,6 +9,7 @@ import Groq from 'groq-sdk';
 import Anthropic from '@anthropic-ai/sdk';
 import {
   getUntriagedLeads,
+  getUntriagedOutreachTargets,
   getRepliedOutreach,
   saveTriagedLead,
   getTriagedLeads,
@@ -37,7 +38,7 @@ interface TriageResult {
 
 interface LeadInput {
   id: string;
-  source_table: 'business_leads' | 'outreach_log';
+  source_table: 'business_leads' | 'outreach_log' | 'outreach_targets';
   name: string;
   email: string;
   context: string;
@@ -248,6 +249,7 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
   _groqDailyLimitHit = false; // Reset for this cycle
   const maxBiz = Math.min(80, Math.max(5, parseInt(process.env.TRIAGE_MAX_BUSINESS_LEADS || '20', 10) || 20));
   const maxOut = Math.min(40, Math.max(3, parseInt(process.env.TRIAGE_MAX_OUTREACH || '10', 10) || 10));
+  const maxProspects = Math.min(50, Math.max(5, parseInt(process.env.TRIAGE_MAX_PROSPECTS || '30', 10) || 30));
 
   // Sequential queries to avoid concurrent Oracle connection issues
   console.log('🎯 [triage] Querying untriaged leads...');
@@ -255,6 +257,9 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
   console.log(`🎯 [triage] Raw leads: ${rawLeads.length}`);
   const repliedOutreach = await getRepliedOutreach(maxOut);
   console.log(`🎯 [triage] Replied outreach: ${repliedOutreach.length}`);
+  // NEW: fresh prospects from HN / GitHub / Product Hunt ingestion
+  const freshProspects = await getUntriagedOutreachTargets(maxProspects);
+  console.log(`🎯 [triage] Fresh outreach_targets: ${freshProspects.length}`);
 
   const inputs: LeadInput[] = [
     ...(rawLeads as any[]).map((r: any) => ({
@@ -272,6 +277,20 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
       email: r[2] || '',
       context: `Replied to outreach. Subject: ${r[3] || ''}. Reply: ${r[4] || ''}`,
       utm_source: 'outreach',
+    })),
+    // r[0]=id, r[1]=name, r[2]=company, r[3]=email, r[4]=source,
+    // r[5]=pain_point, r[6]=matched_system, r[7]=status, r[8]=email_status
+    ...(freshProspects as any[]).map((r: any) => ({
+      id: r[0],
+      source_table: 'outreach_targets' as const,
+      name: r[2] || r[1] || '',      // company name as primary display name
+      email: r[3] || '',
+      context: [
+        r[5] ? `Pain point: ${r[5]}` : '',
+        r[6] ? `Matched AIdeazz system: ${r[6]}` : '',
+        r[4] ? `Source: ${r[4]}` : '',
+      ].filter(Boolean).join('. '),
+      utm_source: r[4] || 'fresh_leads',
     })),
   ];
 
@@ -308,14 +327,27 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
         source_email: lead.email,
       });
 
-      // Push real qualified leads (client_lead / partnership, urgency ≥ 3) to HubSpot
-      // Skip: test entries, missing name/email, pattern emails
+      // Push qualified leads to HubSpot
+      // Gates:
+      //  - Never test/demo entries
+      //  - business_leads / outreach_log: need real email + urgency ≥ 3 + right signal type
+      //  - outreach_targets (fresh prospects): we actively sourced them, so push
+      //    urgency ≥ 2 if they have a real email (lower bar = more HubSpot visibility)
       const isTestEntry = /^e2e|^test|^demo|^sample|^fake/i.test(lead.name || '');
       const hasRealEmail = lead.email && !lead.email.startsWith('founder@') && lead.email.includes('@');
-      const hsEligible = !isTestEntry && hasRealEmail && result.urgency >= 3 &&
-        (result.signal_type === 'client_lead' || result.signal_type === 'partnership');
+      const isFreshProspect = lead.source_table === 'outreach_targets';
+      const urgencyBar = isFreshProspect ? 2 : 3;
+      const hsEligible =
+        !isTestEntry &&
+        hasRealEmail &&
+        result.urgency >= urgencyBar &&
+        (result.signal_type === 'client_lead' || result.signal_type === 'partnership' ||
+         (isFreshProspect && result.signal_type !== 'irrelevant'));
+
       if (hsEligible) {
-        const hsStage = result.urgency >= 4 ? HS_STAGES.engaged : HS_STAGES.contacted;
+        const hsStage = result.urgency >= 4 ? HS_STAGES.engaged
+                      : result.urgency >= 3 ? HS_STAGES.contacted
+                      : HS_STAGES.prospected;
         pushLeadToHubSpot({
           name:      lead.name || 'Unknown',
           email:     lead.email || undefined,
@@ -333,7 +365,10 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
     }
   }
 
-  const summary = `Triaged ${processed} signals. Urgent (4-5): ${urgent}.`;
+  const fromBiz = inputs.filter(i => i.source_table === 'business_leads').length;
+  const fromProspects = inputs.filter(i => i.source_table === 'outreach_targets').length;
+  const fromReplies = inputs.filter(i => i.source_table === 'outreach_log').length;
+  const summary = `Triaged ${processed} signals. Urgent (4-5): ${urgent}.\nSources: ${fromBiz} form leads · ${fromProspects} fresh prospects · ${fromReplies} outreach replies`;
 
   // Log to agent_outcomes per WIRING_CONDUCTOR
   await saveAgentOutcome('lead_triage', 'triage_cycle', {

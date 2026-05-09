@@ -2763,6 +2763,45 @@ async function getRepliedOutreach(limit = 20): Promise<any[]> {
   }
 }
 
+/**
+ * Pull outreach_targets that:
+ *  - have a real (non-pattern) email, OR a pain_point already classified
+ *  - have NOT yet been saved to lead_triage with source_table='outreach_targets'
+ *
+ * These are the fresh prospects from HN Hiring / GitHub / Product Hunt ingestion.
+ * They contain pain_point + matched_system already filled by Claude Haiku during
+ * ingest, so triage can use that as context for scoring.
+ */
+async function getUntriagedOutreachTargets(limit = 50): Promise<any[]> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(ot.id), ot.name, ot.company, ot.email, ot.source,
+              ot.pain_point, ot.matched_system, ot.status, ot.email_status
+       FROM outreach_targets ot
+       WHERE NOT EXISTS (
+         SELECT 1 FROM lead_triage lt
+         WHERE lt.source_ref_id = HEXTORAW(RAWTOHEX(ot.id))
+           AND lt.source_table = 'outreach_targets'
+       )
+       AND (
+         (ot.email IS NOT NULL AND ot.email NOT LIKE 'founder@%' AND ot.email LIKE '%@%')
+         OR ot.pain_point IS NOT NULL
+       )
+       ORDER BY ot.created_at DESC
+       FETCH FIRST :1 ROWS ONLY`,
+      [limit]
+    );
+    return (result.rows as any[]) || [];
+  } catch (err) {
+    console.error('getUntriagedOutreachTargets error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 initLeadTriageTable().catch((e: any) => console.error('❌ Lead triage table init error:', e?.message?.slice(0, 200)));
 
 export {
@@ -2847,6 +2886,7 @@ export {
   saveTriagedLead,
   getTriagedLeads,
   getUntriagedLeads,
+  getUntriagedOutreachTargets,
   getRepliedOutreach,
   getPlacesPipelineSnapshot,
 };
