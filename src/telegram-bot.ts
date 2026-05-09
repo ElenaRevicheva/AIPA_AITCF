@@ -600,7 +600,9 @@ Type /menu for all commands! 🚀
         { cmd: '/add_email', desc: 'Manually set email on a pending lead', usage: '/add_email <id-prefix> user@company.com' },
         { cmd: '/linkedin_draft', desc: 'Generate LinkedIn connection message + search link', usage: '/linkedin_draft Chili Panama\nAI drafts a 300-char LinkedIn DM + opens people search' },
         { cmd: '/triage', desc: 'Phase 5: run AI lead triage (site + outreach replies → dashboard)', usage: '/triage\nClassifies business_leads + replied outreach; see /leads/dashboard with secret' },
-        { cmd: '/hubspot', desc: 'HubSpot CRM stats (contacts · companies · deals)', usage: '/hubspot\nShows live counts. Leads auto-push from /outreach_ingest + /triage' },
+        { cmd: '/hubspot', desc: 'HubSpot CRM stats (contacts · companies · deals)', usage: '/hubspot\n/hubspot sync — backfill existing pipeline to HubSpot\nShows live counts. Leads auto-push from /outreach_ingest + /triage' },
+        { cmd: '/xlsx', desc: 'Export pipeline to CSV file', usage: '/xlsx\nDownloads full outreach_targets pipeline as CSV — open in Excel' },
+        { cmd: '/cleanbiz', desc: 'Remove test/fake entries from lead database', usage: '/cleanbiz — preview what will be deleted\n/cleanbiz confirm — permanently delete test entries (E2E, Marina, etc.)' },
         { cmd: '/espaluz', desc: 'EspaLuz funnel status', usage: '/espaluz\nTrials, paid users, expiring, revenue' },
         { cmd: '/outcome', desc: 'Log an agent outcome', usage: '/outcome cmo post_published {\"platform\":\"linkedin\"}\nLogs what an agent did' },
       ]
