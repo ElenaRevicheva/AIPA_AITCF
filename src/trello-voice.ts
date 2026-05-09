@@ -617,10 +617,19 @@ async function transcribeVoice(audioBuffer: Buffer, fileId: string): Promise<str
   fs.writeFileSync(tmpPath, audioBuffer);
 
   try {
+    // No language lock — Elena speaks EN, ES and RU mixed.
+    // Prompt seeds Whisper with vocabulary to prevent common substitutions
+    // ("desk" → "card", "me" → "May", etc.)
     const transcription = await groq.audio.transcriptions.create({
       file: fs.createReadStream(tmpPath),
       model: 'whisper-large-v3',
       response_format: 'text',
+      prompt: [
+        'January, February, March, April, May, June, July, August, September, October, November, December.',
+        'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena.',
+        'Move card, create card, add card, archive card, move this card, add task, new task.',
+        'Trello card. Kira board. Kira Mayo. Kira Junio.',
+      ].join(' '),
     });
     return typeof transcription === 'string' ? transcription : (transcription as { text: string }).text;
   } finally {
@@ -1086,16 +1095,32 @@ Return ONLY a JSON array — no explanation, no markdown.
 Action schema:
 [
   {"type":"create","description":"full task description to create as a new card"},
-  {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"destination board name"},
+  {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"BOARD_KEY"},
   {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"}
 ]
 
+BOARD_KEY must be one of these exact keys (NOT a person's name, NOT a free-form phrase):
+  "kira_current_month"  — Elena's personal Kira monthly board (Mayo/Junio/Julio 2026)
+  "kira_future"         — Kira Ano 2026 и дальше — long-term plans
+  "kira_habits"         — Kira Horario del dia / Habits
+  "kira_finance"        — Kira FIN Discipline / Shopping / Expenses
+  "vibejob"             — VibeJob AI Hunter (job search)
+  "aldeazz"             — AIdeazz Web3 Ecosystem
+  "espaluz"             — EspaLuz AI Family Tutor
+  "algom"               — Algom Alpha Crypto Coach
+
+CRITICAL — "to me" / "me" / "my board" / "my personal board" / "Kira" / "to myself" rules:
+- When the user says "move to me", "move to my board", "put it on my board", "to myself", "to Kira" — this ALWAYS means Elena's personal Kira board → use targetBoard: "kira_current_month"
+- NEVER output a person's name (e.g. "Elena Revicheva") as targetBoard — that is always wrong
+- If you genuinely cannot determine the destination board, use "kira_current_month" as default
+
 Rules:
 - Return [] if no Trello card management is requested (e.g. "transfer the hospital card to another clinic" is NOT a Trello action)
-- "move" / "archive" when the user refers to EXISTING cards by name, topic, or vague pronoun ("those", "them", "those cards")
+- "move" / "archive" when the user refers to EXISTING cards by name, topic, or vague pronoun ("those", "them", "those cards", "this card", "it")
 - "create" for new tasks
 - One message can contain multiple actions of different types
-- For vague pronouns ("those", "them"), set cardQuery to "__recent__"
+- For vague pronouns ("those", "them", "this", "it", "this one"), set cardQuery to "__recent__"
+- Note: Whisper may mishear "card" as "desk" or "task" — treat "this desk/task/item" as referring to a card
 
 Message: "${transcript}"`,
         }],
@@ -1159,8 +1184,35 @@ export async function processMultiAction(
         }
 
         const boards = await getAllBoards();
-        const hint = action.targetBoard.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-        const dest = boards.find(b => hint.some(w => b.name.toLowerCase().includes(w)));
+
+        // Resolve destination board — supports two modes:
+        // 1. BoardTarget key (e.g. "kira_current_month") — use structured resolveBoard()
+        // 2. Free-form board name substring — word-overlap fuzzy match
+        const knownBoardKeys: BoardTarget[] = [
+          'kira_current_month', 'kira_future', 'kira_habits', 'kira_finance',
+          'vibejob', 'aldeazz', 'espaluz', 'algom',
+        ];
+        let dest: TrelloBoard | undefined;
+        const tbLower = action.targetBoard.toLowerCase().trim();
+
+        if (knownBoardKeys.includes(tbLower as BoardTarget)) {
+          // Structured key — use resolveBoard which handles month rolling etc.
+          dest = resolveBoard(boards, tbLower as BoardTarget);
+        } else {
+          // Free-form — try keyword match from BOARD_KEYWORDS first
+          for (const key of knownBoardKeys) {
+            if (BOARD_KEYWORDS[key].some(kw => tbLower.includes(kw.toLowerCase()))) {
+              dest = resolveBoard(boards, key);
+              if (dest) break;
+            }
+          }
+          // Fallback: word-overlap match against actual board names
+          if (!dest) {
+            const hint = tbLower.split(/\s+/).filter(w => w.length > 2);
+            dest = boards.find(b => hint.some(w => b.name.toLowerCase().includes(w)));
+          }
+        }
+
         if (!dest) {
           results.push({ type: 'move', success: false, cardQuery: action.cardQuery,
             error: `Board not found: "${action.targetBoard}"` });

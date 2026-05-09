@@ -7468,13 +7468,25 @@ function downloadFile(url: string, dest: string): Promise<void> {
 
 async function transcribeAudio(filePath: string): Promise<string | null> {
   try {
+    // No language lock — Elena speaks EN, ES and RU in the same message.
+    // The prompt seeds Whisper's vocabulary with project names and month names
+    // so it transcribes them correctly (e.g. "May" not "me", "card" not "desk").
     const transcription = await groq.audio.transcriptions.create({
       file: fs.createReadStream(filePath),
       model: 'whisper-large-v3',
-      language: 'en',
-      response_format: 'text'
+      response_format: 'text',
+      prompt: [
+        // Month names (common source of errors when mixed EN/ES/RU)
+        'January, February, March, April, May, June, July, August, September, October, November, December.',
+        // Project / brand vocabulary
+        'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena.',
+        // Trello action vocabulary
+        'Move card, create card, add card, archive card, move this card, add task, new task.',
+        // Avoid common substitutions
+        'Trello card. Kira board. Kira Mayo. Kira Junio.',
+      ].join(' '),
     });
-    
+
     return transcription as unknown as string;
   } catch (error) {
     console.error('Transcription error:', error);
