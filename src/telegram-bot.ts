@@ -57,6 +57,7 @@ import {
   // Phase 4 - Outreach
   getOutreachStats,
   getOutreachDrafts,
+  getOutreachTargets,
 } from './database';
 import { runTriageCycle, buildDailyBrief } from './lead-triage';
 import {
@@ -82,7 +83,7 @@ import {
 } from './trello-voice';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
-import { getHubSpotStats } from './hubspot-client';
+import { getHubSpotStats, pushLeadToHubSpot } from './hubspot-client';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 import * as fs from 'fs';
@@ -1430,12 +1431,61 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
     }
   });
 
-  // /hubspot — CRM stats
+  // /hubspot — CRM stats + backfill sync
   bot.command('hubspot', async (ctx) => {
     if (!process.env.HUBSPOT_API_KEY?.trim()) {
       await ctx.reply('❌ HUBSPOT_API_KEY not set in .env. Add it and `pm2 restart cto-aipa --update-env`.');
       return;
     }
+
+    const arg = ctx.message?.text?.replace('/hubspot', '').trim().toLowerCase() || '';
+
+    // /hubspot sync — push all existing Oracle outreach_targets to HubSpot
+    if (arg === 'sync') {
+      await ctx.reply('🔄 Syncing all Oracle outreach targets → HubSpot CRM...');
+      try {
+        const rows = await getOutreachTargets({ limit: 500 }) as any[];
+        if (rows.length === 0) {
+          await ctx.reply('📭 No outreach targets in Oracle yet. Run /outreach_ingest first.');
+          return;
+        }
+        let pushed = 0;
+        let failed = 0;
+        for (const r of rows) {
+          // columns: id, name, company, email, email_status, linkedin_url, source, pain_point, matched_system, status, created_at, updated_at
+          const name          = r[1] || r[2] || 'Unknown';
+          const company       = r[2] || undefined;
+          const email         = r[3] || undefined;
+          const linkedinUrl   = r[5] || undefined;
+          const source        = r[6] || 'Oracle outreach_targets';
+          const painPoint     = r[7] || undefined;
+          const matchedSystem = r[8] || undefined;
+          try {
+            await pushLeadToHubSpot({ name, email, company, linkedinUrl, source, painPoint, matchedSystem });
+            pushed++;
+          } catch {
+            failed++;
+          }
+          // Respect HubSpot free-tier 100 req/10s — small delay between records
+          await new Promise(res => setTimeout(res, 120));
+        }
+        const stats = await getHubSpotStats();
+        await ctx.reply(
+          `✅ HubSpot sync complete\n\n` +
+          `Pushed: ${pushed}${failed ? `  Failed: ${failed}` : ''}\n\n` +
+          `🟠 CRM totals now:\n` +
+          `👤 Contacts:  ${stats?.contacts ?? '?'}\n` +
+          `🏢 Companies: ${stats?.companies ?? '?'}\n` +
+          `💼 Deals:     ${stats?.deals ?? '?'}`
+        );
+      } catch (error) {
+        console.error('HubSpot sync error:', error);
+        await ctx.reply('❌ Sync error. Check server logs.');
+      }
+      return;
+    }
+
+    // /hubspot — just show stats
     await ctx.reply('📊 Fetching HubSpot CRM stats...');
     try {
       const stats = await getHubSpotStats();
@@ -1448,7 +1498,8 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
         `👤 Contacts:  ${stats.contacts}\n` +
         `🏢 Companies: ${stats.companies}\n` +
         `💼 Deals:     ${stats.deals}\n\n` +
-        `Leads auto-push via /outreach_ingest + /triage\n` +
+        `Sync existing targets: /hubspot sync\n` +
+        `Auto-push: /outreach_ingest + /triage\n` +
         `Dashboard: app.hubspot.com`
       );
     } catch (error) {
