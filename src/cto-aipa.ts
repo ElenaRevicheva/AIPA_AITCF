@@ -101,22 +101,6 @@ What are you working on? Always happy to connect with builders.`;
   }
 }
 
-async function xAutoReplyDm(senderId: string, senderName: string, incomingText: string) {
-  try {
-    const resp = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 300,
-      system: `You are Elena Revicheva — AI engineer and founder in Panama. You built 12 AI systems solo in 2025-2026. Reply to this X DM briefly (max 3 sentences). Be genuine — no marketing speak. If it looks like spam or a bot, reply with just "Thanks!" If it is a genuine message, engage with curiosity. Never mention you are AI.`,
-      messages: [{ role: 'user', content: `Incoming DM from @${senderName}: "${incomingText}"` }],
-    });
-    const reply = (resp.content[0] as any).text?.trim();
-    if (!reply) return;
-    const c2 = getXClient(); if (!c2) return; await c2.v2.post(`dm_conversations/with/${senderId}/messages`, { text: reply } as any);
-    console.log('[X-Auto] 💬 Auto-replied to @' + senderName + ': ' + reply.slice(0, 80));
-  } catch (e: any) {
-    console.warn('[X-Auto] Auto-reply failed for @' + senderName + ':', e.message);
-  }
-}
 
 const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || process.env.GH_TOKEN || '')
   .replace(/^['"]|['"]$/g, '')
@@ -1973,9 +1957,6 @@ ${u?.followers_count} followers · ${(u?.description || '').slice(0, 100)}`;
 "${text.slice(0, 300)}"`;
           console.log('[X-Webhook] DM:', text.slice(0, 80));
           sendTelegramBroadcast(msg, { parseMode: false }).catch(() => {});
-          // Auto-reply via Claude
-          const senderName = event.users?.[senderId]?.screen_name || senderId;
-          xAutoReplyDm(senderId, senderName, text).catch((e: any) => console.error('[X-Auto] xAutoReplyDm error:', e.message));
         }
       }
 
