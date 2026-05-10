@@ -1,3 +1,5 @@
+import { TwitterApi } from 'twitter-api-v2';
+import { createHmac as nodeHmac } from 'crypto';
 import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
 import {
@@ -62,6 +64,60 @@ process.on('uncaughtException', (err: Error) => {
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// ── X Automation Client (OAuth 1.0a — acts as @reviceva) ───────────────────
+let _xClient: TwitterApi | null = null;
+function getXClient(): TwitterApi | null {
+  if (_xClient) return _xClient;
+  const key = process.env.TWITTER_API_KEY;
+  const secret = process.env.TWITTER_API_SECRET;
+  const token = process.env.TWITTER_ACCESS_TOKEN;
+  const tokenSecret = process.env.TWITTER_ACCESS_TOKEN_SECRET;
+  console.log("[X-Auto] getXClient env:", key ? key.length : "MISSING", secret ? secret.length : "MISSING", token ? token.length : "MISSING", tokenSecret ? tokenSecret.length : "MISSING");
+  if (!key || !secret || !token || !tokenSecret) { console.warn("[X-Auto] Missing Twitter env vars - keys not loaded"); return null; }
+  _xClient = new TwitterApi({ appKey: key, appSecret: secret, accessToken: token, accessSecret: tokenSecret });
+  return _xClient;
+}
+
+async function xAutoFollowBack(userId: string, screenName: string, bio: string, followerCount: number) {
+  const client = getXClient(); if (!client) { console.warn("[X-Auto] No Twitter client"); return; }
+  try {
+    await client.v2.follow('1563632998863577092', userId);
+    console.log('[X-Auto] ✅ Followed back @' + screenName);
+  } catch (e: any) {
+    console.warn('[X-Auto] Follow-back failed for @' + screenName + ':', e.message);
+  }
+  if (followerCount < 5 && !bio) return;
+  try {
+    const dmText = `Hey! Thanks for following 🙏
+
+I'm Elena — building AI agents in Panama (12 production systems solo in 2025-2026).
+
+What are you working on? Always happy to connect with builders.`;
+    await client.v2.post(`dm_conversations/with/${userId}/messages`, { text: dmText } as any);
+    console.log('[X-Auto] 💬 Welcome DM sent to @' + screenName);
+  } catch (e: any) {
+    console.warn('[X-Auto] DM failed for @' + screenName + ':', e.message);
+  }
+}
+
+async function xAutoReplyDm(senderId: string, senderName: string, incomingText: string) {
+  try {
+    const resp = await anthropic.messages.create({
+      model: 'claude-haiku-4-5',
+      max_tokens: 300,
+      system: `You are Elena Revicheva — AI engineer and founder in Panama. You built 12 AI systems solo in 2025-2026. Reply to this X DM briefly (max 3 sentences). Be genuine — no marketing speak. If it looks like spam or a bot, reply with just "Thanks!" If it is a genuine message, engage with curiosity. Never mention you are AI.`,
+      messages: [{ role: 'user', content: `Incoming DM from @${senderName}: "${incomingText}"` }],
+    });
+    const reply = (resp.content[0] as any).text?.trim();
+    if (!reply) return;
+    const c2 = getXClient(); if (!c2) return; await c2.v2.post(`dm_conversations/with/${senderId}/messages`, { text: reply } as any);
+    console.log('[X-Auto] 💬 Auto-replied to @' + senderName + ': ' + reply.slice(0, 80));
+  } catch (e: any) {
+    console.warn('[X-Auto] Auto-reply failed for @' + senderName + ':', e.message);
+  }
+}
+
 const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || process.env.GH_TOKEN || '')
   .replace(/^['"]|['"]$/g, '')
   .trim();
@@ -757,7 +813,7 @@ async function startCTOAIPA() {
   
   const app = express();
   app.set('trust proxy', 1); // behind nginx (webhook.aideazz.xyz → /cto/)
-  app.use(express.json());
+  app.use(express.json({ verify: (req: any, _res: any, buf: Buffer) => { req.rawBody = buf; } }));
   
   // Health check & status
   app.get('/', (req, res) => {
@@ -1831,6 +1887,100 @@ async function startCTOAIPA() {
     } catch (e: unknown) {
       console.error('[sprint-knowledge] error:', e);
       res.status(500).json({ error: String((e as Error)?.message || e) });
+    }
+  });
+
+
+  // ── X/Twitter Account Activity API Webhook ──────────────────────────────────
+  // Public URL: https://webhook.aideazz.xyz/cto/x-webhook
+  // Register at: console.x.com → Toolbox → Webhooks → Add URL
+  // Then:        Toolbox → Event subscriptions → Create → select @reviceva
+  //
+  // GET  /x-webhook?crc_token=... → HMAC-SHA256 CRC response (X ownership check)
+  // POST /x-webhook               → real-time events pushed by X Activity API
+
+  app.get('/x-webhook', (req: Request, res: Response) => {
+    const crcToken = req.query.crc_token as string;
+    const secret = process.env.TWITTER_API_SECRET || '';
+    if (!crcToken) { res.status(400).json({ error: 'missing crc_token' }); return; }
+    if (!secret)   { res.status(500).json({ error: 'TWITTER_API_SECRET not set' }); return; }
+    const hmac = nodeHmac('sha256', secret).update(crcToken).digest('base64');
+    res.json({ response_token: `sha256=${hmac}` });
+    console.log('[X-Webhook] ✅ CRC challenge answered');
+  });
+
+  // Capture raw body BEFORE json middleware for signature verification
+  app.post('/x-webhook', express.raw({ type: 'application/json' }), (req: Request, res: Response) => {
+    res.sendStatus(200); // Acknowledge immediately — X requires <3s response
+    try {
+      const secret    = process.env.TWITTER_API_SECRET || '';
+      const signature = req.headers['x-twitter-webhooks-signature'] as string;
+      const rawBody   = ((req as any).rawBody as Buffer) ?? Buffer.from(JSON.stringify(req.body));
+
+      // Verify signature
+      if (secret && signature) {
+        const expected = 'sha256=' + nodeHmac('sha256', secret).update(rawBody).digest('base64');
+        if (expected !== signature) {
+          console.warn('[X-Webhook] Invalid signature — ignoring');
+          return;
+        }
+      }
+
+      const event = JSON.parse(rawBody.toString('utf8'));
+
+      // ── Mentions / Replies ──────────────────────────────────────────────────
+      if (event.tweet_create_events?.length) {
+        for (const tweet of event.tweet_create_events) {
+          if (tweet.user?.id_str === '1563632998863577092') continue; // Elena's own tweets
+          const url = `https://x.com/${tweet.user?.screen_name}/status/${tweet.id_str}`;
+          const msg = `🐦 New mention from @${tweet.user?.screen_name} (${tweet.user?.followers_count} followers):
+"${(tweet.text || '').slice(0, 200)}"
+${url}`;
+          console.log('[X-Webhook] Mention:', msg.slice(0, 120));
+          sendTelegramBroadcast(msg, { parseMode: false }).catch(() => {});
+        }
+      }
+
+      // ── New Followers ───────────────────────────────────────────────────────
+      if (event.follow_events?.length) {
+        for (const f of event.follow_events) {
+          if (f.type !== 'follow') continue;
+          const u = f.source;
+          const msg = `✅ New follower: @${u?.screen_name}
+${u?.followers_count} followers · ${(u?.description || '').slice(0, 100)}`;
+          console.log('[X-Webhook] Follow:', msg.slice(0, 100));
+          sendTelegramBroadcast(msg, { parseMode: false }).catch(() => {});
+          // Auto-follow back + welcome DM
+          if (u?.id_str) xAutoFollowBack(u.id_str, u.screen_name || 'unknown', u.description || '', u.followers_count || 0).catch((e: any) => console.error('[X-Auto] xAutoFollowBack error:', e.message));
+        }
+      }
+
+      // ── Likes on Elena's posts ──────────────────────────────────────────────
+      if (event.favorite_events?.length) {
+        for (const like of event.favorite_events) {
+          console.log(`[X-Webhook] ❤️ Like from @${like.user?.screen_name} on tweet ${like.favorited_status?.id_str}`);
+        }
+      }
+
+      // ── Direct Messages ─────────────────────────────────────────────────────
+      if (event.direct_message_events?.length) {
+        for (const dm of event.direct_message_events) {
+          if (dm.type !== 'message_create') continue;
+          const senderId = dm.message_create?.sender_id;
+          if (senderId === '1563632998863577092') continue; // Elena's own DMs
+          const text = dm.message_create?.message_data?.text || '';
+          const msg = `💬 New X DM received:
+"${text.slice(0, 300)}"`;
+          console.log('[X-Webhook] DM:', text.slice(0, 80));
+          sendTelegramBroadcast(msg, { parseMode: false }).catch(() => {});
+          // Auto-reply via Claude
+          const senderName = event.users?.[senderId]?.screen_name || senderId;
+          xAutoReplyDm(senderId, senderName, text).catch((e: any) => console.error('[X-Auto] xAutoReplyDm error:', e.message));
+        }
+      }
+
+    } catch (err: unknown) {
+      console.error('[X-Webhook] Parse error:', (err as Error)?.message);
     }
   });
 
