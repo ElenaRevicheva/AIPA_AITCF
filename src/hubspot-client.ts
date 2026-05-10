@@ -76,6 +76,24 @@ async function hsPost<T>(path: string, body: unknown): Promise<T | null> {
   return res.json() as Promise<T>;
 }
 
+async function hsPut<T>(path: string, body: unknown): Promise<T | null> {
+  const key = HS_KEY();
+  if (!key) return null;
+  const res = await fetch(`${HS_BASE}${path}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    if (res.status !== 409) console.error(`[HubSpot] PUT ${path} → ${res.status}: ${txt}`);
+    return null;
+  }
+  // 204 No Content is success for associations
+  const text = await res.text();
+  return (text ? JSON.parse(text) : {}) as T;
+}
+
 async function hsPatch<T>(path: string, body: unknown): Promise<T | null> {
   const key = HS_KEY();
   if (!key) return null;
@@ -148,7 +166,7 @@ export async function upsertContact(input: {
         ...(lastName        ? { lastname: lastName }               : {}),
         ...(input.company   ? { company: input.company }           : {}),
         ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
-        ...(input.source    ? { hs_lead_status: 'NEW', lead_source: input.source } : {}),
+        ...(input.source    ? { hs_lead_status: 'NEW' } : {}),
       },
     },
   );
@@ -224,21 +242,22 @@ export async function createDeal(input: {
 // ─── Associations ─────────────────────────────────────────────────────────────
 
 export async function associateContactCompany(contactId: string, companyId: string): Promise<void> {
-  await hsPost(
+  // CRM v4 associations require PUT, not POST
+  await hsPut(
     `/crm/v4/objects/contacts/${contactId}/associations/companies/${companyId}`,
     [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 1 }],
   );
 }
 
 export async function associateDealContact(dealId: string, contactId: string): Promise<void> {
-  await hsPost(
+  await hsPut(
     `/crm/v4/objects/deals/${dealId}/associations/contacts/${contactId}`,
     [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 3 }],
   );
 }
 
 export async function associateDealCompany(dealId: string, companyId: string): Promise<void> {
-  await hsPost(
+  await hsPut(
     `/crm/v4/objects/deals/${dealId}/associations/companies/${companyId}`,
     [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 5 }],
   );
@@ -254,7 +273,7 @@ export async function addNoteToContact(contactId: string, body: string): Promise
     },
   });
   if (note?.id) {
-    await hsPost(
+    await hsPut(
       `/crm/v4/objects/notes/${note.id}/associations/contacts/${contactId}`,
       [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }],
     );
@@ -359,11 +378,13 @@ export async function getHubSpotStats(): Promise<{
   companies: number;
   deals: number;
 } | null> {
+  // HubSpot list endpoint (/crm/v3/objects/*) does NOT return a `total` field.
+  // Use the search endpoint instead — it always returns `total` with the full count.
   try {
     const [contacts, companies, deals] = await Promise.all([
-      hsGet<{ total: number }>('/crm/v3/objects/contacts?limit=1&properties=email'),
-      hsGet<{ total: number }>('/crm/v3/objects/companies?limit=1&properties=name'),
-      hsGet<{ total: number }>('/crm/v3/objects/deals?limit=1&properties=dealname'),
+      hsPost<{ total: number }>('/crm/v3/objects/contacts/search',  { filterGroups: [], properties: ['email'],    limit: 1 }),
+      hsPost<{ total: number }>('/crm/v3/objects/companies/search', { filterGroups: [], properties: ['name'],     limit: 1 }),
+      hsPost<{ total: number }>('/crm/v3/objects/deals/search',     { filterGroups: [], properties: ['dealname'], limit: 1 }),
     ]);
     return {
       contacts:  contacts?.total  ?? 0,

@@ -1558,7 +1558,7 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
 
           // Push without fake email — HubSpot contact will just have name + company
           try {
-            await pushLeadToHubSpot({
+            const hsResult = await pushLeadToHubSpot({
               name:          name || company || 'Unknown',
               email:         isPatternEmail ? undefined : email,
               company,
@@ -1567,9 +1567,17 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
               painPoint,
               matchedSystem,
             });
-            pushed++;
-          } catch {
+            // pushLeadToHubSpot never throws — it returns null on any API error
+            const anyCreated = hsResult && (hsResult.contactId || hsResult.companyId || hsResult.dealId);
+            if (anyCreated) {
+              pushed++;
+            } else {
+              failed++;
+              console.warn(`[HS sync] silent fail for "${name || company}" — result: ${JSON.stringify(hsResult)}`);
+            }
+          } catch (e: any) {
             failed++;
+            console.error(`[HS sync] exception for "${name || company}":`, e?.message || e);
           }
           // Respect HubSpot free-tier 100 req/10s
           await new Promise(res => setTimeout(res, 120));

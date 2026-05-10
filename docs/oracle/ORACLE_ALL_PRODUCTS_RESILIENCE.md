@@ -368,11 +368,11 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
-## Last Verified (May 9, 2026)
+## Last Verified (May 10, 2026)
 
 | Agent | Status | Notes |
 |-------|--------|-------|
-| CTO AIPA + Atuona | ✅ Running | **HubSpot CRM + multi-source fresh leads engine live May 9**. **X webhook handler live May 10**: receives Follow/DM/Mention/Like events, broadcasts to Telegram, fires auto-follow back. Body parser fixed (express.json verify callback). twitter-api-v2 added as dependency. Board Trello briefing + task management live May 8–9. CTO→CMO pipeline May 1. |
+| CTO AIPA + Atuona | ✅ Running | **HubSpot CRM + multi-source fresh leads engine live May 9**. **X webhook handler live May 10**: receives Follow/DM/Mention/Like events, broadcasts to Telegram, fires auto-follow back. Body parser fixed (express.json verify callback — raw body saved before json() consumes stream). twitter-api-v2 added as dependency. **HubSpot duplicate posting loop fixed May 10** (see §11). Board Trello briefing + task management live May 8–9. CTO→CMO pipeline May 1. |
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
 | EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
 | EspaLuz Influencer | ✅ Running + **CTO milestone posts live (May 1)** | On even calendar days, checks for pending CTO milestone before AI Marketing Engine. If found: generates Instagram caption (zero jargon, HR/founder tone, Groq), posts with `sprinter.jpg` via Make.com → Instagram. Falls through to regular content if no milestone. `cto_milestone_module.py` — additive, never breaks existing schedule. |
@@ -456,3 +456,69 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 | `/done N` | `telegram-bot.ts` | Delete task(s) by number from `/tasks` list. `/done 1,4,7` removes three at once. |
 | `/cleartasks auto` | `telegram-bot.ts` | Claude reads all tasks, identifies stale ones, proposes a list to delete. |
 | `/cleartasks confirm N,M` | `telegram-bot.ts` | Executes Claude's suggestion. |
+
+---
+
+## 11. X Full Automation + HubSpot Duplicate Loop Fix (May 10, 2026)
+
+### X Webhook & Automation — What Shipped
+
+| Component | File | Status |
+|-----------|------|--------|
+| Account Activity API subscription | Script: `POST /2/account_activity/webhooks/{id}/subscriptions/all` (OAuth 1.0a) | ✅ Active — Follow/DM/Mention/Like stream to CTO AIPA webhook |
+| Webhook body parser fix | `src/cto-aipa.ts` — `express.json({ verify: (req,_,buf) => { req.rawBody=buf } })` | ✅ HMAC signature verification working — was failing because global `express.json()` consumed body stream before route-level `express.raw()` could capture it |
+| Auto-follow back | `src/cto-aipa.ts` — `client.v2.follow('1563632998863577092', userId)` | ✅ Live on PPU tier — fires instantly on every new follower event |
+| Telegram follow alerts | `src/cto-aipa.ts` | ✅ Follow/Mention/Like events previewed in Elena's Telegram (`@aitcf_aideazz_bot`) |
+| DM auto-reply | — | ❌ Blocked at PPU tier (X API 403 on both v1 + v2 endpoints). Requires Basic tier ($100/mo). Elena handles DMs manually in X inbox; Telegram previews DM text so she knows when to check. |
+| Filtered stream | `dragontrade-agent/stream-listener.js` | ✅ App-Only Bearer token (OAuth 2.0 `client_credentials` grant) — separate from OAuth 1.0a. 5 keyword rules: `fractional_cto`, `need_cto`, `ai_engineer_hiring`, `crm_pain`, `ai_founder`. Auto-like + auto-follow prospects. |
+| Stream retry loop | `dragontrade-agent/index.js` | ✅ 5-attempt retry with 90s delay — handles X "subscription provisioning" delay on first connect |
+| Engagement bot | `dragontrade-agent/engagement-bot.js` | ✅ Runs every 45min — max 2 replies + 3 follows per run. State in `engagement_state.json`. |
+| Elena's correct Twitter user ID | All files | ✅ `1563632998863577092` — confirmed via `client.v2.me()`. Was incorrectly `30551469` in prior versions. |
+
+**Credentials location:** `TWITTER_API_KEY/SECRET/ACCESS_TOKEN/SECRET/BEARER_TOKEN` in **both** `/home/ubuntu/dragontrade-agent/.env` AND `/home/ubuntu/cto-aipa/.env`.
+
+---
+
+### HubSpot Duplicate Posting Loop — Root Cause & Fix
+
+**Symptom:** Same tweet posted twice, ~6 minutes apart. HubSpot milestone items kept reappearing as "pending" on every `x-tech-updater.js` cycle.
+
+**Root causes (three compounding issues):**
+
+| # | Bug | Detail |
+|---|-----|--------|
+| 1 | **Field name mismatch** | JSON file used `"posted": true` (written by legacy path). GET `/api/x-updates` filtered on `"posted_x"` only → items with only `posted=true` passed the filter every cycle. |
+| 2 | **Timestamp field mismatch** | Mark endpoint matched on `repo + timestamp`. Old HubSpot items had no `timestamp` field — only `received_at`. Match always failed → `posted_x` never set → items stayed "pending" forever. |
+| 3 | **5 backlog items with no `posted_x`** | Already-posted items accumulated `posted: true` but never got `posted_x: true`. Backfill needed. |
+
+**Fixes applied — `VibeJobHunterAIPA_AIMCF/src/api/app.py`:**
+
+```python
+# GET /api/x-updates — now excludes BOTH fields
+pending = [u for u in updates if not u.get("posted_x", False) and not u.get("posted", False)]
+
+# POST /api/x-updates/mark — 3-tier matching
+for u in updates:
+    ts_match = (u.get("timestamp") == ts) or (u.get("received_at") == ts)
+    repo_match = u.get("repo") == repo or repo in u.get("repo", "")
+    already = u.get("posted_x") or u.get("posted")
+    if repo_match and ts_match and not already:
+        u["posted_x"] = True
+        u["posted_x_at"] = datetime.utcnow().isoformat() + "Z"
+        marked = True; break
+# Fallback: match by title if timestamp matching fails
+if not marked and body.get("title"):
+    for u in updates:
+        if u.get("title") == title and not u.get("posted_x") and not u.get("posted"):
+            u["posted_x"] = True; marked = True; break
+```
+
+**Fix in `x-tech-updater.js`** (both dragontrade-agent + VibeJobHunterAIPA_AIMCF copies): mark body now sends `title` field alongside `repo` and `timestamp`, enabling fallback matching.
+
+**Backfill:** 5 items in `pending_tech_updates.json` that had `posted: true` but no `posted_x` were manually set to `posted_x: true`.
+
+**Verified state after fix:**
+```json
+{"ok": true, "pending": [], "total": 0, "held": true}
+```
+All 4 HubSpot items: `posted_x=True AND posted=True`. Queue clean. Future milestone items (tasks/trello/voice features) will post cleanly — one per 5th-tweet cycle, no duplicates.
