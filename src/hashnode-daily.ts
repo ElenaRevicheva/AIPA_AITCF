@@ -40,6 +40,28 @@ export function hashnodeDailyIsDelisted(): boolean {
   return false;
 }
 
+/**
+ * True when Dev.to is the only publish target (Hashnode token absent or HASHNODE_DAILY_DEVTO_ONLY=true).
+ * In this mode runDailyHashnodePost routes to runDailyDevToPost — no Hashnode API call is made.
+ */
+export function hashnodeDailyDevToOnly(): boolean {
+  if (process.env.HASHNODE_DAILY_DEVTO_ONLY === "true") return true;
+  if (!process.env.HASHNODE_ACCESS_TOKEN?.trim()) return true;
+  return false;
+}
+
+/** Convert article title to URL-safe slug for aideazz.xyz/blog/{slug} canonical. */
+function titleToSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/-$/, "")
+    .slice(0, 100);
+}
+
 /** Best-effort: confirm the Hashnode URL responds (may 403 from datacenter IPs — ignore then). */
 async function verifyHashnodeUrlReachable(url: string): Promise<{ ok: boolean; status: number }> {
   try {
@@ -534,6 +556,124 @@ async function crossPostToDevTo(
   }
 }
 
+/**
+ * Dev.to-only publish path — used when Hashnode API is unavailable (paid wall) or
+ * HASHNODE_DAILY_DEVTO_ONLY=true.  Dev.to article canonical_url points to
+ * aideazz.xyz/blog/{slug} so aideazz gets the backlink credit and the blog page at
+ * that slug can fetch content from Dev.to (fetchEnglishFromDevto in blog-es-bundle.ts
+ * already matches dev.to slugs with numeric suffix against the clean title slug).
+ */
+export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: string; maxTokens: number }): Promise<{
+  title: string;
+  url: string;
+  slug: string;
+  aideazzBlogUrl: string;
+  topicIndex: number;
+  devtoUrl: string;
+  delisted: boolean;
+}> {
+  const apiKey = process.env.DEVTO_API_KEY?.trim();
+  if (!apiKey) {
+    throw new Error(
+      "DEVTO_API_KEY missing — required for Dev.to-only mode (HASHNODE_ACCESS_TOKEN is not set)"
+    );
+  }
+
+  const gscQueries = await fetchGscTopQueries();
+  const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries);
+
+  const baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
+
+Topic brief:
+${brief}
+
+Write the article for developers and technical founders. Ground in AIdeazz reality: multi-agent systems, Oracle infra, Groq/Claude routing, Telegram/WhatsApp agents, real constraints.`;
+
+  console.log(`📰 Dev.to direct: generating topic #${index} (${keyword})…`);
+
+  const MAX_GENERATION_ATTEMPTS = 3;
+  let parsed: ReturnType<typeof parseArticle> | null = null;
+  let lastValidationError = "";
+
+  for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
+    const forbiddenNote = lastValidationError
+      ? `\n\nCRITICAL: The previous attempt failed quality gate — ${lastValidationError}. Do NOT use that phrase anywhere in the article.`
+      : "";
+    const userPrompt = baseUserPrompt + forbiddenNote;
+
+    if (attempt > 1) {
+      console.log(`📰 Dev.to direct: retry ${attempt}/${MAX_GENERATION_ATTEMPTS} (quality gate: ${lastValidationError})`);
+    }
+
+    const resp = await deps.anthropic.messages.create({
+      model: deps.model,
+      max_tokens: deps.maxTokens,
+      system: ARTICLE_SYSTEM,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+    const block = resp.content[0];
+    const rawText = block && block.type === "text" ? block.text : "";
+    if (!rawText) throw new Error("Empty model response");
+
+    parsed = parseArticle(rawText);
+    if (!parsed) throw new Error("Could not parse TITLE/MARKDOWN from model output");
+
+    const v = validateArticle(parsed.markdown);
+    if (v.ok) break;
+
+    lastValidationError = v.reason;
+    if (attempt === MAX_GENERATION_ATTEMPTS) {
+      throw new Error(`Quality gate: ${v.reason} (failed after ${MAX_GENERATION_ATTEMPTS} attempts)`);
+    }
+  }
+
+  if (!parsed) throw new Error("Article generation produced no output");
+
+  const slug = titleToSlug(parsed.title);
+  const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${slug}`;
+
+  // Dev.to canonical points to aideazz.xyz/blog/{slug} — backlink credit to aideazz
+  const devtoUrl = await crossPostToDevTo(parsed.title, parsed.markdown, aideazzBlogUrl);
+  if (!devtoUrl) {
+    throw new Error("Dev.to publishing failed — check DEVTO_API_KEY and rate limits");
+  }
+
+  writeTopicIndex(index);
+  await saveContentLog({
+    channel: "devto_direct",
+    keyword,
+    title: parsed.title,
+    url: aideazzBlogUrl,
+    status: "published",
+    topicIndex: index,
+  });
+
+  const lines = [
+    "🏗 Hashnode unavailable (API paid wall) — dev.to only today.",
+    "",
+    parsed.title,
+    "",
+    "1) aideazz /blog (canonical — aideazz.xyz gets backlink credit):",
+    aideazzBlogUrl,
+    "",
+    "2) Dev.to (cross-post with canonical link back to aideazz):",
+    devtoUrl,
+    "",
+    "ℹ️ Set HASHNODE_ACCESS_TOKEN to re-enable Hashnode. Set HASHNODE_DAILY_DEVTO_ONLY=false to force Hashnode mode.",
+  ];
+  await notifyTelegramHashnodePublished(parsed.title, lines.join("\n"));
+
+  return {
+    title: parsed.title,
+    url: aideazzBlogUrl,
+    slug,
+    aideazzBlogUrl,
+    topicIndex: index,
+    devtoUrl,
+    delisted: false,
+  };
+}
+
 export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: string; maxTokens: number }): Promise<{
   title: string;
   url: string;
@@ -543,6 +683,11 @@ export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: 
   devtoUrl?: string | undefined;
   delisted: boolean;
 }> {
+  // Route to Dev.to-only path when Hashnode token is absent or explicitly disabled
+  if (hashnodeDailyDevToOnly()) {
+    return runDailyDevToPost(deps);
+  }
+
   const token = process.env.HASHNODE_ACCESS_TOKEN?.trim();
   if (!token) throw new Error("HASHNODE_ACCESS_TOKEN missing");
 
@@ -746,8 +891,24 @@ export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model:
     },
     { timezone: tz }
   );
-  console.log(
-    `📰 Hashnode daily: scheduled ${cronExpr} (${tz}) — listed (aideazz sync): ${hashnodeDailyIsDelisted() ? "no (DELISTED)" : "yes"}`
-  );
+  const mode = hashnodeDailyDevToOnly()
+    ? "Dev.to-only (HASHNODE_ACCESS_TOKEN absent or HASHNODE_DAILY_DEVTO_ONLY=true)"
+    : `Hashnode + Dev.to cross-post — listed: ${hashnodeDailyIsDelisted() ? "no (DELISTED)" : "yes"}`;
+  console.log(`📰 Hashnode daily: scheduled ${cronExpr} (${tz}) — mode: ${mode}`);
+
+  // Fire once immediately on startup when HASHNODE_DAILY_RUN_ON_START=true.
+  // Useful after deploys to publish without waiting for the next cron window.
+  if (process.env.HASHNODE_DAILY_RUN_ON_START === "true") {
+    console.log("📰 Hashnode daily: HASHNODE_DAILY_RUN_ON_START=true — firing in 10s…");
+    setTimeout(async () => {
+      console.log("📰 Hashnode daily: startup run starting…");
+      try {
+        await runDailyHashnodePost(deps);
+      } catch (e) {
+        console.error("📰 Hashnode daily (startup run) error:", e);
+      }
+    }, 10_000);
+  }
+
   return job;
 }

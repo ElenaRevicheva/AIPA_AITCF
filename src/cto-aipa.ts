@@ -14,6 +14,7 @@ import {
   getOutreachStats,
   getOutreachDrafts,
   markOutreachReply,
+  getRecentContentLogs,
 } from './database';
 import { initTelegramBot, sendTelegramBroadcast } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
@@ -1001,6 +1002,52 @@ async function startCTOAIPA() {
     }
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.json(meta);
+  });
+
+  // ==========================================================================
+  // BLOG — Published posts list (aideazz.xyz/blog + portfolio + sitemap)
+  // Reads from Oracle content_log (hashnode_daily + devto_direct channels).
+  // aideazz frontend calls this instead of Hashnode public GraphQL when
+  // HASHNODE_ACCESS_TOKEN is absent (Dev.to-only mode).
+  // ==========================================================================
+
+  app.options('/blog/posts', (_req: Request, res: Response) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).end();
+  });
+
+  app.get('/blog/posts', async (_req: Request, res: Response) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const limit = 50;
+      const logs = await getRecentContentLogs(limit);
+      const posts = logs
+        .map((log) => {
+          const url = log.url || '';
+          // Extract blog slug from aideazz.xyz/blog/{slug} (devto_direct) or hashnode URL
+          const aideazzMatch = url.match(/aideazz\.xyz\/blog\/([^/?#]+)/);
+          const hashnodeMatch = url.match(/hashnode\.dev\/([^/?#]+)/);
+          const slug = (aideazzMatch?.[1] || hashnodeMatch?.[1] || '').trim();
+          if (!slug) return null;
+          return {
+            title: log.title,
+            slug,
+            url,
+            publishedAt: log.created_at,
+            source: (log.channel === 'devto_direct' ? 'devto' : 'hashnode') as 'devto' | 'hashnode',
+            keyword: log.keyword ?? null,
+          };
+        })
+        .filter(Boolean);
+      res.setHeader('Cache-Control', 'public, max-age=300');
+      res.json({ posts, count: posts.length });
+    } catch (e) {
+      console.error('GET /blog/posts:', e);
+      const msg = e instanceof Error ? e.message : String(e);
+      res.status(500).json({ error: msg });
+    }
   });
 
   // ==========================================================================
