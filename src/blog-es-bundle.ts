@@ -145,8 +145,18 @@ async function fetchEnglishFromDevto(blogSlug: string): Promise<EnglishSource | 
   }
 }
 
+function readLocalBlogPost(slug: string): EnglishSource | null {
+  try {
+    const cacheFile = path.join(process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data"), "blog-posts-cache.json");
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, { title: string; markdown: string; devtoUrl: string; aideazzBlogUrl: string }>;
+    const entry = cache[slug];
+    if (!entry?.markdown) return null;
+    return { title: entry.title, brief: null, markdown: entry.markdown, url: entry.devtoUrl, source: "devto" };
+  } catch { return null; }
+}
+
 async function fetchEnglishPost(slug: string): Promise<EnglishSource | null> {
-  return fetchEnglishFromDevto(slug);
+  return readLocalBlogPost(slug) ?? fetchEnglishFromDevto(slug);
 }
 
 /** Serialize translation jobs so we do not run many Claude calls at once. */

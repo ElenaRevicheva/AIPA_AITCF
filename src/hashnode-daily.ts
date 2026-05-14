@@ -336,6 +336,19 @@ function writeTopicIndex(i: number): void {
   fs.writeFileSync(statePath(), JSON.stringify({ lastIndex: i, updatedAt: new Date().toISOString() }, null, 2), "utf8");
 }
 
+/** Write published post to data/blog-posts-cache.json so blog-es-bundle can serve it without hitting dev.to's paginated API. */
+export function saveBlogPostCache(entry: { slug: string; title: string; markdown: string; devtoUrl: string; aideazzBlogUrl: string }): void {
+  const cacheFile = path.join(process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data"), "blog-posts-cache.json");
+  let cache: Record<string, typeof entry & { publishedAt: string }> = {};
+  try { cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")); } catch { /* first run */ }
+  cache[entry.slug] = { ...entry, publishedAt: new Date().toISOString() };
+  fs.writeFileSync(cacheFile, JSON.stringify(cache, null, 2), "utf8");
+}
+
+export function getBlogPostCachePath(): string {
+  return path.join(process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data"), "blog-posts-cache.json");
+}
+
 function pickNextTopic(): { index: number; keyword: string; brief: string } {
   const n = HASHNODE_TOPIC_BRIEFS.length;
   const prev = readTopicIndex();
@@ -639,6 +652,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   }
 
   writeTopicIndex(index);
+  saveBlogPostCache({ slug, title: parsed.title, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
   await saveContentLog({
     channel: "devto_direct",
     keyword,
