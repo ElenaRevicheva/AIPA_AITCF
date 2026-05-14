@@ -1909,7 +1909,14 @@ async function startCTOAIPA() {
       const { createHiringPipeline } = await import('./hubspot-client');
       const result = await createHiringPipeline();
       if (!result) {
-        res.status(500).json({ error: 'Failed to create Hiring Pipeline — check HUBSPOT_API_KEY' });
+        res.status(422).json({
+          error: 'HubSpot Private App token lacks crm.schemas.deals.write scope — create pipeline manually',
+          manualSteps: [
+            '1. HubSpot → Settings → Objects → Deals → Pipelines → Add pipeline',
+            '2. Name: "Hiring Pipeline", add stages: Applied / Recruiter Responded / Interview Scheduled / Offer Received / Accepted / Declined',
+            '3. Save, then call GET /api/crm-pipeline/ids to extract IDs automatically',
+          ],
+        });
         return;
       }
       res.json({
@@ -1921,6 +1928,43 @@ async function startCTOAIPA() {
       });
     } catch (e: unknown) {
       console.error('[crm-pipeline/setup] error:', e);
+      res.status(500).json({ error: String((e as Error)?.message || e) });
+    }
+  });
+
+  // GET /api/crm-pipeline/ids  — reads existing pipelines from HubSpot and returns env var format
+  // After creating "Hiring Pipeline" manually in HubSpot UI, call this to get the IDs.
+  app.get('/api/crm-pipeline/ids', outreachAuth, async (_req: Request, res: Response) => {
+    try {
+      const key = process.env.HUBSPOT_API_KEY || '';
+      if (!key) { res.status(500).json({ error: 'HUBSPOT_API_KEY not set' }); return; }
+      const r = await fetch('https://api.hubapi.com/crm/v3/pipelines/deals', {
+        headers: { Authorization: `Bearer ${key}` },
+      });
+      if (!r.ok) { res.status(502).json({ error: `HubSpot ${r.status}` }); return; }
+      const d = await r.json() as { results: { id: string; label: string; stages: { id: string; label: string }[] }[] };
+      const hiring = d.results.find(p => p.label.toLowerCase().includes('hiring'));
+      if (!hiring) {
+        res.status(404).json({
+          error: 'No "Hiring Pipeline" found in HubSpot',
+          existingPipelines: d.results.map(p => p.label),
+          instructions: 'Create it in HubSpot → Settings → Objects → Deals → Pipelines',
+        });
+        return;
+      }
+      const stageLabels = ['applied','recruiter_responded','interview_scheduled','offer_received','accepted','declined'];
+      const stageMap = Object.fromEntries(hiring.stages.map((s, i) => [stageLabels[i] ?? `stage_${i}`, s.id]));
+      const envVars = [
+        `HUBSPOT_HIRING_PIPELINE_ID=${hiring.id}`,
+        `HUBSPOT_HIRING_STAGE_APPLIED=${stageMap.applied ?? ''}`,
+        `HUBSPOT_HIRING_STAGE_RECRUITER_RESPONDED=${stageMap.recruiter_responded ?? ''}`,
+        `HUBSPOT_HIRING_STAGE_INTERVIEW_SCHEDULED=${stageMap.interview_scheduled ?? ''}`,
+        `HUBSPOT_HIRING_STAGE_OFFER_RECEIVED=${stageMap.offer_received ?? ''}`,
+        `HUBSPOT_HIRING_STAGE_ACCEPTED=${stageMap.accepted ?? ''}`,
+        `HUBSPOT_HIRING_STAGE_DECLINED=${stageMap.declined ?? ''}`,
+      ].join('\n');
+      res.json({ ok: true, pipelineId: hiring.id, stageIds: stageMap, envVars });
+    } catch (e: unknown) {
       res.status(500).json({ error: String((e as Error)?.message || e) });
     }
   });

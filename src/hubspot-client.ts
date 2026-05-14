@@ -497,13 +497,13 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
     console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping hiring push');
     return null;
   }
-  const pipelineId = HS_HIRING_PIPELINE_ID();
+  // Fall back to default Sales Pipeline if Hiring Pipeline not yet created in HubSpot UI
+  const pipelineId = HS_HIRING_PIPELINE_ID() || 'default';
   const stage = input.stage ?? 'applied';
-  const stageId = HS_HIRING_STAGE_IDS[stage]();
-  if (!pipelineId || !stageId) {
-    console.warn('[HubSpot] Hiring Pipeline not configured — run /api/crm-pipeline/setup first');
-    return null;
-  }
+  const rawStageId = HS_HIRING_STAGE_IDS[stage]();
+  // If custom stage not configured, use Sales Pipeline's "Appointment Scheduled" as proxy for Applied
+  const stageId = rawStageId || 'appointmentscheduled';
+  console.log(`[HubSpot] Hiring deal → pipeline=${pipelineId} stage=${stageId} (custom=${!!HS_HIRING_PIPELINE_ID()})`);
 
   try {
     const contactId = input.recruiterEmail || input.recruiterName
