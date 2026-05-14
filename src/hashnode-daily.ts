@@ -204,7 +204,7 @@ async function notifyTelegramHashnodeFailure(message: string): Promise<void> {
   }
 }
 
-/** Rotating briefs — aligned with marketing roadmap; one per calendar day when enabled. */
+/** Rotating briefs — 20 topics so the 10-day cycle never repeats before a full month. */
 export const HASHNODE_TOPIC_BRIEFS: Array<{ keyword: string; brief: string }> = [
   {
     keyword: "multi-agent AI system",
@@ -255,6 +255,56 @@ export const HASHNODE_TOPIC_BRIEFS: Array<{ keyword: string; brief: string }> = 
     keyword: "autonomous job search AI",
     brief:
       "Autonomous job search at scale: discovery, scoring, ATS reality, and ethics boundaries — what 'automation' means when outcomes affect people.",
+  },
+  {
+    keyword: "HubSpot CRM automation AI",
+    brief:
+      "Wiring AI agents to CRM: how a 10-agent ecosystem feeds HubSpot automatically — dedup, pipeline routing, and what breaks when you skip dedup.",
+  },
+  {
+    keyword: "fractional CTO AI startup",
+    brief:
+      "What a fractional CTO actually does for an early-stage AI startup: architecture decisions, vendor lock-in prevention, and when to hire full-time.",
+  },
+  {
+    keyword: "LangGraph stateful agents",
+    brief:
+      "LangGraph in production: stateful multi-step pipelines, checkpointing, and the failure modes nobody mentions in tutorials.",
+  },
+  {
+    keyword: "pgvector RAG production",
+    brief:
+      "pgvector + Oracle Autonomous DB as a production RAG store: embedding choice, index tuning, and real retrieval quality vs. benchmark quality.",
+  },
+  {
+    keyword: "AI lead generation B2B",
+    brief:
+      "Automating B2B lead discovery with AI agents: what signals actually predict intent, why most scrapers fail, and building a pipeline that feeds CRM without manual work.",
+  },
+  {
+    keyword: "web scraping AI enrichment",
+    brief:
+      "Using BrightData / proxy infrastructure for AI-grade web enrichment: bypassing bot detection, structuring unstructured pages, and when scraping is the right call.",
+  },
+  {
+    keyword: "AI content publishing pipeline",
+    brief:
+      "End-to-end AI content pipeline: GSC gap analysis → Claude article → Dev.to → aideazz.xyz blog — dedup, canonical URLs, and what a 'publish' actually means for GEO.",
+  },
+  {
+    keyword: "Telegram bot AI agent",
+    brief:
+      "Telegram as an AI agent control plane: commands, inline keyboards, broadcast, and why messaging beats dashboards for solo operators.",
+  },
+  {
+    keyword: "AI hiring pipeline automation",
+    brief:
+      "Automating the job application pipeline with AI: scoring, ATS quirks, auto-apply ethics, and what still requires a human in the loop.",
+  },
+  {
+    keyword: "startup AI infrastructure cost",
+    brief:
+      "Real infra costs for an AI startup running 10 agents: Oracle Always Free, Railway, Vercel, Resend, Groq — and where the hidden costs actually hide.",
   },
 ];
 
@@ -349,6 +399,18 @@ export function getBlogPostCachePath(): string {
   return path.join(process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data"), "blog-posts-cache.json");
 }
 
+/** Returns true if this slug already exists in the local cache (= canonical URL collision risk). */
+function slugAlreadyPublished(slug: string): boolean {
+  try {
+    const cacheFile = getBlogPostCachePath();
+    if (!fs.existsSync(cacheFile)) return false;
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, unknown>;
+    return Object.prototype.hasOwnProperty.call(cache, slug);
+  } catch {
+    return false;
+  }
+}
+
 function pickNextTopic(): { index: number; keyword: string; brief: string } {
   const n = HASHNODE_TOPIC_BRIEFS.length;
   const prev = readTopicIndex();
@@ -385,6 +447,13 @@ function validateArticle(markdown: string): { ok: true } | { ok: false; reason: 
   if (h2 < 3) {
     return { ok: false, reason: `Need at least 3 ## sections; found ${h2}.` };
   }
+  if (!/^## Frequently Asked Questions/m.test(markdown)) {
+    return { ok: false, reason: 'Missing ## Frequently Asked Questions section (required for GEO).' };
+  }
+  const faqQs = (markdown.match(/^\*\*Q:/gm) || []).length;
+  if (faqQs < 3) {
+    return { ok: false, reason: `FAQ section needs ≥3 Q&A pairs; found ${faqQs}.` };
+  }
   for (const re of BANNED_PHRASES) {
     if (re.test(markdown)) {
       return { ok: false, reason: `Banned generic phrase matched: ${re}` };
@@ -420,6 +489,18 @@ Hard rules:
 - Minimum depth: concrete tradeoffs, failure modes, costs, or operational reality — not a listicle of obvious tips.
 - Use Markdown: start with ## sections (not H1). Include at least four ## headings after an intro paragraph.
 - Target length: 1,400–2,400 words of body (excluding title).
+- Before the byline, add a section exactly like this (3–5 pairs, questions a practitioner would actually ask):
+
+## Frequently Asked Questions
+
+**Q: [specific question about the topic]**
+A: [direct, factual answer — 2-4 sentences]
+
+**Q: [another question]**
+A: [answer]
+
+(continue for 3–5 total Q&A pairs)
+
 - End with a short byline line: "— Elena Revicheva · [AIdeazz](https://aideazz.xyz) · [Portfolio](https://aideazz.xyz/portfolio)"
 - Output EXACTLY in this envelope (XML tags, no text outside):
 
@@ -642,17 +723,27 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   if (!parsed) throw new Error("Article generation produced no output");
 
-  const slug = titleToSlug(parsed.title);
+  // Guard against canonical URL collision: if this slug is already in the cache,
+  // append the current date so Dev.to gets a unique canonical and the new article
+  // doesn't collide with the April post that caused the 422 issue.
+  let finalTitle = parsed.title;
+  let slug = titleToSlug(finalTitle);
+  if (slugAlreadyPublished(slug)) {
+    const dateTag = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    finalTitle = `${parsed.title} (${dateTag})`;
+    slug = titleToSlug(finalTitle);
+    console.log(`📰 Slug collision detected — using disambiguated title: "${finalTitle}"`);
+  }
   const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${slug}`;
 
   // Dev.to canonical points to aideazz.xyz/blog/{slug} — backlink credit to aideazz
-  const devtoUrl = await crossPostToDevTo(parsed.title, parsed.markdown, aideazzBlogUrl);
+  const devtoUrl = await crossPostToDevTo(finalTitle, parsed.markdown, aideazzBlogUrl);
   if (!devtoUrl) {
     throw new Error("Dev.to publishing failed — check DEVTO_API_KEY and rate limits");
   }
 
   writeTopicIndex(index);
-  saveBlogPostCache({ slug, title: parsed.title, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
+  saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
   await saveContentLog({
     channel: "devto_direct",
     keyword,
@@ -673,10 +764,10 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     "2) Dev.to (cross-post):",
     devtoUrl,
   ];
-  await notifyTelegramHashnodePublished(parsed.title, lines.join("\n"));
+  await notifyTelegramHashnodePublished(finalTitle, lines.join("\n"));
 
   return {
-    title: parsed.title,
+    title: finalTitle,
     url: aideazzBlogUrl,
     slug,
     aideazzBlogUrl,
