@@ -649,17 +649,15 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   });
 
   const lines = [
-    "🏗 Hashnode unavailable (API paid wall) — dev.to only today.",
+    "📰 Article published.",
     "",
     parsed.title,
     "",
-    "1) aideazz /blog (canonical — aideazz.xyz gets backlink credit):",
+    "1) aideazz /blog (canonical):",
     aideazzBlogUrl,
     "",
-    "2) Dev.to (cross-post with canonical link back to aideazz):",
+    "2) Dev.to (cross-post):",
     devtoUrl,
-    "",
-    "ℹ️ Set HASHNODE_ACCESS_TOKEN to re-enable Hashnode. Set HASHNODE_DAILY_DEVTO_ONLY=false to force Hashnode mode.",
   ];
   await notifyTelegramHashnodePublished(parsed.title, lines.join("\n"));
 
@@ -683,193 +681,7 @@ export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: 
   devtoUrl?: string | undefined;
   delisted: boolean;
 }> {
-  // Route to Dev.to-only path when Hashnode token is absent or explicitly disabled
-  if (hashnodeDailyDevToOnly()) {
-    return runDailyDevToPost(deps);
-  }
-
-  const token = process.env.HASHNODE_ACCESS_TOKEN?.trim();
-  if (!token) throw new Error("HASHNODE_ACCESS_TOKEN missing");
-
-  // Pull GSC queries (best-effort) and let Claude pick the gap topic
-  const gscQueries = await fetchGscTopQueries();
-  const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries);
-
-  const baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
-
-Topic brief:
-${brief}
-
-Write the article for developers and technical founders. Ground in AIdeazz reality: multi-agent systems, Oracle infra, Groq/Claude routing, Telegram/WhatsApp agents, real constraints.`;
-
-  console.log(`📰 Hashnode daily: generating topic #${index} (${keyword})…`);
-
-  const MAX_GENERATION_ATTEMPTS = 3;
-  let parsed: ReturnType<typeof parseArticle> | null = null;
-  let lastValidationError = "";
-
-  for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
-    const forbiddenNote = lastValidationError
-      ? `\n\nCRITICAL: The previous attempt failed quality gate — ${lastValidationError}. Do NOT use that phrase anywhere in the article.`
-      : "";
-    const userPrompt = baseUserPrompt + forbiddenNote;
-
-    if (attempt > 1) console.log(`📰 Hashnode daily: retry attempt ${attempt}/${MAX_GENERATION_ATTEMPTS} (quality gate failure: ${lastValidationError})`);
-
-    const resp = await deps.anthropic.messages.create({
-      model: deps.model,
-      max_tokens: deps.maxTokens,
-      system: ARTICLE_SYSTEM,
-      messages: [{ role: "user", content: userPrompt }],
-    });
-    const block = resp.content[0];
-    const rawText = block && block.type === "text" ? block.text : "";
-    if (!rawText) throw new Error("Empty model response");
-
-    parsed = parseArticle(rawText);
-    if (!parsed) {
-      throw new Error("Could not parse TITLE/MARKDOWN from model output");
-    }
-
-    const v = validateArticle(parsed.markdown);
-    if (v.ok) break;
-
-    lastValidationError = v.reason;
-    if (attempt === MAX_GENERATION_ATTEMPTS) {
-      throw new Error(`Quality gate: ${v.reason} (failed after ${MAX_GENERATION_ATTEMPTS} attempts)`);
-    }
-  }
-
-  if (!parsed) throw new Error("Article generation produced no output");
-
-  const publicationId = await resolvePublicationId(token);
-  const delisted = hashnodeDailyIsDelisted();
-  const input = {
-    publicationId,
-    title: parsed.title.slice(0, 200),
-    contentMarkdown: parsed.markdown,
-    tags: [
-      { slug: "ai", name: "AI" },
-      { slug: "programming", name: "Programming" },
-      { slug: "machine-learning", name: "Machine Learning" },
-    ],
-    settings: {
-      delisted,
-      enableTableOfContent: true,
-      isNewsletterActivated: false,
-    },
-  };
-
-  const out = await gql<{ publishPost: { post: { title: string; url: string; slug: string } } }>(
-    PUBLISH_MUTATION,
-    { input },
-    token
-  );
-  const post = out.publishPost?.post;
-  if (!post?.url) throw new Error("publishPost returned no URL");
-
-  const slug = post.slug?.trim() || "";
-  if (!slug) {
-    const err = "Hashnode returned no post slug; cannot verify public feed (aideazz /blog).";
-    await notifyTelegramHashnodeFailure(`${err}\n${post.url}`);
-    throw new Error(err);
-  }
-
-  console.log(`📰 Hashnode publishPost OK: ${post.url} (${delisted ? "delisted" : "listed"}) — verifying public API (aideazz uses same)…`);
-
-  if (!delisted) {
-    const inFeed = await waitForPostInPublicHashnodeFeed(
-      slug,
-      Number(process.env.HASHNODE_FEED_WAIT_ATTEMPTS || "15"),
-      Number(process.env.HASHNODE_FEED_WAIT_MS || "4000")
-    );
-    if (!inFeed) {
-      const err =
-        "Post not visible in public Hashnode GraphQL after repeated checks — aideazz /blog and sitemap will NOT list it. " +
-        `Confirm HASHNODE_HOST=${HASHNODE_PUBLIC_HOST} matches the publication, publicationId is correct, and HASHNODE_DAILY_DELISTED is not true.`;
-      await notifyTelegramHashnodeFailure(`${err}\nSlug: ${slug}\n${post.url}`);
-      throw new Error(err);
-    }
-  } else {
-    console.warn(
-      "📰 HASHNODE_DAILY_DELISTED: post is not in public GQL — aideazz /blog will not list it. Remove delist for full pipeline."
-    );
-  }
-
-  const reach = await verifyUrlReachableWithRetries(post.url, {
-    maxAttempts: 6,
-    delayMs: 3000,
-  });
-  if (!reach.ok && reach.status === 404) {
-    console.warn(
-      "📰 Direct URL check: HTTP 404 (browser/server); public GQL already passed for aideazz — optional to verify in browser."
-    );
-  } else if (!reach.ok && reach.status && reach.status !== 403) {
-    console.warn(
-      `📰 Direct URL: HTTP ${reach.status} (datacenter or bot filter); portfolio uses GQL, not this fetch.`
-    );
-  }
-
-  // Cross-post to Dev.to only after listed posts are confirmed in the same public API as aideazz
-  const devtoUrl = await crossPostToDevTo(post.title, parsed.markdown, post.url);
-  if (!devtoUrl && process.env.DEVTO_API_KEY?.trim()) {
-    console.warn("📰 Dev.to API returned no URL (check key / rate); Hashnode + aideazz are still OK.");
-  }
-
-  writeTopicIndex(index);
-  await saveContentLog({
-    channel: "hashnode_daily",
-    keyword,
-    title: post.title,
-    url: post.url,
-    status: "published",
-    topicIndex: index,
-  });
-
-  const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${encodeURIComponent(slug)}`;
-  /** Same page with Spanish UI + localized titles/bodies where bundled (`?lng=es`). */
-  const aideazzSpanishUiUrl = `${aideazzBlogUrl}?lng=es`;
-  const gqOk = !delisted;
-  const lines = [
-    gqOk
-      ? "📰 OK — English article live on all three surfaces below (API URLs, not placeholders)."
-      : "📰 Hashnode published (delisted — not in public GQL; aideazz /blog will not list).",
-    "",
-    post.title,
-    "",
-    "1) Hashnode (canonical, English):",
-    post.url,
-    "",
-    "2) aideazz /blog (mirrors Hashnode; add ?lng=es for Spanish chrome + overrides):",
-    aideazzSpanishUiUrl,
-    "",
-    devtoUrl
-      ? "3) Dev.to (cross-post, English):"
-      : process.env.DEVTO_API_KEY?.trim()
-        ? "3) Dev.to: (cross-post failed — check logs / DEVTO_API_KEY)"
-        : "3) Dev.to: (skipped — DEVTO_API_KEY not set)",
-  ];
-  if (devtoUrl) lines.push(devtoUrl);
-  if (delisted) {
-    lines.push("");
-    lines.push("⚠️ Delisted: set HASHNODE_DAILY_DELISTED=false (and HASHNODE_DAILY_PUBLIC=true) for portfolio + feed sync.");
-  }
-  if (!devtoUrl && process.env.DEVTO_API_KEY?.trim()) {
-    lines.push("");
-    lines.push("⚠️ Dev.to cross-post failed or skipped — see PM2 logs.");
-  }
-  const telegramMsg = lines.join("\n");
-  await notifyTelegramHashnodePublished(post.title, telegramMsg);
-
-  return {
-    title: post.title,
-    url: post.url,
-    aideazzBlogUrl,
-    topicIndex: index,
-    delisted,
-    ...(slug ? { slug } : {}),
-    ...(devtoUrl ? { devtoUrl } : {}),
-  };
+  return runDailyDevToPost(deps);
 }
 
 export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model: string; maxTokens: number }): cron.ScheduledTask | null {
