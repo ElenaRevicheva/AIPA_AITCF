@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -13,7 +13,7 @@ This file is organized around **six phases**. Everything else (AutoSEO critique,
 | Phase | Name | What it is (one line) | Status (Apr 2026) |
 |------:|------|----------------------|-------------------|
 | **1** | Foundation (GEO + SEO health) | Google and AI assistants can **find** and **trust** your site — structured data, sitemap, GSC, analytics. | **Complete** |
-| **2** | Content engine | Automated **long-form publishing** (Hashnode) + Oracle **`content_log`** — compound visibility. | **Complete** (Dev.to cross-post + GSC gap topic selection live) |
+| **2** | Content engine | Automated **long-form publishing** (dev.to primary) + Oracle **`blog-posts-cache.json`** + **`/blog/posts`** endpoint — compound visibility. Hashnode fully removed May 2026. | **Complete** (dev.to-only crosspost; Oracle local cache; Spanish translation pipeline live) |
 | **3** | Attribution | **UTM** + inquiry → Oracle **`business_leads`** — know which channel sent the lead. | **Complete** |
 | **4** | Outbound | **Cold email** (CTO AIPA “hire us” + VJH “hire me”) — Resend, Hunter, caps, honest **`outreach_log`**. | **Shipped & hardened** (warmup ramp live Apr 28; `/pending_leads` + `/add_email` unblock stuck leads; VJH gate bug fixed → applications now flowing) |
 | **5** | Lead triage | **AI classification** → **`lead_triage`** + dashboard + Telegram — respond to the right signal first. | **Operational** |
@@ -56,7 +56,15 @@ This block is for the **next engineer** (Claude Code, Cursor, human): **verifiab
 
 **Production signals (Phase 5 accomplishments):** `🎯 [triage-run] Starting (background=true)...` → per-lead **`[triage] Classifying lead…`** → **`🎯 [triage-run] Complete: N processed, M urgent`** in PM2 logs; Oracle **`lead_triage`** rows from **`business_leads`** + **`outreach_log`**; **`agent_outcomes`** records the **`triage_cycle`** run. **`GET /leads/triage-status`** exposes **`ready: true`** when **`ANTHROPIC_API_KEY`** is configured. **Optional deep check:** **`TRIAGE_FIRE_WAIT=1 npm run triage:fire`** returns one JSON payload with **`processed` / `urgent`** without tailing logs.
 
-**What we did *not* claim:** Atuona creative engine untouched; Hashnode daily unchanged in this handoff; no broad refactors.
+| **Hashnode fully removed — dev.to-only pipeline (May 2026)** | **AIPA_AITCF** `src/hashnode-daily.ts`, `src/blog-es-bundle.ts`, `src/cto-aipa.ts` + **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/pages/BlogPost.tsx`, `src/pages/BlogIndex.tsx`, `src/lib/devto-public.ts` | **Backend:** `runDailyHashnodePost` now delegates entirely to `runDailyDevToPost`. All Hashnode GraphQL calls removed from `fetchEnglishPost` in `blog-es-bundle.ts`. `readLocalBlogPost()` reads from `data/blog-posts-cache.json` first; dev.to API is fallback. **Frontend:** `BlogPost.tsx` — removed `fetchHashnodePostBySlug`; goes directly to `fetchDevtoPostByBlogSlug`. `BlogIndex.tsx` — removed `fetchHashnodePostList`; Oracle `/blog/posts` is primary, dev.to merge is additive. | Hashnode moved to paid wall — GQL returned HTML instead of JSON, causing `SyntaxError: Unexpected token '<'` on every es-bundle and blog page load. Removing Hashnode eliminated the entire failure class. |
+| **`blog-posts-cache.json` — local publish cache (May 2026)** | **AIPA_AITCF** `src/hashnode-daily.ts` `saveBlogPostCache()` + `src/cto-aipa.ts` `/blog/posts` endpoint | After each successful dev.to publish, `saveBlogPostCache()` writes `{slug, title, markdown, devtoUrl, aideazzBlogUrl, publishedAt}` to `data/blog-posts-cache.json`. **`GET /blog/posts`** reads that file as primary source; Oracle `content_log` is secondary/additive; deduplicates by slug; returns `{posts, count}`. | Oracle ADB pool was timing out silently on the `content_log` query — `/blog/posts` returned empty `{"posts":[],"count":0}`. Local file cache is always available, zero latency, no DB dependency. |
+| **Spanish translation pipeline (May 2026)** | **AIPA_AITCF** `src/blog-es-bundle.ts` + `src/cto-aipa.ts` endpoints | `GET /blog/es-bundle/:slug` — fetches English from local cache → Claude translation → JSON cached to `data/blog-es-cache/<slug>.json`. `GET /blog/es-meta/:slug` — lightweight title+brief for blog index. `BlogIndex.tsx` calls `/blog/es-meta/` for every post when `lang=es`; `BlogPost.tsx` calls `/blog/es-bundle/` on demand. Cache version `v=3`; stale entries auto-regenerate. | Frontend shows Spanish UI in real-time for all blog posts without any manual translation work. |
+| **Dev.to pagination fix (May 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/devto-public.ts` `fetchDevtoUserArticles()` | `per_page=100` returns CDN-cached 30-article response that misses newest articles. Fix: always fetch `per_page=9` (real-time, newest-first) in parallel with `per_page=100` bulk fetch; merge with recent-first dedup by `id`. | Without this, the newest blog post was invisible to the frontend even though it was successfully published to dev.to. |
+| **HubSpot CRM v4 integration live (May 9, 2026)** | **AIPA_AITCF** `src/hubspot-client.ts` | `pushLeadToHubSpot()` — upserts Contact (email, firstname, lastname, company, phone, linkedin), Company (domain), Deal (pipeline stage); links all three via CRM v4 associations. `hsPut<T>()` helper — v4 association endpoints require PUT not POST (POST returns 405). `getHubSpotStats()` — uses `/crm/v3/objects/contacts/search` (not list; list has no `total` field). Notes attached to contacts via `addNoteToContact()`. `upsertContact()` — removed `lead_source` property (field doesn't exist in HubSpot schema; was rejecting entire contact upsert). Telegram: `/hubspot` (live stats), `/fresh_leads` (HN + GitHub), `/fresh_leads all` (+ Product Hunt), `/hubspot sync` (backfill). Cron: Tue & Fri 7:00 AM Panama. | Three sources (HN "Who's Hiring", GitHub AI-tagged repos, Product Hunt AI launches) now push qualified leads automatically into HubSpot pipeline. Multi-source = ~200–330 new contacts/month without any manual work. |
+| **HubSpot duplicate loop fix (May 10, 2026)** | **VibeJobHunterAIPA_AIMCF** `src/api/app.py` + `src/x-milestone-poster` | `GET /api/x-updates` excluded items with `posted_x=False` but not `posted=False` → same tweet posted twice ~6 min apart. Fix: both fields now excluded. POST mark endpoint: 3-tier matching (timestamp + repo → title fallback). dragontrade-agent mark body now sends `title` field for fallback. 5 backlog items manually backfilled to `posted_x=True AND posted=True`. | Clean state verified: queue empty, all milestones marked, future milestones fire once per 5th-tweet cycle. |
+| **Algom Alpha X credits — recovery (May 14, 2026)** | **dragontrade-agent** PM2 `dragontrade-main` | `402 CreditsDepleted` (`account_id: 1910676161845186560`) blocked all tweet posting since ~May 12. Root cause: monthly X API Basic plan credits exhausted. After credits topped up: `pm2 restart dragontrade-main` clears in-memory `rateLimitTracker.isPaused` state. Stream reconnected at 19:25 UTC; first post fired at 19:28 UTC (`Posts: 1`). Normal cadence: every 3–10 min. | Separate issue: `dragontrade-binance` crashes permanently with HTTP 451 (Binance geo-restricts Oracle IP). `dragontrade-bybit` in same state. These processes need either a VPN/proxy layer or migration to a non-restricted IP. |
+
+**What we did *not* claim:** Atuona creative engine untouched; no broad refactors outside the modules listed above.
 
 ---
 
@@ -1015,6 +1023,143 @@ When a founder asks you "what does this actually do" — use these plain-languag
 
 ---
 
+## PHASE 5.5: HUBSPOT CRM — UNIFIED INTELLIGENCE LAYER
+
+<a id="phase-55-hubspot-crm"></a>
+
+### What's live (May 9–10, 2026)
+
+HubSpot CRM v4 is the **single destination** for every lead the system discovers. All writes go through `src/hubspot-client.ts` in AIPA_AITCF.
+
+**CRM account:** `aipa@aideazz.xyz` | **Tier:** Free (1M contacts, unlimited companies/deals) | **Auth:** `HUBSPOT_API_KEY=pat-na1-…` in Oracle `.env`
+
+#### Objects & fields
+
+| Object | Fields synced | How deduped |
+|--------|--------------|-------------|
+| **Contact** | `firstname`, `lastname`, `email`, `phone`, `company` (assoc.), notes (source context, pain points), `hs_lead_status` | Upsert by email — existing record updated, never duplicated |
+| **Company** | `name`, `website`, `industry`, domain-derived | Upsert by domain — pattern emails (`founder@domain.com`) create Company only, no Contact until email verified |
+| **Deal** | `dealname` (milestone title or lead source), `dealstage`, `amount` (estimated ARR from classification), `pipeline` | New deal per qualified lead; associated to contact + company |
+| **Note** | Free-text: source thread, tweet URL, job description excerpt, pain-point tag | Attached to Contact via `addNoteToContact()` |
+
+#### CRM v4 association fix
+
+CRM v4 association endpoints require **PUT**, not POST. Three association types wired:
+- `Contact ↔ Company` — `PUT /crm/v4/objects/contacts/{id}/associations/default/companies/{id}`
+- `Deal ↔ Contact` — same pattern
+- `Deal ↔ Company` — same pattern
+
+#### Multi-source fresh leads (automated, 2×/week)
+
+| Source | Method | Volume | Guard |
+|--------|--------|--------|-------|
+| **Hacker News "Who's Hiring"** | Algolia API — monthly thread parse | 150–250/month | Skip test/demo emails; skip pattern emails for Contact (Company still created) |
+| **GitHub repos** | Search `topic:ai-agent,llm,automation`; extract README emails | 20–30/run | Hunter.io format-verify before Contact push |
+| **Product Hunt AI launches** | GraphQL API; maker profiles | 30–50/run | `/fresh_leads all` only (default omits PH) |
+
+**Cron:** Tuesday & Friday, 07:00 AM Panama — auto-runs HN + GitHub; classifies pain points via Claude Haiku; qualified leads → HubSpot.
+
+#### Telegram ops commands
+
+```
+/fresh_leads          → Pull HN + GitHub now (default)
+/fresh_leads all      → HN + GitHub + Product Hunt
+/hubspot              → Live CRM stats (contacts · companies · deals)
+/hubspot sync         → Backfill all Oracle outreach_targets → HubSpot
+```
+
+#### Stats endpoint
+
+`getHubSpotStats()` uses **search** endpoint (`POST /crm/v3/objects/contacts/search`) with `limit=1` — only field that returns a real `total`. The list endpoint has no `total` field and was returning wrong counts.
+
+---
+
+## PHASE 5.6: MULTI-AGENT HUBSPOT INTEGRATION PLAN
+
+<a id="phase-56-multi-agent-hubspot"></a>
+
+### Objective
+
+Every agent in the 10-agent ecosystem that **touches a human signal** — a tweet, a LinkedIn comment, a WhatsApp message, a job posting, a voice note — should create or enrich a HubSpot record. Today only CTO AIPA writes to HubSpot. This phase wires all agents.
+
+### Architecture: CTO AIPA as CRM hub
+
+All agents `POST` to a single endpoint on CTO AIPA:
+
+```
+POST https://webhook.aideazz.xyz/cto/api/crm-event
+Authorization: Bearer <OUTREACH_SECRET>
+{
+  "source": "algom_alpha" | "vjh" | "cmo_linkedin" | "espaluz_whatsapp" | "espaluz_influencer" | "sprint",
+  "type": "prospect" | "milestone" | "engagement" | "application" | "inquiry",
+  "email": "...",          // optional — if known
+  "domain": "...",         // optional — for company-only records
+  "name": "...",           // optional
+  "context": "...",        // free text: tweet URL, job title, DM excerpt, voice note summary
+  "urgency": 1–5           // optional — passed to lead triage scorer
+}
+```
+
+CTO AIPA validates, deduplicates against Oracle `outreach_targets`, and writes to HubSpot. All events logged to new Oracle table `crm_event_log` (source, type, hubspot_contact_id, timestamp, status).
+
+### Per-agent integration plan
+
+| Agent | Signal detected | What to send to CRM hub | HubSpot result |
+|-------|----------------|--------------------------|----------------|
+| **CTO AIPA** *(live)* | HN/GitHub/PH leads, milestone commits | Already integrated directly | Contact + Company + Deal; milestone → Deal stage update |
+| **Algom Alpha** (`dragontrade-main`) | Filtered stream keyword match (`need_cto`, `ai_engineer_hiring`, `crm_pain`, `ai_founder`, `fractional_cto`) | `source=algom_alpha, type=prospect, context=tweet_url+tweet_text` | Contact tagged `source_algom_x`; Note with tweet text; Deal stage = "Social Prospect" |
+| **Algom Alpha** | Auto-follow-back fires on new follower | `source=algom_alpha, type=engagement, context=@handle followed` | Contact tagged `engaged_x_follow`; existing record enriched if email known |
+| **VJH** (`VibeJobHunterAIPA_AIMCF`) | Company posting AI/fractional-CTO/ML job | `source=vjh, type=prospect, domain=company.com, context=job_title+ATS_url` | Company record tagged `hiring_ai`; Deal = "Client Opportunity — Hiring AI" (they need what Elena sells) |
+| **VJH** | Employer responds to application | `source=vjh, type=engagement, context=recruiter_email+company` | Contact (recruiter) + Company; Deal stage advances to "Engaged" |
+| **CMO LinkedIn** | Tech update post goes live | `source=cmo_linkedin, type=milestone, context=post_url+milestone_title` | Note on existing Deals — post published, proof of activity |
+| **CMO LinkedIn** (future) | LinkedIn comment/like on Elena's post (via Make.com webhook) | `source=cmo_linkedin, type=engagement, email_or_name=commenter` | Contact tagged `engaged_linkedin`; warm lead enrichment |
+| **EspaLuz WhatsApp** | Business inquiry (non-student message with company context) | `source=espaluz_whatsapp, type=inquiry, context=message_summary` | Contact + Deal stage = "Inbound Inquiry" |
+| **EspaLuz Influencer** | Instagram DM from a founder/builder profile | `source=espaluz_instagram, type=engagement, context=ig_handle+message` | Contact tagged `source_instagram`; Note with message excerpt |
+| **Sprint Briefing** | Voice note mentions a company or prospect name (extracted by Whisper/Claude) | `source=sprint, type=task, context=voice_note_summary` | HubSpot Task created on matching Contact (or new Contact if unknown) |
+
+### CRM pipeline stages (unified across all agent sources)
+
+```
+Social Prospect   →  Engaged  →  Qualified  →  Proposal Sent  →  Closed Won
+                                    ↓
+                                 Lost / Nurture
+```
+
+- **Social Prospect:** Signal from Algom Alpha stream, Instagram DM, LinkedIn like — unverified human
+- **Engaged:** Replied to outreach, commented meaningfully, accepted connection request
+- **Qualified:** Company + use case confirmed; urgency ≥ 3 from triage scorer
+- **Proposal Sent:** Outreach email or LinkedIn DM with specific offer sent
+- **Closed Won / Lost:** Outcome recorded
+
+### Implementation sequence (what to build next)
+
+| Priority | Agent | Effort | What to build |
+|----------|-------|--------|---------------|
+| **1** | CTO AIPA — `/api/crm-event` endpoint | Low | Accept POSTs from other agents; validate + dedup + write to HubSpot; log to `crm_event_log` |
+| **2** | Algom Alpha — keyword stream → CRM | Medium | In `index.js` `startFilteredStream()`: on keyword match, `fetch('/api/crm-event', …)` with tweet context |
+| **3** | VJH — hiring companies → CRM | Medium | In LangGraph pipeline after job parse: POST company domain + job title to CRM hub |
+| **4** | CMO LinkedIn — Make.com → CRM | Medium | Add Make.com scenario: on LinkedIn post engagement → webhook → `/api/crm-event` |
+| **5** | Sprint Briefing — voice note extraction | High | Claude parses Whisper transcript for company/person names → CRM task |
+| **6** | EspaLuz WhatsApp — business inquiry detection | High | Classify WhatsApp messages: student vs. business inquiry → route business to CRM |
+
+### Environment additions needed
+
+```bash
+# In dragontrade-agent .env
+CTO_AIPA_CRM_URL=https://webhook.aideazz.xyz/cto/api/crm-event
+OUTREACH_SECRET=<shared_secret>
+
+# In VibeJobHunterAIPA_AIMCF .env
+CTO_AIPA_CRM_URL=https://webhook.aideazz.xyz/cto/api/crm-event
+OUTREACH_SECRET=<shared_secret>
+```
+
+### Expected outcome
+
+When fully wired: **every organic signal the system generates** — a tweet engagement, a job match, a LinkedIn comment, a WhatsApp inquiry, a voice note — lands in HubSpot within minutes, enriched with source context and triage score. Elena sees one unified pipeline, no manual data entry. The CRM becomes a live map of the entire business.
+
+---
+
 ## QUICK REFERENCE: PROMPT ORDER FOR CTO AIPA
 
 Execute in this order. Do not start Phase 2 until Phase 1 is complete.
@@ -1038,11 +1183,14 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: April 13, 2026 (v15.4 — Manny table: doc-ingest shipped; Places shipped; draft-queue deferred; `.env.example` Phase 4c–4d)
-> Aligned with: CAREER_FOCUS.md v4 (April 2026 — outreach operational), SKILL.md v1.3
-> Phase 1 status: COMPLETE (GEO + sitemap + GSC + OG + GA4); **canonical SPA fix** + **GEO v4 iron** (`geo-manifest`, `llms.txt`, expanded **`robots.txt`**, ItemList/WebPage JSON-LD) in **[aideazz](https://github.com/ElenaRevicheva/aideazz)** Apr 2026 — see [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026)
-> Phase 2 status: COMPLETE — Hashnode daily publisher live; Dev.to cross-post (DA 90+ backlink, `canonical_url` → Hashnode) live; GSC gap topic selection live (`GOOGLE_ANALYTICS_CREDENTIALS` JWT, no extra API key)
+> Document version: May 14, 2026 (v19.0) | Prior: April 28, 2026 (v18.0) | April 13, 2026 (v15.4)
+> Aligned with: CAREER_FOCUS.md v4, SKILL.md v1.3, ORACLE_ALL_PRODUCTS_RESILIENCE.md (May 2026)
+> Phase 1 status: COMPLETE — GEO v4 iron (`geo-manifest.json`, `llms.txt`, `/.well-known/llms.txt`, expanded `robots.txt`, ItemList/WebPage JSON-LD, `CITATION.cff`, `humans.txt`). Canonical SPA fix. GSC verified.
+> Phase 2 status: COMPLETE (updated May 2026) — **Hashnode fully removed**. dev.to is the sole crosspost target. `saveBlogPostCache()` writes slug+markdown+devtoUrl to `data/blog-posts-cache.json` after every publish. `/blog/posts` endpoint reads local cache first, Oracle `content_log` additive. Spanish translation pipeline: `/blog/es-bundle/:slug` + `/blog/es-meta/:slug` (Claude translate + disk cache v3). Dev.to pagination: always fetch `per_page=9` + `per_page=100` merged. Sitemap `generate-sitemap.mjs` — update: remove Hashnode slug fetch, use Oracle `/blog/posts` instead.
 > Phase 3 status: COMPLETE — UTM + inquiry + reCAPTCHA Enterprise
-> Phase 4 status: COMPLETE & VERIFIED — client sends via CTO AIPA (Resend+Oracle); employer sends via VJH only when email delivers; applications counted only on real ATS or email delivery
-> Phase 5 status: OPERATIONAL — **`lead_triage`** + **`agent_outcomes`**; **`/leads/dashboard`** unlock form; **`triage-run`** 202/ sync; **`TRIAGE_SKIP_GROQ`**; **`reviewCode`** Groq→Haiku (**`CODE_REVIEW_FALLBACK_MODEL`**)
+> Phase 4 status: COMPLETE & VERIFIED — client outreach via CTO AIPA (Resend + Oracle); employer outreach via VJH; warmup ramp live; `/pending_leads` + `/add_email` ops commands
+> Phase 5 status: OPERATIONAL — `lead_triage` + `agent_outcomes`; `/leads/dashboard`; `triage-run` 202/sync; `TRIAGE_SKIP_GROQ`; Groq→Haiku fallback
+> Phase 5.5 status: LIVE (May 9–10, 2026) — HubSpot CRM v4; contacts/companies/deals/notes; CRM v4 PUT associations; HN + GitHub + Product Hunt sources; Tue+Fri 7 AM Panama cron; `/hubspot`, `/fresh_leads`, `/fresh_leads all`, `/hubspot sync` Telegram commands
+> Phase 5.6 status: PLANNED — Multi-agent CRM hub: `/api/crm-event` endpoint + Algom Alpha stream → CRM + VJH hiring companies → CRM + CMO LinkedIn engagements → CRM + EspaLuz WhatsApp inquiries → CRM + Sprint voice note extraction → HubSpot tasks. See [§5.6](#phase-56-multi-agent-hubspot) for full plan.
+> Phase 6 status: NOT STARTED — highest priority for hiring + client acquisition showcase
 > Next: Phase 6 (showcase package); optional widen outreach sources; optional draft→approve before Hashnode publish
