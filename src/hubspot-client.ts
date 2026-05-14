@@ -454,7 +454,7 @@ export async function createHiringPipeline(): Promise<{
   const stageMap: Record<string, string> = {};
   const keyOrder: HiringStage[] = ['applied', 'recruiter_responded', 'interview_scheduled', 'offer_received', 'accepted', 'declined'];
   for (let i = 0; i < keyOrder.length; i++) {
-    stageMap[keyOrder[i]] = data.stages[i]?.id ?? '';
+    stageMap[keyOrder[i]!] = data.stages[i]?.id ?? '';
   }
 
   const envVars = [
