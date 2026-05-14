@@ -45,6 +45,8 @@ import { runDocIngestion } from './doc-ingest';
 import { runTriageCycle, buildDailyBrief, buildDashboardHtml, getPhase5TriageStatus } from './lead-triage';
 import { runSprintBriefing, deliverBriefingToTelegram } from './sprint-briefing/run';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as path from 'path';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { Octokit } from '@octokit/rest';
@@ -982,26 +984,39 @@ async function startCTOAIPA() {
   app.get('/blog/posts', async (_req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
-      const limit = 50;
-      const logs = await getRecentContentLogs(limit);
-      const posts = logs
-        .map((log) => {
+      // Primary source: local blog-posts-cache.json (written at publish time, always up to date)
+      const cacheFile = path.join(process.cwd(), 'data', 'blog-posts-cache.json');
+      type CacheEntry = { slug: string; title: string; aideazzBlogUrl: string; publishedAt: string; devtoUrl?: string };
+      let cacheEntries: CacheEntry[] = [];
+      try {
+        const raw = fs.readFileSync(cacheFile, 'utf8');
+        const obj = JSON.parse(raw) as Record<string, CacheEntry>;
+        cacheEntries = Object.values(obj).sort(
+          (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        );
+      } catch { /* cache missing — fall through to Oracle */ }
+
+      // Secondary source: Oracle content_log (may be unavailable)
+      const oraclePosts: typeof cacheEntries = [];
+      try {
+        const logs = await getRecentContentLogs(50);
+        for (const log of logs) {
           const url = log.url || '';
-          // Extract blog slug from aideazz.xyz/blog/{slug} (devto_direct) or hashnode URL
-          const aideazzMatch = url.match(/aideazz\.xyz\/blog\/([^/?#]+)/);
-          const hashnodeMatch = url.match(/hashnode\.dev\/([^/?#]+)/);
-          const slug = (aideazzMatch?.[1] || hashnodeMatch?.[1] || '').trim();
-          if (!slug) return null;
-          return {
-            title: log.title,
-            slug,
-            url,
-            publishedAt: log.created_at,
-            source: (log.channel === 'devto_direct' ? 'devto' : 'hashnode') as 'devto' | 'hashnode',
-            keyword: log.keyword ?? null,
-          };
-        })
-        .filter(Boolean);
+          const m = url.match(/aideazz\.xyz\/blog\/([^/?#]+)/);
+          const slug = m?.[1]?.trim();
+          if (!slug || cacheEntries.find(e => e.slug === slug)) continue; // skip duplicates
+          oraclePosts.push({ slug, title: log.title, aideazzBlogUrl: url, publishedAt: String(log.created_at) });
+        }
+      } catch { /* Oracle unavailable — cache is sufficient */ }
+
+      const combined = [...cacheEntries, ...oraclePosts];
+      const posts = combined.map(e => ({
+        title: e.title,
+        slug: e.slug,
+        url: e.aideazzBlogUrl || `https://aideazz.xyz/blog/${e.slug}`,
+        publishedAt: e.publishedAt,
+        source: 'devto' as const,
+      }));
       res.setHeader('Cache-Control', 'public, max-age=300');
       res.json({ posts, count: posts.length });
     } catch (e) {
