@@ -146,7 +146,7 @@ async function fetchEnglishFromDevto(blogSlug: string): Promise<EnglishSource | 
 }
 
 async function fetchEnglishPost(slug: string): Promise<EnglishSource | null> {
-  return (await fetchEnglishFromHashnode(slug)) ?? (await fetchEnglishFromDevto(slug));
+  return fetchEnglishFromDevto(slug);
 }
 
 /** Serialize translation jobs so we do not run many Claude calls at once. */
