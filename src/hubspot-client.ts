@@ -14,17 +14,29 @@
 const HS_BASE = 'https://api.hubapi.com';
 const HS_KEY  = () => process.env.HUBSPOT_API_KEY || '';
 
-// ─── Deal pipeline stage IDs (HubSpot default pipeline) ──────────────────────
-// Free-tier default pipeline uses these stage internal values.
+// ─── Client Pipeline — HubSpot default pipeline stage IDs ────────────────────
 export const HS_STAGES = {
-  prospected:  'appointmentscheduled',   // Found / added to list
-  contacted:   'qualifiedtobuy',         // Cold email / outreach sent
-  engaged:     'presentationscheduled',  // Replied or shown interest
-  negotiating: 'decisionmakerboughtin', // Active conversation
+  prospected:  'appointmentscheduled',
+  contacted:   'qualifiedtobuy',
+  engaged:     'presentationscheduled',
+  negotiating: 'decisionmakerboughtin',
   won:         'closedwon',
   lost:        'closedlost',
 } as const;
 export type HSDealStage = typeof HS_STAGES[keyof typeof HS_STAGES];
+
+// ─── Hiring Pipeline — stage IDs written to env after one-time setup ─────────
+// Run POST /api/crm-pipeline/setup once to create the pipeline and get these IDs.
+export const HS_HIRING_PIPELINE_ID  = () => process.env.HUBSPOT_HIRING_PIPELINE_ID  || '';
+export const HS_HIRING_STAGE_IDS = {
+  applied:             () => process.env.HUBSPOT_HIRING_STAGE_APPLIED             || '',
+  recruiter_responded: () => process.env.HUBSPOT_HIRING_STAGE_RECRUITER_RESPONDED || '',
+  interview_scheduled: () => process.env.HUBSPOT_HIRING_STAGE_INTERVIEW_SCHEDULED || '',
+  offer_received:      () => process.env.HUBSPOT_HIRING_STAGE_OFFER_RECEIVED      || '',
+  accepted:            () => process.env.HUBSPOT_HIRING_STAGE_ACCEPTED            || '',
+  declined:            () => process.env.HUBSPOT_HIRING_STAGE_DECLINED            || '',
+} as const;
+export type HiringStage = keyof typeof HS_HIRING_STAGE_IDS;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -367,6 +379,166 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
 
   } catch (err) {
     console.error('[HubSpot] pushLeadToHubSpot error:', err);
+    return null;
+  }
+}
+
+// ─── Deals (pipeline-aware) ───────────────────────────────────────────────────
+
+/** Create a deal in any pipeline. Use for Hiring Pipeline deals. */
+export async function createDealInPipeline(input: {
+  name: string;
+  pipelineId: string;
+  stageId: string;
+  amount?: number | undefined;
+  closeDate?: string | undefined;
+  description?: string | undefined;
+}): Promise<string | null> {
+  const data = await hsPost<{ id: string }>(
+    '/crm/v3/objects/deals',
+    {
+      properties: {
+        dealname:  input.name,
+        dealstage: input.stageId,
+        pipeline:  input.pipelineId,
+        ...(input.amount      ? { amount: String(input.amount) }   : {}),
+        ...(input.closeDate   ? { closedate: input.closeDate }     : {}),
+        ...(input.description ? { description: input.description } : {}),
+      },
+    },
+  );
+  if (data?.id) console.log(`[HubSpot] Created deal ${data.id} in pipeline ${input.pipelineId}`);
+  return data?.id ?? null;
+}
+
+// ─── One-time Hiring Pipeline setup ──────────────────────────────────────────
+
+type PipelineStageResponse = { id: string; label: string };
+type PipelineCreateResponse = { id: string; stages: PipelineStageResponse[] };
+
+/**
+ * Creates the "Hiring Pipeline" in HubSpot with 6 stages.
+ * Call once via POST /api/crm-pipeline/setup — returns env vars to add to Oracle .env.
+ * Safe to skip if HUBSPOT_HIRING_PIPELINE_ID is already set.
+ */
+export async function createHiringPipeline(): Promise<{
+  pipelineId: string;
+  stageIds: Record<string, string>;
+  envVars: string;
+} | null> {
+  if (HS_HIRING_PIPELINE_ID()) {
+    return {
+      pipelineId: HS_HIRING_PIPELINE_ID(),
+      stageIds: Object.fromEntries(
+        Object.entries(HS_HIRING_STAGE_IDS).map(([k, fn]) => [k, fn()])
+      ),
+      envVars: '(already configured)',
+    };
+  }
+
+  const data = await hsPost<PipelineCreateResponse>('/crm/v3/pipelines/deals', {
+    label: 'Hiring Pipeline',
+    displayOrder: 2,
+    stages: [
+      { label: 'Applied',              displayOrder: 0, metadata: { probability: '0.1' } },
+      { label: 'Recruiter Responded',  displayOrder: 1, metadata: { probability: '0.2' } },
+      { label: 'Interview Scheduled',  displayOrder: 2, metadata: { probability: '0.4' } },
+      { label: 'Offer Received',       displayOrder: 3, metadata: { probability: '0.7' } },
+      { label: 'Accepted',             displayOrder: 4, metadata: { probability: '1.0', isClosed: 'true' } },
+      { label: 'Declined',             displayOrder: 5, metadata: { probability: '0.0', isClosed: 'true' } },
+    ],
+  });
+
+  if (!data?.id) return null;
+
+  const stageMap: Record<string, string> = {};
+  const keyOrder: HiringStage[] = ['applied', 'recruiter_responded', 'interview_scheduled', 'offer_received', 'accepted', 'declined'];
+  for (let i = 0; i < keyOrder.length; i++) {
+    stageMap[keyOrder[i]] = data.stages[i]?.id ?? '';
+  }
+
+  const envVars = [
+    `HUBSPOT_HIRING_PIPELINE_ID=${data.id}`,
+    `HUBSPOT_HIRING_STAGE_APPLIED=${stageMap.applied}`,
+    `HUBSPOT_HIRING_STAGE_RECRUITER_RESPONDED=${stageMap.recruiter_responded}`,
+    `HUBSPOT_HIRING_STAGE_INTERVIEW_SCHEDULED=${stageMap.interview_scheduled}`,
+    `HUBSPOT_HIRING_STAGE_OFFER_RECEIVED=${stageMap.offer_received}`,
+    `HUBSPOT_HIRING_STAGE_ACCEPTED=${stageMap.accepted}`,
+    `HUBSPOT_HIRING_STAGE_DECLINED=${stageMap.declined}`,
+  ].join('\n');
+
+  console.log(`[HubSpot] ✅ Hiring Pipeline created: ${data.id}\n${envVars}`);
+  return { pipelineId: data.id, stageIds: stageMap, envVars };
+}
+
+// ─── High-level: push a job application into HubSpot Hiring Pipeline ─────────
+
+export interface HiringDealInput {
+  jobTitle: string;
+  company: string;
+  domain?: string | undefined;
+  recruiterEmail?: string | undefined;
+  recruiterName?: string | undefined;
+  jobUrl?: string | undefined;
+  source?: string | undefined;
+  stage?: HiringStage | undefined;
+}
+
+/**
+ * Contact (recruiter) → Company → Deal in Hiring Pipeline → Associations.
+ * Falls back gracefully if pipeline not yet configured.
+ */
+export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
+  contactId: string | null;
+  companyId: string | null;
+  dealId: string | null;
+} | null> {
+  if (!HS_KEY()) {
+    console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping hiring push');
+    return null;
+  }
+  const pipelineId = HS_HIRING_PIPELINE_ID();
+  const stage = input.stage ?? 'applied';
+  const stageId = HS_HIRING_STAGE_IDS[stage]();
+  if (!pipelineId || !stageId) {
+    console.warn('[HubSpot] Hiring Pipeline not configured — run /api/crm-pipeline/setup first');
+    return null;
+  }
+
+  try {
+    const contactId = input.recruiterEmail || input.recruiterName
+      ? await upsertContact({
+          email:     input.recruiterEmail,
+          firstName: input.recruiterName?.split(' ')[0],
+          lastName:  input.recruiterName?.split(' ').slice(1).join(' ') || undefined,
+          company:   input.company,
+          source:    input.source ?? 'VJH Job Application',
+        })
+      : null;
+
+    const companyId = await upsertCompany({
+      name:   input.company,
+      domain: input.domain,
+    });
+
+    const dealId = await createDealInPipeline({
+      name:        `${input.jobTitle} @ ${input.company}`,
+      pipelineId,
+      stageId,
+      description: [
+        input.jobUrl   ? `Job URL: ${input.jobUrl}` : null,
+        input.source   ? `Source: ${input.source}`  : null,
+      ].filter(Boolean).join('\n') || undefined,
+    });
+
+    if (contactId && companyId) await associateContactCompany(contactId, companyId);
+    if (dealId && contactId)    await associateDealContact(dealId, contactId);
+    if (dealId && companyId)    await associateDealCompany(dealId, companyId);
+
+    console.log(`[HubSpot] ✅ Hiring deal pushed — "${input.jobTitle} @ ${input.company}" contact:${contactId} deal:${dealId}`);
+    return { contactId, companyId, dealId };
+  } catch (err) {
+    console.error('[HubSpot] pushHiringDealToHubSpot error:', err);
     return null;
   }
 }

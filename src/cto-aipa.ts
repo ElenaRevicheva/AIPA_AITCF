@@ -1898,6 +1898,118 @@ async function startCTOAIPA() {
   });
 
 
+  // ==========================================================================
+  // CRM HUB — Unified HubSpot entry point for all agents
+  // ==========================================================================
+
+  // POST /api/crm-pipeline/setup  — one-time: creates Hiring Pipeline in HubSpot
+  // Returns env vars to paste into Oracle .env. Safe to call again (idempotent).
+  app.post('/api/crm-pipeline/setup', outreachAuth, async (_req: Request, res: Response) => {
+    try {
+      const { createHiringPipeline } = await import('./hubspot-client');
+      const result = await createHiringPipeline();
+      if (!result) {
+        res.status(500).json({ error: 'Failed to create Hiring Pipeline — check HUBSPOT_API_KEY' });
+        return;
+      }
+      res.json({
+        ok: true,
+        pipelineId: result.pipelineId,
+        stageIds: result.stageIds,
+        action: 'Paste these into Oracle .env and restart PM2:',
+        envVars: result.envVars,
+      });
+    } catch (e: unknown) {
+      console.error('[crm-pipeline/setup] error:', e);
+      res.status(500).json({ error: String((e as Error)?.message || e) });
+    }
+  });
+
+  // POST /api/crm-event  — all agents call this to write leads/deals into HubSpot
+  // Auth: Bearer OUTREACH_SECRET
+  // Body: { source, type, pipeline, email?, domain?, name?, context?, urgency? }
+  //   source:   "vjh" | "algom_alpha" | "cmo_linkedin" | "espaluz_whatsapp" | "sprint" | "cto_aipa"
+  //   type:     "application" | "prospect" | "engagement" | "inquiry" | "milestone"
+  //   pipeline: "hiring" | "client"
+  //   stage:    hiring → "applied"|"recruiter_responded"|"interview_scheduled"|"offer_received"|"accepted"|"declined"
+  //             client → "prospected"|"contacted"|"engaged"|"negotiating"|"won"|"lost"
+  app.post('/api/crm-event', outreachAuth, async (req: Request, res: Response) => {
+    try {
+      const {
+        source, type, pipeline,
+        email, domain, name, context: ctx,
+        jobTitle, company, recruiterEmail, recruiterName, jobUrl,
+        stage, urgency,
+      } = req.body as {
+        source?: string; type?: string; pipeline?: string;
+        email?: string; domain?: string; name?: string; context?: string;
+        jobTitle?: string; company?: string; recruiterEmail?: string; recruiterName?: string; jobUrl?: string;
+        stage?: string; urgency?: number;
+      };
+
+      if (!source || !pipeline) {
+        res.status(400).json({ error: 'source and pipeline are required' });
+        return;
+      }
+
+      const {
+        pushLeadToHubSpot, pushHiringDealToHubSpot, HS_STAGES,
+      } = await import('./hubspot-client');
+
+      let result: { contactId: string | null; companyId: string | null; dealId: string | null } | null = null;
+
+      if (pipeline === 'hiring') {
+        if (!jobTitle || !company) {
+          res.status(400).json({ error: 'jobTitle and company required for hiring pipeline' });
+          return;
+        }
+        result = await pushHiringDealToHubSpot({
+          jobTitle,
+          company,
+          domain,
+          recruiterEmail: recruiterEmail || email,
+          recruiterName:  recruiterName  || name,
+          jobUrl,
+          source: source || 'VJH',
+          stage: (stage as import('./hubspot-client').HiringStage) || 'applied',
+        });
+
+      } else {
+        // client pipeline
+        const stageMap: Record<string, import('./hubspot-client').HSDealStage> = {
+          prospected: HS_STAGES.prospected, contacted: HS_STAGES.contacted,
+          engaged: HS_STAGES.engaged, negotiating: HS_STAGES.negotiating,
+          won: HS_STAGES.won, lost: HS_STAGES.lost,
+        };
+        result = await pushLeadToHubSpot({
+          name:   name || company || email || source,
+          email,
+          company: company || domain,
+          source:  source || 'AI Marketing Engine',
+          painPoint: ctx,
+          stage:  stageMap[stage ?? ''] ?? HS_STAGES.prospected,
+        });
+      }
+
+      // Log to Oracle regardless of HubSpot outcome
+      await saveAgentOutcome(source || 'unknown', type || 'crm_event', {
+        pipeline, email, domain, name, company, jobTitle, stage, urgency, ctx,
+      }, result ? 'verified_delivered' : 'pending_verification');
+
+      res.json({
+        ok: true,
+        pipeline,
+        hubspot: result
+          ? { contactId: result.contactId, companyId: result.companyId, dealId: result.dealId }
+          : null,
+      });
+
+    } catch (e: unknown) {
+      console.error('[crm-event] error:', e);
+      res.status(500).json({ error: String((e as Error)?.message || e) });
+    }
+  });
+
   const PORT = 3000;
   const baseUrl = process.env.CTO_AIPA_PUBLIC_URL || `http://0.0.0.0:${PORT}`;
   app.listen(PORT, '0.0.0.0', () => {
