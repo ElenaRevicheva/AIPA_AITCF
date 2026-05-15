@@ -1902,34 +1902,23 @@ async function startCTOAIPA() {
   // CRM HUB — Unified HubSpot entry point for all agents
   // ==========================================================================
 
-  // POST /api/crm-pipeline/setup  — one-time: creates Hiring Pipeline in HubSpot
-  // Returns env vars to paste into Oracle .env. Safe to call again (idempotent).
-  app.post('/api/crm-pipeline/setup', outreachAuth, async (_req: Request, res: Response) => {
-    try {
-      const { createHiringPipeline } = await import('./hubspot-client');
-      const result = await createHiringPipeline();
-      if (!result) {
-        res.status(422).json({
-          error: 'HubSpot Private App token lacks crm.schemas.deals.write scope — create pipeline manually',
-          manualSteps: [
-            '1. HubSpot → Settings → Objects → Deals → Pipelines → Add pipeline',
-            '2. Name: "Hiring Pipeline", add stages: Applied / Recruiter Responded / Interview Scheduled / Offer Received / Accepted / Declined',
-            '3. Save, then call GET /api/crm-pipeline/ids to extract IDs automatically',
-          ],
-        });
-        return;
-      }
-      res.json({
-        ok: true,
-        pipelineId: result.pipelineId,
-        stageIds: result.stageIds,
-        action: 'Paste these into Oracle .env and restart PM2:',
-        envVars: result.envVars,
-      });
-    } catch (e: unknown) {
-      console.error('[crm-pipeline/setup] error:', e);
-      res.status(500).json({ error: String((e as Error)?.message || e) });
-    }
+  // POST /api/crm-pipeline/setup  — explains free-tier strategy (no upgrade needed)
+  app.post('/api/crm-pipeline/setup', outreachAuth, (_req: Request, res: Response) => {
+    res.json({
+      ok: true,
+      strategy: 'free-tier',
+      message: 'HubSpot free plan = 1 pipeline. Using [HIRING] prefix + stage mapping instead.',
+      dealNaming: '[HIRING] {jobTitle} @ {company}',
+      stageMapping: {
+        applied:             'Appointment Scheduled',
+        recruiter_responded: 'Qualified to Buy',
+        interview_scheduled: 'Presentation Scheduled',
+        offer_received:      'Decision Maker Bought-In',
+        accepted:            'Closed Won',
+        declined:            'Closed Lost',
+      },
+      filterInHubSpot: 'Deals → filter by Name contains "[HIRING]"',
+    });
   });
 
   // GET /api/crm-pipeline/ids  — reads existing pipelines from HubSpot and returns env var format

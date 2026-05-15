@@ -497,13 +497,21 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
     console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping hiring push');
     return null;
   }
-  // Fall back to default Sales Pipeline if Hiring Pipeline not yet created in HubSpot UI
-  const pipelineId = HS_HIRING_PIPELINE_ID() || 'default';
+  // Free HubSpot tier = single pipeline only.
+  // Strategy: use Sales Pipeline + [HIRING] prefix + structured description for easy filtering.
+  const pipelineId = 'default';
+  // Map hiring stages to Sales Pipeline stages (closest semantic match)
+  const stageMap: Record<HiringStage, HSDealStage> = {
+    applied:             HS_STAGES.prospected,          // Appointment Scheduled
+    recruiter_responded: HS_STAGES.contacted,           // Qualified to Buy
+    interview_scheduled: HS_STAGES.engaged,             // Presentation Scheduled
+    offer_received:      HS_STAGES.negotiating,         // Decision Maker Bought-In
+    accepted:            HS_STAGES.won,
+    declined:            HS_STAGES.lost,
+  };
   const stage = input.stage ?? 'applied';
-  const rawStageId = HS_HIRING_STAGE_IDS[stage]();
-  // If custom stage not configured, use Sales Pipeline's "Appointment Scheduled" as proxy for Applied
-  const stageId = rawStageId || 'appointmentscheduled';
-  console.log(`[HubSpot] Hiring deal → pipeline=${pipelineId} stage=${stageId} (custom=${!!HS_HIRING_PIPELINE_ID()})`);
+  const stageId = stageMap[stage];
+  console.log(`[HubSpot] Hiring deal → pipeline=default stage=${stageId} (hiring stage=${stage})`);
 
   try {
     const contactId = input.recruiterEmail || input.recruiterName
@@ -521,14 +529,15 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       domain: input.domain,
     });
 
-    const dealId = await createDealInPipeline({
-      name:        `${input.jobTitle} @ ${input.company}`,
-      pipelineId,
-      stageId,
+    const dealId = await createDeal({
+      name:  `[HIRING] ${input.jobTitle} @ ${input.company}`,
+      stage: stageId,
       description: [
-        input.jobUrl   ? `Job URL: ${input.jobUrl}` : null,
-        input.source   ? `Source: ${input.source}`  : null,
-      ].filter(Boolean).join('\n') || undefined,
+        `Category: hiring`,
+        `Stage: ${stage}`,
+        input.jobUrl ? `Job URL: ${input.jobUrl}` : null,
+        input.source ? `Source: ${input.source}`  : null,
+      ].filter(Boolean).join('\n'),
     });
 
     if (contactId && companyId) await associateContactCompany(contactId, companyId);
