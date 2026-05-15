@@ -148,7 +148,18 @@ My job is to:
 ```
 src/
 ├── cto-aipa.ts          # Main Express service + code review pipeline + Ask CTO API
+│                        # Endpoints: /api/crm-event (multi-agent HubSpot hub, Bearer OUTREACH_SECRET)
+│                        #            /api/crm-pipeline/setup (free-tier hiring strategy)
+│                        #            /api/crm-pipeline/ids (read pipeline IDs from HubSpot)
 ├── database.ts          # Oracle mTLS connection + all 8+ table operations
+├── hubspot-client.ts    # HubSpot CRM v4 wrapper — upsertContact, upsertCompany, createDeal,
+│                        # CRM v4 associations (PUT), pushLeadToHubSpot, getHubSpotStats,
+│                        # HS_HIRING_PIPELINE_ID, HS_HIRING_STAGE_IDS, HiringStage type,
+│                        # createHiringPipeline(), pushHiringDealToHubSpot()
+├── fresh-leads-ingest.ts # Multi-source prospecting; BrightData enrichment after dedup
+├── brightdata-enrich.ts # NEW — BrightData Web Unlocker: bdFetch(), extractFromPageText(),
+│                        #       batchEnrichLeads(), isBrightDataConfigured()
+│                        #       Zone: web_unlocker1, $1.50/CPM, max 10/run, 1 req/s
 ├── telegram-bot.ts      # CTO Telegram bot (Grammy) — 6k+ lines, monolithic (known debt)
 └── atuona-creative-ai.ts # Creative AI bot (Grammy) — persistent emotional/creative state
 ```
@@ -388,6 +399,7 @@ Priority order (as of 2026-04-18 — aligned with career analysis v2 + Apr 2026 
 | 0 | **Audit VibeJobHunter auto-apply targets** | Check role categories, not just scores. Senior/Staff at 20+ companies = rabbit holes | Small | ✅ Done (wrong-stack, outsourcer, US-only, AI gate fixes deployed) |
 | 1 | **Eval framework on VibeJob Hunter** | Closes Q2 interview gap + fixes scoring calibration — two outcomes from one build | Medium | ✅ **ALL 4 LAYERS DONE (Mar 30).** 131 tests verified from code. Layer 4 LLM-as-judge real Claude API calls. |
 | 1c | **GEO + SEO Marketing Engine (Phases 1-5)** | Makes aideazz.xyz discoverable by Google + AI tools. Full showcase asset for client pitches. | High | ✅ **DONE (Apr 17-18).** JSON-LD, sitemap, daily blog, UTM, outreach, lead triage, www→apex 301. |
+| 1d | **Multi-agent HubSpot hub + BrightData (Phase 5.6 Steps 1–5)** | All agents route to `/api/crm-event`; BrightData enriches leads before Claude classification. | High | ✅ **DONE (May 14–15).** `/api/crm-event` + `/api/crm-pipeline/setup` + `/api/crm-pipeline/ids` live. `src/brightdata-enrich.ts` NEW. VJH `crm_hub.py` + Algom Alpha `pushProspectToCRM()` wired. Step 6 (CMO LinkedIn / Make.com) = ⏳ pending. |
 | 1b | **Activate fractional channels** | Toptal (in progress), Braintrust, A-Team, LinkedIn founder DMs. One reference > any skill addition. | Small | Elena's action |
 | 2 | **Document tool-use design in README** | README is first thing a hiring manager sees; visible in 30 seconds | Small | |
 | 3 | **Add monitoring/eval section to README** | Shows production-level thinking without reading 6k lines of code | Small | |

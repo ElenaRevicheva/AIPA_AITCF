@@ -368,16 +368,16 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
-## Last Verified (May 10, 2026)
+## Last Verified (May 15, 2026)
 
 | Agent | Status | Notes |
 |-------|--------|-------|
-| CTO AIPA + Atuona | ✅ Running | **HubSpot CRM + multi-source fresh leads engine live May 9**. **X webhook handler live May 10**: receives Follow/DM/Mention/Like events, broadcasts to Telegram, fires auto-follow back. Body parser fixed (express.json verify callback — raw body saved before json() consumes stream). twitter-api-v2 added as dependency. **HubSpot duplicate posting loop fixed May 10** (see §11). Board Trello briefing + task management live May 8–9. CTO→CMO pipeline May 1. |
+| CTO AIPA + Atuona | ✅ Running | **Multi-agent HubSpot hub + BrightData live May 14–15**: `/api/crm-event` unified hub (all agents POST, Bearer OUTREACH_SECRET); `/api/crm-pipeline/setup` + `/api/crm-pipeline/ids`; `src/brightdata-enrich.ts` (NEW — zone `web_unlocker1`, max 10/run, 1 req/s); `src/hubspot-client.ts` additions: `HS_HIRING_PIPELINE_ID`, `HS_HIRING_STAGE_IDS`, `HiringStage`, `createHiringPipeline()`, `pushHiringDealToHubSpot()`. Free-tier hiring pipeline: `[HIRING] {jobTitle} @ {company}`. Oracle env: `BRIGHTDATA_API_TOKEN`, `BRIGHTDATA_ZONE=web_unlocker1`. **HubSpot CRM + multi-source fresh leads engine live May 9**. **X webhook handler live May 10**: receives Follow/DM/Mention/Like events, broadcasts to Telegram, fires auto-follow back. Body parser fixed (express.json verify callback — raw body saved before json() consumes stream). twitter-api-v2 added as dependency. **HubSpot duplicate posting loop fixed May 10** (see §11). Board Trello briefing + task management live May 8–9. CTO→CMO pipeline May 1. |
 | EspaLuz Telegram | ✅ Running + **2-layer memory live (Apr 25)** | LangChain retrieval + pgvector RAG wired. `espaluz_rag.py` + `espaluz_embeddings` (pgvector, ivfflat, 1536 dims). Confirmed in logs. |
 | EspaLuz WhatsApp | ✅ Running + **2-layer memory live (Apr 25)** | LangChain + pgvector RAG wired (`espaluz_rag.py`, two save blocks). PayPal webhook signature verification still disabled — free/paid detection unreliable. Pre-existing `Enhancement error: slice(None, 5, None)` — non-critical. |
 | EspaLuz Influencer | ✅ Running + **CTO milestone posts live (May 1)** | On even calendar days, checks for pending CTO milestone before AI Marketing Engine. If found: generates Instagram caption (zero jargon, HR/founder tone, Groq), posts with `sprinter.jpg` via Make.com → Instagram. Falls through to regular content if no milestone. `cto_milestone_module.py` — additive, never breaks existing schedule. |
-| VibeJob Hunter + CMO | ✅ Running (Oracle) + **CTO collab live (May 1)** | `vibejobhunter-web` (port 8080). CMO now picks up pending CTO milestones at daily 20:00 Panama post — generates LinkedIn post, then fires Hashnode + dev.to blog crosspost (`blog_publisher.py`, fire-and-forget). 4 real milestones queued: eval harness, Sprinter, LangGraph, pgvector RAG — will post on schedule. `sprinter.jpg` added to image rotation pool. |
-| Algom Alpha (dragontrade @reviceva) | ✅ Running (PM2) + **X Activity API full automation live May 10** | Every 5th tweet, `x-tech-updater.js` checks `/api/x-updates` for a pending CTO milestone. **X webhook automation May 10**: Account Activity API subscription active — Follow/DM/Mention/Like events stream to CTO AIPA in real-time → Elena's personal Telegram (@aitcf_aideazz_bot). Auto-follow back: when @reviceva gets a new follower → `v2.follow()` fires instantly. Engagement bot (`engagement-bot.js`): replies to mentions every 45min (max 2/run), auto-follows substantive commenters. Filtered stream (`stream-listener.js`): monitors "fractional CTO", "AI engineer hiring", "HubSpot CRM pain" keywords across all X in real-time → auto-like + follow prospects. **DM auto-reply**: Claude Haiku generates contextual reply — blocked at PPU tier (X API 403, requires Basic $100/mo). Profile events subscribed via X Activity API console: Bio/Pic/Screenname. Credentials: `TWITTER_API_KEY/SECRET/ACCESS_TOKEN/SECRET` in both `/home/ubuntu/dragontrade-agent/.env` AND `/home/ubuntu/cto-aipa/.env`. Elena's correct Twitter user ID: `1563632998863577092`. |
+| VibeJob Hunter + CMO | ✅ Running (Oracle) + **CTO collab live (May 1)** + **HubSpot CRM push live May 14–15** | `vibejobhunter-web` (port 8080). **NEW: `src/langgraph_pipeline/crm_hub.py`** — after each job application, posts to `/api/crm-event` (pipeline=hiring). Env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https://webhook.aideazz.xyz/cto`. `nodes.py` modified to call CRM push after submit. CMO now picks up pending CTO milestones at daily 20:00 Panama post — generates LinkedIn post, then fires dev.to blog crosspost (`blog_publisher.py`, fire-and-forget). `sprinter.jpg` added to image rotation pool. |
+| Algom Alpha (dragontrade @reviceva) | ✅ Running (PM2) + **X Activity API full automation live May 10** + **HubSpot CRM push live May 14–15** | **NEW: `pushProspectToCRM()` in `stream-listener.js`** — high-intent keyword matches (`need_cto`, `ai_engineer_hiring`, `crm_pain`, `ai_founder`, `fractional_cto`) POST to `/api/crm-event` → Client Pipeline in HubSpot. Env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL`. Every 5th tweet, `x-tech-updater.js` checks `/api/x-updates` for a pending CTO milestone. **X webhook automation May 10**: Account Activity API subscription active — Follow/DM/Mention/Like events stream to CTO AIPA in real-time → Elena's personal Telegram (@aitcf_aideazz_bot). Auto-follow back: when @reviceva gets a new follower → `v2.follow()` fires instantly. Engagement bot (`engagement-bot.js`): replies to mentions every 45min (max 2/run), auto-follows substantive commenters. Filtered stream (`stream-listener.js`): monitors "fractional CTO", "AI engineer hiring", "HubSpot CRM pain" keywords across all X in real-time → auto-like + follow prospects. **DM auto-reply**: Claude Haiku generates contextual reply — blocked at PPU tier (X API 403, requires Basic $100/mo). Profile events subscribed via X Activity API console: Bio/Pic/Screenname. Credentials: `TWITTER_API_KEY/SECRET/ACCESS_TOKEN/SECRET` in both `/home/ubuntu/dragontrade-agent/.env` AND `/home/ubuntu/cto-aipa/.env`. Elena's correct Twitter user ID: `1563632998863577092`. |
 | Sprint Briefing (Sprinter) | ✅ AWS Lambda — **voice notes fixed May 3** | Bug: `SPRINT_BRIEFING_SKIP_ORACLE=1` in Lambda handler was gating the ENTIRE personal-context load (including HTTP proxy). Fix: gate moved to `knowledge-context.ts` paths 2/3 only. `SPRINT_BRIEFING_KNOWLEDGE_USER_IDS=5481526862` confirmed set in Lambda. Code + Lambda bundle redeployed May 3. Voice notes from prior day will appear in next 8AM briefing. See §8 for full architecture. |
 | AILA | ❌ Not deployed | Repo exists, no code. CTO AIPA serves as interim conductor via `agent_outcomes` table. |
 
@@ -444,6 +444,29 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 - Service Key: stored in Oracle `.env` as `HUBSPOT_API_KEY` (pat-na1-… format, never commit in plaintext)
 - Scopes: `crm.objects.contacts`, `crm.objects.companies`, `crm.objects.deals` read+write
 - Free tier: 1M contacts, unlimited companies/deals, 100 req/10s rate limit
+
+### BrightData Web Unlocker (added May 14–15, 2026)
+
+Oracle `.env` additions:
+
+| Var | Value |
+|-----|-------|
+| `BRIGHTDATA_API_TOKEN` | `77c17e6d-bb2d-42da-84d5-f300420a1721` |
+| `BRIGHTDATA_ZONE` | `web_unlocker1` |
+
+Zone: `web_unlocker1`, $1.50/CPM, 30-day trial active. Max 10 enrichments/run, 1 req/sec throttle. Integrated in `src/brightdata-enrich.ts` → called from `fresh-leads-ingest.ts` after dedup, before Claude pain classification.
+
+### Multi-agent CRM hub (added May 14–15, 2026)
+
+New CTO AIPA endpoints:
+
+| Endpoint | Auth | Purpose |
+|----------|------|---------|
+| `POST /api/crm-event` | `Bearer OUTREACH_SECRET` | Unified hub — all agents route here; validates, deduplicates, writes to HubSpot, logs to `crm_event_log` |
+| `GET /api/crm-pipeline/setup` | `Bearer OUTREACH_SECRET` | Returns free-tier strategy (`[HIRING] {jobTitle} @ {company}` naming, stage map) |
+| `GET /api/crm-pipeline/ids` | `Bearer OUTREACH_SECRET` | Reads existing pipeline IDs from HubSpot |
+
+VJH + Algom Alpha env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https://webhook.aideazz.xyz/cto`.
 
 ---
 

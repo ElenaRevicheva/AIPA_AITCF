@@ -213,4 +213,46 @@ CREATE TABLE espaluz_funnel (
 | **VJH ATS_DRY_RUN verified** | ✅ **Verified (Apr 26, 2026)** | `ATS_DRY_RUN=false` confirmed on Oracle — flag was already off. Real problem was Resend rate limiting (3/hour cap) and deduplication failures (Deel ×7, Vanta ×4). LangGraph pipeline now addresses both. |
 | **Resume updated on Oracle** | ✅ **Done (Apr 26, 2026)** | `autonomous_data/resumes/elena_resume.pdf` replaced. Claude Code + Cursor now explicit in summary + dedicated CORE SKILLS section. pgvector/RAG added. Railway removed. Target roles expanded (AI Systems Operator, Automation Lead, Integration Specialist, Solutions Architect, AI Program Manager). generator at `aideazz/scripts/generate_resume.py`. |
 
-**Version:** 1.3 — Updated 2026-04-26 (LangGraph pipeline live + ATS verified + resume updated)
+**Version:** 1.4 — Updated 2026-05-15 (Multi-agent HubSpot hub + BrightData enrichment + blog pipeline fixes)
+
+---
+
+## Session: May 14–15, 2026
+
+### What was wired
+
+#### HubSpot CRM Hub — `/api/crm-event`
+
+| Item | Detail |
+|------|--------|
+| **`/api/crm-event`** | Unified hub endpoint in CTO AIPA. All agents POST here. Validates, deduplicates vs Oracle `outreach_targets`, writes to HubSpot, logs to `crm_event_log`. Live at `https://webhook.aideazz.xyz/cto/api/crm-event`. Auth: `Bearer OUTREACH_SECRET`. |
+| **`/api/crm-pipeline/setup`** | Returns free-tier HubSpot strategy: `[HIRING] {jobTitle} @ {company}` naming in Sales Pipeline. Stage map: applied→Appointment Scheduled, recruiter_responded→Qualified to Buy, interview_scheduled→Presentation Scheduled, offer_received→Decision Maker Bought-In, accepted→Closed Won, declined→Closed Lost. |
+| **`/api/crm-pipeline/ids`** | Reads existing pipeline IDs directly from HubSpot API. |
+| **`src/hubspot-client.ts` additions** | `HS_HIRING_PIPELINE_ID`, `HS_HIRING_STAGE_IDS`, `HiringStage` type, `createHiringPipeline()` (documents free-tier 1-pipeline limitation), `pushHiringDealToHubSpot(input: HiringDealInput)` — full Contact+Company+Deal pipeline for job applications. |
+
+#### VJH → HubSpot (Step 3)
+
+`src/langgraph_pipeline/crm_hub.py` (NEW file in VibeJobHunterAIPA_AIMCF). After each job application in `nodes.py`, posts to `/api/crm-event` with `pipeline=hiring`. Env vars added to VJH: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL=https://webhook.aideazz.xyz/cto`.
+
+#### Algom Alpha → HubSpot (Step 2)
+
+`pushProspectToCRM()` added to `dragontrade-agent/stream-listener.js`. Fires on high-intent keyword matches from filtered stream: `need_cto`, `ai_engineer_hiring`, `crm_pain`, `ai_founder`, `fractional_cto`. Routes to Client Pipeline in HubSpot. Env vars added: `OUTREACH_SECRET`, `CTO_AIPA_WEBHOOK_URL`.
+
+#### BrightData Web Unlocker (Step 4 equivalent)
+
+`src/brightdata-enrich.ts` (NEW file in AIPA_AITCF). Functions: `bdFetch()`, `extractFromPageText()`, `batchEnrichLeads()`, `isBrightDataConfigured()`. Scrapes company websites for founder names, tech stack, team size, funding signals. Zone: `web_unlocker1`, $1.50/CPM, 30-day trial active. Integrated into `fresh-leads-ingest.ts` — runs after dedup, before Claude pain classification. Max 10 enrichments/run, 1 req/sec throttle. Env added to Oracle `.env`: `BRIGHTDATA_API_TOKEN=77c17e6d-bb2d-42da-84d5-f300420a1721`, `BRIGHTDATA_ZONE=web_unlocker1`.
+
+#### Blog/Content Pipeline Fixes
+
+| Fix | Detail |
+|-----|--------|
+| Hashnode fully removed | Dev.to-only for cross-posting. All Hashnode GraphQL calls removed. |
+| 20-topic rotation | Was 10 — prevents slug collision and topic recycling. |
+| `slugAlreadyPublished()` | Dedup check added in `src/hashnode-daily.ts`. |
+| FAQ blocks mandatory | Every article requires `## Frequently Asked Questions` with 3–5 Q&A pairs (GEO optimization). |
+| FAQPage JSON-LD | Injected in `BlogPost.tsx` from article markdown. |
+| `/blog/posts` endpoint | Oracle endpoint for portfolio blog index sync — reads `data/blog-posts-cache.json` first, Oracle `content_log` additive. |
+
+#### Status after this session
+
+Steps 1–5 of Phase 5.6 multi-agent HubSpot plan: ✅ DONE. Step 6 (CMO LinkedIn / Make.com) = ⏳ pending.
