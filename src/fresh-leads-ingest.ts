@@ -16,6 +16,7 @@
 import { Anthropic } from '@anthropic-ai/sdk';
 import { getOutreachTargetByCompany, saveOutreachTargetsBulk } from './database';
 import { pushLeadToHubSpot } from './hubspot-client';
+import { batchEnrichLeads, isBrightDataConfigured } from './brightdata-enrich';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -378,6 +379,32 @@ export async function runFreshLeadsIngestion(
     const summary = `Fresh leads: 0 new companies (${skipped} already in pipeline). Sources: ${JSON.stringify(bySource)}`;
     if (sendTelegram) await sendTelegram(`🔍 ${summary}`);
     return { ingested: 0, skipped, errors: 0, bySource, summary };
+  }
+
+  // BrightData enrichment — scrape company websites for founder names, tech stack, funding
+  // Enriches up to 10 leads per run (preserves trial credits). Skips if zone not configured.
+  const bdEnrichMap = isBrightDataConfigured()
+    ? await batchEnrichLeads(newLeads.filter(l => l.website), 10)
+    : new Map();
+
+  // Merge BrightData enrichment into lead descriptions for better pain classification
+  if (bdEnrichMap.size > 0) {
+    for (const lead of newLeads) {
+      if (!lead.website) continue;
+      const bd = bdEnrichMap.get(lead.website);
+      if (!bd) continue;
+      const extras: string[] = [];
+      if (bd.founderNames.length > 0) extras.push(`Founders: ${bd.founderNames.join(', ')}`);
+      if (bd.techStack.length > 0)    extras.push(`Tech: ${bd.techStack.slice(0, 5).join(', ')}`);
+      if (bd.teamSizeSignal)          extras.push(bd.teamSizeSignal);
+      if (bd.fundingSignal)           extras.push(bd.fundingSignal);
+      if (extras.length > 0) lead.description = `${lead.description} | ${extras.join(' | ')}`;
+      // Prefer real founder name if found
+      if (bd.founderNames.length > 0 && lead.name.startsWith('Founder @')) {
+        lead.name = `${bd.founderNames[0]} @ ${lead.company}`;
+      }
+    }
+    console.log(`[${tag}] BrightData enriched ${bdEnrichMap.size} leads`);
   }
 
   // Classify pain points in batches of 20 (Haiku token limit)
