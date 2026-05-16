@@ -50,7 +50,7 @@ function stripHtml(html: string): string {
 }
 
 function extractEmail(text: string): string | null {
-  const m = text.match(/[\w.+\-]+@[\w\-]+\.[\w.]{2,}/);
+  const m = text.match(/[\w.+\-]+@[\w\-]+\.[a-zA-Z][\w.]{1,}/);
   return m ? m[0].toLowerCase() : null;
 }
 

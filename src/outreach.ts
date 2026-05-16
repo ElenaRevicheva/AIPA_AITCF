@@ -240,6 +240,12 @@ export async function verifyTargetEmails(): Promise<{
     const email = (row as any[])[3] as string | null;
     const targetId = (row as any[])[0] as string;
     if (!email) continue;
+    // Skip obviously invalid emails (package versions, numeric TLDs, etc.)
+    if (!/^[\w.+\-]+@[\w\-]+\.[a-zA-Z][\w.]{1,}$/.test(email)) {
+      await updateOutreachTargetStatus(targetId, 'invalid_email', 'invalid');
+      invalid++;
+      continue;
+    }
     const result = await verifyEmailHunter(email);
     if (result.status === 'invalid') {
       await updateOutreachTargetStatus(targetId, 'invalid_email', 'invalid');
