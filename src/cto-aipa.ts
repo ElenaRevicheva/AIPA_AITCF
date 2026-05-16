@@ -40,6 +40,7 @@ import {
   formatDraftPreview,
 } from './outreach';
 import { runProspectIngestion } from './prospect-ingest';
+import { runSerpProspects } from './serpapi-prospects';
 import { runPlacesIngestion, INDUSTRY_PRESETS } from './prospect-places';
 import { runDocIngestion } from './doc-ingest';
 import { runTriageCycle, buildDailyBrief, buildDashboardHtml, getPhase5TriageStatus } from './lead-triage';
@@ -2203,6 +2204,17 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
         { timezone: triageTz },
       );
       console.log(`☀️ Sprint briefing cron: "${sprintCronExpr}" (${triageTz})`);
+    }
+    // SerpAPI prospect discovery — Google Jobs + Google Search every 6h
+    if (process.env.SERPAPI_KEY?.trim()) {
+      // Run once at startup
+      runSerpProspects().catch(e => console.error('[SerpProspects] startup error:', e));
+      // Then every 6h
+      cron.schedule('0 */6 * * *', () => {
+        console.log('[SerpProspects] Running 6h discovery cycle...');
+        runSerpProspects().catch(e => console.error('[SerpProspects] cron error:', e));
+      }, { timezone: triageTz });
+      console.log('[SerpProspects] Google Jobs + Search discovery: every 6h');
     }
   });
 }
