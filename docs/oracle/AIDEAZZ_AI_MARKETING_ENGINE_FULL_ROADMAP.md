@@ -1186,7 +1186,25 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 
 ---
 
-> Document version: May 14, 2026 (v19.0) | Prior: April 28, 2026 (v18.0) | April 13, 2026 (v15.4)
+> **Phase 5.7 status: LIVE (May 16, 2026)** — BrightData full wiring + VJH LinkedIn Jobs source + all EspaLuz agents → HubSpot.
+> 
+> **BrightData expanded (brightdata-enrich.ts):** `enrichLinkedInCompany(url)` — fetches `linkedin.com/company/{slug}` via Web Unlocker, extracts employee range, company type, HQ, founded year, recent open roles. `enrichCrunchbase(slug)` — fetches `crunchbase.com/organization/{slug}`, extracts total funding, last round type + amount, investor names. `enrichCompanyFull({websiteUrl, linkedinUrl, crunchbaseSlug})` — runs all three in parallel, non-fatal per source. Auto-triggered in `/api/crm-event` for CLIENT pipeline deals whenever context contains `linkedin.com/company/` or `crunchbase.com/organization/` URLs.
+>
+> **VJH LinkedIn Jobs (job_monitor.py `_search_brightdata_linkedin()`):** Queries 3 LinkedIn search URLs (`linkedin.com/jobs/search/?keywords=...&location=Worldwide&f_WT=2&f_JT=F&f_TPR=r86400`) via BrightData Web Unlocker. Returns 120 jobs/cycle (confirmed live May 16). Enriches top 5 candidates with individual job page fetch → salary range, applicant count, seniority level. BRIGHTDATA_API_TOKEN + BRIGHTDATA_ZONE added to VJH `.env`.
+>
+> **Gate additions (job_gate.py):** Gate 4.1: `applicant_count > 200 → reject`. Gate 4.2: LinkedIn `seniority_level` in {Director, Executive, VP, C-Suite} → reject.
+>
+> **EspaLuz → HubSpot:** WhatsApp (`user_trial_system.py`) + Telegram (`espaluz_database.py`) both fire `[ESPALUZ] {WA|TG} {id} — trial` deals on `start_trial()`. Influencer (`main.py`) fires CRM signal after every daily post: EspaLuz days → `[ESPALUZ]`, marketing engine days → `[CLIENT]`.
+>
+> **SEO inquiry form → HubSpot:** `/marketing/inquiry` handler in `cto-aipa.ts` now pushes `[CLIENT]` deal to HubSpot via `setImmediate` (non-blocking) after each inquiry form submission.
+>
+> **Eval harness fixed (May 16):** Layer 4 LLM judge model updated `claude-3-haiku-20240307` → `claude-haiku-4-5-20251001`. Golden set updated to CAREER_FOCUS v4 (20 scorer cases + 2 gate-only cases). Gate-only cases now tested via dedicated `test_gate_blocks_excluded_title`. **129/129 passing**, ~$0.03/run, ~76 seconds. nodes.py f-string syntax error fixed (was silently killing every LangGraph application cycle).
+>
+> **aipa@aideazz.xyz confirmed live:** SMTP smtp.zoho.com:587 ✅, IMAP imappro.zoho.com:993 ✅ (403 messages). `ResponseDetector` scans inbox every VJH cycle, fires Telegram `🔥 INTERVIEW REQUEST DETECTED` on positive responses. First interview signal detected May 16.
+>
+> Document version: May 16, 2026 (v20.0) | Prior: May 14, 2026 (v19.0)
+> 
+> Document version: May 14, 2026 (v19.0) [superseded] | Prior: April 28, 2026 (v18.0) | April 13, 2026 (v15.4)
 > Aligned with: CAREER_FOCUS.md v4, SKILL.md v1.3, ORACLE_ALL_PRODUCTS_RESILIENCE.md (May 2026)
 > Phase 1 status: COMPLETE — GEO v4 iron (`geo-manifest.json`, `llms.txt`, `/.well-known/llms.txt`, expanded `robots.txt`, ItemList/WebPage JSON-LD, `CITATION.cff`, `humans.txt`). Canonical SPA fix. GSC verified.
 > Phase 2 status: COMPLETE (updated May 2026) — **Hashnode fully removed**. dev.to is the sole crosspost target. `saveBlogPostCache()` writes slug+markdown+devtoUrl to `data/blog-posts-cache.json` after every publish. `/blog/posts` endpoint reads local cache first, Oracle `content_log` additive. Spanish translation pipeline: `/blog/es-bundle/:slug` + `/blog/es-meta/:slug` (Claude translate + disk cache v3). Dev.to pagination: always fetch `per_page=9` + `per_page=100` merged. Sitemap `generate-sitemap.mjs` — update: remove Hashnode slug fetch, use Oracle `/blog/posts` instead.

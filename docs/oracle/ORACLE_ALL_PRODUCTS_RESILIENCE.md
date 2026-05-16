@@ -608,3 +608,122 @@ Called from `linkedin_cmo.py` via the `POST /api/crm-event` hub endpoint.
 | `GOOGLE_ANALYTICS_CREDENTIALS` | ✅ Yes | GSC + GA4 auth (same service account) |
 | `GSC_SITE_URL` | ✅ Yes | `sc-domain:aideazz.xyz` |
 | `GA4_PROPERTY_ID` | ✅ Yes | `515154124` |
+
+
+## 13. HubSpot Income Dashboard + BrightData Full Wiring (May 14–16, 2026)
+
+### What shipped
+
+All agents now feed HubSpot as a unified income dashboard. Three deal types in one pipeline (free tier), separated by name prefix:
+
+| Prefix | Source agents | HubSpot stage on arrival |
+|--------|--------------|--------------------------|
+| `[HIRING]` | VJH LangGraph after each application | Appointment Scheduled (= Applied) |
+| `[CLIENT]` | SEO inquiry form, Algom Alpha X stream, EspaLuz Influencer (marketing days) | Appointment Scheduled (= Prospected) |
+| `[ESPALUZ]` | EspaLuz WhatsApp `user_trial_system.py`, EspaLuz Telegram `espaluz_database.py`, EspaLuz Influencer (EspaLuz days) | Appointment Scheduled (= Trial Started) |
+
+Stage progression mapping (free-tier stage names → real meaning):
+- Appointment Scheduled = Applied / Prospected / Trial Started
+- Qualified to Buy = Recruiter Responded / Contacted / Trial Active
+- Presentation Scheduled = Interview / Demo Call / Personal Outreach Sent
+- Decision Maker Bought In = Offer / Proposal / Payment Link Sent
+- Contract Sent = Negotiating
+- Closed Won / Closed Lost = final outcomes
+
+### /api/crm-event hub (CTO AIPA)
+
+Single POST endpoint all agents call. Auth: `Bearer OUTREACH_SECRET`.
+
+```
+POST https://webhook.aideazz.xyz/cto/api/crm-event
+Body: { source, type, pipeline: "hiring"|"client", stage?, email?, domain?,
+        name?, context?, jobTitle?, company?, recruiterEmail?, jobUrl?, score?, urgency?, notes? }
+```
+
+Logs to Oracle `agent_outcomes` table. Routes to `pushHiringDealToHubSpot()` or `pushLeadToHubSpot()` based on pipeline. Non-fatal — 500 from HubSpot never breaks caller.
+
+### BrightData enrichment layers (brightdata-enrich.ts)
+
+Zone: `web_unlocker1` | Token: `BRIGHTDATA_API_TOKEN` | Cost: ~$1.50/CPM (web_unlocker)
+
+| Function | What it fetches | When triggered |
+|----------|----------------|----------------|
+| `enrichLeadWebsite(url)` | Company homepage → founders, tech stack, team size, funding signal | Algom Alpha CLIENT deals with a domain |
+| `enrichLinkedInCompany(url)` | `linkedin.com/company/{slug}` → employee range, type, HQ, founded, recent open roles | CLIENT deals where context contains a LI company URL |
+| `enrichCrunchbase(slug)` | `crunchbase.com/organization/{slug}` → total funding, last round, investors | CLIENT deals where context contains a CB org URL |
+| `enrichCompanyFull({websiteUrl, linkedinUrl, crunchbaseSlug})` | All three in parallel, non-fatal per source | Auto-triggered in /api/crm-event for CLIENT pipeline |
+| `bdFetch(url)` | Any URL via BrightData Web Unlocker (raw HTML) | Base primitive for all above |
+
+All results appended to HubSpot deal notes as structured sections (`--- LinkedIn ---`, `--- Crunchbase ---`).
+
+### VJH → HubSpot wiring (crm_hub.py)
+
+File: `src/langgraph_pipeline/crm_hub.py`
+
+```python
+push_application_to_crm(job_title, company, job_url, recruiter_email, stage, score)
+```
+
+Called from `nodes.py` after every LangGraph application. POSTs to `/api/crm-event` with `pipeline=hiring`. Deal notes include score and apply URL. `human_pending` jobs get a `⚠️ NEEDS MANUAL APPLY` note.
+
+### BrightData LinkedIn Jobs (VJH job_monitor.py)
+
+Method: `_search_brightdata_linkedin()` — added to secondary sources pool, 60s timeout.
+
+- Queries 3 LinkedIn search URLs (founding AI engineer, fractional CTO, AI automation engineer)
+- URL: `linkedin.com/jobs/search/?keywords=...&location=Worldwide&f_WT=2&f_JT=F&f_TPR=r86400`
+- Returns ~120 jobs per cycle from LinkedIn SSR HTML (confirmed working May 16)
+- Enriches top 5 gate-passing candidates with individual job page fetch → salary, applicant count, seniority level
+- Env: `BRIGHTDATA_API_TOKEN`, `BRIGHTDATA_ZONE` added to VJH `.env`
+
+### Gate additions (job_gate.py)
+
+Two new gates added May 16:
+
+```python
+# Gate 4.1 — applicant count (from BrightData LinkedIn enrichment)
+if applicant_count > 200: return False  # too crowded for cold apply
+
+# Gate 4.2 — LinkedIn seniority field (catches what title regex misses)
+BLOCKED_SENIORITY = {"director", "executive", "c-suite", "vp", "not applicable"}
+if seniority_level in BLOCKED_SENIORITY: return False
+```
+
+### Eval harness (VJH evals/)
+
+Fixed May 16:
+- Layer 4 LLM judge: model updated `claude-3-haiku-20240307` (404) → `claude-haiku-4-5-20251001`
+- `test_full_pipeline.py`: `SCORER_GOLDEN_SET` (scorer cases) split from `GATE_ONLY_CASES` (gate cases)
+- New `test_gate_blocks_excluded_title` test validates gate on VP/Director titles
+- Golden set updated: 20 scorer cases + 2 gate-only cases (v4_002 VP Eng, v4_004 Dir Eng)
+- **129/129 passing**, ~$0.03/run, ~76 seconds
+
+### aipa@aideazz.xyz email — status
+
+SMTP: `smtp.zoho.com:587` ✅ authenticated  
+IMAP: `imappro.zoho.com:993` ✅ authenticated (403 messages in inbox)  
+Response detector: `src/autonomous/response_detector.py` — scans inbox every VJH cycle for recruiter replies, alerts via Telegram with `🔥🔥🔥 INTERVIEW REQUEST DETECTED`
+
+### EspaLuz bots → HubSpot wiring
+
+`EspaLuzWhatsApp/user_trial_system.py` — `start_trial()` PostgreSQL path: after `conn.commit()`, fires `threading.Thread` to POST `[ESPALUZ] WA {phone} — trial day 1` to `/api/crm-event`.
+
+`EspaLuzFamilybot/espaluz_database.py` — same pattern, `[ESPALUZ] TG {user_id} — {N}d trial`.
+
+`EspaLuz_Influencer/main.py` — `send_automated_daily_promo()`: after Make.com webhook, fires CRM signal. EspaLuz days → `[ESPALUZ] Influencer post — YYYY-MM-DD`. Marketing engine days → `[CLIENT] AIdeazz tech content — YYYY-MM-DD`.
+
+### Commits (May 14–16, 2026)
+
+| Repo | Commit | Description |
+|------|--------|-------------|
+| cto-aipa | `e66a1f0` | SEO inquiry form → HubSpot [CLIENT] |
+| cto-aipa | `f32d315` | BrightData LinkedIn + Crunchbase enrichment |
+| VibeJobHunterAIPA_AIMCF | `9b214e1` | Gate VP/Director/Manager + crm_hub score field |
+| VibeJobHunterAIPA_AIMCF | `150ec07` | Eval harness: LLM judge model fix + golden set v4 |
+| VibeJobHunterAIPA_AIMCF | `0c1151a` | test_full_pipeline: gate-only cases split |
+| VibeJobHunterAIPA_AIMCF | `92e3eba` | BrightData LinkedIn Jobs source + gate 4.1/4.2 |
+| VibeJobHunterAIPA_AIMCF | `b33f7d1` | Fix LinkedIn URL (SSR search page, not guest API) |
+| VibeJobHunterAIPA_AIMCF | `ec4e072` | Fix nodes.py f-string syntax error (was killing pipeline) |
+| EspaLuzWhatsApp | `887f419` | Trial start → HubSpot [ESPALUZ] |
+| EspaLuzFamilybot | `80be496` | Trial start → HubSpot [ESPALUZ] |
+| EspaLuz_Influencer | `d1534d9` | Daily posts → HubSpot CRM signal |
