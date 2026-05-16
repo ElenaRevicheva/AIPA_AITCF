@@ -1097,6 +1097,28 @@ async function startCTOAIPA() {
     if (utm_campaign !== undefined) emailFields.utm_campaign = utm_campaign;
     if (page_url !== undefined) emailFields.page_url = page_url;
     scheduleMarketingInquiryEmails(id, emailFields);
+
+    // Push to HubSpot as [CLIENT] deal — hottest lead signal (person filled the form)
+    setImmediate(async () => {
+      try {
+        const { pushLeadToHubSpot } = await import('./hubspot-client');
+        const contextParts: string[] = [];
+        if (message) contextParts.push(`Message: ${message}`);
+        if (utm_source) contextParts.push(`Source: ${utm_source}`);
+        if (page_url) contextParts.push(`Page: ${page_url}`);
+        await pushLeadToHubSpot({
+          name: name || contactEmail || 'Inquiry via aideazz.xyz',
+          email: contactEmail || '',
+          source: utm_source || 'aideazz_inquiry_form',
+          painPoint: contextParts.join(' | ') || 'Direct inquiry from aideazz.xyz contact form',
+          stage: 'appointmentscheduled',
+        });
+        console.log(`[inquiry] HubSpot [CLIENT] deal created for: ${name || contactEmail}`);
+      } catch (e) {
+        console.warn('[inquiry] HubSpot push non-fatal:', (e as Error).message?.slice(0, 80));
+      }
+    });
+
     res.json({ ok: true, id });
   });
 
