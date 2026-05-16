@@ -2014,12 +2014,58 @@ async function startCTOAIPA() {
           engaged: HS_STAGES.engaged, negotiating: HS_STAGES.negotiating,
           won: HS_STAGES.won, lost: HS_STAGES.lost,
         };
+
+        // BrightData + Claude enrichment for X prospects with a bio website
+        let enrichedCtx = ctx;
+        if (source === 'algom_poll' && domain) {
+          try {
+            const { enrichLeadWebsite, isBrightDataConfigured } = await import('./brightdata-enrich');
+            if (isBrightDataConfigured()) {
+              const enrichment = await enrichLeadWebsite(domain);
+              if (enrichment) {
+                let painInsight = '';
+                try {
+                  const Anthropic = (await import('@anthropic-ai/sdk')).default;
+                  const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+                  const msg = await claude.messages.create({
+                    model: 'claude-haiku-4-5-20251001',
+                    max_tokens: 200,
+                    messages: [{ role: 'user', content: `You are Elena Revicheva, fractional CTO and AI engineer. Based on the company website excerpt and X signal below, write 2 sentences: (1) their technical pain, (2) how Elena could help.
+
+Website (${domain}):
+${enrichment.rawExcerpt}
+
+X signal: ${(ctx || '').slice(0, 300)}
+
+Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichment.techStack.slice(0, 5).join(', ') || 'unknown'} | Team: ${enrichment.teamSizeSignal || '?'} | Funding: ${enrichment.fundingSignal || '?'}` }],
+                  });
+                  painInsight = ((msg.content[0] as { type: string; text: string })?.text || '').trim();
+                } catch { /* non-fatal */ }
+
+                enrichedCtx = [
+                  ctx,
+                  `\n--- BrightData (${domain}) ---`,
+                  enrichment.founderNames.length ? `Founders: ${enrichment.founderNames.join(', ')}` : null,
+                  enrichment.techStack.length    ? `Tech: ${enrichment.techStack.join(', ')}` : null,
+                  enrichment.teamSizeSignal      ? `Team: ${enrichment.teamSizeSignal}` : null,
+                  enrichment.fundingSignal        ? `Funding: ${enrichment.fundingSignal}` : null,
+                  painInsight                    ? `\nAI Pain: ${painInsight}` : null,
+                ].filter(Boolean).join('\n');
+
+                console.log(`[crm-event] BrightData enriched: ${domain} | founders: ${enrichment.founderNames.join(', ') || '—'}`);
+              }
+            }
+          } catch (e) {
+            console.warn('[crm-event] BrightData non-fatal:', (e as Error).message?.slice(0, 100));
+          }
+        }
+
         result = await pushLeadToHubSpot({
           name:   name || company || email || source,
           email,
           company: company || domain,
           source:  source || 'AI Marketing Engine',
-          painPoint: ctx,
+          painPoint: enrichedCtx,
           stage:  stageMap[stage ?? ''] ?? HS_STAGES.prospected,
         });
       }
