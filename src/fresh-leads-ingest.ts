@@ -51,7 +51,7 @@ function stripHtml(html: string): string {
 
 function extractEmail(text: string): string | null {
   const m = text.match(/[\w.+\-]+@[\w\-]+\.[a-zA-Z][\w.]{1,}/);
-  return m ? m[0].toLowerCase() : null;
+  return m ? m[0].replace(/[.]+$/, '').toLowerCase() : null;
 }
 
 function extractUrl(text: string): string | null {
