@@ -171,3 +171,137 @@ export async function batchEnrichLeads(
 export function isBrightDataConfigured(): boolean {
   return !!(BD_TOKEN() && BD_ZONE());
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LinkedIn Company Enrichment
+// Fetches linkedin.com/company/{slug} via Web Unlocker.
+// Returns employee range, company type, HQ, founded year.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface LinkedInCompanyEnrichment {
+  employeeRange: string | null;   // "11-50 employees"
+  companyType:   string | null;   // "Privately Held" | "Startup"
+  headquarters:  string | null;   // "San Francisco, CA"
+  founded:       string | null;   // "2021"
+  recentRoles:   string[];        // Job titles actively hiring for
+  rawExcerpt:    string;
+}
+
+export async function enrichLinkedInCompany(
+  linkedinUrl: string,
+): Promise<LinkedInCompanyEnrichment | null> {
+  const html = await bdFetch(linkedinUrl);
+  if (!html) return null;
+
+  const text = html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  const employeeMatch = text.match(/(\d[\d,]*\s*[-–]\s*\d[\d,]*\s*employees?|\d[\d,]+\+?\s*employees?)/i);
+  const typeMatch     = text.match(/\b(Privately Held|Public Company|Non-?profit|Startup|Self-?Employed|Partnership|Educational Institution|Government Agency)\b/i);
+  const hqMatch       = text.match(/(?:Headquarters?|HQ)[:\s]+([A-Z][^,\n]+,\s*[A-Z]{2})/i);
+  const foundedMatch  = text.match(/(?:Founded|Est\.?)[:\s]+(\d{4})/i);
+
+  // Recent open roles: grab lines that look like job titles
+  const roleLines = text.match(/(?:Hiring|Openings?|Open Roles?|Jobs?)[:\s]*([\s\S]{0,400})/i);
+  const recentRoles: string[] = [];
+  if (roleLines) {
+    const candidates = (roleLines[1] ?? '').split(/[,\n•·]/).map(s => s.trim()).filter(s => s.length > 5 && s.length < 60);
+    recentRoles.push(...candidates.slice(0, 5));
+  }
+
+  return {
+    employeeRange: employeeMatch ? (employeeMatch[1] ?? '').trim() || null : null,
+    companyType:   typeMatch     ? (typeMatch[1] ?? '').trim() || null : null,
+    headquarters:  hqMatch       ? (hqMatch[1] ?? '').trim() || null : null,
+    founded:       foundedMatch  ? (foundedMatch[1] ?? '').trim() || null : null,
+    recentRoles,
+    rawExcerpt:    text.slice(0, 600),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Crunchbase Enrichment
+// Fetches crunchbase.com/organization/{slug} via Web Unlocker.
+// Returns funding round, investors, founded year.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface CrunchbaseEnrichment {
+  totalFunding:      string | null;   // "$3.2M"
+  lastRoundType:     string | null;   // "Seed" | "Series A"
+  lastRoundAmount:   string | null;   // "$1.5M"
+  investors:         string[];
+  foundedYear:       string | null;
+  employeeRange:     string | null;
+  rawExcerpt:        string;
+}
+
+export async function enrichCrunchbase(
+  orgSlug: string,
+): Promise<CrunchbaseEnrichment | null> {
+  const url  = `https://www.crunchbase.com/organization/${orgSlug}`;
+  const html = await bdFetch(url);
+  if (!html) return null;
+
+  const text = html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  // Total funding
+  const totalMatch  = text.match(/Total Funding Amount[:\s]+(\$[\d.,]+[MKBmkb]?)/i);
+  // Last round
+  const roundMatch  = text.match(/(?:Last Funding Type|Funding Type)[:\s]+(Seed|Pre-Seed|Series [A-F]|Angel|Grant|Convertible Note|Bridge|IPO)/i);
+  const amountMatch = text.match(/(?:Last Funding Amount|Funding Amount)[:\s]+(\$[\d.,]+[MKBmkb]?)/i);
+  // Investors
+  const investorSection = text.match(/Investors?[:\s]*([\s\S]{0,400})/i);
+  const investors: string[] = [];
+  if (investorSection) {
+    const parts = (investorSection[1] ?? '').split(/[,\n•·]/).map(s => s.trim()).filter(s => s.length > 3 && s.length < 50);
+    investors.push(...parts.slice(0, 5));
+  }
+  const foundedMatch  = text.match(/(?:Founded|Founded Year)[:\s]+(\d{4})/i);
+  const empMatch      = text.match(/(?:Employee Count|Number of Employees)[:\s]+([\d,\-+]+)/i);
+
+  return {
+    totalFunding:    totalMatch  ? (totalMatch[1] ?? null)  : null,
+    lastRoundType:   roundMatch  ? (roundMatch[1] ?? null)  : null,
+    lastRoundAmount: amountMatch ? (amountMatch[1] ?? null) : null,
+    investors,
+    foundedYear:     foundedMatch ? (foundedMatch[1] ?? null) : null,
+    employeeRange:   empMatch     ? (empMatch[1] ?? null)     : null,
+    rawExcerpt:      text.slice(0, 600),
+  };
+}
+
+/**
+ * Full company intel: website (existing) + LinkedIn + Crunchbase.
+ * Call this from /api/crm-event for CLIENT pipeline deals.
+ * Non-fatal — returns whatever sources succeed.
+ */
+export async function enrichCompanyFull(opts: {
+  websiteUrl?: string | undefined;
+  linkedinUrl?: string | undefined;
+  crunchbaseSlug?: string | undefined;
+}): Promise<{
+  website?:    EnrichmentResult;
+  linkedin?:   LinkedInCompanyEnrichment;
+  crunchbase?: CrunchbaseEnrichment;
+}> {
+  const [website, linkedin, crunchbase] = await Promise.allSettled([
+    opts.websiteUrl     ? enrichLeadWebsite(opts.websiteUrl)          : Promise.resolve(null),
+    opts.linkedinUrl    ? enrichLinkedInCompany(opts.linkedinUrl)      : Promise.resolve(null),
+    opts.crunchbaseSlug ? enrichCrunchbase(opts.crunchbaseSlug)        : Promise.resolve(null),
+  ]);
+
+  const result: Record<string, unknown> = {};
+  if (website.status     === 'fulfilled' && website.value)    result.website    = website.value;
+  if (linkedin.status    === 'fulfilled' && linkedin.value)   result.linkedin   = linkedin.value;
+  if (crunchbase.status  === 'fulfilled' && crunchbase.value) result.crunchbase = crunchbase.value;
+  return result;
+}

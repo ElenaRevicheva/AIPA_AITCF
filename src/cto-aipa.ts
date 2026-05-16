@@ -2039,8 +2039,52 @@ async function startCTOAIPA() {
           won: HS_STAGES.won, lost: HS_STAGES.lost,
         };
 
-        // BrightData + Claude enrichment for X prospects with a bio website
+        // BrightData enrichment: website + LinkedIn + Crunchbase for CLIENT pipeline deals
         let enrichedCtx = ctx;
+
+        // If context contains LinkedIn or Crunchbase URLs, run full company intel
+        const liMatch = (ctx || '').match(/linkedin\.com\/company\/([\w-]+)/i);
+        const cbMatch = (ctx || '').match(/crunchbase\.com\/organization\/([\w-]+)/i);
+        if ((liMatch || cbMatch) && pipeline !== 'hiring') {
+          try {
+            const { enrichCompanyFull, isBrightDataConfigured } = await import('./brightdata-enrich');
+            if (isBrightDataConfigured()) {
+              const intel = await enrichCompanyFull({
+                websiteUrl:     domain ? `https://${domain}` : undefined,
+                linkedinUrl:    liMatch ? `https://www.linkedin.com/company/${liMatch[1]}` : undefined,
+                crunchbaseSlug: cbMatch ? cbMatch[1] : undefined,
+              });
+              const parts: string[] = [ctx || ''];
+              if (intel.linkedin) {
+                const li = intel.linkedin;
+                parts.push(`\n--- LinkedIn ---`);
+                if (li.employeeRange)      parts.push(`Employees: ${li.employeeRange}`);
+                if (li.companyType)        parts.push(`Type: ${li.companyType}`);
+                if (li.founded)            parts.push(`Founded: ${li.founded}`);
+                if (li.headquarters)       parts.push(`HQ: ${li.headquarters}`);
+                if (li.recentRoles.length) parts.push(`Hiring for: ${li.recentRoles.join(', ')}`);
+              }
+              if (intel.crunchbase) {
+                const cb = intel.crunchbase;
+                parts.push(`\n--- Crunchbase ---`);
+                if (cb.totalFunding)       parts.push(`Total funding: ${cb.totalFunding}`);
+                if (cb.lastRoundType)      parts.push(`Last round: ${cb.lastRoundType}${cb.lastRoundAmount ? ' ' + cb.lastRoundAmount : ''}`);
+                if (cb.investors.length)   parts.push(`Investors: ${cb.investors.join(', ')}`);
+              }
+              if (intel.website) {
+                const w = intel.website;
+                if (w.founderNames.length) parts.push(`Founders: ${w.founderNames.join(', ')}`);
+                if (w.techStack.length)    parts.push(`Tech: ${w.techStack.slice(0, 5).join(', ')}`);
+              }
+              enrichedCtx = parts.filter(Boolean).join('\n');
+              console.log(`[crm-event] Company intel: LI=${!!intel.linkedin} CB=${!!intel.crunchbase} site=${!!intel.website}`);
+            }
+          } catch (e) {
+            console.warn('[crm-event] enrichCompanyFull non-fatal:', (e as Error).message?.slice(0, 80));
+          }
+        }
+
+        // BrightData + Claude enrichment for X prospects with a bio website
         if (source === 'algom_poll' && domain) {
           try {
             const { enrichLeadWebsite, isBrightDataConfigured } = await import('./brightdata-enrich');
