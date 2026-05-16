@@ -391,7 +391,7 @@ When CTO AIPA ships a meaningful milestone, the following happens automatically 
 | 2 | Notifies CMO AIPA via `POST http://127.0.0.1:8080/api/tech-update` | Same Oracle VM, localhost |
 | 3 | Milestone queued in `pending_tech_updates.json` | `/home/ubuntu/VibeJobHunterAIPA_AIMCF/cto_aipa_updates/` |
 | 4 | **LinkedIn** — CMO picks it up at 20:00 Panama, generates post via Claude, sends via Make.com | `linkedin_cmo_v4.py`, `vibejobhunter-web` |
-| 5 | **Hashnode + dev.to** — blog crosspost fires after LinkedIn, fire-and-forget | `blog_publisher.py` |
+| 5 | **Dev.to only** — blog crosspost fires after LinkedIn, fire-and-forget (Hashnode dropped — paid plan only; NOT in use) | `blog_publisher.py` |
 | 6 | **X @reviceva** — dragontrade posts tweet on next 5th-post slot | `x-tech-updater.js`, `dragontrade-main` PM2 |
 | 7 | **Instagram** — EspaLuz Influencer uses milestone on next even day at 18:00 Panama (23:00 UTC) | `cto_milestone_module.py`, `espaluz-influencer` systemd |
 
@@ -545,3 +545,66 @@ if not marked and body.get("title"):
 {"ok": true, "pending": [], "total": 0, "held": true}
 ```
 All 4 HubSpot items: `posted_x=True AND posted=True`. Queue clean. Future milestone items (tasks/trello/voice features) will post cleanly — one per 5th-tweet cycle, no duplicates.
+
+---
+
+## 12. Blog Publishing Pipeline (May 2026)
+
+### What fires and where
+
+| Channel | Status | Notes |
+|---------|--------|-------|
+| **Dev.to** | ✅ Active | Primary blog channel — all posts published here via `DEVTO_API_KEY` |
+| **aideazz.xyz/blog** | ✅ Active | Auto-populated from Dev.to crosspost via existing sync mechanism |
+| **Hashnode** | ❌ NOT IN USE | Dropped — paid plan only. `HASHNODE_ACCESS_TOKEN` is NOT set in `.env` |
+
+> **Important:** The source file is `src/hashnode-daily.ts` — **misleading name**. It runs in Dev.to-only mode whenever `HASHNODE_ACCESS_TOKEN` is absent from env. Do not rename without a full audit; the PM2 config references this file directly.
+
+### Source file
+
+`/home/ubuntu/cto-aipa/src/hashnode-daily.ts`
+
+When `HASHNODE_ACCESS_TOKEN` is not set → Dev.to-only mode (calls `publishToDevTo()` only, skips `publishToHashnode()`).
+
+### PM2 process
+
+| Process | Script | Schedule |
+|---------|--------|---------|
+| `cto-aipa` | `dist/cto-aipa.js` | Runs blog generation on schedule (daily) |
+
+Logs: `pm2 logs cto-aipa --lines 200 | grep -i blog`
+
+### GSC integration
+
+| Env var | Value |
+|---------|-------|
+| `GOOGLE_ANALYTICS_CREDENTIALS` | JSON string — service account key from GCP project `vaulted-circle-368018` |
+| `GSC_SITE_URL` | `sc-domain:aideazz.xyz` |
+
+Function: `fetchGscTopQueries()` in `src/gsc-client.ts` — returns top search queries to inform blog topic selection.
+Service account added to GSC property as `siteFullUser` (verified May 16 2026).
+
+### GA4 integration
+
+| Env var | Value |
+|---------|-------|
+| `GOOGLE_ANALYTICS_CREDENTIALS` | Same service account JSON as GSC (reused) |
+| `GA4_PROPERTY_ID` | `515154124` |
+
+GCP property: `vaulted-circle-368018` ("My First Project"). Service account added as Viewer in GA4 (verified May 16 2026).
+Analytics Data API enabled. Returns 30-day traffic data (e.g. 1151 homepage views, 172 portfolio views).
+
+### VJH CMO crosspost
+
+`blog_publisher.py` in `VibeJobHunterAIPA_AIMCF/` — fire-and-forget Dev.to crosspost after LinkedIn posts.
+Called from `linkedin_cmo.py` via the `POST /api/crm-event` hub endpoint.
+
+### Env vars summary
+
+| Var | Required | Purpose |
+|-----|----------|---------|
+| `DEVTO_API_KEY` | ✅ Yes | Publishes to Dev.to |
+| `HASHNODE_ACCESS_TOKEN` | ❌ Not set | Leave unset — Hashnode is dropped |
+| `GOOGLE_ANALYTICS_CREDENTIALS` | ✅ Yes | GSC + GA4 auth (same service account) |
+| `GSC_SITE_URL` | ✅ Yes | `sc-domain:aideazz.xyz` |
+| `GA4_PROPERTY_ID` | ✅ Yes | `515154124` |
