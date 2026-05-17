@@ -1995,12 +1995,12 @@ async function startCTOAIPA() {
         source, type, pipeline,
         email, domain, name, context: ctx,
         jobTitle, company, recruiterEmail, recruiterName, jobUrl,
-        stage, urgency, notes,
+        stage, urgency, notes, score,
       } = req.body as {
         source?: string; type?: string; pipeline?: string;
         email?: string; domain?: string; name?: string; context?: string;
         jobTitle?: string; company?: string; recruiterEmail?: string; recruiterName?: string; jobUrl?: string;
-        stage?: string; urgency?: number; notes?: string;
+        stage?: string; urgency?: number; notes?: string; score?: number;
       };
 
       if (!source || !pipeline) {
@@ -2028,6 +2028,7 @@ async function startCTOAIPA() {
           jobUrl,
           source: source || 'VJH',
           notes,
+          score:  score ?? undefined,
           stage: (stage as import('./hubspot-client').HiringStage) || 'applied',
         });
 

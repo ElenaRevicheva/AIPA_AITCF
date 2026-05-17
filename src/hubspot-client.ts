@@ -292,6 +292,21 @@ export async function addNoteToContact(contactId: string, body: string): Promise
   }
 }
 
+export async function addNoteToDeal(dealId: string, body: string): Promise<void> {
+  const note = await hsPost<{ id: string }>('/crm/v3/objects/notes', {
+    properties: {
+      hs_note_body: body,
+      hs_timestamp: new Date().toISOString(),
+    },
+  });
+  if (note?.id) {
+    await hsPut(
+      `/crm/v4/objects/notes/${note.id}/associations/deals/${dealId}`,
+      [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }],
+    );
+  }
+}
+
 // ─── High-level: push one lead into HubSpot ───────────────────────────────────
 
 export interface LeadForHubSpot {
@@ -482,6 +497,7 @@ export interface HiringDealInput {
   jobUrl?: string | undefined;
   source?: string | undefined;
   stage?: HiringStage | undefined;
+  score?: number | undefined;
   notes?: string | undefined;
 }
 
@@ -546,6 +562,16 @@ ${input.notes}` : null,
     if (contactId && companyId) await associateContactCompany(contactId, companyId);
     if (dealId && contactId)    await associateDealContact(dealId, contactId);
     if (dealId && companyId)    await associateDealCompany(dealId, companyId);
+
+    // Attach actionable Note engagement so Elena sees score + URL in Notes tab
+    if (dealId) {
+      const noteLines: string[] = [];
+      if (input.score)  noteLines.push(`Score: ${input.score}/100`);
+      if (input.jobUrl) noteLines.push(`Apply: ${input.jobUrl}`);
+      if (input.notes)  noteLines.push(input.notes);
+      if ((input.stage as string) === 'human_pending') noteLines.push('⚠️ NEEDS MANUAL APPLY — click link above');
+      if (noteLines.length) await addNoteToDeal(dealId, noteLines.join('\n'));
+    }
 
     console.log(`[HubSpot] ✅ Hiring deal pushed — "${input.jobTitle} @ ${input.company}" contact:${contactId} deal:${dealId}`);
     return { contactId, companyId, dealId };
