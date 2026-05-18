@@ -395,6 +395,93 @@ export function saveBlogPostCache(entry: { slug: string; title: string; markdown
   fs.writeFileSync(cacheFile, JSON.stringify(cache, null, 2), "utf8");
 }
 
+
+/** Regenerate sitemap.xml from cache + static pages, commit to ElenaRevicheva/aideazz via GitHub API. */
+export async function pushSitemapToGithub(): Promise<void> {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (!token) { console.warn("📍 Sitemap: GITHUB_TOKEN not set — skipping"); return; }
+
+  const REPO = "ElenaRevicheva/aideazz";
+  const FILE = "public/sitemap.xml";
+  const SITE = "https://aideazz.xyz";
+  const today = new Date().toISOString().slice(0, 10);
+
+  const staticUrls = [
+    ["/"                  , "1.0", "weekly" , today],
+    ["/about"             , "0.8", "monthly", today],
+    ["/portfolio"         , "0.9", "weekly" , today],
+    ["/blog"              , "0.85","weekly" , today],
+    ["/pitch.html"        , "0.7", "monthly", today],
+    ["/pitch-es.html"     , "0.6", "monthly", today],
+    ["/sop-ai-ops.html"   , "0.72","weekly" , today],
+    ["/sop-ai-ops-es.html", "0.72","weekly" , today],
+    ["/llms.txt"          , "0.55","monthly", today],
+    ["/.well-known/llms.txt","0.55","monthly",today],
+    ["/geo-manifest.json" , "0.55","monthly", today],
+    ["/humans.txt"        , "0.35","yearly" , today],
+    ["/CITATION.cff"      , "0.35","yearly" , today],
+    ["/robots.txt"        , "0.3" ,"yearly" , today],
+  ] as const;
+
+  const makeUrl = (loc: string, date: string, freq: string, priority: string): string =>
+    ["  <url>",
+     "    <loc>" + loc + "</loc>",
+     "    <lastmod>" + date + "</lastmod>",
+     "    <changefreq>" + freq + "</changefreq>",
+     "    <priority>" + priority + "</priority>",
+     "  </url>"].join("\n");
+
+  const rows: string[] = staticUrls.map(([p, pri, freq, d]) =>
+    makeUrl(SITE + p, d, freq, pri));
+
+  type CacheEntry = { slug: string; publishedAt?: string };
+  try {
+    const cacheFile = getBlogPostCachePath();
+    const obj = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, CacheEntry>;
+    const posts = Object.values(obj)
+      .sort((a, b) => (b.publishedAt || "").localeCompare(a.publishedAt || ""));
+    for (const e of posts) {
+      rows.push(makeUrl(SITE + "/blog/" + e.slug,
+        (e.publishedAt || today).slice(0, 10), "monthly", "0.75"));
+    }
+    console.log("📍 Sitemap: " + posts.length + " blog posts + " + staticUrls.length + " static pages");
+  } catch { console.warn("📍 Sitemap: cache read failed"); }
+
+  const xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    + rows.join("\n") + "\n"
+    + "</urlset>\n";
+
+  const encoded = Buffer.from(xml).toString("base64");
+  const headers: Record<string,string> = {
+    Authorization: "Bearer " + token,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "Content-Type": "application/json",
+    "User-Agent": "cto-aipa-sitemap/1.0",
+  };
+  const apiUrl = "https://api.github.com/repos/" + REPO + "/contents/" + FILE;
+
+  let sha: string | undefined;
+  try {
+    const r = await fetch(apiUrl, { headers });
+    if (r.ok) { const j = await r.json() as { sha?: string }; sha = j.sha; }
+  } catch { /* new file */ }
+
+  const body: Record<string,string> = {
+    message: "chore(sitemap): auto-update [skip ci]",
+    content: encoded,
+  };
+  if (sha) body.sha = sha;
+
+  const put = await fetch(apiUrl, { method: "PUT", headers, body: JSON.stringify(body) });
+  if (put.ok) {
+    console.log("📍 Sitemap committed to GitHub ✅");
+  } else {
+    const err = await put.text();
+    console.warn("📍 Sitemap commit failed (" + put.status + "): " + err.slice(0, 200));
+  }
+}
 export function getBlogPostCachePath(): string {
   return path.join(process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data"), "blog-posts-cache.json");
 }
@@ -781,6 +868,8 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   writeTopicIndex(index);
   saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
+  // Auto-push updated sitemap to aideazz repo → 4everland redeploys
+  pushSitemapToGithub().catch(e => console.warn("📍 Sitemap:", e instanceof Error ? e.message : String(e)));
   await saveContentLog({
     channel: "devto_direct",
     keyword,
