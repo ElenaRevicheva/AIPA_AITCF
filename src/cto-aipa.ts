@@ -871,7 +871,7 @@ async function startCTOAIPA() {
     });
   });
 
-  app.post('/hashnode/daily-run', async (req, res) => {
+  app.post('/hashnode/daily-run', (req, res) => {
     const secret = process.env.HASHNODE_DAILY_TRIGGER_SECRET;
     if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
       res.status(401).json({
@@ -880,15 +880,13 @@ async function startCTOAIPA() {
       });
       return;
     }
-    try {
-      const model = process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic;
-      const maxTok = Math.min(AI_MODELS.maxTokens, 8192);
-      const out = await runDailyHashnodePost({ anthropic, model, maxTokens: maxTok });
-      res.json({ ok: true, ...out });
-    } catch (e) {
-      console.error('hashnode/daily-run:', e);
-      res.status(500).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
-    }
+    // Fire-and-forget — Opus generation takes 2-3 min, past nginx timeout.
+    res.status(202).json({ ok: true, status: 'started', note: 'Generating in background — check PM2 logs in ~3 min' });
+    const model = process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic;
+    const maxTok = Math.min(AI_MODELS.maxTokens, 8192);
+    runDailyHashnodePost({ anthropic, model, maxTokens: maxTok })
+      .then(out => console.log('\U0001f4f0 [manual-run] done:', JSON.stringify(out)))
+      .catch(e => console.error('\U0001f4f0 [manual-run] error:', e instanceof Error ? e.message : String(e)));
   });
 
   // ==========================================================================

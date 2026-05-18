@@ -411,6 +411,24 @@ function slugAlreadyPublished(slug: string): boolean {
   }
 }
 
+/** Returns set of topic indices already present in the cache (by keyword match on slug). */
+function getPublishedTopicIndices(): Set<number> {
+  const excluded = new Set<number>();
+  try {
+    const cacheFile = getBlogPostCachePath();
+    if (!fs.existsSync(cacheFile)) return excluded;
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, unknown>;
+    const publishedSlugs = Object.keys(cache);
+    HASHNODE_TOPIC_BRIEFS.forEach((t, i) => {
+      const kSlug = t.keyword.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      if (publishedSlugs.some(s => s.includes(kSlug) || kSlug.includes(s.slice(0, 20)))) {
+        excluded.add(i);
+      }
+    });
+  } catch { /* ignore */ }
+  return excluded;
+}
+
 function pickNextTopic(): { index: number; keyword: string; brief: string } {
   const n = HASHNODE_TOPIC_BRIEFS.length;
   const prev = readTopicIndex();
@@ -579,12 +597,32 @@ async function fetchGscTopQueries(): Promise<string[]> {
 /** Ask Claude which topic from the rotation is least covered by current GSC queries. */
 async function pickTopicWithGscGap(
   anthropic: Anthropic,
-  gscQueries: string[]
+  gscQueries: string[],
+  excludedIndices: Set<number> = new Set()
 ): Promise<{ index: number; keyword: string; brief: string }> {
-  const fallback = pickNextTopic();
+  // Find fallback = next rotation topic that isn't already published
+  const baseFallback = pickNextTopic();
+  const fallback = excludedIndices.has(baseFallback.index)
+    ? (() => {
+        const n = HASHNODE_TOPIC_BRIEFS.length;
+        for (let d = 1; d < n; d++) {
+          const idx = (baseFallback.index + d) % n;
+          if (!excludedIndices.has(idx)) {
+            const t = HASHNODE_TOPIC_BRIEFS[idx]!;
+            return { index: idx, keyword: t.keyword, brief: t.brief };
+          }
+        }
+        return baseFallback; // all published, just use rotation
+      })()
+    : baseFallback;
   if (!gscQueries.length) return fallback;
   try {
-    const topics = HASHNODE_TOPIC_BRIEFS.map((t, i) => `${i}: ${t.keyword}`).join("\n");
+    // Only offer topics not already in the cache
+    const available = HASHNODE_TOPIC_BRIEFS
+      .map((t, i) => ({ i, t }))
+      .filter(({ i }) => !excludedIndices.has(i));
+    const topics = available.map(({ i, t }) => `${i}: ${t.keyword}`).join("\n");
+    if (!topics) return fallback;
     const resp = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 64,
@@ -674,7 +712,11 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
   }
 
   const gscQueries = await fetchGscTopQueries();
-  const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries);
+  const publishedIndices = getPublishedTopicIndices();
+  if (publishedIndices.size > 0) {
+    console.log(`📰 Skipping ${publishedIndices.size} already-published topic(s): [${[...publishedIndices].join(', ')}]`);
+  }
+  const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries, publishedIndices);
 
   const baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
 
@@ -723,16 +765,11 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   if (!parsed) throw new Error("Article generation produced no output");
 
-  // Guard against canonical URL collision: if this slug is already in the cache,
-  // append the current date so Dev.to gets a unique canonical and the new article
-  // doesn't collide with the April post that caused the 422 issue.
+  // Slug collision guard — topic exclusion above should prevent this, but just in case.
   let finalTitle = parsed.title;
   let slug = titleToSlug(finalTitle);
   if (slugAlreadyPublished(slug)) {
-    const dateTag = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    finalTitle = `${parsed.title} (${dateTag})`;
-    slug = titleToSlug(finalTitle);
-    console.log(`📰 Slug collision detected — using disambiguated title: "${finalTitle}"`);
+    console.warn(`📰 Slug collision for "${slug}" — topic filter missed it; publishing anyway (Dev.to will accept as duplicate).`);
   }
   const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${slug}`;
 
