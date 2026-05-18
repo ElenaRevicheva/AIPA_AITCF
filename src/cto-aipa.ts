@@ -1027,6 +1027,49 @@ async function startCTOAIPA() {
     }
   });
 
+
+  // BLOG — English post content (by slug, from local cache)
+  // Frontend falls back to this when Dev.to API is unavailable or slow.
+  // ==========================================================================
+
+  app.options("/blog/post/:slug", (req: Request, res: Response) => {
+    blogEsCors(req, res);
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).end();
+  });
+
+  app.get("/blog/post/:slug", (req: Request, res: Response) => {
+    blogEsCors(req, res);
+    const raw = typeof req.params.slug === "string" ? req.params.slug : "";
+    const slug = decodeURIComponent(raw).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 180);
+    if (!slug) {
+      res.status(400).json({ error: "Invalid slug" });
+      return;
+    }
+    try {
+      const cacheFile = path.join(process.cwd(), "data", "blog-posts-cache.json");
+      type CacheEntry = { slug: string; title: string; markdown?: string; publishedAt: string; devtoUrl?: string; aideazzBlogUrl?: string };
+      const obj = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, CacheEntry>;
+      const entry = obj[slug];
+      if (!entry || !entry.markdown?.trim()) {
+        res.status(404).json({ error: "Post not found" });
+        return;
+      }
+      res.setHeader("Cache-Control", "public, max-age=3600");
+      res.json({
+        slug: entry.slug,
+        title: entry.title,
+        markdown: entry.markdown,
+        publishedAt: entry.publishedAt,
+        devtoUrl: entry.devtoUrl || null,
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      res.status(500).json({ error: msg });
+    }
+  });
+
   // ==========================================================================
   // MARKETING — UTM inbound (aideazz.xyz contact form → Oracle business_leads)
   // ==========================================================================
