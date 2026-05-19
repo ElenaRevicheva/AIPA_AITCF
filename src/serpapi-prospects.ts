@@ -55,6 +55,41 @@ interface SerpResult {
   displayed_link?: string;
 }
 
+// ─── Hard filter: skip results whose title screams "wrong shape" ───
+// Mirrors Python JobGate (CAREER_FOCUS) — was missing here, allowing
+// Bristol Myers / Atlassian / Medium / useshiny.com to pollute [CLIENT].
+const TITLE_REJECT_PATTERNS = [
+  // Senior/wrong-level roles in result titles
+  'principal', 'director', 'vp ', 'vp,', 'vice president', 'staff engineer',
+  'head of', 'trainee', 'graduate engineer', 'apprentice',
+  // Wrong domain
+  'devops', 'devsecops', 'database engineer', 'ui developer', 'power bi',
+  'cloud engineer', 'sales', 'recruiter', 'account manager',
+  'senior engineer', 'senior software', 'senior ai', 'senior ml',
+  'ml engineer', 'machine learning engineer', 'data scientist',
+];
+
+// Fortune-500 / large companies that should NOT show up as fractional-CTO prospects
+const BIG_CO_REJECT = [
+  'bristol myers', 'atlassian', 'medium ', 'medium —', 'workday', 'pepsico',
+  'expedia', 'general motors', 'bausch + lomb', 'saic', 'pennymac', 'teradata',
+  'blue orange digital', 'new york life', 'datavant', 'airbnb', 'rocket lawyer',
+  'liberty mutual', 'salesforce', 'adobe', 'hubspot ', 'servicenow',
+  'google', 'meta', 'amazon', 'microsoft', 'oracle', 'apple',
+  // Aggregator/listing/recruiting sites that show up as "company"
+  'useshiny.com', 'ziprecruiter', 'indeed.com', 'glassdoor',
+  'ai 2030', 'intalex', 'tds global', 'jobgether', 'tempo software',
+  'careeratlas', 'jobs for humanity', 'jobs for the future',
+];
+
+function shouldRejectResult(title: string, link: string): string | null {
+  const t = (title || '').toLowerCase();
+  const l = (link || '').toLowerCase();
+  for (const p of TITLE_REJECT_PATTERNS) if (t.includes(p)) return `title-pattern: ${p}`;
+  for (const c of BIG_CO_REJECT)         if (t.includes(c) || l.includes(c)) return `big-co/aggregator: ${c}`;
+  return null;
+}
+
 async function fetchGoogleSearch(query: string, site: string): Promise<SerpResult[]> {
   if (!SERPAPI_KEY) return [];
   const q = site ? `${query} ${site}` : query;
@@ -110,6 +145,13 @@ export async function runSerpProspects(): Promise<void> {
       const hash = urlHash(result.link);
       if (seen.has(hash)) continue;
       seen.add(hash);
+
+      // HARD FILTER: skip wrong-role + big-co + aggregator results before any push.
+      const rejectReason = shouldRejectResult(result.title || '', result.link || '');
+      if (rejectReason) {
+        console.log(`[SerpProspects]   ✗ REJECT (${rejectReason}): ${result.title?.slice(0, 60)}`);
+        continue;
+      }
       newProspects++;
 
       // Extract domain for BrightData enrichment (fires automatically in crm-event handler)
