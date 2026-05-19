@@ -251,6 +251,51 @@ export async function createDeal(input: {
   return data?.id ?? null;
 }
 
+/**
+ * Find existing deal by exact name match (most recent first). Returns deal id or null.
+ * Used by upsert paths (lead-triage, fresh-leads-ingest) to avoid creating duplicates.
+ */
+export async function findDealByName(name: string): Promise<{ id: string; stage: string } | null> {
+  try {
+    const data = await hsPost<{ results?: Array<{ id: string; properties: { dealstage: string } }> }>(
+      '/crm/v3/objects/deals/search',
+      {
+        filterGroups: [{ filters: [{ propertyName: 'dealname', operator: 'EQ', value: name }] }],
+        properties: ['dealname', 'dealstage'],
+        sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+        limit: 1,
+      },
+    );
+    const hit = data?.results?.[0];
+    return hit ? { id: hit.id, stage: hit.properties.dealstage } : null;
+  } catch (e) {
+    console.warn('[HubSpot] findDealByName error:', (e as Error).message?.slice(0, 80));
+    return null;
+  }
+}
+
+/**
+ * Update an existing deal's stage + optionally description.
+ * Used by upsert flows after findDealByName().
+ */
+export async function updateDeal(dealId: string, input: {
+  stage?: HSDealStage | undefined;
+  description?: string | undefined;
+}): Promise<boolean> {
+  try {
+    const props: Record<string, string> = {};
+    if (input.stage) props.dealstage = input.stage;
+    if (input.description) props.description = input.description;
+    if (!Object.keys(props).length) return true;
+    await hsPatch(`/crm/v3/objects/deals/${dealId}`, { properties: props });
+    console.log(`[HubSpot] Updated deal ${dealId} → stage=${input.stage || '(unchanged)'}`);
+    return true;
+  } catch (e) {
+    console.warn(`[HubSpot] updateDeal ${dealId} error:`, (e as Error).message?.slice(0, 80));
+    return false;
+  }
+}
+
 // ─── Associations ─────────────────────────────────────────────────────────────
 
 export async function associateContactCompany(contactId: string, companyId: string): Promise<void> {

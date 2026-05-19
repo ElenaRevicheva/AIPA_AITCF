@@ -350,16 +350,37 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
         const hsStage = result.urgency >= 4 ? HS_STAGES.engaged
                       : result.urgency >= 3 ? HS_STAGES.contacted
                       : HS_STAGES.prospected;
-        pushLeadToHubSpot({
-          name:      lead.name || 'Unknown',
-          // For outreach_targets the "name" column holds the company name —
-          // pass it explicitly as company so HubSpot creates a Company record
-          company:   isFreshProspect ? lead.name : undefined,
-          email:     hasRealEmail ? lead.email : undefined,
-          source:    lead.utm_source || lead.source_table,
-          painPoint: result.one_line_summary,
-          stage:     hsStage,
-        }).catch((e) => { console.warn('[triage→HS] push failed:', e?.message || e); });
+        // UPSERT: find existing deal by name (created by fresh-leads-ingest 1h earlier)
+        // and update its stage instead of creating a duplicate. Falls back to create-new
+        // if no match. Was creating 1 dup per company per cron run.
+        const companyForDeal = isFreshProspect ? lead.name : undefined;
+        const dealName = companyForDeal
+          ? `${companyForDeal} — outreach`
+          : `${lead.name || 'Unknown'} — outreach`;
+        (async () => {
+          try {
+            const { findDealByName, updateDeal } = await import('./hubspot-client');
+            const existing = await findDealByName(dealName);
+            if (existing) {
+              await updateDeal(existing.id, {
+                stage: hsStage,
+                description: `Pain point: ${result.one_line_summary}\nSource: ${lead.utm_source || lead.source_table}`,
+              });
+              console.log(`[triage→HS] UPDATED existing deal ${existing.id} (${dealName})`);
+            } else {
+              await pushLeadToHubSpot({
+                name:      lead.name || 'Unknown',
+                company:   companyForDeal,
+                email:     hasRealEmail ? lead.email : undefined,
+                source:    lead.utm_source || lead.source_table,
+                painPoint: result.one_line_summary,
+                stage:     hsStage,
+              });
+            }
+          } catch (e: any) {
+            console.warn('[triage→HS] push failed:', e?.message || e);
+          }
+        })();
       }
 
       processed++;
