@@ -675,3 +675,26 @@ logger.info("Orchestrator ready (dashboard reads only — autonomous loop runs i
 
 > This file is my memory. I read it at the start of every session. Without it, I start blind.
 > Last scan: 2026-04-25 | Version: 1.5 — RAG shipped in EspaLuz Telegram (pgvector + LangChain 2-layer memory, confirmed live). RAG gap closed.
+
+
+---
+
+## 🆕 May 20 2026 additions
+
+### New positioning proof point (interview / founder calls)
+
+> "When my multi-agent HubSpot was unreadable — five agents pushing to the same dashboard with no way to tell who found what — I designed a `[STREAM-AGENT]` dealname prefix convention. One env-aware design change, threaded through one endpoint + two helper functions + five writers. Now every deal tells me at a glance which agent found it, which pipeline it belongs to, and what my next action should be. That's the difference between a busy dashboard and a decision-making dashboard."
+
+Pairs well with: "I shipped this in a single session — diagnosed the gap, designed the architecture, deployed across three repos (TypeScript + Python + JavaScript), smoke-tested end-to-end. Velocity comes from Claude Code + a clear contract, not from cutting corners."
+
+Reference for the work: `docs/HUBSPOT_NAMING.md` + `project_hubspot_dashboard.md` in Claude memory.
+
+### xAI team available
+
+- **Team:** `rhino-sneezing-lemon` (xAI developer console, created 06.05.2026)
+- **X account:** `1910676161845186560`
+- **Key:** `XAI_API_KEY` in `/home/ubuntu/cto-aipa/.env` and `/home/ubuntu/dragontrade-agent/.env`
+- **Status:** key available, not yet wired
+- **Pending uses:** (1) Algom backup Twitter listener (rate-limit insurance), (2) Grok in CTO AIPA model routing, (3) xAI team X API for elevated limits
+
+For interview framing: "I keep optionality in my model routing. Anthropic Opus for high-stakes, Groq Llama for high-volume cheap calls, Grok as a third option when xAI cost/performance fits a use case. The router makes the choice per request — I'm not married to any one vendor."

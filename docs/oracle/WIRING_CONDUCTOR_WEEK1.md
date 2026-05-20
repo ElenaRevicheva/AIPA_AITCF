@@ -256,3 +256,27 @@ CREATE TABLE espaluz_funnel (
 #### Status after this session
 
 Steps 1–5 of Phase 5.6 multi-agent HubSpot plan: ✅ DONE. Step 6 (CMO LinkedIn / Make.com) = ⏳ pending.
+
+
+---
+
+## 🆕 May 20 2026 status update
+
+### ✅ Closed this session
+
+- **HubSpot dashboard Step 1 — source prefix system.** All 5 active HubSpot writers (crm_hub.py, serpapi_jobs_ingest.py, serpapi-prospects.ts, fresh-leads-ingest.ts + lead-triage.ts, algom-poll.js + stream-listener.js) now stamp `sourcePrefix` into dealname. Helper functions in `hubspot-client.ts` wrap as `[STREAM-AGENT] {baseName}`. Smoke-tested end-to-end. See `docs/HUBSPOT_NAMING.md` for prefix table.
+- **Sprinter voice → morning briefing.** Telegram voice handler now persists every voice note to Oracle `knowledge_base` as `voice_note` category. `/sprint-knowledge` endpoint fetches them alongside diary + tasks so Lambda briefing includes voice context.
+
+### 🟡 New pending items
+
+- **Step 2 — bulk-rename existing ~175 HubSpot deals** with the right prefix (script reads each deal's source/description field, prepends correct tag).
+- **Step 3 — HubSpot UI stage rename** (Elena's hands; both available HubSpot tokens lack `crm.pipelines.write` scope). Proposed labels (under review): 📥 Just arrived / 🔥 Reach out TODAY / ⚡ Reach out this week / ✉️ Sent — waiting / 💬 They replied — YOUR TURN / ✅ Won / ❌ No fit.
+- **xAI key wiring.** `XAI_API_KEY` added to cto-aipa + dragontrade env on May 20 2026, not yet wired. Three concrete next options: Algom backup listener / Grok in model routing / xAI team X API.
+
+### Still red (carry forward)
+
+- `fresh-leads-ingest.ts` PATH B still ungated (no JobGate-equivalent filter — TS port pending).
+- Resend 422 emails: `Founder @ DiaMonTech AG@DiaMonTech AG` — company name pasted as email address (bug in outreach draft path, not yet investigated).
+- Hashnode dead-code cleanup: `hashnode-daily.ts` only publishes to Dev.to now; file name + ~500 lines of dead Hashnode types are stale.
+- CMO LinkedIn engagement → HubSpot: Make.com posts work, but reply/comment events never flow back to HubSpot.
+- EspaLuz PayPal subscriber + WhatsApp chat events → HubSpot: not wired.

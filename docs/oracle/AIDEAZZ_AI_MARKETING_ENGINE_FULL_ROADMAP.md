@@ -1222,3 +1222,18 @@ The answer is no longer "I can build it." It's "Here it is, running. Want me to 
 > Phase 5.6 status: **STEPS 1–5 LIVE (May 14–15, 2026)** — `/api/crm-event` hub endpoint live at `https://webhook.aideazz.xyz/cto/api/crm-event` (Bearer `OUTREACH_SECRET`); `/api/crm-pipeline/setup` (free-tier strategy) + `/api/crm-pipeline/ids` (read pipeline IDs); **free-tier strategy**: `[HIRING] {jobTitle} @ {company}` naming in Sales Pipeline (stage map: applied→Appointment Scheduled, recruiter_responded→Qualified to Buy, interview_scheduled→Presentation Scheduled, offer_received→Decision Maker Bought-In, accepted→Closed Won, declined→Closed Lost); `src/hubspot-client.ts` — `HS_HIRING_PIPELINE_ID`, `HS_HIRING_STAGE_IDS`, `HiringStage` type, `createHiringPipeline()`, `pushHiringDealToHubSpot()`; **VJH → CRM**: `src/langgraph_pipeline/crm_hub.py` (NEW) posts to `/api/crm-event` after each application (pipeline=hiring); **Algom Alpha → CRM**: `pushProspectToCRM()` in `stream-listener.js` — high-intent keyword matches → Client Pipeline; env vars `OUTREACH_SECRET` + `CTO_AIPA_WEBHOOK_URL` added to both VJH and Algom Alpha. **Step 6** (CMO LinkedIn / Make.com) = ⏳ pending. See [§5.6](#phase-56-multi-agent-hubspot) for full plan.
 > Phase 6 status: NOT STARTED — highest priority for hiring + client acquisition showcase
 > Next: Phase 6 (showcase package); optional widen outreach sources; optional draft→approve before Hashnode publish
+
+
+---
+
+## 🆕 May 20 2026 addition — Multi-agent HubSpot triage with source provenance
+
+Real depth proof point for client demos: every lead entering the marketing engine's HubSpot now carries a source tag like `[CLIENT-CTO-INGEST]`, `[CLIENT-ALGOM]`, `[CLIENT-CTO-SERP]`, etc. This means:
+
+- A client scanning their HubSpot can instantly tell which marketing channel produced each opportunity
+- AI agents can be A/B compared by deal quality, not just deal volume
+- New marketing channels (LinkedIn engagement, Google Places, Product Hunt, organic search) plug in by claiming a new reserved prefix — no rewiring of the dashboard
+
+This is exactly the kind of "AI marketing engine you can actually operate" depth that differentiates a portfolio piece from a buzzword pitch. The full prefix convention reference lives in `docs/HUBSPOT_NAMING.md`.
+
+Deployed May 20 2026. Pairs with the existing GEO+SEO blog pipeline (Dev.to publishing + GA4 + Search Console feedback loop in `hashnode-daily.ts`).

@@ -727,3 +727,54 @@ Response detector: `src/autonomous/response_detector.py` — scans inbox every V
 | EspaLuzWhatsApp | `887f419` | Trial start → HubSpot [ESPALUZ] |
 | EspaLuzFamilybot | `80be496` | Trial start → HubSpot [ESPALUZ] |
 | EspaLuz_Influencer | `d1534d9` | Daily posts → HubSpot CRM signal |
+
+
+---
+
+## 🆕 May 20 2026 — HubSpot prefix architecture + Sprinter voice fix + xAI key in env
+
+### HubSpot dealname prefix system (deployed May 20 2026)
+
+Every HubSpot deal is now stamped with a `[STREAM-AGENT]` prefix so the dashboard is scannable by source. Helper functions live in:
+
+- `/home/ubuntu/cto-aipa/src/hubspot-client.ts` — `pushHiringDealToHubSpot` and `pushLeadToHubSpot` both accept `sourcePrefix?: string`. When set, dealname is wrapped as `[<sourcePrefix>] <baseName>`.
+- `/home/ubuntu/cto-aipa/src/cto-aipa.ts` — `/api/crm-event` endpoint destructures `sourcePrefix` from body and passes through to the right helper.
+
+Active prefixes (full reference: `docs/HUBSPOT_NAMING.md`):
+
+| Prefix | Writer | Pipeline |
+|--------|--------|----------|
+| `[HIRING-VJH]` | `crm_hub.py` (VJH) | HIRING |
+| `[HIRING-VJH-SERP]` | `serpapi_jobs_ingest.py` (VJH) | HIRING |
+| `[CLIENT-CTO-INGEST]` | `fresh-leads-ingest.ts` + `lead-triage.ts` (CTO) | CLIENT |
+| `[CLIENT-CTO-SERP]` | `serpapi-prospects.ts` (CTO) | CLIENT |
+| `[CLIENT-ALGOM]` | `algom-poll.js` + `stream-listener.js` (dragontrade) | CLIENT |
+
+Backwards compatible: callers without `sourcePrefix` keep legacy naming. New writers MUST set `sourcePrefix` — pick from the table or add a new reserved prefix.
+
+**Smoke test (verifies end-to-end):**
+```bash
+S=$(grep '^OUTREACH_SECRET=' /home/ubuntu/cto-aipa/.env | cut -d= -f2-)
+curl -s -X POST https://webhook.aideazz.xyz/cto/api/crm-event \
+  -H "Authorization: Bearer $S" -H 'Content-Type: application/json' \
+  -d '{"source":"smoke","type":"application","pipeline":"hiring","sourcePrefix":"TEST","jobTitle":"x","company":"y","domain":"z.io","jobUrl":"https://z","stage":"applied"}'
+# Then DELETE the resulting deal+company via /crm/v3/objects/{deals,companies}/{id}
+```
+
+### Sprinter voice-knowledge fix (deployed May 20 2026)
+
+The Telegram voice handler in `telegram-bot.ts` previously created Trello cards from voice notes but never persisted them to Oracle `knowledge_base`. The Lambda morning briefing therefore had zero voice context. Fixed in two places:
+
+1. `src/telegram-bot.ts`: both Trello return paths (`processMultiAction` and `createTrelloCardFromTranscript`) now call `saveKnowledge(userId, 'voice_note', ...)` before returning.
+2. `src/cto-aipa.ts`: `/sprint-knowledge` endpoint now fetches `getKnowledgeByCategory(uid, 'voice_note', 10)` alongside existing `diary` and `task` queries, and renders them under "recent voice notes" in the Lambda context.
+
+### XAI_API_KEY env requirement (added May 20 2026)
+
+xAI team key for `rhino-sneezing-lemon` (X account `1910676161845186560`) is now in env on both:
+
+- `/home/ubuntu/cto-aipa/.env` — `XAI_API_KEY`, `XAI_TEAM_NAME`, `XAI_TEAM_X_ACCOUNT_ID`
+- `/home/ubuntu/dragontrade-agent/.env` — same 3 keys
+
+**Status:** key available in env, **not yet wired to any code**. Three pending wiring options (each its own session): (1) Algom backup Twitter listener with higher rate limits, (2) Grok-as-LLM in CTO AIPA model routing, (3) xAI team-level X API access.
+
+**Security note:** key was shared in chat on May 20 2026; rotate before production use.
