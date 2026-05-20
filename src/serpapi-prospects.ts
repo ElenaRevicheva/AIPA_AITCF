@@ -169,6 +169,7 @@ export async function runSerpProspects(): Promise<void> {
         source:   'serpapi_search',
         type:     'prospect',
         pipeline: 'client',
+        sourcePrefix: 'CLIENT-CTO-SERP',
         name:     result.title?.slice(0, 120) || 'Unknown',
         domain,
         context:  `[Google/${entry.tag}] ${result.title}\n${result.link}\n\n${result.snippet}`,

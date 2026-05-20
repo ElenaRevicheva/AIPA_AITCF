@@ -369,6 +369,7 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
               console.log(`[triage→HS] UPDATED existing deal ${existing.id} (${dealName})`);
             } else {
               await pushLeadToHubSpot({
+      sourcePrefix: 'CLIENT-CTO-INGEST',
                 name:      lead.name || 'Unknown',
                 company:   companyForDeal,
                 email:     hasRealEmail ? lead.email : undefined,

@@ -363,6 +363,8 @@ export interface LeadForHubSpot {
   painPoint?: string | undefined;
   matchedSystem?: string | undefined;
   stage?: HSDealStage | undefined;
+  /** e.g. 'CLIENT-CTO-INGEST' or 'CLIENT-ALGOM' — wrapped in [brackets] as dealname prefix */
+  sourcePrefix?: string | undefined;
 }
 
 /**
@@ -403,9 +405,12 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
       : null;
 
     // 3. Deal
-    const dealName = lead.company
+    const baseDealName = lead.company
       ? `${lead.company} — outreach`
       : `${lead.name} — outreach`;
+    const dealName = lead.sourcePrefix
+      ? `[${lead.sourcePrefix}] ${baseDealName}`
+      : baseDealName;
 
     const dealId = await createDeal({
       name:        dealName,
@@ -544,6 +549,8 @@ export interface HiringDealInput {
   stage?: HiringStage | undefined;
   score?: number | undefined;
   notes?: string | undefined;
+  /** e.g. 'HIRING-VJH' or 'HIRING-VJH-SERP' — wrapped in [brackets] as dealname prefix */
+  sourcePrefix?: string | undefined;
 }
 
 /**
@@ -592,7 +599,7 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
     });
 
     const dealId = await createDeal({
-      name:  `[HIRING] ${input.jobTitle} @ ${input.company}`,
+      name:  `[${input.sourcePrefix || 'HIRING'}] ${input.jobTitle} @ ${input.company}`,
       stage: stageId,
       description: [
         `Category: hiring`,

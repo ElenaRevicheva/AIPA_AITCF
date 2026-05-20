@@ -449,6 +449,7 @@ export async function runFreshLeadsIngestion(
     const pain = painMap.get(l.company);
     try {
       await pushLeadToHubSpot({
+        sourcePrefix: 'CLIENT-CTO-INGEST',
         name:          l.name,
         email:         l.email || undefined,
         company:       l.company,

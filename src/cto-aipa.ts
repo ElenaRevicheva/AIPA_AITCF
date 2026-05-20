@@ -2045,12 +2045,13 @@ async function startCTOAIPA() {
         source, type, pipeline,
         email, domain, name, context: ctx,
         jobTitle, company, recruiterEmail, recruiterName, jobUrl,
-        stage, urgency, notes, score,
+        stage, urgency, notes, score, sourcePrefix,
       } = req.body as {
         source?: string; type?: string; pipeline?: string;
         email?: string; domain?: string; name?: string; context?: string;
         jobTitle?: string; company?: string; recruiterEmail?: string; recruiterName?: string; jobUrl?: string;
         stage?: string; urgency?: number; notes?: string; score?: number;
+        sourcePrefix?: string;
       };
 
       if (!source || !pipeline) {
@@ -2080,6 +2081,7 @@ async function startCTOAIPA() {
           notes,
           score:  score ?? undefined,
           stage: (stage as import('./hubspot-client').HiringStage) || 'applied',
+          sourcePrefix,
         });
 
       } else {
@@ -2180,6 +2182,7 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
         }
 
         result = await pushLeadToHubSpot({
+          sourcePrefix,
           name:   name || company || email || source,
           email,
           company: company || domain,
