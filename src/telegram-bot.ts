@@ -6313,6 +6313,19 @@ Ready to commit? Use:
             lastTrelloSession.set(uid, { cards: newlyCreated, listTarget: 'todo_flow', ts: Date.now() });
           }
           await ctx.reply(formatMultiActionReply(multiResult.results), { parse_mode: 'Markdown' });
+          // Save voice note to knowledge_base so Sprinter morning briefing picks it up
+          {
+            const voiceUserId = ctx.from?.id || 0;
+            const cardTitles = multiResult.results
+              .filter(r => r.type === 'create' && r.success)
+              .flatMap(r => (r.cards ?? []).map((c: { name?: string }) => c.name || ''))
+              .filter(Boolean);
+            const noteTitle = transcription.substring(0, 100);
+            const noteContent = cardTitles.length
+              ? ('Voice: ' + transcription + (cardTitles.length ? '\n\nTrello cards created:\n' + cardTitles.map(t => '- ' + t).join('\n') : ''))
+              : ('Voice: ' + transcription);
+            saveKnowledge(voiceUserId, 'voice_note', noteTitle, noteContent, 'voice,trello', undefined, 'voice').catch(() => {});
+          }
           return;
         }
       }
@@ -6334,6 +6347,15 @@ Ready to commit? Use:
           });
         }
         await ctx.reply(formatVoiceTrelloReply(trelloResult), { parse_mode: 'Markdown' });
+        // Save voice note to knowledge_base so Sprinter morning briefing picks it up
+        {
+          const voiceUserId2 = ctx.from?.id || 0;
+          const createdCards2 = trelloResult.cards ?? (trelloResult.card ? [trelloResult.card] : []);
+          const cardTitles2 = createdCards2.map((c: { name?: string }) => c.name || '').filter(Boolean);
+          const noteTitle2 = transcription.substring(0, 100);
+          const noteContent2 = 'Voice: ' + transcription + (cardTitles2.length ? '\n\nTrello cards created:\n' + cardTitles2.map((t: string) => '- ' + t).join('\n') : '');
+          saveKnowledge(voiceUserId2, 'voice_note', noteTitle2, noteContent2, 'voice,trello', undefined, 'voice').catch(() => {});
+        }
         return;
       }
       // ──────────────────────────────────────────────────────────────────────

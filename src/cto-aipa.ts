@@ -1937,6 +1937,7 @@ async function startCTOAIPA() {
       for (const uid of userIds) {
         const diary = await getKnowledgeByCategory(uid, 'diary', 5) as KbRow[];
         const tasks = await getKnowledgeByCategory(uid, 'task', 15) as KbRow[];
+        const voiceNotes = await getKnowledgeByCategory(uid, 'voice_note', 10) as KbRow[];
         if (diary?.length) {
           lines.push(`User ${uid} recent diary:`);
           for (const row of diary) {
@@ -1950,6 +1951,14 @@ async function startCTOAIPA() {
           for (const row of tasks) {
             const t = (row[2] || '').slice(0, 120);
             const c = (row[3] || '').slice(0, 200);
+            if (t) lines.push(`- ${t}${c && c !== t ? ': ' + c : ''}`);
+          }
+        }
+        if (voiceNotes?.length) {
+          lines.push(`User ${uid} recent voice notes (from Telegram voice messages):`);
+          for (const row of voiceNotes) {
+            const t = (row[2] || '').slice(0, 120);
+            const c = (row[3] || '').slice(0, 300);
             if (t) lines.push(`- ${t}${c && c !== t ? ': ' + c : ''}`);
           }
         }
