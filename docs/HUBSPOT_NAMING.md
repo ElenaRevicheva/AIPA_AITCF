@@ -41,3 +41,31 @@ For HTTP callers (Algom, VJH from Python), include `sourcePrefix` in the JSON bo
 ## Backwards compatibility
 
 Omitting `sourcePrefix` keeps the legacy naming behavior — never breaks existing callers. The HIRING pipeline previously used a hardcoded `[HIRING]` prefix; absent `sourcePrefix`, that fallback still applies.
+
+---
+
+## 🆕 May 21 2026 update — HIRING prefixes renamed to honest LEAD mode
+
+After May 21 audit: VJH has **never actually submitted an application** in its ~6-month lifetime (0 emails sent, 0 ATS form deliveries, 0 recruiter responses despite 707 application records claiming otherwise). The "auto-apply" was simulated.
+
+**Prefixes renamed to reflect reality:**
+
+| Old (misleading) | New (honest) | What it actually means |
+|------------------|--------------|------------------------|
+| `[HIRING-VJH]` | `[HIRING-VJH-LEAD]` | VJH found this job + generated cover letter; Elena must manually apply |
+| `[HIRING-VJH-SERP]` | `[HIRING-VJH-SERP-LEAD]` | VJH SerpAPI found this job; Elena must manually apply (no cover letter pre-gen for this path) |
+
+**Stage routing changed:** new LEAD deals land in `🔥 YOU act TODAY` (not `📥 AI working`) because Elena IS the one who needs to act.
+
+**Notes field added** to each new VJH deal: "⚠️ MANUAL APPLY REQUIRED — VJH found this job and generated a cover letter, but did NOT submit. Click the job URL + paste the cover letter."
+
+**`ATS_SUBMISSION_ENABLED=false`** in VJH `.env` — the fake-submission attempts that produced 1-9 cycle errors each cycle are now disabled.
+
+### What's actually working in VJH (the honest list)
+
+✅ Fetches ~1,900 jobs/cycle from ATS APIs
+✅ Filters via JobGate (career-aligned + new May 21 hard-reject filters: coding tests, pedigree, location, AI-augmented bonus)
+✅ Scores via 4-layer eval harness (131 tests, $0.03/run, Claude Haiku as L4 judge)
+✅ Generates tailored cover letters (saved as .txt files to disk)
+✅ Pushes lead to HubSpot with all context
+❌ Does NOT auto-submit (intentionally — option (b) honest mode)

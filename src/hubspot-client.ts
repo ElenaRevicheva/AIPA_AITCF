@@ -570,11 +570,14 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
   // Strategy: use Sales Pipeline + [HIRING] prefix + structured description for easy filtering.
   const pipelineId = 'default';
   // Map hiring stages to Sales Pipeline stages (closest semantic match)
+  // HONEST MODE (May 21 2026): VJH does NOT actually submit applications.
+  // 'applied' really means "VJH found this lead — Elena must manually apply".
+  // Stage routing reflects what Elena needs to ACT on, not application lifecycle fiction.
   const stageMap: Record<HiringStage, HSDealStage> = {
-    applied:             HS_STAGES.prospected,          // Appointment Scheduled
-    recruiter_responded: HS_STAGES.contacted,           // Qualified to Buy
-    interview_scheduled: HS_STAGES.engaged,             // Presentation Scheduled
-    offer_received:      HS_STAGES.negotiating,         // Decision Maker Bought-In
+    applied:             HS_STAGES.contacted,           // \ud83d\udd25 YOU act TODAY (was: prospected/AI-working)
+    recruiter_responded: 'contractsent' as HSDealStage, // \ud83d\udcac They replied \u2014 YOU act
+    interview_scheduled: 'contractsent' as HSDealStage, // \ud83d\udcac They replied \u2014 YOU act
+    offer_received:      'contractsent' as HSDealStage, // \ud83d\udcac They replied \u2014 YOU act
     accepted:            HS_STAGES.won,
     declined:            HS_STAGES.lost,
   };
