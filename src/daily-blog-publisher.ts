@@ -870,6 +870,12 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
   // Auto-push updated sitemap to aideazz repo → 4everland redeploys
   pushSitemapToGithub().catch(e => console.warn("📍 Sitemap:", e instanceof Error ? e.message : String(e)));
+
+  // ADDITIVE (May 22 2026): also regenerate per-article static HTML pages for SEO/GEO discoverability.
+  // Fire-and-forget so it never blocks the publish cycle. Surgical: only ADDS new files at
+  // public/blog/{slug}/index.html in aideazz repo; no existing files touched.
+  import('./blog-static-pages').then(m => m.pushAllBlogArticlesHtml())
+    .catch(e => console.warn("[BlogStatic]", e instanceof Error ? e.message : String(e)));
   await saveContentLog({
     channel: "devto_direct",
     keyword,

@@ -21,7 +21,7 @@ import {
   runDailyHashnodePost,
   HASHNODE_TOPIC_BRIEFS,
   hashnodeDailyIsDelisted,
-} from './hashnode-daily';
+} from './daily-blog-publisher';
 import { getOrCreateSpanishBundle, readCachedSpanishMeta } from './blog-es-bundle';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
 import {
