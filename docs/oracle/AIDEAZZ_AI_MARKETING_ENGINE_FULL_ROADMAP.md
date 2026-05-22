@@ -1237,3 +1237,38 @@ Real depth proof point for client demos: every lead entering the marketing engin
 This is exactly the kind of "AI marketing engine you can actually operate" depth that differentiates a portfolio piece from a buzzword pitch. The full prefix convention reference lives in `docs/HUBSPOT_NAMING.md`.
 
 Deployed May 20 2026. Pairs with the existing GEO+SEO blog pipeline (Dev.to publishing + GA4 + Search Console feedback loop in `hashnode-daily.ts`).
+
+
+---
+
+## NEW May 22 2026 - SEO discoverability layer now live
+
+### What this unlocks for the marketing engine
+
+Previously: aideazz.xyz blog was a React SPA. Every /blog/SLUG URL returned identical generic shell HTML to Googlebot. 30+ articles, zero unique content from crawler perspective, near-zero organic search traffic.
+
+Now: each article URL serves a static HTML page with:
+- Article-specific title, meta description, OG tags, Twitter Card meta
+- JSON-LD BlogPosting schema (with author, datePublished, mainEntityOfPage)
+- Full article body in real HTML (visible to bots without JS execution)
+- Canonical URL pointing to the aideazz.xyz article path
+
+### Operationally
+
+- Generator: cto-aipa/src/blog-static-pages.ts (reads same article cache used by sitemap)
+- Trigger: fire-and-forget call alongside existing pushSitemapToGithub after every blog publish
+- Storage: pushed to aideazz/public/blog/SLUG/index.html via GitHub Contents API
+- Deploy: 4everland auto-deploys on commit
+- Routing: 1-line _redirects rule serves /blog/:slug and /blog/:slug/ identically
+- Auth: same GITHUB_TOKEN already used for sitemap pushes (no new credentials)
+
+### Why this matters for client pitches
+
+The marketing engine now demonstrates a real end-to-end SEO loop:
+1. Content generation (Claude writes article daily)
+2. Multi-platform publishing (Dev.to via API + per-article static HTML on aideazz.xyz)
+3. Discoverability infrastructure (sitemap + per-article meta + JSON-LD + robots.txt + structured data)
+4. Server-render compatibility on a static IPFS host (4everland) without SSR framework
+5. Auto-recovery (git history preserved through renames; GitHub Contents API as the deploy channel; fire-and-forget so blog publish never blocks)
+
+Honest portfolio talking point: "Built a content pipeline that publishes daily articles AND auto-generates per-article static HTML pages for SEO, all on a $0/month IPFS host that doesn't natively support SSR. Solved the React-SPA-vs-Googlebot problem with a 1-line redirect rule + a markdown-to-HTML generator."

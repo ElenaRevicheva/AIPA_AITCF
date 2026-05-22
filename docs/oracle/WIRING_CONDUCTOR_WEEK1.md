@@ -280,3 +280,21 @@ Steps 1–5 of Phase 5.6 multi-agent HubSpot plan: ✅ DONE. Step 6 (CMO LinkedI
 - Hashnode dead-code cleanup: `hashnode-daily.ts` only publishes to Dev.to now; file name + ~500 lines of dead Hashnode types are stale.
 - CMO LinkedIn engagement → HubSpot: Make.com posts work, but reply/comment events never flow back to HubSpot.
 - EspaLuz PayPal subscriber + WhatsApp chat events → HubSpot: not wired.
+
+
+---
+
+## NEW May 22 2026 status update
+
+### Closed this session
+
+- **Blog SEO discoverability (the per-article SSR problem).** Per-article static HTML generation deployed via cto-aipa 8984a02 + aideazz e4fe4ee. 14 articles backfilled. All /blog/SLUG URLs now serve article-specific HTML with proper meta tags + JSON-LD + article body. Google can finally rank each article individually. Verified live with curl.
+- **hashnode-daily.ts tech debt.** Renamed to daily-blog-publisher.ts with git history preserved. Import in cto-aipa.ts updated. Build clean.
+
+### Still red (carry forward)
+
+- response_detector.py Zoho IMAP poll: still dormant. When recruiters reply to VJH-LEAD manual applies, HubSpot doesn't auto-move to They replied. THE single highest-leverage gap remaining.
+- CMO LinkedIn engagement return webhook (Make.com to /api/crm-event): not wired
+- EspaLuz PayPal subscriber events to HubSpot: not wired
+- Resend 422 emails ("Founder @ DiaMonTech AG@DiaMonTech AG" pattern): not investigated
+- 6 dead HASHNODE_* env vars in cto-aipa .env: leave for future cleanup (only HASHNODE_DAILY_* are still read; rest are harmless)

@@ -778,3 +778,42 @@ xAI team key for `rhino-sneezing-lemon` (X account `1910676161845186560`) is now
 **Status:** key available in env, **not yet wired to any code**. Three pending wiring options (each its own session): (1) Algom backup Twitter listener with higher rate limits, (2) Grok-as-LLM in CTO AIPA model routing, (3) xAI team-level X API access.
 
 **Security note:** key was shared in chat on May 20 2026; rotate before production use.
+
+
+---
+
+## NEW May 22 2026 - Blog SEO fix (per-article static HTML pages)
+
+### Root cause confirmed by audit
+
+aideazz.xyz blog URLs were all serving identical generic SPA shell HTML to Google. All 30+ articles looked like duplicate content - zero organic discovery. The previous sitemap fix (commit 8c65f07) was correct, but the URLs it pointed to had no per-article content.
+
+### What changed (2 commits across 2 repos)
+
+**cto-aipa commit 8984a02:**
+- NEW file src/blog-static-pages.ts - reads data/blog-posts-cache.json, renders markdown to HTML inline (no new npm deps), generates per-article static HTML with article-specific title/OG tags/JSON-LD/article body, pushes to ElenaRevicheva/aideazz/public/blog/SLUG/index.html via GitHub Contents API.
+- RENAMED src/hashnode-daily.ts to src/daily-blog-publisher.ts (file name now matches function; Hashnode was already removed in b30c334).
+- WIRED into the renamed file alongside pushSitemapToGithub (fire-and-forget; auto-fires after every blog publish).
+- 14 cached articles backfilled (one-shot run).
+
+**aideazz commit e4fe4ee:**
+- 1-line additive rule in public/_redirects: `/blog/:slug    /blog/:slug/index.html    200`
+- Inserted ABOVE the SPA catch-all so /blog/SLUG (no trailing slash) serves the static HTML.
+- All other existing rules preserved.
+
+### Verification (live)
+
+```bash
+curl -s 'https://aideazz.xyz/blog/what-a-fractional-cto-actually-does-for-ai-startups' | grep -oE '<title>[^<]+</title>'
+# Returns: <title>What a Fractional CTO Actually Does for AI Startups | AIdeazz</title>
+```
+
+Was: `<title>AIdeazz - AI Personal Assistants That Evolve With You</title>` (generic).
+Now: article-specific title, OG tags, JSON-LD, real article body in HTML.
+
+### Operational notes
+
+- Future articles auto-generate static HTML when daily-blog-publisher cron fires (no manual action)
+- If GITHUB_TOKEN expires, BlogStatic logs a warning and skips - daily blog publish still works
+- 4everland deploy lag: ~90-180 seconds after GitHub commit
+- Google re-crawl + ranking impact: ~1-2 weeks

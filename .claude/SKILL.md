@@ -698,3 +698,22 @@ Reference for the work: `docs/HUBSPOT_NAMING.md` + `project_hubspot_dashboard.md
 - **Pending uses:** (1) Algom backup Twitter listener (rate-limit insurance), (2) Grok in CTO AIPA model routing, (3) xAI team X API for elevated limits
 
 For interview framing: "I keep optionality in my model routing. Anthropic Opus for high-stakes, Groq Llama for high-volume cheap calls, Grok as a third option when xAI cost/performance fits a use case. The router makes the choice per request — I'm not married to any one vendor."
+
+
+---
+
+## NEW May 22 2026 addition - SEO/SSR fix interview proof point
+
+### "I solved a 30+ article SEO discoverability problem in 90 minutes"
+
+Story arc for founder calls / engineering interviews:
+
+> "My blog publishes daily articles to Dev.to and to aideazz.xyz. After 30+ articles I had zero organic search traffic. I audited what Google actually saw when crawling each article URL: identical generic React SPA shell with the same title on every page. All articles looked like duplicate content to the crawler.
+>
+> The blog is on 4everland (IPFS-based host) - no SSR framework available. So I wrote a markdown-to-HTML generator that runs in my CTO AIPA backend after every article publish. It pushes one static HTML file per article to the aideazz GitHub repo via the GitHub Contents API - same auth pattern I was already using to auto-update the sitemap. Then added one rewrite rule to _redirects so URLs without trailing slash serve the static HTML before falling back to the SPA.
+>
+> 14 articles backfilled. Future articles auto-generate. Article-specific title, OG tags, JSON-LD, real article body in HTML - all visible to Googlebot. End-to-end shipped in 90 minutes including the rollback-safe git mv rename of a misnamed file I'd been carrying as tech debt for two weeks."
+
+Pairs well with: "I solve real problems on real systems and document the trade-offs. I don't over-engineer."
+
+Reference for the work: docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md (this commit) + project_hubspot_dashboard.md in Claude memory.
