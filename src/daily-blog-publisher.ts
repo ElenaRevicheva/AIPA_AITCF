@@ -204,107 +204,107 @@ async function notifyTelegramHashnodeFailure(message: string): Promise<void> {
   }
 }
 
-/** Rotating briefs — 20 topics so the 10-day cycle never repeats before a full month. */
+/** Rotating briefs — 20 topics. Each has a long-tail keyword and an opinionated, story-driven brief. */
 export const HASHNODE_TOPIC_BRIEFS: Array<{ keyword: string; brief: string }> = [
   {
-    keyword: "multi-agent AI system",
+    keyword: "Oracle Always Free production AI agents",
     brief:
-      "How to run a multi-agent AI system at ~$0/month infra (Oracle Always Free, systemd, PM2). No hype — constraints, failure modes, what you actually operate.",
+      "Running 10 AI agents on Oracle Always Free: exact VM shape, PM2 supervision, RAM ceiling, and what crashes first when you hit the limit. Written from 18 months of operating — not a setup tutorial.",
   },
   {
-    keyword: "AI-assisted development",
+    keyword: "AI-assisted development non-technical founder",
     brief:
-      "AI-assisted development in production: Cursor, Claude Code, and how an executive-turned-builder ships TypeScript without a traditional CS path. Concrete workflow, not tool marketing.",
+      "How I build production TypeScript as an executive with no CS degree: Claude Code as a permanent pair programmer, not a shortcut. Concrete workflow — what I can fully explain, what I trust blindly, and why that's the honest answer.",
   },
   {
-    keyword: "multi-model LLM routing",
+    keyword: "LLM routing cost Groq vs Claude",
     brief:
-      "Why route ~76% of inference to fast open-weight stacks and reserve frontier models for high-stakes steps. Cost, latency, and when 'best model' is wrong economics.",
+      "Why 76% of my inference hits Groq/Llama instead of Claude: a real cost and latency matrix after 18 months. When frontier models are the wrong economics — and the one step where they're non-negotiable.",
   },
   {
-    keyword: "AI for construction business",
+    keyword: "HubSpot CRM automation AI agents dedup",
     brief:
-      "Wiring real operations (not demos): documents, field data, and automation for construction-adjacent businesses — boundaries, trust, and human handoff.",
+      "My 10 AI agents fill HubSpot automatically — no SDR, no manual entry. The dedup failure that created 300 duplicate deals, the pipeline routing fix, and what breaks when one agent skips the schema.",
   },
   {
-    keyword: "AI automation small business",
+    keyword: "WhatsApp AI bot production webhook failures",
     brief:
-      "What actually ships in small-business AI automation vs. what dies in slides: integrations, deliverability, and owning your data.",
+      "Three things that killed my first WhatsApp bot in production: webhook delivery gaps, in-memory state resets on PM2 restart, and Twilio rate limits at 2 AM. What tutorials never say about running messaging bots continuously.",
   },
   {
-    keyword: "Oracle Cloud free tier AI",
+    keyword: "AI job application automation ATS limitations",
     brief:
-      "Oracle Cloud Always Free as a serious home for agents: VM shape, Autonomous DB, mTLS, and the boring work that keeps processes alive.",
+      "VibeJobHunter fires applications every hour. Here's what it misses, the ATS rejection patterns I discovered, and the ethics boundary I drew around auto-apply. ATS isn't the enemy — blind automation is.",
   },
   {
-    keyword: "what is an AI agent",
+    keyword: "pgvector Oracle Autonomous DB RAG production",
     brief:
-      "A production definition of an AI agent from someone running several: observe → decide → act → persist state; contrast with chat-only wrappers.",
+      "Six months of pgvector on Oracle Autonomous DB: embedding model trade-offs, IVFFlat vs HNSW for my data size, and why retrieval quality dropped at 10k vectors. Real numbers, not benchmark charts.",
   },
   {
-    keyword: "GEO generative engine optimization",
+    keyword: "LangGraph stateful agents production checkpointing",
     brief:
-      "GEO vs SEO: being quotable in ChatGPT/Perplexity — structured facts, authorship, and durable pages on domains you control.",
+      "Three LangGraph rewrites before it clicked: a state schema mismatch that silently discarded every job for weeks, checkpoint corruption, and the one pattern that finally made multi-step pipelines stable.",
   },
   {
-    keyword: "AI language tutor WhatsApp",
+    keyword: "generative engine optimization structured data citations",
     brief:
-      "EspaLuz-style systems: language tutoring on WhatsApp/Telegram — memory, voice, payments, and why messaging UX beats a generic web chat.",
+      "GEO isn't SEO with AI buzzwords — it's a different game: structured facts, authorship signals, citation-ready format, and durable pages on domains you control. What I changed to appear in Perplexity answers.",
   },
   {
-    keyword: "autonomous job search AI",
+    keyword: "fractional CTO AI vendor lock-in audit",
     brief:
-      "Autonomous job search at scale: discovery, scoring, ATS reality, and ethics boundaries — what 'automation' means when outcomes affect people.",
+      "The vendor lock-in decisions I made at AIdeazz that I'd unmake: one API contract I can't escape, one database choice that costs more than expected, one infra bet that aged badly. What a fractional CTO should audit before you're locked in.",
   },
   {
-    keyword: "HubSpot CRM automation AI",
+    keyword: "AI language learning WhatsApp conversation memory",
     brief:
-      "Wiring AI agents to CRM: how a 10-agent ecosystem feeds HubSpot automatically — dedup, pipeline routing, and what breaks when you skip dedup.",
+      "Why WhatsApp beat a web app for Spanish learning: EspaLuz architecture — two-layer memory without a paid vector store, conversation continuity across sessions, and what 3 paying users taught me that 100 free signups couldn't.",
   },
   {
-    keyword: "fractional CTO AI startup",
+    keyword: "BrightData web unlocker B2B lead enrichment",
     brief:
-      "What a fractional CTO actually does for an early-stage AI startup: architecture decisions, vendor lock-in prevention, and when to hire full-time.",
+      "When BrightData Web Unlocker is worth $1.50/CPM and when it's wasted money: what I learned enriching B2B leads before HubSpot push. Real false-positive rate, extraction failure modes, and which signals are actually worth scraping.",
   },
   {
-    keyword: "LangGraph stateful agents",
+    keyword: "AI agent evaluation harness 131 tests production",
     brief:
-      "LangGraph in production: stateful multi-step pipelines, checkpointing, and the failure modes nobody mentions in tutorials.",
+      "131 tests, 4 layers, $0.03/run: why I built an eval harness before writing new features. The silent failure I would have shipped without it — and what AI agent tests catch that unit tests fundamentally cannot.",
   },
   {
-    keyword: "pgvector RAG production",
+    keyword: "small business AI automation client pipeline results",
     brief:
-      "pgvector + Oracle Autonomous DB as a production RAG store: embedding choice, index tuning, and real retrieval quality vs. benchmark quality.",
+      "What actually happened when I wired a construction-adjacent business to AI automation: real lead conversion numbers, the manual step that couldn't be removed no matter what, and why clients don't care about the tech stack.",
   },
   {
-    keyword: "AI lead generation B2B",
+    keyword: "B2B lead generation AI agent X Twitter signals",
     brief:
-      "Automating B2B lead discovery with AI agents: what signals actually predict intent, why most scrapers fail, and building a pipeline that feeds CRM without manual work.",
+      "How Algom Alpha finds B2B leads on X using hiring-adjacent keyword signals: the scoring logic, the false-positive rate I'm not proud of, and what 'qualified lead' actually means when a bot is deciding.",
   },
   {
-    keyword: "web scraping AI enrichment",
+    keyword: "executive career pivot AI developer non-traditional",
     brief:
-      "Using BrightData / proxy infrastructure for AI-grade web enrichment: bypassing bot detection, structuring unstructured pages, and when scraping is the right call.",
+      "From Deputy CEO at a Russian digital infrastructure program to solo AI builder in Panama: what executive experience transferred to running a tech startup, what was completely useless, and why I stopped hiding the gap.",
   },
   {
-    keyword: "AI content publishing pipeline",
+    keyword: "AI startup infrastructure cost breakdown real numbers",
     brief:
-      "End-to-end AI content pipeline: GSC gap analysis → Claude article → Dev.to → aideazz.xyz blog — dedup, canonical URLs, and what a 'publish' actually means for GEO.",
+      "Real monthly line items for an AI startup running 10 agents: Oracle $0, Groq $12, BrightData $40/run, Claude API $8, Resend $4. Where the hidden costs accumulate — and what 'free tier' actually means at operating scale.",
   },
   {
-    keyword: "Telegram bot AI agent",
+    keyword: "Telegram bot ops dashboard AI agents production",
     brief:
-      "Telegram as an AI agent control plane: commands, inline keyboards, broadcast, and why messaging beats dashboards for solo operators.",
+      "Why Telegram replaced my web dashboard for running AI agents: broadcast to subscribers, inline keyboards for approval flows, and why a chat interface beats a web UI for a solo operator managing 10 live systems.",
   },
   {
-    keyword: "AI hiring pipeline automation",
+    keyword: "AI content pipeline GSC gap analysis automated publishing",
     brief:
-      "Automating the job application pipeline with AI: scoring, ATS quirks, auto-apply ethics, and what still requires a human in the loop.",
+      "The blog pipeline that writes and publishes itself: GSC gap analysis picks the topic, Claude drafts the article, Dev.to gets the post, aideazz.xyz caches it. What 'content gap' actually means when you have 15 GSC queries.",
   },
   {
-    keyword: "startup AI infrastructure cost",
+    keyword: "AI hiring automation ethics auto-apply boundary",
     brief:
-      "Real infra costs for an AI startup running 10 agents: Oracle Always Free, Railway, Vercel, Resend, Groq — and where the hidden costs actually hide.",
+      "The ethics line I drew inside VibeJobHunter: what I automated without hesitation, what I kept manual on purpose, and why auto-apply is a bad product decision even when it works technically. Where AI should stop in a job search.",
   },
 ];
 
@@ -586,27 +586,30 @@ async function resolvePublicationId(token: string): Promise<string> {
   return pub.id;
 }
 
-const ARTICLE_SYSTEM = `You are the writing voice of Elena Revicheva / AIdeazz: executive-turned-AI-builder, Panama-based, shipping production agents on Oracle Cloud.
+const ARTICLE_SYSTEM = `You are the writing voice of Elena Revicheva / AIdeazz: executive-turned-AI-builder, single mother who relocated from Russia to Panama, shipping production AI agents on Oracle Cloud with zero VC funding.
 
 Hard rules:
-- First person or neutral technical — never fake case studies or client names.
-- No startup clichés or filler (no "game-changer", "revolutionary", "in today's fast-paced world", "comprehensive guide", "unlock", "synergies").
-- Minimum depth: concrete tradeoffs, failure modes, costs, or operational reality — not a listicle of obvious tips.
-- Use Markdown: start with ## sections (not H1). Include at least four ## headings after an intro paragraph.
+- Lead with the failure, the constraint, the hard number, or the decision — never with background or context-setting. The reader decides in the first three sentences whether to continue.
+- Take a clear position. If you write "it depends", follow it immediately with your own specific answer. Hedging without a conclusion is not depth — it's padding.
+- A specific number, a real error message, or an actual cost figure is worth more than three adjectives. Use them.
+- Write for the practitioner who is already skeptical of AI hype. They stop reading the moment you state the obvious. Assume they have shipped something before.
+- First person or neutral technical — never fake case studies or invented client names.
+- No startup clichés: no "game-changer", "revolutionary", "in today's fast-paced world", "comprehensive guide", "unlock", "synergies", "seamlessly".
+- Use Markdown: ## sections only (no H1, no "Introduction" or "Conclusion" as headings). At least four ## headings after the opening paragraph.
 - Target length: 1,400–2,400 words of body (excluding title).
-- Before the byline, add a section exactly like this (3–5 pairs, questions a practitioner would actually ask):
+- Before the byline, add exactly this section (3–5 pairs, questions a skeptical practitioner would actually ask — not beginner FAQ):
 
 ## Frequently Asked Questions
 
-**Q: [specific question about the topic]**
-A: [direct, factual answer — 2-4 sentences]
+**Q: [specific, non-obvious question about the topic]**
+A: [direct, factual answer — 2-4 sentences, with a concrete number or tradeoff]
 
-**Q: [another question]**
+**Q: [another practitioner-level question]**
 A: [answer]
 
 (continue for 3–5 total Q&A pairs)
 
-- End with a short byline line: "— Elena Revicheva · [AIdeazz](https://aideazz.xyz) · [Portfolio](https://aideazz.xyz/portfolio)"
+- End with: "— Elena Revicheva · [AIdeazz](https://aideazz.xyz) · [Portfolio](https://aideazz.xyz/portfolio)"
 - Output EXACTLY in this envelope (XML tags, no text outside):
 
 <TITLE>Your compelling title here (under 100 chars)</TITLE>

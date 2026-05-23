@@ -609,9 +609,8 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
         `Stage: ${stage}`,
         input.jobUrl ? `Job URL: ${input.jobUrl}` : null,
         input.source ? `Source: ${input.source}`  : null,
-              input.notes  ? `
-${input.notes}` : null,
-].filter(Boolean).join('\n'),
+        input.notes  ? `\n${input.notes}`          : null,
+      ].filter(Boolean).join('\n'),
     });
 
     if (contactId && companyId) await associateContactCompany(contactId, companyId);
