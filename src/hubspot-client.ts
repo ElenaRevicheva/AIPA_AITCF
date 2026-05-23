@@ -482,6 +482,7 @@ export interface HiringDealInput {
   jobUrl?: string | undefined;
   source?: string | undefined;
   stage?: HiringStage | undefined;
+  notes?: string | undefined;
 }
 
 /**
@@ -537,6 +538,7 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
         `Stage: ${stage}`,
         input.jobUrl ? `Job URL: ${input.jobUrl}` : null,
         input.source ? `Source: ${input.source}`  : null,
+        input.notes  ? `\n${input.notes}`          : null,
       ].filter(Boolean).join('\n'),
     });
 

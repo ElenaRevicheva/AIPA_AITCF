@@ -21,7 +21,7 @@ import {
   runDailyHashnodePost,
   HASHNODE_TOPIC_BRIEFS,
   hashnodeDailyIsDelisted,
-} from './hashnode-daily';
+} from './daily-blog-publisher';
 import { getOrCreateSpanishBundle, readCachedSpanishMeta } from './blog-es-bundle';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
 import {
@@ -1972,12 +1972,12 @@ async function startCTOAIPA() {
         source, type, pipeline,
         email, domain, name, context: ctx,
         jobTitle, company, recruiterEmail, recruiterName, jobUrl,
-        stage, urgency,
+        stage, urgency, notes,
       } = req.body as {
         source?: string; type?: string; pipeline?: string;
         email?: string; domain?: string; name?: string; context?: string;
         jobTitle?: string; company?: string; recruiterEmail?: string; recruiterName?: string; jobUrl?: string;
-        stage?: string; urgency?: number;
+        stage?: string; urgency?: number; notes?: string;
       };
 
       if (!source || !pipeline) {
@@ -2005,6 +2005,7 @@ async function startCTOAIPA() {
           jobUrl,
           source: source || 'VJH',
           stage: (stage as import('./hubspot-client').HiringStage) || 'applied',
+          notes,
         });
 
       } else {
