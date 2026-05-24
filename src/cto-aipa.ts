@@ -572,7 +572,14 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
     }
   } else {
     try {
-      console.log(`⚡ Using ${AI_MODELS.standard} for standard code review...`);
+      // GROQ PRE-CHECK (May 24 2026): skip Groq if prompt exceeds context limit.
+      // Llama 3.3 70B on Groq = ~8K tokens. Pre-check at 24K chars (~6K tokens, with headroom).
+      // Avoids 413 'Request too large' warnings flooding logs; goes straight to Claude.
+      const GROQ_MAX_PROMPT_CHARS = 24_000;
+      if (aiPrompt.length > GROQ_MAX_PROMPT_CHARS) {
+        throw new Error(`pre-check: prompt too large for Groq (${aiPrompt.length} chars > ${GROQ_MAX_PROMPT_CHARS} char limit); using Claude directly`);
+      }
+      console.log(`⚡ Using ${AI_MODELS.standard} for standard code review (${aiPrompt.length} chars)...`);
       const response = await groq.chat.completions.create(
         {
           model: AI_MODELS.standard,
@@ -584,7 +591,12 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
       modelUsed = AI_MODELS.standard;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`⚡ Groq review failed (${msg.slice(0, 160)}), using Claude Haiku fallback...`);
+      // Quiet log for the expected pre-check skip; warn loudly for unexpected errors.
+      if (msg.startsWith('pre-check:')) {
+        console.log(`⚡ ${msg.slice(0, 200)}`);
+      } else {
+        console.warn(`⚡ Groq review failed (${msg.slice(0, 160)}), using Claude Haiku fallback...`);
+      }
       try {
         review = await anthropicTextReview(
           CODE_REVIEW_FALLBACK_MODEL,
