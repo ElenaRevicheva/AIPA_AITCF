@@ -367,6 +367,12 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
                 description: `Pain point: ${result.one_line_summary}\nSource: ${lead.utm_source || lead.source_table}`,
               });
               console.log(`[triage→HS] UPDATED existing deal ${existing.id} (${dealName})`);
+              try {
+                const { markLeadTriagePushed } = await import('./database');
+                await markLeadTriagePushed(lead.id);
+              } catch (e: any) {
+                console.warn('[triage→HS] mark pushed failed (non-fatal):', e?.message || e);
+              }
             } else {
               await pushLeadToHubSpot({
       sourcePrefix: 'CLIENT-CTO-INGEST',
@@ -377,6 +383,14 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
                 painPoint: result.one_line_summary,
                 stage:     hsStage,
               });
+            }
+            // May 24 2026: mark lead_triage row as pushed so future daily briefs skip it
+            // (HubSpot becomes source of truth for 'what to act on'). Fire-and-forget.
+            try {
+              const { markLeadTriagePushed } = await import('./database');
+              await markLeadTriagePushed(lead.id);
+            } catch (e: any) {
+              console.warn('[triage→HS] mark pushed failed (non-fatal):', e?.message || e);
             }
           } catch (e: any) {
             console.warn('[triage→HS] push failed:', e?.message || e);

@@ -2637,6 +2637,35 @@ async function getPlacesPipelineSnapshot(): Promise<PlacesPipelineSnapshot> {
   }
 }
 
+async function markLeadTriagePushed(sourceRefId: string): Promise<boolean> {
+  // Mark a lead_triage row as 'pushed_to_hubspot' so it stops appearing in daily briefs.
+  // sourceRefId should be the outreach_targets.id (or business_leads.id) as hex string
+  // WITHOUT dashes. Returns true if a row was updated.
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const cleanId = sourceRefId.replace(/-/g, '');
+    const result = await connection.execute(
+      `UPDATE lead_triage
+         SET status = 'pushed_to_hubspot', updated_at = SYSTIMESTAMP
+       WHERE source_ref_id = HEXTORAW(:1)
+         AND (status IS NULL OR status NOT IN ('pushed_to_hubspot', 'archived', 'dismissed'))`,
+      [cleanId],
+      { autoCommit: true } as oracledb.ExecuteOptions
+    );
+    const rowsAffected = (result as { rowsAffected?: number }).rowsAffected ?? 0;
+    if (rowsAffected > 0) {
+      console.log(`🎯 [triage] marked lead_triage ${cleanId.slice(0, 16)} as pushed_to_hubspot`);
+    }
+    return rowsAffected > 0;
+  } catch (err) {
+    console.warn('⚠️ markLeadTriagePushed error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
   let connection;
   try {
@@ -2649,6 +2678,9 @@ async function getTriagedLeads(status?: string, limit = 50): Promise<any[]> {
               classified_at
        FROM lead_triage
        WHERE 1=1 ${where}
+       -- May 24 2026: hide leads already pushed to HubSpot (HubSpot becomes
+       -- the source of truth for 'what to act on'; brief only shows fresh signal)
+       AND (status IS NULL OR status NOT IN ('pushed_to_hubspot', 'archived', 'dismissed'))
        AND LOWER(source_name) NOT IN (
          'e2e','e2e2','typo','tytjyt','katarinar','hope','kate',
          'irina','maya','katya','marina','katerina','test','demo',
@@ -2888,5 +2920,6 @@ export {
   getUntriagedLeads,
   getUntriagedOutreachTargets,
   getRepliedOutreach,
-  getPlacesPipelineSnapshot,
+  getPlacesPipelineSnapshot,,
+  markLeadTriagePushed,
 };
