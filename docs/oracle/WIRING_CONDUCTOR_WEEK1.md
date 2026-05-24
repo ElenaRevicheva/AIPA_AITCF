@@ -318,3 +318,67 @@ Steps 1–5 of Phase 5.6 multi-agent HubSpot plan: ✅ DONE. Step 6 (CMO LinkedI
 - EspaLuz WhatsApp/Telegram chat user events to HubSpot: not wired
 - Resend 422 emails ("Founder @ DiaMonTech AG@DiaMonTech AG" malformed-recipient pattern): not investigated
 - 6 dead HASHNODE_* env vars in cto-aipa .env: leave for future cleanup (harmless, only HASHNODE_DAILY_* still read)
+
+
+## NEW May 24-25 2026 status update (closed-loop + dashboard hygiene)
+
+This session closed every remaining "noise" gap in the daily operator surface
+(Telegram + HubSpot + Trello) and shipped the inbox-to-CRM loop. Net effect:
+the daily morning briefing now shows ONLY real issues. Zero hallucinated focus
+suggestions, zero stale-repo spam, zero triage-already-pushed re-surfacing,
+zero Resend 422 noise.
+
+### Closed this session (deployed + verified live)
+
+- **response_detector → HubSpot loop closed (commit a65216c).** Detector now
+  POSTs every classified recruiter response to `/api/crm-event` with
+  `pipeline=hiring`, `stage=recruiter_responded`, `sourcePrefix=HIRING-VJH-LEAD`.
+  Sender blocklist filters platform-noise domains (torre.ai, substack, outlier,
+  zohocalendar, mindrift, hireflix, onhires, noreply). 16 missed recruiter
+  responses backfilled — including Maddy Sky interview from May 16 that had
+  been buried in noise for over a week.
+- **HubSpot → Trello bridge (commit b2b795b).** Urgent deals (`qualifiedtobuy`
+  + `contractsent` stages) fire a one-way push to the current-month
+  "Kira {Mes} 2026" board, "Just for Today" column. Idempotent via
+  `[hs:dealId]` tag. Auto-detects Panama-time month. 67 cards backfilled to
+  "Kira Mayo 2026" on first run.
+- **Triage dedup (commits 84f9e15 + 3d4139c).** `lead_triage` rows marked
+  `pushed_to_hubspot` after successful HubSpot push. `getTriagedLeads` filters
+  status NOT IN ('pushed_to_hubspot', 'archived', 'dismissed') — daily brief
+  no longer re-surfaces leads already in your CRM. HubSpot becomes the source
+  of truth for "what to act on"; brief shows only fresh signal.
+- **Proactive stale-repo alert dedup (commit 5e93cab).** Threshold raised
+  5d → 14d. Per-repo `lastStaleRepoAlertAt` Map with 24h cooldown. Before: 6
+  alerts/day for the same EspaLuzWhatsApp. After: at most 1 alert/day, and
+  only when genuinely stale (2+ weeks).
+- **Outreach 422 noise eliminated (commit 7796438 + DB backfill).**
+  `isBogusOutreachEmail()` helper filters bogus patterns ("Founder @ X",
+  whitespace, missing TLD, leading/trailing dot, RFC-fail) before send.
+  Backfilled 68 existing `outreach_targets` rows → `status='invalid_email'`.
+  Final distribution: `invalid_email=109, emailed=41`. Phase 4 daily summary
+  no longer contains Resend 422 spam.
+- **Morning briefing deterministic real-issues (commit 7c7d910).** The
+  "💡 Today" line was a Groq hallucination from a content-less prompt — same
+  EspaLuz focus suggestion every day. Replaced with deterministic, signal-
+  driven "🚨 Today's real issues" section. Renders only when CMO is offline
+  OR an AIDEAZZ repo has been silent >14 days. On clean days the section is
+  omitted entirely (no "✅ all clear" filler). Reuses module-scope
+  `STALE_REPO_THRESHOLD_DAYS=14` — single source of truth with the
+  proactive-alert dedup logic.
+
+### Still red (carry forward)
+
+- CMO LinkedIn engagement return webhook (Make.com → `/api/crm-event`): not wired
+- EspaLuz PayPal subscriber events → HubSpot: not wired
+- EspaLuz WhatsApp/Telegram chat user events → HubSpot: not wired
+- 6 dead HASHNODE_* env vars in cto-aipa .env: leave for future cleanup
+  (harmless, only HASHNODE_DAILY_* still read)
+
+### Pattern that emerged this session
+
+> "Detection without action is theater." Every closure this session followed
+> the same shape: a signal was being computed but discarded (recruiter
+> responses detected but not pushed; bogus emails attempted instead of
+> filtered; LLM suggestions confabulated instead of grounded). The fix was
+> always wiring the signal to a deterministic action — never adding more
+> intelligence, always closing a loop.

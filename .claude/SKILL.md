@@ -743,3 +743,34 @@ Pairs well with: "I look at my own infrastructure as a skeptical practitioner �
 - Remote Control launcher: `~/Desktop/claude-remote.bat` (PowerShell wrapper, auto-finds latest claude.exe via MSIX path)
 - Auth via `claude auth login --claudeai` (Pro account OAuth, one-time)
 - Trust dialog accepted by running interactive Claude in worktree path once
+
+
+### Interview story #3: "Replace LLM hallucinations with deterministic signals"
+
+> "My daily 8 AM Telegram briefing kept telling me the same thing every day —
+> 'focus on EspaLuz today.' For weeks. I'd already shipped EspaLuz features.
+> The reason: the briefing's 'Today's focus' line was a Groq call with a
+> content-less prompt ('give Elena one specific actionable task'). With no
+> input signal, the LLM confabulated the same plausible-sounding suggestion
+> daily. Pure noise dressed as intelligence.
+>
+> I replaced it with a deterministic, signal-driven section. Two real checks:
+> CMO health endpoint, and per-repo days-since-last-commit (>14 days threshold,
+> same constant as the proactive stale-repo alert — single source of truth).
+> If either fires, the briefing surfaces the specific actionable issue. If
+> neither fires, the section is omitted entirely — no '✅ all clear' filler.
+>
+> Token spend dropped to zero. Briefing noise dropped to zero. The pattern
+> is: don't ask an LLM what to do when you can derive it from real state."
+
+Pairs with: "I treat my own infrastructure with the same skepticism I'd treat
+a client's. An agent confabulating answers is worse than no agent — it trains
+the operator to ignore the channel."
+
+### Operational reference
+
+- Morning briefing fix: `cto-aipa/src/telegram-bot.ts` ~line 7990 — deterministic
+  `realIssues: string[]` replacing `suggestionPrompt + askAI` (commit 7c7d910)
+- Triage dedup: `lead-triage.ts` + `database.ts` `markLeadTriagePushed()` (84f9e15, 3d4139c)
+- Stale-repo dedup: `telegram-bot.ts` `lastStaleRepoAlertAt` Map + 14d threshold (5e93cab)
+- Outreach 422 filter: `outreach.ts` `isBogusOutreachEmail()` (7796438)
