@@ -2920,6 +2920,6 @@ export {
   getUntriagedLeads,
   getUntriagedOutreachTargets,
   getRepliedOutreach,
-  getPlacesPipelineSnapshot,,
+  getPlacesPipelineSnapshot,
   markLeadTriagePushed,
 };
