@@ -76,6 +76,11 @@ const octokit = new Octokit({ auth: githubToken || undefined });
 // AI MODEL CONFIGURATION - Change models via environment variables!
 // =============================================================================
 
+// Groq rate-limit cooldown (May 24 2026): when Groq 429s, skip it for 60s.
+// Avoids spamming the same 429 over and over. After cooldown, retry normally.
+let groqCooldownUntil = 0;
+const GROQ_COOLDOWN_MS = 60_000;
+
 const AI_MODELS = {
   // For critical reviews (security, payments, complex architecture)
   critical: process.env.CRITICAL_MODEL || 'claude-opus-4-20250514',
@@ -572,12 +577,16 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
     }
   } else {
     try {
-      // GROQ PRE-CHECK (May 24 2026): skip Groq if prompt exceeds context limit.
+      // GROQ PRE-CHECK (May 24 2026): skip Groq if prompt exceeds context limit OR in 429-cooldown.
       // Llama 3.3 70B on Groq = ~8K tokens. Pre-check at 24K chars (~6K tokens, with headroom).
       // Avoids 413 'Request too large' warnings flooding logs; goes straight to Claude.
       const GROQ_MAX_PROMPT_CHARS = 24_000;
       if (aiPrompt.length > GROQ_MAX_PROMPT_CHARS) {
         throw new Error(`pre-check: prompt too large for Groq (${aiPrompt.length} chars > ${GROQ_MAX_PROMPT_CHARS} char limit); using Claude directly`);
+      }
+      if (Date.now() < groqCooldownUntil) {
+        const remainingSec = Math.ceil((groqCooldownUntil - Date.now()) / 1000);
+        throw new Error(`pre-check: Groq in 429-cooldown for ${remainingSec}s more; using Claude directly`);
       }
       console.log(`⚡ Using ${AI_MODELS.standard} for standard code review (${aiPrompt.length} chars)...`);
       const response = await groq.chat.completions.create(
@@ -591,10 +600,16 @@ Remember: You're a co-founder, not just a reviewer. Be supportive but honest.`;
       modelUsed = AI_MODELS.standard;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      // Quiet log for the expected pre-check skip; warn loudly for unexpected errors.
-      if (msg.startsWith('pre-check:')) {
+      // If genuine 429 from Groq, start a 60s cooldown so next calls skip Groq.
+      const is429 = msg.includes('429') || /rate ?limit/i.test(msg);
+      if (is429 && !msg.startsWith('pre-check:')) {
+        groqCooldownUntil = Date.now() + GROQ_COOLDOWN_MS;
+        console.log(`⚡ Groq 429 hit — cooldown ${GROQ_COOLDOWN_MS / 1000}s started; using Claude Haiku fallback`);
+      } else if (msg.startsWith('pre-check:')) {
+        // Quiet log for the expected pre-check skip (size limit OR cooldown).
         console.log(`⚡ ${msg.slice(0, 200)}`);
       } else {
+        // Genuine unexpected error — warn loudly.
         console.warn(`⚡ Groq review failed (${msg.slice(0, 160)}), using Claude Haiku fallback...`);
       }
       try {
