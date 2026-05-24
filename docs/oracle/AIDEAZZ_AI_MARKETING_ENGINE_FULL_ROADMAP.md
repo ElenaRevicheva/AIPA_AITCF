@@ -1272,3 +1272,89 @@ The marketing engine now demonstrates a real end-to-end SEO loop:
 5. Auto-recovery (git history preserved through renames; GitHub Contents API as the deploy channel; fire-and-forget so blog publish never blocks)
 
 Honest portfolio talking point: "Built a content pipeline that publishes daily articles AND auto-generates per-article static HTML pages for SEO, all on a $0/month IPFS host that doesn't natively support SSR. Solved the React-SPA-vs-Googlebot problem with a 1-line redirect rule + a markdown-to-HTML generator."
+
+
+---
+
+## NEW May 24 2026 - Blog content + SEO infrastructure complete
+
+### Major enhancements deployed (verifiable in commits 393c7eb, adab901, 7d5c01f)
+
+**1. Blog topics overhauled: commodity to specific**
+
+Replaced all 20 HASHNODE_TOPIC_BRIEFS with grounded long-tail keywords reflecting actual production work:
+
+Before (generic, commodity):
+- "multi-agent AI system" / "AI automation small business" / "what is an AI agent" / "AI for construction business" / "AI lead generation B2B"
+
+After (specific, your stack):
+- "Oracle Always Free production AI agents" - YOUR real $0/month infra story
+- "LLM routing cost Groq vs Claude" - the 76/24 split with actual numbers
+- "HubSpot CRM automation AI agents dedup" - the prefix system we built this week
+- "AI job application automation ATS limitations" - the VJH honest mode story (707 fake records, 0 actual submissions)
+- "fractional CTO AI vendor lock-in audit" - opinionated take from real audits
+- "pgvector Oracle Autonomous DB RAG production" - EspaLuz memory layer
+- "BrightData web unlocker B2B lead enrichment" - the 40% budget / 12% lift story
+- "executive career pivot AI developer non-traditional" - your unique angle
+- "AI agent evaluation harness 131 tests production" - your real eval harness
+
+These topics are stories only YOU can write. Generic AI blogs can't compete on specifics.
+
+**2. ARTICLE_SYSTEM prompt strengthened**
+
+Updated the article-generation system prompt to enforce:
+- Lead with failure or constraint (not "Introduction to X")
+- Take a clear opinionated position (not balanced both-sides)
+- Use specific numbers from real systems (not "studies show")
+- Write for skeptical practitioners (not first-time AI readers)
+
+Result: titles like "BrightData Web Unlocker ate 40% of our enrichment budget for 12% lift" instead of "Using BrightData for AI Enrichment: A Complete Guide"
+
+**3. File rename for honesty: hashnode-daily.ts to daily-blog-publisher.ts**
+
+Hashnode was removed from the publishing pipeline in commit b30c334 (long ago) but the FILE NAME stayed. Renamed via git mv (history preserved). Import in cto-aipa.ts updated. Hashnode is dead - we publish to Dev.to + per-article static HTML on aideazz.xyz only.
+
+**4. Per-article static HTML SSR fix (verified end-to-end)**
+
+Was: aideazz.xyz blog is a React SPA. Every /blog/{slug} URL returned identical generic shell HTML to Googlebot. 30+ articles, zero unique content from crawler perspective.
+
+Now: cto-aipa/src/blog-static-pages.ts generates one static HTML per cached article. Each has article-specific title, OG meta tags, JSON-LD BlogPosting schema, full article body. Pushed to aideazz/public/blog/{slug}/index.html via GitHub Contents API. Pairs with 1-line _redirects rule (/blog/:slug to /blog/:slug/index.html 200) so URLs without trailing slash also serve the static HTML.
+
+17 articles backfilled including 2 BrightData variants. Future articles auto-generate via fire-and-forget call alongside pushSitemapToGithub.
+
+**5. Manual blog trigger working (cron untouched)**
+
+POST /hashnode/daily-run with Bearer HASHNODE_DAILY_TRIGGER_SECRET fires an extra article without disturbing the 14:30 Panama daily cron. Useful for testing new topics or backfilling missed days.
+
+**6. Groq 413 pre-check (cleaner logs)**
+
+Code-review path was hitting Groq's 8K token context limit and falling back to Claude Haiku - which worked, but the warning flood was hiding real errors. Added pre-check at 24K chars: if prompt would exceed Groq context, skip directly to Claude. Fallback for genuine errors (network, real rate limits) still logs loudly.
+
+### What this unlocks for client pitches
+
+The marketing engine now demonstrates a complete content distribution loop:
+
+1. Daily article generation (Claude Opus 4) with grounded topic rotation
+2. Multi-platform publishing (Dev.to API + per-article static HTML on aideazz.xyz)
+3. Per-article SEO infrastructure (unique title, OG tags, JSON-LD, real body HTML)
+4. Server-render compatibility on IPFS host (4everland) without SSR framework
+5. Auto-recovery (git history preserved through renames, GitHub Contents API as deploy channel, fire-and-forget so blog publish never blocks)
+6. Manual trigger endpoint for ad-hoc runs without disturbing the schedule
+
+### Honest portfolio talking point (interview-ready)
+
+"My marketing engine publishes daily AI-engineering articles to multiple platforms with full per-article SEO infrastructure on a $0/month IPFS host that doesn't natively support SSR. Topics rotate through real failure modes and specific numbers from my own production systems - not generic AI listicles. The publishing path, sitemap, per-article static HTML, and Google indexing are all auto-managed by the cto-aipa backend. Adding a new article topic is a one-line config change."
+
+### Operational verification
+
+```bash
+# Sitemap has all articles:
+curl -s https://aideazz.xyz/sitemap.xml | grep -c "blog/"
+
+# Article URLs serve real HTML to Google:
+curl -sL "https://aideazz.xyz/blog/<slug>" | grep -oE "<title>[^<]+</title>"
+
+# Manual fire (cron untouched):
+S=$(grep ^HASHNODE_DAILY_TRIGGER_SECRET= /home/ubuntu/cto-aipa/.env | cut -d= -f2-)
+curl -s -X POST https://webhook.aideazz.xyz/cto/hashnode/daily-run -H "Authorization: Bearer $S"
+```
