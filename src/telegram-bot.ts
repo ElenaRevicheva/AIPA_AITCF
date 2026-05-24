@@ -106,6 +106,13 @@ const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || proce
   .trim();
 const octokit = new Octokit({ auth: githubToken || undefined });
 
+// May 24 2026: dedup state for stale-repo proactive alerts (telegram-bot.ts).
+// Without this, the every-4-hour cron re-alerts about the same stale repo
+// 6 times/day. Now: per-repo last-alerted timestamp; skip if alerted within 24h.
+const lastStaleRepoAlertAt = new Map<string, number>();
+const STALE_REPO_ALERT_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h
+const STALE_REPO_THRESHOLD_DAYS = 14; // raised from 5 — only alert on genuinely stale (2+ weeks)
+
 // Authorized users (Telegram user IDs) - add your ID for security
 const AUTHORIZED_USERS = process.env.TELEGRAM_AUTHORIZED_USERS?.split(',').map(id => parseInt(id.trim())) || [];
 
@@ -7680,8 +7687,13 @@ async function checkEcosystemHealth(bot: Bot): Promise<void> {
         const commitDate = new Date(latestCommit.commit.author?.date || '');
         const daysAgo = Math.floor((now.getTime() - commitDate.getTime()) / (1000 * 60 * 60 * 24));
         
-        if (daysAgo > 5) {
-          staleRepos.push(`${escapeMarkdown(repo)} (${daysAgo} days)`);
+        if (daysAgo > STALE_REPO_THRESHOLD_DAYS) {
+          // Dedup: skip if we already alerted about this repo in last 24h
+          const lastAlert = lastStaleRepoAlertAt.get(repo) || 0;
+          if (Date.now() - lastAlert >= STALE_REPO_ALERT_COOLDOWN_MS) {
+            staleRepos.push(`${escapeMarkdown(repo)} (${daysAgo} days)`);
+            lastStaleRepoAlertAt.set(repo, Date.now());
+          }
         }
       }
     } catch {}
