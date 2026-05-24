@@ -20,6 +20,24 @@ import {
   getPendingLeads,
   updateTargetEmail,
 } from './database';
+
+// May 24 2026 — surgical pre-filter to silence Resend 422 noise.
+// fresh-leads-ingest creates leads with name='Founder @ {company}'. When
+// email is also bogus (e.g. 'Founder @ X@X', missing TLD, spaces in local part),
+// Resend rejects with 422 and pollutes the daily Phase 4 summary. Skip them.
+function isBogusOutreachEmail(email: string | null | undefined): boolean {
+  if (!email) return true;
+  const s = email.trim();
+  if (s.length < 6) return true;
+  // Pattern that fresh-leads sometimes leaves: 'Founder @ X' or 'X @ X@X'
+  if (/^founder\s*@/i.test(s)) return true;
+  if (/\s/.test(s)) return true;                       // any whitespace = invalid
+  if (s.endsWith('.') || s.startsWith('.')) return true; // trailing/leading dot
+  // RFC-ish minimal check (matches the existing verify regex)
+  if (!/^[\w.+\-]+@[\w\-]+\.[a-zA-Z][\w.]{1,}$/.test(s)) return true;
+  return false;
+}
+
 import { getResendApiKey } from './marketing-notify';
 
 // ---------------------------------------------------------------------------
@@ -349,8 +367,8 @@ export async function generateBatchDrafts(
   const verified = await getOutreachTargets({ status: 'verified' });
   const fresh = await getOutreachTargets({ status: 'new' });
   const targets = [
-    ...verified,
-    ...fresh.filter((row: any[]) => row[3]),  // row[3] = email column
+    ...verified.filter((row: any[]) => !isBogusOutreachEmail(row[3])),
+    ...fresh.filter((row: any[]) => row[3] && !isBogusOutreachEmail(row[3])),
   ];
   const drafts: Array<{ targetId: string; subject: string }> = [];
   const cap = Math.min(limit, targets.length);
