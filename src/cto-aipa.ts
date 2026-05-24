@@ -2224,6 +2224,20 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
         pipeline, email, domain, name, company, jobTitle, stage, urgency, ctx,
       }, result ? 'verified_delivered' : 'pending_verification');
 
+      // NEW (May 24 2026): if HIRING deal landed in urgent stage, fire-and-forget
+      // a Trello card on the current-month "Kira {Mes}" board, "Just for Today" list.
+      // Idempotent (Trello search before create). Never blocks the response.
+      if (result?.dealId && pipeline === 'hiring' && (stage === 'recruiter_responded' || urgency === 5 || urgency === 4)) {
+        const dealStageForTrello = stage === 'recruiter_responded' ? 'contractsent' : 'qualifiedtobuy';
+        const dealNameForTrello = `[${sourcePrefix || 'HIRING'}] ${jobTitle} @ ${company}`;
+        import('./hubspot-to-trello').then(m => m.pushDealToTrelloToday({
+          dealId: result.dealId!,
+          dealName: dealNameForTrello,
+          dealStage: dealStageForTrello,
+          suggestedAction: notes ? notes.slice(0, 300) : undefined,
+        })).catch(e => console.warn('[HubSpot→Trello fire-and-forget]', e instanceof Error ? e.message : String(e)));
+      }
+
       res.json({
         ok: true,
         pipeline,
