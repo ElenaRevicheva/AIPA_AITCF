@@ -7987,9 +7987,11 @@ function startScheduledTasks(bot: Bot): void {
           cmoStatus = '❌';
         }
         
-        // Get recent activity
-        const recentRepos: string[] = [];
-        for (const repo of AIDEAZZ_REPOS.slice(0, 3)) {
+        // Get recent activity AND detect genuinely stale repos in one GitHub pass
+        // (May 25 2026: walk all AIDEAZZ_REPOS so stale detection is complete;
+        // 'Activity' section still shows only top 3.)
+        const allRepoActivity: { repo: string; daysAgo: number }[] = [];
+        for (const repo of AIDEAZZ_REPOS) {
           try {
             const commits = await octokit.repos.listCommits({
               owner: 'ElenaRevicheva',
@@ -8000,14 +8002,33 @@ function startScheduledTasks(bot: Bot): void {
             if (latestCommit) {
               const date = new Date(latestCommit.commit.author?.date || '');
               const daysAgo = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-              recentRepos.push(`• ${escapeMarkdown(repo)}: ${daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}`);
+              allRepoActivity.push({ repo, daysAgo });
             }
           } catch {}
         }
-        
-        // Get AI suggestion (with Groq fallback)
-        const suggestionPrompt = `${AIDEAZZ_CONTEXT}\n\nGive Elena one specific, actionable task for today in 1-2 sentences. Be motivating!`;
-        const suggestion = await askAI(suggestionPrompt, 200);
+        const recentRepos: string[] = allRepoActivity.slice(0, 3).map(
+          ({ repo, daysAgo }) => `• ${escapeMarkdown(repo)}: ${daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}`
+        );
+
+        // May 25 2026: deterministic, signal-driven 'Today's real issues' section.
+        // Replaces the previous LLM-confabulated 'Today' line that hallucinated the
+        // same EspaLuz focus suggestion every day (content-less prompt → same output).
+        // Only renders when there is a TRUE crucial issue. On clean days, the
+        // entire section is omitted (no '✅ all clear' filler — no noise).
+        // Reuses module-scope STALE_REPO_THRESHOLD_DAYS (14d) — single source of truth
+        // with the stale-repo proactive-alert dedup logic.
+        const realIssues: string[] = [];
+        if (cmoStatus === '❌') {
+          realIssues.push('CMO offline — `pm2 logs cmo` to triage');
+        }
+        for (const { repo, daysAgo } of allRepoActivity) {
+          if (daysAgo > STALE_REPO_THRESHOLD_DAYS) {
+            realIssues.push(`${escapeMarkdown(repo)} stale (${daysAgo} days)`);
+          }
+        }
+        const issuesSection = realIssues.length > 0
+          ? `\n\n🚨 *Today's real issues*\n${realIssues.map((i) => `• ${i}`).join('\n')}`
+          : '';
         
         const briefing = `${greeting}
 
@@ -8015,10 +8036,7 @@ function startScheduledTasks(bot: Bot): void {
 CTO: ✅ | CMO: ${cmoStatus}
 
 📁 *Activity*
-${recentRepos.join('\n')}
-
-💡 *Today*
-${suggestion}
+${recentRepos.join('\n')}${issuesSection}
 
 _/daily for full briefing_`;
 
