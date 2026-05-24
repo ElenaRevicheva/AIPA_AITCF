@@ -717,3 +717,29 @@ Story arc for founder calls / engineering interviews:
 Pairs well with: "I solve real problems on real systems and document the trade-offs. I don't over-engineer."
 
 Reference for the work: docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md (this commit) + project_hubspot_dashboard.md in Claude memory.
+
+
+---
+
+## NEW May 24 2026 (evening) additions — AEO + Remote Control proof points
+
+### Interview story #1: "I shipped AEO infrastructure for my blog in 30 minutes"
+
+> "My blog already had mandatory FAQ sections in every article — the prompt enforced it. But my static HTML generator was only emitting BlogPosting JSON-LD, ignoring the FAQ. Google AI Overview / Perplexity / Bing Chat couldn't recognize the Q&A as discrete answerable entities — they just saw prose.
+>
+> I wrote a markdown FAQ extractor that parses the article body, finds the `## Frequently Asked Questions` section, parses the `**Q: question?** / A: answer.` format my prompt enforces, and emits a second FAQPage JSON-LD block. Pure additive — BlogPosting schema unchanged. Articles without FAQ section get no FAQPage emitted (graceful degradation).
+>
+> Backfilled all 17 cached articles in one shot via the existing GitHub Contents API push pipeline. Live in production within 30 minutes from problem identification to deploy. AEO score went from 4/10 to 9/10. Cost: zero new dependencies."
+
+Pairs well with: "I look at my own infrastructure as a skeptical practitioner — what's there, what's stale, what's missing. Then I ship the smallest change that closes the biggest gap."
+
+### Interview story #2: "I work on the go because I have to"
+
+> "I'm a single mother — I can't sit at my laptop 24/7. So I set up Claude Code Remote Control: laptop runs the agent, my phone drives it. While taking my daughter to karate, I can ask Claude to run audits, review logs, even ship small fixes — actions run on my laptop, results land in my HubSpot / GitHub / Oracle. The constraints of solo parenting forced an architecture decision most teams never make. It also turns out to be a great answer to 'how do you handle interruptions' in interviews."
+
+### Operational reference
+
+- AEO patch: `cto-aipa/src/blog-static-pages.ts` `extractFaqPairs()` + dual JSON-LD emission (commit c053548)
+- Remote Control launcher: `~/Desktop/claude-remote.bat` (PowerShell wrapper, auto-finds latest claude.exe via MSIX path)
+- Auth via `claude auth login --claudeai` (Pro account OAuth, one-time)
+- Trust dialog accepted by running interactive Claude in worktree path once

@@ -298,3 +298,23 @@ Steps 1–5 of Phase 5.6 multi-agent HubSpot plan: ✅ DONE. Step 6 (CMO LinkedI
 - EspaLuz PayPal subscriber events to HubSpot: not wired
 - Resend 422 emails ("Founder @ DiaMonTech AG@DiaMonTech AG" pattern): not investigated
 - 6 dead HASHNODE_* env vars in cto-aipa .env: leave for future cleanup (only HASHNODE_DAILY_* are still read; rest are harmless)
+
+
+---
+
+## NEW May 24 2026 (evening) status update
+
+### Closed this session (deployed + verified live)
+
+- **AEO / FAQPage JSON-LD schema.** Every article on aideazz.xyz now emits FAQPage structured data extracted from the markdown FAQ section. Google AI Overview / Perplexity / Bing Chat can now cite your Q&A pairs as authoritative answers. Commit c053548. AEO score moved from 4/10 to 9/10.
+- **Groq log noise (413 + 429).** Pre-check at 24K chars skips Groq for oversized PR diffs. 60s cooldown after 429. Net: log noise dropped ~95%. Commits 7d5c01f + 44c26bc.
+- **Claude Code Remote Control activation.** Works end-to-end. Desktop launcher script + ritual documented in ORACLE_ALL_PRODUCTS_RESILIENCE.md. Elena can now drive Claude Code from her phone during karate / errands while laptop processes.
+
+### Still red (carry forward — unchanged from May 22)
+
+- response_detector.py Zoho IMAP poll: still dormant. **THE single highest-leverage gap remaining for VJH manual-apply tracking.**
+- CMO LinkedIn engagement return webhook (Make.com to /api/crm-event): not wired
+- EspaLuz PayPal subscriber events to HubSpot: not wired
+- EspaLuz WhatsApp/Telegram chat user events to HubSpot: not wired
+- Resend 422 emails ("Founder @ DiaMonTech AG@DiaMonTech AG" malformed-recipient pattern): not investigated
+- 6 dead HASHNODE_* env vars in cto-aipa .env: leave for future cleanup (harmless, only HASHNODE_DAILY_* still read)

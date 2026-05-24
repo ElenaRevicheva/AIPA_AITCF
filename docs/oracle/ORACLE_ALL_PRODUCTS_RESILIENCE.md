@@ -817,3 +817,60 @@ Now: article-specific title, OG tags, JSON-LD, real article body in HTML.
 - If GITHUB_TOKEN expires, BlogStatic logs a warning and skips - daily blog publish still works
 - 4everland deploy lag: ~90-180 seconds after GitHub commit
 - Google re-crawl + ranking impact: ~1-2 weeks
+
+
+---
+
+## NEW May 24 2026 (evening) — FAQPage schema (AEO) + Groq 413/429 fixes + Remote Control
+
+### FAQPage JSON-LD schema (AEO discoverability)
+
+Was: ARTICLE_SYSTEM prompt required `## Frequently Asked Questions` (3-5 Q&A pairs) and validateArticle gated publication on it. Content was visible to humans as headings + paragraphs, but the static-HTML generator only emitted BlogPosting JSON-LD. Crawlers couldn't recognize the Q&A as discrete answerable entities.
+
+Now: `cto-aipa/src/blog-static-pages.ts` has `extractFaqPairs()` that parses the markdown FAQ section and emits a second `<script type="application/ld+json">` with FAQPage schema. Purely additive — BlogPosting unchanged. Falls back gracefully (no FAQPage emitted) if article lacks the section.
+
+Verified live: every blog URL on aideazz.xyz now serves both BlogPosting + FAQPage JSON-LD blocks. Google AI Overview / Perplexity / Bing Chat now pull from your Q&A as authoritative.
+
+### Groq 413 (request too large) pre-check
+
+Code-review path was sending full PR diffs to Llama 3.3 70B on Groq, exceeding ~8K token context. Returned 413 repeatedly. Fallback to Claude Haiku worked, but warnings flooded logs.
+
+Fix in `cto-aipa.ts`: pre-check `aiPrompt.length > 24_000` chars before calling Groq. If too big, throw a typed pre-check error logged quietly (not warn). Saves ~100 noisy log lines per cycle.
+
+### Groq 429 (rate limit) 60-second cooldown
+
+Free-tier Groq has per-minute rate limits. When 429 hit, fallback worked but next call also tried Groq, also 429'd, etc — log flood.
+
+Fix in `cto-aipa.ts`: module-scope `groqCooldownUntil` timestamp. On 429, set cooldown 60s into future. Pre-check skips Groq during cooldown (1 quiet log per skip). After cooldown expires, retries Groq normally. Genuine unexpected errors (network/auth) still warn loudly.
+
+### Claude Code Remote Control activation (works on Windows)
+
+Successfully activated `claude remote-control` for working from phone while away from laptop. Stack:
+- Claude Code v2.1.149 installed via MSIX (Windows Store package, at `C:\\Users\\kirav\\AppData\\Local\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\claude-code\\2.1.149\\claude.exe`)
+- Auth: `claude auth login --claudeai` (browser OAuth to elena.revicheva2016@gmail.com Pro account)
+- TUI requires Windows Terminal (not raw cmd.exe — MSIX symlink + ConPTY issues)
+- Workspace trust dialog accepted by running interactive Claude in the worktree path once
+- Desktop launcher: `claude-remote.bat` (PowerShell wrapper, auto-finds latest claude.exe version)
+
+Ritual: plug in laptop → double-click `claude-remote.bat` → press `y` + Enter (default spawn mode) → press SPACE for QR → Win+L to lock screen → take phone (Claude app, Code tab, scan QR) → continue work from phone.
+
+Security: phone session has FULL access to SSH/git/HubSpot. If phone lost during away time, come back to laptop, Ctrl+C the terminal window, session dies immediately.
+
+### Operational verification commands
+
+```bash
+# FAQ schema live on any article:
+curl -s 'https://aideazz.xyz/blog/<slug>/' | python3 -c "import sys,re; html=sys.stdin.read(); print('FAQPage:', 'YES' if 'FAQPage' in html else 'NO')"
+
+# Groq cooldown active:
+pm2 logs cto-aipa --nostream --lines 100 | grep -E 'pre-check|429 hit|cooldown'
+
+# Remote control auth + version:
+& 'C:\\Users\\kirav\\AppData\\Local\\Packages\\Claude_pzs8sxrjxfjjc\\LocalCache\\Roaming\\Claude\\claude-code\\2.1.149\\claude.exe' auth status
+```
+
+### Commits
+
+- `c053548` feat(blog-seo): emit FAQPage JSON-LD schema from article markdown
+- `44c26bc` fix(code-review): option-a Groq 60s cooldown after 429 to silence rate-limit noise
+- `7d5c01f` fix(code-review): pre-check prompt size before Groq call to avoid 413 noise

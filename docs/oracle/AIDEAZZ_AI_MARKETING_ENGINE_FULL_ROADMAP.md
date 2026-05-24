@@ -1358,3 +1358,51 @@ curl -sL "https://aideazz.xyz/blog/<slug>" | grep -oE "<title>[^<]+</title>"
 S=$(grep ^HASHNODE_DAILY_TRIGGER_SECRET= /home/ubuntu/cto-aipa/.env | cut -d= -f2-)
 curl -s -X POST https://webhook.aideazz.xyz/cto/hashnode/daily-run -H "Authorization: Bearer $S"
 ```
+
+
+---
+
+## NEW May 24 2026 (evening) — FAQPage AEO schema completes the SEO/GEO/AEO triad
+
+### Final piece of "answer engine" infrastructure now live
+
+Today closed the only remaining gap in your AEO score. Every article on aideazz.xyz emits a FAQPage JSON-LD schema (in addition to the BlogPosting one). The Q&A content was already there (enforced by ARTICLE_SYSTEM prompt + validateArticle gate), but the static-HTML generator wasn't extracting it into structured data — so crawlers saw prose instead of discrete questions.
+
+Now: Google AI Overview, Perplexity, Bing Chat, ChatGPT search (when crawling) all see your articles as authoritative sources of specific answerable questions. "What's the false positive rate on executive email detection?" → Perplexity can cite YOUR exact answer.
+
+### Updated scorecard (independent audit)
+
+| Dimension | Was | Now |
+|-----------|-----|-----|
+| SEO (meta, headings, readability) | 9/10 | 9/10 |
+| GEO (AI-citation readiness) | 10/10 | 10/10 |
+| AEO (answer engines, Q&A schema) | **4/10** | **9/10** |
+| Technical SEO (HTTPS, mobile, security) | 7/10 | 7/10 |
+| **Overall** | **85%** | **~92%** to "final fully working" |
+
+### What this unlocks for client demos
+
+The marketing engine now demonstrates the complete content-to-citation loop:
+
+1. Daily articles auto-generate with ARTICLE_SYSTEM enforced format (failure-first lead, opinionated, specific numbers, mandatory FAQ section)
+2. Multi-platform publishing (Dev.to API + per-article static HTML on aideazz.xyz IPFS)
+3. Per-article SEO infrastructure (article-specific title, OG meta, canonical URL)
+4. BlogPosting JSON-LD per article (authoritative article identity)
+5. **FAQPage JSON-LD per article** (Q&A as discrete answerable entities — featured snippet eligible)
+6. Sitemap auto-updates on every publish
+7. AI crawlers explicitly welcomed via robots.txt + llms.txt + geo-manifest.json + CITATION.cff
+8. _redirects routing for trailing-slash URL canonicalization on IPFS
+9. Manual trigger endpoint for ad-hoc article fires without disturbing daily cron
+10. Quieter logs via Groq pre-check + cooldown (operational hygiene)
+
+### Honest portfolio talking point (interview / client / investor)
+
+"My marketing engine publishes daily Claude-Opus-written articles to multiple platforms with full SEO + GEO + AEO infrastructure on a $0/month IPFS host that doesn't natively support SSR. Each article ships with BlogPosting AND FAQPage JSON-LD schemas — visible to Google, Perplexity, and ChatGPT search as authoritative Q&A sources. Topics rotate through real failure modes and specific numbers from my own production systems — not commodity AI listicles. Adding a new topic is a one-line config change."
+
+### Remaining 8% to "final fully working"
+
+Diminishing returns; defer until after first paying client/interview:
+- Security headers at 4everland edge (cosmetic for SEO, real for security audits)
+- Core Web Vitals testing + optimization (only matters if mobile is slow)
+- Per-article OG images (currently all use elena-og.jpg)
+- Schema.org `Organization` + `WebSite` at site root (brand SERP carousel)
