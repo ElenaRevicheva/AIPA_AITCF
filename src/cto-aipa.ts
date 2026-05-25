@@ -2356,8 +2356,13 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       try {
         await runTriageCycle(groq, anthropic);
         const brief = await buildDailyBrief();
-        const chatId = process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID;
-        if (chatId) await sendTelegramBroadcast(brief, { parseMode: false });
+        // MAY 25 2026: null brief = silent day, no Telegram (zero noise).
+        if (brief === null) {
+          console.log('🎯 [cron] Triage: quiet day (0 Oracle signals + 0 HubSpot actionable) — Telegram SUPPRESSED');
+        } else {
+          const chatId = process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID;
+          if (chatId) await sendTelegramBroadcast(brief, { parseMode: false });
+        }
       } catch (e) { console.error('🎯 [cron] Triage error:', e); }
     }, { timezone: triageTz });
     console.log(`🎯 Triage cron: "${triageCronExpr}" (${triageTz}) — daily lead brief`);

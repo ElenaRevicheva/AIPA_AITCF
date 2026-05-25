@@ -608,8 +608,19 @@ export async function runDailyOutreachCycle(
       .filter(Boolean)
       .join('\n');
 
-    if (sendTelegram) {
+    // MAY 25 2026: silent skip on quiet outreach cycle.
+    // If nothing happened (no sends, no auto-marked, no real errors), don't
+    // pollute Telegram with a "verified=0 / generated=0 / sent=0 / errors=0" report.
+    const actionableOutreach =
+      send.sent > 0 ||
+      (send.autoMarkedInvalid && send.autoMarkedInvalid > 0) ||
+      send.errors.length > 0 ||
+      gen.generated > 0 ||
+      verify.verified > 0;
+    if (sendTelegram && actionableOutreach) {
       await sendTelegram(lines);
+    } else if (!actionableOutreach) {
+      console.log('📧 Phase 4 outreach: quiet cycle (0 actionable signals) — Telegram SUPPRESSED');
     }
   } catch (e) {
     console.error(`[${tag}] Cycle error:`, e);

@@ -1519,7 +1519,9 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
   bot.command('triage_urgent', async (ctx) => {
     try {
       const brief = await buildDailyBrief();
-      await ctx.reply(brief);
+      // MAY 25 2026: buildDailyBrief can return null on quiet days. Surface a
+      // concrete message when invoked manually rather than silently doing nothing.
+      await ctx.reply(brief || '📥 Lead Brief: 0 actionable signals right now (Oracle triage + HubSpot pipeline both quiet).');
     } catch (error) {
       await ctx.reply('❌ Error fetching lead brief.');
     }

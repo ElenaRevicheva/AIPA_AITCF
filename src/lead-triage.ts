@@ -17,7 +17,7 @@ import {
   getPlacesPipelineSnapshot,
   type PlacesPipelineSnapshot,
 } from './database';
-import { pushLeadToHubSpot, HS_STAGES } from './hubspot-client';
+import { pushLeadToHubSpot, HS_STAGES, getActionableHubSpotDeals } from "./hubspot-client";
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = 'claude-sonnet-4-5';
@@ -437,13 +437,45 @@ function isTestRow(r: any): boolean {
   return TEST_NAMES.has(name) || /^(e2e|test|demo|sample|fake)/i.test(name);
 }
 
-export async function buildDailyBrief(): Promise<string> {
+export async function buildDailyBrief(): Promise<string | null> {
   const leads = await getTriagedLeads(undefined, 100);
   // Filter out test/demo entries that slipped in from form testing
   const rows = (leads as any[]).filter(r => !isTestRow(r));
 
-  if (rows.length === 0) {
-    return `📥 Lead Brief — No real signals yet.\n\nAdd signals via /lead add or the aideazz.xyz inquiry form.\nTip: run /cleanbiz confirm to wipe test entries from the database.`;
+  // MAY 25 2026: HubSpot-enriched brief — return null when nothing actionable.
+  // Old behavior sent "No real signals yet" every day to the operator. Bad noise.
+  // New behavior: ALWAYS check HubSpot for actionable deals (since lead activity
+  // flows there now via May 24 response_detector + crm-event wiring). Only send
+  // the Telegram brief if EITHER (a) there are Oracle triage signals, or
+  // (b) HubSpot has actionable deals. On a truly quiet day, return null and
+  // the caller suppresses the send entirely.
+  const actionableDeals = await getActionableHubSpotDeals({ limit: 10 }).catch(() => []);
+
+  if (rows.length === 0 && actionableDeals.length === 0) {
+    console.log('📥 Lead Brief: 0 Oracle signals + 0 HubSpot actionable deals — Telegram SUPPRESSED');
+    return null;
+  }
+
+  // If we ONLY have HubSpot deals (no Oracle signals), surface those:
+  if (rows.length === 0 && actionableDeals.length > 0) {
+    const dealLines = actionableDeals.slice(0, 8).map(d => {
+      const stageHint = d.stage === 'qualifiedtobuy' ? '🔥' :
+                        d.stage === 'contractsent'   ? '💬' :
+                        d.stage.includes('recruiter') ? '🎯' :
+                        d.stage.includes('interview') ? '📅' :
+                        d.stage.includes('offer')     ? '🏆' : '•';
+      const t = d.lastModified ? new Date(d.lastModified).getTime() : 0; const days = t > 0 && Number.isFinite(t) ? Math.floor((Date.now() - t) / 86400_000) : -1;
+      return `  ${stageHint} ${d.dealname}${days < 0 ? '' : (days === 0 ? ' — today' : ' — ' + days + 'd')}`;
+    }).join('\n');
+    return [
+      `📥 Lead Brief — ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`,
+      ``,
+      `🎯 HubSpot deals needing action (${actionableDeals.length}):`,
+      dealLines,
+      ``,
+      `(No new Oracle triage signals — leads flow to HubSpot via May 24 wiring.)`,
+      `/triage — re-run triage  |  /leads — full list`,
+    ].join('\n');
   }
 
   const urgent = rows.filter((r: any) => r[4] >= 4);    // urgency
@@ -459,6 +491,20 @@ export async function buildDailyBrief(): Promise<string> {
     `  • ${r[8] || 'unknown'}: ${(r[7] || '').substring(0, 80)}`
   ).join('\n');
 
+  // Always append HubSpot actionable deals section if any present.
+  const hsSection = actionableDeals.length > 0
+    ? `\n\n🎯 HubSpot deals needing action (${actionableDeals.length}):\n` +
+      actionableDeals.slice(0, 8).map(d => {
+        const stageHint = d.stage === 'qualifiedtobuy' ? '🔥' :
+                          d.stage === 'contractsent'   ? '💬' :
+                          d.stage.includes('recruiter') ? '🎯' :
+                          d.stage.includes('interview') ? '📅' :
+                          d.stage.includes('offer')     ? '🏆' : '•';
+        const t = d.lastModified ? new Date(d.lastModified).getTime() : 0; const days = t > 0 && Number.isFinite(t) ? Math.floor((Date.now() - t) / 86400_000) : -1;
+        return `  ${stageHint} ${d.dealname}${days < 0 ? '' : (days === 0 ? ' — today' : ' — ' + days + 'd')}`;
+      }).join('\n')
+    : '';
+
   return [
     `📥 Lead Brief — ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`,
     ``,
@@ -468,6 +514,7 @@ export async function buildDailyBrief(): Promise<string> {
     `⚪ Monitor: ${monitor.length}`,
     ``,
     topLine,
+    hsSection,
     ``,
     `/triage — run triage now`,
     `/leads — full lead list`,

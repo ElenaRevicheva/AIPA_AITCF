@@ -637,6 +637,79 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
 
 // ─── Stats for /hubspot command ───────────────────────────────────────────────
 
+export interface ActionableDeal {
+  id: string;
+  dealname: string;
+  stage: string;
+  pipeline: string;
+  amount?: string;
+  lastModified: string;
+}
+
+/**
+ * MAY 25 2026: Query HubSpot for deals that need ACTION RIGHT NOW.
+ * Used by the CTO AIPA daily Telegram messages so the operator only sees
+ * what to act on, not what was technically processed.
+ *
+ * Returns deals in stages that mean "needs my attention":
+ *   Client pipeline: qualifiedtobuy ('I act today'), contractsent ('they replied')
+ *   Hiring pipeline: recruiter_responded, interview_scheduled, offer_received
+ *
+ * Deals are sorted by lastModified desc so the freshest signals surface first.
+ */
+export async function getActionableHubSpotDeals(opts: {
+  limit?: number;
+  sinceHoursAgo?: number; // if set, only deals modified in last N hours
+} = {}): Promise<ActionableDeal[]> {
+  const limit = opts.limit ?? 25;
+  const sinceHoursAgo = opts.sinceHoursAgo;
+
+  // Stage IDs we care about. Some come from env (hiring pipeline), some are constants.
+  const stageIds = [
+    HS_STAGES.contacted,       // 'qualifiedtobuy' — client pipeline 'I act today'
+    'contractsent',            // client pipeline 'they replied'
+    HS_HIRING_STAGE_IDS.recruiter_responded(),
+    HS_HIRING_STAGE_IDS.interview_scheduled(),
+    HS_HIRING_STAGE_IDS.offer_received(),
+  ].filter(Boolean) as string[];
+
+  if (stageIds.length === 0) return [];
+
+  const filters: Array<{ propertyName: string; operator: string; value?: string; values?: string[] }> = [
+    { propertyName: 'dealstage', operator: 'IN', values: stageIds },
+  ];
+  if (sinceHoursAgo && sinceHoursAgo > 0) {
+    const since = Date.now() - sinceHoursAgo * 60 * 60 * 1000;
+    filters.push({ propertyName: 'hs_lastmodifieddate', operator: 'GTE', value: String(since) });
+  }
+
+  try {
+    const body = {
+      filterGroups: [{ filters }],
+      properties: ['dealname', 'dealstage', 'pipeline', 'amount', 'hs_lastmodifieddate'],
+      sorts: [{ propertyName: 'hs_lastmodifieddate', direction: 'DESCENDING' }],
+      limit,
+    };
+    const resp = await hsPost<{ results: Array<{ id: string; properties: Record<string, string> }> }>(
+      '/crm/v3/objects/deals/search',
+      body,
+    );
+    return (resp?.results || []).map(r => {
+      const out: ActionableDeal = {
+        id: r.id,
+        dealname: r.properties.dealname || '(unnamed)',
+        stage: r.properties.dealstage || '',
+        pipeline: r.properties.pipeline || '',
+        lastModified: r.properties.hs_lastmodifieddate || '',
+      };
+      if (r.properties.amount) out.amount = r.properties.amount;
+      return out;
+    });
+  } catch {
+    return [];
+  }
+}
+
 export async function getHubSpotStats(): Promise<{
   contacts: number;
   companies: number;

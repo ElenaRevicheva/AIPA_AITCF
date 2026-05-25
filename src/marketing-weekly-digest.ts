@@ -34,7 +34,10 @@ export async function runWeeklyMarketingDigest(): Promise<void> {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const rows = await getLeadsSinceForDigest(since, "aideazz_inquiry");
   if (rows.length === 0) {
-    await sendTelegramDigest("📋 AIdeazz inbound (last 7 days)\n\nNo new inquiries.");
+    // MAY 25 2026: silent skip — empty inbound is not a signal worth surfacing.
+    // Lead activity flows into HubSpot now (May 24 wiring), not business_leads.
+    // If you want a non-empty inbound, check HubSpot or trigger via the form.
+    console.log("📣 Weekly marketing digest: 0 inquiries in last 7d — Telegram SUPPRESSED");
     return;
   }
   let body = `📋 AIdeazz inbound (last 7 days) — ${rows.length} new\n\n`;

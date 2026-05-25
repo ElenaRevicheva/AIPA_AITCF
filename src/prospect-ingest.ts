@@ -282,9 +282,9 @@ export async function runProspectIngestion(
     console.log(`[${tag}] ${newCompanies.length} new companies (${skipped} already in DB)`);
 
     if (newCompanies.length === 0) {
-      if (sendTelegram) {
-        await sendTelegram(`🔍 Prospect ingestion: 0 new companies (all ${skipped} fetched were already in pipeline — nothing to do)`);
-      }
+      // MAY 25 2026: silent skip — 0 new is not a signal worth reporting.
+      // The operator only wants to hear when there's something to act on.
+      console.log(`🔍 Prospect ingestion: 0 new (all ${skipped} fetched were dupes) — Telegram SUPPRESSED`);
       return { ingested: 0, skipped, errors: 0, hunterUsed: 0 };
     }
 
