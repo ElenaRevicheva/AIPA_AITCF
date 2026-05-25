@@ -594,6 +594,9 @@ Type /menu for all commands! 🚀
     'wiring': {
       title: '📊 BUSINESS WIRING',
       commands: [
+        { cmd: '/research_company',    desc: '🔥 NEW (hackathon) — Autonomous Claude + Bright Data research on a prospect. Returns founder, pain signals, decision-maker, sendable pitch angle, HOT/WARM/COLD verdict. ~90s.', usage: '/research_company decircle.io\n/research_company Acme.ai' },
+        { cmd: '/research_employer',   desc: '🎯 NEW (hackathon) — Same agent, employer mode. Recent funding, hiring patterns, tech stack, comp signals, application angle for you.', usage: '/research_employer Cresta\n/research_employer Anthropic' },
+        { cmd: '/research_competitor', desc: '📚 NEW (hackathon) — Same agent, SEO/AEO competitor gap analysis. Returns top-ranking content + 3-5 blog topic gaps for your daily publisher.', usage: '/research_competitor brain.fm\n/research_competitor manny-santos.com' },
         { cmd: '/briefing',       desc: '📋 Full business snapshot — agents, leads, EspaLuz, health. Start here every morning.', usage: '/briefing' },
         { cmd: '/outcomes',       desc: '✅ What your AI agents actually did today — posts, leads, emails, revenue.', usage: '/outcomes\n/outcomes cmo' },
         { cmd: '/leads',          desc: '👥 Everyone who has shown interest in working with you — your live client list.', usage: '/leads\n/leads new' },
