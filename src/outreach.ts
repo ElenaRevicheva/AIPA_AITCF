@@ -496,17 +496,35 @@ export async function sendApprovedDrafts(): Promise<{
   sent: number;
   skipped: number;
   errors: string[];
+  autoMarkedInvalid: number;
 }> {
   const drafts = await getOutreachDrafts();
   let sent = 0;
   let skipped = 0;
   const errors: string[] = [];
 
+  // MAY 25 2026 FIX: pre-send bogus filter + 422-auto-mark-invalid
+  // Bogus drafts (e.g. "katex@0.16.9" — npm version captured as email)
+  // were retrying every cron forever, polluting the daily Phase 4 summary.
+  // Two-layer fix: (1) skip + auto-mark invalid_email on bogus; (2) on
+  // Resend 422 (invalid `to` format), auto-mark invalid_email so it never
+  // retries. getOutreachDrafts (database.ts) also excludes invalid_email
+  // targets at query time so this is belt-and-suspenders.
+  let autoMarkedInvalid = 0;
   for (const row of drafts) {
     const [emailId, targetId, subject, body, , name, company, email] =
       row as any[];
     if (!email) {
       skipped++;
+      continue;
+    }
+
+    // Layer 1: pre-send bogus filter
+    if (isBogusOutreachEmail(email)) {
+      await updateOutreachTargetStatus(targetId, 'invalid_email', 'bogus_format');
+      await markOutreachDraftStatus(emailId, 'rejected_bogus_email');
+      autoMarkedInvalid++;
+      console.warn(`[outreach] auto-marked bogus draft invalid: ${name} / ${company} / ${email}`);
       continue;
     }
 
@@ -522,10 +540,22 @@ export async function sendApprovedDrafts(): Promise<{
       await updateOutreachTargetStatus(targetId, 'emailed');
     } else {
       if (result.reason?.includes('Daily cap')) break;
+
+      // Layer 2: Resend 422 = invalid email format. Auto-mark so we don't retry.
+      const is422InvalidFormat = result.reason?.includes('422') &&
+        (result.reason?.toLowerCase().includes('invalid') || result.reason?.toLowerCase().includes('to'));
+      if (is422InvalidFormat) {
+        await updateOutreachTargetStatus(targetId, 'invalid_email', 'rejected_by_resend_422');
+        await markOutreachDraftStatus(emailId, 'rejected_by_resend_422');
+        autoMarkedInvalid++;
+        console.warn(`[outreach] Resend 422 auto-marked invalid: ${name} / ${company} / ${email}`);
+        continue;
+      }
+
       errors.push(`${name}@${company}: ${result.reason}`);
     }
   }
-  return { sent, skipped, errors };
+  return { sent, skipped, errors, autoMarkedInvalid };
 }
 
 // ---------------------------------------------------------------------------
@@ -566,6 +596,7 @@ export async function runDailyOutreachCycle(
       `Draft rows created (Claude): ${gen.generated}`,
       `Emails accepted by Resend + DB: ${send.sent}`,
       send.skipped ? `Skipped (no address on target): ${send.skipped}` : '',
+      send.autoMarkedInvalid ? `Auto-marked invalid (bogus or Resend 422): ${send.autoMarkedInvalid} — won't retry` : '',
       send.errors.length ? `Send failures: ${send.errors.join('; ')}` : '',
       gen.generated > 0 && send.sent === 0 && resendConfigured
         ? `Note: drafts exist but 0 sends — check errors above or daily cap.`
@@ -594,6 +625,7 @@ export async function runDailyOutreachCycle(
 
 // Re-export DB helpers so callers only need to import from outreach
 export { getPendingLeads, updateTargetEmail } from './database';
+import { markOutreachDraftStatus } from './database';
 
 export function formatOutreachStatsMessage(stats: Awaited<ReturnType<typeof getOutreachStats>>): string {
   return [

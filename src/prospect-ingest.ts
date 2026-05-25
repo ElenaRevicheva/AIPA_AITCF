@@ -283,7 +283,7 @@ export async function runProspectIngestion(
 
     if (newCompanies.length === 0) {
       if (sendTelegram) {
-        await sendTelegram(`🔍 Prospect ingestion: 0 new companies (${skipped} already in pipeline)`);
+        await sendTelegram(`🔍 Prospect ingestion: 0 new companies (all ${skipped} fetched were already in pipeline — nothing to do)`);
       }
       return { ingested: 0, skipped, errors: 0, hunterUsed: 0 };
     }

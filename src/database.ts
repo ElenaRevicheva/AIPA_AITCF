@@ -2447,6 +2447,29 @@ async function saveOutreachTargetsBulk(
   }
 }
 
+export async function markOutreachDraftStatus(
+  emailIdHex: string,
+  newStatus: string
+): Promise<boolean> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `UPDATE outreach_log SET status = :status WHERE id = HEXTORAW(:id)`,
+      { status: newStatus, id: emailIdHex },
+      { autoCommit: true }
+    );
+    return (result.rowsAffected || 0) > 0;
+  } catch (err) {
+    console.error('❌ markOutreachDraftStatus error:', err);
+    return false;
+  } finally {
+    if (connection) {
+      try { await connection.close(); } catch {}
+    }
+  }
+}
+
 async function getOutreachDrafts(): Promise<any[]> {
   let connection;
   try {
@@ -2458,6 +2481,7 @@ async function getOutreachDrafts(): Promise<any[]> {
        FROM outreach_log ol
        JOIN outreach_targets ot ON ol.target_id = ot.id
        WHERE ol.status = 'draft'
+         AND ot.status NOT IN ('invalid_email', 'archived', 'dismissed')
        ORDER BY ol.created_at DESC`
     );
     return result.rows || [];
