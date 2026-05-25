@@ -590,3 +590,48 @@ summaries to also pull from HubSpot for richer context.
 3. EspaLuz WhatsApp/Telegram chat user events → HubSpot
 4. **NEW**: Wire AIdeazz inbound + Lead Brief Telegram summaries to pull from HubSpot (the Oracle tables they currently read are empty/all-archived because lead activity flows into HubSpot now)
 5. 6 dead HASHNODE_* env vars in cto-aipa .env (deferred cleanup; some are still used by blog-es-bundle)
+
+
+## NEW May 25 2026 evening (final) — Telegram messages now USEFUL or SILENT
+
+After the bogus-422 fix, operator pushed back: messages must be USEFUL for
+hiring/clients/monetization, not just noise-free. Honest answer was no, I had
+not accomplished that.
+
+### Closed this session (commit `4c40349`)
+
+- ✅ **Lead Brief now HubSpot-enriched.** `buildDailyBrief()` queries
+  `getActionableHubSpotDeals()` for deals in `qualifiedtobuy` / `contractsent`
+  / `recruiter_responded` / `interview_scheduled` / `offer_received` stages.
+  Renders with stage hints (🔥 act today, 💬 they replied, 🎯 recruiter,
+  📅 interview, 🏆 offer) + days-since-modified. Live test shows 5 hiring
+  leads (Cresta, decircle, Jerry.ai, Ensitech, Norwest) + 3 client prospects
+  (eBay, Huskyauto, Skool) — all actionable, all real, all from HubSpot.
+- ✅ **Silent-skip on all 4 noisy messages.** Prospect ingestion, AIdeazz
+  inbound weekly, Lead Brief, Phase 4 outreach — each now suppresses
+  Telegram entirely on quiet cycles (0 actionable signals). Console logs
+  show `... — Telegram SUPPRESSED` for observability.
+- ✅ **CLOSED red item #4 from the late-afternoon list**: "Wire AIdeazz
+  inbound + Lead Brief Telegram summaries to pull from HubSpot." Done for
+  Lead Brief (full HubSpot enrichment). AIdeazz inbound is now silent on
+  empty (was the actual operator complaint); deal-by-source enrichment
+  remains for a future session.
+
+### Pattern that emerged
+
+"Yesterday's good code is today's fastest fix." Before writing new modules,
+audit recent commits for already-deployed primitives. The `realIssues[]`
+"only fire when actionable" pattern (morning briefing fix `7c7d910`) +
+the HubSpot client (May 23) + the `getActionableHubSpotDeals()`-shaped
+stage filtering (already in `hubspot-to-trello.ts` `b2b795b`) were all
+there. One new function + 6 small call-site edits delivered the whole
+behavior change.
+
+### Still red (carry forward)
+
+1. CMO LinkedIn engagement return webhook (Make.com → /api/crm-event)
+2. EspaLuz PayPal subscriber events → HubSpot
+3. EspaLuz WhatsApp/Telegram chat user events → HubSpot
+4. UTM-driven attribution surface in Telegram summaries (form captures UTM, not yet shown)
+5. Algom Alpha [CLIENT-ALGOM] deals → daily Telegram digest
+6. 6 dead HASHNODE_* env vars in cto-aipa .env (deferred; some still used by blog-es-bundle)

@@ -1055,3 +1055,41 @@ from config" -> extended to "...and for stateful agents, query the actual
 DB before claiming the bug isn't fixed (or that it is)." The DB query
 showed exactly 1 bogus draft (not 20, not 0), which made the fix surgical
 and the backfill trivial.
+
+
+### Telegram-usefulness refactor — May 25 2026 evening (final)
+
+The 4 daily Telegram messages from CTO AIPA (prospect ingest, AIdeazz inbound,
+Lead Brief, Phase 4 outreach) all used to read from Oracle tables that are
+now empty / all-archived because real lead activity flows into HubSpot since
+May 24 (response_detector + crm-event wiring). Result: technically-correct
+but useless "no signals" / "0 new" daily noise.
+
+**Fix shipped in commit `4c40349`:**
+
+- **New helper** `getActionableHubSpotDeals()` in `src/hubspot-client.ts`
+  queries HubSpot for deals in stages that mean "needs my attention":
+  client `qualifiedtobuy` + `contractsent`; hiring `recruiter_responded` +
+  `interview_scheduled` + `offer_received`.
+- **Lead Brief** (`src/lead-triage.ts buildDailyBrief`) returns `string | null`;
+  null when 0 Oracle signals AND 0 HubSpot actionable. Otherwise renders
+  HubSpot deals with stage hints (🔥 act today, 💬 they replied, 🎯 recruiter,
+  📅 interview, 🏆 offer) + days-since-modified.
+- **Silent-skip** applied to prospect-ingest (0 new), marketing-weekly-digest
+  (0 inquiries), outreach Phase 4 (0 actionable activity).
+
+**Verification anchors in logs**:
+- `📥 Lead Brief: 0 Oracle signals + 0 HubSpot actionable deals — Telegram SUPPRESSED` (quiet)
+- `🔍 Prospect ingestion: 0 new (all N fetched were dupes) — Telegram SUPPRESSED`
+- `📣 Weekly marketing digest: 0 inquiries in last 7d — Telegram SUPPRESSED`
+- `📧 Phase 4 outreach: quiet cycle (0 actionable signals) — Telegram SUPPRESSED`
+- `🎯 [cron] Triage: quiet day (0 Oracle signals + 0 HubSpot actionable) — Telegram SUPPRESSED`
+
+**Required env vars for hiring-stage filtering** (already configured):
+- `HUBSPOT_API_KEY`
+- `HUBSPOT_HIRING_PIPELINE_ID`
+- `HUBSPOT_HIRING_STAGE_RECRUITER_RESPONDED`
+- `HUBSPOT_HIRING_STAGE_INTERVIEW_SCHEDULED`
+- `HUBSPOT_HIRING_STAGE_OFFER_RECEIVED`
+
+If any hiring-stage env is unset, that stage is silently excluded from the filter (no error).

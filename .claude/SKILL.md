@@ -1091,3 +1091,75 @@ To make AIdeazz inbound + Lead Brief useful again, they should pull from
 HubSpot too (since lead activity now flows there via May 24 response_detector
 + Trello bridge). Currently both messages report from Oracle tables that are
 empty or all-archived. Separate session.
+
+
+## NEW May 25 2026 evening (final) — Useful Telegram messages (HubSpot-enrich + silent-skip noise)
+
+Operator feedback after the bogus-422 fix: "i need cto aipa sending me reasonable
+messages on telegram about triage, marketing, outreach, leads, inbound, outbound,
+UTM etc — but these messages should be fulfilled with actual, real, proved data
+and be understandable for me — they should play true impact on my being hired
+and getting clients / monetization process. please make it work for me, not
+empty gun anymore and noise."
+
+### The honest answer was: NO, I had not accomplished this
+
+The morning fix removed noise (bogus 422 retry loop) but the underlying problem
+was bigger: the 4 daily Telegram messages all read from Oracle tables that are
+now empty or all-archived because real lead activity flows into HubSpot since
+the May 24 wiring (response_detector + crm-event). Messages were technically
+correct but useless.
+
+### The fix re-used yesterday's good patterns instead of building new
+
+- **Morning briefing's `realIssues[] — only fire when actionable` pattern** applied to all 4 noisy messages
+- **hubspot-client.ts** (already comprehensive from prior work) extended with one new function `getActionableHubSpotDeals()` that filters by stage IDs
+- **HUBSPOT_PORTAL = 51409153** + the stage-ID env vars (recruiter_responded, interview_scheduled, offer_received) were all already configured
+
+### Six surgical patches (commit `4c40349`)
+
+| File | Change |
+|---|---|
+| `src/hubspot-client.ts` | new `getActionableHubSpotDeals()` — queries client (qualifiedtobuy + contractsent) + hiring (recruiter_responded + interview_scheduled + offer_received) stages, sorted by last-modified desc |
+| `src/prospect-ingest.ts` | suppress Telegram on 0 new companies (was "0 new (20 already in pipeline)") |
+| `src/marketing-weekly-digest.ts` | suppress Telegram on 0 inquiries (was "No new inquiries" weekly) |
+| `src/lead-triage.ts buildDailyBrief` | returns `string \| null`; queries HubSpot; renders Lead Brief with `🔥 act today / 💬 they replied / 🎯 recruiter / 📅 interview / 🏆 offer` stage hints + days-since-modified; returns null on truly quiet days |
+| `src/cto-aipa.ts triage cron` | respects null brief → Telegram suppressed |
+| `src/outreach.ts runDailyOutreachCycle` | only sends Phase 4 summary when something actionable happened |
+| `src/telegram-bot.ts /triage_urgent` | handles null brief with concrete "0 actionable" reply for manual command |
+
+### Live proof (tested against HubSpot API directly)
+
+```
+📥 Lead Brief — Mon, May 25
+
+🎯 HubSpot deals needing action (10):
+  🔥 [HIRING-VJH-SERP-LEAD] Remote GTM Automation Lead Pipeline & Revenue Ops @ Cresta — 2d
+  🔥 [HIRING-VJH-SERP-LEAD] Founding Engineer – AI & Compute @ decircle — 2d
+  🔥 [HIRING-VJH-SERP-LEAD] Manager, AI Agents and Platform @ Jerry.ai — 2d
+  🔥 [HIRING-VJH-SERP-LEAD] Founding Solutions Engineer @ Ensitech — 2d
+  🔥 [HIRING-VJH-SERP-LEAD] Remote AI Accounting Automation Lead @ Norwest Venture — 2d
+  🔥 [CLIENT-CTO-INGEST] eBay — 4d
+  🔥 [CLIENT-CTO-INGEST] Huskyauto — 4d
+  🔥 [CLIENT-CTO-INGEST] Skool — 4d
+```
+
+5 real hiring leads + 3 real client prospects, all in qualifiedtobuy stage = "🔥 I act today". This is what the operator means by "true impact on being hired and getting clients."
+
+### What the operator sees going forward
+
+- **Quiet day**: silence on Telegram (no "0 new" / "no signals" noise)
+- **Active day**: Lead Brief leads with actionable HubSpot deals, names + age + stage emoji
+- **New prospect ingest**: only when actual new companies discovered
+- **Weekly digest**: only when actual aideazz form inquiries exist
+- **Phase 4 outreach summary**: only when sends > 0 or auto-marks > 0 or real errors
+
+### Rule that emerged
+
+"Yesterday's good code is today's fastest fix." Before writing new modules, audit the recent commit history for already-deployed primitives. The `realIssues[]` pattern + the HubSpot client were both already there from May 24-25 morning work — one new function + 6 small call-site edits delivered the whole behavior change.
+
+### Out of scope (acknowledged followups)
+
+- **Inbound weekly digest** could be further enriched with HubSpot deal-by-source breakdown (still per-source filter currently)
+- **UTM-driven attribution** is wired in the form but not yet surfaced in any Telegram summary
+- **Algom Alpha CRM hit rate** could surface in a daily summary (deals tagged `[CLIENT-ALGOM]` are visible in HubSpot but not in a Telegram digest yet)
