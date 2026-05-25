@@ -874,3 +874,46 @@ pm2 logs cto-aipa --nostream --lines 100 | grep -E 'pre-check|429 hit|cooldown'
 - `c053548` feat(blog-seo): emit FAQPage JSON-LD schema from article markdown
 - `44c26bc` fix(code-review): option-a Groq 60s cooldown after 429 to silence rate-limit noise
 - `7d5c01f` fix(code-review): pre-check prompt size before Groq call to avoid 413 noise
+
+
+### XAI status update — May 25 2026 — Grok wiring complete in dragontrade-agent
+
+The May 20 2026 note above said the `XAI_API_KEY` (rhino-sneezing-lemon
+team, X account `1910676161845186560`) was "in env, not yet wired to any
+code." That's now superseded for **option (1) Algom backup / Grok routing**:
+
+**Wired in `dragontrade-agent` commit `294efee`** (pushed to origin/main):
+
+- New file `grok-content.js` — minimal xAI Chat Completions wrapper using
+  model `grok-4.20-0309-non-reasoning`. Consecutive-failure cutoff at 3
+  prevents burning credits on a depleted account; HTTP 402 (credits
+  depleted) and 429 (rate limit) raised with specific error messages for
+  log triage.
+- `index.js` switch: educational posts try Grok first
+  (`generateEducationalWithGrok()`), fall back to the 7-month-old CMC
+  engine (`this.cmcEngine.generateRealInsight(...)`) on any Grok error.
+  `isGrokTemporarilyDisabled()` short-circuits Grok calls after the
+  cutoff fires.
+
+**Verification anchors in logs** (`pm2 logs dragontrade-main`):
+- Success: `✅ Generated via Grok (xAI)`
+- Graceful fallback: `⚠️ Grok failed (...) — falling back to CMC/Claude`
+- Cutoff active: `ℹ️ Grok temporarily disabled (consecutive failures) — using CMC/Claude`
+
+**Posting identity unchanged.** The bot still posts from `@reviceva`
+(Elena's personal X dev account via existing `TWITTER_API_KEY` /
+`TWITTER_ACCESS_TOKEN` in `dragontrade-agent/.env`). The rhino-sneezing-
+lemon team account ID `1910676161845186560` is **not** used for posting —
+only the team's xAI key is consumed, for the educational slot only.
+
+**Cadence note for future ops.** `POST_INTERVAL_MIN` and
+`POST_INTERVAL_MAX` are read from `process.env` first with `'300'`/`'420'`
+as fallbacks. `dragontrade-agent/.env` was previously set to `120`/`180`
+which silently overrode the new code defaults. Both `.env` and code now
+agree on `300`/`420` (≈4 posts/day). If you tweak cadence, update both
+or remove the `.env` lines so the code defaults take effect.
+
+**Still pending wiring** for the same xAI key (separate future sessions):
+(2) Grok-as-LLM in CTO AIPA model routing,
+(3) xAI team-level X API access (would change posting identity — defer
+unless brand strategy says otherwise).

@@ -382,3 +382,67 @@ zero Resend 422 noise.
 > filtered; LLM suggestions confabulated instead of grounded). The fix was
 > always wiring the signal to a deterministic action — never adding more
 > intelligence, always closing a loop.
+
+
+## NEW May 25 2026 evening — Algom Alpha repositioning + xAI team Grok wired
+
+Two long-standing red items closed in one session; one new red surfaced
+from pre-existing X API behavior (not introduced by this work).
+
+### Closed this session (deployed + verified live on Oracle)
+
+- **Algom Alpha repositioning** (`dragontrade-agent` commit `294efee`,
+  pushed to origin/main). 20-post cycle pivoted: 50% aideazz / 20%
+  client_pitch / 15% monetization / 15% educational / 0% paper_trading
+  (removed — was noise). Cadence `POST_INTERVAL_MIN/MAX` 3-10 min →
+  300/420 min (~4 posts/day) in both `index.js` defaults and
+  `dragontrade-agent/.env` (the lurking `.env` override would have
+  defeated the code defaults — aligned both).
+- **xAI team key (`rhino-sneezing-lemon`) wired into Grok-routed
+  educational posts.** Previously listed as "key available in env, not
+  yet wired to any code" — that's now false. New `grok-content.js`
+  wrapper (model `grok-4.20-0309-non-reasoning`), educational case in
+  `index.js` switch tries Grok first, falls back to the 7-month-old CMC
+  engine on any failure. End-to-end verified: `✅ Generated via Grok
+  (xAI)` logged at `00:19:48 UTC`, two consecutive successful calls.
+  Posting identity preserved: bot still ships as `@reviceva` (Elena's
+  personal X dev account). Team xAI credits drain on cheap educational
+  slot, Claude/personal-account combo handles the brand-voice slots.
+
+### Newly surfaced red (pre-existing, not from this patch)
+
+- **`dragontrade-main` thread-posting 403 duplicate-content loop.** Every
+  4-6 minutes the bot tries to post a 4-tweet thread, X API returns
+  `403 {"detail":"You are not allowed to create a Tweet with duplicate
+  content."}` for tweet 1/4, thread aborts cleanly (no crash). Pattern
+  visible in `pm2 logs dragontrade-main` for the past several hours
+  before today's repositioning restart. NOT caused by the new cycle —
+  separate thread-posting code path. Needs its own session to diagnose
+  (likely the thread template produces near-identical openers across
+  cycles, or a cache key isn't varying).
+
+### Still red (carry forward from May 24-25 sweep)
+
+1. CMO LinkedIn engagement return webhook (Make.com → `/api/crm-event`):
+   outbound CMO posts work, no inbound engagement loop
+2. EspaLuz PayPal subscriber events → HubSpot: not wired (free/paid
+   detection still unreliable)
+3. EspaLuz WhatsApp/Telegram chat user events → HubSpot: not wired
+4. **NEW:** `dragontrade-main` thread-posting 403 duplicate-content loop
+   (above — surfaced this session)
+
+(**Removed from red:** xAI key wiring — closed this session, commit
+`294efee` in `ElenaRevicheva/dragontrade-agent`. Algom Alpha cycle
+repositioning — closed this session, same commit.)
+
+### Pattern that emerged this session
+
+> "Separate cost from voice." The team xAI credits (commodity) drive the
+> commodity slot (crypto education — generic, replaceable, low brand
+> cost). Claude (expensive, my personal account) drives the brand slot
+> (builder identity, client pitch, monetization). One dashboard, two
+> ledgers, no brand contamination. Pairs with the May 24-25 closure
+> theme of "detection without action is theater" — wiring an already-
+> available signal (the team xAI key, sitting in `.env` since May 20) to
+> a deterministic consumer (the educational slot in the cycle) rather
+> than adding more intelligence.

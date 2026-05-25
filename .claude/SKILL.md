@@ -774,3 +774,68 @@ the operator to ignore the channel."
 - Triage dedup: `lead-triage.ts` + `database.ts` `markLeadTriagePushed()` (84f9e15, 3d4139c)
 - Stale-repo dedup: `telegram-bot.ts` `lastStaleRepoAlertAt` Map + 14d threshold (5e93cab)
 - Outreach 422 filter: `outreach.ts` `isBogusOutreachEmail()` (7796438)
+
+
+## NEW May 25 2026 evening proof point — "Algom Alpha repositioning + xAI team key wired end-to-end"
+
+Pivoted my fully-autonomous social media agent (running 7 months, 70% crypto
+education / 30% AIdeazz) to a builder-identity-first cycle in one session:
+50% aideazz (founder/builder voice) / 20% client_pitch (fractional CTO + AI
+marketing + HubSpot orchestration + Algom lessons) / 15% monetization
+(EspaLuz, VJH LEAD mode, aideazz blog) / 15% educational (preserved but
+secondary) / 0% paper_trading (removed — was noise). Cadence 3-10 minutes →
+~4 posts/day. Educational posts now route through the `rhino-sneezing-lemon`
+xAI team key (Grok, `grok-4.20-0309-non-reasoning`) with the 7-month-old CMC
+engine as fallback. Posting identity unchanged — bot still ships as
+`@reviceva` (personal X dev account). Team xAI credits + personal X brand
+working together exactly as intended.
+
+End-to-end verified live on Oracle: `pm2 restart dragontrade-main` → first
+educational cycle at `00:19:48 UTC` logged `✅ Generated via Grok (xAI)`.
+Two consecutive Grok calls succeeded back-to-back. Fallback path proven on
+the initial `grok-2-latest` model-name mismatch (model rotated to
+`grok-4.20-0309-non-reasoning` after probing `/v1/models`). All shipped in
+commit `294efee` on `ElenaRevicheva/dragontrade-agent` main.
+
+### Interview story #4: "Reposition a 7-month-old agent without breaking its brand"
+
+> "My Algom Alpha bot had been running 7 months on @reviceva — 70% crypto
+> education, 30% builder content. As I shifted toward fractional CTO and AI
+> marketing work, I needed the bot to lead with builder identity instead of
+> burying it as the minority slot.
+>
+> The risk: rewriting the cycle could change voice, change cadence, change
+> account identity, or break 7 months of brand continuity. So I treated it
+> as a surgical operation. Three files: a new `grok-content.js` wrapper for
+> the xAI team key (separates cost from brand voice — Claude still owns the
+> high-value builder posts), the existing content generator extended with
+> two new theme libraries (`CLIENT_PITCH_THEMES`, `MONETIZATION_THEMES`),
+> and the main cycle array replaced atomically.
+>
+> Two anchor drifts caught during the patch (`Paper trades` vs
+> `Paper trading`, a 10-space trailing-whitespace mismatch on a switch
+> separator) — both diagnosed by reading the actual file state with
+> `cat -A` and patching the patch before re-running. Then a Grok model-name
+> mismatch caught on the first live cycle — the fallback to CMC engine
+> proved the resilience pattern, and I rotated the model name after
+> probing `/v1/models` for the actually-available list. Bot identity
+> preserved (`@reviceva` throughout), 7 months of brand continuity intact,
+> and the rhino-sneezing-lemon team xAI credits now actively drained on the
+> educational slot."
+
+Pairs with: "I separate cost from voice. The expensive provider runs the
+content that has to sound like me; the cheaper team-credit provider runs
+the commodity slot. Same dashboard, different ledgers."
+
+### Operational reference (May 25)
+
+- Repositioning patch: `dragontrade-agent` commit `294efee`. Files:
+  `grok-content.js` (NEW), `aideazz-content-generator.js` (+86 lines),
+  `index.js` (+86/-35 lines). `POST_INTERVAL_MIN/MAX` set to `300/420` in
+  `/home/ubuntu/dragontrade-agent/.env` (overrides defeat code defaults
+  unless aligned).
+- Grok wrapper: model `grok-4.20-0309-non-reasoning`, consecutive-failure
+  cutoff at 3, 402 / 429 surfaced explicitly to avoid burning depleted
+  credits.
+- Verification anchor in logs: `✅ Generated via Grok (xAI)` (success) /
+  `⚠️ Grok failed (...) — falling back to CMC/Claude` (graceful fallback).
