@@ -1093,3 +1093,56 @@ but useless "no signals" / "0 new" daily noise.
 - `HUBSPOT_HIRING_STAGE_OFFER_RECEIVED`
 
 If any hiring-stage env is unset, that stage is silently excluded from the filter (no error).
+
+
+### Research agent + BrightData operations — May 25 2026 evening (post-final)
+
+CTO AIPA now exposes 3 autonomous research commands powered by Claude
+tool-use over BrightData. Implementation: `src/research-agent.ts` (the
+loop + tool dispatcher) + `src/brightdata-enrich.ts` (the BD primitives:
+`bdFetch`, `bdSerpSearch`, `bdScrapingBrowserFetch`, `bdSmartFetch`).
+
+**Telegram commands** (all gated by `TELEGRAM_AUTHORIZED_USERS`):
+- `/research_company <name>` — client prospect mode
+- `/research_employer <name>` — hiring target mode
+- `/research_competitor <domain>` — SEO/AEO competitor mode
+
+**Env vars required (single set — all 4 BD products share):**
+- `BRIGHTDATA_API_TOKEN` (already set since May 14-15)
+- `BRIGHTDATA_ZONE` (= `web_unlocker1` since May 14-15)
+- `ANTHROPIC_API_KEY` (Claude Sonnet 4.5 for the agent's tool-use)
+
+**Operational characteristics:**
+- Loop budget: max 8 BD tool calls per command, 120s timeout
+- Returns structured markdown report (sent to Telegram chunked at 4000 char)
+- Falls back gracefully on any single BD call failure
+- Telegram reply format: `📊 Research: <target> (<mode>) · N BD calls · Ns · model claude-sonnet-4-5`
+
+**Verification anchors in logs:**
+- Bot startup: standard initTelegramBot output (no special line)
+- Successful run: `🔍 Researching <target> (<mode>) via Bright Data + Claude tool-use loop` then `[BrightData] ...` / `[BD-SERP] ...` lines per tool call
+- Errors: `❌ Research agent error: ...`
+
+**MCP Server config for IDE-side use (`.mcp.json` at cto-aipa repo root):**
+```json
+{
+  "mcpServers": {
+    "Bright Data": {
+      "command": "npx",
+      "args": ["@brightdata/mcp"],
+      "env": {
+        "API_TOKEN": "${BRIGHTDATA_API_TOKEN}",
+        "WEB_UNLOCKER_ZONE": "${BRIGHTDATA_ZONE}",
+        "GROUPS": "browser,advanced_scraping"
+      }
+    }
+  }
+}
+```
+This gives Claude Code (developer side) direct access to BD tools via MCP
+when working in the repo. NOT a production wiring — the production loop
+is in `src/research-agent.ts`.
+
+**Audit fix (May 25 post-final, commit `4f786d2`):** `/triage` Telegram
+command now guards against `null` return from `buildDailyBrief`. Same
+pattern as `/triage_urgent`. Surfaced by the non-destructive change audit.

@@ -650,3 +650,65 @@ freshness.
 - ✅ `renderDealBuckets()` helper added to `lead-triage.ts`. Groups by 🆕 NEW (≤24h) / 🔥 ACTIVE (1-7d) / ⏰ AGING (>7d). Renders each bucket only when non-empty. Top-level summary shows totals. Sub-day ages in m/h for NEW.
 - ✅ Query limit raised 10 → 25 so buckets fill across all tiers.
 - ✅ Daily-fresh signal delivered without changing underlying query frequency. Pattern: "Freshness is a render concern, not a query concern."
+
+
+## NEW May 25 2026 evening (post-final) — Hackathon-day closures
+
+Web Data UNLOCKED hackathon registration kicked off late afternoon. Used
+existing yesterday-shipped primitives (Web Unlocker, HubSpot hub, daily
+Lead Brief, freshness buckets) as the foundation and added the missing
+pieces in 4 commits.
+
+### Closed this session
+
+- ✅ **BrightData 4-product integration** (commit `cdd47f7`). Added 3
+  more BD products on top of the existing Web Unlocker:
+    - SERP API via Web Unlocker proxy + `brd_json=1` (`bdSerpSearch`)
+    - Scraping Browser via `render:true` flag (`bdScrapingBrowserFetch`)
+    - MCP Server via `.mcp.json` exposing `@brightdata/mcp` to Claude Code
+  - Plus a `bdSmartFetch` orchestrator: tries Web Unlocker first (cheap),
+    escalates to Scraping Browser when content is thin or JS-gated.
+  - SERP API live-verified: 10 real Google results returned for fractional-CTO query.
+  - `enrichLinkedInCompany` upgraded to `bdSmartFetch`.
+
+- ✅ **Autonomous research agent** (commit `67383b2`). New `src/research-agent.ts`
+  exposing 3 BD primitives as Claude tools. Claude decides search count,
+  URLs to scrape, when to stop. Mode-specific system prompts for client /
+  employer / competitor research. 3 Telegram commands:
+    - `/research_company <name>` → CRM-feeding client research
+    - `/research_employer <name>` → hiring-target research
+    - `/research_competitor <domain>` → SEO blog-topic gap analysis
+  - Live-verified on decircle.io (client mode, 86s, 7 BD tool calls,
+    real pitch angle generated).
+
+- ✅ **/menu wiring** (commit `d2f516e`). 3 research commands surface at
+  top of `/menu` → **📊 Business Wiring** with vibe-coder descriptions.
+
+- ✅ **/triage null audit fix** (commit `4f786d2`). After May 25 evening
+  `buildDailyBrief` return-type change to `string | null`, `/triage` would
+  have printed literal "null" on quiet days. Caught by the non-destructive
+  audit + fixed.
+
+- ✅ **HACKATHON_SUBMISSION.md relocated** (commits `cbe3829` removed
+  from public + `bd0ec46` added to private). Kit now lives at
+  `aideazz-private-docs/docs/01-career-applications/Accelerator-Applications/BrightData-WebDataUnlocked-2026/`
+  alongside other accelerator apps.
+
+### Still red (carry forward, unchanged)
+
+1. CMO LinkedIn engagement return webhook (Make.com → /api/crm-event)
+2. EspaLuz PayPal subscriber events → HubSpot
+3. EspaLuz WhatsApp/Telegram chat user events → HubSpot
+4. UTM-driven attribution surface in Telegram summaries
+5. Algom Alpha `[CLIENT-ALGOM]` deals → dedicated daily Telegram digest (currently rolled into Lead Brief — works, but could be its own surface)
+6. 6 dead HASHNODE_* env vars in cto-aipa .env (deferred; some still used by blog-es-bundle)
+
+### Pattern that emerged from the hackathon push
+
+> "Yesterday's good code is today's fastest fix" — proven again. The
+> autonomous research agent shipped in 2-3 hours because Web Unlocker,
+> the HubSpot hub, `/api/crm-event`, the Telegram bot scaffolding, and the
+> Lead Brief freshness buckets were ALL already in production from prior
+> sessions. Net new code: 1 file (`research-agent.ts`, ~290 lines) +
+> 1 helper file (`brightdata-enrich.ts` extended) + 3 Telegram command
+> handlers. Everything else was reused.

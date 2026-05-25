@@ -1454,3 +1454,95 @@ Multiple fixes in one day:
 4. **"Freshness is a render concern, not a query concern"** — when daily messages risk showing the same data repeatedly, bucket by freshness at render time instead of changing the query frequency.
 
 All four rules are now in `SKILL.md` + local memory (`feedback_verify_from_logs.md`) and will travel into every client engagement and interview narrative.
+
+
+---
+
+## May 25 2026 evening (post-final) — Autonomous research agent (client-pitch headline capability)
+
+Net-new capability added today that strengthens every client conversation:
+**autonomous Claude tool-use loop over Bright Data**. Inspired by Stephen
+Kimoi's lablab tutorial pattern, adapted for AIdeazz production multi-agent
+context (output flows into existing HubSpot / Telegram / blog plumbing,
+not a localhost Flask page).
+
+### What the operator does from a phone
+
+```
+/research_company decircle.io
+   → Claude autonomously decides: 5-8 BrightData calls (SERP, Web Unlocker,
+     Scraping Browser), 30-120 seconds, structured markdown report with
+     HOT/WARM/COLD verdict and a sendable pitch angle ready to copy-paste.
+
+/research_employer Cresta
+   → Same agent, employer-research system prompt. Hiring intel, comp
+     signals, application angle.
+
+/research_competitor brain.fm
+   → Same agent, SEO/AEO competitor mode. Top-ranking content + 3-5
+     blog topic gaps for the daily publisher.
+```
+
+### Why this is sellable as a service to clients
+
+Three repeatable patterns clients will pay for once they see them work:
+
+1. **"My agents read the live web, not your static APIs."** Bright Data
+   Web Unlocker bypasses bot detection on any page. Their LinkedIn shows
+   accurate employee count. Their CrunchBase shows current funding. Their
+   blog index returns the actual posts. No "API limit reached".
+
+2. **"Claude decides what to research, not a hardcoded cron."** The
+   research agent's tool-use loop means Claude itself decides: "fire 3
+   searches", "scrape these 2 URLs", "I have enough — stop". That's a
+   different category from the cron-driven enrichment cycles. Sellable as
+   `/research_client_X` for any client onboarding flow.
+
+3. **"Cost separation by voice value."** Bright Data team credits run
+   the commodity slot (SERP discovery, JS rendering). Personal Claude
+   subscription runs the brand-voice slot (the actual outreach copy +
+   research report synthesis). Same dashboard, two ledgers. Repeatable
+   pattern across any client content + GTM engagement.
+
+### Live proof (decircle.io, client mode, 86 seconds, 7 BD tool calls)
+
+> *"Saw you're hiring a Head of BD to build Midas's distribution engine —
+> before you scale that team, would a 2-week AI marketing sprint make
+> sense? We help Web3 startups build automated lead-gen systems that
+> feed your BD pipeline with qualified exchange/custody/DeFi partnerships."*
+
+That's a sendable LinkedIn DM, generated autonomously from BrightData
+intel on a real Web3 startup, in 86 seconds. **That's what "find me
+clients" looks like in production.**
+
+### How it fits with the blog publisher's GEO/AEO/SEO mechanism
+
+The blog publisher already picks topics from Google Search Console gaps
+(queries where the site shows impressions but no clicks). The research
+agent in `competitor` mode is the next layer:
+
+1. Operator fires `/research_competitor manny-santos.com`
+2. Agent scrapes their blog index + recent posts via BD Web Unlocker
+3. Runs BD SERP queries for shared keywords to see where competitor ranks
+4. Returns 3-5 specific blog topic gaps with rationale
+5. Operator feeds topics into `DAILY_BLOG_TOPIC_BRIEFS` rotation
+6. Daily auto-publisher writes them → dev.to + aideazz.xyz + FAQPage JSON-LD + sitemap update
+
+End-to-end: BD → Claude → research → topic queue → daily publish. No
+human in the loop after one Telegram command. **Same GEO/AEO/SEO infrastructure,
+now competitor-aware instead of only GSC-aware.**
+
+### What the kit + commits look like
+
+- Code in public repo `AIPA_AITCF/main` (judges evaluate this):
+  - `src/research-agent.ts` (the loop + tool dispatcher, ~290 lines)
+  - `src/brightdata-enrich.ts` (extended with `bdSerpSearch`, `bdScrapingBrowserFetch`, `bdSmartFetch`)
+  - `src/serpapi-prospects.ts` (`fetchGoogleSearch` swapped to prefer BrightData SERP)
+  - `src/telegram-bot.ts` (3 new commands + menu entries)
+  - `.mcp.json` (BrightData MCP Server config for IDE use)
+- Submission kit in private repo `aideazz-private-docs/docs/01-career-applications/Accelerator-Applications/BrightData-WebDataUnlocked-2026/BRIGHTDATA-WEB-DATA-UNLOCKED-SUBMISSION.md` (paste-ready form fields, video script, slide outline, submission checklist)
+
+### Carries forward (separate future sessions)
+
+- Use the research agent's competitor mode output to auto-add topics to `DAILY_BLOG_TOPIC_BRIEFS` (currently manual: copy topic from Telegram → add to file)
+- Add daily SERP rank tracking for "fractional CTO Panama" / "AI marketing engine" / etc. with Telegram alert on movement (uses same `bdSerpSearch`, would be a 1-hour cron add)

@@ -1337,3 +1337,53 @@ update. End-to-end, no human in the loop after you fire one Telegram command.
 4. **"Freshness is a render concern, not a query concern."** Daily Telegram briefs surface what's new today vs aging — same query, smarter render. (NEW/ACTIVE/AGING buckets.)
 
 All four travel into the hackathon pitch + every client conversation. They are the methodology, not just code anecdotes.
+
+
+## NEW May 25 2026 evening (post-final) — Hackathon kit location + /menu wiring
+
+Two small post-shipment housekeeping items + one operational reminder:
+
+### Where the hackathon submission kit lives
+
+NOT in the public `AIPA_AITCF` repo (was at root briefly, removed in
+commit `cbe3829`). Now correctly placed alongside other accelerator
+prep alongside `a16z-Speedrun-2026/` and `500-Global-LATAM-Application/`:
+
+```
+aideazz-private-docs/docs/01-career-applications/Accelerator-Applications/BrightData-WebDataUnlocked-2026/BRIGHTDATA-WEB-DATA-UNLOCKED-SUBMISSION.md
+```
+
+(commit `bd0ec46` on the `docs` branch.) Contains: ready-to-paste descriptions
+for the lablab form, 5-7 min video script, 10-slide outline, cover-image
+instructions, submission checklist, risk register. The PUBLIC code repo is
+what judges actually evaluate.
+
+### /menu now surfaces the 3 research commands (commit `d2f516e`)
+
+Operator can tap `/menu` in Telegram → **📊 Business Wiring** and see the
+3 new research commands at the top of the section with vibe-coder
+descriptions:
+
+- `/research_company <name>` → CLIENT prospect research (HOT/WARM/COLD verdict + sendable pitch angle)
+- `/research_employer <name>` → HIRING target research (application angle for Elena)
+- `/research_competitor <domain>` → SEO/AEO competitor gap (blog topic suggestions)
+
+Each entry is tap-able for full detail. Position above existing
+`/fresh_leads` / `/triage` / `/hubspot` because they are the headline new
+capability.
+
+### Audit cleanup (commit `4f786d2`)
+
+`/triage` Telegram command was interpolating `${brief}` directly into a
+template literal. After the May 25 evening Telegram-usefulness refactor
+made `buildDailyBrief` return `string | null`, the command would have
+printed literal "null" at the end of the reply on quiet days. Fixed with
+the same null-guard as `/triage_urgent`. Found by the non-destructive
+change audit.
+
+### Operator-reading-order for the hackathon week
+
+1. SKILL.md (this doc) — positioning + proof points + the 4 sellable rules + the BD vibe-coder section
+2. BRIGHTDATA-WEB-DATA-UNLOCKED-SUBMISSION.md (private repo) — submission kit, paste-ready
+3. AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md — client-pitch depth for context
+4. The 3 Telegram commands themselves — try them once before recording the video
