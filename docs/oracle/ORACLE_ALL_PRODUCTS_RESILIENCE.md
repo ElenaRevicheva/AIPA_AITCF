@@ -917,3 +917,57 @@ or remove the `.env` lines so the code defaults take effect.
 (2) Grok-as-LLM in CTO AIPA model routing,
 (3) xAI team-level X API access (would change posting identity — defer
 unless brand strategy says otherwise).
+
+
+### check_oracle_health.sh status update — May 25 2026 — jq fix for dragontrade loop
+
+The dragontrade-* loop in `/home/ubuntu/check_oracle_health.sh` previously
+used `pm2 describe "$app" | grep -q "status: online"`. That grep NEVER
+matched because pm2's actual output is box-drawing-character formatted
+(`│ status │ online │`), not colon-separated. The script wrongly restarted
+every dragontrade-* app on EVERY 5-min cron tick for weeks, creating a
+silent 5-min crashloop that prevented Algom Alpha's engagement loop from
+ever completing a cycle (first run is delayed 5 min after bot startup —
+exactly when the cron restart fired).
+
+**Patched live (live state on Oracle VM):**
+
+```bash
+# 4. Algom Alpha (dragontrade PM2 apps)
+# May 25 2026 FIX: use jq on pm2 jlist. Previous grep "status: online"
+# NEVER matched because pm2 describe uses box-drawing chars (no colon).
+for app in dragontrade-main dragontrade-dashboard; do
+  status=$(pm2 jlist 2>/dev/null | jq -r --arg app "$app" '.[] | select(.name==$app) | .pm2_env.status' 2>/dev/null)
+  if [ -z "$status" ]; then
+    echo "Algom Alpha / $app (4) MISSING from pm2 list, skipping (deleted or never started)"
+  elif [ "$status" != "online" ]; then
+    echo "Algom Alpha / $app (4) status=$status, restarting..."
+    pm2 restart "$app"
+  fi
+done
+```
+
+Also: `dragontrade-bybit` and `dragontrade-binance` removed from the loop
+(both deleted from pm2 via `pm2 delete` + `pm2 save` and commented out of
+`dragontrade-agent/ecosystem.config.cjs` — the new 20-post cycle is 0%
+paper_trading so they're orphaned).
+
+**Companion fix in cto-aipa:** `src/daily-blog-publisher.ts` now uses
+sliding-window mutex + prefix-collision dedup + always-fire Telegram
+notification on every outcome. Env knobs:
+`HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES` (default 12),
+`HASHNODE_DAILY_SLUG_PREFIX_LEN` (default 30). Prevents the May 24 issue
+where two BrightData articles published 20 min apart with no Telegram
+notification.
+
+**Verification anchors in logs:**
+
+- Engagement cycle success: `[Engagement] Done — N replies sent, M new follows` in `pm2 logs dragontrade-main`
+- Engagement state file exists at `/home/ubuntu/dragontrade-agent/engagement_state.json`
+- Blog publish success: `📰 Article published.` followed by Telegram notify
+- Blog publish skipped: `📰 Daily blog SKIPPED: ...` + dedicated skip notify to Telegram
+
+**Lesson rule documented in SKILL.md** (Interview story #5): "Verify from
+logs, never claim from config." Before reporting agent behavior, grep
+historical logs for the ACTION line (not the SETUP line). If the action
+signature count is 0, the behavior isn't happening regardless of config.

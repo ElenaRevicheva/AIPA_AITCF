@@ -839,3 +839,107 @@ the commodity slot. Same dashboard, different ledgers."
   credits.
 - Verification anchor in logs: `✅ Generated via Grok (xAI)` (success) /
   `⚠️ Grok failed (...) — falling back to CMC/Claude` (graceful fallback).
+
+
+## NEW May 25 2026 late-afternoon proof points — "Verify from logs, never claim from config"
+
+Three discoveries in one debugging session, all flowing from the same lesson:
+
+### Discovery 1 — Algom Alpha engagement loop never ran (4,357 startups, 0 cycles)
+
+Asked to prove the "45-min engagement loop" claim from logs. Grep showed
+`[Engagement] Loop started` 4,357 times across all history — but
+`[Engagement] Starting engagement cycle` only ONCE, `[Engagement] Found N
+recent mentions` ZERO, `[Engagement] Done — N replies sent` ZERO, and
+`engagement_state.json` (written at end of every cycle) DID NOT EXIST on disk.
+Across months of runtime: 0 replies, 0 follows, 0 cycles completed. My
+earlier "~32 engagements/day" was derived from config, not logs — wrong.
+
+### Discovery 2 — Health-check cron had a grep bug for weeks
+
+Root cause: `/home/ubuntu/check_oracle_health.sh` checks pm2 status via
+`pm2 describe "$app" | grep -q "status: online"`. But `pm2 describe`
+prints box-drawing characters (`│ status │ online │`), NOT colon-separated
+text. The grep NEVER matched. Every 5 minutes the script wrongly concluded
+each dragontrade-* app was offline and triggered `pm2 restart` — silent
+5-minute crashloop for `dragontrade-main` for weeks. The engagement loop's
+first run was scheduled for "5 minutes after bot startup" — the bot crashed
+right at that boundary every time.
+
+### Discovery 3 — May 24 daily blog publisher fired twice + sent no Telegram
+
+Cache shows two BrightData articles published 20 min apart (00:30:20 +
+00:50:34 UTC on May 24). The existing dedup logic uses fuzzy topic-INDEX
+exclusion that resets on restart and substring-matches keywords loosely —
+the second BrightData publish slipped through. Separately, the Telegram
+notify function only fires on the success branch, so when something fails
+early or the dedup skips, the operator gets nothing.
+
+### Combined fix shipped this session
+
+- `check_oracle_health.sh`: rewrote status check to use `pm2 jlist | jq -r '.[] | select(.name==$app) | .pm2_env.status'` and compare to literal "online". The grep-against-text-format was the bug.
+- `pm2 delete dragontrade-bybit dragontrade-binance` + `pm2 save`: the two orphan paper-trading bots (677,000+ restarts each, status "waiting") were removed from PM2. They're 0% of the new cycle anyway.
+- `dragontrade-agent/ecosystem.config.cjs`: commented out the bybit + binance blocks so `pm2 start ecosystem.config.cjs` won't re-spawn them on a clean boot. Re-enable by uncommenting if paper trading returns. Commit `2307a9b` in `ElenaRevicheva/dragontrade-agent`.
+- `cto-aipa/src/daily-blog-publisher.ts`: added three guards — (a) sliding-window mutex `HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES` (default 12h, blocks any publish regardless of trigger source), (b) prefix-collision detector that catches near-duplicate slugs (BrightData-12-lift vs BrightData-actually-worked), (c) Telegram notification on EVERY outcome — success, skip-by-cooldown, prefix-collision, failure. Tested live: 48h cooldown override → manual HTTP trigger → SKIPPED log + skip notification sent.
+
+### Proof the engagement loop now works (May 25 14:50:11 UTC)
+
+```
+14:50:03 [Engagement] Starting engagement cycle...
+14:50:04 [Engagement] Found 20 recent mentions
+14:50:04 [Engagement] Replied to @Crypto__fi: "Love the simplicity..."
+14:50:04 [Engagement] Followed @Crypto__fi
+14:50:08 [Engagement] Replied to @solanamultibuy: "Love the enthusiasm..."
+14:50:08 [Engagement] Followed @solanamultibuy
+14:50:11 [Engagement] Done — 2 replies sent, 2 new follows
+```
+
+`engagement_state.json` written for the first time ever. 2 real replies +
+2 real follows on real X accounts.
+
+### Interview story #5: "The engagement loop that never ran"
+
+> "I told myself the bot was engaging 32 times a day — that math came from
+> the 45-minute interval × 24 hours config. When someone asked for log
+> proof, I grepped for the cycle's actual execution signatures: `Starting
+> engagement cycle`, `Found N recent mentions`, `Done — N replies sent`.
+> One match. Zero. Zero. The cycle had never completed in the bot's entire
+> history. The state file the cycle writes at the end of every run didn't
+> exist on disk.
+>
+> Root cause was three layers deep: (1) my code's first engagement run is
+> scheduled 5 minutes after bot startup, (2) the bot was being restarted
+> every 5 minutes by an external cron, (3) that cron was a health-check
+> script whose `pm2 describe | grep "status: online"` check had NEVER
+> matched because pm2's output uses box-drawing characters, not colons.
+>
+> I rewrote the status check to parse `pm2 jlist` JSON via jq. Bot stayed
+> up. The 5-minute first-engagement-run timer fired for real. Two replies
+> sent. Two follows done. The first engagement cycle in the bot's history.
+>
+> The lesson goes wider than this fix: never claim agent behavior from
+> config. Always derive from log signatures. If you can't grep for the
+> ACTION line (not the SETUP line), you don't know it happened."
+
+Pairs with: "Detection without action is theater. But describing-detection-
+that-isn't-running is worse — it builds a story you act on, that has no
+foundation in reality."
+
+### Operational reference (May 25 evening)
+
+- Crashloop fix: `/home/ubuntu/check_oracle_health.sh` (lines for dragontrade loop now use jq). Backup at `.pre-may25-fix`.
+- Blog publisher: `cto-aipa/src/daily-blog-publisher.ts` — new helpers `recentPublishCutoffOk`, `findPrefixConflict`, `notifyTelegramSkipped`, wrapped `runDailyHashnodePost`. Env knobs: `HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES` (default 12), `HASHNODE_DAILY_SLUG_PREFIX_LEN` (default 30). Backup at `.pre-may25-fix`.
+- Verification anchors in logs: `[Engagement] Done — N replies sent, M new follows` (engagement success), `📰 Daily blog SKIPPED: ...` (mutex tripped), `📰 Daily blog: prefix conflict` (advisory after-publish warning).
+
+### Rule for memory — "Verify from logs, never claim from config"
+
+Before reporting any agent behavior, dimension, or daily rate to the operator:
+1. Identify the log line(s) the code emits when the behavior ACTUALLY HAPPENS — not when it's SCHEDULED.
+2. Grep historical logs for that signature. If count is 0, the behavior is not happening, regardless of what the config says.
+3. Cross-check against any on-disk artifact the behavior produces (state file, DB row, cache entry).
+4. Only then write the description.
+
+This rule was earned by claiming "~32 engagements/day" from a 45-min config
+interval × 24 hours, when the actual count was 0. The cost of the wrong
+claim: an operator-facing summary that built a false picture of the bot's
+behavior. The cost of the right discipline: one grep before writing.

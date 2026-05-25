@@ -446,3 +446,72 @@ repositioning — closed this session, same commit.)
 > available signal (the team xAI key, sitting in `.env` since May 20) to
 > a deterministic consumer (the educational slot in the cycle) rather
 > than adding more intelligence.
+
+
+## NEW May 25 2026 late-afternoon — crashloop fix + blog publisher dedup + engagement loop alive
+
+Three closures in one session. The chain reaction is significant: fixing
+the health-check grep bug unlocked the dragontrade-main engagement loop
+that had never successfully completed a cycle in the bot's entire history.
+
+### Closed this session (verified live on Oracle)
+
+- **`dragontrade-main` 5-min crashloop FIXED** — root cause was a `grep -q
+  "status: online"` check in `/home/ubuntu/check_oracle_health.sh` that
+  NEVER matched pm2's actual box-drawing output format (`│ status │
+  online │`, no colon). The cron triggered `pm2 restart` for all
+  dragontrade-* apps every 5 minutes for weeks. **Fix:** rewrote the check
+  to use `pm2 jlist | jq -r '.[] | select(.name==$app) | .pm2_env.status'`.
+  Also deleted the two orphan paper-trading bots (`dragontrade-bybit`,
+  `dragontrade-binance` — 677,000+ restarts each, status "waiting")
+  from pm2 and commented them out in `dragontrade-agent/ecosystem.config.cjs`
+  so they won't re-spawn on a clean boot (commit `2307a9b`).
+- **Algom engagement loop FIRED FOR THE FIRST TIME EVER** — direct
+  consequence of the crashloop fix. First successful cycle at
+  `2026-05-25 14:50:03–14:50:11 UTC`. 2 replies sent (@Crypto__fi,
+  @solanamultibuy), 2 follows executed. `engagement_state.json` written
+  for the first time. Log signatures `[Engagement] Starting engagement
+  cycle...` + `[Engagement] Found 20 recent mentions` + `[Engagement]
+  Done — 2 replies sent, 2 new follows` all present.
+- **Blog publisher dedup + always-notify FIXED** — root cause analysis
+  for May 24 incident: two BrightData articles published 20 min apart
+  (00:30:20 + 00:50:34 UTC); existing dedup uses fuzzy topic-INDEX
+  exclusion that resets on restart and substring-matches keywords loosely.
+  Separately, `notifyTelegramHashnodePublished` only fires on the success
+  branch — silent on dedup skip / early exception. **Fix:** added three
+  guards to `cto-aipa/src/daily-blog-publisher.ts` — (a) sliding-window
+  mutex `HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES` (default 12h), (b)
+  prefix-collision detector `HASHNODE_DAILY_SLUG_PREFIX_LEN` (default 30
+  chars), (c) Telegram notification on EVERY outcome (success / skip-by-
+  cooldown / prefix-conflict / failure). Tested live with 48h override:
+  `📰 Daily blog SKIPPED: last publish was 38.1h ago (< 48h cooldown)`
+  logged + skip notification dispatched to Telegram.
+
+### Removed from red
+
+- `dragontrade-main` thread-posting 403 duplicate-content loop (was item
+  #4 on May 25 evening list): this was a SYMPTOM of the crashloop, not a
+  separate bug — the bot was being restarted before it could vary its
+  thread template state. Now that the bot stays up, the thread-posting
+  path is producing fresh content per cycle (May 25 14:26 UTC successfully
+  posted a 3-tweet thread: tweets 2058917725007712560, ..36361713931,
+  ..47724099855).
+
+### Still red (carry forward)
+
+1. CMO LinkedIn engagement return webhook (Make.com → /api/crm-event):
+   outbound CMO posts work, no inbound engagement loop
+2. EspaLuz PayPal subscriber events → HubSpot: not wired
+3. EspaLuz WhatsApp/Telegram chat user events → HubSpot: not wired
+4. 6 dead HASHNODE_* env vars in cto-aipa .env: deferred cleanup
+
+### Pattern that emerged this session
+
+> "Verify from logs, never claim from config." When asked for proof that
+> the engagement loop runs 32 times a day, the actual log signatures
+> showed 0 cycles ever completed — and the state file the cycle writes
+> at the end didn't exist on disk. The 32/day was my own math from the
+> 45-min interval, treated as fact without ever grepping for the action
+> line. Following that thread surfaced the real crashloop bug that had
+> been silent for weeks. New rule documented in SKILL.md and added to
+> local memory as a feedback file.

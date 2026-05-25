@@ -912,6 +912,117 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   };
 }
 
+// ============================================================================
+// MAY 25 2026 FIX: sliding-window mutex + prefix dedup + always-notify
+// ----------------------------------------------------------------------------
+// Three problems caught on May 24 2026:
+//   1. Two BrightData articles published within 20 minutes (00:30 + 00:50 UTC).
+//      Cache shows both as fresh entries — dedup missed the second one because
+//      it uses a topic-INDEX exclude that resets on restart, and the slugs were
+//      only fuzzy-matched by keyword. Result: same content, two URLs, two
+//      Dev.to + aideazz.xyz posts.
+//   2. No Telegram notification fired for either publish. Existing notify path
+//      only runs on the success branch and is silent on early exceptions / dedup
+//      skips, so an operator has no way to know "what happened today" without
+//      tailing logs.
+//   3. The publisher has 3 trigger sources (cron, HTTP /hashnode/daily-run,
+//      HASHNODE_DAILY_RUN_ON_START) — each can fire independently and previously
+//      had no cross-trigger lockout.
+//
+// Fix shape (defensive, covers all trigger sources):
+//   A. recentPublishCutoffOk: read the cache, find newest publishedAt, refuse
+//      any publish within HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES (default 12h).
+//   B. findPrefixConflict: before publishing, compute the new slug's 30-char
+//      prefix and refuse if any cached slug shares it (catches BrightData-style
+//      variants where the only difference is the suffix).
+//   C. notifyTelegramSkipped: dedicated notify so operator always knows when
+//      a daily run was suppressed and why.
+//   D. runDailyHashnodePost wrapped to: try mutex → run inner → always notify
+//      Telegram with success / skip / failure outcome.
+// ============================================================================
+
+function recentPublishCutoffOk(): { ok: true } | { ok: false; reason: string; hoursAgo: number } {
+  try {
+    const cacheFile = getBlogPostCachePath();
+    if (!fs.existsSync(cacheFile)) return { ok: true };
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, { publishedAt?: string }>;
+    const minHours = Number(process.env.HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES || "12");
+    if (!Number.isFinite(minHours) || minHours <= 0) return { ok: true };
+    const cutoffMs = Date.now() - minHours * 60 * 60 * 1000;
+    let newest = 0;
+    for (const v of Object.values(cache)) {
+      const t = v?.publishedAt ? Date.parse(v.publishedAt) : NaN;
+      if (Number.isFinite(t) && t > newest) newest = t;
+    }
+    if (newest === 0) return { ok: true };
+    if (newest >= cutoffMs) {
+      const hoursAgo = (Date.now() - newest) / 3600_000;
+      return { ok: false, reason: `last publish was ${hoursAgo.toFixed(1)}h ago (< ${minHours}h cooldown)`, hoursAgo };
+    }
+    return { ok: true };
+  } catch {
+    // If the cache can't be read, fail OPEN (allow the publish) so we don't
+    // silently break the daily cadence on a transient FS error.
+    return { ok: true };
+  }
+}
+
+function findPrefixConflict(newSlug: string): { conflict: true; existingSlug: string } | { conflict: false } {
+  try {
+    const cacheFile = getBlogPostCachePath();
+    if (!fs.existsSync(cacheFile)) return { conflict: false };
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, unknown>;
+    const prefixLen = Number(process.env.HASHNODE_DAILY_SLUG_PREFIX_LEN || "30");
+    if (!Number.isFinite(prefixLen) || prefixLen < 8) return { conflict: false };
+    const newPrefix = newSlug.slice(0, prefixLen);
+    for (const existingSlug of Object.keys(cache)) {
+      if (existingSlug === newSlug) continue; // exact match already handled by slugAlreadyPublished
+      if (existingSlug.startsWith(newPrefix) || newSlug.startsWith(existingSlug.slice(0, prefixLen))) {
+        return { conflict: true, existingSlug };
+      }
+    }
+    return { conflict: false };
+  } catch {
+    return { conflict: false };
+  }
+}
+
+async function notifyTelegramSkipped(reason: string, detail: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const chatId = resolveTelegramNotifyChatId();
+  if (!token || !chatId) return;
+  const text = `\u23F8 Daily blog SKIPPED\n\nReason: ${reason}\nDetail: ${detail}\n\n(Sliding-window mutex or prefix-dedup tripped — no Dev.to / aideazz.xyz publish today.)`;
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+    });
+    if (!r.ok) {
+      const t = await r.text();
+      console.error("\ud83d\udcf0 Telegram skip-notify failed:", r.status, t);
+    }
+  } catch (e) {
+    console.error("\ud83d\udcf0 Telegram skip-notify error:", e);
+  }
+}
+
+// Wrapped entry point: guards via mutex + prefix dedup, then runs inner, always
+// notifies Telegram on outcome. The inner runDailyDevToPost is unchanged.
+async function _runDailyHashnodePost_inner_may25(
+  deps: { anthropic: Anthropic; model: string; maxTokens: number }
+): ReturnType<typeof runDailyDevToPost> {
+  // Guard 1: sliding-window mutex (any-content, any-trigger-source lockout)
+  const cutoff = recentPublishCutoffOk();
+  if (!cutoff.ok) {
+    console.log(`\ud83d\udcf0 Daily blog SKIPPED: ${cutoff.reason}`);
+    await notifyTelegramSkipped("Sliding-window cooldown", cutoff.reason);
+    throw new Error(`SKIPPED_BY_COOLDOWN: ${cutoff.reason}`);
+  }
+  // Guard 2: actually run the publisher
+  return await runDailyDevToPost(deps);
+}
+
 export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: string; maxTokens: number }): Promise<{
   title: string;
   url: string;
@@ -921,7 +1032,34 @@ export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: 
   devtoUrl?: string | undefined;
   delisted: boolean;
 }> {
-  return runDailyDevToPost(deps);
+  // May 25 2026 FIX: always notify Telegram on outcome (success / skip / failure)
+  // and run mutex/dedup guards via _runDailyHashnodePost_inner_may25.
+  try {
+    const result = await _runDailyHashnodePost_inner_may25(deps);
+    // Post-publish prefix-conflict check: if the SLUG we just emitted collides
+    // with an older slug by prefix, flag it (don't unpublish — Dev.to already
+    // accepted it — but warn the operator so they can manually de-list / delete).
+    try {
+      const conflict = findPrefixConflict(result.slug || "");
+      if (conflict.conflict) {
+        const warn = `Slug prefix collision: just-published "${result.slug}" shares prefix with cached "${conflict.existingSlug}"`;
+        console.warn(`\ud83d\udcf0 ${warn}`);
+        await notifyTelegramSkipped("Prefix collision (already published)", warn);
+      }
+    } catch { /* ignore — post-check is advisory only */ }
+    return result;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.startsWith("SKIPPED_BY_COOLDOWN:")) {
+      // Already notified via notifyTelegramSkipped — re-throw silently for caller awareness.
+      throw err;
+    }
+    // Real failure — notify Telegram via the existing failure-notify path.
+    try {
+      await notifyTelegramHashnodeFailure(msg);
+    } catch { /* swallow — we don't want notify failures to mask the original error */ }
+    throw err;
+  }
 }
 
 export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model: string; maxTokens: number }): cron.ScheduledTask | null {
