@@ -971,3 +971,53 @@ notification.
 logs, never claim from config." Before reporting agent behavior, grep
 historical logs for the ACTION line (not the SETUP line). If the action
 signature count is 0, the behavior isn't happening regardless of config.
+
+
+### Daily blog publisher — Hashnode->DailyBlog rename (May 25 2026 late-evening)
+
+Internal symbol cleanup: the publisher hasn't written to Hashnode in weeks,
+it publishes to Dev.to + aideazz.xyz only. Renamed everything in commit
+`1565895` to match reality. Backward compat preserved for all env vars and
+HTTP routes.
+
+**Canonical names going forward:**
+
+| Old | New |
+|---|---|
+| `HASHNODE_DAILY_ENABLED` | `DAILY_BLOG_ENABLED` |
+| `HASHNODE_DAILY_CRON` | `DAILY_BLOG_CRON` |
+| `HASHNODE_DAILY_TZ` | `DAILY_BLOG_TZ` |
+| `HASHNODE_DAILY_TRIGGER_SECRET` | `DAILY_BLOG_TRIGGER_SECRET` |
+| `HASHNODE_DAILY_PUBLIC` | `DAILY_BLOG_PUBLIC` |
+| `HASHNODE_DAILY_DELISTED` | `DAILY_BLOG_DELISTED` |
+| `HASHNODE_DAILY_DEVTO_ONLY` | `DAILY_BLOG_DEVTO_ONLY` |
+| `HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES` | `DAILY_BLOG_MIN_HOURS_BETWEEN_PUBLISHES` |
+| `HASHNODE_DAILY_SLUG_PREFIX_LEN` | `DAILY_BLOG_SLUG_PREFIX_LEN` |
+| `HASHNODE_DAILY_RUN_ON_START` | `DAILY_BLOG_RUN_ON_START` |
+| `HASHNODE_ARTICLE_MODEL` | `DAILY_BLOG_ARTICLE_MODEL` |
+| `HASHNODE_TOPIC_STATE_DIR` | `DAILY_BLOG_TOPIC_STATE_DIR` |
+| `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` | `TELEGRAM_DAILY_BLOG_NOTIFY_CHAT_ID` |
+
+**HTTP routes:**
+
+| Operation | Canonical (new) | Deprecated alias (still works, 307-redirects) |
+|---|---|---|
+| Status | `GET /blog/daily-status` | `GET /hashnode/daily-status` |
+| Manual trigger | `POST /blog/daily-run` | `POST /hashnode/daily-run` |
+
+The deprecation alias responses include an `X-Deprecation:` header indicating
+the new canonical path. 307 status preserves the POST method + body, so any
+existing webhook with `Authorization: Bearer ...` header continues to work
+unchanged through the redirect.
+
+**Out of scope** for this rename (separate future cleanup): `HASHNODE_ACCESS_TOKEN`,
+`HASHNODE_HOST`, `HASHNODE_PUBLICATION_ID`, `HASHNODE_SUBDOMAIN` — these belong
+to `src/blog-es-bundle.ts`, which uses Hashnode public GraphQL as a vestigial
+*source* for legacy Spanish translation cache. Not a publish target.
+
+**Verification anchors:**
+
+- Startup log: `📰 Daily blog: scheduled 30 14 * * * (America/Panama) — mode: Dev.to + aideazz.xyz cross-post — listed: yes`
+- Successful publish: `📰 Daily blog published` (Telegram notify text starts with this)
+- Failure: `🚨 Daily blog FAILED` (Telegram notify text)
+- Skip (mutex): `📰 Daily blog SKIPPED: last publish was N.Nh ago (< 12h cooldown)`

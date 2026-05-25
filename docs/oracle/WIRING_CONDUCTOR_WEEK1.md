@@ -515,3 +515,31 @@ that had never successfully completed a cycle in the bot's entire history.
 > line. Following that thread surfaced the real crashloop bug that had
 > been silent for weeks. New rule documented in SKILL.md and added to
 > local memory as a feedback file.
+
+
+## NEW May 25 2026 late-evening — sustained engagement proof + Hashnode->DailyBlog rename
+
+### Closed this session
+
+- **Engagement loop SUSTAINED across 2 cycles, with dedup state working.**
+  Verified live: cycle #1 at 14:50:03 UTC (2 replies + 2 follows), cycle #2
+  at 15:30:03 UTC (2 replies + 2 follows; 2 prior users correctly skipped
+  via `[Engagement] Already replied — skipping`). 4 unique users engaged on
+  @reviceva (`@Crypto__fi`, `@solanamultibuy`, `@gi_dutraa`, `@CNBIGBUYS`).
+  PM2 restart count steady at 1251 across 46+ min uptime — morning crashloop
+  fix is holding.
+
+- **Hashnode->DailyBlog rename shipped** (commit `1565895` in
+  `ElenaRevicheva/AIPA_AITCF`). Internal symbol naming now matches reality
+  (Dev.to + aideazz.xyz only; Hashnode hasn't been a publish target in weeks).
+  Renamed env vars (`HASHNODE_DAILY_*` -> `DAILY_BLOG_*`), functions,
+  constants, log strings. New HTTP routes (`/blog/daily-status`,
+  `/blog/daily-run`) added with 307-redirect aliases at the old paths
+  (`/hashnode/daily-*`) for backward compat with any external webhooks.
+
+### Out of scope (separate future cleanup, low priority)
+
+- `src/blog-es-bundle.ts` still queries Hashnode public GraphQL as a fallback
+  source for Spanish-translation cache. Not a publish target. The remaining
+  `HASHNODE_ACCESS_TOKEN` / `HASHNODE_HOST` / `HASHNODE_PUBLICATION_ID` /
+  `HASHNODE_SUBDOMAIN` env vars belong to that module.

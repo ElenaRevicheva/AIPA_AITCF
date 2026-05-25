@@ -943,3 +943,87 @@ This rule was earned by claiming "~32 engagements/day" from a 45-min config
 interval × 24 hours, when the actual count was 0. The cost of the wrong
 claim: an operator-facing summary that built a false picture of the bot's
 behavior. The cost of the right discipline: one grep before writing.
+
+
+## NEW May 25 2026 late-evening — Sustained engagement proof + Hashnode->DailyBlog rename
+
+Two follow-ups to the morning's crashloop + blog publisher fixes:
+
+### Sustained engagement loop proof (TWO cycles, dedup state working)
+
+Asked for log proof beyond "fired once." Watched for cycle #2 at ~45 min
+after cycle #1. Result, captured from `pm2 logs dragontrade-main`:
+
+```
+14:50:03 [Engagement] Starting engagement cycle...     # cycle #1
+14:50:11 [Engagement] Done — 2 replies sent, 2 new follows
+
+15:30:03 [Engagement] Starting engagement cycle...     # cycle #2 (45-min setInterval)
+15:30:04 [Engagement] Already replied to @Crypto__fi — skipping     # 48h dedup state working
+15:30:04 [Engagement] Already replied to @solanamultibuy — skipping
+15:30:12 [Engagement] Done — 2 replies sent, 2 new follows
+```
+
+Real users engaged on May 25 (verifiable from @reviceva timeline):
+- @Crypto__fi (cycle #1) — reply + follow
+- @solanamultibuy (cycle #1) — reply + follow
+- @gi_dutraa (cycle #2) — reply + follow
+- @CNBIGBUYS (cycle #2) — reply + follow
+
+`engagement_state.json` after cycle #2: 4 entries in `replied`, 4 in
+`followed`, `dailyFollows: 4`, `lastRunAt: 2026-05-25T15:30:03.584Z`.
+
+PM2 restart count: 1251 → 1251 (zero new restarts across 46+ min uptime).
+The 5-min crashloop is definitively gone — fix from the morning is holding.
+
+### Hashnode->DailyBlog rename (commit `1565895`)
+
+The daily publisher hasn't written to Hashnode in weeks (Dev.to + aideazz.xyz
+only). Internal symbol naming was lying. Renamed across:
+
+**Env vars** (all with `process.env.NEW ?? process.env.OLD` backward-compat
+fallback so OLD names still work if any external scripts set them):
+- `HASHNODE_DAILY_ENABLED` -> `DAILY_BLOG_ENABLED`
+- `HASHNODE_DAILY_CRON` -> `DAILY_BLOG_CRON`
+- `HASHNODE_DAILY_TZ` -> `DAILY_BLOG_TZ`
+- `HASHNODE_DAILY_TRIGGER_SECRET` -> `DAILY_BLOG_TRIGGER_SECRET`
+- `HASHNODE_DAILY_PUBLIC` -> `DAILY_BLOG_PUBLIC`
+- `HASHNODE_DAILY_DELISTED` -> `DAILY_BLOG_DELISTED`
+- `HASHNODE_DAILY_DEVTO_ONLY` -> `DAILY_BLOG_DEVTO_ONLY`
+- `HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES` -> `DAILY_BLOG_MIN_HOURS_BETWEEN_PUBLISHES`
+- `HASHNODE_DAILY_SLUG_PREFIX_LEN` -> `DAILY_BLOG_SLUG_PREFIX_LEN`
+- `HASHNODE_DAILY_RUN_ON_START` -> `DAILY_BLOG_RUN_ON_START`
+- `HASHNODE_ARTICLE_MODEL` -> `DAILY_BLOG_ARTICLE_MODEL`
+- `HASHNODE_TOPIC_STATE_DIR` -> `DAILY_BLOG_TOPIC_STATE_DIR`
+- `TELEGRAM_HASHNODE_NOTIFY_CHAT_ID` -> `TELEGRAM_DAILY_BLOG_NOTIFY_CHAT_ID`
+
+**Functions / constants:**
+- `runDailyHashnodePost` -> `runDailyBlogPost`
+- `startHashnodeDailyPublisher` -> `startDailyBlogPublisher`
+- `notifyTelegramHashnodePublished` -> `notifyTelegramBlogPublished`
+- `notifyTelegramHashnodeFailure` -> `notifyTelegramBlogFailure`
+- `hashnodeDailyIsDelisted` -> `dailyBlogIsDelisted`
+- `hashnodeDailyDevToOnly` -> `dailyBlogDevToOnly`
+- `HASHNODE_TOPIC_BRIEFS` -> `DAILY_BLOG_TOPIC_BRIEFS`
+
+**HTTP routes** (NEW canonical + deprecated-alias 307-redirects):
+- NEW canonical: `GET /blog/daily-status`, `POST /blog/daily-run`
+- Deprecation aliases: `GET /hashnode/daily-status`, `POST /hashnode/daily-run`
+  -> return `307 Temporary Redirect` with `X-Deprecation` header (preserves
+  POST method + body, so existing webhooks keep working unchanged).
+
+**Log strings:** `📰 Hashnode daily: ...` -> `📰 Daily blog: ...`,
+`🚨 Hashnode daily FAILED` -> `🚨 Daily blog FAILED`, etc.
+
+**Out of scope** (separate future cleanup): `src/blog-es-bundle.ts` still
+uses Hashnode GraphQL as a vestigial *source* for legacy Spanish
+translation cache. Not the publish target. The remaining `HASHNODE_*` env
+vars (`HASHNODE_ACCESS_TOKEN`, `HASHNODE_HOST`, `HASHNODE_PUBLICATION_ID`,
+`HASHNODE_SUBDOMAIN`) belong to that module.
+
+### Verification
+
+- `GET /blog/daily-status` returns the JSON status with new `DAILY_BLOG_*` env names in the `note` field.
+- `GET /hashnode/daily-status` returns `307 -> /blog/daily-status` with `X-Deprecation` header.
+- Startup log: `📰 Daily blog: scheduled 30 14 * * * (America/Panama) — mode: Dev.to + aideazz.xyz cross-post — listed: yes`.
+- Manual trigger log: `📰 Daily blog manual: POST https://webhook.aideazz.xyz/cto/blog/daily-run with Bearer secret (deprecated alias: https://webhook.aideazz.xyz/cto/hashnode/daily-run)`.
