@@ -437,6 +437,71 @@ function isTestRow(r: any): boolean {
   return TEST_NAMES.has(name) || /^(e2e|test|demo|sample|fake)/i.test(name);
 }
 
+// MAY 25 2026 (later): freshness buckets — NEW / ACTIVE / AGING
+// Groups HubSpot actionable deals by recency so each day's brief surfaces
+// what's NEW today separately from what's still in play vs what's aging.
+// Without buckets, the same 10 deals can show identically for a week and
+// the operator stops reading the message.
+function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastModified: string }>): { section: string; counts: { newToday: number; active: number; aging: number } } {
+  const stageHint = (stage: string): string =>
+    stage === 'qualifiedtobuy' ? '🔥' :
+    stage === 'contractsent'   ? '💬' :
+    stage.includes('recruiter') ? '🎯' :
+    stage.includes('interview') ? '📅' :
+    stage.includes('offer')     ? '🏆' : '•';
+
+  const HOUR = 60 * 60 * 1000;
+  const DAY  = 24 * HOUR;
+  const now = Date.now();
+
+  type Bucket = 'new' | 'active' | 'aging';
+  const buckets: Record<Bucket, Array<{ line: string; days: number }>> = { new: [], active: [], aging: [] };
+
+  for (const d of deals) {
+    const t = d.lastModified ? new Date(d.lastModified).getTime() : 0;
+    const ageMs = t > 0 && Number.isFinite(t) ? now - t : -1;
+    const days = ageMs >= 0 ? Math.floor(ageMs / DAY) : -1;
+    let bucket: Bucket;
+    if (days < 0) bucket = 'aging'; // unknown freshness -> conservative
+    else if (ageMs <= DAY) bucket = 'new';
+    else if (days <= 7) bucket = 'active';
+    else bucket = 'aging';
+
+    const ageLabel =
+      days < 0 ? '' :
+      days === 0 ? (ageMs <= HOUR ? `${Math.max(1, Math.floor(ageMs / 60_000))}m ago` : `${Math.floor(ageMs / HOUR)}h ago`) :
+      `${days}d`;
+    const line = `  ${stageHint(d.stage)} ${d.dealname}${ageLabel ? ' — ' + ageLabel : ''}`;
+    buckets[bucket].push({ line, days });
+  }
+
+  // Sort each bucket: newest first
+  buckets.new.sort((a, b) => a.days - b.days);
+  buckets.active.sort((a, b) => a.days - b.days);
+  buckets.aging.sort((a, b) => a.days - b.days);
+
+  const parts: string[] = [];
+  if (buckets.new.length > 0) {
+    parts.push(`🆕 NEW today (${buckets.new.length}) — fresh in last 24h:`);
+    parts.push(buckets.new.slice(0, 6).map(b => b.line).join('\n'));
+  }
+  if (buckets.active.length > 0) {
+    if (parts.length > 0) parts.push('');
+    parts.push(`🔥 ACTIVE (${buckets.active.length}) — modified 1-7 days ago:`);
+    parts.push(buckets.active.slice(0, 6).map(b => b.line).join('\n'));
+  }
+  if (buckets.aging.length > 0) {
+    if (parts.length > 0) parts.push('');
+    parts.push(`⏰ AGING (${buckets.aging.length}) — >7d untouched, close or remove:`);
+    parts.push(buckets.aging.slice(0, 4).map(b => b.line).join('\n'));
+  }
+
+  return {
+    section: parts.join('\n'),
+    counts: { newToday: buckets.new.length, active: buckets.active.length, aging: buckets.aging.length },
+  };
+}
+
 export async function buildDailyBrief(): Promise<string | null> {
   const leads = await getTriagedLeads(undefined, 100);
   // Filter out test/demo entries that slipped in from form testing
@@ -449,7 +514,8 @@ export async function buildDailyBrief(): Promise<string | null> {
   // the Telegram brief if EITHER (a) there are Oracle triage signals, or
   // (b) HubSpot has actionable deals. On a truly quiet day, return null and
   // the caller suppresses the send entirely.
-  const actionableDeals = await getActionableHubSpotDeals({ limit: 10 }).catch(() => []);
+  // Limit 25 so we have enough deals to bucket meaningfully across freshness tiers.
+  const actionableDeals = await getActionableHubSpotDeals({ limit: 25 }).catch(() => []);
 
   if (rows.length === 0 && actionableDeals.length === 0) {
     console.log('📥 Lead Brief: 0 Oracle signals + 0 HubSpot actionable deals — Telegram SUPPRESSED');
@@ -458,20 +524,12 @@ export async function buildDailyBrief(): Promise<string | null> {
 
   // If we ONLY have HubSpot deals (no Oracle signals), surface those:
   if (rows.length === 0 && actionableDeals.length > 0) {
-    const dealLines = actionableDeals.slice(0, 8).map(d => {
-      const stageHint = d.stage === 'qualifiedtobuy' ? '🔥' :
-                        d.stage === 'contractsent'   ? '💬' :
-                        d.stage.includes('recruiter') ? '🎯' :
-                        d.stage.includes('interview') ? '📅' :
-                        d.stage.includes('offer')     ? '🏆' : '•';
-      const t = d.lastModified ? new Date(d.lastModified).getTime() : 0; const days = t > 0 && Number.isFinite(t) ? Math.floor((Date.now() - t) / 86400_000) : -1;
-      return `  ${stageHint} ${d.dealname}${days < 0 ? '' : (days === 0 ? ' — today' : ' — ' + days + 'd')}`;
-    }).join('\n');
+    const { section, counts } = renderDealBuckets(actionableDeals);
     return [
       `📥 Lead Brief — ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`,
       ``,
-      `🎯 HubSpot deals needing action (${actionableDeals.length}):`,
-      dealLines,
+      `🎯 HubSpot deals needing action (${actionableDeals.length} total: ${counts.newToday} new, ${counts.active} active, ${counts.aging} aging):`,
+      section,
       ``,
       `(No new Oracle triage signals — leads flow to HubSpot via May 24 wiring.)`,
       `/triage — re-run triage  |  /leads — full list`,
@@ -491,19 +549,12 @@ export async function buildDailyBrief(): Promise<string | null> {
     `  • ${r[8] || 'unknown'}: ${(r[7] || '').substring(0, 80)}`
   ).join('\n');
 
-  // Always append HubSpot actionable deals section if any present.
-  const hsSection = actionableDeals.length > 0
-    ? `\n\n🎯 HubSpot deals needing action (${actionableDeals.length}):\n` +
-      actionableDeals.slice(0, 8).map(d => {
-        const stageHint = d.stage === 'qualifiedtobuy' ? '🔥' :
-                          d.stage === 'contractsent'   ? '💬' :
-                          d.stage.includes('recruiter') ? '🎯' :
-                          d.stage.includes('interview') ? '📅' :
-                          d.stage.includes('offer')     ? '🏆' : '•';
-        const t = d.lastModified ? new Date(d.lastModified).getTime() : 0; const days = t > 0 && Number.isFinite(t) ? Math.floor((Date.now() - t) / 86400_000) : -1;
-        return `  ${stageHint} ${d.dealname}${days < 0 ? '' : (days === 0 ? ' — today' : ' — ' + days + 'd')}`;
-      }).join('\n')
-    : '';
+  // Always append HubSpot actionable deals section if any present — bucketed by freshness.
+  let hsSection = '';
+  if (actionableDeals.length > 0) {
+    const { section, counts } = renderDealBuckets(actionableDeals);
+    hsSection = `\n\n🎯 HubSpot deals needing action (${actionableDeals.length} total: ${counts.newToday} new, ${counts.active} active, ${counts.aging} aging):\n${section}`;
+  }
 
   return [
     `📥 Lead Brief — ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`,
