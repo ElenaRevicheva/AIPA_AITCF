@@ -1214,3 +1214,126 @@ query already returned fresh data on every cron run — but the operator's
 eye loses the signal if NEW and OLD are interleaved with no header. Adding
 the bucket grouping at render time delivers daily-fresh signal without
 changing the underlying data flow.
+
+
+## NEW May 25 2026 evening (deep-final) — Bright Data plumbing explained for the goals it serves
+
+Vibe-coder version: what each Bright Data product actually DOES for the
+four goals (finding clients, being hired, monetization, GEO/AEO/SEO), and
+how the new autonomous research agent ties them together. Use this in
+interviews, founder calls, the hackathon pitch, and any client conversation.
+
+### The 4 Bright Data products in your stack and what each one is for
+
+**1. Web Unlocker — "bypass the wall on any website"**
+- Plain English: hit any public URL through Bright Data's network instead of yours. Their network rotates IPs, solves CAPTCHAs, looks like a real browser, gets through.
+- Where it lives in your code: `src/brightdata-enrich.ts` `bdFetch()`.
+- What it does for **finding clients**: when a prospect lands in HubSpot (any agent path), `enrichLeadWebsite` / `enrichLinkedInCompany` / `enrichCrunchbase` fire automatically. You get founder names, team size, funding amount, tech stack attached to the deal — without any manual research.
+- What it does for **being hired**: VJH `_search_brightdata_linkedin` pulls 120 LinkedIn job cards per cycle. LinkedIn blocks normal scrapers; Web Unlocker walks right through.
+- What it does for **GEO/AEO/SEO**: not directly. (But the research agent uses it on competitor blogs.)
+- Pitch line: *"We don't fight bot detection — we route around it. Every CRM deal in our system gets founder + funding + tech-stack intel attached automatically."*
+
+**2. SERP API — "real-time Google results, in JSON"**
+- Plain English: send a Google query, get parsed JSON back (titles + links + snippets), as if you had Google's own API. Synchronous, fast.
+- Where it lives in your code: `src/brightdata-enrich.ts` `bdSerpSearch()` (via Web Unlocker proxy + `brd_json=1`).
+- What it does for **finding clients**: `serpapi-prospects.ts` runs every 6h with queries like `"need CTO" site:news.ycombinator.com` — picks up fresh buying signals from HN/Reddit/the open web → HubSpot CLIENT pipeline. Replaced the legacy SerpAPI competitor.
+- What it does for **being hired**: extends VJH coverage to non-LinkedIn job boards (Wellfound, RemoteOK, etc.) via Google site: queries — when a fresh AI engineer post appears anywhere on the web, you see it.
+- What it does for **GEO/AEO/SEO**: the research agent uses SERP for "what's ranking for [your target keyword] right now" — direct competitor rank check + content-gap discovery for the daily blog publisher.
+- Pitch line: *"We don't pay for stale rank-tracking SaaS. We hit Google directly through Bright Data, fresh each day, with the queries that matter to my pipeline."*
+
+**3. Scraping Browser — "render the JavaScript on hard sites"**
+- Plain English: spin up a real headless Chrome browser on Bright Data's network for sites that only render after JS executes (LinkedIn profile detail, complex SPAs, login-walled feeds).
+- Where it lives in your code: `src/brightdata-enrich.ts` `bdScrapingBrowserFetch()` + `bdSmartFetch()` orchestrator.
+- What it does for **finding clients**: `enrichLinkedInCompany` now uses `bdSmartFetch` — tries Web Unlocker first (cheap), escalates to Scraping Browser when content is thin or JS-gated (LinkedIn does both). Result: company pages that used to come back empty now give us employee count, recent roles, leadership.
+- What it does for **being hired**: same upgrade — applies to LinkedIn profile pages of hiring managers Elena considers reaching out to.
+- What it does for **GEO/AEO/SEO**: research agent uses it when competitor blogs are SPA-driven (e.g. Next.js-rendered content) so we don't miss their actual blog posts in gap analysis.
+- Pitch line: *"When the page lies behind JavaScript, we render it for real. That's why our intel is complete where simple scrapers come back blank."*
+
+**4. MCP Server (BrightData @brightdata/mcp) — "Claude Code can do live web research from your IDE"**
+- Plain English: a Model Context Protocol server that exposes BD tools (search_engine, scrape_as_markdown, discover) to any MCP-aware client like Claude Code.
+- Where it lives in your repo: `.mcp.json` at repo root.
+- What it does for **finding clients**: when you (or Claude in your IDE) need ad-hoc research on a company while you're coding, the BD MCP tools are right there — no separate browser tab.
+- What it does for **being hired**: same — use Claude Code to research an employer's recent funding, tech stack, leadership while drafting your application materials.
+- What it does for **GEO/AEO/SEO**: use Claude Code with BD MCP to draft article research alongside the daily blog publisher's automated topic picking.
+- Pitch line: *"My IDE itself can hit the live web via Bright Data. I don't context-switch to research — I research from where I build."*
+
+### NEW: the autonomous research agent (`src/research-agent.ts`)
+
+This is the production version of the MCP pattern. Where MCP is for Claude
+Code (developer time), the research agent is for Telegram (operator time —
+yours, on the go from your phone).
+
+**3 Telegram commands, each serves one of your stated goals:**
+
+```
+/research_company <name>     → CLIENT prospect research (sendable pitch angle)
+/research_employer <name>    → HIRING target research (application angle)
+/research_competitor <domain>→ SEO/AEO competitor gap analysis (blog topics)
+```
+
+**What happens under the hood (90 seconds per command):**
+
+1. The command fires `runResearchAgent(anthropic, query, mode)` in `src/research-agent.ts`.
+2. Claude (Sonnet 4.5) receives a mode-specific system prompt and 3 tools:
+   `bd_serp_search`, `bd_unlock_url`, `bd_scrape_browser`.
+3. Claude **decides** — autonomously — how many Google searches to fire,
+   which URLs to scrape, when to render JS, when it has enough. The hardcoded
+   cron flows in the rest of the system are predetermined; this one isn't.
+4. Up to 8 BD tool calls, 120s timeout. On end_turn → final structured report.
+5. Report comes back in Telegram chunked under 4096 chars, markdown-formatted.
+
+**Live proof (run on `decircle.io` in client mode, 86 seconds, 7 BD calls):**
+
+> *"Saw you are hiring a Head of BD to build Midas distribution engine —
+> before you scale that team, would a 2-week AI marketing sprint make
+> sense? We help Web3 startups build automated lead-gen systems that
+> feed your BD pipeline with qualified exchange/custody/DeFi partnerships."*
+
+That's a real sendable LinkedIn DM, generated autonomously from Bright Data
+intel on a real prospect, in 86 seconds. **This is what "find me clients"
+looks like in production.**
+
+### How it ties to the GEO/AEO/SEO mechanism specifically
+
+The daily blog publisher (`src/daily-blog-publisher.ts`) currently picks
+topics from Google Search Console gaps (queries where your site shows
+impressions but no clicks → write the article that closes the gap).
+
+The research agent in `competitor` mode is the next layer on top:
+
+```
+/research_competitor manny-santos.com
+```
+
+Output:
+- Top-ranking content from that competitor (last 3 months)
+- Content gaps Elena should fill (3-5 specific blog topic suggestions)
+- Schema/AEO patterns they use (FAQPage, HowTo, BlogPosting)
+- Linkable assets worth referencing
+
+You then feed those topics into your DAILY_BLOG_TOPIC_BRIEFS rotation, and
+the auto-publisher writes them. Bright Data → Claude → research → topic
+queue → daily publish → dev.to + aideazz.xyz + FAQPage JSON-LD + sitemap
+update. End-to-end, no human in the loop after you fire one Telegram command.
+
+### Pitch-ready summary (one paragraph for the next founder call or interview)
+
+> *"My marketing engine runs 10 production AI agents that act on the live
+> web instead of static APIs. Every inbound lead gets enriched with founder /
+> tech-stack / funding intel via Bright Data Web Unlocker. Every outbound
+> prospect-discovery cron query hits Google live via Bright Data SERP API.
+> JS-heavy LinkedIn profile pages render via Bright Data Scraping Browser.
+> And from my phone in Telegram I can fire `/research_company <name>` and
+> get an autonomous Claude-driven research report — 7 Bright Data calls,
+> 90 seconds, a sendable pitch angle. Same pattern works for hiring targets
+> and for competitor blog gap analysis. 13 months solo, $0/month infra, real
+> paying users, real pipeline today."*
+
+### The 4 sellable rules earned today carry forward into client conversations
+
+1. **"Verify from logs, never claim from config."** Every agent metric we report has a grep-able action signature in production logs. (Caught the 4,357-startup-banner / 0-cycle Algom engagement loop bug today.)
+2. **"Verify from DB ground truth for stateful agents."** Before claiming a bug is fixed, query the underlying DB. (Caught the `katex@0.16.9` stuck draft.)
+3. **"Yesterday's good code is today's fastest fix."** Before writing new modules, audit recent commits. (Today's biggest behavior change was 1 new function + 6 small call-site edits.)
+4. **"Freshness is a render concern, not a query concern."** Daily Telegram briefs surface what's new today vs aging — same query, smarter render. (NEW/ACTIVE/AGING buckets.)
+
+All four travel into the hackathon pitch + every client conversation. They are the methodology, not just code anecdotes.
