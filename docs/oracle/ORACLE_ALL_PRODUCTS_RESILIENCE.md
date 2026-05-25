@@ -1021,3 +1021,37 @@ to `src/blog-es-bundle.ts`, which uses Hashnode public GraphQL as a vestigial
 - Successful publish: `📰 Daily blog published` (Telegram notify text starts with this)
 - Failure: `🚨 Daily blog FAILED` (Telegram notify text)
 - Skip (mutex): `📰 Daily blog SKIPPED: last publish was N.Nh ago (< 12h cooldown)`
+
+
+### Outreach bogus-retry-loop fix — May 25 2026 evening (later)
+
+The daily Phase 4 outreach Telegram summary kept showing the same Resend
+422 "invalid email" failures every day even after the May 25 morning
+isBogusOutreachEmail filter shipped. Root cause: the morning filter ran
+only at draft-CREATION time (`generateBatchDrafts`). The actual SEND step
+(`sendApprovedDrafts`) iterates `outreach_log` status='draft' and sends
+ALL of them without checking — old bogus drafts retried every cron run
+forever.
+
+**Three-layer fix in commit `daf757b`:**
+
+| Layer | What | Where |
+|---|---|---|
+| 1 | `getOutreachDrafts` SQL excludes targets with status='invalid_email'/'archived'/'dismissed' | `src/database.ts` |
+| 2 | `sendApprovedDrafts` pre-send check via `isBogusOutreachEmail`; on bogus -> mark target invalid_email + draft rejected_bogus_email | `src/outreach.ts` |
+| 3 | `sendApprovedDrafts` on Resend 422 (invalid email format) -> auto-mark target invalid_email + draft rejected_by_resend_422 (so it never retries) | `src/outreach.ts` |
+
+**DB backfill done live**: 1 stuck bogus draft (`leeex1 / katex@0.16.9` — a
+npm package version captured as email by the fresh-leads parser) was
+marked invalid. Verified: bogus drafts remaining = 0.
+
+**Verification anchors in logs**:
+- Pre-send bogus auto-mark: `[outreach] auto-marked bogus draft invalid: <name> / <company> / <email>`
+- Resend 422 auto-mark: `[outreach] Resend 422 auto-marked invalid: <name> / <company> / <email>`
+- Phase 4 Telegram summary: new line `Auto-marked invalid (bogus or Resend 422): N — won't retry`
+
+**Lesson rule extension** (in SKILL.md): "Verify from logs, never claim
+from config" -> extended to "...and for stateful agents, query the actual
+DB before claiming the bug isn't fixed (or that it is)." The DB query
+showed exactly 1 bogus draft (not 20, not 0), which made the fix surgical
+and the backfill trivial.

@@ -543,3 +543,50 @@ that had never successfully completed a cycle in the bot's entire history.
   source for Spanish-translation cache. Not a publish target. The remaining
   `HASHNODE_ACCESS_TOKEN` / `HASHNODE_HOST` / `HASHNODE_PUBLICATION_ID` /
   `HASHNODE_SUBDOMAIN` env vars belong to that module.
+
+
+## NEW May 25 2026 evening (later) — outreach bogus 422 retry loop closed
+
+Operator reported still receiving stale Phase 4 Telegram summaries with
+the same bogus 422 failures (Founder @ X@X, leeex1 / katex@0.16.9, etc.)
+after the morning isBogusOutreachEmail filter shipped.
+
+### Root cause (verified by direct DB query)
+
+The morning filter ran only at `generateBatchDrafts` (draft-creation time).
+`sendApprovedDrafts` sent ALL drafts in `outreach_log` status='draft'
+without checking, so old bogus drafts created before the filter retried
+every cron run forever. DB query confirmed: 1 stuck bogus draft
+(`leeex1 / katex@0.16.9` — a npm package version captured as email by the
+fresh-leads parser).
+
+### Closed this session (commit `daf757b`)
+
+- `getOutreachDrafts` SQL now excludes targets with status='invalid_email'/'archived'/'dismissed'
+- `sendApprovedDrafts` runs `isBogusOutreachEmail` pre-send + auto-marks bogus targets/drafts as invalid
+- `sendApprovedDrafts` auto-marks invalid on Resend 422 (invalid email format) so it never retries
+- Phase 4 summary now shows `Auto-marked invalid (bogus or Resend 422): N — won't retry`
+- DB backfill: 1 stuck bogus draft + target marked invalid. Bogus drafts remaining = 0.
+
+### Bonus: prospect ingestion wording clarified
+
+Before: misleading "(20 already in pipeline)" — sounded like total.
+After: "(all 20 fetched were already in pipeline — nothing to do)".
+
+### Verified-as-correct (not bugs) from the same session
+
+- "AIdeazz inbound (last 7 days) — No new inquiries": `business_leads` table is empty (0 rows ever). Message is true.
+- "Lead Brief — No real signals yet": `lead_triage` has 150 archived rows, 0 not-pushed. Message is true (brief intentionally hides archived).
+
+Both of these are technically correct but unhelpful because lead activity
+now flows into HubSpot, not these Oracle tables (May 24 response_detector
++ Trello bridge wiring). Followup carries forward: wire the Telegram
+summaries to also pull from HubSpot for richer context.
+
+### Still red (carry forward)
+
+1. CMO LinkedIn engagement return webhook (Make.com → /api/crm-event)
+2. EspaLuz PayPal subscriber events → HubSpot
+3. EspaLuz WhatsApp/Telegram chat user events → HubSpot
+4. **NEW**: Wire AIdeazz inbound + Lead Brief Telegram summaries to pull from HubSpot (the Oracle tables they currently read are empty/all-archived because lead activity flows into HubSpot now)
+5. 6 dead HASHNODE_* env vars in cto-aipa .env (deferred cleanup; some are still used by blog-es-bundle)

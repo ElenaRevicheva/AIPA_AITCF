@@ -1027,3 +1027,67 @@ vars (`HASHNODE_ACCESS_TOKEN`, `HASHNODE_HOST`, `HASHNODE_PUBLICATION_ID`,
 - `GET /hashnode/daily-status` returns `307 -> /blog/daily-status` with `X-Deprecation` header.
 - Startup log: `📰 Daily blog: scheduled 30 14 * * * (America/Panama) — mode: Dev.to + aideazz.xyz cross-post — listed: yes`.
 - Manual trigger log: `📰 Daily blog manual: POST https://webhook.aideazz.xyz/cto/blog/daily-run with Bearer secret (deprecated alias: https://webhook.aideazz.xyz/cto/hashnode/daily-run)`.
+
+
+## NEW May 25 2026 evening (later) — stale outreach Telegram messages, root-caused via DB query
+
+Operator reported still receiving stale Phase 4 outreach summaries with the
+same bogus 422 failures (e.g. "Founder @ Skool@Skool: Resend 422...") after
+the May 25 morning isBogusOutreachEmail filter shipped.
+
+### Verify-from-logs (and from-DB) discipline at work
+
+Instead of guessing, queried the actual Oracle DB tables behind each of
+the 4 daily Telegram messages the operator listed:
+
+| Message | DB state |
+|---|---|
+| Prospect ingestion "0 new (20 already in pipeline)" | 149 total companies. "20" is THIS-run's fetched-duplicate count, NOT total pipeline. Wording was just misleading. |
+| Phase 4 outreach 422 failures | **1 stuck bogus draft confirmed**: `leeex1 / leeex1 / katex@0.16.9` (a npm package version captured as email by the fresh-leads parser). |
+| AIdeazz inbound "no new" | `business_leads` table is **empty (0 rows ever)**. Message is true. The inbound form doesn't write here, or no inquiries have happened. Lead activity actually flows into HubSpot now (May 24 wiring). |
+| Lead Brief "no real signals" | `lead_triage` has **150 archived rows**, 0 not-pushed. Message is true. The brief intentionally hides archived leads. |
+
+Only the Phase 4 message was an actual bug. The other 3 are accurate reports
+of empty data — the data itself flows into HubSpot now, not the Oracle
+tables these messages read.
+
+### Root cause for the Phase 4 bug
+
+The May 25 morning fix added `isBogusOutreachEmail()` at
+`generateBatchDrafts` (draft-generation time). But `sendApprovedDrafts`
+iterates `outreach_log status='draft'` and sends ALL drafts without
+checking — old bogus drafts created before the morning filter keep being
+retried every cron run forever.
+
+### Three-layer fix (commit `daf757b`)
+
+- **`getOutreachDrafts` query**: added `AND ot.status NOT IN ('invalid_email', 'archived', 'dismissed')` so bogus targets are excluded at query time (belt-and-suspenders).
+- **`sendApprovedDrafts` Layer 1**: pre-send `isBogusOutreachEmail(email)` check. On bogus -> mark target `invalid_email`, mark draft `rejected_bogus_email`, increment `autoMarkedInvalid` counter.
+- **`sendApprovedDrafts` Layer 2**: on Resend 422 (invalid email format from Resend's check) -> auto-mark target `invalid_email`, draft `rejected_by_resend_422`. Won't retry tomorrow.
+- **Phase 4 Telegram summary now reports** `Auto-marked invalid (bogus or Resend 422): N — won't retry`.
+- **DB backfill** (executed live): the 1 stuck `leeex1` draft -> target invalid_email, draft rejected_bogus_email. Verified: bogus drafts remaining = 0.
+
+### Cosmetic: prospect ingestion wording clarified
+
+Before: `🔍 Prospect ingestion: 0 new companies (20 already in pipeline)` (sounds like total pipeline)
+After:  `🔍 Prospect ingestion: 0 new companies (all 20 fetched were already in pipeline — nothing to do)`
+
+### Lesson extension to the verify-from-logs rule
+
+Applied today: verify from logs OR from underlying data state. For agents
+that write to a DB, the DB is the ground truth — query it before reporting
+or fixing. The DB query showed exactly 1 bogus draft (not 20, not 0,
+specifically `leeex1 / katex@0.16.9`) which made the fix surgical and the
+backfill trivial. Without the DB query I might have over-engineered a
+broader fix or backfilled rows that didn't need it.
+
+Pairs with the morning's rule: "Verify from logs, never claim from config."
+Extended: "...and for stateful agents, query the actual DB before claiming
+the bug isn't fixed (or that it is)."
+
+### Followup flagged (out of scope for this session)
+
+To make AIdeazz inbound + Lead Brief useful again, they should pull from
+HubSpot too (since lead activity now flows there via May 24 response_detector
++ Trello bridge). Currently both messages report from Oracle tables that are
+empty or all-archived. Separate session.
