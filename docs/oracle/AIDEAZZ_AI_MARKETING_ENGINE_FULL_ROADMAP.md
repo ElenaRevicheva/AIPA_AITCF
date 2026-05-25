@@ -1406,3 +1406,51 @@ Diminishing returns; defer until after first paying client/interview:
 - Core Web Vitals testing + optimization (only matters if mobile is slow)
 - Per-article OG images (currently all use elena-og.jpg)
 - Schema.org `Organization` + `WebSite` at site root (brand SERP carousel)
+
+
+---
+
+## May 25 2026 — Multi-agent orchestration deepens (client-pitch depth)
+
+Today shipped several pieces that strengthen the marketing-engine pitch:
+
+### Algom Alpha repositioning — cost-vs-voice separation on a live agent
+
+Pivoted my 7-month-old @reviceva social-media agent from 70% crypto / 30% AIdeazz to **50% aideazz / 20% client_pitch / 15% monetization / 15% educational / 0% paper_trading** in one session. Educational posts now route through the `rhino-sneezing-lemon` xAI team key (Grok `grok-4.20-0309-non-reasoning`), commodity content drains team credits; brand-voice posts stay on Claude/personal account. **Posting identity unchanged** — 7 months of brand continuity intact. Commit `294efee` in `dragontrade-agent`.
+
+**Client-pitch angle:** "I separate cost from voice. The expensive provider runs content that has to sound like you; the cheaper team-credit provider runs the commodity slot. Same dashboard, two ledgers, no brand contamination." Repeatable pattern for any client running a content engine.
+
+### Engagement loop now actually running (4,357 startups → 0 cycles → live)
+
+Asked for log proof, found the bot's "45-min engagement loop" had **never successfully completed a cycle in months** because of a 5-min crashloop caused by a grep bug in `/home/ubuntu/check_oracle_health.sh` (used `grep "status: online"` but pm2 outputs box-drawing chars, no colon — never matched). Fixed with `pm2 jlist | jq` parsing. Bot now stable, restart count steady; engagement loop fires every 45 min, replies + follows real users from the @reviceva mentions timeline with 48h dedup. 4 unique users engaged on first day: @Crypto__fi, @solanamultibuy, @gi_dutraa, @CNBIGBUYS.
+
+**Portfolio depth:** "Verify from logs, never claim from config" — a discipline that surfaced a months-long silent defect.
+
+### CTO AIPA Telegram messages — HubSpot-enriched, freshness-bucketed, silent on quiet days
+
+Operator-facing daily messages used to report from empty Oracle tables ("no new inquiries", "no real signals yet"). Refactored to:
+- Query HubSpot for actionable deals (qualifiedtobuy + contractsent client stages + recruiter_responded / interview_scheduled / offer_received hiring stages)
+- Group into 🆕 NEW (≤24h, fresh) / 🔥 ACTIVE (1-7d) / ⏰ AGING (>7d, close-or-remove) buckets
+- Silent skip on quiet days (no "0 new" noise)
+
+**Live proof:** Lead Brief at 8 AM Panama now surfaces 5+ real hiring leads (Cresta, decircle, Jerry.ai, Ensitech, Norwest) + real client prospects (eBay, Huskyauto, Skool) instead of empty filler. Commit `4c40349` + `bb1782d` in `AIPA_AITCF`.
+
+**Direct client pitch:** "I built a HubSpot-orchestrated daily-intelligence layer where 5 agents push deals into one dashboard and the operator gets a daily Telegram brief grouped by freshness. No one re-implements this — they re-use it."
+
+### Daily blog publisher hardened (sliding-window mutex + always-fire Telegram + Hashnode→DailyBlog rename)
+
+Multiple fixes in one day:
+- Sliding-window mutex prevents accidental double-publishes (the May 24 BrightData duplicate would have been blocked)
+- Telegram notifies on EVERY outcome (success, skip, failure) — no more silent failures
+- Hashnode→DailyBlog rename: `HASHNODE_DAILY_*` → `DAILY_BLOG_*` env vars + function names + log strings + new HTTP routes (`/blog/daily-*` canonical with `/hashnode/daily-*` 307-redirect aliases)
+
+**Client-pitch hook:** "When I shipped the BrightData article today, my own infrastructure caught a near-duplicate from yesterday and warned me. That's the kind of safety net WordPress doesn't give you — built in 30 minutes on top of yesterday's already-deployed primitives."
+
+### Rules earned today (each one a sellable methodology)
+
+1. **"Verify from logs, never claim from config"** — for any agent behavior claim, grep for the ACTION log line, not the SETUP line. If count is 0, the behavior isn't happening regardless of config.
+2. **"Verify from DB ground truth for stateful agents"** — extension of (1). For agents that write to a DB, query the DB before claiming the bug is or isn't fixed.
+3. **"Yesterday's good code is today's fastest fix"** — audit recent commits for already-deployed primitives before writing new modules. Today's biggest behavior change was 1 new function + 6 small call-site edits — the rest was wiring existing pieces.
+4. **"Freshness is a render concern, not a query concern"** — when daily messages risk showing the same data repeatedly, bucket by freshness at render time instead of changing the query frequency.
+
+All four rules are now in `SKILL.md` + local memory (`feedback_verify_from_logs.md`) and will travel into every client engagement and interview narrative.
