@@ -635,3 +635,18 @@ behavior change.
 4. UTM-driven attribution surface in Telegram summaries (form captures UTM, not yet shown)
 5. Algom Alpha [CLIENT-ALGOM] deals → daily Telegram digest
 6. 6 dead HASHNODE_* env vars in cto-aipa .env (deferred; some still used by blog-es-bundle)
+
+
+## NEW May 25 2026 evening (final-final) — Freshness buckets in Lead Brief
+
+Operator: "make sure each day I get fresh data."
+
+The previous usefulness refactor surfaced real HubSpot deals but could
+have shown the same 10 deals identically for 7 days. Fix: bucket them by
+freshness.
+
+### Closed this session (commit `bb1782d`)
+
+- ✅ `renderDealBuckets()` helper added to `lead-triage.ts`. Groups by 🆕 NEW (≤24h) / 🔥 ACTIVE (1-7d) / ⏰ AGING (>7d). Renders each bucket only when non-empty. Top-level summary shows totals. Sub-day ages in m/h for NEW.
+- ✅ Query limit raised 10 → 25 so buckets fill across all tiers.
+- ✅ Daily-fresh signal delivered without changing underlying query frequency. Pattern: "Freshness is a render concern, not a query concern."

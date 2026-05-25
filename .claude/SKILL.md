@@ -1163,3 +1163,54 @@ correct but useless.
 - **Inbound weekly digest** could be further enriched with HubSpot deal-by-source breakdown (still per-source filter currently)
 - **UTM-driven attribution** is wired in the form but not yet surfaced in any Telegram summary
 - **Algom Alpha CRM hit rate** could surface in a daily summary (deals tagged `[CLIENT-ALGOM]` are visible in HubSpot but not in a Telegram digest yet)
+
+
+## NEW May 25 2026 evening (final-final) — Freshness buckets in Lead Brief ("each day I get fresh data")
+
+Operator's follow-up after the usefulness refactor: "make sure each day I
+get fresh data." Concrete risk: the brief was now actionable but could
+show the same 10 HubSpot deals identically for 7+ days, and the eye stops
+noticing what's new today vs what's aging.
+
+### Fix shipped (commit `bb1782d`)
+
+New `renderDealBuckets()` helper in `lead-triage.ts` groups HubSpot
+actionable deals into 3 freshness tiers based on `hs_lastmodifieddate`:
+
+| Bucket | Window | Show | Purpose |
+|---|---|---|---|
+| 🆕 NEW today | ≤24h | top 6 | what's fresh — open and act today |
+| 🔥 ACTIVE | 1-7d | top 6 | still in play, monitor or follow-up |
+| ⏰ AGING | >7d | top 4 | close or remove — going stale |
+
+Each bucket only renders when non-empty. Bucket header includes count.
+Top-level summary line shows totals: `(N total: X new, Y active, Z aging)`.
+
+Sub-day age in 🆕 NEW shows as `Xm ago` or `Xh ago` so a deal that landed
+20 minutes before the brief is clearly the freshest signal of the day.
+
+Query limit raised 10 → 25 so buckets have enough inventory to render
+across all 3 tiers.
+
+### Live proof
+
+```
+📥 Lead Brief — Mon, May 25
+
+🎯 HubSpot deals needing action (25 total: 0 new, 25 active, 0 aging):
+🔥 ACTIVE (25) — modified 1-7 days ago:
+  🔥 [HIRING-VJH-SERP-LEAD] Remote GTM Automation Lead @ Cresta — 2d
+  🔥 [HIRING-VJH-SERP-LEAD] Founding Engineer – AI & Compute @ decircle — 2d
+  ...
+```
+
+Tomorrow when a deal lands in HubSpot it surfaces in 🆕 NEW separately.
+After 7 days untouched it moves to ⏰ AGING with the close-or-remove prompt.
+
+### Pattern that emerged
+
+"Freshness is a render concern, not a query concern." The actionable-deals
+query already returned fresh data on every cron run — but the operator's
+eye loses the signal if NEW and OLD are interleaved with no header. Adding
+the bucket grouping at render time delivers daily-fresh signal without
+changing the underlying data flow.
