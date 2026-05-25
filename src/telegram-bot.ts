@@ -1575,8 +1575,10 @@ Return ONLY the message text. No subject line. No "Hi [Name]" opener that requir
       const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
       const result = await runTriageCycle(groq, anthropic);
       const brief = await buildDailyBrief();
+      // MAY 25 2026: buildDailyBrief now returns string|null. Don't print literal 'null'.
+      const briefText = brief || '(0 actionable signals right now — Oracle triage + HubSpot pipeline both quiet)';
       await ctx.reply(
-        `✅ Triage complete\n\nProcessed: ${result.processed}\nUrgent (4-5): ${result.urgent}\n\n${brief}`
+        `✅ Triage complete\n\nProcessed: ${result.processed}\nUrgent (4-5): ${result.urgent}\n\n${briefText}`
       );
     } catch (error) {
       console.error('Triage error:', error);
