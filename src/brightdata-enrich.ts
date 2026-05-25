@@ -65,6 +65,159 @@ export async function bdFetch(url: string): Promise<string | null> {
 }
 
 /**
+ * MAY 25 2026 (hackathon submission): BrightData SERP API integration.
+ * Sends a Google Search query through the Web Unlocker proxy with
+ * `brd_json=1`, which makes Google return parsed JSON instead of HTML.
+ *
+ * Demonstrates a second BrightData product (SERP API) alongside the existing
+ * Web Unlocker integration. Reuses the same API token + zone — no new env vars.
+ *
+ * Returns an array of SERP result objects in BrightData's standard shape:
+ *   [{ title, link, description, ... }, ...]
+ *
+ * Returns [] on failure / not-configured so callers can fall back cleanly.
+ */
+export interface BDSerpResult {
+  title: string;
+  link: string;
+  description?: string;
+  rank?: number;
+  display_link?: string;
+}
+
+export async function bdSerpSearch(
+  query: string,
+  opts: { site?: string; num?: number; gl?: string; hl?: string; tbs?: string } = {},
+): Promise<BDSerpResult[]> {
+  const token = BD_TOKEN();
+  const zone = BD_ZONE();
+  if (!token || !zone) return [];
+
+  const num = opts.num ?? 10;
+  const gl = opts.gl ?? 'us';
+  const hl = opts.hl ?? 'en';
+  const tbs = opts.tbs ?? 'qdr:w'; // past week — same default as legacy SerpAPI path
+
+  const qWithSite = opts.site ? `${query} ${opts.site}` : query;
+  const params = new URLSearchParams({
+    q: qWithSite,
+    hl,
+    gl,
+    num: String(num),
+    tbs,
+    brd_json: '1', // KEY: tells BrightData to return parsed JSON from Google
+  });
+  const url = `https://www.google.com/search?${params.toString()}`;
+
+  try {
+    const res = await fetch(BD_API, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ zone, url, format: 'raw' }),
+      signal: AbortSignal.timeout(30_000),
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      console.warn(`[BD-SERP] ${query.slice(0, 40)} → ${res.status}: ${txt.slice(0, 200)}`);
+      return [];
+    }
+
+    const text = await res.text();
+    // BrightData with brd_json=1 returns JSON; parse defensively.
+    let parsed: any;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      console.warn(`[BD-SERP] non-JSON response for "${query.slice(0, 40)}" — first 200 chars: ${text.slice(0, 200)}`);
+      return [];
+    }
+
+    // BrightData SERP JSON: `organic` (some versions) or `organic_results` (Google parity).
+    const organic: any[] = parsed.organic || parsed.organic_results || [];
+    const results: BDSerpResult[] = organic.map((r: any, idx: number) => ({
+      title: r.title || '',
+      link: r.link || r.url || '',
+      description: r.description || r.snippet || '',
+      rank: r.rank || idx + 1,
+      display_link: r.display_link || r.displayed_link || undefined,
+    })).filter(r => r.link);
+
+    return results;
+  } catch (err) {
+    console.warn(`[BD-SERP] fetch error for "${query.slice(0, 40)}":`, (err as Error).message);
+    return [];
+  }
+}
+
+/**
+ * MAY 25 2026 (hackathon): BrightData Scraping Browser fallback for JS-heavy
+ * sites where Web Unlocker raw fetch can't render dynamic content (LinkedIn
+ * profile pages, complex SPAs, login-walled feeds).
+ *
+ * Uses the BrightData Browser API endpoint with `render=1` to spin up a
+ * real headless browser, execute JavaScript, and return the rendered HTML.
+ * Reuses the same BRIGHTDATA_API_TOKEN + BRIGHTDATA_ZONE.
+ *
+ * Demonstrates a third BrightData product (Scraping Browser) alongside
+ * Web Unlocker + SERP API.
+ *
+ * Returns null on failure / not-configured so callers can fall back to bdFetch.
+ */
+export async function bdScrapingBrowserFetch(url: string): Promise<string | null> {
+  const token = BD_TOKEN();
+  const zone = BD_ZONE();
+  if (!token || !zone) return null;
+
+  try {
+    const res = await fetch(BD_API, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      // The BrightData /request endpoint accepts a `render: true` flag that
+      // routes the request through Scraping Browser. JS executes, dynamic
+      // content renders, then the final HTML is returned.
+      body: JSON.stringify({ zone, url, format: 'raw', render: true }),
+      signal: AbortSignal.timeout(45_000),
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      console.warn(`[BD-Browser] ${url} → ${res.status}: ${txt.slice(0, 200)}`);
+      return null;
+    }
+
+    return res.text();
+  } catch (err) {
+    console.warn(`[BD-Browser] fetch error for ${url}:`, (err as Error).message);
+    return null;
+  }
+}
+
+/**
+ * Smart fetcher: tries Web Unlocker first (cheap, fast), falls back to
+ * Scraping Browser (JS rendering) if the response looks empty or JS-gated.
+ *
+ * "JS-gated" heuristic: returned body is unusually small (<500 chars) or
+ * contains telltale phrases like "Please enable JavaScript" / "noscript".
+ */
+export async function bdSmartFetch(url: string): Promise<string | null> {
+  const fast = await bdFetch(url);
+  if (fast && fast.length > 500 && !/please\s+enable\s+javascript|<noscript>/i.test(fast)) {
+    return fast;
+  }
+  if (fast) {
+    console.log(`[BD-Smart] Web Unlocker returned thin/JS-gated content for ${url} — escalating to Scraping Browser`);
+  }
+  return bdScrapingBrowserFetch(url);
+}
+
+/**
  * Lightweight regex-based extraction — no LLM call, runs instantly.
  * Used to pre-enrich leads before Claude pain-point classification.
  */
@@ -190,7 +343,7 @@ export interface LinkedInCompanyEnrichment {
 export async function enrichLinkedInCompany(
   linkedinUrl: string,
 ): Promise<LinkedInCompanyEnrichment | null> {
-  const html = await bdFetch(linkedinUrl);
+  const html = await bdSmartFetch(linkedinUrl);
   if (!html) return null;
 
   const text = html

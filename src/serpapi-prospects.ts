@@ -10,6 +10,7 @@
  */
 
 import crypto from 'crypto';
+import { bdSerpSearch, isBrightDataConfigured } from './brightdata-enrich';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
@@ -91,6 +92,27 @@ function shouldRejectResult(title: string, link: string): string | null {
 }
 
 async function fetchGoogleSearch(query: string, site: string): Promise<SerpResult[]> {
+  // MAY 25 2026 (hackathon): prefer BrightData SERP API (Web Unlocker proxy +
+  // brd_json=1) — reuses BRIGHTDATA_API_TOKEN + BRIGHTDATA_ZONE, no extra creds.
+  // Falls back to legacy SerpAPI if BrightData not configured. The two responses
+  // are normalized to the same `SerpResult` shape so downstream code is unchanged.
+  if (isBrightDataConfigured()) {
+    const bdResults = await bdSerpSearch(query, { site, num: 10, gl: 'us', hl: 'en', tbs: 'qdr:w' });
+    if (bdResults.length > 0) {
+      return bdResults.map(r => {
+        const out: SerpResult = {
+          title: r.title,
+          link: r.link,
+          snippet: r.description || '',
+        };
+        if (r.display_link) out.displayed_link = r.display_link;
+        return out;
+      });
+    }
+    // bdSerpSearch returned [] — log + continue to SerpAPI fallback if available
+    console.log(`[SerpProspects] BrightData SERP returned 0 for "${query.slice(0, 40)}" — falling back to SerpAPI`);
+  }
+
   if (!SERPAPI_KEY) return [];
   const q = site ? `${query} ${site}` : query;
   try {
