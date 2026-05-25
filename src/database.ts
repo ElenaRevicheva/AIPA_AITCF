@@ -1422,7 +1422,7 @@ async function getOutcomeSummary(hoursBack: number = 24): Promise<{
 }
 
 // =============================================================================
-// CONTENT LOG — Marketing engine (Hashnode daily + future channels)
+// CONTENT LOG — Marketing engine (Daily blog + future channels)
 // Roadmap: AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md Phase 2
 // =============================================================================
 
@@ -2884,7 +2884,7 @@ export {
   verifyAgentOutcome,
   getAgentOutcomes,
   getOutcomeSummary,
-  // Content log — marketing publishes (Hashnode, etc.)
+  // Content log — marketing publishes (Daily blog: dev.to + aideazz.xyz)
   saveContentLog,
   getRecentContentLogs,
   // Business Leads — engagement signal tracking

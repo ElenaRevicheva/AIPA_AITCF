@@ -34,18 +34,18 @@ const HASHNODE_PUBLIC_HOST = (process.env.HASHNODE_HOST || "aideazz.hashnode.dev
   ?.trim() || "aideazz.hashnode.dev";
 
 /** True if posts are delisted (hidden from public feed + aideazz blog sync). Default: false = listed. */
-export function hashnodeDailyIsDelisted(): boolean {
-  if (process.env.HASHNODE_DAILY_DELISTED === "true") return true;
-  if (process.env.HASHNODE_DAILY_PUBLIC === "false") return true;
+export function dailyBlogIsDelisted(): boolean {
+  if ((process.env.DAILY_BLOG_DELISTED ?? process.env.HASHNODE_DAILY_DELISTED) === "true") return true;
+  if ((process.env.DAILY_BLOG_PUBLIC ?? process.env.HASHNODE_DAILY_PUBLIC) === "false") return true;
   return false;
 }
 
 /**
- * True when Dev.to is the only publish target (Hashnode token absent or HASHNODE_DAILY_DEVTO_ONLY=true).
- * In this mode runDailyHashnodePost routes to runDailyDevToPost — no Hashnode API call is made.
+ * True when Dev.to is the only publish target (HASHNODE_ACCESS_TOKEN absent or DAILY_BLOG_DEVTO_ONLY=true). HASHNODE_ACCESS_TOKEN is the legacy Spanish-bundle GraphQL source token, unrelated to publishing.
+ * In this mode runDailyBlogPost routes to runDailyDevToPost — no Hashnode API call is made.
  */
-export function hashnodeDailyDevToOnly(): boolean {
-  if (process.env.HASHNODE_DAILY_DEVTO_ONLY === "true") return true;
+export function dailyBlogDevToOnly(): boolean {
+  if ((process.env.DAILY_BLOG_DEVTO_ONLY ?? process.env.HASHNODE_DAILY_DEVTO_ONLY) === "true") return true;
   if (!process.env.HASHNODE_ACCESS_TOKEN?.trim()) return true;
   return false;
 }
@@ -150,17 +150,17 @@ async function verifyUrlReachableWithRetries(
 /** Same bot as CTO AIPA; prefers HASHNODE-specific chat, else digest chat (so one ID works). */
 function resolveTelegramNotifyChatId(): string | undefined {
   return (
-    process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim() ||
+    (process.env.TELEGRAM_DAILY_BLOG_NOTIFY_CHAT_ID ?? process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID)?.trim() ||
     process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID?.trim()
   );
 }
 
-async function notifyTelegramHashnodePublished(title: string, urlOrMessage: string): Promise<void> {
+async function notifyTelegramBlogPublished(title: string, urlOrMessage: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = resolveTelegramNotifyChatId();
   if (!token || !chatId) return;
   // If urlOrMessage already contains newlines it's a pre-built message, else build one
-  const text = urlOrMessage.includes("\n") ? urlOrMessage : `📰 Hashnode published\n\n${title}\n${urlOrMessage}`;
+  const text = urlOrMessage.includes("\n") ? urlOrMessage : `📰 Daily blog published\n\n${title}\n${urlOrMessage}`;
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
@@ -173,18 +173,18 @@ async function notifyTelegramHashnodePublished(title: string, urlOrMessage: stri
     });
     if (!r.ok) {
       const t = await r.text();
-      console.error("📰 Telegram notify failed:", r.status, t);
+      console.error("📰 Telegram blog-published notify failed:", r.status, t);
     }
   } catch (e) {
-    console.error("📰 Telegram notify error:", e);
+    console.error("📰 Telegram blog-published notify error:", e);
   }
 }
 
-async function notifyTelegramHashnodeFailure(message: string): Promise<void> {
+async function notifyTelegramBlogFailure(message: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = resolveTelegramNotifyChatId();
   if (!token || !chatId) return;
-  const text = `🚨 Hashnode daily FAILED (no Dev.to cross-post until fixed)\n\n${message}`;
+  const text = `🚨 Daily blog FAILED (no Dev.to cross-post until fixed)\n\n${message}`;
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
@@ -197,15 +197,15 @@ async function notifyTelegramHashnodeFailure(message: string): Promise<void> {
     });
     if (!r.ok) {
       const t = await r.text();
-      console.error("📰 Telegram failure notify failed:", r.status, t);
+      console.error("📰 Telegram blog-failure notify failed:", r.status, t);
     }
   } catch (e) {
-    console.error("📰 Telegram failure notify error:", e);
+    console.error("📰 Telegram blog-failure notify error:", e);
   }
 }
 
 /** Rotating briefs — 20 topics. Each has a long-tail keyword and an opinionated, story-driven brief. */
-export const HASHNODE_TOPIC_BRIEFS: Array<{ keyword: string; brief: string }> = [
+export const DAILY_BLOG_TOPIC_BRIEFS: Array<{ keyword: string; brief: string }> = [
   {
     keyword: "Oracle Always Free production AI agents",
     brief:
@@ -367,7 +367,7 @@ async function gql<T>(query: string, variables: Record<string, unknown> | undefi
 }
 
 function statePath(): string {
-  const base = process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data");
+  const base = (process.env.DAILY_BLOG_TOPIC_STATE_DIR ?? process.env.HASHNODE_TOPIC_STATE_DIR) || path.join(process.cwd(), "data");
   if (!fs.existsSync(base)) fs.mkdirSync(base, { recursive: true });
   return path.join(base, "hashnode-last-topic.json");
 }
@@ -388,7 +388,7 @@ function writeTopicIndex(i: number): void {
 
 /** Write published post to data/blog-posts-cache.json so blog-es-bundle can serve it without hitting dev.to's paginated API. */
 export function saveBlogPostCache(entry: { slug: string; title: string; markdown: string; devtoUrl: string; aideazzBlogUrl: string }): void {
-  const cacheFile = path.join(process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data"), "blog-posts-cache.json");
+  const cacheFile = path.join((process.env.DAILY_BLOG_TOPIC_STATE_DIR ?? process.env.HASHNODE_TOPIC_STATE_DIR) || path.join(process.cwd(), "data"), "blog-posts-cache.json");
   let cache: Record<string, typeof entry & { publishedAt: string }> = {};
   try { cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")); } catch { /* first run */ }
   cache[entry.slug] = { ...entry, publishedAt: new Date().toISOString() };
@@ -483,7 +483,7 @@ export async function pushSitemapToGithub(): Promise<void> {
   }
 }
 export function getBlogPostCachePath(): string {
-  return path.join(process.env.HASHNODE_TOPIC_STATE_DIR || path.join(process.cwd(), "data"), "blog-posts-cache.json");
+  return path.join((process.env.DAILY_BLOG_TOPIC_STATE_DIR ?? process.env.HASHNODE_TOPIC_STATE_DIR) || path.join(process.cwd(), "data"), "blog-posts-cache.json");
 }
 
 /** Returns true if this slug already exists in the local cache (= canonical URL collision risk). */
@@ -506,7 +506,7 @@ function getPublishedTopicIndices(): Set<number> {
     if (!fs.existsSync(cacheFile)) return excluded;
     const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, unknown>;
     const publishedSlugs = Object.keys(cache);
-    HASHNODE_TOPIC_BRIEFS.forEach((t, i) => {
+    DAILY_BLOG_TOPIC_BRIEFS.forEach((t, i) => {
       const kSlug = t.keyword.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       if (publishedSlugs.some(s => s.includes(kSlug) || kSlug.includes(s.slice(0, 20)))) {
         excluded.add(i);
@@ -517,10 +517,10 @@ function getPublishedTopicIndices(): Set<number> {
 }
 
 function pickNextTopic(): { index: number; keyword: string; brief: string } {
-  const n = HASHNODE_TOPIC_BRIEFS.length;
+  const n = DAILY_BLOG_TOPIC_BRIEFS.length;
   const prev = readTopicIndex();
   const index = (prev + 1) % n;
-  const t = HASHNODE_TOPIC_BRIEFS[index]!;
+  const t = DAILY_BLOG_TOPIC_BRIEFS[index]!;
   return { index, keyword: t.keyword, brief: t.brief };
 }
 
@@ -694,11 +694,11 @@ async function pickTopicWithGscGap(
   const baseFallback = pickNextTopic();
   const fallback = excludedIndices.has(baseFallback.index)
     ? (() => {
-        const n = HASHNODE_TOPIC_BRIEFS.length;
+        const n = DAILY_BLOG_TOPIC_BRIEFS.length;
         for (let d = 1; d < n; d++) {
           const idx = (baseFallback.index + d) % n;
           if (!excludedIndices.has(idx)) {
-            const t = HASHNODE_TOPIC_BRIEFS[idx]!;
+            const t = DAILY_BLOG_TOPIC_BRIEFS[idx]!;
             return { index: idx, keyword: t.keyword, brief: t.brief };
           }
         }
@@ -708,7 +708,7 @@ async function pickTopicWithGscGap(
   if (!gscQueries.length) return fallback;
   try {
     // Only offer topics not already in the cache
-    const available = HASHNODE_TOPIC_BRIEFS
+    const available = DAILY_BLOG_TOPIC_BRIEFS
       .map((t, i) => ({ i, t }))
       .filter(({ i }) => !excludedIndices.has(i));
     const topics = available.map(({ i, t }) => `${i}: ${t.keyword}`).join("\n");
@@ -723,8 +723,8 @@ async function pickTopicWithGscGap(
     });
     const raw = resp.content[0]?.type === "text" ? resp.content[0].text.trim() : "";
     const idx = parseInt(raw, 10);
-    if (!isNaN(idx) && idx >= 0 && idx < HASHNODE_TOPIC_BRIEFS.length) {
-      const t = HASHNODE_TOPIC_BRIEFS[idx]!;
+    if (!isNaN(idx) && idx >= 0 && idx < DAILY_BLOG_TOPIC_BRIEFS.length) {
+      const t = DAILY_BLOG_TOPIC_BRIEFS[idx]!;
       console.log(`📰 GSC gap analysis: picked topic #${idx} (${t.keyword})`);
       return { index: idx, keyword: t.keyword, brief: t.brief };
     }
@@ -899,7 +899,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     "2) Dev.to (cross-post):",
     devtoUrl,
   ];
-  await notifyTelegramHashnodePublished(finalTitle, lines.join("\n"));
+  await notifyTelegramBlogPublished(finalTitle, lines.join("\n"));
 
   return {
     title: finalTitle,
@@ -937,7 +937,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 //      variants where the only difference is the suffix).
 //   C. notifyTelegramSkipped: dedicated notify so operator always knows when
 //      a daily run was suppressed and why.
-//   D. runDailyHashnodePost wrapped to: try mutex → run inner → always notify
+//   D. runDailyBlogPost wrapped to: try mutex → run inner → always notify
 //      Telegram with success / skip / failure outcome.
 // ============================================================================
 
@@ -946,7 +946,7 @@ function recentPublishCutoffOk(): { ok: true } | { ok: false; reason: string; ho
     const cacheFile = getBlogPostCachePath();
     if (!fs.existsSync(cacheFile)) return { ok: true };
     const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, { publishedAt?: string }>;
-    const minHours = Number(process.env.HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES || "12");
+    const minHours = Number((process.env.DAILY_BLOG_MIN_HOURS_BETWEEN_PUBLISHES ?? process.env.HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES) || "12");
     if (!Number.isFinite(minHours) || minHours <= 0) return { ok: true };
     const cutoffMs = Date.now() - minHours * 60 * 60 * 1000;
     let newest = 0;
@@ -972,7 +972,7 @@ function findPrefixConflict(newSlug: string): { conflict: true; existingSlug: st
     const cacheFile = getBlogPostCachePath();
     if (!fs.existsSync(cacheFile)) return { conflict: false };
     const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, unknown>;
-    const prefixLen = Number(process.env.HASHNODE_DAILY_SLUG_PREFIX_LEN || "30");
+    const prefixLen = Number((process.env.DAILY_BLOG_SLUG_PREFIX_LEN ?? process.env.HASHNODE_DAILY_SLUG_PREFIX_LEN) || "30");
     if (!Number.isFinite(prefixLen) || prefixLen < 8) return { conflict: false };
     const newPrefix = newSlug.slice(0, prefixLen);
     for (const existingSlug of Object.keys(cache)) {
@@ -1009,7 +1009,7 @@ async function notifyTelegramSkipped(reason: string, detail: string): Promise<vo
 
 // Wrapped entry point: guards via mutex + prefix dedup, then runs inner, always
 // notifies Telegram on outcome. The inner runDailyDevToPost is unchanged.
-async function _runDailyHashnodePost_inner_may25(
+async function _runDailyBlogPost_inner_may25(
   deps: { anthropic: Anthropic; model: string; maxTokens: number }
 ): ReturnType<typeof runDailyDevToPost> {
   // Guard 1: sliding-window mutex (any-content, any-trigger-source lockout)
@@ -1023,7 +1023,7 @@ async function _runDailyHashnodePost_inner_may25(
   return await runDailyDevToPost(deps);
 }
 
-export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: string; maxTokens: number }): Promise<{
+export async function runDailyBlogPost(deps: { anthropic: Anthropic; model: string; maxTokens: number }): Promise<{
   title: string;
   url: string;
   slug?: string;
@@ -1033,9 +1033,9 @@ export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: 
   delisted: boolean;
 }> {
   // May 25 2026 FIX: always notify Telegram on outcome (success / skip / failure)
-  // and run mutex/dedup guards via _runDailyHashnodePost_inner_may25.
+  // and run mutex/dedup guards via _runDailyBlogPost_inner_may25.
   try {
-    const result = await _runDailyHashnodePost_inner_may25(deps);
+    const result = await _runDailyBlogPost_inner_may25(deps);
     // Post-publish prefix-conflict check: if the SLUG we just emitted collides
     // with an older slug by prefix, flag it (don't unpublish — Dev.to already
     // accepted it — but warn the operator so they can manually de-list / delete).
@@ -1056,46 +1056,46 @@ export async function runDailyHashnodePost(deps: { anthropic: Anthropic; model: 
     }
     // Real failure — notify Telegram via the existing failure-notify path.
     try {
-      await notifyTelegramHashnodeFailure(msg);
+      await notifyTelegramBlogFailure(msg);
     } catch { /* swallow — we don't want notify failures to mask the original error */ }
     throw err;
   }
 }
 
-export function startHashnodeDailyPublisher(deps: { anthropic: Anthropic; model: string; maxTokens: number }): cron.ScheduledTask | null {
-  if (process.env.HASHNODE_DAILY_ENABLED !== "true") {
-    console.log("📰 Hashnode daily: off (set HASHNODE_DAILY_ENABLED=true to schedule)");
+export function startDailyBlogPublisher(deps: { anthropic: Anthropic; model: string; maxTokens: number }): cron.ScheduledTask | null {
+  if ((process.env.DAILY_BLOG_ENABLED ?? process.env.HASHNODE_DAILY_ENABLED) !== "true") {
+    console.log("📰 Daily blog: off (set DAILY_BLOG_ENABLED=true to schedule)");
     return null;
   }
-  // Default: 14:30 (2:30 PM) every day, America/Panama (UTC−5, Panama City — no DST)
-  const cronExpr = process.env.HASHNODE_DAILY_CRON || "30 14 * * *";
-  const tz = process.env.HASHNODE_DAILY_TZ || "America/Panama";
+  // Default: 14:30 (2:30 PM) every day, America/Panama (UTC-5, Panama City — no DST)
+  const cronExpr = (process.env.DAILY_BLOG_CRON ?? process.env.HASHNODE_DAILY_CRON) || "30 14 * * *";
+  const tz = (process.env.DAILY_BLOG_TZ ?? process.env.HASHNODE_DAILY_TZ) || "America/Panama";
   const job = cron.schedule(
     cronExpr,
     async () => {
       try {
-        await runDailyHashnodePost(deps);
+        await runDailyBlogPost(deps);
       } catch (e) {
-        console.error("📰 Hashnode daily error:", e);
+        console.error("📰 Daily blog error:", e);
       }
     },
     { timezone: tz }
   );
-  const mode = hashnodeDailyDevToOnly()
-    ? "Dev.to-only (HASHNODE_ACCESS_TOKEN absent or HASHNODE_DAILY_DEVTO_ONLY=true)"
-    : `Hashnode + Dev.to cross-post — listed: ${hashnodeDailyIsDelisted() ? "no (DELISTED)" : "yes"}`;
-  console.log(`📰 Hashnode daily: scheduled ${cronExpr} (${tz}) — mode: ${mode}`);
+  const mode = dailyBlogDevToOnly()
+    ? "Dev.to-only (HASHNODE_ACCESS_TOKEN absent or DAILY_BLOG_DEVTO_ONLY=true)"
+    : `Dev.to + aideazz.xyz cross-post — listed: ${dailyBlogIsDelisted() ? "no (DELISTED)" : "yes"}`;
+  console.log(`📰 Daily blog: scheduled ${cronExpr} (${tz}) — mode: ${mode}`);
 
   // Fire once immediately on startup when HASHNODE_DAILY_RUN_ON_START=true.
   // Useful after deploys to publish without waiting for the next cron window.
-  if (process.env.HASHNODE_DAILY_RUN_ON_START === "true") {
-    console.log("📰 Hashnode daily: HASHNODE_DAILY_RUN_ON_START=true — firing in 10s…");
+  if ((process.env.DAILY_BLOG_RUN_ON_START ?? process.env.HASHNODE_DAILY_RUN_ON_START) === "true") {
+    console.log("📰 Daily blog: DAILY_BLOG_RUN_ON_START=true — firing in 10s…");
     setTimeout(async () => {
-      console.log("📰 Hashnode daily: startup run starting…");
+      console.log("📰 Daily blog: startup run starting…");
       try {
-        await runDailyHashnodePost(deps);
+        await runDailyBlogPost(deps);
       } catch (e) {
-        console.error("📰 Hashnode daily (startup run) error:", e);
+        console.error("📰 Daily blog (startup run) error:", e);
       }
     }, 10_000);
   }

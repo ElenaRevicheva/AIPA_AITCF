@@ -135,7 +135,7 @@ async function classifyPainPoints(
     'Oracle Always-Free Stack — 9 AI agents at $0/month',
     'Telegram Bot Ecosystem — 5 bots for ops',
     'Atuona Creative AI — poetry, image, video generation',
-    'Hashnode Auto-Publisher — daily AI tech articles',
+    'Daily Blog Auto-Publisher — daily AI tech articles',
   ];
 
   const companyList = companies

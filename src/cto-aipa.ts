@@ -17,10 +17,10 @@ import {
 import { initTelegramBot, sendTelegramBroadcast } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
 import {
-  startHashnodeDailyPublisher,
-  runDailyHashnodePost,
-  HASHNODE_TOPIC_BRIEFS,
-  hashnodeDailyIsDelisted,
+  startDailyBlogPublisher,
+  runDailyBlogPost,
+  DAILY_BLOG_TOPIC_BRIEFS,
+  dailyBlogIsDelisted,
 } from './daily-blog-publisher';
 import { getOrCreateSpanishBundle, readCachedSpanishMeta } from './blog-es-bundle';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
@@ -811,7 +811,7 @@ async function startCTOAIPA() {
         'CMO Integration (LinkedIn Announcements)',
         'AIdeazz Ecosystem Awareness (NEW!)',
         'Telegram Bot (Chat from phone!)',
-        'Hashnode daily article (opt-in, HASHNODE_DAILY_ENABLED)'
+        'Daily blog article (opt-in, DAILY_BLOG_ENABLED)'
       ],
       endpoints: {
         health: 'GET /',
@@ -880,26 +880,26 @@ async function startCTOAIPA() {
   });
 
   // ==========================================================================
-  // HASHNODE DAILY — long-form article generation + publish (opt-in)
+  // DAILY BLOG — long-form article generation + publish (opt-in)
   // ==========================================================================
 
-  app.get('/hashnode/daily-status', (_req, res) => {
+  app.get('/blog/daily-status', (_req, res) => {
     res.json({
-      enabled: process.env.HASHNODE_DAILY_ENABLED === 'true',
-      cron: process.env.HASHNODE_DAILY_CRON || '30 14 * * *',
-      timezone: process.env.HASHNODE_DAILY_TZ || 'America/Panama',
-      note: 'Default 14:30 Panama City (UTC−5); override HASHNODE_DAILY_CRON / HASHNODE_DAILY_TZ',
-      publicFeed: !hashnodeDailyIsDelisted(),
+      enabled: (process.env.DAILY_BLOG_ENABLED ?? process.env.HASHNODE_DAILY_ENABLED) === 'true',
+      cron: (process.env.DAILY_BLOG_CRON ?? process.env.HASHNODE_DAILY_CRON) || '30 14 * * *',
+      timezone: (process.env.DAILY_BLOG_TZ ?? process.env.HASHNODE_DAILY_TZ) || 'America/Panama',
+      note: 'Default 14:30 Panama City (UTC-5); override DAILY_BLOG_CRON / DAILY_BLOG_TZ',
+      publicFeed: !dailyBlogIsDelisted(),
       delistedNote:
-        'When delisted, Hashnode hides posts from public GraphQL — aideazz.xyz/blog will not list them. Default is listed.',
-      topicCount: HASHNODE_TOPIC_BRIEFS.length,
-      manualTriggerConfigured: !!process.env.HASHNODE_DAILY_TRIGGER_SECRET,
-      articleModel: process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic,
+        'When delisted, the publish path skips listing the post; aideazz.xyz/blog will not surface it. Default is listed.',
+      topicCount: DAILY_BLOG_TOPIC_BRIEFS.length,
+      manualTriggerConfigured: !!(process.env.DAILY_BLOG_TRIGGER_SECRET ?? process.env.HASHNODE_DAILY_TRIGGER_SECRET),
+      articleModel: (process.env.DAILY_BLOG_ARTICLE_MODEL ?? process.env.HASHNODE_ARTICLE_MODEL) || AI_MODELS.strategic,
     });
   });
 
-  app.post('/hashnode/daily-run', (req, res) => {
-    const secret = process.env.HASHNODE_DAILY_TRIGGER_SECRET;
+  app.post('/blog/daily-run', (req, res) => {
+    const secret = (process.env.DAILY_BLOG_TRIGGER_SECRET ?? process.env.HASHNODE_DAILY_TRIGGER_SECRET);
     if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
       res.status(401).json({
         error: 'Unauthorized',
@@ -909,11 +909,27 @@ async function startCTOAIPA() {
     }
     // Fire-and-forget — Opus generation takes 2-3 min, past nginx timeout.
     res.status(202).json({ ok: true, status: 'started', note: 'Generating in background — check PM2 logs in ~3 min' });
-    const model = process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic;
+    const model = (process.env.DAILY_BLOG_ARTICLE_MODEL ?? process.env.HASHNODE_ARTICLE_MODEL) || AI_MODELS.strategic;
     const maxTok = Math.min(AI_MODELS.maxTokens, 8192);
-    runDailyHashnodePost({ anthropic, model, maxTokens: maxTok })
+    runDailyBlogPost({ anthropic, model, maxTokens: maxTok })
       .then(out => console.log('\U0001f4f0 [manual-run] done:', JSON.stringify(out)))
       .catch(e => console.error('\U0001f4f0 [manual-run] error:', e instanceof Error ? e.message : String(e)));
+  });
+
+  // ==========================================================================
+  // MAY 25 2026 RENAME — deprecated /hashnode/* aliases (preserve any external
+  // webhooks that still target the old route paths). New canonical routes are
+  // /blog/daily-status and /blog/daily-run above.
+  // ==========================================================================
+  app.get('/hashnode/daily-status', (_req, res) => {
+    res.setHeader('X-Deprecation', '/hashnode/daily-status -> /blog/daily-status');
+    res.redirect(307, '/blog/daily-status');
+  });
+  app.post('/hashnode/daily-run', (_req, res) => {
+    res.setHeader('X-Deprecation', '/hashnode/daily-run -> /blog/daily-run');
+    // 307 preserves the POST method + body, so the Authorization header
+    // and any payload flow through to the canonical /blog/daily-run.
+    res.redirect(307, '/blog/daily-run');
   });
 
   // ==========================================================================
@@ -2288,15 +2304,15 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       console.log(`🎭 Ready to create with your Creative Co-Founder!`);
     }
 
-    const articleModel = process.env.HASHNODE_ARTICLE_MODEL || AI_MODELS.strategic;
+    const articleModel = (process.env.DAILY_BLOG_ARTICLE_MODEL ?? process.env.HASHNODE_ARTICLE_MODEL) || AI_MODELS.strategic;
     const maxArticleTokens = Math.min(AI_MODELS.maxTokens, 8192);
-    startHashnodeDailyPublisher({
+    startDailyBlogPublisher({
       anthropic,
       model: articleModel,
       maxTokens: maxArticleTokens,
     });
-    if (process.env.HASHNODE_DAILY_TRIGGER_SECRET) {
-      console.log(`📰 Hashnode manual: POST ${baseUrl}/hashnode/daily-run with Bearer secret`);
+    if ((process.env.DAILY_BLOG_TRIGGER_SECRET ?? process.env.HASHNODE_DAILY_TRIGGER_SECRET)) {
+      console.log(`📰 Daily blog manual: POST ${baseUrl}/blog/daily-run with Bearer secret (deprecated alias: ${baseUrl}/hashnode/daily-run)`);
     }
     if (process.env.MARKETING_INQUIRY_SECRET?.trim()) {
       console.log(`📣 Marketing inquiry: POST ${baseUrl}/marketing/inquiry (Bearer secret); digest ${baseUrl}/marketing/digest-run`);

@@ -8,7 +8,7 @@ async function sendTelegramDigest(text: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId =
     process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID?.trim() ||
-    process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim();
+    (process.env.TELEGRAM_DAILY_BLOG_NOTIFY_CHAT_ID ?? process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID)?.trim();
   if (!token || !chatId) {
     console.warn("📣 Weekly digest: missing TELEGRAM_BOT_TOKEN or chat id");
     return;
@@ -60,7 +60,7 @@ export function startMarketingWeeklyDigest(): void {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId =
     process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID?.trim() ||
-    process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID?.trim();
+    (process.env.TELEGRAM_DAILY_BLOG_NOTIFY_CHAT_ID ?? process.env.TELEGRAM_HASHNODE_NOTIFY_CHAT_ID)?.trim();
   if (!token || !chatId) {
     console.log(
       "📣 Marketing weekly digest: skip (set TELEGRAM_LEADS_DIGEST_CHAT_ID or TELEGRAM_HASHNODE_NOTIFY_CHAT_ID + TELEGRAM_BOT_TOKEN)"

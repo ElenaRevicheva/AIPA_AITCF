@@ -89,7 +89,7 @@ const AIDEAZZ_SYSTEMS: Array<{
     painKeywords: ['creative', 'content creation', 'visual', 'video', 'art', 'generative ai'],
   },
   {
-    name: 'Hashnode Auto-Publisher',
+    name: 'Daily Blog Auto-Publisher',
     description: 'Daily AI-generated technical articles with SEO/GEO optimization — fully automated blog pipeline',
     painKeywords: ['blog', 'content marketing', 'thought leadership', 'publishing', 'seo content'],
   },
