@@ -3,6 +3,7 @@ dotenv.config({ override: true });
 
 import { Bot, Context, InputFile } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
+import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
 import { 
   getRelevantMemory, 
@@ -1086,6 +1087,74 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       await ctx.reply('❌ Failed to save outcome.');
     }
   });
+
+  // MAY 25 2026 (hackathon): autonomous research agent commands
+  // ============================================================================
+  // Powered by Claude tool-use loop over Bright Data SERP API + Web Unlocker
+  // + Scraping Browser. Inspired by Stephen Kimoi's lablab tutorial, adapted
+  // to AIdeazz's production multi-agent context (output flows where the
+  // existing CRM / blog / Telegram plumbing already lives).
+  //
+  // Three modes, three real goals:
+  //   /research_company <name>     → find/qualify CLIENT prospects
+  //   /research_employer <name>    → research a hiring target before applying
+  //   /research_competitor <domain>→ SEO/AEO competitor gap analysis for blog
+  // ============================================================================
+  async function runResearchTelegram(ctx: any, mode: ResearchMode, cmdName: string): Promise<void> {
+    const raw = ctx.message?.text?.replace('/' + cmdName, '').trim() || '';
+    if (!raw) {
+      await ctx.reply(`Usage: /${cmdName} <company-or-domain>\n\nExample: /${cmdName} Cresta`);
+      return;
+    }
+    const startedAt = Date.now();
+    await ctx.reply(`🔍 Researching ${raw} (${mode} mode) via Bright Data + Claude tool-use loop. This typically takes 30-90 seconds.`);
+
+    try {
+      const result = await runResearchAgent(anthropic, raw, mode, { maxToolCalls: 8, timeoutMs: 150_000 });
+      if (!result.ok) {
+        await ctx.reply(`❌ Research failed for ${raw}: ${result.error || 'unknown'}\n\n${result.report.slice(0, 1000)}`);
+        return;
+      }
+
+      const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
+      const header = `📊 *Research: ${raw}* (${mode})\n` +
+        `_${result.toolCalls} BrightData tool calls · ${elapsed}s · model claude-sonnet-4-5_` +
+        (result.truncatedAt ? `\n⚠️ Truncated at ${result.truncatedAt}` : '') +
+        `\n\n`;
+
+      // Telegram caps at 4096 chars. Chunk if needed (preserve markdown by splitting on blank lines).
+      const fullText = header + result.report;
+      const MAX = 4000;
+      if (fullText.length <= MAX) {
+        await ctx.reply(fullText, { parse_mode: 'Markdown' as const });
+      } else {
+        const chunks: string[] = [];
+        let buf = '';
+        for (const para of fullText.split('\n\n')) {
+          if ((buf + '\n\n' + para).length > MAX) {
+            if (buf) chunks.push(buf);
+            buf = para;
+          } else {
+            buf = buf ? buf + '\n\n' + para : para;
+          }
+        }
+        if (buf) chunks.push(buf);
+        for (const c of chunks) {
+          try { await ctx.reply(c, { parse_mode: 'Markdown' as const }); } catch {
+            // If markdown parse fails (special chars in scraped text), retry plain
+            await ctx.reply(c);
+          }
+          await new Promise(r => setTimeout(r, 400));
+        }
+      }
+    } catch (err) {
+      await ctx.reply(`❌ Research agent error: ${(err as Error).message?.slice(0, 300)}`);
+    }
+  }
+
+  bot.command('research_company',    async (ctx) => { await runResearchTelegram(ctx, 'client',     'research_company'); });
+  bot.command('research_employer',   async (ctx) => { await runResearchTelegram(ctx, 'employer',   'research_employer'); });
+  bot.command('research_competitor', async (ctx) => { await runResearchTelegram(ctx, 'competitor', 'research_competitor'); });
 
   // /leads - View business leads
   bot.command('leads', async (ctx) => {
