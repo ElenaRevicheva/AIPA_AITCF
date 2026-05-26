@@ -1167,8 +1167,8 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
       }
 
       const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
-      const header = `📊 *Research: ${raw}* (${mode})\n` +
-        `_${result.toolCalls} BrightData tool calls · ${elapsed}s · model claude-sonnet-4-5_` +
+      const header = `📊 **Research: ${raw}** (${mode})\n` +
+        `${result.toolCalls} BrightData tool calls · ${elapsed}s · model claude-sonnet-4-5` +
         (result.truncatedAt ? `\n⚠️ Truncated at ${result.truncatedAt}` : '') +
         `\n\n`;
 
