@@ -1387,3 +1387,38 @@ change audit.
 2. BRIGHTDATA-WEB-DATA-UNLOCKED-SUBMISSION.md (private repo) — submission kit, paste-ready
 3. AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md — client-pitch depth for context
 4. The 3 Telegram commands themselves — try them once before recording the video
+
+---
+
+## 🆕 May 26 2026 evening — submission clicked + pitch deck shipped + HubSpot fresh verified
+
+### Submission actually clicked Submit on lablab.ai
+- Submitted "Web Data UNLOCKED" hackathon entry from `BRIGHTDATA-WEB-DATA-UNLOCKED-SUBMISSION.md` (commit `45583e0` in `aideazz-private-docs`).
+- Demo platform: "Other" (Telegram bot — no web app demo).
+- Demo URL pasted into form: `https://t.me/aitcf_aideazz_bot`.
+- GitHub repo pasted: `https://github.com/ElenaRevicheva/AIPA_AITCF`.
+- Additional Information field used the paste-ready judge-quickstart block: how to try `/research_company decircle.io`, what makes this different from a tutorial demo, the two repo links (primary code + pitch deck), and the judge-verifiable claims.
+
+### Pitch deck adapted in aideazz repo (commit `f0c8a26`)
+- Source: `public/pitch.html` (with synced `dist/pitch.html`). Output: `pitch-pdf/aideazz-pitch-brightdata-hackathon-2026-05-26.pdf`.
+- 15 slides → exactly **15 A4-landscape PDF pages**, **1.91 MB** (down from a 58 MB first cut by killing per-page raster of the noise SVG + mesh gradient in print CSS only — screen view unchanged).
+- Surgical adaptations: hero hackathon pill (amber gradient, first chip), `9+1` stat with AILA muted blueprint note, agents table title now "9 agents in production. 1 blueprint." with `pm2 list` + `systemctl is-active` verification anchors, NEW Slide 9 (BD hackathon — 4 products mapped to code + autonomous Claude loop + live decircle.io proof stat row + 3 commands + honest scope note), founder timeline row updated to May 2026 with amber "Bright Data Web Data UNLOCKED hackathon submission shipped" line.
+- Honesty sweep across the deck: every "10 agents" / "10 production" / "10-agent" / "10 systems" claim corrected to "9 production + AILA blueprint" (Solution slide tile, Methodology slide tile, Founder timeline, Hero stat, Agents table title — all unified).
+- Print CSS additions (print-only, zero screen impact): tighter padding/font/gap so each slide fits on one page, `page-break-inside: avoid` on tiles, selective override of the existing "hide all .btn in print" rule so SOCIAL/COMMUNITY/WEB3 partnership tiles and the Ask contact tile aren't empty in the PDF.
+- Backups saved locally: `public/pitch.html.backup-2026-05-26` + `dist/pitch.html.backup-2026-05-26` (gitignored; rollback any time).
+- PDF generated via headless Chrome from PowerShell: `chrome.exe --headless=new --disable-gpu --no-pdf-header-footer --print-to-pdf=... file:///D:/.../pitch.html`.
+
+### HubSpot Fresh-today view created in UI (operator-side)
+- Filter: `Last Modified Date = today` (the `Last Activity Date` field only updates on manual activities — notes/emails/calls — and won't catch API-driven property updates from CTO AIPA writers; `Last Modified Date` does).
+- Counter shows 21 deals across multiple agent prefixes (`[CLIENT-CTO-SERP]`, `[CLIENT-CTO-INGEST]`, `[HIRING-VJH-SERP-LEAD]`, `[CLIENT-ALGOM]`) — proves multi-agent attribution + freshness pipeline is healthy live.
+- The submission kit's "25+ actionable deals" claim is conservative; non-destructive freshness audit (`hubspot_freshness_audit.cjs`) confirmed 50 actionable deals at time of submission.
+
+### What this means for the operator-reading-order
+
+Two more entries earned a permanent slot:
+- **The pitch deck PDF** (`aideazz` repo, `pitch-pdf/`) — primary artifact for any pitch / accelerator / founder call going forward. Short URL: `https://github.com/ElenaRevicheva/aideazz/blob/main/pitch-pdf/aideazz-pitch-brightdata-hackathon-2026-05-26.pdf`.
+- **The `Fresh today` HubSpot view** — operator-side daily proof that the engine works without needing to read logs. Click into HubSpot Deals → Fresh today → see the multi-agent attribution at a glance.
+
+### Pattern earned (write this on the wall)
+
+> **"Honesty matters most — and the system rewards it."** The submission text was iteratively rewritten v1 → v7 to remove every "10-agent" puff and unify on "9 production + AILA blueprint" with verification anchors. The pitch deck was surgically re-swept three times to match. The CAREER_FOCUS interview hook now leads with the honesty patch as a feature, not a footnote. Recruiters and accelerators will read the same number ("9") in every artifact — that's the brand.
