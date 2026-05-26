@@ -1390,14 +1390,12 @@ change audit.
 
 ---
 
-## 🆕 May 26 2026 evening — submission clicked + pitch deck shipped + HubSpot fresh verified
+## 🆕 May 25–26 2026 — engine improvements that landed (hackathon was the deadline, not the artifact)
 
-### Submission actually clicked Submit on lablab.ai
-- Submitted "Web Data UNLOCKED" hackathon entry from `BRIGHTDATA-WEB-DATA-UNLOCKED-SUBMISSION.md` (commit `45583e0` in `aideazz-private-docs`).
-- Demo platform: "Other" (Telegram bot — no web app demo).
-- Demo URL pasted into form: `https://t.me/aitcf_aideazz_bot`.
-- GitHub repo pasted: `https://github.com/ElenaRevicheva/AIPA_AITCF`.
-- Additional Information field used the paste-ready judge-quickstart block: how to try `/research_company decircle.io`, what makes this different from a tutorial demo, the two repo links (primary code + pitch deck), and the judge-verifiable claims.
+> **Frame correction.** The Bright Data "Web Data UNLOCKED" hackathon submission was the deadline that forced this work into one week — but what matters for the engine going forward is the permanent improvements that landed in production, not the submission. Read this section as a list of **new engine capabilities that operate every day** regardless of whether the hackathon is remembered.
+
+### Submission (the by-product, not the artifact)
+The hackathon submission was clicked Submit on lablab.ai on May 26. Form fields: demo platform "Other" (Telegram bot), demo URL `https://t.me/aitcf_aideazz_bot`, repo `https://github.com/ElenaRevicheva/AIPA_AITCF`, Additional Information used the paste-ready judge-quickstart. The submission text + pitch deck got iteratively honesty-patched v1 → v7 to remove every "10-agent" puff and unify on "9 production + AILA blueprint." That's the only direct-submission detail worth remembering.
 
 ### Pitch deck adapted in aideazz repo (commit `f0c8a26`)
 - Source: `public/pitch.html` (with synced `dist/pitch.html`). Output: `pitch-pdf/aideazz-pitch-brightdata-hackathon-2026-05-26.pdf`.
@@ -1422,3 +1420,93 @@ Two more entries earned a permanent slot:
 ### Pattern earned (write this on the wall)
 
 > **"Honesty matters most — and the system rewards it."** The submission text was iteratively rewritten v1 → v7 to remove every "10-agent" puff and unify on "9 production + AILA blueprint" with verification anchors. The pitch deck was surgically re-swept three times to match. The CAREER_FOCUS interview hook now leads with the honesty patch as a feature, not a footnote. Recruiters and accelerators will read the same number ("9") in every artifact — that's the brand.
+
+---
+
+## 🔧 Permanent engine improvements landed May 25–26 (operator-daily, not hackathon-only)
+
+These are the **new capabilities the engine has every day forward**. Each one is independently useful even if the lablab submission is never opened again.
+
+### 1. Live web layer is now a first-class engine primitive
+**Before:** the engine could publish content, enrich HubSpot from cached data, and respond to events. Live web research was ad-hoc (paid SerpAPI for queries; Web Unlocker only for HubSpot enrichment; no Scraping Browser; no MCP).
+**Now:** `src/brightdata-enrich.ts` exposes 4 primitives any agent can call:
+- `bdFetch(url)` — Web Unlocker (existed; still the most-used primitive — feeds HubSpot deal enrichment + VJH LinkedIn jobs at 120/cycle)
+- `bdSerpSearch(query)` — SERP API via Web Unlocker proxy + `brd_json=1`. **Replaces paid SerpAPI.** One credential set for everything.
+- `bdScrapingBrowserFetch(url)` — Scraping Browser with `render:true` for JS-gated sites
+- `bdSmartFetch(url)` — orchestrator: try Web Unlocker first, escalate to Scraping Browser only when content is thin/JS-gated. **Cost-aware by default — no manual decisioning needed.**
+
+Plus `.mcp.json` at repo root exposes the Bright Data MCP Server to Claude Code IDE — in-editor live web research without leaving the editor.
+
+**Engine impact:** any new feature that needs live web data calls one of those 4 functions. No more paid-SerpAPI bills, no more "should I escalate to Scraping Browser" decision tree in each writer.
+
+### 2. Autonomous Claude tool-use loop is now a sellable pattern in the codebase
+**Before:** every Claude call was single-shot — system prompt → user prompt → response. The engine had no example of Claude making multi-step tool decisions.
+**Now:** `src/research-agent.ts` is a Claude Sonnet 4.5 tool-use loop that exposes the 3 BD primitives as tools (`bd_serp_search`, `bd_unlock_url`, `bd_scrape_browser`), enforces max 8 calls / 120 s budget, and runs 3 mode-specific system prompts (client / employer / competitor).
+
+**Engine impact:** this is the reference implementation for any future autonomous agent in the codebase. Next time we want "Claude decides what to do until it's done," we copy this pattern instead of inventing one. It's also the technical lift that proves the engine can host autonomous tool-use, not just LLM-in-a-pipeline.
+
+### 3. Three operator-daily Telegram commands wired into `/menu` Business Wiring
+The 3 `/research_*` commands are **permanent operator capabilities**, not hackathon props:
+- `/research_company <name>` — client prospect research → HOT/WARM/COLD verdict + sendable pitch angle. Use case: a new lead lands in HubSpot, fire this to draft the LinkedIn DM in ~90 seconds.
+- `/research_employer <name>` — hiring target research → application angle. Use case: VJH surfaces a lead, fire this to draft the founder-outreach paragraph.
+- `/research_competitor <domain>` — competitor SEO/AEO gap → blog topic suggestions for the daily blog publisher. Use case: weekly content planning loop.
+
+All three positioned at the top of the `/menu` Business Wiring section because they are the headline operator-daily capabilities.
+
+### 4. Lead Brief freshness buckets — operator daily reading habit improvement
+**Before:** the daily Lead Brief at 8 AM Panama could show the same 10 deals for 7 days running. Operator couldn't tell at a glance what landed *today* vs what was *aging*.
+**Now:** `src/lead-triage.ts` `renderDealBuckets()` splits the brief into:
+- 🆕 **NEW** (≤24h) — what landed since yesterday's brief, shown with sub-day age in `m/h`
+- 🔥 **ACTIVE** (1–7d) — currently in flight
+- ⏰ **AGING** (>7d) — close-or-remove prompt
+
+Plus `buildDailyBrief()` now returns `string | null` so quiet days suppress Telegram entirely (no daily noise when nothing is actionable).
+
+**Engine impact:** the operator can read the morning brief in <30 seconds and know what changed. The "freshness is a render concern, not a query concern" pattern is now a sellable rule the team can apply elsewhere.
+
+### 5. Telegram render safety — engine-wide hardening
+**Before:** Telegram replies used MarkdownV1 directly. A long message with rich formatting could trigger `parse entities are too long` or `unsupported tag` errors, killing the response. This actually broke `/research_company decircle.io` once during testing.
+**Now:** `src/telegram-bot.ts` has two new helpers used by every reply path:
+- `mdToHtmlTelegramSafe(text)` — converts Markdown to Telegram-HTML mode safely
+- `safeReply(ctx, text)` — tries HTML first, falls back to plain text on parse error
+
+**Engine impact:** any Telegram reply anywhere in the codebase now uses `safeReply` instead of `ctx.reply`. Future commands can't crash on render formatting issues.
+
+### 6. `/triage` null-brief guard caught by the non-destructive change audit
+After change #4 made `buildDailyBrief` return `string | null`, the `/triage` command would have printed literal `"null"` on quiet days. Caught by `hubspot_freshness_audit.cjs` (a script that exercises all 4 buckets + verifies no test/demo entries in the pipeline). Fix: null-guard with friendly fallback message, same pattern as `/triage_urgent`.
+
+**Engine impact:** the non-destructive change audit script itself is now part of the playbook — run it after any change to lead-triage / hubspot-client / telegram-bot before declaring done.
+
+### 7. `check_oracle_health.sh` jq fix — ended a months-long silent crashloop
+**Before:** the health-check script used `pm2 list | grep -q "status: online"` to verify each PM2 process. But `pm2 list` outputs box-drawing characters around column headers — the literal text `"status: online"` (with colon-space) never matches. The script wrongly concluded `dragontrade-main` was down every 5 minutes and `pm2 restart`ed it. This had been happening **silently for months** — 4,357 startup banners across the logs, zero engagement cycles ever completed because the bot was restarted before any cycle finished.
+**Now:** `/home/ubuntu/check_oracle_health.sh` uses `pm2 jlist | jq -r '.[] | select(.name==$app) | .pm2_env.status'` — structured JSON parsing instead of regex against decorated text.
+
+**Engine impact:** `dragontrade-main` is now at 31+ hour uptime with restart count steady at 1252. The Algom engagement loop on `@reviceva` is **alive for the first time ever** — confirmed cycles fired May 25 with 4 unique real users engaged (@Crypto__fi, @solanamultibuy, @gi_dutraa, @CNBIGBUYS). Pattern earned: **"verify from logs, not config"** — the bot was *configured* correctly all along; what failed was the *health-check observing the config*.
+
+### 8. HubSpot multi-agent attribution proven live (operator-side observability)
+**Before:** HubSpot CRM had multiple agents writing deals (`[CLIENT-CTO-SERP]`, `[CLIENT-CTO-INGEST]`, `[HIRING-VJH-SERP-LEAD]`, `[CLIENT-ALGOM]`, `[ESPALUZ]`, etc.) but no operator-side proof the attribution was actually flowing.
+**Now:** HubSpot UI **"Fresh today"** view created (filter `Last Modified Date = today` — NOT `Last Activity Date` which only updates on manual notes/emails/calls). Counter shows 21 deals across 4+ agent prefixes — visible proof at a glance.
+
+**Engine impact:** operator can verify the multi-agent attribution layer is healthy without running an audit script. Clicked once per day = full daily sanity check.
+
+### 9. Pitch deck restructured with verification anchors — permanent positioning artifact
+`public/pitch.html` in the `aideazz` repo is now the canonical hackathon-week-cleaned deck:
+- 15 slides → 15 A4-landscape PDF pages, 1.91 MB
+- Every "10 agents" claim corrected to "9 production + AILA blueprint" with `pm2 list` + `systemctl is-active` verification anchors
+- NEW Slide 9: Bright Data hackathon — 4 products mapped to code, autonomous loop, live decircle.io stat row, 3 commands, honest scope note
+- Founder timeline May 2026 row with amber "Bright Data Web Data UNLOCKED hackathon submission shipped" line
+- Print CSS additive: each slide fits one page (was 18 pages with 3 half-empty overflow → now 15), and partnership tiles render their links instead of going empty in PDF
+
+**Engine impact:** any future pitch / accelerator / founder call uses this deck. The honesty anchors (`pm2 list` + `systemctl is-active`) are reusable everywhere — they're how any external party verifies our 9-agent claim without taking it on faith.
+
+### Three new sellable rules earned this week (interview / founder-call ammo)
+
+1. **"Yesterday's good code is today's fastest fix."** Research agent reused already-shipped primitives (`bdFetch` was weeks old, the HubSpot prefix convention was a week old, the Telegram `safeReply` pattern was a day old). Hackathon-week effort was 90% orchestration + 10% genuinely new code.
+2. **"Freshness is a render concern, not a query concern."** Lead Brief shipped buckets without changing the query — same data, different render, drastically better operator UX.
+3. **"Verify from logs, not config."** The dragontrade-main crashloop wasn't a config bug — it was a health-check that *observed* the config wrong. Earned at high cost (months of silent restarts).
+
+(Existing sellable rule reaffirmed: **"Honesty matters most — and the system rewards it."**)
+
+### What I would say in the next interview when asked "what did you ship recently?"
+
+> "Last week I added a live web layer to my production AI system — 4 Bright Data primitives wrapped in a `bdSmartFetch` orchestrator that escalates from Web Unlocker to Scraping Browser only when content is JS-gated. On top of that I wrote an autonomous Claude tool-use loop — Claude itself decides which web calls to fire, up to 8 calls / 120s, then stops. Three new operator-daily Telegram commands consume it. I also ended a months-long silent crashloop on my crypto agent by replacing a regex health-check with a structured-JSON one — that bot has been at 31+ hour uptime since the fix, engagement loop alive for the first time. And I refreshed my pitch deck to unify every '10 agents' claim down to the honest '9 production + AILA blueprint' with verification anchors anyone can SSH and check. The hackathon submission was the deadline that forced this into one week. The engine improvements are what stay."
