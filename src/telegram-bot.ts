@@ -1103,6 +1103,53 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
   //   /research_employer <name>    → research a hiring target before applying
   //   /research_competitor <domain>→ SEO/AEO competitor gap analysis for blog
   // ============================================================================
+  // MAY 25 2026 (post-final fix): Telegram-safe Markdown→HTML converter.
+  // Claude returns standard Markdown (**bold**, ## headers, [text](url)) but
+  // Telegram MarkdownV1 doesn't render those. HTML mode does — and it's far
+  // more forgiving than MarkdownV2 for arbitrary content. This converter
+  // handles the subset of Markdown Claude actually emits in research reports.
+  function mdToHtmlTelegramSafe(md: string): string {
+    // 1. HTML-escape first (so any < > & in raw scraped content stays literal)
+    let out = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    // 2. Convert [text](url) → <a href="url">text</a> (links). Skip images.
+    //    Escape internal quotes in url to keep HTML valid.
+    out = out.replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g, (_m, text: string, url: string) => {
+      const safeUrl = url.replace(/"/g, '%22');
+      const safeText = text;
+      return `<a href="${safeUrl}">${safeText}</a>`;
+    });
+
+    // 3. Convert **bold** → <b>bold</b> (must come BEFORE single-asterisk italic).
+    out = out.replace(/\*\*([^*\n]+?)\*\*/g, '<b>$1</b>');
+
+    // 4. Convert `code` → <code>code</code>.
+    out = out.replace(/`([^`\n]+?)`/g, '<code>$1</code>');
+
+    // 5. Convert leading markdown headers (#, ##, ###, ####) → bold lines.
+    //    Telegram has no native headers; bolding the line keeps the hierarchy visible.
+    out = out.replace(/^####\s+(.+)$/gm, '<b>$1</b>');
+    out = out.replace(/^###\s+(.+)$/gm, '<b>$1</b>');
+    out = out.replace(/^##\s+(.+)$/gm, '<b>$1</b>');
+    out = out.replace(/^#\s+(.+)$/gm, '<b>$1</b>');
+
+    return out;
+  }
+
+  // Try HTML reply first; on any parse error fall back to plain text (no parse_mode).
+  // Robust: never raises, never leaves the operator without a reply.
+  async function safeReply(ctx: any, text: string): Promise<void> {
+    try {
+      await ctx.reply(mdToHtmlTelegramSafe(text), { parse_mode: 'HTML' as const });
+    } catch (e) {
+      try {
+        await ctx.reply(text);
+      } catch (e2) {
+        console.error('[research] safeReply: even plain-text reply failed:', (e2 as Error).message);
+      }
+    }
+  }
+
   async function runResearchTelegram(ctx: any, mode: ResearchMode, cmdName: string): Promise<void> {
     const raw = ctx.message?.text?.replace('/' + cmdName, '').trim() || '';
     if (!raw) {
@@ -1125,11 +1172,14 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
         (result.truncatedAt ? `\n⚠️ Truncated at ${result.truncatedAt}` : '') +
         `\n\n`;
 
-      // Telegram caps at 4096 chars. Chunk if needed (preserve markdown by splitting on blank lines).
+      // MAY 25 2026 (post-final fix): use safeReply which renders via HTML
+      // (so **bold** + ## headers + [text](url) actually render) and falls
+      // back to plain text on any parse error. Replaces both the
+      // single-message (no fallback) and chunked-with-fallback paths.
       const fullText = header + result.report;
       const MAX = 4000;
       if (fullText.length <= MAX) {
-        await ctx.reply(fullText, { parse_mode: 'Markdown' as const });
+        await safeReply(ctx, fullText);
       } else {
         const chunks: string[] = [];
         let buf = '';
@@ -1143,10 +1193,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
         }
         if (buf) chunks.push(buf);
         for (const c of chunks) {
-          try { await ctx.reply(c, { parse_mode: 'Markdown' as const }); } catch {
-            // If markdown parse fails (special chars in scraped text), retry plain
-            await ctx.reply(c);
-          }
+          await safeReply(ctx, c);
           await new Promise(r => setTimeout(r, 400));
         }
       }
