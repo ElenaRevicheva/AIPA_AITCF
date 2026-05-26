@@ -1,5 +1,10 @@
 # CTO AIPA — Production AI Code Review & Agent Orchestration System
 
+[![Web Data UNLOCKED](https://img.shields.io/badge/Web%20Data%20UNLOCKED-Bright%20Data%20Hackathon-orange)](https://lablab.ai/ai-hackathons/brightdata-ai-agents-web-data-hackathon) [![Track 1](https://img.shields.io/badge/Track%201-GTM%20Intelligence-blue)](https://lablab.ai/ai-hackathons/brightdata-ai-agents-web-data-hackathon) [![Bright Data](https://img.shields.io/badge/Bright%20Data-4%20products%20in%20production-success)](https://brightdata.com)
+
+> **Web Data UNLOCKED hackathon submission (May 2026):** Track 1 — GTM Intelligence. Four Bright Data products in production (Web Unlocker, SERP API, Scraping Browser, MCP Server) + autonomous Claude tool-use loop exposing them as `/research_company`, `/research_employer`, `/research_competitor` Telegram commands. See [Live Web Data Layer](#-live-web-data-layer-may-2026) below.
+
+
 Single TypeScript service that:
 
 - Automatically reviews every PR and push
@@ -165,6 +170,21 @@ No code review bottlenecks; strategic technical guidance on demand.
 
 ---
 
+## What's new since v4.0 (May 2026 hackathon week)
+
+Six commits this week that turn CTO AIPA into a live-web-powered GTM intelligence system, not just a code-review bot:
+
+- **Autonomous research agent** (`src/research-agent.ts`): Claude tool-use loop exposing Bright Data primitives as agent tools. Three modes — client / employer / competitor — surfaced as `/research_company`, `/research_employer`, `/research_competitor` Telegram commands.
+- **Bright Data 4-product integration** (`src/brightdata-enrich.ts`, `src/serpapi-prospects.ts`, `.mcp.json`): Web Unlocker for enrichment + SERP API for prospect discovery + Scraping Browser for JS-heavy pages + MCP Server for IDE-side use, all sharing one credential set.
+- **HubSpot Lead Brief with freshness buckets** (`src/lead-triage.ts`): daily 8 AM Panama brief in Telegram, grouped 🆕 NEW (≤24h) / 🔥 ACTIVE (1-7d) / ⏰ AGING (>7d). Silent skip on quiet days (zero noise).
+- **Daily blog publisher hardening** (`src/daily-blog-publisher.ts`): sliding-window mutex prevents accidental double-publishes; always-fire Telegram notify on every outcome (success / skip / failure).
+- **dragontrade-main crashloop fix** (separate `dragontrade-agent` repo + Oracle `check_oracle_health.sh`): jq-based pm2 status check replaces a brittle grep that wrongly restarted the bot every 5 minutes for weeks. Engagement loop now runs autonomously, replying to and following real users on `@reviceva`.
+- **Outreach hardening**: bogus-email retry loop fixed in `src/outreach.ts` + `markOutreachDraftStatus` + auto-mark-invalid on Resend 422.
+
+See **`HACKATHON_SUBMISSION.md`** in the private docs repo (`aideazz-private-docs/docs/01-career-applications/Accelerator-Applications/BrightData-WebDataUnlocked-2026/`) for the full submission kit.
+
+---
+
 ## 🚀 How To Use Your CTO
 
 **Quick connect:** See **[docs/CONNECT_TO_CTO_AIPA.md](docs/CONNECT_TO_CTO_AIPA.md)** for all ways to reach your CTO (Telegram, terminal, API, GitHub).
@@ -224,6 +244,8 @@ CTO AIPA uses the **best AI models** for each task:
 | Ask CTO Questions | Claude Opus 4 | Best for strategic thinking |
 | Standard Reviews | Llama 3.3 70B | Fast & free via Groq |
 | Voice Transcription | Whisper (Groq) | Fast & accurate |
+| Autonomous research loop (`/research_*`) | Claude Sonnet 4.5 | Tool-use over Bright Data; balanced cost + reasoning |
+| Lead/employer/competitor live-web data | Bright Data (Web Unlocker, SERP API, Scraping Browser, MCP) | Bypasses bot detection, JS-renders, returns parsed Google JSON |
 
 ### Configuration
 
@@ -236,6 +258,42 @@ MAX_TOKENS=8192
 ```
 
 *(Orchestration, model routing, and data lifecycle are described in the sections at the top.)*
+
+---
+
+## 🌐 Live Web Data Layer (May 2026)
+
+Every agent in this stack that touches the open web does it through Bright Data — one shared `BRIGHTDATA_API_TOKEN` + one zone, four products in production:
+
+| Bright Data product | Where it lives in code | What it does |
+|---|---|---|
+| **Web Unlocker** | `src/brightdata-enrich.ts` — `bdFetch`, `enrichLeadWebsite`, `enrichLinkedInCompany`, `enrichCrunchbase`, `enrichCompanyFull` | Every CLIENT and HIRING HubSpot deal gets auto-enriched with founder names, tech stack, team size, funding scraped from the company's website + LinkedIn + Crunchbase. Also powers VJH LinkedIn Jobs feed (120 jobs/cycle). |
+| **SERP API** | `src/brightdata-enrich.ts` `bdSerpSearch` (Web Unlocker proxy + `brd_json=1`) + `src/serpapi-prospects.ts` `fetchGoogleSearch` | Synchronous Google results parsed as JSON. Replaced the legacy paid SerpAPI competitor. Powers the 6-hour prospect-discovery cron + the on-demand research agent. |
+| **Scraping Browser** | `src/brightdata-enrich.ts` `bdScrapingBrowserFetch` (via `render:true`) + `bdSmartFetch` orchestrator | Full headless browser with JS execution for LinkedIn profile pages and SPAs. `bdSmartFetch` tries Web Unlocker first (cheap), escalates to Scraping Browser only when content is thin or JS-gated. |
+| **MCP Server** | `.mcp.json` at repo root exposes `@brightdata/mcp` to Claude Code | Developer-side: `search_engine`, `scrape_as_markdown`, `discover` tools available from inside Cursor/Claude Code when working on this repo. |
+
+### Autonomous research agent (`src/research-agent.ts`)
+
+Three Telegram commands wrap a Claude tool-use loop that exposes the Bright Data primitives as agent tools (`bd_serp_search`, `bd_unlock_url`, `bd_scrape_browser`). Claude itself decides how many calls to make, which URLs to fetch, when to stop. Budget: max 8 tool calls or 120s per command.
+
+| Command | Mode | Output |
+|---|---|---|
+| `/research_company <name>` | client | Founder, pain signals, decision-maker, sendable pitch angle, HOT/WARM/COLD verdict |
+| `/research_employer <name>` | employer | Recent funding, hiring patterns, tech stack, comp signals, application angle |
+| `/research_competitor <domain>` | competitor | Top-ranking content (last 3 months), 3-5 blog topic gaps, schema/AEO patterns to match or beat |
+
+Live proof (decircle.io, client mode): 86 seconds, 7 Bright Data tool calls, returned a sendable LinkedIn DM pitch angle the operator could copy-paste.
+
+### Signal flow (end-to-end)
+
+```
+External web → Bright Data (Web Unlocker / SERP / Scraping Browser)
+            → Claude (Sonnet 4.5 tool-use loop in research-agent.ts, or Opus 4 in code-review path)
+            → /api/crm-event (unified Bearer-auth hub)
+            → HubSpot deal ([CLIENT-*] / [HIRING-VJH-*] / [CLIENT-ALGOM] prefixes)
+            → HubSpot → Trello current-month "Kira {Mes} 2026" board (urgent stages)
+            → Lead Brief Telegram (8 AM Panama, 🆕 / 🔥 / ⏰ freshness buckets, silent on quiet days)
+```
 
 ---
 
@@ -283,6 +341,10 @@ Chat with your CTO from your phone — now with voice messages!
 | `/explain <concept>` | 📚 Explain any coding concept |
 | `/code <repo> <task>` | 💻 CTO writes code & creates PR! |
 | `/fix <repo> <issue>` | 🔧 CTO fixes bugs & creates PR! |
+| `/research_company <name>` | 🔥 Autonomous Claude + Bright Data research on a CLIENT prospect → sendable pitch angle (~90s) |
+| `/research_employer <name>` | 🎯 Same agent, employer mode → hiring intel + application angle for Elena |
+| `/research_competitor <domain>` | 📚 Same agent, competitor SEO/AEO gap analysis → blog topic suggestions for the daily publisher |
+| `/triage_urgent` | 📥 Lead Brief on demand — HubSpot actionable deals bucketed by freshness (🆕 NEW / 🔥 ACTIVE / ⏰ AGING) |
 | `/stats` | 📊 Ecosystem metrics & weekly activity |
 | `/daily` | ☀️ Get your morning briefing |
 | `/idea <text>` | 💡 Capture startup ideas |
@@ -435,14 +497,17 @@ Single Node/Express process: GitHub webhooks and HTTP API drive the CTO pipeline
 | Storage (50GB) | Oracle Block Storage | $0 |
 | AI - Standard Reviews | Groq (free tier) | $0 |
 | AI - Critical Reviews | Anthropic Claude | ~$0.50 |
-| **Total** | | **< $1/month** |
+| Live web data — enrichment + SERP + Scraping Browser | Bright Data (hackathon credits: $250 promo + $250 MKT through Jun 24 2026) | $0 |
+| Autonomous research agent (Claude Sonnet 4.5 tool-use) | Anthropic Claude | ~$0.10 per /research_* call |
+| **Total** | | **< $1/month** (research calls pay-per-use, ~$0.05–0.10 each) |
 
 ---
 
 ## Roadmap
 
-- [x] v4.0: Code review pipeline, Ask CTO, Oracle persistence, Atuona (persistent creative memory, multi-modal).
-- [ ] Next: Multi-repo learning, custom coding standards.
+- [x] v4.0 (Feb 2026): Code review pipeline, Ask CTO, Oracle persistence, Atuona (persistent creative memory, multi-modal).
+- [x] v4.1 (May 2026 — hackathon week): Live web data layer (4 Bright Data products in one stack), autonomous Claude tool-use research agent (`/research_*` Telegram commands), HubSpot Lead Brief with freshness buckets (🆕 / 🔥 / ⏰), dragontrade-main crashloop permanent fix, outreach bogus-email retry loop fix, daily blog publisher sliding-window mutex + always-fire Telegram notify.
+- [ ] Next: auto-add competitor-mode topic suggestions to `DAILY_BLOG_TOPIC_BRIEFS` rotation; daily SERP rank-tracking cron; wire `/research_company` output to auto-create HubSpot deal notes; CMO LinkedIn engagement return webhook.
 
 ---
 
@@ -535,4 +600,4 @@ LUMA_API_KEY=<your-luma-key>
 
 ---
 
-**Version 4.0.0 | February 2026 | Production**
+**Version 4.1.0 | May 2026 | Production + Live Web Data Layer (Bright Data hackathon week)**
