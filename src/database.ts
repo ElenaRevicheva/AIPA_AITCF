@@ -2671,7 +2671,7 @@ async function markLeadTriagePushed(sourceRefId: string): Promise<boolean> {
     const cleanId = sourceRefId.replace(/-/g, '');
     const result = await connection.execute(
       `UPDATE lead_triage
-         SET status = 'pushed_to_hubspot', updated_at = SYSTIMESTAMP
+         SET status = 'pushed_to_hubspot'
        WHERE source_ref_id = HEXTORAW(:1)
          AND (status IS NULL OR status NOT IN ('pushed_to_hubspot', 'archived', 'dismissed'))`,
       [cleanId],
