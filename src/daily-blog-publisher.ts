@@ -18,6 +18,65 @@ import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
 
+/**
+ * 2026-05-27 — Anthropic-credit-exhaustion resilience.
+ *
+ * Daily blog generation was a single point of failure: a 400 credit-balance
+ * error from Anthropic took the whole publish cycle down. With Elena's tight
+ * Anthropic budget, this would happen multiple days per month and the engine
+ * would silently miss its daily blog post.
+ *
+ * Pattern matches src/lead-triage.ts (the canonical Groq-fallback pattern in
+ * this repo): try Anthropic first → on credit-exhaustion 400, fall through to
+ * Groq `llama-3.3-70b-versatile` (free tier) using the official groq-sdk
+ * (which sets a Cloudflare-compatible UA — bypasses the urllib 1010 bug
+ * documented in EspaLuzWhatsApp/espaluz_bridge.py:2887).
+ *
+ * Non-credit errors re-throw normally so retry logic upstream still works.
+ */
+async function generateTextWithGroqFallback(
+  anthropic: Anthropic,
+  model: string,
+  maxTokens: number,
+  system: string | null,
+  userPrompt: string,
+): Promise<string> {
+  try {
+    const resp = await anthropic.messages.create({
+      model,
+      max_tokens: maxTokens,
+      ...(system ? { system } : {}),
+      messages: [{ role: "user", content: userPrompt }],
+    });
+    const block = resp.content[0];
+    return block && block.type === "text" ? block.text : "";
+  } catch (e: any) {
+    const msg = String(e?.message || e || "");
+    const status = e?.status ?? e?.statusCode ?? null;
+    const isCreditExhaustion =
+      (status === 400 || msg.includes("400")) &&
+      (msg.toLowerCase().includes("credit") || msg.toLowerCase().includes("balance"));
+    const groqKey = process.env.GROQ_API_KEY?.trim();
+    if (!isCreditExhaustion || !groqKey) throw e;
+
+    console.warn("📰 Anthropic credit exhausted on blog generation — falling back to Groq llama-3.3-70b-versatile");
+    const { default: Groq } = await import("groq-sdk");
+    const groq = new Groq({ apiKey: groqKey });
+    const messages: Array<{ role: "system" | "user"; content: string }> = system
+      ? [{ role: "system", content: system }, { role: "user", content: userPrompt }]
+      : [{ role: "user", content: userPrompt }];
+    const groqResp = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages,
+      max_tokens: Math.min(maxTokens, 8000), // Groq max for this model
+      temperature: 0.7,
+    });
+    const reply = groqResp.choices[0]?.message?.content?.trim() || "";
+    if (reply) console.warn(`📰 Groq fallback returned ${reply.length} chars — blog cycle continues`);
+    return reply;
+  }
+}
+
 const GQL = "https://gql.hashnode.com/";
 
 /** Base site where /blog mirrors Hashnode via public GraphQL (see aideazz repo `src/lib/hashnode-public.ts`). */
@@ -831,15 +890,15 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
       console.log(`📰 Dev.to direct: retry ${attempt}/${MAX_GENERATION_ATTEMPTS} (quality gate: ${lastValidationError})`);
     }
 
-    const resp = await deps.anthropic.messages.create({
-      model: deps.model,
-      max_tokens: deps.maxTokens,
-      system: ARTICLE_SYSTEM,
-      messages: [{ role: "user", content: userPrompt }],
-    });
-    const block = resp.content[0];
-    const rawText = block && block.type === "text" ? block.text : "";
-    if (!rawText) throw new Error("Empty model response");
+    // Anthropic with Groq fallback on credit exhaustion (see generateTextWithGroqFallback above)
+    const rawText = await generateTextWithGroqFallback(
+      deps.anthropic,
+      deps.model,
+      deps.maxTokens,
+      ARTICLE_SYSTEM,
+      userPrompt,
+    );
+    if (!rawText) throw new Error("Empty model response (Anthropic + Groq both returned empty)");
 
     parsed = parseArticle(rawText);
     if (!parsed) throw new Error("Could not parse TITLE/MARKDOWN from model output");
