@@ -45,6 +45,18 @@ function bufferOrgId(): string {
   return process.env.BUFFER_ORG_ID?.trim() || DEFAULT_ORG_ID;
 }
 
+/**
+ * Default share mode. `shareNow` publishes immediately (reliable — does not depend on a
+ * configured posting schedule). `addToQueue` requires the channel to have posting-schedule
+ * time slots set up in Buffer, otherwise the post silently lands as a DRAFT (the 2026-05-28
+ * symptom). Override with BUFFER_POST_MODE if a schedule is later configured.
+ */
+type ShareMode = 'addToQueue' | 'shareNow' | 'shareNext' | 'customScheduled' | 'recommendedTime';
+function defaultPostMode(): ShareMode {
+  const m = process.env.BUFFER_POST_MODE?.trim() as ShareMode | undefined;
+  return m || 'shareNow';
+}
+
 function targetServices(): string[] {
   return (process.env.BUFFER_TARGET_SERVICES?.trim() || 'linkedin')
     .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
@@ -127,7 +139,7 @@ export async function bufferCreatePost(opts: {
   dueAt?: string;        // ISO 8601 UTC, only for customScheduled
   saveToDraft?: boolean; // true = goes to Buffer drafts, NOT published
 }): Promise<CreatePostResult> {
-  const mode = opts.mode || 'addToQueue';
+  const mode = opts.mode || defaultPostMode();
   const dueAtField = opts.dueAt ? `, dueAt: ${gqlStr(opts.dueAt)}` : '';
   const draftField = opts.saveToDraft ? `, saveToDraft: true` : '';
   try {
@@ -218,7 +230,7 @@ export interface DistributeResult {
 export async function distributeArticleToBuffer(
   anthropic: Anthropic,
   article: BlogArticle,
-  opts: { dryRun?: boolean; saveToDraft?: boolean; mode?: 'addToQueue' | 'shareNext' | 'customScheduled' | 'recommendedTime' } = {},
+  opts: { dryRun?: boolean; saveToDraft?: boolean; mode?: ShareMode } = {},
 ): Promise<DistributeResult> {
   const channels = await bufferPostableChannels();
   const result: DistributeResult = { article: article.slug, posted: [], skipped: [], dryRun: !!opts.dryRun };
@@ -235,7 +247,7 @@ export async function distributeArticleToBuffer(
     const r = await bufferCreatePost({
       channelId: ch.id,
       text,
-      mode: opts.mode || 'addToQueue',
+      mode: opts.mode || defaultPostMode(),
       ...(opts.saveToDraft ? { saveToDraft: true } : {}),
     });
     result.posted.push(r);
