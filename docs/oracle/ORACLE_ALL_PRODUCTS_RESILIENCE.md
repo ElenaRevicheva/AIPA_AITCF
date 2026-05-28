@@ -1217,3 +1217,56 @@ returned real content. Deployed: `git pull` → `npm run build` → `pm2 restart
 **Pattern earned:** *"graceful degradation is not resilience — a feature that
 silently returns empty when Claude fails never actually ran Groq. Wire the fallback,
 then prove it fires with an isolation test."*
+
+---
+
+## NEW May 28 2026 — Buffer GraphQL social distribution (ADDITIVE, parallel to Make.com CMO)
+
+**Goal.** Turn the daily GEO/SEO/AEO blog output into multi-channel social reach with
+closed-loop attribution, WITHOUT disturbing the existing CMO path.
+
+**Two parallel social paths now exist (by design):**
+1. **VJH CMO → Make.com → Buffer → LinkedIn/IG** (milestone posts) — *unchanged, untouched.*
+2. **cto-aipa → Buffer GraphQL API → LinkedIn** (blog-article distribution) — *new this release.*
+
+They are different processes (`vibejobhunter-web` vs `cto-aipa`) posting different content.
+Only shared resource is the Buffer account posting queue (handled by graceful skip).
+
+**Buffer API facts (verified live 2026-05-28):**
+- Endpoint `https://api.buffer.com`, auth `Authorization: Bearer <BUFFER_API_TOKEN>`.
+- Org `6837714cc8be66c3825d0904`. Channels: LinkedIn `68389647d6d25b49a18a0de2`,
+  Instagram `68389b15d6d25b49a1d75b8e`, YouTube `68389437d6d25b49a1665d44`, TikTok (LOCKED).
+- Mutations: `createPost` (input requires `channelId`, `schedulingType: automatic`,
+  `mode: addToQueue|shareNow|shareNext|customScheduled|recommendedTime`, `assets: []`;
+  optional `saveToDraft: true`, `dueAt`), `createIdea`, `editPost`, `deletePost`.
+- **No analytics query** — attribution is UTM-side, not Buffer-side.
+
+**Code (commits `41808c3` Stage A, `6e306c7` Stage B):**
+- `src/buffer-publisher.ts` — standalone module: `bufferGetChannels`, `bufferPostableChannels`,
+  `bufferCreatePost`, `bufferCreateIdea`, `generateSocialVariant` (Claude→Groq via
+  `claudeWithGroqFallback`), `buildUtmLink`, `distributeArticleToBuffer`, `isBufferSocialEnabled`.
+- `scripts/buffer-cli.ts` — manual CLI: `channels | idea | dry | draft | post`.
+- `src/daily-blog-publisher.ts` — ONE added fire-and-forget block after `saveBlogPostCache`,
+  gated on `BUFFER_SOCIAL_ENABLED`, try-catch wrapped (cannot break the blog cycle).
+  Mirrors the existing `blog-static-pages` additive pattern.
+
+**UTM loop (the measurement):** each post carries
+`aideazz.xyz/blog/{slug}?utm_source=linkedin&utm_medium=buffer_cmo&utm_campaign={slug}` →
+click-through → `/marketing/inquiry` → lead-triage → HubSpot. Wires the pending `[CLIENT-CMO]`
+attribution from the UTM side (no LinkedIn API needed).
+
+**Env (gitignored, set local + Oracle):** `BUFFER_API_TOKEN`, `BUFFER_ORG_ID`,
+`BUFFER_TARGET_SERVICES=linkedin`, `BUFFER_SOCIAL_ENABLED=true` (live on Oracle).
+
+**Verified on Oracle:** `createIdea` test OK; `channels` lists 4; `dry` generated a real
+LinkedIn variant w/ UTM link; `draft` created Buffer draft `6a18a026c50122d5a577c8cc`
+(saveToDraft, not published). Build clean, `tsc --noEmit` zero errors, `cto-aipa` online
+after restart. Next daily blog cron (14:30 Panama) auto-distributes via `addToQueue`.
+
+**Safety verification command (run anytime):**
+```bash
+ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/buffer-cli.ts dry"
+```
+
+**Pattern earned:** *"a new distribution arm should be a second parallel path, never a
+rewrite of the working one — gate it off by default, prove it with draft mode, then flip on."*
