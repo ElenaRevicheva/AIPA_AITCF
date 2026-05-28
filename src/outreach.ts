@@ -6,6 +6,7 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback, isAnthropicCreditExhaustion } from './llm-resilience';
 import {
   saveOutreachTargetsBulk,
   updateOutreachTargetStatus,
@@ -318,17 +319,17 @@ The body should use plain text with \\n for line breaks.`;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      const response = await anthropic.messages.create({
-        model: process.env.OUTREACH_MODEL || 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        messages: [{ role: 'user', content: prompt }],
-      });
-
-      const firstBlock = response.content[0];
-      const text = firstBlock && 'text' in firstBlock ? firstBlock.text : '';
+      const text = await claudeWithGroqFallback(
+        anthropic,
+        process.env.OUTREACH_MODEL || 'claude-sonnet-4-20250514',
+        1024,
+        null,
+        prompt,
+        'outreach/email-draft',
+      );
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        console.error('outreach: Claude returned non-JSON:', text.slice(0, 200));
+        console.error('outreach: model returned non-JSON:', text.slice(0, 200));
         return null;
       }
       const parsed = JSON.parse(jsonMatch[0]) as {
@@ -345,10 +346,16 @@ The body should use plain text with \\n for line breaks.`;
 
       return { subject: parsed.subject, body: parsed.body, emailId };
     } catch (e: any) {
+      // Credit exhaustion already handled inside claudeWithGroqFallback (Groq fallback fires
+      // there). If we still reach here it means Groq also failed — don't retry, just bail.
+      if (isAnthropicCreditExhaustion(e)) {
+        console.error('outreach: both Anthropic and Groq failed on credit exhaustion');
+        return null;
+      }
       const status = e?.status ?? e?.statusCode;
       if (retryCodes.has(status) && attempt < maxRetries - 1) {
         const wait = 2000 * (attempt + 1);
-        console.warn(`outreach: Claude ${status} (attempt ${attempt + 1}/${maxRetries}), retrying in ${wait}ms`);
+        console.warn(`outreach: ${status} (attempt ${attempt + 1}/${maxRetries}), retrying in ${wait}ms`);
         await new Promise(r => setTimeout(r, wait));
         continue;
       }

@@ -10,6 +10,7 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback, isAnthropicCreditExhaustion } from './llm-resilience';
 import * as fs from 'fs';
 import * as path from 'path';
 import {
@@ -162,19 +163,17 @@ Return ONLY valid JSON array:
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      const response = await anthropic.messages.create({
-        model: process.env.OUTREACH_MODEL || 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        messages: [{ role: 'user', content: prompt }],
-      });
-
-      const text =
-        response.content[0] && 'text' in response.content[0]
-          ? response.content[0].text
-          : '';
+      const text = await claudeWithGroqFallback(
+        anthropic,
+        process.env.OUTREACH_MODEL || 'claude-sonnet-4-20250514',
+        2048,
+        null,
+        prompt,
+        'prospect-ingest/classify',
+      );
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
-        console.error('[prospect-ingest] Claude returned non-JSON for classification');
+        console.error('[prospect-ingest] Model returned non-JSON for classification');
         return result;
       }
 
@@ -192,14 +191,18 @@ Return ONLY valid JSON array:
       }
       return result;
     } catch (e: any) {
+      if (isAnthropicCreditExhaustion(e)) {
+        console.error('[prospect-ingest] Both Anthropic and Groq failed on credit exhaustion');
+        return result;
+      }
       const status = e?.status ?? e?.statusCode;
       if (retryCodes.has(status) && attempt < maxRetries - 1) {
         const wait = 2000 * (attempt + 1);
-        console.warn(`[prospect-ingest] Claude ${status}, retrying in ${wait}ms`);
+        console.warn(`[prospect-ingest] ${status}, retrying in ${wait}ms`);
         await new Promise((r) => setTimeout(r, wait));
         continue;
       }
-      console.error('[prospect-ingest] Claude classification error:', e);
+      console.error('[prospect-ingest] Classification error:', e);
       return result;
     }
   }

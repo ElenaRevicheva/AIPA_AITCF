@@ -25,6 +25,7 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import {
   hunterDomainSearch,
   importTargets,
@@ -101,16 +102,12 @@ Return ONLY valid JSON array (no prose, no markdown):
 If no clear prospects found, return: []`;
 
   try {
-    const resp = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 2048,
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    const raw = resp.content[0]?.type === 'text' ? resp.content[0].text.trim() : '';
+    const raw = await claudeWithGroqFallback(
+      anthropic, 'claude-3-5-haiku-20241022', 2048, null, prompt, 'doc-ingest/extract'
+    );
     const match = raw.match(/\[[\s\S]*\]/);
     if (!match) {
-      console.warn('[doc-ingest] Claude returned no JSON array');
+      console.warn('[doc-ingest] Model returned no JSON array');
       return [];
     }
     const parsed = JSON.parse(match[0]) as DocProspect[];

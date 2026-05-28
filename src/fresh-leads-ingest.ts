@@ -14,6 +14,7 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import { getOutreachTargetByCompany, saveOutreachTargetsBulk } from './database';
 import { pushLeadToHubSpot } from './hubspot-client';
 import { batchEnrichLeads, isBrightDataConfigured } from './brightdata-enrich';
@@ -303,12 +304,9 @@ Return ONLY valid JSON array:
 [{"company":"Name","painPoint":"...","matchedSystem":"SystemName"},...]`;
 
   try {
-    const resp = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }],
-    });
-    const text = resp.content[0] && 'text' in resp.content[0] ? resp.content[0].text : '';
+    const text = await claudeWithGroqFallback(
+      anthropic, 'claude-haiku-4-5-20251001', 1500, null, prompt, 'fresh-leads/pain-classify'
+    );
     const match = text.match(/\[[\s\S]*\]/);
     if (!match) return result;
     const parsed = JSON.parse(match[0]) as Array<{ company: string; painPoint: string; matchedSystem: string }>;

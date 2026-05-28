@@ -10,6 +10,7 @@
  *   TRELLO_TOKEN     — generated at https://trello.com/1/authorize?expiration=never&scope=read,write&response_type=token&key=YOUR_KEY
  */
 import Anthropic from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -156,14 +157,9 @@ export async function analyzeKanban(): Promise<string> {
 
   const prompt = `${KANBAN_ANALYSIS_PROMPT}\n\n# Your Trello workspace (${boards.length} boards, ${totalCards} total cards)\n\n${boardsText}`;
 
-  const msg = await anthropic.messages.create({
-    model: 'claude-opus-4-20250514',
-    max_tokens: 4096,
-    messages: [{ role: 'user', content: prompt }],
-  });
-
-  const block = msg.content[0];
-  return block && block.type === 'text' ? block.text : '(no analysis returned)';
+  return await claudeWithGroqFallback(
+    anthropic, 'claude-opus-4-20250514', 4096, null, prompt, 'trello-kanban/analyze'
+  ) || '(no analysis returned)';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

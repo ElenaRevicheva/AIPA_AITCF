@@ -5,6 +5,7 @@ import { Bot, Context, InputFile } from 'grammy';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import { 
   getRelevantMemory, 
   saveMemory,
@@ -1460,12 +1461,9 @@ Context: Elena builds AI automations — Telegram/WhatsApp bots, outreach pipeli
 
 Return ONLY the message text. No subject line. No "Hi [Name]" opener that requires a name. Start with a hook about their company or industry.`;
 
-      const resp = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 200,
-        messages: [{ role: 'user', content: prompt }],
-      });
-      const draft = resp.content[0]?.type === 'text' ? resp.content[0].text.trim() : 'Could not generate draft.';
+      const draft = (await claudeWithGroqFallback(
+        anthropic, 'claude-haiku-4-5-20251001', 200, null, prompt, 'telegram-bot/linkedin-draft'
+      )).trim() || 'Could not generate draft.';
 
       const searchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(company + ' founder CEO')}&origin=GLOBAL_SEARCH_HEADER`;
 

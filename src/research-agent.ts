@@ -28,6 +28,8 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import Groq from 'groq-sdk';
+import { isAnthropicCreditExhaustion, GROQ_FALLBACK_MODEL } from './llm-resilience';
 import { bdSerpSearch, bdFetch, bdScrapingBrowserFetch, isBrightDataConfigured } from './brightdata-enrich';
 
 export type ResearchMode = 'client' | 'employer' | 'competitor';
@@ -234,6 +236,33 @@ export async function runResearchAgent(
         messages,
       });
     } catch (err) {
+      if (isAnthropicCreditExhaustion(err)) {
+        const groqKey = process.env.GROQ_API_KEY?.trim();
+        if (groqKey) {
+          try {
+            console.warn('[research-agent] Anthropic credit exhausted mid-loop — Groq single-shot fallback');
+            const groq = new Groq({ apiKey: groqKey });
+            const gathered = messages
+              .slice(0, 12)
+              .map((m) => (typeof m.content === 'string' ? m.content : JSON.stringify(m.content)))
+              .join('\n\n')
+              .slice(0, 12000);
+            const groqResp = await groq.chat.completions.create({
+              model: GROQ_FALLBACK_MODEL,
+              messages: [{ role: 'user', content: `Based on this research gathered so far for "${query}" (mode: ${mode}), write the best possible structured report you can:\n\n${gathered}\n\nReturn the final report now.` }],
+              max_tokens: 2048,
+              temperature: 0.3,
+            });
+            const fallbackReport = groqResp.choices[0]?.message?.content?.trim() || '';
+            if (fallbackReport) {
+              console.warn(`[research-agent] Groq fallback returned ${fallbackReport.length} chars`);
+              return { query, mode, ok: true, report: fallbackReport, toolCalls, durationMs: Date.now() - started, truncatedAt: 'tool_cap', error: 'groq_fallback' };
+            }
+          } catch (groqErr) {
+            console.error('[research-agent] Groq fallback also failed:', (groqErr as Error).message);
+          }
+        }
+      }
       return {
         query, mode, ok: false, report: `Claude API error: ${(err as Error).message?.slice(0, 300)}`,
         toolCalls, durationMs: Date.now() - started, error: 'claude_api_error',

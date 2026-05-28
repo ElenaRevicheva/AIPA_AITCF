@@ -18,6 +18,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
@@ -556,15 +557,9 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
 
 If isTask is false, still return the full JSON but the other fields can be empty/default.`;
 
-  const response = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 768,
-    system: systemPrompt,
-    messages: [{ role: 'user', content: userPrompt }],
-  });
-
-  const firstBlock = response.content[0];
-  const text = firstBlock && firstBlock.type === 'text' ? (firstBlock as { type: 'text'; text: string }).text : '';
+  const text = await claudeWithGroqFallback(
+    anthropic, 'claude-haiku-4-5-20251001', 768, systemPrompt, userPrompt, 'trello-voice/classify'
+  );
 
   try {
     const parsed = JSON.parse(text.replace(/```json|```/g, '').trim()) as CardClassification;

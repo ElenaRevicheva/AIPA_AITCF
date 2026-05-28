@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import {
   initializeDatabase,
   saveMemory,
@@ -681,14 +682,9 @@ Respond as a supportive technical co-founder would:
 - Suggest next steps when appropriate`;
 
   console.log(`🧠 Using ${AI_MODELS.strategic} for strategic thinking...`);
-  const response = await anthropic.messages.create({
-    model: AI_MODELS.strategic,
-    max_tokens: AI_MODELS.maxTokens,
-    messages: [{ role: 'user', content: prompt }]
-  });
-
-  const firstContent = response.content[0];
-  const answer = firstContent && firstContent.type === 'text' ? firstContent.text : '';
+  const answer = await claudeWithGroqFallback(
+    anthropic, AI_MODELS.strategic, AI_MODELS.maxTokens, null, prompt, 'cto-aipa/strategic-qa'
+  );
 
   await saveMemory('CTO', 'qa', {
     question: request.question,

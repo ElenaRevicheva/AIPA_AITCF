@@ -7,6 +7,7 @@
 
 import Groq from 'groq-sdk';
 import Anthropic from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import {
   getUntriagedLeads,
   getUntriagedOutreachTargets,
@@ -171,23 +172,16 @@ async function classifyLead(
   if (parsed.urgency >= 4 && contextShort) {
     try {
       const refineCtx = truncateTriageContext(lead.context).slice(0, 2500);
-      const claudeResponse = await anthropic.messages.create({
-        model: CLAUDE_MODEL,
-        max_tokens: 150,
-        messages: [
-          {
-            role: 'user',
-            content: `Refine this lead summary to be maximally actionable in one sentence.
+      const refined = await claudeWithGroqFallback(
+        anthropic, CLAUDE_MODEL, 150, null,
+        `Refine this lead summary to be maximally actionable in one sentence.
 Context: ${refineCtx}
 Current summary: ${parsed.one_line_summary}
 Name: ${lead.name}, Source: ${lead.utm_source || lead.source_table}
 Reply with ONLY the improved one-sentence summary, nothing else.`,
-          },
-        ],
-      });
-      const refinedSummary =
-        claudeResponse.content[0]?.type === 'text' ? claudeResponse.content[0].text.trim() : parsed.one_line_summary;
-      parsed.one_line_summary = refinedSummary.substring(0, 500);
+        'lead-triage/refine',
+      );
+      if (refined.trim()) parsed.one_line_summary = refined.trim().substring(0, 500);
     } catch {
       // Keep prior summary
     }

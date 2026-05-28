@@ -17,6 +17,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
+import { claudeWithGroqFallback } from "./llm-resilience";
 
 /**
  * 2026-05-27 — Anthropic-credit-exhaustion resilience.
@@ -772,15 +773,11 @@ async function pickTopicWithGscGap(
       .filter(({ i }) => !excludedIndices.has(i));
     const topics = available.map(({ i, t }) => `${i}: ${t.keyword}`).join("\n");
     if (!topics) return fallback;
-    const resp = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 64,
-      messages: [{
-        role: "user",
-        content: `These are the search queries already bringing traffic to aideazz.xyz:\n${gscQueries.slice(0, 20).join(", ")}\n\nThese are available article topics (index: keyword):\n${topics}\n\nWhich single index number has the biggest gap — i.e. is least represented in the current traffic? Reply with only the integer index.`,
-      }],
-    });
-    const raw = resp.content[0]?.type === "text" ? resp.content[0].text.trim() : "";
+    const raw = await claudeWithGroqFallback(
+      anthropic, "claude-haiku-4-5-20251001", 64, null,
+      `These are the search queries already bringing traffic to aideazz.xyz:\n${gscQueries.slice(0, 20).join(", ")}\n\nThese are available article topics (index: keyword):\n${topics}\n\nWhich single index number has the biggest gap — i.e. is least represented in the current traffic? Reply with only the integer index.`,
+      "daily-blog/topic-picker",
+    );
     const idx = parseInt(raw, 10);
     if (!isNaN(idx) && idx >= 0 && idx < DAILY_BLOG_TOPIC_BRIEFS.length) {
       const t = DAILY_BLOG_TOPIC_BRIEFS[idx]!;

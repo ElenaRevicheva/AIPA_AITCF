@@ -15,6 +15,7 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import {
   hunterDomainSearch,
   importTargets,
@@ -229,12 +230,9 @@ async function classifyPlacesPain(
   const list = places.map((p, i) => `${i + 1}. ${p.name} (${p.address})`).join('\n');
 
   try {
-    const resp = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: `You are a B2B outreach analyst. Context about the business doing outreach: "${clientContext}"
+    const text = await claudeWithGroqFallback(
+      anthropic, 'claude-haiku-4-5-20251001', 1024, null,
+      `You are a B2B outreach analyst. Context about the business doing outreach: "${clientContext}"
 
 For each business below, write ONE sentence describing their likely pain point that the outreach business can solve.
 Industry being targeted: ${places[0]?.industry ?? 'local business'}
@@ -243,10 +241,8 @@ Businesses:
 ${list}
 
 Return ONLY valid JSON array: [{"name":"...","painPoint":"..."}, ...]`,
-      }],
-    });
-
-    const text = resp.content[0]?.type === 'text' ? resp.content[0].text : '';
+      'prospect-places/pain-classify',
+    );
     const match = text.match(/\[[\s\S]*\]/);
     if (!match) return result;
     const parsed = JSON.parse(match[0]) as Array<{ name: string; painPoint: string }>;
