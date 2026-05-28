@@ -1146,3 +1146,74 @@ is in `src/research-agent.ts`.
 **Audit fix (May 25 post-final, commit `4f786d2`):** `/triage` Telegram
 command now guards against `null` return from `buildDailyBrief`. Same
 pattern as `/triage_urgent`. Surfaced by the non-destructive change audit.
+
+---
+
+## NEW May 28 2026 — Groq free-fallback on EVERY Anthropic call site (no agent dies on credit exhaustion)
+
+**Operator goal (verbatim):** "all my agents do not silently die — none of their
+features and functionalities die or hallucinate when I run out of Anthropic tokens —
+let Grok truly work with its fallback."
+
+**Problem.** A resilience audit found the codebase had *some* Groq fallbacks
+(reviewCode, lead-triage, sprint-briefing, atuona, dragontrade, daily-blog
+generation) but **12 Anthropic call sites had NO fallback** — they threw on the
+Anthropic `400 "credit balance is too low"` error and the feature silently died.
+That is why, on credit-exhaustion days, `/research_company`, outreach drafts,
+prospect enrichment, LinkedIn drafts, and several Telegram commands degraded.
+
+**Canonical helper — `src/llm-resilience.ts` (NEW).** One shared module all call
+sites import. Exports:
+- `isAnthropicCreditExhaustion(e)` — true only for `400` + `credit`/`balance`/`billing`
+  (transient 429/503/529 are NOT treated as exhaustion — those still retry upstream).
+- `claudeWithGroqFallback(anthropic, model, maxTokens, system, userPrompt, label)` —
+  try Anthropic → on credit exhaustion route to **Groq `llama-3.3-70b-versatile`**
+  via the official `groq-sdk` (Cloudflare-safe UA — avoids the urllib 1010 bug).
+  Non-credit errors re-throw so existing retry/error handling is unchanged.
+
+**All 12 newly-protected call sites (commit `dbc8b90`):**
+
+| File:fn | Model (primary) | Fallback label |
+|---------|-----------------|----------------|
+| `cto-aipa.ts` askCTO strategic Q&A | Opus | `cto-aipa/strategic-qa` |
+| `lead-triage.ts` urgency≥4 refine | Sonnet | `lead-triage/refine` |
+| `trello-voice.ts` card classify | Haiku | `trello-voice/classify` |
+| `research-agent.ts` tool loop | Sonnet | Groq single-shot summary on exhaustion mid-loop |
+| `daily-blog-publisher.ts` GSC topic picker | Haiku | `daily-blog/topic-picker` |
+| `doc-ingest.ts` prospect extract | Haiku | `doc-ingest/extract` |
+| `fresh-leads-ingest.ts` pain classify | Haiku | `fresh-leads/pain-classify` |
+| `outreach.ts` cold email draft | Sonnet | `outreach/email-draft` (skips retry on exhaustion) |
+| `prospect-ingest.ts` pain scoring | Sonnet | `prospect-ingest/classify` (skips retry on exhaustion) |
+| `prospect-places.ts` places enrich | Haiku | `prospect-places/pain-classify` |
+| `telegram-bot.ts` LinkedIn draft | Haiku | `telegram-bot/linkedin-draft` |
+| `trello-kanban.ts` Kanban analysis | Opus | `trello-kanban/analyze` |
+
+`research-agent.ts` is special: its multi-turn Bright Data tool loop can't run on
+Groq (no tool API parity), so on credit exhaustion it does a **Groq single-shot
+summary** of whatever it gathered so far — returns a usable (if thinner) report
+instead of `ok:false`.
+
+**Already-fixed paths (context, not re-touched):**
+- VJH `src/utils/claude_helper.py` `call_groq_fallback()` — fixed 2026-05-27
+  (urllib→requests + UA; powers resume + cover-letter generation).
+- EspaLuz WhatsApp `espaluz_bridge.py:2891` — fixed 2026-05-27 (same Cloudflare 1010 fix).
+- `daily-blog-publisher.ts` main article generation — `generateTextWithGroqFallback`
+  (commit `84e7486`).
+
+**Verification — isolation test (does NOT touch the live key).**
+`scripts/test-llm-resilience.ts` mocks an Anthropic client that throws the exact
+`400 credit balance` error, then calls `claudeWithGroqFallback` for every label and
+asserts Groq returns a non-empty response. Run on Oracle (where `GROQ_API_KEY` is set):
+
+```bash
+ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/test-llm-resilience.ts"
+```
+
+**Result on Oracle May 28 2026:** `11 passed, 0 failed` — every path logged
+`Anthropic credit exhausted — falling back to Groq llama-3.3-70b-versatile` and
+returned real content. Deployed: `git pull` → `npm run build` → `pm2 restart cto-aipa`
+(online, build clean, `tsc --noEmit` zero errors).
+
+**Pattern earned:** *"graceful degradation is not resilience — a feature that
+silently returns empty when Claude fails never actually ran Groq. Wire the fallback,
+then prove it fires with an isolation test."*
