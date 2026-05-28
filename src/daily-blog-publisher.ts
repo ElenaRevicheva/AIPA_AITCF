@@ -935,6 +935,17 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   // public/blog/{slug}/index.html in aideazz repo; no existing files touched.
   import('./blog-static-pages').then(m => m.pushAllBlogArticlesHtml())
     .catch(e => console.warn("[BlogStatic]", e instanceof Error ? e.message : String(e)));
+
+  // ADDITIVE (May 28 2026): also distribute this article to Buffer (LinkedIn etc.) with a
+  // UTM-tagged link so click-throughs flow into /marketing/inquiry → triage → HubSpot.
+  // Gated behind BUFFER_SOCIAL_ENABLED (default off) and fire-and-forget in a try-catch so a
+  // Buffer outage or bad key can NEVER break the blog publish cycle. Runs in parallel to the
+  // existing VJH CMO → Make.com → Buffer milestone path, which is untouched.
+  import('./buffer-publisher').then(m => {
+    if (!m.isBufferSocialEnabled()) return;
+    return m.distributeArticleToBuffer(deps.anthropic, { slug, title: finalTitle, markdown: parsed!.markdown, aideazzBlogUrl })
+      .then(r => console.log(`📣 [Buffer] article=${r.article} posted=${r.posted.filter(p => p.ok).length}/${r.posted.length} skipped=${r.skipped.length}`));
+  }).catch(e => console.warn("[Buffer]", e instanceof Error ? e.message : String(e)));
   await saveContentLog({
     channel: "devto_direct",
     keyword,
