@@ -1148,7 +1148,7 @@ Social Prospect   →  Engaged  →  Qualified  →  Proposal Sent  →  Closed 
 | **3** | VJH — hiring companies → CRM | Medium | In LangGraph pipeline after job parse: POST company domain + job title to CRM hub | ✅ Live — `src/langgraph_pipeline/crm_hub.py` |
 | **4** | BrightData enrichment | Medium | `src/brightdata-enrich.ts` — scrape company sites for founder/stack/funding before Claude pain classification | ✅ Live — zone `web_unlocker1`, max 10/run, 1 req/s throttle |
 | **5** | CRM hub endpoints | Low | `/api/crm-pipeline/setup` (free-tier strategy) + `/api/crm-pipeline/ids` (read IDs from HubSpot) | ✅ Live |
-| **6** | CMO LinkedIn — Make.com → CRM | Medium | Add Make.com scenario: on LinkedIn post engagement → webhook → `/api/crm-event` | ⏳ Pending |
+| **6** | CMO LinkedIn — blog → Buffer → LinkedIn (UTM) → CRM | Medium | **Realized via Buffer GraphQL API + UTM** (May 28 2026) — see "Buffer social distribution" section below. Outbound + UTM lead capture is ✅ Live. (The narrower inbound "engagement comment/like webhook" remains ⏳ pending — needs paid LinkedIn API.) | ✅ Live (outbound + UTM) |
 | **7** | Sprint Briefing — voice note extraction | High | Claude parses Whisper transcript for company/person names → CRM task | ⏳ Pending |
 | **8** | EspaLuz WhatsApp — business inquiry detection | High | Classify WhatsApp messages: student vs. business inquiry → route business to CRM | ⏳ Pending |
 
@@ -1546,3 +1546,65 @@ now competitor-aware instead of only GSC-aware.**
 
 - Use the research agent's competitor mode output to auto-add topics to `DAILY_BLOG_TOPIC_BRIEFS` (currently manual: copy topic from Telegram → add to file)
 - Add daily SERP rank tracking for "fractional CTO Panama" / "AI marketing engine" / etc. with Telegram alert on movement (uses same `bdSerpSearch`, would be a 1-hour cron add)
+
+---
+
+## Buffer social distribution — blog → LinkedIn auto-publish (May 28 2026, LIVE)
+
+> **Status: LIVE & AUTONOMOUS.** Every daily blog post now auto-publishes to LinkedIn via
+> the Buffer GraphQL API with a UTM-tagged link, with zero manual steps. This is the
+> realized form of **Step 6** (CMO contributing measurable leads). Additive — runs in
+> **parallel** to the existing VJH CMO → Make.com → Buffer milestone path, which is untouched.
+
+### What it does
+
+```
+daily blog cron (14:30 Panama)
+  → publishes to Dev.to + aideazz.xyz            (unchanged)
+  → generates a LinkedIn variant (Claude→Groq)   (new)
+  → publishes to LinkedIn via Buffer API         (new, mode=shareNow)
+  → post text carries:
+     aideazz.xyz/blog/{slug}?utm_source=linkedin&utm_medium=buffer_cmo&utm_campaign={slug}
+  → click-through → /marketing/inquiry → lead-triage → HubSpot
+```
+
+Measurement is **UTM-side**, not Buffer-side: the Buffer API exposes **no analytics query**,
+so attribution flows through the existing UTM → inquiry → HubSpot pipeline (the `[CLIENT-CMO]`
+source). No LinkedIn API needed.
+
+### Code (all in AIPA_AITCF `main`)
+
+- `src/buffer-publisher.ts` — module: `bufferGetChannels`, `bufferPostableChannels`,
+  `bufferCreatePost`, `bufferCreateIdea`, `generateSocialVariant` (uses `claudeWithGroqFallback`),
+  `buildUtmLink`, `distributeArticleToBuffer`, `isBufferSocialEnabled`.
+- `scripts/buffer-cli.ts` — manual CLI: `channels | idea | dry | draft | post`.
+- `src/daily-blog-publisher.ts` — one fire-and-forget, gated, try-catch-wrapped hook after
+  `saveBlogPostCache` (cannot break the blog cycle). Commits `41808c3`, `6e306c7`, `0b46fa5`, `2ec7dd1`.
+
+### Config (env, gitignored — set on Oracle + local)
+
+| Var | Value | Note |
+|-----|-------|------|
+| `BUFFER_API_TOKEN` | (secret) | from publish.buffer.com/settings/api |
+| `BUFFER_ORG_ID` | `6837714cc8be66c3825d0904` | AIdeazz org |
+| `BUFFER_TARGET_SERVICES` | `linkedin` | add `instagram,youtube` to expand |
+| `BUFFER_SOCIAL_ENABLED` | `true` | gate for the auto-hook (live on Oracle) |
+| `BUFFER_POST_MODE` | `shareNow` (default) | `addToQueue` requires a Buffer posting schedule or it silently drafts |
+
+### Key lesson (debug note)
+
+`addToQueue` silently lands posts as **drafts** when the channel has no posting-schedule
+slots configured — invisible in the queue. Default is therefore `shareNow` (publishes
+immediately, no schedule dependency). Verified by querying `post(id).status` → `sent`.
+
+### Channels connected (May 28 2026)
+
+LinkedIn `68389647d6d25b49a18a0de2` · Instagram `68389b15d6d25b49a1d75b8e` ·
+YouTube `68389437d6d25b49a1665d44` · TikTok (locked, plan limit — cannot post).
+
+### Carries forward
+
+- Optionally expand `BUFFER_TARGET_SERVICES` to Instagram/YouTube (note: IG caption links are
+  not clickable, so UTM attribution is weak there — LinkedIn is the high-value channel).
+- Optionally configure a Buffer posting schedule, then switch `BUFFER_POST_MODE=addToQueue`
+  for spaced-out publishing instead of immediate.
