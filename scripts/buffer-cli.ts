@@ -84,7 +84,7 @@ async function main() {
 
   if (cmd === 'post') {
     const r = await distributeArticleToBuffer(anthropic, article, {});
-    console.log(`\n--- QUEUED to Buffer (addToQueue) ---`);
+    console.log(`\n--- SENT to Buffer (mode=${process.env.BUFFER_POST_MODE || 'shareNow'}) ---`);
     for (const p of r.posted) console.log(`  ${p.ok ? 'OK' : 'FAIL'} channel=${p.channelId} ${p.id || p.error}`);
     for (const s of r.skipped) console.log(`  SKIP ${s}`);
     console.log('');
