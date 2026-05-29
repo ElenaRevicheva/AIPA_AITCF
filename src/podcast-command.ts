@@ -16,9 +16,15 @@ import * as path from 'path';
 import { transcribeAndTranslate } from './speechmatics';
 import { buildPodcastPackage } from './podcast-engine';
 import { publishVoiceCampaign } from './voice-campaign-publish';
+import { publishEpisode } from './podcast-publish';
 
 export function isPodcastEngineEnabled(): boolean {
   return process.env.PODCAST_ENGINE_ENABLED?.trim().toLowerCase() === 'true';
+}
+
+/** Separate gate: actually publish the audio episode to the podcast feed (off until 4everland is connected). */
+export function isPodcastPublishEnabled(): boolean {
+  return process.env.PODCAST_PUBLISH_ENABLED?.trim().toLowerCase() === 'true';
 }
 
 /** Download a Telegram file to a Buffer (grammY pattern, mirrors the existing voice handler). */
@@ -65,6 +71,31 @@ export async function runPodcast(ctx: any): Promise<void> {
     await ctx.reply('📡 Publishing the blog + queuing social...');
     const pub = await publishVoiceCampaign(pkg.cluster);
 
+    // Publish the actual audio episode to the podcast feed (gated until 4everland is connected).
+    let episodeUrl: string | null = null;
+    if (isPodcastPublishEnabled()) {
+      try {
+        await ctx.reply('🎧 Publishing the episode to your podcast feed...');
+        const r = await publishEpisode(
+          {
+            id: pkg.cluster.campaignId,
+            title: pkg.cluster.topic,
+            description: pkg.showNotes || pkg.cluster.topic,
+            audioBytes: audio.length,
+            durationSec: transcribed.durationSec || 0,
+            chapters: pkg.chapters,
+            ...(pub.enBlogUrl ? { blogUrl: pub.enBlogUrl } : {}),
+            source: 'voice',
+          },
+          audio,
+        );
+        episodeUrl = r.episodeUrl;
+      } catch (e) {
+        console.warn('[Podcast] episode publish:', e instanceof Error ? e.message : String(e));
+        await ctx.reply(`🎧 (Episode audio publish skipped: ${e instanceof Error ? e.message.slice(0, 120) : 'error'})`);
+      }
+    }
+
     // Save full podcast assets (show notes, chapters, clips, transcript) for reuse.
     const file = path.join(podcastDir(), `${pkg.cluster.campaignId}.json`);
     fs.writeFileSync(file, JSON.stringify({ ...pkg, transcript: transcribed.transcript, segments: transcribed.segments }, null, 2), 'utf8');
@@ -77,6 +108,7 @@ export async function runPodcast(ctx: any): Promise<void> {
       `Topic: ${pkg.cluster.topic} | speakers: ${pkg.speakers}${pkg.durationSec ? ` | ~${Math.round(pkg.durationSec / 60)} min` : ''}`,
       '',
       pub.enBlogUrl ? `📰 Show-notes blog: ${pub.enBlogUrl}` : '📰 Blog: (skipped)',
+      episodeUrl ? `🎧 Episode live: ${episodeUrl}` : '🎧 Episode audio: saved (enable PODCAST_PUBLISH_ENABLED to push to feed)',
       `💼 LinkedIn: ${liOk}/${pub.linkedinPosted.length} queued (1 now, rest dripped)`,
       '',
       '📑 CHAPTERS:',

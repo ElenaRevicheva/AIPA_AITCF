@@ -599,7 +599,8 @@ Type /menu for all commands! 🚀
         { cmd: '/research_employer',   desc: '🎯 NEW (hackathon) — Same agent, employer mode. Recent funding, hiring patterns, tech stack, comp signals, application angle for you.', usage: '/research_employer Cresta\n/research_employer Anthropic' },
         { cmd: '/research_competitor', desc: '📚 NEW (hackathon) — Same agent, SEO/AEO competitor gap analysis. Returns top-ranking content + 3-5 blog topic gaps for your daily publisher.', usage: '/research_competitor brain.fm\n/research_competitor manny-santos.com' },
         { cmd: '/campaign',       desc: '🎙️ NEW — Voice Growth Engine. Reply to any voice note with /campaign → it transcribes + translates (Speechmatics), writes a bilingual blog (EN+ES) + LinkedIn + Instagram posts, publishes the blog + drips LinkedIn via Buffer, all UTM-tagged into HubSpot. Speak once, market everywhere.', usage: 'Send a voice note, then reply to it with:\n/campaign' },
-        { cmd: '/podcast',        desc: '🎧 NEW — Podcast repurposing. Reply to a podcast/interview/long audio with /podcast → speaker-diarized transcript → show notes + timestamped chapters + clip-worthy quotes + a bilingual blog + social posts, published + UTM-tagged. One episode = weeks of content.', usage: 'Send (or forward) an audio file, then reply to it with:\n/podcast' },
+        { cmd: '/podcast',        desc: '🎧 NEW — Podcast repurposing. Reply to a podcast/interview/long audio with /podcast → speaker-diarized transcript → show notes + timestamped chapters + clip-worthy quotes + a bilingual blog + social posts, published + UTM-tagged. With PODCAST_PUBLISH_ENABLED it also publishes the audio episode to your podcast feed. One episode = weeks of content.', usage: 'Send (or forward) an audio file, then reply to it with:\n/podcast' },
+        { cmd: '/podcast_ai',     desc: '🤖🎧 NEW — AI-narrated episode from a topic. Claude writes a script → OpenAI voices it → Speechmatics transcribes for captions/chapters → publishes episode + blog + social. Hands-free, no recording needed.', usage: '/podcast_ai why attribution beats activity for solo founders' },
         { cmd: '/briefing',       desc: '📋 Full business snapshot — agents, leads, EspaLuz, health. Start here every morning.', usage: '/briefing' },
         { cmd: '/outcomes',       desc: '✅ What your AI agents actually did today — posts, leads, emails, revenue.', usage: '/outcomes\n/outcomes cmo' },
         { cmd: '/leads',          desc: '👥 Everyone who has shown interest in working with you — your live client list.', usage: '/leads\n/leads new' },
@@ -1214,6 +1215,9 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
 
   // /podcast - Podcast repurposing: reply to a long audio to get show notes + chapters + clips + bilingual blog + social (additive, gated)
   bot.command('podcast', async (ctx) => { const { runPodcast } = await import('./podcast-command'); await runPodcast(ctx); });
+
+  // /podcast_ai - AI-narrated episode from a topic: script -> TTS -> Speechmatics -> publish (additive, gated)
+  bot.command('podcast_ai', async (ctx) => { const { runPodcastAi } = await import('./podcast-ai-command'); await runPodcastAi(ctx); });
 
   // /leads - View business leads
   bot.command('leads', async (ctx) => {
