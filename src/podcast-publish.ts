@@ -8,7 +8,7 @@
  * Gated by the caller (PODCAST_PUBLISH_ENABLED). Uses the same GITHUB_TOKEN as the blog pipeline.
  */
 
-import { generateFeedXml, generateIndexHtml, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
+import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
 
 const API = 'https://api.github.com';
 
@@ -140,6 +140,9 @@ export async function ensurePodcastRepo(): Promise<boolean> {
   await ghPutFile('episodes.json', Buffer.from('[]').toString('base64'), 'seed: empty manifest');
   await ghPutFile('feed.xml', Buffer.from(generateFeedXml(meta, [])).toString('base64'), 'seed: empty feed');
   await ghPutFile('index.html', Buffer.from(generateIndexHtml(meta, [])).toString('base64'), 'seed: landing page');
+  await ghPutFile('robots.txt', Buffer.from(generateRobotsTxt(meta)).toString('base64'), 'seed: robots.txt');
+  await ghPutFile('sitemap.xml', Buffer.from(generateSitemapXml(meta, [])).toString('base64'), 'seed: sitemap');
+  await ghPutFile('llms.txt', Buffer.from(generateLlmsTxt(meta, [])).toString('base64'), 'seed: llms.txt (AEO)');
   return true;
 }
 
@@ -150,13 +153,58 @@ async function readManifest(): Promise<PodcastEpisode[]> {
 }
 
 function episodePageHtml(meta: PodcastMeta, e: PodcastEpisode): string {
-  const chapters = e.chapters?.length ? '<h3>Chapters</h3><ul>' + e.chapters.map((c) => `<li>${c.time} — ${c.title}</li>`).join('') + '</ul>' : '';
-  return `<!DOCTYPE html><html lang="${meta.language}"><head><meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/><title>${e.title}</title>
-<style>body{background:#0b0d12;color:#e8ecf3;font:16px/1.6 -apple-system,Segoe UI,sans-serif;max-width:720px;margin:0 auto;padding:40px 20px}a{color:#6ee7b7}audio{width:100%;margin:16px 0}</style>
-</head><body><a href="${meta.siteUrl}">← ${meta.title}</a><h1>${e.title}</h1>
-<audio controls src="${e.audioUrl}"></audio><p>${e.description.replace(/</g, '&lt;')}</p>${chapters}
-${e.blogUrl ? `<p><a href="${e.blogUrl}">Full write-up →</a></p>` : ''}</body></html>`;
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const chapters = e.chapters?.length
+    ? '<div class="chapters"><h3>Chapters</h3><ul>' + e.chapters.map((c) => `<li><span class="t">${esc(c.time)}</span> ${esc(c.title)}</li>`).join('') + '</ul></div>'
+    : '';
+  return `<!DOCTYPE html>
+<html lang="${meta.language}"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${esc(e.title)} — ${esc(meta.title)}</title>
+<meta name="description" content="${esc(e.description).slice(0, 160)}"/>
+<meta property="og:title" content="${esc(e.title)}"/>
+<meta property="og:image" content="${meta.coverUrl}"/>
+<meta name="theme-color" content="#05060a"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<style>
+  :root{--bg:#05060a;--txt:#eef1f7;--mut:#9aa3b8;--line:rgba(255,255,255,.08);--a1:#34d399;--a2:#22d3ee;--a3:#a78bfa;
+    --disp:'Space Grotesk',sans-serif;--body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.7;-webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden}
+  .aurora{position:fixed;inset:0;z-index:-1;filter:blur(70px);opacity:.4;overflow:hidden}
+  .aurora span{position:absolute;border-radius:50%;mix-blend-mode:screen}
+  .aurora .b1{width:50vw;height:50vw;left:-12vw;top:-14vw;background:radial-gradient(circle,#34d39988,transparent 60%)}
+  .aurora .b2{width:46vw;height:46vw;right:-12vw;top:0;background:radial-gradient(circle,#a78bfa88,transparent 60%)}
+  .wrap{max-width:720px;margin:0 auto;padding:34px 22px 80px}
+  .back{font-family:var(--mono);font-size:12px;color:var(--mut);text-decoration:none;display:inline-flex;gap:7px;align-items:center}
+  .back:hover{color:var(--a2)}
+  .num{font-family:var(--mono);font-size:12px;color:var(--a2);letter-spacing:.05em;margin:34px 0 10px;display:block}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(28px,5vw,42px);line-height:1.1;letter-spacing:-.02em;margin-bottom:12px}
+  .meta{font-family:var(--mono);font-size:12px;color:var(--mut);margin-bottom:24px}
+  .player{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:28px}
+  audio{width:100%;display:block}
+  .desc{color:var(--mut);font-size:16px;white-space:pre-wrap}
+  .chapters{margin-top:34px;border-top:1px solid var(--line);padding-top:24px}
+  .chapters h3{font-family:var(--disp);font-size:18px;margin-bottom:14px}
+  .chapters ul{list-style:none} .chapters li{padding:9px 0;border-bottom:1px solid var(--line);color:var(--mut)}
+  .chapters .t{font-family:var(--mono);font-size:12px;color:var(--a1);margin-right:12px}
+  .cta{display:inline-flex;align-items:center;gap:7px;margin-top:30px;font-family:var(--disp);font-weight:600;color:var(--a2);text-decoration:none}
+  .cta:hover{gap:11px}
+</style></head>
+<body>
+<div class="aurora"><span class="b1"></span><span class="b2"></span></div>
+<div class="wrap">
+  <a class="back" href="${meta.siteUrl}">&larr; ${esc(meta.title)}</a>
+  <span class="num">${e.source === 'ai' ? 'AI-NARRATED EPISODE' : 'EPISODE'}</span>
+  <h1>${esc(e.title)}</h1>
+  <div class="meta">${new Date(e.pubDate).toDateString()} &middot; ${Math.round((e.durationSec || 0) / 60)} min</div>
+  <div class="player"><audio controls preload="none" src="${e.audioUrl}"></audio></div>
+  <p class="desc">${esc(e.description)}</p>
+  ${chapters}
+  ${e.blogUrl ? `<a class="cta" href="${e.blogUrl}">Read the full write-up &rarr;</a>` : ''}
+</div>
+</body></html>`;
 }
 
 export interface PublishEpisodeResult { episodeUrl: string; feedUrl: string; audioUrl: string }
@@ -177,10 +225,12 @@ export async function publishEpisode(
   const manifest = await readManifest();
   const next = [episode, ...manifest.filter((m) => m.id !== ep.id)];
   await ghPutFile('episodes.json', Buffer.from(JSON.stringify(next, null, 2)).toString('base64'), `episode: ${ep.id} manifest`);
-  // 3. feed + 4. index + 5. episode page
+  // 3. feed + index + episode page + SEO files (sitemap, llms.txt regenerate with the new episode)
   await ghPutFile('feed.xml', Buffer.from(generateFeedXml(meta, next)).toString('base64'), `episode: ${ep.id} feed`);
   await ghPutFile('index.html', Buffer.from(generateIndexHtml(meta, next)).toString('base64'), `episode: ${ep.id} index`);
   await ghPutFile(`episodes/${ep.id}.html`, Buffer.from(episodePageHtml(meta, episode)).toString('base64'), `episode: ${ep.id} page`);
+  await ghPutFile('sitemap.xml', Buffer.from(generateSitemapXml(meta, next)).toString('base64'), `episode: ${ep.id} sitemap`);
+  await ghPutFile('llms.txt', Buffer.from(generateLlmsTxt(meta, next)).toString('base64'), `episode: ${ep.id} llms.txt`);
 
   return { episodeUrl: `${meta.siteUrl}/episodes/${ep.id}.html`, feedUrl: `${meta.siteUrl}/feed.xml`, audioUrl };
 }
@@ -193,6 +243,9 @@ export async function reseedSiteFiles(): Promise<{ feedUrl: string; episodes: nu
   const manifest = await readManifest();
   await ghPutFile('feed.xml', Buffer.from(generateFeedXml(meta, manifest)).toString('base64'), 'reseed: feed');
   await ghPutFile('index.html', Buffer.from(generateIndexHtml(meta, manifest)).toString('base64'), 'reseed: index');
+  await ghPutFile('robots.txt', Buffer.from(generateRobotsTxt(meta)).toString('base64'), 'reseed: robots.txt');
+  await ghPutFile('sitemap.xml', Buffer.from(generateSitemapXml(meta, manifest)).toString('base64'), 'reseed: sitemap');
+  await ghPutFile('llms.txt', Buffer.from(generateLlmsTxt(meta, manifest)).toString('base64'), 'reseed: llms.txt');
   for (const e of manifest) {
     await ghPutFile(`episodes/${e.id}.html`, Buffer.from(episodePageHtml(meta, e)).toString('base64'), `reseed: ${e.id} page`);
   }
