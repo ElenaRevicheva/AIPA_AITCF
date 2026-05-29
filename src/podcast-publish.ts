@@ -67,20 +67,58 @@ async function repoExists(): Promise<boolean> {
   return r.ok;
 }
 
-/** Generate a simple branded 1500x1500 cover PNG (Apple/Spotify require >=1400 square). */
+/** Generate a striking modern 1500x1500 cover PNG (Apple/Spotify require >=1400 square). */
 async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
   const sharp = (await import('sharp')).default;
+  // Concentric audio-orbit rings + gradient mesh, "AI lab" aesthetic. resvg supports gradients/opacity.
+  const rings = Array.from({ length: 7 }, (_, i) => {
+    const r = 150 + i * 78;
+    return `<circle cx="750" cy="620" r="${r}" fill="none" stroke="url(#ring)" stroke-width="2" opacity="${0.5 - i * 0.05}"/>`;
+  }).join('');
+  // a stylized waveform arc of bars around the center
+  const bars = Array.from({ length: 56 }, (_, i) => {
+    const ang = (i / 56) * Math.PI * 2;
+    const base = 250;
+    const len = 26 + Math.abs(Math.sin(i * 1.7)) * 70;
+    const x1 = 750 + Math.cos(ang) * base, y1 = 620 + Math.sin(ang) * base;
+    const x2 = 750 + Math.cos(ang) * (base + len), y2 = 620 + Math.sin(ang) * (base + len);
+    return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="url(#bar)" stroke-width="7" stroke-linecap="round" opacity="0.9"/>`;
+  }).join('');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1500">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0b0d12"/><stop offset="1" stop-color="#1a2030"/></linearGradient></defs>
-    <rect width="1500" height="1500" fill="url(#g)"/>
-    <circle cx="750" cy="560" r="200" fill="none" stroke="#6ee7b7" stroke-width="14"/>
-    <text x="750" y="600" font-family="Arial,sans-serif" font-size="170" fill="#6ee7b7" text-anchor="middle">AIdeazz</text>
-    <text x="750" y="980" font-family="Arial,sans-serif" font-size="78" fill="#e8ecf3" text-anchor="middle">Building in Public</text>
-    <text x="750" y="1080" font-family="Arial,sans-serif" font-size="78" fill="#e8ecf3" text-anchor="middle">with AI</text>
-    <text x="750" y="1320" font-family="Arial,sans-serif" font-size="48" fill="#8b93a7" text-anchor="middle">${meta.author}</text>
+    <defs>
+      <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+        <stop offset="0" stop-color="#101428"/><stop offset="55%" stop-color="#0a0b14"/><stop offset="100%" stop-color="#05060a"/>
+      </radialGradient>
+      <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#34d399"/><stop offset="50%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#a78bfa"/>
+      </linearGradient>
+      <linearGradient id="bar" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#34d399"/><stop offset="100%" stop-color="#a78bfa"/>
+      </linearGradient>
+      <radialGradient id="ring" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#22d3ee"/><stop offset="100%" stop-color="#a78bfa"/>
+      </radialGradient>
+      <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#34d39955"/><stop offset="100%" stop-color="#34d39900"/>
+      </radialGradient>
+    </defs>
+    <rect width="1500" height="1500" fill="url(#bg)"/>
+    <circle cx="750" cy="620" r="430" fill="url(#glow)"/>
+    ${rings}
+    ${bars}
+    <circle cx="750" cy="620" r="150" fill="#0a0b14" stroke="url(#brand)" stroke-width="5"/>
+    <text x="750" y="648" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="120" fill="url(#brand)" text-anchor="middle">AI</text>
+    <text x="750" y="1080" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="118" fill="#eef1f7" text-anchor="middle" letter-spacing="2">AIdeazz</text>
+    <text x="750" y="1175" font-family="Arial,Helvetica,sans-serif" font-size="50" fill="#9aa3b8" text-anchor="middle" letter-spacing="9">BUILDING IN PUBLIC</text>
+    <text x="750" y="1390" font-family="Arial,Helvetica,sans-serif" font-size="42" fill="#6b7488" text-anchor="middle" letter-spacing="3">${meta.author}</text>
   </svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
+}
+
+/** Regenerate + push just the cover art (used when the cover design changes). */
+export async function reseedCover(): Promise<void> {
+  const cover = await generateCoverPng(podcastMeta());
+  await ghPutFile('cover.png', cover.toString('base64'), 'design: refresh cover art');
 }
 
 /** Create + seed the podcast repo if it does not exist. Returns true if it now exists. */
