@@ -8,7 +8,10 @@
  * Gated by the caller (PODCAST_PUBLISH_ENABLED). Uses the same GITHUB_TOKEN as the blog pipeline.
  */
 
-import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, BRAIN_PATHS, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
+import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
+
+/** URL of the real AIdeazz brand icon (the gradient "A" mark in the aideazz.xyz address bar). */
+const BRAND_ICON_URL = process.env.PODCAST_ICON_URL?.trim() || 'https://aideazz.xyz/faviconnew.png';
 
 const API = 'https://api.github.com';
 
@@ -67,35 +70,37 @@ async function repoExists(): Promise<boolean> {
   return r.ok;
 }
 
-/** Generate the AIdeazz-branded 1500x1500 cover PNG (brain mark on purple→pink, like aideazz.xyz). */
+/** Generate the AIdeazz-branded 1500x1500 cover PNG: real "A" icon on purple+yellow, like aideazz.xyz. */
 async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
   const sharp = (await import('sharp')).default;
-  // Brand mark: lucide brain (white) on a purple→pink rounded tile — the exact AIdeazz logo.
-  // Tile 440x440 centered at (750,470); brain 24-unit icon scaled x12 (=288) centered in it.
-  const brainTile = `
-    <rect x="530" y="250" width="440" height="440" rx="92" fill="url(#brand)"/>
-    <g transform="translate(${750 - 144},${470 - 144}) scale(12)" fill="none" stroke="#ffffff" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">${BRAIN_PATHS}</g>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1500">
+  const W = 1500;
+  const bgSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${W}">
     <defs>
-      <radialGradient id="bg" cx="50%" cy="34%" r="80%">
-        <stop offset="0" stop-color="#1a0b2e"/><stop offset="55%" stop-color="#0c0717"/><stop offset="100%" stop-color="#050309"/>
+      <radialGradient id="bg" cx="50%" cy="33%" r="85%">
+        <stop offset="0" stop-color="#1b1033"/><stop offset="55%" stop-color="#0d0820"/><stop offset="100%" stop-color="#06040f"/>
       </radialGradient>
-      <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#9333ea"/><stop offset="55%" stop-color="#c026d3"/><stop offset="100%" stop-color="#db2777"/>
-      </linearGradient>
-      <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0" stop-color="#c026d366"/><stop offset="100%" stop-color="#c026d300"/>
+      <radialGradient id="glow" cx="50%" cy="31%" r="44%">
+        <stop offset="0" stop-color="#a855f755"/><stop offset="62%" stop-color="#facc1522"/><stop offset="100%" stop-color="#00000000"/>
       </radialGradient>
     </defs>
-    <rect width="1500" height="1500" fill="url(#bg)"/>
-    <circle cx="750" cy="470" r="440" fill="url(#glow)"/>
-    ${brainTile}
-    <text x="750" y="980" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="138" text-anchor="middle" letter-spacing="1"><tspan fill="#ffffff">AI</tspan><tspan fill="#c084fc">deazz</tspan></text>
-    <text x="750" y="1078" font-family="Arial,Helvetica,sans-serif" font-size="46" fill="#9aa3b8" text-anchor="middle" letter-spacing="11">BUILDING IN PUBLIC</text>
-    <text x="750" y="1235" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="50" fill="#f472b6" text-anchor="middle" letter-spacing="2">From &#8220;A&#8221; to &#8220;Z&#8221; of building with AI</text>
-    <text x="750" y="1400" font-family="Arial,Helvetica,sans-serif" font-size="42" fill="#6b7488" text-anchor="middle" letter-spacing="3">${meta.author}</text>
+    <rect width="${W}" height="${W}" fill="url(#bg)"/>
+    <circle cx="750" cy="480" r="480" fill="url(#glow)"/>
+    <text x="750" y="990" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="140" text-anchor="middle" letter-spacing="1"><tspan fill="#ffffff">AI</tspan><tspan fill="#c084fc">deazz</tspan></text>
+    <text x="750" y="1088" font-family="Arial,Helvetica,sans-serif" font-size="46" fill="#b9a8e0" text-anchor="middle" letter-spacing="11">BUILDING IN PUBLIC</text>
+    <text x="750" y="1245" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="50" fill="#facc15" text-anchor="middle" letter-spacing="2">From &#8220;A&#8221; to &#8220;Z&#8221; of building with AI</text>
+    <text x="750" y="1405" font-family="Arial,Helvetica,sans-serif" font-size="42" fill="#8a7fb0" text-anchor="middle" letter-spacing="3">${meta.author}</text>
   </svg>`;
-  return sharp(Buffer.from(svg)).png().toBuffer();
+  const bg = await sharp(Buffer.from(bgSvg)).png().toBuffer();
+  // Composite the real AIdeazz "A" icon (faviconnew.png) as the central brand mark.
+  try {
+    const resp = await fetch(BRAND_ICON_URL);
+    if (resp.ok) {
+      const size = 470;
+      const icon = await sharp(Buffer.from(await resp.arrayBuffer())).resize(size, size, { fit: 'cover' }).png().toBuffer();
+      return sharp(bg).composite([{ input: icon, top: 245, left: Math.round((W - size) / 2) }]).png().toBuffer();
+    }
+  } catch { /* fall back to text-only cover */ }
+  return bg;
 }
 
 /** Regenerate + push just the cover art (used when the cover design changes). */
