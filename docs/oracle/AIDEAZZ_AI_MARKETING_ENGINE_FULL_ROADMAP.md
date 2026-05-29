@@ -1652,8 +1652,23 @@ YouTube `68389437d6d25b49a1665d44` · TikTok (locked, plan limit — cannot post
 
 One ~40s synthesized voice note -> campaign `voice-20260529-attribution-over-activity` = 2 blogs (EN + native ES) + 6 social atoms, distinct angles, all UTM-tagged (CLI `cluster` on Oracle).
 
+### Podcast mode — /podcast (May 29 2026, LIVE & ARMED)
+
+`PODCAST_ENGINE_ENABLED=true`. Reply to a podcast/interview/long audio with `/podcast`:
+- Speechmatics transcribes with **speaker diarization** (who-said-what) + timestamps + ES translation.
+- Produces: bilingual blog recap + LinkedIn + IG atoms (reuses the cluster), **show notes**,
+  **timestamped chapters**, **clip-worthy quotes** (near-verbatim, for video clipping), **key takeaways**.
+- Publishes the show-notes blog + drips LinkedIn via Buffer; saves all assets to `data/podcasts/{id}.json`.
+- One episode -> weeks of content. Also a high-demand productized Upwork service.
+- Code: `src/podcast-engine.ts`, `src/podcast-command.ts`; `speechmatics.ts` gained an optional
+  `diarization` param (existing /campaign calls unchanged). Commit `a392680`. Additive: one
+  registration line + one menu entry in telegram-bot.ts.
+- Proven live: 2-speaker clip -> 2 speakers, 3 chapters, 2 clips, 5 takeaways, 2 blogs + 6 social.
+- Inherently manual step: uploading the audio file to a podcast host (Spotify/Apple) to publish
+  the episode itself — the engine produces all the surrounding content + metadata.
+
 ### Deferred (Phase 3)
 
 Native ES-blog static publishing (/es/blog); IG auto-post (needs media); `[CLIENT-CMO-VOICE]`
-HubSpot prefix + outreach personalization; podcast mode (long audio + speaker diarization ->
-show notes + clips + blog). All saved campaign data is in `data/voice-campaigns/`.
+HubSpot prefix + outreach personalization; auto-publish audio to a podcast host (RSS). All saved
+campaign/podcast data is in `data/voice-campaigns/` and `data/podcasts/`.
