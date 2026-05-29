@@ -233,6 +233,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
         <p>Hit Follow and the first drop lands in your app automatically — wherever you listen.</p></div>
       </div>`;
   const countLabel = total ? `${total} episode${total > 1 ? 's' : ''}` : 'Launching soon';
+  const waveBars = Array.from({ length: 72 }, (_, i) => `<span style="animation-delay:${(i * 0.035).toFixed(2)}s"></span>`).join('');
   const jsonLd = generatePodcastJsonLd(meta, sorted);
 
   return `<!DOCTYPE html>
@@ -314,6 +315,12 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   .iconlinks a{color:var(--mut2);transition:.2s}
   .iconlinks a:hover{color:var(--txt);transform:scale(1.12)}
   .iconlinks svg{width:23px;height:23px;display:block}
+  /* flowing equalizer wave */
+  .wave{display:flex;align-items:center;justify-content:center;gap:4px;height:48px;margin:26px 0 4px;opacity:.9;
+    -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .wave span{flex:1;max-width:5px;height:100%;border-radius:4px;background:var(--grad);transform:scaleY(.16);transform-origin:center;animation:eq 1.2s ease-in-out infinite}
+  @keyframes eq{0%,100%{transform:scaleY(.16)}50%{transform:scaleY(1)}}
+  @media(prefers-reduced-motion:reduce){.wave span{animation:none;transform:scaleY(.5)}}
   /* section heads */
   .sec-head{display:flex;align-items:baseline;gap:12px;margin:48px 0 8px}
   .sec-head h2{font-family:var(--brandf);font-size:24px;font-weight:700;letter-spacing:-.01em}
@@ -386,6 +393,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
       <a href="${esc(meta.siteUrl)}/feed.xml" aria-label="RSS"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 11a9 9 0 019 9h-2.5A6.5 6.5 0 004 13.5V11zm0-5a14 14 0 0114 14h-2.5A11.5 11.5 0 004 8.5V6zm2.5 10.5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></a>
     </div>
   </div>
+  <div class="wave">${waveBars}</div>
   <div class="sec-head" id="episodes"><h2>All episodes</h2><span class="count">${countLabel}</span></div>
   ${total ? '<div class="list-cols"><span>#</span><span>Episode</span></div>' : ''}
 ${rows}
