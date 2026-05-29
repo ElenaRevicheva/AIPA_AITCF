@@ -1667,8 +1667,22 @@ One ~40s synthesized voice note -> campaign `voice-20260529-attribution-over-act
 - Inherently manual step: uploading the audio file to a podcast host (Spotify/Apple) to publish
   the episode itself — the engine produces all the surrounding content + metadata.
 
+### Full podcast (auto-publishing feed) — May 29 2026
+
+The actual listenable podcast. New isolated repo `ElenaRevicheva/aideazz-podcast` (created + seeded)
+→ 4everland at `podcast.aideazz.xyz` → Spotify/Apple subscribe to `/feed.xml`.
+- `src/podcast-feed.ts`: RSS 2.0 + iTunes feed + branded landing page (the wrapper).
+- `src/podcast-publish.ts`: ensure/seed repo (cover via sharp) + publishEpisode (commit audio +
+  regen feed/index/page via GitHub API).
+- `/podcast` (real voice) publishes the audio episode; `/podcast_ai <topic>` (Claude script ->
+  OpenAI TTS -> Speechmatics transcribes -> publish). Speechmatics used in BOTH paths.
+- Gated: PODCAST_ENGINE_ENABLED=true, PODCAST_PUBLISH_ENABLED=false (off until 4everland connected).
+- Commit `7a2ee0c`. Additive: new files + repo; 2 registration lines + 2 menu entries.
+- ONE-TIME (Elena): connect repo to 4everland; point podcast.aideazz.xyz DNS; set
+  PODCAST_PUBLISH_ENABLED=true + restart; submit feed.xml to Spotify + Apple.
+
 ### Deferred (Phase 3)
 
 Native ES-blog static publishing (/es/blog); IG auto-post (needs media); `[CLIENT-CMO-VOICE]`
-HubSpot prefix + outreach personalization; auto-publish audio to a podcast host (RSS). All saved
-campaign/podcast data is in `data/voice-campaigns/` and `data/podcasts/`.
+HubSpot prefix + outreach personalization; ffmpeg intro/outro polish. All saved campaign/podcast
+data is in `data/voice-campaigns/` and `data/podcasts/`.
