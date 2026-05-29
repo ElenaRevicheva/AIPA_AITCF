@@ -8,7 +8,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { ensurePodcastRepo, podcastMeta } from '../src/podcast-publish';
+import { ensurePodcastRepo, podcastMeta, reseedSiteFiles } from '../src/podcast-publish';
 
 async function main() {
   const cmd = (process.argv[2] || 'info').toLowerCase();
@@ -31,7 +31,14 @@ async function main() {
     return;
   }
 
-  console.error(`Unknown command: ${cmd}. Use: init | info`);
+  if (cmd === 'reseed') {
+    console.log('Regenerating feed.xml + index.html + episode pages with current site URL...');
+    const r = await reseedSiteFiles();
+    console.log(`Done. Feed: ${r.feedUrl} (${r.episodes} episodes)`);
+    return;
+  }
+
+  console.error(`Unknown command: ${cmd}. Use: init | info | reseed`);
   process.exit(1);
 }
 

@@ -146,3 +146,17 @@ export async function publishEpisode(
 
   return { episodeUrl: `${meta.siteUrl}/episodes/${ep.id}.html`, feedUrl: `${meta.siteUrl}/feed.xml`, audioUrl };
 }
+
+/** Regenerate feed.xml + index.html (+ episode pages) from the current manifest and current
+ * meta/PODCAST_SITE_URL. Use after changing the site URL so all links are consistent. */
+export async function reseedSiteFiles(): Promise<{ feedUrl: string; episodes: number }> {
+  await ensurePodcastRepo();
+  const meta = podcastMeta();
+  const manifest = await readManifest();
+  await ghPutFile('feed.xml', Buffer.from(generateFeedXml(meta, manifest)).toString('base64'), 'reseed: feed');
+  await ghPutFile('index.html', Buffer.from(generateIndexHtml(meta, manifest)).toString('base64'), 'reseed: index');
+  for (const e of manifest) {
+    await ghPutFile(`episodes/${e.id}.html`, Buffer.from(episodePageHtml(meta, e)).toString('base64'), `reseed: ${e.id} page`);
+  }
+  return { feedUrl: `${meta.siteUrl}/feed.xml`, episodes: manifest.length };
+}
