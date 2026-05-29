@@ -20,10 +20,11 @@ export function isVoiceEngineEnabled(): boolean {
   return process.env.VOICE_ENGINE_ENABLED?.trim().toLowerCase() === 'true';
 }
 
-/** Download a Telegram file (voice/audio) to a Buffer via the bot's file link. */
+/** Download a Telegram file (voice/audio) to a Buffer. Mirrors the existing grammY voice handler. */
 async function downloadTelegramFile(ctx: any, fileId: string): Promise<Buffer> {
-  const link = await ctx.telegram.getFileLink(fileId);
-  const res = await fetch(link.href || link.toString());
+  const file = await ctx.api.getFile(fileId);
+  const fileUrl = `https://api.telegram.org/file/bot${process.env.TELEGRAM_BOT_TOKEN}/${file.file_path}`;
+  const res = await fetch(fileUrl);
   if (!res.ok) throw new Error(`file download failed ${res.status}`);
   return Buffer.from(await res.arrayBuffer());
 }
