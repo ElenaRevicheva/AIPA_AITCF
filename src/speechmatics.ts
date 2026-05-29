@@ -46,6 +46,16 @@ export interface TranscribeOptions {
   translateTo?: string[];
   /** Optional domain-specific words to bias recognition (brand names, jargon). */
   customDictionary?: string[];
+  /** Enable speaker diarization (who-said-what) for podcasts/interviews. Additive — off by default. */
+  diarization?: boolean;
+}
+
+/** A timestamped speaker turn — only populated when diarization is requested. */
+export interface SpeakerSegment {
+  speaker: string;   // e.g. "S1"
+  start: number;     // seconds
+  end: number;       // seconds
+  text: string;
 }
 
 export interface TranscribeResult {
@@ -56,6 +66,8 @@ export interface TranscribeResult {
   translations: Record<string, string>;
   /** Rough audio duration in seconds, if reported. */
   durationSec?: number;
+  /** Speaker-labeled timestamped segments — only present when diarization was requested. */
+  segments?: SpeakerSegment[];
 }
 
 /** Build the Speechmatics job config JSON. */
@@ -70,6 +82,9 @@ function buildConfig(opts: TranscribeOptions): string {
   }
   if (opts.customDictionary?.length) {
     transcription_config.additional_vocab = opts.customDictionary.map((w) => ({ content: w }));
+  }
+  if (opts.diarization) {
+    transcription_config.diarization = 'speaker';
   }
   const config: Record<string, unknown> = { type: 'transcription', transcription_config };
   if (opts.translateTo?.length) {
@@ -108,8 +123,31 @@ async function getStatus(jobId: string): Promise<string> {
 
 interface SmTranscriptResponse {
   job?: { duration?: number };
-  results?: Array<{ alternatives?: Array<{ content?: string }>; type?: string }>;
+  results?: Array<{ alternatives?: Array<{ content?: string; speaker?: string }>; type?: string; start_time?: number; end_time?: number }>;
   translations?: Record<string, Array<{ content?: string; type?: string }>>;
+}
+
+/** Group word/punctuation results into speaker turns with timestamps (for diarized audio). */
+function buildSegments(results: NonNullable<SmTranscriptResponse['results']>): SpeakerSegment[] {
+  const segments: SpeakerSegment[] = [];
+  let cur: SpeakerSegment | null = null;
+  for (const r of results) {
+    const alt = r.alternatives?.[0];
+    const content = alt?.content || '';
+    if (!content) continue;
+    const speaker = alt?.speaker || 'S1';
+    const isPunct = r.type === 'punctuation';
+    if (!cur || (!isPunct && speaker !== cur.speaker)) {
+      if (cur) segments.push(cur);
+      cur = { speaker, start: r.start_time ?? 0, end: r.end_time ?? 0, text: content };
+    } else {
+      cur.text += isPunct ? content : ' ' + content;
+      if (r.end_time !== undefined) cur.end = r.end_time;
+    }
+  }
+  if (cur) segments.push(cur);
+  for (const s of segments) s.text = s.text.replace(/\s+([,.;:!?])/g, '$1').trim();
+  return segments;
 }
 
 /** Reassemble plain text from Speechmatics word/punctuation tokens. */
@@ -124,7 +162,7 @@ function joinTokens(tokens: Array<{ content?: string | undefined; type?: string 
   return out.replace(/\s+([,.;:!?])/g, '$1').trim();
 }
 
-async function getResult(jobId: string): Promise<{ transcript: string; translations: Record<string, string>; durationSec?: number }> {
+async function getResult(jobId: string, withSegments: boolean): Promise<{ transcript: string; translations: Record<string, string>; durationSec?: number; segments?: SpeakerSegment[] }> {
   const res = await fetch(`${smBase()}/jobs/${jobId}/transcript?format=json-v2`, {
     headers: { Authorization: `Bearer ${smKey()}` },
   });
@@ -137,11 +175,12 @@ async function getResult(jobId: string): Promise<{ transcript: string; translati
   for (const [lang, toks] of Object.entries(json.translations || {})) {
     translations[lang] = joinTokens(toks);
   }
-  const result: { transcript: string; translations: Record<string, string>; durationSec?: number } = {
+  const result: { transcript: string; translations: Record<string, string>; durationSec?: number; segments?: SpeakerSegment[] } = {
     transcript,
     translations,
   };
   if (json.job?.duration !== undefined) result.durationSec = json.job.duration;
+  if (withSegments) result.segments = buildSegments(json.results || []);
   return result;
 }
 
@@ -157,7 +196,7 @@ export async function transcribeAndTranslate(
   for (let i = 0; i < POLL_MAX_ATTEMPTS; i++) {
     const status = await getStatus(jobId);
     if (status === 'done') {
-      const r = await getResult(jobId);
+      const r = await getResult(jobId, !!opts.diarization);
       return { jobId, ...r };
     }
     if (status === 'rejected' || status === 'deleted') {

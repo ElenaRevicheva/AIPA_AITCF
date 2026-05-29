@@ -17,6 +17,9 @@ import Anthropic from '@anthropic-ai/sdk';
 import { transcribeFile, speechmaticsHealthCheck } from '../src/speechmatics';
 import { buildContentCluster } from '../src/voice-growth-engine';
 import { publishVoiceCampaign } from '../src/voice-campaign-publish';
+import { transcribeAndTranslate } from '../src/speechmatics';
+import { buildPodcastPackage } from '../src/podcast-engine';
+import * as fs from 'fs';
 
 async function main() {
   const cmd = (process.argv[2] || 'health').toLowerCase();
@@ -74,7 +77,25 @@ async function main() {
     return;
   }
 
-  console.error(`Unknown command: ${cmd}. Use: health | transcribe <audio> | cluster <audio> | publish <audio>`);
+  if (cmd === 'podcast') {
+    console.log('Transcribing with diarization + translation...');
+    const r = await transcribeAndTranslate(fs.readFileSync(audio), audio.split(/[\\/]/).pop() || 'audio', { language: 'en', translateTo: ['es'], diarization: true });
+    console.log(`Speakers detected: ${new Set((r.segments || []).map((s) => s.speaker)).size}`);
+    console.log('Building podcast package (no publish)...');
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const pkg = await buildPodcastPackage(anthropic, r, { numSocialPerChannel: 3 });
+    console.log('\n=== SHOW NOTES ===\n' + pkg.showNotes.slice(0, 500));
+    console.log('\n=== CHAPTERS ===');
+    pkg.chapters.forEach((c) => console.log(`  ${c.time}  ${c.title}`));
+    console.log('\n=== CLIPS ===');
+    pkg.clips.forEach((c) => console.log(`  ${c.time}  "${c.quote}" (${c.hook})`));
+    console.log('\n=== TAKEAWAYS ===');
+    pkg.keyTakeaways.forEach((t) => console.log(`  - ${t}`));
+    console.log(`\nBlogs: ${pkg.cluster.blogs.length}, social atoms: ${pkg.cluster.social.length}`);
+    return;
+  }
+
+  console.error(`Unknown command: ${cmd}. Use: health | transcribe <audio> | cluster <audio> | publish <audio> | podcast <audio>`);
   process.exit(1);
 }
 
