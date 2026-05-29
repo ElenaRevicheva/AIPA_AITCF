@@ -1608,3 +1608,52 @@ YouTube `68389437d6d25b49a1665d44` · TikTok (locked, plan limit — cannot post
   not clickable, so UTM attribution is weak there — LinkedIn is the high-value channel).
 - Optionally configure a Buffer posting schedule, then switch `BUFFER_POST_MODE=addToQueue`
   for spaced-out publishing instead of immediate.
+
+---
+
+## AIdeazz Voice Growth Engine — speak once, market everywhere, attributed (May 29 2026)
+
+> **GoHighLevel-style growth OS. LIVE & ARMED** (`VOICE_ENGINE_ENABLED=true` on Oracle).
+> Powered by Speechmatics ($200 free credits). Additive — reuses the blog engine, the
+> Buffer pipeline (May 28), UTM, triage, and HubSpot; runs parallel to the Make.com CMO path.
+
+### The loop
+
+```
+🎙️ voice note (reply to it with /campaign in @aitcf_aideazz_bot)
+  → Speechmatics: transcribe + translate EN->ES in ONE call (handles accents/code-switching)
+  → Atomizer (Claude->Groq): 1 EN blog + 1 ES blog + 3 LinkedIn + 3 IG, each UTM-tagged
+  → EN blog auto-published: Dev.to + aideazz.xyz + per-article static HTML + sitemap (full SEO/GEO/AEO)
+  → LinkedIn atoms dripped via Buffer (1 now, rest scheduled over days)
+  → ES blog + IG atoms saved to data/voice-campaigns/{id}.json for next iteration
+  → every link: utm_campaign=voice-{date}-{topic}, utm_content={angle}
+  → click-through -> /marketing/inquiry -> lead-triage -> HubSpot
+```
+
+### Why it is the maximum-value use of the $200
+
+- **Bilingual multiplier:** one note -> EN + native ES content -> 2x markets (Spanish GEO is wide open). The Whisper layer cannot translate in one call; Speechmatics can.
+- **Atomization:** one note -> 8 content pieces, distinct angles.
+- **Granular attribution:** you learn which ANGLE from which VOICE NOTE closed a lead.
+- **Sellable:** this is a productized "Voice-to-Revenue" service for Upwork clients. The $200 builds Elena's engine AND the client demo.
+- **Economics:** intake ~$0.02-0.08/note -> $200 ≈ thousands of notes. Effectively free perpetual front-end.
+
+### Code (AIPA_AITCF main, all additive)
+
+- `src/speechmatics.ts` — batch ASR + translation (verified live; eu1 region).
+- `src/voice-growth-engine.ts` — atomizer (`buildContentCluster`), UTM builder, integrity rule (never fabricate metrics).
+- `src/voice-campaign-publish.ts` — orchestrator; reuses exported blog + Buffer helpers only.
+- `src/voice-campaign-command.ts` — `/campaign` handler (reply-to a voice note); gated on `VOICE_ENGINE_ENABLED`.
+- `scripts/voice-engine-cli.ts` — `health | transcribe | cluster | publish`.
+- `src/telegram-bot.ts` — ONE dynamic-import registration line (no existing handler modified).
+- Commits: `f513f0a`, `380d335`, `10cbe59`. Env: `SPEECHMATICS_API_KEY`, `SPEECHMATICS_REGION=eu1`, `VOICE_ENGINE_ENABLED`.
+
+### Proven
+
+One ~40s synthesized voice note -> campaign `voice-20260529-attribution-over-activity` = 2 blogs (EN + native ES) + 6 social atoms, distinct angles, all UTM-tagged (CLI `cluster` on Oracle).
+
+### Deferred (Phase 3)
+
+Native ES-blog static publishing (/es/blog); IG auto-post (needs media); `[CLIENT-CMO-VOICE]`
+HubSpot prefix + outreach personalization; podcast mode (long audio + speaker diarization ->
+show notes + clips + blog). All saved campaign data is in `data/voice-campaigns/`.
