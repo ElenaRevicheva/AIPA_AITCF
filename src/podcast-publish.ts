@@ -96,7 +96,14 @@ async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
     const resp = await fetch(BRAND_ICON_URL);
     if (resp.ok) {
       const size = 470;
-      const icon = await sharp(Buffer.from(await resp.arrayBuffer())).resize(size, size, { fit: 'cover' }).png().toBuffer();
+      const raw = Buffer.from(await resp.arrayBuffer());
+      // trim() removes the flat white canvas border so only the rounded icon tile remains.
+      let icon: Buffer;
+      try {
+        icon = await sharp(raw).trim({ threshold: 15 }).resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
+      } catch {
+        icon = await sharp(raw).resize(size, size, { fit: 'cover' }).png().toBuffer();
+      }
       return sharp(bg).composite([{ input: icon, top: 245, left: Math.round((W - size) / 2) }]).png().toBuffer();
     }
   } catch { /* fall back to text-only cover */ }

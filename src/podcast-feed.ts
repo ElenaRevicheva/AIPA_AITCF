@@ -293,7 +293,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0;position:sticky;top:0;z-index:20;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
   .brand{font-family:var(--brandf);font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px;letter-spacing:-.01em}
-  .mark{width:38px;height:38px;border-radius:11px;display:block;box-shadow:0 4px 20px rgba(168,85,247,.5);animation:breathe 4s ease-in-out infinite}
+  .mark{width:38px;height:38px;border-radius:11px;overflow:hidden;display:inline-block;box-shadow:0 4px 20px rgba(168,85,247,.5);animation:breathe 4s ease-in-out infinite}
+  .mark img{width:100%;height:100%;object-fit:cover;transform:scale(1.18);display:block}
   @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
   .wm i{font-style:normal;color:var(--a1)} .wm b{color:var(--a2);font-weight:700}
   .nav-cta{font-family:var(--disp);font-weight:600;font-size:13px;color:#05060a;text-decoration:none;background:var(--grad);padding:9px 17px;border-radius:999px;transition:.25s}
@@ -376,7 +377,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <div class="aurora"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
 <div class="wrap">
   <nav>
-    <span class="brand"><img class="mark" src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/><span class="wm">AI<i>deazz</i><b>·FM</b></span></span>
+    <span class="brand"><span class="mark"><img src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/></span><span class="wm">AI<i>deazz</i><b>·FM</b></span></span>
     <a class="nav-cta" href="#listen">Listen</a>
   </nav>
   <header>
