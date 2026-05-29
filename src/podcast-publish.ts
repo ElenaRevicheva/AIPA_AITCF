@@ -8,7 +8,7 @@
  * Gated by the caller (PODCAST_PUBLISH_ENABLED). Uses the same GITHUB_TOKEN as the blog pipeline.
  */
 
-import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
+import { generateFeedXml, generateIndexHtml, generateRobotsTxt, generateSitemapXml, generateLlmsTxt, BRAIN_PATHS, type PodcastEpisode, type PodcastMeta } from './podcast-feed';
 
 const API = 'https://api.github.com';
 
@@ -67,50 +67,33 @@ async function repoExists(): Promise<boolean> {
   return r.ok;
 }
 
-/** Generate a striking modern 1500x1500 cover PNG (Apple/Spotify require >=1400 square). */
+/** Generate the AIdeazz-branded 1500x1500 cover PNG (brain mark on purple→pink, like aideazz.xyz). */
 async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
   const sharp = (await import('sharp')).default;
-  // Concentric audio-orbit rings + gradient mesh, "AI lab" aesthetic. resvg supports gradients/opacity.
-  const rings = Array.from({ length: 7 }, (_, i) => {
-    const r = 150 + i * 78;
-    return `<circle cx="750" cy="620" r="${r}" fill="none" stroke="url(#ring)" stroke-width="2" opacity="${0.5 - i * 0.05}"/>`;
-  }).join('');
-  // a stylized waveform arc of bars around the center
-  const bars = Array.from({ length: 56 }, (_, i) => {
-    const ang = (i / 56) * Math.PI * 2;
-    const base = 250;
-    const len = 26 + Math.abs(Math.sin(i * 1.7)) * 70;
-    const x1 = 750 + Math.cos(ang) * base, y1 = 620 + Math.sin(ang) * base;
-    const x2 = 750 + Math.cos(ang) * (base + len), y2 = 620 + Math.sin(ang) * (base + len);
-    return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="url(#bar)" stroke-width="7" stroke-linecap="round" opacity="0.9"/>`;
-  }).join('');
+  // Brand mark: lucide brain (white) on a purple→pink rounded tile — the exact AIdeazz logo.
+  // Tile 440x440 centered at (750,470); brain 24-unit icon scaled x12 (=288) centered in it.
+  const brainTile = `
+    <rect x="530" y="250" width="440" height="440" rx="92" fill="url(#brand)"/>
+    <g transform="translate(${750 - 144},${470 - 144}) scale(12)" fill="none" stroke="#ffffff" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">${BRAIN_PATHS}</g>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1500">
     <defs>
-      <radialGradient id="bg" cx="50%" cy="38%" r="75%">
-        <stop offset="0" stop-color="#101428"/><stop offset="55%" stop-color="#0a0b14"/><stop offset="100%" stop-color="#05060a"/>
+      <radialGradient id="bg" cx="50%" cy="34%" r="80%">
+        <stop offset="0" stop-color="#1a0b2e"/><stop offset="55%" stop-color="#0c0717"/><stop offset="100%" stop-color="#050309"/>
       </radialGradient>
       <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#34d399"/><stop offset="50%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#a78bfa"/>
+        <stop offset="0" stop-color="#9333ea"/><stop offset="55%" stop-color="#c026d3"/><stop offset="100%" stop-color="#db2777"/>
       </linearGradient>
-      <linearGradient id="bar" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#34d399"/><stop offset="100%" stop-color="#a78bfa"/>
-      </linearGradient>
-      <radialGradient id="ring" cx="50%" cy="50%" r="50%">
-        <stop offset="0" stop-color="#22d3ee"/><stop offset="100%" stop-color="#a78bfa"/>
-      </radialGradient>
       <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0" stop-color="#34d39955"/><stop offset="100%" stop-color="#34d39900"/>
+        <stop offset="0" stop-color="#c026d366"/><stop offset="100%" stop-color="#c026d300"/>
       </radialGradient>
     </defs>
     <rect width="1500" height="1500" fill="url(#bg)"/>
-    <circle cx="750" cy="620" r="430" fill="url(#glow)"/>
-    ${rings}
-    ${bars}
-    <circle cx="750" cy="620" r="150" fill="#0a0b14" stroke="url(#brand)" stroke-width="5"/>
-    <text x="750" y="648" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="120" fill="url(#brand)" text-anchor="middle">AI</text>
-    <text x="750" y="1080" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="118" fill="#eef1f7" text-anchor="middle" letter-spacing="2">AIdeazz</text>
-    <text x="750" y="1175" font-family="Arial,Helvetica,sans-serif" font-size="50" fill="#9aa3b8" text-anchor="middle" letter-spacing="9">BUILDING IN PUBLIC</text>
-    <text x="750" y="1390" font-family="Arial,Helvetica,sans-serif" font-size="42" fill="#6b7488" text-anchor="middle" letter-spacing="3">${meta.author}</text>
+    <circle cx="750" cy="470" r="440" fill="url(#glow)"/>
+    ${brainTile}
+    <text x="750" y="980" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="138" text-anchor="middle" letter-spacing="1"><tspan fill="#ffffff">AI</tspan><tspan fill="#c084fc">deazz</tspan></text>
+    <text x="750" y="1078" font-family="Arial,Helvetica,sans-serif" font-size="46" fill="#9aa3b8" text-anchor="middle" letter-spacing="11">BUILDING IN PUBLIC</text>
+    <text x="750" y="1235" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="50" fill="#f472b6" text-anchor="middle" letter-spacing="2">From &#8220;A&#8221; to &#8220;Z&#8221; of building with AI</text>
+    <text x="750" y="1400" font-family="Arial,Helvetica,sans-serif" font-size="42" fill="#6b7488" text-anchor="middle" letter-spacing="3">${meta.author}</text>
   </svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
@@ -168,14 +151,14 @@ function episodePageHtml(meta: PodcastMeta, e: PodcastEpisode): string {
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
 <style>
-  :root{--bg:#05060a;--txt:#eef1f7;--mut:#9aa3b8;--line:rgba(255,255,255,.08);--a1:#34d399;--a2:#22d3ee;--a3:#a78bfa;
+  :root{--bg:#05060a;--txt:#eef1f7;--mut:#9aa3b8;--line:rgba(255,255,255,.08);--a1:#a855f7;--a2:#ec4899;--a3:#d946ef;
     --disp:'Space Grotesk',sans-serif;--body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.7;-webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden}
   .aurora{position:fixed;inset:0;z-index:-1;filter:blur(70px);opacity:.4;overflow:hidden}
   .aurora span{position:absolute;border-radius:50%;mix-blend-mode:screen}
-  .aurora .b1{width:50vw;height:50vw;left:-12vw;top:-14vw;background:radial-gradient(circle,#34d39988,transparent 60%)}
-  .aurora .b2{width:46vw;height:46vw;right:-12vw;top:0;background:radial-gradient(circle,#a78bfa88,transparent 60%)}
+  .aurora .b1{width:50vw;height:50vw;left:-12vw;top:-14vw;background:radial-gradient(circle,#a855f788,transparent 60%)}
+  .aurora .b2{width:46vw;height:46vw;right:-12vw;top:0;background:radial-gradient(circle,#d946ef88,transparent 60%)}
   .wrap{max-width:720px;margin:0 auto;padding:34px 22px 80px}
   .back{font-family:var(--mono);font-size:12px;color:var(--mut);text-decoration:none;display:inline-flex;gap:7px;align-items:center}
   .back:hover{color:var(--a2)}

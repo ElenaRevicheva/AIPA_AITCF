@@ -36,6 +36,18 @@ function xmlEscape(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/** The exact AIdeazz brand mark: lucide "brain" icon paths (matches Navigation.tsx on aideazz.xyz). */
+export const BRAIN_PATHS =
+  '<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>' +
+  '<path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>' +
+  '<path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>' +
+  '<path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>' +
+  '<path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/>' +
+  '<path d="M3.477 10.896a4 4 0 0 1 .585-.396"/>' +
+  '<path d="M19.938 10.5a4 4 0 0 1 .585.396"/>' +
+  '<path d="M6 18a4 4 0 0 1-1.967-.516"/>' +
+  '<path d="M19.967 17.484A4 4 0 0 1 18 18"/>';
+
 // ─── SEO / GEO / AEO / TechSEO layer ───────────────────────────────────────────
 
 /** PodcastSeries JSON-LD (+ episodes) for Google rich results and AI answer engines. */
@@ -249,15 +261,16 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <link rel="sitemap" type="application/xml" href="${xmlEscape(meta.siteUrl)}/sitemap.xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
 <script type="application/ld+json">${jsonLd}</script>
 <style>
   :root{
-    --bg:#05060a; --panel:rgba(255,255,255,.025); --line:rgba(255,255,255,.08);
-    --txt:#eef1f7; --mut:#9aa3b8; --mut2:#6b7488;
-    --a1:#34d399; --a2:#22d3ee; --a3:#a78bfa;
+    --bg:#070310; --panel:rgba(255,255,255,.025); --line:rgba(255,255,255,.08);
+    --txt:#eef1f7; --mut:#a99cc4; --mut2:#7d7396;
+    --a1:#a855f7; --a2:#ec4899; --a3:#d946ef;
     --grad:linear-gradient(110deg,var(--a1),var(--a2) 45%,var(--a3));
     --disp:'Space Grotesk',-apple-system,Segoe UI,sans-serif;
+    --brandf:'Poppins',-apple-system,Segoe UI,sans-serif;
     --body:'Inter',-apple-system,Segoe UI,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,monospace;
   }
@@ -267,24 +280,25 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
     -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
   .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;filter:blur(64px);opacity:.6}
   .aurora span{position:absolute;display:block;border-radius:50%;mix-blend-mode:screen;animation:drift 22s ease-in-out infinite}
-  .aurora .b1{width:48vw;height:48vw;left:-8vw;top:-12vw;background:radial-gradient(circle,#34d399aa,transparent 60%)}
-  .aurora .b2{width:44vw;height:44vw;right:-10vw;top:-6vw;background:radial-gradient(circle,#a78bfaaa,transparent 60%);animation-delay:-6s}
-  .aurora .b3{width:52vw;height:52vw;left:25vw;top:36vh;background:radial-gradient(circle,#22d3ee88,transparent 60%);animation-delay:-12s}
+  .aurora .b1{width:48vw;height:48vw;left:-8vw;top:-12vw;background:radial-gradient(circle,#a855f7aa,transparent 60%)}
+  .aurora .b2{width:44vw;height:44vw;right:-10vw;top:-6vw;background:radial-gradient(circle,#d946efaa,transparent 60%);animation-delay:-6s}
+  .aurora .b3{width:52vw;height:52vw;left:25vw;top:36vh;background:radial-gradient(circle,#ec489988,transparent 60%);animation-delay:-12s}
   @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(7vw,4vh) scale(1.12)}66%{transform:translate(-5vw,-3vh) scale(.94)}}
   body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   /* cursor spotlight */
   #spot{position:fixed;width:600px;height:600px;border-radius:50%;pointer-events:none;z-index:0;left:0;top:0;
-    transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(52,211,153,.10),transparent 65%);transition:opacity .4s;opacity:0}
+    transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(192,132,252,.10),transparent 65%);transition:opacity .4s;opacity:0}
   .wrap{max-width:840px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
   nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0;position:sticky;top:0;z-index:20;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-  .brand{font-family:var(--disp);font-weight:700;font-size:16px;display:flex;align-items:center;gap:9px;letter-spacing:-.01em}
-  .brand b{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .dot{width:9px;height:9px;border-radius:50%;background:var(--a1);box-shadow:0 0 14px var(--a1);animation:blink 2.4s ease-in-out infinite}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+  .brand{font-family:var(--brandf);font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px;letter-spacing:-.01em}
+  .mark{display:inline-flex;padding:7px;border-radius:11px;background:var(--grad);box-shadow:0 4px 18px rgba(192,132,252,.45);animation:breathe 4s ease-in-out infinite}
+  .mark svg{width:20px;height:20px;display:block}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .wm i{font-style:normal;color:var(--a1)} .wm b{color:var(--a2);font-weight:700}
   .nav-cta{font-family:var(--disp);font-weight:600;font-size:13px;color:#05060a;text-decoration:none;background:var(--grad);padding:9px 17px;border-radius:999px;transition:.25s}
-  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(52,211,153,.4)}
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(192,132,252,.4)}
   header{text-align:center;padding:54px 0 26px}
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--a1);margin-bottom:30px;display:inline-flex;gap:10px;align-items:center}
   .eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:linear-gradient(90deg,transparent,var(--a1))}
@@ -305,8 +319,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   .subs{display:flex;flex-wrap:wrap;gap:11px;justify-content:center}
   .subs a{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:999px;font-family:var(--disp);font-weight:600;font-size:14px;text-decoration:none;transition:.25s;border:1px solid var(--line);color:var(--txt)}
   .subs a svg{width:17px;height:17px}
-  .subs .primary{background:var(--grad);color:#05060a;border:none;box-shadow:0 8px 28px rgba(52,211,153,.32)}
-  .subs .primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(52,211,153,.5)}
+  .subs .primary{background:var(--grad);color:#05060a;border:none;box-shadow:0 8px 28px rgba(192,132,252,.32)}
+  .subs .primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(192,132,252,.5)}
   .subs .ghost{background:var(--panel)}
   .subs .ghost:hover{border-color:var(--a3);color:#fff;transform:translateY(-2px)}
   /* marquee */
@@ -343,14 +357,16 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   .empty{text-align:center;padding:64px 24px;border:1px dashed var(--line);border-radius:22px;background:var(--panel)}
   .empty h3{font-family:var(--disp);font-size:24px;font-weight:600;margin-bottom:8px}
   .empty p{color:var(--mut);max-width:400px;margin:0 auto}
-  .pulse{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--a1);margin-bottom:18px;box-shadow:0 0 0 0 rgba(52,211,153,.5);animation:ring 2s infinite}
-  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 20px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+  .pulse{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--a1);margin-bottom:18px;box-shadow:0 0 0 0 rgba(192,132,252,.5);animation:ring 2s infinite}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(192,132,252,.5)}70%{box-shadow:0 0 0 20px rgba(192,132,252,0)}100%{box-shadow:0 0 0 0 rgba(192,132,252,0)}}
   /* about */
   .about{display:flex;gap:22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px;margin:18px 0}
   .about img{width:84px;height:84px;border-radius:18px;object-fit:cover;border:1px solid var(--line);flex-shrink:0}
   .about h4{font-family:var(--disp);font-size:18px;font-weight:600;margin-bottom:6px}
   .about p{color:var(--mut);font-size:14.5px}
   .about a{color:var(--a2);text-decoration:none}
+  .slogan{margin-top:12px;font-family:var(--disp);font-size:14px;color:var(--mut2)}
+  .slogan b{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
   footer{text-align:center;padding:60px 20px 56px;color:var(--mut2);font-family:var(--mono);font-size:12px;border-top:1px solid var(--line);margin-top:56px}
   footer .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   @media(max-width:600px){.ep{padding:20px}.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}}
@@ -361,11 +377,11 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <div class="aurora"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
 <div class="wrap">
   <nav>
-    <span class="brand"><span class="dot"></span>AIdeazz<b>·FM</b></span>
+    <span class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${BRAIN_PATHS}</svg></span><span class="wm">AI<i>deazz</i><b>·FM</b></span></span>
     <a class="nav-cta" href="#listen">Listen</a>
   </nav>
   <header>
-    <span class="eyebrow">AI &middot; Solo Founder &middot; Built in Public</span>
+    <span class="eyebrow">From &ldquo;A&rdquo; to &ldquo;Z&rdquo; &middot; Built in Public</span>
     <div class="cover-wrap"><img src="${xmlEscape(meta.coverUrl)}" alt="${xmlEscape(meta.title)} cover"/></div>
     <h1>Building a company<br/><span class="g">with AI agents.</span></h1>
     <p class="lede">${xmlEscape(meta.description)}</p>
@@ -388,7 +404,8 @@ ${cards}
   <div class="sec-head"><h2>Your host</h2></div>
   <div class="about">
     <img src="${xmlEscape(meta.coverUrl)}" alt="${xmlEscape(meta.author)}"/>
-    <div><h4>${xmlEscape(meta.author)}</h4><p>Solo founder of <a href="https://aideazz.xyz">AIdeazz</a> — building a company with AI agents from Panama. Former board-level operator, now an AI-augmented builder shipping multi-agent systems in production. This is the honest, unedited version.</p></div>
+    <div><h4>${xmlEscape(meta.author)}</h4><p>Solo founder of <a href="https://aideazz.xyz">AIdeazz</a> — building a company with AI agents from Panama. Former board-level operator, now an AI-augmented builder shipping multi-agent systems in production. This is the honest, unedited version.</p>
+    <p class="slogan">Your AI companion who remembers your journey — from struggle to success. The <b>A&#8209;to&#8209;Z</b> of your private AI space. <a href="https://aideazz.xyz">aideazz.xyz &rarr;</a></p></div>
   </div>
 </div>
 <footer>© ${new Date().getFullYear()} ${xmlEscape(meta.author)} &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span></footer>
