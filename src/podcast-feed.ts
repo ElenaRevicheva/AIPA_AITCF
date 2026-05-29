@@ -276,8 +276,19 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   html{scroll-behavior:smooth}
   body{background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.6;
     -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
-  /* Spotify-style color wash that fades into the dark base */
-  .wash{position:fixed;top:0;left:0;right:0;height:560px;z-index:-1;
+  /* ambient flowing color palette (dark / purple / yellow) */
+  .aurora{position:fixed;inset:0;z-index:-3;overflow:hidden;filter:blur(72px);opacity:.5}
+  .aurora span{position:absolute;display:block;border-radius:50%;mix-blend-mode:screen;animation:drift 24s ease-in-out infinite}
+  .aurora .b1{width:46vw;height:46vw;left:-8vw;top:6vh;background:radial-gradient(circle,#a855f7aa,transparent 60%)}
+  .aurora .b2{width:42vw;height:42vw;right:-10vw;top:32vh;background:radial-gradient(circle,#7c3aedaa,transparent 60%);animation-delay:-7s}
+  .aurora .b3{width:48vw;height:48vw;left:30vw;top:62vh;background:radial-gradient(circle,#facc1577,transparent 60%);animation-delay:-14s}
+  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6vw,4vh) scale(1.1)}66%{transform:translate(-5vw,-3vh) scale(.94)}}
+  /* cursor spotlight — reveals a purple→yellow palette as you move */
+  #spot{position:fixed;width:680px;height:680px;border-radius:50%;pointer-events:none;z-index:0;left:50%;top:28%;
+    transform:translate(-50%,-50%);opacity:0;transition:opacity .5s;
+    background:radial-gradient(circle,rgba(168,85,247,.16),rgba(250,204,21,.06) 42%,transparent 70%)}
+  /* Spotify-style color wash that fades into the dark base (sits over the aurora at the top) */
+  .wash{position:fixed;top:0;left:0;right:0;height:560px;z-index:-2;
     background:linear-gradient(180deg,#5b21b6 0%,#3b1769 32%,rgba(20,12,38,.4) 70%,transparent 100%)}
   .wash::after{content:"";position:absolute;inset:0;opacity:.06;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
@@ -364,6 +375,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 </style>
 </head>
 <body>
+<div class="aurora"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+<div id="spot"></div>
 <div class="wash"></div>
 <div class="wrap">
   <nav>
@@ -411,6 +424,11 @@ ${rows}
   </div>
 </div>
 <footer>© ${new Date().getFullYear()} ${esc(meta.author)} &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span></footer>
+<script>
+  (function(){var s=document.getElementById('spot');if(!s)return;
+   window.addEventListener('pointermove',function(e){s.style.opacity=1;s.style.left=e.clientX+'px';s.style.top=e.clientY+'px';},{passive:true});
+   window.addEventListener('pointerleave',function(){s.style.opacity=0;});})();
+</script>
 </body>
 </html>
 `;
