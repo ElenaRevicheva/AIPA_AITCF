@@ -1676,10 +1676,15 @@ The actual listenable podcast. New isolated repo `ElenaRevicheva/aideazz-podcast
   regen feed/index/page via GitHub API).
 - `/podcast` (real voice) publishes the audio episode; `/podcast_ai <topic>` (Claude script ->
   OpenAI TTS -> Speechmatics transcribes -> publish). Speechmatics used in BOTH paths.
-- Gated: PODCAST_ENGINE_ENABLED=true, PODCAST_PUBLISH_ENABLED=false (off until 4everland connected).
-- Commit `7a2ee0c`. Additive: new files + repo; 2 registration lines + 2 menu entries.
-- ONE-TIME (Elena): connect repo to 4everland; point podcast.aideazz.xyz DNS; set
-  PODCAST_PUBLISH_ENABLED=true + restart; submit feed.xml to Spotify + Apple.
+- Gated: PODCAST_ENGINE_ENABLED=true, **PODCAST_PUBLISH_ENABLED=true (LIVE).**
+- **Custom domain LIVE:** `https://podcast.aideazz.xyz` (Cloudflare CNAME `podcast → ...ddnsweb3.com`, DNS-only; 4everland Valid Configuration; SSL OK). Feed `https://podcast.aideazz.xyz/feed.xml` valid.
+
+**Design (final, May 29 — Spotify-grade, on-brand):** Spotify show-page layout (purple color wash → dark, cover-left hero, big circular Play + Follow + platform icons, episode ROWS), real AIdeazz brand (the gradient "A" favicon mark + AIdeazz·FM Poppins wordmark), **purple + yellow** palette (pink dropped), flowing equalizer **wave** under the play bar, ambient **aurora** + cursor **spotlight** (purple/yellow flow). Hero: "Building in Public with **AI Agents**" (AI Agents = moving gradient), meta "AIdeazz · Elena Revicheva · From 'A' to 'Z' of AI-Augmented Workflows · Launching soon". Cover = pure brand (A icon + AIdeazz wordmark, no taglines). No emojis. Full SEO/GEO/AEO: PodcastSeries JSON-LD, robots.txt (AI engines welcomed), sitemap.xml, llms.txt, canonical/OG/Twitter. Commits `7a2ee0c`→`11073fd`. Re-push design/SEO: `npx ts-node scripts/podcast-host-cli.ts reseed`.
+
+**GO-LIVE CHECKLIST (remaining = submit feed to platforms):**
+- ✅ Site + branded design live at podcast.aideazz.xyz; ✅ feed valid; ✅ publishing enabled.
+- ⏳ Fire Episode 01: `/podcast_ai <topic>` (or `/podcast` reply to a voice note) — feed needs ≥1 episode before Spotify/Apple accept it.
+- ⏳ Submit `https://podcast.aideazz.xyz/feed.xml` to Spotify for Podcasters + Apple Podcasts Connect (one-time, Elena). Then YouTube Music, Amazon/Audible, Overcast/Pocket Casts auto-pull or accept the same feed.
 
 ### Deferred (Phase 3)
 
