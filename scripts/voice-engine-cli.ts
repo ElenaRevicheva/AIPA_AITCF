@@ -16,6 +16,7 @@ dotenv.config();
 import Anthropic from '@anthropic-ai/sdk';
 import { transcribeFile, speechmaticsHealthCheck } from '../src/speechmatics';
 import { buildContentCluster } from '../src/voice-growth-engine';
+import { publishVoiceCampaign } from '../src/voice-campaign-publish';
 
 async function main() {
   const cmd = (process.argv[2] || 'health').toLowerCase();
@@ -60,7 +61,20 @@ async function main() {
     return;
   }
 
-  console.error(`Unknown command: ${cmd}. Use: health | transcribe <audio> | cluster <audio>`);
+  if (cmd === 'publish') {
+    console.log('Transcribing + translating...');
+    const r = await transcribeFile(audio, { language: 'en', translateTo: ['es'] });
+    console.log('Atomizing...');
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const cluster = await buildContentCluster(anthropic, r, { numSocialPerChannel: 3 });
+    console.log(`Publishing campaign ${cluster.campaignId}...`);
+    const res = await publishVoiceCampaign(cluster);
+    console.log('\n=== PUBLISH RESULT ===');
+    console.log(JSON.stringify(res, null, 2));
+    return;
+  }
+
+  console.error(`Unknown command: ${cmd}. Use: health | transcribe <audio> | cluster <audio> | publish <audio>`);
   process.exit(1);
 }
 

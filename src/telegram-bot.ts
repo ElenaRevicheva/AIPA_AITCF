@@ -1207,6 +1207,9 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
   bot.command('research_employer',   async (ctx) => { await runResearchTelegram(ctx, 'employer',   'research_employer'); });
   bot.command('research_competitor', async (ctx) => { await runResearchTelegram(ctx, 'competitor', 'research_competitor'); });
 
+  // /campaign - Voice Growth Engine: reply to a voice note to publish a full bilingual campaign (additive, gated)
+  bot.command('campaign', async (ctx) => { const { runVoiceCampaign } = await import('./voice-campaign-command'); await runVoiceCampaign(ctx); });
+
   // /leads - View business leads
   bot.command('leads', async (ctx) => {
     const statusFilter = ctx.message?.text?.replace('/leads', '').trim() || undefined;
