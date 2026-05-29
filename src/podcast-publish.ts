@@ -84,18 +84,15 @@ async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
       </radialGradient>
     </defs>
     <rect width="${W}" height="${W}" fill="url(#bg)"/>
-    <circle cx="750" cy="480" r="480" fill="url(#glow)"/>
-    <text x="750" y="990" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="140" text-anchor="middle" letter-spacing="1"><tspan fill="#ffffff">AI</tspan><tspan fill="#c084fc">deazz</tspan></text>
-    <text x="750" y="1088" font-family="Arial,Helvetica,sans-serif" font-size="46" fill="#b9a8e0" text-anchor="middle" letter-spacing="11">BUILDING IN PUBLIC</text>
-    <text x="750" y="1245" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="50" fill="#facc15" text-anchor="middle" letter-spacing="2">From &#8220;A&#8221; to &#8220;Z&#8221; of building with AI</text>
-    <text x="750" y="1405" font-family="Arial,Helvetica,sans-serif" font-size="42" fill="#8a7fb0" text-anchor="middle" letter-spacing="3">${meta.author}</text>
+    <circle cx="750" cy="620" r="500" fill="url(#glow)"/>
+    <text x="750" y="1170" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="178" text-anchor="middle" letter-spacing="1"><tspan fill="#ffffff">AI</tspan><tspan fill="#c084fc">deazz</tspan></text>
   </svg>`;
   const bg = await sharp(Buffer.from(bgSvg)).png().toBuffer();
   // Composite the real AIdeazz "A" icon (faviconnew.png) as the central brand mark.
   try {
     const resp = await fetch(BRAND_ICON_URL);
     if (resp.ok) {
-      const size = 470;
+      const size = 560;
       const raw = Buffer.from(await resp.arrayBuffer());
       // Crop ~10% into the icon to remove its baked-in white card frame, then round the corners.
       const big = Math.round(size * 1.2);
@@ -104,7 +101,7 @@ async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
       const maskSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${r}" ry="${r}" fill="#fff"/></svg>`;
       const cropped = await sharp(raw).resize(big, big, { fit: 'cover' }).extract({ left: off, top: off, width: size, height: size }).png().toBuffer();
       const icon = await sharp(cropped).composite([{ input: Buffer.from(maskSvg), blend: 'dest-in' }]).png().toBuffer();
-      return sharp(bg).composite([{ input: icon, top: 245, left: Math.round((W - size) / 2) }]).png().toBuffer();
+      return sharp(bg).composite([{ input: icon, top: 320, left: Math.round((W - size) / 2) }]).png().toBuffer();
     }
   } catch { /* fall back to text-only cover */ }
   return bg;

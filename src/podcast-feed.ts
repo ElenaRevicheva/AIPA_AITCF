@@ -308,7 +308,9 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   .hero-info{min-width:0;padding-bottom:6px}
   .kind{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--txt)}
   .hero-info h1{font-family:var(--brandf);font-weight:700;font-size:clamp(34px,6.5vw,76px);line-height:1.02;letter-spacing:-.03em;margin:14px 0 16px}
-  .hero-info h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero-info h1 .g{background:var(--grad);background-size:220% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shift 5s linear infinite}
+  @keyframes shift{to{background-position:220% center}}
+  @media(prefers-reduced-motion:reduce){.hero-info h1 .g{animation:none}}
   .hero-meta{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--mut);flex-wrap:wrap}
   .hero-meta .mk{width:22px;height:22px;border-radius:6px;overflow:hidden;display:inline-block}
   .hero-meta .mk img{width:100%;height:100%;object-fit:cover;transform:scale(1.18)}
@@ -358,7 +360,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   .bento{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:10px 0}
   .cardb{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;transition:.25s}
   .cardb:hover{background:rgba(255,255,255,.07)}
-  .cardb .ic{font-size:24px;margin-bottom:12px;display:block}
+  .cardb .kbar{display:block;width:30px;height:3px;border-radius:3px;background:var(--grad);margin-bottom:16px}
   .cardb h4{font-family:var(--disp);font-size:16px;font-weight:600;margin-bottom:6px}
   .cardb p{color:var(--mut);font-size:13.5px;line-height:1.5}
   /* about */
@@ -387,12 +389,13 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
     <img class="cover" src="${esc(meta.coverUrl)}" alt="${esc(meta.title)} cover"/>
     <div class="hero-info">
       <span class="kind">Podcast</span>
-      <h1>Building a company <span class="g">with AI agents.</span></h1>
-      <p class="lede" style="color:var(--mut);max-width:560px;margin-bottom:14px">${esc(meta.description)}</p>
+      <h1>Building in Public<br/>with <span class="g">AI Agents.</span></h1>
+      <p class="lede" style="color:var(--mut);max-width:580px;margin-bottom:14px">Honest lessons on AI-augmented building, marketing engines, and shipping in production. By ${esc(meta.author)}.</p>
       <div class="hero-meta">
         <span class="mk"><img src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/></span>
-        <b>${esc(meta.author)}</b><span class="dotsep">&middot;</span>
-        <span>From &ldquo;A&rdquo; to &ldquo;Z&rdquo;</span><span class="dotsep">&middot;</span>
+        <b>AIdeazz</b><span class="dotsep">&middot;</span>
+        <span>${esc(meta.author)}</span><span class="dotsep">&middot;</span>
+        <span>From &ldquo;A&rdquo; to &ldquo;Z&rdquo; of AI-Augmented Workflows</span><span class="dotsep">&middot;</span>
         <span>${countLabel}</span>
       </div>
     </div>
@@ -412,9 +415,9 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 ${rows}
   <div class="sec-head"><h2>What you'll hear</h2></div>
   <div class="bento">
-    <div class="cardb"><span class="ic">🤖</span><h4>Real multi-agent systems</h4><p>Nine production AI agents, what broke, and what actually held up.</p></div>
-    <div class="cardb"><span class="ic">📈</span><h4>Marketing that's measured</h4><p>GEO/SEO/AEO, attribution over vanity metrics, and the engine behind it.</p></div>
-    <div class="cardb"><span class="ic">🛠️</span><h4>Shipping as a solo founder</h4><p>AI-augmented building, honest constraints, no hype — just what ships.</p></div>
+    <div class="cardb"><span class="kbar"></span><h4>Real multi-agent systems</h4><p>Nine production AI agents, what broke, and what actually held up.</p></div>
+    <div class="cardb"><span class="kbar"></span><h4>Marketing that's measured</h4><p>GEO/SEO/AEO, attribution over vanity metrics, and the engine behind it.</p></div>
+    <div class="cardb"><span class="kbar"></span><h4>Shipping as a solo founder</h4><p>AI-augmented building, honest constraints, no hype — just what ships.</p></div>
   </div>
   <div class="sec-head"><h2>About</h2></div>
   <div class="about">
