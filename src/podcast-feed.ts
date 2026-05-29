@@ -210,32 +210,29 @@ ${items}
 export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[]): string {
   const sorted = episodes.slice().sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
   const total = sorted.length;
-  const cards = total
+  const esc = xmlEscape;
+  const rows = total
     ? sorted.map((e, i) => {
         const num = String(total - i).padStart(2, '0');
         const src = e.source === 'ai' ? 'AI-narrated' : 'Elena';
         return `
-      <article class="ep">
-        <div class="ep-top">
-          <span class="ep-num">EP ${num}</span>
-          <span class="chip ${e.source === 'ai' ? 'chip-ai' : 'chip-voice'}">${src}</span>
+      <article class="erow">
+        <div class="erow-num">${num}</div>
+        <div class="erow-main">
+          <h3 class="erow-title">${esc(e.title)}</h3>
+          <div class="erow-meta">${new Date(e.pubDate).toDateString()} &middot; ${fmtDuration(e.durationSec)} &middot; ${src}</div>
+          <p class="erow-desc">${esc(e.description).slice(0, 220)}</p>
+          <audio controls preload="none" src="${esc(e.audioUrl)}"></audio>
+          ${e.blogUrl ? `<a class="readmore" href="${esc(e.blogUrl)}">Read the write-up &rarr;</a>` : ''}
         </div>
-        <h3 class="ep-title">${xmlEscape(e.title)}</h3>
-        <div class="ep-meta">${new Date(e.pubDate).toDateString()} &middot; ${fmtDuration(e.durationSec)}</div>
-        <div class="player"><audio controls preload="none" src="${xmlEscape(e.audioUrl)}"></audio></div>
-        <p class="ep-desc">${xmlEscape(e.description).slice(0, 300)}</p>
-        ${e.blogUrl ? `<a class="readmore" href="${xmlEscape(e.blogUrl)}">Read the write-up <span class="arr">&rarr;</span></a>` : ''}
       </article>`;
       }).join('\n')
     : `<div class="empty">
         <span class="pulse"></span>
-        <h3>Episode 01 is in the studio</h3>
-        <p>Subscribe once and the first drop lands in your feed automatically — wherever you listen.</p>
+        <div><h3>Episode 01 is in the studio</h3>
+        <p>Hit Follow and the first drop lands in your app automatically — wherever you listen.</p></div>
       </div>`;
-
-  const waveBars = Array.from({ length: 52 }, (_, i) => `<span style="animation-delay:${(i * 0.04).toFixed(2)}s"></span>`).join('');
-  const topics = ['AI agents', 'Attribution over activity', 'Marketing engines', 'Shipping in production', 'Voice automation', 'Multi-agent systems', 'GEO · SEO · AEO', 'Solo-founder economics', 'Production resilience', 'Building in public'];
-  const marquee = [...topics, ...topics].map((t) => `<span class="t">${xmlEscape(t)}</span>`).join('');
+  const countLabel = total ? `${total} episode${total > 1 ? 's' : ''}` : 'Launching soon';
   const jsonLd = generatePodcastJsonLd(meta, sorted);
 
   return `<!DOCTYPE html>
@@ -265,8 +262,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <script type="application/ld+json">${jsonLd}</script>
 <style>
   :root{
-    --bg:#070310; --panel:rgba(255,255,255,.025); --line:rgba(255,255,255,.08);
-    --txt:#eef1f7; --mut:#a99cc4; --mut2:#7d7396;
+    --bg:#0a0712; --bg2:#0f0a18; --panel:rgba(255,255,255,.04); --line:rgba(255,255,255,.09);
+    --txt:#f3f0fa; --mut:#b3a9c9; --mut2:#857a9c;
     --a1:#a855f7; --a2:#facc15; --a3:#7c3aed;
     --grad:linear-gradient(115deg,#7c3aed,#a855f7 42%,#facc15);
     --disp:'Space Grotesk',-apple-system,Segoe UI,sans-serif;
@@ -278,142 +275,134 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   html{scroll-behavior:smooth}
   body{background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.6;
     -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
-  .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;filter:blur(64px);opacity:.6}
-  .aurora span{position:absolute;display:block;border-radius:50%;mix-blend-mode:screen;animation:drift 22s ease-in-out infinite}
-  .aurora .b1{width:48vw;height:48vw;left:-8vw;top:-12vw;background:radial-gradient(circle,#a855f7aa,transparent 60%)}
-  .aurora .b2{width:44vw;height:44vw;right:-10vw;top:-6vw;background:radial-gradient(circle,#7c3aedaa,transparent 60%);animation-delay:-6s}
-  .aurora .b3{width:52vw;height:52vw;left:25vw;top:36vh;background:radial-gradient(circle,#facc1588,transparent 60%);animation-delay:-12s}
-  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(7vw,4vh) scale(1.12)}66%{transform:translate(-5vw,-3vh) scale(.94)}}
-  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+  /* Spotify-style color wash that fades into the dark base */
+  .wash{position:fixed;top:0;left:0;right:0;height:560px;z-index:-1;
+    background:linear-gradient(180deg,#5b21b6 0%,#3b1769 32%,rgba(20,12,38,.4) 70%,transparent 100%)}
+  .wash::after{content:"";position:absolute;inset:0;opacity:.06;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-  /* cursor spotlight */
-  #spot{position:fixed;width:600px;height:600px;border-radius:50%;pointer-events:none;z-index:0;left:0;top:0;
-    transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(192,132,252,.10),transparent 65%);transition:opacity .4s;opacity:0}
-  .wrap{max-width:840px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
-  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0;position:sticky;top:0;z-index:20;
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;position:sticky;top:0;z-index:20;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
   .brand{font-family:var(--brandf);font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px;letter-spacing:-.01em}
-  .mark{width:38px;height:38px;border-radius:11px;overflow:hidden;display:inline-block;box-shadow:0 4px 20px rgba(168,85,247,.5);animation:breathe 4s ease-in-out infinite}
+  .mark{width:38px;height:38px;border-radius:11px;overflow:hidden;display:inline-block;box-shadow:0 4px 20px rgba(168,85,247,.5)}
   .mark img{width:100%;height:100%;object-fit:cover;transform:scale(1.18);display:block}
-  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
   .wm i{font-style:normal;color:var(--a1)} .wm b{color:var(--a2);font-weight:700}
-  .nav-cta{font-family:var(--disp);font-weight:600;font-size:13px;color:#05060a;text-decoration:none;background:var(--grad);padding:9px 17px;border-radius:999px;transition:.25s}
-  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(192,132,252,.4)}
-  header{text-align:center;padding:54px 0 26px}
-  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--a1);margin-bottom:30px;display:inline-flex;gap:10px;align-items:center}
-  .eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:linear-gradient(90deg,transparent,var(--a1))}
-  .eyebrow::after{background:linear-gradient(90deg,var(--a1),transparent)}
-  .cover-wrap{position:relative;width:230px;height:230px;margin:0 auto 34px}
-  .cover-wrap::before{content:"";position:absolute;inset:-6px;border-radius:34px;background:var(--grad);filter:blur(28px);opacity:.75;z-index:-1;animation:pulseGlow 5s ease-in-out infinite}
-  @keyframes pulseGlow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.9;transform:scale(1.05)}}
-  .cover-wrap img{width:230px;height:230px;border-radius:28px;object-fit:cover;border:1px solid var(--line);box-shadow:0 24px 70px rgba(0,0,0,.65);animation:float 7s ease-in-out infinite}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-  h1{font-family:var(--disp);font-weight:700;font-size:clamp(40px,7vw,68px);line-height:1.02;letter-spacing:-.03em;margin-bottom:20px}
-  h1 .g{background:var(--grad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shift 6s linear infinite}
-  @keyframes shift{to{background-position:200% center}}
-  .lede{color:var(--mut);max-width:560px;margin:0 auto 22px;font-size:18px}
-  /* hero waveform */
-  .wave{display:flex;align-items:center;justify-content:center;gap:4px;height:54px;margin:0 auto 30px;max-width:440px}
-  .wave span{width:4px;height:100%;border-radius:4px;background:var(--grad);transform:scaleY(.18);transform-origin:center;animation:eq 1.2s ease-in-out infinite}
-  @keyframes eq{0%,100%{transform:scaleY(.18)}50%{transform:scaleY(1)}}
-  .subs{display:flex;flex-wrap:wrap;gap:11px;justify-content:center}
-  .subs a{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:999px;font-family:var(--disp);font-weight:600;font-size:14px;text-decoration:none;transition:.25s;border:1px solid var(--line);color:var(--txt)}
-  .subs a svg{width:17px;height:17px}
-  .subs .primary{background:var(--grad);color:#05060a;border:none;box-shadow:0 8px 28px rgba(192,132,252,.32)}
-  .subs .primary:hover{transform:translateY(-2px);box-shadow:0 12px 38px rgba(192,132,252,.5)}
-  .subs .ghost{background:var(--panel)}
-  .subs .ghost:hover{border-color:var(--a3);color:#fff;transform:translateY(-2px)}
-  /* marquee */
-  .marquee{margin:46px 0;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-  .marquee .track{display:inline-flex;gap:14px;white-space:nowrap;animation:scroll 32s linear infinite}
-  .marquee .t{font-family:var(--mono);font-size:13px;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:8px 16px;background:var(--panel)}
-  @keyframes scroll{to{transform:translateX(-50%)}}
-  /* bento "what you'll hear" */
-  .bento{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0 10px}
-  .cardb{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;transition:.3s}
-  .cardb:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.16)}
-  .cardb .ic{font-size:22px;margin-bottom:12px;display:block}
+  .nav-cta{font-family:var(--disp);font-weight:700;font-size:13px;color:var(--txt);text-decoration:none;border:1px solid rgba(255,255,255,.55);padding:8px 18px;border-radius:999px;transition:.2s}
+  .nav-cta:hover{border-color:#fff;transform:scale(1.04)}
+  /* hero (Spotify show header) */
+  .hero{display:flex;gap:30px;align-items:flex-end;padding:30px 0 8px}
+  .cover{width:228px;height:228px;border-radius:14px;object-fit:cover;box-shadow:0 16px 50px rgba(0,0,0,.55);flex-shrink:0}
+  .hero-info{min-width:0;padding-bottom:6px}
+  .kind{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--txt)}
+  .hero-info h1{font-family:var(--brandf);font-weight:700;font-size:clamp(34px,6.5vw,76px);line-height:1.02;letter-spacing:-.03em;margin:14px 0 16px}
+  .hero-info h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero-meta{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--mut);flex-wrap:wrap}
+  .hero-meta .mk{width:22px;height:22px;border-radius:6px;overflow:hidden;display:inline-block}
+  .hero-meta .mk img{width:100%;height:100%;object-fit:cover;transform:scale(1.18)}
+  .hero-meta b{color:var(--txt);font-weight:600}
+  .hero-meta .dotsep{color:var(--mut2)}
+  /* action bar */
+  .actions{display:flex;align-items:center;gap:24px;padding:24px 0 6px}
+  .play{width:58px;height:58px;border-radius:50%;background:var(--grad);display:grid;place-items:center;text-decoration:none;
+    box-shadow:0 10px 30px rgba(168,85,247,.5);transition:.2s}
+  .play:hover{transform:scale(1.07)}
+  .play svg{width:26px;height:26px;color:#0a0712;margin-left:3px}
+  .follow{font-family:var(--disp);font-weight:700;font-size:14px;color:var(--txt);text-decoration:none;border:1px solid rgba(255,255,255,.5);padding:11px 24px;border-radius:999px;transition:.2s}
+  .follow:hover{border-color:#fff;transform:scale(1.04)}
+  .iconlinks{display:flex;gap:18px;margin-left:4px}
+  .iconlinks a{color:var(--mut2);transition:.2s}
+  .iconlinks a:hover{color:var(--txt);transform:scale(1.12)}
+  .iconlinks svg{width:23px;height:23px;display:block}
+  /* section heads */
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin:48px 0 8px}
+  .sec-head h2{font-family:var(--brandf);font-size:24px;font-weight:700;letter-spacing:-.01em}
+  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--mut2)}
+  .list-cols{display:grid;grid-template-columns:36px 1fr;gap:16px;padding:6px 12px;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut2)}
+  /* episode rows (Spotify list) */
+  .erow{display:grid;grid-template-columns:36px 1fr;gap:16px;padding:16px 12px;border-radius:8px;transition:background .2s;align-items:start}
+  .erow:hover{background:rgba(255,255,255,.05)}
+  .erow-num{font-family:var(--mono);font-size:15px;color:var(--mut2);padding-top:2px}
+  .erow-title{font-family:var(--disp);font-size:17px;font-weight:600;line-height:1.3}
+  .erow-meta{font-family:var(--mono);font-size:12px;color:var(--mut2);margin:5px 0 8px}
+  .erow-desc{color:var(--mut);font-size:14px;margin-bottom:12px}
+  audio{width:100%;max-width:560px;height:36px;display:block}
+  .readmore{display:inline-block;margin-top:12px;font-family:var(--disp);font-weight:600;font-size:13px;color:var(--a2);text-decoration:none}
+  .readmore:hover{text-decoration:underline}
+  /* empty state (row-like banner) */
+  .empty{display:flex;align-items:center;gap:20px;padding:30px 24px;border-radius:14px;background:var(--panel);border:1px solid var(--line);margin-top:8px}
+  .empty h3{font-family:var(--disp);font-size:20px;font-weight:600;margin-bottom:5px}
+  .empty p{color:var(--mut);font-size:14px}
+  .pulse{flex-shrink:0;width:14px;height:14px;border-radius:50%;background:var(--a1);box-shadow:0 0 0 0 rgba(192,132,252,.5);animation:ring 2s infinite}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(192,132,252,.5)}70%{box-shadow:0 0 0 18px rgba(192,132,252,0)}100%{box-shadow:0 0 0 0 rgba(192,132,252,0)}}
+  /* what you'll hear */
+  .bento{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:10px 0}
+  .cardb{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;transition:.25s}
+  .cardb:hover{background:rgba(255,255,255,.07)}
+  .cardb .ic{font-size:24px;margin-bottom:12px;display:block}
   .cardb h4{font-family:var(--disp);font-size:16px;font-weight:600;margin-bottom:6px}
   .cardb p{color:var(--mut);font-size:13.5px;line-height:1.5}
-  /* sections */
-  .sec-head{display:flex;align-items:baseline;gap:12px;margin:64px 0 22px}
-  .sec-head h2{font-family:var(--disp);font-size:24px;font-weight:600;letter-spacing:-.01em}
-  .sec-head .count{font-family:var(--mono);font-size:12px;color:var(--mut2)}
-  .ep{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:18px;transition:.3s;overflow:hidden}
-  .ep::before{content:"";position:absolute;left:0;top:0;height:100%;width:3px;background:var(--grad);opacity:0;transition:.3s}
-  .ep:hover{border-color:rgba(255,255,255,.16);transform:translateY(-3px);background:rgba(255,255,255,.04)}
-  .ep:hover::before{opacity:1}
-  .ep-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-  .ep-num{font-family:var(--mono);font-size:12px;color:var(--a2);letter-spacing:.05em}
-  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
-  .chip-ai{color:var(--a3)} .chip-voice{color:var(--a1)}
-  .ep-title{font-family:var(--disp);font-size:21px;font-weight:600;line-height:1.25;margin-bottom:7px}
-  .ep-meta{font-family:var(--mono);font-size:12px;color:var(--mut2);margin-bottom:16px}
-  .player{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:15px}
-  audio{width:100%;height:38px;display:block}
-  .ep-desc{color:var(--mut);font-size:15px}
-  .readmore{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--disp);font-weight:600;font-size:14px;color:var(--a2);text-decoration:none}
-  .readmore .arr{transition:.25s} .readmore:hover .arr{transform:translateX(4px)}
-  .empty{text-align:center;padding:64px 24px;border:1px dashed var(--line);border-radius:22px;background:var(--panel)}
-  .empty h3{font-family:var(--disp);font-size:24px;font-weight:600;margin-bottom:8px}
-  .empty p{color:var(--mut);max-width:400px;margin:0 auto}
-  .pulse{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--a1);margin-bottom:18px;box-shadow:0 0 0 0 rgba(192,132,252,.5);animation:ring 2s infinite}
-  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(192,132,252,.5)}70%{box-shadow:0 0 0 20px rgba(192,132,252,0)}100%{box-shadow:0 0 0 0 rgba(192,132,252,0)}}
   /* about */
-  .about{display:flex;gap:22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px;margin:18px 0}
-  .about img{width:84px;height:84px;border-radius:18px;object-fit:cover;border:1px solid var(--line);flex-shrink:0}
+  .about{display:flex;gap:22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px;margin:10px 0}
+  .about img{width:84px;height:84px;border-radius:14px;object-fit:cover;flex-shrink:0}
   .about h4{font-family:var(--disp);font-size:18px;font-weight:600;margin-bottom:6px}
   .about p{color:var(--mut);font-size:14.5px}
   .about a{color:var(--a2);text-decoration:none}
   .slogan{margin-top:12px;font-family:var(--disp);font-size:14px;color:var(--mut2)}
   .slogan b{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
-  footer{text-align:center;padding:60px 20px 56px;color:var(--mut2);font-family:var(--mono);font-size:12px;border-top:1px solid var(--line);margin-top:56px}
+  footer{text-align:center;padding:54px 20px 50px;color:var(--mut2);font-family:var(--mono);font-size:12px;border-top:1px solid var(--line);margin-top:48px}
   footer .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  @media(max-width:600px){.ep{padding:20px}.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}}
+  @media(max-width:680px){.hero{flex-direction:column;align-items:flex-start}.cover{width:180px;height:180px}.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}}
 </style>
 </head>
 <body>
-<div id="spot"></div>
-<div class="aurora"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+<div class="wash"></div>
 <div class="wrap">
   <nav>
     <span class="brand"><span class="mark"><img src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/></span><span class="wm">AI<i>deazz</i><b>·FM</b></span></span>
-    <a class="nav-cta" href="#listen">Listen</a>
+    <a class="nav-cta" href="${esc(meta.siteUrl)}/feed.xml">Follow</a>
   </nav>
-  <header>
-    <span class="eyebrow">From &ldquo;A&rdquo; to &ldquo;Z&rdquo; &middot; Built in Public</span>
-    <div class="cover-wrap"><img src="${xmlEscape(meta.coverUrl)}" alt="${xmlEscape(meta.title)} cover"/></div>
-    <h1>Building a company<br/><span class="g">with AI agents.</span></h1>
-    <p class="lede">${xmlEscape(meta.description)}</p>
-    <div class="wave">${waveBars}</div>
-    <div class="subs" id="listen">
-      <a class="primary" href="https://open.spotify.com/"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.3a.75.75 0 01-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 11-.33-1.46c4.57-1.04 8.5-.59 11.66 1.34.35.22.46.68.25 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 11-.54-1.8c4.37-1.32 9.79-.68 13.49 1.6.44.27.58.85.31 1.29zm.13-3.4C15.13 8.28 8.6 8.07 4.85 9.21a1.12 1.12 0 11-.65-2.15C8.5 5.75 15.71 6 20.06 8.58a1.12 1.12 0 11-1.16 1.92z"/></svg>Spotify</a>
-      <a class="ghost" href="https://podcasts.apple.com/"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-3.2 19.47c-.05-.83-.1-2.1.02-3.01.11-.82.7-5.2.7-5.2s-.18-.36-.18-.9c0-.83.49-1.46 1.09-1.46.51 0 .76.39.76.85 0 .52-.33 1.3-.5 2.02-.14.6.3 1.1.9 1.1 1.08 0 1.9-1.14 1.9-2.78 0-1.45-1.04-2.47-2.53-2.47-1.72 0-2.73 1.29-2.73 2.62 0 .52.2 1.08.45 1.38a.18.18 0 01.04.17c-.05.2-.15.6-.17.68-.03.11-.09.14-.21.08-.79-.37-1.28-1.51-1.28-2.43 0-1.98 1.44-3.8 4.15-3.8 2.18 0 3.87 1.55 3.87 3.63 0 2.17-1.36 3.91-3.26 3.91-.64 0-1.24-.33-1.44-.72l-.39 1.5c-.14.55-.52 1.23-.78 1.65A10 10 0 1012 2z"/></svg>Apple</a>
-      <a class="ghost" href="${xmlEscape(meta.siteUrl)}/feed.xml"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 11a9 9 0 019 9h-2.5A6.5 6.5 0 004 13.5V11zm0-5a14 14 0 0114 14h-2.5A11.5 11.5 0 004 8.5V6zm2.5 10.5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>RSS</a>
+  <header class="hero">
+    <img class="cover" src="${esc(meta.coverUrl)}" alt="${esc(meta.title)} cover"/>
+    <div class="hero-info">
+      <span class="kind">Podcast</span>
+      <h1>Building a company <span class="g">with AI agents.</span></h1>
+      <p class="lede" style="color:var(--mut);max-width:560px;margin-bottom:14px">${esc(meta.description)}</p>
+      <div class="hero-meta">
+        <span class="mk"><img src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/></span>
+        <b>${esc(meta.author)}</b><span class="dotsep">&middot;</span>
+        <span>From &ldquo;A&rdquo; to &ldquo;Z&rdquo;</span><span class="dotsep">&middot;</span>
+        <span>${countLabel}</span>
+      </div>
     </div>
   </header>
-  <div class="marquee"><div class="track">${marquee}</div></div>
+  <div class="actions" id="listen">
+    <a class="play" href="https://open.spotify.com/" aria-label="Play on Spotify"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></a>
+    <a class="follow" href="${esc(meta.siteUrl)}/feed.xml">Follow</a>
+    <div class="iconlinks">
+      <a href="https://open.spotify.com/" aria-label="Spotify"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.3a.75.75 0 01-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 11-.33-1.46c4.57-1.04 8.5-.59 11.66 1.34.35.22.46.68.25 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 11-.54-1.8c4.37-1.32 9.79-.68 13.49 1.6.44.27.58.85.31 1.29zm.13-3.4C15.13 8.28 8.6 8.07 4.85 9.21a1.12 1.12 0 11-.65-2.15C8.5 5.75 15.71 6 20.06 8.58a1.12 1.12 0 11-1.16 1.92z"/></svg></a>
+      <a href="https://podcasts.apple.com/" aria-label="Apple Podcasts"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-3.2 19.47c-.05-.83-.1-2.1.02-3.01.11-.82.7-5.2.7-5.2s-.18-.36-.18-.9c0-.83.49-1.46 1.09-1.46.51 0 .76.39.76.85 0 .52-.33 1.3-.5 2.02-.14.6.3 1.1.9 1.1 1.08 0 1.9-1.14 1.9-2.78 0-1.45-1.04-2.47-2.53-2.47-1.72 0-2.73 1.29-2.73 2.62 0 .52.2 1.08.45 1.38a.18.18 0 01.04.17c-.05.2-.15.6-.17.68-.03.11-.09.14-.21.08-.79-.37-1.28-1.51-1.28-2.43 0-1.98 1.44-3.8 4.15-3.8 2.18 0 3.87 1.55 3.87 3.63 0 2.17-1.36 3.91-3.26 3.91-.64 0-1.24-.33-1.44-.72l-.39 1.5c-.14.55-.52 1.23-.78 1.65A10 10 0 1012 2z"/></svg></a>
+      <a href="${esc(meta.siteUrl)}/feed.xml" aria-label="RSS"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 11a9 9 0 019 9h-2.5A6.5 6.5 0 004 13.5V11zm0-5a14 14 0 0114 14h-2.5A11.5 11.5 0 004 8.5V6zm2.5 10.5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></a>
+    </div>
+  </div>
+  <div class="sec-head" id="episodes"><h2>All episodes</h2><span class="count">${countLabel}</span></div>
+  ${total ? '<div class="list-cols"><span>#</span><span>Episode</span></div>' : ''}
+${rows}
   <div class="sec-head"><h2>What you'll hear</h2></div>
   <div class="bento">
     <div class="cardb"><span class="ic">🤖</span><h4>Real multi-agent systems</h4><p>Nine production AI agents, what broke, and what actually held up.</p></div>
     <div class="cardb"><span class="ic">📈</span><h4>Marketing that's measured</h4><p>GEO/SEO/AEO, attribution over vanity metrics, and the engine behind it.</p></div>
     <div class="cardb"><span class="ic">🛠️</span><h4>Shipping as a solo founder</h4><p>AI-augmented building, honest constraints, no hype — just what ships.</p></div>
   </div>
-  <div class="sec-head" id="episodes"><h2>Episodes</h2><span class="count">${total ? `${total} published` : 'launching soon'}</span></div>
-${cards}
-  <div class="sec-head"><h2>Your host</h2></div>
+  <div class="sec-head"><h2>About</h2></div>
   <div class="about">
-    <img src="${xmlEscape(meta.coverUrl)}" alt="${xmlEscape(meta.author)}"/>
-    <div><h4>${xmlEscape(meta.author)}</h4><p>Solo founder of <a href="https://aideazz.xyz">AIdeazz</a> — building a company with AI agents from Panama. Former board-level operator, now an AI-augmented builder shipping multi-agent systems in production. This is the honest, unedited version.</p>
+    <img src="${esc(meta.coverUrl)}" alt="${esc(meta.author)}"/>
+    <div><h4>${esc(meta.author)}</h4><p>Solo founder of <a href="https://aideazz.xyz">AIdeazz</a> — building a company with AI agents from Panama. Former board-level operator, now an AI-augmented builder shipping multi-agent systems in production. This is the honest, unedited version.</p>
     <p class="slogan">Your AI companion who remembers your journey — from struggle to success. The <b>A&#8209;to&#8209;Z</b> of your private AI space. <a href="https://aideazz.xyz">aideazz.xyz &rarr;</a></p></div>
   </div>
 </div>
-<footer>© ${new Date().getFullYear()} ${xmlEscape(meta.author)} &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span></footer>
-<script>
-  (function(){var s=document.getElementById('spot');if(!s)return;
-   window.addEventListener('pointermove',function(e){s.style.opacity=1;s.style.left=e.clientX+'px';s.style.top=e.clientY+'px';},{passive:true});
-   window.addEventListener('pointerleave',function(){s.style.opacity=0;});})();
-</script>
+<footer>© ${new Date().getFullYear()} ${esc(meta.author)} &middot; powered by the <span class="g">AIdeazz Voice Growth Engine</span></footer>
 </body>
 </html>
 `;
