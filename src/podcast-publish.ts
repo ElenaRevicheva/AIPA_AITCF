@@ -97,13 +97,13 @@ async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
     if (resp.ok) {
       const size = 470;
       const raw = Buffer.from(await resp.arrayBuffer());
-      // trim() removes the flat white canvas border so only the rounded icon tile remains.
-      let icon: Buffer;
-      try {
-        icon = await sharp(raw).trim({ threshold: 15 }).resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
-      } catch {
-        icon = await sharp(raw).resize(size, size, { fit: 'cover' }).png().toBuffer();
-      }
+      // Crop ~10% into the icon to remove its baked-in white card frame, then round the corners.
+      const big = Math.round(size * 1.2);
+      const off = Math.round((big - size) / 2);
+      const r = Math.round(size * 0.2);
+      const maskSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${r}" ry="${r}" fill="#fff"/></svg>`;
+      const cropped = await sharp(raw).resize(big, big, { fit: 'cover' }).extract({ left: off, top: off, width: size, height: size }).png().toBuffer();
+      const icon = await sharp(cropped).composite([{ input: Buffer.from(maskSvg), blend: 'dest-in' }]).png().toBuffer();
       return sharp(bg).composite([{ input: icon, top: 245, left: Math.round((W - size) / 2) }]).png().toBuffer();
     }
   } catch { /* fall back to text-only cover */ }
