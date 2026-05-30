@@ -60,10 +60,15 @@ export function generatePodcastJsonLd(meta: PodcastMeta, episodes: PodcastEpisod
     url: meta.siteUrl,
     image: meta.coverUrl,
     inLanguage: meta.language,
-    author: { '@type': 'Person', name: meta.author, url: 'https://aideazz.xyz' },
+    author: {
+      '@type': 'Person', name: meta.author, url: 'https://aideazz.xyz',
+      sameAs: ['https://www.linkedin.com/in/elenarevicheva', 'https://dev.to/elenarevicheva', 'https://www.youtube.com/@AIdeazz'],
+    },
     publisher: { '@type': 'Organization', name: 'AIdeazz', url: 'https://aideazz.xyz' },
     webFeed: `${meta.siteUrl}/feed.xml`,
     genre: meta.category,
+    keywords: 'AI podcast, AI-augmented building, agentic AI, AI agents, building in public, solo founder, multi-agent systems, AI engineering, marketing engine, GEO SEO AEO',
+    sameAs: ['https://www.youtube.com/@AIdeazz', 'https://aideazz.xyz'],
   };
   if (episodes.length) {
     series.numberOfEpisodes = episodes.length;
@@ -129,7 +134,9 @@ export function generateLlmsTxt(meta: PodcastMeta, episodes: PodcastEpisode[]): 
     `- Format: ${meta.category} podcast, episodic, language ${meta.language}`,
     `- RSS feed: ${meta.siteUrl}/feed.xml`,
     `- Website: ${meta.siteUrl}`,
+    '- Listen on: Spotify (https://open.spotify.com) and YouTube (https://www.youtube.com/@AIdeazz)',
     `- Parent project: AIdeazz (https://aideazz.xyz) — multi-agent AI systems built in production`,
+    '- Topics / keywords: AI-augmented building, agentic AI, AI agents, building in public, solo founder, multi-agent systems, AI engineering, marketing engine, GEO/SEO/AEO',
     '',
     '## What this podcast covers',
     'Honest, failure-first lessons from building a company with AI agents: AI-augmented development, multi-agent orchestration, marketing engines (GEO/SEO/AEO), attribution over vanity metrics, voice automation, and shipping resilient systems as a solo founder.',
@@ -243,6 +250,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${xmlEscape(meta.title)} — AI podcast by ${xmlEscape(meta.author)}</title>
 <meta name="description" content="${xmlEscape(meta.description)}"/>
+<meta name="keywords" content="AI podcast, AI-augmented, agentic AI, AI agents, building in public, solo founder, multi-agent systems, AI engineering, marketing engine, AIdeazz, Elena Revicheva"/>
+<meta name="author" content="${xmlEscape(meta.author)}"/>
 <link rel="canonical" href="${xmlEscape(meta.siteUrl)}/"/>
 <meta name="theme-color" content="#05060a"/>
 <meta property="og:type" content="website"/>
