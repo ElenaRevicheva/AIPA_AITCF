@@ -1687,6 +1687,14 @@ The actual listenable podcast. New isolated repo `ElenaRevicheva/aideazz-podcast
 - ✅ **LIVE ON SPOTIFY**: submitted + accepted on Spotify for Creators via RSS `https://podcast.aideazz.xyz/feed.xml` (OAuth login, feed validated, ownership email-verified, metadata Panama/English/Business & Technology). Future episodes auto-appear (Spotify polls the feed).
 - ⏳ Optional remaining (same feed): Apple Podcasts Connect, YouTube Music, Amazon Music.
 
+**MAY 30 2026 UPDATE — distribution + design + verification:**
+- ✅ **LIVE ON YOUTUBE**: @AIdeazz channel (UCMhNF55kLPSk-tv5CW13VHQ) → Studio → Podcasts → Submit RSS feed → feed validated + ownership-verified; show now **Public** (1 video). New feed episodes auto-upload. (YT title syncs from feed on its poll cadence.)
+- ✅ **Retitled**: "AIdeazz — Building in Public On The Go" + tagline "AI-Augmented. Agentic. From A to Z." (was "Building in Public with AI").
+- ✅ **Typography = Figtree** (Spotify-Circular style) across site + cover (Figtree TTF installed on Oracle `~/.fonts/` for the server-rendered cover). Brand mark = real aideazz.xyz "A" favicon. Palette purple+yellow. YouTube icon replaced Apple in the links row.
+- ✅ **Surfaced on own resources**: `aideazz.xyz/pitch.html` (AIdeazz Podcast button + favicon), Portfolio + homepage (Podcast buttons next to Pitch) — aideazz repo commits `6bf3bb0`/`627ee04`/`9fc353b`.
+- ✅ **PIPELINE VERIFIED (evidence, not config)**: one `/podcast`|`/podcast_ai` → 6 legs automatically — podcast.aideazz.xyz (feed+site), Spotify (auto-poll), YouTube (auto-upload, Public), blog (Dev.to+aideazz), LinkedIn (Buffer: Ep1 = 1 sent + 2 scheduled), HubSpot (UTM `utm_medium=voice_engine`→/marketing/inquiry→triage; **real leads only**, never fabricated). SEO/GEO/AEO all valid (PodcastSeries JSON-LD, robots AI-crawlers, sitemap, llms.txt).
+- ⏳ Still optional: Apple Podcasts (paused at Apple ID sign-in), Amazon Music.
+
 ### Deferred (Phase 3)
 
 Native ES-blog static publishing (/es/blog); IG auto-post (needs media); `[CLIENT-CMO-VOICE]`

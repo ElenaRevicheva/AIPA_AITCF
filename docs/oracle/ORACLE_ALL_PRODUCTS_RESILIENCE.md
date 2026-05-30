@@ -1270,3 +1270,40 @@ ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/buffer-cli.
 
 **Pattern earned:** *"a new distribution arm should be a second parallel path, never a
 rewrite of the working one — gate it off by default, prove it with draft mode, then flip on."*
+
+---
+
+## NEW May 29-30 2026 — AIdeazz Voice Growth Engine + Podcast (additive, gated, in cto-aipa)
+
+**What it is:** Voice/topic → bilingual omnichannel campaign + an actual auto-publishing podcast.
+All additive in the `cto-aipa` (AIPA_AITCF) process; existing agents untouched. Full design +
+build history in [[project_voice_growth_engine]] memory + the marketing roadmap doc.
+
+**Telegram commands (in `cto-aipa`, gated by env flags):**
+- `/campaign` (reply to a voice note) → Speechmatics transcribe+translate → Claude→Groq atomizer →
+  bilingual blog + LinkedIn/IG, UTM-tagged → publish. Flag `VOICE_ENGINE_ENABLED=true`.
+- `/podcast` (reply to audio) + `/podcast_ai <topic>` → same + show notes/chapters + **publishes an
+  audio episode to the podcast feed**. Flags `PODCAST_ENGINE_ENABLED=true`, `PODCAST_PUBLISH_ENABLED=true`.
+
+**Key files (cto-aipa/src):** `speechmatics.ts` (ASR+translation+diarization), `voice-growth-engine.ts`
+(atomizer), `voice-campaign-publish.ts` (blog+Buffer), `podcast-engine.ts` + `podcast-command.ts` +
+`podcast-ai-command.ts`, `podcast-feed.ts` (RSS+site+SEO), `podcast-publish.ts` (GitHub-API publish).
+CLIs: `scripts/voice-engine-cli.ts`, `scripts/podcast-host-cli.ts` (init|info|reseed).
+
+**External infra (NEW):**
+- **Podcast site/repo:** `ElenaRevicheva/aideazz-podcast` (separate repo) → **4everland** → `https://podcast.aideazz.xyz`
+  (Cloudflare CNAME `podcast` → ddnsweb3.com, DNS-only). Feed `…/feed.xml`. Episodes commit via GitHub API → 4everland auto-redeploys.
+- **Distribution LIVE:** Spotify for Creators (auto-polls feed) + YouTube @AIdeazz podcast (Public, auto-uploads). Apple pending.
+- **Fonts:** Figtree TTF installed on Oracle `~/.fonts/Figtree.ttf` (+`fc-cache`) — required for the
+  server-rendered cover PNG (sharp/librsvg via fontconfig). If cover reverts to Arial, re-install.
+
+**Env added to `/home/ubuntu/cto-aipa/.env` (gitignored):** `SPEECHMATICS_API_KEY`, `SPEECHMATICS_REGION=eu1`,
+`BUFFER_API_TOKEN`, `BUFFER_ORG_ID`, `BUFFER_TARGET_SERVICES`, `BUFFER_SOCIAL_ENABLED`, `VOICE_ENGINE_ENABLED`,
+`PODCAST_ENGINE_ENABLED`, `PODCAST_PUBLISH_ENABLED`, `PODCAST_SITE_URL=https://podcast.aideazz.xyz`.
+(Rotate Speechmatics + Buffer keys — they appeared in chat during setup.)
+
+**Verify command:** `ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && npx ts-node scripts/voice-engine-cli.ts health"`
+(Speechmatics auth) and `npx ts-node scripts/podcast-host-cli.ts info`.
+
+**Pattern earned:** *"distribute once, prove each leg from evidence — feed item, Dev.to URL, Buffer
+'sent' status, UTM in content, 200 from /marketing/inquiry — never claim propagation from config."*
