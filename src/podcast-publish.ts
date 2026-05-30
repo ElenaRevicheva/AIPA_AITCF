@@ -158,10 +158,10 @@ function episodePageHtml(meta: PodcastMeta, e: PodcastEpisode): string {
 <meta property="og:image" content="${meta.coverUrl}"/>
 <meta name="theme-color" content="#05060a"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-  :root{--bg:#05060a;--txt:#eef1f7;--mut:#9aa3b8;--line:rgba(255,255,255,.08);--a1:#a855f7;--a2:#ec4899;--a3:#d946ef;
-    --disp:'Space Grotesk',sans-serif;--body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+  :root{--bg:#0a0712;--txt:#f3f0fa;--mut:#b3a9c9;--line:rgba(255,255,255,.09);--a1:#a855f7;--a2:#facc15;--a3:#7c3aed;
+    --disp:'Figtree',-apple-system,Segoe UI,sans-serif;--body:'Figtree',-apple-system,Segoe UI,sans-serif;--mono:'Figtree',-apple-system,Segoe UI,sans-serif}
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.7;-webkit-font-smoothing:antialiased;position:relative;overflow-x:hidden}
   .aurora{position:fixed;inset:0;z-index:-1;filter:blur(70px);opacity:.4;overflow:hidden}

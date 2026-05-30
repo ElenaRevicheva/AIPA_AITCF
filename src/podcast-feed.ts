@@ -259,7 +259,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <link rel="sitemap" type="application/xml" href="${xmlEscape(meta.siteUrl)}/sitemap.xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <script type="application/ld+json">${jsonLd}</script>
 <style>
   :root{
@@ -267,10 +267,10 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
     --txt:#f3f0fa; --mut:#b3a9c9; --mut2:#857a9c;
     --a1:#a855f7; --a2:#facc15; --a3:#7c3aed;
     --grad:linear-gradient(115deg,#7c3aed,#a855f7 42%,#facc15);
-    --disp:'Space Grotesk',-apple-system,Segoe UI,sans-serif;
-    --brandf:'Poppins',-apple-system,Segoe UI,sans-serif;
-    --body:'Inter',-apple-system,Segoe UI,sans-serif;
-    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --disp:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
+    --brandf:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
+    --body:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
+    --mono:'Figtree',-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
