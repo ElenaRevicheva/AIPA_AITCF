@@ -26,8 +26,8 @@ function ghToken(): string {
 export function podcastMeta(): PodcastMeta {
   const site = siteUrl();
   return {
-    title: process.env.PODCAST_TITLE?.trim() || 'AIdeazz — Building in Public with AI',
-    description: process.env.PODCAST_DESC?.trim() || 'A solo founder building a company with AI agents. Honest lessons on AI-augmented building, marketing engines, and shipping in production. By Elena Revicheva.',
+    title: process.env.PODCAST_TITLE?.trim() || 'AIdeazz — Building in Public On The Go',
+    description: process.env.PODCAST_DESC?.trim() || 'Building in public, on the go — AI-augmented, agentic, from A to Z. Honest lessons on building a company with AI agents, marketing engines, and shipping in production. By Elena Revicheva.',
     author: process.env.PODCAST_AUTHOR?.trim() || 'Elena Revicheva',
     email: process.env.PODCAST_EMAIL?.trim() || process.env.MARKETING_INQUIRY_TO || 'elena.revicheva2016@gmail.com',
     siteUrl: site,

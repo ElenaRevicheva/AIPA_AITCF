@@ -311,6 +311,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   .hero-info h1 .g{background:var(--grad);background-size:220% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shift 5s linear infinite}
   @keyframes shift{to{background-position:220% center}}
   @media(prefers-reduced-motion:reduce){.hero-info h1 .g{animation:none}}
+  .tagline{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--a2);margin:0 0 16px}
   .hero-meta{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--mut);flex-wrap:wrap}
   .hero-meta .mk{width:22px;height:22px;border-radius:6px;overflow:hidden;display:inline-block}
   .hero-meta .mk img{width:100%;height:100%;object-fit:cover;transform:scale(1.18)}
@@ -389,7 +390,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
     <img class="cover" src="${esc(meta.coverUrl)}" alt="${esc(meta.title)} cover"/>
     <div class="hero-info">
       <span class="kind">Podcast</span>
-      <h1>Building in Public<br/>with <span class="g">AI Agents.</span></h1>
+      <h1>Building in Public<br/><span class="g">On The Go.</span></h1>
+      <p class="tagline">AI-Augmented. Agentic. From A to Z.</p>
       <p class="lede" style="color:var(--mut);max-width:580px;margin-bottom:14px">Honest lessons on AI-augmented building, marketing engines, and shipping in production. By ${esc(meta.author)}.</p>
       <div class="hero-meta">
         <span class="mk"><img src="https://aideazz.xyz/faviconnew.png" alt="AIdeazz"/></span>
