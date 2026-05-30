@@ -85,7 +85,7 @@ async function generateCoverPng(meta: PodcastMeta): Promise<Buffer> {
     </defs>
     <rect width="${W}" height="${W}" fill="url(#bg)"/>
     <circle cx="750" cy="620" r="500" fill="url(#glow)"/>
-    <text x="750" y="1170" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="178" text-anchor="middle" letter-spacing="1"><tspan fill="#ffffff">AI</tspan><tspan fill="#c084fc">deazz</tspan></text>
+    <text x="750" y="1170" font-family="Figtree, Arial, sans-serif" font-weight="800" font-size="178" text-anchor="middle" letter-spacing="-2"><tspan fill="#ffffff">AI</tspan><tspan fill="#c084fc">deazz</tspan></text>
   </svg>`;
   const bg = await sharp(Buffer.from(bgSvg)).png().toBuffer();
   // Composite the real AIdeazz "A" icon (faviconnew.png) as the central brand mark.
