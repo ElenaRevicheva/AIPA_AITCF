@@ -149,10 +149,11 @@ async function classifyBuyingIntent(
 
   const prompt = `You triage web search results for AIdeazz, which sells: a Fractional CTO retainer, AI Marketing Engine setup, and custom AI agent builds. The ideal buyer is a NON-TECHNICAL FOUNDER or a small/mid business that needs technical leadership or AI/automation help.
 
-For each result decide: is this a REAL BUYING SIGNAL — i.e. a specific person or company ACTIVELY EXPRESSING A NEED to hire/find a CTO, technical co-founder, AI engineer, or someone to build their app/product/automation?
+For each result decide: is this a REAL BUYING SIGNAL — i.e. a specific person or company ACTIVELY EXPRESSING A NEED for TECHNICAL help AIdeazz sells: to hire/find a CTO, technical co-founder, AI engineer, or someone to BUILD their app/product/software/automation.
 
 Mark is_lead=false for: news/opinion articles, how-to/guides, definitions, general discussions or debates ABOUT the topic, podcasts, course/ad pages, people OFFERING their own services (freelancers/agencies/"for hire"), and job-seekers looking for roles.
-Mark is_lead=true ONLY when someone is the BUYER actively seeking the help AIdeazz provides.
+ALSO mark is_lead=false when the person is seeking the OPPOSITE of what AIdeazz offers — e.g. a (technical) founder seeking a SALES / MARKETING / BUSINESS / non-technical co-founder. AIdeazz is the technical/AI side, so only people who need TECHNICAL/AI/BUILD help are buyers.
+Mark is_lead=true ONLY when someone is the BUYER actively seeking the technical/AI/build help AIdeazz provides.
 
 For each lead, write a short human label of WHO wants WHAT (e.g. "Non-technical founder seeking CTO for social-media app", "SMB owner needs help automating operations with AI"). For non-leads, label can be "".
 
