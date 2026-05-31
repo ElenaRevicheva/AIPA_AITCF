@@ -249,6 +249,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${xmlEscape(meta.title)} — AI podcast by ${xmlEscape(meta.author)}</title>
+<link rel="icon" type="image/png" href="https://aideazz.xyz/faviconnew.png"/>
+<link rel="apple-touch-icon" href="https://aideazz.xyz/faviconnew.png"/>
 <meta name="description" content="${xmlEscape(meta.description)}"/>
 <meta name="keywords" content="AI podcast, AI-augmented, agentic AI, AI agents, building in public, solo founder, multi-agent systems, AI engineering, marketing engine, AIdeazz, Elena Revicheva"/>
 <meta name="author" content="${xmlEscape(meta.author)}"/>
