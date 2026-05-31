@@ -121,15 +121,17 @@ async function firstAssoc(dealId, toType) {
         }
       }
 
-      // Company enrichment (fill blanks only)
+      // Company enrichment (fill blanks only).
+      // NOTE: we deliberately DO NOT derive company domain from the README-extracted
+      // contact email here — those are frequently placeholder (acme.com, yourco.com)
+      // or third-party domains, so writing them would fabricate wrong data. The
+      // original scraped website isn't persisted, so backfill only sets the
+      // (accurate, Haiku-classified) description.
       if (companyId) {
         const co = await hs('GET', `/crm/v3/objects/companies/${companyId}?properties=name,domain,website,description`);
         const p = co.properties || {};
         const patch = {};
-        const domain = companyDomainFromEmail(contactEmail);
         const desc = descFromDeal(deal.description);
-        if (domain && !p.domain)         patch.domain = domain;
-        if (domain && !p.website)        patch.website = `https://${domain}`;
         if (desc && !p.description)      patch.description = desc;
         if (Object.keys(patch).length) {
           if (DRY) { console.log(`  company ${companyId} (${p.name}): would set ${JSON.stringify(patch)}`); }

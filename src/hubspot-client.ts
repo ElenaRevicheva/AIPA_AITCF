@@ -42,10 +42,20 @@ export function domainFromUrl(url?: string | null): string | undefined {
   } catch { return undefined; }
 }
 
-/** Company domain derived from a contact email — only when it is NOT free webmail. */
+// Placeholder/example domains that appear in README templates — never a real company.
+const PLACEHOLDER_DOMAINS = new Set([
+  'example.com', 'example.org', 'example.net', 'acme.com', 'yourco.com',
+  'yourcompany.com', 'company.com', 'domain.com', 'email.com', 'test.com',
+  'mycompany.com', 'sample.com', 'foo.com', 'bar.com', 'localhost',
+]);
+
+/** Company domain derived from a contact email — only when it is NOT free webmail
+ *  and NOT a known placeholder/example domain (those would fabricate wrong data). */
 export function companyDomainFromEmail(email?: string | null): string | undefined {
   if (!email || !email.includes('@') || isFreeEmailDomain(email)) return undefined;
-  return email.split('@')[1]?.toLowerCase().trim() || undefined;
+  const dom = email.split('@')[1]?.toLowerCase().trim();
+  if (!dom || PLACEHOLDER_DOMAINS.has(dom)) return undefined;
+  return dom;
 }
 
 // ─── Client Pipeline — HubSpot default pipeline stage IDs ────────────────────
