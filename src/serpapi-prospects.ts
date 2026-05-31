@@ -191,7 +191,8 @@ async function fetchGoogleSearch(query: string, site: string): Promise<SerpResul
   // Falls back to legacy SerpAPI if BrightData not configured. The two responses
   // are normalized to the same `SerpResult` shape so downstream code is unchanged.
   if (isBrightDataConfigured()) {
-    const bdResults = await bdSerpSearch(query, { site, num: 10, gl: 'us', hl: 'en', tbs: 'qdr:w' });
+    // num:20 — more candidates per BrightData request = more leads per credit.
+    const bdResults = await bdSerpSearch(query, { site, num: 20, gl: 'us', hl: 'en', tbs: 'qdr:w' });
     if (bdResults.length > 0) {
       return bdResults.map(r => {
         const out: SerpResult = {
@@ -203,8 +204,10 @@ async function fetchGoogleSearch(query: string, site: string): Promise<SerpResul
         return out;
       });
     }
-    // bdSerpSearch returned [] — log + continue to SerpAPI fallback if available
-    console.log(`[SerpProspects] BrightData SERP returned 0 for "${query.slice(0, 40)}" — falling back to SerpAPI`);
+    // BrightData is the engine. When it returns 0 the query is simply sparse this
+    // week — do NOT fall back to SerpAPI (quota exhausted; wastes a 20s timeout).
+    console.log(`[SerpProspects] BrightData SERP returned 0 for "${query.slice(0, 40)}" (sparse) — skipping`);
+    return [];
   }
 
   if (!SERPAPI_KEY) return [];

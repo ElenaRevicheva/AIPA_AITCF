@@ -2176,8 +2176,11 @@ async function startCTOAIPA() {
           }
         }
 
-        // BrightData + Claude enrichment for X prospects with a bio website
-        if (source === 'algom_poll' && domain) {
+        // BrightData + Claude enrichment for ANY client-pipeline lead with a domain
+        // (May 31 2026: generalized from algom_poll-only → all client leads, incl.
+        // serpapi_search buying signals — fills HubSpot with founder + tech + AI-pain
+        // using the $200 BrightData credits, on the now-small gated lead set).
+        if (domain && pipeline !== 'hiring' && !liMatch && !cbMatch) {
           try {
             const { enrichLeadWebsite, isBrightDataConfigured } = await import('./brightdata-enrich');
             if (isBrightDataConfigured()) {
@@ -2190,12 +2193,12 @@ async function startCTOAIPA() {
                   const msg = await claude.messages.create({
                     model: 'claude-haiku-4-5-20251001',
                     max_tokens: 200,
-                    messages: [{ role: 'user', content: `You are Elena Revicheva, fractional CTO and AI engineer. Based on the company website excerpt and X signal below, write 2 sentences: (1) their technical pain, (2) how Elena could help.
+                    messages: [{ role: 'user', content: `You are Elena Revicheva, fractional CTO and AI engineer. Based on the company website excerpt and lead signal below, write 2 sentences: (1) their technical pain, (2) how Elena could help.
 
 Website (${domain}):
 ${enrichment.rawExcerpt}
 
-X signal: ${(ctx || '').slice(0, 300)}
+Lead signal: ${(ctx || '').slice(0, 300)}
 
 Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichment.techStack.slice(0, 5).join(', ') || 'unknown'} | Team: ${enrichment.teamSizeSignal || '?'} | Funding: ${enrichment.fundingSignal || '?'}` }],
                   });
@@ -2384,8 +2387,12 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       );
       console.log(`☀️ Sprint briefing cron: "${sprintCronExpr}" (${triageTz})`);
     }
-    // SerpAPI prospect discovery — Google Jobs + Google Search every 6h
-    if (process.env.SERPAPI_KEY?.trim()) {
+    // Client-prospect discovery — every 6h. Runs on BrightData SERP (primary, $200
+    // credits) OR legacy SerpAPI. May 31 2026: SerpAPI quota exhausted, so the gate
+    // now also fires on BrightData alone — the engine is BD-first regardless.
+    const serpDiscoveryEnabled = !!(process.env.SERPAPI_KEY?.trim()
+      || (process.env.BRIGHTDATA_API_TOKEN?.trim() && process.env.BRIGHTDATA_ZONE?.trim()));
+    if (serpDiscoveryEnabled) {
       // Run once at startup
       runSerpProspects().catch(e => console.error('[SerpProspects] startup error:', e));
       // Then every 6h
@@ -2393,7 +2400,7 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
         console.log('[SerpProspects] Running 6h discovery cycle...');
         runSerpProspects().catch(e => console.error('[SerpProspects] cron error:', e));
       }, { timezone: triageTz });
-      console.log('[SerpProspects] Google Jobs + Search discovery: every 6h');
+      console.log('[SerpProspects] Buying-intent client discovery (BrightData-first): every 6h');
     }
   });
 }
