@@ -10,6 +10,8 @@
  */
 
 import crypto from 'crypto';
+import { Anthropic } from '@anthropic-ai/sdk';
+import { claudeWithGroqFallback } from './llm-resilience';
 import { bdSerpSearch, isBrightDataConfigured } from './brightdata-enrich';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
@@ -29,6 +31,10 @@ const SEARCH_QUERIES = [
   // General web — broad but catches blog posts / Twitter threads indexed by Google
   { q: '"fractional CTO" interested OR "fractional CTO" hire OR "fractional CTO" available', site: '', tag: 'web_fractional', urgency: 4 },
   { q: '"hire AI engineer" OR "hiring AI engineer" (startup OR seed OR "series a")',      site: 'site:wellfound.com OR site:ycombinator.com', tag: 'web_ai_eng', urgency: 4 },
+  // ICP-targeted (May 31 2026): non-technical founders + SMBs needing AI/automation
+  { q: '"non-technical founder" ("looking for" OR "need" OR "seeking") (CTO OR "technical co-founder" OR "someone to build")', site: '', tag: 'nontech_founder', urgency: 5 },
+  { q: '"looking for someone to build" (my app OR MVP OR platform OR SaaS OR startup)', site: 'site:reddit.com', tag: 'reddit_build', urgency: 4 },
+  { q: '"need help" ("AI automation" OR "automate my business" OR "AI for my business") (small business OR agency OR founder)', site: '', tag: 'smb_ai', urgency: 4 },
 ];
 
 function loadSeen(): Set<string> {
@@ -83,12 +89,99 @@ const BIG_CO_REJECT = [
   'careeratlas', 'jobs for humanity', 'jobs for the future',
 ];
 
+// Cheap, high-confidence NOISE pre-filter (May 31 2026) — drops obvious
+// articles / news / discussions / job-seekers BEFORE the LLM intent call, to
+// save tokens. Conservative: only rejects when clearly not a buying signal.
+const NOISE_DOMAINS = [
+  'wikipedia.org', 'britannica.com', 'youtube.com', 'youtu.be', 'forbes.com',
+  'techcrunch.com', 'wired.com', 'cnn.com', 'bbc.com', 'nbcnews.com', 'nytimes.com',
+  'theverge.com', 'cnbc.com', 'washingtonpost.com', 'theguardian.com',
+  'businessinsider.com', 'vox.com', 'platformer.news', 'medium.com', 'substack.com',
+  'energy.gov', 'investopedia.com', 'hbr.org', 'gartner.com', 'mckinsey.com',
+];
+// Article/opinion/discussion title shapes — content ABOUT the topic, not a buyer.
+const NOISE_TITLE_PATTERNS = [
+  'how to', 'how ai', 'why ', 'what is', 'what are', 'the best', 'top ', ' vs ',
+  'guide to', 'tutorial', 'explained', 'definition', 'examples', 'is destroying',
+  'is dead', 'surpasses', 'step down', 'steps down', 'suffering from', 'apparently',
+  ' | hacker news', 'ask hn:', 'i talked', 'i hired', 'i briefly', 'i always',
+  'my worst', "i've ever had", 'rant on', 'for hire', '[for hire]', 'for-hire',
+  'seeking roles', 'seeking ml', 'seeking a job', 'cs student', 'cs grad', 'unemployed',
+  'data scientist', 'open to work', '#opentowork', 'available for hire',
+];
+
+function looksLikeNoise(title: string, link: string): string | null {
+  const t = (title || '').toLowerCase();
+  const l = (link || '').toLowerCase();
+  for (const d of NOISE_DOMAINS)        if (l.includes(d)) return `noise-domain: ${d}`;
+  for (const p of NOISE_TITLE_PATTERNS) if (t.includes(p)) return `noise-title: ${p}`;
+  return null;
+}
+
 function shouldRejectResult(title: string, link: string): string | null {
   const t = (title || '').toLowerCase();
   const l = (link || '').toLowerCase();
   for (const p of TITLE_REJECT_PATTERNS) if (t.includes(p)) return `title-pattern: ${p}`;
   for (const c of BIG_CO_REJECT)         if (t.includes(c) || l.includes(c)) return `big-co/aggregator: ${c}`;
+  const noise = looksLikeNoise(title, link);
+  if (noise) return noise;
   return null;
+}
+
+// ─── Buying-intent classifier (the core fix) ──────────────────────────────────
+// A Google result is a PAGE, not a prospect. This decides whether the page
+// represents a real person/company ACTIVELY SEEKING to hire a CTO / technical
+// co-founder / AI build help — vs an article, discussion, news, or job-seeker.
+
+interface Candidate { title: string; link: string; snippet: string; tag: string; urgency: number; domain?: string | undefined; }
+interface IntentVerdict { isLead: boolean; label: string; confidence: number; }
+
+async function classifyBuyingIntent(
+  anthropic: Anthropic,
+  candidates: Candidate[],
+): Promise<Map<number, IntentVerdict>> {
+  const out = new Map<number, IntentVerdict>();
+  if (candidates.length === 0) return out;
+
+  const list = candidates
+    .map((c, i) => `${i + 1}. TITLE: ${c.title}\n   SNIPPET: ${(c.snippet || '').slice(0, 220)}\n   URL: ${c.link}`)
+    .join('\n');
+
+  const prompt = `You triage web search results for AIdeazz, which sells: a Fractional CTO retainer, AI Marketing Engine setup, and custom AI agent builds. The ideal buyer is a NON-TECHNICAL FOUNDER or a small/mid business that needs technical leadership or AI/automation help.
+
+For each result decide: is this a REAL BUYING SIGNAL — i.e. a specific person or company ACTIVELY EXPRESSING A NEED to hire/find a CTO, technical co-founder, AI engineer, or someone to build their app/product/automation?
+
+Mark is_lead=false for: news/opinion articles, how-to/guides, definitions, general discussions or debates ABOUT the topic, podcasts, course/ad pages, people OFFERING their own services (freelancers/agencies/"for hire"), and job-seekers looking for roles.
+Mark is_lead=true ONLY when someone is the BUYER actively seeking the help AIdeazz provides.
+
+For each lead, write a short human label of WHO wants WHAT (e.g. "Non-technical founder seeking CTO for social-media app", "SMB owner needs help automating operations with AI"). For non-leads, label can be "".
+
+Results:
+${list}
+
+Return ONLY a valid JSON array, one object per result in order:
+[{"i":1,"is_lead":true,"label":"...","confidence":0.0-1.0}, ...]`;
+
+  try {
+    const text = await claudeWithGroqFallback(
+      anthropic, 'claude-haiku-4-5-20251001', 2048, null, prompt, 'serp-prospects/intent',
+    );
+    const m = text.match(/\[[\s\S]*\]/);
+    if (!m) { console.warn('[SerpProspects] intent classifier returned non-JSON'); return out; }
+    const parsed = JSON.parse(m[0]) as Array<{ i: number; is_lead: boolean; label?: string; confidence?: number }>;
+    for (const e of parsed) {
+      const idx = e.i - 1;
+      if (idx < 0 || idx >= candidates.length) continue;
+      out.set(idx, {
+        isLead: !!e.is_lead,
+        label: (e.label || '').trim(),
+        confidence: typeof e.confidence === 'number' ? e.confidence : (e.is_lead ? 0.7 : 0),
+      });
+    }
+  } catch (e) {
+    console.error('[SerpProspects] intent classification error:', (e as Error).message?.slice(0, 120));
+  }
+  return out;
 }
 
 async function fetchGoogleSearch(query: string, site: string): Promise<SerpResult[]> {
@@ -149,18 +242,32 @@ async function pushToCRM(payload: Record<string, unknown>): Promise<void> {
   } catch {}
 }
 
-export async function runSerpProspects(): Promise<void> {
-  if (!SERPAPI_KEY) {
-    console.warn('[SerpProspects] SERPAPI_KEY not set — skipping');
-    return;
+const SERP_MIN_CONFIDENCE = Number(process.env.SERP_MIN_CONFIDENCE || 0.6);
+
+/**
+ * @param opts.dryRun  when true, classifies + logs decisions but pushes NOTHING
+ *                     to the CRM and does NOT persist the seen-set. Used to test
+ *                     the buying-intent gate on live search results safely.
+ */
+export async function runSerpProspects(opts: { dryRun?: boolean } = {}): Promise<{
+  fetched: number; preFiltered: number; classified: number; leads: number; pushed: number;
+}> {
+  const dryRun = !!opts.dryRun;
+  if (!SERPAPI_KEY && !isBrightDataConfigured()) {
+    console.warn('[SerpProspects] no SERPAPI_KEY / BrightData — skipping');
+    return { fetched: 0, preFiltered: 0, classified: 0, leads: 0, pushed: 0 };
   }
 
   const seen = loadSeen();
-  let newProspects = 0;
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || '' });
 
+  // ── 1. Gather candidates across all queries (cheap regex pre-filter only) ──
+  const candidates: Candidate[] = [];
+  let fetched = 0;
   for (const entry of SEARCH_QUERIES) {
     console.log(`[SerpProspects] Querying: ${entry.q.slice(0, 60)} ${entry.site}`);
     const results = await fetchGoogleSearch(entry.q, entry.site);
+    fetched += results.length;
     console.log(`[SerpProspects]   → ${results.length} results`);
 
     for (const result of results) {
@@ -168,42 +275,66 @@ export async function runSerpProspects(): Promise<void> {
       if (seen.has(hash)) continue;
       seen.add(hash);
 
-      // HARD FILTER: skip wrong-role + big-co + aggregator results before any push.
       const rejectReason = shouldRejectResult(result.title || '', result.link || '');
       if (rejectReason) {
-        console.log(`[SerpProspects]   ✗ REJECT (${rejectReason}): ${result.title?.slice(0, 60)}`);
+        console.log(`[SerpProspects]   ✗ pre-filter (${rejectReason}): ${result.title?.slice(0, 55)}`);
         continue;
       }
-      newProspects++;
 
-      // Extract domain for BrightData enrichment (fires automatically in crm-event handler)
+      // Domain for enrichment — drop aggregator/forum domains (not a company site)
       let domain: string | undefined;
       try {
         domain = new URL(result.link).origin;
-        // Skip aggregator domains — not useful to enrich
-        const skipDomains = ['news.ycombinator.com', 'reddit.com', 'twitter.com', 'x.com', 'google.com', 'wikipedia.org', 'youtube.com', 'forbes.com', 'techcrunch.com', 'wired.com', 'cnn.com', 'bbc.com', 'medium.com', 'indeed.com', 'glassdoor.com', 'linkedin.com'];
+        const skipDomains = ['news.ycombinator.com', 'reddit.com', 'twitter.com', 'x.com', 'google.com', 'wikipedia.org', 'youtube.com', 'forbes.com', 'techcrunch.com', 'wired.com', 'cnn.com', 'bbc.com', 'medium.com', 'indeed.com', 'glassdoor.com', 'linkedin.com', 'wellfound.com'];
         if (skipDomains.some(d => domain!.includes(d))) domain = undefined;
       } catch {}
 
-      console.log(`[SerpProspects]   + [${entry.tag}] ${result.title?.slice(0, 60)}`);
-
-      await pushToCRM({
-        source:   'serpapi_search',
-        type:     'prospect',
-        pipeline: 'client',
-        sourcePrefix: 'CLIENT-CTO-SERP',
-        name:     result.title?.slice(0, 120) || 'Unknown',
-        domain,
-        context:  `[Google/${entry.tag}] ${result.title}\n${result.link}\n\n${result.snippet}`,
-        urgency:  entry.urgency,
-      });
-
-      await new Promise(r => setTimeout(r, 500));
+      candidates.push({ title: result.title || '', link: result.link, snippet: result.snippet || '', tag: entry.tag, urgency: entry.urgency, domain });
     }
-
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, dryRun ? 300 : 2000));
   }
 
-  saveSeen(seen);
-  console.log(`[SerpProspects] Done — new prospects: ${newProspects}`);
+  console.log(`[SerpProspects] ${candidates.length} candidates survived pre-filter (of ${fetched} fetched)`);
+
+  // ── 2. Buying-intent classification (batches of 20) ──
+  const verdicts = new Map<number, IntentVerdict>();
+  for (let i = 0; i < candidates.length; i += 20) {
+    const batch = candidates.slice(i, i + 20);
+    const map = await classifyBuyingIntent(anthropic, batch);
+    map.forEach((v, localIdx) => verdicts.set(i + localIdx, v));
+  }
+
+  // ── 3. Push only genuine buying signals ──
+  let leads = 0, pushed = 0;
+  for (let i = 0; i < candidates.length; i++) {
+    const c = candidates[i]!;
+    const v = verdicts.get(i);
+    const isLead = !!v?.isLead && (v?.confidence ?? 0) >= SERP_MIN_CONFIDENCE;
+    if (!isLead) {
+      console.log(`[SerpProspects]   ✗ not-a-lead (${v ? v.confidence.toFixed(2) : 'n/a'}): ${c.title.slice(0, 55)}`);
+      continue;
+    }
+    leads++;
+    const dealName = (v!.label || c.title).slice(0, 120);
+    console.log(`[SerpProspects]   ✅ LEAD [${c.tag}] ${dealName}`);
+    if (dryRun) continue;
+
+    await pushToCRM({
+      source:   'serpapi_search',
+      type:     'prospect',
+      pipeline: 'client',
+      sourcePrefix: 'CLIENT-CTO-SERP',
+      name:     dealName,
+      domain:   c.domain,
+      context:  `[Google/${c.tag}] BUYING SIGNAL: ${v!.label}\n${c.title}\n${c.link}\n\n${c.snippet}`,
+      urgency:  c.urgency,
+    });
+    pushed++;
+    await new Promise(r => setTimeout(r, 500));
+  }
+
+  if (!dryRun) saveSeen(seen);
+  const stats = { fetched, preFiltered: candidates.length, classified: verdicts.size, leads, pushed };
+  console.log(`[SerpProspects] ${dryRun ? '[DRY-RUN] ' : ''}Done — ${JSON.stringify(stats)}`);
+  return stats;
 }
