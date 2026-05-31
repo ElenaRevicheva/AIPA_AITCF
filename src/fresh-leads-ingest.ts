@@ -451,6 +451,7 @@ export async function runFreshLeadsIngestion(
         name:          l.name,
         email:         l.email || undefined,
         company:       l.company,
+        website:       l.website || undefined,
         linkedinUrl:   l.linkedinUrl || undefined,
         source:        l.source,
         painPoint:     pain?.painPoint,

@@ -18,7 +18,7 @@ import {
   getPlacesPipelineSnapshot,
   type PlacesPipelineSnapshot,
 } from './database';
-import { pushLeadToHubSpot, HS_STAGES, getActionableHubSpotDeals } from "./hubspot-client";
+import { pushLeadToHubSpot, HS_STAGES, getActionableHubSpotDeals, isFreeEmailDomain } from "./hubspot-client";
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = 'claude-sonnet-4-5';
@@ -341,9 +341,18 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
          (isFreshProspect && result.signal_type !== 'irrelevant'));
 
       if (hsEligible) {
-        const hsStage = result.urgency >= 4 ? HS_STAGES.engaged
-                      : result.urgency >= 3 ? HS_STAGES.contacted
-                      : HS_STAGES.prospected;
+        let hsStage = result.urgency >= 4 ? HS_STAGES.engaged
+                    : result.urgency >= 3 ? HS_STAGES.contacted
+                    : HS_STAGES.prospected;
+        // QUALITY GATE (May 31 2026): a fresh prospect only earns an "act now" stage
+        // (qualifiedtobuy / presentationscheduled = the "🔥 I Act TODAY" view) when there's
+        // a real COMPANY signal — a non-free-webmail email. Indie GitHub devs on personal
+        // Gmail stay at 'prospected' so they don't inflate the daily action view with noise.
+        const hasCompanySignal = hasRealEmail && !isFreeEmailDomain(lead.email);
+        if (isFreshProspect && !hasCompanySignal && hsStage !== HS_STAGES.prospected) {
+          console.log(`[triage→HS] gate: "${lead.name}" lacks company signal (free/no email) → capped at prospected`);
+          hsStage = HS_STAGES.prospected;
+        }
         // UPSERT: find existing deal by name (created by fresh-leads-ingest 1h earlier)
         // and update its stage instead of creating a duplicate. Falls back to create-new
         // if no match. Was creating 1 dup per company per cron run.

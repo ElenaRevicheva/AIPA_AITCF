@@ -14,6 +14,40 @@
 const HS_BASE = 'https://api.hubapi.com';
 const HS_KEY  = () => process.env.HUBSPOT_API_KEY || '';
 
+// ─── Enrichment helpers (May 31 2026) ─────────────────────────────────────────
+// Used to fill HubSpot Company/Contact/Deal records with real, scannable data
+// instead of bare names. See pushLeadToHubSpot + lead-triage quality gate.
+
+const FREE_EMAIL_DOMAINS = new Set([
+  'gmail.com', 'googlemail.com', 'yahoo.com', 'ymail.com', 'hotmail.com',
+  'outlook.com', 'live.com', 'msn.com', 'icloud.com', 'me.com', 'mac.com',
+  'aol.com', 'proton.me', 'protonmail.com', 'pm.me', 'gmx.com', 'gmx.net',
+  'mail.com', 'yandex.com', 'zoho.com', 'fastmail.com', 'hey.com', 'tutanota.com',
+]);
+
+/** True when the email is a personal/free webmail address (no company signal). */
+export function isFreeEmailDomain(email?: string | null): boolean {
+  if (!email || !email.includes('@')) return false;
+  const dom = email.split('@')[1]?.toLowerCase().trim();
+  return dom ? FREE_EMAIL_DOMAINS.has(dom) : false;
+}
+
+/** Extract a bare domain (no protocol/path/www) from a URL. */
+export function domainFromUrl(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  try {
+    const u = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    const host = new URL(u).hostname.replace(/^www\./i, '').toLowerCase();
+    return host || undefined;
+  } catch { return undefined; }
+}
+
+/** Company domain derived from a contact email — only when it is NOT free webmail. */
+export function companyDomainFromEmail(email?: string | null): string | undefined {
+  if (!email || !email.includes('@') || isFreeEmailDomain(email)) return undefined;
+  return email.split('@')[1]?.toLowerCase().trim() || undefined;
+}
+
 // ─── Client Pipeline — HubSpot default pipeline stage IDs ────────────────────
 export const HS_STAGES = {
   prospected:  'appointmentscheduled',
@@ -201,13 +235,50 @@ export async function findCompanyByName(name: string): Promise<string | null> {
   return data?.results?.[0]?.id ?? null;
 }
 
+/** Like findCompanyByName but also returns current enrichable props (to fill blanks only). */
+async function findCompanyWithProps(name: string): Promise<{
+  id: string;
+  props: { domain?: string | undefined; website?: string | undefined; description?: string | undefined };
+} | null> {
+  const data = await hsPost<{ results: Array<{ id: string; properties: Record<string, string | null> }> }>(
+    '/crm/v3/objects/companies/search',
+    {
+      filterGroups: [{ filters: [{ propertyName: 'name', operator: 'EQ', value: name }] }],
+      properties: ['name', 'domain', 'website', 'description'],
+      limit: 1,
+    },
+  );
+  const hit = data?.results?.[0];
+  if (!hit) return null;
+  return {
+    id: hit.id,
+    props: {
+      domain:      hit.properties.domain      || undefined,
+      website:     hit.properties.website     || undefined,
+      description: hit.properties.description || undefined,
+    },
+  };
+}
+
 export async function upsertCompany(input: {
   name: string;
   domain?: string | undefined;
+  website?: string | undefined;
   description?: string | undefined;
 }): Promise<string | null> {
-  const existing = await findCompanyByName(input.name);
-  if (existing) return existing;
+  // Existing company → FILL BLANKS ONLY (never clobber operator-entered values).
+  const existing = await findCompanyWithProps(input.name);
+  if (existing) {
+    const patch: Record<string, string> = {};
+    if (input.domain      && !existing.props.domain)      patch.domain      = input.domain;
+    if (input.website     && !existing.props.website)     patch.website     = input.website;
+    if (input.description && !existing.props.description) patch.description = input.description;
+    if (Object.keys(patch).length) {
+      await hsPatch(`/crm/v3/objects/companies/${existing.id}`, { properties: patch });
+      console.log(`[HubSpot] Enriched company ${existing.id} (${input.name}) +[${Object.keys(patch).join(',')}]`);
+    }
+    return existing.id;
+  }
 
   const data = await hsPost<{ id: string }>(
     '/crm/v3/objects/companies',
@@ -215,6 +286,7 @@ export async function upsertCompany(input: {
       properties: {
         name: input.name,
         ...(input.domain      ? { domain: input.domain }           : {}),
+        ...(input.website     ? { website: input.website }         : {}),
         ...(input.description ? { description: input.description } : {}),
       },
     },
@@ -232,6 +304,7 @@ export async function createDeal(input: {
   amount?: number | undefined;
   closeDate?: string | undefined;
   description?: string | undefined;
+  dealType?: string | undefined;
 }): Promise<string | null> {
   const data = await hsPost<{ id: string }>(
     '/crm/v3/objects/deals',
@@ -243,6 +316,7 @@ export async function createDeal(input: {
         ...(input.amount      ? { amount: String(input.amount) }    : {}),
         ...(input.closeDate   ? { closedate: input.closeDate }      : {}),
         ...(input.description ? { description: input.description }  : {}),
+        ...(input.dealType    ? { dealtype: input.dealType }        : {}),
       },
     },
   );
@@ -358,6 +432,10 @@ export interface LeadForHubSpot {
   name: string;
   email?: string | undefined;
   company?: string | undefined;
+  /** Company website scraped at ingest time — used to populate company domain + website. */
+  website?: string | undefined;
+  /** Explicit company domain (overrides website/email-derived). */
+  domain?: string | undefined;
   linkedinUrl?: string | undefined;
   source?: string | undefined;
   painPoint?: string | undefined;
@@ -365,6 +443,29 @@ export interface LeadForHubSpot {
   stage?: HSDealStage | undefined;
   /** e.g. 'CLIENT-CTO-INGEST' or 'CLIENT-ALGOM' — wrapped in [brackets] as dealname prefix */
   sourcePrefix?: string | undefined;
+}
+
+/** Collapse an ugly "X @ X" or redundant "Name @ Company" display name. */
+export function cleanDisplayName(raw: string, company?: string | undefined): string {
+  let name = (raw || '').trim();
+  const parts = name.split(' @ ');
+  if (parts.length === 2) {
+    const left = parts[0]?.trim() || '';
+    const right = parts[1]?.trim() || '';
+    // "Laith0003 @ Laith0003" → "Laith0003"; "Founder @ Acme" / "Jane @ Acme" → keep left
+    if (left && (left === right || right === (company || '').trim())) name = left;
+  }
+  return name;
+}
+
+/** Build a one-line, human-scannable company description from enrichment signals. */
+function buildCompanyDescription(lead: LeadForHubSpot): string | undefined {
+  const bits = [
+    lead.matchedSystem ? `Best-fit AIdeazz system: ${lead.matchedSystem}` : null,
+    lead.painPoint     ? `Likely pain: ${lead.painPoint}`                 : null,
+    lead.source        ? `Discovered via ${lead.source}`                  : null,
+  ].filter(Boolean);
+  return bits.length ? bits.join(' · ') : undefined;
 }
 
 /**
@@ -386,11 +487,12 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
     // 1. Contact — skip if no email AND no name (nothing to identify by)
     //    When email is absent HubSpot still creates a contact by name (useful for
     //    company-sourced prospects where we don't yet have a personal email).
-    const [firstName, ...rest] = lead.name.trim().split(' ');
-    const contactId = lead.email || lead.name
+    const displayName = cleanDisplayName(lead.name, lead.company);
+    const [firstName, ...rest] = displayName.split(' ');
+    const contactId = lead.email || displayName
       ? await upsertContact({
           email:        lead.email,
-          firstName:    firstName ?? lead.name,
+          firstName:    firstName ?? displayName,
           lastName:     rest.join(' ') || undefined,
           company:      lead.company,
           linkedinUrl:  lead.linkedinUrl,
@@ -398,16 +500,24 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
         })
       : null;
 
-    // 2. Company — use explicit company field, fallback to name for company-sourced leads
-    const companyName = lead.company || (lead.email ? undefined : lead.name);
+    // 2. Company — use explicit company field, fallback to name for company-sourced leads.
+    //    Enrich with domain (explicit → website → real company email) + website + description
+    //    so the Company record is scannable, not a bare name.
+    const companyName = lead.company || (lead.email ? undefined : displayName);
+    const companyDomain = lead.domain || domainFromUrl(lead.website) || companyDomainFromEmail(lead.email);
     const companyId = companyName
-      ? await upsertCompany({ name: companyName })
+      ? await upsertCompany({
+          name:        companyName,
+          domain:      companyDomain,
+          website:     lead.website || (companyDomain ? `https://${companyDomain}` : undefined),
+          description: buildCompanyDescription(lead),
+        })
       : null;
 
     // 3. Deal
     const baseDealName = lead.company
       ? `${lead.company} — outreach`
-      : `${lead.name} — outreach`;
+      : `${displayName} — outreach`;
     const dealName = lead.sourcePrefix
       ? `[${lead.sourcePrefix}] ${baseDealName}`
       : baseDealName;
@@ -415,10 +525,13 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
     const dealId = await createDeal({
       name:        dealName,
       stage:       lead.stage ?? HS_STAGES.prospected,
+      dealType:    'newbusiness',
       description: [
         lead.painPoint     ? `Pain point: ${lead.painPoint}`         : null,
         lead.matchedSystem ? `Matched system: ${lead.matchedSystem}` : null,
         lead.source        ? `Source: ${lead.source}`                : null,
+        lead.website       ? `Website: ${lead.website}`              : null,
+        lead.linkedinUrl   ? `LinkedIn: ${lead.linkedinUrl}`         : null,
       ].filter(Boolean).join('\n') || undefined,
     });
 
