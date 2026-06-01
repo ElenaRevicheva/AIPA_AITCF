@@ -590,16 +590,83 @@ function extractTag(text: string, tag: string): string | null {
   return m ? m[1]!.trim() : null;
 }
 
+function cleanTitle(t: string): string {
+  return (t || "")
+    .replace(/<\/?TITLE>/gi, "")
+    .replace(/\*\*/g, "")
+    .replace(/^[#*\s"'`]+/, "")
+    .replace(/["'`#*\s]+$/, "")
+    .trim()
+    .slice(0, 120)
+    .trim();
+}
+
+/**
+ * Tolerant article parser. The canonical contract is the XML envelope
+ * <TITLE>..</TITLE><MARKDOWN>..</MARKDOWN> (Claude obeys it). But the Groq
+ * fallback (and any future model) frequently drops the envelope — and because
+ * ARTICLE_SYSTEM says "no H1", Groq returns a valid body with NO title line at
+ * all. This parser recovers a usable {title, markdown} from any of those shapes
+ * so a credit-exhaustion fallback never silently kills the daily blog.
+ */
 function parseArticle(raw: string): { title: string; markdown: string } | null {
-  const title = extractTag(raw, "TITLE");
-  const markdown = extractTag(raw, "MARKDOWN");
-  if (title && markdown) return { title, markdown };
-  const lines = raw.split(/\r?\n/);
-  if (lines[0]?.startsWith("# ")) {
-    return {
-      title: lines[0].slice(2).trim(),
-      markdown: lines.slice(1).join("\n").replace(/^\s+/, "").trim(),
-    };
+  if (!raw || !raw.trim()) return null;
+
+  // Strip a leading/trailing ```markdown code-fence wrapper some models add.
+  let text = raw.trim()
+    .replace(/^```(?:markdown|md)?\s*\n?/i, "")
+    .replace(/\n?```\s*$/i, "")
+    .trim();
+
+  // 1. Canonical envelope.
+  let title = extractTag(text, "TITLE");
+  let markdown = extractTag(text, "MARKDOWN");
+  if (title && markdown) return { title: cleanTitle(title), markdown: markdown.trim() };
+
+  // 2. Tolerant TITLE detection (envelope missing or malformed).
+  if (!title) {
+    const titlePatterns = [
+      /<TITLE>\s*([^\n<]+?)\s*(?:<\/TITLE>|\n|$)/i,                 // unclosed <TITLE>
+      /^\s*(?:\*\*)?\s*TITLE\s*[:\-]\s*(?:\*\*)?\s*([^\n]+?)\s*$/im, // TITLE: / **TITLE:**
+      /^\s*(?:\*\*)?\s*Title\s*[:\-]\s*(?:\*\*)?\s*([^\n]+?)\s*$/im, // Title:
+      /^\s*#\s+(.+?)\s*$/m,                                          // first '# ' heading anywhere
+    ];
+    for (const re of titlePatterns) {
+      const m = text.match(re);
+      if (m && m[1] && m[1].trim().length >= 8) { title = m[1].trim(); break; }
+    }
+  }
+
+  // 3. Body: use <MARKDOWN> if present, else strip envelope/title scaffolding.
+  if (!markdown) {
+    markdown = text
+      .replace(/<\/?MARKDOWN>/gi, "")
+      .replace(/<TITLE>[\s\S]*?<\/TITLE>/gi, "")
+      .replace(/<\/?TITLE>/gi, "")
+      .replace(/^\s*(?:\*\*)?\s*TITLE\s*[:\-].*$/im, "")
+      .replace(/^\s*(?:\*\*)?\s*Title\s*[:\-].*$/im, "")
+      .trim();
+    if (title) {
+      // Drop a leading '# {title}' heading from the body if it duplicates the title.
+      const esc = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      markdown = markdown.replace(new RegExp(`^\\s*#\\s+${esc}\\s*$`, "m"), "").trim();
+    }
+  }
+
+  // 4. Last-resort title — derive from the first '## ' section or first real line so a
+  //    quality body is NEVER discarded just because the model omitted the title.
+  if (!title && markdown) {
+    const h2 = markdown.match(/^##\s+(.+?)\s*$/m);
+    if (h2 && h2[1]) {
+      title = h2[1].trim();
+    } else {
+      const firstLine = markdown.split(/\r?\n/).find((l) => l.trim().replace(/^[#*>\s]+/, "").length > 12);
+      if (firstLine) title = firstLine.replace(/^[#*>\s]+/, "").trim().slice(0, 90);
+    }
+  }
+
+  if (title && markdown && markdown.length > 200) {
+    return { title: cleanTitle(title), markdown };
   }
   return null;
 }
