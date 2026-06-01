@@ -66,15 +66,40 @@ async function generateTextWithGroqFallback(
     const messages: Array<{ role: "system" | "user"; content: string }> = system
       ? [{ role: "system", content: system }, { role: "user", content: userPrompt }]
       : [{ role: "user", content: userPrompt }];
-    const groqResp = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages,
-      max_tokens: Math.min(maxTokens, 8000), // Groq max for this model
-      temperature: 0.7,
-    });
-    const reply = groqResp.choices[0]?.message?.content?.trim() || "";
-    if (reply) console.warn(`📰 Groq fallback returned ${reply.length} chars — blog cycle continues`);
-    return reply;
+
+    // Groq free tier = 12,000 tokens-per-minute. When Anthropic is fully exhausted,
+    // EVERY agent's fallback competes for that budget in the same minute, so the big
+    // blog-generation call can hit a 413/429 "tokens per minute" error. Retry with a
+    // wait that lets the per-minute window reset — a transient congestion spike must
+    // not kill the daily blog (the exact gap that made the fallback look "broken").
+    const GROQ_MAX_RETRIES = 4;
+    for (let attempt = 1; attempt <= GROQ_MAX_RETRIES; attempt++) {
+      try {
+        const groqResp = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages,
+          max_tokens: Math.min(maxTokens, 8000), // Groq max for this model
+          temperature: 0.7,
+        });
+        const reply = groqResp.choices[0]?.message?.content?.trim() || "";
+        if (reply) console.warn(`📰 Groq fallback returned ${reply.length} chars — blog cycle continues`);
+        return reply;
+      } catch (ge: any) {
+        const gmsg = String(ge?.message || ge || "");
+        const gstatus = ge?.status ?? ge?.statusCode ?? null;
+        const isRateLimit =
+          gstatus === 429 || gstatus === 413 ||
+          /rate.?limit|tokens per minute|\bTPM\b|too large|\b429\b|\b413\b/i.test(gmsg);
+        if (!isRateLimit || attempt === GROQ_MAX_RETRIES) {
+          console.error(`📰 Groq fallback failed (attempt ${attempt}/${GROQ_MAX_RETRIES}): ${gmsg.slice(0, 160)}`);
+          throw ge;
+        }
+        const waitMs = 30_000 + attempt * 5_000; // per-minute TPM window — wait it out
+        console.warn(`📰 Groq ${gstatus ?? ""} TPM/rate limit — retry ${attempt + 1}/${GROQ_MAX_RETRIES} in ${Math.round(waitMs / 1000)}s`);
+        await new Promise((r) => setTimeout(r, waitMs));
+      }
+    }
+    return "";
   }
 }
 
