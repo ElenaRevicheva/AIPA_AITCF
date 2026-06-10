@@ -60,8 +60,15 @@ async function hs(method, p, body) {
     const amt = parseFloat(d.properties.amount || '');
     if (Number.isFinite(amt) && amt > 0) { skippedHasAmount++; continue; }
 
-    const intentText = `${name} ${(d.properties.description || '').slice(0, 300)}`;
-    const offer = matchOfferToIntent(intentText);
+    // Strip the [PREFIX] (contains 'CTO') and OUR OWN product names ('CTO AIPA',
+    // 'CMO AIPA', 'AIdeazz system') from the text — otherwise every deal
+    // false-matches the Fractional CTO offer.
+    const baseName = name.replace(/^\[[A-Z-]+\]\s*/, '');
+    const desc = (d.properties.description || '').slice(0, 300)
+      .replace(/\b(CTO|CMO|VJH)\s*AIPA\b/gi, '')
+      .replace(/matched (system|to)[^.\n]*/gi, '')
+      .replace(/best-fit aideazz system[^.\n]*/gi, '');
+    const offer = matchOfferToIntent(`${baseName} ${desc}`);
     byOffer[offer.label] = (byOffer[offer.label] || 0) + 1;
     priced++;
     if (priced <= 15) console.log(`  ${offer.label.padEnd(28)} ${renderOfferEstimate(offer).padEnd(10)} ${name.slice(0, 75)}`);
