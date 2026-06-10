@@ -78,7 +78,10 @@ function buildConfig(opts: TranscribeOptions): string {
     operating_point: operatingPoint(),
   };
   if (language === 'auto') {
-    transcription_config.language_identification_config = { expected_languages: ['en', 'es'] };
+    // Elena speaks EN, ES, and RU into the engine. Configurable via env.
+    const expected = (process.env.SPEECHMATICS_EXPECTED_LANGS || 'en,es,ru')
+      .split(',').map((s) => s.trim()).filter(Boolean);
+    transcription_config.language_identification_config = { expected_languages: expected };
   }
   if (opts.customDictionary?.length) {
     transcription_config.additional_vocab = opts.customDictionary.map((w) => ({ content: w }));

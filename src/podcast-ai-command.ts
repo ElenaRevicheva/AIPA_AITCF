@@ -19,36 +19,9 @@ import { buildPodcastPackage } from './podcast-engine';
 import { publishVoiceCampaign } from './voice-campaign-publish';
 import { publishEpisode } from './podcast-publish';
 import { isPodcastEngineEnabled, isPodcastPublishEnabled } from './podcast-command';
+import { ttsToMp3 } from './podcast-tts';
 
 const SCRIPT_SYSTEM = `You write spoken podcast scripts for Elena Revicheva, a solo AI founder in Panama (AI-augmented builder). First-person, warm, clear, conversational — it will be read aloud by a single narrator. Short sentences. No headings, no stage directions, no markdown, no emojis. Plain ASCII only. Never invent statistics or facts. 600-900 words.`;
-
-/** Split text into <=maxLen chunks on sentence boundaries (OpenAI TTS caps ~4096 chars/call). */
-function chunkText(text: string, maxLen = 3800): string[] {
-  const sentences = text.split(/(?<=[.!?])\s+/);
-  const chunks: string[] = [];
-  let cur = '';
-  for (const s of sentences) {
-    if ((cur + ' ' + s).length > maxLen) { if (cur) chunks.push(cur.trim()); cur = s; }
-    else cur += (cur ? ' ' : '') + s;
-  }
-  if (cur.trim()) chunks.push(cur.trim());
-  return chunks;
-}
-
-async function ttsToMp3(openai: OpenAI, text: string): Promise<Buffer> {
-  const voice = (process.env.PODCAST_TTS_VOICE || 'nova') as 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
-  const parts: Buffer[] = [];
-  for (const chunk of chunkText(text)) {
-    const res = await openai.audio.speech.create({
-      model: process.env.PODCAST_TTS_MODEL || 'tts-1',
-      voice,
-      input: chunk,
-      response_format: 'mp3',
-    });
-    parts.push(Buffer.from(await res.arrayBuffer()));
-  }
-  return Buffer.concat(parts);
-}
 
 export async function runPodcastAi(ctx: any): Promise<void> {
   try {
