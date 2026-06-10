@@ -185,6 +185,19 @@ See **`HACKATHON_SUBMISSION.md`** in the private docs repo (`aideazz-private-doc
 
 ---
 
+## What's new (late May – June 2026)
+
+The engine grew four durable capabilities — each one earned by a real production incident, not a roadmap:
+
+- **Voice Growth Engine + "Building in Public" Podcast** (`src/voice-growth-engine.ts`, `src/podcast-*.ts`): one voice note → Speechmatics transcription → bilingual blog + LinkedIn/IG atoms (Buffer drip) + a published podcast episode, all UTM-attributed into HubSpot. Auto-publishing RSS + branded site ([podcast.aideazz.xyz](https://podcast.aideazz.xyz)) — **live on Spotify, YouTube, Listen Notes, and Podcast Index**. Episodes from real voice (`/podcast`) or AI-narrated (`/podcast_ai`).
+- **Credit-exhaustion resilience, engine-wide** (`src/llm-resilience.ts` + call-site hardening): every agent falls back Anthropic → Groq on credit exhaustion. When Anthropic credits actually ran out, the daily blog still failed — twice — exposing two deeper gaps that are now fixed: a **tolerant article parser** (Groq drops the XML envelope Claude obeys) and a **TPM-aware retry** (all agents share Groq's 12K tokens/min, so the big blog call retries through congestion). Proof: a full article was generated, parsed, quality-gated, and cross-posted to Dev.to + aideazz.xyz **entirely on the free fallback**.
+- **Buying-intent lead gate + Bright Data-first discovery** (`src/serpapi-prospects.ts`): a Google result is a *page*, not a prospect. An LLM intent classifier now admits only people **actively seeking** technical/AI/build help — articles, news, job-seekers, and freelancers-for-hire are dropped, and deals are named by intent (*"Non-technical founder seeking technical co-founder for music infrastructure startup"*), not by headline. When the paid SERP API quota died (429, no top-up), discovery migrated to **Bright Data organic SERP the same day** — the legacy `serpapi-*` names remain, but Bright Data runs inside.
+- **HubSpot as a revenue surface, not a data dump** (`src/hubspot-client.ts`, `scripts/`): enriched writes (company domain/website/description, `dealtype`, clean contact names, placeholder-domain guard), a quality gate that keeps personal-Gmail prospects out of the "I Act TODAY" view, plus two idempotent operator tools — `carve-revenue-pipeline.cjs` (demote non-contactable deals out of action stages, reversible log) and `cleanup-junk-crm.cjs` (archive headline-era junk: 198 deals + 145 companies + 63 contacts in the June 10 pass). Every record left is a real job lead or a real prospect.
+
+Cross-repo, same period: VibeJobHunter's two dead hiring paths were restored (missing-ID drop fix + SerpAPI→Bright Data jobs migration) — see [that repo's README](https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF) for the engineering highlights.
+
+---
+
 ## 🚀 How To Use Your CTO
 
 **Quick connect:** See **[docs/CONNECT_TO_CTO_AIPA.md](docs/CONNECT_TO_CTO_AIPA.md)** for all ways to reach your CTO (Telegram, terminal, API, GitHub).
@@ -592,12 +605,14 @@ LUMA_API_KEY=<your-luma-key>
 
 | Area | What’s in this repo |
 |------|----------------------|
-| **LLM orchestration** | Multi-step pipeline (analyze → route → generate → persist); two agent personas (CTO + Atuona); model routing by task criticality. |
-| **Integrations** | GitHub API (webhooks, PR comments), Telegram (Grammy, 2 bots), Oracle Autonomous DB (mTLS), Express HTTP, CMO webhook, Replicate/Runway/Luma/OpenAI for image & video. |
+| **LLM orchestration** | Multi-step pipeline (analyze → route → generate → persist); two agent personas (CTO + Atuona); model routing by task criticality; engine-wide Anthropic→Groq credit-exhaustion fallback (proven in production). |
+| **Lead & revenue engine** | LLM buying-intent gate over Bright Data SERP discovery; HubSpot enrichment (domain/description/dealtype, dedup, source prefixes); operator tools for pipeline carving and junk archiving. |
+| **Voice & content** | Voice note → bilingual blog + social atoms + published podcast episode (Spotify / YouTube / Listen Notes / Podcast Index); resilient daily blog with GEO/AEO structured data. |
+| **Integrations** | GitHub API (webhooks, PR comments), Telegram (Grammy, 2 bots), Oracle Autonomous DB (mTLS), HubSpot CRM, Bright Data, Speechmatics, Buffer, Express HTTP, CMO webhook, Replicate/Runway/Luma/OpenAI for image & video. |
 | **Persistence & memory** | Oracle tables (reviews, tech debt, arch decisions, lessons, alerts, conversation context, knowledge base); file-based creative state with extraction and anti-repetition. |
 | **Production** | Live on Oracle Cloud; PM2, cron, health endpoint; < $1/month; security scanning and structured error handling. |
-| **Codebase** | ~15k LOC TypeScript; single deployable service; clear separation between CTO flow, Atuona flow, and shared DB. |
+| **Codebase** | ~35k LOC TypeScript; single deployable service; clear separation between CTO flow, Atuona flow, and shared DB. |
 
 ---
 
-**Version 4.1.0 | May 2026 | Production + Live Web Data Layer (Bright Data hackathon week)**
+**Version 4.2.0 | June 2026 | Production + Buying-Intent Lead Engine + Voice/Podcast Engine + Credit-Exhaustion Resilience**
