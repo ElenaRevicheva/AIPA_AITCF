@@ -12,6 +12,7 @@
 import crypto from 'crypto';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { claudeWithGroqFallback } from './llm-resilience';
+import { matchOfferToIntent, renderOfferEstimate } from './offer-pricing';
 import { bdSerpSearch, isBrightDataConfigured } from './brightdata-enrich';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
@@ -320,7 +321,9 @@ export async function runSerpProspects(opts: { dryRun?: boolean } = {}): Promise
     }
     leads++;
     const dealName = (v!.label || c.title).slice(0, 120);
-    console.log(`[SerpProspects]   ✅ LEAD [${c.tag}] ${dealName}`);
+    // Revenue Cockpit Phase 2: estimate deal value from the intent label
+    const offer = matchOfferToIntent(`${v!.label} ${c.title} ${c.snippet}`);
+    console.log(`[SerpProspects]   ✅ LEAD [${c.tag}] ${dealName} → ${offer.label} (${renderOfferEstimate(offer)})`);
     if (dryRun) continue;
 
     await pushToCRM({
@@ -330,7 +333,8 @@ export async function runSerpProspects(opts: { dryRun?: boolean } = {}): Promise
       sourcePrefix: 'CLIENT-CTO-SERP',
       name:     dealName,
       domain:   c.domain,
-      context:  `[Google/${c.tag}] BUYING SIGNAL: ${v!.label}\n${c.title}\n${c.link}\n\n${c.snippet}`,
+      amount:   offer.amount,
+      context:  `[Google/${c.tag}] BUYING SIGNAL: ${v!.label}\nBest-fit offer: ${offer.label} — est. ${renderOfferEstimate(offer)}\n${c.title}\n${c.link}\n\n${c.snippet}`,
       urgency:  c.urgency,
     });
     pushed++;

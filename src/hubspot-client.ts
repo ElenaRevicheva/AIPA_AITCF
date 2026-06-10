@@ -453,6 +453,8 @@ export interface LeadForHubSpot {
   stage?: HSDealStage | undefined;
   /** e.g. 'CLIENT-CTO-INGEST' or 'CLIENT-ALGOM' — wrapped in [brackets] as dealname prefix */
   sourcePrefix?: string | undefined;
+  /** Estimated deal value in USD (Revenue Cockpit Phase 2 — offer-matched). */
+  amount?: number | undefined;
 }
 
 /** Collapse an ugly "X @ X" or redundant "Name @ Company" display name. */
@@ -536,6 +538,7 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
       name:        dealName,
       stage:       lead.stage ?? HS_STAGES.prospected,
       dealType:    'newbusiness',
+      ...(lead.amount && lead.amount > 0 ? { amount: lead.amount } : {}),
       description: [
         lead.painPoint     ? `Pain point: ${lead.painPoint}`         : null,
         lead.matchedSystem ? `Matched system: ${lead.matchedSystem}` : null,

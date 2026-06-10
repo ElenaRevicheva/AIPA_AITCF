@@ -2084,13 +2084,13 @@ async function startCTOAIPA() {
         source, type, pipeline,
         email, domain, name, context: ctx,
         jobTitle, company, recruiterEmail, recruiterName, jobUrl,
-        stage, urgency, notes, score, sourcePrefix,
+        stage, urgency, notes, score, sourcePrefix, amount,
       } = req.body as {
         source?: string; type?: string; pipeline?: string;
         email?: string; domain?: string; name?: string; context?: string;
         jobTitle?: string; company?: string; recruiterEmail?: string; recruiterName?: string; jobUrl?: string;
         stage?: string; urgency?: number; notes?: string; score?: number;
-        sourcePrefix?: string;
+        sourcePrefix?: string; amount?: number;
       };
 
       if (!source || !pipeline) {
@@ -2231,6 +2231,7 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
           source:  source || 'AI Marketing Engine',
           painPoint: enrichedCtx,
           stage:  stageMap[stage ?? ''] ?? HS_STAGES.prospected,
+          ...(typeof amount === 'number' && amount > 0 ? { amount } : {}),
         });
       }
 

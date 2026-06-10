@@ -445,7 +445,7 @@ function isTestRow(r: any): boolean {
 // what's NEW today separately from what's still in play vs what's aging.
 // Without buckets, the same 10 deals can show identically for a week and
 // the operator stops reading the message.
-function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastModified: string }>): { section: string; counts: { newToday: number; active: number; aging: number } } {
+function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastModified: string; amount?: string }>): { section: string; counts: { newToday: number; active: number; aging: number }; pipelineUsd: number } {
   const stageHint = (stage: string): string =>
     stage === 'qualifiedtobuy' ? '🔥' :
     stage === 'contractsent'   ? '💬' :
@@ -459,6 +459,8 @@ function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastM
 
   type Bucket = 'new' | 'active' | 'aging';
   const buckets: Record<Bucket, Array<{ line: string; days: number }>> = { new: [], active: [], aging: [] };
+  // Revenue Cockpit Phase 2: sum estimated deal values so the brief talks money.
+  let pipelineUsd = 0;
 
   for (const d of deals) {
     const t = d.lastModified ? new Date(d.lastModified).getTime() : 0;
@@ -470,11 +472,15 @@ function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastM
     else if (days <= 7) bucket = 'active';
     else bucket = 'aging';
 
+    const usd = d.amount ? parseFloat(d.amount) : 0;
+    if (Number.isFinite(usd) && usd > 0) pipelineUsd += usd;
+    const moneyTag = Number.isFinite(usd) && usd > 0 ? ` 💰$${Math.round(usd / 100) / 10}K` : '';
+
     const ageLabel =
       days < 0 ? '' :
       days === 0 ? (ageMs <= HOUR ? `${Math.max(1, Math.floor(ageMs / 60_000))}m ago` : `${Math.floor(ageMs / HOUR)}h ago`) :
       `${days}d`;
-    const line = `  ${stageHint(d.stage)} ${d.dealname}${ageLabel ? ' — ' + ageLabel : ''}`;
+    const line = `  ${stageHint(d.stage)} ${d.dealname}${moneyTag}${ageLabel ? ' — ' + ageLabel : ''}`;
     buckets[bucket].push({ line, days });
   }
 
@@ -502,6 +508,7 @@ function renderDealBuckets(deals: Array<{ dealname: string; stage: string; lastM
   return {
     section: parts.join('\n'),
     counts: { newToday: buckets.new.length, active: buckets.active.length, aging: buckets.aging.length },
+    pipelineUsd,
   };
 }
 
@@ -527,16 +534,20 @@ export async function buildDailyBrief(): Promise<string | null> {
 
   // If we ONLY have HubSpot deals (no Oracle signals), surface those:
   if (rows.length === 0 && actionableDeals.length > 0) {
-    const { section, counts } = renderDealBuckets(actionableDeals);
+    const { section, counts, pipelineUsd } = renderDealBuckets(actionableDeals);
+    const moneyLine = pipelineUsd > 0
+      ? `💰 Est. pipeline in play: $${Math.round(pipelineUsd).toLocaleString('en-US')}`
+      : '';
     return [
       `📥 Lead Brief — ${new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`,
+      moneyLine,
       ``,
       `🎯 HubSpot deals needing action (${actionableDeals.length} total: ${counts.newToday} new, ${counts.active} active, ${counts.aging} aging):`,
       section,
       ``,
       `(No new Oracle triage signals — leads flow to HubSpot via May 24 wiring.)`,
       `/triage — re-run triage  |  /leads — full list`,
-    ].join('\n');
+    ].filter(Boolean).join('\n');
   }
 
   const urgent = rows.filter((r: any) => r[4] >= 4);    // urgency
@@ -555,8 +566,9 @@ export async function buildDailyBrief(): Promise<string | null> {
   // Always append HubSpot actionable deals section if any present — bucketed by freshness.
   let hsSection = '';
   if (actionableDeals.length > 0) {
-    const { section, counts } = renderDealBuckets(actionableDeals);
-    hsSection = `\n\n🎯 HubSpot deals needing action (${actionableDeals.length} total: ${counts.newToday} new, ${counts.active} active, ${counts.aging} aging):\n${section}`;
+    const { section, counts, pipelineUsd } = renderDealBuckets(actionableDeals);
+    const moneyLine = pipelineUsd > 0 ? `\n💰 Est. pipeline in play: $${Math.round(pipelineUsd).toLocaleString('en-US')}` : '';
+    hsSection = `\n\n🎯 HubSpot deals needing action (${actionableDeals.length} total: ${counts.newToday} new, ${counts.active} active, ${counts.aging} aging):${moneyLine}\n${section}`;
   }
 
   return [
