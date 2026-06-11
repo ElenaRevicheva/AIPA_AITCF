@@ -87,11 +87,20 @@ async function generateTextWithGroqFallback(
       } catch (ge: any) {
         const gmsg = String(ge?.message || ge || "");
         const gstatus = ge?.status ?? ge?.statusCode ?? null;
+        // Daily token cap (TPD) — waiting seconds is pointless; jump straight to Grok.
+        const isDailyCap = /tokens per day|\bTPD\b/i.test(gmsg);
         const isRateLimit =
           gstatus === 429 || gstatus === 413 ||
           /rate.?limit|tokens per minute|\bTPM\b|too large|\b429\b|\b413\b/i.test(gmsg);
-        if (!isRateLimit || attempt === GROQ_MAX_RETRIES) {
-          console.error(`📰 Groq fallback failed (attempt ${attempt}/${GROQ_MAX_RETRIES}): ${gmsg.slice(0, 160)}`);
+        if (isDailyCap || !isRateLimit || attempt === GROQ_MAX_RETRIES) {
+          console.error(`📰 Groq fallback failed (attempt ${attempt}/${GROQ_MAX_RETRIES}${isDailyCap ? ', daily cap' : ''}): ${gmsg.slice(0, 160)}`);
+          // Tier 3: Grok (xAI team credits) — keeps the daily blog alive when both
+          // Anthropic (credits) and Groq (daily cap) are down.
+          if (process.env.XAI_API_KEY?.trim()) {
+            const { grokComplete } = await import("./llm-resilience");
+            console.warn("📰 Falling back to Grok (xAI) for blog generation");
+            return grokComplete(system, userPrompt, maxTokens, "daily-blog/grok");
+          }
           throw ge;
         }
         const waitMs = 30_000 + attempt * 5_000; // per-minute TPM window — wait it out
