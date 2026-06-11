@@ -53,7 +53,9 @@ export async function runPodcastAi(ctx: any): Promise<void> {
     const audio = await ttsToMp3(openai, script);
 
     await ctx.reply('🎙️ Transcribing the narration with Speechmatics (captions + chapters)...');
-    const transcribed = await transcribeAndTranslate(audio, 'episode.mp3', { language: 'en', translateTo: ['es'], diarization: true });
+    const { getPodcastDictionary } = await import('./podcast-dictionary');
+    const customDictionary = await getPodcastDictionary().catch(() => [] as string[]);
+    const transcribed = await transcribeAndTranslate(audio, 'episode.mp3', { language: 'en', translateTo: ['es'], diarization: true, customDictionary });
 
     await ctx.reply('✍️ Building show notes, chapters, blog, and social...');
     const pkg = await buildPodcastPackage(anthropic, transcribed, { numSocialPerChannel: 4 });

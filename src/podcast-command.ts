@@ -88,13 +88,17 @@ export async function runPodcast(ctx: any): Promise<void> {
     await ctx.reply('🎧 Got it. Transcribing the episode with language auto-detection (this can take a few minutes for long audio)...');
     const audio = await downloadTelegramFile(ctx, media.file_id);
     const filename = replied.voice ? 'voice.ogg' : (replied.audio?.file_name || replied.document?.file_name || 'audio.mp3');
+    // Living vocabulary: core domain terms + daily market terms (GEO/AEO, model
+    // names, product launches) so spoken jargon transcribes correctly.
+    const { getPodcastDictionary } = await import('./podcast-dictionary');
+    const customDictionary = await getPodcastDictionary().catch(() => [] as string[]);
     let transcribed;
     try {
-      transcribed = await transcribeAndTranslate(audio, filename, { language: 'auto', translateTo: ['es'], diarization: true });
+      transcribed = await transcribeAndTranslate(audio, filename, { language: 'auto', translateTo: ['es'], diarization: true, customDictionary });
     } catch (e) {
       // Some language/translation pairs are unsupported (e.g. ru->es) — retry without translation.
       console.warn('[Podcast] auto+translate failed, retrying without translation:', e instanceof Error ? e.message.slice(0, 120) : e);
-      transcribed = await transcribeAndTranslate(audio, filename, { language: 'auto', diarization: true });
+      transcribed = await transcribeAndTranslate(audio, filename, { language: 'auto', diarization: true, customDictionary });
     }
     if (!transcribed.transcript.trim()) {
       await ctx.reply('🎧 Could not get a transcript from that audio. Try a clearer recording.');
@@ -127,7 +131,7 @@ export async function runPodcast(ctx: any): Promise<void> {
       episodeSource = 'ai';
 
       await ctx.reply('🎙️ Transcribing the narration with Speechmatics (captions + chapters)...');
-      transcribed = await transcribeAndTranslate(episodeAudio, 'episode.mp3', { language: 'en', translateTo: ['es'], diarization: true });
+      transcribed = await transcribeAndTranslate(episodeAudio, 'episode.mp3', { language: 'en', translateTo: ['es'], diarization: true, customDictionary });
       if (!transcribed.transcript.trim()) throw new Error('Narrated audio produced no transcript');
     } else if (isRussian && wantRaw) {
       await ctx.reply('🎙️ Raw mode: publishing your natural Russian voice as-is.');

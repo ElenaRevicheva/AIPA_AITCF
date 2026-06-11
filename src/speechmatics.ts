@@ -198,7 +198,22 @@ export async function transcribeAndTranslate(
   filename: string,
   opts: TranscribeOptions = {},
 ): Promise<TranscribeResult> {
-  const jobId = await submitJob(audio, filename, opts);
+  let jobId: string;
+  try {
+    jobId = await submitJob(audio, filename, opts);
+  } catch (e) {
+    // Custom dictionary must never block transcription: if the submit is rejected
+    // with a 400 while additional_vocab is present (e.g. vocab unsupported for the
+    // detected language), retry once without the dictionary.
+    const msg = e instanceof Error ? e.message : String(e);
+    if (opts.customDictionary?.length && msg.includes('400')) {
+      console.warn('[Speechmatics] submit 400 with custom dictionary — retrying without vocab');
+      const { customDictionary: _drop, ...rest } = opts;
+      jobId = await submitJob(audio, filename, rest);
+    } else {
+      throw e;
+    }
+  }
   for (let i = 0; i < POLL_MAX_ATTEMPTS; i++) {
     const status = await getStatus(jobId);
     if (status === 'done') {

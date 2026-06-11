@@ -2403,6 +2403,18 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       }, { timezone: triageTz });
       console.log('[SerpProspects] Buying-intent client discovery (BrightData-first): every 6h');
     }
+    // Podcast living dictionary — refresh daily from live market trends (Bright Data
+    // headlines → LLM term extraction) so spoken jargon/product names transcribe right.
+    if (process.env.PODCAST_ENGINE_ENABLED?.trim().toLowerCase() === 'true') {
+      // Warm the cache at startup (non-blocking)
+      import('./podcast-dictionary').then(m => m.refreshPodcastDictionary())
+        .catch(e => console.warn('[podcast-dict] startup refresh:', e instanceof Error ? e.message : String(e)));
+      cron.schedule('0 7 * * *', () => {
+        import('./podcast-dictionary').then(m => m.refreshPodcastDictionary())
+          .catch(e => console.warn('[podcast-dict] cron refresh:', e instanceof Error ? e.message : String(e)));
+      }, { timezone: triageTz });
+      console.log(`[podcast-dict] daily market-trend refresh: 07:00 ${triageTz}`);
+    }
   });
 }
 

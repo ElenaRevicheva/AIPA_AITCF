@@ -49,7 +49,9 @@ export async function runVoiceCampaign(ctx: any): Promise<void> {
     await ctx.reply('🎙️ Got it. Transcribing your voice note...');
     const audio = await downloadTelegramFile(ctx, voice.file_id);
     const filename = replied.voice ? 'voice.ogg' : (replied.audio?.file_name || 'audio.mp3');
-    const transcribed = await transcribeAndTranslate(audio, filename, { language: 'en', translateTo: ['es'] });
+    const { getPodcastDictionary } = await import('./podcast-dictionary');
+    const customDictionary = await getPodcastDictionary().catch(() => [] as string[]);
+    const transcribed = await transcribeAndTranslate(audio, filename, { language: 'en', translateTo: ['es'], customDictionary });
     if (!transcribed.transcript.trim()) {
       await ctx.reply('🎙️ Could not get a transcript from that audio. Try again with clearer audio.');
       return;
