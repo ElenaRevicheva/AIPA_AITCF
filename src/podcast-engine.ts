@@ -38,13 +38,43 @@ export function fmtTime(sec: number): string {
   return h > 0 ? `${h}:${pad(m)}:${pad(ss)}` : `${m}:${pad(ss)}`;
 }
 
+/** Escape raw control characters that LLMs (esp. the Groq fallback) sometimes emit
+ *  INSIDE string literals — invalid JSON ("Bad control character in string literal").
+ *  Whitespace BETWEEN tokens is legal JSON and left untouched: we track in-string
+ *  state so only literals are repaired. */
+function escapeCtrlInStrings(json: string): string {
+  let out = '';
+  let inStr = false;
+  let esc = false;
+  for (const ch of json) {
+    if (inStr) {
+      if (esc) { out += ch; esc = false; continue; }
+      if (ch === '\\') { out += ch; esc = true; continue; }
+      if (ch === '"') { out += ch; inStr = false; continue; }
+      const code = ch.charCodeAt(0);
+      if (code < 0x20) { out += ch === '\n' ? '\\n' : ch === '\t' ? '\\t' : ''; continue; }
+      out += ch;
+    } else {
+      if (ch === '"') inStr = true;
+      out += ch;
+    }
+  }
+  return out;
+}
+
 function extractJson(raw: string): any {
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
   const candidate = (fenced && fenced[1]) ? fenced[1] : raw;
   const start = candidate.indexOf('{');
   const end = candidate.lastIndexOf('}');
   if (start === -1 || end === -1) throw new Error('No JSON object found in model output');
-  return JSON.parse(candidate.slice(start, end + 1));
+  const slice = candidate.slice(start, end + 1);
+  try {
+    return JSON.parse(slice);
+  } catch {
+    // Groq/Llama frequently emits literal newlines inside JSON strings — repair + retry.
+    return JSON.parse(escapeCtrlInStrings(slice));
+  }
 }
 
 /** Compact diarized segments into a timestamped digest the model can reason over. */

@@ -69,6 +69,28 @@ export function buildCampaignUtm(opts: {
   return `${AIDEAZZ_SITE}${path}?${p.toString()}`;
 }
 
+/** Escape raw control chars inside string literals only (Groq/Llama emits them;
+ *  strict JSON.parse fails with "Bad control character"). Formatting whitespace
+ *  between tokens is untouched. */
+function escapeCtrlInStrings(json: string): string {
+  let out = '';
+  let inStr = false;
+  let esc = false;
+  for (const ch of json) {
+    if (inStr) {
+      if (esc) { out += ch; esc = false; continue; }
+      if (ch === '\\') { out += ch; esc = true; continue; }
+      if (ch === '"') { out += ch; inStr = false; continue; }
+      if (ch.charCodeAt(0) < 0x20) { out += ch === '\n' ? '\\n' : ch === '\t' ? '\\t' : ''; continue; }
+      out += ch;
+    } else {
+      if (ch === '"') inStr = true;
+      out += ch;
+    }
+  }
+  return out;
+}
+
 function extractJson(raw: string): any {
   // Models sometimes wrap JSON in prose or fences — pull the first {...} block.
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -76,7 +98,12 @@ function extractJson(raw: string): any {
   const start = candidate.indexOf('{');
   const end = candidate.lastIndexOf('}');
   if (start === -1 || end === -1) throw new Error('No JSON object found in model output');
-  return JSON.parse(candidate.slice(start, end + 1));
+  const slice = candidate.slice(start, end + 1);
+  try {
+    return JSON.parse(slice);
+  } catch {
+    return JSON.parse(escapeCtrlInStrings(slice));
+  }
 }
 
 const ATOMIZER_SYSTEM = `You are the AIdeazz Voice Growth Engine — a content strategist for a solo AI founder (Elena Revicheva, Panama). She builds multi-agent AI systems with real production constraints. Her audience: technical founders, AI builders, potential clients.
