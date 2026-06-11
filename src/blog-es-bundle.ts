@@ -156,8 +156,42 @@ function readLocalBlogPost(slug: string): EnglishSource | null {
   } catch { return null; }
 }
 
+/** Direct dev.to fetch by /{username}/{slug} — immune to the stale per-edge cache
+ *  of the listing API (June 11 2026: Oracle's edge served a 64-article list missing
+ *  the newest posts, so suffixed slugs returned "Post not found"). */
+async function fetchDevtoByPath(slug: string): Promise<EnglishSource | null> {
+  try {
+    const res = await fetch(`https://dev.to/api/articles/${encodeURIComponent(devtoUsername())}/${encodeURIComponent(slug)}`);
+    if (!res.ok) return null;
+    const j = (await res.json()) as { title: string; body_markdown?: string; url?: string; path?: string; description?: string };
+    const md = j.body_markdown?.trim();
+    if (!md) return null;
+    const brief = j.description?.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 500) || null;
+    return { title: j.title, brief, markdown: md, url: j.url || `https://dev.to${j.path || ""}`, source: "devto" };
+  } catch {
+    return null;
+  }
+}
+
+/** dev.to cross-post slugs carry a short random suffix with a digit (initial-failure-51hn).
+ *  Strip it to recover OUR clean slug — only when the tail contains a digit, so real
+ *  words ("...-space") are never mangled. */
+function cleanSlugFromDevto(slug: string): string | null {
+  const m = slug.match(/^(.*)-(?=[a-z0-9]{3,6}$)(?:[a-z]*\d[a-z0-9]*)$/i);
+  return m && m[1] ? m[1] : null;
+}
+
 async function fetchEnglishPost(slug: string): Promise<EnglishSource | null> {
-  return readLocalBlogPost(slug) ?? fetchEnglishFromDevto(slug);
+  // 1. Our own publish cache — exact slug, then the de-suffixed clean slug.
+  const local = readLocalBlogPost(slug);
+  if (local) return local;
+  const clean = cleanSlugFromDevto(slug);
+  if (clean) {
+    const localClean = readLocalBlogPost(clean);
+    if (localClean) return localClean;
+  }
+  // 2. dev.to by direct path (fresh), then the listing matcher as last resort.
+  return (await fetchDevtoByPath(slug)) ?? fetchEnglishFromDevto(slug);
 }
 
 /** Serialize translation jobs so we do not run many Claude calls at once. */
