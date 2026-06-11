@@ -980,7 +980,12 @@ async function startCTOAIPA() {
     } catch (e) {
       console.error('GET /blog/es-bundle:', e);
       const msg = e instanceof Error ? e.message : String(e);
-      res.status(msg.includes('not found') ? 404 : 502).json({ error: msg });
+      // NEVER leak raw provider errors (API keys hints, request ids, billing text)
+      // into the public blog page — the client renders this string verbatim.
+      const friendly = msg.includes('not found')
+        ? 'Post not found'
+        : 'Traducción temporalmente no disponible — el artículo está en inglés más abajo.';
+      res.status(msg.includes('not found') ? 404 : 502).json({ error: friendly });
     }
   });
 

@@ -5,6 +5,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Anthropic } from "@anthropic-ai/sdk";
+import { claudeWithGroqFallback } from "./llm-resilience";
 
 const GQL = "https://gql.hashnode.com/";
 const CACHE_VERSION = 3;
@@ -177,6 +178,26 @@ function anthropicClient(): Anthropic {
   return new Anthropic({ apiKey: key });
 }
 
+/** Escape raw control chars inside JSON string literals only (Groq/Llama emits them). */
+function escapeCtrlInStrings(json: string): string {
+  let out = "";
+  let inStr = false;
+  let esc = false;
+  for (const ch of json) {
+    if (inStr) {
+      if (esc) { out += ch; esc = false; continue; }
+      if (ch === "\\") { out += ch; esc = true; continue; }
+      if (ch === '"') { out += ch; inStr = false; continue; }
+      if (ch.charCodeAt(0) < 0x20) { out += ch === "\n" ? "\\n" : ch === "\t" ? "\\t" : ""; continue; }
+      out += ch;
+    } else {
+      if (ch === '"') inStr = true;
+      out += ch;
+    }
+  }
+  return out;
+}
+
 async function translateToSpanish(src: EnglishSource): Promise<{ title: string; brief: string; markdown: string }> {
   /** Prefer HASHNODE_ARTICLE_MODEL then Sonnet — Haiku 3/3.5 IDs often return not_found on newer Anthropic keys. */
   const model =
@@ -195,13 +216,7 @@ async function translateToSpanish(src: EnglishSource): Promise<{ title: string; 
     0
   );
 
-  const resp = await client.messages.create({
-    model,
-    max_tokens: maxTokens,
-    messages: [
-      {
-        role: "user",
-        content: `You translate AI/technical blog content from English into natural Spanish (neutral LATAM/Spain).
+  const userPrompt = `You translate AI/technical blog content from English into natural Spanish (neutral LATAM/Spain).
 
 Input is JSON with keys title, brief, markdown (GitHub-Flavored Markdown).
 
@@ -217,12 +232,11 @@ Rules:
 - Translate the prose for human readers; keep brand names (AIdeazz, Oracle, Groq, Claude, WhatsApp, etc.) as-is or readable Spanish mention when natural.
 
 INPUT JSON:
-${payload}`,
-      },
-    ],
-  });
-  const block = resp.content[0];
-  const raw = block && block.type === "text" ? block.text.trim() : "";
+${payload}`;
+
+  // Anthropic-first with Groq fallback — Spanish translation must survive credit
+  // exhaustion (June 11 2026: raw Anthropic 400 leaked into the published page).
+  const raw = (await claudeWithGroqFallback(client, model, maxTokens, null, userPrompt, "blog-es/translate")).trim();
   if (!raw) throw new Error("Empty translation response");
   let parsed: { title?: string; brief?: string; markdown?: string };
   try {
@@ -230,7 +244,13 @@ ${payload}`,
   } catch {
     const m = raw.match(/\{[\s\S]*\}/);
     if (!m) throw new Error("Translation JSON parse failed");
-    parsed = JSON.parse(m[0]) as { title?: string; brief?: string; markdown?: string };
+    try {
+      parsed = JSON.parse(m[0]) as { title?: string; brief?: string; markdown?: string };
+    } catch {
+      // Groq/Llama emits literal newlines inside JSON strings (markdown field!) —
+      // escape control chars inside string literals only, then retry.
+      parsed = JSON.parse(escapeCtrlInStrings(m[0])) as { title?: string; brief?: string; markdown?: string };
+    }
   }
   if (!parsed.markdown?.trim()) throw new Error("Translation missing markdown");
   return {
