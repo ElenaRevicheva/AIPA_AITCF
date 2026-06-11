@@ -1058,6 +1058,8 @@ async function startCTOAIPA() {
         slug: e.slug,
         url: e.aideazzBlogUrl || `https://aideazz.xyz/blog/${e.slug}`,
         publishedAt: e.publishedAt,
+        // Cross-post link — the blog listing renders the "Also on Dev.to" badge from this.
+        ...(e.devtoUrl ? { devtoUrl: e.devtoUrl } : {}),
         source: 'devto' as const,
       }));
       res.setHeader('Cache-Control', 'public, max-age=300');
