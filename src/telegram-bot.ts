@@ -7614,32 +7614,61 @@ function downloadFile(url: string, dest: string): Promise<void> {
 // HELPER: Transcribe audio with Groq Whisper
 // =============================================================================
 
-async function transcribeAudio(filePath: string): Promise<string | null> {
-  try {
-    // No language lock — Elena speaks EN, ES and RU in the same message.
-    // The prompt seeds Whisper's vocabulary with project names and month names
-    // so it transcribes them correctly (e.g. "May" not "me", "card" not "desk").
-    const transcription = await groq.audio.transcriptions.create({
-      file: fs.createReadStream(filePath),
-      model: 'whisper-large-v3',
-      response_format: 'text',
-      prompt: [
-        // Month names (common source of errors when mixed EN/ES/RU)
-        'January, February, March, April, May, June, July, August, September, October, November, December.',
-        // Project / brand vocabulary
-        'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena.',
-        // Trello action vocabulary
-        'Move card, create card, add card, archive card, move this card, add task, new task.',
-        // Avoid common substitutions
-        'Trello card. Kira board. Kira Mayo. Kira Junio.',
-      ].join(' '),
-    });
+// Whisper vocabulary seed — month names + project/brand + Trello action words,
+// shared by the Groq primary and the OpenAI fallback.
+const WHISPER_PROMPT = [
+  // Month names (common source of errors when mixed EN/ES/RU)
+  'January, February, March, April, May, June, July, August, September, October, November, December.',
+  // Project / brand vocabulary
+  'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena.',
+  // Trello action vocabulary
+  'Move card, create card, add card, archive card, move this card, add task, new task.',
+  // Avoid common substitutions
+  'Trello card. Kira board. Kira Mayo. Kira Junio.',
+].join(' ');
 
-    return transcription as unknown as string;
-  } catch (error) {
-    console.error('Transcription error:', error);
-    return null;
+async function transcribeAudio(filePath: string): Promise<string | null> {
+  // No language lock — Elena speaks EN, ES and RU in the same message.
+  // 1) Groq Whisper with retries (transient ECONNRESET / 5xx / 429 must not
+  //    surface to the operator — June 11 2026 failure was a single conn reset).
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const transcription = await groq.audio.transcriptions.create({
+        file: fs.createReadStream(filePath),
+        model: 'whisper-large-v3',
+        response_format: 'text',
+        prompt: WHISPER_PROMPT,
+      });
+      return transcription as unknown as string;
+    } catch (error: any) {
+      const msg = String(error?.message || error);
+      const status = error?.status ?? error?.statusCode ?? null;
+      const transient = /ECONNRESET|ETIMEDOUT|ENOTFOUND|socket|connection|fetch failed/i.test(msg)
+        || status === 429 || (typeof status === 'number' && status >= 500);
+      console.error(`Transcription error (groq attempt ${attempt}/3${status ? `, ${status}` : ''}):`, msg.slice(0, 160));
+      if (!transient || attempt === 3) break;
+      await new Promise((r) => setTimeout(r, 1500 * attempt));
+    }
   }
+
+  // 2) OpenAI Whisper fallback (key already in use for TTS; pennies, fallback-only).
+  try {
+    if (process.env.OPENAI_API_KEY?.trim()) {
+      console.warn('Transcription: Groq Whisper failed — falling back to OpenAI whisper-1');
+      const { default: OpenAI } = await import('openai');
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const transcription = await openai.audio.transcriptions.create({
+        file: fs.createReadStream(filePath),
+        model: 'whisper-1',
+        response_format: 'text',
+        prompt: WHISPER_PROMPT,
+      });
+      return transcription as unknown as string;
+    }
+  } catch (error) {
+    console.error('Transcription error (openai fallback):', error instanceof Error ? error.message.slice(0, 160) : error);
+  }
+  return null;
 }
 
 // =============================================================================
