@@ -77,12 +77,6 @@ function buildConfig(opts: TranscribeOptions): string {
     language,
     operating_point: operatingPoint(),
   };
-  if (language === 'auto') {
-    // Elena speaks EN, ES, and RU into the engine. Configurable via env.
-    const expected = (process.env.SPEECHMATICS_EXPECTED_LANGS || 'en,es,ru')
-      .split(',').map((s) => s.trim()).filter(Boolean);
-    transcription_config.language_identification_config = { expected_languages: expected };
-  }
   if (opts.customDictionary?.length) {
     transcription_config.additional_vocab = opts.customDictionary.map((w) => ({ content: w }));
   }
@@ -90,6 +84,15 @@ function buildConfig(opts: TranscribeOptions): string {
     transcription_config.diarization = 'speaker';
   }
   const config: Record<string, unknown> = { type: 'transcription', transcription_config };
+  if (language === 'auto') {
+    // Language identification config lives at the TOP LEVEL of the job config —
+    // nesting it inside transcription_config returns 400 "Additional property
+    // language_identification_config is not allowed" (verified live June 10 2026).
+    // Elena speaks EN, ES, RU into the engine; configurable via env.
+    const expected = (process.env.SPEECHMATICS_EXPECTED_LANGS || 'en,es,ru')
+      .split(',').map((s) => s.trim()).filter(Boolean);
+    config.language_identification_config = { expected_languages: expected };
+  }
   if (opts.translateTo?.length) {
     config.translation_config = { target_languages: opts.translateTo };
   }
