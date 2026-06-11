@@ -56,13 +56,27 @@ async function ghGetFile(path: string): Promise<{ contentB64: string; sha: strin
 }
 
 async function ghPutFile(path: string, contentB64: string, message: string): Promise<void> {
-  const existing = await ghGetFile(path).catch(() => null);
-  const body: Record<string, string> = { message, content: contentB64 };
-  if (existing?.sha) body.sha = existing.sha;
-  const r = await fetch(`${API}/repos/${repoFull()}/contents/${path}`, {
-    method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body),
-  });
-  if (!r.ok) throw new Error(`GitHub put ${path} failed ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  // June 11 2026: a transient GitHub 401 ("Bad credentials" with a token that was
+  // valid minutes later) killed an episode publish. Auth/server blips must not
+  // lose an episode — retry up to 3x with backoff before giving up.
+  let lastErr: Error | null = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const existing = await ghGetFile(path).catch(() => null);
+    const body: Record<string, string> = { message, content: contentB64 };
+    if (existing?.sha) body.sha = existing.sha;
+    const r = await fetch(`${API}/repos/${repoFull()}/contents/${path}`, {
+      method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body),
+    });
+    if (r.ok) return;
+    const txt = (await r.text()).slice(0, 200);
+    lastErr = new Error(`GitHub put ${path} failed ${r.status}: ${txt}`);
+    // 422 sha-conflict: refetch sha next loop. 401/403/5xx: transient — backoff.
+    const retryable = r.status === 401 || r.status === 403 || r.status === 422 || r.status >= 500;
+    if (!retryable || attempt === 3) throw lastErr;
+    console.warn(`[podcast-publish] ${lastErr.message} — retry ${attempt + 1}/3`);
+    await new Promise((res) => setTimeout(res, 2000 * attempt));
+  }
+  if (lastErr) throw lastErr;
 }
 
 async function repoExists(): Promise<boolean> {
