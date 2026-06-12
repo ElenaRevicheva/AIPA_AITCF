@@ -712,3 +712,18 @@ pieces in 4 commits.
 > sessions. Net new code: 1 file (`research-agent.ts`, ~290 lines) +
 > 1 helper file (`brightdata-enrich.ts` extended) + 3 Telegram command
 > handlers. Everything else was reused.
+
+## NEW June 12 2026 — blog new-article 404 closed + public proof layer refreshed
+
+**CLOSED:** new blog articles 404'd on aideazz.xyz until an unrelated deploy shipped them —
+`blog-static-pages.ts` tagged every page commit `[skip ci]`. Now only UPDATES skip CI; a NEW
+article page triggers exactly one deploy (cto-aipa `1cc388a`, live on Oracle, pm2 `online`).
+
+**SHIPPED (aideazz repo `83fd5df`→`d742a6c`):** SOP EN+ES actualized to June 2026 state; site-wide
+favicon fixed at the root (`favicon.ico` regenerated from the real logo); portfolio: diagram label
+corrections (CMO mislabel fixed), capability chips, Ops Runbook + Blog + Podcast proof buttons,
+honest "10-agent ecosystem — 9 live 24/7" in 8 places EN+ES, resume-aligned positioning line
+("Agents · AI Marketing · CRM & Revenue Automation"), EspaLuz node = "Spanish Tutor · Relocation".
+
+**STILL RED (unchanged by this session):** EspaLuz PayPal; VJH employer-response loop. Don't start
+new build work while these are red.

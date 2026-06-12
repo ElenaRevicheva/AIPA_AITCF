@@ -1700,3 +1700,17 @@ The actual listenable podcast. New isolated repo `ElenaRevicheva/aideazz-podcast
 Native ES-blog static publishing (/es/blog); IG auto-post (needs media); `[CLIENT-CMO-VOICE]`
 HubSpot prefix + outreach personalization; ffmpeg intro/outro polish. All saved campaign/podcast
 data is in `data/voice-campaigns/` and `data/podcasts/`.
+
+## June 12 2026 — every new article now reachable minutes after publish (SEO/GEO reliability)
+
+Per-article static pages (`public/blog/{slug}/index.html` in aideazz repo) used to be committed
+with `[skip ci]` — a NEW article's page stayed un-deployed on IPFS until an unrelated commit
+triggered a build, silently 404ing the exact URLs the GEO layer promotes. Fixed in cto-aipa
+`1cc388a`: new pages deploy themselves (one deploy per article), updates still skip CI.
+**Client-pitch line:** "content lands AND is verifiably reachable within minutes — the pipeline
+owns its own deployment, no human in the loop."
+
+Same day, the public proof artifacts this engine points at were actualized: SOP EN+ES (June 2026
+state incl. bilingual blog pipeline + Bright Data + 3-tier failover), portfolio positioning now
+names **AI Marketing** explicitly ("Agents · AI Marketing · CRM & Revenue Automation"), and the
+blog + podcast got first-screen proof buttons under the portfolio architecture diagram.

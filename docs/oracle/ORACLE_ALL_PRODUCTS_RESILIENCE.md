@@ -1307,3 +1307,27 @@ CLIs: `scripts/voice-engine-cli.ts`, `scripts/podcast-host-cli.ts` (init|info|re
 
 **Pattern earned:** *"distribute once, prove each leg from evidence — feed item, Dev.to URL, Buffer
 'sent' status, UTM in content, 200 from /marketing/inquiry — never claim propagation from config."*
+
+## NEW June 12 2026 — blog-static deploy semantics fix (`1cc388a`, deployed + verified online)
+
+**Incident:** `aideazz.xyz/blog/0-to-1-transferable-skills` returned a raw IPFS resolution error
+("no link named … under bafybei…"). The article's static page WAS committed to the aideazz repo —
+but by `src/blog-static-pages.ts` with `[skip ci]`, so 4everland never rebuilt. Every NEW article
+404'd on its own URL until an unrelated commit happened to trigger a deploy.
+
+**Fix (cto-aipa `1cc388a`):** `[skip ci]` is appended only when UPDATING an existing page (GitHub
+Contents API returned a `sha`). A NEW page commits normally → exactly one deploy per new article.
+Bulk-regenerate deploy-storm protection preserved (unchanged files produce no commits at all).
+
+**Deploy:** `git pull` + `npm run build` (tsc clean) + `pm2 restart cto-aipa` on Oracle.
+**Verified:** `pm2 jlist | jq -r '.[] | select(.name==$n) | .pm2_env.status'` → `online`,
+restart count 11; boot logs show full startup (business_leads ready, scheduled tasks, SerpProspects).
+
+**Rule earned:** *"A new public artifact must trigger its own deploy — the pipeline that creates
+something linkable owns making it reachable."*
+
+**Same-day public proof layer refresh (aideazz repo `83fd5df`→`d742a6c`):** SOP EN+ES actualized to
+June 2026 (Grok tier-3 failover, Bright Data layer, bilingual blog pipeline, NEW "engagement loop
+that never ran" postmortem — this doc's verify-from-logs story is now public); root `favicon.ico`
+regenerated from the real AIdeazz logo (multi-size) + crisp 32px/apple-touch icons wired sitewide;
+portfolio diagram labels corrected + honest "9 live 24/7" count enforced in 8 places EN+ES.
