@@ -1382,3 +1382,13 @@ Real key 52 chars. Fixed in place (`${K%n}` + `tr -d "[:space:]"`); never re-typ
 **Deploy:** pull + build (tsc clean) + `pm2 restart cto-aipa` → online (restart 14), boot log
 `🎭 Atuona Creative AI started`. Director's Cut (Modify) still on legacy schema — skips gracefully,
 open follow-up. Veo 3.1 needs GEMINI_API_KEY + billing; Runway keyed, needs Runway credits.
+
+## June 13 2026 (cont.) — Director's Cut (Modify Video) working on new Luma API (`7a8531c`)
+
+Migrated the fashion/editorial restyle pass to agents.lumalabs.ai/v1: POST `/generations` with
+`model:"ray-3.2"` + `type:"video"` + `mode:"flex_1"` + `media:{url:<base video>}` (replaces legacy
+`/generations/video/modify` + `generation_type:modify_video`, model ray-2). Verified live — a ray-3.2
+modify completed in ~25s (faster than base generation, confirming the source video was actually used).
+Poll uses the output[]-aware `extractLumaVideoUrl`. Deployed, cto-aipa online (restart 15), boot clean.
+Full /visualize pipeline now end-to-end on the new platform: Flux image → ray-3.2 base video →
+ray-3.2 Modify Director's Cut.
