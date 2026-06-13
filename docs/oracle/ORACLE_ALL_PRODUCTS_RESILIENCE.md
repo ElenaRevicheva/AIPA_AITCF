@@ -1362,3 +1362,23 @@ https://lumalabs.ai/dream-machine/api/billing/overview (not Account→Subscripti
 
 **Fallback truth (answer to "do I fall back to runway/dalle?"):** video falls back Luma→Replicate→Runway
 (yes Runway). Images are **Flux-only** (Ultra→Pro→Dev) — **no DALL-E** anywhere in /visualize.
+
+## NEW June 13 2026 — Luma migrated to current API (agents.lumalabs.ai/v1 + ray-3.2), commit `e523b8b`
+
+**Root cause of the "Insufficient credits" / 403 confusion:** Luma runs TWO APIs.
+- LEGACY (what Atuona used): `api.lumalabs.ai/dream-machine/v1`, ray-2, old keys — wallet $0, being phased out.
+- CURRENT (now migrated to): `https://agents.lumalabs.ai/v1` — console `platform.lumalabs.ai`, per-project
+  billing (`proj_…`), `luma-api-` keys, models `ray-3.2` (video) / `uni-1` (image). This is where the
+  operator's $8 lives. Billing is per-platform — the old key's wallet ≠ the new $8.
+
+**New-API schema (verified live, gen `fe0de54f…` → completed on the $8):** POST `/generations` requires
+top-level **`type:"video"`** + `model:"ray-3.2"` + `keyframes.frame0.{type:image,url}` + resolution/
+duration/aspect_ratio. Poll GET `/generations/{id}`; finished URL at **`output[].url`** (legacy was
+`assets.video`). `extractLumaVideoUrl` now handles both. Base overridable `LUMA_API_BASE`, model `LUMA_VIDEO_MODEL`.
+
+**Key write gotcha:** the .env key came in 53 chars ending `n` — a stray `\n` literalized into the value.
+Real key 52 chars. Fixed in place (`${K%n}` + `tr -d "[:space:]"`); never re-typed the secret.
+
+**Deploy:** pull + build (tsc clean) + `pm2 restart cto-aipa` → online (restart 14), boot log
+`🎭 Atuona Creative AI started`. Director's Cut (Modify) still on legacy schema — skips gracefully,
+open follow-up. Veo 3.1 needs GEMINI_API_KEY + billing; Runway keyed, needs Runway credits.
