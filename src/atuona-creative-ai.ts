@@ -111,7 +111,11 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 // Voice: Whisper-1 (best transcription)
 // =============================================================================
 const IMAGE_MODELS = {
-  // Flux Pro - Best photorealistic images, try Ultra first then Pro
+  // Flux 2 Pro (Nov 2025, BFL) — newest workhorse: stronger photoreal + prompt adherence.
+  // Top tier; if it errors/unavailable, we fall back to the proven Flux 1.1 chain below.
+  // Override / disable via FLUX2_MODEL (set empty string to skip Flux 2 entirely).
+  flux2Pro: (process.env.FLUX2_MODEL ?? 'black-forest-labs/flux-2-pro').trim(),
+  // Flux 1.1 Pro - Best photorealistic images, try Ultra first then Pro (proven fallback chain)
   fluxUltra: 'black-forest-labs/flux-1.1-pro-ultra',  // Highest quality
   fluxPro: 'black-forest-labs/flux-1.1-pro',          // Excellent fallback
   fluxDev: 'black-forest-labs/flux-dev',              // Free tier option
@@ -131,16 +135,20 @@ const VIDEO_MODELS = {
   runwayImageToVideo: 'gen4.5',
   /** Google Veo 3.1 model id on the Gemini API. Override: VEO_MODEL (e.g. veo-3.1-fast-generate-preview). */
   veoModel: (process.env.VEO_MODEL || 'veo-3.1-generate-preview').trim(),
+  /** Kling image→video via Replicate (kwaivgi namespace, existing REPLICATE_API_TOKEN — no new key).
+   *  Strong for stylized/arthouse motion. Override: KLING_REPLICATE_MODEL. */
+  klingReplicate: (process.env.KLING_REPLICATE_MODEL || 'kwaivgi/kling-v2.1-master').trim(),
 };
 
 /** Canonical video provider ids selectable from `/visualize <provider> NNN`. */
-type VideoProvider = 'luma' | 'runway' | 'veo';
+type VideoProvider = 'luma' | 'runway' | 'veo' | 'kling';
 /** Map operator aliases → canonical provider id. Returns null if the token isn't a provider. */
 function parseVideoProvider(token: string): VideoProvider | null {
   const t = token.toLowerCase();
   if (['luma', 'ray', 'ray2', 'ray3', 'ray-3', 'dream', 'dreammachine'].includes(t)) return 'luma';
   if (['runway', 'gen4', 'gen45', 'gen-4', 'gen4.5', 'runwayml'].includes(t)) return 'runway';
   if (['veo', 'veo3', 'veo31', 'google', 'gemini'].includes(t)) return 'veo';
+  if (['kling', 'kuaishou', 'kwaivgi'].includes(t)) return 'kling';
   return null;
 }
 
@@ -3409,7 +3417,7 @@ interface VideoGenerationResult {
   success: boolean;
   videoUrl?: string;
   taskId?: string;
-  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'none';
+  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'kling' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
@@ -3428,6 +3436,11 @@ async function generateVideo(
     const veo = await generateWithVeo(imageUrl, prompt, ctx);
     if (veo.success) return veo;
     await ctx.reply(`⚠️ Veo unavailable (${(veo.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
+    // continue into default chain
+  } else if (preferredProvider === 'kling') {
+    const kling = await tryKling(imageUrl, prompt, ctx);
+    if (kling.success) return kling;
+    await ctx.reply(`⚠️ Kling unavailable (${(kling.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
     // continue into default chain
   } else if (preferredProvider === 'runway') {
     if (runwayApiKey) {
@@ -3734,6 +3747,57 @@ async function generateWithVeo(
   } catch (veoErr: any) {
     console.error('Veo error:', veoErr.message);
     return { success: false, provider: 'veo', error: veoErr.message };
+  }
+}
+
+/**
+ * Kling image→video via Replicate (kwaivgi). Strong for stylized/arthouse motion.
+ * Uses the existing REPLICATE_API_TOKEN — no new key. Self-contained: returns a ready videoUrl
+ * (delivered via the caller's direct-URL branch, same as Luma-via-Replicate).
+ * Model id env-overridable (KLING_REPLICATE_MODEL). Falls back gracefully on any error.
+ */
+async function tryKling(
+  imageUrl: string,
+  prompt: string,
+  ctx: Context
+): Promise<VideoGenerationResult> {
+  if (!replicate) {
+    return { success: false, provider: 'kling', error: 'Kling needs REPLICATE_API_TOKEN' };
+  }
+  try {
+    await ctx.reply(
+      `🎬 *Generating video with Kling...*\n\n_${VIDEO_MODELS.klingReplicate} · stylized/arthouse · takes 2–4 minutes..._`,
+      { parse_mode: 'Markdown' }
+    );
+    const out = await replicate.run(
+      VIDEO_MODELS.klingReplicate as `${string}/${string}`,
+      {
+        input: {
+          prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+          start_image: imageUrl,
+          duration: 5,
+          aspect_ratio: '16:9',
+        }
+      }
+    );
+    // Replicate returns a URL string, an array, or a FileOutput with .url() — same as the Luma-Replicate path.
+    let videoUrl: string | null = null;
+    if (out != null) {
+      const s = Array.isArray(out) ? String(out[0]) : String(out);
+      if (s.startsWith('http')) videoUrl = s;
+      if (!videoUrl && typeof out === 'object') {
+        const o = out as { url?: () => URL };
+        if (typeof o.url === 'function') { try { videoUrl = o.url().href; } catch { /* ignore */ } }
+      }
+    }
+    if (videoUrl && videoUrl.startsWith('http')) {
+      console.log('✅ Kling via Replicate succeeded:', videoUrl.substring(0, 80) + '…');
+      return { success: true, videoUrl, provider: 'kling', needsPolling: false };
+    }
+    return { success: false, provider: 'kling', error: 'Kling returned invalid output' };
+  } catch (klingErr: any) {
+    console.error('Kling error:', klingErr.message);
+    return { success: false, provider: 'kling', error: klingErr.message };
   }
 }
 
@@ -4237,10 +4301,11 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 \`/visualize luma 052\` → Luma ray-3.2 (HDR cinematic)
 \`/visualize runway 052\` → Runway Gen-4.5
 \`/visualize veo 052\` → Google Veo 3.1 (native audio)
+\`/visualize kling 052\` → Kling (stylized/arthouse)
 
 *What it creates:*
-🎨 Flux 1.1 Pro Ultra image (16:9 YouTube) - BEST quality!
-📱 Flux 1.1 Pro Ultra image (9:16 Instagram)
+🎨 Flux 2 Pro image (16:9 YouTube) - newest, BEST quality!
+📱 Flux 2 Pro image (9:16 Instagram)
 🎬 Cinematic video from your chosen engine + Director's Cut
 📝 Caption + hashtags auto-generated
 
@@ -4469,6 +4534,7 @@ _Just click any command to see what it does!_
 /visualize luma 048 - 🎬 Luma ray-3.2 (HDR cinematic)
 /visualize runway 048 - 🎬 Runway Gen-4.5
 /visualize veo 048 - 🎬 Google Veo 3.1 (native audio)
+/visualize kling 048 - 🎬 Kling (stylized/arthouse)
 /gallery - 🖼 All visualizations
 /film - 🎬 Film compilation status
 /videostatus - ⏳ Video progress
@@ -7927,12 +7993,13 @@ Create stunning visuals for your book pages:
 \`/visualize all\` - Queue all pages for visualization
 
 🎛️ *Choose your video engine:*
-\`/visualize luma 048\` - Luma Ray 3 (HDR, cinematic)
+\`/visualize luma 048\` - Luma ray-3.2 (HDR, cinematic)
 \`/visualize runway 048\` - Runway Gen-4.5
 \`/visualize veo 048\` - Google Veo 3.1 (native audio)
+\`/visualize kling 048\` - Kling (stylized/arthouse)
 
 Each visualization creates:
-🎨 Flux 1.1 Pro Ultra image (BEST photorealistic!)
+🎨 Flux 2 Pro image (newest, BEST quality!)
 🎬 Cinematic video from your chosen engine (9 sec)
 🎬✨ Director's Cut (fashion/editorial layer via Modify Video)
 📱 Instagram format (9:16 vertical)
@@ -7941,13 +8008,14 @@ Each visualization creates:
 ━━━━━━━━━━━━━━━━━━━━
 📊 *Status*
 Visualizations: ${visualizations.length} pages
-🎨 Flux: ${replicate ? '✅ Ultra/Pro Ready' : '❌ Set REPLICATE_API_TOKEN'}
-🎬 Luma Ray 3 (Direct): ${lumaApiKey ? '✅ Ready' : '⚪ Set LUMA_API_KEY'}
+🎨 Flux: ${replicate ? '✅ Flux 2 Pro / 1.1 Ready' : '❌ Set REPLICATE_API_TOKEN'}
+🎬 Luma ray-3.2 (Direct): ${lumaApiKey ? '✅ Ready' : '⚪ Set LUMA_API_KEY'}
 🎬 Luma (Replicate): ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
 🎬 Runway Gen-4.5: ${runwayApiKey ? '✅ Ready' : '⚪ Set RUNWAY_API_KEY'}
 🎬 Google Veo 3.1: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
+🎬 Kling: ${replicate ? '✅ via Replicate' : '⚪ Set REPLICATE_API_TOKEN'}
 
-_Default chain: Luma Ray 3 → Luma Replicate → Runway_
+_Default chain: Luma ray-3.2 → Luma Replicate → Runway_
 _Name a provider to pick it; it falls back through the chain if it fails._
 _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ 🚀`, { parse_mode: 'Markdown' });
       return;
@@ -8230,50 +8298,76 @@ Return ONLY the motion direction. No preamble.`;
             try {
               console.log(`Flux attempt ${attempt}/${maxRetries} for ${aspectRatio} (safety_tolerance=${tol})`);
               
-              // Try Flux Ultra first (best quality), fall back to Pro
+              // Quality ladder: Flux 2 Pro (newest) → Flux 1.1 Pro Ultra → Flux 1.1 Pro.
               let output: any = null;
               let modelUsed = '';
-              
-              // Try Flux 1.1 Pro Ultra first (highest quality)
-              try {
-                console.log('Trying Flux 1.1 Pro Ultra...');
-                output = await replicate.run(
-                  IMAGE_MODELS.fluxUltra as `${string}/${string}`,
-                  {
-                    input: {
-                      prompt: imagePrompt,
-                      aspect_ratio: aspectRatio,
-                      // Replicate Ultra rejects webp — must be jpg or png (see API 422)
-                      output_format: 'jpg',
-                      output_quality: 95,
-                      safety_tolerance: tol,
-                      // Keep false: upsampling can drift from poem text; creativity comes from LLM prompt + temp 0.9
-                      prompt_upsampling: false,
-                      raw: false
+
+              // Try Flux 2 Pro first (best 2026 quality). Conservative input so a schema
+              // surprise just falls through to the proven Flux 1.1 chain, never breaks the run.
+              let flux2Ok = false;
+              if (IMAGE_MODELS.flux2Pro) {
+                try {
+                  console.log('Trying Flux 2 Pro...');
+                  output = await replicate.run(
+                    IMAGE_MODELS.flux2Pro as `${string}/${string}`,
+                    {
+                      input: {
+                        prompt: imagePrompt,
+                        aspect_ratio: aspectRatio,
+                        output_format: 'jpg',
+                      }
                     }
-                  }
-                );
-                modelUsed = 'Flux 1.1 Pro Ultra';
-                lastModelUsed = modelUsed;
-              } catch (ultraError: any) {
-                console.log('Flux Ultra not available, trying Flux Pro...', ultraError.message);
-                
-                // Fall back to Flux 1.1 Pro
-                output = await replicate.run(
-                  IMAGE_MODELS.fluxPro as `${string}/${string}`,
-                  {
-                    input: {
-                      prompt: imagePrompt,
-                      aspect_ratio: aspectRatio,
-                      output_format: "webp",
-                      output_quality: 90,
-                      safety_tolerance: tol,
-                      prompt_upsampling: false
+                  );
+                  modelUsed = 'Flux 2 Pro';
+                  lastModelUsed = modelUsed;
+                  flux2Ok = true;
+                } catch (flux2Error: any) {
+                  console.log('Flux 2 Pro unavailable, falling back to Flux 1.1 Pro Ultra...', flux2Error.message);
+                }
+              }
+
+              // Try Flux 1.1 Pro Ultra (highest 1.1 quality), then Flux 1.1 Pro
+              if (!flux2Ok) {
+                try {
+                  console.log('Trying Flux 1.1 Pro Ultra...');
+                  output = await replicate.run(
+                    IMAGE_MODELS.fluxUltra as `${string}/${string}`,
+                    {
+                      input: {
+                        prompt: imagePrompt,
+                        aspect_ratio: aspectRatio,
+                        // Replicate Ultra rejects webp — must be jpg or png (see API 422)
+                        output_format: 'jpg',
+                        output_quality: 95,
+                        safety_tolerance: tol,
+                        // Keep false: upsampling can drift from poem text; creativity comes from LLM prompt + temp 0.9
+                        prompt_upsampling: false,
+                        raw: false
+                      }
                     }
-                  }
-                );
-                modelUsed = 'Flux 1.1 Pro';
-                lastModelUsed = modelUsed;
+                  );
+                  modelUsed = 'Flux 1.1 Pro Ultra';
+                  lastModelUsed = modelUsed;
+                } catch (ultraError: any) {
+                  console.log('Flux Ultra not available, trying Flux Pro...', ultraError.message);
+
+                  // Fall back to Flux 1.1 Pro
+                  output = await replicate.run(
+                    IMAGE_MODELS.fluxPro as `${string}/${string}`,
+                    {
+                      input: {
+                        prompt: imagePrompt,
+                        aspect_ratio: aspectRatio,
+                        output_format: "webp",
+                        output_quality: 90,
+                        safety_tolerance: tol,
+                        prompt_upsampling: false
+                      }
+                    }
+                  );
+                  modelUsed = 'Flux 1.1 Pro';
+                  lastModelUsed = modelUsed;
+                }
               }
               
               console.log(`Image generated with ${modelUsed}`);
@@ -8472,9 +8566,11 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
         );
 
         if (videoResult.success) {
-          // Any provider that returns a ready URL (Luma-via-Replicate, Veo) → direct delivery.
-          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo')) {
-            const providerLabel = videoResult.provider === 'veo' ? 'Google Veo 3.1' : 'Luma via Replicate';
+          // Any provider that returns a ready URL (Luma-via-Replicate, Veo, Kling) → direct delivery.
+          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling')) {
+            const providerLabel = videoResult.provider === 'veo' ? 'Google Veo 3.1'
+              : videoResult.provider === 'kling' ? 'Kling'
+              : 'Luma via Replicate';
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
             saveState();
