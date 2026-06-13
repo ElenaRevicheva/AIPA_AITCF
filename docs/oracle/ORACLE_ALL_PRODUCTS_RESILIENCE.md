@@ -1331,3 +1331,34 @@ June 2026 (Grok tier-3 failover, Bright Data layer, bilingual blog pipeline, NEW
 that never ran" postmortem — this doc's verify-from-logs story is now public); root `favicon.ico`
 regenerated from the real AIdeazz logo (multi-size) + crisp 32px/apple-touch icons wired sitewide;
 portfolio diagram labels corrected + honest "9 live 24/7" count enforced in 8 places EN+ES.
+
+## NEW June 13 2026 — Atuona Ray-3 swap + operator-selectable video providers (`cbc3a49`, deployed)
+
+**Backup before touching the live creative agent:** tag `atuona-pre-ray3-multiprovider-20260613` +
+branch `backup/atuona-pre-multiprovider-20260613` pushed to GitHub. Restore: `git checkout <tag>`.
+
+**Shipped in `src/atuona-creative-ai.ts`:**
+- **Luma Ray-2 → Ray-3** (`VIDEO_MODELS.lumaDirect`), env-overridable `LUMA_VIDEO_MODEL`. Ray-3 =
+  native 1080p, ~3x cheaper, 16-bit HDR, best-in-class video-to-video. Replicate fallback deliberately
+  KEPT on `ray-2-720p` so the fallback never shares a Ray-3 enum/schema surprise.
+- **Operator-selectable engine:** `/visualize <provider> NNN` where provider ∈ luma | runway | veo
+  (aliases ray3/gen4/google). Explicit provider runs FIRST, then falls back through
+  Luma→Replicate→Runway with honest provider labeling on the delivered clip. Bare `/visualize NNN`
+  unchanged (default chain).
+- **NEW `generateWithVeo`** — Google Veo 3.1 via Gemini API (image→video, native audio), self-contained
+  submit+poll, returns ready videoUrl (same delivery path as Luma-via-Replicate). Activates when
+  `GEMINI_API_KEY`/`GOOGLE_API_KEY` is set; without it returns clean failure → falls through to the chain.
+  **STATUS: wired but UNTESTED — no GEMINI key on Oracle yet; Veo's Gemini response shape needs one live
+  confirmation once a key is added (response parse has defensive fallbacks).**
+- `tryRunway()` extracted so Runway can run primary OR fallback; call-site direct-URL delivery generalized.
+
+**Deploy:** pull + `npm run build` (tsc clean) + `pm2 restart cto-aipa`. Verified `online` (restart 12),
+boot log `🎭 Atuona Creative AI started: @Atuona_AI_CCF_AIdeazz_bot` — clean init, no crash.
+
+**Root cause of the June 12 Atuona failure (same as Algom): billing.** Luma API wallet hit
+`{"detail":"Insufficient credits"}` — Direct + Modify (Director's Cut) both 402; Replicate fallback
+delivered the base cut. Luma API wallet is SEPARATE from the consumer app: top up at
+https://lumalabs.ai/dream-machine/api/billing/overview (not Account→Subscription).
+
+**Fallback truth (answer to "do I fall back to runway/dalle?"):** video falls back Luma→Replicate→Runway
+(yes Runway). Images are **Flux-only** (Ultra→Pro→Dev) — **no DALL-E** anywhere in /visualize.
