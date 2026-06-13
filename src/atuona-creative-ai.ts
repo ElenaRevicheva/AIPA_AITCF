@@ -76,15 +76,25 @@ async function replyWithVideoFromUrlReliable(
   }
 }
 
-// Runway API base URL (image_to_video fallback — see VIDEO_MODELS.runwayImageToVideo)
+// Runway API base URL (image_to_video — see VIDEO_MODELS.runwayImageToVideo)
 const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
 const runwayApiKey = process.env.RUNWAY_API_KEY || null;
 
+// Google Veo 3.1 via Gemini API (image→video, native audio). Needs GEMINI_API_KEY (or GOOGLE_API_KEY).
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta';
+const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim() || null;
+
 // =============================================================================
-// 🎨 AI MODEL CONFIGURATION - LATEST & BEST (Jan 2026)
+// 🎨 AI MODEL CONFIGURATION - LATEST & BEST (June 2026)
 // =============================================================================
 // Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro; Reels 9:16 = Flux or center-crop from 16:9 (photoreal, no DALL-E)
-// Video: Luma Direct API (primary) > Luma via Replicate > Runway Gen-4.5 (fallback)
+// Video: multi-provider, operator-selectable via `/visualize <provider> NNN`:
+//   • luma   → Luma Ray 3 Direct API  → Luma via Replicate (fallback)
+//   • runway → Runway Gen-4.5 image_to_video
+//   • veo    → Google Veo 3.1 (Gemini API, native audio) — needs GEMINI_API_KEY
+//   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Runway.
+//   When a provider is named explicitly and fails, we fall back through the chain
+//   and label the delivered clip with the provider that actually produced it (honest labeling).
 // Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
 // Voice: Whisper-1 (best transcription)
 // =============================================================================
@@ -96,15 +106,31 @@ const IMAGE_MODELS = {
 };
 
 const VIDEO_MODELS = {
-  /** Full-quality tier (vs ray-flash-2 = faster). API: docs.lumalabs.ai — VideoModel */
-  lumaDirect: 'ray-2',
+  /** Luma full-quality tier. Ray 3 (Mar 2026): native 1080p, ~3x cheaper, 16-bit HDR, best-in-class
+   *  video-to-video. Same Dream Machine API as Ray 2 — drop-in model swap. Override: LUMA_VIDEO_MODEL.
+   *  Fallback chain (Replicate, Runway) catches any Ray-3 enum/schema surprise → safe to ship. */
+  lumaDirect: (process.env.LUMA_VIDEO_MODEL || 'ray-3').trim(),
   /** Max output resolution for I2V (540p | 720p | 1080p | 4k). 1080p = best default; 4k = slower/more credits */
   lumaResolution: '1080p' as const,
-  /** Replicate-hosted Luma Ray 2 (720p). `luma/dream-machine` was retired → API 404/500 — use ray-2-720p. Override: REPLICATE_LUMA_MODEL */
+  /** Replicate-hosted Luma fallback. ray-2-720p is proven-stable; bump via REPLICATE_LUMA_MODEL once
+   *  luma/ray-3 is confirmed on Replicate. Kept on 2 deliberately so the fallback never shares Ray-3's fate. */
   lumaReplicate: (process.env.REPLICATE_LUMA_MODEL || 'luma/ray-2-720p').trim(),
-  /** Runway image→video fallback — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
+  /** Runway image→video — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
   runwayImageToVideo: 'gen4.5',
+  /** Google Veo 3.1 model id on the Gemini API. Override: VEO_MODEL (e.g. veo-3.1-fast-generate-preview). */
+  veoModel: (process.env.VEO_MODEL || 'veo-3.1-generate-preview').trim(),
 };
+
+/** Canonical video provider ids selectable from `/visualize <provider> NNN`. */
+type VideoProvider = 'luma' | 'runway' | 'veo';
+/** Map operator aliases → canonical provider id. Returns null if the token isn't a provider. */
+function parseVideoProvider(token: string): VideoProvider | null {
+  const t = token.toLowerCase();
+  if (['luma', 'ray', 'ray2', 'ray3', 'ray-3', 'dream', 'dreammachine'].includes(t)) return 'luma';
+  if (['runway', 'gen4', 'gen45', 'gen-4', 'gen4.5', 'runwayml'].includes(t)) return 'runway';
+  if (['veo', 'veo3', 'veo31', 'google', 'gemini'].includes(t)) return 'veo';
+  return null;
+}
 
 /**
  * Center-crop a landscape Flux still to 9:16 for Reels — same photoreal pixels, no second model.
@@ -3371,17 +3397,38 @@ interface VideoGenerationResult {
   success: boolean;
   videoUrl?: string;
   taskId?: string;
-  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'none';
+  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
 
 async function generateVideo(
-  imageUrl: string, 
+  imageUrl: string,
   prompt: string,
-  ctx: Context
+  ctx: Context,
+  preferredProvider?: VideoProvider | null
 ): Promise<VideoGenerationResult> {
-  
+
+  // ========== 0. EXPLICIT PROVIDER (e.g. `/visualize veo 089`) ==========
+  // When the operator names a provider, try it FIRST. On failure, fall through to the
+  // default chain below and label the delivered clip with whatever actually produced it.
+  if (preferredProvider === 'veo') {
+    const veo = await generateWithVeo(imageUrl, prompt, ctx);
+    if (veo.success) return veo;
+    await ctx.reply(`⚠️ Veo unavailable (${(veo.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
+    // continue into default chain
+  } else if (preferredProvider === 'runway') {
+    if (runwayApiKey) {
+      const rw = await tryRunway(imageUrl, prompt, ctx);
+      if (rw.success) return rw;
+      await ctx.reply(`⚠️ Runway unavailable — falling back to Luma → Replicate...`);
+    } else {
+      await ctx.reply(`⚠️ Runway not configured (RUNWAY_API_KEY) — using Luma → Replicate...`);
+    }
+    // continue into default chain (Luma Direct → Replicate → Runway)
+  }
+  // preferredProvider 'luma' or null → default chain below is already Luma-first.
+
   // ========== 1. TRY LUMA DIRECT API FIRST (your Luma API key) ==========
   if (lumaApiKey) {
     try {
@@ -3392,7 +3439,7 @@ async function generateVideo(
           ? (process.env.LUMA_VIDEO_RESOLUTION as (typeof allowedLumaRes)[number])
           : VIDEO_MODELS.lumaResolution;
       await ctx.reply(
-        `🎬 *Generating video with Luma Dream Machine...*\n\n_Ray 2 · ${lumaResolution} · Direct API — takes 1–3 minutes..._`,
+        `🎬 *Generating video with Luma Dream Machine...*\n\n_${VIDEO_MODELS.lumaDirect} · ${lumaResolution} · Direct API — takes 1–3 minutes..._`,
         { parse_mode: 'Markdown' }
       );
       
@@ -3528,60 +3575,153 @@ async function generateVideo(
   
   // ========== 3. FALLBACK TO RUNWAY GEN-4.5 (image_to_video) ==========
   if (runwayApiKey) {
-    try {
-      console.log('🎬 Using Runway Gen-4.5 (final fallback)...');
-      await ctx.reply('🎬 *Generating video with Runway Gen-4.5...*\n\n_Final fallback. Takes 1-3 minutes..._', { parse_mode: 'Markdown' });
-      
-      const runwayBody = {
-        model: VIDEO_MODELS.runwayImageToVideo,
-        promptImage: imageUrl,
-        promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 320)}`,
-        duration: 10,  // 5 / 8 / 10 supported — keep immersive 10s
-        watermark: false,
-        ratio: '1280:720' // 16:9 — Runway gen4.5 expects documented ratios (not legacy 1280:768)
-      };
-      
-      const runwayResponse = await fetch(`${RUNWAY_API_URL}/image_to_video`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${runwayApiKey}`,
-          'Content-Type': 'application/json',
-          'X-Runway-Version': '2024-11-06'
-        },
-        body: JSON.stringify(runwayBody)
-      });
-      
-      const responseText = await runwayResponse.text();
-      
-      if (runwayResponse.ok) {
-        const runwayData = JSON.parse(responseText);
-        console.log('✅ Runway Gen-4.5 job started, task ID:', runwayData.id);
-        return {
-          success: true,
-          taskId: runwayData.id,
-          provider: 'runway',
-          needsPolling: true
-        };
-      } else {
-        throw new Error(`Runway error: ${responseText.substring(0, 200)}`);
-      }
-      
-    } catch (runwayError: any) {
-      console.error('Runway fallback error:', runwayError.message);
-      return {
-        success: false,
-        provider: 'none',
-        error: `All providers failed. Last error: ${runwayError.message}`
-      };
-    }
+    return await tryRunway(imageUrl, prompt, ctx);
   }
-  
+
   // No video providers available
   return {
     success: false,
     provider: 'none',
     error: 'No video generation providers configured (need REPLICATE_API_TOKEN for Luma or RUNWAY_API_KEY for Runway)'
   };
+}
+
+/**
+ * Runway Gen-4.5 image→video. Standalone so it can run as the primary (`/visualize runway NNN`)
+ * or as the final fallback tier. Returns a taskId for the caller's Runway polling branch.
+ */
+async function tryRunway(
+  imageUrl: string,
+  prompt: string,
+  ctx: Context
+): Promise<VideoGenerationResult> {
+  try {
+    console.log('🎬 Using Runway Gen-4.5...');
+    await ctx.reply('🎬 *Generating video with Runway Gen-4.5...*\n\n_image→video · takes 1-3 minutes..._', { parse_mode: 'Markdown' });
+
+    const runwayBody = {
+      model: VIDEO_MODELS.runwayImageToVideo,
+      promptImage: imageUrl,
+      promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 320)}`,
+      duration: 10,  // 5 / 8 / 10 supported — keep immersive 10s
+      watermark: false,
+      ratio: '1280:720' // 16:9 — Runway gen4.5 expects documented ratios (not legacy 1280:768)
+    };
+
+    const runwayResponse = await fetch(`${RUNWAY_API_URL}/image_to_video`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${runwayApiKey}`,
+        'Content-Type': 'application/json',
+        'X-Runway-Version': '2024-11-06'
+      },
+      body: JSON.stringify(runwayBody)
+    });
+
+    const responseText = await runwayResponse.text();
+
+    if (runwayResponse.ok) {
+      const runwayData = JSON.parse(responseText);
+      console.log('✅ Runway Gen-4.5 job started, task ID:', runwayData.id);
+      return {
+        success: true,
+        taskId: runwayData.id,
+        provider: 'runway',
+        needsPolling: true
+      };
+    } else {
+      throw new Error(`Runway error: ${responseText.substring(0, 200)}`);
+    }
+  } catch (runwayError: any) {
+    console.error('Runway error:', runwayError.message);
+    return {
+      success: false,
+      provider: 'none',
+      error: `Runway failed: ${runwayError.message}`
+    };
+  }
+}
+
+/**
+ * Google Veo 3.1 image→video via the Gemini API (native audio, cinematic camera language).
+ * Self-contained: submits a long-running prediction, polls the operation, returns a ready videoUrl
+ * (handled by the caller's direct-URL delivery branch — same path as Luma-via-Replicate).
+ * Needs GEMINI_API_KEY (or GOOGLE_API_KEY). Without it, returns a clean failure so generateVideo
+ * falls through to the Luma → Replicate → Runway chain. Model id overridable via VEO_MODEL.
+ */
+async function generateWithVeo(
+  imageUrl: string,
+  prompt: string,
+  ctx: Context
+): Promise<VideoGenerationResult> {
+  if (!geminiApiKey) {
+    return { success: false, provider: 'veo', error: 'VEO not configured — set GEMINI_API_KEY (or GOOGLE_API_KEY) in .env' };
+  }
+  try {
+    await ctx.reply(
+      `🎬 *Generating video with Google Veo 3.1...*\n\n_${VIDEO_MODELS.veoModel} · native audio · takes 1–3 minutes..._`,
+      { parse_mode: 'Markdown' }
+    );
+
+    // Fetch the still and base64-encode it (Veo image input is inline bytes, not a URL).
+    const imgRes = await fetch(imageUrl);
+    if (!imgRes.ok) throw new Error(`fetch still failed: ${imgRes.status}`);
+    const imgBuf = Buffer.from(await imgRes.arrayBuffer());
+    const mimeType = imgRes.headers.get('content-type')?.startsWith('image/') ? imgRes.headers.get('content-type')! : 'image/jpeg';
+    const imageBase64 = imgBuf.toString('base64');
+
+    // 1) Submit long-running generation
+    const submitUrl = `${GEMINI_API_URL}/models/${VIDEO_MODELS.veoModel}:predictLongRunning?key=${geminiApiKey}`;
+    const submitBody = {
+      instances: [{
+        prompt: `9-second cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+        image: { bytesBase64Encoded: imageBase64, mimeType },
+      }],
+      parameters: { aspectRatio: '16:9', personGeneration: 'allow_all' },
+    };
+    const submit = await fetch(submitUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submitBody),
+    });
+    const submitText = await submit.text();
+    if (!submit.ok) throw new Error(`Veo submit ${submit.status}: ${submitText.substring(0, 200)}`);
+    const opName = JSON.parse(submitText).name as string;
+    if (!opName) throw new Error('Veo submit returned no operation name');
+    console.log('🎬 Veo operation:', opName);
+
+    // 2) Poll the operation (max ~5 min)
+    const pollUrl = `${GEMINI_API_URL}/${opName}?key=${geminiApiKey}`;
+    for (let attempt = 1; attempt <= 30; attempt++) {
+      await new Promise((r) => setTimeout(r, 10_000));
+      const poll = await fetch(pollUrl);
+      if (!poll.ok) { console.warn(`Veo poll ${poll.status} (retrying)`); continue; }
+      const op = await poll.json() as any;
+      if (op.error) throw new Error(`Veo op error: ${JSON.stringify(op.error).substring(0, 200)}`);
+      if (op.done) {
+        // Response shape: response.generateVideoResponse.generatedSamples[0].video.uri
+        const sample = op.response?.generateVideoResponse?.generatedSamples?.[0]
+          || op.response?.generatedSamples?.[0]
+          || op.response?.predictions?.[0];
+        let uri: string | undefined = sample?.video?.uri || sample?.video?.url || sample?.videoUri || sample?.uri;
+        if (!uri && typeof sample?.bytesBase64Encoded === 'string') {
+          // Some responses inline the bytes — not expected for Veo, but guard anyway.
+          throw new Error('Veo returned inline bytes (unsupported here); use a uri-returning model');
+        }
+        if (!uri) throw new Error('Veo done but no video uri in response');
+        // The file URI needs the API key to download — append it so the delivery fetch succeeds.
+        if (uri.includes('generativelanguage.googleapis.com') && !uri.includes('key=')) {
+          uri += (uri.includes('?') ? '&' : '?') + `key=${geminiApiKey}`;
+        }
+        console.log('✅ Veo video ready:', uri.substring(0, 80) + '…');
+        return { success: true, videoUrl: uri, provider: 'veo', needsPolling: false };
+      }
+    }
+    throw new Error('Veo timed out after ~5 min');
+  } catch (veoErr: any) {
+    console.error('Veo error:', veoErr.message);
+    return { success: false, provider: 'veo', error: veoErr.message };
+  }
 }
 
 // =============================================================================
@@ -7757,13 +7897,18 @@ _Set OPENAI_API_KEY for automatic generation!_`, { parse_mode: 'Markdown' });
 
 Create stunning visuals for your book pages:
 
-\`/visualize 048\` - Visualize specific page
+\`/visualize 048\` - Visualize page (default: Luma Ray 3)
 \`/visualize last\` - Visualize last published page
 \`/visualize all\` - Queue all pages for visualization
 
+🎛️ *Choose your video engine:*
+\`/visualize luma 048\` - Luma Ray 3 (HDR, cinematic)
+\`/visualize runway 048\` - Runway Gen-4.5
+\`/visualize veo 048\` - Google Veo 3.1 (native audio)
+
 Each visualization creates:
 🎨 Flux 1.1 Pro Ultra image (BEST photorealistic!)
-🎬 Luma Dream Machine video (cinematic 9 sec)
+🎬 Cinematic video from your chosen engine (9 sec)
 🎬✨ Director's Cut (fashion/editorial layer via Modify Video)
 📱 Instagram format (9:16 vertical)
 📺 YouTube format (16:9 horizontal)
@@ -7772,30 +7917,50 @@ Each visualization creates:
 📊 *Status*
 Visualizations: ${visualizations.length} pages
 🎨 Flux: ${replicate ? '✅ Ultra/Pro Ready' : '❌ Set REPLICATE_API_TOKEN'}
-🎬 Luma Direct: ${lumaApiKey ? '✅ Dream Machine Ready' : '⚪ Set LUMA_API_KEY'}
-🎬 Luma Replicate: ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
-🎬 Runway: ${runwayApiKey ? '✅ Gen-4.5 (fallback)' : '⚪ Not configured'}
+🎬 Luma Ray 3 (Direct): ${lumaApiKey ? '✅ Ready' : '⚪ Set LUMA_API_KEY'}
+🎬 Luma (Replicate): ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
+🎬 Runway Gen-4.5: ${runwayApiKey ? '✅ Ready' : '⚪ Set RUNWAY_API_KEY'}
+🎬 Google Veo 3.1: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
 
-_Video priority: Luma Direct → Luma Replicate → Runway_
+_Default chain: Luma Ray 3 → Luma Replicate → Runway_
+_Name a provider to pick it; it falls back through the chain if it fails._
 _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ 🚀`, { parse_mode: 'Markdown' });
       return;
     }
     
+    // Optional provider token: `/visualize veo 089`, `/visualize runway last`, `/visualize luma 089`.
+    // Default (no token) keeps the Luma Ray 3 → Replicate → Runway chain.
+    let selectedProvider: VideoProvider | null = null;
+    let argRest = arg;
+    {
+      const parts = arg.split(/\s+/);
+      const maybeProvider = parseVideoProvider(parts[0] ?? '');
+      if (maybeProvider) {
+        if (parts.length > 1) {
+          selectedProvider = maybeProvider;
+          argRest = parts.slice(1).join(' ').trim();
+        } else {
+          await ctx.reply(`🎬 Provider *${maybeProvider}* selected — now add a page, e.g. \`/visualize ${maybeProvider} 089\` or \`/visualize ${maybeProvider} last\`.`, { parse_mode: 'Markdown' });
+          return;
+        }
+      }
+    }
+
     // Determine which page to visualize
-    let pageId = arg;
-    if (arg === 'last') {
+    let pageId = argRest;
+    if (argRest === 'last') {
       pageId = String(bookState.currentPage - 1).padStart(3, '0');
     }
-    
-    if (arg === 'all') {
+
+    if (argRest === 'all') {
       await ctx.reply('🎬 *Batch visualization coming soon!*\n\nFor now, visualize one page at a time.', { parse_mode: 'Markdown' });
       return;
     }
-    
+
     // Normalize page ID
     const pageNum = parseInt(pageId);
     if (isNaN(pageNum)) {
-      await ctx.reply('❌ Invalid page number. Use `/visualize 048` or `/visualize last`', { parse_mode: 'Markdown' });
+      await ctx.reply('❌ Invalid page number. Use `/visualize 048`, `/visualize last`, or pick a provider: `/visualize veo 048`', { parse_mode: 'Markdown' });
       return;
     }
     pageId = String(pageNum).padStart(3, '0');
@@ -8272,23 +8437,25 @@ Free tier limit reached. Options:
 Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
       };
       
-      // Generate video with Luma Direct (primary) > Luma Replicate > Runway (fallback)
-      if (visualization.imageUrlHorizontal && (lumaApiKey || replicate || runwayApiKey)) {
+      // Generate video. Default chain Luma Ray 3 → Replicate → Runway; selectedProvider pins a primary.
+      if (visualization.imageUrlHorizontal && (lumaApiKey || replicate || runwayApiKey || geminiApiKey)) {
         const videoResult = await generateVideo(
           visualization.imageUrlHorizontal,
           motionPrompt,  // Page-specific motion, not truncated image prompt
-          ctx
+          ctx,
+          selectedProvider
         );
-        
+
         if (videoResult.success) {
-          if (videoResult.provider === 'luma-replicate' && videoResult.videoUrl) {
-            // Luma via Replicate returns video URL directly
+          // Any provider that returns a ready URL (Luma-via-Replicate, Veo) → direct delivery.
+          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo')) {
+            const providerLabel = videoResult.provider === 'veo' ? 'Google Veo 3.1' : 'Luma via Replicate';
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
             saveState();
 
             await replyWithVideoFromUrlReliable(ctx, videoResult.videoUrl, {
-              caption: `✅ *Video Ready!* (Luma via Replicate — base cut)\n\n_Tap to play, long-press to save!_`,
+              caption: `✅ *Video Ready!* (${providerLabel} — base cut)\n\n_Tap to play, long-press to save!_`,
               parse_mode: 'Markdown'
             });
             await sendKnowledgeAuditAfterVideo();
