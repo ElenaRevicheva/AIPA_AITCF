@@ -19,8 +19,12 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPE
 // Replicate client for Flux Pro (best realistic images)
 const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({ auth: process.env.REPLICATE_API_TOKEN }) : null;
 
-// Luma Labs Direct API (Dream Machine)
-const LUMA_API_URL = 'https://api.lumalabs.ai/dream-machine/v1';
+// Luma Labs Direct API.
+// Current platform = agents.lumalabs.ai/v1 (platform.lumalabs.ai console, ray-3.2, luma-api- keys).
+// Legacy = api.lumalabs.ai/dream-machine/v1 (ray-2, older keys, being phased out).
+// New API verified June 13 2026: POST /generations needs top-level type:"video"; finished URL at output[].url.
+// Override with LUMA_API_BASE if Luma moves the host again.
+const LUMA_API_URL = (process.env.LUMA_API_BASE || 'https://agents.lumalabs.ai/v1').trim().replace(/\/$/, '');
 const lumaApiKey = process.env.LUMA_API_KEY || null;
 
 /** Luma HTTP must not hang forever (stalled TCP); otherwise Telegram shows no further updates. */
@@ -37,8 +41,16 @@ function lumaCreateSignal(): AbortSignal {
 
 /** MP4 URL from GET /generations/:id (handles API shape drift). */
 function extractLumaVideoUrl(statusData: any): string | null {
+  // Legacy Dream Machine API (api.lumalabs.ai/dream-machine/v1): assets.video
   const v = statusData?.assets?.video;
   if (typeof v === 'string' && /^https?:\/\//i.test(v)) return v.trim();
+  // New Luma API (agents.lumalabs.ai/v1): output[] = [{ type:"video", url }]
+  const out = statusData?.output;
+  if (Array.isArray(out)) {
+    const vid = out.find((o: any) => o?.type === 'video' && typeof o?.url === 'string')
+      || out.find((o: any) => typeof o?.url === 'string');
+    if (vid?.url && /^https?:\/\//i.test(vid.url)) return String(vid.url).trim();
+  }
   return null;
 }
 
@@ -109,7 +121,7 @@ const VIDEO_MODELS = {
   /** Luma full-quality tier. Ray 3 (Mar 2026): native 1080p, ~3x cheaper, 16-bit HDR, best-in-class
    *  video-to-video. Same Dream Machine API as Ray 2 — drop-in model swap. Override: LUMA_VIDEO_MODEL.
    *  Fallback chain (Replicate, Runway) catches any Ray-3 enum/schema surprise → safe to ship. */
-  lumaDirect: (process.env.LUMA_VIDEO_MODEL || 'ray-3').trim(),
+  lumaDirect: (process.env.LUMA_VIDEO_MODEL || 'ray-3.2').trim(),
   /** Max output resolution for I2V (540p | 720p | 1080p | 4k). 1080p = best default; 4k = slower/more credits */
   lumaResolution: '1080p' as const,
   /** Replicate-hosted Luma fallback. ray-2-720p is proven-stable; bump via REPLICATE_LUMA_MODEL once
@@ -3446,6 +3458,7 @@ async function generateVideo(
       // Ray-2 = full-quality model (ray-flash-2 = faster). Default 1080p (was implicit 720p). Override: LUMA_VIDEO_RESOLUTION=4k|1080p|720p|540p
       const lumaBody = {
         model: VIDEO_MODELS.lumaDirect,
+        type: 'video', // REQUIRED by agents.lumalabs.ai/v1 for ray-3.2 (verified June 13 2026)
         resolution: lumaResolution,
         prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
         keyframes: {
