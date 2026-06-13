@@ -4230,13 +4230,18 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
       await ctx.reply(`🎬 *AI Film Studio Help*
 
 *Create visuals for a page:*
-\`/visualize 052\` → Specific page
+\`/visualize 052\` → Specific page (default: Luma)
 \`/visualize last\` → Last published page
+
+*Pick your video engine:*
+\`/visualize luma 052\` → Luma ray-3.2 (HDR cinematic)
+\`/visualize runway 052\` → Runway Gen-4.5
+\`/visualize veo 052\` → Google Veo 3.1 (native audio)
 
 *What it creates:*
 🎨 Flux 1.1 Pro Ultra image (16:9 YouTube) - BEST quality!
 📱 Flux 1.1 Pro Ultra image (9:16 Instagram)
-🎬 Runway Gen-4.5 video (5-10 sec cinematic)
+🎬 Cinematic video from your chosen engine + Director's Cut
 📝 Caption + hashtags auto-generated
 
 *View your gallery:*
@@ -4460,7 +4465,10 @@ _Just click any command to see what it does!_
 ━━━━━━━━━━━━━━━━━━━━
 🎬 *AI FILM STUDIO*
 ━━━━━━━━━━━━━━━━━━━━
-/visualize 048 - 🎥 Image+video for page
+/visualize 048 - 🎥 Image+video (default: Luma)
+/visualize luma 048 - 🎬 Luma ray-3.2 (HDR cinematic)
+/visualize runway 048 - 🎬 Runway Gen-4.5
+/visualize veo 048 - 🎬 Google Veo 3.1 (native audio)
 /gallery - 🖼 All visualizations
 /film - 🎬 Film compilation status
 /videostatus - ⏳ Video progress
