@@ -3807,20 +3807,24 @@ async function startModifyVideo(
     return { success: false, error: 'No LUMA_API_KEY — modify pass skipped' };
   }
 
+  // New Luma API (agents.lumalabs.ai/v1): Modify = POST /generations with type:"video" +
+  // mode (flex/adhere/reimagine) + media.url (source video). Verified live June 13 2026 — a
+  // ray-3.2 modify completed in ~25s. firstFrameImageUrl is unused on the new API (kept in the
+  // signature for the legacy path / future keyframe anchoring).
+  void firstFrameImageUrl;
   const body = {
-    generation_type: 'modify_video',
-    model: 'ray-2',
-    mode: MODIFY_VIDEO_MODE,
+    model: VIDEO_MODELS.lumaDirect, // ray-3.2
+    type: 'video',
+    mode: MODIFY_VIDEO_MODE,        // flex_1 (Modify Video V2 mode enum)
     prompt: fashionPrompt,
     media: { url: baseVideoUrl },
-    first_frame: { url: firstFrameImageUrl }
   };
 
   console.log('🎬✨ Starting Modify Video (fashion/editorial pass)...');
   console.log('Modify request:', JSON.stringify(body, null, 2));
 
   try {
-    const resp = await fetch(`${LUMA_API_URL}/generations/video/modify`, {
+    const resp = await fetch(`${LUMA_API_URL}/generations`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${lumaApiKey}`,
