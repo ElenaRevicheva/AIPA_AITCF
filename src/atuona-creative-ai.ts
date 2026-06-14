@@ -8282,7 +8282,7 @@ Return ONLY the motion direction. No preamble.`;
       
       // Generate image with Flux Pro via Replicate (with retry for rate limits)
       if (replicate) {
-        await ctx.reply('🎨 *Generating image with Flux Pro...*\n\n_This takes 30-60 seconds..._', { parse_mode: 'Markdown' });
+        await ctx.reply('🎨 *Generating image with Flux 2 Pro...*\n\n_This takes 30-60 seconds..._', { parse_mode: 'Markdown' });
         
         // Track which model was used for display
         let lastModelUsed = 'Flux Pro';
