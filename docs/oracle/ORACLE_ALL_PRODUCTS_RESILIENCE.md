@@ -1392,3 +1392,18 @@ modify completed in ~25s (faster than base generation, confirming the source vid
 Poll uses the output[]-aware `extractLumaVideoUrl`. Deployed, cto-aipa online (restart 15), boot clean.
 Full /visualize pipeline now end-to-end on the new platform: Flux image → ray-3.2 base video →
 ray-3.2 Modify Director's Cut.
+
+## June 14 2026 — Atuona engine expansion: Flux 2 Pro (image) + Kling (4th video engine), verified live
+
+Surgical/additive (commits `8af553c` code, `a499200` polish; backup tag `atuona-pre-flux2-kling-20260613`):
+- **Image: Flux 2 Pro** (`black-forest-labs/flux-2-pro`, env `FLUX2_MODEL`, empty=disable) is the new top
+  tier; Flux 1.1 Ultra→Pro→Dev kept intact as fallback. Verified: `Trying Flux 2 Pro → Image generated
+  with Flux 2 Pro` every run (no fallback).
+- **Video: Kling** (4th selectable engine, `/visualize kling NNN`) via Replicate `kwaivgi/kling-v2.1-master`
+  (env `KLING_REPLICATE_MODEL`, existing REPLICATE_API_TOKEN — no new key). Verified: `✅ Kling via
+  Replicate succeeded` (~3 min/render). For stylized/arthouse motion. Falls back to Luma→Replicate→Runway.
+- Existing Luma ray-3.2 / Runway / Veo 3.1 / Director's Cut all untouched.
+
+**Full Atuona engine matrix now:** image = Flux 2 Pro (→1.1 fallback); video = Luma ray-3.2 · Runway
+Gen-4.5 · Veo 3.1 (native audio) · Kling — all operator-selectable via `/visualize <provider> NNN` and /menu.
+All three codebases (local / GitHub / Oracle) synced at `a499200`.
