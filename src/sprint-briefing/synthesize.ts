@@ -2,7 +2,7 @@ import Groq from 'groq-sdk';
 import type { Anthropic } from '@anthropic-ai/sdk';
 
 const GROQ_MODEL = process.env.SPRINT_BRIEFING_GROQ_MODEL || 'llama-3.3-70b-versatile';
-const CLAUDE_MODEL = process.env.SPRINT_BRIEFING_CLAUDE_MODEL || 'claude-sonnet-4-20250514';
+const CLAUDE_MODEL = process.env.SPRINT_BRIEFING_CLAUDE_MODEL || 'claude-sonnet-4-6';
 
 /** Fast clustering / deltas — same Groq tier family as CTO triage + reviews. */
 export async function clusterSignalsWithGroq(groq: Groq, rawDigest: string): Promise<string> {

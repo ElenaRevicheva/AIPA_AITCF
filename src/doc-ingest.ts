@@ -103,7 +103,7 @@ If no clear prospects found, return: []`;
 
   try {
     const raw = await claudeWithGroqFallback(
-      anthropic, 'claude-3-5-haiku-20241022', 2048, null, prompt, 'doc-ingest/extract'
+      anthropic, 'claude-haiku-4-5-20251001', 2048, null, prompt, 'doc-ingest/extract'
     );
     const match = raw.match(/\[[\s\S]*\]/);
     if (!match) {

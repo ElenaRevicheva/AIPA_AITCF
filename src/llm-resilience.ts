@@ -60,6 +60,19 @@ export function isAnthropicCreditExhaustion(e: unknown): boolean {
   );
 }
 
+/** True when the Anthropic error is a decommissioned/unknown model (404 not_found), not a transient failure.
+ *  Historically these were mislabeled as "credit exhausted" — they need the model id updated, not a top-up. */
+export function isAnthropicModelNotFound(e: unknown): boolean {
+  const msg = String(
+    (e as any)?.error?.error?.message ||
+    (e as any)?.message ||
+    e ||
+    ''
+  ).toLowerCase();
+  const status = (e as any)?.status ?? (e as any)?.statusCode ?? null;
+  return (status === 404 || msg.includes('404')) && (msg.includes('not_found') || msg.includes('model:'));
+}
+
 /**
  * Drop-in replacement for a single anthropic.messages.create() call.
  * Returns the text content string (empty string if model returned no text).
@@ -84,14 +97,19 @@ export async function claudeWithGroqFallback(
     const block = resp.content[0];
     return block && block.type === 'text' ? block.text : '';
   } catch (e: unknown) {
-    if (!isAnthropicCreditExhaustion(e)) throw e;
+    const deadModel = isAnthropicModelNotFound(e);
+    if (!isAnthropicCreditExhaustion(e) && !deadModel) throw e;
+    // Accurate reason — a decommissioned model id (404) was historically mislabeled as "credit exhausted".
+    const reason = deadModel
+      ? `Anthropic model not found (${model} — decommissioned? update the id)`
+      : 'Anthropic credit exhausted';
     const groqKey = process.env.GROQ_API_KEY?.trim();
     if (!groqKey && !XAI_KEY()) throw e;
 
     // Tier 2: Groq (free) — primary fallback.
     if (groqKey) {
       try {
-        console.warn(`[${label}] Anthropic credit exhausted — falling back to Groq ${GROQ_FALLBACK_MODEL}`);
+        console.warn(`[${label}] ${reason} — falling back to Groq ${GROQ_FALLBACK_MODEL}`);
         const groq = new Groq({ apiKey: groqKey });
         const messages: Array<{ role: 'system' | 'user'; content: string }> = systemPrompt
           ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
@@ -115,7 +133,7 @@ export async function claudeWithGroqFallback(
       }
     }
     // No Groq key configured — go straight to Grok.
-    console.warn(`[${label}] Anthropic credit exhausted — falling back to Grok ${XAI_MODEL()}`);
+    console.warn(`[${label}] ${reason} — falling back to Grok ${XAI_MODEL()}`);
     return grokComplete(systemPrompt, userPrompt, maxTokens, label);
   }
 }

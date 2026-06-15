@@ -321,7 +321,7 @@ The body should use plain text with \\n for line breaks.`;
     try {
       const text = await claudeWithGroqFallback(
         anthropic,
-        process.env.OUTREACH_MODEL || 'claude-sonnet-4-20250514',
+        process.env.OUTREACH_MODEL || 'claude-sonnet-4-6',
         1024,
         null,
         prompt,

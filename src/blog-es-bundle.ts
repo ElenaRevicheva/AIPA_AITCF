@@ -237,7 +237,7 @@ async function translateToSpanish(src: EnglishSource): Promise<{ title: string; 
   const model =
     process.env.BLOG_ES_TRANSLATE_MODEL?.trim() ||
     process.env.HASHNODE_ARTICLE_MODEL?.trim() ||
-    "claude-sonnet-4-20250514";
+    "claude-sonnet-4-6";
   const client = anthropicClient();
   const maxTokens = model.includes("haiku") ? 4096 : 8192;
   const payload = JSON.stringify(
