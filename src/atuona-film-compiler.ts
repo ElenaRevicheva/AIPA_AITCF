@@ -19,6 +19,14 @@ import { Octokit } from '@octokit/rest';
 
 const execFileP = promisify(execFile);
 
+/** Race a promise against a timeout so a hung API call can't freeze the whole film. */
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, rej) => setTimeout(() => rej(new Error(`${label} timed out after ${ms}ms`)), ms)),
+  ]);
+}
+
 // Self-contained clients (read env; never throw at import).
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 const octokit = new Octokit({ auth: (process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '').trim() || undefined });
@@ -74,9 +82,9 @@ async function ffprobeDuration(file: string): Promise<number> {
 /** Fetch the English poem text + title for VO from the atuona repo metadata. */
 async function fetchPoem(pageId: string): Promise<{ title: string; text: string }> {
   try {
-    const { data } = await octokit.repos.getContent({
+    const { data } = await withTimeout(octokit.repos.getContent({
       owner: ATUONA_OWNER, repo: ATUONA_REPO, path: `metadata/${pageId}.json`, ref: 'main',
-    });
+    }), 15000, `fetchPoem ${pageId}`);
     if ('content' in data) {
       const meta = JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'));
       const attrs: Array<{ trait_type?: string; value?: string }> = meta.attributes || [];
@@ -97,9 +105,9 @@ async function ttsForPoem(pageId: string, text: string): Promise<string | null> 
   try {
     const out = path.join(workDir(), `vo_${pageId}.mp3`);
     const voice = (process.env.ATUONA_TTS_VOICE || 'onyx').trim(); // onyx = deep, fitting for the tone
-    const resp = await openai.audio.speech.create({
+    const resp = await withTimeout(openai.audio.speech.create({
       model: 'tts-1', voice: voice as any, input: text.substring(0, 1800),
-    });
+    }), 45000, `TTS ${pageId}`);
     fs.writeFileSync(out, Buffer.from(await resp.arrayBuffer()));
     return out;
   } catch (e: any) {
@@ -216,7 +224,7 @@ export async function buildFilm(opts: {
           '-map', '[v]', '-map', '[a]', '-t', clipDur.toFixed(2),
           '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
           '-c:a', 'aac', '-ar', '44100', '-ac', '2', clip,
-        ], { maxBuffer: 1 << 26 });
+        ], { maxBuffer: 1 << 26, timeout: 150000 });
       } else {
         // no VO: keep shot, add silent track for uniform concat
         await execFileP('ffmpeg', [
@@ -225,7 +233,7 @@ export async function buildFilm(opts: {
           '-map', '[v]', '-map', '1:a', '-t', clipDur.toFixed(2),
           '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
           '-c:a', 'aac', '-ar', '44100', '-ac', '2', clip,
-        ], { maxBuffer: 1 << 26 });
+        ], { maxBuffer: 1 << 26, timeout: 150000 });
       }
       clips.push(clip);
       await note(`shot ${i + 1}/${shots.length} ✓ (#${id})`);
@@ -240,7 +248,7 @@ export async function buildFilm(opts: {
   const listFile = path.join(W, 'concat.txt');
   fs.writeFileSync(listFile, clips.map(c => `file '${c.replace(/'/g, "'\\''")}'`).join('\n'));
   const body = path.join(W, 'body.mp4');
-  await execFileP('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', body], { maxBuffer: 1 << 26 });
+  await execFileP('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', body], { maxBuffer: 1 << 26, timeout: 150000 });
 
   // 4) Ducked music bed (loop to length, low volume, mix under the baked VO)
   const filmLen = await ffprobeDuration(body);
@@ -256,7 +264,7 @@ export async function buildFilm(opts: {
         '-filter_complex', `[1:a]volume=${vol}[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=3[a]`,
         '-map', '0:v', '-map', '[a]', '-t', filmLen.toFixed(2),
         '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', final,
-      ], { maxBuffer: 1 << 26 });
+      ], { maxBuffer: 1 << 26, timeout: 150000 });
     } else {
       fs.copyFileSync(body, final);
     }
