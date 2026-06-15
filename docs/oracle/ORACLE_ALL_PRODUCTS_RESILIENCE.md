@@ -1407,3 +1407,21 @@ Surgical/additive (commits `8af553c` code, `a499200` polish; backup tag `atuona-
 **Full Atuona engine matrix now:** image = Flux 2 Pro (→1.1 fallback); video = Luma ray-3.2 · Runway
 Gen-4.5 · Veo 3.1 (native audio) · Kling — all operator-selectable via `/visualize <provider> NNN` and /menu.
 All three codebases (local / GitHub / Oracle) synced at `a499200`.
+
+## June 15 2026 — Atuona FILM COMPILER (`/film build`) live + first film made
+
+New isolated module `src/atuona-film-compiler.ts` (commits `8d549eb`, `42d94bd`). Turns Atuona's
+per-poem shots into a finished film, all on Oracle via ffmpeg (ffmpeg 6.1.1 + ffprobe present):
+- `persistShot()` saves each base cut to `data/atuona/films/shots/<pageId>.mp4` as generated (fixes
+  CDN URL expiry); hooked into the 3 base-video success paths.
+- `buildFilm()` = staged ffmpeg: normalize 720p + last-frame-hold → bake OpenAI-TTS poem voiceover per
+  clip → hard-cut concat → ducked music bed → mp4. `/film build [pages]` command; delivers to Telegram
+  (<49MB) or saves to server.
+- Music: royalty-free library in `data/atuona/films/music/` (Suno gated on SUNO_API_KEY).
+- **Hang fix:** first run froze on a no-timeout network call after shot 1 → `withTimeout` added
+  (TTS 45s / GitHub 15s / ffmpeg 150s); a hung call now skips the shot, film always completes.
+- **Recovery:** past shot URLs (Luma cdn-luma.com) often outlive their 1h signature — recovered 18/22
+  prior shots by probing `atuona-state.json` (repo root) and curling live URLs into shots/.
+
+**First film: `finding-paradise` — 97s, 5 shots, 12.8MB, full poem VO + melancholic ambient score.**
+Backup tag `atuona-pre-filmcompiler-20260615`. Restore points clean; existing engines untouched.
