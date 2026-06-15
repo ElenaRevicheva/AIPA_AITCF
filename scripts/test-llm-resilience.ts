@@ -74,7 +74,7 @@ async function main() {
   const tests: Array<() => Promise<TestResult>> = [
     () => runTest(
       'cto-aipa/strategic-qa',
-      () => claudeWithGroqFallback(mock, 'claude-opus-4-20250514', 512, null,
+      () => claudeWithGroqFallback(mock, 'claude-opus-4-8', 512, null,
         'What is 2+2? Answer in one sentence.', 'cto-aipa/strategic-qa'),
     ),
     () => runTest(
@@ -125,7 +125,7 @@ async function main() {
     ),
     () => runTest(
       'trello-kanban/analyze',
-      () => claudeWithGroqFallback(mock, 'claude-opus-4-20250514', 512, null,
+      () => claudeWithGroqFallback(mock, 'claude-opus-4-8', 512, null,
         'Analyze this Trello board: 1 card "Fix bug" in "Todo". Give a 1-sentence health summary.', 'trello-kanban/analyze'),
     ),
   ];

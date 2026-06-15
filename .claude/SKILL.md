@@ -233,7 +233,7 @@ Post GitHub comment + save to Oracle + notify CMO AIPA
 |-------|-----------|-------|
 | Language | TypeScript 5.9.3 (strict mode) | CommonJS, compiles to `dist/` |
 | Runtime | Node.js | Express 5.x |
-| AI - Primary | Anthropic Claude Opus 4 | claude-opus-4-20250514 |
+| AI - Primary | Anthropic Claude Opus 4.8 | claude-opus-4-8 |
 | AI - Standard | Groq Llama 3.3 70B | `llama-3.3-70b-versatile` |
 | AI - Vision/Voice | OpenAI (Whisper, DALL-E) / Groq Whisper | |
 | AI - Images | Replicate Flux Pro 1.1 | `black-forest-labs/flux-pro` |

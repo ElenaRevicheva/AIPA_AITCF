@@ -3101,7 +3101,7 @@ function stopProactiveScheduler(): void {
 // Fallback: Llama 3.3 70B via Groq - Fast and free
 /** All text generation uses the same sampling: max creativity for ATUONA. Grounding (page text, knowledge, hard rules in prompts) limits hallucinations — not low temperature. */
 const AI_CONFIG = {
-  primaryModel: 'claude-opus-4-20250514',
+  primaryModel: 'claude-opus-4-8',
   fallbackModel: 'llama-3.3-70b-versatile',
   poetryTemperature: 0.9,
   conversationTemperature: 0.9,

@@ -158,7 +158,7 @@ export async function analyzeKanban(): Promise<string> {
   const prompt = `${KANBAN_ANALYSIS_PROMPT}\n\n# Your Trello workspace (${boards.length} boards, ${totalCards} total cards)\n\n${boardsText}`;
 
   return await claudeWithGroqFallback(
-    anthropic, 'claude-opus-4-20250514', 4096, null, prompt, 'trello-kanban/analyze'
+    anthropic, 'claude-opus-4-8', 4096, null, prompt, 'trello-kanban/analyze'
   ) || '(no analysis returned)';
 }
 

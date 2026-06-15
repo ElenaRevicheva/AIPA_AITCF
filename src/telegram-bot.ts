@@ -384,7 +384,7 @@ async function askAI(prompt: string, maxTokens: number = 1500): Promise<string> 
   // Try Claude first (better quality)
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-opus-4-20250514',
+      model: 'claude-opus-4-8',
       max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }]
     });
@@ -6584,7 +6584,7 @@ Keep response concise for Telegram. Use emojis.`;
       try {
         // Try Claude Vision (requires credits)
         const response = await anthropic.messages.create({
-          model: 'claude-opus-4-20250514',
+          model: 'claude-opus-4-8',
           max_tokens: 1500,
           messages: [{
             role: 'user',

@@ -84,10 +84,10 @@ const GROQ_COOLDOWN_MS = 60_000;
 
 const AI_MODELS = {
   // For critical reviews (security, payments, complex architecture)
-  critical: process.env.CRITICAL_MODEL || 'claude-opus-4-20250514',
+  critical: process.env.CRITICAL_MODEL || 'claude-opus-4-8',
   
   // For Ask CTO strategic questions
-  strategic: process.env.STRATEGIC_MODEL || 'claude-opus-4-20250514',
+  strategic: process.env.STRATEGIC_MODEL || 'claude-opus-4-8',
   
   // For standard code reviews (fast)
   standard: process.env.STANDARD_MODEL || 'llama-3.3-70b-versatile',

@@ -264,8 +264,8 @@ CTO AIPA uses the **best AI models** for each task:
 
 Edit `.env` on your server:
 ```bash
-CRITICAL_MODEL=claude-opus-4-20250514
-STRATEGIC_MODEL=claude-opus-4-20250514
+CRITICAL_MODEL=claude-opus-4-8
+STRATEGIC_MODEL=claude-opus-4-8
 STANDARD_MODEL=llama-3.3-70b-versatile
 MAX_TOKENS=8192
 ```
