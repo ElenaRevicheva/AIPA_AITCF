@@ -8,6 +8,7 @@ import OpenAI from 'openai';
 import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
+import { persistShot, buildFilm } from './atuona-film-compiler';
 import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
@@ -4535,6 +4536,7 @@ _Just click any command to see what it does!_
 /visualize runway 048 - 🎬 Runway Gen-4.5
 /visualize veo 048 - 🎬 Google Veo 3.1 (native audio)
 /visualize kling 048 - 🎬 Kling (stylized/arthouse)
+/film build - 🎬✨ AUTO-ASSEMBLE shots → one film (VO+music)
 /gallery - 🖼 All visualizations
 /film - 🎬 Film compilation status
 /videostatus - ⏳ Video progress
@@ -8574,6 +8576,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
             saveState();
+            persistShot(pageId, videoResult.videoUrl).catch(() => undefined); // save base cut for /film build
 
             await replyWithVideoFromUrlReliable(ctx, videoResult.videoUrl, {
               caption: `✅ *Video Ready!* (${providerLabel} — base cut)\n\n_Tap to play, long-press to save!_`,
@@ -8615,6 +8618,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                     visualization.videoUrlHorizontal = videoUrl;
                     visualization.status = 'complete';
                     saveState();
+                    persistShot(pageId, videoUrl).catch(() => undefined); // save base cut for /film build
 
                     await replyWithVideoFromUrlReliable(ctx, videoUrl, {
                       caption: `✅ *Video Ready!* (Luma Direct — base cut)\n\n_Tap to play, long-press to save!_`,
@@ -8725,6 +8729,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                     visualization.videoUrlHorizontal = vUrl;
                     visualization.status = 'complete';
                     saveState();
+                    persistShot(pageId, vUrl).catch(() => undefined); // save base cut for /film build
 
                     await replyWithVideoFromUrlReliable(ctx, vUrl, {
                       caption: `✅ *Video Ready!* (Runway — base cut)\n\n_Tap to play, long-press to save!_`,
@@ -8844,9 +8849,46 @@ Complete: ${visualizations.filter(v => v.status === 'complete').length}
 
   // /film - Film compilation status and info
   atuonaBot.command('film', async (ctx) => {
+    const filmArg = ctx.message?.text?.replace('/film', '').trim() || '';
+
+    // /film build [033 041 052]  →  assemble persisted base-cut shots into one mp4 (VO + music)
+    if (filmArg.toLowerCase().startsWith('build')) {
+      const rest = filmArg.replace(/^build/i, '').trim();
+      const pageIds = rest
+        ? rest.split(/[\s,]+/).map(p => String(parseInt(p)).padStart(3, '0')).filter(p => p !== 'NaN')
+        : undefined; // undefined = all persisted shots
+      await ctx.reply(
+        `🎬 *Building film${pageIds ? ` (${pageIds.length} pages)` : ' (all completed shots)'}...*\n\n_Voiceover + music + assembly. This can take a few minutes — I'll narrate progress._`,
+        { parse_mode: 'Markdown' }
+      );
+      let last = 0;
+      const result = await buildFilm({
+        pageIds: pageIds ?? [],
+        onProgress: async (m) => {
+          const now = Date.now();
+          if (now - last > 12000) { last = now; await ctx.reply(`🎬 ${m}`).catch(() => undefined); }
+        },
+      });
+      if (!result.ok) {
+        await ctx.reply(`⚠️ Film build: ${result.error}`, { parse_mode: 'Markdown' });
+        return;
+      }
+      const cap = `🎬✨ *Film ready!*\n\n${result.shots} shots · ${result.sizeMB?.toFixed(1)}MB\n_Underground poetry → cinema._`;
+      try {
+        if ((result.sizeMB || 0) <= 49 && result.path) {
+          await ctx.replyWithVideo({ source: result.path } as any, { caption: cap, parse_mode: 'Markdown' });
+        } else {
+          await ctx.reply(`${cap}\n\n_Too large for Telegram (${result.sizeMB?.toFixed(0)}MB). Saved on server:_\n\`${result.path}\``, { parse_mode: 'Markdown' });
+        }
+      } catch (e: any) {
+        await ctx.reply(`${cap}\n\n_Delivery hiccup — saved on server:_\n\`${result.path}\`\n(${e?.message?.substring(0, 80)})`, { parse_mode: 'Markdown' });
+      }
+      return;
+    }
+
     const completeViz = visualizations.filter(v => v.videoUrlHorizontal);
     const imageOnly = visualizations.filter(v => v.imageUrlHorizontal && !v.videoUrlHorizontal);
-    
+
     await ctx.reply(`🎬 *AI Film: "Finding Paradise"*
 
 Based on the book by Elena Revicheva
@@ -8875,13 +8917,15 @@ ${completeViz.length} horizontal videos ready
 ━━━━━━━━━━━━━━━━━━━━
 🎬 *Compilation*
 ━━━━━━━━━━━━━━━━━━━━
-_Export all videos and compile in:_
-• DaVinci Resolve (free, pro)
-• CapCut (easy, mobile)
-• Adobe Premiere
+\`/film build\` - 🎬✨ AUTO-ASSEMBLE into one film
+   (base cuts + poem voiceover + music bed)
+\`/film build 033 041 052\` - specific pages, in order
 
-\`/export film\` - Get all video URLs
-\`/visualize <page>\` - Add more scenes`, { parse_mode: 'Markdown' });
+_Or export + hand-edit:_
+\`/export film\` - get all video URLs (DaVinci / CapCut / Premiere)
+\`/visualize <page>\` - add more scenes
+
+_Music: drop tracks in data/atuona/films/music/ (or set SUNO_API_KEY)_`, { parse_mode: 'Markdown' });
   });
 
   // /videostatus - Check Runway video status
