@@ -171,6 +171,29 @@ async function sunoScore(filmLen: number): Promise<string | null> {
   return null;
 }
 
+// ── Text rendering (Phase 2: title cards + on-screen poem text) ───────────────
+const FILM_FONT = process.env.ATUONA_FONT || '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
+const FILM_FONT_BOLD = process.env.ATUONA_FONT_BOLD || '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf';
+const off = (v: string | undefined): boolean => /^(0|false|off|no)$/i.test((v || '').trim());
+
+/** Word-wrap a poem to a fixed column, preserving its own line/stanza breaks. Caps total lines. */
+function wrapPoem(s: string, maxCols = 44, maxLines = 11): string {
+  const out: string[] = [];
+  for (const raw of (s || '').replace(/\r/g, '').split('\n')) {
+    const words = raw.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) { out.push(''); continue; } // keep stanza break
+    let cur = '';
+    for (const w of words) {
+      if (cur && (cur.length + 1 + w.length) > maxCols) { out.push(cur); cur = w; }
+      else cur = cur ? `${cur} ${w}` : w;
+    }
+    if (cur) out.push(cur);
+  }
+  while (out.length && out[out.length - 1] === '') out.pop();
+  while (out.length && out[0] === '') out.shift();
+  return out.slice(0, maxLines).join('\n');
+}
+
 // ── Build ────────────────────────────────────────────────────────────────────
 export interface BuildFilmResult { ok: boolean; path?: string; sizeMB?: number; shots?: number; error?: string; }
 
@@ -181,10 +204,44 @@ export interface BuildFilmResult { ok: boolean; path?: string; sizeMB?: number; 
  */
 export async function buildFilm(opts: {
   pageIds?: string[];
+  title?: string;
+  subtitle?: string;
   onProgress?: (msg: string) => Promise<void> | void;
 }): Promise<BuildFilmResult> {
   const W = workDir();
   const note = async (m: string) => { console.log('🎬 [film]', m); try { await opts.onProgress?.(m); } catch { /* ignore */ } };
+
+  // Phase 2 features — all default ON, each independently disablable via env (no rebuild needed).
+  const usePoemText = !off(process.env.ATUONA_FILM_POEMTEXT);
+  const useCards = !off(process.env.ATUONA_FILM_CARDS);
+  const useXfade = !off(process.env.ATUONA_FILM_CROSSFADE);
+  const XFADE_D = Math.max(0.2, parseFloat(process.env.ATUONA_FILM_XFADE_SEC || '0.8') || 0.8);
+
+  // Render a black title/credits card (faded in/out, silent audio) → normalized to the clip spec.
+  const makeCard = async (cardTitle: string, cardSub: string, outFile: string, dur = 3.7): Promise<string | null> => {
+    try {
+      const tFile = path.join(W, `${path.basename(outFile, '.mp4')}_title.txt`);
+      fs.writeFileSync(tFile, wrapPoem(cardTitle, 26, 3));
+      let draw = `drawtext=fontfile=${FILM_FONT_BOLD}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=58:line_spacing=12:x=(w-text_w)/2:y=(h-text_h)/2-28`;
+      if (cardSub.trim()) {
+        const sFile = path.join(W, `${path.basename(outFile, '.mp4')}_sub.txt`);
+        fs.writeFileSync(sFile, wrapPoem(cardSub, 48, 2));
+        draw += `,drawtext=fontfile=${FILM_FONT}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=27:line_spacing=8:x=(w-text_w)/2:y=(h/2)+40`;
+      }
+      const vf = `${draw},fade=t=in:st=0:d=0.8,fade=t=out:st=${(dur - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
+      await execFileP('ffmpeg', [
+        '-y', '-f', 'lavfi', '-i', `color=c=black:s=1280x720:r=30:d=${dur.toFixed(2)}`,
+        '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
+        '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', dur.toFixed(2),
+        '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-ar', '44100', '-ac', '2', outFile,
+      ], { maxBuffer: 1 << 26, timeout: 60000 });
+      return outFile;
+    } catch (e: any) {
+      console.warn('🎬 title card failed:', e?.stderr?.toString?.()?.slice(-200) || e?.message);
+      return null;
+    }
+  };
 
   // 1) Resolve ordered shots from disk
   let ids = opts.pageIds && opts.pageIds.length ? opts.pageIds : [];
@@ -215,8 +272,19 @@ export async function buildFilm(opts: {
     const clipDur = Math.min(Math.max(shotDur, voDur + 0.6), Math.max(shotDur, 22));
     const holdPad = Math.max(0, clipDur - shotDur);
 
+    // On-screen poem text: wrapped, lower third, soft dark plate, fades in over 0.7s.
+    let drawPoem = '';
+    if (usePoemText && text.trim()) {
+      const wrapped = wrapPoem(text, 46, 10);
+      if (wrapped) {
+        const txtFile = path.join(W, `txt_${String(i).padStart(3, '0')}.txt`);
+        fs.writeFileSync(txtFile, wrapped);
+        drawPoem = `,drawtext=fontfile=${FILM_FONT}:textfile=${txtFile}:expansion=none:fontcolor=white:fontsize=26:line_spacing=8:box=1:boxcolor=black@0.42:boxborderw=18:x=(w-text_w)/2:y=h-text_h-46:alpha=if(lt(t\\,0.7)\\,t/0.7\\,1)`;
+      }
+    }
+
     try {
-      const vNorm = `scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black,fps=30,tpad=stop_mode=clone:stop_duration=${holdPad.toFixed(2)},format=yuv420p`;
+      const vNorm = `scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black,fps=30,tpad=stop_mode=clone:stop_duration=${holdPad.toFixed(2)},format=yuv420p${drawPoem}`;
       if (voFile) {
         await execFileP('ffmpeg', [
           '-y', '-i', file, '-i', voFile,
@@ -244,13 +312,48 @@ export async function buildFilm(opts: {
   }
   if (!clips.length) return { ok: false, error: 'All shots failed to normalize (ffmpeg).' };
 
-  // 3) Hard-cut concat (uniform codecs → stream copy)
-  const listFile = path.join(W, 'concat.txt');
-  fs.writeFileSync(listFile, clips.map(c => `file '${c.replace(/'/g, "'\\''")}'`).join('\n'));
-  const body = path.join(W, 'body.mp4');
-  await execFileP('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', body], { maxBuffer: 1 << 26, timeout: 150000 });
+  // 3) Title cards (intro + outro) → front/back of the sequence
+  const seq = [...clips];
+  if (useCards) {
+    await note('rendering title cards...');
+    const filmTitle = (opts.title || 'ATUONA').trim();
+    const filmSub = (opts.subtitle || 'an underground poetry film').trim();
+    const intro = await makeCard(filmTitle, filmSub, path.join(W, 'card_intro.mp4'), 3.8);
+    const outro = await makeCard('ATUONA', 'poems · Elena Revicheva', path.join(W, 'card_outro.mp4'), 3.6);
+    if (intro) seq.unshift(intro);
+    if (outro) seq.push(outro);
+  }
 
-  // 4) Ducked music bed (loop to length, low volume, mix under the baked VO)
+  // 4) Assemble: crossfade chain (xfade video + acrossfade audio), or hard-cut concat fallback.
+  const body = path.join(W, 'body.mp4');
+  if (useXfade && seq.length >= 2) {
+    await note('crossfading shots...');
+    const durs: number[] = [];
+    for (const c of seq) durs.push((await ffprobeDuration(c)) || 6);
+    const inputs = seq.flatMap(c => ['-i', c]);
+    let fc = ''; let vlab = '0:v'; let alab = '0:a'; let merged = durs[0]!;
+    for (let k = 1; k < seq.length; k++) {
+      const ofs = Math.max(0, merged - XFADE_D).toFixed(3);
+      const vo = `vc${k}`, ao = `ac${k}`;
+      fc += `[${vlab}][${k}:v]xfade=transition=fade:duration=${XFADE_D}:offset=${ofs}[${vo}];`;
+      fc += `[${alab}][${k}:a]acrossfade=d=${XFADE_D}[${ao}];`;
+      vlab = vo; alab = ao;
+      merged += durs[k]! - XFADE_D;
+    }
+    await execFileP('ffmpeg', [
+      '-y', ...inputs, '-filter_complex', fc.replace(/;$/, ''),
+      '-map', `[${vlab}]`, '-map', `[${alab}]`,
+      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-ar', '44100', '-ac', '2', body,
+    ], { maxBuffer: 1 << 26, timeout: 300000 });
+  } else {
+    // Hard-cut concat (uniform codecs → stream copy)
+    const listFile = path.join(W, 'concat.txt');
+    fs.writeFileSync(listFile, seq.map(c => `file '${c.replace(/'/g, "'\\''")}'`).join('\n'));
+    await execFileP('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', body], { maxBuffer: 1 << 26, timeout: 150000 });
+  }
+
+  // 5) Ducked music bed (loop to length, low volume, mix under the baked VO)
   const filmLen = await ffprobeDuration(body);
   const music = await pickMusic(filmLen);
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
