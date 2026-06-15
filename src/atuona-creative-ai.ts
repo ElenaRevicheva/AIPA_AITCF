@@ -8876,7 +8876,7 @@ Complete: ${visualizations.filter(v => v.status === 'complete').length}
       const cap = `🎬✨ *Film ready!*\n\n${result.shots} shots · ${result.sizeMB?.toFixed(1)}MB\n_Underground poetry → cinema._`;
       try {
         if ((result.sizeMB || 0) <= 49 && result.path) {
-          await ctx.replyWithVideo({ source: result.path } as any, { caption: cap, parse_mode: 'Markdown' });
+          await ctx.replyWithVideo({ source: fs.readFileSync(result.path), filename: 'finding-paradise.mp4' } as any, { caption: cap, parse_mode: 'Markdown' });
         } else {
           await ctx.reply(`${cap}\n\n_Too large for Telegram (${result.sizeMB?.toFixed(0)}MB). Saved on server:_\n\`${result.path}\``, { parse_mode: 'Markdown' });
         }
