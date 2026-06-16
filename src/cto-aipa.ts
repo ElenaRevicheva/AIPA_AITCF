@@ -1078,6 +1078,22 @@ async function startCTOAIPA() {
     res.send(html);
   });
 
+  // JSON film list (CORS) so atuona.xyz/aifilmstudio can render players natively (no iframe).
+  app.get('/films.json', (req: Request, res: Response) => {
+    if (!filmsAuthOk(req)) { res.status(401).json({ error: 'unauthorized' }); return; }
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    const base = (process.env.CTO_AIPA_PUBLIC_URL || '').replace(/\/$/, '');
+    const keyQ = FILMS_KEY ? `?key=${encodeURIComponent(FILMS_KEY)}` : '';
+    res.json(listFilms().map(f => ({
+      name: f.name,
+      title: f.name.replace(/\.mp4$/i, '').replace(/-\d{4}-\d{2}-\d{2}T.*$/, '').replace(/[-_]/g, ' ').trim(),
+      url: `${base}/films/${encodeURIComponent(f.name)}${keyQ}`,
+      sizeMB: Math.round(f.sizeMB * 10) / 10,
+      when: new Date(f.mtimeMs).toISOString().slice(0, 16).replace('T', ' '),
+    })));
+  });
+
   app.get('/blog/posts', async (_req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     try {
