@@ -129,7 +129,7 @@ My job is to:
 | 6 | **CMO AIPA** | VibeJobHunterAIPA_AIMCF (same) | LinkedIn / Instagram | systemd (same as 5) | ✅ Live |
 | 7 | **CTO AIPA** | **AIPA_AITCF** (THIS REPO) | t.me/aitcf_aideazz_bot | PM2 `cto-aipa` | ✅ Live |
 | 7.1 | **Sprint Briefing (Sprinter)** | **AIPA_AITCF** `src/sprint-briefing/` · packaging: `D:\aideazz\SprintBriefingAgent` | Private Telegram (audio) | **AWS Lambda** `sprint-briefing-agent` | ✅ Live (Apr 28, 2026). EventBridge cron 8AM Panama → reads 12 repos + Oracle voice notes → Groq → Claude narrative → OpenAI TTS MP3 → Telegram. ~$2/month. |
-| 8 | **Atuona Creative AI** | **AIPA_AITCF** (same) | t.me/Atuona_AI_CCF_AIdeazz_bot | PM2 (same as 7) | ✅ Live, 48+ NFTs |
+| 8 | **Atuona Creative AI** | **AIPA_AITCF** (same) | t.me/Atuona_AI_CCF_AIdeazz_bot | PM2 (same as 7) | ✅ Live, 48+ NFTs + **AI Film Studio** (atuona.xyz/aifilmstudio): multi-provider video + ffmpeg film compiler |
 | 9 | **OpenClaw Vibejob Shortlist** | openclaw-vibejob-shortlist | Telegram + voice | systemd `openclaw-gateway` | ✅ Live |
 | 10 | **AILA** | [AILA](https://github.com/ElenaRevicheva/AILA) · local: `D:\aideazz\AILA` | — | Planning only | Not deployed. Architecture docs in repo (`docs` branch). |
 
@@ -188,13 +188,14 @@ Post GitHub comment + save to Oracle + notify CMO AIPA
 ### Model Routing
 | Task | Model | Why |
 |------|-------|-----|
-| Critical code review (security, payment) | Claude Opus 4 | Best reasoning |
+| Critical code review (security, payment) | claude-opus-4-8 | Best reasoning |
 | Standard code review | Groq Llama 3.3 70B | Fast, free |
-| Ask CTO (strategic Q&A) | Claude Opus 4 | Multi-repo context |
-| Voice transcription | Groq Whisper | Free + fast |
-| Atuona text (all) | Claude Opus 4 | Creative quality |
-| Atuona images | Flux Pro 1.1 (Replicate) | Best photorealism |
-| Atuona video | Luma Dream Machine / Runway | Latest capabilities |
+| Ask CTO (strategic Q&A) | claude-opus-4-8 | Multi-repo context |
+| Voice transcription | Groq Whisper → OpenAI Whisper | Free + fallback |
+| Atuona text (all) | claude-opus-4-8 → Groq → Grok (xAI) | Creative quality + resilience |
+| Atuona images | Flux 2 Pro → Flux 1.1 Ultra/Pro (Replicate) | Best photorealism |
+| Atuona video | Luma Ray-3.2 / Runway Gen-4.5 / Veo 3.1 / Kling — operator-selectable, auto-fallback | Latest 2026 models |
+| Atuona film assembly | ffmpeg (TTS VO + subtitles + title cards + crossfades + music bed) | Automated editor-in-a-box |
 
 ---
 
@@ -502,6 +503,7 @@ When Elena says "interview prep" or asks about a specific company/role:
 - "50K+ lines across the AIdeazz ecosystem (TypeScript, Python, JavaScript, SQL) — 9 production agents, 8 Oracle tables, 4 LLM APIs integrated"
 - "76/24 multi-model routing (Groq/Claude) with explicit cost reasoning — not default, deliberate"
 - "48+ NFTs published, Telegram bots with users in 19 countries"
+- "Built an AI Film Studio (atuona.xyz/aifilmstudio): multi-provider AI video orchestration (Luma Ray-3.2 / Runway Gen-4.5 / Veo 3.1 / Kling — operator-selectable with automatic fallback) + an automated ffmpeg pipeline (TTS voiceover, on-screen subtitles, title cards, crossfades, ducked music bed) that turns poems into finished films, HTTP-streamable to any device. End-to-end creative-tech, not an API wrapper."
 - "EspaLuz has early paid subscribers" (honest: very early, very small)
 - "Deterministic + LLM hybrid pipeline for code review (not just prompt → output)"
 - "131-test eval harness on VibeJobHunter — keyword, bias compensation, golden-set, LLM-as-judge (4 layers), ~$0.03/run"
