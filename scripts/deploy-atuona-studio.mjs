@@ -72,30 +72,45 @@ const PAGE = `<!doctype html>
 `;
 
 (async () => {
-  // 1) index.html nav link
+  // 1) index.html — (a) FILM STUDIO nav link, (b) let .nav-link with a real "/" href navigate.
+  //    The SPA handler preventDefault()s ALL .nav-link clicks (only the wallet button is skipped),
+  //    so our link went nowhere. Patch the skip-condition to also pass through absolute-path hrefs.
   const idx = await o.repos.getContent({ owner: OWNER, repo: REPO, path: 'index.html' });
   let html = Buffer.from(idx.data.content, 'base64').toString('utf8');
-  if (html.includes('/aifilmstudio/')) {
-    console.log('• index.html already has the studio link — skipping');
-  } else if (!html.includes(NAV_ANCHOR)) {
-    console.error('✗ VAULT nav anchor not found in index.html — aborting'); process.exit(1);
+  let changed = false;
+  if (!html.includes('/aifilmstudio/')) {
+    if (!html.includes(NAV_ANCHOR)) { console.error('✗ VAULT nav anchor not found — aborting'); process.exit(1); }
+    html = html.replace(NAV_ANCHOR, NAV_INSERT); changed = true; console.log('✓ added FILM STUDIO nav link');
+  } else { console.log('• FILM STUDIO nav link already present'); }
+  const HANDLER_OLD = "if (this.classList.contains('wallet-status')) {";
+  const HANDLER_NEW = "if (this.classList.contains('wallet-status') || (this.getAttribute('href')||'').charAt(0) === '/') {";
+  if (html.includes(HANDLER_NEW)) {
+    console.log('• nav handler already lets "/" links navigate');
+  } else if (html.includes(HANDLER_OLD)) {
+    html = html.replace(HANDLER_OLD, HANDLER_NEW); changed = true; console.log('✓ patched nav handler — "/" links now navigate (not SPA-intercepted)');
   } else {
-    html = html.replace(NAV_ANCHOR, NAV_INSERT);
+    console.warn('⚠ nav-handler skip-condition not found — link may still be intercepted');
+  }
+  if (changed) {
     await o.repos.createOrUpdateFileContents({
       owner: OWNER, repo: REPO, path: 'index.html', sha: idx.data.sha,
-      message: 'feat(nav): AI FILM STUDIO link -> /aifilmstudio/',
+      message: 'fix(nav): FILM STUDIO link navigates to /aifilmstudio/ (was SPA-intercepted)',
       content: b64(html),
     });
-    console.log('✓ index.html nav updated');
+    console.log('✓ index.html committed');
+  } else { console.log('• index.html already correct'); }
+  // 2) the studio page (idempotent — skip if unchanged so we don't spam empty commits)
+  let existSha, existContent = '';
+  try { const e = await o.repos.getContent({ owner: OWNER, repo: REPO, path: 'public/aifilmstudio/index.html' }); existSha = e.data.sha; existContent = Buffer.from(e.data.content, 'base64').toString('utf8'); } catch { /* new file */ }
+  if (existContent === PAGE) {
+    console.log('• studio page already up to date — skipping');
+  } else {
+    await o.repos.createOrUpdateFileContents({
+      owner: OWNER, repo: REPO, path: 'public/aifilmstudio/index.html',
+      message: 'feat: AI Film Studio page (loads films from cto /films.json)',
+      content: b64(PAGE), ...(existSha ? { sha: existSha } : {}),
+    });
+    console.log('✓ public/aifilmstudio/index.html ' + (existSha ? 'updated' : 'created'));
   }
-  // 2) the studio page
-  let existSha;
-  try { const e = await o.repos.getContent({ owner: OWNER, repo: REPO, path: 'public/aifilmstudio/index.html' }); existSha = e.data.sha; } catch { /* new file */ }
-  await o.repos.createOrUpdateFileContents({
-    owner: OWNER, repo: REPO, path: 'public/aifilmstudio/index.html',
-    message: 'feat: AI Film Studio page (loads films from cto /films.json)',
-    content: b64(PAGE), ...(existSha ? { sha: existSha } : {}),
-  });
-  console.log('✓ public/aifilmstudio/index.html ' + (existSha ? 'updated' : 'created'));
   console.log('\n4everland will rebuild atuona.xyz from main shortly → https://atuona.xyz/aifilmstudio/');
 })().catch(e => { console.error('✗ ERR', e.status, e.message); process.exit(1); });
