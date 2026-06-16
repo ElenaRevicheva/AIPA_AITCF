@@ -21,16 +21,14 @@ const PAGE = `<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ATUONA · AI Film Studio</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{--red:#e0144c;--bg:#070708;--ink:#ededed;--muted:#8a8a90}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Courier New',monospace}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,sans-serif}
   header{padding:28px 18px;text-align:center;border-bottom:1px solid #1a1a1e;position:relative}
-  .brand{font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:700;background:linear-gradient(45deg,#dc143c,#8b0000);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .tag{color:var(--red);font-size:12px;letter-spacing:.45em;margin-top:9px}
-  .sub{color:var(--muted);font-size:12px;margin-top:10px;letter-spacing:.15em}
+  .brand{font-weight:300;font-size:34px;letter-spacing:.35em;color:#eee}
+  .tag{color:var(--red);font-size:12px;letter-spacing:.45em;margin-top:10px;font-family:'Courier New',monospace}
+  .sub{color:#888;font-size:13px;margin-top:8px;letter-spacing:.04em}
   .back{position:absolute;left:18px;top:30px;color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.2em}
   .back:hover{color:var(--red)}
   .wrap{max-width:820px;margin:0 auto;padding:22px 16px 64px}
