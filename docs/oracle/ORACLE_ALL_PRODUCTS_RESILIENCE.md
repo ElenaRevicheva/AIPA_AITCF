@@ -368,6 +368,29 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
+## Last Verified (June 16, 2026) — Fleet-wide Claude model-retirement fix
+
+**June 15–16 2026: Anthropic decommissioned the May-2025 model IDs `claude-sonnet-4-20250514` and `claude-opus-4-20250514` (also older `claude-3-5-*`, `claude-3-*`, `claude-2*`, `claude-instant*`).** Every agent hardcoding them got `404 not_found_error` (a *fallback-class* failure — silent until you read logs). Swept the entire fleet; all fixed + deployed + verified live.
+
+| Agent | Status | Fix (commit / change) |
+|-------|--------|------------------------|
+| **CTO AIPA + Atuona** | ✅ Fixed + running | `claude-opus-4-8` / `claude-sonnet-4-6` / `claude-haiku-4-5-20251001` across all call paths (AIPA_AITCF `10337e1`, `9c453ec`). **Atuona `/create`** got a **Grok (xAI) tier-3 fallback** (`95c359a`) so a Claude credit dip + Groq free-tier cap (429/413) no longer breaks page creation. Atuona film **Phase 2** also shipped (`d6ed8a8`: title cards + on-screen poem text + crossfades). Blog delivery buffer fix (`946e165`). |
+| **EspaLuz Telegram** | ✅ Fixed + restarted | `claude-sonnet-4-20250514` → `claude-sonnet-4-5-20250929` in `main.py` ×3 (EspaLuzFamilybot `88a36d0`). systemd `espaluz-familybot` restarted. |
+| **EspaLuz WhatsApp** | ✅ Fixed + restarted | same swap in `espaluz_bridge.py` ×2, `main.py`, `whatsapp_convo_mode.py` (EspaLuzWhatsApp `997d5c8`). systemd `espaluz-whatsapp` restarted; live RU→ES translation verified. |
+| **VibeJob Hunter + CMO** | ✅ Fixed + restarted | **~22 active call sites** `claude-sonnet-4-20250514` → `claude-sonnet-4-5-20250929` + rebuilt the broken fallback chain in `src/utils/claude_helper.py` (was 4× the SAME dead model → now 4 distinct live models) (VibeJobHunterAIPA_AIMCF `43ebdfd`). systemd `vibejobhunter` + `vibejobhunter-web` restarted (`:8080` HTTP 200). **Was 404ing its whole autonomous apply/message pipeline.** |
+| **Algom Alpha** | ✅ Fixed + restarted | 2 calls in `aideazz-content-generator.js` → `claude-sonnet-4-5-20250929` (dragontrade-agent `7447949`). PM2 `dragontrade-main` restarted. |
+| **Sprinter (AWS Lambda)** | ✅ Fixed (env override) | Lambda DID fire (EventBridge OK) but synthesis 404'd. `synthesize.ts` reads `process.env.SPRINT_BRIEFING_CLAUDE_MODEL`, which was unset → **set Lambda env `SPRINT_BRIEFING_CLAUDE_MODEL=claude-sonnet-4-6` (no rebuild needed)** via AWS SDK from the dev machine (Oracle has no AWS creds). Force-tested → `{"ok":true}`, briefing delivered. Helper scripts in `scripts/`: `diagnose-lambda.mjs`, `fix-sprinter-model.mjs`, `check-sprinter-logs.mjs`, `deploy-lambda.mjs`. |
+| **EspaLuz Influencer** | ✅ Clean | No hardcoded dead model ID — uses Groq/current. |
+| **OpenClaw** | ✅ Clean | No hardcoded dead model ID. |
+
+**Current entitled Claude model IDs** (keep these): Opus `claude-opus-4-8` · Sonnet `claude-sonnet-4-6` / `claude-sonnet-4-5-20250929` · Haiku `claude-haiku-4-5-20251001`. **Dead (will 404):** anything `*-20250514`, `claude-3-*`, `claude-2*`, `claude-instant*`, `claude-3-5-haiku-20241022`. Probe a key: `curl https://api.anthropic.com/v1/messages -H "x-api-key: $K" -H "anthropic-version: 2023-06-01" -d '{"model":"<id>","max_tokens":4,"messages":[{"role":"user","content":"hi"}]}'`.
+
+**⚠️ Still open:** Sprinter Lambda `GITHUB_TOKEN` env is **expired** — every `/repos/...` query 401s, so the briefing's "what shipped from repos" section is degraded (briefing still generates from Oracle knowledge + Trello). Refresh the Lambda's `GITHUB_TOKEN` env var with a valid PAT.
+
+**RULE reinforced (June 16):** edit the **canonical local clone** (paths in the table above) → push to GitHub → deploy on Oracle (EspaLuz/VJH carry runtime-state drift in their repo dirs, so deploy specific code files via `git checkout origin/main -- <file>` or in-place `sed`, never a blind `git pull`). Hotfixing directly on Oracle without committing to git leaves the repo behind the running code.
+
+---
+
 ## Last Verified (May 15, 2026)
 
 | Agent | Status | Notes |
