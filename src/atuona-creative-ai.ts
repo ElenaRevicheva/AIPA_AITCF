@@ -8887,15 +8887,21 @@ Complete: ${visualizations.filter(v => v.status === 'complete').length}
         await ctx.reply(`⚠️ Film build: ${result.error}`, { parse_mode: 'Markdown' });
         return;
       }
-      const cap = `🎬✨ *Film ready!*\n\n${result.shots} shots · ${result.sizeMB?.toFixed(1)}MB\n_Underground poetry → cinema._`;
+      // Permanent watch link — works on phone or laptop, any size (Telegram bot caps at 50MB).
+      const filmName = result.path ? path.basename(result.path) : '';
+      const filmsBase = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
+      const filmsKey = process.env.ATUONA_FILMS_KEY?.trim();
+      const watchUrl = filmName ? `${filmsBase}/films/${encodeURIComponent(filmName)}${filmsKey ? `?key=${encodeURIComponent(filmsKey)}` : ''}` : '';
+      const galleryUrl = `${filmsBase}/films${filmsKey ? `?key=${encodeURIComponent(filmsKey)}` : ''}`;
+      const cap = `🎬✨ *Film ready!*\n\n${result.shots} shots · ${result.sizeMB?.toFixed(1)}MB\n_Underground poetry → cinema._${watchUrl ? `\n\n▶️ *Watch anywhere (phone or laptop):*\n${watchUrl}\n\n🎞️ _All your films:_ ${galleryUrl}` : ''}`;
       try {
         if ((result.sizeMB || 0) <= 49 && result.path) {
-          await ctx.replyWithVideo({ source: fs.readFileSync(result.path), filename: 'finding-paradise.mp4' } as any, { caption: cap, parse_mode: 'Markdown' });
+          await ctx.replyWithVideo(new InputFile(result.path), { caption: cap, parse_mode: 'Markdown' });
         } else {
-          await ctx.reply(`${cap}\n\n_Too large for Telegram (${result.sizeMB?.toFixed(0)}MB). Saved on server:_\n\`${result.path}\``, { parse_mode: 'Markdown' });
+          await ctx.reply(`${cap}\n\n_(${result.sizeMB?.toFixed(0)}MB — too big to play inside Telegram; tap the link above to watch.)_`, { parse_mode: 'Markdown' });
         }
       } catch (e: any) {
-        await ctx.reply(`${cap}\n\n_Delivery hiccup — saved on server:_\n\`${result.path}\`\n(${e?.message?.substring(0, 80)})`, { parse_mode: 'Markdown' });
+        await ctx.reply(`${cap}\n\n_(Couldn't play inline — tap the link above to watch. ${e?.message?.substring(0, 60)})_`, { parse_mode: 'Markdown' });
       }
       return;
     }

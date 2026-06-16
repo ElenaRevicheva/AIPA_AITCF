@@ -17,6 +17,7 @@ import {
 } from './database';
 import { initTelegramBot, sendTelegramBroadcast } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
+import { filmsOutDir, listFilms } from './atuona-film-compiler';
 import {
   startDailyBlogPublisher,
   runDailyBlogPost,
@@ -1022,6 +1023,59 @@ async function startCTOAIPA() {
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.status(204).end();
+  });
+
+  // ── Atuona films — watch from any device (laptop or phone) ──────────────────
+  // Films persist on the server. Telegram's 50MB bot limit can't deliver big ones,
+  // so serve them over HTTP with Range support (mobile seeking) + a gallery page.
+  // Optional gate: set ATUONA_FILMS_KEY and access with ?key=… (default: open).
+  const FILMS_KEY = process.env.ATUONA_FILMS_KEY?.trim() || '';
+  const filmsAuthOk = (req: Request) => !FILMS_KEY || String(req.query.key || '') === FILMS_KEY;
+  const safeFilmName = (n: string) => (/^[A-Za-z0-9._-]+\.mp4$/.test(n) ? n : '');
+
+  app.get('/films/:name', (req: Request, res: Response) => {
+    if (!filmsAuthOk(req)) { res.status(401).send('Unauthorized'); return; }
+    const name = safeFilmName(path.basename(req.params.name || ''));
+    if (!name) { res.status(404).send('Not found'); return; }
+    const file = path.join(filmsOutDir(), name);
+    if (!fs.existsSync(file)) { res.status(404).send('Not found'); return; }
+    const stat = fs.statSync(file);
+    res.setHeader('Content-Type', 'video/mp4');
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    const range = req.headers.range;
+    if (range) {
+      const m = /bytes=(\d+)-(\d*)/.exec(range);
+      const start = m ? parseInt(m[1] as string, 10) : 0;
+      const end = m && m[2] ? parseInt(m[2], 10) : stat.size - 1;
+      if (start >= stat.size || start > end) { res.status(416).setHeader('Content-Range', `bytes */${stat.size}`); res.end(); return; }
+      res.status(206);
+      res.setHeader('Content-Range', `bytes ${start}-${end}/${stat.size}`);
+      res.setHeader('Content-Length', String(end - start + 1));
+      fs.createReadStream(file, { start, end }).pipe(res);
+    } else {
+      res.setHeader('Content-Length', String(stat.size));
+      fs.createReadStream(file).pipe(res);
+    }
+  });
+
+  app.get('/films', (req: Request, res: Response) => {
+    if (!filmsAuthOk(req)) { res.status(401).send('Unauthorized'); return; }
+    const base = (process.env.CTO_AIPA_PUBLIC_URL || '').replace(/\/$/, '');
+    const keyQ = FILMS_KEY ? `?key=${encodeURIComponent(FILMS_KEY)}` : '';
+    const films = listFilms();
+    const cards = films.map(f => {
+      const url = `${base}/films/${encodeURIComponent(f.name)}${keyQ}`;
+      const when = new Date(f.mtimeMs).toISOString().slice(0, 16).replace('T', ' ');
+      const title = f.name.replace(/\.mp4$/i, '').replace(/-\d{4}-\d{2}-\d{2}T.*$/, '').replace(/[-_]/g, ' ').trim();
+      return `<div class="film"><h2>${title || f.name}</h2><div class="meta">${when} UTC · ${f.sizeMB.toFixed(1)} MB</div><video controls preload="metadata" playsinline src="${url}"></video><div><a href="${url}" download>⬇ download</a></div></div>`;
+    }).join('\n');
+    const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ATUONA — Films</title>
+<style>body{margin:0;background:#0b0b0d;color:#eee;font-family:-apple-system,Segoe UI,Roboto,sans-serif}header{padding:24px 16px;text-align:center;border-bottom:1px solid #1c1c1f}h1{margin:0;font-weight:300;letter-spacing:.35em}.sub{color:#888;font-size:13px;margin-top:6px}.wrap{max-width:780px;margin:0 auto;padding:16px}.film{margin:0 0 34px}.film h2{font-weight:400;font-size:18px;margin:0 0 4px;text-transform:capitalize}.meta{color:#777;font-size:12px;margin-bottom:8px}video{width:100%;border-radius:8px;background:#000}a{color:#9ad;text-decoration:none;font-size:13px}.empty{color:#888;text-align:center;padding:48px}</style></head>
+<body><header><h1>ATUONA</h1><div class="sub">underground poetry → cinema · ${films.length} film${films.length === 1 ? '' : 's'}</div></header>
+<div class="wrap">${films.length ? cards : '<div class="empty">No films yet. Run <code>/film build</code> in the bot.</div>'}</div></body></html>`;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
   });
 
   app.get('/blog/posts', async (_req: Request, res: Response) => {

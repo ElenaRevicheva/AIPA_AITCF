@@ -49,6 +49,18 @@ export function musicDir(): string { return dir('music'); }
 function workDir(): string { return dir('work'); }
 function outDir(): string { return dir('out'); }
 
+/** Absolute dir where finished films land — used by the web /films routes (watch from any device). */
+export function filmsOutDir(): string { return outDir(); }
+/** Finished films, newest first, for the web gallery. */
+export function listFilms(): Array<{ name: string; sizeMB: number; mtimeMs: number }> {
+  try {
+    return fs.readdirSync(outDir())
+      .filter(f => f.toLowerCase().endsWith('.mp4'))
+      .map(f => { const s = fs.statSync(path.join(outDir(), f)); return { name: f, sizeMB: s.size / 1e6, mtimeMs: s.mtimeMs }; })
+      .sort((a, b) => b.mtimeMs - a.mtimeMs);
+  } catch { return []; }
+}
+
 // ── Shot persistence (called from each base-video success path) ───────────────
 /** Download a finished base-cut video to shots/<pageId>.mp4 so films can be assembled later
  *  (CDN URLs expire ~1h; this makes shots permanent). Fire-and-forget safe: never throws. */
