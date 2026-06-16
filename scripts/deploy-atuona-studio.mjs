@@ -20,7 +20,7 @@ const PAGE = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ATUONA · AI Film Studio</title>
-<link rel="icon" href="/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
   :root{--red:#e0144c;--bg:#070708;--ink:#ededed;--muted:#8a8a90}
   *{box-sizing:border-box}
@@ -38,6 +38,8 @@ const PAGE = `<!doctype html>
   video{width:100%;border-radius:6px;background:#000;display:block}
   .dl{display:inline-block;margin-top:9px;color:var(--red);text-decoration:none;font-size:12px;letter-spacing:.1em}
   .msg{color:var(--muted);text-align:center;padding:50px;letter-spacing:.1em}
+  footer{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.08em;line-height:2;padding:34px 16px 48px;border-top:1px solid #16161a;margin-top:18px}
+  footer a{color:#9a9aa0;text-decoration:none}footer a:hover{color:var(--red)}
 </style>
 </head>
 <body>
@@ -45,7 +47,7 @@ const PAGE = `<!doctype html>
   <a class="back" href="/">&larr; ATUONA</a>
   <div class="brand">ATUONA</div>
   <div class="tag">AI FILM STUDIO</div>
-  <div class="sub">underground poetry &rarr; cinema</div>
+  <div class="sub">Underground Aesthetic AI Cinema</div>
 </header>
 <div class="wrap" id="films"><div class="msg">Loading films&hellip;</div></div>
 <script>
@@ -64,6 +66,7 @@ const PAGE = `<!doctype html>
     document.getElementById('films').innerHTML='<div class="msg">Could not load films right now. Please try again shortly.</div>';
   });
 </script>
+<footer>A project of <strong>AIdeazz</strong> &mdash; Founder-Led AI Lab &middot; <a href="https://aideazz.xyz">aideazz.xyz</a> &middot; <a href="https://atuona.xyz">atuona.xyz</a><br>&copy; 2026 AIdeazz. All rights reserved.</footer>
 </body>
 </html>
 `;
