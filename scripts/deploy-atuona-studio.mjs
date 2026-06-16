@@ -27,8 +27,8 @@ const PAGE = `<!doctype html>
   body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,sans-serif}
   header{padding:28px 18px;text-align:center;border-bottom:1px solid #1a1a1e;position:relative}
   .brand{font-weight:300;font-size:34px;letter-spacing:.35em;color:#eee}
-  .tag{color:var(--red);font-size:12px;letter-spacing:.45em;margin-top:10px;font-family:'Courier New',monospace}
-  .sub{color:#888;font-size:13px;margin-top:8px;letter-spacing:.04em}
+  .tag{color:#eee;font-size:12px;letter-spacing:.4em;margin-top:11px;font-family:'Courier New',monospace;text-transform:uppercase}
+  .sub{color:#eee;font-size:12px;letter-spacing:.4em;margin-top:9px;font-family:'Courier New',monospace;text-transform:uppercase}
   .back{position:absolute;left:18px;top:30px;color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.2em}
   .back:hover{color:var(--red)}
   .wrap{max-width:820px;margin:0 auto;padding:22px 16px 64px}
