@@ -9,6 +9,7 @@ import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import { persistShot, buildFilm } from './atuona-film-compiler';
+import { grokComplete } from './llm-resilience';
 import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
@@ -3141,9 +3142,13 @@ async function createContent(prompt: string, maxTokens: number = 2000, creativit
     return firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not generate content.';
   } catch (claudeError: any) {
     const errorMessage = claudeError?.error?.error?.message || claudeError?.message || '';
-    if (errorMessage.includes('credit') || errorMessage.includes('billing') || claudeError?.status === 400) {
-      console.log('⚠️ Atuona: Claude credits low, using Groq Llama 3.3...');
-      
+    const st = claudeError?.status;
+    // Fall back on credit/billing dips, transient overloads (429/503/529), AND model-not-found (404).
+    const shouldFallback = errorMessage.includes('credit') || errorMessage.includes('billing')
+      || st === 400 || st === 404 || st === 429 || st === 503 || st === 529;
+    if (shouldFallback) {
+      console.log('⚠️ Atuona: Claude unavailable (' + (st || errorMessage.slice(0, 40)) + '), falling back to Groq...');
+
       try {
         const groqResponse = await groq.chat.completions.create({
           model: AI_CONFIG.fallbackModel,
@@ -3151,10 +3156,19 @@ async function createContent(prompt: string, maxTokens: number = 2000, creativit
           max_tokens: maxTokens,
           temperature: temperature
         });
-        
+
         return groqResponse.choices[0]?.message?.content || 'Could not generate content.';
-      } catch (groqError) {
-        console.error('Groq fallback error:', groqError);
+      } catch (groqError: any) {
+        // Tier 3: Grok (xAI). Groq's free tier caps (daily TPD + 12k TPM) can't handle large /create
+        // prompts — that 429/413 is what broke page creation. Grok's big context keeps Atuona alive
+        // through a Claude credit dip. No new key (XAI_API_KEY already wired in llm-resilience).
+        console.warn('⚠️ Atuona: Groq failed (' + (groqError?.message || groqError) + '), trying Grok (xAI)...');
+        try {
+          const grokText = await grokComplete(null, prompt, maxTokens, 'atuona/generate');
+          if (grokText && grokText.trim()) return grokText;
+        } catch (grokError: any) {
+          console.error('Atuona Grok fallback error:', grokError?.message || grokError);
+        }
         throw groqError;
       }
     }
