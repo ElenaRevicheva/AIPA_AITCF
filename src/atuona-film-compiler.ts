@@ -188,10 +188,19 @@ const FILM_FONT = process.env.ATUONA_FONT || '/usr/share/fonts/truetype/dejavu/D
 const FILM_FONT_BOLD = process.env.ATUONA_FONT_BOLD || '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf';
 const off = (v: string | undefined): boolean => /^(0|false|off|no)$/i.test((v || '').trim());
 
+/** Strip markdown so titles/poems render clean on screen (no literal ** * _ ` # in the video). */
+function stripMd(s: string): string {
+  return (s || '').replace(/\r/g, '').replace(/[*_`]+/g, '').replace(/^\s{0,3}#{1,6}\s*/gm, '');
+}
+/** Filesystem-safe slug from a poem/film title → meaningful film filenames (gallery shows real titles). */
+function slugifyTitle(s: string): string {
+  return stripMd(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'atuona-film';
+}
+
 /** Word-wrap a poem to a fixed column, preserving its own line/stanza breaks. Caps total lines. */
 function wrapPoem(s: string, maxCols = 44, maxLines = 11): string {
   const out: string[] = [];
-  for (const raw of (s || '').replace(/\r/g, '').split('\n')) {
+  for (const raw of stripMd(s).split('\n')) {
     const words = raw.trim().split(/\s+/).filter(Boolean);
     if (!words.length) { out.push(''); continue; } // keep stanza break
     let cur = '';
@@ -272,26 +281,29 @@ export async function buildFilm(opts: {
 
   // 2) Per-shot clip: normalize 720p/30fps, bake VO (hold last frame if VO longer), uniform codec
   const clips: string[] = [];
+  let firstPoemTitle = '';
   for (let i = 0; i < shots.length; i++) {
     const { id, file } = shots[i]!;
     const clip = path.join(W, `clip_${String(i).padStart(3, '0')}.mp4`);
     const shotDur = (await ffprobeDuration(file)) || 6;
 
-    const { text } = await fetchPoem(id);
+    const { title: poemTitle, text } = await fetchPoem(id);
+    if (i === 0 && poemTitle) firstPoemTitle = poemTitle;
     const voFile = await ttsForPoem(id, text);
     const voDur = voFile ? await ffprobeDuration(voFile) : 0;
     // Clip length: long enough to hear the poem, min the shot length, capped so one poem can't dominate.
     const clipDur = Math.min(Math.max(shotDur, voDur + 0.6), Math.max(shotDur, 22));
     const holdPad = Math.max(0, clipDur - shotDur);
 
-    // On-screen poem text: wrapped, lower third, soft dark plate, fades in over 0.7s.
+    // On-screen poem text: subtitle band anchored to the bottom (keeps the center/image clear),
+    // smaller font, wider/fewer lines, compact dark plate, fades in over 0.7s.
     let drawPoem = '';
     if (usePoemText && text.trim()) {
-      const wrapped = wrapPoem(text, 46, 10);
+      const wrapped = wrapPoem(text, 58, 7);
       if (wrapped) {
         const txtFile = path.join(W, `txt_${String(i).padStart(3, '0')}.txt`);
         fs.writeFileSync(txtFile, wrapped);
-        drawPoem = `,drawtext=fontfile=${FILM_FONT}:textfile=${txtFile}:expansion=none:fontcolor=white:fontsize=26:line_spacing=8:box=1:boxcolor=black@0.42:boxborderw=18:x=(w-text_w)/2:y=h-text_h-46:alpha=if(lt(t\\,0.7)\\,t/0.7\\,1)`;
+        drawPoem = `,drawtext=fontfile=${FILM_FONT}:textfile=${txtFile}:expansion=none:fontcolor=white:fontsize=20:line_spacing=5:box=1:boxcolor=black@0.55:boxborderw=12:x=(w-text_w)/2:y=h-text_h-22:alpha=if(lt(t\\,0.7)\\,t/0.7\\,1)`;
       }
     }
 
@@ -328,7 +340,7 @@ export async function buildFilm(opts: {
   const seq = [...clips];
   if (useCards) {
     await note('rendering title cards...');
-    const filmTitle = (opts.title || 'ATUONA').trim();
+    const filmTitle = (opts.title || firstPoemTitle || 'ATUONA').trim();
     const filmSub = (opts.subtitle || 'an underground poetry film').trim();
     const intro = await makeCard(filmTitle, filmSub, path.join(W, 'card_intro.mp4'), 3.8);
     const outro = await makeCard('ATUONA', 'poems · Elena Revicheva', path.join(W, 'card_outro.mp4'), 3.6);
@@ -369,7 +381,7 @@ export async function buildFilm(opts: {
   const filmLen = await ffprobeDuration(body);
   const music = await pickMusic(filmLen);
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const final = path.join(outDir(), `finding-paradise-${stamp}.mp4`);
+  const final = path.join(outDir(), `${slugifyTitle(opts.title || firstPoemTitle || 'atuona-film')}-${stamp}.mp4`);
   try {
     if (music) {
       await note('mixing music bed...');
