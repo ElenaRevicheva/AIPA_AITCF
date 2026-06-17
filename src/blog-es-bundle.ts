@@ -353,3 +353,18 @@ export function readCachedSpanishMeta(slug: string): { title: string; brief: str
     return null;
   }
 }
+
+/** Synchronous disk read of a COMPLETE cached bundle — never triggers generation.
+ *  Lets the HTTP route serve the common (cached) path instantly and hand cache
+ *  misses to a background job instead of holding the request through a slow translate. */
+export function readCachedSpanishBundle(slug: string): BlogEsBundle | null {
+  const s = safeSlug(slug);
+  if (!s || !fs.existsSync(bundlePath(s))) return null;
+  try {
+    const cached = JSON.parse(fs.readFileSync(bundlePath(s), "utf8")) as BlogEsBundle;
+    if (cached.v !== CACHE_VERSION || !cached.markdown?.trim()) return null;
+    return cached;
+  } catch {
+    return null;
+  }
+}

@@ -24,7 +24,7 @@ import {
   DAILY_BLOG_TOPIC_BRIEFS,
   dailyBlogIsDelisted,
 } from './daily-blog-publisher';
-import { getOrCreateSpanishBundle, readCachedSpanishMeta } from './blog-es-bundle';
+import { getOrCreateSpanishBundle, readCachedSpanishMeta, readCachedSpanishBundle } from './blog-es-bundle';
 import { startMarketingWeeklyDigest, runWeeklyMarketingDigest } from './marketing-weekly-digest';
 import {
   getResendApiKey,
@@ -974,20 +974,22 @@ async function startCTOAIPA() {
       res.status(400).json({ error: 'Invalid slug' });
       return;
     }
-    try {
-      const bundle = await getOrCreateSpanishBundle(slug);
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.json(bundle);
-    } catch (e) {
-      console.error('GET /blog/es-bundle:', e);
-      const msg = e instanceof Error ? e.message : String(e);
-      // NEVER leak raw provider errors (API keys hints, request ids, billing text)
-      // into the public blog page — the client renders this string verbatim.
-      const friendly = msg.includes('not found')
-        ? 'Post not found'
-        : 'Traducción temporalmente no disponible — el artículo está en inglés más abajo.';
-      res.status(msg.includes('not found') ? 404 : 502).json({ error: friendly });
+    // Common path: serve the disk-cached Spanish bundle instantly.
+    const cached = readCachedSpanishBundle(slug);
+    if (cached) {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.json(cached);
+      return;
     }
+
+    // Cache miss: do NOT hold the connection through a 20–60s Claude translation —
+    // that's what drops the browser request and surfaces "Failed to fetch". Kick the
+    // translation off in the background (idempotent via the inflight map in
+    // getOrCreateSpanishBundle) and tell the client to poll. It caches to disk in
+    // ~30s, after which the next poll returns 200 from the fast path above.
+    void getOrCreateSpanishBundle(slug).catch((e) => console.error('es-bundle bg gen:', e));
+    res.setHeader('Cache-Control', 'no-store');
+    res.status(202).json({ generating: true, slug });
   });
 
   app.get('/blog/es-meta/:slug', (req: Request, res: Response) => {
