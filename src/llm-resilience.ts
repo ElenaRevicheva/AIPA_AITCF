@@ -45,6 +45,47 @@ export async function grokComplete(
   return text;
 }
 
+const GEMINI_MODEL = () => (process.env.GEMINI_MODEL || 'gemini-2.5-flash').trim();
+const GEMINI_KEY = () => process.env.GEMINI_API_KEY?.trim() || '';
+
+/** Free-tier Gemini via REST (no SDK). Its generous free quota (~1500 req/day) makes it
+ *  the durable $0 tier for high-volume-but-not-latency-critical work like blog translation —
+ *  so coverage never depends on keeping paid Anthropic credits topped up. Throws on any
+ *  failure so callers can fall through to the paid/limited Anthropic→Groq→Grok chain. */
+export async function geminiComplete(
+  systemPrompt: string | null,
+  userPrompt: string,
+  maxTokens: number,
+  label: string,
+): Promise<string> {
+  const key = GEMINI_KEY();
+  if (!key) throw new Error('GEMINI_API_KEY missing');
+  const model = GEMINI_MODEL();
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...(systemPrompt ? { systemInstruction: { parts: [{ text: systemPrompt }] } } : {}),
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          maxOutputTokens: Math.min(maxTokens, 8192),
+          temperature: 0.3,
+          // Disable "thinking" so the whole token budget goes to output, not reasoning.
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      }),
+      signal: AbortSignal.timeout(120_000),
+    },
+  );
+  if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  const data = (await res.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('').trim();
+  if (text) console.warn(`[${label}] Gemini (${model}) returned ${text.length} chars`);
+  return text;
+}
+
 /** True when the Anthropic error is credit/balance exhaustion (400), not a transient failure. */
 export function isAnthropicCreditExhaustion(e: unknown): boolean {
   const msg = String(

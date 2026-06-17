@@ -5,7 +5,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Anthropic } from "@anthropic-ai/sdk";
-import { claudeWithGroqFallback } from "./llm-resilience";
+import { claudeWithGroqFallback, geminiComplete } from "./llm-resilience";
 
 const GQL = "https://gql.hashnode.com/";
 const CACHE_VERSION = 3;
@@ -238,7 +238,6 @@ async function translateToSpanish(src: EnglishSource): Promise<{ title: string; 
     process.env.BLOG_ES_TRANSLATE_MODEL?.trim() ||
     process.env.HASHNODE_ARTICLE_MODEL?.trim() ||
     "claude-sonnet-4-6";
-  const client = anthropicClient();
   const maxTokens = model.includes("haiku") ? 4096 : 8192;
   const payload = JSON.stringify(
     {
@@ -268,9 +267,22 @@ Rules:
 INPUT JSON:
 ${payload}`;
 
-  // Anthropic-first with Groq fallback — Spanish translation must survive credit
-  // exhaustion (June 11 2026: raw Anthropic 400 leaked into the published page).
-  const raw = (await claudeWithGroqFallback(client, model, maxTokens, null, userPrompt, "blog-es/translate")).trim();
+  // Free-first: Gemini's generous free tier translates the blog at $0 (no daily Anthropic
+  // top-ups). The paid/limited Anthropic→Groq→Grok chain is only the backstop. Whatever
+  // succeeds is cached to disk once and never regenerated — so each post costs nothing
+  // ongoing and the "Failed to fetch" / exhausted-provider failure can't recur.
+  let raw = "";
+  try {
+    raw = (await geminiComplete(null, userPrompt, maxTokens, "blog-es/translate")).trim();
+  } catch (gerr) {
+    console.warn(
+      `[blog-es/translate] Gemini failed (${gerr instanceof Error ? gerr.message : String(gerr)}) — falling back to Anthropic/Groq/Grok`
+    );
+  }
+  if (!raw) {
+    const client = anthropicClient();
+    raw = (await claudeWithGroqFallback(client, model, maxTokens, null, userPrompt, "blog-es/translate")).trim();
+  }
   if (!raw) throw new Error("Empty translation response");
   let parsed: { title?: string; brief?: string; markdown?: string };
   try {
