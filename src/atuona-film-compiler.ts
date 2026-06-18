@@ -16,6 +16,7 @@ import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
 import { Octokit } from '@octokit/rest';
+import { geminiComplete } from './llm-resilience';
 
 const execFileP = promisify(execFile);
 
@@ -91,8 +92,59 @@ async function ffprobeDuration(file: string): Promise<number> {
   } catch { return 0; }
 }
 
-/** Fetch the English poem text + title for VO from the atuona repo metadata. */
+/** Russian body for #001-046, whose per-page metadata omits it — pulled from the repo poem
+ *  JSON files (complete-with-dates covers #007-046; numeric id match avoids zero-pad misses). */
+async function fetchRussianBodyFromJson(pageId: string): Promise<string> {
+  const wantNum = parseInt(pageId, 10);
+  for (const file of ['atuona-complete-with-dates.json', 'atuona-45-poems-with-text.json']) {
+    try {
+      const { data } = await withTimeout(octokit.repos.getContent({
+        owner: ATUONA_OWNER, repo: ATUONA_REPO, path: file, ref: 'main',
+      }), 15000, `poemsJson ${file}`);
+      if (!('content' in data)) continue;
+      let arr: any = JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'));
+      if (!Array.isArray(arr)) arr = arr.poems || Object.values(arr);
+      const entry = arr.find((p: any) => {
+        const idVal = (p.attributes?.find((a: any) => a.trait_type === 'ID')?.value || '').toString().trim();
+        const nm = p.name || '';
+        const nmNum = (nm.match(/#(\d{1,3})\b/) || [])[1];
+        return idVal === pageId || (idVal && parseInt(idVal, 10) === wantNum)
+          || nm.includes(`#${pageId}`) || (nmNum && parseInt(nmNum, 10) === wantNum);
+      });
+      const rt = entry?.attributes?.find((a: any) => a.trait_type === 'Poem Text' || a.trait_type === 'Russian Text')?.value || '';
+      if (rt.trim()) return rt;
+    } catch (e: any) { console.warn(`🎙️ poemsJson ${file}:`, e?.message); }
+  }
+  return '';
+}
+
+/** Translate a Russian poem to English (free Gemini first, OpenAI fallback). RULE: film
+ *  stanzas are English-only — this fills #007-046, which have no English trait. */
+async function translatePoemToEnglish(russian: string): Promise<string> {
+  const prompt = `Translate this Russian underground poem into English. Read it as original literature, not a literal translation — simple words, heavy weight, keep the line breaks. Return ONLY the English translation as plain text.\n\n${russian.slice(0, 2200)}`;
+  try {
+    const out = (await withTimeout(geminiComplete(null, prompt, 1200, 'film/translate'), 45000, 'gemini translate')).trim();
+    if (out) return out;
+  } catch (e: any) { console.warn('🎙️ translate (gemini):', e?.message); }
+  try {
+    if (openai) {
+      const r = await withTimeout(openai.chat.completions.create({
+        model: process.env.ATUONA_TRANSLATE_MODEL || 'gpt-4o-mini', max_tokens: 1200,
+        messages: [{ role: 'user', content: prompt }],
+      }), 45000, 'openai translate');
+      return (r.choices[0]?.message?.content || '').trim();
+    }
+  } catch (e: any) { console.warn('🎙️ translate (openai):', e?.message); }
+  return '';
+}
+
+/** Fetch the ENGLISH poem text + title for the on-screen stanza + voiceover.
+ *  Stanzas are English-only: prefer the English trait; for #007-046 (no English trait)
+ *  pull the Russian body from the repo JSONs and translate it. Never returns Russian. */
 async function fetchPoem(pageId: string): Promise<{ title: string; text: string }> {
+  let title = `Page ${pageId}`;
+  let englishText = '';
+  let russianText = '';
   try {
     const { data } = await withTimeout(octokit.repos.getContent({
       owner: ATUONA_OWNER, repo: ATUONA_REPO, path: `metadata/${pageId}.json`, ref: 'main',
@@ -101,14 +153,19 @@ async function fetchPoem(pageId: string): Promise<{ title: string; text: string 
       const meta = JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'));
       const attrs: Array<{ trait_type?: string; value?: string }> = meta.attributes || [];
       const get = (...keys: string[]) => attrs.find(a => keys.includes(a.trait_type || ''))?.value || '';
-      const title = get('Poem', 'Title') || `Page ${pageId}`;
-      const text = get('English Text', 'English Translation') || '';
-      return { title, text };
+      title = get('Poem', 'Title') || title;
+      englishText = get('English Text', 'English Translation') || '';
+      russianText = get('Russian Text', 'Poem Text') || '';
     }
   } catch (e: any) {
     console.warn(`🎙️ fetchPoem ${pageId}:`, e?.message);
   }
-  return { title: `Page ${pageId}`, text: '' };
+  if (!englishText && !russianText) russianText = await fetchRussianBodyFromJson(pageId);
+  if (!englishText && russianText) {
+    englishText = await translatePoemToEnglish(russianText);
+    if (englishText) console.log(`🎙️ #${pageId}: translated RU→EN for film stanza (${englishText.length} chars)`);
+  }
+  return { title, text: englishText }; // English-only by construction
 }
 
 /** Generate voiceover audio for a poem via OpenAI TTS. Returns the mp3 path, or null. */
