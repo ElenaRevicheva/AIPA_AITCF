@@ -186,11 +186,24 @@ async function sunoScore(filmLen: number): Promise<string | null> {
 // ── Text rendering (Phase 2: title cards + on-screen poem text) ───────────────
 const FILM_FONT = process.env.ATUONA_FONT || '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
 const FILM_FONT_BOLD = process.env.ATUONA_FONT_BOLD || '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf';
+// Title cards mirror the atuona.xyz/aifilmstudio header: monospace (Courier-like), UPPERCASE,
+// wide letter-spacing. Liberation Mono is metric-compatible with the site's 'Courier New';
+// DejaVu Sans Mono is the safe default (full Cyrillic for Russian poem titles).
+const FILM_FONT_MONO = process.env.ATUONA_FONT_MONO || '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
 const off = (v: string | undefined): boolean => /^(0|false|off|no)$/i.test((v || '').trim());
 
 /** Strip markdown so titles/poems render clean on screen (no literal ** * _ ` # in the video). */
 function stripMd(s: string): string {
   return (s || '').replace(/\r/g, '').replace(/[*_`]+/g, '').replace(/^\s{0,3}#{1,6}\s*/gm, '');
+}
+/** UPPERCASE — match the atuona.xyz header (mono, all-caps). */
+function caps(s: string): string { return stripMd(s).toUpperCase(); }
+/** Tracked caps: letters spaced within each word, wider gaps between words — the
+ *  letter-spaced monospace look of the "ATUONA · AI FILM STUDIO" site header. */
+function tracked(s: string): string {
+  return caps(s).split('\n')
+    .map(line => line.split(/\s+/).filter(Boolean).map(w => w.split('').join(' ')).join('   '))
+    .join('\n');
 }
 /** Filesystem-safe slug from a poem/film title → meaningful film filenames (gallery shows real titles). */
 function slugifyTitle(s: string): string {
@@ -242,12 +255,12 @@ export async function buildFilm(opts: {
   const makeCard = async (cardTitle: string, cardSub: string, outFile: string, dur = 3.7, bgImage?: string): Promise<string | null> => {
     try {
       const tFile = path.join(W, `${path.basename(outFile, '.mp4')}_title.txt`);
-      fs.writeFileSync(tFile, wrapPoem(cardTitle, 26, 3));
-      let draw = `drawtext=fontfile=${FILM_FONT_BOLD}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=58:line_spacing=12:x=(w-text_w)/2:y=(h-text_h)/2-28`;
+      fs.writeFileSync(tFile, tracked(wrapPoem(cardTitle, 16, 2)));   // header-style: tracked mono caps
+      let draw = `drawtext=fontfile=${FILM_FONT_MONO}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=42:line_spacing=18:x=(w-text_w)/2:y=(h-text_h)/2-28`;
       if (cardSub.trim()) {
         const sFile = path.join(W, `${path.basename(outFile, '.mp4')}_sub.txt`);
-        fs.writeFileSync(sFile, wrapPoem(cardSub, 52, 2));
-        draw += `,drawtext=fontfile=${FILM_FONT}:textfile=${sFile}:expansion=none:fontcolor=0xCCCCCC:fontsize=26:line_spacing=8:x=(w-text_w)/2:y=(h/2)+40`;
+        fs.writeFileSync(sFile, caps(wrapPoem(cardSub, 42, 2)));
+        draw += `,drawtext=fontfile=${FILM_FONT_MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=21:line_spacing=10:x=(w-text_w)/2:y=(h/2)+44`;
       }
       const fades = `fade=t=in:st=0:d=0.8,fade=t=out:st=${(dur - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
       if (bgImage && fs.existsSync(bgImage)) {
