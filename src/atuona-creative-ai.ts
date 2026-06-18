@@ -8107,37 +8107,46 @@ _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ �
       let englishText = metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
       let russianText = metadata.attributes?.find((a: any) => a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text')?.value || '';
       
-      // FALLBACK: For older pages (001-046) that don't have English/Russian text in metadata,
-      // fetch from the full poems JSON file which contains all text
+      // FALLBACK: older pages (001-046) lack English/Russian text in metadata. Their full
+      // body lives in the repo's poem JSON files — try them in order until one yields the text.
+      // IMPORTANT: atuona-45-poems-with-text.json skips #007-#046 (its ids jump #006 -> #048),
+      // so on its own it leaves 40 poems with only title+theme = generic prompts. The
+      // complete-with-dates file is the one that actually covers #007-#046. Match by numeric id
+      // too, so a zero-pad mismatch ("7" vs "007") can never silently drop a poem again.
       if (!englishText && !russianText) {
         console.log(`📖 Page #${pageId} missing text in metadata, fetching from poems JSON...`);
-        try {
-          const { data: poemsFile } = await octokit.repos.getContent({
-            owner: 'ElenaRevicheva',
-            repo: 'atuona',
-            path: 'atuona-45-poems-with-text.json',
-            ref: 'main'
-          });
-          
-          if ('content' in poemsFile) {
-            const poemsData = JSON.parse(Buffer.from(poemsFile.content, 'base64').toString('utf-8'));
-            const poemEntry = poemsData.find((p: any) => {
-              const idAttr = p.attributes?.find((a: any) => a.trait_type === 'ID');
-              return idAttr?.value === pageId || p.name?.includes(`#${pageId}`);
+        const wantNum = parseInt(pageId, 10);
+        const candidateFiles = ['atuona-complete-with-dates.json', 'atuona-45-poems-with-text.json'];
+        for (const file of candidateFiles) {
+          if (russianText) break; // found it already
+          try {
+            const { data: poemsFile } = await octokit.repos.getContent({
+              owner: 'ElenaRevicheva', repo: 'atuona', path: file, ref: 'main'
             });
-            
+            if (!('content' in poemsFile)) continue;
+            let poemsData: any = JSON.parse(Buffer.from(poemsFile.content, 'base64').toString('utf-8'));
+            if (!Array.isArray(poemsData)) poemsData = poemsData.poems || Object.values(poemsData);
+            const poemEntry = poemsData.find((p: any) => {
+              const idVal = (p.attributes?.find((a: any) => a.trait_type === 'ID')?.value || '').toString().trim();
+              const nm = p.name || '';
+              const nmNum = (nm.match(/#(\d{1,3})\b/) || [])[1];
+              return idVal === pageId
+                || (idVal && parseInt(idVal, 10) === wantNum)
+                || nm.includes(`#${pageId}`)
+                || (nmNum && parseInt(nmNum, 10) === wantNum);
+            });
             if (poemEntry) {
-              russianText = poemEntry.attributes?.find((a: any) => a.trait_type === 'Poem Text')?.value || '';
+              russianText = poemEntry.attributes?.find((a: any) => a.trait_type === 'Poem Text' || a.trait_type === 'Russian Text')?.value || '';
               theme = theme || poemEntry.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
-              // Use description as fallback for English context
-              if (!englishText && poemEntry.description) {
-                englishText = poemEntry.description;
-              }
-              console.log(`✅ Found poem text for #${pageId}: ${russianText.substring(0, 50)}...`);
+              // Only take a REAL English trait; otherwise leave englishText empty so the
+              // on-the-fly translator below renders the exact poem (not boilerplate description).
+              const engTrait = poemEntry.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
+              if (!englishText && engTrait) englishText = engTrait;
+              if (russianText) console.log(`✅ Found poem text for #${pageId} in ${file}: ${russianText.substring(0, 50)}...`);
             }
+          } catch (fallbackError) {
+            console.error(`Failed to fetch poems fallback from ${file}:`, fallbackError);
           }
-        } catch (fallbackError) {
-          console.error('Failed to fetch poems fallback:', fallbackError);
         }
       }
       
