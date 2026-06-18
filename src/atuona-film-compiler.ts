@@ -239,24 +239,38 @@ export async function buildFilm(opts: {
   const XFADE_D = Math.max(0.2, parseFloat(process.env.ATUONA_FILM_XFADE_SEC || '0.8') || 0.8);
 
   // Render a black title/credits card (faded in/out, silent audio) → normalized to the clip spec.
-  const makeCard = async (cardTitle: string, cardSub: string, outFile: string, dur = 3.7): Promise<string | null> => {
+  const makeCard = async (cardTitle: string, cardSub: string, outFile: string, dur = 3.7, bgImage?: string): Promise<string | null> => {
     try {
       const tFile = path.join(W, `${path.basename(outFile, '.mp4')}_title.txt`);
       fs.writeFileSync(tFile, wrapPoem(cardTitle, 26, 3));
       let draw = `drawtext=fontfile=${FILM_FONT_BOLD}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=58:line_spacing=12:x=(w-text_w)/2:y=(h-text_h)/2-28`;
       if (cardSub.trim()) {
         const sFile = path.join(W, `${path.basename(outFile, '.mp4')}_sub.txt`);
-        fs.writeFileSync(sFile, wrapPoem(cardSub, 48, 2));
-        draw += `,drawtext=fontfile=${FILM_FONT}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=27:line_spacing=8:x=(w-text_w)/2:y=(h/2)+40`;
+        fs.writeFileSync(sFile, wrapPoem(cardSub, 52, 2));
+        draw += `,drawtext=fontfile=${FILM_FONT}:textfile=${sFile}:expansion=none:fontcolor=0xCCCCCC:fontsize=26:line_spacing=8:x=(w-text_w)/2:y=(h/2)+40`;
       }
-      const vf = `${draw},fade=t=in:st=0:d=0.8,fade=t=out:st=${(dur - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
-      await execFileP('ffmpeg', [
-        '-y', '-f', 'lavfi', '-i', `color=c=black:s=1280x720:r=30:d=${dur.toFixed(2)}`,
-        '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
-        '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', dur.toFixed(2),
-        '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
-        '-c:a', 'aac', '-ar', '44100', '-ac', '2', outFile,
-      ], { maxBuffer: 1 << 26, timeout: 60000 });
+      const fades = `fade=t=in:st=0:d=0.8,fade=t=out:st=${(dur - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
+      if (bgImage && fs.existsSync(bgImage)) {
+        // Cover card: a darkened still (e.g. the first shot) behind the title — so the film
+        // opens on an image, not a black void. Title/sub fade in over it, then it crossfades in.
+        const vf = `scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,fps=30,eq=brightness=-0.34:saturation=0.82,${draw},${fades}`;
+        await execFileP('ffmpeg', [
+          '-y', '-loop', '1', '-i', bgImage,
+          '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
+          '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', dur.toFixed(2),
+          '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
+          '-c:a', 'aac', '-ar', '44100', '-ac', '2', outFile,
+        ], { maxBuffer: 1 << 26, timeout: 60000 });
+      } else {
+        const vf = `${draw},${fades}`;
+        await execFileP('ffmpeg', [
+          '-y', '-f', 'lavfi', '-i', `color=c=black:s=1280x720:r=30:d=${dur.toFixed(2)}`,
+          '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
+          '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', dur.toFixed(2),
+          '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
+          '-c:a', 'aac', '-ar', '44100', '-ac', '2', outFile,
+        ], { maxBuffer: 1 << 26, timeout: 60000 });
+      }
       return outFile;
     } catch (e: any) {
       console.warn('🎬 title card failed:', e?.stderr?.toString?.()?.slice(-200) || e?.message);
@@ -341,9 +355,19 @@ export async function buildFilm(opts: {
   if (useCards) {
     await note('rendering title cards...');
     const filmTitle = (opts.title || firstPoemTitle || 'ATUONA').trim();
-    const filmSub = (opts.subtitle || 'an underground poetry film').trim();
-    const intro = await makeCard(filmTitle, filmSub, path.join(W, 'card_intro.mp4'), 3.8);
-    const outro = await makeCard('ATUONA', 'poems · Elena Revicheva', path.join(W, 'card_outro.mp4'), 3.6);
+    // Cover image for the intro — first shot's frame (darkened in makeCard), so the film
+    // opens on a visual, not black. Falls back to a black card if extraction fails.
+    let cover: string | undefined;
+    try {
+      const coverImg = path.join(W, 'cover.jpg');
+      await execFileP('ffmpeg', ['-y', '-ss', '0.6', '-i', shots[0]!.file, '-frames:v', '1', '-q:v', '3', coverImg], { maxBuffer: 1 << 26, timeout: 30000 });
+      if (fs.existsSync(coverImg)) cover = coverImg;
+    } catch { /* black card fallback */ }
+    // Subtitle = the real gallery moments (poem numbers) featured in this film.
+    const moments = shots.map(s => `#${s.id}`).join(', ');
+    const filmSub = (opts.subtitle || `atuona.xyz Gallery  ·  Moments ${moments}`).trim();
+    const intro = await makeCard(filmTitle, filmSub, path.join(W, 'card_intro.mp4'), 3.8, cover);
+    const outro = await makeCard('ATUONA', 'atuona.xyz // Paradise.js  ·  by Kira Velerevich', path.join(W, 'card_outro.mp4'), 3.6);
     if (intro) seq.unshift(intro);
     if (outro) seq.push(outro);
   }
