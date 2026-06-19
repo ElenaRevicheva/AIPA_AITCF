@@ -17,7 +17,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
-import { claudeWithGroqFallback } from "./llm-resilience";
+import { claudeWithGroqFallback, geminiComplete } from "./llm-resilience";
 
 /**
  * 2026-05-27 — Anthropic-credit-exhaustion resilience.
@@ -42,6 +42,15 @@ async function generateTextWithGroqFallback(
   system: string | null,
   userPrompt: string,
 ): Promise<string> {
+  // Free-first: Gemini's generous free tier writes the article at $0, decoupled from the
+  // exhausted Anthropic credits / Groq daily cap that keep breaking the daily blog. Only
+  // fall through to the paid/limited Anthropic→Groq→Grok chain if Gemini fails or is empty.
+  try {
+    const g = (await geminiComplete(system, userPrompt, maxTokens, "blog/article")).trim();
+    if (g) { console.warn(`📰 Gemini wrote ${g.length} chars — blog cycle continues`); return g; }
+  } catch (ge: any) {
+    console.warn("📰 Gemini blog-gen failed, falling back to Anthropic/Groq/Grok:", String(ge?.message || ge).slice(0, 120));
+  }
   try {
     const resp = await anthropic.messages.create({
       model,
