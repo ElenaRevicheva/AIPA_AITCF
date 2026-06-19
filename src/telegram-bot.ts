@@ -7788,7 +7788,14 @@ ${suggestion}
 
 _/briefing for full business view | /daily anytime for update_`;
 
-    await ctx.reply(briefing, { parse_mode: 'Markdown' });
+    try {
+      await ctx.reply(briefing, { parse_mode: 'Markdown' });
+    } catch (e) {
+      // A single malformed Markdown entity (e.g. an unbalanced * _ ` in a repo/deal name) must
+      // never drop the whole 8 AM briefing — fall back to plain text so it always lands.
+      console.warn('Daily briefing: Markdown parse failed, sending plain text:', (e as Error)?.message);
+      await ctx.reply(briefing.replace(/[*_`]+/g, ''));
+    }
 
     await saveAgentOutcome('cto_aipa', 'daily_briefing_sent', {
       type: 'auto_scheduled'

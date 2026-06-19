@@ -1016,7 +1016,12 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
   let finalTitle = parsed.title;
   let slug = titleToSlug(finalTitle);
   if (slugAlreadyPublished(slug)) {
-    console.warn(`📰 Slug collision for "${slug}" — topic filter missed it; publishing anyway (Dev.to will accept as duplicate).`);
+    // This exact canonical was already published — Dev.to hard-fails a duplicate canonical with
+    // 422 "Canonical url has already been taken". Uniquify with today's date so the (freshly
+    // generated) post still ships instead of crashing the whole daily run.
+    const suffix = new Date().toISOString().slice(0, 10);
+    console.warn(`📰 Slug "${slug}" already published — uniquifying canonical with ${suffix} to avoid 422 collision.`);
+    slug = `${slug}-${suffix}`;
   }
   const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${slug}`;
 
