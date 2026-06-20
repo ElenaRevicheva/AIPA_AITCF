@@ -18,6 +18,7 @@ import { claudeWithGroqFallback } from './llm-resilience';
 import { getOutreachTargetByCompany, saveOutreachTargetsBulk } from './database';
 import { pushLeadToHubSpot } from './hubspot-client';
 import { batchEnrichLeads, isBrightDataConfigured } from './brightdata-enrich';
+import { enrichWithEmail, extractDomain } from './doc-ingest';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -403,6 +404,33 @@ export async function runFreshLeadsIngestion(
       }
     }
     console.log(`[${tag}] BrightData enriched ${bdEnrichMap.size} leads`);
+  }
+
+  // Hunter.io email enrichment — fill emails for leads that have a website but NO email,
+  // so they become "actionable" for the cold-email pool. This was the Phase-4 bottleneck:
+  // leads were imported to outreach_targets but stayed email=null → never draftable/sent.
+  // Additive + safe: only fills MISSING emails (never overwrites), per-lead try/catch,
+  // and capped to protect the Hunter quota (free tier ~25 searches/month).
+  if (process.env.HUNTER_API_KEY?.trim()) {
+    const hunterCap = Math.max(0, parseInt(process.env.FRESH_LEADS_HUNTER_CAP || '5', 10) || 5);
+    let hunterFilled = 0, hunterTried = 0;
+    for (const lead of newLeads) {
+      if (hunterTried >= hunterCap) break;
+      if (lead.email || !lead.website) continue;
+      const domain = extractDomain(lead.website);
+      if (!domain) continue;
+      hunterTried++;
+      try {
+        const { email, contactName } = await enrichWithEmail(domain);
+        if (email) {
+          lead.email = email;
+          if (contactName && lead.name.startsWith('Founder @')) lead.name = `${contactName} @ ${lead.company}`;
+          hunterFilled++;
+        }
+      } catch { /* non-fatal — leave email null */ }
+      await new Promise(r => setTimeout(r, 300)); // Hunter rate courtesy
+    }
+    if (hunterTried) console.log(`[${tag}] Hunter: filled ${hunterFilled}/${hunterTried} missing emails (cap ${hunterCap})`);
   }
 
   // Classify pain points in batches of 20 (Haiku token limit)

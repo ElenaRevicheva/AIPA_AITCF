@@ -123,7 +123,7 @@ If no clear prospects found, return: []`;
 // Step 2: Enrich with Hunter.io (domain search) if website is present
 // ---------------------------------------------------------------------------
 
-async function enrichWithEmail(
+export async function enrichWithEmail(
   domain: string
 ): Promise<{ email: string | null; contactName: string | null }> {
   const hunterKey = process.env.HUNTER_API_KEY?.trim();
@@ -141,7 +141,7 @@ async function enrichWithEmail(
   return { email: null, contactName: null };
 }
 
-function extractDomain(url: string): string | null {
+export function extractDomain(url: string): string | null {
   if (!url) return null;
   try {
     const u = new URL(url.startsWith('http') ? url : `https://${url}`);
