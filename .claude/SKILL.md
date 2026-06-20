@@ -128,7 +128,7 @@ My job is to:
 | 5 | **VibeJob Hunter** | VibeJobHunterAIPA_AIMCF | t.me/vibejob_hunter_bot | systemd `vibejobhunter` | ✅ Live. LangGraph 7-node StateGraph, SQLite checkpointer, human-approval interrupt. |
 | 6 | **CMO AIPA** | VibeJobHunterAIPA_AIMCF (same) | LinkedIn / Instagram | systemd (same as 5) | ✅ Live |
 | 7 | **CTO AIPA** | **AIPA_AITCF** (THIS REPO) | t.me/aitcf_aideazz_bot | PM2 `cto-aipa` | ✅ Live |
-| 7.1 | **Sprint Briefing (Sprinter)** | **AIPA_AITCF** `src/sprint-briefing/` · packaging: `D:\aideazz\SprintBriefingAgent` | Private Telegram (audio) | **AWS Lambda** `sprint-briefing-agent` | ✅ Live (Apr 28, 2026). EventBridge cron 8AM Panama → reads 12 repos + Oracle voice notes → Groq → Claude narrative → OpenAI TTS MP3 → Telegram. ~$2/month. |
+| 7.1 | **Sprint Briefing (Sprinter)** | **AIPA_AITCF** `src/sprint-briefing/` · packaging: `D:\aideazz\SprintBriefingAgent` | Private Telegram (audio) | **AWS Lambda** `sprint-briefing-agent` | ✅ Live (Apr 28, 2026). EventBridge cron 8AM Panama → reads 12 repos + Oracle voice notes → Groq → Claude → Gemini (free, $0-resilient) narrative → OpenAI TTS MP3 → Telegram. ~$2/month. |
 | 8 | **Atuona Creative AI** | **AIPA_AITCF** (same) | t.me/Atuona_AI_CCF_AIdeazz_bot | PM2 (same as 7) | ✅ Live, 48+ NFTs + **AI Film Studio** (atuona.xyz/aifilmstudio): multi-provider video + ffmpeg film compiler |
 | 9 | **OpenClaw Vibejob Shortlist** | openclaw-vibejob-shortlist | Telegram + voice | systemd `openclaw-gateway` | ✅ Live |
 | 10 | **AILA** | [AILA](https://github.com/ElenaRevicheva/AILA) · local: `D:\aideazz\AILA` | — | Planning only | Not deployed. Architecture docs in repo (`docs` branch). |
@@ -1531,3 +1531,14 @@ Client-onboarding system for a hiring pipeline: **one bootstrap Apps Script `set
 ### What I would add in the next interview after June 12
 
 > "This morning a hiring test asked for a form→sheet automation with n8n. I didn't have n8n, so I shipped the whole system as one Google Apps Script bootstrap — folders, tracker, form, trigger, SOP doc — built and twice-tested live in under two hours, and my first live test caught a real formula-injection bug in phone numbers, which I fixed and re-tested. Same day I root-caused a 404 on my own blog to a `[skip ci]` tag that kept new articles from deploying themselves — the rule I took away is that any pipeline creating a public artifact owns making it reachable."
+
+## 🆕 June 17–19 2026 — durable $0 LLM resilience + Atuona AI Film Studio production
+
+### 1. Free-first multi-provider LLM fallback across blog + sprinter (no paid credits required)
+When Anthropic credits ran dry and Groq's daily cap hit (both drained by heavy creative use), the daily blog **and** the 8AM Sprint Briefing both stopped generating. Made both **free-first**: a `gemini-2.5-flash` tier (Google's free quota, `thinkingBudget:0`) runs *before* the paid chain → then Anthropic → Groq → Grok. Blog ES translation, blog article generation, and the AWS Lambda Sprinter (rebuilt via esbuild + redeployed) now all survive a fully-paid-exhausted day at **$0 ongoing**. Plus a Dev.to canonical-`422` uniquifier and a crash-proof briefing (HTML-first, plain-text fallback on Telegram parse errors). Pattern: *on a bootstrap budget, never depend on one provider or on funding credits daily.*
+
+### 2. Atuona AI Film Studio — automated poetry-film production pipeline
+Multi-provider AI video (Luma Ray-3 · Runway Gen-4.5 · Veo 3.1 · Kling) → an ffmpeg compiler that assembles finished films: per-clip slow-motion sized to its voiceover (no frozen frames), 1.3s cross-dissolves, onyx TTS reading the *sharpest real stanza* from each visualized poem, side-chain-ducked score, cover intro + monospace title cards matching the site header, selective grayscale clips, and English-only on-the-fly RU→EN translation. Published watch-anywhere at **atuona.xyz/aifilmstudio**.
+
+### What I would say in the next interview after June 19
+> "My creative agents share LLM keys, and one heavy day drained every paid provider at once — the blog and the morning briefing both went dark. I rebuilt the whole fleet free-first: Google's free Gemini tier runs before the paid chain, so the systems keep producing at $0 even when credits are gone. On a bootstrap budget, resilience means never depending on a single provider — or on remembering to top up."
