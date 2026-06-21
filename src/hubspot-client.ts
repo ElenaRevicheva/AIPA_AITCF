@@ -699,16 +699,17 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
   // HONEST MODE (May 21 2026): VJH does NOT actually submit applications.
   // 'applied' really means "VJH found this lead — Elena must manually apply".
   // Stage routing reflects what Elena needs to ACT on, not application lifecycle fiction.
-  const stageMap: Record<HiringStage, HSDealStage> = {
+  const stageMap: Record<string, HSDealStage> = {
     applied:             HS_STAGES.contacted,           // \ud83d\udd25 YOU act TODAY (was: prospected/AI-working)
     recruiter_responded: 'contractsent' as HSDealStage, // \ud83d\udcac They replied \u2014 YOU act
     interview_scheduled: 'contractsent' as HSDealStage, // \ud83d\udcac They replied \u2014 YOU act
     offer_received:      'contractsent' as HSDealStage, // \ud83d\udcac They replied \u2014 YOU act
     accepted:            HS_STAGES.won,
     declined:            HS_STAGES.lost,
+    lead_parked:         HS_STAGES.prospected,  // parked in "ignore" — not iron-clad fit (stops the SERP firehose)
   };
   const stage = input.stage ?? 'applied';
-  const stageId = stageMap[stage];
+  const stageId = stageMap[stage] ?? HS_STAGES.contacted;
   console.log(`[HubSpot] Hiring deal → pipeline=default stage=${stageId} (hiring stage=${stage})`);
 
   try {
