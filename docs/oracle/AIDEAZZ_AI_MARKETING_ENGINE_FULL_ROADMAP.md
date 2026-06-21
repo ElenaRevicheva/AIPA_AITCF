@@ -6,11 +6,31 @@
 
 ---
 
+## ✅ VERIFIED IN PRODUCTION — June 20, 2026
+
+> The **honest, log-verified status** — what actually fires in production, with real numbers, not aspirations. Method: grepped the *action* log lines (not setup lines) + live endpoints + DB counts — code presence is not proof. Read this first; the phase tables below are the build history.
+
+| Layer | Status | Real evidence (June 20, 2026) |
+|---|---|---|
+| **Phase 1 — GEO/SEO** | ✅ **Loaded** | Live now: **87 sitemap URLs**, AI-crawler `robots.txt` entries, `llms.txt` → 200, **6 JSON-LD schemas** on the homepage |
+| **Phase 2 — Content engine** | ✅ **Loaded** | **47 posts** cached, daily cadence (Jun 13→19), **68 real Dev.to cross-posts** with live URLs |
+| **CRM ingest (HubSpot)** | ✅✅ **Strongly loaded — the workhorse** | **721 leads pushed, 1,075 deals created** (real object IDs; multi-source: HN + GitHub + Places + SERP) |
+| **Phase 5 — Lead triage** | ✅ **Loaded (light use)** | Real cycle verified: **8 processed, 5 urgent**; classifies + ranks + Telegram brief |
+| **Phase 3 — Attribution** | ⚠️ **Plumbing only — empty in practice** | `business_leads` + UTM columns ready, but **0 real inbound leads captured** — no inbound traffic yet to attribute. Demand-gated, not a code bug. |
+| **Phase 4 — Outbound** | ⚠️ **Partial — fires, but 0 conversion** | **168 targets** pooled, **54 emails sent, 0 replies**; sends intermittently with ~5–6 errors/cycle, currently quiet ("0 actionable signals"). Auth mostly passes (DKIM ✓, SPF via `send.aideazz.xyz` ✓, alignment ✓; **DMARC missing**) → likely delivered, so the 0-reply is a **targeting + copy** problem, not deliverability. Jun 20: added Hunter email-enrichment for website-but-no-email leads (commit `6ca67bc`). |
+| **Phase 6 — Showcase** | ✅ **Exists** | Portfolio + `/pitch.html` live; this doc is the engineer-facing version |
+
+**One-line truth:** discovery + content + CRM + triage are **genuinely loaded**; attribution is **empty (no inbound yet)**; outbound **fires but converts at 0%** (a targeting/copy problem, not deliverability). Documented honestly so nobody ever pitches an empty gun.
+
+---
+
 ## Document map — Phases 1 through 6 (read in this order)
 
 This file is organized around **six phases**. Everything else (AutoSEO critique, Manny blueprint, engineer handoff) **supports** the same sequence.
 
-| Phase | Name | What it is (one line) | Status (Apr 2026) |
+> ⚠️ The status column below is the **April 2026 build intent** — for the **real, log-verified June 2026 status (loaded / partial / empty), see the ✅ VERIFIED block above.** (e.g. Phase 4 "Shipped & hardened" here = "fires but 0 replies" verified; Phase 3 "Complete" = "plumbing only, 0 captures".)
+
+| Phase | Name | What it is (one line) | Status (Apr 2026 build-intent — see ✅ Verified block for real status) |
 |------:|------|----------------------|-------------------|
 | **1** | Foundation (GEO + SEO health) | Google and AI assistants can **find** and **trust** your site — structured data, sitemap, GSC, analytics. | **Complete** |
 | **2** | Content engine | Automated **long-form publishing** (dev.to primary) + Oracle **`blog-posts-cache.json`** + **`/blog/posts`** endpoint — compound visibility. Hashnode fully removed May 2026. | **Complete** (dev.to-only crosspost; Oracle local cache; Spanish translation pipeline live) |
