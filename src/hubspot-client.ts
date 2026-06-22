@@ -481,6 +481,36 @@ function buildCompanyDescription(lead: LeadForHubSpot): string | undefined {
 }
 
 /**
+ * "Right client" qualification gate for Elena (fractional AI CTO / AI-augmented builder).
+ * A RIGHT client shows ACTIVE demand for help she can deliver AND is reachable — not a
+ * scraped GitHub dev/repo with a Claude-guessed "pain". The discriminator is buying INTENT
+ * (seeking / needs / non-technical founder / hiring a developer …), which passive scraped
+ * leads lack. Returns {ok, reason} so the skip reason is logged + auditable.
+ */
+export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: string } {
+  // 1) Must be reachable / a real entity
+  if (!(lead.email || lead.domain || lead.website || lead.linkedinUrl)) {
+    return { ok: false, reason: 'no reachable identity (no email/domain/site/linkedin)' };
+  }
+  // 2) Must show ACTIVE demand for AI/technical-build help (not a passive scraped repo).
+  const text = [lead.company, lead.painPoint, lead.matchedSystem, lead.source]
+    .filter(Boolean).join(' ').toLowerCase();
+  const INTENT = [
+    'seeking', 'looking for', 'looking to hire', 'looking to build', 'in search of',
+    'need a', 'needs a', 'need an', 'needs an', 'need help', 'needs help', 'need to build',
+    'want to build', 'wants to build', 'hiring a', 'hire a', 'help building', 'help me build',
+    'non-technical founder', 'non technical founder', 'no technical', 'technical co-founder',
+    'technical cofounder', 'fractional cto', 'fractional', 'request for proposal', 'rfp',
+    'looking for a developer', 'need a developer', 'need an engineer', 'build an mvp',
+    'building an mvp', 'outsource', 'looking to outsource', 'want help', 'we need',
+  ];
+  if (!INTENT.some(k => text.includes(k))) {
+    return { ok: false, reason: 'no active buying-intent signal (passive/scraped lead — not a buyer)' };
+  }
+  return { ok: true, reason: 'qualified: reachable + active buying intent' };
+}
+
+/**
  * Full pipeline: Contact → Company → Deal → Associations → Note.
  * Safe to call multiple times — upserts prevent duplicates.
  * Returns { contactId, companyId, dealId } or null on total failure.
@@ -492,6 +522,13 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
 } | null> {
   if (!HS_KEY()) {
     console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping CRM push');
+    return null;
+  }
+
+  // RIGHT-CLIENT GATE: qualify before transfer, so HubSpot only shows real prospects.
+  const _q = isQualifiedClient(lead);
+  if (!_q.ok) {
+    console.log(`[HubSpot] CLIENT lead NOT qualified (${_q.reason}) — skipping: ${(lead.company || lead.name || lead.email || '?').slice(0, 50)}`);
     return null;
   }
 
