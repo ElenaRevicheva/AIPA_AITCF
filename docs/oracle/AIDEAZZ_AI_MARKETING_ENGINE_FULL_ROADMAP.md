@@ -6,6 +6,24 @@
 
 ---
 
+## ✅ UPDATE — June 22, 2026 — "qualify-then-transfer" on BOTH pipelines + LLM resilience
+
+> Headline: **every agent now vets its lead BEFORE it touches HubSpot**, so the CRM's actionable stages show only true, worth-targets — for hiring *and* clients. Plus the LLM layer no longer dies when a paid key runs dry.
+
+**1. Jobs (get hired) — iron-clad fit gate on BOTH job paths.** Only **fully-remote + LATAM/global-friendly + AI-augmented (no heavy-coding/US-only)** roles reach Elena.
+- `serpapi_jobs_ingest.py` (Path C, Remotive + Google → HubSpot) and the **autonomous bot** `gate_node` (Path A, LangGraph → Telegram + HubSpot) both call the shared **`src/core/fit_gate.py` `iron_clad_fit`**. Non-fit jobs park in the "ignore" stage; fits land in "🔥 I Act TODAY".
+- **Source retargeted to Remotive** (region-tagged: `candidate_required_location` = Worldwide/Americas/LATAM/Brazil/USA) — the region tag is authoritative for eligibility. Verified: of 201 scraped jobs only ~1–3 pass the bar (right roles are rare — that's honesty, not a bug).
+
+**2. Clients (get money) — "right-client" gate at the single chokepoint.** `pushLeadToHubSpot` (used by **fresh-leads, lead-triage, prospect-ingest, serpapi-prospects, crm-event, algom**) now runs **`isQualifiedClient`** first: requires a **reachable identity** AND an **active buying-intent signal** (seeking / needs / non-technical founder / hiring a dev / build an MVP). Passive scraped GitHub-dev leads (the old `[CLIENT-CTO-INGEST]` noise) are rejected with a logged reason; the SERP buying-intent source passes. Verified deterministically (jhb-software → rejected, "non-technical founder seeking AI developer" → qualified).
+
+**3. LLM resilience (the engine can't pitch if it can't think).** Reality found June 22: **both paid keys are depleted** — Anthropic (`400 credit too low`) AND the Gemini key previously mislabeled "free" (`429 prepayment depleted`). The only genuinely-free working provider is **Groq (Llama 3.3 70B)**. Fixed: `claude_helper` already falls back Claude→Groq (UA-correct); added the same Groq fallback to VJH `response_detector` + `message_generator` (both were silently 403ing on **Cloudflare blocking the default Python-urllib User-Agent** — must send a browser UA); fixed the false "INTERVIEW REQUEST" Telegram spam (auto-reply acknowledgments were misclassified). Net: key hired/clients LLM paths have a verified free fallback; topping up Anthropic/Gemini is now optional.
+
+**4. Op note:** `serpapi-jobs` (PM2, **system python**, no pydantic) crash-looped after `iron_clad_fit` moved into `src/core/fit_gate.py` (importing it pulled `src.core.__init__` → `config` → `pydantic_settings`). Fixed with a resilient by-file-path import (fit_gate.py is stdlib-free); the venv paths use the normal import. Online + pulling Remotive cleanly.
+
+**Dashboard meaning:** "🔥 I Act TODAY" (jobs) and client deals now contain only vetted prospects; raw/parked noise sits in "AI working — ignore". Manual effort = worth-targets only.
+
+---
+
 ## ✅ VERIFIED IN PRODUCTION — June 20, 2026
 
 > The **honest, log-verified status** — what actually fires in production, with real numbers, not aspirations. Method: grepped the *action* log lines (not setup lines) + live endpoints + DB counts — code presence is not proof. Read this first; the phase tables below are the build history.
