@@ -2268,21 +2268,18 @@ async function startCTOAIPA() {
               if (enrichment) {
                 let painInsight = '';
                 try {
+                  const { claudeWithGroqFallback } = await import('./llm-resilience');
                   const Anthropic = (await import('@anthropic-ai/sdk')).default;
                   const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-                  const msg = await claude.messages.create({
-                    model: 'claude-haiku-4-5-20251001',
-                    max_tokens: 200,
-                    messages: [{ role: 'user', content: `You are Elena Revicheva, fractional CTO and AI engineer. Based on the company website excerpt and lead signal below, write 2 sentences: (1) their technical pain, (2) how Elena could help.
+                  painInsight = (await claudeWithGroqFallback(claude, 'claude-haiku-4-5-20251001', 200, null,
+                    `You are Elena Revicheva, fractional CTO and AI engineer. Based on the company website excerpt and lead signal below, write 2 sentences: (1) their technical pain, (2) how Elena could help.
 
 Website (${domain}):
 ${enrichment.rawExcerpt}
 
 Lead signal: ${(ctx || '').slice(0, 300)}
 
-Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichment.techStack.slice(0, 5).join(', ') || 'unknown'} | Team: ${enrichment.teamSizeSignal || '?'} | Funding: ${enrichment.fundingSignal || '?'}` }],
-                  });
-                  painInsight = ((msg.content[0] as { type: string; text: string })?.text || '').trim();
+Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichment.techStack.slice(0, 5).join(', ') || 'unknown'} | Team: ${enrichment.teamSizeSignal || '?'} | Funding: ${enrichment.fundingSignal || '?'}`, 'crm-enrich-pain')).trim();
                 } catch { /* non-fatal */ }
 
                 enrichedCtx = [
