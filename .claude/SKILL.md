@@ -1,5 +1,13 @@
 # SKILL.md — AI Tech Co-Founder Operating Manual
-> Last updated: 2026-04-30 | Repo: https://github.com/ElenaRevicheva/AIPA_AITCF | Working dir: `D:\aideazz\ai-cofounders\cto-aipa`
+> Last updated: 2026-06-23 | Repo: https://github.com/ElenaRevicheva/AIPA_AITCF | Working dir: `D:\aideazz\ai-cofounders\cto-aipa`
+
+---
+
+## 🆕 Proof point — recall-then-precision job pipeline + LLM judge (June 23 2026)
+
+**Interview/founder hook (production ML systems):** *"I rebuilt my job-hunting agent's filtering as a recall-then-precision pipeline: a generous keyword + region-tagged gate for recall, then an LLM judge (OpenAI gpt-4o-mini with a Groq free-tier fallback) for precision — it vetoes wrong-fit roles against explicit criteria before anything surfaces. When debugging why nothing surfaced, I traced a 7-bug cascade — including LangGraph silently stripping a state field that wasn't declared in the TypedDict schema, which made an iron-clad filter see empty data and discard every job. Fixed each, kept a 115-test eval harness green throughout, and added a per-cycle surface cap after a dedup-reset flooded the notification channel."*
+
+Engineering depth this demonstrates: LangGraph StateGraph internals, multi-provider LLM fallback under credit/rate-limit constraints (Anthropic+Gemini depleted → Groq+OpenAI), eval-harness-guarded refactoring, and honest precision/recall trade-off design. Code: `VibeJobHunterAIPA_AIMCF` `src/core/{fit_gate,llm_judge}.py`, `src/langgraph_pipeline/`. Full chain in that repo's `CLAUDE.md` → "CURRENT PIPELINE".
 
 ---
 

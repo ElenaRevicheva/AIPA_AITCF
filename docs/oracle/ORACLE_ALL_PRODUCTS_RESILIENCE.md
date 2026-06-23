@@ -6,6 +6,13 @@
 
 ---
 
+## 🟢 LLM resilience + VibeJobHunter pipeline (June 23 2026)
+
+- **Provider reality:** the **Anthropic** key AND the **Gemini** key are OUT OF CREDITS (`400` / `429 prepayment depleted`). Working free/cheap: **Groq** (`llama-3.3-70b-versatile`, free) + **OpenAI** (`gpt-4o-mini`, cheap). Every AI path now falls back: `claude_helper`→Groq; VJH `response_detector` classify→Groq; VJH **LLM judge → OpenAI → Groq**. **Keys are read from each repo's `.env` directly** (bots do NOT export them to `os.environ`, which would otherwise fail-open/degrade). Groq sits behind Cloudflare → **must send a browser `User-Agent`** or it 403s the default urllib UA.
+- **VibeJobHunter (`vibejobhunter` systemd):** honest-LEAD mode — surfaces right-fit (fully-remote · LATAM-open · AI-augmented · no-coding) jobs to Telegram + HubSpot "🔥 I Act TODAY", **capped at 6/cycle** (`VJH_SURFACE_CAP`). Deploy: `cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && git pull && sudo systemctl restart vibejobhunter`. Full chain + the "0-surfacing" bug-chain gotchas: VJH `CLAUDE.md` → "CURRENT PIPELINE". **Dedup stores:** `autonomous_data/seen_jobs.json` (`seen_jobs_v2`) + `vjh_checkpoint.db` — clearing them WITHOUT the surface cap **floods Telegram** (happened June 23; cap added).
+
+---
+
 ## Server
 
 | Field     | Value |
