@@ -765,8 +765,21 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       domain: input.domain,
     });
 
+    // Dedup: if a deal with this exact name already exists, don't create a second
+    // card (now that multiple agents — the bot's Remotive search + Path C — can find
+    // the same job). Returns the existing deal instead of duplicating it.
+    const dealName = `[${input.sourcePrefix || 'HIRING'}] ${input.jobTitle} @ ${input.company}`;
+    const existing = await findDealByName(dealName);
+    if (existing) {
+      console.log(`[HubSpot] Hiring deal already exists (${existing.id}) — skip create: ${dealName.slice(0, 64)}`);
+      if (contactId && companyId) await associateContactCompany(contactId, companyId);
+      if (existing.id && contactId) await associateDealContact(existing.id, contactId);
+      if (existing.id && companyId) await associateDealCompany(existing.id, companyId);
+      return { contactId, companyId, dealId: existing.id };
+    }
+
     const dealId = await createDeal({
-      name:  `[${input.sourcePrefix || 'HIRING'}] ${input.jobTitle} @ ${input.company}`,
+      name:  dealName,
       stage: stageId,
       description: [
         `Category: hiring`,
