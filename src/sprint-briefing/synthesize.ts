@@ -96,10 +96,10 @@ Keep under 1200 words. Be factual — no invention.`;
   } catch (err) {
     console.warn(`[sprint] Groq clustering failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Gemini`);
   }
-  // Free-Gemini fallback, then OpenAI; empty result is acceptable (narrative still works from RAW).
-  const gem = await geminiText(prompt, 4096);
-  if (gem) return gem;
-  return await openaiText(prompt, 4096);
+  // Working-providers-first: OpenAI (reliable) then Gemini (auto-rejoins when topped up).
+  const oai = await openaiText(prompt, 4096);
+  if (oai) return oai;
+  return await geminiText(prompt, 4096);
 }
 
 /** Narrative briefing script — Claude Sonnet with Groq fallback on credit exhaustion (400). */
@@ -131,22 +131,11 @@ RAW SIGNALS (live data — use these):
 ${rawDigest.slice(0, 60000)}
 `;
 
-  // Try Claude first
-  try {
-    const msg = await anthropic.messages.create({
-      model: CLAUDE_MODEL,
-      max_tokens: 8192,
-      messages: [{ role: 'user', content: prompt }],
-    });
-    const block = msg.content[0];
-    return block && block.type === 'text' ? block.text : '';
-  } catch (err: unknown) {
-    const status = (err as { status?: number })?.status;
-    if (status !== 400 && status !== 529 && status !== 503) throw err;
-    console.warn(`[sprint] Claude narrative failed (${status}) — falling back to Groq`);
-  }
+  // WORKING-PROVIDERS-FIRST chain: Groq (free) → OpenAI (cheap, reliable) → Claude → Gemini.
+  // The currently-dead/capped providers (Claude = Anthropic credits, Gemini) are tried LAST so they
+  // auto-rejoin the instant their credits are topped up — without wasting a call every run while down.
 
-  // Groq fallback — llama-3.3-70b-versatile, same model as clustering
+  // 1) Groq (free)
   const groqKey = process.env.GROQ_API_KEY?.trim();
   if (groqKey) {
     try {
@@ -160,25 +149,43 @@ ${rawDigest.slice(0, 60000)}
       });
       const text = completion.choices[0]?.message?.content;
       if (typeof text === 'string' && text.trim()) {
-        console.log('[sprint] Groq narrative fallback succeeded');
+        console.log('[sprint] Groq narrative succeeded');
         return text;
       }
     } catch (err) {
-      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Gemini`);
+      console.warn(`[sprint] Groq narrative failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying OpenAI`);
     }
   }
 
-  // Free-tier fallback — Gemini.
-  const gem = await geminiText(prompt.slice(0, 120000), 4096);
-  if (gem) {
-    console.log('[sprint] Gemini narrative fallback succeeded');
-    return gem;
-  }
-  // Final backstop — OpenAI gpt-4o-mini (cheap, reliable; key already in the Lambda env).
+  // 2) OpenAI (cheap, reliable backstop)
   const oai = await openaiText(prompt.slice(0, 120000), 4096);
   if (oai) {
-    console.log('[sprint] OpenAI narrative fallback succeeded');
+    console.log('[sprint] OpenAI narrative succeeded');
     return oai;
   }
-  throw new Error('All narrative providers failed (Claude credit-dead, Groq capped, Gemini empty/capped, OpenAI failed)');
+
+  // 3) Claude (premium — used automatically once Anthropic credits are topped up)
+  try {
+    const msg = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
+      max_tokens: 8192,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const block = msg.content[0];
+    if (block && block.type === 'text' && block.text.trim()) {
+      console.log('[sprint] Claude narrative succeeded');
+      return block.text;
+    }
+  } catch (err: unknown) {
+    console.warn(`[sprint] Claude narrative failed (${(err as { status?: number })?.status})`);
+  }
+
+  // 4) Gemini (free — used automatically once its credits are topped up)
+  const gem = await geminiText(prompt.slice(0, 120000), 4096);
+  if (gem) {
+    console.log('[sprint] Gemini narrative succeeded');
+    return gem;
+  }
+
+  throw new Error('All narrative providers failed (Groq capped, OpenAI failed, Claude credit-dead, Gemini empty/capped)');
 }
