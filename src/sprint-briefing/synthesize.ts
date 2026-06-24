@@ -4,6 +4,37 @@ import type { Anthropic } from '@anthropic-ai/sdk';
 const GROQ_MODEL = process.env.SPRINT_BRIEFING_GROQ_MODEL || 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = process.env.SPRINT_BRIEFING_CLAUDE_MODEL || 'claude-sonnet-4-6';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const OPENAI_MODEL = process.env.SPRINT_BRIEFING_OPENAI_MODEL || 'gpt-4o-mini';
+
+/** Final cheap-but-RELIABLE fallback — OpenAI gpt-4o-mini. As of June 2026 the Anthropic
+ *  AND Gemini keys are credit-dead and Groq's free tier rate-caps, so on a heavy morning ALL
+ *  three failed and the 8AM briefing didn't fire. OpenAI (key already in the Lambda env) is the
+ *  backstop. Returns '' on any failure so callers can degrade. */
+async function openaiText(prompt: string, maxTokens = 4096): Promise<string> {
+  const key = process.env.OPENAI_API_KEY?.trim();
+  if (!key) return '';
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: Math.min(maxTokens, 8192),
+        temperature: 0.3,
+      }),
+      signal: AbortSignal.timeout(90000),
+    });
+    if (!res.ok) { console.warn(`[sprint] OpenAI ${res.status}: ${(await res.text()).slice(0, 120)}`); return ''; }
+    const d = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const t = (d.choices?.[0]?.message?.content || '').trim();
+    if (t) console.log(`[sprint] OpenAI (${OPENAI_MODEL}) returned ${t.length} chars`);
+    return t;
+  } catch (e) {
+    console.warn('[sprint] OpenAI failed:', e instanceof Error ? e.message : String(e));
+    return '';
+  }
+}
 
 /** Free-tier Gemini fallback (REST, no SDK). Keeps the 8AM briefing alive when both the
  *  paid Anthropic credits AND Groq's daily cap are exhausted — exactly the failure that
@@ -65,8 +96,10 @@ Keep under 1200 words. Be factual — no invention.`;
   } catch (err) {
     console.warn(`[sprint] Groq clustering failed (${(err as { status?: number })?.status ?? (err instanceof Error ? err.message : '')}) — trying Gemini`);
   }
-  // Free-Gemini fallback; empty result is acceptable (narrative still works from RAW).
-  return await geminiText(prompt, 4096);
+  // Free-Gemini fallback, then OpenAI; empty result is acceptable (narrative still works from RAW).
+  const gem = await geminiText(prompt, 4096);
+  if (gem) return gem;
+  return await openaiText(prompt, 4096);
 }
 
 /** Narrative briefing script — Claude Sonnet with Groq fallback on credit exhaustion (400). */
@@ -135,11 +168,17 @@ ${rawDigest.slice(0, 60000)}
     }
   }
 
-  // Final free-tier fallback — Gemini — so the briefing survives a fully Groq-dry morning.
+  // Free-tier fallback — Gemini.
   const gem = await geminiText(prompt.slice(0, 120000), 4096);
   if (gem) {
     console.log('[sprint] Gemini narrative fallback succeeded');
     return gem;
   }
-  throw new Error('All narrative providers failed (Claude credit-dead, Groq capped, Gemini empty/capped)');
+  // Final backstop — OpenAI gpt-4o-mini (cheap, reliable; key already in the Lambda env).
+  const oai = await openaiText(prompt.slice(0, 120000), 4096);
+  if (oai) {
+    console.log('[sprint] OpenAI narrative fallback succeeded');
+    return oai;
+  }
+  throw new Error('All narrative providers failed (Claude credit-dead, Groq capped, Gemini empty/capped, OpenAI failed)');
 }
