@@ -8001,7 +8001,9 @@ async function detectPersonalAIIntent(text: string): Promise<{
   if (text.length > 5 && text.length < 400) {
     try {
       const classifyResponse = await groq.chat.completions.create({
-        model: 'llama-3.1-8b-instant',
+        // Migrated June 25 2026 off llama-3.1-8b-instant (Groq deprecation, decommission Aug 16 2026)
+        // to the fleet-standard current model. 30-token intent classification — cost negligible.
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 30,
         messages: [{
           role: 'user',
