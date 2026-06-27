@@ -592,39 +592,58 @@ Type /menu for all commands! 🚀
         { cmd: '/forget', desc: 'Clear conversation memory', usage: '/forget\nStart fresh (keeps knowledge base)' },
       ]
     },
+    'wiring_research': {
+      title: '🔬 RESEARCH AGENTS',
+      commands: [
+        { cmd: '/research_company',    desc: '🔥 Autonomous Claude + Bright Data research on a prospect. Founder, pain signals, pitch angle, HOT/WARM/COLD. ~90s.', usage: '/research_company decircle.io' },
+        { cmd: '/research_employer',   desc: '🎯 Employer mode — funding, hiring, tech stack, comp signals, application angle.', usage: '/research_employer Anthropic' },
+        { cmd: '/research_competitor', desc: '📚 SEO/AEO competitor gap — top content + blog topic gaps.', usage: '/research_competitor brain.fm' },
+      ],
+    },
+    'wiring_atlas': {
+      title: '🎯 ATLAS SHIFTED (marketing intel)',
+      commands: [
+        { cmd: '/atlas_move',   desc: 'TODAY\'S MOVE — one ranked recommendation: vertical, ENTER/WATCH angle, confidence, reason.', usage: '/atlas_move auto_insurance' },
+        { cmd: '/atlas_export', desc: 'Campaign export — hook, headline, visual, CTA, why Atlas picked it.', usage: '/atlas_export expat_language' },
+        { cmd: '/atlas_brief',  desc: 'Full daily brief — all verticals + MOVE/AVOID (9 AM Panama push).', usage: '/atlas_brief' },
+        { cmd: '/atlas_scan',   desc: 'Whitespace finder — live Meta + TikTok scan for any vertical (~90s).', usage: '/atlas_scan medicare advantage' },
+      ],
+    },
+    'wiring_voice': {
+      title: '🎙️ VOICE & CONTENT',
+      commands: [
+        { cmd: '/campaign',    desc: 'Voice Growth Engine — reply to voice with /campaign → blog + LinkedIn + Instagram + HubSpot UTM.', usage: 'Reply to voice note with: /campaign' },
+        { cmd: '/podcast',     desc: 'Podcast from voice — show notes, chapters, clips, bilingual blog + social.', usage: 'Reply to audio with: /podcast' },
+        { cmd: '/podcast_ai',  desc: 'AI-narrated episode from a topic — script → TTS → publish.', usage: '/podcast_ai solo founder attribution' },
+        { cmd: '/briefing',    desc: 'Full business snapshot — agents, leads, EspaLuz, health.', usage: '/briefing' },
+        { cmd: '/outcomes',    desc: 'What your AI agents did today — posts, leads, emails.', usage: '/outcomes' },
+      ],
+    },
+    'wiring_pipeline': {
+      title: '📬 OUTREACH & CRM',
+      commands: [
+        { cmd: '/leads',           desc: 'Live client list — everyone who showed interest.', usage: '/leads' },
+        { cmd: '/lead',            desc: 'Manually add a prospect.', usage: '/lead add linkedin John at TechCorp' },
+        { cmd: '/outreach',        desc: 'Pipeline health — sent, replies, cap.', usage: '/outreach' },
+        { cmd: '/fresh_leads',     desc: 'HN + GitHub + PH companies hiring now. Tue/Fri 7am.', usage: '/fresh_leads' },
+        { cmd: '/outreach_ingest', desc: 'YC startups + founder emails.', usage: '/outreach_ingest' },
+        { cmd: '/places_ingest',   desc: 'Local businesses by industry + city.', usage: '/places_ingest construction Lexington KY' },
+        { cmd: '/doc_ingest',      desc: 'Paste doc — AI extracts prospects.', usage: '/doc_ingest' },
+        { cmd: '/outreach_drafts', desc: 'Emails waiting for your review.', usage: '/outreach_drafts' },
+        { cmd: '/pending_leads',   desc: 'Leads stuck with no email.', usage: '/pending_leads' },
+        { cmd: '/add_email',       desc: 'Unblock a lead with an email.', usage: '/add_email <id> ceo@co.com' },
+        { cmd: '/linkedin_draft',  desc: '300-char connection message.', usage: '/linkedin_draft fintech Panama' },
+        { cmd: '/triage',          desc: 'Score prospects 1–5, push best to HubSpot.', usage: '/triage' },
+        { cmd: '/hubspot',         desc: 'HubSpot CRM — view or sync pipeline.', usage: '/hubspot sync' },
+        { cmd: '/xlsx',            desc: 'Download pipeline spreadsheet.', usage: '/xlsx' },
+        { cmd: '/cleanbiz',        desc: 'Remove test/fake pipeline entries.', usage: '/cleanbiz confirm' },
+        { cmd: '/espaluz',         desc: 'EspaLuz business pulse — trials, revenue.', usage: '/espaluz' },
+        { cmd: '/outcome',         desc: 'Log what an agent did.', usage: '/outcome cmo post_published linkedin' },
+      ],
+    },
     'wiring': {
       title: '📊 BUSINESS WIRING',
-      commands: [
-        { cmd: '/research_company',    desc: '🔥 NEW (hackathon) — Autonomous Claude + Bright Data research on a prospect. Returns founder, pain signals, decision-maker, sendable pitch angle, HOT/WARM/COLD verdict. ~90s.', usage: '/research_company decircle.io\n/research_company Acme.ai' },
-        { cmd: '/research_employer',   desc: '🎯 NEW (hackathon) — Same agent, employer mode. Recent funding, hiring patterns, tech stack, comp signals, application angle for you.', usage: '/research_employer Cresta\n/research_employer Anthropic' },
-        { cmd: '/research_competitor', desc: '📚 NEW (hackathon) — Same agent, SEO/AEO competitor gap analysis. Returns top-ranking content + 3-5 blog topic gaps for your daily publisher.', usage: '/research_competitor brain.fm\n/research_competitor manny-santos.com' },
-        { cmd: '/atlas_move',       desc: '🎯 Atlas TODAY\'S MOVE — one ranked recommendation from live ad libraries: vertical, ENTER/WATCH angle, confidence, reason. Closes the loop to campaign export.', usage: '/atlas_move\n/atlas_move auto_insurance\n/atlas_export expat_language' },
-        { cmd: '/atlas_export',     desc: '📦 Atlas campaign export — hook, headline, visual, CTA, landing angle, why Atlas picked it. Copy-paste into Meta Ads Manager.', usage: '/atlas_export auto_insurance\n/atlas_export expat_language' },
-        { cmd: '/atlas_brief',      desc: '🌐 Full Atlas daily brief — all tracked verticals + MOVE/AVOID. Same as the 9 AM Panama push.', usage: '/atlas_brief' },
-        { cmd: '/atlas_scan',       desc: '🔍 Atlas whitespace finder — live Meta + TikTok scan for any vertical you type (~90s in browser).', usage: '/atlas_scan medicare advantage\n/atlas_scan AI language tutor' },
-        { cmd: '/campaign',       desc: '🎙️ NEW — Voice Growth Engine. Reply to any voice note with /campaign → it transcribes + translates (Speechmatics), writes a bilingual blog (EN+ES) + LinkedIn + Instagram posts, publishes the blog + drips LinkedIn via Buffer, all UTM-tagged into HubSpot. Speak once, market everywhere.', usage: 'Send a voice note, then reply to it with:\n/campaign' },
-        { cmd: '/podcast',        desc: '🎧 Podcast from your voice. Reply to a voice note/long audio with /podcast → language auto-detect (EN/ES/RU). 🌐 Speak RUSSIAN and it translates + POLISHES your idea into a tech-savvy English episode, narrates it (TTS), and publishes it. English audio publishes in your natural voice. Always: show notes + chapters + clips + bilingual blog + social, UTM-tagged. Want your natural voice as-is (any language)? Use /podcast raw.', usage: 'Send a voice note, then reply to it with:\n/podcast\n— or to publish your natural voice unchanged:\n/podcast raw' },
-        { cmd: '/podcast_ai',     desc: '🤖🎧 NEW — AI-narrated episode from a topic. Claude writes a script → OpenAI voices it → Speechmatics transcribes for captions/chapters → publishes episode + blog + social. Hands-free, no recording needed.', usage: '/podcast_ai why attribution beats activity for solo founders' },
-        { cmd: '/briefing',       desc: '📋 Full business snapshot — agents, leads, EspaLuz, health. Start here every morning.', usage: '/briefing' },
-        { cmd: '/outcomes',       desc: '✅ What your AI agents actually did today — posts, leads, emails, revenue.', usage: '/outcomes\n/outcomes cmo' },
-        { cmd: '/leads',          desc: '👥 Everyone who has shown interest in working with you — your live client list.', usage: '/leads\n/leads new' },
-        { cmd: '/lead',           desc: '➕ Manually add someone you spotted — so you never lose a potential client.', usage: '/lead add linkedin John at TechCorp asked about AI agents' },
-        { cmd: '/outreach',       desc: '📬 Sales pipeline health — companies targeted, emails sent, who replied.', usage: '/outreach' },
-        { cmd: '/fresh_leads',    desc: '🔍 Finds companies hiring/building RIGHT NOW on HN, GitHub, Product Hunt. Auto-runs Tue + Fri 7am.', usage: '/fresh_leads\n/fresh_leads all — include Product Hunt' },
-        { cmd: '/outreach_ingest',desc: '🚀 Discovers YC-backed startups and finds their founder emails automatically.', usage: '/outreach_ingest' },
-        { cmd: '/places_ingest',  desc: '📍 Local businesses by industry + city — builds your local prospect list.', usage: '/places_ingest construction Lexington KY\n/places_ingest architects Panama City' },
-        { cmd: '/doc_ingest',     desc: '📄 Paste any doc (RFP, email, list) — AI pulls every potential client from it.', usage: '/doc_ingest\n[paste document text below]' },
-        { cmd: '/outreach_drafts',desc: '✉️ Outreach emails written and waiting for your review before sending.', usage: '/outreach_drafts' },
-        { cmd: '/pending_leads',  desc: '🔒 Pipeline companies stuck because we have no email yet — shows who needs unblocking.', usage: '/pending_leads' },
-        { cmd: '/add_email',      desc: '📧 Unblock a stuck lead by adding their email so outreach can proceed.', usage: '/add_email <lead-id> ceo@company.com' },
-        { cmd: '/linkedin_draft', desc: '💼 AI writes your 300-char LinkedIn connection message — copy-paste ready.', usage: '/linkedin_draft fintech startup Panama' },
-        { cmd: '/triage',         desc: '🎯 AI scores every prospect 1–5, tells you who to contact TODAY, pushes best to HubSpot. Run after /fresh_leads.', usage: '/triage' },
-        { cmd: '/hubspot',        desc: '🟠 Your HubSpot CRM live — view contacts/deals or sync your full pipeline there.', usage: '/hubspot\n/hubspot sync — push all pipeline to HubSpot' },
-        { cmd: '/xlsx',           desc: '📊 Download full pipeline as a spreadsheet — open in Excel or Google Sheets.', usage: '/xlsx' },
-        { cmd: '/cleanbiz',       desc: '🧹 Remove test/fake entries so triage and HubSpot work on real data only.', usage: '/cleanbiz\n/cleanbiz confirm — delete permanently' },
-        { cmd: '/espaluz',        desc: '🌟 EspaLuz tutoring business pulse — trials, paying subscribers, revenue.', usage: '/espaluz' },
-        { cmd: '/outcome',        desc: '📝 Log what an AI agent just did. Used automatically — you can also log manually.', usage: '/outcome cmo post_published linkedin' },
-      ]
+      commands: [],
     },
     'chat': {
       title: '💬 CHAT & MEDIA',
@@ -635,7 +654,15 @@ Type /menu for all commands! 🚀
       ]
     },
   };
-  
+
+  // Flatten wiring submenus so /cmd: detail lookup still finds every command.
+  const wiringMenu = MENU_SECTIONS['wiring']!;
+  for (const subKey of ['wiring_research', 'wiring_atlas', 'wiring_voice', 'wiring_pipeline'] as const) {
+    wiringMenu.commands.push(...MENU_SECTIONS[subKey]!.commands);
+  }
+
+  const WIRING_SUB_KEYS = new Set(['wiring_research', 'wiring_atlas', 'wiring_voice', 'wiring_pipeline']);
+
   async function showMenu(ctx: Context) {
     const menuMessage = `🤖 *CTO AIPA v6.0 - PERSONAL AI CO-FOUNDER*
 
@@ -678,14 +705,52 @@ Or just ask me anything - I understand natural language!`;
       }
     });
   }
-  
+
+  /** Telegram caps messages at 4096 chars — chunk long sections without dropping commands. */
+  function buildMenuSectionMessages(sectionData: { title: string; commands: Array<{ cmd: string; desc: string; usage?: string }> }): string[] {
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const MAX = 3800;
+    const chunks: string[] = [];
+    let response = `<b>${esc(sectionData.title)}</b>\n\n`;
+    for (const cmd of sectionData.commands) {
+      const block = `<b>${esc(cmd.cmd)}</b>\n${esc(cmd.desc)}\n<code>${esc((cmd.usage || '').split('\n')[0] || '')}</code>\n\n`;
+      if (response.length + block.length > MAX) {
+        chunks.push(response);
+        response = `<b>${esc(sectionData.title)}</b>\n\n${block}`;
+      } else {
+        response += block;
+      }
+    }
+    if (response.trim()) chunks.push(response);
+    if (chunks.length <= 1) return chunks;
+    return chunks.map((c, i) => {
+      const body = c.replace(/^<b>[^<]*<\/b>\n\n/, '');
+      return `<b>${esc(sectionData.title)} (${i + 1}/${chunks.length})</b>\n\n${body}`;
+    });
+  }
+
+  function menuBackKeyboard(section: string) {
+    if (WIRING_SUB_KEYS.has(section)) {
+      return {
+        inline_keyboard: [
+          [
+            { text: '◀ Business Wiring', callback_data: 'menu:wiring' },
+            { text: '📋 Main Menu', callback_data: 'menu:main' },
+          ],
+        ],
+      };
+    }
+    return { inline_keyboard: [[{ text: '📋 Back to Menu', callback_data: 'menu:main' }]] };
+  }
+
   // Handle menu section callbacks - using callbackQuery filter for better grammY compatibility
   bot.callbackQuery(/^menu:/, async (ctx) => {
     const data = ctx.callbackQuery?.data || '';
     console.log(`📲 Menu callback received: ${data}`);
-    
+
+    try {
     const section = data.replace('menu:', '');
-    
+
     if (section === 'settings') {
       await ctx.answerCallbackQuery();
       await ctx.reply(`⚙️ *Settings*
@@ -696,10 +761,27 @@ Or just ask me anything - I understand natural language!`;
 /resume - Restore last session`, { parse_mode: 'Markdown' });
       return;
     }
-    
+
     if (section === 'main') {
       await ctx.answerCallbackQuery();
       await showMenu(ctx);
+      return;
+    }
+
+    if (section === 'wiring') {
+      await ctx.answerCallbackQuery();
+      await ctx.reply('<b>📊 BUSINESS WIRING</b>\n\nPick a group — every command is listed inside:', {
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '🔬 Research (3)', callback_data: 'menu:wiring_research' }],
+            [{ text: '🎯 Atlas (4)', callback_data: 'menu:wiring_atlas' }],
+            [{ text: '🎙️ Voice & Content (5)', callback_data: 'menu:wiring_voice' }],
+            [{ text: '📬 Outreach & CRM (17)', callback_data: 'menu:wiring_pipeline' }],
+            [{ text: '📋 Back to Menu', callback_data: 'menu:main' }],
+          ],
+        },
+      });
       return;
     }
 
@@ -755,24 +837,22 @@ Or just ask me anything - I understand natural language!`;
     
     await ctx.answerCallbackQuery();
 
-    // Use HTML — Markdown v1 chokes on underscores inside bold (**/fresh_leads**)
-    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    let response = `<b>${esc(sectionData.title)}</b>\n\n`;
-
-    for (const cmd of sectionData.commands) {
-      response += `<b>${esc(cmd.cmd)}</b>\n`;
-      response += `${esc(cmd.desc)}\n`;
-      response += `<code>${esc((cmd.usage || '').split('\n')[0] || '')}</code>\n\n`;
+    const messages = buildMenuSectionMessages(sectionData);
+    for (let i = 0; i < messages.length; i++) {
+      const isLast = i === messages.length - 1;
+      await ctx.reply(messages[i]!, {
+        parse_mode: 'HTML',
+        ...(isLast ? { reply_markup: menuBackKeyboard(section) } : {}),
+      });
+      if (!isLast) await new Promise((r) => setTimeout(r, 250));
     }
-
-    await ctx.reply(response, {
-      parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: '📋 Back to Menu', callback_data: 'menu:main' }],
-        ],
-      },
-    });
+    } catch (err) {
+      console.error('Menu callback error:', err);
+      try {
+        await ctx.answerCallbackQuery({ text: 'Menu failed — try again' });
+      } catch { /* ignore */ }
+      await ctx.reply('Menu failed to load (message too long or parse error). Type a command directly, e.g. /atlas_move').catch(() => {});
+    }
   });
   
   // Handle command detail callbacks
