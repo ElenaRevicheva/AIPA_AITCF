@@ -2,9 +2,11 @@
  * atlas-command.ts — Telegram Atlas Shifted commands (ADDITIVE, isolated).
  *
  * Reads live brief + concepts from the whitespace data dir on Oracle (or ATLAS API fallback).
- * Does not modify captures, cron, or the web UI — read-only fleet integration.
+ * Does not modify captures, cron, or the web UI — read-only except /atlas_track (same as web Add to radar).
  *
- * Commands: /atlas_move /atlas_export /atlas_brief /atlas_scan (/atlas = move)
+ * Radar (daily memory): /atlas_move /atlas_export /atlas_brief /atlas_track
+ * WHITESPACE (one-shot): /atlas_scan
+ * /atlas = move
  */
 
 import * as fs from 'fs';
@@ -32,6 +34,19 @@ interface Brief {
   snapshot_date: string;
   verticals: BriefVertical[];
   resilience?: string;
+}
+
+interface TrackedVertical {
+  id: string;
+  label: string;
+  added_at?: string;
+}
+
+interface AtlasApiPayload {
+  brief?: Brief;
+  concepts?: Record<string, ConceptRecord>;
+  tracked_verticals?: TrackedVertical[];
+  snapshot_date?: string;
 }
 
 interface ConceptRecord {
@@ -65,21 +80,30 @@ function loadJson<T>(file: string): T | null {
   }
 }
 
-async function loadAtlasApi(): Promise<{ brief: Brief | null; concepts: Record<string, ConceptRecord> }> {
+async function loadAtlasApi(): Promise<{
+  brief: Brief | null;
+  concepts: Record<string, ConceptRecord>;
+  tracked: TrackedVertical[];
+}> {
   try {
     const res = await fetch(`${ATLAS_BASE}/api/atlas`, { signal: AbortSignal.timeout(15_000) });
-    if (!res.ok) return { brief: null, concepts: {} };
-    const d = (await res.json()) as { brief?: Brief; concepts?: Record<string, ConceptRecord> };
-    return { brief: d.brief ?? null, concepts: d.concepts ?? {} };
+    if (!res.ok) return { brief: null, concepts: {}, tracked: [] };
+    const d = (await res.json()) as AtlasApiPayload;
+    return { brief: d.brief ?? null, concepts: d.concepts ?? {}, tracked: d.tracked_verticals ?? [] };
   } catch {
-    return { brief: null, concepts: {} };
+    return { brief: null, concepts: {}, tracked: [] };
   }
 }
 
-async function loadAtlasData(): Promise<{ brief: Brief | null; concepts: Record<string, ConceptRecord> }> {
+async function loadAtlasData(): Promise<{
+  brief: Brief | null;
+  concepts: Record<string, ConceptRecord>;
+  tracked: TrackedVertical[];
+}> {
   const brief = loadJson<Brief>('brief.json');
   const concepts = loadJson<Record<string, ConceptRecord>>('concepts.json') ?? {};
-  if (brief) return { brief, concepts };
+  const tracked = loadJson<{ verticals: TrackedVertical[] }>('tracked-verticals.json')?.verticals ?? [];
+  if (brief) return { brief, concepts, tracked };
   return loadAtlasApi();
 }
 
@@ -132,6 +156,8 @@ export function formatTodayMove(v: BriefVertical, brief: Brief, concept?: Concep
     '',
     `📊 Radar: ${ATLAS_BASE}/atlas.html`,
     `📋 Export: /atlas_export ${v.vertical}`,
+    `📡 Track new vertical: /atlas_track your niche`,
+    `🔍 One-shot discovery: /atlas_scan medicare advantage`,
   );
   if (concept?.asset?.image_file) {
     lines.push(`🖼 Visual: ${ATLAS_BASE}/${concept.asset.image_file}`);
@@ -161,7 +187,7 @@ export function formatCampaignExport(v: BriefVertical, brief: Brief, concept?: C
     audience,
     '',
     'Hook:',
-    c.hook || '(no concept yet — /atlas_scan then wait for daily concept run)',
+    c.hook || '(no concept yet — add to radar or wait for daily concept run)',
     '',
     'Headline:',
     c.headline || '—',
@@ -188,7 +214,7 @@ export function formatCampaignExport(v: BriefVertical, brief: Brief, concept?: C
   return lines.filter(Boolean).join('\n').slice(0, 4096);
 }
 
-export function formatFullBrief(brief: Brief): string {
+export function formatFullBrief(brief: Brief, tracked: TrackedVertical[] = []): string {
   const lines = [`🌐 ATLAS DAILY BRIEF · ${brief.snapshot_date}`, ''];
   for (const v of brief.verticals || []) {
     const m = v.move;
@@ -199,8 +225,15 @@ export function formatFullBrief(brief: Brief): string {
     if (v.avoid?.length) lines.push(`   avoid: ${v.avoid.map((a) => a.angle).join(', ')}`);
     lines.push('');
   }
-  lines.push(`📊 ${ATLAS_BASE}/atlas.html`);
+  if (tracked.length) {
+    lines.push('📡 Your tracked verticals (daily cron 9 AM Panama):');
+    for (const t of tracked) lines.push(`   • ${t.label}`);
+    lines.push('');
+  }
+  lines.push(`📊 Radar: ${ATLAS_BASE}/atlas.html`);
   lines.push(`🎯 One move: /atlas_move`);
+  lines.push(`📡 Add vertical: /atlas_track medicare advantage`);
+  lines.push(`🔍 WHITESPACE (one-shot): /atlas_scan`);
   return lines.join('\n').slice(0, 4096);
 }
 
@@ -212,13 +245,15 @@ export async function runAtlasMove(ctx: any): Promise<void> {
   const arg = parseArg(ctx);
   const { brief, concepts } = await loadAtlasData();
   if (!brief?.verticals?.length) {
-    await ctx.reply('No Atlas brief yet — daily capture runs at 9 AM Panama.\n\nLive scan: /atlas_scan medicare advantage');
+    await ctx.reply(
+      'No Atlas brief yet — daily capture runs at 9 AM Panama.\n\nOne-shot: /atlas_scan medicare advantage\nAdd to radar: /atlas_track medicare advantage',
+    );
     return;
   }
   const v = matchVertical(brief, arg);
   if (!v) {
     const names = brief.verticals.map((x) => x.vertical).join(', ');
-    await ctx.reply(`Unknown vertical "${arg}".\n\nTracked: ${names}\n\nTry: /atlas_move auto_insurance`);
+    await ctx.reply(`Unknown vertical "${arg}".\n\nOn radar: ${names}\n\nTry: /atlas_move auto_insurance`);
     return;
   }
   await ctx.reply(formatTodayMove(v, brief, concepts[v.vertical]));
@@ -240,24 +275,140 @@ export async function runAtlasExport(ctx: any): Promise<void> {
 }
 
 export async function runAtlasBrief(ctx: any): Promise<void> {
-  const { brief } = await loadAtlasData();
+  const { brief, tracked } = await loadAtlasData();
   if (!brief?.verticals?.length) {
     await ctx.reply('No brief yet — Atlas captures every morning at 9 AM Panama.');
     return;
   }
-  await ctx.reply(formatFullBrief(brief));
+  await ctx.reply(formatFullBrief(brief, tracked));
 }
 
 export async function runAtlasScan(ctx: any): Promise<void> {
   const q = parseArg(ctx);
   if (!q) {
     await ctx.reply(
-      `🔍 Atlas whitespace finder — type any vertical for a live battle plan (~90s in browser).\n\nUsage: /atlas_scan medicare advantage\n\nOpens: ${ATLAS_BASE}/?q=your+vertical`,
+      [
+        '🔍 WHITESPACE — one-shot angle discovery (no daily memory)',
+        '',
+        'Finds the open angle almost nobody is running yet — Meta + TikTok, ~90s in browser.',
+        '',
+        'Usage: /atlas_scan medicare advantage',
+        '',
+        `Open: ${ATLAS_BASE}/`,
+        '',
+        '📡 To track a market daily (ENTER/WATCH over time): /atlas_track',
+      ].join('\n'),
     );
     return;
   }
   const url = `${ATLAS_BASE}/?q=${encodeURIComponent(q)}`;
   await ctx.reply(
-    `🔍 Live scan ready for "${q}"\n\nOpen the finder and click Find the whitespace:\n${url}\n\nTo add to daily radar: open atlas.html → Add to radar`,
+    [
+      `🔍 WHITESPACE · "${q}"`,
+      '',
+      'One-shot discovery — click Find the whitespace in browser:',
+      url,
+      '',
+      '📡 Want daily radar memory + cron refresh?',
+      `/atlas_track ${q}`,
+    ].join('\n'),
   );
+}
+
+interface TrackEvent {
+  stage?: string;
+  message?: string;
+  vertical_id?: string;
+}
+
+/** Stream /api/atlas/track SSE — same as web "Add to radar". */
+async function consumeTrackSse(vertical: string, onStage: (stage: string, message: string) => Promise<void>): Promise<TrackEvent> {
+  const url = `${ATLAS_BASE}/api/atlas/track?vertical=${encodeURIComponent(vertical)}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(600_000) });
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    throw new Error(res.status === 409 ? 'Another track capture is in progress — try again in a few minutes.' : err.slice(0, 200) || `HTTP ${res.status}`);
+  }
+  const reader = res.body?.getReader();
+  if (!reader) throw new Error('No response stream');
+  const dec = new TextDecoder();
+  let buf = '';
+  let last: TrackEvent = {};
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop() ?? '';
+    for (const line of lines) {
+      if (!line.startsWith('data:')) continue;
+      try {
+        const ev = JSON.parse(line.slice(5).trim()) as TrackEvent;
+        last = { ...last, ...ev };
+        if (ev.stage && ev.message) await onStage(ev.stage, ev.message);
+        if (ev.stage === 'error') throw new Error(ev.message || 'track failed');
+      } catch (e) {
+        if (e instanceof SyntaxError) continue;
+        throw e;
+      }
+    }
+  }
+  if (last.stage !== 'done') throw new Error(last.message || 'track stream ended early');
+  return last;
+}
+
+export async function runAtlasTrack(ctx: any): Promise<void> {
+  const q = parseArg(ctx);
+  if (!q) {
+    await ctx.reply(
+      [
+        '📡 ADD TO RADAR — daily memory + automatic 9 AM Panama refresh',
+        '',
+        'Captures live ads → scores ENTER/WATCH → persists for tomorrow\'s cron.',
+        '',
+        'Usage: /atlas_track personal ai companions on the go',
+        '',
+        `Web: ${ATLAS_BASE}/atlas.html`,
+        '',
+        '🔍 One-shot only (no memory): /atlas_scan',
+      ].join('\n'),
+    );
+    return;
+  }
+
+  const progress = await ctx.reply(`📡 Adding "${q}" to Atlas radar…\n\ncapture → classify → brief (~2–5 min)`);
+  const chatId = ctx.chat?.id;
+  const msgId = progress.message_id;
+  let lastLine = 'starting…';
+
+  const editProgress = async (stage: string, message: string) => {
+    lastLine = `${stage}: ${message}`;
+    if (!chatId || !msgId) return;
+    const text = `📡 "${q}"\n\n${lastLine}`.slice(0, 4096);
+    try {
+      await ctx.telegram.editMessageText(chatId, msgId, undefined, text);
+    } catch {
+      /* rate limit or unchanged — ignore */
+    }
+  };
+
+  try {
+    const done = await consumeTrackSse(q, editProgress);
+    const vid = done.vertical_id || slug(q);
+    await ctx.reply(
+      [
+        `✅ On radar: ${vid.replace(/_/g, ' ')}`,
+        '',
+        '• Captured & scored today',
+        '• Saved for daily cron (9 AM Panama)',
+        '• ENTER/WATCH updates each morning',
+        '',
+        `🎯 Move: /atlas_move ${vid}`,
+        `📊 Board: ${ATLAS_BASE}/atlas.html`,
+      ].join('\n'),
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    await ctx.reply(`❌ Add to radar failed: ${msg}\n\nLast: ${lastLine}`);
+  }
 }

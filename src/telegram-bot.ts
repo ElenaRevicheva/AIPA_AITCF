@@ -601,12 +601,13 @@ Type /menu for all commands! 🚀
       ],
     },
     'wiring_atlas': {
-      title: '🎯 ATLAS SHIFTED (marketing intel)',
+      title: '🎯 ATLAS SHIFTED — Radar (daily memory)',
       commands: [
-        { cmd: '/atlas_move',   desc: 'TODAY\'S MOVE — one ranked recommendation: vertical, ENTER/WATCH angle, confidence, reason.', usage: '/atlas_move auto_insurance' },
+        { cmd: '/atlas_move',   desc: 'TODAY\'S MOVE — one recommendation per vertical: ENTER/WATCH, confidence, reason.', usage: '/atlas_move auto_insurance' },
         { cmd: '/atlas_export', desc: 'Campaign export — hook, headline, visual, CTA, why Atlas picked it.', usage: '/atlas_export expat_language' },
-        { cmd: '/atlas_brief',  desc: 'Full daily brief — all verticals + MOVE/AVOID (9 AM Panama push).', usage: '/atlas_brief' },
-        { cmd: '/atlas_scan',   desc: 'Whitespace finder — live Meta + TikTok scan for any vertical (~90s).', usage: '/atlas_scan medicare advantage' },
+        { cmd: '/atlas_brief',  desc: 'Full daily brief — all verticals + your tracked list (9 AM Panama push).', usage: '/atlas_brief' },
+        { cmd: '/atlas_track',  desc: 'Add to radar — capture ads, score ENTER/WATCH, daily cron refresh (same as atlas.html).', usage: '/atlas_track medicare advantage' },
+        { cmd: '/atlas_scan',   desc: 'WHITESPACE one-shot — instant Meta + TikTok angle discovery (no daily memory).', usage: '/atlas_scan medicare advantage' },
       ],
     },
     'wiring_voice': {
@@ -775,7 +776,7 @@ Or just ask me anything - I understand natural language!`;
         reply_markup: {
           inline_keyboard: [
             [{ text: '🔬 Research (3)', callback_data: 'menu:wiring_research' }],
-            [{ text: '🎯 Atlas (4)', callback_data: 'menu:wiring_atlas' }],
+            [{ text: '🎯 Atlas (5)', callback_data: 'menu:wiring_atlas' }],
             [{ text: '🎙️ Voice & Content (5)', callback_data: 'menu:wiring_voice' }],
             [{ text: '📬 Outreach & CRM (17)', callback_data: 'menu:wiring_pipeline' }],
             [{ text: '📋 Back to Menu', callback_data: 'menu:main' }],
@@ -1298,6 +1299,7 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
   bot.command('atlas',       async (ctx) => { const { runAtlasMove } = await import('./atlas-command'); await runAtlasMove(ctx); });
   bot.command('atlas_export', async (ctx) => { const { runAtlasExport } = await import('./atlas-command'); await runAtlasExport(ctx); });
   bot.command('atlas_brief', async (ctx) => { const { runAtlasBrief } = await import('./atlas-command'); await runAtlasBrief(ctx); });
+  bot.command('atlas_track', async (ctx) => { const { runAtlasTrack } = await import('./atlas-command'); await runAtlasTrack(ctx); });
   bot.command('atlas_scan',  async (ctx) => { const { runAtlasScan } = await import('./atlas-command'); await runAtlasScan(ctx); });
 
   // /campaign - Voice Growth Engine: reply to a voice note to publish a full bilingual campaign (additive, gated)
