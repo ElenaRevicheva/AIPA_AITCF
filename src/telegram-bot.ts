@@ -598,6 +598,10 @@ Type /menu for all commands! 🚀
         { cmd: '/research_company',    desc: '🔥 NEW (hackathon) — Autonomous Claude + Bright Data research on a prospect. Returns founder, pain signals, decision-maker, sendable pitch angle, HOT/WARM/COLD verdict. ~90s.', usage: '/research_company decircle.io\n/research_company Acme.ai' },
         { cmd: '/research_employer',   desc: '🎯 NEW (hackathon) — Same agent, employer mode. Recent funding, hiring patterns, tech stack, comp signals, application angle for you.', usage: '/research_employer Cresta\n/research_employer Anthropic' },
         { cmd: '/research_competitor', desc: '📚 NEW (hackathon) — Same agent, SEO/AEO competitor gap analysis. Returns top-ranking content + 3-5 blog topic gaps for your daily publisher.', usage: '/research_competitor brain.fm\n/research_competitor manny-santos.com' },
+        { cmd: '/atlas_move',       desc: '🎯 Atlas TODAY\'S MOVE — one ranked recommendation from live ad libraries: vertical, ENTER/WATCH angle, confidence, reason. Closes the loop to campaign export.', usage: '/atlas_move\n/atlas_move auto_insurance\n/atlas_export expat_language' },
+        { cmd: '/atlas_export',     desc: '📦 Atlas campaign export — hook, headline, visual, CTA, landing angle, why Atlas picked it. Copy-paste into Meta Ads Manager.', usage: '/atlas_export auto_insurance\n/atlas_export expat_language' },
+        { cmd: '/atlas_brief',      desc: '🌐 Full Atlas daily brief — all tracked verticals + MOVE/AVOID. Same as the 9 AM Panama push.', usage: '/atlas_brief' },
+        { cmd: '/atlas_scan',       desc: '🔍 Atlas whitespace finder — live Meta + TikTok scan for any vertical you type (~90s in browser).', usage: '/atlas_scan medicare advantage\n/atlas_scan AI language tutor' },
         { cmd: '/campaign',       desc: '🎙️ NEW — Voice Growth Engine. Reply to any voice note with /campaign → it transcribes + translates (Speechmatics), writes a bilingual blog (EN+ES) + LinkedIn + Instagram posts, publishes the blog + drips LinkedIn via Buffer, all UTM-tagged into HubSpot. Speak once, market everywhere.', usage: 'Send a voice note, then reply to it with:\n/campaign' },
         { cmd: '/podcast',        desc: '🎧 Podcast from your voice. Reply to a voice note/long audio with /podcast → language auto-detect (EN/ES/RU). 🌐 Speak RUSSIAN and it translates + POLISHES your idea into a tech-savvy English episode, narrates it (TTS), and publishes it. English audio publishes in your natural voice. Always: show notes + chapters + clips + bilingual blog + social, UTM-tagged. Want your natural voice as-is (any language)? Use /podcast raw.', usage: 'Send a voice note, then reply to it with:\n/podcast\n— or to publish your natural voice unchanged:\n/podcast raw' },
         { cmd: '/podcast_ai',     desc: '🤖🎧 NEW — AI-narrated episode from a topic. Claude writes a script → OpenAI voices it → Speechmatics transcribes for captions/chapters → publishes episode + blog + social. Hands-free, no recording needed.', usage: '/podcast_ai why attribution beats activity for solo founders' },
@@ -1209,6 +1213,12 @@ New (uncontacted): ${newLeads.length}${highLeadsList}${trialSection}
   bot.command('research_company',    async (ctx) => { await runResearchTelegram(ctx, 'client',     'research_company'); });
   bot.command('research_employer',   async (ctx) => { await runResearchTelegram(ctx, 'employer',   'research_employer'); });
   bot.command('research_competitor', async (ctx) => { await runResearchTelegram(ctx, 'competitor', 'research_competitor'); });
+
+  bot.command('atlas_move',  async (ctx) => { const { runAtlasMove } = await import('./atlas-command'); await runAtlasMove(ctx); });
+  bot.command('atlas',       async (ctx) => { const { runAtlasMove } = await import('./atlas-command'); await runAtlasMove(ctx); });
+  bot.command('atlas_export', async (ctx) => { const { runAtlasExport } = await import('./atlas-command'); await runAtlasExport(ctx); });
+  bot.command('atlas_brief', async (ctx) => { const { runAtlasBrief } = await import('./atlas-command'); await runAtlasBrief(ctx); });
+  bot.command('atlas_scan',  async (ctx) => { const { runAtlasScan } = await import('./atlas-command'); await runAtlasScan(ctx); });
 
   // /campaign - Voice Growth Engine: reply to a voice note to publish a full bilingual campaign (additive, gated)
   bot.command('campaign', async (ctx) => { const { runVoiceCampaign } = await import('./voice-campaign-command'); await runVoiceCampaign(ctx); });
