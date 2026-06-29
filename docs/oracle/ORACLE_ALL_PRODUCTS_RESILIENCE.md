@@ -400,6 +400,21 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
+## Last Verified (June 29, 2026) — EspaLuz PagueloFacil + Access Control
+
+| Agent | Status | Change |
+|-------|--------|--------|
+| **EspaLuz WhatsApp** | ✅ Live | PagueloFacil `pagar` (shared webhook), help menu payment section, iron-clad access gate, trial + PF expiry reminders. PayPangea removed. Repo: [EspaLuzWhatsApp](https://github.com/ElenaRevicheva/EspaLuzWhatsApp). Status doc: `docs/CURRENT_STATUS_JUNE29.md`. |
+| **EspaLuz Telegram** | ✅ Live | Fixed `is_subscribed()` (removed 7-day grace + default allow). `enforce_learning_access()` on voice/text/photo. Same reminder + pause logic via `espaluz_paypal_system.py`. Repo: [EspaLuzFamilybot](https://github.com/ElenaRevicheva/EspaLuzFamilybot). |
+| **Payment webhooks** | ✅ Live | Shared `espaluz_paguelofacil.py` — `WA:` / `TG:` user keys, `paguelofacil_payments.json`, `https://webhook.aideazz.xyz/paguelofacil-webhook`. systemd `espaluz-payments-webhook`. |
+| **Git on Oracle** | ✅ PAT auth | `git fetch origin main` works for all private repos via `GITHUB_TOKEN` in `cto-aipa/.env`. Deploy code: `git checkout origin/main -- <files>` (avoid blind pull — runtime JSON drift). Script: `scripts/oracle-resilience/oracle-fix-git-https-auth.sh`. |
+
+**Deploy rule (unchanged):** canonical local clone → push GitHub → Oracle `git fetch` + checkout specific files → `systemctl restart espaluz-whatsapp espaluz-familybot espaluz-payments-webhook`.
+
+**Docs updated:** `EspaLuzFamilybot/docs/CURRENT_STATUS_JUNE26.md`, `docs/SWOT_ANALYSIS_ESPALUZ.md`, `EspaLuzWhatsApp/docs/CURRENT_STATUS_JUNE29.md`.
+
+---
+
 ## Last Verified (June 16, 2026) — Fleet-wide Claude model-retirement fix
 
 **June 15–16 2026: Anthropic decommissioned the May-2025 model IDs `claude-sonnet-4-20250514` and `claude-opus-4-20250514` (also older `claude-3-5-*`, `claude-3-*`, `claude-2*`, `claude-instant*`).** Every agent hardcoding them got `404 not_found_error` (a *fallback-class* failure — silent until you read logs). Swept the entire fleet; all fixed + deployed + verified live.
