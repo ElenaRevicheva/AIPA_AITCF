@@ -1,0 +1,674 @@
+"""
+EspaLuz Advanced Features Module
+================================
+- Housing/Apartment Listings
+- Business English for Locals
+- Learning Preference Tracking
+- Proactive Follow-ups
+
+PURELY ADDITIVE - Does not modify existing functionality.
+"""
+
+import logging
+import json
+import re
+from datetime import datetime, timedelta
+from typing import Optional, Dict, List, Any
+import os
+
+# Database connection (reuse existing)
+try:
+    import psycopg2
+    DB_AVAILABLE = True
+except ImportError:
+    DB_AVAILABLE = False
+
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
+
+
+# =============================================================================
+# 1. HOUSING/APARTMENT LISTINGS
+# =============================================================================
+
+# Sample housing data by country (can be replaced with real API later)
+HOUSING_LISTINGS = {
+    "panama": {
+        "areas": ["Punta Pacífica", "Costa del Este", "San Francisco", "Casco Viejo", "El Cangrejo", "Clayton"],
+        "avg_rent": {
+            "studio": "$600-900/month",
+            "1br": "$800-1,200/month", 
+            "2br": "$1,000-1,800/month",
+            "3br": "$1,500-3,000/month",
+            "house": "$2,000-5,000/month"
+        },
+        "websites": [
+            "compreoalquile.com",
+            "encuentra24.com",
+            "facebook.com/marketplace",
+            "gogetit.com.pa"
+        ],
+        "tips": [
+            "Negotiate rent - 10-15% off is common",
+            "Ask about 'gastos comunes' (HOA fees)",
+            "Check water pressure and A/C condition",
+            "Furnished apartments include utilities sometimes",
+            "First month + deposit + last month typical"
+        ],
+        "phrases": {
+            "looking": "Busco apartamento para alquilar / I'm looking for an apartment to rent",
+            "price": "¿Cuánto es el alquiler mensual? / How much is monthly rent?",
+            "deposit": "¿Cuánto es el depósito? / How much is the deposit?",
+            "utilities": "¿Los servicios están incluidos? / Are utilities included?",
+            "furnished": "¿Viene amueblado? / Is it furnished?",
+            "available": "¿Cuándo está disponible? / When is it available?",
+            "contract": "¿Cuánto tiempo es el contrato? / How long is the contract?"
+        }
+    },
+    "mexico": {
+        "areas": ["Polanco", "Roma Norte", "Condesa", "Santa Fe", "Coyoacán", "Del Valle"],
+        "avg_rent": {
+            "studio": "$400-700/month",
+            "1br": "$500-1,000/month",
+            "2br": "$700-1,500/month", 
+            "3br": "$1,000-2,500/month",
+            "house": "$1,500-4,000/month"
+        },
+        "websites": [
+            "inmuebles24.com",
+            "segundamano.mx",
+            "metroscubicos.com",
+            "vivanuncios.com.mx"
+        ],
+        "tips": [
+            "Ask for 'amueblado' if you need furniture",
+            "CDMX has rental laws protecting tenants",
+            "Check earthquake safety of building",
+            "Verify water supply schedule in your area"
+        ],
+        "phrases": {
+            "looking": "Busco departamento en renta",
+            "price": "¿Cuál es la renta mensual?",
+            "deposit": "¿Cuánto es el depósito de garantía?",
+            "utilities": "¿Incluye servicios?",
+            "furnished": "¿Está amueblado?",
+            "available": "¿Cuándo puedo mudarme?"
+        }
+    },
+    "colombia": {
+        "areas": ["Chapinero", "Zona Rosa", "Usaquén", "El Poblado (Medellín)", "Laureles", "Cartagena Centro"],
+        "avg_rent": {
+            "studio": "$300-500/month",
+            "1br": "$400-800/month",
+            "2br": "$600-1,200/month",
+            "3br": "$800-2,000/month"
+        },
+        "websites": [
+            "fincaraiz.com.co",
+            "metrocuadrado.com",
+            "properati.com.co",
+            "ciencuadras.com"
+        ],
+        "tips": [
+            "Check 'estrato' (1-6) - affects utility costs",
+            "Higher estrato = higher utility rates",
+            "Ask about 'administración' (building fees)",
+            "Furnished = 'amoblado'"
+        ],
+        "phrases": {
+            "looking": "Estoy buscando apartamento en arriendo",
+            "price": "¿Cuánto es el canon de arrendamiento?",
+            "estrato": "¿Qué estrato es? / What estrato is it?"
+        }
+    }
+}
+
+
+def get_housing_help(country: str) -> str:
+    """Get housing/apartment information for a country."""
+    country_lower = country.lower().replace(' ', '_')
+    
+    if country_lower not in HOUSING_LISTINGS:
+        # Default response for countries without specific data
+        return f"""🏠 *HOUSING HELP*
+
+For {country.title()}, I recommend:
+
+📱 *Search Websites:*
+• Facebook Marketplace
+• Local real estate websites
+• Expat Facebook groups
+
+📝 *Key Phrases:*
+• "Busco apartamento" = I'm looking for an apartment
+• "¿Cuánto es el alquiler?" = How much is the rent?
+• "¿Incluye servicios?" = Are utilities included?
+
+💡 Ask locals for neighborhood recommendations!
+"""
+    
+    data = HOUSING_LISTINGS[country_lower]
+    
+    response = f"🏠 *APARTMENT HUNTING - {country.upper()}*\n\n"
+    
+    # Popular areas
+    response += "📍 *Popular Areas:*\n"
+    for area in data['areas'][:6]:
+        response += f"• {area}\n"
+    
+    # Average rent
+    response += "\n💰 *Average Rent:*\n"
+    for apt_type, price in data['avg_rent'].items():
+        response += f"• {apt_type.upper()}: {price}\n"
+    
+    # Websites
+    response += "\n🌐 *Search Websites:*\n"
+    for site in data['websites'][:4]:
+        response += f"• {site}\n"
+    
+    # Tips
+    response += "\n💡 *Tips:*\n"
+    for tip in data['tips'][:4]:
+        response += f"• {tip}\n"
+    
+    # Key phrases
+    response += "\n📝 *Useful Phrases:*\n"
+    for key, phrase in list(data['phrases'].items())[:5]:
+        response += f"• {phrase}\n"
+    
+    response += "\n💬 Need help with a specific area or budget?"
+    
+    return response
+
+
+# =============================================================================
+# 2. BUSINESS ENGLISH FOR LOCALS
+# =============================================================================
+
+BUSINESS_ENGLISH = {
+    "modules": {
+        "customer_service": {
+            "title": "Customer Service English",
+            "phrases": {
+                "greeting": ("How may I help you today?", "¿En qué puedo ayudarle?"),
+                "wait": ("Please wait a moment", "Por favor espere un momento"),
+                "understand": ("Let me make sure I understand", "Déjeme asegurarme de entender"),
+                "apologize": ("I apologize for the inconvenience", "Disculpe las molestias"),
+                "thank": ("Thank you for your patience", "Gracias por su paciencia"),
+                "anything_else": ("Is there anything else I can help you with?", "¿Hay algo más en que pueda ayudarle?")
+            }
+        },
+        "hospitality": {
+            "title": "Hotel & Restaurant English",
+            "phrases": {
+                "welcome": ("Welcome to our hotel/restaurant", "Bienvenido a nuestro hotel/restaurante"),
+                "reservation": ("Do you have a reservation?", "¿Tiene reservación?"),
+                "room": ("Your room is ready", "Su habitación está lista"),
+                "menu": ("Here is our menu", "Aquí tiene nuestro menú"),
+                "recommend": ("I would recommend the...", "Le recomendaría el/la..."),
+                "bill": ("Here is your bill", "Aquí está su cuenta"),
+                "enjoy": ("Enjoy your stay/meal", "Disfrute su estadía/comida")
+            }
+        },
+        "retail": {
+            "title": "Retail & Sales English",
+            "phrases": {
+                "help": ("Can I help you find something?", "¿Puedo ayudarle a encontrar algo?"),
+                "size": ("What size are you looking for?", "¿Qué talla busca?"),
+                "color": ("We have it in other colors", "Lo tenemos en otros colores"),
+                "price": ("The price is...", "El precio es..."),
+                "discount": ("We have a special discount today", "Tenemos un descuento especial hoy"),
+                "card": ("Will that be cash or card?", "¿Será efectivo o tarjeta?"),
+                "receipt": ("Here's your receipt", "Aquí está su recibo")
+            }
+        },
+        "phone": {
+            "title": "Phone & Email English",
+            "phrases": {
+                "answer": ("Good morning/afternoon, [Company] speaking", "Buenos días/tardes, habla [Empresa]"),
+                "hold": ("May I put you on hold?", "¿Puedo ponerle en espera?"),
+                "transfer": ("I'll transfer you to...", "Le transfiero con..."),
+                "message": ("May I take a message?", "¿Puedo tomar un mensaje?"),
+                "email_start": ("Dear Mr./Ms. [Name]", "Estimado/a Sr./Sra. [Nombre]"),
+                "email_end": ("Best regards", "Atentamente / Saludos cordiales")
+            }
+        }
+    }
+}
+
+
+def get_business_english(topic: str = None) -> str:
+    """Get Business English module content."""
+    
+    if not topic:
+        # Return overview of all modules
+        response = "💼 *BUSINESS ENGLISH FOR PROFESSIONALS*\n\n"
+        response += "Choose a module:\n\n"
+        
+        for key, module in BUSINESS_ENGLISH['modules'].items():
+            response += f"📚 *{module['title']}*\n"
+            response += f"   Type: business {key}\n\n"
+        
+        response += "💡 Example: Type 'business customer service'\n"
+        response += "Or 'business hotel' for hospitality phrases"
+        return response
+    
+    # Find matching module
+    topic_lower = topic.lower()
+    matched_module = None
+    
+    for key, module in BUSINESS_ENGLISH['modules'].items():
+        if key in topic_lower or topic_lower in module['title'].lower():
+            matched_module = (key, module)
+            break
+    
+    if not matched_module:
+        return get_business_english()  # Return overview if no match
+    
+    key, module = matched_module
+    
+    response = f"💼 *{module['title'].upper()}*\n\n"
+    response += "📝 *Essential Phrases:*\n\n"
+    
+    for phrase_key, (english, spanish) in module['phrases'].items():
+        response += f"🇬🇧 \"{english}\"\n"
+        response += f"🇪🇸 {spanish}\n\n"
+    
+    response += "💡 Practice these with voice messages!\n"
+    response += "I'll help you with pronunciation."
+    
+    return response
+
+
+# =============================================================================
+# 3. LEARNING PREFERENCES
+# =============================================================================
+
+DEFAULT_PREFERENCES = {
+    "learning_style": "balanced",  # visual, auditory, kinesthetic, balanced
+    "pace": "moderate",  # slow, moderate, fast
+    "focus_areas": [],  # grammar, vocabulary, pronunciation, conversation, motivational
+    "preferred_topics": [],  # travel, business, daily_life, culture
+    "voice_responses": True,
+    "video_responses": True,
+    "correction_style": "gentle",  # gentle, direct, detailed
+    "session_length": "medium",  # short (5min), medium (15min), long (30min+)
+    "reminders_enabled": False,
+    "daily_goal_minutes": 10
+}
+
+
+def get_user_preferences(user_id: str) -> Dict[str, Any]:
+    """Get user's learning preferences from database."""
+    if not DB_AVAILABLE or not DATABASE_URL:
+        return DEFAULT_PREFERENCES.copy()
+    
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT preferences FROM user_learning_preferences 
+            WHERE user_id = %s
+        """, (user_id,))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        
+        if result and result[0]:
+            prefs = DEFAULT_PREFERENCES.copy()
+            prefs.update(result[0])
+            return prefs
+        return DEFAULT_PREFERENCES.copy()
+    except Exception as e:
+        logging.error(f"Error getting preferences: {e}")
+        return DEFAULT_PREFERENCES.copy()
+
+
+def save_user_preferences(user_id: str, preferences: Dict[str, Any]) -> bool:
+    """Save user's learning preferences to database."""
+    if not DB_AVAILABLE or not DATABASE_URL:
+        return False
+    
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO user_learning_preferences (user_id, preferences, updated_at)
+            VALUES (%s, %s, NOW())
+            ON CONFLICT (user_id) DO UPDATE SET 
+                preferences = EXCLUDED.preferences,
+                updated_at = NOW()
+        """, (user_id, json.dumps(preferences)))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        logging.error(f"Error saving preferences: {e}")
+        return False
+
+
+def get_preferences_menu() -> str:
+    """Get the learning preferences setup menu."""
+    return """⚙️ *PERSONALIZE YOUR LEARNING*
+
+Tell me your preferences and I'll adapt!
+
+📚 *Learning Style:*
+• "I learn better by hearing" → More audio
+• "I prefer reading" → More text
+• "Show me examples" → More visual
+
+⏱️ *Pace:*
+• "Go slower please"
+• "I can handle faster"
+• "This pace is good"
+
+🎯 *Focus Areas:*
+• "Focus on grammar"
+• "More vocabulary"
+• "Help my pronunciation"
+• "Practice conversations"
+• "Motivational" or "Give me motivational messages"
+
+✅ *Corrections:*
+• "Be gentle with corrections"
+• "Correct me directly"
+• "Explain my mistakes in detail"
+
+💡 Just tell me naturally and I'll remember!
+Example: "I prefer slow pace with lots of audio"
+"""
+
+
+def _contains_preference_term(text: str, terms: List[str]) -> bool:
+    """Match whole words/phrases so e.g. 'kind' does not match 'kinder'."""
+    for term in terms:
+        if ' ' in term:
+            if term in text:
+                return True
+        elif re.search(r'\b' + re.escape(term) + r'\b', text):
+            return True
+    return False
+
+
+def parse_preference_update(text: str) -> Optional[Dict[str, Any]]:
+    """Parse natural language preference updates."""
+    text_lower = text.lower()
+    updates = {}
+    
+    # Pace
+    if _contains_preference_term(text_lower, ['slower', 'slow down', 'más lento']):
+        updates['pace'] = 'slow'
+    elif _contains_preference_term(text_lower, ['faster', 'quicker', 'más rápido']):
+        updates['pace'] = 'fast'
+    
+    # Learning style
+    if _contains_preference_term(text_lower, ['hearing', 'audio', 'listen', 'escuchar']):
+        updates['learning_style'] = 'auditory'
+    elif _contains_preference_term(text_lower, ['reading', 'text', 'visual', 'leer']):
+        updates['learning_style'] = 'visual'
+    
+    # Correction style
+    if _contains_preference_term(text_lower, ['gentle', 'suave', 'kind']):
+        updates['correction_style'] = 'gentle'
+    elif _contains_preference_term(text_lower, ['direct', 'directo', 'straight']):
+        updates['correction_style'] = 'direct'
+    elif _contains_preference_term(text_lower, ['detail', 'explain', 'explicar']):
+        updates['correction_style'] = 'detailed'
+    
+    # Focus areas
+    if _contains_preference_term(text_lower, ['grammar', 'gramática']):
+        updates.setdefault('focus_areas', []).append('grammar')
+    if _contains_preference_term(text_lower, ['vocabulary', 'vocabulario']):
+        updates.setdefault('focus_areas', []).append('vocabulary')
+    if _contains_preference_term(text_lower, ['pronunciation', 'pronunciación']):
+        updates.setdefault('focus_areas', []).append('pronunciation')
+    if _contains_preference_term(text_lower, ['conversation', 'conversación']):
+        updates.setdefault('focus_areas', []).append('conversation')
+    if _contains_preference_term(text_lower, ['motivation', 'motivational', 'motivación', 'motivadora', 'motivador']):
+        updates.setdefault('focus_areas', []).append('motivational')
+    
+    return updates if updates else None
+
+
+# =============================================================================
+# 4. PROACTIVE FOLLOW-UPS
+# =============================================================================
+
+def save_followup_event(user_id: str, event_type: str, event_details: str, followup_date: datetime) -> bool:
+    """Save an event that needs follow-up."""
+    if not DB_AVAILABLE or not DATABASE_URL:
+        return False
+    
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO user_followups (user_id, event_type, event_details, followup_date, status, created_at)
+            VALUES (%s, %s, %s, %s, 'pending', NOW())
+        """, (user_id, event_type, event_details, followup_date))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        logging.error(f"Error saving followup: {e}")
+        return False
+
+
+def get_pending_followups(user_id: str) -> List[Dict]:
+    """Get pending follow-ups for a user."""
+    if not DB_AVAILABLE or not DATABASE_URL:
+        return []
+    
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT event_type, event_details, followup_date 
+            FROM user_followups 
+            WHERE user_id = %s AND status = 'pending' AND followup_date <= NOW()
+            ORDER BY followup_date ASC
+        """, (user_id,))
+        results = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        return [
+            {"type": r[0], "details": r[1], "date": r[2]}
+            for r in results
+        ]
+    except Exception as e:
+        logging.error(f"Error getting followups: {e}")
+        return []
+
+
+def detect_followup_opportunity(text: str) -> Optional[Dict]:
+    """Detect if user mentions something worth following up on."""
+    text_lower = text.lower()
+    
+    # Doctor/medical appointment
+    if any(word in text_lower for word in ['doctor', 'médico', 'hospital', 'appointment', 'cita']):
+        if any(word in text_lower for word in ['going', 'have', 'tomorrow', 'mañana', 'today', 'hoy']):
+            return {
+                "type": "medical",
+                "followup_delay_hours": 24,
+                "message": "How did your doctor appointment go? / ¿Cómo te fue en la cita médica? 🏥"
+            }
+    
+    # Job interview
+    if any(word in text_lower for word in ['interview', 'entrevista', 'job']):
+        return {
+            "type": "job_interview",
+            "followup_delay_hours": 48,
+            "message": "How did your interview go? I'm curious! / ¿Cómo te fue en la entrevista? 💼"
+        }
+    
+    # Moving/apartment
+    if any(word in text_lower for word in ['moving', 'mudanza', 'apartment', 'apartamento', 'move in']):
+        return {
+            "type": "moving",
+            "followup_delay_hours": 72,
+            "message": "How's the new place? All settled in? / ¿Cómo está el nuevo lugar? 🏠"
+        }
+    
+    # School enrollment
+    if any(word in text_lower for word in ['school', 'escuela', 'enrollment', 'inscripción']):
+        return {
+            "type": "school",
+            "followup_delay_hours": 168,  # 1 week
+            "message": "How are things going at the new school? / ¿Cómo van las cosas en la escuela? 📚"
+        }
+    
+    # Trip/travel
+    if any(word in text_lower for word in ['trip', 'viaje', 'traveling', 'vacation', 'vacaciones']):
+        return {
+            "type": "travel",
+            "followup_delay_hours": 72,
+            "message": "How was your trip? Tell me about it! / ¿Cómo estuvo el viaje? 🌎"
+        }
+    
+    return None
+
+
+def generate_followup_response(followup: Dict) -> str:
+    """Generate a caring follow-up message."""
+    return f"💙 *Just checking in...*\n\n{followup['message']}\n\nI remember you mentioned this and wanted to see how everything went!"
+
+
+# =============================================================================
+# MAIN PROCESSING FUNCTIONS
+# =============================================================================
+
+def is_housing_request(text: str) -> bool:
+    """Check if message is about housing/apartments."""
+    text_lower = text.lower()
+    triggers = [
+        'housing', 'apartment', 'rent', 'alquiler', 'apartamento',
+        'vivienda', 'help housing', 'help rent', 'busco apartamento',
+        'looking for apartment', 'where to live'
+    ]
+    return any(trigger in text_lower for trigger in triggers)
+
+
+def is_business_english_request(text: str) -> bool:
+    """Check if message is about business English."""
+    text_lower = text.lower()
+    triggers = [
+        'business english', 'inglés de negocios', 'work english',
+        'professional english', 'customer service english',
+        'hotel english', 'retail english', 'phone english',
+        'business customer', 'business hotel', 'business retail'
+    ]
+    return any(trigger in text_lower for trigger in triggers)
+
+
+def is_preferences_request(text: str) -> bool:
+    """Check if user wants to set preferences."""
+    text_lower = text.lower()
+    triggers = [
+        'my preferences', 'mis preferencias', 'learning style',
+        'personalize', 'personalizar', 'settings', 'configuración',
+        'how i learn', 'cómo aprendo'
+    ]
+    return any(trigger in text_lower for trigger in triggers)
+
+
+def process_advanced_features(text: str, user_id: str, user_data: dict) -> Optional[str]:
+    """
+    Main entry point for advanced features.
+    Returns response or None if not an advanced feature request.
+    """
+    # Housing request
+    if is_housing_request(text):
+        country = user_data.get('country', 'panama')
+        return get_housing_help(country)
+    
+    # Business English
+    if is_business_english_request(text):
+        # Extract topic if specified
+        text_lower = text.lower()
+        topic = None
+        for keyword in ['customer', 'hotel', 'hospitality', 'retail', 'phone', 'email']:
+            if keyword in text_lower:
+                topic = keyword
+                break
+        return get_business_english(topic)
+    
+    # Learning preferences
+    if is_preferences_request(text):
+        return get_preferences_menu()
+    
+    # Check for preference updates in natural conversation
+    pref_updates = parse_preference_update(text)
+    if pref_updates:
+        current_prefs = get_user_preferences(user_id)
+        current_prefs.update(pref_updates)
+        if save_user_preferences(user_id, current_prefs):
+            response = "✅ Got it! I've noted your preferences:\n"
+            for key, value in pref_updates.items():
+                response += f"• {key.replace('_', ' ').title()}: {value}\n"
+            response += "\nI'll adapt my teaching accordingly! 🎯"
+            return response
+    
+    # Detect follow-up opportunities (save silently, don't interrupt)
+    followup = detect_followup_opportunity(text)
+    if followup:
+        followup_date = datetime.now() + timedelta(hours=followup['followup_delay_hours'])
+        save_followup_event(user_id, followup['type'], text[:200], followup_date)
+        # Don't return anything - let normal conversation continue
+    
+    return None
+
+
+# =============================================================================
+# DATABASE SETUP (Run once to create tables)
+# =============================================================================
+
+def setup_advanced_tables():
+    """Create database tables for advanced features."""
+    if not DB_AVAILABLE or not DATABASE_URL:
+        return False
+    
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        
+        # Learning preferences table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS user_learning_preferences (
+                user_id VARCHAR(50) PRIMARY KEY,
+                preferences JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            )
+        """)
+        
+        # Follow-ups table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS user_followups (
+                id SERIAL PRIMARY KEY,
+                user_id VARCHAR(50),
+                event_type VARCHAR(50),
+                event_details TEXT,
+                followup_date TIMESTAMP,
+                status VARCHAR(20) DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        """)
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        logging.info("✅ Advanced features tables created")
+        return True
+    except Exception as e:
+        logging.error(f"Error creating tables: {e}")
+        return False
+
+
+# Auto-setup tables on import
+try:
+    setup_advanced_tables()
+except:
+    pass
