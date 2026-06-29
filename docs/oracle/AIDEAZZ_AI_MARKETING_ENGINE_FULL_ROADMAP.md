@@ -1,5 +1,5 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: May 18, 2026 (v20.0 — **Blog 404 resolved** (`/blog/post/:slug` Oracle endpoint + `BlogPost.tsx` parallel-fetch Dev.to + backend fallback); **fire-and-forget `/hashnode/daily-run`** (202 immediate, Opus runs background — no more nginx 60s timeout); **i18n Hashnode → Dev.to** (EN + ES footer/link strings); **topic dedup** (`getPublishedTopicIndices()` + `excludedIndices` in `pickTopicWithGscGap` — no more date-suffix titles); **dynamic sitemap** (`pushSitemapToGithub()` commits fresh `sitemap.xml` to `ElenaRevicheva/aideazz` after every publish; 4everland auto-deploys); **AI crawlers maxed** (9 new entries → 28 total explicit `robots.txt` signals). Prior: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: June 29, 2026 (v21.0 — **Atlas ↔ AIdeazz performance bridge** — closed-loop outcome tracking without rewriting Atlas capture/classify/brief/ship; **UTM tags + `concept_id`** on every Atlas export; Oracle **`atlas_performance_events`** ledger; **`POST /cto/api/performance-event`** + **`GET /cto/api/atlas-performance`** on CTO AIPA; Atlas UI reads aggregated ROAS/CPA/leads when hub is wired; **`scripts/sync-atlas-business-leads.mjs`** ingests `business_leads` where `utm_campaign LIKE 'atlas_%'`). Prior: May 18, 2026 (v20.0 — **Blog 404 resolved** (`/blog/post/:slug` Oracle endpoint + `BlogPost.tsx` parallel-fetch Dev.to + backend fallback); **fire-and-forget `/hashnode/daily-run`** (202 immediate, Opus runs background — no more nginx 60s timeout); **i18n Hashnode → Dev.to** (EN + ES footer/link strings); **topic dedup** (`getPublishedTopicIndices()` + `excludedIndices` in `pickTopicWithGscGap` — no more date-suffix titles); **dynamic sitemap** (`pushSitemapToGithub()` commits fresh `sitemap.xml` to `ElenaRevicheva/aideazz` after every publish; 4everland auto-deploys); **AI crawlers maxed** (9 new entries → 28 total explicit `robots.txt` signals). Prior: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
@@ -24,6 +24,66 @@
 
 ---
 
+## ✅ UPDATE — June 29, 2026 — Atlas performance bridge (detect → create → **measure**)
+
+> Headline: **Atlas still does public-ad-library intelligence; AIdeazz now owns the outcome ledger.** No rewrite of capture → classify → brief → concept → ship. A thin sidecar connects the two products on stable join keys.
+
+**Problem solved:** Atlas ranked hypotheses and shipped test-ready creative, but had **no performance truth** (public ad libraries expose no spend/CTR/ROAS). Phase 3 UTM plumbing existed on `aideazz.xyz`, but Atlas campaigns had no standard tags to correlate back.
+
+**What shipped (additive only):**
+
+| Layer | Repo | What | Status |
+|-------|------|------|--------|
+| **Tracking tags** | [`atlas-shifted`](https://github.com/ElenaRevicheva/atlas-shifted) `b72064f` | Every concept gets `tracking.concept_id` (`{vertical}_{snapshot_date}`), `utm_campaign=atlas_{vertical}`, `utm_content={angle}`; **Export test** includes landing URL + ingest URL | ✅ Live |
+| **Performance ledger** | **AIPA_AITCF** `ef25645` | Oracle table **`atlas_performance_events`**; ingest via **`POST https://webhook.aideazz.xyz/cto/api/performance-event`** (Bearer **`OUTREACH_SECRET`**); read via **`GET /cto/api/atlas-performance`** | ✅ Live |
+| **Atlas UI panel** | atlas-shifted | `/api/atlas` merges performance when **`ATLAS_PERFORMANCE_SECRET`** wired (copied from CTO **`OUTREACH_SECRET`** by `scripts/wire-atlas-performance-env.sh`) | ✅ Live when secret set |
+| **Lead adapter** | AIPA_AITCF | **`scripts/sync-atlas-business-leads.mjs`** — posts `business_leads` with `utm_campaign=atlas_*` as `metrics.leads=1` | ✅ Ready (run on Oracle) |
+
+**Architecture (sidecar, not merge):**
+
+```
+Atlas (unchanged)          AIdeazz fleet (existing + new ledger)
+─────────────────          ─────────────────────────────────────
+public ads → creative  →   GA4 · business_leads · postbacks · ads API
+       │                   POST /api/performance-event
+       └── concept_id + UTM tags on export
+                           ↓
+                    atlas_performance_events (Oracle)
+                           ↓ read-only
+                    Atlas concept card: spend / ROAS / leads
+```
+
+**Honest scope:** This is **Phase 3 extension + Phase 5 outcome labeling** for Atlas — not a performance guarantee. Guarantees require spend + conversion volume under controlled tests. Next adapters (not yet built): GA4 nightly sync by `utm_campaign`, Meta/Google Ads API read cron, affiliate postback webhook.
+
+**How to verify:**
+
+1. Open [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) → any concept with creative → see **Track:** line with `concept_id` + landing link.
+2. **Export test** → file includes **TRACKING** block with UTM params.
+3. POST a test event:
+   ```bash
+   curl -X POST https://webhook.aideazz.xyz/cto/api/performance-event \
+     -H "Authorization: Bearer $OUTREACH_SECRET" \
+     -H "Content-Type: application/json" \
+     -d '{"source":"manual","concept_id":"ai_marketing_studios_2026-06-28","vertical":"ai_marketing_studios","angle_id":"pain_point","metrics":{"spend":50,"clicks":120,"conversions":3,"revenue":180}}'
+   ```
+4. Refresh Atlas → concept card shows **AIdeazz performance** block (ROAS/CPA when spend + revenue present).
+5. On Oracle: `cd ~/cto-aipa && node scripts/sync-atlas-business-leads.mjs` after form leads use `utm_campaign=atlas_*`.
+
+**Env (Oracle):**
+
+```bash
+# whitespace/.env (auto-wired by deploy script from cto-aipa OUTREACH_SECRET)
+ATLAS_PERFORMANCE_HUB_URL=https://webhook.aideazz.xyz/cto/api/atlas-performance
+ATLAS_PERFORMANCE_SECRET=<same as OUTREACH_SECRET>
+
+# Optional landing base for UTM links in export
+ATLAS_LANDING_BASE=https://aideazz.xyz
+```
+
+**Commits:** atlas-shifted `b72064f` · AIPA_AITCF `ef25645`
+
+---
+
 ## ✅ VERIFIED IN PRODUCTION — June 20, 2026
 
 > The **honest, log-verified status** — what actually fires in production, with real numbers, not aspirations. Method: grepped the *action* log lines (not setup lines) + live endpoints + DB counts — code presence is not proof. Read this first; the phase tables below are the build history.
@@ -34,7 +94,8 @@
 | **Phase 2 — Content engine** | ✅ **Loaded** | **47 posts** cached, daily cadence (Jun 13→19), **68 real Dev.to cross-posts** with live URLs |
 | **CRM ingest (HubSpot)** | ✅✅ **Strongly loaded — the workhorse** | **721 leads pushed, 1,075 deals created** (real object IDs; multi-source: HN + GitHub + Places + SERP) |
 | **Phase 5 — Lead triage** | ✅ **Loaded (light use)** | Real cycle verified: **8 processed, 5 urgent**; classifies + ranks + Telegram brief |
-| **Phase 3 — Attribution** | ⚠️ **Plumbing only — empty in practice** | `business_leads` + UTM columns ready, but **0 real inbound leads captured** — no inbound traffic yet to attribute. Demand-gated, not a code bug. |
+| **Phase 3 — Attribution** | ⚠️ **Plumbing only — empty in practice** | `business_leads` + UTM columns ready, but **0 real inbound leads captured** — no inbound traffic yet to attribute. Demand-gated, not a code bug. **Jun 29:** Atlas bridge adds **`utm_campaign=atlas_*`** standard + performance ledger — ready when paid traffic uses tagged landing URLs. |
+| **Atlas Shifted — performance bridge** | ✅ **Loaded (Jun 29)** | Sidecar connect: **`atlas_performance_events`**, **`/api/performance-event`**, UTM export tags, UI panel on concept cards. Detect→create unchanged; measure layer additive. |
 | **Phase 4 — Outbound** | ⚠️ **Partial — fires, but 0 conversion** | **168 targets** pooled, **54 emails sent, 0 replies**; sends intermittently with ~5–6 errors/cycle, currently quiet ("0 actionable signals"). Auth mostly passes (DKIM ✓, SPF via `send.aideazz.xyz` ✓, alignment ✓; **DMARC missing**) → likely delivered, so the 0-reply is a **targeting + copy** problem, not deliverability. Jun 20: added Hunter email-enrichment for website-but-no-email leads (commit `6ca67bc`) — but Hunter is **dormant** (logs show 0 real `hunter.io` calls; YC source exhausted = static 20-company list, all already ingested; pool emails come from HN/GitHub text-extraction). Jun 21: **DMARC published** (`_dmarc.aideazz.xyz`, `p=none`, Cloudflare-managed `rua` — verified live); **fixed dead `OUTREACH_FROM`** (was the non-existent `elena@aideazz.xyz` → replies bounced; now the real `aipa@aideazz.xyz`). **Resend confirms all 54 sends "Delivered"** → 0-reply is a **targeting+copy** problem, not deliverability. **Strategic call: do NOT invest in outbound** — lean into content/GEO (warm inbound) + the job search, where the verified engine is the proof. |
 | **Phase 6 — Showcase** | ✅ **Exists** | Portfolio + `/pitch.html` live; this doc is the engineer-facing version |
 
@@ -78,6 +139,7 @@ This block is for the **next engineer** (Claude Code, Cursor, human): **verifiab
 | **GitHub webhook + Groq** | **AIPA_AITCF** `src/cto-aipa.ts` — `reviewCode()` | **Standard reviews** use Groq inside **try/catch** with **`timeout: 120s`**, **`maxRetries: 0`**. On any failure (including **429** / rate limit), **fallback to Claude Haiku** via `CODE_REVIEW_FALLBACK_MODEL` (default `claude-3-5-haiku-20241022`, overridable in `.env`). **Critical (Opus) path** also wrapped: try Opus → Haiku → **static-analysis-only stub** so the handler never leaves an unhandled rejection that kills a **PM2 cluster worker**. | Previously, Groq errors from **push/PR webhooks** could take down the same Node process as **lead triage** (shared Groq quota). **Atuona / `atuona-creative-ai.ts` was not modified** — surgical change only in code review. |
 | **Env** | `.env.example` | Documented optional **`CODE_REVIEW_FALLBACK_MODEL`**. | Same Haiku default as triage fallback — predictable ops. |
 | **Phase 5 HTTP + ops** | AIPA_AITCF | **`POST /leads/triage-run`** — default **202** + background triage; sync JSON with **`?wait=1`** or **`npm run triage:fire`** + **`TRIAGE_FIRE_WAIT=1`**. **`GET /leads/dashboard`** — if `LEAD_TRIAGE_SECRET` is set, opening the URL **without** `?secret=` shows a small **HTML unlock form** (not a bare 401); bookmark **`?secret=…`** or use Bearer automation. On Oracle, **`TRIAGE_SKIP_GROQ`** → Haiku-only triage (saves **Groq** quota for Hashnode / code review). | Avoids proxy socket hang-up; humans can open the dashboard from a phone without hand-building query strings. |
+| **Atlas performance bridge (Jun 29, 2026)** | **AIPA_AITCF** + **atlas-shifted** | **`POST /api/performance-event`** → Oracle **`atlas_performance_events`**; **`GET /api/atlas-performance`**; Atlas **`tracking`** + export UTM block; UI performance panel on concept cards. Auth: **`OUTREACH_SECRET`**. Adapters: **`sync-atlas-business-leads.mjs`**. | Closes detect→create→**measure** loop without merging codebases. Same hub pattern as **`/api/crm-event`**. |
 | **GSC “duplicate canonical”** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** repo (not AIPA_AITCF) | Removed the **static** `<link rel="canonical" href="https://aideazz.xyz/" />` from root **`index.html`** (it made every crawled URL look like `https://aideazz.xyz/` before JS ran). **Homepage** now sets canonical in **`src/pages/Index.tsx`** via `useEffect`, same pattern as `/about`, `/blog`, `/portfolio`. | Fixes Search Console confusion when Google reads HTML first on SPA deploys (IPFS/4everland). Deploy **4everland** from `main` after pull. |
 | **SPA meta — one module (Apr 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/seo.ts` + pages | **`applyPageSeo()`** sets `document.title`, `meta[name=description]`, OG + Twitter, canonical, `og:site_name`, optional `robots`. **`applyHomePageSeo()`** reapplies strings matching **`index.html`** when **`/`** mounts — fixes meta staying on **portfolio** copy after client-side navigation home. **`BusinessCard`** previously only updated description if a tag existed; now always ensured. **`NotFound`**: `noindex, follow` + short description. Commit on `main`: centralize; **no duplicate** `setMeta` blocks across `About` / `Blog*` / `Portfolio`. | Audits that only read static HTML still see **`index.html`** for first paint; after JS, **DevTools → Elements → `<head>`** or **[opengraph.xyz](https://www.opengraph.xyz/)** on the full URL proves per-route tags. Deploy **4everland** from `main`. Details: [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026). |
 | **Sitemap + apex + robots (Apr 2026)** | **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `scripts/generate-sitemap.mjs`, `public/robots.txt`, `package.json` build | **`npm run build`** = **`node scripts/generate-sitemap.mjs`** (static routes + **live Hashnode** slugs via public GraphQL → **`/blog/{slug}`** on **`aideazz.xyz`**) → **`vite build`** → **`verify-seo.mjs`**. Pretty-printed **`sitemap.xml`** / **`sitemap.txt`**. **`robots.txt`**: comment on **apex canonical**; **`Disallow: /.gitignore`** (mitigate stray indexing). Internal links standardized from **`www.aideazz.xyz`** → **`https://aideazz.xyz`**. **`BlogPost`**: default **`alt`** for markdown **`img`** without alt. **`index.html`**: HTML comment on apex + `seo.ts`. | Google can discover **on-domain blog URLs** in sitemap (not only Hashnode). **Still manual:** **301 `www` → apex** at DNS/host if both exist; **GSC** URL removal for **`/.gitignore`** if previously indexed. If **`/sitemap.xml` returned 500**, redeploy from `main` and retest gateway. Details: [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026). |
@@ -431,13 +493,15 @@ The first three rows are Phase 3 only. The last three rows are a **cross-phase s
 |---|---|---|
 | Phase 3: UTM + inquiry pipeline | **COMPLETE** | **aideazz:** `InquiryForm` — UTM from URL → `POST https://webhook.aideazz.xyz/cto/marketing/inquiry-proxy` (no Bearer in browser). **CTO AIPA (Oracle):** `business_leads` in Oracle; `POST /marketing/inquiry` (Bearer) for automation; `POST /marketing/inquiry-proxy` (Origin allowlist for `aideazz.xyz` / `www`, honeypot `company`, per-IP rate limit). **Weekly Telegram digest** of new leads (optional env). **Docs:** `docs/oracle/CTO_AIPA_PUBLIC_HTTPS.md`. |
 | Phase 3b: Email notifications | **COMPLETE** | **Resend** via `RESEND_API_KEY`. Team inbox: `MARKETING_INQUIRY_NOTIFY_TO` (default `aipa@aideazz.xyz`). Submitter gets confirmation email when address is valid. **Sender:** `MARKETING_INQUIRY_FROM` — production uses verified **`AIdeazz <aipa@aideazz.xyz>`** (same domain pattern as VibeJobHunter). Implementation: `src/marketing-notify.ts`. |
-| Phase 3c: reCAPTCHA Enterprise + inquiry | **COMPLETE (production)** | **Verified Apr 2026:** end-to-end form submit on `https://aideazz.xyz` → Oracle `POST /marketing/inquiry-proxy` → `business_leads` + Resend team email (`[AIdeazz] Inquiry — …`). **Why it was hard:** initial key lived in GCP project `aideazz-177575763145287` (no console access); API key was created in **`aideazz-1775763145287`** — Enterprise **CreateAssessment** must use the **same** project as the reCAPTCHA **site key** + an API key from that project. Classic `siteverify` + `api.js` also failed for Enterprise-only keys. **What we did:** (1) Registered a **new** reCAPTCHA Enterprise key in **`aideazz-1775763145287`** (domains `aideazz.xyz`, `www.aideazz.xyz`; site key id `6LcHda8sAAAAAAGwl5alB2xdX_6Dqve5a5vifoHj`). (2) **Credentials** in that project: API key restricted to **reCAPTCHA Enterprise API**. (3) **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `src/lib/recaptcha.ts`: load **`https://www.google.com/recaptcha/enterprise.js?render=…`**, **`grecaptcha.enterprise.execute`** with action **`inquiry`** (not classic `api.js` / `grecaptcha.execute`). **`VITE_RECAPTCHA_SITE_KEY`** in `.env.production` + deploy **4everland** from `main`. (4) **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** `src/marketing-notify.ts`: **`verifyRecaptchaEnterprise`** → `recaptchaenterprise.googleapis.com/.../assessments?key=…`; optional fallback to classic **`siteverify`**; verification can run with **Enterprise-only** env (no legacy secret required when `RECAPTCHA_ENTERPRISE_PROJECT_ID` + `RECAPTCHA_ENTERPRISE_API_KEY` + `RECAPTCHA_SITE_KEY` are set). **Oracle** `~/cto-aipa/.env`: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_ENTERPRISE_PROJECT_ID=aideazz-1775763145287`, `RECAPTCHA_ENTERPRISE_API_KEY`; optional `RECAPTCHA_SECRET_KEY`; optional `RECAPTCHA_MIN_SCORE` (default **0.1** in code). **`pm2 restart cto-aipa --update-env`**. **Docs:** `.env.example` in both repos. |
+| Phase 3c: reCAPTCHA Enterprise + inquiry | **COMPLETE (production)** | **Verified Apr 2026:** end-to-end form submit on `https://aideazz.xyz` → Oracle `POST /marketing/inquiry-proxy` → `business_leads` + Resend team email (`[AIdeazz] Inquiry — …`). Enterprise key in **`aideazz-1775763145287`**; **[aideazz](https://github.com/ElenaRevicheva/aideazz)** `recaptcha.ts` + **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** `marketing-notify.ts`. **`pm2 restart cto-aipa --update-env`**. |
+| Phase 3d: Atlas performance bridge | **COMPLETE (Jun 29, 2026)** | **[atlas-shifted](https://github.com/ElenaRevicheva/atlas-shifted)** emits **`concept_id` + UTM block** on export (`utm_campaign=atlas_{vertical}`). **[AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF)** **`POST /api/performance-event`** writes **`atlas_performance_events`**; **`GET /api/atlas-performance`** aggregates spend/clicks/conversions/revenue/ROAS for Atlas UI. Same auth as fleet hub: **`OUTREACH_SECRET`**. Lead adapter: **`scripts/sync-atlas-business-leads.mjs`**. Wire: **`whitespace/scripts/wire-atlas-performance-env.sh`**. Does **not** replace public-library radar — labels outcomes after tests run. |
 **How to check Phase 3 (non-dev guide):**
 1. Open **https://aideazz.xyz** → scroll to the bottom → find the **contact/inquiry form** → fill it out with YOUR OWN email as a test. Put “TEST from Elena” in the message.
 2. Check your email inbox — you should receive a confirmation email from `AIdeazz <aipa@aideazz.xyz>` within 1–2 minutes. If you got it, the email notification works.
 3. Check the CTO AIPA Telegram bot — you should also get a Telegram notification about the new inquiry.
 4. To verify UTM tracking: add `?utm_source=test&utm_campaign=selfcheck` to the URL before visiting the form. Example: `https://aideazz.xyz?utm_source=test&utm_campaign=selfcheck` → then fill the form. The inquiry in Oracle should capture those UTM values.
 5. To see ALL leads: open **https://webhook.aideazz.xyz/cto/leads/dashboard** → enter your secret to unlock → any form submissions (including your test) should appear in the list.
+6. **Atlas bridge (Jun 29):** run an Atlas campaign landing URL with `utm_campaign=atlas_{vertical}` (from **Export test** on [atlas.html](https://webhook.aideazz.xyz/whitespace/atlas.html)) → submit inquiry → `node ~/cto-aipa/scripts/sync-atlas-business-leads.mjs` → refresh Atlas concept card for performance totals.
 
 | Phase 4: Founder Outreach Pipeline | **COMPLETE (verified send path)** | Real Resend + Oracle; see “Phase 4 outreach — what is actually working” and Phase 4 section below. |
 | Phase 5: Lead Triage | **OPERATIONAL (Apr 2026)** | Oracle **`lead_triage`** + **`agent_outcomes`**; sources **`business_leads`** (site inquiries) + **`outreach_log`** (replies). Classification: **Groq** `llama-3.3-70b-versatile` → **Claude Haiku** fallback (**`TRIAGE_FALLBACK_MODEL`** / **`TRIAGE_SKIP_GROQ`**); **Sonnet** optional refine for high urgency. **`/leads/triage-status`**, **`POST /leads/triage-run`** (202 async or **`?wait=1`** sync), **`GET /leads/dashboard`** (unlock form or **`?secret=`**), Telegram **`/triage`**, cron **`TRIAGE_CRON`**. **Webhook hardening:** **`reviewCode`** → Haiku on Groq failure — shared process with triage. |
@@ -1182,6 +1246,7 @@ Social Prospect   →  Engaged  →  Qualified  →  Proposal Sent  →  Closed 
 | Priority | Agent | Effort | What to build | Status |
 |----------|-------|--------|---------------|--------|
 | **1** | CTO AIPA — `/api/crm-event` endpoint | Low | Accept POSTs from other agents; validate + dedup + write to HubSpot; log to `crm_event_log` | ✅ Live (May 14–15) |
+| **1b** | CTO AIPA — `/api/performance-event` (Atlas bridge) | Low | Ingest spend/conversion/leads by `concept_id`; aggregate for Atlas UI; same Bearer as CRM hub | ✅ Live (Jun 29, 2026) |
 | **2** | Algom Alpha — keyword stream → CRM | Medium | In `index.js` `startFilteredStream()`: on keyword match, `fetch('/api/crm-event', …)` with tweet context | ✅ Live — `pushProspectToCRM()` in `stream-listener.js` |
 | **3** | VJH — hiring companies → CRM | Medium | In LangGraph pipeline after job parse: POST company domain + job title to CRM hub | ✅ Live — `src/langgraph_pipeline/crm_hub.py` |
 | **4** | BrightData enrichment | Medium | `src/brightdata-enrich.ts` — scrape company sites for founder/stack/funding before Claude pain classification | ✅ Live — zone `web_unlocker1`, max 10/run, 1 req/s throttle |
@@ -1200,6 +1265,13 @@ OUTREACH_SECRET=<shared_secret>
 # In VibeJobHunterAIPA_AIMCF .env
 CTO_AIPA_CRM_URL=https://webhook.aideazz.xyz/cto/api/crm-event
 OUTREACH_SECRET=<shared_secret>
+
+# Atlas performance ingest (any adapter: manual, GA4 cron, postback, sync-atlas-business-leads)
+ATLAS_PERFORMANCE_INGEST_URL=https://webhook.aideazz.xyz/cto/api/performance-event
+
+# whitespace/.env (Atlas read-only — wired by scripts/wire-atlas-performance-env.sh)
+ATLAS_PERFORMANCE_HUB_URL=https://webhook.aideazz.xyz/cto/api/atlas-performance
+ATLAS_PERFORMANCE_SECRET=<same OUTREACH_SECRET>
 ```
 
 ### Expected outcome
