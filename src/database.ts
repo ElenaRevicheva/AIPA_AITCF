@@ -1277,6 +1277,192 @@ async function initAgentOutcomesTable(): Promise<void> {
   }
 }
 
+// ============================================================
+// Atlas performance bridge — links Atlas concept_id → outcomes
+// ============================================================
+
+async function initAtlasPerformanceTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE atlas_performance_events (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          concept_id VARCHAR2(120) NOT NULL,
+          vertical VARCHAR2(80) NOT NULL,
+          angle_id VARCHAR2(80),
+          source VARCHAR2(64) NOT NULL,
+          metrics CLOB NOT NULL,
+          period_start VARCHAR2(16),
+          period_end VARCHAR2(16),
+          notes CLOB,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE INDEX atlas_perf_concept_idx ON atlas_performance_events (concept_id)';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE INDEX atlas_perf_vertical_idx ON atlas_performance_events (vertical)';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ atlas_performance_events table ready');
+  } catch (err) {
+    console.error('atlas_performance_events table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+export interface AtlasPerformanceMetrics {
+  spend?: number;
+  impressions?: number;
+  clicks?: number;
+  conversions?: number;
+  revenue?: number;
+  sessions?: number;
+  leads?: number;
+}
+
+async function saveAtlasPerformanceEvent(payload: {
+  concept_id: string;
+  vertical: string;
+  angle_id?: string;
+  source: string;
+  metrics: AtlasPerformanceMetrics;
+  period_start?: string;
+  period_end?: string;
+  notes?: string;
+}): Promise<string | null> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `INSERT INTO atlas_performance_events (concept_id, vertical, angle_id, source, metrics, period_start, period_end, notes)
+       VALUES (:concept_id, :vertical, :angle_id, :source, :metrics, :period_start, :period_end, :notes)
+       RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        concept_id: payload.concept_id.slice(0, 120),
+        vertical: payload.vertical.slice(0, 80),
+        angle_id: payload.angle_id?.slice(0, 80) || null,
+        source: payload.source.slice(0, 64),
+        metrics: JSON.stringify(payload.metrics || {}),
+        period_start: payload.period_start || null,
+        period_end: payload.period_end || null,
+        notes: payload.notes || null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 },
+      },
+      { autoCommit: true },
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds?.id?.[0] || null;
+  } catch (err) {
+    console.error('saveAtlasPerformanceEvent error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+function sumMetrics(rows: Array<{ metrics: AtlasPerformanceMetrics }>): AtlasPerformanceMetrics & {
+  roas: number | null;
+  cpa: number | null;
+  event_count: number;
+} {
+  const t = { spend: 0, impressions: 0, clicks: 0, conversions: 0, revenue: 0, sessions: 0, leads: 0 };
+  for (const r of rows) {
+    const m = r.metrics || {};
+    t.spend += Number(m.spend) || 0;
+    t.impressions += Number(m.impressions) || 0;
+    t.clicks += Number(m.clicks) || 0;
+    t.conversions += Number(m.conversions) || 0;
+    t.revenue += Number(m.revenue) || 0;
+    t.sessions += Number(m.sessions) || 0;
+    t.leads += Number(m.leads) || 0;
+  }
+  const roas = t.spend > 0 && t.revenue > 0 ? Math.round((t.revenue / t.spend) * 100) / 100 : null;
+  const convBase = t.conversions || t.leads;
+  const cpa = t.spend > 0 && convBase > 0 ? Math.round((t.spend / convBase) * 100) / 100 : null;
+  return { ...t, roas, cpa, event_count: rows.length };
+}
+
+async function getAtlasPerformanceSummary(filters: { vertical?: string; concept_id?: string; limit?: number } = {}) {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const binds: Record<string, string> = {};
+    let sql = `SELECT concept_id, vertical, angle_id, source, metrics, period_start, period_end, notes,
+                      TO_CHAR(created_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS created_at
+               FROM atlas_performance_events WHERE 1=1`;
+    if (filters.vertical) {
+      sql += ' AND vertical = :vertical';
+      binds.vertical = filters.vertical;
+    }
+    if (filters.concept_id) {
+      sql += ' AND concept_id = :concept_id';
+      binds.concept_id = filters.concept_id;
+    }
+    const lim = Math.min(Math.max(filters.limit || 500, 1), 2000);
+    sql += ` ORDER BY created_at DESC FETCH FIRST ${lim} ROWS ONLY`;
+
+    const result = await connection.execute(sql, binds, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+    const raw = (result.rows || []) as Array<{
+      CONCEPT_ID: string;
+      VERTICAL: string;
+      ANGLE_ID: string | null;
+      SOURCE: string;
+      METRICS: string;
+      CREATED_AT: string;
+    }>;
+
+    const concepts: Record<
+      string,
+      {
+        vertical: string;
+        angle_id: string | null;
+        totals: ReturnType<typeof sumMetrics>;
+        events: Array<{ source: string; created_at: string; metrics: AtlasPerformanceMetrics }>;
+      }
+    > = {};
+
+    for (const row of raw) {
+      let metrics: AtlasPerformanceMetrics = {};
+      try {
+        metrics = JSON.parse(row.METRICS || '{}');
+      } catch {
+        metrics = {};
+      }
+      const cid = row.CONCEPT_ID;
+      if (!concepts[cid]) {
+        concepts[cid] = { vertical: row.VERTICAL, angle_id: row.ANGLE_ID, totals: sumMetrics([]), events: [] };
+      }
+      concepts[cid].events.push({ source: row.SOURCE, created_at: row.CREATED_AT, metrics });
+      concepts[cid].totals = sumMetrics(concepts[cid].events.map((e) => ({ metrics: e.metrics })));
+    }
+
+    return { ok: true, concepts };
+  } catch (err) {
+    console.error('getAtlasPerformanceSummary error:', err);
+    return { ok: false, concepts: {} };
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function saveAgentOutcome(
   agentName: string,
   actionType: string,
@@ -2502,6 +2688,7 @@ async function getOutreachDrafts(): Promise<any[]> {
     await initConversationContextTable();
     await initKnowledgeBaseTable();
     await initAgentOutcomesTable();
+    await initAtlasPerformanceTable();
     await initContentLogTable();
     await initEspaluzFunnelTable();
     await initOutreachTargetsTable();
@@ -2908,6 +3095,9 @@ export {
   verifyAgentOutcome,
   getAgentOutcomes,
   getOutcomeSummary,
+  // Atlas performance bridge
+  saveAtlasPerformanceEvent,
+  getAtlasPerformanceSummary,
   // Content log — marketing publishes (Daily blog: dev.to + aideazz.xyz)
   saveContentLog,
   getRecentContentLogs,

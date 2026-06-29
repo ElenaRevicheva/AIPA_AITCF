@@ -2345,6 +2345,67 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
     }
   });
 
+  // POST /api/performance-event — Atlas + fleet adapters ingest spend/conversion outcomes
+  // Auth: Bearer OUTREACH_SECRET
+  // Body: { source, concept_id, vertical, angle_id?, metrics, period_start?, period_end?, notes? }
+  app.post('/api/performance-event', outreachAuth, async (req: Request, res: Response) => {
+    try {
+      const { source, concept_id, vertical, angle_id, metrics, period_start, period_end, notes } = req.body as {
+        source?: string;
+        concept_id?: string;
+        vertical?: string;
+        angle_id?: string;
+        metrics?: Record<string, number>;
+        period_start?: string;
+        period_end?: string;
+        notes?: string;
+      };
+      if (!source || !concept_id || !vertical || !metrics || typeof metrics !== 'object') {
+        res.status(400).json({ error: 'source, concept_id, vertical, and metrics are required' });
+        return;
+      }
+      const { saveAtlasPerformanceEvent, saveAgentOutcome } = await import('./database');
+      const id = await saveAtlasPerformanceEvent({
+        source,
+        concept_id,
+        vertical,
+        ...(angle_id ? { angle_id } : {}),
+        metrics,
+        ...(period_start ? { period_start } : {}),
+        ...(period_end ? { period_end } : {}),
+        ...(notes ? { notes } : {}),
+      });
+      if (!id) {
+        res.status(500).json({ error: 'failed to persist performance event' });
+        return;
+      }
+      await saveAgentOutcome('atlas', 'performance_event', { source, concept_id, vertical, angle_id, metrics }, 'verified_delivered', {
+        event_id: id,
+      });
+      res.json({ ok: true, id });
+    } catch (e: unknown) {
+      console.error('[performance-event] error:', e);
+      res.status(500).json({ error: String((e as Error)?.message || e) });
+    }
+  });
+
+  // GET /api/atlas-performance — read-only summary for Atlas UI (server-side secret)
+  app.get('/api/atlas-performance', outreachAuth, async (req: Request, res: Response) => {
+    try {
+      const vertical = typeof req.query.vertical === 'string' ? req.query.vertical.trim() : undefined;
+      const concept_id = typeof req.query.concept_id === 'string' ? req.query.concept_id.trim() : undefined;
+      const { getAtlasPerformanceSummary } = await import('./database');
+      const summary = await getAtlasPerformanceSummary({
+        ...(vertical ? { vertical } : {}),
+        ...(concept_id ? { concept_id } : {}),
+      });
+      res.json(summary);
+    } catch (e: unknown) {
+      console.error('[atlas-performance] error:', e);
+      res.status(500).json({ error: String((e as Error)?.message || e) });
+    }
+  });
+
   const PORT = 3000;
   const baseUrl = process.env.CTO_AIPA_PUBLIC_URL || `http://0.0.0.0:${PORT}`;
   app.listen(PORT, '0.0.0.0', () => {
@@ -2397,6 +2458,7 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
     startMarketingWeeklyDigest();
     if (process.env.OUTREACH_SECRET?.trim()) {
       console.log(`📧 Outreach pipeline: ${baseUrl}/outreach/* (Bearer OUTREACH_SECRET)`);
+      console.log(`📊 Atlas performance: POST ${baseUrl}/api/performance-event · GET ${baseUrl}/api/atlas-performance`);
 
       // Prospect ingestion: 2 PM Panama (before outreach send at 3 PM)
       const ingestCronExpr = process.env.INGEST_CRON || '0 14 * * *';
