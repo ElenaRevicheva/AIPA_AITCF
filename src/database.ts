@@ -1400,6 +1400,65 @@ function sumMetrics(rows: Array<{ metrics: AtlasPerformanceMetrics }>): AtlasPer
   return { ...t, roas, cpa, event_count: rows.length };
 }
 
+async function hasAtlasLeadEventForBusinessLead(leadId: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT COUNT(*) AS cnt FROM atlas_performance_events
+       WHERE source = 'aideazz_leads' AND notes = :notes`,
+      { notes: `business_leads id ${leadId}` },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT },
+    );
+    const row = (result.rows?.[0] || {}) as { CNT?: number; cnt?: number };
+    return Number(row.CNT ?? row.cnt ?? 0) > 0;
+  } catch (err) {
+    console.error('hasAtlasLeadEventForBusinessLead error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getAtlasBusinessLeadsForSync(limit = 200): Promise<
+  Array<{
+    id: string;
+    utm_campaign: string;
+    utm_term: string | null;
+    utm_content: string | null;
+    created_at: Date;
+  }>
+> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) AS id, utm_campaign, utm_term, utm_content, created_at
+       FROM business_leads
+       WHERE utm_campaign LIKE 'atlas_%'
+       ORDER BY created_at DESC
+       FETCH FIRST :lim ROWS ONLY`,
+      { lim: limit },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT },
+    );
+    return (result.rows || []).map((raw) => {
+      const row = raw as Record<string, unknown>;
+      return {
+        id: String(row.ID ?? row.id),
+        utm_campaign: String(row.UTM_CAMPAIGN ?? row.utm_campaign),
+        utm_term: (row.UTM_TERM ?? row.utm_term) as string | null,
+        utm_content: (row.UTM_CONTENT ?? row.utm_content) as string | null,
+        created_at: (row.CREATED_AT ?? row.created_at) as Date,
+      };
+    });
+  } catch (err) {
+    console.error('getAtlasBusinessLeadsForSync error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 async function getAtlasPerformanceSummary(filters: { vertical?: string; concept_id?: string; limit?: number } = {}) {
   let connection;
   try {
@@ -3098,6 +3157,8 @@ export {
   // Atlas performance bridge
   saveAtlasPerformanceEvent,
   getAtlasPerformanceSummary,
+  hasAtlasLeadEventForBusinessLead,
+  getAtlasBusinessLeadsForSync,
   // Content log — marketing publishes (Daily blog: dev.to + aideazz.xyz)
   saveContentLog,
   getRecentContentLogs,

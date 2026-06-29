@@ -3,7 +3,7 @@
  * Sync business_leads with utm_campaign=atlas_* → atlas_performance_events.
  * Run on Oracle: node scripts/sync-atlas-business-leads.mjs
  *
- * Counts each lead as metrics.leads=1 (deduped by lead id per day).
+ * Prefer utm_term (concept_id) when present; dedupes by business_leads id in notes.
  */
 import 'dotenv/config';
 import oracledb from 'oracledb';
@@ -23,6 +23,30 @@ if (!SECRET) {
   process.exit(1);
 }
 
+function conceptFromUtm(campaign, utmTerm, utmContent, createdAt) {
+  const vertical = campaign.replace(/^atlas_/, '');
+  let concept_id = (utmTerm || '').trim();
+  if (!/^[a-z0-9_]+_\d{4}-\d{2}-\d{2}$/.test(concept_id)) {
+    const day =
+      createdAt instanceof Date
+        ? createdAt.toISOString().slice(0, 10)
+        : String(createdAt).slice(0, 10);
+    concept_id = `${vertical}_${day}`;
+  }
+  return { concept_id, vertical, angle_id: utmContent || undefined };
+}
+
+async function alreadySynced(conn, leadId) {
+  const r = await conn.execute(
+    `SELECT COUNT(*) AS cnt FROM atlas_performance_events
+     WHERE source = 'aideazz_leads' AND notes = :notes`,
+    { notes: `business_leads id ${leadId}` },
+    { outFormat: oracledb.OUT_FORMAT_OBJECT },
+  );
+  const row = r.rows?.[0] || {};
+  return Number(row.CNT ?? row.cnt ?? 0) > 0;
+}
+
 async function main() {
   const conn = await oracledb.getConnection({
     user: process.env.DB_USER,
@@ -30,37 +54,39 @@ async function main() {
     connectionString: process.env.DB_SERVICE_NAME,
   });
   const r = await conn.execute(
-    `SELECT id, utm_campaign, utm_content, utm_source, created_at
+    `SELECT RAWTOHEX(id) AS id, utm_campaign, utm_term, utm_content, utm_source, created_at
      FROM business_leads
      WHERE utm_campaign LIKE 'atlas_%'
      ORDER BY created_at DESC FETCH FIRST 200 ROWS ONLY`,
     [],
     { outFormat: oracledb.OUT_FORMAT_OBJECT },
   );
-  await conn.close();
 
-  const rows = (r.rows || []) as Array<{
-    ID: string;
-    UTM_CAMPAIGN: string;
-    UTM_CONTENT: string | null;
-    UTM_SOURCE: string | null;
-    CREATED_AT: Date;
-  }>;
-
+  const rows = r.rows || [];
   let ok = 0;
   for (const row of rows) {
-    const vertical = row.UTM_CAMPAIGN.replace(/^atlas_/, '');
-    const day = row.CREATED_AT instanceof Date ? row.CREATED_AT.toISOString().slice(0, 10) : String(row.CREATED_AT).slice(0, 10);
-    const concept_id = `${vertical}_${day}`;
+    const leadId = String(row.ID ?? row.id);
+    if (await alreadySynced(conn, leadId)) continue;
+
+    const { concept_id, vertical, angle_id } = conceptFromUtm(
+      row.UTM_CAMPAIGN,
+      row.UTM_TERM,
+      row.UTM_CONTENT,
+      row.CREATED_AT,
+    );
+    const day =
+      row.CREATED_AT instanceof Date
+        ? row.CREATED_AT.toISOString().slice(0, 10)
+        : String(row.CREATED_AT).slice(0, 10);
     const body = {
       source: 'aideazz_leads',
       concept_id,
       vertical,
-      angle_id: row.UTM_CONTENT || undefined,
+      angle_id,
       metrics: { leads: 1 },
       period_start: day,
       period_end: day,
-      notes: `business_leads id ${row.ID}`,
+      notes: `business_leads id ${leadId}`,
     };
     const res = await fetch(`${HUB}/api/performance-event`, {
       method: 'POST',
@@ -70,7 +96,8 @@ async function main() {
     if (res.ok) ok++;
     else console.warn('skip', concept_id, await res.text());
   }
-  console.log(`synced ${ok}/${rows.length} atlas lead events`);
+  await conn.close();
+  console.log(`synced ${ok}/${rows.length} atlas lead events (${rows.length - ok} skipped or failed)`);
 }
 
 main().catch((e) => {

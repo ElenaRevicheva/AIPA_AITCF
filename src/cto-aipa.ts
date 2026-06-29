@@ -1258,6 +1258,21 @@ async function startCTOAIPA() {
     if (page_url !== undefined) emailFields.page_url = page_url;
     scheduleMarketingInquiryEmails(id, emailFields);
 
+    if (utm_campaign?.startsWith('atlas_')) {
+      setImmediate(() => {
+        import('./atlas-lead-sync')
+          .then(m =>
+            m.recordAtlasLeadFromInquiry({
+              leadId: id,
+              utm_campaign,
+              utm_term: utm_term ?? null,
+              utm_content: utm_content ?? null,
+            }),
+          )
+          .catch(e => console.error('[atlas-lead] inquiry sync error:', e));
+      });
+    }
+
     // Push to HubSpot as [CLIENT] deal — hottest lead signal (person filled the form)
     setImmediate(async () => {
       try {
@@ -1518,6 +1533,22 @@ async function startCTOAIPA() {
     if (utm_campaign !== undefined) proxyEmailFields.utm_campaign = utm_campaign;
     if (page_url !== undefined) proxyEmailFields.page_url = page_url;
     scheduleMarketingInquiryEmails(id, proxyEmailFields);
+
+    if (utm_campaign?.startsWith('atlas_')) {
+      setImmediate(() => {
+        import('./atlas-lead-sync')
+          .then(m =>
+            m.recordAtlasLeadFromInquiry({
+              leadId: id,
+              utm_campaign,
+              utm_term: utm_term ?? null,
+              utm_content: utm_content ?? null,
+            }),
+          )
+          .catch(e => console.error('[atlas-lead] inquiry sync error:', e));
+      });
+    }
+
     res.json({ ok: true, id });
   });
 
@@ -2505,6 +2536,18 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       } catch (e) { console.error('🎯 [cron] Triage error:', e); }
     }, { timezone: triageTz });
     console.log(`🎯 Triage cron: "${triageCronExpr}" (${triageTz}) — daily lead brief`);
+
+    const atlasLeadCronExpr = process.env.ATLAS_LEAD_SYNC_CRON || '15 * * * *';
+    cron.schedule(
+      atlasLeadCronExpr,
+      () => {
+        import('./atlas-lead-sync')
+          .then(m => m.syncAllAtlasBusinessLeads())
+          .catch(e => console.error('[atlas-lead] cron sync error:', e));
+      },
+      { timezone: triageTz },
+    );
+    console.log(`📊 Atlas lead sync cron: "${atlasLeadCronExpr}" (${triageTz}) — business_leads utm_campaign=atlas_*`);
 
     const sprintCronExpr = process.env.SPRINT_BRIEFING_CRON?.trim();
     if (sprintCronExpr && process.env.SPRINT_BRIEFING_SECRET?.trim()) {
