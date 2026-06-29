@@ -510,6 +510,57 @@ export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: 
   return { ok: true, reason: 'qualified: reachable + active buying intent' };
 }
 
+/** EspaLuz TG/WA users — product trials, not CTO client prospects. Bypass client gate. */
+export async function pushEspaLuzDealToHubSpot(input: {
+  channel: 'telegram' | 'whatsapp';
+  userId: string;
+  context?: string;
+  atlasConceptId?: string;
+  accessType?: string;
+}): Promise<{ contactId: string | null; dealId: string | null } | null> {
+  if (!HS_KEY()) {
+    console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping EspaLuz CRM push');
+    return null;
+  }
+  const ch = input.channel === 'whatsapp' ? 'WA' : 'TG';
+  const dealName = `[ESPALUZ] ${ch} ${input.userId} — trial`;
+  try {
+    const existing = await findDealByName(dealName);
+    const contactId = await upsertContact({
+      firstName: 'EspaLuz',
+      lastName: `${ch} ${input.userId}`,
+      source: `espaluz_${input.channel}`,
+    });
+    if (existing?.id) {
+      console.log(`[HubSpot] EspaLuz deal exists (${existing.id}): ${dealName}`);
+      if (contactId) await associateDealContact(existing.id, contactId);
+      return { contactId, dealId: existing.id };
+    }
+    const description = [
+      input.context,
+      input.accessType ? `Access: ${input.accessType}` : null,
+      input.atlasConceptId ? `Atlas concept: ${input.atlasConceptId}` : null,
+      `Channel: ${input.channel}`,
+      `User ID: ${input.userId}`,
+    ]
+      .filter(Boolean)
+      .join('\n');
+    const dealId = await createDeal({
+      name: dealName,
+      stage: HS_STAGES.prospected,
+      dealType: 'newbusiness',
+      description: description || undefined,
+    });
+    if (dealId && contactId) await associateDealContact(dealId, contactId);
+    if (dealId && description) await addNoteToDeal(dealId, description);
+    console.log(`[HubSpot] EspaLuz deal created: ${dealName}`);
+    return { contactId, dealId };
+  } catch (err) {
+    console.error('[HubSpot] pushEspaLuzDealToHubSpot error:', err);
+    return null;
+  }
+}
+
 /**
  * Full pipeline: Contact → Company → Deal → Associations → Note.
  * Safe to call multiple times — upserts prevent duplicates.

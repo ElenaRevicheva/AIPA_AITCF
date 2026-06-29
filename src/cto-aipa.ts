@@ -1633,6 +1633,25 @@ async function startCTOAIPA() {
                 .catch(e => console.error('[atlas-lead] espaluz trial sync error:', e));
             });
           }
+          setImmediate(() => {
+            import('./hubspot-client')
+              .then(m =>
+                m.pushEspaLuzDealToHubSpot({
+                  channel,
+                  userId: String(data?.user_id || 'unknown'),
+                  ...(typeof data?.first_message === 'string' ? { context: data.first_message } : {}),
+                  ...(typeof data?.atlas_concept_id === 'string'
+                    ? { atlasConceptId: data.atlas_concept_id }
+                    : typeof data?.utm_term === 'string'
+                      ? { atlasConceptId: data.utm_term }
+                      : {}),
+                  ...(typeof data?.access_type === 'string'
+                    ? { accessType: data.access_type }
+                    : { accessType: action }),
+                }),
+              )
+              .catch(e => console.error('[espaluz-crm] HubSpot push error:', e));
+          });
           res.json({ ok: true, action: 'user_upserted_as_trial' });
 
         } else if (action === 'payment_received' || action === 'subscription_activated') {
@@ -2238,7 +2257,7 @@ async function startCTOAIPA() {
       }
 
       const {
-        pushLeadToHubSpot, pushHiringDealToHubSpot, HS_STAGES,
+        pushLeadToHubSpot, pushHiringDealToHubSpot, pushEspaLuzDealToHubSpot, HS_STAGES,
       } = await import('./hubspot-client');
 
       let result: { contactId: string | null; companyId: string | null; dealId: string | null } | null = null;
@@ -2261,6 +2280,30 @@ async function startCTOAIPA() {
           stage: (stage as import('./hubspot-client').HiringStage) || 'applied',
           sourcePrefix,
         });
+
+      } else if (source.startsWith('espaluz_')) {
+        const body = req.body as Record<string, unknown>;
+        const userId =
+          (typeof body.userId === 'string' && body.userId) ||
+          (typeof name === 'string' && name.replace(/^TG user\s+/i, '')) ||
+          'unknown';
+        const channel: 'telegram' | 'whatsapp' = source.includes('whatsapp') ? 'whatsapp' : 'telegram';
+        const espaluz = await pushEspaLuzDealToHubSpot({
+          channel,
+          userId: String(userId),
+          ...(ctx ? { context: ctx } : {}),
+          ...(typeof body.atlas_concept_id === 'string'
+            ? { atlasConceptId: body.atlas_concept_id }
+            : typeof body.utm_term === 'string'
+              ? { atlasConceptId: body.utm_term }
+              : {}),
+          ...(typeof body.accessType === 'string' || type
+            ? { accessType: (typeof body.accessType === 'string' ? body.accessType : type) as string }
+            : {}),
+        });
+        result = espaluz
+          ? { contactId: espaluz.contactId, companyId: null, dealId: espaluz.dealId }
+          : null;
 
       } else {
         // client pipeline
