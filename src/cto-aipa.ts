@@ -1607,9 +1607,32 @@ async function startCTOAIPA() {
             paymentStatus: 'trial',
             trialStart: data?.timestamp ? new Date(data.timestamp) : new Date(),
             ...(data?.trial_end ? { trialEnd: new Date(data.trial_end) } : {}),
-            lastActive: new Date()
+            lastActive: new Date(),
           });
           await saveAgentOutcome(agent, action, data, 'verified_delivered');
+          const conceptId =
+            typeof data?.atlas_concept_id === 'string'
+              ? data.atlas_concept_id
+              : typeof data?.utm_term === 'string' && data.utm_term.includes('_20')
+                ? data.utm_term
+                : null;
+          if (conceptId?.startsWith('expat_language_')) {
+            setImmediate(() => {
+              import('./atlas-lead-sync')
+                .then(async m => {
+                  const { saveAtlasPerformanceEvent } = await import('./database');
+                  await saveAtlasPerformanceEvent({
+                    concept_id: conceptId,
+                    vertical: 'expat_language',
+                    ...(typeof data?.utm_content === 'string' ? { angle_id: data.utm_content } : {}),
+                    source: `espaluz_${channel}`,
+                    metrics: { conversions: 1 },
+                    notes: `${action} user ${data?.user_id || 'unknown'}`,
+                  });
+                })
+                .catch(e => console.error('[atlas-lead] espaluz trial sync error:', e));
+            });
+          }
           res.json({ ok: true, action: 'user_upserted_as_trial' });
 
         } else if (action === 'payment_received' || action === 'subscription_activated') {
