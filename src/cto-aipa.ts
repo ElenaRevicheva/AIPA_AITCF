@@ -1654,7 +1654,12 @@ async function startCTOAIPA() {
           res.json({ ok: true, action: 'user_marked_churned' });
 
         } else if (action === 'lesson_sent' || action === 'message_processed') {
-          // Don't upsert user for every message — just log the outcome
+          const uid = data?.user_id || 'unknown';
+          await upsertEspaluzUser(uid, channel, {
+            lastActive: new Date(),
+            paymentStatus: 'trial',
+            trialStart: data?.timestamp ? new Date(data.timestamp as string) : new Date(),
+          });
           await saveAgentOutcome(agent, action, {
             user_id: data?.user_id,
             lesson_type: data?.lesson_type || 'text',
