@@ -455,6 +455,13 @@ export interface LeadForHubSpot {
   sourcePrefix?: string | undefined;
   /** Estimated deal value in USD (Revenue Cockpit Phase 2 — offer-matched). */
   amount?: number | undefined;
+  /** Atlas concept_id for deal description (does not affect qualification gate). */
+  atlasConceptId?: string | undefined;
+  utmCampaign?: string | undefined;
+  utmTerm?: string | undefined;
+  utmContent?: string | undefined;
+  /** Atlas ↔ HubSpot loop metadata (audit log + concept link when UTMs present). */
+  crmMeta?: import('./atlas-crm-bridge').HubSpotCrmMeta;
 }
 
 /** Collapse an ugly "X @ X" or redundant "Name @ Company" display name. */
@@ -517,6 +524,7 @@ export async function pushEspaLuzDealToHubSpot(input: {
   context?: string;
   atlasConceptId?: string;
   accessType?: string;
+  crmMeta?: import('./atlas-crm-bridge').HubSpotCrmMeta;
 }): Promise<{ contactId: string | null; dealId: string | null } | null> {
   if (!HS_KEY()) {
     console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping EspaLuz CRM push');
@@ -534,7 +542,17 @@ export async function pushEspaLuzDealToHubSpot(input: {
     if (existing?.id) {
       console.log(`[HubSpot] EspaLuz deal exists (${existing.id}): ${dealName}`);
       if (contactId) await associateDealContact(existing.id, contactId);
-      return { contactId, dealId: existing.id };
+      const dup = { contactId, dealId: existing.id };
+      const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+      attachHubSpotToAtlasLoop('espaluz', dup, input.crmMeta ?? {
+        source: `espaluz_${input.channel}`,
+        pipeline: 'client',
+        type: 'trial',
+        atlas_concept_id: input.atlasConceptId ?? null,
+        utm_term: input.atlasConceptId ?? null,
+        utm_campaign: input.atlasConceptId ? `atlas_${input.atlasConceptId.replace(/_\d{4}-\d{2}-\d{2}$/, '')}` : null,
+      }, 'duplicate');
+      return dup;
     }
     const description = [
       input.context,
@@ -554,7 +572,17 @@ export async function pushEspaLuzDealToHubSpot(input: {
     if (dealId && contactId) await associateDealContact(dealId, contactId);
     if (dealId && description) await addNoteToDeal(dealId, description);
     console.log(`[HubSpot] EspaLuz deal created: ${dealName}`);
-    return { contactId, dealId };
+    const out = { contactId, dealId };
+    const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+    attachHubSpotToAtlasLoop('espaluz', out, input.crmMeta ?? {
+      source: `espaluz_${input.channel}`,
+      pipeline: 'client',
+      type: 'trial',
+      atlas_concept_id: input.atlasConceptId ?? null,
+      utm_term: input.atlasConceptId ?? null,
+      utm_campaign: input.atlasConceptId ? `atlas_${input.atlasConceptId.replace(/_\d{4}-\d{2}-\d{2}$/, '')}` : null,
+    }, 'created');
+    return out;
   } catch (err) {
     console.error('[HubSpot] pushEspaLuzDealToHubSpot error:', err);
     return null;
@@ -577,9 +605,20 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
   }
 
   // RIGHT-CLIENT GATE: qualify before transfer, so HubSpot only shows real prospects.
+  const clientMeta: import('./atlas-crm-bridge').HubSpotCrmMeta = lead.crmMeta ?? {
+    source: lead.source || 'AI Marketing Engine',
+    pipeline: 'client',
+    type: 'prospect',
+    utm_campaign: lead.utmCampaign ?? null,
+    utm_term: lead.utmTerm ?? lead.atlasConceptId ?? null,
+    utm_content: lead.utmContent ?? null,
+    atlas_concept_id: lead.atlasConceptId ?? null,
+  };
   const _q = isQualifiedClient(lead);
   if (!_q.ok) {
     console.log(`[HubSpot] CLIENT lead NOT qualified (${_q.reason}) — skipping: ${(lead.company || lead.name || lead.email || '?').slice(0, 50)}`);
+    const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+    attachHubSpotToAtlasLoop('client', null, clientMeta, 'skipped');
     return null;
   }
 
@@ -633,6 +672,9 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
         lead.source        ? `Source: ${lead.source}`                : null,
         lead.website       ? `Website: ${lead.website}`              : null,
         lead.linkedinUrl   ? `LinkedIn: ${lead.linkedinUrl}`         : null,
+        lead.atlasConceptId ? `Atlas concept: ${lead.atlasConceptId}` : null,
+        lead.utmCampaign   ? `UTM campaign: ${lead.utmCampaign}`     : null,
+        lead.utmTerm       ? `UTM term: ${lead.utmTerm}`             : null,
       ].filter(Boolean).join('\n') || undefined,
     });
 
@@ -654,7 +696,10 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
     }
 
     console.log(`[HubSpot] ✅ Lead pushed — contact:${contactId} company:${companyId} deal:${dealId}`);
-    return { contactId, companyId, dealId };
+    const out = { contactId, companyId, dealId };
+    const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+    attachHubSpotToAtlasLoop('client', out, clientMeta, 'created');
+    return out;
 
   } catch (err) {
     console.error('[HubSpot] pushLeadToHubSpot error:', err);
@@ -765,6 +810,7 @@ export interface HiringDealInput {
   notes?: string | undefined;
   /** e.g. 'HIRING-VJH' or 'HIRING-VJH-SERP' — wrapped in [brackets] as dealname prefix */
   sourcePrefix?: string | undefined;
+  crmMeta?: import('./atlas-crm-bridge').HubSpotCrmMeta;
 }
 
 /**
@@ -826,7 +872,12 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       if (contactId && companyId) await associateContactCompany(contactId, companyId);
       if (existing.id && contactId) await associateDealContact(existing.id, contactId);
       if (existing.id && companyId) await associateDealCompany(existing.id, companyId);
-      return { contactId, companyId, dealId: existing.id };
+      const dup = { contactId, companyId, dealId: existing.id };
+      if (input.crmMeta) {
+        const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+        attachHubSpotToAtlasLoop('hiring', dup, input.crmMeta, 'duplicate');
+      }
+      return dup;
     }
 
     const dealId = await createDeal({
@@ -856,7 +907,19 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
     }
 
     console.log(`[HubSpot] ✅ Hiring deal pushed — "${input.jobTitle} @ ${input.company}" contact:${contactId} deal:${dealId}`);
-    return { contactId, companyId, dealId };
+    const out = { contactId, companyId, dealId };
+    if (input.crmMeta) {
+      const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+      attachHubSpotToAtlasLoop('hiring', out, input.crmMeta, 'created');
+    } else {
+      const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+      attachHubSpotToAtlasLoop('hiring', out, {
+        source: input.source || 'VJH',
+        pipeline: 'hiring',
+        type: 'application',
+      }, 'created');
+    }
+    return out;
   } catch (err) {
     console.error('[HubSpot] pushHiringDealToHubSpot error:', err);
     return null;

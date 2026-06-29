@@ -1336,6 +1336,8 @@ export interface AtlasPerformanceMetrics {
   revenue?: number;
   sessions?: number;
   leads?: number;
+  /** HubSpot deals linked to this concept (sidecar metric — not double-counted as leads). */
+  hubspot_deals?: number;
 }
 
 async function saveAtlasPerformanceEvent(payload: {
@@ -1383,7 +1385,7 @@ function sumMetrics(rows: Array<{ metrics: AtlasPerformanceMetrics }>): AtlasPer
   cpa: number | null;
   event_count: number;
 } {
-  const t = { spend: 0, impressions: 0, clicks: 0, conversions: 0, revenue: 0, sessions: 0, leads: 0 };
+  const t = { spend: 0, impressions: 0, clicks: 0, conversions: 0, revenue: 0, sessions: 0, leads: 0, hubspot_deals: 0 };
   for (const r of rows) {
     const m = r.metrics || {};
     t.spend += Number(m.spend) || 0;
@@ -1393,6 +1395,7 @@ function sumMetrics(rows: Array<{ metrics: AtlasPerformanceMetrics }>): AtlasPer
     t.revenue += Number(m.revenue) || 0;
     t.sessions += Number(m.sessions) || 0;
     t.leads += Number(m.leads) || 0;
+    t.hubspot_deals += Number(m.hubspot_deals) || 0;
   }
   const roas = t.spend > 0 && t.revenue > 0 ? Math.round((t.revenue / t.spend) * 100) / 100 : null;
   const convBase = t.conversions || t.leads;
@@ -1415,6 +1418,108 @@ async function hasAtlasLeadEventForBusinessLead(leadId: string): Promise<boolean
   } catch (err) {
     console.error('hasAtlasLeadEventForBusinessLead error:', err);
     return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function hasAtlasCrmEventForDeal(dealId: string): Promise<boolean> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT COUNT(*) AS cnt FROM atlas_performance_events
+       WHERE notes LIKE :pattern`,
+      { pattern: `%hubspot deal ${dealId}%` },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT },
+    );
+    const row = (result.rows?.[0] || {}) as { CNT?: number; cnt?: number };
+    return Number(row.CNT ?? row.cnt ?? 0) > 0;
+  } catch (err) {
+    console.error('hasAtlasCrmEventForDeal error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function initCrmEventLogTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE crm_event_log (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          source VARCHAR2(64) NOT NULL,
+          event_type VARCHAR2(64),
+          pipeline VARCHAR2(32),
+          stream VARCHAR2(16),
+          hubspot_contact_id VARCHAR2(32),
+          hubspot_deal_id VARCHAR2(32),
+          hubspot_company_id VARCHAR2(32),
+          status VARCHAR2(16) NOT NULL,
+          atlas_concept_id VARCHAR2(120),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE INDEX crm_event_deal_idx ON crm_event_log (hubspot_deal_id)';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ crm_event_log table ready');
+  } catch (err) {
+    console.error('crm_event_log table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function saveCrmEventLog(payload: {
+  source: string;
+  type?: string;
+  pipeline: string;
+  stream: string;
+  hubspot_contact_id?: string | null;
+  hubspot_deal_id?: string | null;
+  hubspot_company_id?: string | null;
+  status: string;
+  atlas_concept_id?: string | null;
+}): Promise<string | null> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    await connection.execute(
+      `INSERT INTO crm_event_log
+         (source, event_type, pipeline, stream, hubspot_contact_id, hubspot_deal_id,
+          hubspot_company_id, status, atlas_concept_id)
+       VALUES (:source, :event_type, :pipeline, :stream, :contact_id, :deal_id,
+               :company_id, :status, :atlas_concept_id)`,
+      {
+        source: payload.source.slice(0, 64),
+        event_type: (payload.type || 'crm_event').slice(0, 64),
+        pipeline: payload.pipeline.slice(0, 32),
+        stream: payload.stream.slice(0, 16),
+        contact_id: payload.hubspot_contact_id?.slice(0, 32) || null,
+        deal_id: payload.hubspot_deal_id?.slice(0, 32) || null,
+        company_id: payload.hubspot_company_id?.slice(0, 32) || null,
+        status: payload.status.slice(0, 16),
+        atlas_concept_id: payload.atlas_concept_id?.slice(0, 120) || null,
+      },
+    );
+    await connection.commit();
+    return 'ok';
+  } catch (err) {
+    console.error('saveCrmEventLog error:', err);
+    return null;
   } finally {
     if (connection) await connection.close();
   }
@@ -1520,6 +1625,69 @@ async function getAtlasPerformanceSummary(filters: { vertical?: string; concept_
   } finally {
     if (connection) await connection.close();
   }
+}
+
+export interface CrmLoopSummary {
+  espaluz: number;
+  client: number;
+  hiring: number;
+  recent: Array<{ deal_id: string; stream: string; source: string; status: string; created_at: string }>;
+}
+
+async function getCrmLoopByConcepts(conceptIds: string[]): Promise<Record<string, CrmLoopSummary>> {
+  const out: Record<string, CrmLoopSummary> = {};
+  if (!conceptIds.length) return out;
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    for (const cid of conceptIds.slice(0, 100)) {
+      const result = await connection.execute(
+        `SELECT stream, hubspot_deal_id, source, status,
+                TO_CHAR(created_at, 'YYYY-MM-DD"T"HH24:MI:SS') AS created_at
+         FROM crm_event_log
+         WHERE atlas_concept_id = :cid AND hubspot_deal_id IS NOT NULL
+         ORDER BY created_at DESC
+         FETCH FIRST 20 ROWS ONLY`,
+        { cid },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+      const rows = (result.rows || []) as Array<Record<string, unknown>>;
+      const summary: CrmLoopSummary = { espaluz: 0, client: 0, hiring: 0, recent: [] };
+      for (const row of rows) {
+        const stream = String(row.STREAM ?? row.stream ?? '');
+        if (stream === 'espaluz') summary.espaluz++;
+        else if (stream === 'client') summary.client++;
+        else if (stream === 'hiring') summary.hiring++;
+        summary.recent.push({
+          deal_id: String(row.HUBSPOT_DEAL_ID ?? row.hubspot_deal_id ?? ''),
+          stream,
+          source: String(row.SOURCE ?? row.source ?? ''),
+          status: String(row.STATUS ?? row.status ?? ''),
+          created_at: String(row.CREATED_AT ?? row.created_at ?? ''),
+        });
+      }
+      if (summary.recent.length) out[cid] = summary;
+    }
+    return out;
+  } catch (err) {
+    console.error('getCrmLoopByConcepts error:', err);
+    return out;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getAtlasPerformanceSummaryWithCrm(filters: { vertical?: string; concept_id?: string; limit?: number } = {}) {
+  const summary = await getAtlasPerformanceSummary(filters);
+  if (!summary.ok) return summary;
+  const ids = Object.keys(summary.concepts);
+  const loops = await getCrmLoopByConcepts(ids);
+  for (const [cid, loop] of Object.entries(loops)) {
+    if (summary.concepts[cid]) {
+      (summary.concepts[cid] as { hubspot?: CrmLoopSummary }).hubspot = loop;
+    }
+  }
+  return summary;
 }
 
 async function saveAgentOutcome(
@@ -2748,6 +2916,7 @@ async function getOutreachDrafts(): Promise<any[]> {
     await initKnowledgeBaseTable();
     await initAgentOutcomesTable();
     await initAtlasPerformanceTable();
+    await initCrmEventLogTable();
     await initContentLogTable();
     await initEspaluzFunnelTable();
     await initOutreachTargetsTable();
@@ -3013,7 +3182,8 @@ async function getUntriagedLeads(limit = 50): Promise<any[]> {
     // Exclude obvious test / demo entries by name pattern so they never surface in triage
     // even if /cleanbiz confirm has not been run yet.
     const result = await connection.execute(
-      `SELECT RAWTOHEX(bl.id), bl.name, bl.contact_email, bl.context, bl.utm_source
+      `SELECT RAWTOHEX(bl.id), bl.name, bl.contact_email, bl.context, bl.utm_source,
+              bl.utm_campaign, bl.utm_term, bl.utm_content
        FROM business_leads bl
        WHERE NOT EXISTS (
          SELECT 1 FROM lead_triage lt
@@ -3157,7 +3327,11 @@ export {
   // Atlas performance bridge
   saveAtlasPerformanceEvent,
   getAtlasPerformanceSummary,
+  getAtlasPerformanceSummaryWithCrm,
+  getCrmLoopByConcepts,
   hasAtlasLeadEventForBusinessLead,
+  hasAtlasCrmEventForDeal,
+  saveCrmEventLog,
   getAtlasBusinessLeadsForSync,
   // Content log — marketing publishes (Daily blog: dev.to + aideazz.xyz)
   saveContentLog,

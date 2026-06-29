@@ -55,6 +55,14 @@ public ads → creative  →   GA4 · business_leads · postbacks · ads API
 
 **Honest scope:** This is **Phase 3 extension + Phase 5 outcome labeling** for Atlas — not a performance guarantee. Guarantees require spend + conversion volume under controlled tests. Next adapters (not yet built): GA4 nightly sync by `utm_campaign`, Meta/Google Ads API read cron, affiliate postback webhook.
 
+**Atlas ↔ HubSpot sidecar (Jun 29, 2026 — additive, Atlas-safe):**
+
+| Layer | What | Atlas impact |
+|-------|------|----------------|
+| **`src/atlas-crm-bridge.ts`** | After any HubSpot deal create (ESPALUZ / CLIENT / HIRING), fire-and-forget audit → `crm_event_log` + optional `hubspot_deals:1` on performance ledger when `utm_campaign=atlas_*` or `atlas_concept_id` present | **None on capture/classify/brief/ship** — whitespace unchanged except optional “HubSpot deals” row on concept cards |
+| **Dedup** | `hubspot_deals` metric — does **not** double-count `leads` (inquiry form) or `conversions` (EspaLuz wiring) | Existing performance totals unchanged |
+| **Streams** | `[ESPALUZ]` via wiring + `/api/crm-event` · `[CLIENT-*]` via inquiry + crm-event · `[HIRING-*]` via VJH crm-event (audit log only unless Atlas UTM) | Judges: Atlas UI still loads if performance hub is down (`/api/atlas` try/catch) |
+
 **How to verify:**
 
 1. Open [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) → any concept with creative → see **Track:** line with `concept_id` + landing link.

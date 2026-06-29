@@ -1277,18 +1277,42 @@ async function startCTOAIPA() {
     setImmediate(async () => {
       try {
         const { pushLeadToHubSpot } = await import('./hubspot-client');
+        const { parseAtlasAttribution } = await import('./atlas-crm-bridge');
         const contextParts: string[] = [];
         if (message) contextParts.push(`Message: ${message}`);
         if (utm_source) contextParts.push(`Source: ${utm_source}`);
+        if (utm_campaign) contextParts.push(`Campaign: ${utm_campaign}`);
+        if (utm_term) contextParts.push(`Concept: ${utm_term}`);
         if (page_url) contextParts.push(`Page: ${page_url}`);
-        await pushLeadToHubSpot({
+        const attribution = parseAtlasAttribution({
+          utm_campaign: utm_campaign ?? null,
+          utm_term: utm_term ?? null,
+          utm_content: utm_content ?? null,
+        });
+        const hs = await pushLeadToHubSpot({
           name: name || contactEmail || 'Inquiry via aideazz.xyz',
           email: contactEmail || '',
           source: utm_source || 'aideazz_inquiry_form',
+          sourcePrefix: 'CLIENT-CTO-INQUIRY',
           painPoint: contextParts.join(' | ') || 'Direct inquiry from aideazz.xyz contact form',
           stage: 'appointmentscheduled',
+          ...(attribution?.concept_id ? { atlasConceptId: attribution.concept_id } : {}),
+          ...(utm_campaign ? { utmCampaign: utm_campaign } : {}),
+          ...(utm_term ? { utmTerm: utm_term } : {}),
+          ...(utm_content ? { utmContent: utm_content } : {}),
+          crmMeta: {
+            source: 'aideazz_inquiry_form',
+            pipeline: 'client',
+            type: 'inquiry',
+            utm_campaign: utm_campaign ?? null,
+            utm_term: utm_term ?? null,
+            utm_content: utm_content ?? null,
+            atlas_concept_id: attribution?.concept_id ?? null,
+          },
         });
-        console.log(`[inquiry] HubSpot [CLIENT] deal created for: ${name || contactEmail}`);
+        if (hs?.dealId) {
+          console.log(`[inquiry] HubSpot [CLIENT] deal created for: ${name || contactEmail}`);
+        }
       } catch (e) {
         console.warn('[inquiry] HubSpot push non-fatal:', (e as Error).message?.slice(0, 80));
       }
@@ -1648,6 +1672,26 @@ async function startCTOAIPA() {
                   ...(typeof data?.access_type === 'string'
                     ? { accessType: data.access_type }
                     : { accessType: action }),
+                  crmMeta: {
+                    source: `espaluz_${channel}`,
+                    pipeline: 'client',
+                    type: action,
+                    utm_term:
+                      typeof data?.utm_term === 'string'
+                        ? data.utm_term
+                        : typeof data?.atlas_concept_id === 'string'
+                          ? data.atlas_concept_id
+                          : null,
+                    atlas_concept_id:
+                      typeof data?.atlas_concept_id === 'string'
+                        ? data.atlas_concept_id
+                        : typeof data?.utm_term === 'string'
+                          ? data.utm_term
+                          : null,
+                    utm_campaign:
+                      typeof data?.utm_campaign === 'string' ? data.utm_campaign : 'atlas_expat_language',
+                    utm_content: typeof data?.utm_content === 'string' ? data.utm_content : null,
+                  },
                 }),
               )
               .catch(e => console.error('[espaluz-crm] HubSpot push error:', e));
@@ -2249,7 +2293,16 @@ async function startCTOAIPA() {
         jobTitle?: string; company?: string; recruiterEmail?: string; recruiterName?: string; jobUrl?: string;
         stage?: string; urgency?: number; notes?: string; score?: number;
         sourcePrefix?: string; amount?: number;
+        utm_campaign?: string; utm_term?: string; utm_content?: string;
+        atlas_concept_id?: string;
       };
+      const body = req.body as Record<string, unknown>;
+      const utm_campaign =
+        typeof body.utm_campaign === 'string' ? body.utm_campaign : undefined;
+      const utm_term = typeof body.utm_term === 'string' ? body.utm_term : undefined;
+      const utm_content = typeof body.utm_content === 'string' ? body.utm_content : undefined;
+      const atlas_concept_id =
+        typeof body.atlas_concept_id === 'string' ? body.atlas_concept_id : undefined;
 
       if (!source || !pipeline) {
         res.status(400).json({ error: 'source and pipeline are required' });
@@ -2279,10 +2332,18 @@ async function startCTOAIPA() {
           score:  score ?? undefined,
           stage: (stage as import('./hubspot-client').HiringStage) || 'applied',
           sourcePrefix,
+          crmMeta: {
+            source: source || 'VJH',
+            pipeline: 'hiring',
+            type: type || 'application',
+            utm_campaign: utm_campaign ?? null,
+            utm_term: utm_term ?? null,
+            utm_content: utm_content ?? null,
+            atlas_concept_id: atlas_concept_id ?? null,
+          },
         });
 
       } else if (source.startsWith('espaluz_')) {
-        const body = req.body as Record<string, unknown>;
         const userId =
           (typeof body.userId === 'string' && body.userId) ||
           (typeof name === 'string' && name.replace(/^TG user\s+/i, '')) ||
@@ -2300,6 +2361,15 @@ async function startCTOAIPA() {
           ...(typeof body.accessType === 'string' || type
             ? { accessType: (typeof body.accessType === 'string' ? body.accessType : type) as string }
             : {}),
+          crmMeta: {
+            source: source || `espaluz_${channel}`,
+            pipeline: 'client',
+            type: type || 'trial',
+            utm_campaign: utm_campaign ?? null,
+            utm_term: utm_term ?? null,
+            utm_content: utm_content ?? null,
+            atlas_concept_id: atlas_concept_id ?? null,
+          },
         });
         result = espaluz
           ? { contactId: espaluz.contactId, companyId: null, dealId: espaluz.dealId }
@@ -2411,6 +2481,19 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
           painPoint: enrichedCtx,
           stage:  stageMap[stage ?? ''] ?? HS_STAGES.prospected,
           ...(typeof amount === 'number' && amount > 0 ? { amount } : {}),
+          ...(atlas_concept_id ? { atlasConceptId: atlas_concept_id } : {}),
+          ...(utm_campaign ? { utmCampaign: utm_campaign } : {}),
+          ...(utm_term ? { utmTerm: utm_term } : {}),
+          ...(utm_content ? { utmContent: utm_content } : {}),
+          crmMeta: {
+            source: source || 'AI Marketing Engine',
+            pipeline: 'client',
+            type: type || 'prospect',
+            utm_campaign: utm_campaign ?? null,
+            utm_term: utm_term ?? null,
+            utm_content: utm_content ?? null,
+            atlas_concept_id: atlas_concept_id ?? null,
+          },
         });
       }
 
@@ -2496,8 +2579,8 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
     try {
       const vertical = typeof req.query.vertical === 'string' ? req.query.vertical.trim() : undefined;
       const concept_id = typeof req.query.concept_id === 'string' ? req.query.concept_id.trim() : undefined;
-      const { getAtlasPerformanceSummary } = await import('./database');
-      const summary = await getAtlasPerformanceSummary({
+      const { getAtlasPerformanceSummaryWithCrm } = await import('./database');
+      const summary = await getAtlasPerformanceSummaryWithCrm({
         ...(vertical ? { vertical } : {}),
         ...(concept_id ? { concept_id } : {}),
       });

@@ -44,6 +44,9 @@ interface LeadInput {
   email: string;
   context: string;
   utm_source?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+  utm_content?: string;
 }
 
 function truncateTriageContext(text: string): string {
@@ -263,6 +266,9 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
       email: r[2] || '',
       context: r[3] || '',
       utm_source: r[4] || '',
+      utm_campaign: r[5] || '',
+      utm_term: r[6] || '',
+      utm_content: r[7] || '',
     })),
     ...(repliedOutreach as any[]).map((r: any) => ({
       id: r[0],
@@ -377,14 +383,48 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
                 console.warn('[triage→HS] mark pushed failed (non-fatal):', e?.message || e);
               }
             } else {
+              const isAtlasClient = lead.utm_campaign?.trim().startsWith('atlas_');
+              const { parseAtlasAttribution } = await import('./atlas-crm-bridge');
+              const attribution = isAtlasClient
+                ? parseAtlasAttribution({
+                    utm_campaign: lead.utm_campaign ?? null,
+                    utm_term: lead.utm_term ?? null,
+                    utm_content: lead.utm_content ?? null,
+                  })
+                : null;
+              if (isAtlasClient && lead.source_table === 'business_leads') {
+                import('./atlas-lead-sync')
+                  .then(m =>
+                    m.recordAtlasLeadFromInquiry({
+                      leadId: lead.id,
+                      utm_campaign: lead.utm_campaign ?? null,
+                      utm_term: lead.utm_term ?? null,
+                      utm_content: lead.utm_content ?? null,
+                    }),
+                  )
+                  .catch(() => {});
+              }
               await pushLeadToHubSpot({
-      sourcePrefix: 'CLIENT-CTO-INGEST',
+                sourcePrefix: isAtlasClient ? 'CLIENT-CTO-INQUIRY' : 'CLIENT-CTO-INGEST',
                 name:      lead.name || 'Unknown',
                 company:   companyForDeal,
                 email:     hasRealEmail ? lead.email : undefined,
                 source:    lead.utm_source || lead.source_table,
                 painPoint: result.one_line_summary,
                 stage:     hsStage,
+                ...(attribution?.concept_id ? { atlasConceptId: attribution.concept_id } : {}),
+                ...(lead.utm_campaign ? { utmCampaign: lead.utm_campaign } : {}),
+                ...(lead.utm_term ? { utmTerm: lead.utm_term } : {}),
+                ...(lead.utm_content ? { utmContent: lead.utm_content } : {}),
+                crmMeta: {
+                  source: isAtlasClient ? 'aideazz_inquiry_form' : (lead.utm_source || lead.source_table),
+                  pipeline: 'client',
+                  type: isAtlasClient ? 'inquiry' : 'prospect',
+                  utm_campaign: lead.utm_campaign ?? null,
+                  utm_term: lead.utm_term ?? null,
+                  utm_content: lead.utm_content ?? null,
+                  atlas_concept_id: attribution?.concept_id ?? null,
+                },
               });
             }
             // May 24 2026: mark lead_triage row as pushed so future daily briefs skip it
