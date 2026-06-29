@@ -96,9 +96,28 @@ This doc is the **single map**: **Oracle VM paths** (above) + **where your autho
 
 #### How CTO AIPA accesses all repos — including private ones
 
-Every repo (public **and** private) is already cloned at the canonical path in the table above. Git credentials are configured on this machine — `git pull` and `git push` work without additional login on all repos.
+**On your Windows dev machine:** every repo is cloned at the canonical path in the table above. Git credentials are configured locally — `git pull` and `git push` work without additional login.
 
-**Operating rule:** Never clone a fresh copy or create a new folder. Go directly to the canonical local path and work there. Private repos are treated identically to public — same paths, same git operations, no extra steps.
+**On Oracle VM (`170.9.242.90`):** use **HTTPS + `GITHUB_TOKEN`** (PAT in `/home/ubuntu/cto-aipa/.env`). GitHub **deploy keys are one-repo-only** — the atlas key cannot pull private repos like `EspaLuzFamilybot`. Do **not** rely on `https://github.com/...` without credentials (fails with `could not read Username`).
+
+**One-time fix (refresh PAT or after token rotation):**
+
+```bash
+# On Oracle VM — pass new PAT once (also updates cto-aipa/.env + ~/.git-credentials):
+TOKEN=ghp_YOUR_NEW_PAT bash ~/oracle-fix-git-https-auth.sh
+
+# Or from Windows:
+scp -i ~/.ssh/ssh-key-2026-01-07private.key \
+  scripts/oracle-resilience/oracle-fix-git-https-auth.sh ubuntu@170.9.242.90:~/
+ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90 \
+  "TOKEN=ghp_YOUR_NEW_PAT bash ~/oracle-fix-git-https-auth.sh"
+```
+
+**Verify:** `cd /home/ubuntu/EspaLuzFamilybot && git fetch origin main` (no username prompt).
+
+**EspaLuz deploy note:** runtime JSON (`subscribers.json`, `paguelofacil_payments.json`, trials) may differ from git — prefer `git fetch` + `git checkout origin/main -- <code-files>` for code-only deploys, or stash before pull. See `EspaLuzFamilybot/deploy/BACKUP_AND_ROLLBACK_PAGUELOFACIL_WA.md`.
+
+**Operating rule:** Never clone a fresh copy or create a new folder. Go directly to the canonical local path and work there.
 
 | What you need | Where to go |
 |---------------|-------------|

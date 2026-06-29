@@ -45,3 +45,20 @@ ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90 "tail -30 /var/l
 ```
 
 See `docs/ORACLE_ALL_PRODUCTS_RESILIENCE.md` for the full plan and adding more agents (2, 4, 5+6) when you have their ports/service names.
+
+## GitHub auth on Oracle (fix `git pull` / `git fetch`)
+
+**Root cause:** HTTPS remotes without credentials → `could not read Username`. Deploy keys are **one repo each** (atlas key ≠ EspaLuzFamilybot).
+
+**Fix:** PAT in `cto-aipa/.env` + `oracle-fix-git-https-auth.sh` (sets `~/.git-credentials` + `url.insteadOf`).
+
+```powershell
+scp -i $env:USERPROFILE\.ssh\ssh-key-2026-01-07private.key `
+  scripts\oracle-resilience\oracle-fix-git-https-auth.sh ubuntu@170.9.242.90:~/
+ssh -i $env:USERPROFILE\.ssh\ssh-key-2026-01-07private.key ubuntu@170.9.242.90 `
+  "TOKEN=ghp_YOUR_PAT bash ~/oracle-fix-git-https-auth.sh"
+```
+
+When PAT expires (~2026-09-01), regenerate at GitHub → Settings → Developer settings → PATs, then re-run the script.
+
+Legacy: `oracle-setup-github-ssh-fleet.sh` (SSH deploy keys) — only works for repos that registered that specific key (e.g. atlas-shifted).
