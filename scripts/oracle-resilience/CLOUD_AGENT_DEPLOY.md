@@ -1,117 +1,115 @@
-# Cloud agent deploys to Oracle (from phone or Cursor Cloud)
+# Cloud agent + phone deploy — full Oracle fleet
 
-Deploy **without your laptop SSH key on the cloud VM** — GitHub Actions SSHs to Oracle using a repo secret.
+Deploy **every AI product on `170.9.242.90`** from your phone or Cursor Cloud Agent — no laptop SSH.
 
 ---
 
-## One-time setup (~5 min on laptop)
+## One-time setup (~10 min)
 
-### 1. Add `ORACLE_SSH_KEY` secret (required)
+### 1. GitHub secrets (AIPA_AITCF repo)
 
-**GitHub → [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) → Settings → Secrets and variables → Actions → New repository secret**
-
-| Name | Value |
-|------|--------|
-| `ORACLE_SSH_KEY` | **Entire contents** of `ssh-key-2026-01-07private.key` (including `-----BEGIN ... KEY-----` lines) |
-
-**From laptop (after `gh auth login`):**
+| Secret | Required for | Value |
+|--------|--------------|-------|
+| **`ORACLE_SSH_KEY`** | All Oracle products (#1–11) | Full `ssh-key-2026-01-07private.key` |
+| **`AWS_ACCESS_KEY_ID`** | Sprinter Lambda (#8.1) only | AWS IAM key with Lambda update |
+| **`AWS_SECRET_ACCESS_KEY`** | Sprinter Lambda (#8.1) only | Matching secret |
 
 ```powershell
-gh secret set ORACLE_SSH_KEY --repo ElenaRevicheva/AIPA_AITCF `
-  < "$env:USERPROFILE\.ssh\ssh-key-2026-01-07private.key"
+gh auth login
+gh secret set ORACLE_SSH_KEY --repo ElenaRevicheva/AIPA_AITCF < "$env:USERPROFILE\.ssh\ssh-key-2026-01-07private.key"
 ```
 
-**Verify:** Actions → **Deploy to Oracle VM** → Run workflow → pick **verify only** → green = secret works.
-
-### 2. Oracle git fetch (no password prompts)
+### 2. Oracle git auth (one-time per PAT rotation)
 
 ```bash
-ssh ubuntu@170.9.242.90 "cd /home/ubuntu/cto-aipa && git fetch origin main"
+TOKEN=ghp_YOUR_PAT bash ~/oracle-fix-git-https-auth.sh
 ```
 
-If fetch fails, set `GITHUB_TOKEN` PAT on VM — see `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md`.
+Verify: `git fetch origin main` in each product dir — no username prompt.
 
 ---
 
-## Deploy from your phone (daily use)
+## Daily use from phone
 
-1. Open **GitHub** app or browser → **ElenaRevicheva/AIPA_AITCF**
-2. **Actions** → **Deploy to Oracle VM** → **Run workflow**
-3. Pick script + files (presets below)
-4. Green check = live on Oracle
+1. **GitHub** → **ElenaRevicheva/AIPA_AITCF** → **Actions**
+2. **Deploy to Oracle VM** → **Run workflow**
+3. Pick **product** → optional **deploy_files** → Run
 
-### Preset: WhatsApp hotfix
+### Product picker
 
-| Field | Value |
-|-------|--------|
-| **deploy_script** | `espaluz-hotfixes/deploy-whatsapp-checkout-and-restart.sh` |
-| **deploy_files** | `espaluz_bridge.py espaluz_memory.py espaluz_rag.py` |
+| Product | What it deploys | Default files (if deploy_files empty) |
+|---------|-----------------|--------------------------------------|
+| **whatsapp** | EspaLuz WhatsApp + restart | `espaluz_bridge.py`, memory, RAG |
+| **telegram** | EspaLuz Telegram + payments webhook | `main.py`, memory, RAG, PF |
+| **influencer** | EspaLuz Influencer bot | `main.py`, `cto_milestone_module.py` |
+| **dragontrade** | Algom Alpha PM2 apps | git pull + PM2 restart all 4 apps |
+| **vjh** | VibeJob Hunter loop | `main.py`, claude helpers |
+| **vjh_web** | CMO FastAPI :8080 | `web_app.py`, `main.py` |
+| **openclaw** | OpenClaw gateway | git pull + restart |
+| **cto_aipa** | CTO AIPA + Atuona (PM2) | git pull + npm build + PM2 |
+| **atlas** | Atlas Shifted radar (PM2) | git pull + PM2 whitespace |
+| **fleet-verify** | Health check all — **no deploy** | — |
+| **sprinter-aws** | AWS Lambda (not Oracle SSH) | builds + `deploy-lambda.mjs` |
 
-### Preset: Telegram hotfix
+### Override files (checkout products)
 
-| Field | Value |
-|-------|--------|
-| **deploy_script** | `espaluz-hotfixes/deploy-telegram-checkout-and-restart.sh` |
-| **deploy_files** | `main.py espaluz_memory.py espaluz_rag.py` |
+Example — deploy only bridge after cloud agent fix:
 
-### Preset: Health check only (no restart)
-
-| Field | Value |
-|-------|--------|
-| **deploy_script** | `oracle-resilience/verify-espaluz-memory-only.sh` |
-| **deploy_files** | *(leave default)* |
-
-### Preset: Memory module + verify
-
-| Field | Value |
-|-------|--------|
-| **deploy_script** | `oracle-resilience/deploy-memory-hardening-on-oracle.sh` |
+```
+deploy_files: espaluz_bridge.py espaluz_advanced_features.py
+product: whatsapp
+```
 
 ---
 
 ## Cursor Cloud Agent workflow
 
-Cloud agents **cannot SSH to Oracle** (no private key on cloud VM). Use this pattern:
+Cloud agents **cannot SSH to Oracle**. Standard loop:
 
 ```
-1. Fix → push to EspaLuzWhatsApp or EspaLuzFamilybot main
-2. Cloud agent → PR/merge to AIPA_AITCF (deploy scripts if needed)
-3. Elena → phone → Actions → Run workflow
+1. Cloud agent edits code → push to product repo main (EspaLuzWhatsApp, VJH, etc.)
+2. Cloud agent updates oracle-products.conf / deploy script in AIPA_AITCF if needed → merge
+3. Elena (phone) → Actions → Run workflow → pick product
 ```
 
-**Memory-safe rule:** deploy scripts use `git checkout origin/main -- <specific files>` — never overwrite prod JSON (`user_sessions.json`, `family_memory_data/`, trials).
+**Memory-safe rule:** Python bots use `git checkout origin/main -- <files>` — never overwrite prod JSON (`user_sessions.json`, `family_memory_data/`, trials, PF payments).
+
+**PM2 products** (`cto_aipa`, `atlas`, `dragontrade`): `git pull --ff-only` + build + PM2 restart (`.env` / `wallet/` gitignored).
 
 ---
 
-## Workflow
+## Products NOT on Oracle SSH
 
-`.github/workflows/deploy-oracle.yml` — `appleboy/ssh-action` + `secrets.ORACLE_SSH_KEY`
-
-**Server:** `ubuntu@170.9.242.90`
-
-| Script | What it does |
-|--------|----------------|
-| `deploy-whatsapp-checkout-and-restart.sh` | Pull WA files from GitHub + restart |
-| `deploy-telegram-checkout-and-restart.sh` | Pull TG files from GitHub + restart |
-| `deploy-kinder-fix-on-oracle.sh` | Kinder preference fix + test |
-| `deploy-memory-hardening-on-oracle.sh` | Memory UUID + RAG migration + verify |
-| `verify-espaluz-memory-only.sh` | Read-only health (safe anytime) |
+| Product | Deploy path |
+|---------|-------------|
+| **AILA (#10)** | Not deployed on VM yet — no workflow action |
+| **aideazz.xyz** | Push [aideazz](https://github.com/ElenaRevicheva/aideazz) `main` → 4everland auto-deploy |
+| **atuona.xyz** | Push [atuona](https://github.com/ElenaRevicheva/atuona) `main` → 4everland |
 
 ---
 
-## Product paths on Oracle
+## Architecture
 
-| Product | Path | systemd |
-|---------|------|---------|
-| EspaLuz WhatsApp | `/home/ubuntu/EspaLuzWhatsApp` | `espaluz-whatsapp` |
-| EspaLuz Telegram | `/home/ubuntu/EspaLuzFamilybot` | `espaluz-familybot` |
-| Payments webhook | *(Familybot)* | `espaluz-payments-webhook` |
-| CTO AIPA | `/home/ubuntu/cto-aipa` | PM2 `cto-aipa` |
+```
+Phone / Cloud Agent
+       ↓
+GitHub Actions (deploy-oracle.yml)
+       ↓ SSH (ORACLE_SSH_KEY)
+170.9.242.90
+       ↓
+scripts/oracle-resilience/deploy-product.sh
+       ↓
+oracle-products.conf  →  per-product dir, mode, restart, health
+```
+
+Registry: `scripts/oracle-resilience/oracle-products.conf`  
+Universal deploy: `scripts/oracle-resilience/deploy-product.sh`  
+Fleet health: `scripts/oracle-resilience/verify-fleet-health.sh`
 
 ---
 
 ## Security
 
-- Never commit the private key to git.
-- Rotate `ORACLE_SSH_KEY` if exposed; update GitHub secret only.
+- Never commit private keys or `.env` to git.
+- Rotate `ORACLE_SSH_KEY` / AWS keys if exposed — update GitHub secrets only.
 - Prefer **checkout specific files** over blind `git pull` on EspaLuz repos.

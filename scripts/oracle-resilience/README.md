@@ -62,3 +62,12 @@ ssh -i $env:USERPROFILE\.ssh\ssh-key-2026-01-07private.key ubuntu@170.9.242.90 `
 When PAT expires (~2026-09-01), regenerate at GitHub → Settings → Developer settings → PATs, then re-run the script.
 
 Legacy: `oracle-setup-github-ssh-fleet.sh` (SSH deploy keys) — only works for repos that registered that specific key (e.g. atlas-shifted).
+
+## Cloud agent deploys (GitHub Actions → Oracle)
+
+**No laptop SSH needed** — deploy from your phone after one-time secret setup.
+
+1. Add **`ORACLE_SSH_KEY`** to [AIPA_AITCF Actions secrets](https://github.com/ElenaRevicheva/AIPA_AITCF/settings/secrets/actions) (full private key file).
+2. Actions → **Deploy to Oracle VM** → Run workflow.
+
+See **`CLOUD_AGENT_DEPLOY.md`** in this folder.

@@ -1,5 +1,5 @@
-# Deploy to Oracle VM from GitHub Actions — Cursor Cloud Agent + phone workflow_dispatch.
-# Requires one-time secret: ORACLE_SSH_KEY (full private key for ubuntu@170.9.242.90)
+# Deploy to Oracle VM (+ optional AWS Sprinter) — Cursor Cloud Agent + phone workflow_dispatch.
+# Requires: ORACLE_SSH_KEY (Oracle SSH). For Sprinter: AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY.
 # See scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md
 
 name: Deploy to Oracle VM
@@ -7,27 +7,34 @@ name: Deploy to Oracle VM
 on:
   workflow_dispatch:
     inputs:
-      deploy_script:
-        description: Script under scripts/ on Oracle (after git fetch)
+      product:
+        description: Product to deploy or verify
         required: true
-        default: espaluz-hotfixes/deploy-whatsapp-checkout-and-restart.sh
+        default: whatsapp
         type: choice
         options:
-          - espaluz-hotfixes/deploy-whatsapp-checkout-and-restart.sh
-          - espaluz-hotfixes/deploy-telegram-checkout-and-restart.sh
-          - espaluz-hotfixes/deploy-kinder-fix-on-oracle.sh
-          - oracle-resilience/deploy-memory-hardening-on-oracle.sh
-          - oracle-resilience/verify-espaluz-memory-only.sh
+          - whatsapp
+          - telegram
+          - influencer
+          - dragontrade
+          - vjh
+          - vjh_web
+          - openclaw
+          - cto_aipa
+          - atlas
+          - fleet-verify
+          - sprinter-aws
       deploy_files:
-        description: Space-separated files from product repo main (WhatsApp/Telegram checkout scripts)
+        description: Override files (checkout mode) — space-separated, from product repo main
         required: false
-        default: espaluz_bridge.py espaluz_memory.py espaluz_rag.py
+        default: ""
       notes:
-        description: Audit note (who/why — e.g. Elena phone deploy)
+        description: Audit note (e.g. Elena phone deploy)
         required: false
 
 jobs:
-  deploy:
+  deploy-oracle:
+    if: inputs.product != 'sprinter-aws'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,41 +42,70 @@ jobs:
       - name: Require ORACLE_SSH_KEY
         run: |
           if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
-            echo "::error::Add ORACLE_SSH_KEY in GitHub → Settings → Secrets → Actions"
-            echo "See scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
             exit 1
           fi
 
-      - name: Deploy via SSH
+      - name: Fleet deploy or verify via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 170.9.242.90
           username: ubuntu
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script_stop: true
-          envs: DEPLOY_SCRIPT,DEPLOY_FILES,DISPATCH_NOTES
+          envs: PRODUCT,DEPLOY_FILES,DISPATCH_NOTES
           script: |
             set -euo pipefail
-            export DEPLOY_SCRIPT="${{ github.event.inputs.deploy_script }}"
+            export PRODUCT="${{ github.event.inputs.product }}"
             export DEPLOY_FILES="${{ github.event.inputs.deploy_files }}"
-            export DISPATCH_NOTES="${{ github.event.inputs.notes || 'manual workflow_dispatch' }}"
+            export DISPATCH_NOTES="${{ github.event.inputs.notes || 'workflow_dispatch' }}"
 
             AIPA_DIR=/home/ubuntu/cto-aipa
             if [ ! -d "$AIPA_DIR/.git" ]; then AIPA_DIR=/home/ubuntu/AIPA_AITCF; fi
             cd "$AIPA_DIR"
-            echo "=== Deploy note: $DISPATCH_NOTES ==="
             git fetch origin main
             git checkout origin/main -- scripts/
 
-            SCRIPT_PATH="scripts/$DEPLOY_SCRIPT"
-            if [ ! -f "$SCRIPT_PATH" ]; then
-              echo "::error::Deploy script not found: $SCRIPT_PATH"
-              exit 1
+            chmod +x scripts/oracle-resilience/*.sh scripts/oracle-resilience/lib/*.sh 2>/dev/null || true
+            chmod +x scripts/espaluz-hotfixes/*.sh 2>/dev/null || true
+
+            if [ "$PRODUCT" = "fleet-verify" ]; then
+              bash scripts/oracle-resilience/verify-fleet-health.sh
+            else
+              bash scripts/oracle-resilience/deploy-product.sh
             fi
 
-            chmod +x scripts/**/*.sh 2>/dev/null || true
-            export DEPLOY_FILES
-            bash "$SCRIPT_PATH"
+  deploy-sprinter:
+    if: inputs.product == 'sprinter-aws'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            echo "=== Post-deploy health ==="
-            systemctl is-active espaluz-whatsapp espaluz-familybot espaluz-payments-webhook 2>/dev/null || true
+      - name: Require AWS credentials
+        run: |
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "::error::Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for Sprinter Lambda deploy"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Build Lambda bundle
+        run: |
+          npm ci --omit=dev
+          npx esbuild src/lambda/sprint-briefing-aws.ts --bundle --platform=node --target=node20 --format=cjs \
+            --external:@aws-sdk/signature-v4-crt --external:encoding \
+            --outfile=dist-lambda/sprint/lambda-pkg/handler.js
+          cd dist-lambda/sprint/lambda-pkg && zip -r ../handler-fixed.zip handler.js
+
+      - name: Deploy Lambda
+        run: node scripts/deploy-lambda.mjs

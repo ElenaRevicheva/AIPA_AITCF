@@ -117,17 +117,23 @@ ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90 \
 
 **EspaLuz deploy note:** runtime JSON (`subscribers.json`, `paguelofacil_payments.json`, trials) may differ from git — prefer `git fetch` + `git checkout origin/main -- <code-files>` for code-only deploys, or stash before pull. See `EspaLuzFamilybot/deploy/BACKUP_AND_ROLLBACK_PAGUELOFACIL_WA.md`.
 
-#### Cloud agent deploys (no laptop SSH) — **June 30, 2026**
+#### Cloud agent deploys (no laptop SSH) — **June 30, 2026 — full fleet**
 
-Cursor Cloud Agents **cannot** SSH to Oracle (no private key on cloud VM). Use **GitHub Actions** from your **phone**:
+Cursor Cloud Agents **cannot** SSH to Oracle. Deploy **all 11 agents** from your **phone** via GitHub Actions:
 
-1. **One-time:** [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) → **Settings → Secrets → Actions** → **`ORACLE_SSH_KEY`** = full `ssh-key-2026-01-07private.key`
-2. **From phone:** GitHub → **Actions** → **Deploy to Oracle VM** → **Run workflow**
-3. **Presets:** WhatsApp `deploy-whatsapp-checkout-and-restart.sh` · Telegram `deploy-telegram-checkout-and-restart.sh` · Health `verify-espaluz-memory-only.sh`
+1. **One-time secrets** on [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF):
+   - **`ORACLE_SSH_KEY`** — all Oracle products (#1–11)
+   - **`AWS_ACCESS_KEY_ID`** + **`AWS_SECRET_ACCESS_KEY`** — Sprinter Lambda (#8.1) only
+2. **From phone:** GitHub → **Actions** → **Deploy to Oracle VM** → pick **product** → Run
+3. **Products:** `whatsapp` · `telegram` · `influencer` · `dragontrade` · `vjh` · `vjh_web` · `openclaw` · `cto_aipa` · `atlas` · `fleet-verify` · `sprinter-aws`
+
+Registry: `scripts/oracle-resilience/oracle-products.conf` · universal deploy: `deploy-product.sh`
+
+**Not on Oracle SSH:** AILA (#10, not deployed) · [aideazz.xyz](https://aideazz.xyz) / [atuona.xyz](https://atuona.xyz) → push GitHub `main` → 4everland
 
 Full guide: `scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md` · workflow: `.github/workflows/deploy-oracle.yml`
 
-**Cloud agent pattern:** fix → push product repo `main` → merge AIPA_AITCF deploy script if needed → Elena runs workflow from phone.
+**Cloud agent loop:** fix → push product repo `main` → (optional) merge AIPA_AITCF registry → phone → Actions → product.
 
 **Operating rule:** Never clone a fresh copy or create a new folder. Go directly to the canonical local path and work there.
 
