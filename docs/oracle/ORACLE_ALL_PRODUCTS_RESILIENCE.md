@@ -117,6 +117,18 @@ ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90 \
 
 **EspaLuz deploy note:** runtime JSON (`subscribers.json`, `paguelofacil_payments.json`, trials) may differ from git — prefer `git fetch` + `git checkout origin/main -- <code-files>` for code-only deploys, or stash before pull. See `EspaLuzFamilybot/deploy/BACKUP_AND_ROLLBACK_PAGUELOFACIL_WA.md`.
 
+#### Cloud agent deploys (no laptop SSH) — **June 30, 2026**
+
+Cursor Cloud Agents **cannot** SSH to Oracle (no private key on cloud VM). Use **GitHub Actions** from your **phone**:
+
+1. **One-time:** [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) → **Settings → Secrets → Actions** → **`ORACLE_SSH_KEY`** = full `ssh-key-2026-01-07private.key`
+2. **From phone:** GitHub → **Actions** → **Deploy to Oracle VM** → **Run workflow**
+3. **Presets:** WhatsApp `deploy-whatsapp-checkout-and-restart.sh` · Telegram `deploy-telegram-checkout-and-restart.sh` · Health `verify-espaluz-memory-only.sh`
+
+Full guide: `scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md` · workflow: `.github/workflows/deploy-oracle.yml`
+
+**Cloud agent pattern:** fix → push product repo `main` → merge AIPA_AITCF deploy script if needed → Elena runs workflow from phone.
+
 **Operating rule:** Never clone a fresh copy or create a new folder. Go directly to the canonical local path and work there.
 
 | What you need | Where to go |

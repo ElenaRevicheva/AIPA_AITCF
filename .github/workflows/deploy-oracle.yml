@@ -1,0 +1,75 @@
+# Deploy to Oracle VM from GitHub Actions — Cursor Cloud Agent + phone workflow_dispatch.
+# Requires one-time secret: ORACLE_SSH_KEY (full private key for ubuntu@170.9.242.90)
+# See scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md
+
+name: Deploy to Oracle VM
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_script:
+        description: Script under scripts/ on Oracle (after git fetch)
+        required: true
+        default: espaluz-hotfixes/deploy-whatsapp-checkout-and-restart.sh
+        type: choice
+        options:
+          - espaluz-hotfixes/deploy-whatsapp-checkout-and-restart.sh
+          - espaluz-hotfixes/deploy-telegram-checkout-and-restart.sh
+          - espaluz-hotfixes/deploy-kinder-fix-on-oracle.sh
+          - oracle-resilience/deploy-memory-hardening-on-oracle.sh
+          - oracle-resilience/verify-espaluz-memory-only.sh
+      deploy_files:
+        description: Space-separated files from product repo main (WhatsApp/Telegram checkout scripts)
+        required: false
+        default: espaluz_bridge.py espaluz_memory.py espaluz_rag.py
+      notes:
+        description: Audit note (who/why — e.g. Elena phone deploy)
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require ORACLE_SSH_KEY
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY in GitHub → Settings → Secrets → Actions"
+            echo "See scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 170.9.242.90
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script_stop: true
+          envs: DEPLOY_SCRIPT,DEPLOY_FILES,DISPATCH_NOTES
+          script: |
+            set -euo pipefail
+            export DEPLOY_SCRIPT="${{ github.event.inputs.deploy_script }}"
+            export DEPLOY_FILES="${{ github.event.inputs.deploy_files }}"
+            export DISPATCH_NOTES="${{ github.event.inputs.notes || 'manual workflow_dispatch' }}"
+
+            AIPA_DIR=/home/ubuntu/cto-aipa
+            if [ ! -d "$AIPA_DIR/.git" ]; then AIPA_DIR=/home/ubuntu/AIPA_AITCF; fi
+            cd "$AIPA_DIR"
+            echo "=== Deploy note: $DISPATCH_NOTES ==="
+            git fetch origin main
+            git checkout origin/main -- scripts/
+
+            SCRIPT_PATH="scripts/$DEPLOY_SCRIPT"
+            if [ ! -f "$SCRIPT_PATH" ]; then
+              echo "::error::Deploy script not found: $SCRIPT_PATH"
+              exit 1
+            fi
+
+            chmod +x scripts/**/*.sh 2>/dev/null || true
+            export DEPLOY_FILES
+            bash "$SCRIPT_PATH"
+
+            echo "=== Post-deploy health ==="
+            systemctl is-active espaluz-whatsapp espaluz-familybot espaluz-payments-webhook 2>/dev/null || true
