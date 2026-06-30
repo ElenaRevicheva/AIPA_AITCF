@@ -27,7 +27,7 @@ conn = psycopg2.connect(url)
 cur = conn.cursor()
 cur.execute(
     "SELECT id, telegram_id, current_country, total_messages FROM users "
-    "WHERE telegram_id IS NOT NULL ORDER BY updated_at DESC NULLS LAST LIMIT 5"
+    "WHERE telegram_id IS NOT NULL ORDER BY created_at DESC NULLS LAST LIMIT 5"
 )
 rows = cur.fetchall()
 print(f"Telegram users in PG: {len(rows)} recent")

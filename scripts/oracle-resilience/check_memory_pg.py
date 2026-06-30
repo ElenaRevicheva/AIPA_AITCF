@@ -38,7 +38,7 @@ print(f"OK  distinct chat sessions: {cur.fetchone()[0]}")
 cur.execute(
     "SELECT display_name, whatsapp_id, telegram_id, current_country FROM users "
     "WHERE whatsapp_id IS NOT NULL OR telegram_id IS NOT NULL "
-    "ORDER BY updated_at DESC NULLS LAST LIMIT 3"
+    "ORDER BY created_at DESC NULLS LAST LIMIT 3"
 )
 print("Recent users:")
 for row in cur.fetchall():
