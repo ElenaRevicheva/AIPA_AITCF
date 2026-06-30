@@ -4,6 +4,16 @@ All products deploy via **GitHub Actions → Deploy to Oracle VM** — pick a **
 
 See **`scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md`** for phone setup and product table.
 
+## Telegram drift recovery (June 30 sync)
+
+If Oracle Telegram is behind GitHub with dirty tree + runtime JSON:
+
+```bash
+bash scripts/espaluz-hotfixes/deploy-telegram-june30-sync.sh
+```
+
+Backs up runtime JSON → checkout code from `origin/main` → restore JSON → fast-forward HEAD → restart both systemd units.
+
 ## Legacy script names (still work)
 
 | Script | Maps to |

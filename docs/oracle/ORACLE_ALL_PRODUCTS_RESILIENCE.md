@@ -135,7 +135,27 @@ Full guide: `scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md` · workflow: `.git
 
 **Cloud agent loop:** fix → push product repo `main` → (optional) merge AIPA_AITCF registry → phone → Actions → product.
 
-**Operating rule:** Never clone a fresh copy or create a new folder. Go directly to the canonical local path and work there.
+#### EspaLuz bots — sync status (June 30, 2026, verified live)
+
+| Layer | WhatsApp (#1) | Telegram (#2) |
+|-------|---------------|---------------|
+| **GitHub `main`** | `11829c3` (Atlas prefilled + June 30 stack) | `65ad940` (Atlas `/start=expat_language_*` + memory/RAG/PF) |
+| **Local (Elena PC)** | `11829c3` ✓ | `65ad940` ✓ |
+| **Oracle live HEAD** | `11829c3` ✓ | `65ad940` ✓ (synced June 30) |
+| **Services** | `espaluz-whatsapp` active | `espaluz-familybot` + `espaluz-payments-webhook` active |
+| **Memory/RAG** | `get_session_uuid` ✓ · PG 346 chat rows · 84 embeddings | `get_session_uuid` ✓ · same PG · TG sessions 26 677 bytes preserved |
+
+**WhatsApp Atlas:** new prefilled `concept_id` path in `11829c3` (`espaluz_bridge.py` + `user_trial_system.py`). June 30 fixes (`4084e45` memory, LLM chain, markdown, PF) included via fast-forward — not overwritten.
+
+**Telegram Atlas:** already in `main.py` at `65ad940` via `/start=expat_language_*` — no separate Atlas commit needed.
+
+**Telegram Oracle drift (fixed):** Oracle had been at `80be496` with local staged PF/memory edits. Synced with backup → checkout code → restore runtime JSON → `git merge --ff-only origin/main`. Script: `scripts/espaluz-hotfixes/deploy-telegram-june30-sync.sh`.
+
+**Expected `git status` on Oracle Telegram:** runtime JSON files show `M` (prod data vs empty placeholders still tracked in git) — **normal; do not commit**. Untracked `??` backup/mp3 files are safe to delete.
+
+**WhatsApp Oracle stash:** `stash@{0}: pre-atlas-deploy-oracle-local` — old local hotfixes; drop with `git stash drop stash@{0}` when confirmed unneeded.
+
+**Before cloud-agent deploy:** set `ORACLE_SSH_KEY` on AIPA_AITCF; use `PRODUCT=telegram` or `deploy-telegram-june30-sync.sh` pattern for future Telegram code-only deploys.
 
 | What you need | Where to go |
 |---------------|-------------|
