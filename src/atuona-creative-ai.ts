@@ -4523,7 +4523,7 @@ See: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/ATUONA-BOOK-ROADMAP.md
 *Publish:* /preview, /publish, /setpage
 *Drafts:* /draft, /read
 *Proactive:* /proactive, /dailyinspire, /history
-*Film:* /visualize, /gallery, /film, /videostatus
+*Film:* /visualize (luma · omni · veo · runway · kling), /gallery, /film, /videostatus
 *Social:* /post
 *Export:* /export, /import_backup
 *Tools:* /spanish, /imagine
@@ -4676,6 +4676,7 @@ _Just click any command to see what it does!_
 ━━━━━━━━━━━━━━━━━━━━
 /visualize 048 - 🎥 Image+video (default: Luma)
 /visualize luma 048 - 🎬 Luma ray-3.2 (HDR cinematic)
+/visualize omni 048 - ✨ Gemini Omni Flash (native audio)
 /visualize runway 048 - 🎬 Runway Gen-4.5
 /visualize veo 048 - 🎬 Google Veo 3.1 (native audio)
 /visualize kling 048 - 🎬 Kling (stylized/arthouse)
@@ -8139,6 +8140,7 @@ Create stunning visuals for your book pages:
 
 🎛️ *Choose your video engine:*
 \`/visualize luma 048\` - Luma ray-3.2 (HDR, cinematic)
+\`/visualize omni 048\` - Gemini Omni Flash (native audio)
 \`/visualize runway 048\` - Runway Gen-4.5
 \`/visualize veo 048\` - Google Veo 3.1 (native audio)
 \`/visualize kling 048\` - Kling (stylized/arthouse)
@@ -8156,11 +8158,12 @@ Visualizations: ${visualizations.length} pages
 🎨 Flux: ${replicate ? '✅ Flux 2 Pro / 1.1 Ready' : '❌ Set REPLICATE_API_TOKEN'}
 🎬 Luma ray-3.2 (Direct): ${lumaApiKey ? '✅ Ready' : '⚪ Set LUMA_API_KEY'}
 🎬 Luma (Replicate): ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
+🎬 Gemini Omni Flash: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
 🎬 Runway Gen-4.5: ${runwayApiKey ? '✅ Ready' : '⚪ Set RUNWAY_API_KEY'}
 🎬 Google Veo 3.1: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
 🎬 Kling: ${replicate ? '✅ via Replicate' : '⚪ Set REPLICATE_API_TOKEN'}
 
-_Default chain: Luma ray-3.2 → Luma Replicate → Runway_
+_Default chain: Luma ray-3.2 → Luma Replicate → Omni Flash → Runway_
 _Name a provider to pick it; it falls back through the chain if it fails._
 _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ 🚀`, { parse_mode: 'Markdown' });
       return;
@@ -8198,7 +8201,7 @@ _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ �
     // Normalize page ID
     const pageNum = parseInt(pageId);
     if (isNaN(pageNum)) {
-      await ctx.reply('❌ Invalid page number. Use `/visualize 048`, `/visualize last`, or pick a provider: `/visualize veo 048`', { parse_mode: 'Markdown' });
+      await ctx.reply('❌ Invalid page number. Use `/visualize 048`, `/visualize last`, or pick a provider: `/visualize omni 048`', { parse_mode: 'Markdown' });
       return;
     }
     pageId = String(pageNum).padStart(3, '0');
@@ -9867,9 +9870,33 @@ ${elenaLang === 'english'
   // ==========================================================================
   
   atuonaBot.start({
-    onStart: (botInfo) => {
+    onStart: async (botInfo) => {
       console.log(`🎭 Atuona Creative AI started: @${botInfo.username}`);
       console.log(`   Create book pages at: https://t.me/${botInfo.username}`);
+
+      try {
+        await atuonaBot!.api.setMyCommands([
+          { command: 'menu', description: '📋 Full command menu' },
+          { command: 'help', description: '📖 Vibe coder guide' },
+          { command: 'ritual', description: '🔄 Begin daily writing flow' },
+          { command: 'create', description: '🎨 AI generates new content' },
+          { command: 'publish', description: '🚀 Push page to atuona.xyz' },
+          { command: 'visualize', description: '🎥 Image+video — try: omni|luma|veo|runway|kling 048' },
+          { command: 'gallery', description: '🖼 All visualizations' },
+          { command: 'film', description: '🎞 Film compilation status' },
+          { command: 'videostatus', description: '⏳ Video progress' },
+          { command: 'post', description: '📱 Post to Instagram / YouTube' },
+          { command: 'spanish', description: '🇪🇸 Content in Spanish' },
+          { command: 'imagine', description: '🎨 Create AI image' },
+          { command: 'export', description: '📤 Download all content' },
+          { command: 'import_backup', description: '📥 Restore backup' },
+          { command: 'status', description: '📈 Book & API status' },
+          { command: 'style', description: '🎨 My writing style guide' },
+          { command: 'fixgallery', description: '🔧 Fix gallery issues' },
+        ]);
+      } catch (e) {
+        console.warn('Atuona setMyCommands failed:', (e as Error).message);
+      }
       
       // Start proactive inspiration scheduler
       startProactiveScheduler(atuonaBot!);
