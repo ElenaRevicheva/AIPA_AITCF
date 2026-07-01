@@ -81,6 +81,28 @@ export async function persistShot(pageId: string, videoUrl: string): Promise<str
   }
 }
 
+/** Save inline video bytes (e.g. Gemini Omni Flash) — same path as persistShot. */
+export function persistShotBytes(pageId: string, buf: Buffer): string | null {
+  try {
+    if (!buf?.length) return null;
+    const dest = path.join(shotsDir(), `${pageId}.mp4`);
+    fs.writeFileSync(dest, buf);
+    console.log(`🎞️ persistShotBytes ${pageId}: saved ${(buf.length / 1e6).toFixed(1)}MB → ${dest}`);
+    return dest;
+  } catch (e: any) {
+    console.warn(`🎞️ persistShotBytes ${pageId} error:`, e?.message);
+    return null;
+  }
+}
+
+/** Public URL for a persisted base shot (Luma Modify / Director's Cut needs HTTP). */
+export function shotPublicUrl(pageId: string): string {
+  const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
+  const key = process.env.ATUONA_FILMS_KEY?.trim();
+  const q = key ? `?key=${encodeURIComponent(key)}` : '';
+  return `${base}/films/shots/${encodeURIComponent(pageId)}.mp4${q}`;
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 async function ffprobeDuration(file: string): Promise<number> {
   try {

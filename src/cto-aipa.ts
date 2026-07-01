@@ -17,7 +17,7 @@ import {
 } from './database';
 import { initTelegramBot, sendTelegramBroadcast } from './telegram-bot';
 import { initAtuonaBot } from './atuona-creative-ai';
-import { filmsOutDir, listFilms } from './atuona-film-compiler';
+import { filmsOutDir, listFilms, shotsDir } from './atuona-film-compiler';
 import {
   startDailyBlogPublisher,
   runDailyBlogPost,
@@ -1034,6 +1034,33 @@ async function startCTOAIPA() {
   const FILMS_KEY = process.env.ATUONA_FILMS_KEY?.trim() || '';
   const filmsAuthOk = (req: Request) => !FILMS_KEY || String(req.query.key || '') === FILMS_KEY;
   const safeFilmName = (n: string) => (/^[A-Za-z0-9._-]+\.mp4$/.test(n) ? n : '');
+  const safeShotName = (n: string) => (/^[A-Za-z0-9._-]+\.mp4$/.test(n) ? n : '');
+
+  app.get('/films/shots/:name', (req: Request, res: Response) => {
+    if (!filmsAuthOk(req)) { res.status(401).send('Unauthorized'); return; }
+    const name = safeShotName(path.basename(req.params.name || ''));
+    if (!name) { res.status(404).send('Not found'); return; }
+    const file = path.join(shotsDir(), name);
+    if (!fs.existsSync(file)) { res.status(404).send('Not found'); return; }
+    const stat = fs.statSync(file);
+    res.setHeader('Content-Type', 'video/mp4');
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    const range = req.headers.range;
+    if (range) {
+      const m = /bytes=(\d+)-(\d*)/.exec(range);
+      const start = m ? parseInt(m[1] as string, 10) : 0;
+      const end = m && m[2] ? parseInt(m[2], 10) : stat.size - 1;
+      if (start >= stat.size || start > end) { res.status(416).setHeader('Content-Range', `bytes */${stat.size}`); res.end(); return; }
+      res.status(206);
+      res.setHeader('Content-Range', `bytes ${start}-${end}/${stat.size}`);
+      res.setHeader('Content-Length', String(end - start + 1));
+      fs.createReadStream(file, { start, end }).pipe(res);
+    } else {
+      res.setHeader('Content-Length', String(stat.size));
+      fs.createReadStream(file).pipe(res);
+    }
+  });
 
   app.get('/films/:name', (req: Request, res: Response) => {
     if (!filmsAuthOk(req)) { res.status(401).send('Unauthorized'); return; }

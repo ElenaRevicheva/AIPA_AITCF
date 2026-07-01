@@ -8,7 +8,7 @@ import OpenAI from 'openai';
 import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
-import { persistShot, buildFilm } from './atuona-film-compiler';
+import { persistShot, persistShotBytes, shotPublicUrl, buildFilm } from './atuona-film-compiler';
 import { grokComplete } from './llm-resilience';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -106,7 +106,8 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 //   • luma   → Luma Ray 3 Direct API  → Luma via Replicate (fallback)
 //   • runway → Runway Gen-4.5 image_to_video
 //   • veo    → Google Veo 3.1 (Gemini API, native audio) — needs GEMINI_API_KEY
-//   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Runway.
+//   • omni   → Gemini Omni Flash (Interactions API, image→video + native audio)
+//   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Omni Flash → Runway.
 //   When a provider is named explicitly and fails, we fall back through the chain
 //   and label the delivered clip with the provider that actually produced it (honest labeling).
 // Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
@@ -137,21 +138,29 @@ const VIDEO_MODELS = {
   runwayImageToVideo: 'gen4.5',
   /** Google Veo 3.1 model id on the Gemini API. Override: VEO_MODEL (e.g. veo-3.1-fast-generate-preview). */
   veoModel: (process.env.VEO_MODEL || 'veo-3.1-generate-preview').trim(),
+  /** Gemini Omni Flash — Interactions API image→video. Override: GEMINI_OMNI_MODEL. */
+  omniModel: (process.env.GEMINI_OMNI_MODEL || 'gemini-omni-flash-preview').trim(),
   /** Kling image→video via Replicate (kwaivgi namespace, existing REPLICATE_API_TOKEN — no new key).
    *  Strong for stylized/arthouse motion. Override: KLING_REPLICATE_MODEL. */
   klingReplicate: (process.env.KLING_REPLICATE_MODEL || 'kwaivgi/kling-v2.1-master').trim(),
 };
 
 /** Canonical video provider ids selectable from `/visualize <provider> NNN`. */
-type VideoProvider = 'luma' | 'runway' | 'veo' | 'kling';
+type VideoProvider = 'luma' | 'runway' | 'veo' | 'omni' | 'kling';
 /** Map operator aliases → canonical provider id. Returns null if the token isn't a provider. */
 function parseVideoProvider(token: string): VideoProvider | null {
   const t = token.toLowerCase();
   if (['luma', 'ray', 'ray2', 'ray3', 'ray-3', 'dream', 'dreammachine'].includes(t)) return 'luma';
   if (['runway', 'gen4', 'gen45', 'gen-4', 'gen4.5', 'runwayml'].includes(t)) return 'runway';
-  if (['veo', 'veo3', 'veo31', 'google', 'gemini'].includes(t)) return 'veo';
+  if (['veo', 'veo3', 'veo31'].includes(t)) return 'veo';
+  if (['omni', 'omniflash', 'gemini-omni', 'gemini', 'google'].includes(t)) return 'omni';
   if (['kling', 'kuaishou', 'kwaivgi'].includes(t)) return 'kling';
   return null;
+}
+
+function googleVideoOmniOnly(): boolean {
+  const v = (process.env.GOOGLE_VIDEO_OMNI_ONLY || process.env.ATUONA_GOOGLE_VIDEO || '').trim().toLowerCase();
+  return v === '1' || v === 'true' || v === 'omni' || v === 'omni-only';
 }
 
 /**
@@ -3432,7 +3441,7 @@ interface VideoGenerationResult {
   success: boolean;
   videoUrl?: string;
   taskId?: string;
-  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'kling' | 'none';
+  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
@@ -3441,15 +3450,22 @@ async function generateVideo(
   imageUrl: string,
   prompt: string,
   ctx: Context,
-  preferredProvider?: VideoProvider | null
+  preferredProvider?: VideoProvider | null,
+  pageId?: string
 ): Promise<VideoGenerationResult> {
 
-  // ========== 0. EXPLICIT PROVIDER (e.g. `/visualize veo 089`) ==========
-  // When the operator names a provider, try it FIRST. On failure, fall through to the
-  // default chain below and label the delivered clip with whatever actually produced it.
-  if (preferredProvider === 'veo') {
+  // ========== 0. EXPLICIT PROVIDER (e.g. `/visualize omni 089`) ==========
+  if (preferredProvider === 'omni') {
+    const omni = await generateWithOmni(imageUrl, prompt, ctx, pageId);
+    if (omni.success) return omni;
+    await ctx.reply(`⚠️ Omni Flash unavailable (${(omni.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
+  } else if (preferredProvider === 'veo') {
     const veo = await generateWithVeo(imageUrl, prompt, ctx);
     if (veo.success) return veo;
+    if (!googleVideoOmniOnly()) {
+      const omni = await generateWithOmni(imageUrl, prompt, ctx, pageId);
+      if (omni.success) return omni;
+    }
     await ctx.reply(`⚠️ Veo unavailable (${(veo.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
     // continue into default chain
   } else if (preferredProvider === 'kling') {
@@ -3608,12 +3624,20 @@ async function generateVideo(
       }
       
     } catch (lumaReplicateError: any) {
-      console.log('⚠️ Luma Replicate failed, trying Runway fallback...');
+      console.log('⚠️ Luma Replicate failed, trying Gemini Omni Flash...');
       console.error('Luma Replicate error:', lumaReplicateError.message);
-      await ctx.reply(`⚠️ Luma Replicate unavailable, trying Runway Gen-4.5...`);
+      await ctx.reply(`⚠️ Luma Replicate unavailable, trying Gemini Omni Flash...`);
     }
   }
-  
+
+  // ========== 2b. GEMINI OMNI FLASH (Google Interactions API) ==========
+  if (geminiApiKey) {
+    const omni = await generateWithOmni(imageUrl, prompt, ctx, pageId);
+    if (omni.success) return omni;
+    console.log('⚠️ Omni Flash failed, trying Runway fallback...');
+    await ctx.reply(`⚠️ Omni Flash unavailable${omni.error ? ` (${omni.error.substring(0, 80)})` : ''}, trying Runway Gen-4.5...`);
+  }
+
   // ========== 3. FALLBACK TO RUNWAY GEN-4.5 (image_to_video) ==========
   if (runwayApiKey) {
     return await tryRunway(imageUrl, prompt, ctx);
@@ -3680,6 +3704,108 @@ async function tryRunway(
       provider: 'none',
       error: `Runway failed: ${runwayError.message}`
     };
+  }
+}
+
+/**
+ * Gemini Omni Flash image→video via Interactions API (same path as Atlas whitespace).
+ * Atuona uses 16:9 · 9s to match the Luma film pipeline. Persists bytes to shots/ when pageId given.
+ */
+async function generateWithOmni(
+  imageUrl: string,
+  prompt: string,
+  ctx: Context,
+  pageId?: string
+): Promise<VideoGenerationResult> {
+  if (!geminiApiKey) {
+    return { success: false, provider: 'omni', error: 'Omni not configured — set GEMINI_API_KEY (or GOOGLE_API_KEY) in .env' };
+  }
+  try {
+    await ctx.reply(
+      `🎬 *Generating video with Gemini Omni Flash...*\n\n_${VIDEO_MODELS.omniModel} · native audio · 16:9 · takes ~1–3 minutes..._`,
+      { parse_mode: 'Markdown' }
+    );
+    const imgRes = await fetch(imageUrl);
+    if (!imgRes.ok) throw new Error(`fetch still failed: ${imgRes.status}`);
+    const imgBuf = Buffer.from(await imgRes.arrayBuffer());
+    const mimeType = imgRes.headers.get('content-type')?.startsWith('image/') ? imgRes.headers.get('content-type')! : 'image/jpeg';
+    const imageBase64 = imgBuf.toString('base64');
+    const motion = `9-second cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`;
+
+    const create = await fetch(`${GEMINI_API_URL}/interactions?key=${geminiApiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: VIDEO_MODELS.omniModel,
+        input: [
+          { type: 'text', text: motion },
+          { type: 'image', mime_type: mimeType, data: imageBase64 },
+        ],
+        generation_config: { video_config: { task: 'image_to_video' } },
+        response_format: { type: 'video', aspect_ratio: '16:9', duration: '9s' },
+        background: true,
+      }),
+    });
+    const createText = await create.text();
+    if (!create.ok) throw new Error(`Omni create ${create.status}: ${createText.substring(0, 220)}`);
+
+    let body = JSON.parse(createText) as Record<string, unknown>;
+    const status = String(body.status || '');
+    if (status !== 'completed' && body.id) {
+      const id = String(body.id);
+      for (let i = 0; i < 72; i++) {
+        await new Promise((r) => setTimeout(r, 10_000));
+        const poll = await fetch(`${GEMINI_API_URL}/interactions/${encodeURIComponent(id)}?key=${geminiApiKey}`);
+        if (!poll.ok) continue;
+        body = (await poll.json()) as Record<string, unknown>;
+        const st = String(body.status || '');
+        if (st === 'failed' || st === 'cancelled') throw new Error(`omni interaction ${st}`);
+        if (st === 'completed') break;
+        if (i % 3 === 0) console.log(`🎬 Omni polling… status=${st || 'pending'}`);
+      }
+      if (String(body.status || '') !== 'completed') throw new Error('Omni timed out after ~12 min');
+    }
+
+    const extractVideo = (b: Record<string, unknown>): { uri?: string; data?: string } => {
+      const steps = b.steps as { type?: string; content?: { type?: string; uri?: string; data?: string }[] }[] | undefined;
+      if (Array.isArray(steps)) {
+        for (const step of steps) {
+          if (step.type !== 'model_output' || !Array.isArray(step.content)) continue;
+          for (const c of step.content) {
+            if (c.type === 'video' && (c.uri || c.data)) {
+              return { ...(c.uri ? { uri: c.uri } : {}), ...(c.data ? { data: c.data } : {}) };
+            }
+          }
+        }
+      }
+      return {};
+    };
+
+    let { uri, data } = extractVideo(body);
+    if (data) {
+      const bytes = Buffer.from(data, 'base64');
+      if (pageId) persistShotBytes(pageId, bytes);
+      const videoUrl = pageId ? shotPublicUrl(pageId) : undefined;
+      console.log('✅ Omni Flash video ready (inline)', pageId ? `→ ${videoUrl}` : '');
+      if (!videoUrl) throw new Error('Omni inline video needs pageId for delivery URL');
+      return { success: true, videoUrl, provider: 'omni', needsPolling: false };
+    }
+    if (!uri) throw new Error('Omni completed but no video uri/data');
+
+    if (uri.includes('generativelanguage.googleapis.com') && !uri.includes('key=')) {
+      uri += (uri.includes('?') ? '&' : '?') + `key=${geminiApiKey}`;
+    }
+    if (pageId) {
+      const res = await fetch(uri);
+      if (!res.ok) throw new Error(`Omni video download ${res.status}`);
+      persistShotBytes(pageId, Buffer.from(await res.arrayBuffer()));
+    }
+    const videoUrl = pageId ? shotPublicUrl(pageId) : uri;
+    console.log('✅ Omni Flash video ready:', videoUrl.substring(0, 80) + '…');
+    return { success: true, videoUrl, provider: 'omni', needsPolling: false };
+  } catch (omniErr: any) {
+    console.error('Omni error:', omniErr.message);
+    return { success: false, provider: 'omni', error: omniErr.message };
   }
 }
 
@@ -4314,9 +4440,12 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 
 *Pick your video engine:*
 \`/visualize luma 052\` → Luma ray-3.2 (HDR cinematic)
+\`/visualize omni 052\` → Gemini Omni Flash (native audio, conversational edit path)
 \`/visualize runway 052\` → Runway Gen-4.5
 \`/visualize veo 052\` → Google Veo 3.1 (native audio)
 \`/visualize kling 052\` → Kling (stylized/arthouse)
+
+_Default chain when Luma is dry: Omni Flash → Runway._
 
 *What it creates:*
 🎨 Flux 2 Pro image (16:9 YouTube) - newest, BEST quality!
@@ -8587,13 +8716,15 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
           visualization.imageUrlHorizontal,
           motionPrompt,  // Page-specific motion, not truncated image prompt
           ctx,
-          selectedProvider
+          selectedProvider,
+          pageId
         );
 
         if (videoResult.success) {
-          // Any provider that returns a ready URL (Luma-via-Replicate, Veo, Kling) → direct delivery.
-          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling')) {
-            const providerLabel = videoResult.provider === 'veo' ? 'Google Veo 3.1'
+          // Ready URL providers (Replicate, Veo, Kling, Omni) → direct delivery.
+          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni')) {
+            const providerLabel = videoResult.provider === 'omni' ? 'Gemini Omni Flash'
+              : videoResult.provider === 'veo' ? 'Google Veo 3.1'
               : videoResult.provider === 'kling' ? 'Kling'
               : 'Luma via Replicate';
             visualization.videoUrlHorizontal = videoResult.videoUrl;
