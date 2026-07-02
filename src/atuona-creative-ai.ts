@@ -220,6 +220,8 @@ interface PersistedState {
   elenaChatId: number | null;
   lastProactiveDate: string;
   creativeMemory?: CreativeMemory;
+  /** Moods/tone history — without this, emotional intelligence resets on every PM2 restart. */
+  emotionalState?: EmotionalState;
 }
 
 interface Draft {
@@ -285,7 +287,8 @@ function saveState(): void {
       visualizations,
       elenaChatId,
       lastProactiveDate,
-      creativeMemory
+      creativeMemory,
+      emotionalState
     };
     fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
     console.log('💾 State saved');
@@ -322,7 +325,19 @@ function loadState(): void {
           usedAssociationPatterns: state.creativeMemory.usedAssociationPatterns || [],
           usedEnhancements: state.creativeMemory.usedEnhancements || [],
           recentResponseFingerprints: state.creativeMemory.recentResponseFingerprints || [],
-          recentProactiveKnowledgeKeys: (state.creativeMemory as any).recentProactiveKnowledgeKeys || []
+          recentProactiveKnowledgeKeys: (state.creativeMemory as any).recentProactiveKnowledgeKeys || [],
+          recentCreateKnowledgeKeys: (state.creativeMemory as any).recentCreateKnowledgeKeys || []
+        };
+      }
+      
+      // Restore emotional state (moods survive restarts; safe defaults for legacy files)
+      if (state.emotionalState) {
+        emotionalState = {
+          currentMood: state.emotionalState.currentMood || 'contemplative',
+          recentMoods: state.emotionalState.recentMoods || [],
+          lastInteractionTone: state.emotionalState.lastInteractionTone || 'unknown',
+          emotionalMemory: state.emotionalState.emotionalMemory || [],
+          consecutiveSameMood: state.emotionalState.consecutiveSameMood || 0
         };
       }
       
@@ -1878,6 +1893,107 @@ ${FULL_KNOWLEDGE_BASE}
 `;
 }
 
+// =============================================================================
+// 🔄 ROTATING DEEP-EXCERPT KNOWLEDGE (anti-staleness for /create + daily inspiration)
+// The full-KB dump made the model latch onto the same salient facts every day.
+// Here we feed ONLY 3-4 selected modules, and only a rotating SUBSET of each module's
+// paragraphs, plus a rotating sample of the canon — so yesterday's anchors are
+// physically absent from today's context.
+// =============================================================================
+
+/** Keep the first paragraph (context header), randomly sample the rest. Different every call. */
+function sampleModuleParagraphs(content: string, keepRatio: number = 0.55): string {
+  const paragraphs = content.split(/\n\n+/).map(p => p.trim()).filter(p => p.length > 0);
+  if (paragraphs.length <= 4) return content;
+  const head = paragraphs[0] as string;
+  const rest = paragraphs.slice(1);
+  const keepCount = Math.max(3, Math.round(rest.length * keepRatio));
+  const shuffled = [...rest].sort(() => Math.random() - 0.5);
+  const kept = new Set(shuffled.slice(0, keepCount));
+  // Preserve original order of the kept paragraphs (KB text reads coherently)
+  const body = rest.filter(p => kept.has(p));
+  return [head, ...body].join('\n\n');
+}
+
+/** Random sample of N canon poems (keeps the voice anchor, varies WHICH poems anchor it). */
+function sampleCanonExcerpts(canon: string, count: number = 14): string {
+  if (!canon.trim()) return '';
+  const entries = canon.split(/\n\n(?=### #)/).filter(e => e.trim().length > 0);
+  if (entries.length <= count) return canon;
+  const shuffled = [...entries].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count).sort().join('\n\n');
+}
+
+/**
+ * Pick 3-4 fresh modules for /create: trigger-scan Elena's direction first,
+ * then fill with least-recently-used modules. Never gauguin+auction together.
+ */
+function selectCreateKnowledgeModules(seedText?: string): KnowledgeCategory[] {
+  const selected: KnowledgeCategory[] = [];
+  
+  if (seedText && seedText.trim()) {
+    for (const key of collectTriggerKnowledgeKeys(seedText, creativeSession.activeVoice)) {
+      if (selected.length < 2 && !selected.includes(key)) selected.push(key);
+    }
+  }
+  
+  // Least-recently-used fill based on /create's own rotation history
+  const recentFlat = creativeMemory.recentCreateKnowledgeKeys.slice(-3).flat();
+  const usage: Record<string, number> = {};
+  for (const k of recentFlat) usage[k] = (usage[k] || 0) + 1;
+  const byFreshness = [...ALL_KNOWLEDGE_KEYS].sort(
+    (a, b) => (usage[a] || 0) - (usage[b] || 0) + (Math.random() - 0.5)
+  ) as KnowledgeCategory[];
+  for (const k of byFreshness) {
+    if (selected.length >= 4) break;
+    if (!selected.includes(k)) selected.push(k);
+  }
+  
+  return diversifyProactiveKeys(selected);
+}
+
+/**
+ * Rotating knowledge block: style canon + sampled published poems + ONLY the selected
+ * modules (each paragraph-sampled). Used by /create and daily inspiration.
+ * buildFullCreativityKnowledgeBlock() remains untouched for all other commands.
+ */
+async function buildRotatingCreativityKnowledgeBlock(selectedKeys: KnowledgeCategory[]): Promise<string> {
+  const canon = await getUndergroundCanonCorpus();
+  const canonSample = sampleCanonExcerpts(canon, 14);
+  const canonBlock = canonSample
+    ? `
+═══════════════════════════════════════════════════════════════
+CANON — ROTATING SAMPLE FROM PUBLISHED POEMS #001–#048 (match rhythm, cuts, temperature; never copy-paste)
+═══════════════════════════════════════════════════════════════
+${canonSample}
+`
+    : '';
+  
+  const excluded = ALL_KNOWLEDGE_KEYS.filter(k => !selectedKeys.includes(k as KnowledgeCategory));
+  const moduleParts: string[] = [];
+  for (const key of selectedKeys) {
+    const section = KNOWLEDGE_SECTIONS.find(s => s.key === key);
+    if (section) {
+      moduleParts.push(`--- MODULE: ${key.toUpperCase()} (rotating excerpt — dig into the specifics below) ---\n${sampleModuleParagraphs(section.content)}`);
+    }
+  }
+  
+  return `${BOOK_UNDERGROUND_STYLE_CANON}
+
+═══════════════════════════════════════════════════════════════
+DEEP USE OF TODAY'S KNOWLEDGE MODULES (NON-NEGOTIABLE):
+═══════════════════════════════════════════════════════════════
+- Today you see ONLY these modules: **${selectedKeys.join(', ')}** — and only a rotating slice of each. Yesterday's facts are deliberately absent. Do NOT reconstruct them from habit.
+- Draw **unique, specific, obscure** details from at least TWO of today's modules — a lesser work, a procedural detail, a texture — never the "everybody knows" line.
+- Other domains exist (${excluded.join(', ')}) but are off-limits today except as a passing shadow.
+${canonBlock}
+═══════════════════════════════════════════════════════════════
+TODAY'S KNOWLEDGE MODULES (rotating excerpts)
+═══════════════════════════════════════════════════════════════
+${moduleParts.join('\n\n')}
+`;
+}
+
 /**
  * Knowledge for /visualize and /imagine: scan the FULL poem text (not a 200-char snippet).
  * If nothing matches, use a stable fallback — NOT rotating random Gauguin/beach blocks.
@@ -1899,9 +2015,22 @@ const VISUAL_HARD_EXCLUSIONS = `
 MANDATORY EXCLUSIONS (even if they sound "pretty"): no cartoon, no Pixar/Disney/3D render style, no chibi, no toy animals, no cute red dogs, no random mascots, no stock-photo beach vacation, no generic yellow flowers, no open notebook or journaling props, no laptop close-up — UNLESS the poem text above explicitly names or clearly requires that exact object.
 Style: photorealistic cinematic still, 35mm or large-format photograph, natural film grain, adult arthouse tone, single coherent scene tied to the poem.`;
 
+/**
+ * 🌹 ATUONA AESTHETIC CANON — physical beauty and sensuality are part of her art, not an accident.
+ * Injected into image/video prompt writers so the model is PERMITTED and DIRECTED toward the body.
+ * Arthouse-erotic, tasteful — implied over explicit — so Flux/Luma/Runway accept the prompts.
+ */
+const ATUONA_AESTHETIC_DIRECTIVE = `
+AESTHETIC CANON (ATUONA — non-negotiable when a human figure fits the poem):
+- Physical beauty is central to ATUONA's art: the human body rendered with painterly reverence — collarbone, spine, bare shoulder, the weight of a hip, damp hair against skin.
+- Sensual, arthouse-erotic tone in the lineage of Gauguin's nudes, Helmut Newton's editorial noir, Paolo Roversi's intimacy: skin and fabric, light falling on the body, tension and desire — implied, never pornographic.
+- Fabric interacts with the body: silk clinging, a strap slipped from a shoulder, sheer material against light, the line where clothing ends.
+- Faces and bodies are beautiful, adult, alive — never mannequin-stiff, never censored into shapeless modesty. Sweat, flush, goosebumps welcome.
+- If the poem is about objects/landscape, keep the frame sensual through texture and light instead of forcing a figure.`;
+
 /** Luma/Runway — style anchor for all video prompts (underground poetry film, not stock b-roll) */
 const VIDEO_MOTION_ANCHOR =
-  'ATUONA underground poetry film: premium arthouse look, live-action, natural film grain, intimate lensing, rich chiaroscuro, slow prestige pacing. Luxurious in mood and light — editorial beauty, emotional weight, tactile atmosphere — not generic stock footage, hotel commercial, or influencer gloss. Subtle motion only; do not invent new objects, people, or animals. No cartoon, 3D, Pixar, or toy mascots.';
+  'ATUONA underground poetry film: premium arthouse look, live-action, natural film grain, intimate lensing, rich chiaroscuro, slow prestige pacing. Luxurious in mood and light — editorial beauty, emotional weight, tactile atmosphere — not generic stock footage, hotel commercial, or influencer gloss. Sensual arthouse eroticism is part of the canon: the camera loves skin, fabric and the human form — breath visible in the body, slow tactile movement, implied desire, never explicit. Subtle motion only; do not invent new objects, people, or animals. No cartoon, 3D, Pixar, or toy mascots.';
 
 /**
  * Get knowledge for a specific topic (for direct queries like /art gauguin)
@@ -2465,6 +2594,8 @@ interface CreativeMemory {
   recentResponseFingerprints: string[];// first 80 chars of each AI creative response
   // Proactive daily message knowledge tracking
   recentProactiveKnowledgeKeys: string[][]; // last N days' module keys, newest last
+  // /create knowledge module tracking (rotation independent from daily inspirations)
+  recentCreateKnowledgeKeys: string[][];
 }
 
 let creativeMemory: CreativeMemory = {
@@ -2481,7 +2612,8 @@ let creativeMemory: CreativeMemory = {
   usedAssociationPatterns: [],
   usedEnhancements: [],
   recentResponseFingerprints: [],
-  recentProactiveKnowledgeKeys: []
+  recentProactiveKnowledgeKeys: [],
+  recentCreateKnowledgeKeys: []
 };
 
 /**
@@ -2528,8 +2660,9 @@ const KNOWN_PAINTINGS = [
   'luncheon on the grass', 'déjeuner sur l\'herbe', 'mont sainte-victoire',
   'the card players', 'bathers', 'les demoiselles', 'guernica', 'persistence of memory',
   'the kiss', 'the scream', 'girl with a pearl earring', 'birth of venus',
-  'atуона', 'atuona', 'paradise', 'рай', 'tahiti', 'таити',
-  'self-portrait', 'автопортрет', 'les misérables', 'маха'
+  // NOTE: generic words ('atuona', 'paradise', 'рай', 'tahiti', 'self-portrait') were removed —
+  // they matched nearly every response and flooded painting memory with noise.
+  'les misérables', 'маха', 'riders on the beach', 'всадники на пляже'
 ];
 
 /**
@@ -2614,6 +2747,14 @@ function getCreativeAvoidanceList(): string {
   const recentDomains = creativeMemory.usedSurpriseDomains.slice(-3);
   if (recentDomains.length > 0) {
     sections.push(`Recently used knowledge domains: ${recentDomains.join(', ')} — draw from DIFFERENT domains`);
+  }
+  
+  // Deep anti-repetition: recent openings (fingerprints) — the strongest signal of structural staleness
+  const recentOpenings = creativeMemory.recentResponseFingerprints.slice(-6);
+  if (recentOpenings.length > 0) {
+    sections.push(
+      `RECENT OPENINGS — you started your last pieces like this (NEVER open the same way again; change the setting, the first image, the first sentence structure):\n${recentOpenings.map(o => `  × "${o}"`).join('\n')}`
+    );
   }
   
   if (sections.length === 0) return '';
@@ -2721,15 +2862,98 @@ function generateFreshCreativeDirection(): string {
     'What if memory and present blur together?'
   ];
   
-  // Filter out recently used directions
-  const fresh = directions.filter(d => !creativeMemory.lastPlotSuggestions.includes(d));
-  const selected = fresh[Math.floor(Math.random() * fresh.length)] ?? directions[0];
+  // Filter out only RECENTLY used directions (last 6). Filtering against the whole memory
+  // (10 slots vs 10 options) deadlocked: once all cycled, it returned directions[0] forever.
+  const recentDirections = creativeMemory.lastPlotSuggestions.slice(-6);
+  let fresh = directions.filter(d => !recentDirections.includes(d));
+  if (fresh.length === 0) fresh = directions;
+  const selected = fresh[Math.floor(Math.random() * fresh.length)];
   const result = selected ?? 'What if the unexpected becomes the center of the scene?';
   
   // TRACK: record this direction so it won't repeat
   trackCreativeElement('plot', result);
   
   return result;
+}
+
+/**
+ * 🧠 IMAGINATIVE INTELLIGENCE — LLM-invented creative direction.
+ * Instead of cycling 10 hardcoded "What if" lines, ask the model to invent a NEW one
+ * grounded in the book's current state, avoiding everything recently used.
+ * Falls back to the static list on any error (additive, never breaks /create).
+ */
+async function generateFreshCreativeDirectionSmart(): Promise<string> {
+  const avoid = creativeMemory.lastPlotSuggestions.slice(-8);
+  const prompt = `You invent ONE fresh narrative direction for the next page of an underground poetry book ("Gallery of Moments" — Kira, Ule, the Vibe Coding Spirit, Atuona, art, recovery, code).
+
+CURRENT STATE:
+- Page: #${bookState.currentPage}, last title: "${bookState.lastPageTitle || 'unknown'}"
+- Open threads: ${creativeSession.plotThreads.slice(0, 3).join('; ') || 'none'}
+- Active voice: ${creativeSession.activeVoice || 'narrator'}
+
+RECENTLY USED DIRECTIONS (invent something structurally DIFFERENT from all of these):
+${avoid.map(a => `× ${a}`).join('\n') || '(none)'}
+
+Return ONE line starting with "What if" — specific, surprising, emotionally loaded, under 20 words. No explanation.`;
+  try {
+    const raw = await createContent(prompt, 80, true);
+    const line = raw.split('\n').map(s => s.trim()).find(s => /^what if/i.test(s)) || raw.trim();
+    if (line.length >= 15 && line.length <= 220) {
+      trackCreativeElement('plot', line);
+      return line;
+    }
+  } catch (err) {
+    console.error('Smart direction generation failed, using static fallback:', err);
+  }
+  return generateFreshCreativeDirection();
+}
+
+/** Domain pool for LLM-generated surprise connections — names only; the insight itself is invented fresh. */
+const SURPRISE_DOMAIN_POOL = [
+  'astronomy', 'deep sea biology', 'mycology', 'quantum physics', 'architecture', 'mythology',
+  'linguistics', 'cartography', 'entomology', 'metallurgy', 'meteorology', 'archaeology',
+  'music theory', 'neuroscience', 'typography', 'horology', 'perfumery', 'textile weaving',
+  'volcanology', 'ornithology', 'cryptography', 'anatomy', 'glassblowing', 'tides and navigation'
+];
+
+/**
+ * 🎨 ASSOCIATIVE INTELLIGENCE — LLM-invented surprise connection.
+ * Replaces (additively) the ~25 canned insights: picks an unusual domain not used recently
+ * and asks the model to forge a NEW association with the book's current moment.
+ * Falls back to the static generateSurpriseConnection() on any error.
+ */
+async function generateSurpriseConnectionSmart(): Promise<string> {
+  const recentDomains = creativeMemory.usedSurpriseDomains.slice(-6);
+  let pool = SURPRISE_DOMAIN_POOL.filter(d => !recentDomains.includes(d));
+  if (pool.length === 0) pool = SURPRISE_DOMAIN_POOL;
+  const domain = pool[Math.floor(Math.random() * pool.length)] || 'astronomy';
+  const avoidInsights = creativeMemory.usedSurpriseInsights.slice(-10);
+  const prompt = `Forge ONE surprising, TRUE association between the domain "${domain}" and this moment of an underground poetry book: page #${bookState.currentPage}, last title "${bookState.lastPageTitle || 'unknown'}", themes of exile, art, recovery, code, desire.
+
+Use a SPECIFIC real fact or mechanism from ${domain} (not a cliché). One or two sentences, English, poetic but precise.
+
+DO NOT resemble any of these already-used insights:
+${avoidInsights.map(a => `× ${a.slice(0, 90)}`).join('\n') || '(none)'}
+
+Return ONLY the association.`;
+  try {
+    const raw = (await createContent(prompt, 120, true)).trim();
+    if (raw.length >= 30 && raw.length <= 500) {
+      trackCreativeElement('metaphor', `[${domain}] ${raw}`);
+      creativeMemory.usedSurpriseDomains.push(domain);
+      if (creativeMemory.usedSurpriseDomains.length > 20) {
+        creativeMemory.usedSurpriseDomains = creativeMemory.usedSurpriseDomains.slice(-20);
+      }
+      creativeMemory.usedSurpriseInsights.push(raw);
+      if (creativeMemory.usedSurpriseInsights.length > 25) {
+        creativeMemory.usedSurpriseInsights = creativeMemory.usedSurpriseInsights.slice(-25);
+      }
+      return `[Unexpected connection from ${domain}]: ${raw}`;
+    }
+  } catch (err) {
+    console.error('Smart surprise generation failed, using static fallback:', err);
+  }
+  return generateSurpriseConnection();
 }
 
 // =============================================================================
@@ -2917,13 +3141,18 @@ async function generateProactiveMessage(): Promise<string> {
   });
   
   const emotionalGuidelines = getEmotionalGuidelines(selectedMood);
-  const creativeEnhancement = getCreativeEnhancement(selectedMood);
+  // 30% chance: LLM-forged surprise association (fresh every time); otherwise mood-based enhancement
+  const creativeEnhancement = Math.random() < 0.3
+    ? `\n\nCREATIVE ENHANCEMENT - Use this unexpected connection:\n${await generateSurpriseConnectionSmart()}\n`
+    : getCreativeEnhancement(selectedMood);
   const avoidanceList = getCreativeAvoidanceList();
-  const freshDirection = generateFreshCreativeDirection();
+  const freshDirection = await generateFreshCreativeDirectionSmart();
   const proactiveStaleBlock = buildProactiveStaleAndBanBlock();
   
   const selectedKeys = await selectProactiveKnowledgeModules();
-  const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
+  // 🔄 ROTATING KNOWLEDGE: the router's selection now actually limits what the model sees
+  // (previously the FULL knowledge base was dumped in regardless — selection was cosmetic).
+  const fullKnowledgeBlock = await buildRotatingCreativityKnowledgeBlock(selectedKeys);
 
   const recentSets = creativeMemory.recentProactiveKnowledgeKeys.slice(-3);
   const recentSummary = recentSets.length > 0
@@ -2939,7 +3168,7 @@ ${STORY_CONTEXT}
 ${PROACTIVE_STYLE}
 
 ═══════════════════════════════════════════════════════════════
-📚 FULL KNOWLEDGE + CANON #001–#048 (router suggested emphasis: ${selectedKeys.join(', ')})
+📚 TODAY'S KNOWLEDGE MODULES + ROTATING CANON SAMPLE (today you see ONLY: ${selectedKeys.join(', ')})
 ═══════════════════════════════════════════════════════════════
 
 ${fullKnowledgeBlock}
@@ -5271,7 +5500,15 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
       // Get previous content for continuity
       const previousContent = await getRelevantMemory('ATUONA', 'book_page', 3);
       
-      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
+      // 🔄 ROTATING KNOWLEDGE: only 3-4 fresh modules per page, paragraph-sampled —
+      // the full-KB dump made every page latch onto the same salient facts.
+      const createKeys = selectCreateKnowledgeModules(customPrompt);
+      const fullKnowledgeBlock = await buildRotatingCreativityKnowledgeBlock(createKeys);
+      creativeMemory.recentCreateKnowledgeKeys.push([...createKeys]);
+      if (creativeMemory.recentCreateKnowledgeKeys.length > 10) {
+        creativeMemory.recentCreateKnowledgeKeys = creativeMemory.recentCreateKnowledgeKeys.slice(-10);
+      }
+      console.log('🔄 /create knowledge modules:', createKeys.join(', '));
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(creativeMood);
@@ -5279,12 +5516,12 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
       // 🎨 Get creative enhancement
       const creativeEnhancement = getCreativeEnhancement(creativeMood);
       
-      // 🔮 Get fresh direction and avoidance list
-      const freshDirection = generateFreshCreativeDirection();
+      // 🔮 Fresh direction: LLM-invented (falls back to static list internally)
+      const freshDirection = await generateFreshCreativeDirectionSmart();
       const avoidanceList = getCreativeAvoidanceList();
       
-      // 🎨 Maybe get a surprise connection
-      const surpriseConnection = Math.random() < 0.35 ? generateSurpriseConnection() : '';
+      // 🎨 Maybe get a surprise connection — LLM-forged association (static fallback inside)
+      const surpriseConnection = Math.random() < 0.35 ? await generateSurpriseConnectionSmart() : '';
       
       const createPrompt = `${ATUONA_CONTEXT}
 
@@ -5328,7 +5565,7 @@ THEME: [One word theme]
 CRITICAL REQUIREMENTS:
 1. Your mood is ${creativeMood.toUpperCase()} - the TONE must match this (not just content!)
 2. Obey BOOK_UNDERGROUND_STYLE_CANON and the published canon excerpts — same underground temperature as #001–#048.
-3. Pull UNIQUE facts from **at least three domains** in the full knowledge above (not only Gauguin+auction headlines).
+3. Pull UNIQUE, specific facts from **at least two of today's knowledge modules** above (${createKeys.join(', ')}) — obscure details, not headlines.
 4. If there's a surprise spark - incorporate it subtly, don't force it
 
 Remember: Raw, honest, personal. Mix Russian with English naturally. End on breath — hope allowed, comfort not required.`;
@@ -8053,6 +8290,7 @@ USER DESCRIPTION (the image must reflect THIS, not a generic beach/flower/laptop
 "${description}"
 
 Context: NFT art for underground poetry / ATUONA. Photoreal cinematic still, emotional weight.
+${ATUONA_AESTHETIC_DIRECTIVE}
 
 ${VISUAL_HARD_EXCLUSIONS}
 
@@ -8351,6 +8589,9 @@ Return ONLY the translation. Plain text.`;
 
       const cinematicPrompt = `You write ONE image-generation prompt for ATUONA (underground poetry NFT / film stills).
 
+CURRENT CREATIVE MOOD: ${emotionalState.currentMood} — let it color the light, the body language, the tension of the frame.
+${ATUONA_AESTHETIC_DIRECTIVE}
+
 PRIMARY SOURCE (read all of this — visuals MUST follow the poem's specific images, metaphors, and emotional weight, not a generic "tropical tech" mood):
 TITLE: "${title}"
 THEME: ${theme}
@@ -8444,10 +8685,12 @@ Return ONLY the motion direction. No preamble.`;
         // Track which model was used for display
         let lastModelUsed = 'Flux Pro';
         
-        // Helper: safety_tolerance 1=strict … 6=most permissive (Replicate Flux). Vertical 9:16 often false-positives at 2.
+        // Helper: safety_tolerance 1=strict … 6=most permissive (Replicate Flux).
+        // Default raised 2→5: at 2 Flux sanitized sensuality/skin — ATUONA's arthouse-erotic
+        // aesthetic needs permissive moderation (prompts stay tasteful/implied by design).
         const runFluxWithRetry = async (
           aspectRatio: string,
-          safetyTolerance: number = 2,
+          safetyTolerance: number = 5,
           maxRetries = 3
         ): Promise<string | null> => {
           const tol = Math.min(6, Math.max(1, Math.round(safetyTolerance)));
@@ -8615,7 +8858,7 @@ Return ONLY the motion direction. No preamble.`;
         };
         
         try {
-          const output = await runFluxWithRetry('16:9', 2);
+          const output = await runFluxWithRetry('16:9', 5);
           
           console.log('Flux output (16:9):', output, typeof output);
           
