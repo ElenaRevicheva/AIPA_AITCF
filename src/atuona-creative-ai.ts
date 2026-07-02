@@ -3680,7 +3680,9 @@ async function generateVideo(
   prompt: string,
   ctx: Context,
   preferredProvider?: VideoProvider | null,
-  pageId?: string
+  pageId?: string,
+  /** True when re-running the chain after a Luma Direct job failed DURING rendering (poll-time) — skips resubmitting to Luma Direct. */
+  skipLumaDirect: boolean = false
 ): Promise<VideoGenerationResult> {
 
   // ========== 0. EXPLICIT PROVIDER (e.g. `/visualize omni 089`) ==========
@@ -3715,7 +3717,7 @@ async function generateVideo(
   // preferredProvider 'luma' or null → default chain below is already Luma-first.
 
   // ========== 1. TRY LUMA DIRECT API FIRST (your Luma API key) ==========
-  if (lumaApiKey) {
+  if (lumaApiKey && !skipLumaDirect) {
     try {
       console.log('🎬 Trying Luma Dream Machine (Direct API)...');
       const allowedLumaRes = ['540p', '720p', '1080p', '4k'] as const;
@@ -9000,6 +9002,91 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
             const pollIntervalMs = 30_000;
             const maxAttempts = 20; // ~10 min after first poll + 60s initial wait
 
+            /** Deliver a fallback-produced video: same steps as the primary paths (persist, send, audit, Director's Cut, summary, unlock). */
+            const deliverFallbackVideo = async (vUrl: string, providerLabel: string): Promise<void> => {
+              visualization.videoUrlHorizontal = vUrl;
+              visualization.status = 'complete';
+              saveState();
+              persistShot(pageId, vUrl).catch(() => undefined);
+              await replyWithVideoFromUrlReliable(ctx, vUrl, {
+                caption: `✅ *Video Ready!* (${providerLabel} — fallback after Luma fail)\n\n_Tap to play, long-press to save!_`,
+                parse_mode: 'Markdown'
+              });
+              await sendKnowledgeAuditAfterVideo();
+              startDirectorsCutPipeline({
+                baseVideoUrl: vUrl,
+                firstFrameImageUrl: visualization.imageUrlHorizontal!,
+                title, theme, englishExcerpt,
+                knowledgeKeys: deepKb.mergedKeys as string[],
+                ctx, visualization
+              }).catch(err => console.error('Director\'s Cut error (fallback path):', err));
+              await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+              visualizeInFlight.delete(vizLockKey);
+            };
+
+            /**
+             * 🔁 NEW: Luma jobs that fail DURING rendering (e.g. Ray moderation on sensual frames)
+             * previously ended the whole pipeline — the Replicate → Omni → Runway chain only covered
+             * submission-time failures. Now the chain re-runs (skipping Luma Direct resubmit).
+             */
+            const runPostLumaFallbackChain = async (): Promise<void> => {
+              try {
+                await ctx.reply(
+                  '🔁 *Running fallback chain:* Luma Replicate → Gemini Omni Flash → Runway Gen-4.5...',
+                  { parse_mode: 'Markdown' }
+                );
+                const fb = await generateVideo(visualization.imageUrlHorizontal!, motionPrompt, ctx, null, pageId, true);
+
+                if (fb.success && fb.videoUrl) {
+                  const providerLabel = fb.provider === 'omni' ? 'Gemini Omni Flash'
+                    : fb.provider === 'veo' ? 'Google Veo 3.1'
+                    : fb.provider === 'kling' ? 'Kling'
+                    : 'Luma via Replicate';
+                  await deliverFallbackVideo(fb.videoUrl, providerLabel);
+                  return;
+                }
+
+                if (fb.success && fb.provider === 'runway' && fb.taskId && runwayApiKey) {
+                  // Compact await-based Runway poll (~60s + 7×40s ≈ 5.5 min max)
+                  for (let attempt = 1; attempt <= 8; attempt++) {
+                    await new Promise(r => setTimeout(r, attempt === 1 ? 60_000 : 40_000));
+                    try {
+                      const sr = await fetch(`${RUNWAY_API_URL}/tasks/${fb.taskId}`, {
+                        headers: { 'Authorization': `Bearer ${runwayApiKey}`, 'X-Runway-Version': '2024-11-06' }
+                      });
+                      if (!sr.ok) continue;
+                      const sd = await sr.json() as any;
+                      if (sd.status === 'SUCCEEDED' && sd.output?.[0]) {
+                        await deliverFallbackVideo(String(sd.output[0]), 'Runway Gen-4.5');
+                        return;
+                      }
+                      if (sd.status === 'FAILED') {
+                        await ctx.reply(`❌ Runway fallback failed: ${sd.failure || 'Unknown'}`);
+                        break;
+                      }
+                      console.log(`Runway fallback ${fb.taskId} still ${sd.status} (${attempt}/8)...`);
+                    } catch (pollErr) {
+                      console.error('Runway fallback poll error:', pollErr);
+                    }
+                  }
+                  await ctx.reply(
+                    `⏳ Runway fallback did not finish in time. Try \`/videostatus ${fb.taskId}\` or \`/visualize runway ${pageId}\`.`,
+                    { parse_mode: 'Markdown' }
+                  );
+                } else if (!fb.success) {
+                  await ctx.reply(
+                    `❌ All video fallbacks failed${fb.error ? `: ${String(fb.error).substring(0, 140)}` : ''}.\n\nImage is saved — retry later with \`/visualize ${pageId}\`.`,
+                    { parse_mode: 'Markdown' }
+                  );
+                }
+              } catch (fallbackErr: any) {
+                console.error('Post-Luma fallback chain error:', fallbackErr);
+                await ctx.reply(`❌ Fallback chain error: ${String(fallbackErr?.message || fallbackErr).substring(0, 140)}`).catch(() => undefined);
+              }
+              await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
+              visualizeInFlight.delete(vizLockKey);
+            };
+
             const pollLumaVideo = async (attempt: number = 1) => {
               try {
                 const statusResponse = await fetch(`${LUMA_API_URL}/generations/${taskId}`, {
@@ -9052,8 +9139,12 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
 
                   if (statusData.state === 'failed') {
                     await ctx.reply(`❌ Luma video failed.\nReason: ${statusData.failure_reason || 'Unknown'}`);
-                    await sendVisualizationSummary().catch(e => console.error('sendVisualizationSummary:', e));
-                    visualizeInFlight.delete(vizLockKey);
+                    // 🔁 Don't give up: run Replicate → Omni → Runway (handles summary + lock itself)
+                    runPostLumaFallbackChain().catch(async (e) => {
+                      console.error('runPostLumaFallbackChain fatal:', e);
+                      await sendVisualizationSummary().catch(() => undefined);
+                      visualizeInFlight.delete(vizLockKey);
+                    });
                     return;
                   }
 
