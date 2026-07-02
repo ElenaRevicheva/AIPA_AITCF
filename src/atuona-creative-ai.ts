@@ -426,6 +426,9 @@ function chunkForTelegram(text: string, maxLen: number = TELEGRAM_MAX_MESSAGE_LE
 // ATUONA'S CREATIVE CONTEXT - The Soul of the Book
 // =============================================================================
 
+/** Published poem count on GitHub (metadata/001.json … metadata/098.json). */
+const CANON_MAX_PUBLISHED_PAGE = 98;
+
 const ATUONA_CONTEXT = `
 You are ATUONA, the AI Creative Co-Founder & Co-Writer of AIdeazz.
 
@@ -467,7 +470,7 @@ When you write or translate:
 - If a sentence sounds safe — rewrite it
 - If it sounds like it was written by an AI trying to be poetic — delete it
 
-THEMATIC CONTINUITY (from 48 existing pages):
+THEMATIC CONTINUITY (from ${CANON_MAX_PUBLISHED_PAGE} published pages):
 - Memory and mortality (На память)
 - Addiction and farewell (To Beautrix)
 - Violence merged with technology (Atuona)
@@ -502,14 +505,14 @@ interface BookState {
 
 let bookState: BookState = {
   currentChapter: 1,
-  currentPage: 48, // Current: 048 exists, next will be 049
+  currentPage: 99, // Next draft after #098 published
   lastPageContent: '',
   lastPageTitle: '',
   lastPageTitleEnglish: '',
   lastPageEnglish: '',
   lastPageTheme: '',
   lastPageDescription: '',
-  totalPages: 48
+  totalPages: CANON_MAX_PUBLISHED_PAGE
 };
 
 // Queue for importing multiple pages
@@ -1610,11 +1613,11 @@ ${EMOTIONAL_INTELLIGENCE}
 `;
 
 /**
- * Poems #001–#048 define the underground voice — not “literary AI,” not decorative, not explainer.
+ * Poems #001–#098 define the underground voice — not “literary AI,” not decorative, not explainer.
  * (Live excerpts from GitHub are appended separately via getUndergroundCanonCorpus.)
  */
 const BOOK_UNDERGROUND_STYLE_CANON = `
-UNDERGROUND POETRY STYLE — CANON #001–#048 (Gallery of Moments):
+UNDERGROUND POETRY STYLE — CANON #001–#098 (Gallery of Moments):
 
 This book is not aesthetic wallpaper. It is survival, shame, hunger, exile, sex, art market, code, and family — on one semantic layer.
 
@@ -1803,7 +1806,7 @@ function stripCanonDescriptionBoilerplate(description: string): string {
 
 /**
  * Prefer full on-chain text when present; otherwise title + Poem trait + cleaned description
- * (matches what is actually published on GitHub for #001–#048).
+ * (matches what is actually published on GitHub for #001–#098).
  */
 function buildCanonExcerptFromMetadata(
   pageId: string,
@@ -1849,7 +1852,137 @@ async function fetchOneCanonMetadataPage(pageNum: number): Promise<string | null
   }
 }
 
-/** Russian excerpts from published metadata #001–#048 — underground style anchor (cached). */
+interface PagePoemContent {
+  title: string;
+  theme: string;
+  englishText: string;
+  russianText: string;
+}
+
+const POEM_JSON_FALLBACK_FILES = ['atuona-complete-with-dates.json', 'atuona-45-poems-with-text.json'] as const;
+
+/** Older pages may lack poem body in metadata — scan repo JSON files by numeric id. */
+async function fetchPoemTextFromJsonFiles(
+  pageId: string,
+  existing: { theme?: string; englishText?: string }
+): Promise<{ theme: string; englishText: string; russianText: string }> {
+  const wantNum = parseInt(pageId, 10);
+  let theme = existing.theme || '';
+  let englishText = existing.englishText || '';
+  let russianText = '';
+
+  for (const file of POEM_JSON_FALLBACK_FILES) {
+    if (russianText) break;
+    try {
+      const { data: poemsFile } = await octokit.repos.getContent({
+        owner: ATUONA_BOOK_REPO.owner,
+        repo: ATUONA_BOOK_REPO.repo,
+        path: file,
+        ref: 'main'
+      });
+      if (!('content' in poemsFile)) continue;
+      let poemsData: any = JSON.parse(Buffer.from(poemsFile.content, 'base64').toString('utf-8'));
+      if (!Array.isArray(poemsData)) poemsData = poemsData.poems || Object.values(poemsData);
+      const poemEntry = poemsData.find((p: any) => {
+        const idVal = (p.attributes?.find((a: any) => a.trait_type === 'ID')?.value || '').toString().trim();
+        const nm = p.name || '';
+        const nmNum = (nm.match(/#(\d{1,3})\b/) || [])[1];
+        return idVal === pageId
+          || (idVal && parseInt(idVal, 10) === wantNum)
+          || nm.includes(`#${pageId}`)
+          || (nmNum && parseInt(nmNum, 10) === wantNum);
+      });
+      if (poemEntry) {
+        russianText = poemEntry.attributes?.find((a: any) => a.trait_type === 'Poem Text' || a.trait_type === 'Russian Text')?.value || '';
+        theme = theme || poemEntry.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
+        const engTrait = poemEntry.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
+        if (!englishText && engTrait) englishText = engTrait;
+        if (russianText) console.log(`✅ Found poem text for #${pageId} in ${file}: ${russianText.substring(0, 50)}...`);
+      }
+    } catch (fallbackError) {
+      console.error(`Failed to fetch poems fallback from ${file}:`, fallbackError);
+    }
+  }
+  return { theme, englishText, russianText };
+}
+
+/**
+ * Full poem body for /visualize and /imagine: metadata/{pageId}.json first, then poem JSON,
+ * then local bookState draft for unpublished pages (#099+).
+ */
+async function fetchPagePoemContent(pageId: string): Promise<PagePoemContent> {
+  let title = 'Unknown';
+  let theme = '';
+  let englishText = '';
+  let russianText = '';
+
+  try {
+    const { data: metaFile } = await octokit.repos.getContent({
+      owner: ATUONA_BOOK_REPO.owner,
+      repo: ATUONA_BOOK_REPO.repo,
+      path: `metadata/${pageId}.json`,
+      ref: 'main'
+    });
+    if ('content' in metaFile) {
+      const metadata = JSON.parse(Buffer.from(metaFile.content, 'base64').toString('utf-8'));
+      title =
+        metadata.attributes?.find((a: any) => a.trait_type === 'Poem' || a.trait_type === 'Title')?.value
+        || metadata.name?.replace(/\s*#\d+\s*$/, '').trim()
+        || title;
+      theme = metadata.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
+      englishText =
+        metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
+      russianText =
+        metadata.attributes?.find((a: any) => a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text')?.value || '';
+    }
+  } catch {
+    console.log(`📖 metadata/${pageId}.json not on GitHub — trying poem JSON + local draft…`);
+  }
+
+  if (!englishText && !russianText) {
+    console.log(`📖 Page #${pageId} missing text in metadata, fetching from poems JSON...`);
+    const fromJson = await fetchPoemTextFromJsonFiles(pageId, { theme, englishText });
+    theme = fromJson.theme || theme;
+    englishText = fromJson.englishText || englishText;
+    russianText = fromJson.russianText;
+  }
+
+  const wantNum = parseInt(pageId, 10);
+  if (!russianText && !englishText && bookState.lastPageContent) {
+    const lastPublished = bookState.currentPage - 1;
+    if (wantNum === bookState.currentPage || wantNum === lastPublished) {
+      console.log(`📖 Using local bookState draft for page #${pageId}`);
+      russianText = bookState.lastPageContent;
+      englishText = bookState.lastPageEnglish || '';
+      title = bookState.lastPageTitle || title;
+      theme = bookState.lastPageTheme || theme;
+    }
+  }
+
+  if (!englishText && russianText) {
+    console.log(`🔄 Translating Russian text for #${pageId}...`);
+    const translationPrompt = `ATUONA translation — meaning + rhythm, not words.
+
+${russianText.substring(0, 1000)}
+
+Rules: Read as original underground lit, not translation. Simple words, heavy weight. Kill safe sentences.
+Return ONLY the translation. Plain text.`;
+    try {
+      englishText = await createContent(translationPrompt, 800, true);
+    } catch (transError) {
+      console.error('Translation failed:', transError);
+      englishText = russianText;
+    }
+  }
+
+  if (!russianText && !englishText) {
+    throw new Error(`Page #${pageId} not found (no metadata, poem JSON, or local draft)`);
+  }
+
+  return { title, theme, englishText, russianText };
+}
+
+/** Russian excerpts from published metadata #001–#098 — underground style anchor (cached). */
 async function getUndergroundCanonCorpus(): Promise<string> {
   if (undergroundCanonCorpusCache !== null) return undergroundCanonCorpusCache;
   if (!githubToken) {
@@ -1858,9 +1991,10 @@ async function getUndergroundCanonCorpus(): Promise<string> {
   }
   const parts: string[] = [];
   const batchSize = 8;
-  for (let start = 1; start <= 48; start += batchSize) {
+  const maxPage = CANON_MAX_PUBLISHED_PAGE;
+  for (let start = 1; start <= maxPage; start += batchSize) {
     const batch: Promise<string | null>[] = [];
-    for (let n = start; n < start + batchSize && n <= 48; n++) {
+    for (let n = start; n < start + batchSize && n <= maxPage; n++) {
       batch.push(fetchOneCanonMetadataPage(n));
     }
     const results = await Promise.all(batch);
@@ -1870,19 +2004,19 @@ async function getUndergroundCanonCorpus(): Promise<string> {
   }
   undergroundCanonCorpusCache = parts.join('\n\n');
   console.log(
-    `📚 Underground canon corpus: ${parts.length}/48 pages, ${undergroundCanonCorpusCache.length} chars (full poem text when trait present; else title + theme from metadata)`
+    `📚 Underground canon corpus: ${parts.length}/${maxPage} pages, ${undergroundCanonCorpusCache.length} chars (full poem text when trait present; else title + theme from metadata)`
   );
   return undergroundCanonCorpusCache;
 }
 
-/** Full KB + style canon + poems 001–048 excerpts — for major creative generation. */
+/** Full KB + style canon + poems 001–098 excerpts — for major creative generation. */
 async function buildFullCreativityKnowledgeBlock(): Promise<string> {
   const canon = await getUndergroundCanonCorpus();
   const canonBlock =
     canon.length > 0
       ? `
 ═══════════════════════════════════════════════════════════════
-CANON — PUBLISHED POEMS #001–#048 (match rhythm, cuts, temperature; never copy-paste)
+CANON — PUBLISHED POEMS #001–#098 (match rhythm, cuts, temperature; never copy-paste)
 ═══════════════════════════════════════════════════════════════
 ${canon}
 `
@@ -1957,6 +2091,106 @@ function selectCreateKnowledgeModules(seedText?: string): KnowledgeCategory[] {
 }
 
 /**
+ * LLM router for /create — same intelligence as daily inspiration, but tracks
+ * recentCreateKnowledgeKeys (not proactive history).
+ */
+async function selectCreateKnowledgeModulesSmart(seedText?: string): Promise<KnowledgeCategory[]> {
+  const seedKeys: KnowledgeCategory[] = [];
+  if (seedText?.trim()) {
+    for (const k of collectTriggerKnowledgeKeys(seedText, creativeSession.activeVoice)) {
+      if (seedKeys.length < 2 && !seedKeys.includes(k)) seedKeys.push(k);
+    }
+  }
+
+  const recentSets = creativeMemory.recentCreateKnowledgeKeys.slice(-4);
+  const recentFlat = recentSets.flat();
+  const frequencyMap: Record<string, number> = {};
+  for (const k of recentFlat) frequencyMap[k] = (frequencyMap[k] || 0) + 1;
+  const overusedKeys = Object.entries(frequencyMap)
+    .filter(([, count]) => count >= 2)
+    .map(([key]) => key);
+  const available = ALL_KNOWLEDGE_KEYS.filter(k => !overusedKeys.includes(k));
+  const preferred = available.length >= 3 ? available : ALL_KNOWLEDGE_KEYS;
+
+  const routerPrompt = `You select knowledge modules for ONE new BOOK PAGE of underground poetry prose (NOT an art-market essay, NOT a Gauguin biography recap).
+
+AVAILABLE MODULES (pick exactly 3 or 4):
+${ALL_KNOWLEDGE_KEYS.join(', ')}
+
+CONTEXT:
+- Next page: #${bookState.currentPage}
+- Last page title: "${bookState.lastPageTitle || 'unknown'}"
+- Plot threads: ${creativeSession.plotThreads.slice(0, 3).join('; ') || 'none'}
+- Active voice: ${creativeSession.activeVoice || 'narrator'}
+
+RECENTLY OVERUSED in /create (strongly avoid): ${overusedKeys.join(', ') || 'none'}
+PREFERRED (fresh): ${preferred.join(', ')}
+RECENT /create SELECTIONS: ${recentSets.map((s, i) => `Run-${recentSets.length - i}: [${s.join(', ')}]`).join(' | ') || 'none'}
+
+RULES:
+- Pick modules that open NEW angles — museums backstage, impressionist technique, NFT fusion, agentic AI soul, Atlas philosophy, emotional recovery, fashion cruelty.
+- **Never pick BOTH "gauguin" AND "auction"** — forces Nafea/Christie's/morphine loop.
+- **Avoid "gauguin" + "atuona" together** unless seed text demands it — that pairing defaults to bedroom/mirror/Maison du Jouir scenes.
+- At least TWO modules must differ from the last /create run.
+- Return ONLY comma-separated module keys. No explanation.`;
+
+  try {
+    const raw = await createContent(routerPrompt, 60, false);
+    const parsed = raw.toLowerCase().split(/[,\s]+/)
+      .map(s => s.trim().replace(/[^a-z]/g, ''))
+      .filter(s => ALL_KNOWLEDGE_KEYS.includes(s)) as KnowledgeCategory[];
+    if (parsed.length >= 2) {
+      const merged = diversifyProactiveKeys(
+        [...new Set([...seedKeys, ...parsed])].slice(0, 4) as KnowledgeCategory[]
+      );
+      console.log('🔄 /create LLM router selected:', merged.join(', '));
+      return merged;
+    }
+  } catch (err) {
+    console.error('/create LLM router failed, using LRU fallback:', err);
+  }
+  return selectCreateKnowledgeModules(seedText);
+}
+
+/** Slim continuity for /create — avoids dumping full Gauguin/Atuona KB on every page. */
+function buildCreateContinuityBlock(): string {
+  return `
+BOOK CONTINUITY (slim — the FULL Gauguin biography and chapter synopsis are deliberately absent):
+- Chapter ${bookState.currentChapter}, writing page #${String(bookState.currentPage).padStart(3, '0')}
+- Last published page: "${bookState.lastPageTitle || 'none'}" (${bookState.lastPageTheme || 'no theme'})
+- Active voice: ${creativeSession.activeVoice}
+- Current setting variable: ${creativeSession.currentSetting} — you MAY change location; do NOT default to the same room every page.
+- Open threads (develop ONE, not all): ${creativeSession.plotThreads.slice(0, 4).join('; ') || 'the journey continues'}
+`;
+}
+
+/** Anti-staleness for /create: surface-fact bans + structural loop detection + regen directive. */
+function buildCreateStaleAndBanBlock(): string {
+  const recentCreates = creativeMemory.recentResponseFingerprints.slice(-8);
+  const recentText = [bookState.lastPageContent, ...recentCreates].join(' ');
+  const stale = extractStaleDetailsFromHistory([recentText], 1);
+
+  const createLoops: string[] = [];
+  const lt = recentText.toLowerCase();
+  if (/maison du jouir|бамбук|bamboo.?wall/.test(lt)) createLoops.push('Maison du Jouir interior / bamboo wall');
+  if (/mirror|отражен|зеркал|reflection|шепот отраж/.test(lt)) createLoops.push('mirror / reflection-as-character dialogue');
+  if (/validator|consensus|deploy|cursor|commit|fork/.test(lt)) createLoops.push('blockchain/Cursor/deploy validator metaphors as spine');
+  if (/gauguin.*papeete|papeete.*glass|woman with mango|vahine/.test(lt)) createLoops.push('Gauguin mirror prop / Woman with Mango citation');
+  if (/eddie willers|atlas shrugged|rail/.test(lt)) createLoops.push('Atlas Eddie Willers / train metaphor');
+  if (/musée d'orsay|courtauld|folies-berg/.test(lt)) createLoops.push('museum painting lecture (Manet, Courtauld, etc.)');
+  if (/premotor cortex|mirror neuron/.test(lt)) createLoops.push('mirror neuron / neuroscience lecture');
+
+  let block = `${PROACTIVE_EXHAUSTED_SURFACE_FACTS}\n${stale}`;
+  if (createLoops.length > 0) {
+    block += `\n⛔ STRUCTURAL LOOPS from recent /create drafts — do NOT repeat:\n${createLoops.map(x => `  × ${x}`).join('\n')}\nMandatory: NEW location, NEW central object, NEW opening sentence structure.\n`;
+  }
+  if (bookState.lastPageContent && bookState.lastPageContent.length > 100) {
+    block += `\n⚠️ REGENERATION: Elena asked for a DIFFERENT version of page #${String(bookState.currentPage).padStart(3, '0')}. Previous draft opened: "${bookState.lastPageContent.replace(/\s+/g, ' ').substring(0, 140)}…" — write structurally DIFFERENT prose (new place, new image, new tension).\n`;
+  }
+  return block;
+}
+
+/**
  * Rotating knowledge block: style canon + sampled published poems + ONLY the selected
  * modules (each paragraph-sampled). Used by /create and daily inspiration.
  * buildFullCreativityKnowledgeBlock() remains untouched for all other commands.
@@ -1967,7 +2201,7 @@ async function buildRotatingCreativityKnowledgeBlock(selectedKeys: KnowledgeCate
   const canonBlock = canonSample
     ? `
 ═══════════════════════════════════════════════════════════════
-CANON — ROTATING SAMPLE FROM PUBLISHED POEMS #001–#048 (match rhythm, cuts, temperature; never copy-paste)
+CANON — ROTATING SAMPLE FROM PUBLISHED POEMS #001–#098 (match rhythm, cuts, temperature; never copy-paste)
 ═══════════════════════════════════════════════════════════════
 ${canonSample}
 `
@@ -2052,7 +2286,32 @@ HARD BANS (these words/concepts get jobs killed — translate into shadow/light/
 
 /** Detect provider moderation failures (input image or output flagged). */
 function isVideoModerationError(message: string): boolean {
-  return /moderation|sexual|ContentModeration|flagged|nsfw|did not pass content/i.test(message);
+  return /moderation|sexual|ContentModeration|flagged|nsfw|did not pass content|content_moderated|content policy|sensitive/i.test(message);
+}
+
+/** Pages with underground erotic charge — video APIs need chiaroscuro keyframes, not gallery stills. */
+function isLikelySensualVisual(...texts: (string | undefined)[]): boolean {
+  const combined = texts.filter(Boolean).join(' ').toLowerCase();
+  return /\b(sensual|erotic|intimate|bare skin|naked|nude|lovers?|arch(?:es|ing)?|spine|collarbone|thigh|stomach|breast|chest|tactile|damp skin|woven mat|maison du jouir|jouir|exhale|skin gli|on her back|on his back|between them|heat and silence|linen breathes)\b/i.test(combined);
+}
+
+/** Luma Modify API rejects body-action language — keep editorial grade only. */
+const MODIFY_SAFE_FALLBACK_PROMPT =
+  'Underground editorial grade: sculpted low-key light, subtle specular on shadowed skin, luxurious fabric drape, deep chiaroscuro, muted filmic color separation, haute-couture stillness. Preserve motion and composition; no new elements.';
+
+function sanitizeModifyPrompt(prompt: string): string {
+  let s = prompt
+    .replace(/\b(Kira|Ule|Elena|Gauguin)\b/gi, 'figure')
+    .replace(/\b(traces|tracing|presses|pressed|dig(?:s|ging)? into|on (?:her|his) (?:stomach|chest|thigh|back|shoulder))\b/gi, 'shadow sculpts')
+    .replace(/\b(muscular undertones|bare|naked|nude)\b/gi, 'silhouette');
+  s = sanitizeMotionForVideoProviders(s);
+  if (s.length > 320) s = s.slice(0, 320);
+  return s;
+}
+
+const GEMINI_HTTP_TIMEOUT_MS = 45_000;
+function geminiFetchSignal(): AbortSignal {
+  return AbortSignal.timeout(GEMINI_HTTP_TIMEOUT_MS);
 }
 
 /** Strip only hard-ban vocabulary from motion text — keeps erotic atmosphere words (desire, breath, skin, silk). */
@@ -2832,8 +3091,11 @@ function extractAndTrackFromResponse(response: string, context?: string): void {
     }
   }
   
-  // 4. Track response fingerprint (first meaningful 80 chars for deep anti-repetition)
-  const fingerprint = response.replace(/\s+/g, ' ').trim().substring(0, 80);
+  // 4. Track response fingerprint (content body preferred — not "TITLE:" boilerplate)
+  let fingerprintSource = response;
+  const contentBody = response.match(/CONTENT:\s*([\s\S]*?)(?=THEME:|$)/i)?.[1]?.trim();
+  if (contentBody && contentBody.length > 40) fingerprintSource = contentBody;
+  const fingerprint = fingerprintSource.replace(/\s+/g, ' ').trim().substring(0, 120);
   creativeMemory.recentResponseFingerprints.push(fingerprint);
   if (creativeMemory.recentResponseFingerprints.length > 50) {
     creativeMemory.recentResponseFingerprints = creativeMemory.recentResponseFingerprints.slice(-50);
@@ -3708,7 +3970,7 @@ async function translateToEnglish(russianText: string, title: string): Promise<s
   
   const translatePrompt = `You are translating ATUONA — underground literature, not poetry for magazines.
 
-CONTEXTUAL KNOWLEDGE (full embedded KB + poems #001–#048 canon — enrich references with obscure cross-domain facts, not clichés):
+CONTEXTUAL KNOWLEDGE (full embedded KB + poems #001–#098 canon — enrich references with obscure cross-domain facts, not clichés):
 ${relevantKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -3801,9 +4063,192 @@ interface VideoGenerationResult {
 type VideoGenerationOptions = {
   /** Skip Luma Direct resubmit (used after a Luma render-time failure). */
   skipLumaDirect?: boolean;
-  /** Cap Omni polling at ~3 min instead of ~12 min (fallback chain). */
+  /** Cap Omni polling at ~3 min instead of ~6–12 min (fallback chain). */
   fastOmniPoll?: boolean;
+  /** Gallery still prompt — enables chiaroscuro keyframe retry on moderation/timeout. */
+  galleryImagePrompt?: string;
+  title?: string;
+  /** Pre-detected sensual page — prefer encoded keyframe for video providers. */
+  sensual?: boolean;
+  /** Providers already tried (explicit `/visualize omni` etc.) — skip in alternate chain. */
+  excludeProviders?: VideoProvider[];
 };
+
+/** Luma via Replicate — shared by default chain and alternate fallback. */
+async function tryLumaReplicate(
+  imageUrl: string,
+  safeMotion: string,
+  ctx: Context
+): Promise<VideoGenerationResult> {
+  if (!replicate) {
+    return { success: false, provider: 'luma-replicate', error: 'Replicate not configured' };
+  }
+  try {
+    console.log(`🎬 Trying Luma via Replicate (model=${VIDEO_MODELS.lumaReplicate})...`);
+    await ctx.reply(`🎬 *Trying Luma via Replicate...*\n\n_${VIDEO_MODELS.lumaReplicate}..._`, { parse_mode: 'Markdown' });
+
+    const isRay3Replicate = /ray-3/i.test(VIDEO_MODELS.lumaReplicate);
+    const lumaReplicateInput = isRay3Replicate
+      ? {
+          prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
+          start_image: imageUrl,
+          duration: 5,
+          resolution: '1080p',
+        }
+      : {
+          prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
+          start_image_url: imageUrl,
+          aspect_ratio: '16:9',
+          loop: false,
+          duration: 9,
+        };
+
+    const lumaOutput = await replicate.run(
+      VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
+      { input: lumaReplicateInput }
+    );
+
+    let videoUrl: string | null = null;
+    if (lumaOutput != null) {
+      if (Array.isArray(lumaOutput) && lumaOutput[0] != null) {
+        const s = String(lumaOutput[0]);
+        if (s.startsWith('http')) videoUrl = s;
+      } else {
+        const s = String(lumaOutput);
+        if (s.startsWith('http')) videoUrl = s;
+      }
+      if (!videoUrl && typeof lumaOutput === 'object' && lumaOutput !== null) {
+        const o = lumaOutput as { url?: () => URL };
+        if (typeof o.url === 'function') {
+          try { videoUrl = o.url().href; } catch { /* ignore */ }
+        }
+      }
+    }
+
+    if (videoUrl && videoUrl.startsWith('http')) {
+      console.log('✅ Luma via Replicate succeeded!');
+      return { success: true, videoUrl, provider: 'luma-replicate', needsPolling: false };
+    }
+    throw new Error('Luma Replicate returned invalid output');
+  } catch (err: any) {
+    console.error('Luma Replicate error:', err.message);
+    return { success: false, provider: 'luma-replicate', error: err.message };
+  }
+}
+
+/**
+ * After an explicit provider fails — try the rest in reliability order for underground/sensual content.
+ * Kling first (proven on 098), then Luma Replicate, Omni (fast), Veo, Luma Direct, Runway.
+ */
+async function runAlternateVideoChain(
+  imageUrl: string,
+  prompt: string,
+  ctx: Context,
+  pageId: string | undefined,
+  options: VideoGenerationOptions = {}
+): Promise<VideoGenerationResult> {
+  const { skipLumaDirect = false, fastOmniPoll = true, excludeProviders = [] } = options;
+  const exclude = new Set(excludeProviders);
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
+
+  if (!exclude.has('kling') && replicate) {
+    const kling = await tryKling(imageUrl, safeMotion, ctx);
+    if (kling.success) return kling;
+  }
+
+  if (!exclude.has('luma')) {
+    const lumaRep = await tryLumaReplicate(imageUrl, safeMotion, ctx);
+    if (lumaRep.success) return lumaRep;
+  }
+
+  if (!exclude.has('omni') && geminiApiKey) {
+    const omni = await generateWithOmni(imageUrl, safeMotion, ctx, pageId, fastOmniPoll);
+    if (omni.success) return omni;
+  }
+
+  if (!exclude.has('veo') && geminiApiKey && !googleVideoOmniOnly()) {
+    const veo = await generateWithVeo(imageUrl, safeMotion, ctx);
+    if (veo.success) return veo;
+  }
+
+  if (!exclude.has('luma') && lumaApiKey && !skipLumaDirect) {
+    try {
+      console.log('🎬 Trying Luma Dream Machine (Direct API)...');
+      const allowedLumaRes = ['540p', '720p', '1080p', '4k'] as const;
+      const lumaResolution =
+        (allowedLumaRes as readonly string[]).includes(process.env.LUMA_VIDEO_RESOLUTION || '')
+          ? (process.env.LUMA_VIDEO_RESOLUTION as (typeof allowedLumaRes)[number])
+          : VIDEO_MODELS.lumaResolution;
+      await ctx.reply(
+        `🎬 *Generating video with Luma Dream Machine...*\n\n_${VIDEO_MODELS.lumaDirect} · ${lumaResolution} · Direct API — takes 1–3 minutes..._`,
+        { parse_mode: 'Markdown' }
+      );
+      const lumaBody = {
+        model: VIDEO_MODELS.lumaDirect,
+        type: 'video',
+        resolution: lumaResolution,
+        prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
+        keyframes: { frame0: { type: 'image', url: imageUrl } },
+        aspect_ratio: '16:9',
+        duration: '9s',
+        loop: false,
+      };
+      const lumaResponse = await fetch(`${LUMA_API_URL}/generations`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${lumaApiKey}`,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(lumaBody),
+        signal: lumaCreateSignal(),
+      });
+      const responseText = await lumaResponse.text();
+      if (lumaResponse.ok) {
+        const lumaData = JSON.parse(responseText);
+        await ctx.reply(`🎬 Luma generation started!\nID: \`${lumaData.id}\`\n\n_Checking status in 60 seconds..._`, { parse_mode: 'Markdown' });
+        return { success: true, taskId: lumaData.id, provider: 'luma-direct', needsPolling: true };
+      }
+      throw new Error(`Luma Direct API error: ${responseText.substring(0, 200)}`);
+    } catch (lumaErr: any) {
+      console.error('Alternate chain Luma Direct error:', lumaErr.message);
+    }
+  }
+
+  if (!exclude.has('runway') && runwayApiKey) {
+    return tryRunway(imageUrl, safeMotion, ctx);
+  }
+
+  return { success: false, provider: 'none', error: 'All alternate video providers exhausted' };
+}
+
+/** Keyframe retry + alternate chain after explicit provider failure. */
+async function runExplicitProviderFallback(
+  imageUrl: string,
+  prompt: string,
+  ctx: Context,
+  pageId: string | undefined,
+  failedProvider: VideoProvider,
+  options: VideoGenerationOptions
+): Promise<VideoGenerationResult> {
+  const errSnippet = options.sensual ? 'sensual scene — encoding keyframe' : 'trying alternate chain';
+  await ctx.reply(
+    `🔁 *${failedProvider} unavailable* — ${errSnippet}\n\n_Kling → Luma → Veo → Runway…_`,
+    { parse_mode: 'Markdown' }
+  );
+
+  let videoImageUrl = imageUrl;
+  if (options.galleryImagePrompt && options.title && !options.sensual) {
+    const safeFrame = await generateVideoSafeKeyframe(options.galleryImagePrompt, options.title, ctx);
+    if (safeFrame) videoImageUrl = safeFrame;
+  }
+
+  return runAlternateVideoChain(videoImageUrl, prompt, ctx, pageId, {
+    ...options,
+    fastOmniPoll: true,
+    excludeProviders: [...(options.excludeProviders || []), failedProvider],
+  });
+}
 
 async function generateVideo(
   imageUrl: string,
@@ -3813,37 +4258,42 @@ async function generateVideo(
   pageId?: string,
   options: VideoGenerationOptions = {}
 ): Promise<VideoGenerationResult> {
-  const { skipLumaDirect = false, fastOmniPoll = false } = options;
+  const { skipLumaDirect = false, fastOmniPoll = false, sensual = false } = options;
   const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  const omniFast = fastOmniPoll || sensual;
 
   // ========== 0. EXPLICIT PROVIDER (e.g. `/visualize omni 089`) ==========
   if (preferredProvider === 'omni') {
-    const omni = await generateWithOmni(imageUrl, prompt, ctx, pageId);
+    let omni = await generateWithOmni(imageUrl, prompt, ctx, pageId, omniFast, options);
+    if (!omni.success && !options.sensual && options.galleryImagePrompt && options.title &&
+        (isVideoModerationError(omni.error || '') || /timed out/i.test(omni.error || ''))) {
+      const safeFrame = await generateVideoSafeKeyframe(options.galleryImagePrompt, options.title, ctx);
+      if (safeFrame) omni = await generateWithOmni(safeFrame, prompt, ctx, pageId, true, options);
+    }
     if (omni.success) return omni;
-    await ctx.reply(`⚠️ Omni Flash unavailable (${(omni.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'omni', options);
   } else if (preferredProvider === 'veo') {
     const veo = await generateWithVeo(imageUrl, prompt, ctx);
     if (veo.success) return veo;
     if (!googleVideoOmniOnly()) {
-      const omni = await generateWithOmni(imageUrl, prompt, ctx, pageId);
+      let omni = await generateWithOmni(imageUrl, prompt, ctx, pageId, true, options);
       if (omni.success) return omni;
     }
-    await ctx.reply(`⚠️ Veo unavailable (${(veo.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
-    // continue into default chain
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'veo', options);
   } else if (preferredProvider === 'kling') {
     const kling = await tryKling(imageUrl, prompt, ctx);
     if (kling.success) return kling;
-    await ctx.reply(`⚠️ Kling unavailable (${(kling.error || 'error').substring(0, 120)}) — falling back to Luma → Replicate → Runway...`);
-    // continue into default chain
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'kling', options);
   } else if (preferredProvider === 'runway') {
     if (runwayApiKey) {
       const rw = await tryRunway(imageUrl, prompt, ctx);
       if (rw.success) return rw;
-      await ctx.reply(`⚠️ Runway unavailable — falling back to Luma → Replicate...`);
     } else {
-      await ctx.reply(`⚠️ Runway not configured (RUNWAY_API_KEY) — using Luma → Replicate...`);
+      await ctx.reply(`⚠️ Runway not configured (RUNWAY_API_KEY) — using alternate chain...`);
     }
-    // continue into default chain (Luma Direct → Replicate → Runway)
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'runway', options);
+  } else if (preferredProvider === 'luma') {
+    // Explicit luma — skip duplicate if default chain below handles it; fall through to Luma Direct first.
   }
   // preferredProvider 'luma' or null → default chain below is already Luma-first.
 
@@ -3923,82 +4373,10 @@ async function generateVideo(
   
   // ========== 2. TRY LUMA VIA REPLICATE ==========
   if (replicate) {
-    try {
-      console.log(`🎬 Trying Luma via Replicate (model=${VIDEO_MODELS.lumaReplicate})...`);
-      await ctx.reply(`🎬 *Trying Luma via Replicate...*\n\n_${VIDEO_MODELS.lumaReplicate}..._`, { parse_mode: 'Markdown' });
-
-      // Ray 3.x on Replicate uses start_image (+5s max with i2v, 1080p); legacy ray-2 uses start_image_url + 9s.
-      const isRay3Replicate = /ray-3/i.test(VIDEO_MODELS.lumaReplicate);
-      const lumaReplicateInput = isRay3Replicate
-        ? {
-            prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
-            start_image: imageUrl,
-            duration: 5,
-            resolution: '1080p',
-          }
-        : {
-            prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
-            start_image_url: imageUrl,
-            aspect_ratio: '16:9',
-            loop: false,
-            // Ray-2 on Replicate: 5 or 9 seconds (see model schema)
-            duration: 9,
-          };
-
-      const lumaOutput = await replicate.run(
-        VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
-        { input: lumaReplicateInput }
-      );
-
-      /**
-       * Replicate SDK wraps https URLs in FileOutput (ReadableStream) with url() + toString() → URL string.
-       * Same pattern as Flux image path above — do not only check typeof === 'string'.
-       */
-      let videoUrl: string | null = null;
-      if (lumaOutput != null) {
-        if (Array.isArray(lumaOutput) && lumaOutput[0] != null) {
-          const s = String(lumaOutput[0]);
-          if (s.startsWith('http')) videoUrl = s;
-        } else {
-          const s = String(lumaOutput);
-          if (s.startsWith('http')) videoUrl = s;
-        }
-        if (!videoUrl && typeof lumaOutput === 'object' && lumaOutput !== null) {
-          const o = lumaOutput as { url?: () => URL };
-          if (typeof o.url === 'function') {
-            try {
-              videoUrl = o.url().href;
-            } catch {
-              /* ignore */
-            }
-          }
-        }
-      }
-      console.log(
-        'Luma Replicate output resolved:',
-        videoUrl ? videoUrl.substring(0, 80) + '…' : 'none',
-        '(raw type:',
-        typeof lumaOutput,
-        ')'
-      );
-
-      if (videoUrl && videoUrl.startsWith('http')) {
-        console.log('✅ Luma via Replicate succeeded!');
-        return {
-          success: true,
-          videoUrl,
-          provider: 'luma-replicate',
-          needsPolling: false
-        };
-      } else {
-        throw new Error('Luma Replicate returned invalid output');
-      }
-      
-    } catch (lumaReplicateError: any) {
-      console.log('⚠️ Luma Replicate failed, trying Gemini Omni Flash...');
-      console.error('Luma Replicate error:', lumaReplicateError.message);
-      await ctx.reply(`⚠️ Luma Replicate unavailable, trying Gemini Omni Flash...`);
-    }
+    const lumaRep = await tryLumaReplicate(imageUrl, safeMotion, ctx);
+    if (lumaRep.success) return lumaRep;
+    console.log('⚠️ Luma Replicate failed, trying Gemini Omni Flash...');
+    await ctx.reply(`⚠️ Luma Replicate unavailable, trying Gemini Omni Flash...`);
   }
 
   // ========== 2b. GEMINI OMNI FLASH (Google Interactions API) ==========
@@ -4104,18 +4482,20 @@ async function generateWithOmni(
   prompt: string,
   ctx: Context,
   pageId?: string,
-  fastPoll = false
+  fastPoll = false,
+  _options: VideoGenerationOptions = {}
 ): Promise<VideoGenerationResult> {
   if (!geminiApiKey) {
     return { success: false, provider: 'omni', error: 'Omni not configured — set GEMINI_API_KEY (or GOOGLE_API_KEY) in .env' };
   }
   const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  const maxWaitLabel = fastPoll ? '~3 min' : '~6 min';
   try {
     await ctx.reply(
-      `🎬 *Generating video with Gemini Omni Flash...*\n\n_${VIDEO_MODELS.omniModel} · native audio · 16:9 · takes ~1–3 minutes..._`,
+      `🎬 *Generating video with Gemini Omni Flash...*\n\n_${VIDEO_MODELS.omniModel} · native audio · 16:9 · takes 1–3 minutes (max ${maxWaitLabel})..._`,
       { parse_mode: 'Markdown' }
     );
-    const imgRes = await fetch(imageUrl);
+    const imgRes = await fetch(imageUrl, { signal: geminiFetchSignal() });
     if (!imgRes.ok) throw new Error(`fetch still failed: ${imgRes.status}`);
     const imgBuf = Buffer.from(await imgRes.arrayBuffer());
     const mimeType = imgRes.headers.get('content-type')?.startsWith('image/') ? imgRes.headers.get('content-type')! : 'image/jpeg';
@@ -4135,6 +4515,7 @@ async function generateWithOmni(
         response_format: { type: 'video', aspect_ratio: '16:9', duration: '9s' },
         background: true,
       }),
+      signal: geminiFetchSignal(),
     });
     const createText = await create.text();
     if (!create.ok) throw new Error(`Omni create ${create.status}: ${createText.substring(0, 220)}`);
@@ -4143,19 +4524,34 @@ async function generateWithOmni(
     const status = String(body.status || '');
     if (status !== 'completed' && body.id) {
       const id = String(body.id);
-      const maxPolls = fastPoll ? 18 : 72; // fallback: ~3 min; primary: ~12 min
+      const maxPolls = fastPoll ? 18 : 36; // fallback: ~3 min; explicit primary: ~6 min (was 12)
       for (let i = 0; i < maxPolls; i++) {
         await new Promise((r) => setTimeout(r, 10_000));
-        const poll = await fetch(`${GEMINI_API_URL}/interactions/${encodeURIComponent(id)}?key=${geminiApiKey}`);
-        if (!poll.ok) continue;
+        let poll: Response;
+        try {
+          poll = await fetch(`${GEMINI_API_URL}/interactions/${encodeURIComponent(id)}?key=${geminiApiKey}`, {
+            signal: geminiFetchSignal(),
+          });
+        } catch (fetchErr: any) {
+          console.log(`🎬 Omni poll fetch error (attempt ${i + 1}):`, fetchErr.message);
+          continue;
+        }
+        if (!poll.ok) {
+          console.log(`🎬 Omni poll HTTP ${poll.status} (attempt ${i + 1})`);
+          continue;
+        }
         body = (await poll.json()) as Record<string, unknown>;
         const st = String(body.status || '');
         if (st === 'failed' || st === 'cancelled') throw new Error(`omni interaction ${st}`);
         if (st === 'completed') break;
         if (i % 3 === 0) console.log(`🎬 Omni polling… status=${st || 'pending'}`);
+        if (i > 0 && i % 6 === 0) {
+          const mins = Math.round(((i + 1) * 10) / 60);
+          await ctx.reply(`⏳ *Omni Flash still rendering…* (${mins} min, status: ${st || 'pending'})`, { parse_mode: 'Markdown' }).catch(() => undefined);
+        }
       }
       if (String(body.status || '') !== 'completed') {
-        throw new Error(fastPoll ? 'Omni timed out after ~3 min (fallback chain)' : 'Omni timed out after ~12 min');
+        throw new Error(fastPoll ? 'Omni timed out after ~3 min (fallback chain)' : 'Omni timed out after ~6 min');
       }
     }
 
@@ -4377,8 +4773,10 @@ RULES:
 - You are NOT re-describing the scene. The clip exists. You direct a RESTYLE pass only.
 - Aim for: underground elegance — beauty with literary weight, tactile light, couture-adjacent texture, color grade that feels *authored* (Wong Kar-wai intimacy, arthouse melancholy, fashion campaign stillness) — never generic "pretty" or influencer sheen.
 - Skin luminosity, fabric drape, silhouette, shadow sculpting, subtle speculars, filmic contrast — rooted in the poem's mood (e.g. cold Moscow sharpness vs warm exile vs digital alienation).
+- Never name characters or describe body actions (no tracing stomach, chest lines, hand on body). Use abstract editorial language: "shadow sculpts silhouette", "moonlit specular on fabric", "chiaroscuro grade".
 - Never add characters, animals, new objects, or locations.
 - Never cartoon, 3D, Pixar, toy, or mascot language.
+${VIDEO_PROVIDER_HARD_BANS}
 - Return ONLY the modify prompt. No quotes, no preamble.`;
 
   const userMsg = `TITLE: "${title}"
@@ -4390,9 +4788,9 @@ Write the fashion/editorial modify-video prompt.`;
 
   try {
     const result = await createContent(`${systemPrompt}\n\n---\n\n${userMsg}`, 120, true);
-    return result.trim();
+    return sanitizeModifyPrompt(result.trim());
   } catch (err) {
-    return 'Underground editorial grade: sculpted low-key light, skin with subtle specular life, luxurious natural fabrics, deep shadows with soft falloff, filmic color separation, haute-couture stillness. Preserve motion and composition; no new elements.';
+    return MODIFY_SAFE_FALLBACK_PROMPT;
   }
 }
 
@@ -4566,7 +4964,14 @@ async function startDirectorsCutPipeline(opts: {
       await ctx.reply(`🎬 Fashion direction:\n\n${dirSnippet}`);
     }
 
-    const result = await startModifyVideo(baseVideoUrl, firstFrameImageUrl, fashionPrompt);
+    let result = await startModifyVideo(baseVideoUrl, firstFrameImageUrl, fashionPrompt);
+
+    // Retry with moderation-safe prompt if Luma Modify rejects body language
+    if (!result.success && result.error && isVideoModerationError(result.error)) {
+      console.log('Modify Video moderation — retrying with safe editorial prompt');
+      await ctx.reply('🎬 _Director\'s Cut: re-encoding fashion direction for Modify API…_', { parse_mode: 'Markdown' }).catch(() => undefined);
+      result = await startModifyVideo(baseVideoUrl, firstFrameImageUrl, MODIFY_SAFE_FALLBACK_PROMPT);
+    }
 
     if (result.success && result.generationId) {
       await ctx.reply(
@@ -5201,7 +5606,7 @@ TODAY'S FOCUS: Use **unique** facts from **at least three domains** in the full 
 
 Include:
 - A mood or emotion (aligned with ${selectedMood})
-- One specific, **lesser-known** image or fact tied to the underground voice of poems #001–#048
+- One specific, **lesser-known** image or fact tied to the underground voice of poems #001–#098
 - How it connects to Kira / Paradise / vibe coding without sounding like a brochure
 
 Your tone should match the ${selectedMood} mood. In Russian with English phrases naturally mixed.`;
@@ -5267,7 +5672,7 @@ ${knowledge}
 
 ${fullKnowledgeBlock}
 
-Give her a creative briefing (not a lesson!) — **unique** facts she can STEAL, grounded in the underground voice of poems #001–#048:
+Give her a creative briefing (not a lesson!) — **unique** facts she can STEAL, grounded in the underground voice of poems #001–#098:
 - Pull **non-obvious** names, dates, places, quotes from **several** domains above — not the same headline every time
 - Sensory details (corridor light, fabric, island weather, auction room air — vary the lens)
 - Character / Paradise connections without sounding like a docent
@@ -5662,87 +6067,103 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
       isProactive: false
     });
     
-    await ctx.reply(`📝 Creating page #${String(bookState.currentPage).padStart(3, '0')}...\n\n_Mood: ${creativeMood} | Voice: ${creativeSession.activeVoice}_`, { parse_mode: 'Markdown' });
-    
     try {
-      // Get previous content for continuity
-      const previousContent = await getRelevantMemory('ATUONA', 'book_page', 3);
-      
-      // 🔄 ROTATING KNOWLEDGE: only 3-4 fresh modules per page, paragraph-sampled —
-      // the full-KB dump made every page latch onto the same salient facts.
-      const createKeys = selectCreateKnowledgeModules(customPrompt);
+      // 🔄 LLM router + rotating excerpts (NOT full 11-module KB dump)
+      const createKeys = await selectCreateKnowledgeModulesSmart(customPrompt);
       const fullKnowledgeBlock = await buildRotatingCreativityKnowledgeBlock(createKeys);
       creativeMemory.recentCreateKnowledgeKeys.push([...createKeys]);
       if (creativeMemory.recentCreateKnowledgeKeys.length > 10) {
         creativeMemory.recentCreateKnowledgeKeys = creativeMemory.recentCreateKnowledgeKeys.slice(-10);
       }
       console.log('🔄 /create knowledge modules:', createKeys.join(', '));
-      
-      // 🧠 Get emotional guidelines
+
+      await ctx.reply(
+        `📝 Creating page #${String(bookState.currentPage).padStart(3, '0')}…\n\n` +
+        `_Mood: ${creativeMood} | Voice: ${creativeSession.activeVoice}_\n` +
+        `🔄 _Modules today: ${createKeys.join(', ')}_`,
+        { parse_mode: 'Markdown' }
+      );
+
+      const previousContent = await getRelevantMemory('ATUONA', 'book_page', 2);
       const emotionalGuidelines = getEmotionalGuidelines(creativeMood);
-      
-      // 🎨 Get creative enhancement
       const creativeEnhancement = getCreativeEnhancement(creativeMood);
-      
-      // 🔮 Fresh direction: LLM-invented (falls back to static list internally)
       const freshDirection = await generateFreshCreativeDirectionSmart();
       const avoidanceList = getCreativeAvoidanceList();
-      
-      // 🎨 Maybe get a surprise connection — LLM-forged association (static fallback inside)
-      const surpriseConnection = Math.random() < 0.35 ? await generateSurpriseConnectionSmart() : '';
-      
+      const staleBlock = buildCreateStaleAndBanBlock();
+      const continuityBlock = buildCreateContinuityBlock();
+      // Associative intelligence: almost always forge a cross-domain spark for /create
+      const surpriseConnection = Math.random() < 0.75 ? await generateSurpriseConnectionSmart() : '';
+
+      const recentCreateModules = creativeMemory.recentCreateKnowledgeKeys.slice(-3);
+      const moduleHistory = recentCreateModules.length > 0
+        ? recentCreateModules.map((s, i) => `Run-${recentCreateModules.length - i}: ${s.join(', ')}`).join(' | ')
+        : 'none';
+
       const createPrompt = `${ATUONA_CONTEXT}
 
-${STORY_CONTEXT}
+${continuityBlock}
 
 ${fullKnowledgeBlock}
 
-═══════════════════════════════════════════════════════════════
-🧠 EMOTIONAL INTELLIGENCE DIRECTIVES:
-═══════════════════════════════════════════════════════════════
-CREATIVE MOOD: **${creativeMood.toUpperCase()}**
-${emotionalGuidelines}
+${staleBlock}
 
+═══════════════════════════════════════════════════════════════
+🧠 CO-AUTHOR INTELLIGENCE (emotional + associative + imaginative):
+═══════════════════════════════════════════════════════════════
+You are Elena's creative CO-FOUNDER — not a docent, not a Wikipedia summarizer.
+
+EMOTIONAL: Mood is **${creativeMood.toUpperCase()}**. Feel it in the body, breath, silence — not as adjectives.
+${emotionalGuidelines}
 ${creativeEnhancement}
+
+ASSOCIATIVE: ${surpriseConnection
+        ? `Weave this cross-domain spark (oblique, 1-2 beats max):\n${surpriseConnection}`
+        : 'Find ONE unexpected true association from an unusual domain (science, craft, myth) — not art history.'}
+
+IMAGINATIVE: Structural seed — "${freshDirection}"
+- Change the ROOM, the FIRST IMAGE, the SENTENCE RHYTHM from recent drafts.
+- One scene, one spine — not a tour of every myth node (Gauguin + Atlas + Cursor + museums in one page = failure).
+
 ${avoidanceList}
 
-${surpriseConnection ? `🌟 SURPRISE SPARK (weave this in subtly):\n${surpriseConnection}\n` : ''}
+RECENT /create MODULE HISTORY (vary angle): ${moduleHistory}
+TODAY'S MODULES (your ONLY deep sources): ${createKeys.join(', ')}
 
-FRESH DIRECTION TO CONSIDER: "${freshDirection}"
 ═══════════════════════════════════════════════════════════════
 
-CURRENT PROGRESS:
-- Chapter: ${bookState.currentChapter}
-- Page number: ${bookState.currentPage}
-- Previous pages context: ${JSON.stringify(previousContent)}
-- Current setting: ${creativeSession.currentSetting}
-- Current mood: ${creativeSession.currentMood}
-- Active voice: ${creativeSession.activeVoice}
+PRIOR PAGES (titles only — do not replay their scenes):
+${JSON.stringify(Array.isArray(previousContent)
+        ? previousContent.map((p: unknown) => {
+            const row = p as { page?: number; title?: string };
+            return { page: row.page, title: row.title };
+          })
+        : previousContent)}
 
-${customPrompt ? `ELENA'S DIRECTION: "${customPrompt}"` : 'Continue the journey naturally.'}
+${customPrompt ? `ELENA'S DIRECTION: "${customPrompt}"` : 'Continue the journey — but invent a fresh place and image.'}
 
-Create the next page of the book. Return in this format:
+Return in this format:
 
 TITLE: [Page title in Russian or English]
 
 CONTENT:
-[The actual page content - 300-600 words of prose or poetry]
+[300-600 words of prose or poetry]
 
 THEME: [One word theme]
 
 CRITICAL REQUIREMENTS:
-1. Your mood is ${creativeMood.toUpperCase()} - the TONE must match this (not just content!)
-2. Obey BOOK_UNDERGROUND_STYLE_CANON and the published canon excerpts — same underground temperature as #001–#048.
-3. Pull UNIQUE, specific facts from **at least two of today's knowledge modules** above (${createKeys.join(', ')}) — obscure details, not headlines.
-4. If there's a surprise spark - incorporate it subtly, don't force it
+1. Tone = ${creativeMood.toUpperCase()} in the bones, not the label.
+2. **Two obscure module facts** from ${createKeys.join(', ')} must appear as texture (name the work, technique, or detail — not "Gauguin sought paradise").
+3. NO mirror-dialogue with reflection-as-character unless Elena explicitly asked.
+4. NO Maison du Jouir bedroom default — pick a different place unless the scene truly demands it.
+5. Tech metaphors (blockchain, deploy, Cursor) — max ONE line, never the spine.
+6. Obey canon rhythm from the rotating poem sample — underground, not decorative.
 
-Remember: Raw, honest, personal. Mix Russian with English naturally. End on breath — hope allowed, comfort not required.`;
+Raw. Honest. Mix Russian and English where emotionally true. End on breath — hope allowed, comfort not required.`;
 
-      // Use poetry mode for creative writing
       const pageContent = await createContent(createPrompt, 2000, true);
       
-      // 🧠 CREATIVE MEMORY: Extract and track creative elements from response
       extractAndTrackFromResponse(pageContent, 'create');
+      updateEmotionalMemory(detectedTone, creativeMood, 'create');
       
       // Parse the response
       const titleMatch = pageContent.match(/TITLE:\s*(.+)/);
@@ -5769,10 +6190,14 @@ Remember: Raw, honest, personal. Mix Russian with English naturally. End on brea
       });
       
       // Send preview
+      bookState.lastPageTheme = theme;
+      saveState();
+
       const previewMessage = `📖 *Page #${String(bookState.currentPage).padStart(3, '0')}*
       
 📌 *${title}*
 🎭 Theme: ${theme}
+🔄 Modules: ${createKeys.join(', ')}
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -6753,7 +7178,7 @@ Write in Russian, be poetic but concise.`;
 
       const inspirationPrompt = `${ATUONA_CONTEXT}
 
-KNOWLEDGE FOR INSPIRATION (unique facts across domains — match underground style of #001–#048):
+KNOWLEDGE FOR INSPIRATION (unique facts across domains — match underground style of #001–#098):
 ${ritualKnowledge}
 
 Today is ${new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}.
@@ -6911,7 +7336,7 @@ Available: narrator, kira, ule, vibe`);
 
 ${STORY_CONTEXT}
 
-KNOWLEDGE FOR THIS DIALOGUE (full KB + canon #001–#048 — unique facts across domains):
+KNOWLEDGE FOR THIS DIALOGUE (full KB + canon #001–#098 — unique facts across domains):
 ${dialogueKnowledge}
 
 ═══════════════════════════════════════════════════════════════
@@ -8626,85 +9051,8 @@ _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ �
     await ctx.reply(`🎬 *Starting Visualization for Page #${pageId}*\n\n_Fetching page content..._`, { parse_mode: 'Markdown' });
 
     try {
-      // Fetch page content from GitHub
-      const { data: metaFile } = await octokit.repos.getContent({
-        owner: 'ElenaRevicheva',
-        repo: 'atuona',
-        path: `metadata/${pageId}.json`,
-        ref: 'main'
-      });
-      
-      if (!('content' in metaFile)) {
-        await ctx.reply(`❌ Page #${pageId} not found`);
-        return;
-      }
-      
-      const metadata = JSON.parse(Buffer.from(metaFile.content, 'base64').toString('utf-8'));
-      const title = metadata.attributes?.find((a: any) => a.trait_type === 'Poem' || a.trait_type === 'Title')?.value || 'Unknown';
-      let theme = metadata.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
-      let englishText = metadata.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
-      let russianText = metadata.attributes?.find((a: any) => a.trait_type === 'Russian Text' || a.trait_type === 'Poem Text')?.value || '';
-      
-      // FALLBACK: older pages (001-046) lack English/Russian text in metadata. Their full
-      // body lives in the repo's poem JSON files — try them in order until one yields the text.
-      // IMPORTANT: atuona-45-poems-with-text.json skips #007-#046 (its ids jump #006 -> #048),
-      // so on its own it leaves 40 poems with only title+theme = generic prompts. The
-      // complete-with-dates file is the one that actually covers #007-#046. Match by numeric id
-      // too, so a zero-pad mismatch ("7" vs "007") can never silently drop a poem again.
-      if (!englishText && !russianText) {
-        console.log(`📖 Page #${pageId} missing text in metadata, fetching from poems JSON...`);
-        const wantNum = parseInt(pageId, 10);
-        const candidateFiles = ['atuona-complete-with-dates.json', 'atuona-45-poems-with-text.json'];
-        for (const file of candidateFiles) {
-          if (russianText) break; // found it already
-          try {
-            const { data: poemsFile } = await octokit.repos.getContent({
-              owner: 'ElenaRevicheva', repo: 'atuona', path: file, ref: 'main'
-            });
-            if (!('content' in poemsFile)) continue;
-            let poemsData: any = JSON.parse(Buffer.from(poemsFile.content, 'base64').toString('utf-8'));
-            if (!Array.isArray(poemsData)) poemsData = poemsData.poems || Object.values(poemsData);
-            const poemEntry = poemsData.find((p: any) => {
-              const idVal = (p.attributes?.find((a: any) => a.trait_type === 'ID')?.value || '').toString().trim();
-              const nm = p.name || '';
-              const nmNum = (nm.match(/#(\d{1,3})\b/) || [])[1];
-              return idVal === pageId
-                || (idVal && parseInt(idVal, 10) === wantNum)
-                || nm.includes(`#${pageId}`)
-                || (nmNum && parseInt(nmNum, 10) === wantNum);
-            });
-            if (poemEntry) {
-              russianText = poemEntry.attributes?.find((a: any) => a.trait_type === 'Poem Text' || a.trait_type === 'Russian Text')?.value || '';
-              theme = theme || poemEntry.attributes?.find((a: any) => a.trait_type === 'Theme')?.value || '';
-              // Only take a REAL English trait; otherwise leave englishText empty so the
-              // on-the-fly translator below renders the exact poem (not boilerplate description).
-              const engTrait = poemEntry.attributes?.find((a: any) => a.trait_type === 'English Text' || a.trait_type === 'English Translation')?.value || '';
-              if (!englishText && engTrait) englishText = engTrait;
-              if (russianText) console.log(`✅ Found poem text for #${pageId} in ${file}: ${russianText.substring(0, 50)}...`);
-            }
-          } catch (fallbackError) {
-            console.error(`Failed to fetch poems fallback from ${file}:`, fallbackError);
-          }
-        }
-      }
-      
-      // If still no text, translate Russian on the fly
-      if (!englishText && russianText) {
-        console.log(`🔄 Translating Russian text for #${pageId}...`);
-        const translationPrompt = `ATUONA translation — meaning + rhythm, not words.
+      const { title, theme, englishText, russianText } = await fetchPagePoemContent(pageId);
 
-${russianText.substring(0, 1000)}
-
-Rules: Read as original underground lit, not translation. Simple words, heavy weight. Kill safe sentences.
-Return ONLY the translation. Plain text.`;
-        try {
-          englishText = await createContent(translationPrompt, 800, true);
-        } catch (transError) {
-          console.error('Translation failed:', transError);
-          englishText = russianText; // Use Russian as fallback
-        }
-      }
-      
       const combinedForKnowledge = `${title}\n${theme}\n${englishText}\n${russianText}`.slice(0, 12000);
       const englishExcerpt = englishText.slice(0, 3500);
       const russianExcerpt = russianText ? russianText.slice(0, 2200) : '';
@@ -9128,12 +9476,31 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
       
       // Generate video. Default chain Luma Ray 3 → Replicate → Runway; selectedProvider pins a primary.
       if (visualization.imageUrlHorizontal && (lumaApiKey || replicate || runwayApiKey || geminiApiKey)) {
+        const sensualPage = isLikelySensualVisual(imagePrompt, title, theme, englishExcerpt, motionPrompt);
+        let videoImageUrl = visualization.imageUrlHorizontal;
+        const videoGenOptions: VideoGenerationOptions = {
+          galleryImagePrompt: imagePrompt,
+          title,
+          sensual: sensualPage,
+        };
+
+        // Sensual pages: encode chiaroscuro keyframe for video APIs; gallery still stays erotic for Telegram.
+        if (sensualPage && replicate) {
+          const safeFrame = await generateVideoSafeKeyframe(imagePrompt, title, ctx);
+          if (safeFrame) {
+            videoImageUrl = safeFrame;
+            visualization.videoKeyframeUrl = safeFrame;
+            saveState();
+          }
+        }
+
         const videoResult = await generateVideo(
-          visualization.imageUrlHorizontal,
+          videoImageUrl,
           motionPrompt,  // Page-specific motion, not truncated image prompt
           ctx,
           selectedProvider,
-          pageId
+          pageId,
+          videoGenOptions
         );
 
         if (videoResult.success) {
@@ -9263,7 +9630,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
               try {
                 // Attempt 1: gallery still + oblique motion (underground erotic encoding)
                 if (await runChain(
-                  visualization.imageUrlHorizontal!,
+                  visualization.videoKeyframeUrl || visualization.imageUrlHorizontal!,
                   'Fallback chain: Replicate → Omni → Kling → Veo → Runway'
                 )) return;
 
@@ -10367,7 +10734,7 @@ HOW TO RESPOND:
 
 Keep response concise for Telegram. Match her energy.
 
-📚 FULL KNOWLEDGE + CANON #001–#048 (router hint: ${textSelKeys.join(', ')} — use deep unique facts across domains):
+📚 FULL KNOWLEDGE + CANON #001–#098 (router hint: ${textSelKeys.join(', ')} — use deep unique facts across domains):
 ${fullKnowledgeBlock}
 
 ═══════════════════════════════════════════════════════════════

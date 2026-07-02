@@ -27,6 +27,10 @@ HEALTH="$(fleet_product_var "$PRODUCT" HEALTH)"
 LABEL="$(fleet_product_var "$PRODUCT" LABEL)"
 BUILD="$(fleet_product_var "$PRODUCT" BUILD)"
 
+if [[ "$PRODUCT" == "cto_aipa" && ! -d "$DIR/.git" && -d "/home/ubuntu/AIPA_AITCF/.git" ]]; then
+  DIR="/home/ubuntu/AIPA_AITCF"
+fi
+
 if [[ -z "$DIR" || ! -d "$DIR/.git" ]]; then
   echo "ERROR: Product $PRODUCT repo not found at $DIR"
   exit 1
