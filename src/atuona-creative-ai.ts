@@ -131,9 +131,10 @@ const VIDEO_MODELS = {
   lumaDirect: (process.env.LUMA_VIDEO_MODEL || 'ray-3.2').trim(),
   /** Max output resolution for I2V (540p | 720p | 1080p | 4k). 1080p = best default; 4k = slower/more credits */
   lumaResolution: '1080p' as const,
-  /** Replicate-hosted Luma fallback. ray-2-720p is proven-stable; bump via REPLICATE_LUMA_MODEL once
-   *  luma/ray-3 is confirmed on Replicate. Kept on 2 deliberately so the fallback never shares Ray-3's fate. */
-  lumaReplicate: (process.env.REPLICATE_LUMA_MODEL || 'luma/ray-2-720p').trim(),
+  /** Replicate-hosted Luma fallback. luma/ray-3.2 confirmed live on Replicate (June 2026): 1080p,
+   *  native HDR option. NOTE: ray-3.x i2v uses start_image + duration 5 (schema differs from ray-2).
+   *  Override: REPLICATE_LUMA_MODEL (legacy ray-2 input shape auto-detected). */
+  lumaReplicate: (process.env.REPLICATE_LUMA_MODEL || 'luma/ray-3.2').trim(),
   /** Runway image→video — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
   runwayImageToVideo: 'gen4.5',
   /** Google Veo 3.1 model id on the Gemini API. Override: VEO_MODEL (e.g. veo-3.1-fast-generate-preview). */
@@ -141,8 +142,9 @@ const VIDEO_MODELS = {
   /** Gemini Omni Flash — Interactions API image→video. Override: GEMINI_OMNI_MODEL. */
   omniModel: (process.env.GEMINI_OMNI_MODEL || 'gemini-omni-flash-preview').trim(),
   /** Kling image→video via Replicate (kwaivgi namespace, existing REPLICATE_API_TOKEN — no new key).
-   *  Strong for stylized/arthouse motion. Override: KLING_REPLICATE_MODEL. */
-  klingReplicate: (process.env.KLING_REPLICATE_MODEL || 'kwaivgi/kling-v2.1-master').trim(),
+   *  v2.6 (latest): 1080p + NATIVE SYNCHRONIZED AUDIO (dialogue/ambient/sfx in one pass).
+   *  Override: KLING_REPLICATE_MODEL. */
+  klingReplicate: (process.env.KLING_REPLICATE_MODEL || 'kwaivgi/kling-v2.6').trim(),
 };
 
 /** Canonical video provider ids selectable from `/visualize <provider> NNN`. */
@@ -3794,20 +3796,29 @@ async function generateVideo(
   if (replicate) {
     try {
       console.log(`🎬 Trying Luma via Replicate (model=${VIDEO_MODELS.lumaReplicate})...`);
-      await ctx.reply('🎬 *Trying Luma via Replicate...*\n\n_Alternative provider..._', { parse_mode: 'Markdown' });
+      await ctx.reply(`🎬 *Trying Luma via Replicate...*\n\n_${VIDEO_MODELS.lumaReplicate}..._`, { parse_mode: 'Markdown' });
 
-      const lumaOutput = await replicate.run(
-        VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
-        {
-          input: {
+      // Ray 3.x on Replicate uses start_image (+5s max with i2v, 1080p); legacy ray-2 uses start_image_url + 9s.
+      const isRay3Replicate = /ray-3/i.test(VIDEO_MODELS.lumaReplicate);
+      const lumaReplicateInput = isRay3Replicate
+        ? {
+            prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+            start_image: imageUrl,
+            duration: 5,
+            resolution: '1080p',
+          }
+        : {
             prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
             start_image_url: imageUrl,
             aspect_ratio: '16:9',
             loop: false,
             // Ray-2 on Replicate: 5 or 9 seconds (see model schema)
             duration: 9,
-          },
-        }
+          };
+
+      const lumaOutput = await replicate.run(
+        VIDEO_MODELS.lumaReplicate as `${string}/${string}`,
+        { input: lumaReplicateInput }
       );
 
       /**
@@ -4137,20 +4148,22 @@ async function tryKling(
     return { success: false, provider: 'kling', error: 'Kling needs REPLICATE_API_TOKEN' };
   }
   try {
+    // Kling v2.6: native synchronized audio (dialogue/ambient/sfx generated with the video)
+    const klingHasNativeAudio = /v2\.6|v2-6/i.test(VIDEO_MODELS.klingReplicate);
     await ctx.reply(
-      `🎬 *Generating video with Kling...*\n\n_${VIDEO_MODELS.klingReplicate} · stylized/arthouse · takes 2–4 minutes..._`,
+      `🎬 *Generating video with Kling...*\n\n_${VIDEO_MODELS.klingReplicate} · stylized/arthouse${klingHasNativeAudio ? ' · native audio' : ''} · takes 2–4 minutes..._`,
       { parse_mode: 'Markdown' }
     );
+    const klingInput: Record<string, unknown> = {
+      prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+      start_image: imageUrl,
+      duration: 5,
+      aspect_ratio: '16:9',
+    };
+    if (klingHasNativeAudio) klingInput.generate_audio = true;
     const out = await replicate.run(
       VIDEO_MODELS.klingReplicate as `${string}/${string}`,
-      {
-        input: {
-          prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
-          start_image: imageUrl,
-          duration: 5,
-          aspect_ratio: '16:9',
-        }
-      }
+      { input: klingInput }
     );
     // Replicate returns a URL string, an array, or a FileOutput with .url() — same as the Luma-Replicate path.
     let videoUrl: string | null = null;
@@ -4674,7 +4687,7 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 \`/visualize omni 052\` → Gemini Omni Flash (native audio, conversational edit path)
 \`/visualize runway 052\` → Runway Gen-4.5
 \`/visualize veo 052\` → Google Veo 3.1 (native audio)
-\`/visualize kling 052\` → Kling (stylized/arthouse)
+\`/visualize kling 052\` → Kling v2.6 (stylized/arthouse, native audio)
 
 _Default chain when Luma is dry: Omni Flash → Runway._
 
@@ -4910,7 +4923,7 @@ _Just click any command to see what it does!_
 /visualize omni 048 - ✨ Gemini Omni Flash (native audio)
 /visualize runway 048 - 🎬 Runway Gen-4.5
 /visualize veo 048 - 🎬 Google Veo 3.1 (native audio)
-/visualize kling 048 - 🎬 Kling (stylized/arthouse)
+/visualize kling 048 - 🎬 Kling v2.6 (stylized/arthouse, native audio)
 /film build - 🎬✨ AUTO-ASSEMBLE shots → one film (VO+music)
 /gallery - 🖼 All visualizations
 /film - 🎬 Film compilation status
@@ -8383,7 +8396,7 @@ Create stunning visuals for your book pages:
 \`/visualize omni 048\` - Gemini Omni Flash (native audio)
 \`/visualize runway 048\` - Runway Gen-4.5
 \`/visualize veo 048\` - Google Veo 3.1 (native audio)
-\`/visualize kling 048\` - Kling (stylized/arthouse)
+\`/visualize kling 048\` - Kling v2.6 (stylized/arthouse, native audio)
 
 Each visualization creates:
 🎨 Flux 2 Pro image (newest, BEST quality!)
