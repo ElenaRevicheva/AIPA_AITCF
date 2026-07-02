@@ -28,8 +28,8 @@ fleet_checkout_files() {
 
 fleet_pull_ff_only() {
   local branch="$1"
-  echo "=== git pull --ff-only origin/$branch ==="
-  git pull --ff-only "origin/$branch"
+  echo "=== git merge --ff-only origin/$branch ==="
+  git merge --ff-only "origin/$branch"
 }
 
 fleet_run_build() {
