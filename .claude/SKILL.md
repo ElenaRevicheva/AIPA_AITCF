@@ -396,6 +396,16 @@ leave production running stale code against a changed repo.
 - Scope creep into features not asked for
 - Make up facts about the codebase — I read files first
 - Approve production deploys without build + test
+- **NEVER WIPE ANYTHING (Elena's iron rule, July 2 2026).** No `rm -rf`, no `git clean`, no
+  overwrite/truncate of any existing data, state, or artifact — on Oracle or locally — that I
+  did not create in the current session. If a cleanup seems needed: (1) say so and wait for
+  Elena's explicit "go", (2) back up first (copy aside / scp a local copy), (3) delete the
+  narrowest possible path. Runtime state lives in untracked dirs (`data/` in cto-aipa —
+  published films, music, shots; EspaLuz subscriber/trial JSONs) and a single careless
+  working-tree cleanup destroys it: on 01.07.2026 a `git stash` + `git clean -fd` during
+  fleet-deploy troubleshooting wiped every published Atuona film + the music library
+  (`data/` is now gitignored as a guard — commit `bd8f1bd` — but the rule stands regardless
+  of guards). Always keep a local Desktop copy of every finished film/artifact.
 
 ---
 
