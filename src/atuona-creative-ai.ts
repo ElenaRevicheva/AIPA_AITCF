@@ -107,7 +107,8 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 //   • runway → Runway Gen-4.5 image_to_video
 //   • veo    → Google Veo 3.1 (Gemini API, native audio) — needs GEMINI_API_KEY
 //   • omni   → Gemini Omni Flash (Interactions API, image→video + native audio)
-//   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Omni Flash → Runway.
+//   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Omni Flash → Kling v2.6 → Veo 3.1 → Runway.
+//   On moderation failure, auto-retries once with a video-safe keyframe (editorial shadow/silhouette still).
 //   When a provider is named explicitly and fails, we fall back through the chain
 //   and label the delivered clip with the provider that actually produced it (honest labeling).
 // Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
@@ -205,6 +206,7 @@ interface PageVisualization {
   videoUrl?: string;
   videoUrlVertical?: string;  // 9:16 for Reels
   videoUrlHorizontal?: string; // 16:9 for YouTube
+  videoKeyframeUrl?: string;   // chiaroscuro-encoded still used when gallery frame fails video moderation
   directorsCutVideoUrl?: string; // Fashion/editorial modify pass
   caption: string;
   hashtags: string[];
@@ -2030,9 +2032,128 @@ AESTHETIC CANON (ATUONA — non-negotiable when a human figure fits the poem):
 - Faces and bodies are beautiful, adult, alive — never mannequin-stiff, never censored into shapeless modesty. Sweat, flush, goosebumps welcome.
 - If the poem is about objects/landscape, keep the frame sensual through texture and light instead of forcing a figure.`;
 
-/** Luma/Runway — style anchor for all video prompts (underground poetry film, not stock b-roll) */
+/** Luma/Runway/Kling/Omni — style anchor sent to video APIs (moderation-safe wording). */
 const VIDEO_MOTION_ANCHOR =
-  'ATUONA underground poetry film: premium arthouse look, live-action, natural film grain, intimate lensing, rich chiaroscuro, slow prestige pacing. Luxurious in mood and light — editorial beauty, emotional weight, tactile atmosphere — not generic stock footage, hotel commercial, or influencer gloss. Sensual arthouse eroticism is part of the canon: the camera loves skin, fabric and the human form — breath visible in the body, slow tactile movement, implied desire, never explicit. Subtle motion only; do not invent new objects, people, or animals. No cartoon, 3D, Pixar, or toy mascots.';
+  'ATUONA underground poetry film: premium arthouse look, live-action, natural film grain, intimate lensing, rich chiaroscuro, slow prestige pacing. Editorial beauty through light, shadow, and fabric — emotional weight, tactile atmosphere — not stock footage or ad polish. Implied intimacy via breath, stillness, and light on skin — never explicit. Subtle motion only; do not invent new objects, people, or animals. No cartoon, 3D, Pixar, or toy mascots.';
+
+/** Rules for VIDEO motion prompts — underground erotic through implication ("circles around" explicit). */
+const UNDERGROUND_EROTIC_VIDEO_ENCODING = `
+UNDERGROUND EROTIC ENCODING (desire stays — we circle around what APIs ban literally):
+- The FEELING is erotic: hunger, breath held, skin remembering touch, fabric as second skin, moonlight as a lover's hand on collarbone.
+- The LANGUAGE is oblique: chiaroscuro, whisper, ache, heat in the room, the space between two bodies, silence before the word — Gauguin/Roversi/Newton editorial noir.
+- Video APIs (Luma, Runway, Kling, Google) reject literal anatomy and sex acts — encode the SAME charge through light, shadow, linen, bare shoulder, slow exhale, fabric shifting.
+- NEVER sanitize into bland modesty. Still beautiful, still heavy, still underground — implied not pornographic.`;
+
+/** Hard bans only — what triggers automatic API rejection regardless of artistry. */
+const VIDEO_PROVIDER_HARD_BANS = `
+HARD BANS (these words/concepts get jobs killed — translate into shadow/light/fabric instead):
+- No literal: nudity with genitals visible, sex acts, oral sex, explicit arousal, positions between legs, graphic undressing.
+- Instead: "moonlight on shoulder", "silk catching breath", "shadow between them", "heat without showing why".`;
+
+/** Detect provider moderation failures (input image or output flagged). */
+function isVideoModerationError(message: string): boolean {
+  return /moderation|sexual|ContentModeration|flagged|nsfw|did not pass content/i.test(message);
+}
+
+/** Strip only hard-ban vocabulary from motion text — keeps erotic atmosphere words (desire, breath, skin, silk). */
+function sanitizeMotionForVideoProviders(motion: string): string {
+  let s = motion
+    .replace(/\b(genital|oral sex|orgasm|penetration|between her legs|between his legs|nipple|bare genitals|undress(?:ing)?|tongue on (?:her|his)|lips on (?:her|his) (?:thigh|genital))\b/gi, 'shadow')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  if (s.length > 380) s = s.slice(0, 380);
+  return s;
+}
+
+/**
+ * Build an underground-erotic motion direction (oblique, not explicit) from title/theme/mood.
+ */
+async function buildUndergroundVideoMotionPrompt(title: string, theme: string, moodHint: string): Promise<string> {
+  const prompt = `Write a 2–3 sentence motion direction for a 9-second underground arthouse film clip.
+
+TITLE: "${title}"
+THEME: ${theme}
+ATMOSPHERE (encode the charge obliquely — do NOT quote explicit body actions from source text): ${moodHint.slice(0, 220)}
+
+${UNDERGROUND_EROTIC_VIDEO_ENCODING}
+${VIDEO_PROVIDER_HARD_BANS}
+
+Return ONLY the motion direction (max 80 words). Erotic through light, fabric, breath, shadow — never pornographic.`;
+  try {
+    const raw = await createContent(prompt, 140, true);
+    return sanitizeMotionForVideoProviders(raw.trim());
+  } catch {
+    return sanitizeMotionForVideoProviders(
+      `Moonlight breathes across linen and bare shoulder. Slow lens drift — fabric shifts, shadow deepens, the room holds its ache — ${theme}.`
+    );
+  }
+}
+
+/**
+ * Rewrite gallery still prompt for video APIs: SAME underground erotic charge, encoded through shadow/silhouette.
+ */
+async function buildVideoSafeImagePrompt(galleryImagePrompt: string, title: string): Promise<string> {
+  const prompt = `Rewrite this IMAGE prompt for VIDEO API acceptance while keeping ATUONA underground erotic aesthetic.
+
+SAME scene, same characters, same emotional heat — encoded through editorial noir (NOT censored into bland modesty):
+- Chiaroscuro: bare shoulder, spine, collarbone in moonlight; bodies partly in shadow; silk/linen as second skin
+- Implied intimacy like Roversi, Newton, Gauguin — desire visible in light and fabric, not pornographic literal nudity
+- Photoreal cinematic still, 35mm grain, adult arthouse
+
+${VIDEO_PROVIDER_HARD_BANS}
+
+ORIGINAL GALLERY PROMPT:
+${galleryImagePrompt.slice(0, 900)}
+
+TITLE: "${title}"
+
+Return ONLY the rewritten English prompt (120–180 words). Still erotic. Still underground.`;
+  try {
+    const raw = await createContent(prompt, 350, true);
+    return `${raw.trim()}\n\n${VISUAL_HARD_EXCLUSIONS.trim()}`;
+  } catch {
+    return `${galleryImagePrompt.slice(0, 600)}\n\nEditorial chiaroscuro, moonlight on bare shoulder and silk, implied underground desire through shadow — not explicit.\n\n${VISUAL_HARD_EXCLUSIONS.trim()}`;
+  }
+}
+
+/** One Flux 16:9 pass at tolerance 4 — video-safe keyframe when providers flag the gallery still. */
+async function generateVideoSafeKeyframe(
+  galleryImagePrompt: string,
+  title: string,
+  ctx: Context
+): Promise<string | null> {
+  if (!replicate) return null;
+  try {
+    await ctx.reply(
+      '🎬 *Encoding video keyframe…*\n\n_Same underground erotic charge — through shadow & chiaroscuro so video APIs accept it. Gallery still unchanged._',
+      { parse_mode: 'Markdown' }
+    );
+    const safePrompt = await buildVideoSafeImagePrompt(galleryImagePrompt, title);
+    const output = await replicate.run(
+      (IMAGE_MODELS.fluxUltra || IMAGE_MODELS.fluxPro) as `${string}/${string}`,
+      {
+        input: {
+          prompt: safePrompt,
+          aspect_ratio: '16:9',
+          output_format: 'jpg',
+          output_quality: 90,
+          safety_tolerance: 4,
+          prompt_upsampling: false,
+        },
+      }
+    );
+    let url: string | null = null;
+    if (output != null) {
+      const s = Array.isArray(output) ? String(output[0]) : String(output);
+      if (s.startsWith('http')) url = s;
+    }
+    console.log('Video-safe keyframe:', url ? url.slice(0, 80) + '…' : 'none');
+    return url;
+  } catch (err: any) {
+    console.error('Video-safe keyframe error:', err.message);
+    return null;
+  }
+}
 
 /**
  * Get knowledge for a specific topic (for direct queries like /art gauguin)
@@ -3677,15 +3798,23 @@ interface VideoGenerationResult {
   needsPolling?: boolean;
 }
 
+type VideoGenerationOptions = {
+  /** Skip Luma Direct resubmit (used after a Luma render-time failure). */
+  skipLumaDirect?: boolean;
+  /** Cap Omni polling at ~3 min instead of ~12 min (fallback chain). */
+  fastOmniPoll?: boolean;
+};
+
 async function generateVideo(
   imageUrl: string,
   prompt: string,
   ctx: Context,
   preferredProvider?: VideoProvider | null,
   pageId?: string,
-  /** True when re-running the chain after a Luma Direct job failed DURING rendering (poll-time) — skips resubmitting to Luma Direct. */
-  skipLumaDirect: boolean = false
+  options: VideoGenerationOptions = {}
 ): Promise<VideoGenerationResult> {
+  const { skipLumaDirect = false, fastOmniPoll = false } = options;
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
 
   // ========== 0. EXPLICIT PROVIDER (e.g. `/visualize omni 089`) ==========
   if (preferredProvider === 'omni') {
@@ -3737,7 +3866,7 @@ async function generateVideo(
         model: VIDEO_MODELS.lumaDirect,
         type: 'video', // REQUIRED by agents.lumalabs.ai/v1 for ray-3.2 (verified June 13 2026)
         resolution: lumaResolution,
-        prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+        prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
         keyframes: {
           frame0: {
             type: 'image',
@@ -3802,13 +3931,13 @@ async function generateVideo(
       const isRay3Replicate = /ray-3/i.test(VIDEO_MODELS.lumaReplicate);
       const lumaReplicateInput = isRay3Replicate
         ? {
-            prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+            prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
             start_image: imageUrl,
             duration: 5,
             resolution: '1080p',
           }
         : {
-            prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+            prompt: `9-second fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
             start_image_url: imageUrl,
             aspect_ratio: '16:9',
             loop: false,
@@ -3874,15 +4003,31 @@ async function generateVideo(
 
   // ========== 2b. GEMINI OMNI FLASH (Google Interactions API) ==========
   if (geminiApiKey) {
-    const omni = await generateWithOmni(imageUrl, prompt, ctx, pageId);
+    const omni = await generateWithOmni(imageUrl, safeMotion, ctx, pageId, fastOmniPoll);
     if (omni.success) return omni;
-    console.log('⚠️ Omni Flash failed, trying Runway fallback...');
-    await ctx.reply(`⚠️ Omni Flash unavailable${omni.error ? ` (${omni.error.substring(0, 80)})` : ''}, trying Runway Gen-4.5...`);
+    console.log('⚠️ Omni Flash failed, trying Kling...');
+    await ctx.reply(`⚠️ Omni Flash unavailable${omni.error ? ` (${omni.error.substring(0, 80)})` : ''}, trying Kling v2.6...`);
+  }
+
+  // ========== 2c. KLING v2.6 (Replicate — native audio, often accepts editorial frames) ==========
+  if (replicate) {
+    const kling = await tryKling(imageUrl, safeMotion, ctx);
+    if (kling.success) return kling;
+    console.log('⚠️ Kling failed, trying Veo 3.1...');
+    await ctx.reply(`⚠️ Kling unavailable${kling.error ? ` (${kling.error.substring(0, 80)})` : ''}, trying Google Veo 3.1...`);
+  }
+
+  // ========== 2d. GOOGLE VEO 3.1 ==========
+  if (geminiApiKey && !googleVideoOmniOnly()) {
+    const veo = await generateWithVeo(imageUrl, safeMotion, ctx);
+    if (veo.success) return veo;
+    console.log('⚠️ Veo failed, trying Runway...');
+    await ctx.reply(`⚠️ Veo unavailable${veo.error ? ` (${veo.error.substring(0, 80)})` : ''}, trying Runway Gen-4.5...`);
   }
 
   // ========== 3. FALLBACK TO RUNWAY GEN-4.5 (image_to_video) ==========
   if (runwayApiKey) {
-    return await tryRunway(imageUrl, prompt, ctx);
+    return await tryRunway(imageUrl, safeMotion, ctx);
   }
 
   // No video providers available
@@ -3902,6 +4047,7 @@ async function tryRunway(
   prompt: string,
   ctx: Context
 ): Promise<VideoGenerationResult> {
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
   try {
     console.log('🎬 Using Runway Gen-4.5...');
     await ctx.reply('🎬 *Generating video with Runway Gen-4.5...*\n\n_image→video · takes 1-3 minutes..._', { parse_mode: 'Markdown' });
@@ -3909,7 +4055,7 @@ async function tryRunway(
     const runwayBody = {
       model: VIDEO_MODELS.runwayImageToVideo,
       promptImage: imageUrl,
-      promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 320)}`,
+      promptText: `9-12 second fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 320)}`,
       duration: 10,  // 5 / 8 / 10 supported — keep immersive 10s
       watermark: false,
       ratio: '1280:720' // 16:9 — Runway gen4.5 expects documented ratios (not legacy 1280:768)
@@ -3957,11 +4103,13 @@ async function generateWithOmni(
   imageUrl: string,
   prompt: string,
   ctx: Context,
-  pageId?: string
+  pageId?: string,
+  fastPoll = false
 ): Promise<VideoGenerationResult> {
   if (!geminiApiKey) {
     return { success: false, provider: 'omni', error: 'Omni not configured — set GEMINI_API_KEY (or GOOGLE_API_KEY) in .env' };
   }
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
   try {
     await ctx.reply(
       `🎬 *Generating video with Gemini Omni Flash...*\n\n_${VIDEO_MODELS.omniModel} · native audio · 16:9 · takes ~1–3 minutes..._`,
@@ -3972,7 +4120,7 @@ async function generateWithOmni(
     const imgBuf = Buffer.from(await imgRes.arrayBuffer());
     const mimeType = imgRes.headers.get('content-type')?.startsWith('image/') ? imgRes.headers.get('content-type')! : 'image/jpeg';
     const imageBase64 = imgBuf.toString('base64');
-    const motion = `9-second cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`;
+    const motion = `9-second cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`;
 
     const create = await fetch(`${GEMINI_API_URL}/interactions?key=${geminiApiKey}`, {
       method: 'POST',
@@ -3995,7 +4143,8 @@ async function generateWithOmni(
     const status = String(body.status || '');
     if (status !== 'completed' && body.id) {
       const id = String(body.id);
-      for (let i = 0; i < 72; i++) {
+      const maxPolls = fastPoll ? 18 : 72; // fallback: ~3 min; primary: ~12 min
+      for (let i = 0; i < maxPolls; i++) {
         await new Promise((r) => setTimeout(r, 10_000));
         const poll = await fetch(`${GEMINI_API_URL}/interactions/${encodeURIComponent(id)}?key=${geminiApiKey}`);
         if (!poll.ok) continue;
@@ -4005,7 +4154,9 @@ async function generateWithOmni(
         if (st === 'completed') break;
         if (i % 3 === 0) console.log(`🎬 Omni polling… status=${st || 'pending'}`);
       }
-      if (String(body.status || '') !== 'completed') throw new Error('Omni timed out after ~12 min');
+      if (String(body.status || '') !== 'completed') {
+        throw new Error(fastPoll ? 'Omni timed out after ~3 min (fallback chain)' : 'Omni timed out after ~12 min');
+      }
     }
 
     const extractVideo = (b: Record<string, unknown>): { uri?: string; data?: string } => {
@@ -4066,6 +4217,7 @@ async function generateWithVeo(
   if (!geminiApiKey) {
     return { success: false, provider: 'veo', error: 'VEO not configured — set GEMINI_API_KEY (or GOOGLE_API_KEY) in .env' };
   }
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
   try {
     await ctx.reply(
       `🎬 *Generating video with Google Veo 3.1...*\n\n_${VIDEO_MODELS.veoModel} · native audio · takes 1–3 minutes..._`,
@@ -4083,7 +4235,7 @@ async function generateWithVeo(
     const submitUrl = `${GEMINI_API_URL}/models/${VIDEO_MODELS.veoModel}:predictLongRunning?key=${geminiApiKey}`;
     const submitBody = {
       instances: [{
-        prompt: `9-second cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+        prompt: `9-second cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
         image: { bytesBase64Encoded: imageBase64, mimeType },
       }],
       parameters: { aspectRatio: '16:9', personGeneration: 'allow_all' },
@@ -4147,6 +4299,7 @@ async function tryKling(
   if (!replicate) {
     return { success: false, provider: 'kling', error: 'Kling needs REPLICATE_API_TOKEN' };
   }
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
   try {
     // Kling v2.6: native synchronized audio (dialogue/ambient/sfx generated with the video)
     const klingHasNativeAudio = /v2\.6|v2-6/i.test(VIDEO_MODELS.klingReplicate);
@@ -4155,7 +4308,7 @@ async function tryKling(
       { parse_mode: 'Markdown' }
     );
     const klingInput: Record<string, unknown> = {
-      prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${prompt.substring(0, 350)}`,
+            prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
       start_image: imageUrl,
       duration: 5,
       aspect_ratio: '16:9',
@@ -8416,7 +8569,7 @@ Visualizations: ${visualizations.length} pages
 🎬 Google Veo 3.1: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
 🎬 Kling: ${replicate ? '✅ via Replicate' : '⚪ Set REPLICATE_API_TOKEN'}
 
-_Default chain: Luma ray-3.2 → Luma Replicate → Omni Flash → Runway_
+_Default chain: Luma ray-3.2 → Replicate → Omni → Kling v2.6 → Veo 3.1 → Runway (on moderation: chiaroscuro keyframe retry)_
 _Name a provider to pick it; it falls back through the chain if it fails._
 _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ 🚀`, { parse_mode: 'Markdown' });
       return;
@@ -8662,22 +8815,24 @@ Rules:
       
       const motionPromptInput = `TITLE: "${title}"
 THEME: ${theme}
-TEXT: "${englishText.substring(0, 1200)}"
+ATMOSPHERE (encode obliquely — do NOT quote explicit body actions from source):
+${englishExcerpt.slice(0, 400)}
 
-You are directing motion for ATUONA — underground Russian–English poetry made into a short film. The still frame is already generated; your words control how it *breathes* for ~9 seconds.
+You are directing motion for ATUONA underground poetry film. The still is already generated; your words control how it *breathes* for ~9 seconds.
 
-Write a TIGHT motion direction (2–4 sentences, max 95 words). It must feel literary, sensual, and art-film: tension in stillness, beauty with an edge — never generic "cinematic" filler.
+${UNDERGROUND_EROTIC_VIDEO_ENCODING}
+${VIDEO_PROVIDER_HARD_BANS}
 
-Describe ONLY subtle motion matched to THIS poem's exact mood: light breathing across surfaces, slow lens drift, fabric or skin micro-movement, steam/rain/smoke, reflections, eyelids, hands — whatever the TEXT implies.
-- Luxurious = depth of shadow, quality of light, emotional intimacy — NOT sparkle filters, NOT stock travel footage, NOT ad polish.
-- Underground = raw nerve under elegance; whisper, ache, defiance, hunger — as the poem demands.
+Write a TIGHT motion direction (2–4 sentences, max 85 words). Literary, sensual, art-film — erotic through light, fabric, breath, shadow — never pornographic literal.
+
+Describe ONLY subtle motion: moonlight drift, linen breathing, slow lens push, shadow on collarbone, eyelid, hand on fabric, steam — whatever the MOOD implies (not explicit acts from the text).
 
 Hard rules:
-- Do NOT introduce new characters, animals, cartoon figures, toys, mascots, or props not implied by the poem.
-- FORBIDDEN unless the poem explicitly names them: random dogs, birds, notebooks, beach establishing shots, generic flowers.
+- Do NOT introduce new characters, animals, or props not in the still.
+- Do NOT describe sex acts, nudity with genitals, or graphic intimacy — circle around desire instead.
 
 Return ONLY the motion direction. No preamble.`;
-      const motionPrompt = await createContent(motionPromptInput, 200, true);
+      let motionPrompt = sanitizeMotionForVideoProviders(await createContent(motionPromptInput, 200, true));
       
       // Generate hashtags
       const hashtags = ['#ATUONA', '#AIFilm', '#VibeCoding', '#UndergroundArt', '#ParadiseFound', '#AIGenerated', '#DigitalArt', '#BookToFilm'];
@@ -9038,60 +9193,98 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
             };
 
             /**
-             * 🔁 NEW: Luma jobs that fail DURING rendering (e.g. Ray moderation on sensual frames)
-             * previously ended the whole pipeline — the Replicate → Omni → Runway chain only covered
-             * submission-time failures. Now the chain re-runs (skipping Luma Direct resubmit).
+             * 🔁 Luma render-time failure → full fallback chain. On moderation, retry once with
+             * chiaroscuro keyframe (same erotic charge, encoded for video APIs).
              */
             const runPostLumaFallbackChain = async (): Promise<void> => {
-              try {
+              let lastError = '';
+              let moderationBlocked = false;
+
+              const pollRunwayAndDeliver = async (taskId: string): Promise<boolean> => {
+                for (let attempt = 1; attempt <= 8; attempt++) {
+                  await new Promise(r => setTimeout(r, attempt === 1 ? 60_000 : 40_000));
+                  try {
+                    const sr = await fetch(`${RUNWAY_API_URL}/tasks/${taskId}`, {
+                      headers: { 'Authorization': `Bearer ${runwayApiKey}`, 'X-Runway-Version': '2024-11-06' }
+                    });
+                    if (!sr.ok) continue;
+                    const sd = await sr.json() as any;
+                    if (sd.status === 'SUCCEEDED' && sd.output?.[0]) {
+                      await deliverFallbackVideo(String(sd.output[0]), 'Runway Gen-4.5');
+                      return true;
+                    }
+                    if (sd.status === 'FAILED') {
+                      lastError = String(sd.failure || 'Unknown');
+                      moderationBlocked = isVideoModerationError(lastError);
+                      if (moderationBlocked) {
+                        await ctx.reply(`⚠️ Runway flagged content — encoding keyframe through chiaroscuro…`);
+                      } else {
+                        await ctx.reply(`❌ Runway fallback failed: ${lastError}`);
+                      }
+                      return false;
+                    }
+                    console.log(`Runway fallback ${taskId} still ${sd.status} (${attempt}/8)...`);
+                  } catch (pollErr) {
+                    console.error('Runway fallback poll error:', pollErr);
+                  }
+                }
                 await ctx.reply(
-                  '🔁 *Running fallback chain:* Luma Replicate → Gemini Omni Flash → Runway Gen-4.5...',
+                  `⏳ Runway still rendering. Try \`/videostatus ${taskId}\` or \`/visualize runway ${pageId}\`.`,
                   { parse_mode: 'Markdown' }
                 );
-                const fb = await generateVideo(visualization.imageUrlHorizontal!, motionPrompt, ctx, null, pageId, true);
+                return false;
+              };
+
+              const runChain = async (imageUrl: string, chainLabel: string): Promise<boolean> => {
+                await ctx.reply(`🔁 *${chainLabel}*`, { parse_mode: 'Markdown' });
+                const fb = await generateVideo(imageUrl, motionPrompt, ctx, null, pageId, {
+                  skipLumaDirect: true,
+                  fastOmniPoll: true,
+                });
 
                 if (fb.success && fb.videoUrl) {
                   const providerLabel = fb.provider === 'omni' ? 'Gemini Omni Flash'
                     : fb.provider === 'veo' ? 'Google Veo 3.1'
-                    : fb.provider === 'kling' ? 'Kling'
+                    : fb.provider === 'kling' ? 'Kling v2.6'
                     : 'Luma via Replicate';
                   await deliverFallbackVideo(fb.videoUrl, providerLabel);
-                  return;
+                  return true;
                 }
 
                 if (fb.success && fb.provider === 'runway' && fb.taskId && runwayApiKey) {
-                  // Compact await-based Runway poll (~60s + 7×40s ≈ 5.5 min max)
-                  for (let attempt = 1; attempt <= 8; attempt++) {
-                    await new Promise(r => setTimeout(r, attempt === 1 ? 60_000 : 40_000));
-                    try {
-                      const sr = await fetch(`${RUNWAY_API_URL}/tasks/${fb.taskId}`, {
-                        headers: { 'Authorization': `Bearer ${runwayApiKey}`, 'X-Runway-Version': '2024-11-06' }
-                      });
-                      if (!sr.ok) continue;
-                      const sd = await sr.json() as any;
-                      if (sd.status === 'SUCCEEDED' && sd.output?.[0]) {
-                        await deliverFallbackVideo(String(sd.output[0]), 'Runway Gen-4.5');
-                        return;
-                      }
-                      if (sd.status === 'FAILED') {
-                        await ctx.reply(`❌ Runway fallback failed: ${sd.failure || 'Unknown'}`);
-                        break;
-                      }
-                      console.log(`Runway fallback ${fb.taskId} still ${sd.status} (${attempt}/8)...`);
-                    } catch (pollErr) {
-                      console.error('Runway fallback poll error:', pollErr);
-                    }
-                  }
-                  await ctx.reply(
-                    `⏳ Runway fallback did not finish in time. Try \`/videostatus ${fb.taskId}\` or \`/visualize runway ${pageId}\`.`,
-                    { parse_mode: 'Markdown' }
-                  );
-                } else if (!fb.success) {
-                  await ctx.reply(
-                    `❌ All video fallbacks failed${fb.error ? `: ${String(fb.error).substring(0, 140)}` : ''}.\n\nImage is saved — retry later with \`/visualize ${pageId}\`.`,
-                    { parse_mode: 'Markdown' }
-                  );
+                  return pollRunwayAndDeliver(fb.taskId);
                 }
+
+                lastError = fb.error || lastError;
+                if (fb.error && isVideoModerationError(fb.error)) moderationBlocked = true;
+                return false;
+              };
+
+              try {
+                // Attempt 1: gallery still + oblique motion (underground erotic encoding)
+                if (await runChain(
+                  visualization.imageUrlHorizontal!,
+                  'Fallback chain: Replicate → Omni → Kling → Veo → Runway'
+                )) return;
+
+                // Attempt 2: chiaroscuro keyframe — same desire, circles around explicit
+                if (moderationBlocked || isVideoModerationError(lastError)) {
+                  const safeFrame = await generateVideoSafeKeyframe(imagePrompt, title, ctx);
+                  if (safeFrame) {
+                    visualization.videoKeyframeUrl = safeFrame;
+                    saveState();
+                    if (await runChain(
+                      safeFrame,
+                      'Retry with chiaroscuro keyframe (underground erotic — shadow encoded)'
+                    )) return;
+                  }
+                }
+
+                await ctx.reply(
+                  `❌ Video providers blocked or timed out${lastError ? `: ${lastError.substring(0, 140)}` : ''}.\n\n` +
+                  `Gallery still saved ✅ — try \`/visualize kling ${pageId}\` or \`/visualize omni ${pageId}\` on the encoded keyframe.`,
+                  { parse_mode: 'Markdown' }
+                );
               } catch (fallbackErr: any) {
                 console.error('Post-Luma fallback chain error:', fallbackErr);
                 await ctx.reply(`❌ Fallback chain error: ${String(fallbackErr?.message || fallbackErr).substring(0, 140)}`).catch(() => undefined);
