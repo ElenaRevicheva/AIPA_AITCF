@@ -56,3 +56,6 @@ proper_working_fix.py
 
 # Claude Code worktrees (local only)
 .claude/worktrees/
+
+# Runtime state - NEVER let git clean/stash cleanup touch this (films/music/shots wiped 01.07.2026)
+data/
