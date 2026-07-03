@@ -1338,11 +1338,6 @@ export interface AtlasPerformanceMetrics {
   leads?: number;
   /** HubSpot deals linked to this concept (sidecar metric — not double-counted as leads). */
   hubspot_deals?: number;
-  /** GA4 nightly sync (scripts/sync-atlas-ga4.mjs) — distinct from generic sessions to avoid double-count. */
-  ga4_sessions?: number;
-  ga4_key_events?: number;
-  /** WhatsApp redirect clicks (future /go/wa adapter). */
-  wa_clicks?: number;
 }
 
 async function saveAtlasPerformanceEvent(payload: {
@@ -1390,19 +1385,7 @@ function sumMetrics(rows: Array<{ metrics: AtlasPerformanceMetrics }>): AtlasPer
   cpa: number | null;
   event_count: number;
 } {
-  const t = {
-    spend: 0,
-    impressions: 0,
-    clicks: 0,
-    conversions: 0,
-    revenue: 0,
-    sessions: 0,
-    leads: 0,
-    hubspot_deals: 0,
-    ga4_sessions: 0,
-    ga4_key_events: 0,
-    wa_clicks: 0,
-  };
+  const t = { spend: 0, impressions: 0, clicks: 0, conversions: 0, revenue: 0, sessions: 0, leads: 0, hubspot_deals: 0 };
   for (const r of rows) {
     const m = r.metrics || {};
     t.spend += Number(m.spend) || 0;
@@ -1413,9 +1396,6 @@ function sumMetrics(rows: Array<{ metrics: AtlasPerformanceMetrics }>): AtlasPer
     t.sessions += Number(m.sessions) || 0;
     t.leads += Number(m.leads) || 0;
     t.hubspot_deals += Number(m.hubspot_deals) || 0;
-    t.ga4_sessions += Number(m.ga4_sessions) || 0;
-    t.ga4_key_events += Number(m.ga4_key_events) || 0;
-    t.wa_clicks += Number(m.wa_clicks) || 0;
   }
   const roas = t.spend > 0 && t.revenue > 0 ? Math.round((t.revenue / t.spend) * 100) / 100 : null;
   const convBase = t.conversions || t.leads;
