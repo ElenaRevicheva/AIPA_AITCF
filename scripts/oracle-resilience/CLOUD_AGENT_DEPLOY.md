@@ -6,17 +6,26 @@ Deploy **every AI product on `170.9.242.90`** from your phone or Cursor Cloud Ag
 
 ## One-time setup (~10 min)
 
+### 0. Laptop one-shot (fastest)
+
+From repo root in PowerShell (finds your key in `~\.ssh`, tests SSH, sets secret, runs fleet-verify):
+
+```powershell
+cd D:\aideazz\ai-cofounders\cto-aipa
+.\scripts\oracle-resilience\setup-remote-deploy-from-laptop.ps1
+```
+
 ### 1. GitHub secrets (AIPA_AITCF repo)
 
 | Secret | Required for | Value |
 |--------|--------------|-------|
-| **`ORACLE_SSH_KEY`** | All Oracle products (#1–11) | Full `ssh-key-2026-01-07private.key` |
+| **`ORACLE_SSH_KEY`** | All Oracle products (#1–11) | Full private key file (e.g. `ssh-key-2025-01-07-private.key`) |
 | **`AWS_ACCESS_KEY_ID`** | Sprinter Lambda (#8.1) only | AWS IAM key with Lambda update |
 | **`AWS_SECRET_ACCESS_KEY`** | Sprinter Lambda (#8.1) only | Matching secret |
 
 ```powershell
 gh auth login
-gh secret set ORACLE_SSH_KEY --repo ElenaRevicheva/AIPA_AITCF < "$env:USERPROFILE\.ssh\ssh-key-2026-01-07private.key"
+gh secret set ORACLE_SSH_KEY --repo ElenaRevicheva/AIPA_AITCF < "C:\Users\kirav\.ssh\ssh-key-2025-01-07-private.key"
 ```
 
 ### 2. Oracle git auth (one-time per PAT rotation)
