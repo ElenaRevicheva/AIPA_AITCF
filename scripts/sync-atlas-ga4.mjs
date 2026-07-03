@@ -86,7 +86,8 @@ async function initOracleIfNeeded() {
 async function alreadySynced(conn, notes) {
   const r = await conn.execute(
     `SELECT COUNT(*) AS cnt FROM atlas_performance_events
-     WHERE source = 'ga4_sync' AND notes = :notes`,
+     WHERE source = 'ga4_sync'
+       AND DBMS_LOB.SUBSTR(notes, 4000, 1) = :notes`,
     { notes },
     { outFormat: oracledb.OUT_FORMAT_OBJECT },
   );
