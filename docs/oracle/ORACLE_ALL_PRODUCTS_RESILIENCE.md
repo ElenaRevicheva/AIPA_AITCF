@@ -2,6 +2,8 @@
 
 **Purpose:** Stop all AI bots on Oracle from silently dying. One plan, one deployment, covers every product on `170.9.242.90`. This file also lists **canonical Git repos**, **Oracle VM directories**, and **authoritative local Windows clones** so nothing is duplicated or misplaced across machines.
 
+**Related:** The **AIdeazz AI Lab** story (marketing engine phases, Atlas measure layer, client-facing narrative) lives in [`AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md`](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md) — start there for *what the lab does*; use **this file** for *where it runs and how to keep it alive*.
+
 **Note:** These details are synced to [aideazz-private-docs / docs/plans/oracle-infrastructure](https://github.com/ElenaRevicheva/aideazz-private-docs/tree/docs/docs/plans/oracle-infrastructure). In this repo, the export lives in `docs/plans/oracle-infrastructure/` (README, OVERVIEW, RESILIENCE). Copy that folder to the private repo’s `docs/plans/oracle-infrastructure/` and push to the `docs` branch. See `docs/plans/oracle-infrastructure/SYNC_TO_PRIVATE_REPO.md`.
 
 ---
@@ -10,7 +12,7 @@
 
 - **Sprinter (AWS Lambda `sprint-briefing-agent`, us-east-1, EventBridge `cron(0 13 * * ? *)` = 8AM Panama):** narrative + clustering chain is now **Claude → Groq → Gemini → OpenAI `gpt-4o-mini`** (`src/sprint-briefing/synthesize.ts`). It failed to fire June 23 because all of Claude(400 dead)/Groq(429 capped)/Gemini(429 depleted) failed — added OpenAI as the reliable backstop (key already in the Lambda env, 19 vars). **Verified June 24:** force-test logged `OpenAI (gpt-4o-mini) returned 1926 chars → narrative fallback succeeded`, `{"ok":true}`. **Rebuild+deploy:** `npx esbuild src/lambda/sprint-briefing-aws.ts --bundle --platform=node --target=node20 --format=cjs --external:@aws-sdk/signature-v4-crt --external:encoding --outfile=dist-lambda/sprint/lambda-pkg/handler.js` → `py` zipfile (handler.js at zip root) → `node scripts/deploy-lambda.mjs`. **Force-test** = set Lambda env `SPRINT_BRIEFING_FORCE=1`, invoke (boto3, creds in `~/.aws`), then REMOVE the var. Deploy step 4 may transiently `ResourceConflict` ("update in progress") — code still uploaded; retry config update or ignore (it only re-sets an already-set var).
 - **Provider reality:** the **Anthropic** key AND the **Gemini** key are OUT OF CREDITS (`400` / `429 prepayment depleted`). Working free/cheap: **Groq** (`llama-3.3-70b-versatile`, free) + **OpenAI** (`gpt-4o-mini`, cheap). Every AI path now falls back: `claude_helper`→Groq; VJH `response_detector` classify→Groq; VJH **LLM judge → OpenAI → Groq**. **Keys are read from each repo's `.env` directly** (bots do NOT export them to `os.environ`, which would otherwise fail-open/degrade). Groq sits behind Cloudflare → **must send a browser `User-Agent`** or it 403s the default urllib UA.
-- **Atlas Shifted (`whitespace` PM2, port 8095) — added June 25 2026; performance bridge June 29 2026:** the marketing-angle radar (repo [`atlas-shifted`](https://github.com/ElenaRevicheva/atlas-shifted), Oracle `/home/ubuntu/whitespace`). Most complete LLM chain in the fleet: **Claude → Groq → OpenAI → Grok** (text/JSON, per-process circuit breaker) + **OpenAI `text-embedding-3-small`** for the angle classifier (⚠️ embeddings are **OpenAI-only — no failover**; if OpenAI dies, classification halts). Image: Flux (Replicate) → OpenAI `gpt-image-1`. Video: Runway → **Luma Agents API** (`ray-3.2` i2v fallback). **Jun 29 performance bridge:** Atlas exports **`concept_id` + UTM tags**; CTO AIPA **`POST /cto/api/performance-event`** → Oracle **`atlas_performance_events`**; Atlas UI shows ROAS/CPA/leads when hub wired (`ATLAS_PERFORMANCE_SECRET` = `OUTREACH_SECRET`). Detect→create pipeline **unchanged**. **Gotcha fixed June 25:** a standalone CLI that reads `process.env.*` directly (e.g. `video.ts`) **must `import 'dotenv/config'`** or every key is undefined and providers skip silently (looked like "dry credits"; it wasn't).
+- **Atlas Shifted (`whitespace` PM2, port 8095) — added June 25 2026; performance bridge June 29 2026; GA4 sync July 3 2026:** the marketing-angle radar (repo [`atlas-shifted`](https://github.com/ElenaRevicheva/atlas-shifted), Oracle `/home/ubuntu/whitespace`). Daily capture cron **`0 14 * * *` UTC** (= **9 AM Panama**). Most complete LLM chain in the fleet: **Claude → Groq → OpenAI → Grok** (text/JSON, per-process circuit breaker) + **OpenAI `text-embedding-3-small`** for the angle classifier (⚠️ embeddings are **OpenAI-only — no failover**; if OpenAI dies, classification halts). Image: Flux (Replicate) → OpenAI `gpt-image-1`. Video: Runway → **Luma Agents API** (`ray-3.2` i2v fallback). **Jun 29 performance bridge:** Atlas exports **`concept_id` + UTM tags**; CTO AIPA **`POST /cto/api/performance-event`** → Oracle **`atlas_performance_events`**; Atlas UI shows ROAS/CPA/leads/**ga4_sessions** when hub wired (`ATLAS_PERFORMANCE_SECRET` = `OUTREACH_SECRET`). **Jul 3 GA4 adapter:** **`scripts/sync-atlas-ga4.mjs`** cron **`15 6 * * *` UTC** on `cto-aipa` (separate from Atlas capture — measure only). **Jul 3 UI:** public banner client-safe before 9 AM (`atlas-shifted` `eb9e99c`). Detect→create pipeline **unchanged**. **Gotcha fixed June 25:** a standalone CLI that reads `process.env.*` directly (e.g. `video.ts`) **must `import 'dotenv/config'`** or every key is undefined and providers skip silently (looked like "dry credits"; it wasn't).
 - **Fleet LLM failover — UNIVERSAL `Claude → Groq` spine (re-audited in code June 25):** **every** agent falls to **Groq (free `llama-3.3-70b-versatile`)** on Claude 400/credit-exhaustion — EspaLuz Telegram (`main.py` ~L4255), EspaLuz WhatsApp (`espaluz_bridge.py` ~L2880 + `whatsapp_convo_mode.py`), EspaLuz Influencer (`cto_milestone_module.py`), VJH (`claude_helper` / `response_detector` / judge `OpenAI→Groq`), cto-aipa (`claudeWithGroqFallback`, `src/llm-resilience.ts`), Algom, Atlas. **Extended tiers** in higher-volume/critical paths: **Grok (xAI)** in cto-aipa / Algom / Atlas (`XAI_MODEL` default `grok-4.20-0309-non-reasoning`); **OpenAI** in Atlas / Sprinter / VJH-judge; **Gemini** in Sprinter / blog-es. Fullest chain = Atlas (**Claude → Groq → OpenAI → Grok**). **CORRECTION (June 25):** an earlier draft of this note wrongly stated EspaLuz was "Claude + OpenAI only, no Groq/Grok" — that was a grep artifact (matched backup files). EspaLuz has the Claude→Groq fallback; "free grok" = **Groq**, the free Llama provider (not xAI Grok). The fleet is uniformly resilient to a single Anthropic outage.
 - **VibeJobHunter (`vibejobhunter` systemd):** honest-LEAD mode — surfaces right-fit (fully-remote · LATAM-open · AI-augmented · no-coding) jobs to Telegram + HubSpot "🔥 I Act TODAY", **capped at 6/cycle** (`VJH_SURFACE_CAP`). Deploy: `cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && git pull && sudo systemctl restart vibejobhunter`. Full chain + the "0-surfacing" bug-chain gotchas: VJH `CLAUDE.md` → "CURRENT PIPELINE". **Dedup stores:** `autonomous_data/seen_jobs.json` (`seen_jobs_v2`) + `vjh_checkpoint.db` — clearing them WITHOUT the surface cap **floods Telegram** (happened June 23; cap added).
 
@@ -666,13 +668,13 @@ All 4 HubSpot items: `posted_x=True AND posted=True`. Queue clean. Future milest
 | **aideazz.xyz/blog** | ✅ Active | Auto-populated from Dev.to crosspost via existing sync mechanism |
 | **Hashnode** | ❌ NOT IN USE | Dropped — paid plan only. `HASHNODE_ACCESS_TOKEN` is NOT set in `.env` |
 
-> **Important:** The source file is `src/hashnode-daily.ts` — **misleading name**. It runs in Dev.to-only mode whenever `HASHNODE_ACCESS_TOKEN` is absent from env. Do not rename without a full audit; the PM2 config references this file directly.
+> **Important:** The blog publisher source file is **`src/daily-blog-publisher.ts`** (renamed from `hashnode-daily.ts` May 2026). It runs in **Dev.to-only mode** whenever `HASHNODE_ACCESS_TOKEN` is absent from env.
 
 ### Source file
 
-`/home/ubuntu/cto-aipa/src/hashnode-daily.ts`
+`/home/ubuntu/cto-aipa/src/daily-blog-publisher.ts`
 
-When `HASHNODE_ACCESS_TOKEN` is not set → Dev.to-only mode (calls `publishToDevTo()` only, skips `publishToHashnode()`).
+When `HASHNODE_ACCESS_TOKEN` is not set → Dev.to-only mode (Hashnode path skipped entirely).
 
 ### PM2 process
 
@@ -689,7 +691,7 @@ Logs: `pm2 logs cto-aipa --lines 200 | grep -i blog`
 | `GOOGLE_ANALYTICS_CREDENTIALS` | JSON string — service account key from GCP project `vaulted-circle-368018` |
 | `GSC_SITE_URL` | `sc-domain:aideazz.xyz` |
 
-Function: `fetchGscTopQueries()` in `src/gsc-client.ts` — returns top search queries to inform blog topic selection.
+Function: `fetchGscTopQueries()` in **`src/daily-blog-publisher.ts`** — JWT from `GOOGLE_ANALYTICS_CREDENTIALS`; returns top search queries to inform blog topic selection.
 Service account added to GSC property as `siteFullUser` (verified May 16 2026).
 
 ### GA4 integration
@@ -699,8 +701,15 @@ Service account added to GSC property as `siteFullUser` (verified May 16 2026).
 | `GOOGLE_ANALYTICS_CREDENTIALS` | Same service account JSON as GSC (reused) |
 | `GA4_PROPERTY_ID` | `515154124` |
 
-GCP property: `vaulted-circle-368018` ("My First Project"). Service account added as Viewer in GA4 (verified May 16 2026).
-Analytics Data API enabled. Returns 30-day traffic data (e.g. 1151 homepage views, 172 portfolio views).
+**GCP project:** `vaulted-circle-368018` — **analytics only** (GA4 + GSC). Service account **`aideazz-analytics-reader@vaulted-circle-368018.iam.gserviceaccount.com`**. Do **not** conflate with the separate **Aldeazz** GCP project (reCAPTCHA Enterprise, Google Places) — leave both projects as-is.
+
+| Use | Where | Script / endpoint |
+|-----|-------|-------------------|
+| Site-wide analytics dashboard | VJH `vibejobhunter-web` :8080 | `performance_tracker.py` |
+| GSC gap topic pick (blog) | CTO AIPA PM2 | `fetchGscTopQueries()` in `daily-blog-publisher.ts` |
+| **Atlas campaign sessions** | CTO AIPA cron **`15 6 * * *` UTC** | **`scripts/sync-atlas-ga4.mjs`** → `ga4_sessions` / `ga4_key_events` on performance ledger |
+
+Verified Jul 3 2026: GA4 adapter live; first `ga4_sync` row (`ai_augmented_product_building`, 1 session, Jul 2).
 
 ### VJH CMO crosspost
 
@@ -750,19 +759,25 @@ Body: { source, type, pipeline: "hiring"|"client", stage?, email?, domain?,
 
 Logs to Oracle `agent_outcomes` table. Routes to `pushHiringDealToHubSpot()` or `pushLeadToHubSpot()` based on pipeline. Non-fatal — 500 from HubSpot never breaks caller.
 
-### /api/performance-event hub (Atlas ↔ AIdeazz — June 29, 2026)
+### /api/performance-event hub (Atlas ↔ AIdeazz — June 29 2026; GA4 adapter July 3 2026)
 
 Sidecar outcome ledger for Atlas creatives. Auth: `Bearer OUTREACH_SECRET` (same secret as CRM hub).
 
 ```
 POST https://webhook.aideazz.xyz/cto/api/performance-event
-Body: { source, concept_id, vertical, angle_id?, metrics: { spend?, clicks?, conversions?, revenue?, sessions?, leads? },
+Body: { source, concept_id, vertical, angle_id?, metrics: { spend?, clicks?, conversions?, revenue?, sessions?, leads?, ga4_sessions?, ga4_key_events?, hubspot_deals?, wa_clicks? },
         period_start?, period_end?, notes? }
 
 GET https://webhook.aideazz.xyz/cto/api/atlas-performance?vertical=&concept_id=
 ```
 
-Writes Oracle **`atlas_performance_events`**. Atlas **`/api/atlas`** reads aggregated totals when `ATLAS_PERFORMANCE_SECRET` is set in `whitespace/.env`. Lead adapter: `~/cto-aipa/scripts/sync-atlas-business-leads.mjs` (ingests `business_leads` where `utm_campaign LIKE 'atlas_%'`).
+Writes Oracle **`atlas_performance_events`**. Atlas **`/api/atlas`** reads aggregated totals when `ATLAS_PERFORMANCE_SECRET` is set in `whitespace/.env`.
+
+| Adapter | Script / trigger | Metric names |
+|---------|------------------|--------------|
+| Form leads | `~/cto-aipa/scripts/sync-atlas-business-leads.mjs` | `leads` |
+| GA4 nightly | `~/cto-aipa/scripts/sync-atlas-ga4.mjs` (cron 06:15 UTC) | `ga4_sessions`, `ga4_key_events` |
+| HubSpot deals | `src/atlas-crm-bridge.ts` (sidecar) | `hubspot_deals` |
 
 ### BrightData enrichment layers (brightdata-enrich.ts)
 
