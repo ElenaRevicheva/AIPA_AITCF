@@ -1096,7 +1096,7 @@ async function startCTOAIPA() {
     const cards = films.map(f => {
       const url = `${base}/films/${encodeURIComponent(f.name)}${keyQ}`;
       const when = new Date(f.mtimeMs).toISOString().slice(0, 16).replace('T', ' ');
-      const title = f.name.replace(/\.mp4$/i, '').replace(/-\d{4}-\d{2}-\d{2}T.*$/, '').replace(/[-_]/g, ' ').trim();
+      const title = f.name.replace(/\.mp4$/i, '').replace(/-\d{4}-\d{2}-\d{2}T.*$/, '').replace(/__/g, ' // ').replace(/[-_]/g, ' ').trim();
       return `<div class="film"><h2>${title || f.name}</h2><div class="meta">${when} UTC · ${f.sizeMB.toFixed(1)} MB</div><video controls preload="metadata" playsinline src="${url}"></video><div><a href="${url}" download>⬇ download</a></div></div>`;
     }).join('\n');
     const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ATUONA — Underground Aesthetic AI Cinema</title><link rel="icon" type="image/svg+xml" href="https://atuona.xyz/favicon.svg">
@@ -1117,7 +1117,7 @@ async function startCTOAIPA() {
     const keyQ = FILMS_KEY ? `?key=${encodeURIComponent(FILMS_KEY)}` : '';
     res.json(listFilms().map(f => ({
       name: f.name,
-      title: f.name.replace(/\.mp4$/i, '').replace(/-\d{4}-\d{2}-\d{2}T.*$/, '').replace(/[-_]/g, ' ').trim(),
+      title: f.name.replace(/\.mp4$/i, '').replace(/-\d{4}-\d{2}-\d{2}T.*$/, '').replace(/__/g, ' // ').replace(/[-_]/g, ' ').trim(),
       url: `${base}/films/${encodeURIComponent(f.name)}${keyQ}`,
       sizeMB: Math.round(f.sizeMB * 10) / 10,
       when: new Date(f.mtimeMs).toISOString().slice(0, 16).replace('T', ' '),
