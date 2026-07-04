@@ -9915,24 +9915,29 @@ Complete: ${visualizations.filter(v => v.status === 'complete').length}
   atuonaBot.command('film', async (ctx) => {
     const filmArg = ctx.message?.text?.replace('/film', '').trim() || '';
 
-    // /film build [033 041 052]  →  assemble persisted base-cut shots into one mp4 (VO + music)
+    // /film build [033 041 052] [music:atmospheric]  →  assemble persisted base-cut shots into one mp4 (VO + music)
     if (filmArg.toLowerCase().startsWith('build')) {
       const rest = filmArg.replace(/^build/i, '').trim();
-      const pageIds = rest
-        ? rest.split(/[\s,]+/).map(p => String(parseInt(p)).padStart(3, '0')).filter(p => p !== 'NaN')
+      const musicMatch = rest.match(/music:([^\s]+)/i);
+      const musicHint = musicMatch?.[1];
+      const restNoMusic = rest.replace(/\bmusic:[^\s]+/gi, '').trim();
+      const pageIds = restNoMusic
+        ? restNoMusic.split(/[\s,]+/).map(p => String(parseInt(p)).padStart(3, '0')).filter(p => p !== 'NaN')
         : undefined; // undefined = all persisted shots
       await ctx.reply(
-        `🎬 *Building film${pageIds ? ` (${pageIds.length} pages)` : ' (all completed shots)'}...*\n\n_Voiceover + music + assembly. This can take a few minutes — I'll narrate progress._`,
+        `🎬 *Building film${pageIds ? ` (${pageIds.length} pages)` : ' (all completed shots)'}${musicHint ? ` · music:${musicHint}` : ''}...*\n\n_Voiceover + music + assembly. This can take a few minutes — I'll narrate progress._`,
         { parse_mode: 'Markdown' }
       );
       let last = 0;
-      const result = await buildFilm({
+      const buildOpts: Parameters<typeof buildFilm>[0] = {
         pageIds: pageIds ?? [],
         onProgress: async (m) => {
           const now = Date.now();
           if (now - last > 12000) { last = now; await ctx.reply(`🎬 ${m}`).catch(() => undefined); }
         },
-      });
+      };
+      if (musicHint) buildOpts.musicHint = musicHint;
+      const result = await buildFilm(buildOpts);
       if (!result.ok) {
         await ctx.reply(`⚠️ Film build: ${result.error}`, { parse_mode: 'Markdown' });
         return;
@@ -9990,6 +9995,7 @@ ${completeViz.length} horizontal videos ready
 \`/film build\` - 🎬✨ AUTO-ASSEMBLE into one film
    (base cuts + poem voiceover + music bed)
 \`/film build 033 041 052\` - specific pages, in order
+\`/film build 088 090 music:atmospheric\` - pick music by filename substring
 
 _Or export + hand-edit:_
 \`/export film\` - get all video URLs (DaVinci / CapCut / Premiere)

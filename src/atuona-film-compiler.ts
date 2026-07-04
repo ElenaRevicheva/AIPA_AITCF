@@ -160,10 +160,8 @@ async function translatePoemToEnglish(russian: string): Promise<string> {
   return '';
 }
 
-/** Fetch the ENGLISH poem text + title for the on-screen stanza + voiceover.
- *  Stanzas are English-only: prefer the English trait; for #007-046 (no English trait)
- *  pull the Russian body from the repo JSONs and translate it. Never returns Russian. */
-async function fetchPoem(pageId: string): Promise<{ title: string; text: string }> {
+/** Fetch poem text + title. `deferTranslation`: skip full RU→EN (sharp stanza picks + translates fragment only). */
+async function fetchPoem(pageId: string, opts?: { deferTranslation?: boolean }): Promise<{ title: string; text: string; russianText: string }> {
   let title = `Page ${pageId}`;
   let englishText = '';
   let russianText = '';
@@ -183,11 +181,32 @@ async function fetchPoem(pageId: string): Promise<{ title: string; text: string 
     console.warn(`🎙️ fetchPoem ${pageId}:`, e?.message);
   }
   if (!englishText && !russianText) russianText = await fetchRussianBodyFromJson(pageId);
-  if (!englishText && russianText) {
+  if (!englishText && russianText && !opts?.deferTranslation) {
     englishText = await translatePoemToEnglish(russianText);
     if (englishText) console.log(`🎙️ #${pageId}: translated RU→EN for film stanza (${englishText.length} chars)`);
   }
-  return { title, text: englishText }; // English-only by construction
+  return { title, text: englishText, russianText };
+}
+
+/** Pick ONE sharpest 2–4 line verbatim fragment from a poem (gemini → OpenAI fallback). */
+async function pickSharpStanza(poemText: string): Promise<string> {
+  const prompt = `From this poem, pick exactly ONE fragment: 2–4 consecutive short lines copied VERBATIM from the poem (do not rewrite, invent, or combine non-adjacent lines). Choose the fragment with the highest emotional charge and the strongest haunting image. Return ONLY the fragment as plain text, preserving line breaks.\n\n${poemText.slice(0, 2200)}`;
+  try {
+    const out = (await withTimeout(geminiComplete(null, prompt, 400, 'film/stanza'), 45000, 'gemini stanza')).trim();
+    if (out) return out;
+  } catch (e: any) { console.warn('🎙️ pickSharpStanza (gemini):', e?.message); }
+  try {
+    if (openai) {
+      const r = await withTimeout(openai.chat.completions.create({
+        model: process.env.ATUONA_STANZA_MODEL || 'gpt-4o-mini', max_tokens: 400,
+        messages: [{ role: 'user', content: prompt }],
+      }), 45000, 'openai stanza');
+      return (r.choices[0]?.message?.content || '').trim();
+    }
+  } catch (e: any) { console.warn('🎙️ pickSharpStanza (openai):', e?.message); }
+  // Fallback: first few non-empty lines
+  const lines = poemText.split('\n').map(l => l.trim()).filter(Boolean);
+  return lines.slice(0, 3).join('\n');
 }
 
 /** Generate voiceover audio for a poem via OpenAI TTS. Returns the mp3 path, or null. */
@@ -197,7 +216,7 @@ async function ttsForPoem(pageId: string, text: string): Promise<string | null> 
     const out = path.join(workDir(), `vo_${pageId}.mp3`);
     const voice = (process.env.ATUONA_TTS_VOICE || 'onyx').trim(); // onyx = deep, fitting for the tone
     const resp = await withTimeout(openai.audio.speech.create({
-      model: 'tts-1', voice: voice as any, input: text.substring(0, 1800),
+      model: 'tts-1', voice: voice as any, input: text.substring(0, 1800), speed: 0.9,
     }), 45000, `TTS ${pageId}`);
     fs.writeFileSync(out, Buffer.from(await resp.arrayBuffer()));
     return out;
@@ -207,13 +226,31 @@ async function ttsForPoem(pageId: string, text: string): Promise<string | null> 
   }
 }
 
-/** Pick a music bed: first file in music/, else Suno (gated), else null (VO-only film). */
-async function pickMusic(filmLen: number): Promise<string | null> {
+const LAST_TRACK_FILE = '.last-track';
+
+/** Pick a music bed: random (or substring match), skip last-used when ≥2 tracks, else Suno, else null. */
+async function pickMusic(filmLen: number, hint?: string): Promise<string | null> {
   try {
     const files = fs.readdirSync(musicDir()).filter(f => /\.(mp3|m4a|wav|aac|ogg)$/i.test(f));
     if (files.length) {
-      const chosen = path.join(musicDir(), files[Math.floor(Math.random() * files.length)]!);
-      console.log(`🎵 music bed: ${chosen}`);
+      let candidates = files;
+      if (hint?.trim()) {
+        const h = hint.trim().toLowerCase();
+        const matched = files.filter(f => f.toLowerCase().includes(h));
+        if (matched.length) candidates = matched;
+        else console.log(`🎵 music hint "${hint}" matched nothing — picking from all tracks`);
+      }
+      const lastPath = path.join(musicDir(), LAST_TRACK_FILE);
+      let lastName = '';
+      try { if (fs.existsSync(lastPath)) lastName = fs.readFileSync(lastPath, 'utf8').trim(); } catch { /* ignore */ }
+      if (lastName && candidates.length >= 2) {
+        const filtered = candidates.filter(f => f !== lastName);
+        if (filtered.length) candidates = filtered;
+      }
+      const chosenName = candidates[Math.floor(Math.random() * candidates.length)]!;
+      const chosen = path.join(musicDir(), chosenName);
+      try { fs.writeFileSync(lastPath, chosenName); } catch { /* ignore */ }
+      console.log(`🎵 music bed: ${chosen}${hint ? ` (hint: ${hint})` : ''}`);
       return chosen;
     }
   } catch { /* ignore */ }
@@ -284,6 +321,8 @@ function tracked(s: string): string {
     .map(line => line.split(/\s+/).filter(Boolean).map(w => w.split('').join(' ')).join('   '))
     .join('\n');
 }
+/** Per-letter tracking (outro A T U O N A card). */
+function letterTrack(s: string): string { return caps(s).split('').join(' '); }
 /** Filesystem-safe slug from a poem/film title → meaningful film filenames (gallery shows real titles). */
 function slugifyTitle(s: string): string {
   return stripMd(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'atuona-film';
@@ -319,6 +358,7 @@ export async function buildFilm(opts: {
   pageIds?: string[];
   title?: string;
   subtitle?: string;
+  musicHint?: string;
   onProgress?: (msg: string) => Promise<void> | void;
 }): Promise<BuildFilmResult> {
   const W = workDir();
@@ -328,24 +368,34 @@ export async function buildFilm(opts: {
   const usePoemText = !off(process.env.ATUONA_FILM_POEMTEXT);
   const useCards = !off(process.env.ATUONA_FILM_CARDS);
   const useXfade = !off(process.env.ATUONA_FILM_CROSSFADE);
-  const XFADE_D = Math.max(0.2, parseFloat(process.env.ATUONA_FILM_XFADE_SEC || '0.8') || 0.8);
+  const stanzaMode = (process.env.ATUONA_FILM_STANZA_MODE || 'sharp').trim().toLowerCase();
+  const XFADE_D = Math.max(0.2, parseFloat(process.env.ATUONA_FILM_XFADE_SEC || '1.3') || 1.3);
+  const VO_LEAD = 0.7;
+  const VO_TAIL = 1.9;
 
   // Render a black title/credits card (faded in/out, silent audio) → normalized to the clip spec.
-  const makeCard = async (cardTitle: string, cardSub: string, outFile: string, dur = 3.7, bgImage?: string): Promise<string | null> => {
+  const makeCard = async (
+    cardTitle: string, cardSub: string, outFile: string, dur = 4.4,
+    opts2?: { bgImage?: string; noFadeIn?: boolean; titleSize?: number; letterTrackTitle?: boolean },
+  ): Promise<string | null> => {
     try {
+      const titleSize = opts2?.titleSize ?? 42;
+      const titleText = opts2?.letterTrackTitle ? letterTrack(cardTitle) : tracked(wrapPoem(cardTitle, 16, 2));
       const tFile = path.join(W, `${path.basename(outFile, '.mp4')}_title.txt`);
-      fs.writeFileSync(tFile, tracked(wrapPoem(cardTitle, 16, 2)));   // header-style: tracked mono caps
-      let draw = `drawtext=fontfile=${FILM_FONT_MONO}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=42:line_spacing=18:x=(w-text_w)/2:y=(h-text_h)/2-28`;
+      fs.writeFileSync(tFile, titleText);
+      let draw = `drawtext=fontfile=${FILM_FONT_MONO}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=${titleSize}:line_spacing=18:x=(w-text_w)/2:y=(h-text_h)/2-26`;
       if (cardSub.trim()) {
         const sFile = path.join(W, `${path.basename(outFile, '.mp4')}_sub.txt`);
-        fs.writeFileSync(sFile, caps(wrapPoem(cardSub, 42, 2)));
-        draw += `,drawtext=fontfile=${FILM_FONT_MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=21:line_spacing=10:x=(w-text_w)/2:y=(h/2)+44`;
+        fs.writeFileSync(sFile, caps(wrapPoem(cardSub, 56, 2)));
+        draw += `,drawtext=fontfile=${FILM_FONT_MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=20:line_spacing=10:x=(w-text_w)/2:y=(h/2)+40`;
       }
-      const fades = `fade=t=in:st=0:d=0.8,fade=t=out:st=${(dur - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
+      const fadeOut = `fade=t=out:st=${(dur - 0.8).toFixed(2)}:d=0.8`;
+      const fades = `${opts2?.noFadeIn ? '' : 'fade=t=in:st=0:d=0.8,'}${fadeOut},format=yuv420p`;
+      const bgImage = opts2?.bgImage;
       if (bgImage && fs.existsSync(bgImage)) {
         // Cover card: a darkened still (e.g. the first shot) behind the title — so the film
         // opens on an image, not a black void. Title/sub fade in over it, then it crossfades in.
-        const vf = `scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,fps=30,eq=brightness=-0.34:saturation=0.82,${draw},${fades}`;
+        const vf = `scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,fps=30,eq=brightness=-0.36:saturation=0.8,${draw},${fades}`;
         await execFileP('ffmpeg', [
           '-y', '-loop', '1', '-i', bgImage,
           '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
@@ -385,46 +435,66 @@ export async function buildFilm(opts: {
   }
   await note(`assembling ${shots.length} shot(s)...`);
 
-  // 2) Per-shot clip: normalize 720p/30fps, bake VO (hold last frame if VO longer), uniform codec
+  // 2) Per-shot clip: normalize 720p/30fps, slow-mo extend, bake VO at t=0.7s, drop native audio
   const clips: string[] = [];
   let firstPoemTitle = '';
   for (let i = 0; i < shots.length; i++) {
     const { id, file } = shots[i]!;
     const clip = path.join(W, `clip_${String(i).padStart(3, '0')}.mp4`);
-    const shotDur = (await ffprobeDuration(file)) || 6;
+    const naturalDur = (await ffprobeDuration(file)) || 6;
 
-    const { title: poemTitle, text } = await fetchPoem(id);
+    const { title: poemTitle, text: englishText, russianText } = await fetchPoem(id, { deferTranslation: stanzaMode === 'sharp' });
     if (i === 0 && poemTitle) firstPoemTitle = poemTitle;
-    const voFile = await ttsForPoem(id, text);
-    const voDur = voFile ? await ffprobeDuration(voFile) : 0;
-    // Clip length: long enough to hear the poem, min the shot length, capped so one poem can't dominate.
-    const clipDur = Math.min(Math.max(shotDur, voDur + 0.6), Math.max(shotDur, 22));
-    const holdPad = Math.max(0, clipDur - shotDur);
 
-    // On-screen poem text: subtitle band anchored to the bottom (keeps the center/image clear),
-    // smaller font, wider/fewer lines, compact dark plate, fades in over 0.7s.
+    // Stanza text for VO + on-screen band (sharp = one verbatim fragment; full = legacy whole poem)
+    let stanzaText = englishText;
+    if (stanzaMode === 'sharp') {
+      const pickFrom = englishText.trim() || russianText.trim();
+      if (pickFrom) {
+        let fragment = await pickSharpStanza(pickFrom);
+        if (!englishText.trim() && russianText.trim() && fragment) {
+          fragment = await translatePoemToEnglish(fragment);
+          if (fragment) console.log(`🎙️ #${id}: sharp stanza RU→EN (${fragment.length} chars)`);
+        }
+        if (fragment.trim()) stanzaText = fragment;
+      }
+    } else if (!stanzaText.trim() && russianText.trim()) {
+      stanzaText = await translatePoemToEnglish(russianText);
+    }
+
+    const voFile = stanzaText.trim() ? await ttsForPoem(id, stanzaText) : null;
+    const voDur = voFile ? await ffprobeDuration(voFile) : 0;
+    const clipDur = voFile
+      ? Math.max(naturalDur, VO_LEAD + voDur + VO_TAIL)
+      : naturalDur;
+    const setptsFactor = (clipDur / naturalDur).toFixed(5);
+
+    // On-screen poem text: bottom band, fade in 0.7s + fade out over last 1.0s of clip
     let drawPoem = '';
-    if (usePoemText && text.trim()) {
-      const wrapped = wrapPoem(text, 58, 7);
+    if (usePoemText && stanzaText.trim()) {
+      const wrapped = wrapPoem(stanzaText, 50, 7);
       if (wrapped) {
         const txtFile = path.join(W, `txt_${String(i).padStart(3, '0')}.txt`);
         fs.writeFileSync(txtFile, wrapped);
-        drawPoem = `,drawtext=fontfile=${FILM_FONT}:textfile=${txtFile}:expansion=none:fontcolor=white:fontsize=20:line_spacing=5:box=1:boxcolor=black@0.55:boxborderw=12:x=(w-text_w)/2:y=h-text_h-22:alpha=if(lt(t\\,0.7)\\,t/0.7\\,1)`;
+        const fadeOutAt = (clipDur - 1.0).toFixed(2);
+        const alpha = `if(lt(t\\,0.7)\\,t/0.7\\,if(gt(t\\,${fadeOutAt})\\,max(0\\,(${clipDur.toFixed(2)}-t)/1.0)\\,1))`;
+        drawPoem = `,drawtext=fontfile=${FILM_FONT}:textfile=${txtFile}:expansion=none:fontcolor=white:fontsize=22:line_spacing=6:box=1:boxcolor=black@0.5:boxborderw=14:x=(w-text_w)/2:y=h-text_h-30:alpha=${alpha}`;
       }
     }
 
     try {
-      const vNorm = `scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black,fps=30,tpad=stop_mode=clone:stop_duration=${holdPad.toFixed(2)},format=yuv420p${drawPoem}`;
+      const vNorm = `scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black,setpts=${setptsFactor}*PTS,fps=30,format=yuv420p${drawPoem}`;
       if (voFile) {
+        // Drop native shot audio — VO only, starting at t=0.7s (adelay=700)
         await execFileP('ffmpeg', [
           '-y', '-i', file, '-i', voFile,
-          '-filter_complex', `[0:v]${vNorm}[v];[1:a]aresample=44100,apad[a]`,
+          '-filter_complex', `[0:v]${vNorm}[v];[1:a]aresample=44100,aformat=channel_layouts=stereo,adelay=700|700,apad=pad_dur=${clipDur.toFixed(2)}[a]`,
           '-map', '[v]', '-map', '[a]', '-t', clipDur.toFixed(2),
           '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-pix_fmt', 'yuv420p',
           '-c:a', 'aac', '-ar', '44100', '-ac', '2', clip,
         ], { maxBuffer: 1 << 26, timeout: 150000 });
       } else {
-        // no VO: keep shot, add silent track for uniform concat
+        // no VO: silent track only — never map source clip audio (Change 2b)
         await execFileP('ffmpeg', [
           '-y', '-i', file, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
           '-filter_complex', `[0:v]${vNorm}[v]`,
@@ -455,11 +525,18 @@ export async function buildFilm(opts: {
       await execFileP('ffmpeg', ['-y', '-ss', '0.6', '-i', shots[0]!.file, '-frames:v', '1', '-q:v', '3', coverImg], { maxBuffer: 1 << 26, timeout: 30000 });
       if (fs.existsSync(coverImg)) cover = coverImg;
     } catch { /* black card fallback */ }
-    // Subtitle = the real gallery moments (poem numbers) featured in this film.
-    const moments = shots.map(s => `#${s.id}`).join(', ');
-    const filmSub = (opts.subtitle || `atuona.xyz Gallery  ·  Moments ${moments}`).trim();
-    const intro = await makeCard(filmTitle, filmSub, path.join(W, 'card_intro.mp4'), 3.8, cover);
-    const outro = await makeCard('ATUONA', 'atuona.xyz // Paradise.js  ·  by Kira Velerevich', path.join(W, 'card_outro.mp4'), 3.6);
+    // Intro subtitle: DD.MM.YYYY · ATUONA.XYZ GALLERY · MOMENTS #088 #090 …
+    const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.');
+    const moments = shots.map(s => `#${s.id}`).join(' ');
+    const filmSub = (opts.subtitle || `${dateStr} · ATUONA.XYZ GALLERY · MOMENTS ${moments}`).trim();
+    const introOpts: { noFadeIn: boolean; titleSize: number; letterTrackTitle: boolean; bgImage?: string } = {
+      noFadeIn: true, titleSize: 40, letterTrackTitle: true,
+    };
+    if (cover) introOpts.bgImage = cover;
+    const intro = await makeCard(filmTitle, filmSub, path.join(W, 'card_intro.mp4'), 4.4, introOpts);
+    const outro = await makeCard('ATUONA', 'atuona.xyz // Paradise.js  ·  by Kira Velerevich', path.join(W, 'card_outro.mp4'), 4.2, {
+      titleSize: 56, letterTrackTitle: true,
+    });
     if (intro) seq.unshift(intro);
     if (outro) seq.push(outro);
   }
@@ -493,21 +570,28 @@ export async function buildFilm(opts: {
     await execFileP('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', body], { maxBuffer: 1 << 26, timeout: 150000 });
   }
 
-  // 5) Ducked music bed (loop to length, low volume, mix under the baked VO)
+  // 5) Sidechain-ducked music bed + loudnorm (body audio = VO bus, baked pre-concat)
   const filmLen = await ffprobeDuration(body);
-  const music = await pickMusic(filmLen);
+  const music = await pickMusic(filmLen, opts.musicHint);
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const final = path.join(outDir(), `${slugifyTitle(opts.title || firstPoemTitle || 'atuona-film')}-${stamp}.mp4`);
   try {
     if (music) {
       await note('mixing music bed...');
-      const vol = (process.env.ATUONA_MUSIC_VOLUME || '0.16').trim();
+      const fadeOutSt = Math.max(0, filmLen - 3).toFixed(2);
+      const mixFc = [
+        `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.30,afade=t=in:st=0:d=2,afade=t=out:st=${fadeOutSt}:d=3[music]`,
+        `[0:a]volume=1.9,asplit=2[vsc][vmix]`,
+        `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked]`,
+        `[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix]`,
+        `[premix]loudnorm=I=-16:TP=-1.5:LRA=11[a]`,
+      ].join(';');
       await execFileP('ffmpeg', [
         '-y', '-i', body, '-stream_loop', '-1', '-i', music,
-        '-filter_complex', `[1:a]volume=${vol}[m];[0:a][m]amix=inputs=2:duration=first:dropout_transition=3[a]`,
+        '-filter_complex', mixFc,
         '-map', '0:v', '-map', '[a]', '-t', filmLen.toFixed(2),
-        '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', final,
-      ], { maxBuffer: 1 << 26, timeout: 150000 });
+        '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final,
+      ], { maxBuffer: 1 << 26, timeout: 300000 });
     } else {
       fs.copyFileSync(body, final);
     }
