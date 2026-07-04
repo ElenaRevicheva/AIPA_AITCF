@@ -34,7 +34,7 @@ Con las respuestas técnicas podré entregar un primer informe concreto y accion
 
 Cuando tenga las respuestas al cuestionario, puede encargar el informe técnico preliminar ($200 USD) completando sus datos y pagando de forma segura aquí:
 
-https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_prelim
+https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_prelim&lng=es
 
 El trabajo del informe comienza al recibir el pago y las respuestas técnicas. Si después del informe preliminar desea avanzar con un plan de implementación paso a paso, el siguiente nivel es $500 USD (enlace bajo invitación).
 

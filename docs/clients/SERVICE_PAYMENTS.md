@@ -15,9 +15,10 @@ Consulting SKUs for **Análisis técnico web** and future AIdeazz services. Reus
 
 | Channel | URL |
 |---------|-----|
-| Aideazz page (EN/ES) | https://aideazz.xyz/pay/analisis-tecnico |
-| Prelim (default SKU) | https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_prelim |
-| Blueprint (invite only) | https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_blueprint&invite=blueprint |
+| Aideazz page (ES, default) | https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_prelim&lng=es |
+| Aideazz page (EN) | https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_prelim&lng=en |
+| Prelim (default SKU) | https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_prelim&lng=es |
+| Blueprint (invite only) | https://aideazz.xyz/pay/analisis-tecnico?sku=web_audit_blueprint&invite=blueprint&lng=es |
 
 **WhatsApp:** paste the same URL after the discovery conversation. Page includes copy-link + WhatsApp prefill.
 
