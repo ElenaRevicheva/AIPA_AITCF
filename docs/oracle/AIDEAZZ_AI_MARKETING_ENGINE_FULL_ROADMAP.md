@@ -2,33 +2,88 @@
 > Version: **July 3, 2026 (v22.0 — GA4 Atlas adapter live)** — **`scripts/sync-atlas-ga4.mjs`** nightly cron on Oracle (`06:15 UTC`); posts `ga4_sessions` / `ga4_key_events` for `utm_campaign=atlas_*` → **`atlas_performance_events`**; first live row verified Jul 2 2026 (`ai_augmented_product_building`, 1 session). Atlas public UI banner polished (`atlas-shifted` `eb9e99c` — no Oracle ops text for clients). Prior: June 29, 2026 (v21.0 — **Atlas ↔ AIdeazz performance bridge** — closed-loop outcome tracking without rewriting Atlas capture/classify/brief/ship; **UTM tags + `concept_id`** on every Atlas export; Oracle **`atlas_performance_events`** ledger; **`POST /cto/api/performance-event`** + **`GET /cto/api/atlas-performance`** on CTO AIPA; Atlas UI reads aggregated ROAS/CPA/leads when hub is wired; **`scripts/sync-atlas-business-leads.mjs`** ingests `business_leads` where `utm_campaign LIKE 'atlas_%'`). Prior: May 18, 2026 (v20.0 — **Blog 404 resolved** (`/blog/post/:slug` Oracle endpoint + `BlogPost.tsx` parallel-fetch Dev.to + backend fallback); **fire-and-forget `/hashnode/daily-run`** (202 immediate, Opus runs background — no more nginx 60s timeout); **i18n Hashnode → Dev.to** (EN + ES footer/link strings); **topic dedup** (`getPublishedTopicIndices()` + `excludedIndices` in `pickTopicWithGscGap` — no more date-suffix titles); **dynamic sitemap** (`pushSitemapToGithub()` commits fresh `sitemap.xml` to `ElenaRevicheva/aideazz` after every publish; 4everland auto-deploys); **AI crawlers maxed** (9 new entries → 28 total explicit `robots.txt` signals). Prior: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
-**Who should read this:** **Engineers** — implementation tables, env names, endpoints. **Vibe coders & builders** — phased prompts and “what shipped” without needing every Oracle detail. **Potential clients** — read *What is AIdeazz AI Lab* and *Document map* (one screen), then *Why this engine exists*, *WordPress clients*, and *Jargon cheat sheet*; deeper sections prove the stack is real.
+**Who should read this:** **Business owners & clients** — start with [What is AIdeazz AI Lab](#what-is-aideazz-ai-lab--right-now-july-3-2026) below, then the public page [aideazz.xyz/sop-ai-ops.html](https://aideazz.xyz/sop-ai-ops.html). **Vibe coders & builders** — same section + [Document map](#document-map--phases-1-through-6-read-in-this-order). **Engineers** — full doc + [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md).
 
 ---
 
 ## What is AIdeazz AI Lab — right now (July 3, 2026)
 
-**Plain English:** AIdeazz AI Lab is Elena's **production fleet of AI co-founder agents** plus the **marketing engine** that feeds them real business signals. It is not a demo repo — it runs 24/7 on Oracle Cloud (`170.9.242.90`), with one public face at [aideazz.xyz](https://aideazz.xyz) and a live strategy radar at [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html).
+AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing engine** that connects real business signals end-to-end. It is **not a prototype** — it runs 24/7 on Oracle Cloud, with a public face at [aideazz.xyz](https://aideazz.xyz) and a live strategy radar at [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html).
 
-| Layer | What it is | Try it |
-|-------|------------|--------|
-| **Public brand** | [aideazz.xyz](https://aideazz.xyz) — portfolio, blog, inquiry form (4everland from GitHub `main`) | `/portfolio`, `/pitch.html`, `/blog` |
-| **Tech hub** | **CTO AIPA** (PM2 `cto-aipa`) — webhooks, CRM hub, blog publisher, outreach, performance ledger | [t.me/aitcf_aideazz_bot](https://t.me/aitcf_aideazz_bot) |
-| **Marketing radar** | **Atlas Shifted** (PM2 `whitespace`) — reads public ad libraries daily, scores angles, exports test campaigns | [atlas.html](https://webhook.aideazz.xyz/whitespace/atlas.html) |
-| **Income CRM** | **HubSpot** — all agents POST deals/leads via `/api/crm-event` | HubSpot Sales Pipeline |
-| **Measure layer** | Oracle **`atlas_performance_events`** — GA4 sessions, form leads, HubSpot deals by `concept_id` | `GET /cto/api/atlas-performance` |
-| **Sibling products** | EspaLuz (WhatsApp/Telegram), VibeJob Hunter, Algom Alpha, Atuona, Sprinter (AWS Lambda), etc. | See [Oracle resilience doc](./ORACLE_ALL_PRODUCTS_RESILIENCE.md) §11 agents |
+### Lab stack — what each piece does
 
-**The marketing engine** = Phases 1–6 in this doc wired together: **SEO/GEO → daily blog (Dev.to) → UTM inquiry form → HubSpot → lead triage → (optional) cold outreach → Atlas closed-loop measure**.
+| Piece | Role | Live URL / process |
+| --- | --- | --- |
+| Public face | Portfolio, blog, inquiry form | [aideazz.xyz](https://aideazz.xyz) (4everland) |
+| Tech hub | CRM, blog, outreach, performance ledger | CTO AIPA — PM2 `cto-aipa` on Oracle · [Telegram bot](https://t.me/aitcf_aideazz_bot) |
+| Marketing radar | Daily ad-market intelligence + campaign export | [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) — PM2 `whitespace` |
+| CRM spine | All agents → HubSpot | `POST /api/crm-event` (hub on CTO AIPA) |
+| Measure layer | GA4 sessions, form leads, deals by campaign | Oracle `atlas_performance_events` · `POST /api/performance-event` |
+| Sibling products | EspaLuz, VJH, Algom, Atuona, Sprinter, etc. | 11 agents on Oracle (+ Sprinter on AWS) — [full list](./ORACLE_ALL_PRODUCTS_RESILIENCE.md) |
 
-**What's genuinely loaded today (log-verified, not aspirational):**
-- Discovery + content + CRM ingest + lead triage + Atlas detect→create→**measure** (GA4 adapter live Jul 3).
-- Outbound email **fires** but **0 replies** — targeting/copy problem, not deliverability (Resend shows Delivered).
-- Form attribution **plumbing ready**; inbound volume still low — first real GA4 Atlas session logged Jul 2 2026.
+**Marketing engine flow:**
 
-**What's next (honest queue):** Meta/Google Ads API read cron · WhatsApp click tracking (`/go/wa`) · EspaLuz business-inquiry classifier · case-study generator from ledger rows.
+`SEO/GEO` → `daily Dev.to blog` → `UTM inquiry form` → `HubSpot` → `lead triage` → `(optional) outreach` → `Atlas detect → create → measure`
 
-**Ops map:** Fleet health, repos, deploy paths → [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md).
+### Honest July 3 reality
+
+| Status | What |
+| --- | --- |
+| **Loaded** | Discovery, content, CRM ingest (721+ leads / 1,075 deals historically), triage, Atlas radar, performance bridge, GA4 sync |
+| **Partial** | Outbound (54 sends, 0 replies); form attribution (low inbound volume; **1 real GA4 `atlas_*` session** logged Jul 2) |
+| **Not started** | Phase 6 showcase package; WA click tracking; EspaLuz business-inquiry classifier; ads API cron |
+
+### Roadmap position (v22)
+
+| Phase | Name | Status |
+| --- | --- | --- |
+| 1 | Foundation (GEO / SEO / GA4 tag) | Loaded |
+| 2 | Content (Dev.to daily — Hashnode removed May 2026) | Loaded |
+| 3 | Attribution + Atlas measure | Plumbing + first GA4 signal |
+| 4 | Outbound | Fires, 0 conversion |
+| 5 | Lead triage | Operational |
+| 6 | Showcase package | Not started — highest priority for hiring story |
+
+### Atlas performance adapters
+
+| Adapter | Status | Notes |
+| --- | --- | --- |
+| UTM + ledger + UI | Live (Jun 29) | Export tags + concept card performance panel |
+| Lead sync | Ready | `scripts/sync-atlas-business-leads.mjs` |
+| GA4 nightly | Live (Jul 3) | `scripts/sync-atlas-ga4.mjs` — cron 06:15 UTC |
+| Meta / Google Ads API | Not built | — |
+| `/go/wa` click tracking | Not built | Phase 2 queue |
+| Case-study generator | Not built | Phase 2 queue |
+
+### How to check it works
+
+**For anyone (browser):**
+
+1. **Atlas radar** — after ~9:15 AM Panama, open [atlas.html](https://webhook.aideazz.xyz/whitespace/atlas.html). Snapshot date should match today; no internal ops warnings for clients.
+2. **Public site** — [aideazz.xyz/blog](https://aideazz.xyz/blog) shows daily posts; inquiry form sends confirmation email.
+3. **Portfolio proof** — [aideazz.xyz/portfolio](https://aideazz.xyz/portfolio) lists live products.
+
+**For engineers (Oracle SSH):**
+
+```bash
+# GA4 → ledger
+cd ~/cto-aipa && node scripts/sync-atlas-ga4.mjs --dry-run
+curl -s -H "Authorization: Bearer $OUTREACH_SECRET" \
+  http://127.0.0.1:3000/api/atlas-performance | grep ga4_sessions
+
+# Fleet health
+pm2 list | grep -E 'cto-aipa|whitespace'
+curl -s http://127.0.0.1:8095/healthz | grep performanceHub
+```
+
+**End-to-end attribution (when you run a campaign):**
+
+1. Atlas → **Export test** → URL with `utm_campaign=atlas_{vertical}`
+2. Visit landing page (GA4 counts session; nightly sync posts to ledger)
+3. Submit inquiry → `node ~/cto-aipa/scripts/sync-atlas-business-leads.mjs`
+4. Refresh Atlas concept card → `ga4_sessions` + `leads` in performance block
+
+**Ops map:** Fleet health, repos, deploy paths → [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md). **Public-friendly version** → [sop-ai-ops.html](https://aideazz.xyz/sop-ai-ops.html).
 
 ---
 
