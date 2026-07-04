@@ -31,7 +31,7 @@ AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing eng
 | --- | --- |
 | **Loaded** | Discovery, content, CRM ingest (721+ leads / 1,075 deals historically), triage, Atlas radar, performance bridge, GA4 sync |
 | **Partial** | Outbound (54 sends, 0 replies); form attribution (low inbound volume; **1 real GA4 `atlas_*` session** logged Jul 2) |
-| **Not started** | Phase 6 showcase package; WA click tracking; EspaLuz business-inquiry classifier; ads API cron |
+| **Not started** | Phase 6 showcase package; EspaLuz business-inquiry classifier; ads API cron |
 
 ### Roadmap position (v22)
 
@@ -52,7 +52,7 @@ AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing eng
 | Lead sync | Ready | `scripts/sync-atlas-business-leads.mjs` |
 | GA4 nightly | Live (Jul 3) | `scripts/sync-atlas-ga4.mjs` — cron 06:15 UTC |
 | Meta / Google Ads API | Not built | — |
-| `/go/wa` click tracking | Not built | Phase 2 queue |
+| `/go/wa` click tracking | Live (Jul 4) | `GET /cto/go/wa` → `wa_clicks` in ledger; EspaLuz Atlas CTAs |
 | Case-study generator | Not built | Phase 2 queue |
 
 ### How to check it works
@@ -102,7 +102,7 @@ curl -s http://127.0.0.1:8095/healthz | grep performanceHub
 
 **How to verify:** `node ~/cto-aipa/scripts/sync-atlas-ga4.mjs --dry-run` · `grep ga4_sessions` on `GET /api/atlas-performance` · Atlas concept card **AIdeazz performance** block after tagged traffic.
 
-**Not built yet (Phase 2 queue):** `/go/wa` click redirect · EspaLuz business-inquiry → `conversions` · auto case-study generator.
+**Not built yet (Phase 2 queue):** EspaLuz business-inquiry → `conversions` · auto case-study generator · Meta/Google Ads API read cron.
 
 ---
 

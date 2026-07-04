@@ -31,6 +31,7 @@ import {
   scheduleMarketingInquiryEmails,
   verifyRecaptchaV3Token,
 } from './marketing-notify';
+import { registerGoWaRoutes } from './go-wa.js';
 import {
   importTargets,
   verifyTargetEmails,
@@ -2568,6 +2569,9 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
     }
   });
 
+  // GET /go/wa — Atlas WhatsApp click tracking (public redirect → wa.me + ledger wa_clicks)
+  registerGoWaRoutes(app, getMarketingClientIp);
+
   // POST /api/performance-event — Atlas + fleet adapters ingest spend/conversion outcomes
   // Auth: Bearer OUTREACH_SECRET
   // Body: { source, concept_id, vertical, angle_id?, metrics, period_start?, period_end?, notes? }
@@ -2682,6 +2686,7 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
     if (process.env.OUTREACH_SECRET?.trim()) {
       console.log(`📧 Outreach pipeline: ${baseUrl}/outreach/* (Bearer OUTREACH_SECRET)`);
       console.log(`📊 Atlas performance: POST ${baseUrl}/api/performance-event · GET ${baseUrl}/api/atlas-performance`);
+      console.log(`💬 WhatsApp track: GET ${baseUrl}/go/wa (Atlas utm_campaign → wa_clicks ledger)`);
 
       // Prospect ingestion: 2 PM Panama (before outreach send at 3 PM)
       const ingestCronExpr = process.env.INGEST_CRON || '0 14 * * *';
