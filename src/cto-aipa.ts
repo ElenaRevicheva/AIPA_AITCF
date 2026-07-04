@@ -32,6 +32,7 @@ import {
   verifyRecaptchaV3Token,
 } from './marketing-notify';
 import { registerGoWaRoutes } from './go-wa.js';
+import { registerServiceCheckoutRoutes } from './service-checkout.js';
 import {
   importTargets,
   verifyTargetEmails,
@@ -1389,6 +1390,20 @@ async function startCTOAIPA() {
     next();
   };
 
+  const internalWebhookAuth = (req: Request, res: Response, next: NextFunction) => {
+    const secret =
+      process.env.INTERNAL_WEBHOOK_SECRET?.trim() || process.env.OUTREACH_SECRET?.trim();
+    if (!secret) {
+      res.status(503).json({ error: 'Internal webhook not configured' });
+      return;
+    }
+    if (req.headers.authorization !== `Bearer ${secret}`) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    next();
+  };
+
   app.get('/outreach/stats', outreachAuth, async (_req, res) => {
     try {
       const stats = await getOutreachStats();
@@ -2572,6 +2587,14 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
   // GET /go/wa — Atlas WhatsApp click tracking (public redirect → wa.me + ledger wa_clicks)
   registerGoWaRoutes(app, getMarketingClientIp);
 
+  registerServiceCheckoutRoutes(app, {
+    marketingCors: marketingInquiryCors,
+    isAllowedSite: isAllowedAideazzSiteRequest,
+    allowRate: allowInquiryProxyRate,
+    getClientIp: getMarketingClientIp,
+    internalAuth: internalWebhookAuth,
+  });
+
   // POST /api/performance-event — Atlas + fleet adapters ingest spend/conversion outcomes
   // Auth: Bearer OUTREACH_SECRET
   // Body: { source, concept_id, vertical, angle_id?, metrics, period_start?, period_end?, notes? }
@@ -2687,6 +2710,7 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       console.log(`📧 Outreach pipeline: ${baseUrl}/outreach/* (Bearer OUTREACH_SECRET)`);
       console.log(`📊 Atlas performance: POST ${baseUrl}/api/performance-event · GET ${baseUrl}/api/atlas-performance`);
       console.log(`💬 WhatsApp track: GET ${baseUrl}/go/wa (Atlas utm_campaign → wa_clicks ledger)`);
+      console.log(`💳 Service checkout: POST ${baseUrl}/api/service-checkout · catalog ${baseUrl}/api/service-catalog`);
 
       // Prospect ingestion: 2 PM Panama (before outreach send at 3 PM)
       const ingestCronExpr = process.env.INGEST_CRON || '0 14 * * *';

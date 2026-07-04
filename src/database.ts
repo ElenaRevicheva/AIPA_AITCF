@@ -3296,6 +3296,200 @@ async function getUntriagedOutreachTargets(limit = 50): Promise<any[]> {
 
 initLeadTriageTable().catch((e: any) => console.error('❌ Lead triage table init error:', e?.message?.slice(0, 200)));
 
+// =============================================================================
+// SERVICE ORDERS — PagueloFacil checkout for AIdeazz consulting SKUs
+// =============================================================================
+
+export type ServiceOrderStatus = 'pending' | 'paid' | 'cancelled';
+
+async function initServiceOrdersTable(): Promise<void> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    await connection.execute(`
+      BEGIN
+        EXECUTE IMMEDIATE 'CREATE TABLE service_orders (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          sku VARCHAR2(80) NOT NULL,
+          amount_usd NUMBER(10,2) NOT NULL,
+          status VARCHAR2(30) DEFAULT ''pending'',
+          client_name VARCHAR2(500),
+          client_email VARCHAR2(500),
+          company_name VARCHAR2(500),
+          notes CLOB,
+          pf_link_code VARCHAR2(120),
+          pf_cod_oper VARCHAR2(120),
+          utm_source VARCHAR2(200),
+          utm_medium VARCHAR2(200),
+          utm_campaign VARCHAR2(500),
+          page_url VARCHAR2(2000),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          paid_at TIMESTAMP
+        )';
+      EXCEPTION
+        WHEN OTHERS THEN
+          IF SQLCODE != -955 THEN RAISE; END IF;
+      END;
+    `);
+    console.log('✅ service_orders table ready');
+  } catch (err) {
+    console.error('service_orders table error:', err);
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function createServiceOrder(params: {
+  sku: string;
+  amountUsd: number;
+  clientName?: string;
+  clientEmail?: string;
+  companyName?: string;
+  notes?: string;
+  pfLinkCode?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  page_url?: string;
+}): Promise<string | null> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `INSERT INTO service_orders (
+         sku, amount_usd, status, client_name, client_email, company_name, notes,
+         pf_link_code, utm_source, utm_medium, utm_campaign, page_url
+       ) VALUES (
+         :sku, :amountUsd, 'pending', :clientName, :clientEmail, :companyName, :notes,
+         :pfLinkCode, :utm_source, :utm_medium, :utm_campaign, :page_url
+       ) RETURNING RAWTOHEX(id) INTO :id`,
+      {
+        sku: params.sku.slice(0, 80),
+        amountUsd: params.amountUsd,
+        clientName: params.clientName?.trim()?.slice(0, 500) || null,
+        clientEmail: params.clientEmail?.trim()?.slice(0, 500) || null,
+        companyName: params.companyName?.trim()?.slice(0, 500) || null,
+        notes: params.notes?.trim()?.slice(0, 4000) || null,
+        pfLinkCode: params.pfLinkCode?.slice(0, 120) || null,
+        utm_source: params.utm_source?.trim() || null,
+        utm_medium: params.utm_medium?.trim() || null,
+        utm_campaign: params.utm_campaign?.trim() || null,
+        page_url: params.page_url?.trim()?.slice(0, 2000) || null,
+        id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 32 },
+      },
+      { autoCommit: true },
+    );
+    const outBinds = result.outBinds as { id: string[] };
+    return outBinds?.id?.[0] || null;
+  } catch (err) {
+    console.error('createServiceOrder error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function markServiceOrderPaid(params: {
+  orderIdHex: string;
+  pfCodOper: string;
+}): Promise<boolean> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `UPDATE service_orders
+       SET status = 'paid', pf_cod_oper = :pfCodOper, paid_at = CURRENT_TIMESTAMP
+       WHERE RAWTOHEX(id) = :orderId AND status = 'pending'`,
+      {
+        orderId: params.orderIdHex,
+        pfCodOper: params.pfCodOper.slice(0, 120),
+      },
+      { autoCommit: true },
+    );
+    return (result.rowsAffected ?? 0) > 0;
+  } catch (err) {
+    console.error('markServiceOrderPaid error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function getServiceOrderById(orderIdHex: string): Promise<{
+  id: string;
+  sku: string;
+  amount_usd: number;
+  status: string;
+  client_name: string | null;
+  client_email: string | null;
+  company_name: string | null;
+  notes: string | null;
+  pf_link_code: string | null;
+  pf_cod_oper: string | null;
+  created_at: Date;
+  paid_at: Date | null;
+} | null> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) AS id, sku, amount_usd, status, client_name, client_email,
+              company_name, notes, pf_link_code, pf_cod_oper, created_at, paid_at
+       FROM service_orders WHERE RAWTOHEX(id) = :orderId`,
+      { orderId: orderIdHex },
+      {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+        fetchInfo: { NOTES: { type: oracledb.STRING } },
+      },
+    );
+    const row = (result.rows as any[])?.[0];
+    if (!row) return null;
+    return {
+      id: row.ID ?? row.id,
+      sku: row.SKU ?? row.sku,
+      amount_usd: Number(row.AMOUNT_USD ?? row.amount_usd),
+      status: row.STATUS ?? row.status,
+      client_name: row.CLIENT_NAME ?? row.client_name ?? null,
+      client_email: row.CLIENT_EMAIL ?? row.client_email ?? null,
+      company_name: row.COMPANY_NAME ?? row.company_name ?? null,
+      notes: row.NOTES ?? row.notes ?? null,
+      pf_link_code: row.PF_LINK_CODE ?? row.pf_link_code ?? null,
+      pf_cod_oper: row.PF_COD_OPER ?? row.pf_cod_oper ?? null,
+      created_at: row.CREATED_AT ?? row.created_at,
+      paid_at: row.PAID_AT ?? row.paid_at ?? null,
+    };
+  } catch (err) {
+    console.error('getServiceOrderById error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+async function clientHasPaidSku(clientEmail: string, sku: string): Promise<boolean> {
+  if (!clientEmail?.trim()) return false;
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT 1 FROM service_orders
+       WHERE LOWER(client_email) = LOWER(:email) AND sku = :sku AND status = 'paid'
+       FETCH FIRST 1 ROWS ONLY`,
+      { email: clientEmail.trim().slice(0, 500), sku },
+    );
+    return ((result.rows as unknown[])?.length ?? 0) > 0;
+  } catch (err) {
+    console.error('clientHasPaidSku error:', err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+initServiceOrdersTable().catch((e: any) =>
+  console.error('❌ service_orders init error:', e?.message?.slice(0, 200)),
+);
+
 export {
   initializeDatabase,
   saveMemory,
@@ -3391,4 +3585,9 @@ export {
   getRepliedOutreach,
   getPlacesPipelineSnapshot,
   markLeadTriagePushed,
+  // === Service orders (PagueloFacil consulting SKUs) ===
+  createServiceOrder,
+  markServiceOrderPaid,
+  getServiceOrderById,
+  clientHasPaidSku,
 };
