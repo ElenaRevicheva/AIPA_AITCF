@@ -5,6 +5,14 @@
 
 **Problem:** `Button` uses `whitespace-nowrap` — long audit CTA overflows on mobile.
 
+## Cloud Agent push scope
+
+Cursor Cloud Agent in **AIPA_AITCF** can push **this repo only**. For **aideazz**, either:
+
+1. Run Cloud Agent from the **aideazz** repo / add it to your Cloud Agent environment, or  
+2. On laptop: `bash scripts/aideazz-hotfixes/apply-portfolio-audit-button-mobile.sh` (with `gh auth` as ElenaRevicheva), or  
+3. GitHub mobile edit: https://github.com/ElenaRevicheva/aideazz/edit/main/src/components/InquiryForm.tsx
+
 **Fix:** Override wrap + flex layout on the audit pay link only.
 
 Replace the audit `Button` block (~line 220) with:
