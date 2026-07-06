@@ -2,7 +2,7 @@
 
 > **Use:** Email or message to Matt after his note about contest entries sounding AI-generated.  
 > **Voice:** Elena — not CTO AIPA. Honest, human, no pitch-deck fluff.  
-> **Live links:** [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) · [Portfolio](https://aideazz.xyz/portfolio)
+> **Live links:** [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) · [Portfolio](https://aideazz.xyz/portfolio) · [Atuona AI Film Studio](https://atuona.xyz/aifilmstudio)
 
 ---
 
@@ -36,6 +36,14 @@ I can’t babysit dashboards. I’m a single mom. The architecture had to be **m
 
 **Atlas** fits that same logic. My engine could generate angles and creative, but it couldn’t tell me whether a hypothesis actually moved anything. I built the measure layer for my own lab first — EspaLuz campaigns, aideazz.xyz, HubSpot, GA4 — because I needed closed loops, not another tool I’d have to watch all day.
 
+**Atuona — my hobby, but not “just art”**
+
+I’m also a poet. **Atuona AI Film Studio** started as creative survival — poetry as therapy during relocation — but it became something I care about for marketing, not only for aesthetics.
+
+It’s a full production pipeline: multi-provider AI video (Luma, Runway, Veo, Kling with automatic fallback), voiceover from real poem stanzas, scored audio, title cards, cross-dissolves, ffmpeg assembly — finished films published and streamable at **atuona.xyz/aifilmstudio**. Same design philosophy as Atlas: agents and providers do the heavy lifting; I own story, pacing, and what ships.
+
+For a media buying team, that matters because I’m not theorizing about “AI creative.” I’ve built the stack that turns concepts into **watchable video assets** under real provider failures, moderation limits, and bootstrap budget. Atlas handles angle intelligence and test copy; Atuona is where I stress-tested **video generation and assembly** end to end. Hobby on the surface — commercially relevant underneath.
+
 **Why I entered your contest**
 
 I’m not applying as someone who has run eight figures in media buy. I’m applying because I’m genuinely obsessed with AI marketing and the infrastructure that helps brands get visibility without a twenty-person ops team. Your brief — creative tools, automation, performance truth for media buyers — is almost exactly the problem I’ve been solving for myself, just from the builder side.
@@ -49,7 +57,8 @@ If that’s the kind of person you want owning marketing tooling — someone who
 Elena
 
 https://webhook.aideazz.xyz/whitespace/atlas.html  
-https://aideazz.xyz/portfolio
+https://aideazz.xyz/portfolio  
+https://atuona.xyz/aifilmstudio
 
 ---
 
@@ -62,6 +71,8 @@ Fair point about the submissions — a lot of them read like one-shot AI copy. I
 After seven years in Russian e-government I relocated to Panama in 2022: single mom, toddler, retired parents, no Spanish, no team budget, no tutors, no profession left. I had IT project leadership and board experience. I built to survive.
 
 EspaLuz for my family’s Spanish and relocation. Then marketing agents for my professional image. Then CTO AIPA. Then the full AIdeazz lab — still with no salary, but proof of what one person can ship with AI augmentation. I can’t babysit dashboards; everything is designed for agents to run while I’m parenting. Atlas closed the last gap: creative intelligence plus measurable outcomes.
+
+**Atuona AI Film Studio** is my poetry hobby — but it’s also my video lab: multi-provider AI film pipeline (Luma/Runway/Veo/Kling → ffmpeg → published films). Not decoration; it’s where I learned to ship **real video creative** at production depth — directly relevant to what media buyers need from tooling.
 
 I entered your contest because I’m serious about AI marketing infrastructure — not as a media buyer, as a builder. I’m not a manual coder; I own architecture, Kanban workflow, and production debugging through deep work with my CTO agent.
 
@@ -87,6 +98,8 @@ EspaLuz came first for my family. Then marketing agents for my image. Then CTO A
 
 Atlas was the missing piece: my engine could detect and create, but not measure. I built it for my lab first (EspaLuz, aideazz.xyz, CRM), not as a contest gimmick. Your brief maps to the same problem from the builder side.
 
+**Atuona AI Film Studio** (atuona.xyz/aifilmstudio) is personal — underground poetry — but the pipeline is professional: multi-model video generation, fallback chains, TTS, scoring, automated film compilation. It’s the creative-production side of the same lab; Atlas is strategy + measure, Atuona is where I prove I can deliver **finished video**, not just prompts.
+
 ### What would you build next if this were your full-time job?
 
 Private ad-platform adapters — Meta, Google, Taboola, TikTok spend and conversion data into the same performance ledger Atlas already uses for GA4 and CRM. Same sidecar pattern, no rewrite of the capture pipeline. Then operator workflows for media buyers: daily brief in Telegram, export-to-test with one click, concept-level ROAS when spend volume is there.
@@ -95,7 +108,7 @@ Private ad-platform adapters — Meta, Google, Taboola, TikTok spend and convers
 
 ## 30-second spoken version (finalist call)
 
-> I built AIdeazz because I relocated to Panama as a single mom with no Spanish, no team, and no income — only project leadership and board experience. EspaLuz for my family, then marketing agents, then CTO AIPA, then a nine-agent lab that runs without me babysitting dashboards. Atlas closes the loop: public ad intelligence, test creative, and measurable outcomes on one concept card. I’m not a manual coder — I own architecture and decisions through deep work with my CTO agent and Kanban-style workflow. I entered your contest because AI marketing infrastructure is what I’ve been building to survive, and it matches what your media buying team needs on the tooling side.
+> I built AIdeazz because I relocated to Panama as a single mom with no Spanish, no team, and no income — only project leadership and board experience. EspaLuz for my family, then marketing agents, then CTO AIPA, then a nine-agent lab that runs without me babysitting dashboards. Atlas closes the loop: public ad intelligence, test creative, and measurable outcomes on one concept card. Atuona AI Film Studio is my poetry hobby, but it’s also my video production lab — multi-provider AI film pipeline with real published output — because marketing isn’t only copy, it’s **assets people watch**. I’m not a manual coder — I own architecture and decisions through deep work with my CTO agent and Kanban-style workflow. I entered your contest because AI marketing infrastructure is what I’ve been building to survive, and it matches what your media buying team needs on the tooling side.
 
 ---
 
@@ -108,4 +121,4 @@ Private ad-platform adapters — Meta, Google, Taboola, TikTok spend and convers
 
 ---
 
-*Last updated: July 6, 2026*
+*Last updated: July 6, 2026 (Atuona AI Film Studio section added)*
