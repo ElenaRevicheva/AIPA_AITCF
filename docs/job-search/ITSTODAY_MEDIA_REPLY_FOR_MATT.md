@@ -1,5 +1,8 @@
 # It's Today Media — Reply for Matt Lazas (copy-paste)
 
+> **Branch-only:** lives on `cursor/itstoday-matt-reply-doc-a402` — **not on `main`**.  
+> **Folder:** `docs/job-search/` (employer / contest outreach — with `JOB_SEARCH.md`).
+
 > **Use:** Email or message to Matt after his note about contest entries sounding AI-generated.  
 > **Voice:** Elena — not CTO AIPA. Honest, human, no pitch-deck fluff.  
 > **Live links:** [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) · [Portfolio](https://aideazz.xyz/portfolio) · [Atuona AI Film Studio](https://atuona.xyz/aifilmstudio)
