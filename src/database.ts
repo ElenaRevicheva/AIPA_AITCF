@@ -1429,7 +1429,7 @@ async function hasAtlasLeadEventForBusinessLead(leadId: string): Promise<boolean
     connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT COUNT(*) AS cnt FROM atlas_performance_events
-       WHERE source = 'aideazz_leads' AND notes = :notes`,
+       WHERE source = 'aideazz_leads' AND notes LIKE :notes`,
       { notes: `business_leads id ${leadId}` },
       { outFormat: oracledb.OUT_FORMAT_OBJECT },
     );
