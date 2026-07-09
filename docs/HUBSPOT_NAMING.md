@@ -13,6 +13,7 @@ Every HubSpot deal is prefixed with `[STREAM-AGENT]` so the dashboard is scannab
 | `[CLIENT-CTO-INGEST]` | `fresh-leads-ingest.ts` + `lead-triage.ts` | CLIENT |
 | `[CLIENT-CTO-SERP]` | `serpapi-prospects.ts` | CLIENT |
 | `[CLIENT-ALGOM]` | `algom-poll.js` + `stream-listener.js` (dragontrade-agent) | CLIENT |
+| `[ATLAS-RADAR]` | `pushAtlasRadarDealToHubSpot` (hubspot-client.ts) ← whitespace `radar-to-crm.ts` via `/api/crm-event` `source=atlas_radar` (July 9 2026) | CLIENT (deal-only; bypasses client gate BY DESIGN — a detected market window is Elena's action item, not a scraped buyer; never writes Atlas conversion-ledger attribution) |
 
 ## Reserved (not yet wired)
 
