@@ -2429,6 +2429,28 @@ async function startCTOAIPA() {
           ? { contactId: espaluz.contactId, companyId: null, dealId: espaluz.dealId }
           : null;
 
+      } else if (source === 'atlas_radar') {
+        // Atlas Radar market-window insight (Gap-1 bridge, July 9 2026) — deal-only
+        // [ATLAS-RADAR] writer; bypasses the client gate by design (not a buyer lead).
+        const vertical = typeof body.vertical === 'string' ? body.vertical.trim() : '';
+        const angle = typeof body.angle === 'string' ? body.angle.trim() : '';
+        if (!vertical || !angle) {
+          res.status(400).json({ error: 'vertical and angle required for atlas_radar' });
+          return;
+        }
+        const { pushAtlasRadarDealToHubSpot } = await import('./hubspot-client');
+        const radar = await pushAtlasRadarDealToHubSpot({
+          vertical,
+          angle,
+          state: typeof body.state === 'string' && body.state ? String(body.state) : 'ENTER',
+          ...(typeof body.score === 'number' ? { score: body.score } : {}),
+          ...(typeof body.why === 'string' && body.why ? { why: body.why } : {}),
+          ...(typeof body.evidence === 'string' && body.evidence ? { evidence: body.evidence } : {}),
+          ...(atlas_concept_id ? { conceptId: atlas_concept_id } : {}),
+          ...(typeof body.landing_url === 'string' && body.landing_url ? { landingUrl: body.landing_url } : {}),
+        });
+        result = radar ? { contactId: null, companyId: null, dealId: radar.dealId } : null;
+
       } else {
         // client pipeline
         const stageMap: Record<string, import('./hubspot-client').HSDealStage> = {

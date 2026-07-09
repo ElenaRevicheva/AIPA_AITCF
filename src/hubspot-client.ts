@@ -590,6 +590,61 @@ export async function pushEspaLuzDealToHubSpot(input: {
 }
 
 /**
+ * Atlas Radar market-window insights → deal-only [ATLAS-RADAR] deals (Gap-1 bridge,
+ * July 9 2026). Bypasses the RIGHT-CLIENT gate BY DESIGN (same pattern as EspaLuz
+ * trials): a radar window is Elena's own action item, not a scraped "buyer" — it has
+ * no email/domain and must not be forced through buying-intent keywords.
+ * Idempotent by dealname (score/why drift daily → kept in the note, NOT the name).
+ * Deliberately does NOT call attachHubSpotToAtlasLoop with UTM/concept attribution:
+ * radar insights must never inflate the Atlas conversion ledger (hubspot_deals stays
+ * real-conversions-only, so the dashboard "Convert ✓" claim stays honest).
+ */
+export async function pushAtlasRadarDealToHubSpot(input: {
+  vertical: string;
+  angle: string;
+  state: string; // 'ENTER' today; kept open for future states
+  score?: number | undefined;
+  why?: string | undefined;
+  evidence?: string | undefined;
+  conceptId?: string | undefined;
+  landingUrl?: string | undefined;
+}): Promise<{ dealId: string | null; duplicate: boolean } | null> {
+  if (!HS_KEY()) {
+    console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping Atlas radar push');
+    return null;
+  }
+  const dealName = `[ATLAS-RADAR] ${input.vertical} — ${input.state}: ${input.angle}`;
+  try {
+    const existing = await findDealByName(dealName);
+    if (existing?.id) {
+      console.log(`[HubSpot] Atlas radar deal exists (${existing.id}): ${dealName}`);
+      return { dealId: existing.id, duplicate: true };
+    }
+    const description = [
+      'Atlas Radar detected an open market window (detected, not predicted).',
+      input.score != null ? `Window score: ${input.score}/100` : null,
+      input.why ? `Why: ${input.why}` : null,
+      input.evidence ? `Evidence: ${input.evidence}` : null,
+      input.conceptId ? `Atlas concept: ${input.conceptId}` : null,
+      input.landingUrl ? `Landing URL (UTM-tagged): ${input.landingUrl}` : null,
+      'Dashboard: https://webhook.aideazz.xyz/whitespace/atlas.html',
+    ].filter(Boolean).join('\n');
+    const dealId = await createDeal({
+      name: dealName,
+      stage: HS_STAGES.prospected,
+      dealType: 'newbusiness',
+      description,
+    });
+    if (dealId) await addNoteToDeal(dealId, description);
+    console.log(`[HubSpot] Atlas radar deal created: ${dealName}`);
+    return { dealId, duplicate: false };
+  } catch (err) {
+    console.error('[HubSpot] pushAtlasRadarDealToHubSpot error:', err);
+    return null;
+  }
+}
+
+/**
  * Full pipeline: Contact → Company → Deal → Associations → Note.
  * Safe to call multiple times — upserts prevent duplicates.
  * Returns { contactId, companyId, dealId } or null on total failure.
