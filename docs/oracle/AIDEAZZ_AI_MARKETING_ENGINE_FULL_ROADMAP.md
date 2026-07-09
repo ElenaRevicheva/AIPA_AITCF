@@ -16,14 +16,14 @@ AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing eng
 | --- | --- | --- |
 | Public face | Portfolio, blog, inquiry form | [aideazz.xyz](https://aideazz.xyz) (4everland) |
 | Tech hub | CRM, blog, outreach, performance ledger | CTO AIPA — PM2 `cto-aipa` on Oracle · [Telegram bot](https://t.me/aitcf_aideazz_bot) |
-| Marketing radar | Daily ad-market intelligence + campaign export | [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) — PM2 `whitespace` |
+| Marketing radar | Daily ad-market intelligence + campaign export · **bilingual EN/ES UI (Jul 9)** | [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) — PM2 `whitespace` |
 | CRM spine | All agents → HubSpot | `POST /api/crm-event` (hub on CTO AIPA) |
 | Measure layer | GA4 sessions, form leads, WhatsApp clicks, deals by campaign | Oracle `atlas_performance_events` · `GET /cto/go/wa` · `POST /api/performance-event` |
 | Sibling products | EspaLuz, VJH, Algom, Atuona, Sprinter, etc. | 11 agents on Oracle (+ Sprinter on AWS) — [full list](./ORACLE_ALL_PRODUCTS_RESILIENCE.md) |
 
 **Marketing engine flow:**
 
-`SEO/GEO` → `daily Dev.to blog` → `UTM inquiry form` → `HubSpot` → `lead triage` → `(optional) outreach` → `Atlas detect → create → measure`
+`SEO/GEO` → `daily Dev.to blog` → `UTM inquiry form` → `HubSpot` → `lead triage` → `(optional) outreach` → `Atlas detect → create → measure` → `detected windows → HubSpot ([ATLAS-RADAR], Jul 9)`
 
 ### Honest July 4 reality
 
@@ -87,6 +87,21 @@ curl -s http://127.0.0.1:8095/healthz | grep performanceHub
 4. Refresh Atlas concept card → `ga4_sessions` + `leads` + **`wa_clicks`** in performance block
 
 **Ops map:** Fleet health, repos, deploy paths → [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md). **Public-friendly version** → [sop-ai-ops.html](https://aideazz.xyz/sop-ai-ops.html).
+
+---
+
+## ✅ UPDATE — July 9, 2026 — [ATLAS-RADAR] CRM bridge · EN/ES bilingual UI · radar outage guard
+
+> Headline: **Atlas now closes its own loop into the CRM and speaks Spanish.** Detected market windows land in HubSpot automatically, the client-facing UI is bilingual for LATAM, and the radar can no longer go stale silently.
+
+| Layer | Repo | What | Status |
+| --- | --- | --- | --- |
+| **[ATLAS-RADAR] → HubSpot** | AIPA_AITCF `3f8faba` + atlas-shifted `b640d63` | Daily brief cron pushes **ENTER windows** → deal-only `[ATLAS-RADAR] {vertical} — ENTER: {angle}` deals via `/api/crm-event` `source=atlas_radar`. Dealname-deduped; bypasses the client quality gate by design (a market window is an action item, not a buyer); carries **no conversion attribution** — the performance ledger stays real-conversions-only. Disable: `ATLAS_CRM_RADAR_PUSH=off` | ✅ Live (fired against fresh Jul 9 data; honest quiet when no ENTER) |
+| **EN/ES bilingual UI** | atlas-shifted `e192b9c` | [Atlas radar](https://webhook.aideazz.xyz/whitespace/atlas.html) + [WHITESPACE finder](https://webhook.aideazz.xyz/whitespace/): portfolio-style EN/ES toggle, Spanish browsers auto-detect (LATAM clients land in Spanish), choice persists. ENTER/WATCH/AVOID stay as product vocabulary; LLM ad copy renders in its generated language (US ad market → EN) | ✅ Live |
+| **Radar outage guard** | atlas-shifted `2393a33` | **Postmortem Jul 6-9:** Bright Data account went invalid (balance burned) → Scraping Browser 403s → 4 days of 0-row captures while cron exited 0 → dashboard froze at Jul 5. **Guard:** capture now fires a Telegram alert when a full run finds **0 ads across all verticals** (outage signature, never a quiet market), with the diagnose-curl in the message. Delivery verified live | ✅ Live + tested |
+| **Fresh data restored** | — | $20 Bright Data top-up → manual chain run same day → snapshot **2026-07-09**, 44 angle cells, all concepts regenerated | ✅ Verified on dashboard + `/api/atlas` |
+
+**Client-pitch line earned today:** *"The radar doesn't just detect the open angle — it files it in your CRM as a ready-to-act deal, in your language, and it tells you when its own data source needs attention."*
 
 ---
 
