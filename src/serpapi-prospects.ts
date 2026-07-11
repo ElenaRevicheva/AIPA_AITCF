@@ -200,22 +200,65 @@ Return ONLY a valid JSON array, one object per result in order:
 
 // ── SerpAPI quota guard (July 11 2026) ────────────────────────────────────────
 // Elena re-subscribed (Starter, 1,000 searches/mo). The same key also feeds the
-// VJH hiring-side ingest, so client discovery only uses SerpAPI as a fallback
-// when BrightData is sparse AND the account still has > SERPAPI_RESERVE left.
+// VJH hiring-side ingest, so client discovery only uses SerpAPI when the
+// account still has > SERPAPI_RESERVE searches left.
 const SERPAPI_RESERVE = Number(process.env.SERPAPI_RESERVE || 200);
 let serpQuotaOkCache: boolean | null = null;
+
+// ── Operator alert when the SerpAPI leg goes dark (July 11 2026) ──────────────
+// Previously a bad key / exhausted quota / probe error disabled SerpAPI silently
+// for the whole 6h cycle. Now every DISABLED verdict is logged with its reason
+// and pinged to the operator Telegram chat (same bot + chat as the leads
+// digest). No-ops when TELEGRAM_BOT_TOKEN / TELEGRAM_LEADS_DIGEST_CHAT_ID are
+// unset. Cooldown prevents 4x/day repeats of the same reason.
+const SERP_ALERT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+let lastSerpAlert: { reason: string; at: number } = { reason: '', at: 0 };
+
+async function alertSerpApiDisabled(reason: string): Promise<void> {
+  console.warn(`[SerpProspects] SerpAPI DISABLED — ${reason}`);
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const chatId = process.env.TELEGRAM_LEADS_DIGEST_CHAT_ID?.trim();
+  if (!token || !chatId) return;
+  const now = Date.now();
+  if (lastSerpAlert.reason === reason && now - lastSerpAlert.at < SERP_ALERT_COOLDOWN_MS) return;
+  lastSerpAlert = { reason, at: now };
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: `⚠️ SerpAPI disabled for client discovery\n\n${reason}\n\nImpact: Spanish/LATAM queries fall back to BrightData; EN queries lose their sparse-result fallback.\nCheck: https://serpapi.com/dashboard`,
+        disable_web_page_preview: true,
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) console.warn(`[SerpProspects] Telegram alert failed: HTTP ${res.status}`);
+  } catch (e) {
+    console.warn('[SerpProspects] Telegram alert error:', (e as Error).message?.slice(0, 80));
+  }
+}
 
 async function serpApiQuotaOk(): Promise<boolean> {
   if (!SERPAPI_KEY) return false;
   if (serpQuotaOkCache === null) {
     try {
       const res = await fetch(`https://serpapi.com/account?api_key=${SERPAPI_KEY}`, { signal: AbortSignal.timeout(10_000) });
-      const d = res.ok ? await res.json() as { total_searches_left?: number } : {};
+      if (!res.ok) {
+        serpQuotaOkCache = false;
+        await alertSerpApiDisabled(`account probe HTTP ${res.status} — key invalid or rotated? (.env changes need pm2 restart cto-aipa)`);
+        return serpQuotaOkCache;
+      }
+      const d = await res.json() as { total_searches_left?: number };
       const left = d.total_searches_left ?? 0;
       serpQuotaOkCache = left > SERPAPI_RESERVE;
-      console.log(`[SerpProspects] SerpAPI quota: ${left} left (reserve ${SERPAPI_RESERVE}) → fallback ${serpQuotaOkCache ? 'ENABLED' : 'DISABLED'}`);
-    } catch {
+      console.log(`[SerpProspects] SerpAPI quota: ${left} left (reserve ${SERPAPI_RESERVE}) → ${serpQuotaOkCache ? 'ENABLED' : 'DISABLED'}`);
+      if (!serpQuotaOkCache) {
+        await alertSerpApiDisabled(`quota ${left} ≤ reserve ${SERPAPI_RESERVE} (VJH hiring ingest shares this key — top-up or lower SERPAPI_RESERVE)`);
+      }
+    } catch (e) {
       serpQuotaOkCache = false;
+      await alertSerpApiDisabled(`account probe failed: ${(e as Error).message?.slice(0, 80)}`);
     }
   }
   return serpQuotaOkCache;
@@ -245,25 +288,45 @@ async function serpApiSearch(query: string, site: string, lang: 'en' | 'es'): Pr
   }
 }
 
+function bdToSerpResults(bdResults: Awaited<ReturnType<typeof bdSerpSearch>>): SerpResult[] {
+  return bdResults.map(r => {
+    const out: SerpResult = {
+      title: r.title,
+      link: r.link,
+      snippet: r.description || '',
+    };
+    if (r.display_link) out.displayed_link = r.display_link;
+    return out;
+  });
+}
+
 async function fetchGoogleSearch(query: string, site: string, lang: 'en' | 'es' = 'en'): Promise<SerpResult[]> {
   // MAY 25 2026 (hackathon): prefer BrightData SERP API (Web Unlocker proxy +
   // brd_json=1) — reuses BRIGHTDATA_API_TOKEN + BRIGHTDATA_ZONE, no extra creds.
   // JULY 11 2026: SerpAPI re-subscribed → when BrightData returns 0 (sparse), we
   // now FALL BACK to SerpAPI instead of skipping, guarded by serpApiQuotaOk().
   // The two responses are normalized to the same `SerpResult` shape.
+  // JULY 11 2026 (later): Spanish/LATAM queries (hl=es) go SerpAPI-FIRST — the
+  // BrightData gl=us proxy pool is consistently sparse for Spanish buyer intent.
+  // BrightData stays the fallback for those, so coverage never shrinks.
+  if (lang === 'es' && SERPAPI_KEY && await serpApiQuotaOk()) {
+    const serpResults = await serpApiSearch(query, site, lang);
+    if (serpResults.length > 0) {
+      console.log(`[SerpProspects] ES query "${query.slice(0, 40)}" → SerpAPI primary (${serpResults.length} results)`);
+      return serpResults;
+    }
+    if (isBrightDataConfigured()) {
+      console.log(`[SerpProspects] SerpAPI sparse for ES "${query.slice(0, 40)}" → BrightData fallback`);
+      return bdToSerpResults(await bdSerpSearch(query, { site, num: 20, gl: 'us', hl: lang, tbs: 'qdr:w' }));
+    }
+    return [];
+  }
+
   if (isBrightDataConfigured()) {
     // num:20 — more candidates per BrightData request = more leads per credit.
     const bdResults = await bdSerpSearch(query, { site, num: 20, gl: 'us', hl: lang, tbs: 'qdr:w' });
     if (bdResults.length > 0) {
-      return bdResults.map(r => {
-        const out: SerpResult = {
-          title: r.title,
-          link: r.link,
-          snippet: r.description || '',
-        };
-        if (r.display_link) out.displayed_link = r.display_link;
-        return out;
-      });
+      return bdToSerpResults(bdResults);
     }
     if (SERPAPI_KEY && await serpApiQuotaOk()) {
       console.log(`[SerpProspects] BD sparse for "${query.slice(0, 40)}" → SerpAPI fallback`);
