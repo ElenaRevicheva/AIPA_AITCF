@@ -1,0 +1,66 @@
+# Auto-deploy on push of .deploy-trigger — lets Cursor Cloud Agents deploy without
+# workflow_dispatch rights (agent tokens get HTTP 403 on the dispatches API).
+# The trigger file's first line = product name (same choices as deploy-oracle.yml).
+# Reuses the same SSH + deploy-product.sh path. See scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md
+#
+# Usage (cloud agent or laptop):
+#   echo "cto_aipa" > .deploy-trigger && git add .deploy-trigger && git commit -m "deploy: cto_aipa" && git push origin main
+
+name: Deploy to Oracle VM (trigger file)
+
+on:
+  push:
+    branches: [main]
+    paths: [".deploy-trigger"]
+
+jobs:
+  deploy-oracle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read product from trigger file
+        id: trigger
+        run: |
+          PRODUCT=$(head -n1 .deploy-trigger | tr -d '[:space:]')
+          case "$PRODUCT" in
+            whatsapp|telegram|influencer|dragontrade|vjh|vjh_web|openclaw|cto_aipa|atlas|fleet-verify)
+              echo "product=$PRODUCT" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "::error::Invalid product '$PRODUCT' in .deploy-trigger"; exit 1 ;;
+          esac
+
+      - name: Require ORACLE_SSH_KEY
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      - name: Fleet deploy or verify via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 170.9.242.90
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            export PRODUCT="${{ steps.trigger.outputs.product }}"
+            export DEPLOY_FILES=""
+            export DISPATCH_NOTES="deploy-trigger file push (${{ github.sha }})"
+
+            AIPA_DIR=/home/ubuntu/cto-aipa
+            if [ ! -d "$AIPA_DIR/.git" ]; then AIPA_DIR=/home/ubuntu/AIPA_AITCF; fi
+            cd "$AIPA_DIR"
+            git fetch origin main
+            git checkout origin/main -- scripts/
+
+            chmod +x scripts/oracle-resilience/*.sh scripts/oracle-resilience/lib/*.sh 2>/dev/null || true
+            chmod +x scripts/espaluz-hotfixes/*.sh 2>/dev/null || true
+
+            if [ "$PRODUCT" = "fleet-verify" ]; then
+              bash scripts/oracle-resilience/verify-fleet-health.sh
+            else
+              bash scripts/oracle-resilience/deploy-product.sh
+            fi
