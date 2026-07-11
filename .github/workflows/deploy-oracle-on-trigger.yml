@@ -43,9 +43,8 @@ jobs:
           host: 170.9.242.90
           username: ubuntu
           key: ${{ secrets.ORACLE_SSH_KEY }}
-          script_stop: true
           script: |
-            set -euo pipefail
+            set -uo pipefail
             export PRODUCT="${{ steps.trigger.outputs.product }}"
             export DEPLOY_FILES=""
             export DISPATCH_NOTES="deploy-trigger file push (${{ github.sha }})"
@@ -53,14 +52,28 @@ jobs:
             AIPA_DIR=/home/ubuntu/cto-aipa
             if [ ! -d "$AIPA_DIR/.git" ]; then AIPA_DIR=/home/ubuntu/AIPA_AITCF; fi
             cd "$AIPA_DIR"
-            git fetch origin main
-            git checkout origin/main -- scripts/
+            echo "--- deploy-trigger: $PRODUCT in $AIPA_DIR as $(whoami) ---"
+
+            echo "--- git fetch origin main ---"
+            git fetch origin main 2>&1 || { echo "FATAL: fetch rc=$?"; exit 1; }
+
+            echo "--- refresh deploy scripts from origin/main ---"
+            if ! git checkout origin/main -- scripts/ 2>&1; then
+              echo "WARN: scripts/ checkout rc=$? — diagnosing:"
+              git status --porcelain 2>&1 | head -20
+              ls -la .git/index.lock 2>/dev/null && echo "WARN: stale index.lock present"
+              echo "Continuing with the deploy scripts already on the box."
+            fi
 
             chmod +x scripts/oracle-resilience/*.sh scripts/oracle-resilience/lib/*.sh 2>/dev/null || true
             chmod +x scripts/espaluz-hotfixes/*.sh 2>/dev/null || true
 
+            echo "--- running deploy ---"
             if [ "$PRODUCT" = "fleet-verify" ]; then
-              bash scripts/oracle-resilience/verify-fleet-health.sh
+              bash scripts/oracle-resilience/verify-fleet-health.sh 2>&1
             else
-              bash scripts/oracle-resilience/deploy-product.sh
+              bash scripts/oracle-resilience/deploy-product.sh 2>&1
             fi
+            RC=$?
+            echo "--- deploy script exit code: $RC ---"
+            exit $RC
