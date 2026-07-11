@@ -90,6 +90,17 @@ curl -s http://127.0.0.1:8095/healthz | grep performanceHub
 
 ---
 
+## ✅ UPDATE — July 11, 2026 — Fable 5 Lead Concierge LIVE + case study published (the meta-play)
+
+> One day, end-to-end: Claude Fable 5 (in Make.com since July 3) wired into production, then the build itself published as a Tech SEO + AEO + GEO case study — the promotion machine promoting itself.
+
+- **Lead Concierge (Make scenario 5633833, us2 org 938264, ALWAYS-ON every 15 min):** HubSpot watch-new-contacts (portfolio inquiries via existing inquiry-proxy, NO Oracle changes) → Anthropic Claude module `claude-fable-5` with full-portfolio system prompt → draft reply in Elena's Telegram for one-tap approval. Verified end-to-end July 11 (Spanish test lead → zero-edit draft with reasoned link selection + scoped pilot offer). Spam self-filtered on first run. ~800 in / ~550 out tokens ≈ cents/lead. Docs: `docs/make-fable5/` (setup recipe with verbatim system prompt + published article source).
+- **Case study PUBLISHED same day (3 rooms):** Dev.to (live: https://dev.to/elenarevicheva/how-i-wired-claude-fable-5-into-makecom-to-answer-my-portfolio-leads-8-days-after-launch-h93, via DEVTO_API_KEY on Oracle) · LinkedIn (Buffer shareNow, post `6a5263cbc4b9e094ad01566a`) · Make Community announcement thread (Elena posts, text ready). Attribution: portfolio links carry `utm_campaign=fable5-case-study` → watch HubSpot for that campaign.
+- **Engineering lesson worth reusing fleet-wide:** when Make/integration field-mappings misbehave, pass the module's raw `[bundle]` JSON to the LLM and let it extract fields itself — 1M-context models don't need pre-chewed data; immune to property-path bugs.
+- Also feeds [[SELLING_KIT]] Offer B as Proof #2 / work sample.
+
+---
+
 ## ✅ UPDATE — July 11, 2026 — SELLING PIVOT: the engine now hunts buyers for 3 productized offers
 
 > Headline: **Elena's directive — done building without selling.** The marketing engine's discovery layer is now pointed at buyers for a concrete offer menu, in English AND Spanish.

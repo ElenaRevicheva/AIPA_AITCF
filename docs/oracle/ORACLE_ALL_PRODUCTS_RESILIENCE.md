@@ -30,6 +30,23 @@ Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely
 
 ---
 
+## 🟢 Lead Concierge — Fable 5 in Make.com (July 11 2026) — runs in MAKE CLOUD, not on Oracle
+
+**What it is:** every new portfolio inquiry (HubSpot contact) gets a personalized reply draft from Claude Fable 5 delivered to Elena's Telegram for one-tap approval. **Nothing runs on this VM** — the scenario lives in Make.com cloud (scenario `5633833`, us2, org `938264`, paid plan, ALWAYS-ON polling every 15 min). Health-check scripts on Oracle do NOT cover it.
+
+**Flow:** HubSpot "Watch CRM Objects" (Contacts/Created; inquiries arrive via the existing InquiryForm → cto-aipa inquiry-proxy → HubSpot path — untouched) → Anthropic Claude module (`claude-fable-5`, max 1500 tokens, full-portfolio system prompt; verbatim prompt in `docs/make-fable5/LEAD_CONCIERGE_SETUP.md`) → Telegram Bot sendMessage (Elena's chat `5481526862`, Text = `{{3.textResponse}}` "Text Response" — NOT `3.text`).
+
+**Failure modes + fixes (learned during the July 11 build):**
+- `[400] credit balance is too low` → Anthropic API is prepaid, separate from chat subscriptions — top up at console.anthropic.com Plans & Billing.
+- Telegram "Validation failed for 1 parameter(s)" → Text field mapped to non-existent `3.text`; correct output field is `Text Response` (`textResponse`).
+- Fable 5 reports "inquiry came through empty" → field-mapping resolved blank; durable fix in place: the prompt passes the HubSpot module's raw `[bundle]` output as full JSON and the model extracts name/email/company/message itself (immune to property-path bugs). If it regresses, check that bundle chip survived edits.
+- Scenario won't toggle ON → Make active-scenario plan limit.
+- Trigger pointer consumes contacts per run — re-testing needs a NEW test contact.
+
+**Case study published July 11 (the meta-play):** https://dev.to/elenarevicheva/how-i-wired-claude-fable-5-into-makecom-to-answer-my-portfolio-leads-8-days-after-launch-h93 (+ LinkedIn via Buffer, + Make Community). Watch HubSpot for `utm_campaign=fable5-case-study`.
+
+---
+
 ## 🟢 SELLING PIVOT + SerpAPI re-subscribed (July 10-11 2026)
 
 **Elena's directive July 10: done building without selling — every hour goes to putting her in front of a buyer.** Canonical selling kit: **`docs/selling/SELLING_KIT.md`** (positioning names, 3 offers with pricing, Upwork/Fiverr copy, proposal template, week-1 firing sequence). Umbrella identity: **Production AI Builder**; lanes: Conversational AI Agent Builder (WhatsApp·Telegram) · AI Automation & Integration Architect · AI Search Visibility Architect (GEO/AEO/Tech SEO).

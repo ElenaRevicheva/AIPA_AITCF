@@ -61,6 +61,8 @@
 
 **Proof (the flagship case study):** *"I built an autonomous system that sources, scores, prices, and CRM-tracks 300+ job opportunities per month — LangGraph pipeline, HubSpot integration, self-evolving outcome judge — running on a $0/month VM."* (VJH machine, log-verified July 10 2026.) Plus: CTO→all-channels content pipeline, daily AI blog publisher with Buffer distribution.
 
+**Proof #2 (freshest — published July 11 2026, use for Make/no-code buyers):** *"Claude Fable 5 appeared in Make.com on July 3; by July 11 my production build was answering my portfolio leads — HubSpot → Fable 5 (full portfolio in its 1M context) → approval draft in Telegram. 3 modules, 0 code, a few cents per lead, spam self-filtered."* Public write-up with honest cost math: https://dev.to/elenarevicheva/how-i-wired-claude-fable-5-into-makecom-to-answer-my-portfolio-leads-8-days-after-launch-h93 — this doubles as the Offer B work sample ("I'll build this same pattern on your CRM/tools").
+
 ---
 
 ### Offer C — AI Search Visibility (GEO/AEO) Audit → Fix 🥉

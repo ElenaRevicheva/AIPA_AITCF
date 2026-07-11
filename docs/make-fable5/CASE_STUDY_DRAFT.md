@@ -1,4 +1,10 @@
-# CASE STUDY DRAFT — publish only AFTER the build is live and tested
+# CASE STUDY — ✅ PUBLISHED July 11 2026
+
+> **Dev.to (live):** https://dev.to/elenarevicheva/how-i-wired-claude-fable-5-into-makecom-to-answer-my-portfolio-leads-8-days-after-launch-h93 — final published text is in `PUBLISHED_DEVTO.md` (source of record; supersedes the canonical draft below).
+> **LinkedIn:** shared July 11 via Buffer shareNow (post `6a5263cbc4b9e094ad01566a`).
+> **Make Community:** pending Elena's login — use the Make Community version below with the Dev.to link.
+
+# Original draft (kept for reference)
 
 > Meta-play: Fable 5 appeared in Make on **July 3, 2026**. Almost nobody has published a
 > real production build with it yet. Freshness is the entire distribution advantage —
