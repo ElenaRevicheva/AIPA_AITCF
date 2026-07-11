@@ -23,7 +23,9 @@ const SERPAPI_KEY    = (process.env.SERPAPI_KEY || '').trim();
 const OUTREACH_URL   = (process.env.CTO_AIPA_WEBHOOK_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
 const OUTREACH_SECRET = (process.env.OUTREACH_SECRET || '').trim();
 
-const SEARCH_QUERIES = [
+interface SearchQuery { q: string; site: string; tag: string; urgency: number; lang?: 'en' | 'es' }
+
+const SEARCH_QUERIES: SearchQuery[] = [
   // Hacker News — high signal, technical founders
   { q: '"need CTO" OR "looking for CTO" OR "hire CTO"',      site: 'site:news.ycombinator.com', tag: 'hn_cto',        urgency: 5 },
   { q: '"technical co-founder" wanted OR needed OR seeking',  site: 'site:news.ycombinator.com', tag: 'hn_cofounder',  urgency: 5 },
@@ -36,6 +38,14 @@ const SEARCH_QUERIES = [
   { q: '"non-technical founder" ("looking for" OR "need" OR "seeking") (CTO OR "technical co-founder" OR "someone to build")', site: '', tag: 'nontech_founder', urgency: 5 },
   { q: '"looking for someone to build" (my app OR MVP OR platform OR SaaS OR startup)', site: 'site:reddit.com', tag: 'reddit_build', urgency: 4 },
   { q: '"need help" ("AI automation" OR "automate my business" OR "AI for my business") (small business OR agency OR founder)', site: '', tag: 'smb_ai', urgency: 4 },
+  // ── SELLING KIT queries (July 11 2026, docs/selling/SELLING_KIT.md) ──
+  // Offer A: WhatsApp/Telegram conversational agents — EN + ES (LATAM edge)
+  { q: '("whatsapp bot" OR "whatsapp chatbot" OR "telegram bot") ("for my business" OR "for our business" OR "recommend" OR "looking for someone" OR "need a")', site: 'site:reddit.com', tag: 'whatsapp_agent', urgency: 5 },
+  { q: '("bot de whatsapp" OR "chatbot para whatsapp" OR "chatbot whatsapp") (negocio OR empresa OR necesito OR busco OR recomienden OR "alguien que")', site: '', tag: 'whatsapp_es', urgency: 5, lang: 'es' },
+  // Offer B: automation/integration builds — people trying to PAY someone
+  { q: '(make.com OR n8n OR zapier) ("looking for someone" OR "hire someone" OR "need someone" OR "pay someone") (automation OR workflow OR integrate)', site: '', tag: 'automation_hire', urgency: 5 },
+  // Offer C: GEO/AEO — businesses that want to show up in AI answers
+  { q: '("answer engine optimization" OR "generative engine optimization" OR "AI search visibility" OR "show up in ChatGPT" OR "cited by ChatGPT") (hire OR consultant OR agency OR "need help" OR "looking for")', site: '', tag: 'geo_aeo', urgency: 4 },
 ];
 
 function loadSeen(): Set<string> {
@@ -148,9 +158,11 @@ async function classifyBuyingIntent(
     .map((c, i) => `${i + 1}. TITLE: ${c.title}\n   SNIPPET: ${(c.snippet || '').slice(0, 220)}\n   URL: ${c.link}`)
     .join('\n');
 
-  const prompt = `You triage web search results for AIdeazz, which sells: a Fractional CTO retainer, AI Marketing Engine setup, and custom AI agent builds. The ideal buyer is a NON-TECHNICAL FOUNDER or a small/mid business that needs technical leadership or AI/automation help.
+  const prompt = `You triage web search results for Elena (aideazz.xyz), a Production AI Builder who sells: (A) WhatsApp/Telegram conversational AI agents for businesses (bilingual EN/ES), (B) AI automation & integration builds (Make/n8n/custom, LLM + CRM/tools), (C) AI search visibility work (GEO/AEO/technical SEO — getting businesses cited by ChatGPT/Perplexity), and (D) fractional-CTO / custom AI agent builds. The ideal buyer is a NON-TECHNICAL FOUNDER or a small/mid business that needs any of the above.
 
-For each result decide: is this a REAL BUYING SIGNAL — i.e. a specific person or company ACTIVELY EXPRESSING A NEED for TECHNICAL help AIdeazz sells: to hire/find a CTO, technical co-founder, AI engineer, or someone to BUILD their app/product/software/automation.
+Results may be in English OR Spanish — treat both equally (LATAM SMBs are a target market); always write the label in English.
+
+For each result decide: is this a REAL BUYING SIGNAL — i.e. a specific person or company ACTIVELY EXPRESSING A NEED for help Elena sells: a WhatsApp/Telegram bot for their business, workflow automation/integration, visibility in AI search results, or hiring a CTO / technical co-founder / someone to BUILD their app/product/software.
 
 Mark is_lead=false for: news/opinion articles, how-to/guides, definitions, general discussions or debates ABOUT the topic, podcasts, course/ad pages, people OFFERING their own services (freelancers/agencies/"for hire"), and job-seekers looking for roles.
 ALSO mark is_lead=false when the person is seeking the OPPOSITE of what AIdeazz offers — e.g. a (technical) founder seeking a SALES / MARKETING / BUSINESS / non-technical co-founder. AIdeazz is the technical/AI side, so only people who need TECHNICAL/AI/BUILD help are buyers.
@@ -186,14 +198,62 @@ Return ONLY a valid JSON array, one object per result in order:
   return out;
 }
 
-async function fetchGoogleSearch(query: string, site: string): Promise<SerpResult[]> {
+// ── SerpAPI quota guard (July 11 2026) ────────────────────────────────────────
+// Elena re-subscribed (Starter, 1,000 searches/mo). The same key also feeds the
+// VJH hiring-side ingest, so client discovery only uses SerpAPI as a fallback
+// when BrightData is sparse AND the account still has > SERPAPI_RESERVE left.
+const SERPAPI_RESERVE = Number(process.env.SERPAPI_RESERVE || 200);
+let serpQuotaOkCache: boolean | null = null;
+
+async function serpApiQuotaOk(): Promise<boolean> {
+  if (!SERPAPI_KEY) return false;
+  if (serpQuotaOkCache === null) {
+    try {
+      const res = await fetch(`https://serpapi.com/account?api_key=${SERPAPI_KEY}`, { signal: AbortSignal.timeout(10_000) });
+      const d = res.ok ? await res.json() as { total_searches_left?: number } : {};
+      const left = d.total_searches_left ?? 0;
+      serpQuotaOkCache = left > SERPAPI_RESERVE;
+      console.log(`[SerpProspects] SerpAPI quota: ${left} left (reserve ${SERPAPI_RESERVE}) → fallback ${serpQuotaOkCache ? 'ENABLED' : 'DISABLED'}`);
+    } catch {
+      serpQuotaOkCache = false;
+    }
+  }
+  return serpQuotaOkCache;
+}
+
+async function serpApiSearch(query: string, site: string, lang: 'en' | 'es'): Promise<SerpResult[]> {
+  const q = site ? `${query} ${site}` : query;
+  try {
+    const params = new URLSearchParams({
+      engine:  'google',
+      q,
+      hl:      lang,
+      tbs:     'qdr:w',  // past week
+      num:     '10',
+      api_key: SERPAPI_KEY,
+    });
+    const res = await fetch(`https://serpapi.com/search?${params}`, { signal: AbortSignal.timeout(20_000) });
+    if (!res.ok) {
+      console.warn(`[SerpProspects] SerpAPI error (${query.slice(0, 40)}): ${res.status}`);
+      return [];
+    }
+    const data = await res.json() as { organic_results?: SerpResult[] };
+    return data.organic_results || [];
+  } catch (e) {
+    console.warn(`[SerpProspects] SerpAPI fetch error:`, (e as Error).message?.slice(0, 80));
+    return [];
+  }
+}
+
+async function fetchGoogleSearch(query: string, site: string, lang: 'en' | 'es' = 'en'): Promise<SerpResult[]> {
   // MAY 25 2026 (hackathon): prefer BrightData SERP API (Web Unlocker proxy +
   // brd_json=1) — reuses BRIGHTDATA_API_TOKEN + BRIGHTDATA_ZONE, no extra creds.
-  // Falls back to legacy SerpAPI if BrightData not configured. The two responses
-  // are normalized to the same `SerpResult` shape so downstream code is unchanged.
+  // JULY 11 2026: SerpAPI re-subscribed → when BrightData returns 0 (sparse), we
+  // now FALL BACK to SerpAPI instead of skipping, guarded by serpApiQuotaOk().
+  // The two responses are normalized to the same `SerpResult` shape.
   if (isBrightDataConfigured()) {
     // num:20 — more candidates per BrightData request = more leads per credit.
-    const bdResults = await bdSerpSearch(query, { site, num: 20, gl: 'us', hl: 'en', tbs: 'qdr:w' });
+    const bdResults = await bdSerpSearch(query, { site, num: 20, gl: 'us', hl: lang, tbs: 'qdr:w' });
     if (bdResults.length > 0) {
       return bdResults.map(r => {
         const out: SerpResult = {
@@ -205,34 +265,16 @@ async function fetchGoogleSearch(query: string, site: string): Promise<SerpResul
         return out;
       });
     }
-    // BrightData is the engine. When it returns 0 the query is simply sparse this
-    // week — do NOT fall back to SerpAPI (quota exhausted; wastes a 20s timeout).
+    if (SERPAPI_KEY && await serpApiQuotaOk()) {
+      console.log(`[SerpProspects] BD sparse for "${query.slice(0, 40)}" → SerpAPI fallback`);
+      return serpApiSearch(query, site, lang);
+    }
     console.log(`[SerpProspects] BrightData SERP returned 0 for "${query.slice(0, 40)}" (sparse) — skipping`);
     return [];
   }
 
   if (!SERPAPI_KEY) return [];
-  const q = site ? `${query} ${site}` : query;
-  try {
-    const params = new URLSearchParams({
-      engine:  'google',
-      q,
-      hl:      'en',
-      tbs:     'qdr:w',  // past week
-      num:     '10',
-      api_key: SERPAPI_KEY,
-    });
-    const res = await fetch(`https://serpapi.com/search?${params}`, { signal: AbortSignal.timeout(20_000) });
-    if (!res.ok) {
-      console.warn(`[SerpProspects] Search error (${query.slice(0, 40)}): ${res.status}`);
-      return [];
-    }
-    const data = await res.json() as { organic_results?: SerpResult[] };
-    return data.organic_results || [];
-  } catch (e) {
-    console.warn(`[SerpProspects] fetch error:`, (e as Error).message?.slice(0, 80));
-    return [];
-  }
+  return serpApiSearch(query, site, lang);
 }
 
 async function pushToCRM(payload: Record<string, unknown>): Promise<void> {
@@ -258,6 +300,7 @@ export async function runSerpProspects(opts: { dryRun?: boolean } = {}): Promise
   fetched: number; preFiltered: number; classified: number; leads: number; pushed: number;
 }> {
   const dryRun = !!opts.dryRun;
+  serpQuotaOkCache = null;  // re-check SerpAPI quota once per run
   if (!SERPAPI_KEY && !isBrightDataConfigured()) {
     console.warn('[SerpProspects] no SERPAPI_KEY / BrightData — skipping');
     return { fetched: 0, preFiltered: 0, classified: 0, leads: 0, pushed: 0 };
@@ -271,7 +314,7 @@ export async function runSerpProspects(opts: { dryRun?: boolean } = {}): Promise
   let fetched = 0;
   for (const entry of SEARCH_QUERIES) {
     console.log(`[SerpProspects] Querying: ${entry.q.slice(0, 60)} ${entry.site}`);
-    const results = await fetchGoogleSearch(entry.q, entry.site);
+    const results = await fetchGoogleSearch(entry.q, entry.site, entry.lang || 'en');
     fetched += results.length;
     console.log(`[SerpProspects]   → ${results.length} results`);
 

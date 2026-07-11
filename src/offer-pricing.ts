@@ -32,7 +32,7 @@ const RULES: Array<{ offer: keyof typeof OFFERS; re: RegExp }> = [
   { offer: 'fractional_cto',   re: /\b(cto|technical co-?founder|tech co-?founder|technical leadership|technical partner)\b/i },
   // Someone wants a thing BUILT (app/MVP/platform/agent/bot/website/software)
   { offer: 'agent_build',      re: /\b(build|building|develop|developing|create|creating)\b.{0,60}\b(app|mvp|platform|saas|agent|bot|website|web site|software|product|tool|store)\b/i },
-  { offer: 'agent_build',      re: /\b(ai agent|chatbot|voice agent|developer to|someone to build)\b/i },
+  { offer: 'agent_build',      re: /\b(ai agent|chatbot|voice agent|developer to|someone to build|whatsapp|telegram|bot de|bot para)\b/i },
   // Marketing / content / SEO / leads-from-content
   { offer: 'marketing_engine', re: /\b(marketing|seo|geo|aeo|content engine|blog|social media|brand visibility|discoverability)\b/i },
   // CRM / sales pipeline / revenue ops
