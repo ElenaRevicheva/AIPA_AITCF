@@ -90,6 +90,16 @@ curl -s http://127.0.0.1:8095/healthz | grep performanceHub
 
 ---
 
+## ✅ UPDATE — July 11, 2026 — SELLING PIVOT: the engine now hunts buyers for 3 productized offers
+
+> Headline: **Elena's directive — done building without selling.** The marketing engine's discovery layer is now pointed at buyers for a concrete offer menu, in English AND Spanish.
+
+- **Canonical selling kit: `docs/selling/SELLING_KIT.md`** — positioning ("Production AI Builder"; Conversational AI Agent Builder WhatsApp·Telegram / AI Automation & Integration Architect / AI Search Visibility Architect GEO·AEO·Tech SEO), 3 priced offers ($1.5K WhatsApp agent entry / $800–5K automation / $500 GEO audit → $1.5K fix), paste-ready Upwork profile + 3 Fiverr gigs + proposal template + week-1 firing sequence. Market validation July 10: chatbot dev +71% YoY, AI integration +178%, 91% of LATAM conversational AI = WhatsApp, GEO/AEO budgets rising at 94% of CMOs.
+- **Channel truth:** marketplace-first (Upwork/Fiverr) is the primary channel; this engine is the background buyer-radar, NOT the funnel. July 10 HubSpot audit: 861 deals, 0 replied, 0 won — success metric is now ONLY buyer replies (`contractsent`).
+- **Discovery serves the kit (cto-aipa `48f38b1`, deployed + dry-run-verified):** SerpAPI re-subscribed (Starter 1,000/mo) as guarded fallback behind BrightData (`SERPAPI_RESERVE=200`); 4 new buying-intent queries mapped to offers (`whatsapp_agent`, `whatsapp_es` — Spanish hl=es, `automation_hire`, `geo_aeo`); classifier prompt sells the 3 offers and reads Spanish results; offer matcher routes whatsapp/telegram → agent build. First dry-run: 88 results → 1 genuine GEO/AEO buyer ($3,000 est).
+
+---
+
 ## ✅ UPDATE — July 9, 2026 — [ATLAS-RADAR] CRM bridge · EN/ES bilingual UI · radar outage guard
 
 > Headline: **Atlas now closes its own loop into the CRM and speaks Spanish.** Detected market windows land in HubSpot automatically, the client-facing UI is bilingual for LATAM, and the radar can no longer go stale silently.

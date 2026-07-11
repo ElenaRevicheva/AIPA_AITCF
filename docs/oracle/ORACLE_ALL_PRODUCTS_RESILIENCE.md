@@ -30,6 +30,26 @@ Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely
 
 ---
 
+## 🟢 SELLING PIVOT + SerpAPI re-subscribed (July 10-11 2026)
+
+**Elena's directive July 10: done building without selling — every hour goes to putting her in front of a buyer.** Canonical selling kit: **`docs/selling/SELLING_KIT.md`** (positioning names, 3 offers with pricing, Upwork/Fiverr copy, proposal template, week-1 firing sequence). Umbrella identity: **Production AI Builder**; lanes: Conversational AI Agent Builder (WhatsApp·Telegram) · AI Automation & Integration Architect · AI Search Visibility Architect (GEO/AEO/Tech SEO).
+
+**July 10 live fleet audit (verify-from-logs, both ends — Oracle logs + HubSpot API), key findings:**
+- HubSpot funnel truth (861 deals): **0 contractsent / 0 won ever** — intake works, conversion motion never existed. Success metric now = buyer replies landing at `contractsent`.
+- 🟢 Alive writers: VJH SERP (`[HIRING-VJH-SERP-LEAD]` 222 deals/28d, hourly) + VJH LangGraph (79) + cto-aipa crm-event hub.
+- 🔴 `algom-stream` crash-looping since ~June 13: X API **account 1910676161845186560 has no credits** (restart loop every 30s — top-up or `pm2 stop algom-stream`). `[CLIENT-ALGOM]` frozen since June 13.
+- 🔴 `openclaw-gateway` systemd **inactive**; `[HIRING-OPENCLAW]` never wired (0 deals ever).
+- 🔴 `[ESPALUZ]` HubSpot deals = June 29 wiring TESTS only (incl. duplicates) — no live EspaLuz→HubSpot writer exists.
+- 🟡 `[CLIENT-CTO-SERP]` was dry June 22→July 10 (BrightData SERP sparse + gate); `[CLIENT-CTO-INGEST]` trickle; `[ATLAS-RADAR]` 1 deal (July 9, by design new).
+
+**SerpAPI re-subscribed July 11 (Starter, 1,000 searches/mo) — cto-aipa `48f38b1`:**
+- `serpapi-prospects.ts`: BD-first kept; **SerpAPI fallback re-enabled** when BD returns 0, guarded by live quota check (`SERPAPI_RESERVE`, default 200, protects VJH hiring ingest on the same key). Quota probe: `curl "https://serpapi.com/account?api_key=$K"`.
+- **4 new buyer queries mapped to the kit offers:** `whatsapp_agent` (EN reddit), `whatsapp_es` (Spanish, hl=es — LATAM lane), `automation_hire` (make/n8n/zapier "hire someone"), `geo_aeo`. Per-query `lang` threads through both engines.
+- Intent-classifier prompt now sells the kit's offers + reads Spanish results (labels stay English). `offer-pricing.ts`: whatsapp/telegram/bot-de → agent_build.
+- **Verified live (dry-run on Oracle):** 88 fetched (was 48) · quota guard "998 left → fallback ENABLED" · 1 genuine lead first run (`geo_aeo` SMB → $3,000 est). Deployed: pull → `npm run build` → `pm2 restart cto-aipa`.
+
+---
+
 ## Server
 
 | Field     | Value |
