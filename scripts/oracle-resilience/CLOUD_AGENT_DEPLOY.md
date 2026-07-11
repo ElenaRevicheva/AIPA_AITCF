@@ -2,6 +2,8 @@
 
 Deploy **every AI product on `170.9.242.90`** from your phone or Cursor Cloud Agent — no laptop SSH.
 
+> **UPDATE July 11, 2026:** Cloud agents no longer need Elena to press "Run workflow" — they can deploy themselves by pushing a product name to `.deploy-trigger` on `main`. See **`docs/oracle/CLOUD_AGENT_SELF_DEPLOY.md`**. The phone flow below still works unchanged.
+
 ---
 
 ## One-time setup (~10 min)
