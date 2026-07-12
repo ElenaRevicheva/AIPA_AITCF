@@ -16,6 +16,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import * as express from 'express';
 import type { Express, Request, Response } from 'express';
 import type { Bot } from 'grammy';
 import { getResendApiKey } from './marketing-notify';
@@ -109,7 +110,9 @@ async function sendTelegram(
 }
 
 export function registerConciergeRoutes(app: Express): void {
-  app.post('/concierge/draft', async (req: Request, res: Response) => {
+  // Make's HTTP module can't JSON-escape multi-line drafts; form-urlencoded
+  // fields are encoded natively by Make, so accept both content types here.
+  app.post('/concierge/draft', express.urlencoded({ extended: true, limit: '1mb' }), async (req: Request, res: Response) => {
     const secret = process.env.CONCIERGE_SECRET?.trim();
     if (!secret) {
       res.status(503).json({ error: 'Concierge not configured — set CONCIERGE_SECRET' });
