@@ -1,8 +1,15 @@
-# Deploy to Oracle VM (+ optional AWS Sprinter) — Cursor Cloud Agent + phone workflow_dispatch.
+# Deploy to Oracle VM (+ optional AWS Sprinter) — Elena phone / workflow_dispatch only.
 # Requires: ORACLE_SSH_KEY (Oracle SSH). For Sprinter: AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY.
 # See scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md
 
 name: Deploy to Oracle VM
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-oracle-${{ github.actor }}-${{ inputs.product }}
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:
@@ -33,18 +40,28 @@ on:
         required: false
 
 jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only ElenaRevicheva may deploy
+        run: |
+          if [ "${{ github.actor }}" != "ElenaRevicheva" ]; then
+            echo "::error::Deploy blocked — only ElenaRevicheva may trigger Oracle deploys."
+            exit 1
+          fi
+
   deploy-oracle:
+    needs: authorize
     if: inputs.product != 'sprinter-aws'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Require ORACLE_SSH_KEY
+        if: ${{ secrets.ORACLE_SSH_KEY == '' }}
         run: |
-          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
-            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
-            exit 1
-          fi
+          echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+          exit 1
 
       - name: Fleet deploy or verify via SSH
         uses: appleboy/ssh-action@v1.2.0
@@ -76,17 +93,17 @@ jobs:
             fi
 
   deploy-sprinter:
+    needs: authorize
     if: inputs.product == 'sprinter-aws'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Require AWS credentials
+        if: ${{ secrets.AWS_ACCESS_KEY_ID == '' || secrets.AWS_SECRET_ACCESS_KEY == '' }}
         run: |
-          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
-            echo "::error::Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for Sprinter Lambda deploy"
-            exit 1
-          fi
+          echo "::error::Add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY for Sprinter Lambda deploy"
+          exit 1
 
       - uses: actions/setup-node@v4
         with:

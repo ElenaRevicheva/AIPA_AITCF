@@ -110,6 +110,8 @@ Fleet health: `scripts/oracle-resilience/verify-fleet-health.sh`
 
 ## Security
 
+- **Build in public is fine** — the SSH key lives in GitHub Secrets, not in the repo.
+- **Only `ElenaRevicheva`** can trigger **Deploy to Oracle VM** (actor gate in workflow).
 - Never commit private keys or `.env` to git.
 - Rotate `ORACLE_SSH_KEY` / AWS keys if exposed — update GitHub secrets only.
 - Prefer **checkout specific files** over blind `git pull` on EspaLuz repos.

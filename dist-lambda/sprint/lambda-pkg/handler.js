@@ -6428,7 +6428,7 @@ var require_abort_controller = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     var eventTargetShim = require_event_target_shim();
-    var AbortSignal = class extends eventTargetShim.EventTarget {
+    var AbortSignal2 = class extends eventTargetShim.EventTarget {
       /**
        * AbortSignal cannot be constructed directly.
        */
@@ -6447,9 +6447,9 @@ var require_abort_controller = __commonJS({
         return aborted;
       }
     };
-    eventTargetShim.defineEventAttribute(AbortSignal.prototype, "abort");
+    eventTargetShim.defineEventAttribute(AbortSignal2.prototype, "abort");
     function createAbortSignal() {
-      const signal = Object.create(AbortSignal.prototype);
+      const signal = Object.create(AbortSignal2.prototype);
       eventTargetShim.EventTarget.call(signal);
       abortedFlags.set(signal, false);
       return signal;
@@ -6462,11 +6462,11 @@ var require_abort_controller = __commonJS({
       signal.dispatchEvent({ type: "abort" });
     }
     var abortedFlags = /* @__PURE__ */ new WeakMap();
-    Object.defineProperties(AbortSignal.prototype, {
+    Object.defineProperties(AbortSignal2.prototype, {
       aborted: { enumerable: true }
     });
     if (typeof Symbol === "function" && typeof Symbol.toStringTag === "symbol") {
-      Object.defineProperty(AbortSignal.prototype, Symbol.toStringTag, {
+      Object.defineProperty(AbortSignal2.prototype, Symbol.toStringTag, {
         configurable: true,
         value: "AbortSignal"
       });
@@ -6510,11 +6510,11 @@ var require_abort_controller = __commonJS({
       });
     }
     exports2.AbortController = AbortController2;
-    exports2.AbortSignal = AbortSignal;
+    exports2.AbortSignal = AbortSignal2;
     exports2.default = AbortController2;
     module2.exports = AbortController2;
     module2.exports.AbortController = module2.exports["default"] = AbortController2;
-    module2.exports.AbortSignal = AbortSignal;
+    module2.exports.AbortSignal = AbortSignal2;
   }
 });
 
@@ -75296,7 +75296,10 @@ __export(database_exports, {
   addDecision: () => addDecision,
   addTechDebt: () => addTechDebt,
   clearConversationContext: () => clearConversationContext,
+  clearKnowledgeByCategory: () => clearKnowledgeByCategory,
   clearPendingCode: () => clearPendingCode,
+  deleteKnowledgeById: () => deleteKnowledgeById,
+  deleteTestBusinessLeads: () => deleteTestBusinessLeads,
   getActiveInsights: () => getActiveInsights,
   getAgentOutcomes: () => getAgentOutcomes,
   getAlertPreferences: () => getAlertPreferences,
@@ -75329,8 +75332,11 @@ __export(database_exports, {
   getTechDebt: () => getTechDebt,
   getTriagedLeads: () => getTriagedLeads,
   getUntriagedLeads: () => getUntriagedLeads,
+  getUntriagedOutreachTargets: () => getUntriagedOutreachTargets,
   initializeDatabase: () => initializeDatabase,
   loadConversationContext: () => loadConversationContext,
+  markLeadTriagePushed: () => markLeadTriagePushed,
+  markOutreachDraftStatus: () => markOutreachDraftStatus,
   markOutreachReply: () => markOutreachReply,
   markOutreachSent: () => markOutreachSent,
   resolveInsight: () => resolveInsight,
@@ -76308,6 +76314,40 @@ async function getKnowledgeByCategory(userId, category, limit2 = 20) {
   } catch (err) {
     console.error("\u274C Get knowledge by category error:", err);
     return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+async function deleteKnowledgeById(userId, id) {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `DELETE FROM knowledge_base WHERE RAWTOHEX(id) = :id AND user_id = :userId`,
+      { id: id.toUpperCase(), userId }
+    );
+    await connection.commit();
+    return (result.rowsAffected ?? 0) > 0;
+  } catch (err) {
+    console.error("\u274C Delete knowledge error:", err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+async function clearKnowledgeByCategory(userId, category) {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `DELETE FROM knowledge_base WHERE user_id = :userId AND category = :category`,
+      { userId, category }
+    );
+    await connection.commit();
+    return result.rowsAffected ?? 0;
+  } catch (err) {
+    console.error("\u274C Clear knowledge error:", err);
+    return 0;
   } finally {
     if (connection) await connection.close();
   }
@@ -77357,6 +77397,28 @@ async function saveOutreachTargetsBulk(targets) {
     if (connection) await connection.close();
   }
 }
+async function markOutreachDraftStatus(emailIdHex, newStatus) {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `UPDATE outreach_log SET status = :status WHERE id = HEXTORAW(:id)`,
+      { status: newStatus, id: emailIdHex },
+      { autoCommit: true }
+    );
+    return (result.rowsAffected || 0) > 0;
+  } catch (err) {
+    console.error("\u274C markOutreachDraftStatus error:", err);
+    return false;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch {
+      }
+    }
+  }
+}
 async function getOutreachDrafts() {
   let connection;
   try {
@@ -77368,6 +77430,7 @@ async function getOutreachDrafts() {
        FROM outreach_log ol
        JOIN outreach_targets ot ON ol.target_id = ot.id
        WHERE ol.status = 'draft'
+         AND ot.status NOT IN ('invalid_email', 'archived', 'dismissed')
        ORDER BY ol.created_at DESC`
     );
     return result.rows || [];
@@ -77498,6 +77561,31 @@ async function getPlacesPipelineSnapshot() {
     if (connection) await connection.close();
   }
 }
+async function markLeadTriagePushed(sourceRefId) {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const cleanId = sourceRefId.replace(/-/g, "");
+    const result = await connection.execute(
+      `UPDATE lead_triage
+         SET status = 'pushed_to_hubspot'
+       WHERE source_ref_id = HEXTORAW(:1)
+         AND (status IS NULL OR status NOT IN ('pushed_to_hubspot', 'archived', 'dismissed'))`,
+      [cleanId],
+      { autoCommit: true }
+    );
+    const rowsAffected = result.rowsAffected ?? 0;
+    if (rowsAffected > 0) {
+      console.log(`\u{1F3AF} [triage] marked lead_triage ${cleanId.slice(0, 16)} as pushed_to_hubspot`);
+    }
+    return rowsAffected > 0;
+  } catch (err) {
+    console.warn("\u26A0\uFE0F markLeadTriagePushed error:", err);
+    return false;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
 async function getTriagedLeads(status, limit2 = 50) {
   let connection;
   try {
@@ -77510,6 +77598,15 @@ async function getTriagedLeads(status, limit2 = 50) {
               classified_at
        FROM lead_triage
        WHERE 1=1 ${where}
+       -- May 24 2026: hide leads already pushed to HubSpot (HubSpot becomes
+       -- the source of truth for 'what to act on'; brief only shows fresh signal)
+       AND (status IS NULL OR status NOT IN ('pushed_to_hubspot', 'archived', 'dismissed'))
+       AND LOWER(source_name) NOT IN (
+         'e2e','e2e2','typo','tytjyt','katarinar','hope','kate',
+         'irina','maya','katya','marina','katerina','test','demo',
+         'sample','fake','elena revicheva'
+       )
+       AND NOT REGEXP_LIKE(source_name, '^(e2e|test|demo|sample|fake)', 'i')
        ORDER BY urgency DESC, classified_at DESC
        FETCH FIRST :1 ROWS ONLY`,
       params
@@ -77518,6 +77615,40 @@ async function getTriagedLeads(status, limit2 = 50) {
   } catch (err) {
     console.error("getTriagedLeads error:", err);
     return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+async function deleteTestBusinessLeads(names) {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    let blDeleted = 0;
+    for (const name of names) {
+      const r6 = await connection.execute(
+        `DELETE FROM business_leads WHERE LOWER(name) = :n`,
+        [name.toLowerCase()],
+        { autoCommit: false }
+      );
+      blDeleted += r6.rowsAffected || 0;
+    }
+    const placeholders = names.map((_2, i6) => `:n${i6}`).join(",");
+    const binds = {};
+    names.forEach((n3, i6) => {
+      binds[`n${i6}`] = n3;
+    });
+    const r22 = await connection.execute(
+      `DELETE FROM lead_triage WHERE source_table = 'business_leads' AND LOWER(source_name) IN (${names.map((n3) => `'${n3.toLowerCase().replace(/'/g, "''")}'`).join(",")})`,
+      [],
+      { autoCommit: false }
+    );
+    const trDeleted = r22.rowsAffected || 0;
+    await connection.commit();
+    return { blDeleted, trDeleted };
+  } catch (err) {
+    if (connection) await connection.rollback?.();
+    console.error("\u274C deleteTestBusinessLeads error:", err);
+    return { blDeleted: 0, trDeleted: 0 };
   } finally {
     if (connection) await connection.close();
   }
@@ -77533,6 +77664,12 @@ async function getUntriagedLeads(limit2 = 50) {
          SELECT 1 FROM lead_triage lt
          WHERE lt.source_ref_id = bl.id AND lt.source_table = 'business_leads'
        )
+       AND LOWER(bl.name) NOT IN (
+         'e2e','e2e2','typo','tytjyt','katarinar','hope','kate',
+         'irina','maya','katya','marina','katerina','test','demo',
+         'sample','fake','elena revicheva'
+       )
+       AND REGEXP_LIKE(bl.name, '^[A-Za-z0-9]', 'i')
        ORDER BY bl.created_at DESC
        FETCH FIRST :1 ROWS ONLY`,
       [limit2]
@@ -77565,6 +77702,35 @@ async function getRepliedOutreach(limit2 = 20) {
     return result.rows || [];
   } catch (err) {
     console.error("getRepliedOutreach error:", err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+async function getUntriagedOutreachTargets(limit2 = 50) {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(ot.id), ot.name, ot.company, ot.email, ot.source,
+              ot.pain_point, ot.matched_system, ot.status, ot.email_status
+       FROM outreach_targets ot
+       WHERE NOT EXISTS (
+         SELECT 1 FROM lead_triage lt
+         WHERE lt.source_ref_id = HEXTORAW(RAWTOHEX(ot.id))
+           AND lt.source_table = 'outreach_targets'
+       )
+       AND (
+         (ot.email IS NOT NULL AND ot.email NOT LIKE 'founder@%' AND ot.email LIKE '%@%')
+         OR ot.pain_point IS NOT NULL
+       )
+       ORDER BY ot.created_at DESC
+       FETCH FIRST :1 ROWS ONLY`,
+      [limit2]
+    );
+    return result.rows || [];
+  } catch (err) {
+    console.error("getUntriagedOutreachTargets error:", err);
     return [];
   } finally {
     if (connection) await connection.close();
@@ -77683,6 +77849,88 @@ var init_knowledge_context = __esm({
   }
 });
 
+// src/llm-resilience.ts
+async function grokComplete(systemPrompt, userPrompt, maxTokens, label) {
+  const messages = systemPrompt ? [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] : [{ role: "user", content: userPrompt }];
+  const res = await fetch("https://api.x.ai/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${XAI_KEY()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: XAI_MODEL(), messages, max_tokens: Math.min(maxTokens, 8e3), temperature: 0.7 }),
+    signal: AbortSignal.timeout(12e4)
+  });
+  if (!res.ok) throw new Error(`xAI ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  const data2 = await res.json();
+  const text = data2.choices?.[0]?.message?.content?.trim() || "";
+  if (text) console.warn(`[${label}] Grok (xAI) fallback returned ${text.length} chars`);
+  return text;
+}
+function isAnthropicCreditExhaustion(e6) {
+  const msg = String(
+    e6?.error?.error?.message || e6?.message || e6 || ""
+  ).toLowerCase();
+  const status = e6?.status ?? e6?.statusCode ?? null;
+  return (status === 400 || msg.includes("400")) && (msg.includes("credit") || msg.includes("balance") || msg.includes("billing"));
+}
+function isAnthropicModelNotFound(e6) {
+  const msg = String(
+    e6?.error?.error?.message || e6?.message || e6 || ""
+  ).toLowerCase();
+  const status = e6?.status ?? e6?.statusCode ?? null;
+  return (status === 404 || msg.includes("404")) && (msg.includes("not_found") || msg.includes("model:"));
+}
+async function claudeWithGroqFallback(anthropic, model, maxTokens, systemPrompt, userPrompt, label) {
+  try {
+    const resp = await anthropic.messages.create({
+      model,
+      max_tokens: maxTokens,
+      ...systemPrompt ? { system: systemPrompt } : {},
+      messages: [{ role: "user", content: userPrompt }]
+    });
+    const block = resp.content[0];
+    return block && block.type === "text" ? block.text : "";
+  } catch (e6) {
+    const deadModel = isAnthropicModelNotFound(e6);
+    if (!isAnthropicCreditExhaustion(e6) && !deadModel) throw e6;
+    const reason = deadModel ? `Anthropic model not found (${model} \u2014 decommissioned? update the id)` : "Anthropic credit exhausted";
+    const groqKey = process.env.GROQ_API_KEY?.trim();
+    if (!groqKey && !XAI_KEY()) throw e6;
+    if (groqKey) {
+      try {
+        console.warn(`[${label}] ${reason} \u2014 falling back to Groq ${GROQ_FALLBACK_MODEL}`);
+        const groq = new groq_sdk_default({ apiKey: groqKey });
+        const messages = systemPrompt ? [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }] : [{ role: "user", content: userPrompt }];
+        const groqResp = await groq.chat.completions.create({
+          model: GROQ_FALLBACK_MODEL,
+          messages,
+          max_tokens: Math.min(maxTokens, GROQ_MAX_TOKENS),
+          temperature: 0.7
+        });
+        const text = groqResp.choices[0]?.message?.content?.trim() || "";
+        if (text) console.warn(`[${label}] Groq fallback returned ${text.length} chars`);
+        return text;
+      } catch (ge2) {
+        if (!XAI_KEY()) throw ge2;
+        const gmsg = ge2 instanceof Error ? ge2.message : String(ge2);
+        console.warn(`[${label}] Groq failed (${gmsg.slice(0, 100)}) \u2014 falling back to Grok ${XAI_MODEL()}`);
+        return grokComplete(systemPrompt, userPrompt, maxTokens, label);
+      }
+    }
+    console.warn(`[${label}] ${reason} \u2014 falling back to Grok ${XAI_MODEL()}`);
+    return grokComplete(systemPrompt, userPrompt, maxTokens, label);
+  }
+}
+var GROQ_FALLBACK_MODEL, GROQ_MAX_TOKENS, XAI_MODEL, XAI_KEY;
+var init_llm_resilience = __esm({
+  "src/llm-resilience.ts"() {
+    "use strict";
+    init_groq_sdk();
+    GROQ_FALLBACK_MODEL = "llama-3.3-70b-versatile";
+    GROQ_MAX_TOKENS = 8e3;
+    XAI_MODEL = () => (process.env.XAI_MODEL || "grok-4.20-0309-non-reasoning").trim();
+    XAI_KEY = () => process.env.XAI_API_KEY?.trim() || "";
+  }
+});
+
 // src/trello-kanban.ts
 var trello_kanban_exports = {};
 __export(trello_kanban_exports, {
@@ -77754,13 +78002,14 @@ async function analyzeKanban() {
 # Your Trello workspace (${boards.length} boards, ${totalCards} total cards)
 
 ${boardsText}`;
-  const msg = await anthropic.messages.create({
-    model: "claude-opus-4-20250514",
-    max_tokens: 4096,
-    messages: [{ role: "user", content: prompt }]
-  });
-  const block = msg.content[0];
-  return block && block.type === "text" ? block.text : "(no analysis returned)";
+  return await claudeWithGroqFallback(
+    anthropic,
+    "claude-opus-4-8",
+    4096,
+    null,
+    prompt,
+    "trello-kanban/analyze"
+  ) || "(no analysis returned)";
 }
 function isTodayColumn(name) {
   const lower = name.toLowerCase();
@@ -77798,6 +78047,7 @@ var init_trello_kanban = __esm({
   "src/trello-kanban.ts"() {
     "use strict";
     init_sdk();
+    init_llm_resilience();
     KANBAN_ANALYSIS_PROMPT = `You are a Kanban expert analyzing a personal productivity board.
 
 Apply strict Kanban philosophy:
@@ -88331,7 +88581,66 @@ async function fetchLinearSprintSignals(apiKey, _teamId) {
 
 // src/sprint-briefing/synthesize.ts
 var GROQ_MODEL = process.env.SPRINT_BRIEFING_GROQ_MODEL || "llama-3.3-70b-versatile";
-var CLAUDE_MODEL = process.env.SPRINT_BRIEFING_CLAUDE_MODEL || "claude-sonnet-4-20250514";
+var CLAUDE_MODEL = process.env.SPRINT_BRIEFING_CLAUDE_MODEL || "claude-sonnet-4-6";
+var GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+var OPENAI_MODEL = process.env.SPRINT_BRIEFING_OPENAI_MODEL || "gpt-4o-mini";
+async function openaiText(prompt, maxTokens = 4096) {
+  const key = process.env.OPENAI_API_KEY?.trim();
+  if (!key) return "";
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: Math.min(maxTokens, 8192),
+        temperature: 0.3
+      }),
+      signal: AbortSignal.timeout(9e4)
+    });
+    if (!res.ok) {
+      console.warn(`[sprint] OpenAI ${res.status}: ${(await res.text()).slice(0, 120)}`);
+      return "";
+    }
+    const d6 = await res.json();
+    const t2 = (d6.choices?.[0]?.message?.content || "").trim();
+    if (t2) console.log(`[sprint] OpenAI (${OPENAI_MODEL}) returned ${t2.length} chars`);
+    return t2;
+  } catch (e6) {
+    console.warn("[sprint] OpenAI failed:", e6 instanceof Error ? e6.message : String(e6));
+    return "";
+  }
+}
+async function geminiText(prompt, maxTokens = 4096) {
+  const key = process.env.GEMINI_API_KEY?.trim();
+  if (!key) return "";
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent?key=${encodeURIComponent(key)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: Math.min(maxTokens, 8192), temperature: 0.3, thinkingConfig: { thinkingBudget: 0 } }
+        }),
+        signal: AbortSignal.timeout(9e4)
+      }
+    );
+    if (!res.ok) {
+      console.warn(`[sprint] Gemini ${res.status}: ${(await res.text()).slice(0, 120)}`);
+      return "";
+    }
+    const d6 = await res.json();
+    const t2 = (d6.candidates?.[0]?.content?.parts || []).map((p3) => p3.text || "").join("").trim();
+    if (t2) console.log(`[sprint] Gemini (${GEMINI_MODEL}) returned ${t2.length} chars`);
+    return t2;
+  } catch (e6) {
+    console.warn("[sprint] Gemini failed:", e6 instanceof Error ? e6.message : String(e6));
+    return "";
+  }
+}
 async function clusterSignalsWithGroq(groq, rawDigest) {
   const prompt = `You are a delivery lead extracting STRUCTURED FACTS from raw sprint signals.
 
@@ -88348,14 +88657,21 @@ ${rawDigest.slice(0, 12e4)}
 ---
 
 Keep under 1200 words. Be factual \u2014 no invention.`;
-  const completion = await groq.chat.completions.create({
-    model: GROQ_MODEL,
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.2,
-    max_tokens: 4096
-  });
-  const text = completion.choices[0]?.message?.content;
-  return typeof text === "string" ? text : "";
+  try {
+    const completion = await groq.chat.completions.create({
+      model: GROQ_MODEL,
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.2,
+      max_tokens: 4096
+    });
+    const text = completion.choices[0]?.message?.content;
+    if (typeof text === "string" && text.trim()) return text;
+  } catch (err) {
+    console.warn(`[sprint] Groq clustering failed (${err?.status ?? (err instanceof Error ? err.message : "")}) \u2014 trying Gemini`);
+  }
+  const oai = await openaiText(prompt, 4096);
+  if (oai) return oai;
+  return await geminiText(prompt, 4096);
 }
 async function writeBriefingNarrative(anthropic, clusterMarkdown, rawDigest) {
   const prompt = `Write a SPOKEN morning briefing for Elena Revicheva \u2014 a solo technical founder (3-5 minutes when read aloud).
@@ -88380,6 +88696,31 @@ ${clusterMarkdown}
 RAW SIGNALS (live data \u2014 use these):
 ${rawDigest.slice(0, 6e4)}
 `;
+  const groqKey = process.env.GROQ_API_KEY?.trim();
+  if (groqKey) {
+    try {
+      const { default: Groq2 } = await Promise.resolve().then(() => (init_groq_sdk(), groq_sdk_exports));
+      const groq = new Groq2({ apiKey: groqKey });
+      const completion = await groq.chat.completions.create({
+        model: GROQ_MODEL,
+        messages: [{ role: "user", content: prompt.slice(0, 28e3) }],
+        temperature: 0.3,
+        max_tokens: 4096
+      });
+      const text = completion.choices[0]?.message?.content;
+      if (typeof text === "string" && text.trim()) {
+        console.log("[sprint] Groq narrative succeeded");
+        return text;
+      }
+    } catch (err) {
+      console.warn(`[sprint] Groq narrative failed (${err?.status ?? (err instanceof Error ? err.message : "")}) \u2014 trying OpenAI`);
+    }
+  }
+  const oai = await openaiText(prompt.slice(0, 12e4), 4096);
+  if (oai) {
+    console.log("[sprint] OpenAI narrative succeeded");
+    return oai;
+  }
   try {
     const msg = await anthropic.messages.create({
       model: CLAUDE_MODEL,
@@ -88387,25 +88728,19 @@ ${rawDigest.slice(0, 6e4)}
       messages: [{ role: "user", content: prompt }]
     });
     const block = msg.content[0];
-    return block && block.type === "text" ? block.text : "";
+    if (block && block.type === "text" && block.text.trim()) {
+      console.log("[sprint] Claude narrative succeeded");
+      return block.text;
+    }
   } catch (err) {
-    const status = err?.status;
-    if (status !== 400 && status !== 529 && status !== 503) throw err;
-    console.warn(`[sprint] Claude narrative failed (${status}) \u2014 falling back to Groq`);
+    console.warn(`[sprint] Claude narrative failed (${err?.status})`);
   }
-  const groqKey = process.env.GROQ_API_KEY?.trim();
-  if (!groqKey) throw new Error("Claude narrative failed and GROQ_API_KEY not set \u2014 no fallback available");
-  const { default: Groq2 } = await Promise.resolve().then(() => (init_groq_sdk(), groq_sdk_exports));
-  const groq = new Groq2({ apiKey: groqKey });
-  const completion = await groq.chat.completions.create({
-    model: GROQ_MODEL,
-    messages: [{ role: "user", content: prompt.slice(0, 28e3) }],
-    temperature: 0.3,
-    max_tokens: 4096
-  });
-  const text = completion.choices[0]?.message?.content;
-  console.log("[sprint] Groq narrative fallback succeeded");
-  return typeof text === "string" ? text : "";
+  const gem = await geminiText(prompt.slice(0, 12e4), 4096);
+  if (gem) {
+    console.log("[sprint] Gemini narrative succeeded");
+    return gem;
+  }
+  throw new Error("All narrative providers failed (Groq capped, OpenAI failed, Claude credit-dead, Gemini empty/capped)");
 }
 
 // src/sprint-briefing/tts-openai.ts
