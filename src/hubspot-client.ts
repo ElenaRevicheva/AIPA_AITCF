@@ -529,6 +529,12 @@ export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: 
   if (!(lead.email || lead.domain || lead.website || lead.linkedinUrl)) {
     return { ok: false, reason: 'no reachable identity (no email/domain/site/linkedin)' };
   }
+  // A direct portfolio-form submission IS the buying signal — a human chose to
+  // write in. The keyword intent gate below is for scraped/passive sources only.
+  // (July 12 2026: gate was silently dropping real form inquiries.)
+  if (lead.sourcePrefix === 'CLIENT-CTO-INQUIRY') {
+    return { ok: true, reason: 'qualified: direct form inquiry (active by definition)' };
+  }
   // 2) Must show ACTIVE demand for AI/technical-build help (not a passive scraped repo).
   const text = [lead.company, lead.painPoint, lead.matchedSystem, lead.source]
     .filter(Boolean).join(' ').toLowerCase();
