@@ -30,18 +30,20 @@ Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely
 
 ---
 
-## 🟢 Lead Concierge — Fable 5 in Make.com (July 11 2026) — runs in MAKE CLOUD, not on Oracle
+## 🟢 Lead Concierge — Fable 5 in Make.com + Oracle one-tap send (v3, July 12 2026)
 
-**What it is:** every new portfolio inquiry (HubSpot contact) gets a personalized reply draft from Claude Fable 5 delivered to Elena's Telegram for one-tap approval. **Nothing runs on this VM** — the scenario lives in Make.com cloud (scenario `5633833`, us2, org `938264`, paid plan, ALWAYS-ON polling every 15 min). Health-check scripts on Oracle do NOT cover it.
+**What it is:** every new portfolio inquiry becomes a Fable 5 reply draft in Elena's Telegram with **[✅ Send now] [✏️ Edit] [🗑 Skip]** buttons; one tap emails the lead from `aipa@aideazz.xyz` (reply-to Elena's gmail) and logs the sent text as a **note on the HubSpot contact** (CRM trail). Make cloud does the AI drafting (scenario `5633833`, us2, org `938264`, paid plan, ALWAYS-ON polling every 15 min); **the buttons/send/notes run on THIS VM inside `cto-aipa`** (`src/concierge.ts`).
 
-**Flow:** HubSpot "Watch CRM Objects" (Contacts/Created; inquiries arrive via the existing InquiryForm → cto-aipa inquiry-proxy → HubSpot path — untouched) → Anthropic Claude module (`claude-fable-5`, max 1500 tokens, full-portfolio system prompt; verbatim prompt in `docs/make-fable5/LEAD_CONCIERGE_SETUP.md`) → Telegram Bot sendMessage (Elena's chat `5481526862`, Text = `{{3.textResponse}}` "Text Response" — NOT `3.text`).
+**Flow (v3):** InquiryForm → cto-aipa `/marketing/inquiry-proxy` → `business_leads` + **INSTANT HubSpot push** (July 12: no longer waits for the 08:00 UTC triage cron; `CLIENT-CTO-INQUIRY` bypasses the buying-intent keyword gate; the inquiry text is written to the contact's `message` property) → Make "Watch CRM Objects" (Contacts/**Created** — updates do NOT fire) → Anthropic Claude module (`claude-fable-5`, max 1500) → **HTTP module POST `https://webhook.aideazz.xyz/cto/concierge/draft`** (Bearer `CONCIERGE_SECRET` from Oracle `.env`; body form-urlencoded, single field `claude_output` = Text Response chip) → cto-aipa resolves the recipient itself (`findRecentContacts(45)` + first-name-in-draft match; ambiguous → TG notice WITHOUT button, never wrong-recipient sends) → Telegram buttons → tap → Resend email + HubSpot contact note. Drafts persist in `data/concierge/` (gitignored). Edit = REPLY to the draft TG message with full edited text (20+ chars) → that version is sent.
 
-**Failure modes + fixes (learned during the July 11 build):**
-- `[400] credit balance is too low` → Anthropic API is prepaid, separate from chat subscriptions — top up at console.anthropic.com Plans & Billing.
-- Telegram "Validation failed for 1 parameter(s)" → Text field mapped to non-existent `3.text`; correct output field is `Text Response` (`textResponse`).
-- Fable 5 reports "inquiry came through empty" → field-mapping resolved blank; durable fix in place: the prompt passes the HubSpot module's raw `[bundle]` output as full JSON and the model extracts name/email/company/message itself (immune to property-path bugs). If it regresses, check that bundle chip survived edits.
+**Failure modes + fixes:**
+- `[400] credit balance is too low` (Make Claude module) → Anthropic API is prepaid — top up at console.anthropic.com Plans & Billing.
+- No TG message after a form submit → check contact was **created** not updated (reused email = update = no trigger), then `grep concierge ~/.pm2/logs/cto-aipa-out-9.log` for `/concierge/draft` arrival, then Make execution history.
+- "Recipient could not be determined" TG notice → >1 contact created in the 45-min window with no name match; reply manually from the notice.
+- Confirmation/reply emails "not received" → Resend accepted + DNS verified OK (DKIM `resend._domainkey`, SPF on `send.aideazz.xyz`, DMARC p=none): **check Gmail Spam** — cold sender reputation; verify true delivery status in the Resend dashboard (API key is send-only, can't query events).
 - Scenario won't toggle ON → Make active-scenario plan limit.
-- Trigger pointer consumes contacts per run — re-testing needs a NEW test contact.
+- Trigger pointer consumes contacts per run — re-testing needs a NEW test contact (fresh email, gmail `+alias` works).
+- Buttons dead after pm2 restart → drafts survive (`data/concierge/`), but reply-to-edit needs the draft's `tgMessageId` — drafts created before July 12 evening lack it.
 
 **Case study published July 11 (the meta-play):** https://dev.to/elenarevicheva/how-i-wired-claude-fable-5-into-makecom-to-answer-my-portfolio-leads-8-days-after-launch-h93 (+ LinkedIn via Buffer, + Make Community). Watch HubSpot for `utm_campaign=fable5-case-study`.
 
