@@ -120,13 +120,31 @@ export function registerConciergeRoutes(app: Express): void {
       return;
     }
     const b = (req.body || {}) as Record<string, unknown>;
-    const email = typeof b.email === 'string' ? b.email.trim() : '';
-    const name = typeof b.name === 'string' ? b.name.trim() : '';
-    const inquiry = typeof b.inquiry === 'string' ? b.inquiry.trim() : '';
+    let email = typeof b.email === 'string' ? b.email.trim() : '';
+    let name = typeof b.name === 'string' ? b.name.trim() : '';
+    let inquiry = typeof b.inquiry === 'string' ? b.inquiry.trim() : '';
     const claudeOutput =
       typeof b.claude_output === 'string' ? b.claude_output : typeof b.draft === 'string' ? b.draft : '';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      res.status(400).json({ error: 'Valid lead email required' });
+    // Make's per-property chips can arrive blank (the raw-record chip is the
+    // reliable one — see LEAD_CONCIERGE_SETUP.md second fix). Fall back to
+    // extracting from the raw HubSpot record JSON when direct fields are empty.
+    const raw = typeof b.raw === 'string' ? b.raw : '';
+    const emailOk = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+    if (!emailOk(email) && raw) {
+      const m = raw.match(/"email"\s*:\s*"([^"]+@[^"]+)"/i);
+      if (m?.[1] && emailOk(m[1])) email = m[1];
+      if (!name) {
+        const fn = raw.match(/"firstname"\s*:\s*"([^"]*)"/i)?.[1] || '';
+        const ln = raw.match(/"lastname"\s*:\s*"([^"]*)"/i)?.[1] || '';
+        name = `${fn} ${ln}`.trim();
+      }
+      if (!inquiry) {
+        const msg = raw.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)"/i)?.[1] || '';
+        inquiry = msg.replace(/\\n/g, '\n').replace(/\\"/g, '"').slice(0, 1000);
+      }
+    }
+    if (!emailOk(email)) {
+      res.status(400).json({ error: 'Valid lead email required (direct field or raw record)' });
       return;
     }
     if (!claudeOutput.trim()) {
