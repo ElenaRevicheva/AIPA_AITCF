@@ -146,10 +146,6 @@ export function registerConciergeRoutes(app: Express): void {
         inquiry = msg.replace(/\\n/g, '\n').replace(/\\"/g, '"').slice(0, 1000);
       }
     }
-    if (!emailOk(email)) {
-      res.status(400).json({ error: 'Valid lead email required (direct field or raw record)' });
-      return;
-    }
     if (!claudeOutput.trim()) {
       res.status(400).json({ error: 'claude_output (Fable 5 text) required' });
       return;
@@ -157,8 +153,37 @@ export function registerConciergeRoutes(app: Express): void {
 
     const { draft, subject, spam } = parseClaudeOutput(claudeOutput);
     if (spam) {
-      await sendTelegram(`🚫 Concierge: Fable 5 flagged the inquiry from ${name || email} as SPAM — no reply drafted.`);
+      await sendTelegram(`🚫 Concierge: Fable 5 flagged the inquiry from ${name || email || 'unknown'} as SPAM — no reply drafted.`);
       res.json({ ok: true, spam: true });
+      return;
+    }
+
+    // Make forwards only the draft text; resolve the recipient from HubSpot:
+    // contacts created in the ~poll window whose first name appears in the
+    // draft's opening. Send button only when the match is unambiguous — a
+    // wrong-recipient email is worse than no button.
+    if (!emailOk(email)) {
+      try {
+        const { findRecentContacts } = await import('./hubspot-client');
+        const recent = (await findRecentContacts(45)).filter((c) => emailOk(c.email));
+        const head = draft.slice(0, 300).toLowerCase();
+        const named = recent.filter((c) => c.firstname && head.includes(c.firstname.toLowerCase()));
+        const pick = named.length === 1 ? named[0]! : recent.length === 1 ? recent[0]! : null;
+        if (pick) {
+          email = pick.email;
+          if (!name) name = `${pick.firstname} ${pick.lastname}`.trim() || pick.email;
+          if (!inquiry) inquiry = (pick.message || '').slice(0, 1000);
+          console.log(`[concierge] recipient resolved from HubSpot: ${email}`);
+        }
+      } catch (e) {
+        console.warn('[concierge] HubSpot recipient lookup failed:', (e as Error).message?.slice(0, 80));
+      }
+    }
+    if (!emailOk(email)) {
+      await sendTelegram(
+        `⚠️ Concierge: a Fable 5 draft arrived but the recipient could not be determined unambiguously — reply manually.\n\n${draft.slice(0, 3200)}`
+      );
+      res.json({ ok: true, unresolved: true });
       return;
     }
 

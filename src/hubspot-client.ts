@@ -181,6 +181,36 @@ export async function findContactByEmail(email: string): Promise<string | null> 
   return data?.results?.[0]?.id ?? null;
 }
 
+/**
+ * Contacts created in the last N minutes. Lead Concierge uses this to resolve
+ * the reply recipient when Make only forwards the Fable 5 draft text.
+ */
+export async function findRecentContacts(sinceMinutes: number): Promise<Array<{
+  id: string;
+  email: string;
+  firstname: string;
+  lastname: string;
+  message: string;
+}>> {
+  const since = Date.now() - sinceMinutes * 60_000;
+  const data = await hsPost<{ results: Array<{ id: string; properties: Record<string, string | null> }> }>(
+    '/crm/v3/objects/contacts/search',
+    {
+      filterGroups: [{ filters: [{ propertyName: 'createdate', operator: 'GTE', value: String(since) }] }],
+      properties: ['email', 'firstname', 'lastname', 'message'],
+      sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+      limit: 10,
+    },
+  );
+  return (data?.results ?? []).map((r) => ({
+    id: r.id,
+    email: r.properties?.email ?? '',
+    firstname: r.properties?.firstname ?? '',
+    lastname: r.properties?.lastname ?? '',
+    message: r.properties?.message ?? '',
+  }));
+}
+
 /** Create or update a contact. Returns HubSpot contact ID. */
 export async function upsertContact(input: {
   email?: string | undefined;
