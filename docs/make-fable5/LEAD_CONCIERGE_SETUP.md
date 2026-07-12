@@ -34,6 +34,36 @@
    text = `{{Claude response text}}`.
 6. Turn scenario **ON**. Test by submitting the portfolio inquiry form once yourself.
 
+## v2 — one-tap send (July 12 2026)
+
+Module 3 is now **HTTP → CTO AIPA** instead of a plain Telegram message. CTO AIPA
+sends Elena the Telegram message itself, with **[✅ Send now] / [🗑 Skip] buttons**;
+tapping Send emails the Fable 5 reply to the lead via Resend (aipa@aideazz.xyz,
+reply-to Elena's gmail). Drafts persist in `data/concierge/` on Oracle.
+
+**Module 3 (HTTP "Make a request") config:**
+- URL: `https://webhook.aideazz.xyz/cto/concierge/draft`
+- Method: POST · Body type: Raw · Content type: JSON (application/json)
+- Headers: `Authorization: Bearer <CONCIERGE_SECRET from Oracle .env>`
+- Request content (map the chips):
+```json
+{
+  "email": "<module-1 email chip>",
+  "name": "<module-1 firstname+lastname chips>",
+  "inquiry": "<module-1 message chip>",
+  "raw": <module-1 RAW HUBSPOT RECORD chip, in quotes>,
+  "claude_output": <module-3 Text Response chip, in quotes>
+}
+```
+- If the direct property chips are blank (known Make quirk), the server extracts
+  email/name/message from `raw` automatically — mapping `raw` + `claude_output`
+  alone is enough.
+- SPAM verdicts from Fable 5 become a plain Telegram notice, no button.
+
+Also July 12: `/marketing/inquiry-proxy` now pushes every form inquiry to HubSpot
+**immediately** (commit `43dac73`) — the daily 08:00 UTC triage cron is enrichment,
+no longer the only path. Form → HubSpot contact in seconds → Make fires on next poll.
+
 ## Cost guardrail
 
 - Fable 5 is Anthropic's most expensive model. This scenario calls it **only when a real
