@@ -115,6 +115,33 @@ async function sendTelegram(
   return data.result?.message_id ?? null;
 }
 
+/**
+ * CRM trail (fire-and-forget): after a successful send, log the reply as a
+ * note on the lead's HubSpot contact so the CRM shows what was sent and when.
+ */
+function logReplyToHubSpot(d: ConciergeDraft, edited: boolean): void {
+  setImmediate(async () => {
+    try {
+      const { findContactByEmail, addNoteToContact } = await import('./hubspot-client');
+      const contactId = await findContactByEmail(d.email);
+      if (!contactId) {
+        console.warn(`[concierge] CRM trail: no HubSpot contact for ${d.email} — note not logged`);
+        return;
+      }
+      const esc = (s: string) =>
+        s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+      await addNoteToContact(
+        contactId,
+        `<strong>📧 Lead Concierge reply SENT${edited ? ' (edited in Telegram)' : ' (one-tap)'}</strong><br>` +
+          `Sent: ${d.sentAt}<br>From: aipa@aideazz.xyz · Subject: ${esc(d.subject)}<br><br>${esc(d.draft)}`
+      );
+      console.log(`[concierge] CRM trail: note logged on contact ${contactId} (${d.email})`);
+    } catch (e) {
+      console.warn('[concierge] CRM trail failed (non-fatal):', (e as Error).message?.slice(0, 80));
+    }
+  });
+}
+
 /** Find a pending draft by the Telegram message that carries its buttons. */
 function findDraftByTgMessage(messageId: number): ConciergeDraft | null {
   try {
@@ -281,6 +308,7 @@ export function registerConciergeCallbacks(bot: Bot): void {
       await ctx.editMessageText(
         `✅ SENT to ${d.name} <${d.email}> at ${d.sentAt}\n📧 Subject: ${d.subject}\n\n${d.draft.slice(0, 3500)}`
       );
+      logReplyToHubSpot(d, false);
       console.log(`[concierge] draft ${d.id} SENT to ${d.email}`);
     } catch (e) {
       const msg = (e as Error)?.message || String(e);
@@ -315,6 +343,7 @@ export function registerConciergeCallbacks(bot: Bot): void {
       d.sentAt = new Date().toISOString();
       saveDraft(d);
       await ctx.reply(`✅ Your edited version was SENT to ${d.name} <${d.email}>.\n📧 Subject: ${d.subject}`);
+      logReplyToHubSpot(d, true);
       console.log(`[concierge] draft ${d.id} SENT (edited) to ${d.email}`);
     } catch (e) {
       const msg = (e as Error)?.message || String(e);
