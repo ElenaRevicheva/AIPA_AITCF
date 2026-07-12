@@ -448,7 +448,12 @@ export function initTelegramBot(): Bot | null {
       await ctx.reply('⛔ Sorry, you are not authorized to use this bot.');
     }
   });
-  
+
+  // Lead Concierge buttons + edited-draft replies. Registered before every
+  // other handler so a reply to a concierge draft is consumed here and never
+  // falls through to the AI chat handler.
+  registerConciergeCallbacks(bot);
+
   // ==========================================================================
   // COMMANDS
   // ==========================================================================
@@ -7561,9 +7566,6 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
       await ctx.reply(`❌ Trello analysis failed: ${msg}\n\nCheck that TRELLO_API_KEY and TRELLO_TOKEN are set in .env on Oracle.`);
     }
   });
-
-  // Lead Concierge [✅ Send now] / [🗑 Skip] buttons (must register before bot.start)
-  registerConciergeCallbacks(bot);
 
   // ==========================================================================
   // START BOT & SCHEDULED TASKS

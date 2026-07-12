@@ -33,6 +33,7 @@ interface ConciergeDraft {
   status: 'pending' | 'sent' | 'skipped';
   createdAt: string;
   sentAt?: string;
+  tgMessageId?: number;
 }
 
 function draftPath(id: string): string {
@@ -90,12 +91,12 @@ async function sendReplyEmail(d: ConciergeDraft): Promise<void> {
 async function sendTelegram(
   text: string,
   keyboard?: { text: string; callback_data: string }[][]
-): Promise<void> {
+): Promise<number | null> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.CONCIERGE_TG_CHAT?.trim();
   if (!token || !chatId) {
     console.warn('[concierge] TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT not set — no TG notify');
-    return;
+    return null;
   }
   const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
@@ -106,7 +107,26 @@ async function sendTelegram(
       ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
     }),
   });
-  if (!r.ok) console.error('[concierge] TG send failed:', (await r.text()).slice(0, 200));
+  if (!r.ok) {
+    console.error('[concierge] TG send failed:', (await r.text()).slice(0, 200));
+    return null;
+  }
+  const data = (await r.json()) as { result?: { message_id?: number } };
+  return data.result?.message_id ?? null;
+}
+
+/** Find a pending draft by the Telegram message that carries its buttons. */
+function findDraftByTgMessage(messageId: number): ConciergeDraft | null {
+  try {
+    for (const f of fs.readdirSync(DRAFT_DIR)) {
+      if (!f.endsWith('.json')) continue;
+      const d = JSON.parse(fs.readFileSync(path.join(DRAFT_DIR, f), 'utf8')) as ConciergeDraft;
+      if (d.tgMessageId === messageId) return d;
+    }
+  } catch {
+    /* no drafts dir yet */
+  }
+  return null;
 }
 
 export function registerConciergeRoutes(app: Express): void {
@@ -197,32 +217,34 @@ export function registerConciergeRoutes(app: Express): void {
       status: 'pending',
       createdAt: new Date().toISOString(),
     };
-    saveDraft(d);
-    await sendTelegram(
+    const tgMessageId = await sendTelegram(
       `📨 New lead: ${d.name} <${d.email}>\n` +
         (inquiry ? `\n💬 They wrote:\n${inquiry.slice(0, 500)}\n` : '') +
         `\n✍️ Fable 5 draft:\n──────────\n${draft}\n──────────\n📧 Subject: ${subject}`,
       [
         [
           { text: '✅ Send now', callback_data: `cz:send:${d.id}` },
+          { text: '✏️ Edit', callback_data: `cz:edit:${d.id}` },
           { text: '🗑 Skip', callback_data: `cz:skip:${d.id}` },
         ],
       ]
     );
+    if (tgMessageId) d.tgMessageId = tgMessageId;
+    saveDraft(d);
     console.log(`[concierge] draft ${d.id} stored for ${d.email}, TG notify sent`);
     res.json({ ok: true, id: d.id });
   });
 }
 
-/** Must be called BEFORE bot.start() (grammY registers middleware at start). */
+/** Must be called BEFORE the catch-all chat handlers and bot.start(). */
 export function registerConciergeCallbacks(bot: Bot): void {
-  bot.callbackQuery(/^cz:(send|skip):([a-f0-9]{16})$/, async (ctx) => {
+  bot.callbackQuery(/^cz:(send|skip|edit):([a-f0-9]{16})$/, async (ctx) => {
     const allowedChat = process.env.CONCIERGE_TG_CHAT?.trim();
     if (allowedChat && String(ctx.chat?.id) !== allowedChat) {
       await ctx.answerCallbackQuery({ text: 'Not authorized' });
       return;
     }
-    const action = ctx.match![1] as 'send' | 'skip';
+    const action = ctx.match![1] as 'send' | 'skip' | 'edit';
     const id = ctx.match![2]!;
     const d = loadDraft(id);
     if (!d) {
@@ -231,6 +253,14 @@ export function registerConciergeCallbacks(bot: Bot): void {
     }
     if (d.status !== 'pending') {
       await ctx.answerCallbackQuery({ text: `Already ${d.status}` });
+      return;
+    }
+
+    if (action === 'edit') {
+      await ctx.answerCallbackQuery();
+      await ctx.reply(
+        `✏️ To send your own version to ${d.name} <${d.email}>:\n\nREPLY to the draft message above (swipe/long-press it → Reply) with the full edited text. I'll email exactly what you write, same subject line. The buttons on the original stay active until you send or skip.`
+      );
       return;
     }
 
@@ -257,6 +287,39 @@ export function registerConciergeCallbacks(bot: Bot): void {
       console.error(`[concierge] send failed for ${d.id}:`, msg);
       await ctx.answerCallbackQuery({ text: 'Send failed — see message' });
       await ctx.reply(`❌ Concierge send to ${d.email} failed: ${msg.slice(0, 300)}\nDraft ${d.id} is still pending — tap Send again to retry.`);
+    }
+  });
+
+  // Edited-draft path: a text reply to a concierge draft message sends the
+  // edited text to the lead. Anything else falls through to the normal bot.
+  bot.on('message:text', async (ctx, next) => {
+    const repliedTo = ctx.message.reply_to_message?.message_id;
+    if (!repliedTo) return next();
+    const allowedChat = process.env.CONCIERGE_TG_CHAT?.trim();
+    if (allowedChat && String(ctx.chat?.id) !== allowedChat) return next();
+    const d = findDraftByTgMessage(repliedTo);
+    if (!d) return next();
+    if (d.status !== 'pending') {
+      await ctx.reply(`This draft was already ${d.status} — nothing sent.`);
+      return;
+    }
+    const edited = ctx.message.text.trim();
+    if (edited.length < 20) {
+      await ctx.reply('That looks too short to be a full reply — nothing sent. Reply again with the complete edited text.');
+      return;
+    }
+    try {
+      d.draft = edited;
+      await sendReplyEmail(d);
+      d.status = 'sent';
+      d.sentAt = new Date().toISOString();
+      saveDraft(d);
+      await ctx.reply(`✅ Your edited version was SENT to ${d.name} <${d.email}>.\n📧 Subject: ${d.subject}`);
+      console.log(`[concierge] draft ${d.id} SENT (edited) to ${d.email}`);
+    } catch (e) {
+      const msg = (e as Error)?.message || String(e);
+      console.error(`[concierge] edited send failed for ${d.id}:`, msg);
+      await ctx.reply(`❌ Send failed: ${msg.slice(0, 300)}\nDraft is still pending — reply again or tap Send.`);
     }
   });
 }
