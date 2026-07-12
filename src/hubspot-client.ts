@@ -220,6 +220,8 @@ export async function upsertContact(input: {
   linkedinUrl?: string | undefined;
   source?: string | undefined;
   notes?: string | undefined;
+  /** Inquiry text → contact `message` property (Make Lead Concierge reads it). */
+  message?: string | undefined;
 }): Promise<string | null> {
   // Try to find existing by email first
   if (input.email) {
@@ -231,6 +233,7 @@ export async function upsertContact(input: {
           ...(input.company    ? { company: input.company }          : {}),
           ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
           ...(input.source     ? { lead_source: input.source }        : {}),
+          ...(input.message    ? { message: input.message.slice(0, 5000) } : {}),
         },
       });
       console.log(`[HubSpot] Updated contact ${existingId} (${input.email})`);
@@ -253,6 +256,7 @@ export async function upsertContact(input: {
         ...(input.company   ? { company: input.company }           : {}),
         ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
         ...(input.source    ? { hs_lead_status: 'NEW' } : {}),
+        ...(input.message   ? { message: input.message.slice(0, 5000) } : {}),
       },
     },
   );
@@ -479,6 +483,8 @@ export interface LeadForHubSpot {
   linkedinUrl?: string | undefined;
   source?: string | undefined;
   painPoint?: string | undefined;
+  /** Raw inquiry text → contact `message` property (Lead Concierge context). */
+  message?: string | undefined;
   matchedSystem?: string | undefined;
   stage?: HSDealStage | undefined;
   /** e.g. 'CLIENT-CTO-INGEST' or 'CLIENT-ALGOM' — wrapped in [brackets] as dealname prefix */
@@ -727,6 +733,7 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
           company:      lead.company,
           linkedinUrl:  lead.linkedinUrl,
           source:       lead.source ?? 'AI Marketing Engine',
+          message:      lead.message,
         })
       : null;
 

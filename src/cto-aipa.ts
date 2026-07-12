@@ -1268,6 +1268,7 @@ async function startCTOAIPA() {
         const hs = await pushLeadToHubSpot({
           name: name || contactEmail || 'Inquiry via aideazz.xyz',
           email: contactEmail || '',
+          ...(message ? { message } : {}),
           source: utm_source || 'aideazz_inquiry_form',
           sourcePrefix: 'CLIENT-CTO-INQUIRY',
           painPoint: contextParts.join(' | ') || 'Direct inquiry from aideazz.xyz contact form',
