@@ -37,9 +37,14 @@
 ## v2 — one-tap send (July 12 2026)
 
 Module 3 is now **HTTP → CTO AIPA** instead of a plain Telegram message. CTO AIPA
-sends Elena the Telegram message itself, with **[✅ Send now] / [🗑 Skip] buttons**;
-tapping Send emails the Fable 5 reply to the lead via Resend (aipa@aideazz.xyz,
-reply-to Elena's gmail). Drafts persist in `data/concierge/` on Oracle.
+sends Elena the Telegram message itself, with **[✅ Send now] / [✏️ Edit] / [🗑 Skip]**
+buttons; tapping Send emails the Fable 5 reply to the lead via Resend
+(aipa@aideazz.xyz, reply-to Elena's gmail). **Edit-before-send:** REPLY to the
+draft message in Telegram with the full edited text (20+ chars) and that version
+is emailed instead, same subject. Drafts persist in `data/concierge/` on Oracle.
+Recipient is resolved server-side from HubSpot contacts created in the last
+45 min (first-name match in the draft opening) — the HTTP module only needs the
+single `claude_output` field; ambiguous recipients get a no-button TG notice.
 
 **Module 3 (HTTP "Make a request") config:**
 - URL: `https://webhook.aideazz.xyz/cto/concierge/draft`
