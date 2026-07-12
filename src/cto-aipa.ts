@@ -16,6 +16,7 @@ import {
   getRecentContentLogs,
 } from './database';
 import { initTelegramBot, sendTelegramBroadcast } from './telegram-bot';
+import { registerConciergeRoutes } from './concierge';
 import { initAtuonaBot } from './atuona-creative-ai';
 import { filmsOutDir, listFilms, shotsDir } from './atuona-film-compiler';
 import {
@@ -1231,6 +1232,69 @@ async function startCTOAIPA() {
   // MARKETING — UTM inbound (aideazz.xyz contact form → Oracle business_leads)
   // ==========================================================================
 
+  /**
+   * Instant HubSpot push shared by /marketing/inquiry (Bearer) and the public
+   * form proxy. July 12 2026: the proxy previously only queued for the daily
+   * 08:00 UTC triage cron, so form → HubSpot took up to 24h and vague-but-real
+   * inquiries were dropped by the urgency gate. A person filling the form is the
+   * hottest signal we have — push immediately, triage still enriches later.
+   */
+  function pushInquiryToHubSpotNow(fields: {
+    name?: string;
+    contactEmail?: string;
+    message?: string;
+    utm_source?: string;
+    utm_campaign?: string;
+    utm_term?: string;
+    utm_content?: string;
+    page_url?: string;
+  }): void {
+    const { name, contactEmail, message, utm_source, utm_campaign, utm_term, utm_content, page_url } = fields;
+    setImmediate(async () => {
+      try {
+        const { pushLeadToHubSpot } = await import('./hubspot-client');
+        const { parseAtlasAttribution } = await import('./atlas-crm-bridge');
+        const contextParts: string[] = [];
+        if (message) contextParts.push(`Message: ${message}`);
+        if (utm_source) contextParts.push(`Source: ${utm_source}`);
+        if (utm_campaign) contextParts.push(`Campaign: ${utm_campaign}`);
+        if (utm_term) contextParts.push(`Concept: ${utm_term}`);
+        if (page_url) contextParts.push(`Page: ${page_url}`);
+        const attribution = parseAtlasAttribution({
+          utm_campaign: utm_campaign ?? null,
+          utm_term: utm_term ?? null,
+          utm_content: utm_content ?? null,
+        });
+        const hs = await pushLeadToHubSpot({
+          name: name || contactEmail || 'Inquiry via aideazz.xyz',
+          email: contactEmail || '',
+          source: utm_source || 'aideazz_inquiry_form',
+          sourcePrefix: 'CLIENT-CTO-INQUIRY',
+          painPoint: contextParts.join(' | ') || 'Direct inquiry from aideazz.xyz contact form',
+          stage: 'appointmentscheduled',
+          ...(attribution?.concept_id ? { atlasConceptId: attribution.concept_id } : {}),
+          ...(utm_campaign ? { utmCampaign: utm_campaign } : {}),
+          ...(utm_term ? { utmTerm: utm_term } : {}),
+          ...(utm_content ? { utmContent: utm_content } : {}),
+          crmMeta: {
+            source: 'aideazz_inquiry_form',
+            pipeline: 'client',
+            type: 'inquiry',
+            utm_campaign: utm_campaign ?? null,
+            utm_term: utm_term ?? null,
+            utm_content: utm_content ?? null,
+            atlas_concept_id: attribution?.concept_id ?? null,
+          },
+        });
+        if (hs?.dealId) {
+          console.log(`[inquiry] HubSpot [CLIENT] deal created for: ${name || contactEmail}`);
+        }
+      } catch (e) {
+        console.warn('[inquiry] HubSpot push non-fatal:', (e as Error).message?.slice(0, 80));
+      }
+    });
+  }
+
   app.get('/marketing/inquiry-status', (_req, res) => {
     const base = process.env.CTO_AIPA_PUBLIC_URL?.replace(/\/$/, '') || '';
     res.json({
@@ -1314,48 +1378,15 @@ async function startCTOAIPA() {
     }
 
     // Push to HubSpot as [CLIENT] deal — hottest lead signal (person filled the form)
-    setImmediate(async () => {
-      try {
-        const { pushLeadToHubSpot } = await import('./hubspot-client');
-        const { parseAtlasAttribution } = await import('./atlas-crm-bridge');
-        const contextParts: string[] = [];
-        if (message) contextParts.push(`Message: ${message}`);
-        if (utm_source) contextParts.push(`Source: ${utm_source}`);
-        if (utm_campaign) contextParts.push(`Campaign: ${utm_campaign}`);
-        if (utm_term) contextParts.push(`Concept: ${utm_term}`);
-        if (page_url) contextParts.push(`Page: ${page_url}`);
-        const attribution = parseAtlasAttribution({
-          utm_campaign: utm_campaign ?? null,
-          utm_term: utm_term ?? null,
-          utm_content: utm_content ?? null,
-        });
-        const hs = await pushLeadToHubSpot({
-          name: name || contactEmail || 'Inquiry via aideazz.xyz',
-          email: contactEmail || '',
-          source: utm_source || 'aideazz_inquiry_form',
-          sourcePrefix: 'CLIENT-CTO-INQUIRY',
-          painPoint: contextParts.join(' | ') || 'Direct inquiry from aideazz.xyz contact form',
-          stage: 'appointmentscheduled',
-          ...(attribution?.concept_id ? { atlasConceptId: attribution.concept_id } : {}),
-          ...(utm_campaign ? { utmCampaign: utm_campaign } : {}),
-          ...(utm_term ? { utmTerm: utm_term } : {}),
-          ...(utm_content ? { utmContent: utm_content } : {}),
-          crmMeta: {
-            source: 'aideazz_inquiry_form',
-            pipeline: 'client',
-            type: 'inquiry',
-            utm_campaign: utm_campaign ?? null,
-            utm_term: utm_term ?? null,
-            utm_content: utm_content ?? null,
-            atlas_concept_id: attribution?.concept_id ?? null,
-          },
-        });
-        if (hs?.dealId) {
-          console.log(`[inquiry] HubSpot [CLIENT] deal created for: ${name || contactEmail}`);
-        }
-      } catch (e) {
-        console.warn('[inquiry] HubSpot push non-fatal:', (e as Error).message?.slice(0, 80));
-      }
+    pushInquiryToHubSpotNow({
+      ...(name !== undefined ? { name } : {}),
+      ...(contactEmail !== undefined ? { contactEmail } : {}),
+      ...(message !== undefined ? { message } : {}),
+      ...(utm_source !== undefined ? { utm_source } : {}),
+      ...(utm_campaign !== undefined ? { utm_campaign } : {}),
+      ...(utm_term !== undefined ? { utm_term } : {}),
+      ...(utm_content !== undefined ? { utm_content } : {}),
+      ...(page_url !== undefined ? { page_url } : {}),
     });
 
     res.json({ ok: true, id });
@@ -1627,8 +1658,25 @@ async function startCTOAIPA() {
       });
     }
 
+    // July 12 2026: same instant HubSpot push as the Bearer endpoint — the form
+    // is the public path real humans use; waiting for the daily triage cron
+    // meant the Make Lead Concierge saw nothing until the next morning.
+    pushInquiryToHubSpotNow({
+      ...(name !== undefined ? { name } : {}),
+      ...(contactEmail !== undefined ? { contactEmail } : {}),
+      ...(message !== undefined ? { message } : {}),
+      ...(utm_source !== undefined ? { utm_source } : {}),
+      ...(utm_campaign !== undefined ? { utm_campaign } : {}),
+      ...(utm_term !== undefined ? { utm_term } : {}),
+      ...(utm_content !== undefined ? { utm_content } : {}),
+      ...(page_url !== undefined ? { page_url } : {}),
+    });
+
     res.json({ ok: true, id });
   });
+
+  // Lead Concierge one-tap send: Make.com POSTs the Fable 5 draft here.
+  registerConciergeRoutes(app);
 
   // ==========================================================================
   // ASK CTO ENDPOINT - Ask your Tech Co-Founder anything!

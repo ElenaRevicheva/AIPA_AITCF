@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config({ override: true });
 
 import { Bot, Context, InputFile } from 'grammy';
+import { registerConciergeCallbacks } from './concierge';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
@@ -7561,10 +7562,13 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
     }
   });
 
+  // Lead Concierge [✅ Send now] / [🗑 Skip] buttons (must register before bot.start)
+  registerConciergeCallbacks(bot);
+
   // ==========================================================================
   // START BOT & SCHEDULED TASKS
   // ==========================================================================
-  
+
   bot.start({
     onStart: async (botInfo) => {
       console.log(`🤖 Telegram bot started: @${botInfo.username}`);
