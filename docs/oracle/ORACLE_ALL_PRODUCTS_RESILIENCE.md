@@ -102,6 +102,10 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 
 **Public sites:** [aideazz.xyz](https://aideazz.xyz) and [atuona.xyz](https://atuona.xyz) — **4everland** hosting, deploy from GitHub **`main`**. Not Oracle processes; columns above tie each site to its owning agent narrative.
 
+> **⚠️ Frontend serving chain (learned July 15 2026):** these static sites are served by **BunnyCDN pulling from a 4everland/IPFS origin** — NOT directly from Oracle. So a site outage is **independent** of the Oracle VM: Oracle can be 100% healthy (all agents + `webhook.aideazz.xyz/cto` returning 200) while the public site is down. Diagnose the layers separately before touching anything.
+>
+> **Incident — aideazz.xyz `502 Bad Gateway` (July 15 2026):** whole site 502 with `Server: BunnyCDN`, `CDN-PullZone: 5088105`, **`ErrorCode: 107`**. Root cause = Bunny's **IPFS origin pin went stale/unreachable** (same failure class as the July raw-IPFS-resolution blog incident below). Oracle was fully healthy throughout. **Fix = push a real rebuild commit to `aideazz` `main`** (must NOT be `[skip ci]`, or 4everland won't rebuild) → 4everland re-pins a fresh IPFS CID → Bunny origin recovers in **~90–180s**. Recovery order: **subpaths (`/portfolio`) return 200 first, root `/` last** — so keep checking root before declaring failure. **Before triggering, `git pull --ff-only` first** — the live build is from GitHub `origin/main`, which may be ahead of a stale local clone; never rebuild from behind. **If a push does NOT recover it**, the 4everland project itself is likely paused/expired — that lives in Elena's **4everland dashboard** (credential boundary — Claude cannot reach it).
+
 ### Canonical deploy directories on Oracle (`ubuntu@170.9.242.90`)
 
 Each **GitHub repo** has **one** working tree on the VM — **no duplicate clones** for the same product. Agents that share a repo share **one directory** and differ only by **process** (systemd unit or PM2 app name).
