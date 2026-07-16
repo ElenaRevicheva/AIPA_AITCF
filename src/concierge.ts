@@ -34,6 +34,8 @@ interface ConciergeDraft {
   createdAt: string;
   sentAt?: string;
   tgMessageId?: number;
+  /** Resend's message id — the only handle for tracing delivery after acceptance. */
+  resendId?: string;
 }
 
 function draftPath(id: string): string {
@@ -73,7 +75,15 @@ function parseClaudeOutput(raw: string): { draft: string; subject: string; spam:
 const escHtml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-async function sendReplyEmail(d: ConciergeDraft): Promise<void> {
+/**
+ * Hands the reply to Resend and returns Resend's message id.
+ *
+ * A 2xx here means Resend ACCEPTED the mail — not that it reached an inbox. The id is the
+ * only thread back to what actually happened (delivered / bounced / spam), because our API
+ * key is send-only and cannot query events: look the id up in the Resend dashboard.
+ * Discarding it, as this used to, made every "not received" report unfalsifiable.
+ */
+async function sendReplyEmail(d: ConciergeDraft): Promise<string | null> {
   const apiKey = getResendApiKey();
   if (!apiKey) throw new Error('RESEND_API_KEY not set');
   const from = process.env.CONCIERGE_FROM?.trim() || 'Elena Revicheva <aipa@aideazz.xyz>';
@@ -85,6 +95,10 @@ async function sendReplyEmail(d: ConciergeDraft): Promise<void> {
     body: JSON.stringify({ from, to: [d.email], subject: d.subject, html, reply_to: replyTo }),
   });
   if (!r.ok) throw new Error(`Resend ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  const body = (await r.json().catch(() => ({}))) as { id?: string };
+  const id = body.id ?? null;
+  console.log(`[concierge] Resend accepted ${d.email} — id=${id ?? 'UNKNOWN'} from=${from}`);
+  return id;
 }
 
 /** Raw Bot API send so the HTTP route works without holding the grammY instance. */
@@ -300,16 +314,19 @@ export function registerConciergeCallbacks(bot: Bot): void {
     }
 
     try {
-      await sendReplyEmail(d);
+      const resendId = await sendReplyEmail(d);
       d.status = 'sent';
       d.sentAt = new Date().toISOString();
+      if (resendId) d.resendId = resendId;
       saveDraft(d);
       await ctx.answerCallbackQuery({ text: 'Sent ✅' });
       await ctx.editMessageText(
-        `✅ SENT to ${d.name} <${d.email}> at ${d.sentAt}\n📧 Subject: ${d.subject}\n\n${d.draft.slice(0, 3500)}`
+        `✅ SENT to ${d.name} <${d.email}> at ${d.sentAt}\n📧 Subject: ${d.subject}` +
+          `\n🧾 Resend id: ${resendId ?? 'unknown'} — accepted by Resend; if they say it never arrived, check their spam, then this id in the Resend dashboard.` +
+          `\n\n${d.draft.slice(0, 3300)}`
       );
       logReplyToHubSpot(d, false);
-      console.log(`[concierge] draft ${d.id} SENT to ${d.email}`);
+      console.log(`[concierge] draft ${d.id} SENT to ${d.email} (resend id=${resendId ?? 'unknown'})`);
     } catch (e) {
       const msg = (e as Error)?.message || String(e);
       console.error(`[concierge] send failed for ${d.id}:`, msg);
@@ -338,13 +355,17 @@ export function registerConciergeCallbacks(bot: Bot): void {
     }
     try {
       d.draft = edited;
-      await sendReplyEmail(d);
+      const resendId = await sendReplyEmail(d);
       d.status = 'sent';
       d.sentAt = new Date().toISOString();
+      if (resendId) d.resendId = resendId;
       saveDraft(d);
-      await ctx.reply(`✅ Your edited version was SENT to ${d.name} <${d.email}>.\n📧 Subject: ${d.subject}`);
+      await ctx.reply(
+        `✅ Your edited version was SENT to ${d.name} <${d.email}>.\n📧 Subject: ${d.subject}` +
+          `\n🧾 Resend id: ${resendId ?? 'unknown'}`
+      );
       logReplyToHubSpot(d, true);
-      console.log(`[concierge] draft ${d.id} SENT (edited) to ${d.email}`);
+      console.log(`[concierge] draft ${d.id} SENT (edited) to ${d.email} (resend id=${resendId ?? 'unknown'})`);
     } catch (e) {
       const msg = (e as Error)?.message || String(e);
       console.error(`[concierge] edited send failed for ${d.id}:`, msg);
