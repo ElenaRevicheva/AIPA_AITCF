@@ -7,7 +7,7 @@
 
 import Groq from 'groq-sdk';
 import Anthropic from '@anthropic-ai/sdk';
-import { claudeWithGroqFallback } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel } from './llm-resilience';
 import {
   getUntriagedLeads,
   getUntriagedOutreachTargets,
@@ -20,7 +20,6 @@ import {
 } from './database';
 import { pushLeadToHubSpot, HS_STAGES, getActionableHubSpotDeals, isFreeEmailDomain } from "./hubspot-client";
 
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = 'claude-sonnet-4-5';
 /** Groq free tier TPM ~12k — huge inquiry bodies must be clipped or requests fail with 413. */
 const TRIAGE_CONTEXT_MAX_CHARS = 3600;
@@ -145,7 +144,7 @@ async function classifyLead(
     try {
       const groqResponse = await groq.chat.completions.create(
         {
-          model: GROQ_MODEL,
+          model: groqModel(),
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 220,
           temperature: 0.1,

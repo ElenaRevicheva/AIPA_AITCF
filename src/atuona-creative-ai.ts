@@ -9,7 +9,7 @@ import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import { persistShot, persistShotBytes, shotPublicUrl, buildFilm } from './atuona-film-compiler';
-import { grokComplete } from './llm-resilience';
+import { grokComplete, groqModel } from './llm-resilience';
 import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
@@ -3726,7 +3726,8 @@ function stopProactiveScheduler(): void {
 /** All text generation uses the same sampling: max creativity for ATUONA. Grounding (page text, knowledge, hard rules in prompts) limits hallucinations — not low temperature. */
 const AI_CONFIG = {
   primaryModel: 'claude-opus-4-8',
-  fallbackModel: 'llama-3.3-70b-versatile',
+  // Getter, not a literal: resolves through the fleet-wide GROQ_MODEL switch.
+  get fallbackModel(): string { return groqModel(); },
   poetryTemperature: 0.9,
   conversationTemperature: 0.9,
   /** Routers, theme tags, etc. — same as poetry (was 0.7). */
@@ -3735,7 +3736,7 @@ const AI_CONFIG = {
 
 console.log('🎭 Atuona AI Config:');
 console.log(`   Primary: ${AI_CONFIG.primaryModel} (Claude Opus 4 - BEST)`);
-console.log(`   Fallback: ${AI_CONFIG.fallbackModel} (Llama 3.3 70B)`);
+console.log(`   Fallback: ${AI_CONFIG.fallbackModel} (Groq)`);
 console.log(`   Temperature (all modes): ${AI_CONFIG.poetryTemperature}`);
 
 // =============================================================================

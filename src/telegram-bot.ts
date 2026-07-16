@@ -6,7 +6,7 @@ import { registerConciergeCallbacks } from './concierge';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
-import { claudeWithGroqFallback } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel } from './llm-resilience';
 import { 
   getRelevantMemory, 
   saveMemory,
@@ -401,7 +401,7 @@ async function askAI(prompt: string, maxTokens: number = 1500): Promise<string> 
       // Fallback to Groq (free!)
       try {
         const groqResponse = await groq.chat.completions.create({
-          model: 'llama-3.3-70b-versatile',
+          model: groqModel(),
           messages: [{ role: 'user', content: prompt }],
           max_tokens: maxTokens,
           temperature: 0.7
@@ -3500,7 +3500,7 @@ Checking services now...`, { parse_mode: 'Markdown' });
     try {
       const start = Date.now();
       await groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+        model: groqModel(),
         max_tokens: 10,
         messages: [{ role: 'user', content: 'ping' }]
       });
@@ -8101,7 +8101,7 @@ async function detectPersonalAIIntent(text: string): Promise<{
       const classifyResponse = await groq.chat.completions.create({
         // Migrated June 25 2026 off llama-3.1-8b-instant (Groq deprecation, decommission Aug 16 2026)
         // to the fleet-standard current model. 30-token intent classification — cost negligible.
-        model: 'llama-3.3-70b-versatile',
+        model: groqModel(),
         max_tokens: 30,
         messages: [{
           role: 'user',

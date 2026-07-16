@@ -29,7 +29,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import Groq from 'groq-sdk';
-import { isAnthropicCreditExhaustion, GROQ_FALLBACK_MODEL } from './llm-resilience';
+import { isAnthropicCreditExhaustion, groqModel } from './llm-resilience';
 import { bdSerpSearch, bdFetch, bdScrapingBrowserFetch, isBrightDataConfigured } from './brightdata-enrich';
 
 export type ResearchMode = 'client' | 'employer' | 'competitor';
@@ -248,7 +248,7 @@ export async function runResearchAgent(
               .join('\n\n')
               .slice(0, 12000);
             const groqResp = await groq.chat.completions.create({
-              model: GROQ_FALLBACK_MODEL,
+              model: groqModel(),
               messages: [{ role: 'user', content: `Based on this research gathered so far for "${query}" (mode: ${mode}), write the best possible structured report you can:\n\n${gathered}\n\nReturn the final report now.` }],
               max_tokens: 2048,
               temperature: 0.3,

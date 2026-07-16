@@ -2,7 +2,7 @@
  * llm-resilience.ts — canonical Groq fallback wrapper
  *
  * When Anthropic credits exhaust (HTTP 400 + "credit"/"balance"/"billing" in body),
- * these helpers route to Groq llama-3.3-70b-versatile instead of dying silently.
+ * these helpers route to Groq (model id resolved via groqModel()) instead of dying silently.
  * Non-credit errors re-throw so retry logic and error boundaries upstream still work.
  *
  * Pattern originated in lead-triage.ts and daily-blog-publisher.ts; generalised here
@@ -12,7 +12,24 @@
 import Groq from 'groq-sdk';
 import type Anthropic from '@anthropic-ai/sdk';
 
-export const GROQ_FALLBACK_MODEL = 'llama-3.3-70b-versatile';
+/**
+ * THE one Groq model switch for the whole fleet (July 15 2026).
+ *
+ * Models are rented, not owned — providers retire them every few months (Groq is
+ * dropping llama-3.3-70b-versatile for dev tier in August 2026). Code should name a
+ * ROLE ("the fast cheap one"), never a model id, so a retirement is a config change
+ * and not a rewrite. Every Groq call site in this repo resolves the id through here.
+ *
+ * Cutover = set GROQ_MODEL in .env and restart. No code change, instantly reversible.
+ * Verified available on our key (2026-07-15): openai/gpt-oss-120b, openai/gpt-oss-20b,
+ * llama-3.1-8b-instant, qwen/qwen3-32b, groq/compound.
+ *
+ * Lazy getter (not a const) on purpose: cto-aipa.ts has no top-of-file dotenv, so a
+ * module-load-time read could resolve before .env is loaded. Same pattern as XAI_MODEL.
+ */
+export const groqModel = (): string =>
+  (process.env.GROQ_MODEL || 'llama-3.3-70b-versatile').trim();
+
 const GROQ_MAX_TOKENS = 8000;
 
 // Tier 3 (June 11 2026): xAI Grok — the rhino-sneezing-lemon team credits, already
@@ -117,7 +134,7 @@ export function isAnthropicModelNotFound(e: unknown): boolean {
 /**
  * Drop-in replacement for a single anthropic.messages.create() call.
  * Returns the text content string (empty string if model returned no text).
- * On credit exhaustion routes to Groq llama-3.3-70b-versatile.
+ * On credit exhaustion routes to Groq (model id via groqModel()).
  * On all other errors re-throws so upstream retry / error handling still works.
  */
 export async function claudeWithGroqFallback(
@@ -150,13 +167,13 @@ export async function claudeWithGroqFallback(
     // Tier 2: Groq (free) — primary fallback.
     if (groqKey) {
       try {
-        console.warn(`[${label}] ${reason} — falling back to Groq ${GROQ_FALLBACK_MODEL}`);
+        console.warn(`[${label}] ${reason} — falling back to Groq ${groqModel()}`);
         const groq = new Groq({ apiKey: groqKey });
         const messages: Array<{ role: 'system' | 'user'; content: string }> = systemPrompt
           ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
           : [{ role: 'user', content: userPrompt }];
         const groqResp = await groq.chat.completions.create({
-          model: GROQ_FALLBACK_MODEL,
+          model: groqModel(),
           messages,
           max_tokens: Math.min(maxTokens, GROQ_MAX_TOKENS),
           temperature: 0.7,

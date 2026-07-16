@@ -1,7 +1,11 @@
 import Groq from 'groq-sdk';
 import type { Anthropic } from '@anthropic-ai/sdk';
 
-const GROQ_MODEL = process.env.SPRINT_BRIEFING_GROQ_MODEL || 'llama-3.3-70b-versatile';
+// Follows the fleet-wide GROQ_MODEL switch (see llm-resilience.ts groqModel()); the
+// SPRINT_BRIEFING_* var still wins for Lambda-specific tuning. Not imported from
+// llm-resilience on purpose — this module ships in the separate AWS Lambda bundle.
+const GROQ_MODEL =
+  process.env.SPRINT_BRIEFING_GROQ_MODEL || process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 const CLAUDE_MODEL = process.env.SPRINT_BRIEFING_CLAUDE_MODEL || 'claude-sonnet-4-6';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const OPENAI_MODEL = process.env.SPRINT_BRIEFING_OPENAI_MODEL || 'gpt-4o-mini';

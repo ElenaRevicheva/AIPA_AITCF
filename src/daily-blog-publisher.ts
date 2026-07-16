@@ -17,7 +17,7 @@ import * as fs from "fs";
 import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
-import { claudeWithGroqFallback, geminiComplete } from "./llm-resilience";
+import { claudeWithGroqFallback, geminiComplete, groqModel } from "./llm-resilience";
 
 /**
  * 2026-05-27 — Anthropic-credit-exhaustion resilience.
@@ -29,7 +29,7 @@ import { claudeWithGroqFallback, geminiComplete } from "./llm-resilience";
  *
  * Pattern matches src/lead-triage.ts (the canonical Groq-fallback pattern in
  * this repo): try Anthropic first → on credit-exhaustion 400, fall through to
- * Groq `llama-3.3-70b-versatile` (free tier) using the official groq-sdk
+ * Groq (model id via groqModel() — see llm-resilience.ts) using the official groq-sdk
  * (which sets a Cloudflare-compatible UA — bypasses the urllib 1010 bug
  * documented in EspaLuzWhatsApp/espaluz_bridge.py:2887).
  *
@@ -69,7 +69,7 @@ async function generateTextWithGroqFallback(
     const groqKey = process.env.GROQ_API_KEY?.trim();
     if (!isCreditExhaustion || !groqKey) throw e;
 
-    console.warn("📰 Anthropic credit exhausted on blog generation — falling back to Groq llama-3.3-70b-versatile");
+    console.warn(`📰 Anthropic credit exhausted on blog generation — falling back to Groq ${groqModel()}`);
     const { default: Groq } = await import("groq-sdk");
     const groq = new Groq({ apiKey: groqKey });
     const messages: Array<{ role: "system" | "user"; content: string }> = system
@@ -85,7 +85,7 @@ async function generateTextWithGroqFallback(
     for (let attempt = 1; attempt <= GROQ_MAX_RETRIES; attempt++) {
       try {
         const groqResp = await groq.chat.completions.create({
-          model: "llama-3.3-70b-versatile",
+          model: groqModel(),
           messages,
           max_tokens: Math.min(maxTokens, 8000), // Groq max for this model
           temperature: 0.7,

@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 import { Anthropic } from '@anthropic-ai/sdk';
-import { claudeWithGroqFallback } from './llm-resilience';
+import { claudeWithGroqFallback, groqModel } from './llm-resilience';
 import {
   initializeDatabase,
   saveMemory,
@@ -93,8 +93,9 @@ const AI_MODELS = {
   // For Ask CTO strategic questions
   strategic: process.env.STRATEGIC_MODEL || 'claude-opus-4-8',
   
-  // For standard code reviews (fast)
-  standard: process.env.STANDARD_MODEL || 'llama-3.3-70b-versatile',
+  // For standard code reviews (fast). Getter, not a literal: the Groq id resolves
+  // through groqModel() so the fleet-wide GROQ_MODEL switch governs it too.
+  get standard(): string { return process.env.STANDARD_MODEL || groqModel(); },
   
   // Max tokens for responses
   maxTokens: parseInt(process.env.MAX_TOKENS || '8192', 10)
