@@ -8,6 +8,32 @@
 
 ---
 
+## 🔴 VJH `detected_responses` — real replies detected, surfaced to NOBODY (found July 16 2026)
+
+**The bug:** `VibeJobHunterAIPA_AIMCF/src/autonomous/response_detector.py` classifies inbound email replies into
+`autonomous_data/vibejobhunter.db` → table `detected_responses`, and **there is no code path from that table to
+HubSpot, Telegram, or anything Elena reads.** 189 rows accumulated Jan–Jul 2026 in silence.
+
+**What was actually in there** (this is why it matters — it is not a hygiene issue, it is lost money):
+- `alex@alex.com` **2026-07-15 — "Interview Invitation for Senior Full-Stack Engineer (TypeScript / AI Automation) at Truelogic"** + an Event Confirmation for a scheduled AI-assisted interview. Elena was shortlisted; the invite lived in SQLite.
+- `adriana.vargas@oracle.com` — **"Reunión Aideazz + Oracle"** (June 24) and "Aideazz Future Projects" (Jan 19): real Zoom invites from the Oracle Startup Program contact.
+- Foundever Panama interview invitation; a stranger offering LangGraph help; article-collab follow-ups.
+
+**Honest triage of the 189 (don't repeat "186 lost jobs" — it's wrong):** ~90 are **Torre.ai "Emma" bot** mail, 11 are
+`noreply@` senders, and the classifier is noisy enough to have tagged a **Zoom app-install confirmation** as a
+`positive` employer response. **88 are plausibly real humans.** So: real gold, buried under bot noise — the fix must
+**filter**, not firehose.
+
+**Schema:** `detected_responses(id, email_id, from_email, from_name, subject, body_preview, received_at,
+response_type, confidence, company_name, ai_analysis, suggested_action, created_at)`;
+`response_type ∈ positive|question|rejection`, `confidence` 0–1.
+
+**The fix when we build it (money-first, not a rebuild):** push high-confidence, non-Torre/non-`noreply` rows to
+HubSpot as a **note + task** on the matching contact and ping Telegram. Reuse the existing HubSpot writer and the
+`[STREAM-AGENT]` prefix convention; verify from logs before/after. Related gap: outreach **message text** likely is
+not visible as an engagement on the `[HIRING-VJH]` deals it creates (`outreach_log.jsonl` has no hubspot/synced
+field and stopped writing 2026-05-16; newer sends go via `src/autonomous/multi_channel_sender.py`).
+
 ## ⏳ Groq model deprecation — ONE `GROQ_MODEL` switch per repo (July 15 2026) — **DEADLINE AUGUST 2026**
 
 **The threat:** Groq retires **`llama-3.3-70b-versatile`** (dev tier) in **August 2026**. That model is the **universal tier-2 fallback for the entire fleet** (see the "UNIVERSAL Claude → Groq spine" note below) — and the Anthropic key is routinely credit-dead, so Groq is often what is *actually* answering. Also **`llama-3.1-8b-instant` is decommissioned Aug 16 2026** → it is **NOT a valid migration target** (we already fled it in June 2026; note at `src/telegram-bot.ts:8104`).
@@ -83,6 +109,7 @@ Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely
 - No TG message after a form submit → check contact was **created** not updated (reused email = update = no trigger), then `grep concierge ~/.pm2/logs/cto-aipa-out-9.log` for `/concierge/draft` arrival, then Make execution history.
 - "Recipient could not be determined" TG notice → >1 contact created in the 45-min window with no name match; reply manually from the notice.
 - Confirmation/reply emails "not received" → Resend accepted + DNS verified OK (DKIM `resend._domainkey`, SPF on `send.aideazz.xyz`, DMARC p=none): **check Gmail Spam** — cold sender reputation; verify true delivery status in the Resend dashboard (API key is send-only, can't query events).
+- **CONFIRMED July 16 2026 — replies DO land in Gmail spam.** A real lead (`espaluztester@gmail.com`) reported nothing arrived while Telegram said `✅ SENT`; it was in spam. Full DNS re-check that day: SPF `send.aideazz.xyz` = `v=spf1 include:amazonses.com ~all` ✅, DKIM `resend._domainkey.aideazz.xyz` present + aligns with From `aipa@aideazz.xyz` ✅, DMARC `p=none` ✅, SES bounce MX `feedback-smtp.us-east-1.amazonses.com` ✅ — **auth is not the problem; sender trust is** (new domain, near-zero volume). Two fixes shipped: (1) `src/concierge.ts` now **captures Resend's message id**, persists it on the draft, logs it, and shows it in the TG receipt — previously the id was discarded and the key is send-only (`401` on `GET /emails`), so every "never arrived" was unfalsifiable; (2) mail now sends **multipart `text` + `html`** (HTML-only is a structural spam signal). Remaining levers are Elena's, not code: mark **"Report not spam"** in Gmail (highest value), cut first-reply link count in the Fable 5 prompt (that reply carried 4 links), and only later raise DMARC `p=none` → `p=quarantine`. **"✅ SENT" means Resend ACCEPTED, never "delivered" — look the id up in the dashboard.**
 - Scenario won't toggle ON → Make active-scenario plan limit.
 - Trigger pointer consumes contacts per run — re-testing needs a NEW test contact (fresh email, gmail `+alias` works).
 - Buttons dead after pm2 restart → drafts survive (`data/concierge/`), but reply-to-edit needs the draft's `tgMessageId` — drafts created before July 12 evening lack it.
