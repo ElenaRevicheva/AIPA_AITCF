@@ -8,6 +8,48 @@
 
 ---
 
+## ⏳ Groq model deprecation — ONE `GROQ_MODEL` switch per repo (July 15 2026) — **DEADLINE AUGUST 2026**
+
+**The threat:** Groq retires **`llama-3.3-70b-versatile`** (dev tier) in **August 2026**. That model is the **universal tier-2 fallback for the entire fleet** (see the "UNIVERSAL Claude → Groq spine" note below) — and the Anthropic key is routinely credit-dead, so Groq is often what is *actually* answering. Also **`llama-3.1-8b-instant` is decommissioned Aug 16 2026** → it is **NOT a valid migration target** (we already fled it in June 2026; note at `src/telegram-bot.ts:8104`).
+
+**Groq the PROVIDER is not going away — only the model.** Same API key, same LPU, same tier-2 slot. Migration = ask Groq for a different model id.
+
+**The principle:** models are rented, not owned; retirement is permanent and recurring. You don't escape the treadmill — you make each retirement cost **10 minutes, not 2 days**. Code names a **role**, never a model id. Evals are what remove the fear of swapping.
+
+**Cutover (when decided) = one line + restart, instantly reversible:**
+```bash
+# in the repo's .env, then restart the process
+GROQ_MODEL=<new-model-id>
+```
+
+**Status by repo:**
+
+| Repo | Switch | State |
+|---|---|---|
+| **cto-aipa** (`ced31f5`) | `src/llm-resilience.ts` → `groqModel()` | ✅ 7 hard-coded sites collapsed to one |
+| **VibeJobHunterAIPA_AIMCF** (`04c4001`) | `src/utils/model_config.py` → `groq_model()` | ✅ 4 sites wired |
+| **whitespace / Atlas** | `WHITESPACE_GROQ_MODEL` (`src/config.ts:23`) | ✅ was already correct — the pattern others copied |
+| **EspaLuzFamilybot** | `main.py:2556,4311` | ❌ hard-coded — ⚠️ **paying users**, deploy carefully |
+| **EspaLuzWhatsApp** | `espaluz_bridge.py:3021`, `whatsapp_convo_mode.py:161` | ❌ hard-coded — ⚠️ **paying users** |
+| **EspaLuz_Influencer** | `cto_milestone_module.py:42`, `main.py:672,1042` | ❌ hard-coded |
+| **dragontrade-agent** | `aideazz-content-generator.js:333,375`, `engagement-bot.js:61`, `x-tech-updater.js:115` | ❌ hard-coded |
+
+(Ignore `*.bak-modelfix-20260616` files — backups, not live.)
+
+**Implementation gotchas (both were real bugs, not theory):**
+- **Resolve at CALL time, not import time.** `cto-aipa.ts` has **no top-of-file dotenv**, so a module-load `process.env` read silently misses `GROQ_MODEL` and pins you to the dead default — the switch *looks* fine and does nothing. Hence `groqModel()` is a lazy getter, and `AI_MODELS.standard` / `AI_CONFIG.fallbackModel` became **getters**. Same reason VJH's `groq_model()` reads `os.environ` **then falls back to `dotenv_values`** (mirrors `llm_judge._key()` — the bot doesn't always export .env).
+- **Log strings must print the resolved id**, never a literal — otherwise logs lie after cutover and you debug a ghost.
+- `sprint-briefing` follows `GROQ_MODEL` **without importing** `llm-resilience` (it ships in the separate AWS Lambda bundle).
+
+**⚠️ MODEL TARGET STILL UNDECIDED — do not flip yet:**
+- **`openai/gpt-oss-120b` is a REASONING model.** Against the real 2,918-char VJH judge prompt at `max_tokens:120` it burned the budget *thinking* and returned **EMPTY content (`finish=length`) in 16/22 golden cases**. The judge **fails open** → it would have **silently approved every job**. Same exposure: lead-triage (`max_tokens:220`), Telegram intent classifier (`max_tokens:30`). **When it did answer it was 10/10 correct** — quality is fine, the token budget is the problem. Any move to a reasoning model requires raising `max_tokens` at every call site.
+- Non-reasoning candidates live on the key: **`meta-llama/llama-4-scout-17b-16e-instruct`**, `qwen/qwen3-32b` (⚠️ Qwen3 has hybrid *thinking* mode — verify before trusting), `groq/compound`.
+- **Eval harness:** VJH `evals/golden_set.json` — 22 cases, labels are **`apply` / `discard`** (not approve/reject). Run it against a candidate before any cutover.
+
+**⚠️ Groq free-tier TPD is the real churn driver (verified July 15):** `Rate limit reached … tokens per day (TPD): Limit 100000, Used 99606`. The fleet burns its 100k/day/model budget and fails over to xAI/Gemini for the rest of the day. Same 429s in `whitespace/data/capture.log`. **This also blocks evals** — a burned baseline can't be compared. Run model evals on **fresh daily quota, one model at a time**, separating 429s from truncations.
+
+---
+
 ## 🟢 LLM resilience + VibeJobHunter pipeline (June 23-24 2026)
 
 - **Sprinter (AWS Lambda `sprint-briefing-agent`, us-east-1, EventBridge `cron(0 13 * * ? *)` = 8AM Panama):** narrative + clustering chain is now **Claude → Groq → Gemini → OpenAI `gpt-4o-mini`** (`src/sprint-briefing/synthesize.ts`). It failed to fire June 23 because all of Claude(400 dead)/Groq(429 capped)/Gemini(429 depleted) failed — added OpenAI as the reliable backstop (key already in the Lambda env, 19 vars). **Verified June 24:** force-test logged `OpenAI (gpt-4o-mini) returned 1926 chars → narrative fallback succeeded`, `{"ok":true}`. **Rebuild+deploy:** `npx esbuild src/lambda/sprint-briefing-aws.ts --bundle --platform=node --target=node20 --format=cjs --external:@aws-sdk/signature-v4-crt --external:encoding --outfile=dist-lambda/sprint/lambda-pkg/handler.js` → `py` zipfile (handler.js at zip root) → `node scripts/deploy-lambda.mjs`. **Force-test** = set Lambda env `SPRINT_BRIEFING_FORCE=1`, invoke (boto3, creds in `~/.aws`), then REMOVE the var. Deploy step 4 may transiently `ResourceConflict` ("update in progress") — code still uploaded; retry config update or ignore (it only re-sets an already-set var).
