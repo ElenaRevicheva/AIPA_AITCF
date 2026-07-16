@@ -8,6 +8,14 @@
 
 ---
 
+## ✅ VJH `detected_responses` — FIXED July 16 2026 (was: real replies detected, surfaced to NOBODY)
+
+**Fixed same day** (VibeJobHunterAIPA_AIMCF `3bf8894`, deployed + restarted `vibejobhunter`). Root cause was sharper than first thought: `push_response_to_hubspot()` and the sender-blocklist filter already existed in `response_detector.py`, but only inside a dead sibling function nothing called — the actual live orchestrator cycle (`orchestrator.py::_check_for_responses`) duplicated the save+alert logic without either helper. Wired both in. **Backfill run live:** of 189 historical rows, 49 survived the blocklist (Torre.ai/newsletter noise) as real; all 49 pushed to HubSpot (`dealstage=contractsent`, verified via direct API read) + one Telegram digest sent — includes the July 15 Truelogic interview shortlisting, 2 Oracle Startup Program meeting invites, and several inbound `[AIdeazz]` client inquiries. **This retires the "0 contractsent ever" funnel-truth line** in `AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md` / selling-pivot notes — update those before quoting old numbers. Backfill script: `scripts/backfill_detected_responses.py` (one-off, not cron — re-running would re-touch the same 49 deals).
+
+**Gap #2 still open** (confirmed by code read, corrected from the July 15 guess): `multi_channel_sender.py` (the module that actually sends LinkedIn/email/Twitter outreach) has zero HubSpot references. It's fully disconnected from `crm_hub.py::push_application_to_crm` (which only fires earlier, at cover-letter-generation time). No dealId is threaded through to attach the sent message text as a note after send. Not started — needs a lookup-by-company+jobTitle or a stored dealId on the outreach record.
+
+<details><summary>Original finding (superseded, kept for context)</summary>
+
 ## 🔴 VJH `detected_responses` — real replies detected, surfaced to NOBODY (found July 16 2026)
 
 **The bug:** `VibeJobHunterAIPA_AIMCF/src/autonomous/response_detector.py` classifies inbound email replies into
@@ -33,6 +41,8 @@ HubSpot as a **note + task** on the matching contact and ping Telegram. Reuse th
 `[STREAM-AGENT]` prefix convention; verify from logs before/after. Related gap: outreach **message text** likely is
 not visible as an engagement on the `[HIRING-VJH]` deals it creates (`outreach_log.jsonl` has no hubspot/synced
 field and stopped writing 2026-05-16; newer sends go via `src/autonomous/multi_channel_sender.py`).
+
+</details>
 
 ## ⏳ Groq model deprecation — ONE `GROQ_MODEL` switch per repo (July 15 2026) — **DEADLINE AUGUST 2026**
 
