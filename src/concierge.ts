@@ -89,10 +89,13 @@ async function sendReplyEmail(d: ConciergeDraft): Promise<string | null> {
   const from = process.env.CONCIERGE_FROM?.trim() || 'Elena Revicheva <aipa@aideazz.xyz>';
   const replyTo = process.env.CONCIERGE_REPLY_TO?.trim() || 'elena.revicheva2016@gmail.com';
   const html = `<div style="white-space:pre-wrap;font-family:inherit;">${escHtml(d.draft)}</div>`;
+  // Send multipart (text + html). HTML-only is a spam signal from an unestablished sender —
+  // real people's mail clients produce both, bulk senders often don't. The draft is already
+  // plain prose, so the text part is the draft itself; no separate copy to keep in sync.
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: [d.email], subject: d.subject, html, reply_to: replyTo }),
+    body: JSON.stringify({ from, to: [d.email], subject: d.subject, html, text: d.draft, reply_to: replyTo }),
   });
   if (!r.ok) throw new Error(`Resend ${r.status}: ${(await r.text()).slice(0, 200)}`);
   const body = (await r.json().catch(() => ({}))) as { id?: string };
