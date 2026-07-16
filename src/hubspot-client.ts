@@ -193,10 +193,23 @@ export async function findRecentContacts(sinceMinutes: number): Promise<Array<{
   message: string;
 }>> {
   const since = Date.now() - sinceMinutes * 60_000;
+  // Found July 16 2026: HubSpot's own account-level CalendarSync / OnboardingDataSync
+  // (auto-imports every person you've ever emailed/met, triggered by connecting Gmail/
+  // Calendar — landed a ~90-contact burst right after the Starter-plan upgrade) can flood
+  // this window with recruiters/newsletters/vendors who never touched the portfolio form.
+  // Real cto-aipa-created contacts always carry this private app's id here — scope to it
+  // so the concierge never drafts a "thanks for your portfolio inquiry" reply to someone
+  // who just happens to be in Elena's inbox history.
+  const OWN_APP_ID = '39045903';
   const data = await hsPost<{ results: Array<{ id: string; properties: Record<string, string | null> }> }>(
     '/crm/v3/objects/contacts/search',
     {
-      filterGroups: [{ filters: [{ propertyName: 'createdate', operator: 'GTE', value: String(since) }] }],
+      filterGroups: [{
+        filters: [
+          { propertyName: 'createdate', operator: 'GTE', value: String(since) },
+          { propertyName: 'hs_analytics_source_data_2', operator: 'EQ', value: OWN_APP_ID },
+        ],
+      }],
       properties: ['email', 'firstname', 'lastname', 'message'],
       sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
       limit: 10,
