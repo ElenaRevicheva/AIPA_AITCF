@@ -51,6 +51,7 @@ Same choices as the phone workflow — registry lives in `scripts/oracle-resilie
 | `openclaw` | OpenClaw gateway |
 | `cto_aipa` | CTO AIPA + Atuona (pull → `npm ci && npm run build` → PM2 restart) |
 | `atlas` | Atlas Shifted radar |
+| `aideazz` | **Patch relay (added July 17, 2026):** the box `git am`'s every `scripts/aideazz-patches/*.patch` onto the aideazz repo's `main` and pushes (4everland auto-deploys aideazz.xyz). Exists because cloud agents get 403 pushing to the aideazz repo directly; the box's PAT can. See `scripts/aideazz-patches/README.md`. |
 | `fleet-verify` | **Health check only — deploys nothing.** Runs `verify-fleet-health.sh` across all 9 products + EspaLuz memory-persistence audit. |
 
 ## Safety properties (same guarantees as the phone flow)

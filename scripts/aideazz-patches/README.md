@@ -1,8 +1,22 @@
-# Pending patch for the `aideazz` repo (aideazz.xyz portfolio)
+# Patch relay for the `aideazz` repo (aideazz.xyz portfolio)
 
-Cursor cloud agents can push to `AIPA_AITCF` but got **403 denied** on
-`ElenaRevicheva/aideazz` — so the portfolio-card change is parked here as a
-git patch, built and browser-verified from a local clone.
+Cursor cloud agents can push to `AIPA_AITCF` but get **403 denied** on
+`ElenaRevicheva/aideazz`. Solution (July 17, 2026): park verified patches here,
+then push `aideazz` as the `.deploy-trigger` product — the Oracle box (which
+holds a full PAT in its git credential store) runs
+`scripts/oracle-resilience/push-aideazz-patch.sh`: it syncs
+`/home/ubuntu/aideazz`, `git am`'s every `*.patch` in this folder (skipping
+already-applied ones, aborting on conflict), and pushes `main` so 4everland
+auto-deploys.
+
+```bash
+printf 'aideazz\nreason-%s\n' "$(date -u +%s)" > .deploy-trigger
+git add .deploy-trigger && git commit -m "deploy: aideazz (<what>)" && git push origin main
+```
+
+`0001-geo-card-visibility-api.patch` shipped this way on July 17, 2026
+(aideazz commit `bfdcd0b`, Actions run 29620502489). Applied patches stay in
+the folder as a record — the relay script skips them via reverse-apply check.
 
 ## What `0001-geo-card-visibility-api.patch` does
 
