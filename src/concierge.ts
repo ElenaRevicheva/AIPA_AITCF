@@ -225,13 +225,15 @@ export function registerConciergeRoutes(app: Express): void {
     // Make forwards only the draft text; resolve the recipient from HubSpot.
     // findRecentContacts is scoped to contacts created by OUR integration (the
     // July 16 fix — HubSpot's own CalendarSync/OnboardingDataSync imports never
-    // match), so a wide 24h window is safe: the pool is only genuine form
-    // inquiries, and Make's draft always arrives within ~15 min of the contact.
+    // match). Window = 90 min: Make's draft arrives ≤15 min after the contact
+    // is created, so 90 min is ample headroom — and a narrow window makes the
+    // junk-drop below decisive (junk only slips into "warn" mode during the
+    // brief period right after a genuine inquiry).
     let formContactsInWindow = 0;
     if (!emailOk(email)) {
       try {
         const { findRecentContacts } = await import('./hubspot-client');
-        const recent = (await findRecentContacts(24 * 60)).filter((c) => emailOk(c.email));
+        const recent = (await findRecentContacts(90)).filter((c) => emailOk(c.email));
         formContactsInWindow = recent.length;
         const head = draft.slice(0, 300).toLowerCase();
         const named = recent.filter((c) => c.firstname && head.includes(c.firstname.toLowerCase()));
@@ -251,12 +253,12 @@ export function registerConciergeRoutes(app: Express): void {
       }
     }
     if (!emailOk(email)) {
-      // No form-created contact exists in the last 24h → this draft cannot
+      // No form-created contact exists in the window → this draft cannot
       // belong to a real portfolio inquiry. It is Make reacting to a HubSpot
       // auto-import (CalendarSync dumped ~90 inbox contacts July 16). Drop it
       // quietly — paging Elena with junk drafts trains her to ignore the bot.
       if (formContactsInWindow === 0) {
-        console.log(`[concierge] draft dropped — no form contact in 24h window (auto-import noise): "${draft.slice(0, 80)}…"`);
+        console.log(`[concierge] draft dropped — no form contact in window (auto-import noise): "${draft.slice(0, 80)}…"`);
         res.json({ ok: true, dropped: 'no-form-contact' });
         return;
       }
