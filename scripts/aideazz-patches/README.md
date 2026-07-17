@@ -1,0 +1,32 @@
+# Pending patch for the `aideazz` repo (aideazz.xyz portfolio)
+
+Cursor cloud agents can push to `AIPA_AITCF` but got **403 denied** on
+`ElenaRevicheva/aideazz` — so the portfolio-card change is parked here as a
+git patch, built and browser-verified from a local clone.
+
+## What `0001-geo-card-visibility-api.patch` does
+
+On the `/portfolio` page's **GEO + SEO Engine** card (bilingual EN/ES):
+
+- Adds a plain-language paragraph about the AIdeazz Lab **AI Visibility Audit API**
+  (free endpoint, 0–100 score, 34 checks, AEO/GEO/tech-SEO, scored diagnosis for
+  bot-blocked / JS-only sites, "this site scores A+ 100/100 on its own engine").
+- Updates the Traction line: "Public AI Visibility Audit API live • aideazz.xyz
+  scores A+ 100/100 on its own engine • …".
+- Adds a second card button — "Audit your site free — AI Visibility API" — linking
+  to the existing `/api` page (which already calls the production endpoint).
+- `BusinessCard.tsx`: the aiCoFounders card renderer now supports `extraLinks`
+  (previously only the EspaLuz/Algom card list rendered them).
+
+## Apply it (from a laptop with aideazz push access)
+
+```bash
+cd aideazz
+git checkout main && git pull
+git am path/to/0001-geo-card-visibility-api.patch
+git push origin main   # 4everland auto-deploys
+```
+
+Or: grant the Cursor GitHub App access to the `aideazz` repo
+(GitHub → Settings → Applications → Cursor → Repository access), then any
+cloud agent can push it directly.
