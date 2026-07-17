@@ -18,27 +18,40 @@ export interface Offer {
 }
 
 export const OFFERS: Record<string, Offer> = {
+  // 2026 demand lanes (Elena skill → invoice). Amounts are estimates for HubSpot pipeline $.
+  wa_tg_bots:       { key: 'wa_tg_bots',       label: 'WhatsApp/Telegram AI bot',    amount: 3500, cadence: 'per project' },
+  llm_wiring:       { key: 'llm_wiring',       label: 'LLM API / AI integration',    amount: 4000, cadence: 'per project' },
   fractional_cto:   { key: 'fractional_cto',   label: 'Fractional CTO retainer',     amount: 2500, cadence: 'per month' },
   agent_build:      { key: 'agent_build',      label: 'Custom AI agent build',       amount: 5000, cadence: 'per project' },
+  geo_aeo:          { key: 'geo_aeo',          label: 'GEO/AEO visibility setup',    amount: 3000, cadence: 'one-time' },
   marketing_engine: { key: 'marketing_engine', label: 'AI Marketing Engine setup',   amount: 3000, cadence: 'one-time' },
   revops:           { key: 'revops',           label: 'AI Ops / RevOps setup',       amount: 2500, cadence: 'one-time' },
   automation:       { key: 'automation',       label: 'AI Automation package',       amount: 1500, cadence: 'per project' },
+  ai_video:         { key: 'ai_video',         label: 'AI product/ad video',         amount: 2000, cadence: 'per project' },
   catalyst:         { key: 'catalyst',         label: 'AI Catalyst sprint',          amount: 1200, cadence: 'one-time' },
 };
 
-/** Keyword → offer routing. First match wins; order = highest-signal first. */
+/** Keyword → offer routing. First match wins; order = highest-signal 2026 demand first. */
 const RULES: Array<{ offer: keyof typeof OFFERS; re: RegExp }> = [
+  // WhatsApp / Telegram bots (hottest LATAM lane)
+  { offer: 'wa_tg_bots',       re: /\b(whatsapp|telegram|wa\b|tg\b|bot de|bot para|chatbot|chat bot|conversational)\b/i },
+  // LLM / API wiring
+  { offer: 'llm_wiring',       re: /\b(llm|openai|anthropic|groq|api wiring|ai integration|model router|multi-?model)\b/i },
+  // AI video as service (ads/product — not art)
+  { offer: 'ai_video',         re: /\b(ai video|product video|video ad|promo video|marketing video|video generation)\b/i },
+  // GEO / AEO
+  { offer: 'geo_aeo',          re: /\b(geo|aeo|answer engine|generative engine|ai search|cited by chatgpt|show up in chatgpt)\b/i },
   // Someone wants a CTO / technical co-founder / technical leadership
   { offer: 'fractional_cto',   re: /\b(cto|technical co-?founder|tech co-?founder|technical leadership|technical partner)\b/i },
   // Someone wants a thing BUILT (app/MVP/platform/agent/bot/website/software)
   { offer: 'agent_build',      re: /\b(build|building|develop|developing|create|creating)\b.{0,60}\b(app|mvp|platform|saas|agent|bot|website|web site|software|product|tool|store)\b/i },
-  { offer: 'agent_build',      re: /\b(ai agent|chatbot|voice agent|developer to|someone to build|whatsapp|telegram|bot de|bot para)\b/i },
+  { offer: 'agent_build',      re: /\b(ai agent|voice agent|developer to|someone to build)\b/i },
   // Marketing / content / SEO / leads-from-content
-  { offer: 'marketing_engine', re: /\b(marketing|seo|geo|aeo|content engine|blog|social media|brand visibility|discoverability)\b/i },
+  { offer: 'marketing_engine', re: /\b(marketing|seo|content engine|blog|social media|brand visibility|discoverability)\b/i },
   // CRM / sales pipeline / revenue ops
   { offer: 'revops',           re: /\b(crm|hubspot|sales pipeline|rev ?ops|lead (gen|generation|capture|qualification)|sales process|follow-?ups?)\b/i },
   // Workflow automation
-  { offer: 'automation',       re: /\b(automat(e|ion|ing)|workflow|integrat(e|ion)|zapier|make\.com|n8n|streamline)\b/i },
+  { offer: 'automation',       re: /\b(automat(e|ion|ing)|workflow|integrat(e|ion)|zapier|make\.com|n8n|streamline|oracle|cron)\b/i },
 ];
 
 /**

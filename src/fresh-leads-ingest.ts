@@ -283,13 +283,14 @@ async function ingestGitHub(limit = 30): Promise<FreshLead[]> {
 
 // ─── Pain-point classification ────────────────────────────────────────────────
 
+// July 17 2026 — only systems Elena sells into (2026 demand lanes). No VJH job-hunt noise.
 const AIDEAZZ_SYSTEMS = [
-  'CTO AIPA — code review, architecture, deployment orchestration',
-  'CMO AIPA — SEO/GEO, lead triage, cold outreach',
-  'VibeJobHunter — autonomous job search, 3000+ listings/hour',
-  'EspaLuz — AI Spanish tutor on WhatsApp',
-  'Multi-Model Router — 76% Groq / 24% Claude, $0/month inference',
-  'Oracle Always-Free Stack — 9 AI agents at $0/month',
+  'WhatsApp/Telegram AI bots — EspaLuz-class conversational agents for SMB/LATAM',
+  'LLM API wiring / AI integration — Anthropic→Groq→Grok fallbacks, HubSpot, Make',
+  'Automation workflows — Make/n8n/Oracle pipelines, cron agents',
+  'GEO/AEO — show up in ChatGPT / AI-answer engines',
+  'AI video as a service — product videos and ads (Atuona pipeline)',
+  'Fractional CTO / custom AI agent build — MVP, SaaS, architecture',
 ];
 
 async function classifyPainPoints(
@@ -301,17 +302,18 @@ async function classifyPainPoints(
 
   const list = leads.map((l, i) => `${i + 1}. ${l.company}: "${l.description.slice(0, 200)}"`).join('\n');
 
-  const prompt = `You are a B2B analyst for AIdeazz, an AI systems builder.
-
-AIdeazz systems:
+  const prompt = `You are a B2B analyst for AIdeazz. Elena sells ONLY these 2026 lanes:
 ${AIDEAZZ_SYSTEMS.map(s => `- ${s}`).join('\n')}
 
-For each company below give: their likely pain point (1 sentence) and the best matching AIdeazz system.
+For each company: (1) one-sentence pain ONLY if they show buyer demand for one of those lanes
+(chatbot/WhatsApp/Telegram, LLM integration, automation, GEO/AEO, AI product video, fractional CTO/MVP).
+(2) matchedSystem MUST be one of the lane names above — or "SKIP" if they are just hiring employees,
+construction/local trades, or unrelated.
 
 ${list}
 
 Return ONLY valid JSON array:
-[{"company":"Name","painPoint":"...","matchedSystem":"SystemName"},...]`;
+[{"company":"Name","painPoint":"...","matchedSystem":"WhatsApp/Telegram AI bots|SKIP|..."},...]`;
 
   try {
     const text = await claudeWithGroqFallback(
@@ -476,14 +478,18 @@ export async function runFreshLeadsIngestion(
     errors = newLeads.length;
   }
 
-  // Push real contacts (with actual email) to HubSpot
+  // HubSpot: real email + classifier did not SKIP + gate (intent + skill ICP) must pass.
   let hsCount = 0;
   for (const l of newLeads) {
     const isRealEmail = l.email && !l.email.startsWith('founder@') && l.email.includes('@');
     if (!isRealEmail) continue;
     const pain = painMap.get(l.company);
+    if (!pain?.matchedSystem || /^skip$/i.test(pain.matchedSystem.trim())) {
+      console.log(`[${tag}] HubSpot skip (classifier SKIP / no lane): ${l.company}`);
+      continue;
+    }
     try {
-      await pushLeadToHubSpot({
+      const hs = await pushLeadToHubSpot({
         sourcePrefix: 'CLIENT-CTO-INGEST',
         name:          l.name,
         email:         l.email || undefined,
@@ -491,10 +497,11 @@ export async function runFreshLeadsIngestion(
         website:       l.website || undefined,
         linkedinUrl:   l.linkedinUrl || undefined,
         source:        l.source,
-        painPoint:     pain?.painPoint,
-        matchedSystem: pain?.matchedSystem,
+        // Include raw description so the skill-ICP gate can see chatbot/automation words
+        painPoint:     [pain.painPoint, l.description.slice(0, 280)].filter(Boolean).join(' — '),
+        matchedSystem: pain.matchedSystem,
       });
-      hsCount++;
+      if (hs?.dealId || hs?.contactId) hsCount++;
       await new Promise(r => setTimeout(r, 120)); // HubSpot rate limit
     } catch { /* non-fatal */ }
   }

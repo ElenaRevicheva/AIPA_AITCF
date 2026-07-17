@@ -403,7 +403,7 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
                   )
                   .catch(() => {});
               }
-              await pushLeadToHubSpot({
+              const hsResult = await pushLeadToHubSpot({
                 sourcePrefix: isAtlasClient ? 'CLIENT-CTO-INQUIRY' : 'CLIENT-CTO-INGEST',
                 name:      lead.name || 'Unknown',
                 company:   companyForDeal,
@@ -425,6 +425,11 @@ export async function runTriageCycle(groq: Groq, anthropic: Anthropic): Promise<
                   atlas_concept_id: attribution?.concept_id ?? null,
                 },
               });
+              // Only mark pushed when HubSpot actually accepted (gate skips return null)
+              if (!hsResult) {
+                console.log(`[triage→HS] not marking pushed — HubSpot skipped/failed: ${(companyForDeal || lead.name || '').slice(0, 50)}`);
+                return;
+              }
             }
             // May 24 2026: mark lead_triage row as pushed so future daily briefs skip it
             // (HubSpot becomes source of truth for 'what to act on'). Fire-and-forget.

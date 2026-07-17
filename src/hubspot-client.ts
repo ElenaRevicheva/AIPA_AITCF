@@ -241,11 +241,13 @@ export async function upsertContact(input: {
     const existingId = await findContactByEmail(input.email);
     if (existingId) {
       // Update existing
+      // Never send `lead_source` — not in this HubSpot portal schema (PATCH 400).
+      // Source lives on the deal name prefix + contact note instead.
       await hsPatch(`/crm/v3/objects/contacts/${existingId}`, {
         properties: {
           ...(input.company    ? { company: input.company }          : {}),
           ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
-          ...(input.source     ? { lead_source: input.source }        : {}),
+          ...(input.source     ? { hs_lead_status: 'NEW' }           : {}),
           ...(input.message    ? { message: input.message.slice(0, 5000) } : {}),
         },
       });
@@ -537,11 +539,15 @@ function buildCompanyDescription(lead: LeadForHubSpot): string | undefined {
 }
 
 /**
- * "Right client" qualification gate for Elena (fractional AI CTO / AI-augmented builder).
- * A RIGHT client shows ACTIVE demand for help she can deliver AND is reachable — not a
- * scraped GitHub dev/repo with a Claude-guessed "pain". The discriminator is buying INTENT
- * (seeking / needs / non-technical founder / hiring a developer …), which passive scraped
- * leads lack. Returns {ok, reason} so the skip reason is logged + auditable.
+ * "Right client" gate — only buyers for Elena's 2026 money skills land in HubSpot:
+ *   1) WhatsApp/Telegram AI bots (EspaLuz lane, LATAM)
+ *   2) LLM API wiring / AI integration
+ *   3) Automation workflows (Make / n8n / Oracle / cron agents)
+ *   4) GEO/AEO
+ *   5) AI video as a service (product videos/ads — not art films)
+ *
+ * Must be reachable + show BUYING intent (not a job post, not a passive scrape)
+ * + match skill ICP. Form inquiries (CLIENT-CTO-INQUIRY) bypass keyword checks.
  */
 export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: string } {
   // 1) Must be reachable / a real entity
@@ -554,22 +560,53 @@ export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: 
   if (lead.sourcePrefix === 'CLIENT-CTO-INQUIRY') {
     return { ok: true, reason: 'qualified: direct form inquiry (active by definition)' };
   }
-  // 2) Must show ACTIVE demand for AI/technical-build help (not a passive scraped repo).
-  const text = [lead.company, lead.painPoint, lead.matchedSystem, lead.source]
-    .filter(Boolean).join(' ').toLowerCase();
+  const text = [
+    lead.company, lead.painPoint, lead.matchedSystem, lead.source, lead.message,
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  // 2) ACTIVE buyer language — not "Company X is hiring engineers" (job posts).
+  //    Removed bare "hiring a"/"hire a" — those match HN Who-is-Hiring junk.
   const INTENT = [
-    'seeking', 'looking for', 'looking to hire', 'looking to build', 'in search of',
+    'looking for someone', 'need someone', 'hire someone', 'pay someone',
+    'looking for', 'looking to build', 'looking to hire', 'in search of', 'seeking',
     'need a', 'needs a', 'need an', 'needs an', 'need help', 'needs help', 'need to build',
-    'want to build', 'wants to build', 'hiring a', 'hire a', 'help building', 'help me build',
-    'non-technical founder', 'non technical founder', 'no technical', 'technical co-founder',
-    'technical cofounder', 'fractional cto', 'fractional', 'request for proposal', 'rfp',
-    'looking for a developer', 'need a developer', 'need an engineer', 'build an mvp',
-    'building an mvp', 'outsource', 'looking to outsource', 'want help', 'we need',
+    'want to build', 'wants to build', 'help building', 'help me build', 'someone to build',
+    'non-technical founder', 'non technical founder', 'technical co-founder', 'technical cofounder',
+    'fractional cto', 'need cto', 'looking for cto', 'hire cto', 'need a cto',
+    'looking for a developer', 'need a developer', 'need an engineer',
+    'build an mvp', 'building an mvp', 'outsource', 'looking to outsource', 'want help', 'we need',
+    'request for proposal', 'rfp',
+    // LATAM Spanish buyer language (WhatsApp bot demand)
+    'necesito', 'busco', 'alguien que', 'recomienden', 'para mi negocio', 'para mi empresa',
   ];
   if (!INTENT.some(k => text.includes(k))) {
     return { ok: false, reason: 'no active buying-intent signal (passive/scraped lead — not a buyer)' };
   }
-  return { ok: true, reason: 'qualified: reachable + active buying intent' };
+
+  // 3) Skill ICP — must touch a lane Elena actually sells in 2026.
+  const SKILL_ICP = [
+    // WhatsApp / Telegram AI bots
+    'whatsapp', 'telegram', 'chatbot', 'chat bot', 'conversational ai', 'conversational agent',
+    'bot de whatsapp', 'bot para', 'wa bot', 'tg bot', 'espaluz',
+    // LLM / AI integration / fractional CTO build
+    'llm', 'ai integration', 'ai agent', 'ai automation', 'anthropic', 'openai', 'groq',
+    'fractional cto', 'technical co-founder', 'cto', 'mvp', 'saas', 'api',
+    // Automation workflows
+    'automation', 'workflow', 'make.com', 'n8n', 'zapier', 'integrat', 'oracle', 'cron', 'revops',
+    // GEO / AEO
+    'geo', 'aeo', 'answer engine', 'generative engine', 'ai search', 'chatgpt', 'cited by',
+    'seo', 'content engine',
+    // AI video as service (ads/product — not art films)
+    'ai video', 'product video', 'video ad', 'video ads', 'video generation', 'promo video',
+    'marketing video', 'atuona',
+    // Matched-system labels from classifiers
+    'whatsapp/telegram', 'llm api', 'automation workflow', 'geo/aeo', 'ai video',
+  ];
+  if (!SKILL_ICP.some(k => text.includes(k))) {
+    return { ok: false, reason: 'outside Elena skill ICP (bots/LLM/automation/GEO/AI-video)' };
+  }
+
+  return { ok: true, reason: 'qualified: reachable + buyer intent + skill ICP' };
 }
 
 /** EspaLuz TG/WA users — product trials, not CTO client prospects. Bypass client gate. */

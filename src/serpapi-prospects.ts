@@ -46,6 +46,8 @@ const SEARCH_QUERIES: SearchQuery[] = [
   { q: '(make.com OR n8n OR zapier) ("looking for someone" OR "hire someone" OR "need someone" OR "pay someone") (automation OR workflow OR integrate)', site: '', tag: 'automation_hire', urgency: 5 },
   // Offer C: GEO/AEO — businesses that want to show up in AI answers
   { q: '("answer engine optimization" OR "generative engine optimization" OR "AI search visibility" OR "show up in ChatGPT" OR "cited by ChatGPT") (hire OR consultant OR agency OR "need help" OR "looking for")', site: '', tag: 'geo_aeo', urgency: 4 },
+  // Offer D: AI video as a service (product/ads — July 17 2026 demand table)
+  { q: '("AI video" OR "AI product video" OR "AI ad video" OR "AI promo video") ("looking for" OR "need" OR "hire" OR agency OR freelancer OR "for my business")', site: '', tag: 'ai_video', urgency: 4 },
 ];
 
 function loadSeen(): Set<string> {
