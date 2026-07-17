@@ -217,7 +217,15 @@ export function registerConciergeRoutes(app: Express): void {
 
     const { draft, subject, spam } = parseClaudeOutput(claudeOutput);
     if (spam) {
-      await sendTelegram(`🚫 Concierge: Fable 5 flagged the inquiry from ${name || email || 'unknown'} as SPAM — no reply drafted.`);
+      // Only page Elena when the flagged sender is identifiable — a named/emailed
+      // contact judged SPAM might be a misjudged real lead worth her eyes. An
+      // "unknown" spam verdict is Make chewing on HubSpot auto-import junk
+      // (CalendarSync et al.); notifying about it every 15-min poll is pure noise.
+      if (name || email) {
+        await sendTelegram(`🚫 Concierge: Fable 5 flagged the inquiry from ${name || email} as SPAM — no reply drafted.`);
+      } else {
+        console.log('[concierge] SPAM verdict for unidentifiable sender — dropped quietly (auto-import junk)');
+      }
       res.json({ ok: true, spam: true });
       return;
     }
