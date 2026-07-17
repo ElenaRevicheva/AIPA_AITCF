@@ -75,7 +75,7 @@ export interface AuditResult {
   };
 }
 
-export const ENGINE_VERSION = '1.0.0';
+export const ENGINE_VERSION = '1.0.1';
 
 const CATEGORY_DEFS: Record<CategoryId, { label: string; weight: number }> = {
   aiAccess: { label: 'AI Crawler Access', weight: 25 },
@@ -218,8 +218,13 @@ function collectJsonLdTypes(node: unknown, info: JsonLdInfo): void {
     const t = obj['@type'];
     if (typeof t === 'string') info.types.add(t);
     else if (Array.isArray(t)) for (const x of t) if (typeof x === 'string') info.types.add(x);
-    for (const key of ['@graph', 'mainEntity', 'itemListElement']) {
-      if (obj[key] !== undefined) collectJsonLdTypes(obj[key], info);
+    // Walk EVERY nested value, not just @graph/mainEntity/itemListElement:
+    // real-world identity often lives in nested nodes — e.g. Wikipedia declares
+    // its Organization inside Article.publisher — and missing it falsely fails
+    // the identity check.
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === '@type' || key === '@context') continue;
+      if (value && typeof value === 'object') collectJsonLdTypes(value, info);
     }
   }
 }
