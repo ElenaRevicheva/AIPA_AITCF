@@ -80,18 +80,27 @@ interface AlgoliaCommentHit {
 }
 
 async function findHNThread(query: string): Promise<{ id: string; title: string } | null> {
-  try {
-    const url = `${HN_ALGOLIA}/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=5`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'AIdeazz-CTO-AIPA/1.0' } });
-    if (!res.ok) return null;
-    const data = await res.json() as { hits: AlgoliaStoryHit[] };
-    // Pick the most recent matching thread
-    const hit = data.hits.find(h =>
-      h.title.toLowerCase().includes('who is hiring') ||
-      h.title.toLowerCase().includes('who wants to be hired')
-    );
-    return hit ? { id: hit.objectID, title: hit.title } : null;
-  } catch { return null; }
+  // MUST be /search_by_date (newest first). The plain /search endpoint ranks by
+  // popularity and pinned this to a March-2020 mega-thread (id 22665398) forever —
+  // every "fresh" run re-scraped 6-year-old companies (caught July 17 2026).
+  // Official monthly threads are posted by the "whoishiring" account; try that
+  // tag first, fall back to any story. A 45-day gate rejects stale hits either way.
+  const freshCutoff = Date.now() - 45 * 24 * 3600 * 1000;
+  for (const tags of ['story,author_whoishiring', 'story']) {
+    try {
+      const url = `${HN_ALGOLIA}/search_by_date?query=${encodeURIComponent(query)}&tags=${tags}&hitsPerPage=10`;
+      const res = await fetch(url, { headers: { 'User-Agent': 'AIdeazz-CTO-AIPA/1.0' } });
+      if (!res.ok) continue;
+      const data = await res.json() as { hits: AlgoliaStoryHit[] };
+      const hit = data.hits.find(h =>
+        (h.title.toLowerCase().includes('who is hiring') ||
+          h.title.toLowerCase().includes('who wants to be hired')) &&
+        new Date(h.created_at).getTime() > freshCutoff
+      );
+      if (hit) return { id: hit.objectID, title: hit.title };
+    } catch { /* try next tag set */ }
+  }
+  return null;
 }
 
 async function fetchHNComments(storyId: string, limit = 300): Promise<AlgoliaCommentHit[]> {
