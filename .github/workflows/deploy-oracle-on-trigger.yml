@@ -24,7 +24,7 @@ jobs:
         run: |
           PRODUCT=$(head -n1 .deploy-trigger | tr -d '[:space:]')
           case "$PRODUCT" in
-            whatsapp|telegram|influencer|dragontrade|vjh|vjh_web|openclaw|cto_aipa|atlas|fleet-verify)
+            whatsapp|telegram|influencer|dragontrade|vjh|vjh_web|openclaw|cto_aipa|atlas|fleet-verify|aideazz)
               echo "product=$PRODUCT" >> "$GITHUB_OUTPUT" ;;
             *)
               echo "::error::Invalid product '$PRODUCT' in .deploy-trigger"; exit 1 ;;
@@ -71,6 +71,8 @@ jobs:
             echo "--- running deploy ---"
             if [ "$PRODUCT" = "fleet-verify" ]; then
               bash scripts/oracle-resilience/verify-fleet-health.sh 2>&1
+            elif [ "$PRODUCT" = "aideazz" ]; then
+              bash scripts/oracle-resilience/push-aideazz-patch.sh 2>&1
             else
               bash scripts/oracle-resilience/deploy-product.sh 2>&1
             fi
