@@ -1,0 +1,28 @@
+# Audit our OWN properties with our own AEO/GEO/Tech-SEO engine.
+# Cloud agents cannot workflow_dispatch (HTTP 403), so this uses the same
+# trigger-file pattern as deploy-oracle-on-trigger.yml, plus a weekly schedule.
+#
+# Manual run (cloud agent or laptop):
+#   date -u +%s > .audit-trigger && git add .audit-trigger && git commit -m "audit: self" && git push origin main
+
+name: AIdeazz visibility self-audit
+
+on:
+  push:
+    branches: [main]
+    paths: [".audit-trigger"]
+  schedule:
+    - cron: "0 12 * * 1" # Mondays 12:00 UTC
+
+jobs:
+  self-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build engine
+        run: npm ci && npx tsc
+      - name: Audit AIdeazz properties
+        run: node scripts/visibility-self-audit.cjs

@@ -443,18 +443,31 @@ export async function runVisibilityAudit(inputUrl: string): Promise<AuditResult>
     ...(hasSitemap ? {} : { fix: 'Generate a sitemap.xml and reference it from robots.txt (Sitemap: <url>).' }),
   });
 
+  // noindex can hide in the HTML meta OR the X-Robots-Tag response header —
+  // the header variant is invisible in "view source" and a classic silent killer.
   const robotsMeta = (meta.get('robots') ?? '').toLowerCase();
-  const noindexed = robotsMeta.includes('noindex');
+  const robotsHeader = (page.headers?.get('x-robots-tag') ?? '').toLowerCase();
+  const metaNoindex = robotsMeta.includes('noindex') || robotsMeta.includes('none');
+  const headerNoindex = /\b(noindex|none)\b/.test(robotsHeader);
+  const noindexed = metaNoindex || headerNoindex;
   checks.push({
     id: 'no-noindex',
     category: 'aiAccess',
-    label: 'Page is indexable (no noindex)',
+    label: 'Page is indexable (no noindex meta/header)',
     status: noindexed ? 'fail' : 'pass',
     impact: 'high',
-    detail: noindexed
+    detail: metaNoindex
       ? `<meta name="robots" content="${robotsMeta}"> — this page tells every engine to ignore it`
-      : 'No noindex directive found',
-    ...(noindexed ? { fix: 'Remove the noindex directive unless this page is intentionally hidden.' } : {}),
+      : headerNoindex
+        ? `X-Robots-Tag response header "${robotsHeader}" — invisible in the HTML, but every engine obeys it`
+        : 'No noindex directive in meta robots or X-Robots-Tag header',
+    ...(noindexed
+      ? {
+          fix: metaNoindex
+            ? 'Remove the noindex directive unless this page is intentionally hidden.'
+            : 'Remove "noindex" from the X-Robots-Tag header (check CDN/server config — it is often set there by mistake).',
+        }
+      : {}),
   });
 
   // ---- Category 2: Structured Data (GEO) ---------------------------------

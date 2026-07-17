@@ -148,6 +148,15 @@ function docsPage(): string {
   .cat { display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--line); }
   .fixes li { margin:8px 0; }
   .dim { color:var(--dim); } .hide { display:none; }
+  .engines { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+  .chip { display:flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid var(--line); border-radius:20px; font-size:.85rem; background:#010409; }
+  .chip b { font-weight:600; }
+  details.checks { margin-top:12px; }
+  details.checks summary { cursor:pointer; color:var(--accent); font-weight:600; }
+  .chk { padding:8px 0; border-top:1px solid var(--line); font-size:.9rem; }
+  .chk .st { font-weight:700; margin-right:6px; }
+  .chk .d { color:var(--dim); display:block; }
+  .chk .fx { color:var(--accent); display:block; margin-top:2px; }
 </style>
 </head>
 <body><div class="wrap">
@@ -163,9 +172,11 @@ function docsPage(): string {
     <div id="out" class="hide" style="margin-top:16px">
       <div class="score"><span class="grade" id="grade"></span><div class="bar"><i id="fill"></i></div><strong id="num"></strong></div>
       <p id="verdict"></p>
+      <div class="engines" id="engines"></div>
       <div id="cats"></div>
       <div id="fixwrap" class="hide"><strong>Do these first</strong><ol class="fixes" id="fixes"></ol></div>
-      <p class="dim">Full JSON (28 checks with evidence + fixes) comes from the API call below.</p>
+      <details class="checks"><summary id="chksum">All checks</summary><div id="chks"></div></details>
+      <p class="dim" style="margin-top:12px">Shareable link: <a id="share" href="" style="color:var(--accent); word-break:break-all"></a></p>
     </div>
     <p id="err" class="hide" style="color:var(--bad)"></p>
   </div>
@@ -181,6 +192,7 @@ function docsPage(): string {
 
 <script>
 const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 $('go').onclick = run;
 $('url').addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
 async function run() {
@@ -189,7 +201,7 @@ async function run() {
   $('go').disabled = true; $('go').textContent = 'Auditing…';
   $('err').classList.add('hide'); $('out').classList.add('hide');
   try {
-    const r = await fetch('', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': '${DEMO_API_KEY}' }, body: JSON.stringify({ url }) });
+    const r = await fetch(location.pathname, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': '${DEMO_API_KEY}' }, body: JSON.stringify({ url }) });
     const d = await r.json();
     if (!r.ok) throw new Error(d.message || d.error || ('HTTP ' + r.status));
     $('grade').textContent = d.grade;
@@ -198,17 +210,36 @@ async function run() {
     $('fill').style.background = $('grade').style.color;
     $('num').textContent = d.score + '/100';
     $('verdict').textContent = d.verdict;
+    const eIcon = { yes: ['✓', 'var(--ok)'], blocked: ['✕', 'var(--bad)'], unknown: ['?', 'var(--warn)'] };
+    $('engines').innerHTML = (d.aiEngines || []).map((e) => {
+      const [ic, col] = eIcon[e.crawlable] || eIcon.unknown;
+      return '<span class="chip"><b style="color:' + col + '">' + ic + '</b>' + esc(e.engine) + '</span>';
+    }).join('');
     $('cats').innerHTML = d.categories.map((c) =>
-      '<div class="cat"><span>' + c.label + '</span><span><strong>' + c.score + '</strong><span class="dim">/100 · ' + c.passed + '/' + c.total + ' passed</span></span></div>').join('');
+      '<div class="cat"><span>' + esc(c.label) + '</span><span><strong>' + c.score + '</strong><span class="dim">/100 · ' + c.passed + '/' + c.total + ' passed</span></span></div>').join('');
     const fx = d.topFixes || [];
     $('fixwrap').classList.toggle('hide', fx.length === 0);
-    $('fixes').innerHTML = fx.map((f) => '<li>' + f.replace(/</g, '&lt;') + '</li>').join('');
+    $('fixes').innerHTML = fx.map((f) => '<li>' + esc(f) + '</li>').join('');
+    const cIcon = { pass: ['✓', 'var(--ok)'], warn: ['!', 'var(--warn)'], fail: ['✕', 'var(--bad)'] };
+    const checks = d.checks || [];
+    $('chksum').textContent = 'All ' + checks.length + ' checks (' + checks.filter((c) => c.status === 'pass').length + ' passed)';
+    $('chks').innerHTML = checks.map((c) => {
+      const [ic, col] = cIcon[c.status];
+      return '<div class="chk"><span class="st" style="color:' + col + '">' + ic + '</span>' + esc(c.label) +
+        '<span class="d">' + esc(c.detail) + '</span>' + (c.fix ? '<span class="fx">→ ' + esc(c.fix) + '</span>' : '') + '</div>';
+    }).join('');
+    const share = location.origin + location.pathname + '?url=' + encodeURIComponent(url);
+    $('share').textContent = share; $('share').href = share;
+    history.replaceState(null, '', '?url=' + encodeURIComponent(url));
     $('out').classList.remove('hide');
   } catch (e) {
     $('err').textContent = e.message; $('err').classList.remove('hide');
   }
   $('go').disabled = false; $('go').textContent = 'Audit';
 }
+// Shareable audit links: /cto/v1/visibility?url=https://site.com auto-runs on load.
+const preset = new URLSearchParams(location.search).get('url');
+if (preset) { $('url').value = preset; run(); }
 </script>
 </div></body></html>`;
 }
