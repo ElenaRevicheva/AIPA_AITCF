@@ -222,17 +222,24 @@ export function registerConciergeRoutes(app: Express): void {
       return;
     }
 
-    // Make forwards only the draft text; resolve the recipient from HubSpot:
-    // contacts created in the ~poll window whose first name appears in the
-    // draft's opening. Send button only when the match is unambiguous — a
-    // wrong-recipient email is worse than no button.
+    // Make forwards only the draft text; resolve the recipient from HubSpot.
+    // findRecentContacts is scoped to contacts created by OUR integration (the
+    // July 16 fix — HubSpot's own CalendarSync/OnboardingDataSync imports never
+    // match), so a wide 24h window is safe: the pool is only genuine form
+    // inquiries, and Make's draft always arrives within ~15 min of the contact.
+    let formContactsInWindow = 0;
     if (!emailOk(email)) {
       try {
         const { findRecentContacts } = await import('./hubspot-client');
-        const recent = (await findRecentContacts(45)).filter((c) => emailOk(c.email));
+        const recent = (await findRecentContacts(24 * 60)).filter((c) => emailOk(c.email));
+        formContactsInWindow = recent.length;
         const head = draft.slice(0, 300).toLowerCase();
         const named = recent.filter((c) => c.firstname && head.includes(c.firstname.toLowerCase()));
-        const pick = named.length === 1 ? named[0]! : recent.length === 1 ? recent[0]! : null;
+        // Name match REQUIRED. The old "exactly one recent contact" fallback
+        // could attach a junk auto-import draft to a real lead who happened to
+        // be the only contact in the window — a wrong-recipient send. A draft
+        // that names nobody stays unresolved.
+        const pick = named.length === 1 ? named[0]! : null;
         if (pick) {
           email = pick.email;
           if (!name) name = `${pick.firstname} ${pick.lastname}`.trim() || pick.email;
@@ -244,6 +251,17 @@ export function registerConciergeRoutes(app: Express): void {
       }
     }
     if (!emailOk(email)) {
+      // No form-created contact exists in the last 24h → this draft cannot
+      // belong to a real portfolio inquiry. It is Make reacting to a HubSpot
+      // auto-import (CalendarSync dumped ~90 inbox contacts July 16). Drop it
+      // quietly — paging Elena with junk drafts trains her to ignore the bot.
+      if (formContactsInWindow === 0) {
+        console.log(`[concierge] draft dropped — no form contact in 24h window (auto-import noise): "${draft.slice(0, 80)}…"`);
+        res.json({ ok: true, dropped: 'no-form-contact' });
+        return;
+      }
+      // Real form contacts DO exist but none matched unambiguously — that may
+      // be a real lead. Warn loudly.
       await sendTelegram(
         `⚠️ Concierge: a Fable 5 draft arrived but the recipient could not be determined unambiguously — reply manually.\n\n${draft.slice(0, 3200)}`
       );
