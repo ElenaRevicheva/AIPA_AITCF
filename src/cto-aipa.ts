@@ -55,6 +55,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
+import { visibilityRouter } from './visibility-api';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 
@@ -791,7 +792,10 @@ async function startCTOAIPA() {
   const app = express();
   app.set('trust proxy', 1); // behind nginx (webhook.aideazz.xyz → /cto/)
   app.use(express.json({ verify: (req: any, _res: any, buf: Buffer) => { req.rawBody = buf; } }));
-  
+
+  // AIdeazz Lab Visibility API (AEO/GEO/Tech-SEO audit) — public at /cto/v1/visibility
+  app.use(visibilityRouter());
+
   // Health check & status
   app.get('/', (req, res) => {
     res.json({ 
