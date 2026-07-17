@@ -75,7 +75,7 @@ export interface AuditResult {
   };
 }
 
-export const ENGINE_VERSION = '1.0.1';
+export const ENGINE_VERSION = '1.1.0';
 
 const CATEGORY_DEFS: Record<CategoryId, { label: string; weight: number }> = {
   aiAccess: { label: 'AI Crawler Access', weight: 25 },
@@ -186,11 +186,15 @@ function extractMeta(html: string): Map<string, string> {
 interface JsonLdInfo {
   blocks: number;
   types: Set<string>;
+  /** type → JSON path where it was first seen (evidence for check details). */
+  typePaths: Map<string, string>;
   hasDates: boolean;
+  /** sameAs entity links (Wikidata, social profiles) — strong disambiguation signal. */
+  hasSameAs: boolean;
 }
 
 function extractJsonLd(html: string): JsonLdInfo {
-  const info: JsonLdInfo = { blocks: 0, types: new Set(), hasDates: false };
+  const info: JsonLdInfo = { blocks: 0, types: new Set(), typePaths: new Map(), hasDates: false, hasSameAs: false };
   const re = /<script\b[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(html)) !== null) {
@@ -199,34 +203,69 @@ function extractJsonLd(html: string): JsonLdInfo {
     info.blocks += 1;
     try {
       const parsed: unknown = JSON.parse(raw);
-      collectJsonLdTypes(parsed, info);
+      collectJsonLdTypes(parsed, info, 'root');
     } catch {
       // Malformed JSON-LD still counts as a block; the schema checks will flag quality.
     }
     if (/"date(?:Published|Modified)"\s*:/.test(raw)) info.hasDates = true;
+    if (/"sameAs"\s*:/.test(raw)) info.hasSameAs = true;
   }
   return info;
 }
 
-function collectJsonLdTypes(node: unknown, info: JsonLdInfo): void {
+function collectJsonLdTypes(node: unknown, info: JsonLdInfo, path: string): void {
   if (Array.isArray(node)) {
-    for (const item of node) collectJsonLdTypes(item, info);
+    for (const item of node) collectJsonLdTypes(item, info, path);
     return;
   }
   if (node && typeof node === 'object') {
     const obj = node as Record<string, unknown>;
     const t = obj['@type'];
-    if (typeof t === 'string') info.types.add(t);
-    else if (Array.isArray(t)) for (const x of t) if (typeof x === 'string') info.types.add(x);
+    const addType = (x: string) => {
+      info.types.add(x);
+      if (!info.typePaths.has(x)) info.typePaths.set(x, path);
+    };
+    if (typeof t === 'string') addType(t);
+    else if (Array.isArray(t)) for (const x of t) if (typeof x === 'string') addType(x);
     // Walk EVERY nested value, not just @graph/mainEntity/itemListElement:
     // real-world identity often lives in nested nodes — e.g. Wikipedia declares
     // its Organization inside Article.publisher — and missing it falsely fails
     // the identity check.
     for (const [key, value] of Object.entries(obj)) {
       if (key === '@type' || key === '@context') continue;
-      if (value && typeof value === 'object') collectJsonLdTypes(value, info);
+      if (value && typeof value === 'object') {
+        collectJsonLdTypes(value, info, path === 'root' ? key : `${path}.${key}`);
+      }
     }
   }
+}
+
+/**
+ * schema.org types declared as HTML microdata (itemtype=) or RDFa (typeof=).
+ * Older CMSes and several major platforms mark up this way instead of JSON-LD —
+ * AI retrievers read it fine, so "no JSON-LD" must not mean "no structured data".
+ */
+function extractInlineSchemaTypes(html: string): Set<string> {
+  const types = new Set<string>();
+  const microdata = /\bitemtype\s*=\s*["']https?:\/\/schema\.org\/([A-Za-z]+)["']/gi;
+  let m: RegExpExecArray | null;
+  while ((m = microdata.exec(html)) !== null) if (m[1]) types.add(m[1]);
+  if (/\b(?:vocab\s*=\s*["']https?:\/\/schema\.org\/?["']|typeof\s*=\s*["'](?:schema:)?[A-Za-z]+["'])/i.test(html)) {
+    const rdfa = /\btypeof\s*=\s*["'](?:schema:)?([A-Za-z]+)["']/gi;
+    while ((m = rdfa.exec(html)) !== null) if (m[1]) types.add(m[1]);
+  }
+  return types;
+}
+
+/** "Organization (in publisher)" — evidence of where the type was declared. */
+function describeTypeSource(types: string[], jsonLd: JsonLdInfo, inline: Set<string>): string {
+  return types
+    .map((t) => {
+      const path = jsonLd.typePaths.get(t);
+      if (path) return path === 'root' ? t : `${t} (in ${path})`;
+      return inline.has(t) ? `${t} (microdata/RDFa)` : t;
+    })
+    .join(', ');
 }
 
 /**
@@ -419,37 +458,44 @@ export async function runVisibilityAudit(inputUrl: string): Promise<AuditResult>
   });
 
   // ---- Category 2: Structured Data (GEO) ---------------------------------
+  // Structured data is JSON-LD *or* microdata/RDFa — engines read all three.
+  const inlineTypes = extractInlineSchemaTypes(html);
+  const allSchemaTypes = new Set<string>([...jsonLd.types, ...inlineTypes]);
   const hasJsonLd = jsonLd.blocks > 0;
+  const hasAnySchema = hasJsonLd || inlineTypes.size > 0;
   checks.push({
     id: 'json-ld',
     category: 'geo',
-    label: 'JSON-LD structured data present',
-    status: hasJsonLd ? 'pass' : 'fail',
+    label: 'Structured data present (JSON-LD / microdata)',
+    status: hasJsonLd ? 'pass' : inlineTypes.size > 0 ? 'warn' : 'fail',
     impact: 'high',
     detail: hasJsonLd
-      ? `${jsonLd.blocks} JSON-LD block(s), types: ${[...jsonLd.types].slice(0, 8).join(', ') || 'none parsed'}`
-      : 'No <script type="application/ld+json"> found — machines must guess what this page is',
+      ? `${jsonLd.blocks} JSON-LD block(s), types: ${[...jsonLd.types].slice(0, 8).join(', ') || 'none parsed'}${inlineTypes.size > 0 ? ` + microdata/RDFa: ${[...inlineTypes].slice(0, 4).join(', ')}` : ''}`
+      : inlineTypes.size > 0
+        ? `No JSON-LD, but microdata/RDFa found: ${[...inlineTypes].slice(0, 8).join(', ')} — readable, though JSON-LD is what engines parse most reliably`
+        : 'No JSON-LD or microdata found — machines must guess what this page is',
     ...(hasJsonLd ? {} : { fix: 'Add JSON-LD (schema.org) describing the page: at minimum Organization or WebSite.' }),
   });
 
-  const identityTypes = ['Organization', 'LocalBusiness', 'Person', 'WebSite', 'ProfessionalService'];
-  const hasIdentity = identityTypes.some((t) => jsonLd.types.has(t));
+  const identityTypes = ['Organization', 'NewsMediaOrganization', 'LocalBusiness', 'Person', 'WebSite', 'ProfessionalService', 'Corporation', 'Brand'];
+  const presentIdentity = identityTypes.filter((t) => allSchemaTypes.has(t));
+  const hasIdentity = presentIdentity.length > 0;
   checks.push({
     id: 'schema-identity',
     category: 'geo',
     label: 'Identity schema (Organization / Person / WebSite)',
-    status: hasIdentity ? 'pass' : hasJsonLd ? 'warn' : 'fail',
+    status: hasIdentity ? 'pass' : hasAnySchema ? 'warn' : 'fail',
     impact: 'high',
     detail: hasIdentity
-      ? `Identity type present: ${identityTypes.filter((t) => jsonLd.types.has(t)).join(', ')}`
+      ? `Identity declared: ${describeTypeSource(presentIdentity, jsonLd, inlineTypes)}`
       : 'No identity schema — AI engines cannot confidently say WHO is behind this site',
     ...(hasIdentity
       ? {}
       : { fix: 'Add Organization (or Person) JSON-LD with name, url, logo, sameAs links to your profiles.' }),
   });
 
-  const answerTypes = ['FAQPage', 'HowTo', 'Article', 'BlogPosting', 'Product', 'Service', 'Offer'];
-  const presentAnswerTypes = answerTypes.filter((t) => jsonLd.types.has(t));
+  const answerTypes = ['FAQPage', 'QAPage', 'HowTo', 'Article', 'NewsArticle', 'BlogPosting', 'Product', 'Service', 'Offer', 'Recipe', 'Event'];
+  const presentAnswerTypes = answerTypes.filter((t) => allSchemaTypes.has(t));
   checks.push({
     id: 'schema-answer',
     category: 'geo',
@@ -458,11 +504,27 @@ export async function runVisibilityAudit(inputUrl: string): Promise<AuditResult>
     impact: 'medium',
     detail:
       presentAnswerTypes.length > 0
-        ? `Present: ${presentAnswerTypes.join(', ')}`
+        ? `Present: ${describeTypeSource(presentAnswerTypes, jsonLd, inlineTypes)}`
         : 'None of FAQPage/HowTo/Article/Product/Service found — these are the types answer engines quote most',
     ...(presentAnswerTypes.length > 0
       ? {}
       : { fix: 'Mark up your FAQ or key offer as FAQPage / Service JSON-LD so engines can lift Q&A directly.' }),
+  });
+
+  // sameAs links tie the page to a canonical entity (Wikidata, LinkedIn, GitHub…)
+  // — how engines disambiguate YOU from someone with a similar name.
+  checks.push({
+    id: 'entity-links',
+    category: 'geo',
+    label: 'Entity links (sameAs to profiles / knowledge graph)',
+    status: jsonLd.hasSameAs ? 'pass' : 'warn',
+    impact: 'medium',
+    detail: jsonLd.hasSameAs
+      ? 'sameAs present — the page anchors itself to known entities'
+      : 'No sameAs links — engines cannot tie this page to your profiles or knowledge-graph entries',
+    ...(jsonLd.hasSameAs
+      ? {}
+      : { fix: 'Add sameAs to your JSON-LD: links to LinkedIn, GitHub, Wikidata, social profiles.' }),
   });
 
   const ogTitle = meta.get('og:title');

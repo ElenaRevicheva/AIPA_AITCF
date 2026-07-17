@@ -69,6 +69,12 @@ export function visibilityRouter(): Router {
     res.json({ ok: true, service: 'aideazz-lab-visibility-api', engineVersion: ENGINE_VERSION });
   });
 
+  // Browser-friendly docs + try-it page at the same URL (the API itself is POST).
+  // Without this, opening the endpoint on a phone shows Express's "Cannot GET".
+  router.get('/v1/visibility', (_req, res) => {
+    res.type('html').send(docsPage());
+  });
+
   router.post('/v1/visibility', async (req: Request, res: Response) => {
     const key = req.header('X-API-Key') ?? '';
     if (!configuredKeys().has(key)) {
@@ -111,6 +117,100 @@ export function visibilityRouter(): Router {
   });
 
   return router;
+}
+
+/** Single-file docs + try-it widget served at GET /v1/visibility. */
+function docsPage(): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIdeazz Lab — AI Visibility Audit API</title>
+<style>
+  :root { --bg:#0d1117; --card:#161b22; --line:#30363d; --text:#e6edf3; --dim:#8b949e; --accent:#58a6ff; --ok:#3fb950; --warn:#d29922; --bad:#f85149; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 -apple-system,'Segoe UI',Roboto,sans-serif; }
+  .wrap { max-width:720px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:1.5rem; margin:.2em 0; }
+  .sub { color:var(--dim); margin-bottom:24px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin:16px 0; }
+  code, pre { background:#010409; border:1px solid var(--line); border-radius:6px; font-family:ui-monospace,Menlo,monospace; font-size:.85em; }
+  code { padding:2px 6px; } pre { padding:12px; overflow-x:auto; }
+  .row { display:flex; gap:8px; }
+  input[type=url] { flex:1; min-width:0; padding:12px; border-radius:8px; border:1px solid var(--line); background:#010409; color:var(--text); font-size:1rem; }
+  button { padding:12px 20px; border:0; border-radius:8px; background:var(--accent); color:#04121f; font-weight:700; font-size:1rem; cursor:pointer; }
+  button:disabled { opacity:.5; }
+  .score { display:flex; align-items:center; gap:16px; margin:12px 0; }
+  .grade { font-size:2.4rem; font-weight:800; }
+  .bar { height:8px; border-radius:4px; background:#010409; overflow:hidden; flex:1; }
+  .bar i { display:block; height:100%; }
+  .cat { display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--line); }
+  .fixes li { margin:8px 0; }
+  .dim { color:var(--dim); } .hide { display:none; }
+</style>
+</head>
+<body><div class="wrap">
+  <h1>AIdeazz Lab — AI Visibility Audit</h1>
+  <p class="sub">Can ChatGPT, Perplexity, Claude and Gemini find you, understand you, and quote you? One call audits any URL: AI crawler access, structured data (GEO), answer-readiness (AEO), technical foundation. Engine v${ENGINE_VERSION}.</p>
+
+  <div class="card">
+    <strong>Try it now</strong> — free demo key, ${DEMO_LIMIT_PER_HOUR} audits/hour.
+    <div class="row" style="margin-top:12px">
+      <input id="url" type="url" placeholder="https://your-site.com" inputmode="url">
+      <button id="go">Audit</button>
+    </div>
+    <div id="out" class="hide" style="margin-top:16px">
+      <div class="score"><span class="grade" id="grade"></span><div class="bar"><i id="fill"></i></div><strong id="num"></strong></div>
+      <p id="verdict"></p>
+      <div id="cats"></div>
+      <div id="fixwrap" class="hide"><strong>Do these first</strong><ol class="fixes" id="fixes"></ol></div>
+      <p class="dim">Full JSON (28 checks with evidence + fixes) comes from the API call below.</p>
+    </div>
+    <p id="err" class="hide" style="color:var(--bad)"></p>
+  </div>
+
+  <div class="card">
+    <strong>API</strong>
+    <pre>curl -X POST https://webhook.aideazz.xyz/cto/v1/visibility \\
+  -H "Content-Type: application/json" \\
+  -H "X-API-Key: ${DEMO_API_KEY}" \\
+  -d '{"url":"https://your-site.com"}'</pre>
+    <p class="dim">Returns score (0–100), grade, per-engine crawlability (GPTBot, ClaudeBot, PerplexityBot, Google-Extended…), 4 category scores, 28 evidence-backed checks and a prioritized fix list. Production keys (${KEY_LIMIT_PER_HOUR}/hour): <a href="mailto:aipa@aideazz.xyz" style="color:var(--accent)">aipa@aideazz.xyz</a></p>
+  </div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+$('go').onclick = run;
+$('url').addEventListener('keydown', (e) => { if (e.key === 'Enter') run(); });
+async function run() {
+  const url = $('url').value.trim();
+  if (!url) return;
+  $('go').disabled = true; $('go').textContent = 'Auditing…';
+  $('err').classList.add('hide'); $('out').classList.add('hide');
+  try {
+    const r = await fetch('', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': '${DEMO_API_KEY}' }, body: JSON.stringify({ url }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.message || d.error || ('HTTP ' + r.status));
+    $('grade').textContent = d.grade;
+    $('grade').style.color = d.score >= 70 ? 'var(--ok)' : d.score >= 40 ? 'var(--warn)' : 'var(--bad)';
+    $('fill').style.width = d.score + '%';
+    $('fill').style.background = $('grade').style.color;
+    $('num').textContent = d.score + '/100';
+    $('verdict').textContent = d.verdict;
+    $('cats').innerHTML = d.categories.map((c) =>
+      '<div class="cat"><span>' + c.label + '</span><span><strong>' + c.score + '</strong><span class="dim">/100 · ' + c.passed + '/' + c.total + ' passed</span></span></div>').join('');
+    const fx = d.topFixes || [];
+    $('fixwrap').classList.toggle('hide', fx.length === 0);
+    $('fixes').innerHTML = fx.map((f) => '<li>' + f.replace(/</g, '&lt;') + '</li>').join('');
+    $('out').classList.remove('hide');
+  } catch (e) {
+    $('err').textContent = e.message; $('err').classList.remove('hide');
+  }
+  $('go').disabled = false; $('go').textContent = 'Audit';
+}
+</script>
+</div></body></html>`;
 }
 
 export function startVisibilityServer(port: number): void {
