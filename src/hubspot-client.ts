@@ -532,7 +532,7 @@ export function buildHiringActionPackage(input: {
   notes?: string | undefined;
   source?: string | undefined;
 }): string {
-  const letter =
+  const extracted =
     (input.coverLetter || '').trim() ||
     // VJH sometimes embeds the letter inside opaque notes
     (() => {
@@ -540,6 +540,24 @@ export function buildHiringActionPackage(input: {
       const m = n.match(/(?:COVER\s*LETTER|cover letter)\s*[:\-]?\s*([\s\S]{80,})/i);
       return m?.[1]?.trim() || '';
     })();
+  // Always park a paste-ready letter — even when VJH omits coverLetter
+  const letter =
+    extracted ||
+    [
+      `Dear Hiring Manager,`,
+      ``,
+      `I am writing to apply for the ${input.jobTitle} role at ${input.company}.`,
+      ``,
+      `I build AI-augmented products end-to-end (bots, LLM wiring, automation, GEO/AEO) and would welcome the chance to contribute on this team.`,
+      ``,
+      input.jobUrl ? `Role link: ${input.jobUrl}` : '',
+      ``,
+      `[Edit this stub — add 1–2 proof points from your resume, then paste into the apply form.]`,
+      ``,
+      `Best regards,`,
+      `Elena Revicheva`,
+      `https://aideazz.xyz`,
+    ].filter(l => l !== null && l !== undefined).join('\n');
   const lines: string[] = [
     `<strong>⚠️ MANUAL APPLY REQUIRED</strong> — VJH found this; you submit.`,
     input.jobUrl
@@ -552,9 +570,7 @@ export function buildHiringActionPackage(input: {
     input.source ? `<strong>Source:</strong> ${escHs(input.source)}` : '',
     '',
     `<strong>--- COVER / OUTREACH LETTER (edit, then paste) ---</strong>`,
-    letter
-      ? `<pre style="white-space:pre-wrap;font-family:inherit">${escHs(letter)}</pre>`
-      : `<em>(No letter yet — draft one from the job URL above, or wait for VJH cover-letter sync.)</em>`,
+    `<pre style="white-space:pre-wrap;font-family:inherit">${escHs(letter)}</pre>`,
     '',
     `<strong>--- CHECKLIST ---</strong>`,
     `[ ] Open Apply link`,
