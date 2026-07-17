@@ -407,6 +407,22 @@ export async function findDealByName(name: string): Promise<{ id: string; stage:
   }
 }
 
+/** Deal IDs associated with a contact (Concierge drafts park on the right deal). */
+export async function findDealIdsForContact(contactId: string): Promise<string[]> {
+  try {
+    const data = await hsGet<{ results?: Array<{ toObjectId?: string; id?: string }> }>(
+      `/crm/v4/objects/contacts/${contactId}/associations/deals`,
+    );
+    if (!data?.results?.length) return [];
+    return data.results
+      .map(r => r.toObjectId || r.id)
+      .filter((id): id is string => !!id);
+  } catch (e) {
+    console.warn('[HubSpot] findDealIdsForContact error:', (e as Error).message?.slice(0, 80));
+    return [];
+  }
+}
+
 /**
  * Update an existing deal's stage + optionally description.
  * Used by upsert flows after findDealByName().
@@ -485,6 +501,128 @@ export async function addNoteToDeal(dealId: string, body: string): Promise<void>
   }
 }
 
+/** Escape plain text for HubSpot HTML notes. */
+function escHs(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
+function hsLink(url: string, label: string): string {
+  const u = url.trim();
+  if (!u) return '';
+  const href = u.startsWith('http') ? u : `https://${u}`;
+  return `<a href="${href.replace(/"/g, '&quot;')}">${escHs(label)}</a>`;
+}
+
+/**
+ * Hiring action package — Elena opens the deal and can Apply + paste the letter.
+ * Always includes MANUAL APPLY (VJH does not submit).
+ */
+export function buildHiringActionPackage(input: {
+  jobTitle: string;
+  company: string;
+  jobUrl?: string | undefined;
+  score?: number | undefined;
+  recruiterName?: string | undefined;
+  recruiterEmail?: string | undefined;
+  coverLetter?: string | undefined;
+  notes?: string | undefined;
+  source?: string | undefined;
+}): string {
+  const letter =
+    (input.coverLetter || '').trim() ||
+    // VJH sometimes embeds the letter inside opaque notes
+    (() => {
+      const n = input.notes || '';
+      const m = n.match(/(?:COVER\s*LETTER|cover letter)\s*[:\-]?\s*([\s\S]{80,})/i);
+      return m?.[1]?.trim() || '';
+    })();
+  const lines: string[] = [
+    `<strong>⚠️ MANUAL APPLY REQUIRED</strong> — VJH found this; you submit.`,
+    input.jobUrl
+      ? `<strong>Apply:</strong> ${hsLink(input.jobUrl, 'Open job / apply page')}<br><code>${escHs(input.jobUrl)}</code>`
+      : `<strong>Apply:</strong> (no URL — search "${escHs(input.jobTitle)} @ ${escHs(input.company)}")`,
+    input.score != null ? `<strong>Score:</strong> ${input.score}/100` : '',
+    input.recruiterName || input.recruiterEmail
+      ? `<strong>Recruiter:</strong> ${escHs([input.recruiterName, input.recruiterEmail].filter(Boolean).join(' · '))}`
+      : '',
+    input.source ? `<strong>Source:</strong> ${escHs(input.source)}` : '',
+    '',
+    `<strong>--- COVER / OUTREACH LETTER (edit, then paste) ---</strong>`,
+    letter
+      ? `<pre style="white-space:pre-wrap;font-family:inherit">${escHs(letter)}</pre>`
+      : `<em>(No letter yet — draft one from the job URL above, or wait for VJH cover-letter sync.)</em>`,
+    '',
+    `<strong>--- CHECKLIST ---</strong>`,
+    `[ ] Open Apply link`,
+    `[ ] Edit letter`,
+    `[ ] Attach resume`,
+    `[ ] Submit`,
+    `[ ] Move deal stage after you apply`,
+  ];
+  // Keep leftover notes that aren't the letter itself
+  if (input.notes?.trim() && !letter) {
+    lines.push('', `<strong>Extra notes:</strong>`, escHs(input.notes.trim()));
+  } else if (input.notes?.trim() && letter && !input.notes.includes(letter.slice(0, 40))) {
+    const stripped = input.notes.replace(/(?:COVER\s*LETTER|cover letter)\s*[:\-]?[\s\S]*/i, '').trim();
+    if (stripped) lines.push('', `<strong>Extra notes:</strong>`, escHs(stripped));
+  }
+  return lines.filter(l => l !== null && l !== undefined).join('<br>');
+}
+
+/**
+ * Client action package — open deal → review draft → edit → send (Resend / email client).
+ */
+export function buildClientActionPackage(lead: LeadForHubSpot): string {
+  const first = cleanDisplayName(lead.name, lead.company).split(/\s+/)[0] || 'there';
+  const company = lead.company || 'your team';
+  const offer = lead.matchedSystem || 'an AI system that fits';
+  const subject =
+    (lead.draftSubject || '').trim() ||
+    `Quick idea for ${company} — ${offer}`.slice(0, 120);
+  const body =
+    (lead.draftBody || '').trim() ||
+    [
+      `Hi ${first},`,
+      ``,
+      lead.painPoint
+        ? `I noticed ${lead.painPoint.slice(0, 220)}`
+        : `I help teams ship WhatsApp/Telegram bots, LLM wiring, automation, GEO/AEO, and AI product video — fast.`,
+      ``,
+      `I built systems in that lane (EspaLuz, Oracle agents, HubSpot wiring). Happy to show a 15-min walkthrough if useful.`,
+      ``,
+      `Elena`,
+      `https://aideazz.xyz`,
+    ].join('\n');
+
+  const website = lead.website || (lead.domain ? `https://${lead.domain.replace(/^https?:\/\//, '')}` : '');
+  const lines: string[] = [
+    `<strong>🎯 ACTION PACKAGE — review → edit → send</strong>`,
+    lead.sourcePrefix ? `<strong>Stream:</strong> ${escHs(lead.sourcePrefix)}` : '',
+    lead.email ? `<strong>To:</strong> ${escHs(lead.email)}` : `<strong>To:</strong> <em>(add email — then /add_email or edit contact)</em>`,
+    website ? `<strong>Website:</strong> ${hsLink(website, website)}` : '',
+    lead.linkedinUrl ? `<strong>LinkedIn:</strong> ${hsLink(lead.linkedinUrl, 'Open profile')}` : '',
+    lead.sourceUrl ? `<strong>Source signal:</strong> ${hsLink(lead.sourceUrl, 'Open original post')}` : '',
+    lead.matchedSystem ? `<strong>Best-fit offer:</strong> ${escHs(lead.matchedSystem)}` : '',
+    lead.painPoint ? `<strong>Pain / signal:</strong> ${escHs(lead.painPoint.slice(0, 500))}` : '',
+    lead.message ? `<strong>They wrote:</strong> ${escHs(lead.message.slice(0, 800))}` : '',
+    '',
+    `<strong>--- EMAIL DRAFT (copy / edit / send) ---</strong>`,
+    `<strong>Subject:</strong> ${escHs(subject)}`,
+    `<pre style="white-space:pre-wrap;font-family:inherit">${escHs(body)}</pre>`,
+    '',
+    `<strong>--- CHECKLIST ---</strong>`,
+    `[ ] Confirm email / LinkedIn`,
+    `[ ] Edit draft`,
+    `[ ] Send (Resend / your mail / TG concierge)`,
+    `[ ] Move deal to "Qualified to buy" after send`,
+  ];
+  return lines.filter(Boolean).join('<br>');
+}
+
 // ─── High-level: push one lead into HubSpot ───────────────────────────────────
 
 export interface LeadForHubSpot {
@@ -513,6 +651,11 @@ export interface LeadForHubSpot {
   utmContent?: string | undefined;
   /** Atlas ↔ HubSpot loop metadata (audit log + concept link when UTMs present). */
   crmMeta?: import('./atlas-crm-bridge').HubSpotCrmMeta;
+  /** Clickable original post / SERP result URL. */
+  sourceUrl?: string | undefined;
+  /** Pre-written outreach draft parked on the deal for review→edit→send. */
+  draftSubject?: string | undefined;
+  draftBody?: string | undefined;
 }
 
 /** Collapse an ugly "X @ X" or redundant "Name @ Company" display name. */
@@ -550,9 +693,9 @@ function buildCompanyDescription(lead: LeadForHubSpot): string | undefined {
  * + match skill ICP. Form inquiries (CLIENT-CTO-INQUIRY) bypass keyword checks.
  */
 export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: string } {
-  // 1) Must be reachable / a real entity
-  if (!(lead.email || lead.domain || lead.website || lead.linkedinUrl)) {
-    return { ok: false, reason: 'no reachable identity (no email/domain/site/linkedin)' };
+  // 1) Must be reachable / a real entity (sourceUrl = SERP/HN post counts as a trail)
+  if (!(lead.email || lead.domain || lead.website || lead.linkedinUrl || lead.sourceUrl)) {
+    return { ok: false, reason: 'no reachable identity (no email/domain/site/linkedin/sourceUrl)' };
   }
   // A direct portfolio-form submission IS the buying signal — a human chose to
   // write in. The keyword intent gate below is for scraped/passive sources only.
@@ -562,6 +705,7 @@ export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: 
   }
   const text = [
     lead.company, lead.painPoint, lead.matchedSystem, lead.source, lead.message,
+    lead.draftSubject, lead.draftBody, lead.sourceUrl,
   ].filter(Boolean).join(' ').toLowerCase();
 
   // 2) ACTIVE buyer language — not "Company X is hiring engineers" (job posts).
@@ -646,12 +790,34 @@ export async function pushEspaLuzDealToHubSpot(input: {
       }, 'duplicate');
       return dup;
     }
+    const waLink = input.channel === 'whatsapp' && /^\+?\d{8,15}$/.test(input.userId.replace(/\s/g, ''))
+      ? `https://wa.me/${input.userId.replace(/[^\d]/g, '')}`
+      : '';
+    const actionNote = [
+      `<strong>🟢 ESPALUZ TRIAL — action package</strong>`,
+      `<strong>Channel:</strong> ${escHs(input.channel)} · <strong>User:</strong> ${escHs(input.userId)}`,
+      waLink ? `<strong>Open chat:</strong> ${hsLink(waLink, 'WhatsApp deep link')}` : '',
+      input.accessType ? `<strong>Access:</strong> ${escHs(input.accessType)}` : '',
+      input.atlasConceptId ? `<strong>Atlas:</strong> ${escHs(input.atlasConceptId)}` : '',
+      input.context ? `<strong>Context:</strong> ${escHs(input.context.slice(0, 600))}` : '',
+      '',
+      `<strong>--- UPSELL DRAFT (edit → send in ${ch}) ---</strong>`,
+      `<pre style="white-space:pre-wrap;font-family:inherit">${escHs(
+        `¡Hola! Vi que estás probando EspaLuz. Si quieres el plan completo (más práctica + seguimiento), te paso el enlace de pago o una demo de 10 min. ¿Te sirve?`
+      )}</pre>`,
+      '',
+      `<strong>--- CHECKLIST ---</strong>`,
+      `[ ] Open chat`,
+      `[ ] Send upsell / ask for feedback`,
+      `[ ] If paid → move deal stage / tag ESPALUZ-PAID`,
+    ].filter(Boolean).join('<br>');
     const description = [
       input.context,
       input.accessType ? `Access: ${input.accessType}` : null,
       input.atlasConceptId ? `Atlas concept: ${input.atlasConceptId}` : null,
       `Channel: ${input.channel}`,
       `User ID: ${input.userId}`,
+      waLink ? `WhatsApp: ${waLink}` : null,
     ]
       .filter(Boolean)
       .join('\n');
@@ -662,7 +828,7 @@ export async function pushEspaLuzDealToHubSpot(input: {
       description: description || undefined,
     });
     if (dealId && contactId) await associateDealContact(dealId, contactId);
-    if (dealId && description) await addNoteToDeal(dealId, description);
+    if (dealId) await addNoteToDeal(dealId, actionNote);
     console.log(`[HubSpot] EspaLuz deal created: ${dealName}`);
     const out = { contactId, dealId };
     const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
@@ -721,13 +887,36 @@ export async function pushAtlasRadarDealToHubSpot(input: {
       input.landingUrl ? `Landing URL (UTM-tagged): ${input.landingUrl}` : null,
       'Dashboard: https://webhook.aideazz.xyz/whitespace/atlas.html',
     ].filter(Boolean).join('\n');
+    const linkedInDraft = [
+      `Market window: ${input.vertical} — ${input.angle}`,
+      input.why ? `Why now: ${input.why}` : '',
+      ``,
+      `I help teams ship this with AI agents (bots, automation, GEO). Landing:`,
+      input.landingUrl || 'https://aideazz.xyz',
+    ].filter(Boolean).join('\n');
+    const actionNote = [
+      `<strong>📡 ATLAS RADAR — action package</strong>`,
+      input.score != null ? `<strong>Score:</strong> ${input.score}/100` : '',
+      input.why ? `<strong>Why:</strong> ${escHs(input.why)}` : '',
+      input.evidence ? `<strong>Evidence:</strong> ${escHs(input.evidence.slice(0, 400))}` : '',
+      input.landingUrl ? `<strong>Landing:</strong> ${hsLink(input.landingUrl, 'Open UTM landing')}` : '',
+      `${hsLink('https://webhook.aideazz.xyz/whitespace/atlas.html', 'Open Atlas dashboard')}`,
+      '',
+      `<strong>--- LINKEDIN / POST DRAFT (edit → publish) ---</strong>`,
+      `<pre style="white-space:pre-wrap;font-family:inherit">${escHs(linkedInDraft)}</pre>`,
+      '',
+      `<strong>--- CHECKLIST ---</strong>`,
+      `[ ] Open landing`,
+      `[ ] Post / DM angle`,
+      `[ ] Log outcome via /outcome`,
+    ].filter(Boolean).join('<br>');
     const dealId = await createDeal({
       name: dealName,
       stage: HS_STAGES.prospected,
       dealType: 'newbusiness',
       description,
     });
-    if (dealId) await addNoteToDeal(dealId, description);
+    if (dealId) await addNoteToDeal(dealId, actionNote);
     console.log(`[HubSpot] Atlas radar deal created: ${dealName}`);
     return { dealId, duplicate: false };
   } catch (err) {
@@ -818,8 +1007,11 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
         lead.painPoint     ? `Pain point: ${lead.painPoint}`         : null,
         lead.matchedSystem ? `Matched system: ${lead.matchedSystem}` : null,
         lead.source        ? `Source: ${lead.source}`                : null,
+        lead.sourceUrl     ? `Source URL: ${lead.sourceUrl}`          : null,
         lead.website       ? `Website: ${lead.website}`              : null,
         lead.linkedinUrl   ? `LinkedIn: ${lead.linkedinUrl}`         : null,
+        lead.email         ? `Email: ${lead.email}`                  : null,
+        lead.draftSubject  ? `Draft subject: ${lead.draftSubject}`   : null,
         lead.atlasConceptId ? `Atlas concept: ${lead.atlasConceptId}` : null,
         lead.utmCampaign   ? `UTM campaign: ${lead.utmCampaign}`     : null,
         lead.utmTerm       ? `UTM term: ${lead.utmTerm}`             : null,
@@ -831,16 +1023,20 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
     if (dealId && contactId)    await associateDealContact(dealId, contactId);
     if (dealId && companyId)    await associateDealCompany(dealId, companyId);
 
-    // 5. Note
-    if (contactId && (lead.painPoint || lead.matchedSystem)) {
-      const noteBody = [
-        `Source: ${lead.source ?? 'AI Marketing Engine'}`,
-        lead.painPoint     ? `Pain point: ${lead.painPoint}`         : null,
-        lead.matchedSystem ? `Matched system: ${lead.matchedSystem}` : null,
-        lead.email         ? `Email: ${lead.email}`                  : null,
-        lead.linkedinUrl   ? `LinkedIn: ${lead.linkedinUrl}`         : null,
-      ].filter(Boolean).join('\n');
-      await addNoteToContact(contactId, noteBody);
+    // 5. Action package on the DEAL (review → edit → send) + light contact trail
+    const actionNote = buildClientActionPackage(lead);
+    if (dealId) await addNoteToDeal(dealId, actionNote);
+    if (contactId) {
+      await addNoteToContact(
+        contactId,
+        [
+          `Source: ${lead.source ?? 'AI Marketing Engine'}`,
+          lead.painPoint     ? `Pain: ${lead.painPoint.slice(0, 300)}` : null,
+          lead.matchedSystem ? `Offer: ${lead.matchedSystem}` : null,
+          lead.email         ? `Email: ${lead.email}` : null,
+          dealId             ? `Deal action package attached (open associated deal).` : null,
+        ].filter(Boolean).join('\n'),
+      );
     }
 
     console.log(`[HubSpot] ✅ Lead pushed — contact:${contactId} company:${companyId} deal:${dealId}`);
@@ -956,6 +1152,8 @@ export interface HiringDealInput {
   stage?: HiringStage | undefined;
   score?: number | undefined;
   notes?: string | undefined;
+  /** Full cover letter text for Elena to edit + paste on apply. */
+  coverLetter?: string | undefined;
   /** e.g. 'HIRING-VJH' or 'HIRING-VJH-SERP' — wrapped in [brackets] as dealname prefix */
   sourcePrefix?: string | undefined;
   crmMeta?: import('./atlas-crm-bridge').HubSpotCrmMeta;
@@ -1006,20 +1204,35 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       : null;
 
     const companyId = await upsertCompany({
-      name:   input.company,
-      domain: input.domain,
+      name:    input.company,
+      domain:  input.domain,
+      website: input.domain
+        ? (input.domain.startsWith('http') ? input.domain : `https://${input.domain}`)
+        : undefined,
     });
 
     // Dedup: if a deal with this exact name already exists, don't create a second
     // card (now that multiple agents — the bot's Remotive search + Path C — can find
     // the same job). Returns the existing deal instead of duplicating it.
     const dealName = `[${input.sourcePrefix || 'HIRING'}] ${input.jobTitle} @ ${input.company}`;
+    const actionPkg = buildHiringActionPackage({
+      jobTitle: input.jobTitle,
+      company: input.company,
+      jobUrl: input.jobUrl,
+      score: input.score,
+      recruiterName: input.recruiterName,
+      recruiterEmail: input.recruiterEmail,
+      coverLetter: input.coverLetter,
+      notes: input.notes,
+      source: input.source,
+    });
     const existing = await findDealByName(dealName);
     if (existing) {
-      console.log(`[HubSpot] Hiring deal already exists (${existing.id}) — skip create: ${dealName.slice(0, 64)}`);
+      console.log(`[HubSpot] Hiring deal already exists (${existing.id}) — refresh action note: ${dealName.slice(0, 64)}`);
       if (contactId && companyId) await associateContactCompany(contactId, companyId);
       if (existing.id && contactId) await associateDealContact(existing.id, contactId);
       if (existing.id && companyId) await associateDealCompany(existing.id, companyId);
+      if (existing.id) await addNoteToDeal(existing.id, actionPkg);
       const dup = { contactId, companyId, dealId: existing.id };
       if (input.crmMeta) {
         const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
@@ -1034,9 +1247,11 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       description: [
         `Category: hiring`,
         `Stage: ${stage}`,
+        `⚠️ MANUAL APPLY — open Notes for letter + checklist`,
         input.jobUrl ? `Job URL: ${input.jobUrl}` : null,
         input.source ? `Source: ${input.source}`  : null,
-        input.notes  ? `\n${input.notes}`          : null,
+        input.score != null ? `Score: ${input.score}/100` : null,
+        input.coverLetter ? `Cover letter: yes (${input.coverLetter.length} chars)` : null,
       ].filter(Boolean).join('\n'),
     });
 
@@ -1044,15 +1259,8 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
     if (dealId && contactId)    await associateDealContact(dealId, contactId);
     if (dealId && companyId)    await associateDealCompany(dealId, companyId);
 
-    // Attach actionable Note engagement so Elena sees score + URL in Notes tab
-    if (dealId) {
-      const noteLines: string[] = [];
-      if (input.score)  noteLines.push(`Score: ${input.score}/100`);
-      if (input.jobUrl) noteLines.push(`Apply: ${input.jobUrl}`);
-      if (input.notes)  noteLines.push(input.notes);
-      if ((input.stage as string) === 'human_pending') noteLines.push('⚠️ NEEDS MANUAL APPLY — click link above');
-      if (noteLines.length) await addNoteToDeal(dealId, noteLines.join('\n'));
-    }
+    // Always attach full action package (Apply link + letter + checklist)
+    if (dealId) await addNoteToDeal(dealId, actionPkg);
 
     console.log(`[HubSpot] ✅ Hiring deal pushed — "${input.jobTitle} @ ${input.company}" contact:${contactId} deal:${dealId}`);
     const out = { contactId, companyId, dealId };

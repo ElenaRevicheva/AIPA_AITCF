@@ -1,8 +1,24 @@
 # HubSpot Deal Name Convention
 
 > Deployed May 20 2026 — see project_hubspot_dashboard.md in Claude memory for fuller context.
+>
+> **July 17 2026 — Action packages:** every new deal gets a **Notes** tab package:
+> clickable links + letter/email draft + checklist. Open deal → review → edit → send/apply.
+> Hiring accepts optional `coverLetter` / `cover_letter` on `/api/crm-event`.
+> Client SERP/inquiry/ingest park `draftSubject` + `draftBody` (or auto-template).
+> Concierge pending drafts mirror onto the associated HubSpot deal note.
 
 Every HubSpot deal is prefixed with `[STREAM-AGENT]` so the dashboard is scannable. Adding a new writer? Pick a prefix from the table below (or add a new one), then pass it as `sourcePrefix` to `pushHiringDealToHubSpot` / `pushLeadToHubSpot` (or include it in the `/api/crm-event` payload).
+
+## Where Elena acts (per type)
+
+| Prefix | Open deal → Notes for | Click |
+|--------|----------------------|-------|
+| `[HIRING-VJH-LEAD]` / `[HIRING-VJH-SERP-LEAD]` | Cover letter + Apply checklist | Apply URL |
+| `[CLIENT-CTO-SERP]` / `[CLIENT-CTO-INGEST]` | Outreach email draft | Website / source post / LinkedIn |
+| `[CLIENT-CTO-INQUIRY]` | Concierge reply draft (also Telegram) | Send via TG ✅ or copy draft |
+| `[ESPALUZ]` | Upsell WA message | `wa.me` deep link |
+| `[ATLAS-RADAR]` | LinkedIn/post draft | Landing + Atlas dashboard |
 
 ## Active prefixes
 

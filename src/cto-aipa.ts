@@ -1273,6 +1273,19 @@ async function startCTOAIPA() {
           source: utm_source || 'aideazz_inquiry_form',
           sourcePrefix: 'CLIENT-CTO-INQUIRY',
           painPoint: contextParts.join(' | ') || 'Direct inquiry from aideazz.xyz contact form',
+          sourceUrl: 'https://aideazz.xyz',
+          draftSubject: `Re: your note to AIdeazz`,
+          draftBody: [
+            `Hi ${((name || 'there').split(' ')[0])},`,
+            ``,
+            `Thanks for writing in — I read your note.`,
+            message ? `\nYou said: "${message.slice(0, 400)}"\n` : '',
+            `I help with WhatsApp/Telegram AI bots, LLM wiring, automation, GEO/AEO, and AI product video.`,
+            `If useful, I can send a short next step or book a 15-min walkthrough.`,
+            ``,
+            `Elena`,
+            `https://aideazz.xyz`,
+          ].filter(Boolean).join('\n'),
           stage: 'appointmentscheduled',
           ...(attribution?.concept_id ? { atlasConceptId: attribution.concept_id } : {}),
           ...(utm_campaign ? { utmCampaign: utm_campaign } : {}),
@@ -2433,6 +2446,9 @@ async function startCTOAIPA() {
           jobUrl,
           source: source || 'VJH',
           notes,
+          coverLetter: typeof body.coverLetter === 'string' ? body.coverLetter
+            : typeof body.cover_letter === 'string' ? body.cover_letter
+            : undefined,
           score:  score ?? undefined,
           stage: (stage as import('./hubspot-client').HiringStage) || 'applied',
           sourcePrefix,
@@ -2598,13 +2614,34 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
           }
         }
 
+        // Extract clickable source URL from SERP / signal context (first http link)
+        const sourceUrlMatch = (enrichedCtx || ctx || '').match(/https?:\/\/[^\s<>"']+/);
+        const sourceUrl = typeof body.sourceUrl === 'string' ? body.sourceUrl
+          : typeof body.source_url === 'string' ? body.source_url
+          : sourceUrlMatch?.[0];
+        const websiteFromDomain = domain
+          ? (domain.startsWith('http') ? domain : `https://${domain.replace(/^www\./, '')}`)
+          : undefined;
+
         result = await pushLeadToHubSpot({
           sourcePrefix,
           name:   name || company || email || source,
           email,
           company: company || domain,
+          domain: domain || undefined,
+          website: typeof body.website === 'string' ? body.website : websiteFromDomain,
+          linkedinUrl: typeof body.linkedinUrl === 'string' ? body.linkedinUrl
+            : typeof body.linkedin_url === 'string' ? body.linkedin_url
+            : undefined,
           source:  source || 'AI Marketing Engine',
           painPoint: enrichedCtx,
+          sourceUrl,
+          draftSubject: typeof body.draftSubject === 'string' ? body.draftSubject
+            : typeof body.draft_subject === 'string' ? body.draft_subject
+            : undefined,
+          draftBody: typeof body.draftBody === 'string' ? body.draftBody
+            : typeof body.draft_body === 'string' ? body.draft_body
+            : undefined,
           stage:  stageMap[stage ?? ''] ?? HS_STAGES.prospected,
           ...(typeof amount === 'number' && amount > 0 ? { amount } : {}),
           ...(atlas_concept_id ? { atlasConceptId: atlas_concept_id } : {}),

@@ -497,9 +497,21 @@ export async function runFreshLeadsIngestion(
         website:       l.website || undefined,
         linkedinUrl:   l.linkedinUrl || undefined,
         source:        l.source,
+        sourceUrl:     l.website || undefined,
         // Include raw description so the skill-ICP gate can see chatbot/automation words
         painPoint:     [pain.painPoint, l.description.slice(0, 280)].filter(Boolean).join(' — '),
         matchedSystem: pain.matchedSystem,
+        draftSubject:  `${pain.matchedSystem || 'AI build'} for ${l.company}?`,
+        draftBody: [
+          `Hi ${(l.name.split(/\s+/)[0] || 'there').replace(/^Founder.*/i, 'there')},`,
+          ``,
+          pain.painPoint || l.description.slice(0, 200),
+          ``,
+          `I help with ${pain.matchedSystem} — WhatsApp/Telegram bots, LLM wiring, automation, GEO/AEO, AI product video.`,
+          `Happy to show a 15-min walkthrough if useful.`,
+          ``,
+          `Elena · https://aideazz.xyz`,
+        ].join('\n'),
       });
       if (hs?.dealId || hs?.contactId) hsCount++;
       await new Promise(r => setTimeout(r, 120)); // HubSpot rate limit

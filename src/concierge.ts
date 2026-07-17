@@ -304,6 +304,35 @@ export function registerConciergeRoutes(app: Express): void {
     if (tgMessageId) d.tgMessageId = tgMessageId;
     saveDraft(d);
     console.log(`[concierge] draft ${d.id} stored for ${d.email}, TG notify sent`);
+
+    // Mirror pending draft onto HubSpot deal Notes so Elena can review→edit→send from CRM too
+    setImmediate(async () => {
+      try {
+        const { findContactByEmail, findDealIdsForContact, addNoteToDeal, addNoteToContact } =
+          await import('./hubspot-client');
+        const contactId = await findContactByEmail(d.email);
+        if (!contactId) return;
+        const esc = (s: string) =>
+          s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+        const pendingNote =
+          `<strong>✍️ PENDING CONCIERGE DRAFT — review in Telegram or edit here, then send</strong><br>` +
+          `To: ${esc(d.email)}<br>Subject: ${esc(d.subject)}<br><br>` +
+          (d.inquiry ? `<strong>They wrote:</strong><br>${esc(d.inquiry.slice(0, 800))}<br><br>` : '') +
+          `<strong>Draft:</strong><br><pre style="white-space:pre-wrap;font-family:inherit">${esc(d.draft)}</pre><br>` +
+          `[ ] Edit · [ ] Send via Telegram ✅ button or Resend · [ ] Move deal stage`;
+        const dealIds = await findDealIdsForContact(contactId);
+        if (dealIds.length) {
+          for (const dealId of dealIds.slice(0, 3)) await addNoteToDeal(dealId, pendingNote);
+          console.log(`[concierge] pending draft mirrored to ${dealIds.length} HubSpot deal(s)`);
+        } else {
+          await addNoteToContact(contactId, pendingNote);
+          console.log(`[concierge] pending draft mirrored to HubSpot contact ${contactId} (no deal assoc)`);
+        }
+      } catch (e) {
+        console.warn('[concierge] HubSpot draft mirror failed (non-fatal):', (e as Error).message?.slice(0, 80));
+      }
+    });
+
     res.json({ ok: true, id: d.id });
   });
 }
