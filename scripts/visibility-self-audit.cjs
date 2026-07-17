@@ -12,26 +12,29 @@
  */
 const { runVisibilityAudit, ENGINE_VERSION } = require('../dist/visibility-audit.js');
 
+// enforce: fail the CI run if this property drops below the floor.
+// atuona.xyz is deployed from a different repo — report it, don't gate on it here.
 const DEFAULT_TARGETS = [
-  'https://aideazz.xyz',
-  'https://atuona.xyz',
-  'https://webhook.aideazz.xyz/cto/v1/visibility',
+  { url: 'https://aideazz.xyz', enforce: true },
+  { url: 'https://webhook.aideazz.xyz/cto/v1/visibility', enforce: true },
+  { url: 'https://atuona.xyz', enforce: false },
 ];
 
 const PASS_SCORE = 70; // grade B — our own properties must not slip below this
 
 async function main() {
-  const targets = process.argv.slice(2).length > 0 ? process.argv.slice(2) : DEFAULT_TARGETS;
+  const args = process.argv.slice(2);
+  const targets = args.length > 0 ? args.map((url) => ({ url, enforce: true })) : DEFAULT_TARGETS;
   console.log(`=== AIdeazz visibility self-audit — engine ${ENGINE_VERSION} — ${new Date().toISOString()} ===\n`);
 
   let worst = 100;
-  for (const url of targets) {
+  for (const { url, enforce } of targets) {
     try {
       const r = await runVisibilityAudit(url);
-      worst = Math.min(worst, r.score);
+      if (enforce) worst = Math.min(worst, r.score);
       const cats = r.categories.map((c) => `${c.id}:${c.score}`).join(' ');
       const blocked = r.aiEngines.filter((e) => e.crawlable === 'blocked').map((e) => e.crawler);
-      console.log(`${r.grade.padEnd(2)} ${String(r.score).padStart(3)}/100  ${url}`);
+      console.log(`${r.grade.padEnd(2)} ${String(r.score).padStart(3)}/100  ${url}${enforce ? '' : '  (report-only)'}`);
       console.log(`   ${cats}`);
       console.log(`   ${r.verdict}`);
       if (blocked.length > 0) console.log(`   BLOCKED CRAWLERS: ${blocked.join(', ')}`);
@@ -40,8 +43,8 @@ async function main() {
       console.log(`   non-passing checks (${failing.length}): ${failing.map((c) => `${c.id}[${c.status}]`).join(', ')}`);
       console.log();
     } catch (err) {
-      worst = 0;
-      console.log(`F    0/100  ${url}`);
+      if (enforce) worst = 0;
+      console.log(`F    0/100  ${url}${enforce ? '' : '  (report-only)'}`);
       console.log(`   UNAUDITABLE: ${err.message}\n`);
     }
   }

@@ -119,14 +119,76 @@ export function visibilityRouter(): Router {
   return router;
 }
 
+/** Canonical public URL of the docs page (behind nginx). */
+const PUBLIC_URL = 'https://webhook.aideazz.xyz/cto/v1/visibility';
+
+/** FAQ content — rendered as question-H2 sections AND mirrored in FAQPage JSON-LD. */
+const FAQ: Array<{ q: string; a: string }> = [
+  {
+    q: 'What does the AI Visibility Audit check?',
+    a: 'It runs 34 evidence-backed checks in 4 weighted categories: AI crawler access (can GPTBot, ClaudeBot, PerplexityBot and Google-Extended even reach your pages?), structured data (GEO — can machines tell WHO you are and WHAT you offer?), answer-readiness (AEO — will an answer engine quote you?), and the technical foundation (HTTPS, speed, server-rendered content). Every check reports what it observed, not just a verdict.',
+  },
+  {
+    q: 'Why does my beautiful React site score so low?',
+    a: 'Most AI crawlers do not execute JavaScript. If your content only appears after the browser runs your bundle, GPTBot and PerplexityBot see an almost-empty shell. The audit detects this and tells you to server-render or prerender — usually the single highest-impact fix for a modern SPA.',
+  },
+  {
+    q: 'How is this different from a classic SEO audit?',
+    a: 'Classic SEO optimizes for ten blue links. This audit optimizes for being cited by answer engines: robots access for AI-specific crawlers, llms.txt, JSON-LD entity identity (including sameAs links to your profiles), question-shaped headings, and extractable facts that language models can lift verbatim.',
+  },
+  {
+    q: 'Do you scrape or use paid data providers?',
+    a: 'No. Audits are direct page reads only: your page, robots.txt, llms.txt and sitemap.xml. No SerpAPI, no Bright Data, no API keys to third parties — which is why the demo tier can stay free.',
+  },
+];
+
 /** Single-file docs + try-it widget served at GET /v1/visibility. */
 function docsPage(): string {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://aideazz.xyz/#org',
+        name: 'AIdeazz',
+        url: 'https://aideazz.xyz',
+        logo: 'https://aideazz.xyz/favicon.ico',
+        sameAs: ['https://github.com/ElenaRevicheva', 'https://www.linkedin.com/in/elena-revicheva/'],
+      },
+      {
+        '@type': 'WebAPI',
+        name: 'AIdeazz Lab AI Visibility Audit API',
+        url: PUBLIC_URL,
+        documentation: PUBLIC_URL,
+        provider: { '@id': 'https://aideazz.xyz/#org' },
+        description:
+          'AEO/GEO/Tech-SEO audit API: 34 checks answering whether ChatGPT, Perplexity, Claude and Gemini can find, understand and quote a website.',
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: FAQ.map(({ q, a }) => ({
+          '@type': 'Question',
+          name: q,
+          acceptedAnswer: { '@type': 'Answer', text: a },
+        })),
+        dateModified: '2026-07-17',
+      },
+    ],
+  };
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AIdeazz Lab — AI Visibility Audit API</title>
+<title>AI Visibility Audit — is your site quotable by ChatGPT? | AIdeazz Lab</title>
+<meta name="description" content="Free AEO/GEO/Tech-SEO audit: 34 checks that tell you if ChatGPT, Perplexity, Claude and Gemini can find, understand and quote your website — with fixes.">
+<link rel="canonical" href="${PUBLIC_URL}">
+<meta property="og:title" content="AI Visibility Audit — is your site quotable by ChatGPT?">
+<meta property="og:description" content="Free audit of AI crawler access, structured data (GEO), answer-readiness (AEO) and tech SEO. Direct page reads, no keys, instant grade.">
+<meta property="og:image" content="https://aideazz.xyz/favicon.ico">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${PUBLIC_URL}">
+<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 <style>
   :root { --bg:#0d1117; --card:#161b22; --line:#30363d; --text:#e6edf3; --dim:#8b949e; --accent:#58a6ff; --ok:#3fb950; --warn:#d29922; --bad:#f85149; }
   * { box-sizing:border-box; }
@@ -160,10 +222,12 @@ function docsPage(): string {
 </style>
 </head>
 <body><div class="wrap">
-  <h1>AIdeazz Lab — AI Visibility Audit</h1>
-  <p class="sub">Can ChatGPT, Perplexity, Claude and Gemini find you, understand you, and quote you? One call audits any URL: AI crawler access, structured data (GEO), answer-readiness (AEO), technical foundation. Engine v${ENGINE_VERSION}.</p>
-
-  <div class="card">
+  <header>
+    <h1>AIdeazz Lab — AI Visibility Audit</h1>
+    <p class="sub">Can ChatGPT, Perplexity, Claude and Gemini find you, understand you, and quote you? One call audits any URL across 4 weighted categories: AI crawler access, structured data (GEO), answer-readiness (AEO), technical foundation. Engine v${ENGINE_VERSION}.</p>
+  </header>
+  <main>
+  <section class="card">
     <strong>Try it now</strong> — free demo key, ${DEMO_LIMIT_PER_HOUR} audits/hour.
     <div class="row" style="margin-top:12px">
       <input id="url" type="url" placeholder="https://your-site.com" inputmode="url">
@@ -179,16 +243,32 @@ function docsPage(): string {
       <p class="dim" style="margin-top:12px">Shareable link: <a id="share" href="" style="color:var(--accent); word-break:break-all"></a></p>
     </div>
     <p id="err" class="hide" style="color:var(--bad)"></p>
-  </div>
+  </section>
 
-  <div class="card">
-    <strong>API</strong>
-    <pre>curl -X POST https://webhook.aideazz.xyz/cto/v1/visibility \\
+  <section class="card">
+    <h2 style="font-size:1.1rem; margin:.2em 0">API</h2>
+    <pre>curl -X POST ${PUBLIC_URL} \\
   -H "Content-Type: application/json" \\
   -H "X-API-Key: ${DEMO_API_KEY}" \\
   -d '{"url":"https://your-site.com"}'</pre>
-    <p class="dim">Returns score (0–100), grade, per-engine crawlability (GPTBot, ClaudeBot, PerplexityBot, Google-Extended…), 4 category scores, 28 evidence-backed checks and a prioritized fix list. Production keys (${KEY_LIMIT_PER_HOUR}/hour): <a href="mailto:aipa@aideazz.xyz" style="color:var(--accent)">aipa@aideazz.xyz</a></p>
-  </div>
+    <p class="dim">Returns score (0–100), grade, per-engine crawlability (GPTBot, ClaudeBot, PerplexityBot, Google-Extended…), 4 category scores, 34 evidence-backed checks and a prioritized fix list. Production keys (${KEY_LIMIT_PER_HOUR}/hour): <a href="mailto:aipa@aideazz.xyz" style="color:var(--accent)">aipa@aideazz.xyz</a></p>
+    <ul class="dim" style="margin:8px 0 0; padding-left:20px">
+      <li>Direct page reads only — no scraping providers, no third-party keys</li>
+      <li>Bot-blocked and JS-only sites get a scored diagnosis, not an error</li>
+      <li>Shareable audit links: <code>?url=https://your-site.com</code></li>
+    </ul>
+  </section>
+
+  <section class="card" id="faq">
+    <h2 style="font-size:1.1rem; margin:.2em 0">FAQ</h2>
+    ${FAQ.map(
+      ({ q, a }) => `<article><h3 style="font-size:1rem; margin:14px 0 4px">${q}</h3><p class="dim" style="margin:0">${a}</p></article>`,
+    ).join('\n    ')}
+  </section>
+  </main>
+  <footer class="dim" style="margin-top:24px; font-size:.85rem">
+    Built by <a href="https://aideazz.xyz" style="color:var(--accent)">AIdeazz</a> — AI Personal Assistants that ship. <time datetime="2026-07-17">Updated July 17, 2026</time>.
+  </footer>
 
 <script>
 const $ = (id) => document.getElementById(id);
