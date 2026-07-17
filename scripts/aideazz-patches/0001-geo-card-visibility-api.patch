@@ -1,0 +1,92 @@
+From 775a63cd070f3e157bdd7eca8d1e822202eb99f5 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 17 Jul 2026 23:15:05 +0000
+Subject: [PATCH] feat(portfolio): AI Visibility Audit API on the GEO + SEO
+ Engine card
+
+Bilingual (EN/ES) card update: what the API does (score 0-100, 34 checks,
+AEO/GEO/tech-SEO, scored diagnosis for bot-blocked/JS-only sites), traction
+line (public API live, aideazz.xyz A+ 100/100 on its own engine), and a
+second card button linking to /api. aiCoFounders cards now render extraLinks.
+---
+ src/i18n/locales/en.json   |  7 ++++---
+ src/i18n/locales/es.json   |  7 ++++---
+ src/pages/BusinessCard.tsx | 17 ++++++++++++++++-
+ 3 files changed, 24 insertions(+), 7 deletions(-)
+
+diff --git a/src/i18n/locales/en.json b/src/i18n/locales/en.json
+index 48b000f..bf97976 100644
+--- a/src/i18n/locales/en.json
++++ b/src/i18n/locales/en.json
+@@ -507,10 +507,11 @@
+     "geo": {
+       "title": "GEO + SEO Engine",
+       "subtitle": "Discoverability for Google, AI answers, and the blog",
+-      "desc": "SEO is the classic piece: a clean map of pages for Google (sitemap, bilingual EN/ES, structured snippets). GEO is the same discipline for AI overviews—accurate facts and authorship on your own domain so assistants can cite you instead of guessing. Automation ties it together: on a schedule, long posts are drafted and published to the off-site blog and mirrored here; optional syndication; every run logged in Oracle. Site forms drop inquiries and campaign tags into the same lead store CMO and CTO already use.",
+-      "traction": "Sitemap + structured pages live • Blog autopilot (opt-in) • Optional syndication • Leads + UTMs in Oracle",
+-      "tech": "Vite, React, bilingual daily blog (aideazz.xyz/blog), Dev.to crosspost, FAQPage JSON-LD (AEO), Claude, Google Search Console (optional), GA4, reCAPTCHA Enterprise, Oracle DB, CTO AIPA cron",
++      "desc": "SEO is the classic piece: a clean map of pages for Google (sitemap, bilingual EN/ES, structured snippets). GEO is the same discipline for AI overviews—accurate facts and authorship on your own domain so assistants can cite you instead of guessing. Automation ties it together: on a schedule, long posts are drafted and published to the off-site blog and mirrored here; optional syndication; every run logged in Oracle. Site forms drop inquiries and campaign tags into the same lead store CMO and CTO already use. NEW (July 2026): the AIdeazz Lab AI Visibility Audit API — a free public endpoint that scores any website 0–100 on one question: when someone asks ChatGPT, Perplexity, Claude or Gemini what you sell, can they find you, understand you, and quote you? 34 evidence-backed checks across AI crawler access, structured data (GEO), answer-readiness (AEO) and tech SEO — with a prioritized fix list. No signup, no scraping costs; even bot-blocked or JS-only sites get a scored diagnosis instead of an error. This site scores A+ 100/100 on its own engine.",
++      "traction": "Public AI Visibility Audit API live • aideazz.xyz scores A+ 100/100 on its own engine • Sitemap + structured pages live • Blog autopilot (opt-in) • Optional syndication • Leads + UTMs in Oracle",
++      "tech": "Vite, React, bilingual daily blog (aideazz.xyz/blog), Dev.to crosspost, FAQPage JSON-LD (AEO), Visibility Audit API (TypeScript/Express, 34 checks, weekly self-audit CI), Claude, Google Search Console (optional), GA4, reCAPTCHA Enterprise, Oracle DB, CTO AIPA cron",
+       "action": "View on GitHub",
++      "action2": "Audit your site free — AI Visibility API",
+       "badge": "LIVE"
+     },
+     "cmo": {
+diff --git a/src/i18n/locales/es.json b/src/i18n/locales/es.json
+index 898d61c..481139f 100644
+--- a/src/i18n/locales/es.json
++++ b/src/i18n/locales/es.json
+@@ -507,10 +507,11 @@
+     "geo": {
+       "title": "Motor GEO + SEO",
+       "subtitle": "Visibilidad en Google, respuestas de IA y blog automático",
+-      "desc": "El SEO es la parte clásica: un mapa claro de páginas para Google (sitemap, sitio bilingüe EN/ES, datos estructurados). El GEO aplica la misma idea a las respuestas de IA: hechos y autoría en tu dominio para que los asistentes te citen bien, sin relleno de palabras clave. La automatización lo une: con calendario, posts largos se redactan y publican en el blog externo y se reflejan aquí; sindicación opcional; cada corrida queda en Oracle. Los formularios guardan consultas y etiquetas de campaña en el mismo almacén de leads que ya usan CMO y CTO.",
+-      "traction": "Sitemap + páginas estructuradas en vivo • Blog en piloto automático (opt-in) • Sindicación opcional • Leads + UTM en Oracle",
+-      "tech": "Vite, React, blog diario bilingüe (aideazz.xyz/blog), crosspost Dev.to, FAQPage JSON-LD (AEO), Claude, Google Search Console (opcional), GA4, reCAPTCHA Enterprise, Oracle DB, cron CTO AIPA",
++      "desc": "El SEO es la parte clásica: un mapa claro de páginas para Google (sitemap, sitio bilingüe EN/ES, datos estructurados). El GEO aplica la misma idea a las respuestas de IA: hechos y autoría en tu dominio para que los asistentes te citen bien, sin relleno de palabras clave. La automatización lo une: con calendario, posts largos se redactan y publican en el blog externo y se reflejan aquí; sindicación opcional; cada corrida queda en Oracle. Los formularios guardan consultas y etiquetas de campaña en el mismo almacén de leads que ya usan CMO y CTO. NUEVO (julio 2026): la API de Auditoría de Visibilidad IA de AIdeazz Lab — un endpoint público y gratuito que califica cualquier sitio web de 0 a 100 con una pregunta: cuando alguien le pregunta a ChatGPT, Perplexity, Claude o Gemini qué vendes, ¿pueden encontrarte, entenderte y citarte? 34 chequeos con evidencia en acceso de crawlers IA, datos estructurados (GEO), respuesta-lista (AEO) y SEO técnico — con lista de arreglos priorizada. Sin registro ni costos de scraping; hasta los sitios bloqueados o solo-JavaScript reciben un diagnóstico con puntaje en vez de un error. Este sitio obtiene A+ 100/100 en su propio motor.",
++      "traction": "API pública de Auditoría de Visibilidad IA en vivo • aideazz.xyz obtiene A+ 100/100 en su propio motor • Sitemap + páginas estructuradas en vivo • Blog en piloto automático (opt-in) • Sindicación opcional • Leads + UTM en Oracle",
++      "tech": "Vite, React, blog diario bilingüe (aideazz.xyz/blog), crosspost Dev.to, FAQPage JSON-LD (AEO), API de Auditoría de Visibilidad (TypeScript/Express, 34 chequeos, self-audit semanal en CI), Claude, Google Search Console (opcional), GA4, reCAPTCHA Enterprise, Oracle DB, cron CTO AIPA",
+       "action": "Ver en GitHub",
++      "action2": "Audita tu sitio gratis — API de Visibilidad IA",
+       "badge": "EN VIVO"
+     },
+     "cmo": {
+diff --git a/src/pages/BusinessCard.tsx b/src/pages/BusinessCard.tsx
+index 51e031f..ff2cc6b 100644
+--- a/src/pages/BusinessCard.tsx
++++ b/src/pages/BusinessCard.tsx
+@@ -314,7 +314,10 @@ export default function BusinessCard() {
+       tech: t('section1.geo.tech'),
+       action: t('section1.geo.action'),
+       link: "https://github.com/ElenaRevicheva/aideazz",
+-      badge: t('section1.geo.badge')
++      badge: t('section1.geo.badge'),
++      extraLinks: [
++        { action: t('section1.geo.action2'), link: "/api", className: "bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400" }
++      ]
+     },
+     {
+       icon: TrendingUp,
+@@ -623,6 +626,18 @@ export default function BusinessCard() {
+                           >
+                             {agent.action} <ExternalLink className="w-4 h-4" />
+                           </a>
++                          {agent.extraLinks?.map((extra, i) => (
++                            <a
++                              key={i}
++                              href={extra.link}
++                              target="_blank"
++                              rel="noreferrer"
++                              onClick={(e) => e.stopPropagation()}
++                              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-semibold text-sm shadow-lg ${extra.className || 'bg-white/10 hover:bg-white/20 border border-white/10'}`}
++                            >
++                              {extra.action} <ExternalLink className="w-4 h-4" />
++                            </a>
++                          ))}
+                         </div>
+                       </motion.div>
+                     ))}
+-- 
+2.43.0
+
