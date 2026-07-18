@@ -23,10 +23,16 @@
    `curl -sL https://PROSPECT.com | grep -ioE "(wa\.me/[0-9]+|api\.whatsapp\.com/send[^\"']*|tel:[+0-9]+|mailto:[^\"']+|\+507[- ]?[0-9]{3,4}[- ]?[0-9]{4})"`
 
 3. **Dedupe** in HubSpot (search deals/companies for the domain), then create
-   via the HubSpot connector — all four, every time (Starter plan features on max):
+   via the HubSpot connector — all FIVE, every time (Starter plan features on max):
    - **Company** — name, domain, phone, city, email in description
    - **Deal** — `[CLIENT-MANUAL] {Company} — GEO/AEO fix (audit: {score}/{grade})`,
      Sales Pipeline, stage **qualifiedtobuy** ("🔥 I Act TODAY")
+   - **Contact** — associated to BOTH the company and the deal. Even a
+     placeholder (firstname = business name, lastname = "(WhatsApp contact)" /
+     "(Instagram: @handle)", phone/email if known, `lifecyclestage: opportunity`,
+     `hs_lead_status: OPEN`) — **never skip this**, the deal's Contacts panel
+     must not be empty (gap caught by Elena July 18 2026 on prospects #1-3).
+     Fill in the real name/title later once learned from the reply.
    - **Note on deal** — audit evidence + pitch angle + top fixes + contacts +
      **ONE-CLICK SEND link** (see §4) + plain-text draft + "Next:" line
    - **Task** — HIGH, due same day: "Send WhatsApp outreach → {Company}"
