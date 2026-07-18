@@ -52,6 +52,64 @@ function underLimit(key: string): boolean {
   return true;
 }
 
+/**
+ * Lead visibility: every audit is a self-qualified lead (someone just told us
+ * their website and cares about its AI visibility). Log it to stdout (pm2
+ * history) and ping Elena's Telegram — same channel + env vars the Lead
+ * Concierge already uses (TELEGRAM_BOT_TOKEN + CONCIERGE_TG_CHAT), so leads
+ * land where she already looks. Own properties are logged but NOT pinged, so
+ * self-tests and the docs-page demo don't page her phone.
+ */
+const OWN_AUDIT_DOMAINS = /(^|\.)aideazz\.xyz$|(^|\.)atuona\.xyz$|^localhost$|^127\.0\.0\.1$/i;
+
+function isOwnProperty(url: string): boolean {
+  try {
+    return OWN_AUDIT_DOMAINS.test(new URL(/^https?:\/\//i.test(url) ? url : `https://${url}`).hostname);
+  } catch {
+    return false;
+  }
+}
+
+function logAuditLead(params: {
+  url: string;
+  score: number;
+  grade: string;
+  key: string;
+  ip: string | undefined;
+  referer: string | undefined;
+}): void {
+  const { url, score, grade, key, ip, referer } = params;
+  const keyLabel = key === DEMO_API_KEY ? 'demo' : `key:${key.slice(0, 8)}…`;
+  const own = isOwnProperty(url);
+  // Structured stdout line — grep-able in pm2 logs: grep visibility-lead
+  console.log(
+    `[visibility-lead] url=${url} score=${score} grade=${grade} key=${keyLabel} ip=${ip ?? '-'} referer=${referer ?? '-'}${own ? ' (own-property)' : ''}`,
+  );
+  if (own) return;
+
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.CONCIERGE_TG_CHAT?.trim();
+  if (!token || !chatId) {
+    console.warn('[visibility-lead] TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT not set — lead logged to stdout only');
+    return;
+  }
+  const text =
+    `🔍 Visibility audit lead\n` +
+    `${url} → ${score}/100 (${grade})\n` +
+    `via ${keyLabel}${referer ? `, from ${referer}` : ''}\n` +
+    `They just told you their site + their pain. Follow up: aideazz.xyz/api`;
+  // Fire-and-forget: a Telegram hiccup must never fail or slow the audit response.
+  fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, text: text.slice(0, 4090), disable_web_page_preview: true }),
+  })
+    .then(async (r) => {
+      if (!r.ok) console.error('[visibility-lead] TG send failed:', (await r.text()).slice(0, 200));
+    })
+    .catch((e) => console.error('[visibility-lead] TG send error:', e?.message ?? e));
+}
+
 export function visibilityRouter(): Router {
   const router = Router();
   router.use(express.json({ limit: '10kb' }));
@@ -103,6 +161,14 @@ export function visibilityRouter(): Router {
 
     try {
       const result = await runVisibilityAudit(url);
+      logAuditLead({
+        url: result.finalUrl || url,
+        score: result.score,
+        grade: result.grade,
+        key,
+        ip: req.ip ?? req.header('x-forwarded-for')?.split(',')[0]?.trim(),
+        referer: req.header('referer') ?? undefined,
+      });
       return res.json(result);
     } catch (err) {
       if (err instanceof AuditFetchError) {
