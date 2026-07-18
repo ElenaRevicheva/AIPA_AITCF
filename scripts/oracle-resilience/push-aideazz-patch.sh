@@ -35,11 +35,17 @@ fi
 APPLIED=0
 for p in "${PATCHES[@]}"; do
   echo "=== Patch: $(basename "$p") ==="
+  # Skip by commit subject: reverse-apply checks break once later commits touch
+  # the same lines, but the subject stays unique in history. git mailinfo
+  # decodes RFC-2047 (=?UTF-8?q?...) subjects that plain grep would mangle.
+  SUBJECT=$(git mailinfo /dev/null /dev/null < "$p" | grep -m1 '^Subject: ' | sed 's/^Subject: //')
+  if [ -n "$SUBJECT" ] && [ -n "$(git log --oneline -F --grep="$SUBJECT" origin/main)" ]; then
+    echo "Already in history (\"$SUBJECT\") — skipping."
+    continue
+  fi
   if git apply --check "$p" 2>/dev/null; then
     git am "$p"
     APPLIED=$((APPLIED + 1))
-  elif git apply --check --reverse "$p" 2>/dev/null; then
-    echo "Already applied — skipping."
   else
     echo "ERROR: patch does not apply cleanly (repo diverged?). Aborting before push."
     git am --abort 2>/dev/null || true
