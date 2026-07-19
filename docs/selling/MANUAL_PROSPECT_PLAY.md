@@ -34,7 +34,11 @@
      must not be empty (gap caught by Elena July 18 2026 on prospects #1-3).
      Fill in the real name/title later once learned from the reply.
    - **Note on deal** — audit evidence + pitch angle + top fixes + contacts +
-     **ONE-CLICK SEND link** (see §4) + plain-text draft + "Next:" line
+     **ONE-CLICK SEND link** (see §4) + **`--- MENSAJE (plain text) ---`** block
+     with the **full** WhatsApp draft (never audit-only — Elena must see the message
+     in HubSpot without opening another file) + "Next:" line. Save the draft in
+     `docs/selling/drafts/{slug}.txt` and the paste-ready note pack in
+     `docs/selling/prospects/{COMPANY}.md` (see § Staged deal packs).
    - **Task** — HIGH, due same day: "Send WhatsApp outreach → {Company}"
 
 4. **One-click WhatsApp link** — the message pre-typed so Elena only hits Send:
@@ -103,3 +107,34 @@ Elena✨🌍💫
 | 2026-07-19 | Eurostone Panamá (Atelier de la Piedra) | 86/A (AEO 81) | 62837342362 |
 | 2026-07-19 | AIRCO / SINOTRUK Panamá | 73/B (AI-access 59 — robots.txt blocks all AI crawlers) | 62841350764 |
 | 2026-07-19 | Panama Fertility | 86/A (AI-access 64 — robots.txt blocks GPTBot/Claude/Gemini) | 62828946074 |
+| 2026-07-19 | Nomad Constructions Corp | 90/A (AEO 81 — construction Pedasí/Azuero) | STAGED — paste note from `prospects/NOMAD_CONSTRUCTIONS.md` |
+
+## Staged deal packs (draft + HubSpot note)
+
+Every staged `[CLIENT-MANUAL]` deal ships **three artifacts**:
+
+| Artifact | Path | Purpose |
+|---|---|---|
+| WhatsApp draft | `docs/selling/drafts/{slug}.txt` | Input to `outreach-walink.cjs` (UTF-8, literal emojis) |
+| HubSpot note pack | `docs/selling/prospects/{COMPANY}.md` | **Copy-paste into deal Notes** — wa.me link + full `MENSAJE` block + audit + Next |
+| Deal row | table above | HubSpot deal ID once created |
+
+**Nomad Constructions Corp** (2026-07-19) — deal exists in HubSpot but the note was missing the message. Fix: open `prospects/NOMAD_CONSTRUCTIONS.md` → copy the **Note body** block into the deal Notes tab.
+
+Draft (`drafts/nomad-constructions-corp.txt`):
+
+```
+Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — su sitio web está técnicamente impecable (100/100) y abierto a todos los motores de IA. Les escribo porque analicé nomadcc.com con mi motor de visibilidad en IA y obtuvo 90/100: están muy cerca, faltan solo unos ajustes — cuando alguien que quiere construir su casa en Pedasí o Azuero le pregunta a ChatGPT "¿qué constructora recomiendan en Panamá?", su empresa todavía no aparece como respuesta citable porque falta contenido en formato de preguntas y respuestas que los motores puedan citar (preparación para respuestas 81/100).
+
+Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 🏠
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que atienden y agendan cotizaciones y visitas 24/7 (EN/ES, conectados a su CRM), automatización completa de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena✨🌍💫
+```
+
+Regenerate wa.me: `node scripts/outreach-walink.cjs 50769484982 docs/selling/drafts/nomad-constructions-corp.txt`

@@ -100,7 +100,11 @@ Expat families search AI for schooling before moving. Lead = **AI Visibility** +
 
 ## Tier C — solid local-money (quote/lead-driven)
 
-Validated here: **Eurostone Panamá** (stone/cladding) and **AIRCO / SINOTRUK** (heavy trucks). Same shape:
+Validated here: **Eurostone Panamá** (stone/cladding), **AIRCO / SINOTRUK** (heavy trucks), and **Nomad Constructions Corp** (Pedasí/Azuero). Same shape:
+
+| Prospect | Domain | Notes |
+|---|---|---|
+| Nomad Constructions Corp | nomadcc.com | Pedasí/Azuero construction; WhatsApp +507 6948-4982; IG @nomad_constructions — ✅ STAGED 2026-07-19 (90/A, AEO 81 weakest; note pack `prospects/NOMAD_CONSTRUCTIONS.md`) |
 
 - **Construction & home improvement** — kitchens, pools, solar installers, windows/aluminum, cladding/stone, AC/HVAC. Quote-driven → WhatsApp agent + AI visibility.
 - **Auto & equipment** — dealers, heavy equipment, car rental. (AIRCO validated.)
@@ -114,15 +118,16 @@ Validated here: **Eurostone Panamá** (stone/cladding) and **AIRCO / SINOTRUK** 
 Highest expected pain × highest ticket. Run the play top-down:
 
 1. panamafertility.com — A1, very high ticket, intl — ✅ STAGED 2026-07-19 (deal 62828946074; 86/A, robots.txt blocks GPTBot/Claude/Gemini)
-2. dopanama.com — A2, expat RE+relocation
-3. panamaaesthetics.com — A1, aesthetic tourism
-4. relofirm.com — A2, law + relocation
-5. panamadentalclinic.com — A1, dental tourism
-6. kraemerlaw.com — A2, immigration
-7. ampatours.com — A3, charters + fishing
-8. tranquilobay.com — A3, eco lodge
-9. americantradehotel.com — B1, weddings/events
-10. sanblasdreams.com — A3, ATP tour operator
+2. nomadcc.com — C, construction Pedasí/Azuero — ✅ STAGED 2026-07-19 (90/A, AEO 81; **HubSpot note missing message — paste from `prospects/NOMAD_CONSTRUCTIONS.md`**)
+3. dopanama.com — A2, expat RE+relocation
+4. panamaaesthetics.com — A1, aesthetic tourism
+5. relofirm.com — A2, law + relocation
+6. panamadentalclinic.com — A1, dental tourism
+7. kraemerlaw.com — A2, immigration
+8. ampatours.com — A3, charters + fishing
+9. tranquilobay.com — A3, eco lodge
+10. americantradehotel.com — B1, weddings/events
+11. sanblasdreams.com — A3, ATP tour operator
 
 ## Directories to mine for more prospects (not prospects themselves)
 medicaltourismpackages.com · smilejet.app · health-tourism.com · placidway.com ·
