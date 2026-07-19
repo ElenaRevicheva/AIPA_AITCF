@@ -61,11 +61,11 @@ literal emoji characters, never encoded entities (encoding happens only inside
 the wa.me URL):
 
 ```
-Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: aideazz.xyz/portfolio.
+Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
 
 Primero, felicitaciones por su sitio web — [genuine compliment from the audit]. Les escribo porque analicé [domain] con mi motor de visibilidad en IA y obtuvo [score]/100: cuando un [their customer] le pregunta a ChatGPT o Perplexity "[their money query]", su empresa todavía no aparece como respuesta citable — [the gap in one clause] ([category score]/100).
 
-Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: aideazz.xyz/api 🛥️
+Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 🛥️
 
 PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización completa de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
 
@@ -75,9 +75,14 @@ Elena✨🌍💫
 ```
 
 ### Iron rules (from Elena, all July 18 2026)
-1. Portfolio link `aideazz.xyz/portfolio` appears **exactly once** — in the intro
+0. **ALWAYS `https://` on every link** (July 19 2026, proven with WhatsApp screenshots):
+   the portfolio link MUST be `https://aideazz.xyz/portfolio` — bare `aideazz.xyz/portfolio`
+   renders **NO OG preview card** in WhatsApp, `https://…` renders the full rich card
+   (image + "Elena Revicheva — AI Portfolio | Live Agents…"). Same for `https://aideazz.xyz/api`.
+   Applies to the plain-text draft AND the wa.me pre-typed message. Never ship a bare-domain link.
+1. Portfolio link `https://aideazz.xyz/portfolio` appears **exactly once** — in the intro
    line. The PD points back with "en mi portafolio👆". Never bare `aideazz.xyz`.
-2. `aideazz.xyz/api` may additionally appear when the audit is the hook.
+2. `https://aideazz.xyz/api` may additionally appear when the audit is the hook.
 3. **Courteous Panamanian tone**: warm greeting (no time-of-day), genuine
    compliment BEFORE any critique, soft asks ("Si les parece bien, con mucho
    gusto…", "sin ningún compromiso"), never blunt.
@@ -87,7 +92,7 @@ Elena✨🌍💫
 5. Sign-off: "¡Que tengan un excelente día! / Saludos, / Elena✨🌍💫".
 6. English mirror (for English-first prospects): same structure —
    "Hi, great to meet you! 👋I'm Elena Revicheva, an AI engineer here in
-   Panama: aideazz.xyz/portfolio." … "Have a great day! / Best, / Elena✨🌍💫".
+   Panama: https://aideazz.xyz/portfolio." … "Have a great day! / Best, / Elena✨🌍💫".
 
 ## Deals sent with this play
 
@@ -95,3 +100,5 @@ Elena✨🌍💫
 |------|---------|-------|------|
 | 2026-07-18 | Alquiler de Yates Panamá | 82/B (GEO 56) | 62792913925 — SENT same day |
 | 2026-07-18 | Panama Yacht Group | 86/A (AEO 69) | 62801585568 |
+| 2026-07-19 | Eurostone Panamá (Atelier de la Piedra) | 86/A (AEO 81) | 62837342362 |
+| 2026-07-19 | AIRCO / SINOTRUK Panamá | 73/B (AI-access 59 — robots.txt blocks all AI crawlers) | 62841350764 |
