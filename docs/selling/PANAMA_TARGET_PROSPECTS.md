@@ -113,7 +113,7 @@ Validated here: **Eurostone Panamá** (stone/cladding) and **AIRCO / SINOTRUK** 
 
 Highest expected pain × highest ticket. Run the play top-down:
 
-1. panamafertility.com — A1, very high ticket, intl
+1. panamafertility.com — A1, very high ticket, intl — ✅ STAGED 2026-07-19 (deal 62828946074; 86/A, robots.txt blocks GPTBot/Claude/Gemini)
 2. dopanama.com — A2, expat RE+relocation
 3. panamaaesthetics.com — A1, aesthetic tourism
 4. relofirm.com — A2, law + relocation
