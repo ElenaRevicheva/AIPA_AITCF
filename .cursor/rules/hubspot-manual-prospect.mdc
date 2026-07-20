@@ -32,4 +32,4 @@ node -e "const k=require('fs').readFileSync('.env','utf8').match(/^HUBSPOT_API_K
 
 ## Elena actions (human only)
 
-Click wa.me in HubSpot note → Send in WhatsApp Business. Say **"sent {company}"** for agent to move deal stage and close task.
+Click WhatsApp link in HubSpot note → Send in WhatsApp Business. Say **"sent {company}"** for agent to: move deal → ⏳ Sent, close send-task, append ✅ SENT, **and create a MEDIUM follow-up task due ~+4 days** (soft WA if still silent). Say **"they replied…"** to move to 💬 and cancel that follow-up.

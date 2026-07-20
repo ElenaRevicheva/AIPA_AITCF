@@ -77,9 +77,15 @@
 
 5. **After Elena sends** (she says "sent" — WhatsApp Business app has no API,
    so detection is manual by design): move deal → **decisionmakerboughtin**
-   ("⏳ Sent — passive wait"), mark task COMPLETED, append `✅ SENT {date}` +
-   the verbatim sent text to the note, set follow-up expectation (~+4 days).
-   On reply: stage → **contractsent** ("💬 They replied — I act").
+   ("⏳ Sent — passive wait"), mark the *send* task COMPLETED, append `✅ SENT {date}`
+   to the note, **and automatically create a follow-up Task** on the same deal:
+   - Subject: `Soft follow-up WhatsApp → {Company} (no reply yet?)`
+   - Priority: MEDIUM · due **~+4 calendar days** (end of that day)
+   - Body: if still silent, soft 1–2 line follow-up; if they already replied, ignore
+     and use the 💬 path instead
+   - Append `📅 Follow-up task {id} due {YYYY-MM-DD}` to the note
+   On reply (before or after that date): stage → **contractsent** ("💬 They replied — I act"),
+   and complete/cancel the follow-up task so it does not nag.
 
 6. **The "send it by email" reply path** (added July 20 2026 — Panama Aesthetics):
    when a prospect answers WhatsApp with "commercial proposals go to email":
