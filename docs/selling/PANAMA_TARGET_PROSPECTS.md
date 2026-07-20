@@ -129,6 +129,9 @@ Highest expected pain × highest ticket. Run the play top-down:
 10. americantradehotel.com — B1, weddings/events
 11. sanblasdreams.com — A3, ATP tour operator
 
+### Elena-mined (outside shortlist order)
+- **ycyachts.com** (YC Panama Yachts) — A3 yacht charter / our-fleet — ✅ STAGED 2026-07-20 (deal **62864888204**; 94/A+, AEO 81; WhatsApp +507 6503-1745 + **info@ycyachts.com**)
+
 ## Directories to mine for more prospects (not prospects themselves)
 medicaltourismpackages.com · smilejet.app · health-tourism.com · placidway.com ·
 tripadvisor (Bocas/Boquete hotels) · vacationtopanama.com/hotels/boutique ·
