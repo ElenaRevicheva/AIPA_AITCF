@@ -1,12 +1,14 @@
 /**
  * wa-link-lib.cjs — canonical WhatsApp link builder for Manual Prospect Play.
  *
- * DECISION (Elena, July 19 2026): HubSpot deal notes use a DIRECT wa.me anchor
- * `https://wa.me/<digits>?text=<encodeURIComponent(msg)>`. This is proven to render
- * emojis correctly on Elena's WhatsApp Web — the earlier "�" corruption came from the
- * b64 + /go/outreach server round-trip layers, NOT from wa.me itself. Direct wa.me has a
- * single `?text=` param (no `&`), so HubSpot can't mangle it. Keep the draft files UTF-8
- * with literal emojis; encode ONCE here. The /go/outreach slug server is retired (dormant).
+ * DECISION (Elena, July 19 2026, CORRECTED after a live test): HubSpot deal notes use a
+ * `https://web.whatsapp.com/send?phone=<digits>&text=<encodeURIComponent(msg)>` anchor.
+ * `wa.me` DID corrupt 4-byte emojis to "�" on Elena's desktop WhatsApp Web (its server
+ * redirect re-encodes the bytes). `web.whatsapp.com/send` hands the text straight to the
+ * browser — no redirect, emojis survive in full color. (Cursor was right about this.) The
+ * `&` in the URL is written as `&amp;` inside the note href (valid HTML → decodes to `&`).
+ * Keep draft files UTF-8 with literal color-default emojis; encode ONCE. The /go/outreach
+ * slug server is retired (dormant).
  */
 'use strict';
 
@@ -95,9 +97,10 @@ function buildWhatsAppPrefillUrl(phone, text, web = true) {
     : `https://api.whatsapp.com/send?phone=${digits}&text=${encoded}`;
 }
 
-/** Direct wa.me anchor for HubSpot notes (chosen method — see header). */
+/** web.whatsapp.com/send anchor for HubSpot notes (chosen method — see header).
+ * Emojis survive (no wa.me redirect). `&` → `&amp;` so the HTML href is valid. */
 function buildHubSpotWaAnchor(phone, text, label) {
-  const url = buildWaMeUrl(phone, text);
+  const url = buildWhatsAppPrefillUrl(phone, text, true).replace(/&/g, '&amp;');
   const title = label || `➡️ ENVIAR POR WHATSAPP (${formatPhone507(phone)})`;
   return `<a href="${url}"><b>${title}</b></a>`;
 }

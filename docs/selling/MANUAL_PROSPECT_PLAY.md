@@ -5,6 +5,7 @@
 > "I know a potential client's website" into a staged deal with a ready-to-send
 > WhatsApp message. Canonical rules also live in Claude memory
 > (`feedback_outreach_draft_rules.md`); this file is the repo source of truth.
+> **Cursor/Claude HubSpot API setup:** `docs/HUBSPOT_CURSOR_CONNECTION.md`
 
 ## The play, end to end
 
@@ -45,16 +46,16 @@
    ```bash
    node scripts/outreach-walink.cjs 507XXXXXXXX draft.txt
    ```
-   **July 19 2026 — FINAL decision (Elena): DIRECT `wa.me` anchor.** The note href is a real
-   (never HTML-escaped) `<a href="https://wa.me/<digits>?text=<encodeURIComponent(msg)>">` above
-   the plain-text `MENSAJE` block. This renders emojis correctly on Elena's WhatsApp Web — the
-   earlier `�` came from the b64 + `/go/outreach` server round-trip, NOT from wa.me. Direct
-   wa.me has a single `?text=` param (no `&`) so HubSpot can't mangle it. **Rules:** (1) the
-   `<a>` must be REAL html (`&lt;a…` shows as literal text — regression seen on the first
-   DoPanama note); (2) draft files UTF-8, encode ONCE; (3) safe color-emoji set only
-   (👋🏠✨🌍💫👶🚛🪨 — avoid U+FE0F glyphs, they go monochrome in the WA Web composer on Windows).
-   The `/go/outreach` slug server (`src/go-wa.ts`) is retired/dormant — kept in the tree, nothing
-   links to it. Automation `stage-manual-prospect.cjs` emits this via `buildHubSpotWaAnchor(phone, draft)`.
+   **July 19 2026 — FINAL decision (Elena), CORRECTED after a live send test:** the note href is a real
+   (never HTML-escaped) `<a href="https://web.whatsapp.com/send?phone=<digits>&amp;text=<encodeURIComponent(msg)>">`
+   above the plain-text `MENSAJE` block. **`wa.me` DID corrupt emojis to `�`** on Elena's desktop WhatsApp Web
+   (its server redirect re-encodes the 4-byte glyphs) — `web.whatsapp.com/send` hands the text straight to the
+   browser, so emojis survive in full color (Cursor was right about this). **Rules:** (1) the `<a>` must be REAL
+   html (`&lt;a…` shows as literal text — regression seen on the first DoPanama note); (2) write the URL's `&`
+   as `&amp;` in the href (valid HTML → decodes to `&`); (3) draft files UTF-8, encode ONCE; (4) color-default
+   emoji set only (👋🏠✨🌍💫👶🚛🪨 — avoid U+FE0F glyphs, they go monochrome in the WA Web composer). Mobile
+   variant = `api.whatsapp.com/send`. The `/go/outreach` slug server (`src/go-wa.ts`) is retired/dormant.
+   Automation `stage-manual-prospect.cjs` emits this via `buildHubSpotWaAnchor(phone, draft)`.
    Works on laptop via web.whatsapp.com **linked to WhatsApp Business** (phone: WhatsApp Business → ⋮ → Linked
    devices) and on phone directly.
 
@@ -68,8 +69,8 @@
 
 Spanish, WhatsApp-first ("Panamanians are crazy about WhatsApp"). Adapt the
 [bracketed] parts per prospect; keep the shape, tone and emojis EXACTLY —
-literal emoji characters, never encoded entities. **HubSpot href:** a REAL direct
-   `<a href="https://wa.me/<digits>?text=<encodeURIComponent(msg)>">` (see §4 — proven method):
+literal emoji characters, never encoded entities. **HubSpot href:** a REAL
+   `<a href="https://web.whatsapp.com/send?phone=<digits>&amp;text=<encodeURIComponent(msg)>">` (see §4 — emojis survive; wa.me corrupts them):
 
 ```
 Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
