@@ -20,7 +20,9 @@
    - Low AEO, high rest (e.g. 86/A) → "ustedes están muy cerca — 3 arreglos"
    - JS-shell / bot-blocked → "most AI crawlers see an EMPTY page" (strongest)
 
-2. **Extract contacts from their site** (WhatsApp number is gold in Panama, **email is mandatory too**):
+2. **Extract contacts from their site** — in Panama/LatAm **WhatsApp is the #1 channel**,
+   but **BOTH WhatsApp and email go into HubSpot every time** (email is the fallback when
+   a prospect redirects, and some only take commercial proposals there):
    `curl -sL https://PROSPECT.com | grep -ioE "(wa\.me/[0-9]+|api\.whatsapp\.com/send[^\"']*|tel:[+0-9]+|mailto:[^\"']+|\+507[- ]?[0-9]{3,4}[- ]?[0-9]{4})"`
 
    **Email search (added July 20 2026 — Panama Aesthetics lesson: they replied "commercial
@@ -146,6 +148,7 @@ Elena✨🌍💫
 | 2026-07-19 | Nomad Constructions Corp | 90/A (AEO 81 — construction Pedasí/Azuero) | 62832583063 |
 | 2026-07-19 | DoPanama | 91/A (GEO/AEO 88 — expat RE+relocation) | 62821413988 |
 | 2026-07-20 | Panama Aesthetics | 88/A (Tech 71 — 11s response; no FAQ) | 62873560951 — SENT same day; replied "email only" → info@panamaaesthetics.com, email draft `drafts/panama-aesthetics-email.txt` |
+| 2026-07-20 | YC Panama Yachts | 94/A+ (AEO 81 — no FAQ; rest 100/100) | 62864888204 — SENT same day (WA +507 6503-1745 + info@ycyachts.com) |
 
 ## Staged deal packs (draft + HubSpot note)
 
