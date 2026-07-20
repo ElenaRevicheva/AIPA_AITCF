@@ -58,22 +58,20 @@
      `docs/selling/prospects/{COMPANY}.md` (see § Staged deal packs).
    - **Task** — HIGH, due same day: "Send WhatsApp outreach → {Company}"
 
-4. **One-click WhatsApp link** — the message pre-typed so Elena only hits Send:
+4. **One-click send links (WhatsApp + Email)** — message pre-typed so Elena only hits Send:
    ```bash
    node scripts/outreach-walink.cjs 507XXXXXXXX draft.txt
    ```
-   **July 19 2026 — FINAL decision (Elena), CORRECTED after a live send test:** the note href is a real
-   (never HTML-escaped) `<a href="https://web.whatsapp.com/send?phone=<digits>&amp;text=<encodeURIComponent(msg)>">`
-   above the plain-text `MENSAJE` block. **`wa.me` DID corrupt emojis to `�`** on Elena's desktop WhatsApp Web
-   (its server redirect re-encodes the 4-byte glyphs) — `web.whatsapp.com/send` hands the text straight to the
-   browser, so emojis survive in full color (Cursor was right about this). **Rules:** (1) the `<a>` must be REAL
-   html (`&lt;a…` shows as literal text — regression seen on the first DoPanama note); (2) write the URL's `&`
-   as `&amp;` in the href (valid HTML → decodes to `&`); (3) draft files UTF-8, encode ONCE; (4) color-default
-   emoji set only (👋🏠✨🌍💫👶🚛🪨 — avoid U+FE0F glyphs, they go monochrome in the WA Web composer). Mobile
-   variant = `api.whatsapp.com/send`. The `/go/outreach` slug server (`src/go-wa.ts`) is retired/dormant.
-   Automation `stage-manual-prospect.cjs` emits this via `buildHubSpotWaAnchor(phone, draft)`.
-   Works on laptop via web.whatsapp.com **linked to WhatsApp Business** (phone: WhatsApp Business → ⋮ → Linked
-   devices) and on phone directly.
+   **July 19–20 2026 — dual channel (Fuerte Amador lesson):** HubSpot notes always get:
+   1. WhatsApp: real `<a href="https://web.whatsapp.com/send?phone=…&amp;text=…">` (never `wa.me` — emoji corruption).
+   2. **Email (mandatory when an address exists):** real `<a href="mailto:…?subject=…&amp;body=…">` **plus** a plain-text
+      `--- EMAIL ---` block (SUBJECT / TO / body) to paste into **HubSpot → Contact → Email** if mailto truncates.
+   LatAm sites often wire WhatsApp to a **reservations/menu bot** (not commercial). If the chat opens a bot,
+   do **not** treat it as a successful send — use the email path immediately. Staging writes both
+   `drafts/{slug}.txt` and `drafts/{slug}-email.txt`. Automation: `buildDualChannelNoteLinks` in `wa-link-lib.cjs`.
+
+   **July 19 WhatsApp rules (unchanged):** real `<a>` (not `&lt;a`), `&` as `&amp;` in href, UTF-8 draft encode ONCE,
+   color-default emoji set (👋🏠✨🌍💫👶🚛🪨). Mobile WA variant = `api.whatsapp.com/send`.
 
 5. **After Elena sends** (she says "sent" — WhatsApp Business app has no API,
    so detection is manual by design): move deal → **decisionmakerboughtin**
@@ -167,6 +165,7 @@ Elena✨🌍💫
 | 2026-07-19 | DoPanama | 91/A (GEO/AEO 88 — expat RE+relocation) | 62821413988 |
 | 2026-07-20 | Panama Aesthetics | 88/A (Tech 71 — 11s response; no FAQ) | 62873560951 — SENT WA same day; replied "email only" → 📧 EMAILED same day via HubSpot (auto-detected, email 113286576039) |
 | 2026-07-20 | YC Panama Yachts | 94/A+ (AEO 81 — no FAQ; rest 100/100) | 62864888204 — SENT same day (WA +507 6503-1745 + info@ycyachts.com) |
+| 2026-07-20 | Fuerte Amador Resort & Marina | 68/C (GEO 31 — flamencomarina.com) | 62857562269 — WA hit restaurant bot → EMAIL ready `service@fuerteamador.com` |
 
 ## Staged deal packs (draft + HubSpot note)
 

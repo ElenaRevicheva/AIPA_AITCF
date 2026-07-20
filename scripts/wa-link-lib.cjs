@@ -105,6 +105,81 @@ function buildHubSpotWaAnchor(phone, text, label) {
   return `<a href="${url}"><b>${title}</b></a>`;
 }
 
+/** Canonical email subject for Manual Prospect Play (spam-safe, audit-specific). */
+function buildManualEmailSubject(company, score) {
+  return `Auditoría de visibilidad en IA — ${company} (${score}/100): 3 arreglos concretos`;
+}
+
+/**
+ * Email body from the WhatsApp draft. Optional botFallback opener when WA hit a
+ * reservations/menu bot (Fuerte Amador lesson, July 20 2026).
+ */
+function buildManualEmailBody(waDraft, opts = {}) {
+  const draft = String(waDraft || '').trim();
+  const lines = [];
+  if (opts.botFallback) {
+    lines.push(
+      'Estimado equipo:',
+      '',
+      '¡Un gusto saludarles! 👋 Les escribo por este medio porque el WhatsApp llegó a un bot de reservas / menú automático — esta propuesta es comercial (visibilidad en IA), no una reserva. Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.',
+      '',
+    );
+    // Drop the WA greeting line(s) if present; keep from "Primero," onward.
+    const rest = draft.replace(/^Hola[\s\S]*?(?=Primero,)/i, '').trim();
+    lines.push(rest || draft);
+  } else {
+    lines.push(
+      'Estimado equipo:',
+      '',
+      draft.replace(
+        /^Hola, ¡un gusto saludarles! 👋/,
+        '¡Un gusto saludarles! 👋',
+      ),
+    );
+  }
+  // Prefer full-name sign-off on email
+  return lines
+    .join('\n')
+    .replace(/\nElena✨🌍💫\s*$/, '\nElena Revicheva✨🌍💫')
+    .trim();
+}
+
+/**
+ * One-click mailto for HubSpot notes (desktop mail / Gmail handler).
+ * Long bodies may truncate in some clients — full text stays in the note below.
+ * `&` → `&amp;` in href.
+ */
+function buildHubSpotMailtoAnchor(email, subject, body, label) {
+  const addr = String(email || '').trim();
+  if (!addr || !addr.includes('@')) throw new Error('mailto needs a real email');
+  const url =
+    `mailto:${addr}` +
+    `?subject=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(sliceWaText(body, 1800))}`;
+  const href = url.replace(/&/g, '&amp;');
+  const title = label || `➡️ ENVIAR POR EMAIL (${addr})`;
+  return `<a href="${href}"><b>${title}</b></a>`;
+}
+
+/**
+ * HubSpot note block: WA link + optional mailto + both MENSAJE sections.
+ * Always emit email path when email exists — WA bots/menus are common in LatAm.
+ */
+function buildDualChannelNoteLinks(phone, email, waDraft, company, score) {
+  const parts = [buildHubSpotWaAnchor(phone, waDraft)];
+  if (email) {
+    const subject = buildManualEmailSubject(company, score);
+    const emailBody = buildManualEmailBody(waDraft, { botFallback: false });
+    parts.push('');
+    parts.push(buildHubSpotMailtoAnchor(email, subject, emailBody));
+    parts.push('');
+    parts.push(
+      '<i>Si WhatsApp abre un bot de reservas/menú (no comercial): use el email — o copie el bloque EMAIL abajo en HubSpot → Contact → Email.</i>',
+    );
+  }
+  return parts.join('<br>');
+}
+
 module.exports = {
   OUTREACH_BASE,
   REGISTRY_PATH,
@@ -119,4 +194,8 @@ module.exports = {
   buildWaMeUrl,
   buildWhatsAppPrefillUrl,
   buildHubSpotWaAnchor,
+  buildManualEmailSubject,
+  buildManualEmailBody,
+  buildHubSpotMailtoAnchor,
+  buildDualChannelNoteLinks,
 };

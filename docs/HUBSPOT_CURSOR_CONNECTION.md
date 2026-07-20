@@ -121,7 +121,8 @@ Polls HubSpot CRM emails (`sales-email-read`), matches contacts that have a
 | Inbound email reply | → `contractsent` (💬 They replied) + complete follow-up tasks |
 
 State (idempotent): `docs/selling/.hs-manual-email-watcher-state.json` (gitignored).
-Optional Oracle cron every 10 min. Agents may also run it at session start.
+**Oracle cron (installed July 20 2026):** `*/10 * * * * /home/ubuntu/bin/hs-watch-manual-emails.sh`
+→ log `/home/ubuntu/logs/hs-watch-manual-emails.log`. Agents may also run the script at session start.
 
 ---
 

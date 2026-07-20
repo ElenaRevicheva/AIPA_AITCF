@@ -130,7 +130,8 @@ Highest expected pain × highest ticket. Run the play top-down:
 11. sanblasdreams.com — A3, ATP tour operator
 
 ### Elena-mined (outside shortlist order)
-- **ycyachts.com** (YC Panama Yachts) — A3 yacht charter / our-fleet — ✅ STAGED 2026-07-20 (deal **62864888204**; 94/A+, AEO 81; WhatsApp +507 6503-1745 + **info@ycyachts.com**)
+- **ycyachts.com** (YC Panama Yachts) — A3 yacht charter / our-fleet — ✅ STAGED 2026-07-20 (deal **62864888204**; 94/A+, AEO 81; WhatsApp +507 6503-1745 + **info@ycyachts.com**) — SENT same day
+- **flamencomarina.com** (Fuerte Amador Resort & Marina) — A3 marina/resort Amador — ✅ STAGED 2026-07-20 (deal **62857562269**; 68/C, GEO 31; WhatsApp +507 6030-8992 + **service@fuerteamador.com**)
 
 ## Directories to mine for more prospects (not prospects themselves)
 medicaltourismpackages.com · smilejet.app · health-tourism.com · placidway.com ·

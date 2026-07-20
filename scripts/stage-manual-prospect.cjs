@@ -8,6 +8,9 @@ const fs = require('fs');
 const path = require('path');
 const {
   buildHubSpotWaAnchor,
+  buildDualChannelNoteLinks,
+  buildManualEmailSubject,
+  buildManualEmailBody,
   formatPhone507,
   registerOutreachSlug,
   slugify,
@@ -140,6 +143,32 @@ const PROSPECT_META = {
     contactFirstName: 'Panama Aesthetics',
     contactLastName: '(WhatsApp contact)',
   },
+  'ycyachts.com': {
+    company: 'YC Panama Yachts',
+    city: 'Panama City',
+    customer: 'turista internacional que quiere alquilar un yate en Panamá o San Blas',
+    moneyQuery: '¿cuál es el mejor charter de yates en Panamá?',
+    compliment: 'su sitio está técnicamente impecable — 100/100 en fundación técnica, acceso de IA y datos estructurados, algo que casi nadie logra',
+    gapClause: 'falta una sección de preguntas y respuestas que los motores puedan citar directamente',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas de charters 24/7 (EN/ES, conectados a su CRM), automatización completa de procesos, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) sección FAQ con las preguntas reales de sus clientes (precios, rutas San Blas, qué incluye el charter) como H2/H3, (2) FAQPage JSON-LD, (3) dateModified/fechas visibles en contenido actualizado',
+    contactFirstName: 'YC Panama Yachts',
+    contactLastName: '(WhatsApp contact)',
+  },
+  'flamencomarina.com': {
+    company: 'Fuerte Amador Resort & Marina',
+    city: 'Panama City',
+    customer: 'turista o visitante que busca marina, charter o resort en Amador / Isla Flamenco',
+    moneyQuery: '¿cuál es la mejor marina o resort en Amador Panamá?',
+    compliment: 'tienen un complejo real y completo en Isla Flamenco — marina, resort, charters y restaurantes en la Calzada de Amador',
+    gapClause: 'casi no hay datos estructurados que ChatGPT pueda citar (sin Organization/FAQ JSON-LD) y el título/H1 no describen claramente la oferta',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas de marina, charters y eventos 24/7 (EN/ES, conectados a su CRM), automatización completa de procesos, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) Organization + LocalBusiness/Marina JSON-LD con name/url/logo/sameAs, (2) un solo H1 + title 15–70 chars que nombren la oferta (marina/resort Amador), (3) FAQ con preguntas reales de visitantes + FAQPage',
+    contactFirstName: 'Fuerte Amador',
+    contactLastName: '(WhatsApp contact)',
+  },
 };
 
 (async () => {
@@ -199,14 +228,35 @@ const PROSPECT_META = {
   const dealName = `[CLIENT-MANUAL] ${meta.company} — GEO/AEO fix (audit: ${score}/${grade})`;
 
   const draftPath = `docs/selling/drafts/${slug}.txt`;
+  const emailDraftPath = `docs/selling/drafts/${slug}-email.txt`;
   const prospectPath = `docs/selling/prospects/${meta.company.toUpperCase().replace(/\s+/g, '_')}.md`;
+
+  const emailSubject = contacts.email
+    ? buildManualEmailSubject(meta.company, score)
+    : null;
+  const emailBody = contacts.email
+    ? buildManualEmailBody(draft, { botFallback: false })
+    : null;
 
   if (!dryRun) {
     fs.writeFileSync(path.join(root, draftPath), draft + '\n', { encoding: 'utf8' });
     registerOutreachSlug(slug, phoneDigits, draftPath, meta.company);
+    if (contacts.email && emailSubject && emailBody) {
+      fs.writeFileSync(
+        path.join(root, emailDraftPath),
+        `SUBJECT: ${emailSubject}\n\nTO: ${contacts.email}\n\n${emailBody}\n`,
+        { encoding: 'utf8' },
+      );
+    }
   }
 
-  const waAnchor = buildHubSpotWaAnchor(phoneDigits, draft);
+  const dualLinks = buildDualChannelNoteLinks(
+    phoneDigits,
+    contacts.email,
+    draft,
+    meta.company,
+    score,
+  );
   const phoneFmt = formatPhone507(phoneDigits);
 
   // Dedupe
@@ -224,14 +274,31 @@ const PROSPECT_META = {
   }
 
   const auditLine = `${score}/100 Grade ${grade} | Tech ${catScores.techSeo ?? '?'} | AI Access ${catScores.aiAccess ?? '?'} | GEO ${catScores.geo ?? '?'} | AEO ${catScores.aeo ?? '?'} (${weak.name} ${weak.score} weakest)`;
+  const emailBlock = contacts.email && emailSubject && emailBody
+    ? [
+        '',
+        '--- EMAIL (si WhatsApp es bot / canal equivocado — copie en HubSpot Contact → Email, o use el mailto arriba) ---',
+        '',
+        `SUBJECT: ${escHtml(emailSubject)}`,
+        `TO: ${escHtml(contacts.email)}`,
+        '',
+        escHtml(emailBody),
+      ]
+    : [
+        '',
+        '--- EMAIL ---',
+        '',
+        '<i>No on-domain email found at staging — search again if WA is a bot.</i>',
+      ];
   const noteHtml = [
     `[CLIENT-MANUAL] ${meta.company} — AI Visibility outreach (https links; data verified live)`,
     '',
-    waAnchor,
+    dualLinks,
     '',
-    '--- MENSAJE (plain text — copy or send via link above) ---',
+    '--- MENSAJE WhatsApp (plain text) ---',
     '',
     escHtml(draft),
+    ...emailBlock,
     '',
     '--- Audit (verified live) ---',
     escHtml(auditLine),
@@ -242,7 +309,7 @@ const PROSPECT_META = {
     '',
     `Contacts: WhatsApp ${phoneFmt}${contacts.email ? ` | ${contacts.email}` : ''} | ${domain}`,
     '',
-    'Next: Click wa.me link → Send → move deal to "⏳ Sent — passive wait" → complete task → append ✅ SENT {date} + verbatim text to this note.',
+    'Next: Try WhatsApp first. If a bot/menu answers → send EMAIL (mailto or HubSpot compose). Then say "sent" / "emailed" (email watcher also catches HubSpot sends).',
   ].join('<br>');
 
   if (dryRun) {
@@ -298,8 +365,10 @@ const PROSPECT_META = {
   due.setHours(23, 59, 0, 0);
   const task = await hs('POST', '/crm/v3/objects/tasks', {
     properties: {
-      hs_task_subject: `Send WhatsApp outreach → ${meta.company}`,
-      hs_task_body: `Open deal note → click wa.me → Send via WhatsApp Business. Then move to Sent.`,
+      hs_task_subject: `Send outreach → ${meta.company} (WhatsApp first; email if bot)`,
+      hs_task_body: contacts.email
+        ? `1) Open deal note → WhatsApp link → Send. 2) If a reservations/menu BOT answers → use EMAIL mailto or HubSpot Email to ${contacts.email} (subject + body in note).`
+        : `Open deal note → click WhatsApp → Send. No email found at staging — search again if WA is a bot.`,
       hs_task_status: 'NOT_STARTED',
       hs_task_priority: 'HIGH',
       hs_timestamp: due.toISOString(),
