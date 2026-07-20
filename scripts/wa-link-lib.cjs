@@ -62,13 +62,19 @@ function saveRegistry(reg) {
   fs.writeFileSync(REGISTRY_PATH, `${JSON.stringify(reg, null, 2)}\n`, { encoding: 'utf8' });
 }
 
-/** Register slug → phone + draft path (called by stage-manual-prospect). */
-function registerOutreachSlug(slug, phone, draftRelPath, company) {
+/** Register slug → phone + draft (+ optional email draft for one-click aipa@ send). */
+function registerOutreachSlug(slug, phone, draftRelPath, company, extra = {}) {
   const reg = loadRegistry();
   reg[slug] = {
     phone: digitsOnly(phone),
     draft: draftRelPath.replace(/\\/g, '/'),
     company,
+    ...(extra.email ? { email: String(extra.email).trim().toLowerCase() } : {}),
+    ...(extra.emailDraft
+      ? { emailDraft: String(extra.emailDraft).replace(/\\/g, '/') }
+      : {}),
+    ...(extra.dealId ? { dealId: String(extra.dealId) } : {}),
+    ...(extra.score != null ? { score: Number(extra.score) } : {}),
   };
   saveRegistry(reg);
   return slug;
@@ -79,6 +85,14 @@ function buildOutreachSlugUrl(slug) {
   const safe = String(slug).replace(/[^a-z0-9-]/gi, '');
   if (!safe) throw new Error('Invalid outreach slug');
   return `${OUTREACH_BASE}/${safe}`;
+}
+
+/** One-click email via cto-aipa → Resend as aipa@aideazz.xyz (same sender as Concierge). */
+function buildOutreachEmailUrl(slug) {
+  const safe = String(slug).replace(/[^a-z0-9-]/gi, '');
+  if (!safe) throw new Error('Invalid outreach email slug');
+  const base = OUTREACH_BASE.replace(/\/outreach\/?$/, '/outreach-email');
+  return `${base}/${safe}`;
 }
 
 function buildWaMeUrl(phone, text) {
@@ -124,7 +138,6 @@ function buildManualEmailBody(waDraft, opts = {}) {
       '¡Un gusto saludarles! 👋 Les escribo por este medio porque el WhatsApp llegó a un bot de reservas / menú automático — esta propuesta es comercial (visibilidad en IA), no una reserva. Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.',
       '',
     );
-    // Drop the WA greeting line(s) if present; keep from "Primero," onward.
     const rest = draft.replace(/^Hola[\s\S]*?(?=Primero,)/i, '').trim();
     lines.push(rest || draft);
   } else {
@@ -137,7 +150,6 @@ function buildManualEmailBody(waDraft, opts = {}) {
       ),
     );
   }
-  // Prefer full-name sign-off on email
   return lines
     .join('\n')
     .replace(/\nElena✨🌍💫\s*$/, '\nElena Revicheva✨🌍💫')
@@ -145,10 +157,31 @@ function buildManualEmailBody(waDraft, opts = {}) {
 }
 
 /**
- * One-click mailto for HubSpot notes (desktop mail / Gmail handler).
- * Long bodies may truncate in some clients — full text stays in the note below.
- * `&` → `&amp;` in href.
+ * One-click email from aipa@aideazz.xyz — HubSpot note link opens confirm page,
+ * then Resend sends (same path as Lead Concierge). NOT Gmail, NOT HubSpot compose
+ * (HubSpot has no public prefill deep-link for connected inbox).
  */
+function buildHubSpotEmailAnchor(slug, email, label) {
+  const url = buildOutreachEmailUrl(slug);
+  const addr = String(email || '').trim();
+  const title = label || `➡️ ENVIAR POR EMAIL — aipa@aideazz.xyz (${addr || 'prospect'})`;
+  return `<a href="${url}"><b>${title}</b></a>`;
+}
+
+/** @deprecated — kept for scripts; prefer buildHubSpotEmailAnchor(slug). */
+function buildGmailComposeUrl(email, subject, body) {
+  const addr = String(email || '').trim();
+  if (!addr || !addr.includes('@')) throw new Error('gmail compose needs a real email');
+  const params = new URLSearchParams({
+    view: 'cm',
+    fs: '1',
+    to: addr,
+    su: subject,
+    body: sliceWaText(body, 1800),
+  });
+  return `https://mail.google.com/mail/?${params.toString()}`;
+}
+
 function buildHubSpotMailtoAnchor(email, subject, body, label) {
   const addr = String(email || '').trim();
   if (!addr || !addr.includes('@')) throw new Error('mailto needs a real email');
@@ -157,24 +190,21 @@ function buildHubSpotMailtoAnchor(email, subject, body, label) {
     `?subject=${encodeURIComponent(subject)}` +
     `&body=${encodeURIComponent(sliceWaText(body, 1800))}`;
   const href = url.replace(/&/g, '&amp;');
-  const title = label || `➡️ ENVIAR POR EMAIL (${addr})`;
+  const title = label || `➡️ EMAIL (mailto) (${addr})`;
   return `<a href="${href}"><b>${title}</b></a>`;
 }
 
 /**
- * HubSpot note block: WA link + optional mailto + both MENSAJE sections.
- * Always emit email path when email exists — WA bots/menus are common in LatAm.
+ * HubSpot note: WA + aipa@ one-click email (confirm page → Resend).
  */
-function buildDualChannelNoteLinks(phone, email, waDraft, company, score) {
+function buildDualChannelNoteLinks(phone, email, waDraft, company, score, slug) {
   const parts = [buildHubSpotWaAnchor(phone, waDraft)];
-  if (email) {
-    const subject = buildManualEmailSubject(company, score);
-    const emailBody = buildManualEmailBody(waDraft, { botFallback: false });
+  if (email && slug) {
     parts.push('');
-    parts.push(buildHubSpotMailtoAnchor(email, subject, emailBody));
+    parts.push(buildHubSpotEmailAnchor(slug, email));
     parts.push('');
     parts.push(
-      '<i>Si WhatsApp abre un bot de reservas/menú (no comercial): use el email — o copie el bloque EMAIL abajo en HubSpot → Contact → Email.</i>',
+      '<i><b>Email options (always both):</b> (1) HubSpot → Email from <b>aipa@aideazz.xyz</b> — best CRM trail; paste SUBJECT/body from EMAIL block below. (2) Speed: click <b>ENVIAR POR EMAIL — aipa@</b> → confirm → Resend (same From). If WA opens a bot, use email.</i>',
     );
   }
   return parts.join('<br>');
@@ -191,11 +221,14 @@ module.exports = {
   loadRegistry,
   registerOutreachSlug,
   buildOutreachSlugUrl,
+  buildOutreachEmailUrl,
   buildWaMeUrl,
   buildWhatsAppPrefillUrl,
   buildHubSpotWaAnchor,
   buildManualEmailSubject,
   buildManualEmailBody,
+  buildGmailComposeUrl,
   buildHubSpotMailtoAnchor,
+  buildHubSpotEmailAnchor,
   buildDualChannelNoteLinks,
 };

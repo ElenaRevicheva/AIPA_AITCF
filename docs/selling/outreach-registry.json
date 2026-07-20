@@ -2,16 +2,55 @@
   "dopanama": {
     "phone": "50764433341",
     "draft": "docs/selling/drafts/dopanama.txt",
-    "company": "DoPanama"
+    "company": "DoPanama",
+    "email": "info@dopanama.com",
+    "emailDraft": "docs/selling/drafts/dopanama-email.txt",
+    "dealId": "62821413988",
+    "score": 91
   },
   "nomad-constructions-corp": {
     "phone": "50769484982",
     "draft": "docs/selling/drafts/nomad-constructions-corp.txt",
-    "company": "Nomad Constructions Corp"
+    "company": "Nomad Constructions Corp",
+    "email": "info@nomadcc.com",
+    "emailDraft": "docs/selling/drafts/nomad-constructions-corp-email.txt",
+    "dealId": "62832583063",
+    "score": 90
   },
   "panama-aesthetics": {
     "phone": "50769896999",
     "draft": "docs/selling/drafts/panama-aesthetics.txt",
-    "company": "Panama Aesthetics"
+    "company": "Panama Aesthetics",
+    "email": "info@panamaaesthetics.com",
+    "emailDraft": "docs/selling/drafts/panama-aesthetics-email.txt",
+    "dealId": "62873560951",
+    "score": 88
+  },
+  "yc-panama-yachts": {
+    "phone": "50765031745",
+    "draft": "docs/selling/drafts/yc-panama-yachts.txt",
+    "company": "YC Panama Yachts",
+    "email": "info@ycyachts.com",
+    "emailDraft": "docs/selling/drafts/yc-panama-yachts-email.txt",
+    "dealId": "62864888204",
+    "score": 94
+  },
+  "fuerte-amador-resort-marina": {
+    "phone": "50760308992",
+    "draft": "docs/selling/drafts/fuerte-amador-resort-marina.txt",
+    "company": "Fuerte Amador Resort & Marina",
+    "email": "service@fuerteamador.com",
+    "emailDraft": "docs/selling/drafts/fuerte-amador-resort-marina-email.txt",
+    "dealId": "62857562269",
+    "score": 68
+  },
+  "centro-marino-panam": {
+    "phone": "50766150368",
+    "draft": "docs/selling/drafts/centro-marino-panam.txt",
+    "company": "Centro Marino Panamá",
+    "email": "ernesto@centromarino.com",
+    "emailDraft": "docs/selling/drafts/centro-marino-panam-email.txt",
+    "dealId": "62863032403",
+    "score": 84
   }
 }

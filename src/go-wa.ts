@@ -111,6 +111,202 @@ function loadOutreachBySlug(slug: string): { phone: string; text: string } | nul
   }
 }
 
+type OutreachEmailPayload = {
+  slug: string;
+  to: string;
+  subject: string;
+  body: string;
+  company: string;
+  dealId?: string;
+};
+
+function loadOutreachEmailBySlug(slug: string): OutreachEmailPayload | null {
+  try {
+    const reg = JSON.parse(fs.readFileSync(OUTREACH_REGISTRY, 'utf8')) as Record<
+      string,
+      {
+        email?: string;
+        emailDraft?: string;
+        draft?: string;
+        company?: string;
+        dealId?: string;
+        score?: number;
+      }
+    >;
+    const entry = reg[slug];
+    if (!entry) return null;
+    const company = entry.company || slug;
+    let subject = '';
+    let body = '';
+    let to = (entry.email || '').trim().toLowerCase();
+
+    if (entry.emailDraft) {
+      const raw = fs.readFileSync(path.join(REPO_ROOT, entry.emailDraft), 'utf8').trim();
+      const subjM = raw.match(/^SUBJECT:\s*(.+)$/m);
+      const toM = raw.match(/^TO:\s*(.+)$/m);
+      subject = subjM?.[1]?.trim() || '';
+      if (toM?.[1]?.trim()) to = toM[1].trim().toLowerCase();
+      body = raw
+        .replace(/^SUBJECT:.*$/m, '')
+        .replace(/^TO:.*$/m, '')
+        .replace(/^\s+/, '')
+        .trim();
+    } else if (entry.draft) {
+      const wa = fs.readFileSync(path.join(REPO_ROOT, entry.draft), 'utf8').trim();
+      const score = entry.score ?? 0;
+      subject = `Auditoría de visibilidad en IA — ${company} (${score}/100): 3 arreglos concretos`;
+      body = `Estimado equipo:\n\n${wa.replace(/^Hola, ¡un gusto saludarles! 👋/, '¡Un gusto saludarles! 👋')}`.replace(
+        /\nElena✨🌍💫\s*$/,
+        '\nElena Revicheva✨🌍💫',
+      );
+    }
+
+    if (!to || !to.includes('@') || !subject || !body) return null;
+    const out: OutreachEmailPayload = { slug, to, subject, body, company };
+    if (entry.dealId) out.dealId = entry.dealId;
+    return out;
+  } catch (e) {
+    console.warn('[go/outreach-email] registry read failed:', (e as Error).message?.slice(0, 80));
+    return null;
+  }
+}
+
+function outreachEmailConfirmHtml(p: OutreachEmailPayload, sendPath: string): string {
+  const esc = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return `<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Enviar email — ${esc(p.company)}</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:40rem;margin:2rem auto;padding:0 1rem;color:#111;line-height:1.45}
+.box{border:1px solid #ddd;border-radius:12px;padding:1.25rem;background:#fafafa}
+.meta{font-size:.95rem;margin:.35rem 0}
+.preview{white-space:pre-wrap;background:#fff;border:1px solid #eee;border-radius:8px;padding:1rem;max-height:50vh;overflow:auto;margin:1rem 0}
+button{background:#ff7a59;color:#fff;border:0;border-radius:8px;padding:.85rem 1.25rem;font-size:1.05rem;font-weight:600;cursor:pointer;width:100%}
+button:hover{filter:brightness(.95)}
+.dim{color:#666;font-size:.9rem}
+</style>
+</head><body>
+<h1>Enviar outreach</h1>
+<div class="box">
+  <p class="meta"><b>From:</b> Elena Revicheva &lt;aipa@aideazz.xyz&gt;</p>
+  <p class="meta"><b>To:</b> ${esc(p.to)}</p>
+  <p class="meta"><b>Subject:</b> ${esc(p.subject)}</p>
+  <div class="preview">${esc(p.body)}</div>
+  <form method="POST" action="${esc(sendPath)}">
+    <button type="submit">✉️ Enviar ahora desde aipa@aideazz.xyz</button>
+  </form>
+  <p class="dim">Igual que WhatsApp: revisas → un click → Send. Se registra en HubSpot automáticamente.</p>
+</div>
+</body></html>`;
+}
+
+function outreachEmailDoneHtml(ok: boolean, detail: string): string {
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${ok ? 'Enviado' : 'Error'}</title>
+<style>body{font-family:system-ui,sans-serif;max-width:32rem;margin:3rem auto;padding:0 1rem}</style>
+</head><body>
+<h1>${ok ? '✅ Email enviado' : '❌ No se pudo enviar'}</h1>
+<p>${esc(detail)}</p>
+<p><a href="https://app.hubspot.com">Volver a HubSpot</a></p>
+</body></html>`;
+}
+
+async function sendOutreachEmailViaResend(p: OutreachEmailPayload): Promise<string> {
+  const { getResendApiKey } = await import('./marketing-notify.js');
+  const apiKey = getResendApiKey();
+  if (!apiKey) throw new Error('RESEND_API_KEY not set');
+  const rawFrom = (process.env.CONCIERGE_FROM || process.env.OUTREACH_FROM || '').trim().replace(/^["']|["']$/g, '');
+  const fromOk =
+    /^[^\s<>]+@[^\s<>]+\.[^\s<>]+$/.test(rawFrom) || /^.+\s*<[^\s<>]+@[^\s<>]+\.[^\s<>]+>\s*$/.test(rawFrom);
+  const from = fromOk ? rawFrom : 'Elena Revicheva <aipa@aideazz.xyz>';
+  const replyTo = (process.env.CONCIERGE_REPLY_TO || 'elena.revicheva2016@gmail.com').trim().replace(/^["']|["']$/g, '');
+  const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const html = `<div style="white-space:pre-wrap;font-family:inherit;">${escHtml(p.body)}</div>`;
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from,
+      to: [p.to],
+      subject: p.subject,
+      html,
+      text: p.body,
+      reply_to: replyTo,
+    }),
+  });
+  if (!r.ok) throw new Error(`Resend ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  const j = (await r.json()) as { id?: string };
+  return j.id || 'ok';
+}
+
+async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: string): Promise<void> {
+  const key = process.env.HUBSPOT_API_KEY?.trim();
+  if (!key || !p.dealId) return;
+  const headers = { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
+  const when = new Date().toISOString().slice(0, 10);
+  await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${p.dealId}`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({ properties: { dealstage: 'decisionmakerboughtin' } }),
+  });
+  const notesAssoc = await fetch(
+    `https://api.hubapi.com/crm/v4/objects/deals/${p.dealId}/associations/notes`,
+    { headers },
+  ).then(r => r.json() as Promise<{ results?: { toObjectId?: string; id?: string }[] }>);
+  const noteIds = (notesAssoc.results || []).map(r => r.toObjectId || r.id).filter(Boolean) as string[];
+  if (noteIds.length) {
+    let best: { id: string; body: string; ts: string } | null = null;
+    for (const id of noteIds) {
+      const n = await fetch(
+        `https://api.hubapi.com/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`,
+        { headers },
+      ).then(r => r.json() as Promise<{ id: string; properties?: { hs_note_body?: string; hs_timestamp?: string } }>);
+      const ts = n.properties?.hs_timestamp || '';
+      if (!best || ts > best.ts) best = { id: n.id, body: n.properties?.hs_note_body || '', ts };
+    }
+    if (best && !best.body.includes(`Resend:${resendId}`)) {
+      const add =
+        `<br><br>📧 EMAILED ${when} from <b>aipa@aideazz.xyz</b> → ${p.to}` +
+        `<br>Subject: ${p.subject}` +
+        `<br>Resend:${resendId} (one-click /go/outreach-email/${p.slug}).`;
+      await fetch(`https://api.hubapi.com/crm/v3/objects/notes/${best.id}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ properties: { hs_note_body: best.body + add } }),
+      });
+    }
+  }
+  // +4 day follow-up if none open
+  const due = new Date();
+  due.setDate(due.getDate() + 4);
+  due.setHours(23, 59, 0, 0);
+  const task = await fetch('https://api.hubapi.com/crm/v3/objects/tasks', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      properties: {
+        hs_task_subject: `Soft follow-up email/WA → ${p.company} (no reply yet?)`,
+        hs_task_body: `Auto after aipa@ one-click send. Deal ${p.dealId}`,
+        hs_task_status: 'NOT_STARTED',
+        hs_task_priority: 'MEDIUM',
+        hs_timestamp: due.toISOString(),
+      },
+    }),
+  }).then(r => r.json() as Promise<{ id?: string }>);
+  if (task.id) {
+    await fetch(`https://api.hubapi.com/crm/v4/objects/tasks/${task.id}/associations/deals/${p.dealId}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify([{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 }]),
+    });
+  }
+}
+
 /** Build tracked redirect URL for Atlas-tagged EspaLuz CTAs (browser-safe). */
 export function buildGoWaUrl(params: {
   to?: string;
@@ -257,5 +453,60 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
     }
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(outreachBridgeHtml(digits, text));
+  });
+
+  /**
+   * Manual Prospect Play — email from aipa@aideazz.xyz (Resend).
+   * GET = confirm (like WhatsApp open-then-Send). POST = send + HubSpot update.
+   */
+  app.get('/go/outreach-email/:slug', (req: Request, res: Response) => {
+    const ip = getClientIp(req);
+    if (!allowGoWaRate(ip)) {
+      res.status(429).send('Too many requests');
+      return;
+    }
+    const slug = String(req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
+    const hit = loadOutreachEmailBySlug(slug);
+    if (!hit) {
+      res.status(404).send('Unknown outreach email slug (need email + draft in registry)');
+      return;
+    }
+    const sendPath = `${GO_WA_BASE}/go/outreach-email/${slug}/send`;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(outreachEmailConfirmHtml(hit, sendPath));
+  });
+
+  app.post('/go/outreach-email/:slug/send', async (req: Request, res: Response) => {
+    const ip = getClientIp(req);
+    if (!allowGoWaRate(ip)) {
+      res.status(429).send('Too many requests');
+      return;
+    }
+    const slug = String(req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
+    const hit = loadOutreachEmailBySlug(slug);
+    if (!hit) {
+      res.status(404).send(outreachEmailDoneHtml(false, 'Unknown slug'));
+      return;
+    }
+    try {
+      const resendId = await sendOutreachEmailViaResend(hit);
+      await markHubSpotAfterOutreachEmail(hit, resendId).catch(e =>
+        console.error('[go/outreach-email] HubSpot update failed:', e),
+      );
+      console.log(`[go/outreach-email] sent ${slug} → ${hit.to} resend=${resendId}`);
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(
+        outreachEmailDoneHtml(
+          true,
+          `Enviado a ${hit.to} desde aipa@aideazz.xyz. Subject: ${hit.subject}. Resend id: ${resendId}. Deal movido a ⏳ Sent si tenía dealId.`,
+        ),
+      );
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('[go/outreach-email] send failed:', msg);
+      res.status(500);
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(outreachEmailDoneHtml(false, msg));
+    }
   });
 }

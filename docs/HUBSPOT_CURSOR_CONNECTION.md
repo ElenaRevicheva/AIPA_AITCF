@@ -117,8 +117,12 @@ Polls HubSpot CRM emails (`sales-email-read`), matches contacts that have a
 
 | Event | Deal action |
 |-------|-------------|
-| Outbound email (HubSpot UI) | → `decisionmakerboughtin` (⏳ Sent) + note `📧 EMAILED` + +4 day follow-up |
+| Outbound email (HubSpot UI from aipa@) | → `decisionmakerboughtin` (⏳ Sent) + note `📧 EMAILED` + +4 day follow-up |
 | Inbound email reply | → `contractsent` (💬 They replied) + complete follow-up tasks |
+
+**Every deal note also has a speed one-click:** `/go/outreach-email/{slug}` → confirm →
+Resend from **aipa@aideazz.xyz** (same From). Ensure/refresh links:
+`node scripts/hs-ensure-aipa-email-links.cjs`.
 
 State (idempotent): `docs/selling/.hs-manual-email-watcher-state.json` (gitignored).
 **Oracle cron (installed July 20 2026):** `*/10 * * * * /home/ubuntu/bin/hs-watch-manual-emails.sh`

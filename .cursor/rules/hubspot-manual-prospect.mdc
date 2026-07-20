@@ -28,7 +28,7 @@ node -e "const k=require('fs').readFileSync('.env','utf8').match(/^HUBSPOT_API_K
 - Deal prefix: **`[CLIENT-MANUAL]`** · stage new deals: **`qualifiedtobuy`** (🔥 I Act TODAY)
 - Every deal: company + deal + **contact** + note (full MENSAJE + WhatsApp anchor) + task
 - **Contacts in Panama/LatAm:** search **both WhatsApp AND email** every time — WhatsApp is #1 channel; email still goes on the HubSpot contact (fallback when they redirect commercial proposals). Never stage WhatsApp-only if an email exists on the site.
-- HubSpot note: **dual channel** — WhatsApp (`web.whatsapp.com/send`) **and** Email (`mailto:` + paste block) via `buildDualChannelNoteLinks`. If WA opens a reservations/menu bot, send email instead (do not count as successful outreach).
+- HubSpot note: **always dual email options when email exists** — (1) HubSpot UI Email from **aipa@aideazz.xyz** (best CRM), (2) speed one-click `/go/outreach-email/{slug}` → Resend from **aipa@** + WhatsApp link. Refresh all: `node scripts/hs-ensure-aipa-email-links.cjs`.
 - Email sent from HubSpot UI is auto-detected by `hs-watch-manual-emails.cjs` (Oracle cron */10).
 
 ## Elena actions (human only)

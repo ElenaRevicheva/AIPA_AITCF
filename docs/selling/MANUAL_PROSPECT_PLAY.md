@@ -62,16 +62,23 @@
    ```bash
    node scripts/outreach-walink.cjs 507XXXXXXXX draft.txt
    ```
-   **July 19–20 2026 — dual channel (Fuerte Amador lesson):** HubSpot notes always get:
-   1. WhatsApp: real `<a href="https://web.whatsapp.com/send?phone=…&amp;text=…">` (never `wa.me` — emoji corruption).
-   2. **Email (mandatory when an address exists):** real `<a href="mailto:…?subject=…&amp;body=…">` **plus** a plain-text
-      `--- EMAIL ---` block (SUBJECT / TO / body) to paste into **HubSpot → Contact → Email** if mailto truncates.
-   LatAm sites often wire WhatsApp to a **reservations/menu bot** (not commercial). If the chat opens a bot,
-   do **not** treat it as a successful send — use the email path immediately. Staging writes both
-   `drafts/{slug}.txt` and `drafts/{slug}-email.txt`. Automation: `buildDualChannelNoteLinks` in `wa-link-lib.cjs`.
+   **July 19–20 2026 — dual channel (always on every deal note):**
+   1. WhatsApp: `<a href="https://web.whatsapp.com/send?phone=…&amp;text=…">`
+   2. **Email speed: aipa@ one-click** — `<a href="https://webhook.aideazz.xyz/cto/go/outreach-email/{slug}">`
+      → confirm → Resend from `aipa@aideazz.xyz` (same From as HubSpot UI).
+   3. **Email CRM (also always available):** HubSpot deal/contact → **Email** → From
+      `aipa@aideazz.xyz` → paste SUBJECT/body from the note’s EMAIL block (best threading).
+   Both email paths are mandatory whenever a prospect email exists. If WhatsApp opens a
+   reservations bot, use either email path. Refresh helper:
+   `node scripts/hs-ensure-aipa-email-links.cjs`.
+   WhatsApp rules: real `<a>` (not escaped), never `wa.me` for emoji messages (use
+   `web.whatsapp.com/send`), UTF-8 draft encode once, color-default emoji set.
 
-   **July 19 WhatsApp rules (unchanged):** real `<a>` (not `&lt;a`), `&` as `&amp;` in href, UTF-8 draft encode ONCE,
-   color-default emoji set (👋🏠✨🌍💫👶🚛🪨). Mobile WA variant = `api.whatsapp.com/send`.
+   **Zoho Sent vs Resend (July 20 2026):** HubSpot UI Email uses the connected **Zoho**
+   inbox → shows in Zoho Mail → Sent. One-click / campaign sends use **Resend** (same
+   From `aipa@aideazz.xyz`) → appear in [Resend dashboard](https://resend.com/emails),
+   **not** in Zoho Sent. Both are real sends. Zero-click campaign:
+   `node scripts/hs-campaign-send-aipa-emails.cjs` (on Oracle).
 
 5. **After Elena sends** (she says "sent" — WhatsApp Business app has no API,
    so detection is manual by design): move deal → **decisionmakerboughtin**
@@ -166,6 +173,7 @@ Elena✨🌍💫
 | 2026-07-20 | Panama Aesthetics | 88/A (Tech 71 — 11s response; no FAQ) | 62873560951 — SENT WA same day; replied "email only" → 📧 EMAILED same day via HubSpot (auto-detected, email 113286576039) |
 | 2026-07-20 | YC Panama Yachts | 94/A+ (AEO 81 — no FAQ; rest 100/100) | 62864888204 — SENT same day (WA +507 6503-1745 + info@ycyachts.com) |
 | 2026-07-20 | Fuerte Amador Resort & Marina | 68/C (GEO 31 — flamencomarina.com) | 62857562269 — WA hit restaurant bot → EMAIL ready `service@fuerteamador.com` |
+| 2026-07-20 | Centro Marino Panamá | 84/B (AEO 75 — Mercury/botes) | 62863032403 — WA +507 6615-0368 + ernesto@centromarino.com (dual-channel note) |
 
 ## Staged deal packs (draft + HubSpot note)
 

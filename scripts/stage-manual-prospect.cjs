@@ -62,10 +62,15 @@ function parseContacts(html) {
     while ((m = re.exec(html)) !== null) out.add(m[1] || m[0]);
   }
   const phones = [...out]
-    .map(p => p.replace(/\D/g, ''))
+    .map(p => {
+      let d = p.replace(/\D/g, '');
+      // wa.me/66150368 (local 8-digit) → 50766150368
+      if (d.length === 8) d = `507${d}`;
+      return d;
+    })
     .filter(p => p.length >= 10 && p.startsWith('507'));
   // Emails: mailto links AND plain text (many Panama sites print info@… as text).
-  const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js)$|@(2x|3x)\b|sentry|wixpress|example\./i;
+  const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js)$|@(2x|3x)\b|sentry|wixpress|example\.|correoernesto|^[0-9]+@/i;
   const emails = [
     ...[...html.matchAll(/mailto:([^"'\s?]+)/gi)].map(m => m[1]),
     ...(html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []),
@@ -169,6 +174,19 @@ const PROSPECT_META = {
     contactFirstName: 'Fuerte Amador',
     contactLastName: '(WhatsApp contact)',
   },
+  'centromarino.com': {
+    company: 'Centro Marino Panamá',
+    city: 'Panama City',
+    customer: 'dueño de bote o comprador que busca motores Mercury, botes o servicio náutico en Panamá',
+    moneyQuery: '¿dónde compro motores Mercury o servicio de botes en Panamá?',
+    compliment: 'más de 35 años en el sector náutico con varias sucursales (Amador/Flamenco Marina, Ocean Reef, Club de Yates) y representación Mercury',
+    gapClause: 'falta un H1 claro, poco contenido profundo y no hay FAQ en formato de preguntas que los motores puedan citar',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y califican consultas de ventas/taller 24/7 (EN/ES, conectados a su CRM), automatización de cotizaciones e intake de servicio, video con IA para marketing de botes y motores, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) un solo H1 + copy sustantivo (qué venden, a quién, prueba), (2) FAQ con preguntas reales de dueños de botes + FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Centro Marino',
+    contactLastName: '(WhatsApp contact)',
+  },
 };
 
 (async () => {
@@ -240,7 +258,11 @@ const PROSPECT_META = {
 
   if (!dryRun) {
     fs.writeFileSync(path.join(root, draftPath), draft + '\n', { encoding: 'utf8' });
-    registerOutreachSlug(slug, phoneDigits, draftPath, meta.company);
+    registerOutreachSlug(slug, phoneDigits, draftPath, meta.company, {
+      email: contacts.email || undefined,
+      emailDraft: contacts.email ? emailDraftPath : undefined,
+      score,
+    });
     if (contacts.email && emailSubject && emailBody) {
       fs.writeFileSync(
         path.join(root, emailDraftPath),
@@ -256,6 +278,7 @@ const PROSPECT_META = {
     draft,
     meta.company,
     score,
+    slug,
   );
   const phoneFmt = formatPhone507(phoneDigits);
 
@@ -277,7 +300,7 @@ const PROSPECT_META = {
   const emailBlock = contacts.email && emailSubject && emailBody
     ? [
         '',
-        '--- EMAIL (si WhatsApp es bot / canal equivocado — copie en HubSpot Contact → Email, o use el mailto arriba) ---',
+        '--- EMAIL (mismo texto que el link Gmail de arriba — backup si el link se trunca) ---',
         '',
         `SUBJECT: ${escHtml(emailSubject)}`,
         `TO: ${escHtml(contacts.email)}`,
@@ -309,7 +332,7 @@ const PROSPECT_META = {
     '',
     `Contacts: WhatsApp ${phoneFmt}${contacts.email ? ` | ${contacts.email}` : ''} | ${domain}`,
     '',
-    'Next: Try WhatsApp first. If a bot/menu answers → send EMAIL (mailto or HubSpot compose). Then say "sent" / "emailed" (email watcher also catches HubSpot sends).',
+    'Next: Click WhatsApp OR Gmail one-click (prefilled → Send). If WA is a bot → use Gmail. Email watcher auto-advances HubSpot-logged/Gmail-synced sends when visible.',
   ].join('<br>');
 
   if (dryRun) {
@@ -390,11 +413,17 @@ const PROSPECT_META = {
   ]);
 
   // Prospect pack
+  registerOutreachSlug(slug, phoneDigits, draftPath, meta.company, {
+    email: contacts.email || undefined,
+    emailDraft: contacts.email ? emailDraftPath : undefined,
+    score,
+    dealId,
+  });
   const pack = `# [CLIENT-MANUAL] ${meta.company} — HubSpot note pack
 
 > Staged ${new Date().toISOString().slice(0, 10)}. Deal: \`${dealName}\` (ID ${dealId}).
 > Draft: \`${draftPath}\`
-> wa.me: \`node scripts/outreach-walink.cjs ${phoneDigits} ${draftPath}\` (HubSpot-safe /go/outreach redirect)
+> Email one-click: \`https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}\` (from aipa@aideazz.xyz)
 
 Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note **${note.id}** | Task **${task.id}**
 `;

@@ -131,7 +131,8 @@ Highest expected pain × highest ticket. Run the play top-down:
 
 ### Elena-mined (outside shortlist order)
 - **ycyachts.com** (YC Panama Yachts) — A3 yacht charter / our-fleet — ✅ STAGED 2026-07-20 (deal **62864888204**; 94/A+, AEO 81; WhatsApp +507 6503-1745 + **info@ycyachts.com**) — SENT same day
-- **flamencomarina.com** (Fuerte Amador Resort & Marina) — A3 marina/resort Amador — ✅ STAGED 2026-07-20 (deal **62857562269**; 68/C, GEO 31; WhatsApp +507 6030-8992 + **service@fuerteamador.com**)
+- **flamencomarina.com** (Fuerte Amador Resort & Marina / **Flamenco Marina**) — A3 marina/resort Amador — ✅ STAGED 2026-07-20 (deal **62857562269**; 68/C, GEO 31; WhatsApp +507 6030-8992 bot miss → email **service@fuerteamador.com**; marina ops email also `marina@fuerteamador.com`)
+- **centromarino.com** (Centro Marino Panamá) — Mercury motors / boats / service (branch at Flamenco Marina) — ✅ STAGED 2026-07-20 (deal **62863032403**; 84/B, AEO 75; WhatsApp +507 6615-0368 + **ernesto@centromarino.com**)
 
 ## Directories to mine for more prospects (not prospects themselves)
 medicaltourismpackages.com · smilejet.app · health-tourism.com · placidway.com ·
