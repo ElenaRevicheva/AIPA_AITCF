@@ -1,40 +1,56 @@
 #!/usr/bin/env node
 /**
- * outreach-walink.cjs — one-click WhatsApp outreach link generator.
+ * outreach-walink.cjs — WhatsApp outreach link for Manual Prospect Play.
  *
- * Part of the MANUAL PROSPECT PLAY (docs/selling/MANUAL_PROSPECT_PLAY.md):
- * every prospect deal note in HubSpot carries a wa.me link with the FULL
- * outreach message pre-typed, so Elena's only action is click → Send.
+ * Preferred (HubSpot-safe slug URL, no query string):
+ *   node scripts/outreach-walink.cjs --slug dopanama
  *
- * Usage:
- *   node scripts/outreach-walink.cjs <phone-digits> <message-file.txt>
- *   node scripts/outreach-walink.cjs 50769596919 draft.txt
- *
- * - phone: international format, digits only, no "+" (Panama: 507xxxxxxxx)
- * - message file: UTF-8 plain text, EXACTLY as it should appear in WhatsApp,
- *   literal emojis included (never pre-encoded — encoding happens here).
- *
- * Prints the https://wa.me/<phone>?text=<encoded> URL to stdout.
- * Paste it into a browser (WhatsApp Web linked to WhatsApp Business) or wrap
- * it in an <a href="..."> inside the HubSpot deal note.
+ * Direct wa.me (terminal testing only):
+ *   node scripts/outreach-walink.cjs --direct 50764433341 draft.txt
  */
+const path = require('path');
+const {
+  buildOutreachSlugUrl,
+  buildWhatsAppPrefillUrl,
+  readDraftUtf8,
+  formatPhone507,
+  loadRegistry,
+} = require('./wa-link-lib.cjs');
 
-const fs = require('fs');
+const args = process.argv.slice(2);
+const slugMode = args.includes('--slug');
+const direct = args.includes('--direct');
+const rest = args.filter(a => !a.startsWith('--'));
 
-const [phone, file] = process.argv.slice(2);
+if (slugMode) {
+  const slug = rest[0];
+  if (!slug) {
+    console.error('Usage: node scripts/outreach-walink.cjs --slug <slug>');
+    process.exit(1);
+  }
+  const reg = loadRegistry()[slug];
+  if (!reg) {
+    console.error(`Unknown slug "${slug}" — add to docs/selling/outreach-registry.json`);
+    process.exit(1);
+  }
+  console.log(buildOutreachSlugUrl(slug));
+  console.error(`# HubSpot slug link → ${reg.company} ${formatPhone507(reg.phone)}`);
+  process.exit(0);
+}
+
+const [phone, file] = rest;
 if (!phone || !file) {
-  console.error('Usage: node scripts/outreach-walink.cjs <phone-digits> <message-file.txt>');
-  process.exit(1);
-}
-if (!/^\d{8,15}$/.test(phone)) {
-  console.error(`Phone must be 8-15 digits, international format without "+" (got "${phone}").`);
-  process.exit(1);
-}
-
-const message = fs.readFileSync(file, 'utf8').trim();
-if (!message) {
-  console.error(`Message file ${file} is empty.`);
+  console.error('Usage:');
+  console.error('  node scripts/outreach-walink.cjs --slug dopanama');
+  console.error('  node scripts/outreach-walink.cjs --direct 507XXXXXXXX draft.txt');
   process.exit(1);
 }
 
-console.log(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`);
+const message = readDraftUtf8(path.isAbsolute(file) ? file : path.join(__dirname, '..', file));
+if (direct) {
+  console.log(buildWhatsAppPrefillUrl(phone, message, true));
+  console.error('# Direct web.whatsapp.com link (testing — HubSpot notes use --slug)');
+} else {
+  console.error('For file+phone mode use --direct (HubSpot notes must use --slug)');
+  process.exit(1);
+}

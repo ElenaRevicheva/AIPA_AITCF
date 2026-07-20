@@ -118,8 +118,8 @@ Validated here: **Eurostone Panamá** (stone/cladding), **AIRCO / SINOTRUK** (he
 Highest expected pain × highest ticket. Run the play top-down:
 
 1. panamafertility.com — A1, very high ticket, intl — ✅ STAGED 2026-07-19 (deal 62828946074; 86/A, robots.txt blocks GPTBot/Claude/Gemini)
-2. nomadcc.com — C, construction Pedasí/Azuero — ✅ STAGED 2026-07-19 (90/A, AEO 81; **HubSpot note missing message — paste from `prospects/NOMAD_CONSTRUCTIONS.md`**)
-3. dopanama.com — A2, expat RE+relocation
+2. nomadcc.com — C, construction Pedasí/Azuero — ✅ STAGED 2026-07-19 (deal 62832583063; 90/A, AEO 81)
+3. dopanama.com — A2, expat RE+relocation — ✅ STAGED 2026-07-19 (deal 62821413988; 91/A, GEO/AEO 88)
 4. panamaaesthetics.com — A1, aesthetic tourism
 5. relofirm.com — A2, law + relocation
 6. panamadentalclinic.com — A1, dental tourism

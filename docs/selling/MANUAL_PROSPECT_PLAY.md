@@ -45,10 +45,17 @@
    ```bash
    node scripts/outreach-walink.cjs 507XXXXXXXX draft.txt
    ```
-   Wrap the output in the note as
-   `<a href="{url}"><b>➡️ ENVIAR POR WHATSAPP (+507 XXXX-XXXX)</b></a>`
-   placed ABOVE the plain-text draft. Works on laptop via web.whatsapp.com
-   **linked to WhatsApp Business** (phone: WhatsApp Business → ⋮ → Linked
+   **July 19 2026 — FINAL decision (Elena): DIRECT `wa.me` anchor.** The note href is a real
+   (never HTML-escaped) `<a href="https://wa.me/<digits>?text=<encodeURIComponent(msg)>">` above
+   the plain-text `MENSAJE` block. This renders emojis correctly on Elena's WhatsApp Web — the
+   earlier `�` came from the b64 + `/go/outreach` server round-trip, NOT from wa.me. Direct
+   wa.me has a single `?text=` param (no `&`) so HubSpot can't mangle it. **Rules:** (1) the
+   `<a>` must be REAL html (`&lt;a…` shows as literal text — regression seen on the first
+   DoPanama note); (2) draft files UTF-8, encode ONCE; (3) safe color-emoji set only
+   (👋🏠✨🌍💫👶🚛🪨 — avoid U+FE0F glyphs, they go monochrome in the WA Web composer on Windows).
+   The `/go/outreach` slug server (`src/go-wa.ts`) is retired/dormant — kept in the tree, nothing
+   links to it. Automation `stage-manual-prospect.cjs` emits this via `buildHubSpotWaAnchor(phone, draft)`.
+   Works on laptop via web.whatsapp.com **linked to WhatsApp Business** (phone: WhatsApp Business → ⋮ → Linked
    devices) and on phone directly.
 
 5. **After Elena sends** (she says "sent" — WhatsApp Business app has no API,
@@ -61,8 +68,8 @@
 
 Spanish, WhatsApp-first ("Panamanians are crazy about WhatsApp"). Adapt the
 [bracketed] parts per prospect; keep the shape, tone and emojis EXACTLY —
-literal emoji characters, never encoded entities (encoding happens only inside
-the wa.me URL):
+literal emoji characters, never encoded entities. **HubSpot href:** a REAL direct
+   `<a href="https://wa.me/<digits>?text=<encodeURIComponent(msg)>">` (see §4 — proven method):
 
 ```
 Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
@@ -107,7 +114,8 @@ Elena✨🌍💫
 | 2026-07-19 | Eurostone Panamá (Atelier de la Piedra) | 86/A (AEO 81) | 62837342362 |
 | 2026-07-19 | AIRCO / SINOTRUK Panamá | 73/B (AI-access 59 — robots.txt blocks all AI crawlers) | 62841350764 |
 | 2026-07-19 | Panama Fertility | 86/A (AI-access 64 — robots.txt blocks GPTBot/Claude/Gemini) | 62828946074 |
-| 2026-07-19 | Nomad Constructions Corp | 90/A (AEO 81 — construction Pedasí/Azuero) | STAGED — paste note from `prospects/NOMAD_CONSTRUCTIONS.md` |
+| 2026-07-19 | Nomad Constructions Corp | 90/A (AEO 81 — construction Pedasí/Azuero) | 62832583063 |
+| 2026-07-19 | DoPanama | 91/A (GEO/AEO 88 — expat RE+relocation) | 62821413988 |
 
 ## Staged deal packs (draft + HubSpot note)
 
@@ -119,7 +127,7 @@ Every staged `[CLIENT-MANUAL]` deal ships **three artifacts**:
 | HubSpot note pack | `docs/selling/prospects/{COMPANY}.md` | **Copy-paste into deal Notes** — wa.me link + full `MENSAJE` block + audit + Next |
 | Deal row | table above | HubSpot deal ID once created |
 
-**Nomad Constructions Corp** (2026-07-19) — deal exists in HubSpot but the note was missing the message. Fix: open `prospects/NOMAD_CONSTRUCTIONS.md` → copy the **Note body** block into the deal Notes tab.
+**Nomad Constructions Corp** (2026-07-19, deal **62832583063**) — full note with wa.me link + MENSAJE block added via HubSpot API.
 
 Draft (`drafts/nomad-constructions-corp.txt`):
 
@@ -137,4 +145,4 @@ Saludos,
 Elena✨🌍💫
 ```
 
-Regenerate wa.me: `node scripts/outreach-walink.cjs 50769484982 docs/selling/drafts/nomad-constructions-corp.txt`
+Regenerate link: `node scripts/outreach-walink.cjs 50769484982 docs/selling/drafts/nomad-constructions-corp.txt`

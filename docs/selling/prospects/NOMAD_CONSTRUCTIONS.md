@@ -2,7 +2,7 @@
 
 > Staged 2026-07-19. Deal: `[CLIENT-MANUAL] Nomad Constructions Corp. — GEO/AEO fix (audit: 90/A)`.
 > Draft file: `docs/selling/drafts/nomad-constructions-corp.txt`
-> Regenerate wa.me: `node scripts/outreach-walink.cjs 50769484982 docs/selling/drafts/nomad-constructions-corp.txt`
+> Link: `node scripts/outreach-walink.cjs --slug nomad-constructions-corp`
 
 **If the HubSpot note is missing the message:** paste everything below into the deal **Notes** tab (replace or append).
 
