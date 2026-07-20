@@ -33,3 +33,5 @@ node -e "const k=require('fs').readFileSync('.env','utf8').match(/^HUBSPOT_API_K
 ## Elena actions (human only)
 
 Click WhatsApp link in HubSpot note → Send in WhatsApp Business. Say **"sent {company}"** for agent to: move deal → ⏳ Sent, close send-task, append ✅ SENT, **and create a MEDIUM follow-up task due ~+4 days** (soft WA if still silent). Say **"they replied…"** to move to 💬 and cancel that follow-up.
+
+**Email (automatic):** sending from HubSpot UI is detected by `node scripts/hs-watch-manual-emails.cjs` (scope `sales-email-read`) — no need to say "emailed". Native WhatsApp↔HubSpot needs Marketing/Service **Professional** — not on Starter; keep saying `sent` for WA.

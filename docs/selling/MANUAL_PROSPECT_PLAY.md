@@ -101,6 +101,18 @@
    - Save as `docs/selling/drafts/{slug}-email.txt` (SUBJECT + TO + body), append the
      email version + `📧 EMAILED {date}` to the deal note after sending.
 
+7. **Email auto-watcher (July 20 2026)** — when Elena sends from the **HubSpot UI**,
+   she does **not** need to say "emailed". Run (or cron every 10 min on Oracle):
+   ```bash
+   node scripts/hs-watch-manual-emails.cjs
+   ```
+   Requires Service Key scope **`sales-email-read`**. The watcher:
+   - Outbound CRM email on a `[CLIENT-MANUAL]` contact → deal **⏳ Sent**, note `📧 EMAILED`,
+     +4 day soft follow-up task (idempotent via state file).
+   - Inbound email reply on that contact while waiting → deal **💬 They replied**,
+     complete open follow-up tasks.
+   WhatsApp send/reply still needs Elena to say `sent` / `they replied` (no WA API on Starter).
+
 ## The canonical outreach template (Elena's own final edit, July 18 2026)
 
 Spanish, WhatsApp-first ("Panamanians are crazy about WhatsApp"). Adapt the
@@ -153,7 +165,7 @@ Elena✨🌍💫
 | 2026-07-19 | Panama Fertility | 86/A (AI-access 64 — robots.txt blocks GPTBot/Claude/Gemini) | 62828946074 |
 | 2026-07-19 | Nomad Constructions Corp | 90/A (AEO 81 — construction Pedasí/Azuero) | 62832583063 |
 | 2026-07-19 | DoPanama | 91/A (GEO/AEO 88 — expat RE+relocation) | 62821413988 |
-| 2026-07-20 | Panama Aesthetics | 88/A (Tech 71 — 11s response; no FAQ) | 62873560951 — SENT same day; replied "email only" → info@panamaaesthetics.com, email draft `drafts/panama-aesthetics-email.txt` |
+| 2026-07-20 | Panama Aesthetics | 88/A (Tech 71 — 11s response; no FAQ) | 62873560951 — SENT WA same day; replied "email only" → 📧 EMAILED same day via HubSpot (auto-detected, email 113286576039) |
 | 2026-07-20 | YC Panama Yachts | 94/A+ (AEO 81 — no FAQ; rest 100/100) | 62864888204 — SENT same day (WA +507 6503-1745 + info@ycyachts.com) |
 
 ## Staged deal packs (draft + HubSpot note)

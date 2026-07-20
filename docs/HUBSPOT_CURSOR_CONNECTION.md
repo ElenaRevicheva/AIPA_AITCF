@@ -29,15 +29,20 @@ Add to `.env.example` placeholder only:
 HUBSPOT_API_KEY=
 ```
 
-### Service Key scopes (already granted)
+### Service Key scopes (granted)
 
+**Core CRM (original):**
 - `crm.objects.deals.read` / `.write`
 - `crm.objects.contacts.read` / `.write`
 - `crm.objects.companies.read` / `.write`
-- `crm.objects.notes` (or engagements write — notes API works with current key)
 - `crm.objects.owners.read`
 
-Account: **Aldeazz startup** · Starter plan · enough for Manual Prospect Play.
+**Email / reply detection (added July 20 2026):**
+- `sales-email-read` — read CRM emails sent from HubSpot UI (required; `crm.objects.emails.read` does **not** appear in Service Key picker)
+- `conversations.read` — inbox/reply signals
+- `timeline.read` — engagement timeline
+
+Notes/tasks APIs already work with the current key in practice. Account: **Aldeazz startup** · Starter plan.
 
 ### Verify connection (agent self-test)
 
@@ -99,7 +104,47 @@ const headers = { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/j
 
 ---
 
-## Staged deals (July 19 2026)
+## Email auto-watcher (July 20 2026)
+
+```bash
+node scripts/hs-watch-manual-emails.cjs           # live
+node scripts/hs-watch-manual-emails.cjs --dry-run
+node scripts/hs-watch-manual-emails.cjs --hours=48
+```
+
+Polls HubSpot CRM emails (`sales-email-read`), matches contacts that have a
+`[CLIENT-MANUAL]` deal, then:
+
+| Event | Deal action |
+|-------|-------------|
+| Outbound email (HubSpot UI) | → `decisionmakerboughtin` (⏳ Sent) + note `📧 EMAILED` + +4 day follow-up |
+| Inbound email reply | → `contractsent` (💬 They replied) + complete follow-up tasks |
+
+State (idempotent): `docs/selling/.hs-manual-email-watcher-state.json` (gitignored).
+Optional Oracle cron every 10 min. Agents may also run it at session start.
+
+---
+
+## WhatsApp Business ↔ HubSpot (can we connect?)
+
+**Native HubSpot WhatsApp channel** (inbox / coexistence with WhatsApp Business App):
+requires **Marketing Hub Professional or Service Hub Professional** (or Enterprise) —
+**not available on Starter** (Aldeazz startup is Starter). Docs:
+[Connect WhatsApp to inbox](https://knowledge.hubspot.com/inbox/connect-whatsapp-to-the-conversations-inbox) ·
+[Coexistence](https://knowledge.hubspot.com/inbox/connect-a-whatsapp-number-to-hubspot-using-coexistence).
+
+| Option | Fits Starter? | Notes |
+|--------|---------------|-------|
+| Native HubSpot WhatsApp + coexistence | No (needs Pro) | Best long-term: send/reply logged in CRM; could auto-advance like email |
+| Marketplace / 3rd-party WA bridges | Sometimes | Extra cost; Meta Business API templates still apply |
+| Current Manual Prospect Play | **Yes** | One-click `web.whatsapp.com/send` + Elena says `sent` / `they replied` |
+
+**Recommendation while on Starter:** keep WhatsApp as today (manual report). Use the
+**email watcher** for HubSpot-sent email. Revisit native WA if/when upgrading to Pro.
+
+---
+
+## Staged deals (July 19–20 2026)
 
 | Company | Deal ID | Draft |
 |---------|---------|-------|

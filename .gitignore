@@ -21,6 +21,7 @@ Thumbs.db
 atuona-state.json
 data/hashnode-last-topic.json
 data/blog-es-cache/
+docs/selling/.hs-manual-email-watcher-state.json
 # Local Places smoke-test output (real API responses)
 data/places-live-test.html
 data/places-live-test.json
