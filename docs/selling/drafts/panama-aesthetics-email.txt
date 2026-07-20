@@ -1,0 +1,23 @@
+SUBJECT: Auditoría de visibilidad en IA — Panama Aesthetics (88/100): 3 arreglos concretos
+
+TO: info@panamaaesthetics.com
+
+Estimado equipo de Panama Aesthetics:
+
+¡Un gusto saludarles! 👋 Les escribo por este medio, como amablemente me indicaron por WhatsApp. Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — su sitio transmite profesionalismo médico real: contenido completo, datos estructurados y abierto a todos los motores de IA. Les escribo porque analicé panamaaesthetics.com con mi motor de visibilidad en IA y obtuvo 88/100: cuando un paciente internacional que busca cirugía plástica o estética en Panamá le pregunta a ChatGPT o Perplexity "¿cuál es la mejor clínica de cirugía plástica en Panamá?", su clínica todavía no aparece como respuesta citable. Los dos factores principales: la página tarda más de 11 segundos en responder (los motores de IA cortan la lectura antes de terminar) y falta una sección de preguntas y respuestas que puedan citar (Fundación Técnica 71/100).
+
+Son 3 arreglos concretos:
+
+1. Sección de preguntas frecuentes con las preguntas reales de sus pacientes (precios, recuperación, paquetes internacionales) + datos estructurados FAQPage.
+2. Caché/CDN del HTML para bajar de 11 segundos a menos de 1.5 — hoy los motores de IA abandonan la página antes de leerla.
+3. Archivo llms.txt para indicar a los asistentes de IA qué páginas importan.
+
+Si les parece bien, con mucho gusto se los muestro en una llamada de 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api ✨
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan consultas de pacientes 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes internacionales, video con IA para marketing de procedimientos, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva✨🌍💫

@@ -61,9 +61,17 @@ function parseContacts(html) {
   const phones = [...out]
     .map(p => p.replace(/\D/g, ''))
     .filter(p => p.length >= 10 && p.startsWith('507'));
-  const emails = [...html.matchAll(/mailto:([^"'\s?]+)/gi)].map(m => m[1].toLowerCase());
+  // Emails: mailto links AND plain text (many Panama sites print info@… as text).
+  const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js)$|@(2x|3x)\b|sentry|wixpress|example\./i;
+  const emails = [
+    ...[...html.matchAll(/mailto:([^"'\s?]+)/gi)].map(m => m[1]),
+    ...(html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []),
+  ]
+    .map(e => e.toLowerCase())
+    .filter(e => !junk.test(e));
   const wa = phones[0] || null;
-  const email = emails.find(e => e.includes(domain.split('.')[0])) || emails[0] || null;
+  const onDomain = emails.find(e => e.endsWith(`@${domain}`) || e.includes(domain.split('.')[0]));
+  const email = onDomain || emails[0] || null;
   return { phones: [...new Set(phones)], email, whatsapp: wa };
 }
 
@@ -119,6 +127,19 @@ const PROSPECT_META = {
     contactFirstName: 'DoPanama',
     contactLastName: '(WhatsApp contact)',
   },
+  'panamaaesthetics.com': {
+    company: 'Panama Aesthetics',
+    city: 'Panama City',
+    customer: 'paciente internacional que busca cirugía plástica o estética en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica de cirugía plástica en Panamá?',
+    compliment: 'su sitio transmite profesionalismo médico real — contenido completo, datos estructurados y abierto a todos los motores de IA',
+    gapClause: 'la página tarda más de 11 segundos en responder (los motores de IA cortan la lectura) y falta una sección de preguntas y respuestas que puedan citar',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas de pacientes 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes internacionales, video con IA para marketing de procedimientos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ con preguntas reales de pacientes (precios, recuperación, paquetes internacionales) + FAQPage JSON-LD, (2) cache/CDN del HTML — 11s → <1.5s, (3) llms.txt',
+    contactFirstName: 'Panama Aesthetics',
+    contactLastName: '(WhatsApp contact)',
+  },
 };
 
 (async () => {
@@ -145,7 +166,7 @@ const PROSPECT_META = {
 
   // Contacts
   let html = '';
-  for (const page of [url, `${url}/contact`, `${url}/contact-us`]) {
+  for (const page of [url, `${url}/contact`, `${url}/contact-us`, `${url}/contacto`]) {
     try {
       const r = await fetch(page, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AIPA/1.0)' } });
       if (r.ok) html += '\n' + await r.text();

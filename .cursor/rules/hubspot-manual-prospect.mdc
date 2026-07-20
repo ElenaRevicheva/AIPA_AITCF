@@ -1,0 +1,34 @@
+---
+description: HubSpot API connection and Manual Prospect Play for Cursor agents — read before any HubSpot CRM work
+alwaysApply: true
+---
+
+# HubSpot — how Cursor agents connect
+
+**Full reference:** `docs/HUBSPOT_CURSOR_CONNECTION.md`
+
+## Connection (every session)
+
+1. Read **`HUBSPOT_API_KEY`** from **`cto-aipa/.env`** (gitignored). Format: `pat-na1-…` Service Key **`Aldeazz_Marketing_Engine`** in HubSpot → Development → Keys → Service Keys.
+2. Call **`https://api.hubapi.com`** with `Authorization: Bearer ${HUBSPOT_API_KEY}`.
+3. There is **no HubSpot MCP** in Cursor — use repo scripts or the same fetch pattern as `scripts/stage-manual-prospect.cjs`.
+4. If key missing locally, tell Elena to add it to `.env` (copy from HubSpot Show → Copy). **Never ask her to paste the token in chat. Never commit `.env`.**
+
+## Self-test before HubSpot writes
+
+```bash
+node -e "const k=require('fs').readFileSync('.env','utf8').match(/^HUBSPOT_API_KEY=(.+)$/m)?.[1]?.trim(); if(!k) throw new Error('HUBSPOT_API_KEY missing in .env'); console.log('HubSpot key present');"
+```
+
+## Manual Prospect Play shortcuts
+
+- Playbook: `docs/selling/MANUAL_PROSPECT_PLAY.md`
+- Stage prospect: `node scripts/stage-manual-prospect.cjs <domain>`
+- Refresh wa links in notes: `node scripts/hs-refresh-manual-wa-links.cjs`
+- Deal prefix: **`[CLIENT-MANUAL]`** · stage new deals: **`qualifiedtobuy`** (🔥 I Act TODAY)
+- Every deal: company + deal + **contact** + note (full MENSAJE + wa.me anchor) + task
+- HubSpot note WhatsApp link: `buildHubSpotWaAnchor(phone, draft)` from `scripts/wa-link-lib.cjs` — **`web.whatsapp.com/send`** (never wa.me — it corrupts emojis), real HTML `<a>` tag with `&amp;` in href
+
+## Elena actions (human only)
+
+Click wa.me in HubSpot note → Send in WhatsApp Business. Say **"sent {company}"** for agent to move deal stage and close task.

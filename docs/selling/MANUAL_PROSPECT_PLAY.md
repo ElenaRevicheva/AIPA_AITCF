@@ -20,8 +20,19 @@
    - Low AEO, high rest (e.g. 86/A) → "ustedes están muy cerca — 3 arreglos"
    - JS-shell / bot-blocked → "most AI crawlers see an EMPTY page" (strongest)
 
-2. **Extract contacts from their site** (WhatsApp number is gold in Panama):
+2. **Extract contacts from their site** (WhatsApp number is gold in Panama, **email is mandatory too**):
    `curl -sL https://PROSPECT.com | grep -ioE "(wa\.me/[0-9]+|api\.whatsapp\.com/send[^\"']*|tel:[+0-9]+|mailto:[^\"']+|\+507[- ]?[0-9]{3,4}[- ]?[0-9]{4})"`
+
+   **Email search (added July 20 2026 — Panama Aesthetics lesson: they replied "commercial
+   proposals by email only", and the contact had no email staged):**
+   - Scan the homepage **and** `/contact`, `/contact-us`, `/contacto` for BOTH `mailto:` links
+     AND plain-text addresses: `grep -ioE "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}"`
+     (many Panama sites print `info@…` as text, not a mailto link).
+   - Prefer an address on the prospect's own domain (`info@`, `contacto@`, `citas@`,
+     `ventas@`); ignore third-party junk (image names, CDN, plugin authors).
+   - If nothing on the site: check their Instagram bio / Google Business profile.
+   - **The HubSpot Contact must carry the email whenever one exists** — a WhatsApp-only
+     contact is incomplete. If found after staging, PATCH the contact immediately.
 
 3. **Dedupe** in HubSpot (search deals/companies for the domain), then create
    via the HubSpot connector — all FIVE, every time (Starter plan features on max):
@@ -34,6 +45,9 @@
      `hs_lead_status: OPEN`) — **never skip this**, the deal's Contacts panel
      must not be empty (gap caught by Elena July 18 2026 on prospects #1-3).
      Fill in the real name/title later once learned from the reply.
+     **Email is part of a full contact** (July 20 2026): run the email search from
+     step 2 and set the contact's `email` — some prospects only accept commercial
+     proposals by email (Panama Aesthetics), and without it the play stalls.
    - **Note on deal** — audit evidence + pitch angle + top fixes + contacts +
      **ONE-CLICK SEND link** (see §4) + **`--- MENSAJE (plain text) ---`** block
      with the **full** WhatsApp draft (never audit-only — Elena must see the message
@@ -64,6 +78,20 @@
    ("⏳ Sent — passive wait"), mark task COMPLETED, append `✅ SENT {date}` +
    the verbatim sent text to the note, set follow-up expectation (~+4 days).
    On reply: stage → **contractsent** ("💬 They replied — I act").
+
+6. **The "send it by email" reply path** (added July 20 2026 — Panama Aesthetics):
+   when a prospect answers WhatsApp with "commercial proposals go to email":
+   - That IS a reply → stage **contractsent** ("💬 They replied — I act").
+   - Find/confirm their email (step 2 search), PATCH the HubSpot contact with it.
+   - Convert the WhatsApp draft to an email: same template, same iron rules, plus
+     a courteous opener acknowledging the redirect ("Les escribo por este medio,
+     como amablemente me indicaron por WhatsApp"), the 3 fixes as a numbered list,
+     and full name in the sign-off ("Elena Revicheva✨🌍💫").
+   - **Subject formula:** `Auditoría de visibilidad en IA — {Company} ({score}/100): 3 arreglos concretos`
+     (audit-specific, concrete, no salesy words like "oferta"/"promoción" — survives spam filters
+     and mirrors the hook). English mirror: `AI visibility audit — {Company} ({score}/100): 3 concrete fixes`.
+   - Save as `docs/selling/drafts/{slug}-email.txt` (SUBJECT + TO + body), append the
+     email version + `📧 EMAILED {date}` to the deal note after sending.
 
 ## The canonical outreach template (Elena's own final edit, July 18 2026)
 
@@ -117,6 +145,7 @@ Elena✨🌍💫
 | 2026-07-19 | Panama Fertility | 86/A (AI-access 64 — robots.txt blocks GPTBot/Claude/Gemini) | 62828946074 |
 | 2026-07-19 | Nomad Constructions Corp | 90/A (AEO 81 — construction Pedasí/Azuero) | 62832583063 |
 | 2026-07-19 | DoPanama | 91/A (GEO/AEO 88 — expat RE+relocation) | 62821413988 |
+| 2026-07-20 | Panama Aesthetics | 88/A (Tech 71 — 11s response; no FAQ) | 62873560951 — SENT same day; replied "email only" → info@panamaaesthetics.com, email draft `drafts/panama-aesthetics-email.txt` |
 
 ## Staged deal packs (draft + HubSpot note)
 
