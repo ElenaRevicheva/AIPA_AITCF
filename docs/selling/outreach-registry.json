@@ -236,6 +236,8 @@
     "draft": "docs/selling/drafts/eclypse-de-mar.txt",
     "company": "Eclypse de Mar",
     "dealId": "62955236994",
-    "score": 57
+    "score": 57,
+    "email": "info@eclypsedemar.com",
+    "emailDraft": "docs/selling/drafts/eclypse-de-mar-email.txt"
   }
 }

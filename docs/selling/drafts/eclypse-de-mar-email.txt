@@ -1,0 +1,23 @@
+SUBJECT: AI visibility audit — Eclypse de Mar (57/100): 3 concrete fixes
+
+TO: info@eclypsedemar.com
+
+Dear Eclypse de Mar team:
+
+Great to meet you! 👋 I'm Elena Revicheva, an AI engineer here in Panama: https://aideazz.xyz/portfolio.
+
+First, congratulations — Eclypse de Mar is the only overwater-bungalow experience in Panama, and that is exactly what travelers dream about. I'm writing because I analyzed eclypsedemar.com with my AI-visibility engine and it scored 57/100: when a traveler asks ChatGPT or Perplexity "where can I stay in an overwater bungalow in Panama?" — the one question you own — the AI engines can't cite you, because your site's firewall currently blocks their crawlers and a noindex tag hides key pages (structured data 31/100). Booking platforms get recommended instead of you.
+
+These are 3 concrete fixes:
+
+1. Allowlist the AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended) in your site's firewall / bot protection — the single biggest win.
+2. Remove the noindex directive so the engines can read your key pages.
+3. Add Organization / Resort JSON-LD plus a short FAQ (rooms, rates, how to get there) so the answer engines can quote you.
+
+If you like, I'd be happy to show you in a 15-minute call, no obligation at all. The full audit is free here: https://aideazz.xyz/api ⛵
+
+P.S. Besides AI visibility, I build WhatsApp agents that answer travelers and take booking requests 24/7 (EN/ES, wired to your calendar/CRM), full process automation, and AI video for destination marketing. Live demos in my portfolio👆
+
+Have a great day!
+Best,
+Elena Revicheva✨🌍💫
