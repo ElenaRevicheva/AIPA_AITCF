@@ -230,5 +230,12 @@
     "dealId": "62950148475",
     "score": 92,
     "emailDraft": "docs/selling/drafts/ipanema-residences-email.txt"
+  },
+  "eclypse-de-mar": {
+    "phone": "50766114581",
+    "draft": "docs/selling/drafts/eclypse-de-mar.txt",
+    "company": "Eclypse de Mar",
+    "dealId": "62955236994",
+    "score": 57
   }
 }
