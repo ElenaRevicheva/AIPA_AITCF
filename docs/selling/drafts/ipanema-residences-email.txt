@@ -1,0 +1,23 @@
+SUBJECT: Auditoría de visibilidad en IA — Ipanema Residences (92/100): 3 arreglos concretos
+
+TO: ventas@ipanemaresidences.com
+
+Estimado equipo de Ipanema Residences:
+
+¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — el sitio de Ipanema es impecable: abierto por completo a los motores de IA (acceso 100/100) y con datos estructurados excelentes (94/100). Les escribo porque analicé ipanemaresidences.com con mi motor de visibilidad en IA y obtuvo 92/100: están muy cerca — cuando un comprador internacional le pregunta a ChatGPT o Perplexity "¿cuál es el mejor proyecto residencial nuevo en Costa del Este?", Ipanema todavía no aparece como respuesta citable, y hoy esas consultas las capturan los brokers en lugar del proyecto.
+
+Son 3 arreglos concretos:
+
+1. Una sección de preguntas y respuestas (FAQ) con las dudas reales de compradores — precios, entrega, financiamiento, playa privada — con FAQPage JSON-LD para que los motores la citen (hoy 88/100).
+2. Etiquetas og:title/og:description/og:image — hoy faltan, y son las que usan las vistas previas y varios motores de IA.
+3. El recorrido virtual 360 (360.ipanemaresidences.com) obtuvo 54/100 — casi invisible para la IA: le falta JSON-LD y un título descriptivo; es rápido de arreglar.
+
+Si les parece bien, con mucho gusto se los muestro en una llamada de 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 🌆
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que califican compradores y agendan visitas al showroom 24/7 (EN/ES, conectados a su CRM), automatización completa del embudo de ventas, y video con IA para marketing inmobiliario. Todo con demos en vivo en mi portafolio👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva✨🌍💫

@@ -228,6 +228,7 @@
     "company": "Ipanema Residences",
     "email": "ventas@ipanemaresidences.com",
     "dealId": "62950148475",
-    "score": 92
+    "score": 92,
+    "emailDraft": "docs/selling/drafts/ipanema-residences-email.txt"
   }
 }
