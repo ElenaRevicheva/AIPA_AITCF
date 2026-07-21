@@ -5,6 +5,43 @@
 > is a real Panama business with its own website + (usually) a WhatsApp number —
 > exactly the profile the play converts. Dedupe in HubSpot before creating.
 
+## The 2026 market — why this lane wins (added July 21 2026)
+
+**In simple words:** people don't only Google anymore — they ask ChatGPT/Perplexity *"who
+should I hire?" / "best clinic in Panama?"*. If the AI names you, you win; if it names a
+competitor, you lose even with a pretty website. **The agency in one sentence: get
+businesses recommended by AI, then close their customers on WhatsApp.**
+
+| 2026 signal | Direction |
+|---|---|
+| GEO/AEO spend | ~$0.9–1.8B in 2026 (definitions vary); ~35–50%+ CAGR — category is **early, not mature** |
+| Retainers | Credible US GEO shops: $3k–$18k/mo. **Elena's realistic entry: $200/$500 paid audits (checkout LIVE at `/pay/analisis-tecnico`) → $500–2K/mo retainers → grow with proof** |
+| Buyer shift | Citations in ChatGPT / Perplexity / AI Overviews > classic blue links |
+| The open lane | US GEO lists are crowded (First Page Sage, Directive, iPullRank). Nobody owns **builder-led GEO + WhatsApp close, bilingual EN/ES, LATAM** — ~91% of LATAM enterprise AI chat is WhatsApp; only ~14% have agentic AI live |
+
+**8-word bio (use everywhere, identically):** *Remote AI visibility agency — GEO · AEO · WhatsApp close.*
+
+### How to BECOME "the remote expert" — honest answer: you already are; make it visible
+1. **No new building.** The proof exists: live audit engine (aideazz.xyz/api), WhatsApp
+   agent with 15+ months of paying users (EspaLuz), 38 audited outreaches in flight,
+   Atlas radar public. Nobody grants the title — you claim it with consistency.
+2. **Say it identically everywhere:** the 8-word bio goes on the portfolio hero,
+   LinkedIn headline, Upwork profile, email signature, WhatsApp Business profile.
+3. **Proof beats claims:** the first 1–2 paying case studies are worth more than any
+   positioning. Fastest path = the pipeline ALREADY loaded — work every 💬 reply, run
+   every +4-day follow-up, and offer the **$200 prelim audit** as the low-friction first
+   yes (payment link live).
+4. **Win your own money query (GEO for yourself):** keep publishing Atlas-snapshot FAQ
+   posts so *"who gets me recommended in ChatGPT and closes on WhatsApp?"* answers
+   **aideazz.xyz/portfolio**. The loop (#2) already does this — feed it weekly.
+5. **Skip the 100-candidate cattle calls.** Upwork/job boards are crowded lanes;
+   outbound-with-a-measured-audit-deficit (this hit-list) is the lane where you're the
+   only bidder. The play + both one-click buttons + Monday Atlas briefs = the machine.
+6. **Beat 4%.** That's the measured reply-rate baseline; every week's angle test either
+   beats it or teaches something. The outcomes loop keeps score automatically.
+
+---
+
 ## What we're selling (portfolio → buyer need)
 
 Elena's six live services (https://aideazz.xyz/portfolio) and who needs them most:
