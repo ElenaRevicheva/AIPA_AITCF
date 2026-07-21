@@ -53,11 +53,19 @@
      step 2 and set the contact's `email` — some prospects only accept commercial
      proposals by email (Panama Aesthetics), and without it the play stalls.
    - **Note on deal** — audit evidence + pitch angle + top fixes + contacts +
-     **ONE-CLICK SEND link** (see §4) + **`--- MENSAJE (plain text) ---`** block
-     with the **full** WhatsApp draft (never audit-only — Elena must see the message
-     in HubSpot without opening another file) + "Next:" line. Save the draft in
-     `docs/selling/drafts/{slug}.txt` and the paste-ready note pack in
-     `docs/selling/prospects/{COMPANY}.md` (see § Staged deal packs).
+     **BOTH ONE-CLICK SEND BUTTONS (HARD RULE, July 21 2026)** + **`--- MENSAJE (plain text) ---`**
+     block with the **full** draft (never audit-only) + "Next:" line.
+     **⚠️ EVERY note carries TWO buttons side-by-side so Elena chooses the channel:**
+     1. `➡️ ENVIAR POR WHATSAPP` → `web.whatsapp.com/send?phone=…&amp;text=…` (§4). Manual "sent".
+     2. `✉️ ENVIAR POR EMAIL — aipa@aideazz.xyz (<email>)` → `https://webhook.aideazz.xyz/cto/go/outreach-email/<slug>`.
+        **Fully automatic**: preview → Send → deal auto-moves ⏳ Sent + `📧 EMAILED` note + `+4-day` follow-up task (`src/go-wa.ts`, Cursor's flow). NO manual "sent" needed.
+     The email button REQUIRES a registry entry with `email` + `emailDraft` → so always create
+     `docs/selling/drafts/{slug}-email.txt` (SUBJECT/TO/body) and add `email`+`emailDraft` to
+     `docs/selling/outreach-registry.json`, then `git pull` on Oracle so the confirm page resolves.
+     If no email is found: use the standard `info@{domain}` and **flag it UNVERIFIED** in the note
+     (the preview page shows the recipient — Elena confirms before sending). Never ship a note with
+     only the WhatsApp button. Save the WA draft in `docs/selling/drafts/{slug}.txt` and the pack in
+     `docs/selling/prospects/{COMPANY}.md`.
    - **Task** — HIGH, due same day: "Send WhatsApp outreach → {Company}"
 
 4. **One-click send links (WhatsApp + Email)** — message pre-typed so Elena only hits Send:

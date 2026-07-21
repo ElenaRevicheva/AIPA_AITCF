@@ -18,4 +18,6 @@
 
 **GOLDEN HOOK (strongest class — crawler-blocked):** Panama's ONLY overwater bungalows. They own the money query "overwater bungalow Panama" — but AI engines can't cite them, so OTAs (Expedia/TripAdvisor) capture their demand. Fixes: (1) allowlist AI crawlers in WAF, (2) remove noindex, (3) Resort JSON-LD + FAQ.
 
-**Next:** Open deal → Notes → click ➡️ SEND VIA WHATSAPP → wait for OG card → Send → say "sent".
+**Two one-click buttons on the note:** ➡️ WhatsApp (+507 6611-4581) OR ✉️ Email (aipa@ → info@eclypsedemar.com, UNVERIFIED — confirm on preview page; auto ⏳ Sent + follow-up). Email draft: `docs/selling/drafts/eclypse-de-mar-email.txt`.
+
+**Next:** pick a channel on the deal note → Send. WhatsApp = say "sent"; Email = automatic.
