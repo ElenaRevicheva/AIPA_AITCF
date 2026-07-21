@@ -213,7 +213,7 @@ Elena✨🌍💫
 | 2026-07-19 | Nomad Constructions Corp | 90/A (AEO 81 — construction Pedasí/Azuero) | 62832583063 |
 | 2026-07-19 | DoPanama | 91/A (GEO/AEO 88 — expat RE+relocation) | 62821413988 |
 | 2026-07-21 | PRP Events (weddings) | 86/A (AEO 75 — Atlas automation angle 75/100) | 62881755679 |
-| 2026-07-21 | Ipanema Residences (Grupo Los Pueblos) | 92/A (AEO 88; 360-tour 54/D — luxury RE Costa del Este) | 62950148475 |
+| 2026-07-21 | Ipanema Residences (Grupo Los Pueblos) | 92/A (AEO 88; 360-tour 54/D — luxury RE Costa del Este) | 62950148475 — SENT same day via aipa@ one-click EMAIL (auto ⏳ Sent + follow-up 25 jul) |
 | 2026-07-20 | Panama Aesthetics | 88/A (Tech 71 — 11s response; no FAQ) | 62873560951 — SENT WA same day; replied "email only" → 📧 EMAILED same day via HubSpot (auto-detected, email 113286576039) |
 | 2026-07-20 | YC Panama Yachts | 94/A+ (AEO 81 — no FAQ; rest 100/100) | 62864888204 — SENT same day (WA +507 6503-1745 + info@ycyachts.com) |
 | 2026-07-20 | Fuerte Amador Resort & Marina | 68/C (GEO 31 — flamencomarina.com) | 62857562269 — WA hit restaurant bot → EMAIL ready `service@fuerteamador.com` |

@@ -20,4 +20,4 @@
 **Angle:** "muy cerca" + the 360-tour gap as concrete proof. Money query: *"¿cuál es el mejor proyecto residencial nuevo en Costa del Este?"* — Ipanema isn't the citable answer; broker sites (Panama Equity etc.) capture those queries instead of the developer.
 **Atlas (Jul 20):** AI-video window 67/100 → PD cross-sells real-estate marketing video + WhatsApp buyer-qualification agents for the showroom funnel.
 
-**Next:** Open deal → Notes → click ➡️ ENVIAR POR WHATSAPP → wait for OG card → Send → say "sent" → deal → ⏳ Sent — passive wait.
+**✅ SENT 2026-07-21 via one-click EMAIL** (aipa@aideazz.xyz → ventas@ipanemaresidences.com). Automation verified: deal auto-moved ⏳ Sent (16:24 UTC), 📧 EMAILED logged on the note, follow-up task auto-created (due 2026-07-25). WhatsApp send-task closed as superseded. On reply → stage 💬 They replied.
