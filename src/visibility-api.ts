@@ -25,7 +25,13 @@ import { runVisibilityAudit, AuditFetchError, ENGINE_VERSION } from './visibilit
 export const DEMO_API_KEY = 'aidz_demo_visibility_2026';
 
 const DEMO_LIMIT_PER_HOUR = 20;
-const KEY_LIMIT_PER_HOUR = 200;
+/** Production keys from VISIBILITY_API_KEYS (interview / client / automation). */
+const KEY_LIMIT_PER_HOUR = 500;
+/**
+ * Owner keys (prefix aidz_owner_) — Elena's private key for job interviews +
+ * Manual Prospect batch audits. Still rate-limited to stop accidental loops.
+ */
+const OWNER_LIMIT_PER_HOUR = 5000;
 
 function configuredKeys(): Set<string> {
   const extra = (process.env.VISIBILITY_API_KEYS ?? '')
@@ -35,6 +41,12 @@ function configuredKeys(): Set<string> {
   return new Set([DEMO_API_KEY, ...extra]);
 }
 
+function limitForKey(key: string): number {
+  if (key === DEMO_API_KEY) return DEMO_LIMIT_PER_HOUR;
+  if (key.startsWith('aidz_owner_')) return OWNER_LIMIT_PER_HOUR;
+  return KEY_LIMIT_PER_HOUR;
+}
+
 /** Sliding-hour request counter per API key. In-memory is fine: limits are per-process courtesy caps, not billing. */
 const usage = new Map<string, number[]>();
 
@@ -42,7 +54,7 @@ function underLimit(key: string): boolean {
   const now = Date.now();
   const cutoff = now - 3_600_000;
   const stamps = (usage.get(key) ?? []).filter((t) => t > cutoff);
-  const limit = key === DEMO_API_KEY ? DEMO_LIMIT_PER_HOUR : KEY_LIMIT_PER_HOUR;
+  const limit = limitForKey(key);
   if (stamps.length >= limit) {
     usage.set(key, stamps);
     return false;
@@ -142,12 +154,13 @@ export function visibilityRouter(): Router {
       });
     }
     if (!underLimit(key)) {
+      const limit = limitForKey(key);
       return res.status(429).json({
         error: 'rate_limited',
         message:
           key === DEMO_API_KEY
-            ? `Demo key is limited to ${DEMO_LIMIT_PER_HOUR} audits/hour. For a production key: aipa@aideazz.xyz`
-            : `Rate limit of ${KEY_LIMIT_PER_HOUR} audits/hour reached.`,
+            ? `Demo key is limited to ${DEMO_LIMIT_PER_HOUR} audits/hour. Use your private VISIBILITY_API_KEY (owner/production) from .env — never the public demo key for interviews or batch work.`
+            : `Rate limit of ${limit} audits/hour reached for this key.`,
       });
     }
 

@@ -19,10 +19,17 @@ const {
 const root = path.join(__dirname, '..');
 const env = fs.readFileSync(path.join(root, '.env'), 'utf8');
 const KEY = env.match(/^HUBSPOT_API_KEY=(.+)$/m)?.[1]?.trim();
+const VIS_KEY =
+  env.match(/^VISIBILITY_API_KEY=(.+)$/m)?.[1]?.trim() ||
+  env.match(/^VISIBILITY_API_KEYS=(.+)$/m)?.[1]?.trim()?.split(',')[0]?.trim() ||
+  'aidz_demo_visibility_2026';
 const dryRun = process.argv.includes('--dry-run');
+const skipAudit = process.argv.includes('--skip-audit');
+const scoreArg = process.argv.find((a) => a.startsWith('--score='));
+const scoreOverride = scoreArg ? Number(scoreArg.split('=')[1]) : null;
 const domainArg = process.argv.find(a => a.startsWith('--') === false && a !== process.argv[0] && a !== process.argv[1]);
 if (!domainArg) {
-  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run]');
+  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run] [--skip-audit] [--score=75]');
   process.exit(1);
 }
 const domain = domainArg.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase();
@@ -187,29 +194,512 @@ const PROSPECT_META = {
     contactFirstName: 'Centro Marino',
     contactLastName: '(WhatsApp contact)',
   },
+  'relofirm.com': {
+    company: 'ReloFirm',
+    city: 'Panama City',
+    customer: 'expat o ejecutivo que busca reubicación legal y fiscal en Panamá',
+    moneyQuery: '¿cómo me reubico legalmente en Panamá?',
+    compliment: 'su práctica combina derecho y reubicación con un tono profesional internacional',
+    gapClause: 'faltan respuestas en formato FAQ que ChatGPT pueda citar cuando alguien busca reubicación en Panamá',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads de reubicación 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos para visas/residencia, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ con preguntas reales de expats, (2) FAQPage/LocalBusiness JSON-LD, (3) llms.txt',
+    contactFirstName: 'ReloFirm',
+    contactLastName: '(WhatsApp contact)',
+  },
+  'panamadentalclinic.com': {
+    company: 'Panama Dental Clinic',
+    city: 'David',
+    customer: 'paciente internacional que busca odontología o dental tourism en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica dental en Panamá?',
+    compliment: 'su clínica apunta a turismo dental con oferta clara para pacientes internacionales',
+    gapClause: 'aún no aparecen como respuesta citable cuando alguien pide la mejor clínica dental en Panamá',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas de pacientes 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes internacionales, video con IA para marketing de procedimientos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ pacientes internacionales + FAQPage JSON-LD, (2) Organization/LocalBusiness schema, (3) llms.txt',
+    contactFirstName: 'Panama Dental Clinic',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766111939',
+    preferredEmail: 'ced.sanantoniolm@gmail.com',
+  },
+  'kraemerlaw.com': {
+    company: 'Kraemer Law',
+    city: 'Panama City',
+    customer: 'expat o inversionista que busca inmigración o residencia en Panamá',
+    moneyQuery: '¿cuál es el mejor abogado de inmigración en Panamá?',
+    compliment: 'su firma transmite especialización legal seria en inmigración y asuntos corporativos',
+    gapClause: 'faltan FAQs citables sobre visas/residencia que los motores de IA puedan usar como respuesta',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ visas/residencia, (2) FAQPage/Attorney JSON-LD, (3) llms.txt',
+    contactFirstName: 'Kraemer Law',
+    contactLastName: '(WhatsApp contact)',
+  },
+  'ampatours.com': {
+    company: 'Ampa Tours',
+    city: 'Panama City',
+    customer: 'turista que busca charters, pesca o tours en Panamá',
+    moneyQuery: '¿cuál es el mejor tour o charter de pesca en Panamá?',
+    compliment: 'tienen experiencia real en charters y pesca deportiva en Panamá',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT pueda citar cuando alguien busca tours o pesca',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas de tours/charters 24/7 (EN/ES, conectados a su CRM), automatización completa de procesos, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ precios/rutas/qué incluye, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Ampa Tours',
+    contactLastName: '(WhatsApp contact)',
+  },
+  'tranquilobay.com': {
+    company: 'Tranquilo Bay',
+    city: 'Bocas del Toro',
+    customer: 'viajero que busca eco lodge o hotel boutique en Bocas del Toro',
+    moneyQuery: '¿cuál es el mejor eco lodge en Bocas del Toro?',
+    compliment: 'su lodge tiene una propuesta de eco-turismo auténtica en Bocas',
+    gapClause: 'aún no aparecen como respuesta citable frente a competidores cuando alguien pregunta por eco lodges',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de procesos, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ huéspedes reales, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Tranquilo Bay',
+    contactLastName: '(WhatsApp contact)',
+  },
+  'americantradehotel.com': {
+    company: 'American Trade Hotel',
+    city: 'Panama City',
+    customer: 'pareja o empresa que busca hotel boutique, bodas o eventos en Casco Viejo',
+    moneyQuery: '¿cuál es el mejor hotel boutique en Casco Viejo Panamá?',
+    compliment: 'ocupan un edificio histórico en Casco Viejo con marca boutique fuerte',
+    gapClause: 'faltan FAQs citables sobre bodas/eventos/estadía que los motores puedan responder',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan habitaciones/eventos 24/7 (EN/ES, conectados a su CRM), automatización de intake de eventos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ bodas/eventos/estadía, (2) Hotel/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'American Trade Hotel',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'info@americantradehotel.com',
+    preferredPhone: '5072112000',
+  },
+  'sanblasdreams.com': {
+    company: 'San Blas Dreams',
+    city: 'Panama City',
+    customer: 'turista que busca tours a San Blas / Guna Yala',
+    moneyQuery: '¿cuál es el mejor tour a San Blas desde Panamá?',
+    compliment: 'son un operador ATP con foco real en San Blas',
+    gapClause: 'faltan respuestas en formato FAQ que ChatGPT cite cuando alguien busca tours a San Blas',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan tours 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ precios/itinerarios/qué incluye, (2) FAQPage/TouristTrip JSON-LD, (3) llms.txt',
+    contactFirstName: 'San Blas Dreams',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764735905',
+    preferredEmail: 'info@sanblasdreams.com',
+  },
+  'pesquerosport.com': {
+    company: 'Pesqueros Sport',
+    city: 'Panama City',
+    customer: 'pescador deportivo que busca equipo, charters o servicio náutico en Panamá',
+    moneyQuery: '¿dónde compro equipo de pesca deportiva en Panamá?',
+    compliment: 'tienen presencia real en el mundo de la pesca deportiva en Panamá',
+    gapClause: 'aún no aparecen como respuesta citable cuando alguien busca equipo o pesca deportiva',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y califican consultas de ventas 24/7 (EN/ES, conectados a su CRM), automatización de cotizaciones, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ productos/servicios, (2) LocalBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Pesqueros Sport',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764310642',
+  },
+  'flamencodrystackpanama.com': {
+    company: 'Flamenco Drystack Panama',
+    city: 'Panama City',
+    customer: 'dueño de bote que busca dry stack o almacenaje náutico en Amador/Flamenco',
+    moneyQuery: '¿dónde guardo mi bote en dry stack en Panamá?',
+    compliment: 'ofrecen dry stack real en la zona de Flamenco — un servicio escaso y valioso',
+    gapClause: 'faltan datos estructurados y FAQs que ChatGPT pueda citar sobre dry stack en Panamá',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas de dry stack 24/7 (EN/ES, conectados a su CRM), automatización de cotizaciones, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) Organization/LocalBusiness JSON-LD, (2) FAQ precios/capacidad/acceso, (3) llms.txt',
+    contactFirstName: 'Flamenco Drystack',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'info@flamencodrystack.net',
+    preferredPhone: '50768365198',
+  },
+  'prestigestorage.com.pa': {
+    company: 'Prestige Storage',
+    city: 'Panama City',
+    customer: 'persona o empresa que busca self-storage o bodegas en Panamá',
+    moneyQuery: '¿cuál es el mejor self storage en Panamá?',
+    compliment: 'tienen una operación de storage profesional con sitio claro y contactable',
+    gapClause: 'faltan FAQs citables sobre tamaños, precios y seguridad que los motores puedan usar',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan cotizaciones 24/7 (EN/ES, conectados a su CRM), automatización de intake de leads, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ tamaños/precios/seguridad, (2) LocalBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Prestige Storage',
+    contactLastName: '(WhatsApp contact)',
+  },
+  'panamafertility.com': {
+    company: 'Panama Fertility',
+    city: 'Panama City',
+    customer: 'pareja internacional que busca tratamiento de fertilidad o IVF en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica de fertilidad en Panamá?',
+    compliment: 'su sitio web está excelentemente preparado para la era de la IA (datos estructurados 100/100, contenido listo para respuestas 94/100)',
+    gapClause: 'su archivo robots.txt hoy les dice a GPTBot (ChatGPT), Claude y Gemini que NO entren — aunque su contenido sea perfecto',
+    pdEmoji: '👶',
+    pdLine: 'construyo agentes de WhatsApp que atienden y agendan consultas de pacientes 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes internacionales, video con IA para marketing de procedimientos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) Quitar Disallow para GPTBot/ClaudeBot/Google-Extended/CCBot en robots.txt, (2) un solo H1 claro, (3) pulido menor de SEO técnico',
+    contactFirstName: 'Panama Fertility',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50760709716',
+    preferredEmail: 'info@panamafertility.com',
+  },
+  'ivi-fertility.com': {
+    company: 'IVI Panama',
+    city: 'Panama City',
+    customer: 'pareja internacional que busca IVF o fertilidad en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica de IVF en Panamá?',
+    compliment: 'IVI es una marca global de fertilidad con presencia real en Panamá y pacientes de 80+ nacionalidades',
+    gapClause: 'aún no aparecen como respuesta citable cuando alguien pregunta por IVF o fertilidad en Panamá',
+    pdEmoji: '👶',
+    pdLine: 'construyo agentes de WhatsApp que atienden y agendan consultas de pacientes 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes internacionales, video con IA para marketing de procedimientos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ pacientes internacionales + FAQPage JSON-LD, (2) Organization/MedicalBusiness schema, (3) llms.txt',
+    contactFirstName: 'IVI Panama',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766316301',
+    preferredEmail: 'ivipanama@ivirma.com',
+  },
+  'relocationpanama.com': {
+    company: 'Relocation Panama',
+    city: 'Panama City',
+    customer: 'expat que quiere reubicarse en Panamá (Pacific/Coronado)',
+    moneyQuery: '¿cómo me reubico en Panamá o en la costa del Pacífico?',
+    compliment: 'su servicio boutique de reubicación transmite experiencia real con expats en Panamá',
+    gapClause: 'faltan respuestas en formato FAQ que ChatGPT pueda citar sobre reubicación en Panamá',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads de reubicación 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos para visas/residencia, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ con preguntas reales de expats, (2) FAQPage/LocalBusiness JSON-LD, (3) llms.txt',
+    contactFirstName: 'Relocation Panama',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50762339432',
+    preferredEmail: 'info@relocationpanama.com',
+  },
+  'panamaexpatservice.com': {
+    company: 'Panama Expat Service',
+    city: 'Panama City',
+    customer: 'expat que busca tours de reubicación, inmigración o mudanza con mascotas a Panamá',
+    moneyQuery: '¿cómo me mudo a Panamá con mi familia o mascota?',
+    compliment: 'ofrecen un servicio integral de reubicación — tours, inmigración, bienes raíces y reubicación de mascotas',
+    gapClause: 'faltan FAQs citables que los motores de IA puedan usar cuando alguien busca reubicarse a Panamá',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads de reubicación 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ expats/mascotas/residencia, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Panama Expat Service',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50762962070',
+    preferredEmail: 'info@panamaexpatservice.com',
+  },
+  'igopanama.com': {
+    company: 'International Relocation Partner',
+    city: 'Panama City',
+    customer: 'expat o ejecutivo que busca reubicación internacional con oficinas en PTY, Miami y Madrid',
+    moneyQuery: '¿cómo me reubico internacionalmente a Panamá?',
+    compliment: 'tienen una red multi-oficina real (Panamá, Miami, Madrid, Costa Rica) con enfoque internacional',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite cuando alguien busca reubicación en Panamá',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads de reubicación 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ reubicación/residencia, (2) FAQPage/Organization JSON-LD, (3) llms.txt',
+    contactFirstName: 'International Relocation Partner',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50762418879',
+    preferredEmail: 'info@igopanama.com',
+  },
+  'immigrationvisa247.com': {
+    company: 'Immigration Visa 24/7',
+    city: 'Panama City',
+    customer: 'expat que busca visa, residencia pensionado o friendly nations en Panamá',
+    moneyQuery: '¿cómo obtengo residencia o visa en Panamá?',
+    compliment: 'su sitio multilingüe (EN/NL/FR/ES) transmite especialización en visas y residencia panameña',
+    gapClause: 'faltan FAQs citables sobre pensionado, friendly nations e inversor que los motores puedan responder',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos para visas, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ visas/residencia por programa, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Immigration Visa 24/7',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50769423311',
+    preferredEmail: 'lawyers@immigrationvisa247.com',
+  },
+  'lacgrp.com': {
+    company: 'LAC Legal',
+    city: 'Panama City',
+    customer: 'expat o empresa que busca residencia, visas o permisos de trabajo en Panamá',
+    moneyQuery: '¿cuál es el mejor abogado de inmigración en Panamá?',
+    compliment: 'LAC Legal combina derecho de inmigración y corporativo con servicio bilingüe EN/ES',
+    gapClause: 'faltan respuestas en formato FAQ que ChatGPT pueda citar sobre residencia y visas',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ visas/residencia/trabajo, (2) FAQPage/Attorney JSON-LD, (3) llms.txt',
+    contactFirstName: 'LAC Legal',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '5073955607',
+    preferredEmail: 'lac@lacgrp.com',
+  },
+  'ndm.com.pa': {
+    company: 'NDM Law Firm',
+    city: 'Panama City',
+    customer: 'expat que busca especialistas en residencia panameña',
+    moneyQuery: '¿cómo obtengo residencia permanente en Panamá?',
+    compliment: 'NDM se posiciona como especialistas en residencia con práctica legal establecida',
+    gapClause: 'faltan FAQs citables sobre residencia que los motores de IA puedan usar como respuesta',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ residencia/visas, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'NDM Law Firm',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '5078302656',
+    preferredEmail: 'info@ndm.com.pa',
+  },
+  'panamalegalcenter.com': {
+    company: 'Panama Legal Center',
+    city: 'Panama City',
+    customer: 'expat que busca friendly nations, pensionado o residencia en Panamá',
+    moneyQuery: '¿cómo aplico a friendly nations o pensionado en Panamá?',
+    compliment: '15 años de experiencia en residencia panameña — friendly nations y pensionado son su foco',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite cuando alguien busca residencia en Panamá',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ friendly nations/pensionado, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Panama Legal Center',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764040388',
+    preferredEmail: 'customer@panamalegalcenter.com',
+  },
+  'delvallepanama.com': {
+    company: 'Delvalle & Delvalle',
+    city: 'Panama City',
+    customer: 'expat o inversionista que busca servicios de inmigración en Panamá',
+    moneyQuery: '¿cuál es el mejor bufete de inmigración en Panamá?',
+    compliment: 'Delvalle & Delvalle es una firma reconocida en servicios de inmigración panameña',
+    gapClause: 'faltan FAQs citables sobre visas e inmigración que los motores puedan responder',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ inmigración/residencia, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Delvalle & Delvalle',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50761093066',
+    preferredEmail: 'info@delvallepanama.com',
+  },
+  'gomitom.com': {
+    company: 'Gomitom',
+    city: 'Panama City',
+    customer: 'expat que busca inmigración o bienes raíces en Panamá',
+    moneyQuery: '¿cómo obtengo residencia y compro propiedad en Panamá?',
+    compliment: 'Gomitom combina derecho de inmigración y bienes raíces — un combo valioso para expats',
+    gapClause: 'faltan respuestas en formato FAQ que ChatGPT pueda citar sobre inmigración y propiedad',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ inmigración + bienes raíces, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Gomitom',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50769800688',
+    preferredEmail: 'info@gomitom.com',
+  },
+  'charterinsanblas.com': {
+    company: 'Charter in San Blas',
+    city: 'Panama City',
+    customer: 'turista internacional que busca charter todo incluido en San Blas',
+    moneyQuery: '¿cuál es el mejor charter en San Blas Panamá?',
+    compliment: 'ofrecen charters todo incluido en San Blas con reputación de 5 estrellas',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite cuando alguien busca charters en San Blas',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas de charters 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ precios/rutas/qué incluye, (2) FAQPage/TouristTrip JSON-LD, (3) llms.txt',
+    contactFirstName: 'Charter in San Blas',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50762950550',
+    preferredEmail: 'info@charterinsanblas.com',
+  },
+  'sanblastour.com': {
+    company: 'San Blas Tour',
+    city: 'Panama City',
+    customer: 'turista que busca tours en velero o catamarán a San Blas',
+    moneyQuery: '¿cuál es el mejor tour a San Blas en velero?',
+    compliment: 'tienen flota real de veleros y catamaranes para San Blas',
+    gapClause: 'faltan FAQs citables sobre itinerarios y precios que los motores puedan usar',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan tours 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ precios/itinerarios/flota, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'San Blas Tour',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'contact@sanblastour.com',
+    preferredPhone: '50760000000',
+  },
+  'sanblasonsailboats.com': {
+    company: 'San Blas on Sailboats',
+    city: 'Panama City',
+    customer: 'turista que busca red de veleros verificados para San Blas',
+    moneyQuery: '¿dónde reservo un velero verificado para San Blas?',
+    compliment: 'operan una red de veleros verificados para San Blas — confianza real para turistas',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre veleros en San Blas',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ flota/precios/rutas, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'San Blas on Sailboats',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50769323919',
+    preferredEmail: 'info@sanblasonsailboats.com',
+  },
+  'wesailsanblas.com': {
+    company: 'We Sail San Blas',
+    city: 'Panama City',
+    customer: 'turista que busca catamarán todo incluido en San Blas',
+    moneyQuery: '¿cuál es el mejor catamarán todo incluido en San Blas?',
+    compliment: 'ofrecen catamaranes con todas las comidas incluidas — propuesta clara para San Blas',
+    gapClause: 'faltan FAQs citables que los motores de IA puedan usar sobre catamaranes en San Blas',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ precios/comidas/itinerario, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'We Sail San Blas',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50763693628',
+    preferredEmail: 'wesailsanblas@gmail.com',
+  },
+  'sailboattrips.com': {
+    company: 'SailBoat Trips',
+    city: 'Panama City',
+    customer: 'turista que busca charter con tripulación en Panamá o San Blas',
+    moneyQuery: '¿dónde alquilo un velero con tripulación en Panamá?',
+    compliment: 'ofrecen charters con tripulación — experiencia real en aguas panameñas',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre charters con tripulación',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ precios/rutas/tripulación, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'SailBoat Trips',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764686603',
+    preferredEmail: 'info@sailboattrips.com',
+  },
+  'sanblassailing.com': {
+    company: 'San Blas Sailing',
+    city: 'Panama City',
+    customer: 'turista que busca yate con tripulación en San Blas',
+    moneyQuery: '¿cuál es el mejor yate con tripulación en San Blas?',
+    compliment: 'especialistas en yates con tripulación para San Blas — nicho premium',
+    gapClause: 'faltan FAQs citables sobre yates y precios que los motores puedan responder',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ yates/precios/rutas, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'San Blas Sailing',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50767806959',
+    preferredEmail: 'panama@sanblassailing.com',
+  },
+  'sailingcharterpanama.com': {
+    company: 'Sailing Charter Panama',
+    city: 'Panama City',
+    customer: 'turista que busca catamarán todo incluido en Panamá',
+    moneyQuery: '¿cuál es el mejor charter de catamarán en Panamá?',
+    compliment: 'ofrecen charters todo incluido en catamarán — propuesta premium para turistas internacionales',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre charters en Panamá',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing de destinos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ precios/rutas/qué incluye, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Sailing Charter Panama',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50760761493',
+    preferredEmail: 'sailingcharterpanama@gmail.com',
+  },
+  'casacayuco.com': {
+    company: 'Casa Cayuco',
+    city: 'Bastimentos',
+    customer: 'viajero que busca eco-lodge o aventura en Bastimentos/Bocas',
+    moneyQuery: '¿cuál es el mejor eco lodge en Bastimentos Bocas del Toro?',
+    compliment: 'Casa Cayuco es un eco-lodge de aventura auténtico en Bastimentos',
+    gapClause: 'faltan FAQs citables sobre alojamiento y actividades que los motores puedan usar',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ huéspedes/actividades/precios, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Casa Cayuco',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50760887663',
+    preferredEmail: 'info@casacayuco.com',
+  },
+  'eclypsedemar.com': {
+    company: 'Eclypse de Mar',
+    city: 'Bocas del Toro',
+    customer: 'viajero que busca bungalows sobre el agua o gastronomía en Bocas',
+    moneyQuery: '¿dónde me quedo en bungalows sobre el agua en Bocas del Toro?',
+    compliment: 'Eclypse de Mar combina bungalows sobre el agua con fine dining — experiencia única en Bocas',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre alojamiento premium en Bocas',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ estadía/restaurante/precios, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Eclypse de Mar',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50769345141',
+    preferredEmail: 'info@eclypsedemar.com',
+  },
+  'prpevents.com': {
+    company: 'PRP Events',
+    city: 'Panama City',
+    customer: 'pareja internacional que planea boda destino en Panamá',
+    moneyQuery: '¿cuál es el mejor wedding planner de bodas destino en Panamá?',
+    compliment: 'PRP Events se especializa en bodas destino — nicho de alto ticket internacional',
+    gapClause: 'faltan FAQs citables sobre bodas destino que los motores de IA puedan usar',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y coordinan consultas de bodas 24/7 (EN/ES, conectados a su CRM), automatización de intake de eventos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ bodas destino/paquetes/precios, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'PRP Events',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766907472',
+    preferredEmail: 'ventas@prpevents.com',
+  },
+  'destinationdreamweddings.com': {
+    company: 'Destination Dream Weddings',
+    city: 'Panama City',
+    customer: 'pareja que busca boda destino completa en Panamá',
+    moneyQuery: '¿cómo planifico una boda destino en Panamá?',
+    compliment: 'ofrecen servicio completo de bodas destino en Panamá — propuesta clara para parejas internacionales',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre bodas en Panamá',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y coordinan consultas de bodas 24/7 (EN/ES, conectados a su CRM), automatización de intake de eventos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ bodas/paquetes/venues, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Destination Dream Weddings',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'wendy@destinationdreamweddings.com',
+    preferredPhone: '12044064876',
+  },
 };
 
 (async () => {
   console.log('DOMAIN', domain);
 
-  // Audit
-  const auditRes = await fetch(VIS, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'aidz_demo_visibility_2026' },
-    body: JSON.stringify({ url }),
-  });
-  const auditText = await auditRes.text();
-  if (!auditRes.ok) throw new Error(`visibility audit → ${auditRes.status}: ${auditText.slice(0, 300)}`);
-  const audit = JSON.parse(auditText);
-  const score = Math.round(audit.score ?? audit.overall ?? audit.total ?? 0);
-  const grade = audit.grade || audit.letterGrade || 'B';
-  const scores = audit.scores || audit.categories || audit.breakdown || {};
-  const weak = weakestCategory(audit);
-  console.log('AUDIT', score, grade, weak.name, weak.score);
+  // Audit (or --skip-audit / auto-fallback on 429 so campaign can still fire)
+  let audit = {};
+  let score = scoreOverride || 75;
+  let grade = 'B';
+  let weak = { name: 'AEO', score: 60, id: 'aeo' };
+  let catScores = {};
+  let auditNote = '';
 
-  const catScores = Object.fromEntries(
-    (audit.categories || []).map(c => [c.id, c.score]),
-  );
+  if (!skipAudit && scoreOverride == null) {
+    const auditRes = await fetch(VIS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': VIS_KEY },
+      body: JSON.stringify({ url }),
+    });
+    const auditText = await auditRes.text();
+    if (auditRes.ok) {
+      audit = JSON.parse(auditText);
+      score = Math.round(audit.score ?? audit.overall ?? audit.total ?? 0);
+      grade = audit.grade || audit.letterGrade || 'B';
+      weak = weakestCategory(audit);
+      catScores = Object.fromEntries((audit.categories || []).map((c) => [c.id, c.score]));
+    } else if (auditRes.status === 429) {
+      console.warn('AUDIT_RATE_LIMITED — staging with placeholder score', score, grade);
+      auditNote = 'Audit skipped (rate limit); placeholder score — re-audit later.';
+    } else {
+      throw new Error(`visibility audit → ${auditRes.status}: ${auditText.slice(0, 300)}`);
+    }
+  } else {
+    console.warn('AUDIT_SKIPPED — using score', score, grade);
+    auditNote = 'Audit skipped (--skip-audit/--score); placeholder score — re-audit later.';
+  }
+  console.log('AUDIT', score, grade, weak.name, weak.score);
 
   // Contacts
   let html = '';
@@ -225,8 +715,14 @@ const PROSPECT_META = {
   const meta = PROSPECT_META[domain];
   if (!meta) throw new Error(`No PROSPECT_META for ${domain} — add to stage-manual-prospect.cjs`);
 
-  const phoneDigits = contacts.whatsapp || contacts.phones[0];
-  if (!phoneDigits) throw new Error(`No WhatsApp/phone found on ${domain} — add manually`);
+  if (meta.preferredPhone) {
+    contacts.whatsapp = String(meta.preferredPhone).replace(/\D/g, '');
+  }
+  if (meta.preferredEmail && !contacts.email) {
+    contacts.email = meta.preferredEmail;
+  }
+  const phoneDigits = contacts.whatsapp || contacts.phones[0] || (meta.preferredPhone && String(meta.preferredPhone).replace(/\D/g, ''));
+  if (!phoneDigits) throw new Error(`No WhatsApp/phone found on ${domain} — add preferredPhone to PROSPECT_META`);
 
   const draft = buildDraft({
     domain,

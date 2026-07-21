@@ -1,4 +1,13 @@
 {
+  "panama-fertility": {
+    "phone": "50760709716",
+    "draft": "docs/selling/drafts/panama-fertility.txt",
+    "company": "Panama Fertility",
+    "email": "info@panamafertility.com",
+    "emailDraft": "docs/selling/drafts/panama-fertility-email.txt",
+    "dealId": "62828946074",
+    "score": 86
+  },
   "dopanama": {
     "phone": "50764433341",
     "draft": "docs/selling/drafts/dopanama.txt",
@@ -52,5 +61,165 @@
     "emailDraft": "docs/selling/drafts/centro-marino-panam-email.txt",
     "dealId": "62863032403",
     "score": 84
+  },
+  "relofirm": {
+    "phone": "50763325777",
+    "draft": "docs/selling/drafts/relofirm.txt",
+    "company": "ReloFirm",
+    "email": "contact@relofirm.com",
+    "emailDraft": "docs/selling/drafts/relofirm-email.txt",
+    "dealId": "62851992582",
+    "score": 94
+  },
+  "kraemer-law": {
+    "phone": "5073108688",
+    "draft": "docs/selling/drafts/kraemer-law.txt",
+    "company": "Kraemer Law",
+    "email": "info@kraemerlaw.com",
+    "emailDraft": "docs/selling/drafts/kraemer-law-email.txt",
+    "dealId": "62872179381",
+    "score": 97
+  },
+  "ampa-tours": {
+    "phone": "50760270607",
+    "draft": "docs/selling/drafts/ampa-tours.txt",
+    "company": "Ampa Tours",
+    "email": "info@ampatours.com",
+    "emailDraft": "docs/selling/drafts/ampa-tours-email.txt",
+    "dealId": "62872179385",
+    "score": 98
+  },
+  "tranquilo-bay": {
+    "phone": "5078380021",
+    "draft": "docs/selling/drafts/tranquilo-bay.txt",
+    "company": "Tranquilo Bay",
+    "email": "info@tranquilobay.com",
+    "emailDraft": "docs/selling/drafts/tranquilo-bay-email.txt",
+    "dealId": "62871509035",
+    "score": 83
+  },
+  "pesqueros-sport": {
+    "phone": "50764310642",
+    "draft": "docs/selling/drafts/pesqueros-sport.txt",
+    "company": "Pesqueros Sport",
+    "dealId": "62856793161",
+    "score": 90
+  },
+  "prestige-storage": {
+    "phone": "5073027760",
+    "draft": "docs/selling/drafts/prestige-storage.txt",
+    "company": "Prestige Storage",
+    "email": "info@prestigestorage.com.pa",
+    "emailDraft": "docs/selling/drafts/prestige-storage-email.txt",
+    "dealId": "62867929503",
+    "score": 87
+  },
+  "panama-dental-clinic": {
+    "phone": "50766111939",
+    "draft": "docs/selling/drafts/panama-dental-clinic.txt",
+    "company": "Panama Dental Clinic",
+    "email": "ced.sanantoniolm@gmail.com",
+    "emailDraft": "docs/selling/drafts/panama-dental-clinic-email.txt",
+    "dealId": "62865516872",
+    "score": 88
+  },
+  "san-blas-dreams": {
+    "phone": "50764735905",
+    "draft": "docs/selling/drafts/san-blas-dreams.txt",
+    "company": "San Blas Dreams",
+    "email": "info@sanblasdreams.com",
+    "emailDraft": "docs/selling/drafts/san-blas-dreams-email.txt",
+    "dealId": "62868082222",
+    "score": 54
+  },
+  "flamenco-drystack-panama": {
+    "phone": "50768365198",
+    "draft": "docs/selling/drafts/flamenco-drystack-panama.txt",
+    "company": "Flamenco Drystack Panama",
+    "email": "info@flamencodrystack.net",
+    "emailDraft": "docs/selling/drafts/flamenco-drystack-panama-email.txt",
+    "dealId": "62860098823",
+    "score": 54
+  },
+  "ivi-panama": {
+    "phone": "50766316301",
+    "draft": "docs/selling/drafts/ivi-panama.txt",
+    "company": "IVI Panama",
+    "email": "ivipanama@ivirma.com",
+    "emailDraft": "docs/selling/drafts/ivi-panama-email.txt",
+    "dealId": "62872490395",
+    "score": 75
+  },
+  "relocation-panama": {
+    "phone": "50762339432",
+    "draft": "docs/selling/drafts/relocation-panama.txt",
+    "company": "Relocation Panama",
+    "email": "info@relocationpanama.com",
+    "emailDraft": "docs/selling/drafts/relocation-panama-email.txt",
+    "dealId": "62879198124",
+    "score": 75
+  },
+  "panama-expat-service": {
+    "phone": "50762962070",
+    "draft": "docs/selling/drafts/panama-expat-service.txt",
+    "company": "Panama Expat Service",
+    "email": "info@panamaexpatservice.com",
+    "emailDraft": "docs/selling/drafts/panama-expat-service-email.txt",
+    "dealId": "62861954230",
+    "score": 75
+  },
+  "international-relocation-partner": {
+    "phone": "50762418879",
+    "draft": "docs/selling/drafts/international-relocation-partner.txt",
+    "company": "International Relocation Partner",
+    "email": "info@igopanama.com",
+    "emailDraft": "docs/selling/drafts/international-relocation-partner-email.txt",
+    "dealId": "62861954305",
+    "score": 75
+  },
+  "immigration-visa-24-7": {
+    "phone": "50769423311",
+    "draft": "docs/selling/drafts/immigration-visa-24-7.txt",
+    "company": "Immigration Visa 24/7",
+    "email": "lawyers@immigrationvisa247.com",
+    "emailDraft": "docs/selling/drafts/immigration-visa-24-7-email.txt",
+    "dealId": "62861024793",
+    "score": 75
+  },
+  "lac-legal": {
+    "phone": "5073955607",
+    "draft": "docs/selling/drafts/lac-legal.txt",
+    "company": "LAC Legal",
+    "email": "lac@lacgrp.com",
+    "emailDraft": "docs/selling/drafts/lac-legal-email.txt",
+    "dealId": "62876980999",
+    "score": 75
+  },
+  "ndm-law-firm": {
+    "phone": "5078302656",
+    "draft": "docs/selling/drafts/ndm-law-firm.txt",
+    "company": "NDM Law Firm",
+    "email": "info@ndm.com.pa",
+    "emailDraft": "docs/selling/drafts/ndm-law-firm-email.txt",
+    "dealId": "62876671266",
+    "score": 75
+  },
+  "panama-legal-center": {
+    "phone": "50764040388",
+    "draft": "docs/selling/drafts/panama-legal-center.txt",
+    "company": "Panama Legal Center",
+    "email": "customer@panamalegalcenter.com",
+    "emailDraft": "docs/selling/drafts/panama-legal-center-email.txt",
+    "dealId": "62873424288",
+    "score": 75
+  },
+  "delvalle-delvalle": {
+    "phone": "50761093066",
+    "draft": "docs/selling/drafts/delvalle-delvalle.txt",
+    "company": "Delvalle & Delvalle",
+    "email": "info@delvallepanama.com",
+    "emailDraft": "docs/selling/drafts/delvalle-delvalle-email.txt",
+    "dealId": "62870120358",
+    "score": 75
   }
 }

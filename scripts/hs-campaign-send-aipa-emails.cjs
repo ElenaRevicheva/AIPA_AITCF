@@ -3,6 +3,9 @@
  * hs-campaign-send-aipa-emails.cjs — auto-send Manual Prospect Play emails
  * from aipa@aideazz.xyz via Resend (no Elena clicks). Moves deals → Sent.
  *
+ * Iron rule: EVERY campaign candidate (new send OR already emailed) gets a
+ * +4 calendar-day soft follow-up Task (idempotent — skips if one is open).
+ *
  * NOTE: Resend ≠ Zoho. These will NOT appear in Zoho Mail → Sent.
  * HubSpot UI sends (connected Zoho inbox) DO appear in Zoho Sent.
  * Resend id is stamped on the HubSpot note; check https://resend.com/emails
@@ -108,6 +111,59 @@ async function latestNote(dealId) {
   return best;
 }
 
+/** Open (non-COMPLETED) soft follow-up tasks on a deal — iron rule: every campaign send gets one. */
+async function openFollowUpTasks(dealId) {
+  const assoc = await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/tasks`);
+  const ids = (assoc.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
+  const open = [];
+  for (const id of ids) {
+    const t = await hs(
+      'GET',
+      `/crm/v3/objects/tasks/${id}?properties=hs_task_subject,hs_task_status,hs_timestamp`,
+    );
+    const subj = t.properties?.hs_task_subject || '';
+    const status = t.properties?.hs_task_status || '';
+    if (status !== 'COMPLETED' && /follow-up/i.test(subj)) open.push(t);
+  }
+  return open;
+}
+
+async function ensureFollowUpTask(dealId, company, note) {
+  const existing = await openFollowUpTasks(dealId);
+  if (existing.length) {
+    return {
+      id: existing[0].id,
+      due: (existing[0].properties?.hs_timestamp || '').slice(0, 10),
+      created: false,
+    };
+  }
+  const due = new Date();
+  due.setDate(due.getDate() + 4);
+  due.setHours(23, 59, 0, 0);
+  const dueStr = due.toISOString().slice(0, 10);
+  const task = await hs('POST', '/crm/v3/objects/tasks', {
+    properties: {
+      hs_task_subject: `Soft follow-up email/WA → ${company} (no reply yet?)`,
+      hs_task_body:
+        `Campaign rule: every sent prospect gets a +4 day soft follow-up. ` +
+        `If still silent, soft 1–2 lines. If they replied, cancel and use 💬 path. Deal ${dealId}`,
+      hs_task_status: 'NOT_STARTED',
+      hs_task_priority: 'MEDIUM',
+      hs_timestamp: due.toISOString(),
+    },
+  });
+  await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${dealId}`, [
+    { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 },
+  ]);
+  if (note) {
+    const stamp = `<br>📅 Follow-up task <b>${task.id}</b> due <b>${dueStr}</b> (soft if still silent).`;
+    await hs('PATCH', `/crm/v3/objects/notes/${note.id}`, {
+      properties: { hs_note_body: (note.properties?.hs_note_body || '') + stamp },
+    });
+  }
+  return { id: task.id, due: dueStr, created: true };
+}
+
 async function sendResend({ to, subject, body }) {
   const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const r = await fetch('https://api.resend.com/emails', {
@@ -140,9 +196,23 @@ async function sendResend({ to, subject, body }) {
 
     const note = await latestNote(cfg.dealId);
     const body = note?.properties?.hs_note_body || '';
-    // Already campaign/one-click Resend OR HubSpot UI emailed (watcher stamps EMAILED)
-    if (/Resend:[a-z0-9-]+/i.test(body) || /📧 EMAILED/.test(body)) {
-      results.push({ slug, skip: 'already emailed (note has EMAILED/Resend)' });
+    const alreadyEmailed = /Resend:[a-z0-9-]+/i.test(body) || /📧 EMAILED/.test(body);
+
+    // Already emailed → still ensure +4 day soft follow-up (every campaign candidate)
+    if (alreadyEmailed) {
+      if (dryRun) {
+        results.push({ slug, skip: 'already emailed', followUp: 'would ensure' });
+        continue;
+      }
+      const fu = await ensureFollowUpTask(cfg.dealId, cfg.company || slug, note);
+      results.push({
+        slug,
+        skip: 'already emailed (note has EMAILED/Resend)',
+        followUpId: fu.id,
+        followUpDue: fu.due,
+        followUpCreated: fu.created,
+      });
+      console.log('FOLLOWUP', slug, fu.created ? 'created' : 'exists', fu.id, 'due', fu.due);
       continue;
     }
 
@@ -161,7 +231,7 @@ async function sendResend({ to, subject, body }) {
     }
 
     if (dryRun) {
-      results.push({ slug, dryRun: true, to, subject: subject?.slice(0, 60) });
+      results.push({ slug, dryRun: true, to, subject: subject?.slice(0, 60), followUp: '+4d' });
       continue;
     }
 
@@ -170,36 +240,38 @@ async function sendResend({ to, subject, body }) {
     await hs('PATCH', `/crm/v3/objects/deals/${cfg.dealId}`, {
       properties: { dealstage: 'decisionmakerboughtin' },
     });
-    if (note) {
+    let noteForStamp = note;
+    if (noteForStamp) {
       const add =
         `<br><br>📧 EMAILED ${when} from <b>aipa@aideazz.xyz</b> → ${to}` +
         `<br>Subject: ${subject}` +
         `<br>Resend:${resendId} (campaign auto-send hs-campaign-send-aipa-emails).` +
         `<br><i>Note: Resend does not appear in Zoho Sent — check Resend dashboard.</i>`;
-      await hs('PATCH', `/crm/v3/objects/notes/${note.id}`, {
-        properties: { hs_note_body: (note.properties?.hs_note_body || '') + add },
+      await hs('PATCH', `/crm/v3/objects/notes/${noteForStamp.id}`, {
+        properties: { hs_note_body: (noteForStamp.properties?.hs_note_body || '') + add },
       });
+      noteForStamp = {
+        ...noteForStamp,
+        properties: {
+          ...noteForStamp.properties,
+          hs_note_body: (noteForStamp.properties?.hs_note_body || '') + add,
+        },
+      };
     }
-    // follow-up task
-    const due = new Date();
-    due.setDate(due.getDate() + 4);
-    due.setHours(23, 59, 0, 0);
-    const task = await hs('POST', '/crm/v3/objects/tasks', {
-      properties: {
-        hs_task_subject: `Soft follow-up email/WA → ${cfg.company} (no reply yet?)`,
-        hs_task_body: `Campaign auto-email sent ${when}. Deal ${cfg.dealId}`,
-        hs_task_status: 'NOT_STARTED',
-        hs_task_priority: 'MEDIUM',
-        hs_timestamp: due.toISOString(),
-      },
-    });
-    await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${cfg.dealId}`, [
-      { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 },
-    ]);
 
-    results.push({ slug, ok: true, to, resendId, dealId: cfg.dealId });
-    console.log('SENT', slug, '→', to, resendId);
-    // gentle pacing
+    // Iron rule: every campaign send → +4 day soft follow-up (idempotent)
+    const fu = await ensureFollowUpTask(cfg.dealId, cfg.company || slug, noteForStamp);
+
+    results.push({
+      slug,
+      ok: true,
+      to,
+      resendId,
+      dealId: cfg.dealId,
+      followUpId: fu.id,
+      followUpDue: fu.due,
+    });
+    console.log('SENT', slug, '→', to, resendId, 'followUp', fu.id, 'due', fu.due);
     await new Promise((r) => setTimeout(r, 1500));
   }
 

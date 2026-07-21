@@ -11,8 +11,10 @@
 
 1. **Audit the prospect** with our own Visibility API (free, no keys):
    ```bash
+   # For interviews / Manual Prospect / batch: use VISIBILITY_API_KEY from .env
+   # (owner key). NEVER the public demo key — that is capped at 20/hour.
    curl -s -X POST https://webhook.aideazz.xyz/cto/v1/visibility \
-     -H "Content-Type: application/json" -H "X-API-Key: aidz_demo_visibility_2026" \
+     -H "Content-Type: application/json" -H "X-API-Key: $VISIBILITY_API_KEY" \
      -d '{"url":"https://PROSPECT.com"}'
    ```
    The score + weakest category becomes the outreach hook. Angles by profile:
@@ -77,8 +79,46 @@
    **Zoho Sent vs Resend (July 20 2026):** HubSpot UI Email uses the connected **Zoho**
    inbox → shows in Zoho Mail → Sent. One-click / campaign sends use **Resend** (same
    From `aipa@aideazz.xyz`) → appear in [Resend dashboard](https://resend.com/emails),
-   **not** in Zoho Sent. Both are real sends. Zero-click campaign:
-   `node scripts/hs-campaign-send-aipa-emails.cjs` (on Oracle).
+   **not** in Zoho Sent. Both are real sends.
+
+4b. **Zero-click email campaign (do not reinvent — July 20 2026)**
+
+   Use this when Elena wants emails fired without clicking HubSpot/one-click links.
+   One-click WA + one-click email links stay on every deal note in parallel.
+
+   **Prerequisites (every prospect):**
+   1. Add `PROSPECT_META[domain]` in `scripts/stage-manual-prospect.cjs` (optional
+      `preferredPhone` / `preferredEmail` if scrape misses).
+   2. Stage: `node scripts/stage-manual-prospect.cjs <domain>`
+      → company + deal `[CLIENT-MANUAL]` (`qualifiedtobuy`) + contact + note
+      (WA + `/go/outreach-email/{slug}`) + send task + registry row in
+      `docs/selling/outreach-registry.json` (needs `email` + `dealId` + drafts).
+   3. Oracle has `RESEND_API_KEY` (and HubSpot key) in `.env`.
+
+   **Fire the campaign (Oracle):**
+   ```bash
+   cd ~/AIPA_AITCF   # or repo path on Oracle
+   git pull
+   node scripts/hs-campaign-send-aipa-emails.cjs --dry-run   # preview
+   node scripts/hs-campaign-send-aipa-emails.cjs             # send all registry rows
+   # or only some: --only=slug1,slug2
+   ```
+
+   **What the script does per registry slug with email+dealId:**
+   - Skips re-send if note already has `📧 EMAILED` or `Resend:…`.
+   - Else Resend from `aipa@aideazz.xyz` → deal **⏳ Sent** (`decisionmakerboughtin`)
+     → stamps note with Resend id.
+   - **Iron rule — +4 day soft follow-up for EVERY campaign candidate** (new send
+     *and* already-emailed rows): creates (or reuses) an open Task
+     `Soft follow-up email/WA → {Company} (no reply yet?)`, due ~+4 calendar days,
+     stamps `📅 Follow-up task {id} due {YYYY-MM-DD}` on the note. Idempotent —
+     will not duplicate if an open follow-up already exists.
+   - Proof of send: [https://resend.com/emails](https://resend.com/emails) (not Zoho Sent).
+
+   **Hit-list source:** stage domains from `docs/selling/PANAMA_TARGET_PROSPECTS.md`
+   (shortlist + Elena-mined), then fire campaign. Prospects without email stay
+   staged for WhatsApp-only; campaign skips them until an email is added to the
+   registry.
 
 5. **After Elena sends** (she says "sent" — WhatsApp Business app has no API,
    so detection is manual by design): move deal → **decisionmakerboughtin**
@@ -89,6 +129,8 @@
    - Body: if still silent, soft 1–2 line follow-up; if they already replied, ignore
      and use the 💬 path instead
    - Append `📅 Follow-up task {id} due {YYYY-MM-DD}` to the note
+   Same +4 day follow-up rule applies to **campaign** and **HubSpot UI email**
+   (watcher) paths — every sent candidate gets one.
    On reply (before or after that date): stage → **contractsent** ("💬 They replied — I act"),
    and complete/cancel the follow-up task so it does not nag.
 
@@ -174,6 +216,14 @@ Elena✨🌍💫
 | 2026-07-20 | YC Panama Yachts | 94/A+ (AEO 81 — no FAQ; rest 100/100) | 62864888204 — SENT same day (WA +507 6503-1745 + info@ycyachts.com) |
 | 2026-07-20 | Fuerte Amador Resort & Marina | 68/C (GEO 31 — flamencomarina.com) | 62857562269 — WA hit restaurant bot → EMAIL ready `service@fuerteamador.com` |
 | 2026-07-20 | Centro Marino Panamá | 84/B (AEO 75 — Mercury/botes) | 62863032403 — WA +507 6615-0368 + ernesto@centromarino.com (dual-channel note) |
+| 2026-07-20 | ReloFirm | campaign Resend | 62851992582 — 📧 + follow-up due ~2026-07-24 |
+| 2026-07-20 | Kraemer Law | campaign Resend | 62872179381 — 📧 + follow-up due ~2026-07-24 |
+| 2026-07-20 | Ampa Tours | campaign Resend | 62872179385 — 📧 + follow-up due ~2026-07-24 |
+| 2026-07-20 | Tranquilo Bay | campaign Resend | 62871509035 — 📧 + follow-up due ~2026-07-24 |
+| 2026-07-20 | Prestige Storage | campaign Resend | 62867929503 — 📧 + follow-up due ~2026-07-24 |
+| 2026-07-20 | Panama Dental Clinic | campaign Resend | 62865516872 — 📧 + follow-up due ~2026-07-24 |
+| 2026-07-20 | San Blas Dreams | campaign Resend | 62868082222 — 📧 + follow-up due ~2026-07-24 |
+| 2026-07-20 | Flamenco Drystack Panama | campaign Resend | 62860098823 — 📧 + follow-up due ~2026-07-24 |
 
 ## Staged deal packs (draft + HubSpot note)
 

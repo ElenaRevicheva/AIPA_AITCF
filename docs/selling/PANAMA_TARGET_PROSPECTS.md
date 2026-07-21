@@ -118,23 +118,28 @@ Validated here: **Eurostone Panamá** (stone/cladding), **AIRCO / SINOTRUK** (he
 Highest expected pain × highest ticket. Run the play top-down:
 
 1. panamafertility.com — A1, very high ticket, intl — ✅ STAGED 2026-07-19 (deal 62828946074; 86/A, robots.txt blocks GPTBot/Claude/Gemini)
-2. nomadcc.com — C, construction Pedasí/Azuero — ✅ STAGED 2026-07-19 (deal 62832583063; 90/A, AEO 81)
-3. dopanama.com — A2, expat RE+relocation — ✅ STAGED 2026-07-19 (deal 62821413988; 91/A, GEO/AEO 88)
-4. panamaaesthetics.com — A1, aesthetic tourism — ✅ STAGED 2026-07-20 (deal 62873560951; 88/A, Tech 71: 11s response, no FAQ)
-5. relofirm.com — A2, law + relocation
-6. panamadentalclinic.com — A1, dental tourism
-7. kraemerlaw.com — A2, immigration
-8. ampatours.com — A3, charters + fishing
-9. tranquilobay.com — A3, eco lodge
-10. americantradehotel.com — B1, weddings/events
-11. sanblasdreams.com — A3, ATP tour operator
+2. nomadcc.com — C, construction Pedasí/Azuero — ✅ STAGED 2026-07-19 (deal 62832583063; 90/A, AEO 81) — 📧 campaign + +4d follow-up
+3. dopanama.com — A2, expat RE+relocation — ✅ STAGED 2026-07-19 (deal 62821413988; 91/A, GEO/AEO 88) — 📧 campaign + +4d follow-up
+4. panamaaesthetics.com — A1, aesthetic tourism — ✅ STAGED 2026-07-20 (deal 62873560951; 88/A, Tech 71: 11s response, no FAQ) — 📧 emailed + +4d follow-up
+5. relofirm.com — A2, law + relocation — ✅ STAGED 2026-07-20 (deal 62851992582) — 📧 campaign + +4d follow-up
+6. panamadentalclinic.com — A1, dental tourism (David/Chiriquí) — ✅ STAGED 2026-07-20 (deal 62865516872; WA +507 6611-1939) — 📧 campaign + +4d follow-up
+7. kraemerlaw.com — A2, immigration — ✅ STAGED 2026-07-20 (deal 62872179381) — 📧 campaign + +4d follow-up
+8. ampatours.com — A3, charters + fishing — ✅ STAGED 2026-07-20 (deal 62872179385) — 📧 campaign + +4d follow-up
+9. tranquilobay.com — A3, eco lodge — ✅ STAGED 2026-07-20 (deal 62871509035) — 📧 campaign + +4d follow-up
+10. americantradehotel.com — B1, weddings/events — ⏸ BLOCKED 2026-07-20 (visibility audit URL unfetchable)
+11. sanblasdreams.com — A3, ATP tour operator — ✅ STAGED 2026-07-20 (deal 62868082222; WA +507 6473-5905) — 📧 campaign + +4d follow-up
 
 ### Elena-mined (outside shortlist order)
 - **ycyachts.com** (YC Panama Yachts) — A3 yacht charter / our-fleet — ✅ STAGED 2026-07-20 (deal **62864888204**; 94/A+, AEO 81; WhatsApp +507 6503-1745 + **info@ycyachts.com**) — SENT same day
 - **flamencomarina.com** (Fuerte Amador Resort & Marina / **Flamenco Marina**) — A3 marina/resort Amador — ✅ STAGED 2026-07-20 (deal **62857562269**; 68/C, GEO 31; WhatsApp +507 6030-8992 bot miss → email **service@fuerteamador.com**; marina ops email also `marina@fuerteamador.com`)
 - **centromarino.com** (Centro Marino Panamá) — Mercury motors / boats / service (branch at Flamenco Marina) — ✅ STAGED 2026-07-20 (deal **62863032403**; 84/B, AEO 75; WhatsApp +507 6615-0368 + **ernesto@centromarino.com**)
+- **pesquerosport.com** (Pesqueros Sport) — ✅ STAGED 2026-07-20 (deal **62856793161**; WA +507 6431-0642; no email → WA-only until email found)
+- **flamencodrystackpanama.com** (Flamenco Drystack) — ✅ STAGED 2026-07-20 (deal **62860098823**; WA +507 6836-5198 + info@flamencodrystack.net) — 📧 campaign + +4d follow-up
+- **prestigestorage.com.pa** (Prestige Storage) — ✅ STAGED 2026-07-20 (deal **62867929503**) — 📧 campaign + +4d follow-up
+- Porky Lobster Marina / Snappy Marine / SeaChoice / Biglure / Marine and Cargo / Galeria Textiles — no usable Panama site at staging time (blocked until contact found)
 
-## Directories to mine for more prospects (not prospects themselves)
+### How to fire campaign for this list
+See **§4b Zero-click email campaign** in `MANUAL_PROSPECT_PLAY.md`. Every emailed candidate gets a **+4 day soft follow-up task** (iron rule). Proof: https://resend.com/emails
 medicaltourismpackages.com · smilejet.app · health-tourism.com · placidway.com ·
 tripadvisor (Bocas/Boquete hotels) · vacationtopanama.com/hotels/boutique ·
 clickandboat.com (Panama) · igopanama.com listings.

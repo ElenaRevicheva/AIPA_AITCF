@@ -1,0 +1,23 @@
+SUBJECT: Auditoría de visibilidad en IA — Panama Fertility (86/100): 3 arreglos concretos
+
+TO: info@panamafertility.com
+
+Estimado equipo de Panama Fertility:
+
+¡Un gusto saludarles! 👋 Les escribo por este medio, como amablemente me indicaron por WhatsApp. Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — su sitio web está excelentemente preparado para la era de la IA: datos estructurados 100/100 y contenido listo para respuestas 94/100. Les escribo porque analicé panamafertility.com con mi motor de visibilidad en IA y obtuvo 86/100: hay un solo detalle que los frena — su archivo robots.txt hoy les dice a GPTBot (ChatGPT), Claude y Gemini que NO entren, así que cuando una pareja internacional le pregunta a ChatGPT "¿cuál es la mejor clínica de fertilidad en Panamá?", esos motores no pueden citarlos aunque su contenido sea perfecto (Acceso IA 64/100).
+
+Son 3 arreglos concretos:
+
+1. Quitar el Disallow para GPTBot, ClaudeBot, Google-Extended y CCBot en robots.txt — casi inmediato y el mayor impacto.
+2. Un solo H1 claro que nombre su oferta de fertilidad/IVF para pacientes internacionales.
+3. Pulido menor de SEO técnico (GEO ya 100, AEO 94 — están muy bien).
+
+Si les parece bien, con mucho gusto se los muestro en una llamada de 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 👶
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que atienden y agendan consultas de pacientes 24/7 (EN/ES, conectados a su CRM), automatización completa de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva✨🌍💫
