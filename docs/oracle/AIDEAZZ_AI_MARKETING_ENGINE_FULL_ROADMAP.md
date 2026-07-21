@@ -1,14 +1,16 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: **July 4, 2026 (v24.0 — consulting pay: Análisis técnico web via PagueloFacil)** — **`/pay/analisis-tecnico`** on [aideazz.xyz](https://aideazz.xyz/pay/analisis-tecnico); CTO AIPA **`POST /api/service-checkout`** + **`SVC:*`** PF webhook hook (`web_audit_prelim` **$200**, `web_audit_blueprint` **$500** after prelim); discovery-first → pay → deliver (Global Marine model). Docs: `docs/clients/SERVICE_PAYMENTS.md`. Deploy: `scripts/oracle-deploy-service-payments.sh`. Prior: **July 4, 2026 (v23.0 — `/go/wa` WhatsApp click adapter live)** — **`scripts/sync-atlas-ga4.mjs`** nightly cron on Oracle (`06:15 UTC`); posts `ga4_sessions` / `ga4_key_events` for `utm_campaign=atlas_*` → **`atlas_performance_events`**; first live row verified Jul 2 2026 (`ai_augmented_product_building`, 1 session). Atlas public UI banner polished (`atlas-shifted` `eb9e99c` — no Oracle ops text for clients). Prior: June 29, 2026 (v21.0 — **Atlas ↔ AIdeazz performance bridge** — closed-loop outcome tracking without rewriting Atlas capture/classify/brief/ship; **UTM tags + `concept_id`** on every Atlas export; Oracle **`atlas_performance_events`** ledger; **`POST /cto/api/performance-event`** + **`GET /cto/api/atlas-performance`** on CTO AIPA; Atlas UI reads aggregated ROAS/CPA/leads when hub is wired; **`scripts/sync-atlas-business-leads.mjs`** ingests `business_leads` where `utm_campaign LIKE 'atlas_%'`). Prior: May 18, 2026 (v20.0 — **Blog 404 resolved** (`/blog/post/:slug` Oracle endpoint + `BlogPost.tsx` parallel-fetch Dev.to + backend fallback); **fire-and-forget `/hashnode/daily-run`** (202 immediate, Opus runs background — no more nginx 60s timeout); **i18n Hashnode → Dev.to** (EN + ES footer/link strings); **topic dedup** (`getPublishedTopicIndices()` + `excludedIndices` in `pickTopicWithGscGap` — no more date-suffix titles); **dynamic sitemap** (`pushSitemapToGithub()` commits fresh `sitemap.xml` to `ElenaRevicheva/aideazz` after every publish; 4everland auto-deploys); **AI crawlers maxed** (9 new entries → 28 total explicit `robots.txt` signals). Prior: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: **July 21, 2026 (v25.0 — Atlas Service Loop: detect → sell → learn, closed)** — Atlas re-pointed at the lab's own 7 sellable services; weekly cheap-mode capture (~$10 lasts months); `GET /api/atlas/angle` shared intelligence endpoint; ENTER windows → Telegram **ready-to-run sales briefs**; HubSpot deal outcomes (staged/sent/replied/won per service) flow **back into Atlas** so it learns what converts; Atlas data published as AEO blog content on aideazz.xyz. See [§ July 21 update](#-update--july-21-2026--atlas-service-loop-detect--sell--learn-closed). Prior: **July 4, 2026 (v24.0 — consulting pay: Análisis técnico web via PagueloFacil)** — **`/pay/analisis-tecnico`** on [aideazz.xyz](https://aideazz.xyz/pay/analisis-tecnico); CTO AIPA **`POST /api/service-checkout`** + **`SVC:*`** PF webhook hook (`web_audit_prelim` **$200**, `web_audit_blueprint` **$500** after prelim); discovery-first → pay → deliver (Global Marine model). Docs: `docs/clients/SERVICE_PAYMENTS.md`. Deploy: `scripts/oracle-deploy-service-payments.sh`. Prior: **July 4, 2026 (v23.0 — `/go/wa` WhatsApp click adapter live)** — **`scripts/sync-atlas-ga4.mjs`** nightly cron on Oracle (`06:15 UTC`); posts `ga4_sessions` / `ga4_key_events` for `utm_campaign=atlas_*` → **`atlas_performance_events`**; first live row verified Jul 2 2026 (`ai_augmented_product_building`, 1 session). Atlas public UI banner polished (`atlas-shifted` `eb9e99c` — no Oracle ops text for clients). Prior: June 29, 2026 (v21.0 — **Atlas ↔ AIdeazz performance bridge** — closed-loop outcome tracking without rewriting Atlas capture/classify/brief/ship; **UTM tags + `concept_id`** on every Atlas export; Oracle **`atlas_performance_events`** ledger; **`POST /cto/api/performance-event`** + **`GET /cto/api/atlas-performance`** on CTO AIPA; Atlas UI reads aggregated ROAS/CPA/leads when hub is wired; **`scripts/sync-atlas-business-leads.mjs`** ingests `business_leads` where `utm_campaign LIKE 'atlas_%'`). Prior: May 18, 2026 (v20.0 — **Blog 404 resolved** (`/blog/post/:slug` Oracle endpoint + `BlogPost.tsx` parallel-fetch Dev.to + backend fallback); **fire-and-forget `/hashnode/daily-run`** (202 immediate, Opus runs background — no more nginx 60s timeout); **i18n Hashnode → Dev.to** (EN + ES footer/link strings); **topic dedup** (`getPublishedTopicIndices()` + `excludedIndices` in `pickTopicWithGscGap` — no more date-suffix titles); **dynamic sitemap** (`pushSitemapToGithub()` commits fresh `sitemap.xml` to `ElenaRevicheva/aideazz` after every publish; 4everland auto-deploys); **AI crawlers maxed** (9 new entries → 28 total explicit `robots.txt` signals). Prior: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Business owners & clients** — start with [What is AIdeazz AI Lab](#what-is-aideazz-ai-lab--right-now-july-4-2026) below, then the public page [aideazz.xyz/sop-ai-ops.html](https://aideazz.xyz/sop-ai-ops.html). **Vibe coders & builders** — same section + [Document map](#document-map--phases-1-through-6-read-in-this-order). **Engineers** — full doc + [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md).
 
 ---
 
-## What is AIdeazz AI Lab — right now (July 4, 2026)
+## What is AIdeazz AI Lab — right now (July 21, 2026)
 
 AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing engine** that connects real business signals end-to-end. It is **not a prototype** — it runs 24/7 on Oracle Cloud, with a public face at [aideazz.xyz](https://aideazz.xyz) and a live strategy radar at [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html).
+
+**As of July 21 the engine is a closed sales loop:** Atlas watches the live ad market for the lab's **own seven sellable services** (WhatsApp agents, AI automation, GEO/AEO visibility, AI video, AI product building, AI marketing, fractional CTO). When a market window opens, a **ready-to-run sales brief lands in Telegram**. Every outreach outcome in HubSpot (sent → replied → won, per service) flows **back into Atlas**, so next week's briefs are informed by what actually converted — and each weekly snapshot can be published as AEO content that raises the lab's own AI-search visibility.
 
 ### Lab stack — what each piece does
 
@@ -16,33 +18,33 @@ AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing eng
 | --- | --- | --- |
 | Public face | Portfolio, blog, inquiry form | [aideazz.xyz](https://aideazz.xyz) (4everland) |
 | Tech hub | CRM, blog, outreach, performance ledger | CTO AIPA — PM2 `cto-aipa` on Oracle · [Telegram bot](https://t.me/aitcf_aideazz_bot) |
-| Marketing radar | Daily ad-market intelligence + campaign export · **bilingual EN/ES UI (Jul 9)** | [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) — PM2 `whitespace` |
+| Marketing radar | **Weekly** ad-market intelligence on the lab's **7 service lanes** (Mondays 9 AM Panama, cheap-mode ≈ pennies/week) + campaign export · shared angle API (`/api/atlas/angle`) · **bilingual EN/ES UI** | [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html) — PM2 `whitespace` |
 | CRM spine | All agents → HubSpot | `POST /api/crm-event` (hub on CTO AIPA) |
 | Measure layer | GA4 sessions, form leads, WhatsApp clicks, deals by campaign | Oracle `atlas_performance_events` · `GET /cto/go/wa` · `POST /api/performance-event` |
 | Sibling products | EspaLuz, VJH, Algom, Atuona, Sprinter, etc. | 11 agents on Oracle (+ Sprinter on AWS) — [full list](./ORACLE_ALL_PRODUCTS_RESILIENCE.md) |
 
-**Marketing engine flow:**
+**Marketing engine flow (closed loop since July 21):**
 
-`SEO/GEO` → `daily Dev.to blog` → `UTM inquiry form` → `HubSpot` → `lead triage` → `(optional) outreach` → `Atlas detect → create → measure` → `detected windows → HubSpot ([ATLAS-RADAR], Jul 9)`
+`SEO/GEO` → `daily Dev.to blog` → `UTM inquiry form` → `HubSpot` → `lead triage` → `Manual Prospect Play + Concierge outreach` → `Atlas weekly detect (7 service lanes)` → `open window → Telegram sales brief` → `Elena sells (WhatsApp/email)` → `HubSpot outcomes (sent/replied/won)` → **`back into Atlas`** → `snapshot → AEO blog content → more inbound`
 
-### Honest July 4 reality
+### Honest July 21 reality
 
 | Status | What |
 | --- | --- |
-| **Loaded** | Discovery, content, CRM ingest (721+ leads / 1,075 deals historically), triage, Atlas radar, performance bridge, GA4 sync, **WhatsApp click tracking (`/go/wa`)** |
-| **Partial** | Outbound (54 sends, 0 replies); form attribution (low inbound volume; **1 real GA4 `atlas_*` session** logged Jul 2) |
-| **Not started** | Phase 6 showcase package; EspaLuz business-inquiry classifier; ads API cron |
+| **Loaded** | Discovery, content, CRM ingest, triage, Atlas radar **on the lab's 7 service lanes**, performance bridge, GA4 sync, WhatsApp click tracking, **angle API + Telegram sales briefs + outcomes feedback (Jul 20-21)** |
+| **Partial** | Conversion: the loop's first honest read is **GEO/AEO outreach ≈ 4% reply rate (24 sends → 1 reply)**; WhatsApp-agent lane too new to judge. The loop now MEASURES this per service — beating 4% is the current game. |
+| **Not started** | Phase 6 showcase package; ads API cron; automated weekly blog from each Atlas snapshot (July 20 post was the manual prototype) |
 
-### Roadmap position (v23)
+### Roadmap position (v25)
 
 | Phase | Name | Status |
 | --- | --- | --- |
 | 1 | Foundation (GEO / SEO / GA4 tag) | Loaded |
-| 2 | Content (Dev.to daily — Hashnode removed May 2026) | Loaded |
-| 3 | Attribution + Atlas measure | GA4 + **WhatsApp clicks live** (Jul 3–4) |
-| 4 | Outbound | Fires, 0 conversion |
+| 2 | Content (Dev.to daily; + Atlas-snapshot AEO posts) | Loaded |
+| 3 | Attribution + Atlas measure | GA4 + WhatsApp clicks + **CRM outcomes loop (Jul 21)** |
+| 4 | Outbound | **Live via Manual Prospect Play + Atlas briefs — measured per service lane** |
 | 5 | Lead triage | Operational |
-| 6 | Showcase package | Not started — highest priority for hiring story |
+| 6 | Showcase package | Not started — highest priority for client story |
 
 ### Atlas performance adapters
 
@@ -59,7 +61,8 @@ AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing eng
 
 **For anyone (browser):**
 
-1. **Atlas radar** — after ~9:15 AM Panama, open [atlas.html](https://webhook.aideazz.xyz/whitespace/atlas.html). Snapshot date should match today; no internal ops warnings for clients.
+1. **Atlas radar** — open [atlas.html](https://webhook.aideazz.xyz/whitespace/atlas.html). **Snapshot refreshes weekly: Mondays ~9:15 AM Panama** (cheap-mode since Jul 19); the snapshot date should show the most recent Monday. No internal ops warnings for clients.
+2. **Angle API (Jul 20)** — `https://webhook.aideazz.xyz/whitespace/api/atlas/angle?vertical=whatsapp_ai_agents` returns the live market angle + real CRM outcomes for that service lane, as JSON.
 2. **Public site** — [aideazz.xyz/blog](https://aideazz.xyz/blog) shows daily posts; inquiry form sends confirmation email.
 3. **Atlas WhatsApp** — Export test → open landing `#espaluz` → click green WhatsApp → refresh concept card → **WhatsApp clicks** increments.
 
@@ -87,6 +90,37 @@ curl -s http://127.0.0.1:8095/healthz | grep performanceHub
 4. Refresh Atlas concept card → `ga4_sessions` + `leads` + **`wa_clicks`** in performance block
 
 **Ops map:** Fleet health, repos, deploy paths → [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md). **Public-friendly version** → [sop-ai-ops.html](https://aideazz.xyz/sop-ai-ops.html).
+
+---
+
+## ✅ UPDATE — July 21, 2026 — Atlas Service Loop: detect → sell → learn, closed
+
+> **In one sentence:** Atlas now works *for the business* — it watches the ad market for the seven services AIdeazz sells, tells Elena the moment a market opens (with a ready-to-run pitch), and learns from every real outcome in the CRM.
+
+### For business owners — what changed and why it matters
+
+| Before (≤ Jul 19) | After (Jul 21) |
+| --- | --- |
+| Atlas tracked demo verticals (solar, auto insurance…) daily; interesting, not monetized | Atlas tracks the **7 services on [aideazz.xyz/portfolio](https://aideazz.xyz/portfolio)** — every insight is directly sellable |
+| Insights sat on a dashboard waiting to be read | Open windows arrive as **Telegram sales briefs**: angle + hook + headline + CTA + evidence link — adapt and send the same day |
+| No idea which pitch angle converts | HubSpot outcomes (staged → sent → replied → won, per service) **feed back into Atlas weekly** — reply-rate per lane on the angle API |
+| Bright Data burned ~$1.80/day and froze when unpaid | **Weekly cheap-mode**: pennies/week; a $10 top-up lasts months. Suspension now alerts loudly instead of failing silently |
+| Atlas intelligence never reached the public site | Each snapshot can become an **AEO/FAQ blog post** ([first one, Jul 20](https://aideazz.xyz/blog/what-the-live-ad-market-says-about-ai-services-july-2026)) — Atlas markets the lab itself |
+
+**First live results (Jul 20 capture):** fresh ads across the service lanes (fractional CTO 21, WhatsApp agents 13, AI marketing 11); 3 open windows detected (AI automation 75/100, AI video 67, AI product building 60) → 3 sales briefs delivered to Telegram; outcomes loop processed 40 real deals and computed the first honest per-lane reply rate (**GEO/AEO: 4%** — the number to beat).
+
+### The four pieces (engineers)
+
+| # | Piece | Where | How it runs |
+| --- | --- | --- | --- |
+| 1 | **Shared angle API** — `GET /api/atlas/angle?vertical=…` or `?industry=<free text>` → state, score, hook/headline/CTA, evidence, **CRM outcomes** | `whitespace` `src/server.ts` (`114057f`, `1ebc1f8`) | read-only; industry text maps to nearest service lane; fallback always pitches an AIdeazz service |
+| 2 | **Snapshot → AEO content** | `aideazz` blog (`3811057`) | manual prototype Jul 20; automate per-snapshot later |
+| 3 | **Window → Telegram sales brief** | `cto-aipa` `scripts/atlas-campaign-alert.cjs` (`9ca455a`) | cron Mon 15:15 UTC (after capture); dedup per vertical+snapshot; threshold `ATLAS_ALERT_SCORE=60` |
+| 4 | **Outcomes feedback** — HubSpot `[CLIENT-MANUAL]`+`[ATLAS-RADAR]` deal stages → per-lane staged/sent/replied/won + reply_rate → `POST /api/atlas/outcomes` (Bearer `ATLAS_OUTCOMES_TOKEN`) | `cto-aipa` `scripts/hs-outcomes-to-atlas.cjs` (`472031c`) + `whitespace` receiver (`c903bc4`) | cron Mon 15:30 UTC; read-only on HubSpot |
+
+**Monday cadence (all UTC):** `14:00` capture+classify+brief (7 lanes, Web Unlocker cheap-mode) → `15:15` sales briefs to Telegram → `15:30` outcomes push. Service lanes = `WHITESPACE_CAPTURE_ONLY` in `whitespace/.env`; restore full Scraping-Browser quality with `WHITESPACE_META_USE_BROWSER=1` when budget allows.
+
+**Try it (browser, 2 minutes):** (1) open the [Atlas board](https://webhook.aideazz.xyz/whitespace/atlas.html) — snapshot = latest Monday; (2) open the [angle API](https://webhook.aideazz.xyz/whitespace/api/atlas/angle?vertical=whatsapp_ai_agents) — JSON with the live angle + outcomes; (3) check Telegram Mondays ~10:15 AM Panama for the sales briefs.
 
 ---
 
