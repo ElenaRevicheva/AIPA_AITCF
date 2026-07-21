@@ -85,7 +85,7 @@ International couples, high ticket, WhatsApp coordination, huge **AI-video** ups
 | Prospect | Domain | Notes |
 |---|---|---|
 | American Trade Hotel | americantradehotel.com | Casco Viejo weddings/events |
-| PRP Events | prpevents.com | Destination-wedding planner |
+| PRP Events | prpevents.com | Destination-wedding planner — ✅ STAGED 2026-07-21 (86/A; deal 62881755679; Atlas automation angle) |
 | Destination Dream Weddings | destinationdreamweddings.com | Full-service Panama weddings |
 
 ### B2. Wellness / med-spa / fitness retreats
