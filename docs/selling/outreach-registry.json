@@ -221,5 +221,13 @@
     "emailDraft": "docs/selling/drafts/delvalle-delvalle-email.txt",
     "dealId": "62870120358",
     "score": 75
+  },
+  "ipanema-residences": {
+    "phone": "50767396666",
+    "draft": "docs/selling/drafts/ipanema-residences.txt",
+    "company": "Ipanema Residences",
+    "email": "ventas@ipanemaresidences.com",
+    "dealId": "62950148475",
+    "score": 92
   }
 }
