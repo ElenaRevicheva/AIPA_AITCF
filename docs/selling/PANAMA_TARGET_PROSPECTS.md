@@ -64,18 +64,18 @@ Patients research "best dental implants Panama" in ChatGPT, then book over Whats
 
 | Prospect | Domain | Notes |
 |---|---|---|
-| Panama Dental Clinic | panamadentalclinic.com | Dental-vacation packages; David/Chiriquí — ✅ STAGED 2026-07-20 (deal 62865516872; WA +507 6611-1939) — 📧 campaign + +4d follow-up |
-| Panamá Sonríe | panamasonrie.com | Smile design / prosthetics; Via Israel + Albrook; info@panamasonrie.com |
-| Clínica Arango Orillac | arango-orillac.com | Since 1935, 50+ pros, English guaranteed; WhatsApp on site |
-| Centro Odontológico Paitilla | centroodontologicopaitilla.com | Paitilla Medical Center since 1990; high review volume |
+| Panama Dental Clinic · SENT | panamadentalclinic.com | Dental-vacation packages; David/Chiriquí — ✅ STAGED 2026-07-20 (deal 62865516872; WA +507 6611-1939) — 📧 campaign + +4d follow-up |
+| Panamá Sonríe · SENT | panamasonrie.com | Smile design / prosthetics; Via Israel + Albrook; info@panamasonrie.com |
+| Clínica Arango Orillac · SENT | arango-orillac.com | Since 1935, 50+ pros, English guaranteed; WhatsApp on site |
+| Centro Odontológico Paitilla · SENT | centroodontologicopaitilla.com | Paitilla Medical Center since 1990; high review volume |
 | Almanza Carrizo / Grupo Dental Nacional | grupodentalnacional.com | 25+ yrs; Centro Médico Nacional + La Chorrera; WA booking |
 | MaDenta / Gianna Dentist | giannadentist.com | Cosmetic / implants for intl + expats; online eval before travel |
 | Sonrisas Meraki | (mine via smilejet / IG) | Bilingual dental tourism; confirm own domain before staging |
-| Panama Aesthetics | panamaaesthetics.com | Plastic/aesthetic, all-inclusive intl — ✅ STAGED 2026-07-20 (deal 62873560951) — 📧 + +4d follow-up |
-| The Skin Clinic (Dr. Drohan) | theskinclinicpanama.com | Tulane-trained derm; WA +507 6450-9248; Hospital Pacífica Salud |
+| Panama Aesthetics · SENT | panamaaesthetics.com | Plastic/aesthetic, all-inclusive intl — ✅ STAGED 2026-07-20 (deal 62873560951) — 📧 + +4d follow-up |
+| The Skin Clinic (Dr. Drohan) · SENT | theskinclinicpanama.com | Tulane-trained derm; WA +507 6450-9248; Hospital Pacífica Salud |
 | DermoMédica (Dr. Tejada) | dermomedica.com.pa | Clinical derm + cosmiatry + laser; EN site |
-| Panama Fertility | panamafertility.com | 35 yrs, 10k babies, English team — ✅ STAGED 2026-07-19 (deal 62828946074; robots block AI crawlers = strongest hook) |
-| IVI Panama | ivi-fertility.com | Patients from 80+ nationalities; enterprise-scale intl patient ops |
+| Panama Fertility · SENT | panamafertility.com | 35 yrs, 10k babies, English team — ✅ STAGED 2026-07-19 (deal 62828946074; robots block AI crawlers = strongest hook) |
+| IVI Panama · SENT | ivi-fertility.com | Patients from 80+ nationalities; enterprise-scale intl patient ops |
 | Hospital Punta Pacífica | puntapacifica.com | Johns Hopkins Medicine International affiliate — GEO + intake automation |
 | Clínica Hospital San Fernando | hospitalsanfernando.com | First JCI in Panama; intl patient desk candidate |
 
@@ -84,18 +84,18 @@ Expats ask AI "how do I get Panama residency / buy property" — then consult ov
 
 | Prospect | Domain | Notes |
 |---|---|---|
-| DoPanama | dopanama.com | Licensed RE + relocation — ✅ STAGED 2026-07-19 (deal 62821413988; 91/A) — 📧 + +4d follow-up |
-| Relocation Panama | relocationpanama.com | Boutique full-service, Pacific/Coronado |
-| International Relocation Firm | relofirm.com | Law + RE + citizenship, 20 yrs — ✅ STAGED 2026-07-20 (deal 62851992582) — 📧 + +4d follow-up |
-| Panama Expat Service | panamaexpatservice.com | Relocation tours, RE, immigration, pet relo |
-| International Relocation Partner | igopanama.com | Multi-office (PTY, Miami, Madrid, CR) |
-| Kraemer & Kraemer | kraemerlaw.com | Immigration/residency — ✅ STAGED 2026-07-20 (deal 62872179381) — 📧 + +4d follow-up |
-| Immigration Visa 24/7 | immigrationvisa247.com | EN/NL/FR/ES; pensionado / friendly-nations — drafts exist |
-| LAC Legal | lacgrp.com | Residency/visas EN+ES — drafts exist |
-| NDM Law Firm | ndm.com.pa | Residency specialists — drafts exist |
-| Panama Legal Center | panamalegalcenter.com | 15 yrs, friendly-nations/pensionado — drafts exist |
-| Delvalle & Delvalle | delvallepanama.com | Immigration — drafts exist |
-| Gomitom | gomitom.com | Immigration + real estate law |
+| DoPanama · SENT | dopanama.com | Licensed RE + relocation — ✅ STAGED 2026-07-19 (deal 62821413988; 91/A) — 📧 + +4d follow-up |
+| Relocation Panama · SENT | relocationpanama.com | Boutique full-service, Pacific/Coronado |
+| International Relocation Firm · SENT | relofirm.com | Law + RE + citizenship, 20 yrs — ✅ STAGED 2026-07-20 (deal 62851992582) — 📧 + +4d follow-up |
+| Panama Expat Service · SENT | panamaexpatservice.com | Relocation tours, RE, immigration, pet relo |
+| International Relocation Partner · SENT | igopanama.com | Multi-office (PTY, Miami, Madrid, CR) |
+| Kraemer & Kraemer · SENT | kraemerlaw.com | Immigration/residency — ✅ STAGED 2026-07-20 (deal 62872179381) — 📧 + +4d follow-up |
+| Immigration Visa 24/7 · SENT | immigrationvisa247.com | EN/NL/FR/ES; pensionado / friendly-nations — drafts exist |
+| LAC Legal · SENT | lacgrp.com | Residency/visas EN+ES — drafts exist |
+| NDM Law Firm · SENT | ndm.com.pa | Residency specialists — drafts exist |
+| Panama Legal Center · SENT | panamalegalcenter.com | 15 yrs, friendly-nations/pensionado — drafts exist |
+| Delvalle & Delvalle · SENT | delvallepanama.com | Immigration — drafts exist |
+| Gomitom · SENT | gomitom.com | Immigration + real estate law |
 | Encuentra24 Panama (premium RE brokers via listings) | encuentra24.com | Use to mine bilingual brokers with weak sites — don't stage the portal itself |
 | Panama Homes / similar expat brokers | (mine) | Prefer brokers with own `.com` + WA |
 
@@ -104,25 +104,25 @@ International travelers plan with AI and book on WhatsApp. **Yacht rental alread
 
 | Prospect | Domain | Notes |
 |---|---|---|
-| Charter in San Blas | charterinsanblas.com | All-inclusive, 5★ |
+| Charter in San Blas · SENT | charterinsanblas.com | All-inclusive, 5★ |
 | San Blas Tour | sanblastour.com | Sailboat/catamaran fleet |
-| Ampa Tours | ampatours.com | San Blas + Pacific — ✅ STAGED 2026-07-20 (deal 62872179385) — 📧 + +4d follow-up |
-| San Blas on Sailboats | sanblasonsailboats.com | Vetted boat network |
-| We Sail San Blas | wesailsanblas.com | Catamaran, all meals |
-| SailBoat Trips | sailboattrips.com | Charter w/ crew |
-| San Blas Sailing | sanblassailing.com | Crewed yacht charters |
-| San Blas Dreams | sanblasdreams.com | ATP operator — ✅ STAGED 2026-07-20 (deal 62868082222; WA +507 6473-5905) — 📧 + +4d follow-up |
-| Sailing Charter Panama | sailingcharterpanama.com | All-inclusive catamaran |
-| YC Panama Yachts | ycyachts.com | Fleet charter — ✅ STAGED 2026-07-20 (deal 62864888204; 94/A+; SENT) |
-| Flamenco Marina / Fuerte Amador | flamencomarina.com | Resort + marina — ✅ STAGED 2026-07-20 (deal 62857562269; 68/C GEO 31) |
-| Centro Marino Panamá | centromarino.com | Mercury / boats — ✅ STAGED 2026-07-20 (deal 62863032403) |
-| Pesqueros Sport | pesquerosport.com | ✅ STAGED 2026-07-20 (deal 62856793161; WA-only until email found) |
-| Flamenco Drystack | flamencodrystackpanama.com | ✅ STAGED 2026-07-20 (deal 62860098823) — 📧 + +4d follow-up |
-| Casa Cayuco | casacayuco.com | Eco-adventure lodge, Bastimentos |
-| Tranquilo Bay | tranquilobay.com | Eco lodge — ✅ STAGED 2026-07-20 (deal 62871509035) — 📧 + +4d follow-up |
-| Eclypse de Mar | eclypsedemar.com | Overwater bungalows — drafts exist |
+| Ampa Tours · SENT | ampatours.com | San Blas + Pacific — ✅ STAGED 2026-07-20 (deal 62872179385) — 📧 + +4d follow-up |
+| San Blas on Sailboats · SENT | sanblasonsailboats.com | Vetted boat network |
+| We Sail San Blas · SENT | wesailsanblas.com | Catamaran, all meals |
+| SailBoat Trips · SENT | sailboattrips.com | Charter w/ crew |
+| San Blas Sailing · SENT | sanblassailing.com | Crewed yacht charters |
+| San Blas Dreams · SENT | sanblasdreams.com | ATP operator — ✅ STAGED 2026-07-20 (deal 62868082222; WA +507 6473-5905) — 📧 + +4d follow-up |
+| Sailing Charter Panama · SENT | sailingcharterpanama.com | All-inclusive catamaran |
+| YC Panama Yachts · SENT | ycyachts.com | Fleet charter — ✅ STAGED 2026-07-20 (deal 62864888204; 94/A+; SENT) |
+| Flamenco Marina / Fuerte Amador · SENT | flamencomarina.com | Resort + marina — ✅ STAGED 2026-07-20 (deal 62857562269; 68/C GEO 31) |
+| Centro Marino Panamá · SENT | centromarino.com | Mercury / boats — ✅ STAGED 2026-07-20 (deal 62863032403) |
+| Pesqueros Sport · SENT | pesquerosport.com | ✅ STAGED 2026-07-20 (deal 62856793161; WA-only until email found) |
+| Flamenco Drystack · SENT | flamencodrystackpanama.com | ✅ STAGED 2026-07-20 (deal 62860098823) — 📧 + +4d follow-up |
+| Casa Cayuco · SENT | casacayuco.com | Eco-adventure lodge, Bastimentos |
+| Tranquilo Bay · SENT | tranquilobay.com | Eco lodge — ✅ STAGED 2026-07-20 (deal 62871509035) — 📧 + +4d follow-up |
+| Eclypse de Mar · SENT | eclypsedemar.com | Overwater bungalows — drafts exist |
 | Isla Palenque | islapalenque.com | Luxury private-island resort, Bocas — high ticket + intl |
-| Red Frog Beach Island Resort | redfrogbeach.com | Bocas real estate + resort — GEO + WA |
+| Red Frog Beach Island Resort · SENT | redfrogbeach.com | Bocas real estate + resort — GEO + WA |
 | Bristol Panama / similar luxury hotels | thebristol.com | City luxury; events + intl guests |
 
 ---
@@ -135,9 +135,9 @@ International couples, high ticket, WhatsApp coordination, huge **AI-video** ups
 | Prospect | Domain | Notes |
 |---|---|---|
 | American Trade Hotel | americantradehotel.com | Casco Viejo weddings/events — ⏸ BLOCKED 2026-07-20 (visibility audit URL unfetchable) — retry later |
-| PRP Events | prpevents.com | Destination-wedding planner — ✅ STAGED 2026-07-21 (86/A; deal 62881755679; Atlas automation angle) |
-| Destination Dream Weddings | destinationdreamweddings.com | Full-service Panama weddings |
-| Valle Escondido Resort (Boquete) | valleescondidoboquete.com | Weddings + events; eventos@ + WA on site |
+| PRP Events · SENT | prpevents.com | Destination-wedding planner — ✅ STAGED 2026-07-21 (86/A; deal 62881755679; Atlas automation angle) |
+| Destination Dream Weddings · SENT | destinationdreamweddings.com | Full-service Panama weddings |
+| Valle Escondido Resort (Boquete) · SENT | valleescondidoboquete.com | Weddings + events; eventos@ + WA on site |
 | Sortis Hotel / Sortis Spa (events) | sortishotel.com | City events + spa — mine WA/email |
 | Gamboa Rainforest Reserve (events) | gamboaresort.com | Nature venue; intl groups |
 
@@ -146,7 +146,7 @@ Booking + AI video + AI visibility for retreat seekers (Boquete / Pacific / City
 
 | Prospect | Domain | Notes |
 |---|---|---|
-| The Haven Wellness Resort & Spa | havenboquete.com | Boquete hotel + spa + yoga studio; info@havenboquete.com |
+| The Haven Wellness Resort & Spa · SENT | havenboquete.com | Boquete hotel + spa + yoga studio; info@havenboquete.com |
 | STUDIO at The Haven | studiohavenboquete.com | Yoga/exercise; WA +507 6426-0843 |
 | Finca Lérida | fincalerida.com | Historic coffee estate hotel, Boquete |
 | Los Quetzales Ecolodge | losquetzales.com | Highland ecolodge / nature — intl hikers |
@@ -157,7 +157,7 @@ Expat families search AI for schooling before moving. Lead = **AI Visibility** +
 
 | Prospect | Domain | Notes |
 |---|---|---|
-| International School of Panama (ISP) | isp.edu.pa | NEASC / IB; 40+ yrs; admissions desk |
+| International School of Panama (ISP) · SENT | isp.edu.pa | NEASC / IB; 40+ yrs; admissions desk |
 | Boston School International | bostonschool.edu.pa | Costa del Este; tour + admissions form |
 | The Casco School | thecascoschool.com | British bilingual; Albrook + CDE; admissions@thecascoschool.com |
 | Balboa Academy | balboaacademy.edu | US-style intl; mine admissions contact |
@@ -171,8 +171,8 @@ Validated shape: **Eurostone**, **AIRCO / SINOTRUK**, **Nomad Constructions**. Q
 
 | Prospect | Domain | Notes |
 |---|---|---|
-| Nomad Constructions Corp | nomadcc.com | Pedasí/Azuero — ✅ STAGED 2026-07-19 (deal 62832583063; 90/A) — 📧 + +4d follow-up |
-| Prestige Storage | prestigestorage.com.pa | ✅ STAGED 2026-07-20 (deal 62867929503) — 📧 + +4d follow-up |
+| Nomad Constructions Corp · SENT | nomadcc.com | Pedasí/Azuero — ✅ STAGED 2026-07-19 (deal 62832583063; 90/A) — 📧 + +4d follow-up |
+| Prestige Storage · SENT | prestigestorage.com.pa | ✅ STAGED 2026-07-20 (deal 62867929503) — 📧 + +4d follow-up |
 | Construction & home improvement | (mine) | Kitchens, pools, solar, windows/aluminum, cladding/stone, AC/HVAC — prefer `.com.pa` + WA |
 | Auto & heavy equipment | (mine) | Dealers, car rental; AIRCO pattern validated |
 | Logistics / Colón Free Zone / import-export | (mine) | B2B lead capture + automation |
@@ -200,7 +200,7 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 
 | Prospect | Domain | Country | Notes |
 |---|---|---|---|
-| Dr. Daniela Correa | danielacorreacirujana.com | CO | Medellín plastic surgery; EN + WhatsApp intl flow |
+| Dr. Daniela Correa · SENT | danielacorreacirujana.com | CO | Medellín plastic surgery; EN + WhatsApp intl flow |
 | Dr. Jorge Rodríguez | drjorgerodriguez.com | CO | Intl patients Medellín; bilingual team |
 | Dr. Luis Guillermo Tobón | luisguillermotobon.com | CO | 30+ yrs aesthetic surgery Medellín; EN |
 | Salud sin Fronteras | saludsinfronteras.com | CO | Medical tourism facilitator Medellín/Bogotá/Cartagena |
@@ -213,9 +213,9 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 
 | Prospect | Domain | Country | Notes |
 |---|---|---|---|
-| Cancun Dental Specialists | cancundentalspecialists.com | MX | Hotel Zone; 15k+ US/CA patients claimed; English dentists |
+| Cancun Dental Specialists · SENT | cancundentalspecialists.com | MX | Hotel Zone; 15k+ US/CA patients claimed; English dentists |
 | SOTA Dental | sotadental.com | MX | Cancún / Tijuana / Los Algodones / PdC — multi-city dental tourism |
-| Smile Tijuana | smiletijuana.com | MX | Border dental; bilingual; WA +52 664 293 0717 |
+| Smile Tijuana · SENT | smiletijuana.com | MX | Border dental; bilingual; WA +52 664 293 0717 |
 | Dental Connect | dentalconnect.com.mx | MX | Tijuana border pickup + bilingual |
 | Tijuana Dental Center | tijuanadentalcenter.com | MX | Zona Río; US patients; high review volume |
 
@@ -226,35 +226,35 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 Highest expected pain × highest ticket. **Skip already-staged.** Run Manual Prospect Play top-down:
 
 ### Panama — next unstaged Tier A/B
-1. arango-orillac.com — A1 dental tourism, English guaranteed, WhatsApp on site
-2. theskinclinicpanama.com — A1 aesthetics/derm, WA +507 6450-9248
+1. ~~arango-orillac.com~~ — · SENT (HubSpot)
+2. ~~theskinclinicpanama.com~~ — · SENT (HubSpot)
 3. dermomedica.com.pa — A1 derm/cosmiatry EN
-4. centroodontologicopaitilla.com — A1 Paitilla dental
+4. ~~centroodontologicopaitilla.com~~ — · SENT (HubSpot)
 5. grupodentalnacional.com — A1 Almanza Carrizo multi-branch
 6. giannadentist.com — A1 cosmetic/implants intl
-7. panamasonrie.com — A1 Panamá Sonríe
-8. ivi-fertility.com — A1 fertility intl (enterprise)
+7. ~~panamasonrie.com~~ — · SENT (HubSpot)
+8. ~~ivi-fertility.com~~ — · SENT (HubSpot)
 9. puntapacifica.com — A1 Hospital Punta Pacífica
-10. relocationpanama.com — A2 boutique relocation
-11. panamaexpatservice.com — A2 expat full-service
-12. igopanama.com — A2 multi-office relocation
-13. gomitom.com — A2 immigration + RE law
-14. charterinsanblas.com — A3 charter
+10. ~~relocationpanama.com~~ — · SENT (HubSpot)
+11. ~~panamaexpatservice.com~~ — · SENT (HubSpot)
+12. ~~igopanama.com~~ — · SENT (HubSpot)
+13. ~~gomitom.com~~ — · SENT (HubSpot)
+14. ~~charterinsanblas.com~~ — · SENT (HubSpot)
 15. sanblastour.com — A3 fleet
 16. islapalenque.com — A3 luxury island
-17. havenboquete.com — B2 wellness
-18. valleescondidoboquete.com — B1 weddings Boquete
-19. isp.edu.pa — B3 international school admissions
+17. ~~havenboquete.com~~ — · SENT (HubSpot)
+18. ~~valleescondidoboquete.com~~ — · SENT (HubSpot)
+19. ~~isp.edu.pa~~ — · SENT (HubSpot)
 20. thecascoschool.com — B3 British bilingual admissions
 
 ### LATAM expansion (after Panama pressure eases)
 21. clinicabiblica.com — D1 CR hospital
 22. hospitalcima.com — D1 CR medical tourism
 23. goodnessdental.com — D1 CR dental tourism
-24. danielacorreacirujana.com — D2 Medellín aesthetics + WA
+24. ~~danielacorreacirujana.com~~ — · SENT (HubSpot)
 25. colombialuxurygroup.com — D2 Cartagena yachts + WA
-26. cancundentalspecialists.com — D3 Cancún dental tourism
-27. smiletijuana.com — D3 border dental + WA
+26. ~~cancundentalspecialists.com~~ — · SENT (HubSpot)
+27. ~~smiletijuana.com~~ — · SENT (HubSpot)
 
 ### Already staged / blocked (do not re-create — work replies + follow-ups)
 See lists above marked ✅ STAGED / ⏸ BLOCKED / SENT. Campaign mechanism: **§4b** in `MANUAL_PROSPECT_PLAY.md`. Every emailed candidate gets a **+4 day soft follow-up** (iron rule). Proof: https://resend.com/emails
