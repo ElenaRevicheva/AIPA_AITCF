@@ -165,7 +165,100 @@ async function hsPatch<T>(path: string, body: unknown): Promise<T | null> {
   return res.json() as Promise<T>;
 }
 
+async function hsDelete(path: string): Promise<boolean> {
+  const key = HS_KEY();
+  if (!key) return false;
+  const res = await fetch(`${HS_BASE}${path}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${key}` },
+  });
+  if (!res.ok && res.status !== 404) {
+    console.error(`[HubSpot] DELETE ${path} → ${res.status}: ${await res.text()}`);
+    return false;
+  }
+  return true;
+}
+
 // ─── Contacts ─────────────────────────────────────────────────────────────────
+
+/** Distinctive stamp for portfolio-form contacts — Make filter: Equals portfolio_inquiry. */
+export const AIDEAZZ_LEAD_KIND_PROP = 'aideazz_lead_kind';
+export const PORTFOLIO_INQUIRY_KIND = 'portfolio_inquiry';
+/** Always-writable stamp (no custom-property scope needed). Make filter: message Contains this. */
+export const AIDEAZZ_FORM_MESSAGE_STAMP = '[AIDEAZZ-FORM]';
+
+const DEFAULT_CONCIERGE_TEST_EMAILS = [
+  'adamvelena@gmail.com',
+  'marinakulaginabowen@gmail.com',
+  'kiravelerevich@gmail.com',
+];
+
+/** Allowlisted test inboxes that may force-recreate the HubSpot contact so Make's Contacts/Created fires. */
+export function isConciergeTestEmail(email?: string | null): boolean {
+  if (!email) return false;
+  const raw =
+    process.env.CONCIERGE_TEST_EMAILS?.trim() ||
+    DEFAULT_CONCIERGE_TEST_EMAILS.join(',');
+  const allow = new Set(
+    raw.split(',').map((s) => s.trim().toLowerCase()).filter(Boolean),
+  );
+  return allow.has(email.trim().toLowerCase());
+}
+
+/** Prefix inquiry text so Make can filter form leads without a custom HubSpot property. */
+export function stampPortfolioInquiryMessage(message?: string | null): string | undefined {
+  if (!message?.trim()) return `${AIDEAZZ_FORM_MESSAGE_STAMP}`;
+  const trimmed = message.trim();
+  if (trimmed.startsWith(AIDEAZZ_FORM_MESSAGE_STAMP)) return trimmed.slice(0, 5000);
+  return `${AIDEAZZ_FORM_MESSAGE_STAMP} ${trimmed}`.slice(0, 5000);
+}
+
+export function stripPortfolioInquiryStamp(message?: string | null): string {
+  if (!message) return '';
+  return message.replace(/^\[AIDEAZZ-FORM\]\s*/i, '').trim();
+}
+
+let leadKindPropReady: Promise<boolean> | null = null;
+
+/**
+ * Ensure custom contact property aideazz_lead_kind exists (idempotent).
+ * Private app often lacks `crm.schemas.contacts.write` — then returns false and
+ * callers rely on the [AIDEAZZ-FORM] message stamp instead (Make can filter either).
+ */
+export function ensureAideazzLeadKindProperty(): Promise<boolean> {
+  if (!leadKindPropReady) {
+    leadKindPropReady = (async () => {
+      const key = HS_KEY();
+      if (!key) return false;
+      const get = await fetch(
+        `${HS_BASE}/crm/v3/properties/contacts/${AIDEAZZ_LEAD_KIND_PROP}`,
+        { headers: { Authorization: `Bearer ${key}` } },
+      );
+      if (get.ok) return true;
+      const create = await fetch(`${HS_BASE}/crm/v3/properties/contacts`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: AIDEAZZ_LEAD_KIND_PROP,
+          label: 'AIdeazz Lead Kind',
+          type: 'string',
+          fieldType: 'text',
+          groupName: 'contactinformation',
+          description:
+            'portfolio_inquiry = aideazz.xyz contact form. Make Lead Concierge filters on this.',
+        }),
+      });
+      if (create.ok || create.status === 409) return true;
+      // 403 = missing schemas scope — Elena can create the property once in HubSpot UI.
+      console.warn(
+        `[HubSpot] ${AIDEAZZ_LEAD_KIND_PROP} unavailable (${create.status}) — Make filter on message Contains ${AIDEAZZ_FORM_MESSAGE_STAMP} instead`,
+      );
+      leadKindPropReady = Promise.resolve(false);
+      return false;
+    })();
+  }
+  return leadKindPropReady;
+}
 
 /** Search for an existing contact by email. Returns HubSpot contact ID or null. */
 export async function findContactByEmail(email: string): Promise<string | null> {
@@ -181,17 +274,19 @@ export async function findContactByEmail(email: string): Promise<string | null> 
   return data?.results?.[0]?.id ?? null;
 }
 
-/**
- * Contacts created in the last N minutes. Lead Concierge uses this to resolve
- * the reply recipient when Make only forwards the Fable 5 draft text.
- */
-export async function findRecentContacts(sinceMinutes: number): Promise<Array<{
+export type ConciergeContactHit = {
   id: string;
   email: string;
   firstname: string;
   lastname: string;
   message: string;
-}>> {
+};
+
+/**
+ * Contacts created in the last N minutes. Lead Concierge uses this to resolve
+ * the reply recipient when Make only forwards the Fable 5 draft text.
+ */
+export async function findRecentContacts(sinceMinutes: number): Promise<ConciergeContactHit[]> {
   const since = Date.now() - sinceMinutes * 60_000;
   // Found July 16 2026: HubSpot's own account-level CalendarSync / OnboardingDataSync
   // (auto-imports every person you've ever emailed/met, triggered by connecting Gmail/
@@ -224,6 +319,97 @@ export async function findRecentContacts(sinceMinutes: number): Promise<Array<{
   }));
 }
 
+/**
+ * Portfolio-form recipients for Lead Concierge — includes REUSED contacts.
+ *
+ * Make watches Contacts/Created, so a re-test with the same email only creates a new
+ * deal on the old contact. findRecentContacts() misses those; this looks at:
+ *   1) contacts stamped aideazz_lead_kind=portfolio_inquiry and recently modified
+ *   2) contacts associated to recently created [CLIENT-CTO-INQUIRY] deals
+ */
+export async function findRecentInquiryContacts(sinceMinutes: number): Promise<ConciergeContactHit[]> {
+  const since = Date.now() - sinceMinutes * 60_000;
+  const byId = new Map<string, ConciergeContactHit>();
+
+  const mapHit = (r: { id: string; properties?: Record<string, string | null> }): ConciergeContactHit => ({
+    id: r.id,
+    email: r.properties?.email ?? '',
+    firstname: r.properties?.firstname ?? '',
+    lastname: r.properties?.lastname ?? '',
+    message: stripPortfolioInquiryStamp(r.properties?.message ?? ''),
+  });
+
+  // Path A: custom property (only if Elena created it in HubSpot UI / schemas scope)
+  const propOk = await ensureAideazzLeadKindProperty();
+  if (propOk) {
+    const stamped = await hsPost<{ results: Array<{ id: string; properties: Record<string, string | null> }> }>(
+      '/crm/v3/objects/contacts/search',
+      {
+        filterGroups: [{
+          filters: [
+            { propertyName: AIDEAZZ_LEAD_KIND_PROP, operator: 'EQ', value: PORTFOLIO_INQUIRY_KIND },
+            { propertyName: 'lastmodifieddate', operator: 'GTE', value: String(since) },
+          ],
+        }],
+        properties: ['email', 'firstname', 'lastname', 'message'],
+        sorts: [{ propertyName: 'lastmodifieddate', direction: 'DESCENDING' }],
+        limit: 10,
+      },
+    );
+    for (const r of stamped?.results ?? []) byId.set(r.id, mapHit(r));
+  }
+
+  // Path B: message stamp (always works — no custom property required)
+  const msgStamped = await hsPost<{ results: Array<{ id: string; properties: Record<string, string | null> }> }>(
+    '/crm/v3/objects/contacts/search',
+    {
+      filterGroups: [{
+        filters: [
+          { propertyName: 'message', operator: 'CONTAINS_TOKEN', value: 'AIDEAZZ-FORM' },
+          { propertyName: 'lastmodifieddate', operator: 'GTE', value: String(since) },
+        ],
+      }],
+      properties: ['email', 'firstname', 'lastname', 'message'],
+      sorts: [{ propertyName: 'lastmodifieddate', direction: 'DESCENDING' }],
+      limit: 10,
+    },
+  );
+  for (const r of msgStamped?.results ?? []) {
+    if (!byId.has(r.id)) byId.set(r.id, mapHit(r));
+  }
+
+  const deals = await hsPost<{ results: Array<{ id: string }> }>(
+    '/crm/v3/objects/deals/search',
+    {
+      filterGroups: [{
+        filters: [
+          { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: 'CLIENT-CTO-INQUIRY' },
+          { propertyName: 'createdate', operator: 'GTE', value: String(since) },
+        ],
+      }],
+      properties: ['dealname'],
+      sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
+      limit: 10,
+    },
+  );
+  for (const deal of deals?.results ?? []) {
+    const assoc = await hsGet<{ results?: Array<{ toObjectId?: string; id?: string }> }>(
+      `/crm/v4/objects/deals/${deal.id}/associations/contacts`,
+    );
+    for (const row of assoc?.results ?? []) {
+      const cid = row.toObjectId || row.id;
+      if (!cid || byId.has(cid)) continue;
+      const c = await hsGet<{ id: string; properties?: Record<string, string | null> }>(
+        `/crm/v3/objects/contacts/${cid}?properties=email,firstname,lastname,message`,
+      );
+      if (!c?.id) continue;
+      byId.set(c.id, mapHit(c));
+    }
+  }
+
+  return [...byId.values()];
+}
+
 /** Create or update a contact. Returns HubSpot contact ID. */
 export async function upsertContact(input: {
   email?: string | undefined;
@@ -235,11 +421,35 @@ export async function upsertContact(input: {
   notes?: string | undefined;
   /** Inquiry text → contact `message` property (Make Lead Concierge reads it). */
   message?: string | undefined;
+  /** When set, stamps aideazz_lead_kind so Make can filter form leads vs radar junk. */
+  leadKind?: string | undefined;
+  /**
+   * Delete+recreate when email already exists (Make Contacts/Created only fires on create).
+   * Used for CONCIERGE_TEST_EMAILS re-tests — do not use for real buyer re-inquiries.
+   */
+  forceRecreate?: boolean | undefined;
 }): Promise<string | null> {
+  const propOk = input.leadKind ? await ensureAideazzLeadKindProperty() : false;
+  const kindProps =
+    input.leadKind && propOk ? { [AIDEAZZ_LEAD_KIND_PROP]: input.leadKind } : {};
+  const messageValue =
+    input.leadKind && input.message !== undefined
+      ? stampPortfolioInquiryMessage(input.message)
+      : input.message
+        ? input.message.slice(0, 5000)
+        : input.leadKind
+          ? stampPortfolioInquiryMessage('')
+          : undefined;
+
   // Try to find existing by email first
   if (input.email) {
     const existingId = await findContactByEmail(input.email);
-    if (existingId) {
+    if (existingId && input.forceRecreate) {
+      const ok = await hsDelete(`/crm/v3/objects/contacts/${existingId}`);
+      console.log(
+        `[HubSpot] ${ok ? 'Deleted' : 'Failed to delete'} contact ${existingId} for concierge re-test (${input.email})`,
+      );
+    } else if (existingId) {
       // Update existing
       // Never send `lead_source` — not in this HubSpot portal schema (PATCH 400).
       // Source lives on the deal name prefix + contact note instead.
@@ -248,7 +458,8 @@ export async function upsertContact(input: {
           ...(input.company    ? { company: input.company }          : {}),
           ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
           ...(input.source     ? { hs_lead_status: 'NEW' }           : {}),
-          ...(input.message    ? { message: input.message.slice(0, 5000) } : {}),
+          ...(messageValue !== undefined ? { message: messageValue } : {}),
+          ...kindProps,
         },
       });
       console.log(`[HubSpot] Updated contact ${existingId} (${input.email})`);
@@ -271,7 +482,8 @@ export async function upsertContact(input: {
         ...(input.company   ? { company: input.company }           : {}),
         ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
         ...(input.source    ? { hs_lead_status: 'NEW' } : {}),
-        ...(input.message   ? { message: input.message.slice(0, 5000) } : {}),
+        ...(messageValue !== undefined ? { message: messageValue } : {}),
+        ...kindProps,
       },
     },
   );
@@ -672,6 +884,11 @@ export interface LeadForHubSpot {
   /** Pre-written outreach draft parked on the deal for review→edit→send. */
   draftSubject?: string | undefined;
   draftBody?: string | undefined;
+  /**
+   * When true, delete+recreate the HubSpot contact if the email already exists
+   * so Make's Contacts/Created trigger fires (test-email re-runs only).
+   */
+  forceRecreateContact?: boolean | undefined;
 }
 
 /** Collapse an ugly "X @ X" or redundant "Name @ Company" display name. */
@@ -980,6 +1197,10 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
     //    company-sourced prospects where we don't yet have a personal email).
     const displayName = cleanDisplayName(lead.name, lead.company);
     const [firstName, ...rest] = displayName.split(' ');
+    const isFormInquiry = lead.sourcePrefix === 'CLIENT-CTO-INQUIRY';
+    const forceRecreate =
+      !!lead.forceRecreateContact ||
+      (isFormInquiry && isConciergeTestEmail(lead.email));
     const contactId = lead.email || displayName
       ? await upsertContact({
           email:        lead.email,
@@ -989,6 +1210,8 @@ export async function pushLeadToHubSpot(lead: LeadForHubSpot): Promise<{
           linkedinUrl:  lead.linkedinUrl,
           source:       lead.source ?? 'AI Marketing Engine',
           message:      lead.message,
+          ...(isFormInquiry ? { leadKind: PORTFOLIO_INQUIRY_KIND } : {}),
+          ...(forceRecreate ? { forceRecreate: true } : {}),
         })
       : null;
 

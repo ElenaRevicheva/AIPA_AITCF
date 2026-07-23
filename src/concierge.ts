@@ -207,7 +207,11 @@ export function registerConciergeRoutes(app: Express): void {
       }
       if (!inquiry) {
         const msg = raw.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)"/i)?.[1] || '';
-        inquiry = msg.replace(/\\n/g, '\n').replace(/\\"/g, '"').slice(0, 1000);
+        inquiry = msg
+          .replace(/\\n/g, '\n')
+          .replace(/\\"/g, '"')
+          .replace(/^\[AIDEAZZ-FORM\]\s*/i, '')
+          .slice(0, 1000);
       }
     }
     if (!claudeOutput.trim()) {
@@ -231,17 +235,22 @@ export function registerConciergeRoutes(app: Express): void {
     }
 
     // Make forwards only the draft text; resolve the recipient from HubSpot.
-    // findRecentContacts is scoped to contacts created by OUR integration (the
-    // July 16 fix — HubSpot's own CalendarSync/OnboardingDataSync imports never
-    // match). Window = 90 min: Make's draft arrives ≤15 min after the contact
+    // Prefer portfolio-inquiry contacts (stamped / linked to recent CLIENT-CTO-INQUIRY
+    // deals) so re-tests that reused an old contact still resolve. Fall back to
+    // findRecentContacts (own-app createdate window) for brand-new contacts.
+    // Window = 90 min: Make's draft arrives ≤15 min after the contact
     // is created, so 90 min is ample headroom — and a narrow window makes the
     // junk-drop below decisive (junk only slips into "warn" mode during the
     // brief period right after a genuine inquiry).
     let formContactsInWindow = 0;
     if (!emailOk(email)) {
       try {
-        const { findRecentContacts } = await import('./hubspot-client');
-        const recent = (await findRecentContacts(90)).filter((c) => emailOk(c.email));
+        const { findRecentInquiryContacts, findRecentContacts } = await import('./hubspot-client');
+        const inquiryHits = await findRecentInquiryContacts(90);
+        const recentRaw = inquiryHits.length
+          ? inquiryHits
+          : await findRecentContacts(90);
+        const recent = recentRaw.filter((c) => emailOk(c.email));
         formContactsInWindow = recent.length;
         const head = draft.slice(0, 300).toLowerCase();
         const named = recent.filter((c) => c.firstname && head.includes(c.firstname.toLowerCase()));

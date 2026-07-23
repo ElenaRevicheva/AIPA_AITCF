@@ -1243,6 +1243,10 @@ async function startCTOAIPA() {
    * 08:00 UTC triage cron, so form → HubSpot took up to 24h and vague-but-real
    * inquiries were dropped by the urgency gate. A person filling the form is the
    * hottest signal we have — push immediately, triage still enriches later.
+   *
+   * July 23 2026: also stamps aideazz_lead_kind=portfolio_inquiry (Make filter),
+   * force-recreates allowlisted test emails so Contacts/Created fires, and POSTs
+   * MAKE_CONCIERGE_WEBHOOK_URL so reused production emails still enter the Make cycle.
    */
   function pushInquiryToHubSpotNow(fields: {
     name?: string;
@@ -1257,7 +1261,7 @@ async function startCTOAIPA() {
     const { name, contactEmail, message, utm_source, utm_campaign, utm_term, utm_content, page_url } = fields;
     setImmediate(async () => {
       try {
-        const { pushLeadToHubSpot } = await import('./hubspot-client');
+        const { pushLeadToHubSpot, isConciergeTestEmail, findContactByEmail } = await import('./hubspot-client');
         const { parseAtlasAttribution } = await import('./atlas-crm-bridge');
         const contextParts: string[] = [];
         if (message) contextParts.push(`Message: ${message}`);
@@ -1270,6 +1274,10 @@ async function startCTOAIPA() {
           utm_term: utm_term ?? null,
           utm_content: utm_content ?? null,
         });
+        // Detect reuse BEFORE push — Make Contacts/Created only fires on brand-new
+        // contacts (or test-email force-recreate). Reused production emails need the webhook.
+        const existedBefore = contactEmail ? await findContactByEmail(contactEmail) : null;
+        const willForceRecreate = !!(existedBefore && isConciergeTestEmail(contactEmail));
         const hs = await pushLeadToHubSpot({
           name: name || contactEmail || 'Inquiry via aideazz.xyz',
           email: contactEmail || '',
@@ -1306,7 +1314,43 @@ async function startCTOAIPA() {
           },
         });
         if (hs?.dealId) {
-          console.log(`[inquiry] HubSpot [CLIENT] deal created for: ${name || contactEmail}`);
+          console.log(
+            `[inquiry] HubSpot [CLIENT] deal created for: ${name || contactEmail}` +
+              (willForceRecreate ? ' (test email — contact recreated for Make)' : existedBefore ? ' (existing contact reused)' : ' (new contact)'),
+          );
+        }
+        // Reused production contacts never trip Make's Contacts/Created — push the
+        // same payload Make would have seen. Skip when we just created/recreated a
+        // contact (Watch CRM already fires) to avoid double Fable 5 drafts.
+        const makeHook = process.env.MAKE_CONCIERGE_WEBHOOK_URL?.trim();
+        const needsMakeWebhook = !!(existedBefore && !willForceRecreate);
+        if (makeHook && needsMakeWebhook && (contactEmail || message)) {
+          try {
+            const r = await fetch(makeHook, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: contactEmail || '',
+                name: name || '',
+                firstname: (name || '').split(/\s+/)[0] || '',
+                lastname: (name || '').split(/\s+/).slice(1).join(' '),
+                message: message || '',
+                inquiry: message || '',
+                aideazz_lead_kind: 'portfolio_inquiry',
+                contactId: hs?.contactId ?? null,
+                dealId: hs?.dealId ?? null,
+                source: 'aideazz_inquiry_form',
+                reused_contact: true,
+              }),
+            });
+            console.log(`[inquiry] Make concierge webhook → ${r.status} (reused contact)`);
+          } catch (e) {
+            console.warn('[inquiry] Make concierge webhook failed:', (e as Error).message?.slice(0, 80));
+          }
+        } else if (needsMakeWebhook && !makeHook) {
+          console.warn(
+            '[inquiry] Reused contact — Make will NOT fire until MAKE_CONCIERGE_WEBHOOK_URL is set on Oracle',
+          );
         }
       } catch (e) {
         console.warn('[inquiry] HubSpot push non-fatal:', (e as Error).message?.slice(0, 80));

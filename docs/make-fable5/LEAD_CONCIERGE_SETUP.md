@@ -2,37 +2,54 @@
 
 > **Goal:** every new portfolio inquiry (HubSpot) gets an instant, personalized draft reply
 > written by Claude Fable 5 with full portfolio context, delivered to Elena's Telegram for
-> one-tap approval. Zero Oracle changes, zero code — 3 Make modules.
+> one-tap approval. Make drafts; Oracle (`/concierge/draft`) owns one-tap send + CRM notes.
 >
-> **Why no Oracle changes:** portfolio inquiries already land in HubSpot
-> (InquiryForm → CTO AIPA inquiry-proxy → business_leads → HubSpot). Make watches HubSpot
-> directly, so the existing pipeline is untouched.
+> **Pipeline:** InquiryForm → CTO AIPA inquiry-proxy → HubSpot (`[AIDEAZZ-FORM]` message stamp)
+> → Make (Contacts/Created **or** Custom Webhook) → Fable 5 → `/concierge/draft`.
 
 ## Architecture (3 modules)
 
 ```
 [1] HubSpot: Watch CRM objects (contacts)   ← new portfolio inquiry appears
+    OR Custom Webhook (for reused emails)   ← cto-aipa POSTs MAKE_CONCIERGE_WEBHOOK_URL
 [2] Anthropic Claude: Create a message      ← model: claude-fable-5
-[3] Telegram Bot: Send a message            ← draft reply lands in Elena's TG
+[3] HTTP → cto-aipa /concierge/draft        ← TG one-tap send (v2+)
 ```
+
+## July 23 2026 — two bugs that blocked re-tests (fixed in cto-aipa)
+
+1. **Reused email ≠ new contact.** Form push upserts the existing HubSpot contact and
+   only creates a new deal. Make's Contacts/**Created** never fires. Fix:
+   - Allowlisted test emails (`adamvelena@`, `marinakulaginabowen@`, `kiravelerevich@`,
+     override via `CONCIERGE_TEST_EMAILS`) **delete+recreate** the contact so Created fires.
+   - Production re-inquiries POST `MAKE_CONCIERGE_WEBHOOK_URL` with the same payload.
+2. **Form contacts look identical to buyer-radar junk** (same app `39045903`,
+   `source=OFFLINE`, `INTEGRATION`, `num_conversion_events=0`). A filter like
+   "only native HubSpot forms" drops **all** of them. Fix: every form contact's
+   `message` is prefixed with `[AIDEAZZ-FORM]` (custom property `aideazz_lead_kind`
+   is optional — private app lacks schemas scope). **Make filter must use the stamp.**
 
 ## Elena's 15 minutes (credential steps only)
 
 1. **make.com** → log in (free plan is enough: this uses ~3 ops per inquiry).
-2. Create scenario → add the 3 modules above in order.
-3. **Module 1 — HubSpot** "Watch CRM objects": connect HubSpot account (OAuth click),
-   object type `Contacts`, watch `Created`. Optional filter (recommended): only continue if
-   the associated deal name contains `[PORTFOLIO` (matches our `[STREAM-AGENT]` prefix
-   convention) — otherwise every HubSpot contact from every agent triggers the scenario.
-4. **Module 2 — Anthropic Claude** "Create a Message": paste Anthropic API key
+2. Open scenario **5633833** (or create fresh) → 3 modules in order.
+3. **Module 1 — HubSpot** "Watch CRM objects": connect HubSpot, object `Contacts`,
+   watch `Created`. **Filter (required):**
+   `message` **contains** `AIDEAZZ-FORM`
+   — do **not** filter on `hs_analytics_source*` / `num_conversion_events` / "own forms";
+   those cannot tell portfolio form from radar noise.
+4. **Reused-email path (required for production re-inquiries):** add a **Custom webhook**
+   module (or a second scenario that shares modules 2–3). Copy the webhook URL into Oracle
+   `.env` as `MAKE_CONCIERGE_WEBHOOK_URL=…` then `pm2 restart cto-aipa --update-env`.
+   Map webhook JSON → Claude the same way: `email`, `firstname`/`name`, `message`.
+5. **Module 2 — Anthropic Claude** "Create a Message": paste Anthropic API key
    (console.anthropic.com → API keys), model **claude-fable-5**, max_tokens 1500.
    - System prompt: paste the **SYSTEM PROMPT** block below verbatim.
-   - User message: map HubSpot fields:
+   - User message: map HubSpot (or webhook) fields:
      `New inquiry — Name: {{firstname}} {{lastname}} | Email: {{email}} | Message: {{message}} | Company: {{company}}`
-5. **Module 3 — Telegram Bot** "Send a Text Message": connect with the bot token
-   (@BotFather bot you already use), chat ID = Elena's own TG chat with the bot,
-   text = `{{Claude response text}}`.
-6. Turn scenario **ON**. Test by submitting the portfolio inquiry form once yourself.
+6. **Module 3 — HTTP** to `/concierge/draft` (see v2 below). Turn scenario **ON**.
+7. Test with an allowlisted address (e.g. `marinakulaginabowen@gmail.com`) — contact is
+   recreated, stamp applied, Make should run end-to-end within one poll.
 
 ## v2 — one-tap send (July 12 2026)
 
@@ -42,8 +59,9 @@ buttons; tapping Send emails the Fable 5 reply to the lead via Resend
 (aipa@aideazz.xyz, reply-to Elena's gmail). **Edit-before-send:** REPLY to the
 draft message in Telegram with the full edited text (20+ chars) and that version
 is emailed instead, same subject. Drafts persist in `data/concierge/` on Oracle.
-Recipient is resolved server-side from HubSpot contacts created in the last
-45 min (first-name match in the draft opening) — the HTTP module only needs the
+Recipient is resolved server-side from recent portfolio-inquiry contacts
+(stamped / linked to `[CLIENT-CTO-INQUIRY]` deals in the last 90 min, with
+first-name match in the draft opening) — the HTTP module only needs the
 single `claude_output` field; ambiguous recipients get a no-button TG notice.
 
 **Module 3 (HTTP "Make a request") config:**
@@ -91,7 +109,8 @@ Write a DRAFT reply for Elena to review — never send anything yourself.
 Rules:
 1. Reply in the language of the inquiry (English or Spanish).
 2. Be warm, direct, professional — an experienced executive's voice, not marketing fluff.
-3. Cite the 2-3 MOST RELEVANT proof links for this specific inquirer, chosen from:
+3. Ignore a leading `[AIDEAZZ-FORM]` stamp on the inquiry text if present (internal CRM marker).
+4. Cite the 2-3 MOST RELEVANT proof links for this specific inquirer, chosen from:
    - CTO AIPA (autonomous eng. control tower): https://github.com/ElenaRevicheva/AIPA_AITCF
    - VibeJobHunter (job-hunt automation): https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF
    - Atlas Shifted (marketing strategist agent, live): https://webhook.aideazz.xyz/whitespace/atlas.html
@@ -102,12 +121,12 @@ Rules:
    - Podcast: https://podcast.aideazz.xyz
    - Pitch (investors): https://aideazz.xyz/pitch.html
    - Calendly: https://calendly.com/elena_revicheva/coffee-chat
-4. If the inquiry is a job/role conversation: position her for AI-augmented builder,
+5. If the inquiry is a job/role conversation: position her for AI-augmented builder,
    GEO/AEO/TechSEO, or AI-automation solutions architect lanes (NOT ML-research roles).
-5. If it is a client/service inquiry: propose a concrete small first engagement and
+6. If it is a client/service inquiry: propose a concrete small first engagement and
    offer the Calendly link.
-6. If the inquiry looks like spam or is abusive, output only: SPAM — no reply needed.
-7. End with a suggested subject line for the email.
+7. If the inquiry looks like spam or is abusive, output only: SPAM — no reply needed.
+8. End with a suggested subject line for the email.
 
 Output format:
 DRAFT REPLY:
