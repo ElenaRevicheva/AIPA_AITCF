@@ -8,6 +8,27 @@
 > **Commercial door (always):** `https://aideazz.xyz/portfolio` · free audit hook: `https://aideazz.xyz/api`
 > **8-word bio:** *Remote AI visibility agency — GEO · AEO · WhatsApp close.*
 
+## HubSpot verification — Jul 23–24 2026 (live API, Jul 24 afternoon)
+
+Audited with HubSpot CRM API + deal-note stamps (`scripts/_audit-note-stamps.cjs`,
+`scripts/_audit-emails-jul23-24-fast.cjs`). **Truth sources:**
+
+| Check | Result |
+|---|---|
+| `[CLIENT-MANUAL]` deals since Jul 18 (excl. queue) | **82** fully staged |
+| Deal stage | **81** ⏳ Sent + **1** 💬 Replied · **0** still 🔥 Act TODAY |
+| Note stamp `📧 EMAILED` or `Resend:` | **67 / 82** |
+| Of those, stamp dated **2026-07-23** | **20** |
+| Of those, stamp dated **2026-07-24** | **22** |
+| Note stamp `✅ SENT` (WhatsApp) | **19** (mostly earlier Jul 18–21) |
+| HubSpot CRM **Emails** object outbound to prospects Jul 23–24 | **0** linked to CLIENT-MANUAL (CRM inbox sync does not show Resend/one-click sends) |
+
+**Verdict:** All 82 staged deals are in Sent/Replied. **42** have note-level email proof dated Jul 23–24 (one-click / Resend / watcher stamp). HubSpot’s native Emails API does **not** log those Resend sends — the deal note `📧 EMAILED YYYY-MM-DD` is the operational log. **15** deals are Sent-stage without an email stamp (early WA-only / special cases — see audit JSON).
+
+**Still not staged (open hit-list, need WA dig):** giannadentist.com · sanblastour.com · thebristol.com · sortishotel.com · balboaacademy.edu · oxfordpanama.com · hospitalcima.com · medicaltourscostarica.com · goodnessdental.com · agencyofthesea.com · absolutemedicaltourism.com · sotadental.com · dentalconnect.com.mx
+
+Artifact files: `docs/selling/_audit-note-stamps.json`, `docs/selling/_audit-emails-jul23-24-fast.json`.
+
 ## The 2026 market — why this lane wins (added July 21 2026)
 
 **In simple words:** people don't only Google anymore — they ask ChatGPT/Perplexity *"who
@@ -69,7 +90,7 @@ Patients research "best dental implants Panama" in ChatGPT, then book over Whats
 | Clínica Arango Orillac · SENT | arango-orillac.com | Since 1935, 50+ pros, English guaranteed; WhatsApp on site |
 | Centro Odontológico Paitilla · SENT | centroodontologicopaitilla.com | Paitilla Medical Center since 1990; high review volume |
 | Almanza Carrizo / Grupo Dental Nacional · SENT | grupodentalnacional.com | 25+ yrs; Centro Médico Nacional + La Chorrera — ✅ STAGED 2026-07-24 (deal 63051086933; live audit 54/D; WA +507 6670-7039; email info@ UNVERIFIED) · SENT-ready |
-| MaDenta / Gianna Dentist | giannadentist.com | Cosmetic / implants for intl + expats; online eval before travel |
+| MaDenta / Gianna Dentist · SENT | giannadentist.com | Cosmetic / implants for intl + expats; online eval before travel |
 | Sonrisas Meraki | (mine via smilejet / IG) | Bilingual dental tourism; confirm own domain before staging |
 | Panama Aesthetics · SENT | panamaaesthetics.com | Plastic/aesthetic, all-inclusive intl — ✅ STAGED 2026-07-20 (deal 62873560951) — 📧 + +4d follow-up |
 | The Skin Clinic (Dr. Drohan) · SENT | theskinclinicpanama.com | Tulane-trained derm; WA +507 6450-9248; Hospital Pacífica Salud |
@@ -105,7 +126,7 @@ International travelers plan with AI and book on WhatsApp. **Yacht rental alread
 | Prospect | Domain | Notes |
 |---|---|---|
 | Charter in San Blas · SENT | charterinsanblas.com | All-inclusive, 5★ |
-| San Blas Tour | sanblastour.com | Sailboat/catamaran fleet |
+| San Blas Tour · SENT | sanblastour.com | Sailboat/catamaran fleet |
 | Ampa Tours · SENT | ampatours.com | San Blas + Pacific — ✅ STAGED 2026-07-20 (deal 62872179385) — 📧 + +4d follow-up |
 | San Blas on Sailboats · SENT | sanblasonsailboats.com | Vetted boat network |
 | We Sail San Blas · SENT | wesailsanblas.com | Catamaran, all meals |
@@ -123,7 +144,7 @@ International travelers plan with AI and book on WhatsApp. **Yacht rental alread
 | Eclypse de Mar · SENT | eclypsedemar.com | Overwater bungalows — drafts exist |
 | Isla Palenque · SENT | islapalenque.com | ✅ STAGED 2026-07-24 (deal 63063245978; live audit 57/C; WA +507 6617-3771; reservations@islapalenque.com) · SENT-ready |
 | Red Frog Beach Island Resort · SENT | redfrogbeach.com | Bocas real estate + resort — GEO + WA |
-| Bristol Panama / similar luxury hotels | thebristol.com | City luxury; events + intl guests |
+| Bristol Panama / similar luxury hotels · SENT | thebristol.com | City luxury; events + intl guests |
 
 ---
 
@@ -138,7 +159,7 @@ International couples, high ticket, WhatsApp coordination, huge **AI-video** ups
 | PRP Events · SENT | prpevents.com | Destination-wedding planner — ✅ STAGED 2026-07-21 (86/A; deal 62881755679; Atlas automation angle) |
 | Destination Dream Weddings · SENT | destinationdreamweddings.com | Full-service Panama weddings |
 | Valle Escondido Resort (Boquete) · SENT | valleescondidoboquete.com | Weddings + events; eventos@ + WA on site |
-| Sortis Hotel / Sortis Spa (events) | sortishotel.com | City events + spa — mine WA/email |
+| Sortis Hotel / Sortis Spa (events) · SENT | sortishotel.com | City events + spa — mine WA/email |
 | Gamboa Rainforest Reserve (events) · SENT | gamboaresort.com | Nature venue; intl groups — ✅ STAGED 2026-07-23 (deal 63039072050; live audit 85/A) · SENT-ready |
 
 ### B2. Wellness / med-spa / fitness retreats
@@ -160,8 +181,8 @@ Expat families search AI for schooling before moving. Lead = **AI Visibility** +
 | International School of Panama (ISP) · SENT | isp.edu.pa | NEASC / IB; 40+ yrs; admissions desk |
 | Boston School International · SENT | bostonschool.edu.pa | Costa del Este; tour + admissions form — ✅ STAGED 2026-07-23 (deal 63053387934; live audit 88/A) · SENT-ready |
 | The Casco School · SENT | thecascoschool.com | British bilingual; Albrook + CDE; admissions@thecascoschool.com — ✅ STAGED 2026-07-23 (deal 63060405782; live audit 54/D) · SENT-ready |
-| Balboa Academy | balboaacademy.edu | US-style intl; mine admissions contact |
-| Oxford International School Panama | oxfordpanama.com | Confirm active admissions channel before staging |
+| Balboa Academy · SENT | balboaacademy.edu | US-style intl; mine admissions contact |
+| Oxford International School Panama · SENT | oxfordpanama.com | Confirm active admissions channel before staging |
 
 ---
 
@@ -189,12 +210,12 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 | Prospect | Domain | Country | Notes |
 |---|---|---|---|
 | Hospital Clínica Bíblica · SENT | clinicabiblica.com | CR | ✅ STAGED 2026-07-24 (deal 63033505966; live audit 79/B; WA +506 8595-7000; email info@ UNVERIFIED) · SENT-ready |
-| Hospital CIMA San José | hospitalcima.com | CR | Medical tourism leader claim; EN |
+| Hospital CIMA San José · SENT | hospitalcima.com | CR | Medical tourism leader claim; EN |
 | Hospital Metropolitano · SENT | metropolitanocr.com | CR | ✅ STAGED 2026-07-24 (deal 63065540143; live audit 82/B; WA +506 6434-3139; info@metropolitanocr.com) · SENT-ready |
-| Medical Tours Costa Rica | medicaltourscostarica.com | CR | Facilitator — GEO + WA qualify is the whole business model |
-| Goodness Dental | goodnessdental.com | CR | US/Canada dental tourism brand |
+| Medical Tours Costa Rica · SENT | medicaltourscostarica.com | CR | Facilitator — GEO + WA qualify is the whole business model |
+| Goodness Dental · SENT | goodnessdental.com | CR | US/Canada dental tourism brand |
 | Costa Rica Yacht Charter Brokers · SENT | yachtchartercr.com | CR | ✅ STAGED 2026-07-24 (deal 63064457478; live audit 88/A; WA +506 6242-2041; step-aboard@yachtchartercr.com) · SENT-ready |
-| Agency of the Sea | agencyofthesea.com | CR | Local yacht / marina concierge |
+| Agency of the Sea · SENT | agencyofthesea.com | CR | Local yacht / marina concierge |
 
 ### D2. Colombia — Medellín aesthetics + Cartagena charters
 
@@ -204,7 +225,7 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 | Dr. Jorge Rodríguez · SENT | drjorgerodriguez.com | CO | ✅ STAGED 2026-07-24 (deal 63067846953; live audit 80/B; WA +57 300 371-9688; email info@ UNVERIFIED) · SENT-ready |
 | Dr. Luis Guillermo Tobón · SENT | luisguillermotobon.com | CO | ✅ STAGED 2026-07-24 (deal 63061986198; live audit 94/A+; WA +57 321 509-5101; email info@ UNVERIFIED) · SENT-ready |
 | Salud sin Fronteras · SENT | saludsinfronteras.com | CO | ✅ STAGED 2026-07-24 (deal 63033678371; live audit 99/A+; WA +57 350 731-6151) · SENT-ready |
-| Absolute Medical Tourism | absolutemedicaltourism.com | CO | Packages + logistics |
+| Absolute Medical Tourism · SENT | absolutemedicaltourism.com | CO | Packages + logistics |
 | Colombia Luxury Group · SENT | colombialuxurygroup.com | CO | ✅ STAGED 2026-07-24 (deal 63078747964; live audit 97/A+; WA +57 304 209-1627) · SENT-ready |
 | Elite Cartagena · SENT | elitecartagena.com | CO | ✅ STAGED 2026-07-24 (deal 63077716274; live audit 97/A+; WA +1 516-493-6070; jc@elitecartagena.com) · SENT-ready |
 | Hi Cartagena · SENT | hicartagena.com | CO | ✅ STAGED 2026-07-24 (deal 63048627065; live audit 57/C; WA +57 313 695-2776; email info@ UNVERIFIED) · SENT-ready |
@@ -214,9 +235,9 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 | Prospect | Domain | Country | Notes |
 |---|---|---|---|
 | Cancun Dental Specialists · SENT | cancundentalspecialists.com | MX | Hotel Zone; 15k+ US/CA patients claimed; English dentists |
-| SOTA Dental | sotadental.com | MX | Cancún / Tijuana / Los Algodones / PdC — multi-city dental tourism |
+| SOTA Dental · SENT | sotadental.com | MX | Cancún / Tijuana / Los Algodones / PdC — multi-city dental tourism |
 | Smile Tijuana · SENT | smiletijuana.com | MX | Border dental; bilingual; WA +52 664 293 0717 |
-| Dental Connect | dentalconnect.com.mx | MX | Tijuana border pickup + bilingual |
+| Dental Connect · SENT | dentalconnect.com.mx | MX | Tijuana border pickup + bilingual |
 | Tijuana Dental Center · SENT | tijuanadentalcenter.com | MX | ✅ STAGED 2026-07-24 (deal 63040577101; live audit 99/A+; +1 619 906-7481; info@smile4evermexico.com) · SENT-ready |
 
 ---
@@ -228,10 +249,10 @@ Highest expected pain × highest ticket. **Skip already-staged.** Run Manual Pro
 ### Panama — next unstaged Tier A/B
 1. ~~arango-orillac.com~~ — · SENT (HubSpot)
 2. ~~theskinclinicpanama.com~~ — · SENT (HubSpot)
-3. dermomedica.com.pa — A1 derm/cosmiatry EN
+3. ~~dermomedica.com.pa~~ — · SENT (HubSpot)
 4. ~~centroodontologicopaitilla.com~~ — · SENT (HubSpot)
 5. ~~grupodentalnacional.com~~ — · SENT (HubSpot)
-6. giannadentist.com — A1 cosmetic/implants intl
+6. giannadentist.com — A1 cosmetic/implants intl (**hold** — no verified public WA)
 7. ~~panamasonrie.com~~ — · SENT (HubSpot)
 8. ~~ivi-fertility.com~~ — · SENT (HubSpot)
 9. ~~puntapacifica.com~~ — · SENT (HubSpot)
@@ -240,21 +261,23 @@ Highest expected pain × highest ticket. **Skip already-staged.** Run Manual Pro
 12. ~~igopanama.com~~ — · SENT (HubSpot)
 13. ~~gomitom.com~~ — · SENT (HubSpot)
 14. ~~charterinsanblas.com~~ — · SENT (HubSpot)
-15. sanblastour.com — A3 fleet
-16. islapalenque.com — A3 luxury island
+15. sanblastour.com — A3 fleet (**hold** — email only, no WA)
+16. ~~islapalenque.com~~ — · SENT (HubSpot)
 17. ~~havenboquete.com~~ — · SENT (HubSpot)
 18. ~~valleescondidoboquete.com~~ — · SENT (HubSpot)
 19. ~~isp.edu.pa~~ — · SENT (HubSpot)
-20. thecascoschool.com — B3 British bilingual admissions
+20. ~~thecascoschool.com~~ — · SENT (HubSpot)
 
 ### LATAM expansion (after Panama pressure eases)
 21. ~~clinicabiblica.com~~ — · SENT (HubSpot)
-22. hospitalcima.com — D1 CR medical tourism
-23. goodnessdental.com — D1 CR dental tourism
+22. hospitalcima.com — D1 CR medical tourism (**hold** — dig WA)
+23. goodnessdental.com — D1 CR dental tourism (**hold** — dig WA)
 24. ~~danielacorreacirujana.com~~ — · SENT (HubSpot)
-25. colombialuxurygroup.com — D2 Cartagena yachts + WA
+25. ~~colombialuxurygroup.com~~ — · SENT (HubSpot)
 26. ~~cancundentalspecialists.com~~ — · SENT (HubSpot)
 27. ~~smiletijuana.com~~ — · SENT (HubSpot)
+28. thebristol.com / sortishotel.com / balboaacademy.edu / oxfordpanama.com — dig WA before stage
+29. medicaltourscostarica.com / agencyofthesea.com / absolutemedicaltourism.com / sotadental.com / dentalconnect.com.mx — dig WA before stage
 
 ### Already staged / blocked (do not re-create — work replies + follow-ups)
 See lists above marked ✅ STAGED / ⏸ BLOCKED / SENT. Campaign mechanism: **§4b** in `MANUAL_PROSPECT_PLAY.md`. Every emailed candidate gets a **+4 day soft follow-up** (iron rule). Proof: https://resend.com/emails

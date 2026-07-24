@@ -617,5 +617,122 @@
     "emailDraft": "docs/selling/drafts/american-trade-hotel-email.txt",
     "dealId": "63037250145",
     "score": 70
+  },
+  "gianna-dentist-madenta": {
+    "phone": "50762709109",
+    "draft": "docs/selling/drafts/gianna-dentist-madenta.txt",
+    "company": "Gianna Dentist MaDenta",
+    "email": "recepcion@madentaclinic.com",
+    "emailDraft": "docs/selling/drafts/gianna-dentist-madenta-email.txt",
+    "score": 80,
+    "dealId": "63051108381"
+  },
+  "san-blas-tour": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/san-blas-tour.txt",
+    "company": "San Blas Tour",
+    "email": "contact@sanblastour.com",
+    "emailDraft": "docs/selling/drafts/san-blas-tour-email.txt",
+    "dealId": "63083214942",
+    "score": 86
+  },
+  "bristol-panama": {
+    "phone": "5072947878",
+    "draft": "docs/selling/drafts/bristol-panama.txt",
+    "company": "Bristol Panama",
+    "email": "concierge@bristolpanama.com",
+    "emailDraft": "docs/selling/drafts/bristol-panama-email.txt",
+    "dealId": "63067561358",
+    "score": 87
+  },
+  "sortis-hotel": {
+    "phone": "5073988888",
+    "draft": "docs/selling/drafts/sortis-hotel.txt",
+    "company": "Sortis Hotel",
+    "email": "reservaciones@sortishotel.com",
+    "emailDraft": "docs/selling/drafts/sortis-hotel-email.txt",
+    "dealId": "63080329285",
+    "score": 37
+  },
+  "oxford-international-school-panama": {
+    "phone": "50763795769",
+    "draft": "docs/selling/drafts/oxford-international-school-panama.txt",
+    "company": "Oxford International School Panama",
+    "email": "admisiones@ois.edu.pa",
+    "emailDraft": "docs/selling/drafts/oxford-international-school-panama-email.txt",
+    "dealId": "63080326304",
+    "score": 49
+  },
+  "medical-tours-costa-rica": {
+    "phone": "18666656433",
+    "draft": "docs/selling/drafts/medical-tours-costa-rica.txt",
+    "company": "Medical Tours Costa Rica",
+    "email": "operations@medtourscr.com",
+    "emailDraft": "docs/selling/drafts/medical-tours-costa-rica-email.txt",
+    "dealId": "63080345866",
+    "score": 82
+  },
+  "goodness-dental": {
+    "phone": "18664062744",
+    "draft": "docs/selling/drafts/goodness-dental.txt",
+    "company": "Goodness Dental",
+    "email": "patients@goodnessdental.com",
+    "emailDraft": "docs/selling/drafts/goodness-dental-email.txt",
+    "dealId": "63052802860",
+    "score": 64
+  },
+  "agency-of-the-sea": {
+    "phone": "50672885005",
+    "draft": "docs/selling/drafts/agency-of-the-sea.txt",
+    "company": "Agency of the Sea",
+    "email": "gabriela@agencyofthesea.com",
+    "emailDraft": "docs/selling/drafts/agency-of-the-sea-email.txt",
+    "dealId": "63046459931",
+    "score": 54
+  },
+  "absolute-medical-tourism": {
+    "phone": "573016347898",
+    "draft": "docs/selling/drafts/absolute-medical-tourism.txt",
+    "company": "Absolute Medical Tourism",
+    "email": "info@absolutemedicaltourism.com",
+    "emailDraft": "docs/selling/drafts/absolute-medical-tourism-email.txt",
+    "dealId": "63049713744",
+    "score": 54
+  },
+  "sota-dental": {
+    "phone": "18006813340",
+    "draft": "docs/selling/drafts/sota-dental.txt",
+    "company": "SOTA Dental",
+    "email": "contact@sotadental.com",
+    "emailDraft": "docs/selling/drafts/sota-dental-email.txt",
+    "dealId": "63080279443",
+    "score": 94
+  },
+  "dental-connect": {
+    "phone": "18885758150",
+    "draft": "docs/selling/drafts/dental-connect.txt",
+    "company": "Dental Connect",
+    "email": "emailcontactus@dentalconnect.com.mx",
+    "emailDraft": "docs/selling/drafts/dental-connect-email.txt",
+    "dealId": "63083296695",
+    "score": 87
+  },
+  "balboa-academy": {
+    "phone": "5073021076",
+    "draft": "docs/selling/drafts/balboa-academy.txt",
+    "company": "Balboa Academy",
+    "email": "contactba@balboa-academy.org",
+    "emailDraft": "docs/selling/drafts/balboa-academy-email.txt",
+    "dealId": "63083234656",
+    "score": 70
+  },
+  "hospital-cima": {
+    "phone": "50622081000",
+    "draft": "docs/selling/drafts/hospital-cima.txt",
+    "company": "Hospital CIMA",
+    "email": "info@hospitalcima.com",
+    "emailDraft": "docs/selling/drafts/hospital-cima-email.txt",
+    "dealId": "63062155835",
+    "score": 70
   }
 }
