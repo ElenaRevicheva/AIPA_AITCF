@@ -966,6 +966,8 @@ const PROSPECT_META = {
     topFixes: '(1) FAQ estadía/paquetes, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
     contactFirstName: 'Isla Palenque',
     contactLastName: '(WhatsApp contact)',
+    // Site: island direct mobile +(507) 6617-3771; reservations@islapalenque.com
+    preferredPhone: '50766173771',
     preferredEmail: 'reservations@islapalenque.com',
   },
   'cancundentalspecialists.com': {

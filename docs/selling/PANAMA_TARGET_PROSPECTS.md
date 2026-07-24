@@ -121,7 +121,7 @@ International travelers plan with AI and book on WhatsApp. **Yacht rental alread
 | Casa Cayuco · SENT | casacayuco.com | Eco-adventure lodge, Bastimentos |
 | Tranquilo Bay · SENT | tranquilobay.com | Eco lodge — ✅ STAGED 2026-07-20 (deal 62871509035) — 📧 + +4d follow-up |
 | Eclypse de Mar · SENT | eclypsedemar.com | Overwater bungalows — drafts exist |
-| Isla Palenque | islapalenque.com | Luxury private-island resort, Bocas — high ticket + intl |
+| Isla Palenque · SENT | islapalenque.com | ✅ STAGED 2026-07-24 (deal 63063245978; live audit 57/C; WA +507 6617-3771; reservations@islapalenque.com) · SENT-ready |
 | Red Frog Beach Island Resort · SENT | redfrogbeach.com | Bocas real estate + resort — GEO + WA |
 | Bristol Panama / similar luxury hotels | thebristol.com | City luxury; events + intl guests |
 
@@ -134,7 +134,7 @@ International couples, high ticket, WhatsApp coordination, huge **AI-video** ups
 
 | Prospect | Domain | Notes |
 |---|---|---|
-| American Trade Hotel | americantradehotel.com | Casco Viejo weddings/events — ⏸ BLOCKED 2026-07-20 (visibility audit URL unfetchable) — retry later |
+| American Trade Hotel · SENT | americantradehotel.com | ✅ STAGED 2026-07-24 (deal 63037250145; placeholder audit 70/B — site unfetchable; WA/landline +507 211-2000; info@americantradehotel.com) · SENT-ready|
 | PRP Events · SENT | prpevents.com | Destination-wedding planner — ✅ STAGED 2026-07-21 (86/A; deal 62881755679; Atlas automation angle) |
 | Destination Dream Weddings · SENT | destinationdreamweddings.com | Full-service Panama weddings |
 | Valle Escondido Resort (Boquete) · SENT | valleescondidoboquete.com | Weddings + events; eventos@ + WA on site |
@@ -202,12 +202,12 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 |---|---|---|---|
 | Dr. Daniela Correa · SENT | danielacorreacirujana.com | CO | Medellín plastic surgery; EN + WhatsApp intl flow |
 | Dr. Jorge Rodríguez · SENT | drjorgerodriguez.com | CO | ✅ STAGED 2026-07-24 (deal 63067846953; live audit 80/B; WA +57 300 371-9688; email info@ UNVERIFIED) · SENT-ready |
-| Dr. Luis Guillermo Tobón | luisguillermotobon.com | CO | 30+ yrs aesthetic surgery Medellín; EN |
-| Salud sin Fronteras | saludsinfronteras.com | CO | Medical tourism facilitator Medellín/Bogotá/Cartagena |
+| Dr. Luis Guillermo Tobón · SENT | luisguillermotobon.com | CO | ✅ STAGED 2026-07-24 (deal 63061986198; live audit 94/A+; WA +57 321 509-5101; email info@ UNVERIFIED) · SENT-ready |
+| Salud sin Fronteras · SENT | saludsinfronteras.com | CO | ✅ STAGED 2026-07-24 (deal 63033678371; live audit 99/A+; WA +57 350 731-6151) · SENT-ready |
 | Absolute Medical Tourism | absolutemedicaltourism.com | CO | Packages + logistics |
-| Colombia Luxury Group | colombialuxurygroup.com | CO | Cartagena yacht rental; WhatsApp quote in 5 min |
+| Colombia Luxury Group · SENT | colombialuxurygroup.com | CO | ✅ STAGED 2026-07-24 (deal 63078747964; live audit 97/A+; WA +57 304 209-1627) · SENT-ready |
 | Elite Cartagena · SENT | elitecartagena.com | CO | ✅ STAGED 2026-07-24 (deal 63077716274; live audit 97/A+; WA +1 516-493-6070; jc@elitecartagena.com) · SENT-ready |
-| Hi Cartagena | hicartagena.com | CO | Luxury concierge + yachts; WA +57 313 695 2776 |
+| Hi Cartagena · SENT | hicartagena.com | CO | ✅ STAGED 2026-07-24 (deal 63048627065; live audit 57/C; WA +57 313 695-2776; email info@ UNVERIFIED) · SENT-ready |
 
 ### D3. Mexico — dental / medical tourism (US border + Cancún)
 
@@ -217,7 +217,7 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 | SOTA Dental | sotadental.com | MX | Cancún / Tijuana / Los Algodones / PdC — multi-city dental tourism |
 | Smile Tijuana · SENT | smiletijuana.com | MX | Border dental; bilingual; WA +52 664 293 0717 |
 | Dental Connect | dentalconnect.com.mx | MX | Tijuana border pickup + bilingual |
-| Tijuana Dental Center | tijuanadentalcenter.com | MX | Zona Río; US patients; high review volume |
+| Tijuana Dental Center · SENT | tijuanadentalcenter.com | MX | ✅ STAGED 2026-07-24 (deal 63040577101; live audit 99/A+; +1 619 906-7481; info@smile4evermexico.com) · SENT-ready |
 
 ---
 

@@ -572,5 +572,50 @@
     "emailDraft": "docs/selling/drafts/colombia-luxury-group-email.txt",
     "dealId": "63078747964",
     "score": 97
+  },
+  "dr-luis-guillermo-tobon": {
+    "phone": "573215095101",
+    "draft": "docs/selling/drafts/dr-luis-guillermo-tobon.txt",
+    "company": "Dr. Luis Guillermo Tobon",
+    "email": "info@luisguillermotobon.com",
+    "emailDraft": "docs/selling/drafts/dr-luis-guillermo-tobon-email.txt",
+    "dealId": "63061986198",
+    "score": 94
+  },
+  "hi-cartagena": {
+    "phone": "573136952776",
+    "draft": "docs/selling/drafts/hi-cartagena.txt",
+    "company": "Hi Cartagena",
+    "email": "info@hicartagena.com",
+    "emailDraft": "docs/selling/drafts/hi-cartagena-email.txt",
+    "dealId": "63048627065",
+    "score": 57
+  },
+  "tijuana-dental-center": {
+    "phone": "16199067481",
+    "draft": "docs/selling/drafts/tijuana-dental-center.txt",
+    "company": "Tijuana Dental Center",
+    "email": "info@smile4evermexico.com",
+    "emailDraft": "docs/selling/drafts/tijuana-dental-center-email.txt",
+    "dealId": "63040577101",
+    "score": 99
+  },
+  "isla-palenque": {
+    "phone": "50766173771",
+    "draft": "docs/selling/drafts/isla-palenque.txt",
+    "company": "Isla Palenque",
+    "email": "reservations@islapalenque.com",
+    "emailDraft": "docs/selling/drafts/isla-palenque-email.txt",
+    "dealId": "63063245978",
+    "score": 57
+  },
+  "american-trade-hotel": {
+    "phone": "5072112000",
+    "draft": "docs/selling/drafts/american-trade-hotel.txt",
+    "company": "American Trade Hotel",
+    "email": "info@americantradehotel.com",
+    "emailDraft": "docs/selling/drafts/american-trade-hotel-email.txt",
+    "dealId": "63037250145",
+    "score": 70
   }
 }
