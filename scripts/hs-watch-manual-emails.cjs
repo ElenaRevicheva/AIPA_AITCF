@@ -103,6 +103,7 @@ async function createFollowUpTask(dealId, company, channelLabel) {
   const due = new Date();
   due.setDate(due.getDate() + 4);
   due.setHours(23, 59, 0, 0);
+  const OWNER = process.env.HUBSPOT_OWNER_ID || '91612860'; // Elena
   const task = await hs('POST', '/crm/v3/objects/tasks', {
     properties: {
       hs_task_subject: `Soft follow-up ${channelLabel} → ${company} (no reply yet?)`,
@@ -110,6 +111,7 @@ async function createFollowUpTask(dealId, company, channelLabel) {
       hs_task_status: 'NOT_STARTED',
       hs_task_priority: 'MEDIUM',
       hs_timestamp: due.toISOString(),
+      hubspot_owner_id: OWNER,
     },
   });
   await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${dealId}`, [

@@ -17,6 +17,7 @@ There is **no native HubSpot MCP** in Cursor for this workspace. Connection is:
 | Where | Variable | Notes |
 |-------|----------|-------|
 | **Local dev (Cursor)** | `HUBSPOT_API_KEY=pat-na1-…` in `cto-aipa/.env` | **gitignored** — never commit |
+| **Owner (Elena)** | `HUBSPOT_OWNER_ID=91612860` in `.env` (optional; code defaults to Elena) | All CLIENT-MANUAL tasks/deals assign to her so Tasks → Assigned to me works |
 | **Oracle production** | `HUBSPOT_API_KEY` in `/home/ubuntu/cto-aipa/.env` | pm2 `cto-aipa --update-env` |
 | **HubSpot UI** | Development → Keys → **Service Keys** | Key name: **`Aldeazz_Marketing_Engine`** |
 

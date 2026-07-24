@@ -384,6 +384,8 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
         hs_task_status: 'NOT_STARTED',
         hs_task_priority: 'MEDIUM',
         hs_timestamp: due.toISOString(),
+        // Elena Revicheva — Tasks UI "Assigned to me"
+        hubspot_owner_id: process.env.HUBSPOT_OWNER_ID || '91612860',
       },
     }),
   }).then(r => r.json() as Promise<{ id?: string }>);

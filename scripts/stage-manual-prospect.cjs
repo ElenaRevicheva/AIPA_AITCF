@@ -19,6 +19,9 @@ const {
 const root = path.join(__dirname, '..');
 const env = fs.readFileSync(path.join(root, '.env'), 'utf8');
 const KEY = env.match(/^HUBSPOT_API_KEY=(.+)$/m)?.[1]?.trim();
+/** Elena Revicheva — always assign Manual Prospect tasks/deals so Tasks UI "Assigned to me" works */
+const HUBSPOT_OWNER_ID =
+  env.match(/^HUBSPOT_OWNER_ID=(.+)$/m)?.[1]?.trim() || '91612860';
 const VIS_KEY =
   env.match(/^VISIBILITY_API_KEY=(.+)$/m)?.[1]?.trim() ||
   env.match(/^VISIBILITY_API_KEYS=(.+)$/m)?.[1]?.trim()?.split(',')[0]?.trim() ||
@@ -1537,6 +1540,7 @@ const PROSPECT_META = {
       dealname: dealName,
       dealstage: 'qualifiedtobuy',
       pipeline: 'default',
+      hubspot_owner_id: HUBSPOT_OWNER_ID,
     },
   }).then(r => r.id);
 
@@ -1561,6 +1565,7 @@ const PROSPECT_META = {
       hs_task_status: 'NOT_STARTED',
       hs_task_priority: 'HIGH',
       hs_timestamp: due.toISOString(),
+      hubspot_owner_id: HUBSPOT_OWNER_ID,
     },
   });
   await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${dealId}`, [

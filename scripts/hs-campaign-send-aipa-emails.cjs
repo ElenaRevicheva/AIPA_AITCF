@@ -150,6 +150,7 @@ async function ensureFollowUpTask(dealId, company, note) {
       hs_task_status: 'NOT_STARTED',
       hs_task_priority: 'MEDIUM',
       hs_timestamp: due.toISOString(),
+      hubspot_owner_id: process.env.HUBSPOT_OWNER_ID || '91612860',
     },
   });
   await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${dealId}`, [
