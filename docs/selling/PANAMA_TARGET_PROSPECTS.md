@@ -8,26 +8,49 @@
 > **Commercial door (always):** `https://aideazz.xyz/portfolio` · free audit hook: `https://aideazz.xyz/api`
 > **8-word bio:** *Remote AI visibility agency — GEO · AEO · WhatsApp close.*
 
-## HubSpot verification — Jul 23–24 2026 (live API, Jul 24 afternoon)
+## HubSpot verification — list = HubSpot reality (live API, Jul 24 ~19:00 UTC)
 
-Audited with HubSpot CRM API + deal-note stamps (`scripts/_audit-note-stamps.cjs`,
-`scripts/_audit-emails-jul23-24-fast.cjs`). **Truth sources:**
+Audited with HubSpot CRM API + deal-note stamps (`scripts/_audit-manual-jul18-revision.cjs`).
+**Source of truth for “sent”:** note stamps `📧 EMAILED` / `Resend:` / `✅ SENT` (WhatsApp).
+Native HubSpot CRM Emails objects do **not** reliably log Resend/one-click — notes are the log.
 
 | Check | Result |
 |---|---|
-| `[CLIENT-MANUAL]` deals since Jul 18 (excl. queue) | **82** fully staged |
-| Deal stage | **81** ⏳ Sent + **1** 💬 Replied · **0** still 🔥 Act TODAY |
-| Note stamp `📧 EMAILED` or `Resend:` | **67 / 82** |
-| Of those, stamp dated **2026-07-23** | **20** |
-| Of those, stamp dated **2026-07-24** | **22** |
-| Note stamp `✅ SENT` (WhatsApp) | **19** (mostly earlier Jul 18–21) |
-| HubSpot CRM **Emails** object outbound to prospects Jul 23–24 | **0** linked to CLIENT-MANUAL (CRM inbox sync does not show Resend/one-click sends) |
+| `[CLIENT-MANUAL]` deals since Jul 18 (excl. queue) | **95** |
+| Rows on this file covering those deals | **95** (target tables + Early Manual section below) |
+| Deal stage | **94** ⏳ Sent + **1** 💬 Replied · **0** 🔥 Act TODAY |
+| Contacted (email OR WhatsApp stamp) | **93 / 95** |
+| Email stamp (`📧 EMAILED` or Resend) | **80** (Jul 19:1 · 20:14 · 21:10 · 23:20 · 24:35) |
+| WhatsApp stamp (`✅ SENT`) | **19** |
+| Both channels | **6** |
+| Stage moved, no email/WA stamp | **2** (Grupo Residencial 💬 · Supreme Storage ⏳) |
+| CRM Emails objects since Jul 18 (any) | **10** (incomplete vs note stamps) |
 
-**Verdict:** All 82 staged deals are in Sent/Replied. **42** have note-level email proof dated Jul 23–24 (one-click / Resend / watcher stamp). HubSpot’s native Emails API does **not** log those Resend sends — the deal note `📧 EMAILED YYYY-MM-DD` is the operational log. **15** deals are Sent-stage without an email stamp (early WA-only / special cases — see audit JSON).
+**Verdict:** This markdown is the inventory of HubSpot `[CLIENT-MANUAL]` since Jul 18. Every deal below has a HubSpot deal ID in notes or Early Manual table. Do not re-stage.
 
-**Still not staged (open hit-list, need WA dig):** giannadentist.com · sanblastour.com · thebristol.com · sortishotel.com · balboaacademy.edu · oxfordpanama.com · hospitalcima.com · medicaltourscostarica.com · goodnessdental.com · agencyofthesea.com · absolutemedicaltourism.com · sotadental.com · dentalconnect.com.mx
+Artifact: `docs/selling/_audit-jul18-revision.json` · `docs/selling/_audit-jul18-revision.md`.
 
-Artifact files: `docs/selling/_audit-note-stamps.json`, `docs/selling/_audit-emails-jul23-24-fast.json`.
+## Early Manual Prospect deals (in HubSpot since Jul 18 — outside original LATAM tables)
+
+These **13** were staged/contacted before/alongside the LATAM hit-list. They are real HubSpot deals and belong on this file so the list matches CRM.
+
+| Prospect | Domain | Channel (HubSpot note) | HubSpot |
+|---|---|---|---|
+| Alquiler de Yates Panamá · SENT | alquilerdeyatespanama.com | ✅ WA Jul 18 | deal 62792913925 · ⏳ Sent |
+| Panama Yacht Group · SENT | panamayachtgroup.com | ✅ WA Jul 18 | deal 62801585568 · ⏳ Sent |
+| Riga Design · SENT | rigadesign.pa *(Instagram @rigadesignpa — company domain stored as instagram.com in HS)* | ✅ IG/WA Jul 18 | deal 62803339042 · ⏳ Sent |
+| Grupo Residencial / Park House · REPLIED | gruporesidencial.com | stage 💬 only (no EMAILED/SENT stamp) | deal 62807104886 · 💬 They replied |
+| DQSA Panamá · SENT | dqsa.com.pa | ✅ WA Jul 19 | deal 62807534128 · ⏳ Sent |
+| Supreme Storage (Grupo Los Pueblos) · SENT | supremestorage.net | ⏳ Sent stage, no EMAILED/SENT stamp | deal 62831000747 · ⏳ Sent |
+| Pan-American Life (PALIG) Panamá · SENT | palig.com | ✅ WA Jul 19 | deal 62822214951 · ⏳ Sent |
+| Banco LAFISE Panamá · SENT | lafise.com | ✅ WA Jul 19 | deal 62828463221 · ⏳ Sent |
+| Panama Equity Real Estate · SENT | panamaequity.com | ✅ WA Jul 19 | deal 62841018415 · ⏳ Sent |
+| Eurostone Panamá · SENT | eurostonepanama.com | ✅ WA | deal 62837342362 · ⏳ Sent |
+| AIRCO / SINOTRUK Panamá · SENT | aircopanama.com | ✅ WA Jul 19 | deal 62841350764 · ⏳ Sent |
+| Sotillo & Company · SENT | sotillocompany.com | 📧 + ✅ WA Jul 19 | deal 62826916357 · ⏳ Sent |
+| Ipanema Residences (Grupo Los Pueblos) · SENT | ipanemaresidences.com | 📧 Jul 21 (aipa@ one-click) | deal 62950148475 · ⏳ Sent |
+
+---
 
 ## The 2026 market — why this lane wins (added July 21 2026)
 
@@ -242,45 +265,12 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 
 ---
 
-## Ready-to-run shortlist (audit / stage these next)
+## Ready-to-run shortlist
 
-Highest expected pain × highest ticket. **Skip already-staged.** Run Manual Prospect Play top-down:
+**Empty for new stage work.** All 95 HubSpot `[CLIENT-MANUAL]` deals since Jul 18 are on this file (LATAM tables + Early Manual section). Next work = replies, +4d follow-ups, close — not re-staging.
 
-### Panama — next unstaged Tier A/B
-1. ~~arango-orillac.com~~ — · SENT (HubSpot)
-2. ~~theskinclinicpanama.com~~ — · SENT (HubSpot)
-3. ~~dermomedica.com.pa~~ — · SENT (HubSpot)
-4. ~~centroodontologicopaitilla.com~~ — · SENT (HubSpot)
-5. ~~grupodentalnacional.com~~ — · SENT (HubSpot)
-6. giannadentist.com — A1 cosmetic/implants intl (**hold** — no verified public WA)
-7. ~~panamasonrie.com~~ — · SENT (HubSpot)
-8. ~~ivi-fertility.com~~ — · SENT (HubSpot)
-9. ~~puntapacifica.com~~ — · SENT (HubSpot)
-10. ~~relocationpanama.com~~ — · SENT (HubSpot)
-11. ~~panamaexpatservice.com~~ — · SENT (HubSpot)
-12. ~~igopanama.com~~ — · SENT (HubSpot)
-13. ~~gomitom.com~~ — · SENT (HubSpot)
-14. ~~charterinsanblas.com~~ — · SENT (HubSpot)
-15. sanblastour.com — A3 fleet (**hold** — email only, no WA)
-16. ~~islapalenque.com~~ — · SENT (HubSpot)
-17. ~~havenboquete.com~~ — · SENT (HubSpot)
-18. ~~valleescondidoboquete.com~~ — · SENT (HubSpot)
-19. ~~isp.edu.pa~~ — · SENT (HubSpot)
-20. ~~thecascoschool.com~~ — · SENT (HubSpot)
-
-### LATAM expansion (after Panama pressure eases)
-21. ~~clinicabiblica.com~~ — · SENT (HubSpot)
-22. hospitalcima.com — D1 CR medical tourism (**hold** — dig WA)
-23. goodnessdental.com — D1 CR dental tourism (**hold** — dig WA)
-24. ~~danielacorreacirujana.com~~ — · SENT (HubSpot)
-25. ~~colombialuxurygroup.com~~ — · SENT (HubSpot)
-26. ~~cancundentalspecialists.com~~ — · SENT (HubSpot)
-27. ~~smiletijuana.com~~ — · SENT (HubSpot)
-28. thebristol.com / sortishotel.com / balboaacademy.edu / oxfordpanama.com — dig WA before stage
-29. medicaltourscostarica.com / agencyofthesea.com / absolutemedicaltourism.com / sotadental.com / dentalconnect.com.mx — dig WA before stage
-
-### Already staged / blocked (do not re-create — work replies + follow-ups)
-See lists above marked ✅ STAGED / ⏸ BLOCKED / SENT. Campaign mechanism: **§4b** in `MANUAL_PROSPECT_PLAY.md`. Every emailed candidate gets a **+4 day soft follow-up** (iron rule). Proof: https://resend.com/emails
+### Already contacted (do not re-create)
+See every row marked `· SENT` / `· REPLIED` / ✅ STAGED above. Campaign mechanism: **§4b** in `MANUAL_PROSPECT_PLAY.md`. Every emailed candidate gets a **+4 day soft follow-up** (iron rule). Proof: https://resend.com/emails
 
 ---
 
