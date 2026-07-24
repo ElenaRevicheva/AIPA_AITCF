@@ -1,13 +1,67 @@
-# The Manual Prospect Play — audit → deal → one-click WhatsApp send
+# The Manual Prospect Play — audit → deal → email → WhatsApp FU
 
 > Born July 18 2026, the day the first [CLIENT-MANUAL] outreach was SENT
 > (Alquiler de Yates Panamá). This is the repeatable ~3-minute play that turns
-> "I know a potential client's website" into a staged deal with a ready-to-send
-> WhatsApp message. Canonical rules also live in Claude memory
+> "I know a potential client's website" into a staged deal with ready-to-send
+> outreach. Canonical rules also live in Claude memory
 > (`feedback_outreach_draft_rules.md`); this file is the repo source of truth.
 > **Cursor/Claude HubSpot API setup:** `docs/HUBSPOT_CURSOR_CONNECTION.md`
+> **Hit-list = HubSpot inventory:** `docs/selling/PANAMA_TARGET_PROSPECTS.md`
 
-## The play, end to end
+## How it works NOW (Jul 24 2026) — money loop
+
+**Product we sell:** AI Growth Operator (not “AI agents / GEO / bots” as separate SKUs).  
+**ICP:** high-ticket service businesses (avg sale > $2k), international, WhatsApp-close, AI-discoverable (medical tourism, dental, immigration/relo, luxury tourism / yachts / charters).
+
+### Why email first (HubSpot Starter)
+
+In LATAM, **WhatsApp is the primary app**. On HubSpot **Starter**, email is still the channel that **automatically** proves outreach started: one-click `/go/outreach-email/{slug}` or HubSpot UI Email from `aipa@` → deal → **⏳ Sent**, note `📧 EMAILED`, **+4d follow-up task**. WhatsApp Business has **no API** on Starter — WA send/reply still needs Elena (`sent` / `they replied`).
+
+**Jul 18–24 batch:** ~**95** `[CLIENT-MANUAL]` deals; most **emailed first**, few WhatsApp-first. Hit-list on GitHub matches HubSpot (**95/95**, incl. Early Manual section).
+
+### Follow-up = full WhatsApp (not a 2-line nudge)
+
+After email, FU is a **second outreach on WhatsApp**: audit already on the deal (no re-crawl) + **AI Growth Operator** pitch. Installed Jul 24 on **93/95** deals with a phone (skipped: Riga Design IG-only, San Blas Tour email-only).
+
+1. **Sales → Tasks** → filter **Assigned to Elena** (all CLIENT-MANUAL tasks/deals use `hubspot_owner_id` **91612860**).
+2. Open task → open **deal** → top of note → **`➡️ WHATSAPP FU — AI Growth Operator + auditoría`**.
+3. Click → WhatsApp opens with **full text prefilled** → Send (no manual edit).
+4. Mark task done. Reply → stage **💬 They replied** (or say `they replied {company}`).
+
+Approved FU ending (after audit paragraph):
+
+```
+No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7
+dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue
+prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga
+el CRM al día y les entregue un briefing diario con las mejores oportunidades.
+
+Si les sirve, en 15 minutos les muestro los 3 arreglos de esa auditoría y cómo
+quedaría el Operator en su negocio — sin compromiso. Auditoría gratuita:
+https://aideazz.xyz/api
+
+Saludos,
+Elena✨
+```
+
+Re-install / refresh note buttons (ops): `node scripts/_install-wa-fu-notes.cjs`  
+Assign owner if Tasks hide: `node scripts/_assign-manual-tasks-elena.cjs`
+
+### HubSpot fruit (what “done” looks like)
+
+| Step | HubSpot |
+|------|---------|
+| Staged | Deal `[CLIENT-MANUAL]` · owner Elena · note + send task |
+| First contact | **⏳ Sent** + `📧 EMAILED` / `✅ SENT` |
+| FU ready | Task *WhatsApp FU → {Company}* + note WA FU button |
+| Conversation | **💬 They replied** |
+| Cash | **✅ Won** + Amount |
+
+Views that matter: **CLIENT-MANUAL**, **NEW today**, **ACTIVE (1–7d)**, **AGING**, **Tasks → Assigned to me**.
+
+---
+
+## The play, end to end (stage a new prospect)
 
 1. **Audit the prospect** with our own Visibility API (free, no keys):
    ```bash
@@ -71,7 +125,9 @@
      (the preview page shows the recipient — Elena confirms before sending). Never ship a note with
      only the WhatsApp button. Save the WA draft in `docs/selling/drafts/{slug}.txt` and the pack in
      `docs/selling/prospects/{COMPANY}.md`.
-   - **Task** — HIGH, due same day: "Send WhatsApp outreach → {Company}"
+   - **Task** — HIGH, due same day: "Send outreach → {Company}" — **always**
+     `hubspot_owner_id: 91612860` (Elena). Same owner on the deal. New follow-up /
+     email-watcher / one-click tasks must set this too (see `HUBSPOT_OWNER_ID` in `.env`).
 
 4. **One-click send links (WhatsApp + Email)** — message pre-typed so Elena only hits Send:
    ```bash
@@ -121,11 +177,11 @@
    - Skips re-send if note already has `📧 EMAILED` or `Resend:…`.
    - Else Resend from `aipa@aideazz.xyz` → deal **⏳ Sent** (`decisionmakerboughtin`)
      → stamps note with Resend id.
-   - **Iron rule — +4 day soft follow-up for EVERY campaign candidate** (new send
-     *and* already-emailed rows): creates (or reuses) an open Task
-     `Soft follow-up email/WA → {Company} (no reply yet?)`, due ~+4 calendar days,
-     stamps `📅 Follow-up task {id} due {YYYY-MM-DD}` on the note. Idempotent —
-     will not duplicate if an open follow-up already exists.
+   - **Iron rule — +4 day follow-up for EVERY campaign candidate** (new send
+     *and* already-emailed rows): creates (or reuses) an open Task assigned to
+     Elena; due ~+4 calendar days; stamp `📅 Follow-up task…` on the note.
+     **Elena’s action:** deal note → **WHATSAPP FU** (full Operator+audit text),
+     not a 2-line soft nudge. Idempotent — will not duplicate if open FU exists.
    - Proof of send: [https://resend.com/emails](https://resend.com/emails) (not Zoho Sent).
 
    **Hit-list source:** stage domains from `docs/selling/PANAMA_TARGET_PROSPECTS.md`
@@ -133,19 +189,16 @@
    staged for WhatsApp-only; campaign skips them until an email is added to the
    registry.
 
-5. **After Elena sends** (she says "sent" — WhatsApp Business app has no API,
-   so detection is manual by design): move deal → **decisionmakerboughtin**
-   ("⏳ Sent — passive wait"), mark the *send* task COMPLETED, append `✅ SENT {date}`
-   to the note, **and automatically create a follow-up Task** on the same deal:
-   - Subject: `Soft follow-up WhatsApp → {Company} (no reply yet?)`
-   - Priority: MEDIUM · due **~+4 calendar days** (end of that day)
-   - Body: if still silent, soft 1–2 line follow-up; if they already replied, ignore
-     and use the 💬 path instead
-   - Append `📅 Follow-up task {id} due {YYYY-MM-DD}` to the note
-   Same +4 day follow-up rule applies to **campaign** and **HubSpot UI email**
-   (watcher) paths — every sent candidate gets one.
-   On reply (before or after that date): stage → **contractsent** ("💬 They replied — I act"),
-   and complete/cancel the follow-up task so it does not nag.
+5. **After first contact**
+   - **Email one-click / HubSpot UI:** auto → **⏳ Sent**, `📧 EMAILED`, +4d FU task
+     (owner Elena). No need to say "emailed".
+   - **WhatsApp first contact** (she says `sent {company}` — no WA API on Starter):
+     move deal → **decisionmakerboughtin** ("⏳ Sent"), complete send task, append
+     `✅ SENT {date}`, create +4d FU task (owner Elena), stamp `📅 Follow-up task…`.
+   - **FU work (Jul 24+):** open the FU task → deal note → click
+     **`WHATSAPP FU — AI Growth Operator + auditoría`** → Send prefilled WhatsApp
+     (audit from deal + Operator ending above). **Not** a 2-line soft nudge.
+   - On reply: stage → **contractsent** ("💬 They replied — I act"), complete/cancel FU task.
 
 6. **The "send it by email" reply path** (added July 20 2026 — Panama Aesthetics):
    when a prospect answers WhatsApp with "commercial proposals go to email":
@@ -194,6 +247,12 @@ Saludos,
 Elena✨🌍💫
 ```
 
+**Jul 24 positioning (FU / new drafts):** PD and FU ending sell **one product** —
+**AI Growth Operator** (modules: AI visibility, research, outreach, WhatsApp qualify,
+CRM, daily briefing). Prefer that language over a long menu of separate AI services.
+First-contact template above remains valid for audit-led openers; FU uses the
+approved Operator block in **How it works NOW**.
+
 ### Iron rules (from Elena, all July 18 2026)
 0. **ALWAYS `https://` on every link** (July 19 2026, proven with WhatsApp screenshots):
    the portfolio link MUST be `https://aideazz.xyz/portfolio` — bare `aideazz.xyz/portfolio`
@@ -215,6 +274,11 @@ Elena✨🌍💫
    Panama: https://aideazz.xyz/portfolio." … "Have a great day! / Best, / Elena✨🌍💫".
 
 ## Deals sent with this play
+
+**Scale (Jul 24 2026 live HubSpot):** **95** `[CLIENT-MANUAL]` since Jul 18 · **93** contacted
+(email and/or WA stamp) · **0** still 🔥 Act TODAY · WhatsApp FU buttons on **93** notes ·
+full inventory + Early Manual 13 in `PANAMA_TARGET_PROSPECTS.md`. Below = early seed rows;
+do not re-stage anyone already `· SENT` on the hit-list.
 
 | Date | Company | Audit | Deal |
 |------|---------|-------|------|
