@@ -464,5 +464,113 @@
     "emailDraft": "docs/selling/drafts/gamboa-rainforest-reserve-email.txt",
     "dealId": "63039072050",
     "score": 85
+  },
+  "grupo-dental-nacional": {
+    "phone": "50766707039",
+    "draft": "docs/selling/drafts/grupo-dental-nacional.txt",
+    "company": "Grupo Dental Nacional",
+    "email": "info@grupodentalnacional.com",
+    "emailDraft": "docs/selling/drafts/grupo-dental-nacional-email.txt",
+    "dealId": "63051086933",
+    "score": 54
+  },
+  "hospital-punta-pac-fica": {
+    "phone": "50766141448",
+    "draft": "docs/selling/drafts/hospital-punta-pac-fica.txt",
+    "company": "Hospital Punta Pacífica",
+    "email": "turismomedico@pacificasalud.com",
+    "emailDraft": "docs/selling/drafts/hospital-punta-pac-fica-email.txt",
+    "dealId": "63052782744",
+    "score": 64
+  },
+  "hospital-san-fernando": {
+    "phone": "50766393783",
+    "draft": "docs/selling/drafts/hospital-san-fernando.txt",
+    "company": "Hospital San Fernando",
+    "email": "global@hospitalsanfernando.com",
+    "emailDraft": "docs/selling/drafts/hospital-san-fernando-email.txt",
+    "dealId": "63064457219",
+    "score": 85
+  },
+  "finca-l-rida": {
+    "phone": "50765095139",
+    "draft": "docs/selling/drafts/finca-l-rida.txt",
+    "company": "Finca Lérida",
+    "email": "info@fincalerida.com",
+    "emailDraft": "docs/selling/drafts/finca-l-rida-email.txt",
+    "dealId": "63061827228",
+    "score": 50
+  },
+  "los-quetzales-ecolodge": {
+    "phone": "50766712131",
+    "draft": "docs/selling/drafts/los-quetzales-ecolodge.txt",
+    "company": "Los Quetzales EcoLodge",
+    "email": "stay@losquetzales.com",
+    "emailDraft": "docs/selling/drafts/los-quetzales-ecolodge-email.txt",
+    "dealId": "63060432904",
+    "score": 54
+  },
+  "hospital-clinica-biblica": {
+    "phone": "50685957000",
+    "draft": "docs/selling/drafts/hospital-clinica-biblica.txt",
+    "company": "Hospital Clinica Biblica",
+    "email": "info@clinicabiblica.com",
+    "emailDraft": "docs/selling/drafts/hospital-clinica-biblica-email.txt",
+    "dealId": "63033505966",
+    "score": 79
+  },
+  "hospital-metropolitano": {
+    "phone": "50664343139",
+    "draft": "docs/selling/drafts/hospital-metropolitano.txt",
+    "company": "Hospital Metropolitano",
+    "email": "info@metropolitanocr.com",
+    "emailDraft": "docs/selling/drafts/hospital-metropolitano-email.txt",
+    "dealId": "63065540143",
+    "score": 82
+  },
+  "costa-rica-yacht-charter-brokers": {
+    "phone": "50662422041",
+    "draft": "docs/selling/drafts/costa-rica-yacht-charter-brokers.txt",
+    "company": "Costa Rica Yacht Charter Brokers",
+    "email": "step-aboard@yachtchartercr.com",
+    "emailDraft": "docs/selling/drafts/costa-rica-yacht-charter-brokers-email.txt",
+    "dealId": "63064457478",
+    "score": 88
+  },
+  "elite-cartagena": {
+    "phone": "15164936070",
+    "draft": "docs/selling/drafts/elite-cartagena.txt",
+    "company": "Elite Cartagena",
+    "email": "jc@elitecartagena.com",
+    "emailDraft": "docs/selling/drafts/elite-cartagena-email.txt",
+    "dealId": "63077716274",
+    "score": 97
+  },
+  "dr-jorge-rodriguez": {
+    "phone": "573003719688",
+    "draft": "docs/selling/drafts/dr-jorge-rodriguez.txt",
+    "company": "Dr. Jorge Rodriguez",
+    "email": "info@drjorgerodriguez.com",
+    "emailDraft": "docs/selling/drafts/dr-jorge-rodriguez-email.txt",
+    "dealId": "63067846953",
+    "score": 80
+  },
+  "salud-sin-fronteras": {
+    "phone": "573507316151",
+    "draft": "docs/selling/drafts/salud-sin-fronteras.txt",
+    "company": "Salud sin Fronteras",
+    "email": "coordinacion@saludsinfronteras.com",
+    "emailDraft": "docs/selling/drafts/salud-sin-fronteras-email.txt",
+    "dealId": "63033678371",
+    "score": 99
+  },
+  "colombia-luxury-group": {
+    "phone": "573042091627",
+    "draft": "docs/selling/drafts/colombia-luxury-group.txt",
+    "company": "Colombia Luxury Group",
+    "email": "info@colombialuxurygroup.com",
+    "emailDraft": "docs/selling/drafts/colombia-luxury-group-email.txt",
+    "dealId": "63078747964",
+    "score": 97
   }
 }

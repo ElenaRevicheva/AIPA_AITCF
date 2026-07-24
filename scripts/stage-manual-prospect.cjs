@@ -77,13 +77,14 @@ function parseContacts(html) {
     })
     .filter(p => p.length >= 10 && p.startsWith('507'));
   // Emails: mailto links AND plain text (many Panama sites print info@… as text).
-  const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js)$|@(2x|3x)\b|sentry|wixpress|example\.|correoernesto|^[0-9]+@/i;
+  const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js|html)$|@(2x|3x)\b|sentry|wixpress|example\.|correoernesto|^[0-9]+@|@.*-seccion\.|user@domain|john@doe|ttycirugia/i;
   const emails = [
     ...[...html.matchAll(/mailto:([^"'\s?]+)/gi)].map(m => m[1]),
     ...(html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []),
   ]
     .map(e => e.toLowerCase())
-    .filter(e => !junk.test(e));
+    .filter(e => !junk.test(e))
+    .filter(e => /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(e));
   const wa = phones[0] || null;
   const onDomain = emails.find(e => e.endsWith(`@${domain}`) || e.includes(domain.split('.')[0]));
   const email = onDomain || emails[0] || null;
@@ -526,7 +527,7 @@ const PROSPECT_META = {
     contactFirstName: 'San Blas Tour',
     contactLastName: '(WhatsApp contact)',
     preferredEmail: 'contact@sanblastour.com',
-    preferredPhone: '50760000000',
+    // no preferredPhone — dig live WA before staging (do not invent)
   },
   'sanblasonsailboats.com': {
     company: 'San Blas on Sailboats',
@@ -663,6 +664,502 @@ const PROSPECT_META = {
     preferredEmail: 'wendy@destinationdreamweddings.com',
     preferredPhone: '12044064876',
   },
+  'panamasonrie.com': {
+    company: 'Panamá Sonríe',
+    city: 'Panama City',
+    customer: 'paciente que busca diseño de sonrisa o prótesis dental en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica de diseño de sonrisa en Panamá?',
+    compliment: 'Panamá Sonríe ofrece diseño de sonrisa y prótesis con presencia en Via Israel y Albrook',
+    gapClause: 'aún no aparecen como respuesta citable cuando alguien pregunta por clínicas dentales en Panamá',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas dentales 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes, video con IA para marketing de procedimientos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ pacientes/precios/implantes, (2) FAQPage/Dentist JSON-LD, (3) llms.txt',
+    contactFirstName: 'Panamá Sonríe',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50761405700',
+    preferredEmail: 'info@panamasonrie.com',
+  },
+  'arango-orillac.com': {
+    company: 'Clínica Arango Orillac',
+    city: 'Panama City',
+    customer: 'paciente internacional que busca odontología de confianza en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica dental bilingüe en Panamá?',
+    compliment: 'desde 1935 con más de 50 profesionales e inglés garantizado — credibilidad real',
+    gapClause: 'faltan FAQs citables sobre odontología internacional que ChatGPT pueda usar como respuesta',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes internacionales, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ pacientes intl + inglés, (2) Dentist/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Clínica Arango Orillac',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50769973733',
+    // Site is WA-only; directory listings show info@ — flag UNVERIFIED in note when used
+    preferredEmail: 'info@arango-orillac.com',
+  },
+  'centroodontologicopaitilla.com': {
+    company: 'Centro Odontológico Paitilla',
+    city: 'Panama City',
+    customer: 'paciente que busca odontología en Paitilla / turismo dental',
+    moneyQuery: '¿cuál es la mejor clínica dental en Paitilla Panamá?',
+    compliment: 'desde 1990 en el Centro Médico Paitilla con alto volumen de reseñas',
+    gapClause: 'aún no aparecen como respuesta citable frente a clínicas competidoras en búsquedas de IA',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan citas 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ citas/especialidades, (2) Dentist/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Centro Odontológico Paitilla',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50762334051',
+    preferredEmail: 'contacto@centroodontologicopaitilla.com',
+  },
+  'theskinclinicpanama.com': {
+    company: 'The Skin Clinic Panama',
+    city: 'Panama City',
+    customer: 'paciente que busca dermatología o estética médica en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica de dermatología en Panamá?',
+    compliment: 'Dr. Drohan (Tulane) en Hospital Pacífica Salud — perfil médico internacional fuerte',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre dermatología en Panamá',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas estéticas 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing de tratamientos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ tratamientos/precios, (2) Physician/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'The Skin Clinic',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764509248',
+    preferredEmail: 'citas@theskinclinicpanama.com',
+  },
+  'dermomedica.com.pa': {
+    company: 'DermoMédica',
+    city: 'Panama City',
+    customer: 'paciente que busca dermatología clínica o cosmiatría en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica de dermatología y láser en Panamá?',
+    compliment: 'ofrecen dermatología clínica, cosmiatría y láser con sitio en inglés',
+    gapClause: 'faltan FAQs citables sobre tratamientos que los motores de IA puedan responder',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ tratamientos/láser, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'DermoMédica',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50762372819',
+    preferredEmail: 'info@dermomedica.com.pa',
+  },
+  'grupodentalnacional.com': {
+    company: 'Grupo Dental Nacional',
+    city: 'Panama City',
+    customer: 'paciente que busca odontología en Centro Médico Nacional o La Chorrera',
+    moneyQuery: '¿cuál es la mejor clínica dental Almanza Carrizo en Panamá?',
+    compliment: 'más de 25 años con sedes en Centro Médico Nacional y La Chorrera',
+    gapClause: 'faltan respuestas citables cuando alguien busca clínicas dentales multi-sede en Panamá',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan citas multi-sede 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ sedes/especialidades, (2) Dentist/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Grupo Dental Nacional',
+    contactLastName: '(WhatsApp contact)',
+    // Contacto page: WhatsApp mobiles (507) 6670-7039 / 6673-6040 — no public mailto → info@ UNVERIFIED
+    preferredPhone: '50766707039',
+  },
+  'giannadentist.com': {
+    company: 'Gianna Dentist / MaDenta',
+    city: 'Panama City',
+    customer: 'paciente internacional que busca odontología cosmética o implantes en Panamá',
+    moneyQuery: '¿cuál es la mejor clínica de implantes dentales en Panamá para extranjeros?',
+    compliment: 'enfocados en cosmética e implantes para pacientes internacionales y expats',
+    gapClause: 'faltan FAQs citables sobre eval online / turismo dental que ChatGPT pueda usar',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan evaluaciones 24/7 (EN/ES, conectados a su CRM), automatización de intake intl, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ implantes/turismo dental, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Gianna Dentist',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'info@giannadentist.com',
+    // hold — no verified public WA yet (form-only site)
+  },
+  'puntapacifica.com': {
+    company: 'Hospital Punta Pacífica',
+    city: 'Panama City',
+    customer: 'paciente internacional que busca hospital afiliado a Johns Hopkins en Panamá',
+    moneyQuery: '¿cuál es el mejor hospital de turismo médico en Panamá?',
+    compliment: 'Pacífica Salud / Punta Pacífica es afiliado a Johns Hopkins Medicine International — marca clínica fuerte',
+    gapClause: 'faltan FAQs citables de turismo médico que ChatGPT use frente a otros hospitales en Panamá',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y coordinan pacientes intl 24/7 (EN/ES, conectados a su CRM), automatización de intake médico, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ turismo médico/especialidades, (2) Hospital/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Mike',
+    contactLastName: 'Kelly (Medical Tourism)',
+    // pacificasalud.com medical-tourism page: Mike Kelly +507-6614-1448 / turismomedico@pacificasalud.com
+    preferredPhone: '50766141448',
+    preferredEmail: 'turismomedico@pacificasalud.com',
+  },
+  'hospitalsanfernando.com': {
+    company: 'Hospital San Fernando',
+    city: 'Panama City',
+    customer: 'paciente internacional que busca hospital JCI o Global Patient Care en Panamá',
+    moneyQuery: '¿cuál es el mejor hospital privado JCI en Panamá para pacientes internacionales?',
+    compliment: 'Clínica Hospital San Fernando fue el primer hospital privado de Panamá y opera Global Patient Care 24/7',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre atención a pacientes internacionales en San Fernando',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y coordinan pacientes intl 24/7 (EN/ES, conectados a su CRM), automatización de intake médico, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ Global Patient Care/especialidades, (2) Hospital/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Global Patient Care',
+    contactLastName: '(WhatsApp contact)',
+    // Site: global@hospitalsanfernando.com / 6639-3783 (Global Patient Care)
+    preferredPhone: '50766393783',
+    preferredEmail: 'global@hospitalsanfernando.com',
+  },
+  'fincalerida.com': {
+    company: 'Finca Lérida',
+    city: 'Boquete',
+    customer: 'viajero que busca hotel boutique de café o coffee estate en Boquete',
+    moneyQuery: '¿cuál es el mejor coffee estate hotel en Boquete Panamá?',
+    compliment: 'Finca Lérida es un coffee estate histórico en Boquete (Cayuga Collection) — propuesta premium clara',
+    gapClause: 'faltan FAQs citables sobre estadía/café/tours que ChatGPT pueda responder frente a otros lodges de Boquete',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas/tours 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ estadía/café/tours, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Finca Lérida',
+    contactLastName: '(WhatsApp contact)',
+    // hotelfincalerida.com/contact: WhatsApp rooms +507 6509-5139; email on domain
+    preferredPhone: '50765095139',
+    preferredEmail: 'info@fincalerida.com',
+  },
+  'losquetzales.com': {
+    company: 'Los Quetzales EcoLodge',
+    city: 'Cerro Punta',
+    customer: 'viajero que busca ecolodge, birding o spa en las tierras altas de Chiriquí',
+    moneyQuery: '¿cuál es el mejor ecolodge en Cerro Punta Panamá?',
+    compliment: 'Los Quetzales es un ecolodge icónico en Cerro Punta con birding y spa en cloud forest',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre ecolodges en Cerro Punta / Guadalupe',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ estadía/birding/spa, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Los Quetzales',
+    contactLastName: '(WhatsApp contact)',
+    // Footer: +507 6671-2131 / stay@losquetzales.com
+    preferredPhone: '50766712131',
+    preferredEmail: 'stay@losquetzales.com',
+  },
+  'havenboquete.com': {
+    company: 'The Haven Wellness Resort',
+    city: 'Boquete',
+    customer: 'viajero que busca spa, yoga o wellness retreat en Boquete',
+    moneyQuery: '¿cuál es el mejor wellness resort en Boquete Panamá?',
+    compliment: 'The Haven combina hotel, spa y estudio de yoga en Boquete — propuesta wellness clara',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre wellness en Boquete',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas/spa 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ spa/yoga/estadía, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'The Haven',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764915578',
+    preferredEmail: 'info@havenboquete.com',
+  },
+  'valleescondidoboquete.com': {
+    company: 'Valle Escondido Resort',
+    city: 'Boquete',
+    customer: 'pareja o grupo que busca bodas o eventos en Boquete',
+    moneyQuery: '¿dónde hacer una boda o evento en Boquete Panamá?',
+    compliment: 'Valle Escondido es un resort de eventos y bodas en Boquete con oferta clara',
+    gapClause: 'faltan FAQs citables sobre eventos/bodas que los motores de IA puedan responder',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y coordinan eventos 24/7 (EN/ES, conectados a su CRM), automatización de intake de eventos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ eventos/bodas/paquetes, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Valle Escondido',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50765369875',
+    preferredEmail: 'eventos@valleescondidoboquete.com',
+  },
+  'isp.edu.pa': {
+    company: 'International School of Panama',
+    city: 'Panama City',
+    customer: 'familia expat que busca colegio internacional IB en Panamá',
+    moneyQuery: '¿cuál es el mejor colegio internacional en Panamá?',
+    compliment: 'ISP es NEASC/IB con más de 40 años — referencia fuerte para familias internacionales',
+    gapClause: 'faltan FAQs citables de admisiones que ChatGPT use cuando un expat busca colegio en Panamá',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que responden y califican leads de admisiones 24/7 (EN/ES, conectados a su CRM), automatización de intake de admisiones, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ admisiones/IB/fees, (2) EducationalOrganization/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'ISP Admissions',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50769821470',
+    preferredEmail: 'admissions@isp.edu.pa',
+  },
+  'thecascoschool.com': {
+    company: 'The Casco School',
+    city: 'Panama City',
+    customer: 'familia que busca colegio bilingüe británico en Panamá',
+    moneyQuery: '¿cuál es el mejor colegio británico bilingüe en Panamá?',
+    compliment: 'colegio británico bilingüe con sedes en Albrook y Costa del Este',
+    gapClause: 'faltan respuestas citables de admisiones que los motores de IA puedan usar',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que responden y califican admisiones 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ admisiones/curriculum, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'The Casco School',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766442413',
+    preferredEmail: 'admissions@thecascoschool.com',
+  },
+  'bostonschool.edu.pa': {
+    company: 'Boston School International',
+    city: 'Panama City',
+    customer: 'familia expat que busca colegio internacional en Costa del Este',
+    moneyQuery: '¿cuál es el mejor colegio internacional en Costa del Este Panamá?',
+    compliment: 'colegio internacional en Costa del Este con flujo claro de tours y admisiones',
+    gapClause: 'faltan FAQs citables de admisiones que ChatGPT use cuando un expat busca colegio en Panamá',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que responden y califican leads de admisiones 24/7 (EN/ES, conectados a su CRM), automatización de intake de admisiones, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ admisiones/curriculum/fees, (2) EducationalOrganization/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Boston School Admissions',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764548560',
+    preferredEmail: 'admissions@bostonschool.edu.pa',
+  },
+  'studiohavenboquete.com': {
+    company: 'STUDIO at The Haven',
+    city: 'Boquete',
+    customer: 'viajero o residente que busca yoga o wellness en Boquete',
+    moneyQuery: '¿dónde hacer yoga o wellness en Boquete Panamá?',
+    compliment: 'estudio de yoga/ejercicio ligado a The Haven en Boquete — propuesta wellness clara',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre yoga/wellness en Boquete',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan clases/reservas 24/7 (EN/ES, conectados a su CRM), automatización de booking, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ clases/horarios/precios, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'STUDIO Haven',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50764260843',
+    preferredEmail: 'studiohavenboquete@gmail.com',
+  },
+  'gamboaresort.com': {
+    company: 'Gamboa Rainforest Reserve',
+    city: 'Gamboa',
+    customer: 'grupo o viajero internacional que busca venue o eco-resort cerca del Canal',
+    moneyQuery: '¿cuál es el mejor resort o venue de eventos en Gamboa Panamá?',
+    compliment: 'eco-resort/nature venue con oferta internacional de grupos y eventos',
+    gapClause: 'faltan FAQs citables sobre estadía y eventos que los motores de IA puedan responder',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas/eventos 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ reservas/eventos/paquetes, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Gamboa Rainforest',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766723083',
+    preferredEmail: 'reservations@gamboaresort.com',
+  },
+  'redfrogbeach.com': {
+    company: 'Red Frog Beach Island Resort',
+    city: 'Bocas del Toro',
+    customer: 'viajero o comprador que busca resort o propiedad en Bocas',
+    moneyQuery: '¿cuál es el mejor resort en Bocas del Toro?',
+    compliment: 'combinan resort e inmobiliaria en Bocas — ticket alto e internacional',
+    gapClause: 'faltan FAQs citables sobre estadía y propiedades que ChatGPT pueda citar',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y califican reservas/leads RE 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing del destino, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ resort/RE/precios, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Red Frog Beach',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50763476597',
+    preferredEmail: 'reservations@redfrogbeach.com',
+  },
+  'islapalenque.com': {
+    company: 'Isla Palenque',
+    city: 'Bocas del Toro',
+    customer: 'viajero de lujo que busca resort en isla privada en Bocas',
+    moneyQuery: '¿cuál es el mejor resort de isla privada en Bocas del Toro?',
+    compliment: 'resort de lujo en isla privada — posicionamiento premium internacional',
+    gapClause: 'faltan respuestas estructuradas que ChatGPT cite sobre resorts premium en Bocas',
+    pdEmoji: '🛥️',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan reservas de lujo 24/7 (EN/ES, conectados a su CRM), automatización de reservas, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ estadía/paquetes, (2) LodgingBusiness/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Isla Palenque',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'reservations@islapalenque.com',
+  },
+  'cancundentalspecialists.com': {
+    company: 'Cancun Dental Specialists',
+    city: 'Cancún',
+    customer: 'paciente de EE.UU./Canadá que busca odontología en Cancún',
+    moneyQuery: '¿cuál es la mejor clínica dental en Cancún para pacientes de EE.UU.?',
+    compliment: 'Hotel Zone con dentistas en inglés y alto volumen de pacientes norteamericanos',
+    gapClause: 'faltan FAQs citables de turismo dental que ChatGPT use frente a competidores de Cancún',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that answer and book dental consults 24/7 (EN/ES, CRM-wired), international patient intake automation, AI video for procedure marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ US patients/prices/travel, (2) Dentist/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Cancun Dental Specialists',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '529983130107',
+    preferredEmail: 'contact@cancundentalspecialists.com',
+  },
+  'smiletijuana.com': {
+    company: 'Smile Tijuana',
+    city: 'Tijuana',
+    customer: 'paciente de EE.UU. que busca odontología fronteriza bilingüe',
+    moneyQuery: '¿cuál es la mejor clínica dental en Tijuana para pacientes de San Diego?',
+    compliment: 'clínica fronteriza bilingüe con flujo claro para pacientes de EE.UU.',
+    gapClause: 'faltan respuestas citables en IA sobre odontología fronteriza en Tijuana',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that answer and book dental consults 24/7 (EN/ES, CRM-wired), border-patient intake automation, AI video for marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ border patients/prices, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Smile Tijuana',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '526642930717',
+    preferredEmail: 'info@smiletijuanadentist.com',
+  },
+  'clinicabiblica.com': {
+    company: 'Hospital Clinica Biblica',
+    city: 'San José',
+    customer: 'paciente internacional que busca hospital privado en Costa Rica',
+    moneyQuery: '¿cuál es el mejor hospital privado en Costa Rica para pacientes internacionales?',
+    compliment: 'Clínica Bíblica is Costa Rica’s longest-running private hospital with an English-facing intl patient path',
+    gapClause: 'AI answers still lack citable FAQs on intl patient intake vs other CR hospitals',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that answer and coordinate intl patients 24/7 (EN/ES, CRM-wired), medical intake automation, AI video for hospital marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ intl patients/specialties, (2) Hospital/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Hospital Clinica Biblica',
+    contactLastName: '(WhatsApp contact)',
+    // Site click-to-chat / wa.me 50685957000 — no public mailto → info@ UNVERIFIED
+    preferredPhone: '50685957000',
+  },
+  'metropolitanocr.com': {
+    company: 'Hospital Metropolitano',
+    city: 'San José',
+    customer: 'paciente o turista que busca hospital multi-sede en Costa Rica',
+    moneyQuery: '¿cuál es el mejor hospital Metropolitano en Costa Rica?',
+    compliment: 'Hospital Metropolitano has multi-site coverage including tourism corridors (Guanacaste / Quepos)',
+    gapClause: 'missing citable AI answers for multi-site hospital choice and intl patient flow in Costa Rica',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that answer and coordinate patients 24/7 (EN/ES, CRM-wired), intake automation across sites, AI video for marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ sedes/especialidades/turismo médico, (2) Hospital/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Hospital Metropolitano',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50664343139',
+    preferredEmail: 'info@metropolitanocr.com',
+  },
+  'yachtchartercr.com': {
+    company: 'Costa Rica Yacht Charter Brokers',
+    city: 'Costa Rica',
+    customer: 'viajero que busca yacht charter de lujo en Costa Rica',
+    moneyQuery: '¿cuál es el mejor yacht charter en Costa Rica?',
+    compliment: 'you run a luxury yacht charter concierge brand for Costa Rica’s Pacific',
+    gapClause: 'AI still lacks structured FAQs on routes, boats, and booking that get cited vs competitors',
+    pdEmoji: '🛥️',
+    pdLine: 'I build WhatsApp agents that answer and book charters 24/7 (EN/ES, CRM-wired), reservation automation, AI video for destination marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ boats/routes/pricing, (2) FAQPage/TouristTrip JSON-LD, (3) llms.txt',
+    contactFirstName: 'CR Yacht Charter',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50662422041',
+    preferredEmail: 'step-aboard@yachtchartercr.com',
+  },
+  'elitecartagena.com': {
+    company: 'Elite Cartagena',
+    city: 'Cartagena',
+    customer: 'viajero que busca yacht o catamarán verificado en Cartagena',
+    moneyQuery: '¿cuál es el mejor yacht charter en Cartagena?',
+    compliment: 'Elite Cartagena markets a verified yacht/catamaran fleet for Cartagena',
+    gapClause: 'missing citable FAQs on fleet, pricing, and booking that ChatGPT can use',
+    pdEmoji: '🛥️',
+    pdLine: 'I build WhatsApp agents that answer and book charters 24/7 (EN/ES, CRM-wired), reservation automation, AI video for destination marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ fleet/prices/routes, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Elite Cartagena',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '15164936070',
+    preferredEmail: 'jc@elitecartagena.com',
+  },
+  'drjorgerodriguez.com': {
+    company: 'Dr. Jorge Rodriguez',
+    city: 'Medellín',
+    customer: 'paciente internacional que busca cirugía estética en Medellín',
+    moneyQuery: '¿cuál es el mejor cirujano plástico en Medellín para pacientes internacionales?',
+    compliment: 'intl-facing aesthetic practice in Medellín with a bilingual patient path',
+    gapClause: 'missing citable FAQs on procedures and medical tourism that AI engines can answer',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that answer and book consults 24/7 (EN/ES, CRM-wired), intl patient intake automation, AI video for procedure marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ procedures/travel/pricing, (2) Physician/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Dr. Jorge Rodriguez',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '573003719688',
+  },
+  'saludsinfronteras.com': {
+    company: 'Salud sin Fronteras',
+    city: 'Medellín',
+    customer: 'paciente internacional que busca facilitador de turismo médico en Colombia',
+    moneyQuery: '¿cuál es el mejor facilitador de turismo médico en Medellín?',
+    compliment: 'you coordinate medical tourism across Medellín/Bogotá/Cartagena for intl patients',
+    gapClause: 'AI still lacks citable FAQs on packages, specialties, and intake for medical tourism facilitators',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that qualify and route intl patients 24/7 (EN/ES, CRM-wired), intake automation, AI video for destination marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ packages/specialties/travel, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Salud sin Fronteras',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '573507316151',
+  },
+  'colombialuxurygroup.com': {
+    company: 'Colombia Luxury Group',
+    city: 'Cartagena',
+    customer: 'viajero que busca yacht rental o charter en Cartagena',
+    moneyQuery: '¿cuál es el mejor yacht rental en Cartagena?',
+    compliment: 'Cartagena yacht rental with a fast WhatsApp quote flow — clear luxury positioning',
+    gapClause: 'missing structured FAQs on fleet, routes, and pricing that ChatGPT can cite',
+    pdEmoji: '🛥️',
+    pdLine: 'I build WhatsApp agents that answer and book charters 24/7 (EN/ES, CRM-wired), reservation automation, AI video for destination marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ fleet/prices/routes, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Colombia Luxury Group',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '573042091627',
+  },
+  'luisguillermotobon.com': {
+    company: 'Dr. Luis Guillermo Tobon',
+    city: 'Medellín',
+    customer: 'paciente internacional que busca cirugía estética en Medellín',
+    moneyQuery: '¿cuál es el mejor cirujano plástico en Medellín con 30 años de experiencia?',
+    compliment: '30+ years aesthetic surgery in Medellín with an English-facing intl path',
+    gapClause: 'missing citable FAQs on procedures and medical tourism that AI engines can answer',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that answer and book consults 24/7 (EN/ES, CRM-wired), intl patient intake automation, AI video for procedure marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ procedures/travel/pricing, (2) Physician/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Dr. Luis Guillermo Tobon',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '573215095101',
+  },
+  'hicartagena.com': {
+    company: 'Hi Cartagena',
+    city: 'Cartagena',
+    customer: 'viajero que busca concierge de lujo o yachts en Cartagena',
+    moneyQuery: '¿cuál es el mejor luxury concierge o yacht en Cartagena?',
+    compliment: 'luxury concierge + yachts in Cartagena with a WhatsApp-first booking path',
+    gapClause: 'AI answers lack structured FAQs on charters and concierge packages to cite',
+    pdEmoji: '🛥️',
+    pdLine: 'I build WhatsApp agents that answer and book 24/7 (EN/ES, CRM-wired), reservation automation, AI video for destination marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ yachts/concierge/pricing, (2) FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Hi Cartagena',
+    contactLastName: '(WhatsApp contact)',
+    // Hit-list verified WA +57 313 695 2776
+    preferredPhone: '573136952776',
+  },
+  'tijuanadentalcenter.com': {
+    company: 'Tijuana Dental Center',
+    city: 'Tijuana',
+    customer: 'paciente de EE.UU. que busca odontología en Zona Río Tijuana',
+    moneyQuery: '¿cuál es la mejor clínica dental en Tijuana Zona Río para pacientes de EE.UU.?',
+    compliment: 'Zona Río clinic with high US-patient volume and an English contact path',
+    gapClause: 'missing citable FAQs on border dental care that ChatGPT uses vs competitors',
+    pdEmoji: '✨',
+    pdLine: 'I build WhatsApp agents that answer and book dental consults 24/7 (EN/ES, CRM-wired), border-patient intake automation, AI video for marketing, and AI-system rescue.',
+    topFixes: '(1) FAQ US patients/prices/travel, (2) Dentist/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Tijuana Dental Center',
+    contactLastName: '(WhatsApp contact)',
+    // Contact page published +1 (619) 906-7481 / info@smile4evermexico.com
+    preferredPhone: '16199067481',
+    preferredEmail: 'info@smile4evermexico.com',
+  },
+  'danielacorreacirujana.com': {
+    company: 'Dr. Daniela Correa',
+    city: 'Medellín',
+    customer: 'paciente internacional que busca cirugía plástica en Medellín',
+    moneyQuery: '¿cuál es la mejor cirujana plástica en Medellín para pacientes internacionales?',
+    compliment: 'cirugía plástica en Medellín con flujo EN + WhatsApp para pacientes intl',
+    gapClause: 'faltan FAQs citables sobre procedimientos y turismo médico que ChatGPT pueda usar',
+    pdEmoji: '✨',
+    pdLine: 'construyo agentes de WhatsApp que responden y agendan consultas 24/7 (EN/ES, conectados a su CRM), automatización de intake intl, video con IA para marketing de procedimientos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) FAQ procedimientos/precios/viaje, (2) Physician/FAQPage JSON-LD, (3) llms.txt',
+    contactFirstName: 'Dr. Daniela Correa',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '573332841861',
+    preferredEmail: 'danielacorreacirujana@gmail.com',
+  },
 };
 
 (async () => {
@@ -718,8 +1215,15 @@ const PROSPECT_META = {
   if (meta.preferredPhone) {
     contacts.whatsapp = String(meta.preferredPhone).replace(/\D/g, '');
   }
+  // Iron rule (MANUAL_PROSPECT_PLAY.md): BOTH WhatsApp + email on every deal.
+  // Prefer scraped → preferredEmail → info@{domain} flagged UNVERIFIED (Elena confirms).
+  let emailUnverified = false;
   if (meta.preferredEmail && !contacts.email) {
     contacts.email = meta.preferredEmail;
+  }
+  if (!contacts.email) {
+    contacts.email = `info@${domain}`;
+    emailUnverified = true;
   }
   const phoneDigits = contacts.whatsapp || contacts.phones[0] || (meta.preferredPhone && String(meta.preferredPhone).replace(/\D/g, ''));
   if (!phoneDigits) throw new Error(`No WhatsApp/phone found on ${domain} — add preferredPhone to PROSPECT_META`);
@@ -745,27 +1249,21 @@ const PROSPECT_META = {
   const emailDraftPath = `docs/selling/drafts/${slug}-email.txt`;
   const prospectPath = `docs/selling/prospects/${meta.company.toUpperCase().replace(/\s+/g, '_')}.md`;
 
-  const emailSubject = contacts.email
-    ? buildManualEmailSubject(meta.company, score)
-    : null;
-  const emailBody = contacts.email
-    ? buildManualEmailBody(draft, { botFallback: false })
-    : null;
+  const emailSubject = buildManualEmailSubject(meta.company, score);
+  const emailBody = buildManualEmailBody(draft, { botFallback: false });
 
   if (!dryRun) {
     fs.writeFileSync(path.join(root, draftPath), draft + '\n', { encoding: 'utf8' });
     registerOutreachSlug(slug, phoneDigits, draftPath, meta.company, {
-      email: contacts.email || undefined,
-      emailDraft: contacts.email ? emailDraftPath : undefined,
+      email: contacts.email,
+      emailDraft: emailDraftPath,
       score,
     });
-    if (contacts.email && emailSubject && emailBody) {
-      fs.writeFileSync(
-        path.join(root, emailDraftPath),
-        `SUBJECT: ${emailSubject}\n\nTO: ${contacts.email}\n\n${emailBody}\n`,
-        { encoding: 'utf8' },
-      );
-    }
+    fs.writeFileSync(
+      path.join(root, emailDraftPath),
+      `SUBJECT: ${emailSubject}\n\nTO: ${contacts.email}\n${emailUnverified ? 'NOTE: UNVERIFIED — confirm recipient before send\n' : ''}\n${emailBody}\n`,
+      { encoding: 'utf8' },
+    );
   }
 
   const dualLinks = buildDualChannelNoteLinks(
@@ -793,22 +1291,18 @@ const PROSPECT_META = {
   }
 
   const auditLine = `${score}/100 Grade ${grade} | Tech ${catScores.techSeo ?? '?'} | AI Access ${catScores.aiAccess ?? '?'} | GEO ${catScores.geo ?? '?'} | AEO ${catScores.aeo ?? '?'} (${weak.name} ${weak.score} weakest)`;
-  const emailBlock = contacts.email && emailSubject && emailBody
-    ? [
-        '',
-        '--- EMAIL (mismo texto que el link Gmail de arriba — backup si el link se trunca) ---',
-        '',
-        `SUBJECT: ${escHtml(emailSubject)}`,
-        `TO: ${escHtml(contacts.email)}`,
-        '',
-        escHtml(emailBody),
-      ]
-    : [
-        '',
-        '--- EMAIL ---',
-        '',
-        '<i>No on-domain email found at staging — search again if WA is a bot.</i>',
-      ];
+  const emailBlock = [
+    '',
+    '--- EMAIL (mismo texto que el link aipa@ de arriba — backup si el link se trunca) ---',
+    '',
+    emailUnverified
+      ? `<b>⚠️ TO UNVERIFIED</b> — fallback <code>info@${escHtml(domain)}</code>; confirm before Send.`
+      : '',
+    `SUBJECT: ${escHtml(emailSubject)}`,
+    `TO: ${escHtml(contacts.email)}`,
+    '',
+    escHtml(emailBody),
+  ];
   const noteHtml = [
     `[CLIENT-MANUAL] ${meta.company} — AI Visibility outreach (https links; data verified live)`,
     '',
@@ -826,9 +1320,9 @@ const PROSPECT_META = {
     '',
     `Top fixes: ${meta.topFixes}.`,
     '',
-    `Contacts: WhatsApp ${phoneFmt}${contacts.email ? ` | ${contacts.email}` : ''} | ${domain}`,
+    `Contacts: WhatsApp ${phoneFmt} | ${contacts.email}${emailUnverified ? ' (UNVERIFIED)' : ''} | ${domain}`,
     '',
-    'Next: Click WhatsApp OR Gmail one-click (prefilled → Send). If WA is a bot → use Gmail. Email watcher auto-advances HubSpot-logged/Gmail-synced sends when visible.',
+    'Next: Click WhatsApp OR aipa@ email one-click (prefilled → Send). If WA is a bot → use email. After send, say "sent {company}" so follow-up task is created (+4 days).',
   ].join('<br>');
 
   if (dryRun) {
@@ -846,19 +1340,19 @@ const PROSPECT_META = {
       website: url,
       city: meta.city,
       phone: phoneFmt,
-      ...(contacts.email ? { description: `Email: ${contacts.email}` } : {}),
+      description: `Email: ${contacts.email}${emailUnverified ? ' (UNVERIFIED fallback)' : ''}`,
     },
   }).then(r => r.id);
 
-  // Contact
+  // Contact — always email + phone
   const contactProps = {
     firstname: meta.contactFirstName,
     lastname: meta.contactLastName,
     company: meta.company,
     phone: phoneFmt,
+    email: contacts.email,
     lifecyclestage: 'opportunity',
     hs_lead_status: 'OPEN',
-    ...(contacts.email ? { email: contacts.email } : {}),
   };
   const contactId = await hs('POST', '/crm/v3/objects/contacts', { properties: contactProps }).then(r => r.id);
 
@@ -879,15 +1373,16 @@ const PROSPECT_META = {
     { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 },
   ]);
 
-  // Task — due today, HIGH
+  // Task 1 — send today, HIGH
   const due = new Date();
   due.setHours(23, 59, 0, 0);
   const task = await hs('POST', '/crm/v3/objects/tasks', {
     properties: {
-      hs_task_subject: `Send outreach → ${meta.company} (WhatsApp first; email if bot)`,
-      hs_task_body: contacts.email
-        ? `1) Open deal note → WhatsApp link → Send. 2) If a reservations/menu BOT answers → use EMAIL mailto or HubSpot Email to ${contacts.email} (subject + body in note).`
-        : `Open deal note → click WhatsApp → Send. No email found at staging — search again if WA is a bot.`,
+      hs_task_subject: `Send outreach → ${meta.company} (WhatsApp + email ready)`,
+      hs_task_body:
+        `1) Open deal note → WhatsApp link → Send. ` +
+        `2) Or ENVIAR POR EMAIL — aipa@ → ${contacts.email}${emailUnverified ? ' (UNVERIFIED — confirm)' : ''}. ` +
+        `Say "sent ${meta.company}" after WA (creates +4d follow-up); email one-click auto-advances + follow-up.`,
       hs_task_status: 'NOT_STARTED',
       hs_task_priority: 'HIGH',
       hs_timestamp: due.toISOString(),
@@ -908,10 +1403,10 @@ const PROSPECT_META = {
     { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 5 },
   ]);
 
-  // Prospect pack
+  // Prospect pack + registry (email always present per playbook)
   registerOutreachSlug(slug, phoneDigits, draftPath, meta.company, {
-    email: contacts.email || undefined,
-    emailDraft: contacts.email ? emailDraftPath : undefined,
+    email: contacts.email,
+    emailDraft: emailDraftPath,
     score,
     dealId,
   });
@@ -920,8 +1415,8 @@ const PROSPECT_META = {
 > Staged ${new Date().toISOString().slice(0, 10)}. Deal: \`${dealName}\` (ID ${dealId}).
 > Draft: \`${draftPath}\`
 > Email one-click: \`https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}\` (from aipa@aideazz.xyz)
-
-Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note **${note.id}** | Task **${task.id}**
+${emailUnverified ? `> ⚠️ Email \`${contacts.email}\` is UNVERIFIED fallback — confirm before send.\n` : ''}
+Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note **${note.id}** | Send task **${task.id}**
 `;
   fs.writeFileSync(path.join(root, prospectPath), pack, 'utf8');
 
@@ -934,11 +1429,21 @@ Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note 
     contactId,
     noteId: note.id,
     taskId: task.id,
+    email: contacts.email,
+    emailUnverified,
     audit: { score, grade, weak },
     phone: phoneFmt,
     draftPath,
     prospectPath,
+    emailOneClick: `https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}`,
   }, null, 2));
+  console.warn('');
+  console.warn('⚠️  EMAIL ONE-CLICK requires GitHub push (else UI: Unknown outreach email slug):');
+  console.warn(`    git add docs/selling/outreach-registry.json ${draftPath} ${emailDraftPath}`);
+  console.warn('    git commit && git push origin main');
+  console.warn('    Oracle: cd ~/cto-aipa && git pull && npm run build && pm2 restart cto-aipa');
+  console.warn('    (After go-wa GitHub fallback is deployed: push alone is enough for confirm page.)');
+  console.warn('');
 })().catch(e => {
   console.error(String(e.message || e));
   process.exit(1);

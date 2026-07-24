@@ -11,10 +11,67 @@ const DEFAULT_PHONE = '50766623757';
 const GO_WA_BASE = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
 const REPO_ROOT = process.env.CTO_AIPA_ROOT || process.cwd();
 const OUTREACH_REGISTRY = path.join(REPO_ROOT, 'docs/selling/outreach-registry.json');
+/** GitHub raw fallback when Oracle disk registry/drafts are stale (common after local staging without pull). */
+const OUTREACH_GITHUB_RAW_BASE = (
+  process.env.OUTREACH_GITHUB_RAW_BASE ||
+  'https://raw.githubusercontent.com/ElenaRevicheva/AIPA_AITCF/main'
+).replace(/\/$/, '');
 
 const goWaHits = new Map<string, number[]>();
 const GO_WA_WINDOW_MS = 15 * 60 * 1000;
 const GO_WA_MAX = Number(process.env.GO_WA_MAX_PER_WINDOW ?? 60);
+
+type OutreachRegistryEntry = {
+  email?: string;
+  emailDraft?: string;
+  draft?: string;
+  company?: string;
+  dealId?: string;
+  score?: number;
+  phone?: string;
+};
+
+let githubRegistryCache: { at: number; data: Record<string, OutreachRegistryEntry> } | null = null;
+const GITHUB_REGISTRY_CACHE_MS = 60_000;
+
+async function fetchGithubRegistry(): Promise<Record<string, OutreachRegistryEntry> | null> {
+  const now = Date.now();
+  if (githubRegistryCache && now - githubRegistryCache.at < GITHUB_REGISTRY_CACHE_MS) {
+    return githubRegistryCache.data;
+  }
+  try {
+    const r = await fetch(`${OUTREACH_GITHUB_RAW_BASE}/docs/selling/outreach-registry.json`, {
+      signal: AbortSignal.timeout(8000),
+      headers: { Accept: 'application/json', 'User-Agent': 'AIPA-go-wa/1.0' },
+    });
+    if (!r.ok) return null;
+    const data = (await r.json()) as Record<string, OutreachRegistryEntry>;
+    githubRegistryCache = { at: now, data };
+    return data;
+  } catch (e) {
+    console.warn('[go/outreach-email] GitHub registry fetch failed:', (e as Error).message?.slice(0, 80));
+    return null;
+  }
+}
+
+async function readOutreachText(relPath: string): Promise<string | null> {
+  const localPath = path.join(REPO_ROOT, relPath);
+  try {
+    if (fs.existsSync(localPath)) return fs.readFileSync(localPath, 'utf8');
+  } catch {
+    /* fall through to GitHub */
+  }
+  try {
+    const r = await fetch(`${OUTREACH_GITHUB_RAW_BASE}/${relPath.replace(/^\/+/, '')}`, {
+      signal: AbortSignal.timeout(8000),
+      headers: { Accept: 'text/plain', 'User-Agent': 'AIPA-go-wa/1.0' },
+    });
+    if (!r.ok) return null;
+    return await r.text();
+  } catch {
+    return null;
+  }
+}
 
 function allowedPhones(): Set<string> {
   const extra =
@@ -120,51 +177,83 @@ type OutreachEmailPayload = {
   dealId?: string;
 };
 
-function loadOutreachEmailBySlug(slug: string): OutreachEmailPayload | null {
-  try {
-    const reg = JSON.parse(fs.readFileSync(OUTREACH_REGISTRY, 'utf8')) as Record<
-      string,
-      {
-        email?: string;
-        emailDraft?: string;
-        draft?: string;
-        company?: string;
-        dealId?: string;
-        score?: number;
-      }
-    >;
-    const entry = reg[slug];
-    if (!entry) return null;
-    const company = entry.company || slug;
-    let subject = '';
-    let body = '';
-    let to = (entry.email || '').trim().toLowerCase();
+async function buildOutreachEmailPayload(
+  slug: string,
+  entry: OutreachRegistryEntry,
+): Promise<OutreachEmailPayload | null> {
+  const company = entry.company || slug;
+  let subject = '';
+  let body = '';
+  let to = (entry.email || '').trim().toLowerCase();
 
-    if (entry.emailDraft) {
-      const raw = fs.readFileSync(path.join(REPO_ROOT, entry.emailDraft), 'utf8').trim();
-      const subjM = raw.match(/^SUBJECT:\s*(.+)$/m);
-      const toM = raw.match(/^TO:\s*(.+)$/m);
-      subject = subjM?.[1]?.trim() || '';
-      if (toM?.[1]?.trim()) to = toM[1].trim().toLowerCase();
-      body = raw
-        .replace(/^SUBJECT:.*$/m, '')
-        .replace(/^TO:.*$/m, '')
-        .replace(/^\s+/, '')
-        .trim();
-    } else if (entry.draft) {
-      const wa = fs.readFileSync(path.join(REPO_ROOT, entry.draft), 'utf8').trim();
-      const score = entry.score ?? 0;
-      subject = `Auditoría de visibilidad en IA — ${company} (${score}/100): 3 arreglos concretos`;
-      body = `Estimado equipo:\n\n${wa.replace(/^Hola, ¡un gusto saludarles! 👋/, '¡Un gusto saludarles! 👋')}`.replace(
-        /\nElena✨🌍💫\s*$/,
-        '\nElena Revicheva✨🌍💫',
-      );
+  if (entry.emailDraft) {
+    const raw = (await readOutreachText(entry.emailDraft))?.trim();
+    if (!raw) return null;
+    const subjM = raw.match(/^SUBJECT:\s*(.+)$/m);
+    const toM = raw.match(/^TO:\s*(.+)$/m);
+    subject = subjM?.[1]?.trim() || '';
+    // Drafts may append " (UNVERIFIED — …)" after the address. Resend 422s if
+    // `to` contains non-ASCII (em dash). Extract the email token only.
+    if (toM?.[1]?.trim()) {
+      const rawTo = toM[1].trim();
+      const emailTok = rawTo.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0];
+      to = (emailTok || entry.email || '').trim().toLowerCase();
+    }
+    body = raw
+      .replace(/^SUBJECT:.*$/m, '')
+      .replace(/^TO:.*$/m, '')
+      .replace(/^NOTE:.*$/m, '')
+      .replace(/^\s+/, '')
+      .trim();
+  } else if (entry.draft) {
+    const wa = (await readOutreachText(entry.draft))?.trim();
+    if (!wa) return null;
+    const score = entry.score ?? 0;
+    subject = `Auditoría de visibilidad en IA — ${company} (${score}/100): 3 arreglos concretos`;
+    body = `Estimado equipo:\n\n${wa.replace(/^Hola, ¡un gusto saludarles! 👋/, '¡Un gusto saludarles! 👋')}`.replace(
+      /\nElena✨🌍💫\s*$/,
+      '\nElena Revicheva✨🌍💫',
+    );
+  }
+
+  if (!to || !to.includes('@') || !subject || !body) return null;
+  const out: OutreachEmailPayload = { slug, to, subject, body, company };
+  if (entry.dealId) out.dealId = entry.dealId;
+  return out;
+}
+
+/**
+ * Resolve email one-click payload.
+ * 1) Local Oracle disk registry+drafts (fast path after git pull)
+ * 2) GitHub main raw fallback — fixes the recurring UI 404 when agents stage
+ *    locally but Oracle has not pulled yet (as long as GitHub is pushed).
+ */
+async function loadOutreachEmailBySlug(slug: string): Promise<OutreachEmailPayload | null> {
+  try {
+    let localReg: Record<string, OutreachRegistryEntry> | null = null;
+    try {
+      localReg = JSON.parse(fs.readFileSync(OUTREACH_REGISTRY, 'utf8')) as Record<
+        string,
+        OutreachRegistryEntry
+      >;
+    } catch {
+      localReg = null;
     }
 
-    if (!to || !to.includes('@') || !subject || !body) return null;
-    const out: OutreachEmailPayload = { slug, to, subject, body, company };
-    if (entry.dealId) out.dealId = entry.dealId;
-    return out;
+    if (localReg?.[slug]) {
+      const localHit = await buildOutreachEmailPayload(slug, localReg[slug]);
+      if (localHit) return localHit;
+    }
+
+    const ghReg = await fetchGithubRegistry();
+    if (ghReg?.[slug]) {
+      const ghHit = await buildOutreachEmailPayload(slug, ghReg[slug]);
+      if (ghHit) {
+        console.log(`[go/outreach-email] resolved ${slug} via GitHub fallback`);
+        return ghHit;
+      }
+    }
+    return null;
   } catch (e) {
     console.warn('[go/outreach-email] registry read failed:', (e as Error).message?.slice(0, 80));
     return null;
@@ -459,16 +548,25 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
    * Manual Prospect Play — email from aipa@aideazz.xyz (Resend).
    * GET = confirm (like WhatsApp open-then-Send). POST = send + HubSpot update.
    */
-  app.get('/go/outreach-email/:slug', (req: Request, res: Response) => {
+  app.get('/go/outreach-email/:slug', async (req: Request, res: Response) => {
     const ip = getClientIp(req);
     if (!allowGoWaRate(ip)) {
       res.status(429).send('Too many requests');
       return;
     }
     const slug = String(req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
-    const hit = loadOutreachEmailBySlug(slug);
+    const hit = await loadOutreachEmailBySlug(slug);
     if (!hit) {
-      res.status(404).send('Unknown outreach email slug (need email + draft in registry)');
+      res
+        .status(404)
+        .type('text')
+        .send(
+          `Unknown outreach email slug "${slug}".\n\n` +
+            `Need email + emailDraft in docs/selling/outreach-registry.json on GitHub main ` +
+            `(and drafts under docs/selling/drafts/).\n` +
+            `Usual cause: staged locally but not pushed — commit/push registry+drafts, ` +
+            `then retry (Oracle also git-pulls ~/cto-aipa).\n`,
+        );
       return;
     }
     const sendPath = `${GO_WA_BASE}/go/outreach-email/${slug}/send`;
@@ -483,9 +581,9 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
       return;
     }
     const slug = String(req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
-    const hit = loadOutreachEmailBySlug(slug);
+    const hit = await loadOutreachEmailBySlug(slug);
     if (!hit) {
-      res.status(404).send(outreachEmailDoneHtml(false, 'Unknown slug'));
+      res.status(404).send(outreachEmailDoneHtml(false, `Unknown slug "${slug}" — push registry+drafts to GitHub main`));
       return;
     }
     try {

@@ -68,7 +68,7 @@ Patients research "best dental implants Panama" in ChatGPT, then book over Whats
 | Panamá Sonríe · SENT | panamasonrie.com | Smile design / prosthetics; Via Israel + Albrook; info@panamasonrie.com |
 | Clínica Arango Orillac · SENT | arango-orillac.com | Since 1935, 50+ pros, English guaranteed; WhatsApp on site |
 | Centro Odontológico Paitilla · SENT | centroodontologicopaitilla.com | Paitilla Medical Center since 1990; high review volume |
-| Almanza Carrizo / Grupo Dental Nacional | grupodentalnacional.com | 25+ yrs; Centro Médico Nacional + La Chorrera; WA booking |
+| Almanza Carrizo / Grupo Dental Nacional · SENT | grupodentalnacional.com | 25+ yrs; Centro Médico Nacional + La Chorrera — ✅ STAGED 2026-07-24 (deal 63051086933; live audit 54/D; WA +507 6670-7039; email info@ UNVERIFIED) · SENT-ready |
 | MaDenta / Gianna Dentist | giannadentist.com | Cosmetic / implants for intl + expats; online eval before travel |
 | Sonrisas Meraki | (mine via smilejet / IG) | Bilingual dental tourism; confirm own domain before staging |
 | Panama Aesthetics · SENT | panamaaesthetics.com | Plastic/aesthetic, all-inclusive intl — ✅ STAGED 2026-07-20 (deal 62873560951) — 📧 + +4d follow-up |
@@ -76,8 +76,8 @@ Patients research "best dental implants Panama" in ChatGPT, then book over Whats
 | DermoMédica (Dr. Tejada) · SENT | dermomedica.com.pa | Clinical derm + cosmiatry + laser; EN site — ✅ STAGED 2026-07-23 (deal 63060115712; live audit 54/D) · SENT-ready |
 | Panama Fertility · SENT | panamafertility.com | 35 yrs, 10k babies, English team — ✅ STAGED 2026-07-19 (deal 62828946074; robots block AI crawlers = strongest hook) |
 | IVI Panama · SENT | ivi-fertility.com | Patients from 80+ nationalities; enterprise-scale intl patient ops |
-| Hospital Punta Pacífica | puntapacifica.com | Johns Hopkins Medicine International affiliate — GEO + intake automation |
-| Clínica Hospital San Fernando | hospitalsanfernando.com | First JCI in Panama; intl patient desk candidate |
+| Hospital Punta Pacífica · SENT | puntapacifica.com | Johns Hopkins / Pacífica Salud — ✅ STAGED 2026-07-24 (deal 63052782744; live audit 64/C; WA Mike Kelly +507 6614-1448; turismomedico@pacificasalud.com) · SENT-ready |
+| Clínica Hospital San Fernando · SENT | hospitalsanfernando.com | Global Patient Care — ✅ STAGED 2026-07-24 (deal 63064457219; live audit 85/A; WA +507 6639-3783; global@hospitalsanfernando.com) · SENT-ready |
 
 ### A2. Relocation, immigration law & expat real estate (Panama)
 Expats ask AI "how do I get Panama residency / buy property" — then consult over WhatsApp. Lead = **AI Visibility** + **WhatsApp lead-qualify** + **automation** (doc intake).
@@ -148,8 +148,8 @@ Booking + AI video + AI visibility for retreat seekers (Boquete / Pacific / City
 |---|---|---|
 | The Haven Wellness Resort & Spa · SENT | havenboquete.com | Boquete hotel + spa + yoga studio; info@havenboquete.com |
 | STUDIO at The Haven · SENT | studiohavenboquete.com | Yoga/exercise; WA +507 6426-0843 — ✅ STAGED 2026-07-23 (deal 63049661069; live audit 87/A) · SENT-ready |
-| Finca Lérida | fincalerida.com | Historic coffee estate hotel, Boquete |
-| Los Quetzales Ecolodge | losquetzales.com | Highland ecolodge / nature — intl hikers |
+| Finca Lérida · SENT | fincalerida.com | ✅ STAGED 2026-07-24 (deal 63061827228; live audit 50/D; WA +507 6509-5139; info@fincalerida.com) · SENT-ready|
+| Los Quetzales Ecolodge · SENT | losquetzales.com | ✅ STAGED 2026-07-24 (deal 63060432904; live audit 54/D; WA +507 6671-2131; stay@losquetzales.com) · SENT-ready|
 | Panama Aesthetics / Skin Clinic | (see A1) | Cross-sell video + WA booking if not already in pipeline |
 
 ### B3. Private / international schools
@@ -188,12 +188,12 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 
 | Prospect | Domain | Country | Notes |
 |---|---|---|---|
-| Hospital Clínica Bíblica | clinicabiblica.com | CR | Longest-running private hospital; EN site; intl patients |
+| Hospital Clínica Bíblica · SENT | clinicabiblica.com | CR | ✅ STAGED 2026-07-24 (deal 63033505966; live audit 79/B; WA +506 8595-7000; email info@ UNVERIFIED) · SENT-ready |
 | Hospital CIMA San José | hospitalcima.com | CR | Medical tourism leader claim; EN |
-| Hospital Metropolitano | metropolitanocr.com | CR | Multi-sede incl. Guanacaste / Quepos — tourism overlap |
+| Hospital Metropolitano · SENT | metropolitanocr.com | CR | ✅ STAGED 2026-07-24 (deal 63065540143; live audit 82/B; WA +506 6434-3139; info@metropolitanocr.com) · SENT-ready |
 | Medical Tours Costa Rica | medicaltourscostarica.com | CR | Facilitator — GEO + WA qualify is the whole business model |
 | Goodness Dental | goodnessdental.com | CR | US/Canada dental tourism brand |
-| Costa Rica Yacht Charter Brokers | yachtchartercr.com | CR | Luxury charter concierge |
+| Costa Rica Yacht Charter Brokers · SENT | yachtchartercr.com | CR | ✅ STAGED 2026-07-24 (deal 63064457478; live audit 88/A; WA +506 6242-2041; step-aboard@yachtchartercr.com) · SENT-ready |
 | Agency of the Sea | agencyofthesea.com | CR | Local yacht / marina concierge |
 
 ### D2. Colombia — Medellín aesthetics + Cartagena charters
@@ -201,12 +201,12 @@ Same iron filter: **intl patients/travelers ask AI → close on WhatsApp → bil
 | Prospect | Domain | Country | Notes |
 |---|---|---|---|
 | Dr. Daniela Correa · SENT | danielacorreacirujana.com | CO | Medellín plastic surgery; EN + WhatsApp intl flow |
-| Dr. Jorge Rodríguez | drjorgerodriguez.com | CO | Intl patients Medellín; bilingual team |
+| Dr. Jorge Rodríguez · SENT | drjorgerodriguez.com | CO | ✅ STAGED 2026-07-24 (deal 63067846953; live audit 80/B; WA +57 300 371-9688; email info@ UNVERIFIED) · SENT-ready |
 | Dr. Luis Guillermo Tobón | luisguillermotobon.com | CO | 30+ yrs aesthetic surgery Medellín; EN |
 | Salud sin Fronteras | saludsinfronteras.com | CO | Medical tourism facilitator Medellín/Bogotá/Cartagena |
 | Absolute Medical Tourism | absolutemedicaltourism.com | CO | Packages + logistics |
 | Colombia Luxury Group | colombialuxurygroup.com | CO | Cartagena yacht rental; WhatsApp quote in 5 min |
-| Elite Cartagena | elitecartagena.com | CO | Verified yacht/catamaran fleet |
+| Elite Cartagena · SENT | elitecartagena.com | CO | ✅ STAGED 2026-07-24 (deal 63077716274; live audit 97/A+; WA +1 516-493-6070; jc@elitecartagena.com) · SENT-ready |
 | Hi Cartagena | hicartagena.com | CO | Luxury concierge + yachts; WA +57 313 695 2776 |
 
 ### D3. Mexico — dental / medical tourism (US border + Cancún)
@@ -230,11 +230,11 @@ Highest expected pain × highest ticket. **Skip already-staged.** Run Manual Pro
 2. ~~theskinclinicpanama.com~~ — · SENT (HubSpot)
 3. dermomedica.com.pa — A1 derm/cosmiatry EN
 4. ~~centroodontologicopaitilla.com~~ — · SENT (HubSpot)
-5. grupodentalnacional.com — A1 Almanza Carrizo multi-branch
+5. ~~grupodentalnacional.com~~ — · SENT (HubSpot)
 6. giannadentist.com — A1 cosmetic/implants intl
 7. ~~panamasonrie.com~~ — · SENT (HubSpot)
 8. ~~ivi-fertility.com~~ — · SENT (HubSpot)
-9. puntapacifica.com — A1 Hospital Punta Pacífica
+9. ~~puntapacifica.com~~ — · SENT (HubSpot)
 10. ~~relocationpanama.com~~ — · SENT (HubSpot)
 11. ~~panamaexpatservice.com~~ — · SENT (HubSpot)
 12. ~~igopanama.com~~ — · SENT (HubSpot)
@@ -248,7 +248,7 @@ Highest expected pain × highest ticket. **Skip already-staged.** Run Manual Pro
 20. thecascoschool.com — B3 British bilingual admissions
 
 ### LATAM expansion (after Panama pressure eases)
-21. clinicabiblica.com — D1 CR hospital
+21. ~~clinicabiblica.com~~ — · SENT (HubSpot)
 22. hospitalcima.com — D1 CR medical tourism
 23. goodnessdental.com — D1 CR dental tourism
 24. ~~danielacorreacirujana.com~~ — · SENT (HubSpot)

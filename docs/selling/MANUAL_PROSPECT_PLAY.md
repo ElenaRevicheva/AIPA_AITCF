@@ -61,7 +61,12 @@
         **Fully automatic**: preview → Send → deal auto-moves ⏳ Sent + `📧 EMAILED` note + `+4-day` follow-up task (`src/go-wa.ts`, Cursor's flow). NO manual "sent" needed.
      The email button REQUIRES a registry entry with `email` + `emailDraft` → so always create
      `docs/selling/drafts/{slug}-email.txt` (SUBJECT/TO/body) and add `email`+`emailDraft` to
-     `docs/selling/outreach-registry.json`, then `git pull` on Oracle so the confirm page resolves.
+     `docs/selling/outreach-registry.json`, then **commit + push to `main`**. Oracle serves
+     `/go/outreach-email/{slug}` from disk **and** (after Jul 2026 fix) falls back to GitHub
+     raw `main` — so **unpushed staging = UI error**
+     `Unknown outreach email slug`. Sync Oracle when convenient:
+     `cd ~/cto-aipa && bash scripts/oracle-sync-outreach-registry.sh`
+     (or full `bash scripts/oracle-deploy-go-wa.sh`). Never leave registry-only local.
      If no email is found: use the standard `info@{domain}` and **flag it UNVERIFIED** in the note
      (the preview page shows the recipient — Elena confirms before sending). Never ship a note with
      only the WhatsApp button. Save the WA draft in `docs/selling/drafts/{slug}.txt` and the pack in
