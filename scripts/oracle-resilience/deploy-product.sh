@@ -47,7 +47,16 @@ case "$MODE" in
     fleet_checkout_files "$BRANCH" "$DEPLOY_FILES"
     ;;
   pull_build|pull_build_pm2)
-    fleet_pull_ff_only "$BRANCH"
+    # cto_aipa often has dirty Manual Prospect drafts/registry on the box
+    # (staged locally then scp'd / half-synced). That blocks ff-only merge and
+    # causes live /go/outreach-email 404s. .env stays (gitignored).
+    if [[ "$PRODUCT" == "cto_aipa" ]]; then
+      echo "=== cto_aipa: reset --hard origin/$BRANCH (fix dirty registry/drafts) ==="
+      git reset --hard "origin/$BRANCH"
+      git clean -fd -- docs/selling/drafts/ || true
+    else
+      fleet_pull_ff_only "$BRANCH"
+    fi
     fleet_run_build "$BUILD"
     ;;
   *)
