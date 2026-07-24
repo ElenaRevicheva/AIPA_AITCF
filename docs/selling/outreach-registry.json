@@ -239,5 +239,230 @@
     "score": 57,
     "email": "info@eclypsedemar.com",
     "emailDraft": "docs/selling/drafts/eclypse-de-mar-email.txt"
+  },
+  "panam-sonr-e": {
+    "phone": "50761405700",
+    "draft": "docs/selling/drafts/panam-sonr-e.txt",
+    "company": "Panamá Sonríe",
+    "email": "info@panamasonrie.com",
+    "emailDraft": "docs/selling/drafts/panam-sonr-e-email.txt",
+    "dealId": "63034686254",
+    "score": 91
+  },
+  "cl-nica-arango-orillac": {
+    "phone": "50769973733",
+    "draft": "docs/selling/drafts/cl-nica-arango-orillac.txt",
+    "company": "Clínica Arango Orillac",
+    "email": "info@arango-orillac.com",
+    "emailDraft": "docs/selling/drafts/cl-nica-arango-orillac-email.txt",
+    "dealId": "63057127263",
+    "score": 58
+  },
+  "centro-odontol-gico-paitilla": {
+    "phone": "50762334051",
+    "draft": "docs/selling/drafts/centro-odontol-gico-paitilla.txt",
+    "company": "Centro Odontológico Paitilla",
+    "email": "contacto@centroodontologicopaitilla.com",
+    "emailDraft": "docs/selling/drafts/centro-odontol-gico-paitilla-email.txt",
+    "dealId": "63055888158",
+    "score": 69
+  },
+  "gomitom": {
+    "phone": "50769800688",
+    "draft": "docs/selling/drafts/gomitom.txt",
+    "company": "Gomitom",
+    "email": "info@gomitom.com",
+    "emailDraft": "docs/selling/drafts/gomitom-email.txt",
+    "dealId": "63066851203",
+    "score": 49
+  },
+  "charter-in-san-blas": {
+    "phone": "50762950550",
+    "draft": "docs/selling/drafts/charter-in-san-blas.txt",
+    "company": "Charter in San Blas",
+    "email": "info@charterinsanblas.com",
+    "emailDraft": "docs/selling/drafts/charter-in-san-blas-email.txt",
+    "dealId": "63039485826",
+    "score": 96
+  },
+  "san-blas-on-sailboats": {
+    "phone": "50769323919",
+    "draft": "docs/selling/drafts/san-blas-on-sailboats.txt",
+    "company": "San Blas on Sailboats",
+    "email": "info@sanblasonsailboats.com",
+    "emailDraft": "docs/selling/drafts/san-blas-on-sailboats-email.txt",
+    "dealId": "63038403138",
+    "score": 83
+  },
+  "we-sail-san-blas": {
+    "phone": "50763693628",
+    "draft": "docs/selling/drafts/we-sail-san-blas.txt",
+    "company": "We Sail San Blas",
+    "email": "wesailsanblas@gmail.com",
+    "emailDraft": "docs/selling/drafts/we-sail-san-blas-email.txt",
+    "dealId": "63063441827",
+    "score": 97
+  },
+  "sailboat-trips": {
+    "phone": "50764686603",
+    "draft": "docs/selling/drafts/sailboat-trips.txt",
+    "company": "SailBoat Trips",
+    "email": "info@sailboattrips.com",
+    "emailDraft": "docs/selling/drafts/sailboat-trips-email.txt",
+    "dealId": "63052399762",
+    "score": 87
+  },
+  "san-blas-sailing": {
+    "phone": "50767806959",
+    "draft": "docs/selling/drafts/san-blas-sailing.txt",
+    "company": "San Blas Sailing",
+    "email": "panama@sanblassailing.com",
+    "emailDraft": "docs/selling/drafts/san-blas-sailing-email.txt",
+    "dealId": "63045749810",
+    "score": 90
+  },
+  "sailing-charter-panama": {
+    "phone": "50760761493",
+    "draft": "docs/selling/drafts/sailing-charter-panama.txt",
+    "company": "Sailing Charter Panama",
+    "email": "sailingcharterpanama@gmail.com",
+    "emailDraft": "docs/selling/drafts/sailing-charter-panama-email.txt",
+    "dealId": "63033440775",
+    "score": 97
+  },
+  "casa-cayuco": {
+    "phone": "50760887663",
+    "draft": "docs/selling/drafts/casa-cayuco.txt",
+    "company": "Casa Cayuco",
+    "email": "info@casacayuco.com",
+    "emailDraft": "docs/selling/drafts/casa-cayuco-email.txt",
+    "dealId": "63065611883",
+    "score": 86
+  },
+  "destination-dream-weddings": {
+    "phone": "12044064876",
+    "draft": "docs/selling/drafts/destination-dream-weddings.txt",
+    "company": "Destination Dream Weddings",
+    "email": "wendy@destinationdreamweddings.com",
+    "emailDraft": "docs/selling/drafts/destination-dream-weddings-email.txt",
+    "dealId": "63064999707",
+    "score": 91
+  },
+  "the-haven-wellness-resort": {
+    "phone": "50764915578",
+    "draft": "docs/selling/drafts/the-haven-wellness-resort.txt",
+    "company": "The Haven Wellness Resort",
+    "email": "info@havenboquete.com",
+    "emailDraft": "docs/selling/drafts/the-haven-wellness-resort-email.txt",
+    "dealId": "63040487766",
+    "score": 81
+  },
+  "valle-escondido-resort": {
+    "phone": "50765369875",
+    "draft": "docs/selling/drafts/valle-escondido-resort.txt",
+    "company": "Valle Escondido Resort",
+    "email": "ventas@valleescondidoboquete.com",
+    "emailDraft": "docs/selling/drafts/valle-escondido-resort-email.txt",
+    "dealId": "63042652940",
+    "score": 84
+  },
+  "cancun-dental-specialists": {
+    "phone": "529983130107",
+    "draft": "docs/selling/drafts/cancun-dental-specialists.txt",
+    "company": "Cancun Dental Specialists",
+    "email": "contact@cancundentalspecialists.com",
+    "emailDraft": "docs/selling/drafts/cancun-dental-specialists-email.txt",
+    "dealId": "63054341484",
+    "score": 81
+  },
+  "smile-tijuana": {
+    "phone": "526642930717",
+    "draft": "docs/selling/drafts/smile-tijuana.txt",
+    "company": "Smile Tijuana",
+    "email": "info@smiletijuanadentist.com",
+    "emailDraft": "docs/selling/drafts/smile-tijuana-email.txt",
+    "dealId": "63027059795",
+    "score": 77
+  },
+  "dr-daniela-correa": {
+    "phone": "573332841861",
+    "draft": "docs/selling/drafts/dr-daniela-correa.txt",
+    "company": "Dr. Daniela Correa",
+    "email": "danielacorreacirujana@gmail.com",
+    "emailDraft": "docs/selling/drafts/dr-daniela-correa-email.txt",
+    "dealId": "63059453757",
+    "score": 98
+  },
+  "the-skin-clinic-panama": {
+    "phone": "50764509248",
+    "draft": "docs/selling/drafts/the-skin-clinic-panama.txt",
+    "company": "The Skin Clinic Panama",
+    "email": "citas@theskinclinicpanama.com",
+    "emailDraft": "docs/selling/drafts/the-skin-clinic-panama-email.txt",
+    "dealId": "63062979686",
+    "score": 60
+  },
+  "red-frog-beach-island-resort": {
+    "phone": "50763476597",
+    "draft": "docs/selling/drafts/red-frog-beach-island-resort.txt",
+    "company": "Red Frog Beach Island Resort",
+    "email": "reservations@redfrogbeach.com",
+    "emailDraft": "docs/selling/drafts/red-frog-beach-island-resort-email.txt",
+    "dealId": "63059453793",
+    "score": 70
+  },
+  "international-school-of-panama": {
+    "phone": "50769821470",
+    "draft": "docs/selling/drafts/international-school-of-panama.txt",
+    "company": "International School of Panama",
+    "email": "admissions@isp.edu.pa",
+    "emailDraft": "docs/selling/drafts/international-school-of-panama-email.txt",
+    "dealId": "63044818308",
+    "score": 75
+  },
+  "dermom-dica": {
+    "phone": "50762372819",
+    "draft": "docs/selling/drafts/dermom-dica.txt",
+    "company": "DermoMédica",
+    "email": "info@dermomedica.com.pa",
+    "emailDraft": "docs/selling/drafts/dermom-dica-email.txt",
+    "dealId": "63060115712",
+    "score": 54
+  },
+  "the-casco-school": {
+    "phone": "50766442413",
+    "draft": "docs/selling/drafts/the-casco-school.txt",
+    "company": "The Casco School",
+    "email": "admissions@thecascoschool.com",
+    "emailDraft": "docs/selling/drafts/the-casco-school-email.txt",
+    "dealId": "63060405782",
+    "score": 54
+  },
+  "boston-school-international": {
+    "phone": "50764548560",
+    "draft": "docs/selling/drafts/boston-school-international.txt",
+    "company": "Boston School International",
+    "email": "admissions@bostonschool.edu.pa",
+    "emailDraft": "docs/selling/drafts/boston-school-international-email.txt",
+    "dealId": "63053387934",
+    "score": 88
+  },
+  "studio-at-the-haven": {
+    "phone": "50764260843",
+    "draft": "docs/selling/drafts/studio-at-the-haven.txt",
+    "company": "STUDIO at The Haven",
+    "email": "studiohavenboquete@gmail.com",
+    "emailDraft": "docs/selling/drafts/studio-at-the-haven-email.txt",
+    "dealId": "63049661069",
+    "score": 87
+  },
+  "gamboa-rainforest-reserve": {
+    "phone": "50766723083",
+    "draft": "docs/selling/drafts/gamboa-rainforest-reserve.txt",
+    "company": "Gamboa Rainforest Reserve",
+    "email": "reservations@gamboaresort.com",
+    "emailDraft": "docs/selling/drafts/gamboa-rainforest-reserve-email.txt",
+    "dealId": "63039072050",
+    "score": 85
   }
 }

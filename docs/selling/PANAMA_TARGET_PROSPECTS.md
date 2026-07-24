@@ -73,7 +73,7 @@ Patients research "best dental implants Panama" in ChatGPT, then book over Whats
 | Sonrisas Meraki | (mine via smilejet / IG) | Bilingual dental tourism; confirm own domain before staging |
 | Panama Aesthetics · SENT | panamaaesthetics.com | Plastic/aesthetic, all-inclusive intl — ✅ STAGED 2026-07-20 (deal 62873560951) — 📧 + +4d follow-up |
 | The Skin Clinic (Dr. Drohan) · SENT | theskinclinicpanama.com | Tulane-trained derm; WA +507 6450-9248; Hospital Pacífica Salud |
-| DermoMédica (Dr. Tejada) · SENT | dermomedica.com.pa | Clinical derm + cosmiatry + laser; EN site |
+| DermoMédica (Dr. Tejada) · SENT | dermomedica.com.pa | Clinical derm + cosmiatry + laser; EN site — ✅ STAGED 2026-07-23 (deal 63060115712; live audit 54/D) · SENT-ready |
 | Panama Fertility · SENT | panamafertility.com | 35 yrs, 10k babies, English team — ✅ STAGED 2026-07-19 (deal 62828946074; robots block AI crawlers = strongest hook) |
 | IVI Panama · SENT | ivi-fertility.com | Patients from 80+ nationalities; enterprise-scale intl patient ops |
 | Hospital Punta Pacífica | puntapacifica.com | Johns Hopkins Medicine International affiliate — GEO + intake automation |
@@ -139,7 +139,7 @@ International couples, high ticket, WhatsApp coordination, huge **AI-video** ups
 | Destination Dream Weddings · SENT | destinationdreamweddings.com | Full-service Panama weddings |
 | Valle Escondido Resort (Boquete) · SENT | valleescondidoboquete.com | Weddings + events; eventos@ + WA on site |
 | Sortis Hotel / Sortis Spa (events) | sortishotel.com | City events + spa — mine WA/email |
-| Gamboa Rainforest Reserve (events) · SENT | gamboaresort.com | Nature venue; intl groups |
+| Gamboa Rainforest Reserve (events) · SENT | gamboaresort.com | Nature venue; intl groups — ✅ STAGED 2026-07-23 (deal 63039072050; live audit 85/A) · SENT-ready |
 
 ### B2. Wellness / med-spa / fitness retreats
 Booking + AI video + AI visibility for retreat seekers (Boquete / Pacific / City).
@@ -147,7 +147,7 @@ Booking + AI video + AI visibility for retreat seekers (Boquete / Pacific / City
 | Prospect | Domain | Notes |
 |---|---|---|
 | The Haven Wellness Resort & Spa · SENT | havenboquete.com | Boquete hotel + spa + yoga studio; info@havenboquete.com |
-| STUDIO at The Haven · SENT | studiohavenboquete.com | Yoga/exercise; WA +507 6426-0843 |
+| STUDIO at The Haven · SENT | studiohavenboquete.com | Yoga/exercise; WA +507 6426-0843 — ✅ STAGED 2026-07-23 (deal 63049661069; live audit 87/A) · SENT-ready |
 | Finca Lérida | fincalerida.com | Historic coffee estate hotel, Boquete |
 | Los Quetzales Ecolodge | losquetzales.com | Highland ecolodge / nature — intl hikers |
 | Panama Aesthetics / Skin Clinic | (see A1) | Cross-sell video + WA booking if not already in pipeline |
@@ -158,8 +158,8 @@ Expat families search AI for schooling before moving. Lead = **AI Visibility** +
 | Prospect | Domain | Notes |
 |---|---|---|
 | International School of Panama (ISP) · SENT | isp.edu.pa | NEASC / IB; 40+ yrs; admissions desk |
-| Boston School International · SENT | bostonschool.edu.pa | Costa del Este; tour + admissions form |
-| The Casco School · SENT | thecascoschool.com | British bilingual; Albrook + CDE; admissions@thecascoschool.com |
+| Boston School International · SENT | bostonschool.edu.pa | Costa del Este; tour + admissions form — ✅ STAGED 2026-07-23 (deal 63053387934; live audit 88/A) · SENT-ready |
+| The Casco School · SENT | thecascoschool.com | British bilingual; Albrook + CDE; admissions@thecascoschool.com — ✅ STAGED 2026-07-23 (deal 63060405782; live audit 54/D) · SENT-ready |
 | Balboa Academy | balboaacademy.edu | US-style intl; mine admissions contact |
 | Oxford International School Panama | oxfordpanama.com | Confirm active admissions channel before staging |
 
