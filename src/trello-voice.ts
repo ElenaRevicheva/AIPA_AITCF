@@ -377,6 +377,84 @@ function resolveList(lists: TrelloList[], target: ListTarget): TrelloList | unde
   return lists.find((l) => fuzzyMatch(l.name, keywords)) ?? lists[0];
 }
 
+const KNOWN_BOARD_KEYS: BoardTarget[] = [
+  'kira_current_month', 'kira_future', 'kira_habits', 'kira_finance',
+  'vibejob', 'aldeazz', 'espaluz', 'algom',
+];
+const KNOWN_LIST_KEYS: ListTarget[] = [
+  'just_for_today', 'todo_flow', 'in_process_me', 'in_process_them',
+  'not_sure', 'dated', 'rules', 'done',
+];
+const ALL_MONTHS = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
+/**
+ * Resolve the destination board for a MOVE. Handles (in order):
+ *  1. a structured BoardTarget key
+ *  2. a named month ("Kira Agosto [2026]") — REQUIRES the month token to match,
+ *     so "Agosto" never collides with the first "Kira …" board
+ *  3. BOARD_KEYWORDS match
+ *  4. best word-overlap (most matching words wins — "kira agosto" beats "kira julio")
+ */
+function resolveMoveDestBoard(boards: TrelloBoard[], targetBoard: string): TrelloBoard | undefined {
+  const tb = targetBoard.toLowerCase().trim();
+  if (KNOWN_BOARD_KEYS.includes(tb as BoardTarget)) return resolveBoard(boards, tb as BoardTarget);
+
+  const month = ALL_MONTHS.find((m) => tb.includes(m));
+  if (month) {
+    const yr = (tb.match(/20\d\d/) || [])[0];
+    const hit = boards.find((b) => {
+      const n = b.name.toLowerCase();
+      return n.includes(month) && n.includes('kira') && (!yr || n.includes(yr));
+    });
+    if (hit) return hit;
+  }
+
+  for (const key of KNOWN_BOARD_KEYS) {
+    if (BOARD_KEYWORDS[key].some((kw) => tb.includes(kw.toLowerCase()))) {
+      const d = resolveBoard(boards, key);
+      if (d) return d;
+    }
+  }
+
+  const hint = tb.split(/\s+/).filter((w) => w.length > 2);
+  let best: TrelloBoard | undefined;
+  let bestScore = 0;
+  for (const b of boards) {
+    const n = b.name.toLowerCase();
+    const score = hint.filter((w) => n.includes(w)).length;
+    if (score > bestScore) { bestScore = score; best = b; }
+  }
+  return bestScore > 0 ? best : undefined;
+}
+
+/**
+ * Resolve the destination list for a MOVE from the column the user actually named.
+ * "Cita" → "Датировано / «Cita»"; "dated"/"appointment" → dated; a ListTarget key
+ * → that list. Falls back to todo_flow only when nothing was specified/matched.
+ */
+function resolveMoveDestList(lists: TrelloList[], targetList: string | undefined): TrelloList | undefined {
+  if (!targetList || !targetList.trim()) return resolveList(lists, 'todo_flow') ?? lists[0];
+  const tl = targetList.toLowerCase().trim();
+
+  if (KNOWN_LIST_KEYS.includes(tl as ListTarget)) return resolveList(lists, tl as ListTarget);
+
+  // Direct substring against the real list names (handles "Cita", "Поток", etc.)
+  const direct = lists.find((l) => l.name.toLowerCase().includes(tl));
+  if (direct) return direct;
+
+  // Map the spoken word onto a ListTarget via LIST_KEYWORDS (both directions)
+  for (const key of KNOWN_LIST_KEYS) {
+    if (LIST_KEYWORDS[key].some((kw) => tl.includes(kw.toLowerCase()) || kw.toLowerCase().includes(tl))) {
+      const r = resolveList(lists, key);
+      if (r) return r;
+    }
+  }
+  return resolveList(lists, 'todo_flow') ?? lists[0];
+}
+
 async function resolveOrCreateLabel(
   boardId: string,
   color: TrelloColor,
@@ -1053,6 +1131,7 @@ interface _RawAction {
   cardQuery?: string;
   sourceBoardHint?: string;
   targetBoard?: string;
+  targetList?: string;   // the column/list the user named for a move (e.g. "Cita", "dated", "just_for_today")
 }
 
 /** Search Trello cards by text, optionally restricted to a board. */
@@ -1099,12 +1178,13 @@ Return ONLY a JSON array — no explanation, no markdown.
 Action schema:
 [
   {"type":"create","description":"full task description to create as a new card"},
-  {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"BOARD_KEY"},
+  {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"BOARD_KEY or exact board name","targetList":"the column the user named, or null"},
   {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"}
 ]
 
-BOARD_KEY must be one of these exact keys (NOT a person's name, NOT a free-form phrase):
-  "kira_current_month"  — Elena's personal Kira monthly board (Mayo/Junio/Julio 2026)
+targetBoard rules:
+  Prefer one of these exact keys when it fits:
+  "kira_current_month"  — Elena's personal Kira board for the CURRENT month
   "kira_future"         — Kira Ano 2026 и дальше — long-term plans
   "kira_habits"         — Kira Horario del dia / Habits
   "kira_finance"        — Kira FIN Discipline / Shopping / Expenses
@@ -1112,6 +1192,19 @@ BOARD_KEY must be one of these exact keys (NOT a person's name, NOT a free-form 
   "aldeazz"             — AIdeazz Web3 Ecosystem
   "espaluz"             — EspaLuz AI Family Tutor
   "algom"               — Algom Alpha Crypto Coach
+  BUT when the user names a SPECIFIC MONTH board (e.g. "Kira Agosto", "Kira Septiembre",
+  "move to August board"), output targetBoard as the EXACT board name string
+  "Kira <Month> 2026" (Spanish month, capitalized; append 2026 if no year said) — do NOT
+  collapse a named month into "kira_current_month".
+
+targetList rules (the COLUMN — capture it, it matters):
+  Set targetList to what the user said. Map obvious synonyms to these keys when clear:
+  "just_for_today" (priority/today/приоритет) · "todo_flow" (backlog/поток/надо) ·
+  "in_process_me" (I'm working on it/мяч на моей) · "in_process_them" (waiting on them/контрагента) ·
+  "not_sure" · "dated"  ← use this for "Cita", "Датировано", "appointment", "scheduled" ·
+  "rules" (NB/reglas) · "done" (gane/сделано).
+  If the user says a literal column name that isn't an obvious synonym (e.g. "Cita"), pass that
+  raw word as targetList — the code fuzzy-matches it to the real column. null only if no column named.
 
 CRITICAL — "to me" / "me" / "my board" / "my personal board" / "Kira" / "to myself" rules:
 - When the user says "move to me", "move to my board", "put it on my board", "to myself", "to Kira" — this ALWAYS means Elena's personal Kira board → use targetBoard: "kira_current_month"
@@ -1189,34 +1282,8 @@ export async function processMultiAction(
 
         const boards = await getAllBoards();
 
-        // Resolve destination board — supports two modes:
-        // 1. BoardTarget key (e.g. "kira_current_month") — use structured resolveBoard()
-        // 2. Free-form board name substring — word-overlap fuzzy match
-        const knownBoardKeys: BoardTarget[] = [
-          'kira_current_month', 'kira_future', 'kira_habits', 'kira_finance',
-          'vibejob', 'aldeazz', 'espaluz', 'algom',
-        ];
-        let dest: TrelloBoard | undefined;
-        const tbLower = action.targetBoard.toLowerCase().trim();
-
-        if (knownBoardKeys.includes(tbLower as BoardTarget)) {
-          // Structured key — use resolveBoard which handles month rolling etc.
-          dest = resolveBoard(boards, tbLower as BoardTarget);
-        } else {
-          // Free-form — try keyword match from BOARD_KEYWORDS first
-          for (const key of knownBoardKeys) {
-            if (BOARD_KEYWORDS[key].some(kw => tbLower.includes(kw.toLowerCase()))) {
-              dest = resolveBoard(boards, key);
-              if (dest) break;
-            }
-          }
-          // Fallback: word-overlap match against actual board names
-          if (!dest) {
-            const hint = tbLower.split(/\s+/).filter(w => w.length > 2);
-            dest = boards.find(b => hint.some(w => b.name.toLowerCase().includes(w)));
-          }
-        }
-
+        // Resolve destination board — structured key, named month, keywords, or best word-overlap
+        const dest = resolveMoveDestBoard(boards, action.targetBoard);
         if (!dest) {
           results.push({ type: 'move', success: false, cardQuery: action.cardQuery,
             error: `Board not found: "${action.targetBoard}"` });
@@ -1224,7 +1291,8 @@ export async function processMultiAction(
         }
 
         const lists = await getBoardLists(dest.id);
-        const destList = resolveList(lists, 'todo_flow') ?? lists[0];
+        // Honor the COLUMN the user named ("Cita" → Датировано/Cita); todo_flow only as last resort
+        const destList = resolveMoveDestList(lists, action.targetList);
         if (!destList) {
           results.push({ type: 'move', success: false, error: `No lists on "${dest.name}"` });
           continue;
