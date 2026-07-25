@@ -38,6 +38,10 @@ also shows the text with a **Copiar mensaje** button if WhatsApp fails to open.
 Requires per-slug `fuDraft` in `docs/selling/outreach-registry.json` +
 `docs/selling/drafts/{slug}-fu.txt` — both written by `_install-wa-fu-notes.cjs`;
 **commit + push after every run** or the button 404s (Oracle reads disk, then GitHub raw `main`).
+The **first-contact** button was migrated the same day by `node scripts/_fix-wa-links-mobile.cjs`
+(81 notes repointed to `/go/outreach/{slug}`) — **both buttons now work from the phone**.
+New notes: never write a raw `web.whatsapp.com/send` href again; use the bridge
+(`buildOutreachSlugUrl` / `buildHubSpotFuAnchor` in `scripts/wa-link-lib.cjs`).
 
 **No engineering jargon in the message (fixed July 25 2026).** HubSpot flattens the note
 HTML, so `Money query: …` and `Top fixes: (1) FAQ …, (2) LodgingBusiness/FAQPage JSON-LD…`
