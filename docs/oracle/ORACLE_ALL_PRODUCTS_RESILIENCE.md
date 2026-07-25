@@ -1064,6 +1064,21 @@ The Telegram voice handler in `telegram-bot.ts` previously created Trello cards 
 1. `src/telegram-bot.ts`: both Trello return paths (`processMultiAction` and `createTrelloCardFromTranscript`) now call `saveKnowledge(userId, 'voice_note', ...)` before returning.
 2. `src/cto-aipa.ts`: `/sprint-knowledge` endpoint now fetches `getKnowledgeByCategory(uid, 'voice_note', 10)` alongside existing `diary` and `task` queries, and renders them under "recent voice notes" in the Lambda context.
 
+### Voice→Trello move fix + `[HIRING-VJH-LEAD]` purge (deployed July 25 2026, commit `0e027b1`)
+
+Two bugs made spoken moves disobey ("move the court cards to Kira Agosto, column Cita"):
+
+1. **The column was thrown away.** The move branch hard-coded `resolveList(lists, 'todo_flow')`, and the move action schema had no `targetList` field at all — every moved card landed in "Надо сделать / Поток" regardless of the column named.
+2. **The board resolved to the wrong month.** The fallback matched any word, so "Kira Agosto" hit whichever `Kira …` board came first (Julio / Finance / Habits); `agosto` was not even in the month list.
+
+Fix in `src/trello-voice.ts`: `targetList` added to the move action + prompt rules, plus two resolvers — `resolveMoveDestBoard()` (structured key → named-month token that MUST match → `BOARD_KEYWORDS` → best word-overlap) and `resolveMoveDestList()` (real list-name substring, e.g. `"Cita"` → `Датировано / "Cita"` → `LIST_KEYWORDS` synonyms → `todo_flow` only as last resort).
+
+Verified against the live board/list names with the compiled `dist/trello-voice.js`: "Kira Agosto"+"Cita" → `Kira Agosto 2026 / Датировано / "Cita"`; "kira julio"+"поток" → `Kira Julio 2026 / Надо сделать / "Поток"`; no column named → `Поток` fallback.
+
+**Deploy note (bit me here):** Oracle has **no `tsc`** (`node_modules/typescript` absent) — `npm run build` on the server fails with `sh: 1: tsc: not found`. Build locally on Windows, back up the server file, then `scp dist/<file>.js oracle-cto-aipa:/home/ubuntu/cto-aipa/dist/` and `pm2 restart cto-aipa --update-env`.
+
+**Card purge (same day):** 54 stale `[HIRING-VJH-LEAD]` cards (auto-pushed recruiter/job emails) deleted from the Kira boards; 0 remain across all 11 boards; `[hs:]` client cards and real job cards untouched. Full card data backed up first to `backups/trello-vjh-cards-20260724-175218.json` on Oracle **and** on the Windows clone. That file is **gitignored on purpose — this repo is PUBLIC and the dump carries recruiter names, emails and message bodies.** Never commit it.
+
 ### XAI_API_KEY env requirement (added May 20 2026)
 
 xAI team key for `rhino-sneezing-lemon` (X account `1910676161845186560`) is now in env on both:
