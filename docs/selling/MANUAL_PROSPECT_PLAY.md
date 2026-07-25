@@ -28,6 +28,25 @@ After email, FU is a **second outreach on WhatsApp**: audit already on the deal 
 3. Click → WhatsApp opens with **full text prefilled** → Send (no manual edit).
 4. Mark task done. Reply → stage **💬 They replied** (or say `they replied {company}`).
 
+**📱 Works on the phone too (fixed July 25 2026).** The FU button used to be a raw
+`web.whatsapp.com/send` link — on a phone that redirects to `web.whatsapp.com/mobile/`
+("use WhatsApp Web from your computer") and the app **never opens**, so FUs could only be
+sent from the laptop. Buttons now point at **`/go/outreach/{slug}?v=fu`**, the bridge that
+sniffs the device: **api.whatsapp.com on mobile** (opens the app) · **web.whatsapp.com on
+desktop** (no redirect → 4-byte emojis survive). Same button, both devices; the bridge page
+also shows the text with a **Copiar mensaje** button if WhatsApp fails to open.
+Requires per-slug `fuDraft` in `docs/selling/outreach-registry.json` +
+`docs/selling/drafts/{slug}-fu.txt` — both written by `_install-wa-fu-notes.cjs`;
+**commit + push after every run** or the button 404s (Oracle reads disk, then GitHub raw `main`).
+
+**No engineering jargon in the message (fixed July 25 2026).** HubSpot flattens the note
+HTML, so `Money query: …` and `Top fixes: (1) FAQ …, (2) LodgingBusiness/FAQPage JSON-LD…`
+land on one line; the old parser swallowed the fixes into the quoted customer question and
+cut it mid-word. `cleanMoneyQuery()` now stops at the `?`/next note field, drops analyst
+tails, and returns the generic question if any engineering token (`JSON-LD`, `FAQPage`,
+`schema`, `robots.txt`, `llms.txt`, `H1`) survives. **`Top fixes` stays in the deal note —
+never in the prospect's message.**
+
 Approved FU ending (after audit paragraph):
 
 ```

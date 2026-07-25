@@ -87,6 +87,26 @@ function buildOutreachSlugUrl(slug) {
   return `${OUTREACH_BASE}/${safe}`;
 }
 
+/**
+ * Follow-up URL — the server bridge, NOT a raw web.whatsapp.com link.
+ *
+ * MOBILE (July 25 2026, proven with Elena's screenshots): `web.whatsapp.com/send`
+ * redirects a phone to `web.whatsapp.com/mobile/` ("use WhatsApp Web from your
+ * computer") — the app never opens, so the FU could only be sent from the laptop.
+ * `/go/outreach/{slug}?v=fu` serves the bridge that sniffs the device:
+ * api.whatsapp.com on mobile (opens the app), web.whatsapp.com on desktop (the
+ * no-redirect path that keeps 4-byte emojis intact). One URL, both devices.
+ */
+function buildOutreachFuUrl(slug) {
+  return `${buildOutreachSlugUrl(slug)}?v=fu`;
+}
+
+/** HubSpot note anchor pointing at the device-aware FU bridge (works on her phone). */
+function buildHubSpotFuAnchor(slug, label) {
+  const title = label || '➡️ WHATSAPP FU — AI Growth Operator + auditoría';
+  return `<a href="${buildOutreachFuUrl(slug)}"><b>${title}</b></a>`;
+}
+
 /** One-click email via cto-aipa → Resend as aipa@aideazz.xyz (same sender as Concierge). */
 function buildOutreachEmailUrl(slug) {
   const safe = String(slug).replace(/[^a-z0-9-]/gi, '');
@@ -219,8 +239,11 @@ module.exports = {
   slugify,
   readDraftUtf8,
   loadRegistry,
+  saveRegistry,
   registerOutreachSlug,
   buildOutreachSlugUrl,
+  buildOutreachFuUrl,
+  buildHubSpotFuAnchor,
   buildOutreachEmailUrl,
   buildWaMeUrl,
   buildWhatsAppPrefillUrl,

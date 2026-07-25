@@ -6,7 +6,8 @@
     "email": "info@panamafertility.com",
     "emailDraft": "docs/selling/drafts/panama-fertility-email.txt",
     "dealId": "62828946074",
-    "score": 86
+    "score": 86,
+    "fuDraft": "docs/selling/drafts/panama-fertility-fu.txt"
   },
   "dopanama": {
     "phone": "50764433341",
@@ -15,7 +16,8 @@
     "email": "info@dopanama.com",
     "emailDraft": "docs/selling/drafts/dopanama-email.txt",
     "dealId": "62821413988",
-    "score": 91
+    "score": 91,
+    "fuDraft": "docs/selling/drafts/dopanama-fu.txt"
   },
   "nomad-constructions-corp": {
     "phone": "50769484982",
@@ -24,7 +26,8 @@
     "email": "info@nomadcc.com",
     "emailDraft": "docs/selling/drafts/nomad-constructions-corp-email.txt",
     "dealId": "62832583063",
-    "score": 90
+    "score": 90,
+    "fuDraft": "docs/selling/drafts/nomad-constructions-corp-fu.txt"
   },
   "panama-aesthetics": {
     "phone": "50769896999",
@@ -33,7 +36,8 @@
     "email": "info@panamaaesthetics.com",
     "emailDraft": "docs/selling/drafts/panama-aesthetics-email.txt",
     "dealId": "62873560951",
-    "score": 88
+    "score": 88,
+    "fuDraft": "docs/selling/drafts/panama-aesthetics-fu.txt"
   },
   "yc-panama-yachts": {
     "phone": "50765031745",
@@ -42,7 +46,8 @@
     "email": "info@ycyachts.com",
     "emailDraft": "docs/selling/drafts/yc-panama-yachts-email.txt",
     "dealId": "62864888204",
-    "score": 94
+    "score": 94,
+    "fuDraft": "docs/selling/drafts/yc-panama-yachts-fu.txt"
   },
   "fuerte-amador-resort-marina": {
     "phone": "50760308992",
@@ -51,7 +56,8 @@
     "email": "service@fuerteamador.com",
     "emailDraft": "docs/selling/drafts/fuerte-amador-resort-marina-email.txt",
     "dealId": "62857562269",
-    "score": 68
+    "score": 68,
+    "fuDraft": "docs/selling/drafts/fuerte-amador-resort-marina-fu.txt"
   },
   "centro-marino-panam": {
     "phone": "50766150368",
@@ -60,7 +66,8 @@
     "email": "ernesto@centromarino.com",
     "emailDraft": "docs/selling/drafts/centro-marino-panam-email.txt",
     "dealId": "62863032403",
-    "score": 84
+    "score": 84,
+    "fuDraft": "docs/selling/drafts/centro-marino-panam-fu.txt"
   },
   "relofirm": {
     "phone": "50763325777",
@@ -69,7 +76,8 @@
     "email": "contact@relofirm.com",
     "emailDraft": "docs/selling/drafts/relofirm-email.txt",
     "dealId": "62851992582",
-    "score": 94
+    "score": 94,
+    "fuDraft": "docs/selling/drafts/relofirm-fu.txt"
   },
   "kraemer-law": {
     "phone": "5073108688",
@@ -78,7 +86,8 @@
     "email": "info@kraemerlaw.com",
     "emailDraft": "docs/selling/drafts/kraemer-law-email.txt",
     "dealId": "62872179381",
-    "score": 97
+    "score": 97,
+    "fuDraft": "docs/selling/drafts/kraemer-law-fu.txt"
   },
   "ampa-tours": {
     "phone": "50760270607",
@@ -87,7 +96,8 @@
     "email": "info@ampatours.com",
     "emailDraft": "docs/selling/drafts/ampa-tours-email.txt",
     "dealId": "62872179385",
-    "score": 98
+    "score": 98,
+    "fuDraft": "docs/selling/drafts/ampa-tours-fu.txt"
   },
   "tranquilo-bay": {
     "phone": "5078380021",
@@ -96,14 +106,16 @@
     "email": "info@tranquilobay.com",
     "emailDraft": "docs/selling/drafts/tranquilo-bay-email.txt",
     "dealId": "62871509035",
-    "score": 83
+    "score": 83,
+    "fuDraft": "docs/selling/drafts/tranquilo-bay-fu.txt"
   },
   "pesqueros-sport": {
     "phone": "50764310642",
     "draft": "docs/selling/drafts/pesqueros-sport.txt",
     "company": "Pesqueros Sport",
     "dealId": "62856793161",
-    "score": 90
+    "score": 90,
+    "fuDraft": "docs/selling/drafts/pesqueros-sport-fu.txt"
   },
   "prestige-storage": {
     "phone": "5073027760",
@@ -112,7 +124,8 @@
     "email": "info@prestigestorage.com.pa",
     "emailDraft": "docs/selling/drafts/prestige-storage-email.txt",
     "dealId": "62867929503",
-    "score": 87
+    "score": 87,
+    "fuDraft": "docs/selling/drafts/prestige-storage-fu.txt"
   },
   "panama-dental-clinic": {
     "phone": "50766111939",
@@ -121,7 +134,8 @@
     "email": "ced.sanantoniolm@gmail.com",
     "emailDraft": "docs/selling/drafts/panama-dental-clinic-email.txt",
     "dealId": "62865516872",
-    "score": 88
+    "score": 88,
+    "fuDraft": "docs/selling/drafts/panama-dental-clinic-fu.txt"
   },
   "san-blas-dreams": {
     "phone": "50764735905",
@@ -130,7 +144,8 @@
     "email": "info@sanblasdreams.com",
     "emailDraft": "docs/selling/drafts/san-blas-dreams-email.txt",
     "dealId": "62868082222",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/san-blas-dreams-fu.txt"
   },
   "flamenco-drystack-panama": {
     "phone": "50768365198",
@@ -139,7 +154,8 @@
     "email": "info@flamencodrystack.net",
     "emailDraft": "docs/selling/drafts/flamenco-drystack-panama-email.txt",
     "dealId": "62860098823",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/flamenco-drystack-panama-fu.txt"
   },
   "ivi-panama": {
     "phone": "50766316301",
@@ -148,7 +164,8 @@
     "email": "ivipanama@ivirma.com",
     "emailDraft": "docs/selling/drafts/ivi-panama-email.txt",
     "dealId": "62872490395",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/ivi-panama-fu.txt"
   },
   "relocation-panama": {
     "phone": "50762339432",
@@ -157,7 +174,8 @@
     "email": "info@relocationpanama.com",
     "emailDraft": "docs/selling/drafts/relocation-panama-email.txt",
     "dealId": "62879198124",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/relocation-panama-fu.txt"
   },
   "panama-expat-service": {
     "phone": "50762962070",
@@ -166,7 +184,8 @@
     "email": "info@panamaexpatservice.com",
     "emailDraft": "docs/selling/drafts/panama-expat-service-email.txt",
     "dealId": "62861954230",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/panama-expat-service-fu.txt"
   },
   "international-relocation-partner": {
     "phone": "50762418879",
@@ -175,7 +194,8 @@
     "email": "info@igopanama.com",
     "emailDraft": "docs/selling/drafts/international-relocation-partner-email.txt",
     "dealId": "62861954305",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/international-relocation-partner-fu.txt"
   },
   "immigration-visa-24-7": {
     "phone": "50769423311",
@@ -184,7 +204,8 @@
     "email": "lawyers@immigrationvisa247.com",
     "emailDraft": "docs/selling/drafts/immigration-visa-24-7-email.txt",
     "dealId": "62861024793",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/immigration-visa-24-7-fu.txt"
   },
   "lac-legal": {
     "phone": "5073955607",
@@ -193,7 +214,8 @@
     "email": "lac@lacgrp.com",
     "emailDraft": "docs/selling/drafts/lac-legal-email.txt",
     "dealId": "62876980999",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/lac-legal-fu.txt"
   },
   "ndm-law-firm": {
     "phone": "5078302656",
@@ -202,7 +224,8 @@
     "email": "info@ndm.com.pa",
     "emailDraft": "docs/selling/drafts/ndm-law-firm-email.txt",
     "dealId": "62876671266",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/ndm-law-firm-fu.txt"
   },
   "panama-legal-center": {
     "phone": "50764040388",
@@ -211,7 +234,8 @@
     "email": "customer@panamalegalcenter.com",
     "emailDraft": "docs/selling/drafts/panama-legal-center-email.txt",
     "dealId": "62873424288",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/panama-legal-center-fu.txt"
   },
   "delvalle-delvalle": {
     "phone": "50761093066",
@@ -220,7 +244,8 @@
     "email": "info@delvallepanama.com",
     "emailDraft": "docs/selling/drafts/delvalle-delvalle-email.txt",
     "dealId": "62870120358",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/delvalle-delvalle-fu.txt"
   },
   "ipanema-residences": {
     "phone": "50767396666",
@@ -229,7 +254,8 @@
     "email": "ventas@ipanemaresidences.com",
     "dealId": "62950148475",
     "score": 92,
-    "emailDraft": "docs/selling/drafts/ipanema-residences-email.txt"
+    "emailDraft": "docs/selling/drafts/ipanema-residences-email.txt",
+    "fuDraft": "docs/selling/drafts/ipanema-residences-fu.txt"
   },
   "eclypse-de-mar": {
     "phone": "50766114581",
@@ -238,7 +264,8 @@
     "dealId": "62955236994",
     "score": 57,
     "email": "info@eclypsedemar.com",
-    "emailDraft": "docs/selling/drafts/eclypse-de-mar-email.txt"
+    "emailDraft": "docs/selling/drafts/eclypse-de-mar-email.txt",
+    "fuDraft": "docs/selling/drafts/eclypse-de-mar-fu.txt"
   },
   "panam-sonr-e": {
     "phone": "50761405700",
@@ -247,7 +274,8 @@
     "email": "info@panamasonrie.com",
     "emailDraft": "docs/selling/drafts/panam-sonr-e-email.txt",
     "dealId": "63034686254",
-    "score": 91
+    "score": 91,
+    "fuDraft": "docs/selling/drafts/panam-sonr-e-fu.txt"
   },
   "cl-nica-arango-orillac": {
     "phone": "50769973733",
@@ -256,7 +284,8 @@
     "email": "info@arango-orillac.com",
     "emailDraft": "docs/selling/drafts/cl-nica-arango-orillac-email.txt",
     "dealId": "63057127263",
-    "score": 58
+    "score": 58,
+    "fuDraft": "docs/selling/drafts/cl-nica-arango-orillac-fu.txt"
   },
   "centro-odontol-gico-paitilla": {
     "phone": "50762334051",
@@ -265,7 +294,8 @@
     "email": "contacto@centroodontologicopaitilla.com",
     "emailDraft": "docs/selling/drafts/centro-odontol-gico-paitilla-email.txt",
     "dealId": "63055888158",
-    "score": 69
+    "score": 69,
+    "fuDraft": "docs/selling/drafts/centro-odontol-gico-paitilla-fu.txt"
   },
   "gomitom": {
     "phone": "50769800688",
@@ -274,7 +304,8 @@
     "email": "info@gomitom.com",
     "emailDraft": "docs/selling/drafts/gomitom-email.txt",
     "dealId": "63066851203",
-    "score": 49
+    "score": 49,
+    "fuDraft": "docs/selling/drafts/gomitom-fu.txt"
   },
   "charter-in-san-blas": {
     "phone": "50762950550",
@@ -283,7 +314,8 @@
     "email": "info@charterinsanblas.com",
     "emailDraft": "docs/selling/drafts/charter-in-san-blas-email.txt",
     "dealId": "63039485826",
-    "score": 96
+    "score": 96,
+    "fuDraft": "docs/selling/drafts/charter-in-san-blas-fu.txt"
   },
   "san-blas-on-sailboats": {
     "phone": "50769323919",
@@ -292,7 +324,8 @@
     "email": "info@sanblasonsailboats.com",
     "emailDraft": "docs/selling/drafts/san-blas-on-sailboats-email.txt",
     "dealId": "63038403138",
-    "score": 83
+    "score": 83,
+    "fuDraft": "docs/selling/drafts/san-blas-on-sailboats-fu.txt"
   },
   "we-sail-san-blas": {
     "phone": "50763693628",
@@ -301,7 +334,8 @@
     "email": "wesailsanblas@gmail.com",
     "emailDraft": "docs/selling/drafts/we-sail-san-blas-email.txt",
     "dealId": "63063441827",
-    "score": 97
+    "score": 97,
+    "fuDraft": "docs/selling/drafts/we-sail-san-blas-fu.txt"
   },
   "sailboat-trips": {
     "phone": "50764686603",
@@ -310,7 +344,8 @@
     "email": "info@sailboattrips.com",
     "emailDraft": "docs/selling/drafts/sailboat-trips-email.txt",
     "dealId": "63052399762",
-    "score": 87
+    "score": 87,
+    "fuDraft": "docs/selling/drafts/sailboat-trips-fu.txt"
   },
   "san-blas-sailing": {
     "phone": "50767806959",
@@ -319,7 +354,8 @@
     "email": "panama@sanblassailing.com",
     "emailDraft": "docs/selling/drafts/san-blas-sailing-email.txt",
     "dealId": "63045749810",
-    "score": 90
+    "score": 90,
+    "fuDraft": "docs/selling/drafts/san-blas-sailing-fu.txt"
   },
   "sailing-charter-panama": {
     "phone": "50760761493",
@@ -328,7 +364,8 @@
     "email": "sailingcharterpanama@gmail.com",
     "emailDraft": "docs/selling/drafts/sailing-charter-panama-email.txt",
     "dealId": "63033440775",
-    "score": 97
+    "score": 97,
+    "fuDraft": "docs/selling/drafts/sailing-charter-panama-fu.txt"
   },
   "casa-cayuco": {
     "phone": "50760887663",
@@ -337,7 +374,8 @@
     "email": "info@casacayuco.com",
     "emailDraft": "docs/selling/drafts/casa-cayuco-email.txt",
     "dealId": "63065611883",
-    "score": 86
+    "score": 86,
+    "fuDraft": "docs/selling/drafts/casa-cayuco-fu.txt"
   },
   "destination-dream-weddings": {
     "phone": "12044064876",
@@ -346,7 +384,8 @@
     "email": "wendy@destinationdreamweddings.com",
     "emailDraft": "docs/selling/drafts/destination-dream-weddings-email.txt",
     "dealId": "63064999707",
-    "score": 91
+    "score": 91,
+    "fuDraft": "docs/selling/drafts/destination-dream-weddings-fu.txt"
   },
   "the-haven-wellness-resort": {
     "phone": "50764915578",
@@ -355,7 +394,8 @@
     "email": "info@havenboquete.com",
     "emailDraft": "docs/selling/drafts/the-haven-wellness-resort-email.txt",
     "dealId": "63040487766",
-    "score": 81
+    "score": 81,
+    "fuDraft": "docs/selling/drafts/the-haven-wellness-resort-fu.txt"
   },
   "valle-escondido-resort": {
     "phone": "50765369875",
@@ -364,7 +404,8 @@
     "email": "ventas@valleescondidoboquete.com",
     "emailDraft": "docs/selling/drafts/valle-escondido-resort-email.txt",
     "dealId": "63042652940",
-    "score": 84
+    "score": 84,
+    "fuDraft": "docs/selling/drafts/valle-escondido-resort-fu.txt"
   },
   "cancun-dental-specialists": {
     "phone": "529983130107",
@@ -373,7 +414,8 @@
     "email": "contact@cancundentalspecialists.com",
     "emailDraft": "docs/selling/drafts/cancun-dental-specialists-email.txt",
     "dealId": "63054341484",
-    "score": 81
+    "score": 81,
+    "fuDraft": "docs/selling/drafts/cancun-dental-specialists-fu.txt"
   },
   "smile-tijuana": {
     "phone": "526642930717",
@@ -382,7 +424,8 @@
     "email": "info@smiletijuanadentist.com",
     "emailDraft": "docs/selling/drafts/smile-tijuana-email.txt",
     "dealId": "63027059795",
-    "score": 77
+    "score": 77,
+    "fuDraft": "docs/selling/drafts/smile-tijuana-fu.txt"
   },
   "dr-daniela-correa": {
     "phone": "573332841861",
@@ -391,7 +434,8 @@
     "email": "danielacorreacirujana@gmail.com",
     "emailDraft": "docs/selling/drafts/dr-daniela-correa-email.txt",
     "dealId": "63059453757",
-    "score": 98
+    "score": 98,
+    "fuDraft": "docs/selling/drafts/dr-daniela-correa-fu.txt"
   },
   "the-skin-clinic-panama": {
     "phone": "50764509248",
@@ -400,7 +444,8 @@
     "email": "citas@theskinclinicpanama.com",
     "emailDraft": "docs/selling/drafts/the-skin-clinic-panama-email.txt",
     "dealId": "63062979686",
-    "score": 60
+    "score": 60,
+    "fuDraft": "docs/selling/drafts/the-skin-clinic-panama-fu.txt"
   },
   "red-frog-beach-island-resort": {
     "phone": "50763476597",
@@ -409,7 +454,8 @@
     "email": "reservations@redfrogbeach.com",
     "emailDraft": "docs/selling/drafts/red-frog-beach-island-resort-email.txt",
     "dealId": "63059453793",
-    "score": 70
+    "score": 70,
+    "fuDraft": "docs/selling/drafts/red-frog-beach-island-resort-fu.txt"
   },
   "international-school-of-panama": {
     "phone": "50769821470",
@@ -418,7 +464,8 @@
     "email": "admissions@isp.edu.pa",
     "emailDraft": "docs/selling/drafts/international-school-of-panama-email.txt",
     "dealId": "63044818308",
-    "score": 75
+    "score": 75,
+    "fuDraft": "docs/selling/drafts/international-school-of-panama-fu.txt"
   },
   "dermom-dica": {
     "phone": "50762372819",
@@ -427,7 +474,8 @@
     "email": "info@dermomedica.com.pa",
     "emailDraft": "docs/selling/drafts/dermom-dica-email.txt",
     "dealId": "63060115712",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/dermom-dica-fu.txt"
   },
   "the-casco-school": {
     "phone": "50766442413",
@@ -436,7 +484,8 @@
     "email": "admissions@thecascoschool.com",
     "emailDraft": "docs/selling/drafts/the-casco-school-email.txt",
     "dealId": "63060405782",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/the-casco-school-fu.txt"
   },
   "boston-school-international": {
     "phone": "50764548560",
@@ -445,7 +494,8 @@
     "email": "admissions@bostonschool.edu.pa",
     "emailDraft": "docs/selling/drafts/boston-school-international-email.txt",
     "dealId": "63053387934",
-    "score": 88
+    "score": 88,
+    "fuDraft": "docs/selling/drafts/boston-school-international-fu.txt"
   },
   "studio-at-the-haven": {
     "phone": "50764260843",
@@ -454,7 +504,8 @@
     "email": "studiohavenboquete@gmail.com",
     "emailDraft": "docs/selling/drafts/studio-at-the-haven-email.txt",
     "dealId": "63049661069",
-    "score": 87
+    "score": 87,
+    "fuDraft": "docs/selling/drafts/studio-at-the-haven-fu.txt"
   },
   "gamboa-rainforest-reserve": {
     "phone": "50766723083",
@@ -463,7 +514,8 @@
     "email": "reservations@gamboaresort.com",
     "emailDraft": "docs/selling/drafts/gamboa-rainforest-reserve-email.txt",
     "dealId": "63039072050",
-    "score": 85
+    "score": 85,
+    "fuDraft": "docs/selling/drafts/gamboa-rainforest-reserve-fu.txt"
   },
   "grupo-dental-nacional": {
     "phone": "50766707039",
@@ -472,7 +524,8 @@
     "email": "info@grupodentalnacional.com",
     "emailDraft": "docs/selling/drafts/grupo-dental-nacional-email.txt",
     "dealId": "63051086933",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/grupo-dental-nacional-fu.txt"
   },
   "hospital-punta-pac-fica": {
     "phone": "50766141448",
@@ -481,7 +534,8 @@
     "email": "turismomedico@pacificasalud.com",
     "emailDraft": "docs/selling/drafts/hospital-punta-pac-fica-email.txt",
     "dealId": "63052782744",
-    "score": 64
+    "score": 64,
+    "fuDraft": "docs/selling/drafts/hospital-punta-pac-fica-fu.txt"
   },
   "hospital-san-fernando": {
     "phone": "50766393783",
@@ -490,7 +544,8 @@
     "email": "global@hospitalsanfernando.com",
     "emailDraft": "docs/selling/drafts/hospital-san-fernando-email.txt",
     "dealId": "63064457219",
-    "score": 85
+    "score": 85,
+    "fuDraft": "docs/selling/drafts/hospital-san-fernando-fu.txt"
   },
   "finca-l-rida": {
     "phone": "50765095139",
@@ -499,7 +554,8 @@
     "email": "info@fincalerida.com",
     "emailDraft": "docs/selling/drafts/finca-l-rida-email.txt",
     "dealId": "63061827228",
-    "score": 50
+    "score": 50,
+    "fuDraft": "docs/selling/drafts/finca-l-rida-fu.txt"
   },
   "los-quetzales-ecolodge": {
     "phone": "50766712131",
@@ -508,7 +564,8 @@
     "email": "stay@losquetzales.com",
     "emailDraft": "docs/selling/drafts/los-quetzales-ecolodge-email.txt",
     "dealId": "63060432904",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/los-quetzales-ecolodge-fu.txt"
   },
   "hospital-clinica-biblica": {
     "phone": "50685957000",
@@ -517,7 +574,8 @@
     "email": "info@clinicabiblica.com",
     "emailDraft": "docs/selling/drafts/hospital-clinica-biblica-email.txt",
     "dealId": "63033505966",
-    "score": 79
+    "score": 79,
+    "fuDraft": "docs/selling/drafts/hospital-clinica-biblica-fu.txt"
   },
   "hospital-metropolitano": {
     "phone": "50664343139",
@@ -526,7 +584,8 @@
     "email": "info@metropolitanocr.com",
     "emailDraft": "docs/selling/drafts/hospital-metropolitano-email.txt",
     "dealId": "63065540143",
-    "score": 82
+    "score": 82,
+    "fuDraft": "docs/selling/drafts/hospital-metropolitano-fu.txt"
   },
   "costa-rica-yacht-charter-brokers": {
     "phone": "50662422041",
@@ -535,7 +594,8 @@
     "email": "step-aboard@yachtchartercr.com",
     "emailDraft": "docs/selling/drafts/costa-rica-yacht-charter-brokers-email.txt",
     "dealId": "63064457478",
-    "score": 88
+    "score": 88,
+    "fuDraft": "docs/selling/drafts/costa-rica-yacht-charter-brokers-fu.txt"
   },
   "elite-cartagena": {
     "phone": "15164936070",
@@ -544,7 +604,8 @@
     "email": "jc@elitecartagena.com",
     "emailDraft": "docs/selling/drafts/elite-cartagena-email.txt",
     "dealId": "63077716274",
-    "score": 97
+    "score": 97,
+    "fuDraft": "docs/selling/drafts/elite-cartagena-fu.txt"
   },
   "dr-jorge-rodriguez": {
     "phone": "573003719688",
@@ -553,7 +614,8 @@
     "email": "info@drjorgerodriguez.com",
     "emailDraft": "docs/selling/drafts/dr-jorge-rodriguez-email.txt",
     "dealId": "63067846953",
-    "score": 80
+    "score": 80,
+    "fuDraft": "docs/selling/drafts/dr-jorge-rodriguez-fu.txt"
   },
   "salud-sin-fronteras": {
     "phone": "573507316151",
@@ -562,7 +624,8 @@
     "email": "coordinacion@saludsinfronteras.com",
     "emailDraft": "docs/selling/drafts/salud-sin-fronteras-email.txt",
     "dealId": "63033678371",
-    "score": 99
+    "score": 99,
+    "fuDraft": "docs/selling/drafts/salud-sin-fronteras-fu.txt"
   },
   "colombia-luxury-group": {
     "phone": "573042091627",
@@ -571,7 +634,8 @@
     "email": "info@colombialuxurygroup.com",
     "emailDraft": "docs/selling/drafts/colombia-luxury-group-email.txt",
     "dealId": "63078747964",
-    "score": 97
+    "score": 97,
+    "fuDraft": "docs/selling/drafts/colombia-luxury-group-fu.txt"
   },
   "dr-luis-guillermo-tobon": {
     "phone": "573215095101",
@@ -580,7 +644,8 @@
     "email": "info@luisguillermotobon.com",
     "emailDraft": "docs/selling/drafts/dr-luis-guillermo-tobon-email.txt",
     "dealId": "63061986198",
-    "score": 94
+    "score": 94,
+    "fuDraft": "docs/selling/drafts/dr-luis-guillermo-tobon-fu.txt"
   },
   "hi-cartagena": {
     "phone": "573136952776",
@@ -589,7 +654,8 @@
     "email": "info@hicartagena.com",
     "emailDraft": "docs/selling/drafts/hi-cartagena-email.txt",
     "dealId": "63048627065",
-    "score": 57
+    "score": 57,
+    "fuDraft": "docs/selling/drafts/hi-cartagena-fu.txt"
   },
   "tijuana-dental-center": {
     "phone": "16199067481",
@@ -598,7 +664,8 @@
     "email": "info@smile4evermexico.com",
     "emailDraft": "docs/selling/drafts/tijuana-dental-center-email.txt",
     "dealId": "63040577101",
-    "score": 99
+    "score": 99,
+    "fuDraft": "docs/selling/drafts/tijuana-dental-center-fu.txt"
   },
   "isla-palenque": {
     "phone": "50766173771",
@@ -607,7 +674,8 @@
     "email": "reservations@islapalenque.com",
     "emailDraft": "docs/selling/drafts/isla-palenque-email.txt",
     "dealId": "63063245978",
-    "score": 57
+    "score": 57,
+    "fuDraft": "docs/selling/drafts/isla-palenque-fu.txt"
   },
   "american-trade-hotel": {
     "phone": "5072112000",
@@ -616,7 +684,8 @@
     "email": "info@americantradehotel.com",
     "emailDraft": "docs/selling/drafts/american-trade-hotel-email.txt",
     "dealId": "63037250145",
-    "score": 70
+    "score": 70,
+    "fuDraft": "docs/selling/drafts/american-trade-hotel-fu.txt"
   },
   "gianna-dentist-madenta": {
     "phone": "50762709109",
@@ -625,7 +694,8 @@
     "email": "recepcion@madentaclinic.com",
     "emailDraft": "docs/selling/drafts/gianna-dentist-madenta-email.txt",
     "score": 80,
-    "dealId": "63051108381"
+    "dealId": "63051108381",
+    "fuDraft": "docs/selling/drafts/gianna-dentist-madenta-fu.txt"
   },
   "san-blas-tour": {
     "phone": "00000000000",
@@ -643,7 +713,8 @@
     "email": "concierge@bristolpanama.com",
     "emailDraft": "docs/selling/drafts/bristol-panama-email.txt",
     "dealId": "63067561358",
-    "score": 87
+    "score": 87,
+    "fuDraft": "docs/selling/drafts/bristol-panama-fu.txt"
   },
   "sortis-hotel": {
     "phone": "5073988888",
@@ -652,7 +723,8 @@
     "email": "reservaciones@sortishotel.com",
     "emailDraft": "docs/selling/drafts/sortis-hotel-email.txt",
     "dealId": "63080329285",
-    "score": 37
+    "score": 37,
+    "fuDraft": "docs/selling/drafts/sortis-hotel-fu.txt"
   },
   "oxford-international-school-panama": {
     "phone": "50763795769",
@@ -661,7 +733,8 @@
     "email": "admisiones@ois.edu.pa",
     "emailDraft": "docs/selling/drafts/oxford-international-school-panama-email.txt",
     "dealId": "63080326304",
-    "score": 49
+    "score": 49,
+    "fuDraft": "docs/selling/drafts/oxford-international-school-panama-fu.txt"
   },
   "medical-tours-costa-rica": {
     "phone": "18666656433",
@@ -670,7 +743,8 @@
     "email": "operations@medtourscr.com",
     "emailDraft": "docs/selling/drafts/medical-tours-costa-rica-email.txt",
     "dealId": "63080345866",
-    "score": 82
+    "score": 82,
+    "fuDraft": "docs/selling/drafts/medical-tours-costa-rica-fu.txt"
   },
   "goodness-dental": {
     "phone": "18664062744",
@@ -679,7 +753,8 @@
     "email": "patients@goodnessdental.com",
     "emailDraft": "docs/selling/drafts/goodness-dental-email.txt",
     "dealId": "63052802860",
-    "score": 64
+    "score": 64,
+    "fuDraft": "docs/selling/drafts/goodness-dental-fu.txt"
   },
   "agency-of-the-sea": {
     "phone": "50672885005",
@@ -688,7 +763,8 @@
     "email": "gabriela@agencyofthesea.com",
     "emailDraft": "docs/selling/drafts/agency-of-the-sea-email.txt",
     "dealId": "63046459931",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/agency-of-the-sea-fu.txt"
   },
   "absolute-medical-tourism": {
     "phone": "573016347898",
@@ -697,7 +773,8 @@
     "email": "info@absolutemedicaltourism.com",
     "emailDraft": "docs/selling/drafts/absolute-medical-tourism-email.txt",
     "dealId": "63049713744",
-    "score": 54
+    "score": 54,
+    "fuDraft": "docs/selling/drafts/absolute-medical-tourism-fu.txt"
   },
   "sota-dental": {
     "phone": "18006813340",
@@ -706,7 +783,8 @@
     "email": "contact@sotadental.com",
     "emailDraft": "docs/selling/drafts/sota-dental-email.txt",
     "dealId": "63080279443",
-    "score": 94
+    "score": 94,
+    "fuDraft": "docs/selling/drafts/sota-dental-fu.txt"
   },
   "dental-connect": {
     "phone": "18885758150",
@@ -715,7 +793,8 @@
     "email": "emailcontactus@dentalconnect.com.mx",
     "emailDraft": "docs/selling/drafts/dental-connect-email.txt",
     "dealId": "63083296695",
-    "score": 87
+    "score": 87,
+    "fuDraft": "docs/selling/drafts/dental-connect-fu.txt"
   },
   "balboa-academy": {
     "phone": "5073021076",
@@ -724,7 +803,8 @@
     "email": "contactba@balboa-academy.org",
     "emailDraft": "docs/selling/drafts/balboa-academy-email.txt",
     "dealId": "63083234656",
-    "score": 70
+    "score": 70,
+    "fuDraft": "docs/selling/drafts/balboa-academy-fu.txt"
   },
   "hospital-cima": {
     "phone": "50622081000",
@@ -733,6 +813,79 @@
     "email": "info@hospitalcima.com",
     "emailDraft": "docs/selling/drafts/hospital-cima-email.txt",
     "dealId": "63062155835",
-    "score": 70
+    "score": 70,
+    "fuDraft": "docs/selling/drafts/hospital-cima-fu.txt"
+  },
+  "alquiler-de-yates-panam": {
+    "phone": "50769198892",
+    "company": "Alquiler de Yates Panamá",
+    "dealId": "62792913925",
+    "fuDraft": "docs/selling/drafts/alquiler-de-yates-panam-fu.txt"
+  },
+  "panama-yacht-group": {
+    "phone": "50769596919",
+    "company": "Panama Yacht Group",
+    "dealId": "62801585568",
+    "fuDraft": "docs/selling/drafts/panama-yacht-group-fu.txt"
+  },
+  "grupo-residencial-park-house": {
+    "phone": "50763466747",
+    "company": "Grupo Residencial (Park House)",
+    "dealId": "62807104886",
+    "fuDraft": "docs/selling/drafts/grupo-residencial-park-house-fu.txt"
+  },
+  "dqsa-panam": {
+    "phone": "50767810093",
+    "company": "DQSA Panamá",
+    "dealId": "62807534128",
+    "fuDraft": "docs/selling/drafts/dqsa-panam-fu.txt"
+  },
+  "supreme-storage": {
+    "phone": "50762114444",
+    "company": "Supreme Storage",
+    "dealId": "62831000747",
+    "fuDraft": "docs/selling/drafts/supreme-storage-fu.txt"
+  },
+  "palig-panam": {
+    "phone": "50768434729",
+    "company": "PALIG Panamá",
+    "dealId": "62822214951",
+    "fuDraft": "docs/selling/drafts/palig-panam-fu.txt"
+  },
+  "banco-lafise-panam": {
+    "phone": "50760268077",
+    "company": "Banco LAFISE Panamá",
+    "dealId": "62828463221",
+    "fuDraft": "docs/selling/drafts/banco-lafise-panam-fu.txt"
+  },
+  "panama-equity-kent-davis": {
+    "phone": "50760306782",
+    "company": "Panama Equity (Kent Davis)",
+    "dealId": "62841018415",
+    "fuDraft": "docs/selling/drafts/panama-equity-kent-davis-fu.txt"
+  },
+  "eurostone-panam": {
+    "phone": "50763254172",
+    "company": "Eurostone Panamá",
+    "dealId": "62837342362",
+    "fuDraft": "docs/selling/drafts/eurostone-panam-fu.txt"
+  },
+  "airco-sinotruk-panam": {
+    "phone": "5072715337",
+    "company": "AIRCO / SINOTRUK Panamá",
+    "dealId": "62841350764",
+    "fuDraft": "docs/selling/drafts/airco-sinotruk-panam-fu.txt"
+  },
+  "sotillo-company": {
+    "phone": "5073939910",
+    "company": "Sotillo & Company",
+    "dealId": "62826916357",
+    "fuDraft": "docs/selling/drafts/sotillo-company-fu.txt"
+  },
+  "prp-events": {
+    "phone": "50766907472",
+    "company": "PRP Events",
+    "dealId": "62881755679",
+    "fuDraft": "docs/selling/drafts/prp-events-fu.txt"
   }
 }

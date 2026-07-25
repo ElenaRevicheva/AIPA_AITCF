@@ -25,6 +25,8 @@ type OutreachRegistryEntry = {
   email?: string;
   emailDraft?: string;
   draft?: string;
+  /** Follow-up WhatsApp text (AI Growth Operator + audit) — served by /go/outreach/:slug?v=fu */
+  fuDraft?: string;
   company?: string;
   dealId?: string;
   score?: number;
@@ -119,10 +121,16 @@ function outreachBridgeHtml(phone: string, text: string): string {
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Abriendo WhatsApp…</title>
 <style>body{font-family:system-ui,sans-serif;max-width:32rem;margin:3rem auto;padding:0 1rem;color:#111}
-a{color:#25D366}</style>
+a{color:#25D366}
+pre{white-space:pre-wrap;word-break:break-word;font:14px/1.55 system-ui,sans-serif;background:#f6f6f6;padding:.75rem;border-radius:.5rem}
+button{font:16px system-ui;padding:.5rem 1rem;border:0;border-radius:.5rem;background:#25D366;color:#fff}
+summary{margin:1.5rem 0 .5rem;cursor:pointer}</style>
 </head><body>
 <p>Abriendo WhatsApp con el mensaje listo…</p>
 <p>Si no abre automáticamente, <a id="fallback" href="#">haz clic aquí</a>.</p>
+<details id="manual"><summary>Copiar el texto a mano</summary>
+<button id="copy" type="button">Copiar mensaje</button>
+<pre id="msg"></pre></details>
 <script>
 (function(){
   var d=${payload};
@@ -130,6 +138,13 @@ a{color:#25D366}</style>
   var base=mobile?'https://api.whatsapp.com/send':'https://web.whatsapp.com/send';
   var url=base+'?phone='+d.phone+'&text='+encodeURIComponent(d.text);
   document.getElementById('fallback').href=url;
+  // Phone fallback: if WhatsApp never opens, the text is still on screen to copy.
+  document.getElementById('msg').textContent=d.text;
+  document.getElementById('copy').onclick=function(){
+    navigator.clipboard.writeText(d.text).then(function(){
+      document.getElementById('copy').textContent='¡Copiado!';
+    });
+  };
   location.replace(url);
 })();
 </script>
@@ -147,6 +162,42 @@ export function buildOutreachWaUrl(phone: string, text: string): string {
 export function buildOutreachSlugUrl(slug: string): string {
   const safe = slug.replace(/[^a-z0-9-]/gi, '');
   return `${GO_WA_BASE}/go/outreach/${safe}`;
+}
+
+/**
+ * Slug → phone + text, with the GitHub-raw fallback the email path already uses
+ * (Oracle disk goes stale whenever staging happens locally without a pull).
+ * `variant: 'fu'` serves the follow-up draft — that is what the HubSpot note
+ * buttons link to, so Elena can send the FU from her phone (the bridge picks
+ * api.whatsapp.com on mobile; a raw web.whatsapp.com link dead-ends there).
+ */
+async function loadOutreachBySlugAsync(
+  slug: string,
+  variant: 'first' | 'fu',
+): Promise<{ phone: string; text: string } | null> {
+  let entry: OutreachRegistryEntry | undefined;
+  try {
+    const reg = JSON.parse(fs.readFileSync(OUTREACH_REGISTRY, 'utf8')) as Record<
+      string,
+      OutreachRegistryEntry
+    >;
+    entry = reg[slug];
+  } catch {
+    /* fall through to GitHub */
+  }
+  const wanted = (e?: OutreachRegistryEntry) => (variant === 'fu' ? e?.fuDraft : e?.draft);
+  if (!entry?.phone || !wanted(entry)) {
+    const gh = await fetchGithubRegistry();
+    const ghEntry = gh?.[slug];
+    if (ghEntry?.phone && wanted(ghEntry)) entry = ghEntry;
+  }
+  const draftPath = wanted(entry);
+  if (!entry?.phone || !draftPath) return null;
+
+  const text = (await readOutreachText(draftPath))?.trim();
+  const phone = entry.phone.replace(/\D/g, '');
+  if (!/^507\d{8}$/.test(phone) || !text) return null;
+  return { phone, text };
 }
 
 function loadOutreachBySlug(slug: string): { phone: string; text: string } | null {
@@ -489,16 +540,28 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
   });
 
   /** Manual Prospect Play — slug URL (preferred): zero query string, HubSpot cannot break emojis. */
-  app.get('/go/outreach/:slug', (req: Request, res: Response) => {
+  app.get('/go/outreach/:slug', async (req: Request, res: Response) => {
     const ip = getClientIp(req);
     if (!allowGoWaRate(ip)) {
       res.status(429).send('Too many requests');
       return;
     }
     const slug = String(req.params.slug || '').replace(/[^a-z0-9-]/gi, '');
-    const hit = loadOutreachBySlug(slug);
+    // ?v=fu → the follow-up text (AI Growth Operator + audit already on the deal)
+    const variant = String(req.query.v || '').toLowerCase() === 'fu' ? 'fu' : 'first';
+    // Never fall back to the first-contact text for a FU — sending "un gusto
+    // saludarles" as a second touch is worse than showing the 404 hint.
+    const hit =
+      (await loadOutreachBySlugAsync(slug, variant)) ??
+      (variant === 'first' ? loadOutreachBySlug(slug) : null);
     if (!hit) {
-      res.status(404).send('Unknown outreach slug');
+      res
+        .status(404)
+        .send(
+          variant === 'fu'
+            ? 'Unknown outreach slug (no FU draft). Copy the MENSAJE text from the deal note instead.'
+            : 'Unknown outreach slug',
+        );
       return;
     }
     // HTML bridge → web.whatsapp.com (desktop) or api.whatsapp.com (mobile).

@@ -1,0 +1,671 @@
+{
+  "deals": 95,
+  "installed": 93,
+  "skipNoPhone": 2,
+  "errors": 0,
+  "skipNoPhoneList": [
+    {
+      "dealId": "62803339042",
+      "company": "Riga Design"
+    },
+    {
+      "dealId": "63083214942",
+      "company": "San Blas Tour"
+    }
+  ],
+  "errorList": [],
+  "ok": [
+    {
+      "dealId": "62792913925",
+      "company": "Alquiler de Yates Panamá",
+      "phone": "50769198892",
+      "score": 82,
+      "noteId": "113211036689"
+    },
+    {
+      "dealId": "62801585568",
+      "company": "Panama Yacht Group",
+      "phone": "50769596919",
+      "score": 86,
+      "noteId": "113215065764"
+    },
+    {
+      "dealId": "62807104886",
+      "company": "Grupo Residencial (Park House)",
+      "phone": "50763466747",
+      "score": 62,
+      "noteId": "113220940425"
+    },
+    {
+      "dealId": "62807534128",
+      "company": "DQSA Panamá",
+      "phone": "50767810093",
+      "score": 54,
+      "noteId": "113255180815"
+    },
+    {
+      "dealId": "62831000747",
+      "company": "Supreme Storage",
+      "phone": "50762114444",
+      "score": 94,
+      "noteId": "113239830306"
+    },
+    {
+      "dealId": "62822214951",
+      "company": "PALIG Panamá",
+      "phone": "50768434729",
+      "score": 79,
+      "noteId": "113258047912"
+    },
+    {
+      "dealId": "62828463221",
+      "company": "Banco LAFISE Panamá",
+      "phone": "50760268077",
+      "score": 80,
+      "noteId": "113249670717"
+    },
+    {
+      "dealId": "62841018415",
+      "company": "Panama Equity (Kent Davis)",
+      "phone": "50760306782",
+      "score": 97,
+      "noteId": "113245008233"
+    },
+    {
+      "dealId": "62837342362",
+      "company": "Eurostone Panamá",
+      "phone": "50763254172",
+      "score": 86,
+      "noteId": "113245027231"
+    },
+    {
+      "dealId": "62841350764",
+      "company": "AIRCO / SINOTRUK Panamá",
+      "phone": "5072715337",
+      "score": 73,
+      "noteId": "113232893988"
+    },
+    {
+      "dealId": "62828946074",
+      "company": "Panama Fertility",
+      "phone": "50760709716",
+      "score": 86,
+      "noteId": "113256364186"
+    },
+    {
+      "dealId": "62832583063",
+      "company": "Nomad Constructions Corp.",
+      "phone": "50769484982",
+      "score": 90,
+      "noteId": "113241617071"
+    },
+    {
+      "dealId": "62826916357",
+      "company": "Sotillo & Company",
+      "phone": "5073939910",
+      "score": 87,
+      "noteId": "113239877916"
+    },
+    {
+      "dealId": "62821413988",
+      "company": "DoPanama",
+      "phone": "50764433341",
+      "score": 91,
+      "noteId": "113257932116"
+    },
+    {
+      "dealId": "62873560951",
+      "company": "Panama Aesthetics",
+      "phone": "50769896999",
+      "score": 88,
+      "noteId": "113300656658"
+    },
+    {
+      "dealId": "62864888204",
+      "company": "YC Panama Yachts",
+      "phone": "50765031745",
+      "score": 94,
+      "noteId": "113304365082"
+    },
+    {
+      "dealId": "62857562269",
+      "company": "Fuerte Amador Resort & Marina",
+      "phone": "50760308992",
+      "score": 68,
+      "noteId": "113315049527"
+    },
+    {
+      "dealId": "62863032403",
+      "company": "Centro Marino Panamá",
+      "phone": "50766150368",
+      "score": 84,
+      "noteId": "113299431175"
+    },
+    {
+      "dealId": "62851992582",
+      "company": "ReloFirm",
+      "phone": "50763325777",
+      "score": 94,
+      "noteId": "113305327989"
+    },
+    {
+      "dealId": "62872179381",
+      "company": "Kraemer Law",
+      "phone": "5073108688",
+      "score": 97,
+      "noteId": "113305791274"
+    },
+    {
+      "dealId": "62872179385",
+      "company": "Ampa Tours",
+      "phone": "50760270607",
+      "score": 98,
+      "noteId": "113309154891"
+    },
+    {
+      "dealId": "62871509035",
+      "company": "Tranquilo Bay",
+      "phone": "5078380021",
+      "score": 83,
+      "noteId": "113310866216"
+    },
+    {
+      "dealId": "62856793161",
+      "company": "Pesqueros Sport",
+      "phone": "50764310642",
+      "score": 90,
+      "noteId": "113417772397"
+    },
+    {
+      "dealId": "62867929503",
+      "company": "Prestige Storage",
+      "phone": "5073027760",
+      "score": 87,
+      "noteId": "113320395425"
+    },
+    {
+      "dealId": "62865516872",
+      "company": "Panama Dental Clinic",
+      "phone": "50766111939",
+      "score": 88,
+      "noteId": "113288764317"
+    },
+    {
+      "dealId": "62868082222",
+      "company": "San Blas Dreams",
+      "phone": "50764735905",
+      "score": 54,
+      "noteId": "113288927388"
+    },
+    {
+      "dealId": "62860098823",
+      "company": "Flamenco Drystack Panama",
+      "phone": "50768365198",
+      "score": 54,
+      "noteId": "113291932583"
+    },
+    {
+      "dealId": "62872490395",
+      "company": "IVI Panama",
+      "phone": "50766316301",
+      "score": 75,
+      "noteId": "113301902935"
+    },
+    {
+      "dealId": "62879198124",
+      "company": "Relocation Panama",
+      "phone": "50762339432",
+      "score": 75,
+      "noteId": "113288771880"
+    },
+    {
+      "dealId": "62861954230",
+      "company": "Panama Expat Service",
+      "phone": "50762962070",
+      "score": 75,
+      "noteId": "113318853012"
+    },
+    {
+      "dealId": "62861954305",
+      "company": "International Relocation Partner",
+      "phone": "50762418879",
+      "score": 75,
+      "noteId": "113319775241"
+    },
+    {
+      "dealId": "62861024793",
+      "company": "Immigration Visa 24/7",
+      "phone": "50769423311",
+      "score": 75,
+      "noteId": "113290011561"
+    },
+    {
+      "dealId": "62876980999",
+      "company": "LAC Legal",
+      "phone": "5073955607",
+      "score": 75,
+      "noteId": "113300069529"
+    },
+    {
+      "dealId": "62876671266",
+      "company": "NDM Law Firm",
+      "phone": "5078302656",
+      "score": 75,
+      "noteId": "113314608950"
+    },
+    {
+      "dealId": "62873424288",
+      "company": "Panama Legal Center",
+      "phone": "50764040388",
+      "score": 75,
+      "noteId": "113309306542"
+    },
+    {
+      "dealId": "62870120358",
+      "company": "Delvalle & Delvalle",
+      "phone": "50761093066",
+      "score": 75,
+      "noteId": "113308378034"
+    },
+    {
+      "dealId": "62881755679",
+      "company": "PRP Events",
+      "phone": "50766907472",
+      "score": 86,
+      "noteId": "113417323909"
+    },
+    {
+      "dealId": "62950148475",
+      "company": "Ipanema Residences",
+      "phone": "50767396666",
+      "score": 92,
+      "noteId": "113390164484"
+    },
+    {
+      "dealId": "62955236994",
+      "company": "Eclypse de Mar",
+      "phone": "50766114581",
+      "score": 57,
+      "noteId": "113407461966"
+    },
+    {
+      "dealId": "63034686254",
+      "company": "Panamá Sonríe",
+      "phone": "50761405700",
+      "score": 91,
+      "noteId": "113550727979"
+    },
+    {
+      "dealId": "63057127263",
+      "company": "Clínica Arango Orillac",
+      "phone": "50769973733",
+      "score": 58,
+      "noteId": "113551224669"
+    },
+    {
+      "dealId": "63066851203",
+      "company": "Gomitom",
+      "phone": "50769800688",
+      "score": 49,
+      "noteId": "113550856846"
+    },
+    {
+      "dealId": "63039485826",
+      "company": "Charter in San Blas",
+      "phone": "50762950550",
+      "score": 96,
+      "noteId": "113535815850"
+    },
+    {
+      "dealId": "63038403138",
+      "company": "San Blas on Sailboats",
+      "phone": "50769323919",
+      "score": 83,
+      "noteId": "113533960614"
+    },
+    {
+      "dealId": "63063441827",
+      "company": "We Sail San Blas",
+      "phone": "50763693628",
+      "score": 97,
+      "noteId": "113551310940"
+    },
+    {
+      "dealId": "63052399762",
+      "company": "SailBoat Trips",
+      "phone": "50764686603",
+      "score": 87,
+      "noteId": "113550634603"
+    },
+    {
+      "dealId": "63045749810",
+      "company": "San Blas Sailing",
+      "phone": "50767806959",
+      "score": 90,
+      "noteId": "113527478583"
+    },
+    {
+      "dealId": "63033440775",
+      "company": "Sailing Charter Panama",
+      "phone": "50760761493",
+      "score": 97,
+      "noteId": "113535055241"
+    },
+    {
+      "dealId": "63065611883",
+      "company": "Casa Cayuco",
+      "phone": "50760887663",
+      "score": 86,
+      "noteId": "113550755919"
+    },
+    {
+      "dealId": "63064999707",
+      "company": "Destination Dream Weddings",
+      "phone": "12044064876",
+      "score": 91,
+      "noteId": "113550679436"
+    },
+    {
+      "dealId": "63040487766",
+      "company": "The Haven Wellness Resort",
+      "phone": "50764915578",
+      "score": 81,
+      "noteId": "113495087694"
+    },
+    {
+      "dealId": "63042652940",
+      "company": "Valle Escondido Resort",
+      "phone": "50765369875",
+      "score": 84,
+      "noteId": "113533034778"
+    },
+    {
+      "dealId": "63054341484",
+      "company": "Cancun Dental Specialists",
+      "phone": "529983130107",
+      "score": 81,
+      "noteId": "113512865204"
+    },
+    {
+      "dealId": "63027059795",
+      "company": "Smile Tijuana",
+      "phone": "526642930717",
+      "score": 77,
+      "noteId": "113534758037"
+    },
+    {
+      "dealId": "63059453757",
+      "company": "Dr. Daniela Correa",
+      "phone": "573332841861",
+      "score": 98,
+      "noteId": "113511450025"
+    },
+    {
+      "dealId": "63055888158",
+      "company": "Centro Odontológico Paitilla",
+      "phone": "50762334051",
+      "score": 69,
+      "noteId": "113548107013"
+    },
+    {
+      "dealId": "63062979686",
+      "company": "The Skin Clinic Panama",
+      "phone": "50764509248",
+      "score": 60,
+      "noteId": "113535816765"
+    },
+    {
+      "dealId": "63059453793",
+      "company": "Red Frog Beach Island Resort",
+      "phone": "50763476597",
+      "score": 70,
+      "noteId": "113532724631"
+    },
+    {
+      "dealId": "63044818308",
+      "company": "International School of Panama",
+      "phone": "50769821470",
+      "score": 75,
+      "noteId": "113494736301"
+    },
+    {
+      "dealId": "63060115712",
+      "company": "DermoMédica",
+      "phone": "50762372819",
+      "score": 54,
+      "noteId": "113582301565"
+    },
+    {
+      "dealId": "63060405782",
+      "company": "The Casco School",
+      "phone": "50766442413",
+      "score": 54,
+      "noteId": "113585747114"
+    },
+    {
+      "dealId": "63053387934",
+      "company": "Boston School International",
+      "phone": "50764548560",
+      "score": 88,
+      "noteId": "113581035430"
+    },
+    {
+      "dealId": "63049661069",
+      "company": "STUDIO at The Haven",
+      "phone": "50764260843",
+      "score": 87,
+      "noteId": "113582202168"
+    },
+    {
+      "dealId": "63039072050",
+      "company": "Gamboa Rainforest Reserve",
+      "phone": "50766723083",
+      "score": 85,
+      "noteId": "113585582221"
+    },
+    {
+      "dealId": "63051086933",
+      "company": "Grupo Dental Nacional",
+      "phone": "50766707039",
+      "score": 54,
+      "noteId": "113604272481"
+    },
+    {
+      "dealId": "63052782744",
+      "company": "Hospital Punta Pacífica",
+      "phone": "50766141448",
+      "score": 64,
+      "noteId": "113603941906"
+    },
+    {
+      "dealId": "63064457219",
+      "company": "Hospital San Fernando",
+      "phone": "50766393783",
+      "score": 85,
+      "noteId": "113602866006"
+    },
+    {
+      "dealId": "63061827228",
+      "company": "Finca Lérida",
+      "phone": "50765095139",
+      "score": 50,
+      "noteId": "113603099537"
+    },
+    {
+      "dealId": "63060432904",
+      "company": "Los Quetzales EcoLodge",
+      "phone": "50766712131",
+      "score": 54,
+      "noteId": "113604025097"
+    },
+    {
+      "dealId": "63033505966",
+      "company": "Hospital Clinica Biblica",
+      "phone": "50685957000",
+      "score": 79,
+      "noteId": "113605245617"
+    },
+    {
+      "dealId": "63065540143",
+      "company": "Hospital Metropolitano",
+      "phone": "50664343139",
+      "score": 82,
+      "noteId": "113603389214"
+    },
+    {
+      "dealId": "63064457478",
+      "company": "Costa Rica Yacht Charter Brokers",
+      "phone": "50662422041",
+      "score": 88,
+      "noteId": "113602909973"
+    },
+    {
+      "dealId": "63077716274",
+      "company": "Elite Cartagena",
+      "phone": "15164936070",
+      "score": 97,
+      "noteId": "113602811207"
+    },
+    {
+      "dealId": "63067846953",
+      "company": "Dr. Jorge Rodriguez",
+      "phone": "573003719688",
+      "score": 80,
+      "noteId": "113603592601"
+    },
+    {
+      "dealId": "63033678371",
+      "company": "Salud sin Fronteras",
+      "phone": "573507316151",
+      "score": 99,
+      "noteId": "113604102421"
+    },
+    {
+      "dealId": "63078747964",
+      "company": "Colombia Luxury Group",
+      "phone": "573042091627",
+      "score": 97,
+      "noteId": "113603161690"
+    },
+    {
+      "dealId": "63061986198",
+      "company": "Dr. Luis Guillermo Tobon",
+      "phone": "573215095101",
+      "score": 94,
+      "noteId": "113604200217"
+    },
+    {
+      "dealId": "63048627065",
+      "company": "Hi Cartagena",
+      "phone": "573136952776",
+      "score": 57,
+      "noteId": "113622195471"
+    },
+    {
+      "dealId": "63040577101",
+      "company": "Tijuana Dental Center",
+      "phone": "16199067481",
+      "score": 99,
+      "noteId": "113607698529"
+    },
+    {
+      "dealId": "63063245978",
+      "company": "Isla Palenque",
+      "phone": "50766173771",
+      "score": 57,
+      "noteId": "113623186456"
+    },
+    {
+      "dealId": "63037250145",
+      "company": "American Trade Hotel",
+      "phone": "5072112000",
+      "score": 70,
+      "noteId": "113621627178"
+    },
+    {
+      "dealId": "63051108381",
+      "company": "Gianna Dentist MaDenta",
+      "phone": "50762709109",
+      "score": 80,
+      "noteId": "113624479497"
+    },
+    {
+      "dealId": "63067561358",
+      "company": "Bristol Panama",
+      "phone": "5072947878",
+      "score": 87,
+      "noteId": "113627536202"
+    },
+    {
+      "dealId": "63080329285",
+      "company": "Sortis Hotel",
+      "phone": "5073988888",
+      "score": 37,
+      "noteId": "113596430128"
+    },
+    {
+      "dealId": "63080326304",
+      "company": "Oxford International School Panama",
+      "phone": "50763795769",
+      "score": 49,
+      "noteId": "113627616831"
+    },
+    {
+      "dealId": "63080345866",
+      "company": "Medical Tours Costa Rica",
+      "phone": "18666656433",
+      "score": 82,
+      "noteId": "113607568414"
+    },
+    {
+      "dealId": "63052802860",
+      "company": "Goodness Dental",
+      "phone": "18664062744",
+      "score": 64,
+      "noteId": "113624364855"
+    },
+    {
+      "dealId": "63046459931",
+      "company": "Agency of the Sea",
+      "phone": "50672885005",
+      "score": 54,
+      "noteId": "113624067621"
+    },
+    {
+      "dealId": "63049713744",
+      "company": "Absolute Medical Tourism",
+      "phone": "573016347898",
+      "score": 54,
+      "noteId": "113624862595"
+    },
+    {
+      "dealId": "63080279443",
+      "company": "SOTA Dental",
+      "phone": "18006813340",
+      "score": 94,
+      "noteId": "113627551589"
+    },
+    {
+      "dealId": "63083296695",
+      "company": "Dental Connect",
+      "phone": "18885758150",
+      "score": 87,
+      "noteId": "113624952404"
+    },
+    {
+      "dealId": "63083234656",
+      "company": "Balboa Academy",
+      "phone": "5073021076",
+      "score": 70,
+      "noteId": "113624480131"
+    },
+    {
+      "dealId": "63062155835",
+      "company": "Hospital CIMA",
+      "phone": "50622081000",
+      "score": 70,
+      "noteId": "113624424338"
+    }
+  ],
+  "at": "2026-07-25T22:36:15.679Z"
+}
