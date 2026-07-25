@@ -165,6 +165,22 @@ export function buildOutreachSlugUrl(slug: string): string {
 }
 
 /**
+ * Registry numbers are OURS (staged by the Manual Prospect Play), not user input,
+ * so they only need to be a plausible international number — never the Panama-only
+ * `507########` gate that still guards the open `?to=` redirect below.
+ *
+ * July 25 2026: that gate 404'd 32 of 93 prospects on Elena's phone — every
+ * Mexico/Costa Rica/Colombia/US prospect (Dental Connect +1 888 575 8150) plus
+ * Panama landlines, which are 507 + 7 digits.
+ */
+function registryPhoneDigits(raw: string | undefined): string | null {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (digits.length < 8 || digits.length > 15) return null; // E.164 bounds
+  if (/^0+$/.test(digits)) return null; // placeholder rows (00000000000)
+  return digits;
+}
+
+/**
  * Slug → phone + text, with the GitHub-raw fallback the email path already uses
  * (Oracle disk goes stale whenever staging happens locally without a pull).
  * `variant: 'fu'` serves the follow-up draft — that is what the HubSpot note
@@ -195,8 +211,8 @@ async function loadOutreachBySlugAsync(
   if (!entry?.phone || !draftPath) return null;
 
   const text = (await readOutreachText(draftPath))?.trim();
-  const phone = entry.phone.replace(/\D/g, '');
-  if (!/^507\d{8}$/.test(phone) || !text) return null;
+  const phone = registryPhoneDigits(entry.phone);
+  if (!phone || !text) return null;
   return { phone, text };
 }
 
@@ -210,8 +226,8 @@ function loadOutreachBySlug(slug: string): { phone: string; text: string } | nul
     if (!entry?.phone || !entry?.draft) return null;
     const draftPath = path.join(REPO_ROOT, entry.draft);
     const text = fs.readFileSync(draftPath, 'utf8').trim();
-    const phone = entry.phone.replace(/\D/g, '');
-    if (!/^507\d{8}$/.test(phone) || !text) return null;
+    const phone = registryPhoneDigits(entry.phone);
+    if (!phone || !text) return null;
     return { phone, text };
   } catch (e) {
     console.warn('[go/outreach] registry read failed:', (e as Error).message?.slice(0, 80));
