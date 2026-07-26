@@ -6,7 +6,7 @@ import type { Express, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { atlasConceptFromUtm } from './atlas-lead-sync.js';
-import { recordResendSend } from './resend-webhook.js';
+import { recordResendSend, logEmailEngagement, findOutreachNote } from './resend-webhook.js';
 
 const DEFAULT_PHONE = '50766623757';
 const GO_WA_BASE = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
@@ -344,21 +344,10 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
     headers,
     body: JSON.stringify({ properties: { dealstage: 'decisionmakerboughtin' } }),
   });
-  const notesAssoc = await fetch(
-    `https://api.hubapi.com/crm/v4/objects/deals/${p.dealId}/associations/notes`,
-    { headers },
-  ).then(r => r.json() as Promise<{ results?: { toObjectId?: string; id?: string }[] }>);
-  const noteIds = (notesAssoc.results || []).map(r => r.toObjectId || r.id).filter(Boolean) as string[];
-  if (noteIds.length) {
-    let best: { id: string; body: string; ts: string } | null = null;
-    for (const id of noteIds) {
-      const n = await fetch(
-        `https://api.hubapi.com/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`,
-        { headers },
-      ).then(r => r.json() as Promise<{ id: string; properties?: { hs_note_body?: string; hs_timestamp?: string } }>);
-      const ts = n.properties?.hs_timestamp || '';
-      if (!best || ts > best.ts) best = { id: n.id, body: n.properties?.hs_note_body || '', ts };
-    }
+  {
+    // Stamp the OUTREACH note (the one with the audit + FU buttons), not whatever
+    // note is newest — Elena's own typed notes were becoming the newest.
+    const best = await findOutreachNote(p.dealId).catch(() => null);
     if (best && !best.body.includes(`Resend:${resendId}`)) {
       const add =
         `<br><br>📧 EMAILED ${when} from <b>aipa@aideazz.xyz</b> → ${p.to}` +
@@ -593,6 +582,24 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
       const resendId = await sendOutreachEmailViaResend(hit);
       // Ledger first: delivery events arrive within seconds and need the deal.
       recordResendSend(resendId, { dealId: hit.dealId, slug, to: hit.to, subject: hit.subject });
+      // Log it as a real HubSpot EMAIL activity — otherwise agent-sent mail is
+      // invisible in the deal's Emails tab and timeline (it only lived in a note).
+      const engagementId = await logEmailEngagement({
+        dealId: hit.dealId,
+        to: hit.to,
+        subject: hit.subject,
+        body: hit.body,
+        resendId,
+      });
+      if (engagementId) {
+        recordResendSend(resendId, {
+          dealId: hit.dealId,
+          slug,
+          to: hit.to,
+          subject: hit.subject,
+          engagementId,
+        });
+      }
       await markHubSpotAfterOutreachEmail(hit, resendId).catch(e =>
         console.error('[go/outreach-email] HubSpot update failed:', e),
       );

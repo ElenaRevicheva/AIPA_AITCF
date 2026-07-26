@@ -30,6 +30,8 @@ export type ResendLedgerEntry = {
   to?: string | undefined;
   subject?: string | undefined;
   at?: string | undefined;
+  /** HubSpot EMAIL activity id, so a later bounce can flip it from SENT to BOUNCED. */
+  engagementId?: string | undefined;
 };
 
 /** Record a send so delivery events can be matched back to the deal. */
@@ -157,29 +159,119 @@ async function hs(method: string, p: string, body?: unknown): Promise<unknown> {
   return t ? JSON.parse(t) : null;
 }
 
-/** Append the stamp to the deal's latest note; idempotent per resend id + event. */
+/**
+ * Pick the OUTREACH note, not simply the newest one.
+ *
+ * July 26 2026: Elena typed her own note ("WA fu not sent — account blocked") on a
+ * deal, which made it the newest — so the next delivery stamp would have landed on
+ * her note instead of the one holding the audit and the FU buttons. Prefer a note
+ * that actually carries outreach content; fall back to newest.
+ */
+export async function findOutreachNote(dealId: string): Promise<{ id: string; body: string } | null> {
+  const assoc = (await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`)) as {
+    results?: { toObjectId?: string; id?: string }[];
+  };
+  const ids = (assoc.results || []).map(r => r.toObjectId || r.id).filter(Boolean) as string[];
+  if (!ids.length) return null;
+
+  const notes: { id: string; body: string; ts: string }[] = [];
+  for (const id of ids.slice(0, 8)) {
+    const n = (await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`)) as {
+      id: string;
+      properties?: { hs_note_body?: string; hs_timestamp?: string };
+    };
+    notes.push({ id: n.id, body: n.properties?.hs_note_body || '', ts: n.properties?.hs_timestamp || '' });
+  }
+  notes.sort((a, b) => (a.ts < b.ts ? 1 : -1)); // newest first
+  const isOutreach = (b: string) =>
+    /FOLLOW-UP|MENSAJE|ENVIAR POR (WHATSAPP|EMAIL)|EMAIL FU|WHATSAPP FU|CLIENT-MANUAL/i.test(b);
+  const hit = notes.find(n => isOutreach(n.body)) || notes[0];
+  return hit ? { id: hit.id, body: hit.body } : null;
+}
+
+/**
+ * Log the send as a real HubSpot EMAIL activity.
+ *
+ * Resend never touches HubSpot's email object, so the deal's Emails tab and the
+ * Activities timeline stayed empty and the send looked like it never happened —
+ * only the note body knew. This makes agent-sent mail show up exactly like mail
+ * sent from the HubSpot UI. Returns the engagement id (stored in the ledger so a
+ * later bounce can flip its status).
+ */
+export async function logEmailEngagement(input: {
+  dealId?: string | undefined;
+  to: string;
+  subject: string;
+  body: string;
+  resendId: string;
+}): Promise<string | null> {
+  try {
+    const created = (await hs('POST', '/crm/v3/objects/emails', {
+      properties: {
+        hs_timestamp: Date.now(),
+        hs_email_direction: 'EMAIL', // logged outgoing email
+        hs_email_status: 'SENT',
+        hs_email_subject: input.subject,
+        hs_email_text: `${input.body}\n\n— enviado por aipa@aideazz.xyz (Resend ${input.resendId})`,
+        // From/to must go through hs_email_headers — HubSpot rejects the flat
+        // hs_email_from_email / hs_email_to_email properties with a 400 ("derived
+        // from the hs_email_headers property"), which would silently cost the
+        // Emails-tab visibility this whole change exists for.
+        hs_email_headers: JSON.stringify({
+          from: { email: 'aipa@aideazz.xyz', firstName: 'Elena', lastName: 'Revicheva' },
+          to: [{ email: input.to }],
+          cc: [],
+          bcc: [],
+        }),
+        hubspot_owner_id: HUBSPOT_OWNER_ID,
+      },
+    })) as { id?: string };
+    if (!created?.id) return null;
+
+    if (input.dealId) {
+      await hs('PUT', `/crm/v4/objects/emails/${created.id}/associations/default/deals/${input.dealId}`).catch(
+        e => console.warn('[resend-webhook] email→deal association failed:', (e as Error).message?.slice(0, 90)),
+      );
+      // Associate the contact too, so it shows on their timeline as well.
+      const cAssoc = (await hs('GET', `/crm/v4/objects/deals/${input.dealId}/associations/contacts`).catch(
+        () => null,
+      )) as { results?: { toObjectId?: string; id?: string }[] } | null;
+      const contactId = (cAssoc?.results || []).map(r => r.toObjectId || r.id).filter(Boolean)[0];
+      if (contactId) {
+        await hs('PUT', `/crm/v4/objects/emails/${created.id}/associations/default/contacts/${contactId}`).catch(
+          () => undefined,
+        );
+      }
+    }
+    return created.id;
+  } catch (e) {
+    console.warn('[resend-webhook] logEmailEngagement failed:', (e as Error).message?.slice(0, 120));
+    return null;
+  }
+}
+
+/** Flip the logged email's status when Resend says it never arrived. */
+async function updateEngagementStatus(engagementId: string, status: 'BOUNCED' | 'FAILED'): Promise<void> {
+  await hs('PATCH', `/crm/v3/objects/emails/${engagementId}`, {
+    properties: { hs_email_status: status },
+  }).catch(e => console.warn('[resend-webhook] engagement status update failed:', (e as Error).message?.slice(0, 90)));
+}
+
+/** Append the stamp to the deal's outreach note; idempotent per resend id + event. */
 export async function applyResendEventToHubSpot(
   dealId: string,
   resendId: string,
   type: string,
   stamp: Stamp,
+  engagementId?: string,
 ): Promise<'applied' | 'duplicate' | 'no-note'> {
-  const assoc = (await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`)) as {
-    results?: { toObjectId?: string; id?: string }[];
-  };
-  const ids = (assoc.results || []).map(r => r.toObjectId || r.id).filter(Boolean) as string[];
-  if (!ids.length) return 'no-note';
-
-  let best: { id: string; body: string; ts: string } | null = null;
-  for (const id of ids.slice(0, 6)) {
-    const n = (await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`)) as {
-      id: string;
-      properties?: { hs_note_body?: string; hs_timestamp?: string };
-    };
-    const ts = n.properties?.hs_timestamp || '';
-    if (!best || ts > best.ts) best = { id: n.id, body: n.properties?.hs_note_body || '', ts };
-  }
+  const best = await findOutreachNote(dealId);
   if (!best) return 'no-note';
+
+  // A send that never arrived must not keep showing as SENT in the Emails tab.
+  if (engagementId && (type === 'email.bounced' || type === 'email.complained')) {
+    await updateEngagementStatus(engagementId, type === 'email.bounced' ? 'BOUNCED' : 'FAILED');
+  }
 
   const marker = `<!-- resend:${resendId}:${type} -->`;
   if (best.body.includes(marker)) return 'duplicate';
@@ -244,7 +336,13 @@ export function registerResendWebhookRoutes(app: Express): void {
         console.log(`[resend-webhook] ${type} for ${to} (${resendId}) — no matching deal, skipped`);
         return;
       }
-      const outcome = await applyResendEventToHubSpot(hit.dealId, resendId, type, stamp);
+      const outcome = await applyResendEventToHubSpot(
+        hit.dealId,
+        resendId,
+        type,
+        stamp,
+        (hit as ResendLedgerEntry).engagementId,
+      );
       console.log(`[resend-webhook] ${type} ${to} deal=${hit.dealId} → ${outcome}`);
     } catch (e) {
       console.error('[resend-webhook] handling failed:', (e as Error).message);
