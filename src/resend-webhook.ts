@@ -190,6 +190,24 @@ export async function findOutreachNote(dealId: string): Promise<{ id: string; bo
 }
 
 /**
+ * Put a stamp where Elena will actually see it: the TOP of the note, immediately
+ * under the FU buttons — not appended to the bottom of a long note where a
+ * delivery confirmation goes unnoticed (July 26 2026, her call).
+ *
+ * The FU block ends at its first <hr>; the stamp goes right after it so the
+ * buttons stay first. Without a FU block the stamp leads the note.
+ */
+export function insertNoteStamp(body: string, stampHtml: string): string {
+  const fuEnd = body.search(/<hr\s*\/?>/i);
+  const fuHeading = /FOLLOW-UP/i.test(body.slice(0, Math.max(fuEnd, 0)));
+  if (fuEnd >= 0 && fuHeading) {
+    const cut = fuEnd + (body.slice(fuEnd).match(/<hr\s*\/?>/i)?.[0].length || 4);
+    return `${body.slice(0, cut)}${stampHtml}<br>${body.slice(cut)}`;
+  }
+  return `${stampHtml}<br>${body}`;
+}
+
+/**
  * Log the send as a real HubSpot EMAIL activity.
  *
  * Resend never touches HubSpot's email object, so the deal's Emails tab and the
@@ -277,7 +295,7 @@ export async function applyResendEventToHubSpot(
   if (best.body.includes(marker)) return 'duplicate';
 
   await hs('PATCH', `/crm/v3/objects/notes/${best.id}`, {
-    properties: { hs_note_body: `${best.body}<br>${marker}<b>${stamp.text}</b>` },
+    properties: { hs_note_body: insertNoteStamp(best.body, `${marker}<b>${stamp.text}</b>`) },
   });
 
   if (stamp.task) {

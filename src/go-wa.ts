@@ -6,7 +6,7 @@ import type { Express, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { atlasConceptFromUtm } from './atlas-lead-sync.js';
-import { recordResendSend, logEmailEngagement, findOutreachNote } from './resend-webhook.js';
+import { recordResendSend, logEmailEngagement, findOutreachNote, insertNoteStamp } from './resend-webhook.js';
 
 const DEFAULT_PHONE = '50766623757';
 const GO_WA_BASE = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
@@ -349,14 +349,16 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
     // note is newest — Elena's own typed notes were becoming the newest.
     const best = await findOutreachNote(p.dealId).catch(() => null);
     if (best && !best.body.includes(`Resend:${resendId}`)) {
+      // Top of the note, under the FU buttons — a send stamp buried at the bottom
+      // of a long note is a stamp Elena never sees.
       const add =
-        `<br><br>📧 EMAILED ${when} from <b>aipa@aideazz.xyz</b> → ${p.to}` +
+        `<b>📧 EMAILED ${when} from aipa@aideazz.xyz → ${p.to}</b>` +
         `<br>Subject: ${p.subject}` +
         `<br>Resend:${resendId} (one-click /go/outreach-email/${p.slug}).`;
       await fetch(`https://api.hubapi.com/crm/v3/objects/notes/${best.id}`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ properties: { hs_note_body: best.body + add } }),
+        body: JSON.stringify({ properties: { hs_note_body: insertNoteStamp(best.body, add) } }),
       });
     }
   }
