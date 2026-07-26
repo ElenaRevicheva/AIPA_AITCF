@@ -1,0 +1,15 @@
+{
+  "rowsWithEmail": 169,
+  "suspicious": [
+    {
+      "slug": "dental-connect",
+      "dealId": "63083296695",
+      "staged": "emailcontactus@dentalconnect.com.mx",
+      "likelyCorrect": "contactus@dentalconnect.com.mx",
+      "siteShowsStaged": false,
+      "siteShowsCandidate": false,
+      "siteReachable": true
+    }
+  ],
+  "at": "2026-07-26T15:08:23.303Z"
+}

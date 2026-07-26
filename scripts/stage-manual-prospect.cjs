@@ -81,11 +81,31 @@ function parseContacts(html) {
     .filter(p => p.length >= 10 && p.startsWith('507'));
   // Emails: mailto links AND plain text (many Panama sites print info@… as text).
   const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js|html)$|@(2x|3x)\b|sentry|wixpress|example\.|correoernesto|^[0-9]+@|@.*-seccion\.|user@domain|john@doe|ttycirugia/i;
-  const emails = [
-    ...[...html.matchAll(/mailto:([^"'\s?]+)/gi)].map(m => m[1]),
-    ...(html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []),
-  ]
+  // mailto: is authoritative — the site itself declares the address there.
+  const mailtoEmails = [...html.matchAll(/mailto:([^"'\s?<>]+)/gi)].map(m => m[1].toLowerCase());
+  // Plain text needs a LEFT boundary, or a label glued to the address is swallowed
+  // into the local part: "Email" + "contactus@dentalconnect.com.mx" became
+  // emailcontactus@… and the send was suppressed (caught July 26 2026).
+  const textEmails = [
+    ...html.matchAll(/(?<![A-Za-z0-9._%+-])[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g),
+  ].map(m => m[0].toLowerCase());
+
+  /**
+   * Last-resort repair for addresses that still arrive glued to a label
+   * ("emailcontactus@…", "correoinfo@…"). Only accepts the stripped variant when
+   * the site itself also shows it — never guesses a new address.
+   */
+  const unglue = (addr) => {
+    const m = addr.match(/^(e-?mail|correo(?:electronico)?|mail|escr[ií]benos|cont[áa]ctenos)([a-z][a-z0-9._%+-]{2,})@(.+)$/i);
+    if (!m) return addr;
+    const candidate = `${m[2]}@${m[3]}`.toLowerCase();
+    const shown = new RegExp(`(?<![A-Za-z0-9._%+-])${candidate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+    return shown.test(html) || mailtoEmails.includes(candidate) ? candidate : addr;
+  };
+
+  const emails = [...mailtoEmails, ...textEmails]
     .map(e => e.toLowerCase())
+    .map(unglue)
     .filter(e => !junk.test(e))
     .filter(e => /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(e));
   const wa = phones[0] || null;

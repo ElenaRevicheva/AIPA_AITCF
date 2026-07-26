@@ -33,6 +33,7 @@ import {
   verifyRecaptchaV3Token,
 } from './marketing-notify';
 import { registerGoWaRoutes } from './go-wa.js';
+import { registerResendWebhookRoutes } from './resend-webhook.js';
 import { registerServiceCheckoutRoutes } from './service-checkout.js';
 import {
   importTargets,
@@ -2743,6 +2744,11 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
 
   // GET /go/wa — Atlas WhatsApp click tracking (public redirect → wa.me + ledger wa_clicks)
   registerGoWaRoutes(app, getMarketingClientIp);
+
+  // POST /resend/webhook — delivered/bounced/complained → HubSpot note + task.
+  // Acceptance by Resend is NOT delivery (Dental Connect was suppressed while the
+  // deal read 📧 EMAILED); this is what makes the CRM tell the truth.
+  registerResendWebhookRoutes(app);
 
   registerServiceCheckoutRoutes(app, {
     marketingCors: marketingInquiryCors,

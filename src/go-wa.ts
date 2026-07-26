@@ -6,6 +6,7 @@ import type { Express, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { atlasConceptFromUtm } from './atlas-lead-sync.js';
+import { recordResendSend } from './resend-webhook.js';
 
 const DEFAULT_PHONE = '50766623757';
 const GO_WA_BASE = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
@@ -590,6 +591,8 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
     }
     try {
       const resendId = await sendOutreachEmailViaResend(hit);
+      // Ledger first: delivery events arrive within seconds and need the deal.
+      recordResendSend(resendId, { dealId: hit.dealId, slug, to: hit.to, subject: hit.subject });
       await markHubSpotAfterOutreachEmail(hit, resendId).catch(e =>
         console.error('[go/outreach-email] HubSpot update failed:', e),
       );
