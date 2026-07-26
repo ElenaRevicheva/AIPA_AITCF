@@ -1,16 +1,13 @@
 {
   "deals": 95,
-  "installed": 93,
-  "skipNoPhone": 2,
+  "installed": 94,
+  "skipNoPhone": 1,
   "errors": 0,
   "skipNoPhoneList": [
     {
       "dealId": "62803339042",
-      "company": "Riga Design"
-    },
-    {
-      "dealId": "63083214942",
-      "company": "San Blas Tour"
+      "company": "Riga Design",
+      "reason": "no phone and no email"
     }
   ],
   "errorList": [],
@@ -132,7 +129,7 @@
       "company": "Fuerte Amador Resort & Marina",
       "phone": "50760308992",
       "score": 68,
-      "noteId": "113315049527"
+      "noteId": "113681935251"
     },
     {
       "dealId": "62863032403",
@@ -590,6 +587,13 @@
       "noteId": "113624479497"
     },
     {
+      "dealId": "63083214942",
+      "company": "San Blas Tour",
+      "phone": "",
+      "score": 86,
+      "noteId": "113619865736"
+    },
+    {
       "dealId": "63067561358",
       "company": "Bristol Panama",
       "phone": "5072947878",
@@ -664,8 +668,8 @@
       "company": "Hospital CIMA",
       "phone": "50622081000",
       "score": 70,
-      "noteId": "113624424338"
+      "noteId": "113681940003"
     }
   ],
-  "at": "2026-07-26T00:40:29.136Z"
+  "at": "2026-07-26T12:21:32.046Z"
 }

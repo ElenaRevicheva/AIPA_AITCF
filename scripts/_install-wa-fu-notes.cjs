@@ -8,7 +8,10 @@ const fs = require('fs');
 const path = require('path');
 const {
   buildHubSpotWaAnchor,
+  buildHubSpotEmailAnchor,
   loadRegistry,
+  saveRegistry,
+  slugify,
   digitsOnly,
   formatPhone507,
 } = require('./wa-link-lib.cjs');
@@ -36,6 +39,22 @@ async function hs(method, p, body, attempt = 0) {
   }
   if (!r.ok) throw new Error(`${r.status} ${p} ${t.slice(0, 220)}`);
   return t ? JSON.parse(t) : null;
+}
+
+/**
+ * Remove previously installed FU blocks.
+ *
+ * Used for BOTH rewriting the note and — critically — before parsing the audit:
+ * the FU text we write contains `pregunta a ChatGPT … "…"`, so on the next run the
+ * parser matched OUR OWN sentence and locked the generic fallback in as if it were
+ * the prospect's real money query (caught on Hospital CIMA, July 26 2026).
+ * HubSpot also strips the HTML comment marker, hence the visible-heading patterns.
+ */
+function stripFu(html) {
+  return String(html)
+    .replace(new RegExp(`${FU_MARKER}[\\s\\S]*?<hr>(?:<br>)?`, 'gi'), '')
+    .replace(/(?:<b>)?FOLLOW-UP WhatsApp \(click[\s\S]*?<hr>(?:<br>)?/gi, '')
+    .replace(/(?:<b>)?FOLLOW-UP — click y enviar[\s\S]*?<hr>(?:<br>)?/gi, '');
 }
 
 function plain(html) {
@@ -104,34 +123,62 @@ function cleanMoneyQuery(raw) {
     return null;
   }
   if (q.length < 8 || q.length > 120) return null; // truncated or runaway → generic
+  // Belt and braces against the self-feeding loop: never accept our own fallbacks
+  if (/^¿cuál es la mejor opción( en .+)?\?$/i.test(q)) return null;
   return q;
 }
 
-function buildFuText({ company, domain, score, grade, weakName, weakScore, moneyQuery }) {
-  // Fallback stays a QUESTION — it sits inside "pregunta a ChatGPT …" quotes.
-  const mq = moneyQuery || '¿cuál es la mejor opción en Panamá?';
-  const weakBit =
-    weakScore != null
-      ? `${weakName} ${weakScore}/100`
-      : weakName;
+function buildFuText({ company, domain, score, grade, weakName, weakScore, moneyQuery, city, firstTouch }) {
+  // Only claim the channel we can prove from the note stamps — some prospects were
+  // emailed (📧 EMAILED), some WhatsApp-first (✅ SENT); saying "por correo" to a
+  // WhatsApp-first prospect is a lie they will notice.
+  const channel =
+    firstTouch === 'email' ? ' por correo' : firstTouch === 'whatsapp' ? ' por WhatsApp' : '';
+  // No invented query: when the note has no parsable money query we describe the
+  // search instead of quoting a fake one — and NEVER hardcode "Panamá", half the
+  // list is Costa Rica / Mexico / Colombia (Hospital CIMA is in San José).
+  const place = city ? ` en ${city}` : '';
+  const gapSentence = moneyQuery
+    ? `Cuando un cliente pregunta a ChatGPT o Perplexity "${moneyQuery}", su empresa todavía no aparece como una respuesta citable`
+    : `Cuando un cliente busca en ChatGPT o Perplexity opciones como la suya${place}, su empresa todavía no aparece como una respuesta citable`;
+  // Only claim a category score when we actually parsed one.
+  const weakBit = weakScore != null ? ` (${weakName} ${weakScore}/100)` : '';
+  // Copy approved by Elena July 26 2026 — keep this wording verbatim.
   return [
-    `Hola, ¡un gusto saludarles de nuevo! 👋 Soy Elena Revicheva, aquí en Panamá: https://aideazz.xyz/portfolio`,
+    `Hola, ¡un gusto saludarles de nuevo! 👋 Soy Elena Revicheva, Ingeniera de IA y Automatización: https://aideazz.xyz/portfolio`,
     '',
-    `Les escribí hace unos días por email sobre ${company}. Analicé ${domain || 'su sitio'} con mi motor de visibilidad en IA: ${score}/100 (${grade}). Cuando un cliente pregunta a ChatGPT o Perplexity "${mq}", todavía no aparecen como respuesta citable (${weakBit}).`,
+    `Les escribí hace unos días${channel} sobre ${company}. Analicé ${domain || 'su sitio'} con mi motor de visibilidad en IA: ${score}/100 (${grade}). ${gapSentence}${weakBit}.`,
     '',
     `No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.`,
     '',
-    `Si les sirve, en 15 minutos les muestro los 3 arreglos de esa auditoría y cómo quedaría el Operator en su negocio — sin compromiso. Auditoría gratuita: https://aideazz.xyz/api`,
+    `Si les sirve, en 15 minutos les muestro los 3 principales arreglos de esa auditoría y cómo quedaría el Operator en su negocio — sin compromiso. Auditoría gratuita: https://aideazz.xyz/api`,
     '',
     `Saludos,`,
-    `Elena✨`,
+    `Elena Revicheva`,
+    `Fundadora | Ingeniera de IA y Automatización`,
+    `AIdeazz AI Lab✨`,
   ].join('\n');
+}
+
+/** Same FU, as an email: SUBJECT/TO header block + body (format read by /go/outreach-email). */
+function buildFuEmailDraft({ company, to, score, fuText }) {
+  const subject = `Seguimiento — auditoría de visibilidad en IA: ${company} (${score}/100)`;
+  const body = fuText.replace(
+    /^Hola, ¡un gusto saludarles de nuevo! 👋 /,
+    `Estimado equipo de ${company}:\n\n¡Un gusto saludarles de nuevo! 👋 `,
+  );
+  return `SUBJECT: ${subject}\n\nTO: ${to}\n\n${body}\n`;
 }
 
 (async () => {
   const reg = loadRegistry();
+  let registryDirty = false;
   const byDeal = new Map();
   for (const [slug, cfg] of Object.entries(reg)) {
+    // Skip our own FU rows — they carry the SAME dealId as the base row, so they
+    // used to win the map and the slug grew a `-fu` every run
+    // (hospital-cima-fu-fu-fu-email.txt). The base slug is the only source here.
+    if (/-fu$/.test(slug)) continue;
     if (cfg.dealId) byDeal.set(String(cfg.dealId), { slug, ...cfg });
   }
 
@@ -157,7 +204,11 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
     await sleep(200);
   } while (after);
 
-  const real = deals.filter((d) => !/HIT-LIST|remaining|queue/i.test(d.properties.dealname || ''));
+  // --only=<substring|dealId> → single-deal test run before touching the batch
+  const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').split('=')[1];
+  const real = deals
+    .filter((d) => !/HIT-LIST|remaining|queue/i.test(d.properties.dealname || ''))
+    .filter((d) => !ONLY || d.id === ONLY || (d.properties.dealname || '').toLowerCase().includes(ONLY.toLowerCase()));
   const results = { ok: [], skipNoPhone: [], errors: [] };
 
   for (let i = 0; i < real.length; i++) {
@@ -174,12 +225,14 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
       const cIds = (cAssoc.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
       let domain = null;
       let phone = null;
+      let city = null;
       if (cIds[0]) {
         await sleep(80);
         const co = await hs(
           'GET',
-          `/crm/v3/objects/companies/${cIds[0]}?properties=domain,website,phone,name`,
+          `/crm/v3/objects/companies/${cIds[0]}?properties=domain,website,phone,name,city`,
         );
+        city = (co.properties?.city || '').trim() || null;
         domain = (co.properties?.domain || co.properties?.website || '')
           .replace(/^https?:\/\//, '')
           .replace(/\/.*$/, '')
@@ -188,6 +241,19 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
       }
       const regHit = byDeal.get(String(d.id));
       if (regHit?.phone && regHit.phone !== '00000000000') phone = digitsOnly(regHit.phone);
+      // Email drives the second FU button — registry first, live HubSpot contact as
+      // fallback so an address Elena just typed into the contact record is picked up.
+      let email = String(regHit?.email || '').trim().toLowerCase();
+      {
+        const ctAssoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/contacts`);
+        const ctIds = (ctAssoc.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
+        if (ctIds[0]) {
+          await sleep(80);
+          const ct = await hs('GET', `/crm/v3/objects/contacts/${ctIds[0]}?properties=email,phone,mobilephone`);
+          const live = String(ct.properties?.email || '').trim().toLowerCase();
+          if (live && /.+@.+\..+/.test(live)) email = live;
+        }
+      }
       if (regHit && !domain) {
         /* keep company domain from HS */
       }
@@ -200,8 +266,11 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
           phone = digitsOnly(ct.properties?.phone || ct.properties?.mobilephone);
         }
       }
-      if (!phone || phone.length < 8 || phone === '00000000000') {
-        results.skipNoPhone.push({ dealId: d.id, company });
+      const hasPhone = !!phone && phone.length >= 8 && phone !== '00000000000';
+      // Email-only prospects still get their FU button — skip only when we have
+      // neither channel (was: skipped on missing phone, losing the email FU too).
+      if (!hasPhone && !(email && /.+@.+\..+/.test(email))) {
+        results.skipNoPhone.push({ dealId: d.id, company, reason: 'no phone and no email' });
         continue;
       }
 
@@ -219,26 +288,70 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
         if (!note || (n.properties?.hs_timestamp || '') > (note.properties?.hs_timestamp || '')) note = n;
       }
       const oldBody = note.properties?.hs_note_body || '';
-      const audit = parseAudit(d.properties.dealname || '', plain(oldBody));
+      // Parse the ORIGINAL note only — never our own previously installed FU text.
+      const originalPlain = plain(stripFu(oldBody));
+      const audit = parseAudit(d.properties.dealname || '', originalPlain);
+      const firstTouch = /📧\s*EMAILED|Resend:/i.test(originalPlain)
+        ? 'email'
+        : /✅\s*SENT/i.test(originalPlain)
+          ? 'whatsapp'
+          : null;
       const fuText = buildFuText({
         company,
         domain: domain || regHit?.company || company,
+        city,
+        firstTouch,
         ...audit,
       });
       // Direct web.whatsapp.com prefill — LAPTOP ONLY, by Elena's decision
       // (July 25 2026, after WhatsApp restricted her linked devices). Do NOT
       // reintroduce a mobile bridge here without her explicit go-ahead.
-      const anchor = buildHubSpotWaAnchor(
-        phone,
-        fuText,
-        `➡️ WHATSAPP FU — AI Growth Operator + auditoría (${formatPhone507(phone)})`,
-      );
+      const waAnchor = hasPhone
+        ? buildHubSpotWaAnchor(
+            phone,
+            fuText,
+            `➡️ WHATSAPP FU (laptop) — AI Growth Operator + auditoría (${formatPhone507(phone)})`,
+          )
+        : null;
+
+      // Second channel: one-click FU EMAIL. Its own registry slug `{slug}-fu` so the
+      // existing /go/outreach-email route serves it without any server change — the
+      // first-contact `emailDraft` on the base slug stays untouched.
+      let emailAnchor = null;
+      const slug = (regHit?.slug || slugify(company)).replace(/(-fu)+$/, '');
+      if (email && /.+@.+\..+/.test(email)) {
+        const fuEmailRel = `docs/selling/drafts/${slug}-fu-email.txt`;
+        fs.writeFileSync(
+          path.join(root, fuEmailRel),
+          buildFuEmailDraft({ company, to: email, score: audit.score, fuText }),
+          { encoding: 'utf8' },
+        );
+        reg[`${slug}-fu`] = {
+          ...(reg[`${slug}-fu`] || {}),
+          phone,
+          company,
+          email,
+          emailDraft: fuEmailRel,
+          dealId: String(d.id),
+          score: audit.score,
+        };
+        registryDirty = true;
+        emailAnchor = buildHubSpotEmailAnchor(
+          `${slug}-fu`,
+          email,
+          `✉️ EMAIL FU — aipa@aideazz.xyz (${email})`,
+        );
+      }
+
       const block = [
         FU_MARKER,
-        `<b>FOLLOW-UP WhatsApp (click → texto listo, sin editar)</b>`,
-        anchor,
+        `<b>FOLLOW-UP — click y enviar (texto listo, sin editar)</b>`,
+        ...(emailAnchor ? [emailAnchor] : []),
+        ...(waAnchor ? [waAnchor] : []),
         `<br><i>Audit used from this deal (no re-crawl): ${audit.score}/100 ${audit.grade}` +
           (audit.weakScore != null ? ` · ${audit.weakName} ${audit.weakScore}` : '') +
+          (emailAnchor ? '' : ' · sin email en el contacto → solo WhatsApp') +
+          (waAnchor ? '' : ' · sin teléfono → solo email') +
           `</i>`,
         `<hr>`,
       ].join('<br>');
@@ -247,10 +360,6 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
       // FU_MARKER alone missed and every run prepended ANOTHER copy (Elena's phone
       // screenshot showed the block twice). Strip by the visible heading instead,
       // globally, then prepend one fresh block.
-      const stripFu = (html) =>
-        String(html)
-          .replace(new RegExp(`${FU_MARKER}[\\s\\S]*?<hr>(?:<br>)?`, 'gi'), '')
-          .replace(/(?:<b>)?FOLLOW-UP WhatsApp \(click[\s\S]*?<hr>(?:<br>)?/gi, '');
       const newBody = block + '<br>' + stripFu(oldBody);
 
       await sleep(100);
@@ -274,11 +383,12 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
         await hs('PATCH', `/crm/v3/objects/tasks/${tid}`, {
           properties: {
             hubspot_owner_id: OWNER,
-            hs_task_subject: `WhatsApp FU → ${company} (click link in deal note)`,
+            hs_task_subject: `FU → ${company} (click link in deal note: email or WhatsApp)`,
             hs_task_body:
-              `Open this deal → note → click "WHATSAPP FU — AI Growth Operator + auditoría". ` +
-              `Text is prefilled (audit + Operator). Send in WhatsApp. Then mark this task done. ` +
-              `If they reply → stage 💬 They replied.`,
+              `Open this deal → note → two buttons, same text: ` +
+              `"✉️ EMAIL FU" (one click → preview → Send, moves the deal itself) or ` +
+              `"➡️ WHATSAPP FU (laptop)" (opens WhatsApp Web prefilled — laptop only). ` +
+              `Then mark this task done. If they reply → stage 💬 They replied.`,
           },
         });
       }
@@ -295,6 +405,10 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
     }
   }
   process.stderr.write('\n');
+
+  // Registry rows feed the one-click FU email — commit + push after every run, or
+  // the EMAIL FU button 404s (Oracle reads disk, then GitHub raw main).
+  if (registryDirty) saveRegistry(reg);
 
   const summary = {
     deals: real.length,
