@@ -36,6 +36,41 @@ send anything by themselves, but making 93 cold first-touches frictionless is ex
 pattern WhatsApp's anti-spam targets, and **her number is a business asset** (site, HubSpot,
 portfolio). Notes are back to direct `web.whatsapp.com/send` hrefs — laptop only, by design.
 
+**📧 The FU now ships on BOTH channels (July 26 2026).** Every deal note carries, at the top:
+`✉️ EMAIL FU — aipa@aideazz.xyz ({address})` and `➡️ WHATSAPP FU (laptop)`. The email button
+needed **no server change**: the FU gets its own registry slug **`{slug}-fu`**
+(`email` + `emailDraft: docs/selling/drafts/{slug}-fu-email.txt`), which the existing
+`/go/outreach-email/:slug` route serves — click → preview → Send via Resend → deal ⏳ Sent.
+Installed on **94/95** deals (Riga Design has neither phone nor email); 88 carry both buttons.
+Rebuild with `node scripts/_install-wa-fu-notes.cjs` (`--only=<company>` for one), then
+**commit + push** drafts + registry.
+
+**Every FU claim is verified against Elena's own audit data.** `node scripts/_verify-fu-claims.cjs`
+re-derives each claim (score/grade, domain, quoted money query, category score, city, the
+emailed-vs-WhatsApp channel claim, WhatsApp text == email text, jargon) and requires it to
+trace to the deal name, the ORIGINAL audit note, or the first-contact draft actually sent —
+the FU block is stripped first so a FU can never verify itself. Current: **88/88 clean**.
+Rules it enforces: no invented money query (no query in the note → describe the search using
+their real HubSpot city, never a fabricated quote), no domain unless the note or sent draft
+names it (→ "su sitio web"), no category score unless parsed, and **never** hardcode "Panamá"
+(half the list is CR/MX/CO).
+
+**📬 Delivery truth — Resend webhook → HubSpot (July 26 2026).** Acceptance by Resend is NOT
+delivery: Dental Connect was **Suppressed** while the deal read ⏳ Sent + `📧 EMAILED`.
+Now `POST /cto/resend/webhook` (Svix-signed, `RESEND_WEBHOOK_SECRET` in Oracle `.env`) stamps
+the OUTREACH note — **at the top, under the FU buttons** — with `✅ ENTREGADO` / `⛔ REBOTE` /
+`🚫 QUEJA` / `👀 ABIERTO` / `🔗 CLIC`; bounces and complaints also raise a HIGH task. New sends
+are logged as real HubSpot **EMAIL activities** (from/to must go in `hs_email_headers` — the flat
+`hs_email_*_email` properties 400). Suppressed sends emit **no webhook at all**, so
+`scripts/resend-reconcile.cjs` (cron :17 hourly) polls final status and stamps `⛔ SUPRIMIDO`.
+**No backfill of past sends — existing notes stay untouched, only new sends get this.**
+
+**Email extraction bug (fixed July 26 2026):** the plain-text regex had no left boundary, so a
+label glued to the address was swallowed — `Email` + `contactus@…` → `emailcontactus@dentalconnect.com.mx`,
+which Resend suppressed. `mailto:` is now authoritative, text matches need a left boundary, and a
+glued label is stripped only when the site itself shows the stripped address.
+Audit all staged addresses with `node scripts/_audit-prospect-emails.cjs`.
+
 **Rules that came out of it:**
 - Never reintroduce a mobile WhatsApp bridge without Elena's explicit go-ahead.
 - WhatsApp = prospects who **replied** or messaged first. Cold first-touch at volume → **email**
