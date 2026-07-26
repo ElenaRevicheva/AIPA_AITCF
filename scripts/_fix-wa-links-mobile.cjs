@@ -1,22 +1,20 @@
 #!/usr/bin/env node
 /**
- * Ops (July 25 2026): repoint every FIRST-CONTACT WhatsApp button in CLIENT-MANUAL
- * deal notes from a raw `web.whatsapp.com/send?…` link to the device-aware bridge
- * `/go/outreach/{slug}`.
+ * Ops (July 25 2026, REVERT): put the FIRST-CONTACT WhatsApp button back to a direct
+ * `web.whatsapp.com/send?phone=…&text=…` link — laptop only, Elena's decision after
+ * WhatsApp restricted her linked devices the same day the mobile bridge went in.
  *
- * Why: on a phone `web.whatsapp.com/send` redirects to web.whatsapp.com/mobile/
- * ("use WhatsApp Web from your computer") — the app never opens, so outreach could
- * only be sent from the laptop. The bridge picks api.whatsapp.com on mobile and
- * web.whatsapp.com on desktop (no redirect → emojis survive). The FU buttons were
- * already migrated by `_install-wa-fu-notes.cjs`.
+ * Earlier today this same script pointed those buttons at `/go/outreach/{slug}`
+ * (device-aware bridge). This version undoes exactly that: bridge href → direct
+ * prefill built from `docs/selling/drafts/{slug}.txt`. Labels/phones untouched.
  *
- * Only rewrites anchors whose slug has a `draft` in the outreach registry — never
- * touches a link we cannot serve. Idempotent.
+ * Do NOT reintroduce a mobile bridge without Elena's explicit go-ahead.
+ * Idempotent: notes already carrying a direct link are left alone.
  */
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { loadRegistry, buildOutreachSlugUrl } = require('./wa-link-lib.cjs');
+const { loadRegistry, buildWhatsAppPrefillUrl, readDraftUtf8 } = require('./wa-link-lib.cjs');
 
 const root = path.join(__dirname, '..');
 const env = fs.readFileSync(path.join(root, '.env'), 'utf8');
@@ -43,13 +41,22 @@ async function hs(method, p, body, attempt = 0) {
 (async () => {
   const reg = loadRegistry();
   const rows = Object.entries(reg).filter(([, c]) => c.dealId && c.draft);
-  const out = { checked: 0, patched: 0, alreadyOk: 0, noNote: 0, errors: [] };
+  const out = { checked: 0, reverted: 0, alreadyDirect: 0, noDraft: 0, noNote: 0, errors: [] };
 
   for (let i = 0; i < rows.length; i++) {
     const [slug, cfg] = rows[i];
     process.stderr.write(`\r ${i + 1}/${rows.length} ${slug.slice(0, 34).padEnd(34)}`);
     try {
       out.checked++;
+      let draftText;
+      try {
+        draftText = readDraftUtf8(cfg.draft);
+      } catch {
+        out.noDraft++;
+        continue;
+      }
+      const direct = buildWhatsAppPrefillUrl(cfg.phone, draftText, true).replace(/&/g, '&amp;');
+
       await sleep(110);
       const assoc = await hs('GET', `/crm/v4/objects/deals/${cfg.dealId}/associations/notes`);
       const ids = (assoc.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
@@ -64,20 +71,19 @@ async function hs(method, p, body, attempt = 0) {
         if (!note || (n.properties?.hs_timestamp || '') > (note.properties?.hs_timestamp || '')) note = n;
       }
       const body = note?.properties?.hs_note_body || '';
-      if (!/web\.whatsapp\.com/i.test(body)) {
-        out.alreadyOk++;
-        continue;
-      }
-      // Swap only the href; the visible label (phone number, emoji) stays as is.
-      const bridge = buildOutreachSlugUrl(slug);
-      const next = body.replace(/href="https:\/\/web\.whatsapp\.com\/send\?[^"]*"/gi, `href="${bridge}"`);
+      // Only the first-contact bridge href (no ?v=fu) — the FU button is rewritten
+      // by _install-wa-fu-notes.cjs, which carries the jargon-cleaned text.
+      const next = body.replace(
+        /href="https?:\/\/[^"]*\/go\/outreach\/[a-z0-9-]+"/gi,
+        `href="${direct}"`,
+      );
       if (next === body) {
-        out.alreadyOk++;
+        out.alreadyDirect++;
         continue;
       }
       await sleep(100);
       await hs('PATCH', `/crm/v3/objects/notes/${note.id}`, { properties: { hs_note_body: next } });
-      out.patched++;
+      out.reverted++;
     } catch (e) {
       out.errors.push({ slug, err: e.message });
     }

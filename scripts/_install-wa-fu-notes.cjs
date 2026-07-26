@@ -7,10 +7,8 @@
 const fs = require('fs');
 const path = require('path');
 const {
-  buildHubSpotFuAnchor,
+  buildHubSpotWaAnchor,
   loadRegistry,
-  saveRegistry,
-  slugify,
   digitsOnly,
   formatPhone507,
 } = require('./wa-link-lib.cjs');
@@ -132,7 +130,6 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
 
 (async () => {
   const reg = loadRegistry();
-  let registryDirty = false;
   const byDeal = new Map();
   for (const [slug, cfg] of Object.entries(reg)) {
     if (cfg.dealId) byDeal.set(String(cfg.dealId), { slug, ...cfg });
@@ -228,22 +225,12 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
         domain: domain || regHit?.company || company,
         ...audit,
       });
-      // Slug + FU draft on disk → the note links to the device-aware bridge, so the
-      // same button works from Elena's phone. Registry row is created if missing.
-      const slug = regHit?.slug || slugify(company);
-      const fuRel = `docs/selling/drafts/${slug}-fu.txt`;
-      fs.writeFileSync(path.join(root, fuRel), `${fuText}\n`, { encoding: 'utf8' });
-      reg[slug] = {
-        ...(reg[slug] || {}),
+      // Direct web.whatsapp.com prefill — LAPTOP ONLY, by Elena's decision
+      // (July 25 2026, after WhatsApp restricted her linked devices). Do NOT
+      // reintroduce a mobile bridge here without her explicit go-ahead.
+      const anchor = buildHubSpotWaAnchor(
         phone,
-        company: reg[slug]?.company || company,
-        dealId: String(d.id),
-        fuDraft: fuRel,
-      };
-      registryDirty = true;
-
-      const anchor = buildHubSpotFuAnchor(
-        slug,
+        fuText,
         `➡️ WHATSAPP FU — AI Growth Operator + auditoría (${formatPhone507(phone)})`,
       );
       const block = [
@@ -308,10 +295,6 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
     }
   }
   process.stderr.write('\n');
-
-  // One write at the end — the bridge reads these rows (disk on Oracle, GitHub raw
-  // as fallback), so commit + push after this run or the FU buttons 404.
-  if (registryDirty) saveRegistry(reg);
 
   const summary = {
     deals: real.length,

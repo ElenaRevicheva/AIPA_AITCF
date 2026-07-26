@@ -28,20 +28,19 @@ After email, FU is a **second outreach on WhatsApp**: audit already on the deal 
 3. Click → WhatsApp opens with **full text prefilled** → Send (no manual edit).
 4. Mark task done. Reply → stage **💬 They replied** (or say `they replied {company}`).
 
-**📱 Works on the phone too (fixed July 25 2026).** The FU button used to be a raw
-`web.whatsapp.com/send` link — on a phone that redirects to `web.whatsapp.com/mobile/`
-("use WhatsApp Web from your computer") and the app **never opens**, so FUs could only be
-sent from the laptop. Buttons now point at **`/go/outreach/{slug}?v=fu`**, the bridge that
-sniffs the device: **api.whatsapp.com on mobile** (opens the app) · **web.whatsapp.com on
-desktop** (no redirect → 4-byte emojis survive). Same button, both devices; the bridge page
-also shows the text with a **Copiar mensaje** button if WhatsApp fails to open.
-Requires per-slug `fuDraft` in `docs/selling/outreach-registry.json` +
-`docs/selling/drafts/{slug}-fu.txt` — both written by `_install-wa-fu-notes.cjs`;
-**commit + push after every run** or the button 404s (Oracle reads disk, then GitHub raw `main`).
-The **first-contact** button was migrated the same day by `node scripts/_fix-wa-links-mobile.cjs`
-(81 notes repointed to `/go/outreach/{slug}`) — **both buttons now work from the phone**.
-New notes: never write a raw `web.whatsapp.com/send` href again; use the bridge
-(`buildOutreachSlugUrl` / `buildHubSpotFuAnchor` in `scripts/wa-link-lib.cjs`).
+**💻 WhatsApp outreach is LAPTOP-ONLY — Elena's decision, July 25 2026. Do not "fix" this.**
+A mobile bridge (`/go/outreach/{slug}?v=fu`, device-sniffing → api.whatsapp.com on phones)
+was built and **rolled back the same day**: hours after bulk FU became one tap, WhatsApp
+restricted her linked devices (*"You can't start new chats right now"*). The buttons never
+send anything by themselves, but making 93 cold first-touches frictionless is exactly the
+pattern WhatsApp's anti-spam targets, and **her number is a business asset** (site, HubSpot,
+portfolio). Notes are back to direct `web.whatsapp.com/send` hrefs — laptop only, by design.
+
+**Rules that came out of it:**
+- Never reintroduce a mobile WhatsApp bridge without Elena's explicit go-ahead.
+- WhatsApp = prospects who **replied** or messaged first. Cold first-touch at volume → **email**
+  (one-click `aipa@`, campaign script, auto ⏳ Sent + 4-day FU task) — compliant and untouched by this.
+- If a restriction appears: stop clicking, use WhatsApp's in-app review, never a second number.
 
 **No engineering jargon in the message (fixed July 25 2026).** HubSpot flattens the note
 HTML, so `Money query: …` and `Top fixes: (1) FAQ …, (2) LodgingBusiness/FAQPage JSON-LD…`
