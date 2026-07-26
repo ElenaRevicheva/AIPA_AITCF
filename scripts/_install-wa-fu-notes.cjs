@@ -85,7 +85,10 @@ function parseAudit(dealName, notePlain) {
   const weakM =
     blob.match(/\(([A-Za-z][A-Za-z /]+?)\s+(\d+)\s+weakest\)/i) ||
     blob.match(/(GEO|AEO|Tech|AI Access|Structured Data)[^\d]{0,20}(\d+)\s*\/\s*100/i) ||
-    blob.match(/(GEO|AEO)\s+(\d+)\s*\/\s*100/i);
+    blob.match(/(GEO|AEO)\s+(\d+)\s*\/\s*100/i) ||
+    // Early notes wrote it bare: "AEO 69 (missing FAQ/answer-content)". Still her
+    // own audit number — the verifier re-checks it against the note either way.
+    blob.match(/\b(GEO|AEO|Tech|AI Access)\s+(\d{1,3})\b(?!\s*\/\s*\d)/i);
   const weakName = weakM ? weakM[1].trim() : 'visibilidad en IA';
   const weakScore = weakM ? weakM[2] : null;
   const mq =
@@ -147,7 +150,7 @@ function buildFuText({ company, domain, score, grade, weakName, weakScore, money
   return [
     `Hola, ¡un gusto saludarles de nuevo! 👋 Soy Elena Revicheva, Ingeniera de IA y Automatización: https://aideazz.xyz/portfolio`,
     '',
-    `Les escribí hace unos días${channel} sobre ${company}. Analicé ${domain || 'su sitio'} con mi motor de visibilidad en IA: ${score}/100 (${grade}). ${gapSentence}${weakBit}.`,
+    `Les escribí hace unos días${channel} sobre ${company}. Analicé ${domain || 'su sitio web'} con mi motor de visibilidad en IA: ${score}/100 (${grade}). ${gapSentence}${weakBit}.`,
     '',
     `No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.`,
     '',
@@ -296,9 +299,28 @@ function buildFuEmailDraft({ company, to, score, fuText }) {
         : /✅\s*SENT/i.test(originalPlain)
           ? 'whatsapp'
           : null;
+      // Name the domain ONLY if her own audit material names it. Two early deals
+      // (Panama Yacht Group, Eurostone) had a domain in the HubSpot company field
+      // that the audit note never mentions — Eurostone's contact is even
+      // @eurostone-atelier.com while the field said eurostonepanama.com. Saying
+      // "analicé X.com" when the audit may have run on another URL is exactly the
+      // fabrication Elena rejected, so those fall back to "su sitio web".
+      let firstDraftText = '';
+      try {
+        if (regHit?.draft && fs.existsSync(path.join(root, regHit.draft))) {
+          firstDraftText = fs.readFileSync(path.join(root, regHit.draft), 'utf8');
+        }
+      } catch {
+        /* no first-contact draft on disk */
+      }
+      const domainCorroborated =
+        !!domain &&
+        (originalPlain.toLowerCase().includes(domain.toLowerCase()) ||
+          firstDraftText.toLowerCase().includes(domain.toLowerCase()));
+
       const fuText = buildFuText({
         company,
-        domain: domain || regHit?.company || company,
+        domain: domainCorroborated ? domain : null,
         city,
         firstTouch,
         ...audit,
