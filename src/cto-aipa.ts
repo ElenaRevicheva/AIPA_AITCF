@@ -2476,7 +2476,8 @@ async function startCTOAIPA() {
       }
 
       const {
-        pushLeadToHubSpot, pushHiringDealToHubSpot, pushEspaLuzDealToHubSpot, HS_STAGES,
+        pushLeadToHubSpot, pushHiringDealToHubSpot, pushEspaLuzDealToHubSpot,
+        pushEspaLuzContentActivityToHubSpot, HS_STAGES,
       } = await import('./hubspot-client');
 
       let result: { contactId: string | null; companyId: string | null; dealId: string | null } | null = null;
@@ -2511,6 +2512,30 @@ async function startCTOAIPA() {
             atlas_concept_id: atlas_concept_id ?? null,
           },
         });
+
+      } else if (source === 'espaluz_influencer') {
+        // [ESPALUZ] Influencer post — date only. Non-[ESPALUZ] names (e.g. CLIENT marketing
+        // days) are skipped. Do NOT use pushEspaLuzDealToHubSpot (trial wrapper).
+        const dealName =
+          (typeof name === 'string' && name.trim()) ||
+          (typeof body.dealName === 'string' && body.dealName.trim()) ||
+          '';
+        const content = await pushEspaLuzContentActivityToHubSpot({
+          dealName,
+          ...(ctx ? { context: ctx } : {}),
+          crmMeta: {
+            source: 'espaluz_influencer',
+            pipeline: 'client',
+            type: type || 'engagement',
+            utm_campaign: utm_campaign ?? null,
+            utm_term: utm_term ?? null,
+            utm_content: utm_content ?? null,
+            atlas_concept_id: atlas_concept_id ?? null,
+          },
+        });
+        result = content
+          ? { contactId: content.contactId, companyId: null, dealId: content.dealId }
+          : null;
 
       } else if (source.startsWith('espaluz_')) {
         const userId =

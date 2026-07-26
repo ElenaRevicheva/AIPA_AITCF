@@ -986,6 +986,79 @@ export function isQualifiedClient(lead: LeadForHubSpot): { ok: boolean; reason: 
   return { ok: true, reason: 'qualified: reachable + buyer intent + skill ICP' };
 }
 
+/**
+ * EspaLuz Influencer daily content → HubSpot [ESPALUZ] activity deal only.
+ * Uses the pre-baked name as-is (e.g. `[ESPALUZ] Influencer post — YYYY-MM-DD`).
+ * Skips non-[ESPALUZ] names (no CLIENT stream). Must NOT use pushEspaLuzDealToHubSpot
+ * (trial helper would wrap the title as `TG … — trial`).
+ */
+export async function pushEspaLuzContentActivityToHubSpot(input: {
+  dealName: string;
+  context?: string;
+  crmMeta?: import('./atlas-crm-bridge').HubSpotCrmMeta;
+}): Promise<{ contactId: string | null; dealId: string | null } | null> {
+  if (!HS_KEY()) {
+    console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping EspaLuz content CRM push');
+    return null;
+  }
+  const dealName = input.dealName.trim();
+  if (!dealName) {
+    console.warn('[HubSpot] EspaLuz content deal missing name — skipping');
+    return null;
+  }
+  if (!dealName.startsWith('[ESPALUZ]')) {
+    console.log(`[HubSpot] EspaLuz content skip (not [ESPALUZ] prefix): ${dealName.slice(0, 80)}`);
+    return null;
+  }
+  try {
+    const existing = await findDealByName(dealName);
+    if (existing?.id) {
+      console.log(`[HubSpot] EspaLuz content deal exists (${existing.id}): ${dealName}`);
+      const dup = { contactId: null as string | null, dealId: existing.id };
+      const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+      attachHubSpotToAtlasLoop('espaluz', dup, input.crmMeta ?? {
+        source: 'espaluz_influencer',
+        pipeline: 'client',
+        type: 'engagement',
+        atlas_concept_id: null,
+        utm_term: null,
+        utm_campaign: null,
+      }, 'duplicate');
+      return dup;
+    }
+    const actionNote = [
+      `<strong>📣 ESPALUZ INFLUENCER — daily post</strong>`,
+      `<strong>Deal:</strong> ${escHs(dealName)}`,
+      input.context ? `<strong>Context:</strong> ${escHs(input.context.slice(0, 800))}` : '',
+      '',
+      `<strong>--- NOTE ---</strong>`,
+      `Content activity under [ESPALUZ] (not a user trial). WA/TG trials stay separate.`,
+    ].filter(Boolean).join('<br>');
+    const dealId = await createDeal({
+      name: dealName,
+      stage: HS_STAGES.prospected,
+      dealType: 'newbusiness',
+      description: input.context?.slice(0, 1000) || undefined,
+    });
+    if (dealId) await addNoteToDeal(dealId, actionNote);
+    console.log(`[HubSpot] EspaLuz content deal created: ${dealName}`);
+    const out = { contactId: null as string | null, dealId };
+    const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+    attachHubSpotToAtlasLoop('espaluz', out, input.crmMeta ?? {
+      source: 'espaluz_influencer',
+      pipeline: 'client',
+      type: 'engagement',
+      atlas_concept_id: null,
+      utm_term: null,
+      utm_campaign: null,
+    }, 'created');
+    return out;
+  } catch (err) {
+    console.error('[HubSpot] pushEspaLuzContentActivityToHubSpot error:', err);
+    return null;
+  }
+}
+
 /** EspaLuz TG/WA users — product trials, not CTO client prospects. Bypass client gate. */
 export async function pushEspaLuzDealToHubSpot(input: {
   channel: 'telegram' | 'whatsapp';
