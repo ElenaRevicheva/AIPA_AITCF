@@ -8378,6 +8378,13 @@ _/daily for full briefing_`;
   }, { timezone: 'America/Panama' });
   cronJobs.push(freshLeadsCron);
 
+  // Web chat on aideazz.xyz → Telegram alert + same HubSpot/Fable path as the
+  // portfolio form. Isolated module with its own state and try/catch: if it fails,
+  // nothing here or in /marketing/inquiry is affected.
+  void import('./chat-concierge.js')
+    .then(m => m.startChatConcierge())
+    .catch(e => console.warn('[chat-concierge] not started:', (e as Error).message?.slice(0, 100)));
+
   console.log('📅 Scheduled tasks started');
 }
 
