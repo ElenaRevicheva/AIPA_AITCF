@@ -612,7 +612,7 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | **`_redirects` `.gitignore` seal** | DONE | `public/_redirects`: added `/.gitignore / 301` rule **before** the `/* /index.html 200` catch-all. Root cause: catch-all was serving the React app at HTTP 200 for `/.gitignore` — Google indexed it. `robots.txt Disallow` only prevents crawling, does not block serving. GSC URL removal also submitted. |
 | **404 noindex fix** | DONE | `src/App.tsx`: `<Route path="*">` was a bare `<div>404 - Page Not Found</div>` that never invoked `NotFound.tsx`. Imported `NotFound` and wired it. `NotFound.tsx` already had `applyPageSeo({ robots: "noindex, follow" })` — it just wasn't being used. |
 | **hreflang EN/ES** | DONE | `index.html`: added three `<link rel="alternate" hreflang="...">` tags — `en`, `es`, `x-default` all pointing to `https://aideazz.xyz/`. Site serves both languages at same URLs via i18next browser/localStorage detection; hreflang signals both to Google and avoids duplicate-content penalty for the bilingual content. |
-| **Cloudflare HTTP 301 www→apex** | DONE (Apr 18) | Cloudflare Redirect Rules: `www.aideazz.xyz*` → `https://aideazz.xyz/$1`, 301 Permanent, preserve query string. www CNAME added (proxied/orange cloud). Verified via httpstatus.io and browser. |
+| **Cloudflare HTTP 301 www→apex** | **BROKEN again (Jul 21 2026)** — was DONE Apr 18 | Apr 18 rule missing live: `www` HTTPS returns **200** on Bunny zone **5088110** (old IPFS CID), while apex is zone **5088105** (fresh). JS redirect in `main.tsx` cannot help until CF 301 is restored (old pin has no that JS). **Restore:** CF → aideazz.xyz → Rules → Redirect Rules → hostname `www.aideazz.xyz` → `https://aideazz.xyz` + path, **301**. See resilience doc §Frontend serving chain Jul 21 incident. |
 
 **How to check (non-dev guide) — all of Phase 1 redirects + hreflang:**
 1. Go to **https://httpstatus.io** → type `www.aideazz.xyz` → click **Check status**. Should show **301** → **200**. That means www redirects permanently to apex.
@@ -2033,3 +2033,50 @@ Same day, the public proof artifacts this engine points at were actualized: SOP 
 state incl. bilingual blog pipeline + Bright Data + 3-tier failover), portfolio positioning now
 names **AI Marketing** explicitly ("Agents · AI Marketing · CRM & Revenue Automation"), and the
 blog + podcast got first-screen proof buttons under the portfolio architecture diagram.
+
+---
+
+## July 26–27 2026 — Inbound now closes itself: two entry points, one concierge cycle (LIVE)
+
+The engine could always *find* prospects. What it could not do was catch the ones who came to
+**us** — the highest-intent traffic there is. Three people had written into the site chat and were
+never seen by anyone: *"i want to create my ai agent"*, *"I want my own CRM"*, *"i want ai agent on
+personal psychological help"*. They sat in the HubSpot inbox with no ping, no CRM record, no reply.
+
+**Now both inbound entry points run the identical cycle:**
+
+| Step | Portfolio UTM form | Web chat bubble (new) |
+|---|---|---|
+| Entry | `/marketing/inquiry-proxy` | HubSpot chat on aideazz.xyz |
+| Alert to Elena | Telegram (instant) | Telegram (≤3 min poll) |
+| CRM | `[CLIENT-CTO-INQUIRY] {name} — outreach` | same |
+| Visitor gets | "We received your inquiry — AIdeazz" | same |
+| Elena's Zoho copy | "[AIdeazz] Inquiry — {name}" | same |
+| Draft | Make → Fable 5, ✅ Send button | same (Make), or cto-aipa fallback in ~3 min |
+| Send | tap ✅ → Resend from `aipa@aideazz.xyz` | same |
+| CRM trail | HubSpot **EMAIL activity** + ✅ ENTREGADO stamp | same |
+
+**The one rule that decides who drafts:** Make watches HubSpot *Contacts CREATED*. A first-time
+person is created → Make drafts. Someone already in the CRM is only updated → Make cannot fire, so
+cto-aipa drafts instead and posts to `/concierge/draft`, producing the same card with the same
+Send button. Returning prospects are the most valuable ones; they were the ones getting silence.
+
+**What "delivered" now means.** Previously a reply was marked sent the moment Resend *accepted* the
+API call. Dental Connect's mail was **suppressed** — never delivered — while HubSpot showed
+⏳ Sent + `📧 EMAILED`. The Resend webhook now writes the truth onto the deal note (`✅ ENTREGADO`,
+`⛔ REBOTE`, `🚫 QUEJA`, `👀 ABIERTO`, `🔗 CLIC`), raises a HIGH task on a bounce, and an hourly
+reconcile catches suppressed sends, which emit no webhook at all.
+
+**Follow-up track (the 95 CLIENT-MANUAL deals), same days:** every deal note now carries two
+one-click buttons — `✉️ EMAIL FU` (preview → Send → deal auto-stamped) and `➡️ WHATSAPP FU
+(laptop)`. 94/95 installed. Every claim in all 88 FU messages was verified against Elena's own
+audit data by `scripts/_verify-fu-claims.cjs` — **88/88 clean**: no invented money query, no
+domain unless the audit note names it, no category score unless parsed, channel wording matching
+the actual note stamps. WhatsApp stays **laptop-only** by decision after Meta restricted her
+linked devices; cold first-touch at volume belongs on email.
+
+**Site changes that made this possible:** HubSpot chat installed on aideazz.xyz (one loader in
+`index.html`, SPA so it covers `/`, `/portfolio`, `/api`), WhatsApp float moved bottom-left and
+finally added to the homepage, scroll-top button lifted clear of the chat launcher. GA4, OG tags
+(exactly one `og:image` / `og:image:width`), 6 JSON-LD blocks, canonicals, hreflang, llms.txt,
+geo-manifest.json and robots.txt verified byte-identical after every deploy.

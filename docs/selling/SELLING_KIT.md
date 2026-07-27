@@ -166,3 +166,35 @@ Basic $250 (audit + scorecard) · Standard $500 (audit + schema/FAQ JSON-LD fixe
 ---
 
 *Kit created July 11 2026 from: Upwork In-Demand Skills 2026 report, Infobip LATAM Messaging Trends 2026, Conductor State of AEO/GEO 2026, Fiverr/agency pricing guides 2026, and the July 10 live HubSpot/agent audit (verify-from-logs).*
+
+---
+
+## 8. INBOUND CONCIERGE — the demo that sells the offer (LIVE July 26–27 2026)
+
+**Why this belongs in the kit:** it is the AI Growth Operator, running on Elena's own site, that a
+prospect can trigger themselves. Best possible proof: *"write in the chat on my site and watch what
+happens — that is what I install in yours."*
+
+**What a prospect sees:** they write in the bubble (or the portfolio form), and within seconds get
+*"We received your inquiry — AIdeazz"*. Nothing is lost if they close the tab.
+
+**What Elena sees:** Telegram ping with their message (≤3 min), a HubSpot deal
+`[CLIENT-CTO-INQUIRY] {name} — outreach`, then a Fable 5 draft with a ✅ **Send** button. One tap
+sends from `aipa@aideazz.xyz`, logs a HubSpot **EMAIL activity**, and stamps `✅ ENTREGADO` on the
+deal when Resend confirms delivery — or `⛔ REBOTE` + a task if it never arrived.
+
+**The line to use on a call:** *"Most agencies stop at traffic. This is the part after traffic —
+the message gets answered, the person gets a receipt, the deal gets created, the reply gets drafted,
+and the CRM knows whether it actually landed. Nobody on your team touched it."*
+
+**Honest caveats — say them, they build trust:**
+- The draft is **assisted, not autonomous**: Elena taps Send. Nothing goes to a prospect unreviewed.
+- Delivery ≠ interest. The engine proves the message arrived; it cannot promise a reply.
+- WhatsApp is **laptop-only** and reserved for people who already replied — cold WhatsApp at volume
+  gets accounts restricted (Meta restricted Elena's linked devices on July 25; the rollback is
+  documented in the resilience doc).
+
+**Live artifacts for a demo:** chat bubble on aideazz.xyz + /portfolio · the deal note's two
+one-click FU buttons on 94 of 95 CLIENT-MANUAL deals · `scripts/_verify-fu-claims.cjs` output
+(**88/88** messages traceable to real audit data, zero fabrication) · the Resend dashboard next to
+the deal's Emails tab, showing the same send from both sides.

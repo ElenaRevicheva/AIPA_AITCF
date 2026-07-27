@@ -1736,3 +1736,98 @@ per-poem shots into a finished film, all on Oracle via ffmpeg (ffmpeg 6.1.1 + ff
 
 **First film: `finding-paradise` — 97s, 5 shots, 12.8MB, full poem VO + melancholic ambient score.**
 Backup tag `atuona-pre-filmcompiler-20260615`. Restore points clean; existing engines untouched.
+
+---
+
+## July 26–27 2026 — Inbound concierge: HubSpot web chat + Resend delivery truth (LIVE)
+
+**What changed:** aideazz.xyz got a HubSpot chat bubble, and both inbound tracks (portfolio UTM
+form + web chat) now end in the same place — a Telegram draft with a ✅ Send button, a Resend
+send, a HubSpot **EMAIL activity**, and a delivery stamp. Files: `src/chat-concierge.ts` (new),
+`src/resend-webhook.ts` (new), `src/concierge.ts`, `src/go-wa.ts`, `src/hubspot-client.ts`.
+
+### The rule that governs BOTH tracks (learned the hard way)
+
+> **Make's Lead Concierge trigger is HubSpot `Watch CRM Objects → Contacts CREATED`.**
+> A first-time person is **created** → Make drafts. A person already in the CRM is only
+> **updated** → **Make never fires**. Proven July 27: Malina Choke (`espaluztester@`) wrote on
+> Jul 16 (new contact → draft sent) and again via chat (existing contact → silence).
+
+Elena's four test inboxes hide this, because `isConciergeTestEmail()` force-recreates them
+(delete + create) so Make fires every time: `adamvelena@`, `marinakulaginabowen@`,
+`kiravelerevich@`, `espaluztester@` (added Jul 27). **All four are hers — never add a real
+prospect, their history is destroyed on every touch.**
+
+**Fix (`dc5465f`):** `chat-concierge` checks `findContactByEmail()` **before** pushing.
+New contact or allowlisted tester → Make drafts, unchanged. Existing contact → cto-aipa drafts
+and POSTs to its own `/concierge/draft` (Bearer `CONCIERGE_SECRET`, form-urlencoded,
+`claude_output` in Fable's `SUBJECT:` / `DRAFT REPLY:` shape) → identical Telegram card with the
+Send button. Never both.
+
+### `src/chat-concierge.ts` — web chat watcher
+
+Polls `conversations/v3/conversations/threads` every `CHAT_CONCIERGE_POLL_MS` (default 180s),
+state in `data/chat-concierge-state.json` (gitignored). Per new INCOMING message: Telegram ping →
+HubSpot lead (`[CLIENT-CTO-INQUIRY] {name} — outreach`, `aideazz_web_chat` source) → visitor
+acknowledgment via `scheduleMarketingInquiryEmails` (the same pair the form sends: visitor
+confirmation + `aipa@` copy that lands in Zoho).
+
+Three traps found live, all fixed:
+- **No email on the sender.** Chat messages carry `CHANNEL_SPECIFIC_OPAQUE_ID`; the identity is on
+  the thread's `associatedContactId` → resolve the contact for email + name.
+- **Email arrives AFTER the message.** Visitors type first, leave the email seconds later, so the
+  poll that catches the message often sees an anonymous thread. `pendingIdentity` re-checks those
+  threads every poll and pushes when the contact appears (gives up after `MAX_AGE_MS`, 24h).
+  Without it the message is marked seen and the lead never reaches the CRM.
+- **One deal per conversation.** The first run created three deals for one person's three lines;
+  `pushedThreads` guards it (later messages still alert, no new deal).
+
+HubSpot seeds every inbox with a sample thread (`emailmaria@hubspot.com`) — skipped by
+`isHubSpotSample()`. `pollChatOnce({ dryRun: true })` prints what would be sent, writes nothing.
+
+### `src/resend-webhook.ts` — acceptance is NOT delivery
+
+Dental Connect's sends were **Suppressed** by Resend while HubSpot read ⏳ Sent + `📧 EMAILED`.
+`POST /cto/resend/webhook` (Svix-signed, `RESEND_WEBHOOK_SECRET` in Oracle `.env`) stamps the
+**outreach note** — at the TOP, under the FU buttons — with `✅ ENTREGADO` / `⛔ REBOTE` /
+`🚫 QUEJA` / `👀 ABIERTO` / `🔗 CLIC`; bounce and complaint also raise a HIGH task and flip the
+logged email SENT → BOUNCED. Signature verified manually (no svix dep): valid 200, forged 401,
+unsigned 401, replayed 401.
+
+**Suppressed sends emit NO webhook at all** → `scripts/resend-reconcile.cjs` (cron `17 * * * *`,
+log `~/logs/resend-reconcile.log`) polls `GET /emails/{id}` for recent ledger entries and stamps
+`⛔ SUPRIMIDO` + a task. Ledger: `data/resend-ledger.json` (resendId → dealId/engagementId).
+
+### HubSpot EMAIL activities — the `hs_email_headers` gotcha
+
+A note is not an email: agent-sent replies were invisible in the deal's **Emails** tab. Both
+senders (`/go/outreach-email/:slug/send` and the concierge) now call `logEmailEngagement()`.
+**From/to MUST go in `hs_email_headers` JSON** — the flat `hs_email_from_email` /
+`hs_email_to_email` properties are rejected **400** ("derived from the hs_email_headers
+property"). That 400 silently killed a 89-row backfill attempt; no backfill was performed
+(deliberate — existing notes stay, only new sends get activities).
+
+### Site-side gotchas (repo `aideazz`)
+
+- **HubSpot loader is CDN-cached.** After publishing a chatflow, `js-na1.hs-scripts.com/51409153.js`
+  kept serving a stale 1893-byte copy with **no** `conversations-embed` (`cf-cache-status: HIT`,
+  `Age` climbing with the clock) — so the widget could not appear for **any** visitor, incognito
+  included. Fix: version the URL — `…/51409153.js?v=20260726` is a different cache key and returns
+  the current 2352-byte build. Bump the date if a future chatflow change is ever stuck.
+- **Widget collisions.** HubSpot's launcher is hard-anchored bottom-right at z-index ~2.1e9.
+  `WhatsAppFloat` moved to **bottom-left** (both `/portfolio` and, added Jul 27, the homepage —
+  it had never been mounted on `Index.tsx`), and `ScrollProgress` moved `bottom-8` → `bottom-28`
+  so the scroll-top button is not hidden behind the chat bubble (`Index.tsx` only, `/portfolio`
+  untouched).
+- **Collected Forms** ships with the tracking script and captures the portfolio inquiry form
+  directly — turn it off (Settings → Tracking & Analytics → Tracking Code → Collected Forms) or it
+  creates contacts in parallel with the cto-aipa → Fable pipeline.
+
+### Markdown in drafts
+
+Fable emits `**bold**`, which renders as literal asterisks in the prospect's email.
+`stripMarkdownEmphasis()` in `parseClaudeOutput` removes `**`/`*`/`__` for **every** draft (Make's
+and ours); `- bullets` and `5*3` are preserved.
+
+**Restore points:** tags `pre-chat-concierge-20260727` (cto-aipa), `pre-hubspot-chat-20260726`
+(aideazz); zips in `D:\aideazz\_backups\`.
