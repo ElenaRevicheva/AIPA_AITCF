@@ -42,6 +42,16 @@ type State = {
    * many messages the visitor sends. The first live run created three deals for
    * Irinsa's three lines; Elena needs one prospect, not a deal per sentence. */
   pushedThreads?: string[];
+  /**
+   * Threads alerted while still anonymous, waiting for an identity.
+   *
+   * Visitors type the message FIRST and leave their email a moment later, so the
+   * poll that catches the message often sees no contact yet (proven live July 27:
+   * thread 11024960536 was alerted at 16:02 with no email, and
+   * kiravelerevich@gmail.com only appeared afterwards). Without this the message
+   * is marked seen and the lead never reaches the CRM.
+   */
+  pendingIdentity?: { threadId: string; firstSeen: string }[];
   lastRunAt?: string;
 };
 
@@ -51,10 +61,11 @@ function readState(): State {
     return {
       seen: Array.isArray(s.seen) ? s.seen.slice(-500) : [],
       pushedThreads: Array.isArray(s.pushedThreads) ? s.pushedThreads.slice(-200) : [],
+      pendingIdentity: Array.isArray(s.pendingIdentity) ? s.pendingIdentity.slice(-100) : [],
       ...(s.lastRunAt ? { lastRunAt: s.lastRunAt } : {}),
     };
   } catch {
-    return { seen: [], pushedThreads: [] };
+    return { seen: [], pushedThreads: [], pendingIdentity: [] };
   }
 }
 
@@ -67,6 +78,7 @@ function writeState(s: State): void {
         {
           seen: s.seen.slice(-500),
           pushedThreads: (s.pushedThreads || []).slice(-200),
+          pendingIdentity: (s.pendingIdentity || []).slice(-100),
           lastRunAt: new Date().toISOString(),
         },
         null,
@@ -362,8 +374,75 @@ export async function pollChatOnce(
       }
     } else if (m.email && alreadyPushed) {
       console.log(`[chat-concierge] thread ${m.threadId} already in HubSpot — alert only, no second deal`);
+    } else if (!m.email && !alreadyPushed) {
+      // Anonymous for now — remember the thread and pick the identity up later.
+      const pend = state.pendingIdentity || [];
+      if (!pend.some(p => p.threadId === m.threadId)) {
+        state.pendingIdentity = [...pend, { threadId: m.threadId, firstSeen: new Date().toISOString() }];
+        console.log(`[chat-concierge] thread ${m.threadId} has no email yet — will re-check for identity`);
+      }
     }
   }
+
+  // Second pass: threads alerted while anonymous. The visitor usually leaves an
+  // email seconds later, long after their message was marked seen.
+  const stillPending: { threadId: string; firstSeen: string }[] = [];
+  for (const p of state.pendingIdentity || []) {
+    if ((state.pushedThreads || []).includes(p.threadId)) continue; // resolved elsewhere
+    if (Date.now() - Date.parse(p.firstSeen) > MAX_AGE_MS) {
+      console.log(`[chat-concierge] thread ${p.threadId} stayed anonymous — giving up on identity`);
+      continue;
+    }
+    try {
+      const th = await hs(`/conversations/v3/conversations/threads/${p.threadId}`);
+      if (!th?.associatedContactId) {
+        stillPending.push(p);
+        continue;
+      }
+      const c = await hs(
+        `/crm/v3/objects/contacts/${th.associatedContactId}?properties=email,firstname,lastname`,
+      );
+      const email = c?.properties?.email;
+      if (!email) {
+        stillPending.push(p);
+        continue;
+      }
+      const msgs = await hs(`/conversations/v3/conversations/threads/${p.threadId}/messages?limit=20`);
+      const firstIncoming = (msgs?.results || []).find(
+        (x: any) => x.type === 'MESSAGE' && x.direction === 'INCOMING' && String(x.text || '').trim(),
+      );
+      const m2: VisitorMessage = {
+        messageId: String(firstIncoming?.id || p.threadId),
+        threadId: p.threadId,
+        text: String(firstIncoming?.text || '').trim(),
+        email,
+        name: [c?.properties?.firstname, c?.properties?.lastname].filter(Boolean).join(' ').trim() || null,
+        createdAt: firstIncoming?.createdAt || p.firstSeen,
+      };
+      if (dry) {
+        console.log(`[chat-concierge] (dry) would now push late identity ${email} for thread ${p.threadId}`);
+        stillPending.push(p);
+        continue;
+      }
+      const hsRes = await pushChatLeadToHubSpot(m2);
+      if (hsRes?.dealId) {
+        result.pushed++;
+        state.pushedThreads = [...(state.pushedThreads || []), p.threadId];
+        console.log(
+          `[chat-concierge] late identity resolved — HubSpot lead ${email} (deal ${hsRes.dealId}, thread ${p.threadId})`,
+        );
+        await telegramToOwners(
+          `📧 Email captured for an earlier chat\n\n👤 ${m2.name || email}\n📧 ${email}\n\n"${m2.text.slice(0, 400)}"\n\nNow in HubSpot — you can reply by email.`,
+        );
+      } else {
+        stillPending.push(p);
+      }
+    } catch (e) {
+      console.warn('[chat-concierge] identity re-check failed:', (e as Error).message?.slice(0, 90));
+      stillPending.push(p);
+    }
+  }
+  state.pendingIdentity = stillPending;
 
   if (!dry) writeState(state); // a dry run must leave the queue untouched
   if (result.found) {
