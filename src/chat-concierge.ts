@@ -310,6 +310,33 @@ async function draftReply(m: VisitorMessage): Promise<string | null> {
   }
 }
 
+/**
+ * Same acknowledgment pair the portfolio form sends (July 27 2026, Elena's call):
+ *   → visitor: "We received your inquiry — AIdeazz"
+ *   → aipa@aideazz.xyz: "[AIdeazz] Inquiry — {name}" (this is what lands in Zoho)
+ *
+ * A chat visitor who leaves an email currently gets nothing back, so from their
+ * side the message vanished. Fires once per conversation — it is called only on
+ * the push, which the one-deal-per-thread guard already limits to once.
+ */
+function sendVisitorAck(m: VisitorMessage): void {
+  if (!m.email) return;
+  try {
+    void import('./marketing-notify.js').then(({ scheduleMarketingInquiryEmails }) => {
+      scheduleMarketingInquiryEmails(`chat-${m.threadId}`, {
+        ...(m.name ? { name: m.name } : {}),
+        contactEmail: m.email as string,
+        ...(m.text ? { message: m.text } : {}),
+        utm_source: 'aideazz_web_chat',
+        page_url: 'https://aideazz.xyz/portfolio',
+      });
+      console.log(`[chat-concierge] acknowledgment queued for ${m.email} (+ team copy to aipa@)`);
+    });
+  } catch (e) {
+    console.warn('[chat-concierge] acknowledgment failed:', (e as Error).message?.slice(0, 90));
+  }
+}
+
 export async function pollChatOnce(
   opts: { dryRun?: boolean } = {},
 ): Promise<{ found: number; alerted: number; pushed: number; skipped: number }> {
@@ -368,6 +395,7 @@ export async function pollChatOnce(
           result.pushed++;
           state.pushedThreads = [...(state.pushedThreads || []), m.threadId];
           console.log(`[chat-concierge] HubSpot lead from web chat: ${m.email} (deal ${hsRes.dealId})`);
+          sendVisitorAck(m);
         }
       } catch (e) {
         console.warn('[chat-concierge] HubSpot push failed:', (e as Error).message?.slice(0, 100));
@@ -431,6 +459,7 @@ export async function pollChatOnce(
         console.log(
           `[chat-concierge] late identity resolved — HubSpot lead ${email} (deal ${hsRes.dealId}, thread ${p.threadId})`,
         );
+        sendVisitorAck(m2);
         await telegramToOwners(
           `📧 Email captured for an earlier chat\n\n👤 ${m2.name || email}\n📧 ${email}\n\n"${m2.text.slice(0, 400)}"\n\nNow in HubSpot — you can reply by email.`,
         );
