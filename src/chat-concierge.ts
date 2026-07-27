@@ -15,16 +15,17 @@
  *      aideazz_lead_kind=portfolio_inquiry — the exact stamp the form uses, so
  *      Make's Contacts/Created watch fires Fable 5 and drops the draft in Telegram
  *
+ *   4. sends the visitor the same acknowledgment pair the form sends (their
+ *      "We received your inquiry" + the aipa@ copy that lands in Zoho)
+ *
+ * It does NOT draft the reply — Make does, and its draft carries the ✅ Send
+ * button that actually sends and produces the HubSpot Email activity + ENTREGADO
+ * stamp. This module is the instant "someone is on your site" ping.
+ *
  * What it deliberately does NOT do:
  *   - never writes into the conversation
- *   - never emails the visitor (no auto-reply without Elena's word)
  *   - never touches /marketing/inquiry or its state; separate module, separate
  *     state file, own try/catch. If this throws, the form path is unaffected.
- *
- * Known limit, identical to the form: Make fires on Contacts/CREATED, so a repeat
- * visitor whose email is already a contact gets no Fable draft until
- * MAKE_CONCIERGE_WEBHOOK_URL is set on Oracle (it is not, as of today). The
- * Telegram alert in step 2 fires regardless — that is the part that never fails.
  */
 import fs from 'fs';
 import path from 'path';
@@ -235,80 +236,17 @@ async function pushChatLeadToHubSpot(m: VisitorMessage): Promise<{ contactId: st
 }
 
 /**
- * The reply draft, generated here rather than in Make.
+ * Drafting is Make's job, deliberately (Elena, July 27 2026).
  *
- * The form path relies on Make's Contacts/CREATED watch to trigger Fable 5. That
- * can never fire for web chat: HubSpot creates the contact itself the moment the
- * visitor leaves an email (verified — Irinsa's contact predates her chat by two
- * weeks). So the draft is produced locally through the fleet's resilience chain
- * (Claude → Groq → Gemini), which matters because the Anthropic key is dry.
+ * A locally generated draft was tried and removed: it arrived ~12 minutes earlier
+ * but as plain text she could not act on, while Make's Fable 5 draft lands with the
+ * ✅ Send button that actually sends the reply and produces the HubSpot Email
+ * activity + ENTREGADO stamp. Two drafts for one message was noise, so this module
+ * now only pings — Make owns the reply.
  *
- * If MAKE_CONCIERGE_WEBHOOK_URL is ever set, Make owns the draft again and this
- * returns null — Elena must never receive two different drafts for one message.
+ * The chat push stamps [AIDEAZZ-FORM] via pushLeadToHubSpot, which is exactly what
+ * Make's filter watches, so chat leads enter the same concierge cycle as the form.
  */
-async function draftReply(m: VisitorMessage): Promise<string | null> {
-  if (process.env.MAKE_CONCIERGE_WEBHOOK_URL?.trim()) return null;
-  try {
-    const Anthropic = (await import('@anthropic-ai/sdk')).default;
-    const { claudeWithGroqFallback } = await import('./llm-resilience.js');
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'missing' });
-    const first = (m.name || m.email || 'there').split(/[\s@]/)[0];
-    const system =
-      'You are Elena Revicheva writing a short first reply to someone who just messaged the chat on her site ' +
-      'aideazz.xyz. Elena is an AI engineer in Panama who installs an AI Growth Operator for service businesses ' +
-      '(AI search visibility, prospect research, outreach, follow-up, WhatsApp qualification, CRM, daily briefing). ' +
-      'Rules: warm and direct, max 90 words, no bullet lists, no marketing adjectives, never promise results, ' +
-      'answer what they actually asked, end by offering a 15-minute call. Reply in the language they wrote in. ' +
-      'Output only the message body, no subject line, no signature.';
-    const userPrompt = `Their message: "${m.text}"\nTheir name: ${first}`;
-    try {
-      const text = await claudeWithGroqFallback(anthropic, 'claude-opus-5', 400, system, userPrompt, 'chat-concierge/draft');
-      if (text?.trim()) return text.trim();
-    } catch (e) {
-      // claudeWithGroqFallback only falls back on credit exhaustion / dead model —
-      // an invalid or missing key (401) rethrows, which would silently cost the
-      // draft. A prospect waiting is worth one more attempt on a live provider.
-      console.warn('[chat-concierge] Claude path failed:', (e as Error).message?.slice(0, 90));
-    }
-
-    const groqKey = process.env.GROQ_API_KEY?.trim();
-    if (groqKey) {
-      try {
-        const { groqModel } = await import('./llm-resilience.js');
-        const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: groqModel(),
-            max_tokens: 400,
-            messages: [
-              { role: 'system', content: system },
-              { role: 'user', content: userPrompt },
-            ],
-          }),
-        });
-        if (r.ok) {
-          const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };
-          const t = j.choices?.[0]?.message?.content?.trim();
-          if (t) return t;
-        }
-      } catch (e) {
-        console.warn('[chat-concierge] Groq draft failed:', (e as Error).message?.slice(0, 90));
-      }
-    }
-
-    try {
-      const { geminiComplete } = await import('./llm-resilience.js');
-      const t = await geminiComplete(system, userPrompt, 400, 'chat-concierge/draft');
-      return t?.trim() ? t.trim() : null;
-    } catch {
-      return null;
-    }
-  } catch (e) {
-    console.warn('[chat-concierge] draft failed:', (e as Error).message?.slice(0, 100));
-    return null;
-  }
-}
 
 /**
  * Same acknowledgment pair the portfolio form sends (July 27 2026, Elena's call):
@@ -358,8 +296,7 @@ export async function pollChatOnce(
       result.skipped++;
       continue;
     }
-    // 1. Alert first — this must survive any CRM or LLM failure.
-    const draft = await draftReply(m);
+    // 1. Alert first — this must survive any CRM failure.
     const alert = [
       `💬 New chat message on aideazz.xyz`,
       ``,
@@ -368,10 +305,13 @@ export async function pollChatOnce(
       ``,
       `💬 They wrote:`,
       `"${m.text.slice(0, 900)}"`,
-      ...(draft ? [``, `✍️ Draft reply:`, `──────────`, draft, `──────────`] : []),
+      ``,
+      m.email
+        ? `✍️ Fable 5 draft with the ✅ Send button follows from Make (~15 min).`
+        : `⚠️ No email yet — answer in the chat while their tab is still open. If they leave one, I'll ping you again.`,
       ``,
       `Reply here: ${INBOX_URL}/inbox/${m.threadId}`,
-      m.email ? `Or by email: ${m.email}` : `⚠️ No email — answer in the chat while their tab is still open.`,
+      m.email ? `Or by email: ${m.email}` : null,
     ]
       .filter(l => l !== null)
       .join('\n');
