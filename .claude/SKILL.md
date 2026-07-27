@@ -1,5 +1,39 @@
 # SKILL.md — AI Tech Co-Founder Operating Manual
-> Last updated: 2026-06-23 | Repo: https://github.com/ElenaRevicheva/AIPA_AITCF | Working dir: `D:\aideazz\ai-cofounders\cto-aipa`
+> Last updated: 2026-07-27 | Repo: https://github.com/ElenaRevicheva/AIPA_AITCF | Working dir: `D:\aideazz\ai-cofounders\cto-aipa`
+
+---
+
+## 🎯 CURRENT REALITY — READ THIS FIRST (July 27 2026)
+
+**The building era is over. Elena runs TWO money tracks in parallel — both are first-class:**
+
+| Track | Goal | Where it lives |
+|---|---|---|
+| **SELL** | Paying clients for the **AI Growth Operator** (one product; AI search visibility, prospect research, outreach + follow-up, WhatsApp qualification, CRM, daily briefing are *modules*, not separate SKUs) | `docs/selling/SELLING_KIT.md` · `docs/selling/MANUAL_PROSPECT_PLAY.md` · `docs/selling/PANAMA_TARGET_PROSPECTS.md` · HubSpot `[CLIENT-MANUAL]` |
+| **HIRED** | A role — she is actively job-hunting, this is not historical | VibeJobHunter (`VibeJobHunterAIPA_AIMCF`) · HubSpot `[HIRING-*]` · portfolio + resume |
+
+**Golden rule (July 11 2026):** before any action ask *"which paying human — client or employer —
+does this move closer?"* Building for its own sake fails the test.
+
+**Do not pitch her as an ML researcher.** Her three lanes: AI-augmented builder · GEO/AEO/tech-SEO ·
+AI-automation solutions architect.
+
+### What exists now that this manual predates
+
+- **Manual Prospect Play** — ~95 `[CLIENT-MANUAL]` deals, each with an audit-led outreach note and
+  **two one-click FU buttons** (`✉️ EMAIL FU` via Resend, `➡️ WHATSAPP FU (laptop)`).
+  **WhatsApp is laptop-only by decision** after Meta restricted her linked devices (July 25) —
+  never rebuild a mobile WhatsApp bridge without her explicit go-ahead.
+- **Inbound concierge (July 26–27)** — portfolio UTM form **and** the new HubSpot chat bubble on
+  aideazz.xyz both run one cycle: Telegram ping → `[CLIENT-CTO-INQUIRY]` deal → visitor
+  acknowledgment → Fable 5 draft with ✅ Send → Resend → HubSpot EMAIL activity + `✅ ENTREGADO`.
+  New modules: `src/chat-concierge.ts`, `src/resend-webhook.ts`, plus `src/concierge.ts`.
+  **Make's trigger is HubSpot Contacts CREATED** — a returning contact is only *updated*, so
+  cto-aipa drafts the fallback itself. Full detail: `docs/oracle/ORACLE_ALL_PRODUCTS_RESILIENCE.md`
+  → "July 26–27 2026 — Inbound concierge".
+- **No fabrication rule** — every claim in prospect-facing text must trace to Elena's own audit
+  data (`scripts/_verify-fu-claims.cjs`, currently 88/88 clean). No invented money query, no
+  unverified domain, no unproven score.
 
 ---
 
@@ -169,6 +203,17 @@ src/
 │                        #       batchEnrichLeads(), isBrightDataConfigured()
 │                        #       Zone: web_unlocker1, $1.50/CPM, max 10/run, 1 req/s
 ├── telegram-bot.ts      # CTO Telegram bot (Grammy) — 6k+ lines, monolithic (known debt)
+├── concierge.ts         # Lead Concierge — Make/Fable 5 POSTs a draft to /concierge/draft,
+│                        # Telegram card with ✅ Send → Resend → HubSpot EMAIL activity.
+│                        # parseClaudeOutput strips markdown ** from EVERY draft.
+├── chat-concierge.ts    # NEW Jul 27 — HubSpot web-chat watcher (3-min poll). Telegram ping,
+│                        # [CLIENT-CTO-INQUIRY] deal, visitor acknowledgment, and a fallback
+│                        # draft when the contact already exists (Make fires on CREATED only).
+│                        # State: data/chat-concierge-state.json. pollChatOnce({dryRun:true}).
+├── resend-webhook.ts    # NEW Jul 26 — POST /resend/webhook (Svix-signed). delivered/bounced/
+│                        # complained → stamp at the TOP of the outreach note + HIGH task.
+│                        # logEmailEngagement() — from/to MUST go in hs_email_headers (flat
+│                        # hs_email_*_email properties 400). Ledger: data/resend-ledger.json.
 └── atuona-creative-ai.ts # Creative AI bot (Grammy) — persistent emotional/creative state
 ```
 
@@ -194,6 +239,16 @@ Post GitHub comment + save to Oracle + notify CMO AIPA
 ```
 
 ### Model Routing
+
+> **Model ids — live-probed on Oracle July 27 2026, ALL return 200:** `claude-opus-4-8`,
+> `claude-opus-5`, `claude-sonnet-5`, `claude-haiku-4-5-20251001`, `claude-fable-5`.
+> The table below matches what the code actually calls (`claude-opus-4-8`, 6 call sites);
+> newer code uses `claude-opus-5` (`chat-concierge.ts`). **Never swap a model id from memory —
+> probe first**, then `grep dist/` to confirm the built output changed. A decommissioned id
+> surfaces as a 404 `not_found_error`, which `llm-resilience.ts` reports accurately.
+> ⚠️ Anthropic credits have been dry before: `claudeWithGroqFallback()` falls back on credit
+> exhaustion and dead models, **but rethrows on 401** — an invalid key kills the call silently.
+
 | Task | Model | Why |
 |------|-------|-----|
 | Critical code review (security, payment) | claude-opus-4-8 | Best reasoning |
