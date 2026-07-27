@@ -218,6 +218,8 @@ export function insertNoteStamp(body: string, stampHtml: string): string {
  */
 export async function logEmailEngagement(input: {
   dealId?: string | undefined;
+  /** Pass when the caller already knows the contact (Lead Concierge does). */
+  contactId?: string | undefined;
   to: string;
   subject: string;
   body: string;
@@ -250,16 +252,20 @@ export async function logEmailEngagement(input: {
       await hs('PUT', `/crm/v4/objects/emails/${created.id}/associations/default/deals/${input.dealId}`).catch(
         e => console.warn('[resend-webhook] email→deal association failed:', (e as Error).message?.slice(0, 90)),
       );
-      // Associate the contact too, so it shows on their timeline as well.
+    }
+    // Associate the contact too, so it shows on their timeline as well — taken
+    // from the caller when known, otherwise resolved from the deal.
+    let contactId = input.contactId;
+    if (!contactId && input.dealId) {
       const cAssoc = (await hs('GET', `/crm/v4/objects/deals/${input.dealId}/associations/contacts`).catch(
         () => null,
       )) as { results?: { toObjectId?: string; id?: string }[] } | null;
-      const contactId = (cAssoc?.results || []).map(r => r.toObjectId || r.id).filter(Boolean)[0];
-      if (contactId) {
-        await hs('PUT', `/crm/v4/objects/emails/${created.id}/associations/default/contacts/${contactId}`).catch(
-          () => undefined,
-        );
-      }
+      contactId = (cAssoc?.results || []).map(r => r.toObjectId || r.id).filter(Boolean)[0];
+    }
+    if (contactId) {
+      await hs('PUT', `/crm/v4/objects/emails/${created.id}/associations/default/contacts/${contactId}`).catch(
+        () => undefined,
+      );
     }
     return created.id;
   } catch (e) {

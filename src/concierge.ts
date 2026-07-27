@@ -153,6 +153,43 @@ function logReplyToHubSpot(d: ConciergeDraft, edited: boolean): void {
           `Sent: ${d.sentAt}<br>From: aipa@aideazz.xyz · Subject: ${esc(d.subject)}<br><br>${esc(d.draft)}`
       );
       console.log(`[concierge] CRM trail: note logged on contact ${contactId} (${d.email})`);
+
+      // A note is not an email. Until now a concierge reply left no trace in the
+      // deal's Emails tab or the Activities timeline, so a sent reply looked unsent
+      // (July 27 2026, Elena on the UTM track). Log a real HubSpot EMAIL activity
+      // and register the send so the Resend webhook can stamp ✅ ENTREGADO on
+      // delivery — the same machinery the one-click FU sends already use.
+      if (!d.resendId) {
+        console.warn('[concierge] no Resend id — Email activity skipped (nothing to trace)');
+        return;
+      }
+      try {
+        const { findDealIdsForContact } = await import('./hubspot-client');
+        const dealIds = await findDealIdsForContact(contactId).catch(() => [] as string[]);
+        const dealId = dealIds[0];
+        const { logEmailEngagement, recordResendSend } = await import('./resend-webhook.js');
+        const engagementId = await logEmailEngagement({
+          ...(dealId ? { dealId } : {}),
+          contactId,
+          to: d.email,
+          subject: d.subject,
+          body: d.draft,
+          resendId: d.resendId,
+        });
+        recordResendSend(d.resendId, {
+          ...(dealId ? { dealId } : {}),
+          slug: `concierge-${d.id}`,
+          to: d.email,
+          subject: d.subject,
+          ...(engagementId ? { engagementId } : {}),
+        });
+        console.log(
+          `[concierge] HubSpot EMAIL activity ${engagementId ?? 'FAILED'} logged for ${d.email}` +
+            (dealId ? ` (deal ${dealId})` : ' (contact only)'),
+        );
+      } catch (e) {
+        console.warn('[concierge] Email activity logging failed (non-fatal):', (e as Error).message?.slice(0, 90));
+      }
     } catch (e) {
       console.warn('[concierge] CRM trail failed (non-fatal):', (e as Error).message?.slice(0, 80));
     }
