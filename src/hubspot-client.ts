@@ -187,10 +187,19 @@ export const PORTFOLIO_INQUIRY_KIND = 'portfolio_inquiry';
 /** Always-writable stamp (no custom-property scope needed). Make filter: message Contains this. */
 export const AIDEAZZ_FORM_MESSAGE_STAMP = '[AIDEAZZ-FORM]';
 
+/**
+ * Elena's own test inboxes. All four are hers and may be deleted/recreated as
+ * often as needed — that force-recreate is what makes Make's Contacts/CREATED
+ * watch fire again, so she can re-verify the whole draft workflow end to end.
+ * espaluztester was missing (added July 27 2026): a chat from it produced the
+ * alert, deal and acknowledgment but no Fable draft, because the contact merely
+ * got updated. Never add a real prospect here — their history would be destroyed.
+ */
 const DEFAULT_CONCIERGE_TEST_EMAILS = [
   'adamvelena@gmail.com',
   'marinakulaginabowen@gmail.com',
   'kiravelerevich@gmail.com',
+  'espaluztester@gmail.com',
 ];
 
 /** Allowlisted test inboxes that may force-recreate the HubSpot contact so Make's Contacts/Created fires. */

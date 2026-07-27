@@ -61,15 +61,32 @@ function loadDraft(id: string): ConciergeDraft | null {
  *   DRAFT REPLY:\n<reply>\n\nSUBJECT: <subject>\n\nWHY THESE LINKS: <line>
  * Spam verdict is the bare token `SPAM — no reply needed`.
  */
+/**
+ * Markdown emphasis has to go before a draft ever reaches a prospect.
+ *
+ * Fable writes **bold** out of habit; the reply is sent as an email and shown in
+ * Telegram, and in neither place does that render — the reader just sees literal
+ * asterisks around words (Elena, July 27 2026). Stripped here rather than in a
+ * prompt, so it holds for Make's drafts and our fallback drafts alike, whatever
+ * either model decides to emit.
+ */
+function stripMarkdownEmphasis(s: string): string {
+  return s
+    .replace(/\*\*\*(.+?)\*\*\*/gs, '$1') // ***both***
+    .replace(/\*\*(.+?)\*\*/gs, '$1') // **bold**
+    .replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s).,;:!?]|$)/g, '$1$2') // *italic*, never a bullet
+    .replace(/__(.+?)__/gs, '$1'); // __bold__
+}
+
 function parseClaudeOutput(raw: string): { draft: string; subject: string; spam: boolean } {
   const text = (raw || '').trim();
   if (/^SPAM\b/.test(text)) return { draft: '', subject: '', spam: true };
   const subjectMatch = text.match(/^SUBJECT:\s*(.+)$/m);
-  const subject = subjectMatch?.[1]?.trim() || 'Re: your inquiry — AIdeazz';
+  const subject = stripMarkdownEmphasis(subjectMatch?.[1]?.trim() || 'Re: your inquiry — AIdeazz');
   let draft = text;
   const replyMatch = text.match(/DRAFT REPLY:\s*\n?([\s\S]*?)(?:\n\s*SUBJECT:|$)/);
   if (replyMatch?.[1]?.trim()) draft = replyMatch[1].trim();
-  return { draft, subject, spam: false };
+  return { draft: stripMarkdownEmphasis(draft), subject, spam: false };
 }
 
 const escHtml = (s: string) =>

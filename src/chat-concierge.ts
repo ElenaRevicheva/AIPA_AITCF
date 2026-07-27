@@ -275,6 +275,74 @@ function sendVisitorAck(m: VisitorMessage): void {
   }
 }
 
+/**
+ * Draft fallback for RETURNING visitors — the case Make cannot serve.
+ *
+ * Make's trigger is HubSpot "Watch CRM Objects → Contacts CREATED". A person who
+ * is already a contact only gets UPDATED by our push, so no event fires and no
+ * draft is ever produced. Proven July 27 2026: Malina Choke wrote on July 16 (new
+ * contact → draft sent) and again today through the chat bubble (existing contact
+ * → silence). Returning prospects are the most valuable ones; they cannot be the
+ * ones who get ignored.
+ *
+ * So: brand-new contact → Make drafts, exactly as before, nothing changes here.
+ * Existing contact → we draft and POST to /concierge/draft ourselves, which
+ * produces the identical Telegram card with the ✅ Send button, the same Resend
+ * send path, the same HubSpot Email activity and ENTREGADO stamp.
+ *
+ * Never both: the caller only invokes this when the contact existed beforehand.
+ */
+async function postFallbackDraft(m: VisitorMessage): Promise<boolean> {
+  const secret = process.env.CONCIERGE_SECRET?.trim();
+  if (!secret || !m.email) return false;
+  const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
+  const first = (m.name || m.email).split(/[\s@]/)[0];
+
+  const system =
+    'You are Elena Revicheva, founder of AIdeazz AI Lab, replying to someone who wrote in the chat on ' +
+    'aideazz.xyz. She installs an AI Growth Operator for service businesses: AI search visibility, prospect ' +
+    'research, outreach and follow-up, WhatsApp lead qualification, CRM upkeep, daily briefing. ' +
+    'Answer what they actually asked, warm and direct, max 110 words, no bullet lists, no hype, never promise ' +
+    'results, end by offering a 15-minute call. Reply in the language they wrote in. ' +
+    'Plain text only — no markdown, no ** around words, no headings. ' +
+    'Output EXACTLY this shape:\nSUBJECT: <one line>\nDRAFT REPLY:\n<the message body, no signature>';
+  const userPrompt = `Their message: "${m.text}"\nTheir name: ${first}`;
+
+  let text = '';
+  try {
+    const Anthropic = (await import('@anthropic-ai/sdk')).default;
+    const { claudeWithGroqFallback } = await import('./llm-resilience.js');
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'missing' });
+    text = await claudeWithGroqFallback(anthropic, 'claude-opus-5', 500, system, userPrompt, 'chat-fallback-draft');
+  } catch (e) {
+    console.warn('[chat-concierge] fallback draft LLM failed:', (e as Error).message?.slice(0, 90));
+  }
+  if (!text.trim()) return false;
+
+  try {
+    const body = new URLSearchParams({
+      email: m.email,
+      name: m.name || '',
+      inquiry: m.text,
+      claude_output: text,
+    });
+    const r = await fetch(`${base}/concierge/draft`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+    });
+    if (!r.ok) {
+      console.warn(`[chat-concierge] /concierge/draft returned ${r.status}`);
+      return false;
+    }
+    console.log(`[chat-concierge] fallback draft posted for returning contact ${m.email} (Make cannot fire)`);
+    return true;
+  } catch (e) {
+    console.warn('[chat-concierge] fallback draft post failed:', (e as Error).message?.slice(0, 90));
+    return false;
+  }
+}
+
 export async function pollChatOnce(
   opts: { dryRun?: boolean } = {},
 ): Promise<{ found: number; alerted: number; pushed: number; skipped: number }> {
@@ -330,12 +398,25 @@ export async function pollChatOnce(
     const alreadyPushed = (state.pushedThreads || []).includes(m.threadId);
     if (m.email && !alreadyPushed) {
       try {
+        // Decide BEFORE the push: a contact that already exists will only be
+        // updated, so Make's Contacts/CREATED watch will never see it. Test
+        // inboxes are force-recreated by pushLeadToHubSpot, so Make does fire
+        // for them — they must not get our fallback on top.
+        const { findContactByEmail, isConciergeTestEmail } = await import('./hubspot-client.js');
+        const existedBefore = await findContactByEmail(m.email).catch(() => null);
+        const makeWillFire = !existedBefore || isConciergeTestEmail(m.email);
+
         const hsRes = await pushChatLeadToHubSpot(m);
         if (hsRes?.dealId) {
           result.pushed++;
           state.pushedThreads = [...(state.pushedThreads || []), m.threadId];
           console.log(`[chat-concierge] HubSpot lead from web chat: ${m.email} (deal ${hsRes.dealId})`);
           sendVisitorAck(m);
+          if (makeWillFire) {
+            console.log(`[chat-concierge] new contact — Make will draft for ${m.email}`);
+          } else {
+            await postFallbackDraft(m);
+          }
         }
       } catch (e) {
         console.warn('[chat-concierge] HubSpot push failed:', (e as Error).message?.slice(0, 100));
@@ -392,6 +473,10 @@ export async function pollChatOnce(
         stillPending.push(p);
         continue;
       }
+      // Same rule as the first pass — a returning contact needs our fallback draft.
+      const { findContactByEmail, isConciergeTestEmail } = await import('./hubspot-client.js');
+      const existedBefore = await findContactByEmail(email).catch(() => null);
+      const makeWillFire = !existedBefore || isConciergeTestEmail(email);
       const hsRes = await pushChatLeadToHubSpot(m2);
       if (hsRes?.dealId) {
         result.pushed++;
@@ -400,6 +485,7 @@ export async function pollChatOnce(
           `[chat-concierge] late identity resolved — HubSpot lead ${email} (deal ${hsRes.dealId}, thread ${p.threadId})`,
         );
         sendVisitorAck(m2);
+        if (!makeWillFire) await postFallbackDraft(m2);
         await telegramToOwners(
           `📧 Email captured for an earlier chat\n\n👤 ${m2.name || email}\n📧 ${email}\n\n"${m2.text.slice(0, 400)}"\n\nNow in HubSpot — you can reply by email.`,
         );
