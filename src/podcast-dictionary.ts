@@ -25,6 +25,9 @@ import { bdSerpSearch, isBrightDataConfigured } from './brightdata-enrich';
 
 /** Elena's permanent domain vocabulary — products, stack, market jargon. */
 export const CORE_TERMS: string[] = [
+  // Her name — Speechmatics has misheard "Revicheva" as "Vakeva" before, and that
+  // mis-transcription flowed straight into published show notes (July 2026 incident).
+  'Elena Revicheva', 'Revicheva',
   // Her brands + products
   'AIdeazz', 'EspaLuz', 'VibeJobHunter', 'Algom Alpha', 'Atuona', 'AIPA',
   // The marketing discipline she talks about constantly
