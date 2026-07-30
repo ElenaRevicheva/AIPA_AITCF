@@ -152,8 +152,20 @@ export async function claudeWithGroqFallback(
       ...(systemPrompt ? { system: systemPrompt } : {}),
       messages: [{ role: 'user', content: userPrompt }],
     });
-    const block = resp.content[0];
-    return block && block.type === 'text' ? block.text : '';
+    // Take the first TEXT block, not content[0]. Thinking-enabled models put a
+    // `thinking` block first: claude-opus-5 returns ["thinking","text"], so
+    // reading content[0] and demanding type==='text' silently yielded ''. The
+    // caller could not tell that apart from a real failure — proven July 29 2026,
+    // when the concierge watchdog logged "LLM returned 0 chars" on a request the
+    // API had answered normally (stop_reason end_turn, 362 output tokens), and
+    // chat-concierge's fallback drafter turned out to have never once produced a
+    // draft for the same reason. Join all text blocks so nothing is dropped.
+    const text = resp.content
+      .filter((b): b is Extract<typeof b, { type: 'text' }> => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim();
+    return text;
   } catch (e: unknown) {
     const deadModel = isAnthropicModelNotFound(e);
     if (!isAnthropicCreditExhaustion(e) && !deadModel) throw e;
