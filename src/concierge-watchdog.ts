@@ -143,14 +143,28 @@ async function generateAndPostDraft(w: Watch): Promise<boolean> {
 
   let text = '';
   try {
-    const Anthropic = (await import('@anthropic-ai/sdk')).default;
+    const mod: any = await import('@anthropic-ai/sdk');
+    // CommonJS interop: depending on how the SDK is transpiled the constructor is
+    // either the namespace default or module.exports itself. Picking the wrong one
+    // yields `undefined`, and `new undefined()` throws inside this try — which is
+    // indistinguishable from an API failure in the log. Resolve it explicitly.
+    const Anthropic = mod?.default ?? mod?.Anthropic ?? mod;
+    if (typeof Anthropic !== 'function') {
+      console.error('[watchdog] Anthropic SDK export is not a constructor — cannot draft');
+      return false;
+    }
     const { claudeWithGroqFallback } = await import('./llm-resilience.js');
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'missing' });
     text = await claudeWithGroqFallback(anthropic, 'claude-opus-5', 500, system, userPrompt, 'concierge-watchdog');
+    console.log(`[watchdog] LLM returned ${text.trim().length} chars for ${w.email}`);
   } catch (e) {
-    console.warn('[watchdog] draft LLM failed:', (e as Error).message?.slice(0, 90));
+    console.error('[watchdog] draft LLM failed:', (e as Error).message?.slice(0, 200));
   }
-  if (!text.trim()) return false;
+  if (!text.trim()) {
+    // Was silent before: an empty completion looked exactly like a crash.
+    console.error(`[watchdog] LLM produced an EMPTY draft for ${w.email} — nothing to post`);
+    return false;
+  }
 
   try {
     const body = new URLSearchParams({
@@ -164,13 +178,17 @@ async function generateAndPostDraft(w: Watch): Promise<boolean> {
       headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
     });
+    const replyBody = (await r.text()).slice(0, 200);
     if (!r.ok) {
-      console.warn(`[watchdog] /concierge/draft returned ${r.status}`);
+      console.error(`[watchdog] /concierge/draft returned ${r.status}: ${replyBody}`);
       return false;
     }
+    // A 200 is not proof the card was sent: the endpoint also answers 200 when it
+    // drops a draft as unresolved or as auto-import noise. Say which one happened.
+    console.log(`[watchdog] /concierge/draft accepted for ${w.email}: ${replyBody}`);
     return true;
   } catch (e) {
-    console.warn('[watchdog] draft post failed:', (e as Error).message?.slice(0, 90));
+    console.error('[watchdog] draft post failed:', (e as Error).message?.slice(0, 200));
     return false;
   }
 }
