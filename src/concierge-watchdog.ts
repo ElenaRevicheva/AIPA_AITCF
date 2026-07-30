@@ -265,15 +265,25 @@ async function notifyOwners(text: string): Promise<void> {
   const chat =
     process.env.CONCIERGE_TG_CHAT?.trim() ||
     (process.env.TELEGRAM_AUTHORIZED_USERS || '').split(',')[0]?.trim();
-  if (!token || !chat) return;
+  if (!token || !chat) {
+    console.warn('[watchdog] TELEGRAM_BOT_TOKEN / CONCIERGE_TG_CHAT missing — owner ping skipped');
+    return;
+  }
+  // Log the outcome, not the attempt: "the alert was sent" has to be checkable
+  // in the log afterwards, otherwise a silent failure looks identical to success.
   try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chat, text: text.slice(0, 4090), disable_web_page_preview: true }),
     });
-  } catch {
-    /* best effort */
+    if (r.ok) {
+      console.log(`[watchdog] owner ping DELIVERED to Telegram chat ${chat}`);
+    } else {
+      console.error(`[watchdog] owner ping FAILED ${r.status}: ${(await r.text()).slice(0, 160)}`);
+    }
+  } catch (e) {
+    console.error('[watchdog] owner ping threw:', (e as Error).message?.slice(0, 120));
   }
 }
 
