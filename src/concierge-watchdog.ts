@@ -386,7 +386,7 @@ export async function checkMakeHealth(): Promise<{
       : `The scenario was switched OFF.`;
     await notifyOwners(
       `⚠️ Make Lead Concierge needed help\n\n${verdict}\n` +
-        (action === 'none' || action === 'alerted'
+        (action === 'alerted'
           ? `I could NOT restart it automatically — please open it:\n`
           : `✅ I restarted it automatically (${action}). It should resume the 15-min cycle.\n`) +
         `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
