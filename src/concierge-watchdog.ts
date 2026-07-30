@@ -322,43 +322,84 @@ const MAKE_STALE_MIN = Number(process.env.MAKE_STALE_MIN ?? 45);
 const MAKE_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 let lastMakeAlertAt = 0;
 
-export async function checkMakeHealth(): Promise<{ ok: boolean; lastRunMinAgo: number | null }> {
+export async function checkMakeHealth(): Promise<{
+  ok: boolean;
+  lastRunMinAgo: number | null;
+  nextExecMinAway: number | null;
+  action: 'none' | 're-armed' | 'started' | 'alerted';
+}> {
   const token = process.env.MAKE_API_TOKEN?.trim();
   const base = (process.env.MAKE_API_BASE || 'https://us2.make.com/api/v2').replace(/\/$/, '');
   const scenarioId = process.env.MAKE_CONCIERGE_SCENARIO_ID?.trim() || '5633833';
-  if (!token) return { ok: true, lastRunMinAgo: null }; // not configured — stay silent
+  const idle = { ok: true, lastRunMinAgo: null, nextExecMinAway: null, action: 'none' as const };
+  if (!token) return idle; // not configured — stay silent
+
+  const api = async (p: string, method = 'GET') =>
+    fetch(`${base}${p}`, { method, headers: { Authorization: `Token ${token}`, 'Content-Type': 'application/json' } });
 
   try {
-    const r = await fetch(`${base}/scenarios/${scenarioId}/logs?pg[limit]=5`, {
-      headers: { Authorization: `Token ${token}` },
-    });
-    if (!r.ok) return { ok: true, lastRunMinAgo: null };
-    const rows = (JSON.parse(await r.text())?.scenarioLogs || []) as any[];
-    // Only real executions count. Blueprint edits appear as rows with no
-    // operations and would otherwise mask a scenario that stopped executing.
+    const sr = await api(`/scenarios/${scenarioId}`);
+    if (!sr.ok) return idle;
+    const sc = (JSON.parse(await sr.text()) as any)?.scenario;
+    if (!sc) return idle;
+
+    const lr = await api(`/scenarios/${scenarioId}/logs?pg[limit]=5`);
+    const rows = lr.ok ? ((JSON.parse(await lr.text())?.scenarioLogs || []) as any[]) : [];
+    // Only real executions count. Blueprint edits and stop/start appear as rows
+    // with no `operations` and would make a dead scenario look alive.
     const lastRun = rows.find(l => l.operations !== undefined && l.operations !== null);
-    if (!lastRun?.timestamp) return { ok: true, lastRunMinAgo: null };
+    const lastRunMinAgo = lastRun?.timestamp
+      ? Math.round((Date.now() - Date.parse(lastRun.timestamp)) / 60000)
+      : null;
+    const nextExecMs = sc.nextExec ? Date.parse(sc.nextExec) : NaN;
+    const nextExecMinAway = Number.isFinite(nextExecMs) ? Math.round((nextExecMs - Date.now()) / 60000) : null;
 
-    const minAgo = Math.round((Date.now() - Date.parse(lastRun.timestamp)) / 60000);
-    if (minAgo <= MAKE_STALE_MIN) return { ok: true, lastRunMinAgo: minAgo };
-
-    if (Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS) {
-      lastMakeAlertAt = Date.now();
-      await notifyOwners(
-        `⚠️ Make Lead Concierge looks STALLED\n\n` +
-          `Last execution: ${minAgo} min ago (expected every 15 min).\n\n` +
-          `Inbound leads are still safe — I draft for anyone Make misses within ` +
-          `${Math.round(WAIT_MS / 60000)} min. But Make itself needs a look:\n` +
-          `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
-          `Most likely: the trigger's polling epoch went stale again. Fix = right-click ` +
-          `the HubSpot module → Choose where to start → From now on → Save.`,
-      );
-      console.error(`[watchdog] MAKE STALLED — last run ${minAgo} min ago; owner alerted`);
+    // `nextExec` is the authoritative signal, not the gap between runs. A long
+    // gap with a valid future nextExec is Make pacing itself and needs no help;
+    // acting on the gap alone would restart a perfectly healthy scenario.
+    const scheduledOk = nextExecMinAway !== null && nextExecMinAway > -5 && nextExecMinAway <= MAKE_STALE_MIN;
+    const runningOk = lastRunMinAgo === null || lastRunMinAgo <= MAKE_STALE_MIN;
+    if (sc.isActive && (scheduledOk || runningOk)) {
+      return { ok: true, lastRunMinAgo, nextExecMinAway, action: 'none' };
     }
-    return { ok: false, lastRunMinAgo: minAgo };
+
+    const cooled = Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS;
+    if (!cooled) return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'none' };
+    lastMakeAlertAt = Date.now();
+
+    // Self-heal. Someone switching it off, or a scheduler left un-armed after an
+    // edit, are both cured by a clean stop→start, which recomputes nextExec.
+    let action: 'none' | 're-armed' | 'started' | 'alerted' = 'alerted';
+    try {
+      if (sc.isActive) {
+        await api(`/scenarios/${scenarioId}/stop`, 'POST');
+        await new Promise(r => setTimeout(r, 3000));
+      }
+      const started = await api(`/scenarios/${scenarioId}/start`, 'POST');
+      if (started.ok) action = sc.isActive ? 're-armed' : 'started';
+    } catch {
+      /* fall through to the alert — Elena still needs to know */
+    }
+
+    const verdict = sc.isActive
+      ? `Last execution ${lastRunMinAgo ?? '?'} min ago and no valid next run scheduled.`
+      : `The scenario was switched OFF.`;
+    await notifyOwners(
+      `⚠️ Make Lead Concierge needed help\n\n${verdict}\n` +
+        (action === 'none' || action === 'alerted'
+          ? `I could NOT restart it automatically — please open it:\n`
+          : `✅ I restarted it automatically (${action}). It should resume the 15-min cycle.\n`) +
+        `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
+        `Your leads were never at risk — I draft for anyone Make misses within ` +
+        `${Math.round(WAIT_MS / 60000)} min.\n\n` +
+        `If drafts stay missing, the trigger's polling epoch went stale: right-click ` +
+        `the HubSpot module → Choose where to start → From now on → Save.`,
+    );
+    console.error(`[watchdog] MAKE UNHEALTHY — lastRun=${lastRunMinAgo}min nextExec=${nextExecMinAway}min action=${action}`);
+    return { ok: false, lastRunMinAgo, nextExecMinAway, action };
   } catch (e) {
     console.warn('[watchdog] Make health check failed (non-fatal):', (e as Error).message?.slice(0, 90));
-    return { ok: true, lastRunMinAgo: null };
+    return idle;
   }
 }
 
