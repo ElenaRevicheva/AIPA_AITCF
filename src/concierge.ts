@@ -57,6 +57,51 @@ function loadDraft(id: string): ConciergeDraft | null {
 }
 
 /**
+ * Did a draft for this lead already land since `sinceMs`? (July 29 2026)
+ *
+ * Read-only helper for the concierge watchdog. Make stays the primary drafter —
+ * the watchdog only steps in when Make demonstrably produced NOTHING, and this
+ * is how it proves that. Any draft counts, whoever created it (Make, the chat
+ * fallback, an earlier watchdog run), so we can never double-draft a lead.
+ */
+export function hasDraftForEmailSince(email: string, sinceMs: number): boolean {
+  const target = email.trim().toLowerCase();
+  if (!target) return false;
+  try {
+    for (const f of fs.readdirSync(DRAFT_DIR)) {
+      if (!f.endsWith('.json')) continue;
+      try {
+        const d = JSON.parse(fs.readFileSync(path.join(DRAFT_DIR, f), 'utf8')) as ConciergeDraft;
+        if ((d.email || '').trim().toLowerCase() !== target) continue;
+        if (Date.parse(d.createdAt || '') >= sinceMs) return true;
+      } catch {
+        /* a half-written draft file is not evidence either way */
+      }
+    }
+  } catch {
+    /* no drafts dir yet — nothing has ever been drafted */
+  }
+  return false;
+}
+
+/**
+ * Make DID fire and Fable 5 judged the inquiry spam. Recorded so the watchdog
+ * does not "helpfully" draft a reply to spam that Make deliberately refused.
+ * Silence after a spam verdict is a decision, not a failure.
+ */
+const spamVerdicts = new Map<string, number>();
+
+export function noteConciergeSpamVerdict(email: string): void {
+  const key = email.trim().toLowerCase();
+  if (key) spamVerdicts.set(key, Date.now());
+}
+
+export function hasSpamVerdictSince(email: string, sinceMs: number): boolean {
+  const at = spamVerdicts.get(email.trim().toLowerCase());
+  return at !== undefined && at >= sinceMs;
+}
+
+/**
  * Fable 5's contract (see docs/make-fable5/LEAD_CONCIERGE_SETUP.md):
  *   DRAFT REPLY:\n<reply>\n\nSUBJECT: <subject>\n\nWHY THESE LINKS: <line>
  * Spam verdict is the bare token `SPAM — no reply needed`.
@@ -275,6 +320,8 @@ export function registerConciergeRoutes(app: Express): void {
 
     const { draft, subject, spam } = parseClaudeOutput(claudeOutput);
     if (spam) {
+      // Tell the watchdog Make already ruled on this one — it must not re-draft.
+      if (email) noteConciergeSpamVerdict(email);
       // Only page Elena when the flagged sender is identifiable — a named/emailed
       // contact judged SPAM might be a misjudged real lead worth her eyes. An
       // "unknown" spam verdict is Make chewing on HubSpot auto-import junk

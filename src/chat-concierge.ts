@@ -375,7 +375,7 @@ export async function pollChatOnce(
       `"${m.text.slice(0, 900)}"`,
       ``,
       m.email
-        ? `✍️ Fable 5 draft with the ✅ Send button follows from Make (~15 min).`
+        ? `✍️ Draft with the ✅ Send button follows (~15 min).`
         : `⚠️ No email yet — answer in the chat while their tab is still open. If they leave one, I'll ping you again.`,
       ``,
       `Reply here: ${INBOX_URL}/inbox/${m.threadId}`,
@@ -391,6 +391,21 @@ export async function pollChatOnce(
     }
     await telegramToOwners(alert);
     result.alerted++;
+
+    // 1b. This visitor is owed a draft — register it BEFORE the branching below.
+    //     Make is still the primary drafter and nothing here competes with it;
+    //     the watchdog only acts if Make produces nothing at all. This placement
+    //     matters: the `already in HubSpot` branch below pushes nothing, so
+    //     Make's Contacts/CREATED trigger can never fire for a follow-up message
+    //     in an open thread — that is exactly how July 29's chat went unanswered.
+    if (m.email) {
+      try {
+        const { registerLeadWatch } = await import('./concierge-watchdog.js');
+        registerLeadWatch({ email: m.email, name: m.name, text: m.text, source: 'web_chat' });
+      } catch (e) {
+        console.warn('[chat-concierge] watchdog register failed:', (e as Error).message?.slice(0, 80));
+      }
+    }
 
     // 2. CRM push — isolated; a failure here never blocks the alert above.
     //    ONE deal per conversation: later messages in the same thread still alert
@@ -486,6 +501,12 @@ export async function pollChatOnce(
         );
         sendVisitorAck(m2);
         if (!makeWillFire) await postFallbackDraft(m2);
+        try {
+          const { registerLeadWatch } = await import('./concierge-watchdog.js');
+          registerLeadWatch({ email, name: m2.name, text: m2.text, source: 'web_chat_late_identity' });
+        } catch {
+          /* the alert below still goes out */
+        }
         await telegramToOwners(
           `📧 Email captured for an earlier chat\n\n👤 ${m2.name || email}\n📧 ${email}\n\n"${m2.text.slice(0, 400)}"\n\nNow in HubSpot — you can reply by email.`,
         );

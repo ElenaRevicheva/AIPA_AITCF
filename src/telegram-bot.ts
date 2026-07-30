@@ -8385,6 +8385,13 @@ _/daily for full briefing_`;
     .then(m => m.startChatConcierge())
     .catch(e => console.warn('[chat-concierge] not started:', (e as Error).message?.slice(0, 100)));
 
+  // Safety net under Make: if an inbound lead gets no draft at all within the
+  // watchdog window, we write one ourselves and post it to the same endpoint
+  // Make uses. Make stays primary and untouched — this only covers its silence.
+  void import('./concierge-watchdog.js')
+    .then(m => m.startConciergeWatchdog())
+    .catch(e => console.warn('[watchdog] not started:', (e as Error).message?.slice(0, 100)));
+
   console.log('📅 Scheduled tasks started');
 }
 

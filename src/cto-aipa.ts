@@ -1260,6 +1260,36 @@ async function startCTOAIPA() {
     page_url?: string;
   }): void {
     const { name, contactEmail, message, utm_source, utm_campaign, utm_term, utm_content, page_url } = fields;
+
+    // July 29 2026: the form used to have NO Telegram alert of its own — its only
+    // Telegram output was Make's draft. When Make went silent (Alexia Mikes,
+    // 14:30 UTC) a real submission produced total silence. The chat bubble has
+    // pinged instantly since day one; the form, the hotter signal, did not.
+    // Fires before HubSpot so a CRM failure can never swallow the notification.
+    setImmediate(async () => {
+      try {
+        const { notifyInquiryReceived } = await import('./concierge-watchdog');
+        await notifyInquiryReceived({
+          ...(name ? { name } : {}),
+          ...(contactEmail ? { email: contactEmail } : {}),
+          ...(message ? { message } : {}),
+          ...(utm_source ? { utmSource: utm_source } : {}),
+          ...(page_url ? { pageUrl: page_url } : {}),
+        });
+        if (contactEmail) {
+          const { registerLeadWatch } = await import('./concierge-watchdog');
+          registerLeadWatch({
+            email: contactEmail,
+            name: name ?? null,
+            text: message ?? null,
+            source: 'inquiry_form',
+          });
+        }
+      } catch (e) {
+        console.warn('[inquiry] alert/watch non-fatal:', (e as Error).message?.slice(0, 80));
+      }
+    });
+
     setImmediate(async () => {
       try {
         const { pushLeadToHubSpot, isConciergeTestEmail, findContactByEmail } = await import('./hubspot-client');
