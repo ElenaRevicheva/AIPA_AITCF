@@ -45,6 +45,24 @@ Engineering depth this demonstrates: LangGraph StateGraph internals, multi-provi
 
 ---
 
+## 🆕 Proof point — when your own guardrails fight each other (July 30 2026)
+
+**Interview/founder hook (AI system reliability):** *"One bad lead reached my inbox three times, so I went to the logs instead of the code. The scoring engine had a hard-coded `max(ai_score, 50)` floor that silently overrode any model judgment below 50 — my own Claude call had correctly scored the job 45 and been rewritten to 50. Worse, on two earlier occasions the model call had failed outright (credit exhaustion → rate-limited fallback), and the system treated 'no opinion' exactly like 'no objection': keyword bonuses alone pushed it into the auto-apply band. I removed the floor, made a low model score an actual veto, and made an LLM outage fail CLOSED with an alert — then discovered the veto was now enforcing a rubric that was two revisions out of date, and vetoing perfect-fit roles. A guardrail is only as good as the rubric behind it."*
+
+**The chain, in order, all verified from production logs and a checkpoint DB:**
+1. **Floor overrode the model.** `max(ai_score, 50)` existed to stop the AI "tanking a good keyword match" — i.e. it encoded distrust of the most informed signal in the pipeline.
+2. **Outage read as approval.** Anthropic 400 (credit) → Groq 429 (daily token cap 99,427/100,000) → no score → bias-compensation bonuses alone produced 81/100 → auto-apply band.
+3. **Dedup keyed on the wrong identity.** Torre re-posted one listing under a new id (`torre_7628333` → `torre_8156916`), so thread-id dedup never fired. Fixed with a content fingerprint (normalised company+title) and by making the "surfaced" state terminal.
+4. **The veto then amplified a stale rubric.** With the floor gone, a prompt still targeting "Founding Engineer / AI PM / Staff-Principal" scored an ideal role 45/100 and discarded it. Aligning the prompt to the current target lanes moved the same job to 96.
+5. **A timeout was silently zeroing a whole source.** `ATS APIs: 0 jobs` — a full sweep measured 77s against a 90s budget, and `asyncio.wait_for` cancels the coroutine, so every company already fetched was discarded while the handler logged "returning partial results". Raised the budget: **0 → 2,102 jobs/cycle.**
+6. **Enrichment created a new attack surface on itself.** Fetching a board *index* page instead of a posting returned 8KB of navigation dense with the exact keywords the scorer rewards — a false-positive generator. Guarded by URL shape and by requiring posting-shaped prose.
+
+Engineering depth this demonstrates: debugging from production telemetry rather than code reading, msgpack-serialised LangGraph checkpoint forensics, fail-closed vs fail-open trade-offs with explicit alerting, reject-only gate design (a salary floor that can never zero out flow), and the discipline of updating a test that asserted the defect instead of deleting it. Result the same evening: surfaced-to-human went **0 → 6 per cycle**, all in-lane, two with stated pay above the floor.
+
+**Transferable rule worth stating out loud in an interview:** *every clamp, floor, and default in a scoring system is a silent policy decision. Write them where they can be read, log the branch that fired, and make "the model failed" a distinguishable state from "the model approved".*
+
+---
+
 ## ⚠️ CANONICAL LOCATION RULE — READ BEFORE ANY SESSION
 
 **Never ask Elena where a local folder or GitHub repo is.** The answer is always in one of these two docs:
