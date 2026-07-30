@@ -398,7 +398,7 @@ export async function runSerpProspects(opts: { dryRun?: boolean } = {}): Promise
       let domain: string | undefined;
       try {
         domain = new URL(result.link).origin;
-        const skipDomains = ['news.ycombinator.com', 'reddit.com', 'twitter.com', 'x.com', 'google.com', 'wikipedia.org', 'youtube.com', 'forbes.com', 'techcrunch.com', 'wired.com', 'cnn.com', 'bbc.com', 'medium.com', 'indeed.com', 'glassdoor.com', 'linkedin.com', 'wellfound.com'];
+        const skipDomains = ['news.ycombinator.com', 'reddit.com', 'twitter.com', 'x.com', 'google.com', 'wikipedia.org', 'youtube.com', 'forbes.com', 'techcrunch.com', 'wired.com', 'cnn.com', 'bbc.com', 'medium.com', 'indeed.com', 'glassdoor.com', 'linkedin.com', 'wellfound.com', 'facebook.com', 'instagram.com', 'tiktok.com', 'quora.com', 'upwork.com', 'fiverr.com'];
         if (skipDomains.some(d => domain!.includes(d))) domain = undefined;
       } catch {}
 
@@ -433,6 +433,19 @@ export async function runSerpProspects(opts: { dryRun?: boolean } = {}): Promise
     const offer = matchOfferToIntent(`${v!.label} ${c.title} ${c.snippet}`);
     console.log(`[SerpProspects]   ✅ LEAD [${c.tag}] ${dealName} → ${offer.label} (${renderOfferEstimate(offer)})`);
     if (dryRun) continue;
+
+    // No company domain = an aggregator/forum hit (facebook, reddit, indeed…).
+    // There is no email and no company behind it, so pushing it to HubSpot
+    // creates a contact nobody can ever contact. Those emailless contacts are
+    // real damage: they distort funnel truth, and on July 30 2026 four of them
+    // (deals "[CLIENT-CTO-SERP] https://www.facebook.com — outreach") consumed
+    // every slot of Make's 1-record-per-run trigger, so two real inbound leads
+    // sat unprocessed behind them. The buying signal is still in the log above
+    // if it is ever worth mining by hand.
+    if (!c.domain) {
+      console.log(`[SerpProspects]   ⤳ CRM skip (no company domain — uncontactable): ${dealName.slice(0, 70)}`);
+      continue;
+    }
 
     await pushToCRM({
       source:   'serpapi_search',

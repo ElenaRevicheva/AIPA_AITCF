@@ -305,7 +305,65 @@ async function notifyOwners(text: string): Promise<void> {
   }
 }
 
+/**
+ * Make liveness check — the answer to "how do I know it will work next time?"
+ *
+ * The Lead Concierge scenario has failed silently twice in four days: blind from
+ * July 27-30 (stale polling epoch, `ops=1` on every run), then starved on July 30
+ * (`limit:1` trigger, four junk contacts ate every slot). Both times the first
+ * symptom was a real prospect getting no reply, discovered by hand.
+ *
+ * A scheduled scenario that stops running is invisible from inside Make unless
+ * someone opens the dashboard. So we watch it from outside: if its newest
+ * execution is older than MAKE_STALE_MIN, say so on Telegram — once per
+ * cooldown, never in a loop. Read-only; it never edits or restarts the scenario.
+ */
+const MAKE_STALE_MIN = Number(process.env.MAKE_STALE_MIN ?? 45);
+const MAKE_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+let lastMakeAlertAt = 0;
+
+export async function checkMakeHealth(): Promise<{ ok: boolean; lastRunMinAgo: number | null }> {
+  const token = process.env.MAKE_API_TOKEN?.trim();
+  const base = (process.env.MAKE_API_BASE || 'https://us2.make.com/api/v2').replace(/\/$/, '');
+  const scenarioId = process.env.MAKE_CONCIERGE_SCENARIO_ID?.trim() || '5633833';
+  if (!token) return { ok: true, lastRunMinAgo: null }; // not configured — stay silent
+
+  try {
+    const r = await fetch(`${base}/scenarios/${scenarioId}/logs?pg[limit]=5`, {
+      headers: { Authorization: `Token ${token}` },
+    });
+    if (!r.ok) return { ok: true, lastRunMinAgo: null };
+    const rows = (JSON.parse(await r.text())?.scenarioLogs || []) as any[];
+    // Only real executions count. Blueprint edits appear as rows with no
+    // operations and would otherwise mask a scenario that stopped executing.
+    const lastRun = rows.find(l => l.operations !== undefined && l.operations !== null);
+    if (!lastRun?.timestamp) return { ok: true, lastRunMinAgo: null };
+
+    const minAgo = Math.round((Date.now() - Date.parse(lastRun.timestamp)) / 60000);
+    if (minAgo <= MAKE_STALE_MIN) return { ok: true, lastRunMinAgo: minAgo };
+
+    if (Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS) {
+      lastMakeAlertAt = Date.now();
+      await notifyOwners(
+        `⚠️ Make Lead Concierge looks STALLED\n\n` +
+          `Last execution: ${minAgo} min ago (expected every 15 min).\n\n` +
+          `Inbound leads are still safe — I draft for anyone Make misses within ` +
+          `${Math.round(WAIT_MS / 60000)} min. But Make itself needs a look:\n` +
+          `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
+          `Most likely: the trigger's polling epoch went stale again. Fix = right-click ` +
+          `the HubSpot module → Choose where to start → From now on → Save.`,
+      );
+      console.error(`[watchdog] MAKE STALLED — last run ${minAgo} min ago; owner alerted`);
+    }
+    return { ok: false, lastRunMinAgo: minAgo };
+  } catch (e) {
+    console.warn('[watchdog] Make health check failed (non-fatal):', (e as Error).message?.slice(0, 90));
+    return { ok: true, lastRunMinAgo: null };
+  }
+}
+
 let timer: NodeJS.Timeout | null = null;
+let makeTimer: NodeJS.Timeout | null = null;
 
 export function startConciergeWatchdog(): void {
   if (timer) return;
@@ -317,4 +375,11 @@ export function startConciergeWatchdog(): void {
   console.log(
     `🛟 Concierge watchdog started — Make stays primary; covers only if no draft after ${Math.round(WAIT_MS / 60000)} min`,
   );
+
+  if (process.env.MAKE_API_TOKEN?.trim() && !makeTimer) {
+    // Every 15 min, matching the scenario's own cadence.
+    makeTimer = setInterval(() => void checkMakeHealth(), 15 * 60 * 1000);
+    setTimeout(() => void checkMakeHealth(), 60_000);
+    console.log(`🔎 Make liveness monitor started — alerts if no execution for ${MAKE_STALE_MIN} min`);
+  }
 }

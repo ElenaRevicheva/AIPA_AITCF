@@ -36,6 +36,13 @@ const POLL_MS = Number(process.env.CHAT_CONCIERGE_POLL_MS ?? 3 * 60 * 1000);
 const INBOX_URL = 'https://app.hubspot.com/live-messages/51409153';
 /** Ignore anything older than this on first run, so a fresh deploy doesn't replay history. */
 const MAX_AGE_MS = Number(process.env.CHAT_CONCIERGE_MAX_AGE_MS ?? 24 * 60 * 60 * 1000);
+/**
+ * How many failed identity lookups before we accept a chat visitor is anonymous.
+ * 10 strikes ≈ 30 min at the 3-min poll — long enough for someone who types their
+ * message first and their email a moment later, short enough that a visitor who
+ * never identifies stops costing HubSpot calls for the rest of the day.
+ */
+const IDENTITY_MAX_STRIKES = Number(process.env.CHAT_CONCIERGE_IDENTITY_STRIKES ?? 10);
 
 type State = {
   seen: string[];
@@ -52,7 +59,7 @@ type State = {
    * kiravelerevich@gmail.com only appeared afterwards). Without this the message
    * is marked seen and the lead never reaches the CRM.
    */
-  pendingIdentity?: { threadId: string; firstSeen: string }[];
+  pendingIdentity?: { threadId: string; firstSeen: string; strikes?: number }[];
   lastRunAt?: string;
 };
 
@@ -450,17 +457,29 @@ export async function pollChatOnce(
 
   // Second pass: threads alerted while anonymous. The visitor usually leaves an
   // email seconds later, long after their message was marked seen.
-  const stillPending: { threadId: string; firstSeen: string }[] = [];
+  const stillPending: { threadId: string; firstSeen: string; strikes?: number }[] = [];
   for (const p of state.pendingIdentity || []) {
     if ((state.pushedThreads || []).includes(p.threadId)) continue; // resolved elsewhere
     if (Date.now() - Date.parse(p.firstSeen) > MAX_AGE_MS) {
       console.log(`[chat-concierge] thread ${p.threadId} stayed anonymous — giving up on identity`);
       continue;
     }
+    // A visitor who never leaves an email costs one failed lookup per poll for a
+    // whole day. Thread 11034113718 ("Хочу тебя", July 29 2026) burned 399 of
+    // them. HubSpot's thread field is named associatedContactId but for an
+    // anonymous chat it holds a VISITOR id (actor type VISITOR, verified via
+    // /conversations/v3/conversations/actors) — /crm/v3/objects/contacts/{id}
+    // can NEVER resolve it, so retrying is pure waste against the rate limit.
+    if ((p.strikes ?? 0) >= IDENTITY_MAX_STRIKES) {
+      console.log(
+        `[chat-concierge] thread ${p.threadId} — ${p.strikes} failed identity lookups, visitor is anonymous; no longer re-checking`,
+      );
+      continue;
+    }
     try {
       const th = await hs(`/conversations/v3/conversations/threads/${p.threadId}`);
       if (!th?.associatedContactId) {
-        stillPending.push(p);
+        stillPending.push({ ...p, strikes: (p.strikes ?? 0) + 1 });
         continue;
       }
       const c = await hs(
@@ -468,7 +487,7 @@ export async function pollChatOnce(
       );
       const email = c?.properties?.email;
       if (!email) {
-        stillPending.push(p);
+        stillPending.push({ ...p, strikes: (p.strikes ?? 0) + 1 });
         continue;
       }
       const msgs = await hs(`/conversations/v3/conversations/threads/${p.threadId}/messages?limit=20`);
@@ -485,7 +504,7 @@ export async function pollChatOnce(
       };
       if (dry) {
         console.log(`[chat-concierge] (dry) would now push late identity ${email} for thread ${p.threadId}`);
-        stillPending.push(p);
+        stillPending.push({ ...p, strikes: (p.strikes ?? 0) + 1 });
         continue;
       }
       // Same rule as the first pass — a returning contact needs our fallback draft.
@@ -511,11 +530,16 @@ export async function pollChatOnce(
           `📧 Email captured for an earlier chat\n\n👤 ${m2.name || email}\n📧 ${email}\n\n"${m2.text.slice(0, 400)}"\n\nNow in HubSpot — you can reply by email.`,
         );
       } else {
-        stillPending.push(p);
+        stillPending.push({ ...p, strikes: (p.strikes ?? 0) + 1 });
       }
     } catch (e) {
-      console.warn('[chat-concierge] identity re-check failed:', (e as Error).message?.slice(0, 90));
-      stillPending.push(p);
+      // Log the first strike only. A 404 here is the normal, expected shape of
+      // "anonymous visitor", not an incident — repeating it every poll buried
+      // real errors under 399 identical lines on July 29 2026.
+      if ((p.strikes ?? 0) === 0) {
+        console.warn('[chat-concierge] identity re-check failed:', (e as Error).message?.slice(0, 90));
+      }
+      stillPending.push({ ...p, strikes: (p.strikes ?? 0) + 1 });
     }
   }
   state.pendingIdentity = stillPending;
