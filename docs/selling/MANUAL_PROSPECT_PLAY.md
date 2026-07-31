@@ -65,6 +65,37 @@ are logged as real HubSpot **EMAIL activities** (from/to must go in `hs_email_he
 `scripts/resend-reconcile.cjs` (cron :17 hourly) polls final status and stamps `⛔ SUPRIMIDO`.
 **No backfill of past sends — existing notes stay untouched, only new sends get this.**
 
+**🔎 Every signal is now traceable and typed (July 31 2026 — `9ec2619`, `ae4b334`, `d2dffff`).**
+Three upgrades to the same stamp, all in `src/resend-webhook.ts`:
+
+1. **The Resend id is on the stamp.** `✅ ENTREGADO — Resend confirmó la entrega` carried no
+   handle back to the provider event, so the claim could not be checked against the dashboard.
+   The id comes straight from the webhook payload (`data.email_id`) and renders **only when
+   present — never inferred, never back-filled** from a send record.
+2. **The stamp says WHICH message landed.** A bare ENTREGADO could not tell Elena whether the
+   **first** outreach reached a prospect — the thing that decides if a deal is really in play.
+   Stamps now read `[PRIMER CONTACTO] ENTREGADO …` or `[SEGUIMIENTO] ENTREGADO …`, derived
+   solely from the send ledger's slug (`-fu` suffix is the discriminator). **Unknown slug → tag
+   omitted, never guessed.**
+3. **Opens vs clicks are not the same evidence.** Open tracking was switched OFF at the Resend
+   domain until July 31, so `email.opened` / `email.clicked` had **never once fired** — zero
+   events in the entire log. Now that it is on:
+   - **`👀 ABIERTO` is marked a SOFT signal on the note itself.** Apple Mail Privacy Protection
+     and Gmail's image proxy pre-fetch the tracking pixel, so **some opens are machines**. The
+     note must never let a proxy fetch masquerade as a prospect reading the email.
+   - **`🔗 CLIC` raises a HubSpot task**, the same way a bounce does. A click is a deliberate
+     human act — the strongest buying signal the system produces — and it was previously just a
+     line in a note nobody was watching.
+   Opens and clicks carry the same `[PRIMER CONTACTO]`/`[SEGUIMIENTO]` tag and Resend id as
+   deliveries, so any signal traces back to the message that produced it.
+
+**Route one-off letters through the tracked pipeline, never Zoho (July 31 2026, `07d49b6`).**
+Zoho gives **no delivery or open proof at all**. A one-off (e.g. a procurement letter after a
+referral) gets a normal registry slug + `docs/selling/drafts/{slug}-email.txt` and goes out via
+`/go/outreach-email/{slug}` — so it lands stamped `[PRIMER CONTACTO] ENTREGADO` with a Resend id
+like every other send. If the entry was created directly on Oracle to make the link resolve,
+**commit it** so the slug survives a redeploy or a fresh clone.
+
 **Email extraction bug (fixed July 26 2026):** the plain-text regex had no left boundary, so a
 label glued to the address was swallowed — `Email` + `contactus@…` → `emailcontactus@dentalconnect.com.mx`,
 which Resend suppressed. `mailto:` is now authoritative, text matches need a left boundary, and a
@@ -336,6 +367,26 @@ approved Operator block in **How it works NOW**.
 (email and/or WA stamp) · **0** still 🔥 Act TODAY · WhatsApp FU buttons on **93** notes ·
 full inventory + Early Manual 13 in `PANAMA_TARGET_PROSPECTS.md`. Below = early seed rows;
 do not re-stage anyone already `· SENT` on the hit-list.
+
+**Funnel truth (Jul 31 2026, read live from HubSpot — 96 `[CLIENT-MANUAL]` deals):**
+
+| Stage | Count |
+|---|---|
+| ⏳ Sent (`decisionmakerboughtin`) | ~94 |
+| 💬 They replied (`contractsent`) | **2** |
+| 🔥 Queue holder (`qualifiedtobuy`) | 1 |
+| ✅ Won | **0** |
+
+The two replies: **Grupo Residencial (Park House)** and **Hospital CIMA** — the second is the
+better one and the first real progression this play has produced. **Jafet Artavia (Plataforma
+Omnicanal) answered the follow-up and referred AIdeazz to Compras (procurement)** — a warm
+hand-off into the buying function, not just a reply. The procurement letter went out through
+the tracked pipeline (not Zoho) and is stamped `[PRIMER CONTACTO] ENTREGADO` with a Resend id.
+
+**Read this honestly:** the machinery is excellent — 96 staged, contacts attached, delivery and
+now open/click provenance, 88/88 verified claims. **~2% reply, 0 closed.** The constraint is not
+volume or tooling, it is **message-market fit**. Before scaling the next batch, change the offer
+or the segment — sending more of the same message through better plumbing will reproduce ~2%.
 
 | Date | Company | Audit | Deal |
 |------|---------|-------|------|
