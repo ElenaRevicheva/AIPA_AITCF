@@ -1498,5 +1498,13 @@
     "emailDraft": "docs/selling/drafts/balboa-academy-fu-email.txt",
     "dealId": "63083234656",
     "score": 70
+  },
+  "hospital-cima-compras": {
+    "company": "Hospital CIMA (Compras)",
+    "email": "Compras@hospitalcima.com",
+    "emailDraft": "docs/selling/drafts/hospital-cima-compras-email.txt",
+    "dealId": "63062155835",
+    "score": 70,
+    "phone": "+50622081106"
   }
 }
