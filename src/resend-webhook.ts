@@ -114,9 +114,12 @@ function stampFor(
   to: string,
   data: Record<string, unknown>,
   resendId?: string,
+  /** 'PRIMER CONTACTO' | 'SEGUIMIENTO' — from the recorded send slug, never guessed. */
+  kind?: string | null,
 ): Stamp | null {
   const when = new Date().toISOString().slice(0, 10);
   const reason = String((data as { reason?: string }).reason || '').slice(0, 160);
+  const kindTag = kind ? `[${kind}] ` : '';
   // The Resend message id is the only handle that ties a stamp back to a real
   // provider event. Without it "ENTREGADO" is an unverifiable claim in a note —
   // Elena asked (July 31 2026) that a delivery mark always carry the id she can
@@ -125,10 +128,10 @@ function stampFor(
   const idSuffix = resendId ? ` · Resend id ${resendId}` : '';
   switch (type) {
     case 'email.delivered':
-      return { text: `✅ ENTREGADO ${when} → ${to} (Resend confirmó la entrega${idSuffix})` };
+      return { text: `✅ ${kindTag}ENTREGADO ${when} → ${to} (Resend confirmó la entrega${idSuffix})` };
     case 'email.bounced':
       return {
-        text: `⛔ REBOTE ${when} → ${to}${reason ? ` — ${reason}` : ''} (NO llegó${idSuffix})`,
+        text: `⛔ ${kindTag}REBOTE ${when} → ${to}${reason ? ` — ${reason}` : ''} (NO llegó${idSuffix})`,
         task: {
           subject: `⛔ Email rebotó → buscar otra dirección (${to})`,
           body:
@@ -363,10 +366,18 @@ export function registerResendWebhookRoutes(app: Express): void {
     res.status(200).send('ok');
 
     try {
-      const stamp = stampFor(type, to, data, resendId);
-      if (!stamp) return;
       const ledger = readLedger();
       const hit = ledger[resendId] || dealIdByRecipient(to);
+      // Which message was delivered — the first outreach or the follow-up?
+      // The ledger records the slug used for the send, and the `-fu` suffix is the
+      // only reliable discriminator (Elena, July 31 2026: a bare "ENTREGADO" left
+      // her unable to tell whether the FIRST contact had actually landed). Derived
+      // solely from the recorded send; when the slug is unknown we say nothing
+      // rather than guess.
+      const slug = (hit as ResendLedgerEntry)?.slug;
+      const kind = slug ? (/-fu$/i.test(slug) ? 'SEGUIMIENTO' : 'PRIMER CONTACTO') : null;
+      const stamp = stampFor(type, to, data, resendId, kind);
+      if (!stamp) return;
       if (!hit?.dealId) {
         console.log(`[resend-webhook] ${type} for ${to} (${resendId}) — no matching deal, skipped`);
         return;
