@@ -64,3 +64,11 @@ data/
 # Trello card dumps (deleted-card backups) - THIS REPO IS PUBLIC and these carry
 # recruiter names/emails/message bodies. Keep the files, never publish them.
 backups/trello-*.json
+
+# Make.com scenario blueprints (taken before editing the Lead Concierge scenario).
+# Same rule as above: THIS REPO IS PUBLIC and a blueprint embeds the live
+# CONCIERGE_SECRET as a Bearer header on its HTTP module, plus the full Fable 5
+# prompt. Verified July 31 2026 - the two files in backups/make/ each contain a
+# working bearer token. Keep the backups (they are how the scenario gets
+# restored), never publish them.
+backups/make/
