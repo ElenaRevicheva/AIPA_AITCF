@@ -198,7 +198,17 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 >
 > **Incident — aideazz.xyz `502 Bad Gateway` (July 15 2026):** whole site 502 with `Server: BunnyCDN`, `CDN-PullZone: 5088105`, **`ErrorCode: 107`**. Root cause = Bunny's **IPFS origin pin went stale/unreachable** (same failure class as the July raw-IPFS-resolution blog incident below). Oracle was fully healthy throughout. **Fix = push a real rebuild commit to `aideazz` `main`** (must NOT be `[skip ci]`, or 4everland won't rebuild) → 4everland re-pins a fresh IPFS CID → Bunny origin recovers in **~90–180s**. Recovery order: **subpaths (`/portfolio`) return 200 first, root `/` last** — so keep checking root before declaring failure. **Before triggering, `git pull --ff-only` first** — the live build is from GitHub `origin/main`, which may be ahead of a stale local clone; never rebuild from behind. **If a push does NOT recover it**, the 4everland project itself is likely paused/expired — that lives in Elena's **4everland dashboard** (credential boundary — Claude cannot reach it).
 >
-> **Incident — `www.aideazz.xyz` museum copy (confirmed July 21 2026):** **`https://aideazz.xyz`** (apex) and **`https://www.aideazz.xyz`** are **two different front doors**, not one site with a cache bug.
+> **✅ RESOLVED — re-verified live July 31 2026.** The `www` redirect is **working**; the museum copy is gone. Do not act on the incident notes below without re-checking first:
+> ```
+> curl -sI https://www.aideazz.xyz   → HTTP/1.1 301 Moved Permanently
+>                                       Location: https://aideazz.xyz/
+>                                       Server: cloudflare
+> curl -sI https://aideazz.xyz       → HTTP/1.1 200 OK
+>                                       Server: BunnyCDN · CDN-PullZone: 5088105
+> ```
+> The Cloudflare 301 Redirect Rule described in the fix below was restored at some point between Jul 21 and Jul 31 and nobody updated this doc. On Jul 31 an agent read the stale entry and told Elena her `www` was serving a museum copy — she pushed back, one `curl` settled it, and she was right. **Lesson: this doc records what was true on the date written. Verify the live system before repeating any claim from it** — the same rule already stated in [[feedback_verify_from_logs]]. The history below is kept because the failure mode is real and can recur.
+>
+> **Incident — `www.aideazz.xyz` museum copy (confirmed July 21 2026 · FIXED, see above):** **`https://aideazz.xyz`** (apex) and **`https://www.aideazz.xyz`** are **two different front doors**, not one site with a cache bug.
 > - Apex: Bunny pull zone **`5088105`**, current IPFS root (fresh SOP / July 21 content). DNS A → Bunny edge.
 > - `www`: Cloudflare-proxied → Bunny pull zone **`5088110`** → **different / older IPFS CID** (old title “AI Personal Assistants That Evolve With You”). HTTPS returns **200** (no redirect).
 > - Phase 1f (Apr 18) recorded a Cloudflare **301 `www` → apex** Redirect Rule + SPA JS redirect in `aideazz` `src/main.tsx`. Live check Jul 21: **the CF 301 is gone/broken**; JS redirect never runs because `www` serves the old pin, not the current SPA.
