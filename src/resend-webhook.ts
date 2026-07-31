@@ -109,15 +109,26 @@ function verifySignature(req: Request & { rawBody?: Buffer }, secret: string): b
 
 type Stamp = { text: string; task?: { subject: string; body: string } };
 
-function stampFor(type: string, to: string, data: Record<string, unknown>): Stamp | null {
+function stampFor(
+  type: string,
+  to: string,
+  data: Record<string, unknown>,
+  resendId?: string,
+): Stamp | null {
   const when = new Date().toISOString().slice(0, 10);
   const reason = String((data as { reason?: string }).reason || '').slice(0, 160);
+  // The Resend message id is the only handle that ties a stamp back to a real
+  // provider event. Without it "ENTREGADO" is an unverifiable claim in a note —
+  // Elena asked (July 31 2026) that a delivery mark always carry the id she can
+  // look up in the Resend dashboard. Only ever rendered from the actual webhook
+  // payload, never inferred.
+  const idSuffix = resendId ? ` · Resend id ${resendId}` : '';
   switch (type) {
     case 'email.delivered':
-      return { text: `✅ ENTREGADO ${when} → ${to} (Resend confirmó la entrega)` };
+      return { text: `✅ ENTREGADO ${when} → ${to} (Resend confirmó la entrega${idSuffix})` };
     case 'email.bounced':
       return {
-        text: `⛔ REBOTE ${when} → ${to}${reason ? ` — ${reason}` : ''} (NO llegó)`,
+        text: `⛔ REBOTE ${when} → ${to}${reason ? ` — ${reason}` : ''} (NO llegó${idSuffix})`,
         task: {
           subject: `⛔ Email rebotó → buscar otra dirección (${to})`,
           body:
@@ -352,7 +363,7 @@ export function registerResendWebhookRoutes(app: Express): void {
     res.status(200).send('ok');
 
     try {
-      const stamp = stampFor(type, to, data);
+      const stamp = stampFor(type, to, data, resendId);
       if (!stamp) return;
       const ledger = readLedger();
       const hit = ledger[resendId] || dealIdByRecipient(to);
