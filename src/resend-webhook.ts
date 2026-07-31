@@ -150,10 +150,25 @@ function stampFor(
       };
     case 'email.delivery_delayed':
       return { text: `⏳ ENTREGA DEMORADA ${when} → ${to} (Resend reintentando)` };
+    // Opens and clicks carry the same provenance as a delivery: which message it
+    // was, and the Resend id to look it up. An open is a SOFT signal — Apple Mail
+    // Privacy Protection and Gmail's image proxy pre-fetch the tracking pixel, so
+    // some "opens" are machines, not people. Labelled as such so it is never read
+    // as proof. A click is a deliberate human act and is called out as the real
+    // buying signal.
     case 'email.opened':
-      return { text: `👀 ABIERTO ${when} → ${to}` };
+      return { text: `👀 ${kindTag}ABIERTO ${when} → ${to} (señal blanda — puede ser el proxy del correo${idSuffix})` };
     case 'email.clicked':
-      return { text: `🔗 CLIC EN ENLACE ${when} → ${to} — señal de interés, seguir hoy` };
+      return {
+        text: `🔗 ${kindTag}CLIC EN ENLACE ${when} → ${to} — señal REAL de interés, seguir hoy${idSuffix}`,
+        task: {
+          subject: `🔗 Hizo clic en el enlace → contactar hoy (${to})`,
+          body:
+            `${to} abrió el correo y además hizo clic en un enlace — es la señal de interés más fuerte ` +
+            `que da el sistema (un clic es un acto humano, no un proxy). Vale la pena escribirle o ` +
+            `llamarle hoy mismo, mientras el tema le resulta presente.`,
+        },
+      };
     default:
       return null;
   }

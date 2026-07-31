@@ -1,0 +1,31 @@
+SUBJECT: Servicio de visibilidad en IA — referidos por Jafet Artavia (Plataforma Omnicanal)
+
+TO: Compras@hospitalcima.com
+
+Estimado equipo de Compras:
+
+Les escribo por indicación del señor Jafet Artavia Ortega, Ejecutivo de Plataforma Omnicanal, quien amablemente me refirió a este departamento el día de hoy.
+
+Soy Elena Revicheva, ingeniera de IA y automatización, radicada en Panamá. Ofrezco un servicio profesional (no un insumo ni un producto de inventario): auditoría y corrección de la visibilidad de Hospital CIMA en motores de respuesta con inteligencia artificial —ChatGPT, Perplexity, Google AI Overviews— que hoy son el primer punto de consulta de muchos pacientes internacionales.
+
+Ya realicé la auditoría preliminar de hospitalcima.com: 70/100. El hallazgo principal es que el hospital no aparece como respuesta citable cuando un paciente pregunta por opciones médicas en San José.
+
+Dado que se trata de un servicio de mercadeo digital y no de una compra de suministros, es posible que la decisión corresponda a Mercadeo, Comunicación o Transformación Digital. Si es así, les agradecería enormemente que canalicen este correo al área respectiva.
+
+Con gusto puedo:
+
+- Enviar el informe completo (2 páginas, sin costo ni compromiso)
+- Presentarlo en una reunión de 15 minutos
+- Completar cualquier registro de proveedor o documentación que el hospital requiera
+
+Quedo atenta a sus indicaciones y les agradezco de antemano.
+
+Saludos cordiales,
+
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización
+AIdeazz AI Lab
+aipa@aideazz.xyz
+https://aideazz.xyz/portfolio
+
+PD: El turismo médico hacia Costa Rica se decide cada vez más en una conversación con IA antes que en un buscador. Los 3 arreglos que propongo son técnicos y de implementación rápida —datos estructurados de servicios médicos, preguntas frecuentes en formato citable y un archivo llms.txt— y no requieren rediseñar el sitio.
