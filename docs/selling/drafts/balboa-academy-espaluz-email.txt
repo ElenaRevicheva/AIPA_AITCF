@@ -4,9 +4,9 @@ TO: contactba@balboa-academy.org
 
 Dear Balboa Academy team,
 
-Great to reach out again! 👋I'm Elena Revicheva, an AI engineer here in Panama: https://aideazz.xyz/portfolio. I wrote to you a few days ago about AI visibility — today I'm writing about something different, and closer to your families' daily life.
+Great to reach out again! 👋I'm Elena Revicheva, an AI engineer and I lead AIdeazz AI Lab here in Panama: https://aideazz.xyz/portfolio. I wrote to you a few days ago about AI visibility — today I'm writing about something different, and closer to your families' daily life.
 
-I'm a single mother who moved to Panama with my daughter and my parents. I know those first weeks first-hand: the doctor's appointment you don't follow, the teacher meeting, the pharmacy. That's why I built EspaLuz — a bilingual AI companion for expat families.
+One of the lab's products is EspaLuz: a bilingual AI companion for expat families. I built it around what a newly arrived family in Panama actually faces — the doctor's appointment you don't follow, the teacher meeting, the paperwork.
 
 What it actually does:
 • A family member sends a voice note in their own language and gets the answer back in Spanish AND English — text and voice. One to say out loud, one to check they got it right.
@@ -26,7 +26,12 @@ If it's useful, I'd be glad to show it in 15 minutes on a call, or come to campu
 
 Would it make sense to try it with this year's newly arrived families?
 
-PS: Beyond EspaLuz, I build AI automation and other business-focused services — WhatsApp agents that answer and qualify admissions enquiries 24/7, process automation, AI video for marketing, and visibility in AI search engines. Live demos here: https://aideazz.xyz/portfolio
+PS: What I build at AIdeazz AI Lab, beyond EspaLuz:
+• AI search visibility — GEO · AEO · technical SEO: when a family asks ChatGPT or Perplexity for the best international school in Panama, Balboa is the answer. Optimised for AI crawlers, answer engines and LLM retrieval.
+• AI agents for WhatsApp and Telegram: answer admissions FAQs, qualify leads and book appointments 24/7 — bilingual EN/ES, connected to your CRM.
+• End-to-end AI automation: Make, n8n or custom code — trigger → AI → action in your own tools, documented so it's yours.
+• AI video generation, and reliability/rescue for AI systems you already run.
+Get recommended by ChatGPT → close on WhatsApp. Live demos: https://aideazz.xyz/portfolio
 
 Have a great day!
 Best,

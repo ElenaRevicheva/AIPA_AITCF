@@ -4,11 +4,11 @@ TO: info@panamcham.com
 
 Estimado equipo de AmCham Panamá:
 
-¡Un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+¡Un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA y dirijo AIdeazz AI Lab aquí en Panamá: https://aideazz.xyz/portfolio.
 
 Les escribo con una propuesta concreta para sus socios, sin costo para la Cámara.
 
-Soy madre soltera y llegué a Panamá con mi hija y mis padres. Conozco de primera mano las primeras semanas de una familia que llega: la cita médica que no entiendes, la reunión en el colegio, el trámite migratorio. Por eso construí EspaLuz — un acompañante bilingüe con IA para familias expatriadas.
+Uno de los productos del laboratorio es EspaLuz: un acompañante bilingüe con IA para familias expatriadas. Lo construí a partir de lo que realmente enfrenta una familia recién llegada a Panamá — la cita médica que no se entiende, la reunión en el colegio, el trámite migratorio.
 
 Qué hace, en concreto:
 • La persona envía una nota de voz en su idioma y recibe la respuesta en español Y en inglés — texto y voz. Una para decirla, otra para confirmar que la dijo bien.
@@ -28,7 +28,12 @@ Una nota práctica: el código está activo en este momento en el bot de Telegra
 
 Si les parece bien, con mucho gusto se los muestro en 15 minutos por videollamada, o hago una demostración corta en alguno de sus eventos de socios — lo que les quede mejor. También puedo prepararles el texto listo para su boletín, sin ningún compromiso.
 
-PD: Además de EspaLuz, desarrollo automatización con IA y otros servicios orientados a resultados de negocio — agentes de WhatsApp que atienden y califican leads 24/7, automatización completa de procesos, video con IA para marketing, y visibilidad en buscadores de IA. Todo con demos en vivo aquí: https://aideazz.xyz/portfolio
+PD: Lo que construyo en AIdeazz AI Lab, y que puede interesar a sus socios:
+• Visibilidad en búsqueda con IA — GEO · AEO · SEO técnico: cuando alguien le pregunta a ChatGPT o Perplexity por lo que su empresa vende, que su negocio sea la respuesta. Optimizado para crawlers de IA, motores de respuesta y recuperación LLM.
+• Agentes de IA para WhatsApp y Telegram: responden preguntas frecuentes, califican leads y agendan citas 24/7 — bilingües EN/ES, conectados a su CRM.
+• Automatización de extremo a extremo: Make, n8n o código a medida — disparador → IA → acción en sus herramientas, documentado para que sea suyo.
+• Generación de video con IA y fiabilidad/rescate de sistemas de IA que ya operan.
+Que ChatGPT te recomiende → cierra en WhatsApp. Demos en vivo: https://aideazz.xyz/portfolio
 
 ¡Que tengan un excelente día!
 Saludos,

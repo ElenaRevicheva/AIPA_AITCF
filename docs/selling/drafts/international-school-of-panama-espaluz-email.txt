@@ -4,9 +4,9 @@ TO: admissions@isp.edu.pa
 
 Estimado equipo de ISP:
 
-¡Un gusto saludarles de nuevo! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio. Hace unos días les escribí sobre visibilidad en IA; hoy les escribo por algo distinto y, creo, más cercano a su día a día.
+¡Un gusto saludarles de nuevo! 👋Soy Elena Revicheva, ingeniera de IA y dirijo AIdeazz AI Lab aquí en Panamá: https://aideazz.xyz/portfolio. Hace unos días les escribí sobre visibilidad en IA; hoy les escribo por algo distinto y, creo, más cercano a su día a día.
 
-Soy madre soltera y llegué a Panamá con mi hija y mis padres. Conozco de primera mano las primeras semanas: la cita médica que no entiendes, la reunión con la maestra, la farmacia. Por eso construí EspaLuz — un acompañante bilingüe con IA para familias expatriadas.
+Uno de los productos del laboratorio es EspaLuz: un acompañante bilingüe con IA para familias expatriadas. Lo construí a partir de lo que realmente enfrenta una familia recién llegada a Panamá — la cita médica que no se entiende, la reunión con la maestra, el trámite.
 
 Qué hace, en concreto:
 • La familia envía una nota de voz en su idioma (inglés, ruso, portugués) y recibe la respuesta en español Y en inglés — texto y voz.
@@ -26,7 +26,12 @@ Si les sirve, con mucho gusto lo muestro en 15 minutos por videollamada, o voy a
 
 ¿Les parece si lo vemos con las familias que empiezan este año escolar?
 
-PD: Además de EspaLuz, desarrollo automatización con IA y otros servicios orientados a resultados de negocio — agentes de WhatsApp que atienden y califican consultas de admisiones 24/7, automatización de procesos, video con IA para marketing, y visibilidad en buscadores de IA. Todo con demos en vivo aquí: https://aideazz.xyz/portfolio
+PD: Lo que construyo en AIdeazz AI Lab, más allá de EspaLuz:
+• Visibilidad en búsqueda con IA — GEO · AEO · SEO técnico: cuando una familia le pregunta a ChatGPT o Perplexity por el mejor colegio internacional en Panamá, que ISP sea la respuesta. Optimizado para crawlers de IA, motores de respuesta y recuperación LLM.
+• Agentes de IA para WhatsApp y Telegram: responden preguntas frecuentes de admisiones, califican leads y agendan citas 24/7 — bilingües EN/ES, conectados a su CRM.
+• Automatización de extremo a extremo: Make, n8n o código a medida — disparador → IA → acción en sus herramientas, documentado para que sea suyo.
+• Generación de video con IA y fiabilidad/rescate de sistemas de IA que ya tienen.
+Que ChatGPT te recomiende → cierra en WhatsApp. Demos en vivo: https://aideazz.xyz/portfolio
 
 ¡Que tengan un excelente día!
 Saludos,
