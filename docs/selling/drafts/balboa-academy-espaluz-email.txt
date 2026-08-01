@@ -6,7 +6,7 @@ Dear Balboa Academy team,
 
 Great to reach out again! 👋I'm Elena Revicheva, an AI engineer and I lead AIdeazz AI Lab here in Panama: https://aideazz.xyz/portfolio. I wrote to you a few days ago about AI visibility — today I'm writing about something different, and closer to your families' daily life.
 
-One of the lab's products is EspaLuz: a bilingual AI companion for expat families. I built it around what a newly arrived family in Panama actually faces — the doctor's appointment you don't follow, the teacher meeting, the paperwork.
+One of the lab's products is EspaLuz: a bilingual AI companion for expat families. I built it out of my own family's experience arriving in Panama — the doctor's appointment you don't follow, the teacher meeting, the paperwork. It isn't a generic chatbot: every feature came from a specific need we lived at home.
 
 What it actually does:
 • A family member sends a voice note in their own language and gets the answer back in Spanish AND English — text and voice. One to say out loud, one to check they got it right.

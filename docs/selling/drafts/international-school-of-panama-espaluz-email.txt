@@ -6,7 +6,7 @@ Estimado equipo de ISP:
 
 ¡Un gusto saludarles de nuevo! 👋Soy Elena Revicheva, ingeniera de IA y dirijo AIdeazz AI Lab aquí en Panamá: https://aideazz.xyz/portfolio. Hace unos días les escribí sobre visibilidad en IA; hoy les escribo por algo distinto y, creo, más cercano a su día a día.
 
-Uno de los productos del laboratorio es EspaLuz: un acompañante bilingüe con IA para familias expatriadas. Lo construí a partir de lo que realmente enfrenta una familia recién llegada a Panamá — la cita médica que no se entiende, la reunión con la maestra, el trámite.
+Uno de los productos del laboratorio es EspaLuz: un acompañante bilingüe con IA para familias expatriadas. Lo construí a partir de la experiencia de mi propia familia al llegar a Panamá — la cita médica que no se entiende, la reunión con la maestra, el trámite. No es un chatbot genérico: cada función salió de una necesidad concreta que vivimos en casa.
 
 Qué hace, en concreto:
 • La familia envía una nota de voz en su idioma (inglés, ruso, portugués) y recibe la respuesta en español Y en inglés — texto y voz.

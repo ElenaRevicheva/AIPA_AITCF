@@ -8,7 +8,7 @@ Estimado equipo de AmCham Panamá:
 
 Les escribo con una propuesta concreta para sus socios, sin costo para la Cámara.
 
-Uno de los productos del laboratorio es EspaLuz: un acompañante bilingüe con IA para familias expatriadas. Lo construí a partir de lo que realmente enfrenta una familia recién llegada a Panamá — la cita médica que no se entiende, la reunión en el colegio, el trámite migratorio.
+Uno de los productos del laboratorio es EspaLuz: un acompañante bilingüe con IA para familias expatriadas. Lo construí a partir de la experiencia de mi propia familia al llegar a Panamá — la cita médica que no se entiende, la reunión en el colegio, el trámite migratorio. No es un chatbot genérico: cada función salió de una necesidad concreta que vivimos en casa.
 
 Qué hace, en concreto:
 • La persona envía una nota de voz en su idioma y recibe la respuesta en español Y en inglés — texto y voz. Una para decirla, otra para confirmar que la dijo bien.
