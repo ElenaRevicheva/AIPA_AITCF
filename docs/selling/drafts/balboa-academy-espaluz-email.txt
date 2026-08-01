@@ -27,11 +27,11 @@ If it's useful, I'd be glad to show it in 15 minutes on a call, or come to campu
 Would it make sense to try it with this year's newly arrived families?
 
 PS: What I build at AIdeazz AI Lab, beyond EspaLuz:
-• AI search visibility — GEO · AEO · technical SEO: when a family asks ChatGPT or Perplexity for the best international school in Panama, Balboa is the answer. Optimised for AI crawlers, answer engines and LLM retrieval.
-• AI agents for WhatsApp and Telegram: answer admissions FAQs, qualify leads and book appointments 24/7 — bilingual EN/ES, connected to your CRM.
-• End-to-end AI automation: Make, n8n or custom code — trigger → AI → action in your own tools, documented so it's yours.
-• AI video generation, and reliability/rescue for AI systems you already run.
-Get recommended by ChatGPT → close on WhatsApp. Live demos: https://aideazz.xyz/portfolio
+• Getting recommended by AI. When a family asks ChatGPT or Perplexity "which is the best international school in Panama?", the answer is Balboa. I prepare the website so AI can read it, understand it, and quote it.
+• A WhatsApp assistant that answers the usual admissions questions, tells which families are serious, and books visits — day and night, in English and Spanish.
+• Automating repetitive work: one admissions form sets the whole process in motion by itself, inside the tools you already use.
+• AI-made videos for your family communications, and fixing AI systems you already have that aren't working properly.
+Get recommended by ChatGPT → close on WhatsApp. Live examples: https://aideazz.xyz/portfolio
 
 Have a great day!
 Best,

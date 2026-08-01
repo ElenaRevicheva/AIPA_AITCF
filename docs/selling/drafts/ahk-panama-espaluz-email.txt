@@ -29,11 +29,11 @@ Una nota práctica: el código está activo en este momento en el bot de Telegra
 Si les parece bien, con mucho gusto se los muestro en 15 minutos por videollamada, o paso por sus oficinas en Obarrio para una demostración corta. También puedo prepararles el texto listo para su comunicación con socios, sin ningún compromiso.
 
 PD: Lo que construyo en AIdeazz AI Lab, y que puede interesar a sus socios:
-• Visibilidad en búsqueda con IA — GEO · AEO · SEO técnico: cuando alguien le pregunta a ChatGPT o Perplexity por lo que su empresa vende, que su negocio sea la respuesta. Optimizado para crawlers de IA, motores de respuesta y recuperación LLM.
-• Agentes de IA para WhatsApp y Telegram: responden preguntas frecuentes, califican leads y agendan citas 24/7 — bilingües EN/ES, conectados a su CRM.
-• Automatización de extremo a extremo: Make, n8n o código a medida — disparador → IA → acción en sus herramientas, documentado para que sea suyo.
-• Generación de video con IA y fiabilidad/rescate de sistemas de IA que ya operan.
-Que ChatGPT te recomiende → cierra en WhatsApp. Demos en vivo: https://aideazz.xyz/portfolio
+• Que la IA los recomiende. Cuando alguien le pregunta a ChatGPT o a Perplexity por lo que su empresa vende, que la respuesta sea su negocio. Preparo el sitio web para que la IA lo lea, lo entienda y lo cite.
+• Un asistente en WhatsApp que contesta las preguntas de siempre, distingue quién va en serio y agenda citas — de día y de noche, en español e inglés.
+• Automatizar el trabajo repetitivo: que un formulario o un mensaje ponga en marcha todo el proceso solo, dentro de las herramientas que ya usan.
+• Videos hechos con IA para su comunicación, y arreglar sistemas de IA que ya tengan y no estén funcionando bien.
+Que ChatGPT te recomiende → cierra en WhatsApp. Ejemplos en vivo: https://aideazz.xyz/portfolio
 
 ¡Que tengan un excelente día!
 Saludos,
