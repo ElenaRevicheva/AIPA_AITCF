@@ -8,7 +8,7 @@ Estimado equipo de AmCham Panamá:
 
 Les escribo con una propuesta concreta para sus socios, sin costo para la Cámara.
 
-Soy madre soltera y llegué a Panamá con mi hija y mis padres. Conozco de primera mano las primeras semanas de una familia que llega: la cita médica que no entiendes, la reunión en el colegio, el trámite migratorio. Por eso construí EspaLuz — un acompañante bilingüe con IA para familias expatriadas, que ya funciona en WhatsApp y Telegram.
+Soy madre soltera y llegué a Panamá con mi hija y mis padres. Conozco de primera mano las primeras semanas de una familia que llega: la cita médica que no entiendes, la reunión en el colegio, el trámite migratorio. Por eso construí EspaLuz — un acompañante bilingüe con IA para familias expatriadas.
 
 Qué hace, en concreto:
 • La persona envía una nota de voz en su idioma y recibe la respuesta en español Y en inglés — texto y voz. Una para decirla, otra para confirmar que la dijo bien.
@@ -16,11 +16,19 @@ Qué hace, en concreto:
 • Recuerda a cada miembro de la familia: nivel, edad, en qué anda cada uno.
 • Sin descargar ninguna app.
 
-Mi propuesta: un **piloto gratuito de 60 días** para los socios que ustedes decidan, con el código **AMCHAM_PANAMA**. Las empresas socias solo comparten el código con sus empleados expatriados y sus familias — ellos lo escriben en el bot y quedan activos. No hay integración, no hay factura, no cambia nada del lado de AmCham, y ustedes lo pueden presentar como un beneficio más de la membresía.
+Mi propuesta: un piloto gratuito de 60 días para los socios que ustedes decidan.
+
+El código es: AMCHAM_PANAMA
+
+Las empresas socias solo comparten el código con sus empleados expatriados y sus familias — ellos escriben /org AMCHAM_PANAMA en el bot y quedan activos. No hay integración, no hay factura, no cambia nada del lado de AmCham, y ustedes lo pueden presentar como un beneficio más de la membresía.
 
 Con más de 400 empresas socias, muchas con personal internacional, creo que puede ser un beneficio muy visible y fácil de comunicar.
 
+Una nota práctica: el código está activo en este momento en el bot de Telegram. El bot de WhatsApp es el mismo producto, y si ustedes aceptan el piloto les entrego el código de WhatsApp de inmediato, para que cada socio use el canal que prefiera.
+
 Si les parece bien, con mucho gusto se los muestro en 15 minutos por videollamada, o hago una demostración corta en alguno de sus eventos de socios — lo que les quede mejor. También puedo prepararles el texto listo para su boletín, sin ningún compromiso.
+
+PD: Además de EspaLuz, desarrollo automatización con IA y otros servicios orientados a resultados de negocio — agentes de WhatsApp que atienden y califican leads 24/7, automatización completa de procesos, video con IA para marketing, y visibilidad en buscadores de IA. Todo con demos en vivo aquí: https://aideazz.xyz/portfolio
 
 ¡Que tengan un excelente día!
 Saludos,

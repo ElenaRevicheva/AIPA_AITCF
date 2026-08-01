@@ -6,7 +6,7 @@ Dear Balboa Academy team,
 
 Great to reach out again! 👋I'm Elena Revicheva, an AI engineer here in Panama: https://aideazz.xyz/portfolio. I wrote to you a few days ago about AI visibility — today I'm writing about something different, and closer to your families' daily life.
 
-I'm a single mother who moved to Panama with my daughter and my parents. I know those first weeks first-hand: the doctor's appointment you don't follow, the teacher meeting, the pharmacy. That's why I built EspaLuz — a bilingual AI companion for expat families, already running on WhatsApp and Telegram.
+I'm a single mother who moved to Panama with my daughter and my parents. I know those first weeks first-hand: the doctor's appointment you don't follow, the teacher meeting, the pharmacy. That's why I built EspaLuz — a bilingual AI companion for expat families.
 
 What it actually does:
 • A family member sends a voice note in their own language and gets the answer back in Spanish AND English — text and voice. One to say out loud, one to check they got it right.
@@ -14,11 +14,19 @@ What it actually does:
 • It remembers each family member — level, age, what they're working through.
 • No app to download.
 
-My proposal is simple and free for the school: a **60-day free pilot** for whichever families you choose, using the code **BALBOA_PARENTS**. Families just type it into the bot and they're active. No integration, no invoice, nothing changes on your side — and you can offer it as one more benefit of the Balboa community.
+My proposal is simple and free for the school: a 60-day free pilot for whichever families you choose.
+
+The code is: BALBOA_PARENTS
+
+Families just type /org BALBOA_PARENTS into the bot and they're active. No integration, no invoice, nothing changes on your side — and you can offer it as one more benefit of the Balboa community.
+
+One practical note: the code is live right now on the Telegram bot. The WhatsApp bot is the same product, and if you accept the pilot I'll provide the WhatsApp code immediately, so each family can use whichever channel they prefer.
 
 If it's useful, I'd be glad to show it in 15 minutes on a call, or come to campus for a short demo for admissions or the PTA — whichever suits you. I can also prepare ready-to-use text for your parent newsletter, with no obligation.
 
 Would it make sense to try it with this year's newly arrived families?
+
+PS: Beyond EspaLuz, I build AI automation and other business-focused services — WhatsApp agents that answer and qualify admissions enquiries 24/7, process automation, AI video for marketing, and visibility in AI search engines. Live demos here: https://aideazz.xyz/portfolio
 
 Have a great day!
 Best,

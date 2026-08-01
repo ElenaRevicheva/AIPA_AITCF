@@ -6,19 +6,27 @@ Estimado equipo de Oxford International School:
 
 ¡Un gusto saludarles de nuevo! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio. Hace unos días les escribí sobre visibilidad en IA; hoy les escribo por algo distinto y más cercano a las familias que reciben cada año.
 
-Soy madre soltera y llegué a Panamá con mi hija y mis padres. Conozco las primeras semanas: la cita médica que no entiendes, la reunión con la maestra, la farmacia. Por eso construí EspaLuz — un acompañante bilingüe con IA para familias expatriadas, que ya funciona en WhatsApp y Telegram.
+Soy madre soltera y llegué a Panamá con mi hija y mis padres. Conozco las primeras semanas: la cita médica que no entiendes, la reunión con la maestra, la farmacia. Por eso construí EspaLuz — un acompañante bilingüe con IA para familias expatriadas.
 
 Qué hace, en concreto:
-• La familia envía una nota de voz en su idioma y recibe la respuesta en español Y en inglés — texto y voz, para decirlo y para confirmar que lo dijo bien.
+• La familia envía una nota de voz en su idioma y recibe la respuesta en español Y en inglés — texto y voz, una para decirlo y otra para confirmar que lo dijo bien.
 • Español panameño real, no de libro: el vocabulario del hospital, del colegio, del trámite migratorio.
 • Recuerda a cada miembro de la familia: nivel, edad, en qué anda cada uno.
 • Sin descargar ninguna app.
 
-Mi propuesta es sencilla y sin costo para el colegio: un **piloto gratuito de 60 días** para las familias que ustedes elijan, con el código **OXFORD_PARENTS**. Las familias solo lo escriben en el bot y quedan activas. No hay integración ni factura — y ustedes pueden ofrecerlo como un beneficio adicional para las familias que recién llegan al país.
+Mi propuesta es sencilla y sin costo para el colegio: un piloto gratuito de 60 días para las familias que ustedes elijan.
+
+El código es: OXFORD_PARENTS
+
+Las familias solo escriben /org OXFORD_PARENTS en el bot y quedan activas. No hay integración ni factura — y ustedes pueden ofrecerlo como un beneficio adicional para las familias que recién llegan al país.
+
+Una nota práctica: el código está activo en este momento en el bot de Telegram. El bot de WhatsApp es el mismo producto, y si ustedes aceptan el piloto les entrego el código de WhatsApp de inmediato, para que cada familia use el canal que prefiera.
 
 Si les parece bien, con mucho gusto se los muestro en 15 minutos por videollamada, o paso por el colegio para una demostración corta con admisiones o el PTA. También puedo prepararles un texto listo para su comunicación con padres, sin ningún compromiso.
 
 ¿Lo intentamos con el grupo de familias nuevas de este año?
+
+PD: Además de EspaLuz, desarrollo automatización con IA y otros servicios orientados a resultados de negocio — agentes de WhatsApp que atienden y califican consultas de admisiones 24/7, automatización de procesos, video con IA para marketing, y visibilidad en buscadores de IA. Todo con demos en vivo aquí: https://aideazz.xyz/portfolio
 
 ¡Que tengan un excelente día!
 Saludos,
