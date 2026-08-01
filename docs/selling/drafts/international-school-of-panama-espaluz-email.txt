@@ -1,0 +1,25 @@
+SUBJECT: EspaLuz para familias ISP — piloto gratuito de 60 días (código ISP_PARENTS)
+
+TO: admissions@isp.edu.pa
+
+Estimado equipo de ISP:
+
+¡Un gusto saludarles de nuevo! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio. Hace unos días les escribí sobre visibilidad en IA; hoy les escribo por algo distinto y, creo, más cercano a su día a día.
+
+Soy madre soltera y llegué a Panamá con mi hija y mis padres. Conozco de primera mano las primeras semanas: la cita médica que no entiendes, la reunión con la maestra, la farmacia. Por eso construí EspaLuz — un acompañante bilingüe con IA para familias expatriadas, que ya funciona en WhatsApp y Telegram.
+
+Qué hace, en concreto:
+• La familia envía una nota de voz en su idioma (inglés, ruso, portugués) y recibe la respuesta en español Y en inglés — texto y voz.
+• Español panameño real, no de libro: "¡qué xopa!", el vocabulario del IMA, del hospital, del colegio.
+• Recuerda a cada miembro de la familia: nivel, edad, en qué anda cada uno.
+• Sin descargar ninguna app.
+
+Mi propuesta es sencilla y sin costo para ISP: un **piloto gratuito de 60 días** para las familias que ustedes quieran, con el código **ISP_PARENTS**. Las familias solo lo escriben en el bot y quedan activas. No hay integración, no hay factura, no cambia nada de su lado — y ustedes pueden ofrecerlo como un beneficio más de la comunidad ISP.
+
+Si les sirve, con mucho gusto lo muestro en 15 minutos por videollamada, o voy al colegio y hago una demostración corta para el PTA — lo que les quede mejor. También puedo prepararles un texto listo para su boletín, sin ningún compromiso.
+
+¿Les parece si lo vemos con las familias que empiezan este año escolar?
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva✨🌍💫

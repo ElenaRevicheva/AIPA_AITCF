@@ -1506,5 +1506,40 @@
     "dealId": "63062155835",
     "score": 70,
     "phone": "+50622081106"
+  },
+  "international-school-of-panama-espaluz": {
+    "company": "International School of Panama",
+    "email": "admissions@isp.edu.pa",
+    "emailDraft": "docs/selling/drafts/international-school-of-panama-espaluz-email.txt",
+    "dealId": "63370307616",
+    "orgCode": "ISP_PARENTS"
+  },
+  "oxford-international-school-panama-espaluz": {
+    "company": "Oxford International School Panama",
+    "email": "admisiones@ois.edu.pa",
+    "emailDraft": "docs/selling/drafts/oxford-international-school-panama-espaluz-email.txt",
+    "dealId": "63384604984",
+    "orgCode": "OXFORD_PARENTS"
+  },
+  "balboa-academy-espaluz": {
+    "company": "Balboa Academy",
+    "email": "contactba@balboa-academy.org",
+    "emailDraft": "docs/selling/drafts/balboa-academy-espaluz-email.txt",
+    "dealId": "63367828303",
+    "orgCode": "BALBOA_PARENTS"
+  },
+  "amcham-panama-espaluz": {
+    "company": "AmCham Panama",
+    "email": "info@panamcham.com",
+    "emailDraft": "docs/selling/drafts/amcham-panama-espaluz-email.txt",
+    "dealId": "63351801898",
+    "orgCode": "AMCHAM_PANAMA"
+  },
+  "ahk-panama-espaluz": {
+    "company": "AHK Panama",
+    "email": "info@panama.ahk.de",
+    "emailDraft": "docs/selling/drafts/ahk-panama-espaluz-email.txt",
+    "dealId": "63355917617",
+    "orgCode": "AHK_PANAMA"
   }
 }
