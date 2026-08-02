@@ -75,7 +75,7 @@ async function fetchDeals(prefix) {
     });
     for (const d of res.results || []) {
       const name = d.properties?.dealname || '';
-      if (name.includes(`[${prefix}]`)) out.push({ name, stage: d.properties?.dealstage || '' });
+      if (name.includes(`[${prefix}]`)) out.push({ name, stage: d.properties?.dealstage || '', source: prefix });
     }
     after = res.paging?.next?.after;
   } while (after);
@@ -93,39 +93,81 @@ async function main() {
   ];
   console.log(`deals: ${deals.length} ([CLIENT-MANUAL] + [CLIENT-ATLAS] + [ATLAS-RADAR])`);
 
-  const outcomes = {};
-  // Per-ANGLE outcomes: the lead machine stamps " · social_proof" etc. on the deal
-  // name. Lane tells Atlas which service converts; angle tells it which OPENING
-  // converts — which is the thing Atlas rewrites every Monday and, until now, had
-  // no way of grading.
-  const byAngle = {};
   const blank = () => ({ staged: 0, sent: 0, replied: 0, won: 0, lost: 0, other: 0, total: 0 });
+  /**
+   * Always publish the DENOMINATOR next to the rate.
+   *
+   * The first [CLIENT-ATLAS] run reported reply_rate 100 — one reply out of one
+   * delivered email. Printed bare, that reads as "the new machine converts
+   * perfectly" and would justify pouring effort into a motion nobody has measured.
+   * `reached` makes 100%-of-1 self-evidently meaningless, and `confident` marks
+   * when the sample is big enough to act on.
+   */
+  const MIN_CONFIDENT = Number(process.env.OUTCOMES_MIN_SAMPLE || 20);
   const rate = (o) => {
     const reached = o.sent + o.replied + o.won + o.lost;
+    o.reached = reached;
+    o.confident = reached >= MIN_CONFIDENT;
     return reached ? Math.round(((o.replied + o.won) / reached) * 100) : null;
   };
 
+  /**
+   * Outcomes are kept STRICTLY PER SOURCE (Elena, Aug 2 2026: "I do not want to mix
+   * things"). [CLIENT-MANUAL] is a 96-deal cold list Atlas never influenced; folding
+   * it in with the Monday machine's output hides whether the new machine works. Two
+   * motions, two scoreboards.
+   *
+   * ATLAS_OUTCOMES_SOURCE decides which one Atlas LEARNS from — CLIENT-ATLAS by
+   * default, because Atlas should be graded on the deals it actually drove. The
+   * others are still reported, just not fed into its angle scoring.
+   */
+  const LEARN_FROM = process.env.ATLAS_OUTCOMES_SOURCE || 'CLIENT-ATLAS';
+  const bySource = {};
+  const anglesBySource = {};
+
   for (const d of deals) {
+    const src = d.source || 'UNKNOWN';
     const v = lane(d.name);
     const bucket = STAGE[d.stage] || 'other';
-    outcomes[v] = outcomes[v] || blank();
-    outcomes[v][bucket] = (outcomes[v][bucket] || 0) + 1;
-    outcomes[v].total++;
+    bySource[src] = bySource[src] || {};
+    bySource[src][v] = bySource[src][v] || blank();
+    bySource[src][v][bucket] = (bySource[src][v][bucket] || 0) + 1;
+    bySource[src][v].total++;
 
+    // Per-ANGLE: the lead machine stamps " · social_proof" on the deal name. Lane
+    // says which service converts; angle says which OPENING converts — the thing
+    // Atlas rewrites every Monday and, until now, had no way of grading.
     const am = String(d.name || '').match(/·\s*([a-z_]+)\s*$/i);
     if (am) {
       const a = am[1].toLowerCase();
-      byAngle[a] = byAngle[a] || blank();
-      byAngle[a][bucket] = (byAngle[a][bucket] || 0) + 1;
-      byAngle[a].total++;
+      anglesBySource[src] = anglesBySource[src] || {};
+      anglesBySource[src][a] = anglesBySource[src][a] || blank();
+      anglesBySource[src][a][bucket] = (anglesBySource[src][a][bucket] || 0) + 1;
+      anglesBySource[src][a].total++;
     }
   }
-  // Reply rate per lane — the "what converts" number Atlas serves.
-  for (const v of Object.keys(outcomes)) outcomes[v].reply_rate = rate(outcomes[v]);
-  for (const a of Object.keys(byAngle)) byAngle[a].reply_rate = rate(byAngle[a]);
-  if (Object.keys(byAngle).length) {
-    console.log('per-angle outcomes:', JSON.stringify(byAngle, null, 2));
-    outcomes._by_angle = byAngle;
+  for (const src of Object.keys(bySource)) {
+    for (const v of Object.keys(bySource[src])) bySource[src][v].reply_rate = rate(bySource[src][v]);
+  }
+  for (const src of Object.keys(anglesBySource)) {
+    for (const a of Object.keys(anglesBySource[src])) anglesBySource[src][a].reply_rate = rate(anglesBySource[src][a]);
+  }
+
+  for (const src of Object.keys(bySource)) {
+    const n = Object.values(bySource[src]).reduce((s, o) => s + o.total, 0);
+    console.log(`\n===== [${src}] — ${n} deals${src === LEARN_FROM ? '  ← Atlas learns from this' : ''} =====`);
+    console.log(JSON.stringify(bySource[src], null, 2));
+    if (anglesBySource[src]) console.log(`per-angle [${src}]:`, JSON.stringify(anglesBySource[src], null, 2));
+  }
+
+  // Atlas reads outcomes[vertical], so the payload it consumes must stay keyed by
+  // lane — only the SOURCE feeding it changes.
+  const outcomes = { ...(bySource[LEARN_FROM] || {}) };
+  if (anglesBySource[LEARN_FROM]) outcomes._by_angle = anglesBySource[LEARN_FROM];
+  outcomes._by_source = bySource;
+  outcomes._learn_from = LEARN_FROM;
+  if (!Object.keys(bySource[LEARN_FROM] || {}).length) {
+    console.warn(`\n⚠️  no [${LEARN_FROM}] deals yet — Atlas receives an empty learning set this run.`);
   }
 
   console.log(JSON.stringify(outcomes, null, 2));
