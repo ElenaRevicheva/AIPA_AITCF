@@ -1541,5 +1541,26 @@
     "emailDraft": "docs/selling/drafts/ahk-panama-espaluz-email.txt",
     "dealId": "63355917617",
     "orgCode": "AHK_PANAMA"
+  },
+  "odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-24-ho": {
+    "company": "Odontologo Moisés Lukowiecki - Urgencia y Clínica Dental 24 Horas",
+    "email": "maribel-kmw@cableonda.net",
+    "emailDraft": "docs/selling/drafts/odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-24-ho-email.txt",
+    "score": 75,
+    "phone": "+507 6674-4647"
+  },
+  "clinica-dental-natural-smile-dise-o-de-sonrisa-atlas": {
+    "company": "Clinica Dental | Natural Smile | Diseño de Sonrisa",
+    "email": "info@clinicanaturalsmile.com",
+    "emailDraft": "docs/selling/drafts/clinica-dental-natural-smile-dise-o-de-sonrisa-atlas-email.txt",
+    "score": 74,
+    "phone": "+507 209-0095"
+  },
+  "cl-nica-dental-sanmartin-atlas": {
+    "company": "Clínica Dental Sanmartin",
+    "email": "info@clinicadentalsanmartin.com",
+    "emailDraft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-email.txt",
+    "score": 76,
+    "phone": "+507 261-7858"
   }
 }
