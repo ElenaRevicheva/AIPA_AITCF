@@ -52,7 +52,11 @@ const VIS = g('VISIBILITY_API_KEY');
 const TG = g('TELEGRAM_BOT_TOKEN');
 const CHAT = g('CONCIERGE_TG_CHAT') || (g('TELEGRAM_AUTHORIZED_USERS') || '').split(',')[0]?.trim();
 const OWNER = g('HUBSPOT_OWNER_ID') || '91612860';
-if (!HS || !SERP || !VIS) throw new Error('need HUBSPOT_API_KEY + SERPAPI_KEY + VISIBILITY_API_KEY');
+// Only a hard requirement when actually mining. Importing this module for its
+// letter templates must not demand API keys the importer will never call.
+if (require.main === module && (!HS || !SERP || !VIS)) {
+  throw new Error('need HUBSPOT_API_KEY + SERPAPI_KEY + VISIBILITY_API_KEY');
+}
 
 const DRY = process.argv.includes('--dry');
 const MAX_NEW = Number(process.env.LEAD_MAX_NEW || 8);
@@ -309,6 +313,47 @@ const ANGLE_ES = {
 };
 const ANGLE_FALLBACK = 'authority';
 
+/**
+ * The services PD — the closing line every [CLIENT-MANUAL] letter carries and the
+ * first Atlas letters did not (Elena, Aug 2 2026).
+ *
+ * The audit opens the door; the PD is what tells them she does more than SEO. It is
+ * deliberately TAILORED per industry — a dental clinic hears "agenda citas y responde
+ * urgencias", a hotel hears "reservas y eventos" — because a generic services list
+ * reads like a brochure and gets skipped. Rule from her outreach doctrine: always
+ * link aideazz.xyz/portfolio, never bare aideazz.xyz.
+ */
+const SERVICES_PD = {
+  dental:
+    'agentes de WhatsApp que responden y agendan citas 24/7 (EN/ES, conectados a su CRM), recordatorios automáticos para bajar ausencias, automatización de intake de pacientes, y video con IA para promocionar tratamientos',
+  hotel:
+    'agentes de WhatsApp que responden y agendan reservas y eventos 24/7 (EN/ES, conectados a su CRM), automatización de intake de grupos, y video con IA para marketing del destino',
+  legal:
+    'agentes de WhatsApp que califican consultas y agendan citas 24/7 (EN/ES, conectados a su CRM), automatización de intake de casos, y rescate de sistemas de IA que fallan',
+  estetica:
+    'agentes de WhatsApp que responden y agendan valoraciones 24/7 (EN/ES, conectados a su CRM), seguimiento automático de pacientes, y video con IA para mostrar resultados',
+  tours:
+    'agentes de WhatsApp que responden y reservan tours 24/7 (EN/ES, conectados a su CRM), automatización de disponibilidad y cupos, y video con IA para promocionar experiencias',
+  default:
+    'agentes de WhatsApp que responden y agendan 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan',
+};
+
+function servicesPD(lead) {
+  const q = `${lead.query || ''} ${lead.company || ''}`.toLowerCase();
+  const key = /dental|odonto|dentist/.test(q)
+    ? 'dental'
+    : /hotel|resort|hostal|lodge/.test(q)
+      ? 'hotel'
+      : /abogad|bufete|legal|law/.test(q)
+        ? 'legal'
+        : /estétic|estetic|spa|derma|belleza/.test(q)
+          ? 'estetica'
+          : /tour|excursion|viaje|charter|sail/.test(q)
+            ? 'tours'
+            : 'default';
+  return `PD: Además de visibilidad en IA, construyo ${SERVICES_PD[key]}. Todo con demos en vivo en mi portafolio 👆`;
+}
+
 function buildDraft(lead, audit, angle) {
   const angleKey = angle?.angle && ANGLE_ES[angle.angle] ? angle.angle : ANGLE_FALLBACK;
   const v = ANGLE_ES[angleKey];
@@ -329,12 +374,47 @@ function buildDraft(lead, audit, angle) {
     ``,
     `La auditoría completa es gratuita aquí: https://aideazz.xyz/api`,
     ``,
-    `Saludos cordiales,`,
+    servicesPD(lead),
+    ``,
+    `¡Que tengan un excelente día!`,
+    `Saludos,`,
     `Elena Revicheva`,
     `Fundadora | Ingeniera de IA y Automatización`,
     `AIdeazz AI Lab ✨`,
   ].join('\n');
   return { subject, body, angleKey };
+}
+
+/**
+ * Second touch, mirroring the [CLIENT-MANUAL] follow-up exactly.
+ *
+ * Its PD is the AI Growth Operator paragraph — the manual FU's closing move: it
+ * reframes her from "someone who audits websites" to "someone who runs the whole
+ * growth motion", which is the pitch that actually carries a retainer. Says
+ * plainly that a previous EMAIL was sent, so it is only ever registered for leads
+ * whose first outreach really went by email.
+ */
+function buildFuDraft(lead, audit, angle) {
+  const subject = `Seguimiento — auditoría de visibilidad en IA: ${lead.company} (${audit.score}/100)`;
+  const body = [
+    `Estimado equipo de ${lead.company}:`,
+    ``,
+    `¡Un gusto saludarles de nuevo! 👋 Soy Elena Revicheva, Ingeniera de IA y Automatización: https://aideazz.xyz/portfolio`,
+    ``,
+    `Les escribí hace unos días por correo sobre ${lead.company}. Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}). Cuando un cliente pregunta a ChatGPT o Perplexity por opciones como la suya en ${lead.city}, su empresa todavía no aparece como una respuesta citable${audit.aeo != null ? ` (AEO ${audit.aeo}/100)` : ''}.`,
+    ``,
+    `No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.`,
+    ``,
+    `Si les sirve, en 15 minutos les muestro los 3 principales arreglos de esa auditoría y cómo quedaría el Operator en su negocio — sin compromiso. Auditoría gratuita: https://aideazz.xyz/api`,
+    ``,
+    servicesPD(lead),
+    ``,
+    `Saludos,`,
+    `Elena Revicheva`,
+    `Fundadora | Ingeniera de IA y Automatización`,
+    `AIdeazz AI Lab ✨`,
+  ].join('\n');
+  return { subject, body };
 }
 
 async function stageLead(lead, audit, angle) {
@@ -398,25 +478,58 @@ async function stageLead(lead, audit, angle) {
   ].join('\n');
   if (lead.phone) fs.writeFileSync(path.join(ROOT, waRel), waText, 'utf8');
 
+  // ── Second touch, staged up front ────────────────────────────────────────────
+  // [CLIENT-MANUAL] deals carry BOTH touches in the note from day one, so the FU is
+  // one click whenever Elena decides the first went unanswered. Atlas leads had no
+  // FU slug at all, which meant a second touch required building one by hand — the
+  // exact manual step that stops it from ever happening.
+  const fuSlug = `${slug}-fu`;
+  const fuRel = `docs/selling/drafts/${fuSlug}-email.txt`;
+  const fuWaRel = `docs/selling/drafts/${fuSlug}.txt`;
+  const fu = buildFuDraft(lead, audit, angle);
+  fs.writeFileSync(path.join(ROOT, fuRel), `SUBJECT: ${fu.subject}\n\nTO: ${lead.email}\n\n${fu.body}\n`, 'utf8');
+  const fuWaText = [
+    `Hola de nuevo 👋 Soy Elena Revicheva (AIdeazz): https://aideazz.xyz/portfolio`,
+    ``,
+    `Les escribí sobre la auditoría de ${lead.website}: ${audit.score}/100 (${audit.grade}).`,
+    `No vendo otro chatbot — instalo un AI Growth Operator que trabaja 24/7: que ChatGPT los recomiende, califique leads por WhatsApp y mantenga el CRM al día.`,
+    ``,
+    `¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+  ].join('\n');
+  if (lead.phone) fs.writeFileSync(path.join(ROOT, fuWaRel), fuWaText, 'utf8');
+
   const reg = loadRegistry();
-  reg[slug] = {
+  const common = {
     company: lead.company,
     email: lead.email,
-    emailDraft: draftRel,
     score: audit.score,
     ...(deal?.id ? { dealId: String(deal.id) } : {}),
-    ...(lead.phone ? { phone: digitsOnly(lead.phone), draft: waRel } : {}),
+    ...(lead.phone ? { phone: digitsOnly(lead.phone) } : {}),
   };
+  reg[slug] = { ...common, emailDraft: draftRel, ...(lead.phone ? { draft: waRel } : {}) };
+  reg[fuSlug] = { ...common, emailDraft: fuRel, ...(lead.phone ? { draft: fuWaRel } : {}) };
   saveRegistry(reg);
 
-  const link = buildHubSpotEmailAnchor(slug, lead.email, `✉️ ENVIAR PRIMER CONTACTO — aipa@aideazz.xyz (${lead.email})`);
+  // Labels matter beyond cosmetics: resend-webhook's findOutreachNote matches
+  // /FOLLOW-UP|EMAIL FU|WHATSAPP FU|.../ to pick WHICH note to stamp, and
+  // insertNoteStamp puts ENTREGADO/ABIERTO directly under the FOLLOW-UP block's
+  // first <hr>. The old "ENVIAR PRIMER CONTACTO" heading matched nothing, so
+  // stamps would have landed at the top of the note instead of under the buttons.
+  const link = buildHubSpotEmailAnchor(slug, lead.email, `✉️ EMAIL 1er CONTACTO — aipa@aideazz.xyz (${lead.email})`);
   const waLink = lead.phone
-    ? buildHubSpotWaAnchor(lead.phone, waText, `➡️ WHATSAPP (laptop) — auditoría ${audit.score}/100 (${formatPhone507(lead.phone)})`)
+    ? buildHubSpotWaAnchor(lead.phone, waText, `➡️ WHATSAPP 1er CONTACTO (laptop) — auditoría ${audit.score}/100 (${formatPhone507(lead.phone)})`)
+    : null;
+  const fuLink = buildHubSpotEmailAnchor(fuSlug, lead.email, `✉️ EMAIL FU — aipa@aideazz.xyz (${lead.email})`);
+  const fuWaLink = lead.phone
+    ? buildHubSpotWaAnchor(lead.phone, fuWaText, `➡️ WHATSAPP FU (laptop) — AI Growth Operator + auditoría (${formatPhone507(lead.phone)})`)
     : null;
   const noteBody = [
-    `<b>🔥 NUEVO LEAD — Atlas lead machine</b><br>`,
+    `<b>FOLLOW-UP — click y enviar (texto listo, sin editar)</b><br>`,
     `${link}<br>`,
-    waLink ? `${waLink}<br><br>` : `<br>`,
+    waLink ? `${waLink}<br>` : '',
+    `${fuLink}<br>`,
+    fuWaLink ? `${fuWaLink}<br><br>` : `<br>`,
+    `<b>🔥 NUEVO LEAD — Atlas lead machine</b><br>`,
     `<b>Auditoría:</b> ${audit.score}/100 ${audit.grade}`,
     audit.aeo != null ? ` · AEO ${audit.aeo}` : '',
     `<br><b>Sitio:</b> ${lead.website}<br>`,
@@ -453,7 +566,10 @@ async function telegram(text) {
   }
 }
 
-(async () => {
+// Only run when executed directly. Without this, `require`-ing the module to reuse
+// its letter templates would fire the whole machine — Google searches, audits, and
+// real HubSpot contacts and deals — as an import side effect.
+if (require.main === module) (async () => {
   const angle = atlasAngle();
   console.log(
     `[lead-machine] start${DRY ? ' (DRY RUN — nothing written)' : ''} · max ${MAX_NEW} · band ${AUDIT_MIN}-${AUDIT_MAX}` +
@@ -539,3 +655,11 @@ async function telegram(text) {
     await telegram(lines.join('\n'));
   }
 })();
+
+/**
+ * Exported so the one-off backfill writes the SAME letters this machine writes.
+ * Copy-pasting the templates into a second script guarantees they drift apart, and
+ * the drift only surfaces when a prospect gets a letter nobody reviewed.
+ * Guarded by require.main so exporting never triggers the run above.
+ */
+module.exports = { buildDraft, buildFuDraft, servicesPD, atlasAngle, ANGLE_ES, ANGLE_FALLBACK };

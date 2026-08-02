@@ -1552,16 +1552,20 @@
   "clinica-dental-natural-smile-dise-o-de-sonrisa-atlas": {
     "company": "Clinica Dental | Natural Smile | Diseño de Sonrisa",
     "email": "info@clinicanaturalsmile.com",
-    "emailDraft": "docs/selling/drafts/clinica-dental-natural-smile-dise-o-de-sonrisa-atlas-email.txt",
     "score": 74,
-    "phone": "+507 209-0095"
+    "dealId": "63389735295",
+    "phone": "5072090095",
+    "emailDraft": "docs/selling/drafts/clinica-dental-natural-smile-dise-o-de-sonrisa-atlas-email.txt",
+    "draft": "docs/selling/drafts/clinica-dental-natural-smile-dise-o-de-sonrisa-atlas.txt"
   },
   "cl-nica-dental-sanmartin-atlas": {
     "company": "Clínica Dental Sanmartin",
     "email": "info@clinicadentalsanmartin.com",
-    "emailDraft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-email.txt",
     "score": 76,
-    "phone": "+507 261-7858"
+    "dealId": "63383767630",
+    "phone": "5072617858",
+    "emailDraft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-email.txt",
+    "draft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas.txt"
   },
   "metropolitan-school-panama-espaluz": {
     "company": "The Metropolitan School of Panama",
@@ -1625,5 +1629,41 @@
     "emailDraft": "docs/selling/drafts/colegio-brader-espaluz-fu-email.txt",
     "dealId": "63401991086",
     "orgCode": "BRADER_PARENTS"
+  },
+  "odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-atlas": {
+    "company": "Odontologo Moisés Lukowiecki - Urgencia y Clínica Dental 24 Horas",
+    "email": "maribel-kmw@cableonda.net",
+    "score": 75,
+    "dealId": "63383820379",
+    "phone": "50766744647",
+    "emailDraft": "docs/selling/drafts/odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-atlas-email.txt",
+    "draft": "docs/selling/drafts/odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-atlas.txt"
+  },
+  "odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-atlas-fu": {
+    "company": "Odontologo Moisés Lukowiecki - Urgencia y Clínica Dental 24 Horas",
+    "email": "maribel-kmw@cableonda.net",
+    "score": 75,
+    "dealId": "63383820379",
+    "phone": "50766744647",
+    "emailDraft": "docs/selling/drafts/odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-atlas-fu.txt"
+  },
+  "clinica-dental-natural-smile-dise-o-de-sonrisa-atlas-fu": {
+    "company": "Clinica Dental | Natural Smile | Diseño de Sonrisa",
+    "email": "info@clinicanaturalsmile.com",
+    "score": 74,
+    "dealId": "63389735295",
+    "phone": "5072090095",
+    "emailDraft": "docs/selling/drafts/clinica-dental-natural-smile-dise-o-de-sonrisa-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/clinica-dental-natural-smile-dise-o-de-sonrisa-atlas-fu.txt"
+  },
+  "cl-nica-dental-sanmartin-atlas-fu": {
+    "company": "Clínica Dental Sanmartin",
+    "email": "info@clinicadentalsanmartin.com",
+    "score": 76,
+    "dealId": "63383767630",
+    "phone": "5072617858",
+    "emailDraft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-fu.txt"
   }
 }
