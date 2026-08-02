@@ -1583,5 +1583,47 @@
     "emailDraft": "docs/selling/drafts/colegio-brader-espaluz-email.txt",
     "dealId": "63401991086",
     "orgCode": "BRADER_PARENTS"
+  },
+  "international-school-of-panama-espaluz-fu": {
+    "company": "International School of Panama",
+    "email": "admissions@isp.edu.pa",
+    "emailDraft": "docs/selling/drafts/international-school-of-panama-espaluz-fu-email.txt",
+    "dealId": "63370307616",
+    "orgCode": "ISP_PARENTS"
+  },
+  "oxford-international-school-panama-espaluz-fu": {
+    "company": "Oxford International School",
+    "email": "admisiones@ois.edu.pa",
+    "emailDraft": "docs/selling/drafts/oxford-international-school-panama-espaluz-fu-email.txt",
+    "dealId": "63384604984",
+    "orgCode": "OXFORD_PARENTS"
+  },
+  "ahk-panama-espaluz-fu": {
+    "company": "AHK Panama",
+    "email": "info@panama.ahk.de",
+    "emailDraft": "docs/selling/drafts/ahk-panama-espaluz-fu-email.txt",
+    "dealId": "63355917617",
+    "orgCode": "AHK_PANAMA"
+  },
+  "metropolitan-school-panama-espaluz-fu": {
+    "company": "The Metropolitan School",
+    "email": "admissions@themetropolitanschool.com",
+    "emailDraft": "docs/selling/drafts/metropolitan-school-panama-espaluz-fu-email.txt",
+    "dealId": "63403408716",
+    "orgCode": "METROPOLITAN_PARENTS"
+  },
+  "academia-interamericana-panama-espaluz-fu": {
+    "company": "Academia Interamericana",
+    "email": "admisiones@aip.edu.pa",
+    "emailDraft": "docs/selling/drafts/academia-interamericana-panama-espaluz-fu-email.txt",
+    "dealId": "63401920064",
+    "orgCode": "AIP_PARENTS"
+  },
+  "colegio-brader-espaluz-fu": {
+    "company": "Colegio Brader",
+    "email": "info@colegiobrader.edu.pa",
+    "emailDraft": "docs/selling/drafts/colegio-brader-espaluz-fu-email.txt",
+    "dealId": "63401991086",
+    "orgCode": "BRADER_PARENTS"
   }
 }
