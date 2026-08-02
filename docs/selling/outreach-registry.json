@@ -1665,5 +1665,33 @@
     "phone": "5072617858",
     "emailDraft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-fu.txt"
+  },
+  "cciap-panama-espaluz": {
+    "company": "la Cámara de Comercio, Industrias y Agricultura de Panamá",
+    "email": "info@panacamara.org",
+    "emailDraft": "docs/selling/drafts/cciap-panama-espaluz-email.txt",
+    "dealId": "63411755388",
+    "orgCode": "CCIAP_PANAMA"
+  },
+  "cciap-panama-espaluz-fu": {
+    "company": "la Cámara de Comercio, Industrias y Agricultura de Panamá",
+    "email": "info@panacamara.org",
+    "emailDraft": "docs/selling/drafts/cciap-panama-espaluz-fu-email.txt",
+    "dealId": "63411755388",
+    "orgCode": "CCIAP_PANAMA"
+  },
+  "britcham-panama-espaluz": {
+    "company": "la British Chamber of Commerce Panama",
+    "email": "admin@britcham.com.pa",
+    "emailDraft": "docs/selling/drafts/britcham-panama-espaluz-email.txt",
+    "dealId": "63409505638",
+    "orgCode": "BRITCHAM_PANAMA"
+  },
+  "britcham-panama-espaluz-fu": {
+    "company": "la British Chamber of Commerce Panama",
+    "email": "admin@britcham.com.pa",
+    "emailDraft": "docs/selling/drafts/britcham-panama-espaluz-fu-email.txt",
+    "dealId": "63409505638",
+    "orgCode": "BRITCHAM_PANAMA"
   }
 }
