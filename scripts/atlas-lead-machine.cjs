@@ -118,7 +118,15 @@ const JUNK_EMAIL =
 function pickBestEmail(emails, domain) {
   const clean = [...new Set(emails)].filter((e) => !JUNK_EMAIL.test(e) && e.length < 70);
   const onDomain = clean.filter((e) => e.toLowerCase().endsWith(`@${domain}`));
-  const pool = onDomain.length ? onDomain : clean;
+  // Off-domain fallback is only safe for personal/ISP inboxes, which small LATAM
+  // businesses genuinely use. An arbitrary OTHER COMPANY's address on the page is
+  // a third-party widget, not the prospect — caught live when a Panama dental
+  // clinic yielded contacto@soft99chile.cl, a Chilean company. Emailing that is
+  // worse than finding nothing: it is a stranger receiving a pitch about someone
+  // else's website.
+  const PERSONAL = /@(gmail|hotmail|outlook|yahoo|live|icloud|proton(mail)?|cableonda|cwpanama|.*\.movil)\./i;
+  const offDomainSafe = clean.filter((e) => PERSONAL.test(e));
+  const pool = onDomain.length ? onDomain : offDomainSafe;
   // Prefer a role inbox someone actually reads over a random personal address.
   const preferred = pool.find((e) => /^(info|contacto|contact|ventas|sales|hola|reservas|reservations|admin|citas)@/i.test(e));
   const picked = preferred || pool[0] || null;
@@ -249,26 +257,73 @@ function atlasAngle(lane = 'geo_aeo_tech_seo_makers') {
     const c = JSON.parse(fs.readFileSync(p, 'utf8'))[lane];
     if (!c || !c.concept) return null;
     return {
+      lane,
       concept_id: c.tracking?.concept_id || null,
       hook: c.concept.hook || c.concept.HOOK || null,
       angle: c.move?.angle || null,
       score: c.move?.score ?? null,
+      snapshot: c.snapshot_date || null,
     };
   } catch {
     return null;
   }
 }
 
+/**
+ * Atlas writes its creative in English ("The Crowd Doesn't Lie"); these prospects
+ * are Panamanian businesses who get a Spanish email. Pasting the English hook in
+ * would read as machine-translated spam, so the ANGLE TYPE — which is the part
+ * Atlas actually derives from live competitor ads — selects a real Spanish framing.
+ * The audit stays the substance; only the way in changes.
+ *
+ * Because Atlas rewrites the angle every Monday, each weekly batch tests a
+ * different opening, and the angle is stamped on the deal so replies can be
+ * attributed back to it.
+ */
+const ANGLE_ES = {
+  social_proof: {
+    subject: (c, s) => `${c}: cómo aparecer en ChatGPT cuando le preguntan por su sector (${s}/100)`,
+    opening: (city) =>
+      `Cada vez más negocios en ${city} están apareciendo como respuesta cuando alguien le pregunta a ChatGPT o Perplexity por opciones en su sector. Otros no aparecen en absoluto — y esa diferencia ya se nota en quién recibe la consulta.`,
+  },
+  pain_point: {
+    subject: (c, s) => `${c} no aparece cuando preguntan a ChatGPT (auditoría: ${s}/100)`,
+    opening: (city) =>
+      `Cuando un cliente potencial le pregunta a ChatGPT o Perplexity por opciones en ${city}, su negocio todavía no aparece como respuesta citable. La consulta existe; simplemente la recibe otro.`,
+  },
+  curiosity_gap: {
+    subject: (c, s) => `Hay algo que su web no le está diciendo a ChatGPT — ${c} (${s}/100)`,
+    opening: () =>
+      `Su sitio está bien hecho para personas, pero le falta la estructura que los motores de IA necesitan para citarlo. Es un detalle técnico invisible en pantalla y decisivo en la respuesta.`,
+  },
+  urgency_scarcity: {
+    subject: (c, s) => `${c}: el lugar en la respuesta de la IA se está ocupando ahora (${s}/100)`,
+    opening: (city) =>
+      `En ${city} casi nadie ha optimizado todavía para búsquedas con IA — por eso el lugar en la respuesta sigue libre. Cuando sus competidores lo hagan, recuperarlo cuesta mucho más que tomarlo hoy.`,
+  },
+  authority: {
+    subject: (c, s) => `Auditoría de visibilidad en IA — ${c} (${s}/100): 3 arreglos concretos`,
+    opening: (city) =>
+      `Analizo cómo aparecen los negocios de ${city} en los motores de respuesta con IA. El suyo tiene una base sólida y tres huecos concretos que lo dejan fuera de la respuesta.`,
+  },
+};
+const ANGLE_FALLBACK = 'authority';
+
 function buildDraft(lead, audit, angle) {
-  const subject = `Auditoría de visibilidad en IA — ${lead.company} (${audit.score}/100): 3 arreglos concretos`;
+  const angleKey = angle?.angle && ANGLE_ES[angle.angle] ? angle.angle : ANGLE_FALLBACK;
+  const v = ANGLE_ES[angleKey];
+  const subject = v.subject(lead.company, audit.score);
   const body = [
     `Estimado equipo de ${lead.company}:`,
     ``,
     `¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA y automatización aquí en Panamá: https://aideazz.xyz/portfolio`,
     ``,
-    `Analicé ${lead.website} con mi motor de visibilidad en IA y obtuvo ${audit.score}/100 (${audit.grade}).`,
+    v.opening(lead.city),
     ``,
-    `Cuando un cliente le pregunta a ChatGPT o Perplexity por opciones como la suya en ${lead.city}, su negocio todavía no aparece como una respuesta citable. No es un problema de diseño ni de publicidad: los motores de IA no encuentran la estructura que necesitan para citarlos.`,
+    `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
+    ...(audit.aeo != null
+      ? [`Su punto más débil es la respuesta-a-preguntas (AEO ${audit.aeo}/100) — y es el más rápido de arreglar.`]
+      : []),
     ``,
     `Son 3 arreglos concretos y de implementación rápida. Si les parece bien, se los muestro en 15 minutos, sin ningún compromiso.`,
     ``,
@@ -278,10 +333,8 @@ function buildDraft(lead, audit, angle) {
     `Elena Revicheva`,
     `Fundadora | Ingeniera de IA y Automatización`,
     `AIdeazz AI Lab ✨`,
-    ``,
-    `PD: ${angle?.hook ? angle.hook : 'Quien aparece primero en la respuesta de la IA se queda con la consulta — y hoy ese lugar sigue libre en su categoría.'}`,
   ].join('\n');
-  return { subject, body };
+  return { subject, body, angleKey };
 }
 
 async function stageLead(lead, audit, angle) {
@@ -292,9 +345,13 @@ async function stageLead(lead, audit, angle) {
   // other's draft.
   const slug = `${slugify(lead.company).slice(0, 48)}-atlas`;
   const draftRel = `docs/selling/drafts/${slug}-email.txt`;
-  const { subject, body } = buildDraft(lead, audit, angle);
+  const { subject, body, angleKey } = buildDraft(lead, audit, angle);
 
-  const dealName = `[CLIENT-ATLAS] ${lead.company} — GEO/AEO fix (audit: ${audit.score}/${audit.grade})`;
+  // The angle rides in the deal NAME because HubSpot custom properties 403 on this
+  // plan (aideazz_lead_kind failed the same way). hs-outcomes-to-atlas.cjs already
+  // parses deal names, so a " · angle" suffix is all it needs to report reply rate
+  // PER ANGLE — the number that tells Elena which opening actually earns.
+  const dealName = `[CLIENT-ATLAS] ${lead.company} — GEO/AEO fix (audit: ${audit.score}/${audit.grade}) · ${angleKey}`;
   if (DRY) return { slug, dealName, dealId: null };
 
   fs.mkdirSync(path.join(ROOT, 'docs/selling/drafts'), { recursive: true });
@@ -367,7 +424,9 @@ async function stageLead(lead, audit, angle) {
     lead.phone ? `<b>Tel:</b> ${lead.phone}<br>` : '',
     lead.rating ? `<b>Google:</b> ${lead.rating}★ (${lead.reviews || 0} reseñas)<br>` : '',
     `<b>Ciudad:</b> ${lead.city}<br>`,
-    angle?.concept_id ? `<b>Atlas:</b> ${angle.angle || ''} · ${angle.concept_id}<br>` : '',
+    angle?.concept_id
+      ? `<b>Atlas:</b> ángulo <code>${angleKey}</code> · lane ${angle.lane || '-'} · score ${angle.score ?? '-'} · snapshot ${angle.snapshot || '-'}<br><b>concept_id:</b> ${angle.concept_id}<br>`
+      : `<b>Atlas:</b> ángulo <code>${angleKey}</code> (sin concepto fresco — fallback)<br>`,
     `<hr>`,
     `<b>Asunto:</b> ${subject}<br><br>`,
     `<pre style="white-space:pre-wrap;font-family:inherit">${body.replace(/</g, '&lt;')}</pre>`,

@@ -83,22 +83,49 @@ async function fetchDeals(prefix) {
 }
 
 async function main() {
-  const deals = [...(await fetchDeals('CLIENT-MANUAL')), ...(await fetchDeals('ATLAS-RADAR'))];
-  console.log(`deals: ${deals.length} ([CLIENT-MANUAL] + [ATLAS-RADAR])`);
+  // [CLIENT-ATLAS] is the Monday lead machine's output. It was missing here, so
+  // every lead it created was invisible to the feedback loop — Atlas could never
+  // learn from the deals it caused.
+  const deals = [
+    ...(await fetchDeals('CLIENT-MANUAL')),
+    ...(await fetchDeals('CLIENT-ATLAS')),
+    ...(await fetchDeals('ATLAS-RADAR')),
+  ];
+  console.log(`deals: ${deals.length} ([CLIENT-MANUAL] + [CLIENT-ATLAS] + [ATLAS-RADAR])`);
 
   const outcomes = {};
+  // Per-ANGLE outcomes: the lead machine stamps " · social_proof" etc. on the deal
+  // name. Lane tells Atlas which service converts; angle tells it which OPENING
+  // converts — which is the thing Atlas rewrites every Monday and, until now, had
+  // no way of grading.
+  const byAngle = {};
+  const blank = () => ({ staged: 0, sent: 0, replied: 0, won: 0, lost: 0, other: 0, total: 0 });
+  const rate = (o) => {
+    const reached = o.sent + o.replied + o.won + o.lost;
+    return reached ? Math.round(((o.replied + o.won) / reached) * 100) : null;
+  };
+
   for (const d of deals) {
     const v = lane(d.name);
     const bucket = STAGE[d.stage] || 'other';
-    outcomes[v] = outcomes[v] || { staged: 0, sent: 0, replied: 0, won: 0, lost: 0, other: 0, total: 0 };
+    outcomes[v] = outcomes[v] || blank();
     outcomes[v][bucket] = (outcomes[v][bucket] || 0) + 1;
     outcomes[v].total++;
+
+    const am = String(d.name || '').match(/·\s*([a-z_]+)\s*$/i);
+    if (am) {
+      const a = am[1].toLowerCase();
+      byAngle[a] = byAngle[a] || blank();
+      byAngle[a][bucket] = (byAngle[a][bucket] || 0) + 1;
+      byAngle[a].total++;
+    }
   }
   // Reply rate per lane — the "what converts" number Atlas serves.
-  for (const v of Object.keys(outcomes)) {
-    const o = outcomes[v];
-    const reached = o.sent + o.replied + o.won + o.lost;
-    o.reply_rate = reached ? Math.round(((o.replied + o.won) / reached) * 100) : null;
+  for (const v of Object.keys(outcomes)) outcomes[v].reply_rate = rate(outcomes[v]);
+  for (const a of Object.keys(byAngle)) byAngle[a].reply_rate = rate(byAngle[a]);
+  if (Object.keys(byAngle).length) {
+    console.log('per-angle outcomes:', JSON.stringify(byAngle, null, 2));
+    outcomes._by_angle = byAngle;
   }
 
   console.log(JSON.stringify(outcomes, null, 2));
