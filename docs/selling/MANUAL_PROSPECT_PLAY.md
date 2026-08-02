@@ -19,6 +19,63 @@ In LATAM, **WhatsApp is the primary app**. On HubSpot **Starter**, email is stil
 
 **Jul 18–24 batch:** ~**95** `[CLIENT-MANUAL]` deals; most **emailed first**, few WhatsApp-first. Hit-list on GitHub matches HubSpot (**95/95**, incl. Early Manual section).
 
+---
+
+## Aug 1 2026 — audited truth of the first 65 deals (Alquiler de Yates → Gamboa)
+
+Every number below came from Resend message IDs in the send log plus Resend's own
+delivery callbacks, not from deal stages. **Stage is not evidence of a send** — 64 of
+those 65 sat in `decisionmakerboughtin` ("Sent — passive wait") while 46 had never
+been emailed at all.
+
+| Reality | Count | How it was proven |
+| --- | --- | --- |
+| Already emailed before Aug 1 | **38** | 36 with a real Resend message id + 2 sent from the HubSpot UI |
+| Emailed Aug 1 (first contact) | **14** | Resend ids, one-click endpoint |
+| Never emailed, **no address at all** | **7** | WhatsApp-only; Elena's channel, not automatable |
+| Follow-up sent Aug 1 | **38 / 38** | zero failures |
+
+**Bounces: 5 real** out of ~110 sends (≈4%, healthy; zero spam complaints) —
+Centro Marino, Fuerte Amador, Destination Dream Weddings, Balboa Academy,
+Eclypse de Mar. Each is stamped `⛔ REBOTE` with a task to find a working address.
+Two of them (Centro Marino, Eclypse de Mar) bounced on their **first** contact, so
+those prospects have received nothing and are not "waiting on you".
+
+### ⚠️ The endpoint has NO double-send guard
+
+`/go/outreach-email/{slug}/send` sends **every time it is called**. Verified in the
+log: `hospital-san-fernando-fu` went out **10 times** to the same prospect; four
+others went twice. Clicking the button again, or refreshing the confirmation, sends
+another copy. Until a guard exists, treat one click as irreversible.
+
+### 6 deals cannot send a follow-up
+
+Panama Yacht Group, DQSA, PALIG, Banco LAFISE, Panama Equity and Eurostone have a
+`-fu` draft but **no first-outreach draft** — their first-contact send 404s. Their FU
+text says *"les escribí hace unos días por correo"*, which would be false to send:
+they were reached on WhatsApp, never by email. Write the first-contact draft before
+touching them.
+
+### Delivery + engagement stamping (live and verified Aug 1)
+
+Resend `open_tracking` and `click_tracking` are **both true**, the domain and the
+`links` CNAME are **verified**, and the webhook subscribes to 19 events including
+`email.opened` and `email.clicked`. Stamps land at the TOP of the outreach note:
+
+- `✅ ENTREGADO` — hard proof, the receiving server accepted it
+- `👀 ABIERTO` — **soft signal only**; Apple Mail Privacy and Gmail's image proxy
+  pre-fetch the pixel, so some opens are machines. Never read it as proof.
+- `🔗 CLIC EN ENLACE` — the trustworthy engagement signal (a click is a human act)
+  and it raises a HubSpot task to follow up the same day.
+
+Open/click tracking applies **only to mail sent after Aug 1 12:54 UTC**. Anything
+earlier — including the Hospital CIMA Compras letter — carries no pixel and will
+never report an open.
+
+**Cloudflare gotcha:** the `links` tracking CNAME must be **DNS only (grey cloud)**.
+Proxied (orange), Cloudflare intercepts it and link rewriting breaks in real
+outreach.
+
 ### Follow-up = full WhatsApp (not a 2-line nudge)
 
 After email, FU is a **second outreach on WhatsApp**: audit already on the deal (no re-crawl) + **AI Growth Operator** pitch. Installed Jul 24 on **93/95** deals with a phone (skipped: Riga Design IG-only, San Blas Tour email-only).

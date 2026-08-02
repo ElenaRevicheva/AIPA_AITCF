@@ -35,6 +35,60 @@ AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing eng
 | **Partial** | Conversion: the loop's first honest read is **GEO/AEO outreach ≈ 4% reply rate (24 sends → 1 reply)**; WhatsApp-agent lane too new to judge. The loop now MEASURES this per service — beating 4% is the current game. |
 | **Not started** | Phase 6 showcase package; ads API cron; automated weekly blog from each Atlas snapshot (July 20 post was the manual prototype) |
 
+### Honest Aug 1 2026 reality — the Monday Atlas cycle, verified leg by leg
+
+The July 21 "≈4% reply rate" was measured on 24 sends. At ~90 sends the number is
+worse and it is the only number that matters:
+
+**`geo_aeo_tech_seo_makers`: 90 sent · 1 replied · 0 won → 1% reply rate**
+(from `hs-outcomes-to-atlas.cjs`, 99 deals, pushed to Atlas Jul 27 15:30 UTC)
+
+| Leg | Cron | Verified state |
+| --- | --- | --- |
+| Capture | `0 14 * * 1` (whitespace) | ✅ ran Jul 27 14:22, wrote concepts for 7 lanes, pushed backup |
+| Window alert | `15 15 * * 1` | ✅ ran 15:15, scored 7 lanes, 1 alert (`fractional_cto`) |
+| Outcomes → Atlas | `30 15 * * 1` | ✅ ran 15:30, 99 deals classified, real per-lane rates |
+| GA4 measurement | `15 6 * * *` | ⚠️ **0 `atlas_` rows every day** |
+| **Lead supply** | `0 16 * * 1` | ✅ **NEW Aug 1 — `atlas-lead-machine.cjs`** |
+
+**Three of four legs always worked. Distribution was the broken one.** GA4 returned
+zero because nothing was ever published carrying an `atlas_` UTM — the alert ended
+with *"adapt this into a campaign"*, i.e. it handed the work back to Elena, and it
+never got done. A detection engine whose output requires manual labour produces
+nothing.
+
+**Two lane-vs-pool mismatches worth knowing before trusting a window:**
+
+- **93 of 96 `[CLIENT-MANUAL]` deals map to `geo_aeo_tech_seo_makers`** — the lane
+  Atlas scored **0 / "no window"**. The lane that DID alert, `fractional_cto`, has
+  essentially no prospects. Gating outreach on an ENTER window would therefore never
+  fire. The window score is useful as **priority**, not as **permission**.
+- Atlas's real value here is the **grounded creative angle** (hooks derived from real
+  competitor ads, rewritten weekly), which is usable regardless of window state.
+
+### Lead supply — solved without new credentials (Aug 1 2026)
+
+The method that built all 96 audited prospects could not run: **`GOOGLE_PLACES_API_KEY`
+is absent** from `.env`, and Hunter is on the **free tier (47 lookups left, resets
+Aug 20)** — a hard ceiling that can never feed a 1% funnel.
+
+**SerpAPI's `google_maps` engine replaces Places entirely** and is already paid for
+(Starter plan, 180 searches left, ~20 businesses each). It returns local businesses
+with website and phone — the same shape Places gives. Emails are read from each
+business's own contact page, so Hunter's cap is never touched.
+
+`scripts/atlas-lead-machine.cjs` (Mon 16:00 UTC, after the outcomes job) qualifies
+every candidate before it may enter the CRM — real site, real email, visibility score
+inside **35–90** (bad enough to need her, real enough to pay), not already known —
+then creates **contact + deal `[CLIENT-ATLAS] {company} — GEO/AEO fix (audit: NN/G)`
+at stage `qualifiedtobuy` (🔥 I Act TODAY)** with the audit, the Atlas angle and a
+one-click send link in the note. **It never sends**; the human gate stays.
+
+Dedup is on an accent- and punctuation-stripped company fingerprint plus email domain,
+seeded from every `CLIENT-*` deal and the outreach registry (330 companies, 86
+domains) — email-only matching had already re-created Centro Odontologico Paitilla,
+whose site publishes an address one typo from the one in HubSpot.
+
 ### Roadmap position (v25)
 
 | Phase | Name | Status |

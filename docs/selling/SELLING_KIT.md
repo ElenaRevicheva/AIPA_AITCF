@@ -6,6 +6,38 @@
 
 ---
 
+## FUNNEL TRUTH — Aug 1 2026 (read before planning any campaign)
+
+Measured, not estimated. Source: Resend message ids + delivery callbacks, and
+`hs-outcomes-to-atlas.cjs` over 99 HubSpot deals.
+
+| Metric | Value |
+| --- | --- |
+| `[CLIENT-MANUAL]` deals | 96 |
+| Emails delivered (all-time, incl. Aug 1 batch) | ~110 |
+| **Replies** | **1** (Hospital CIMA) |
+| **Reply rate, `geo_aeo` lane** | **1%** (90 sent → 1 replied) |
+| Deals won | **0** |
+| Bounce rate | ~4% (5 real bounces) · spam complaints **0** |
+
+**What this says:** the machine is not broken — delivery, tracking, stamping and CRM
+attribution all work end to end. **The offer/market is the constraint.** Automating
+more touches on the same cold list multiplies effort, not income. Before building
+anything else, the honest questions are: is the ICP right, is the offer priced and
+framed to be answerable, and is cold email the channel that reaches these buyers.
+
+**The one live conversation is worth more than the next 90 cold sends.** Hospital CIMA
+replied, routed Elena to Compras, and that letter is delivered and tracked. Work the
+reply.
+
+**Top of funnel (new Aug 1):** `scripts/atlas-lead-machine.cjs` stages up to 8 fresh,
+audited, deduped leads every Monday as `[CLIENT-ATLAS]` deals at 🔥 I Act TODAY with a
+one-click send link. It solves *supply*, not *conversion* — see
+`docs/selling/MANUAL_PROSPECT_PLAY.md` for the operational rules and the
+double-send warning.
+
+---
+
 ## 0. POSITIONING NAMES (canonical, polished July 11 2026)
 
 **Umbrella identity:** **Production AI Builder** — *"I ship AI systems that run real businesses 24/7 — agents, automations, and AI-search visibility. Not demos. Production."*
