@@ -67,8 +67,24 @@ async function hs(method, urlPath, body) {
   return text ? JSON.parse(text) : null;
 }
 
+/**
+ * Deal prefixes this watcher advances.
+ *
+ * Aug 2 2026: [CLIENT-ATLAS] leads (the Monday lead machine) are the same play —
+ * audit, one-click aipa@ send, reply expected — but were invisible here because
+ * both the name parser and the filter hard-coded CLIENT-MANUAL. Clínica Dental
+ * Sanmartin replied and the deal sat in "🔥 I Act TODAY" with nothing detected.
+ * Add a prefix by name only; every downstream rule already keys off the deal.
+ */
+const WATCHED_PREFIXES = ['CLIENT-MANUAL', 'CLIENT-ATLAS'];
+const PREFIX_RE = new RegExp(`\\[(?:${WATCHED_PREFIXES.join('|')})\\]\\s+(.+?)\\s+—`);
+
+function isWatchedDeal(name) {
+  return WATCHED_PREFIXES.some((p) => String(name || '').includes(`[${p}]`));
+}
+
 function companyFromDealName(name) {
-  const m = String(name || '').match(/\[CLIENT-MANUAL\]\s+(.+?)\s+—/);
+  const m = String(name || '').match(PREFIX_RE);
   return m ? m[1].trim() : 'Prospect';
 }
 
@@ -127,7 +143,7 @@ async function manualDealsForContact(contactId) {
   for (const id of ids) {
     const d = await hs('GET', `/crm/v3/objects/deals/${id}?properties=dealname,dealstage`);
     const name = d.properties?.dealname || '';
-    if (name.includes('[CLIENT-MANUAL]')) out.push(d);
+    if (isWatchedDeal(name)) out.push(d);
   }
   return out;
 }

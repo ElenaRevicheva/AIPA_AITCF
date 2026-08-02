@@ -37,6 +37,8 @@ const {
   loadRegistry,
   saveRegistry,
   buildHubSpotEmailAnchor,
+  buildHubSpotWaAnchor,
+  digitsOnly,
   formatPhone507,
 } = require('./wa-link-lib.cjs');
 
@@ -292,23 +294,17 @@ async function stageLead(lead, audit, angle) {
   const draftRel = `docs/selling/drafts/${slug}-email.txt`;
   const { subject, body } = buildDraft(lead, audit, angle);
 
-  if (!DRY) {
-    fs.mkdirSync(path.join(ROOT, 'docs/selling/drafts'), { recursive: true });
-    fs.writeFileSync(path.join(ROOT, draftRel), `SUBJECT: ${subject}\n\nTO: ${lead.email}\n\n${body}\n`, 'utf8');
-    const reg = loadRegistry();
-    reg[slug] = {
-      company: lead.company,
-      email: lead.email,
-      emailDraft: draftRel,
-      score: audit.score,
-      ...(lead.phone ? { phone: lead.phone } : {}),
-    };
-    saveRegistry(reg);
-  }
-
   const dealName = `[CLIENT-ATLAS] ${lead.company} — GEO/AEO fix (audit: ${audit.score}/${audit.grade})`;
   if (DRY) return { slug, dealName, dealId: null };
 
+  fs.mkdirSync(path.join(ROOT, 'docs/selling/drafts'), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, draftRel), `SUBJECT: ${subject}\n\nTO: ${lead.email}\n\n${body}\n`, 'utf8');
+
+  // Contact + deal FIRST. The registry entry must carry dealId: go-wa.ts gates the
+  // whole post-send chain on it — `if (!key || !p.dealId) return;` — so without it
+  // a send moves no stage, writes no ENTREGADO/ABIERTO stamp, and creates no
+  // follow-up task. Writing the registry before the deal existed is exactly why the
+  // first three Atlas leads looked dead after Elena clicked send.
   const contact = await hs('POST', '/crm/v3/objects/contacts', {
     properties: {
       email: lead.email,
@@ -332,10 +328,38 @@ async function stageLead(lead, audit, angle) {
     );
   }
 
+  // WhatsApp draft — same play as [CLIENT-MANUAL]: email is the tracked channel,
+  // WhatsApp is Elena's laptop-only close. Registry needs digits-only phone.
+  const waRel = `docs/selling/drafts/${slug}.txt`;
+  const waText = [
+    `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio`,
+    ``,
+    `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
+    `Cuando alguien le pregunta a ChatGPT por opciones como la suya en ${lead.city}, su negocio todavía no aparece como respuesta citable.`,
+    ``,
+    `Son 3 arreglos concretos. ¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+  ].join('\n');
+  if (lead.phone) fs.writeFileSync(path.join(ROOT, waRel), waText, 'utf8');
+
+  const reg = loadRegistry();
+  reg[slug] = {
+    company: lead.company,
+    email: lead.email,
+    emailDraft: draftRel,
+    score: audit.score,
+    ...(deal?.id ? { dealId: String(deal.id) } : {}),
+    ...(lead.phone ? { phone: digitsOnly(lead.phone), draft: waRel } : {}),
+  };
+  saveRegistry(reg);
+
   const link = buildHubSpotEmailAnchor(slug, lead.email, `✉️ ENVIAR PRIMER CONTACTO — aipa@aideazz.xyz (${lead.email})`);
+  const waLink = lead.phone
+    ? buildHubSpotWaAnchor(lead.phone, waText, `➡️ WHATSAPP (laptop) — auditoría ${audit.score}/100 (${formatPhone507(lead.phone)})`)
+    : null;
   const noteBody = [
     `<b>🔥 NUEVO LEAD — Atlas lead machine</b><br>`,
-    `${link}<br><br>`,
+    `${link}<br>`,
+    waLink ? `${waLink}<br><br>` : `<br>`,
     `<b>Auditoría:</b> ${audit.score}/100 ${audit.grade}`,
     audit.aeo != null ? ` · AEO ${audit.aeo}` : '',
     `<br><b>Sitio:</b> ${lead.website}<br>`,
