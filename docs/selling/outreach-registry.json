@@ -1562,5 +1562,26 @@
     "emailDraft": "docs/selling/drafts/cl-nica-dental-sanmartin-atlas-email.txt",
     "score": 76,
     "phone": "+507 261-7858"
+  },
+  "metropolitan-school-panama-espaluz": {
+    "company": "The Metropolitan School of Panama",
+    "email": "admissions@themetropolitanschool.com",
+    "emailDraft": "docs/selling/drafts/metropolitan-school-panama-espaluz-email.txt",
+    "dealId": "63403408716",
+    "orgCode": "METROPOLITAN_PARENTS"
+  },
+  "academia-interamericana-panama-espaluz": {
+    "company": "Academia Interamericana de Panama",
+    "email": "admisiones@aip.edu.pa",
+    "emailDraft": "docs/selling/drafts/academia-interamericana-panama-espaluz-email.txt",
+    "dealId": "63401920064",
+    "orgCode": "AIP_PARENTS"
+  },
+  "colegio-brader-espaluz": {
+    "company": "Colegio Brader",
+    "email": "info@colegiobrader.edu.pa",
+    "emailDraft": "docs/selling/drafts/colegio-brader-espaluz-email.txt",
+    "dealId": "63401991086",
+    "orgCode": "BRADER_PARENTS"
   }
 }
