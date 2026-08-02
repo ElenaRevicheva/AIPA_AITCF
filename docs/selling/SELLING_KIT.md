@@ -11,14 +11,20 @@
 Measured, not estimated. Source: Resend message ids + delivery callbacks, and
 `hs-outcomes-to-atlas.cjs` over 99 HubSpot deals.
 
-| Metric | Value |
-| --- | --- |
-| `[CLIENT-MANUAL]` deals | 96 |
-| Emails delivered (all-time, incl. Aug 1 batch) | ~110 |
-| **Replies** | **1** (Hospital CIMA) |
-| **Reply rate, `geo_aeo` lane** | **1%** (90 sent → 1 replied) |
-| Deals won | **0** |
-| Bounce rate | ~4% (5 real bounces) · spam complaints **0** |
+**Two scoreboards, never mixed** (Aug 2 — Elena's rule: "I do not want to mix things").
+`[CLIENT-MANUAL]` is the July cold list; `[CLIENT-ATLAS]` is the Monday lead machine.
+Folding them together hides whether the new motion works.
+
+| Source | Deals | Reached | Replied | Won | Reply rate |
+| --- | --- | --- | --- | --- | --- |
+| `[CLIENT-MANUAL]` | 96 | 91 | **1** (Hospital CIMA) | **0** | **1%** · confident |
+| `[CLIENT-ATLAS]` | 3 | 1 | **1** (Clínica Dental Sanmartin) | **0** | 100% · **NOT confident** |
+
+Delivered all-time **113** · 5 real prospect addresses bounced (~4%) · spam complaints **0**.
+
+⚠️ **The 100% is one reply out of one delivered email.** Every rate is published with
+its `reached` count and a `confident` flag (≥20 reached) precisely so this number
+cannot be read as "the new machine converts perfectly."
 
 **What this says:** the machine is not broken — delivery, tracking, stamping and CRM
 attribution all work end to end. **The offer/market is the constraint.** Automating
@@ -26,9 +32,10 @@ more touches on the same cold list multiplies effort, not income. Before buildin
 anything else, the honest questions are: is the ICP right, is the offer priced and
 framed to be answerable, and is cold email the channel that reaches these buyers.
 
-**The one live conversation is worth more than the next 90 cold sends.** Hospital CIMA
-replied, routed Elena to Compras, and that letter is delivered and tracked. Work the
-reply.
+**The two live conversations are worth more than the next 200 cold sends.** Hospital
+CIMA replied and routed Elena to Compras (that letter is delivered and tracked);
+Clínica Dental Sanmartin replied "muy pronto atenderemos su solicitud". Both sit at
+💬 They replied. Working those two is the only step the machine cannot do for her.
 
 **Top of funnel (new Aug 1):** `scripts/atlas-lead-machine.cjs` stages up to 8 fresh,
 audited, deduped leads every Monday as `[CLIENT-ATLAS]` deals at 🔥 I Act TODAY with a

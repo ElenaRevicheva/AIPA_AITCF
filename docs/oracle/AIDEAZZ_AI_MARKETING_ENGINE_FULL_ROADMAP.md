@@ -89,6 +89,52 @@ seeded from every `CLIENT-*` deal and the outreach registry (330 companies, 86
 domains) — email-only matching had already re-created Centro Odontologico Paitilla,
 whose site publishes an address one typo from the one in HubSpot.
 
+### Atlas → HubSpot, actually wired (Aug 2 2026)
+
+Until now Atlas's only contribution to a real deal was one footnote line. Three
+changes make it earn, and one archive makes the board readable.
+
+**1. The angle writes the email.** Atlas derives an angle type from live competitor
+ads (`social_proof`, `pain_point`, `curiosity_gap`, `urgency_scarcity`, `authority`)
+and rewrites it weekly. That now selects the **subject and the opening**, so every
+Monday batch tests a different way in. Atlas writes in English and these prospects
+get Spanish mail, so the angle TYPE — the part actually derived from the ad market —
+picks a real Spanish framing (`ANGLE_ES` in `atlas-lead-machine.cjs`) rather than
+pasting translated hooks. The audit stays the substance; only the way in changes.
+
+**2. The angle is stamped on the deal.** HubSpot custom properties 403 on this plan
+(same failure as `aideazz_lead_kind`), so it rides in the deal name as a `· angle`
+suffix — which `hs-outcomes-to-atlas.cjs` already parses names to read.
+
+**3. Outcomes are graded PER SOURCE and per angle.** That job had been fetching
+`[CLIENT-MANUAL]` + `[ATLAS-RADAR]` only, so every lead the Monday machine created
+was invisible to the feedback loop — Atlas could never learn from the deals it
+caused. It now fetches `[CLIENT-ATLAS]` too (99 → 102 deals) and keeps **one
+scoreboard per source**: mixing a 96-deal cold list with a 3-deal new machine hides
+whether the new one works. `ATLAS_OUTCOMES_SOURCE` (default `CLIENT-ATLAS`) picks
+which source Atlas *learns* from; the rest stay visible under `_by_source`.
+
+Every rate is published with its `reached` count and a `confident` flag (≥20
+reached). The first per-source run reported `CLIENT-ATLAS reply_rate 100` — one reply
+out of one delivered email — and bare, that reads as proof of a machine nobody has
+measured.
+
+**Board cleanup:** `tracked-verticals.json` and `concepts.json` carried 7 abandoned
+experiments (health_supplements, solar, auto_insurance, medicare_advantage,
+expat_language, debt_finance, personal_ai_companions) alongside the 7 real service
+lanes. They were **archived, not deleted**, to `data/archive/` with full backups, so
+the board now shows only what is actually captured. `data/` is gitignored runtime
+state — that cleanup lives on Oracle only.
+
+**UI honesty:** every cadence string in `atlas.html` still promised a daily 9 AM run
+after capture moved to weekly cheap-mode on Jul 19, so a board correctly showing a
+6-day-old snapshot read as abandoned. 15 strings corrected across EN and ES
+(atlas-shifted `892fcde`).
+
+**Known limit, stated plainly:** at 8 leads/week, per-angle A/B results need months
+before they mean anything. Attribution costs nothing and compounds — but it is not
+a conversion fix, and the funnel truth above still says the offer is the constraint.
+
 ### Roadmap position (v25)
 
 | Phase | Name | Status |
