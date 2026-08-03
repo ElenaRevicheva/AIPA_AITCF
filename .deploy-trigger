@@ -1,2 +1,2 @@
 cto_aipa
-deploy 2026-08-03: citation tracker + /v1/citations + owner-gated run endpoint
+deploy 2026-08-03b: async citation run (202 + background), 409 on concurrent
