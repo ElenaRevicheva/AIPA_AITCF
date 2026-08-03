@@ -14,13 +14,33 @@ const { runVisibilityAudit, ENGINE_VERSION } = require('../dist/visibility-audit
 
 // enforce: fail the CI run if this property drops below the floor.
 // atuona.xyz is deployed from a different repo — report it, don't gate on it here.
+//
+// /portfolio and /api are the two money pages that prerender-routes.mjs gives a
+// standalone static identity (aideazz `scripts/prerender-routes.mjs`). Auditing the
+// apex alone proved nothing about them: 4everland serves one index.html for every
+// route, so a prerender regression would ship homepage identity on /portfolio and
+// the apex score would stay A+. Audit the URLs we actually ask assistants to cite.
 const DEFAULT_TARGETS = [
   { url: 'https://aideazz.xyz', enforce: true },
+  { url: 'https://aideazz.xyz/portfolio', enforce: true },
+  { url: 'https://aideazz.xyz/api', enforce: true },
   { url: 'https://webhook.aideazz.xyz/cto/v1/visibility', enforce: true },
   { url: 'https://atuona.xyz', enforce: false },
 ];
 
 const PASS_SCORE = 70; // grade B — our own properties must not slip below this
+
+// Checks whose `detail` IS the crawler-visible identity of the page. A route that
+// silently falls back to the homepage template still scores A+, so print the
+// evidence: a wrong title or a homepage word-count on /portfolio is the regression.
+const IDENTITY_CHECKS = ['title', 'meta-description', 'json-ld', 'ssr-content'];
+
+function printIdentity(result) {
+  for (const id of IDENTITY_CHECKS) {
+    const check = result.checks.find((c) => c.id === id);
+    if (check) console.log(`   ${id}: ${check.detail}`);
+  }
+}
 
 async function main() {
   const args = process.argv.slice(2);
@@ -37,6 +57,7 @@ async function main() {
       console.log(`${r.grade.padEnd(2)} ${String(r.score).padStart(3)}/100  ${url}${enforce ? '' : '  (report-only)'}`);
       console.log(`   ${cats}`);
       console.log(`   ${r.verdict}`);
+      printIdentity(r);
       if (blocked.length > 0) console.log(`   BLOCKED CRAWLERS: ${blocked.join(', ')}`);
       for (const fix of r.topFixes.slice(0, 3)) console.log(`   fix: ${fix}`);
       const failing = r.checks.filter((c) => c.status !== 'pass');
