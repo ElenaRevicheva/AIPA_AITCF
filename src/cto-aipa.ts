@@ -57,6 +57,7 @@ import * as path from 'path';
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { visibilityRouter } from './visibility-api';
+import { newsletterRouter } from './newsletter-api';
 import { Octokit } from '@octokit/rest';
 import * as cron from 'node-cron';
 
@@ -796,6 +797,9 @@ async function startCTOAIPA() {
 
   // AIdeazz Lab Visibility API (AEO/GEO/Tech-SEO audit) — public at /cto/v1/visibility
   app.use(visibilityRouter());
+
+  // Newsletter (double opt-in) — public at /cto/v1/newsletter/*
+  app.use(newsletterRouter());
 
   // Health check & status
   app.get('/', (req, res) => {
