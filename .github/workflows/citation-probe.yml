@@ -1,0 +1,40 @@
+# Ask real AI answer engines whether they cite aideazz.xyz, and record the number.
+#
+# The companion to visibility-self-audit.yml: that one proves our pages are citABLE,
+# this one proves whether they are actually CITED. Runs weekly, an hour after the
+# audit, so a week's reading is always "pages scored X, engines cited us Y".
+#
+# Needs at least one engine key in repo secrets. With none set the job FAILS on
+# purpose — a citation tracker that quietly measures nothing is worse than no tracker,
+# because the zero gets reported as "we were not cited".
+#
+# Manual run (cloud agent or laptop):
+#   date -u +%s > .citation-trigger && git add .citation-trigger && git commit -m "probe: citations" && git push origin main
+
+name: AIdeazz AI citation probe
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".citation-trigger"]
+  schedule:
+    - cron: "0 13 * * 1" # Mondays 13:00 UTC, after the visibility self-audit
+  workflow_dispatch:
+
+jobs:
+  citation-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build engine
+        run: npm ci && npx tsc
+      - name: Probe AI answer engines
+        env:
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+        run: node scripts/citation-probe.cjs

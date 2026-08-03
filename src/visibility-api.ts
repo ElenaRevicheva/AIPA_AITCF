@@ -139,6 +139,39 @@ export function visibilityRouter(): Router {
     res.json({ ok: true, service: 'aideazz-lab-visibility-api', engineVersion: ENGINE_VERSION });
   });
 
+  /**
+   * Citation trend — the companion to the audit score. The audit says a page is
+   * citable; this says whether engines actually cited it. Read-only: runs are
+   * expensive upstream calls, so they happen on a schedule (scripts/citation-probe.cjs),
+   * never on an anonymous GET.
+   *
+   * citation-store is imported lazily so the standalone `node dist/visibility-api.js`
+   * mode keeps working on a machine with no Oracle wallet.
+   */
+  router.get('/v1/citations', async (_req, res) => {
+    try {
+      const { getCitationTrend } = await import('./citation-store');
+      const trend = await getCitationTrend(12);
+      if (trend.length === 0) {
+        return res.json({
+          measured: false,
+          message: 'No citation runs recorded yet. This is "not measured", not "not cited".',
+          trend: [],
+        });
+      }
+      const [latest] = trend;
+      return res.json({
+        measured: true,
+        latest,
+        primaryPath: process.env.CITATION_PRIMARY_PATH || '/portfolio',
+        trend,
+      });
+    } catch (err: any) {
+      console.error('[visibility-api] citation trend failed:', err?.message ?? err);
+      return res.status(503).json({ error: 'citations_unavailable', message: 'Citation store unreachable.' });
+    }
+  });
+
   // Browser-friendly docs + try-it page at the same URL (the API itself is POST).
   // Without this, opening the endpoint on a phone shows Express's "Cannot GET".
   router.get('/v1/visibility', (_req, res) => {

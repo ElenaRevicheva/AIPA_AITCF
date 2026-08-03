@@ -86,7 +86,7 @@ async function resetPool(): Promise<void> {
  * NJS-040 / NJS-511 / ORA-12506: transient listener or pool exhaustion — short back-off.
  * (This was removed during Places work; restoring avoids noisy failures when ADB rotates material.)
  */
-async function getPoolConnection(retries = 4): Promise<oracledb.Connection> {
+export async function getPoolConnection(retries = 4): Promise<oracledb.Connection> {
   for (let i = 0; i < retries; i++) {
     try {
       const pool = await getPool();
