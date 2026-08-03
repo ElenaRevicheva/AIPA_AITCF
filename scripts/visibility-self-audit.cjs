@@ -15,15 +15,22 @@ const { runVisibilityAudit, ENGINE_VERSION } = require('../dist/visibility-audit
 // enforce: fail the CI run if this property drops below the floor.
 // atuona.xyz is deployed from a different repo — report it, don't gate on it here.
 //
-// /portfolio and /api are the two money pages that prerender-routes.mjs gives a
-// standalone static identity (aideazz `scripts/prerender-routes.mjs`). Auditing the
-// apex alone proved nothing about them: 4everland serves one index.html for every
-// route, so a prerender regression would ship homepage identity on /portfolio and
-// the apex score would stay A+. Audit the URLs we actually ask assistants to cite.
+// /portfolio leads the list: it is the hub buyers land on and the page we want
+// assistants to cite (see .cursor/rules/portfolio-first.mdc). The apex is the vision
+// site and supports it.
+//
+// These routes get a standalone static identity from the aideazz repo's
+// `scripts/prerender-routes.mjs`. Auditing the apex alone proved nothing about them:
+// 4everland serves one index.html for every route, so a prerender regression ships
+// homepage identity on a money page while the apex keeps scoring A+.
 const DEFAULT_TARGETS = [
-  { url: 'https://aideazz.xyz', enforce: true },
   { url: 'https://aideazz.xyz/portfolio', enforce: true },
+  { url: 'https://aideazz.xyz', enforce: true },
   { url: 'https://aideazz.xyz/api', enforce: true },
+  // Report-only until prerender-routes.mjs gives /blog its own identity — today it
+  // serves the homepage template, so enforcing it would fail CI for a defect that
+  // has to be fixed in the aideazz repo. Flip to enforce once that lands.
+  { url: 'https://aideazz.xyz/blog', enforce: false },
   { url: 'https://webhook.aideazz.xyz/cto/v1/visibility', enforce: true },
   { url: 'https://atuona.xyz', enforce: false },
 ];
@@ -42,16 +49,35 @@ function printIdentity(result) {
   }
 }
 
+/**
+ * The score floor cannot catch the failure it was built to catch. A route missing
+ * from prerender-routes.mjs inherits the homepage template and scores A+ — because it
+ * IS the A+ homepage. Identical crawler-visible identity is the only signal that
+ * exposes it: two routes with the same <title> are one page to an AI engine.
+ */
+function findIdentityCollisions(audited) {
+  const byTitle = new Map();
+  for (const row of audited) {
+    const title = (row.identity?.title ?? '').trim().toLowerCase();
+    if (!title) continue;
+    if (!byTitle.has(title)) byTitle.set(title, []);
+    byTitle.get(title).push(row);
+  }
+  return [...byTitle.values()].filter((rows) => rows.length > 1);
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const targets = args.length > 0 ? args.map((url) => ({ url, enforce: true })) : DEFAULT_TARGETS;
   console.log(`=== AIdeazz visibility self-audit — engine ${ENGINE_VERSION} — ${new Date().toISOString()} ===\n`);
 
   let worst = 100;
+  const audited = [];
   for (const { url, enforce } of targets) {
     try {
       const r = await runVisibilityAudit(url);
       if (enforce) worst = Math.min(worst, r.score);
+      audited.push({ url, enforce, identity: r.identity });
       const cats = r.categories.map((c) => `${c.id}:${c.score}`).join(' ');
       const blocked = r.aiEngines.filter((e) => e.crawlable === 'blocked').map((e) => e.crawler);
       console.log(`${r.grade.padEnd(2)} ${String(r.score).padStart(3)}/100  ${url}${enforce ? '' : '  (report-only)'}`);
@@ -70,8 +96,25 @@ async function main() {
     }
   }
 
+  const collisions = findIdentityCollisions(audited);
+  let identityFailed = false;
+  for (const rows of collisions) {
+    const urls = rows.map((r) => r.url);
+    const enforced = rows.filter((r) => r.enforce);
+    const label = enforced.length > 1 ? 'IDENTICAL IDENTITY' : 'identical identity (report-only)';
+    console.log(`${label}: ${urls.join('  ==  ')}`);
+    console.log(`   title: "${rows[0].identity.title}"`);
+    console.log(`   These routes are one page to an AI engine. A route missing from`);
+    console.log(`   prerender-routes.mjs inherits the homepage template and still scores A+.\n`);
+    if (enforced.length > 1) identityFailed = true;
+  }
+
   if (worst < PASS_SCORE) {
     console.log(`=== SELF-AUDIT FAILED: worst score ${worst} < ${PASS_SCORE} (grade B floor) ===`);
+    process.exit(1);
+  }
+  if (identityFailed) {
+    console.log('=== SELF-AUDIT FAILED: enforced routes share crawler-visible identity ===');
     process.exit(1);
   }
   console.log(`=== Self-audit passed: all properties at or above ${PASS_SCORE} ===`);

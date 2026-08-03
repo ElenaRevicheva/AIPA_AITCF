@@ -1,0 +1,47 @@
+---
+description: /portfolio is the hub of the AIdeazz web presence — link, audit, cite and rank it ahead of the apex
+alwaysApply: true
+---
+
+# Portfolio-first — `aideazz.xyz/portfolio` leads, the apex supports
+
+`https://aideazz.xyz` is the **vision site**. `https://aideazz.xyz/portfolio` is the
+**money page**: the one buyers land on, the one outreach points at, and the one we
+want AI assistants to cite. When a choice exists, the portfolio wins.
+
+## Rules
+
+1. **Order lists portfolio-first.** Audit targets, sitemaps, docs tables, nav — the
+   portfolio is row one, the apex is row two. Never lead with the apex.
+2. **Every artifact links back to the hub.** `/api`, `/blog`, `sop-ai-ops.html`, the
+   Atlas board and the podcast each carry a return link to `/portfolio`, so a crawler
+   entering on any page can reach the hub in one hop.
+3. **Outbound destinations are the portfolio.** Outreach emails, HubSpot notes,
+   Telegram lead pings and the `/api` page send people to `/portfolio`, not the apex.
+4. **Entity files name the portfolio as primary.** `llms.txt`, its `.well-known`
+   mirror and `geo-manifest.json` declare `/portfolio` as the primary entity page;
+   the sitemap gives it the highest priority.
+5. **Citation tracking scores the portfolio first.** A citation of `/portfolio` is the
+   headline number; an apex citation is recorded but reported as secondary.
+
+## The six proof surfaces
+
+The portfolio must link to all of these, and each should link back:
+
+| Surface | URL |
+| --- | --- |
+| Audit API + free tool | `https://aideazz.xyz/api` |
+| Atlas board | `https://webhook.aideazz.xyz/whitespace/atlas.html` |
+| Inquiry form | `https://aideazz.xyz/portfolio#portfolio-inquiry-form` |
+| Ops & marketing engine SOP | `https://aideazz.xyz/sop-ai-ops.html` |
+| Blog | `https://aideazz.xyz/blog` |
+| Podcast | `https://podcast.aideazz.xyz/` |
+
+## Why this is not cosmetic
+
+4everland serves one `index.html` for every route, so a route missing from the
+aideazz repo's `scripts/prerender-routes.mjs` silently inherits **homepage** identity —
+same title, same description, same schema — and still scores A+ in the visibility
+audit, because it *is* the A+ homepage. Adding a route to the portfolio's link graph
+is only real once that route has its own prerendered identity. Verify with
+`node scripts/visibility-self-audit.cjs <url>` and compare titles, never scores alone.

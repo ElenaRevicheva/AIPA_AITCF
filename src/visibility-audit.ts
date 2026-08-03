@@ -53,6 +53,20 @@ export interface EngineVisibility {
   crawlable: 'yes' | 'blocked' | 'unknown';
 }
 
+/**
+ * What the page tells a machine it IS, before any JavaScript runs. Two routes that
+ * return the same identity are the same page to an AI engine no matter how well each
+ * one scores on its own — which is how a prerender regression hides behind an A+.
+ */
+export interface PageIdentity {
+  title: string;
+  metaDescription: string | null;
+  /** Every schema.org type found, JSON-LD and microdata/RDFa combined. */
+  schemaTypes: string[];
+  /** Words in the raw HTML — the text a non-JS crawler actually receives. */
+  words: number;
+}
+
 export interface AuditResult {
   url: string;
   finalUrl: string;
@@ -63,6 +77,7 @@ export interface AuditResult {
   /** One-sentence executive summary. */
   verdict: string;
   aiEngines: EngineVisibility[];
+  identity: PageIdentity;
   categories: CategoryScore[];
   checks: AuditCheck[];
   /** Top failing high-impact fixes, ordered — the "do these first" list. */
@@ -75,7 +90,7 @@ export interface AuditResult {
   };
 }
 
-export const ENGINE_VERSION = '1.1.0';
+export const ENGINE_VERSION = '1.2.0';
 
 const CATEGORY_DEFS: Record<CategoryId, { label: string; weight: number }> = {
   aiAccess: { label: 'AI Crawler Access', weight: 25 },
@@ -835,6 +850,12 @@ export async function runVisibilityAudit(inputUrl: string): Promise<AuditResult>
     grade,
     verdict,
     aiEngines,
+    identity: {
+      title,
+      metaDescription: metaDesc ?? null,
+      schemaTypes: [...allSchemaTypes],
+      words,
+    },
     categories,
     checks,
     topFixes,
