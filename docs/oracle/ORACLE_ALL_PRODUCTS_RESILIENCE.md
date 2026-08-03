@@ -58,6 +58,61 @@ returns HTML, not JSON), the regenerated sitemap **silently drops published URLs
 Never commit sitemap files from a laptop build; `git checkout --` them and let the
 deploy runner regenerate.
 
+## 🟢 Newsletter (double opt-in) + citation runs deployed (August 3 2026, evening)
+
+Deployed to the VM the same evening. Story in
+[`AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md`](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md)
+(Phase 1, Aug 3 evening) — this is the operational half.
+
+**New surfaces on `cto-aipa` (PM2 app `cto-aipa`, port 3000):**
+
+| Surface | Where | Notes |
+| --- | --- | --- |
+| `POST /cto/v1/newsletter/subscribe` | `src/newsletter-api.ts` | Honeypot + validation, writes `pending`, sends opt-in mail. 10/hour per IP. |
+| `GET /cto/v1/newsletter/confirm` | same | Single-use token, HTML page (a human clicked a link, not an API). |
+| `GET /cto/v1/newsletter/unsubscribe` | same | Per-subscriber token, flips status — **the row is never deleted**. |
+| `GET /cto/v1/newsletter/stats` | same | Owner key (`aidz_owner_`) only. |
+| `newsletter_subscribers` | Oracle | Auto-created, ORA-955 ignored, same idiom as the rest of the schema. |
+| `scripts/newsletter-broadcast.cjs` | CLI | Needs `npm run build` first (reads `dist/newsletter-store.js`). |
+| `POST /cto/v1/citations/run` | `src/visibility-api.ts` | Owner key only — a run spends real SerpAPI/OpenAI credit. |
+
+**Keys it needs:** `RESEND_API_KEY` (or `RESEND_KEY`) — already present on the VM, the
+same one `marketing-notify` and the concierge use. Optional overrides:
+`NEWSLETTER_FROM` (default `AIdeazz <aipa@aideazz.xyz>`), `NEWSLETTER_SITE_URL`
+(default `https://aideazz.xyz/portfolio`), `CTO_AIPA_PUBLIC_URL` (link base).
+
+**Why every send is its own message:** `newsletter-broadcast.cjs` sends one email per
+subscriber rather than one with many recipients, because each copy carries that
+reader's own unsubscribe token — and a shared `To:` header would expose the whole list
+to everyone on it. 600ms between sends stays inside the Resend rate budget. Always
+`--dry-run` first; `--test you@x.com` renders with a dead unsubscribe token so
+proofreading cannot remove a real subscriber.
+
+**Isolation rule — do not break this:** the newsletter has its **own table and its own
+module**. A subscriber must never be written into `business_leads` or picked up by the
+concierge. An inquiry is a lead someone answers personally; a subscription is a reader
+on a marketing list. Merging them would push newsletter volume through the address that
+sends lead replies and risk the reputation of both.
+
+**Why nginx forced the citation run async:** a three-engine sweep outlasts nginx's 60s
+proxy timeout, so the first manual run returned `504` while the probe completed and
+saved normally — a success that read as a failure. The endpoint now returns `202` in
+~2s and finishes in the background; `GET /v1/citations` exposes `running`, and a second
+start while one is in flight gets `409` instead of double-billing the engines. **If a
+future long job is added behind nginx, do the same — do not raise the proxy timeout.**
+
+**Verified live the same evening:** invalid email → 400, bogus confirm/unsubscribe
+token → 404 page, stats without owner key → 403, honeypot → 200 with nothing stored,
+and a real end-to-end signup → `{"confirmed":1,"pending":0,"unsubscribed":0}`. First
+citation runs stored: 0/18 then 1/18, `/portfolio` 0%, mention rate 11%.
+
+**Restart safety note:** three deploys ran this evening, each restarting PM2 `cto-aipa`
+(shared with the Lab API, Lead Concierge and inquiry proxy). After each,
+`GET /cto/marketing/inquiry-status` was re-checked for
+`inquiryEndpointConfigured: true` + `emailNotifyConfigured: true` — that endpoint is
+the cheapest proof the website form still reaches Oracle and HubSpot. Do this after
+every `cto_aipa` deploy.
+
 ## ✅ Fleet HubSpot-outcomes audit — July 16 2026 (log-verified, per source prefix)
 
 Elena asked to confirm every agent actually surfaces its outcomes to HubSpot (client/hiring/espaluz). Pulled 175 real deals from the last 14 days + grepped real Oracle logs (not config) per prefix:

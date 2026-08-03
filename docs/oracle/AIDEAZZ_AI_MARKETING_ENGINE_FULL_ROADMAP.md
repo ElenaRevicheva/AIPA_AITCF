@@ -504,6 +504,68 @@ dependency** so it runs on a bare CI runner; persistence is imported lazily.
 
 ---
 
+### Phase 1 — the first citation number, and the newsletter stopped being a claim (August 3, 2026, evening)
+
+Everything above was built the same day. This is what happened when it was pointed at
+production.
+
+**The number exists now, and it is small.** Two runs on the Oracle VM, where the engine
+keys live:
+
+| Run | Measured | Cited | Rate | `/portfolio` | Mention-only |
+| --- | --- | --- | --- | --- | --- |
+| 19:59 UTC | 18 probes | 0 | **0%** | 0% | 11% |
+| 20:14 UTC | 18 probes | 1 | **6%** | 0% | 11% |
+
+Three engines (Google AI Overview, Gemini grounded, OpenAI search) across six prompts.
+The movement between two runs fifteen minutes apart is the useful part: it proves the
+probe is reading live answers rather than replaying a cached zero. **`/portfolio` is at
+0%** — the page the whole portfolio-first rule exists to promote is not yet cited by
+anything, while ~11% of answers mention AIdeazz without linking it. Mentioned but not
+linked is the specific failure GEO work is supposed to fix, and now it has a number.
+
+Read the 0% as a floor, not a verdict. The honest framing is that the measurement now
+exists — the claim that was unbacked this morning is the one thing that is now
+instrumented, dated and stored.
+
+**A success that read as a failure.** The first manual run returned `504 Gateway
+Time-out`. The probe had in fact completed and saved normally; nginx simply closed the
+connection at 60s while a three-engine sweep took longer. Holding an HTTP connection
+open for the length of a sweep was never going to work, so `POST /v1/citations/run` now
+answers `202` immediately and finishes in the background, `GET /v1/citations` reports
+`running`, and a second start while one is in flight gets `409` rather than billing
+SerpAPI and OpenAI twice for the same answer. Verified after deploy: **2.1s to `202`**.
+
+**The newsletter is real.** Email was the one channel on the portfolio with nothing
+behind it — Resend was doing one-to-one outreach and transactional mail only, with no
+list, no subscribe path, no broadcast. It now has all three:
+
+| Surface | What it does |
+| --- | --- |
+| `POST /cto/v1/newsletter/subscribe` | Honeypot + validation, writes `pending`, sends the opt-in mail |
+| `GET /cto/v1/newsletter/confirm` | Single-use token → `confirmed`, returns an HTML page |
+| `GET /cto/v1/newsletter/unsubscribe` | Per-subscriber token, flips status (row is kept) |
+| `GET /cto/v1/newsletter/stats` | Owner-key counts |
+| `scripts/newsletter-broadcast.cjs` | One send per subscriber, `--dry-run`, `--test` |
+| `NewsletterSignup.tsx` on `/portfolio` | EN/ES, below the inquiry form, `#portfolio-newsletter` |
+
+**Double opt-in is a deliverability decision, not ceremony.** A public form on single
+opt-in is one bored bot away from a spam trap, and a trap hit damages the same sending
+domain the concierge replies from — confirmation is what stops marketing volume from
+putting transactional mail at risk. For the same reason the newsletter is a **separate
+component and a separate table**: an inquiry is a lead the concierge answers, a
+subscription is a reader, and a subscriber never becomes a `business_leads` row.
+
+**Verified end to end the same evening:** subscribe → Resend confirmation from
+`aipa@aideazz.xyz` → click → `{"confirmed":1,"pending":0,"unsubscribed":0}`. Pending at
+zero is the meaningful half — the token was consumed, so single-use confirmation works.
+
+**And the newsletter is crawler-visible.** It is a seventh entry in the prerendered
+`/portfolio` nav, because a signup form only React can render is invisible to exactly
+the audience the AEO work is for.
+
+---
+
 ## Document map — Phases 1 through 6 (read in this order)
 
 This file is organized around **six phases**. Everything else (AutoSEO critique, Manny blueprint, engineer handoff) **supports** the same sequence.
