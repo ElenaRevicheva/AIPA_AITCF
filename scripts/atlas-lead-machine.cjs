@@ -66,14 +66,86 @@ const AUDIT_MAX = Number(process.env.LEAD_AUDIT_MAX || 90);
 const STAGE_ACT_TODAY = 'qualifiedtobuy'; // 🔥 I Act TODAY
 
 /** Panama + LATAM verticals that match the offer Elena already sells. ll = geo bias. */
-const TARGETS = [
-  { q: 'clínica dental', ll: '@8.9824,-79.5199,12z', city: 'Panama City' },
-  { q: 'hotel boutique', ll: '@8.9824,-79.5199,12z', city: 'Panama City' },
-  { q: 'bufete de abogados', ll: '@8.9824,-79.5199,12z', city: 'Panama City' },
-  { q: 'clínica estética', ll: '@8.9824,-79.5199,12z', city: 'Panama City' },
-  { q: 'tours y excursiones', ll: '@9.3400,-82.2419,12z', city: 'Bocas del Toro' },
-  { q: 'hotel', ll: '@8.4333,-82.4333,12z', city: 'Boquete' },
-];
+const PTY = '@8.9824,-79.5199,12z';
+/** Atlas writes this every Monday; the lead machine only ever reads it. */
+const CONCEPTS_PATH = process.env.ATLAS_CONCEPTS_PATH || '/home/ubuntu/whitespace/data/concepts.json';
+
+/**
+ * ICPs per Atlas lane — only lanes with a REACHABLE audience.
+ *
+ * Aug 2 2026: `fractional_cto` is Atlas's hottest lane (60) and is deliberately
+ * absent. Every source was checked: 242 [CLIENT-CTO-SERP] signals for it hold ZERO
+ * contact emails (Hacker News and Reddit posts by anonymous founders), the VJH ATS
+ * cache is probe metadata, and the VJH outreach queue is 205 LinkedIn URLs with 2
+ * emails. A lane score measures how hard competitors are ADVERTISING, not whether
+ * Elena can reach a buyer. Mining it would rebuild the same 242 uncontactable deals
+ * that are already parked in "AI working — ignore".
+ *
+ * So lanes are chosen by REACHABILITY × score, never score alone.
+ */
+const ICP_BY_LANE = {
+  whatsapp_ai_agents: [
+    { q: 'restaurante', ll: PTY, city: 'Panama City' },
+    { q: 'clínica veterinaria', ll: PTY, city: 'Panama City' },
+    { q: 'gimnasio', ll: PTY, city: 'Panama City' },
+    { q: 'spa', ll: PTY, city: 'Panama City' },
+    { q: 'taller mecánico', ll: PTY, city: 'Panama City' },
+  ],
+  ai_automation: [
+    { q: 'agencia de marketing', ll: PTY, city: 'Panama City' },
+    { q: 'bienes raíces', ll: PTY, city: 'Panama City' },
+    { q: 'contadores', ll: PTY, city: 'Panama City' },
+    { q: 'agencia de aduanas', ll: PTY, city: 'Panama City' },
+    { q: 'empresa de logística', ll: PTY, city: 'Panama City' },
+  ],
+  geo_aeo_tech_seo_makers: [
+    { q: 'clínica dental', ll: PTY, city: 'Panama City' },
+    { q: 'hotel boutique', ll: PTY, city: 'Panama City' },
+    { q: 'bufete de abogados', ll: PTY, city: 'Panama City' },
+    { q: 'clínica estética', ll: PTY, city: 'Panama City' },
+    { q: 'tours y excursiones', ll: '@9.3400,-82.2419,12z', city: 'Bocas del Toro' },
+    { q: 'hotel', ll: '@8.4333,-82.4333,12z', city: 'Boquete' },
+  ],
+};
+
+/**
+ * What Elena actually sells this lead — the audit stays the credibility hook
+ * (it is real, measured, about THEIR site), but the offer changes per lane.
+ */
+const LANE_OFFER = {
+  whatsapp_ai_agents: {
+    label: 'agente de WhatsApp',
+    pitch: (city) =>
+      `La mayoría de los negocios en ${city} pierden consultas simplemente porque llegan fuera de horario y nadie contesta a tiempo. Instalo un agente de WhatsApp que responde al instante 24/7 en español e inglés, califica al cliente, agenda y deja todo registrado en su CRM.`,
+  },
+  ai_automation: {
+    label: 'automatización con IA',
+    pitch: () =>
+      `Casi siempre hay dos o tres procesos que consumen horas del equipo cada semana — cotizaciones, seguimiento de clientes, reportes, carga de datos. Automatizo justo esos, conectados a las herramientas que ya usan, sin cambiar de sistema.`,
+  },
+  geo_aeo_tech_seo_makers: {
+    label: 'visibilidad en IA',
+    pitch: () =>
+      `Son 3 arreglos concretos y de implementación rápida para que su negocio aparezca como respuesta citable cuando alguien le pregunta a ChatGPT o Perplexity por opciones en su sector.`,
+  },
+};
+
+/** Highest-scoring Atlas lane that has a reachable ICP. Score alone is not enough. */
+function pickLane() {
+  const forced = process.env.LEAD_LANE;
+  if (forced && ICP_BY_LANE[forced]) return { lane: forced, score: null, forced: true };
+  let best = { lane: 'geo_aeo_tech_seo_makers', score: -1 };
+  try {
+    const c = JSON.parse(fs.readFileSync(CONCEPTS_PATH, 'utf8'));
+    for (const lane of Object.keys(ICP_BY_LANE)) {
+      const s = c[lane]?.move?.score;
+      if (typeof s === 'number' && s > best.score) best = { lane, score: s };
+    }
+  } catch {
+    /* no concepts — fall back to the lane Elena provably converts on */
+  }
+  return best;
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -256,9 +328,8 @@ async function contactExists(email) {
 /** The Atlas angle for this lane — grounded in real competitor ads, refreshed weekly. */
 function atlasAngle(lane = 'geo_aeo_tech_seo_makers') {
   try {
-    const p = '/home/ubuntu/whitespace/data/concepts.json';
-    if (!fs.existsSync(p)) return null;
-    const c = JSON.parse(fs.readFileSync(p, 'utf8'))[lane];
+    if (!fs.existsSync(CONCEPTS_PATH)) return null;
+    const c = JSON.parse(fs.readFileSync(CONCEPTS_PATH, 'utf8'))[lane];
     if (!c || !c.concept) return null;
     return {
       lane,
@@ -370,7 +441,9 @@ function buildDraft(lead, audit, angle) {
       ? [`Su punto más débil es la respuesta-a-preguntas (AEO ${audit.aeo}/100) — y es el más rápido de arreglar.`]
       : []),
     ``,
-    `Son 3 arreglos concretos y de implementación rápida. Si les parece bien, se los muestro en 15 minutos, sin ningún compromiso.`,
+    (LANE_OFFER[lead.lane] || LANE_OFFER.geo_aeo_tech_seo_makers).pitch(lead.city),
+    ``,
+    `Si les parece bien, se lo muestro en 15 minutos, sin ningún compromiso.`,
     ``,
     `La auditoría completa es gratuita aquí: https://aideazz.xyz/api`,
     ``,
@@ -431,7 +504,17 @@ async function stageLead(lead, audit, angle) {
   // plan (aideazz_lead_kind failed the same way). hs-outcomes-to-atlas.cjs already
   // parses deal names, so a " · angle" suffix is all it needs to report reply rate
   // PER ANGLE — the number that tells Elena which opening actually earns.
-  const dealName = `[CLIENT-ATLAS] ${lead.company} — GEO/AEO fix (audit: ${audit.score}/${audit.grade}) · ${angleKey}`;
+  // The lane MUST be readable from the deal name: hs-outcomes-to-atlas.cjs maps
+  // deals to lanes by keyword, and its default is geo_aeo — so a WhatsApp-lane lead
+  // would silently be scored against the wrong lane. The trailing " · angle" is the
+  // per-angle attribution the same job parses.
+  const LANE_TAG = {
+    whatsapp_ai_agents: 'WhatsApp agent',
+    ai_automation: 'automation',
+    geo_aeo_tech_seo_makers: 'GEO/AEO fix',
+  };
+  const laneTag = LANE_TAG[lead.lane] || LANE_TAG.geo_aeo_tech_seo_makers;
+  const dealName = `[CLIENT-ATLAS] ${lead.company} — ${laneTag} (audit: ${audit.score}/${audit.grade}) · ${angleKey}`;
   if (DRY) return { slug, dealName, dealId: null };
 
   fs.mkdirSync(path.join(ROOT, 'docs/selling/drafts'), { recursive: true });
@@ -570,10 +653,16 @@ async function telegram(text) {
 // its letter templates would fire the whole machine — Google searches, audits, and
 // real HubSpot contacts and deals — as an import side effect.
 if (require.main === module) (async () => {
-  const angle = atlasAngle();
+  const picked = pickLane();
+  const TARGETS = ICP_BY_LANE[picked.lane];
+  const angle = atlasAngle(picked.lane);
   console.log(
-    `[lead-machine] start${DRY ? ' (DRY RUN — nothing written)' : ''} · max ${MAX_NEW} · band ${AUDIT_MIN}-${AUDIT_MAX}` +
-      (angle ? ` · atlas angle: ${angle.angle} (${angle.score})` : ' · no atlas angle'),
+    `[lead-machine] start${DRY ? ' (DRY RUN — nothing written)' : ''} · max ${MAX_NEW} · band ${AUDIT_MIN}-${AUDIT_MAX}`,
+  );
+  console.log(
+    `[lead-machine] LANE: ${picked.lane}${picked.forced ? ' (forced via LEAD_LANE)' : ` (Atlas score ${picked.score})`}` +
+      ` · offer: ${LANE_OFFER[picked.lane].label} · ${TARGETS.length} ICP queries` +
+      (angle ? ` · angle ${angle.angle}` : ' · no fresh angle'),
   );
   const known = await loadKnown();
   console.log(`[lead-machine] dedup set: ${known.names.size} companies, ${known.domains.size} domains already worked`);
@@ -631,7 +720,7 @@ if (require.main === module) (async () => {
         console.log(`   ✗ ${b.company.slice(0, 30)} — ${audit.score}/100 outside band`);
         continue;
       }
-      const r = await stageLead({ ...b, email }, audit, angle);
+      const r = await stageLead({ ...b, email, lane: picked.lane, query: target.q }, audit, angle);
       staged.push({ ...b, email, score: audit.score, grade: audit.grade, ...r });
       console.log(`   ✅ ${b.company.slice(0, 32)} · ${audit.score}/${audit.grade} · ${email}`);
       await sleep(400);
