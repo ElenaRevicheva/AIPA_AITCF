@@ -50,6 +50,9 @@ function limitForKey(key: string): number {
 /** Sliding-hour request counter per API key. In-memory is fine: limits are per-process courtesy caps, not billing. */
 const usage = new Map<string, number[]>();
 
+/** ISO timestamp while a background citation run is active, else null. Guards against concurrent sweeps burning upstream credit twice. */
+let citationRunInFlight: string | null = null;
+
 function underLimit(key: string): boolean {
   const now = Date.now();
   const cutoff = now - 3_600_000;
@@ -156,6 +159,7 @@ export function visibilityRouter(): Router {
         return res.json({
           measured: false,
           message: 'No citation runs recorded yet. This is "not measured", not "not cited".',
+          running: citationRunInFlight,
           trend: [],
         });
       }
@@ -164,6 +168,7 @@ export function visibilityRouter(): Router {
         measured: true,
         latest,
         primaryPath: process.env.CITATION_PRIMARY_PATH || '/portfolio',
+        running: citationRunInFlight,
         trend,
       });
     } catch (err: any) {
@@ -196,24 +201,52 @@ export function visibilityRouter(): Router {
       return res.status(429).json({ error: 'rate_limited', message: 'Slow down.' });
     }
 
-    try {
-      const { runCitationProbes, summarize } = await import('./citation-tracker');
-      const body = req.body ?? {};
-      const run = await runCitationProbes({
-        ...(Array.isArray(body.prompts) && body.prompts.length > 0 ? { prompts: body.prompts } : {}),
-        ...(Array.isArray(body.engines) && body.engines.length > 0 ? { engines: body.engines } : {}),
+    if (citationRunInFlight) {
+      return res.status(409).json({
+        error: 'already_running',
+        message: 'A citation run is already in flight. Poll GET /v1/citations for the result.',
+        startedAt: citationRunInFlight,
       });
-
-      let savedId: string | null = null;
-      if (run.summary.measured > 0) {
-        const { saveCitationRun } = await import('./citation-store');
-        savedId = await saveCitationRun(run);
-      }
-      return res.json({ summary: summarize(run), savedId, run });
-    } catch (err: any) {
-      console.error('[visibility-api] citation run failed:', err?.message ?? err);
-      return res.status(500).json({ error: 'citation_run_failed', message: 'Probe crashed — see server logs.' });
     }
+
+    const body = req.body ?? {};
+    const options = {
+      ...(Array.isArray(body.prompts) && body.prompts.length > 0 ? { prompts: body.prompts } : {}),
+      ...(Array.isArray(body.engines) && body.engines.length > 0 ? { engines: body.engines } : {}),
+    };
+
+    /**
+     * A full sweep runs well past nginx's 60s proxy timeout, so answer immediately and
+     * let the run finish in the background. Waiting inline returned a 504 to the caller
+     * while the probe carried on and saved anyway — a success that read as a failure.
+     */
+    citationRunInFlight = new Date().toISOString();
+    void (async () => {
+      try {
+        const { runCitationProbes } = await import('./citation-tracker');
+        const run = await runCitationProbes(options);
+        if (run.summary.measured > 0) {
+          const { saveCitationRun } = await import('./citation-store');
+          const savedId = await saveCitationRun(run);
+          console.log(
+            `[citations] run ${savedId} — ${run.summary.cited}/${run.summary.measured} cited ` +
+              `(${run.summary.citationRate}%), portfolio ${run.summary.portfolioCitationRate}%`,
+          );
+        } else {
+          console.warn('[citations] run produced no measurable probes — check engine keys.');
+        }
+      } catch (err: any) {
+        console.error('[citations] background run failed:', err?.message ?? err);
+      } finally {
+        citationRunInFlight = null;
+      }
+    })();
+
+    return res.status(202).json({
+      accepted: true,
+      startedAt: citationRunInFlight,
+      message: 'Citation run started. Poll GET /v1/citations in a minute or two for the result.',
+    });
   });
 
   router.post('/v1/visibility', async (req: Request, res: Response) => {
