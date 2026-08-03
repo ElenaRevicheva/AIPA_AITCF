@@ -45,6 +45,7 @@ const OPERATOR =
 const LEADS = [
   {
     slug: 'vitae-health',
+    existingDealId: process.env.REPAIR ? '63447576873' : null,
     company: 'Vitae Health',
     site: 'https://www.vitae-health.com/',
     email: 'info@vitae-health.com',
@@ -59,6 +60,7 @@ const LEADS = [
   },
   {
     slug: 'medical-depot-panama',
+    existingDealId: process.env.REPAIR ? '63434888257' : null,
     company: 'Medical Depot Panama',
     site: 'https://medicaldepotpanama.com/',
     email: null,
@@ -149,6 +151,24 @@ const LEADS = [
     }
     fs.writeFileSync(path.join(ROOT, wRel), waFirst, 'utf8');
     fs.writeFileSync(path.join(ROOT, wfRel), waFu, 'utf8');
+
+    // REPAIR MODE: the deals already exist in HubSpot (a git reset wiped only the
+    // uncommitted drafts and registry entries, never the CRM records). Re-creating
+    // them would give Elena duplicate deals for the same company, so when
+    // EXISTING_DEAL is set we rebuild the files and skip every CRM write.
+    if (L.existingDealId) {
+      const common0 = {
+        company: L.company,
+        score: L.score,
+        dealId: String(L.existingDealId),
+        phone: digitsOnly(L.phone),
+        ...(L.email ? { email: L.email } : {}),
+      };
+      reg[L.slug] = { ...common0, draft: wRel, ...(L.email ? { emailDraft: dRel } : {}) };
+      reg[`${L.slug}-fu`] = { ...common0, draft: wfRel, ...(L.email ? { emailDraft: fRel } : {}) };
+      console.log(`♻️  ${L.company} · repaired drafts + registry · deal ${L.existingDealId} (no new CRM records)`);
+      continue;
+    }
 
     const contact = await hs('POST', '/crm/v3/objects/contacts', {
       properties: {
