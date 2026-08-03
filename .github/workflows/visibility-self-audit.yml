@@ -4,12 +4,16 @@
 #
 # Manual run (cloud agent or laptop):
 #   date -u +%s > .audit-trigger && git add .audit-trigger && git commit -m "audit: self" && git push origin main
+#
+# cursor/** is included because a cloud agent VM has no egress to aideazz.xyz — the
+# runner is the only place it can prove a live SEO/GEO claim, and it must be able to
+# do that on the branch under review rather than after merging to main.
 
 name: AIdeazz visibility self-audit
 
 on:
   push:
-    branches: [main]
+    branches: [main, "cursor/**"]
     paths: [".audit-trigger"]
   schedule:
     - cron: "0 12 * * 1" # Mondays 12:00 UTC

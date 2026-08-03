@@ -483,9 +483,9 @@ export async function runVisibilityAudit(inputUrl: string): Promise<AuditResult>
     status: hasJsonLd ? 'pass' : inlineTypes.size > 0 ? 'warn' : 'fail',
     impact: 'high',
     detail: hasJsonLd
-      ? `${jsonLd.blocks} JSON-LD block(s), types: ${[...jsonLd.types].slice(0, 8).join(', ') || 'none parsed'}${inlineTypes.size > 0 ? ` + microdata/RDFa: ${[...inlineTypes].slice(0, 4).join(', ')}` : ''}`
+      ? `${jsonLd.blocks} JSON-LD block(s), types: ${listTypes(jsonLd.types, 8) || 'none parsed'}${inlineTypes.size > 0 ? ` + microdata/RDFa: ${listTypes(inlineTypes, 4)}` : ''}`
       : inlineTypes.size > 0
-        ? `No JSON-LD, but microdata/RDFa found: ${[...inlineTypes].slice(0, 8).join(', ')} — readable, though JSON-LD is what engines parse most reliably`
+        ? `No JSON-LD, but microdata/RDFa found: ${listTypes(inlineTypes, 8)} — readable, though JSON-LD is what engines parse most reliably`
         : 'No JSON-LD or microdata found — machines must guess what this page is',
     ...(hasJsonLd ? {} : { fix: 'Add JSON-LD (schema.org) describing the page: at minimum Organization or WebSite.' }),
   });
@@ -887,6 +887,13 @@ function statusRank(s: CheckStatus): number {
 
 function truncate(s: string, n: number): string {
   return s.length <= n ? s : `${s.slice(0, n - 1)}…`;
+}
+
+/** Cap a schema type list, but say how many were left out — a silent cut reads as "that is all you have". */
+function listTypes(types: Iterable<string>, max: number): string {
+  const all = [...types];
+  const shown = all.slice(0, max).join(', ');
+  return all.length > max ? `${shown} +${all.length - max} more` : shown;
 }
 
 function normalizeUrl(input: string): string {
