@@ -436,6 +436,72 @@ actually *cited*. The engine reads pages over HTTP and scores citability — a
 prerequisite for citation, not a measurement of it. Closing that gap is the honest
 next step for the GEO/AEO offer, since it is the one result a buyer can feel.
 
+### Phase 1 — the citation gap closed, and `/blog` was secretly the homepage (August 3, 2026)
+
+Three things shipped the same day the gap above was written down.
+
+**1. Portfolio-first is now a rule, not a preference.** `aideazz.xyz` is the vision
+site; `aideazz.xyz/portfolio` is the money page buyers land on and the page we want
+assistants to cite. Audit target lists, sitemaps, outreach destinations and entity
+files (`llms.txt`, `geo-manifest.json`) lead with `/portfolio`. Written down in
+`.cursor/rules/portfolio-first.mdc` so cloud agents stop defaulting to the apex.
+
+**2. `/blog` was serving crawlers the homepage — and scoring A+ for it.** This is the
+failure mode the score floor structurally cannot catch: a route that falls back to the
+homepage template does not score low, it scores **100/100, because it is the A+
+homepage**. `/blog` returned the apex title, the apex description and the same ~1,274
+words, and 85 published articles were unreachable from the blog index by any non-JS
+crawler.
+
+A `_redirects` rule alone could never have fixed it. cto-aipa writes
+`public/blog/<slug>/index.html`, which makes `/blog` a **real directory** in the IPFS
+build, and gateways resolve real directories **before** `_redirects`. On top of that,
+`fix-blog-index.mjs` deliberately copies `dist/index.html` into `dist/blog/index.html`
+so the directory renders the SPA. The fix: `/blog` is now a prerendered route and
+`prerender-routes.mjs` — which runs last — also writes `dist/blog/index.html`, so the
+directory carries blog identity. The index is generated from the per-article static
+pages that already exist, so it cannot list a post that was never published.
+
+The self-audit now **fails when two enforced routes share a `<title>`**, and
+`AuditResult` carries a first-class `identity` block (title, meta description, schema
+types, server-delivered words) so the gate compares real values instead of parsing a
+display string. Engine bumped to **1.2.0**.
+
+Verified in the build: four routes, four distinct titles and word counts, 6/6 JSON-LD
+blocks parsing on each, homepage byte-identical.
+
+| Route | Crawler-visible identity after the fix |
+| --- | --- |
+| `/portfolio` | 69-char title · 14 schema types · ~649 words · **all six proof links** |
+| `/` (apex) | 54-char title · 11 schema types · ~1,274 words |
+| `/api` | 60-char title · 13 schema types · ~262 words |
+| `/blog` | **61-char title · 12 schema types · ~765 words** (was: the homepage) |
+
+**3. The six proof surfaces are now visible to crawlers, not just to humans.** `/api`,
+the Atlas board, the inquiry-form anchor, `sop-ai-ops.html`, `/blog` and the podcast
+were all clickable in `BusinessCard.tsx`, but three of them never appeared in the
+prerendered `<noscript>` article — so GPTBot and PerplexityBot could not traverse to
+them. All six are now in the crawler-visible nav, and `/blog` and `/api` link back to
+the portfolio hub.
+
+**4. Citation tracking exists.** `src/citation-tracker.ts` asks real answer engines a
+real buyer question and reads the sources attached to the answer: Google AI Overviews
+(SerpAPI), Gemini with search grounding, OpenAI web search, and Perplexity when a key
+is present. Gemini returns redirect URIs rather than destinations, so chunks that look
+like ours are resolved to learn the exact path — a `/portfolio` citation is the
+headline number, an apex citation is secondary.
+
+The design refuses to confuse **"not measured"** with **"not cited"**: rates are
+computed only over probes that reached an engine, a missing key is reported as
+skipped, and a run with zero engines exits 1 so a keyless cron is loud instead of
+quietly reporting 0%. One prompt is a brand-name control — if even "Elena Revicheva AI
+portfolio" returns nothing, the problem is retrieval, not ranking.
+
+Surfaces: `scripts/citation-probe.cjs` (CLI, `--save`, `--notify`, `--json`),
+`GET /cto/v1/citations` (latest + 12-run trend), the `ai_citation_runs` table, and a
+weekly workflow an hour after the self-audit. The tracker itself has **no database
+dependency** so it runs on a bare CI runner; persistence is imported lazily.
+
 ---
 
 ## Document map — Phases 1 through 6 (read in this order)

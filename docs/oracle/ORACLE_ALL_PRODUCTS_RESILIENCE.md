@@ -8,6 +8,56 @@
 
 ---
 
+## 🟢 AI citation tracking + `/blog` identity fix (August 3 2026)
+
+**What runs where, and what to check when it goes quiet.** Story and rationale live in
+[`AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md`](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md)
+(Phase 1, Aug 3) — this entry is the operational half.
+
+**New surfaces on `cto-aipa` (PM2 app `cto-aipa`, port 3000):**
+
+| Surface | Where | Notes |
+| --- | --- | --- |
+| `GET /cto/v1/citations` | `src/visibility-api.ts` | Latest run + 12-run trend. Returns `measured:false` (not `0%`) when nothing has run. |
+| `scripts/citation-probe.cjs` | CLI | `--save` persists, `--notify` pings Telegram, `--json` for storage. **Exits 1 when nothing could be measured.** |
+| `ai_citation_runs` | Oracle | Auto-created on first save (ORA-955 ignored, same idiom as the rest of the schema). |
+| `.github/workflows/citation-probe.yml` | CI | Mondays 13:00 UTC, an hour after the visibility self-audit. |
+
+**Keys it needs (any one is enough; all are optional):** `SERPAPI_KEY` (Google AI
+Overviews), `GEMINI_API_KEY` (grounded search), `OPENAI_API_KEY` (web search),
+`PERPLEXITY_API_KEY` (optional, not currently in the fleet). The keys live in the
+Oracle VM `.env` — **the laptop `.env` has none of them**, so a local run will
+correctly report "not measured" and exit 1. That is the designed behaviour, not a bug.
+
+**Why exit 1 on zero engines:** a citation tracker that quietly measures nothing is
+worse than no tracker, because the resulting 0% gets reported as "we were not cited".
+If the weekly job goes red with `SKIPPED … not set`, the fix is a key, not the code.
+
+**Import rule — do not break this:** `src/citation-tracker.ts` has **no database
+dependency** so it runs on a bare GitHub runner with no Oracle wallet. Persistence
+lives in `src/citation-store.ts` and is imported **lazily** by both the CLI and the
+`/v1/citations` route, because importing `src/database.ts` initialises an Oracle pool
+at module load (verified: a top-level import throws DPI-1047 / NJS-125 off-VM).
+
+**Website side (repo `aideazz`, 4everland from `main`):** `/blog` was serving crawlers
+the homepage template and scoring A+ 100/100 for it. `_redirects` alone cannot fix
+this — the per-article pages make `/blog` a **real directory** in the IPFS build and
+gateways resolve real directories before `_redirects`, and `fix-blog-index.mjs`
+deliberately fills it with `dist/index.html`. `scripts/prerender-routes.mjs` runs last
+and now also writes `dist/blog/index.html` with blog identity. If `/blog` ever reverts
+to the homepage title, check that ordering first.
+
+**Guardrail:** `scripts/visibility-self-audit.cjs` now fails when two enforced routes
+share a `<title>`. Score alone cannot catch a homepage fallback, because the fallback
+*is* the A+ homepage. Engine `1.2.0` adds `AuditResult.identity` so the gate compares
+real values rather than parsing a display string.
+
+**Known local-build trap:** `npm run build` in the `aideazz` repo regenerates
+`public/sitemap*.xml|txt`. If the Hashnode fetch fails (it does from some networks —
+returns HTML, not JSON), the regenerated sitemap **silently drops published URLs**.
+Never commit sitemap files from a laptop build; `git checkout --` them and let the
+deploy runner regenerate.
+
 ## ✅ Fleet HubSpot-outcomes audit — July 16 2026 (log-verified, per source prefix)
 
 Elena asked to confirm every agent actually surfaces its outcomes to HubSpot (client/hiring/espaluz). Pulled 175 real deals from the last 14 days + grepped real Oracle logs (not config) per prefix:

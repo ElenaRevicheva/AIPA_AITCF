@@ -178,6 +178,44 @@ export function visibilityRouter(): Router {
     res.type('html').send(docsPage());
   });
 
+  /**
+   * Trigger a citation run. Owner keys only (aidz_owner_), because every probe spends
+   * real upstream credit on SerpAPI/OpenAI — this must never be reachable with the
+   * public demo key. The VM is the only place the engine keys live, so this is how a
+   * run is started on demand rather than waiting for the weekly schedule.
+   */
+  router.post('/v1/citations/run', async (req: Request, res: Response) => {
+    const key = req.header('X-API-Key') ?? '';
+    if (!key.startsWith('aidz_owner_') || !configuredKeys().has(key)) {
+      return res.status(403).json({
+        error: 'owner_key_required',
+        message: 'Citation runs cost upstream credit and require an owner key.',
+      });
+    }
+    if (!underLimit(key)) {
+      return res.status(429).json({ error: 'rate_limited', message: 'Slow down.' });
+    }
+
+    try {
+      const { runCitationProbes, summarize } = await import('./citation-tracker');
+      const body = req.body ?? {};
+      const run = await runCitationProbes({
+        ...(Array.isArray(body.prompts) && body.prompts.length > 0 ? { prompts: body.prompts } : {}),
+        ...(Array.isArray(body.engines) && body.engines.length > 0 ? { engines: body.engines } : {}),
+      });
+
+      let savedId: string | null = null;
+      if (run.summary.measured > 0) {
+        const { saveCitationRun } = await import('./citation-store');
+        savedId = await saveCitationRun(run);
+      }
+      return res.json({ summary: summarize(run), savedId, run });
+    } catch (err: any) {
+      console.error('[visibility-api] citation run failed:', err?.message ?? err);
+      return res.status(500).json({ error: 'citation_run_failed', message: 'Probe crashed — see server logs.' });
+    }
+  });
+
   router.post('/v1/visibility', async (req: Request, res: Response) => {
     const key = req.header('X-API-Key') ?? '';
     if (!configuredKeys().has(key)) {
