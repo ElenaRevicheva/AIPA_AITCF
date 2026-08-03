@@ -407,6 +407,35 @@ ATLAS_LANDING_BASE=https://aideazz.xyz
 
 **One-line truth:** discovery + content + CRM + triage are **genuinely loaded**; attribution is **empty (no inbound yet)**; outbound **fires but converts at 0%** (a targeting/copy problem, not deliverability). Documented honestly so nobody ever pitches an empty gun.
 
+### Phase 1 — `/portfolio` proven live, not just built (August 3, 2026)
+
+Phase 1b has claimed "**/portfolio page GEO — DONE**" since April. It was never
+*measured*: `scripts/visibility-self-audit.cjs` only audited the apex, and 4everland
+serves one `index.html` for every route — so a `prerender-routes.mjs` regression would
+have shipped homepage identity on `/portfolio` while the apex kept scoring A+.
+
+`/portfolio` and `/api` are now enforced audit targets, and the run prints the
+crawler-visible identity per URL. First live run (GitHub runner, open egress,
+engine 1.1.0):
+
+| URL | Grade | Crawler-visible identity |
+| --- | --- | --- |
+| `https://aideazz.xyz` | **A+ 100/100**, 0 non-passing | 54-char title · **11 schema types** · ~1,274 words in raw HTML |
+| `https://aideazz.xyz/portfolio` | **A+ 100/100**, 0 non-passing | 69-char title · **14 schema types** · ~649 words in raw HTML |
+| `https://aideazz.xyz/api` | **A+ 98/100** | 60-char title · 13 schema types · ~262 words (`content-depth` warn) |
+| `https://webhook.aideazz.xyz/cto/v1/visibility` | A+ 96/100 | no sitemap/robots/llms.txt on the API host — known, low priority |
+| `https://atuona.xyz` (report-only) | **C 69/100** | no JSON-LD, no meta description — the fleet's weakest GEO surface |
+
+Distinct titles, distinct word counts and **more schema on `/portfolio` than on the
+homepage** are the proof the prerender is live per-path: a homepage fallback would
+have returned identical numbers on all three rows.
+
+**Still not built, and the roadmap should stop implying otherwise:** nothing in the
+fleet queries ChatGPT/Perplexity/AI Overviews to check whether these pages are
+actually *cited*. The engine reads pages over HTTP and scores citability — a
+prerequisite for citation, not a measurement of it. Closing that gap is the honest
+next step for the GEO/AEO offer, since it is the one result a buyer can feel.
+
 ---
 
 ## Document map — Phases 1 through 6 (read in this order)
