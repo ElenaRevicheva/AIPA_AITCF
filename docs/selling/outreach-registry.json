@@ -1729,5 +1729,293 @@
     "email": "atencionclientes@medicaldepotpanama.com",
     "draft": "docs/selling/drafts/medical-depot-panama-fu.txt",
     "emailDraft": "docs/selling/drafts/medical-depot-panama-fu-email.txt"
+  },
+  "roots-atlas": {
+    "company": "Roots",
+    "email": "info@rootslatam.com",
+    "emailDraft": "docs/selling/drafts/roots-atlas-email.txt",
+    "score": 82,
+    "dealId": "63388889943",
+    "phone": "5073001066",
+    "draft": "docs/selling/drafts/roots-atlas.txt"
+  },
+  "roots-atlas-fu": {
+    "company": "Roots",
+    "email": "info@rootslatam.com",
+    "emailDraft": "docs/selling/drafts/roots-atlas-fu-email.txt",
+    "score": 82,
+    "dealId": "63388889943",
+    "phone": "5073001066",
+    "draft": "docs/selling/drafts/roots-atlas-fu.txt"
+  },
+  "spot-on-digital-agency-atlas": {
+    "company": "Spot On Digital Agency",
+    "email": "hola@spotondigitalagency.com",
+    "emailDraft": "docs/selling/drafts/spot-on-digital-agency-atlas-email.txt",
+    "score": 89,
+    "dealId": "63404412234",
+    "phone": "50765601885",
+    "draft": "docs/selling/drafts/spot-on-digital-agency-atlas.txt"
+  },
+  "spot-on-digital-agency-atlas-fu": {
+    "company": "Spot On Digital Agency",
+    "email": "hola@spotondigitalagency.com",
+    "emailDraft": "docs/selling/drafts/spot-on-digital-agency-atlas-fu-email.txt",
+    "score": 89,
+    "dealId": "63404412234",
+    "phone": "50765601885",
+    "draft": "docs/selling/drafts/spot-on-digital-agency-atlas-fu.txt"
+  },
+  "agencia-de-marketing-digital-quantic-brands-atlas": {
+    "company": "Agencia de Marketing Digital | Quantic Brands",
+    "email": "contacto@quanticbrands.com",
+    "emailDraft": "docs/selling/drafts/agencia-de-marketing-digital-quantic-brands-atlas-email.txt",
+    "score": 87,
+    "dealId": "63410227090",
+    "phone": "50762280680",
+    "draft": "docs/selling/drafts/agencia-de-marketing-digital-quantic-brands-atlas.txt"
+  },
+  "agencia-de-marketing-digital-quantic-brands-atlas-fu": {
+    "company": "Agencia de Marketing Digital | Quantic Brands",
+    "email": "contacto@quanticbrands.com",
+    "emailDraft": "docs/selling/drafts/agencia-de-marketing-digital-quantic-brands-atlas-fu-email.txt",
+    "score": 87,
+    "dealId": "63410227090",
+    "phone": "50762280680",
+    "draft": "docs/selling/drafts/agencia-de-marketing-digital-quantic-brands-atlas-fu.txt"
+  },
+  "nappo-digital-atlas": {
+    "company": "NAPPO Digital",
+    "email": "hola@nappo.net",
+    "emailDraft": "docs/selling/drafts/nappo-digital-atlas-email.txt",
+    "score": 78,
+    "dealId": "63410253165",
+    "phone": "5072757650",
+    "draft": "docs/selling/drafts/nappo-digital-atlas.txt"
+  },
+  "nappo-digital-atlas-fu": {
+    "company": "NAPPO Digital",
+    "email": "hola@nappo.net",
+    "emailDraft": "docs/selling/drafts/nappo-digital-atlas-fu-email.txt",
+    "score": 78,
+    "dealId": "63410253165",
+    "phone": "5072757650",
+    "draft": "docs/selling/drafts/nappo-digital-atlas-fu.txt"
+  },
+  "gx-live-marketing-atlas": {
+    "company": "GX Live Marketing",
+    "email": "info@gxlivemarketing.com",
+    "emailDraft": "docs/selling/drafts/gx-live-marketing-atlas-email.txt",
+    "score": 79,
+    "dealId": "63393686601",
+    "phone": "50769804859",
+    "draft": "docs/selling/drafts/gx-live-marketing-atlas.txt"
+  },
+  "gx-live-marketing-atlas-fu": {
+    "company": "GX Live Marketing",
+    "email": "info@gxlivemarketing.com",
+    "emailDraft": "docs/selling/drafts/gx-live-marketing-atlas-fu-email.txt",
+    "score": 79,
+    "dealId": "63393686601",
+    "phone": "50769804859",
+    "draft": "docs/selling/drafts/gx-live-marketing-atlas-fu.txt"
+  },
+  "ed-bienes-raices-atlas": {
+    "company": "ED Bienes Raices",
+    "email": "isaac@edpty.com",
+    "emailDraft": "docs/selling/drafts/ed-bienes-raices-atlas-email.txt",
+    "score": 67,
+    "dealId": "63409439089",
+    "phone": "50766953969",
+    "draft": "docs/selling/drafts/ed-bienes-raices-atlas.txt"
+  },
+  "ed-bienes-raices-atlas-fu": {
+    "company": "ED Bienes Raices",
+    "email": "isaac@edpty.com",
+    "emailDraft": "docs/selling/drafts/ed-bienes-raices-atlas-fu-email.txt",
+    "score": 67,
+    "dealId": "63409439089",
+    "phone": "50766953969",
+    "draft": "docs/selling/drafts/ed-bienes-raices-atlas-fu.txt"
+  },
+  "c-m-real-estate-panama-atlas": {
+    "company": "C&M REAL ESTATE PANAMA",
+    "email": "grupogestioninmobiliario@gmail.com",
+    "emailDraft": "docs/selling/drafts/c-m-real-estate-panama-atlas-email.txt",
+    "score": 81,
+    "dealId": "63404115484",
+    "phone": "50767608195",
+    "draft": "docs/selling/drafts/c-m-real-estate-panama-atlas.txt"
+  },
+  "c-m-real-estate-panama-atlas-fu": {
+    "company": "C&M REAL ESTATE PANAMA",
+    "email": "grupogestioninmobiliario@gmail.com",
+    "emailDraft": "docs/selling/drafts/c-m-real-estate-panama-atlas-fu-email.txt",
+    "score": 81,
+    "dealId": "63404115484",
+    "phone": "50767608195",
+    "draft": "docs/selling/drafts/c-m-real-estate-panama-atlas-fu.txt"
+  },
+  "panama-nice-realty-atlas": {
+    "company": "Panama Nice Realty",
+    "email": "scerrud@panamanicerealty.com",
+    "emailDraft": "docs/selling/drafts/panama-nice-realty-atlas-email.txt",
+    "score": 83,
+    "dealId": "63411911487",
+    "phone": "50766779199",
+    "draft": "docs/selling/drafts/panama-nice-realty-atlas.txt"
+  },
+  "panama-nice-realty-atlas-fu": {
+    "company": "Panama Nice Realty",
+    "email": "scerrud@panamanicerealty.com",
+    "emailDraft": "docs/selling/drafts/panama-nice-realty-atlas-fu-email.txt",
+    "score": 83,
+    "dealId": "63411911487",
+    "phone": "50766779199",
+    "draft": "docs/selling/drafts/panama-nice-realty-atlas-fu.txt"
+  },
+  "adn-creativo-panam-atlas": {
+    "company": "ADN Creativo Panamá",
+    "email": "patricia@adn-creativo.com",
+    "emailDraft": "docs/selling/drafts/adn-creativo-panam-atlas-email.txt",
+    "score": 83,
+    "dealId": "63442987017",
+    "phone": "50769386339",
+    "draft": "docs/selling/drafts/adn-creativo-panam-atlas.txt"
+  },
+  "adn-creativo-panam-atlas-fu": {
+    "company": "ADN Creativo Panamá",
+    "email": "patricia@adn-creativo.com",
+    "emailDraft": "docs/selling/drafts/adn-creativo-panam-atlas-fu-email.txt",
+    "score": 83,
+    "dealId": "63442987017",
+    "phone": "50769386339",
+    "draft": "docs/selling/drafts/adn-creativo-panam-atlas-fu.txt"
+  },
+  "fen-mena-digital-atlas": {
+    "company": "Fenómena Digital",
+    "email": "info@fenomenadigital.com",
+    "emailDraft": "docs/selling/drafts/fen-mena-digital-atlas-email.txt",
+    "score": 87,
+    "dealId": "63441549134",
+    "phone": "5073868855",
+    "draft": "docs/selling/drafts/fen-mena-digital-atlas.txt"
+  },
+  "fen-mena-digital-atlas-fu": {
+    "company": "Fenómena Digital",
+    "email": "info@fenomenadigital.com",
+    "emailDraft": "docs/selling/drafts/fen-mena-digital-atlas-fu-email.txt",
+    "score": 87,
+    "dealId": "63441549134",
+    "phone": "5073868855",
+    "draft": "docs/selling/drafts/fen-mena-digital-atlas-fu.txt"
+  },
+  "pedros-bienes-raices-atlas": {
+    "company": "Pedros Bienes Raices",
+    "email": "ventas@brpedros.com",
+    "emailDraft": "docs/selling/drafts/pedros-bienes-raices-atlas-email.txt",
+    "score": 82,
+    "dealId": "63441240336",
+    "phone": "50762663466",
+    "draft": "docs/selling/drafts/pedros-bienes-raices-atlas.txt"
+  },
+  "pedros-bienes-raices-atlas-fu": {
+    "company": "Pedros Bienes Raices",
+    "email": "ventas@brpedros.com",
+    "emailDraft": "docs/selling/drafts/pedros-bienes-raices-atlas-fu-email.txt",
+    "score": 82,
+    "dealId": "63441240336",
+    "phone": "50762663466",
+    "draft": "docs/selling/drafts/pedros-bienes-raices-atlas-fu.txt"
+  },
+  "capital-bienes-ra-ces-sa-atlas": {
+    "company": "Capital Bienes Raíces SA",
+    "email": "asistente@capital-bienesraices.com",
+    "emailDraft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas-email.txt",
+    "score": 83,
+    "dealId": "63450221629",
+    "phone": "5073824144",
+    "draft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas.txt"
+  },
+  "capital-bienes-ra-ces-sa-atlas-fu": {
+    "company": "Capital Bienes Raíces SA",
+    "email": "asistente@capital-bienesraices.com",
+    "emailDraft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas-fu-email.txt",
+    "score": 83,
+    "dealId": "63450221629",
+    "phone": "5073824144",
+    "draft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas-fu.txt"
+  },
+  "cvb-panam-bienes-ra-ces-atlas": {
+    "company": "CVB Panamá Bienes Raíces",
+    "email": "info@cvbpanama.com",
+    "emailDraft": "docs/selling/drafts/cvb-panam-bienes-ra-ces-atlas-email.txt",
+    "score": 85,
+    "dealId": "63448170904",
+    "phone": "50764904736",
+    "draft": "docs/selling/drafts/cvb-panam-bienes-ra-ces-atlas.txt"
+  },
+  "cvb-panam-bienes-ra-ces-atlas-fu": {
+    "company": "CVB Panamá Bienes Raíces",
+    "email": "info@cvbpanama.com",
+    "emailDraft": "docs/selling/drafts/cvb-panam-bienes-ra-ces-atlas-fu-email.txt",
+    "score": 85,
+    "dealId": "63448170904",
+    "phone": "50764904736",
+    "draft": "docs/selling/drafts/cvb-panam-bienes-ra-ces-atlas-fu.txt"
+  },
+  "bienes-raices-en-panam-nery-carri-n-realtor-atlas": {
+    "company": "Bienes Raices en Panamá | Nery Carrión Realtor",
+    "email": "info@nerycarrion.com",
+    "emailDraft": "docs/selling/drafts/bienes-raices-en-panam-nery-carri-n-realtor-atlas-email.txt",
+    "score": 81,
+    "dealId": "63444070743",
+    "phone": "50766282646",
+    "draft": "docs/selling/drafts/bienes-raices-en-panam-nery-carri-n-realtor-atlas.txt"
+  },
+  "bienes-raices-en-panam-nery-carri-n-realtor-atlas-fu": {
+    "company": "Bienes Raices en Panamá | Nery Carrión Realtor",
+    "email": "info@nerycarrion.com",
+    "emailDraft": "docs/selling/drafts/bienes-raices-en-panam-nery-carri-n-realtor-atlas-fu-email.txt",
+    "score": 81,
+    "dealId": "63444070743",
+    "phone": "50766282646",
+    "draft": "docs/selling/drafts/bienes-raices-en-panam-nery-carri-n-realtor-atlas-fu.txt"
+  },
+  "cr-contadores-atlas": {
+    "company": "CR Contadores",
+    "email": "info@crcontadores.com.pa",
+    "emailDraft": "docs/selling/drafts/cr-contadores-atlas-email.txt",
+    "score": 71,
+    "dealId": "63432399020",
+    "phone": "5073107519",
+    "draft": "docs/selling/drafts/cr-contadores-atlas.txt"
+  },
+  "cr-contadores-atlas-fu": {
+    "company": "CR Contadores",
+    "email": "info@crcontadores.com.pa",
+    "emailDraft": "docs/selling/drafts/cr-contadores-atlas-fu-email.txt",
+    "score": 71,
+    "dealId": "63432399020",
+    "phone": "5073107519",
+    "draft": "docs/selling/drafts/cr-contadores-atlas-fu.txt"
+  },
+  "kontadores-panam-contadores-p-blicos-autorizados-atlas": {
+    "company": "Kontadores Panamá | Contadores Públicos Autorizados",
+    "email": "kontadoresdigitales@gmail.com",
+    "emailDraft": "docs/selling/drafts/kontadores-panam-contadores-p-blicos-autorizados-atlas-email.txt",
+    "score": 70,
+    "dealId": "63442987047",
+    "phone": "50766262822",
+    "draft": "docs/selling/drafts/kontadores-panam-contadores-p-blicos-autorizados-atlas.txt"
+  },
+  "kontadores-panam-contadores-p-blicos-autorizados-atlas-fu": {
+    "company": "Kontadores Panamá | Contadores Públicos Autorizados",
+    "email": "kontadoresdigitales@gmail.com",
+    "emailDraft": "docs/selling/drafts/kontadores-panam-contadores-p-blicos-autorizados-atlas-fu-email.txt",
+    "score": 70,
+    "dealId": "63442987047",
+    "phone": "50766262822",
+    "draft": "docs/selling/drafts/kontadores-panam-contadores-p-blicos-autorizados-atlas-fu.txt"
   }
 }
