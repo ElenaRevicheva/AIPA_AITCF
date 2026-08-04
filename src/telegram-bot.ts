@@ -3,6 +3,7 @@ dotenv.config({ override: true });
 
 import { Bot, Context, InputFile } from 'grammy';
 import { registerConciergeCallbacks } from './concierge';
+import { registerCommunityCallbacks } from './community-notify';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { runResearchAgent, type ResearchMode } from './research-agent';
 import Groq from 'groq-sdk';
@@ -453,6 +454,11 @@ export function initTelegramBot(): Bot | null {
   // other handler so a reply to a concierge draft is consumed here and never
   // falls through to the AI chat handler.
   registerConciergeCallbacks(bot);
+
+  // Community listener buttons. Same reasoning as above — registered before the
+  // chat handlers so a tap on "Posted" never reaches the AI. Prefix cm: cannot
+  // collide with the concierge's cz:.
+  registerCommunityCallbacks(bot);
 
   // ==========================================================================
   // COMMANDS

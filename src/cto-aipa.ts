@@ -2978,6 +2978,30 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
     );
     console.log(`📊 Atlas lead sync cron: "${atlasLeadCronExpr}" (${triageTz}) — business_leads utm_campaign=atlas_*`);
 
+    // Community listener. Off unless COMMUNITY_LISTENER_ENABLED is set, because it
+    // spends LLM tokens and Elena's attention on every cycle. Hourly by default:
+    // answering a thread in its first hour is most of the value, but polling more
+    // often than that just burns rate limit on feeds that have not moved.
+    if (process.env.COMMUNITY_LISTENER_ENABLED === 'true') {
+      const communityCronExpr = process.env.COMMUNITY_LISTENER_CRON || '25 * * * *';
+      cron.schedule(
+        communityCronExpr,
+        () => {
+          import('./community-notify')
+            .then(m => m.runCommunityCycle())
+            .then(r =>
+              console.log(
+                `[community] ${r.candidates} candidates · ${r.drafted} drafted · ` +
+                  `${r.declined} declined · ${r.delivered} delivered`,
+              ),
+            )
+            .catch(e => console.error('[community] cron error:', e));
+        },
+        { timezone: triageTz },
+      );
+      console.log(`💬 Community listener cron: "${communityCronExpr}" (${triageTz}) — drafts only, never posts`);
+    }
+
     const sprintCronExpr = process.env.SPRINT_BRIEFING_CRON?.trim();
     if (sprintCronExpr && process.env.SPRINT_BRIEFING_SECRET?.trim()) {
       cron.schedule(
