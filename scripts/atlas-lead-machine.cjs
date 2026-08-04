@@ -239,7 +239,46 @@ async function findEmail(website) {
       /* unreachable page — try the next */
     }
   }
-  return pickBestEmail(found, domain);
+  const direct = pickBestEmail(found, domain);
+  if (direct) return direct;
+  return emailFromGoogleIndex(domain);
+}
+
+/**
+ * Fallback for the prospects worth the most: the ones whose sites block us.
+ *
+ * Elena, Aug 4 2026 — "the businesses whose sites block crawlers hardest are exactly
+ * the ones our email discovery fails on, and the ones with most to gain from the
+ * audit." Medical Depot Panama proved it: a direct fetch returns 0 bytes, which is
+ * the same bot protection that scores them 32/100 on AI crawler access, and the
+ * machine skipped them as "no email" — while being invisible to ChatGPT was the
+ * entire pitch. Their address was public on their own /contactenos page all along.
+ *
+ * So when a site refuses us, we do NOT disguise the crawler as a browser to get
+ * around it — their block is theirs to set. We read what they already published to
+ * Google instead. Same address, no circumvention.
+ *
+ * Capped per run: each lookup is a paid SerpAPI search, and only ~180 remain.
+ */
+let googleEmailBudget = Number(process.env.LEAD_GOOGLE_EMAIL_LOOKUPS || 8);
+async function emailFromGoogleIndex(domain) {
+  if (googleEmailBudget <= 0) return null;
+  googleEmailBudget--;
+  try {
+    const u = new URL('https://serpapi.com/search.json');
+    u.searchParams.set('engine', 'google');
+    u.searchParams.set('q', `"${domain}" (email OR contacto OR correo)`);
+    u.searchParams.set('api_key', SERP);
+    const r = await fetch(u.toString(), { signal: AbortSignal.timeout(45000) });
+    if (!r.ok) return null;
+    const blob = await r.text();
+    const hits = (blob.match(EMAIL_RE) || []).filter((e) => e.toLowerCase().endsWith(`@${domain}`));
+    const pick = pickBestEmail(hits, domain);
+    if (pick) console.log(`      ↳ email recovered from Google's index (site blocks us): ${pick}`);
+    return pick;
+  } catch {
+    return null;
+  }
 }
 
 async function auditSite(url) {
@@ -253,7 +292,17 @@ async function auditSite(url) {
     if (!r.ok) return null;
     const d = await r.json();
     if (typeof d.score !== 'number') return null;
-    return { score: d.score, grade: d.grade || '', aeo: d.aeo ?? null, geo: d.geo ?? null };
+    // The API returns aeo/geo inside `categories`, not at the top level — reading
+    // d.aeo alone silently yielded null and the letters lost their sharpest number.
+    const cat = (id) => (d.categories || []).find((c) => c.id === id)?.score ?? null;
+    return {
+      score: d.score,
+      grade: d.grade || '',
+      aeo: d.aeo ?? cat('aeo'),
+      geo: d.geo ?? cat('geo'),
+      /** Low = they are blocking GPTBot/ClaudeBot. The best prospects score worst here. */
+      aiAccess: cat('aiAccess'),
+    };
   } catch {
     return null;
   }
@@ -667,7 +716,7 @@ if (require.main === module) (async () => {
   const known = await loadKnown();
   console.log(`[lead-machine] dedup set: ${known.names.size} companies, ${known.domains.size} domains already worked`);
   const staged = [];
-  const skip = { noEmail: 0, dupe: 0, band: 0, noAudit: 0, seen: 0 };
+  const skip = { noEmail: 0, dupe: 0, band: 0, noAudit: 0, seen: 0, rescued: 0 };
 
   for (const target of TARGETS) {
     if (staged.length >= MAX_NEW) break;
@@ -715,10 +764,23 @@ if (require.main === module) (async () => {
         skip.noAudit++;
         continue;
       }
-      if (audit.score < AUDIT_MIN || audit.score > AUDIT_MAX) {
+      // A site that blocks GPTBot/ClaudeBot scores near zero on AI access, which
+      // drags its TOTAL under the floor — so the hardest blockers were being
+      // discarded as "broken site" when they are the strongest prospects we have:
+      // being invisible to ChatGPT is the entire pitch, and they are provably
+      // real businesses (Google reviews, a live site that answers humans).
+      // Rescue them below the floor; never above it, where there is nothing to sell.
+      const crawlerBlocked = audit.aiAccess != null && audit.aiAccess <= 50;
+      const realBusiness = (b.reviews || 0) >= 5 || (b.rating || 0) >= 4;
+      const rescued = crawlerBlocked && realBusiness && audit.score < AUDIT_MIN;
+      if ((audit.score < AUDIT_MIN && !rescued) || audit.score > AUDIT_MAX) {
         skip.band++;
         console.log(`   ✗ ${b.company.slice(0, 30)} — ${audit.score}/100 outside band`);
         continue;
+      }
+      if (rescued) {
+        skip.rescued++;
+        console.log(`   ⭐ ${b.company.slice(0, 30)} — ${audit.score}/100 but BLOCKS AI crawlers (access ${audit.aiAccess}) — top prospect`);
       }
       const r = await stageLead({ ...b, email, lane: picked.lane, query: target.q }, audit, angle);
       staged.push({ ...b, email, score: audit.score, grade: audit.grade, ...r });
@@ -729,7 +791,7 @@ if (require.main === module) (async () => {
 
   console.log(
     `[lead-machine] done · staged ${staged.length} · looked at ${skip.seen} · ` +
-      `no-email ${skip.noEmail} · already-in-CRM ${skip.dupe} · outside-band ${skip.band} · audit-failed ${skip.noAudit}`,
+      `no-email ${skip.noEmail} · already-in-CRM ${skip.dupe} · outside-band ${skip.band} · audit-failed ${skip.noAudit} · crawler-blocked rescued ${skip.rescued}`,
   );
 
   if (staged.length && !DRY) {
