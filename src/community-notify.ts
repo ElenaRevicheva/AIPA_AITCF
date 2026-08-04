@@ -119,13 +119,15 @@ function card(thread: ScoredThread, draft: string): string {
     `❓ ${thread.title.slice(0, 300)}`,
     `🔗 ${thread.url}`,
     ``,
-    `✍️ Draft reply — read it, edit it in your own words, then post it yourself:`,
+    `✍️ Draft — copy it, open the link, edit it in your own words, paste it there:`,
     `──────────`,
     draft,
     `──────────`,
     ...(warnings.length ? ['', ...warnings.map(w => `⚠️ ${w}`)] : []),
     ``,
-    `Matched "${thread.matchedQuery}". Nothing is posted automatically.`,
+    `Matched "${thread.matchedQuery}".`,
+    `The buttons below do not post anything — they only record what you did,`,
+    `so this thread stops being offered to you.`,
   ].join('\n');
 }
 
@@ -202,8 +204,11 @@ export async function runCommunityCycle(options: { dryRun?: boolean } = {}): Pro
     const taskId = await createHubSpotTask(thread, draft);
     const messageId = await sendTelegram(card(thread, draft), [
       [
-        { text: '✅ Posted', callback_data: `cm:posted:${id}` },
-        { text: '🗑 Skip', callback_data: `cm:skip:${id}` },
+        // "Posted" read as an instruction rather than a report — the first tap
+        // was made expecting the reply to appear on Reddit. Neither button ever
+        // touches the platform; they only record what Elena already did.
+        { text: "✅ I've posted it", callback_data: `cm:posted:${id}` },
+        { text: '🗑 Not worth it', callback_data: `cm:skip:${id}` },
       ],
     ]);
     await attachDelivery(id, taskId, messageId);
