@@ -303,17 +303,39 @@ export function scoreThread(thread: RawThread, spec: QuerySpec): ScoredThread {
 
 // ─── Drafting ──────────────────────────────────────────────────────────────────
 
-const DRAFT_SYSTEM = `You draft community replies for Elena Revicheva, a solo founder in Panama who builds production AI agents and runs a free AI visibility audit API at https://aideazz.xyz/api that scores any site for whether ChatGPT, Perplexity and Claude can cite it. Her portfolio is https://aideazz.xyz/portfolio.
+/**
+ * The first live draft came back as "ensure proper schema, sitemap and
+ * robots.txt" with no link — generic enough to be worthless and unlinked
+ * enough to be worth less than that, since an uncited mention buys nothing.
+ * Two lessons are encoded below: the URL is mandatory whenever the tool is
+ * mentioned at all, and the model is handed concrete facts to reason from.
+ * Weak models fall back on SEO boilerplate when given nothing specific, and
+ * Anthropic credit runs out often enough that Groq drafts are the normal case,
+ * not the exception.
+ */
+const DRAFT_SYSTEM = `You draft community replies for Elena Revicheva, a solo founder in Panama who builds production AI agents. She runs a free AI visibility audit API at https://aideazz.xyz/api that scores any site on 34 checks for whether ChatGPT, Perplexity and Claude can actually cite it. Her portfolio is https://aideazz.xyz/portfolio.
+
+Things she knows first-hand, because she built and measured them. Use these when relevant instead of generic advice:
+
+- No LLM has "rankings". ChatGPT with browsing retrieves through a search index and cites a handful of sources; without browsing it reproduces what was in training data. Optimising for a "#1 spot" is the wrong frame — the real questions are whether you are in the index it retrieves from, whether a single passage of yours is quotable standalone, and whether enough third-party sources corroborate you that the model's prior already contains you.
+- Being crawlable is necessary and nowhere near sufficient. Her own site scores 100/100 and was still cited 0% of the time in measured probes. Perfect technical hygiene is table stakes; citations come from being the answer somewhere the model already looks.
+- robots.txt must name the AI agents explicitly — GPTBot, ClaudeBot, PerplexityBot, Google-Extended. Blanket allow rules miss them and most sites silently block the ones they most want.
+- llms.txt is an emerging convention, cheap to add, and not yet honoured by every crawler. Worth doing, not worth believing in.
+- Question-shaped headings with a direct answer in the first sentence underneath get quoted. Long preamble before the answer does not.
+- Third-party corroboration moves the needle harder than anything on your own domain, because a model that has seen you in one place has seen an ad, and a model that has seen you in five has seen a fact.
 
 You are writing a comment a real practitioner would leave. Rules, in priority order:
 
-1. The reply must be genuinely useful even if the reader never clicks anything. Answer the actual question, specifically, from real knowledge.
-2. Only mention Elena's tool or site if it is directly relevant to what was asked. Irrelevant plugs are worse than no reply.
-3. If you do mention it, disclose it plainly in her own voice — "I built this" or "disclosure: it's mine". Never hide it.
-4. No marketing language, no hype, no emoji, no "Great question!", no sign-off signature.
-5. Under 140 words. Plain sentences. No headings, no bullet lists unless the question is genuinely a list.
-6. Match the language of the post. A Spanish post gets a Spanish reply.
-7. If the post does not genuinely warrant a reply from her — wrong topic, already answered, rage bait, a job ad, or she has nothing real to add — output exactly: SKIP
+1. The reply must be genuinely useful even if the reader never clicks anything. Answer the actual question specifically. If the question rests on a false premise, correct the premise first — that is the most useful thing you can do.
+2. At least one sentence must carry a concrete, checkable claim: a named crawler, a specific mechanism, a real trade-off, or a number from the list above. A reply that would be true of any website is a failed reply.
+3. NEVER invent facts about Elena. Do not invent statistics, percentages, client counts, revenue figures, timelines, or "I have seen X do Y" anecdotes. The facts listed above are the only things she has measured — everything else you state must be general knowledge true of the field, not a claim about her experience. A fabricated number posted under her name is far worse than a vaguer reply, because she cannot defend it when asked.
+4. Never write generic SEO checklist advice. "Add schema, sitemap and robots.txt" is banned — every reader has heard it and it signals you did not read their question.
+5. Only mention Elena's tool if it is directly relevant to what was asked. Irrelevant plugs are worse than no reply.
+6. If you mention it, you MUST include the full URL https://aideazz.xyz/api inline, and disclose it plainly in her own voice — "I built this" or "disclosure: it's mine". A mention without the URL is useless to both sides. Never hide the affiliation.
+7. No marketing language, no hype, no emoji, no "Great question!", no sign-off signature.
+8. Under 140 words. Plain sentences. No headings, no bullet lists unless the question is genuinely a list.
+9. Match the language of the post. A Spanish post gets a Spanish reply, and the URL stays as-is.
+10. If the post does not genuinely warrant a reply from her — wrong topic, already answered, rage bait, a job ad, or she has nothing real to add — output exactly: SKIP
 
 Output only the reply text, or SKIP. Nothing else.`;
 
@@ -342,7 +364,42 @@ export async function draftReply(thread: ScoredThread): Promise<string | null> {
   );
   const clean = (text ?? '').trim();
   if (!clean || /^SKIP\b/i.test(clean)) return null;
+
+  // A plug without a link is the worst of both worlds: it reads as self-promotion
+  // and earns no citation. Elena reviews every draft anyway, so this warns rather
+  // than rewrites — silently patching a URL in would hide that the model drifted.
+  for (const w of draftWarnings(clean)) console.warn(`[community-listener/draft] ${w}`);
   return clean;
+}
+
+/**
+ * Quality flags shown next to the draft at review time. These are warnings, not
+ * rewrites: silently patching a draft would hide that the model drifted, and
+ * Elena reads every one of these before it goes anywhere.
+ *
+ * Both rules come from real failures. The first live draft plugged the audit API
+ * without linking it, which reads as self-promotion and earns no citation — the
+ * worst of both outcomes. A Spanish test draft then invented "reduce el 65% de
+ * respuestas manuales" plus a four-month client history, neither of which she has
+ * ever measured. She cannot defend an invented number when someone asks where it
+ * came from, so any figure outside the ones she has actually published is surfaced.
+ */
+export function draftWarnings(draft: string): string[] {
+  const out: string[] = [];
+  if (/\b(I built|audit API|visibility audit|disclosure|es mía)\b/i.test(draft) && !draft.includes('aideazz.xyz')) {
+    out.push('mentions the tool without the URL — add https://aideazz.xyz/api or cut the mention');
+  }
+  const PUBLISHED = new Set(['0', '34', '100']);
+  const figures = [...draft.matchAll(/(\d[\d.,]*)\s*(%|por ciento|percent)/gi)]
+    .map(m => m[1]!.replace(/[.,]+$/, ''))
+    .filter(n => !PUBLISHED.has(n));
+  if (figures.length) {
+    out.push(`unverified figure(s): ${[...new Set(figures)].join(', ')} — verify or cut before posting`);
+  }
+  if (/\b(he visto|I have seen|I've seen|mis clientes|my clients)\b/i.test(draft)) {
+    out.push('claims first-hand experience — confirm it is true before posting');
+  }
+  return out;
 }
 
 // ─── Orchestration ─────────────────────────────────────────────────────────────

@@ -13,6 +13,7 @@
 
 import type { Bot } from 'grammy';
 import type { ScoredThread } from './community-listener';
+import { draftWarnings } from './community-listener';
 import {
   attachDelivery,
   getOpportunity,
@@ -109,6 +110,9 @@ async function completeHubSpotTask(taskId: string): Promise<void> {
 }
 
 function card(thread: ScoredThread, draft: string): string {
+  // Warnings belong next to the draft, not only in the logs — the log is not
+  // where the decision to post gets made.
+  const warnings = draftWarnings(draft);
   return [
     `${thread.latam ? '🌎 LatAm · ' : ''}${thread.channel} · score ${thread.score}`,
     ``,
@@ -119,6 +123,7 @@ function card(thread: ScoredThread, draft: string): string {
     `──────────`,
     draft,
     `──────────`,
+    ...(warnings.length ? ['', ...warnings.map(w => `⚠️ ${w}`)] : []),
     ``,
     `Matched "${thread.matchedQuery}". Nothing is posted automatically.`,
   ].join('\n');
