@@ -128,11 +128,35 @@ ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && node scripts/community-listen.c
 |---|---|---|
 | Hacker News | Algolia public API | Works, no credentials |
 | Indie Hackers | Algolia index `discussions` behind their own search box | Works. IH is client-rendered with **no API and no RSS** — fetching HTML returns an empty shell, so scraping is not an option. Keys overridable via `IH_ALGOLIA_APP_ID` / `IH_ALGOLIA_KEY` because they rotate |
-| Reddit | OAuth (`REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET`) | **Blocked until credentials are set.** Reddit returns **403 to datacenter IPs** on unauthenticated search — this is not a bug in the listener |
+| Reddit | **Atom feed** `search.rss`, OAuth used instead when `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` are set | Works with **no credentials**. `search.json` returns **403 Blocked** to datacenter IPs but `search.rss` answers **200** — verified from this VM. The OAuth app registration is therefore optional, not required |
 
 Every source reports `matched` / `zero` / `unavailable` **separately**. A source
 that quietly returns nothing is indistinguishable from a quiet market, and that
 distinction is the entire point of measuring.
+
+**Reddit field notes (all three cost real time):**
+
+- `search.json` → **403**, `search.rss` → **200**, same IP, same second. Do not conclude
+  Reddit is blocked because the JSON API is.
+- The Atom feed **mixes subreddits into post results**: ids are `t5_` for a subreddit and
+  `t3_` for a post. Only `t3_` is something a human can reply to.
+- `sort=new` is a trap. Reddit matches multi-word queries loosely, so newest-first returns
+  whatever was just posted sharing any single word — "AI agents for business Panama"
+  returned r/AskParents, r/careeradvice and a Palantir earnings summary. Use `sort=relevance`.
+- Rate limits bite fast: three quick requests earned a 429 and then **empty 200 bodies**,
+  which is worse than an error because it looks like a quiet market. Calls are spaced by
+  `REDDIT_RSS_GAP_MS` (default 2500).
+
+**Two relevance gates, both earned:**
+
+- `ON_TOPIC` — the thread text must mention AI, automation or search visibility in some
+  language. Reddit's own relevance ranking is not trustworthy enough to skip this.
+- **Spanish `IA` must be matched case-sensitively.** Case-insensitively it also matches
+  Portuguese `ia`, the imperfect of *ir* and among the commonest words in the language,
+  which is how a Messi thread and a bicycle-refund thread cleared an AI topic gate.
+- `latam` comes from the **thread's own text**, never from the query's flag. Trusting the
+  flag stamped "🌎 LatAm" and a HIGH-priority HubSpot task onto a Palantir earnings post
+  because the *query* said Panama.
 
 **IH field notes (cost an hour, do not rediscover):** hits carry `itemId`, and the
 post URL is `https://www.indiehackers.com/post/{itemId}`. `createdTimestamp` is

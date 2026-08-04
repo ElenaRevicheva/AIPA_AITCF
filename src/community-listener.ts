@@ -67,6 +67,32 @@ const LATAM_TERMS =
 const NOISE =
   /\b(who('s| is)? hiring|who wants to be hired|freelancer\?|seeking freelancer|\[hiring\]|\[for hire\]|hiring thread|launch hn|show hn|monthly thread|weekly thread|job board|we're hiring|remote jobs?)\b/i;
 
+/**
+ * The thread has to actually be about something Elena can speak to. Reddit's
+ * search matches loosely enough that "AI agents for business Panama" returned
+ * r/AskParents, r/careeradvice and a Palantir earnings summary — each matched a
+ * single common word and none had anything to do with the subject.
+ *
+ * Trusting the search engine's idea of relevance is what produced that list, so
+ * this re-checks it against the text we actually received. A thread that never
+ * mentions AI, automation, or search visibility in any language is not a thread
+ * she can answer, however well it scored.
+ */
+const ON_TOPIC =
+  /(\bai\b|artificial intelligence|inteligencia artificial|\bllms?\b|\bgpt\b|chatgpt|claude|perplexity|gemini|copilot|\bagents?\b|\bagentes?\b|automat|chatbot|\bbots?\b|whatsapp|\bseo\b|\baeo\b|answer engine|generative engine|search visibility|llms\.txt|crawler|\bcited?\b|citation)/i;
+
+/**
+ * Spanish "IA" has to be matched case-sensitively. Case-insensitively it also
+ * matches Portuguese "ia" — the imperfect of *ir*, one of the most common words
+ * in the language — which is how a r/opiniaoimpopular thread about Messi and a
+ * r/portugal2 thread about bicycle refunds both cleared an AI topic gate.
+ */
+const ON_TOPIC_ES = /\bIA\b/;
+
+function isOnTopic(text: string): boolean {
+  return ON_TOPIC.test(text) || ON_TOPIC_ES.test(text);
+}
+
 const QUESTION_START =
   /^\s*(how|what|why|where|when|which|who|does|do|did|can|could|is|are|should|would|any(one|body)|has anyone|looking for|need help|advice|recomend|recomiend|cómo|como|qué|que|cuál|cual|alguien)\b/i;
 
@@ -179,9 +205,88 @@ async function searchReddit(spec: QuerySpec): Promise<RawThread[]> {
     if (!res.ok) throw new Error(`reddit search ${res.status}`);
     return redditPostsFrom(await res.json(), spec.q);
   }
-  const res = await fetchWithTimeout(`https://www.reddit.com/search.json?${params}`);
-  if (!res.ok) throw new Error(`reddit public search ${res.status} (set REDDIT_CLIENT_ID/SECRET)`);
-  return redditPostsFrom(await res.json(), spec.q);
+  return redditRssSearch(spec);
+}
+
+// ─── Reddit without credentials (Atom) ─────────────────────────────────────────
+
+/**
+ * Reddit answers **403 Blocked** to `search.json` from datacenter IPs, but still
+ * serves `search.rss` with a 200 — verified from this VM. That removes the OAuth
+ * app registration from the critical path entirely; credentials remain supported
+ * and preferred, but are no longer required to have a working Reddit source.
+ *
+ * Two traps live in this feed. It mixes **subreddits into post results** — ids
+ * are prefixed `t5_` for a subreddit and `t3_` for a post, and only `t3_` is a
+ * thread anyone can reply to. And it rate-limits hard: three quick requests
+ * earned a 429 and then empty bodies, so calls are spaced deliberately below.
+ */
+const REDDIT_MIN_GAP_MS = Number(process.env.REDDIT_RSS_GAP_MS || 2500);
+let lastRedditFetch = 0;
+
+const XML_ENTITIES: Record<string, string> = {
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&apos;': "'",
+  '&nbsp;': ' ',
+};
+
+function decodeXml(s: string): string {
+  return s.replace(/&(amp|lt|gt|quot|#39|apos|nbsp);/g, m => XML_ENTITIES[m] ?? m);
+}
+
+function pick(block: string, tag: string): string {
+  const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`));
+  return m ? decodeXml(m[1]!.trim()) : '';
+}
+
+async function redditRssSearch(spec: QuerySpec): Promise<RawThread[]> {
+  const wait = REDDIT_MIN_GAP_MS - (Date.now() - lastRedditFetch);
+  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+  lastRedditFetch = Date.now();
+
+  // `sort=new` looked right and was badly wrong: Reddit matches multi-word
+  // queries loosely, so newest-first returned whatever had just been posted that
+  // shared any single word — r/AskParents and r/therapists for "AI agents for
+  // business Panama". Relevance-first with a one-week window is the honest read.
+  const params = new URLSearchParams({ q: spec.q, sort: 'relevance', t: 'week' });
+  const res = await fetchWithTimeout(`https://www.reddit.com/search.rss?${params}`);
+  if (res.status === 429) throw new Error('reddit rss rate-limited (429) — raise REDDIT_RSS_GAP_MS');
+  if (!res.ok) throw new Error(`reddit rss ${res.status}`);
+
+  const xml = await res.text();
+  if (!xml.trim()) throw new Error('reddit rss returned an empty body (usually throttling)');
+
+  const out: RawThread[] = [];
+  for (const m of xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)) {
+    const block = m[1]!;
+    const id = pick(block, 'id');
+    if (!id.startsWith('t3_')) continue; // t5_ is a subreddit, not a thread
+
+    const href = block.match(/<link[^>]*href="([^"]+)"/)?.[1] ?? '';
+    const title = pick(block, 'title');
+    if (!href || !title) continue;
+
+    out.push({
+      source: 'reddit',
+      externalId: id.slice(3),
+      url: decodeXml(href),
+      title: title.slice(0, 500),
+      body: decodeXml(pick(block, 'content'))
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 4000),
+      author: pick(block, 'name').replace(/^\/u\//, ''),
+      createdAt: Date.parse(pick(block, 'updated')) || Date.now(),
+      channel: href.match(/reddit\.com\/(r\/[^/]+)/)?.[1] ?? 'reddit',
+      matchedQuery: spec.q,
+    } as RawThread);
+  }
+  return out;
 }
 
 // ─── Hacker News (Algolia) ─────────────────────────────────────────────────────
@@ -286,7 +391,12 @@ export function scoreThread(thread: RawThread, spec: QuerySpec): ScoredThread {
   let score = spec.weight;
 
   if (thread.title.includes('?') || QUESTION_START.test(thread.title)) score += 3;
-  const latam = spec.latam === true || LATAM_TERMS.test(haystack);
+
+  // Evidence, not intent. Taking the query's latam flag at face value stamped
+  // "🌎 LatAm" on a Palantir earnings post, because the *query* mentioned Panama
+  // and the thread did not. The flag drives Elena's priority and a HIGH-priority
+  // HubSpot task, so it has to come from the thread's own text.
+  const latam = LATAM_TERMS.test(haystack);
   if (latam) score += 4;
 
   const ageHours = (Date.now() - thread.createdAt) / 3_600_000;
@@ -461,6 +571,7 @@ export async function scanCommunities(options: ScanOptions = {}): Promise<ScanRe
             continue;
           }
           if (NOISE.test(thread.title)) continue;
+          if (!isOnTopic(`${thread.title}\n${thread.body}`)) continue;
           const scored = scoreThread(thread, spec);
           if (scored.score < minScore) continue;
           found++;

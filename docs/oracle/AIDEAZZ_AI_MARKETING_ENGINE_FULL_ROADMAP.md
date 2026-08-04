@@ -589,10 +589,29 @@ After the fix, the English draft corrects the question's false premise, names
 GPTBot/ClaudeBot/PerplexityBot, links the API, and lands at 109 words. The Spanish draft
 answers in Spanish and correctly declines to plug a tool that was irrelevant to the question.
 
-**Honest state:** Hacker News and Indie Hackers work. Reddit returns 403 to datacenter IPs
-without OAuth, so it is reported `unavailable` rather than silently returning zero — a
-source that quietly finds nothing is indistinguishable from a quiet market. Reddit is the
-largest pond and is still shut until credentials are set.
+**Reddit opened without credentials.** Registering an OAuth app kept failing behind Reddit's
+bot challenge, so before spending more of Elena's afternoon on a settings page, the assumption
+got tested: `search.json` returns **403 Blocked** to the VM, but `search.rss` returns **200**
+from the same IP in the same second. Reddit was never blocking us, only that one endpoint. The
+app registration left the critical path entirely.
+
+What arrived next was a lesson in not trusting a source's own relevance ranking. The first
+authenticated-free scan returned 22 Reddit "matches": r/AskParents, r/careeradvice, r/therapists
+and a Palantir earnings summary, every one of them stamped **🌎 LatAm** and scored 19. Three
+compounding faults. `sort=new` on a loosely-matched multi-word query returns whatever was posted
+most recently sharing any single word. Nothing verified the thread was about our subject at all.
+And `latam` was read off the *query's* flag rather than the thread's text, so a query mentioning
+Panama marked an earnings call as a LatAm lead — which would have opened a HIGH-priority HubSpot
+task.
+
+Fixed by relevance-sorting, gating on topic evidence in the thread's own text, and deriving
+`latam` only from that text. One subtlety worth the entry: the Spanish acronym **IA** must be
+matched case-sensitively, because case-insensitively it also matches Portuguese **ia**, the
+imperfect of *ir* and one of the commonest words in the language. That single flag was why a
+thread about Messi and a thread about bicycle refunds both cleared an AI topic gate.
+
+Reddit now returns 12 genuinely answerable threads — r/AI_Agents, r/agenticAI, r/developersIndia —
+where an hour earlier it returned nothing at all.
 
 **What this does not yet prove.** One delivered draft is a working pipeline, not a working
 channel. The number that matters is whether `/portfolio` citation rate moves off 0%, and
