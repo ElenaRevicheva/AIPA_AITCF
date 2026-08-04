@@ -118,6 +118,19 @@ const ICP_BY_LANE = {
  * websites" to "someone who runs the growth motion" — the framing that carries a
  * retainer instead of a one-off fix.
  */
+/**
+ * WhatsApp sign-off. The letters closed properly and the WhatsApp messages just
+ * stopped at a link (Elena, Aug 4 2026) — which reads like an unfinished draft to a
+ * business owner, not like a person introducing herself.
+ */
+const WA_CLOSING = [
+  '',
+  '¡Que tengan un excelente día!',
+  'Saludos,',
+  'Elena Revicheva',
+  'Fundadora | Ingeniera de IA y Automatización — AIdeazz AI Lab ✨',
+].join('\n');
+
 const OPERATOR_ES =
   'No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.';
 
@@ -647,6 +660,7 @@ async function stageLead(lead, audit, angle) {
     OPERATOR_ES,
     ``,
     `Son 3 arreglos concretos. ¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+    WA_CLOSING,
   ].join('\n');
   if (lead.phone) fs.writeFileSync(path.join(ROOT, waRel), waText, 'utf8');
 
@@ -667,6 +681,7 @@ async function stageLead(lead, audit, angle) {
     `No vendo otro chatbot — instalo un AI Growth Operator que trabaja 24/7: que ChatGPT los recomiende, califique leads por WhatsApp y mantenga el CRM al día.`,
     ``,
     `¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
+    WA_CLOSING,
   ].join('\n');
   if (lead.phone) fs.writeFileSync(path.join(ROOT, fuWaRel), fuWaText, 'utf8');
 
