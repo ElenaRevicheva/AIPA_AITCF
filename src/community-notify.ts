@@ -34,6 +34,7 @@ function tgChat(): string | null {
 async function sendTelegram(
   text: string,
   keyboard?: { text: string; callback_data: string }[][],
+  parseMode?: 'HTML',
 ): Promise<number | null> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = tgChat();
@@ -49,6 +50,7 @@ async function sendTelegram(
         chat_id: chatId,
         text: text.slice(0, 4090),
         disable_web_page_preview: true,
+        ...(parseMode ? { parse_mode: parseMode } : {}),
         ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
       }),
     });
@@ -109,25 +111,35 @@ async function completeHubSpotTask(taskId: string): Promise<void> {
   }
 }
 
+const esc = (s: string): string =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/**
+ * Sent as Telegram HTML so the draft sits in a <pre> block, which Telegram
+ * renders with a one-tap copy button. That is as close to "post it from
+ * Telegram" as this can safely get: tap to copy, tap the link, paste, edit.
+ *
+ * The remaining manual step is the point, not friction to be removed. An
+ * automated poster would need a Reddit write token, and automated
+ * self-promotion is precisely what gets a *domain* — not just an account —
+ * into Reddit's spam filter, after which every future mention of aideazz.xyz
+ * is removed on sight, including ones other people write.
+ */
 function card(thread: ScoredThread, draft: string): string {
   // Warnings belong next to the draft, not only in the logs — the log is not
   // where the decision to post gets made.
   const warnings = draftWarnings(draft);
   return [
-    `${thread.latam ? '🌎 LatAm · ' : ''}${thread.channel} · score ${thread.score}`,
+    `${thread.latam ? '🌎 LatAm · ' : ''}${esc(thread.channel)} · score ${thread.score}`,
     ``,
-    `❓ ${thread.title.slice(0, 300)}`,
-    `🔗 ${thread.url}`,
+    `❓ <b>${esc(thread.title.slice(0, 300))}</b>`,
+    `🔗 <a href="${esc(thread.url)}">open the thread</a>`,
     ``,
-    `✍️ Draft — copy it, open the link, edit it in your own words, paste it there:`,
-    `──────────`,
-    draft,
-    `──────────`,
-    ...(warnings.length ? ['', ...warnings.map(w => `⚠️ ${w}`)] : []),
+    `✍️ Tap the draft to copy it, then open the link and paste. Edit it into your own words first:`,
+    `<pre>${esc(draft)}</pre>`,
+    ...(warnings.length ? ['', ...warnings.map(w => `⚠️ ${esc(w)}`)] : []),
     ``,
-    `Matched "${thread.matchedQuery}".`,
-    `The buttons below do not post anything — they only record what you did,`,
-    `so this thread stops being offered to you.`,
+    `<i>Matched "${esc(thread.matchedQuery)}". The buttons below post nothing — they only record what you did, so this thread stops being offered.</i>`,
   ].join('\n');
 }
 
@@ -210,7 +222,7 @@ export async function runCommunityCycle(options: { dryRun?: boolean } = {}): Pro
         { text: "✅ I've posted it", callback_data: `cm:posted:${id}` },
         { text: '🗑 Not worth it', callback_data: `cm:skip:${id}` },
       ],
-    ]);
+    ], 'HTML');
     await attachDelivery(id, taskId, messageId);
     if (messageId || taskId) delivered++;
   }
