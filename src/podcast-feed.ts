@@ -50,6 +50,64 @@ export const BRAIN_PATHS =
 
 // ─── SEO / GEO / AEO / TechSEO layer ───────────────────────────────────────────
 
+/**
+ * Head-only description, capped at the 170 chars search engines and the audit
+ * engine expect. The feed description stays long on purpose — Apple and Spotify
+ * have already ingested it, and podcast directories have no such limit — so this
+ * trims the trailing byline rather than rewriting the sentence. The author is
+ * still declared in <meta name="author"> and in the JSON-LD, so nothing is lost.
+ */
+export function seoDescription(meta: PodcastMeta): string {
+  const full = meta.description.trim();
+  if (full.length <= 170) return full;
+  const trimmed = full.replace(/\s*By\s+[^.]+\.\s*$/i, '');
+  if (trimmed.length <= 170) return trimmed;
+  const cut = trimmed.slice(0, 167);
+  return `${cut.slice(0, cut.lastIndexOf(' '))}…`;
+}
+
+/**
+ * FAQ JSON-LD paired with the visible FAQ on the page. Answer engines lift these
+ * verbatim, which is the whole point: a listener asking "what is this podcast
+ * about" should get our sentence back, not a summary an engine invented.
+ */
+export function generatePodcastFaqJsonLd(meta: PodcastMeta, episodes: PodcastEpisode[]): string {
+  const count = episodes.length;
+  const qa: Array<[string, string]> = [
+    [
+      `What is ${meta.title} about?`,
+      `${seoDescription(meta)} Each episode covers what was built that week, what broke in production, and what the numbers actually said.`,
+    ],
+    [
+      'Who hosts this podcast?',
+      `${meta.author}, a solo founder building AIdeazz from Panama — a fleet of production AI agents plus a marketing engine, run by one person with AI. Formerly a board-level operator, now an AI-augmented builder shipping multi-agent systems in production.`,
+    ],
+    [
+      'Where can I listen?',
+      `Every episode streams directly at ${meta.siteUrl} with no signup. The RSS feed at ${meta.siteUrl}/feed.xml works in Apple Podcasts, Spotify, Overcast, Pocket Casts and any other podcast app.`,
+    ],
+    [
+      'How often do new episodes come out?',
+      count > 0
+        ? `${count} episode${count > 1 ? 's are' : ' is'} published so far. Episodes appear when something real has shipped rather than on a fixed schedule — the point is honest field notes, not filler.`
+        : 'Episodes appear when something real has shipped rather than on a fixed schedule — the point is honest field notes, not filler.',
+    ],
+    [
+      'Is this podcast technical or business focused?',
+      'Both, deliberately. Episodes cover the engineering — multi-agent architecture, reliability, what failed in production — alongside the business side: how organic content becomes pipeline, what marketing automation actually measures, and the economics of running a company on AI agents.',
+    ],
+  ];
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: qa.map(([name, text]) => ({
+      '@type': 'Question',
+      name,
+      acceptedAnswer: { '@type': 'Answer', text },
+    })),
+  });
+}
+
 /** PodcastSeries JSON-LD (+ episodes) for Google rich results and AI answer engines. */
 export function generatePodcastJsonLd(meta: PodcastMeta, episodes: PodcastEpisode[]): string {
   const series: Record<string, unknown> = {
@@ -242,6 +300,8 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   const countLabel = total ? `${total} episode${total > 1 ? 's' : ''}` : 'Launching soon';
   const waveBars = Array.from({ length: 72 }, (_, i) => `<span style="animation-delay:${(i * 0.035).toFixed(2)}s"></span>`).join('');
   const jsonLd = generatePodcastJsonLd(meta, sorted);
+  const faqJsonLd = generatePodcastFaqJsonLd(meta, sorted);
+  const seoDesc = seoDescription(meta);
 
   return `<!DOCTYPE html>
 <html lang="${xmlEscape(meta.language)}">
@@ -251,7 +311,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <title>${xmlEscape(meta.title)} — AI podcast by ${xmlEscape(meta.author)}</title>
 <link rel="icon" type="image/png" href="https://aideazz.xyz/faviconnew.png"/>
 <link rel="apple-touch-icon" href="https://aideazz.xyz/faviconnew.png"/>
-<meta name="description" content="${xmlEscape(meta.description)}"/>
+<meta name="description" content="${xmlEscape(seoDesc)}"/>
 <meta name="keywords" content="AI podcast, AI-augmented, agentic AI, AI agents, building in public, solo founder, multi-agent systems, AI engineering, marketing engine, AIdeazz, Elena Revicheva"/>
 <meta name="author" content="${xmlEscape(meta.author)}"/>
 <link rel="canonical" href="${xmlEscape(meta.siteUrl)}/"/>
@@ -260,11 +320,11 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <meta property="og:site_name" content="${xmlEscape(meta.title)}"/>
 <meta property="og:url" content="${xmlEscape(meta.siteUrl)}/"/>
 <meta property="og:title" content="${xmlEscape(meta.title)}"/>
-<meta property="og:description" content="${xmlEscape(meta.description)}"/>
+<meta property="og:description" content="${xmlEscape(seoDesc)}"/>
 <meta property="og:image" content="${xmlEscape(meta.coverUrl)}"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="${xmlEscape(meta.title)}"/>
-<meta name="twitter:description" content="${xmlEscape(meta.description)}"/>
+<meta name="twitter:description" content="${xmlEscape(seoDesc)}"/>
 <meta name="twitter:image" content="${xmlEscape(meta.coverUrl)}"/>
 <link rel="alternate" type="application/rss+xml" title="${xmlEscape(meta.title)}" href="${xmlEscape(meta.siteUrl)}/feed.xml"/>
 <link rel="sitemap" type="application/xml" href="${xmlEscape(meta.siteUrl)}/sitemap.xml"/>
@@ -272,6 +332,7 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <script type="application/ld+json">${jsonLd}</script>
+<script type="application/ld+json">${faqJsonLd}</script>
 <style>
   :root{
     --bg:#0a0712; --bg2:#0f0a18; --panel:rgba(255,255,255,.04); --line:rgba(255,255,255,.09);
@@ -383,9 +444,21 @@ export function generateIndexHtml(meta: PodcastMeta, episodes: PodcastEpisode[])
   .about a{color:var(--a2);text-decoration:none}
   .slogan{margin-top:12px;font-family:var(--disp);font-size:14px;color:var(--mut2)}
   .slogan b{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+  /* show facts — a real list, because answer engines lift structured facts verbatim */
+  .facts{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0}
+  .facts li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;display:flex;gap:12px;align-items:baseline}
+  .facts .k{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut2);min-width:104px;flex-shrink:0}
+  .facts .v{font-size:14px;color:var(--txt)}
+  .facts a{color:var(--a2);text-decoration:none}
+  /* faq — mirrors the FAQPage JSON-LD in <head>; keep both in sync */
+  .faq{display:flex;flex-direction:column;gap:10px;margin:10px 0}
+  .faq-i{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;transition:.25s}
+  .faq-i:hover{background:rgba(255,255,255,.07)}
+  .faq-i h3{font-family:var(--disp);font-size:16px;font-weight:600;margin-bottom:7px}
+  .faq-i p{color:var(--mut);font-size:14px;line-height:1.6}
   footer{text-align:center;padding:54px 20px 50px;color:var(--mut2);font-family:var(--mono);font-size:12px;border-top:1px solid var(--line);margin-top:48px}
   footer .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  @media(max-width:680px){.hero{flex-direction:column;align-items:flex-start}.cover{width:180px;height:180px}.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}}
+  @media(max-width:680px){.hero{flex-direction:column;align-items:flex-start}.cover{width:180px;height:180px}.bento{grid-template-columns:1fr}.about{flex-direction:column;text-align:center}.facts{grid-template-columns:1fr}.facts .k{min-width:unset}}
 </style>
 </head>
 <body>
@@ -431,6 +504,25 @@ ${rows}
     <div class="cardb"><span class="kbar"></span><h4>Real multi-agent systems</h4><p>Nine production AI agents, what broke, and what actually held up.</p></div>
     <div class="cardb"><span class="kbar"></span><h4>Marketing that's measured</h4><p>GEO/SEO/AEO, attribution over vanity metrics, and the engine behind it.</p></div>
     <div class="cardb"><span class="kbar"></span><h4>Shipping as a solo founder</h4><p>AI-augmented building, honest constraints, no hype — just what ships.</p></div>
+  </div>
+  <div class="sec-head"><h2>Show facts</h2></div>
+  <ul class="facts">
+    <li><span class="k">Host</span><span class="v">${esc(meta.author)}, solo founder of <a href="https://aideazz.xyz/portfolio">AIdeazz</a></span></li>
+    <li><span class="k">Episodes</span><span class="v">${countLabel}</span></li>
+    <li><span class="k">Language</span><span class="v">${esc(meta.language === 'en' ? 'English' : meta.language)}</span></li>
+    <li><span class="k">Category</span><span class="v">${esc(meta.category)}</span></li>
+    <li><span class="k">Recorded in</span><span class="v">Panama (UTC−5), on the go</span></li>
+    <li><span class="k">RSS feed</span><span class="v"><a href="${esc(meta.siteUrl)}/feed.xml">${esc(meta.siteUrl.replace(/^https?:\/\//, ''))}/feed.xml</a></span></li>
+    <li><span class="k">Cost</span><span class="v">Free, no signup, no paywall</span></li>
+    <li><span class="k">Listen on</span><span class="v">Any podcast app, or stream here</span></li>
+  </ul>
+  <div class="sec-head" id="faq"><h2>Frequently asked</h2></div>
+  <div class="faq">
+    <div class="faq-i"><h3>What is ${esc(meta.title)} about?</h3><p>${esc(seoDesc)} Each episode covers what was built that week, what broke in production, and what the numbers actually said.</p></div>
+    <div class="faq-i"><h3>Who hosts this podcast?</h3><p>${esc(meta.author)}, a solo founder building AIdeazz from Panama — a fleet of production AI agents plus a marketing engine, run by one person with AI. Formerly a board-level operator, now an AI-augmented builder shipping multi-agent systems in production.</p></div>
+    <div class="faq-i"><h3>Where can I listen?</h3><p>Every episode streams directly on this page with no signup. The <a href="${esc(meta.siteUrl)}/feed.xml">RSS feed</a> works in Apple Podcasts, Spotify, Overcast, Pocket Casts and any other podcast app.</p></div>
+    <div class="faq-i"><h3>How often do new episodes come out?</h3><p>${total ? `${countLabel} published so far. Episodes` : 'Episodes'} appear when something real has shipped rather than on a fixed schedule — the point is honest field notes, not filler.</p></div>
+    <div class="faq-i"><h3>Is this podcast technical or business focused?</h3><p>Both, deliberately. Episodes cover the engineering — multi-agent architecture, reliability, what failed in production — alongside the business side: how organic content becomes pipeline, what marketing automation actually measures, and the economics of running a company on AI agents.</p></div>
   </div>
   <div class="sec-head"><h2>About</h2></div>
   <div class="about">

@@ -27,11 +27,16 @@ const DEFAULT_TARGETS = [
   { url: 'https://aideazz.xyz/portfolio', enforce: true },
   { url: 'https://aideazz.xyz', enforce: true },
   { url: 'https://aideazz.xyz/api', enforce: true },
-  // Report-only until prerender-routes.mjs gives /blog its own identity — today it
-  // serves the homepage template, so enforcing it would fail CI for a defect that
-  // has to be fixed in the aideazz repo. Flip to enforce once that lands.
-  { url: 'https://aideazz.xyz/blog', enforce: false },
+  { url: 'https://aideazz.xyz/blog', enforce: true },
+  // The three proof surfaces the portfolio links to. They were unaudited until
+  // Aug 4 2026 and had drifted — a proof link that scores worse than the page
+  // citing it is worse than no proof link, so they are enforced like the rest.
+  { url: 'https://aideazz.xyz/sop-ai-ops.html', enforce: true },
+  { url: 'https://podcast.aideazz.xyz/', enforce: true },
   { url: 'https://webhook.aideazz.xyz/cto/v1/visibility', enforce: true },
+  // Report-only: Atlas is a static board in the whitespace repo and atuona is
+  // out of scope by request. Both are tracked so the numbers stay visible.
+  { url: 'https://webhook.aideazz.xyz/whitespace/atlas.html', enforce: false },
   { url: 'https://atuona.xyz', enforce: false },
 ];
 
