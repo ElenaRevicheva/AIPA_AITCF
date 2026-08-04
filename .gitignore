@@ -72,3 +72,6 @@ backups/trello-*.json
 # working bearer token. Keep the backups (they are how the scenario gets
 # restored), never publish them.
 backups/make/
+
+# WA-draft backups from the Aug 4 Growth-Operator backfill (kept on disk, not in git)
+docs/selling/drafts/*.bak-*

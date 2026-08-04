@@ -2,6 +2,8 @@ Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en P
 
 Primero, felicitaciones — Agency of the Sea is a local CR yacht/port agent with WhatsApp-first ops. Les escribo porque analicé agencyofthesea.com con mi motor de visibilidad en IA y obtuvo 54/100: cuando un capitán o charter client que busca yacht agency en Costa Rica le pregunta a ChatGPT o Perplexity "¿cuál es el mejor yacht agent en Costa Rica?", su empresa todavía no aparece como respuesta citable — AI lacks structured FAQs on charters, ports, and agency services to cite (GEO 31/100).
 
+No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.
+
 Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 🛥️
 
 PD: Además de visibilidad en IA, I build WhatsApp agents that answer and book agency/charter requests 24/7 (EN/ES, CRM-wired), intake automation, AI video for destination marketing, and AI-system rescue. Todo con demos en vivo en mi portafolio👆

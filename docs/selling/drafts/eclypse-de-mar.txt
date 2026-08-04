@@ -2,6 +2,8 @@ Hi, great to meet you! 👋I'm Elena Revicheva, an AI engineer here in Panama: h
 
 First — congratulations: Eclypse de Mar is the only overwater-bungalow experience in Panama, and travelers dream about exactly that. I'm writing because I analyzed eclypsedemar.com with my AI-visibility engine and it scored 57/100: when a traveler asks ChatGPT or Perplexity "where can I stay in an overwater bungalow in Panama?" — the one question you own — the AI engines can't cite you, because your site's firewall currently blocks their crawlers and a noindex tag hides key pages (structured data 31/100). Booking platforms get recommended instead of you.
 
+No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.
+
 These are 3 concrete fixes. If you like, I'd be happy to show you in 15 minutes, no obligation at all. The full audit is free here: https://aideazz.xyz/api ⛵
 
 P.S. Besides AI visibility, I build WhatsApp agents that answer travelers and take booking requests 24/7 (EN/ES, wired to your calendar/CRM), full process automation, and AI video for destination marketing. Live demos in my portfolio👆

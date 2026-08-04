@@ -2,6 +2,8 @@ Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en P
 
 Primero, felicitaciones — Clínica Bíblica is Costa Rica’s longest-running private hospital with an English-facing intl patient path. Les escribo porque analicé clinicabiblica.com con mi motor de visibilidad en IA y obtuvo 79/100: cuando un paciente internacional que busca hospital privado en Costa Rica le pregunta a ChatGPT o Perplexity "¿cuál es el mejor hospital privado en Costa Rica para pacientes internacionales?", su empresa todavía no aparece como respuesta citable — AI answers still lack citable FAQs on intl patient intake vs other CR hospitals (GEO 50/100).
 
+No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.
+
 Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api ✨
 
 PD: Además de visibilidad en IA, I build WhatsApp agents that answer and coordinate intl patients 24/7 (EN/ES, CRM-wired), medical intake automation, AI video for hospital marketing, and AI-system rescue. Todo con demos en vivo en mi portafolio👆
