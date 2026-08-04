@@ -668,9 +668,30 @@ not guarantee citations will follow — being indexed is necessary, not sufficie
 the same lesson the 100/100-and-0%-cited result already taught. It does mean the next
 citation probe is the first one running against a blog that is actually *listed*.
 
-**Next honest step:** resubmit `sitemap.xml` in Search Console. Sixty pages of existing
-work move from invisible to indexable — the highest-leverage action currently available,
-and it costs nothing but a click.
+**Then Search Console found a second one.** Resubmitting surfaced *"Crawled – currently
+not indexed"* on an inspected post, and the *Referring page* Google recorded carried a
+trailing slash the page never claimed. Posts live at `/blog/<slug>/`, the host 301s the
+slashless form to it, and the template declared the **pre-redirect** URL as canonical.
+Every post was telling Google its canonical address was one that redirects away. Fixed
+across the template, all 96 published pages, and the sitemap.
+
+**A theory that turned out wrong, worth recording.** Seventeen slug clusters look like
+republished duplicates — four "deputy CEO" posts, three "131 tests" posts. Measured
+before acting: they share **1.3–2.7%** of their text. Genuinely different articles on
+repeated topics. Google is not declining them for duplication, so deleting posts would
+destroy real work and fix nothing.
+
+**Where that leaves the diagnosis.** Both technical faults are gone, and neither was
+about content quality. What remains — "crawled, currently not indexed" — is Google
+saying *found it, not convinced yet*. That is an authority judgment, and authority comes
+from other sites referencing you, not from your own markup. No further on-site fix moves
+it.
+
+**Next honest step:** resubmit `sitemap.xml` in Search Console — sixty pages of existing
+work move from invisible to indexable, and it costs nothing but a click. After that the
+lever is off-site: the community listener and directory submissions, because those are
+the only things that produce the third-party corroboration both Google and the answer
+engines are waiting for.
 
 ### Phase 1 — the first citation number, and the newsletter stopped being a claim (August 3, 2026, evening)
 

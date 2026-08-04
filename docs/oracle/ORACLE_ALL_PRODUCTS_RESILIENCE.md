@@ -117,11 +117,43 @@ sitemap.xml  110 <loc> entries (was 50)
 All seven surfaces confirmed carrying the tag by fetching the **deployed** page, not by
 trusting the source.
 
+### Second defect: canonicals pointed at a URL that redirects
+
+Search Console surfaced this immediately after the sitemap resubmission. Inspecting a
+post returned **"Crawled – currently not indexed"**, and the *Referring page* it
+recorded carried a **trailing slash** the page never declared for itself.
+
+Cause: posts ship as `public/blog/<slug>/index.html`. On IPFS a real directory wins, so
+the host **301s `/blog/<slug>` → `/blog/<slug>/`**. But `blog-static-pages.ts` built
+`const canonical = ${SITE}/blog/${slug}` with no slash, so **every post declared a
+canonical address that immediately redirected away** — and the sitemap listed the same
+pre-redirect URL 96 times.
+
+Fixed in one place (`canonical` in the template), which flows to all four
+self-referential URLs: `rel=canonical`, `og:url`, JSON-LD `url`, JSON-LD
+`mainEntityOfPage`. Published pages backfilled — the regex rewrites **only the post's
+own slug** (`(?![/\w-])` guard) so inter-post links are untouched.
+
+Verified live post-deploy: 96/96 canonicals match their own address, 96/96 sitemap
+entries carry the slash, every sitemap URL resolves to a real file.
+
+> **Rule:** the declared canonical must be a URL that answers **200**, never one that
+> 301s. On IPFS/4everland, any path backed by a directory needs the trailing slash.
+
+### Ruled out: these are not duplicate pages
+
+Seventeen slug clusters look like republished duplicates (4× "deputy CEO", 3× "131
+tests", 3× "GSC gap analysis" — 27 redundant-looking pages of 96). Measured before
+acting, using **5-word-shingle Jaccard on visible body text**: they overlap **1.3–2.7%**.
+They are genuinely distinct articles on repeated topics, not copies. Google is not
+withholding indexing for duplication — do not "fix" this by deleting posts.
+
 ### Open item
 
-Sixty newly-listed pages will not be crawled instantly. Resubmit `sitemap.xml` in
-Search Console to accelerate discovery — the highest-leverage action available, since
-it is sixty pages of existing work moving from invisible to indexable.
+"Crawled – currently not indexed" is Google saying *found it, not convinced yet*. The
+technical faults are now gone, so what remains is authority, which only third-party
+references buy. Resubmit `sitemap.xml`, then let the community listener and directory
+work supply the external signals.
 
 ---
 
