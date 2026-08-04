@@ -112,6 +112,15 @@ const ICP_BY_LANE = {
  * What Elena actually sells this lead — the audit stays the credibility hook
  * (it is real, measured, about THEIR site), but the offer changes per lane.
  */
+/**
+ * The AI Growth Operator paragraph (Elena, Aug 4 2026): every WhatsApp first contact
+ * carries it, not just the follow-up. It is what moves her from "someone who audits
+ * websites" to "someone who runs the growth motion" — the framing that carries a
+ * retainer instead of a one-off fix.
+ */
+const OPERATOR_ES =
+  'No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.';
+
 const LANE_OFFER = {
   whatsapp_ai_agents: {
     label: 'agente de WhatsApp',
@@ -212,6 +221,34 @@ function pickBestEmail(emails, domain) {
 }
 
 /** Read the business's own site for a contact address — no Hunter, no quota. */
+/**
+ * A social profile is not a website.
+ *
+ * Google Maps lists an Instagram or Facebook page in the `website` field when a
+ * business has no site of its own. That poisons everything downstream: the audit
+ * scores INSTAGRAM instead of the clinic (a dental clinic came back 51/D — that was
+ * Instagram's score), the domain becomes instagram.com, and the Google-index email
+ * fallback duly returned support@instagram.com as the "clinic's" address. One tap
+ * and Elena would have pitched an AI visibility audit to Instagram's support desk.
+ *
+ * These businesses are also unsellable for this offer: with no site of their own
+ * there is nothing to add JSON-LD or llms.txt to.
+ */
+const PLATFORM_DOMAINS = [
+  'instagram.com', 'facebook.com', 'fb.com', 'linkedin.com', 'twitter.com', 'x.com',
+  'tiktok.com', 'youtube.com', 'wa.me', 'whatsapp.com', 'linktr.ee', 'google.com',
+  'business.site', 'sites.google.com', 'wixsite.com', 'blogspot.com', 'wordpress.com',
+  'yelp.com', 'tripadvisor.com', 'booking.com', 'doctoralia.com', 'paginasamarillas.com',
+];
+function isPlatformSite(website) {
+  try {
+    const h = new URL(website).hostname.replace(/^www\./, '').toLowerCase();
+    return PLATFORM_DOMAINS.some((d) => h === d || h.endsWith(`.${d}`));
+  } catch {
+    return true; // unparseable — not a site we can audit or sell to
+  }
+}
+
 async function findEmail(website) {
   let domain;
   try {
@@ -219,6 +256,7 @@ async function findEmail(website) {
   } catch {
     return null;
   }
+  if (isPlatformSite(website)) return null;
   const pages = ['', '/contact', '/contacto', '/contact-us', '/contactenos', '/about', '/nosotros'];
   const found = [];
   for (const p of pages) {
@@ -606,6 +644,8 @@ async function stageLead(lead, audit, angle) {
     `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
     `Cuando alguien le pregunta a ChatGPT por opciones como la suya en ${lead.city}, su negocio todavía no aparece como respuesta citable.`,
     ``,
+    OPERATOR_ES,
+    ``,
     `Son 3 arreglos concretos. ¿Les muestro en 15 minutos, sin compromiso? Auditoría gratuita: https://aideazz.xyz/api`,
   ].join('\n');
   if (lead.phone) fs.writeFileSync(path.join(ROOT, waRel), waText, 'utf8');
@@ -730,6 +770,11 @@ if (require.main === module) (async () => {
     console.log(`[lead-machine] ${target.city} · "${target.q}" → ${businesses.length} with a website`);
 
     for (const b of businesses) {
+      // A social profile is not a website: skip before spending an audit on it.
+      if (isPlatformSite(b.website)) {
+        skip.noEmail++;
+        continue;
+      }
       if (staged.length >= MAX_NEW) break;
       skip.seen++;
       // Cheapest checks first: never spend a scrape or an audit on a business
