@@ -63,6 +63,22 @@ Engineering depth this demonstrates: debugging from production telemetry rather 
 
 ---
 
+## 🆕 Proof point — measuring a pipeline by conversion, not by volume (August 4 2026)
+
+**Interview/founder hook (data-driven engineering):** *"My job-search agent stopped surfacing anything, while looking perfectly healthy — 144 cycles in 48 hours, 2,300 jobs a cycle, no errors. Rather than tune filters by feel, I measured every source by conversion: processed versus actually surfaced. One source was carrying 88% of all output at 36% conversion; LinkedIn had processed 3,565 jobs and surfaced exactly zero, and a board I'd been treating as dead turned out to be dead because my own parser couldn't read its pages, not because its jobs were bad. I'd attributed an outcome to the source when the cause was my pipeline."*
+
+**The three findings worth retelling:**
+
+1. **A guard I wrote was eating the good jobs.** A "too thin to judge" rule discarded 107 postings in 48 hours; 37 were squarely on-target, including the exact job title I was applying to elsewhere that week. Cause: one board renders its requirements as bare headed lists, hitting only one of the two prose markers my extractor demanded, so 112 real postings were classified as navigation pages. **A heuristic tuned on one site's HTML silently became a policy about which jobs exist.**
+2. **"Unreadable" is not "unsuitable".** Failing to fetch a page is not evidence about the job. The fix wasn't to loosen the filter but to add a third outcome: surface it *labelled unverified*, with the checks that couldn't run named explicitly. Suppressing the LLM judge on text known to be incomplete matters too — a model asked to rule on 130 characters returns a confident answer built from nothing.
+3. **Absence of log lines is not absence of events.** I reported "zero enrichment failures" from the journal. Those lines log at DEBUG and never reach it. The real rate was 112 failures in 48 hours. I had measured my logging configuration, not my system.
+
+**The measurement that drove the fix:** conversion per source, computed by joining a msgpack-serialised LangGraph checkpoint DB (7,087 jobs) against final outcomes. That table — not intuition — is what said "add another source of the shape that converts" rather than "relax the filters." The new source was verified live before a line of integration was written (111 jobs, 56 through the fit gate, salary present in the payload), and the first production cycle moved surfaced-to-human from 0 to 5.
+
+**And the discipline of the negative result:** in the same session I proposed two changes and shipped one. The second — enlarging the employer pool — died on its own evidence: the companies that convert were already inside the sampled window, and ~50 probed candidate slugs returned 2 hits, 1 of them a duplicate. Reporting that plainly is worth more than shipping something that looks like progress.
+
+---
+
 ## ⚠️ CANONICAL LOCATION RULE — READ BEFORE ANY SESSION
 
 **Never ask Elena where a local folder or GitHub repo is.** The answer is always in one of these two docs:
