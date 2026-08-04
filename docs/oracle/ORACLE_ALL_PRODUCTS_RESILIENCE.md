@@ -8,6 +8,52 @@
 
 ---
 
+## 🟢 Proof surfaces enforced — SOP + podcast to A+ 100 (August 4 2026)
+
+The three surfaces `/portfolio` links to as proof had never been audited. When they
+finally were, two of them graded below the page citing them. Both are fixed and, more
+importantly, **enforced**, so they cannot drift again unnoticed.
+
+| Property | Was | Now | What was wrong |
+| --- | --- | --- | --- |
+| `aideazz.xyz/sop-ai-ops.html` | A 89 | **A+ 100** | No Open Graph tags at all (hard fail), 179-char meta, no `sameAs`, no FAQ schema, one semantic landmark |
+| `podcast.aideazz.xyz/` | A+ 95 | **A+ 100** | 187-char meta, no FAQ schema, no list or table anywhere on the page |
+| `aideazz.xyz/blog` | A+ 100 | **A+ 100** | Nothing — promoted from report-only to enforced |
+
+**Self-audit target list (`scripts/visibility-self-audit.cjs`) — enforced now:**
+`/portfolio`, `aideazz.xyz`, `/api`, `/blog`, `/sop-ai-ops.html`, `podcast.aideazz.xyz`,
+`webhook…/cto/v1/visibility`. Report-only: Atlas board, `atuona.xyz`.
+
+**Where each one is edited — they are three different repos, this is the part that
+wastes time:**
+
+| Surface | Source | Deploy |
+| --- | --- | --- |
+| SOP page | `aideazz` repo → `public/sop-ai-ops.html` (static, not React) | push to `main`, 4everland rebuilds |
+| Podcast | `cto-aipa` → `src/podcast-feed.ts` (generates the HTML) | `npx ts-node scripts/podcast-host-cli.ts reseed` — pushes to `ElenaRevicheva/aideazz-podcast` via the GitHub API, 4everland serves it |
+| `/blog` | `aideazz` → `scripts/prerender-routes.mjs` | push to `main` |
+
+**Podcast reseed needs `GITHUB_TOKEN` only.** It is a pure GitHub API operation and
+does **not** need the Oracle VM — a laptop with `gh auth token` can run it. The VM has
+the token in `.env`; a laptop does not, so export it first.
+
+**Feed safety rule — do not "fix" the feed description.** `reseedSiteFiles()` rewrites
+`feed.xml` as well as `index.html`. The channel description is **187 chars and must
+stay that way**: Apple and Spotify have already ingested it and podcast directories
+have no length limit. The 170-char cap is an HTML `<head>` concern only, so
+`seoDescription()` in `podcast-feed.ts` trims a head-only copy and leaves the feed
+untouched. Verified after deploy: feed still 200, 11 items, 187-char description,
+enclosure URLs unchanged.
+
+**Semantic landmark changes on the SOP page are tag swaps, not restructuring.**
+`div.hero → header`, `div.wrap#main → main`, `div.footer → footer`. All CSS there is
+class-based (no `div.wrap` selectors), so nothing moves visually. The TOC scrollspy
+picks up the new `<section id="faq">` because it selects `.section`.
+
+**Both FAQs are duplicated by design** — visible HTML *and* `FAQPage` JSON-LD. If you
+edit one, edit the other, or answer engines will lift a sentence the page no longer
+says. Both files carry a comment saying so.
+
 ## 🟢 AI citation tracking + `/blog` identity fix (August 3 2026)
 
 **What runs where, and what to check when it goes quiet.** Story and rationale live in

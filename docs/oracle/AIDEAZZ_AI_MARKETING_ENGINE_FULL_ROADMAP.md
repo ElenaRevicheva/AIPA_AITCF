@@ -504,6 +504,44 @@ dependency** so it runs on a bare CI runner; persistence is imported lazily.
 
 ---
 
+### Phase 1 — the proof links were never audited (August 4, 2026)
+
+`/portfolio` cites three surfaces as evidence: the SOP page, the podcast, and the blog.
+Every one of them had been shipped, linked, and then never measured again. Auditing them
+for the first time produced the uncomfortable version of a good result — the page making
+the claim scored A+ 100, and two of the three pages it pointed at scored lower.
+
+The SOP page was the sharper miss. It carried 2,857 crawler-visible words, a TechArticle
+schema, and full hreflang — and had **no Open Graph tags whatsoever**. Every share of it
+on LinkedIn, every preview an AI retriever built, fell back to guessing. Alongside that:
+a 179-char meta description, no `sameAs` anywhere so nothing tied "Elena Revicheva" to a
+resolvable identity, no FAQ markup, and exactly one semantic landmark on a 3,000-word
+technical document. Six non-passing checks, A 89.
+
+The podcast was closer but had the more interesting defect. It scored A+ 95 with a
+187-char meta description and **not a single list or table on the entire page**. The
+audit flags that because answer engines lift structured facts verbatim; a page of
+prose gives them nothing to quote cleanly. It also had no FAQ schema, so any question
+about the show got a summary an engine invented rather than the sentence we wrote.
+
+**Both are A+ 100/100 now, with zero non-passing checks.** So is `/blog`, which was
+already there and has been promoted from report-only to enforced. Seven properties are
+enforced in CI as of this morning.
+
+The fix worth remembering is what was *not* changed. The podcast's meta description had
+to come down to 170 chars, but its RSS `<channel><description>` is the same 187 chars it
+has always been — Apple and Spotify already ingested it, directories have no length
+limit, and rewriting a feed to satisfy an HTML rule would have been a self-inflicted
+wound. `seoDescription()` trims a head-only copy by dropping the trailing byline, which
+the JSON-LD and `<meta name="author">` already carry. Feed verified after deploy: 200,
+11 items, 187 chars, enclosures intact.
+
+The honest lesson is not that two pages had bugs. It is that **an unaudited proof link
+decays silently, and a proof link that grades below the page citing it is worse than no
+proof link at all.** The audit target list was the actual defect; the six checks were
+just its symptoms. Both proof surfaces are enforced now, so the next drift fails CI
+instead of waiting for someone to look.
+
 ### Phase 1 — the first citation number, and the newsletter stopped being a claim (August 3, 2026, evening)
 
 Everything above was built the same day. This is what happened when it was pointed at
