@@ -63,7 +63,10 @@ const LEADS = [
     existingDealId: process.env.REPAIR ? '63434888257' : null,
     company: 'Medical Depot Panama',
     site: 'https://medicaldepotpanama.com/',
-    email: null,
+    // Their site blocks bots hard enough that a direct scrape returns 0 bytes — the
+    // same reason AI Crawler Access scores 32/100. The address is public on their
+    // own /contactenos page and was recovered from Google's index instead.
+    email: 'atencionclientes@medicaldepotpanama.com',
     phone: '+50763173304',
     score: 37,
     grade: 'F',
