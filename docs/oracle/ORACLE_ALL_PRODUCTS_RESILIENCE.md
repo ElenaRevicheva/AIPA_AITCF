@@ -8,6 +8,123 @@
 
 ---
 
+## 🟢 Sitemap rebuilt from shipped pages + Ahrefs LLM-referral tracking (August 4 2026, afternoon)
+
+### The sitemap was lying, and a dead Hashnode call was hiding it
+
+`aideazz/scripts/generate-sitemap.mjs` sourced blog URLs from two publishing APIs.
+Both were wrong.
+
+**Hashnode was retired months ago.** The GraphQL fetch could only fail, and it failed
+silently by design (`on Hashnode failure, writes static URLs only — build still
+succeeds`). That warning line in every build log trained everyone to ignore it, which
+is exactly why the second bug survived.
+
+**dev.to slugs are not aideazz.xyz slugs.** The generator inferred one from the other
+by stripping a trailing hash (`-[a-z0-9]{3,6}$`). That inference is wrong in both
+directions, verified live:
+
+| Direction | Example | Reality |
+| --- | --- | --- |
+| Wanted to publish | `aideazz.xyz/blog/ai-language-learning-5cd4` | **404** — no page on this domain |
+| Wanted to drop | `.../131-tests-4-layers-...-2026-07-31` | **200, 1,595 words** of prerendered content |
+
+Because the fetch was flaky, the committed sitemap had frozen at **50 URLs listing 36
+of 96 blog posts**. Sixty real pages — every one a 200 with 900–1,600 words — were
+absent from the sitemap, invisible to Google and to every AI crawler the citation work
+exists to court. The daily publisher kept adding posts to a list nobody was reading.
+
+**Fix:** blog URLs now come from `public/blog/<slug>/index.html` — the files that
+actually ship. The filesystem is the only source that agrees with what a crawler will
+fetch. Result: **110 URLs, nothing dropped, 96/96 blog URLs backed by a real page.**
+`lastmod` prefers the post's own `datePublished` (JSON-LD, then
+`article:published_time`) over file mtime, because a checkout rewrites mtime and would
+otherwise tell Google the whole archive changed today.
+
+**No network calls at build time now.** The sitemap is reproducible instead of
+dependent on a third party being reachable from the build runner.
+
+### Hashnode is fully out of the live path
+
+Audited before assuming. The sitemap generator held the **last live Hashnode call in
+the entire pipeline**:
+
+| Surface | State |
+| --- | --- |
+| `aideazz/scripts/generate-sitemap.mjs` | **Removed** — was the only live call |
+| `cto-aipa/src/daily-blog-publisher.ts` | Already dev.to-only. `devtoOnly()` returns true when `HASHNODE_ACCESS_TOKEN` is absent, so it self-switched when the token went away. This is why posts kept shipping. |
+| `aideazz/src/pages/BlogIndex.tsx` | Calls `mergeHashnodeWithLocal([], local)` — empty array, pure merge, no fetch |
+| `aideazz/src/lib/hashnode-public.ts` | `fetchHashnodePostList` / `fetchHashnodePostBySlug` have **no callers** — dead code |
+
+Left the dead exports in place rather than ripping them out in the same change as a
+sitemap fix. They cost nothing at runtime (tree-shaken, never called) and deleting them
+would have widened the blast radius of a fix that needed to be provable.
+
+### Ahrefs Web Analytics — the other half of the citation loop
+
+The citation probe answers *does a model mention us*. Nothing answered *does a model
+send anyone*, because GA4 folds ChatGPT, Perplexity, Gemini and Claude into
+undifferentiated referral traffic. Ahrefs Web Analytics splits them out by name, free
+tier, cookie-free.
+
+**Where the tag lives** — four injection points, because these surfaces do not share a
+template:
+
+| Surface | File | Covers |
+| --- | --- | --- |
+| SPA shell | `aideazz/index.html` | `/`, and every prerendered route (`/portfolio`, `/api`, `/blog`) since `prerender-routes.mjs` only swaps SEO tags and leaves `<head>` analytics intact |
+| Standalone pages | `aideazz/public/{pitch,pitch-es,sop-ai-ops,sop-ai-ops-es}.html` | Served directly, inherit nothing |
+| Blog template | `cto-aipa/src/blog-static-pages.ts` | Every **future** post, automatically |
+| Published posts | `aideazz/public/blog/*/index.html` | The 96 that predate the template change (backfilled) |
+
+**Backfill was purely additive: 322 insertions, 0 deletions across 100 files.** Verified
+with `git diff --numstat` before committing.
+
+**Trap — CRLF.** Published posts are CRLF; the template source is LF. A literal `\n`
+anchor matched **zero** files and reported "no GA4 anchor: 95". Match `\r?\n`, capture
+the EOL, and re-emit what the file already uses, or the diff becomes 95 whole-file
+rewrites instead of 3-line additions.
+
+**Trap — one post had no GA4 at all.** A post from an older generator had no analytics
+tag to anchor to. Needed a `</head>` fallback branch.
+
+**Found while verifying: `sop-ai-ops.html` never had GA4.** One of the six `/portfolio`
+proof links has been invisible in analytics since launch. Added GA4 alongside Ahrefs to
+both it and its Spanish twin.
+
+### Windows traps hit during this work (all cost real time)
+
+| Symptom | Cause | Do this instead |
+| --- | --- | --- |
+| `The token '&&' is not a valid statement separator` | PowerShell, not bash | Use `;` or separate calls |
+| `Invalid string escape` in `node -e` | PowerShell mangles quotes in inline JS | Write a `.cjs` file and run it |
+| `git show HEAD:file > out.txt` produced content with **neither** expected string | PowerShell `>` writes **UTF-16LE**; reading as utf8 gives garbage | `execFileSync('git', [...]).toString('utf8')` in node |
+| `1 file changed, 0 insertions(+), 0 deletions(-)` on a `.ts` commit | Git treats `.ts` as **binary** (MPEG transport stream), so it shows no line diff — the content commits fine | Verify with `git show HEAD:<file>` read as utf8, not by reading the diff stat |
+| Read/edit tools refuse `.ts` as "binary" | Same MPEG misdetection | Patch via a node script with an anchor-count guard |
+
+### Verification (live, post-deploy)
+
+```
+A+ 100/100  https://aideazz.xyz/portfolio     ← unchanged, tag is async + cookie-free
+A+ 100/100  https://aideazz.xyz
+A+  98/100  https://aideazz.xyz/api
+A+ 100/100  https://aideazz.xyz/blog
+A+ 100/100  https://aideazz.xyz/sop-ai-ops.html
+A+ 100/100  https://podcast.aideazz.xyz/
+sitemap.xml  110 <loc> entries (was 50)
+```
+
+All seven surfaces confirmed carrying the tag by fetching the **deployed** page, not by
+trusting the source.
+
+### Open item
+
+Sixty newly-listed pages will not be crawled instantly. Resubmit `sitemap.xml` in
+Search Console to accelerate discovery — the highest-leverage action available, since
+it is sixty pages of existing work moving from invisible to indexable.
+
+---
+
 ## 🟢 Proof surfaces enforced — SOP + podcast to A+ 100 (August 4 2026)
 
 The three surfaces `/portfolio` links to as proof had never been audited. When they

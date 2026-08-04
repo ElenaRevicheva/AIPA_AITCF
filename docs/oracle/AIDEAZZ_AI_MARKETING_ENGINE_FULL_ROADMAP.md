@@ -618,6 +618,60 @@ channel. The number that matters is whether `/portfolio` citation rate moves off
 that will take weeks of Elena actually posting, plus a re-probe. Until then this is
 plumbing with one promising sample.
 
+### Phase 1 — sixty pages were never in the sitemap (August 4, 2026, afternoon)
+
+The work started as a small one: install Ahrefs Web Analytics so LLM *referrals* become
+measurable, closing the half of the loop the citation probe does not cover. The probe
+answers *does a model mention us*. Nothing answered *does a model send anyone*, because
+GA4 folds ChatGPT, Perplexity, Gemini and Claude into undifferentiated referral traffic.
+
+Installing it surfaced something much worse.
+
+**The blog had been publishing into a sitemap nobody was updating.** `generate-sitemap.mjs`
+asked two publishing APIs what the blog contained. Hashnode had been retired months
+earlier, so that call could only fail — and it failed *silently by design*, which trained
+everyone to scroll past the warning. Underneath it, the dev.to fallback was inferring
+aideazz.xyz slugs from dev.to slugs by stripping a trailing hash. That inference is wrong
+in both directions, and both directions were verified against the live site:
+
+- It wanted to publish `aideazz.xyz/blog/ai-language-learning-5cd4` → **404**.
+- It wanted to drop `.../131-tests-4-layers-...-2026-07-31` → **200, 1,595 words**.
+
+Because the fetch was flaky, the committed sitemap had frozen at **50 URLs listing 36 of
+96 posts**. **Sixty real pages** — every one a 200 with 900–1,600 words of prerendered
+content — were absent from the sitemap. Invisible to Google, and invisible to the exact
+AI crawlers the entire citation effort exists to court.
+
+This is the uncomfortable one. The daily publisher has been working perfectly for months.
+`/portfolio` has been A+ 100/100. The GSC-gap topic selection has been picking smart
+topics. And roughly 60% of the output was going somewhere no crawler was told to look.
+Every measured surface was green while the distribution layer quietly leaked.
+
+**Fixed by removing the question.** Blog URLs now come from `public/blog/<slug>/index.html`
+— the files that actually ship. The filesystem is the only source that agrees with what a
+crawler will fetch. **110 URLs, nothing dropped, 96/96 backed by a real page**, and no
+network calls at build time, so it cannot silently fail again.
+
+**Ahrefs itself is live on every surface** — `/portfolio`, apex, `/api`, `/blog`, both SOP
+pages, both pitch pages, and all 96 posts — confirmed by fetching the deployed pages
+rather than trusting the source. Future posts inherit it from the generator template.
+Scores unchanged: `/portfolio` still A+ 100/100, since the tag is async and cookie-free.
+The backfill was **322 insertions, 0 deletions across 100 files**.
+
+Also found: **`sop-ai-ops.html` never had GA4 at all.** One of the six `/portfolio` proof
+links has been invisible in analytics since launch.
+
+**What this changes about the honest pitch.** "Owned organic as a revenue channel" is
+still No. But the reason for the 0% citation rate now has a candidate explanation that is
+not about content quality: for months, most of the corpus was not discoverable. That does
+not guarantee citations will follow — being indexed is necessary, not sufficient, which is
+the same lesson the 100/100-and-0%-cited result already taught. It does mean the next
+citation probe is the first one running against a blog that is actually *listed*.
+
+**Next honest step:** resubmit `sitemap.xml` in Search Console. Sixty pages of existing
+work move from invisible to indexable — the highest-leverage action currently available,
+and it costs nothing but a click.
+
 ### Phase 1 — the first citation number, and the newsletter stopped being a claim (August 3, 2026, evening)
 
 Everything above was built the same day. This is what happened when it was pointed at
@@ -1039,6 +1093,22 @@ Elena's engine breaks all three loops. She built it for herself. Now she wires i
 | Apex `/blog` indexing | IN PROGRESS | Indexing request submitted Apr 17, 2026 via GSC URL Inspection. |
 
 ### Phase 2: Blog & distribution (Hashnode + aideazz.xyz) — COMPLETE
+
+> ⚠️ **SUPERSEDED — Hashnode is gone (confirmed August 4, 2026).** That publication was
+> retired months ago; it is a paid platform and the subscription ended. Everything below
+> describing Hashnode as the publish target or the source of truth is **history, not
+> current state**. Do not follow the "How to check" steps — they will send you to a dead
+> publication.
+>
+> **Current state:** **dev.to is the only publishing target.** `daily-blog-publisher.ts`
+> switches to dev.to-only automatically whenever `HASHNODE_ACCESS_TOKEN` is absent
+> (`devtoOnly()`), which is why daily posts never stopped. Canonical URLs point at
+> `aideazz.xyz/blog/<slug>`. The sitemap is built from `public/blog/*/index.html`, not
+> from any API — see *Phase 1 — sixty pages were never in the sitemap (August 4, 2026)*
+> for why the API-driven version was silently wrong.
+>
+> To check the blog is alive today: open **https://aideazz.xyz/blog**, then
+> **https://dev.to/elenarevicheva**. Ignore any step mentioning `aideazz.hashnode.dev`.
 
 | Task | Status | Details |
 |---|---|---|
