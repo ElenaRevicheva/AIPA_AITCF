@@ -1,0 +1,21 @@
+SUBJECT: Auditoría de visibilidad en IA — Vitae Health (84/100): 3 arreglos concretos
+
+TO: info@vitae-health.com
+
+Estimado equipo de Vitae Health:
+
+¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio
+
+Primero, felicitaciones — servicio de coordinación de cuidado en casa con presencia clara y contenido bien escrito — su respuesta-a-preguntas ya está en 94/100, algo muy poco común.
+
+Les escribo porque analicé www.vitae-health.com con mi motor de visibilidad en IA y obtuvo 84/100 (B): cuando alguien le pregunta a ChatGPT o Perplexity "¿quién ofrece cuidado en casa o enfermería a domicilio en Panamá?", su empresa todavía no aparece como respuesta citable — su sitio casi no tiene datos estructurados (GEO 50/100, 2 de 8 revisiones): los motores leen el texto pero no entienden QUÉ empresa es, qué servicios ofrece ni dónde opera.
+
+Son 3 arreglos concretos y de implementación rápida. Si les parece bien, se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes y seguimiento, y video con IA para marketing. Todo con demos en vivo en mi portafolio 👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización
+AIdeazz AI Lab ✨

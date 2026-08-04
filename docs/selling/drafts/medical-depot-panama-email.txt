@@ -1,0 +1,21 @@
+SUBJECT: Auditoría de visibilidad en IA — Medical Depot Panama (37/100): 3 arreglos concretos
+
+TO: atencionclientes@medicaldepotpanama.com
+
+Estimado equipo de Medical Depot Panama:
+
+¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio
+
+Primero, felicitaciones — catálogo de equipo médico con varias sucursales y una base técnica sólida en el sitio (71/100 en fundamentos).
+
+Les escribo porque analicé medicaldepotpanama.com con mi motor de visibilidad en IA y obtuvo 37/100 (F): cuando alguien le pregunta a ChatGPT o Perplexity "¿dónde compro equipo médico, sillas de ruedas o camas hospitalarias en Panamá?", su empresa todavía no aparece como respuesta citable — su sitio BLOQUEA a los rastreadores de IA (GPTBot, ClaudeBot, PerplexityBot) en robots.txt y en su protección de bots — Acceso 32/100: ChatGPT literalmente no puede leer su catálogo aunque quisiera recomendarlo.
+
+Son 3 arreglos concretos y de implementación rápida. Si les parece bien, se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan 24/7 (EN/ES, conectados a su CRM), automatización de intake de pacientes y seguimiento, y video con IA para marketing. Todo con demos en vivo en mi portafolio 👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización
+AIdeazz AI Lab ✨

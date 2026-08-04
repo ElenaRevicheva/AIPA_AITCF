@@ -1693,5 +1693,41 @@
     "emailDraft": "docs/selling/drafts/britcham-panama-espaluz-fu-email.txt",
     "dealId": "63409505638",
     "orgCode": "BRITCHAM_PANAMA"
+  },
+  "vitae-health": {
+    "company": "Vitae Health",
+    "score": 84,
+    "dealId": "63447576873",
+    "phone": "50765691219",
+    "email": "info@vitae-health.com",
+    "draft": "docs/selling/drafts/vitae-health.txt",
+    "emailDraft": "docs/selling/drafts/vitae-health-email.txt"
+  },
+  "vitae-health-fu": {
+    "company": "Vitae Health",
+    "score": 84,
+    "dealId": "63447576873",
+    "phone": "50765691219",
+    "email": "info@vitae-health.com",
+    "draft": "docs/selling/drafts/vitae-health-fu.txt",
+    "emailDraft": "docs/selling/drafts/vitae-health-fu-email.txt"
+  },
+  "medical-depot-panama": {
+    "company": "Medical Depot Panama",
+    "score": 37,
+    "dealId": "63434888257",
+    "phone": "50763173304",
+    "email": "atencionclientes@medicaldepotpanama.com",
+    "draft": "docs/selling/drafts/medical-depot-panama.txt",
+    "emailDraft": "docs/selling/drafts/medical-depot-panama-email.txt"
+  },
+  "medical-depot-panama-fu": {
+    "company": "Medical Depot Panama",
+    "score": 37,
+    "dealId": "63434888257",
+    "phone": "50763173304",
+    "email": "atencionclientes@medicaldepotpanama.com",
+    "draft": "docs/selling/drafts/medical-depot-panama-fu.txt",
+    "emailDraft": "docs/selling/drafts/medical-depot-panama-fu-email.txt"
   }
 }
