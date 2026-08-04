@@ -542,6 +542,63 @@ proof link at all.** The audit target list was the actual defect; the six checks
 just its symptoms. Both proof surfaces are enforced now, so the next drift fails CI
 instead of waiting for someone to look.
 
+### Phase 2 — going to where the questions are (August 4, 2026)
+
+The citation probe returned `/portfolio` cited **0%** of the time against a page
+scoring **100/100**. Those two numbers together are the whole lesson: technical
+perfection is table stakes, not a cause. Models cite what they already encounter.
+Nothing on our own domain changes what they encounter.
+
+So the work moved off the domain. A listener now watches Reddit, Hacker News and
+Indie Hackers for questions Elena can genuinely answer, drafts a reply, and delivers
+it to Telegram with approve buttons plus a HubSpot task for the record. Deliberately
+the same shape as the Lead Concierge, because that shape already works.
+
+**It never posts.** That is the design, not a missing feature. A bot that auto-posts
+links to `aideazz.xyz` gets the domain blacklisted on exactly the platforms where the
+wedge is cheapest, and a blacklisted domain is a permanent loss traded for a few days
+of volume. Finding and drafting are automated; posting stays human.
+
+**First live run found the right thread on the first try:** *"How to rank #1 on
+ChatGPT?"* — 111 comments, Indie Hackers, which is precisely the wedge. Delivered as
+Telegram message `4187` and HubSpot task `114176491621`.
+
+**But the first draft was bad, and that is the useful part of this entry.** It came
+back as "ensure proper schema, sitemap and robots.txt" and mentioned the audit API
+*without linking it*. Generic enough that any reader scrolls past, and unlinked, which
+earns no citation — the pipeline reported success while producing something worthless.
+
+Two root causes. The prompt gave the model nothing concrete, so it fell back on SEO
+boilerplate. And `ANTHROPIC_API_KEY` is **out of credit fleet-wide** (verified by direct
+API call, HTTP 400), so drafts are written by Groq and Grok, which need more scaffolding
+than Claude does. The prompt now carries what Elena actually measured — that no LLM has
+rankings, that her own 100/100 site was still cited 0%, which crawlers `robots.txt` must
+name by name — so a third-tier model has real material to reason from.
+
+The rewritten prompt then produced a Spanish draft claiming *"medí que un agente reduce
+el 65% de respuestas manuales"* and a four-month client history. **Both invented.** This
+is the sharper risk: a fabricated number posted under her name is worse than a vague
+reply, because she cannot defend it the moment someone asks where it came from. Fixed at
+both levels — the prompt forbids inventing statistics, client counts and first-hand
+anecdotes, and `draftWarnings()` flags any figure outside the published set, any unlinked
+plug, and any first-hand claim. The flags render **on the Telegram card**, because the log
+is not where the decision to post gets made, and they **warn rather than rewrite**, because
+silently patching a draft would hide that the model drifted.
+
+After the fix, the English draft corrects the question's false premise, names
+GPTBot/ClaudeBot/PerplexityBot, links the API, and lands at 109 words. The Spanish draft
+answers in Spanish and correctly declines to plug a tool that was irrelevant to the question.
+
+**Honest state:** Hacker News and Indie Hackers work. Reddit returns 403 to datacenter IPs
+without OAuth, so it is reported `unavailable` rather than silently returning zero — a
+source that quietly finds nothing is indistinguishable from a quiet market. Reddit is the
+largest pond and is still shut until credentials are set.
+
+**What this does not yet prove.** One delivered draft is a working pipeline, not a working
+channel. The number that matters is whether `/portfolio` citation rate moves off 0%, and
+that will take weeks of Elena actually posting, plus a re-probe. Until then this is
+plumbing with one promising sample.
+
 ### Phase 1 — the first citation number, and the newsletter stopped being a claim (August 3, 2026, evening)
 
 Everything above was built the same day. This is what happened when it was pointed at

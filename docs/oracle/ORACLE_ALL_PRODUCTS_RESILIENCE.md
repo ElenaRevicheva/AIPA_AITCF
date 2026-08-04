@@ -104,6 +104,80 @@ returns HTML, not JSON), the regenerated sitemap **silently drops published URLs
 Never commit sitemap files from a laptop build; `git checkout --` them and let the
 deploy runner regenerate.
 
+## 🟢 Community listener — finds questions, drafts replies, never posts (August 4 2026)
+
+Operational half of the "citations come from being the answer, not from having a
+good page" work. Story in
+[`AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md`](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md).
+
+**Where it lives:** PM2 app `cto-aipa`, cron `25 * * * *` (America/Panama), gated
+behind `COMMUNITY_LISTENER_ENABLED=true`. Unset the flag and the whole feature is
+inert — no scanning, no LLM spend, no notifications.
+
+**CLI:**
+
+```bash
+ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && node scripts/community-listen.cjs --dry-run"  # scan + score only
+ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && node scripts/community-listen.cjs"            # full cycle
+ssh oracle-cto-aipa "cd /home/ubuntu/cto-aipa && node scripts/community-listen.cjs --stats"    # queued/posted/skipped
+```
+
+**Sources, and why each behaves as it does:**
+
+| Source | Mechanism | State |
+|---|---|---|
+| Hacker News | Algolia public API | Works, no credentials |
+| Indie Hackers | Algolia index `discussions` behind their own search box | Works. IH is client-rendered with **no API and no RSS** — fetching HTML returns an empty shell, so scraping is not an option. Keys overridable via `IH_ALGOLIA_APP_ID` / `IH_ALGOLIA_KEY` because they rotate |
+| Reddit | OAuth (`REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET`) | **Blocked until credentials are set.** Reddit returns **403 to datacenter IPs** on unauthenticated search — this is not a bug in the listener |
+
+Every source reports `matched` / `zero` / `unavailable` **separately**. A source
+that quietly returns nothing is indistinguishable from a quiet market, and that
+distinction is the entire point of measuring.
+
+**IH field notes (cost an hour, do not rediscover):** hits carry `itemId`, and the
+post URL is `https://www.indiehackers.com/post/{itemId}`. `createdTimestamp` is
+**epoch milliseconds**. Results come back **relevance-sorted, not date-sorted**, so
+a `numericFilters: ['createdTimestamp>…']` window is mandatory or you surface
+2023 threads. IH returns HTTP **200 for every path including 404s**, so status
+codes cannot be used to validate a URL.
+
+**Draft safety — both rules came from real failures, do not remove them:**
+
+- The first live draft mentioned the audit API **without linking it**. That is the
+  worst of both outcomes: reads as self-promotion, earns no citation. `draftWarnings()`
+  now flags an unlinked plug.
+- The improved prompt then invented `"reduce el 65% de respuestas manuales"` and a
+  four-month client history. **Both fabricated.** A made-up number under Elena's name
+  is worse than a vaguer reply because she cannot defend it when asked. The prompt
+  forbids inventing statistics, client counts and first-hand anecdotes; `draftWarnings()`
+  flags any figure outside the published set (`0`, `34`, `100`) and any first-hand claim.
+- Warnings appear **on the Telegram card**, not only in logs — the log is not where the
+  decision to post gets made. They **warn, never rewrite**: silently patching a draft
+  would hide that the model drifted.
+
+**Isolation (this deploy changed nothing that already worked):**
+
+- Telegram callback prefix `cm:` cannot collide with the concierge's `cz:`, and is
+  registered after it.
+- New Oracle table `community_opportunities` only, created with the existing ORA-955
+  create-if-absent idiom. Unique index on `(source, external_id)` does the dedupe.
+- HubSpot **creates new tasks only**. The single mutation to an existing object is
+  closing a task it created itself, by an id it stored.
+- No new HTTP routes. **Nothing is ever posted to any community platform** — that is a
+  product decision, not a limitation: a bot that auto-posts links gets the domain
+  blacklisted on precisely the platforms where the wedge is cheapest.
+
+**Deploy trap (bit me again):** Oracle has **no `tsc`** — `npm run build` on the VM
+fails with `sh: 1: tsc: not found`. Build on Windows, `scp dist/*.js`, then
+`pm2 restart cto-aipa --update-env`. Also: **shell scripts scp'd from Windows carry
+CRLF** and fail with `$'\r': command not found` — run `sed -i 's/\r$//'` first.
+
+**⚠️ Fleet-wide finding, August 4:** `ANTHROPIC_API_KEY` returns
+`"Your credit balance is too low to access the Anthropic API"` (HTTP 400). Groq and
+xAI both return 200. Every Claude-dependent feature across the fleet is running on
+fallbacks — `llm-resilience.ts` is doing its job, but drafts are being written by
+third-tier models. Verified by direct API call, not inferred from logs.
+
 ## 🟢 Newsletter (double opt-in) + citation runs deployed (August 3 2026, evening)
 
 Deployed to the VM the same evening. Story in
