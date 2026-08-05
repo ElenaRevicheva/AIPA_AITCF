@@ -1,0 +1,23 @@
+SUBJECT: Rapid Tires Panamá sacó 95/100 en visibilidad en IA — les escribo por otra cosa
+
+TO: info@rapidtirespanama.com
+
+Estimado equipo de Rapid Tires Panamá:
+
+¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio
+
+Primero, felicitaciones de verdad: analicé rapidtirespanama.com con mi motor de visibilidad en IA y obtuvo **95/100 (A+)**. Es de los mejores puntajes que he medido en Panamá — su sitio sí aparece como respuesta citable cuando alguien le pregunta a ChatGPT dónde comprar llantas. Ahí no tienen problema, y no les voy a inventar uno.
+
+Les escribo por otra cosa. Con más de 250 reseñas y varias sucursales, me imagino que por WhatsApp les llegan todo el día las mismas preguntas: si tienen la medida, cuánto cuestan cuatro, si hacen alineación, hasta qué hora abren, si aceptan tarjeta. Eso consume tiempo del equipo y muchas se enfrían cuando llegan de noche o en fin de semana.
+
+Instalo un agente de WhatsApp que contesta eso solo, 24/7, en español e inglés: consulta medida y precio, dice qué sucursal tiene disponibilidad, toma los datos del cliente y le pasa al equipo solo lo que necesita una persona — con un resumen listo.
+
+Si les parece bien, se lo muestro funcionando en 15 minutos, sin ningún compromiso. Pueden probar uno que ya tengo en producción aquí: https://wa.me/50766623757
+
+PD técnica, por si les sirve: los únicos dos detalles que le faltan al sitio para llegar a 100 son un archivo llms.txt y las etiquetas og: para previsualizaciones. Se los paso sin costo aunque no trabajemos juntos.
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización
+AIdeazz AI Lab ✨

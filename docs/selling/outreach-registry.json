@@ -2017,5 +2017,23 @@
     "dealId": "63442987047",
     "phone": "50766262822",
     "draft": "docs/selling/drafts/kontadores-panam-contadores-p-blicos-autorizados-atlas-fu.txt"
+  },
+  "rapid-tires-panama": {
+    "company": "Rapid Tires Panamá",
+    "email": "info@rapidtirespanama.com",
+    "score": 95,
+    "dealId": "63509740433",
+    "phone": "50766172399",
+    "emailDraft": "docs/selling/drafts/rapid-tires-panama-email.txt",
+    "draft": "docs/selling/drafts/rapid-tires-panama.txt"
+  },
+  "rapid-tires-panama-fu": {
+    "company": "Rapid Tires Panamá",
+    "email": "info@rapidtirespanama.com",
+    "score": 95,
+    "dealId": "63509740433",
+    "phone": "50766172399",
+    "emailDraft": "docs/selling/drafts/rapid-tires-panama-fu-email.txt",
+    "draft": "docs/selling/drafts/rapid-tires-panama-fu.txt"
   }
 }
