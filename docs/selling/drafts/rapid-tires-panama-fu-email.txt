@@ -1,18 +1,24 @@
-SUBJECT: Seguimiento — agente de WhatsApp para Rapid Tires Panamá
+SUBJECT: Seguimiento — su bot contesta, pero ¿vende? (Rapid Tires)
 
 TO: info@rapidtirespanama.com
 
-Estimado equipo de Rapid Tires Panamá:
+Estimado equipo de Rapid Tires:
 
 ¡Un gusto saludarles de nuevo! 👋 Soy Elena Revicheva, Ingeniera de IA y Automatización: https://aideazz.xyz/portfolio
 
-Les escribí hace unos días sobre Rapid Tires Panamá. Su sitio está excelente (95/100 A+ en mi auditoría de visibilidad en IA), así que mi propuesta no es arreglar la web — es lo que pasa en WhatsApp: las mismas preguntas de medidas, precios y sucursales, todo el día, y las que llegan de noche esperando hasta la mañana.
+Les escribí hace unos días. Resumo en dos líneas por si se perdió el correo:
 
-No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: responde WhatsApp al instante, califica al cliente, mantiene el CRM al día y les entrega un briefing diario con las mejores oportunidades.
+Su sitio está excelente — 95/100 (A+) en mi auditoría de visibilidad en IA, de los mejores de Panamá. No vengo a arreglar la web.
 
-Si les sirve, en 15 minutos les muestro cómo quedaría con sus propias preguntas y su tono — sin compromiso. Pueden probar uno en producción aquí: https://wa.me/50766623757
+Vengo por WhatsApp. Ya tienen un bot, como casi todos aquí, y como casi todos **contesta pero no vende**: cuando alguien pregunta por una medida un sábado en la noche, recibe "un asesor le atenderá" y esa venta se enfría. El agente que instalo lee la medida desde una foto de la llanta, consulta stock por sucursal, aparta el juego, agenda la instalación y reactiva solo las cotizaciones que quedaron frías.
 
-PD: Además de agentes de WhatsApp, hago automatización de procesos repetitivos (cotizaciones, seguimiento, reportes), visibilidad en motores de IA y video con IA para promociones. Todo con demos en vivo en mi portafolio 👆
+Y para ser clara sobre lo que hago: **no vendo otro CRM ni otro chatbot.** Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.
+
+Sigue en pie la propuesta sin compromiso: mándenme 10 conversaciones reales de WhatsApp de la semana pasada (sin datos personales) y les devuelvo el análisis de en qué mensaje se cayó cada venta.
+
+Agente mío en producción, por si quieren ver el tono: https://wa.me/50766623757
+
+En AIdeazz AI Lab construyo y opero: agentes de WhatsApp y Telegram que venden y agendan, automatización de procesos repetitivos, visibilidad en motores de IA (GEO/AEO), video con IA para promociones, e ingeniería de confiabilidad para sistemas de IA que fallan. Todo con demos en vivo aquí: https://aideazz.xyz/portfolio
 
 Saludos,
 Elena Revicheva

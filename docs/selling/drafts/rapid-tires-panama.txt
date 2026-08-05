@@ -1,12 +1,14 @@
 Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio
 
-Primero, felicitaciones: analicé rapidtirespanama.com con mi motor de visibilidad en IA y sacó 95/100 (A+), de los mejores que he medido en Panamá. Ahí no tienen problema.
+Primero, felicitaciones: analicé rapidtirespanama.com con mi propio motor de auditoría de IA (https://aideazz.xyz/api) y sacó 95/100 (A+) — de los mejores de Panamá. Ahí no tienen problema y no les voy a inventar uno.
 
-Les escribo por otra cosa: con varias sucursales, por WhatsApp les deben llegar todo el día las mismas preguntas — medidas, precio de cuatro, alineación, horarios. Instalo un agente que contesta eso solo 24/7 (ES/EN), toma los datos y le pasa al equipo solo lo que necesita una persona.
+Les escribo por otra cosa. Asumo que ya tienen un bot en WhatsApp; casi todos aquí lo tienen y casi todos solo CONTESTAN. Contestar no es vender: alguien pregunta "¿tienen 225/45R17?" un sábado a las 8pm, recibe "un asesor le atenderá", y esa venta se enfría.
 
-Pueden probar uno que ya tengo en producción: https://wa.me/50766623757
+El agente que instalo lee la medida desde una FOTO del costado de la llanta, consulta stock por sucursal, aparta el juego, agenda la instalación y reactiva solo las cotizaciones frías. Eso un bot genérico no lo hace, porque necesita su inventario y su agenda.
 
-¿Se los muestro en 15 minutos, sin compromiso?
+Propuesta sin compromiso: mándenme 10 conversaciones reales de la semana pasada (sin datos personales) y les señalo en qué mensaje se cayó cada venta.
+
+Agente mío en producción para que vean el tono: https://wa.me/50766623757
 
 ¡Que tengan un excelente día!
 Saludos,
