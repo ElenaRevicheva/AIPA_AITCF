@@ -2079,5 +2079,41 @@
     "email": "info@beluxerealestate.com",
     "emailDraft": "docs/selling/drafts/be-luxe-real-estate-email.txt",
     "score": 60
+  },
+  "madero-valor-development": {
+    "phone": "50765663082",
+    "draft": "docs/selling/drafts/madero-valor-development.txt",
+    "company": "Madero (Valor Development)",
+    "email": "ventas@gvalordevelopment.com",
+    "emailDraft": "docs/selling/drafts/madero-valor-development-email.txt",
+    "dealId": "63529849517",
+    "score": 87
+  },
+  "empresas-bern": {
+    "phone": "50766792204",
+    "draft": "docs/selling/drafts/empresas-bern.txt",
+    "company": "Empresas Bern",
+    "email": "info@empresasbern.com",
+    "emailDraft": "docs/selling/drafts/empresas-bern-email.txt",
+    "dealId": "63528429206",
+    "score": 87
+  },
+  "insignia-resources": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/insignia-resources.txt",
+    "company": "Insignia Resources",
+    "email": "info@insigniaresources.com",
+    "emailDraft": "docs/selling/drafts/insignia-resources-email.txt",
+    "dealId": "63516596373",
+    "score": 88
+  },
+  "foundever": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/foundever.txt",
+    "company": "Foundever",
+    "email": "info@foundever.com",
+    "emailDraft": "docs/selling/drafts/foundever-email.txt",
+    "dealId": "63523808804",
+    "score": 94
   }
 }

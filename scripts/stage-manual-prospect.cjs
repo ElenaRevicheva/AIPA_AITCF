@@ -30,9 +30,16 @@ const dryRun = process.argv.includes('--dry-run');
 const skipAudit = process.argv.includes('--skip-audit');
 const scoreArg = process.argv.find((a) => a.startsWith('--score='));
 const scoreOverride = scoreArg ? Number(scoreArg.split('=')[1]) : null;
+/**
+ * --update=<dealId> refreshes an ALREADY-staged prospect: rewrites its drafts + registry
+ * and posts a fresh note on the existing deal, instead of creating a second one. Purely
+ * additive — the old note stays in the deal's history, nothing is deleted.
+ */
+const updateArg = process.argv.find((a) => a.startsWith('--update='));
+const updateDealId = updateArg ? updateArg.split('=')[1].trim() : null;
 const domainArg = process.argv.find(a => a.startsWith('--') === false && a !== process.argv[0] && a !== process.argv[1]);
 if (!domainArg) {
-  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run] [--skip-audit] [--score=75]');
+  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run] [--skip-audit] [--score=75] [--update=<dealId>]');
   process.exit(1);
 }
 const domain = domainArg.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase();
@@ -133,10 +140,47 @@ function weakestCategory(audit) {
   return { name: pairs[0][0], score: pairs[0][1], id: pairs[0][0] };
 }
 
+/** The AI Growth Operator paragraph — canonical wording (MANUAL_PROSPECT_PLAY.md). */
+const OPERATOR_PARA =
+  'No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.';
+
+/** A site scoring this high has no visibility problem to sell against. */
+const CREDENTIAL_SCORE = 85;
+
 function buildDraft(ctx) {
   const {
     domain, score, grade, weakName, weakScore, moneyQuery, compliment, pdEmoji, pdLine,
   } = ctx;
+
+  // Rapid Tires precedent (Aug 4 2026): telling an 87-94/100 site that it "todavía no
+  // aparece como respuesta citable" is simply false, and reads as not having done the
+  // homework. Above CREDENTIAL_SCORE the audit becomes the CREDENTIAL that earns the
+  // read, and the letter pivots to what they actually lack. Requires a `pivot` in meta
+  // so the reason for writing is specific to their business, never a template.
+  if (score >= CREDENTIAL_SCORE && ctx.pivot) {
+    return [
+      `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio`,
+      '',
+      `Primero, felicitaciones de verdad. Analicé ${domain} con mi propio motor de auditoría de visibilidad en IA (lo desarrollé yo, corre en https://aideazz.xyz/api) y sacó ${score}/100 (${grade}) — ${compliment}.`,
+      '',
+      `Se los digo porque casi nadie está en ese nivel, y porque no les voy a inventar un problema que no tienen.`,
+      '',
+      `Les escribo por otra cosa. ${ctx.pivot}`,
+      '',
+      OPERATOR_PARA,
+      '',
+      ctx.ask ||
+        `Si les sirve, en 15 minutos les muestro cómo quedaría el Operator en su negocio — sin compromiso.`,
+      '',
+      `PD: para llegar a 100/100 solo les falta afinar un par de detalles (${ctx.gapClause}). Se los dejo listos sin costo, trabajemos juntos o no. ${pdEmoji}`,
+      '',
+      `¡Que tengan un excelente día!`,
+      `Saludos,`,
+      `Elena Revicheva`,
+      `Fundadora | Ingeniera de IA y Automatización — AIdeazz AI Lab ✨`,
+    ].join('\n');
+  }
+
   return [
     `Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.`,
     '',
@@ -1388,15 +1432,105 @@ const PROSPECT_META = {
     city: 'Panama City',
     customer: 'inversionista internacional que busca proyectos inmobiliarios de lujo en Panamá',
     moneyQuery: '¿cuál es la mejor inmobiliaria de lujo para invertir en Panamá?',
-    compliment: 'su sitio web está excelentemente preparado para la era de la IA — 94/100 (A+), de los mejores que he medido en Panamá: datos estructurados perfectos y contenido listo para respuestas',
-    gapClause: 'solo les falta pulir el acceso formal de crawlers (robots.txt + sitemap + llms.txt) para blindar esa posición',
+    compliment: 'datos estructurados perfectos, contenido listo para respuestas y base técnica impecable; de los mejores puntajes que he medido en Panamá',
+    gapClause: 'robots.txt, sitemap.xml y llms.txt',
+    dealOffer: 'AI Growth Operator · comprador internacional',
+    pivot:
+      'Con 35 años y oficinas en Panamá, Colombia y Miami, su cuello de botella no es la web: es que un inversionista escribe un domingo desde Bogotá o Miami preguntando por un proyecto, y la respuesta llega cuando ya se enfrió. El agente que instalo califica desde el primer mensaje (presupuesto, proyecto, plazo), responde en el huso horario del comprador, aparta la cita con el asesor correcto y reactiva solo las cotizaciones que quedaron frías.',
+    ask: 'Una propuesta concreta, sin compromiso: mándenme 10 conversaciones reales de WhatsApp de la semana pasada, sin datos personales. Les devuelvo un análisis señalando en qué mensaje exactamente se cayó cada venta.',
     pdEmoji: '🏠',
-    pdLine: 'construyo agentes de WhatsApp que califican al comprador internacional desde el primer mensaje (presupuesto, proyecto, urgencia), coordinan across zonas horarias Panamá/Colombia/Miami y reactivan cotizaciones frías 24/7, conectados a su CRM, video con IA para marketing de proyectos, y rescate de sistemas de IA que fallan.',
+    pdLine: 'construyo agentes de WhatsApp que califican al comprador internacional desde el primer mensaje (presupuesto, proyecto, urgencia), coordinan entre las zonas horarias de Panamá, Colombia y Miami, y reactivan cotizaciones frías 24/7, conectados a su CRM, video con IA para marketing de proyectos, y rescate de sistemas de IA que fallan.',
     topFixes: '(1) robots.txt explícito para crawlers de IA, (2) sitemap.xml, (3) llms.txt',
     contactFirstName: 'Marjalizo',
     contactLastName: '(WhatsApp contact)',
     // Confirmed live via marjalizo.com/contacto (redirect target of this domain): wa.me/50763152222
     preferredPhone: '50763152222',
+  },
+  'valordevelopment.com.pa': {
+    company: 'Madero (Valor Development)',
+    city: 'Panama City',
+    customer: 'comprador que busca apartamento de lujo en Costa del Este',
+    moneyQuery: '¿cuál es el mejor proyecto de apartamentos en Costa del Este?',
+    compliment: 'acceso de crawlers 95/100 y datos estructurados 94/100, un sitio ya listo para la era de la IA',
+    gapClause: 'un solo H1 claro y un llms.txt',
+    dealOffer: 'AI Growth Operator · venta de Madero',
+    // Madero has no site of its own — it lives at valordevelopment.com.pa/project/madero/.
+    // The sellable entity is the developer, so the letter leads with the project by name.
+    pivot:
+      'Madero es un ticket de $600K a $1.4M en Costa del Este, y ese comprador casi nunca cierra en la primera conversación: pregunta por planta, precio y financiamiento, compara con dos torres más, y decide semanas después. Lo que instalo responde esa primera consulta al instante con la planta y el rango correcto, califica presupuesto y plazo, agenda la visita al showroom y reactiva sola la cotización que quedó fría — sin que un asesor tenga que acordarse.',
+    ask: 'Una propuesta concreta, sin compromiso: mándenme 10 conversaciones reales de WhatsApp de la semana pasada, sin datos personales. Les devuelvo un análisis de en qué mensaje exactamente se cayó cada venta y cuántas se habrían cerrado solas.',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican compradores y agendan visitas 24/7 (EN/ES, conectados a su CRM), automatización de seguimiento de cotizaciones, video con IA para marketing de proyectos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) un solo H1 que nombre la oferta, (2) llms.txt, (3) FAQ + FAQPage JSON-LD con las preguntas reales del comprador',
+    contactFirstName: 'Valor Development',
+    contactLastName: '(Ventas — Madero)',
+    // Site's own click-to-chat ("quiero agendar una cita"): api.whatsapp.com/send?phone=50765663082
+    preferredPhone: '50765663082',
+    preferredEmail: 'ventas@gvalordevelopment.com',
+  },
+  'empresasbern.com': {
+    company: 'Empresas Bern',
+    city: 'Panama City',
+    customer: 'comprador o inversionista que busca proyecto inmobiliario premium en Panamá',
+    moneyQuery: '¿cuál es el mejor desarrollador inmobiliario en Panamá?',
+    compliment: 'datos estructurados 94/100 y acceso de crawlers 91/100, un sitio ya bien preparado para la era de la IA',
+    gapClause: 'un H1 único, un robots.txt explícito y un llms.txt',
+    dealOffer: 'AI Growth Operator · ventas multi-proyecto',
+    pivot:
+      'Con más de 160 proyectos y salas de venta en Costa del Este y Bayfront, el problema no es que no los encuentren: es que una consulta que entra un sábado por la noche sobre Bayfront termina esperando al lunes, y el comprador de Boquete o Playa Bonita ya escribió a otro. El agente que instalo atiende esa consulta al instante, sabe distinguir entre sus proyectos, califica presupuesto y zona, agenda la visita a la sala correcta y reactiva las cotizaciones frías.',
+    ask: 'Una propuesta concreta, sin compromiso: mándenme 10 conversaciones reales de WhatsApp de la semana pasada, sin datos personales. Les devuelvo un análisis de en qué mensaje se cayó cada venta.',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican compradores y agendan visitas 24/7 (EN/ES, conectados a su CRM), automatización de seguimiento, video con IA para marketing de proyectos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) un solo H1, (2) robots.txt que dé la bienvenida a crawlers de IA + sitemap, (3) llms.txt',
+    contactFirstName: 'Empresas Bern',
+    contactLastName: '(WhatsApp contact)',
+    // joinchat widget config on /contacto: "telephone":"50766792204" (reproduced 3/3 fetches).
+    // Landline +507 214-2376 also published, but wa.me cannot open it.
+    preferredPhone: '50766792204',
+  },
+  'insigniaresource.com': {
+    company: 'Insignia Resources',
+    city: 'Panama City',
+    customer: 'empresa de EE.UU. que busca un equipo remoto nearshore en Panamá',
+    moneyQuery: '¿cuál es el mejor partner de staffing nearshore en Panamá?',
+    compliment: 'acceso de crawlers 95/100 y contenido profundo de más de 1,000 palabras, que ya compite bien en respuestas de IA',
+    gapClause: 'un H1 único, sameAs a sus perfiles y un llms.txt',
+    dealOffer: 'AI Growth Operator · calificación de leads B2B',
+    pivot:
+      'Ustedes venden equipos remotos a empresas de EE.UU., así que cada lead que llega por el sitio vale mucho y llega en horario gringo. Lo que instalo califica ese lead en el momento (rol buscado, volumen, urgencia, presupuesto), lo rutea al reclutador correcto con el resumen listo, y hace el seguimiento de los que no contestaron — que en B2B suele ser donde se pierde la mitad del pipeline.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo quedaría el Operator sobre su flujo actual de leads — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine: 'construyo agentes que califican y rutean leads B2B 24/7 (EN/ES, conectados a su CRM), automatización de intake y seguimiento, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) un solo H1, (2) sameAs en el JSON-LD + og:image, (3) llms.txt',
+    contactFirstName: 'Insignia Resources',
+    contactLastName: '(Contact)',
+    // mailto: on the site (24 occurrences) — authoritative. Published phone is a US
+    // landline (646.350.1001), which wa.me cannot open, so this one is email-primary.
+    preferredEmail: 'info@insigniaresources.com',
+    emailOnlyOk: true,
+    noteFlag:
+      'PRIOR CONTACT — Insignia Resources already exists in HubSpot as a HIRING lead (deal 62733594526, "Insignia Resources - Zoom Interview", Jul 16 2026). They interviewed you. Do NOT send this as a cold first-touch; open by referencing that conversation, or decide whether pitching them conflicts with the role.',
+  },
+  'foundever.com': {
+    company: 'Foundever',
+    city: 'Panama City',
+    customer: 'empresa global que busca externalizar su experiencia de cliente (CX)',
+    moneyQuery: '¿cuál es el mejor proveedor de CX outsourcing en Panamá?',
+    compliment: 'respuesta-a-preguntas 100/100 y 94/100 global, de los sitios mejor preparados para IA que he medido',
+    gapClause: 'un llms.txt y alt text en las imágenes',
+    dealOffer: 'AI Growth Operator · automatización interna',
+    pivot:
+      'A ustedes no les vendo visibilidad ni un chatbot — son 2,000+ personas haciendo CX en Panamá en cuatro idiomas, saben del tema más que la mayoría. Lo que hago es la capa de automatización interna alrededor de eso: agentes que preparan al asesor antes de que conteste, resumen y clasifican la conversación cuando termina, mantienen el CRM al día solo, y entregan un briefing diario con las cuentas que necesitan atención. Es el trabajo que consume horas del equipo y que nadie quiere hacer a mano.',
+    ask: 'Si les sirve, en 15 minutos les muestro qué automatizaría primero y qué horas libera — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine: 'construyo agentes de IA que asisten y resumen conversaciones, automatización de procesos repetitivos conectada a las herramientas que ya usan, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) llms.txt, (2) alt text en imágenes, (3) FAQPage/Service JSON-LD',
+    contactFirstName: 'Foundever Panamá',
+    contactLastName: '(Contact)',
+    // Only a Panama landline (+507 599-5962) is published; no public WhatsApp or email.
+    emailOnlyOk: true,
+    noteFlag:
+      'PRIOR CONTACT — Foundever already exists in HubSpot as HIRING leads (deals 62754997070 "Interview Invitation from Foundever Panama" + 62740209189, Jul 16 2026). Also note they are a CX outsourcer, i.e. partly a competitor for this offer. Do NOT send as a cold first-touch without deciding the framing.',
   },
   'autogorepuestos.com': {
     company: 'AutoGO Repuestos',
@@ -1512,10 +1646,18 @@ const PROSPECT_META = {
     gapClause: meta.gapClause,
     pdEmoji: meta.pdEmoji,
     pdLine: meta.pdLine,
+    pivot: meta.pivot,
+    ask: meta.ask,
   });
 
   const slug = slugify(meta.company);
-  const dealName = `[CLIENT-MANUAL] ${meta.company} — GEO/AEO fix (audit: ${score}/${grade})`;
+  // A site above CREDENTIAL_SCORE has no GEO/AEO deficit to fix — naming the deal
+  // "GEO/AEO fix" would misdescribe the offer (and mis-route hs-outcomes-to-atlas).
+  const offerLabel =
+    score >= CREDENTIAL_SCORE && meta.pivot
+      ? meta.dealOffer || 'AI Growth Operator'
+      : 'GEO/AEO fix';
+  const dealName = `[CLIENT-MANUAL] ${meta.company} — ${offerLabel} (audit: ${score}/${grade})`;
 
   const draftPath = `docs/selling/drafts/${slug}.txt`;
   const emailDraftPath = `docs/selling/drafts/${slug}-email.txt`;
@@ -1549,8 +1691,8 @@ const PROSPECT_META = {
   const phoneFmt = phoneDigits ? formatPhone507(phoneDigits) : '';
   const phoneDisplay = phoneDigits ? phoneFmt : '(no public WhatsApp — EMAIL PRIMARY)';
 
-  // Dedupe
-  if (KEY) {
+  // Dedupe (skipped in --update mode, where hitting the existing deal is the point)
+  if (KEY && !updateDealId) {
     const existing = await hs('POST', '/crm/v3/objects/deals/search', {
       filterGroups: [{ filters: [{ propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: meta.company.split(' ')[0] }] }],
       properties: ['dealname'],
@@ -1579,6 +1721,9 @@ const PROSPECT_META = {
   const noteHtml = [
     `[CLIENT-MANUAL] ${meta.company} — AI Visibility outreach (https links; data verified live)`,
     '',
+    // Surfaced at the TOP: Elena must see a prior relationship before sending what would
+    // otherwise read as a cold first-touch to someone who already knows her.
+    ...(meta.noteFlag ? [`<b>⚠️ ${escHtml(meta.noteFlag)}</b>`, ''] : []),
     dualLinks,
     '',
     '--- MENSAJE WhatsApp (plain text) ---',
@@ -1589,7 +1734,7 @@ const PROSPECT_META = {
     '--- Audit (verified live) ---',
     escHtml(auditLine),
     '',
-    `Angle: "${score >= 85 ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
+    `Angle: "${score >= CREDENTIAL_SCORE && meta.pivot ? 'audit is the CREDENTIAL — pivot to AI Growth Operator' : score >= CREDENTIAL_SCORE ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
     '',
     `Top fixes: ${meta.topFixes}.`,
     '',
@@ -1602,6 +1747,32 @@ const PROSPECT_META = {
     console.log('DRY_RUN dealName', dealName);
     console.log('DRAFT_PREVIEW', draft.slice(0, 200) + '...');
     console.log('WA', phoneDisplay, '| EMAIL', contacts.email, emailUnverified ? '(UNVERIFIED)' : '');
+    return;
+  }
+
+  // --update: refresh an already-staged prospect. Rewrites drafts + registry (done
+  // above) and posts a corrected note; renames the deal if the offer label changed.
+  // Never deletes the previous note — it stays in the deal history.
+  if (updateDealId) {
+    await hs('PATCH', `/crm/v3/objects/deals/${updateDealId}`, {
+      properties: { dealname: dealName },
+    });
+    const upNote = await hs('POST', '/crm/v3/objects/notes', {
+      properties: { hs_note_body: noteHtml, hs_timestamp: new Date().toISOString() },
+    });
+    await hs('PUT', `/crm/v4/objects/notes/${upNote.id}/associations/deals/${updateDealId}`, [
+      { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 },
+    ]);
+    registerOutreachSlug(slug, phoneForLinks, draftPath, meta.company, {
+      email: contacts.email,
+      emailDraft: emailDraftPath,
+      score,
+      dealId: updateDealId,
+    });
+    console.log(JSON.stringify({
+      ok: true, mode: 'update', dealId: updateDealId, dealName, noteId: upNote.id,
+      email: contacts.email, emailUnverified, audit: { score, grade },
+    }, null, 2));
     return;
   }
 
