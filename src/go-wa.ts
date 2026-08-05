@@ -178,6 +178,28 @@ type OutreachEmailPayload = {
   dealId?: string;
 };
 
+/**
+ * Strip markdown emphasis before anything is sent.
+ *
+ * These emails go out as plain text, where `**bold**` never renders — it arrives as
+ * literal asterisks. Worse (Elena, Aug 4 2026): recipients now recognise `**` as a
+ * tell that a message was machine-generated, so a letter carrying them reads as a
+ * scam bot no matter how good the content is. That undoes the whole point of a
+ * hand-audited, personalised approach.
+ *
+ * Applied at the SEND path deliberately, not just in one generator: drafts are
+ * written by several scripts and by hand, and any of them can reintroduce markdown.
+ * This is the single choke point every outbound email passes through.
+ */
+function stripMarkdown(s: string): string {
+  return String(s)
+    .replace(/\*\*\*(.+?)\*\*\*/gs, '$1')
+    .replace(/\*\*(.+?)\*\*/gs, '$1')
+    .replace(/(^|[\s(])\*(?!\s)([^*\n]+?)\*(?=[\s.,;:!?)]|$)/g, '$1$2')
+    .replace(/(^|\n)#{1,6}\s+/g, '$1')
+    .replace(/(^|\n)\s*[-*]\s+/g, '$1• ');
+}
+
 async function buildOutreachEmailPayload(
   slug: string,
   entry: OutreachRegistryEntry,
@@ -200,12 +222,14 @@ async function buildOutreachEmailPayload(
       const emailTok = rawTo.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)?.[0];
       to = (emailTok || entry.email || '').trim().toLowerCase();
     }
-    body = raw
-      .replace(/^SUBJECT:.*$/m, '')
-      .replace(/^TO:.*$/m, '')
-      .replace(/^NOTE:.*$/m, '')
-      .replace(/^\s+/, '')
-      .trim();
+    body = stripMarkdown(
+      raw
+        .replace(/^SUBJECT:.*$/m, '')
+        .replace(/^TO:.*$/m, '')
+        .replace(/^NOTE:.*$/m, '')
+        .replace(/^\s+/, '')
+        .trim(),
+    );
   } else if (entry.draft) {
     const wa = (await readOutreachText(entry.draft))?.trim();
     if (!wa) return null;
