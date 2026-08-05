@@ -1351,6 +1351,81 @@ const PROSPECT_META = {
     preferredPhone: '573332841861',
     preferredEmail: 'danielacorreacirujana@gmail.com',
   },
+  'panama.evrealestate.com': {
+    company: 'Engel & Völkers Panamá',
+    city: 'Panama City',
+    customer: 'comprador internacional que busca bienes raíces de lujo en Panama City',
+    moneyQuery: '¿cuál es la mejor inmobiliaria de lujo en Panama City?',
+    compliment: 'Engel & Völkers es una marca inmobiliaria internacional con oficinas en Casco Antiguo y Costa del Este',
+    gapClause: 'mi motor recibió una pantalla de "Verificación Humana" en vez de su contenido — así ven hoy sus listados los motores de IA: nada',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican al comprador desde el primer mensaje (presupuesto, zona, urgencia) y lo entregan listo al asesor correcto 24/7 (EN/ES, conectados a su CRM), automatización de seguimiento de leads fríos, video con IA para marketing de propiedades, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) Permitir acceso de los crawlers de IA sin verificación humana, (2) Organization/RealEstateAgent JSON-LD, (3) contenido sustantivo server-rendered (hoy ~35 palabras)',
+    contactFirstName: 'Engel & Völkers Panamá',
+    contactLastName: '(WhatsApp contact)',
+    // Contact page has only a placeholder "you@emailaddress.com" — no real email published.
+    preferredPhone: '50767808277',
+  },
+  'lastregaristorante.com': {
+    company: 'La Strega Ristorante',
+    city: 'Panama City',
+    customer: 'comensal que busca restaurante italiano para reservar en Panama City',
+    moneyQuery: '¿cuál es el mejor restaurante italiano en Panama City?',
+    compliment: 'La Strega tiene dos sedes activas (Bella Vista y Costa del Este) con buena reputación en reseñas',
+    gapClause: 'cuando mi motor visitó su sitio el servidor devolvió error 503 — así lo ven ahora mismo los motores de IA: nada',
+    pdEmoji: '🍝',
+    pdLine: 'construyo agentes de WhatsApp que confirman reservas, manejan lista de espera y reactivan clientes que no llegaron 24/7 (EN/ES, conectados a su CRM), automatización de intake de eventos privados, video con IA para marketing del restaurante, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) Resolver el error del servidor para que el sitio responda 200, (2) Restaurant/LocalBusiness JSON-LD, (3) contenido sustantivo (menú, horarios, FAQ) en HTML server-rendered',
+    contactFirstName: 'La Strega',
+    contactLastName: '(WhatsApp contact)',
+    // Landlines on site: Bella Vista 398-5421, Costa del Este 305-0160 (wa.me may not open these).
+    // Mobile-format number found via Facebook page scrape — UNCONFIRMED, verify before send.
+    preferredPhone: '50760530985',
+    preferredEmail: 'reservas@lastregaristorante.com',
+  },
+  'marjalizorealty.com': {
+    company: 'Marjalizo',
+    city: 'Panama City',
+    customer: 'inversionista internacional que busca proyectos inmobiliarios de lujo en Panamá',
+    moneyQuery: '¿cuál es la mejor inmobiliaria de lujo para invertir en Panamá?',
+    compliment: 'su sitio web está excelentemente preparado para la era de la IA — 94/100 (A+), de los mejores que he medido en Panamá: datos estructurados perfectos y contenido listo para respuestas',
+    gapClause: 'solo les falta pulir el acceso formal de crawlers (robots.txt + sitemap + llms.txt) para blindar esa posición',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican al comprador internacional desde el primer mensaje (presupuesto, proyecto, urgencia), coordinan across zonas horarias Panamá/Colombia/Miami y reactivan cotizaciones frías 24/7, conectados a su CRM, video con IA para marketing de proyectos, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) robots.txt explícito para crawlers de IA, (2) sitemap.xml, (3) llms.txt',
+    contactFirstName: 'Marjalizo',
+    contactLastName: '(WhatsApp contact)',
+    // Confirmed live via marjalizo.com/contacto (redirect target of this domain): wa.me/50763152222
+    preferredPhone: '50763152222',
+  },
+  'autogorepuestos.com': {
+    company: 'AutoGO Repuestos',
+    city: 'Panama City',
+    customer: 'dueño de vehículo que busca repuestos, llantas o baterías en Panamá',
+    moneyQuery: '¿dónde compro repuestos o llantas para mi carro en Panamá?',
+    compliment: 'AutoGO tiene catálogo real de repuestos para Toyota, Suzuki, Kia, Hyundai y más, con buen acceso de crawlers de IA (95/100)',
+    gapClause: 'la página no tiene H1 ni meta-descripción — los motores de IA no pueden resumir claramente qué venden ni a quién',
+    pdEmoji: '🔧',
+    pdLine: 'construyo agentes de WhatsApp que leen la medida o pieza desde una foto, consultan stock por sucursal, apartan el repuesto y reactivan cotizaciones frías 24/7, conectados a su CRM, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) un H1 claro con la oferta, (2) meta-descripción 50–170 caracteres, (3) FAQ con preguntas reales de clientes + FAQPage JSON-LD',
+    contactFirstName: 'AutoGO Repuestos',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766329199',
+  },
+  'beluxerealestate.com': {
+    company: 'Be Luxe Real Estate',
+    city: 'Panama City',
+    customer: 'comprador internacional que busca propiedades de lujo en Costa del Este o Santa María',
+    moneyQuery: '¿cuál es la mejor inmobiliaria de lujo en Costa del Este Panamá?',
+    compliment: 'Be Luxe se posiciona en propiedades exclusivas de Costa del Este y Santa María',
+    gapClause: 'su sitio es un shell de JavaScript — mi motor solo vio 9 palabras en el HTML crudo; la mayoría de los crawlers de IA no ejecutan JavaScript, así que ven una página casi vacía',
+    pdEmoji: '🏠',
+    pdLine: 'construyo agentes de WhatsApp que califican al comprador desde el primer mensaje (presupuesto, zona, urgencia) y reactivan cotizaciones frías 24/7, conectados a su CRM, video con IA para marketing de propiedades, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) Server-renderizar o prerenderizar el sitio (hoy invisible para IA), (2) Organization/RealEstateAgent JSON-LD, (3) un solo H1 claro',
+    contactFirstName: 'Be Luxe Real Estate',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766534655',
+  },
 };
 
 (async () => {
@@ -1526,7 +1601,7 @@ const PROSPECT_META = {
   if (dryRun) {
     console.log('DRY_RUN dealName', dealName);
     console.log('DRAFT_PREVIEW', draft.slice(0, 200) + '...');
-    console.log('WA', waUrl.slice(0, 80) + '...');
+    console.log('WA', phoneDisplay, '| EMAIL', contacts.email, emailUnverified ? '(UNVERIFIED)' : '');
     return;
   }
 

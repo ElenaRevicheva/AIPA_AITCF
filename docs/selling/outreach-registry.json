@@ -2035,5 +2035,49 @@
     "phone": "50766172399",
     "emailDraft": "docs/selling/drafts/rapid-tires-panama-fu-email.txt",
     "draft": "docs/selling/drafts/rapid-tires-panama-fu.txt"
+  },
+  "engel-v-lkers-panam": {
+    "phone": "50767808277",
+    "draft": "docs/selling/drafts/engel-v-lkers-panam.txt",
+    "company": "Engel & Völkers Panamá",
+    "email": "info@panama.evrealestate.com",
+    "emailDraft": "docs/selling/drafts/engel-v-lkers-panam-email.txt",
+    "dealId": "63517061802",
+    "score": 55
+  },
+  "la-strega-ristorante": {
+    "phone": "50760530985",
+    "draft": "docs/selling/drafts/la-strega-ristorante.txt",
+    "company": "La Strega Ristorante",
+    "email": "reservas@lastregaristorante.com",
+    "emailDraft": "docs/selling/drafts/la-strega-ristorante-email.txt",
+    "dealId": "63512345418",
+    "score": 50
+  },
+  "marjalizo": {
+    "phone": "50763152222",
+    "draft": "docs/selling/drafts/marjalizo.txt",
+    "company": "Marjalizo",
+    "email": "info@marjalizorealty.com",
+    "emailDraft": "docs/selling/drafts/marjalizo-email.txt",
+    "dealId": "63526061876",
+    "score": 94
+  },
+  "autogo-repuestos": {
+    "phone": "50766329199",
+    "draft": "docs/selling/drafts/autogo-repuestos.txt",
+    "company": "AutoGO Repuestos",
+    "email": "info@autogorepuestos.com",
+    "emailDraft": "docs/selling/drafts/autogo-repuestos-email.txt",
+    "dealId": "63507662856",
+    "score": 76
+  },
+  "be-luxe-real-estate": {
+    "phone": "50766534655",
+    "draft": "docs/selling/drafts/be-luxe-real-estate.txt",
+    "company": "Be Luxe Real Estate",
+    "email": "info@beluxerealestate.com",
+    "emailDraft": "docs/selling/drafts/be-luxe-real-estate-email.txt",
+    "score": 60
   }
 }
