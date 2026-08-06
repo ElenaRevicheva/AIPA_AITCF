@@ -123,9 +123,12 @@ snapshot > "$AFTER"
 CHANGED=$(mktemp)
 case " ${FLAGS[*]-} " in
   *" --collect-only "*)
-    # Nothing ran, so there is no before/after delta to read. Fall back to recency and
-    # print every path, so a wrong file is caught in review rather than committed blind.
-    find docs/selling -type f -mmin -240 2>/dev/null | sort -u > "$CHANGED"
+    # Nothing ran, so there is no before/after delta. Recency alone would sweep in files
+    # another Oracle job touched, so also require the file to differ from git.
+    DIRTY=$(mktemp)
+    git status --porcelain -- docs/selling | sed 's/^...//' | sort -u > "$DIRTY"
+    find docs/selling -type f -mmin -240 2>/dev/null | sort -u | comm -12 - "$DIRTY" > "$CHANGED"
+    rm -f "$DIRTY"
     ;;
   *)
     # Any hash line present after but not before = created or rewritten by this run.

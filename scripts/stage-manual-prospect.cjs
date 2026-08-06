@@ -218,7 +218,9 @@ const PROSPECT_META = {
   'arden-price.com': {
     company: 'Arden & Price',
     city: 'Panama City',
-    customer: 'empresa que necesita contratar a un gerente o ejecutivo senior en Panamá',
+    // The letter renders this as "cuando un ${customer} le pregunta…", so it has to be a
+    // masculine noun phrase — "un empresa" is the kind of slip that ends a cold read.
+    customer: 'gerente general que necesita contratar a un ejecutivo senior en Panamá',
     moneyQuery: '¿cuál es la mejor firma de executive search o headhunting en Panamá?',
     compliment:
       'su sitio ya está entre los mejor preparados que he medido en Panamá — 82/100, con acceso para crawlers de IA en 95/100 y sitio bilingüe EN/ES',
