@@ -201,11 +201,28 @@ function buildHubSpotMailtoAnchor(email, subject, body, label) {
   return `<a href="${href}"><b>${title}</b></a>`;
 }
 
+/** The placeholder stage-manual-prospect.cjs uses when a prospect has no reachable number. */
+const NO_PHONE = '00000000000';
+
+/** A number we can actually open a WhatsApp chat with — not blank, not the placeholder. */
+function isWhatsAppReachable(phone) {
+  const d = digitsOnly(phone || '');
+  return d.length >= 10 && d !== NO_PHONE;
+}
+
 /**
  * HubSpot note: WA + aipa@ one-click email (confirm page → Resend).
+ *
+ * An email-primary prospect used to get a WhatsApp button pointing at the
+ * 00000000000 placeholder: it rendered like every other button and opened a chat
+ * with nobody. _audit-full-cycle-coverage.cjs counts WhatsApp anchors, so those
+ * deals also reported a complete cycle. Say "no WhatsApp" instead of drawing a
+ * button that cannot be sent.
  */
 function buildDualChannelNoteLinks(phone, email, waDraft, company, score, slug) {
-  const parts = [buildHubSpotWaAnchor(phone, waDraft)];
+  const parts = isWhatsAppReachable(phone)
+    ? [buildHubSpotWaAnchor(phone, waDraft)]
+    : ['<i><b>Sin WhatsApp público</b> — este prospecto es EMAIL-PRIMARY. Use el botón de email.</i>'];
   if (email && slug) {
     parts.push('');
     parts.push(buildHubSpotEmailAnchor(slug, email));
@@ -239,4 +256,6 @@ module.exports = {
   buildHubSpotMailtoAnchor,
   buildHubSpotEmailAnchor,
   buildDualChannelNoteLinks,
+  isWhatsAppReachable,
+  NO_PHONE,
 };
