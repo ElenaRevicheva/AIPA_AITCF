@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
  * stage-manual-prospect.cjs — Manual Prospect Play → HubSpot (5 records).
- * Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run]
- * Reads HUBSPOT_API_KEY from .env. Writes draft + prospect pack under docs/selling/.
+ * Usage: node scripts/stage-manual-prospect.cjs <domain> [--with-fu] [--dry-run]
+ * Reads HUBSPOT_API_KEY from .env or the environment. Writes draft + prospect pack
+ * under docs/selling/.
  */
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 const {
   buildHubSpotWaAnchor,
   buildDualChannelNoteLinks,
@@ -15,19 +17,32 @@ const {
   registerOutreachSlug,
   slugify,
 } = require('./wa-link-lib.cjs');
+const {
+  hubspotKey,
+  hubspotOwnerId,
+  hubspotBase,
+  visibilityUrl,
+  visibilityKey,
+} = require('./hs-env.cjs');
 
 const root = path.join(__dirname, '..');
-const env = fs.readFileSync(path.join(root, '.env'), 'utf8');
-const KEY = env.match(/^HUBSPOT_API_KEY=(.+)$/m)?.[1]?.trim();
+const KEY = hubspotKey();
 /** Elena Revicheva — always assign Manual Prospect tasks/deals so Tasks UI "Assigned to me" works */
-const HUBSPOT_OWNER_ID =
-  env.match(/^HUBSPOT_OWNER_ID=(.+)$/m)?.[1]?.trim() || '91612860';
-const VIS_KEY =
-  env.match(/^VISIBILITY_API_KEY=(.+)$/m)?.[1]?.trim() ||
-  env.match(/^VISIBILITY_API_KEYS=(.+)$/m)?.[1]?.trim()?.split(',')[0]?.trim() ||
-  'aidz_demo_visibility_2026';
+const HUBSPOT_OWNER_ID = hubspotOwnerId();
+const VIS_KEY = visibilityKey();
 const dryRun = process.argv.includes('--dry-run');
 const skipAudit = process.argv.includes('--skip-audit');
+/**
+ * --prepare-only writes every artifact (WhatsApp + email drafts, registry row, prospect
+ * pack with the exact note HTML) without creating anything in HubSpot, so the letter can
+ * be read before a deal exists — and so the play can be prepared from a machine that
+ * cannot reach api.hubapi.com.
+ */
+const prepareOnly = process.argv.includes('--prepare-only');
+/** Skip the prospect-site crawl (contacts then come from PROSPECT_META) — used by tests. */
+const noScrape = process.argv.includes('--no-scrape');
+/** Run the follow-up installer on the new deal, so one command ends the full cycle. */
+const withFu = process.argv.includes('--with-fu');
 const scoreArg = process.argv.find((a) => a.startsWith('--score='));
 const scoreOverride = scoreArg ? Number(scoreArg.split('=')[1]) : null;
 /**
@@ -39,19 +54,21 @@ const updateArg = process.argv.find((a) => a.startsWith('--update='));
 const updateDealId = updateArg ? updateArg.split('=')[1].trim() : null;
 const domainArg = process.argv.find(a => a.startsWith('--') === false && a !== process.argv[0] && a !== process.argv[1]);
 if (!domainArg) {
-  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run] [--skip-audit] [--score=75] [--update=<dealId>]');
+  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--with-fu] [--prepare-only] [--dry-run] [--skip-audit] [--score=75] [--no-scrape] [--update=<dealId>]');
   process.exit(1);
 }
 const domain = domainArg.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase();
 const url = `https://${domain}`;
 
-if (!KEY && !dryRun) {
-  console.error('HUBSPOT_API_KEY missing in .env');
+/** Modes that never call HubSpot; everything else needs the Service Key up front. */
+const offline = dryRun || prepareOnly;
+if (!KEY && !offline) {
+  console.error('HUBSPOT_API_KEY missing — put it in .env or the environment (docs/HUBSPOT_CURSOR_CONNECTION.md)');
   process.exit(1);
 }
 
-const HS = 'https://api.hubapi.com';
-const VIS = 'https://webhook.aideazz.xyz/cto/v1/visibility';
+const HS = hubspotBase();
+const VIS = visibilityUrl();
 const headers = KEY ? { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' } : {};
 
 async function hs(method, urlPath, body) {
@@ -196,10 +213,15 @@ function buildDraft(ctx) {
     ].join('\n');
   }
 
+  // Only quote a category number when the live audit produced one. With --score the
+  // overall figure is a human assertion and the per-category breakdown does not exist;
+  // printing the old default ("AEO 60/100") would invent a measurement.
+  const weakBit = weakScore != null && weakName ? ` (${weakName} ${weakScore}/100)` : '';
+
   return [
     `Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.`,
     '',
-    `Primero, felicitaciones — ${compliment}. Les escribo porque analicé ${domain} con mi motor de visibilidad en IA y obtuvo ${score}/100: cuando un ${ctx.customer} le pregunta a ChatGPT o Perplexity "${moneyQuery}", su empresa todavía no aparece como respuesta citable — ${ctx.gapClause} (${weakName} ${weakScore}/100).`,
+    `Primero, felicitaciones — ${compliment}. Les escribo porque analicé ${domain} con mi motor de visibilidad en IA y obtuvo ${score}/100: cuando un ${ctx.customer} le pregunta a ChatGPT o Perplexity "${moneyQuery}", su empresa todavía no aparece como respuesta citable — ${ctx.gapClause}${weakBit}.`,
     '',
     `Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api ${pdEmoji}`,
     '',
@@ -208,6 +230,34 @@ function buildDraft(ctx) {
     `¡Que tengan un excelente día!`,
     `Saludos,`,
     `Elena✨🌍💫`,
+  ].join('\n');
+}
+
+/**
+ * The reviewable pack for a staged prospect. Written by both paths: with HubSpot ids
+ * after a live stage, and with the note HTML alone under --prepare-only.
+ */
+function buildPack(o) {
+  return [
+    `# [CLIENT-MANUAL] ${o.company} — HubSpot note pack`,
+    '',
+    `> Staged ${new Date().toISOString().slice(0, 10)}. Deal: \`${o.dealName}\`${o.ids ? ` (ID ${o.ids.dealId})` : ' — NOT created yet (--prepare-only)'}.`,
+    `> WhatsApp draft: \`${o.draftPath}\` · Email draft: \`${o.emailDraftPath}\``,
+    `> Email one-click: \`https://webhook.aideazz.xyz/cto/go/outreach-email/${o.slug}\` (from aipa@aideazz.xyz)`,
+    ...(o.emailUnverified ? [`> ⚠️ Email \`${o.email}\` is UNVERIFIED fallback — confirm before send.`] : []),
+    ...(o.emailOnlyOk ? ['> ⚠️ EMAIL-PRIMARY — no public WhatsApp found; use email one-click.'] : []),
+    ...(o.auditNote ? [`> ⚠️ ${o.auditNote}`] : []),
+    '',
+    o.ids
+      ? `Deal **${o.ids.dealId}** | Company **${o.ids.companyId}** | Contact **${o.ids.contactId}** | Note **${o.ids.noteId}** | Send task **${o.ids.taskId}**`
+      : `Create the deal with: \`node scripts/stage-manual-prospect.cjs ${domain} --with-fu\``,
+    '',
+    '## Deal note (HTML as posted to HubSpot)',
+    '',
+    '```html',
+    o.noteHtml,
+    '```',
+    '',
   ].join('\n');
 }
 
@@ -1612,15 +1662,30 @@ const PROSPECT_META = {
 (async () => {
   console.log('DOMAIN', domain);
 
-  // Audit (or --skip-audit / auto-fallback on 429 so campaign can still fire)
+  // Audit. The score is not decoration: it names the deal, it is the email subject line,
+  // and the prospect reads it in the first paragraph ("obtuvo N/100"). A placeholder that
+  // reaches any of those is a claim about their business that nobody measured — so a
+  // number is either measured here or asserted on the command line with --score, and
+  // there is no third path (the old code silently shipped 75/B on a skip or a 429).
   let audit = {};
-  let score = scoreOverride || 75;
+  let score = scoreOverride;
   let grade = 'B';
-  let weak = { name: 'AEO', score: 60, id: 'aeo' };
+  let weak = { name: null, score: null, id: null };
   let catScores = {};
   let auditNote = '';
 
-  if (!skipAudit && scoreOverride == null) {
+  if (scoreOverride != null) {
+    if (!Number.isFinite(scoreOverride) || scoreOverride < 0 || scoreOverride > 100) {
+      throw new Error(`--score must be 0-100, got "${scoreArg.split('=')[1]}"`);
+    }
+    console.warn('AUDIT_ASSERTED — using --score', score);
+    auditNote = `Score ${score} asserted with --score (no live audit in this run) — re-audit before quoting category numbers.`;
+  } else if (skipAudit) {
+    throw new Error(
+      '--skip-audit needs --score=<0-100>: the score goes into the deal name, the email ' +
+        'subject and the prospect\'s first sentence, so it cannot default to a placeholder.',
+    );
+  } else {
     const auditRes = await fetch(VIS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-API-Key': VIS_KEY },
@@ -1634,24 +1699,26 @@ const PROSPECT_META = {
       weak = weakestCategory(audit);
       catScores = Object.fromEntries((audit.categories || []).map((c) => [c.id, c.score]));
     } else if (auditRes.status === 429) {
-      console.warn('AUDIT_RATE_LIMITED — staging with placeholder score', score, grade);
-      auditNote = 'Audit skipped (rate limit); placeholder score — re-audit later.';
+      throw new Error(
+        'visibility audit → 429 rate limited. Use VISIBILITY_API_KEY (owner key, not the ' +
+          '20/hour demo key) and retry, or pass --score=<measured value>. Staging with a ' +
+          'placeholder would put an invented score in front of the prospect.',
+      );
     } else {
       throw new Error(`visibility audit → ${auditRes.status}: ${auditText.slice(0, 300)}`);
     }
-  } else {
-    console.warn('AUDIT_SKIPPED — using score', score, grade);
-    auditNote = 'Audit skipped (--skip-audit/--score); placeholder score — re-audit later.';
   }
   console.log('AUDIT', score, grade, weak.name, weak.score);
 
   // Contacts
   let html = '';
-  for (const page of [url, `${url}/contact`, `${url}/contact-us`, `${url}/contacto`]) {
-    try {
-      const r = await fetch(page, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AIPA/1.0)' } });
-      if (r.ok) html += '\n' + await r.text();
-    } catch { /* skip */ }
+  if (!noScrape) {
+    for (const page of [url, `${url}/contact`, `${url}/contact-us`, `${url}/contacto`]) {
+      try {
+        const r = await fetch(page, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AIPA/1.0)' } });
+        if (r.ok) html += '\n' + await r.text();
+      } catch { /* skip */ }
+    }
   }
   const contacts = parseContacts(html);
   console.log('CONTACTS', JSON.stringify(contacts));
@@ -1724,6 +1791,8 @@ const PROSPECT_META = {
   const emailBody = buildManualEmailBody(draft, { botFallback: false });
 
   if (!dryRun) {
+    fs.mkdirSync(path.join(root, 'docs/selling/drafts'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'docs/selling/prospects'), { recursive: true });
     fs.writeFileSync(path.join(root, draftPath), draft + '\n', { encoding: 'utf8' });
     registerOutreachSlug(slug, phoneForLinks, draftPath, meta.company, {
       email: contacts.email,
@@ -1753,7 +1822,7 @@ const PROSPECT_META = {
       : '(no public WhatsApp — EMAIL PRIMARY)';
 
   // Dedupe (skipped in --update mode, where hitting the existing deal is the point)
-  if (KEY && !updateDealId) {
+  if (KEY && !updateDealId && !offline) {
     const existing = await hs('POST', '/crm/v3/objects/deals/search', {
       filterGroups: [{ filters: [{ propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: meta.company.split(' ')[0] }] }],
       properties: ['dealname'],
@@ -1766,7 +1835,9 @@ const PROSPECT_META = {
     }
   }
 
-  const auditLine = `${score}/100 Grade ${grade} | Tech ${catScores.techSeo ?? '?'} | AI Access ${catScores.aiAccess ?? '?'} | GEO ${catScores.geo ?? '?'} | AEO ${catScores.aeo ?? '?'} (${weak.name} ${weak.score} weakest)`;
+  const auditLine =
+    `${score}/100 Grade ${grade} | Tech ${catScores.techSeo ?? '?'} | AI Access ${catScores.aiAccess ?? '?'} | GEO ${catScores.geo ?? '?'} | AEO ${catScores.aeo ?? '?'}` +
+    (weak.score != null ? ` (${weak.name} ${weak.score} weakest)` : ' (no live category breakdown)');
   const emailBlock = [
     '',
     '--- EMAIL (mismo texto que el link aipa@ de arriba — backup si el link se trunca) ---',
@@ -1792,8 +1863,9 @@ const PROSPECT_META = {
     escHtml(draft),
     ...emailBlock,
     '',
-    '--- Audit (verified live) ---',
+    auditNote ? '--- Audit (ASSERTED, not measured in this run) ---' : '--- Audit (verified live) ---',
     escHtml(auditLine),
+    ...(auditNote ? [`<b>⚠️ ${escHtml(auditNote)}</b>`] : []),
     '',
     `Angle: "${score >= CREDENTIAL_SCORE && meta.pivot ? 'audit is the CREDENTIAL — pivot to AI Growth Operator' : score >= CREDENTIAL_SCORE ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
     '',
@@ -1808,6 +1880,44 @@ const PROSPECT_META = {
     console.log('DRY_RUN dealName', dealName);
     console.log('DRAFT_PREVIEW', draft.slice(0, 200) + '...');
     console.log('WA', phoneDisplay, '| EMAIL', contacts.email, emailUnverified ? '(UNVERIFIED)' : '');
+    return;
+  }
+
+  // --prepare-only: every artifact on disk, nothing in HubSpot. The pack carries the
+  // note HTML verbatim, so the two send buttons can be reviewed (or pasted into a deal
+  // by hand) exactly as the live path would post them.
+  if (prepareOnly) {
+    fs.writeFileSync(
+      path.join(root, prospectPath),
+      buildPack({
+        company: meta.company,
+        dealName,
+        draftPath,
+        emailDraftPath,
+        slug,
+        email: contacts.email,
+        emailUnverified,
+        emailOnlyOk: !!meta.emailOnlyOk,
+        auditNote,
+        ids: null,
+        noteHtml,
+      }),
+      'utf8',
+    );
+    console.log(JSON.stringify({
+      ok: true,
+      mode: 'prepare-only',
+      domain,
+      dealName,
+      email: contacts.email,
+      emailUnverified,
+      phone: phoneDisplay,
+      draftPath,
+      emailDraftPath,
+      prospectPath,
+      emailOneClick: `https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}`,
+      hubspot: 'not touched (--prepare-only)',
+    }, null, 2));
     return;
   }
 
@@ -1917,15 +2027,39 @@ const PROSPECT_META = {
     score,
     dealId,
   });
-  const pack = `# [CLIENT-MANUAL] ${meta.company} — HubSpot note pack
+  fs.writeFileSync(
+    path.join(root, prospectPath),
+    buildPack({
+      company: meta.company,
+      dealName,
+      draftPath,
+      emailDraftPath,
+      slug,
+      email: contacts.email,
+      emailUnverified,
+      emailOnlyOk: !!meta.emailOnlyOk,
+      auditNote,
+      ids: { dealId, companyId, contactId, noteId: note.id, taskId: task.id },
+      noteHtml,
+    }),
+    'utf8',
+  );
 
-> Staged ${new Date().toISOString().slice(0, 10)}. Deal: \`${dealName}\` (ID ${dealId}).
-> Draft: \`${draftPath}\`
-> Email one-click: \`https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}\` (from aipa@aideazz.xyz)
-${emailUnverified ? `> ⚠️ Email \`${contacts.email}\` is UNVERIFIED fallback — confirm before send.\n` : ''}${meta.emailOnlyOk ? '> ⚠️ EMAIL-PRIMARY — no public WhatsApp found; use email one-click.\n' : ''}
-Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note **${note.id}** | Send task **${task.id}**
-`;
-  fs.writeFileSync(path.join(root, prospectPath), pack, 'utf8');
+  // --with-fu closes the cycle in the same command: the follow-up installer writes the
+  // FU WhatsApp + FU email drafts, registers the `{slug}-fu` row and puts both FU
+  // buttons at the top of the note. Without it the deal ships with first-contact
+  // buttons only and someone has to remember a second command.
+  let fuResult = null;
+  if (withFu) {
+    const fu = spawnSync(process.execPath, [path.join(__dirname, '_install-wa-fu-notes.cjs'), `--only=${dealId}`], {
+      cwd: root,
+      encoding: 'utf8',
+      env: process.env,
+    });
+    if (fu.stderr) process.stderr.write(fu.stderr);
+    fuResult = fu.status === 0 ? 'installed' : `FAILED (exit ${fu.status}) — run: node scripts/_install-wa-fu-notes.cjs --only=${dealId}`;
+    if (fu.stdout) console.log(fu.stdout.trim());
+  }
 
   console.log(JSON.stringify({
     ok: true,
@@ -1939,15 +2073,17 @@ Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note 
     email: contacts.email,
     emailUnverified,
     emailOnlyOk: !!meta.emailOnlyOk,
-    audit: { score, grade, weak },
+    audit: { score, grade, weak, ...(auditNote ? { warning: auditNote } : {}) },
     phone: phoneDisplay,
     draftPath,
+    emailDraftPath,
     prospectPath,
+    followUp: fuResult || 'not installed (pass --with-fu)',
     emailOneClick: `https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}`,
   }, null, 2));
   console.warn('');
   console.warn('⚠️  EMAIL ONE-CLICK requires GitHub push (else UI: Unknown outreach email slug):');
-  console.warn(`    git add docs/selling/outreach-registry.json ${draftPath} ${emailDraftPath}`);
+  console.warn(`    git add docs/selling/outreach-registry.json docs/selling/drafts/${slug}*.txt ${prospectPath}`);
   console.warn('    git commit && git push origin main');
   console.warn('    Oracle: cd ~/cto-aipa && git pull && npm run build && pm2 restart cto-aipa');
   console.warn('    (After go-wa GitHub fallback is deployed: push alone is enough for confirm page.)');
