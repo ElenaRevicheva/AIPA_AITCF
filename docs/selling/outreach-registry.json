@@ -2274,5 +2274,14 @@
     "phone": "5073939910",
     "emailDraft": "docs/selling/drafts/sotillo-company-pty-fu-email.txt",
     "draft": "docs/selling/drafts/sotillo-company-pty-fu.txt"
+  },
+  "arden-price": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/arden-price.txt",
+    "company": "Arden & Price",
+    "email": "info@arden-price.com",
+    "emailDraft": "docs/selling/drafts/arden-price-email.txt",
+    "dealId": "63541851801",
+    "score": 82
   }
 }
