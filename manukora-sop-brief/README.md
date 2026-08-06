@@ -155,33 +155,3 @@ Shopify + Klaviyo, engagement-triggered delivery across NZ/LA/travel without
 geolocation, sub-$50/mo operating cost, and an alert on *absence* of a brief.
 
 → [`docs/PART2_MORNING_INTELLIGENCE_BRIEF.md`](docs/PART2_MORNING_INTELLIGENCE_BRIEF.md)
-
-
----
-
-## Publishing the submission repo
-
-Manukora wants **one GitHub repository link**. This folder is the deliverable.
-A clean 4-commit history is packaged as a git bundle:
-
-```bash
-# On a machine where `gh auth` is ElenaRevicheva:
-./scripts/publish_submission_repo.sh
-# → https://github.com/ElenaRevicheva/manukora-sop-brief
-```
-
-Or manually:
-
-```bash
-git clone docs/evidence/manukora-sop-brief.bundle ~/manukora-sop-brief
-cd ~/manukora-sop-brief
-gh repo create ElenaRevicheva/manukora-sop-brief --public --source=. --remote=origin --push
-```
-
-Optional: regenerate the briefing with a live model before pushing:
-
-```bash
-export OPENAI_API_KEY=...   # or ANTHROPIC / GROQ / XAI
-python3 -m src.main --prefer openai
-git add output && git commit -m "chore: regenerate briefing with OpenAI narration"
-```
