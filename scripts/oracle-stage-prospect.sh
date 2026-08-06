@@ -32,10 +32,40 @@ echo "--- fetching $REF ---"
 git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
 git checkout FETCH_HEAD -- scripts/ 2>&1 || echo "WARN: scripts/ checkout failed — using the copy already on the box"
 
-# Snapshot docs/selling so only this run's output is shipped back. Staging appends to a
-# shared 80KB registry, so sending the whole directory back would clobber concurrent work.
+# Ship back ONLY what this run wrote. Oracle's docs/selling is routinely dirty with
+# in-flight work — the first run of this bridge found 21 already-modified files — and
+# packing the whole dirty tree would commit someone else's uncommitted edits. Compare
+# content hashes before and after, so an edit to an already-dirty file is still caught.
+snapshot() { find docs/selling -type f -exec md5sum {} + 2>/dev/null | sort -k2; }
 BEFORE=$(mktemp)
-git status --porcelain -- docs/selling | awk '{print $2}' | sort > "$BEFORE"
+snapshot > "$BEFORE"
+
+# On a dry run, also print the full audit. The pitch copy in PROSPECT_META quotes the
+# site's real weaknesses, and writing it from a bare score invites the "we told an
+# A-grade site it was invisible" mistake. Oracle can reach both the engine and the site.
+case " ${FLAGS[*]-} " in
+  *" --dry-run "*)
+    VIS_KEY=$(sed -n 's/^VISIBILITY_API_KEY=//p' .env | head -1 | tr -d '[:space:]')
+    [ -n "$VIS_KEY" ] || VIS_KEY=$(sed -n 's/^VISIBILITY_API_KEYS=//p' .env | head -1 | cut -d, -f1 | tr -d '[:space:]')
+    [ -n "$VIS_KEY" ] || VIS_KEY=aidz_demo_visibility_2026
+    echo "--- full audit for $DOMAIN ---"
+    curl -sS -m 60 -X POST https://webhook.aideazz.xyz/cto/v1/visibility \
+      -H "Content-Type: application/json" -H "X-API-Key: $VIS_KEY" \
+      -d "{\"url\":\"https://$DOMAIN\"}" |
+      node -e '
+        let s = "";
+        process.stdin.on("data", (d) => (s += d)).on("end", () => {
+          const r = JSON.parse(s);
+          console.log("score", r.score, r.grade, "|", (r.categories || []).map((c) => `${c.id}:${c.score}`).join(" "));
+          console.log("verdict:", r.verdict);
+          for (const f of r.topFixes || []) console.log("  fix:", f);
+          for (const c of (r.checks || []).filter((x) => x.status !== "pass")) {
+            console.log(`  ${c.status.toUpperCase()} ${c.id} — ${c.detail}`);
+          }
+        });
+      ' || echo "WARN: audit detail unavailable"
+    ;;
+esac
 
 echo "--- node scripts/stage-manual-prospect.cjs $DOMAIN ${FLAGS[*]-} ---"
 set +e
@@ -45,17 +75,21 @@ set -e
 echo "--- stage exit code: $RC ---"
 
 AFTER=$(mktemp)
-git status --porcelain -- docs/selling | awk '{print $2}' | sort > "$AFTER"
+snapshot > "$AFTER"
+
+CHANGED=$(mktemp)
+# Any hash line present after but not before = created or rewritten by this run.
+comm -13 "$BEFORE" "$AFTER" | sed 's/^[0-9a-f]*  //' | sort -u > "$CHANGED"
 
 OUT=/tmp/stage-prospect-output.tar.gz
 rm -f "$OUT"
-if [ -s "$AFTER" ]; then
-  # The registry is shared, so ship it whenever it moved; drafts are per-slug and safe.
-  tar -czf "$OUT" -T "$AFTER" 2>/dev/null && echo "--- packed $(wc -l < "$AFTER") changed file(s) → $OUT ---"
+if [ -s "$CHANGED" ]; then
+  echo "--- this run touched: ---"
+  sed 's/^/      /' "$CHANGED"
+  tar -czf "$OUT" -T "$CHANGED" 2>/dev/null && echo "--- packed $(wc -l < "$CHANGED") file(s) → $OUT ---"
 else
   echo "--- no docs/selling changes to pack (dry run, or nothing written) ---"
 fi
-diff "$BEFORE" "$AFTER" >/dev/null 2>&1 && echo "--- note: working tree unchanged under docs/selling ---"
-rm -f "$BEFORE" "$AFTER"
+rm -f "$BEFORE" "$AFTER" "$CHANGED"
 
 exit $RC
