@@ -1,0 +1,125 @@
+# Stage a Manual Prospect Play prospect into HubSpot, from a Cursor cloud agent.
+#
+# The credentials live on the Oracle VM, not in this repo and not on an agent VM: a cloud
+# agent has no HUBSPOT_API_KEY and its egress allowlist excludes api.hubapi.com, so
+# `node scripts/stage-manual-prospect.cjs <domain>` can only ever run on Oracle. This
+# workflow is the bridge — same trigger-file pattern as deploy-oracle-on-trigger.yml,
+# because agent tokens get HTTP 403 on the workflow_dispatch API.
+#
+# It also commits whatever the run wrote under docs/selling back to the triggering branch.
+# That step is load-bearing: /go/outreach-email/{slug} resolves slugs from the committed
+# registry, so a staging run that is never committed leaves a dead email button.
+#
+# Usage (cloud agent or laptop):
+#   echo "example.com --dry-run" > .stage-trigger
+#   git add .stage-trigger && git commit -m "stage: example.com (recon)" && git push
+#
+# Drop --dry-run to create the five HubSpot records. Staging never sends anything —
+# the human gate on WhatsApp/email is unchanged.
+
+name: Stage manual prospect (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".stage-trigger"]
+
+permissions:
+  contents: write
+
+jobs:
+  stage-prospect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .stage-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .stage-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.stage-trigger is empty"; exit 1; }
+
+          # An idle trigger must be a clean no-op. The file keeps the last run's domain,
+          # so merging a branch that staged someone would otherwise re-run the play on
+          # main and post a second note to a prospect who is already in the CRM.
+          case "$LINE" in
+            \#*|none) echo "Trigger is idle ('$LINE') — nothing to stage."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+          esac
+
+          DOMAIN=$(echo "$LINE" | awk '{print $1}' | tr '[:upper:]' '[:lower:]')
+          DOMAIN=${DOMAIN#http://}; DOMAIN=${DOMAIN#https://}; DOMAIN=${DOMAIN%%/*}
+          if ! echo "$DOMAIN" | grep -Eq '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$'; then
+            echo "::error::'$DOMAIN' is not a bare domain"; exit 1
+          fi
+
+          # Allowlist the flags: this runs a CRM write with production credentials, so the
+          # trigger file must not be able to smuggle arbitrary argv into the node process.
+          FLAGS=$(echo "$LINE" | cut -s -d' ' -f2-)
+          for f in $FLAGS; do
+            case "$f" in
+              --dry-run|--collect-only|--skip-audit|--score=[0-9]|--score=[0-9][0-9]|--score=100|--update=[0-9]*) ;;
+              *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
+            esac
+          done
+
+          echo "domain=$DOMAIN" >> "$GITHUB_OUTPUT"
+          echo "flags=$FLAGS" >> "$GITHUB_OUTPUT"
+          echo "Staging '$DOMAIN' with flags: ${FLAGS:-<none>}"
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      - name: Run the play on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+          DOMAIN: ${{ steps.trigger.outputs.domain }}
+          FLAGS: ${{ steps.trigger.outputs.flags }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20"
+
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+            "$REF" "$DOMAIN" $FLAGS < scripts/oracle-stage-prospect.sh
+          RC=$?
+          echo "--- remote exit code: $RC ---"
+
+          # shellcheck disable=SC2086
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/stage-prospect-output.tar.gz /tmp/ 2>/dev/null \
+            && echo "--- pulled staging output ---" \
+            || echo "--- no staging output to pull (dry run, or the run failed) ---"
+
+          rm -f ~/.ssh/oracle
+          exit $RC
+
+      - name: Commit registry + drafts
+        if: success() && steps.trigger.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          if [ ! -f /tmp/stage-prospect-output.tar.gz ]; then
+            echo "Nothing to commit — no files came back."; exit 0
+          fi
+          tar -xzf /tmp/stage-prospect-output.tar.gz -C .
+          git add -A docs/selling
+          if git diff --cached --quiet; then
+            echo "Nothing to commit — docs/selling is unchanged."; exit 0
+          fi
+          git config user.name "aipa-staging[bot]"
+          git config user.email "aipa@aideazz.xyz"
+          git commit \
+            -m "selling: stage ${{ steps.trigger.outputs.domain }} — registry + drafts" \
+            -m "Committed from Oracle so /go/outreach-email/{slug} resolves the slug. Without this the email button 404s with 'Unknown outreach email slug'."
+          git push origin HEAD:${{ github.ref_name }}

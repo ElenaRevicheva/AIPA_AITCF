@@ -21,6 +21,50 @@ In LATAM, **WhatsApp is the primary app**. On HubSpot **Starter**, email is stil
 
 ---
 
+## Aug 6 2026 — a cloud agent can run the play (`.stage-trigger`)
+
+The credentials are on Oracle, not in this repo and not on an agent VM: a Cursor cloud
+agent has no `HUBSPOT_API_KEY`, and its egress allowlist excludes `api.hubapi.com`, so
+`node scripts/stage-manual-prospect.cjs` could only ever be run by hand. Oracle holds
+`.env`, and `ORACLE_SSH_KEY` already reaches Oracle from CI, so the play now runs there:
+
+```bash
+echo "example.com --dry-run" > .stage-trigger   # recon: audit + contacts, no CRM writes
+echo "example.com"           > .stage-trigger   # create the five records
+git add .stage-trigger && git commit -m "stage: example.com" && git push
+```
+
+`.github/workflows/stage-prospect-on-trigger.yml` → `scripts/oracle-stage-prospect.sh`.
+Argv is allowlisted (bare domain + known flags) because the step runs a CRM write with
+production credentials. A first line of `#…` or `none` is an idle no-op, so merging a
+branch that staged someone does not re-run the play on main.
+
+**The commit-back is load-bearing.** The workflow pulls whatever the run wrote under
+`docs/selling` and commits it to the triggering branch, because `/go/outreach-email/{slug}`
+resolves the slug from the **committed** registry. The first run of this bridge created the
+HubSpot records and then failed to ship the files back — which is exactly the dead-button
+defect the July recovery passes cleaned up. Use `--collect-only` to recover such a run:
+it packs the output without re-running the play, since a second real run duplicates the
+deal and `--update=` duplicates the note.
+
+### EMAIL-PRIMARY is a real outcome, not a failure
+
+`parseContacts` used to require a literal `+507`, so a site printing `507 300-2858` read as
+phone-less. Widening the match alone would have been worse: **Panama landlines are 7 digits
+and have no WhatsApp**, and `wa.me` on one opens a chat with nobody. Now only a declared
+`wa.me`/`api.whatsapp.com` link, a Panama **mobile** (`507` + `6xxxxxxx`), or a
+human-asserted `preferredPhone` carries WhatsApp; any other published line still lands on
+the CRM record so it can be called.
+
+The note used to draw a WhatsApp button even for the `00000000000` placeholder, so every
+`emailOnlyOk` deal shipped a dead button — and since `_audit-full-cycle-coverage.cjs`
+counts anchors, those deals **reported a complete cycle**. The note now says *"Sin WhatsApp
+público — este prospecto es EMAIL-PRIMARY"*. Note the consequence: an email-primary deal can
+never satisfy that audit's `waCount >= 2` rule, so it will always list as incomplete until
+the rule learns about email-primary prospects.
+
+---
+
 ## Aug 1 2026 — audited truth of the first 65 deals (Alquiler de Yates → Gamboa)
 
 Every number below came from Resend message IDs in the send log plus Resend's own
