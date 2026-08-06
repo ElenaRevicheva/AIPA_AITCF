@@ -24,7 +24,7 @@ const { spawn } = require('child_process');
 const REPO = path.join(__dirname, '..');
 const DOMAIN = process.argv.find((a) => !a.startsWith('-') && a.includes('.') && !a.endsWith('.cjs')) || 'abolu.net';
 
-/** Fixture audit — shaped like the real engine's payload, values are not measurements. */
+/** Fixture audits — shaped like the real engine's payload, values are not measurements. */
 const MOCK_AUDIT = {
   score: 71,
   grade: 'C',
@@ -33,6 +33,18 @@ const MOCK_AUDIT = {
     { id: 'aiAccess', label: 'AI Access', score: 90 },
     { id: 'geo', label: 'GEO', score: 62 },
     { id: 'aeo', label: 'AEO', score: 48 },
+  ],
+};
+
+/** Above CREDENTIAL_SCORE: the letter must pivot instead of inventing a gap. */
+const MOCK_AUDIT_CREDENTIAL = {
+  score: 89,
+  grade: 'A',
+  categories: [
+    { id: 'techSeo', label: 'Tech', score: 86 },
+    { id: 'aiAccess', label: 'AI Access', score: 100 },
+    { id: 'geo', label: 'GEO', score: 81 },
+    { id: 'aeo', label: 'AEO', score: 88 },
   ],
 };
 
@@ -65,6 +77,12 @@ function createMockHubSpot() {
       )
       .map((a) => (a.from.startsWith(`${toType}:`) ? a.from : a.to).split(':')[1]);
 
+  // HubSpot's object search is eventually consistent: a deal created seconds ago is not
+  // in the index yet. Abolu's first real staging hit exactly this — the follow-up
+  // installer searched, found nothing and patched nothing, while the deal plainly
+  // existed. On by default so the cycle is tested the way it actually runs.
+  const state = { searchIndexLag: true };
+
   const server = http.createServer(async (req, res) => {
     const [pathname] = req.url.split('?');
     const body = req.method === 'GET' ? {} : await readBody(req);
@@ -79,6 +97,7 @@ function createMockHubSpot() {
     let m;
     if ((m = pathname.match(/^\/crm\/v3\/objects\/(\w+)\/search$/)) && req.method === 'POST') {
       const type = m[1];
+      if (state.searchIndexLag) return send(200, { results: [], total: 0 });
       const token = body.filterGroups?.[0]?.filters?.find((f) => f.operator === 'CONTAINS_TOKEN')?.value || '';
       const results = Object.entries(store[type] || {})
         .filter(([, o]) => JSON.stringify(o.properties).toLowerCase().includes(token.toLowerCase()))
@@ -106,16 +125,17 @@ function createMockHubSpot() {
     return send(404, { message: `mock hubspot: unhandled ${req.method} ${pathname}` });
   });
 
-  return { server, store, associations, calls };
+  return { server, store, associations, calls, state };
 }
 
 function createMockVisibility() {
+  const state = { audit: MOCK_AUDIT };
   const server = http.createServer(async (req, res) => {
     await readBody(req);
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(MOCK_AUDIT));
+    res.end(JSON.stringify(state.audit));
   });
-  return { server };
+  return { server, state };
 }
 
 /** Throwaway repo: real scripts, empty selling tree — the repo's own drafts stay put. */
@@ -298,8 +318,39 @@ function check(name, fn) {
     assert.match(pack, new RegExp(`Deal \\*\\*${deal[0]}\\*\\*`));
     assert.match(pack, /web\.whatsapp\.com\/send/);
   });
-  check('the run reports the follow-up as installed', () =>
-    assert.strictEqual(out.followUp, 'installed'));
+  check('follow-up installs even though the deal is not in the search index yet', () => {
+    assert.ok(hub.state.searchIndexLag, 'this run must exercise the lag');
+    assert.strictEqual(out.followUp, 'installed');
+  });
+
+  // 4. A second staging of the same prospect must refuse, not create a second deal.
+  hub.state.searchIndexLag = false;
+  const duplicate = await run(sandbox, [DOMAIN, '--no-scrape', '--with-fu'], env);
+  check('re-staging the same prospect is refused as a duplicate', () => {
+    assert.notStrictEqual(duplicate.status, 0);
+    assert.match(duplicate.stdout + duplicate.stderr, /DUPLICATE/);
+    assert.strictEqual(Object.keys(hub.store.deals).length, 1, 'a second deal was created');
+  });
+
+  // 5. A high scorer gets the credential letter — and a subject that matches it.
+  vis.state.audit = MOCK_AUDIT_CREDENTIAL;
+  const credentialSandbox = makeSandbox();
+  const credential = await run(credentialSandbox, [DOMAIN, '--no-scrape', '--prepare-only'], env);
+  check('a credential-score letter pivots instead of inventing a gap', () => {
+    assert.strictEqual(credential.status, 0, credential.stderr);
+    const letter = fs.readFileSync(path.join(credentialSandbox, lastJson(credential.stdout).draftPath), 'utf8');
+    assert.match(letter, /no les voy a inventar un problema que no tienen/);
+    assert.doesNotMatch(letter, /todavía no aparece como respuesta citable/);
+  });
+  check('the credential subject line does not promise 3 fixes', () => {
+    const emailDraft = fs.readFileSync(
+      path.join(credentialSandbox, lastJson(credential.stdout).emailDraftPath),
+      'utf8',
+    );
+    const subject = emailDraft.match(/^SUBJECT: (.+)$/m)[1];
+    assert.doesNotMatch(subject, /3 arreglos concretos/, `subject contradicts the letter: ${subject}`);
+    assert.match(subject, new RegExp(`${MOCK_AUDIT_CREDENTIAL.score}/100`));
+  });
 
   // Artifacts for review: the note exactly as HubSpot received it. Kept in the sandbox
   // so a test run never leaves anything behind in the repo.

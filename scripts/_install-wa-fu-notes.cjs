@@ -190,30 +190,37 @@ function buildFuEmailDraft({ company, to, score, fuText }) {
     if (cfg.dealId) byDeal.set(String(cfg.dealId), { slug, ...cfg });
   }
 
-  const deals = [];
-  let after;
-  do {
-    const body = {
-      filterGroups: [
-        {
-          filters: [
-            { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: 'CLIENT-MANUAL' },
-            { propertyName: 'createdate', operator: 'GTE', value: String(SINCE) },
-          ],
-        },
-      ],
-      properties: ['dealname', 'dealstage'],
-      limit: 100,
-    };
-    if (after) body.after = after;
-    const page = await hs('POST', '/crm/v3/objects/deals/search', body);
-    deals.push(...(page.results || []));
-    after = page.paging?.next?.after;
-    await sleep(200);
-  } while (after);
-
-  // --only=<substring|dealId> → single-deal test run before touching the batch
+  // --only=<dealId> → fetch that deal directly. HubSpot's deal search is eventually
+  // consistent, so a deal created seconds earlier (stage-manual-prospect.cjs --with-fu)
+  // is not in the index yet: the search returned deals:0 for Abolu while the deal plainly
+  // existed, and the run reported a follow-up it had never installed. An id needs no index.
+  // --only=<substring|dealId> → single-deal run; a substring still goes through search.
   const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').split('=')[1];
+  const deals = [];
+  if (/^\d+$/.test(ONLY || '')) {
+    deals.push(await hs('GET', `/crm/v3/objects/deals/${ONLY}?properties=dealname,dealstage`));
+  } else {
+    let after;
+    do {
+      const body = {
+        filterGroups: [
+          {
+            filters: [
+              { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: 'CLIENT-MANUAL' },
+              { propertyName: 'createdate', operator: 'GTE', value: String(SINCE) },
+            ],
+          },
+        ],
+        properties: ['dealname', 'dealstage'],
+        limit: 100,
+      };
+      if (after) body.after = after;
+      const page = await hs('POST', '/crm/v3/objects/deals/search', body);
+      deals.push(...(page.results || []));
+      after = page.paging?.next?.after;
+      await sleep(200);
+    } while (after);
+  }
   const real = deals
     .filter((d) => !/HIT-LIST|remaining|queue/i.test(d.properties.dealname || ''))
     .filter((d) => !ONLY || d.id === ONLY || (d.properties.dealname || '').toLowerCase().includes(ONLY.toLowerCase()));

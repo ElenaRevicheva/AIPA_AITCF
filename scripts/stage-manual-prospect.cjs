@@ -234,6 +234,35 @@ function buildDraft(ctx) {
 }
 
 /**
+ * Close the cycle on a deal: FU WhatsApp + FU email drafts, the `{slug}-fu` registry row
+ * and both FU buttons at the top of its note.
+ *
+ * Reports what the installer actually did, not merely that it exited 0. On Abolu's first
+ * staging the installer found the deal missing from HubSpot's search index — it is
+ * eventually consistent and the deal was seconds old — so it patched nothing, exited 0,
+ * and the run announced a follow-up that did not exist.
+ */
+function installFollowUp(dealId) {
+  const fu = spawnSync(process.execPath, [path.join(__dirname, '_install-wa-fu-notes.cjs'), `--only=${dealId}`], {
+    cwd: root,
+    encoding: 'utf8',
+    env: process.env,
+  });
+  if (fu.stderr) process.stderr.write(fu.stderr);
+  if (fu.stdout) console.log(fu.stdout.trim());
+  const retry = `run: node scripts/_install-wa-fu-notes.cjs --only=${dealId}`;
+  if (fu.status !== 0) return `FAILED (exit ${fu.status}) — ${retry}`;
+  let summary = {};
+  try {
+    summary = JSON.parse(fu.stdout.slice(fu.stdout.indexOf('{')));
+  } catch {
+    return `UNKNOWN — installer printed no summary; ${retry}`;
+  }
+  if (summary.installed === 1) return 'installed';
+  return `NOT installed (${JSON.stringify(summary.errorList || summary.skipNoPhoneList || [])}) — ${retry}`;
+}
+
+/**
  * The reviewable pack for a staged prospect. Written by both paths: with HubSpot ids
  * after a live stage, and with the note HTML alone under --prepare-only.
  */
@@ -1814,19 +1843,20 @@ const PROSPECT_META = {
   });
 
   const slug = slugify(meta.company);
+  // The letter buildDraft() produced: above CREDENTIAL_SCORE with a pivot it leads with
+  // the score as a credential instead of a gap, and the deal name and subject line have
+  // to say the same thing the prospect is reading.
+  const credentialLetter = score >= CREDENTIAL_SCORE && !!meta.pivot;
   // A site above CREDENTIAL_SCORE has no GEO/AEO deficit to fix — naming the deal
   // "GEO/AEO fix" would misdescribe the offer (and mis-route hs-outcomes-to-atlas).
-  const offerLabel =
-    score >= CREDENTIAL_SCORE && meta.pivot
-      ? meta.dealOffer || 'AI Growth Operator'
-      : 'GEO/AEO fix';
+  const offerLabel = credentialLetter ? meta.dealOffer || 'AI Growth Operator' : 'GEO/AEO fix';
   const dealName = `[CLIENT-MANUAL] ${meta.company} — ${offerLabel} (audit: ${score}/${grade})`;
 
   const draftPath = `docs/selling/drafts/${slug}.txt`;
   const emailDraftPath = `docs/selling/drafts/${slug}-email.txt`;
   const prospectPath = `docs/selling/prospects/${meta.company.toUpperCase().replace(/\s+/g, '_')}.md`;
 
-  const emailSubject = buildManualEmailSubject(meta.company, score);
+  const emailSubject = buildManualEmailSubject(meta.company, score, { credential: credentialLetter });
   const emailBody = buildManualEmailBody(draft, { botFallback: false });
 
   if (!dryRun) {
@@ -1906,7 +1936,7 @@ const PROSPECT_META = {
     escHtml(auditLine),
     ...(auditNote ? [`<b>⚠️ ${escHtml(auditNote)}</b>`] : []),
     '',
-    `Angle: "${score >= CREDENTIAL_SCORE && meta.pivot ? 'audit is the CREDENTIAL — pivot to AI Growth Operator' : score >= CREDENTIAL_SCORE ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
+    `Angle: "${credentialLetter ? 'audit is the CREDENTIAL — pivot to AI Growth Operator' : score >= CREDENTIAL_SCORE ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
     '',
     `Top fixes: ${meta.topFixes}.`,
     '',
@@ -1979,9 +2009,30 @@ const PROSPECT_META = {
       score,
       dealId: updateDealId,
     });
+    fs.writeFileSync(
+      path.join(root, prospectPath),
+      buildPack({
+        company: meta.company,
+        dealName,
+        draftPath,
+        emailDraftPath,
+        slug,
+        email: contacts.email,
+        emailUnverified,
+        emailOnlyOk: !!meta.emailOnlyOk,
+        auditNote,
+        ids: { dealId: updateDealId, companyId: '—', contactId: '—', noteId: upNote.id, taskId: '—' },
+        noteHtml,
+      }),
+      'utf8',
+    );
+    // The FU block lives at the top of the newest note, so it has to be reinstalled after
+    // one is posted — otherwise --update silently buries the follow-up buttons.
+    const upFu = withFu ? installFollowUp(updateDealId) : null;
     console.log(JSON.stringify({
       ok: true, mode: 'update', dealId: updateDealId, dealName, noteId: upNote.id,
       email: contacts.email, emailUnverified, audit: { score, grade },
+      followUp: upFu || 'not installed (pass --with-fu)',
     }, null, 2));
     return;
   }
@@ -2088,17 +2139,7 @@ const PROSPECT_META = {
   // FU WhatsApp + FU email drafts, registers the `{slug}-fu` row and puts both FU
   // buttons at the top of the note. Without it the deal ships with first-contact
   // buttons only and someone has to remember a second command.
-  let fuResult = null;
-  if (withFu) {
-    const fu = spawnSync(process.execPath, [path.join(__dirname, '_install-wa-fu-notes.cjs'), `--only=${dealId}`], {
-      cwd: root,
-      encoding: 'utf8',
-      env: process.env,
-    });
-    if (fu.stderr) process.stderr.write(fu.stderr);
-    fuResult = fu.status === 0 ? 'installed' : `FAILED (exit ${fu.status}) — run: node scripts/_install-wa-fu-notes.cjs --only=${dealId}`;
-    if (fu.stdout) console.log(fu.stdout.trim());
-  }
+  const fuResult = withFu ? installFollowUp(dealId) : null;
 
   console.log(JSON.stringify({
     ok: true,
