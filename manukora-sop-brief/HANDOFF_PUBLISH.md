@@ -18,7 +18,9 @@ and pushes it to `https://github.com/ElenaRevicheva/manukora-sop-brief`.
 ```bash
 git clone manukora-sop-brief/docs/evidence/manukora-sop-brief.bundle ~/manukora-sop-brief
 cd ~/manukora-sop-brief
-gh repo create ElenaRevicheva/manukora-sop-brief --public --source=. --remote=origin --push
+gh repo create ElenaRevicheva/manukora-sop-brief --public \
+  --description "Manukora S&OP briefing automation — AI Automation Engineer practical brief" \
+  --source=. --remote=origin --push
 ```
 
 ## Optional before sending the link
