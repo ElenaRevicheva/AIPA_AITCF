@@ -65,6 +65,9 @@ function escHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
 }
 
+/** Panama mobiles are 8 digits starting with 6; landlines are 7 and have no WhatsApp. */
+const PA_MOBILE = /^5076\d{7}$/;
+
 function parseContacts(html) {
   const out = new Set();
   const patterns = [
@@ -72,12 +75,22 @@ function parseContacts(html) {
     /api\.whatsapp\.com\/send[^"']*phone=(\d+)/gi,
     /tel:([+\d\s-]+)/gi,
     /mailto:([^"'\s?]+)/gi,
-    /\+507[- ]?\d{3,4}[- ]?\d{4}/g,
+    // The plus is optional: Panama sites commonly print "507 300-2858". Requiring it
+    // made those sites look phone-less and silently downgraded them to email-only.
+    /(?<!\d)\+?507[\s.-]?\d{3,4}[\s.-]?\d{4}(?!\d)/g,
   ];
   for (const re of patterns) {
     let m;
     while ((m = re.exec(html)) !== null) out.add(m[1] || m[0]);
   }
+  // An explicit wa.me / api.whatsapp link is the site declaring a WhatsApp number —
+  // authoritative even when it is not a Panama mobile.
+  const waExplicit = [
+    ...[...html.matchAll(/wa\.me\/(\d+)/gi)].map(m => m[1]),
+    ...[...html.matchAll(/api\.whatsapp\.com\/send[^"']*phone=(\d+)/gi)].map(m => m[1]),
+  ]
+    .map(d => (d.length === 8 ? `507${d}` : d))
+    .filter(d => d.length >= 10);
   const phones = [...out]
     .map(p => {
       let d = p.replace(/\D/g, '');
@@ -115,7 +128,9 @@ function parseContacts(html) {
     .map(unglue)
     .filter(e => !junk.test(e))
     .filter(e => /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(e));
-  const wa = phones[0] || null;
+  // Only a declared WhatsApp link or a Panama mobile can receive a WhatsApp message.
+  // Handing a landline to wa.me produces a button that opens a chat with nobody.
+  const wa = waExplicit[0] || phones.find(p => PA_MOBILE.test(p)) || null;
   const onDomain = emails.find(e => e.endsWith(`@${domain}`) || e.includes(domain.split('.')[0]));
   const email = onDomain || emails[0] || null;
   return { phones: [...new Set(phones)], email, whatsapp: wa };
@@ -197,6 +212,38 @@ function buildDraft(ctx) {
 }
 
 const PROSPECT_META = {
+  // Audited live Aug 6 2026: 82/100 B — aiAccess 95, geo 81, aeo 75, techSeo 79.
+  // Crawlers reach them fine, so the letter must not call them invisible; the real gap
+  // is that nothing on the page is shaped like an answer an engine can lift.
+  'arden-price.com': {
+    company: 'Arden & Price',
+    city: 'Panama City',
+    // The letter renders this as "cuando un ${customer} le pregunta…", so it has to be a
+    // masculine noun phrase — "un empresa" is the kind of slip that ends a cold read.
+    customer: 'gerente general que necesita contratar a un ejecutivo senior en Panamá',
+    moneyQuery: '¿cuál es la mejor firma de executive search o headhunting en Panamá?',
+    compliment:
+      'su sitio ya está entre los mejor preparados que he medido en Panamá — 82/100, con acceso para crawlers de IA en 95/100 y sitio bilingüe EN/ES',
+    gapClause:
+      'no hay nada con forma de respuesta: cero titulares en forma de pregunta, sin marcado FAQPage/Service, sin llms.txt, y la meta-descripción del sitio dice literalmente "Executive Search Previous Next" (30 caracteres)',
+    dealOffer: 'AEO/GEO fix · answer-readiness para búsquedas de headhunting',
+    // Only used if a re-audit lands at 85+; keeps the letter honest either way.
+    pivot:
+      'En executive search la primera consulta ya no empieza en Google sino en ChatGPT, y quien contesta esa pregunta se queda con la búsqueda. Lo que hago es dejar el sitio en forma de respuesta citable para esas consultas, y encima montar el intake: un agente que califica al cliente que llega (posición, seniority, industria, urgencia, presupuesto) y al candidato espontáneo, y le pasa a su equipo el resumen listo en vez de un formulario más.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre su flujo actual — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine:
+      'dejo su sitio en forma de respuesta citable para los motores de IA, construyo agentes que califican clientes y candidatos 24/7 en EN/ES conectados a su CRM, automatización de intake y seguimiento, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) meta-descripción real de 50–170 caracteres, (2) FAQ con las preguntas que sus clientes hacen de verdad + FAQPage/Service JSON-LD, (3) llms.txt y sameAs a LinkedIn',
+    contactFirstName: 'Arden & Price',
+    contactLastName: '(Contact)',
+    // mailto: on the site — authoritative. The only published line, 507 300-2858, is a
+    // Panama City landline (mobiles start with 6), so wa.me cannot open it: EMAIL-PRIMARY,
+    // same call as Insignia Resources. The landline still lands on the CRM record to call.
+    preferredEmail: 'info@arden-price.com',
+    emailOnlyOk: true,
+  },
   'dopanama.com': {
     company: 'DoPanama',
     city: 'Panama City',
@@ -1625,15 +1672,25 @@ const PROSPECT_META = {
     contacts.email = `info@${domain}`;
     emailUnverified = true;
   }
-  const phoneDigits = contacts.whatsapp || contacts.phones[0] || (meta.preferredPhone && String(meta.preferredPhone).replace(/\D/g, ''));
-  if (!phoneDigits) {
+  // Two different questions, previously answered by one variable: which number goes on
+  // the CRM record (any published line is useful — Elena can call it), and which number
+  // can receive a WhatsApp message (only a declared WA link, a Panama mobile, or a
+  // human-asserted preferredPhone). A landline answering the first must not answer the
+  // second, or the deal ships a WhatsApp button that opens a chat with nobody.
+  const preferred = meta.preferredPhone ? String(meta.preferredPhone).replace(/\D/g, '') : '';
+  const crmPhone = contacts.whatsapp || contacts.phones[0] || preferred || '';
+  const waPhone = contacts.whatsapp || preferred || '';
+  if (!waPhone) {
     if (meta.emailOnlyOk && contacts.email) {
-      console.warn('EMAIL_ONLY — no public WA/phone; HubSpot note will prioritize email one-click');
+      console.warn(
+        `EMAIL_ONLY — no WhatsApp-capable number${crmPhone ? ` (published line ${formatPhone507(crmPhone)} is not a mobile)` : ''}; note will be email-primary`,
+      );
     } else {
       throw new Error(`No WhatsApp/phone found on ${domain} — add preferredPhone to PROSPECT_META`);
     }
   }
-  const phoneForLinks = phoneDigits || '00000000000';
+  const phoneDigits = crmPhone;
+  const phoneForLinks = waPhone || '00000000000';
   const draft = buildDraft({
     domain,
     score,
@@ -1689,7 +1746,11 @@ const PROSPECT_META = {
     slug,
   );
   const phoneFmt = phoneDigits ? formatPhone507(phoneDigits) : '';
-  const phoneDisplay = phoneDigits ? phoneFmt : '(no public WhatsApp — EMAIL PRIMARY)';
+  const phoneDisplay = waPhone
+    ? phoneFmt
+    : crmPhone
+      ? `${phoneFmt} (fijo — sin WhatsApp; EMAIL PRIMARY)`
+      : '(no public WhatsApp — EMAIL PRIMARY)';
 
   // Dedupe (skipped in --update mode, where hitting the existing deal is the point)
   if (KEY && !updateDealId) {

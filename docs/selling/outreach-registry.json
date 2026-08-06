@@ -628,8 +628,6 @@
     "dealId": "63051108381"
   },
   "san-blas-tour": {
-    "phone": "00000000000",
-    "draft": "docs/selling/drafts/san-blas-tour.txt",
     "company": "San Blas Tour",
     "email": "contact@sanblastour.com",
     "emailDraft": "docs/selling/drafts/san-blas-tour-email.txt",
@@ -2274,5 +2272,46 @@
     "phone": "5073939910",
     "emailDraft": "docs/selling/drafts/sotillo-company-pty-fu-email.txt",
     "draft": "docs/selling/drafts/sotillo-company-pty-fu.txt"
+  },
+  "arden-price": {
+    "company": "Arden & Price",
+    "email": "info@arden-price.com",
+    "emailDraft": "docs/selling/drafts/arden-price-email.txt",
+    "dealId": "63541851801",
+    "score": 82
+  },
+  "hospital-cima-compras-fu": {
+    "company": "Hospital CIMA (Compras)",
+    "email": "Compras@hospitalcima.com",
+    "emailDraft": "docs/selling/drafts/hospital-cima-compras-fu-email.txt",
+    "score": 70,
+    "dealId": "63062155835",
+    "phone": "+50622081106"
+  },
+  "balboa-academy-espaluz-fu": {
+    "company": "Balboa Academy",
+    "email": "contactba@balboa-academy.org",
+    "emailDraft": "docs/selling/drafts/balboa-academy-espaluz-fu-email.txt",
+    "dealId": "63367828303"
+  },
+  "amcham-panama-espaluz-fu": {
+    "company": "AmCham Panama",
+    "email": "info@panamcham.com",
+    "emailDraft": "docs/selling/drafts/amcham-panama-espaluz-fu-email.txt",
+    "dealId": "63351801898"
+  },
+  "odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-24-ho-fu": {
+    "company": "Odontologo Moisés Lukowiecki - Urgencia y Clínica Dental 24 Horas",
+    "email": "maribel-kmw@cableonda.net",
+    "emailDraft": "docs/selling/drafts/odontologo-mois-s-lukowiecki-urgencia-y-cl-nica-dental-24-ho-fu-email.txt",
+    "score": 75,
+    "phone": "+507 6674-4647"
+  },
+  "arden-price-fu": {
+    "company": "Arden & Price",
+    "email": "info@arden-price.com",
+    "emailDraft": "docs/selling/drafts/arden-price-fu-email.txt",
+    "score": 82,
+    "dealId": "63541851801"
   }
 }
