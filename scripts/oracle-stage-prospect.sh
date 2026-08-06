@@ -36,7 +36,9 @@ git checkout FETCH_HEAD -- scripts/ 2>&1 || echo "WARN: scripts/ checkout failed
 # in-flight work — the first run of this bridge found 21 already-modified files — and
 # packing the whole dirty tree would commit someone else's uncommitted edits. Compare
 # content hashes before and after, so an edit to an already-dirty file is still caught.
-snapshot() { find docs/selling -type f -exec md5sum {} + 2>/dev/null | sort -k2; }
+# Plain `sort` (whole line), not `sort -k2`: comm compares full lines and rejects input
+# sorted on a field, which is what silently lost the first real staging run's files.
+snapshot() { find docs/selling -type f -exec md5sum {} + 2>/dev/null | sort; }
 BEFORE=$(mktemp)
 snapshot > "$BEFORE"
 
@@ -97,19 +99,39 @@ case " ${FLAGS[*]-} " in
     ;;
 esac
 
-echo "--- node scripts/stage-manual-prospect.cjs $DOMAIN ${FLAGS[*]-} ---"
-set +e
-node scripts/stage-manual-prospect.cjs "$DOMAIN" "${FLAGS[@]}" 2>&1
-RC=$?
-set -e
-echo "--- stage exit code: $RC ---"
+# --collect-only recovers a staging run whose files never made it back, without
+# re-running the play: a second real run would create a duplicate deal, and --update
+# would post a duplicate note. Recovery must not cost CRM noise.
+case " ${FLAGS[*]-} " in
+  *" --collect-only "*)
+    echo "--- collect-only: no CRM writes, packing recent docs/selling output ---"
+    RC=0
+    ;;
+  *)
+    echo "--- node scripts/stage-manual-prospect.cjs $DOMAIN ${FLAGS[*]-} ---"
+    set +e
+    node scripts/stage-manual-prospect.cjs "$DOMAIN" "${FLAGS[@]}" 2>&1
+    RC=$?
+    set -e
+    echo "--- stage exit code: $RC ---"
+    ;;
+esac
 
 AFTER=$(mktemp)
 snapshot > "$AFTER"
 
 CHANGED=$(mktemp)
-# Any hash line present after but not before = created or rewritten by this run.
-comm -13 "$BEFORE" "$AFTER" | sed 's/^[0-9a-f]*  //' | sort -u > "$CHANGED"
+case " ${FLAGS[*]-} " in
+  *" --collect-only "*)
+    # Nothing ran, so there is no before/after delta to read. Fall back to recency and
+    # print every path, so a wrong file is caught in review rather than committed blind.
+    find docs/selling -type f -mmin -240 2>/dev/null | sort -u > "$CHANGED"
+    ;;
+  *)
+    # Any hash line present after but not before = created or rewritten by this run.
+    comm -13 "$BEFORE" "$AFTER" | sed 's/^[0-9a-f]*  //' | sort -u > "$CHANGED"
+    ;;
+esac
 
 OUT=/tmp/stage-prospect-output.tar.gz
 rm -f "$OUT"

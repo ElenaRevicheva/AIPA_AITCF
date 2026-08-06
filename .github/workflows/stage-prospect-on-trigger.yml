@@ -53,7 +53,7 @@ jobs:
           FLAGS=$(echo "$LINE" | cut -s -d' ' -f2-)
           for f in $FLAGS; do
             case "$f" in
-              --dry-run|--skip-audit|--score=[0-9]|--score=[0-9][0-9]|--score=100|--update=[0-9]*) ;;
+              --dry-run|--collect-only|--skip-audit|--score=[0-9]|--score=[0-9][0-9]|--score=100|--update=[0-9]*) ;;
               *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
             esac
           done
