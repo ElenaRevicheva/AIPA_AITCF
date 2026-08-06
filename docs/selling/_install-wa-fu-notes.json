@@ -1,18 +1,10 @@
 {
-  "deals": 1,
-  "installed": 1,
+  "deals": 0,
+  "installed": 0,
   "skipNoPhone": 0,
   "errors": 0,
   "skipNoPhoneList": [],
   "errorList": [],
-  "ok": [
-    {
-      "dealId": "63083296695",
-      "company": "Dental Connect",
-      "phone": "18885758150",
-      "score": 87,
-      "noteId": "113719399545"
-    }
-  ],
-  "at": "2026-07-26T15:10:58.843Z"
+  "ok": [],
+  "at": "2026-08-06T23:10:17.264Z"
 }
