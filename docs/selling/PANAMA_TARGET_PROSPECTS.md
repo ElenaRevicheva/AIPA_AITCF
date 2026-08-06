@@ -215,6 +215,7 @@ Validated shape: **Eurostone**, **AIRCO / SINOTRUK**, **Nomad Constructions**. Q
 
 | Prospect | Domain | Notes |
 |---|---|---|
+| Abolu Best Value · QUEUED | abolu.net | Largest hardware wholesaler in Panama (Grupo Caco Abbo; 8,000+ SKU, 50+ marcas, Juan Díaz). WA +507 6670-8797 · servicioalcliente@abolu.net — both from their own catalogue/site. Ready to stage: `node scripts/stage-manual-prospect.cjs abolu.net --with-fu` · brief in `prospects/ABOLU_BEST_VALUE.md` |
 | Nomad Constructions Corp · SENT | nomadcc.com | Pedasí/Azuero — ✅ STAGED 2026-07-19 (deal 62832583063; 90/A) — 📧 + +4d follow-up |
 | Prestige Storage · SENT | prestigestorage.com.pa | ✅ STAGED 2026-07-20 (deal 62867929503) — 📧 + +4d follow-up |
 | Construction & home improvement | (mine) | Kitchens, pools, solar, windows/aluminum, cladding/stone, AC/HVAC — prefer `.com.pa` + WA |

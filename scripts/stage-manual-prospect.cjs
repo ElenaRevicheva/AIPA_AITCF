@@ -1643,6 +1643,45 @@ const PROSPECT_META = {
     contactLastName: '(WhatsApp contact)',
     preferredPhone: '50766329199',
   },
+  /**
+   * Abolu, S.A. (Grupo Caco Abbo) — the largest hardware wholesaler in Panama: 8,000+
+   * SKUs, 50+ brands, nationwide delivery under 48h, and the Panama distributor of the
+   * group's own Best Value tool brand. HQ Edificio Abolu, Llano Bonito, Juan Díaz.
+   *
+   * Contacts come from Abolu's own published material, not from guesswork. The site
+   * footer prints servicioalcliente@abolu.net and Tel (+507) 233-7525; their product
+   * catalogue prints "WHATSAPP 6670-8797 / CALL CENTER 233-7525 / VÍA EMAIL
+   * VENTAS@ABOLU.NET" on the ordering pages. 233-7525 is a landline (Panama mobiles start
+   * with 6), so the site scrape alone finds no WhatsApp-capable number — hence
+   * preferredPhone. The other number in that catalogue, 6981-6633, is always paired with
+   * WeChat: that is the export desk, not the Panama sales line, so it is not used here.
+   *
+   * Nothing below quotes an audit number: score, grade and the weakest category come from
+   * the live run of the visibility engine at staging time.
+   */
+  'abolu.net': {
+    company: 'Abolu Best Value',
+    city: 'Panama City',
+    customer: 'dueño de ferretería que necesita reabastecer su tienda en Panamá',
+    moneyQuery: '¿cuál es el mejor distribuidor mayorista de ferretería en Panamá?',
+    compliment:
+      'son el mayorista ferretero más grande de Panamá, con más de 8,000 SKU, más de 50 marcas, entregas a nivel nacional en menos de 48 horas y su propia marca Best Value',
+    gapClause:
+      'todo ese catálogo vive en un PDF y dentro del portal de pedidos, no en páginas que un motor de IA pueda leer y citar, y el sitio no responde en texto lo que un ferretero pregunta antes de escoger proveedor: mínimo de compra, crédito, cobertura y tiempos de entrega, garantía de las marcas',
+    dealOffer: 'AI Growth Operator · pedidos y reposición por WhatsApp',
+    pivot:
+      'Su cliente es el dueño de ferretería, y hoy pide por WhatsApp fuera del horario del call center: pregunta si hay existencia, cuánto cuesta la caja, cuándo le llega. Lo que hago es dejar ese canal atendido 24/7 — un agente que consulta disponibilidad, arma el pedido, lo pasa a su vendedor con el cliente ya identificado, y reactiva solo a las ferreterías que dejaron de comprar este mes.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre su flujo de pedidos actual — sin compromiso.',
+    pdEmoji: '🔧',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden pedidos y cotizaciones de ferreterías 24/7 (consultan disponibilidad, arman el pedido y se lo pasan al vendedor, conectados a su CRM), automatización de reposición y reactivación de clientes inactivos, video con IA para marketing de marcas, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) páginas HTML de marca y categoría con el catálogo que hoy solo existe en PDF, (2) FAQ con las preguntas reales de un ferretero (mínimo de compra, crédito, cobertura y tiempos de entrega, garantías) + FAQPage JSON-LD, (3) Organization/LocalBusiness JSON-LD con dirección, teléfono y horario + llms.txt',
+    contactFirstName: 'Abolu Best Value',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766708797',
+    preferredEmail: 'servicioalcliente@abolu.net',
+  },
   'beluxerealestate.com': {
     company: 'Be Luxe Real Estate',
     city: 'Panama City',
