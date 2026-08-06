@@ -1,0 +1,4 @@
+{
+  "install": "npm ci\nnpm run build",
+  "start": ""
+}
