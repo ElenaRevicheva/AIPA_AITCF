@@ -1,0 +1,17 @@
+SUBJECT: Auditoría de visibilidad en IA — DQSA Panamá (54/100)
+
+TO: servicioalcliente@dqsa.com.pa
+
+Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: aideazz.xyz/portfolio.
+
+Primero, felicitaciones por sus más de 30 años liderando el sector de salud animal en Panamá y Latinoamérica — una trayectoria impresionante. Les escribo porque analicé dqsa.com.pa con mi motor de visibilidad en IA y encontré algo importante: su sitio está bloqueando completamente a los motores de búsqueda con IA — ni ChatGPT, ni Perplexity, ni Claude pueden leer su contenido en este momento. Es decir, cuando un cliente o distribuidor busca "productos veterinarios en Panamá" a través de estas herramientas, DQSA es invisible.
+
+Es un arreglo concreto y rápido de implementar. Con mucho gusto les muestro los detalles en una llamada de 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: aideazz.xyz/api 🐾
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden consultas de clientes y distribuidores 24/7 (EN/ES, conectados a su CRM), automatización completa de procesos, y sistemas de IA con respaldo para que un problema técnico no los deje sin servicio. Todo con demos en vivo en mi portafolio👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena✨🌍💫
+
+Next: after send → tell Claude 'dqsa sent' → stage → ⏳ Sent + task done. No reply by ~Tue Jul 22 → polite follow-up.

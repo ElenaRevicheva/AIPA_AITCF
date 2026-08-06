@@ -763,17 +763,26 @@
   "palig-panam": {
     "phone": "50768434729",
     "company": "PALIG Panamá",
-    "dealId": "62822214951"
+    "dealId": "62822214951",
+    "emailDraft": "docs/selling/drafts/palig-panam-email.txt",
+    "email": "servicioalclientepanama@palig.com",
+    "score": 79
   },
   "banco-lafise-panam": {
     "phone": "50760268077",
     "company": "Banco LAFISE Panamá",
-    "dealId": "62828463221"
+    "dealId": "62828463221",
+    "emailDraft": "docs/selling/drafts/banco-lafise-panam-email.txt",
+    "email": "servicioalcliente@lafise.com.pa",
+    "score": 80
   },
   "panama-equity-kent-davis": {
     "phone": "50760306782",
     "company": "Panama Equity (Kent Davis)",
-    "dealId": "62841018415"
+    "dealId": "62841018415",
+    "emailDraft": "docs/selling/drafts/panama-equity-kent-davis-email.txt",
+    "email": "kent@panamaequity.com",
+    "score": 97
   },
   "eurostone-panam": {
     "phone": "50763254172",
@@ -2193,5 +2202,77 @@
     "email": "info@foundever.com",
     "emailDraft": "docs/selling/drafts/foundever-pty-fu-email.txt",
     "draft": "docs/selling/drafts/foundever-pty-fu.txt"
+  },
+  "panama-yacht-group-pty": {
+    "company": "Panama Yacht Group",
+    "email": "sales@panamayachtgroup.com",
+    "dealId": "62801585568",
+    "score": 86,
+    "phone": "50769596919",
+    "emailDraft": "docs/selling/drafts/panama-yacht-group-pty-email.txt",
+    "draft": "docs/selling/drafts/panama-yacht-group-pty.txt"
+  },
+  "panama-yacht-group-pty-fu": {
+    "company": "Panama Yacht Group",
+    "email": "sales@panamayachtgroup.com",
+    "dealId": "62801585568",
+    "score": 86,
+    "phone": "50769596919",
+    "emailDraft": "docs/selling/drafts/panama-yacht-group-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/panama-yacht-group-pty-fu.txt"
+  },
+  "dqsa-panama-pty": {
+    "company": "DQSA Panamá",
+    "email": "servicioalcliente@dqsa.com.pa",
+    "dealId": "62807534128",
+    "score": 54,
+    "phone": "50767810093",
+    "emailDraft": "docs/selling/drafts/dqsa-panama-pty-email.txt",
+    "draft": "docs/selling/drafts/dqsa-panama-pty.txt"
+  },
+  "dqsa-panama-pty-fu": {
+    "company": "DQSA Panamá",
+    "email": "servicioalcliente@dqsa.com.pa",
+    "dealId": "62807534128",
+    "score": 54,
+    "phone": "50767810093",
+    "emailDraft": "docs/selling/drafts/dqsa-panama-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/dqsa-panama-pty-fu.txt"
+  },
+  "eurostone-panama-pty": {
+    "company": "Eurostone Panamá",
+    "email": "ventas@eurostone-atelier.com",
+    "dealId": "62837342362",
+    "score": 86,
+    "phone": "50763254172",
+    "emailDraft": "docs/selling/drafts/eurostone-panama-pty-email.txt",
+    "draft": "docs/selling/drafts/eurostone-panama-pty.txt"
+  },
+  "eurostone-panama-pty-fu": {
+    "company": "Eurostone Panamá",
+    "email": "ventas@eurostone-atelier.com",
+    "dealId": "62837342362",
+    "score": 86,
+    "phone": "50763254172",
+    "emailDraft": "docs/selling/drafts/eurostone-panama-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/eurostone-panama-pty-fu.txt"
+  },
+  "sotillo-company-pty": {
+    "company": "Sotillo & Company",
+    "email": "ventas@sotillocompany.com",
+    "dealId": "62826916357",
+    "score": 87,
+    "phone": "5073939910",
+    "emailDraft": "docs/selling/drafts/sotillo-company-pty-email.txt",
+    "draft": "docs/selling/drafts/sotillo-company-pty.txt"
+  },
+  "sotillo-company-pty-fu": {
+    "company": "Sotillo & Company",
+    "email": "ventas@sotillocompany.com",
+    "dealId": "62826916357",
+    "score": 87,
+    "phone": "5073939910",
+    "emailDraft": "docs/selling/drafts/sotillo-company-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/sotillo-company-pty-fu.txt"
   }
 }
