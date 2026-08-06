@@ -1,4 +1,4 @@
 {
-  "install": "npm ci\nnpm run build",
+  "install": "npm i\nnpm run build",
   "start": ""
 }
