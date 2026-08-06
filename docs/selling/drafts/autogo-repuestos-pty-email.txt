@@ -1,0 +1,15 @@
+SUBJECT: Auditoría de visibilidad en IA — AutoGO Repuestos (76/100)
+
+TO: info@autogorepuestos.com
+
+Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — AutoGO tiene catálogo real de repuestos para Toyota, Suzuki, Kia, Hyundai y más, con buen acceso de crawlers de IA (95/100). Les escribo porque analicé autogorepuestos.com con mi motor de visibilidad en IA y obtuvo 76/100: cuando un dueño de vehículo que busca repuestos, llantas o baterías en Panamá le pregunta a ChatGPT o Perplexity "¿dónde compro repuestos o llantas para mi carro en Panamá?", su empresa todavía no aparece como respuesta citable — la página no tiene H1 ni meta-descripción — los motores de IA no pueden resumir claramente qué venden ni a quién (AEO 56/100).
+
+Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 🔧
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que leen la medida o pieza desde una foto, consultan stock por sucursal, apartan el repuesto y reactivan cotizaciones frías 24/7, conectados a su CRM, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena✨🌍💫

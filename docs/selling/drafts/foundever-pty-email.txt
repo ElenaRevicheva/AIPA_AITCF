@@ -1,0 +1,22 @@
+SUBJECT: Auditoría de visibilidad en IA — Foundever (94/100)
+
+TO: info@foundever.com
+
+Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio
+
+Primero, felicitaciones de verdad. Analicé foundever.com con mi propio motor de auditoría de visibilidad en IA (lo desarrollé yo, corre en https://aideazz.xyz/api) y sacó 94/100 (A+) — respuesta-a-preguntas 100/100 y 94/100 global, de los sitios mejor preparados para IA que he medido.
+
+Se los digo porque casi nadie está en ese nivel, y porque no les voy a inventar un problema que no tienen.
+
+Les escribo por otra cosa. A ustedes no les vendo visibilidad ni un chatbot — son 2,000+ personas haciendo CX en Panamá en cuatro idiomas, saben del tema más que la mayoría. Lo que hago es la capa de automatización interna alrededor de eso: agentes que preparan al asesor antes de que conteste, resumen y clasifican la conversación cuando termina, mantienen el CRM al día solo, y entregan un briefing diario con las cuentas que necesitan atención. Es el trabajo que consume horas del equipo y que nadie quiere hacer a mano.
+
+No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.
+
+Si les sirve, en 15 minutos les muestro qué automatizaría primero y qué horas libera — sin compromiso.
+
+PD: para llegar a 100/100 solo les falta afinar un par de detalles (un llms.txt y alt text en las imágenes). Se los dejo listos sin costo, trabajemos juntos o no. 💼
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización — AIdeazz AI Lab ✨

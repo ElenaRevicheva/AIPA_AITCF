@@ -1,0 +1,15 @@
+SUBJECT: Auditoría de visibilidad en IA — Be Luxe Real Estate (60/100)
+
+TO: info@beluxerealestate.com
+
+Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — Be Luxe se posiciona en propiedades exclusivas de Costa del Este y Santa María. Les escribo porque analicé beluxerealestate.com con mi motor de visibilidad en IA y obtuvo 60/100: cuando un comprador internacional que busca propiedades de lujo en Costa del Este o Santa María le pregunta a ChatGPT o Perplexity "¿cuál es la mejor inmobiliaria de lujo en Costa del Este Panamá?", su empresa todavía no aparece como respuesta citable — su sitio es un shell de JavaScript — mi motor solo vio 9 palabras en el HTML crudo; la mayoría de los crawlers de IA no ejecutan JavaScript, así que ven una página casi vacía (AEO 25/100).
+
+Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 🏠
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que califican al comprador desde el primer mensaje (presupuesto, zona, urgencia) y reactivan cotizaciones frías 24/7, conectados a su CRM, video con IA para marketing de propiedades, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena✨🌍💫

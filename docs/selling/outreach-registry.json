@@ -2035,5 +2035,163 @@
     "phone": "50766172399",
     "emailDraft": "docs/selling/drafts/rapid-tires-panama-fu-email.txt",
     "draft": "docs/selling/drafts/rapid-tires-panama-fu.txt"
+  },
+  "engel-volkers-panama": {
+    "company": "Engel & Völkers Panamá",
+    "dealId": "63517061802",
+    "score": 55,
+    "email": "info@panama.evrealestate.com",
+    "phone": "50767808277",
+    "emailDraft": "docs/selling/drafts/engel-volkers-panama-email.txt",
+    "draft": "docs/selling/drafts/engel-volkers-panama.txt"
+  },
+  "engel-volkers-panama-fu": {
+    "company": "Engel & Völkers Panamá",
+    "dealId": "63517061802",
+    "score": 55,
+    "email": "info@panama.evrealestate.com",
+    "phone": "50767808277",
+    "emailDraft": "docs/selling/drafts/engel-volkers-panama-fu-email.txt",
+    "draft": "docs/selling/drafts/engel-volkers-panama-fu.txt"
+  },
+  "la-strega-ristorante-pty": {
+    "company": "La Strega Ristorante",
+    "dealId": "63512345418",
+    "score": 50,
+    "email": "reservas@lastregaristorante.com",
+    "phone": "50760530985",
+    "emailDraft": "docs/selling/drafts/la-strega-ristorante-pty-email.txt",
+    "draft": "docs/selling/drafts/la-strega-ristorante-pty.txt"
+  },
+  "la-strega-ristorante-pty-fu": {
+    "company": "La Strega Ristorante",
+    "dealId": "63512345418",
+    "score": 50,
+    "email": "reservas@lastregaristorante.com",
+    "phone": "50760530985",
+    "emailDraft": "docs/selling/drafts/la-strega-ristorante-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/la-strega-ristorante-pty-fu.txt"
+  },
+  "autogo-repuestos-pty": {
+    "company": "AutoGO Repuestos",
+    "dealId": "63507662856",
+    "score": 76,
+    "email": "info@autogorepuestos.com",
+    "phone": "50766329199",
+    "emailDraft": "docs/selling/drafts/autogo-repuestos-pty-email.txt",
+    "draft": "docs/selling/drafts/autogo-repuestos-pty.txt"
+  },
+  "autogo-repuestos-pty-fu": {
+    "company": "AutoGO Repuestos",
+    "dealId": "63507662856",
+    "score": 76,
+    "email": "info@autogorepuestos.com",
+    "phone": "50766329199",
+    "emailDraft": "docs/selling/drafts/autogo-repuestos-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/autogo-repuestos-pty-fu.txt"
+  },
+  "be-luxe-real-estate-pty": {
+    "company": "Be Luxe Real Estate",
+    "dealId": "63526545680",
+    "score": 60,
+    "email": "info@beluxerealestate.com",
+    "phone": "50766534655",
+    "emailDraft": "docs/selling/drafts/be-luxe-real-estate-pty-email.txt",
+    "draft": "docs/selling/drafts/be-luxe-real-estate-pty.txt"
+  },
+  "be-luxe-real-estate-pty-fu": {
+    "company": "Be Luxe Real Estate",
+    "dealId": "63526545680",
+    "score": 60,
+    "email": "info@beluxerealestate.com",
+    "phone": "50766534655",
+    "emailDraft": "docs/selling/drafts/be-luxe-real-estate-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/be-luxe-real-estate-pty-fu.txt"
+  },
+  "madero-valor-development": {
+    "company": "Madero (Valor Development)",
+    "dealId": "63529849517",
+    "score": 87,
+    "email": "ventas@gvalordevelopment.com",
+    "phone": "50765663082",
+    "emailDraft": "docs/selling/drafts/madero-valor-development-email.txt",
+    "draft": "docs/selling/drafts/madero-valor-development.txt"
+  },
+  "madero-valor-development-fu": {
+    "company": "Madero (Valor Development)",
+    "dealId": "63529849517",
+    "score": 87,
+    "email": "ventas@gvalordevelopment.com",
+    "phone": "50765663082",
+    "emailDraft": "docs/selling/drafts/madero-valor-development-fu-email.txt",
+    "draft": "docs/selling/drafts/madero-valor-development-fu.txt"
+  },
+  "empresas-bern-pty": {
+    "company": "Empresas Bern",
+    "dealId": "63528429206",
+    "score": 87,
+    "email": "info@empresasbern.com",
+    "phone": "50766792204",
+    "emailDraft": "docs/selling/drafts/empresas-bern-pty-email.txt",
+    "draft": "docs/selling/drafts/empresas-bern-pty.txt"
+  },
+  "empresas-bern-pty-fu": {
+    "company": "Empresas Bern",
+    "dealId": "63528429206",
+    "score": 87,
+    "email": "info@empresasbern.com",
+    "phone": "50766792204",
+    "emailDraft": "docs/selling/drafts/empresas-bern-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/empresas-bern-pty-fu.txt"
+  },
+  "insignia-resources-pty": {
+    "company": "Insignia Resources",
+    "dealId": "63516596373",
+    "score": 88,
+    "email": "info@insigniaresources.com",
+    "emailDraft": "docs/selling/drafts/insignia-resources-pty-email.txt",
+    "draft": "docs/selling/drafts/insignia-resources-pty.txt"
+  },
+  "insignia-resources-pty-fu": {
+    "company": "Insignia Resources",
+    "dealId": "63516596373",
+    "score": 88,
+    "email": "info@insigniaresources.com",
+    "emailDraft": "docs/selling/drafts/insignia-resources-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/insignia-resources-pty-fu.txt"
+  },
+  "marjalizo-realty": {
+    "company": "Marjalizo",
+    "dealId": "63526061876",
+    "score": 94,
+    "email": "info@marjalizorealty.com",
+    "phone": "50763152222",
+    "emailDraft": "docs/selling/drafts/marjalizo-realty-email.txt",
+    "draft": "docs/selling/drafts/marjalizo-realty.txt"
+  },
+  "marjalizo-realty-fu": {
+    "company": "Marjalizo",
+    "dealId": "63526061876",
+    "score": 94,
+    "email": "info@marjalizorealty.com",
+    "phone": "50763152222",
+    "emailDraft": "docs/selling/drafts/marjalizo-realty-fu-email.txt",
+    "draft": "docs/selling/drafts/marjalizo-realty-fu.txt"
+  },
+  "foundever-pty": {
+    "company": "Foundever",
+    "dealId": "63523808804",
+    "score": 94,
+    "email": "info@foundever.com",
+    "emailDraft": "docs/selling/drafts/foundever-pty-email.txt",
+    "draft": "docs/selling/drafts/foundever-pty.txt"
+  },
+  "foundever-pty-fu": {
+    "company": "Foundever",
+    "dealId": "63523808804",
+    "score": 94,
+    "email": "info@foundever.com",
+    "emailDraft": "docs/selling/drafts/foundever-pty-fu-email.txt",
+    "draft": "docs/selling/drafts/foundever-pty-fu.txt"
   }
 }
