@@ -1,10 +1,18 @@
 {
-  "deals": 0,
-  "installed": 0,
+  "deals": 1,
+  "installed": 1,
   "skipNoPhone": 0,
   "errors": 0,
   "skipNoPhoneList": [],
   "errorList": [],
-  "ok": [],
-  "at": "2026-08-06T23:10:17.264Z"
+  "ok": [
+    {
+      "dealId": "63550690308",
+      "company": "Abolu Best Value",
+      "phone": "50766708797",
+      "score": 89,
+      "noteId": "114386638255"
+    }
+  ],
+  "at": "2026-08-06T23:32:30.586Z"
 }

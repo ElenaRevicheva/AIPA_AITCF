@@ -2322,5 +2322,13 @@
     "emailDraft": "docs/selling/drafts/abolu-best-value-email.txt",
     "dealId": "63550690308",
     "score": 89
+  },
+  "abolu-best-value-fu": {
+    "phone": "50766708797",
+    "company": "Abolu Best Value",
+    "email": "servicioalcliente@abolu.net",
+    "emailDraft": "docs/selling/drafts/abolu-best-value-fu-email.txt",
+    "dealId": "63550690308",
+    "score": 89
   }
 }
