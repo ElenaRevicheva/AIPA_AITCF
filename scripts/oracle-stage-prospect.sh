@@ -48,6 +48,36 @@ case " ${FLAGS[*]-} " in
     VIS_KEY=$(sed -n 's/^VISIBILITY_API_KEY=//p' .env | head -1 | tr -d '[:space:]')
     [ -n "$VIS_KEY" ] || VIS_KEY=$(sed -n 's/^VISIBILITY_API_KEYS=//p' .env | head -1 | cut -d, -f1 | tr -d '[:space:]')
     [ -n "$VIS_KEY" ] || VIS_KEY=aidz_demo_visibility_2026
+    # Widen the contact hunt. stage-manual-prospect.cjs reads the homepage plus three
+    # contact paths; a Panama site that publishes its number only on an "about" or
+    # Spanish page reads as EMAIL-PRIMARY when it is not. Never invent a number —
+    # this prints candidates for a human to confirm.
+    echo "--- contact recon for $DOMAIN ---"
+    node -e '
+      const domain = process.argv[1];
+      const paths = ["", "/contact", "/contact-us", "/contacto", "/contactenos", "/es",
+                     "/about", "/about-us", "/nosotros", "/quienes-somos", "/team", "/equipo"];
+      (async () => {
+        const phones = new Set(), mails = new Set(), seen = [];
+        for (const p of paths) {
+          const u = `https://${domain}${p}`;
+          try {
+            const r = await fetch(u, { redirect: "follow", headers: { "User-Agent": "Mozilla/5.0 (compatible; AIPA/1.0)" } });
+            if (!r.ok) continue;
+            const h = await r.text();
+            seen.push(`${p || "/"} ${r.status} ${(h.match(/<title[^>]*>([^<]*)/i) || [,""])[1].trim().slice(0, 70)}`);
+            for (const m of h.matchAll(/wa\.me\/(\d+)|api\.whatsapp\.com\/send[^"´]*phone=(\d+)/gi)) phones.add(`WA ${m[1] || m[2]}`);
+            for (const m of h.matchAll(/tel:([+\d()\s.-]{7,})/gi)) phones.add(`tel ${m[1].trim()}`);
+            for (const m of h.matchAll(/\+?507[\s.-]?\d{3,4}[\s.-]?\d{4}/g)) phones.add(`text ${m[0].trim()}`);
+            for (const m of h.matchAll(/mailto:([^"´\s?<>]+)/gi)) mails.add(m[1].toLowerCase());
+          } catch { /* path absent */ }
+        }
+        for (const s of seen) console.log("  page", s);
+        console.log("  PHONE CANDIDATES:", phones.size ? [...phones].join(" | ") : "NONE FOUND");
+        console.log("  MAILTO:", mails.size ? [...mails].join(" | ") : "NONE FOUND");
+      })();
+    ' "$DOMAIN" || echo "WARN: contact recon failed"
+
     echo "--- full audit for $DOMAIN ---"
     curl -sS -m 60 -X POST https://webhook.aideazz.xyz/cto/v1/visibility \
       -H "Content-Type: application/json" -H "X-API-Key: $VIS_KEY" \
