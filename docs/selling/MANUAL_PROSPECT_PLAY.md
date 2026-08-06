@@ -416,6 +416,38 @@ score prints no category number and stamps the note `⚠️ Score asserted with 
 a deal the FU installer cannot parse is reported in `errorList` instead of being sent a
 made-up number.
 
+### Two things the first live run of `--with-fu` taught (Abolu, Aug 6 2026)
+
+**HubSpot's object search does not see a deal you just created.** It is eventually
+consistent, so the follow-up installer searched for the seconds-old deal, got nothing,
+patched nothing and exited 0 — and the staging run announced a follow-up that did not
+exist. A numeric `--only=<dealId>` now fetches the deal by id, which needs no index, and
+the staging run reads the installer's summary instead of trusting its exit code. The mock
+CRM in the cycle test simulates the lag by default so this cannot come back.
+
+**A credential letter needs a credential subject.** Abolu audited 89/A, so the letter
+opened with the score as proof and said *"no les voy a inventar un problema que no
+tienen"* — under `…(89/100): 3 arreglos concretos`. The subject is read first and it
+contradicted the body. Above `CREDENTIAL_SCORE` the subject is now
+`{Company} sacó {score}/100 en visibilidad en IA — les escribo por otra cosa`.
+
+### Staging from a cloud agent (no laptop, no key)
+
+A cloud agent has no `HUBSPOT_API_KEY` and its egress excludes `api.hubapi.com`, so the
+play can only run on Oracle. `.github/workflows/stage-prospect-on-trigger.yml` is the
+bridge, same trigger-file pattern as `deploy-oracle-on-trigger.yml`:
+
+```bash
+echo "example.com --dry-run" > .stage-trigger   # recon + full audit, no CRM writes
+echo "example.com --with-fu" > .stage-trigger   # the real thing
+git commit -am "stage: example.com" && git push
+```
+
+It SSHes to Oracle, runs the play there and commits the registry and drafts back to the
+branch. **The job checks out the branch tip, not the commit that triggered it** — a
+trigger pushed while an earlier run is still queued executes the *newest* `.stage-trigger`.
+Leave the file idle (`# idle`) after a run, or the next merge replays it.
+
 ### Proving the cycle without touching the CRM
 
 ```bash
