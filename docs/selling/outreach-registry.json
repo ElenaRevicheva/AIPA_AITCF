@@ -2381,5 +2381,22 @@
     "emailDraft": "docs/selling/drafts/talentum-headhunting-fu-email.txt",
     "dealId": "63573234772",
     "score": 82
+  },
+  "kennedy-home": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/kennedy-home.txt",
+    "company": "Kennedy Home",
+    "email": "web@kennedyhome.com",
+    "emailDraft": "docs/selling/drafts/kennedy-home-email.txt",
+    "dealId": "63557634379",
+    "score": 80
+  },
+  "kennedy-home-fu": {
+    "phone": "5078305756",
+    "company": "Kennedy Home",
+    "email": "web@kennedyhome.com",
+    "emailDraft": "docs/selling/drafts/kennedy-home-fu-email.txt",
+    "dealId": "63557634379",
+    "score": 80
   }
 }
