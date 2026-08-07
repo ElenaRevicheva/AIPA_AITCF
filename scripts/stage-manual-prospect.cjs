@@ -1793,12 +1793,12 @@ const PROSPECT_META = {
   'kennedyhome.com': {
     company: 'Kennedy Home',
     city: 'Panama City',
-    customer: 'familia que está amueblando su casa o busca decoración en Panamá',
+    customer: 'comprador que está amueblando su casa o renovando la decoración en Panamá',
     moneyQuery: '¿dónde comprar muebles y decoración para el hogar en Panamá con envío?',
     compliment:
       'tienen tienda en línea con catálogo amplio — muebles, cocina, ropa de cama, decoración y electrodomésticos — y envío gratis en la ciudad desde compras modestas',
     gapClause:
-      'los asistentes de IA no tienen claro quién es la tienda ni qué venden, la página principal mezcla varios títulos, no hay preguntas y respuestas sobre envío o formas de pago, y la mayoría de las fotos del catálogo no tienen descripción',
+      'la tienda no se presenta con un mensaje claro en la página principal, faltan respuestas sobre envío y formas de pago, y la mayoría de las fotos del catálogo no tienen descripción',
     dealOffer: 'AI Growth Operator · ventas y consultas por WhatsApp',
     pivot:
       'Su cliente compra en la noche o el fin de semana, y la primera duda casi nunca es “quiero comprar”: es si tienen la medida, si llegan a su corregimiento, cuánto tarda el envío, si aceptan tarjeta o Yappy, o si ese color sigue en stock. Lo que hago es dejar ese canal atendido 24/7 — un agente que responde esas preguntas, confirma disponibilidad, arma el pedido o la cita de entrega, y le pasa a ventas el cliente ya listo, además de reactivar a quien dejó el carrito a medias.',
@@ -1808,6 +1808,7 @@ const PROSPECT_META = {
       'construyo agentes de WhatsApp que responden consultas de producto y envío 24/7 (medidas, stock, zona de entrega, forma de pago), ayudan a cerrar el pedido y se conectan a su CRM o tienda en línea, automatización de seguimiento de carritos abandonados, video con IA para marketing de catálogo, y rescate de sistemas de IA que fallan.',
     topFixes:
       '(1) datos claros de la tienda para asistentes de IA (nombre, logo, redes), (2) un titular principal + FAQ con envío, zonas, pagos y devoluciones, (3) descripciones en las fotos del catálogo',
+    contactFirstName: 'Kennedy Home',
     contactLastName: '(Contact)',
     preferredEmail: 'web@kennedyhome.com',
     emailOnlyOk: true,
