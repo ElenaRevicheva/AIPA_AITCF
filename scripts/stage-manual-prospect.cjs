@@ -1673,6 +1673,46 @@ const PROSPECT_META = {
     preferredPhone: '50766329199',
   },
   /**
+   * RE/MAX Millenium Panamá — RE/MAX franchise office at the World Trade Center,
+   * Marbella, Panama City. Owners Jose Jardim and Maria Flores, ~14 agents. Inventory
+   * spans sale, rent, commercial and new developments; the site is written in English
+   * for the international buyer.
+   *
+   * Not to be confused with RE/MAX Millennium (remaxmillennium.ca), the Vaughan/Toronto
+   * brokerage — same name, different company, two n's.
+   *
+   * Contacts: info@remax-millenium.com is the office address published on the site; the
+   * company's own LinkedIn posts sign off with +507 6851-6654 and jljardim@ (the owner).
+   * The site scrape decides which number the WhatsApp button gets — preferredPhone is
+   * only the fallback for when it publishes none.
+   *
+   * No audit number is hardcoded: score, grade and the weakest category come from the
+   * live engine at staging time, and the letter switches to the credential opening on
+   * its own above 85.
+   */
+  'remax-millenium.com': {
+    company: 'REMAX Millenium',
+    city: 'Panama City',
+    customer: 'comprador o inversionista extranjero que busca propiedad en Panamá',
+    moneyQuery: '¿cuál es la mejor inmobiliaria en Ciudad de Panamá para comprar o invertir?',
+    compliment:
+      'tienen el respaldo de la red global RE/MAX con equipo local en el World Trade Center de Marbella, y su sitio ya está en inglés para el comprador internacional, con inventario de venta, alquiler, comercial y proyectos nuevos',
+    gapClause:
+      'el sitio no responde en texto lo que ese comprador pregunta antes de escribirle a nadie — si un extranjero puede comprar sin ser residente, cómo funciona el título, qué impuestos y qué financiamiento hay — y eso es justo lo que un motor de IA necesita para citarlos',
+    dealOffer: 'AI Growth Operator · calificación de compradores por WhatsApp',
+    pivot:
+      'Su comprador llega de otro país y en otra zona horaria, y la primera pregunta casi nunca es por una propiedad: es si puede comprar sin ser residente, qué impuestos paga, si hay financiamiento para extranjeros. Lo que hago es dejar ese primer contacto atendido 24/7 en inglés y español — un agente que responde esas dudas, califica al comprador (presupuesto, zona, plazo, si compra de contado), agenda la visita y le pasa al asesor el lead ya briefeado, además de reactivar a los que preguntaron hace meses y nunca volvieron.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre los leads que ya reciben — sin compromiso.',
+    pdEmoji: '🏠',
+    pdLine:
+      'construyo agentes de WhatsApp que califican compradores 24/7 en inglés y español (presupuesto, zona, plazo, forma de pago), agendan visitas y se conectan a su CRM, automatización de seguimiento y reactivación de leads fríos, video con IA para marketing de propiedades, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) FAQ con las preguntas reales del comprador extranjero (residencia, título, impuestos, financiamiento) + FAQPage JSON-LD, (2) RealEstateAgent/Organization JSON-LD con dirección, teléfono y horario, (3) llms.txt y fichas de propiedad legibles sin ejecutar JavaScript',
+    contactFirstName: 'REMAX Millenium',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'info@remax-millenium.com',
+  },
+  /**
    * Abolu, S.A. (Grupo Caco Abbo) — the largest hardware wholesaler in Panama: 8,000+
    * SKUs, 50+ brands, nationwide delivery under 48h, and the Panama distributor of the
    * group's own Best Value tool brand. HQ Edificio Abolu, Llano Bonito, Juan Díaz.
