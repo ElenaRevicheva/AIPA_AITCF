@@ -141,6 +141,7 @@ Expats ask AI "how do I get Panama residency / buy property" — then consult ov
 | Delvalle & Delvalle · SENT | delvallepanama.com | Immigration — drafts exist |
 | Gomitom · SENT | gomitom.com | Immigration + real estate law |
 | Encuentra24 Panama (premium RE brokers via listings) | encuentra24.com | Use to mine bilingual brokers with weak sites — don't stage the portal itself |
+| RE/MAX Millenium Panamá · STAGED | remax-millenium.com | RE/MAX franchise, World Trade Center Marbella, ~14 agents, EN site for international buyers. ✅ STAGED 2026-08-07 via Oracle bridge (deal 63570315139; live audit **88/A** → credential letter, pivot to 24/7 EN/ES buyer qualification; WA +507 6707-2042; info@remax-millenium.com). 4 send buttons on the note · sourcing in `prospects/REMAX_MILLENIUM_RESEARCH.md` · **not sent yet** |
 | Panama Homes / similar expat brokers | (mine) | Prefer brokers with own `.com` + WA |
 
 ### A3. Tourism — charters, tours, eco-lodges (Panama)
