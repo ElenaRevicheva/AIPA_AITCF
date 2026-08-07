@@ -1902,18 +1902,38 @@ const PROSPECT_META = {
         'subject and the prospect\'s first sentence, so it cannot default to a placeholder.',
     );
   } else {
-    const auditRes = await fetch(VIS, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-API-Key': VIS_KEY },
-      body: JSON.stringify({ url }),
-    });
-    const auditText = await auditRes.text();
+    async function runVisibilityAudit(auditTarget) {
+      const res = await fetch(VIS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': VIS_KEY },
+        body: JSON.stringify({ url: auditTarget }),
+      });
+      const text = await res.text();
+      return { res, text, auditTarget };
+    }
+
+    let { res: auditRes, text: auditText, auditTarget } = await runVisibilityAudit(url);
+    const wwwUrl = `https://www.${domain}`;
+    if (
+      !auditRes.ok &&
+      auditRes.status === 422 &&
+      auditText.includes('unfetchable_url') &&
+      !domain.startsWith('www.') &&
+      auditTarget !== wwwUrl
+    ) {
+      console.warn(`AUDIT_RETRY — ${url} unfetchable, trying ${wwwUrl}`);
+      ({ res: auditRes, text: auditText, auditTarget } = await runVisibilityAudit(wwwUrl));
+    }
+
     if (auditRes.ok) {
       audit = JSON.parse(auditText);
       score = Math.round(audit.score ?? audit.overall ?? audit.total ?? 0);
       grade = audit.grade || audit.letterGrade || 'B';
       weak = weakestCategory(audit);
       catScores = Object.fromEntries((audit.categories || []).map((c) => [c.id, c.score]));
+      if (auditTarget !== url) {
+        auditNote = `Audit ran against ${auditTarget} (${url} was unfetchable from the engine).`;
+      }
     } else if (auditRes.status === 429) {
       throw new Error(
         'visibility audit → 429 rate limited. Use VISIBILITY_API_KEY (owner key, not the ' +
