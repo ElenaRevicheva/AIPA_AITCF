@@ -1797,7 +1797,8 @@ const PROSPECT_META = {
     moneyQuery: '¿dónde comprar muebles y decoración para el hogar en Panamá con envío?',
     compliment:
       'tienen tienda en línea con catálogo amplio — muebles, cocina, ropa de cama, decoración y electrodomésticos — y envío gratis en la ciudad desde compras modestas',
-    gapClause: 'PENDING_AUDIT',
+    gapClause:
+      'los asistentes de IA no tienen claro quién es la tienda ni qué venden, la página principal mezcla varios títulos, no hay preguntas y respuestas sobre envío o formas de pago, y la mayoría de las fotos del catálogo no tienen descripción',
     dealOffer: 'AI Growth Operator · ventas y consultas por WhatsApp',
     pivot:
       'Su cliente compra en la noche o el fin de semana, y la primera duda casi nunca es “quiero comprar”: es si tienen la medida, si llegan a su corregimiento, cuánto tarda el envío, si aceptan tarjeta o Yappy, o si ese color sigue en stock. Lo que hago es dejar ese canal atendido 24/7 — un agente que responde esas preguntas, confirma disponibilidad, arma el pedido o la cita de entrega, y le pasa a ventas el cliente ya listo, además de reactivar a quien dejó el carrito a medias.',
@@ -1805,12 +1806,14 @@ const PROSPECT_META = {
     pdEmoji: '🛋️',
     pdLine:
       'construyo agentes de WhatsApp que responden consultas de producto y envío 24/7 (medidas, stock, zona de entrega, forma de pago), ayudan a cerrar el pedido y se conectan a su CRM o tienda en línea, automatización de seguimiento de carritos abandonados, video con IA para marketing de catálogo, y rescate de sistemas de IA que fallan.',
-    topFixes: 'PENDING_AUDIT',
-    contactFirstName: 'Kennedy Home',
+    topFixes:
+      '(1) datos claros de la tienda para asistentes de IA (nombre, logo, redes), (2) un titular principal + FAQ con envío, zonas, pagos y devoluciones, (3) descripciones en las fotos del catálogo',
     contactLastName: '(Contact)',
     preferredEmail: 'web@kennedyhome.com',
     emailOnlyOk: true,
   },
+  /**
+   * RE/MAX Millenium Panamá — RE/MAX franchise office at the World Trade Center,
    * Marbella, Panama City. Owners Jose Jardim and Maria Flores, ~14 agents. Inventory
    * spans sale, rent, commercial and new developments; the site is written in English
    * for the international buyer.
