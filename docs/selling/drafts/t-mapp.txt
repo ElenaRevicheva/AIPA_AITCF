@@ -12,7 +12,7 @@ Si les sirve, en 15 minutos les muestro cómo se vería sobre su flujo de búsqu
 
 Y una nota personal, con transparencia: además de instalar estos sistemas para empresas, estoy abierta a escuchar oportunidades — liderazgo técnico en IA, arquitectura o automatización, en Panamá o remoto. Si en alguna de sus búsquedas calza ese perfil, con gusto les envío mi CV y conversamos; y si no, la propuesta de arriba sigue en pie igual.
 
-PD: para llegar a 100/100 solo les falta afinar un par de detalles (solo una pregunta en forma de titular, sin llms.txt, sin atributo lang en el <html>, y sin fechas legibles por máquina en el contenido). Se los dejo listos sin costo, trabajemos juntos o no. 💼
+PD: para llegar a 100/100 solo les falta afinar un par de detalles (les falta una sección de preguntas y respuestas con las dudas reales de quien abre una búsqueda, y fechas claras en el contenido que van actualizando). Se los dejo listos sin costo, trabajemos juntos o no. 💼
 
 ¡Que tengan un excelente día!
 Saludos,
