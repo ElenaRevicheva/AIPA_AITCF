@@ -237,9 +237,9 @@ function buildDraft(ctx) {
   const weakBit = weakScore != null && weakName ? ` (${weakName} ${weakScore}/100)` : '';
 
   return [
-    `Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.`,
+    `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.`,
     '',
-    `Primero, felicitaciones — ${compliment}. Les escribo porque analicé ${domain} con mi motor de visibilidad en IA y obtuvo ${score}/100: cuando un ${ctx.customer} le pregunta a ChatGPT o Perplexity "${moneyQuery}", su empresa todavía no aparece como respuesta citable — ${ctx.gapClause}${weakBit}.`,
+    `Primero, felicitaciones — ${compliment}. Les escribo porque analicé ${domain} con mi motor de visibilidad en IA y obtuvo ${score}/100: cuando un ${ctx.customer} le pregunta a ChatGPT o Perplexity "${moneyQuery}", los asistentes todavía no los pueden recomendar con claridad — ${ctx.gapClause}.`,
     '',
     `Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api ${pdEmoji}`,
     ...(ctx.openToRoles ? ['', OPEN_TO_ROLES_NOTE] : []),
@@ -1710,7 +1710,7 @@ const PROSPECT_META = {
     // AEO 81 · Tech 100). WARNs for llms.txt, html-lang, question-headings (only one),
     // semantic-html, freshness-signal.
     gapClause:
-      'solo una pregunta en forma de titular, sin llms.txt, sin atributo lang en el <html>, y sin fechas legibles por máquina en el contenido',
+      'les falta una sección de preguntas y respuestas con las dudas reales de quien abre una búsqueda, y fechas claras en el contenido que van actualizando',
     dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
     pivot:
       'Su activo es el mapa del talento pasivo, y un mapa se enfría solo. Lo que hago es dejarlo vivo: un agente que atiende 24/7 al cliente que llega con una vacante y la califica antes de que un consultor invierta una hora (nivel, industria, banda salarial, urgencia), califica también al candidato que se postula, mantiene el CRM al día y les entrega cada mañana un briefing de qué se movió en el mapa.',
@@ -1719,7 +1719,7 @@ const PROSPECT_META = {
     pdLine:
       'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
     topFixes:
-      '(1) FAQ cuyos H2/H3 sean las preguntas literales que hace un cliente con una vacante ejecutiva + FAQPage/Service JSON-LD, (2) llms.txt + lang="es" en el <html>, (3) dateModified en JSON-LD o <time> visible en el contenido actualizado',
+      '(1) FAQ con las preguntas literales de quien abre una búsqueda ejecutiva (plazo, confidencialidad, industria, honorarios), (2) archivo para asistentes de IA + idioma declarado en la página, (3) fechas visibles en contenido actualizado',
     contactFirstName: 'T-MAPP',
     contactLastName: '(Contact)',
     // Site publishes contact forms only — no mailto or WA link. Their own terms name
@@ -1763,7 +1763,7 @@ const PROSPECT_META = {
     // AEO 75 · Tech 86). FAIL h1, img-alt (7/22); WARNs for llms.txt, schema-answer,
     // entity-links, question-headings.
     gapClause:
-      'no tiene un H1 que diga de qué trata la página, sin llms.txt, sin FAQPage/Service JSON-LD, sin sameAs, y 15 de 22 imágenes sin texto alternativo',
+      'la primera pantalla no deja claro qué hacen, faltan respuestas en forma de pregunta y respuesta para las dudas típicas de una empresa que quiere contratar, y muchas fotos del equipo no tienen descripción que un asistente pueda leer',
     dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
     pivot:
       'Sus clientes son empresas sin departamento de RRHH permanente: cuando necesitan contratar, ustedes son el departamento. Lo que hago es que ese cliente encuentre respuesta apenas escribe, a cualquier hora — un agente que califica la vacante (nivel, funciones, banda salarial, urgencia) y se la entrega al consultor ya perfilada, atiende también al candidato que se postula, y reactiva a los clientes que contrataron el año pasado y no han vuelto.',
@@ -1772,7 +1772,7 @@ const PROSPECT_META = {
     pdLine:
       'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
     topFixes:
-      '(1) un H1 claro + FAQ con las preguntas literales de empresas sin RRHH + FAQPage/Service JSON-LD, (2) llms.txt + sameAs a LinkedIn, (3) alt text en las imágenes del equipo y casos de éxito',
+      '(1) titular principal claro + FAQ con las dudas reales de empresas sin RRHH, (2) conectar el sitio a LinkedIn y perfiles verificados, (3) descripciones en las fotos del equipo y casos de éxito',
     contactFirstName: 'Talentum Headhunting',
     contactLastName: '(Contact)',
     // talentum.com.pa/contacts/ publishes c.fistonich@ for commercial inquiries;
