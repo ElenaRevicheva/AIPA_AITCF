@@ -1697,8 +1697,12 @@ const PROSPECT_META = {
     moneyQuery: '¿cuál es la mejor inmobiliaria en Ciudad de Panamá para comprar o invertir?',
     compliment:
       'tienen el respaldo de la red global RE/MAX con equipo local en el World Trade Center de Marbella, y su sitio ya está en inglés para el comprador internacional, con inventario de venta, alquiler, comercial y proyectos nuevos',
+    // Verified by the live audit run on Aug 7 2026: FAIL question-headings, plus WARNs
+    // for robots.txt, llms.txt, answer schema and sameAs. The buyer-question framing
+    // lives in `pivot`; this clause is what the free fix-list at the end of the letter
+    // promises, so it names only what the engine actually flagged.
     gapClause:
-      'el sitio no responde en texto lo que ese comprador pregunta antes de escribirle a nadie — si un extranjero puede comprar sin ser residente, cómo funciona el título, qué impuestos y qué financiamiento hay — y eso es justo lo que un motor de IA necesita para citarlos',
+      'no hay una sola sección en forma de pregunta y respuesta, ni marcado FAQPage, ni llms.txt, ni sameAs que ate el sitio a sus perfiles',
     dealOffer: 'AI Growth Operator · calificación de compradores por WhatsApp',
     pivot:
       'Su comprador llega de otro país y en otra zona horaria, y la primera pregunta casi nunca es por una propiedad: es si puede comprar sin ser residente, qué impuestos paga, si hay financiamiento para extranjeros. Lo que hago es dejar ese primer contacto atendido 24/7 en inglés y español — un agente que responde esas dudas, califica al comprador (presupuesto, zona, plazo, si compra de contado), agenda la visita y le pasa al asesor el lead ya briefeado, además de reactivar a los que preguntaron hace meses y nunca volvieron.',
@@ -1707,7 +1711,7 @@ const PROSPECT_META = {
     pdLine:
       'construyo agentes de WhatsApp que califican compradores 24/7 en inglés y español (presupuesto, zona, plazo, forma de pago), agendan visitas y se conectan a su CRM, automatización de seguimiento y reactivación de leads fríos, video con IA para marketing de propiedades, y rescate de sistemas de IA que fallan.',
     topFixes:
-      '(1) FAQ con las preguntas reales del comprador extranjero (residencia, título, impuestos, financiamiento) + FAQPage JSON-LD, (2) RealEstateAgent/Organization JSON-LD con dirección, teléfono y horario, (3) llms.txt y fichas de propiedad legibles sin ejecutar JavaScript',
+      '(1) FAQ cuyos H2/H3 sean las preguntas literales del comprador extranjero (residencia, título, impuestos, financiamiento) + FAQPage/Service JSON-LD, (2) robots.txt que dé la bienvenida a los crawlers de IA + llms.txt + sameAs a LinkedIn y redes, (3) el HTML tarda 3.0 s en responder — cache/CDN, y fechas legibles por máquina en el contenido',
     contactFirstName: 'REMAX Millenium',
     contactLastName: '(WhatsApp contact)',
     preferredEmail: 'info@remax-millenium.com',
