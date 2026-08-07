@@ -179,6 +179,22 @@ const OPERATOR_PARA =
 /** A site scoring this high has no visibility problem to sell against. */
 const CREDENTIAL_SCORE = 85;
 
+/**
+ * The one place Elena says she is open to roles (`openToRoles: true` in PROSPECT_META).
+ *
+ * Written for search firms, where a senior engineer is not a favour to place but
+ * inventory to map, and worded to keep that footing: it is disclosed as transparency,
+ * not asked as a favour; it names the level she would consider instead of "cualquier
+ * oportunidad"; and it closes by putting the paid offer back on the table, so the letter
+ * cannot be read as a pitch that was really a job application. One block, one review —
+ * per-prospect wording would drift into pleading on the fourth rewrite.
+ *
+ * Said once, in the first letter only. The follow-up stays purely commercial: asking
+ * twice is what turns a peer's disclosure into a request.
+ */
+const OPEN_TO_ROLES_NOTE =
+  'Y una nota personal, con transparencia: además de instalar estos sistemas para empresas, estoy abierta a escuchar oportunidades — liderazgo técnico en IA, arquitectura o automatización, en Panamá o remoto. Si en alguna de sus búsquedas calza ese perfil, con gusto les envío mi CV y conversamos; y si no, la propuesta de arriba sigue en pie igual.';
+
 function buildDraft(ctx) {
   const {
     domain, score, grade, weakName, weakScore, moneyQuery, compliment, pdEmoji, pdLine,
@@ -203,6 +219,8 @@ function buildDraft(ctx) {
       '',
       ctx.ask ||
         `Si les sirve, en 15 minutos les muestro cómo quedaría el Operator en su negocio — sin compromiso.`,
+      // After the paid ask, never before it: the offer is the reason for writing.
+      ...(ctx.openToRoles ? ['', OPEN_TO_ROLES_NOTE] : []),
       '',
       `PD: para llegar a 100/100 solo les falta afinar un par de detalles (${ctx.gapClause}). Se los dejo listos sin costo, trabajemos juntos o no. ${pdEmoji}`,
       '',
@@ -224,6 +242,7 @@ function buildDraft(ctx) {
     `Primero, felicitaciones — ${compliment}. Les escribo porque analicé ${domain} con mi motor de visibilidad en IA y obtuvo ${score}/100: cuando un ${ctx.customer} le pregunta a ChatGPT o Perplexity "${moneyQuery}", su empresa todavía no aparece como respuesta citable — ${ctx.gapClause}${weakBit}.`,
     '',
     `Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api ${pdEmoji}`,
+    ...(ctx.openToRoles ? ['', OPEN_TO_ROLES_NOTE] : []),
     '',
     `PD: Además de visibilidad en IA, ${pdLine} Todo con demos en vivo en mi portafolio👆`,
     '',
@@ -1673,6 +1692,76 @@ const PROSPECT_META = {
     preferredPhone: '50766329199',
   },
   /**
+   * Panama executive search — the Arden & Price cohort, staged Aug 7 2026 with
+   * `openToRoles` so each letter also states, once, that Elena would hear about a senior
+   * AI role. These three were picked over Amrop and Stanton Chase because a search firm
+   * has to be audited on its own domain: those two publish Panama as a subpath of a
+   * global site, so the engine would score the head office, not the office being written
+   * to. Every claim in the compliments comes from each firm's own site.
+   */
+  't-mapp.com': {
+    company: 'T-MAPP',
+    city: 'Panama City',
+    customer: 'director regional que necesita contratar gerencia media o talento tech en Panamá',
+    moneyQuery: '¿qué headhunter en Panamá consigue talento regional o tecnológico?',
+    compliment:
+      'publican la guía de los mejores headhunters de Panamá — pocos en su sector tienen la seguridad de ubicar a su competencia en una tabla — y su Smart Search apunta al ejecutivo pasivo, que es el difícil',
+    gapClause: 'PENDING_AUDIT',
+    dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
+    pivot:
+      'Su activo es el mapa del talento pasivo, y un mapa se enfría solo. Lo que hago es dejarlo vivo: un agente que atiende 24/7 al cliente que llega con una vacante y la califica antes de que un consultor invierta una hora (nivel, industria, banda salarial, urgencia), califica también al candidato que se postula, mantiene el CRM al día y les entrega cada mañana un briefing de qué se movió en el mapa.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre su flujo de búsquedas — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: 'PENDING_AUDIT',
+    contactFirstName: 'T-MAPP',
+    contactLastName: '(Contact)',
+    openToRoles: true,
+  },
+  'cornerstone.pa': {
+    company: 'Cornerstone Panama',
+    city: 'Panama City',
+    customer:
+      'presidente o miembro de junta directiva que necesita contratar a un CEO o a un director en Panamá',
+    moneyQuery: '¿quién hace búsqueda de CEO y de junta directiva en Panamá?',
+    compliment:
+      'son miembros de la AESC y ponen por escrito algo que casi nadie se atreve: terna final en 10 días hábiles, con coaching de adaptación para el ejecutivo seleccionado',
+    gapClause: 'PENDING_AUDIT',
+    dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
+    pivot:
+      'Su promesa es la terna final en 10 días hábiles, y ese reloj empieza a correr desde el primer contacto del cliente. Lo que hago es proteger esos primeros días: un agente que atiende la consulta apenas entra, califica la posición (nivel, industria, banda salarial, urgencia) y se la pasa al socio con el perfil ya definido, en vez de gastar dos días en agendar la reunión de arranque.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre su proceso actual — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: 'PENDING_AUDIT',
+    contactFirstName: 'Cornerstone Panama',
+    contactLastName: '(Contact)',
+    openToRoles: true,
+  },
+  'talentum.com.pa': {
+    company: 'Talentum Headhunting',
+    city: 'Panama City',
+    customer:
+      'gerente general de una empresa panameña sin departamento de RRHH que necesita contratar gerencia media o ejecutiva',
+    moneyQuery: '¿cuál es la mejor agencia de reclutamiento ejecutivo en Panamá?',
+    compliment:
+      'son una boutique panameña con una promesa que se puede verificar: no reciclan hojas de vida, cada búsqueda arranca identificando dónde está ese talento, y acompañan a empresas que no tienen un departamento de RRHH permanente',
+    gapClause: 'PENDING_AUDIT',
+    dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
+    pivot:
+      'Sus clientes son empresas sin departamento de RRHH permanente: cuando necesitan contratar, ustedes son el departamento. Lo que hago es que ese cliente encuentre respuesta apenas escribe, a cualquier hora — un agente que califica la vacante (nivel, funciones, banda salarial, urgencia) y se la entrega al consultor ya perfilada, atiende también al candidato que se postula, y reactiva a los clientes que contrataron el año pasado y no han vuelto.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre sus búsquedas actuales — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: 'PENDING_AUDIT',
+    contactFirstName: 'Talentum Headhunting',
+    contactLastName: '(Contact)',
+    openToRoles: true,
+  },
+  /**
    * RE/MAX Millenium Panamá — RE/MAX franchise office at the World Trade Center,
    * Marbella, Panama City. Owners Jose Jardim and Maria Flores, ~14 agents. Inventory
    * spans sale, rent, commercial and new developments; the site is written in English
@@ -1838,6 +1927,21 @@ const PROSPECT_META = {
   const meta = PROSPECT_META[domain];
   if (!meta) throw new Error(`No PROSPECT_META for ${domain} — add to stage-manual-prospect.cjs`);
 
+  // `PENDING_AUDIT` marks copy that must be written from the audit rather than guessed:
+  // the gap clause is what the letter offers to fix for free, and the note's fix list is
+  // what Elena walks the prospect through. A --dry-run prints the audit's own findings,
+  // and the sentinel keeps that from being skipped — the string itself must never reach
+  // a prospect. The dry run is exempt: printing the audit is how the copy gets written.
+  if (!dryRun) {
+    const pending = Object.entries(meta).filter(([, v]) => v === 'PENDING_AUDIT');
+    if (pending.length) {
+      throw new Error(
+        `PROSPECT_META.${domain} still has placeholder copy (${pending.map(([k]) => k).join(', ')}). ` +
+          `Run with --dry-run, then write it from what the audit actually found.`,
+      );
+    }
+  }
+
   if (meta.preferredPhone) {
     contacts.whatsapp = String(meta.preferredPhone).replace(/\D/g, '');
   }
@@ -1884,6 +1988,7 @@ const PROSPECT_META = {
     pdLine: meta.pdLine,
     pivot: meta.pivot,
     ask: meta.ask,
+    openToRoles: !!meta.openToRoles,
   });
 
   const slug = slugify(meta.company);
@@ -1981,6 +2086,12 @@ const PROSPECT_META = {
     ...(auditNote ? [`<b>⚠️ ${escHtml(auditNote)}</b>`] : []),
     '',
     `Angle: "${credentialLetter ? 'audit is the CREDENTIAL — pivot to AI Growth Operator' : score >= CREDENTIAL_SCORE ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
+    ...(meta.openToRoles
+      ? [
+          '',
+          '<b>DUAL TRACK</b> — this letter also states Elena is open to roles (senior AI/automation, Panama or remote), once, after the paid ask. If they reply about a role, that is still a 💬 They replied. The follow-up does not repeat it.',
+        ]
+      : []),
     '',
     `Top fixes: ${meta.topFixes}.`,
     '',
