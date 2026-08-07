@@ -144,6 +144,16 @@ Expats ask AI "how do I get Panama residency / buy property" — then consult ov
 | RE/MAX Millenium Panamá · STAGED | remax-millenium.com | RE/MAX franchise, World Trade Center Marbella, ~14 agents, EN site for international buyers. ✅ STAGED 2026-08-07 via Oracle bridge (deal 63570315139; live audit **88/A** → credential letter, pivot to 24/7 EN/ES buyer qualification; WA +507 6707-2042; info@remax-millenium.com). 4 send buttons on the note · sourcing in `prospects/REMAX_MILLENIUM_RESEARCH.md` · **not sent yet** |
 | Panama Homes / similar expat brokers | (mine) | Prefer brokers with own `.com` + WA |
 
+### A2b. Executive search & headhunting (Panama)
+
+Arden & Price cohort — dual-track letters (`openToRoles`: senior AI/automation role disclosed once after the paid ask).
+
+| Prospect | Domain | Notes |
+|---|---|---|
+| T-MAPP · STAGED | t-mapp.com | Regional headhunting / Smart Search; publishes "Mejores Headhunters de Panamá" guide. ✅ STAGED 2026-08-07 (deal **63571556237**; audit **92/A** → credential letter + dual track; **EMAIL-PRIMARY** alejandro@t-mapp.com). Sourcing: `prospects/T-MAPP_RESEARCH.md` · **not sent yet** |
+| Talentum Headhunting · STAGED | talentum.com.pa | Boutique Panama executive/mid-level search. ✅ STAGED 2026-08-07 (deal **63573234772**; audit **84/B** → citable-answer letter + dual track; WA +507 6339-6599; c.fistonich@talentum.com.pa). Sourcing: `prospects/TALENTUM_HEADHUNTING_RESEARCH.md` · **not sent yet** |
+| Cornerstone Panama · BLOCKED | cornerstone.pa | AESC member; terna final en 10 días hábiles. ⛔ DNS/audit blocked 2026-08-07 — visibility engine cannot fetch apex or www from Oracle. See `prospects/CORNERSTONE_PANAMA_RESEARCH.md` |
+
 ### A3. Tourism — charters, tours, eco-lodges (Panama)
 International travelers plan with AI and book on WhatsApp. **Yacht rental already validated.** Lead = **WhatsApp booking** + **AI Visibility** + **AI video**.
 
