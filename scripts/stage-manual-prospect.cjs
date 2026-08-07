@@ -1759,7 +1759,11 @@ const PROSPECT_META = {
     moneyQuery: '¿cuál es la mejor agencia de reclutamiento ejecutivo en Panamá?',
     compliment:
       'son una boutique panameña con una promesa que se puede verificar: no reciclan hojas de vida, cada búsqueda arranca identificando dónde está ese talento, y acompañan a empresas que no tienen un departamento de RRHH permanente',
-    gapClause: 'PENDING_AUDIT',
+    // Verified by the live audit run on Aug 7 2026: score 85 A (AI Access 95 · GEO 88 ·
+    // AEO 75 · Tech 86). FAIL h1, img-alt (7/22); WARNs for llms.txt, schema-answer,
+    // entity-links, question-headings.
+    gapClause:
+      'no tiene un H1 que diga de qué trata la página, sin llms.txt, sin FAQPage/Service JSON-LD, sin sameAs, y 15 de 22 imágenes sin texto alternativo',
     dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
     pivot:
       'Sus clientes son empresas sin departamento de RRHH permanente: cuando necesitan contratar, ustedes son el departamento. Lo que hago es que ese cliente encuentre respuesta apenas escribe, a cualquier hora — un agente que califica la vacante (nivel, funciones, banda salarial, urgencia) y se la entrega al consultor ya perfilada, atiende también al candidato que se postula, y reactiva a los clientes que contrataron el año pasado y no han vuelto.',
@@ -1767,13 +1771,13 @@ const PROSPECT_META = {
     pdEmoji: '💼',
     pdLine:
       'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
-    topFixes: 'PENDING_AUDIT',
+    topFixes:
+      '(1) un H1 claro + FAQ con las preguntas literales de empresas sin RRHH + FAQPage/Service JSON-LD, (2) llms.txt + sameAs a LinkedIn, (3) alt text en las imágenes del equipo y casos de éxito',
     contactFirstName: 'Talentum Headhunting',
     contactLastName: '(Contact)',
     // talentum.com.pa/contacts/ publishes c.fistonich@ for commercial inquiries;
-    // +507 395-7196 is a Panama landline (395 prefix), not WhatsApp-capable.
+    // the scrape also found +507 6339-6599 as a Panama mobile on the site.
     preferredEmail: 'c.fistonich@talentum.com.pa',
-    emailOnlyOk: true,
     openToRoles: true,
   },
   /**
