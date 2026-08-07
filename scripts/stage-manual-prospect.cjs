@@ -1706,7 +1706,11 @@ const PROSPECT_META = {
     moneyQuery: '¿qué headhunter en Panamá consigue talento regional o tecnológico?',
     compliment:
       'publican la guía de los mejores headhunters de Panamá — pocos en su sector tienen la seguridad de ubicar a su competencia en una tabla — y su Smart Search apunta al ejecutivo pasivo, que es el difícil',
-    gapClause: 'PENDING_AUDIT',
+    // Verified by the live audit run on Aug 7 2026: score 92 A (AI Access 95 · GEO 94 ·
+    // AEO 81 · Tech 100). WARNs for llms.txt, html-lang, question-headings (only one),
+    // semantic-html, freshness-signal.
+    gapClause:
+      'solo una pregunta en forma de titular, sin llms.txt, sin atributo lang en el <html>, y sin fechas legibles por máquina en el contenido',
     dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
     pivot:
       'Su activo es el mapa del talento pasivo, y un mapa se enfría solo. Lo que hago es dejarlo vivo: un agente que atiende 24/7 al cliente que llega con una vacante y la califica antes de que un consultor invierta una hora (nivel, industria, banda salarial, urgencia), califica también al candidato que se postula, mantiene el CRM al día y les entrega cada mañana un briefing de qué se movió en el mapa.',
@@ -1714,9 +1718,14 @@ const PROSPECT_META = {
     pdEmoji: '💼',
     pdLine:
       'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
-    topFixes: 'PENDING_AUDIT',
+    topFixes:
+      '(1) FAQ cuyos H2/H3 sean las preguntas literales que hace un cliente con una vacante ejecutiva + FAQPage/Service JSON-LD, (2) llms.txt + lang="es" en el <html>, (3) dateModified en JSON-LD o <time> visible en el contenido actualizado',
     contactFirstName: 'T-MAPP',
     contactLastName: '(Contact)',
+    // Site publishes contact forms only — no mailto or WA link. Their own terms name
+    // alejandro@t-mapp.com for contractual notifications (Talent Mapping S.A.S).
+    preferredEmail: 'alejandro@t-mapp.com',
+    emailOnlyOk: true,
     openToRoles: true,
   },
   'cornerstone.pa': {
@@ -1738,6 +1747,8 @@ const PROSPECT_META = {
     topFixes: 'PENDING_AUDIT',
     contactFirstName: 'Cornerstone Panama',
     contactLastName: '(Contact)',
+    // cornerstone.pa publishes a contact form only — no mailto or WA on the Panama site.
+    emailOnlyOk: true,
     openToRoles: true,
   },
   'talentum.com.pa': {
@@ -1759,6 +1770,10 @@ const PROSPECT_META = {
     topFixes: 'PENDING_AUDIT',
     contactFirstName: 'Talentum Headhunting',
     contactLastName: '(Contact)',
+    // talentum.com.pa/contacts/ publishes c.fistonich@ for commercial inquiries;
+    // +507 395-7196 is a Panama landline (395 prefix), not WhatsApp-capable.
+    preferredEmail: 'c.fistonich@talentum.com.pa',
+    emailOnlyOk: true,
     openToRoles: true,
   },
   /**
