@@ -2347,5 +2347,22 @@
     "emailDraft": "docs/selling/drafts/remax-millenium-fu-email.txt",
     "dealId": "63570315139",
     "score": 88
+  },
+  "t-mapp": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/t-mapp.txt",
+    "company": "T-MAPP",
+    "email": "alejandro@t-mapp.com",
+    "emailDraft": "docs/selling/drafts/t-mapp-email.txt",
+    "dealId": "63571556237",
+    "score": 92
+  },
+  "t-mapp-fu": {
+    "phone": "",
+    "company": "T-MAPP",
+    "email": "alejandro@t-mapp.com",
+    "emailDraft": "docs/selling/drafts/t-mapp-fu-email.txt",
+    "dealId": "63571556237",
+    "score": 92
   }
 }
