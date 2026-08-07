@@ -2330,5 +2330,22 @@
     "emailDraft": "docs/selling/drafts/abolu-best-value-fu-email.txt",
     "dealId": "63550690308",
     "score": 89
+  },
+  "remax-millenium": {
+    "phone": "50767072042",
+    "draft": "docs/selling/drafts/remax-millenium.txt",
+    "company": "REMAX Millenium",
+    "email": "info@remax-millenium.com",
+    "emailDraft": "docs/selling/drafts/remax-millenium-email.txt",
+    "dealId": "63570315139",
+    "score": 88
+  },
+  "remax-millenium-fu": {
+    "phone": "50767072042",
+    "company": "REMAX Millenium",
+    "email": "info@remax-millenium.com",
+    "emailDraft": "docs/selling/drafts/remax-millenium-fu-email.txt",
+    "dealId": "63570315139",
+    "score": 88
   }
 }
