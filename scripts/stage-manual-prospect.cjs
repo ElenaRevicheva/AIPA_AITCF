@@ -1781,7 +1781,36 @@ const PROSPECT_META = {
     openToRoles: true,
   },
   /**
-   * RE/MAX Millenium Panamá — RE/MAX franchise office at the World Trade Center,
+   * Kennedy Home (Hakol Group S.A.) — Panama City e-commerce for furniture, home decor,
+   * bedding, kitchen, electronics and seasonal catalog (founded 2016). Online shop with
+   * delivery across Panama City; showroom/ops tied to Costa del Este / Parque Lefevre.
+   * Not Kennedy Structures (Zona Libre importer) — different company.
+   *
+   * Contact: web@kennedyhome.com is what they publish on LinkedIn for general/web
+   * inquiries; directory listings show 396-4151/52/53 (landline). Staging is
+   * EMAIL-PRIMARY unless the live scrape finds a mobile or wa.me link.
+   */
+  'kennedyhome.com': {
+    company: 'Kennedy Home',
+    city: 'Panama City',
+    customer: 'familia que está amueblando su casa o busca decoración en Panamá',
+    moneyQuery: '¿dónde comprar muebles y decoración para el hogar en Panamá con envío?',
+    compliment:
+      'tienen tienda en línea con catálogo amplio — muebles, cocina, ropa de cama, decoración y electrodomésticos — y envío gratis en la ciudad desde compras modestas',
+    gapClause: 'PENDING_AUDIT',
+    dealOffer: 'AI Growth Operator · ventas y consultas por WhatsApp',
+    pivot:
+      'Su cliente compra en la noche o el fin de semana, y la primera duda casi nunca es “quiero comprar”: es si tienen la medida, si llegan a su corregimiento, cuánto tarda el envío, si aceptan tarjeta o Yappy, o si ese color sigue en stock. Lo que hago es dejar ese canal atendido 24/7 — un agente que responde esas preguntas, confirma disponibilidad, arma el pedido o la cita de entrega, y le pasa a ventas el cliente ya listo, además de reactivar a quien dejó el carrito a medias.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre las consultas que ya reciben — sin compromiso.',
+    pdEmoji: '🛋️',
+    pdLine:
+      'construyo agentes de WhatsApp que responden consultas de producto y envío 24/7 (medidas, stock, zona de entrega, forma de pago), ayudan a cerrar el pedido y se conectan a su CRM o tienda en línea, automatización de seguimiento de carritos abandonados, video con IA para marketing de catálogo, y rescate de sistemas de IA que fallan.',
+    topFixes: 'PENDING_AUDIT',
+    contactFirstName: 'Kennedy Home',
+    contactLastName: '(Contact)',
+    preferredEmail: 'web@kennedyhome.com',
+    emailOnlyOk: true,
+  },
    * Marbella, Panama City. Owners Jose Jardim and Maria Flores, ~14 agents. Inventory
    * spans sale, rent, commercial and new developments; the site is written in English
    * for the international buyer.
