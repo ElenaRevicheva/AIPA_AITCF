@@ -2364,5 +2364,22 @@
     "emailDraft": "docs/selling/drafts/t-mapp-fu-email.txt",
     "dealId": "63571556237",
     "score": 92
+  },
+  "talentum-headhunting": {
+    "phone": "50763396599",
+    "draft": "docs/selling/drafts/talentum-headhunting.txt",
+    "company": "Talentum Headhunting",
+    "email": "c.fistonich@talentum.com.pa",
+    "emailDraft": "docs/selling/drafts/talentum-headhunting-email.txt",
+    "dealId": "63573234772",
+    "score": 84
+  },
+  "talentum-headhunting-fu": {
+    "phone": "50763396599",
+    "company": "Talentum Headhunting",
+    "email": "c.fistonich@talentum.com.pa",
+    "emailDraft": "docs/selling/drafts/talentum-headhunting-fu-email.txt",
+    "dealId": "63573234772",
+    "score": 84
   }
 }
