@@ -1755,7 +1755,7 @@ const PROSPECT_META = {
     company: 'Talentum Headhunting',
     city: 'Panama City',
     customer:
-      'gerente general de una empresa panameña sin departamento de RRHH que necesita contratar gerencia media o ejecutiva',
+      'gerente general sin departamento de RRHH que necesita contratar gerencia media o ejecutiva',
     moneyQuery: '¿cuál es la mejor agencia de reclutamiento ejecutivo en Panamá?',
     compliment:
       'son una boutique panameña con una promesa que se puede verificar: no reciclan hojas de vida, cada búsqueda arranca identificando dónde está ese talento, y acompañan a empresas que no tienen un departamento de RRHH permanente',
