@@ -2313,5 +2313,90 @@
     "emailDraft": "docs/selling/drafts/arden-price-fu-email.txt",
     "score": 82,
     "dealId": "63541851801"
+  },
+  "abolu-best-value": {
+    "phone": "50766708797",
+    "draft": "docs/selling/drafts/abolu-best-value.txt",
+    "company": "Abolu Best Value",
+    "email": "servicioalcliente@abolu.net",
+    "emailDraft": "docs/selling/drafts/abolu-best-value-email.txt",
+    "dealId": "63550690308",
+    "score": 89
+  },
+  "abolu-best-value-fu": {
+    "phone": "50766708797",
+    "company": "Abolu Best Value",
+    "email": "servicioalcliente@abolu.net",
+    "emailDraft": "docs/selling/drafts/abolu-best-value-fu-email.txt",
+    "dealId": "63550690308",
+    "score": 89
+  },
+  "remax-millenium": {
+    "phone": "50767072042",
+    "draft": "docs/selling/drafts/remax-millenium.txt",
+    "company": "REMAX Millenium",
+    "email": "info@remax-millenium.com",
+    "emailDraft": "docs/selling/drafts/remax-millenium-email.txt",
+    "dealId": "63570315139",
+    "score": 88
+  },
+  "remax-millenium-fu": {
+    "phone": "50767072042",
+    "company": "REMAX Millenium",
+    "email": "info@remax-millenium.com",
+    "emailDraft": "docs/selling/drafts/remax-millenium-fu-email.txt",
+    "dealId": "63570315139",
+    "score": 88
+  },
+  "t-mapp": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/t-mapp.txt",
+    "company": "T-MAPP",
+    "email": "alejandro@t-mapp.com",
+    "emailDraft": "docs/selling/drafts/t-mapp-email.txt",
+    "dealId": "63571556237",
+    "score": 92
+  },
+  "t-mapp-fu": {
+    "phone": "",
+    "company": "T-MAPP",
+    "email": "alejandro@t-mapp.com",
+    "emailDraft": "docs/selling/drafts/t-mapp-fu-email.txt",
+    "dealId": "63571556237",
+    "score": 92
+  },
+  "talentum-headhunting": {
+    "phone": "50763396599",
+    "draft": "docs/selling/drafts/talentum-headhunting.txt",
+    "company": "Talentum Headhunting",
+    "email": "c.fistonich@talentum.com.pa",
+    "emailDraft": "docs/selling/drafts/talentum-headhunting-email.txt",
+    "dealId": "63573234772",
+    "score": 82
+  },
+  "talentum-headhunting-fu": {
+    "phone": "50763396599",
+    "company": "Talentum Headhunting",
+    "email": "c.fistonich@talentum.com.pa",
+    "emailDraft": "docs/selling/drafts/talentum-headhunting-fu-email.txt",
+    "dealId": "63573234772",
+    "score": 82
+  },
+  "kennedy-home": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/kennedy-home.txt",
+    "company": "Kennedy Home",
+    "email": "web@kennedyhome.com",
+    "emailDraft": "docs/selling/drafts/kennedy-home-email.txt",
+    "dealId": "63557634379",
+    "score": 80
+  },
+  "kennedy-home-fu": {
+    "phone": "5078305756",
+    "company": "Kennedy Home",
+    "email": "web@kennedyhome.com",
+    "emailDraft": "docs/selling/drafts/kennedy-home-fu-email.txt",
+    "dealId": "63557634379",
+    "score": 80
   }
 }

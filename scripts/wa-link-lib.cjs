@@ -126,8 +126,19 @@ function buildHubSpotWaAnchor(phone, text, label) {
   return `<a href="${url}"><b>${title}</b></a>`;
 }
 
-/** Canonical email subject for Manual Prospect Play (spam-safe, audit-specific). */
-function buildManualEmailSubject(company, score) {
+/**
+ * Canonical email subject for Manual Prospect Play (spam-safe, audit-specific).
+ *
+ * A high scorer gets a different one. Abolu audited 89/A, so the letter opens with the
+ * score as a credential and says outright "no les voy a inventar un problema que no
+ * tienen" — under a subject line promising three fixes. The subject is the first thing
+ * read and it contradicted the body; a prospect who opens on that mismatch has already
+ * been told the letter is a template.
+ */
+function buildManualEmailSubject(company, score, opts = {}) {
+  if (opts.credential) {
+    return `${company} sacó ${score}/100 en visibilidad en IA — les escribo por otra cosa`;
+  }
   return `Auditoría de visibilidad en IA — ${company} (${score}/100): 3 arreglos concretos`;
 }
 

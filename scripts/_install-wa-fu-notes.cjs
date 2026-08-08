@@ -16,18 +16,20 @@ const {
   formatPhone507,
 } = require('./wa-link-lib.cjs');
 
+const { hubspotKey, hubspotOwnerId, hubspotBase } = require('./hs-env.cjs');
+
 const root = path.join(__dirname, '..');
-const env = fs.readFileSync(path.join(root, '.env'), 'utf8');
-const KEY = env.match(/^HUBSPOT_API_KEY=(.+)$/m)?.[1]?.trim();
-const OWNER = env.match(/^HUBSPOT_OWNER_ID=(.+)$/m)?.[1]?.trim() || '91612860';
-if (!KEY) throw new Error('HUBSPOT_API_KEY missing');
+const KEY = hubspotKey();
+const OWNER = hubspotOwnerId();
+const HS = hubspotBase();
+if (!KEY) throw new Error('HUBSPOT_API_KEY missing — put it in .env or the environment');
 const headers = { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const SINCE = new Date('2026-07-18T00:00:00Z').getTime();
 const FU_MARKER = '<!-- WA-FU-GROWTH-OPERATOR -->';
 
 async function hs(method, p, body, attempt = 0) {
-  const r = await fetch(`https://api.hubapi.com${p}`, {
+  const r = await fetch(`${HS}${p}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
@@ -96,7 +98,10 @@ function parseAudit(dealName, notePlain) {
     blob.match(/pregunta a ChatGPT[^\"]*\"([^\"]+)\"/i) ||
     blob.match(/Perplexity\s+\"([^\"]+)\"/i);
   const moneyQuery = cleanMoneyQuery(mq ? mq[1] : null);
-  return { score: score || 75, grade: grade || 'B', weakName, weakScore, moneyQuery };
+  // score stays null when the deal name and note carry no audit: the FU quotes it back
+  // to the prospect ("Analicé su sitio: N/100"), so an unparsed deal is reported, never
+  // defaulted to 75/B.
+  return { score, grade: score != null ? grade || 'B' : null, weakName, weakScore, moneyQuery };
 }
 
 /**
@@ -185,30 +190,37 @@ function buildFuEmailDraft({ company, to, score, fuText }) {
     if (cfg.dealId) byDeal.set(String(cfg.dealId), { slug, ...cfg });
   }
 
-  const deals = [];
-  let after;
-  do {
-    const body = {
-      filterGroups: [
-        {
-          filters: [
-            { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: 'CLIENT-MANUAL' },
-            { propertyName: 'createdate', operator: 'GTE', value: String(SINCE) },
-          ],
-        },
-      ],
-      properties: ['dealname', 'dealstage'],
-      limit: 100,
-    };
-    if (after) body.after = after;
-    const page = await hs('POST', '/crm/v3/objects/deals/search', body);
-    deals.push(...(page.results || []));
-    after = page.paging?.next?.after;
-    await sleep(200);
-  } while (after);
-
-  // --only=<substring|dealId> → single-deal test run before touching the batch
+  // --only=<dealId> → fetch that deal directly. HubSpot's deal search is eventually
+  // consistent, so a deal created seconds earlier (stage-manual-prospect.cjs --with-fu)
+  // is not in the index yet: the search returned deals:0 for Abolu while the deal plainly
+  // existed, and the run reported a follow-up it had never installed. An id needs no index.
+  // --only=<substring|dealId> → single-deal run; a substring still goes through search.
   const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').split('=')[1];
+  const deals = [];
+  if (/^\d+$/.test(ONLY || '')) {
+    deals.push(await hs('GET', `/crm/v3/objects/deals/${ONLY}?properties=dealname,dealstage`));
+  } else {
+    let after;
+    do {
+      const body = {
+        filterGroups: [
+          {
+            filters: [
+              { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: 'CLIENT-MANUAL' },
+              { propertyName: 'createdate', operator: 'GTE', value: String(SINCE) },
+            ],
+          },
+        ],
+        properties: ['dealname', 'dealstage'],
+        limit: 100,
+      };
+      if (after) body.after = after;
+      const page = await hs('POST', '/crm/v3/objects/deals/search', body);
+      deals.push(...(page.results || []));
+      after = page.paging?.next?.after;
+      await sleep(200);
+    } while (after);
+  }
   const real = deals
     .filter((d) => !/HIT-LIST|remaining|queue/i.test(d.properties.dealname || ''))
     .filter((d) => !ONLY || d.id === ONLY || (d.properties.dealname || '').toLowerCase().includes(ONLY.toLowerCase()));
@@ -294,6 +306,14 @@ function buildFuEmailDraft({ company, to, score, fuText }) {
       // Parse the ORIGINAL note only — never our own previously installed FU text.
       const originalPlain = plain(stripFu(oldBody));
       const audit = parseAudit(d.properties.dealname || '', originalPlain);
+      if (audit.score == null) {
+        results.errors.push({
+          dealId: d.id,
+          company,
+          err: 'no audit score in deal name or note — FU would have to invent one',
+        });
+        continue;
+      }
       const firstTouch = /📧\s*EMAILED|Resend:/i.test(originalPlain)
         ? 'email'
         : /✅\s*SENT/i.test(originalPlain)

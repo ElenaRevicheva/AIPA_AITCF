@@ -89,7 +89,10 @@ Full play: `docs/selling/MANUAL_PROSPECT_PLAY.md` · Hit-list: `docs/selling/PAN
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/stage-manual-prospect.cjs <domain>` | Full play → HubSpot + draft + registry |
+| `scripts/stage-manual-prospect.cjs <domain> --with-fu` | Full play → HubSpot + 4 drafts + registry + follow-up buttons, one command |
+| `scripts/stage-manual-prospect.cjs <domain> --prepare-only` | Same artifacts, nothing written to HubSpot (review, or no CRM access) |
+| `scripts/test-manual-prospect-cycle.cjs` | End-to-end cycle against a mock CRM (`npm run test:manual-cycle`) |
+| `scripts/hs-env.cjs` | Key/owner/API base from the environment, then `.env` |
 | `scripts/hs-refresh-manual-wa-links.cjs` | Repatch note wa links on open deals |
 | `scripts/outreach-walink.cjs <phone> <draft.txt>` | Generate wa.me URL for testing |
 | `scripts/wa-link-lib.cjs` | `buildHubSpotWaAnchor(phone, draft)` for notes |
@@ -97,9 +100,14 @@ Full play: `docs/selling/MANUAL_PROSPECT_PLAY.md` · Hit-list: `docs/selling/PAN
 
 **Auth pattern in scripts:**
 ```javascript
-const KEY = fs.readFileSync('.env','utf8').match(/^HUBSPOT_API_KEY=(.+)$/m)[1].trim();
-const headers = { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+const { hubspotKey, hubspotBase } = require('./hs-env.cjs');
+const headers = { Authorization: `Bearer ${hubspotKey()}`, 'Content-Type': 'application/json' };
 ```
+
+Reading `.env` directly still works on Elena's laptop and nowhere else: Oracle cron, CI
+and cloud agents hold the key in the process environment, and `fs.readFileSync('.env')`
+throws ENOENT before the script can say what is missing. `hs-env.cjs` checks the
+environment first, then `.env`.
 
 **Note on deal:** POST `/crm/v3/objects/notes` then PUT association type **214** to deal.
 
