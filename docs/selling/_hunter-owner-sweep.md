@@ -1,6 +1,6 @@
 # Hunter owner sweep — 2026-08-08
 
-Scanned **24** domains · **19** returned people · **4** owner/marketing grade · **3** added to HubSpot.
+Scanned **24** domains · **19** returned people · **4** owner/marketing grade · **4** added to HubSpot.
 Credits 19 → 0.
 
 | Company | Current contact | Decision-maker found | Title | Conf | Added |
@@ -10,7 +10,7 @@ Credits 19 → 0.
 | ReloFirm | contact@relofirm.com | Marcin Wolski — marcin@relofirm.com | Warehouse Specialist | 85% | — |
 | Marjalizo | info@marjalizorealty.com | Evelyn Solórzano — e.solorzano@marjalizorealty.com | Accountant | 99% | — |
 | Foundever | info@foundever.com | Samuel Shrimplin — shrimplin.samuel@foundever.com | Founder | 99% | ✅ |
-| T-MAPP | alejandro@t-mapp.com | Pablo Sagarminaga — pablo@t-mapp.com | Co-Founder | 85% | — |
+| T-MAPP | alejandro@t-mapp.com | Pablo Sagarminaga — pablo@t-mapp.com | Co-Founder | 85% | ✅ (manual) |
 | Destination Dream Weddings | wendy@destinationdreamweddings.com | Wendy Wharton — wendy@destinationdreamweddings.com | Specialist | 72% | — |
 
 ## No named person found

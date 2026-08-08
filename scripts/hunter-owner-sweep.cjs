@@ -219,6 +219,15 @@ async function addOwnerToDeal(entry, best) {
   }
 
   const after = await hunterAccount();
+
+  // A run that scanned nothing (no credits, or --limit=0) must NOT clobber the
+  // last real report — that happened once and the good data was only recoverable
+  // from git. Empty runs leave the previous report alone.
+  if (results.length === 0) {
+    console.log('\nNothing scanned (no budget) — previous report left untouched.');
+    return;
+  }
+
   fs.writeFileSync(REPORT_JSON, JSON.stringify({
     ranAt: new Date().toISOString(), mode: APPLY ? 'apply' : 'report',
     creditsBefore: credits.remaining, creditsAfter: after.remaining,

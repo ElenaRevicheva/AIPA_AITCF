@@ -6,7 +6,7 @@
   "scanned": 24,
   "hits": 19,
   "ownerGrade": 4,
-  "added": 3,
+  "added": 4,
   "minConfidence": 90,
   "results": [
     {
@@ -230,7 +230,8 @@
         "confidence": 85,
         "grade": "owner"
       },
-      "applied": false
+      "applied": true,
+      "appliedNote": "manually approved by Elena Aug 8 2026 (below 90% auto-bar)"
     },
     {
       "company": "DoPanama",
