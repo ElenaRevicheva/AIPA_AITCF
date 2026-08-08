@@ -1,2 +1,6 @@
 # Shell scripts must use LF so they run on Oracle (Linux)
 scripts/oracle-resilience/*.sh text eol=lf
+
+# Cursor Cloud Agent environment install/start scripts break with CRLF
+# (npm sees "i\r" / "build\r" and the install step fails).
+.cursor/environment.json text eol=lf
