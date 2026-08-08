@@ -23,6 +23,12 @@ import {
   type OutreachTargetInput,
 } from './outreach';
 import { getOutreachExistingCompaniesLowercase } from './database';
+import { canSpendHunter, noteHunterSpend } from './hunter-budget';
+
+/** Below this Hunter confidence the address is not worth an outreach slot. */
+const PLACES_MIN_CONFIDENCE = Number(process.env.PLACES_MIN_CONFIDENCE || 70);
+/** At or above this, the domain-search score already stands in for verification. */
+const PLACES_SKIP_VERIFY_AT = Number(process.env.PLACES_SKIP_VERIFY_AT || 90);
 
 // ---------------------------------------------------------------------------
 // Types
@@ -287,6 +293,9 @@ export async function runPlacesIngestion(
 
   places = await enrichPlacesFromDetails(places);
 
+  /** email → Hunter confidence, so the verify pass can skip what is already certain. */
+  const emailConfidence = new Map<string, number>();
+
   let ingested = 0;
   let skipped = 0;
   let errors = 0;
@@ -377,11 +386,25 @@ export async function runPlacesIngestion(
       let founderName: string | null = null;
 
       const hunterKey = process.env.HUNTER_API_KEY?.trim();
-      if (hunterKey) {
+      if (hunterKey && (await canSpendHunter('auto', 1, tag))) {
         const search = await hunterDomainSearch(domain, 5);
-        if (search.emails.length > 0) {
-          email = search.emails[0]!.email;
-          founderName = search.emails[0]!.name || null;
+        if (search.found > 0) noteHunterSpend(1); // misses are free — Hunter only bills hits
+        const best = search.emails[0];
+        // Confidence was previously discarded, then a SECOND credit was spent
+        // verifying the same address. Keep the score: it is the verification.
+        if (best && best.confidence >= PLACES_MIN_CONFIDENCE) {
+          email = best.email;
+          founderName = best.name || null;
+          emailConfidence.set(best.email, best.confidence);
+          console.log(
+            `[${tag}] hunter: ${domain} → ${best.email} (conf ${best.confidence}${best.position ? `, ${best.position}` : ''})`
+          );
+        } else if (best) {
+          console.log(
+            `[${tag}] hunter: ${domain} → ${best.email} conf ${best.confidence} < ${PLACES_MIN_CONFIDENCE}, not used`
+          );
+        } else {
+          console.log(`[${tag}] hunter: ${domain} → no emails (free miss)`);
         }
         await new Promise((r) => setTimeout(r, 2000));
       }
@@ -403,13 +426,18 @@ export async function runPlacesIngestion(
     const result = await importTargets(targets);
     ingested = result.imported;
 
+    // Only verify what Hunter was NOT already confident about. A 90+ domain-search
+    // hit does not need a second paid call to confirm it exists.
     for (const t of targets) {
-      if (t.email) {
-        try {
-          await verifyEmailHunter(t.email);
-        } catch {
-          /* non-fatal */
-        }
+      if (!t.email) continue;
+      const conf = emailConfidence.get(t.email) ?? 0;
+      if (conf >= PLACES_SKIP_VERIFY_AT) continue;
+      if (!(await canSpendHunter('auto', 1, tag))) break;
+      try {
+        await verifyEmailHunter(t.email);
+        noteHunterSpend(1);
+      } catch {
+        /* non-fatal */
       }
     }
   }

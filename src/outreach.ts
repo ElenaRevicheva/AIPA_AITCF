@@ -40,6 +40,10 @@ function isBogusOutreachEmail(email: string | null | undefined): boolean {
 }
 
 import { getResendApiKey } from './marketing-notify';
+import { canSpendHunter, noteHunterSpend } from './hunter-budget';
+
+/** How many drafts one daily cycle writes — also the verification ceiling. */
+const DAILY_DRAFT_BATCH = Number(process.env.OUTREACH_DAILY_CAP || 10);
 
 // ---------------------------------------------------------------------------
 // AIdeazz production systems — used in personalization to map pain → solution
@@ -144,7 +148,12 @@ function matchPainToSystem(text: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Hunter.io — free tier: 25 searches + 50 verifications + 25 finders / month
+// Hunter.io — free tier, confirmed live against /v2/account Aug 8 2026:
+//   50 searches + 100 verifications / month, drawn from 50 shared credits.
+// A domain-search that returns NO emails costs nothing — only hits are billed
+// (measured: 6 searches, 3 empty → 3 credits). So trying a long-shot domain is free.
+// Spend is gated by ./hunter-budget, which reads the real balance and keeps a
+// reserve for the manual client play.
 // ---------------------------------------------------------------------------
 
 export async function hunterDomainSearch(domain: string, limit = 5): Promise<{
@@ -248,7 +257,7 @@ export async function verifyEmailHunter(email: string): Promise<{
   }
 }
 
-export async function verifyTargetEmails(): Promise<{
+export async function verifyTargetEmails(limit = Infinity): Promise<{
   verified: number;
   invalid: number;
 }> {
@@ -256,16 +265,20 @@ export async function verifyTargetEmails(): Promise<{
   let verified = 0;
   let invalid = 0;
   for (const row of targets) {
+    if (verified >= limit) break;
     const email = (row as any[])[3] as string | null;
     const targetId = (row as any[])[0] as string;
     if (!email) continue;
     // Skip obviously invalid emails (package versions, numeric TLDs, etc.)
+    // Free — no Hunter credit spent, so this runs before the budget gate.
     if (!/^[\w.+\-]+@[\w\-]+\.[a-zA-Z][\w.]{1,}$/.test(email)) {
       await updateOutreachTargetStatus(targetId, 'invalid_email', 'invalid');
       invalid++;
       continue;
     }
+    if (!(await canSpendHunter('auto', 1, 'outreach'))) break;
     const result = await verifyEmailHunter(email);
+    noteHunterSpend(1);
     if (result.status === 'invalid') {
       await updateOutreachTargetStatus(targetId, 'invalid_email', 'invalid');
       invalid++;
@@ -577,12 +590,16 @@ export async function runDailyOutreachCycle(
   console.log(`[${tag}] Daily outreach cycle starting…`);
 
   try {
-    // Step 0: verify any 'new' targets → moves them to 'verified' or 'invalid_email'
-    const verify = await verifyTargetEmails();
-    console.log(`[${tag}] Verified ${verify.verified} targets, rejected ${verify.invalid}`);
+    // Step 0: verify only as many targets as today's drafts can consume.
+    // Verifying the whole 'new' pool burned up to 4x the month's allowance on
+    // addresses that were never written to (Aug 2026: 40 verified → 10 drafted).
+    const verify = await verifyTargetEmails(DAILY_DRAFT_BATCH);
+    console.log(
+      `[${tag}] Verified ${verify.verified} targets, rejected ${verify.invalid} (cap ${DAILY_DRAFT_BATCH})`
+    );
 
     // Step 1: generate drafts for verified + new-with-email targets
-    const gen = await generateBatchDrafts(anthropic, 10);
+    const gen = await generateBatchDrafts(anthropic, DAILY_DRAFT_BATCH);
     console.log(`[${tag}] Generated ${gen.generated} drafts`);
 
     // Step 2: immediately send all drafts
