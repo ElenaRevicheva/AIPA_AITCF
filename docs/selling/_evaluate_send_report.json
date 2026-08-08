@@ -1,5 +1,5 @@
 {
-  "mode": "dry-run",
+  "mode": "send",
   "prefixes": [
     "CLIENT-MANUAL",
     "CLIENT"
@@ -15,10 +15,8 @@
     {
       "dealId": "62801585568",
       "name": "Panama Yacht Group — GEO/AEO fix (audit: 86/A)",
-      "slug": "panama-yacht-group-pty",
-      "kind": "first",
-      "action": "would-send",
-      "to": "sales@panamayachtgroup.com"
+      "action": "skip",
+      "why": "first sent — FU not due yet"
     },
     {
       "dealId": "62803339042",
@@ -35,10 +33,8 @@
     {
       "dealId": "62807534128",
       "name": "DQSA Panamá — AI crawler blocked (audit: 54/D)",
-      "slug": "dqsa-panama-pty",
-      "kind": "first",
-      "action": "would-send",
-      "to": "servicioalcliente@dqsa.com.pa"
+      "action": "skip",
+      "why": "first sent — FU not due yet"
     },
     {
       "dealId": "62831000747",
@@ -91,10 +87,8 @@
     {
       "dealId": "62826916357",
       "name": "Sotillo & Company — GEO/AEO fix (audit: 87/A, EM",
-      "slug": "sotillo-company-pty-fu",
-      "kind": "follow-up",
-      "action": "would-send",
-      "to": "ventas@sotillocompany.com"
+      "action": "skip",
+      "why": "already contacted (email+FU)"
     },
     {
       "dealId": "62821413988",
@@ -179,7 +173,8 @@
       "name": "Flamenco Drystack Panama — GEO/AEO fix (audit: 5",
       "slug": "flamenco-drystack-panama-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "4dc53afd-c791-4749-9c1f-7c345053a43d",
       "to": "info@flamencodrystack.net"
     },
     {
@@ -271,7 +266,8 @@
       "name": "Clínica Arango Orillac — GEO/AEO fix (audit: 58/",
       "slug": "cl-nica-arango-orillac",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "ef9ba6dc-f481-4648-90fa-5099b74e1f2f",
       "to": "info@arango-orillac.com"
     },
     {
@@ -285,7 +281,8 @@
       "name": "Charter in San Blas — GEO/AEO fix (audit: 96/A+)",
       "slug": "charter-in-san-blas",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "d21eeedc-b82d-4836-843f-25364a58e7e9",
       "to": "info@charterinsanblas.com"
     },
     {
@@ -293,7 +290,8 @@
       "name": "San Blas on Sailboats — GEO/AEO fix (audit: 83/B",
       "slug": "san-blas-on-sailboats-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "820a17a5-61f9-426f-ae02-0f6651720b93",
       "to": "info@sanblasonsailboats.com"
     },
     {
@@ -308,7 +306,8 @@
       "name": "SailBoat Trips — GEO/AEO fix (audit: 87/A)",
       "slug": "sailboat-trips",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "e00b503c-80b6-40e7-9af3-2cefb102b51d",
       "to": "info@sailboattrips.com"
     },
     {
@@ -323,7 +322,8 @@
       "name": "Sailing Charter Panama — GEO/AEO fix (audit: 97/",
       "slug": "sailing-charter-panama",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "06074fc7-8d4f-4f75-bfab-2f8037f2cc95",
       "to": "sailingcharterpanama@gmail.com"
     },
     {
@@ -338,7 +338,8 @@
       "name": "Destination Dream Weddings — GEO/AEO fix (audit:",
       "slug": "destination-dream-weddings",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "63eb7db6-c8d0-4d8e-a358-a025bab7f380",
       "to": "wendy@destinationdreamweddings.com"
     },
     {
@@ -346,7 +347,8 @@
       "name": "The Haven Wellness Resort — GEO/AEO fix (audit: ",
       "slug": "the-haven-wellness-resort",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "f6c7508b-f49b-49e7-8201-ad8a8ed2d037",
       "to": "info@havenboquete.com"
     },
     {
@@ -354,7 +356,8 @@
       "name": "Valle Escondido Resort — GEO/AEO fix (audit: 84/",
       "slug": "valle-escondido-resort",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "60327c29-849f-415a-947c-2d7044f21165",
       "to": "ventas@valleescondidoboquete.com"
     },
     {
@@ -362,7 +365,8 @@
       "name": "Cancun Dental Specialists — GEO/AEO fix (audit: ",
       "slug": "cancun-dental-specialists",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "e6cd3cfd-fee8-452c-87da-fd6546d82f4c",
       "to": "contact@cancundentalspecialists.com"
     },
     {
@@ -370,7 +374,8 @@
       "name": "Smile Tijuana — GEO/AEO fix (audit: 77/B)",
       "slug": "smile-tijuana",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "25df1676-d944-4adf-a448-a1aab0d4f212",
       "to": "info@smiletijuanadentist.com"
     },
     {
@@ -453,7 +458,8 @@
       "name": "Grupo Dental Nacional — GEO/AEO fix (audit: 54/D",
       "slug": "grupo-dental-nacional-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "b463214c-9321-45df-aaf8-b48175bd8231",
       "to": "info@grupodentalnacional.com"
     },
     {
@@ -461,7 +467,8 @@
       "name": "Hospital Punta Pacífica — GEO/AEO fix (audit: 64",
       "slug": "hospital-punta-pac-fica-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "8418cd33-64b8-4075-942f-3a5432595efa",
       "to": "turismomedico@pacificasalud.com"
     },
     {
@@ -469,7 +476,8 @@
       "name": "Hospital San Fernando — GEO/AEO fix (audit: 85/A",
       "slug": "hospital-san-fernando-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "17a1085c-f288-41f0-81fc-47c204fdbdad",
       "to": "global@hospitalsanfernando.com"
     },
     {
@@ -477,7 +485,8 @@
       "name": "Finca Lérida — GEO/AEO fix (audit: 50/D)",
       "slug": "finca-l-rida-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "db863b0d-618a-4bb1-806c-2e7db82d9f80",
       "to": "info@fincalerida.com"
     },
     {
@@ -492,7 +501,8 @@
       "name": "Hospital Clinica Biblica — GEO/AEO fix (audit: 7",
       "slug": "hospital-clinica-biblica-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "fe4097a2-59da-4501-afc1-f16c62d8a7a2",
       "to": "info@clinicabiblica.com"
     },
     {
@@ -500,7 +510,8 @@
       "name": "Hospital Metropolitano — GEO/AEO fix (audit: 82/",
       "slug": "hospital-metropolitano-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "c05ade44-3c50-4b2e-a2fb-4d92e9450f5a",
       "to": "info@metropolitanocr.com"
     },
     {
@@ -508,7 +519,8 @@
       "name": "Costa Rica Yacht Charter Brokers — GEO/AEO fix (",
       "slug": "costa-rica-yacht-charter-brokers-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "7fa82a40-705c-4a12-b74a-23ecea1c296c",
       "to": "step-aboard@yachtchartercr.com"
     },
     {
@@ -516,7 +528,8 @@
       "name": "Elite Cartagena — GEO/AEO fix (audit: 97/A+)",
       "slug": "elite-cartagena-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "bafb502a-f4f6-4779-b364-f009c1ef3c0d",
       "to": "jc@elitecartagena.com"
     },
     {
@@ -524,7 +537,8 @@
       "name": "Dr. Jorge Rodriguez — GEO/AEO fix (audit: 80/B)",
       "slug": "dr-jorge-rodriguez-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "e78a514b-2b53-4a00-9747-6f56866a3289",
       "to": "info@drjorgerodriguez.com"
     },
     {
@@ -532,7 +546,8 @@
       "name": "Salud sin Fronteras — GEO/AEO fix (audit: 99/A+)",
       "slug": "salud-sin-fronteras-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "fe7bbf56-b4ca-4fa8-93bd-ee1a48d4d78a",
       "to": "coordinacion@saludsinfronteras.com"
     },
     {
@@ -540,7 +555,8 @@
       "name": "Colombia Luxury Group — GEO/AEO fix (audit: 97/A",
       "slug": "colombia-luxury-group-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "44df4c93-4901-43d4-97c4-e4c073dca3b8",
       "to": "info@colombialuxurygroup.com"
     },
     {
@@ -548,7 +564,8 @@
       "name": "Dr. Luis Guillermo Tobon — GEO/AEO fix (audit: 9",
       "slug": "dr-luis-guillermo-tobon",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "b475c348-2f1c-491a-81a1-8cb787fabf62",
       "to": "info@luisguillermotobon.com"
     },
     {
@@ -556,7 +573,8 @@
       "name": "Hi Cartagena — GEO/AEO fix (audit: 57/C)",
       "slug": "hi-cartagena-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "2cc1cf3b-df53-4d0d-aa55-ee0d1aa91518",
       "to": "info@hicartagena.com"
     },
     {
@@ -564,7 +582,8 @@
       "name": "Tijuana Dental Center — GEO/AEO fix (audit: 99/A",
       "slug": "tijuana-dental-center",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "35e6ffdd-a88a-43df-94fd-b392483c1756",
       "to": "info@smile4evermexico.com"
     },
     {
@@ -572,7 +591,8 @@
       "name": "Isla Palenque — GEO/AEO fix (audit: 57/C)",
       "slug": "isla-palenque-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "0c5bfada-50c3-459c-8d86-b92c874cf2b6",
       "to": "reservations@islapalenque.com"
     },
     {
@@ -587,7 +607,8 @@
       "name": "Gianna Dentist MaDenta — GEO/AEO fix (audit: 80/",
       "slug": "gianna-dentist-madenta-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "02ec86e0-1a68-4b66-a7f1-37ee15c4e8e5",
       "to": "recepcion@madentaclinic.com"
     },
     {
@@ -616,7 +637,8 @@
       "name": "Oxford International School Panama — GEO/AEO fix",
       "slug": "oxford-international-school-panama-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "6bf2160f-c177-4ed0-91b0-43cc9ca1a4fc",
       "to": "admisiones@ois.edu.pa"
     },
     {
@@ -631,7 +653,8 @@
       "name": "Goodness Dental — GEO/AEO fix (audit: 64/C)",
       "slug": "goodness-dental-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "03c3ac5c-735a-4fac-b0e4-a1bf1e4dbdd9",
       "to": "patients@goodnessdental.com"
     },
     {
@@ -639,7 +662,8 @@
       "name": "Agency of the Sea — GEO/AEO fix (audit: 54/D)",
       "slug": "agency-of-the-sea",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "c776cac7-8be8-49a3-8006-8223bcb9f102",
       "to": "gabriela@agencyofthesea.com"
     },
     {
@@ -647,7 +671,8 @@
       "name": "Absolute Medical Tourism — GEO/AEO fix (audit: 5",
       "slug": "absolute-medical-tourism",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "696a15c5-95d0-4365-a573-eae1ae1b2a32",
       "to": "info@absolutemedicaltourism.com"
     },
     {
@@ -655,7 +680,8 @@
       "name": "SOTA Dental — GEO/AEO fix (audit: 94/A+)",
       "slug": "sota-dental",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "f5cf8c07-2056-4454-bfcb-d10aacf4e02f",
       "to": "contact@sotadental.com"
     },
     {
@@ -663,7 +689,8 @@
       "name": "Dental Connect — GEO/AEO fix (audit: 87/A)",
       "slug": "dental-connect-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "be932a87-b014-4a67-abe3-f892dbf888a3",
       "to": "contactus@dentalconnect.com.mx"
     },
     {
@@ -678,7 +705,8 @@
       "name": "Hospital CIMA — GEO/AEO fix (audit: 70/B)",
       "slug": "hospital-cima-compras-fu",
       "kind": "follow-up",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "025668e5-8a50-44b2-98fd-c302ef90889a",
       "to": "Compras@hospitalcima.com"
     },
     {
@@ -686,7 +714,8 @@
       "name": "Vitae Health — GEO/AEO fix (audit: 84/B)",
       "slug": "vitae-health",
       "kind": "first",
-      "action": "would-send",
+      "action": "sent",
+      "resendId": "3dba4168-d53e-4cf1-9af9-07cb65904e9e",
       "to": "info@vitae-health.com"
     },
     {
@@ -818,10 +847,10 @@
     }
   ],
   "summary": {
-    "wouldSend": 38,
-    "sent": 0,
-    "skipped": 80,
+    "wouldSend": 0,
+    "sent": 35,
+    "skipped": 83,
     "errors": 0
   },
-  "at": "2026-08-08T00:08:17.351Z"
+  "at": "2026-08-08T00:17:28.409Z"
 }
