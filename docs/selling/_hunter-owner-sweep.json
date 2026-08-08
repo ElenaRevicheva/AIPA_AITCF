@@ -1,0 +1,319 @@
+{
+  "ranAt": "2026-08-08T17:12:13.040Z",
+  "mode": "apply",
+  "creditsBefore": 19,
+  "creditsAfter": 0,
+  "scanned": 24,
+  "hits": 19,
+  "ownerGrade": 4,
+  "added": 3,
+  "minConfidence": 90,
+  "results": [
+    {
+      "company": "Salud sin Fronteras",
+      "domain": "saludsinfronteras.com",
+      "dealId": "63033678371",
+      "score": 99,
+      "currentEmail": "coordinacion@saludsinfronteras.com",
+      "currentIsGeneric": false,
+      "found": 3,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Tijuana Dental Center",
+      "domain": "smile4evermexico.com",
+      "dealId": "63040577101",
+      "score": 99,
+      "currentEmail": "info@smile4evermexico.com",
+      "currentIsGeneric": true,
+      "found": 1,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Ampa Tours",
+      "domain": "ampatours.com",
+      "dealId": "62872179385",
+      "score": 98,
+      "currentEmail": "info@ampatours.com",
+      "currentIsGeneric": true,
+      "found": 0,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Kraemer Law",
+      "domain": "kraemerlaw.com",
+      "dealId": "62872179381",
+      "score": 97,
+      "currentEmail": "info@kraemerlaw.com",
+      "currentIsGeneric": true,
+      "found": 10,
+      "best": {
+        "name": "Marcos Krämer",
+        "email": "marcos@kraemerlaw.com",
+        "position": "Managing Partner",
+        "confidence": 94,
+        "grade": "owner"
+      },
+      "applied": true
+    },
+    {
+      "company": "Elite Cartagena",
+      "domain": "elitecartagena.com",
+      "dealId": "63077716274",
+      "score": 97,
+      "currentEmail": "jc@elitecartagena.com",
+      "currentIsGeneric": false,
+      "found": 1,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Colombia Luxury Group",
+      "domain": "colombialuxurygroup.com",
+      "dealId": "63078747964",
+      "score": 97,
+      "currentEmail": "info@colombialuxurygroup.com",
+      "currentIsGeneric": true,
+      "found": 0,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Panama Equity (Kent Davis)",
+      "domain": "panamaequity.com",
+      "dealId": "62841018415",
+      "score": 97,
+      "currentEmail": "kent@panamaequity.com",
+      "currentIsGeneric": false,
+      "found": 10,
+      "best": {
+        "name": "Kent Davis",
+        "email": "kent@panamaequity.com",
+        "position": "Managing Director",
+        "confidence": 99,
+        "grade": "owner"
+      },
+      "applied": true
+    },
+    {
+      "company": "Charter in San Blas",
+      "domain": "charterinsanblas.com",
+      "dealId": "63039485826",
+      "score": 96,
+      "currentEmail": "info@charterinsanblas.com",
+      "currentIsGeneric": true,
+      "found": 0,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Rapid Tires Panamá",
+      "domain": "rapidtirespanama.com",
+      "dealId": "63509740433",
+      "score": 95,
+      "currentEmail": "info@rapidtirespanama.com",
+      "currentIsGeneric": true,
+      "found": 0,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "YC Panama Yachts",
+      "domain": "ycyachts.com",
+      "dealId": "62864888204",
+      "score": 94,
+      "currentEmail": "info@ycyachts.com",
+      "currentIsGeneric": true,
+      "found": 1,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "ReloFirm",
+      "domain": "relofirm.com",
+      "dealId": "62851992582",
+      "score": 94,
+      "currentEmail": "contact@relofirm.com",
+      "currentIsGeneric": true,
+      "found": 10,
+      "best": {
+        "name": "Marcin Wolski",
+        "email": "marcin@relofirm.com",
+        "position": "Warehouse Specialist",
+        "confidence": 85,
+        "grade": "other"
+      },
+      "applied": false
+    },
+    {
+      "company": "Dr. Luis Guillermo Tobon",
+      "domain": "luisguillermotobon.com",
+      "dealId": "63061986198",
+      "score": 94,
+      "currentEmail": "info@luisguillermotobon.com",
+      "currentIsGeneric": true,
+      "found": 1,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "SOTA Dental",
+      "domain": "sotadental.com",
+      "dealId": "63080279443",
+      "score": 94,
+      "currentEmail": "contact@sotadental.com",
+      "currentIsGeneric": true,
+      "found": 3,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Marjalizo",
+      "domain": "marjalizorealty.com",
+      "dealId": "63526061876",
+      "score": 94,
+      "currentEmail": "info@marjalizorealty.com",
+      "currentIsGeneric": true,
+      "found": 4,
+      "best": {
+        "name": "Evelyn Solórzano",
+        "email": "e.solorzano@marjalizorealty.com",
+        "position": "Accountant",
+        "confidence": 99,
+        "grade": "other"
+      },
+      "applied": false
+    },
+    {
+      "company": "Foundever",
+      "domain": "foundever.com",
+      "dealId": "63523808804",
+      "score": 94,
+      "currentEmail": "info@foundever.com",
+      "currentIsGeneric": true,
+      "found": 10,
+      "best": {
+        "name": "Samuel Shrimplin",
+        "email": "shrimplin.samuel@foundever.com",
+        "position": "Founder",
+        "confidence": 99,
+        "grade": "owner"
+      },
+      "applied": true
+    },
+    {
+      "company": "Ipanema Residences",
+      "domain": "ipanemaresidences.com",
+      "dealId": "62950148475",
+      "score": 92,
+      "currentEmail": "ventas@ipanemaresidences.com",
+      "currentIsGeneric": true,
+      "found": 1,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "T-MAPP",
+      "domain": "t-mapp.com",
+      "dealId": "63571556237",
+      "score": 92,
+      "currentEmail": "alejandro@t-mapp.com",
+      "currentIsGeneric": false,
+      "found": 9,
+      "best": {
+        "name": "Pablo Sagarminaga",
+        "email": "pablo@t-mapp.com",
+        "position": "Co-Founder",
+        "confidence": 85,
+        "grade": "owner"
+      },
+      "applied": false
+    },
+    {
+      "company": "DoPanama",
+      "domain": "dopanama.com",
+      "dealId": "62821413988",
+      "score": 91,
+      "currentEmail": "info@dopanama.com",
+      "currentIsGeneric": true,
+      "found": 8,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Panamá Sonríe",
+      "domain": "panamasonrie.com",
+      "dealId": "63034686254",
+      "score": 91,
+      "currentEmail": "info@panamasonrie.com",
+      "currentIsGeneric": true,
+      "found": 0,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Destination Dream Weddings",
+      "domain": "destinationdreamweddings.com",
+      "dealId": "63064999707",
+      "score": 91,
+      "currentEmail": "wendy@destinationdreamweddings.com",
+      "currentIsGeneric": false,
+      "found": 2,
+      "best": {
+        "name": "Wendy Wharton",
+        "email": "wendy@destinationdreamweddings.com",
+        "position": "Specialist",
+        "confidence": 72,
+        "grade": "other"
+      },
+      "applied": false
+    },
+    {
+      "company": "Nomad Constructions Corp",
+      "domain": "nomadcc.com",
+      "dealId": "62832583063",
+      "score": 90,
+      "currentEmail": "info@nomadcc.com",
+      "currentIsGeneric": true,
+      "found": 2,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "San Blas Sailing",
+      "domain": "sanblassailing.com",
+      "dealId": "63045749810",
+      "score": 90,
+      "currentEmail": "panama@sanblassailing.com",
+      "currentIsGeneric": false,
+      "found": 4,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Spot On Digital Agency",
+      "domain": "spotondigitalagency.com",
+      "dealId": "63404412234",
+      "score": 89,
+      "currentEmail": "hola@spotondigitalagency.com",
+      "currentIsGeneric": true,
+      "found": 2,
+      "best": null,
+      "applied": false
+    },
+    {
+      "company": "Abolu Best Value",
+      "domain": "abolu.net",
+      "dealId": "63550690308",
+      "score": 89,
+      "currentEmail": "servicioalcliente@abolu.net",
+      "currentIsGeneric": true,
+      "found": 1,
+      "best": null,
+      "applied": false
+    }
+  ]
+}
