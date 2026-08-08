@@ -67,6 +67,8 @@ Legacy: `oracle-setup-github-ssh-fleet.sh` (SSH deploy keys) — only works for 
 
 **No laptop SSH needed** — deploy from your phone after one-time secret setup.
 
+**Laptop one-shot:** `.\scripts\oracle-resilience\setup-remote-deploy-from-laptop.ps1` (tests SSH, sets `ORACLE_SSH_KEY`, runs fleet-verify).
+
 1. Add **`ORACLE_SSH_KEY`** to [AIPA_AITCF Actions secrets](https://github.com/ElenaRevicheva/AIPA_AITCF/settings/secrets/actions) (full private key file).
 2. Actions → **Deploy to Oracle VM** → Run workflow.
 
