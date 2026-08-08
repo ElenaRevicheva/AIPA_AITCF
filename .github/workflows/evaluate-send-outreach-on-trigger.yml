@@ -1,0 +1,94 @@
+# Audit [CLIENT*] deals and auto-send first / follow-up email on Oracle.
+# Uses existing /go/outreach-email/{slug}/send — NOT hs-campaign-send.
+#
+# Usage:
+#   echo "dry-run" > .send-trigger && git commit -am "send: dry-run audit" && git push
+#   echo "send" > .send-trigger && git commit -am "send: fire outreach" && git push
+#   echo "send --only=kennedy-home,t-mapp" > .send-trigger && git push
+#   echo "# idle" > .send-trigger   # after a run
+
+name: Evaluate & send outreach (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".send-trigger"]
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate-send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .send-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .send-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.send-trigger is empty"; exit 1; }
+          case "$LINE" in
+            \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+          esac
+          MODE=$(echo "$LINE" | awk '{print $1}')
+          case "$MODE" in
+            dry-run) echo "mode=--dry-run" >> "$GITHUB_OUTPUT" ;;
+            send) echo "mode=--send" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be dry-run or send, got '$MODE'"; exit 1 ;;
+          esac
+          EXTRA=$(echo "$LINE" | cut -s -d' ' -f2-)
+          for f in $EXTRA; do
+            case "$f" in
+              --only=*) echo "extra=$f" >> "$GITHUB_OUTPUT" ;;
+              *) echo "::error::flag '$f' not allowed"; exit 1 ;;
+            esac
+          done
+          echo "Parsed: $LINE"
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY"
+            exit 1
+          fi
+
+      - name: Run on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+          MODE: ${{ steps.trigger.outputs.mode }}
+          EXTRA: ${{ steps.trigger.outputs.extra }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+            "$REF" "$MODE" $EXTRA < scripts/oracle-evaluate-send-outreach.sh
+          RC=$?
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/evaluate-send-output.json /tmp/ 2>/dev/null \
+            && echo "--- pulled report ---" || true
+          rm -f ~/.ssh/oracle
+          exit $RC
+
+      - name: Commit report
+        if: success() && steps.trigger.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          if [ -f /tmp/evaluate-send-output.json ]; then
+            cp /tmp/evaluate-send-output.json docs/selling/_evaluate_send_report.json
+            git add docs/selling/_evaluate_send_report.json
+          fi
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "aipa-outreach[bot]"
+          git config user.email "aipa@aideazz.xyz"
+          git commit -m "selling: evaluate-send outreach report (${{ steps.trigger.outputs.mode }})"
+          git push origin HEAD:${{ github.ref_name }}
