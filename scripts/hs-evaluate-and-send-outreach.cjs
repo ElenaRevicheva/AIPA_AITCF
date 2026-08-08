@@ -55,13 +55,17 @@ const STAGE_CLOSED = new Set(['closedwon', 'closedlost']);
 const headers = { Authorization: `Bearer ${HS_KEY}`, 'Content-Type': 'application/json' };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function hs(method, urlPath, body) {
+async function hs(method, urlPath, body, attempt = 0) {
   const res = await fetch(`${hubspotBase()}${urlPath}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
   const text = await res.text();
+  if (res.status === 429 && attempt < 12) {
+    await sleep(1200 * (attempt + 1));
+    return hs(method, urlPath, body, attempt + 1);
+  }
   if (!res.ok) throw new Error(`${method} ${urlPath} → ${res.status}: ${text.slice(0, 300)}`);
   return text ? JSON.parse(text) : null;
 }
@@ -185,6 +189,7 @@ async function sendViaGoWa(slug) {
   for (const deal of allDeals) {
     report.deals++;
     const short = deal.name.replace(/^\[[A-Z-]+\]\s*/, '').slice(0, 48);
+    try {
     if (/HIT-LIST|QUEUE/i.test(deal.name)) {
       report.actions.push({ dealId: deal.id, name: short, action: 'skip', why: 'queue deal' });
       continue;
@@ -307,6 +312,17 @@ async function sendViaGoWa(slug) {
       });
       console.error('FAIL', slugToSend, e.message);
     }
+    } catch (e) {
+      report.actions.push({
+        dealId: deal.id,
+        name: short,
+        action: 'error',
+        err: String(e.message || e).slice(0, 200),
+      });
+      console.error('DEAL', deal.id, e.message);
+      await sleep(1500);
+    }
+    await sleep(120);
   }
 
   const summary = {
@@ -326,6 +342,8 @@ async function sendViaGoWa(slug) {
     console.log('\n--- send queue ---');
     for (const a of pending) console.log(`  ${a.action.padEnd(10)} ${a.kind || '-'} ${a.slug} (${a.name})`);
   }
+
+  if (summary.errors > 0 && summary.sent === 0) process.exit(1);
 })().catch((e) => {
   console.error(e);
   process.exit(1);
