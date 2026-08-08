@@ -34,7 +34,7 @@ esac
 
 echo "--- evaluate-send in $AIPA_DIR as $(whoami) ref=$REF mode=$MODE ---"
 git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch failed"; exit 1; }
-git checkout FETCH_HEAD -- scripts/hs-evaluate-and-send-outreach.cjs scripts/hs-env.cjs scripts/wa-link-lib.cjs 2>&1 \
+git checkout FETCH_HEAD -- scripts/hs-evaluate-and-send-outreach.cjs scripts/hs-env.cjs 2>&1 \
   || echo "WARN: script checkout partial — using box copy"
 
 echo "--- sync outreach registry + drafts from $REF ---"
