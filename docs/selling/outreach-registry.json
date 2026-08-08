@@ -2313,5 +2313,26 @@
     "emailDraft": "docs/selling/drafts/arden-price-fu-email.txt",
     "score": 82,
     "dealId": "63541851801"
+  },
+  "kraemer-law-owner": {
+    "company": "Kraemer Law (owner)",
+    "email": "marcos@kraemerlaw.com",
+    "emailDraft": "docs/selling/drafts/kraemer-law-owner-email.txt",
+    "dealId": "62872179381",
+    "score": 97
+  },
+  "t-mapp-owner": {
+    "company": "T-MAPP (owner)",
+    "email": "pablo@t-mapp.com",
+    "emailDraft": "docs/selling/drafts/t-mapp-owner-email.txt",
+    "dealId": "63571556237",
+    "score": 92
+  },
+  "foundever-pty-owner": {
+    "company": "Foundever (owner)",
+    "email": "shrimplin.samuel@foundever.com",
+    "emailDraft": "docs/selling/drafts/foundever-pty-owner-email.txt",
+    "dealId": "63523808804",
+    "score": 94
   }
 }

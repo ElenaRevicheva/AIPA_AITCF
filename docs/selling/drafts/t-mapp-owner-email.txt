@@ -1,0 +1,24 @@
+SUBJECT: Pablo — T-mapp salió 92/100 en mi auditoría de visibilidad en IA
+
+TO: pablo@t-mapp.com
+
+Estimado Pablo:
+
+¡Un gusto saludarle! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio
+
+Escribí hace poco al correo general de T-mapp y prefiero plantearlo directo con usted, como co-fundador.
+
+Analicé t-mapp.com con mi propio motor de auditoría de visibilidad en IA (lo desarrollé yo, corre en https://aideazz.xyz/api) y sacó 92/100, con 81 en respuesta-a-preguntas. Es un sitio bien construido — no le voy a fabricar un problema.
+
+Lo que sí veo es una oportunidad muy específica para su negocio. Cuando un director de RRHH le pregunta hoy a ChatGPT "¿qué headhunter en Panamá me consigue un gerente general?", el motor contesta con las firmas que publicaron su metodología en formato citable. Ustedes ya están en el ranking de las 7 mejores en alta gerencia; esa credencial todavía no está escrita de forma que la IA pueda citarla. Es exactamente el tipo de búsqueda donde se decide un mandato de headhunting ejecutivo.
+
+Y hay una segunda capa que en reclutamiento pesa más: los agentes que hacen el trabajo que consume las horas del equipo. Preclasificar candidatos contra el perfil real del cargo, resumir entrevistas, mantener el CRM al día solo, y un briefing diario con los procesos que necesitan atención esta semana.
+
+Si le sirve, en 15 minutos le muestro qué automatizaría primero y qué horas libera. Sin compromiso, y la auditoría completa se la dejo sin costo trabajemos juntos o no.
+
+PD: no vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja dentro de las herramientas que ya usan: que ChatGPT los recomiende, califique candidatos y clientes por WhatsApp en inglés y español, y les entregue cada mañana las mejores oportunidades ya ordenadas. Demos en vivo en mi portafolio 👆
+
+¡Que tenga un excelente día!
+Saludos,
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización — AIdeazz AI Lab ✨

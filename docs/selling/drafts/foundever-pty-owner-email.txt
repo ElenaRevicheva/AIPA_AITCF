@@ -1,0 +1,21 @@
+SUBJECT: Samuel — Foundever scored 94/100 on my AI-visibility audit (nothing to fix)
+
+TO: shrimplin.samuel@foundever.com
+
+Hi Samuel,
+
+Elena Revicheva here, AI and automation engineer based in Panama City: https://aideazz.xyz/portfolio
+
+I wrote to the general inbox a few days ago. Reaching out to you directly in case this belongs on your desk — and if it doesn't, a pointer to the right person would genuinely help me.
+
+I ran foundever.com through my own AI-visibility audit engine (I built it; it runs at https://aideazz.xyz/api) and it scored 94/100 with a perfect 100 on answer-readiness. That is one of the strongest results I have measured, so I am not going to invent a problem you don't have.
+
+My reason for writing is different. You have thousands of people delivering CX in Panama across four languages — you know that work better than I do. What I build is the internal automation layer around it: agents that brief the advisor before they answer, summarise and tag the conversation once it ends, keep the CRM current without anyone touching it, and deliver a morning briefing of the accounts that need attention. It is the work that quietly eats hours and that nobody wants to do by hand.
+
+If it is useful, I can show you in 15 minutes what I would automate first and how many hours it gives back. No obligation.
+
+PS: to reach a clean 100/100 you only need two small technical additions, an llms.txt file and alt text on images. I will hand those over at no cost whether we work together or not. 💼
+
+Have a great day,
+Elena Revicheva
+Founder | AI and Automation Engineer — AIdeazz AI Lab ✨
