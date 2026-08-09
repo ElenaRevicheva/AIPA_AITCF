@@ -40,6 +40,10 @@ const MIN_CONF = Number(args.find(a => a.startsWith('--min-conf='))?.split('=')[
 const REGISTRY = path.join(ROOT, 'docs/selling/outreach-registry.json');
 const REPORT_JSON = path.join(ROOT, 'docs/selling/_hunter-owner-sweep.json');
 const REPORT_MD = path.join(ROOT, 'docs/selling/_hunter-owner-sweep.md');
+// Every domain a past run already spent a credit querying — kept forever (not
+// overwritten like REPORT_JSON) so a fresh month's credits go to NEW domains
+// instead of re-billing the same ~24 the free tier already covered.
+const SCANNED_LEDGER = path.join(ROOT, 'docs/selling/_hunter-scanned-domains.json');
 
 if (!HUNTER_KEY) { console.error('HUNTER_API_KEY missing in .env'); process.exit(1); }
 if (APPLY && !HS_KEY) { console.error('HUBSPOT_API_KEY missing in .env (needed for --apply)'); process.exit(1); }
@@ -165,12 +169,20 @@ async function addOwnerToDeal(entry, best) {
       seen.set(domain, { slug, domain, company: v.company, email: v.email, dealId: v.dealId, score: v.score || 0 });
     }
   }
-  const targets = [...seen.values()].sort((a, b) => b.score - a.score);
+  const allTargets = [...seen.values()].sort((a, b) => b.score - a.score);
+
+  const scannedBefore = fs.existsSync(SCANNED_LEDGER)
+    ? new Set(JSON.parse(fs.readFileSync(SCANNED_LEDGER, 'utf8')))
+    : new Set();
+  const targets = allTargets.filter(t => !scannedBefore.has(t.domain));
+  const skipped = allTargets.length - targets.length;
 
   const credits = await hunterAccount();
   const budget = LIMIT > 0 ? Math.min(LIMIT, credits.remaining) : credits.remaining;
   console.log(`Hunter credits: ${credits.remaining} remaining · budget this run: ${budget}`);
-  console.log(`Domains in registry: ${targets.length} · mode: ${APPLY ? 'APPLY (add owners)' : 'REPORT ONLY'}\n`);
+  console.log(
+    `Domains in registry: ${allTargets.length} · already scanned in a past run: ${skipped} (skipped, free) · fresh this run: ${targets.length} · mode: ${APPLY ? 'APPLY (add owners)' : 'REPORT ONLY'}\n`
+  );
 
   const results = [];
   let spent = 0, hits = 0, ownerGrade = 0, added = 0;
@@ -224,9 +236,17 @@ async function addOwnerToDeal(entry, best) {
   // last real report — that happened once and the good data was only recoverable
   // from git. Empty runs leave the previous report alone.
   if (results.length === 0) {
-    console.log('\nNothing scanned (no budget) — previous report left untouched.');
+    const why = targets.length === 0 && allTargets.length > 0
+      ? 'every registry domain was already scanned in a past run'
+      : 'no budget';
+    console.log(`\nNothing scanned (${why}) — previous report left untouched.`);
     return;
   }
+
+  fs.writeFileSync(
+    SCANNED_LEDGER,
+    JSON.stringify([...scannedBefore, ...results.map(r => r.domain)].sort(), null, 2)
+  );
 
   fs.writeFileSync(REPORT_JSON, JSON.stringify({
     ranAt: new Date().toISOString(), mode: APPLY ? 'apply' : 'report',
