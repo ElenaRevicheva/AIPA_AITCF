@@ -89,6 +89,30 @@ seeded from every `CLIENT-*` deal and the outreach registry (330 companies, 86
 domains) — email-only matching had already re-created Centro Odontologico Paitilla,
 whose site publishes an address one typo from the one in HubSpot.
 
+### Hunter's free tier, redirected — not lead supply, owner-contact enrichment (Aug 8–9 2026)
+
+The Aug 1 verdict above still stands: Hunter cannot feed top-of-funnel supply, SerpAPI
+does that job now. But the free tier wasn't retired — it moved to a job it's actually
+suited for: turning the **role inboxes on deals that already exist** (info@, ventas@,
+recepcion@ — ~86% of the outreach registry) into named decision-makers. A domain-search
+that finds nobody costs nothing (verified live against `/v2/account`), so a full pass
+over the registry's ~112 real company domains fits inside the 50-credit/month free tier
+with room to spare.
+
+`scripts/hunter-owner-sweep.cjs` runs the pass, grades titles EN+ES (owner vs.
+marketing vs. neither), and — with `--apply` — **adds** the found person as an extra
+contact + note on the deal; the existing role-inbox contact is never touched or
+replaced. First run (Aug 8): 24 domains scanned, 4 owner/marketing-grade found, 3
+auto-added at ≥90% confidence (Kraemer Law, Foundever, Panama Equity) plus one
+(T-MAPP, 85%) approved manually by Elena.
+
+**Aug 9 fix:** the script had no memory across runs, so the Aug 20 reset would have
+re-billed the same 24 domains instead of reaching the ~101 still-unscanned ones. A
+persisted ledger (`docs/selling/_hunter-scanned-domains.json`) now makes every run
+skip domains a past run already paid for. A monthly Oracle cron (`0 9 21 * * *`, the
+day after each reset) runs it unattended with `--apply`, so this lane no longer
+depends on anyone remembering to trigger it.
+
 ### Atlas → HubSpot, actually wired (Aug 2 2026)
 
 Until now Atlas's only contribution to a real deal was one footnote line. Three
