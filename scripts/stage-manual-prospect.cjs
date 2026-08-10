@@ -189,6 +189,7 @@ function buildDraft(ctx) {
       '',
       `PD: para llegar a 100/100 solo les falta afinar un par de detalles (${ctx.gapClause}). Se los dejo listos sin costo, trabajemos juntos o no. ${pdEmoji}`,
       '',
+      ...(ctx.hireNote ? [ctx.hireNote, ''] : []),
       `¡Que tengan un excelente día!`,
       `Saludos,`,
       `Elena Revicheva`,
@@ -205,6 +206,7 @@ function buildDraft(ctx) {
     '',
     `PD: Además de visibilidad en IA, ${pdLine} Todo con demos en vivo en mi portafolio👆`,
     '',
+    ...(ctx.hireNote ? [ctx.hireNote, ''] : []),
     `¡Que tengan un excelente día!`,
     `Saludos,`,
     `Elena✨🌍💫`,
@@ -1607,6 +1609,30 @@ const PROSPECT_META = {
     contactLastName: '(WhatsApp contact)',
     preferredPhone: '50766534655',
   },
+  // Audited live Aug 10 2026: 77/100 B — aiAccess 100, geo 56, aeo 69, techSeo 86.
+  // Crawlers reach them fine; the real gap is zero structured data (no JSON-LD at
+  // all — no Organization, no FAQ) and no question-shaped headings to lift.
+  // Humanidea is a recruitment/talent consultancy, so this letter carries a second,
+  // honest thread via `hireNote`: Elena is also open to roles they place candidates
+  // for — a light mention, not the headline. Per Elena's explicit instruction (Aug
+  // 10 2026), "accent" not "focus."
+  'humanidea.com.pa': {
+    company: 'Humanidea',
+    city: 'Panama City',
+    customer: 'gerente de RRHH que necesita reclutar o desarrollar talento en Panamá',
+    moneyQuery: '¿cuál es la mejor firma de reclutamiento y consultoría en talento en Panamá?',
+    compliment: 'su sitio tiene acceso perfecto para los crawlers de IA (100/100) y contenido real y bien estructurado sobre sus servicios',
+    gapClause: 'no hay ningún dato estructurado (JSON-LD) que le diga a un motor de IA quiénes son ni qué ofrecen, y no hay preguntas frecuentes en formato que los motores puedan citar directamente',
+    pdEmoji: '🤝',
+    pdLine: 'construyo agentes de IA que califican candidatos y clientes 24/7 (EN/ES, conectados a su CRM), automatización de screening y agendamiento de entrevistas, video con IA para employer branding, y rescate de sistemas de IA que fallan.',
+    topFixes: '(1) JSON-LD Organization con name/url/logo/sameAs, (2) FAQ con preguntas reales de candidatos y empresas + FAQPage/Service JSON-LD, (3) sameAs a LinkedIn',
+    contactFirstName: 'Humanidea',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50762739944',
+    preferredEmail: 'contacto@humanidea.com.pa',
+    hireNote:
+      'PD aparte, sin relación con lo anterior: si alguna vez ustedes o alguno de sus clientes buscan un perfil que combine 7 años de liderazgo a nivel de directorio (Deputy CEO) con construcción práctica de sistemas de IA en producción, con gusto me postulo — mi perfil está en linkedin.com/in/elenarevicheva.',
+  },
 };
 
 (async () => {
@@ -1705,6 +1731,7 @@ const PROSPECT_META = {
     pdLine: meta.pdLine,
     pivot: meta.pivot,
     ask: meta.ask,
+    hireNote: meta.hireNote,
   });
 
   const slug = slugify(meta.company);

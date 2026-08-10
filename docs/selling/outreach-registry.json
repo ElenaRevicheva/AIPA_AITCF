@@ -2419,5 +2419,14 @@
     "emailDraft": "docs/selling/drafts/kennedy-home-fu-email.txt",
     "dealId": "63557634379",
     "score": 80
+  },
+  "humanidea": {
+    "phone": "50762739944",
+    "draft": "docs/selling/drafts/humanidea.txt",
+    "company": "Humanidea",
+    "email": "contacto@humanidea.com.pa",
+    "emailDraft": "docs/selling/drafts/humanidea-email.txt",
+    "dealId": "63676890377",
+    "score": 77
   }
 }

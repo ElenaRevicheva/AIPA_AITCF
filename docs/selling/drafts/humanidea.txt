@@ -1,0 +1,13 @@
+Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — su sitio tiene acceso perfecto para los crawlers de IA (100/100) y contenido real y bien estructurado sobre sus servicios. Les escribo porque analicé humanidea.com.pa con mi motor de visibilidad en IA y obtuvo 77/100: cuando un gerente de RRHH que necesita reclutar o desarrollar talento en Panamá le pregunta a ChatGPT o Perplexity "¿cuál es la mejor firma de reclutamiento y consultoría en talento en Panamá?", su empresa todavía no aparece como respuesta citable — no hay ningún dato estructurado (JSON-LD) que le diga a un motor de IA quiénes son ni qué ofrecen, y no hay preguntas frecuentes en formato que los motores puedan citar directamente (GEO 56/100).
+
+Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api 🤝
+
+PD: Además de visibilidad en IA, construyo agentes de IA que califican candidatos y clientes 24/7 (EN/ES, conectados a su CRM), automatización de screening y agendamiento de entrevistas, video con IA para employer branding, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
+
+PD aparte, sin relación con lo anterior: si alguna vez ustedes o alguno de sus clientes buscan un perfil que combine 7 años de liderazgo a nivel de directorio (Deputy CEO) con construcción práctica de sistemas de IA en producción, con gusto me postulo — mi perfil está en linkedin.com/in/elenarevicheva.
+
+¡Que tengan un excelente día!
+Saludos,
+Elena✨🌍💫
