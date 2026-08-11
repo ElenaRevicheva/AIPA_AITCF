@@ -136,6 +136,15 @@ function buildHubSpotWaAnchor(phone, text, label) {
  * been told the letter is a template.
  */
 function buildManualEmailSubject(company, score, opts = {}) {
+  // Panama/LATAM is the default market, so Spanish stays the untouched default path.
+  // `lang: 'en'` is opt-in per prospect (PROSPECT_META) for the markets where a Spanish
+  // cold letter would read as a mis-send — Dubai being the first.
+  if (opts.lang === 'en') {
+    if (opts.credential) {
+      return `${company} scored ${score}/100 on AI visibility — I'm writing about something else`;
+    }
+    return `AI visibility audit — ${company} (${score}/100): 3 concrete fixes`;
+  }
   if (opts.credential) {
     return `${company} sacó ${score}/100 en visibilidad en IA — les escribo por otra cosa`;
   }
@@ -149,6 +158,17 @@ function buildManualEmailSubject(company, score, opts = {}) {
 function buildManualEmailBody(waDraft, opts = {}) {
   const draft = String(waDraft || '').trim();
   const lines = [];
+  if (opts.lang === 'en') {
+    // English letters are written for a named decision-maker, not a front desk, so the
+    // salutation carries the name when PROSPECT_META supplies one. The draft is authored
+    // for chat and opens with its own "Hi <name>," — kept there, stripped here, or the
+    // letter greets the same person twice in three lines (same fix as the Spanish path).
+    const body = draft
+      .replace(/^Hi [^,]+,\s*/i, '')
+      .replace(/^([a-z])/, (c) => c.toUpperCase());
+    lines.push(opts.greetName ? `Dear ${opts.greetName},` : 'Dear team,', '', body);
+    return lines.join('\n').trim();
+  }
   if (opts.botFallback) {
     lines.push(
       'Estimado equipo:',

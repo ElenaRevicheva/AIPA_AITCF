@@ -2564,5 +2564,22 @@
     "phone": "50765816917",
     "emailDraft": "docs/selling/drafts/espacio-verde-by-arlinesorganicways-metromall-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/espacio-verde-by-arlinesorganicways-metromall-atlas-fu.txt"
+  },
+  "pumas-digital": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/pumas-digital.txt",
+    "company": "PUMAS.digital",
+    "email": "igor@pumas.digital",
+    "emailDraft": "docs/selling/drafts/pumas-digital-email.txt",
+    "dealId": "63713705052",
+    "score": 70
+  },
+  "pumas-digital-fu": {
+    "phone": "",
+    "company": "PUMAS.digital",
+    "email": "igor@pumas.digital",
+    "emailDraft": "docs/selling/drafts/pumas-digital-fu-email.txt",
+    "dealId": "63713705052",
+    "score": 70
   }
 }

@@ -117,6 +117,12 @@ function parseContacts(html) {
     })
     .filter(p => p.length >= 10 && p.startsWith('507'));
   // Emails: mailto links AND plain text (many Panama sites print info@… as text).
+  // Placeholder addresses printed inside form previews and demo screenshots are the one
+  // class of scrape that is worse than finding nothing: it looks like a real contact, so
+  // it silently outranks the hand-researched preferredEmail and ships a one-click button
+  // aimed at a fictional person. PUMAS.digital (Aug 11 2026) published `jane@company.com`
+  // in its demo-request mock and the staged deal took it as the prospect's address.
+  const placeholder = /^(jane|john|joe|name|you|your(name|email|company)?|firstname|email|test|demo|sample)@|@(company|yourcompany|yourdomain|domain|example|acme|email|mail|test|sample)\.(com|org|net|io|co)$/i;
   const junk = /\.(png|jpg|jpeg|gif|webp|svg|css|js|html)$|@(2x|3x)\b|sentry|wixpress|example\.|correoernesto|^[0-9]+@|@.*-seccion\.|user@domain|john@doe|ttycirugia/i;
   // mailto: is authoritative — the site itself declares the address there.
   const mailtoEmails = [...html.matchAll(/mailto:([^"'\s?<>]+)/gi)].map(m => m[1].toLowerCase());
@@ -144,6 +150,7 @@ function parseContacts(html) {
     .map(e => e.toLowerCase())
     .map(unglue)
     .filter(e => !junk.test(e))
+    .filter(e => !placeholder.test(e))
     .filter(e => /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(e));
   // Only a declared WhatsApp link or a Panama mobile can receive a WhatsApp message.
   // Handing a landline to wa.me produces a button that opens a chat with nobody.
@@ -195,7 +202,47 @@ const CREDENTIAL_SCORE = 85;
 const OPEN_TO_ROLES_NOTE =
   'Y una nota personal, con transparencia: además de instalar estos sistemas para empresas, estoy abierta a escuchar oportunidades — liderazgo técnico en IA, arquitectura o automatización, en Panamá o remoto. Si en alguna de sus búsquedas calza ese perfil, con gusto les envío mi CV y conversamos; y si no, la propuesta de arriba sigue en pie igual.';
 
+/**
+ * English market path (`lang: 'en'` in PROSPECT_META). Panama/LATAM stays the default —
+ * every existing prospect keeps the Spanish letter byte-for-byte. This exists because a
+ * Spanish cold letter to Dubai reads as a mis-send, which costs the read before the
+ * first line is judged on merit.
+ */
+const OPERATOR_PARA_EN =
+  'I do not sell another CRM or another chatbot. I install an AI Growth Operator that works 24/7 inside the tools a company already uses: getting recommended by ChatGPT and Claude, researching prospects, running outreach and follow-up, qualifying inbound leads, keeping the CRM current, and delivering a daily briefing of the best opportunities.';
+
+/** Same discipline as the Spanish note: disclosed once, after the paid ask, never asked twice. */
+const OPEN_TO_ROLES_NOTE_EN =
+  'And one personal note, in the interest of transparency: alongside installing these systems for companies, I am open to hearing about roles — technical AI leadership, architecture or automation, remote or relocating. If that profile is ever useful to you, I will gladly send my CV and we can talk; and if not, the proposal above stands exactly as it is.';
+
+function buildDraftEn(ctx) {
+  const { domain, score, grade, compliment, pdEmoji, pdLine } = ctx;
+  return [
+    `Hi ${ctx.greetName || 'there'}, good to meet you 👋 I'm Elena Revicheva, an AI and automation engineer — portfolio: https://aideazz.xyz/portfolio`,
+    '',
+    `First, genuine congratulations — ${compliment}.`,
+    '',
+    `I analysed ${domain} with my own AI-visibility engine (I built it; it runs at https://aideazz.xyz/api) and it scored ${score}/100 (${grade}). One finding is worth sixty seconds of your time.`,
+    '',
+    ctx.finding,
+    ...(ctx.nuance ? ['', ctx.nuance] : []),
+    '',
+    OPERATOR_PARA_EN,
+    '',
+    ctx.ask || 'If it is useful, I can show you what that looks like on your side in 15 minutes — no obligation.',
+    // After the paid ask, never before it: the offer is the reason for writing.
+    ...(ctx.openToRoles ? ['', OPEN_TO_ROLES_NOTE_EN] : []),
+    '',
+    `PS: beyond AI visibility, ${pdLine} All of it with live demos in my portfolio 👆 ${pdEmoji}`,
+    '',
+    'Have a great day,',
+    'Elena Revicheva',
+    'Founder | AI & Automation Engineer — AIdeazz AI Lab ✨',
+  ].join('\n');
+}
+
 function buildDraft(ctx) {
+  if (ctx.lang === 'en') return buildDraftEn(ctx);
   const {
     domain, score, grade, weakName, weakScore, moneyQuery, compliment, pdEmoji, pdLine,
   } = ctx;
@@ -1932,6 +1979,61 @@ const PROSPECT_META = {
     preferredEmail: 'contacto@humanidea.com.pa',
     openToRoles: true,
   },
+  /**
+   * PUMAS.digital (Dubai, UAE) — the first prospect outside LATAM and the first to use
+   * `lang: 'en'`. Not a marketing agency: it is a runtime governance layer for autonomous
+   * AI agents ("discover agents, monitor behavior, enforce policy at runtime, stop data
+   * leakage"), sold into regulated industries. Founders: Igor Bershadsky (CEO, commercial
+   * + UAE/GCC network, ex-Hacken), Dr. Oleksii Baranovskyi (CTO, PhD, CCISO/CISSP/CISM),
+   * Andrey Kuznetsov (CIO). Early stage — team photos are still placeholders on /team.
+   *
+   * Live audit Aug 11 2026: 70/100 B (AI Access 59 · GEO 50 · AEO 81 · Tech 93).
+   *
+   * The finding had to be written carefully. Their robots.txt is Cloudflare's MANAGED
+   * block — "# BEGIN Cloudflare Managed content" — declaring
+   * `Content-Signal: search=yes,ai-train=no,use=reference`. Telling them "you are blocking
+   * AI, you are invisible" would be false and would read as not having looked: reserving
+   * training rights is deliberate and defensible, and they still allow OAI-SearchBot and
+   * PerplexityBot. The true, useful observation is the CONTRADICTION underneath it — the
+   * managed Disallow list also blocks ClaudeBot and Google-Extended, which are how Claude
+   * and Gemini *reference* a site, so the declared `use=reference` and the enforced rules
+   * disagree. Same discipline as CREDENTIAL_SCORE (Rapid Tires, Aug 4): never invent a
+   * problem, name the real one.
+   *
+   * EMAIL-PRIMARY and UNVERIFIED: the site publishes no address on any of its 11 pages —
+   * only a Calendly and LinkedIn. MX is Google Workspace, so `igor@` is a pattern guess,
+   * flagged so Elena confirms (or sends the same letter as a LinkedIn DM) before firing.
+   */
+  'pumas.digital': {
+    company: 'PUMAS.digital',
+    city: 'Dubai',
+    lang: 'en',
+    greetName: 'Igor',
+    customer: 'CISO or head of compliance rolling out AI agents in a regulated enterprise',
+    moneyQuery: 'who does runtime governance and policy enforcement for autonomous AI agents?',
+    compliment:
+      'PUMAS is the first agent-governance product I have seen that enforces policy at the moment of execution rather than shipping another dashboard — and the team carries the credentials to back that claim, with a CTO holding a PhD plus CISSP/CCISO and a CEO who can actually open the GCC enterprise doors',
+    finding:
+      'Your robots.txt is Cloudflare’s managed block. It declares Content-Signal: search=yes, ai-train=no, use=reference — a deliberate reservation of training rights, and a defensible one. But the Disallow lines underneath it also block ClaudeBot and Google-Extended, and those are how Claude and Gemini *reference* a site, not how they train on it. You have allowed OAI-SearchBot and PerplexityBot, the two crawlers that cite you, and blocked two others that would also cite you. So the policy you declared (use=reference) and the rules enforced below it do not currently agree — which means a CISO asking Claude "who enforces policy on AI agents at runtime?" gets an answer built without you in it.',
+    nuance:
+      'I flag it because for a company whose product is runtime policy enforcement on AI agents, robots.txt is the most public governance artifact you own — and right now it is a vendor default rather than your policy. Two smaller things in the same direction: there is no JSON-LD anywhere on the site, so nothing machine-readable states that Igor Bershadsky founded PUMAS or that your CTO holds CISSP/CCISO — in a category buyers cannot yet name, that identity is the trust; and /team ships {{ a.name }}, {{ a.role }} and {{ a.bio }} to anything that does not run JavaScript, with the real names living only inside an inline script array.',
+    gapClause:
+      'the managed robots.txt blocks the two crawlers that would cite you, there is no JSON-LD identity anywhere on the site, and the team page renders as template placeholders to non-JavaScript readers',
+    ask: 'If it is useful, I can walk you through all three in 15 minutes — no obligation, and I will send the fixes over either way.',
+    pdEmoji: '🛡️',
+    pdLine:
+      'I build AI agents that qualify inbound demand 24/7 and hand sales a briefed lead, automate CRM hygiene and follow-up, produce AI video for marketing, and rescue AI systems that are failing in production.',
+    topFixes:
+      '(1) reconcile robots.txt with the Content-Signal you declared — unblock ClaudeBot and Google-Extended while keeping ai-train=no, (2) Organization + Person JSON-LD with sameAs to the founders’ LinkedIn profiles, (3) server-render the team and capability content, and add an llms.txt',
+    contactFirstName: 'Igor',
+    contactLastName: 'Bershadsky',
+    // Site publishes no email on any of its 11 pages — Calendly + LinkedIn only.
+    // MX = smtp.google.com (Google Workspace), so this is a pattern guess, not a scrape.
+    preferredEmail: 'igor@pumas.digital',
+    preferredEmailUnverified: true,
+    emailOnlyOk: true,
+    openToRoles: true,
+  },
 };
 
 (async () => {
@@ -2044,6 +2146,11 @@ const PROSPECT_META = {
   let emailUnverified = false;
   if (meta.preferredEmail && !contacts.email) {
     contacts.email = meta.preferredEmail;
+    // A preferredEmail is normally a human-verified address lifted off the prospect's own
+    // site. When the site publishes no address at all and the entry carries a pattern
+    // guess instead, it has to travel with the same UNVERIFIED warning as the info@
+    // fallback — otherwise the one-click button looks as trustworthy as a scraped one.
+    emailUnverified = !!meta.preferredEmailUnverified;
   }
   if (!contacts.email) {
     contacts.email = `info@${domain}`;
@@ -2083,6 +2190,10 @@ const PROSPECT_META = {
     pivot: meta.pivot,
     ask: meta.ask,
     openToRoles: !!meta.openToRoles,
+    lang: meta.lang,
+    greetName: meta.greetName,
+    finding: meta.finding,
+    nuance: meta.nuance,
   });
 
   const slug = slugify(meta.company);
@@ -2099,8 +2210,15 @@ const PROSPECT_META = {
   const emailDraftPath = `docs/selling/drafts/${slug}-email.txt`;
   const prospectPath = `docs/selling/prospects/${meta.company.toUpperCase().replace(/\s+/g, '_')}.md`;
 
-  const emailSubject = buildManualEmailSubject(meta.company, score, { credential: credentialLetter });
-  const emailBody = buildManualEmailBody(draft, { botFallback: false });
+  const emailSubject = buildManualEmailSubject(meta.company, score, {
+    credential: credentialLetter,
+    lang: meta.lang,
+  });
+  const emailBody = buildManualEmailBody(draft, {
+    botFallback: false,
+    lang: meta.lang,
+    greetName: meta.greetName,
+  });
 
   if (!dryRun) {
     fs.mkdirSync(path.join(root, 'docs/selling/drafts'), { recursive: true });
