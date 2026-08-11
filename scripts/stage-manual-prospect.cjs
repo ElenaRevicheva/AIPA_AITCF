@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
  * stage-manual-prospect.cjs — Manual Prospect Play → HubSpot (5 records).
- * Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run]
- * Reads HUBSPOT_API_KEY from .env. Writes draft + prospect pack under docs/selling/.
+ * Usage: node scripts/stage-manual-prospect.cjs <domain> [--with-fu] [--dry-run]
+ * Reads HUBSPOT_API_KEY from .env or the environment. Writes draft + prospect pack
+ * under docs/selling/.
  */
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 const {
   buildHubSpotWaAnchor,
   buildDualChannelNoteLinks,
@@ -15,19 +17,32 @@ const {
   registerOutreachSlug,
   slugify,
 } = require('./wa-link-lib.cjs');
+const {
+  hubspotKey,
+  hubspotOwnerId,
+  hubspotBase,
+  visibilityUrl,
+  visibilityKey,
+} = require('./hs-env.cjs');
 
 const root = path.join(__dirname, '..');
-const env = fs.readFileSync(path.join(root, '.env'), 'utf8');
-const KEY = env.match(/^HUBSPOT_API_KEY=(.+)$/m)?.[1]?.trim();
+const KEY = hubspotKey();
 /** Elena Revicheva — always assign Manual Prospect tasks/deals so Tasks UI "Assigned to me" works */
-const HUBSPOT_OWNER_ID =
-  env.match(/^HUBSPOT_OWNER_ID=(.+)$/m)?.[1]?.trim() || '91612860';
-const VIS_KEY =
-  env.match(/^VISIBILITY_API_KEY=(.+)$/m)?.[1]?.trim() ||
-  env.match(/^VISIBILITY_API_KEYS=(.+)$/m)?.[1]?.trim()?.split(',')[0]?.trim() ||
-  'aidz_demo_visibility_2026';
+const HUBSPOT_OWNER_ID = hubspotOwnerId();
+const VIS_KEY = visibilityKey();
 const dryRun = process.argv.includes('--dry-run');
 const skipAudit = process.argv.includes('--skip-audit');
+/**
+ * --prepare-only writes every artifact (WhatsApp + email drafts, registry row, prospect
+ * pack with the exact note HTML) without creating anything in HubSpot, so the letter can
+ * be read before a deal exists — and so the play can be prepared from a machine that
+ * cannot reach api.hubapi.com.
+ */
+const prepareOnly = process.argv.includes('--prepare-only');
+/** Skip the prospect-site crawl (contacts then come from PROSPECT_META) — used by tests. */
+const noScrape = process.argv.includes('--no-scrape');
+/** Run the follow-up installer on the new deal, so one command ends the full cycle. */
+const withFu = process.argv.includes('--with-fu');
 const scoreArg = process.argv.find((a) => a.startsWith('--score='));
 const scoreOverride = scoreArg ? Number(scoreArg.split('=')[1]) : null;
 /**
@@ -39,19 +54,21 @@ const updateArg = process.argv.find((a) => a.startsWith('--update='));
 const updateDealId = updateArg ? updateArg.split('=')[1].trim() : null;
 const domainArg = process.argv.find(a => a.startsWith('--') === false && a !== process.argv[0] && a !== process.argv[1]);
 if (!domainArg) {
-  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--dry-run] [--skip-audit] [--score=75] [--update=<dealId>]');
+  console.error('Usage: node scripts/stage-manual-prospect.cjs <domain> [--with-fu] [--prepare-only] [--dry-run] [--skip-audit] [--score=75] [--no-scrape] [--update=<dealId>]');
   process.exit(1);
 }
 const domain = domainArg.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase();
 const url = `https://${domain}`;
 
-if (!KEY && !dryRun) {
-  console.error('HUBSPOT_API_KEY missing in .env');
+/** Modes that never call HubSpot; everything else needs the Service Key up front. */
+const offline = dryRun || prepareOnly;
+if (!KEY && !offline) {
+  console.error('HUBSPOT_API_KEY missing — put it in .env or the environment (docs/HUBSPOT_CURSOR_CONNECTION.md)');
   process.exit(1);
 }
 
-const HS = 'https://api.hubapi.com';
-const VIS = 'https://webhook.aideazz.xyz/cto/v1/visibility';
+const HS = hubspotBase();
+const VIS = visibilityUrl();
 const headers = KEY ? { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' } : {};
 
 async function hs(method, urlPath, body) {
@@ -162,6 +179,22 @@ const OPERATOR_PARA =
 /** A site scoring this high has no visibility problem to sell against. */
 const CREDENTIAL_SCORE = 85;
 
+/**
+ * The one place Elena says she is open to roles (`openToRoles: true` in PROSPECT_META).
+ *
+ * Written for search firms, where a senior engineer is not a favour to place but
+ * inventory to map, and worded to keep that footing: it is disclosed as transparency,
+ * not asked as a favour; it names the level she would consider instead of "cualquier
+ * oportunidad"; and it closes by putting the paid offer back on the table, so the letter
+ * cannot be read as a pitch that was really a job application. One block, one review —
+ * per-prospect wording would drift into pleading on the fourth rewrite.
+ *
+ * Said once, in the first letter only. The follow-up stays purely commercial: asking
+ * twice is what turns a peer's disclosure into a request.
+ */
+const OPEN_TO_ROLES_NOTE =
+  'Y una nota personal, con transparencia: además de instalar estos sistemas para empresas, estoy abierta a escuchar oportunidades — liderazgo técnico en IA, arquitectura o automatización, en Panamá o remoto. Si en alguna de sus búsquedas calza ese perfil, con gusto les envío mi CV y conversamos; y si no, la propuesta de arriba sigue en pie igual.';
+
 function buildDraft(ctx) {
   const {
     domain, score, grade, weakName, weakScore, moneyQuery, compliment, pdEmoji, pdLine,
@@ -186,10 +219,11 @@ function buildDraft(ctx) {
       '',
       ctx.ask ||
         `Si les sirve, en 15 minutos les muestro cómo quedaría el Operator en su negocio — sin compromiso.`,
+      // After the paid ask, never before it: the offer is the reason for writing.
+      ...(ctx.openToRoles ? ['', OPEN_TO_ROLES_NOTE] : []),
       '',
       `PD: para llegar a 100/100 solo les falta afinar un par de detalles (${ctx.gapClause}). Se los dejo listos sin costo, trabajemos juntos o no. ${pdEmoji}`,
       '',
-      ...(ctx.hireNote ? [ctx.hireNote, ''] : []),
       `¡Que tengan un excelente día!`,
       `Saludos,`,
       `Elena Revicheva`,
@@ -197,19 +231,81 @@ function buildDraft(ctx) {
     ].join('\n');
   }
 
+  // Only quote a category number when the live audit produced one. With --score the
+  // overall figure is a human assertion and the per-category breakdown does not exist;
+  // printing the old default ("AEO 60/100") would invent a measurement.
+  const weakBit = weakScore != null && weakName ? ` (${weakName} ${weakScore}/100)` : '';
+
   return [
-    `Hola, ¡un gusto saludarles! 👋Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.`,
+    `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.`,
     '',
-    `Primero, felicitaciones — ${compliment}. Les escribo porque analicé ${domain} con mi motor de visibilidad en IA y obtuvo ${score}/100: cuando un ${ctx.customer} le pregunta a ChatGPT o Perplexity "${moneyQuery}", su empresa todavía no aparece como respuesta citable — ${ctx.gapClause} (${weakName} ${weakScore}/100).`,
+    `Primero, felicitaciones — ${compliment}. Les escribo porque analicé ${domain} con mi motor de visibilidad en IA y obtuvo ${score}/100: cuando un ${ctx.customer} le pregunta a ChatGPT o Perplexity "${moneyQuery}", los asistentes todavía no los pueden recomendar con claridad — ${ctx.gapClause}.`,
     '',
     `Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api ${pdEmoji}`,
+    ...(ctx.openToRoles ? ['', OPEN_TO_ROLES_NOTE] : []),
     '',
     `PD: Además de visibilidad en IA, ${pdLine} Todo con demos en vivo en mi portafolio👆`,
     '',
-    ...(ctx.hireNote ? [ctx.hireNote, ''] : []),
     `¡Que tengan un excelente día!`,
     `Saludos,`,
     `Elena✨🌍💫`,
+  ].join('\n');
+}
+
+/**
+ * Close the cycle on a deal: FU WhatsApp + FU email drafts, the `{slug}-fu` registry row
+ * and both FU buttons at the top of its note.
+ *
+ * Reports what the installer actually did, not merely that it exited 0. On Abolu's first
+ * staging the installer found the deal missing from HubSpot's search index — it is
+ * eventually consistent and the deal was seconds old — so it patched nothing, exited 0,
+ * and the run announced a follow-up that did not exist.
+ */
+function installFollowUp(dealId) {
+  const fu = spawnSync(process.execPath, [path.join(__dirname, '_install-wa-fu-notes.cjs'), `--only=${dealId}`], {
+    cwd: root,
+    encoding: 'utf8',
+    env: process.env,
+  });
+  if (fu.stderr) process.stderr.write(fu.stderr);
+  if (fu.stdout) console.log(fu.stdout.trim());
+  const retry = `run: node scripts/_install-wa-fu-notes.cjs --only=${dealId}`;
+  if (fu.status !== 0) return `FAILED (exit ${fu.status}) — ${retry}`;
+  let summary = {};
+  try {
+    summary = JSON.parse(fu.stdout.slice(fu.stdout.indexOf('{')));
+  } catch {
+    return `UNKNOWN — installer printed no summary; ${retry}`;
+  }
+  if (summary.installed === 1) return 'installed';
+  return `NOT installed (${JSON.stringify(summary.errorList || summary.skipNoPhoneList || [])}) — ${retry}`;
+}
+
+/**
+ * The reviewable pack for a staged prospect. Written by both paths: with HubSpot ids
+ * after a live stage, and with the note HTML alone under --prepare-only.
+ */
+function buildPack(o) {
+  return [
+    `# [CLIENT-MANUAL] ${o.company} — HubSpot note pack`,
+    '',
+    `> Staged ${new Date().toISOString().slice(0, 10)}. Deal: \`${o.dealName}\`${o.ids ? ` (ID ${o.ids.dealId})` : ' — NOT created yet (--prepare-only)'}.`,
+    `> WhatsApp draft: \`${o.draftPath}\` · Email draft: \`${o.emailDraftPath}\``,
+    `> Email one-click: \`https://webhook.aideazz.xyz/cto/go/outreach-email/${o.slug}\` (from aipa@aideazz.xyz)`,
+    ...(o.emailUnverified ? [`> ⚠️ Email \`${o.email}\` is UNVERIFIED fallback — confirm before send.`] : []),
+    ...(o.emailOnlyOk ? ['> ⚠️ EMAIL-PRIMARY — no public WhatsApp found; use email one-click.'] : []),
+    ...(o.auditNote ? [`> ⚠️ ${o.auditNote}`] : []),
+    '',
+    o.ids
+      ? `Deal **${o.ids.dealId}** | Company **${o.ids.companyId}** | Contact **${o.ids.contactId}** | Note **${o.ids.noteId}** | Send task **${o.ids.taskId}**`
+      : `Create the deal with: \`node scripts/stage-manual-prospect.cjs ${domain} --with-fu\``,
+    '',
+    '## Deal note (HTML as posted to HubSpot)',
+    '',
+    '```html',
+    o.noteHtml,
+    '```',
+    '',
   ].join('\n');
 }
 
@@ -1595,6 +1691,211 @@ const PROSPECT_META = {
     contactLastName: '(WhatsApp contact)',
     preferredPhone: '50766329199',
   },
+  /**
+   * Panama executive search — the Arden & Price cohort, staged Aug 7 2026 with
+   * `openToRoles` so each letter also states, once, that Elena would hear about a senior
+   * AI role. These three were picked over Amrop and Stanton Chase because a search firm
+   * has to be audited on its own domain: those two publish Panama as a subpath of a
+   * global site, so the engine would score the head office, not the office being written
+   * to. Every claim in the compliments comes from each firm's own site.
+   */
+  't-mapp.com': {
+    company: 'T-MAPP',
+    city: 'Panama City',
+    customer: 'director regional que necesita contratar gerencia media o talento tech en Panamá',
+    moneyQuery: '¿qué headhunter en Panamá consigue talento regional o tecnológico?',
+    compliment:
+      'publican la guía de los mejores headhunters de Panamá — pocos en su sector tienen la seguridad de ubicar a su competencia en una tabla — y su Smart Search apunta al ejecutivo pasivo, que es el difícil',
+    // Verified by the live audit run on Aug 7 2026: score 92 A (AI Access 95 · GEO 94 ·
+    // AEO 81 · Tech 100). WARNs for llms.txt, html-lang, question-headings (only one),
+    // semantic-html, freshness-signal.
+    gapClause:
+      'les falta una sección de preguntas y respuestas con las dudas reales de quien abre una búsqueda, y fechas claras en el contenido que van actualizando',
+    dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
+    pivot:
+      'Su activo es el mapa del talento pasivo, y un mapa se enfría solo. Lo que hago es dejarlo vivo: un agente que atiende 24/7 al cliente que llega con una vacante y la califica antes de que un consultor invierta una hora (nivel, industria, banda salarial, urgencia), califica también al candidato que se postula, mantiene el CRM al día y les entrega cada mañana un briefing de qué se movió en el mapa.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre su flujo de búsquedas — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) FAQ con las preguntas literales de quien abre una búsqueda ejecutiva (plazo, confidencialidad, industria, honorarios), (2) archivo para asistentes de IA + idioma declarado en la página, (3) fechas visibles en contenido actualizado',
+    contactFirstName: 'T-MAPP',
+    contactLastName: '(Contact)',
+    // Site publishes contact forms only — no mailto or WA link. Their own terms name
+    // alejandro@t-mapp.com for contractual notifications (Talent Mapping S.A.S).
+    preferredEmail: 'alejandro@t-mapp.com',
+    emailOnlyOk: true,
+    openToRoles: true,
+  },
+  'cornerstone.pa': {
+    company: 'Cornerstone Panama',
+    city: 'Panama City',
+    customer:
+      'presidente o miembro de junta directiva que necesita contratar a un CEO o a un director en Panamá',
+    moneyQuery: '¿quién hace búsqueda de CEO y de junta directiva en Panamá?',
+    compliment:
+      'son miembros de la AESC y ponen por escrito algo que casi nadie se atreve: terna final en 10 días hábiles, con coaching de adaptación para el ejecutivo seleccionado',
+    gapClause: 'PENDING_AUDIT',
+    dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
+    pivot:
+      'Su promesa es la terna final en 10 días hábiles, y ese reloj empieza a correr desde el primer contacto del cliente. Lo que hago es proteger esos primeros días: un agente que atiende la consulta apenas entra, califica la posición (nivel, industria, banda salarial, urgencia) y se la pasa al socio con el perfil ya definido, en vez de gastar dos días en agendar la reunión de arranque.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre su proceso actual — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes: 'PENDING_AUDIT',
+    contactFirstName: 'Cornerstone Panama',
+    contactLastName: '(Contact)',
+    // cornerstone.pa publishes a contact form only — no mailto or WA on the Panama site.
+    emailOnlyOk: true,
+    openToRoles: true,
+  },
+  'talentum.com.pa': {
+    company: 'Talentum Headhunting',
+    city: 'Panama City',
+    customer:
+      'gerente general sin departamento de RRHH que necesita contratar gerencia media o ejecutiva',
+    moneyQuery: '¿cuál es la mejor agencia de reclutamiento ejecutivo en Panamá?',
+    compliment:
+      'son una boutique panameña con una promesa que se puede verificar: no reciclan hojas de vida, cada búsqueda arranca identificando dónde está ese talento, y acompañan a empresas que no tienen un departamento de RRHH permanente',
+    // Verified by the live audit run on Aug 7 2026: score 85 A (AI Access 95 · GEO 88 ·
+    // AEO 75 · Tech 86). FAIL h1, img-alt (7/22); WARNs for llms.txt, schema-answer,
+    // entity-links, question-headings.
+    gapClause:
+      'la primera pantalla no deja claro qué hacen, faltan respuestas en forma de pregunta y respuesta para las dudas típicas de una empresa que quiere contratar, y muchas fotos del equipo no tienen descripción que un asistente pueda leer',
+    dealOffer: 'AI Growth Operator · intake y calificación de búsquedas',
+    pivot:
+      'Sus clientes son empresas sin departamento de RRHH permanente: cuando necesitan contratar, ustedes son el departamento. Lo que hago es que ese cliente encuentre respuesta apenas escribe, a cualquier hora — un agente que califica la vacante (nivel, funciones, banda salarial, urgencia) y se la entrega al consultor ya perfilada, atiende también al candidato que se postula, y reactiva a los clientes que contrataron el año pasado y no han vuelto.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre sus búsquedas actuales — sin compromiso.',
+    pdEmoji: '💼',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden y califican 24/7 tanto al cliente que abre una búsqueda como al candidato que se postula (nivel, industria, urgencia, banda salarial), automatización del intake y del seguimiento de procesos, video con IA para marketing, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) titular principal claro + FAQ con las dudas reales de empresas sin RRHH, (2) conectar el sitio a LinkedIn y perfiles verificados, (3) descripciones en las fotos del equipo y casos de éxito',
+    contactFirstName: 'Talentum Headhunting',
+    contactLastName: '(Contact)',
+    // talentum.com.pa/contacts/ publishes c.fistonich@ for commercial inquiries;
+    // the scrape also found +507 6339-6599 as a Panama mobile on the site.
+    preferredEmail: 'c.fistonich@talentum.com.pa',
+    openToRoles: true,
+  },
+  /**
+   * Kennedy Home (Hakol Group S.A.) — Panama City e-commerce for furniture, home decor,
+   * bedding, kitchen, electronics and seasonal catalog (founded 2016). Online shop with
+   * delivery across Panama City; showroom/ops tied to Costa del Este / Parque Lefevre.
+   * Not Kennedy Structures (Zona Libre importer) — different company.
+   *
+   * Contact: web@kennedyhome.com is what they publish on LinkedIn for general/web
+   * inquiries; directory listings show 396-4151/52/53 (landline). Staging is
+   * EMAIL-PRIMARY unless the live scrape finds a mobile or wa.me link.
+   */
+  'kennedyhome.com': {
+    company: 'Kennedy Home',
+    city: 'Panama City',
+    customer: 'comprador que está amueblando su casa o renovando la decoración en Panamá',
+    moneyQuery: '¿dónde comprar muebles y decoración para el hogar en Panamá con envío?',
+    compliment:
+      'tienen tienda en línea con catálogo amplio — muebles, cocina, ropa de cama, decoración y electrodomésticos — y envío gratis en la ciudad desde compras modestas',
+    gapClause:
+      'la tienda no se presenta con un mensaje claro en la página principal, faltan respuestas sobre envío y formas de pago, y la mayoría de las fotos del catálogo no tienen descripción',
+    dealOffer: 'AI Growth Operator · ventas y consultas por WhatsApp',
+    pivot:
+      'Su cliente compra en la noche o el fin de semana, y la primera duda casi nunca es “quiero comprar”: es si tienen la medida, si llegan a su corregimiento, cuánto tarda el envío, si aceptan tarjeta o Yappy, o si ese color sigue en stock. Lo que hago es dejar ese canal atendido 24/7 — un agente que responde esas preguntas, confirma disponibilidad, arma el pedido o la cita de entrega, y le pasa a ventas el cliente ya listo, además de reactivar a quien dejó el carrito a medias.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre las consultas que ya reciben — sin compromiso.',
+    pdEmoji: '🛋️',
+    pdLine:
+      'construyo agentes de WhatsApp que responden consultas de producto y envío 24/7 (medidas, stock, zona de entrega, forma de pago), ayudan a cerrar el pedido y se conectan a su CRM o tienda en línea, automatización de seguimiento de carritos abandonados, video con IA para marketing de catálogo, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) datos claros de la tienda para asistentes de IA (nombre, logo, redes), (2) un titular principal + FAQ con envío, zonas, pagos y devoluciones, (3) descripciones en las fotos del catálogo',
+    contactFirstName: 'Kennedy Home',
+    contactLastName: '(Contact)',
+    preferredEmail: 'web@kennedyhome.com',
+    emailOnlyOk: true,
+  },
+  /**
+   * RE/MAX Millenium Panamá — RE/MAX franchise office at the World Trade Center,
+   * Marbella, Panama City. Owners Jose Jardim and Maria Flores, ~14 agents. Inventory
+   * spans sale, rent, commercial and new developments; the site is written in English
+   * for the international buyer.
+   *
+   * Not to be confused with RE/MAX Millennium (remaxmillennium.ca), the Vaughan/Toronto
+   * brokerage — same name, different company, two n's.
+   *
+   * Contacts: info@remax-millenium.com is the office address published on the site; the
+   * company's own LinkedIn posts sign off with +507 6851-6654 and jljardim@ (the owner).
+   * The site scrape decides which number the WhatsApp button gets — preferredPhone is
+   * only the fallback for when it publishes none.
+   *
+   * No audit number is hardcoded: score, grade and the weakest category come from the
+   * live engine at staging time, and the letter switches to the credential opening on
+   * its own above 85.
+   */
+  'remax-millenium.com': {
+    company: 'REMAX Millenium',
+    city: 'Panama City',
+    customer: 'comprador o inversionista extranjero que busca propiedad en Panamá',
+    moneyQuery: '¿cuál es la mejor inmobiliaria en Ciudad de Panamá para comprar o invertir?',
+    compliment:
+      'tienen el respaldo de la red global RE/MAX con equipo local en el World Trade Center de Marbella, y su sitio ya está en inglés para el comprador internacional, con inventario de venta, alquiler, comercial y proyectos nuevos',
+    // Verified by the live audit run on Aug 7 2026: FAIL question-headings, plus WARNs
+    // for robots.txt, llms.txt, answer schema and sameAs. The buyer-question framing
+    // lives in `pivot`; this clause is what the free fix-list at the end of the letter
+    // promises, so it names only what the engine actually flagged.
+    gapClause:
+      'no hay una sola sección en forma de pregunta y respuesta, ni marcado FAQPage, ni llms.txt, ni sameAs que ate el sitio a sus perfiles',
+    dealOffer: 'AI Growth Operator · calificación de compradores por WhatsApp',
+    pivot:
+      'Su comprador llega de otro país y en otra zona horaria, y la primera pregunta casi nunca es por una propiedad: es si puede comprar sin ser residente, qué impuestos paga, si hay financiamiento para extranjeros. Lo que hago es dejar ese primer contacto atendido 24/7 en inglés y español — un agente que responde esas dudas, califica al comprador (presupuesto, zona, plazo, si compra de contado), agenda la visita y le pasa al asesor el lead ya briefeado, además de reactivar a los que preguntaron hace meses y nunca volvieron.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre los leads que ya reciben — sin compromiso.',
+    pdEmoji: '🏠',
+    pdLine:
+      'construyo agentes de WhatsApp que califican compradores 24/7 en inglés y español (presupuesto, zona, plazo, forma de pago), agendan visitas y se conectan a su CRM, automatización de seguimiento y reactivación de leads fríos, video con IA para marketing de propiedades, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) FAQ cuyos H2/H3 sean las preguntas literales del comprador extranjero (residencia, título, impuestos, financiamiento) + FAQPage/Service JSON-LD, (2) robots.txt que dé la bienvenida a los crawlers de IA + llms.txt + sameAs a LinkedIn y redes, (3) el HTML tarda 3.0 s en responder — cache/CDN, y fechas legibles por máquina en el contenido',
+    contactFirstName: 'REMAX Millenium',
+    contactLastName: '(WhatsApp contact)',
+    preferredEmail: 'info@remax-millenium.com',
+  },
+  /**
+   * Abolu, S.A. (Grupo Caco Abbo) — the largest hardware wholesaler in Panama: 8,000+
+   * SKUs, 50+ brands, nationwide delivery under 48h, and the Panama distributor of the
+   * group's own Best Value tool brand. HQ Edificio Abolu, Llano Bonito, Juan Díaz.
+   *
+   * Contacts come from Abolu's own published material, not from guesswork. The site
+   * footer prints servicioalcliente@abolu.net and Tel (+507) 233-7525; their product
+   * catalogue prints "WHATSAPP 6670-8797 / CALL CENTER 233-7525 / VÍA EMAIL
+   * VENTAS@ABOLU.NET" on the ordering pages. 233-7525 is a landline (Panama mobiles start
+   * with 6), so the site scrape alone finds no WhatsApp-capable number — hence
+   * preferredPhone. The other number in that catalogue, 6981-6633, is always paired with
+   * WeChat: that is the export desk, not the Panama sales line, so it is not used here.
+   *
+   * Nothing below quotes an audit number: score, grade and the weakest category come from
+   * the live run of the visibility engine at staging time.
+   */
+  'abolu.net': {
+    company: 'Abolu Best Value',
+    city: 'Panama City',
+    customer: 'dueño de ferretería que necesita reabastecer su tienda en Panamá',
+    moneyQuery: '¿cuál es el mejor distribuidor mayorista de ferretería en Panamá?',
+    compliment:
+      'son el mayorista ferretero más grande de Panamá, con más de 8,000 SKU, más de 50 marcas, entregas a nivel nacional en menos de 48 horas y su propia marca Best Value',
+    gapClause:
+      'todo ese catálogo vive en un PDF y dentro del portal de pedidos, no en páginas que un motor de IA pueda leer y citar, y el sitio no responde en texto lo que un ferretero pregunta antes de escoger proveedor: mínimo de compra, crédito, cobertura y tiempos de entrega, garantía de las marcas',
+    dealOffer: 'AI Growth Operator · pedidos y reposición por WhatsApp',
+    pivot:
+      'Su cliente es el dueño de ferretería, y hoy pide por WhatsApp fuera del horario del call center: pregunta si hay existencia, cuánto cuesta la caja, cuándo le llega. Lo que hago es dejar ese canal atendido 24/7 — un agente que consulta disponibilidad, arma el pedido, lo pasa a su vendedor con el cliente ya identificado, y reactiva solo a las ferreterías que dejaron de comprar este mes.',
+    ask: 'Si les sirve, en 15 minutos les muestro cómo se vería sobre su flujo de pedidos actual — sin compromiso.',
+    pdEmoji: '🔧',
+    pdLine:
+      'construyo agentes de WhatsApp que atienden pedidos y cotizaciones de ferreterías 24/7 (consultan disponibilidad, arman el pedido y se lo pasan al vendedor, conectados a su CRM), automatización de reposición y reactivación de clientes inactivos, video con IA para marketing de marcas, y rescate de sistemas de IA que fallan.',
+    topFixes:
+      '(1) páginas HTML de marca y categoría con el catálogo que hoy solo existe en PDF, (2) FAQ con las preguntas reales de un ferretero (mínimo de compra, crédito, cobertura y tiempos de entrega, garantías) + FAQPage JSON-LD, (3) Organization/LocalBusiness JSON-LD con dirección, teléfono y horario + llms.txt',
+    contactFirstName: 'Abolu Best Value',
+    contactLastName: '(WhatsApp contact)',
+    preferredPhone: '50766708797',
+    preferredEmail: 'servicioalcliente@abolu.net',
+  },
   'beluxerealestate.com': {
     company: 'Be Luxe Real Estate',
     city: 'Panama City',
@@ -1612,10 +1913,9 @@ const PROSPECT_META = {
   // Audited live Aug 10 2026: 77/100 B — aiAccess 100, geo 56, aeo 69, techSeo 86.
   // Crawlers reach them fine; the real gap is zero structured data (no JSON-LD at
   // all — no Organization, no FAQ) and no question-shaped headings to lift.
-  // Humanidea is a recruitment/talent consultancy, so this letter carries a second,
-  // honest thread via `hireNote`: Elena is also open to roles they place candidates
-  // for — a light mention, not the headline. Per Elena's explicit instruction (Aug
-  // 10 2026), "accent" not "focus."
+  // Humanidea is a recruitment/talent consultancy — same `openToRoles` cohort as
+  // T-MAPP/Cornerstone/Talentum above (Cursor, Aug 7 2026), so it uses the shared
+  // OPEN_TO_ROLES_NOTE rather than a one-off line.
   'humanidea.com.pa': {
     company: 'Humanidea',
     city: 'Panama City',
@@ -1630,60 +1930,111 @@ const PROSPECT_META = {
     contactLastName: '(WhatsApp contact)',
     preferredPhone: '50762739944',
     preferredEmail: 'contacto@humanidea.com.pa',
-    hireNote:
-      'PD aparte, sin relación con lo anterior: si alguna vez ustedes o alguno de sus clientes buscan un perfil que combine 7 años de liderazgo a nivel de directorio (Deputy CEO) con construcción práctica de sistemas de IA en producción, con gusto me postulo — mi perfil está en linkedin.com/in/elenarevicheva.',
+    openToRoles: true,
   },
 };
 
 (async () => {
   console.log('DOMAIN', domain);
 
-  // Audit (or --skip-audit / auto-fallback on 429 so campaign can still fire)
+  // Audit. The score is not decoration: it names the deal, it is the email subject line,
+  // and the prospect reads it in the first paragraph ("obtuvo N/100"). A placeholder that
+  // reaches any of those is a claim about their business that nobody measured — so a
+  // number is either measured here or asserted on the command line with --score, and
+  // there is no third path (the old code silently shipped 75/B on a skip or a 429).
   let audit = {};
-  let score = scoreOverride || 75;
+  let score = scoreOverride;
   let grade = 'B';
-  let weak = { name: 'AEO', score: 60, id: 'aeo' };
+  let weak = { name: null, score: null, id: null };
   let catScores = {};
   let auditNote = '';
 
-  if (!skipAudit && scoreOverride == null) {
-    const auditRes = await fetch(VIS, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-API-Key': VIS_KEY },
-      body: JSON.stringify({ url }),
-    });
-    const auditText = await auditRes.text();
+  if (scoreOverride != null) {
+    if (!Number.isFinite(scoreOverride) || scoreOverride < 0 || scoreOverride > 100) {
+      throw new Error(`--score must be 0-100, got "${scoreArg.split('=')[1]}"`);
+    }
+    console.warn('AUDIT_ASSERTED — using --score', score);
+    auditNote = `Score ${score} asserted with --score (no live audit in this run) — re-audit before quoting category numbers.`;
+  } else if (skipAudit) {
+    throw new Error(
+      '--skip-audit needs --score=<0-100>: the score goes into the deal name, the email ' +
+        'subject and the prospect\'s first sentence, so it cannot default to a placeholder.',
+    );
+  } else {
+    async function runVisibilityAudit(auditTarget) {
+      const res = await fetch(VIS, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': VIS_KEY },
+        body: JSON.stringify({ url: auditTarget }),
+      });
+      const text = await res.text();
+      return { res, text, auditTarget };
+    }
+
+    let { res: auditRes, text: auditText, auditTarget } = await runVisibilityAudit(url);
+    const wwwUrl = `https://www.${domain}`;
+    if (
+      !auditRes.ok &&
+      auditRes.status === 422 &&
+      auditText.includes('unfetchable_url') &&
+      !domain.startsWith('www.') &&
+      auditTarget !== wwwUrl
+    ) {
+      console.warn(`AUDIT_RETRY — ${url} unfetchable, trying ${wwwUrl}`);
+      ({ res: auditRes, text: auditText, auditTarget } = await runVisibilityAudit(wwwUrl));
+    }
+
     if (auditRes.ok) {
       audit = JSON.parse(auditText);
       score = Math.round(audit.score ?? audit.overall ?? audit.total ?? 0);
       grade = audit.grade || audit.letterGrade || 'B';
       weak = weakestCategory(audit);
       catScores = Object.fromEntries((audit.categories || []).map((c) => [c.id, c.score]));
+      if (auditTarget !== url) {
+        auditNote = `Audit ran against ${auditTarget} (${url} was unfetchable from the engine).`;
+      }
     } else if (auditRes.status === 429) {
-      console.warn('AUDIT_RATE_LIMITED — staging with placeholder score', score, grade);
-      auditNote = 'Audit skipped (rate limit); placeholder score — re-audit later.';
+      throw new Error(
+        'visibility audit → 429 rate limited. Use VISIBILITY_API_KEY (owner key, not the ' +
+          '20/hour demo key) and retry, or pass --score=<measured value>. Staging with a ' +
+          'placeholder would put an invented score in front of the prospect.',
+      );
     } else {
       throw new Error(`visibility audit → ${auditRes.status}: ${auditText.slice(0, 300)}`);
     }
-  } else {
-    console.warn('AUDIT_SKIPPED — using score', score, grade);
-    auditNote = 'Audit skipped (--skip-audit/--score); placeholder score — re-audit later.';
   }
   console.log('AUDIT', score, grade, weak.name, weak.score);
 
   // Contacts
   let html = '';
-  for (const page of [url, `${url}/contact`, `${url}/contact-us`, `${url}/contacto`]) {
-    try {
-      const r = await fetch(page, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AIPA/1.0)' } });
-      if (r.ok) html += '\n' + await r.text();
-    } catch { /* skip */ }
+  if (!noScrape) {
+    for (const page of [url, `${url}/contact`, `${url}/contact-us`, `${url}/contacto`]) {
+      try {
+        const r = await fetch(page, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AIPA/1.0)' } });
+        if (r.ok) html += '\n' + await r.text();
+      } catch { /* skip */ }
+    }
   }
   const contacts = parseContacts(html);
   console.log('CONTACTS', JSON.stringify(contacts));
 
   const meta = PROSPECT_META[domain];
   if (!meta) throw new Error(`No PROSPECT_META for ${domain} — add to stage-manual-prospect.cjs`);
+
+  // `PENDING_AUDIT` marks copy that must be written from the audit rather than guessed:
+  // the gap clause is what the letter offers to fix for free, and the note's fix list is
+  // what Elena walks the prospect through. A --dry-run prints the audit's own findings,
+  // and the sentinel keeps that from being skipped — the string itself must never reach
+  // a prospect. The dry run is exempt: printing the audit is how the copy gets written.
+  if (!dryRun) {
+    const pending = Object.entries(meta).filter(([, v]) => v === 'PENDING_AUDIT');
+    if (pending.length) {
+      throw new Error(
+        `PROSPECT_META.${domain} still has placeholder copy (${pending.map(([k]) => k).join(', ')}). ` +
+          `Run with --dry-run, then write it from what the audit actually found.`,
+      );
+    }
+  }
 
   if (meta.preferredPhone) {
     contacts.whatsapp = String(meta.preferredPhone).replace(/\D/g, '');
@@ -1731,26 +2082,29 @@ const PROSPECT_META = {
     pdLine: meta.pdLine,
     pivot: meta.pivot,
     ask: meta.ask,
-    hireNote: meta.hireNote,
+    openToRoles: !!meta.openToRoles,
   });
 
   const slug = slugify(meta.company);
+  // The letter buildDraft() produced: above CREDENTIAL_SCORE with a pivot it leads with
+  // the score as a credential instead of a gap, and the deal name and subject line have
+  // to say the same thing the prospect is reading.
+  const credentialLetter = score >= CREDENTIAL_SCORE && !!meta.pivot;
   // A site above CREDENTIAL_SCORE has no GEO/AEO deficit to fix — naming the deal
   // "GEO/AEO fix" would misdescribe the offer (and mis-route hs-outcomes-to-atlas).
-  const offerLabel =
-    score >= CREDENTIAL_SCORE && meta.pivot
-      ? meta.dealOffer || 'AI Growth Operator'
-      : 'GEO/AEO fix';
+  const offerLabel = credentialLetter ? meta.dealOffer || 'AI Growth Operator' : 'GEO/AEO fix';
   const dealName = `[CLIENT-MANUAL] ${meta.company} — ${offerLabel} (audit: ${score}/${grade})`;
 
   const draftPath = `docs/selling/drafts/${slug}.txt`;
   const emailDraftPath = `docs/selling/drafts/${slug}-email.txt`;
   const prospectPath = `docs/selling/prospects/${meta.company.toUpperCase().replace(/\s+/g, '_')}.md`;
 
-  const emailSubject = buildManualEmailSubject(meta.company, score);
+  const emailSubject = buildManualEmailSubject(meta.company, score, { credential: credentialLetter });
   const emailBody = buildManualEmailBody(draft, { botFallback: false });
 
   if (!dryRun) {
+    fs.mkdirSync(path.join(root, 'docs/selling/drafts'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'docs/selling/prospects'), { recursive: true });
     fs.writeFileSync(path.join(root, draftPath), draft + '\n', { encoding: 'utf8' });
     registerOutreachSlug(slug, phoneForLinks, draftPath, meta.company, {
       email: contacts.email,
@@ -1780,7 +2134,7 @@ const PROSPECT_META = {
       : '(no public WhatsApp — EMAIL PRIMARY)';
 
   // Dedupe (skipped in --update mode, where hitting the existing deal is the point)
-  if (KEY && !updateDealId) {
+  if (KEY && !updateDealId && !offline) {
     const existing = await hs('POST', '/crm/v3/objects/deals/search', {
       filterGroups: [{ filters: [{ propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: meta.company.split(' ')[0] }] }],
       properties: ['dealname'],
@@ -1793,7 +2147,9 @@ const PROSPECT_META = {
     }
   }
 
-  const auditLine = `${score}/100 Grade ${grade} | Tech ${catScores.techSeo ?? '?'} | AI Access ${catScores.aiAccess ?? '?'} | GEO ${catScores.geo ?? '?'} | AEO ${catScores.aeo ?? '?'} (${weak.name} ${weak.score} weakest)`;
+  const auditLine =
+    `${score}/100 Grade ${grade} | Tech ${catScores.techSeo ?? '?'} | AI Access ${catScores.aiAccess ?? '?'} | GEO ${catScores.geo ?? '?'} | AEO ${catScores.aeo ?? '?'}` +
+    (weak.score != null ? ` (${weak.name} ${weak.score} weakest)` : ' (no live category breakdown)');
   const emailBlock = [
     '',
     '--- EMAIL (mismo texto que el link aipa@ de arriba — backup si el link se trunca) ---',
@@ -1819,10 +2175,17 @@ const PROSPECT_META = {
     escHtml(draft),
     ...emailBlock,
     '',
-    '--- Audit (verified live) ---',
+    auditNote ? '--- Audit (ASSERTED, not measured in this run) ---' : '--- Audit (verified live) ---',
     escHtml(auditLine),
+    ...(auditNote ? [`<b>⚠️ ${escHtml(auditNote)}</b>`] : []),
     '',
-    `Angle: "${score >= CREDENTIAL_SCORE && meta.pivot ? 'audit is the CREDENTIAL — pivot to AI Growth Operator' : score >= CREDENTIAL_SCORE ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
+    `Angle: "${credentialLetter ? 'audit is the CREDENTIAL — pivot to AI Growth Operator' : score >= CREDENTIAL_SCORE ? 'muy cerca — 3 arreglos' : 'invisible as citable answer'}". Money query: ${meta.moneyQuery}`,
+    ...(meta.openToRoles
+      ? [
+          '',
+          '<b>DUAL TRACK</b> — this letter also states Elena is open to roles (senior AI/automation, Panama or remote), once, after the paid ask. If they reply about a role, that is still a 💬 They replied. The follow-up does not repeat it.',
+        ]
+      : []),
     '',
     `Top fixes: ${meta.topFixes}.`,
     '',
@@ -1835,6 +2198,44 @@ const PROSPECT_META = {
     console.log('DRY_RUN dealName', dealName);
     console.log('DRAFT_PREVIEW', draft.slice(0, 200) + '...');
     console.log('WA', phoneDisplay, '| EMAIL', contacts.email, emailUnverified ? '(UNVERIFIED)' : '');
+    return;
+  }
+
+  // --prepare-only: every artifact on disk, nothing in HubSpot. The pack carries the
+  // note HTML verbatim, so the two send buttons can be reviewed (or pasted into a deal
+  // by hand) exactly as the live path would post them.
+  if (prepareOnly) {
+    fs.writeFileSync(
+      path.join(root, prospectPath),
+      buildPack({
+        company: meta.company,
+        dealName,
+        draftPath,
+        emailDraftPath,
+        slug,
+        email: contacts.email,
+        emailUnverified,
+        emailOnlyOk: !!meta.emailOnlyOk,
+        auditNote,
+        ids: null,
+        noteHtml,
+      }),
+      'utf8',
+    );
+    console.log(JSON.stringify({
+      ok: true,
+      mode: 'prepare-only',
+      domain,
+      dealName,
+      email: contacts.email,
+      emailUnverified,
+      phone: phoneDisplay,
+      draftPath,
+      emailDraftPath,
+      prospectPath,
+      emailOneClick: `https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}`,
+      hubspot: 'not touched (--prepare-only)',
+    }, null, 2));
     return;
   }
 
@@ -1857,9 +2258,30 @@ const PROSPECT_META = {
       score,
       dealId: updateDealId,
     });
+    fs.writeFileSync(
+      path.join(root, prospectPath),
+      buildPack({
+        company: meta.company,
+        dealName,
+        draftPath,
+        emailDraftPath,
+        slug,
+        email: contacts.email,
+        emailUnverified,
+        emailOnlyOk: !!meta.emailOnlyOk,
+        auditNote,
+        ids: { dealId: updateDealId, companyId: '—', contactId: '—', noteId: upNote.id, taskId: '—' },
+        noteHtml,
+      }),
+      'utf8',
+    );
+    // The FU block lives at the top of the newest note, so it has to be reinstalled after
+    // one is posted — otherwise --update silently buries the follow-up buttons.
+    const upFu = withFu ? installFollowUp(updateDealId) : null;
     console.log(JSON.stringify({
       ok: true, mode: 'update', dealId: updateDealId, dealName, noteId: upNote.id,
       email: contacts.email, emailUnverified, audit: { score, grade },
+      followUp: upFu || 'not installed (pass --with-fu)',
     }, null, 2));
     return;
   }
@@ -1944,15 +2366,29 @@ const PROSPECT_META = {
     score,
     dealId,
   });
-  const pack = `# [CLIENT-MANUAL] ${meta.company} — HubSpot note pack
+  fs.writeFileSync(
+    path.join(root, prospectPath),
+    buildPack({
+      company: meta.company,
+      dealName,
+      draftPath,
+      emailDraftPath,
+      slug,
+      email: contacts.email,
+      emailUnverified,
+      emailOnlyOk: !!meta.emailOnlyOk,
+      auditNote,
+      ids: { dealId, companyId, contactId, noteId: note.id, taskId: task.id },
+      noteHtml,
+    }),
+    'utf8',
+  );
 
-> Staged ${new Date().toISOString().slice(0, 10)}. Deal: \`${dealName}\` (ID ${dealId}).
-> Draft: \`${draftPath}\`
-> Email one-click: \`https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}\` (from aipa@aideazz.xyz)
-${emailUnverified ? `> ⚠️ Email \`${contacts.email}\` is UNVERIFIED fallback — confirm before send.\n` : ''}${meta.emailOnlyOk ? '> ⚠️ EMAIL-PRIMARY — no public WhatsApp found; use email one-click.\n' : ''}
-Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note **${note.id}** | Send task **${task.id}**
-`;
-  fs.writeFileSync(path.join(root, prospectPath), pack, 'utf8');
+  // --with-fu closes the cycle in the same command: the follow-up installer writes the
+  // FU WhatsApp + FU email drafts, registers the `{slug}-fu` row and puts both FU
+  // buttons at the top of the note. Without it the deal ships with first-contact
+  // buttons only and someone has to remember a second command.
+  const fuResult = withFu ? installFollowUp(dealId) : null;
 
   console.log(JSON.stringify({
     ok: true,
@@ -1966,15 +2402,17 @@ Deal **${dealId}** | Company **${companyId}** | Contact **${contactId}** | Note 
     email: contacts.email,
     emailUnverified,
     emailOnlyOk: !!meta.emailOnlyOk,
-    audit: { score, grade, weak },
+    audit: { score, grade, weak, ...(auditNote ? { warning: auditNote } : {}) },
     phone: phoneDisplay,
     draftPath,
+    emailDraftPath,
     prospectPath,
+    followUp: fuResult || 'not installed (pass --with-fu)',
     emailOneClick: `https://webhook.aideazz.xyz/cto/go/outreach-email/${slug}`,
   }, null, 2));
   console.warn('');
   console.warn('⚠️  EMAIL ONE-CLICK requires GitHub push (else UI: Unknown outreach email slug):');
-  console.warn(`    git add docs/selling/outreach-registry.json ${draftPath} ${emailDraftPath}`);
+  console.warn(`    git add docs/selling/outreach-registry.json docs/selling/drafts/${slug}*.txt ${prospectPath}`);
   console.warn('    git commit && git push origin main');
   console.warn('    Oracle: cd ~/cto-aipa && git pull && npm run build && pm2 restart cto-aipa');
   console.warn('    (After go-wa GitHub fallback is deployed: push alone is enough for confirm page.)');

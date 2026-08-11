@@ -371,6 +371,95 @@ Views that matter: **CLIENT-MANUAL**, **NEW today**, **ACTIVE (1–7d)**, **AGIN
      complete open follow-up tasks.
    WhatsApp send/reply still needs Elena to say `sent` / `they replied` (no WA API on Starter).
 
+## One command stages the whole cycle (Aug 6 2026)
+
+Staging used to end with first-contact buttons and a reminder to run the follow-up
+installer later; a deal was only half-built until someone remembered the second command.
+
+```bash
+node scripts/stage-manual-prospect.cjs <domain> --with-fu
+git add docs/selling/outreach-registry.json docs/selling/drafts/<slug>*.txt docs/selling/prospects/<CO>.md
+git commit && git push origin main      # or the email buttons 404: "Unknown outreach email slug"
+```
+
+`--with-fu` runs `_install-wa-fu-notes.cjs` against the deal it just created, so the note
+ends with **four** click-to-send buttons — first-contact WhatsApp, first-contact email,
+FU WhatsApp, FU email — and all four drafts (`{slug}.txt`, `{slug}-email.txt`,
+`{slug}-fu-email.txt`) plus both registry rows (`{slug}`, `{slug}-fu`) land on disk in
+that one run.
+
+**`--prepare-only`** writes every artifact and the exact note HTML into
+`docs/selling/prospects/{CO}.md` **without touching HubSpot** — for reading the letter
+before a deal exists, or for preparing the play from a machine that cannot reach
+`api.hubapi.com`.
+
+**Credentials come from `.env` or the environment.** The scripts used to `readFileSync`
+`.env` and die with ENOENT anywhere else; Oracle cron, CI and cloud agents hold the
+Service Key in the process environment. `scripts/hs-env.cjs` reads the environment first,
+then `.env`. `HUBSPOT_API_BASE` and `VISIBILITY_API_URL` are overridable so the cycle can
+be exercised against a mock.
+
+### No run may invent an audit score
+
+The score names the deal, is the email subject line, and is the first thing the prospect
+reads (*"obtuvo N/100"*). Three paths used to produce one anyway:
+
+- `--skip-audit` and a rate-limited audit both fell back to a hardcoded **75/B** — the
+  `auditNote` explaining that was assigned to a variable and never printed anywhere.
+- `--score=N` (a human assertion about the overall number) still let the letter print a
+  category score of **"AEO 60/100"**, which no one had measured.
+- The follow-up installer defaulted to **75/B** when it could not parse an audit out of
+  the deal, and then quoted it back to the prospect.
+
+Now: a skipped or rate-limited audit **aborts** unless `--score=` is given, an asserted
+score prints no category number and stamps the note `⚠️ Score asserted with --score`, and
+a deal the FU installer cannot parse is reported in `errorList` instead of being sent a
+made-up number.
+
+### Two things the first live run of `--with-fu` taught (Abolu, Aug 6 2026)
+
+**HubSpot's object search does not see a deal you just created.** It is eventually
+consistent, so the follow-up installer searched for the seconds-old deal, got nothing,
+patched nothing and exited 0 — and the staging run announced a follow-up that did not
+exist. A numeric `--only=<dealId>` now fetches the deal by id, which needs no index, and
+the staging run reads the installer's summary instead of trusting its exit code. The mock
+CRM in the cycle test simulates the lag by default so this cannot come back.
+
+**A credential letter needs a credential subject.** Abolu audited 89/A, so the letter
+opened with the score as proof and said *"no les voy a inventar un problema que no
+tienen"* — under `…(89/100): 3 arreglos concretos`. The subject is read first and it
+contradicted the body. Above `CREDENTIAL_SCORE` the subject is now
+`{Company} sacó {score}/100 en visibilidad en IA — les escribo por otra cosa`.
+
+### Staging from a cloud agent (no laptop, no key)
+
+A cloud agent has no `HUBSPOT_API_KEY` and its egress excludes `api.hubapi.com`, so the
+play can only run on Oracle. `.github/workflows/stage-prospect-on-trigger.yml` is the
+bridge, same trigger-file pattern as `deploy-oracle-on-trigger.yml`:
+
+```bash
+echo "example.com --dry-run" > .stage-trigger   # recon + full audit, no CRM writes
+echo "example.com --with-fu" > .stage-trigger   # the real thing
+git commit -am "stage: example.com" && git push
+```
+
+It SSHes to Oracle, runs the play there and commits the registry and drafts back to the
+branch. **The job checks out the branch tip, not the commit that triggered it** — a
+trigger pushed while an earlier run is still queued executes the *newest* `.stage-trigger`.
+Leave the file idle (`# idle`) after a run, or the next merge replays it.
+
+### Proving the cycle without touching the CRM
+
+```bash
+npm run test:manual-cycle          # 17 checks, ~1s, no network
+```
+
+`scripts/test-manual-prospect-cycle.cjs` runs the real staging script against a mock
+HubSpot and a mock visibility engine inside a throwaway copy of the repo, then asserts
+the five records, the deal stage/owner, both first-contact buttons (with the message
+actually prefilled in the WhatsApp URL), both FU buttons at the top of the note, the four
+drafts, the two registry rows, and that a skipped audit creates nothing.
+
 ## The canonical outreach template (Elena's own final edit, July 18 2026)
 
 Spanish, WhatsApp-first ("Panamanians are crazy about WhatsApp"). Adapt the
