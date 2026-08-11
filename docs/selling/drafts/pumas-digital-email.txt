@@ -1,29 +1,30 @@
-SUBJECT: AI visibility audit — PUMAS.digital (70/100): 3 concrete fixes
+SUBJECT: Three things I can actually do for PUMAS
 
 TO: igor@pumas.digital
-NOTE: UNVERIFIED — confirm recipient before send
-NOTE: EMAIL-PRIMARY — no public WhatsApp on site
+NOTE: UNVERIFIED — confirm recipient before send (site publishes no email; Calendly + LinkedIn only)
+NOTE: POST-MEETING FOLLOW-UP — replaces the original cold letter. Igor met Elena on
+      2026-08-11 and said plainly he is NOT hiring and NOT buying services; he asked
+      whether she could promote PUMAS to her clients. She has no client base yet, so a
+      referral promise would be hollow — this letter says so and trades on what is real.
 
-Dear Igor,
+Igor — good to meet you today.
 
-Good to meet you 👋 I'm Elena Revicheva, an AI and automation engineer — portfolio: https://aideazz.xyz/portfolio
+You mentioned I could promote PUMAS to my clients. Straight answer: my client base in LATAM is still early, so a referral promise from me would be worth very little to you right now. Here are three things that are worth something.
 
-First, genuine congratulations — PUMAS is the first agent-governance product I have seen that enforces policy at the moment of execution rather than shipping another dashboard — and the team carries the credentials to back that claim, with a CTO holding a PhD plus CISSP/CCISO and a CEO who can actually open the GCC enterprise doors.
+1. Your AI visibility — free, and already done.
 
-I analysed pumas.digital with my own AI-visibility engine (I built it; it runs at https://aideazz.xyz/api) and it scored 70/100 (B). One finding is worth sixty seconds of your time.
+I ran pumas.digital through my own audit engine (I built it — https://aideazz.xyz/portfolio). It scored 70/100. The finding worth your CTO's time: your Cloudflare-managed robots.txt declares use=reference, but the Disallow list underneath it blocks ClaudeBot and Google-Extended — the two crawlers that let Claude and Gemini *reference* you. Your declared policy and your enforced rules disagree, so a CISO asking Claude "who enforces policy on AI agents at runtime?" gets an answer built without you in it. There is also no JSON-LD anywhere on the site, so nothing machine-readable states who founded PUMAS. I'll send all three fixes. No strings.
 
-Your robots.txt is Cloudflare’s managed block. It declares Content-Signal: search=yes, ai-train=no, use=reference — a deliberate reservation of training rights, and a defensible one. But the Disallow lines underneath it also block ClaudeBot and Google-Extended, and those are how Claude and Gemini *reference* a site, not how they train on it. You have allowed OAI-SearchBot and PerplexityBot, the two crawlers that cite you, and blocked two others that would also cite you. So the policy you declared (use=reference) and the rules enforced below it do not currently agree — which means a CISO asking Claude "who enforces policy on AI agents at runtime?" gets an answer built without you in it.
+2. A real agent estate to govern.
 
-I flag it because for a company whose product is runtime policy enforcement on AI agents, robots.txt is the most public governance artifact you own — and right now it is a vendor default rather than your policy. Two smaller things in the same direction: there is no JSON-LD anywhere on the site, so nothing machine-readable states that Igor Bershadsky founded PUMAS or that your CTO holds CISSP/CCISO — in a category buyers cannot yet name, that identity is the trust; and /team ships {{ a.name }}, {{ a.role }} and {{ a.bio }} to anything that does not run JavaScript, with the real names living only inside an inline script array.
+I run about ten AI agents in production — messaging bots, content pipelines, a CRM automation fleet. Real deployments with real incidents: an LLM outage that made a judge fail open, silent breakages that ran for days before anyone noticed. Early governance products struggle to find live agent estates to test and cite. Mine is available to you, and you can name it.
 
-I do not sell another CRM or another chatbot. I install an AI Growth Operator that works 24/7 inside the tools a company already uses: getting recommended by ChatGPT and Claude, researching prospects, running outreach and follow-up, qualifying inbound leads, keeping the CRM current, and delivering a daily briefing of the best opportunities.
+3. The practitioner voice your category is missing.
 
-If it is useful, I can walk you through all three in 15 minutes — no obligation, and I will send the fixes over either way.
+PUMAS sells to people who don't yet know they have the problem. Your team is credentialed in security — but the thing that converts is an operator saying "here's what my agents did when nobody was watching." I write and publish. I'll co-author that with you: you get category content you can't produce internally, I get to stand next to a serious security team.
 
-And one personal note, in the interest of transparency: alongside installing these systems for companies, I am open to hearing about roles — technical AI leadership, architecture or automation, remote or relocating. If that profile is ever useful to you, I will gladly send my CV and we can talk; and if not, the proposal above stands exactly as it is.
+One thing I'd want back. When you're in a deal and the enterprise asks "who instruments our agents, and who fixes what you find?" — that's my work. Bring me into those conversations. It costs you nothing, it makes your offer more complete, and it's what makes this run in both directions.
 
-PS: beyond AI visibility, I build AI agents that qualify inbound demand 24/7 and hand sales a briefed lead, automate CRM hygiene and follow-up, produce AI video for marketing, and rescue AI systems that are failing in production. All of it with live demos in my portfolio 👆 🛡️
-
-Have a great day,
 Elena Revicheva
-Founder | AI & Automation Engineer — AIdeazz AI Lab ✨
+Founder | AI & Automation Engineer — AIdeazz AI Lab
+https://aideazz.xyz/portfolio
