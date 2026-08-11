@@ -2428,5 +2428,141 @@
     "emailDraft": "docs/selling/drafts/humanidea-email.txt",
     "dealId": "63676890377",
     "score": 77
+  },
+  "kaandela-restaurant-atlas": {
+    "company": "Kaandela Restaurant",
+    "email": "info@kaandela.com",
+    "score": 82,
+    "dealId": "63647143833",
+    "phone": "50767470682",
+    "emailDraft": "docs/selling/drafts/kaandela-restaurant-atlas-email.txt",
+    "draft": "docs/selling/drafts/kaandela-restaurant-atlas.txt"
+  },
+  "kaandela-restaurant-atlas-fu": {
+    "company": "Kaandela Restaurant",
+    "email": "info@kaandela.com",
+    "score": 82,
+    "dealId": "63647143833",
+    "phone": "50767470682",
+    "emailDraft": "docs/selling/drafts/kaandela-restaurant-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/kaandela-restaurant-atlas-fu.txt"
+  },
+  "restaurante-el-trapiche-san-francisco-atlas": {
+    "company": "Restaurante El Trapiche | San Francisco",
+    "email": "info@eltrapicherestaurante.com",
+    "score": 88,
+    "dealId": "63668927108",
+    "phone": "5073810981",
+    "emailDraft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas-email.txt",
+    "draft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas.txt"
+  },
+  "restaurante-el-trapiche-san-francisco-atlas-fu": {
+    "company": "Restaurante El Trapiche | San Francisco",
+    "email": "info@eltrapicherestaurante.com",
+    "score": 88,
+    "dealId": "63668927108",
+    "phone": "5073810981",
+    "emailDraft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas-fu.txt"
+  },
+  "concolon-panamanian-street-food-atlas": {
+    "company": "Concolon PANAMANIAN Street Food",
+    "email": "fondaconcolon@gmail.com",
+    "score": 65,
+    "dealId": "63669421675",
+    "emailDraft": "docs/selling/drafts/concolon-panamanian-street-food-atlas-email.txt"
+  },
+  "concolon-panamanian-street-food-atlas-fu": {
+    "company": "Concolon PANAMANIAN Street Food",
+    "email": "fondaconcolon@gmail.com",
+    "score": 65,
+    "dealId": "63669421675",
+    "emailDraft": "docs/selling/drafts/concolon-panamanian-street-food-atlas-fu-email.txt"
+  },
+  "restaurante-santa-rita-comida-espa-ola-panam-atlas": {
+    "company": "Restaurante Santa Rita | Comida Española Panamá",
+    "email": "info@restaurantesantaritapanama.com",
+    "score": 76,
+    "dealId": "63671566456",
+    "emailDraft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas-email.txt"
+  },
+  "restaurante-santa-rita-comida-espa-ola-panam-atlas-fu": {
+    "company": "Restaurante Santa Rita | Comida Española Panamá",
+    "email": "info@restaurantesantaritapanama.com",
+    "score": 76,
+    "dealId": "63671566456",
+    "emailDraft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas-fu-email.txt"
+  },
+  "restaurante-el-nacional-sabores-de-panam-atlas": {
+    "company": "Restaurante El Nacional Sabores de Panamá",
+    "email": "reservaselnacionalpty@gmail.com",
+    "score": 83,
+    "dealId": "63669179483",
+    "phone": "50764216817",
+    "emailDraft": "docs/selling/drafts/restaurante-el-nacional-sabores-de-panam-atlas-email.txt",
+    "draft": "docs/selling/drafts/restaurante-el-nacional-sabores-de-panam-atlas.txt"
+  },
+  "restaurante-el-nacional-sabores-de-panam-atlas-fu": {
+    "company": "Restaurante El Nacional Sabores de Panamá",
+    "email": "reservaselnacionalpty@gmail.com",
+    "score": 83,
+    "dealId": "63669179483",
+    "phone": "50764216817",
+    "emailDraft": "docs/selling/drafts/restaurante-el-nacional-sabores-de-panam-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/restaurante-el-nacional-sabores-de-panam-atlas-fu.txt"
+  },
+  "mimosa-spa-san-francisco-atlas": {
+    "company": "Mimosa Spa - San Francisco",
+    "email": "info@mimosaretreat.com",
+    "score": 77,
+    "dealId": "63667994273",
+    "phone": "50764049464",
+    "emailDraft": "docs/selling/drafts/mimosa-spa-san-francisco-atlas-email.txt",
+    "draft": "docs/selling/drafts/mimosa-spa-san-francisco-atlas.txt"
+  },
+  "mimosa-spa-san-francisco-atlas-fu": {
+    "company": "Mimosa Spa - San Francisco",
+    "email": "info@mimosaretreat.com",
+    "score": 77,
+    "dealId": "63667994273",
+    "phone": "50764049464",
+    "emailDraft": "docs/selling/drafts/mimosa-spa-san-francisco-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/mimosa-spa-san-francisco-atlas-fu.txt"
+  },
+  "veladay-spa-atlas": {
+    "company": "VelaDay Spa",
+    "email": "veladayspa5@gmail.com",
+    "score": 88,
+    "dealId": "63669408056",
+    "phone": "50760162716",
+    "emailDraft": "docs/selling/drafts/veladay-spa-atlas-email.txt",
+    "draft": "docs/selling/drafts/veladay-spa-atlas.txt"
+  },
+  "veladay-spa-atlas-fu": {
+    "company": "VelaDay Spa",
+    "email": "veladayspa5@gmail.com",
+    "score": 88,
+    "dealId": "63669408056",
+    "phone": "50760162716",
+    "emailDraft": "docs/selling/drafts/veladay-spa-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/veladay-spa-atlas-fu.txt"
+  },
+  "espacio-verde-by-arlinesorganicways-metromall-atlas": {
+    "company": "Espacio Verde by ArlinesOrganicWays | Metromall",
+    "email": "arlinesorganicways.7@gmail.com",
+    "score": 84,
+    "dealId": "63668616246",
+    "phone": "50765816917",
+    "emailDraft": "docs/selling/drafts/espacio-verde-by-arlinesorganicways-metromall-atlas-email.txt",
+    "draft": "docs/selling/drafts/espacio-verde-by-arlinesorganicways-metromall-atlas.txt"
+  },
+  "espacio-verde-by-arlinesorganicways-metromall-atlas-fu": {
+    "company": "Espacio Verde by ArlinesOrganicWays | Metromall",
+    "email": "arlinesorganicways.7@gmail.com",
+    "score": 84,
+    "dealId": "63668616246",
+    "phone": "50765816917",
+    "emailDraft": "docs/selling/drafts/espacio-verde-by-arlinesorganicways-metromall-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/espacio-verde-by-arlinesorganicways-metromall-atlas-fu.txt"
   }
 }
