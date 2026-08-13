@@ -1,5 +1,65 @@
 # Oracle Instance Resilience — All Products (Fix Bots Dying Silently)
 
+## 🟢 n8n + private ops dashboard — the CRM read layer (August 13 2026)
+
+**What went live:** n8n 2.34.5 on Oracle (PM2 `n8n`, port 5678) plus a
+password-protected ops dashboard at `webhook.aideazz.xyz/ops/` showing live
+HubSpot data across the HIRING and CLIENT streams. First run: 17 HIRING,
+8 CLIENT, 25 needing action.
+
+**Why n8n at all.** Every other candidate in the fleet was rejected on inspection
+— Resend→HubSpot tracking is already solved in TypeScript, prospect staging is
+fully automatic in `atlas-lead-machine.cjs`, follow-up reminders come from
+HubSpot itself, and VJH's LangGraph pipeline would be a strict downgrade. The one
+genuine gap was `aideazz-ops-dashboard`: a deployed React UI whose own code said
+*"Placeholder rows — swap for API response shape when wiring CTO AIPA read
+endpoint."* It needed an aggregation endpoint over HubSpot and nothing else. That
+is n8n's actual shape — and greenfield, so nothing existing could be downgraded.
+
+**The workflow (4 nodes):** Webhook `GET /webhook/ops` → HTTP Request
+`POST api.hubapi.com/crm/v3/objects/deals/search` → Code (maps HubSpot's shape to
+the dashboard's `OpsRow`) → Respond to Webhook (**All Incoming Items**, not First).
+
+### Layout
+
+| Path | Serves | Auth |
+|---|---|---|
+| `webhook.aideazz.xyz/crm/` | n8n editor | n8n's own owner login |
+| `webhook.aideazz.xyz/crm/webhook/ops` | the data feed | **HTTP basic** (`.htpasswd-ops`) |
+| `webhook.aideazz.xyz/ops/` | React dashboard, `/var/www/ops` | **HTTP basic** (same file) |
+| `webhook.aideazz.xyz/crm/webhook/*` (all others) | future external webhooks | **none, deliberately** — Resend/HubSpot cannot type a password |
+
+Dashboard and feed share one origin on purpose: no CORS, and the browser sends
+credentials to both automatically. A static page cannot hold a secret, so
+same-origin + browser auth is the only honest way to protect it.
+
+### ⚠️ Security defect found and fixed the same hour
+
+Before the same-origin move, n8n's webhook **echoed back whatever `Origin` it was
+sent** — verified with `Origin: https://evil-example.com`, which came back as
+`Access-Control-Allow-Origin: https://evil-example.com`. Any website could have
+read the whole pipeline from a visitor's browser, and the URL itself had no auth
+at all. Now both paths return **401** unauthenticated; `/whitespace/`,
+`/aw-portal/` and `/crm/` verified unaffected.
+
+### Traps hit (all cost real time)
+
+- **n8n binds to `0.0.0.0` by default.** Set `N8N_LISTEN_ADDRESS=127.0.0.1` so
+  nginx is the only door. Verify with `ss -tlnp | grep 5678`.
+- **Editor "Execute step" spins forever behind a proxy** while the workflow runs
+  perfectly. Don't trust it — read `execution_entity` in
+  `~/.n8n/database.sqlite`, or just call the production URL.
+- **Test vs production webhook URLs.** `/webhook-test/...` works only while
+  "Listen for test event" is active; `/webhook/...` needs the workflow Published.
+- **git-bash rewrites `--base=/ops/` to `/Git/ops/`.** Build with
+  `MSYS_NO_PATHCONV=1`, then confirm `dist/index.html` references `/ops/`.
+- **`location = /crm/webhook/ops`** must be an EXACT match so it outranks the
+  `/crm/` prefix; otherwise auth either covers every webhook or none.
+
+**Restart:** `pm2 restart n8n` · **wake/kill:** it is PM2-managed and `pm2 save`d.
+**Data:** SQLite at `~/.n8n` — deliberately NOT the shared Postgres, so n8n
+cannot affect EspaLuz or anything else.
+
 **Purpose:** Stop all AI bots on Oracle from silently dying. One plan, one deployment, covers every product on `170.9.242.90`. This file also lists **canonical Git repos**, **Oracle VM directories**, and **authoritative local Windows clones** so nothing is duplicated or misplaced across machines.
 
 **Related:** The **AIdeazz AI Lab** story (marketing engine phases, Atlas measure layer, client-facing narrative) lives in [`AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md`](./AIDEAZZ_AI_MARKETING_ENGINE_FULL_ROADMAP.md) — start there for *what the lab does*; use **this file** for *where it runs and how to keep it alive*.
@@ -587,6 +647,8 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 | 9 | **Creative Co-Founder Atuona** | [AIPA_AITCF](https://github.com/ElenaRevicheva/AIPA_AITCF) (same repo as 8) | [@Atuona_AI_CCF_AIdeazz_bot](https://t.me/Atuona_AI_CCF_AIdeazz_bot) | PM2 (same process as 8) | `cto-aipa` | `http://127.0.0.1:3000/` | [atuona.xyz](https://atuona.xyz) | [atuona](https://github.com/ElenaRevicheva/atuona) | *No local web checkout — deploy site from GitHub `main` only (4everland)* |
 | 10 | **AILA** (Adaptive Intelligent Life Assistant) | [AILA](https://github.com/ElenaRevicheva/AILA) | *Not deployed as its own process on Oracle yet* — repo holds architecture, blueprint, Hive integration notes | — | — | — | — | — | `D:\aideazz\AILA` (planning repo) |
 | 11 | **Atlas Shifted** (Marketing Strategist) | [atlas-shifted](https://github.com/ElenaRevicheva/atlas-shifted) | [live radar](https://webhook.aideazz.xyz/whitespace/atlas.html) | PM2 | `whitespace` (port 8095) | `http://127.0.0.1:8095/healthz` | via `webhook.aideazz.xyz/whitespace/` (nginx → :8095) | — | `D:\aideazz\whitespace` (Oracle `/home/ubuntu/whitespace`; folder ≠ repo). Data backup repo: `atlas-captures` |
+| 12 | **n8n** (ops/CRM automation engine) | *no repo — workflows live in n8n's own SQLite at `~/.n8n`* | [editor](https://webhook.aideazz.xyz/crm/) (n8n owner login) | PM2 | `n8n` (port 5678, **bound to 127.0.0.1**) | `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5678/` → 200 · executions: `sqlite3 ~/.n8n/database.sqlite "SELECT id,status FROM execution_entity ORDER BY id DESC LIMIT 5;"` | via `webhook.aideazz.xyz/crm/` (nginx → :5678) | — | No local checkout — n8n is installed globally (`npm i -g n8n`), workflows are edited in the browser. **Export workflows to git before any upgrade.** |
+| 13 | **Ops dashboard** (private CRM view) | [aideazz-ops-dashboard](https://github.com/ElenaRevicheva/aideazz-ops-dashboard) | [webhook.aideazz.xyz/ops/](https://webhook.aideazz.xyz/ops/) — **HTTP basic auth**, user `elena` | nginx static (`/var/www/ops`) | — (no process) | `curl -o /dev/null -w '%{http_code}' https://webhook.aideazz.xyz/ops/` → **401 expected** (200 would mean the lock is off) | served from `webhook.aideazz.xyz/ops/`, deliberately NOT on the public marketing site | — | `D:\aideazz\aideazz-ops-dashboard`. Deploy: `MSYS_NO_PATHCONV=1 npx vite build --base=/ops/` then `scp -r dist/* oracle:/var/www/ops/` |
 
 **Repos (8 on Oracle VM):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AILA (8 repos for agents **on the VM**; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF). **Sprinter** uses the same **AIPA_AITCF** codebase path plus optional **`D:\aideazz\SprintBriefingAgent`** workspace for AWS packaging — runtime on **AWS Lambda**, not under `/home/ubuntu/` PM2/systemd.
 

@@ -6,6 +6,59 @@
 
 ---
 
+## 🟢 The ops layer — n8n + a private CRM view (August 13 2026)
+
+The marketing engine had every stage except one: **a single place to see what
+needs doing across all income streams.** Prospecting, qualification, drafting,
+sending and tracking were all automated and all reported into HubSpot — but
+HubSpot shows one pipeline distinguished only by `[HIRING-…]` / `[CLIENT-…]`
+name prefixes, so "what should I act on today, across everything?" still meant
+reading a 900-deal list.
+
+**Now live:** [webhook.aideazz.xyz/ops/](https://webhook.aideazz.xyz/ops/) —
+three stream tiles (HIRING · CLIENT · ESPALUZ), a needs-action count, filters,
+and rows that link straight back to the HubSpot record. First run: **17 HIRING,
+8 CLIENT, 25 needing action.** Password-protected; not on the public site.
+
+**How it is built (and why this way):**
+
+```
+Webhook GET /webhook/ops
+  → HTTP Request  POST api.hubapi.com/crm/v3/objects/deals/search
+  → Code          HubSpot shape → the dashboard's OpsRow
+  → Respond       All Incoming Items
+```
+
+Four nodes in n8n, no server written or hosted. The React dashboard
+(`aideazz-ops-dashboard`) fetches that one URL and falls back to sample rows —
+**labelled as sample** — if the feed is unreachable.
+
+**Why n8n here and nowhere else.** Every other candidate in the fleet was
+examined and rejected because working code already existed: Resend→HubSpot
+delivery tracking (TypeScript webhook handler), prospect staging
+(`atlas-lead-machine.cjs`, fully automatic), follow-up reminders (HubSpot's own
+task pings), VJH orchestration (LangGraph + 129 tests). The dashboard was the
+only genuinely empty ground — and its own source comment had been asking for
+exactly this since May: *"swap for API response shape when wiring CTO AIPA read
+endpoint."*
+
+**The rule this established:** n8n earns its place where you need waiting,
+branching, or an integration you have not written yet. It does not earn its place
+where tested code already runs. Knowing where a tool does *not* belong is part of
+choosing it well.
+
+**Security note.** The first version served the pipeline to any website that
+asked — n8n echoes back whatever `Origin` it receives, and the endpoint had no
+auth. Fixed by moving dashboard and feed to the same origin behind one HTTP-auth
+login, which removes CORS from the picture entirely. Full detail and the traps
+hit: [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md)
+§ *n8n + private ops dashboard*.
+
+**Next, in order:** ESPALUZ stream (currently 0 — no feed wired yet) · stage
+changes written back from the dashboard · Atlas signals surfaced beside deals.
+
+---
+
 ## What is AIdeazz AI Lab — right now (July 21, 2026)
 
 AIdeazz AI Lab is your **production AI co-founder fleet** plus a **marketing engine** that connects real business signals end-to-end. It is **not a prototype** — it runs 24/7 on Oracle Cloud, with a public face at [aideazz.xyz](https://aideazz.xyz) and a live strategy radar at [Atlas](https://webhook.aideazz.xyz/whitespace/atlas.html).
