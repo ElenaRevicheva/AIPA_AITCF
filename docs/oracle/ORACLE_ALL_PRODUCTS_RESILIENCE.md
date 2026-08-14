@@ -1,5 +1,81 @@
 # Oracle Instance Resilience — All Products (Fix Bots Dying Silently)
 
+## 🟢 VJH self-learning judge — now learns her REASONS and reads her screenshots (August 14 2026)
+
+Supersedes the July 8-9 "self-evolving judge" entry below. The loop was alive but
+starving: it learned 6 rejected *titles* and nothing else, while the explanations Elena
+types (and the screenshots she attaches) sat unread in HubSpot. Commits in
+`VibeJobHunterAIPA_AIMCF`: `41ccc36` → `7017d05`, docs `02d47b9`.
+
+**Cron changed: `17 3 * * 0` (Sundays) → `17 6 * * *` (DAILY).** It is a read-only
+HubSpot pull and a full week of her manual triage was sitting unlearned between runs.
+Crontab backup before the edit: `/home/ubuntu/crontab.bak-20260814`.
+
+**Measured effect (same HubSpot data, before → after):** applications recognised
+**6 → 12**; negatives **6 bare titles → 12, of which 7 carry her reasoning and 3 the
+contents of her screenshots**.
+
+**Why it mattered, from one day's journal:** at 14:32 the judge surfaced *Forward
+Deployed Engineer @ Blink UX* praising it as "hands-on, aligning with Elena's…" and she
+killed it minutes later with **"manual coding required"**. Taste exactly inverted, and
+the correction was already written in the deal note — being thrown away.
+
+**What was actually broken (all verified, not theorised):**
+- `\bapplied\b` was the only marker of her own applications, so *"I have just submitted
+  manually"* was discarded — **4 of that week's 6 Sent-stage deals lost**.
+- `\bengineer\b` does not match **"Engineering"** → *Forward Deployed Staff (Engineering)
+  @ LevelUp Labs* never reached the negatives at all.
+- Cap of 6 examples while **13** confirmed applications and **68** No-fits existed → raised to 12.
+- VJH's Telegram-approval note is a bot template and was not being stripped.
+
+**🔑 The HubSpot credential is a SERVICE KEY, not a private app.** `AIdeazz_Marketing_Engine`,
+id `39045903`, portal `51409153` — one token, `HUBSPOT_API_KEY` in `/home/ubuntu/cto-aipa/.env`,
+used by the whole fleet. **No private app was ever created**, so ⚙️ Settings → *Private Apps*
+("your private apps have moved") and *Legacy Apps* ("no legacy apps available") are both
+**empty dead ends** — do not send anyone there. Scopes are edited at
+**⚙️ Settings → Integrations → Service Keys** →
+`https://app.hubspot.com/service-keys/51409153/key/39045903` → *Edit → Add new scope*,
+then *Save → "Yes, save"*. `access-token-info` lags a few seconds behind the save —
+**verify by actually fetching a file, not by reading the scope list.**
+
+**Screenshot reading (`gpt-4o-mini` vision) — three traps, each cost a round trip:**
+1. Note attachments report **`access=HIDDEN_PRIVATE`** → `files.read` alone 403s.
+   **`files.ui_hidden.read` is also required.** Both granted Aug 14 (15 scopes total,
+   read-only; nothing that writes or deletes).
+2. `files/v3/files/{id}` → `url` is a **signed-url *redirect*** on `api-na1.hubspot.com`
+   that needs the auth header. Fetched plain it returns an HTML page, which base64s into
+   OpenAI as `invalid_image_format` 400. Use **`/files/v3/files/{id}/signed-url`** for a
+   real CDN link and check magic bytes before spending a vision call.
+3. The prompt must **extract** what a posting demands, not judge disqualification. A
+   version asking "which requirement would disqualify her" (with a NONE escape) returned
+   empty for 2 of 3 real screenshots because their demands are qualitative.
+   Cache: `autonomous_data/screenshot_reasons.json`, keyed by file id + `_prompt_version`
+   → each screenshot is paid for **once**, and a prompt change re-reads instead of
+   inheriting stale answers.
+
+**⚠️ Verification rules (both of these make a healthy loop look dead):**
+- Judge verdicts (`[submit] judge VETO (...)`, `judge OK (...)`) exist **ONLY** in
+  `journalctl -u vibejobhunter`. `logs/vibejobhunter_*.log` carries only
+  `src.autonomous.*` — grepping it returns 0 and proves nothing.
+- **Never trust the sync's own summary line.** It once reported "10 carrying her reason"
+  where every reason was the literal string `⚠️ Apply` — residue of VJH's note template
+  clearing an 8-char length gate. Gate on **≥3 real words**, and always render the real
+  prompt:
+```bash
+cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && python3 scripts/judge_feedback_sync.py && \
+  venv/bin/python -c "from src.core.llm_judge import _feedback_block; print(_feedback_block())"
+```
+
+**Fail-safe unchanged:** HubSpot unreachable / no qualifying outcomes / invalid JSON / no
+files scope → existing `judge_feedback.json` left untouched (atomic tmp+rename) and the
+judge prompt is byte-identical to pre-feature. The loop can never take the judge down.
+Restart rule (Iron Rule #11) still applies to `llm_judge.py` code changes —
+`sudo systemctl restart vibejobhunter` **and** `pm2 restart serpapi-jobs`; feedback-data
+updates need no restart (the file is read per judge call). Full detail:
+`VibeJobHunterAIPA_AIMCF/CLAUDE.md` § SELF-LEARNING LOOP.
+
+---
+
 ## 🟢 n8n + private ops dashboard — the CRM read layer (August 13 2026)
 
 **What went live:** n8n 2.34.5 on Oracle (PM2 `n8n`, port 5678) plus a
@@ -565,6 +641,14 @@ GROQ_MODEL=<new-model-id>
 - **VibeJobHunter (`vibejobhunter` systemd):** honest-LEAD mode — surfaces right-fit (fully-remote · LATAM-open · AI-augmented · no-coding) jobs to Telegram + HubSpot "🔥 I Act TODAY", **capped at 6/cycle** (`VJH_SURFACE_CAP`). Deploy: `cd /home/ubuntu/VibeJobHunterAIPA_AIMCF && git pull && sudo systemctl restart vibejobhunter`. Full chain + the "0-surfacing" bug-chain gotchas: VJH `CLAUDE.md` → "CURRENT PIPELINE". **Dedup stores:** `autonomous_data/seen_jobs.json` (`seen_jobs_v2`) + `vjh_checkpoint.db` — clearing them WITHOUT the surface cap **floods Telegram** (happened June 23; cap added).
 
 ## 🟢 VJH retargeting + self-evolving judge (July 8-9 2026)
+
+> ⚠️ **The judge half of this entry is SUPERSEDED by the August 14 2026 section at the
+> top of this doc.** Still accurate here: the signal-honesty rule (`qualifiedtobuy` is
+> bot-filed and does not count) and the fail-safe design. Now WRONG here: the cron is
+> **daily `17 6 * * *`**, not weekly `17 3 * * 0`; the loop no longer learns bare titles
+> (it carries her reasons and her screenshots); positives now also include her own
+> applications in `decisionmakerboughtin` when a note confirms she applied; and the cap
+> is 12, not 6. The Torre/lane retargeting bullets below are unaffected.
 
 Built after a head-to-head comparison with JobCopilot (paid SaaS, weworkremotely.jobcopilot.com — Elena has access): VJH filters far more precisely for her constraints; JobCopilot's one real edge was its "delete jobs you don't like → trains your copilot" feedback loop. That loop is now adapted into VJH, honestly. All changes additive — eval harness stayed **115 pass / 14 skip** after every deploy; exclude lists / LangGraph shape / safety nets untouched. Commits (VibeJobHunterAIPA_AIMCF):
 
