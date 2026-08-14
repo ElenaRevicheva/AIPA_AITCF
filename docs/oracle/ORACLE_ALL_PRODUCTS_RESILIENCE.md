@@ -1151,6 +1151,26 @@ Always use `row[2]` / `row[3]` for title/content in the `/sprint-knowledge` endp
 
 ---
 
+## Last Verified (August 14, 2026) — PagueloFacil durable mirror, JSON snapshots, RAG key, analytics
+
+Claude Opus encodings reviewed and kept. Real defects, not cosmetic: PagueloFacil lived in a 2 KB JSON file that `_load_store()` would replace with `{}` on `JSONDecodeError` (next save = silent money-record wipe); RAG captured `OPENAI_API_KEY` at import time (any import before `load_dotenv()` = permanent silent amnesia); WhatsApp `user_analytics` never updated `daily_activity` / `total_days_active` on the existing-user Postgres path, and `/analytics/export` read the near-empty JSON fallback (HTTP 500).
+
+| Surface | Status | What landed |
+|---------|--------|-------------|
+| **PagueloFacil store** | ✅ Live | `espaluz_pf_durable.py` append-only Postgres mirror (SHA-deduped). `_load_store()` restores from Postgres if the file is missing or unreadable; bad files are quarantined. `_save_store()` is atomic (temp + fsync + rename) then mirrors. Every durable function swallows its own errors — payments keep working if Postgres is down. Repo: [EspaLuzFamilybot `0b46027`](https://github.com/ElenaRevicheva/EspaLuzFamilybot/commit/0b46027). |
+| **JSON state (both bots)** | ✅ Live | `json_store_guard.py` snapshots 27 JSON files every 15 min via `espaluz-json-guard.timer`. Imports no bot code; secrets denied by name (`credential`, `token`, `secret`, `key.json`, `service_account`). Units: `EspaLuzFamilybot/deploy/espaluz-json-guard.{service,timer}`. |
+| **RAG** | ✅ Live | `espaluz_rag.py` resolves `OPENAI_API_KEY` lazily at call time (both repos). Backfill `rag_backfill.py` (dry-run default, insert-only): 164 vectors / 5 sessions → 415 / 9. |
+| **WhatsApp analytics** | ✅ Live | Existing-user UPDATE now maintains `daily_activity` + derives `total_days_active`. CSV export reads Postgres and includes PayPal / PagueloFacil / trial classification. DB URL resolved by **key priority** (`ESPALUZ_UNIFIED_DB_URL` → `DATABASE_URL_UNIFIED` → `DATABASE_URL`), not first-line-wins — the legacy empty `DATABASE_URL` sits above the unified one in these `.env` files. Repo: [EspaLuzWhatsApp `4d90acf`](https://github.com/ElenaRevicheva/EspaLuzWhatsApp/commit/4d90acf). |
+| **Stale status columns** | ✅ Applied on Oracle | Trial/subscription `status` flipped only where `trial_end` / period already passed (load-bearing for access — date guard first). Historical `total_days_active` floored from `first_seen`/`last_seen` for the 3 multi-day users. |
+
+**Verified live (Aug 14):** PF store 2 users / 2 processed / 3 orders; durable snapshot `ok`; `espaluz-json-guard.timer` enabled; WhatsApp `/webhook` 200; PagueloFacil webhook HTTP 200; RAG key resolvable; analytics DB on unified Postgres. Oracle working-tree drift on `espaluz_paguelofacil.py` + `user_analytics.py` was CRLF-only — canonical `git checkout origin/main -- <files>` (never a blind pull).
+
+**Residual:** `streak_days` is still only updated on the JSON fallback path, not the Postgres existing-user UPDATE. Dashboard streak remains decorative until that column is derived from `daily_activity`.
+
+**Deploy files:** Telegram `espaluz_paguelofacil.py espaluz_pf_durable.py espaluz_rag.py json_store_guard.py` + restart `espaluz-familybot espaluz-payments-webhook`. WhatsApp `espaluz_rag.py user_analytics.py` + restart `espaluz-whatsapp`. Timer install: `sudo cp deploy/espaluz-json-guard.* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now espaluz-json-guard.timer`.
+
+---
+
 ## Last Verified (June 29, 2026) — EspaLuz PagueloFacil + Access Control
 
 | Agent | Status | Change |
