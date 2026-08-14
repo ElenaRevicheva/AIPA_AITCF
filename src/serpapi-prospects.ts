@@ -200,10 +200,22 @@ Return ONLY a valid JSON array, one object per result in order:
   return out;
 }
 
-// ── SerpAPI quota guard (July 11 2026) ────────────────────────────────────────
-// Elena re-subscribed (Starter, 1,000 searches/mo). The same key also feeds the
-// VJH hiring-side ingest, so client discovery only uses SerpAPI when the
-// account still has > SERPAPI_RESERVE searches left.
+// ── SerpAPI quota guard (July 11 2026; corrected Aug 14 2026) ─────────────────
+// Elena re-subscribed (Starter, 1,000 searches/mo). Client discovery only uses
+// SerpAPI while the account still has > SERPAPI_RESERVE searches left.
+//
+// ⚠️ CORRECTION (Aug 14 2026): this reserve was created to leave headroom for
+// "the VJH hiring-side ingest", which no longer uses this key at all. VJH's
+// serpapi_jobs_ingest.py was switched to BrightData ("Replaces the dead SerpAPI
+// google_jobs feed") — `grep -rn serpapi.com` over that repo returns NOTHING, and
+// SERPAPI_KEY there is read into a variable and never used. The old wording sent a
+// real debugging session chasing a phantom "VJH is silently dead".
+//
+// What actually still spends this key: client discovery here, and the AI citation
+// tracker (src/citation-tracker.ts, google-ai-overview probe) behind
+// /visibility-api + scripts/citation-probe.cjs — the GEO/AEO proof surface.
+// The reserve is therefore worth keeping, but it now protects CITATION TRACKING,
+// not job discovery. Tune with SERPAPI_RESERVE if the split should change.
 const SERPAPI_RESERVE = Number(process.env.SERPAPI_RESERVE || 200);
 let serpQuotaOkCache: boolean | null = null;
 
@@ -230,7 +242,7 @@ async function alertSerpApiDisabled(reason: string): Promise<void> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: `⚠️ SerpAPI disabled for client discovery\n\n${reason}\n\nImpact: Spanish/LATAM queries fall back to BrightData; EN queries lose their sparse-result fallback.\nCheck: https://serpapi.com/dashboard`,
+        text: `⚠️ SerpAPI disabled for client discovery\n\n${reason}\n\nImpact: Spanish/LATAM queries fall back to BrightData; EN queries lose their sparse-result fallback.\nNOT affected: VJH job discovery — it runs on BrightData and does not use this key.\nCheck: https://serpapi.com/dashboard`,
         disable_web_page_preview: true,
       }),
       signal: AbortSignal.timeout(10_000),
@@ -256,7 +268,7 @@ async function serpApiQuotaOk(): Promise<boolean> {
       serpQuotaOkCache = left > SERPAPI_RESERVE;
       console.log(`[SerpProspects] SerpAPI quota: ${left} left (reserve ${SERPAPI_RESERVE}) → ${serpQuotaOkCache ? 'ENABLED' : 'DISABLED'}`);
       if (!serpQuotaOkCache) {
-        await alertSerpApiDisabled(`quota ${left} ≤ reserve ${SERPAPI_RESERVE} (VJH hiring ingest shares this key — top-up or lower SERPAPI_RESERVE)`);
+        await alertSerpApiDisabled(`quota ${left} ≤ reserve ${SERPAPI_RESERVE} (reserve protects AI citation tracking — top-up or lower SERPAPI_RESERVE)`);
       }
     } catch (e) {
       serpQuotaOkCache = false;
