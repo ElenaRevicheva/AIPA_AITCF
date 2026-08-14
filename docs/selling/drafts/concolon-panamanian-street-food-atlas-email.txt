@@ -1,4 +1,4 @@
-SUBJECT: Concolon PANAMANIAN Street Food: cómo aparecer en ChatGPT cuando le preguntan por su sector (65/100)
+SUBJECT: Auditoría de visibilidad en IA — Concolon 82/100: GEO 69, ChatGPT no los cita como comida panameña
 
 TO: fondaconcolon@gmail.com
 
@@ -6,18 +6,15 @@ Estimado equipo de Concolon PANAMANIAN Street Food:
 
 ¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA y automatización aquí en Panamá: https://aideazz.xyz/portfolio
 
-Cada vez más negocios en Panama City están apareciendo como respuesta cuando alguien le pregunta a ChatGPT o Perplexity por opciones en su sector. Otros no aparecen en absoluto — y esa diferencia ya se nota en quién recibe la consulta.
+Analicé http://www.concolon-restaurant.com/ con mi motor de visibilidad en IA (https://aideazz.xyz/api): 82/100 (B). El hueco es Structured Data (GEO) 69/100 — cuando alguien le pregunta a ChatGPT por street food panameño en la ciudad, no hay ficha citable con su nombre.
 
-Analicé http://www.concolon-restaurant.com/ con mi motor de visibilidad en IA: 65/100 (C).
-Su punto más débil es la respuesta-a-preguntas (AEO 25/100) — y es el más rápido de arreglar.
+Arreglo GEO/AEO para que sean la respuesta, y un agente de WhatsApp 24/7 EN/ES que toma el pedido o la reserva y la deja en su CRM. Get Recommended by ChatGPT → Close on WhatsApp.
 
-La mayoría de los negocios en Panama City pierden consultas simplemente porque llegan fuera de horario y nadie contesta a tiempo. Instalo un agente de WhatsApp que responde al instante 24/7 en español e inglés, califica al cliente, agenda y deja todo registrado en su CRM.
-
-Si les parece bien, se lo muestro en 15 minutos, sin ningún compromiso.
+Si les parece bien, se lo muestro en 15 minutos, sin compromiso.
 
 La auditoría completa es gratuita aquí: https://aideazz.xyz/api
 
-PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio 👆
+PD: video con IA de platos para Instagram/TikTok también lo tengo en el portafolio 👆
 
 ¡Que tengan un excelente día!
 Saludos,

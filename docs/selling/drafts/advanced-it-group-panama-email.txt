@@ -1,0 +1,23 @@
+SUBJECT: Auditoría de visibilidad en IA — Advanced IT Group 72/100: GEO 38, ChatGPT no cita su core cooperativo
+
+TO: aguilarf@sacsaweb.com
+
+Estimado equipo de Advanced IT Group Panama:
+
+¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA y automatización aquí en Panamá: https://aideazz.xyz/portfolio
+
+Analicé https://bms.aitgpanama.com/ con el motor de visibilidad en IA que construí yo (https://aideazz.xyz/api): 72/100 (B). Los crawlers de ChatGPT sí entran (AI Access 95). El hueco fuerte es Structured Data (GEO) 38/100 — cuando una cooperativa pregunta por un core financiero en Panamá / RD / Honduras, BMS Financial Core casi no existe como respuesta citable.
+
+Eso es visibilidad en IA (GEO · AEO). El otro ángulo, si ya tienen IA dentro del core o en soporte a asociadas: yo testeo contra casos reales, pongo fallbacks para que un apagón de modelo no tumbe el servicio, y les entrego los tests. Y si las cooperativas necesitan atención 24/7, un agente WhatsApp/Telegram EN/ES cableado a su CRM es el producto que yo instalo — ustedes lo pueden llevar a sus clientes.
+
+Si les parece bien, se lo muestro en 15 minutos sobre BMS, sin compromiso.
+
+La auditoría completa es gratuita aquí: https://aideazz.xyz/api
+
+PD: automatización Make/n8n de punta a punta, documentada para que la operen ustedes, también está en el portafolio 👆
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva
+Fundadora | Ingeniera de IA y Automatización
+AIdeazz AI Lab ✨

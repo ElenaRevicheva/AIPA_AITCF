@@ -1,4 +1,4 @@
-SUBJECT: Auditoría de visibilidad en IA — CR Contadores (71/100): 3 arreglos concretos
+SUBJECT: Auditoría de visibilidad en IA — CR Contadores 71/100: GEO 38, casi invisibles para ChatGPT
 
 TO: info@crcontadores.com.pa
 
@@ -6,17 +6,15 @@ Estimado equipo de CR Contadores:
 
 ¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA y automatización aquí en Panamá: https://aideazz.xyz/portfolio
 
-Analizo cómo aparecen los negocios de Panama City en los motores de respuesta con IA. El suyo tiene una base sólida y tres huecos concretos que lo dejan fuera de la respuesta.
+Analicé https://crcontadores.com.pa/ con mi motor de visibilidad en IA (https://aideazz.xyz/api): 71/100 (B). El hueco fuerte es Structured Data (GEO) 38/100 — cuando un dueño de empresa le pregunta a ChatGPT por un contador público en Panamá, ustedes casi no existen como respuesta citable.
 
-Analicé https://crcontadores.com.pa/ con mi motor de visibilidad en IA: 71/100 (B).
+Eso se arregla. Y el trabajo que sí les come horas — intake de documentos, seguimiento de clientes, reportes — lo dejo en un workflow Make/n8n o código, de punta a punta, documentado para que lo operen ustedes. Un agente de WhatsApp puede calificar al prospecto (sociedad, planilla, auditoría, plazo) antes de que un socio invierta una llamada.
 
-Casi siempre hay dos o tres procesos que consumen horas del equipo cada semana — cotizaciones, seguimiento de clientes, reportes, carga de datos. Automatizo justo esos, conectados a las herramientas que ya usan, sin cambiar de sistema.
-
-Si les parece bien, se lo muestro en 15 minutos, sin ningún compromiso.
+Si les parece bien, se lo muestro en 15 minutos, sin compromiso.
 
 La auditoría completa es gratuita aquí: https://aideazz.xyz/api
 
-PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio 👆
+PD: si ya experimentaron con IA para clasificar documentos y alucina o se rompe, eso también lo rescato con tests y fallbacks. Demos en el portafolio 👆
 
 ¡Que tengan un excelente día!
 Saludos,

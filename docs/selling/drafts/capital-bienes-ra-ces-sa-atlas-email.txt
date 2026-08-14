@@ -1,4 +1,4 @@
-SUBJECT: Auditoría de visibilidad en IA — Capital Bienes Raíces SA (83/100): 3 arreglos concretos
+SUBJECT: Auditoría de visibilidad en IA — Capital Bienes Raíces 83/100: GEO 69, ChatGPT no los cita todavía
 
 TO: asistente@capital-bienesraices.com
 
@@ -6,17 +6,15 @@ Estimado equipo de Capital Bienes Raíces SA:
 
 ¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA y automatización aquí en Panamá: https://aideazz.xyz/portfolio
 
-Analizo cómo aparecen los negocios de Panama City en los motores de respuesta con IA. El suyo tiene una base sólida y tres huecos concretos que lo dejan fuera de la respuesta.
+Analicé http://www.capital-bienesraices.com/ con mi motor de visibilidad en IA (https://aideazz.xyz/api): 83/100 (B). AEO 81, pero Structured Data (GEO) 69/100 — los motores de respuesta no tienen ficha citable cuando alguien pide un realtor en Panamá.
 
-Analicé http://www.capital-bienesraices.com/ con mi motor de visibilidad en IA: 83/100 (B).
+Arreglo eso y dejo el cierre en WhatsApp: un agente 24/7 EN/ES que califica al comprador (presupuesto, zona, si compra de contado), agenda y registra en su CRM. Get Recommended by ChatGPT → Close on WhatsApp.
 
-Casi siempre hay dos o tres procesos que consumen horas del equipo cada semana — cotizaciones, seguimiento de clientes, reportes, carga de datos. Automatizo justo esos, conectados a las herramientas que ya usan, sin cambiar de sistema.
-
-Si les parece bien, se lo muestro en 15 minutos, sin ningún compromiso.
+Si les parece bien, se lo muestro en 15 minutos, sin compromiso.
 
 La auditoría completa es gratuita aquí: https://aideazz.xyz/api
 
-PD: Además de visibilidad en IA, construyo agentes de WhatsApp que responden y agendan 24/7 (EN/ES, conectados a su CRM), automatización de intake, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio 👆
+PD: también automatizo el seguimiento de leads que preguntaron hace meses y nunca volvieron, y video con IA del inventario. Demos en el portafolio 👆
 
 ¡Que tengan un excelente día!
 Saludos,

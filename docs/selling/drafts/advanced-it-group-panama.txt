@@ -1,0 +1,7 @@
+Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA en Panamá: https://aideazz.xyz/portfolio
+
+Analicé bms.aitgpanama.com con mi motor de visibilidad en IA (https://aideazz.xyz/api): 72/100 (B). GEO 38 — ChatGPT no cita su core cooperativo.
+
+Arreglo GEO/AEO y, si ya tienen IA en BMS o en soporte, la rescato con tests y fallbacks. También agentes WhatsApp 24/7 EN/ES para las cooperativas.
+
+15 min, sin compromiso.

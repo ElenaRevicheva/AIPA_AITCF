@@ -1759,7 +1759,7 @@
     "company": "Spot On Digital Agency",
     "email": "hola@spotondigitalagency.com",
     "emailDraft": "docs/selling/drafts/spot-on-digital-agency-atlas-email.txt",
-    "score": 89,
+    "score": 88,
     "dealId": "63404412234",
     "phone": "50765601885",
     "draft": "docs/selling/drafts/spot-on-digital-agency-atlas.txt"
@@ -1768,7 +1768,7 @@
     "company": "Spot On Digital Agency",
     "email": "hola@spotondigitalagency.com",
     "emailDraft": "docs/selling/drafts/spot-on-digital-agency-atlas-fu-email.txt",
-    "score": 89,
+    "score": 88,
     "dealId": "63404412234",
     "phone": "50765601885",
     "draft": "docs/selling/drafts/spot-on-digital-agency-atlas-fu.txt"
@@ -1921,18 +1921,18 @@
     "company": "Pedros Bienes Raices",
     "email": "ventas@brpedros.com",
     "emailDraft": "docs/selling/drafts/pedros-bienes-raices-atlas-email.txt",
-    "score": 82,
+    "score": 85,
     "dealId": "63441240336",
-    "phone": "50762663466",
+    "phone": "50760689256",
     "draft": "docs/selling/drafts/pedros-bienes-raices-atlas.txt"
   },
   "pedros-bienes-raices-atlas-fu": {
     "company": "Pedros Bienes Raices",
     "email": "ventas@brpedros.com",
     "emailDraft": "docs/selling/drafts/pedros-bienes-raices-atlas-fu-email.txt",
-    "score": 82,
+    "score": 85,
     "dealId": "63441240336",
-    "phone": "50762663466",
+    "phone": "50760689256",
     "draft": "docs/selling/drafts/pedros-bienes-raices-atlas-fu.txt"
   },
   "capital-bienes-ra-ces-sa-atlas": {
@@ -1941,7 +1941,7 @@
     "emailDraft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas-email.txt",
     "score": 83,
     "dealId": "63450221629",
-    "phone": "5073824144",
+    "phone": "50764960144",
     "draft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas.txt"
   },
   "capital-bienes-ra-ces-sa-atlas-fu": {
@@ -1950,7 +1950,7 @@
     "emailDraft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas-fu-email.txt",
     "score": 83,
     "dealId": "63450221629",
-    "phone": "5073824144",
+    "phone": "50764960144",
     "draft": "docs/selling/drafts/capital-bienes-ra-ces-sa-atlas-fu.txt"
   },
   "cvb-panam-bienes-ra-ces-atlas": {
@@ -1995,7 +1995,7 @@
     "emailDraft": "docs/selling/drafts/cr-contadores-atlas-email.txt",
     "score": 71,
     "dealId": "63432399020",
-    "phone": "5073107519",
+    "phone": "50767208609",
     "draft": "docs/selling/drafts/cr-contadores-atlas.txt"
   },
   "cr-contadores-atlas-fu": {
@@ -2004,7 +2004,7 @@
     "emailDraft": "docs/selling/drafts/cr-contadores-atlas-fu-email.txt",
     "score": 71,
     "dealId": "63432399020",
-    "phone": "5073107519",
+    "phone": "50767208609",
     "draft": "docs/selling/drafts/cr-contadores-atlas-fu.txt"
   },
   "kontadores-panam-contadores-p-blicos-autorizados-atlas": {
@@ -2432,7 +2432,7 @@
   "kaandela-restaurant-atlas": {
     "company": "Kaandela Restaurant",
     "email": "info@kaandela.com",
-    "score": 82,
+    "score": 93,
     "dealId": "63647143833",
     "phone": "50767470682",
     "emailDraft": "docs/selling/drafts/kaandela-restaurant-atlas-email.txt",
@@ -2441,7 +2441,7 @@
   "kaandela-restaurant-atlas-fu": {
     "company": "Kaandela Restaurant",
     "email": "info@kaandela.com",
-    "score": 82,
+    "score": 93,
     "dealId": "63647143833",
     "phone": "50767470682",
     "emailDraft": "docs/selling/drafts/kaandela-restaurant-atlas-fu-email.txt",
@@ -2452,7 +2452,7 @@
     "email": "info@eltrapicherestaurante.com",
     "score": 88,
     "dealId": "63668927108",
-    "phone": "5073810981",
+    "phone": "50762401215",
     "emailDraft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas-email.txt",
     "draft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas.txt"
   },
@@ -2461,42 +2461,50 @@
     "email": "info@eltrapicherestaurante.com",
     "score": 88,
     "dealId": "63668927108",
-    "phone": "5073810981",
+    "phone": "50762401215",
     "emailDraft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/restaurante-el-trapiche-san-francisco-atlas-fu.txt"
   },
   "concolon-panamanian-street-food-atlas": {
     "company": "Concolon PANAMANIAN Street Food",
     "email": "fondaconcolon@gmail.com",
-    "score": 65,
+    "score": 82,
     "dealId": "63669421675",
-    "emailDraft": "docs/selling/drafts/concolon-panamanian-street-food-atlas-email.txt"
+    "emailDraft": "docs/selling/drafts/concolon-panamanian-street-food-atlas-email.txt",
+    "phone": "50767233771",
+    "draft": "docs/selling/drafts/concolon-panamanian-street-food-atlas.txt"
   },
   "concolon-panamanian-street-food-atlas-fu": {
     "company": "Concolon PANAMANIAN Street Food",
     "email": "fondaconcolon@gmail.com",
-    "score": 65,
+    "score": 82,
     "dealId": "63669421675",
-    "emailDraft": "docs/selling/drafts/concolon-panamanian-street-food-atlas-fu-email.txt"
+    "emailDraft": "docs/selling/drafts/concolon-panamanian-street-food-atlas-fu-email.txt",
+    "phone": "50767233771",
+    "draft": "docs/selling/drafts/concolon-panamanian-street-food-atlas-fu.txt"
   },
   "restaurante-santa-rita-comida-espa-ola-panam-atlas": {
     "company": "Restaurante Santa Rita | Comida Española Panamá",
     "email": "info@restaurantesantaritapanama.com",
     "score": 76,
     "dealId": "63671566456",
-    "emailDraft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas-email.txt"
+    "emailDraft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas-email.txt",
+    "phone": "50766296315",
+    "draft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas.txt"
   },
   "restaurante-santa-rita-comida-espa-ola-panam-atlas-fu": {
     "company": "Restaurante Santa Rita | Comida Española Panamá",
     "email": "info@restaurantesantaritapanama.com",
     "score": 76,
     "dealId": "63671566456",
-    "emailDraft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas-fu-email.txt"
+    "emailDraft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas-fu-email.txt",
+    "phone": "50766296315",
+    "draft": "docs/selling/drafts/restaurante-santa-rita-comida-espa-ola-panam-atlas-fu.txt"
   },
   "restaurante-el-nacional-sabores-de-panam-atlas": {
     "company": "Restaurante El Nacional Sabores de Panamá",
     "email": "reservaselnacionalpty@gmail.com",
-    "score": 83,
+    "score": 81,
     "dealId": "63669179483",
     "phone": "50764216817",
     "emailDraft": "docs/selling/drafts/restaurante-el-nacional-sabores-de-panam-atlas-email.txt",
@@ -2505,7 +2513,7 @@
   "restaurante-el-nacional-sabores-de-panam-atlas-fu": {
     "company": "Restaurante El Nacional Sabores de Panamá",
     "email": "reservaselnacionalpty@gmail.com",
-    "score": 83,
+    "score": 81,
     "dealId": "63669179483",
     "phone": "50764216817",
     "emailDraft": "docs/selling/drafts/restaurante-el-nacional-sabores-de-panam-atlas-fu-email.txt",
@@ -2514,7 +2522,7 @@
   "mimosa-spa-san-francisco-atlas": {
     "company": "Mimosa Spa - San Francisco",
     "email": "info@mimosaretreat.com",
-    "score": 77,
+    "score": 94,
     "dealId": "63667994273",
     "phone": "50764049464",
     "emailDraft": "docs/selling/drafts/mimosa-spa-san-francisco-atlas-email.txt",
@@ -2523,7 +2531,7 @@
   "mimosa-spa-san-francisco-atlas-fu": {
     "company": "Mimosa Spa - San Francisco",
     "email": "info@mimosaretreat.com",
-    "score": 77,
+    "score": 94,
     "dealId": "63667994273",
     "phone": "50764049464",
     "emailDraft": "docs/selling/drafts/mimosa-spa-san-francisco-atlas-fu-email.txt",
@@ -2581,5 +2589,23 @@
     "emailDraft": "docs/selling/drafts/pumas-digital-fu-email.txt",
     "dealId": "63713705052",
     "score": 70
+  },
+  "advanced-it-group-panama": {
+    "company": "Advanced IT Group Panama",
+    "email": "aguilarf@sacsaweb.com",
+    "emailDraft": "docs/selling/drafts/advanced-it-group-panama-email.txt",
+    "draft": "docs/selling/drafts/advanced-it-group-panama.txt",
+    "dealId": "60145209608",
+    "phone": "50766796923",
+    "score": 72
+  },
+  "advanced-it-group-panama-fu": {
+    "phone": "50766796923",
+    "company": "Advanced IT Group Panama",
+    "email": "aguilarf@sacsaweb.com",
+    "emailDraft": "docs/selling/drafts/advanced-it-group-panama-fu-email.txt",
+    "draft": "docs/selling/drafts/advanced-it-group-panama-fu.txt",
+    "dealId": "60145209608",
+    "score": 72
   }
 }
