@@ -307,20 +307,57 @@ function sendVisitorAck(m: VisitorMessage): void {
  *
  * Never both: the caller only invokes this when the contact existed beforehand.
  */
+/**
+ * Hand a chat visitor to Make, the same way the form path hands over a returning
+ * contact.
+ *
+ * Make's polling trigger only ever sees contacts it watched being CREATED, so a
+ * chat visitor who is already in HubSpot — or who simply sends a second message
+ * in an open thread — is invisible to it. Posting to the webhook scenario closes
+ * that hole, so "Make drafts every inbound lead" is true for the chat bubble too
+ * and not only for the form.
+ *
+ * Returns false when the webhook is not configured or does not accept the lead,
+ * and the caller then drafts locally — Make is preferred, never required.
+ */
+async function postToMakeWebhook(m: VisitorMessage): Promise<boolean> {
+  const hook = process.env.MAKE_CONCIERGE_WEBHOOK_URL?.trim();
+  if (!hook || !m.email) return false;
+  try {
+    const r = await fetch(hook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: m.email,
+        name: m.name || '',
+        firstname: (m.name || '').split(/\s+/)[0] || '',
+        message: m.text,
+        inquiry: m.text,
+        aideazz_lead_kind: 'portfolio_inquiry',
+        source: 'aideazz_web_chat',
+        reused_contact: true,
+      }),
+    });
+    console.log(`[chat-concierge] Make concierge webhook → ${r.status} for ${m.email}`);
+    return r.ok;
+  } catch (e) {
+    console.warn('[chat-concierge] Make webhook failed:', (e as Error).message?.slice(0, 90));
+    return false;
+  }
+}
+
 async function postFallbackDraft(m: VisitorMessage): Promise<boolean> {
   const secret = process.env.CONCIERGE_SECRET?.trim();
   if (!secret || !m.email) return false;
   const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
   const first = (m.name || m.email).split(/[\s@]/)[0];
 
-  const system =
-    'You are Elena Revicheva, founder of AIdeazz AI Lab, replying to someone who wrote in the chat on ' +
-    'aideazz.xyz. She installs an AI Growth Operator for service businesses: AI search visibility, prospect ' +
-    'research, outreach and follow-up, WhatsApp lead qualification, CRM upkeep, daily briefing. ' +
-    'Answer what they actually asked, warm and direct, max 110 words, no bullet lists, no hype, never promise ' +
-    'results, end by offering a 15-minute call. Reply in the language they wrote in. ' +
-    'Plain text only — no markdown, no ** around words, no headings. ' +
-    'Output EXACTLY this shape:\nSUBJECT: <one line>\nDRAFT REPLY:\n<the message body, no signature>';
+  // One canonical copy, shared with the watchdog and both Make scenarios. This
+  // file used to carry its own fourth copy, which had already fallen behind: it
+  // still ended every draft with a sales call, so a job seeker who arrived
+  // through the chat bubble got pitched instead of answered.
+  const { CONCIERGE_RULES } = await import('./concierge-prompt.js');
+  const system = CONCIERGE_RULES;
   const userPrompt = `Their message: "${m.text}"\nTheir name: ${first}`;
 
   let text = '';
@@ -444,7 +481,8 @@ export async function pollChatOnce(
           sendVisitorAck(m);
           if (makeWillFire) {
             console.log(`[chat-concierge] new contact — Make will draft for ${m.email}`);
-          } else {
+          } else if (!(await postToMakeWebhook(m))) {
+            // Make could not take it — draft it ourselves rather than lose the lead.
             await postFallbackDraft(m);
           }
         }
@@ -452,7 +490,12 @@ export async function pollChatOnce(
         console.warn('[chat-concierge] HubSpot push failed:', (e as Error).message?.slice(0, 100));
       }
     } else if (m.email && alreadyPushed) {
-      console.log(`[chat-concierge] thread ${m.threadId} already in HubSpot — alert only, no second deal`);
+      // One deal per conversation, but every message still deserves an answer.
+      // This branch pushes nothing to HubSpot, so Make's CREATED watch can never
+      // see it — July 29's follow-up message went unanswered for exactly this
+      // reason. Hand it to the webhook scenario, and draft locally if that fails.
+      console.log(`[chat-concierge] thread ${m.threadId} already in HubSpot — no second deal, drafting reply`);
+      if (!(await postToMakeWebhook(m))) await postFallbackDraft(m);
     } else if (!m.email && !alreadyPushed) {
       // Anonymous for now — remember the thread and pick the identity up later.
       const pend = state.pendingIdentity || [];
