@@ -91,17 +91,6 @@ function writeState(s: State): void {
   }
 }
 
-/** Remember that Make missed a real lead. Cheap, and the only proof we keep. */
-function recordCover(): void {
-  try {
-    const s = readState();
-    s.covers = [...(s.covers || []), new Date().toISOString()].slice(-100);
-    writeState(s);
-  } catch {
-    /* never let bookkeeping break a delivered draft */
-  }
-}
-
 /** How many real leads Make failed to answer within the given window. */
 function coversSince(sinceMs: number): number {
   try {
@@ -282,7 +271,12 @@ export async function runWatchdogOnce(): Promise<{ due: number; covered: number;
     const ok = await generateAndPostDraft(w);
     if (ok) {
       result.covered++;
-      recordCover();
+      // Record on the in-memory state, NOT through a separate read-modify-write.
+      // This function writes `state` again when the loop ends, so anything
+      // persisted behind its back gets clobbered — which is exactly what happened
+      // on the first live cover: the log said "covered for Make" while covers[]
+      // stayed empty, quietly disabling the unproductive-Make alert that reads it.
+      state.covers = [...(state.covers || []), new Date().toISOString()].slice(-100);
       console.log(`[watchdog] covered for Make — draft delivered to Telegram for ${w.email}`);
     } else {
       // Could not draft: tell Elena in plain words rather than losing the lead.
