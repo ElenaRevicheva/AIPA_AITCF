@@ -32,6 +32,8 @@ interface ConciergeDraft {
   draft: string;
   status: 'pending' | 'sent' | 'skipped';
   createdAt: string;
+  /** sha1(email|message) — lets redundant drafters collapse to one card. */
+  fingerprint?: string;
   sentAt?: string;
   tgMessageId?: number;
   /** Resend's message id — the only handle for tracing delivery after acceptance. */
@@ -64,6 +66,31 @@ function loadDraft(id: string): ConciergeDraft | null {
  * is how it proves that. Any draft counts, whoever created it (Make, the chat
  * fallback, an earlier watchdog run), so we can never double-draft a lead.
  */
+/**
+ * Id of a draft already answering this exact message, or null.
+ *
+ * Keyed on person + message so that redundant drafters collapse into one card
+ * while a genuine second message still gets its own reply. See the storage point.
+ */
+export function findDraftByFingerprintSince(fingerprint: string, sinceMs: number): string | null {
+  if (!fingerprint) return null;
+  try {
+    for (const f of fs.readdirSync(DRAFT_DIR)) {
+      if (!f.endsWith('.json')) continue;
+      try {
+        const d = JSON.parse(fs.readFileSync(path.join(DRAFT_DIR, f), 'utf8')) as ConciergeDraft;
+        if (d.fingerprint !== fingerprint) continue;
+        if (Date.parse(d.createdAt || '') >= sinceMs) return d.id;
+      } catch {
+        /* a half-written draft file is not evidence either way */
+      }
+    }
+  } catch {
+    /* no draft dir yet */
+  }
+  return null;
+}
+
 export function hasDraftForEmailSince(email: string, sinceMs: number): boolean {
   const target = email.trim().toLowerCase();
   if (!target) return false;
@@ -393,8 +420,36 @@ export function registerConciergeRoutes(app: Express): void {
       return;
     }
 
+    /**
+     * Idempotency — the reason three drafters can all fire without spamming her.
+     *
+     * Every lead is now handed to the real-time webhook scenario, but the 15-min
+     * polling scenario may still pick the same contact up afterwards, and the
+     * watchdog covers anything that looks unanswered. Redundancy is deliberate:
+     * it is what makes a silent death impossible. Duplicate cards are not.
+     *
+     * So dedupe on the person AND what they said, not on the person alone. Two
+     * paths reacting to one message carry identical text and collapse to a
+     * single card; a genuine follow-up an hour later says something different
+     * and rightly gets its own.
+     */
+    const fingerprint = crypto
+      .createHash('sha1')
+      .update(`${email.trim().toLowerCase()}|${(inquiry || '').replace(/\s+/g, ' ').trim().slice(0, 500)}`)
+      .digest('hex');
+    const DEDUPE_WINDOW_MS = 6 * 60 * 60 * 1000;
+    const dupe = findDraftByFingerprintSince(fingerprint, Date.now() - DEDUPE_WINDOW_MS);
+    if (dupe) {
+      console.log(
+        `[concierge] duplicate draft suppressed for ${email} — ${dupe} already answered this message`,
+      );
+      res.json({ ok: true, duplicate: true, existing: dupe });
+      return;
+    }
+
     const d: ConciergeDraft = {
       id: crypto.randomBytes(8).toString('hex'),
+      fingerprint,
       name: name || email,
       email,
       inquiry,

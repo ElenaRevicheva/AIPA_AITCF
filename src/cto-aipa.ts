@@ -1357,8 +1357,18 @@ async function startCTOAIPA() {
         // Reused production contacts never trip Make's Contacts/Created — push the
         // same payload Make would have seen. Skip when we just created/recreated a
         // contact (Watch CRM already fires) to avoid double Fable 5 drafts.
+        // Every lead goes to the webhook, not just returning ones.
+        //
+        // The polling scenario is on a low-priority Make plan: it is scheduled
+        // every 15 min but observed gaps of 1.5h, 5h and 9h between runs. A brand
+        // new prospect was therefore waiting hours for Make while a returning one
+        // was answered in seconds — backwards. The webhook is real-time and not
+        // queued, so it now carries everyone and polling becomes pure backup.
+        //
+        // Firing both is safe: /concierge/draft dedupes on person+message, so
+        // whichever path arrives first produces the single card.
         const makeHook = process.env.MAKE_CONCIERGE_WEBHOOK_URL?.trim();
-        const needsMakeWebhook = !!(existedBefore && !willForceRecreate);
+        const needsMakeWebhook = true;
         if (makeHook && needsMakeWebhook && (contactEmail || message)) {
           try {
             const r = await fetch(makeHook, {
@@ -1375,16 +1385,19 @@ async function startCTOAIPA() {
                 contactId: hs?.contactId ?? null,
                 dealId: hs?.dealId ?? null,
                 source: 'aideazz_inquiry_form',
-                reused_contact: true,
+                reused_contact: !!existedBefore,
               }),
             });
-            console.log(`[inquiry] Make concierge webhook → ${r.status} (reused contact)`);
+            console.log(
+              `[inquiry] Make concierge webhook → ${r.status} (${existedBefore ? 'returning' : 'new'} contact)`,
+            );
           } catch (e) {
             console.warn('[inquiry] Make concierge webhook failed:', (e as Error).message?.slice(0, 80));
           }
         } else if (needsMakeWebhook && !makeHook) {
           console.warn(
-            '[inquiry] Reused contact — Make will NOT fire until MAKE_CONCIERGE_WEBHOOK_URL is set on Oracle',
+            '[inquiry] MAKE_CONCIERGE_WEBHOOK_URL not set — instant drafting disabled, ' +
+              'leads fall back to 15-min polling and the 20-min watchdog',
           );
         }
       } catch (e) {

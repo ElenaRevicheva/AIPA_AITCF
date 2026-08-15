@@ -479,11 +479,16 @@ export async function pollChatOnce(
           state.pushedThreads = [...(state.pushedThreads || []), m.threadId];
           console.log(`[chat-concierge] HubSpot lead from web chat: ${m.email} (deal ${hsRes.dealId})`);
           sendVisitorAck(m);
-          if (makeWillFire) {
-            console.log(`[chat-concierge] new contact — Make will draft for ${m.email}`);
-          } else if (!(await postToMakeWebhook(m))) {
+          // Everyone goes to the real-time webhook, new or returning. The polling
+          // scenario runs on a low-priority Make plan with observed multi-hour
+          // gaps, so relying on it for a brand-new visitor meant they waited
+          // longer than a returning one. Polling stays on as backup, and
+          // /concierge/draft dedupes on person+message so both firing is safe.
+          if (!(await postToMakeWebhook(m))) {
             // Make could not take it — draft it ourselves rather than lose the lead.
             await postFallbackDraft(m);
+          } else if (makeWillFire) {
+            console.log(`[chat-concierge] new contact — polling scenario may also see ${m.email} (deduped)`);
           }
         }
       } catch (e) {
