@@ -177,12 +177,16 @@ async function sendTelegram(
     console.warn('[concierge] TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT not set — no TG notify');
     return null;
   }
+  const { tgSafeText } = await import('./tg-text.js');
   const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: chatId,
-      text: text.slice(0, 4090),
+      // Last line of defence: callers slice this text too, and a slice through an
+      // emoji makes the whole message unsendable. Sanitise here so no caller can
+      // lose a lead by trimming a prospect's message at an unlucky offset.
+      text: tgSafeText(text, 4090),
       ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
     }),
   });
@@ -413,7 +417,18 @@ export function registerConciergeRoutes(app: Express): void {
     );
     if (tgMessageId) d.tgMessageId = tgMessageId;
     saveDraft(d);
-    console.log(`[concierge] draft ${d.id} stored for ${d.email}, TG notify sent`);
+    // Say what actually happened. This line used to claim "TG notify sent"
+    // unconditionally, so the day Telegram rejected the card (Aug 15 2026) the log
+    // read like a success and the failure stayed invisible until Elena asked why
+    // no draft had arrived. A stored draft nobody can see is not a delivered one.
+    if (tgMessageId) {
+      console.log(`[concierge] draft ${d.id} stored for ${d.email}, TG card DELIVERED (msg ${tgMessageId})`);
+    } else {
+      console.error(
+        `[concierge] draft ${d.id} stored for ${d.email} but the TG card was NOT delivered — ` +
+          `Elena has no Send button for this lead`,
+      );
+    }
 
     // Mirror pending draft onto HubSpot deal Notes so Elena can review→edit→send from CRM too
     setImmediate(async () => {

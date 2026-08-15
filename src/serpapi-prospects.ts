@@ -242,7 +242,10 @@ async function alertSerpApiDisabled(reason: string): Promise<void> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: `⚠️ SerpAPI disabled for client discovery\n\n${reason}\n\nImpact: Spanish/LATAM queries fall back to BrightData; EN queries lose their sparse-result fallback.\nNOT affected: VJH job discovery — it runs on BrightData and does not use this key.\nCheck: https://serpapi.com/dashboard`,
+        text: (await import('./tg-text.js')).tgSafeText(
+          `⚠️ SerpAPI disabled for client discovery\n\n${reason}\n\nImpact: Spanish/LATAM queries fall back to BrightData; EN queries lose their sparse-result fallback.\nNOT affected: VJH job discovery — it runs on BrightData and does not use this key.\nCheck: https://serpapi.com/dashboard`,
+          4090,
+        ),
         disable_web_page_preview: true,
       }),
       signal: AbortSignal.timeout(10_000),

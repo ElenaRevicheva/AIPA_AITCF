@@ -43,12 +43,15 @@ async function sendTelegram(
     return null;
   }
   try {
+    const { tgSafeText } = await import('./tg-text.js');
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: text.slice(0, 4090),
+        // Community posts are written by strangers and are full of emoji; a slice
+        // through one makes the Bot API reject the whole message. See tg-text.ts.
+        text: tgSafeText(text, 4090),
         disable_web_page_preview: true,
         ...(parseMode ? { parse_mode: parseMode } : {}),
         ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),

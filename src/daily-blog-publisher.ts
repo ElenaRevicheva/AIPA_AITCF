@@ -265,12 +265,15 @@ async function notifyTelegramBlogPublished(title: string, urlOrMessage: string):
   // If urlOrMessage already contains newlines it's a pre-built message, else build one
   const text = urlOrMessage.includes("\n") ? urlOrMessage : `📰 Daily blog published\n\n${title}\n${urlOrMessage}`;
   try {
+    const { tgSafeText } = await import("./tg-text.js");
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: chatId,
-        text,
+        // Post titles carry emoji and this text was never length-capped — one long
+        // post would 400. tgSafeText caps it without splitting an emoji.
+        text: tgSafeText(text, 4090),
         disable_web_page_preview: false,
       }),
     });
@@ -289,12 +292,14 @@ async function notifyTelegramBlogFailure(message: string): Promise<void> {
   if (!token || !chatId) return;
   const text = `🚨 Daily blog FAILED (no Dev.to cross-post until fixed)\n\n${message}`;
   try {
+    const { tgSafeText } = await import("./tg-text.js");
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: chatId,
-        text,
+        // A failure alert that is itself unsendable is the worst kind of silence.
+        text: tgSafeText(text, 4090),
         disable_web_page_preview: true,
       }),
     });
@@ -1178,7 +1183,7 @@ async function notifyTelegramSkipped(reason: string, detail: string): Promise<vo
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+      body: JSON.stringify({ chat_id: chatId, text: (await import("./tg-text.js")).tgSafeText(text, 4090), disable_web_page_preview: true }),
     });
     if (!r.ok) {
       const t = await r.text();

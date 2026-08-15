@@ -27,12 +27,15 @@ export async function sendTelegramText(params: {
   text: string;
 }): Promise<void> {
   const url = `https://api.telegram.org/bot${params.botToken}/sendMessage`;
+  const { tgSafeText } = await import('../tg-text.js');
   await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: params.chatId,
-      text: params.text.slice(0, 4096),
+      // A slice that lands inside an emoji makes Telegram reject the whole
+      // briefing with a 400. See tg-text.ts.
+      text: tgSafeText(params.text, 4090),
     }),
   });
 }

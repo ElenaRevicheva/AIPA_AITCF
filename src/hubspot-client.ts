@@ -115,21 +115,40 @@ async function hsGet<T>(path: string): Promise<T | null> {
   return res.json() as Promise<T>;
 }
 
-async function hsPost<T>(path: string, body: unknown): Promise<T | null> {
+/**
+ * POST that reports the outcome instead of collapsing it to null.
+ *
+ * `hsPost` throws away the status code, which is fine for fire-and-forget writes
+ * but wrong for an upsert: a 409 ("this email already exists") is not a failure,
+ * it is an instruction to go update the record that already exists. Hiding it
+ * cost 16 days of leads — see the 409 recovery in upsertContact.
+ */
+async function hsPostDetailed<T>(
+  path: string,
+  body: unknown,
+): Promise<{ ok: boolean; status: number; text: string; data: T | null }> {
   const key = HS_KEY();
-  if (!key) return null;
+  if (!key) return { ok: false, status: 0, text: 'no HubSpot key configured', data: null };
   const res = await fetch(`${HS_BASE}${path}`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    const txt = await res.text();
-    // 409 = already exists — not a real error for upserts
-    if (res.status !== 409) console.error(`[HubSpot] POST ${path} → ${res.status}: ${txt}`);
+  if (!res.ok) return { ok: false, status: res.status, text: await res.text(), data: null };
+  return { ok: true, status: res.status, text: '', data: (await res.json()) as T };
+}
+
+async function hsPost<T>(path: string, body: unknown): Promise<T | null> {
+  const r = await hsPostDetailed<T>(path, body);
+  if (!r.ok) {
+    // A 409 is only legitimate where the caller recovers from it (upsertContact
+    // does). Reaching here means nobody did, and the write was lost — so say so
+    // rather than returning null in silence, which is how this went unnoticed.
+    if (r.status === 409) console.warn(`[HubSpot] POST ${path} → 409 already exists — write DROPPED (no recovery)`);
+    else console.error(`[HubSpot] POST ${path} → ${r.status}: ${r.text}`);
     return null;
   }
-  return res.json() as Promise<T>;
+  return r.data;
 }
 
 async function hsPut<T>(path: string, body: unknown): Promise<T | null> {
@@ -481,24 +500,76 @@ export async function upsertContact(input: {
   const firstName = input.firstName || nameParts[0] || '';
   const lastName  = input.lastName  || nameParts.slice(1).join(' ') || '';
 
-  const data = await hsPost<{ id: string }>(
-    '/crm/v3/objects/contacts',
-    {
-      properties: {
-        ...(input.email     ? { email: input.email }               : {}),
-        ...(firstName       ? { firstname: firstName }             : {}),
-        ...(lastName        ? { lastname: lastName }               : {}),
-        ...(input.company   ? { company: input.company }           : {}),
-        ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
-        ...(input.source    ? { hs_lead_status: 'NEW' } : {}),
-        ...(messageValue !== undefined ? { message: messageValue } : {}),
-        ...kindProps,
-      },
-    },
-  );
+  const createProps = {
+    ...(input.email     ? { email: input.email }               : {}),
+    ...(firstName       ? { firstname: firstName }             : {}),
+    ...(lastName        ? { lastname: lastName }               : {}),
+    ...(input.company   ? { company: input.company }           : {}),
+    ...(input.linkedinUrl ? { hs_linkedin_url: input.linkedinUrl } : {}),
+    ...(input.source    ? { hs_lead_status: 'NEW' } : {}),
+    ...(messageValue !== undefined ? { message: messageValue } : {}),
+    ...kindProps,
+  };
 
-  if (data?.id) console.log(`[HubSpot] Created contact ${data.id} (${input.email || input.firstName})`);
-  return data?.id ?? null;
+  const created = await hsPostDetailed<{ id: string }>('/crm/v3/objects/contacts', {
+    properties: createProps,
+  });
+  if (created.data?.id) {
+    console.log(`[HubSpot] Created contact ${created.data.id} (${input.email || input.firstName})`);
+    return created.data.id;
+  }
+
+  /**
+   * 409 recovery — the bug that silently cost every inbound lead from
+   * 2026-07-30 to 2026-08-15.
+   *
+   * The search above can miss a contact that exists: HubSpot's search index is
+   * eventually consistent, so a contact created seconds earlier (by the site's
+   * own HubSpot form, or by a racing write of ours) is invisible to it. We then
+   * fall through to create, HubSpot answers 409, and the old code returned null
+   * without a word.
+   *
+   * That dropped the whole property write — including the `[AIDEAZZ-FORM]` stamp
+   * in `message`. Make's Lead Concierge filters on exactly that stamp, so every
+   * unstamped lead was silently filtered out: the scenario ran every 15 minutes
+   * for 16 days with ops=1 and produced not one draft.
+   *
+   * HubSpot signals the duplicate two different ways, both verified against the
+   * live API on 2026-08-15:
+   *   • 409 `Contact already exists. Existing ID: 123` — the ordinary case, and
+   *     the one that lost AkhilTej. The id is right there, so use it: it beats
+   *     re-querying an index that is still catching up.
+   *   • 400 `Cannot set … propertyName=email …` — two writes colliding in
+   *     flight. It names no id, so fall back to the search, retried a couple of
+   *     times because that is exactly when the index is stalest.
+   */
+  const isDuplicateEmail =
+    created.status === 409 || (created.status === 400 && /propertyName=email/i.test(created.text));
+  if (isDuplicateEmail && input.email) {
+    let existingId: string | null = created.text.match(/Existing ID:\s*(\d+)/i)?.[1] ?? null;
+    for (let attempt = 0; !existingId && attempt < 3; attempt++) {
+      if (attempt) await new Promise(r => setTimeout(r, 1200));
+      existingId = await findContactByEmail(input.email);
+    }
+    if (existingId) {
+      // Never PATCH `email` — it is the conflicting key and updating it can 409 again.
+      const { email: _dropped, ...patchProps } = createProps as Record<string, unknown>;
+      await hsPatch(`/crm/v3/objects/contacts/${existingId}`, { properties: patchProps });
+      console.log(
+        `[HubSpot] Contact ${existingId} already existed (409) — updated instead (${input.email})` +
+          (messageValue !== undefined ? ' — message stamp applied' : ''),
+      );
+      return existingId;
+    }
+    console.error(`[HubSpot] 409 for ${input.email} but the existing contact id could not be resolved`);
+    return null;
+  }
+
+  console.error(
+    `[HubSpot] Create contact failed (${created.status}) for ${input.email || input.firstName}: ` +
+      created.text.slice(0, 200),
+  );
+  return null;
 }
 
 // ─── Companies ────────────────────────────────────────────────────────────────

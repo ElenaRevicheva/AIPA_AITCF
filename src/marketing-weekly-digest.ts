@@ -14,7 +14,10 @@ async function sendTelegramDigest(text: string): Promise<void> {
     return;
   }
   const max = 4090;
-  const chunk = text.length > max ? `${text.slice(0, max)}\n…` : text;
+  // tgSafeText, not a bare slice: cutting at `max` can land inside an emoji and
+  // make Telegram reject the entire digest. See tg-text.ts.
+  const { tgSafeText } = await import('./tg-text.js');
+  const chunk = text.length > max ? `${tgSafeText(text, max)}\n…` : tgSafeText(text, max);
   const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

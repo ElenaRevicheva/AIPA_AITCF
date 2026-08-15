@@ -58,23 +58,56 @@ type Watch = {
   registeredAt: string;
 };
 
-type State = { watches: Watch[] };
+/**
+ * `covers` = ISO timestamps of leads we had to draft for because Make produced
+ * nothing. Each entry is hard evidence that a real inbound lead reached us and
+ * Make did not answer it, which is what turns "Make looks fine" into "Make is
+ * broken" — see checkMakeHealth.
+ */
+type State = { watches: Watch[]; covers: string[] };
 
 function readState(): State {
   try {
     const s = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8')) as State;
-    return { watches: Array.isArray(s.watches) ? s.watches.slice(-200) : [] };
+    return {
+      watches: Array.isArray(s.watches) ? s.watches.slice(-200) : [],
+      covers: Array.isArray(s.covers) ? s.covers.slice(-100) : [],
+    };
   } catch {
-    return { watches: [] };
+    return { watches: [], covers: [] };
   }
 }
 
 function writeState(s: State): void {
   try {
     fs.mkdirSync(path.dirname(STATE_PATH), { recursive: true });
-    fs.writeFileSync(STATE_PATH, JSON.stringify({ watches: s.watches.slice(-200) }, null, 2), 'utf8');
+    fs.writeFileSync(
+      STATE_PATH,
+      JSON.stringify({ watches: s.watches.slice(-200), covers: (s.covers || []).slice(-100) }, null, 2),
+      'utf8',
+    );
   } catch (e) {
     console.warn('[watchdog] state write failed:', (e as Error).message?.slice(0, 80));
+  }
+}
+
+/** Remember that Make missed a real lead. Cheap, and the only proof we keep. */
+function recordCover(): void {
+  try {
+    const s = readState();
+    s.covers = [...(s.covers || []), new Date().toISOString()].slice(-100);
+    writeState(s);
+  } catch {
+    /* never let bookkeeping break a delivered draft */
+  }
+}
+
+/** How many real leads Make failed to answer within the given window. */
+function coversSince(sinceMs: number): number {
+  try {
+    return (readState().covers || []).filter(t => Date.parse(t) >= sinceMs).length;
+  } catch {
+    return 0;
   }
 }
 
@@ -234,6 +267,7 @@ export async function runWatchdogOnce(): Promise<{ due: number; covered: number;
     const ok = await generateAndPostDraft(w);
     if (ok) {
       result.covered++;
+      recordCover();
       console.log(`[watchdog] covered for Make — draft delivered to Telegram for ${w.email}`);
     } else {
       // Could not draft: tell Elena in plain words rather than losing the lead.
@@ -290,10 +324,14 @@ async function notifyOwners(text: string): Promise<void> {
   // Log the outcome, not the attempt: "the alert was sent" has to be checkable
   // in the log afterwards, otherwise a silent failure looks identical to success.
   try {
+    const { tgSafeText } = await import('./tg-text.js');
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chat, text: text.slice(0, 4090), disable_web_page_preview: true }),
+      // These alerts quote the prospect's own words, so they carry the same
+      // emoji hazard as the draft card — and this is the path that is supposed
+      // to work when everything else has failed.
+      body: JSON.stringify({ chat_id: chat, text: tgSafeText(text, 4090), disable_web_page_preview: true }),
     });
     if (r.ok) {
       console.log(`[watchdog] owner ping DELIVERED to Telegram chat ${chat}`);
@@ -318,6 +356,8 @@ async function notifyOwners(text: string): Promise<void> {
  * execution is older than MAKE_STALE_MIN, say so on Telegram — once per
  * cooldown, never in a loop. Read-only; it never edits or restarts the scenario.
  */
+/** Make's own execution status code for a failed run (1 = success, 3 = error). */
+const MAKE_STATUS_ERROR = 3;
 const MAKE_STALE_MIN = Number(process.env.MAKE_STALE_MIN ?? 45);
 const MAKE_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 let lastMakeAlertAt = 0;
@@ -343,7 +383,7 @@ export async function checkMakeHealth(): Promise<{
     const sc = (JSON.parse(await sr.text()) as any)?.scenario;
     if (!sc) return idle;
 
-    const lr = await api(`/scenarios/${scenarioId}/logs?pg[limit]=5`);
+    const lr = await api(`/scenarios/${scenarioId}/logs?pg[limit]=20`);
     const rows = lr.ok ? ((JSON.parse(await lr.text())?.scenarioLogs || []) as any[]) : [];
     // Only real executions count. Blueprint edits and stop/start appear as rows
     // with no `operations` and would make a dead scenario look alive.
@@ -360,6 +400,82 @@ export async function checkMakeHealth(): Promise<{
     const scheduledOk = nextExecMinAway !== null && nextExecMinAway > -5 && nextExecMinAway <= MAKE_STALE_MIN;
     const runningOk = lastRunMinAgo === null || lastRunMinAgo <= MAKE_STALE_MIN;
     if (sc.isActive && (scheduledOk || runningOk)) {
+      // Alive is not the same as working.
+      //
+      // Between 2026-07-30 and 2026-08-15 this scenario ran every 15 minutes,
+      // on schedule, with a valid nextExec and an empty DLQ — and drafted
+      // nothing at all, because a filter rejected every lead (contacts stopped
+      // carrying the [AIDEAZZ-FORM] stamp after a swallowed HubSpot 409). Every
+      // liveness signal said HEALTHY for 16 days while real leads went dark.
+      //
+      // So ask the question liveness cannot answer: is it producing? A run that
+      // does real work costs more than one operation (1 = the trigger alone),
+      // and the only trustworthy witness that leads actually arrived is our own
+      // cover log. No covers means a genuinely quiet inbox — that is not a fault
+      // and must never alert.
+      //
+      // And a run that ERRORS still burns operations, so counting operations
+      // alone is not enough either: on 2026-08-15 the Anthropic module failed
+      // ("credit balance is too low") and the run reported ops=2, which would
+      // have read as perfectly productive. Only a clean run counts.
+      const producedRecently = rows.some(l => (l.operations ?? 0) > 1 && l.status !== MAKE_STATUS_ERROR);
+      const missed = coversSince(Date.now() - 24 * 60 * 60 * 1000);
+
+      // An errored run names its own cause, and that cause is usually something
+      // only Elena can clear (credits, a revoked key). Surfacing the message beats
+      // any guess we could make from the outside.
+      const lastError = rows.find(l => l.status === MAKE_STATUS_ERROR && l.error);
+      const errMinAgo = lastError?.timestamp
+        ? Math.round((Date.now() - Date.parse(lastError.timestamp)) / 60000)
+        : null;
+      // Only complain if nothing has succeeded SINCE the error. Alerting purely
+      // because an error sits inside the window would keep crying wolf for hours
+      // after Elena has already fixed the cause (topping up credits, say).
+      const recoveredSince =
+        !!lastError &&
+        rows.some(
+          l =>
+            l.status !== MAKE_STATUS_ERROR &&
+            (l.operations ?? 0) > 1 &&
+            Date.parse(l.timestamp) > Date.parse(lastError.timestamp),
+        );
+      if (lastError && !recoveredSince && errMinAgo !== null && errMinAgo <= 6 * 60) {
+        if (Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS) {
+          lastMakeAlertAt = Date.now();
+          const msg = String(lastError.error?.message || 'unknown error').slice(0, 300);
+          const mod = lastError.error?.causeModule?.appName || 'a module';
+          await notifyOwners(
+            `⚠️ Make Lead Concierge is ERRORING\n\n` +
+              `Its last run (${errMinAgo} min ago) failed in ${mod}:\n\n"${msg}"\n\n` +
+              `Leads are reaching the scenario but no draft comes out of it.\n\n` +
+              `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
+              `Nothing is lost — I draft for everyone Make misses.`,
+          );
+        }
+        console.error(`[watchdog] MAKE ERRORING — ${lastError.error?.message?.slice(0, 120)}`);
+        return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'alerted' };
+      }
+
+      if (!producedRecently && missed > 0) {
+        const cooled = Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS;
+        if (cooled) {
+          lastMakeAlertAt = Date.now();
+          await notifyOwners(
+            `⚠️ Make runs, but drafts NOTHING\n\n` +
+              `The Lead Concierge is on schedule and looks healthy, but not one of its ` +
+              `last ${rows.length} runs did real work, while I had to cover ${missed} real ` +
+              `lead${missed === 1 ? '' : 's'} in the last 24h.\n\n` +
+              `That means leads are reaching Make and being rejected — almost always the ` +
+              `filter: contacts must carry [AIDEAZZ-FORM] in their message.\n\n` +
+              `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
+              `Nothing is lost — I draft for everyone Make misses.`,
+          );
+        }
+        console.error(
+          `[watchdog] MAKE UNPRODUCTIVE — 0 productive runs in last ${rows.length}, ${missed} leads covered in 24h`,
+        );
+        return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'alerted' };
+      }
       return { ok: true, lastRunMinAgo, nextExecMinAway, action: 'none' };
     }
 

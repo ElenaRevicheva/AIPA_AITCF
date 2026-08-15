@@ -20,6 +20,7 @@
 
 import express, { Router, Request, Response } from 'express';
 import { runVisibilityAudit, AuditFetchError, ENGINE_VERSION } from './visibility-audit';
+import { tgSafeText } from './tg-text';
 
 /** Published demo key — intentionally public, printed on the docs page. */
 export const DEMO_API_KEY = 'aidz_demo_visibility_2026';
@@ -117,7 +118,9 @@ function logAuditLead(params: {
   fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text: text.slice(0, 4090), disable_web_page_preview: true }),
+    // Carries the prospect's own site + pain text, so it can contain emoji —
+    // a slice through one would drop the whole lead alert. See tg-text.ts.
+    body: JSON.stringify({ chat_id: chatId, text: tgSafeText(text, 4090), disable_web_page_preview: true }),
   })
     .then(async (r) => {
       if (!r.ok) console.error('[visibility-lead] TG send failed:', (await r.text()).slice(0, 200));

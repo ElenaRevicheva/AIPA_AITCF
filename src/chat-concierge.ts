@@ -119,11 +119,19 @@ async function telegramToOwners(text: string): Promise<void> {
   }
   for (const id of ids) {
     try {
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      const { tgSafeText } = await import('./tg-text.js');
+      const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: id, text: text.slice(0, 4096), disable_web_page_preview: true }),
+        // Chat visitors write with emoji constantly; slicing one in half made the
+        // Bot API reject the whole alert. Sanitise before sending.
+        body: JSON.stringify({ chat_id: id, text: tgSafeText(text, 4090), disable_web_page_preview: true }),
       });
+      // This send used to ignore its own response entirely, so a rejected alert
+      // was indistinguishable from a delivered one — silence on both sides.
+      if (!r.ok) {
+        console.error(`[chat-concierge] telegram send REJECTED ${r.status}: ${(await r.text()).slice(0, 160)}`);
+      }
     } catch (e) {
       console.warn('[chat-concierge] telegram send failed:', (e as Error).message?.slice(0, 80));
     }
