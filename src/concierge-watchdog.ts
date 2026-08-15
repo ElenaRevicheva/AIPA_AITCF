@@ -153,29 +153,9 @@ async function generateAndPostDraft(w: Watch): Promise<boolean> {
   const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
   const first = (w.name || w.email).split(/[\s@]/)[0];
 
-  const system =
-    'You are Elena Revicheva, founder of AIdeazz AI Lab, replying to someone who contacted her through ' +
-    'aideazz.xyz. She installs an AI Growth Operator for service businesses: AI search visibility, prospect ' +
-    'research, outreach and follow-up, WhatsApp lead qualification, CRM upkeep, daily briefing. ' +
-    'Answer what they actually asked, warm and direct, max 110 words, no bullet lists, no hype, never promise ' +
-    'results. Reply in the language they wrote in. ' +
-    'Plain text only — no markdown, no ** around words, no headings.\n\n' +
-    // Two very different humans arrive through the same form, and the old prompt
-    // answered both as buyers: it ended every draft with a sales call. Someone
-    // offering to work FOR Elena then got pitched her services, which reads badly
-    // and wastes her time. Branch on what the person actually wants.
-    'FIRST decide which kind of message this is:\n' +
-    '(a) A CLIENT/BUYER — they have a business problem they want solved. Answer it, ' +
-    'propose one concrete small first step, and end by offering a 15-minute call.\n' +
-    '(b) A JOB SEEKER or someone offering their services/CV/portfolio, asking to work ' +
-    'for or with Elena. Do NOT pitch her services and do NOT offer a sales call. Thank ' +
-    'them genuinely and specifically for something real in their message, then say ' +
-    'plainly that she is NOT hiring at the moment — no paid roles open — but that she ' +
-    'is genuinely open to a free, low-commitment collaboration if they would enjoy ' +
-    'building something together. Invite them to reply with what they would most like ' +
-    'to work on or contribute. Warm, respectful, never dismissive, never falsely ' +
-    'encouraging about future paid work.\n\n' +
-    'Output EXACTLY this shape:\nSUBJECT: <one line>\nDRAFT REPLY:\n<the message body, no signature>';
+  // One canonical copy, shared with both Make scenarios — see concierge-prompt.ts.
+  const { CONCIERGE_RULES } = await import('./concierge-prompt.js');
+  const system = CONCIERGE_RULES;
   const userPrompt = `Their message: "${w.text || '(no message text captured — they reached out via the site)'}"\nTheir name: ${first}`;
 
   let text = '';
@@ -528,6 +508,103 @@ export async function checkMakeHealth(): Promise<{
   }
 }
 
+/**
+ * The webhook scenario (returning contacts) is "instant": it has no schedule, so
+ * nextExec and run-gap mean nothing for it and checking them would raise false
+ * alarms forever. What CAN go wrong is exactly what went wrong with its sibling:
+ * switched off, or erroring on every call. Watch those two things only.
+ */
+export async function checkWebhookScenarioHealth(): Promise<{ ok: boolean; reason: string }> {
+  const token = process.env.MAKE_API_TOKEN?.trim();
+  const id = process.env.MAKE_CONCIERGE_WEBHOOK_SCENARIO_ID?.trim();
+  if (!token || !id) return { ok: true, reason: 'not configured' };
+  const base = (process.env.MAKE_API_BASE || 'https://us2.make.com/api/v2').replace(/\/$/, '');
+  const api = (p: string) => fetch(`${base}${p}`, { headers: { Authorization: `Token ${token}` } });
+  try {
+    const sr = await api(`/scenarios/${id}`);
+    if (!sr.ok) return { ok: true, reason: 'unreadable' };
+    const sc = (JSON.parse(await sr.text()) as any)?.scenario;
+    if (!sc) return { ok: true, reason: 'unreadable' };
+
+    const lr = await api(`/scenarios/${id}/logs?pg[limit]=10`);
+    const rows = lr.ok ? ((JSON.parse(await lr.text())?.scenarioLogs || []) as any[]) : [];
+    const lastError = rows.find(l => l.status === MAKE_STATUS_ERROR && l.error);
+    const recovered =
+      !!lastError &&
+      rows.some(
+        l =>
+          l.status !== MAKE_STATUS_ERROR &&
+          (l.operations ?? 0) > 1 &&
+          Date.parse(l.timestamp) > Date.parse(lastError.timestamp),
+      );
+
+    if (sc.isActive && !(lastError && !recovered)) return { ok: true, reason: 'healthy' };
+    if (Date.now() - lastWebhookAlertAt < MAKE_ALERT_COOLDOWN_MS) return { ok: false, reason: 'cooling down' };
+    lastWebhookAlertAt = Date.now();
+
+    const why = !sc.isActive
+      ? 'It is switched OFF.'
+      : `Its last run failed in ${lastError.error?.causeModule?.appName || 'a module'}:\n\n"${String(
+          lastError.error?.message || '',
+        ).slice(0, 250)}"`;
+    await notifyOwners(
+      `⚠️ Make webhook concierge needs attention\n\n` +
+        `This is the scenario that answers people ALREADY in HubSpot who fill the form again.\n\n${why}\n\n` +
+        `https://us2.make.com/938264/scenarios/${id}/edit\n\n` +
+        `Nothing is lost — I still draft for anyone it misses.`,
+    );
+    console.error(`[watchdog] WEBHOOK SCENARIO UNHEALTHY — ${why.slice(0, 120)}`);
+    return { ok: false, reason: why.slice(0, 120) };
+  } catch (e) {
+    console.warn('[watchdog] webhook scenario check failed (non-fatal):', (e as Error).message?.slice(0, 90));
+    return { ok: true, reason: 'check failed' };
+  }
+}
+
+/**
+ * The drafting rules live in concierge-prompt.ts and are pushed into Make. A Make
+ * blueprint can also be edited in the UI, where nothing would ever tell us the
+ * copies had diverged — the failure mode that made three copies feel dangerous in
+ * the first place. So re-read the live prompts and say so if one has drifted.
+ */
+export async function checkPromptDrift(): Promise<{ checked: number; drifted: string[] }> {
+  const token = process.env.MAKE_API_TOKEN?.trim();
+  const out = { checked: 0, drifted: [] as string[] };
+  if (!token) return out;
+  const base = (process.env.MAKE_API_BASE || 'https://us2.make.com/api/v2').replace(/\/$/, '');
+  const ids = [
+    process.env.MAKE_CONCIERGE_SCENARIO_ID?.trim() || '5633833',
+    process.env.MAKE_CONCIERGE_WEBHOOK_SCENARIO_ID?.trim(),
+  ].filter(Boolean) as string[];
+  try {
+    const { CONCIERGE_RULES, extractRules } = await import('./concierge-prompt.js');
+    for (const id of ids) {
+      const r = await fetch(`${base}/scenarios/${id}/blueprint`, { headers: { Authorization: `Token ${token}` } });
+      if (!r.ok) continue;
+      const bp = (JSON.parse(await r.text()) as any)?.response?.blueprint;
+      const msg = (bp?.flow || []).find((m: any) => m.id === 3)?.mapper?.messages?.[0]?.content;
+      if (typeof msg !== 'string') continue;
+      out.checked++;
+      if (extractRules(msg) !== CONCIERGE_RULES.trim()) out.drifted.push(id);
+    }
+    if (out.drifted.length && Date.now() - lastDriftAlertAt > MAKE_ALERT_COOLDOWN_MS) {
+      lastDriftAlertAt = Date.now();
+      await notifyOwners(
+        `⚠️ A Make concierge prompt has drifted\n\n` +
+          `Scenario ${out.drifted.join(', ')} no longer matches the rules in the repo, so Make and I would ` +
+          `answer the same person differently.\n\n` +
+          `Fix: npm run make:sync-prompts -- --apply`,
+      );
+      console.error(`[watchdog] PROMPT DRIFT in scenario(s) ${out.drifted.join(', ')}`);
+    }
+  } catch (e) {
+    console.warn('[watchdog] prompt drift check failed (non-fatal):', (e as Error).message?.slice(0, 90));
+  }
+  return out;
+}
+
+let lastWebhookAlertAt = 0;
+let lastDriftAlertAt = 0;
 let timer: NodeJS.Timeout | null = null;
 let makeTimer: NodeJS.Timeout | null = null;
 
@@ -544,8 +621,16 @@ export function startConciergeWatchdog(): void {
 
   if (process.env.MAKE_API_TOKEN?.trim() && !makeTimer) {
     // Every 15 min, matching the scenario's own cadence.
-    makeTimer = setInterval(() => void checkMakeHealth(), 15 * 60 * 1000);
-    setTimeout(() => void checkMakeHealth(), 60_000);
-    console.log(`🔎 Make liveness monitor started — alerts if no execution for ${MAKE_STALE_MIN} min`);
+    const sweep = () => {
+      void checkMakeHealth();
+      void checkWebhookScenarioHealth();
+      void checkPromptDrift();
+    };
+    makeTimer = setInterval(sweep, 15 * 60 * 1000);
+    setTimeout(sweep, 60_000);
+    console.log(
+      `🔎 Make monitor started — liveness (stale after ${MAKE_STALE_MIN} min), productivity, ` +
+        `webhook scenario, and prompt drift`,
+    );
   }
 }
