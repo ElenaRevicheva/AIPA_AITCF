@@ -169,8 +169,23 @@ async function generateAndPostDraft(w: Watch): Promise<boolean> {
     'aideazz.xyz. She installs an AI Growth Operator for service businesses: AI search visibility, prospect ' +
     'research, outreach and follow-up, WhatsApp lead qualification, CRM upkeep, daily briefing. ' +
     'Answer what they actually asked, warm and direct, max 110 words, no bullet lists, no hype, never promise ' +
-    'results, end by offering a 15-minute call. Reply in the language they wrote in. ' +
-    'Plain text only — no markdown, no ** around words, no headings. ' +
+    'results. Reply in the language they wrote in. ' +
+    'Plain text only — no markdown, no ** around words, no headings.\n\n' +
+    // Two very different humans arrive through the same form, and the old prompt
+    // answered both as buyers: it ended every draft with a sales call. Someone
+    // offering to work FOR Elena then got pitched her services, which reads badly
+    // and wastes her time. Branch on what the person actually wants.
+    'FIRST decide which kind of message this is:\n' +
+    '(a) A CLIENT/BUYER — they have a business problem they want solved. Answer it, ' +
+    'propose one concrete small first step, and end by offering a 15-minute call.\n' +
+    '(b) A JOB SEEKER or someone offering their services/CV/portfolio, asking to work ' +
+    'for or with Elena. Do NOT pitch her services and do NOT offer a sales call. Thank ' +
+    'them genuinely and specifically for something real in their message, then say ' +
+    'plainly that she is NOT hiring at the moment — no paid roles open — but that she ' +
+    'is genuinely open to a free, low-commitment collaboration if they would enjoy ' +
+    'building something together. Invite them to reply with what they would most like ' +
+    'to work on or contribute. Warm, respectful, never dismissive, never falsely ' +
+    'encouraging about future paid work.\n\n' +
     'Output EXACTLY this shape:\nSUBJECT: <one line>\nDRAFT REPLY:\n<the message body, no signature>';
   const userPrompt = `Their message: "${w.text || '(no message text captured — they reached out via the site)'}"\nTheir name: ${first}`;
 
