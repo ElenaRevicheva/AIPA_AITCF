@@ -212,11 +212,28 @@ export async function claudeWithGroqFallback(
         console.warn(`[${label}] Groq fallback returned ${text.length} chars`);
         return text;
       } catch (ge: unknown) {
-        // Tier 3: Grok (xAI team credits). Groq's daily token cap (TPD) or any other
-        // Groq failure lands here — the engine keeps producing instead of dying.
         const gmsg = ge instanceof Error ? ge.message : String(ge);
+
+        // Tier 3: Gemini (free tier, PLAIN model). It already existed in this file
+        // as geminiComplete() but only specific callers used it directly — the
+        // failover chain itself never touched it, so the cheapest working provider
+        // sat outside the path that needed it most. It goes BEFORE the paid tiers
+        // for cost, and it is the one provider verified to answer correctly at
+        // tiny budgets (`npm run eval:llm`, SHORT shape).
+        if (GEMINI_KEY()) {
+          try {
+            console.warn(`[${label}] Groq failed (${gmsg.slice(0, 80)}) — falling back to Gemini ${GEMINI_MODEL()}`);
+            const gem = (await geminiComplete(systemPrompt ?? null, userPrompt, maxTokens, label)).trim();
+            if (gem) return gem;
+            console.warn(`[${label}] Gemini returned empty — continuing down the chain`);
+          } catch (gee: unknown) {
+            console.warn(`[${label}] Gemini failed (${(gee instanceof Error ? gee.message : String(gee)).slice(0, 90)})`);
+          }
+        }
+
+        // Tier 4: Grok (xAI team credits).
         if (!XAI_KEY()) return lastResortOpenAI(systemPrompt, userPrompt, maxTokens, label, gmsg);
-        console.warn(`[${label}] Groq failed (${gmsg.slice(0, 100)}) — falling back to Grok ${XAI_MODEL()}`);
+        console.warn(`[${label}] falling back to Grok ${XAI_MODEL()}`);
         try {
           return await grokComplete(systemPrompt, userPrompt, maxTokens, label);
         } catch (xe: unknown) {

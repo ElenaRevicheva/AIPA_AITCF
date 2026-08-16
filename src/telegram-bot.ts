@@ -8106,9 +8106,22 @@ async function detectPersonalAIIntent(text: string): Promise<{
     try {
       const classifyResponse = await groq.chat.completions.create({
         // Migrated June 25 2026 off llama-3.1-8b-instant (Groq deprecation, decommission Aug 16 2026)
-        // to the fleet-standard current model. 30-token intent classification — cost negligible.
+        // to the fleet-standard current model.
+        //
+        // 300, not 30 (Aug 16 2026). Groq's post-deprecation line-up is all
+        // REASONING models: they spend the budget thinking privately and return
+        // "" — measured by `npm run eval:llm`, where groq was the only provider
+        // to fail the 30-token shape while passing at 300. An empty string here
+        // silently drops out of the allow-list below and the voice note falls
+        // back to keyword routing, so the failure looks like "the classifier is
+        // just bad" rather than "the classifier never answered".
+        //
+        // Cheap despite the bigger number: voice notes are low volume, and
+        // max_tokens is a ceiling — the model still stops after one word. If this
+        // ever gets chatty, route it to gemini-3.5-flash-lite instead, which
+        // answers this exact prompt correctly at 30 tokens in ~400ms.
         model: groqModel(),
-        max_tokens: 30,
+        max_tokens: 300,
         messages: [{
           role: 'user',
           content: `Classify this voice note into exactly ONE word: task, diary, idea, research, or question.
