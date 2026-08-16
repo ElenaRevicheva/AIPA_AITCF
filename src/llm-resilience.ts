@@ -167,12 +167,21 @@ export async function claudeWithGroqFallback(
       .trim();
     return text;
   } catch (e: unknown) {
+    // Fail over on ANY Anthropic failure, not just the two we first thought of.
+    //
+    // This used to read `if (!creditExhausted && !deadModel) throw e` — so a
+    // rotated key (401), an outage (5xx), a timeout or a network blip skipped the
+    // fallback chain entirely and the caller just died. "Multi-tier failover" was
+    // real but only covered running out of money and a retired model id, which are
+    // the two failures LEAST likely to hit at 3am. Any error now walks the chain;
+    // the reason string still names the specific cases because they need different
+    // human action (top up vs update the model id).
     const deadModel = isAnthropicModelNotFound(e);
-    if (!isAnthropicCreditExhaustion(e) && !deadModel) throw e;
-    // Accurate reason — a decommissioned model id (404) was historically mislabeled as "credit exhausted".
     const reason = deadModel
       ? `Anthropic model not found (${model} — decommissioned? update the id)`
-      : 'Anthropic credit exhausted';
+      : isAnthropicCreditExhaustion(e)
+        ? 'Anthropic credit exhausted'
+        : `Anthropic failed (${(e instanceof Error ? e.message : String(e)).slice(0, 90)})`;
     const groqKey = process.env.GROQ_API_KEY?.trim();
     if (!groqKey && !XAI_KEY()) throw e;
 
@@ -191,19 +200,85 @@ export async function claudeWithGroqFallback(
           temperature: 0.7,
         });
         const text = groqResp.choices[0]?.message?.content?.trim() || '';
-        if (text) console.warn(`[${label}] Groq fallback returned ${text.length} chars`);
+        // An empty completion is a FAILURE, not an answer.
+        //
+        // Groq's post-August-2026 line-up is all reasoning models: given a small
+        // max_tokens they spend the whole budget thinking privately and return
+        // content:"". Returning that verbatim handed callers a blank string that
+        // reads like a valid reply — a judge sees "no objection", a classifier
+        // sees no flag. Treat it as a failure so the chain moves to the next
+        // provider instead of failing open.
+        if (!text) throw new Error(`Groq ${groqModel()} returned EMPTY (token budget likely spent reasoning)`);
+        console.warn(`[${label}] Groq fallback returned ${text.length} chars`);
         return text;
       } catch (ge: unknown) {
         // Tier 3: Grok (xAI team credits). Groq's daily token cap (TPD) or any other
         // Groq failure lands here — the engine keeps producing instead of dying.
-        if (!XAI_KEY()) throw ge;
         const gmsg = ge instanceof Error ? ge.message : String(ge);
+        if (!XAI_KEY()) return lastResortOpenAI(systemPrompt, userPrompt, maxTokens, label, gmsg);
         console.warn(`[${label}] Groq failed (${gmsg.slice(0, 100)}) — falling back to Grok ${XAI_MODEL()}`);
-        return grokComplete(systemPrompt, userPrompt, maxTokens, label);
+        try {
+          return await grokComplete(systemPrompt, userPrompt, maxTokens, label);
+        } catch (xe: unknown) {
+          return lastResortOpenAI(
+            systemPrompt, userPrompt, maxTokens, label,
+            xe instanceof Error ? xe.message : String(xe),
+          );
+        }
       }
     }
-    // No Groq key configured — go straight to Grok.
+    // No Groq key configured — go straight to Grok, then OpenAI.
     console.warn(`[${label}] ${reason} — falling back to Grok ${XAI_MODEL()}`);
-    return grokComplete(systemPrompt, userPrompt, maxTokens, label);
+    try {
+      return await grokComplete(systemPrompt, userPrompt, maxTokens, label);
+    } catch (xe: unknown) {
+      return lastResortOpenAI(
+        systemPrompt, userPrompt, maxTokens, label,
+        xe instanceof Error ? xe.message : String(xe),
+      );
+    }
   }
+}
+
+/**
+ * Tier 4 — OpenAI, the last provider standing.
+ *
+ * The portfolio claims multi-tier failover across four providers, and until now
+ * that was only true across the fleet as a whole: this chain knew about Anthropic,
+ * Groq and xAI, so OpenAI never carried a single failover request (8 requests and
+ * $1.26 of a topped-up balance, August 2026). Meanwhile Groq's free tier lost every
+ * plain model in the same month, making tier 2 far less dependable.
+ *
+ * gpt-4o-mini is deliberate: it is a NON-reasoning model, so unlike the newer
+ * OpenAI, Groq and Gemini models it still answers correctly when max_tokens is
+ * small (verified 4/4 exact at 30 tokens) — which is precisely when the other
+ * tiers fail open.
+ */
+const OPENAI_KEY = () => process.env.OPENAI_API_KEY?.trim() || '';
+const OPENAI_FALLBACK_MODEL = () => (process.env.OPENAI_FALLBACK_MODEL || 'gpt-4o-mini').trim();
+
+async function lastResortOpenAI(
+  systemPrompt: string | null | undefined,
+  userPrompt: string,
+  maxTokens: number,
+  label: string,
+  priorError: string,
+): Promise<string> {
+  const key = OPENAI_KEY();
+  if (!key) throw new Error(`all providers failed; no OPENAI_API_KEY for last resort (${priorError.slice(0, 120)})`);
+  console.warn(`[${label}] every free tier failed (${priorError.slice(0, 90)}) — last resort OpenAI ${OPENAI_FALLBACK_MODEL()}`);
+  const messages = systemPrompt
+    ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
+    : [{ role: 'user', content: userPrompt }];
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: OPENAI_FALLBACK_MODEL(), messages, max_completion_tokens: Math.min(maxTokens, 4000) }),
+  });
+  if (!r.ok) throw new Error(`OpenAI last resort ${r.status}: ${(await r.text()).slice(0, 160)}`);
+  const j = (await r.json()) as { choices?: Array<{ message?: { content?: string } }> };
+  const text = j.choices?.[0]?.message?.content?.trim() || '';
+  if (!text) throw new Error('OpenAI last resort returned EMPTY');
+  console.warn(`[${label}] OpenAI last resort returned ${text.length} chars`);
+  return text;
 }
