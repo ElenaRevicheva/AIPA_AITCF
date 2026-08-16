@@ -69,34 +69,69 @@ const GEMINI_KEY = () => process.env.GEMINI_API_KEY?.trim() || '';
  *  the durable $0 tier for high-volume-but-not-latency-critical work like blog translation —
  *  so coverage never depends on keeping paid Anthropic credits topped up. Throws on any
  *  failure so callers can fall through to the paid/limited Anthropic→Groq→Grok chain. */
+/** Request body, with or without the thinking guard — see the 400 retry below. */
+function geminiBody(systemPrompt: string | null, userPrompt: string, maxTokens: number, withThinking: boolean) {
+  return {
+    ...(systemPrompt ? { systemInstruction: { parts: [{ text: systemPrompt }] } } : {}),
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    generationConfig: {
+      maxOutputTokens: Math.min(maxTokens, 8192),
+      temperature: 0.3,
+      // Disable "thinking" so the whole token budget goes to output, not reasoning.
+      ...(withThinking ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+    },
+  };
+}
+
 export async function geminiComplete(
   systemPrompt: string | null,
   userPrompt: string,
   maxTokens: number,
   label: string,
+  /** Override the model — lets short/structured callers pick a PLAIN model. */
+  modelOverride?: string,
 ): Promise<string> {
   const key = GEMINI_KEY();
   if (!key) throw new Error('GEMINI_API_KEY missing');
-  const model = GEMINI_MODEL();
+  const model = (modelOverride || '').trim() || GEMINI_MODEL();
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...(systemPrompt ? { systemInstruction: { parts: [{ text: systemPrompt }] } } : {}),
-        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        generationConfig: {
-          maxOutputTokens: Math.min(maxTokens, 8192),
-          temperature: 0.3,
-          // Disable "thinking" so the whole token budget goes to output, not reasoning.
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      }),
+      body: JSON.stringify(geminiBody(systemPrompt, userPrompt, maxTokens, true)),
       signal: AbortSignal.timeout(120_000),
     },
   );
-  if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  if (!res.ok) {
+    const body = (await res.text()).slice(0, 200);
+    // thinkingConfig is REJECTED by plain models.
+    //
+    // Sending thinkingBudget:0 protects us from reasoning models spending the
+    // whole budget thinking. But a PLAIN model has no thinking to disable and
+    // answers 400 INVALID_ARGUMENT — so the very guard that saves us on
+    // gemini-2.5-flash locked us out of gemini-3.5-flash-lite, the fastest and
+    // most reliable model for short prompts. Retry once without it rather than
+    // maintaining a list of which models are plain; the API is the source of
+    // truth and that list would rot at the next release.
+    if (res.status === 400 && /INVALID_ARGUMENT|invalid argument/i.test(body)) {
+      const retry = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(geminiBody(systemPrompt, userPrompt, maxTokens, false)),
+          signal: AbortSignal.timeout(120_000),
+        },
+      );
+      if (!retry.ok) throw new Error(`Gemini ${retry.status}: ${(await retry.text()).slice(0, 160)}`);
+      const rj = (await retry.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+      const rtext = (rj.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('').trim();
+      if (rtext) console.warn(`[${label}] Gemini (${model}, plain) returned ${rtext.length} chars`);
+      return rtext;
+    }
+    throw new Error(`Gemini ${res.status}: ${body.slice(0, 160)}`);
+  }
   const data = (await res.json()) as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
   const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('').trim();
   if (text) console.warn(`[${label}] Gemini (${model}) returned ${text.length} chars`);
@@ -273,6 +308,145 @@ export async function claudeWithGroqFallback(
  */
 const OPENAI_KEY = () => process.env.OPENAI_API_KEY?.trim() || '';
 const OPENAI_FALLBACK_MODEL = () => (process.env.OPENAI_FALLBACK_MODEL || 'gpt-4o-mini').trim();
+
+/**
+ * Same five providers, ordered by what the call is FOR.
+ *
+ * One chain for everything is the expensive mistake: it sends a one-word voice
+ * classification to Claude Opus at Opus prices, and it sends a customer-facing
+ * draft to whatever happened to be free. Order follows use case:
+ *
+ *   quality  — a human reads every word (concierge drafts, replies to prospects).
+ *              Claude first; it is worth paying for. Then OpenAI, then the free
+ *              tiers.
+ *   classify — short structured answers, high volume (intent, urgency, triage).
+ *              Free PLAIN models first. Claude last: reaching it means four
+ *              providers are down, which is the only time it is worth Opus money
+ *              to label one word.
+ *   bulk     — background text nobody is waiting for (blogs, enrichment).
+ *              Free first, paid never unless everything else failed.
+ *
+ * Measured 2026-08-16 with `npm run eval:llm`: at the 30-token shape gemini
+ * answered in 399ms, groq returned EMPTY. At 300 tokens all five answered. So
+ * `classify` deliberately leads with Gemini and gives Groq room further down.
+ */
+export type ChainProfile = 'quality' | 'classify' | 'bulk';
+
+type ProviderName = 'claude' | 'openai' | 'gemini' | 'groq' | 'grok';
+
+const CHAIN_ORDER: Record<ChainProfile, ProviderName[]> = {
+  quality: ['claude', 'openai', 'gemini', 'groq', 'grok'],
+  classify: ['gemini', 'openai', 'groq', 'grok', 'claude'],
+  bulk: ['gemini', 'groq', 'openai', 'grok', 'claude'],
+};
+
+/** Reasoning models emit nothing below this. Never send a provider less. */
+const MIN_REASONING_TOKENS = 300;
+
+/**
+ * Gemini model per use case — one id for everything is the same mistake as one
+ * chain for everything.
+ *
+ * `classify` gets gemini-3.5-flash-lite: a PLAIN model that answers short
+ * prompts correctly (~400ms) and REJECTS thinkingBudget with a 400, which is how
+ * you identify one. The default GEMINI_MODEL is gemini-2.5-flash, which Google
+ * documents as "for tasks that require reasoning" — fine for prose, wrong for a
+ * one-word label, and measurably worse the smaller the budget gets.
+ */
+const GEMINI_FAST_MODEL = () => (process.env.GEMINI_FAST_MODEL || 'gemini-3.5-flash-lite').trim();
+
+async function callProvider(
+  provider: ProviderName,
+  systemPrompt: string | null,
+  userPrompt: string,
+  maxTokens: number,
+  label: string,
+  profile: ChainProfile = 'quality',
+): Promise<string> {
+  if (provider === 'gemini') {
+    const model = profile === 'classify' ? GEMINI_FAST_MODEL() : GEMINI_MODEL();
+    return (await geminiComplete(systemPrompt, userPrompt, maxTokens, label, model)).trim();
+  }
+  if (provider === 'grok') return (await grokComplete(systemPrompt, userPrompt, maxTokens, label)).trim();
+  if (provider === 'openai') {
+    const key = OPENAI_KEY();
+    if (!key) throw new Error('no OPENAI_API_KEY');
+    const messages = systemPrompt
+      ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
+      : [{ role: 'user', content: userPrompt }];
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: OPENAI_FALLBACK_MODEL(), messages, max_completion_tokens: maxTokens }),
+    });
+    if (!r.ok) throw new Error(`OpenAI ${r.status}: ${(await r.text()).slice(0, 120)}`);
+    const j = (await r.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    return (j.choices?.[0]?.message?.content || '').trim();
+  }
+  if (provider === 'groq') {
+    const key = process.env.GROQ_API_KEY?.trim();
+    if (!key) throw new Error('no GROQ_API_KEY');
+    const groq = new Groq({ apiKey: key });
+    const messages: Array<{ role: 'system' | 'user'; content: string }> = systemPrompt
+      ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
+      : [{ role: 'user', content: userPrompt }];
+    const resp = await groq.chat.completions.create({
+      model: groqModel(),
+      messages,
+      max_tokens: Math.min(maxTokens, GROQ_MAX_TOKENS),
+      temperature: 0.7,
+    });
+    return (resp.choices[0]?.message?.content || '').trim();
+  }
+  // claude
+  const key = process.env.ANTHROPIC_API_KEY?.trim();
+  if (!key) throw new Error('no ANTHROPIC_API_KEY');
+  const Anthropic = (await import('@anthropic-ai/sdk')).default;
+  const client = new Anthropic({ apiKey: key });
+  const resp = await client.messages.create({
+    model: (process.env.CLAUDE_CHAIN_MODEL || 'claude-haiku-4-5-20251001').trim(),
+    max_tokens: maxTokens,
+    ...(systemPrompt ? { system: systemPrompt } : {}),
+    messages: [{ role: 'user', content: userPrompt }],
+  });
+  return resp.content
+    .filter((b): b is Extract<typeof b, { type: 'text' }> => b.type === 'text')
+    .map(b => b.text)
+    .join('')
+    .trim();
+}
+
+/**
+ * Walk the profile's chain until a provider returns real text.
+ *
+ * An empty or whitespace reply counts as a FAILURE and moves to the next
+ * provider — returning "" verbatim is what lets reasoning models fail callers
+ * open. Throws only when every provider in the profile has failed, with each
+ * reason attached so the log says why rather than going quiet.
+ */
+export async function completeWithProfile(
+  profile: ChainProfile,
+  systemPrompt: string | null,
+  userPrompt: string,
+  maxTokens: number,
+  label: string,
+): Promise<string> {
+  const budget = Math.max(maxTokens, MIN_REASONING_TOKENS);
+  const reasons: string[] = [];
+  for (const provider of CHAIN_ORDER[profile]) {
+    try {
+      const text = await callProvider(provider, systemPrompt, userPrompt, budget, label, profile);
+      if (text) {
+        if (reasons.length) console.warn(`[${label}] ${profile}: ${provider} answered after ${reasons.length} failure(s)`);
+        return text;
+      }
+      reasons.push(`${provider}: empty`);
+    } catch (e) {
+      reasons.push(`${provider}: ${(e instanceof Error ? e.message : String(e)).slice(0, 90)}`);
+    }
+  }
+  throw new Error(`[${label}] all providers failed for profile '${profile}': ${reasons.join('; ').slice(0, 400)}`);
+}
 
 async function lastResortOpenAI(
   systemPrompt: string | null | undefined,
