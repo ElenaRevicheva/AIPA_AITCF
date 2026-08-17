@@ -457,6 +457,52 @@ function isPlatformSite(website) {
   }
 }
 
+/**
+ * Phones recovered while scraping for email, keyed by domain.
+ *
+ * The SerpAPI maps engine carried `phone`; Bright Data organic does not, so every
+ * lead staged after the supply switch reached HubSpot with NO WhatsApp anchor —
+ * and WhatsApp is the close channel ("owner answers WhatsApp" is an ICP criterion,
+ * not a nice-to-have). Verified live: 0 of the 6 leads staged on Aug 17 had one.
+ *
+ * findEmail() already downloads the contact page, and LATAM businesses publish a
+ * WhatsApp number on exactly that page — so this costs ZERO extra requests.
+ */
+const phoneByDomain = new Map();
+
+// wa.me / tel: are deliberate publisher signals; loose digits are a last resort.
+const WA_LINK_RE = /(?:wa\.me\/|api\.whatsapp\.com\/send\?phone=)(\d{8,15})/gi;
+const TEL_HREF_RE = /tel:\+?([\d\s().-]{7,20})/gi;
+// PA +507 · CR +506 · CO +57 · MX +52 — the ICP's four countries.
+const INTL_RE = /\+\s?(507|506|57|52)[\s.-]?(\d[\d\s.-]{6,13}\d)/g;
+
+/**
+ * MOBILE numbers only reach WhatsApp, so they win over a landline on the same
+ * page. Live proof: csapty.com publishes 507-260-6043, a fixed line — staging
+ * that as the WhatsApp anchor would produce a link that simply never delivers.
+ * Mobile prefixes: PA 6 · CR 6-8 · CO 3 · MX 1 (or a bare 10-digit cell).
+ */
+const MOBILE_RE = /^(?:507[6]|506[678]|57[3]|521?[0-9])/;
+
+function pickPhone(html) {
+  const cands = [];
+  for (const m of html.matchAll(WA_LINK_RE)) cands.push(m[1]);
+  for (const m of html.matchAll(TEL_HREF_RE)) cands.push(m[1]);
+  for (const m of html.matchAll(INTL_RE)) cands.push(m[1] + m[2]);
+  const valid = [];
+  for (const raw of cands) {
+    const d = String(raw).replace(/\D/g, '');
+    // 8 (bare PA/CR local) to 15 (E.164 max). Reject obvious junk like years,
+    // tracking ids and 000-runs that regexes love to find in markup.
+    if (d.length < 8 || d.length > 15) continue;
+    if (/^(0+|1+|1234)/.test(d)) continue;
+    valid.push(d);
+  }
+  // A wa.me link is the strongest signal of all and is already first in `cands`;
+  // beyond that, take the first mobile, and only then settle for any valid number.
+  return valid.find((d) => MOBILE_RE.test(d)) || valid[0] || null;
+}
+
 async function findEmail(website) {
   let domain;
   try {
@@ -475,6 +521,12 @@ async function findEmail(website) {
       });
       if (!r.ok) continue;
       const html = await r.text();
+      // Same bytes, second answer: recover the phone before deciding on email, so
+      // a page that yields a WhatsApp number but no address still pays for itself.
+      if (!phoneByDomain.has(domain)) {
+        const ph = pickPhone(html);
+        if (ph) phoneByDomain.set(domain, ph);
+      }
       const hits = html.match(EMAIL_RE) || [];
       found.push(...hits);
       // mailto: links are the most reliable signal a human put there on purpose
@@ -1029,6 +1081,12 @@ if (require.main === module) (async () => {
       if (!email) {
         skip.noEmail++;
         continue;
+      }
+      // Restore the WhatsApp close channel the maps engine used to supply. Only
+      // fills a gap — if a supply ever returns a real phone again, that one wins.
+      if (!b.phone && domain && phoneByDomain.has(domain)) {
+        b.phone = phoneByDomain.get(domain);
+        console.log(`      ↳ WhatsApp number found on their site: ${formatPhone507(b.phone)}`);
       }
       if (await contactExists(email)) {
         skip.dupe++;
