@@ -41,8 +41,10 @@ export interface ProbeResult {
   sources: CitationSource[];
   /** Our domain appeared as a linked source on the answer. */
   cited: boolean;
-  /** One of those cited URLs was the portfolio hub. */
+  /** One of those cited URLs was a money page (any of CITATION_PRIMARY_PATH). */
   citedPortfolio: boolean;
+  /** WHICH money pages were cited, e.g. ['/api']. Empty when none were. */
+  citedPrimaryPaths?: string[];
   citedUrls: string[];
   /** 1-based rank of our first cited source among all sources. */
   position: number | null;
@@ -72,6 +74,8 @@ export interface CitationRun {
     attempted: number;
     cited: number;
     citedPortfolio: number;
+    /** Per money page, so a /api win is visible instead of averaged away. */
+    byPrimaryPath?: Array<{ path: string; cited: number; citationRate: number }>;
     mentioned: number;
     /** Percent 0-100 of measured probes where our domain was a linked source. */
     citationRate: number;
@@ -101,7 +105,25 @@ const MAX_REDIRECT_RESOLVES = 6;
 const PROBE_CONCURRENCY = 3;
 
 const trackedDomain = (): string => (process.env.CITATION_DOMAIN || 'aideazz.xyz').trim().toLowerCase();
-const primaryPath = (): string => (process.env.CITATION_PRIMARY_PATH || '/portfolio').trim();
+/**
+ * The money pages, tracked in parallel — not one "primary" page.
+ *
+ * /portfolio and /api answer different questions and compete in different races.
+ * /portfolio is the entity page: it wins "who is Elena Revicheva" and "who builds
+ * AI agents". /api is a TOOL page, and tool queries ("best AEO audit tool") are
+ * won by single-purpose tool domains — aeoanalyzer.io, aeotrack.io, aeoscore.io —
+ * which a portfolio can never outrank but a free audit API genuinely can.
+ * Measuring only /portfolio scored /api's wins as losses.
+ *
+ * Comma-separated so a page can be added without a code change.
+ */
+const primaryPaths = (): string[] =>
+  (process.env.CITATION_PRIMARY_PATH || '/portfolio,/api')
+    .split(',')
+    .map((p) => p.trim().toLowerCase())
+    .filter(Boolean);
+
+const primaryPath = (): string => primaryPaths().join(', ');
 
 /** Brand strings an engine may name without linking. Mention without a link is still signal. */
 const brandPattern = (): RegExp => new RegExp(`\\bAIdeazz\\b|${escapeRegex(trackedDomain())}|\\bElena\\s+Revicheva\\b`, 'i');
@@ -403,8 +425,14 @@ function evaluate(engine: EngineId, prompt: string, answer: EngineAnswer): Probe
     if (position === null) position = index + 1;
   });
 
-  const primary = primaryPath().toLowerCase();
-  const citedPortfolio = citedUrls.some((u) => (pathOf(u) ?? '').toLowerCase().startsWith(primary));
+  // Which money pages were cited, kept separate so a /api win is not reported as
+  // a /portfolio loss. citedPortfolio stays "at least one money page" for callers
+  // and stored history that already read that field.
+  const paths = primaryPaths();
+  const citedPrimaryPaths = paths.filter((p) =>
+    citedUrls.some((u) => (pathOf(u) ?? '').toLowerCase().startsWith(p)),
+  );
+  const citedPortfolio = citedPrimaryPaths.length > 0;
 
   return {
     engine,
@@ -414,6 +442,7 @@ function evaluate(engine: EngineId, prompt: string, answer: EngineAnswer): Probe
     sources: answer.sources,
     cited: citedUrls.length > 0,
     citedPortfolio,
+    citedPrimaryPaths,
     citedUrls,
     position,
     mentioned: brandPattern().test(answer.text),
@@ -509,6 +538,12 @@ export async function runCitationProbes(options: RunOptions = {}): Promise<Citat
       citationRate: rate(measuredProbes.filter((p) => p.cited).length),
       portfolioCitationRate: rate(measuredProbes.filter((p) => p.citedPortfolio).length),
       mentionRate: rate(measuredProbes.filter((p) => p.mentioned).length),
+      // Per-page, because /portfolio and /api are in different races and a single
+      // blended number hides which one is actually earning citations.
+      byPrimaryPath: primaryPaths().map((path) => {
+        const hits = measuredProbes.filter((p) => (p.citedPrimaryPaths ?? []).includes(path)).length;
+        return { path, cited: hits, citationRate: rate(hits) };
+      }),
       byEngine,
     },
   };
@@ -524,9 +559,16 @@ export function summarize(run: CitationRun): string {
     const why = run.skipped.map((s) => s.reason).join(', ') || 'every probe failed';
     return `Citation tracking did not run — ${why}. This is "not measured", not "not cited".`;
   }
+  // Per page, not one blended number: /portfolio and /api run in different races,
+  // so "money pages 1/17" would hide WHICH page earned it — the only part that
+  // tells you where the next hour of GEO work should go.
+  const perPath = (summary.byPrimaryPath ?? [])
+    .map((p) => `${p.path} ${p.cited} (${p.citationRate}%)`)
+    .join(' · ');
   return (
     `${run.domain} cited in ${summary.cited}/${summary.measured} AI answers (${summary.citationRate}%), ` +
-    `${run.primaryPath} in ${summary.citedPortfolio} (${summary.portfolioCitationRate}%), ` +
-    `named without a link in ${summary.mentionRate}%.`
+    `money pages ${summary.citedPortfolio} (${summary.portfolioCitationRate}%)` +
+    (perPath ? ` — ${perPath}` : '') +
+    `, named without a link in ${summary.mentionRate}%.`
   );
 }
