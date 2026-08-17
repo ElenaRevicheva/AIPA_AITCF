@@ -80,7 +80,17 @@ const DRY = process.argv.includes('--dry');
 const MAX_NEW = Number(process.env.LEAD_MAX_NEW || 8);
 /** Below 35 the site is usually broken/parked; above 90 there is no problem to sell. */
 const AUDIT_MIN = Number(process.env.LEAD_AUDIT_MIN || 35);
-const AUDIT_MAX = Number(process.env.LEAD_AUDIT_MAX || 90);
+// Raised 90 -> 98 on 2026-08-17, and ONLY because buildDraft now has a credential
+// branch. The old cap was a safety rail against the letters, not a judgement about
+// the prospect: every ANGLE_ES opening claims the site is not citable, so a 98/100
+// business would have been told it is invisible. With CREDENTIAL_SCORE in place the
+// rail is no longer needed, and the refocused ICP — which scores 91-99 precisely
+// because it markets to international customers — becomes reachable at last.
+// 100/100 stays excluded: there is genuinely nothing to open a conversation with.
+const AUDIT_MAX = Number(process.env.LEAD_AUDIT_MAX || 98);
+// At or above this the audit is the CREDENTIAL, never a gap. Same threshold as
+// stage-manual-prospect.cjs — one number, one meaning, across both machines.
+const CREDENTIAL_SCORE = Number(process.env.LEAD_CREDENTIAL_SCORE || 85);
 const STAGE_ACT_TODAY = 'qualifiedtobuy'; // 🔥 I Act TODAY
 
 /** Panama + LATAM verticals that match the offer Elena already sells. ll = geo bias. */
@@ -788,18 +798,49 @@ function servicesPD(lead) {
 function buildDraft(lead, audit, angle) {
   const angleKey = angle?.angle && ANGLE_ES[angle.angle] ? angle.angle : ANGLE_FALLBACK;
   const v = ANGLE_ES[angleKey];
-  const subject = v.subject(lead.company, audit.score);
+
+  // CREDENTIAL MODE — ported from stage-manual-prospect.cjs (Aug 17 2026).
+  //
+  // Every ANGLE_ES opening asserts some version of "no aparece como respuesta
+  // citable". On an 85+ site that is simply FALSE, and it reads as not having
+  // done the homework — a 98/100 clinic replies with its own score and the
+  // conversation is over. This is also the exact contradiction Elena caught in
+  // the Pesqueros letter: 90/100 quoted alongside "todavía no aparece".
+  //
+  // It matters more now than it did in August: the refocused ICP — medical
+  // tourism, dental tourism, relocation, luxury charters — markets to
+  // international customers and is therefore GOOD at AI visibility. The dry run
+  // that proved the retarget also rejected nine prospects scoring 91-99. Without
+  // this branch the band could never be raised past 90 without lying, so the
+  // machine was structurally unable to contact the top of its own ICP.
+  //
+  // Above the threshold the audit becomes the CREDENTIAL that earns the read,
+  // and the letter pivots to the Operator — which is what is being sold anyway.
+  const credential = audit.score >= CREDENTIAL_SCORE;
+  const subject = credential
+    ? `${lead.company} — ${audit.score}/100 en visibilidad IA, y aun así les escribo`
+    : v.subject(lead.company, audit.score);
   const body = [
     `Estimado equipo de ${lead.company}:`,
     ``,
     `¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA y automatización aquí en Panamá: https://aideazz.xyz/portfolio`,
     ``,
-    v.opening(lead.city),
-    ``,
-    `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
-    ...(audit.aeo != null
-      ? [`Su punto más débil es la respuesta-a-preguntas (AEO ${audit.aeo}/100) — y es el más rápido de arreglar.`]
-      : []),
+    ...(credential
+      ? [
+          `Primero, felicitaciones de verdad. Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}) — de los mejores puntajes que he medido en ${lead.city}.`,
+          ``,
+          `Se los digo porque casi nadie está en ese nivel, y porque no les voy a inventar un problema que no tienen.`,
+          ``,
+          `Les escribo por otra cosa: aparecer en la respuesta de la IA es el primer paso, pero la consulta que llega después todavía depende de que alguien la conteste a tiempo.`,
+        ]
+      : [
+          v.opening(lead.city),
+          ``,
+          `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
+          ...(audit.aeo != null
+            ? [`Su punto más débil es la respuesta-a-preguntas (AEO ${audit.aeo}/100) — y es el más rápido de arreglar.`]
+            : []),
+        ]),
     ``,
     (LANE_OFFER[lead.lane] || LANE_OFFER.geo_aeo_tech_seo_makers).pitch(lead.city),
     ``,
@@ -834,7 +875,11 @@ function buildFuDraft(lead, audit, angle) {
     ``,
     `¡Un gusto saludarles de nuevo! 👋 Soy Elena Revicheva, Ingeniera de IA y Automatización: https://aideazz.xyz/portfolio`,
     ``,
-    `Les escribí hace unos días por correo sobre ${lead.company}. Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}). Cuando un cliente pregunta a ChatGPT o Perplexity por opciones como la suya en ${lead.city}, su empresa todavía no aparece como una respuesta citable${audit.aeo != null ? ` (AEO ${audit.aeo}/100)` : ''}.`,
+    // Same credential branch as buildDraft: a follow-up that contradicts the first
+    // letter is worse than no follow-up, and on 85+ the gap line is untrue anyway.
+    audit.score >= CREDENTIAL_SCORE
+      ? `Les escribí hace unos días sobre ${lead.company}. Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}) — de los mejores que he medido en ${lead.city}, así que no les escribo por ahí.`
+      : `Les escribí hace unos días por correo sobre ${lead.company}. Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}). Cuando un cliente pregunta a ChatGPT o Perplexity por opciones como la suya en ${lead.city}, su empresa todavía no aparece como una respuesta citable${audit.aeo != null ? ` (AEO ${audit.aeo}/100)` : ''}.`,
     ``,
     `No vendo otro CRM ni otro chatbot. Instalo un AI Growth Operator que trabaja 24/7 dentro de las herramientas que ya usan: que ChatGPT los recomiende, investigue prospectos, haga outreach y seguimiento, califique leads por WhatsApp, mantenga el CRM al día y les entregue un briefing diario con las mejores oportunidades.`,
     ``,
@@ -954,7 +999,11 @@ async function stageLead(lead, audit, angle) {
     `Hola, ¡un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio`,
     ``,
     `Analicé ${lead.website} con mi motor de visibilidad en IA: ${audit.score}/100 (${audit.grade}).`,
-    `Cuando alguien le pregunta a ChatGPT por opciones como la suya en ${lead.city}, su negocio todavía no aparece como respuesta citable.`,
+    // WhatsApp gets the same treatment — it is the channel Elena actually closes
+    // on, so a false "no aparece" line here costs the most.
+    audit.score >= CREDENTIAL_SCORE
+      ? `De los mejores puntajes que he medido en ${lead.city}. No les voy a inventar un problema que no tienen — les escribo por lo que pasa DESPUÉS de que la IA los recomiende.`
+      : `Cuando alguien le pregunta a ChatGPT por opciones como la suya en ${lead.city}, su negocio todavía no aparece como respuesta citable.`,
     ``,
     OPERATOR_ES,
     ``,
