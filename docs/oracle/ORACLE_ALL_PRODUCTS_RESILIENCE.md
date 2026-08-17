@@ -2413,3 +2413,131 @@ and ours); `- bullets` and `5*3` are preserved.
 
 **Restore points:** tags `pre-chat-concierge-20260727` (cto-aipa), `pre-hubspot-chat-20260726`
 (aideazz); zips in `D:\aideazz\_backups\`.
+
+---
+
+# August 16–17 2026 — fleet-wide 5-provider LLM chains, Atlas, and the GEO/citation layer
+
+Two days of work with one spine: **no single provider, plan, or API can take a product
+down silently.** Recorded here because every failure in this stretch looked configured
+and wasn't — the code named a provider, the env named a model, and nothing was actually
+reachable. Read the lesson before the changelog.
+
+## 🔑 The lesson, earned three times in two days
+
+**An env var existing proves nothing. Probe the provider.**
+
+| Product | It looked like | It actually was |
+|---|---|---|
+| EspaLuz Telegram | `GROQ_MODEL` set → Groq fallback ready | **no `GROQ_API_KEY` at all** — the rung returned `None` on every call for the life of the bot |
+| whitespace/Atlas | `GROQ_MODEL` set by the Aug 16 sweep | the code reads **`WHITESPACE_GROQ_MODEL`** — the var that was set is ignored here, the dead `llama-3.3-70b` default stayed live and **404'd at tier 2 in production** |
+| Atlas lead machine | `BRIGHTDATA_API_TOKEN` in `.env` | the module reads `process.env`, cron runs near-empty → `bdSerpSearch` returned `[]` with **no error**, which would have meant zero leads every Monday |
+
+Verification order that actually works: check the **exact var name the code reads** →
+check the **key** → **curl the model id**. Not one of these three was catchable by
+reading config.
+
+## Fleet chain status — all six products
+
+Order is per USE CASE, never a fleet template. Each product has its own eval; re-run it
+before changing any model id.
+
+| Product | Chain | Eval | HEAD |
+|---|---|---|---|
+| cto-aipa | 3 profiles (quality / classify / bulk) in `llm-resilience.ts` | `npm run eval:llm` | `180aad8` |
+| VJH | judge: openai→gemini→groq→grok→**claude last** | `pytest evals/test_provider_chain.py` | `9d46dcd` |
+| EspaLuz_Influencer | BULK gemini→groq→openai→grok→claude | `python3 eval_llm_chain.py` | `61340e8` |
+| dragontrade | BULK (`llm-chain.mjs`) + Telegram alerting | `node eval-llm-chain.mjs` | `17558e2` |
+| EspaLuz WhatsApp | **QUALITY** claude→openai→gemini→grok→groq | `venv/bin/python3 eval_llm_chain.py` | `24e5c15` |
+| **EspaLuz Telegram** | **QUALITY** claude→openai→gemini→grok→groq · **no markdown strip** (bot strips at send) | `venv/bin/python eval_llm_chain.py` | `58cdb4b` |
+| **whitespace / Atlas Shifted** | **QUALITY** claude→openai→gemini→grok→groq · circuit breaker preserved | `node eval-llm-chain.mjs` | `2986c28` |
+
+**EspaLuz Telegram (`d8e608f`, `58cdb4b`)** — 3 call sites converted, one more than the
+WhatsApp twin: the tutor fallback, `_convo_translate`, and `quick_translate_for_convo`
+(the bot's **last single-provider LLM call** — Claude only, no fallback, hard-coded id).
+Verified by killing providers cumulatively: with **4 of 5 dark, groq still returned
+2,967 chars**. `_telegram_groq_chat` / `_telegram_openai_chat` are now callerless and
+marked `DEAD CODE` rather than deleted — removing code is Elena's call.
+
+**whitespace / Atlas (`fc0313b`, `3de5edb`, `2986c28`)** — Groq moved from tier 2 to
+**last** (post-deprecation its free tier has no plain model; the weakest link does not
+belong second). Gemini added. **Three status strings had drifted from the chain** and
+all now derive from `PROFILE_QUALITY`: `activeLlmLabel()`, the startup banner
+(`Claude+Groq+OpenAI` — three providers, one dead, while five were configured), and the
+brief's shrug footer (`4-tier … Claude → Groq → OpenAI → Grok`). A Groq 404 now logs
+`model NOT FOUND — retired?` by name.
+
+## Atlas Shifted — lanes, leads, and the recovered films
+
+**Lanes now = Elena's portfolio (11 tracked).** Added `ai_video_generation` and
+`ai_reliability_and_rescue` via `/api/atlas/track`, so every portfolio service has a
+radar. Monday chain verified firing on schedule: **14:00** capture→classify→brief→concept
+· **15:15** campaign alert · **15:30** outcomes feedback · **16:00** lead machine.
+
+**⚠️ SerpAPI is CANCELLED (2026-08-11), 0/1000, and is not coming back.** It took two
+things down: the Atlas lead machine (its *entire* supply was `google_maps`) and the AI
+citation probe. Both now run on Bright Data — see `reference_serpapi_vs_brightdata`.
+
+**Lead machine → Bright Data (`2ca559d`).** SerpAPI first only while it has quota (probed
+once per run via the *free* account endpoint), else Bright Data. Four non-obvious fixes
+were required: `process.env` population (above), `tbs:''` (the shared `bdSerpSearch`
+defaults to `qdr:w` — past-week — which is right for buying signals and returns **0** for
+"find me restaurants"), `gl:'pa'` (without it the proxy exited in **South Africa**), and
+an institutional filter (organic returns government pages maps never did — the first dry
+run staged **Panama's Ministry of Commerce**). The Aug 4 crawler-blocked rescue keyed on
+Google reviews/stars, which organic lacks, so page-one placement now stands in — without
+that it would have silently stopped saving exactly the prospects it exists for.
+
+**Atlas videos were never lost.** All 7 mp4s were on disk and publicly served; what
+vanished was the `concepts.json` entry when a vertical left the tracked list. Restored 4
+orphans incl. the EspaLuz WhatsApp-tutor promo — **no re-render, no spend**. Full recipe
+and the unguarded `c.move` crash it exposed: `reference_atlas_orphaned_videos`.
+Irreplaceable-asset backup: `backups/atlas-assets-IRREPLACEABLE-20260817-1144.tgz`.
+
+## GEO / citations
+
+**The citation probe was failing every Monday** — by design ("a tracker that quietly
+measures nothing is worse than no tracker"), because its only Google engine was SerpAPI.
+Fixed (`875614d`, `180aad8`):
+
+- `probeGoogleAiOverviewBD` reads AI Overviews through Bright Data (`brd_json=1`; body in
+  `texts[].snippet`, sources in `references[].href`, no page_token hop). The engine now
+  activates on **either** supply via `altKeyEnv` — a lapsed subscription had removed
+  Google from the picture entirely.
+- **Moved off GitHub Actions to Oracle cron** (`/home/ubuntu/run-citation-probe.sh`,
+  Mondays 13:00 UTC). GitHub reads repo *secrets*, a different store from Oracle's `.env`;
+  Oracle already has every key, so nothing is copied anywhere.
+- `/portfolio` and `/api` are tracked **in parallel** (`CITATION_PRIMARY_PATH`), because
+  they run different races: `/portfolio` is the entity page, `/api` is a tool page and
+  tool queries are won by tool domains. Measuring only `/portfolio` scored `/api`'s wins
+  as losses.
+
+**Live diagnosis (18/18 probes measured, 3 engines):** aideazz.xyz cited 0×, **named
+without a link in 11%**. `/portfolio` IS indexed and ranks #5 for "Elena Revicheva AI
+portfolio" — the four above it are LinkedIn, Instagram, Dev.to and a LinkedIn post, and
+OpenAI cited **twine.net/user1631810 thirteen times** for her own name. The gap is
+authority, not markup. Fix shipped in `aideazz` `520ce00`: `sameAs` now declares
+Instagram, Twine and beBee. **The reciprocal half — those profiles linking back to
+/portfolio — is Elena's and is the highest-leverage remaining move.**
+
+## ⚠️ Oracle-only code with NO git backup
+
+`EspaLuzFamilybot/aideazz_service_payments.py` (4,065 b, Jul 4) is **untracked and live** —
+`paypal_webhook_server.py` wires it via an `AIDEAZZ_SVC_HOOK_START/END` block that is
+also not in git, and `espaluz-payments-webhook` is active. This is **money code with no
+version control**. Backed up 2026-08-17 to
+`backups/oracle-only-code/aideazz_service_payments.py.20260817-1507`; contains no
+hardcoded secrets, so it is safe to commit whenever Elena decides.
+`EspaLuzWhatsApp/scripts/backfill_espaluz_hubspot.py` also differs on Oracle (one-off
+script, low risk).
+
+## Sync audit — 2026-08-17
+
+All 8 repos **local == origin/main**. Oracle git HEADs for cto-aipa, EspaLuzFamilybot and
+whitespace had drifted behind while their *files* were current (deployed by scp/checkout
+without moving the pointer) — realigned with **`git reset --mixed origin/main`**, which
+moves HEAD and index and never touches working files. Verify with
+`git diff --ignore-cr-at-eol --ignore-all-space origin/main`, **not md5**: scp preserves
+Windows CRLF while `git checkout` writes LF, so hashes differ on identical content.
+All services active; `cto-aipa` restarted so `visibility-api.ts`'s dynamic import of the
+tracker could not serve a cached pre-Bright-Data copy.

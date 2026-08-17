@@ -2619,3 +2619,116 @@ linked devices; cold first-touch at volume belongs on email.
 finally added to the homepage, scroll-top button lifted clear of the chat launcher. GA4, OG tags
 (exactly one `og:image` / `og:image:width`), 6 JSON-LD blocks, canonicals, hreflang, llms.txt,
 geo-manifest.json and robots.txt verified byte-identical after every deploy.
+
+---
+
+# August 16–17 2026 — the acquisition loop stops depending on one paid API
+
+The marketing engine's supply, its measurement, and its radar all ran through a single
+$25/mo SerpAPI plan. That plan was **cancelled 2026-08-11** with 0/1000 searches left.
+Nothing announced it: Atlas kept publishing, the dashboard kept rendering, and the two
+things that make money — new leads, and proof that AI engines cite us — went quiet.
+
+## What actually broke, and how it was found
+
+**The lead machine's entire supply was SerpAPI `google_maps`.** `mapsSearch()` throws on
+the API's error and the loop `continue`d, so every lane produced nothing. Last Monday
+(Aug 10) worked only because the plan was not empty yet — the Aug 4 commit counted
+`~180 remain` and **rationed** lookups rather than removing the dependency. Four days
+later the ration ran out. Bright Data had already replaced SerpAPI for client discovery
+(`9c2716f`, May 31) and for Atlas capture (whitespace `6f2f299`, Jul 19); the lead
+machine was written after both and inherited neither.
+
+**Now on Bright Data (`2ca559d`)** — SerpAPI first *only while it has quota*, probed once
+per run through the free account endpoint so a dead key costs no wasted round-trips.
+Verified under cron conditions with SerpAPI dead: lanes return 8–9 businesses each,
+three real leads staged with live audits (74/B, 84/B, 90/A). Cost ≈ 4 Web Unlocker calls
+per lane at `num:20`, against a Bright Data balance of $11.36 and ~$4/month fleet-wide.
+
+**What it cost to get right** (each of these returns *nothing* rather than an error, so
+none would have shown up as a failure): `process.env` had to be populated because the
+script reads `.env` itself while the borrowed module reads `process.env` and cron runs
+near-empty; `tbs:''` because the shared `bdSerpSearch` defaults to a past-week filter
+that is correct for buying signals and useless for finding businesses; `gl:'pa'` because
+without it the proxy exited in South Africa; and an institutional filter because organic
+search returns government pages that maps never did — the first dry run staged **Panama's
+Ministry of Commerce** as a prospect.
+
+## GEO / AEO — the measurement now works, and it says something useful
+
+The weekly citation probe had been failing by design ("a tracker that quietly measures
+nothing is worse than no tracker") because its only Google engine was SerpAPI. Google AI
+Overview now reads through **Bright Data**, the engine activates on either supply, and
+the whole probe **moved off GitHub Actions onto Oracle cron** — GitHub reads repo
+secrets, a separate store from Oracle's `.env`, and Oracle already holds every key.
+
+**`/portfolio` and `/api` are now measured in parallel**, because they compete in
+different races: `/portfolio` is the entity page ("who is Elena Revicheva"), `/api` is a
+tool page, and tool queries are won by single-purpose tool domains. Scoring only
+`/portfolio` counted `/api`'s wins as losses.
+
+**First honest reading — 18/18 probes, three engines:**
+
+- aideazz.xyz cited in **0** answers
+- **named without a link in 11%**
+- `/portfolio` **is** indexed, ranking **#5** for "Elena Revicheva AI portfolio"
+
+The four results above it are LinkedIn, Instagram, Dev.to and a LinkedIn post — and for
+her own name **OpenAI cited `twine.net/user1631810` thirteen times**. A freelancer profile
+is currently the canonical Elena Revicheva on the open web. For category queries
+("best AEO audit tool") the winners are `aeoanalyzer.io`, `aeotrack.io`, `aeoscore.io`,
+`geolens.online` — exact-match tool domains a portfolio cannot outrank, but a free audit
+API can. For LATAM/fractional-CTO queries the answers come from Google Maps listings,
+where there is no presence at all.
+
+**So the GEO gap is authority, not markup.** The machine-readable layer is already strong:
+6 JSON-LD blocks, `llms.txt` with an explicit "cite /portfolio" directive,
+`geo-manifest.json`, `CITATION.cff`, prerendered money pages. Shipped in `aideazz`
+`520ce00`: `sameAs` now declares Instagram, Twine and beBee — the profiles that actually
+rank and get cited — consolidating a scattered entity onto `/portfolio`.
+
+**The remaining half is reciprocal and Elena's:** `sameAs` *asserts* those profiles are
+her; an inbound link from each back to `/portfolio` is what corroborates it. Highest-
+leverage marketing action outstanding. Second: a Google Business Profile, which is the
+only way into the Maps-answered local queries.
+
+## Positioning — from the Jul 24 HubSpot/market review
+
+Recorded because it changes who the engine should hunt, not just how.
+
+- **The category is not "AI agency".** It is *AI-driven customer acquisition for service
+  businesses* — more precisely, **helping businesses get recommended by AI assistants and
+  converting those opportunities into customers.** Young category, small battlefield.
+- **The product is one thing, not modules:** *an AI Growth Operator — your first AI growth
+  employee.* AI search visibility, the WhatsApp employee, research, outreach, follow-up,
+  CRM upkeep and weekly reports are its parts, never separate offers.
+- **ICP is not geography:** average sale **> $2,000**, leads arrive online, owner answers
+  WhatsApp, international audience, English (or bilingual EN) site, high margins.
+  Priority costumes: **medical tourism · immigration/relocation · dental implants &
+  dental tourism · cosmetic surgery · luxury charters/yachts & high-ticket hospitality.**
+- **The list is "AI-Discoverable Businesses", not "Panama list"** — Panama → Costa Rica →
+  Colombia → Mexico as the same ICP expands. Prefer 50 perfect over 1,000 okay.
+- **Outreach leads with the buyer's problem:** *"ChatGPT is unlikely to recommend you
+  because…"* — never "I build AI". Buyers want patients, bookings and contracts.
+
+**⚠️ Open gap:** the lead machine's `ICP_BY_LANE` queries are still the old low-ticket
+Panama-City set (`restaurante`, `gimnasio`, `taller mecánico`, `contadores`…), which is
+the *opposite* of the ICP above — average sale far under $2,000, no international
+audience, Spanish-only sites. This is a plausible contributor to the 1% reply rate across
+96 contacted prospects. Retargeting to the five priority costumes across PA/CR/CO/MX is
+specified and awaiting Elena's go.
+
+## Atlas as a marketing asset
+
+Radar lanes now mirror the portfolio exactly (11 tracked, `ai_video_generation` and
+`ai_reliability_and_rescue` added), so the daily MOVE speaks about services Elena
+actually sells. The Monday chain — capture 14:00, campaign alert 15:15, outcomes feedback
+15:30, lead machine 16:00 UTC — is verified firing on schedule. Four orphaned campaign
+videos were restored to the dashboard (7 total, including the EspaLuz WhatsApp-tutor
+promo) with no re-render and no spend.
+
+**Public copy corrected to match reality (`aideazz` `f309269`):** portfolio and the ops
+SOP page both advertised "4-tier LLM failover", and Atlas's own footer named a chain whose
+second rung had been 404ing since Aug 16. Both languages now state five providers, and the
+ops page says the thing a buyer should care about — the chain is proven by breaking
+providers cumulatively, and with four of five dark the agent still answers.
