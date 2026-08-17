@@ -101,8 +101,48 @@ const CONCEPTS_PATH = process.env.ATLAS_CONCEPTS_PATH || '/home/ubuntu/whitespac
  *
  * So lanes are chosen by REACHABILITY × score, never score alone.
  */
+/**
+ * ICP refocus (Elena, Aug 17 2026 — from the Jul 24 market review).
+ *
+ * The queries below the HIGH-TICKET block are the original local set. They were
+ * mining the wrong buyer: a `gimnasio` or `taller mecánico` has an average sale
+ * far under $2,000, no international audience and a Spanish-only site — it cannot
+ * buy a $2k+ AI Growth Operator. 96 contacted prospects at a 1% reply rate is what
+ * that looks like from the outside.
+ *
+ * The real ICP is not a geography, it is a shape:
+ *   average sale > $2,000 · leads arrive online · owner answers WhatsApp ·
+ *   international audience · English or bilingual-EN site · high margins
+ *
+ * Same ICP, different costumes: medical tourism, dental implants & dental tourism,
+ * immigration/relocation, cosmetic surgery, luxury charters and high-ticket
+ * hospitality. The list is "AI-Discoverable Businesses", not a Panama list —
+ * Panama → Costa Rica → Colombia → Mexico as the same ICP expands.
+ *
+ * ADDITIVE ON PURPOSE. High-ticket targets are PREPENDED, and the loop breaks at
+ * MAX_NEW, so the money queries are worked first and the original local ones stay
+ * as tail fallback if a lane comes back thin. Nothing was deleted; reverting is
+ * deleting the prepended block.
+ *
+ * Queries are ENGLISH for the high-ticket set, on purpose: a clinic that markets
+ * to international patients writes in English, so an English query surfaces the
+ * businesses that already have the audience — and filters out the purely local
+ * ones the old set kept finding.
+ */
+const SJO = '@9.9281,-84.0907,12z';   // San José, Costa Rica
+const MDE = '@6.2442,-75.5812,12z';   // Medellín, Colombia
+const CTG = '@10.3910,-75.4794,12z';  // Cartagena, Colombia
+const CUN = '@21.1619,-86.8515,12z';  // Cancún, Mexico
+
 const ICP_BY_LANE = {
   whatsapp_ai_agents: [
+    // ── HIGH-TICKET ICP (worked first) ──
+    { q: 'dental implants clinic', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
+    { q: 'dental tourism clinic', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
+    { q: 'plastic surgery clinic', ll: MDE, city: 'Medellin Colombia', gl: 'co', hl: 'en' },
+    { q: 'medical tourism clinic', ll: CUN, city: 'Cancun Mexico', gl: 'mx', hl: 'en' },
+    { q: 'yacht charter', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
+    // ── original local set (tail fallback) ──
     { q: 'restaurante', ll: PTY, city: 'Panama City' },
     { q: 'clínica veterinaria', ll: PTY, city: 'Panama City' },
     { q: 'gimnasio', ll: PTY, city: 'Panama City' },
@@ -110,6 +150,13 @@ const ICP_BY_LANE = {
     { q: 'taller mecánico', ll: PTY, city: 'Panama City' },
   ],
   ai_automation: [
+    // ── HIGH-TICKET ICP (worked first) ──
+    { q: 'relocation services company', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
+    { q: 'immigration law firm expats', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
+    { q: 'relocation and visa services', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
+    { q: 'medical tourism agency', ll: MDE, city: 'Medellin Colombia', gl: 'co', hl: 'en' },
+    { q: 'fertility clinic international patients', ll: CUN, city: 'Cancun Mexico', gl: 'mx', hl: 'en' },
+    // ── original local set (tail fallback) ──
     { q: 'agencia de marketing', ll: PTY, city: 'Panama City' },
     { q: 'bienes raíces', ll: PTY, city: 'Panama City' },
     { q: 'contadores', ll: PTY, city: 'Panama City' },
@@ -117,6 +164,13 @@ const ICP_BY_LANE = {
     { q: 'empresa de logística', ll: PTY, city: 'Panama City' },
   ],
   geo_aeo_tech_seo_makers: [
+    // ── HIGH-TICKET ICP (worked first) ──
+    { q: 'cosmetic dentistry veneers', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
+    { q: 'luxury villa rental', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
+    { q: 'private yacht charter', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
+    { q: 'bariatric surgery clinic', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
+    { q: 'luxury boutique resort', ll: CUN, city: 'Cancun Mexico', gl: 'mx', hl: 'en' },
+    // ── original local set (tail fallback) ──
     { q: 'clínica dental', ll: PTY, city: 'Panama City' },
     { q: 'hotel boutique', ll: PTY, city: 'Panama City' },
     { q: 'bufete de abogados', ll: PTY, city: 'Panama City' },
@@ -255,8 +309,12 @@ async function bdSerpBusinesses(target) {
   const { bdSerpSearch } = require('../dist/brightdata-enrich.js');
   const results = await bdSerpSearch(`${target.q} ${target.city}`, {
     num: 20,
-    gl: 'pa', // exit in Panama — without this the proxy landed in South Africa
-    hl: 'es',
+    // Per-target geo, defaulting to Panama/Spanish so every pre-existing target
+    // behaves exactly as before. The ICP now spans PA/CR/CO/MX, and searching a
+    // Costa Rica query from a Panama exit returns Panama businesses — the country
+    // has to travel with the query, not be fixed to where Elena happens to live.
+    gl: target.gl || 'pa', // without a gl the proxy once exited in South Africa
+    hl: target.hl || 'es',
     // MUST be empty. bdSerpSearch defaults tbs to 'qdr:w' (indexed in the past
     // week), which is right for the fresh buying-signal queries it was built for
     // and wrong here: a restaurant's site is not news. With the default this
@@ -364,6 +422,17 @@ const PLATFORM_DOMAINS = [
   'expedia.com', 'waze.com', 'wikipedia.org', 'reddit.com', 'pinterest.com',
   'medium.com', 'indeed.com', 'glassdoor.com', 'craigslist.org', 'clasificados.com',
   'yellowpages.com', 'cybo.com', 'tuugo.net', 'infoisinfo.com', 'paginasblancas.com',
+  // Added 2026-08-17 with the high-ticket ICP. English medical/dental-tourism
+  // queries are dominated by AGGREGATORS and listicles, not by the clinics
+  // themselves — the first ICP dry run staged whatclinic.com ("Top 10+ Dentists
+  // in Panama") and medicaltourismco.com ("Dental Work in Costa Rica 2026") as if
+  // they were prospects. They are competitors for the same buyer, and pitching a
+  // directory its own AI-visibility audit is the fastest way to look automated.
+  'whatclinic.com', 'medicaltourismco.com', 'bookimed.com', 'medigo.com',
+  'placidway.com', 'dentaldepartures.com', 'medicaltourism.com', 'healthtrip.com',
+  'mymeditravel.com', 'qunomedical.com', 'treatmentabroad.com', 'expatexchange.com',
+  'internationalliving.com', 'numbeo.com', 'nomadlist.com', 'dentavacation.com',
+  'dentaltourism.com', 'medicaltourismmag.com', 'patientsbeyondborders.com',
 ];
 /**
  * Government, education and military sites are never prospects.
