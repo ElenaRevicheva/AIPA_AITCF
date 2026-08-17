@@ -908,6 +908,45 @@ async function stageLead(lead, audit, angle) {
     );
   }
 
+  // A TASK, due today. Added Aug 17 2026 — the machine created contact, deal and
+  // note but never a task, so a staged lead only existed if Elena happened to
+  // open the deal list. A lead nobody is reminded about is a lead that ages out;
+  // "AGING >7d untouched" in the morning brief is the shape that failure takes.
+  //
+  // Best-effort: a task failure must never cost the lead itself, which is already
+  // written by this point.
+  if (deal?.id) {
+    try {
+      const task = await hs('POST', '/crm/v3/objects/tasks', {
+        properties: {
+          hs_task_subject: `Enviar 1er contacto — ${lead.company} (auditoría ${audit.score}/${audit.grade})`,
+          hs_task_body:
+            `Lead de Atlas listo para enviar.\n\n` +
+            `Sitio: ${lead.website}\nEmail: ${lead.email}\n` +
+            `${lead.phone ? `WhatsApp: ${formatPhone507(lead.phone)}\n` : 'WhatsApp: no publicado en su sitio\n'}` +
+            `Auditoría: ${audit.score}/100 (${audit.grade})\n\n` +
+            `Los botones de envío están en la nota del deal.`,
+          hs_task_status: 'NOT_STARTED',
+          hs_task_priority: 'HIGH',
+          hs_timestamp: Date.now(),
+          hubspot_owner_id: OWNER,
+        },
+      });
+      if (task?.id) {
+        await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/deals/${deal.id}`, [
+          { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 216 },
+        ]).catch(() => {});
+        if (contact?.id) {
+          await hs('PUT', `/crm/v4/objects/tasks/${task.id}/associations/contacts/${contact.id}`, [
+            { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 204 },
+          ]).catch(() => {});
+        }
+      }
+    } catch (e) {
+      console.warn(`      ⚠️ task not created for ${lead.company}: ${String(e.message).slice(0, 80)}`);
+    }
+  }
+
   // WhatsApp draft — same play as [CLIENT-MANUAL]: email is the tracked channel,
   // WhatsApp is Elena's laptop-only close. Registry needs digits-only phone.
   const waRel = `docs/selling/drafts/${slug}.txt`;
@@ -1139,18 +1178,75 @@ if (require.main === module) (async () => {
       `no-email ${skip.noEmail} · already-in-CRM ${skip.dupe} · outside-band ${skip.band} · audit-failed ${skip.noAudit} · crawler-blocked rescued ${skip.rescued}`,
   );
 
+  // PUBLISH — the step whose absence made every send button dead.
+  //
+  // /go/outreach-email/:slug resolves a slug by reading the registry, and its
+  // documented fallback is GitHub main. Until Aug 17 2026 this machine wrote the
+  // drafts and the registry to Oracle's disk and stopped, so the buttons it had
+  // just put in HubSpot resolved to "Unknown outreach email slug" — and worse, a
+  // stale copy of the registry copied onto the box silently erased 20 entries
+  // that existed nowhere else. Artifacts that live in exactly one place are one
+  // careless `cp` from gone.
+  //
+  // Committing them closes the loop: the buttons work immediately, and the
+  // registry is recoverable from git instead of from memory.
+  if (staged.length && !DRY) await publishOutreachArtifacts(staged.length);
+
   if (staged.length && !DRY) {
     const lines = [
       `🔥 ${staged.length} nuevos leads listos — 🔥 I Act TODAY`,
       ``,
       ...staged.map((s) => `· ${s.company} — ${s.score}/${s.grade} · ${s.city}`),
       ``,
-      `Cada uno ya tiene contacto, deal y el botón ENVIAR en la nota de HubSpot.`,
+      `Cada uno ya tiene contacto, deal, tarea y el botón ENVIAR en la nota de HubSpot.`,
       `Revisa y envía: https://app.hubspot.com/contacts/51409153/objects/0-3/views/all/list`,
     ];
     await telegram(lines.join('\n'));
   }
 })();
+
+/**
+ * Commit and push the drafts + registry this run produced.
+ *
+ * Deliberately narrow: it stages ONLY docs/selling/drafts and the registry. This
+ * repo carries runtime JSON drift and untracked scratch files everywhere, so a
+ * `git add -A` here would sweep them into a commit — a mistake already made once
+ * in this repo's history.
+ *
+ * Never throws. A push failure must not lose the leads that were just written to
+ * HubSpot; it degrades to a loud warning telling Elena to push by hand, because a
+ * silent failure here is what produced dead buttons in the first place.
+ */
+async function publishOutreachArtifacts(count) {
+  const { execFileSync } = require('child_process');
+  const git = (...args) =>
+    execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  try {
+    git('add', 'docs/selling/outreach-registry.json', 'docs/selling/drafts');
+    const staged = git('diff', '--cached', '--name-only');
+    if (!staged) {
+      console.log('[lead-machine] publish: nothing new to commit');
+      return;
+    }
+    git('commit', '-m', `selling: ${count} Atlas lead draft(s) + registry (auto)`);
+    // Rebase first: cron runs unattended and a laptop push in between would
+    // otherwise leave this commit stranded on the box, which is the same failure
+    // in a different costume.
+    try {
+      git('pull', '--rebase', 'origin', 'main');
+    } catch {
+      console.warn('[lead-machine] publish: rebase failed — pushing may be rejected');
+    }
+    git('push', 'origin', 'main');
+    console.log(`[lead-machine] publish: registry + drafts pushed — send buttons live`);
+  } catch (e) {
+    console.warn(
+      `[lead-machine] ⚠️ PUBLISH FAILED: ${String(e.message).slice(0, 140)}\n` +
+        `   The HubSpot send buttons will 404 until someone runs:\n` +
+        `   git add docs/selling/outreach-registry.json docs/selling/drafts && git commit && git push`,
+    );
+  }
+}
 
 /**
  * Exported so the one-off backfill writes the SAME letters this machine writes.
