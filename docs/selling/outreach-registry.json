@@ -2615,5 +2615,139 @@
     "score": 90,
     "phone": "50766228942",
     "dealId": "64049381967"
+  },
+  "aduana-robles-corredor-de-aduanas-atlas": {
+    "company": "Aduana Robles: Corredor de aduanas",
+    "email": "ventas@aduanarobles.com",
+    "emailDraft": "docs/selling/drafts/aduana-robles-corredor-de-aduanas-atlas-email.txt",
+    "dealId": "64050326913",
+    "phone": "50763300787"
+  },
+  "aduana-robles-corredor-de-aduanas-atlas-fu": {
+    "company": "Aduana Robles: Corredor de aduanas",
+    "email": "ventas@aduanarobles.com",
+    "emailDraft": "docs/selling/drafts/aduana-robles-corredor-de-aduanas-atlas-fu-email.txt",
+    "dealId": "64050326913",
+    "phone": "50763300787"
+  },
+  "autogo-repuestos": {
+    "company": "AutoGO Repuestos",
+    "email": "info@autogorepuestos.com",
+    "emailDraft": "docs/selling/drafts/autogo-repuestos-email.txt",
+    "dealId": "63507662856",
+    "phone": "+507 6632-9199"
+  },
+  "be-luxe-real-estate": {
+    "company": "Be Luxe Real Estate",
+    "email": "info@beluxerealestate.com",
+    "emailDraft": "docs/selling/drafts/be-luxe-real-estate-email.txt",
+    "dealId": "63526545680",
+    "phone": "+507 6653-4655"
+  },
+  "colegio-de-contadores-p-blicos-autorizados-atlas": {
+    "company": "Colegio de Contadores Públicos Autorizados",
+    "email": "mrodriguez@colegiocpapanama.org",
+    "emailDraft": "docs/selling/drafts/colegio-de-contadores-p-blicos-autorizados-atlas-email.txt",
+    "dealId": "64047876392"
+  },
+  "colegio-de-contadores-p-blicos-autorizados-atlas-fu": {
+    "company": "Colegio de Contadores Públicos Autorizados",
+    "email": "mrodriguez@colegiocpapanama.org",
+    "emailDraft": "docs/selling/drafts/colegio-de-contadores-p-blicos-autorizados-atlas-fu-email.txt",
+    "dealId": "64047876392"
+  },
+  "despacho-de-aduanas-en-panam-atlas": {
+    "company": "Despacho de aduanas en Panamá",
+    "email": "myyk@dsv.com",
+    "emailDraft": "docs/selling/drafts/despacho-de-aduanas-en-panam-atlas-email.txt",
+    "dealId": "64047767052"
+  },
+  "despacho-de-aduanas-en-panam-atlas-fu": {
+    "company": "Despacho de aduanas en Panamá",
+    "email": "myyk@dsv.com",
+    "emailDraft": "docs/selling/drafts/despacho-de-aduanas-en-panam-atlas-fu-email.txt",
+    "dealId": "64047767052"
+  },
+  "empresa-de-log-stica-en-panam-atlas": {
+    "company": "Empresa de Logística en Panamá",
+    "email": "info@glfcorp.com",
+    "emailDraft": "docs/selling/drafts/empresa-de-log-stica-en-panam-atlas-email.txt",
+    "dealId": "64049381967",
+    "phone": "50766228942"
+  },
+  "empresa-de-log-stica-en-panam-atlas-fu": {
+    "company": "Empresa de Logística en Panamá",
+    "email": "info@glfcorp.com",
+    "emailDraft": "docs/selling/drafts/empresa-de-log-stica-en-panam-atlas-fu-email.txt",
+    "dealId": "64049381967",
+    "phone": "50766228942"
+  },
+  "empresas-bern": {
+    "company": "Empresas Bern",
+    "email": "info@empresasbern.com",
+    "emailDraft": "docs/selling/drafts/empresas-bern-email.txt",
+    "dealId": "63528429206",
+    "phone": "+507 6679-2204"
+  },
+  "engel-v-lkers-panam": {
+    "company": "Engel & Völkers Panamá",
+    "email": "info@panama.evrealestate.com",
+    "emailDraft": "docs/selling/drafts/engel-v-lkers-panam-email.txt",
+    "dealId": "63517061802",
+    "phone": "+507 6780-8277"
+  },
+  "foundever": {
+    "company": "Foundever",
+    "email": "info@foundever.com",
+    "emailDraft": "docs/selling/drafts/foundever-email.txt",
+    "dealId": "63523808804"
+  },
+  "insignia-resources": {
+    "company": "Insignia Resources",
+    "email": "info@insigniaresources.com",
+    "emailDraft": "docs/selling/drafts/insignia-resources-email.txt",
+    "dealId": "63516596373"
+  },
+  "la-strega-ristorante": {
+    "company": "La Strega Ristorante",
+    "email": "reservas@lastregaristorante.com",
+    "emailDraft": "docs/selling/drafts/la-strega-ristorante-email.txt",
+    "dealId": "63512345418",
+    "phone": "+507 6053-0985"
+  },
+  "marjalizo": {
+    "company": "Marjalizo",
+    "email": "info@marjalizorealty.com",
+    "emailDraft": "docs/selling/drafts/marjalizo-email.txt",
+    "dealId": "63526061876",
+    "phone": "+507 6315-2222"
+  },
+  "panam-atlas": {
+    "company": "Panamá",
+    "email": "info@auditool.org",
+    "emailDraft": "docs/selling/drafts/panam-atlas-email.txt",
+    "dealId": "64047549623",
+    "phone": "573027796688"
+  },
+  "panam-atlas-fu": {
+    "company": "Panamá",
+    "email": "info@auditool.org",
+    "emailDraft": "docs/selling/drafts/panam-atlas-fu-email.txt",
+    "dealId": "64047549623",
+    "phone": "573027796688"
+  },
+  "servicios-de-contabilidad-en-panama-c-s-a-atlas": {
+    "company": "Servicios de contabilidad en panama - C.S.A.",
+    "email": "info@csapty.com",
+    "emailDraft": "docs/selling/drafts/servicios-de-contabilidad-en-panama-c-s-a-atlas-email.txt",
+    "dealId": "64049913958",
+    "phone": "5072606043"
+  },
+  "servicios-de-contabilidad-en-panama-c-s-a-atlas-fu": {
+    "company": "Servicios de contabilidad en panama - C.S.A.",
+    "email": "info@csapty.com",
+    "emailDraft": "docs/selling/drafts/servicios-de-contabilidad-en-panama-c-s-a-atlas-fu-email.txt",
+    "dealId": "64049913958",
+    "phone": "5072606043"
   }
 }
