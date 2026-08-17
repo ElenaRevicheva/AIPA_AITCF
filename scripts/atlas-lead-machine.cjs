@@ -46,6 +46,16 @@ const ROOT = path.join(__dirname, '..');
 const env = fs.readFileSync(path.join(ROOT, '.env'), 'utf8');
 const g = (k) => (env.match(new RegExp('^' + k + '=(.+)$', 'm')) || [])[1]?.trim();
 
+// This script reads .env itself via g() and never touched process.env — which is
+// fine until it borrows a module that DOES read process.env. dist/brightdata-enrich
+// resolves its token that way, and cron runs with a near-empty environment, so
+// bdSerpSearch would have returned [] on every call: no error, no warning, just
+// zero leads every Monday from a token that is sitting right there in .env.
+// Verified under `env -i` before this line existed — 0 results; after it, real ones.
+for (const k of ['BRIGHTDATA_API_TOKEN', 'BRIGHTDATA_ZONE']) {
+  if (!process.env[k] && g(k)) process.env[k] = g(k);
+}
+
 const HS = g('HUBSPOT_API_KEY');
 const SERP = g('SERPAPI_KEY');
 const VIS = g('VISIBILITY_API_KEY');
@@ -54,8 +64,16 @@ const CHAT = g('CONCIERGE_TG_CHAT') || (g('TELEGRAM_AUTHORIZED_USERS') || '').sp
 const OWNER = g('HUBSPOT_OWNER_ID') || '91612860';
 // Only a hard requirement when actually mining. Importing this module for its
 // letter templates must not demand API keys the importer will never call.
-if (require.main === module && (!HS || !SERP || !VIS)) {
-  throw new Error('need HUBSPOT_API_KEY + SERPAPI_KEY + VISIBILITY_API_KEY');
+// SERPAPI_KEY is no longer required: Bright Data is a full supply on its own, and
+// the SerpAPI plan was cancelled 2026-08-11. Demanding it here would mean deleting
+// a dead key from .env kills the whole lead machine — so require A supply, not THAT
+// supply. HubSpot and the visibility audit stay mandatory: without them there is
+// nowhere to write and nothing to qualify on.
+const BD_OK = !!(g('BRIGHTDATA_API_TOKEN') && g('BRIGHTDATA_ZONE'));
+if (require.main === module && (!HS || !VIS || (!SERP && !BD_OK))) {
+  throw new Error(
+    'need HUBSPOT_API_KEY + VISIBILITY_API_KEY + a supply (BRIGHTDATA_API_TOKEN+BRIGHTDATA_ZONE, or SERPAPI_KEY)',
+  );
 }
 
 const DRY = process.argv.includes('--dry');
@@ -187,6 +205,92 @@ async function hs(method, p, body, attempt = 0) {
   return t ? JSON.parse(t) : null;
 }
 
+/**
+ * Is there any SerpAPI quota left? Checked ONCE per run, and the account endpoint
+ * is free — it does not consume a search.
+ *
+ * Aug 17 2026: the Starter plan was cancelled (2026-08-11) with 0 searches left, so
+ * this returns false and every lookup goes to Bright Data. Kept rather than ripped
+ * out because the SerpAPI maps engine gives phone + reviews, which organic search
+ * cannot — if a plan is ever restored, the better supply comes back automatically.
+ * Without this probe each of the ~7 targets would burn a doomed round-trip first.
+ */
+let serpAlive = null;
+async function serpHasQuota() {
+  if (serpAlive !== null) return serpAlive;
+  if (!SERP) return (serpAlive = false);
+  try {
+    const r = await fetch(`https://serpapi.com/account?api_key=${SERP}`, {
+      signal: AbortSignal.timeout(20000),
+    });
+    const d = await r.json();
+    serpAlive = Number(d.total_searches_left || 0) > 0;
+    console.log(
+      `[lead-machine] supply: ${serpAlive ? `SerpAPI (${d.total_searches_left} searches left)` : 'Bright Data (SerpAPI exhausted/cancelled)'}`,
+    );
+  } catch {
+    serpAlive = false;
+    console.log('[lead-machine] supply: Bright Data (SerpAPI unreachable)');
+  }
+  return serpAlive;
+}
+
+/**
+ * Bright Data supply — the economical replacement for the SerpAPI maps engine.
+ *
+ * Reuses the fleet's already-compiled bdSerpSearch (Web Unlocker + brd_json), the
+ * same primitive the May-31 "BrightData-first lead engine" and the Jul-19 Atlas
+ * cheap-mode capture run on. Nothing new is integrated; one require, one call.
+ *
+ * ECONOMY: num:20 asks for twenty candidates in ONE request — the same trick that
+ * commit 9c2716f used to get more leads per credit. A whole lane costs ~4 Web
+ * Unlocker calls, against a Bright Data balance that spends ~$4/month fleet-wide.
+ *
+ * HONEST LOSS: organic results carry no phone, rating or review count. Phone is
+ * already optional everywhere downstream (every use is `lead.phone ? … : {}`), so
+ * email outreach is untouched and only the WhatsApp anchor is skipped. Ratings are
+ * handled at the rescue check — see `realBusiness` there.
+ */
+async function bdSerpBusinesses(target) {
+  const { bdSerpSearch } = require('../dist/brightdata-enrich.js');
+  const results = await bdSerpSearch(`${target.q} ${target.city}`, {
+    num: 20,
+    gl: 'pa', // exit in Panama — without this the proxy landed in South Africa
+    hl: 'es',
+    // MUST be empty. bdSerpSearch defaults tbs to 'qdr:w' (indexed in the past
+    // week), which is right for the fresh buying-signal queries it was built for
+    // and wrong here: a restaurant's site is not news. With the default this
+    // returned 0 results for every lane — a silent empty, not an error.
+    tbs: '',
+  });
+  const seenDomain = new Set();
+  const out = [];
+  for (const r of results || []) {
+    if (!r.link) continue;
+    let host;
+    try {
+      host = new URL(r.link).hostname.replace(/^www\./, '').toLowerCase();
+    } catch {
+      continue;
+    }
+    // One lead per business, not one per indexed page of the same site.
+    if (seenDomain.has(host)) continue;
+    seenDomain.add(host);
+    out.push({
+      // Google's title is "Business — tagline | City"; keep the business part only.
+      company: String(r.title || host).split(/[|–—·]/)[0].trim().slice(0, 80),
+      website: `${new URL(r.link).protocol}//${new URL(r.link).hostname}`,
+      phone: null,
+      rating: null,
+      reviews: null,
+      city: target.city,
+      source: 'brightdata',
+      serpRank: r.rank || out.length + 1,
+    });
+  }
+  return out;
+}
+
 /** Businesses with a website, from the maps engine — same data shape Places returns. */
 async function mapsSearch(target) {
   const u =
@@ -252,10 +356,32 @@ const PLATFORM_DOMAINS = [
   'tiktok.com', 'youtube.com', 'wa.me', 'whatsapp.com', 'linktr.ee', 'google.com',
   'business.site', 'sites.google.com', 'wixsite.com', 'blogspot.com', 'wordpress.com',
   'yelp.com', 'tripadvisor.com', 'booking.com', 'doctoralia.com', 'paginasamarillas.com',
+  // Added 2026-08-17 with the Bright Data supply. The maps engine only ever returned
+  // real businesses; ORGANIC search also surfaces directories and marketplaces that
+  // rank for the same commercial query. Selling an AI-visibility audit to Encuentra24
+  // is not a lead, so they are dropped before we spend a scrape or an audit on them.
+  'encuentra24.com', 'mercadolibre.com', 'olx.com', 'foursquare.com', 'opentable.com',
+  'expedia.com', 'waze.com', 'wikipedia.org', 'reddit.com', 'pinterest.com',
+  'medium.com', 'indeed.com', 'glassdoor.com', 'craigslist.org', 'clasificados.com',
+  'yellowpages.com', 'cybo.com', 'tuugo.net', 'infoisinfo.com', 'paginasblancas.com',
 ];
+/**
+ * Government, education and military sites are never prospects.
+ *
+ * The maps engine only ever returned businesses, so this never came up. ORGANIC
+ * search does return institutional pages that rank for commercial queries — the
+ * first Bright Data dry run staged "Inicio JTBR" with dgce@mici.gob.pa, which is
+ * Panama's Ministry of Commerce. The email was not a scraping bug: the page WAS
+ * the ministry's, so the address was legitimately on-domain. Pitching a paid
+ * AI-visibility audit to a government ministry is the kind of lead that costs
+ * credibility, so they are dropped before the audit spends anything on them.
+ */
+const INSTITUTIONAL = /(^|\.)(gob|gov|edu|mil|ac)\.[a-z]{2,3}$|\.(gov|edu|mil)$/i;
+
 function isPlatformSite(website) {
   try {
     const h = new URL(website).hostname.replace(/^www\./, '').toLowerCase();
+    if (INSTITUTIONAL.test(h)) return true;
     return PLATFORM_DOMAINS.some((d) => h === d || h.endsWith(`.${d}`));
   } catch {
     return true; // unparseable — not a site we can audit or sell to
@@ -315,14 +441,27 @@ let googleEmailBudget = Number(process.env.LEAD_GOOGLE_EMAIL_LOOKUPS || 8);
 async function emailFromGoogleIndex(domain) {
   if (googleEmailBudget <= 0) return null;
   googleEmailBudget--;
+  const q = `"${domain}" (email OR contacto OR correo)`;
   try {
-    const u = new URL('https://serpapi.com/search.json');
-    u.searchParams.set('engine', 'google');
-    u.searchParams.set('q', `"${domain}" (email OR contacto OR correo)`);
-    u.searchParams.set('api_key', SERP);
-    const r = await fetch(u.toString(), { signal: AbortSignal.timeout(45000) });
-    if (!r.ok) return null;
-    const blob = await r.text();
+    let blob;
+    if (await serpHasQuota()) {
+      const u = new URL('https://serpapi.com/search.json');
+      u.searchParams.set('engine', 'google');
+      u.searchParams.set('q', q);
+      u.searchParams.set('api_key', SERP);
+      const r = await fetch(u.toString(), { signal: AbortSignal.timeout(45000) });
+      if (!r.ok) return null;
+      blob = await r.text();
+    } else {
+      // Same job on Bright Data: we are only regex-scanning the response for an
+      // address on this domain, so the raw serialized results serve exactly as well
+      // as SerpAPI's JSON. This is the leg that recovers the crawler-blocked
+      // businesses the Aug 4 commit was written to stop discarding.
+      const { bdSerpSearch } = require('../dist/brightdata-enrich.js');
+      const results = await bdSerpSearch(q, { num: 10, gl: 'pa', hl: 'es' });
+      if (!results || !results.length) return null;
+      blob = JSON.stringify(results);
+    }
     const hits = (blob.match(EMAIL_RE) || []).filter((e) => e.toLowerCase().endsWith(`@${domain}`));
     const pick = pickBestEmail(hits, domain);
     if (pick) console.log(`      ↳ email recovered from Google's index (site blocks us): ${pick}`);
@@ -777,10 +916,21 @@ if (require.main === module) (async () => {
     if (staged.length >= MAX_NEW) break;
     let businesses = [];
     try {
-      businesses = await mapsSearch(target);
+      // Best supply first: the SerpAPI maps engine carries phone + reviews, which
+      // organic search cannot. When it has no quota (cancelled Aug 11 2026) we go
+      // straight to Bright Data rather than throwing the lane away — that `continue`
+      // is what would have made this Monday, and every Monday after, produce zero.
+      businesses = (await serpHasQuota()) ? await mapsSearch(target) : await bdSerpBusinesses(target);
     } catch (e) {
-      console.warn(`[lead-machine] serp "${target.q}" failed: ${String(e.message).slice(0, 90)}`);
-      continue;
+      console.warn(`[lead-machine] "${target.q}" primary supply failed: ${String(e.message).slice(0, 90)}`);
+      // A provider hiccup must not silently cost a lane. Try the other supply once.
+      try {
+        businesses = await bdSerpBusinesses(target);
+        console.log(`[lead-machine] "${target.q}" recovered via Bright Data`);
+      } catch (e2) {
+        console.warn(`[lead-machine] "${target.q}" Bright Data also failed: ${String(e2.message).slice(0, 90)}`);
+        continue;
+      }
     }
     console.log(`[lead-machine] ${target.city} · "${target.q}" → ${businesses.length} with a website`);
 
@@ -831,7 +981,15 @@ if (require.main === module) (async () => {
       // real businesses (Google reviews, a live site that answers humans).
       // Rescue them below the floor; never above it, where there is nothing to sell.
       const crawlerBlocked = audit.aiAccess != null && audit.aiAccess <= 50;
-      const realBusiness = (b.reviews || 0) >= 5 || (b.rating || 0) >= 4;
+      // Google reviews/stars are the maps-engine signal. Bright Data organic has
+      // neither — so without a second signal this rescue would silently stop firing
+      // the moment the supply switched, quietly undoing the Aug 4 fix that exists to
+      // save exactly these prospects. Ranking on page one for a local commercial
+      // query is its own proof of a real business, so it stands in for the stars.
+      const realBusiness =
+        (b.reviews || 0) >= 5 ||
+        (b.rating || 0) >= 4 ||
+        (b.source === 'brightdata' && (b.serpRank || 99) <= 10);
       const rescued = crawlerBlocked && realBusiness && audit.score < AUDIT_MIN;
       if ((audit.score < AUDIT_MIN && !rescued) || audit.score > AUDIT_MAX) {
         skip.band++;
