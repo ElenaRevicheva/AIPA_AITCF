@@ -17,8 +17,13 @@ on:
   push:
     branches: [main, "cursor/**"]
     paths: [".citation-trigger"]
-  schedule:
-    - cron: "0 13 * * 1" # Mondays 13:00 UTC, after the visibility self-audit
+  # SCHEDULE MOVED TO ORACLE 2026-08-17 — `0 13 * * 1` now lives in crontab there
+  # (/home/ubuntu/run-citation-probe.sh). GitHub Actions can only read repo
+  # SECRETS, which are a separate store from Oracle's .env; when the SerpAPI plan
+  # was cancelled this workflow had no other engine key configured here, measured
+  # nothing, and failed every Monday by design. Oracle already holds Gemini,
+  # OpenAI and Bright Data, so the probe runs there with nothing copied anywhere.
+  # Kept push- and dispatch-triggerable: with the right secrets set it still works.
   workflow_dispatch:
 
 jobs:

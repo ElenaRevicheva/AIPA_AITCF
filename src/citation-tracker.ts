@@ -180,10 +180,83 @@ async function getJson(url: string): Promise<any> {
  * behind a page_token that must be fetched from a second endpoint; both shapes are
  * normal, and "no AI Overview for this query" is a valid result, not an error.
  */
+/**
+ * Google AI Overview via Bright Data (brd_json=1) — the supply that replaced
+ * SerpAPI on 2026-08-17, when the SerpAPI plan was cancelled with 0 searches left
+ * and took this probe down with it. The reserve that existed to protect exactly
+ * this measurement had nothing left to protect.
+ *
+ * Bright Data returns the overview already parsed under `ai_overview`, with the
+ * body in `texts[].snippet` and the cited sources in `references[].href` — no
+ * page_token second hop, unlike SerpAPI. Verified live: an AI Overview is present
+ * for some queries and absent for others, which is Google's behaviour, not a
+ * failure — "no AI Overview for this query" stays a valid measured result.
+ */
+async function probeGoogleAiOverviewBD(prompt: string): Promise<EngineAnswer> {
+  const token = process.env.BRIGHTDATA_API_TOKEN?.trim();
+  const zone = process.env.BRIGHTDATA_ZONE?.trim();
+  if (!token || !zone) throw new Error('BRIGHTDATA_API_TOKEN/ZONE not set');
+
+  const params = new URLSearchParams({ q: prompt, gl: 'us', hl: 'en', brd_json: '1' });
+  const res = await fetch('https://api.brightdata.com/request', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      zone,
+      url: `https://www.google.com/search?${params.toString()}`,
+      format: 'raw',
+    }),
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`BrightData SERP ${res.status}`);
+
+  const raw = await res.text();
+  let data: any;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    // A non-JSON body means the proxy returned a challenge page, not that Google
+    // showed no overview. Failing loudly keeps it out of the "not cited" bucket.
+    throw new Error('BrightData returned non-JSON for SERP');
+  }
+
+  const overview = data?.ai_overview;
+  if (!overview) return { text: '', sources: [] };
+
+  const text = (overview.texts ?? [])
+    .map((t: any) => t?.snippet)
+    .filter(Boolean)
+    .join('\n');
+
+  // Bright Data names it `href`; SerpAPI named it `link`. Accept both so this
+  // keeps working if either provider renames a field.
+  const sources: CitationSource[] = (overview.references ?? [])
+    .map((r: any) => ({ url: String(r?.href ?? r?.link ?? ''), title: r?.title ?? r?.source }))
+    .filter((s: CitationSource) => s.url);
+
+  return { text, sources };
+}
+
+/**
+ * Dispatcher. Bright Data is the standing supply; SerpAPI is used only while a key
+ * exists AND still answers. A key that is present but out of searches must NOT
+ * become an error — an errored probe is unmeasured, and the whole point of this
+ * tracker is that "not measured" and "not cited" are different answers.
+ */
 async function probeGoogleAiOverview(prompt: string): Promise<EngineAnswer> {
   const key = process.env.SERPAPI_KEY?.trim();
-  if (!key) throw new Error('SERPAPI_KEY not set');
+  if (!key) return probeGoogleAiOverviewBD(prompt);
+  try {
+    return await probeGoogleAiOverviewSerp(prompt, key);
+  } catch (err) {
+    console.warn(
+      `[citation] SerpAPI AI-Overview failed (${String((err as Error)?.message).slice(0, 80)}) — using Bright Data`,
+    );
+    return probeGoogleAiOverviewBD(prompt);
+  }
+}
 
+async function probeGoogleAiOverviewSerp(prompt: string, key: string): Promise<EngineAnswer> {
   const params = new URLSearchParams({ engine: 'google', q: prompt, api_key: key, hl: 'en', gl: 'us' });
   let data = await getJson(`https://serpapi.com/search?${params}`);
 
@@ -299,8 +372,18 @@ async function probePerplexity(prompt: string): Promise<EngineAnswer> {
   return { text, sources: fromResults.length > 0 ? fromResults : fromCitations };
 }
 
-const ENGINES: Record<EngineId, { run: (p: string) => Promise<EngineAnswer>; keyEnv: string }> = {
-  'google-ai-overview': { run: probeGoogleAiOverview, keyEnv: 'SERPAPI_KEY' },
+const ENGINES: Record<
+  EngineId,
+  { run: (p: string) => Promise<EngineAnswer>; keyEnv: string; altKeyEnv?: string }
+> = {
+  // altKeyEnv: this engine now runs on EITHER supply. Without it, losing
+  // SERPAPI_KEY skipped the engine entirely — which is how a cancelled $25/mo
+  // plan silently took Google out of the citation picture.
+  'google-ai-overview': {
+    run: probeGoogleAiOverview,
+    keyEnv: 'SERPAPI_KEY',
+    altKeyEnv: 'BRIGHTDATA_API_TOKEN',
+  },
   'gemini-grounded': { run: probeGeminiGrounded, keyEnv: 'GEMINI_API_KEY' },
   'openai-search': { run: probeOpenAiSearch, keyEnv: 'OPENAI_API_KEY' },
   perplexity: { run: probePerplexity, keyEnv: 'PERPLEXITY_API_KEY' },
@@ -362,9 +445,16 @@ export async function runCitationProbes(options: RunOptions = {}): Promise<Citat
   const active: EngineId[] = [];
   const skipped: Array<{ engine: EngineId; reason: string }> = [];
   for (const engine of requested) {
-    const keyEnv = ENGINES[engine].keyEnv;
-    if (process.env[keyEnv]?.trim()) active.push(engine);
-    else skipped.push({ engine, reason: `${keyEnv} not set` });
+    const { keyEnv, altKeyEnv } = ENGINES[engine];
+    const hasKey = !!process.env[keyEnv]?.trim();
+    const hasAlt = !!(altKeyEnv && process.env[altKeyEnv]?.trim());
+    if (hasKey || hasAlt) active.push(engine);
+    else {
+      skipped.push({
+        engine,
+        reason: altKeyEnv ? `neither ${keyEnv} nor ${altKeyEnv} set` : `${keyEnv} not set`,
+      });
+    }
   }
 
   const jobs = active.flatMap((engine) => prompts.map((prompt) => ({ engine, prompt })));
