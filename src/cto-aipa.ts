@@ -3036,11 +3036,9 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       );
       console.log(`☀️ Sprint briefing cron: "${sprintCronExpr}" (${triageTz})`);
     }
-    // Client-prospect discovery — every 6h. Runs on BrightData SERP (primary, $200
-    // credits) OR legacy SerpAPI. May 31 2026: SerpAPI quota exhausted, so the gate
-    // now also fires on BrightData alone — the engine is BD-first regardless.
-    const serpDiscoveryEnabled = !!(process.env.SERPAPI_KEY?.trim()
-      || (process.env.BRIGHTDATA_API_TOKEN?.trim() && process.env.BRIGHTDATA_ZONE?.trim()));
+    // Client-prospect discovery — every 6h. Runs on BrightData SERP only —
+    // SerpAPI retired Aug 18 2026 (permanently cancelled, not an outage).
+    const serpDiscoveryEnabled = !!(process.env.BRIGHTDATA_API_TOKEN?.trim() && process.env.BRIGHTDATA_ZONE?.trim());
     if (serpDiscoveryEnabled) {
       // Run once at startup
       runSerpProspects().catch(e => console.error('[SerpProspects] startup error:', e));
@@ -3049,7 +3047,7 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
         console.log('[SerpProspects] Running 6h discovery cycle...');
         runSerpProspects().catch(e => console.error('[SerpProspects] cron error:', e));
       }, { timezone: triageTz });
-      console.log('[SerpProspects] Buying-intent client discovery (BrightData-first): every 6h');
+      console.log('[SerpProspects] Buying-intent client discovery (BrightData-only): every 6h');
     }
     // Podcast living dictionary — refresh daily from live market trends (Bright Data
     // headlines → LLM term extraction) so spoken jargon/product names transcribe right.
