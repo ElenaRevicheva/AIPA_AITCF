@@ -539,9 +539,28 @@ export function registerConciergeRoutes(app: Express): void {
      * single card; a genuine follow-up an hour later says something different
      * and rightly gets its own.
      */
+    /**
+     * Normalise before hashing, or the dedupe silently stops deduping.
+     *
+     * The same message reaches this endpoint in two different shapes. The inline
+     * and watchdog paths pass what the visitor typed ("hello"). Make passes only
+     * its draft text, so the recipient — and the inquiry — get resolved from the
+     * HubSpot contact, whose `message` property carries the routing stamp
+     * ("[AIDEAZZ-FORM] hello"). Hashing those raw produces two different
+     * fingerprints for one lead, and the moment Make is switched back on Elena
+     * would get TWO cards for every enquiry, with both paths reporting success.
+     *
+     * Strip the stamp and flatten whitespace so every drafter hashes the same
+     * thing. Dedupe is only as good as the agreement between its inputs.
+     */
+    const fingerprintText = (inquiry || '')
+      .replace(/^\s*\[AIDEAZZ-FORM\]\s*/i, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 500);
     const fingerprint = crypto
       .createHash('sha1')
-      .update(`${email.trim().toLowerCase()}|${(inquiry || '').replace(/\s+/g, ' ').trim().slice(0, 500)}`)
+      .update(`${email.trim().toLowerCase()}|${fingerprintText}`)
       .digest('hex');
     const DEDUPE_WINDOW_MS = 6 * 60 * 60 * 1000;
     const dupe = findDraftByFingerprintSince(fingerprint, Date.now() - DEDUPE_WINDOW_MS);
