@@ -571,6 +571,22 @@ export async function checkMakeHealth(): Promise<{
       return { ok: true, lastRunMinAgo, nextExecMinAway, action: 'none' };
     }
 
+    /**
+     * Off, or scheduled-but-not-running: Make cannot be relied on to draft.
+     *
+     * Recorded BEFORE the alert cooldown, because these are different questions.
+     * "Should Elena hear about this again?" is throttled to once every six hours;
+     * "can Make write the next reply?" must be current on every sweep. Putting
+     * this after the cooldown return would have frozen the verdict for six hours
+     * at whatever it last happened to be.
+     *
+     * This branch was also the gap that stopped the file appearing at all: it is
+     * the state Elena is actually in — both scenarios `isActive:false` and
+     * `isinvalid:true` — and it returned without recording anything, so ingest
+     * read "no verdict yet". Right answer, wrong reason.
+     */
+    writeMakeVerdict(false, sc.isActive ? 'scheduled but not running' : 'scenario switched OFF');
+
     if (!alertAllowed('make-unhealthy', MAKE_ALERT_COOLDOWN_MS)) {
       return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'none' };
     }
