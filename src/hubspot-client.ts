@@ -700,6 +700,70 @@ export async function findDealByName(name: string): Promise<{ id: string; stage:
 }
 
 /** Deal IDs associated with a contact (Concierge drafts park on the right deal). */
+/**
+ * Elena's own stage order, by how far along the deal is. Index = progress.
+ *
+ * The internal HubSpot ids read nothing like her labels (`decisionmakerboughtin`
+ * is the stage she calls "⏳ Sent — passive wait"), so comparing them by name is
+ * guesswork. This list is the single place that knows which way is forward.
+ */
+const STAGE_PROGRESSION: string[] = [
+  'appointmentscheduled',    // 🤖 AI working — ignore (not triaged yet)
+  'qualifiedtobuy',          // 🔥 I act TODAY
+  'presentationscheduled',   // ⚡ I act this week
+  'decisionmakerboughtin',   // ⏳ Sent — passive wait  ← a sent reply lands here
+  'contractsent',            // 💬 They replied — I act
+  'closedwon',               // ✅ Won
+  'closedlost',              // ❌ No fit
+];
+
+/**
+ * A reply went out — move the lead's deals to "⏳ Sent", but only ever FORWARD.
+ *
+ * Every CLIENT-CTO-INQUIRY deal was created in "🤖 AI working — ignore", and
+ * nothing ever moved it, so deals Elena had personally answered sat in the
+ * ignore column forever (flagged in the July 16 audit, unfixed until now). The
+ * board stopped describing reality, which is the only thing a board is for.
+ *
+ * Advancing only is the important half. If the prospect has already REPLIED the
+ * deal is at "💬 They replied — I act", and dragging it back to "Sent" because
+ * she sent a follow-up would bury the one deal that needs her today. Same for
+ * anything closed. An unknown stage is left alone rather than guessed at.
+ */
+export async function markDealsAsSentForContact(contactId: string): Promise<number> {
+  const target = HS_STAGES.negotiating; // 'decisionmakerboughtin' — "⏳ Sent"
+  const targetRank = STAGE_PROGRESSION.indexOf(target);
+  let moved = 0;
+  try {
+    const dealIds = await findDealIdsForContact(contactId);
+    for (const dealId of dealIds.slice(0, 5)) {
+      const d = await hsGet<{ properties?: { dealstage?: string; dealname?: string } }>(
+        `/crm/v3/objects/deals/${dealId}?properties=dealstage,dealname`,
+      );
+      const current = d?.properties?.dealstage || '';
+      const currentRank = STAGE_PROGRESSION.indexOf(current);
+      if (currentRank === -1) {
+        console.log(`[HubSpot] deal ${dealId} in unknown stage "${current}" — left alone`);
+        continue;
+      }
+      if (currentRank >= targetRank) {
+        console.log(`[HubSpot] deal ${dealId} already at or past "Sent" (${current}) — not moved back`);
+        continue;
+      }
+      const ok = await updateDeal(dealId, { stage: target });
+      if (ok) {
+        moved++;
+        console.log(`[HubSpot] deal ${dealId} ${current} → ${target} (reply sent)`);
+      } else {
+        console.warn(`[HubSpot] deal ${dealId} stage update FAILED — still ${current}`);
+      }
+    }
+  } catch (e) {
+    console.warn('[HubSpot] markDealsAsSentForContact error:', (e as Error).message?.slice(0, 90));
+  }
+  return moved;
+}
+
 export async function findDealIdsForContact(contactId: string): Promise<string[]> {
   try {
     const data = await hsGet<{ results?: Array<{ toObjectId?: string; id?: string }> }>(

@@ -232,12 +232,24 @@ async function sendTelegram(
 function logReplyToHubSpot(d: ConciergeDraft, edited: boolean): void {
   setImmediate(async () => {
     try {
-      const { findContactByEmail, addNoteToContact } = await import('./hubspot-client');
+      const { findContactByEmail, addNoteToContact, markDealsAsSentForContact } = await import('./hubspot-client');
       const contactId = await findContactByEmail(d.email);
       if (!contactId) {
         console.warn(`[concierge] CRM trail: no HubSpot contact for ${d.email} — note not logged`);
         return;
       }
+
+      /**
+       * The board has to agree with what actually happened.
+       *
+       * Tapping ✅ Send produced a note and an Email activity but left the deal
+       * in "🤖 AI working — ignore", so a lead Elena had personally answered was
+       * indistinguishable from one nobody had touched. Move it to "⏳ Sent —
+       * passive wait"; the helper only ever advances, so a prospect who has
+       * already replied is never dragged back out of her action column.
+       */
+      const moved = await markDealsAsSentForContact(contactId);
+      if (moved) console.log(`[concierge] ${moved} deal(s) moved to "Sent" for ${d.email}`);
       const esc = (s: string) =>
         s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
       await addNoteToContact(
