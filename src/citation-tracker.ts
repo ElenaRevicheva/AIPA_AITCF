@@ -115,10 +115,18 @@ const trackedDomain = (): string => (process.env.CITATION_DOMAIN || 'aideazz.xyz
  * which a portfolio can never outrank but a free audit API genuinely can.
  * Measuring only /portfolio scored /api's wins as losses.
  *
+ * /ai-ops-wiki.html joins them (Aug 19 2026) as the DEFINITION page. It races a
+ * third kind of query — "what is a single point of failure", "why did my webhook
+ * return 200 but do nothing" — which neither an entity page nor a tool page can
+ * win, and which answer engines answer by quoting a definition. It carries
+ * DefinedTermSet schema with a per-concept anchor precisely so a single entry
+ * can be cited on its own, and it grows an entry every session, so it is the
+ * page most likely to earn long-tail citations over time.
+ *
  * Comma-separated so a page can be added without a code change.
  */
 const primaryPaths = (): string[] =>
-  (process.env.CITATION_PRIMARY_PATH || '/portfolio,/api')
+  (process.env.CITATION_PRIMARY_PATH || '/portfolio,/api,/ai-ops-wiki.html')
     .split(',')
     .map((p) => p.trim().toLowerCase())
     .filter(Boolean);

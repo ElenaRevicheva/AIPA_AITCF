@@ -16,7 +16,9 @@
     "hashnode:publish:article": "node scripts/hashnode-publish.mjs --public --file scripts/hashnode-posts/from-executive-to-ai-builder.md",
     "make:sync-prompts": "node scripts/sync-make-prompts.cjs",
     "eval:llm": "node scripts/eval-llm-chain.cjs",
-    "concierge:selftest": "node scripts/concierge-selftest.cjs"
+    "concierge:selftest": "node scripts/concierge-selftest.cjs",
+    "wiki:ship": "node scripts/wiki-ship.cjs",
+    "wiki:lint": "node scripts/wiki-ship.cjs --dry"
   },
   "keywords": [],
   "author": "Elena Revicheva",
