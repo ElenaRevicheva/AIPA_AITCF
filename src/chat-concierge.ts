@@ -46,6 +46,22 @@ const IDENTITY_MAX_STRIKES = Number(process.env.CHAT_CONCIERGE_IDENTITY_STRIKES 
 
 type State = {
   seen: string[];
+  /**
+   * Identity we have ALREADY resolved for a thread, kept per thread.
+   *
+   * HubSpot hands us the identity as `associatedContactId`, and that id can stop
+   * resolving mid-conversation: it points at the chat VISITOR record, and any
+   * later recreate of the underlying contact leaves the thread referencing an id
+   * that now 404s. Our own force-recreate of allowlisted test inboxes does
+   * exactly that, which is how Elena's Aug 19 session produced an alert saying
+   * "(no email captured yet)" for a visitor whose email we had resolved for the
+   * previous message in the same thread two minutes earlier.
+   *
+   * Remembering it per thread costs nothing and carries no wrong-recipient risk:
+   * a thread is one conversation with one person, so reusing the identity we
+   * already proved for it cannot attach a message to somebody else.
+   */
+  threadEmails?: Record<string, { email: string; name?: string }>;
   /** Threads already pushed to HubSpot — one conversation is ONE deal, however
    * many messages the visitor sends. The first live run created three deals for
    * Irinsa's three lines; Elena needs one prospect, not a deal per sentence. */
@@ -193,6 +209,25 @@ async function collectNewVisitorMessages(state: State): Promise<VisitorMessage[]
         } catch {
           /* identity is a bonus — the alert goes out either way */
         }
+      }
+
+      /**
+       * Fall back to the identity this thread already proved.
+       *
+       * The lookup above silently returns nothing when the thread's contact id
+       * no longer resolves, and a null email is not the same as an anonymous
+       * visitor — it produces an alert claiming "no email captured yet" about
+       * somebody we can already reach. Remember what we learn, and reuse it for
+       * later messages in the same conversation.
+       */
+      const known = state.threadEmails?.[String(th.id)];
+      if (!email && known?.email) {
+        email = known.email;
+        name = name || known.name || null;
+        console.log(`[chat-concierge] thread ${th.id}: contact id no longer resolves — reusing known identity ${email}`);
+      } else if (email) {
+        state.threadEmails = state.threadEmails || {};
+        state.threadEmails[String(th.id)] = { email, ...(name ? { name } : {}) };
       }
 
       out.push({
