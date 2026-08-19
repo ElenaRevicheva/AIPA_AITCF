@@ -1183,12 +1183,24 @@ function findPrefixConflict(newSlug: string): { conflict: true; existingSlug: st
   try {
     const cacheFile = getBlogPostCachePath();
     if (!fs.existsSync(cacheFile)) return { conflict: false };
-    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, unknown>;
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, { stream?: string }>;
     const prefixLen = Number((process.env.DAILY_BLOG_SLUG_PREFIX_LEN ?? process.env.HASHNODE_DAILY_SLUG_PREFIX_LEN) || "30");
     if (!Number.isFinite(prefixLen) || prefixLen < 8) return { conflict: false };
     const newPrefix = newSlug.slice(0, prefixLen);
-    for (const existingSlug of Object.keys(cache)) {
+    for (const [existingSlug, entry] of Object.entries(cache)) {
       if (existingSlug === newSlug) continue; // exact match already handled by slugAlreadyPublished
+      /**
+       * Only DAILY posts can conflict with a daily post.
+       *
+       * This guard exists to catch two near-identical generated articles (the
+       * BrightData variants that differed only by suffix). A wiki field note is
+       * a different article about a real incident — if one is titled after
+       * pgvector and the generator later picks the pgvector topic, their 30-char
+       * prefixes collide and the whole day's post is skipped for no reason.
+       * Same lesson as the sliding-window mutex: a second editorial stream must
+       * not be able to veto the first.
+       */
+      if (entry?.stream && entry.stream !== "daily") continue;
       if (existingSlug.startsWith(newPrefix) || newSlug.startsWith(existingSlug.slice(0, prefixLen))) {
         return { conflict: true, existingSlug };
       }
