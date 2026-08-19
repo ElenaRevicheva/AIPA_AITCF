@@ -303,6 +303,43 @@ function findDraftByTgMessage(messageId: number): ConciergeDraft | null {
   return null;
 }
 
+/**
+ * Write the reply ourselves, on Oracle, through the five-provider waterfall.
+ *
+ * Until now every card in Elena's Telegram was written by an `anthropic-claude`
+ * module INSIDE a Make scenario, so the whole money path terminated at a single
+ * prepaid balance: when it hit zero (Aug 15-19 2026) Make answered `[400] credit
+ * balance is too low` every 15 minutes and not one lead got a draft. Meanwhile
+ * the fleet's own chain — claude → openai → gemini → groq → grok, the same one
+ * shipped to the other five products — was sitting right here answering in under
+ * a second on providers that cost nothing.
+ *
+ * So the drafting brain moves in-process. Make may keep its Anthropic module and
+ * keep failing; nothing downstream depends on it any more. `quality` is the right
+ * profile because a human reads every word of this: Claude first when it is
+ * funded, OpenAI next, then the free tiers — never a silent drop to whatever
+ * happened to be cheapest.
+ */
+export async function draftConciergeReply(lead: {
+  name?: string;
+  email?: string;
+  inquiry?: string;
+}): Promise<{ raw: string; provider: string; skipped: string[]; ms: number }> {
+  const { CONCIERGE_RULES } = await import('./concierge-prompt.js');
+  const { completeWithProfileDetailed } = await import('./llm-resilience.js');
+  const first = (lead.name || lead.email || 'there').split(/[\s@]/)[0];
+  const userPrompt =
+    `Their message: "${lead.inquiry || '(no message text captured — they reached out via the site)'}"\n` +
+    `Their name: ${first}` +
+    (lead.email ? `\nTheir email: ${lead.email}` : '');
+  const out = await completeWithProfileDetailed('quality', CONCIERGE_RULES, userPrompt, 700, 'concierge-draft');
+  console.log(
+    `[concierge] draft written by ${out.provider} in ${out.ms}ms (${out.text.length} chars)` +
+      (out.skipped.length ? ` — skipped: ${out.skipped.join('; ').slice(0, 200)}` : ''),
+  );
+  return { raw: out.text, provider: out.provider, skipped: out.skipped, ms: out.ms };
+}
+
 export function registerConciergeRoutes(app: Express): void {
   // Make's HTTP module can't JSON-escape multi-line drafts; form-urlencoded
   // fields are encoded natively by Make, so accept both content types here.
@@ -320,8 +357,21 @@ export function registerConciergeRoutes(app: Express): void {
     let email = typeof b.email === 'string' ? b.email.trim() : '';
     let name = typeof b.name === 'string' ? b.name.trim() : '';
     let inquiry = typeof b.inquiry === 'string' ? b.inquiry.trim() : '';
-    const claudeOutput =
+    let claudeOutput =
       typeof b.claude_output === 'string' ? b.claude_output : typeof b.draft === 'string' ? b.draft : '';
+    /**
+     * A pipeline verification, not a prospect.
+     *
+     * Self-testing this path used to be impossible: the rules tell the model to
+     * answer `SPAM` to anything that reads like a test, so every probe Elena or
+     * I sent was correctly judged spam and dropped — indistinguishable in her
+     * Telegram from a dead pipeline (Aug 18 2026, "TEST — GBP product UTM check").
+     * The cure is NOT to weaken the spam rule. The canary writes a realistic
+     * inquiry the model answers normally, and carries the flag out-of-band in
+     * this field, where only our own code sees it. The model's judgement is
+     * unchanged; the card is just labelled, and the reply is never mailed out.
+     */
+    const selfTest = b.selftest === '1' || b.selftest === 'true' || b.selftest === true;
     // Make's per-property chips can arrive blank (the raw-record chip is the
     // reliable one — see LEAD_CONCIERGE_SETUP.md second fix). Fall back to
     // extracting from the raw HubSpot record JSON when direct fields are empty.
@@ -344,12 +394,56 @@ export function registerConciergeRoutes(app: Express): void {
           .slice(0, 1000);
       }
     }
+    /**
+     * No draft text supplied → write it here instead of rejecting the lead.
+     *
+     * This endpoint used to hard-require `claude_output`, which quietly made
+     * Make's prepaid Anthropic balance a single point of failure for the entire
+     * money path: no credits → no `claude_output` → 400 → no card, no matter how
+     * many healthy providers Oracle had. Now the caller may post nothing but the
+     * lead itself and get the same card back. Make keeps working exactly as
+     * before when it does send text; it simply is no longer required to.
+     */
+    let draftedHere: { provider: string; ms: number } | null = null;
     if (!claudeOutput.trim()) {
-      res.status(400).json({ error: 'claude_output (Fable 5 text) required' });
-      return;
+      if (!emailOk(email) && !inquiry.trim()) {
+        res.status(400).json({ error: 'need claude_output, or an email/inquiry to draft from' });
+        return;
+      }
+      try {
+        const written = await draftConciergeReply({ name, email, inquiry });
+        claudeOutput = written.raw;
+        draftedHere = { provider: written.provider, ms: written.ms };
+      } catch (e) {
+        // Every provider refused. Say so loudly and page Elena — a lead arriving
+        // during a total LLM outage must not disappear just because no machine
+        // could phrase the answer.
+        const why = (e as Error).message?.slice(0, 300) || 'unknown';
+        console.error(`[concierge] ALL PROVIDERS FAILED for ${email || name || 'unknown lead'}: ${why}`);
+        await sendTelegram(
+          `🆘 A lead arrived and every LLM provider failed — reply by hand.\n\n` +
+            `👤 ${name || '(no name)'}\n📧 ${email || '(no email)'}\n\n` +
+            (inquiry ? `💬 ${inquiry.slice(0, 900)}\n\n` : '') +
+            `Chain error: ${why.slice(0, 300)}`,
+        );
+        res.status(503).json({ error: 'all providers failed', detail: why });
+        return;
+      }
     }
 
     const { draft, subject, spam } = parseClaudeOutput(claudeOutput);
+    if (spam && selfTest) {
+      // The canary is supposed to exercise the whole path. If the model still
+      // rules SPAM on realistic wording that is a real finding about the rules —
+      // report it as a failed check rather than swallowing it as a spam drop.
+      console.error('[concierge] SELF-TEST judged SPAM by the model — the canary wording needs work');
+      await sendTelegram(
+        `🧪 Concierge self-test: reached the model, but it ruled the probe SPAM — no card produced.\n` +
+          `The plumbing works; the canary wording needs to look less like a test.`,
+      );
+      res.json({ ok: true, selftest: true, spam: true });
+      return;
+    }
     if (spam) {
       // Tell the watchdog Make already ruled on this one — it must not re-draft.
       if (email) noteConciergeSpamVerdict(email);
@@ -458,10 +552,15 @@ export function registerConciergeRoutes(app: Express): void {
       status: 'pending',
       createdAt: new Date().toISOString(),
     };
+    // Say who wrote it. With five providers behind one card, "Fable 5 draft" was
+    // a lie whenever Anthropic was dry — and the routing decision is exactly the
+    // thing Elena needs to see to know whether the waterfall is doing its job.
+    const writtenBy = draftedHere ? `✍️ Draft (${draftedHere.provider}, ${draftedHere.ms}ms)` : '✍️ Fable 5 draft (Make)';
     const tgMessageId = await sendTelegram(
-      `📨 New lead: ${d.name} <${d.email}>\n` +
+      (selfTest ? `🧪 SELF-TEST — pipeline check, do NOT send\n\n` : '') +
+        `📨 New lead: ${d.name} <${d.email}>\n` +
         (inquiry ? `\n💬 They wrote:\n${inquiry.slice(0, 500)}\n` : '') +
-        `\n✍️ Fable 5 draft:\n──────────\n${draft}\n──────────\n📧 Subject: ${subject}`,
+        `\n${writtenBy}:\n──────────\n${draft}\n──────────\n📧 Subject: ${subject}`,
       [
         [
           { text: '✅ Send now', callback_data: `cz:send:${d.id}` },

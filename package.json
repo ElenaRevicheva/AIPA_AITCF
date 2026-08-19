@@ -15,7 +15,8 @@
     "test:manual-cycle": "node scripts/test-manual-prospect-cycle.cjs",
     "hashnode:publish:article": "node scripts/hashnode-publish.mjs --public --file scripts/hashnode-posts/from-executive-to-ai-builder.md",
     "make:sync-prompts": "node scripts/sync-make-prompts.cjs",
-    "eval:llm": "node scripts/eval-llm-chain.cjs"
+    "eval:llm": "node scripts/eval-llm-chain.cjs",
+    "concierge:selftest": "node scripts/concierge-selftest.cjs"
   },
   "keywords": [],
   "author": "Elena Revicheva",

@@ -431,14 +431,35 @@ export async function completeWithProfile(
   maxTokens: number,
   label: string,
 ): Promise<string> {
+  return (await completeWithProfileDetailed(profile, systemPrompt, userPrompt, maxTokens, label)).text;
+}
+
+/**
+ * Same walk, but it also says WHO answered and who refused on the way.
+ *
+ * "Five providers with intelligent fallback" is only a claim until a log line
+ * names the one that actually produced the text a prospect will read. Callers
+ * that put the answer in front of a human (the concierge card, the self-test
+ * canary) surface `provider` so a drought is visible as a routing decision
+ * rather than as an unexplained change in tone — and so "which provider wrote
+ * this?" is answerable after the fact instead of guessed.
+ */
+export async function completeWithProfileDetailed(
+  profile: ChainProfile,
+  systemPrompt: string | null,
+  userPrompt: string,
+  maxTokens: number,
+  label: string,
+): Promise<{ text: string; provider: ProviderName; skipped: string[]; ms: number }> {
   const budget = Math.max(maxTokens, MIN_REASONING_TOKENS);
   const reasons: string[] = [];
+  const startedAt = Date.now();
   for (const provider of CHAIN_ORDER[profile]) {
     try {
       const text = await callProvider(provider, systemPrompt, userPrompt, budget, label, profile);
       if (text) {
         if (reasons.length) console.warn(`[${label}] ${profile}: ${provider} answered after ${reasons.length} failure(s)`);
-        return text;
+        return { text, provider, skipped: reasons, ms: Date.now() - startedAt };
       }
       reasons.push(`${provider}: empty`);
     } catch (e) {

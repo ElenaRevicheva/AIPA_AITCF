@@ -1396,10 +1396,53 @@ async function startCTOAIPA() {
           }
         } else if (needsMakeWebhook && !makeHook) {
           console.warn(
-            '[inquiry] MAKE_CONCIERGE_WEBHOOK_URL not set — instant drafting disabled, ' +
-              'leads fall back to 15-min polling and the 20-min watchdog',
+            '[inquiry] MAKE_CONCIERGE_WEBHOOK_URL not set — Make backup path disabled',
           );
         }
+
+        /**
+         * Draft it ourselves, right now, without waiting for anything external.
+         *
+         * Every path to a card used to run through Make: the webhook scenario, or
+         * the 15-min poller, or — only after 20 minutes of proven silence — the
+         * watchdog. So the fastest possible answer for a brand-new prospect was
+         * "however long Make feels like taking", and on a low-priority Make plan
+         * that was measured at 1.5h, 5h and 9h between runs. When Make's Anthropic
+         * balance emptied it became "never" (Aug 15-19 2026: six consecutive
+         * `[400] credit balance too low`, zero drafts).
+         *
+         * The contact and deal exist by this line, so the card can be built
+         * immediately from data we already hold, drafted on the five-provider
+         * waterfall, and delivered in seconds. Make and the watchdog stay wired
+         * and stay welcome — /concierge/draft dedupes on person+message, so
+         * whichever of the three arrives first is the one Elena sees and the
+         * others collapse into it. Redundancy without duplicate cards is the
+         * whole point; this simply makes the fast path the one we control.
+         */
+        setImmediate(async () => {
+          try {
+            const secret = process.env.CONCIERGE_SECRET?.trim();
+            if (!secret) {
+              console.warn('[inquiry] CONCIERGE_SECRET not set — inline drafting skipped');
+              return;
+            }
+            const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
+            const r = await fetch(`${base}/concierge/draft`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({
+                email: contactEmail || '',
+                name: name || '',
+                inquiry: message || '',
+              }),
+            });
+            // A 200 is not proof of a card: the endpoint also answers 200 for a
+            // spam verdict, a duplicate and an unresolved recipient. Log which.
+            console.log(`[inquiry] inline draft → ${r.status} ${(await r.text()).slice(0, 160)}`);
+          } catch (e) {
+            console.warn('[inquiry] inline draft failed (watchdog still covers):', (e as Error).message?.slice(0, 90));
+          }
+        });
       } catch (e) {
         console.warn('[inquiry] HubSpot push non-fatal:', (e as Error).message?.slice(0, 80));
       }

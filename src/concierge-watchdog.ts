@@ -151,44 +151,26 @@ async function generateAndPostDraft(w: Watch): Promise<boolean> {
     return false;
   }
   const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
-  const first = (w.name || w.email).split(/[\s@]/)[0];
 
-  // One canonical copy, shared with both Make scenarios — see concierge-prompt.ts.
-  const { CONCIERGE_RULES } = await import('./concierge-prompt.js');
-  const system = CONCIERGE_RULES;
-  const userPrompt = `Their message: "${w.text || '(no message text captured — they reached out via the site)'}"\nTheir name: ${first}`;
-
-  let text = '';
-  try {
-    const mod: any = await import('@anthropic-ai/sdk');
-    // CommonJS interop: depending on how the SDK is transpiled the constructor is
-    // either the namespace default or module.exports itself. Picking the wrong one
-    // yields `undefined`, and `new undefined()` throws inside this try — which is
-    // indistinguishable from an API failure in the log. Resolve it explicitly.
-    const Anthropic = mod?.default ?? mod?.Anthropic ?? mod;
-    if (typeof Anthropic !== 'function') {
-      console.error('[watchdog] Anthropic SDK export is not a constructor — cannot draft');
-      return false;
-    }
-    const { claudeWithGroqFallback } = await import('./llm-resilience.js');
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'missing' });
-    text = await claudeWithGroqFallback(anthropic, 'claude-opus-5', 500, system, userPrompt, 'concierge-watchdog');
-    console.log(`[watchdog] LLM returned ${text.trim().length} chars for ${w.email}`);
-  } catch (e) {
-    console.error('[watchdog] draft LLM failed:', (e as Error).message?.slice(0, 200));
-  }
-  if (!text.trim()) {
-    // Was silent before: an empty completion looked exactly like a crash.
-    console.error(`[watchdog] LLM produced an EMPTY draft for ${w.email} — nothing to post`);
-    return false;
-  }
-
+  /**
+   * No LLM call here any more — post the lead and let /concierge/draft write it.
+   *
+   * This function used to run its own `claudeWithGroqFallback`: a two-provider
+   * chain that opened on a hard-coded `claude-opus-5`. With Anthropic dry that
+   * meant every watchdog draft depended on Groq alone, and Groq returns EMPTY
+   * rather than erroring at small budgets — which is exactly the failure logged
+   * on Aug 18 ("LLM produced an EMPTY draft for watchdog-verify3"): a dead end
+   * with four healthy providers untried.
+   *
+   * The endpoint now owns drafting for every caller, on the full five-provider
+   * `quality` chain, treating empty as a failure and walking on. Keeping a second
+   * copy of that logic here is how the two drifted apart in the first place.
+   */
   try {
     const body = new URLSearchParams({
       email: w.email,
       name: w.name,
       inquiry: w.text,
-      claude_output: text,
     });
     const r = await fetch(`${base}/concierge/draft`, {
       method: 'POST',
@@ -349,7 +331,10 @@ async function notifyOwners(text: string): Promise<void> {
 const MAKE_STATUS_ERROR = 3;
 const MAKE_STALE_MIN = Number(process.env.MAKE_STALE_MIN ?? 45);
 const MAKE_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+/** Standing, accepted conditions (empty Anthropic balance) get a daily voice, not a six-hourly one. */
+const CREDIT_ALERT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 let lastMakeAlertAt = 0;
+let lastCreditAlertAt = 0;
 
 export async function checkMakeHealth(): Promise<{
   ok: boolean;
@@ -429,16 +414,39 @@ export async function checkMakeHealth(): Promise<{
             Date.parse(l.timestamp) > Date.parse(lastError.timestamp),
         );
       if (lastError && !recoveredSince && errMinAgo !== null && errMinAgo <= 6 * 60) {
-        if (Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS) {
-          lastMakeAlertAt = Date.now();
-          const msg = String(lastError.error?.message || 'unknown error').slice(0, 300);
-          const mod = lastError.error?.causeModule?.appName || 'a module';
+        const msg = String(lastError.error?.message || 'unknown error').slice(0, 300);
+        const mod = lastError.error?.causeModule?.appName || 'a module';
+        /**
+         * An empty Anthropic balance is a KNOWN state, not breaking news.
+         *
+         * Elena decided on Aug 19 2026 to leave Make's Anthropic module in place
+         * and top it up when she has the money; drafting moved to Oracle's own
+         * five-provider chain the same day, so this error costs her nothing. It
+         * will therefore be true continuously for as long as the balance is zero.
+         * Repeating it every six hours trains her to swipe the concierge's alerts
+         * away — which is precisely how a real one gets missed. Once a day, and
+         * worded as the accepted state it is.
+         */
+        const isCredit = /credit balance|too low|billing|purchase credits/i.test(msg);
+        const cooldown = isCredit ? CREDIT_ALERT_COOLDOWN_MS : MAKE_ALERT_COOLDOWN_MS;
+        const lastAt = isCredit ? lastCreditAlertAt : lastMakeAlertAt;
+        if (Date.now() - lastAt > cooldown) {
+          if (isCredit) lastCreditAlertAt = Date.now();
+          else lastMakeAlertAt = Date.now();
           await notifyOwners(
-            `⚠️ Make Lead Concierge is ERRORING\n\n` +
-              `Its last run (${errMinAgo} min ago) failed in ${mod}:\n\n"${msg}"\n\n` +
-              `Leads are reaching the scenario but no draft comes out of it.\n\n` +
-              `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
-              `Nothing is lost — I draft for everyone Make misses.`,
+            isCredit
+              ? `💤 Make is still out of Anthropic credits — and it no longer matters\n\n` +
+                  `Make's ${mod} module says:\n"${msg}"\n\n` +
+                  `Your leads are NOT waiting on it. Every draft is now written on Oracle ` +
+                  `through the 5-provider waterfall (claude → openai → gemini → groq → grok), ` +
+                  `the same one your other products use. Make is optional backup.\n\n` +
+                  `Top the balance up whenever you like — nothing is blocked on it.\n` +
+                  `You will hear this at most once a day.`
+              : `⚠️ Make Lead Concierge is ERRORING\n\n` +
+                  `Its last run (${errMinAgo} min ago) failed in ${mod}:\n\n"${msg}"\n\n` +
+                  `Leads are reaching the scenario but no draft comes out of it.\n\n` +
+                  `https://us2.make.com/938264/scenarios/${scenarioId}/edit\n\n` +
+                  `Nothing is lost — I draft for everyone Make misses.`,
           );
         }
         console.error(`[watchdog] MAKE ERRORING — ${lastError.error?.message?.slice(0, 120)}`);
@@ -539,7 +547,9 @@ export async function checkWebhookScenarioHealth(): Promise<{ ok: boolean; reaso
       );
 
     if (sc.isActive && !(lastError && !recovered)) return { ok: true, reason: 'healthy' };
-    if (Date.now() - lastWebhookAlertAt < MAKE_ALERT_COOLDOWN_MS) return { ok: false, reason: 'cooling down' };
+    // Same reasoning as the credit alert: this scenario being off is no longer a
+    // lead-loss risk now that Oracle drafts at ingest, so it is a daily note.
+    if (Date.now() - lastWebhookAlertAt < CREDIT_ALERT_COOLDOWN_MS) return { ok: false, reason: 'cooling down' };
     lastWebhookAlertAt = Date.now();
 
     const why = !sc.isActive
