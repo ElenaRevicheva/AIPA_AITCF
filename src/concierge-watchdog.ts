@@ -333,8 +333,50 @@ const MAKE_STALE_MIN = Number(process.env.MAKE_STALE_MIN ?? 45);
 const MAKE_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 /** Standing, accepted conditions (empty Anthropic balance) get a daily voice, not a six-hourly one. */
 const CREDIT_ALERT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-let lastMakeAlertAt = 0;
-let lastCreditAlertAt = 0;
+
+/**
+ * Alert cooldowns live ON DISK, because the process restarts.
+ *
+ * These were module-level counters, with a comment claiming a pm2 restart
+ * "re-arms every alert, which is the safe direction to fail". That was wrong in
+ * the only way that matters: on Aug 19 2026 six deploys in an afternoon reset
+ * the counters six times, and Elena received the same two Make notices at 14:23,
+ * 14:40, 15:09 and 15:37 — each one promising "you will hear this at most once
+ * a day". An alert that repeats is an alert that gets muted, and the next real
+ * one goes with it.
+ *
+ * A restart is not new information about Make, so the clock must outlive the
+ * process. Fails OPEN on a read/write error: a duplicate notice is a nuisance,
+ * a swallowed one is a missed lead.
+ */
+const ALERT_CLOCK = path.join(process.cwd(), 'data', 'alert-cooldowns.json');
+
+function alertAllowed(key: string, cooldownMs: number): boolean {
+  try {
+    let clock: Record<string, number> = {};
+    try {
+      clock = JSON.parse(fs.readFileSync(ALERT_CLOCK, 'utf8')) as Record<string, number>;
+    } catch {
+      /* first run — no clock yet */
+    }
+    const last = Number(clock[key]) || 0;
+    const waited = Date.now() - last;
+    if (waited < cooldownMs) {
+      console.log(
+        `[watchdog] alert "${key}" suppressed — ${(waited / 3600000).toFixed(1)}h since last, ` +
+          `cooldown ${(cooldownMs / 3600000).toFixed(0)}h`,
+      );
+      return false;
+    }
+    clock[key] = Date.now();
+    fs.mkdirSync(path.dirname(ALERT_CLOCK), { recursive: true });
+    fs.writeFileSync(ALERT_CLOCK, JSON.stringify(clock, null, 2), 'utf8');
+    return true;
+  } catch (e) {
+    console.warn('[watchdog] alert clock unreadable, allowing:', (e as Error).message?.slice(0, 80));
+    return true;
+  }
+}
 
 export async function checkMakeHealth(): Promise<{
   ok: boolean;
@@ -429,10 +471,7 @@ export async function checkMakeHealth(): Promise<{
          */
         const isCredit = /credit balance|too low|billing|purchase credits/i.test(msg);
         const cooldown = isCredit ? CREDIT_ALERT_COOLDOWN_MS : MAKE_ALERT_COOLDOWN_MS;
-        const lastAt = isCredit ? lastCreditAlertAt : lastMakeAlertAt;
-        if (Date.now() - lastAt > cooldown) {
-          if (isCredit) lastCreditAlertAt = Date.now();
-          else lastMakeAlertAt = Date.now();
+        if (alertAllowed(isCredit ? 'make-credit' : 'make-erroring', cooldown)) {
           await notifyOwners(
             isCredit
               ? `💤 Make is still out of Anthropic credits — and it no longer matters\n\n` +
@@ -454,9 +493,7 @@ export async function checkMakeHealth(): Promise<{
       }
 
       if (!producedRecently && missed > 0) {
-        const cooled = Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS;
-        if (cooled) {
-          lastMakeAlertAt = Date.now();
+        if (alertAllowed('make-unproductive', MAKE_ALERT_COOLDOWN_MS)) {
           await notifyOwners(
             `⚠️ Make runs, but drafts NOTHING\n\n` +
               `The Lead Concierge is on schedule and looks healthy, but not one of its ` +
@@ -476,9 +513,9 @@ export async function checkMakeHealth(): Promise<{
       return { ok: true, lastRunMinAgo, nextExecMinAway, action: 'none' };
     }
 
-    const cooled = Date.now() - lastMakeAlertAt > MAKE_ALERT_COOLDOWN_MS;
-    if (!cooled) return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'none' };
-    lastMakeAlertAt = Date.now();
+    if (!alertAllowed('make-unhealthy', MAKE_ALERT_COOLDOWN_MS)) {
+      return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'none' };
+    }
 
     // Self-heal. Someone switching it off, or a scheduler left un-armed after an
     // edit, are both cured by a clean stop→start, which recomputes nextExec.
@@ -549,8 +586,7 @@ export async function checkWebhookScenarioHealth(): Promise<{ ok: boolean; reaso
     if (sc.isActive && !(lastError && !recovered)) return { ok: true, reason: 'healthy' };
     // Same reasoning as the credit alert: this scenario being off is no longer a
     // lead-loss risk now that Oracle drafts at ingest, so it is a daily note.
-    if (Date.now() - lastWebhookAlertAt < CREDIT_ALERT_COOLDOWN_MS) return { ok: false, reason: 'cooling down' };
-    lastWebhookAlertAt = Date.now();
+    if (!alertAllowed('make-webhook-off', CREDIT_ALERT_COOLDOWN_MS)) return { ok: false, reason: 'cooling down' };
 
     const why = !sc.isActive
       ? 'It is switched OFF.'
@@ -597,8 +633,7 @@ export async function checkPromptDrift(): Promise<{ checked: number; drifted: st
       out.checked++;
       if (extractRules(msg) !== CONCIERGE_RULES.trim()) out.drifted.push(id);
     }
-    if (out.drifted.length && Date.now() - lastDriftAlertAt > MAKE_ALERT_COOLDOWN_MS) {
-      lastDriftAlertAt = Date.now();
+    if (out.drifted.length && alertAllowed('make-prompt-drift', MAKE_ALERT_COOLDOWN_MS)) {
       await notifyOwners(
         `⚠️ A Make concierge prompt has drifted\n\n` +
           `Scenario ${out.drifted.join(', ')} no longer matches the rules in the repo, so Make and I would ` +
@@ -613,8 +648,6 @@ export async function checkPromptDrift(): Promise<{ checked: number; drifted: st
   return out;
 }
 
-let lastWebhookAlertAt = 0;
-let lastDriftAlertAt = 0;
 let timer: NodeJS.Timeout | null = null;
 let makeTimer: NodeJS.Timeout | null = null;
 
