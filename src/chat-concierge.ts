@@ -350,33 +350,21 @@ async function postFallbackDraft(m: VisitorMessage): Promise<boolean> {
   const secret = process.env.CONCIERGE_SECRET?.trim();
   if (!secret || !m.email) return false;
   const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
-  const first = (m.name || m.email).split(/[\s@]/)[0];
 
-  // One canonical copy, shared with the watchdog and both Make scenarios. This
-  // file used to carry its own fourth copy, which had already fallen behind: it
-  // still ended every draft with a sales call, so a job seeker who arrived
-  // through the chat bubble got pitched instead of answered.
-  const { CONCIERGE_RULES } = await import('./concierge-prompt.js');
-  const system = CONCIERGE_RULES;
-  const userPrompt = `Their message: "${m.text}"\nTheir name: ${first}`;
-
-  let text = '';
-  try {
-    const Anthropic = (await import('@anthropic-ai/sdk')).default;
-    const { claudeWithGroqFallback } = await import('./llm-resilience.js');
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'missing' });
-    text = await claudeWithGroqFallback(anthropic, 'claude-opus-5', 500, system, userPrompt, 'chat-fallback-draft');
-  } catch (e) {
-    console.warn('[chat-concierge] fallback draft LLM failed:', (e as Error).message?.slice(0, 90));
-  }
-  if (!text.trim()) return false;
-
+  /**
+   * No LLM call here — post the lead and let /concierge/draft write it.
+   *
+   * This was the last of the four copies of the drafting logic, and the most
+   * out of date: a two-provider chain opening on a hard-coded `claude-opus-5`,
+   * exactly what produced empty drafts once the Anthropic balance emptied. The
+   * endpoint now owns drafting for every caller on the full five-provider
+   * `quality` chain.
+   */
   try {
     const body = new URLSearchParams({
       email: m.email,
       name: m.name || '',
       inquiry: m.text,
-      claude_output: text,
     });
     const r = await fetch(`${base}/concierge/draft`, {
       method: 'POST',
@@ -484,10 +472,23 @@ export async function pollChatOnce(
           // gaps, so relying on it for a brand-new visitor meant they waited
           // longer than a returning one. Polling stays on as backup, and
           // /concierge/draft dedupes on person+message so both firing is safe.
-          if (!(await postToMakeWebhook(m))) {
-            // Make could not take it — draft it ourselves rather than lose the lead.
-            await postFallbackDraft(m);
-          } else if (makeWillFire) {
+          /**
+           * Draft unconditionally. Make's 200 is NOT evidence it will answer.
+           *
+           * This used to read "if Make refused it, draft it ourselves" — and
+           * Make's webhook endpoint returns 200 even when the scenario behind
+           * it is switched off, which scenario 5953877 has been since Aug 15
+           * 2026. So `r.ok` was true, the fallback never ran, and every chat
+           * lead silently waited 20 minutes for the watchdog instead. A queue
+           * that accepts your message and never reads it looks exactly like one
+           * that works.
+           *
+           * The endpoint dedupes on person+message, so drafting here costs
+           * nothing when Make does eventually answer — the second one collapses.
+           */
+          await postToMakeWebhook(m);
+          await postFallbackDraft(m);
+          if (makeWillFire) {
             console.log(`[chat-concierge] new contact — polling scenario may also see ${m.email} (deduped)`);
           }
         }
@@ -500,7 +501,9 @@ export async function pollChatOnce(
       // see it — July 29's follow-up message went unanswered for exactly this
       // reason. Hand it to the webhook scenario, and draft locally if that fails.
       console.log(`[chat-concierge] thread ${m.threadId} already in HubSpot — no second deal, drafting reply`);
-      if (!(await postToMakeWebhook(m))) await postFallbackDraft(m);
+      // Same reasoning as above: Make's 200 proves delivery, never an answer.
+      await postToMakeWebhook(m);
+      await postFallbackDraft(m);
     } else if (!m.email && !alreadyPushed) {
       // Anonymous for now — remember the thread and pick the identity up later.
       const pend = state.pendingIdentity || [];
