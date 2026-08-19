@@ -245,7 +245,11 @@ async function main() {
   }
 
   if (devtoUrl) article.devtoUrl = devtoUrl;
-  saveBlogPostCache({ slug, title, markdown, devtoUrl: devtoUrl || '', aideazzBlogUrl: canonical });
+  // stream:'fieldnote' keeps these out of the DAILY generator's sliding-window
+  // mutex. They are a separate, hand-curated cadence; on Aug 19 2026 three of
+  // them written here made the next daily run refuse with 'last publish was
+  // 0.2h ago' and the blog looked dead.
+  saveBlogPostCache({ slug, title, markdown, devtoUrl: devtoUrl || '', aideazzBlogUrl: canonical, stream: 'fieldnote' });
   const ok = await pushOneArticleHtml(article);
   console.log(`blog page ${ok ? 'PUBLISHED' : 'FAILED'}: ${canonical}`);
   if (ok) await pushSitemapToGithub().catch(e => console.warn('sitemap push:', e.message));

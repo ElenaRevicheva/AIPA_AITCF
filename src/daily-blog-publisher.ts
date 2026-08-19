@@ -494,12 +494,26 @@ function writeTopicIndex(i: number): void {
   fs.writeFileSync(statePath(), JSON.stringify({ lastIndex: i, updatedAt: new Date().toISOString() }, null, 2), "utf8");
 }
 
-/** Write published post to data/blog-posts-cache.json so blog-es-bundle can serve it without hitting dev.to's paginated API. */
-export function saveBlogPostCache(entry: { slug: string; title: string; markdown: string; devtoUrl: string; aideazzBlogUrl: string }): void {
+/**
+ * Write published post to data/blog-posts-cache.json so blog-es-bundle can serve
+ * it without hitting dev.to's paginated API.
+ *
+ * `stream` says WHICH publisher produced the entry, and it matters because the
+ * daily generator's cooldown reads this same file. Anything written here without
+ * a stream is a daily post (every entry predating Aug 19 2026), so the default
+ * preserves the old behaviour exactly. Hand-curated streams — the AI Ops Wiki
+ * field notes — pass "fieldnote" so they stay servable and stay in the sitemap
+ * without being mistaken for the daily cadence.
+ */
+export type BlogStream = "daily" | "fieldnote";
+
+export function saveBlogPostCache(entry: {
+  slug: string; title: string; markdown: string; devtoUrl: string; aideazzBlogUrl: string; stream?: BlogStream;
+}): void {
   const cacheFile = path.join((process.env.DAILY_BLOG_TOPIC_STATE_DIR ?? process.env.HASHNODE_TOPIC_STATE_DIR) || path.join(process.cwd(), "data"), "blog-posts-cache.json");
   let cache: Record<string, typeof entry & { publishedAt: string }> = {};
   try { cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")); } catch { /* first run */ }
-  cache[entry.slug] = { ...entry, publishedAt: new Date().toISOString() };
+  cache[entry.slug] = { ...entry, stream: entry.stream ?? "daily", publishedAt: new Date().toISOString() };
   fs.writeFileSync(cacheFile, JSON.stringify(cache, null, 2), "utf8");
 }
 
@@ -1132,12 +1146,23 @@ function recentPublishCutoffOk(): { ok: true } | { ok: false; reason: string; ho
   try {
     const cacheFile = getBlogPostCachePath();
     if (!fs.existsSync(cacheFile)) return { ok: true };
-    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, { publishedAt?: string }>;
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, { publishedAt?: string; stream?: string }>;
     const minHours = Number((process.env.DAILY_BLOG_MIN_HOURS_BETWEEN_PUBLISHES ?? process.env.HASHNODE_DAILY_MIN_HOURS_BETWEEN_PUBLISHES) || "12");
     if (!Number.isFinite(minHours) || minHours <= 0) return { ok: true };
     const cutoffMs = Date.now() - minHours * 60 * 60 * 1000;
     let newest = 0;
     for (const v of Object.values(cache)) {
+      /**
+       * This mutex exists to stop the DAILY GENERATOR racing itself — it has
+       * three independent trigger sources (cron, HTTP, run-on-start). It was
+       * never meant to gate a second editorial stream.
+       *
+       * On Aug 19 2026 three AI Ops Wiki field notes were published by hand
+       * into this same cache, and the next daily run refused with "last publish
+       * was 0.2h ago": the blog looked down, when in fact a different stream had
+       * simply written here. Judge the daily cadence by daily posts only.
+       */
+      if (v?.stream && v.stream !== "daily") continue;
       const t = v?.publishedAt ? Date.parse(v.publishedAt) : NaN;
       if (Number.isFinite(t) && t > newest) newest = t;
     }
