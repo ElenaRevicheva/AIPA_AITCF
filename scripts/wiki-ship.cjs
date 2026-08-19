@@ -145,32 +145,66 @@ function main() {
   if (!eligible.length) { say('·', 'no unpublished chapters marked "blog: yes"'); return finish(); }
 
   /**
-   * Refuse to "publish" without the Dev.to key.
+   * The Dev.to key lives on the Oracle box and stays there.
    *
-   * The first run did exactly what this script exists to prevent: it printed
-   * two green ticks and recorded both chapters as published, while the cross-
-   * post had been skipped because DEVTO_API_KEY is only on the Oracle box.
-   * The state file then said "done" and would never retry them. A partial
-   * success reported as a success is the failure mode this whole journal is
-   * about — so stop, and say where to run it instead.
+   * Publishing therefore RUNS on Oracle rather than asking for the secret to be
+   * copied here — one machine holds it, and this works the same from any laptop
+   * that can reach the box. Oracle pulls the corpus first, because the chapter
+   * being published was pushed from here moments ago in step 4.
+   *
+   * If the key does happen to be present locally, publish locally instead.
+   * If neither, stop: the earlier version printed green ticks while silently
+   * skipping the cross-post and recorded the chapters as done, so they would
+   * never have been retried. A partial success reported as success is the exact
+   * failure this journal documents.
    */
-  if (!(process.env.DEVTO_API_KEY || '').trim()) {
-    die('DEVTO_API_KEY missing — refusing to half-publish.\n' +
-        '  The key lives on the Oracle box. Run it there:\n' +
-        '    ssh oracle-cto-aipa "cd ~/aideazz && git pull -q origin main"\n' +
-        '    ssh oracle-cto-aipa "cd ~/cto-aipa && AIDEAZZ_REPO_PATH=/home/ubuntu/aideazz node scripts/wiki-ship.cjs"\n' +
-        '  Or pass --no-blog to ship the site only.');
+  const localKey = (process.env.DEVTO_API_KEY || '').trim();
+  const host = (process.env.ORACLE_SSH_HOST || 'oracle-cto-aipa').trim();
+  const remoteSite = (process.env.ORACLE_AIDEAZZ_PATH || '/home/ubuntu/aideazz').trim();
+  const remoteApp = (process.env.ORACLE_CTO_PATH || '/home/ubuntu/cto-aipa').trim();
+
+  let mode = localKey ? 'local' : null;
+  if (!mode) {
+    try {
+      execFileSync('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=15', host,
+        `test -s ${remoteApp}/.env && grep -q '^DEVTO_API_KEY=' ${remoteApp}/.env`], { stdio: 'pipe' });
+      mode = 'oracle';
+    } catch {
+      die(`DEVTO_API_KEY is not here and ${host} is unreachable (or has no key) — refusing to half-publish.\n` +
+          '  Fix SSH access to the box, or pass --no-blog to ship the site only.');
+    }
+  }
+  say('·', `publishing via ${mode === 'local' ? 'this machine' : `${host} (key stays on the box)`}`);
+
+  if (mode === 'oracle' && !DRY) {
+    // Oracle must see the chapter we just pushed before it can publish it.
+    execFileSync('ssh', ['-o', 'ConnectTimeout=20', host,
+      `cd ${remoteSite} && git pull --ff-only -q origin main`], { stdio: 'pipe' });
+    say('✓', 'Oracle pulled the corpus');
   }
 
   for (const inc of eligible) {
-    if (DRY) { say('·', `would publish: ${inc.slug}`); continue; }
+    if (DRY) { say('·', `would publish via ${mode}: ${inc.slug}`); continue; }
     try {
-      const out = execFileSync('node', ['scripts/incident-to-blog.cjs', inc.slug, '--publish'],
-        { cwd: process.cwd(), encoding: 'utf8', stdio: 'pipe' });
-      const url = (out.match(/https:\/\/dev\.to\/\S+/) || out.match(/https:\/\/aideazz\.xyz\/blog\/\S+/) || ['(no url)'])[0];
-      say('✓', `published ${inc.slug} → ${url}`);
+      const out = mode === 'local'
+        ? execFileSync('node', ['scripts/incident-to-blog.cjs', inc.slug, '--publish'],
+            { cwd: process.cwd(), encoding: 'utf8', stdio: 'pipe' })
+        : execFileSync('ssh', ['-o', 'ConnectTimeout=30', host,
+            `cd ${remoteApp} && AIDEAZZ_REPO_PATH=${remoteSite} node scripts/incident-to-blog.cjs ${inc.slug} --publish`],
+            { encoding: 'utf8', stdio: 'pipe' });
+
+      const devto = (out.match(/https:\/\/dev\.to\/\S+/) || [])[0] || null;
+      const blogUrl = (out.match(/https:\/\/aideazz\.xyz\/blog\/\S+/) || ['(no url)'])[0];
+      // Say what actually happened. A blog page without a cross-post is a
+      // partial result and must not read like a full one.
+      if (devto) say('✓', `published ${inc.slug}\n   ${blogUrl}\n   ${devto}`);
+      else say('!', `${inc.slug}: blog page went out but NO Dev.to cross-post — ${blogUrl}`);
+
+      state[inc.slug] = { publishedAt: new Date().toISOString(), slug: inc.slug, devtoUrl: devto };
+      fs.mkdirSync(path.dirname(statePath), { recursive: true });
+      fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
     } catch (e) {
-      say('✖', `publish FAILED for ${inc.slug}: ${(e.stdout || e.message || '').slice(0, 200)}`);
+      say('✖', `publish FAILED for ${inc.slug}: ${(e.stdout || e.stderr || e.message || '').toString().slice(0, 300)}`);
     }
   }
   finish();
