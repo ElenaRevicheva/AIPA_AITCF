@@ -6,6 +6,49 @@
 
 ---
 
+## ✅ UPDATE — August 19, 2026 — AI Ops Wiki: the engine's first *compounding* content asset
+
+> The blog publishes one post a day and each one starts from zero authority. The wiki is the opposite: a corpus that gets denser every session, where a single definition can be cited on its own. It is the first content the engine produces that is worth **more** next month than it is today.
+
+**What it is.** [aideazz.xyz/ai-ops-wiki.html](https://aideazz.xyz/ai-ops-wiki.html) — real production outages, each worked through as a chapter (symptom → your guess → root cause → fix → proof → rule), plus a glossary of the failure modes they earned. Built on Karpathy's LLM-wiki pattern: the durable layer is **Markdown in the repo** (`aideazz/content/ai-ops-wiki/{concepts,incidents}/`), and the page is generated from it, so it can never drift from its source.
+
+**The automatic flow, end to end.** One command — `npm run wiki:ship` (cto-aipa), on a **daily Oracle cron at 16:30 Panama**, deliberately after the 14:30 daily post:
+
+```
+incident .md committed
+   → LINT the corpus (fail closed — a wiki that rots is worse than none)
+   → REGENERATE the page (Rev N · chapters · entries · cross-refs · date
+     recomputes itself from the corpus; nothing to bump by hand)
+   → REFRESH the AEO/GEO surfaces  ── geo-manifest.json `updated` + endpoints.aiOpsWiki
+                                    ── llms.txt canonical-sources list
+                                    ── sitemap.xml / sitemap.txt
+   → COMMIT + PUSH without [skip ci]  (that flag skips the 4everland deploy)
+   → PUBLISH every chapter marked `blog: yes`
+        ├── aideazz.xyz/blog/<slug>-field-note   (canonical lives here)
+        └── dev.to cross-post, canonical_url → aideazz.xyz   (DA 90+ backlink)
+```
+
+**How it feeds GEO / AEO / Tech SEO specifically:**
+
+| Layer | What the wiki contributes |
+|---|---|
+| **AEO** | `DefinedTermSet` + `DefinedTerm` JSON-LD, one anchor per concept — an answer engine can quote *a single definition* and cite it, which a long-form post cannot offer. Targets a query class the portfolio and the audit API structurally cannot win ("what is a single point of failure", "why did my webhook return 200 but do nothing"). |
+| **GEO** | Listed in `llms.txt` canonical sources — the file that tells assistants which URLs to cite — and exposed as `endpoints.aiOpsWiki` in `geo-manifest.json`, the versioned facts file. |
+| **Tech SEO** | Own URL in the sitemap; blog-first canonical with Dev.to pointing home so the DA-90 backlink accrues to aideazz.xyz; internal links from the portfolio ("Explore my WIKI", beside the resume CTA) and from this runbook's Jump bar. |
+| **Measurement** | `citation-tracker` now probes `/ai-ops-wiki.html` alongside `/portfolio` and `/api` (`CITATION_PRIMARY_PATH`), so "is it actually being cited" is measured, not assumed. |
+
+**Selectivity is the whole asset.** A session earns an entry only if all four hold: it hit **real production**, the lesson **transfers** to another stack, something is **verifiable from logs**, and it has a **named failure mode**. Routine deploys and config edits earn nothing. Blog publication is a further opt-in (`blog: yes`). One padded entry devalues the corpus, which is the only thing being accumulated.
+
+**The articles are assembled deterministically** from fields verified when the incident was written — there is no generation step, so there is nothing to hallucinate. Elena's constraint, verbatim: *"I do not want to scam anybody."*
+
+**Two deploy traps found and fixed the same day** (both had published posts sitting unreachable while Dev.to canonicals pointed at 404s):
+1. `[skip ci]` was added to every blog-static push when the file already existed — so republishing a page whose *first* deploy had not landed skipped the build again. Now **bulk-only**; a single publish always deploys.
+2. Hand-published field notes tripped the **daily blog's sliding-window mutex** (`recentPublishCutoffOk` took the newest `publishedAt` across every cache entry) and the daily post refused with *"last publish was 0.2h ago"*. Cache entries now carry `stream` (`daily` | `fieldnote`); the cooldown counts `daily` only.
+
+Seeded with 7 concepts + 5 chapters; first three field notes live on Dev.to Aug 19 2026.
+
+---
+
 ## 🟢 The ops layer — n8n + a private CRM view (August 13 2026)
 
 The marketing engine had every stage except one: **a single place to see what
