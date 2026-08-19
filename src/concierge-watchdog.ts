@@ -141,8 +141,8 @@ export function registerLeadWatch(lead: {
 }
 
 /**
- * Write the draft ourselves, in Fable 5's own output contract, and hand it to
- * the same endpoint Make posts to. Same card, same ✅ Send button, same CRM trail.
+ * Hand the uncovered lead to the same endpoint Make posts to, and let it draft.
+ * Same card, same ✅ Send button, same CRM trail — whoever got there first.
  */
 async function generateAndPostDraft(w: Watch): Promise<boolean> {
   const secret = process.env.CONCIERGE_SECRET?.trim();
