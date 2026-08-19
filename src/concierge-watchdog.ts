@@ -378,6 +378,55 @@ function alertAllowed(key: string, cooldownMs: number): boolean {
   }
 }
 
+/**
+ * Can Make actually produce a draft right now? — cached verdict, read at ingest.
+ *
+ * Elena's call (Aug 19 2026): if she tops the Anthropic balance up, Fable 5
+ * should get first shot at writing the reply; if she does not, today's Oracle
+ * path must fire on its own with no thinking required. Both, without her having
+ * to flip anything.
+ *
+ * That needs a PRECEDENCE the system never had. Redundancy alone only ever
+ * answers "who got there first", and Oracle answers in ~3s against Make's
+ * 15-minute poll, so Make would lose every race even fully funded.
+ *
+ * The verdict is computed by checkMakeHealth (already running every 15 min) and
+ * written here, because the ingest path cannot afford two Make API calls while a
+ * lead is waiting. Stale-by-15-minutes is fine: the cost of being wrong is one
+ * draft arriving 5 minutes later than it had to, never a lost lead.
+ */
+const MAKE_VERDICT = path.join(process.cwd(), 'data', 'make-can-draft.json');
+
+export function makeCanDraft(): { can: boolean; reason: string } {
+  try {
+    const v = JSON.parse(fs.readFileSync(MAKE_VERDICT, 'utf8')) as {
+      can?: boolean; reason?: string; checkedAt?: string;
+    };
+    // A verdict nobody has refreshed for an hour is not evidence Make is well.
+    // Fail toward drafting ourselves — a duplicate collapses, a silence does not.
+    const age = Date.now() - Date.parse(v.checkedAt || '');
+    if (!Number.isFinite(age) || age > 60 * 60 * 1000) {
+      return { can: false, reason: 'verdict stale — drafting locally' };
+    }
+    return { can: !!v.can, reason: v.reason || '' };
+  } catch {
+    return { can: false, reason: 'no verdict yet — drafting locally' };
+  }
+}
+
+function writeMakeVerdict(can: boolean, reason: string): void {
+  try {
+    fs.mkdirSync(path.dirname(MAKE_VERDICT), { recursive: true });
+    fs.writeFileSync(
+      MAKE_VERDICT,
+      JSON.stringify({ can, reason, checkedAt: new Date().toISOString() }, null, 2),
+      'utf8',
+    );
+  } catch (e) {
+    console.warn('[watchdog] make verdict write failed:', (e as Error).message?.slice(0, 80));
+  }
+}
+
 export async function checkMakeHealth(): Promise<{
   ok: boolean;
   lastRunMinAgo: number | null;
@@ -388,7 +437,11 @@ export async function checkMakeHealth(): Promise<{
   const base = (process.env.MAKE_API_BASE || 'https://us2.make.com/api/v2').replace(/\/$/, '');
   const scenarioId = process.env.MAKE_CONCIERGE_SCENARIO_ID?.trim() || '5633833';
   const idle = { ok: true, lastRunMinAgo: null, nextExecMinAway: null, action: 'none' as const };
-  if (!token) return idle; // not configured — stay silent
+  if (!token) {
+    // No Make API access at all — we cannot vouch for it, so Oracle owns drafting.
+    writeMakeVerdict(false, 'MAKE_API_TOKEN not set');
+    return idle;
+  }
 
   const api = async (p: string, method = 'GET') =>
     fetch(`${base}${p}`, { method, headers: { Authorization: `Token ${token}`, 'Content-Type': 'application/json' } });
@@ -470,6 +523,8 @@ export async function checkMakeHealth(): Promise<{
          * worded as the accepted state it is.
          */
         const isCredit = /credit balance|too low|billing|purchase credits/i.test(msg);
+        // Whatever it failed on, it is failing — Oracle must not wait for it.
+        writeMakeVerdict(false, isCredit ? 'Anthropic balance empty' : `erroring: ${msg.slice(0, 60)}`);
         const cooldown = isCredit ? CREDIT_ALERT_COOLDOWN_MS : MAKE_ALERT_COOLDOWN_MS;
         if (alertAllowed(isCredit ? 'make-credit' : 'make-erroring', cooldown)) {
           await notifyOwners(
@@ -505,11 +560,14 @@ export async function checkMakeHealth(): Promise<{
               `Nothing is lost — I draft for everyone Make misses.`,
           );
         }
+        writeMakeVerdict(false, 'runs but drafts nothing (filter rejecting leads)');
         console.error(
           `[watchdog] MAKE UNPRODUCTIVE — 0 productive runs in last ${rows.length}, ${missed} leads covered in 24h`,
         );
         return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'alerted' };
       }
+      // Scheduled, not erroring, doing real work: Fable 5 has earned first shot.
+      writeMakeVerdict(true, `healthy — last run ${lastRunMinAgo ?? '?'} min ago`);
       return { ok: true, lastRunMinAgo, nextExecMinAway, action: 'none' };
     }
 

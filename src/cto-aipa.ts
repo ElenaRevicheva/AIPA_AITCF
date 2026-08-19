@@ -1427,6 +1427,38 @@ async function startCTOAIPA() {
               return;
             }
             const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
+
+            /**
+             * Give Fable 5 first shot — but only when Make can actually take it.
+             *
+             * Elena's call (Aug 19 2026): if she funds the Anthropic balance, the
+             * Make scenario should write the reply; if she does not, this path must
+             * carry every lead on its own with nothing for her to switch.
+             *
+             * That needs a PRECEDENCE the system never had. Redundancy alone only
+             * decides who arrives first, and this path answers in ~3s against Make's
+             * 15-minute poll — so Make would lose every race even fully funded, and
+             * topping up would have bought her nothing.
+             *
+             * So: when the watchdog's cached verdict says Make is healthy, hold back
+             * for a grace window and let it write. Whatever happens, we still POST —
+             * if Make already answered, the fingerprint dedupe collapses ours into
+             * its card; if it did not, ours lands at the end of the grace. The
+             * verdict is treated as stale after an hour and fails toward drafting
+             * locally, because a duplicate collapses and a silence does not.
+             */
+            const { makeCanDraft } = await import('./concierge-watchdog');
+            const verdict = makeCanDraft();
+            const graceMs = Number(process.env.CONCIERGE_MAKE_GRACE_MIN ?? 5) * 60 * 1000;
+            if (verdict.can && graceMs > 0) {
+              console.log(
+                `[inquiry] Make looks able to draft (${verdict.reason}) — holding ` +
+                  `${Math.round(graceMs / 60000)} min so Fable 5 gets first shot`,
+              );
+              await new Promise(r => setTimeout(r, graceMs));
+            } else {
+              console.log(`[inquiry] drafting now — Make cannot: ${verdict.reason}`);
+            }
             const r = await fetch(`${base}/concierge/draft`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded' },
