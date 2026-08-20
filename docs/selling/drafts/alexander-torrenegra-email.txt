@@ -1,0 +1,35 @@
+TO: a@torrenegra.com
+SUBJECT: My "mini-Torre" — and the part that failed
+
+Alex,
+
+Thanks for pointing me here.
+
+I'm Elena Revicheva, founder of AIdeazz AI Lab in Panama. I reached out on LinkedIn about a system I built that I think may be relevant to the kind of work Torrenegra & Co does.
+
+I built my own "mini-Torre": an autonomous job-hunting system that pulls roles from ATS boards, evaluates and ranks them through an LLM gate and an eval harness, writes qualified opportunities into a CRM with source attribution, and learns from outcomes.
+
+The interesting part is that it worked well until the point that mattered most.
+
+Over six months:
+
+- 2,000+ roles processed
+- dozens of interviews
+- 0 hires
+
+Discovery wasn't the bottleneck. Matching wasn't the bottleneck. Conversion was.
+
+That result changed how I think about AI automation: the hardest part isn't automating the workflow. It's identifying where the real-world system loses value after the automation hands it off.
+
+Given your experience building Torre and thinking about hiring infrastructure, I'd genuinely be curious how you'd interpret that failure.
+
+I'm also interested in whether Torrenegra & Co works with outside operators who can build, deploy and operate AI systems around real business workflows. That's the kind of work I'm looking for.
+
+Happy to give you a 15-minute walkthrough. It's one of a small fleet of AI systems I run in production — WhatsApp/Telegram agents, LLM routing with multi-provider failover, CRM and outreach automation, and AI search visibility (GEO/AEO) work.
+
+Portfolio: https://aideazz.xyz/portfolio?utm_source=email&utm_medium=outreach&utm_campaign=torrenegra
+
+Best,
+Elena Revicheva
+AIdeazz AI Lab
+Panama
