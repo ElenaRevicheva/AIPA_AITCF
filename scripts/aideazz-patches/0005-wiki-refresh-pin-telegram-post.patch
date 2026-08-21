@@ -1,0 +1,986 @@
+From 845c3722ad3ff9325442a20dcd45961ee6ae1dd0 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 21 Aug 2026 20:49:47 +0000
+Subject: [PATCH] ai-ops-wiki: refresh journal + AEO surfaces (2026-08-21)
+
+Regenerated from the Markdown corpus; revision line, sitemap and
+geo-manifest date recomputed. Pushed without [skip ci] so the site
+actually rebuilds.
+
+Includes public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/
+so the canonical GEO URL is in this pin.
+---
+ public/ai-ops-wiki.html      |   6 +-
+ public/geo-manifest.json     |  30 +--
+ public/portfolio-sitemap.xml |   2 +-
+ public/sitemap.txt           |   2 +
+ public/sitemap.xml           | 492 ++++++++++++++++++++++++++++++-----
+ 5 files changed, 450 insertions(+), 82 deletions(-)
+
+diff --git a/public/ai-ops-wiki.html b/public/ai-ops-wiki.html
+index d953057..4b74bce 100644
+--- a/public/ai-ops-wiki.html
++++ b/public/ai-ops-wiki.html
+@@ -24,7 +24,7 @@
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+ 
+-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AI Ops Wiki — concepts earned in production","author":{"@type":"Person","name":"Elena Revicheva","url":"https://aideazz.xyz/portfolio","jobTitle":"AI Engineer & Fractional CTO","sameAs":["https://linkedin.com/in/elenarevicheva","https://github.com/ElenaRevicheva","https://x.com/reviceva","https://dev.to/elenarevicheva"]},"dateModified":"2026-08-20","publisher":{"@type":"Organization","name":"AIdeazz","url":"https://aideazz.xyz"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://aideazz.xyz/ai-ops-wiki.html"}}</script>
++  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AI Ops Wiki — concepts earned in production","author":{"@type":"Person","name":"Elena Revicheva","url":"https://aideazz.xyz/portfolio","jobTitle":"AI Engineer & Fractional CTO","sameAs":["https://linkedin.com/in/elenarevicheva","https://github.com/ElenaRevicheva","https://x.com/reviceva","https://dev.to/elenarevicheva"]},"dateModified":"2026-08-21","publisher":{"@type":"Organization","name":"AIdeazz","url":"https://aideazz.xyz"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://aideazz.xyz/ai-ops-wiki.html"}}</script>
+   <script type="application/ld+json">{"@context":"https://schema.org","@type":"DefinedTermSet","name":"AI Ops Wiki — production engineering concepts","url":"https://aideazz.xyz/ai-ops-wiki.html","description":"Named reliability and AI-operations concepts, each defined in plain language and linked to the production incident that taught it.","hasDefinedTerm":[{"@type":"DefinedTerm","name":"Acknowledgement is not completion","description":"A receipt proves delivery. It never proves processing.","url":"https://aideazz.xyz/ai-ops-wiki.html#ack-is-not-completion"},{"@type":"DefinedTerm","name":"Idempotency","description":"Doing it twice produces the same result as doing it once.","url":"https://aideazz.xyz/ai-ops-wiki.html#idempotency"},{"@type":"DefinedTerm","name":"Monotonic state machine","description":"States advance. They never regress.","url":"https://aideazz.xyz/ai-ops-wiki.html#monotonic-state-machine"},{"@type":"DefinedTerm","name":"Silent failure","description":"The system did something reasonable, and told nobody.","url":"https://aideazz.xyz/ai-ops-wiki.html#silent-failure"},{"@type":"DefinedTerm","name":"Single point of failure (SPOF)","description":"One component whose death kills the whole chain.","url":"https://aideazz.xyz/ai-ops-wiki.html#single-point-of-failure"},{"@type":"DefinedTerm","name":"Single source of truth","description":"Copy logic instead of calling it, and you have scheduled a bug for a date nobody will tell you about.","url":"https://aideazz.xyz/ai-ops-wiki.html#single-source-of-truth"},{"@type":"DefinedTerm","name":"Verify from logs, not config","description":"Configuration tells you what somebody intended. Logs tell you what happened.","url":"https://aideazz.xyz/ai-ops-wiki.html#verify-from-logs"}]}</script>
+ 
+   <style>
+@@ -321,7 +321,7 @@
+       <div class="mast-kick">AIdeazz AI Lab · Panama · Field Journal</div>
+       <h1 class="name"><span class="name-sm">AI Ops</span><span class="name-lg">WIKI</span></h1>
+       <div class="rules"><span></span><span></span></div>
+-      <div class="mast-meta">Rev 12 &nbsp;·&nbsp; 5 chapters &nbsp;·&nbsp; 7 entries &nbsp;·&nbsp; <b>7 cross-references</b> &nbsp;·&nbsp; 2026-08-20</div>
++      <div class="mast-meta">Rev 12 &nbsp;·&nbsp; 5 chapters &nbsp;·&nbsp; 7 entries &nbsp;·&nbsp; <b>7 cross-references</b> &nbsp;·&nbsp; 2026-08-21</div>
+       <p class="tagline">Debug it with me.</p>
+       <p class="lede first">Real outages on live production systems, set as chapters. Open one and it unfolds a beat at a time — the symptom, then your guess, then what was actually happening.</p>
+       <p class="lede">Commit to an answer before you turn the page. That is the whole difference between reading a postmortem and keeping one.</p>
+@@ -1029,7 +1029,7 @@
+     <footer>
+       <span>Kept by <a href="https://aideazz.xyz/portfolio">Elena Revicheva</a></span>
+       <span><a href="/sop-ai-ops.html">AI Ops Runbook</a></span>
+-      <span>Updated 2026-08-20</span>
++      <span>Updated 2026-08-21</span>
+     </footer>
+   </div>
+ 
+diff --git a/public/geo-manifest.json b/public/geo-manifest.json
+index 2e0b3a7..3c8eb9c 100644
+--- a/public/geo-manifest.json
++++ b/public/geo-manifest.json
+@@ -1,10 +1,10 @@
+ {
+   "geoPackage": "AIdeazz-GEO/v4-iron",
+-  "updated": "2026-08-20",
++  "updated": "2026-08-21",
+   "canonicalOrigin": "https://aideazz.xyz",
+   "intent": "Maximum GEO: redundant machine-readable identity, explicit crawler policy, and citable facts without relying on a single format.",
+   "preferredCitation": {
+-    "short": "AIdeazz — Elena Revicheva (https://aideazz.xyz/portfolio)",
++    "short": "AIdeazz \u2014 Elena Revicheva (https://aideazz.xyz/portfolio)",
+     "apaStyle": "Revicheva, E. (2026). AIdeazz production AI systems. https://aideazz.xyz",
+     "botsMay": "Summarize and cite using canonical URLs below; do not invent repo counts, agent names, or infrastructure claims beyond this manifest and /llms.txt."
+   },
+@@ -48,11 +48,11 @@
+     "ecosystemAgentsTotal": 10,
+     "productionAgentsLive": 9,
+     "inDesign": [
+-      "AILA — Adaptive Intelligent Life Assistant (orchestration layer)"
++      "AILA \u2014 Adaptive Intelligent Life Assistant (orchestration layer)"
+     ],
+     "infraMonthlyUsd": 0,
+     "cloudPrimary": "Oracle Cloud Always Free + Oracle Autonomous Database 26ai (mTLS)",
+-    "llmProviderChain": "5-provider fallback chain — Claude, OpenAI, Gemini, xAI Grok, Groq (running openai/gpt-oss-120b); order set per task type (quality-first vs. cost/speed-first)",
++    "llmProviderChain": "5-provider fallback chain \u2014 Claude, OpenAI, Gemini, xAI Grok, Groq (running openai/gpt-oss-120b); order set per task type (quality-first vs. cost/speed-first)",
+     "soloBuildMonthsApprox": 13,
+     "langGraphStatefulLive": true,
+     "pgvectorRagLive": true
+@@ -62,7 +62,7 @@
+       "id": "cto-aipa",
+       "name": "CTO AIPA",
+       "status": "live",
+-      "role": "AI Technical Co-Founder — code review & GitHub automation across repos"
++      "role": "AI Technical Co-Founder \u2014 code review & GitHub automation across repos"
+     },
+     {
+       "id": "geo-seo-engine",
+@@ -80,7 +80,7 @@
+       "id": "espaluz-stack",
+       "name": "EspaLuz Stack",
+       "status": "live",
+-      "role": "Language tutor stack — WhatsApp/Telegram + memory (LangChain + pgvector)"
++      "role": "Language tutor stack \u2014 WhatsApp/Telegram + memory (LangChain + pgvector)"
+     },
+     {
+       "id": "algom-alpha",
+@@ -90,7 +90,7 @@
+     },
+     {
+       "id": "atuona",
+-      "name": "Atuona — AI Creative Co-Founder",
++      "name": "Atuona \u2014 AI Creative Co-Founder",
+       "status": "live",
+       "role": "Creative pipeline + gallery / NFT surfaces"
+     },
+@@ -98,28 +98,28 @@
+       "id": "site-leads",
+       "name": "Site forms + lead routing",
+       "status": "live",
+-      "role": "Inquiries & UTMs → Oracle lead store shared with CMO/CTO ops"
++      "role": "Inquiries & UTMs \u2192 Oracle lead store shared with CMO/CTO ops"
+     },
+     {
+       "id": "aila",
+-      "name": "AILA — Adaptive Intelligent Life Assistant",
++      "name": "AILA \u2014 Adaptive Intelligent Life Assistant",
+       "status": "design",
+       "role": "Orchestration layer / unified agent bus (roadmap)"
+     }
+   ],
+-  "ecosystemNote": "Public narrative counts a 10-agent ecosystem (nine production + AILA in design). Named cards on aideazz.xyz/portfolio map to these products; overlapping subprocesses (cron, syndication hooks, multi-repo glue) roll into the rows above — see /portfolio and /pitch.html for the investor-grade breakdown.",
++  "ecosystemNote": "Public narrative counts a 10-agent ecosystem (nine production + AILA in design). Named cards on aideazz.xyz/portfolio map to these products; overlapping subprocesses (cron, syndication hooks, multi-repo glue) roll into the rows above \u2014 see /portfolio and /pitch.html for the investor-grade breakdown.",
+   "geoLayersDeployed": [
+-    "Schema.org JSON-LD — Organization, WebSite, Person, FAQPage, ItemList (agent inventory), WebPage (homepage anchor)",
+-    "HTML link alternates — llms.txt, geo-manifest.json, CITATION.cff; author → humans.txt",
++    "Schema.org JSON-LD \u2014 Organization, WebSite, Person, FAQPage, ItemList (agent inventory), WebPage (homepage anchor)",
++    "HTML link alternates \u2014 llms.txt, geo-manifest.json, CITATION.cff; author \u2192 humans.txt",
+     "Static noscript article + GEO machine-readable link row",
+-    "robots.txt explicit Allow blocks — Google-Extended, Applebot-Extended, OAI-SearchBot, GPTBot, ChatGPT-User, ClaudeBot, PerplexityBot, Meta-ExternalAgent, CCBot, and catch-all *",
++    "robots.txt explicit Allow blocks \u2014 Google-Extended, Applebot-Extended, OAI-SearchBot, GPTBot, ChatGPT-User, ClaudeBot, PerplexityBot, Meta-ExternalAgent, CCBot, and catch-all *",
+     "llms.txt + /.well-known/llms.txt mirrors",
+-    "geo-manifest.json (this file — versioned inventory + preferred citation)",
++    "geo-manifest.json (this file \u2014 versioned inventory + preferred citation)",
+     "humans.txt",
+     "CITATION.cff",
+     "sitemap.xml + sitemap.txt including GEO URLs",
+     "hreflang alternates on apex (EN/ES i18n)",
+-    "sameAs syndication — Dev.to + Hashnode"
++    "sameAs syndication \u2014 Dev.to + Hashnode"
+   ],
+   "contact": {
+     "email": "aipa@aideazz.xyz"
+diff --git a/public/portfolio-sitemap.xml b/public/portfolio-sitemap.xml
+index f9d6393..cd7bff7 100644
+--- a/public/portfolio-sitemap.xml
++++ b/public/portfolio-sitemap.xml
+@@ -2,7 +2,7 @@
+ <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+     <loc>https://aideazz.xyz/portfolio</loc>
+-    <lastmod>2026-08-20</lastmod>
++    <lastmod>2026-08-21</lastmod>
+     <changefreq>weekly</changefreq>
+     <priority>1.0</priority>
+   </url>
+diff --git a/public/sitemap.txt b/public/sitemap.txt
+index 9f68ce0..8780b99 100644
+--- a/public/sitemap.txt
++++ b/public/sitemap.txt
+@@ -14,6 +14,8 @@ https://aideazz.xyz/geo-manifest.json
+ https://aideazz.xyz/humans.txt
+ https://aideazz.xyz/CITATION.cff
+ https://aideazz.xyz/robots.txt
++https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/
++https://aideazz.xyz/blog/why-my-ai-agent-ops-dashboard-is-a-telegram-bot/
+ https://aideazz.xyz/blog/ack-trap-field-note/
+ https://aideazz.xyz/blog/concierge-outage-field-note/
+ https://aideazz.xyz/blog/stage-never-moved-field-note/
+diff --git a/public/sitemap.xml b/public/sitemap.xml
+index a20fe2e..ae94178 100644
+--- a/public/sitemap.xml
++++ b/public/sitemap.xml
+@@ -1,25 +1,31 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+-    <loc>https://aideazz.xyz/</loc>
++    <loc>https://aideazz.xyz/portfolio</loc>
+     <lastmod>2026-08-21</lastmod>
+     <changefreq>weekly</changefreq>
+     <priority>1.0</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/about</loc>
++    <loc>https://aideazz.xyz/api</loc>
+     <lastmod>2026-08-21</lastmod>
+-    <changefreq>monthly</changefreq>
+-    <priority>0.8</priority>
++    <changefreq>weekly</changefreq>
++    <priority>0.95</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/portfolio</loc>
++    <loc>https://aideazz.xyz/</loc>
+     <lastmod>2026-08-21</lastmod>
+     <changefreq>weekly</changefreq>
+     <priority>0.9</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog</loc>
++    <loc>https://aideazz.xyz/about</loc>
++    <lastmod>2026-08-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.8</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/</loc>
+     <lastmod>2026-08-21</lastmod>
+     <changefreq>weekly</changefreq>
+     <priority>0.85</priority>
+@@ -42,6 +48,12 @@
+     <changefreq>weekly</changefreq>
+     <priority>0.72</priority>
+   </url>
++  <url>
++    <loc>https://aideazz.xyz/ai-ops-wiki.html</loc>
++    <lastmod>2026-08-21</lastmod>
++    <changefreq>weekly</changefreq>
++    <priority>0.72</priority>
++  </url>
+   <url>
+     <loc>https://aideazz.xyz/sop-ai-ops-es.html</loc>
+     <lastmod>2026-08-21</lastmod>
+@@ -85,345 +97,699 @@
+     <priority>0.3</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui</loc>
++    <loc>https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/</loc>
+     <lastmod>2026-08-21</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/why-my-ai-agent-ops-dashboard-is-a-telegram-bot</loc>
++    <loc>https://aideazz.xyz/blog/why-my-ai-agent-ops-dashboard-is-a-telegram-bot/</loc>
+     <lastmod>2026-08-20</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/telegram-my-production-ai-agent-dashboard-no-web-ui-needed</loc>
++    <loc>https://aideazz.xyz/blog/ack-trap-field-note/</loc>
+     <lastmod>2026-08-19</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/stage-never-moved-field-note</loc>
++    <loc>https://aideazz.xyz/blog/concierge-outage-field-note/</loc>
+     <lastmod>2026-08-19</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/ack-trap-field-note</loc>
++    <loc>https://aideazz.xyz/blog/stage-never-moved-field-note/</loc>
+     <lastmod>2026-08-19</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/concierge-outage-field-note</loc>
++    <loc>https://aideazz.xyz/blog/telegram-my-production-ai-agent-dashboard-no-web-ui-needed/</loc>
+     <lastmod>2026-08-19</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-for-10-live-systems-2026-08-18</loc>
++    <loc>https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-for-10-live-systems-2026-08-18/</loc>
+     <lastmod>2026-08-18</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/brightdata-web-unlocker-when-150cpm-isnt-a-waste</loc>
++    <loc>https://aideazz.xyz/blog/brightdata-web-unlocker-when-150cpm-isnt-a-waste/</loc>
+     <lastmod>2026-08-17</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/b2b-lead-gen-on-x-my-bots-68-false-positive-rate</loc>
++    <loc>https://aideazz.xyz/blog/b2b-lead-gen-on-x-my-bots-68-false-positive-rate/</loc>
+     <lastmod>2026-08-16</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-evaluation-harness</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-evaluation-harness/</loc>
+     <lastmod>2026-08-15</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/six-months-of-pgvector-on-oracle-autonomous-db-rag-in-production</loc>
++    <loc>https://aideazz.xyz/blog/six-months-of-pgvector-on-oracle-autonomous-db-rag-in-production/</loc>
+     <lastmod>2026-08-14</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/pgvector-on-oracle-autonomous-db-6-months-10k-vectors-and-rag-failure-2026-08-13</loc>
++    <loc>https://aideazz.xyz/blog/pgvector-on-oracle-autonomous-db-6-months-10k-vectors-and-rag-failure-2026-08-13/</loc>
+     <lastmod>2026-08-13</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/pgvector-on-oracle-autonomous-db-6-months-10k-vectors-and-rag-failure-2026-08-12</loc>
++    <loc>https://aideazz.xyz/blog/pgvector-on-oracle-autonomous-db-6-months-10k-vectors-and-rag-failure-2026-08-12/</loc>
+     <lastmod>2026-08-12</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/pgvector-on-oracle-autonomous-db-6-months-10k-vectors-and-rag-failure</loc>
++    <loc>https://aideazz.xyz/blog/pgvector-on-oracle-autonomous-db-6-months-10k-vectors-and-rag-failure/</loc>
+     <lastmod>2026-08-11</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-rewrites-to-production-stability-2026-08-10</loc>
++    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-rewrites-to-production-stability-2026-08-10/</loc>
+     <lastmod>2026-08-10</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/ai-startup-infrastructure-0-oracle-12-groq-40-brightdata-real-costs</loc>
++    <loc>https://aideazz.xyz/blog/ai-startup-infrastructure-0-oracle-12-groq-40-brightdata-real-costs/</loc>
+     <lastmod>2026-08-09</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first-2026-08-08</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first-2026-08-08/</loc>
+     <lastmod>2026-08-08</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness-2026-08-07</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness-2026-08-07/</loc>
+     <lastmod>2026-08-07</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automated-publishing-from-gsc-gap-to-live-post-in-11-minutes</loc>
++    <loc>https://aideazz.xyz/blog/automated-publishing-from-gsc-gap-to-live-post-in-11-minutes/</loc>
+     <lastmod>2026-08-06</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-production-rewrites-to-stop-losing-state-2026-08-05</loc>
++    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-production-rewrites-to-stop-losing-state-2026-08-05/</loc>
+     <lastmod>2026-08-05</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-production-rewrites-before-it-clicked</loc>
++    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-production-rewrites-before-it-clicked/</loc>
+     <lastmod>2026-08-04</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/my-12000-ai-vendor-lock-in-mistakes-a-fractional-ctos-audit</loc>
++    <loc>https://aideazz.xyz/blog/my-12000-ai-vendor-lock-in-mistakes-a-fractional-ctos-audit/</loc>
+     <lastmod>2026-08-03</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automating-gsc-gap-analysis-to-publishing-15-queries-1-ai-pipeline</loc>
++    <loc>https://aideazz.xyz/blog/automating-gsc-gap-analysis-to-publishing-15-queries-1-ai-pipeline/</loc>
+     <lastmod>2026-08-02</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automating-gsc-content-gaps-from-query-to-published-post-in-12-minutes</loc>
++    <loc>https://aideazz.xyz/blog/automating-gsc-content-gaps-from-query-to-published-post-in-12-minutes/</loc>
+     <lastmod>2026-08-01</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness-2026-07-31</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness-2026-07-31/</loc>
+     <lastmod>2026-07-31</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-rewrites-to-production-stability</loc>
++    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-rewrites-to-production-stability/</loc>
+     <lastmod>2026-07-30</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/three-langgraph-rewrites-checkpointing-production-agents</loc>
++    <loc>https://aideazz.xyz/blog/three-langgraph-rewrites-checkpointing-production-agents/</loc>
+     <lastmod>2026-07-29</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/why-ai-cant-make-films-yet-and-what-its-missing</loc>
++    <loc>https://aideazz.xyz/blog/business-intelligence-when-your-co-founder-is-ai/</loc>
+     <lastmod>2026-07-28</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/business-intelligence-when-your-co-founder-is-ai</loc>
++    <loc>https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-for-10-live-systems/</loc>
+     <lastmod>2026-07-28</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-for-10-live-systems</loc>
++    <loc>https://aideazz.xyz/blog/why-ai-cant-make-films-yet-and-what-its-missing/</loc>
+     <lastmod>2026-07-28</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness-2026-07-27</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness-2026-07-27/</loc>
+     <lastmod>2026-07-27</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/algom-alpha-b2b-leads-from-x-my-68-false-positive-rate-and-what-a-bot-calls-qualified</loc>
++    <loc>https://aideazz.xyz/blog/algom-alpha-b2b-leads-from-x-my-68-false-positive-rate-and-what-a-bot-calls-qualified/</loc>
+     <lastmod>2026-07-26</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first-2026-07-25</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first-2026-07-25/</loc>
+     <lastmod>2026-07-25</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-production-rewrites-to-stop-losing-state</loc>
++    <loc>https://aideazz.xyz/blog/langgraph-checkpointing-three-production-rewrites-to-stop-losing-state/</loc>
+     <lastmod>2026-07-24</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/three-langgraph-rewrites-checkpointing-stateful-agents-in-production</loc>
++    <loc>https://aideazz.xyz/blog/three-langgraph-rewrites-checkpointing-stateful-agents-in-production/</loc>
+     <lastmod>2026-07-23</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/gsc-gap-analysis-from-15-queries-to-automated-publishing-2026-07-22</loc>
++    <loc>https://aideazz.xyz/blog/gsc-gap-analysis-from-15-queries-to-automated-publishing-2026-07-22/</loc>
+     <lastmod>2026-07-22</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automating-gsc-gap-analysis-to-publishing-15-queries-1-pipeline-2026-07-21</loc>
++    <loc>https://aideazz.xyz/blog/automating-gsc-gap-analysis-to-publishing-15-queries-1-pipeline-2026-07-21/</loc>
+     <lastmod>2026-07-21</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/whatsapp-beat-my-web-app-espaluzs-two-layer-memory-without-vector-stores</loc>
++    <loc>https://aideazz.xyz/blog/what-the-live-ad-market-says-about-ai-services-july-2026/</loc>
++    <lastmod>2026-07-20</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/whatsapp-beat-my-web-app-espaluzs-two-layer-memory-without-vector-stores/</loc>
+     <lastmod>2026-07-20</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/gsc-gap-analysis-from-15-queries-to-automated-publishing-2026-07-19</loc>
++    <loc>https://aideazz.xyz/blog/gsc-gap-analysis-from-15-queries-to-automated-publishing-2026-07-19/</loc>
+     <lastmod>2026-07-19</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automating-gsc-gap-analysis-to-publishing-15-queries-1-pipeline</loc>
++    <loc>https://aideazz.xyz/blog/automating-gsc-gap-analysis-to-publishing-15-queries-1-pipeline/</loc>
+     <lastmod>2026-07-18</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automating-content-gaps-from-gsc-to-devto-in-15-queries-2026-07-17</loc>
++    <loc>https://aideazz.xyz/blog/automating-content-gaps-from-gsc-to-devto-in-15-queries-2026-07-17/</loc>
+     <lastmod>2026-07-17</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first-2026-07-16</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first-2026-07-16/</loc>
+     <lastmod>2026-07-16</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automating-content-gaps-from-gsc-to-devto-in-15-queries</loc>
++    <loc>https://aideazz.xyz/blog/automating-content-gaps-from-gsc-to-devto-in-15-queries/</loc>
+     <lastmod>2026-07-15</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/15-gsc-queries-my-ai-content-pipelines-reality-check</loc>
++    <loc>https://aideazz.xyz/blog/15-gsc-queries-my-ai-content-pipelines-reality-check/</loc>
+     <lastmod>2026-07-14</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-why-i-built-my-ai-agent-eval-harness-first/</loc>
+     <lastmod>2026-07-13</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-0003run-my-ai-agent-eval-harness/</loc>
+     <lastmod>2026-07-12</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/131-tests-4-layers-why-my-ai-agents-get-an-eval-harness-first</loc>
++    <loc>https://aideazz.xyz/blog/131-tests-4-layers-why-my-ai-agents-get-an-eval-harness-first/</loc>
+     <lastmod>2026-07-11</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/gsc-gap-analysis-from-15-queries-to-automated-publishing</loc>
++    <loc>https://aideazz.xyz/blog/gsc-gap-analysis-from-15-queries-to-automated-publishing/</loc>
+     <lastmod>2026-07-10</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/executive-career-pivot-ai-developer-what-actually-transferred-and-what-cost-47k</loc>
++    <loc>https://aideazz.xyz/blog/executive-career-pivot-ai-developer-what-actually-transferred-and-what-cost-47k/</loc>
+     <lastmod>2026-07-09</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-my-executive-past-actually-built-2026-07-08</loc>
++    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-my-executive-past-actually-built-2026-07-08/</loc>
+     <lastmod>2026-07-08</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-my-executive-past-actually-built-2026-07-07</loc>
++    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-my-executive-past-actually-built-2026-07-07/</loc>
+     <lastmod>2026-07-07</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-executive-skills-actually-shipped-code</loc>
++    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-executive-skills-actually-shipped-code/</loc>
+     <lastmod>2026-07-06</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/deputy-ceo-to-ai-builder-what-my-executive-past-actually-built</loc>
++    <loc>https://aideazz.xyz/blog/deputy-ceo-to-ai-builder-what-my-executive-past-actually-built/</loc>
+     <lastmod>2026-07-05</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/ai-hiring-automation-where-i-drew-the-line-at-auto-apply</loc>
++    <loc>https://aideazz.xyz/blog/ai-hiring-automation-where-i-drew-the-line-at-auto-apply/</loc>
+     <lastmod>2026-07-04</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-my-executive-past-actually-built</loc>
++    <loc>https://aideazz.xyz/blog/deputy-ceo-to-solo-ai-dev-what-my-executive-past-actually-built/</loc>
+     <lastmod>2026-07-03</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/automating-gsc-content-gaps-from-query-to-published-post-in-15-minutes</loc>
++    <loc>https://aideazz.xyz/blog/automating-gsc-content-gaps-from-query-to-published-post-in-15-minutes/</loc>
+     <lastmod>2026-07-02</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
+   <url>
+-    <loc>https://aideazz.xyz/blog/generative-engine-optimization-beyond-seo-buzzwords</loc>
++    <loc>https://aideazz.xyz/blog/generative-engine-optimization-beyond-seo-buzzwords/</loc>
+     <lastmod>2026-07-01</lastmod>
+     <changefreq>monthly</changefreq>
+     <priority>0.75</priority>
+   </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/what-i-changed-to-get-aideazz-cited-in-perplexity-answers/</loc>
++    <lastmod>2026-06-30</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/geo-reality-how-i-made-aideazz-pages-cite-in-perplexity-without-chasing-hype/</loc>
++    <lastmod>2026-06-29</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/ai-language-learning/</loc>
++    <lastmod>2026-06-28</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-whatsapp-beat-my-web-app-for-spanish-learning-and-the-memory-hack-that-made-it-work/</loc>
++    <lastmod>2026-06-27</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/how-i-got-aideazz-cited-in-perplexity-geo-for-skeptical-builders/</loc>
++    <lastmod>2026-06-26</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/i-built-a-131-test-eval-harness-before-writing-new-features-heres-the-silent-failure-it-caught/</loc>
++    <lastmod>2026-06-25</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/executive-career-pivot-ai-developer-what-actually-transferred/</loc>
++    <lastmod>2026-06-24</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-your-ai-agents-keep-stepping-on-each-others-toes/</loc>
++    <lastmod>2026-06-23</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/from-deputy-ceo-to-solo-ai-builder-the-18-month-pivot-that-cost-147k-and-3-failed-agents/</loc>
++    <lastmod>2026-06-22</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/career-pivot-reality-check/</loc>
++    <lastmod>2026-06-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/executive-to-ai-dev-2026-06-20/</loc>
++    <lastmod>2026-06-20</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/three-langgraph-rewrites-what-production-checkpointing-actually-taught-me/</loc>
++    <lastmod>2026-06-19</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/three-langgraph-rewrites-what-stateful-agents-actually-cost-in-production/</loc>
++    <lastmod>2026-06-17</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-whatsapp-beat-my-web-app-for-spanish-learning-and-what-3-paying-users-taught-me/</loc>
++    <lastmod>2026-06-16</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/three-langgraph-rewrites-what-production-checkpointing-actually-costs/</loc>
++    <lastmod>2026-06-15</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/the-4800month-api-lock-in-id-undo-a-fractional-ctos-audit-checklist/</loc>
++    <lastmod>2026-06-14</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/the-47k-mistake-what-your-fractional-cto-should-audit-before-lock-in/</loc>
++    <lastmod>2026-06-13</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/0-to-1-transferable-skills/</loc>
++    <lastmod>2026-06-12</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/how-i-turned-whatsapp-chats-into-my-marketing-engine-using-sqlite-crew/</loc>
++    <lastmod>2026-06-11</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/navigating-the-storm-of-ai-build-space/</loc>
++    <lastmod>2026-06-11</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-chasing-every-new-frontier-model-is-breaking-your-focus/</loc>
++    <lastmod>2026-06-11</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-most-digital-nomads-will-break-when-their-next-remote-job-disappea/</loc>
++    <lastmod>2026-06-11</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-most-digital-nomads-will-fail-without-an-experience-buffer/</loc>
++    <lastmod>2026-06-11</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/initial-failure/</loc>
++    <lastmod>2026-06-10</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/ai-content-pipeline/</loc>
++    <lastmod>2026-06-09</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/executive-to-ai-dev/</loc>
++    <lastmod>2026-06-08</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-my-perplexity-citations-jumped-400-after-killing-seo-tactics/</loc>
++    <lastmod>2026-06-07</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/geo-failed-until-i-stopped-treating-it-like-seo/</loc>
++    <lastmod>2026-06-06</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/spanish-learning-on-whatsapp-why-3-paying-users-beat-100-web-signups/</loc>
++    <lastmod>2026-06-05</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/0-to-100-career-pivot-to-ai-developer/</loc>
++    <lastmod>2026-06-04</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-your-ai-pitch-fails-with-non-technical-investors-and-how-to-fix-it/</loc>
++    <lastmod>2026-06-04</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/automating-content/</loc>
++    <lastmod>2026-06-03</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/80-of-my-executive-experience-was-useless-in-ai-development/</loc>
++    <lastmod>2026-06-02</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/90-of-my-executive-experience-was-useless-in-ai-development/</loc>
++    <lastmod>2026-06-01</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/ai-hiring-automation-ethics/</loc>
++    <lastmod>2026-06-01</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-i-stopped-waiting-for-deep-work-blocks-and-started-building-in-tax/</loc>
++    <lastmod>2026-05-30</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/i-have-no-computer-science-degree-and-i-build-production-ai-systems/</loc>
++    <lastmod>2026-05-29</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/my-daily-routine-as-an-ai-augmented-solo-builder-no-productivity-porn/</loc>
++    <lastmod>2026-05-29</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/what-i-changed-to-get-cited-by-perplexity-geo-is-not-seo/</loc>
++    <lastmod>2026-05-28</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-my-pages-started-appearing-in-perplexity-after-i-gave-up-on-seo/</loc>
++    <lastmod>2026-05-26</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-perplexity-started-citing-my-blog-5-changes-that-actually-worked/</loc>
++    <lastmod>2026-05-25</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/brightdata-web-unlocker-ate-40-of-our-b2b-enrichment-budget-for-12-lift/</loc>
++    <lastmod>2026-05-24</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/brightdata-web-unlocker-ate-40-of-our-enrichment-budget-heres-what-actually-worked/</loc>
++    <lastmod>2026-05-24</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/what-a-fractional-cto-actually-does-for-your-ai-startup/</loc>
++    <lastmod>2026-05-23</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/what-a-fractional-cto-actually-ships-at-an-ai-startup/</loc>
++    <lastmod>2026-05-22</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/what-a-fractional-cto-actually-does-for-ai-startups/</loc>
++    <lastmod>2026-05-21</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/fractional-cto-for-ai-startups-architecture-vendor-traps-and-timing/</loc>
++    <lastmod>2026-05-20</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/building-ai-language-tutors-on-whatsapp-architecture-beyond-chatbots/</loc>
++    <lastmod>2026-05-19</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/geo-vs-seo-engineering-content-for-ai-citation/</loc>
++    <lastmod>2026-05-18</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/geo-vs-seo-why-chatgpt-citations-matter-more-than-google-rankings-2026-05-18/</loc>
++    <lastmod>2026-05-18</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/geo-vs-seo-why-your-content-needs-to-be-quotable-by-ai/</loc>
++    <lastmod>2026-05-18</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/what-a-fractional-cto-actually-does-for-ai-startups-architecture-and-timing/</loc>
++    <lastmod>2026-05-18</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/when-your-ai-startup-actually-needs-a-fractional-cto/</loc>
++    <lastmod>2026-05-18</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/geo-vs-seo-making-your-content-quotable-by-ai-search-engines/</loc>
++    <lastmod>2026-05-17</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/geo-vs-seo-why-chatgpt-citations-matter-more-than-google-rankings/</loc>
++    <lastmod>2026-05-16</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/what-is-an-ai-agent-a-builders-definition-from-production/</loc>
++    <lastmod>2026-05-15</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/ai-automation-for-small-business-why-most-projects-die-before-launch/</loc>
++    <lastmod>2026-05-14</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
++  <url>
++    <loc>https://aideazz.xyz/blog/why-i-run-production-ai-agents-on-oracle-clouds-free-tier/</loc>
++    <lastmod>2026-05-14</lastmod>
++    <changefreq>monthly</changefreq>
++    <priority>0.75</priority>
++  </url>
+ </urlset>
+-- 
+2.43.0
+
