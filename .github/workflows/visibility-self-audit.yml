@@ -30,3 +30,8 @@ jobs:
         run: npm ci && npx tsc
       - name: Audit AIdeazz properties
         run: node scripts/visibility-self-audit.cjs
+      # 2026-08-21: prove the daily post's canonical GEO URL is on the IPFS pin,
+      # not only in git / Dev.to / the portfolio API. A missing public/blog/<slug>
+      # directory 404s with "no link named …" while those other surfaces stay green.
+      - name: Audit canonical Telegram-ops post
+        run: node scripts/visibility-self-audit.cjs https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/
