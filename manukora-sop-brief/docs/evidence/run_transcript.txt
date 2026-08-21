@@ -1,0 +1,82 @@
+=== unittest 2026-08-06T20:21:30Z ===
+test_catches_invented_months_over_target_subtraction (test_numeric_guard.NumericGuardTests.test_catches_invented_months_over_target_subtraction) ... ok
+test_catches_invented_total (test_numeric_guard.NumericGuardTests.test_catches_invented_total) ... ok
+test_catches_rounded_percent (test_numeric_guard.NumericGuardTests.test_catches_rounded_percent) ... ok
+test_clean_display_strings_pass (test_numeric_guard.NumericGuardTests.test_clean_display_strings_pass) ... ok
+test_find_unknown_numbers_empty_on_payload_echo (test_numeric_guard.NumericGuardTests.test_find_unknown_numbers_empty_on_payload_echo) ... ok
+test_template_briefing_passes_guard (test_numeric_guard.NumericGuardTests.test_template_briefing_passes_guard) ... ok
+test_demand_is_pooled_across_channels (test_traps.TrapTests.test_demand_is_pooled_across_channels) ... ok
+test_derived_cover_and_m4_revenue_pins (test_traps.TrapTests.test_derived_cover_and_m4_revenue_pins) ... ok
+test_forward_cover_widens_marginal_top_reorder_gap (test_traps.TrapTests.test_forward_cover_widens_marginal_top_reorder_gap) ... ok
+test_immunity_growth_overstatement_near_13pp (test_traps.TrapTests.test_immunity_growth_overstatement_near_13pp)
+Pinned during build: Immunity overstatement is 12.97pp, displays ~13. ... ok
+test_launch_sku_trend_excludes_partial_month (test_traps.TrapTests.test_launch_sku_trend_excludes_partial_month) ... ok
+test_phaseout_sku_not_reordered_above_threshold (test_traps.TrapTests.test_phaseout_sku_not_reordered_above_threshold) ... ok
+test_premium_sku_uses_three_month_target (test_traps.TrapTests.test_premium_sku_uses_three_month_target) ... ok
+test_priority_ranks_by_revenue_not_stock_risk (test_traps.TrapTests.test_priority_ranks_by_revenue_not_stock_risk) ... ok
+test_revenue_opportunity_uses_projected_demand (test_traps.TrapTests.test_revenue_opportunity_uses_projected_demand) ... ok
+test_sold_well_and_poorly_surface_m4_extremes (test_traps.TrapTests.test_sold_well_and_poorly_surface_m4_extremes) ... ok
+test_tension_case_high_volume_soft_channel_not_reordered (test_traps.TrapTests.test_tension_case_high_volume_soft_channel_not_reordered) ... ok
+test_zero_arrival_ignores_nonzero_units_on_order (test_traps.TrapTests.test_zero_arrival_ignores_nonzero_units_on_order) ... ok
+test_zero_arrival_months_means_no_order (test_traps.TrapTests.test_zero_arrival_months_means_no_order) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.024s
+
+OK
+
+=== pipeline --skip-llm ===
+Wrote /workspace/manukora-sop-brief/output/sop_briefing_2026-03.md
+Provider: template/deterministic | reorders: 5 | template=True
+  · no LLM keys in environment → template
+FAILOVER: NOTICE: No LLM provider keys were available. Briefing rendered from the deterministic template. Figures are identical; prose is not model-written.
+
+=== output head ===
+# S&OP Executive Briefing — March 2026
+
+_Generated from the pre-computed decision object (deterministic template; no LLM)._
+
+## What sold well / poorly (M4 pooled units)
+
+**Sold well**
+- Manuka Honey MGO 263+ 250g — 1604 units ($56,124 at list); growth 20.8%
+- Manuka Honey MGO 100+ 250g — 1032 units ($25,790 at list); growth 11.7%
+- Manuka Honey MGO 514+ 250g — 940 units ($46,991 at list); growth 23.7%
+
+**Sold poorly** (lowest M4 volume)
+- Propolis Tincture 30ml — 168 units ($5,878 at list); growth 40.0%
+- Manuka Honey MGO 850+ 500g — 244 units ($26,838 at list); growth 32.6%
+- Manuka Honey MGO 1700+ 100g — 300 units ($17,997 at list); growth 33.9%
+
+## What changed
+
+Pooled Shopify + Amazon demand is growing on every active line. Bioactive Blend trends use M2→M4 only (mid-January 2026 launch). Cover uses M4 sell-through; revenue opportunity and forward cover use one-month projected demand (price × projected units).
+
+## Reorder now (ranked by revenue opportunity)
+
+- **#1 Manuka Honey MGO 514+ 500g** — cover 1.99 / target 2 (forward 1.82); revenue opportunity $34,284/mo; suggested order 100 units; growth 30.7%.
+- **#2 Manuka Honey MGO 850+ 500g** — cover 1.80 / target 2 (forward 1.64); revenue opportunity $29,491/mo; suggested order 100 units; growth 32.6%.
+- **#3 Manuka Honey MGO 1700+ 100g** — cover 2.80 / target 3 (forward 2.54); revenue opportunity $19,845/mo; suggested order 200 units; growth 33.9%.
+- **#4 Bioactive Blend Energy 250g** — cover 1.91 / target 2 (forward 1.70); revenue opportunity $17,415/mo; suggested order 150 units; growth 26.0%.
+- **#5 Bioactive Blend Recovery 250g** — cover 1.68 / target 2 (forward 1.48); revenue opportunity $16,480/mo; suggested order 250 units; growth 28.2%.
+
+## Investigate — do not reorder
+
+- **Manuka Honey MGO 100+ 250g** — cover 6.20 / target 2 (forward 5.97); Cover is 6.20 months against a 2-month target, with 2000 units inbound. Amazon M3→M4 -4.0% while Shopify M3→M4 +3.9%. Do not reorder — investigate the soft channel.
+
+## Do not reorder
+
+- **Manuka Honey MGO 263+ 250g** — cover 4.55 / target 2; Cover 4.55 meets or exceeds the 2-month target; 3200 units inbound in 1 month(s).
+- **Manuka Honey MGO 263+ 500g** — cover 2.49 / target 2; Cover 2.49 meets or exceeds the 2-month target.
+- **Manuka Honey MGO 514+ 250g** — cover 3.62 / target 2; Cover 3.62 meets or exceeds the 2-month target; 1600 units inbound in 1 month(s).
+- **Manuka Honey MGO 850+ 250g** — cover 3.54 / target 2; Cover 3.54 meets or exceeds the 2-month target; 800 units inbound in 2 month(s).
+- **Propolis Tincture 30ml** — cover 1.37 / target 2; Phase-out SKU at 41 days of cover (floor is 30 days). Under the 2-month target, but do not reorder.
+- **Bioactive Blend Immunity 250g** — cover 2.27 / target 2; Cover 2.27 meets or exceeds the 2-month target; 800 units inbound in 1 month(s).
+
+## Method notes
+
+- Bioactive Blend M1 sales exist in the extract but the brief says mid-M2 launch; trend uses M2→M4 only. Conflict reported, not silently resolved.
+- Cover uses M4 pooled demand (observed baseline per brief). Revenue opportunity and forward cover use one-month projected demand (M4 × (1 + mean MoM of the trend window)).
+- Priority ranks by revenue opportunity (price × projected demand), not by cover shortfall size.
+- Manuka Honey MGO 514+ 500g is only 0.01 months under target on today's cover, but forward cover is 1.82 (gap 0.18). Urgency is justified by growth, not by the 0.01-month headline alone.
+
