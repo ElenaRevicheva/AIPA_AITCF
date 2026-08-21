@@ -95,6 +95,14 @@ check("sitemap source uses SITEMAP_COMMIT_MESSAGE not a skip-ci literal", () => 
   assert.ok(publisher.includes("SITEMAP_COMMIT_MESSAGE"));
 });
 
+const republish = fs.readFileSync(path.join(root, "scripts/republish-blog-html.cjs"), "utf8");
+check("republish CLI uses single-article put, not bulk skip-ci storm", () => {
+  assert.ok(republish.includes("pushOneArticleHtml"));
+  assert.ok(!republish.includes("pushAllBlogArticlesHtml"));
+  assert.ok(!republish.includes("bulk: true"));
+  assert.ok(!republish.includes("[skip ci]"));
+});
+
 if (failed) {
   console.error(`\n${failed} check(s) failed`);
   process.exit(1);
