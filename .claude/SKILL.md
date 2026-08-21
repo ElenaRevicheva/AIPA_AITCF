@@ -1,9 +1,16 @@
 # SKILL.md — AI Tech Co-Founder Operating Manual
-> Last updated: 2026-07-27 | Repo: https://github.com/ElenaRevicheva/AIPA_AITCF | Working dir: `D:\aideazz\ai-cofounders\cto-aipa`
+> Last updated: 2026-08-21 | Repo: https://github.com/ElenaRevicheva/AIPA_AITCF | Working dir: `D:\aideazz\ai-cofounders\cto-aipa`
 
 ---
 
 ## 🎯 CURRENT REALITY — READ THIS FIRST (July 27 2026)
+
+**Open ops handoff (21 Aug 2026):** canonical
+`https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/`
+is on GitHub + Dev.to + `/portfolio` and **404s on IPFS**. 4everland card still
+shows `29d1a63` / CID `bafybeibllpftpprs4kg4p4jjrjsrhddgxl5h5cd3af36abhovxizm25z5m`.
+Do not push more aideazz commits until that card SHA moves. Next agent:
+`docs/oracle/HANDOFF_2026-08-21_TELEGRAM_BLOG_PIN.md` and `CLAUDE.md` CURRENT BLOCKER.
 
 **The building era is over. Elena runs TWO money tracks in parallel — both are first-class:**
 

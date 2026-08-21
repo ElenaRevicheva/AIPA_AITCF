@@ -6,6 +6,17 @@ not optional politeness — they are the deliverable.
 
 ---
 
+## CURRENT BLOCKER (21 Aug 2026) — read before touching the blog pin
+
+The 21 Aug daily post is on GitHub + Dev.to + `/portfolio` and **404s on the
+canonical GEO URL**. 4everland’s last pin is still `29d1a63` (20 Aug 21:30).
+Do **not** push more aideazz commits expecting the CID to move.
+
+**Full handoff for the next agent:**
+`docs/oracle/HANDOFF_2026-08-21_TELEGRAM_BLOG_PIN.md`
+
+---
+
 ## 1. Close every session by teaching the concept
 
 A fix is half-delivered when the code works. The other half is that Elena can
