@@ -59,3 +59,10 @@ runs instead of hiding it behind "Traduciendo…".
 `0004-4everland-rebuild-stamp.patch` is a follow-up no-skip-ci stamp
 (`public/4everland-pin-stamp.txt`) if the first pin commit did not change the CID.
 
+`0005-wiki-refresh-pin-telegram-post.patch` — wiki-ship-shaped sitemap/geo refresh
+so the Telegram-ops HTML already in git is in the pin. Applied; live CID did not move.
+
+`0006-wiki-git-ahead-of-pin.patch` — new wiki chapter + concept (`git-is-not-the-origin`)
+for the 21 Aug 2026 incident (56 skip-ci commits, then eligible SHAs, live CID unchanged).
+Regenerates `public/ai-ops-wiki.html` (Rev 14) and restamps the pin file. No `[skip ci]`.
+
