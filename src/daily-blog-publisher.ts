@@ -18,6 +18,7 @@ import * as path from "path";
 import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
 import { claudeWithGroqFallback, geminiComplete, groqModel } from "./llm-resilience";
+import { SITEMAP_COMMIT_MESSAGE, devtoCanonicalPreface } from "./blog-github-commit";
 
 /**
  * 2026-05-27 — Anthropic-credit-exhaustion resilience.
@@ -591,7 +592,9 @@ export async function pushSitemapToGithub(): Promise<void> {
   } catch { /* new file */ }
 
   const body: Record<string,string> = {
-    message: "chore(sitemap): auto-update [skip ci]",
+    // Never [skip ci]: 4everland will not pin a new /blog/{slug} from a skipped
+    // commit, and a sitemap-only skip after the HTML put can debounce-drop the pin.
+    message: SITEMAP_COMMIT_MESSAGE,
     content: encoded,
   };
   if (sha) body.sha = sha;
@@ -604,6 +607,38 @@ export async function pushSitemapToGithub(): Promise<void> {
     console.warn("📍 Sitemap commit failed (" + put.status + "): " + err.slice(0, 200));
   }
 }
+
+/**
+ * Put THIS article's static HTML, then the sitemap. One GitHub commit that
+ * 4everland will actually build — never the all-articles skip-ci storm.
+ * Returns whether the HTML PUT succeeded.
+ */
+async function shipNewArticleCanonical(article: {
+  slug: string;
+  title: string;
+  markdown: string;
+  devtoUrl: string;
+  aideazzBlogUrl: string;
+}): Promise<boolean> {
+  const { pushOneArticleHtml } = await import("./blog-static-pages");
+  const htmlOk = await pushOneArticleHtml({
+    slug: article.slug,
+    title: article.title,
+    markdown: article.markdown,
+    devtoUrl: article.devtoUrl,
+    url: article.aideazzBlogUrl,
+  });
+  if (!htmlOk) {
+    console.warn("📄 BlogStatic: canonical HTML push failed — GEO/AEO page will 404 until retry");
+  }
+  try {
+    await pushSitemapToGithub();
+  } catch (e) {
+    console.warn("📍 Sitemap:", e instanceof Error ? e.message : String(e));
+  }
+  return htmlOk;
+}
+
 export function getBlogPostCachePath(): string {
   return path.join((process.env.DAILY_BLOG_TOPIC_STATE_DIR ?? process.env.HASHNODE_TOPIC_STATE_DIR) || path.join(process.cwd(), "data"), "blog-posts-cache.json");
 }
@@ -931,8 +966,9 @@ async function crossPostToDevTo(
   const apiKey = process.env.DEVTO_API_KEY?.trim();
   if (!apiKey) return null;
   try {
-    // Prepend authorship line Dev.to readers see before hitting canonical
-    const body = `*Originally published on [AIdeazz](${canonicalUrl}) — cross-posted here with canonical link.*\n\n${markdown}`;
+    // Domain link, not italic "AIdeazz": wrapping this line in *…* made Dev.to
+    // treat the I as the emphasis closer and render the brand as "Aldeazz".
+    const body = `${devtoCanonicalPreface(canonicalUrl)}\n\n${markdown}`;
     const res = await fetch("https://dev.to/api/articles", {
       method: "POST",
       headers: {
@@ -1061,14 +1097,18 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   writeTopicIndex(index);
   saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
-  // Auto-push updated sitemap to aideazz repo → 4everland redeploys
-  pushSitemapToGithub().catch(e => console.warn("📍 Sitemap:", e instanceof Error ? e.message : String(e)));
 
-  // ADDITIVE (May 22 2026): also regenerate per-article static HTML pages for SEO/GEO discoverability.
-  // Fire-and-forget so it never blocks the publish cycle. Surgical: only ADDS new files at
-  // public/blog/{slug}/index.html in aideazz repo; no existing files touched.
-  import('./blog-static-pages').then(m => m.pushAllBlogArticlesHtml())
-    .catch(e => console.warn("[BlogStatic]", e instanceof Error ? e.message : String(e)));
+  // Canonical GEO page first, then sitemap, then Telegram. Fire-and-forget bulk
+  // regen used to (1) skip-ci every existing article in ~15s, (2) tell Telegram
+  // "published" before GitHub even had public/blog/{slug}/index.html — so Dev.to
+  // and /portfolio listed a URL that 4everland's IPFS pin did not contain.
+  const htmlOk = await shipNewArticleCanonical({
+    slug,
+    title: finalTitle,
+    markdown: parsed.markdown,
+    devtoUrl,
+    aideazzBlogUrl,
+  });
 
   // ADDITIVE (May 28 2026): also distribute this article to Buffer (LinkedIn etc.) with a
   // UTM-tagged link so click-throughs flow into /marketing/inquiry → triage → HubSpot.
@@ -1096,6 +1136,9 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     "",
     "1) aideazz /blog (canonical):",
     aideazzBlogUrl,
+    htmlOk
+      ? "   static HTML committed to GitHub (4everland pin follows)."
+      : "   ⚠️ canonical HTML push FAILED — GEO page may 404 until retry.",
     "",
     "2) Dev.to (cross-post):",
     devtoUrl,

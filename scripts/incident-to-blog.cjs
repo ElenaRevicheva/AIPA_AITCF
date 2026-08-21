@@ -223,7 +223,7 @@ async function main() {
   let devtoUrl = null;
   const apiKey = (process.env.DEVTO_API_KEY || '').trim();
   if (apiKey) {
-    const body = `*Originally published on [AIdeazz](${canonical}) — cross-posted here with canonical link.*\n\n${markdown}`;
+    const body = `Originally published at [aideazz.xyz](${canonical}) — cross-posted here with canonical link.\n\n${markdown}`;
     const res = await fetch('https://dev.to/api/articles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': apiKey },

@@ -1,0 +1,71 @@
+From 2f21c3243b7118f50a2f45c0736ef3d12635a493 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 21 Aug 2026 19:52:29 +0000
+Subject: [PATCH] fix(blog): pin telegram-ops-dashboard HTML and show English
+ while translating
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+4everland's current CID has no public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui
+directory, so the canonical GEO URL 404s on IPFS while Dev.to and /portfolio already
+list it. A no-skip-ci commit of the existing static page forces a pin rebuild.
+
+Spanish UI hid the English body behind "Traduciendo…" for the whole poll window
+(and forever if fetch hung). Show the original underneath; abort hung translation
+fetches after 12s.
+---
+ .../index.html                                           | 1 +
+ src/pages/BlogPost.tsx                                   | 9 +++++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html b/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html
+index 81fe654..f4595d9 100644
+--- a/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html
++++ b/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html
+@@ -1,4 +1,5 @@
+ <!DOCTYPE html>
++<!-- 4everland-pin 2026-08-21 telegram-ops-dashboard -->
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8">
+diff --git a/src/pages/BlogPost.tsx b/src/pages/BlogPost.tsx
+index dce5b61..33084a5 100644
+--- a/src/pages/BlogPost.tsx
++++ b/src/pages/BlogPost.tsx
+@@ -154,7 +154,7 @@ export default function BlogPost() {
+     const poll = async () => {
+       attempt += 1;
+       try {
+-        const r = await fetch(url);
++        const r = await fetch(url, { signal: AbortSignal.timeout(12000) });
+         if (r.status === 202) {
+           if (!cancelled && attempt < MAX_ATTEMPTS) window.setTimeout(poll, RETRY_MS);
+           else if (!cancelled) setServerEsLoading(false); // give up quietly → English shows
+@@ -394,11 +394,12 @@ export default function BlogPost() {
+             className="prose prose-invert prose-purple max-w-none prose-headings:text-white prose-a:text-purple-400 prose-strong:text-white"
+           >
+             {showEsTranslating ? (
+-              <div className="flex items-center gap-3 text-purple-300 py-12 not-prose">
++              <div className="flex items-center gap-3 text-purple-300 py-4 not-prose mb-6">
+                 <Loader2 className="w-6 h-6 animate-spin shrink-0" />
+                 <span>{t("blog.post.translatingEs")}</span>
+               </div>
+-            ) : (
++            ) : null}
++            {displayBody ? (
+               <ReactMarkdown
+                 remarkPlugins={[remarkGfm]}
+                 components={{
+@@ -414,7 +415,7 @@ export default function BlogPost() {
+               >
+                 {displayBody}
+               </ReactMarkdown>
+-            )}
++            ) : null}
+           </div>
+           {sourceUrl ? (
+             <footer className="mt-12 pt-8 border-t border-white/10 text-sm text-gray-400">
+-- 
+2.43.0
+

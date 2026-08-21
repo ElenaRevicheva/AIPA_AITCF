@@ -29,7 +29,7 @@ async function publishToDevTo(title: string, markdown: string, canonicalUrl: str
   const apiKey = process.env.DEVTO_API_KEY?.trim();
   if (!apiKey) return null;
   try {
-    const body = `*Originally published on [AIdeazz](${canonicalUrl}) — cross-posted here with canonical link.*\n\n${markdown}`;
+    const body = `Originally published at [aideazz.xyz](${canonicalUrl}) — cross-posted here with canonical link.\n\n${markdown}`;
     const res = await fetch('https://dev.to/api/articles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': apiKey },

@@ -44,3 +44,15 @@ git push origin main   # 4everland auto-deploys
 Or: grant the Cursor GitHub App access to the `aideazz` repo
 (GitHub → Settings → Applications → Cursor → Repository access), then any
 cloud agent can push it directly.
+
+`0002-portfolio-first-seo.patch` — see file.
+
+## What `0003-pin-telegram-blog-html.patch` does
+
+The 21 Aug 2026 daily post `telegram-my-ai-agent-ops-dashboard-not-a-web-ui`
+landed on Dev.to and `/portfolio` while 4everland's IPFS pin still had no
+`public/blog/<slug>/` directory (`no link named "telegram-my-ai-agent-ops-dashboard-not-a-web-ui"`).
+This patch (1) comments the existing static HTML so 4everland rebuilds without
+`[skip ci]`, and (2) shows the English body while the Spanish translation poll
+runs instead of hiding it behind "Traduciendo…".
+
