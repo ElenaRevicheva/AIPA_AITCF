@@ -56,3 +56,6 @@ This patch (1) comments the existing static HTML so 4everland rebuilds without
 `[skip ci]`, and (2) shows the English body while the Spanish translation poll
 runs instead of hiding it behind "Traduciendo…".
 
+`0004-4everland-rebuild-stamp.patch` is a follow-up no-skip-ci stamp
+(`public/4everland-pin-stamp.txt`) if the first pin commit did not change the CID.
+

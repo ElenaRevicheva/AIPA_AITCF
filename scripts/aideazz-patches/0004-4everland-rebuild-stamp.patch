@@ -1,0 +1,34 @@
+From 274d511061c9a397e6abbe924625237da67a8990 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 21 Aug 2026 20:05:11 +0000
+Subject: [PATCH] chore: 4everland rebuild stamp for telegram-ops-dashboard pin
+
+Second no-skip-ci commit so the host rebuilds after the 19:31 skip-ci
+storm. Adds public/4everland-pin-stamp.txt (copied into dist by Vite).
+---
+ public/4everland-pin-stamp.txt                                  | 1 +
+ .../telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html  | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+ create mode 100644 public/4everland-pin-stamp.txt
+
+diff --git a/public/4everland-pin-stamp.txt b/public/4everland-pin-stamp.txt
+new file mode 100644
+index 0000000..cb2ad0b
+--- /dev/null
++++ b/public/4everland-pin-stamp.txt
+@@ -0,0 +1 @@
++pinned 2026-08-21T20:05:11Z telegram-ops-dashboard
+diff --git a/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html b/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html
+index f4595d9..b673446 100644
+--- a/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html
++++ b/public/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/index.html
+@@ -1,5 +1,5 @@
+ <!DOCTYPE html>
+-<!-- 4everland-pin 2026-08-21 telegram-ops-dashboard -->
++<!-- 4everland-pin 2026-08-21T20:05Z telegram-ops-dashboard -->
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8">
+-- 
+2.43.0
+

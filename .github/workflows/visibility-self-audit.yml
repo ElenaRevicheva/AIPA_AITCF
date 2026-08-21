@@ -28,6 +28,26 @@ jobs:
           node-version: "22"
       - name: Build engine
         run: npm ci && npx tsc
+      - name: Dump live canonical HTML
+        run: |
+          set +e
+          echo "=== GET article ==="
+          curl -sS -D /tmp/art.hdr -o /tmp/art.html -A "AIdeazzVisibilityBot/1.0" \
+            "https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/"
+          echo "--- headers ---"
+          cat /tmp/art.hdr
+          echo "--- first 1200 bytes ---"
+          head -c 1200 /tmp/art.html; echo
+          echo "=== GET pin stamp ==="
+          curl -sS -D /tmp/stamp.hdr -o /tmp/stamp.txt -A "AIdeazzVisibilityBot/1.0" \
+            "https://aideazz.xyz/4everland-pin-stamp.txt"
+          echo "--- stamp headers ---"
+          cat /tmp/stamp.hdr
+          echo "--- stamp body ---"
+          cat /tmp/stamp.txt; echo
+          echo "=== /blog/ slug mention count ==="
+          curl -sS -A "AIdeazzVisibilityBot/1.0" "https://aideazz.xyz/blog/" \
+            | grep -c "telegram-my-ai-agent-ops-dashboard-not-a-web-ui" || true
       - name: Audit AIdeazz properties
         run: node scripts/visibility-self-audit.cjs
       # 2026-08-21: prove the daily post's canonical GEO URL is on the IPFS pin,
