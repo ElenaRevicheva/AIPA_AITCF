@@ -333,6 +333,18 @@ const MAKE_STALE_MIN = Number(process.env.MAKE_STALE_MIN ?? 45);
 const MAKE_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 /** Standing, accepted conditions (empty Anthropic balance) get a daily voice, not a six-hourly one. */
 const CREDIT_ALERT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+/**
+ * "Switched OFF" became a standing condition too, so it earns the same daily voice.
+ *
+ * With Make's Anthropic balance at zero, Make disables the scenario itself. The
+ * watchdog finds it off, restarts it, and finds it off again — the same accepted
+ * state re-reported on the dot every six hours (21-22 Aug 2026: 11:14, 17:15,
+ * 23:15, 05:15). That is the Aug 19 mistake wearing a different message. An alert
+ * that repeats is an alert that gets muted, and the next real one goes with it.
+ *
+ * Only the TELLING is throttled — see below, the repair still runs every tick.
+ */
+const UNHEALTHY_ALERT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Alert cooldowns live ON DISK, because the process restarts.
@@ -587,12 +599,14 @@ export async function checkMakeHealth(): Promise<{
      */
     writeMakeVerdict(false, sc.isActive ? 'scheduled but not running' : 'scenario switched OFF');
 
-    if (!alertAllowed('make-unhealthy', MAKE_ALERT_COOLDOWN_MS)) {
-      return { ok: false, lastRunMinAgo, nextExecMinAway, action: 'none' };
-    }
-
     // Self-heal. Someone switching it off, or a scheduler left un-armed after an
     // edit, are both cured by a clean stop→start, which recomputes nextExec.
+    //
+    // This runs BEFORE the alert cooldown, because they answer different questions.
+    // "Is Make down?" must be repaired on every tick; "should Elena hear about it
+    // again?" is once a day. Gating the repair behind the notification, as this did
+    // until 22 Aug 2026, meant a quiet Telegram bought a scenario left off for a
+    // full day.
     let action: 'none' | 're-armed' | 'started' | 'alerted' = 'alerted';
     try {
       if (sc.isActive) {
@@ -603,6 +617,10 @@ export async function checkMakeHealth(): Promise<{
       if (started.ok) action = sc.isActive ? 're-armed' : 'started';
     } catch {
       /* fall through to the alert — Elena still needs to know */
+    }
+
+    if (!alertAllowed('make-unhealthy', UNHEALTHY_ALERT_COOLDOWN_MS)) {
+      return { ok: false, lastRunMinAgo, nextExecMinAway, action };
     }
 
     const verdict = sc.isActive
