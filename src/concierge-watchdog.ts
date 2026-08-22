@@ -329,6 +329,13 @@ async function notifyOwners(text: string): Promise<void> {
  */
 /** Make's own execution status code for a failed run (1 = success, 3 = error). */
 const MAKE_STATUS_ERROR = 3;
+/**
+ * Explicit success. Some rows in the log carry no status at all (a scenario
+ * start/stop marker, an execution still being written), and `!== ERROR` would
+ * silently count those as proof of health. Recovery has to be asserted, not
+ * inferred from the absence of a failure.
+ */
+const MAKE_STATUS_SUCCESS = 1;
 const MAKE_STALE_MIN = Number(process.env.MAKE_STALE_MIN ?? 45);
 const MAKE_ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 /** Standing, accepted conditions (empty Anthropic balance) get a daily voice, not a six-hourly one. */
@@ -512,12 +519,31 @@ export async function checkMakeHealth(): Promise<{
       // Only complain if nothing has succeeded SINCE the error. Alerting purely
       // because an error sits inside the window would keep crying wolf for hours
       // after Elena has already fixed the cause (topping up credits, say).
+      /**
+       * Recovery asks "did the error clear", NOT "has it done work since".
+       *
+       * This used to also demand `operations > 1`, and that deadlocked the exact
+       * case it exists for. On 22 Aug 2026 Elena topped the Anthropic balance up;
+       * Make's next run at 12:29:16Z was clean but cost one operation, because the
+       * trigger found no new contact. A quiet inbox can ONLY produce clean ops=1
+       * runs — so Make stayed "erroring", Oracle kept first refusal on every draft,
+       * and Fable 5 could not get the shot she had just paid for. Make cannot earn
+       * a productive run while the verdict is what withholds the work.
+       *
+       * A clean run is already sufficient evidence the failing module stopped
+       * failing. The ops>1 rule still belongs to `producedRecently` above, which
+       * answers the genuinely different question: is it running and drafting
+       * nothing (the 16-day filter bug of July)? Two questions, two tests.
+       *
+       * Failing wrong is bounded: if Make is still broken it errors on the next
+       * lead, the 15-min check flips the verdict back, and the 20-minute cover
+       * drafts locally regardless. A draft arrives late; none is ever lost.
+       */
       const recoveredSince =
         !!lastError &&
         rows.some(
           l =>
-            l.status !== MAKE_STATUS_ERROR &&
-            (l.operations ?? 0) > 1 &&
+            l.status === MAKE_STATUS_SUCCESS &&
             Date.parse(l.timestamp) > Date.parse(lastError.timestamp),
         );
       if (lastError && !recoveredSince && errMinAgo !== null && errMinAgo <= 6 * 60) {
