@@ -381,6 +381,56 @@ async function postToMakeWebhook(m: VisitorMessage): Promise<boolean> {
   }
 }
 
+/**
+ * Give Fable 5 first shot on chat too — without stalling the poll loop.
+ *
+ * The chat bubble had no precedence at all: it posted to Make and drafted
+ * locally in the same breath, so Oracle answered in ~2.6s against Make's poll
+ * and won every time. On 22 Aug 2026 Elena topped the Anthropic balance up,
+ * watched the form path correctly hand its lead to Fable 5, then tested the
+ * bubble and got "Draft (claude, 2603ms)" — the local writer again. Make never
+ * lost that race; it was never in it.
+ *
+ * The form path (cto-aipa.ts) solves this by AWAITING a grace window, which is
+ * safe there because it handles one inquiry per request. This runs inside a
+ * for-loop over every unread visitor message, so an inline sleep would hold
+ * back everyone queued behind the current visitor — including the second pass
+ * that resolves anonymous threads. So: schedule, do not sleep.
+ *
+ * If the process restarts inside the grace the timer dies with it, and the
+ * registerLeadWatch above still covers the lead at 20 minutes — the same
+ * backstop every chat lead already has. Fails toward drafting NOW whenever the
+ * verdict is missing or negative, because a duplicate collapses on the
+ * person+message fingerprint and a silence does not.
+ */
+async function draftAfterMakeGrace(m: VisitorMessage): Promise<void> {
+  let verdict = { can: false, reason: 'verdict unavailable' };
+  try {
+    const { makeCanDraft } = await import('./concierge-watchdog.js');
+    verdict = makeCanDraft();
+  } catch (e) {
+    console.warn('[chat-concierge] verdict read failed:', (e as Error).message?.slice(0, 80));
+  }
+
+  const graceMs = Number(process.env.CONCIERGE_MAKE_GRACE_MIN ?? 5) * 60 * 1000;
+  if (!verdict.can || graceMs <= 0) {
+    console.log(`[chat-concierge] drafting now — Make cannot: ${verdict.reason}`);
+    await postFallbackDraft(m);
+    return;
+  }
+
+  console.log(
+    `[chat-concierge] Make looks able to draft (${verdict.reason}) — holding ` +
+      `${Math.round(graceMs / 60000)} min so Fable 5 gets first shot for ${m.email}`,
+  );
+  const t = setTimeout(() => {
+    void postFallbackDraft(m).catch(e =>
+      console.warn('[chat-concierge] deferred draft failed:', (e as Error).message?.slice(0, 90)),
+    );
+  }, graceMs);
+  t.unref?.();
+}
+
 async function postFallbackDraft(m: VisitorMessage): Promise<boolean> {
   const secret = process.env.CONCIERGE_SECRET?.trim();
   if (!secret || !m.email) return false;
@@ -522,7 +572,7 @@ export async function pollChatOnce(
            * nothing when Make does eventually answer — the second one collapses.
            */
           await postToMakeWebhook(m);
-          await postFallbackDraft(m);
+          await draftAfterMakeGrace(m);
           if (makeWillFire) {
             console.log(`[chat-concierge] new contact — polling scenario may also see ${m.email} (deduped)`);
           }
@@ -538,7 +588,7 @@ export async function pollChatOnce(
       console.log(`[chat-concierge] thread ${m.threadId} already in HubSpot — no second deal, drafting reply`);
       // Same reasoning as above: Make's 200 proves delivery, never an answer.
       await postToMakeWebhook(m);
-      await postFallbackDraft(m);
+      await draftAfterMakeGrace(m);
     } else if (!m.email && !alreadyPushed) {
       // Anonymous for now — remember the thread and pick the identity up later.
       const pend = state.pendingIdentity || [];
