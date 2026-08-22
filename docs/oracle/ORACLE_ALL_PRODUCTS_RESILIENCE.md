@@ -1,5 +1,123 @@
 # Oracle Instance Resilience — All Products (Fix Bots Dying Silently)
 
+## 🟢 4everland pin + the sitemap's second writer (August 21-22 2026)
+
+The 21 August daily post published to Dev.to, announced itself on Telegram, and its
+canonical `aideazz.xyz` URL returned a raw IPFS error for **16 hours**. Nothing was
+wrong with the article, the generator, or git. Two separate defects, one of which was
+still invisible when the first was declared fixed.
+
+### Defect 1: the host was pinned to a SHA, and "Redeploy" replays the pin
+
+Eight deploy-eligible (non-`[skip ci]`) pushes landed on `aideazz/main` on 21 August.
+They produced **zero** production deployments. The last real build was
+**`29d1a63`, 20 Aug 21:30 UTC** — the previous day's wiki refresh.
+
+Clicking **Redeploy** in the 4everland dashboard did not fix it, and the reason is the
+whole lesson. GitHub's deployment record for that manual rebuild:
+
+```
+2026-08-22T11:41:21Z  production  ref: 29d1a6368073772964d1b8fcb99e80b0b1c41ac2
+```
+
+**A raw SHA, not `main`.** The host stores the revision it last built and Redeploy
+re-runs the build against *that stored pointer*. The rebuild succeeded, went green, and
+republished the same two-day-old tree with the same missing page.
+
+**What actually cured it:** pushing a *new* commit (`3a4efef`). 4everland picked it up
+and built it within ~2 minutes, unattended. Auto-deploy was not broken by then — a new
+SHA is what moves the pin. Whether the 21 Aug silence was throttling after 56
+`[skip ci]` blog-static commits landed inside one minute, or a transient outage, is not
+determinable from the records available; what is verified is that a fresh push builds
+normally now.
+
+**Verified live, before/after:**
+
+| | before | after |
+| --- | --- | --- |
+| `x-ipfs-path` CID | `bafybeif2oracz…` | **`bafybeif6p3okb…`** |
+| `/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/` | IPFS "no link named" | **200**, correct `<title>` |
+
+Seventeen commits were spent on this the previous evening, **six of them pure
+"poke the host" triggers** — rebuild stamps, a wiki chapter pushed to force a rebuild,
+a retry trigger. None moved the CID, because none of them were the problem.
+
+> **Rule:** a stuck static host is a **different system with a different credential**
+> from git. Do not retry the receipt. A second commit cannot unstick a host that is
+> pinned — and when it is not pinned, the *first* commit was already enough.
+
+### Defect 2: two writers own `public/sitemap.xml`, with different rules
+
+While defect 1 was being chased, `d28d8c3 chore(sitemap): auto-update` rewrote
+`aideazz/public/sitemap.xml` from **132 URLs to 71**, and stripped the trailing slash
+from all but one of them — silently reverting the 4 August canonical fix recorded
+below. `public/sitemap.txt`, regenerated in the same window, still held all 132.
+The two files disagreed with each other and nothing noticed.
+
+There are **two independent writers of that one file**:
+
+| Writer | Where | Sources blog URLs from | Trailing slash |
+| --- | --- | --- | --- |
+| `aideazz/scripts/generate-sitemap.mjs` | build step, before `vite build` | `public/blog/<slug>/index.html` — the files that actually ship | **yes**, always |
+| `cto-aipa/src/daily-blog-publisher.ts` | GitHub Contents API, no build | its own list | **no** |
+
+**Why the live site was never damaged:** `generate-sitemap.mjs` runs *inside*
+`npm run build` and overwrites `public/sitemap.xml` before Vite copies `public/` into
+`dist/`. The committed file is therefore a **fallback, not the served artifact** — the
+live sitemap stayed at 132 slashed URLs throughout. The exposure is real but narrower
+than it looks: the bad file is what ships **if the generator step is ever skipped or
+fails**, and it is what every human and crawler reading the repo sees.
+
+**Fix applied:** `aideazz` `3a4efef` restored `sitemap.xml` from the last good commit,
+verified against `sitemap.txt` as an exact set match — 132 URLs, zero drift in either
+direction — before pushing. Live after deploy: **132 URLs, 118 trailing-slashed,
+0 lost**, all seven enforced surfaces 200, `/blog` still carrying its own title rather
+than the homepage fallback.
+
+> **Rule:** one file, one writer. If a second process must write `sitemap.xml`, it has
+> to produce byte-identical output to the build generator — same source, same trailing
+> slash — or it is not a writer, it is a corruption with commit access.
+
+### The failure mode worth naming: a blocked pipeline is not a safe pipeline
+
+Defect 2 was **committed while defect 1 was blocking the deploy**. A stall does not
+just delay good work; it becomes a place where bad artifacts accumulate unobserved,
+and it hands them all to production the instant someone unblocks it. The riskiest
+moment in a stuck pipeline is the moment it starts moving again.
+
+> **Rule:** before unblocking a stuck deploy, diff what is *queued* against what is
+> *live* — deletions, sitemap/robots/canonical surfaces, page counts — and fix the
+> queue first. Unblocking is a release of everything that piled up behind the block.
+
+### Verification recipe (use this, not the dashboard)
+
+```bash
+# 1. What did the host actually build, and for which ref?
+gh api repos/ElenaRevicheva/aideazz/deployments \
+  --jq '.[] | "\(.created_at)  \(.environment)  \(.sha[0:7])  ref=\(.ref[0:12])"' | head -5
+
+# 2. Did the serving origin move? (completion — everything else is a receipt)
+curl -sI https://aideazz.xyz/blog/<slug>/ | grep -i x-ipfs-path
+
+# 3. Pre-flight before unblocking: what is queued vs live?
+git diff --diff-filter=D --name-only <live-sha> <head>      # must be 0
+git ls-tree -d --name-only <live-sha> public/blog/ | wc -l  # vs head — must not shrink
+
+# 4. SEO surfaces after any deploy
+curl -s https://aideazz.xyz/sitemap.xml | grep -o '<loc>' | wc -l          # 132
+curl -s https://aideazz.xyz/sitemap.xml | grep -o '<loc>[^<]*/</loc>' | wc -l  # 118 slashed
+curl -s -L https://aideazz.xyz/blog | grep -oE '<title>[^<]*</title>'      # NOT the homepage title
+```
+
+A trailing slash is not optional on this host: `/blog/<slug>` **301s** to
+`/blog/<slug>/`, so a sitemap or canonical without it points at a redirect.
+
+**Watch:** 4everland build time reads **800.02 minutes** as of 22 Aug. No quota page
+was located in the dashboard to compare it against, so this is a number to keep an eye
+on, not a diagnosed cap.
+
+---
+
 ## 🟢 VJH self-learning judge — now learns her REASONS and reads her screenshots (August 14 2026)
 
 Supersedes the July 8-9 "self-evolving judge" entry below. The loop was alive but
