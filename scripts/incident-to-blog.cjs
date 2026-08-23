@@ -254,7 +254,31 @@ async function main() {
   console.log(`blog page ${ok ? 'PUBLISHED' : 'FAILED'}: ${canonical}`);
   if (ok) await pushSitemapToGithub().catch(e => console.warn('sitemap push:', e.message));
 
-  state[inc.meta.slug] = { publishedAt: article.publishedAt, slug, devtoUrl };
+  /**
+   * Record the OUTCOME, never the attempt.
+   *
+   * This write used to be unconditional. On 23 Aug 2026 a run failed to push
+   * the page AND failed to reach Dev.to, and still stamped the incident as
+   * published -- so `--list` showed it done and every future run would have
+   * skipped it. The post existed nowhere and the ledger said it shipped. That
+   * is ack-is-not-completion inside the tool that publishes the wiki entry
+   * about ack-is-not-completion.
+   *
+   * Nothing shipped means nothing recorded: leave the slug unpublished so the
+   * next run retries it. Fails toward retrying, because a duplicate is caught
+   * by the `already published` guard above and a silent loss is not.
+   */
+  if (!ok && !devtoUrl) {
+    console.error(
+      `
+NOT RECORDED - neither the blog page nor Dev.to accepted it. ` +
+        `${inc.meta.slug} stays unpublished so the next run retries it.
+`,
+    );
+    process.exit(1);
+  }
+
+  state[inc.meta.slug] = { publishedAt: article.publishedAt, slug, devtoUrl, blogPage: ok };
   writeState(state);
   console.log(`\ndone — ${canonical}${devtoUrl ? ` + ${devtoUrl}` : ''}\n`);
 }
