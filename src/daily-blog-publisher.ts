@@ -19,6 +19,13 @@ import type { Anthropic } from "@anthropic-ai/sdk";
 import { saveContentLog } from "./database";
 import { claudeWithGroqFallback, geminiComplete, groqModel } from "./llm-resilience";
 import { SITEMAP_COMMIT_MESSAGE, devtoCanonicalPreface } from "./blog-github-commit";
+import {
+  MIN_FACTS,
+  collectProductionEvidence,
+  renderEvidenceForPrompt,
+  verifyArticleAgainstEvidence,
+  type EvidenceBundle,
+} from "./blog-evidence";
 
 /**
  * 2026-05-27 — Anthropic-credit-exhaustion resilience.
@@ -961,14 +968,64 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
   }
   const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries, publishedIndices);
 
-  const baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
+  /**
+   * GROUNDED MODE (23 Aug 2026) — measure first, then write, then verify.
+   *
+   * The unguarded path below hands the model a brief that asks for first-person
+   * production specifics and supplies none, which makes invention the only way
+   * to complete the task. Grounded mode collects the facts from the running
+   * system first and passes them as the sole permitted source material. If the
+   * day produced too little to say, it publishes nothing — silence is a correct
+   * outcome and a plausible invention is not.
+   */
+  const grounded = (process.env.DAILY_BLOG_GROUNDED ?? "true") === "true";
+  let evidence: EvidenceBundle | null = null;
+  let baseUserPrompt: string;
+
+  if (grounded) {
+    evidence = await collectProductionEvidence();
+    console.log(
+      `📰 Evidence: ${evidence.facts.length} fact(s), ${evidence.stack.length} known technologies` +
+        (evidence.failures.length ? ` — collector issues: ${evidence.failures.join('; ').slice(0, 200)}` : ''),
+    );
+    if (evidence.facts.length < MIN_FACTS) {
+      const why = `only ${evidence.facts.length} verified fact(s), need ${MIN_FACTS}`;
+      console.log(`📰 Daily blog: no article today — ${why}`);
+      await notifyTelegramSkipped("Not enough production evidence", why);
+      throw new Error(`SKIPPED_BY_COOLDOWN: insufficient evidence (${why})`);
+    }
+    baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
+
+Angle to explore: ${brief}
+
+${renderEvidenceForPrompt(evidence)}
+
+ABSOLUTE RULES — the article is rejected automatically if any is broken:
+1. Every number you write MUST appear in the evidence above, copied exactly.
+   Do NOT compute anything: no percentages, no averages, no totals, no ratios,
+   no "that works out to". A derived figure is an invented figure — the reader
+   cannot trace it, so it fails. Rounding a measured number for readability is
+   allowed ("roughly 55,000" for 55193); inventing one is not.
+2. Do NOT name any technology, database, queue or vendor that is not in the
+   evidence above. If you want to discuss something absent, describe the
+   general problem without claiming this system uses it.
+3. Where the evidence is silent, say so plainly or leave it out. "I do not
+   have that measured" is an acceptable sentence; a plausible guess is not.
+4. Write in first person about THIS system only, using the facts above as the
+   spine. The reader should be able to trace every claim to a measurement.
+
+Write for developers and technical founders, and keep it readable for a
+non-engineer business owner: name the concept, then explain it plainly.`;
+  } else {
+    baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
 
 Topic brief:
 ${brief}
 
 Write the article for developers and technical founders. Ground in AIdeazz reality: multi-agent systems, Oracle infra, Groq/Claude routing, Telegram/WhatsApp agents, real constraints.`;
+  }
 
-  console.log(`📰 Dev.to direct: generating topic #${index} (${keyword})…`);
+  console.log(`📰 Dev.to direct: generating topic #${index} (${keyword})… [${grounded ? 'grounded' : 'UNGROUNDED'}]`);
 
   const MAX_GENERATION_ATTEMPTS = 3;
   let parsed: ReturnType<typeof parseArticle> | null = null;
@@ -998,7 +1055,22 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     if (!parsed) throw new Error("Could not parse TITLE/MARKDOWN from model output");
 
     const v = validateArticle(parsed.markdown);
-    if (v.ok) break;
+    if (v.ok) {
+      // Grounding gate. The style gate above asks "is this well written?"; this
+      // one asks "is every claim traceable?" — the question that would have
+      // stopped eleven articles describing a database this system never ran.
+      if (!evidence) break;
+      const g = verifyArticleAgainstEvidence(parsed.markdown, evidence);
+      if (g.ok) break;
+      lastValidationError = `ungrounded — ${g.reason}`;
+      console.warn(`📰 Grounding gate rejected attempt ${attempt}: ${g.reason}`);
+      if (attempt === MAX_GENERATION_ATTEMPTS) {
+        // Fail closed. Nothing publishes, and the operator is told why.
+        await notifyTelegramSkipped("Grounding gate", g.reason);
+        throw new Error(`SKIPPED_BY_COOLDOWN: grounding gate — ${g.reason}`);
+      }
+      continue;
+    }
 
     lastValidationError = v.reason;
     if (attempt === MAX_GENERATION_ATTEMPTS) {
