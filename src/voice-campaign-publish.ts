@@ -17,7 +17,7 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import * as fs from 'fs';
 import * as path from 'path';
-import { saveBlogPostCache, pushSitemapToGithub } from './daily-blog-publisher';
+import { saveBlogPostCache } from './daily-blog-publisher';
 import { pushOneArticleHtml } from './blog-static-pages';
 import { bufferPostableChannels, bufferCreatePost } from './buffer-publisher';
 import type { ContentCluster } from './voice-growth-engine';
@@ -86,7 +86,8 @@ export async function publishVoiceCampaign(cluster: ContentCluster): Promise<Pub
     await pushOneArticleHtml({ slug: en.slug, title: en.title, markdown: en.markdown, ...(devtoUrl ? { devtoUrl } : {}), url: aideazzBlogUrl }).catch((e) =>
       console.warn('[VoiceCampaign] static page:', e instanceof Error ? e.message : String(e)),
     );
-    pushSitemapToGithub().catch((e) => console.warn('[VoiceCampaign] sitemap:', e instanceof Error ? e.message : String(e)));
+    // Sitemap intentionally not written here — generate-sitemap.mjs owns it and
+    // regenerates from the shipped pages on every deploy. See daily-blog-publisher.
     result.enBlogUrl = aideazzBlogUrl;
     result.devtoUrl = devtoUrl;
   }

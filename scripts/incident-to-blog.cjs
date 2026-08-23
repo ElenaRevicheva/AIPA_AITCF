@@ -217,7 +217,7 @@ async function main() {
   };
 
   const { pushOneArticleHtml } = require('../dist/blog-static-pages.js');
-  const { saveBlogPostCache, pushSitemapToGithub } = require('../dist/daily-blog-publisher.js');
+  const { saveBlogPostCache } = require('../dist/daily-blog-publisher.js');
 
   // Dev.to with canonical pointing home, so aideazz.xyz keeps the ranking credit.
   let devtoUrl = null;
@@ -252,7 +252,9 @@ async function main() {
   saveBlogPostCache({ slug, title, markdown, devtoUrl: devtoUrl || '', aideazzBlogUrl: canonical, stream: 'fieldnote' });
   const ok = await pushOneArticleHtml(article);
   console.log(`blog page ${ok ? 'PUBLISHED' : 'FAILED'}: ${canonical}`);
-  if (ok) await pushSitemapToGithub().catch(e => console.warn('sitemap push:', e.message));
+  // No sitemap write here: the website build regenerates it from the pages that
+  // actually ship. Writing one from this side stripped 61 URLs and every
+  // trailing slash each time it ran.
 
   /**
    * Record the OUTCOME, never the attempt.
