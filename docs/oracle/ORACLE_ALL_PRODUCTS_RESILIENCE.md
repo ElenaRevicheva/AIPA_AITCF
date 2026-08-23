@@ -78,6 +78,33 @@ than the homepage fallback.
 > to produce byte-identical output to the build generator — same source, same trailing
 > slash — or it is not a writer, it is a corruption with commit access.
 
+#### Update, 23 August: the restore was not the fix — the writer was removed
+
+Within 24 hours it fired again. Publishing a field note dropped the committed
+sitemap from 134 URLs to **73, with one trailing slash left**. The 22 Aug work
+restored the *data* and left the *cause* in place.
+
+`pushSitemapToGithub()` in `cto-aipa/src/daily-blog-publisher.ts` could not do the
+job from Oracle, and the reason is structural rather than a bug to patch: the VM
+has no copy of the shipped `public/blog/<slug>/index.html` tree, so it sourced
+blog URLs from the publisher's own JSON cache — **59 entries against 118 real
+pages** — and emitted `/blog/<slug>` with no trailing slash.
+
+The served sitemap never came from it. `generate-sitemap.mjs` runs inside the
+website build, before Vite copies `public/` into `dist/`, and reads the pages that
+actually ship. The function only ever wrote a worse fallback — which then became
+what a human reading the repo saw.
+
+**Removed the function and all four call sites** (daily publisher, voice campaign,
+`incident-to-blog`, `republish-blog-html`) in `cto-aipa` `4c6ef11`; sitemap
+regenerated from the build generator in `aideazz` `d133fab`. Verified live:
+**134 URLs, 120 trailing-slashed**, and `grep -c` for the function returns 0 in
+both `src/` and `dist/` on the VM.
+
+> **Rule, sharpened:** restoring the data is not fixing the defect. If a bad value
+> can be written again, you have documented the bug, not closed it. Ask what would
+> have to change for the wrong value to be *impossible*, and do that instead.
+
 ### The failure mode worth naming: a blocked pipeline is not a safe pipeline
 
 Defect 2 was **committed while defect 1 was blocking the deploy**. A stall does not
