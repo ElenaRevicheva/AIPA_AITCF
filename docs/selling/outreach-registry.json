@@ -2757,5 +2757,137 @@
     "email": "a@torrenegra.com",
     "emailDraft": "docs/selling/drafts/alexander-torrenegra-email.txt",
     "dealId": "64209796448"
+  },
+  "panama-relocation-firm-atlas": {
+    "company": "Panama Relocation Firm",
+    "email": "help@panamarelocationfirm.com",
+    "score": 98,
+    "dealId": "64286051211",
+    "phone": "50762000299",
+    "emailDraft": "docs/selling/drafts/panama-relocation-firm-atlas-email.txt",
+    "draft": "docs/selling/drafts/panama-relocation-firm-atlas.txt"
+  },
+  "panama-relocation-firm-atlas-fu": {
+    "company": "Panama Relocation Firm",
+    "email": "help@panamarelocationfirm.com",
+    "score": 98,
+    "dealId": "64286051211",
+    "phone": "50762000299",
+    "emailDraft": "docs/selling/drafts/panama-relocation-firm-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/panama-relocation-firm-atlas-fu.txt"
+  },
+  "panama-city-immigration-lawyer-atlas": {
+    "company": "Panama City Immigration Lawyer",
+    "email": "copyrightagent@primerus.com",
+    "score": 79,
+    "dealId": "64286102567",
+    "emailDraft": "docs/selling/drafts/panama-city-immigration-lawyer-atlas-email.txt"
+  },
+  "panama-city-immigration-lawyer-atlas-fu": {
+    "company": "Panama City Immigration Lawyer",
+    "email": "copyrightagent@primerus.com",
+    "score": 79,
+    "dealId": "64286102567",
+    "emailDraft": "docs/selling/drafts/panama-city-immigration-lawyer-atlas-fu-email.txt"
+  },
+  "permanent-residency-in-panama-atlas": {
+    "company": "Permanent Residency In Panama",
+    "email": "mail@panamags.com",
+    "score": 41,
+    "dealId": "64254213792",
+    "emailDraft": "docs/selling/drafts/permanent-residency-in-panama-atlas-email.txt"
+  },
+  "permanent-residency-in-panama-atlas-fu": {
+    "company": "Permanent Residency In Panama",
+    "email": "mail@panamags.com",
+    "score": 41,
+    "dealId": "64254213792",
+    "emailDraft": "docs/selling/drafts/permanent-residency-in-panama-atlas-fu-email.txt"
+  },
+  "medical-tourism-in-colombia-a-guide-for-american-atlas": {
+    "company": "Medical Tourism in Colombia: A Guide for American ...",
+    "email": "contact@medicaltourismpackages.com",
+    "score": 98,
+    "dealId": "64278502005",
+    "phone": "573107149133",
+    "emailDraft": "docs/selling/drafts/medical-tourism-in-colombia-a-guide-for-american-atlas-email.txt",
+    "draft": "docs/selling/drafts/medical-tourism-in-colombia-a-guide-for-american-atlas.txt"
+  },
+  "medical-tourism-in-colombia-a-guide-for-american-atlas-fu": {
+    "company": "Medical Tourism in Colombia: A Guide for American ...",
+    "email": "contact@medicaltourismpackages.com",
+    "score": 98,
+    "dealId": "64278502005",
+    "phone": "573107149133",
+    "emailDraft": "docs/selling/drafts/medical-tourism-in-colombia-a-guide-for-american-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/medical-tourism-in-colombia-a-guide-for-american-atlas-fu.txt"
+  },
+  "medical-tourism-in-medell-n-your-definitive-guid-atlas": {
+    "company": "Medical Tourism in Medellín: Your Definitive Guide",
+    "email": "info@mdecare.co",
+    "score": 96,
+    "dealId": "64286041233",
+    "phone": "573014688929",
+    "emailDraft": "docs/selling/drafts/medical-tourism-in-medell-n-your-definitive-guid-atlas-email.txt",
+    "draft": "docs/selling/drafts/medical-tourism-in-medell-n-your-definitive-guid-atlas.txt"
+  },
+  "medical-tourism-in-medell-n-your-definitive-guid-atlas-fu": {
+    "company": "Medical Tourism in Medellín: Your Definitive Guide",
+    "email": "info@mdecare.co",
+    "score": 96,
+    "dealId": "64286041233",
+    "phone": "573014688929",
+    "emailDraft": "docs/selling/drafts/medical-tourism-in-medell-n-your-definitive-guid-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/medical-tourism-in-medell-n-your-definitive-guid-atlas-fu.txt"
+  },
+  "medical-tourism-atlas": {
+    "company": "Medical Tourism",
+    "email": "draangelesesmeral@gmail.com",
+    "score": 85,
+    "dealId": "64286431025",
+    "phone": "573143632013",
+    "emailDraft": "docs/selling/drafts/medical-tourism-atlas-email.txt",
+    "draft": "docs/selling/drafts/medical-tourism-atlas.txt"
+  },
+  "medical-tourism-atlas-fu": {
+    "company": "Medical Tourism",
+    "email": "draangelesesmeral@gmail.com",
+    "score": 85,
+    "dealId": "64286431025",
+    "phone": "573143632013",
+    "emailDraft": "docs/selling/drafts/medical-tourism-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/medical-tourism-atlas-fu.txt"
+  },
+  "irega-cancun-atlas": {
+    "company": "IREGA CANCUN",
+    "email": "contact@iregacancun.com.mx",
+    "score": 66,
+    "dealId": "64286131331",
+    "phone": "9988021515",
+    "emailDraft": "docs/selling/drafts/irega-cancun-atlas-email.txt",
+    "draft": "docs/selling/drafts/irega-cancun-atlas.txt"
+  },
+  "irega-cancun-atlas-fu": {
+    "company": "IREGA CANCUN",
+    "email": "contact@iregacancun.com.mx",
+    "score": 66,
+    "dealId": "64286131331",
+    "phone": "9988021515",
+    "emailDraft": "docs/selling/drafts/irega-cancun-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/irega-cancun-atlas-fu.txt"
+  },
+  "advanced-fertility-center-cancun-in-canc-n-mexic-atlas": {
+    "company": "Advanced Fertility Center Cancun in Cancún, Mexico",
+    "email": "info@curemeabroad.com",
+    "score": 90,
+    "dealId": "64253901152",
+    "emailDraft": "docs/selling/drafts/advanced-fertility-center-cancun-in-canc-n-mexic-atlas-email.txt"
+  },
+  "advanced-fertility-center-cancun-in-canc-n-mexic-atlas-fu": {
+    "company": "Advanced Fertility Center Cancun in Cancún, Mexico",
+    "email": "info@curemeabroad.com",
+    "score": 90,
+    "dealId": "64253901152",
+    "emailDraft": "docs/selling/drafts/advanced-fertility-center-cancun-in-canc-n-mexic-atlas-fu-email.txt"
   }
 }
