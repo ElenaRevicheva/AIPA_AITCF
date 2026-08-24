@@ -898,6 +898,77 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
   });
   
   // /status - Ecosystem status
+  /**
+   * /gmailpw <16-char app password> — wire Gmail into VJH's response detector.
+   *
+   * Why this exists (23 Aug 2026): the detector read Zoho only, and employers
+   * reply to Gmail. Closing that needs one credential on the VM, and Elena is
+   * usually on her phone with no terminal.
+   *
+   * Telegram is the transport rather than a web form on purpose. The bot is
+   * already gated by TELEGRAM_AUTHORIZED_USERS, so the sender is authenticated
+   * by construction — where a one-time URL can leak through history, a shoulder,
+   * or a referrer header, and would mean standing up a credential-accepting
+   * endpoint on a public host.
+   *
+   * The value never reaches a log, a shell history, or argv: the message is
+   * deleted the instant it is read, and the password goes to the helper on
+   * STDIN. Nothing is written unless Gmail actually accepts it.
+   */
+  bot.command('gmailpw', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/gmailpw(@\S+)?\s*/i, '')
+      .trim();
+
+    // Delete FIRST, before any await that could fail and leave it sitting there.
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      /* older than 48h, or no delete rights — the reply below still warns her */
+    }
+
+    if (!raw) {
+      await ctx.reply('Usage: /gmailpw <16-character app password>\n\nI delete your message immediately and never log the value.');
+      return;
+    }
+
+    const pw = raw.replace(/\s+/g, '');
+    if (pw.length !== 16) {
+      await ctx.reply(`That was ${pw.length} characters, not 16. Nothing was written. Your message is deleted — send again.`);
+      return;
+    }
+
+    await ctx.reply('🔐 Message deleted. Testing the login against Gmail before writing anything…');
+
+    const { spawn } = await import('child_process');
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn('/home/ubuntu/set-gmail-stdin.sh', [], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      // STDIN only: never argv, so it cannot show up in `ps`.
+      child.stdin.write(pw + '\n');
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 90_000);
+    });
+
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    if (result.startsWith('OK:')) {
+      await ctx.reply(
+        '✅ Gmail is wired in.\n\n' + result + '\n\n' +
+        'The response detector now watches Zoho AND Gmail. Interview requests ' +
+        'with a booking link will reach you as their own alert.\n\n' +
+        '⚠️ Delete the app password you screenshotted earlier at ' +
+        'myaccount.google.com/apppasswords — that one is still live.',
+      );
+    } else {
+      await ctx.reply('❌ ' + result + '\n\nNothing changed. Generate a fresh app password and try again.');
+    }
+  });
+
   bot.command('status', async (ctx) => {
     await ctx.reply('🔍 Checking AIdeazz ecosystem...');
     
