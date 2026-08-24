@@ -1,0 +1,23 @@
+SUBJECT: Following up on today’s call — the systems document, and the licence
+TO: rohit.g@turing.com
+
+Hi Rohit,
+
+Thank you for the time today.
+
+So you can correct me if I have it wrong, here is my understanding: Lazarus acquires businesses where the value sits in team collaboration data and revenue outcomes — several engineers working together, results tied to a P&L. My work is solo-built and does not carry that shape, so it is not a fit on the acquisition side. Have I understood you correctly?
+
+Your suggestion made sense, so I built the document. Nine production AI systems: what each one is, why I built it, the design decisions behind it, the repo, the live link, and what it does in production. Every figure in it was read from the running systems on the day it was written.
+
+https://webhook.aideazz.xyz/doc/nine-systems-040ebc199e9861adda.html
+
+The offer is unchanged from my 21 August note: a non-exclusive licence to a copy of source I solely own, for model-training use. I retain copyright, the brand, the domains, and the right to keep operating, improving and selling it. Production systems, CRM, chat logs, keys and any third-party or client material are out of scope. AIdeazz AI Lab keeps running.
+
+I will be direct about the timing. I have been building without compensation and cannot keep doing it for free. I am looking for a serious role, and since Turing places engineers I would welcome being considered — AI-augmented product engineering, LLM orchestration with provider failover, agent systems running unattended in production, GEO/AEO. Contract work equally.
+
+If a colleague's business needs training data of this shape, or needs someone who builds this class of system, the document is yours to forward.
+
+Best regards,
+Elena Revicheva
+AIdeazz AI Lab · Panama City
+https://aideazz.xyz/portfolio
