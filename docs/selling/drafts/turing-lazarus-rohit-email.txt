@@ -1,5 +1,6 @@
 SUBJECT: Following up on today’s call — the systems document, and the licence
 TO: rohit.g@turing.com
+CC: lazarus@turingcentral.com
 
 Hi Rohit,
 

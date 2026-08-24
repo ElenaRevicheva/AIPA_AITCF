@@ -24,6 +24,9 @@ const GO_WA_MAX = Number(process.env.GO_WA_MAX_PER_WINDOW ?? 60);
 
 type OutreachRegistryEntry = {
   email?: string;
+  /** Comma-separated extra recipients. Some threads belong to a programme alias as
+   *  well as a person — copying it keeps one conversation instead of two. */
+  cc?: string;
   emailDraft?: string;
   draft?: string;
   company?: string;
@@ -172,11 +175,20 @@ function loadOutreachBySlug(slug: string): { phone: string; text: string } | nul
 type OutreachEmailPayload = {
   slug: string;
   to: string;
+  cc?: string[];
   subject: string;
   body: string;
   company: string;
   dealId?: string;
 };
+
+/** Accept "a@b.com, c@d.com" from a draft CC: line or a registry cc field. */
+function parseAddressList(raw: string | undefined): string[] {
+  if (!raw) return [];
+  return [...new Set(String(raw).match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) ?? [])].map(a =>
+    a.toLowerCase(),
+  );
+}
 
 /**
  * Strip markdown emphasis before anything is sent.
@@ -208,13 +220,17 @@ async function buildOutreachEmailPayload(
   let subject = '';
   let body = '';
   let to = (entry.email || '').trim().toLowerCase();
+  let cc = parseAddressList(entry.cc);
 
   if (entry.emailDraft) {
     const raw = (await readOutreachText(entry.emailDraft))?.trim();
     if (!raw) return null;
     const subjM = raw.match(/^SUBJECT:\s*(.+)$/m);
     const toM = raw.match(/^TO:\s*(.+)$/m);
+    const ccM = raw.match(/^CC:\s*(.+)$/m);
     subject = subjM?.[1]?.trim() || '';
+    // A draft CC: line wins over the registry so a one-off copy needs no registry edit.
+    if (ccM?.[1]?.trim()) cc = parseAddressList(ccM[1]);
     // Drafts may append " (UNVERIFIED — …)" after the address. Resend 422s if
     // `to` contains non-ASCII (em dash). Extract the email token only.
     if (toM?.[1]?.trim()) {
@@ -226,6 +242,7 @@ async function buildOutreachEmailPayload(
       raw
         .replace(/^SUBJECT:.*$/m, '')
         .replace(/^TO:.*$/m, '')
+        .replace(/^CC:.*$/m, '')
         .replace(/^NOTE:.*$/m, '')
         .replace(/^\s+/, '')
         .trim(),
@@ -243,6 +260,9 @@ async function buildOutreachEmailPayload(
 
   if (!to || !to.includes('@') || !subject || !body) return null;
   const out: OutreachEmailPayload = { slug, to, subject, body, company };
+  // Never copy the primary recipient to itself.
+  const ccClean = cc.filter(a => a !== to);
+  if (ccClean.length) out.cc = ccClean;
   if (entry.dealId) out.dealId = entry.dealId;
   return out;
 }
@@ -307,6 +327,7 @@ button:hover{filter:brightness(.95)}
 <div class="box">
   <p class="meta"><b>From:</b> Elena Revicheva &lt;aipa@aideazz.xyz&gt;</p>
   <p class="meta"><b>To:</b> ${esc(p.to)}</p>
+  ${p.cc?.length ? `<p class="meta"><b>Cc:</b> ${esc(p.cc.join(', '))}</p>` : ''}
   <p class="meta"><b>Subject:</b> ${esc(p.subject)}</p>
   <div class="preview">${esc(p.body)}</div>
   <form method="POST" action="${esc(sendPath)}">
@@ -347,6 +368,7 @@ async function sendOutreachEmailViaResend(p: OutreachEmailPayload): Promise<stri
     body: JSON.stringify({
       from,
       to: [p.to],
+      ...(p.cc?.length ? { cc: p.cc } : {}),
       subject: p.subject,
       html,
       text: p.body,
@@ -634,7 +656,7 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
       res.send(
         outreachEmailDoneHtml(
           true,
-          `Enviado a ${hit.to} desde aipa@aideazz.xyz. Subject: ${hit.subject}. Resend id: ${resendId}. Deal movido a ⏳ Sent si tenía dealId.`,
+          `Enviado a ${hit.to}${hit.cc?.length ? ` (cc ${hit.cc.join(', ')})` : ''} desde aipa@aideazz.xyz. Subject: ${hit.subject}. Resend id: ${resendId}. Deal movido a ⏳ Sent si tenía dealId.`,
         ),
       );
     } catch (e) {
