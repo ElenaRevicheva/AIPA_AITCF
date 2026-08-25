@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="description" content="Nine production AI systems built solo in Panama - the need behind each, how it was designed, its repo, live link, and what it does in production.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nine Systems and Why They Exist">
+<meta property="og:description" content="Nine production AI systems built solo in Panama - the need behind each, how it was designed, its repo, live link, and what it does in production.">
+<title>Nine Systems and Why They Exist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root{
+    --paper:#F4F6F8; --card:#FFFFFF; --card-2:#EAEFF3;
+    --ink:#141A21; --ink-2:#3C4753; --muted:#68757F;
+    --rule:#D8E0E7; --rule-2:#BCC8D2;
+    --blue:#1F5C8B; --blue-soft:#E2EBF3;
+    --rust:#9C4A2F; --rust-soft:#F5E7E1;
+    --green:#2C6B52;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E1319; --card:#151C24; --card-2:#1C242E;
+      --ink:#E4EAF0; --ink-2:#B6C1CC; --muted:#8593A0;
+      --rule:#242E39; --rule-2:#33404D;
+      --blue:#63A6D8; --blue-soft:#132532;
+      --rust:#D98B6E; --rust-soft:#2A1B15;
+      --green:#63BE96;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1319; --card:#151C24; --card-2:#1C242E;
+    --ink:#E4EAF0; --ink-2:#B6C1CC; --muted:#8593A0;
+    --rule:#242E39; --rule-2:#33404D;
+    --blue:#63A6D8; --blue-soft:#132532;
+    --rust:#D98B6E; --rust-soft:#2A1B15;
+    --green:#63BE96;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16.5px;line-height:1.66;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px 90px}
+  h1,h2,h3,h4{font-family:Fraunces,Georgia,serif}
+  h1{font-weight:700;font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.04;
+    letter-spacing:-.02em;margin:.3em 0 .2em;text-wrap:balance}
+  h2{font-weight:600;font-size:clamp(1.5rem,3.2vw,2rem);line-height:1.16;margin:0;text-wrap:balance}
+  h3{font-weight:600;font-size:1.28rem;margin:0 0 4px;line-height:1.24}
+  p{margin:0 0 14px;max-width:70ch}
+  .mono,code,.k{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  code{font-size:.86em;background:var(--card-2);border:1px solid var(--rule);
+    border-radius:2px;padding:.08em .32em;color:var(--ink-2)}
+  .muted{color:var(--muted)}
+
+  header.top{border-bottom:2px solid var(--ink);padding:46px 0 28px;margin-bottom:20px}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--blue);font-weight:500}
+  .dek{font-size:1.1rem;color:var(--ink-2);max-width:64ch;margin:0 0 18px}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;color:var(--muted)}
+
+  .note{background:var(--blue-soft);border:1px solid var(--blue);border-radius:3px;
+    padding:18px 22px;margin:22px 0}
+  .note .h{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--blue);font-weight:500;margin-bottom:7px}
+  .note p{margin:0;max-width:none}
+  .note p+p{margin-top:9px}
+  .note.warn{background:var(--rust-soft);border-color:var(--rust)}
+  .note.warn .h{color:var(--rust)}
+
+  section.part{margin-top:56px}
+  .part-head{border-top:2px solid var(--ink);padding-top:13px;margin-bottom:24px}
+  .part-head .n{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--blue);font-weight:500}
+
+  /* product file */
+  .file{background:var(--card);border:1px solid var(--rule);border-radius:3px;
+    margin:0 0 22px;overflow:hidden}
+  .file-head{padding:20px 24px 16px;border-bottom:1px solid var(--rule);background:var(--card-2)}
+  .file-head .repo{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--blue);
+    font-weight:500;margin-bottom:5px}
+  .file-head .sub{font-size:14.5px;color:var(--muted);margin-top:3px}
+  .facts{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:11px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+  .facts b{color:var(--ink-2);font-weight:500}
+  .file-body{padding:6px 24px 20px}
+  .row{display:grid;grid-template-columns:118px 1fr;gap:16px;padding:15px 0;
+    border-bottom:1px dotted var(--rule)}
+  .row:last-child{border-bottom:0}
+  @media(max-width:640px){.row{grid-template-columns:1fr;gap:3px}}
+  .row .lab{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;
+    text-transform:uppercase;color:var(--muted);font-weight:500;padding-top:4px}
+  .row .val{max-width:66ch}
+  .row .val p{margin:0}
+  .row .val p+p{margin-top:9px}
+  .row.fit .lab{color:var(--blue)}
+  .row.fit .val{font-weight:500}
+
+  .tw{overflow-x:auto;margin:18px 0 22px;border:1px solid var(--rule);border-radius:3px;background:var(--card)}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+  thead th{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--card-2);
+    border-bottom:1px solid var(--rule-2);white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  td.n{text-align:right;font-family:"IBM Plex Mono",monospace;white-space:nowrap;font-variant-numeric:tabular-nums}
+  td.w{font-weight:600;white-space:nowrap}
+
+  ul{margin:0 0 14px;padding-left:20px;max-width:70ch}
+  li{margin-bottom:7px}
+  blockquote{margin:16px 0;padding:12px 0 12px 20px;border-left:2px solid var(--blue);
+    font-family:Fraunces,Georgia,serif;font-size:1.03rem;color:var(--ink-2)}
+  blockquote p{margin:0;max-width:64ch}
+
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--rule);
+    font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);line-height:1.8}
+  .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .links a{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.03em;
+    text-decoration:none;color:var(--ink-2);border:1px solid var(--rule-2);border-radius:2px;
+    padding:4px 9px;background:var(--card);white-space:nowrap}
+  .links a:hover,.links a:focus-visible{border-color:var(--blue);color:var(--blue)}
+  .links a.crm{border-style:dashed;color:var(--muted);pointer-events:none}
+  a{color:var(--blue)}
+  footer a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="kicker">AIdeazz AI Lab · Panama · provenance dossier · 24 August 2026</div>
+  <h1>Nine systems and why they exist</h1>
+  <p class="dek">Each of these was built to solve a problem I actually had. This is the record of why each one was started, what it was supposed to do, the design decisions that turned out to matter, and where it stands now — written for someone deciding whether any of it belongs in a real business.</p>
+  <div class="meta">
+    <span>~181,000 lines of original code</span>
+    <span>15 months, May 2025 → today</span>
+    <span>One operator, one server</span>
+    <span>No team · no funding</span>
+  </div>
+</header>
+
+<div class="note warn">
+  <div class="h">Who built this</div>
+  <p>I am an expat from Russia, living in Panama, with an executive background — seven years as Deputy CEO and Chief Legal Officer in e-government. No team, no funding, no manual coding background.</p>
+  <p>Those facts set every constraint in this document: one always-free server, a phone-first control room, and a five-provider model chain so that no single account running dry can stop the work.</p>
+  <p>So the honest claim is narrow and I will not stretch it: <strong>these are working systems that solve real problems and have never been put in front of anyone who needed them.</strong> What follows is engineering provenance — why each was built and how it was designed — not a performance record. Every number below was read from the running systems today.</p>
+</div>
+
+<div class="note">
+  <div class="h">The Lab in one paragraph</div>
+  <p>AIdeazz is a live AI Lab built via an AI-augmented workflow in Claude Code and Cursor, running on one Oracle Cloud server: agents that research, sell, publish, tutor, and keep the lights on. <strong>The control room is Telegram. The ledger is HubSpot.</strong> The factory is TypeScript and Python with a five-provider LLM chain — Claude → Groq → OpenAI → Gemini → Grok — so if the primary model goes dark, the Lab does not.</p>
+  <p>A LangGraph job engine discovers and scores roles with a human on the last click. EspaLuz teaches Spanish on WhatsApp and Telegram with memory, voice, emotional intelligence and payments. Atlas reads public ad libraries and flags which creative angle is opening before it saturates. A GEO/AEO/Tech-SEO engine keeps the Lab citable — portfolio, free visibility audit, daily blog, AI Ops Wiki, eleven-episode podcast — each with canonical URLs and UTM/Atlas IDs so a mention can be traced.</p>
+  <p><strong>One server that never sleeps, doing the work of a small company:</strong> it finds potential customers, researches them, writes to them, follows up, keeps the CRM tidy, publishes an article every day, watches the ad market for openings, finds and applies to jobs, and sends me a briefing every morning at 8am.</p>
+</div>
+
+<section class="part">
+  <div class="part-head"><div class="n">How this was built</div><h2>AI-augmented, and that is the point</h2></div>
+
+  <p><strong>I am not a computer-science graduate, and I did not type most of this code.</strong> I direct AI to write it — Claude Code and Cursor — and I have since the first commit. On several of these repositories the majority of commits carry my AI agent's authorship rather than mine. I state that plainly because anyone can see it in a <code>git log</code> in ten minutes, and because I think it is the most interesting thing about the work rather than the most embarrassing.</p>
+
+  <p>What it changes is where the effort goes. My job is not producing the implementation. It is deciding what to build, designing how the pieces fit, and — the part that consumes the most hours — <strong>verifying that what came back is actually true.</strong></p>
+
+  <div class="note">
+    <div class="h">Why the disciplines in Part 3 exist</div>
+    <p>Every one of them was earned because AI-generated code is confidently wrong in specific, repeatable ways. The rules are not general engineering wisdom I read somewhere; they are scar tissue from this exact way of working:</p>
+    <p><strong>It reports success it did not achieve</strong> — so I measure at the edge, never at the source. A publisher told me an article was live while it existed nowhere.<br>
+    <strong>It writes a second implementation rather than finding the first</strong> — so: one file, one writer. Two processes writing one sitemap quietly destroyed 61 URLs on every run.<br>
+    <strong>It produces plausible numbers</strong> — so the daily article generator collects production evidence <em>before</em> it writes and refuses to publish any figure it cannot trace to a measurement.</p>
+  </div>
+
+  <p>This is the honest trade, and I would rather state it than have it discovered. <strong>A whiteboard interview measures the skill this toolchain has made abundant.</strong> What stayed scarce is knowing which output to distrust, and being able to prove the difference. I have one kind of evidence for that: eight systems that have run unattended on one server for fifteen months, the longest single process up 27 days without a restart, and a public record of every time one of them fooled me.</p>
+
+  <blockquote><p>I would rather be judged on a system that survived a provider outage at 3am than on whether I can invert a binary tree on a whiteboard. One of those two things has happened to me in production.</p></blockquote>
+</section>
+
+<section class="part">
+  <div class="part-head"><div class="n">Part 1</div><h2>The shared spine</h2></div>
+  <p>Every product inherits the same infrastructure, and that was a deliberate early decision rather than an accident of laziness. Building eight separate stacks alone is not possible; building one substrate and eight applications on it is.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Layer</th><th>Choice</th><th>Why this and not the obvious alternative</th></tr></thead>
+      <tbody>
+        <tr><td class="w">Compute</td><td>One Oracle Cloud server</td><td>Oracle&rsquo;s always-free tier, plus a <strong>one-year startup credit allocation from Oracle</strong>. Building alone without funding means infrastructure has to cost nothing — and a single box makes failures observable in one place.</td></tr>
+        <tr><td class="w">Control</td><td>Telegram, not a web dashboard</td><td>I operate from a phone most of the day. A dashboard needs a laptop and a login; a chat app is already open. Approvals happen in one tap where I actually am.</td></tr>
+        <tr><td class="w">Ledger</td><td>HubSpot CRM</td><td>Every agent writes to one place with a prefix naming its author, so provenance is a filter rather than an investigation.</td></tr>
+        <tr><td class="w">Models</td><td>Five providers in a ranked chain</td><td>A single API key is a single point of failure for the whole business. Three chains, ordered per use case — quality leads with Claude, classification and bulk lead with cheaper models that are good enough.</td></tr>
+        <tr><td class="w">Language</td><td>TypeScript and Python</td><td>TypeScript for anything touching money or CRM state, where the type checker catches a whole class of mistake before deploy. Python where the ML ecosystem lives.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <div class="h">The decision I would defend hardest</div>
+    <p><strong>The five-provider chain.</strong> On 19 August my Anthropic balance hit zero. Nothing stopped: the chain fell through to OpenAI in 2.4 seconds and the system kept answering leads. The design cost about a day; it has since absorbed a total provider outage, a rate limit, and a model deprecation without a single lost request.</p>
+    <p>The part that took longer to learn: the order has to differ by use case. Reasoning models return empty strings under low token budgets, so a classification chain that leads with one fails silently — worse than erroring. Client-facing copy leads with the strongest model; classification leads with the cheapest that clears the bar.</p>
+  </div>
+</section>
+
+<section class="part">
+  <div class="part-head"><div class="n">Part 2</div><h2>Every product, and the need behind it</h2></div>
+  <p>Each entry carries its repository, its public face, and the CRM prefix its records are written under — so any claim here can be opened and checked. <strong>None of these started as a product idea.</strong> Each one started as something I needed to survive a specific week in Panama.</p>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">EspaLuzFamilybot · EspaLuzWhatsApp · Python</div>
+      <h3>EspaLuz — a bilingual expat advisor for arriving families</h3>
+      <div class="sub">The first thing I built, because four of us arrived at once and none of us had the language</div>
+      <div class="facts"><span>LOC <b>52,487</b></span><span>commits <b>595</b></span><span>since <b>May 2025</b></span><span>memory <b>LangChain + pgvector RAG</b></span><span>designed for <b>21 countries</b></span></div>
+      <div class="links"><a href="https://github.com/ElenaRevicheva/EspaLuzFamilybot" target="_blank" rel="noopener">repo: EspaLuzFamilybot</a><a href="https://github.com/ElenaRevicheva/EspaLuzWhatsApp" target="_blank" rel="noopener">repo: EspaLuzWhatsApp</a><a href="https://t.me/EspaLuzFamily_bot" target="_blank" rel="noopener">live: EspaLuz on Telegram</a><a href="https://wa.me/50766623757" target="_blank" rel="noopener">live: EspaLuz on WhatsApp</a><a class="crm">CRM: [ESPALUZ] · 69 deals</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>Survival, and not only mine.</strong> Three generations arrived in Panama at once — my daughter, my retired American father, my retired Russian mother, and me. A single mother, and the only one of the four who could solve any of it. Four people, four different problems, one language none of us had. A child starting at a new school. Two retirees facing residency paperwork, clinics, pharmacy counters and banks.</p><p>Language apps teach vocabulary on a schedule, and none of that was the problem. The problem was <strong>the sentence in front of us, right now</strong> — and the thing nobody tells you: which form, which queue, what you are actually agreeing to. Every expat family arriving anywhere has that same first month.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>Two front ends over shared logic: in Latin America WhatsApp <em>is</em> the internet, Telegram is where early adopters are. Persistent per-family memory, voice in and voice out, image understanding for the forms, payments wired for trials.</p><p>The constraint that shaped everything: <strong>emotional intelligence before correctness.</strong> A parent asking how to tell a teacher their child is frightened does not need a grammar drill. Neither does a seventy-year-old at a pharmacy counter.</p><p><strong>Two layers of memory, because one was not enough.</strong> A conversation needs recent context. A family arriving needs something else entirely — the answer in November depends on the form they filled in June. So short-term context sits in a LangChain conversation layer, while everything durable goes into a <strong>pgvector store on Oracle Autonomous DB and is retrieved by relevance rather than recency (RAG)</strong>.</p>
+        <p>That distinction is what turned a tutor into an advisor. <em>"Which queue did I use last time?"</em> and <em>"what did the clinic say I needed?"</em> are not language questions — they are retrieval questions over a family's own accumulated history, and nobody else can answer them. Vocabulary fits in a prompt; fifteen months of one household's arrival does not.</p>
+        <p><strong>Then it outgrew tutoring.</strong> What the four of us actually needed was not translation but lived practicality — how residency really works, what to say at the counter, how a lease conversation goes, which queue is the right queue. So EspaLuz became an <strong>expat advisor that teaches the language while it answers</strong>. Memory is per family rather than per user, because the second question always depends on the first, and because a household arrives together.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>Live on both platforms with real families using it, at the scale you would expect from a product that has never had an advertising budget, a launch, or a community behind it. <strong>The engineering is finished; the distribution has never been attempted.</strong></p><p>Nothing in it is Panama-specific by design — the same arrival, the same paperwork and the same first month repeat across <strong>21 Spanish-speaking countries</strong>.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Relocation and residency firms, retirement-abroad services, international schools, and immigration practices — all of whom are already talking to arriving households on WhatsApp. Panama alone is a major destination for North American retirees, and my own family is the proof that the buyer is rarely the learner: <strong>the adult child arranges it for the parents.</strong> The audience exists and is assembled; I have never had access to it.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">VibeJobHunterAIPA_AIMCF · Python · LangGraph</div>
+      <h3>VibeJobHunter — job discovery with a human on the last click</h3>
+      <div class="sub">Built to find work with skills I had just taught myself</div>
+      <div class="facts"><span>LOC <b>33,988</b></span><span>commits <b>543</b></span><span>sources <b>11</b></span><span>evals <b>131 tests / 4 layers</b></span></div>
+      <div class="links"><a href="https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF" target="_blank" rel="noopener">repo: VibeJobHunter</a><a class="crm">CRM: [HIRING-VJH-LEAD] · 1,166</a><a class="crm">CRM: [HIRING-VJH-SERP-LEAD] · 925</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>I needed a job, in a field I had entered sideways.</strong> Seven years as a Deputy CEO and Chief Legal Officer, then a deliberate move into AI — with no CS degree and no manual coding background. Applying by hand meant a hundred hours of repetitive work while competing against people whose CVs read conventionally. I automated the part that was mechanical so I could spend my hours on the part that was not.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>A LangGraph state machine — gate, score, route, notify — with SQLite checkpointing so a crash resumes rather than restarts, and a deliberate human-approval interrupt.</p><p><strong>The decision I made against myself:</strong> it originally auto-applied. An audit showed auto-apply produced volume and zero outcomes — theatre that felt like progress. I removed it. Fewer applications, honest numbers, and the scoring model finally had clean feedback.</p><p><strong>Scoring is done by an LLM judge</strong>, because keyword matching cannot tell an ML-research role from an AI-automation one. But a judge nobody audits will drift, so it has two counterweights.</p><p><strong>An eval harness — 131 tests across four layers.</strong> The first two layers run with the AI disabled and no network, so they are free and fast enough to run before <em>every</em> edit to a scoring rule. Golden-set routing is tested deterministically, which is the interesting part: proving the predictable half of a non-deterministic system still behaves. One test class is dedicated to <strong>bias compensation</strong>, because the failure that matters is not a crash — it is a judge that quietly starts preferring the wrong thing.</p><p><strong>And a feedback loop.</strong> It reads what I actually did in the CRM — which roles I acted on, which I rejected — and writes that back into the judge&rsquo;s prompt. It learns my <em>reasons</em>, not only my verdicts, including the explanations I type and the screenshots I attach.</p><p><strong>The incident that shaped it:</strong> deterministic keyword bonuses were silently outvoting the model, so a role could score well for containing the right words after the judge had correctly said no. The fix was a trust clamp bounding how far the keyword layer can override the model, plus fingerprint deduplication. It also <strong>fails closed on an LLM outage</strong> — no judgment is better than a fabricated one.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>11 sources hourly, 1,166 roles surfaced, learning from the reasons I type when I reject something. <strong>It found the interview I sat this week.</strong></p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Recruiting firms and talent marketplaces. The transferable shape is <em>scored routing with a human interrupt and a feedback loop from real outcomes</em> — the same as underwriting, triage or moderation.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">AIPA_AITCF · TypeScript</div>
+      <h3>CTO AIPA — the operations brain</h3>
+      <div class="sub">Built to find clients, and to keep everything else alive</div>
+      <div class="facts"><span>LOC <b>60,132</b></span><span>commits <b>977</b></span><span>docs <b>164 files</b></span><span>commands <b>82</b></span></div>
+      <div class="links"><a href="https://github.com/ElenaRevicheva/AIPA_AITCF" target="_blank" rel="noopener">repo: AIPA_AITCF</a><a href="https://aideazz.xyz/sop-ai-ops.html" target="_blank" rel="noopener">live: Ops SOP</a><a class="crm">CRM: [CLIENT-CTO-INQUIRY] · 44</a><a class="crm">CRM: [CLIENT-CTO-SERP] · 261</a><a class="crm">CRM: [CLIENT-MANUAL] · 116</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>I needed customers and had no sales team, no network in Panama, and no budget.</strong> So I built the sales operation as software: find businesses that match, research them, write to them, follow up, and keep the ledger honest. The second need was quieter — with eight systems running, I could not tell each morning whether anything had broken overnight. This is the answer to both.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>Telegram as the control plane, HubSpot as the ledger, a webhook API as the front door for every other agent. The lead concierge is the piece I would show first: a form submission becomes a CRM record, a drafted reply, and a one-tap approval card — then delivery and open events write back to the deal.</p><p><strong>The other half is the technical co-founder I did not have.</strong> The repo is named AITCF for a reason: the same Telegram bot is a coding assistant. <em>/code</em> and <em>/fix</em> generate a change and open a real pull request through the GitHub API; <em>/diff</em> shows the before and after; <em>/apply</em> and <em>/approve</em> keep a human on the last click; <em>/batch</em> and <em>/multifile</em> carry one edit across several files in a single commit. Around the typing sit the parts that are actually co-founder work — <em>/architecture</em> to explain the shape of a repo, <em>/decision</em> to record why an architectural choice was made, <em>/debt</em> to track what was knowingly deferred, and <em>/explaincode</em>, <em>/gentest</em>, <em>/error</em> and <em>/logs</em> to work a failure back to its cause. That is what makes a phone-first control room more than a status screen: a fix can be reviewed, approved and shipped from a queue.</p>
+        <p>The non-obvious decision is <strong>precedence</strong>. Two systems can write the reply. Redundancy alone means the faster one always wins, so the better one never runs. A cached health verdict decides who gets first refusal, with a five-minute grace and a twenty-minute safety net.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>82 commands. Briefing at 08:00. Autonomous prospect research in ~90 seconds. A synthetic lead pushed through the real pipeline daily at 07:45 — silent on pass, alerting on failure.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Any small team drowning in inbound where a human must approve the reply — agencies, clinics, brokerages. The approval card is the product.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">aideazz · TypeScript</div>
+      <h3>The visibility engine — and my own audit API</h3>
+      <div class="sub">Built to prove my own professional face is findable, not to assume it</div>
+      <div class="facts"><span>sitemap <b>137 URLs</b></span><span>indexed <b>96</b></span><span>audit <b>34 checks</b></span></div>
+      <div class="links"><a href="https://github.com/ElenaRevicheva/aideazz" target="_blank" rel="noopener">repo: aideazz</a><a href="https://aideazz.xyz/api" target="_blank" rel="noopener">live: free audit</a><a href="https://aideazz.xyz/llms.txt" target="_blank" rel="noopener">live: llms.txt</a><a href="https://aideazz.xyz/geo-manifest.json" target="_blank" rel="noopener">live: GEO manifest</a><a href="https://aideazz.xyz/portfolio" target="_blank" rel="noopener">live: portfolio</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>I had no professional face in a new country and no way to know whether the one I was building was visible.</strong> Buyers and recruiters increasingly ask an assistant before a search engine. So I made everything machine-readable for answer engines — and then built the measurement, because a claim I cannot check is worth nothing. The free audit exists because I needed to run it on myself first.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>Content prerendered to static pages and emitted through a sitemap, <code>llms.txt</code>, a GEO manifest, JSON-LD and a citation file. A weekly probe asks real answer engines whether they quote the page, and that result feeds back into what gets written.</p><p>The rule enforced hardest: <strong>the tracker exits non-zero when it cannot measure</strong>, so a silent zero can never be mistaken for a measured zero.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>137 URLs, 96 pages indexed, all seven machine-readable surfaces returning 200. Honest caveat: my own citation rate measured <strong>0%</strong>. The engine reports the truth including when it is unflattering.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Any agency selling SEO without an answer-engine story, and any business whose customers research before buying. The audit is the door-opener — a specific, checkable report in a minute.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">aideazz · AIPA_AITCF · EspaLuz_Influencer</div>
+      <h3>The publishing engine — blog, podcast, social</h3>
+      <div class="sub">Built so my work has a public face without me performing on social media daily</div>
+      <div class="facts"><span>essays <b>122</b></span><span>podcast <b>11 episodes</b></span><span>cadence <b>daily 14:30</b></span></div>
+      <div class="links"><a href="https://aideazz.xyz/blog" target="_blank" rel="noopener">live: blog</a><a href="https://podcast.aideazz.xyz/" target="_blank" rel="noopener">live: podcast</a><a href="https://dev.to/elenarevicheva" target="_blank" rel="noopener">live: Dev.to</a><a href="https://x.com/reviceva" target="_blank" rel="noopener">live: X</a><a href="https://www.linkedin.com/in/elenarevicheva/" target="_blank" rel="noopener">live: LinkedIn</a><a href="https://github.com/ElenaRevicheva/EspaLuz_Influencer" target="_blank" rel="noopener">repo: EspaLuz_Influencer</a><a class="crm">CRM: [ESPALUZ-ORG] · 10</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>I needed to be visible to strangers while having no hours to spend being visible.</strong> One person building alone cannot also post to LinkedIn, Instagram, X and a blog every day. So the Lab publishes on my behalf — but only things that actually happened, which is the constraint that makes it defensible rather than noise.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>Daily article at 14:30, cross-posted with canonical URLs so the original always wins. Bilingual social atoms routed out through scheduled posting. Every link carries UTM and Atlas IDs so a mention can be traced back to a source.</p><p><strong>Grounded generation:</strong> the daily article collects production evidence <em>before</em> it writes — process uptimes, real commit messages, CRM counts — and refuses to publish if a number cannot be traced to a measurement.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>122 essays, 11 podcast episodes, publishing daily and unattended. Every article carries the command that produced its evidence.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Any founder-led business that needs authority content and has no time to write it. The rare part is not generation — it is the refusal to publish an unverifiable claim.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">aideazz · generated, never hand-edited</div>
+      <h3>AI Ops Wiki — the learning record</h3>
+      <div class="sub">Built to prove I am learning an engineering discipline, not vibe-coding</div>
+      <div class="facts"><span>incidents <b>9</b></span><span>named failure modes <b>9</b></span><span>updated <b>per session</b></span></div>
+      <div class="links"><a href="https://aideazz.xyz/ai-ops-wiki.html" target="_blank" rel="noopener">live: AI Ops Wiki</a><a href="https://github.com/ElenaRevicheva/aideazz" target="_blank" rel="noopener">repo: aideazz</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>This is the one I would point at if someone doubts the AI-augmented route produces real engineers.</strong> Every working session that produces a transferable lesson writes one entry: what broke, why, what the failure mode is called, and the verified number that proves it. It is a public, dated record of me learning in production — including the times a system fooled me. Nobody keeps this unless they are actually paying attention.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>Entries are structured data with a required verification field; the page is generated from them and never hand-edited, so the HTML cannot drift from the record. Scrubbed of client data before publishing. Concepts are cross-linked, so a new incident inherits the vocabulary of the old ones.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>Nine incidents, each with a named failure mode — <em>redundancy is not precedence</em>, <em>acknowledgement is not completion</em>, <em>the wall was on the page, not the data</em>. Written the same day the thing broke.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Any engineering team that wants a postmortem habit and has never made one stick. Also the fastest way for a stranger to judge how I think.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">inside AIPA_AITCF · <a href="https://atuona.xyz" target="_blank" rel="noopener">atuona.xyz</a></div>
+      <h3>Atuona — an automated AI film studio</h3>
+      <div class="sub">Source clips in, finished film out — nobody touches an edit timeline</div>
+      <div class="facts"><span>films <b>6</b></span><span>video providers <b>multi, with fallback</b></span><span>edit stage <b>fully automated</b></span></div>
+      <div class="links"><a href="https://atuona.xyz" target="_blank" rel="noopener">live: Atuona</a><a href="https://atuona.xyz/aifilmstudio" target="_blank" rel="noopener">live: AI Film Studio</a><a href="https://github.com/ElenaRevicheva/AIPA_AITCF" target="_blank" rel="noopener">repo: AIPA_AITCF</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>AI video is becoming a real production category, and almost every tool stops at generating a clip.</strong> Everything that turns clips into a <em>film</em> — pacing, voice timing, transitions, text, mixing, title cards — is still done by hand in an editor. I wanted to know whether that second half could be automated end to end.</p><p><strong>The source material is my own work.</strong> ATUONA is an underground aesthetic gallery I designed and built myself &mdash; multidisciplinary NFT art: written work, imagery and film, presented as claimable drops with a wallet-connect interface and the film studio built into it. Using it as the corpus was a practical decision as well as a personal one &mdash; I needed material I owned outright, so nothing I published carried a licensing question. The films are real output, not a demo reel &mdash; they are how the pipeline gets tested against work I actually care about.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>Multi-provider video generation with fallback, because video APIs fail more often than text ones and each fails differently. Everything downstream of generation is a single script per film: change the constants at the top, run, publish.</p><p><strong>The automated edit is the actual work.</strong> Voiceover is synthesised and then <em>locked to its clip</em> by a duration formula rather than sequenced on its own timeline — sequenced independently, narration drifts out of sync within three cuts. Short clips are stretched with slow-motion, never a held frame, because a freeze catches an actor mid-blink or mid-word. Transitions crossfade video and audio together on a running-offset accumulator so the timeline stays exact across a dozen joins. On-screen text fades out over each clip&rsquo;s final second, so a line can never straddle a dissolve.</p><p><strong>The audio is mixed, not merely added.</strong> Music sits under a voice bus with <strong>sidechain ducking</strong>, so the score drops automatically whenever narration speaks and returns when it stops — then the whole mix is normalised to <strong>−16 LUFS</strong>, the broadcast loudness target, so films sound consistent against each other and against everything else a viewer plays.</p><p><strong>The detail that proves it shipped:</strong> the intro card must not fade in from black. The gallery&rsquo;s video element uses frame 0 as its poster, so a fade-in makes the player look broken before anyone presses play. Every render is verified by extracting frame 1 and confirming the title card is there. That is not a thing you know before publishing — it is a thing you learn from a gallery that looked dead.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>Six films live in the public gallery, each with its own score, narration, generated poster and title cards. The full pipeline — every ffmpeg chain, every setting and the reason behind it — is written up as a compilation guide in the repo, including the errors already paid for.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Brands, agencies and content studios producing AI video at volume — where the bottleneck is never generating a clip, it is the human hours between clips and a publishable film. Two parts transfer directly: multi-provider fallback so one outage cannot kill a campaign, and the automated edit, mix and loudness stage that removes the editor from the loop entirely.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">inside AIPA_AITCF · seven verticals</div>
+      <h3>Atlas — radar for advertising angles</h3>
+      <div class="sub">Built to give me something to sell that was worth a stranger reading</div>
+      <div class="facts"><span>verticals <b>7</b></span><span>cadence <b>weekly</b></span><span>loop <b>detect → sell → measure</b></span></div>
+      <div class="links"><a href="https://webhook.aideazz.xyz/whitespace/atlas.html" target="_blank" rel="noopener">live: Atlas</a><a href="https://github.com/ElenaRevicheva/AIPA_AITCF" target="_blank" rel="noopener">repo: AIPA_AITCF</a><a class="crm">CRM: [CLIENT-ATLAS] · 35</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>Cold outreach with nothing to say fails, and I had nothing to say.</strong> Public ad libraries are open data almost nobody reads systematically. If I could tell a business which creative angle was opening in their market before it saturated, I would have a reason to write to them that was about them rather than about me.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p><strong>Detect, not predict.</strong> That constraint is in the design notes and it is the whole discipline: the system reports what is observably running and for how long, and refuses to forecast. A tool that says "this will work" cannot be checked; one that says "this is live and three weeks old" can. Outcomes are written back and scored.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>Weekly capture across seven service lanes, an angle API, and a closed feedback loop into the CRM.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Performance agencies and media buyers — the one where an operator with existing clients would see value on the first Monday.</p></div></div>
+    </div>
+  </div>
+
+  <div class="file">
+    <div class="file-head">
+      <div class="repo">dragontrade-agent · Algom listener in AIPA_AITCF</div>
+      <h3>DragonTrade and Algom</h3>
+      <div class="sub">Two smaller systems, included for completeness</div>
+      <div class="facts"><span>DragonTrade <b>14,323 LOC</b></span><span>Algom <b>92 leads</b></span></div>
+      <div class="links"><a href="https://github.com/ElenaRevicheva/dragontrade-agent" target="_blank" rel="noopener">repo: dragontrade-agent</a><a class="crm">CRM: [CLIENT-ALGOM] · 92</a></div>
+    </div>
+    <div class="file-body">
+      <div class="row"><div class="lab">Why I built it</div><div class="val"><p><strong>DragonTrade</strong> was built to learn how to run an agent that must never take an irreversible action without a human — trading education and paper trading only, never live money. <strong>Algom</strong> listens to a public post stream for buying-intent signals and files them as leads; I built it to test whether intent could be detected before someone fills in a form.</p></div></div>
+      <div class="row"><div class="lab">Designed</div><div class="val"><p>Both follow the same rule as everything else: the agent proposes, a human disposes. Algom writes to the same CRM ledger with its own prefix so its yield is measurable against every other source.</p></div></div>
+      <div class="row"><div class="lab">Running</div><div class="val"><p>DragonTrade runs with its own dashboard, paper trading only. Algom has filed 92 leads, 30 of them in the last week — the detection works; what sits behind it has never been pointed at a real audience.</p></div></div>
+      <div class="row fit"><div class="lab">Would fit</div><div class="val"><p>Included because you asked what is in each repo. If the interest is commercial, the systems above are the ones worth the time.</p></div></div>
+    </div>
+  </div>
+
+</section>
+
+<section class="part">
+  <div class="part-head"><div class="n">Part 3</div><h2>The decisions that repeat</h2></div>
+  <p>Reading back over fifteen months, the same handful of judgments show up in every system. These are the transferable part — more so than any individual product.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Principle</th><th>Where it came from</th></tr></thead>
+      <tbody>
+        <tr><td class="w">Never a single point of failure for money</td><td>One API balance hitting zero should not stop a business. Five providers, three chains, ordered per use case.</td></tr>
+        <tr><td class="w">Fail open or fail closed — decide per system</td><td>Alerting fails open: a duplicate notice beats silence. Publishing fails closed: better nothing than something unsourceable.</td></tr>
+        <tr><td class="w">A human on the last click</td><td>Removed auto-apply after it produced volume and no outcomes. Anything that reaches another person waits for one tap.</td></tr>
+        <tr><td class="w">Measure at the edge, not the source</td><td>A commit is not a page, a build is not a deploy, an accepted email is not a delivered one. Verify where the request actually lands.</td></tr>
+        <tr><td class="w">Refuse to report unmeasured as zero</td><td>The citation tracker exits non-zero without a key. A zero that means "nothing counted" looks identical to one that means "nothing happened".</td></tr>
+        <tr><td class="w">Every record names its author</td><td>Ten agents write to one CRM. A prefix makes provenance a filter instead of an investigation.</td></tr>
+        <tr><td class="w">Write the failure down in public</td><td>The AI Ops Wiki. Each entry has a named failure mode and a verified number. It is the cheapest way I know to stop repeating a mistake.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <blockquote><p>The thing I would want a business to take from this is not any single agent. It is that all of them were built by one person who had to make them survive unattended — which forces a different set of decisions than a team with an on-call rota ever has to make.</p></blockquote>
+</section>
+
+<section class="part">
+  <div class="part-head"><div class="n">Part 4</div><h2>What this is, and what it is not</h2></div>
+
+  <div class="note warn">
+    <div class="h">The one thing missing</div>
+    <p><strong>What exists:</strong> nine systems running unattended on one server, built and maintained alone over fifteen months, with the design reasoning documented as it happened rather than reconstructed afterwards. Every one solves a problem a real business has.</p>
+    <p><strong>What does not:</strong> a route to those businesses. I built supply for fifteen months from a country where I had no network, in a second language, with no marketing budget. The systems have never been placed in front of the people who need them.</p>
+  </div>
+
+  <p>That gap is not a quality problem, and it is the only one I cannot close alone. Everything else on this page I built by myself.</p>
+
+  <h3 style="margin-top:30px">What would actually help</h3>
+  <ul>
+    <li><strong>An introduction to one business with the matching problem.</strong> A relocation firm or international school for EspaLuz, a performance agency for Atlas, an agency selling SEO for the visibility engine, a team drowning in inbound for the concierge.</li>
+    <li><strong>Or contract engineering work.</strong> If the judgment above reads as useful, the fastest honest route is me building this class of system for someone who already has customers.</li>
+  </ul>
+
+  <p class="muted" style="font-size:.92rem;margin-top:22px">Everything here is verifiable. The code is on GitHub, the systems are running now, and every figure in this document was read from production on the day it was written. Happy to walk anyone through any of it live — including the parts that broke.</p>
+</section>
+
+<footer>
+  <strong>Elena Revicheva</strong> · AIdeazz AI Lab, Panama City · UTC−5<br>
+  Live systems: <a href="https://aideazz.xyz/portfolio" target="_blank" rel="noopener">aideazz.xyz/portfolio</a> · Incident record: <a href="https://aideazz.xyz/ai-ops-wiki.html" target="_blank" rel="noopener">aideazz.xyz/ai-ops-wiki.html</a> · Free audit: <a href="https://aideazz.xyz/api" target="_blank" rel="noopener">aideazz.xyz/api</a><br>
+  Figures read from the running systems on 24 August 2026. Nothing in this document came from memory or from an earlier document.
+</footer>
+
+</div>
+</body>
+</html>

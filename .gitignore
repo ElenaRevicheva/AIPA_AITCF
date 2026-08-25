@@ -75,3 +75,10 @@ backups/make/
 
 # WA-draft backups from the Aug 4 Growth-Operator backfill (kept on disk, not in git)
 docs/selling/drafts/*.bak-*
+
+# docs/strategy — private positioning material. Default-deny: this repo is
+# PUBLIC, and the strategy memo names real third-party businesses and an
+# individual. Only the already-published provenance page is tracked.
+docs/strategy/*
+!docs/strategy/aideazz-provenance.html
+!docs/strategy/aideazz-provenance.standalone.html
