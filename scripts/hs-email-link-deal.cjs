@@ -102,9 +102,16 @@ function stripHtml(html) {
     .trim();
 }
 
-function extractEmail(text) {
-  const m = String(text || '').match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  return m ? m[0].toLowerCase() : '';
+function extractMailto(html) {
+  const m = String(html || '').match(
+    /mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i,
+  );
+  return m ? m[1].toLowerCase() : '';
+}
+
+function extractApplyUrl(text) {
+  const m = String(text || '').match(/https?:\/\/[^\s"'<>]+/i);
+  return m ? m[0].replace(/[.,);]+$/, '') : '';
 }
 
 function companyFromDealName(name) {
@@ -236,19 +243,25 @@ async function main() {
     })),
   };
   fs.writeFileSync(REPORT, JSON.stringify(partial, null, 2) + '\n');
-  console.log('latest_note', latest.id, latest.properties?.hs_timestamp);
+  console.log('latest_note', latest.id, latest.properties?.hs_timestamp, 'html_bytes', html.length);
+  console.log('--- RAW HTML START ---');
+  console.log(html.slice(0, 800));
+  console.log('--- RAW HTML END ---');
   console.log('--- NOTE TEXT START ---');
   console.log(text);
   console.log('--- NOTE TEXT END ---');
   console.log('--- ALL NOTES START ---');
   console.log(allNoteText.slice(0, 4000));
   console.log('--- ALL NOTES END ---');
+  const mailtoFromHtml = notes.map((n) => extractMailto(n.properties?.hs_note_body || '')).find(Boolean) || '';
   const contactEmail =
     [...contacts, ...companyContacts]
       .map((c) => (c.properties?.email || '').trim().toLowerCase())
       .find((e) => e && e.includes('@')) || '';
   const noteTo = extractEmail(text.match(/^TO:\s*(.+)$/m)?.[1] || '') || extractEmail(haystack);
-  const to = contactEmail || noteTo;
+  const to = contactEmail || mailtoFromHtml || noteTo;
+  const applyUrl =
+    (haystack.match(/https?:\/\/torre\.ai\/jobs\/[A-Za-z0-9]+/i) || [])[0] || extractApplyUrl(haystack) || '';
   const subjectFromNote = (haystack.match(/^SUBJECT:\s*(.+)$/m)?.[1] || '').trim();
   const emailBlock = extractBlock(haystack, /---\s*EMAIL[^\n]*---/, /---\s*(Audit|MENSAJE|WhatsApp|NEXT)/i);
   const mensaje = extractBlock(haystack, /---\s*MENSAJE[^\n]*---/, /---\s*(EMAIL|Audit|NEXT)/i);
@@ -283,6 +296,80 @@ async function main() {
     subject = /HIRING|Solo Builder|apply/i.test(dealName)
       ? `${company || 'BSS Groupe'} — Elena Revicheva`
       : buildManualEmailSubject(company || slug, score || 0);
+  }
+
+  if (/Edit this stub|MANUAL APPLY REQUIRED/i.test(body) || /HIRING-VJH/i.test(dealName)) {
+    body = [
+      `Dear Hiring Manager,`,
+      ``,
+      `I am Elena Revicheva, an AI-augmented builder in Panama. I ship production systems solo — GEO/AEO, conversational agents, and AI-ops — and I sell that work from https://aideazz.xyz/portfolio`,
+      ``,
+      `I am applying for the AI-Native B2B Marketplace solo-builder role at ${company || 'BSS Groupe'}. I already run a one-person lab that designs, ships, and operates those systems in production. Happy to walk through a live demo in 20 minutes.`,
+      ``,
+      `Portfolio: https://aideazz.xyz/portfolio`,
+      applyUrl ? `Role: ${applyUrl}` : '',
+      ``,
+      `Best regards,`,
+      `Elena Revicheva`,
+      `Panama City`,
+    ]
+      .filter((l) => l !== undefined)
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n');
+  }
+
+  const applyBtn = applyUrl
+    ? `<a href="${applyUrl.replace(/&/g, '&amp;')}"><b>➡️ APPLY (Torre) — this job has no public email</b></a>`
+    : '';
+
+  if (!to && applyUrl) {
+    const prefix = [
+      applyBtn,
+      '',
+      '<i>No employer email on this deal (Torre apply). Paste the letter below into Torre. CLIENT-MANUAL one-click email needs an address — none exists here.</i>',
+      '',
+      '--- COVER LETTER (paste into Torre) ---',
+      '',
+      body.replace(/\n/g, '<br>'),
+      '',
+    ].join('<br>');
+    if (!html.includes('APPLY (Torre)') && !html.includes(applyUrl)) {
+      await hs('PATCH', `/crm/v3/objects/notes/${latest.id}`, {
+        properties: { hs_note_body: `${prefix}<br>${html}` },
+      });
+      console.log('patched latest note with APPLY link', latest.id, applyUrl);
+    } else {
+      console.log('latest note already has apply url', latest.id);
+    }
+    const draftRel = `docs/selling/drafts/${slug}-email.txt`;
+    fs.writeFileSync(
+      path.join(ROOT, draftRel),
+      [`SUBJECT: ${subject}`, applyUrl ? `APPLY: ${applyUrl}` : '', '', body, ''].filter((x) => x !== undefined).join('\n'),
+    );
+    const out = {
+      ok: true,
+      mode: 'apply-url',
+      dealId: DEAL_ID,
+      dealName,
+      dealStage: deal.properties?.dealstage,
+      dealUrl: `https://app.hubspot.com/contacts/51409153/record/0-3/${DEAL_ID}`,
+      latestNoteId: latest.id,
+      latestNoteAt: latest.properties?.hs_timestamp,
+      noteCount: notes.length,
+      slug,
+      applyUrl,
+      to: null,
+      subject,
+      emailDraft: draftRel,
+      sendUrl: applyUrl,
+      patched: true,
+      latestNoteText: text.slice(0, 8000),
+      latestNoteHtml: html.slice(0, 800),
+      next: 'Open the deal → tap APPLY (Torre) → paste the cover letter. No email to send.',
+    };
+    fs.writeFileSync(REPORT, JSON.stringify(out, null, 2) + '\n');
+    console.log(JSON.stringify({ ...out, latestNoteText: `[${text.length} chars]` }, null, 2));
+    return;
   }
 
   if (!to) throw new Error(`no email on deal ${DEAL_ID} (${dealName}) — contact or note TO: required`);
