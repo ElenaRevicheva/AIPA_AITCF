@@ -4,17 +4,17 @@
   "created": {
     "company": false,
     "contact": false,
-    "deal": false,
-    "note": true,
-    "task": true
+    "deal": true,
+    "note": false,
+    "task": false
   },
   "companyId": "57697262091",
   "contactId": "243891356539",
-  "dealId": "63994708225",
+  "dealId": "64302436100",
   "noteId": "115571559227",
   "taskId": "115572713265",
-  "dealName": "[HIRING-VJH-SERP-LEAD] Jobs at IntelliOps Automation: Explore current Opportunities @ IntelliOps Automation",
-  "dealStage": "appointmentscheduled",
+  "dealName": "[HIRING-MANUAL] BD Expert @ IntelliOps Automation",
+  "dealStage": "qualifiedtobuy",
   "to": "nishant.chaudhary@intelliopsautomation.com",
   "next": "Open the deal → Notes → copy the email → send. Do not countersign."
 }
