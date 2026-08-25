@@ -6,7 +6,13 @@ import type { Express, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { atlasConceptFromUtm } from './atlas-lead-sync.js';
-import { recordResendSend, logEmailEngagement, findOutreachNote, insertNoteStamp } from './resend-webhook.js';
+import {
+  recordResendSend,
+  logEmailEngagement,
+  findOutreachNote,
+  insertNoteStamp,
+  emailBodyToHtml,
+} from './resend-webhook.js';
 
 const DEFAULT_PHONE = '50766623757';
 const GO_WA_BASE = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
@@ -360,8 +366,8 @@ async function sendOutreachEmailViaResend(p: OutreachEmailPayload): Promise<stri
     /^[^\s<>]+@[^\s<>]+\.[^\s<>]+$/.test(rawFrom) || /^.+\s*<[^\s<>]+@[^\s<>]+\.[^\s<>]+>\s*$/.test(rawFrom);
   const from = fromOk ? rawFrom : 'Elena Revicheva <aipa@aideazz.xyz>';
   const replyTo = (process.env.CONCIERGE_REPLY_TO || 'elena.revicheva2016@gmail.com').trim().replace(/^["']|["']$/g, '');
-  const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const html = `<div style="white-space:pre-wrap;font-family:inherit;">${escHtml(p.body)}</div>`;
+  // Anchors the URLs instead of trusting the recipient's client to auto-linkify.
+  const html = emailBodyToHtml(p.body);
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -399,6 +405,9 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
       // of a long note is a stamp Elena never sees.
       const add =
         `<b>📧 EMAILED ${when} from aipa@aideazz.xyz → ${p.to}</b>` +
+        // The note is the audit trail. Leaving the Cc out of it made the deal
+        // understate who had received the message.
+        (p.cc?.length ? `<br>Cc: ${p.cc.join(', ')}` : '') +
         `<br>Subject: ${p.subject}` +
         `<br>Resend:${resendId} (one-click /go/outreach-email/${p.slug}).`;
       await fetch(`https://api.hubapi.com/crm/v3/objects/notes/${best.id}`, {
@@ -635,6 +644,7 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
       const engagementId = await logEmailEngagement({
         dealId: hit.dealId,
         to: hit.to,
+        cc: hit.cc,
         subject: hit.subject,
         body: hit.body,
         resendId,

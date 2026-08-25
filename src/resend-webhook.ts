@@ -245,11 +245,37 @@ export function insertNoteStamp(body: string, stampHtml: string): string {
  * sent from the HubSpot UI. Returns the engagement id (stored in the ledger so a
  * later bounce can flip its status).
  */
+/**
+ * Render a plain-text email body as HTML: escape, keep the line breaks, and make
+ * bare URLs clickable.
+ *
+ * Two things depended on this. HubSpot renders `hs_email_text` in an HTML
+ * context, so newlines collapsed and the timeline showed sentences fused to each
+ * other and a link fused to the words around it — the record was right, the
+ * display was not. And a bare URL in an outgoing mail is only clickable if the
+ * recipient's client happens to auto-linkify; an explicit anchor does not leave
+ * that to chance.
+ */
+export function emailBodyToHtml(body: string): string {
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // Escape first, then linkify, so the anchor we add is the only markup present.
+  // Trailing . , ) ; : are sentence punctuation, not part of the URL.
+  const linkified = esc(body).replace(/https?:\/\/[^\s<>"']+/g, raw => {
+    const m = raw.match(/^(.*?)([.,);:]*)$/s);
+    const url = m?.[1] ?? raw;
+    const tail = m?.[2] ?? '';
+    return `<a href="${url}" target="_blank" rel="noopener">${url}</a>${tail}`;
+  });
+  return `<div style="white-space:pre-wrap;font-family:inherit;">${linkified}</div>`;
+}
+
 export async function logEmailEngagement(input: {
   dealId?: string | undefined;
   /** Pass when the caller already knows the contact (Lead Concierge does). */
   contactId?: string | undefined;
   to: string;
+  /** Extra recipients, so the CRM records everyone who actually received it. */
+  cc?: string[] | undefined;
   subject: string;
   body: string;
   resendId: string;
@@ -262,6 +288,12 @@ export async function logEmailEngagement(input: {
         hs_email_status: 'SENT',
         hs_email_subject: input.subject,
         hs_email_text: `${input.body}\n\n— enviado por aipa@aideazz.xyz (Resend ${input.resendId})`,
+        // Without this HubSpot renders the text in an HTML context and every line
+        // break collapses, gluing sentences together and welding the link to the
+        // words beside it.
+        hs_email_html: emailBodyToHtml(
+          `${input.body}\n\n— enviado por aipa@aideazz.xyz (Resend ${input.resendId})`,
+        ),
         // From/to must go through hs_email_headers — HubSpot rejects the flat
         // hs_email_from_email / hs_email_to_email properties with a 400 ("derived
         // from the hs_email_headers property"), which would silently cost the
@@ -269,7 +301,9 @@ export async function logEmailEngagement(input: {
         hs_email_headers: JSON.stringify({
           from: { email: 'aipa@aideazz.xyz', firstName: 'Elena', lastName: 'Revicheva' },
           to: [{ email: input.to }],
-          cc: [],
+          // Was hardcoded empty, so a copied recipient never reached the CRM and
+          // the deal understated who had actually seen the message.
+          cc: (input.cc || []).map(email => ({ email })),
           bcc: [],
         }),
         hubspot_owner_id: HUBSPOT_OWNER_ID,
