@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "pages": {
+    "ai-native-b2b-marketplace": {
+      "http": "200",
+      "missing": [],
+      "bytes": 1975
+    },
+    "intelliops-bd": {
+      "http": "200",
+      "missing": [],
+      "bytes": 4895
+    }
+  },
+  "pm2": "restarted",
+  "mode": "live-sync"
+}
