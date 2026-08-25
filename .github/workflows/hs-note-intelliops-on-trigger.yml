@@ -56,6 +56,10 @@ jobs:
               echo "cmd=$LINE" >> "$GITHUB_OUTPUT"
               echo "Syncing outreach email assets + go-wa attach support onto Oracle"
               ;;
+            live-sync)
+              echo "cmd=live-sync" >> "$GITHUB_OUTPUT"
+              echo "Live-sync branch files onto Oracle (no HubSpot writes, no sends)"
+              ;;
             fix-send-buttons)
               echo "cmd=fix-send-buttons" >> "$GITHUB_OUTPUT"
               echo "Absolute HubSpot send URLs + Gmail resume-attach proof"
@@ -76,12 +80,12 @@ jobs:
 
       # Oracle production installs skip TypeScript. Compile go-wa here and scp dist/.
       - uses: actions/setup-node@v4
-        if: steps.trigger.outputs.skip != 'true' && startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email')
+        if: steps.trigger.outputs.skip != 'true' && (startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email') || steps.trigger.outputs.cmd == 'live-sync')
         with:
           node-version: '20'
           cache: npm
       - name: Compile go-wa.ts
-        if: steps.trigger.outputs.skip != 'true' && startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email')
+        if: steps.trigger.outputs.skip != 'true' && (startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email') || steps.trigger.outputs.cmd == 'live-sync')
         run: |
           set -euo pipefail
           npm ci
@@ -101,7 +105,7 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
           chmod 600 ~/.ssh/oracle
           SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20"
-          if [[ "$CMD" == sync-outreach-email* ]]; then
+          if [[ "$CMD" == sync-outreach-email* || "$CMD" == live-sync ]]; then
             scp $SSHOPTS dist/go-wa.js ubuntu@170.9.242.90:/tmp/go-wa.sync.js
             echo "--- scp dist/go-wa.js → Oracle /tmp/go-wa.sync.js ---"
           fi
@@ -123,6 +127,9 @@ jobs:
           scp $SSHOPTS ubuntu@170.9.242.90:/tmp/fix-send-buttons-report.json /tmp/ 2>/dev/null \
             && echo "--- pulled fix-send-buttons report ---" \
             || echo "--- no fix-send-buttons report ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/live-sync-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled live-sync report ---" \
+            || echo "--- no live-sync report ---"
           rm -f ~/.ssh/oracle
           exit $RC
 
@@ -133,7 +140,7 @@ jobs:
           CMD="${{ steps.trigger.outputs.cmd }}"
           # sync-outreach-email must not apply stale email-link patches / tarballs —
           # that reverted the hire-me draft and stripped the resume attachment.
-          if [[ "$CMD" == sync-outreach-email* || "$CMD" == fix-send-buttons ]]; then
+          if [[ "$CMD" == sync-outreach-email* || "$CMD" == fix-send-buttons || "$CMD" == live-sync ]]; then
             if [ -f /tmp/outreach-sync-report.json ]; then
               cp /tmp/outreach-sync-report.json docs/selling/_outreach_sync_report.json
               git add docs/selling/_outreach_sync_report.json
@@ -141,6 +148,10 @@ jobs:
             if [ -f /tmp/fix-send-buttons-report.json ]; then
               cp /tmp/fix-send-buttons-report.json docs/selling/_fix_send_buttons_report.json
               git add docs/selling/_fix_send_buttons_report.json
+            fi
+            if [ -f /tmp/live-sync-report.json ]; then
+              cp /tmp/live-sync-report.json docs/selling/_live_sync_report.json
+              git add docs/selling/_live_sync_report.json
             fi
             printf '%s\n' '# idle' > .hs-note-trigger
             git add .hs-note-trigger

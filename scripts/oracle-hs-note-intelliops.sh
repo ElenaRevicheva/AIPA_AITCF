@@ -83,6 +83,85 @@ PY
   exit $RC
 fi
 
+if [ "$CMD" = "live-sync" ]; then
+  echo "--- live-sync money files from $REF (no HubSpot writes, no sends) ---"
+  git checkout FETCH_HEAD -- \
+    src/go-wa.ts \
+    docs/selling/drafts/ai-native-b2b-marketplace-email.txt \
+    docs/selling/drafts/intelliops-bd-email.txt \
+    docs/selling/attachments/ \
+    docs/oracle/NOW.md \
+    docs/oracle/HANDOFF_2026-08-25_INTELLIOPS_BSS.md \
+    CLAUDE.md \
+    .cursor/rules/session-live.mdc \
+    scripts/wa-link-lib.cjs \
+    scripts/hs-fix-send-buttons.cjs \
+    scripts/hs-env.cjs \
+    2>&1 || { echo "FATAL: live-sync checkout failed"; exit 1; }
+  # Merge only our two slugs into the on-box registry so other Oracle entries stay.
+  git show FETCH_HEAD:docs/selling/outreach-registry.json > /tmp/branch-outreach-registry.json
+  node -e '
+    const fs = require("fs");
+    const p = "docs/selling/outreach-registry.json";
+    const local = JSON.parse(fs.readFileSync(p, "utf8"));
+    const branch = JSON.parse(fs.readFileSync("/tmp/branch-outreach-registry.json", "utf8"));
+    for (const slug of ["intelliops-bd", "ai-native-b2b-marketplace"]) {
+      if (!branch[slug]) throw new Error("branch missing slug " + slug);
+      local[slug] = branch[slug];
+    }
+    fs.writeFileSync(p, JSON.stringify(local, null, 2) + "\n");
+    console.log("merged slugs", "intelliops-bd", "ai-native-b2b-marketplace");
+  '
+  if [ ! -f /tmp/go-wa.sync.js ]; then
+    echo "FATAL: compiled dist/go-wa.js was not scp'd"
+    exit 1
+  fi
+  mkdir -p dist
+  cp /tmp/go-wa.sync.js dist/go-wa.js
+  echo "--- installed compiled dist/go-wa.js ($(wc -c < dist/go-wa.js) bytes) ---"
+  grep -n 'Adjunto' dist/go-wa.js | head -3 || { echo "FATAL: Adjunto missing from go-wa.js"; exit 1; }
+  echo "--- pm2 restart cto-aipa --update-env ---"
+  pm2 restart cto-aipa --update-env
+  sleep 3
+  python3 - <<'PY'
+import json, subprocess, pathlib
+slugs = {
+  "ai-native-b2b-marketplace": [
+    "https://aideazz.xyz/portfolio",
+    "Elena_Revicheva_Resume.pdf",
+    "Hire me",
+    "contact@bssgroupe.com",
+  ],
+  "intelliops-bd": [
+    "nishant.chaudhary@intelliopsautomation.com",
+    "https://aideazz.xyz/portfolio",
+  ],
+}
+pages = {}
+ok = True
+for slug, needles in slugs.items():
+    p = f"/tmp/live-sync-{slug}.html"
+    r = subprocess.run(
+        ["curl", "-sS", "-o", p, "-w", "%{http_code}", "-m", "20",
+         f"http://127.0.0.1:3000/go/outreach-email/{slug}"],
+        capture_output=True, text=True,
+    )
+    code = (r.stdout or "").strip()
+    html = pathlib.Path(p).read_text(errors="replace") if pathlib.Path(p).exists() else ""
+    missing = [n for n in needles if n not in html]
+    pages[slug] = {"http": code, "missing": missing, "bytes": len(html)}
+    if code != "200" or missing:
+        ok = False
+report = {"ok": ok, "pages": pages, "pm2": "restarted", "mode": "live-sync"}
+pathlib.Path("/tmp/live-sync-report.json").write_text(json.dumps(report, indent=2) + "\n")
+print(json.dumps(report, indent=2))
+raise SystemExit(0 if ok else 1)
+PY
+  RC=$?
+  echo "--- live-sync exit $RC ---"
+  exit $RC
+fi
+
 if [ "$CMD" = "fix-send-buttons" ]; then
   echo "--- fix HubSpot send hrefs + Gmail resume proof ---"
   git checkout FETCH_HEAD -- \
