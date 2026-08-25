@@ -2911,12 +2911,6 @@
     "company": "AI-Native B2B Marketplace",
     "email": "contact@bssgroupe.com",
     "emailDraft": "docs/selling/drafts/ai-native-b2b-marketplace-email.txt",
-    "dealId": "64302126655",
-    "attachments": [
-      {
-        "path": "docs/selling/attachments/15.07.26_EN_Resume_Elena_Revicheva_compressed.pdf",
-        "filename": "Elena_Revicheva_Resume.pdf"
-      }
-    ]
+    "dealId": "64302126655"
   }
 }

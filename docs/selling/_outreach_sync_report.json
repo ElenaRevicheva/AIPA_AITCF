@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "slug": "ai-native-b2b-marketplace",
+  "http": "200",
+  "missing": [],
+  "hasPortfolio": true,
+  "hasResume": true,
+  "hasHireSubject": true,
+  "hasAdjunto": true,
+  "htmlBytes": 1975,
+  "preview": "<div class=\"box\">\n  <p class=\"meta\"><b>From:</b> Elena Revicheva &lt;aipa@aideazz.xyz&gt;</p>\n  <p class=\"meta\"><b>To:</b> contact@bssgroupe.com</p>\n  \n  <p class=\"meta\"><b>Subject:</b> Hire me \u2014 AI-Native B2B Marketplace solo builder (Elena Revicheva)</p>\n  <p class=\"meta\"><b>Adjunto:</b> Elena_Revicheva_Resume.pdf (96 KB)</p>\n  <div class=\"preview\">Hello,\n\nI applied on Torre for the AI-Native B2B Marketplace solo-builder role. I am writing to ask you to hire me for it.\n\nI am Elena Revicheva, an AI-augmented builder in Panama. I ship production systems solo \u2014 GEO/AEO, conversational agents, and AI-ops. Resume is attached. The live work is here:\n\nhttps://aideazz.xyz/portfolio\n\nI can walk through a live production system this week.\n\nElena Revicheva\nPanama City\nhttps://aideazz.xyz/portfolio</div>\n  <form method=\"POST\" action=\"https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace/send\">\n    <button type=\"submit\">\u2709\ufe0f Enviar ahora desde aipa@aideazz.xyz</button>\n  </form>\n  <p class=\"dim\">Igual que WhatsApp: revisas \u2192 un click \u2192 Send. Se registra en HubSpot autom\u00e1ticamente.</p>\n</div>\n</body></html>"
+}
