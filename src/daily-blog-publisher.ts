@@ -594,6 +594,83 @@ function slugAlreadyPublished(slug: string): boolean {
   }
 }
 
+/**
+ * Overlap threshold, in percent, above which two articles are treated as the
+ * same article. 60 was picked by replaying every slug already shipped: it
+ * separates the 19 real cannibalising clusters from unrelated posts that merely
+ * share vocabulary. Override with DAILY_BLOG_DUP_THRESHOLD if the corpus drifts.
+ */
+const DUP_OVERLAP_THRESHOLD = Number(process.env.DAILY_BLOG_DUP_THRESHOLD ?? 60);
+
+/** Words that carry no topical signal, so they must not prop up a similarity score. */
+/** Minimum shared topic-words before an overlap percentage is trusted at all. */
+const DUP_MIN_SHARED_TOKENS = Number(process.env.DAILY_BLOG_DUP_MIN_SHARED ?? 3);
+
+const DUP_STOPWORDS = new Set(
+  ("the a an to in of for my is it and not what why how i with on at from that " +
+   "this actually before you your me our we was were are be been has have had " +
+   "its into over under than then when while about after also just only more most")
+    .split(" "),
+);
+
+/** Topic-bearing tokens of a title/slug, with any -YYYY-MM-DD disambiguator stripped. */
+function dupTokens(s: string): Set<string> {
+  return new Set(
+    s
+      .toLowerCase()
+      .replace(/-20d{2}-d{2}-d{2}/g, "")
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length > 2 && !DUP_STOPWORDS.has(w)),
+  );
+}
+
+/**
+ * Near-duplicate detector.
+ *
+ * Exact-slug equality is the wrong test. The model rewords one brief into
+ * "...-to-stop-losing-state" on Tuesday and "...-to-production-stability" on
+ * Friday: different slug, same article, and a hasOwnProperty check sees nothing.
+ * Both pages then answer the same query and split the authority between them
+ * instead of compounding it. So measure overlap, not equality.
+ *
+ * Returns the closest already-published article at or above the threshold, or
+ * null when today's piece is genuinely new.
+ */
+function findNearDuplicate(
+  title: string,
+  slug: string,
+): { slug: string; overlapPct: number } | null {
+  try {
+    const cacheFile = getBlogPostCachePath();
+    if (!fs.existsSync(cacheFile)) return null;
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<
+      string,
+      { title?: string } | undefined
+    >;
+    const mine = dupTokens(`${slug} ${title}`);
+    if (!mine.size) return null;
+
+    let closest: { slug: string; overlapPct: number } | null = null;
+    for (const [existingSlug, entry] of Object.entries(cache)) {
+      const theirs = dupTokens(`${existingSlug} ${entry?.title ?? ""}`);
+      if (!theirs.size) continue;
+      let shared = 0;
+      for (const t of mine) if (theirs.has(t)) shared++;
+      const overlapPct = Math.round((shared / Math.min(mine.size, theirs.size)) * 100);
+      // A percentage alone over-fires on very short titles: a three-token slug
+      // needs only two shared words to clear 60%. Require real shared substance
+      // too, so a genuinely new short-titled post is never silently skipped.
+      if (shared < DUP_MIN_SHARED_TOKENS) continue;
+      if (overlapPct >= DUP_OVERLAP_THRESHOLD && (!closest || overlapPct > closest.overlapPct)) {
+        closest = { slug: existingSlug, overlapPct };
+      }
+    }
+    return closest;
+  } catch {
+    return null;
+  }
+}
+
 /** Returns set of topic indices already present in the cache (by keyword match on slug). */
 function getPublishedTopicIndices(): Set<number> {
   const excluded = new Set<number>();
@@ -1080,17 +1157,22 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
   if (!parsed) throw new Error("Article generation produced no output");
 
-  // Slug collision guard — topic exclusion above should prevent this, but just in case.
+  // ── Near-duplicate guard ──────────────────────────────────────────────────
+  // Refuse; do not disambiguate. The previous version appended today's date to
+  // a colliding slug so the run would not crash on Dev.to's 422. That kept the
+  // pipeline green while shipping a second page for a query we already ranked
+  // for — the safety net silently absorbed a topic-exhaustion problem. A skipped
+  // day costs one post; a cannibalising pair costs the cluster.
   let finalTitle = parsed.title;
   let slug = titleToSlug(finalTitle);
-  if (slugAlreadyPublished(slug)) {
-    // This exact canonical was already published — Dev.to hard-fails a duplicate canonical with
-    // 422 "Canonical url has already been taken". Uniquify with today's date so the (freshly
-    // generated) post still ships instead of crashing the whole daily run.
-    const suffix = new Date().toISOString().slice(0, 10);
-    console.warn(`📰 Slug "${slug}" already published — uniquifying canonical with ${suffix} to avoid 422 collision.`);
-    slug = `${slug}-${suffix}`;
+  const dup = findNearDuplicate(finalTitle, slug);
+  if (dup) {
+    const why = `"${finalTitle}" is ${dup.overlapPct}% topic-overlap with already-published "${dup.slug}"`;
+    console.warn(`[daily-blog] Refusing to publish — ${why}`);
+    await notifyTelegramSkipped("Near-duplicate — nothing published", why);
+    throw new Error(`SKIPPED_BY_COOLDOWN: near-duplicate of ${dup.slug} (${dup.overlapPct}%)`);
   }
+
   const aideazzBlogUrl = `${AIDEAZZ_SITE}/blog/${slug}`;
 
   // Dev.to canonical points to aideazz.xyz/blog/{slug} — backlink credit to aideazz

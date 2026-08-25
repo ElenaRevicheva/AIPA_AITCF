@@ -4,16 +4,45 @@ Elena is learning on the go. Every session must leave her more hireable than it
 found her, and the work must be oriented at getting her paid. These rules are
 not optional politeness — they are the deliverable.
 
+**Live across Cursor and Claude Code:** there is no shared chat and no Claude
+MCP. The live layer is HubSpot + `docs/oracle/NOW.md`. Read that file at
+session start. Update it when the money queue changes. Push so the other
+tool sees it.
+
 ---
 
-## CURRENT BLOCKER (21 Aug 2026) — read before touching the blog pin
+## CURRENT STATUS (25 Aug 2026) — the 21 Aug pin blocker is RESOLVED
 
-The 21 Aug daily post is on GitHub + Dev.to + `/portfolio` and **404s on the
-canonical GEO URL**. 4everland’s last pin is still `29d1a63` (20 Aug 21:30).
-Do **not** push more aideazz commits expecting the CID to move.
+**Pushing aideazz commits is safe again.** 4everland is publishing: the URL that
+used to 404 returns 200, `geo-manifest.json` reads `2026-08-24`, and the 23rd and
+24th both pushed clean. The pin was never the cause — a run between the 20th and
+23rd died on `git push … ! [rejected] (non-fast-forward)` because Oracle's clone
+was behind the remote, and it recovered on its own.
+(Superseded handoff: `docs/oracle/HANDOFF_2026-08-21_TELEGRAM_BLOG_PIN.md`.)
 
-**Full handoff for the next agent:**
-`docs/oracle/HANDOFF_2026-08-21_TELEGRAM_BLOG_PIN.md`
+### ⚠️ Oracle holds live code that is on NO branch of `main`
+
+Oracle's `dist/go-wa.js` has the MIME-attach sender (20 `attachment` refs,
+md5 `e469dacf…`). Building `main` produces a version with **zero** — so a normal
+full `dist/` sync from `main` silently destroys the email-attachment feature.
+**Deploy named files only. Never rsync the whole `dist/`, never deploy cto-aipa
+wholesale from `main`.**
+
+### Duplicate blog content — source fixed 25 Aug, cleanup still open
+
+The daily publisher shipped near-duplicates for months: **56 of 121 pages are
+near-copies**, in 19 cannibalising clusters, back to 18 May. The old guard tested
+*exact* slug equality, so reworded titles sailed through, and when it did fire it
+appended a date and published anyway — a green log every time.
+
+Fixed at the source: the publisher now scores **token overlap** against every
+published post and **refuses** (`SKIPPED_BY_COOLDOWN: near-duplicate`) instead of
+disambiguating. Oracle's dedup cache was backfilled **64 → 123** entries; it could
+previously only see half of what was live.
+
+**Still open:** ~50 already-published duplicates need canonical consolidation.
+**Canonical only — do not delete.** 21 published pages contain the fabricated
+Redis stack (see the 23 Aug incident), so never canonicalise *onto* one of those.
 
 ---
 
