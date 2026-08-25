@@ -19,6 +19,62 @@ fi
 
 echo "--- fetching $REF ---"
 git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
+
+if [[ "$CMD" == sync-outreach-email* ]] || [ "$CMD" = "sync-outreach-email" ]; then
+  SLUG="${3:-ai-native-b2b-marketplace}"
+  SLUG=$(echo "$SLUG" | tr -cd 'a-z0-9-')
+  [ -n "$SLUG" ] || SLUG=ai-native-b2b-marketplace
+  echo "--- sync outreach email slug=$SLUG from $REF ---"
+  git checkout FETCH_HEAD -- \
+    src/go-wa.ts \
+    docs/selling/outreach-registry.json \
+    docs/selling/drafts/ \
+    docs/selling/attachments/ \
+    2>&1 || { echo "FATAL: checkout of outreach email files failed"; exit 1; }
+  if command -v npm >/dev/null 2>&1; then
+    echo "--- npm run build ---"
+    npm run build
+  fi
+  echo "--- pm2 restart cto-aipa --update-env ---"
+  pm2 restart cto-aipa --update-env
+  sleep 3
+  START=$(pm2 jlist | python3 -c "import sys,json; d=json.load(sys.stdin); p=[x for x in d if x.get('name')=='cto-aipa']; print(p[0]['pm2_env']['pm_uptime'] if p else 'missing')" 2>/dev/null || echo unknown)
+  echo "--- cto-aipa uptime_ms=$START ---"
+  HTML=/tmp/outreach-email-smoke.html
+  CODE=$(curl -sS -o "$HTML" -w '%{http_code}' -m 20 \
+    "http://127.0.0.1:3000/go/outreach-email/${SLUG}" || true)
+  echo "--- GET /go/outreach-email/${SLUG} HTTP $CODE ---"
+  python3 - <<PY
+import json, re, pathlib
+html = pathlib.Path("$HTML").read_text(errors="replace")
+need = [
+    "https://aideazz.xyz/portfolio",
+    "Elena_Revicheva_Resume.pdf",
+    "Hire me",
+    "contact@bssgroupe.com",
+]
+missing = [n for n in need if n not in html]
+ok = "$CODE" == "200" and not missing
+report = {
+    "ok": ok,
+    "slug": "$SLUG",
+    "http": "$CODE",
+    "missing": missing,
+    "hasPortfolio": "https://aideazz.xyz/portfolio" in html,
+    "hasResume": "Elena_Revicheva_Resume.pdf" in html,
+    "hasHireSubject": "Hire me" in html,
+    "htmlBytes": len(html),
+}
+pathlib.Path("/tmp/outreach-sync-report.json").write_text(json.dumps(report, indent=2) + "\n")
+print(json.dumps(report, indent=2))
+raise SystemExit(0 if ok else 1)
+PY
+  RC=$?
+  echo "--- sync-outreach-email exit $RC ---"
+  mkdir -p /tmp
+  exit $RC
+fi
+
   git checkout FETCH_HEAD -- \
   scripts/hs-note-intelliops-eval.cjs \
   scripts/hs-intelliops-story.cjs \

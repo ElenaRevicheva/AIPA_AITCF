@@ -52,6 +52,10 @@ jobs:
               echo "cmd=$LINE" >> "$GITHUB_OUTPUT"
               echo "Adding CLIENT-MANUAL one-click email to deal $LINE"
               ;;
+            sync-outreach-email*)
+              echo "cmd=$LINE" >> "$GITHUB_OUTPUT"
+              echo "Syncing outreach email assets + go-wa attach support onto Oracle"
+              ;;
             *)
               echo "::error::command '$LINE' is not allowed"
               exit 1
@@ -90,6 +94,9 @@ jobs:
           scp $SSHOPTS ubuntu@170.9.242.90:/tmp/intelliops-story.tar.gz /tmp/ 2>/dev/null \
             && echo "--- pulled story tarball ---" \
             || echo "--- no tarball to pull ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/outreach-sync-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled outreach-sync report ---" \
+            || echo "--- no outreach-sync report ---"
           rm -f ~/.ssh/oracle
           exit $RC
 
@@ -107,6 +114,10 @@ jobs:
           if [ -f /tmp/email-link-deal-report.json ]; then
             cp /tmp/email-link-deal-report.json docs/selling/_email_link_deal_report.json
             git add docs/selling/_email_link_deal_report.json
+          fi
+          if [ -f /tmp/outreach-sync-report.json ]; then
+            cp /tmp/outreach-sync-report.json docs/selling/_outreach_sync_report.json
+            git add docs/selling/_outreach_sync_report.json
           fi
           git add \
             docs/selling/_intelliops_thread.json \

@@ -10,7 +10,7 @@ sees it.
 | Lane | Deal | Tap |
 | --- | --- | --- |
 | Overlay commission (not a job) | IntelliOps BD | https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd |
-| Job follow-up (already applied on Torre) | BSS Groupe | https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace |
+| Job follow-up (already applied on Torre) | BSS Groupe | https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace — hire-me letter, resume attached, portfolio `https://aideazz.xyz/portfolio` |
 
 HubSpot:
 
