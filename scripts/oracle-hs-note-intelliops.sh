@@ -43,7 +43,11 @@ if [ "$CMD" = "intelliops-story" ]; then
   set -e
   echo "--- story exit code: $RC ---"
 elif [[ "$CMD" == email-link* ]]; then
-  DEAL=$(echo "$CMD" | awk '{print $2}')
+  DEAL="${3:-}"
+  if [ -z "$DEAL" ]; then
+    DEAL=$(echo "$CMD" | awk '{print $2}')
+  fi
+  DEAL=$(echo "$DEAL" | tr -cd '0-9')
   echo "--- node scripts/hs-email-link-deal.cjs $DEAL ---"
   set +e
   node scripts/hs-email-link-deal.cjs "$DEAL" 2>&1
