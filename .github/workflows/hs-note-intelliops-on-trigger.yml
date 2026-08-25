@@ -70,6 +70,21 @@ jobs:
             exit 1
           fi
 
+      # Oracle production installs skip TypeScript. Compile go-wa here and scp dist/.
+      - uses: actions/setup-node@v4
+        if: steps.trigger.outputs.skip != 'true' && startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email')
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Compile go-wa.ts
+        if: steps.trigger.outputs.skip != 'true' && startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email')
+        run: |
+          set -euo pipefail
+          npm ci
+          npx tsc
+          grep -n 'Adjunto' dist/go-wa.js | head -5
+          test -f dist/go-wa.js
+
       - name: Run on Oracle
         if: steps.trigger.outputs.skip != 'true'
         env:
@@ -82,6 +97,10 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
           chmod 600 ~/.ssh/oracle
           SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20"
+          if [[ "$CMD" == sync-outreach-email* ]]; then
+            scp $SSHOPTS dist/go-wa.js ubuntu@170.9.242.90:/tmp/go-wa.sync.js
+            echo "--- scp dist/go-wa.js → Oracle /tmp/go-wa.sync.js ---"
+          fi
           ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- "$REF" "$CMD" < scripts/oracle-hs-note-intelliops.sh
           RC=$?
           echo "--- remote exit code: $RC ---"

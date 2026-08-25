@@ -31,10 +31,14 @@ if [[ "$CMD" == sync-outreach-email* ]] || [ "$CMD" = "sync-outreach-email" ]; t
     docs/selling/drafts/ \
     docs/selling/attachments/ \
     2>&1 || { echo "FATAL: checkout of outreach email files failed"; exit 1; }
-  if command -v npm >/dev/null 2>&1; then
-    echo "--- npm run build ---"
-    npm run build
+  if [ ! -f /tmp/go-wa.sync.js ]; then
+    echo "FATAL: compiled dist/go-wa.js was not scp'd to /tmp/go-wa.sync.js (Oracle has no tsc)"
+    exit 1
   fi
+  mkdir -p dist
+  cp /tmp/go-wa.sync.js dist/go-wa.js
+  echo "--- installed compiled dist/go-wa.js ($(wc -c < dist/go-wa.js) bytes) ---"
+  grep -n 'Adjunto' dist/go-wa.js | head -5 || { echo "FATAL: Adjunto missing from compiled go-wa.js"; exit 1; }
   echo "--- pm2 restart cto-aipa --update-env ---"
   pm2 restart cto-aipa --update-env
   sleep 3
@@ -55,6 +59,8 @@ need = [
 ]
 missing = [n for n in need if n not in html]
 ok = "$CODE" == "200" and not missing
+preview_start = html.find('<div class="box">')
+preview = html[preview_start:preview_start + 1800] if preview_start >= 0 else html[:1800]
 report = {
     "ok": ok,
     "slug": "$SLUG",
@@ -63,7 +69,9 @@ report = {
     "hasPortfolio": "https://aideazz.xyz/portfolio" in html,
     "hasResume": "Elena_Revicheva_Resume.pdf" in html,
     "hasHireSubject": "Hire me" in html,
+    "hasAdjunto": "Adjunto" in html,
     "htmlBytes": len(html),
+    "preview": preview,
 }
 pathlib.Path("/tmp/outreach-sync-report.json").write_text(json.dumps(report, indent=2) + "\n")
 print(json.dumps(report, indent=2))
