@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "deals": [
+    {
+      "dealId": "64302436100",
+      "slug": "intelliops-bd",
+      "name": "IntelliOps BD",
+      "url": "https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd",
+      "noteCount": 13,
+      "patched": [
+        {
+          "noteId": "115571559227",
+          "changed": true,
+          "hasAbsHref": true,
+          "hasPlainUrl": true,
+          "relativeLeft": false
+        }
+      ]
+    },
+    {
+      "dealId": "64302126655",
+      "slug": "ai-native-b2b-marketplace",
+      "name": "BSS Groupe",
+      "url": "https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace",
+      "noteCount": 2,
+      "patched": [
+        {
+          "noteId": "115574283777",
+          "changed": true,
+          "hasAbsHref": true,
+          "hasPlainUrl": true,
+          "relativeLeft": false
+        }
+      ]
+    }
+  ],
+  "proof": {
+    "to": "elena.revicheva2016@gmail.com",
+    "resendId": "1b5829b0-d7f3-49c5-86d2-92ec68316578",
+    "bytes": 98201,
+    "sha256": "43146d1086d7f26e3176dec910b94ebd2c16e83012691e7cfe2282cff5d970d8",
+    "filename": "Elena_Revicheva_Resume.pdf"
+  }
+}
