@@ -19,7 +19,7 @@
   "next": "Open the deal → tap ENVIAR POR EMAIL. Do not countersign.",
   "slug": "intelliops-bd",
   "sendUrl": "https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd",
-  "imapMessages": 11,
+  "imapMessages": 6,
   "hubspotEmails": 0,
   "thread": [
     {
@@ -73,47 +73,21 @@
       "attachments": [
         "IntelliOps_Automation_ELENA_REVICHEVA_Business_Development_Agreement.pdf"
       ]
-    },
-    {
-      "date": "2026-08-25T07:52:50-07:00",
-      "source": "imap:gmail",
-      "from": "\"cursor[bot]\" <notifications@github.com>",
-      "to": "ElenaRevicheva/AIPA_AITCF <AIPA_AITCF@noreply.github.com>",
-      "subject": "Re: [ElenaRevicheva/AIPA_AITCF] IntelliOps BD v2 evaluation and\r\n collectable-terms reply (PR #29)",
-      "attachments": []
-    },
-    {
-      "date": "2026-08-25T07:54:47-07:00",
-      "source": "imap:gmail",
-      "from": "\"cursor[bot]\" <notifications@github.com>",
-      "to": "ElenaRevicheva/AIPA_AITCF <AIPA_AITCF@noreply.github.com>",
-      "subject": "Re: [ElenaRevicheva/AIPA_AITCF] IntelliOps BD v2 evaluation and\r\n collectable-terms reply (PR #29)",
-      "attachments": []
-    },
-    {
-      "date": "2026-08-25T07:55:04-07:00",
-      "source": "imap:gmail",
-      "from": "\"github-actions[bot]\" <notifications@github.com>",
-      "to": "ElenaRevicheva/AIPA_AITCF <AIPA_AITCF@noreply.github.com>",
-      "subject": "Re: [ElenaRevicheva/AIPA_AITCF] IntelliOps BD v2 evaluation and\r\n collectable-terms reply (PR #29)",
-      "attachments": []
-    },
-    {
-      "date": "2026-08-25T08:27:20-07:00",
-      "source": "imap:gmail",
-      "from": "\"cursor[bot]\" <notifications@github.com>",
-      "to": "ElenaRevicheva/AIPA_AITCF <AIPA_AITCF@noreply.github.com>",
-      "subject": "Re: [ElenaRevicheva/AIPA_AITCF] IntelliOps BD v2 evaluation and\r\n collectable-terms reply (PR #29)",
-      "attachments": []
-    },
-    {
-      "date": "2026-08-25T14:53:07+00:00",
-      "source": "imap:gmail",
-      "from": "\"github-actions[bot]\" <notifications@github.com>",
-      "to": "ElenaRevicheva/AIPA_AITCF <AIPA_AITCF@noreply.github.com>",
-      "subject": "Re: [ElenaRevicheva/AIPA_AITCF] IntelliOps BD v2 evaluation and\r\n collectable-terms reply (PR #29)",
-      "attachments": []
     }
   ],
-  "pdfs": []
+  "pdfs": [
+    {
+      "label": "v1-20-aug-from-natalie",
+      "filename": "IntelliOps_Automation_ELENA_\r\n REVICHEVA_Business_Development_Agreement.pdf",
+      "bytes": 256614,
+      "hosted": true
+    },
+    {
+      "label": "v2-24-aug-from-nishant",
+      "filename": "IntelliOps_Automation_ELENA_REVICHEVA_Business_Development_Agreement.pdf",
+      "bytes": 34064,
+      "hosted": true
+    }
+  ],
+  "sendButtonOnActionNote": true
 }
