@@ -74,7 +74,11 @@ function registerOutreachSlug(slug, phone, draftRelPath, company, extra = {}) {
       ? { emailDraft: String(extra.emailDraft).replace(/\\/g, '/') }
       : {}),
     ...(extra.dealId ? { dealId: String(extra.dealId) } : {}),
+    ...(extra.cc ? { cc: String(extra.cc).trim().toLowerCase() } : {}),
     ...(extra.score != null ? { score: Number(extra.score) } : {}),
+    ...(Array.isArray(extra.attachments) && extra.attachments.length
+      ? { attachments: extra.attachments }
+      : {}),
   };
   saveRegistry(reg);
   return slug;

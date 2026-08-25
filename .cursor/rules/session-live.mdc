@@ -1,0 +1,25 @@
+---
+description: Live session state shared with Claude Code — HubSpot + NOW.md, not a shared chat
+alwaysApply: true
+---
+
+# Live across Cursor and Claude — there is no shared chat
+
+Cursor Cloud, Cursor Desktop, and Claude Code do **not** share a conversation.
+Do not ask Elena to paste Claude transcripts. Do not pretend a Claude MCP exists.
+
+## Every session, before money work
+
+1. Read `docs/oracle/NOW.md` (the live queue).
+2. Treat **HubSpot** as the system of record for deals, notes, and send buttons.
+3. If NOW.md and HubSpot disagree, HubSpot wins — then update NOW.md and push.
+
+## What “live” means here
+
+| Live | Not live |
+| --- | --- |
+| Git (`NOW.md`, `CLAUDE.md`, this rule) | Claude Code chat |
+| HubSpot deals / notes / tasks | A Cursor↔Claude MCP |
+| Oracle HubSpot+Zoho scripts | Gmail MCP (needs auth) |
+
+When you change the money queue (new send URL, new deal to tap, do-not-countersign), edit `docs/oracle/NOW.md` in the same commit.

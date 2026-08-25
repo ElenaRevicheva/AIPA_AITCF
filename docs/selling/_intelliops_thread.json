@@ -1,0 +1,80 @@
+{
+  "ok": true,
+  "dealId": "64302436100",
+  "dealName": "[HIRING-MANUAL] BD Expert @ IntelliOps Automation",
+  "contactId": "243891356539",
+  "slug": "intelliops-bd",
+  "sendUrl": "https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd",
+  "imapMessages": 6,
+  "hubspotEmails": 0,
+  "thread": [
+    {
+      "date": "2026-08-18T08:08:47-05:00",
+      "source": "imap:zoho",
+      "from": "AIPA AIdeazz <aipa@aideazz.xyz>",
+      "to": "<natalie.adel@intelliopsautomation.com>",
+      "subject": "Re: Profile Shortlisted - Calibration call",
+      "attachments": []
+    },
+    {
+      "date": "2026-08-18T16:29:25+05:30",
+      "source": "imap:zoho",
+      "from": "Natalie Adel <natalie.adel@intelliopsautomation.com>",
+      "to": "\"aipa\" <aipa@aideazz.xyz>",
+      "subject": "Profile Shortlisted - Calibration call",
+      "attachments": []
+    },
+    {
+      "date": "2026-08-19T08:45:13-07:00",
+      "source": "imap:zoho",
+      "from": "<noreply@zohocalendar.com>",
+      "to": "aipa@aideazz.xyz",
+      "subject": "Reminder: Intelliops-Calibration Call @ Wed Aug 19, 2026 11:00 am\r\n - 12:00 pm (America/Panama)",
+      "attachments": []
+    },
+    {
+      "date": "2026-08-20T09:50:13+05:30",
+      "source": "imap:zoho",
+      "from": "Natalie Adel <natalie.adel@intelliopsautomation.com>",
+      "to": "\"aipa\" <aipa@aideazz.xyz>",
+      "subject": "Congratulations on Your Selection – Business Development Expert (Freelance)",
+      "attachments": [
+        "IntelliOps_Automation_ELENA_\r\n REVICHEVA_Business_Development_Agreement.pdf"
+      ]
+    },
+    {
+      "date": "2026-08-23T12:49:28-05:00",
+      "source": "imap:zoho",
+      "from": "AIPA AIdeazz <aipa@aideazz.xyz>",
+      "to": "\"Natalie Adel\" <natalie.adel@intelliopsautomation.com>",
+      "subject": "Business Development Agreement — four items before I sign",
+      "attachments": []
+    },
+    {
+      "date": "2026-08-24T10:17:47+05:30",
+      "source": "imap:zoho",
+      "from": "Nishant Chaudhary <nishant.chaudhary@intelliopsautomation.com>",
+      "to": "\"aipa\" <aipa@aideazz.xyz>",
+      "subject": "Revised Agreement – IntelliOps Automation",
+      "attachments": [
+        "IntelliOps_Automation_ELENA_REVICHEVA_Business_Development_Agreement.pdf"
+      ]
+    }
+  ],
+  "pdfs": [
+    {
+      "label": "v1-20-aug-from-natalie",
+      "filename": "IntelliOps_Automation_ELENA_\r\n REVICHEVA_Business_Development_Agreement.pdf",
+      "bytes": 256614,
+      "hosted": true
+    },
+    {
+      "label": "v2-24-aug-from-nishant",
+      "filename": "IntelliOps_Automation_ELENA_REVICHEVA_Business_Development_Agreement.pdf",
+      "bytes": 34064,
+      "hosted": true
+    }
+  ],
+  "sendButtonOnActionNote": true,
+  "next": "Open the deal → tap ENVIAR POR EMAIL. Do not countersign."
+}

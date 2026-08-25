@@ -1,0 +1,225 @@
+# Stage the IntelliOps BD evaluation onto HubSpot from a Cursor cloud agent.
+#
+# Cloud agents cannot reach api.hubapi.com. Oracle can. Same trigger-file bridge
+# as stage-prospect-on-trigger.yml (agent tokens get HTTP 403 on workflow_dispatch).
+#
+# Usage:
+#   echo "intelliops-eval" > .hs-note-trigger
+#   git add .hs-note-trigger && git commit -m "hs: IntelliOps note onto the deal" && git push
+#
+# Idle (so a later merge does not post a second note):
+#   echo "# idle" > .hs-note-trigger
+
+name: HubSpot note — IntelliOps BD (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".hs-note-trigger"]
+
+permissions:
+  contents: write
+
+jobs:
+  hs-note:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .hs-note-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .hs-note-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.hs-note-trigger is empty"; exit 1; }
+          case "$LINE" in
+            \#*|none|idle)
+              echo "Trigger is idle ('$LINE') — nothing to write."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+            intelliops-eval)
+              echo "cmd=intelliops-eval" >> "$GITHUB_OUTPUT"
+              echo "Staging IntelliOps BD onto HubSpot"
+              ;;
+            intelliops-story)
+              echo "cmd=intelliops-story" >> "$GITHUB_OUTPUT"
+              echo "Pulling Zoho/HubSpot IntelliOps thread onto the deal"
+              ;;
+            email-link\ [0-9]*)
+              echo "cmd=$LINE" >> "$GITHUB_OUTPUT"
+              echo "Adding CLIENT-MANUAL one-click email to deal $LINE"
+              ;;
+            sync-outreach-email*)
+              echo "cmd=$LINE" >> "$GITHUB_OUTPUT"
+              echo "Syncing outreach email assets + go-wa attach support onto Oracle"
+              ;;
+            live-sync)
+              echo "cmd=live-sync" >> "$GITHUB_OUTPUT"
+              echo "Live-sync branch files onto Oracle (no HubSpot writes, no sends)"
+              ;;
+            fix-send-buttons)
+              echo "cmd=fix-send-buttons" >> "$GITHUB_OUTPUT"
+              echo "Absolute HubSpot send URLs + Gmail resume-attach proof"
+              ;;
+            *)
+              echo "::error::command '$LINE' is not allowed"
+              exit 1
+              ;;
+          esac
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      # Oracle production installs skip TypeScript. Compile go-wa here and scp dist/.
+      - uses: actions/setup-node@v4
+        if: steps.trigger.outputs.skip != 'true' && (startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email') || steps.trigger.outputs.cmd == 'live-sync')
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Compile go-wa.ts
+        if: steps.trigger.outputs.skip != 'true' && (startsWith(steps.trigger.outputs.cmd, 'sync-outreach-email') || steps.trigger.outputs.cmd == 'live-sync')
+        run: |
+          set -euo pipefail
+          npm ci
+          npx tsc
+          grep -n 'Adjunto' dist/go-wa.js | head -5
+          test -f dist/go-wa.js
+
+      - name: Run on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+          CMD: ${{ steps.trigger.outputs.cmd }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20"
+          if [[ "$CMD" == sync-outreach-email* || "$CMD" == live-sync ]]; then
+            scp $SSHOPTS dist/go-wa.js ubuntu@170.9.242.90:/tmp/go-wa.sync.js
+            echo "--- scp dist/go-wa.js → Oracle /tmp/go-wa.sync.js ---"
+          fi
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- "$REF" "$CMD" < scripts/oracle-hs-note-intelliops.sh
+          RC=$?
+          echo "--- remote exit code: $RC ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/intelliops-hs-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled HubSpot report ---" \
+            || echo "--- no report to pull ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/email-link-deal-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled email-link report ---" \
+            || echo "--- no email-link report ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/intelliops-story.tar.gz /tmp/ 2>/dev/null \
+            && echo "--- pulled story tarball ---" \
+            || echo "--- no tarball to pull ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/outreach-sync-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled outreach-sync report ---" \
+            || echo "--- no outreach-sync report ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/fix-send-buttons-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled fix-send-buttons report ---" \
+            || echo "--- no fix-send-buttons report ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/live-sync-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled live-sync report ---" \
+            || echo "--- no live-sync report ---"
+          rm -f ~/.ssh/oracle
+          exit $RC
+
+      - name: Commit report and idle the trigger
+        if: success() && steps.trigger.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          CMD="${{ steps.trigger.outputs.cmd }}"
+          # sync-outreach-email must not apply stale email-link patches / tarballs —
+          # that reverted the hire-me draft and stripped the resume attachment.
+          if [[ "$CMD" == sync-outreach-email* || "$CMD" == fix-send-buttons || "$CMD" == live-sync ]]; then
+            if [ -f /tmp/outreach-sync-report.json ]; then
+              cp /tmp/outreach-sync-report.json docs/selling/_outreach_sync_report.json
+              git add docs/selling/_outreach_sync_report.json
+            fi
+            if [ -f /tmp/fix-send-buttons-report.json ]; then
+              cp /tmp/fix-send-buttons-report.json docs/selling/_fix_send_buttons_report.json
+              git add docs/selling/_fix_send_buttons_report.json
+            fi
+            if [ -f /tmp/live-sync-report.json ]; then
+              cp /tmp/live-sync-report.json docs/selling/_live_sync_report.json
+              git add docs/selling/_live_sync_report.json
+            fi
+            printf '%s\n' '# idle' > .hs-note-trigger
+            git add .hs-note-trigger
+            if git diff --cached --quiet; then
+              echo "Nothing to commit."
+              exit 0
+            fi
+            git config user.name "aipa-staging[bot]"
+            git config user.email "aipa@aideazz.xyz"
+            git commit -m "selling: outreach-sync report"
+            git push origin HEAD:${{ github.ref_name }}
+            exit 0
+          fi
+          if [ -f /tmp/intelliops-story.tar.gz ]; then
+            tar -xzf /tmp/intelliops-story.tar.gz -C .
+          fi
+          if [ -f /tmp/intelliops-hs-report.json ]; then
+            cp /tmp/intelliops-hs-report.json docs/selling/_intelliops_hs_report.json
+            git add docs/selling/_intelliops_hs_report.json
+          fi
+          if [ -f /tmp/email-link-deal-report.json ]; then
+            cp /tmp/email-link-deal-report.json docs/selling/_email_link_deal_report.json
+            git add docs/selling/_email_link_deal_report.json
+          fi
+          if [ -f /tmp/outreach-sync-report.json ]; then
+            cp /tmp/outreach-sync-report.json docs/selling/_outreach_sync_report.json
+            git add docs/selling/_outreach_sync_report.json
+          fi
+          git add \
+            docs/selling/_intelliops_thread.json \
+            docs/selling/_intelliops_registry_patch.json \
+            docs/selling/drafts/intelliops-bd-email.txt \
+            docs/selling/_email_link_deal_report.json \
+            docs/selling/_email_link_registry_patch.json \
+            || true
+          if [ -f docs/selling/_intelliops_registry_patch.json ]; then
+            node -e '
+              const fs = require("fs");
+              const patch = JSON.parse(fs.readFileSync("docs/selling/_intelliops_registry_patch.json","utf8"));
+              const p = "docs/selling/outreach-registry.json";
+              const reg = JSON.parse(fs.readFileSync(p,"utf8"));
+              Object.assign(reg, patch);
+              fs.writeFileSync(p, JSON.stringify(reg, null, 2) + "\n");
+            '
+            git add docs/selling/outreach-registry.json
+          fi
+          if [ -f docs/selling/_email_link_registry_patch.json ]; then
+            node -e '
+              const fs = require("fs");
+              const patch = JSON.parse(fs.readFileSync("docs/selling/_email_link_registry_patch.json","utf8"));
+              const p = "docs/selling/outreach-registry.json";
+              const reg = JSON.parse(fs.readFileSync(p,"utf8"));
+              Object.assign(reg, patch);
+              fs.writeFileSync(p, JSON.stringify(reg, null, 2) + "\n");
+            '
+            git add docs/selling/outreach-registry.json docs/selling/_email_link_registry_patch.json
+          fi
+          if [ -f docs/selling/_email_link_deal_report.json ]; then
+            DRAFT=$(node -e 'try{const j=require("./docs/selling/_email_link_deal_report.json"); if(j.emailDraft) process.stdout.write(j.emailDraft)}catch(e){}')
+            [ -n "$DRAFT" ] && [ -f "$DRAFT" ] && git add "$DRAFT"
+          fi
+          printf '%s\n' '# idle' > .hs-note-trigger
+          git add .hs-note-trigger
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git config user.name "aipa-staging[bot]"
+          git config user.email "aipa@aideazz.xyz"
+          git commit -m "selling: HubSpot note job wrote report"
+          git push origin HEAD:${{ github.ref_name }}

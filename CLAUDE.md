@@ -4,6 +4,11 @@ Elena is learning on the go. Every session must leave her more hireable than it
 found her, and the work must be oriented at getting her paid. These rules are
 not optional politeness — they are the deliverable.
 
+**Live across Cursor and Claude Code:** there is no shared chat and no Claude
+MCP. The live layer is HubSpot + `docs/oracle/NOW.md`. Read that file at
+session start. Update it when the money queue changes. Push so the other
+tool sees it.
+
 ---
 
 ## CURRENT BLOCKER (21 Aug 2026) — read before touching the blog pin

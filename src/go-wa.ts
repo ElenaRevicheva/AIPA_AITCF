@@ -28,6 +28,11 @@ const goWaHits = new Map<string, number[]>();
 const GO_WA_WINDOW_MS = 15 * 60 * 1000;
 const GO_WA_MAX = Number(process.env.GO_WA_MAX_PER_WINDOW ?? 60);
 
+type OutreachAttachmentSpec = {
+  path?: string;
+  filename?: string;
+};
+
 type OutreachRegistryEntry = {
   email?: string;
   /** Comma-separated extra recipients. Some threads belong to a programme alias as
@@ -39,6 +44,8 @@ type OutreachRegistryEntry = {
   dealId?: string;
   score?: number;
   phone?: string;
+  /** MIME attachments. Paths must live under docs/selling/attachments/ and end in .pdf */
+  attachments?: OutreachAttachmentSpec[];
 };
 
 let githubRegistryCache: { at: number; data: Record<string, OutreachRegistryEntry> } | null = null;
@@ -178,6 +185,12 @@ function loadOutreachBySlug(slug: string): { phone: string; text: string } | nul
   }
 }
 
+type OutreachResolvedAttachment = {
+  filename: string;
+  bytes: number;
+  relPath: string;
+};
+
 type OutreachEmailPayload = {
   slug: string;
   to: string;
@@ -186,6 +199,7 @@ type OutreachEmailPayload = {
   body: string;
   company: string;
   dealId?: string;
+  attachments?: OutreachResolvedAttachment[];
 };
 
 /** Accept "a@b.com, c@d.com" from a draft CC: line or a registry cc field. */
@@ -194,6 +208,67 @@ function parseAddressList(raw: string | undefined): string[] {
   return [...new Set(String(raw).match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) ?? [])].map(a =>
     a.toLowerCase(),
   );
+}
+
+const OUTREACH_ATTACH_DIR = 'docs/selling/attachments/';
+const OUTREACH_ATTACH_MAX_BYTES = 5 * 1024 * 1024;
+
+/**
+ * Only PDFs under docs/selling/attachments/. Rejects `..`, absolute paths, and
+ * anything that is not a .pdf — this list is what Resend will attach, so it is
+ * the choke point.
+ */
+export function parseOutreachAttachmentSpec(raw: unknown): { relPath: string; filename: string } | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const rec = raw as OutreachAttachmentSpec;
+  const pathRaw = String(rec.path || '').trim().replace(/\\/g, '/');
+  if (!pathRaw.startsWith(OUTREACH_ATTACH_DIR)) return null;
+  if (pathRaw.includes('..') || pathRaw.includes('\0')) return null;
+  const base = path.posix.basename(pathRaw);
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.pdf$/i.test(base)) return null;
+  if (path.posix.normalize(pathRaw) !== pathRaw) return null;
+  const wantName = String(rec.filename || base).trim();
+  if (!/^[A-Za-z0-9][A-Za-z0-9._ -]{0,120}\.pdf$/i.test(wantName)) return null;
+  return { relPath: pathRaw, filename: wantName };
+}
+
+async function readOutreachBinary(relPath: string): Promise<Buffer | null> {
+  const localPath = path.join(REPO_ROOT, relPath);
+  try {
+    if (fs.existsSync(localPath)) {
+      const buf = fs.readFileSync(localPath);
+      if (buf.length > 0 && buf.length <= OUTREACH_ATTACH_MAX_BYTES) return buf;
+    }
+  } catch {
+    /* fall through to GitHub */
+  }
+  try {
+    const r = await fetch(`${OUTREACH_GITHUB_RAW_BASE}/${relPath.replace(/^\/+/, '')}`, {
+      signal: AbortSignal.timeout(15000),
+      headers: { 'User-Agent': 'AIPA-go-wa/1.0' },
+    });
+    if (!r.ok) return null;
+    const ab = await r.arrayBuffer();
+    if (ab.byteLength === 0 || ab.byteLength > OUTREACH_ATTACH_MAX_BYTES) return null;
+    return Buffer.from(ab);
+  } catch {
+    return null;
+  }
+}
+
+export async function resolveOutreachAttachments(
+  specs: OutreachAttachmentSpec[] | undefined,
+): Promise<OutreachResolvedAttachment[] | null> {
+  if (!specs?.length) return [];
+  const out: OutreachResolvedAttachment[] = [];
+  for (const spec of specs) {
+    const parsed = parseOutreachAttachmentSpec(spec);
+    if (!parsed) return null;
+    const buf = await readOutreachBinary(parsed.relPath);
+    if (!buf || buf.subarray(0, 5).toString('ascii') !== '%PDF-') return null;
+    out.push({ filename: parsed.filename, bytes: buf.length, relPath: parsed.relPath });
+  }
+  return out;
 }
 
 /**
@@ -265,11 +340,16 @@ async function buildOutreachEmailPayload(
   }
 
   if (!to || !to.includes('@') || !subject || !body) return null;
+  const attachments = await resolveOutreachAttachments(entry.attachments);
+  // Registry listed files that failed to load — refuse the payload so we never
+  // send a hire letter that claims a resume is attached when it is not.
+  if (entry.attachments?.length && attachments === null) return null;
   const out: OutreachEmailPayload = { slug, to, subject, body, company };
   // Never copy the primary recipient to itself.
   const ccClean = cc.filter(a => a !== to);
   if (ccClean.length) out.cc = ccClean;
   if (entry.dealId) out.dealId = entry.dealId;
+  if (attachments?.length) out.attachments = attachments;
   return out;
 }
 
@@ -314,6 +394,12 @@ async function loadOutreachEmailBySlug(slug: string): Promise<OutreachEmailPaylo
 function outreachEmailConfirmHtml(p: OutreachEmailPayload, sendPath: string): string {
   const esc = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const attachLine = (p.attachments || [])
+    .map(a => `${a.filename} (${Math.round(a.bytes / 1024)} KB)`)
+    .join(', ');
+  const attachHtml = attachLine
+    ? `<p class="meta"><b>Adjunto:</b> ${esc(attachLine)}</p>`
+    : '';
   return `<!DOCTYPE html>
 <html lang="es"><head>
 <meta charset="utf-8"/>
@@ -335,6 +421,7 @@ button:hover{filter:brightness(.95)}
   <p class="meta"><b>To:</b> ${esc(p.to)}</p>
   ${p.cc?.length ? `<p class="meta"><b>Cc:</b> ${esc(p.cc.join(', '))}</p>` : ''}
   <p class="meta"><b>Subject:</b> ${esc(p.subject)}</p>
+  ${attachHtml}
   <div class="preview">${esc(p.body)}</div>
   <form method="POST" action="${esc(sendPath)}">
     <button type="submit">✉️ Enviar ahora desde aipa@aideazz.xyz</button>
@@ -368,6 +455,16 @@ async function sendOutreachEmailViaResend(p: OutreachEmailPayload): Promise<stri
   const replyTo = (process.env.CONCIERGE_REPLY_TO || 'elena.revicheva2016@gmail.com').trim().replace(/^["']|["']$/g, '');
   // Anchors the URLs instead of trusting the recipient's client to auto-linkify.
   const html = emailBodyToHtml(p.body);
+  const attachments: { filename: string; content: string; content_type: string }[] = [];
+  for (const a of p.attachments || []) {
+    const buf = await readOutreachBinary(a.relPath);
+    if (!buf) throw new Error(`attachment missing: ${a.filename}`);
+    attachments.push({
+      filename: a.filename,
+      content: buf.toString('base64'),
+      content_type: 'application/pdf',
+    });
+  }
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -379,6 +476,7 @@ async function sendOutreachEmailViaResend(p: OutreachEmailPayload): Promise<stri
       html,
       text: p.body,
       reply_to: replyTo,
+      ...(attachments.length ? { attachments } : {}),
     }),
   });
   if (!r.ok) throw new Error(`Resend ${r.status}: ${(await r.text()).slice(0, 200)}`);
@@ -409,6 +507,9 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
         // understate who had received the message.
         (p.cc?.length ? `<br>Cc: ${p.cc.join(', ')}` : '') +
         `<br>Subject: ${p.subject}` +
+        (p.attachments?.length
+          ? `<br>Adjunto: ${p.attachments.map(a => a.filename).join(', ')}`
+          : '') +
         `<br>Resend:${resendId} (one-click /go/outreach-email/${p.slug}).`;
       await fetch(`https://api.hubapi.com/crm/v3/objects/notes/${best.id}`, {
         method: 'PATCH',
@@ -666,7 +767,7 @@ export function registerGoWaRoutes(app: Express, getClientIp: (req: Request) => 
       res.send(
         outreachEmailDoneHtml(
           true,
-          `Enviado a ${hit.to}${hit.cc?.length ? ` (cc ${hit.cc.join(', ')})` : ''} desde aipa@aideazz.xyz. Subject: ${hit.subject}. Resend id: ${resendId}. Deal movido a ⏳ Sent si tenía dealId.`,
+          `Enviado a ${hit.to}${hit.cc?.length ? ` (cc ${hit.cc.join(', ')})` : ''} desde aipa@aideazz.xyz. Subject: ${hit.subject}.${hit.attachments?.length ? ` Adjunto: ${hit.attachments.map(a => a.filename).join(', ')}.` : ''} Resend id: ${resendId}. Deal movido a ⏳ Sent si tenía dealId.`,
         ),
       );
     } catch (e) {
