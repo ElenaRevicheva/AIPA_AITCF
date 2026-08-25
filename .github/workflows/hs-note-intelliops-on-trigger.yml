@@ -123,6 +123,26 @@ jobs:
         if: success() && steps.trigger.outputs.skip != 'true'
         run: |
           set -euo pipefail
+          CMD="${{ steps.trigger.outputs.cmd }}"
+          # sync-outreach-email must not apply stale email-link patches / tarballs —
+          # that reverted the hire-me draft and stripped the resume attachment.
+          if [[ "$CMD" == sync-outreach-email* ]]; then
+            if [ -f /tmp/outreach-sync-report.json ]; then
+              cp /tmp/outreach-sync-report.json docs/selling/_outreach_sync_report.json
+              git add docs/selling/_outreach_sync_report.json
+            fi
+            printf '%s\n' '# idle' > .hs-note-trigger
+            git add .hs-note-trigger
+            if git diff --cached --quiet; then
+              echo "Nothing to commit."
+              exit 0
+            fi
+            git config user.name "aipa-staging[bot]"
+            git config user.email "aipa@aideazz.xyz"
+            git commit -m "selling: outreach-sync report"
+            git push origin HEAD:${{ github.ref_name }}
+            exit 0
+          fi
           if [ -f /tmp/intelliops-story.tar.gz ]; then
             tar -xzf /tmp/intelliops-story.tar.gz -C .
           fi
