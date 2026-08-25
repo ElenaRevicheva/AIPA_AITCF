@@ -44,6 +44,10 @@ jobs:
               echo "cmd=intelliops-eval" >> "$GITHUB_OUTPUT"
               echo "Staging IntelliOps BD onto HubSpot"
               ;;
+            intelliops-story)
+              echo "cmd=intelliops-story" >> "$GITHUB_OUTPUT"
+              echo "Pulling Zoho/HubSpot IntelliOps thread onto the deal"
+              ;;
             *)
               echo "::error::command '$LINE' is not allowed"
               exit 1
@@ -63,18 +67,22 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
           REF: ${{ github.ref_name }}
+          CMD: ${{ steps.trigger.outputs.cmd }}
         run: |
           set -uo pipefail
           install -m 700 -d ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
           chmod 600 ~/.ssh/oracle
           SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20"
-          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- "$REF" < scripts/oracle-hs-note-intelliops.sh
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- "$REF" "$CMD" < scripts/oracle-hs-note-intelliops.sh
           RC=$?
           echo "--- remote exit code: $RC ---"
           scp $SSHOPTS ubuntu@170.9.242.90:/tmp/intelliops-hs-report.json /tmp/ 2>/dev/null \
             && echo "--- pulled HubSpot report ---" \
             || echo "--- no report to pull ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/intelliops-story.tar.gz /tmp/ 2>/dev/null \
+            && echo "--- pulled story tarball ---" \
+            || echo "--- no tarball to pull ---"
           rm -f ~/.ssh/oracle
           exit $RC
 
@@ -85,6 +93,25 @@ jobs:
           if [ -f /tmp/intelliops-hs-report.json ]; then
             cp /tmp/intelliops-hs-report.json docs/selling/_intelliops_hs_report.json
             git add docs/selling/_intelliops_hs_report.json
+          fi
+          if [ -f /tmp/intelliops-story.tar.gz ]; then
+            tar -xzf /tmp/intelliops-story.tar.gz -C .
+            git add \
+              docs/selling/_intelliops_thread.json \
+              docs/selling/_intelliops_registry_patch.json \
+              docs/selling/drafts/intelliops-bd-email.txt \
+              || true
+            if [ -f docs/selling/_intelliops_registry_patch.json ]; then
+              node -e '
+                const fs = require("fs");
+                const patch = JSON.parse(fs.readFileSync("docs/selling/_intelliops_registry_patch.json","utf8"));
+                const p = "docs/selling/outreach-registry.json";
+                const reg = JSON.parse(fs.readFileSync(p,"utf8"));
+                Object.assign(reg, patch);
+                fs.writeFileSync(p, JSON.stringify(reg, null, 2) + "\n");
+              '
+              git add docs/selling/outreach-registry.json
+            fi
           fi
           printf '%s\n' '# idle' > .hs-note-trigger
           git add .hs-note-trigger

@@ -2895,5 +2895,13 @@
     "email": "rohit.g@turing.com",
     "emailDraft": "docs/selling/drafts/turing-lazarus-rohit-email.txt",
     "dealId": "64227273846"
+  },
+  "intelliops-bd": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/intelliops-bd-email.txt",
+    "company": "IntelliOps Automation",
+    "email": "nishant.chaudhary@intelliopsautomation.com",
+    "emailDraft": "docs/selling/drafts/intelliops-bd-email.txt",
+    "dealId": "64302436100"
   }
 }
