@@ -1,22 +1,8 @@
 {
   "ok": true,
-  "dryRun": false,
-  "created": {
-    "company": false,
-    "contact": false,
-    "deal": true,
-    "note": false,
-    "task": false
-  },
-  "companyId": "57697262091",
-  "contactId": "243891356539",
   "dealId": "64302436100",
-  "noteId": "115571559227",
-  "taskId": "115572713265",
   "dealName": "[HIRING-MANUAL] BD Expert @ IntelliOps Automation",
-  "dealStage": "qualifiedtobuy",
-  "to": "nishant.chaudhary@intelliopsautomation.com",
-  "next": "Open the deal → tap ENVIAR POR EMAIL. Do not countersign.",
+  "contactId": "243891356539",
   "slug": "intelliops-bd",
   "sendUrl": "https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd",
   "imapMessages": 11,
@@ -115,5 +101,6 @@
       "attachments": []
     }
   ],
-  "pdfs": []
+  "pdfs": [],
+  "next": "Open the deal → tap ENVIAR POR EMAIL. Do not countersign."
 }
