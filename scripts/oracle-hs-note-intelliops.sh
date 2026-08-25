@@ -25,6 +25,7 @@ git checkout FETCH_HEAD -- \
   scripts/hs-note-intelliops-eval.cjs \
   scripts/hs-env.cjs \
   docs/selling/drafts/intelliops-reply-2026-08-25.txt \
+  docs/selling/_intelliops_hs_report.json \
   2>&1 || { echo "FATAL: checkout of IntelliOps files failed"; exit 1; }
 
 echo "--- node scripts/hs-note-intelliops-eval.cjs ---"

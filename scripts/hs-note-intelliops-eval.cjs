@@ -126,6 +126,16 @@ async function associate(fromType, fromId, toType, toId, typeId) {
   ]);
 }
 
+function isJobLeadDeal(name) {
+  return /\[HIRING-VJH/.test(String(name || ''));
+}
+
+function isBdDeal(name) {
+  const n = String(name || '');
+  if (isJobLeadDeal(n)) return false;
+  return n === DEAL_NAME || (n.includes('IntelliOps') && /BD Expert|commission|PARTNER/i.test(n));
+}
+
 async function dealHasMarkerNote(dealId) {
   const assoc = await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`);
   const ids = (assoc.results || []).map((r) => r.toObjectId).filter(Boolean);
@@ -135,6 +145,32 @@ async function dealHasMarkerNote(dealId) {
     if (body.includes(NOTE_MARKER)) return id;
   }
   return null;
+}
+
+async function dealsForContact(contactId) {
+  const assoc = await hs('GET', `/crm/v4/objects/contacts/${contactId}/associations/deals`);
+  const ids = (assoc.results || []).map((r) => r.toObjectId).filter(Boolean);
+  const out = [];
+  for (const id of ids) {
+    out.push(await hs('GET', `/crm/v3/objects/deals/${id}?properties=dealname,dealstage,pipeline,description`));
+  }
+  return out;
+}
+
+async function disassociate(fromType, fromId, toType, toId) {
+  try {
+    await hs('DELETE', `/crm/v4/objects/${fromType}/${fromId}/associations/${toType}/${toId}`);
+  } catch (e) {
+    console.log('WARN disassociate', fromType, fromId, toType, toId, e.message || e);
+  }
+}
+
+function loadPriorReport() {
+  try {
+    return JSON.parse(fs.readFileSync(REPORT, 'utf8'));
+  } catch {
+    return null;
+  }
 }
 
 function writeReport(report) {
@@ -192,11 +228,13 @@ async function main() {
   }
   console.log('contact', contact ? `${contact.id} ${contact.properties?.email || ''}` : DRY ? '(would create)' : '(missing)');
 
-  let deals = await searchToken('deals', 'dealname', 'IntelliOps', ['dealname', 'dealstage', 'pipeline']);
-  if (!deals.length) {
-    deals = (await searchEq('deals', 'dealname', DEAL_NAME, ['dealname', 'dealstage'])).concat(deals);
+  const prior = loadPriorReport();
+  let named = await searchEq('deals', 'dealname', DEAL_NAME, ['dealname', 'dealstage', 'pipeline']);
+  let deal = named.find((d) => isBdDeal(d.properties.dealname)) || null;
+  if (!deal && contact) {
+    const onContact = await dealsForContact(contact.id);
+    deal = onContact.find((d) => isBdDeal(d.properties.dealname)) || null;
   }
-  let deal = deals.find((d) => (d.properties.dealname || '').includes('IntelliOps')) || deals[0];
   if (!deal && !DRY) {
     deal = await hs('POST', '/crm/v3/objects/deals', {
       properties: {
@@ -210,6 +248,9 @@ async function main() {
     created.deal = true;
   }
   console.log('deal', deal ? `${deal.id} ${deal.properties?.dealname || ''}` : DRY ? '(would create)' : '(missing)');
+  if (deal && isJobLeadDeal(deal.properties?.dealname)) {
+    throw new Error(`refusing to use job-lead deal ${deal.id} ${deal.properties.dealname}`);
+  }
 
   if (DRY) {
     const report = {
@@ -233,6 +274,7 @@ async function main() {
   await associate('deals', deal.id, 'companies', company.id, 5);
 
   let noteId = await dealHasMarkerNote(deal.id);
+  if (!noteId && prior?.noteId) noteId = String(prior.noteId);
   if (!noteId) {
     const note = await hs('POST', '/crm/v3/objects/notes', {
       properties: { hs_note_body: NOTE, hs_timestamp: new Date().toISOString() },
@@ -242,6 +284,10 @@ async function main() {
   }
   await associate('notes', noteId, 'deals', deal.id, 214);
   await associate('notes', noteId, 'contacts', contact.id, 202);
+  if (prior?.dealId && String(prior.dealId) !== String(deal.id) && isJobLeadDeal(prior.dealName)) {
+    await disassociate('notes', noteId, 'deals', prior.dealId);
+    console.log('moved note off job-lead deal', prior.dealId);
+  }
   console.log('note', noteId, created.note ? 'created' : 'reused');
 
   let tasks = await searchToken('tasks', 'hs_task_subject', 'IntelliOps', [
@@ -249,6 +295,9 @@ async function main() {
     'hs_task_status',
   ]);
   let task = tasks.find((t) => (t.properties.hs_task_subject || '').includes('IntelliOps reply'));
+  if (!task && prior?.taskId) {
+    task = { id: String(prior.taskId) };
+  }
   if (!task) {
     const due = new Date();
     due.setHours(23, 59, 0, 0);
@@ -256,7 +305,7 @@ async function main() {
       properties: {
         hs_task_subject: TASK_SUBJECT,
         hs_task_body:
-          'Open the IntelliOps deal note. Copy the email. Send to Nishant from Elena. Do not sign the 24 Aug PDF. Do not originate until v3. Then say "sent IntelliOps".',
+          'Open the IntelliOps BD deal note. Copy the email. Send to Nishant from Elena. Do not sign the 24 Aug PDF. Do not originate until v3. Then say "sent IntelliOps".',
         hs_task_status: 'NOT_STARTED',
         hs_task_priority: 'HIGH',
         hs_timestamp: due.toISOString(),
@@ -267,6 +316,10 @@ async function main() {
   }
   await associate('tasks', task.id, 'deals', deal.id, 216);
   await associate('tasks', task.id, 'contacts', contact.id, 204);
+  if (prior?.dealId && String(prior.dealId) !== String(deal.id) && isJobLeadDeal(prior.dealName)) {
+    await disassociate('tasks', task.id, 'deals', prior.dealId);
+    console.log('moved task off job-lead deal', prior.dealId);
+  }
   console.log('task', task.id, created.task ? 'created' : 'reused');
 
   writeReport({
