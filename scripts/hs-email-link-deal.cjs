@@ -279,7 +279,11 @@ async function main() {
       .replace(/\[[A-Z0-9-]+\][^\n]*/g, '')
       .trim();
   }
-  if (!subject) subject = buildManualEmailSubject(company || slug, score || 0);
+  if (!subject) {
+    subject = /HIRING|Solo Builder|apply/i.test(dealName)
+      ? `${company || 'BSS Groupe'} — Elena Revicheva`
+      : buildManualEmailSubject(company || slug, score || 0);
+  }
 
   if (!to) throw new Error(`no email on deal ${DEAL_ID} (${dealName}) — contact or note TO: required`);
   if (!body || body.length < 40) throw new Error(`could not extract a sendable letter from note ${latest.id}`);
