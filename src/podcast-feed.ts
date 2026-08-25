@@ -120,7 +120,7 @@ export function generatePodcastJsonLd(meta: PodcastMeta, episodes: PodcastEpisod
     inLanguage: meta.language,
     author: {
       '@type': 'Person', name: meta.author, url: 'https://aideazz.xyz',
-      sameAs: ['https://www.linkedin.com/in/elenarevicheva', 'https://dev.to/elenarevicheva', 'https://www.youtube.com/@AIdeazz'],
+      sameAs: ['https://www.linkedin.com/in/elenarevicheva/', 'https://dev.to/elenarevicheva', 'https://www.youtube.com/@AIdeazz'],
     },
     publisher: { '@type': 'Organization', name: 'AIdeazz', url: 'https://aideazz.xyz' },
     webFeed: `${meta.siteUrl}/feed.xml`,

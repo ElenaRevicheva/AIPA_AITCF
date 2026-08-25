@@ -339,7 +339,7 @@ function docsPage(): string {
         name: 'AIdeazz',
         url: 'https://aideazz.xyz',
         logo: 'https://aideazz.xyz/favicon.ico',
-        sameAs: ['https://github.com/ElenaRevicheva', 'https://www.linkedin.com/in/elenarevicheva'],
+        sameAs: ['https://github.com/ElenaRevicheva', 'https://www.linkedin.com/in/elenarevicheva/'],
       },
       {
         '@type': 'WebAPI',
