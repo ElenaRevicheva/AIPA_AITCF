@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "dryRun": false,
+  "created": {
+    "company": false,
+    "contact": false,
+    "deal": false,
+    "note": true,
+    "task": true
+  },
+  "companyId": "57697262091",
+  "contactId": "243891356539",
+  "dealId": "63994708225",
+  "noteId": "115571559227",
+  "taskId": "115572713265",
+  "dealName": "[HIRING-VJH-SERP-LEAD] Jobs at IntelliOps Automation: Explore current Opportunities @ IntelliOps Automation",
+  "dealStage": "appointmentscheduled",
+  "to": "nishant.chaudhary@intelliopsautomation.com",
+  "next": "Open the deal → Notes → copy the email → send. Do not countersign."
+}
