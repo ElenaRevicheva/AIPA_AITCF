@@ -166,6 +166,29 @@ async function contactsOnDeal(dealId) {
   return out;
 }
 
+async function companiesOnDeal(dealId) {
+  const assoc = await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/companies`);
+  const ids = (assoc.results || []).map((r) => r.toObjectId).filter(Boolean);
+  const out = [];
+  for (const id of ids) {
+    out.push(
+      await hs('GET', `/crm/v3/objects/companies/${id}?properties=name,domain,website,phone,description`),
+    );
+  }
+  return out;
+}
+
+async function contactsAtCompany(companyId) {
+  if (!companyId) return [];
+  const assoc = await hs('GET', `/crm/v4/objects/companies/${companyId}/associations/contacts`);
+  const ids = (assoc.results || []).map((r) => r.toObjectId).filter(Boolean).slice(0, 20);
+  const out = [];
+  for (const id of ids) {
+    out.push(await hs('GET', `/crm/v3/objects/contacts/${id}?properties=email,firstname,lastname,jobtitle`));
+  }
+  return out;
+}
+
 async function main() {
   const deal = await hs(
     'GET',
@@ -173,12 +196,27 @@ async function main() {
   );
   const dealName = deal.properties?.dealname || '';
   const contacts = await contactsOnDeal(DEAL_ID);
+  const companies = await companiesOnDeal(DEAL_ID);
+  let companyContacts = [];
+  for (const co of companies) {
+    try {
+      companyContacts.push(...(await contactsAtCompany(co.id)));
+    } catch (e) {
+      console.log('WARN company contacts', co.id, e.message || e);
+    }
+  }
   const notes = await notesOnDeal(DEAL_ID);
   const latest = notes[0];
   if (!latest) throw new Error(`deal ${DEAL_ID} has no notes`);
 
   const html = latest.properties?.hs_note_body || '';
   const text = stripHtml(html);
+  const allNoteText = notes
+    .map((n, i) => `#${i + 1} ${n.id} ${n.properties?.hs_timestamp}\n${stripHtml(n.properties?.hs_note_body || '')}`)
+    .join('\n\n-----\n\n');
+  const haystack = [text, allNoteText, deal.properties?.description, ...companies.map((c) => c.properties?.description)]
+    .filter(Boolean)
+    .join('\n');
   const partial = {
     ok: false,
     dealId: DEAL_ID,
@@ -189,15 +227,31 @@ async function main() {
     latestNoteAt: latest.properties?.hs_timestamp,
     noteCount: notes.length,
     latestNoteText: text.slice(0, 8000),
+    allNotesText: allNoteText.slice(0, 12000),
+    companies: companies.map((c) => ({
+      id: c.id,
+      name: c.properties?.name,
+      domain: c.properties?.domain,
+      website: c.properties?.website,
+    })),
   };
   fs.writeFileSync(REPORT, JSON.stringify(partial, null, 2) + '\n');
+  console.log('latest_note', latest.id, latest.properties?.hs_timestamp);
+  console.log('--- NOTE TEXT START ---');
+  console.log(text);
+  console.log('--- NOTE TEXT END ---');
+  console.log('--- ALL NOTES START ---');
+  console.log(allNoteText.slice(0, 4000));
+  console.log('--- ALL NOTES END ---');
   const contactEmail =
-    contacts.map((c) => (c.properties?.email || '').trim().toLowerCase()).find((e) => e && e.includes('@')) || '';
-  const noteTo = extractEmail(text.match(/^TO:\s*(.+)$/m)?.[1] || '') || extractEmail(text);
+    [...contacts, ...companyContacts]
+      .map((c) => (c.properties?.email || '').trim().toLowerCase())
+      .find((e) => e && e.includes('@')) || '';
+  const noteTo = extractEmail(text.match(/^TO:\s*(.+)$/m)?.[1] || '') || extractEmail(haystack);
   const to = contactEmail || noteTo;
-  const subjectFromNote = (text.match(/^SUBJECT:\s*(.+)$/m)?.[1] || '').trim();
-  const emailBlock = extractBlock(text, /---\s*EMAIL[^\n]*---/, /---\s*(Audit|MENSAJE|WhatsApp|NEXT)/i);
-  const mensaje = extractBlock(text, /---\s*MENSAJE[^\n]*---/, /---\s*(EMAIL|Audit|NEXT)/i);
+  const subjectFromNote = (haystack.match(/^SUBJECT:\s*(.+)$/m)?.[1] || '').trim();
+  const emailBlock = extractBlock(haystack, /---\s*EMAIL[^\n]*---/, /---\s*(Audit|MENSAJE|WhatsApp|NEXT)/i);
+  const mensaje = extractBlock(haystack, /---\s*MENSAJE[^\n]*---/, /---\s*(EMAIL|Audit|NEXT)/i);
   const company = companyFromDealName(dealName);
   const scoreM = dealName.match(/audit:\s*(\d+)/i) || text.match(/(\d{2,3})\s*\/\s*100/);
   const score = scoreM ? Number(scoreM[1]) : 0;
@@ -208,19 +262,21 @@ async function main() {
 
   let body = '';
   let subject = subjectFromNote;
+  const longestNote = notes
+    .map((n) => stripHtml(n.properties?.hs_note_body || ''))
+    .sort((a, b) => b.length - a.length)[0] || '';
+  const letterSource = text.length >= 400 ? text : longestNote;
   if (emailBlock && extractEmail(emailBlock.split('\n').slice(0, 8).join('\n'))) {
     const raw = emailBlock.replace(/^\s*SUBJECT:.*$/m, '').replace(/^\s*TO:.*$/m, '').replace(/^\s*CC:.*$/m, '').trim();
     body = raw;
     if (!subject) subject = (emailBlock.match(/^SUBJECT:\s*(.+)$/m)?.[1] || '').trim();
   } else if (mensaje && mensaje.length > 40) {
     body = buildManualEmailBody(mensaje, { botFallback: /bot de reservas|bot of/i.test(text) });
-  } else if (text.length > 80) {
-    // Latest note is the letter. Drop HubSpot chrome / buttons.
-    body = text
+  } else if (letterSource.length > 80) {
+    body = letterSource
       .replace(/➡️[^\n]*/g, '')
       .replace(/Email options[\s\S]*?(?=\n\n|$)/i, '')
-      .replace(/\[CLIENT-MANUAL\][^\n]*/g, '')
-      .replace(/---[\s\S]*$/g, '')
+      .replace(/\[[A-Z0-9-]+\][^\n]*/g, '')
       .trim();
   }
   if (!subject) subject = buildManualEmailSubject(company || slug, score || 0);
