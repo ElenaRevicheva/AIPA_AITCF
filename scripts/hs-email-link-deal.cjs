@@ -102,6 +102,11 @@ function stripHtml(html) {
     .trim();
 }
 
+function extractEmail(text) {
+  const m = String(text || '').match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+  return m ? m[0].toLowerCase() : '';
+}
+
 function extractMailto(html) {
   const m = String(html || '').match(
     /mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i,
@@ -185,6 +190,28 @@ async function companiesOnDeal(dealId) {
   return out;
 }
 
+async function emailsFromUrl(url) {
+  try {
+    const r = await fetch(url, {
+      signal: AbortSignal.timeout(15000),
+      headers: { 'User-Agent': 'AIPA-hs-email-link/1.0', Accept: 'text/html' },
+      redirect: 'follow',
+    });
+    const html = await r.text();
+    const found = [...html.matchAll(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g)].map((m) =>
+      m[0].toLowerCase(),
+    );
+    const uniq = [...new Set(found)].filter(
+      (e) => !/example\.com|sentry|wixpress|cloudflare|schema|godaddy|wordpress|noreply/.test(e),
+    );
+    console.log('scrape', url, r.status, uniq.join(',') || '(none)');
+    return uniq;
+  } catch (e) {
+    console.log('WARN scrape', url, e.message || e);
+    return [];
+  }
+}
+
 async function contactsAtCompany(companyId) {
   if (!companyId) return [];
   const assoc = await hs('GET', `/crm/v4/objects/companies/${companyId}/associations/contacts`);
@@ -259,7 +286,29 @@ async function main() {
       .map((c) => (c.properties?.email || '').trim().toLowerCase())
       .find((e) => e && e.includes('@')) || '';
   const noteTo = extractEmail(text.match(/^TO:\s*(.+)$/m)?.[1] || '') || extractEmail(haystack);
-  const to = contactEmail || mailtoFromHtml || noteTo;
+  const siteUrls = new Set();
+  for (const u of [
+    'https://bssgroupe.com/',
+    'https://www.bssgroupe.com/',
+    'https://bssgroupe.com/contact',
+    'https://www.bssgroupe.com/contact',
+    ...companies.map((c) => c.properties?.website).filter(Boolean),
+    ...(haystack.match(/https?:\/\/[^\s"'<>]*bssgroupe[^\s"'<>]*/gi) || []),
+  ]) {
+    if (u) siteUrls.add(String(u).replace(/[.,);]+$/, ''));
+  }
+  let scraped = [];
+  for (const u of siteUrls) {
+    scraped.push(...(await emailsFromUrl(u)));
+  }
+  scraped = [...new Set(scraped)].filter((e) => !/@torre\.ai$/.test(e));
+  const domainMails = scraped.filter((e) => /@([a-z0-9-]+\.)?bssgroupe\.com$/.test(e));
+  const scrapedTo =
+    domainMails.find((e) => /^(hello|contact|info|hello|jobs|career|rh|hr|talent)@/.test(e)) ||
+    domainMails[0] ||
+    scraped[0] ||
+    '';
+  const to = contactEmail || mailtoFromHtml || noteTo || scrapedTo;
   const applyUrl =
     (haystack.match(/https?:\/\/torre\.ai\/jobs\/[A-Za-z0-9]+/i) || [])[0] || extractApplyUrl(haystack) || '';
   const subjectFromNote = (haystack.match(/^SUBJECT:\s*(.+)$/m)?.[1] || '').trim();
@@ -298,24 +347,21 @@ async function main() {
       : buildManualEmailSubject(company || slug, score || 0);
   }
 
-  if (/Edit this stub|MANUAL APPLY REQUIRED/i.test(body) || /HIRING-VJH/i.test(dealName)) {
+  if (/applied manually|bssgroupe\.com|HIRING-VJH|Edit this stub|MANUAL APPLY REQUIRED/i.test(haystack)) {
     body = [
-      `Dear Hiring Manager,`,
+      `Hello,`,
       ``,
-      `I am Elena Revicheva, an AI-augmented builder in Panama. I ship production systems solo — GEO/AEO, conversational agents, and AI-ops — and I sell that work from https://aideazz.xyz/portfolio`,
+      `I applied via Torre for the AI-Native B2B Marketplace solo-builder role. I am writing here so you have my portfolio in one tap.`,
       ``,
-      `I am applying for the AI-Native B2B Marketplace solo-builder role at ${company || 'BSS Groupe'}. I already run a one-person lab that designs, ships, and operates those systems in production. Happy to walk through a live demo in 20 minutes.`,
+      `I am Elena Revicheva, an AI-augmented builder in Panama. I ship production systems solo — GEO/AEO, conversational agents, and AI-ops — and I sell that work from:`,
+      `https://aideazz.xyz/portfolio`,
       ``,
-      `Portfolio: https://aideazz.xyz/portfolio`,
-      applyUrl ? `Role: ${applyUrl}` : '',
+      `Happy to walk through a live demo this week.`,
       ``,
-      `Best regards,`,
       `Elena Revicheva`,
       `Panama City`,
-    ]
-      .filter((l) => l !== undefined)
-      .join('\n')
-      .replace(/\n{3,}/g, '\n\n');
+    ].join('\n');
+    if (!subject) subject = 'Portfolio — Elena Revicheva (solo builder, Torre application)';
   }
 
   const applyBtn = applyUrl
