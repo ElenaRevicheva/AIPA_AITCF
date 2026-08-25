@@ -56,6 +56,10 @@ jobs:
               echo "cmd=$LINE" >> "$GITHUB_OUTPUT"
               echo "Syncing outreach email assets + go-wa attach support onto Oracle"
               ;;
+            fix-send-buttons)
+              echo "cmd=fix-send-buttons" >> "$GITHUB_OUTPUT"
+              echo "Absolute HubSpot send URLs + Gmail resume-attach proof"
+              ;;
             *)
               echo "::error::command '$LINE' is not allowed"
               exit 1
@@ -116,6 +120,9 @@ jobs:
           scp $SSHOPTS ubuntu@170.9.242.90:/tmp/outreach-sync-report.json /tmp/ 2>/dev/null \
             && echo "--- pulled outreach-sync report ---" \
             || echo "--- no outreach-sync report ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/fix-send-buttons-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled fix-send-buttons report ---" \
+            || echo "--- no fix-send-buttons report ---"
           rm -f ~/.ssh/oracle
           exit $RC
 
@@ -126,10 +133,14 @@ jobs:
           CMD="${{ steps.trigger.outputs.cmd }}"
           # sync-outreach-email must not apply stale email-link patches / tarballs —
           # that reverted the hire-me draft and stripped the resume attachment.
-          if [[ "$CMD" == sync-outreach-email* ]]; then
+          if [[ "$CMD" == sync-outreach-email* || "$CMD" == fix-send-buttons ]]; then
             if [ -f /tmp/outreach-sync-report.json ]; then
               cp /tmp/outreach-sync-report.json docs/selling/_outreach_sync_report.json
               git add docs/selling/_outreach_sync_report.json
+            fi
+            if [ -f /tmp/fix-send-buttons-report.json ]; then
+              cp /tmp/fix-send-buttons-report.json docs/selling/_fix_send_buttons_report.json
+              git add docs/selling/_fix_send_buttons_report.json
             fi
             printf '%s\n' '# idle' > .hs-note-trigger
             git add .hs-note-trigger

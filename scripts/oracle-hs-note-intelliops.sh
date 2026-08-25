@@ -83,6 +83,26 @@ PY
   exit $RC
 fi
 
+if [ "$CMD" = "fix-send-buttons" ]; then
+  echo "--- fix HubSpot send hrefs + Gmail resume proof ---"
+  git checkout FETCH_HEAD -- \
+    scripts/hs-fix-send-buttons.cjs \
+    scripts/hs-env.cjs \
+    docs/selling/drafts/ai-native-b2b-marketplace-email.txt \
+    docs/selling/attachments/ \
+    2>&1 || { echo "FATAL: checkout of fix-send-buttons files failed"; exit 1; }
+  set +e
+  node scripts/hs-fix-send-buttons.cjs 2>&1
+  RC=$?
+  set -e
+  echo "--- fix-send-buttons exit $RC ---"
+  if [ -f docs/selling/_fix_send_buttons_report.json ]; then
+    cp docs/selling/_fix_send_buttons_report.json /tmp/fix-send-buttons-report.json
+    echo "--- copied fix-send-buttons report ---"
+  fi
+  exit $RC
+fi
+
   git checkout FETCH_HEAD -- \
   scripts/hs-note-intelliops-eval.cjs \
   scripts/hs-intelliops-story.cjs \

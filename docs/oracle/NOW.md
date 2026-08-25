@@ -12,10 +12,11 @@ sees it.
 | Overlay commission (not a job) | IntelliOps BD | https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd |
 | Job follow-up (already applied on Torre) | BSS Groupe | https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace — hire-me letter, resume attached, portfolio `https://aideazz.xyz/portfolio` |
 
-HubSpot:
+If HubSpot opens **Edit link** instead of the send page, the URL field is a relative path (`/go/outreach-email/...`). Paste the full URL:
 
-- IntelliOps: https://app.hubspot.com/contacts/51409153/record/0-3/64302436100 — do not countersign v2
-- BSS: https://app.hubspot.com/contacts/51409153/record/0-3/64302126655 — To: `contact@bssgroupe.com` (from `/contact-us/`)
+- IntelliOps: https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd
+- BSS Groupe: https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace
+
 
 ## What is not live
 
