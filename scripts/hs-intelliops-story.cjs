@@ -99,10 +99,55 @@ async function uploadPdf(filePath, filename) {
 }
 
 function classifyPdf(name, bytes) {
+  if (bytes > 100000) return 'v1-20-aug-from-natalie';
+  if (bytes > 0 && bytes < 80000) return 'v2-24-aug-from-nishant';
   const n = String(name || '').toLowerCase();
-  if (/\(1\)|revised|24|aug 24|august 24/.test(n)) return 'v2-revised-24-aug';
-  if (/agreement/.test(n)) return bytes > 0 ? 'agreement-pdf' : 'empty';
-  return 'pdf';
+  if (/revised|24/.test(n)) return 'v2-revised-24-aug';
+  return 'agreement-pdf';
+}
+
+function isNoise(m) {
+  const blob = `${m.from || ''} ${m.to || ''} ${m.subject || ''}`.toLowerCase();
+  return /github\.com|notifications@github|cursor\[bot\]|github-actions\[bot\]/.test(blob);
+}
+
+function docToken() {
+  const crypto = require('crypto');
+  const tokenPath = path.join(ROOT, 'data/intelliops-doc-token');
+  try {
+    const t = fs.readFileSync(tokenPath, 'utf8').trim();
+    if (/^[a-f0-9]{16,}$/.test(t)) return t;
+  } catch {
+    /* first run */
+  }
+  const t = crypto.randomBytes(12).toString('hex');
+  fs.mkdirSync(path.dirname(tokenPath), { recursive: true });
+  try {
+    fs.writeFileSync(tokenPath, t);
+  } catch {
+    /* data/ may be unwritable; still return t */
+  }
+  return t;
+}
+
+function hostPdfOnDoc(filePath, version) {
+  const { execFileSync } = require('child_process');
+  const token = docToken();
+  const name = `intelliops-${version}-${token}.pdf`;
+  const dest = `/var/www/aideazz-docs/${name}`;
+  try {
+    fs.copyFileSync(filePath, dest);
+    fs.chmodSync(dest, 0o644);
+  } catch {
+    try {
+      execFileSync('sudo', ['cp', filePath, dest], { stdio: 'inherit' });
+      execFileSync('sudo', ['chmod', '644', dest], { stdio: 'inherit' });
+    } catch (e) {
+      console.log('WARN cannot write', dest, e.message || e);
+      return null;
+    }
+  }
+  return `https://webhook.aideazz.xyz/doc/${name}`;
 }
 
 async function hubspotEmailsForContact(contactId) {
@@ -160,7 +205,7 @@ async function main() {
   if (!dealId || !contactId) throw new Error('missing deal/contact in _intelliops_hs_report.json — run hs-note-intelliops-eval.cjs first');
 
   const mailDump = loadJson(MAIL_INDEX, { messages: [] });
-  const imapMessages = mailDump.messages || [];
+  const imapMessages = (mailDump.messages || []).filter((m) => !isNoise(m));
   console.log('imap_messages', imapMessages.length, 'accounts', (mailDump.accounts || []).join(','));
 
   const crmEmails = await hubspotEmailsForContact(contactId);
@@ -201,9 +246,49 @@ async function main() {
   thread.sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
 
   const existing = await notesOnDeal(dealId);
-  const have = (prefix) => existing.filter((n) => (n.properties?.hs_note_body || '').includes(prefix));
+  for (const n of existing) {
+    const b = n.properties?.hs_note_body || '';
+    if (b.includes(MAIL_MARKER) && /AIPA_AITCF|notifications@github|github-actions/.test(b)) {
+      try {
+        await hs('DELETE', `/crm/v3/objects/notes/${n.id}`);
+        console.log('deleted noise note', n.id);
+      } catch (e) {
+        console.log('WARN delete note', n.id, e.message || e);
+      }
+    }
+  }
 
-  const uploaded = [];
+  // Recruiter who sent v1
+  const NATALIE = 'natalie.adel@intelliopsautomation.com';
+  try {
+    const found = await hs('POST', '/crm/v3/objects/contacts/search', {
+      filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: NATALIE }] }],
+      properties: ['email', 'firstname', 'lastname'],
+      limit: 1,
+    });
+    let natalie = (found.results || [])[0];
+    if (!natalie) {
+      natalie = await hs('POST', '/crm/v3/objects/contacts', {
+        properties: {
+          firstname: 'Natalie',
+          lastname: 'Adel',
+          email: NATALIE,
+          company: 'IntelliOps Automation',
+          jobtitle: 'Recruiter',
+          hubspot_owner_id: hubspotOwnerId(),
+        },
+      });
+      console.log('created natalie', natalie.id);
+    }
+    await associate('deals', dealId, 'contacts', natalie.id, 3);
+    await associate('contacts', natalie.id, 'companies', report.companyId, 1);
+  } catch (e) {
+    console.log('WARN natalie', e.message || e);
+  }
+
+  const existing2 = await notesOnDeal(dealId);
+  const have = (prefix) => existing2.filter((n) => (n.properties?.hs_note_body || '').includes(prefix));
+
   const pdfs = [];
   for (const m of imapMessages) {
     for (const a of m.attachments || []) {
@@ -211,55 +296,64 @@ async function main() {
       pdfs.push({ ...a, date: m.date, subject: m.subject, from: m.from });
     }
   }
-  // Prefer two distinct PDFs (v1 vs v2) by size+name
   const uniquePdfs = [];
   const seenHash = new Set();
   for (const p of pdfs) {
-    const buf = fs.readFileSync(p.path);
-    const key = `${buf.length}:${p.filename}`;
+    const key = `${p.bytes}:${p.filename}`;
     if (seenHash.has(key)) continue;
     seenHash.add(key);
     uniquePdfs.push(p);
   }
   console.log('pdf_candidates', uniquePdfs.map((p) => `${p.filename} ${p.bytes}`).join(' | ') || '(none)');
 
+  const hosted = [];
   for (const p of uniquePdfs) {
     const label = classifyPdf(p.filename, p.bytes);
-    const marker = `${FILE_MARKER} ${p.filename}`;
-    if (have(marker).length) {
-      console.log('skip existing file note', p.filename);
-      continue;
-    }
+    const marker = `${FILE_MARKER} ${label}`;
+    const docUrl = hostPdfOnDoc(p.path, label);
     let fileId = null;
     try {
-      const f = await uploadPdf(p.path, p.filename);
+      const f = await uploadPdf(p.path, `${label}.pdf`);
       fileId = f.id;
-      uploaded.push({ fileId, filename: p.filename, label, bytes: p.bytes });
-      console.log('uploaded', p.filename, fileId);
+      console.log('uploaded hubspot file', label, fileId);
     } catch (err) {
-      console.log('WARN upload failed', p.filename, err.message || err);
+      console.log('WARN hubspot files scope missing — using /doc/ link', err.message || err);
     }
+    hosted.push({ label, filename: p.filename, bytes: p.bytes, fileId, docUrl });
+    const link = docUrl
+      ? `<a href="${esc(docUrl)}"><b>Download ${esc(label)} PDF</b></a>`
+      : '<i>PDF on Oracle /tmp/intelliops-mail — HubSpot Files scope not granted.</i>';
     const body = [
       `<b>${esc(marker)}</b>`,
       '',
-      `Label: ${esc(label)}`,
+      link,
       `From: ${esc(p.from)}`,
       `Subject: ${esc(p.subject)}`,
       `Date: ${esc(p.date)}`,
       `Size: ${p.bytes} bytes`,
-      fileId ? `HubSpot file id: ${esc(fileId)}` : '<i>Upload failed — PDF is on Oracle /tmp/intelliops-mail/</i>',
-      '',
-      'This is one of the two IntelliOps agreement PDFs. Open Files on this deal / this note attachment.',
+      fileId ? `HubSpot file id: ${esc(fileId)}` : '',
     ].join('<br>');
-    const note = await hs('POST', '/crm/v3/objects/notes', {
-      properties: {
-        hs_note_body: body,
-        hs_timestamp: p.date && !Number.isNaN(Date.parse(p.date)) ? new Date(p.date).toISOString() : new Date().toISOString(),
-        ...(fileId ? { hs_attachment_ids: String(fileId) } : {}),
-      },
-    });
-    await associate('notes', note.id, 'deals', dealId, 214);
-    await associate('notes', note.id, 'contacts', contactId, 202);
+    const already = have(marker)[0];
+    if (already) {
+      await hs('PATCH', `/crm/v3/objects/notes/${already.id}`, {
+        properties: {
+          hs_note_body: body,
+          ...(fileId ? { hs_attachment_ids: String(fileId) } : {}),
+        },
+      });
+      console.log('patched file note', label, already.id);
+    } else {
+      const note = await hs('POST', '/crm/v3/objects/notes', {
+        properties: {
+          hs_note_body: body,
+          hs_timestamp: p.date && !Number.isNaN(Date.parse(p.date)) ? new Date(p.date).toISOString() : new Date().toISOString(),
+          ...(fileId ? { hs_attachment_ids: String(fileId) } : {}),
+        },
+      });
+      await associate('notes', note.id, 'deals', dealId, 214);
+      await associate('notes', note.id, 'contacts', contactId, 202);
+      console.log('file note', label, note.id, docUrl || 'no-url');
+    }
   }
 
   for (const m of thread) {
@@ -308,7 +402,7 @@ async function main() {
     '',
   ].join('<br>');
 
-  let actionNote = existing.find((n) => (n.properties?.hs_note_body || '').includes(NOTE_MARKER));
+  let actionNote = existing2.find((n) => (n.properties?.hs_note_body || '').includes(NOTE_MARKER));
   if (actionNote) {
     let body = actionNote.properties.hs_note_body || '';
     if (!body.includes('/go/outreach-email/intelliops-bd')) {
@@ -320,31 +414,33 @@ async function main() {
     }
   }
 
-  const storyHave = have(STORY_MARKER);
-  if (!storyHave.length) {
-    const lines = [
+  const storyLines = [
       `<b>${STORY_MARKER} full thread on this deal</b>`,
       '',
-      'Nishant Chaudhary / IntelliOps Automation — BD commission agreement.',
-      `IMAP messages: ${imapMessages.length}. HubSpot CRM emails: ${crmEmails.length}. PDFs uploaded: ${uploaded.length}.`,
-      '',
-      '<b>Story</b>',
-      '1. Nishant sent a commission BD agreement (v1 PDF).',
-      '2. Elena raised four points: entity, governing law, monthly statement, attribution before time invested.',
-      '3. 24 Aug v2 PDF claimed to close those four. Still not collectable (silence ≠ deemed accepted; NCR sponge; no USD rail; 6-month tail).',
-      '4. Do not countersign. Tap ENVIAR POR EMAIL on the action note.',
+      'Natalie Adel shortlisted Elena (18 Aug), calibration call 19 Aug.',
+      '20 Aug Natalie sent v1 agreement PDF. 23 Aug Elena replied with four items (entity, governing law, monthly statement, attribution).',
+      '24 Aug Nishant sent v2 revised PDF. Still not collectable — do not countersign.',
+      `IMAP messages kept: ${imapMessages.length}. PDFs: ${hosted.map((h) => h.label).join(', ') || 'none'}.`,
       '',
       '<b>Thread (oldest → newest)</b>',
       ...thread.map(
         (m, i) =>
           `${i + 1}. ${esc(String(m.date || '').slice(0, 19))} · ${esc(m.source)} · ${esc(m.from)} · ${esc(m.subject)} · atts=${esc((m.attachments || []).join('|') || 'none')}`,
       ),
-      uploaded.length
-        ? `<br><b>PDFs on this deal:</b> ${esc(uploaded.map((u) => `${u.label}:${u.filename}`).join(' · '))}`
-        : '<br><i>No PDFs uploaded this run — check IMAP credentials / attachments.</i>',
+      hosted.some((h) => h.docUrl)
+        ? `<br><b>Agreement PDFs (tap):</b> ${hosted
+            .filter((h) => h.docUrl)
+            .map((h) => `<a href="${esc(h.docUrl)}">${esc(h.label)}</a>`)
+            .join(' · ')}`
+        : '<br><i>PDFs not hosted — HubSpot Files scope missing and /doc/ copy failed.</i>',
     ].join('<br>');
+  const storyHave = have(STORY_MARKER);
+  if (storyHave.length) {
+    await hs('PATCH', `/crm/v3/objects/notes/${storyHave[0].id}`, { properties: { hs_note_body: storyLines } });
+    console.log('patched story note', storyHave[0].id);
+  } else {
     const note = await hs('POST', '/crm/v3/objects/notes', {
-      properties: { hs_note_body: lines, hs_timestamp: new Date().toISOString() },
+      properties: { hs_note_body: storyLines, hs_timestamp: new Date().toISOString() },
     });
     await associate('notes', note.id, 'deals', dealId, 214);
     await associate('notes', note.id, 'contacts', contactId, 202);
@@ -368,7 +464,7 @@ async function main() {
       subject: m.subject,
       attachments: m.attachments,
     })),
-    pdfs: uploaded,
+    pdfs: hosted.map((h) => ({ label: h.label, filename: h.filename, bytes: h.bytes, hosted: Boolean(h.docUrl) })),
     next: 'Open the deal → tap ENVIAR POR EMAIL. Do not countersign.',
   };
   fs.writeFileSync(THREAD, JSON.stringify(out, null, 2) + '\n');
