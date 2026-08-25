@@ -1,0 +1,98 @@
+# Stage the IntelliOps BD evaluation onto HubSpot from a Cursor cloud agent.
+#
+# Cloud agents cannot reach api.hubapi.com. Oracle can. Same trigger-file bridge
+# as stage-prospect-on-trigger.yml (agent tokens get HTTP 403 on workflow_dispatch).
+#
+# Usage:
+#   echo "intelliops-eval" > .hs-note-trigger
+#   git add .hs-note-trigger && git commit -m "hs: IntelliOps note onto the deal" && git push
+#
+# Idle (so a later merge does not post a second note):
+#   echo "# idle" > .hs-note-trigger
+
+name: HubSpot note — IntelliOps BD (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".hs-note-trigger"]
+
+permissions:
+  contents: write
+
+jobs:
+  hs-note:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .hs-note-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .hs-note-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.hs-note-trigger is empty"; exit 1; }
+          case "$LINE" in
+            \#*|none|idle)
+              echo "Trigger is idle ('$LINE') — nothing to write."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+            intelliops-eval)
+              echo "cmd=intelliops-eval" >> "$GITHUB_OUTPUT"
+              echo "Staging IntelliOps BD onto HubSpot"
+              ;;
+            *)
+              echo "::error::command '$LINE' is not allowed"
+              exit 1
+              ;;
+          esac
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      - name: Run on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=20"
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- "$REF" < scripts/oracle-hs-note-intelliops.sh
+          RC=$?
+          echo "--- remote exit code: $RC ---"
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/intelliops-hs-report.json /tmp/ 2>/dev/null \
+            && echo "--- pulled HubSpot report ---" \
+            || echo "--- no report to pull ---"
+          rm -f ~/.ssh/oracle
+          exit $RC
+
+      - name: Commit report and idle the trigger
+        if: success() && steps.trigger.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          if [ -f /tmp/intelliops-hs-report.json ]; then
+            cp /tmp/intelliops-hs-report.json docs/selling/_intelliops_hs_report.json
+            git add docs/selling/_intelliops_hs_report.json
+          fi
+          printf '%s\n' '# idle' > .hs-note-trigger
+          git add .hs-note-trigger
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git config user.name "aipa-staging[bot]"
+          git config user.email "aipa@aideazz.xyz"
+          git commit -m "selling: IntelliOps BD is on the HubSpot deal"
+          git push origin HEAD:${{ github.ref_name }}

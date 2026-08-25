@@ -7,9 +7,13 @@ income**, not a job.
 **Counterparty:** Nishant Chaudhary, Founder · `nishant.chaudhary@intelliopsautomation.com`
 **Document:** *Business Development Expert Commission & Representation Agreement*,
 revised 24 August 2026 (4 pages). Already signed on their side.
-**HubSpot:** this cloud session could not reach `api.hubapi.com` (egress allowlist).
-Paste the note at the bottom into the deal when you have local CRM access. Do not
-put HubSpot record ids on any public page.
+**HubSpot:** the CRM is the system of record. Cloud agents cannot reach
+`api.hubapi.com`; Oracle can. Push `.hs-note-trigger` = `intelliops-eval` (already
+wired) so GitHub Actions SSHes to Oracle and runs
+`node scripts/hs-note-intelliops-eval.cjs`. That creates or reuses company +
+contact + deal, posts the evaluation + sendable reply on the deal note, and
+assigns Elena a HIGH send-task. Report:
+`docs/selling/_intelliops_hs_report.json`.
 
 ---
 
@@ -181,11 +185,16 @@ docs/selling/drafts/intelliops-reply-2026-08-25.txt
 Do not originate until v3 has the four remaining items.
 ```
 
-Local CRM write when `HUBSPOT_API_KEY` can reach HubSpot:
+Oracle / laptop (HubSpot reachable):
 
 ```bash
+node scripts/hs-note-intelliops-eval.cjs --dry-run
 node scripts/hs-note-intelliops-eval.cjs
 ```
+
+Cloud agent: `echo intelliops-eval > .hs-note-trigger` then commit + push. The
+workflow idles the trigger after a successful write so a later merge does not
+post a second note.
 
 ---
 
