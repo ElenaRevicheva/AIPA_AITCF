@@ -190,6 +190,17 @@ async function companiesOnDeal(dealId) {
   return out;
 }
 
+function decodeCfEmail(hex) {
+  const h = String(hex || '').trim();
+  if (!/^[a-f0-9]{6,}$/i.test(h)) return '';
+  const r = parseInt(h.slice(0, 2), 16);
+  let out = '';
+  for (let n = 2; n < h.length; n += 2) {
+    out += String.fromCharCode(parseInt(h.slice(n, n + 2), 16) ^ r);
+  }
+  return /@/.test(out) ? out.toLowerCase() : '';
+}
+
 async function emailsFromUrl(url) {
   try {
     const r = await fetch(url, {
@@ -201,10 +212,20 @@ async function emailsFromUrl(url) {
     const found = [...html.matchAll(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g)].map((m) =>
       m[0].toLowerCase(),
     );
+    for (const m of html.matchAll(/data-cfemail="([a-f0-9]+)"/gi)) {
+      const d = decodeCfEmail(m[1]);
+      if (d) found.push(d);
+    }
+    const deent = html
+      .replace(/&#64;/g, '@')
+      .replace(/\[at\]/gi, '@')
+      .replace(/\s*\(at\)\s*/gi, '@');
+    found.push(...[...deent.matchAll(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g)].map((m) => m[0].toLowerCase()));
     const uniq = [...new Set(found)].filter(
-      (e) => !/example\.com|sentry|wixpress|cloudflare|schema|godaddy|wordpress|noreply/.test(e),
+      (e) => !/example\.com|sentry|wixpress|cloudflare|schema|godaddy|wordpress|noreply|wix\.com/.test(e),
     );
-    console.log('scrape', url, r.status, uniq.join(',') || '(none)');
+    const cf = (html.match(/data-cfemail/g) || []).length;
+    console.log('scrape', url, r.status, `bytes=${html.length}`, `cfemail=${cf}`, uniq.join(',') || '(none)');
     return uniq;
   } catch (e) {
     console.log('WARN scrape', url, e.message || e);
@@ -290,8 +311,10 @@ async function main() {
   for (const u of [
     'https://bssgroupe.com/',
     'https://www.bssgroupe.com/',
-    'https://bssgroupe.com/contact',
-    'https://www.bssgroupe.com/contact',
+    'https://bssgroupe.com/about',
+    'https://bssgroupe.com/about-us',
+    'https://bssgroupe.com/en',
+    'https://bssgroupe.com/fr',
     ...companies.map((c) => c.properties?.website).filter(Boolean),
     ...(haystack.match(/https?:\/\/[^\s"'<>]*bssgroupe[^\s"'<>]*/gi) || []),
   ]) {
