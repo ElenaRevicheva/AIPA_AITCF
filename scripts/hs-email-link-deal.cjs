@@ -10,7 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { hubspotKey, hubspotBase } = require('./hs-env.cjs');
+const { hubspotKey, hubspotBase, hubspotOwnerId } = require('./hs-env.cjs');
 const {
   registerOutreachSlug,
   buildHubSpotEmailAnchor,
@@ -311,10 +311,11 @@ async function main() {
   for (const u of [
     'https://bssgroupe.com/',
     'https://www.bssgroupe.com/',
-    'https://bssgroupe.com/about',
-    'https://bssgroupe.com/about-us',
-    'https://bssgroupe.com/en',
-    'https://bssgroupe.com/fr',
+    'https://bssgroupe.com/contact-us/',
+    'https://www.bssgroupe.com/contact-us/',
+    'https://bssgroupe.com/contact',
+    'https://www.linkedin.com/company/bssgroupe',
+    'https://torre.ai/jobs/VWMqgO2W',
     ...companies.map((c) => c.properties?.website).filter(Boolean),
     ...(haystack.match(/https?:\/\/[^\s"'<>]*bssgroupe[^\s"'<>]*/gi) || []),
   ]) {
@@ -327,11 +328,16 @@ async function main() {
   scraped = [...new Set(scraped)].filter((e) => !/@torre\.ai$/.test(e));
   const domainMails = scraped.filter((e) => /@([a-z0-9-]+\.)?bssgroupe\.com$/.test(e));
   const scrapedTo =
-    domainMails.find((e) => /^(hello|contact|info|hello|jobs|career|rh|hr|talent)@/.test(e)) ||
+    domainMails.find((e) => /^(hello|contact|info|jobs|career|rh|hr|talent)@/.test(e)) ||
     domainMails[0] ||
-    scraped[0] ||
+    scraped.filter((e) => !/@torre\.ai$/.test(e))[0] ||
     '';
-  const to = contactEmail || mailtoFromHtml || noteTo || scrapedTo;
+  // LinkedIn company/bssgroupe About publishes this mailbox (not guessed).
+  const linkedInPublished = /bssgroupe/i.test(`${dealName} ${haystack}`) ? 'contact@bssgroupe.com' : '';
+  const to = contactEmail || mailtoFromHtml || noteTo || scrapedTo || linkedInPublished;
+  if (to === linkedInPublished && !scrapedTo && !contactEmail) {
+    console.log('to from LinkedIn company About (published):', to);
+  }
   const applyUrl =
     (haystack.match(/https?:\/\/torre\.ai\/jobs\/[A-Za-z0-9]+/i) || [])[0] || extractApplyUrl(haystack) || '';
   const subjectFromNote = (haystack.match(/^SUBJECT:\s*(.+)$/m)?.[1] || '').trim();
