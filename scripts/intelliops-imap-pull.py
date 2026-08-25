@@ -208,6 +208,8 @@ def pull_account(acc: dict[str, str]) -> list[dict]:
             to = dec(msg.get("To"))
             cc = dec(msg.get("Cc"))
             blob = f"{subj}\n{frm}\n{to}\n{cc}"
+            if re.search(r"github\.com|notifications@github|cursor\[bot\]|github-actions", blob, re.I):
+                continue
             if not NEEDLE.search(blob) and "intelliops" not in blob.lower() and "nishant" not in blob.lower():
                 # still keep FROM/TO exact hits
                 if "intelliopsautomation.com" not in blob.lower() and "nishant" not in blob.lower():

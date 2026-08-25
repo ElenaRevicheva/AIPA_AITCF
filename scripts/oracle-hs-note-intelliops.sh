@@ -19,21 +19,22 @@ fi
 
 echo "--- fetching $REF ---"
 git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
-git checkout FETCH_HEAD -- \
+  git checkout FETCH_HEAD -- \
   scripts/hs-note-intelliops-eval.cjs \
   scripts/hs-intelliops-story.cjs \
   scripts/intelliops-imap-pull.py \
   scripts/hs-env.cjs \
   scripts/wa-link-lib.cjs \
   docs/selling/drafts/intelliops-reply-2026-08-25.txt \
+  docs/selling/drafts/intelliops-bd-email.txt \
   docs/selling/_intelliops_hs_report.json \
   2>&1 || { echo "FATAL: checkout of IntelliOps files failed"; exit 1; }
 
 RC=0
 if [ "$CMD" = "intelliops-story" ]; then
-  echo "--- python3 scripts/intelliops-imap-pull.py ---"
+  echo "--- python3 -u scripts/intelliops-imap-pull.py ---"
   set +e
-  python3 scripts/intelliops-imap-pull.py 2>&1
+  python3 -u scripts/intelliops-imap-pull.py 2>&1
   echo "--- imap exit $? ---"
   echo "--- node scripts/hs-intelliops-story.cjs ---"
   node scripts/hs-intelliops-story.cjs 2>&1

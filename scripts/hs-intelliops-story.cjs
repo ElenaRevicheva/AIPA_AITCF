@@ -41,6 +41,27 @@ function nl2br(s) {
   return esc(s).replace(/\n/g, '<br>');
 }
 
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function parseHsBody(text, method, p, status) {
+  const trimmed = String(text || '').trim();
+  if (!trimmed) return {};
+  if (trimmed.startsWith('<')) {
+    throw new Error(
+      `HubSpot ${status} ${method} ${p} returned HTML (rate-limit/WAF): ${trimmed.slice(0, 180).replace(/\s+/g, ' ')}`,
+    );
+  }
+  try {
+    return JSON.parse(trimmed);
+  } catch (e) {
+    throw new Error(
+      `HubSpot ${status} ${method} ${p} not JSON: ${(e.message || e).toString().slice(0, 120)} :: ${trimmed.slice(0, 180)}`,
+    );
+  }
+}
+
 async function hs(method, p, body, extraHeaders) {
   const k = hubspotKey();
   if (!k) throw new Error('HUBSPOT_API_KEY missing');
@@ -50,11 +71,30 @@ async function hs(method, p, body, extraHeaders) {
     headers['Content-Type'] = 'application/json';
     payload = JSON.stringify(body);
   }
-  const r = await fetch(`${hubspotBase()}${p}`, { method, headers, body: payload });
-  const text = await r.text();
-  const j = text ? JSON.parse(text) : {};
-  if (!r.ok) throw new Error(`HubSpot ${r.status} ${method} ${p}: ${j.message || text.slice(0, 400)}`);
-  return j;
+  let lastErr;
+  for (let attempt = 1; attempt <= 6; attempt++) {
+    try {
+      const r = await fetch(`${hubspotBase()}${p}`, { method, headers, body: payload });
+      const text = await r.text();
+      const j = parseHsBody(text, method, p, r.status);
+      if (r.status === 429 || r.status >= 500) {
+        lastErr = new Error(`HubSpot ${r.status} ${method} ${p}: ${j.message || text.slice(0, 200)}`);
+      } else if (!r.ok) {
+        throw new Error(`HubSpot ${r.status} ${method} ${p}: ${j.message || text.slice(0, 400)}`);
+      } else {
+        if (/^(POST|PATCH|PUT|DELETE)$/.test(method)) await sleep(200);
+        return j;
+      }
+    } catch (e) {
+      lastErr = e;
+      const msg = String(e.message || e);
+      if (!/returned HTML|not JSON|429|50\d/.test(msg) && attempt === 1) throw e;
+    }
+    const wait = Math.min(12000, 700 * 2 ** (attempt - 1));
+    console.log(`WARN HubSpot retry ${attempt}/6 ${method} ${p} in ${wait}ms:`, lastErr?.message || lastErr);
+    await sleep(wait);
+  }
+  throw lastErr || new Error(`HubSpot ${method} ${p} failed`);
 }
 
 async function associate(fromType, fromId, toType, toId, typeId) {
@@ -74,9 +114,15 @@ function loadJson(p, fallback) {
 async function notesOnDeal(dealId) {
   const assoc = await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`);
   const ids = (assoc.results || []).map((r) => r.toObjectId).filter(Boolean);
+  if (!ids.length) return [];
   const out = [];
-  for (const id of ids) {
-    out.push(await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`));
+  for (let i = 0; i < ids.length; i += 50) {
+    const chunk = ids.slice(i, i + 50);
+    const batch = await hs('POST', '/crm/v3/objects/notes/batch/read', {
+      properties: ['hs_note_body', 'hs_timestamp'],
+      inputs: chunk.map((id) => ({ id })),
+    });
+    out.push(...(batch.results || []));
   }
   return out;
 }
@@ -93,9 +139,10 @@ async function uploadPdf(filePath, filename) {
     body: fd,
   });
   const text = await r.text();
-  const j = text ? JSON.parse(text) : {};
-  if (!r.ok) throw new Error(`files upload ${r.status}: ${j.message || text.slice(0, 400)}`);
-  return j;
+  if (!r.ok || String(text).trim().startsWith('<')) {
+    throw new Error(`files upload ${r.status}: ${text.slice(0, 400)}`);
+  }
+  return parseHsBody(text, 'POST', '/files/v3/files', r.status);
 }
 
 function classifyPdf(name, bytes) {
@@ -113,19 +160,26 @@ function isNoise(m) {
 
 function docToken() {
   const crypto = require('crypto');
-  const tokenPath = path.join(ROOT, 'data/intelliops-doc-token');
-  try {
-    const t = fs.readFileSync(tokenPath, 'utf8').trim();
-    if (/^[a-f0-9]{16,}$/.test(t)) return t;
-  } catch {
-    /* first run */
+  const paths = [
+    path.join(ROOT, 'data/intelliops-doc-token'),
+    '/tmp/intelliops-doc-token',
+  ];
+  for (const tokenPath of paths) {
+    try {
+      const t = fs.readFileSync(tokenPath, 'utf8').trim();
+      if (/^[a-f0-9]{16,}$/.test(t)) return t;
+    } catch {
+      /* try next */
+    }
   }
   const t = crypto.randomBytes(12).toString('hex');
-  fs.mkdirSync(path.dirname(tokenPath), { recursive: true });
-  try {
-    fs.writeFileSync(tokenPath, t);
-  } catch {
-    /* data/ may be unwritable; still return t */
+  for (const tokenPath of paths) {
+    try {
+      fs.mkdirSync(path.dirname(tokenPath), { recursive: true });
+      fs.writeFileSync(tokenPath, t);
+    } catch {
+      /* data/ may be unwritable */
+    }
   }
   return t;
 }
@@ -134,32 +188,51 @@ function hostPdfOnDoc(filePath, version) {
   const { execFileSync } = require('child_process');
   const token = docToken();
   const name = `intelliops-${version}-${token}.pdf`;
-  const dest = `/var/www/aideazz-docs/${name}`;
+  const destDir = '/var/www/aideazz-docs';
+  const dest = `${destDir}/${name}`;
+  try {
+    execFileSync('sudo', ['-n', 'mkdir', '-p', destDir], { stdio: 'pipe' });
+  } catch {
+    try {
+      fs.mkdirSync(destDir, { recursive: true });
+    } catch (e) {
+      console.log('WARN mkdir', destDir, e.message || e);
+    }
+  }
   try {
     fs.copyFileSync(filePath, dest);
     fs.chmodSync(dest, 0o644);
-  } catch {
+  } catch (copyErr) {
+    console.log('WARN direct copy', dest, copyErr.message || copyErr);
     try {
-      execFileSync('sudo', ['cp', filePath, dest], { stdio: 'inherit' });
-      execFileSync('sudo', ['chmod', '644', dest], { stdio: 'inherit' });
+      execFileSync('sudo', ['-n', 'cp', filePath, dest], { stdio: 'pipe' });
+      execFileSync('sudo', ['-n', 'chmod', '644', dest], { stdio: 'pipe' });
     } catch (e) {
-      console.log('WARN cannot write', dest, e.message || e);
+      console.log('WARN sudo -n cp', dest, e.message || e);
       return null;
     }
+  }
+  if (!fs.existsSync(dest)) {
+    console.log('WARN hosted file missing after copy', dest);
+    return null;
   }
   return `https://webhook.aideazz.xyz/doc/${name}`;
 }
 
 async function hubspotEmailsForContact(contactId) {
-  const assoc = await hs('GET', `/crm/v4/objects/contacts/${contactId}/associations/emails`);
-  const ids = (assoc.results || []).map((r) => r.toObjectId).filter(Boolean);
   const out = [];
-  for (const id of ids) {
-    const e = await hs(
-      'GET',
-      `/crm/v3/objects/emails/${id}?properties=hs_email_subject,hs_email_text,hs_email_html,hs_email_direction,hs_email_from_email,hs_email_to_email,hs_timestamp,hs_attachment_ids`,
-    );
-    out.push(e);
+  try {
+    const assoc = await hs('GET', `/crm/v4/objects/contacts/${contactId}/associations/emails`);
+    const ids = (assoc.results || []).map((r) => r.toObjectId).filter(Boolean);
+    for (const id of ids) {
+      const e = await hs(
+        'GET',
+        `/crm/v3/objects/emails/${id}?properties=hs_email_subject,hs_email_text,hs_email_html,hs_email_direction,hs_email_from_email,hs_email_to_email,hs_timestamp,hs_attachment_ids`,
+      );
+      out.push(e);
+    }
+  } catch (err) {
+    console.log('WARN contact email associations', err.message || err);
   }
   // also token-search in case associations are empty
   try {
@@ -246,17 +319,21 @@ async function main() {
   thread.sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
 
   const existing = await notesOnDeal(dealId);
+  let deletedNoise = 0;
   for (const n of existing) {
     const b = n.properties?.hs_note_body || '';
     if (b.includes(MAIL_MARKER) && /AIPA_AITCF|notifications@github|github-actions/.test(b)) {
       try {
         await hs('DELETE', `/crm/v3/objects/notes/${n.id}`);
+        deletedNoise += 1;
         console.log('deleted noise note', n.id);
+        await sleep(250);
       } catch (e) {
         console.log('WARN delete note', n.id, e.message || e);
       }
     }
   }
+  if (deletedNoise) await sleep(1500);
 
   // Recruiter who sent v1
   const NATALIE = 'natalie.adel@intelliopsautomation.com';
@@ -333,26 +410,30 @@ async function main() {
       `Size: ${p.bytes} bytes`,
       fileId ? `HubSpot file id: ${esc(fileId)}` : '',
     ].join('<br>');
-    const already = have(marker)[0];
-    if (already) {
-      await hs('PATCH', `/crm/v3/objects/notes/${already.id}`, {
-        properties: {
-          hs_note_body: body,
-          ...(fileId ? { hs_attachment_ids: String(fileId) } : {}),
-        },
-      });
-      console.log('patched file note', label, already.id);
-    } else {
-      const note = await hs('POST', '/crm/v3/objects/notes', {
-        properties: {
-          hs_note_body: body,
-          hs_timestamp: p.date && !Number.isNaN(Date.parse(p.date)) ? new Date(p.date).toISOString() : new Date().toISOString(),
-          ...(fileId ? { hs_attachment_ids: String(fileId) } : {}),
-        },
-      });
-      await associate('notes', note.id, 'deals', dealId, 214);
-      await associate('notes', note.id, 'contacts', contactId, 202);
-      console.log('file note', label, note.id, docUrl || 'no-url');
+    try {
+      const already = have(marker)[0];
+      if (already) {
+        await hs('PATCH', `/crm/v3/objects/notes/${already.id}`, {
+          properties: {
+            hs_note_body: body,
+            ...(fileId ? { hs_attachment_ids: String(fileId) } : {}),
+          },
+        });
+        console.log('patched file note', label, already.id);
+      } else {
+        const note = await hs('POST', '/crm/v3/objects/notes', {
+          properties: {
+            hs_note_body: body,
+            hs_timestamp: p.date && !Number.isNaN(Date.parse(p.date)) ? new Date(p.date).toISOString() : new Date().toISOString(),
+            ...(fileId ? { hs_attachment_ids: String(fileId) } : {}),
+          },
+        });
+        await associate('notes', note.id, 'deals', dealId, 214);
+        await associate('notes', note.id, 'contacts', contactId, 202);
+        console.log('file note', label, note.id, docUrl || 'no-url');
+      }
+    } catch (err) {
+      console.log('WARN file note', label, err.message || err);
     }
   }
 
@@ -369,16 +450,20 @@ async function main() {
       '',
       nl2br(String(m.excerpt || '(no body)')),
     ].join('<br>');
-    const note = await hs('POST', '/crm/v3/objects/notes', {
-      properties: {
-        hs_note_body: body,
-        hs_timestamp:
-          m.date && !Number.isNaN(Date.parse(m.date)) ? new Date(m.date).toISOString() : new Date().toISOString(),
-      },
-    });
-    await associate('notes', note.id, 'deals', dealId, 214);
-    await associate('notes', note.id, 'contacts', contactId, 202);
-    console.log('mail note', marker.slice(0, 80));
+    try {
+      const note = await hs('POST', '/crm/v3/objects/notes', {
+        properties: {
+          hs_note_body: body,
+          hs_timestamp:
+            m.date && !Number.isNaN(Date.parse(m.date)) ? new Date(m.date).toISOString() : new Date().toISOString(),
+        },
+      });
+      await associate('notes', note.id, 'deals', dealId, 214);
+      await associate('notes', note.id, 'contacts', contactId, 202);
+      console.log('mail note', marker.slice(0, 80));
+    } catch (err) {
+      console.log('WARN mail note', marker.slice(0, 80), err.message || err);
+    }
   }
 
   // Registry + one-click send (same path as CLIENT-MANUAL)
@@ -389,6 +474,7 @@ async function main() {
     email: TO,
     emailDraft: EMAIL_DRAFT_REL,
     dealId,
+    cc: 'natalie.adel@intelliopsautomation.com',
   });
   const { loadRegistry } = require('./wa-link-lib.cjs');
   const patch = { [SLUG]: loadRegistry()[SLUG] };
@@ -402,6 +488,7 @@ async function main() {
     '',
   ].join('<br>');
 
+  let sendButtonOnActionNote = false;
   let actionNote = existing2.find((n) => (n.properties?.hs_note_body || '').includes(NOTE_MARKER));
   if (actionNote) {
     let body = actionNote.properties.hs_note_body || '';
@@ -412,6 +499,9 @@ async function main() {
     } else {
       console.log('action note already has send button', actionNote.id);
     }
+    sendButtonOnActionNote = true;
+  } else {
+    console.log('WARN action note with', NOTE_MARKER, 'not found');
   }
 
   const storyLines = [
@@ -465,6 +555,7 @@ async function main() {
       attachments: m.attachments,
     })),
     pdfs: hosted.map((h) => ({ label: h.label, filename: h.filename, bytes: h.bytes, hosted: Boolean(h.docUrl) })),
+    sendButtonOnActionNote,
     next: 'Open the deal → tap ENVIAR POR EMAIL. Do not countersign.',
   };
   fs.writeFileSync(THREAD, JSON.stringify(out, null, 2) + '\n');
@@ -476,6 +567,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  console.error(e.message || e);
+  console.error(e.stack || e.message || e);
   process.exit(1);
 });
