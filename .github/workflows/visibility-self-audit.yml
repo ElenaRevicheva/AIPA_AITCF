@@ -31,11 +31,14 @@ jobs:
       - name: Dump live canonical HTML
         run: |
           set +e
-          echo "=== GET article ==="
+          SLUG="55193-restarts-in-10-days-debugging-an-ai-agents-endless-loop"
+          echo "=== GET today's article (trailing slash — IPFS directory) ==="
           curl -sS -D /tmp/art.hdr -o /tmp/art.html -A "AIdeazzVisibilityBot/1.0" \
-            "https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/"
+            "https://aideazz.xyz/blog/${SLUG}/"
           echo "--- headers ---"
           cat /tmp/art.hdr
+          echo "--- title ---"
+          grep -oE '<title>[^<]*</title>' /tmp/art.html | head -1
           echo "--- first 1200 bytes ---"
           head -c 1200 /tmp/art.html; echo
           echo "=== GET pin stamp ==="
@@ -47,12 +50,11 @@ jobs:
           cat /tmp/stamp.txt; echo
           echo "=== /blog/ slug mention count ==="
           curl -sS -A "AIdeazzVisibilityBot/1.0" "https://aideazz.xyz/blog/" \
-            | grep -c "telegram-my-ai-agent-ops-dashboard-not-a-web-ui" || true
+            | grep -c "$SLUG" || true
       - name: Audit AIdeazz properties
         run: node scripts/visibility-self-audit.cjs
-      # 2026-08-21: prove the daily post's canonical GEO URL is on the IPFS pin,
-      # not only in git / Dev.to / the portfolio API. A missing public/blog/<slug>
-      # directory 404s with "no link named …" while those other surfaces stay green.
-      - name: Audit canonical Telegram-ops post
-        continue-on-error: true
-        run: node scripts/visibility-self-audit.cjs https://aideazz.xyz/blog/telegram-my-ai-agent-ops-dashboard-not-a-web-ui/
+      # Prove today's canonical GEO URL is on the live IPFS pin, not only in git / Dev.to.
+      # A missing public/blog/<slug> directory 404s with "no link named …" while those
+      # other surfaces stay green. Trailing slash is required (IPFS directory).
+      - name: Audit today's canonical post
+        run: node scripts/visibility-self-audit.cjs https://aideazz.xyz/blog/55193-restarts-in-10-days-debugging-an-ai-agents-endless-loop/
