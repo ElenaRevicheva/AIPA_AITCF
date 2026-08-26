@@ -1,0 +1,30 @@
+SUBJECT: Re: Revised Business Development Agreement — four remaining items so commission is actually collectable
+TO: nishant.chaudhary@intelliopsautomation.com
+CC: natalie.adel@intelliopsautomation.com
+
+Hi Nishant,
+
+Thank you for the revision, and for taking the four points seriously. I have read the 24 August agreement in full.
+
+The contracting block, governing law, monthly commission statement, and the five-day attribution window in Section 8 are real improvements. Those were the right things to fix first.
+
+Four remaining items determine whether commission is actually collectable from Panama. I am not trying to re-trade the commercial deal — 20% of collected revenue is acceptable. I need the base, the clock, and the payment rail to be as clear as the rate.
+
+1. Attribution silence. Section 8 gives you five business days to accept, reject, or ask for clarification. It does not say what happens if there is no written response. Please add: if a complete registration receives no written response within five business days, the opportunity is deemed accepted as attributable. A clarification request is one round, answered by me within three business days; silence after that is also deemed accepted. Without this, I cannot invest time with any certainty — which was the point of raising attribution in the first place.
+
+2. Commission base. Section 6 excludes taxes, refunds, credits, chargebacks, pass-through amounts, third-party costs, and reimbursable expenses. The last three can reduce a $25,000 engagement to a much smaller number before the 20% is applied, so the example in Section 6 would no longer hold. Please define Net Collected Revenue as amounts actually received from the customer for Company services, less only taxes, refunds, credits, and chargebacks. Delivery cost stays your cost of sale, not a deduction from the commission base.
+
+3. Payment rail. I am in Panama. Please specify: commission is paid in USD, by Wise or international wire, within fifteen business days of the Company receiving the customer funds (verification in parallel, not as an open-ended extra delay); ordinary transfer fees borne by the Company; monthly statement issued by the 10th of the following month. Section 9 is good on content; it needs a date and a currency.
+
+4. Post-termination tail. Six months is short for RPA and document-processing cycles. For opportunities already confirmed as attributable under Section 8 before termination, please keep commission eligibility for twelve months after termination, still payable only on Net Collected Revenue actually received. I am not asking to be paid for work I did not originate.
+
+One related clarification, not a fifth commercial point: my existing independent practice (AIdeazz — GEO/AEO, conversational agents, and AI-ops systems I build and sell myself) is not a conflict under Section 16. IntelliOps remains the delivery partner for the Company RPA / IDP / workflow-automation services I originate for you. I will not redirect a registered IntelliOps opportunity.
+
+I can start registering opportunities as soon as these four items are in the next revision. To make the first registrations useful rather than theoretical, a one-page ICP, an indicative rate card or sample SOW, and the legal entity name with CIN or GSTIN on the signature block would let me originate immediately.
+
+I am interested in building this. I want the agreement to pay when a deal actually pays you.
+
+Best regards,
+Elena Revicheva
+AIdeazz AI Lab · Panama City
+https://aideazz.xyz/portfolio

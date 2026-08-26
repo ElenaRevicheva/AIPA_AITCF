@@ -2895,5 +2895,28 @@
     "email": "rohit.g@turing.com",
     "emailDraft": "docs/selling/drafts/turing-lazarus-rohit-email.txt",
     "dealId": "64227273846"
+  },
+  "ai-native-b2b-marketplace": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/ai-native-b2b-marketplace-email.txt",
+    "company": "AI-Native B2B Marketplace",
+    "email": "contact@bssgroupe.com",
+    "emailDraft": "docs/selling/drafts/ai-native-b2b-marketplace-email.txt",
+    "dealId": "64302126655",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/15.07.26_EN_Resume_Elena_Revicheva_compressed.pdf",
+        "filename": "Elena_Revicheva_Resume.pdf"
+      }
+    ]
+  },
+  "intelliops-bd": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/intelliops-bd-email.txt",
+    "company": "IntelliOps Automation",
+    "email": "nishant.chaudhary@intelliopsautomation.com",
+    "emailDraft": "docs/selling/drafts/intelliops-bd-email.txt",
+    "dealId": "64302436100",
+    "cc": "natalie.adel@intelliopsautomation.com"
   }
 }
