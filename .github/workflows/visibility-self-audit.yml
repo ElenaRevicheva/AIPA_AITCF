@@ -51,6 +51,16 @@ jobs:
           echo "=== /blog/ slug mention count ==="
           curl -sS -A "AIdeazzVisibilityBot/1.0" "https://aideazz.xyz/blog/" \
             | grep -c "$SLUG" || true
+          echo "=== GET live wiki (prove 0007 is on the pin) ==="
+          curl -sS -D /tmp/wiki.hdr -o /tmp/wiki.html -A "AIdeazzVisibilityBot/1.0" \
+            "https://aideazz.xyz/ai-ops-wiki.html"
+          echo "--- wiki headers ---"
+          cat /tmp/wiki.hdr
+          echo "--- wiki title ---"
+          grep -oE '<title>[^<]*</title>' /tmp/wiki.html | head -1
+          echo "--- wiki chapter present? ---"
+          grep -c '2026-08-26-prompt-poisoned-the-grounding-gate' /tmp/wiki.html || true
+          grep -c 'the-prompt-is-a-source' /tmp/wiki.html || true
       - name: Audit AIdeazz properties
         run: node scripts/visibility-self-audit.cjs
       # Prove today's canonical GEO URL is on the live IPFS pin, not only in git / Dev.to.
@@ -58,3 +68,5 @@ jobs:
       # other surfaces stay green. Trailing slash is required (IPFS directory).
       - name: Audit today's canonical post
         run: node scripts/visibility-self-audit.cjs https://aideazz.xyz/blog/55193-restarts-in-10-days-debugging-an-ai-agents-endless-loop/
+      - name: Audit live wiki chapter
+        run: node scripts/visibility-self-audit.cjs https://aideazz.xyz/ai-ops-wiki.html
