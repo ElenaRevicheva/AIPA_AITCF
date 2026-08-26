@@ -57,10 +57,26 @@ half of what was live). **Supply:** refusing alone would have bought quality wit
 silence, and *the blog must still post every day*. So the 20-brief rotation is no
 longer the only source — spent briefs are now correctly excluded (11 of 20 are
 spent; the old substring test excluded almost none), the last 30 titles are named
-in the prompt as off-limits, and when the rotation is spent the angle is
-**derived from that day's measured evidence** — commits, incidents, outcome
-lines — which never runs out. A duplicate is a *retryable* gate (4 attempts,
-each told to pick a different angle); only if all four collide does the day skip.
+in the prompt as off-limits, and the angle is **derived from that day's
+measured evidence** — commits, wiki incidents, operator queue, outcome lines —
+which never runs out. A duplicate is a *retryable* gate (4 attempts, each told
+to pick a different angle).
+
+**26 Aug 2026 — grounding gate was skipping the day.** The 14:30 Panama cron
+ran and Telegram said `Grounding gate / unsourced number(s): 40`. The scheduler
+was not off. A rotation brief still asked for `BrightData $40/run` (and `76%`,
+`300` duplicate deals, `131` tests). Grounded mode collected real facts, then
+handed the model a brief full of unverified figures; the model copied `40`;
+four retries later the gate fail-closed and published nothing. Same shape as
+the near-duplicate silence: the filter was correct, the cadence was not.
+
+Cadence fix: briefs are not sources (digits stripped before they reach the
+model), today's Claude/Cursor work is collected as evidence, an unsourced
+paragraph is salvaged rather than discarding the draft, and if the model still
+cannot stay inside the bundle a **measured-notes article is assembled
+deterministically** from the facts. Silence remains correct when there is
+nothing to measure (`< MIN_FACTS`). Silence is incorrect when the day produced
+evidence and the model decorated it.
 
 **Wiki-worthy sessions still publish to the blog the same day**, even if the
 daily post already ran. `wiki-ship.cjs` (21:30 UTC) runs after the daily job

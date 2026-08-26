@@ -22,7 +22,11 @@ import { SITEMAP_COMMIT_MESSAGE, devtoCanonicalPreface } from "./blog-github-com
 import {
   MIN_FACTS,
   collectProductionEvidence,
+  composeEvidenceFallbackArticle,
   renderEvidenceForPrompt,
+  renderLicensedNumbersForPrompt,
+  salvageArticleAgainstEvidence,
+  stripUnverifiedNumbers,
   verifyArticleAgainstEvidence,
   type EvidenceBundle,
 } from "./blog-evidence";
@@ -927,6 +931,14 @@ A: [answer]
 ... full markdown ...
 </MARKDOWN>`;
 
+const GROUNDED_SYSTEM_ADDENDUM = `
+Grounded-mode extra rules (these override any urge to sound specific):
+- A number that is not on the licensed list is a rejected article, not a flourish.
+- FAQ answers may say "I do not have that measured" instead of inventing a figure. A concrete number is required ONLY when it appears in the evidence.
+- Ignore every digit in the angle/brief. Briefs are SEO hints. They are not sources. If the brief mentions a cost, a percentage, or a vendor unit price, do not copy it.
+- Claude and Cursor work belongs in the article only as it appears in the evidence (commits, wiki incidents, operator queue, logs). Do not reconstruct a session you were not given.
+`;
+
 // ─────────────────────────────────────────────
 // GSC: pull top queries so Claude can find gaps
 // ─────────────────────────────────────────────
@@ -1143,23 +1155,23 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
       await notifyTelegramSkipped("Not enough production evidence", why);
       throw new Error(`SKIPPED_BY_COOLDOWN: insufficient evidence (${why})`);
     }
-    // The rotation is finite; the work is not. If the brief we were handed is
-    // already written up, or the rotation has almost nothing left, take the
-    // angle from what the system actually did today instead of repeating one.
-    const rotationSpent =
-      publishedIndices.has(index) || publishedIndices.size >= DAILY_BLOG_TOPIC_BRIEFS.length - 2;
-    if (rotationSpent) {
-      const derived = await deriveAngleFromEvidence(deps.anthropic, evidence, recentTitles);
-      if (derived) {
-        keyword = derived.keyword;
-        brief = derived.brief;
-        index = -1;
-      }
+    // The rotation is finite and its briefs still ask for figures nobody
+    // measured ("BrightData $40/run", "76% of inference"). Daily Claude/Cursor
+    // work is not finite. Prefer an angle from today's evidence so the post
+    // is about what actually happened; keep the rotation keyword only as SEO
+    // fallback, with every digit stripped so the model cannot copy it.
+    const derived = await deriveAngleFromEvidence(deps.anthropic, evidence, recentTitles);
+    if (derived) {
+      keyword = derived.keyword;
+      brief = derived.brief;
+      index = -1;
+    } else {
+      brief = stripUnverifiedNumbers(brief);
     }
 
-    baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
+    baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${stripUnverifiedNumbers(keyword)}"
 
-Angle to explore: ${brief}
+Angle to explore (theme only — any figure in this sentence is NOT a fact unless it also appears in the evidence): ${stripUnverifiedNumbers(brief)}
 
 ${renderEvidenceForPrompt(evidence)}
 
@@ -1168,14 +1180,20 @@ ABSOLUTE RULES — the article is rejected automatically if any is broken:
    Do NOT compute anything: no percentages, no averages, no totals, no ratios,
    no "that works out to". A derived figure is an invented figure — the reader
    cannot trace it, so it fails. Rounding a measured number for readability is
-   allowed ("roughly 55,000" for 55193); inventing one is not.
-2. Do NOT name any technology, database, queue or vendor that is not in the
+   allowed; inventing one is not.
+2. Do NOT copy numbers from the angle, the keyword, or from memory of older
+   posts. The rotation briefs still contain unverified figures (unit prices,
+   percentages, test counts). Those are bait. If it is not in the evidence
+   block, it does not go in the article.
+3. Do NOT name any technology, database, queue or vendor that is not in the
    evidence above. If you want to discuss something absent, describe the
    general problem without claiming this system uses it.
-3. Where the evidence is silent, say so plainly or leave it out. "I do not
-   have that measured" is an acceptable sentence; a plausible guess is not.
-4. Write in first person about THIS system only, using the facts above as the
+4. Where the evidence is silent, say so plainly or leave it out. "I do not
+   have that measured" is an acceptable sentence, including in the FAQ; a
+   plausible guess is not.
+5. Write in first person about THIS system only, using the facts above as the
    spine. The reader should be able to trace every claim to a measurement.
+   Prefer today's git, wiki incidents, and operator queue over a generic brief.
 
 Write for developers and technical founders, and keep it readable for a
 non-engineer business owner: name the concept, then explain it plainly.`;
@@ -1205,7 +1223,25 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     return d ? `near-duplicate of "${d.slug}" (${d.overlapPct}% overlap)` : null;
   };
   let parsed: ReturnType<typeof parseArticle> | null = null;
+  const adoptEvidenceFallback = (why: string): boolean => {
+    if (!evidence) return false;
+    const fb = composeEvidenceFallbackArticle(evidence, { keyword });
+    const fv = validateArticle(fb.markdown);
+    const fg = verifyArticleAgainstEvidence(fb.markdown, evidence);
+    const fd = duplicateReason(fb.title);
+    if (!fv.ok || !fg.ok || fd) {
+      console.warn(
+        `📰 Evidence fallback unusable (${why}): style=${fv.ok ? "ok" : fv.reason} ground=${fg.ok ? "ok" : fg.reason} dup=${fd || "no"}`,
+      );
+      return false;
+    }
+    console.log(`📰 Evidence fallback: publishing measured-notes article (${why}) so the day still ships`);
+    parsed = fb;
+    index = -1;
+    return true;
+  };
   let lastValidationError = "";
+  const articleSystem = grounded ? ARTICLE_SYSTEM + GROUNDED_SYSTEM_ADDENDUM : ARTICLE_SYSTEM;
 
   for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
     const forbiddenNote = !lastValidationError
@@ -1213,7 +1249,11 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
       : lastValidationError.startsWith("near-duplicate")
         ? "\n\nCRITICAL: The previous attempt was a " + lastValidationError +
           ". That subject is already covered. Pick a DIFFERENT angle from the evidence - a different system, a different failure, or a different measured outcome - and give it a title that shares little vocabulary with the existing one."
-        : "\n\nCRITICAL: The previous attempt failed quality gate - " + lastValidationError +
+        : lastValidationError.startsWith("ungrounded") && evidence
+          ? "\n\nCRITICAL: The previous draft used numbers that are not in the evidence (" + lastValidationError + ").\n" +
+            renderLicensedNumbersForPrompt(evidence) +
+            "\nRewrite from scratch. Copy licensed numbers exactly. Do not copy numbers from the angle, the keyword, or older posts. If a point needs a number you do not have, omit the point. FAQ answers may say \"I do not have that measured\"."
+          : "\n\nCRITICAL: The previous attempt failed quality gate - " + lastValidationError +
           ". Do NOT use that phrase anywhere in the article.";
     const userPrompt = baseUserPrompt + forbiddenNote;
 
@@ -1226,7 +1266,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
       deps.anthropic,
       deps.model,
       deps.maxTokens,
-      ARTICLE_SYSTEM,
+      articleSystem,
       userPrompt,
     );
     if (!rawText) throw new Error("Empty model response (Anthropic + Groq both returned empty)");
@@ -1241,7 +1281,8 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
       // stopped eleven articles describing a database this system never ran.
       // Duplicate gate. Retry with a different angle rather than ending the day:
       // the blog is meant to publish daily, so exhausting every attempt is the
-      // only acceptable reason to stay silent.
+      // only acceptable reason to stay silent — and even then, a measured-notes
+      // fallback ships if the day produced evidence.
       const dupHit = (): boolean => {
         const dr = duplicateReason(parsed!.title);
         if (!dr) return false;
@@ -1249,26 +1290,40 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
         console.warn("[daily-blog] Duplicate gate rejected attempt " + attempt + ": " + dr);
         return true;
       };
-      const bailIfLast = async (): Promise<void> => {
-        if (attempt !== MAX_GENERATION_ATTEMPTS) return;
+      const bailIfLast = async (): Promise<boolean> => {
+        if (attempt !== MAX_GENERATION_ATTEMPTS) return false;
+        if (adoptEvidenceFallback("duplicate gate")) return true;
         await notifyTelegramSkipped("Near-duplicate after every attempt", lastValidationError);
         throw new Error("SKIPPED_BY_COOLDOWN: " + lastValidationError);
       };
       if (!evidence) {
         if (!dupHit()) break;
-        await bailIfLast();
+        if (await bailIfLast()) break;
         continue;
       }
       const g = verifyArticleAgainstEvidence(parsed.markdown, evidence);
       if (g.ok) {
         if (!dupHit()) break;
-        await bailIfLast();
+        if (await bailIfLast()) break;
         continue;
       }
       lastValidationError = `ungrounded — ${g.reason}`;
       console.warn(`📰 Grounding gate rejected attempt ${attempt}: ${g.reason}`);
+      const salvaged = salvageArticleAgainstEvidence(parsed.markdown, evidence);
+      if (salvaged.ok) {
+        const sv = validateArticle(salvaged.markdown);
+        if (sv.ok) {
+          parsed = { title: parsed.title, markdown: salvaged.markdown };
+          if (!dupHit()) {
+            console.log("📰 Grounding salvage kept the draft after removing unsourced claims");
+            break;
+          }
+        } else {
+          console.warn(`📰 Grounding salvage left a draft that failed style: ${sv.reason}`);
+        }
+      }
       if (attempt === MAX_GENERATION_ATTEMPTS) {
-        // Fail closed. Nothing publishes, and the operator is told why.
+        if (adoptEvidenceFallback("grounding gate")) break;
         await notifyTelegramSkipped("Grounding gate", g.reason);
         throw new Error(`SKIPPED_BY_COOLDOWN: grounding gate — ${g.reason}`);
       }
@@ -1277,6 +1332,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 
     lastValidationError = v.reason;
     if (attempt === MAX_GENERATION_ATTEMPTS) {
+      if (adoptEvidenceFallback("quality gate")) break;
       throw new Error(`Quality gate: ${v.reason} (failed after ${MAX_GENERATION_ATTEMPTS} attempts)`);
     }
   }
@@ -1470,7 +1526,7 @@ async function notifyTelegramSkipped(reason: string, detail: string): Promise<vo
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = resolveTelegramNotifyChatId();
   if (!token || !chatId) return;
-  const text = `\u23F8 Daily blog SKIPPED\n\nReason: ${reason}\nDetail: ${detail}\n\n(Sliding-window mutex or prefix-dedup tripped — no Dev.to / aideazz.xyz publish today.)`;
+  const text = `\u23F8 Daily blog SKIPPED\n\nReason: ${reason}\nDetail: ${detail}\n\nNo Dev.to / aideazz.xyz publish from this run.`;
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",

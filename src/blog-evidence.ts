@@ -67,9 +67,48 @@ export const MIN_FACTS = Number(process.env.BLOG_EVIDENCE_MIN_FACTS || 6);
 
 const HOME = process.env.HOME || '/home/ubuntu';
 
+/**
+ * Git hashes, ISO timestamps, clock times and URLs are not claims. Strip them
+ * before pulling numeric tokens so "35c1f53" does not license 35, and "14:30"
+ * in a sentence about the cron does not look like an unsourced 30.
+ */
+export function stripStructuralNumericTokens(s: string): string {
+  return s
+    .replace(/\bhttps?:\/\/\S+/gi, ' ')
+    .replace(/\b(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b/gi, ' ')
+    .replace(/\b\d{4}-\d{2}-\d{2}(?:[T\s]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?)?\b/g, ' ')
+    .replace(/\b\d{1,2}:\d{2}(?::\d{2})?\b/g, ' ');
+}
+
 /** Pull every numeric token a fact licenses, so the verifier can check the article against it. */
 function numbersIn(s: string): string[] {
-  return (s.match(/\d[\d,.]*/g) || []).map((n) => n.replace(/[.,]$/, ''));
+  return (stripStructuralNumericTokens(s).match(/\d[\d,.]*/g) || []).map((n) => n.replace(/[.,]$/, ''));
+}
+
+/** Public pages must not carry identifiers, even when they showed up in a log line. */
+function scrubPublic(s: string): string {
+  return s
+    .replace(/[\w.+-]+@[\w-]+\.[a-z]{2,}/gi, '[email]')
+    .replace(/Bearer\s+\S+/gi, '[token]')
+    .replace(/\b\d{1,3}(?:\.\d{1,3}){3}\b/g, '[ip]')
+    .replace(/\b\d{9,}\b/g, '[id]');
+}
+
+function firstExistingDir(candidates: Array<string | undefined>): string | null {
+  for (const d of candidates) {
+    if (d && fs.existsSync(d)) return d;
+  }
+  return null;
+}
+
+function gitRepoDir(repo: string): string | null {
+  const candidates: Array<string | undefined> = [path.join(HOME, repo)];
+  if (repo === 'cto-aipa') candidates.push(process.cwd());
+  if (repo === 'aideazz') candidates.push(process.env.AIDEAZZ_REPO_PATH);
+  for (const d of candidates) {
+    if (d && fs.existsSync(path.join(d, '.git'))) return d;
+  }
+  return null;
 }
 
 /**
@@ -123,10 +162,10 @@ async function collectPm2(facts: EvidenceFact[], stack: string[]): Promise<void>
 async function collectGit(facts: EvidenceFact[]): Promise<void> {
   const repos = ['cto-aipa', 'aideazz', 'VibeJobHunterAIPA_AIMCF'];
   for (const repo of repos) {
-    const dir = path.join(HOME, repo);
-    if (!fs.existsSync(path.join(dir, '.git'))) continue;
+    const dir = gitRepoDir(repo);
+    if (!dir) continue;
     const log = await run(
-      `cd ${dir} && git log --since="48 hours ago" --no-merges --pretty=format:"%h|%ad|%s" --date=short | head -12`,
+      `cd ${JSON.stringify(dir)} && git log --since="48 hours ago" --no-merges --pretty=format:"%h|%ad|%s" --date=short | head -12`,
     );
     if (!log) continue;
     const lines = log.split('\n').filter(Boolean);
@@ -164,7 +203,8 @@ async function collectLogs(facts: EvidenceFact[], failures: string[]): Promise<v
       const interesting = tail
         .split('\n')
         .filter((l) => /\b(PASS|FAIL|ok|error|staged|sent|skipped|0 rows|rows|published|verdict|healthy)\b/i.test(l))
-        .slice(-3);
+        .slice(-3)
+        .map(scrubPublic);
       if (!interesting.length) continue;
       facts.push(
         fact(
@@ -216,7 +256,8 @@ async function collectHubSpot(facts: EvidenceFact[], failures: string[]): Promis
 /** Dependency manifests prove which technologies exist. Anything absent here cannot be claimed. */
 async function collectStack(stack: string[], failures: string[]): Promise<void> {
   try {
-    const pkg = JSON.parse(fs.readFileSync(path.join(HOME, 'cto-aipa', 'package.json'), 'utf8')) as {
+    const pkgDir = gitRepoDir('cto-aipa') || path.join(HOME, 'cto-aipa');
+    const pkg = JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8')) as {
       dependencies?: Record<string, string>;
     };
     stack.push(...Object.keys(pkg.dependencies || {}));
@@ -229,6 +270,91 @@ async function collectStack(stack: string[], failures: string[]): Promise<void> 
   } catch {
     /* python stack is optional */
   }
+}
+
+function parseFrontMatterLite(raw: string): Record<string, string> {
+  const m = raw.replace(/\r\n/g, '\n').match(/^---\n([\s\S]*?)\n---/);
+  if (!m) return {};
+  const meta: Record<string, string> = {};
+  let key: string | null = null;
+  for (const line of m[1]!.split('\n')) {
+    const hit = line.match(/^([a-z_]+):\s?(.*)$/);
+    if (hit) {
+      key = hit[1]!;
+      meta[key] = hit[2]!.trim();
+    } else if (key && line.trim()) {
+      meta[key] += ` ${line.trim()}`;
+    }
+  }
+  return meta;
+}
+
+/**
+ * Wiki incidents from the last 48h — the Claude/Cursor sessions that earned a
+ * write-up. Daily work is the article's actual source; without this collector
+ * the model only sees pm2 uptime and invents the rest.
+ */
+async function collectWikiIncidents(facts: EvidenceFact[], failures: string[]): Promise<void> {
+  const dir = firstExistingDir([
+    path.join(HOME, 'aideazz', 'content', 'ai-ops-wiki', 'incidents'),
+    process.env.AIDEAZZ_REPO_PATH
+      ? path.join(process.env.AIDEAZZ_REPO_PATH, 'content', 'ai-ops-wiki', 'incidents')
+      : undefined,
+  ]);
+  if (!dir) {
+    failures.push('aideazz wiki incidents not on disk');
+    return;
+  }
+  const cutoff = Date.now() - 48 * 3_600_000;
+  const files = fs.readdirSync(dir).filter((n) => n.endsWith('.md')).sort().reverse();
+  let kept = 0;
+  for (const f of files) {
+    if (kept >= 6) break;
+    const full = path.join(dir, f);
+    const st = fs.statSync(full);
+    const dateM = f.match(/^(\d{4}-\d{2}-\d{2})/);
+    const dateMs = dateM ? Date.parse(`${dateM[1]}T12:00:00Z`) : NaN;
+    const recent = st.mtimeMs >= cutoff || (Number.isFinite(dateMs) && dateMs >= cutoff);
+    if (!recent) continue;
+    const meta = parseFrontMatterLite(fs.readFileSync(full, 'utf8'));
+    const title = meta['title'] || f.replace(/\.md$/, '');
+    const bits = ['subtitle', 'symptom', 'root_cause', 'verified', 'rule']
+      .map((k) => meta[k])
+      .filter(Boolean)
+      .join(' — ')
+      .slice(0, 400);
+    facts.push(
+      fact(
+        `wiki.${f}`,
+        `Wiki incident: ${title}`,
+        bits || title,
+        `aideazz content/ai-ops-wiki/incidents/${f}`,
+      ),
+    );
+    kept += 1;
+  }
+}
+
+/**
+ * Operator queue from NOW.md when the file exists on the box. Scrubbed: this
+ * can mention money-queue work, but public pages never get identifiers.
+ */
+async function collectNowMd(facts: EvidenceFact[]): Promise<void> {
+  const file = firstExistingDir([
+    path.join(process.cwd(), 'docs', 'oracle', 'NOW.md'),
+    path.join(HOME, 'cto-aipa', 'docs', 'oracle', 'NOW.md'),
+  ]);
+  if (!file) return;
+  const raw = scrubPublic(fs.readFileSync(file, 'utf8'));
+  const lines = raw
+    .split('\n')
+    .map((l) => l.replace(/^#+\s*/, '').trim())
+    .filter((l) => l.length > 24 && !l.startsWith('<!--') && !l.startsWith('---'))
+    .slice(0, 8);
+  if (!lines.length) return;
+  facts.push(
+    fact('now.md', 'Current operator queue (NOW.md)', lines.join(' ⏎ ').slice(0, 500), file),
+  );
 }
 
 /**
@@ -245,6 +371,8 @@ export async function collectProductionEvidence(): Promise<EvidenceBundle> {
     ['git', () => collectGit(facts)],
     ['logs', () => collectLogs(facts, failures)],
     ['hubspot', () => collectHubSpot(facts, failures)],
+    ['wiki', () => collectWikiIncidents(facts, failures)],
+    ['now', () => collectNowMd(facts)],
     ['stack', () => collectStack(stack, failures)],
   ];
   for (const [name, fn] of collectors) {
@@ -263,6 +391,23 @@ export async function collectProductionEvidence(): Promise<EvidenceBundle> {
   };
 }
 
+/** Numbers the article may copy, excluding rhetorical 1–10 and years. */
+export function licensedNumberList(bundle: EvidenceBundle): string[] {
+  const licensed = new Set<string>();
+  for (const f of bundle.facts) for (const n of f.numbers) licensed.add(n.replace(/,/g, ''));
+  return [...licensed]
+    .filter((n) => !isFreeNumber(n))
+    .sort((a, b) => Number(a) - Number(b) || a.localeCompare(b));
+}
+
+export function renderLicensedNumbersForPrompt(bundle: EvidenceBundle): string {
+  const nums = licensedNumberList(bundle);
+  if (!nums.length) {
+    return 'LICENSED NUMBERS: none besides 1–10 and calendar years. If a point needs any other figure, omit the point.';
+  }
+  return `LICENSED NUMBERS — copy these exactly, or omit the point. Nothing else except 1–10 and years: ${nums.join(', ')}`;
+}
+
 /** The bundle as the model sees it. This is the ONLY material it may draw on. */
 export function renderEvidenceForPrompt(b: EvidenceBundle): string {
   const lines = b.facts.map((f) => `- ${f.label}: ${f.value}\n    (measured by: ${f.source})`);
@@ -272,7 +417,24 @@ export function renderEvidenceForPrompt(b: EvidenceBundle): string {
     ...lines,
     '',
     `TECHNOLOGIES PROVEN PRESENT: ${b.stack.slice(0, 60).join(', ')}`,
+    '',
+    renderLicensedNumbersForPrompt(b),
   ].join('\n');
+}
+
+/**
+ * Topic briefs still ask for figures like "BrightData $40/run" and "76% of
+ * inference". Those are not measurements. Before a brief is allowed near the
+ * model, every digit is replaced so the draft cannot copy them and then fail
+ * the gate — which is how 26 Aug 2026 skipped the day.
+ */
+export function stripUnverifiedNumbers(text: string): string {
+  return text
+    .replace(/\$?\d[\d,.]*\s*(?:%|k|\/run|\/month|\/mo)?/gi, ' a measured figure ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+,/g, ',')
+    .replace(/\s+\./g, '.')
+    .trim();
 }
 
 /**
@@ -311,7 +473,10 @@ export function verifyArticleAgainstEvidence(
   for (const f of bundle.facts) for (const n of f.numbers) licensed.add(n.replace(/,/g, ''));
 
   // Strip fenced code — sample code legitimately contains arbitrary literals.
-  const prose = markdown.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`]*`/g, ' ');
+  // Then strip hashes, timestamps and URLs so they cannot look like claims.
+  const prose = stripStructuralNumericTokens(
+    markdown.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`]*`/g, ' '),
+  );
 
   /**
    * Rounding is honest; invention is not. "roughly 55,000 restarts" for a
@@ -346,4 +511,114 @@ export function verifyArticleAgainstEvidence(
   }
 
   return { ok: true };
+}
+
+/**
+ * Keep the day. If the model used one unsourced figure, drop the paragraphs
+ * that contain it rather than throwing the whole article away. Cadence is the
+ * product; invention is not.
+ */
+export function salvageArticleAgainstEvidence(
+  markdown: string,
+  bundle: EvidenceBundle,
+): { ok: true; markdown: string } | { ok: false; reason: string; markdown: string } {
+  const paragraphs = markdown.split(/\n{2,}/);
+  const kept: string[] = [];
+  for (const p of paragraphs) {
+    const check = verifyArticleAgainstEvidence(p, bundle);
+    if (check.ok) {
+      kept.push(p);
+      continue;
+    }
+    const trimmed = p.trim();
+    if (/^#{2,3}\s/.test(trimmed) && !/\d/.test(trimmed)) kept.push(p);
+  }
+  const next = kept.join('\n\n').trim();
+  if (!next) {
+    return { ok: false, reason: 'salvage removed every paragraph', markdown: '' };
+  }
+  const v = verifyArticleAgainstEvidence(next, bundle);
+  if (v.ok) return { ok: true, markdown: next };
+  return { ok: false, reason: v.reason, markdown: next };
+}
+
+function pickDistinctiveFact(bundle: EvidenceBundle): EvidenceFact | null {
+  const git = bundle.facts.find((f) => f.key.startsWith('git.') && !f.key.endsWith('.count'));
+  if (git) return git;
+  const wiki = bundle.facts.find((f) => f.key.startsWith('wiki.'));
+  if (wiki) return wiki;
+  return bundle.facts[0] ?? null;
+}
+
+/**
+ * Deterministic last resort: an article assembled only from measured facts.
+ * No model, so nothing to hallucinate. Used when four generation attempts
+ * still invent numbers — silence is the wrong outcome if the day produced
+ * evidence.
+ */
+export function composeEvidenceFallbackArticle(
+  bundle: EvidenceBundle,
+  opts?: { keyword?: string },
+): { title: string; markdown: string } {
+  const distinctive = pickDistinctiveFact(bundle);
+  const date = bundle.collectedAt.slice(0, 10);
+  const titleCore = distinctive
+    ? distinctive.label.replace(/^Commit in /, 'Commit: ').slice(0, 80)
+    : 'Production measurements';
+  const title = `${titleCore} — ${date}`;
+
+  const factLines = bundle.facts
+    .slice(0, 18)
+    .map((f) => `- **${f.label}:** ${f.value} _(measured by ${f.source})_`);
+  const stack = bundle.stack.slice(0, 24).join(', ') || 'none recorded in the manifests this run';
+  const failures = bundle.failures.length
+    ? bundle.failures.map((x) => `- ${x}`).join('\n')
+    : '- No collector reported a failure this run.';
+  const keywordLine = opts?.keyword
+    ? `Search angle for this note: ${stripUnverifiedNumbers(opts.keyword)}.`
+    : 'This note has no rotation keyword — the angle is the measurements themselves.';
+
+  const q1 = bundle.facts[0];
+  const q2 = bundle.facts.find((f) => f.key.startsWith('git.')) || bundle.facts[1] || q1;
+  const q3 = bundle.facts.find((f) => f.key.startsWith('hs.') || f.key.startsWith('pm2.')) || bundle.facts[2] || q1;
+
+  const markdown = `The daily article is supposed to ship from measurements taken the same day, not from a topic brief that still asks for figures nobody measured. When a draft copies an unsourced number, the grounded path does not invent a replacement and it does not go silent either: it publishes the measurements.
+
+${keywordLine}
+
+## What the running system reported
+
+These are the facts collected before a single sentence was drafted. Each line names the command or file that produced it.
+
+${factLines.join('\n')}
+
+## What I am willing to claim
+
+I will claim only what is on that list. A percentage, a monthly cost, a duplicate-deal count, or a BrightData unit-price that is not on the list is not in this article. One failure mode was pages describing a database this fleet does not run. The other was the opposite: the gate correctly refused an unsourced figure copied from a topic brief, and then treated silence as the product.
+
+Silence is the right answer when there is nothing to measure. It is the wrong answer when the day produced git, process, and outcome lines and the model could not stop decorating them. Claude and Cursor sessions are the source when they show up as commits, wiki incidents, or the operator queue. A rotating brief is an SEO hint, not a fact.
+
+## What I am not claiming
+
+${failures}
+
+Proven stack names this run: ${stack}.
+
+Anything not named there is out of scope. If a reader wants a cost matrix or a queue this fleet does not run, they will not find it here, because it was not measured here.
+
+## Frequently Asked Questions
+
+**Q: Why publish a measured-notes article instead of skipping the day?**
+A: ${q1 ? `${q1.label} was ${q1.value}.` : 'The day produced verified facts.'} Skipping would have told operators the blog was down. Publishing the measurements keeps the cadence and keeps every figure traceable.
+
+**Q: Where did today's git or session work go?**
+A: ${q2 ? `${q2.label}: ${q2.value}.` : 'Git was silent this window, so it is not claimed.'} Claude and Cursor sessions become evidence when they land as commits, wiki incidents, or the operator queue — not when a brief asks for them.
+
+**Q: What number is allowed in this article?**
+A: ${q3 ? `${q3.label} measured ${q3.value}.` : 'Only figures that appear in the evidence bundle.'} Plus counts of ten or under, and calendar years. Everything else is omitted.
+
+— Elena Revicheva · [AIdeazz](https://aideazz.xyz) · [Portfolio](https://aideazz.xyz/portfolio)
+`;
+
+  return { title, markdown };
 }
