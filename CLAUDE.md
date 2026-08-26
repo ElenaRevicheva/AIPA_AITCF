@@ -20,13 +20,28 @@ used to 404 returns 200, `geo-manifest.json` reads `2026-08-24`, and the 23rd an
 was behind the remote, and it recovered on its own.
 (Superseded handoff: `docs/oracle/HANDOFF_2026-08-21_TELEGRAM_BLOG_PIN.md`.)
 
-### ⚠️ Oracle holds live code that is on NO branch of `main`
+### ✅ The outreach email sender is whole on `main` (fixed 25 Aug)
 
-Oracle's `dist/go-wa.js` has the MIME-attach sender (20 `attachment` refs,
-md5 `e469dacf…`). Building `main` produces a version with **zero** — so a normal
-full `dist/` sync from `main` silently destroys the email-attachment feature.
-**Deploy named files only. Never rsync the whole `dist/`, never deploy cto-aipa
-wholesale from `main`.**
+Both halves of the one-click outreach email now live on `main` and are live on
+Oracle:
+
+- **Cc** — `d9b2f30` (carry a Cc) + `d9270e6` (record it in HubSpot, stop the
+  timeline gluing the link). Was already on `main`.
+- **PDF attachments** — MIME attach via Resend, built by the Cursor agent. This
+  existed **only** on `cursor/intelliops-bd-money-play-abc0` and as an
+  uncommitted file on Oracle's disk, so building `main` produced a sender with
+  **zero** attachment support and any full `dist/` sync would have silently
+  destroyed it. `src/go-wa.ts` from that branch is now on `main`.
+
+**Verified:** building `main` and normalising CRLF→LF reproduces Oracle's live
+`dist/go-wa.js` exactly — md5 `e469dacf07a165a5df8931fde1dead26`. Attachments
+are constrained to `docs/selling/attachments/`, `.pdf` only, ≤5 MB, `%PDF-`
+magic-byte checked, and the payload is **refused** if a listed file fails to
+load — so an email never claims a resume it did not attach.
+
+Still deploy **named files only** as a habit: Oracle's checkout sits at
+`d9270e6` with a dirty `src/go-wa.ts` (same content, now also on `main`), and
+other agents may hold work on that box that git has never seen.
 
 ### Duplicate blog content — source fixed 25 Aug, cleanup still open
 
