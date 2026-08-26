@@ -671,6 +671,64 @@ function findNearDuplicate(
   }
 }
 
+/** Titles of the most recently published posts, newest first: the "do not repeat" list. */
+function recentPublishedTitles(limit = 40): string[] {
+  try {
+    const cacheFile = getBlogPostCachePath();
+    if (!fs.existsSync(cacheFile)) return [];
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<
+      string,
+      { title?: string; publishedAt?: string } | undefined
+    >;
+    return Object.entries(cache)
+      .map(([slug, v]) => ({ title: (v?.title || slug).trim(), at: v?.publishedAt ?? "" }))
+      .sort((a, b) => b.at.localeCompare(a.at))
+      .map((x) => x.title)
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Derive a fresh angle from the evidence collected today.
+ *
+ * Twenty fixed briefs are a finite supply and daily publishing exhausts them.
+ * Once spent, the rotation can only hand back something already written, which
+ * is how the corpus filled with near-copies. The work itself is not finite:
+ * commits, incidents and outcome lines differ every day. So when the rotation
+ * runs dry, take the angle from measured evidence rather than repeat a brief.
+ * This is what keeps the blog daily instead of silent.
+ */
+async function deriveAngleFromEvidence(
+  anthropic: Anthropic,
+  evidence: EvidenceBundle,
+  avoidTitles: string[],
+): Promise<{ keyword: string; brief: string } | null> {
+  try {
+    const facts = evidence.facts.slice(0, 40).map((f) => "- " + f.label + ": " + f.value).join("\n");
+    const avoid = avoidTitles.slice(0, 30).map((t) => "- " + t).join("\n");
+    const raw = await claudeWithGroqFallback(
+      anthropic,
+      "claude-haiku-4-5-20251001",
+      300,
+      null,
+      "These facts were measured from a production system today:\n" + facts +
+        "\n\nThese articles already exist and must NOT be re-told in any form:\n" + avoid +
+        "\n\nPropose ONE article angle grounded strictly in the facts above and clearly distinct from every existing title - a different system, a different failure, or a different measured outcome. Reply in exactly two lines:\nKEYWORD: <short search phrase>\nBRIEF: <one sentence naming the specific angle>",
+      "daily-blog/angle-from-evidence",
+    );
+    const kw = raw.match(/KEYWORD:\s*(.+)/i)?.[1]?.trim();
+    const br = raw.match(/BRIEF:\s*(.+)/i)?.[1]?.trim();
+    if (!kw || !br) return null;
+    console.log("[daily-blog] Angle derived from evidence: " + kw);
+    return { keyword: kw, brief: br };
+  } catch (e) {
+    console.warn("[daily-blog] Evidence-angle derivation failed, using rotation:", e);
+    return null;
+  }
+}
+
 /** Returns set of topic indices already present in the cache (by keyword match on slug). */
 function getPublishedTopicIndices(): Set<number> {
   const excluded = new Set<number>();
@@ -679,10 +737,22 @@ function getPublishedTopicIndices(): Set<number> {
     if (!fs.existsSync(cacheFile)) return excluded;
     const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<string, unknown>;
     const publishedSlugs = Object.keys(cache);
+    // Substring matching decided this before, and it almost never fired: a brief
+    // keyword rarely appears verbatim inside a generated slug, so spent topics
+    // kept being offered back to the picker. Score overlap the same way the
+    // duplicate guard does, against slug and title together.
+    const publishedTokenSets = publishedSlugs.map((slug) => {
+      const entry = cache[slug] as { title?: string } | undefined;
+      return dupTokens(slug + " " + (entry?.title ?? ""));
+    });
     DAILY_BLOG_TOPIC_BRIEFS.forEach((t, i) => {
-      const kSlug = t.keyword.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      if (publishedSlugs.some(s => s.includes(kSlug) || kSlug.includes(s.slice(0, 20)))) {
-        excluded.add(i);
+      const kw = dupTokens(t.keyword);
+      if (!kw.size) return;
+      for (const pub of publishedTokenSets) {
+        let shared = 0;
+        for (const tok of kw) if (pub.has(tok)) shared++;
+        if (shared < DUP_MIN_SHARED_TOKENS) continue;
+        if (Math.round((shared / kw.size) * 100) >= DUP_OVERLAP_THRESHOLD) { excluded.add(i); return; }
       }
     });
   } catch { /* ignore */ }
@@ -1043,7 +1113,9 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
   if (publishedIndices.size > 0) {
     console.log(`📰 Skipping ${publishedIndices.size} already-published topic(s): [${[...publishedIndices].join(', ')}]`);
   }
-  const { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries, publishedIndices);
+  const recentTitles = recentPublishedTitles();
+  // eslint-disable-next-line prefer-const
+  let { index, keyword, brief } = await pickTopicWithGscGap(deps.anthropic, gscQueries, publishedIndices);
 
   /**
    * GROUNDED MODE (23 Aug 2026) — measure first, then write, then verify.
@@ -1071,6 +1143,20 @@ export async function runDailyDevToPost(deps: { anthropic: Anthropic; model: str
       await notifyTelegramSkipped("Not enough production evidence", why);
       throw new Error(`SKIPPED_BY_COOLDOWN: insufficient evidence (${why})`);
     }
+    // The rotation is finite; the work is not. If the brief we were handed is
+    // already written up, or the rotation has almost nothing left, take the
+    // angle from what the system actually did today instead of repeating one.
+    const rotationSpent =
+      publishedIndices.has(index) || publishedIndices.size >= DAILY_BLOG_TOPIC_BRIEFS.length - 2;
+    if (rotationSpent) {
+      const derived = await deriveAngleFromEvidence(deps.anthropic, evidence, recentTitles);
+      if (derived) {
+        keyword = derived.keyword;
+        brief = derived.brief;
+        index = -1;
+      }
+    }
+
     baseUserPrompt = `Target SEO keyword (natural use, not stuffing): "${keyword}"
 
 Angle to explore: ${brief}
@@ -1102,16 +1188,33 @@ ${brief}
 Write the article for developers and technical founders. Ground in AIdeazz reality: multi-agent systems, Oracle infra, Groq/Claude routing, Telegram/WhatsApp agents, real constraints.`;
   }
 
+  // Prevention beats rejection: naming the existing corpus up front is cheaper
+  // than generating a duplicate and throwing the day away.
+  if (recentTitles.length) {
+    baseUserPrompt +=
+      "\n\nALREADY PUBLISHED - do not write another article on any of these, and do not reuse their framing or title vocabulary:\n" +
+      recentTitles.slice(0, 30).map((t) => "- " + t).join("\n");
+  }
+
   console.log(`📰 Dev.to direct: generating topic #${index} (${keyword})… [${grounded ? 'grounded' : 'UNGROUNDED'}]`);
 
-  const MAX_GENERATION_ATTEMPTS = 3;
+  const MAX_GENERATION_ATTEMPTS = 4;
+  /** Reason string if this title would cannibalise an existing post, else null. */
+  const duplicateReason = (title: string): string | null => {
+    const d = findNearDuplicate(title, titleToSlug(title));
+    return d ? `near-duplicate of "${d.slug}" (${d.overlapPct}% overlap)` : null;
+  };
   let parsed: ReturnType<typeof parseArticle> | null = null;
   let lastValidationError = "";
 
   for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
-    const forbiddenNote = lastValidationError
-      ? `\n\nCRITICAL: The previous attempt failed quality gate — ${lastValidationError}. Do NOT use that phrase anywhere in the article.`
-      : "";
+    const forbiddenNote = !lastValidationError
+      ? ""
+      : lastValidationError.startsWith("near-duplicate")
+        ? "\n\nCRITICAL: The previous attempt was a " + lastValidationError +
+          ". That subject is already covered. Pick a DIFFERENT angle from the evidence - a different system, a different failure, or a different measured outcome - and give it a title that shares little vocabulary with the existing one."
+        : "\n\nCRITICAL: The previous attempt failed quality gate - " + lastValidationError +
+          ". Do NOT use that phrase anywhere in the article.";
     const userPrompt = baseUserPrompt + forbiddenNote;
 
     if (attempt > 1) {
@@ -1136,9 +1239,32 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
       // Grounding gate. The style gate above asks "is this well written?"; this
       // one asks "is every claim traceable?" — the question that would have
       // stopped eleven articles describing a database this system never ran.
-      if (!evidence) break;
+      // Duplicate gate. Retry with a different angle rather than ending the day:
+      // the blog is meant to publish daily, so exhausting every attempt is the
+      // only acceptable reason to stay silent.
+      const dupHit = (): boolean => {
+        const dr = duplicateReason(parsed!.title);
+        if (!dr) return false;
+        lastValidationError = dr;
+        console.warn("[daily-blog] Duplicate gate rejected attempt " + attempt + ": " + dr);
+        return true;
+      };
+      const bailIfLast = async (): Promise<void> => {
+        if (attempt !== MAX_GENERATION_ATTEMPTS) return;
+        await notifyTelegramSkipped("Near-duplicate after every attempt", lastValidationError);
+        throw new Error("SKIPPED_BY_COOLDOWN: " + lastValidationError);
+      };
+      if (!evidence) {
+        if (!dupHit()) break;
+        await bailIfLast();
+        continue;
+      }
       const g = verifyArticleAgainstEvidence(parsed.markdown, evidence);
-      if (g.ok) break;
+      if (g.ok) {
+        if (!dupHit()) break;
+        await bailIfLast();
+        continue;
+      }
       lastValidationError = `ungrounded — ${g.reason}`;
       console.warn(`📰 Grounding gate rejected attempt ${attempt}: ${g.reason}`);
       if (attempt === MAX_GENERATION_ATTEMPTS) {
@@ -1181,7 +1307,7 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
     throw new Error("Dev.to publishing failed — check DEVTO_API_KEY and rate limits");
   }
 
-  writeTopicIndex(index);
+  if (index >= 0) writeTopicIndex(index);
   saveBlogPostCache({ slug, title: finalTitle, markdown: parsed.markdown, devtoUrl, aideazzBlogUrl });
 
   // Canonical GEO page first, then sitemap, then Telegram. Fire-and-forget bulk

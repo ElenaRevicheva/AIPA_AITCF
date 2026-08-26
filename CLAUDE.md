@@ -35,10 +35,24 @@ near-copies**, in 19 cannibalising clusters, back to 18 May. The old guard teste
 *exact* slug equality, so reworded titles sailed through, and when it did fire it
 appended a date and published anyway — a green log every time.
 
-Fixed at the source: the publisher now scores **token overlap** against every
-published post and **refuses** (`SKIPPED_BY_COOLDOWN: near-duplicate`) instead of
-disambiguating. Oracle's dedup cache was backfilled **64 → 123** entries; it could
-previously only see half of what was live.
+Fixed at the source, in two halves. **Detection:** the publisher scores **token
+overlap** against every published post instead of testing slug equality, and the
+dedup cache was backfilled **64 → 123** entries (it could previously see only
+half of what was live). **Supply:** refusing alone would have bought quality with
+silence, and *the blog must still post every day*. So the 20-brief rotation is no
+longer the only source — spent briefs are now correctly excluded (11 of 20 are
+spent; the old substring test excluded almost none), the last 30 titles are named
+in the prompt as off-limits, and when the rotation is spent the angle is
+**derived from that day's measured evidence** — commits, incidents, outcome
+lines — which never runs out. A duplicate is a *retryable* gate (4 attempts,
+each told to pick a different angle); only if all four collide does the day skip.
+
+**Wiki-worthy sessions still publish to the blog the same day**, even if the
+daily post already ran. `wiki-ship.cjs` (21:30 UTC) runs after the daily job
+(19:30 UTC) and publishes any incident marked `blog: yes` via
+`incident-to-blog.cjs`, which does **not** go through the daily guarded path —
+so the duplicate guard cannot block it. Two posts in one day is correct
+behaviour, not a bug.
 
 **Still open:** ~50 already-published duplicates need canonical consolidation.
 **Canonical only — do not delete.** 21 published pages contain the fabricated
