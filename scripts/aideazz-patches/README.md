@@ -77,3 +77,10 @@ portfolio card back scrolled to a form on the hidden front face and landed on em
 particles. Punch CTA now uses the same `goToForm` handler as the service cards
 (flip, then scroll). Copy and layout unchanged.
 
+`0009-pitch-august-2026-tech.patch` — actualize `public/pitch.html` to August 2026
+without a HUD/VC rewrite. Date, CMO (gates + wiki + concierge + outreach; drop
+Hashnode / "no human in the loop"), slide 09 (what shipped since May), traction
+(12 wiki chapters), founder Aug row, portfolio-first CTAs. ES toggle now matches
+9+blueprint. `pitch-es.html` is a redirect to `/pitch.html?lang=es` (the old
+page was a 2025 $100K pre-seed deck). No `[skip ci]`.
+

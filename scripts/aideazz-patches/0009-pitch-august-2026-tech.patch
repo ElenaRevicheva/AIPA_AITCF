@@ -1,0 +1,1509 @@
+From 62b884721204b947409e7ff4782653a0e03f2828 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Wed, 26 Aug 2026 23:22:47 +0000
+Subject: [PATCH] =?UTF-8?q?docs(pitch):=20actualize=20August=202026=20tech?=
+ =?UTF-8?q?=20=E2=80=94=20gates,=20wiki,=20outreach,=20concierge?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Keep the May design and the honest hire-first ask. Replace the Bright Data
+hero with what shipped after: grounding gate, AI Ops Wiki (12 chapters),
+Cc+PDF outreach that refuses a missing file, inbound concierge, duplicate
+guard. Portfolio is the primary CTA. Spanish EN/ES drift (10 vs 9) is
+fixed in-deck; pitch-es.html redirects to the same file.
+---
+ public/pitch-es.html | 1117 +-----------------------------------------
+ public/pitch.html    |  175 +++----
+ 2 files changed, 98 insertions(+), 1194 deletions(-)
+
+diff --git a/public/pitch-es.html b/public/pitch-es.html
+index 7a7754a..7eb175c 100644
+--- a/public/pitch-es.html
++++ b/public/pitch-es.html
+@@ -1,1118 +1,19 @@
+ <!DOCTYPE html>
+ <html lang="es">
+ <head>
+-    <!-- Google tag (gtag.js) -->
+-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TL5S8V23LT"></script>
+-    <script>
+-      window.dataLayer = window.dataLayer || [];
+-      function gtag(){dataLayer.push(arguments);}
+-      gtag('js', new Date());
+-
+-      gtag('config', 'G-TL5S8V23LT');
+-    </script>
+-    <!-- Ahrefs Web Analytics — separates LLM referrals into their own channel -->
+-    <script src="https://analytics.ahrefs.com/analytics.js" data-key="06Z2AphR1Lvzb5NSr2agUg" async></script>
+     <meta charset="UTF-8">
+-    <meta viewport="width=device-width, initial-scale=1.0">
+-    <title>AIdeazz - Asistentes Personales de IA Emocionalmente Inteligentes</title>
+-    <style>
+-        * {
+-            margin: 0;
+-            padding: 0;
+-            box-sizing: border-box;
+-        }
+-
+-        :root {
+-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+-            --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+-            --dark-bg: #0f0f23;
+-            --card-bg: rgba(255, 255, 255, 0.05);
+-            --light-text: #ffffff;
+-            --muted-text: #a0a0b8;
+-            --glow-color: #667eea;
+-            --accent-color: #f093fb;
+-            --link-color: #64ffda;
+-        }
+-
+-        body {
+-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+-            background-color: var(--dark-bg);
+-            color: var(--light-text);
+-            overflow: hidden;
+-            position: relative;
+-        }
+-
+-        /* Background effects */
+-        .bg-animation {
+-            position: fixed;
+-            width: 100%;
+-            height: 100%;
+-            top: 0;
+-            left: 0;
+-            z-index: -2;
+-            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+-                        radial-gradient(circle at 80% 80%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+-        }
+-
+-        .orb {
+-            position: fixed;
+-            border-radius: 50%;
+-            filter: blur(80px);
+-            opacity: 0.3;
+-            animation: float 20s infinite ease-in-out;
+-            z-index: -1;
+-        }
+-
+-        .orb1 {
+-            width: 500px;
+-            height: 500px;
+-            background: var(--glow-color);
+-            top: -200px;
+-            left: -200px;
+-            animation-duration: 25s;
+-        }
+-
+-        .orb2 {
+-            width: 400px;
+-            height: 400px;
+-            background: var(--accent-color);
+-            bottom: -200px;
+-            right: -200px;
+-            animation-duration: 30s;
+-        }
+-
+-        @keyframes float {
+-            0%, 100% { transform: translate(0, 0) scale(1); }
+-            33% { transform: translate(30px, -30px) scale(1.1); }
+-            66% { transform: translate(-20px, 20px) scale(0.9); }
+-        }
+-
+-        /* Presentation container */
+-        .presentation {
+-            width: 100%;
+-            height: 100vh;
+-            display: flex;
+-            align-items: center;
+-            justify-content: center;
+-            position: relative;
+-        }
+-
+-        /* Slides */
+-        .slide {
+-            width: 90%;
+-            max-width: 1200px;
+-            height: 85vh;
+-            position: absolute;
+-            display: none;
+-            animation: slideIn 0.6s ease-out;
+-            padding: 60px;
+-            background: var(--card-bg);
+-            backdrop-filter: blur(20px);
+-            border: 1px solid rgba(255, 255, 255, 0.1);
+-            border-radius: 30px;
+-            overflow-y: auto;
+-        }
+-
+-        .slide.active {
+-            display: flex;
+-            flex-direction: column;
+-            justify-content: center;
+-        }
+-
+-        /* Override centering for content-heavy slides */
+-        .slide.slide-top.active {
+-            justify-content: flex-start;
+-        }
+-
+-        @keyframes slideIn {
+-            from {
+-                opacity: 0;
+-                transform: translateX(50px);
+-            }
+-            to {
+-                opacity: 1;
+-                transform: translateX(0);
+-            }
+-        }
+-
+-        /* Navigation */
+-        .nav-dots {
+-            position: fixed;
+-            bottom: 30px;
+-            left: 50%;
+-            transform: translateX(-50%);
+-            display: flex;
+-            gap: 10px;
+-            z-index: 100;
+-        }
+-
+-        .nav-dot {
+-            width: 10px;
+-            height: 10px;
+-            border-radius: 50%;
+-            background: rgba(255, 255, 255, 0.3);
+-            cursor: pointer;
+-            transition: all 0.3s ease;
+-        }
+-
+-        .nav-dot.active {
+-            width: 30px;
+-            border-radius: 5px;
+-            background: var(--accent-color);
+-        }
+-
+-        .nav-arrows {
+-            position: fixed;
+-            top: 50%;
+-            transform: translateY(-50%);
+-            width: 100%;
+-            display: flex;
+-            justify-content: space-between;
+-            padding: 0 30px;
+-            z-index: 100;
+-        }
+-
+-        .nav-arrow {
+-            width: 50px;
+-            height: 50px;
+-            background: rgba(255, 255, 255, 0.1);
+-            border: 1px solid rgba(255, 255, 255, 0.2);
+-            border-radius: 50%;
+-            display: flex;
+-            align-items: center;
+-            justify-content: center;
+-            cursor: pointer;
+-            transition: all 0.3s ease;
+-            font-size: 20px;
+-        }
+-
+-        .nav-arrow:hover {
+-            background: rgba(255, 255, 255, 0.2);
+-            transform: scale(1.1);
+-        }
+-
+-        /* Typography */
+-        h1 {
+-            font-size: clamp(3rem, 6vw, 5rem);
+-            font-weight: 700;
+-            margin-bottom: 30px;
+-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+-            -webkit-background-clip: text;
+-            -webkit-text-fill-color: transparent;
+-            background-clip: text;
+-            line-height: 1.2;
+-        }
+-
+-        h2 {
+-            font-size: clamp(2rem, 4vw, 3.5rem);
+-            font-weight: 700;
+-            margin-bottom: 30px;
+-            background: var(--primary-gradient);
+-            -webkit-background-clip: text;
+-            -webkit-text-fill-color: transparent;
+-            background-clip: text;
+-        }
+-
+-        h3 {
+-            font-size: 1.8rem;
+-            font-weight: 600;
+-            margin-bottom: 20px;
+-            color: var(--accent-color);
+-        }
+-
+-        p {
+-            font-size: 1.2rem;
+-            line-height: 1.8;
+-            color: var(--muted-text);
+-            margin-bottom: 20px;
+-        }
+-
+-        .subtitle {
+-            font-size: 1.5rem;
+-            color: var(--muted-text);
+-            margin-bottom: 40px;
+-        }
+-
+-        /* Links */
+-        a {
+-            color: var(--link-color);
+-            text-decoration: none;
+-            transition: all 0.3s ease;
+-            border-bottom: 1px solid transparent;
+-        }
+-
+-        a:hover {
+-            border-bottom-color: var(--link-color);
+-            transform: translateY(-1px);
+-        }
+-
+-        .link-button {
+-            display: inline-block;
+-            padding: 12px 24px;
+-            background: linear-gradient(135deg, rgba(100, 255, 218, 0.2), rgba(102, 126, 234, 0.2));
+-            border: 1px solid var(--link-color);
+-            border-radius: 8px;
+-            margin: 5px;
+-            transition: all 0.3s ease;
+-        }
+-
+-        .link-button:hover {
+-            background: linear-gradient(135deg, rgba(100, 255, 218, 0.3), rgba(102, 126, 234, 0.3));
+-            transform: translateY(-2px);
+-            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+-        }
+-
+-        /* Title slide specific */
+-        .title-slide {
+-            text-align: center;
+-        }
+-
+-        .founder-info {
+-            margin-top: 40px;
+-            font-size: 1.2rem;
+-        }
+-
+-        /* Content layouts */
+-        .problem-grid, .solution-grid, .feature-grid {
+-            display: grid;
+-            gap: 25px;
+-            margin-top: 40px;
+-        }
+-
+-        .problem-item, .solution-item, .feature-item {
+-            background: rgba(255, 255, 255, 0.03);
+-            padding: 25px;
+-            border-radius: 15px;
+-            border: 1px solid rgba(255, 255, 255, 0.1);
+-            transition: all 0.3s ease;
+-        }
+-
+-        .problem-item:hover, .solution-item:hover, .feature-item:hover {
+-            transform: translateY(-5px);
+-            border-color: rgba(102, 126, 234, 0.3);
+-            background: rgba(255, 255, 255, 0.05);
+-        }
+-
+-        .icon-large {
+-            font-size: 2.5rem;
+-            margin-bottom: 15px;
+-            display: inline-block;
+-        }
+-
+-        /* Framework diagram */
+-        .framework-container {
+-            display: grid;
+-            grid-template-columns: repeat(2, 1fr);
+-            gap: 20px;
+-            margin-top: 40px;
+-        }
+-
+-        .framework-item {
+-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.1));
+-            padding: 30px;
+-            border-radius: 20px;
+-            border: 1px solid rgba(255, 255, 255, 0.2);
+-            transition: all 0.3s ease;
+-        }
+-
+-        .framework-item:hover {
+-            transform: scale(1.05);
+-            border-color: var(--accent-color);
+-        }
+-
+-        /* Market stats */
+-        .stats-grid {
+-            display: grid;
+-            grid-template-columns: repeat(3, 1fr);
+-            gap: 30px;
+-            margin-top: 40px;
+-        }
+-
+-        .stat-card {
+-            text-align: center;
+-            background: var(--card-bg);
+-            padding: 30px;
+-            border-radius: 20px;
+-            border: 1px solid rgba(255, 255, 255, 0.1);
+-        }
+-
+-        .stat-number {
+-            font-size: 3rem;
+-            font-weight: 700;
+-            background: var(--accent-gradient);
+-            -webkit-background-clip: text;
+-            -webkit-text-fill-color: transparent;
+-            background-clip: text;
+-        }
+-
+-        .stat-label {
+-            color: var(--muted-text);
+-            margin-top: 10px;
+-        }
+-
+-        /* Business model */
+-        .business-model-grid {
+-            display: grid;
+-            grid-template-columns: repeat(3, 1fr);
+-            gap: 30px;
+-            margin-top: 40px;
+-        }
+-
+-        /* CTA */
+-        .cta-section {
+-            text-align: center;
+-            margin-top: 40px;
+-        }
+-
+-        .cta-button {
+-            display: inline-block;
+-            padding: 20px 50px;
+-            background: var(--primary-gradient);
+-            color: white;
+-            text-decoration: none;
+-            border-radius: 50px;
+-            font-size: 1.2rem;
+-            font-weight: 600;
+-            transition: all 0.3s ease;
+-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+-            border: none;
+-        }
+-
+-        .cta-button:hover {
+-            transform: translateY(-3px);
+-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+-            border-bottom: none;
+-        }
+-
+-        /* Links grid */
+-        .links-grid {
+-            display: grid;
+-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+-            gap: 20px;
+-            margin-top: 30px;
+-        }
+-
+-        .link-section {
+-            background: rgba(255, 255, 255, 0.03);
+-            padding: 20px;
+-            border-radius: 15px;
+-            border: 1px solid rgba(255, 255, 255, 0.1);
+-        }
+-
+-        .link-section h4 {
+-            color: var(--accent-color);
+-            margin-bottom: 15px;
+-            font-size: 1.2rem;
+-        }
+-
+-        /* Traction items */
+-        .traction-list {
+-            list-style: none;
+-            margin-top: 30px;
+-        }
+-
+-        .traction-list li {
+-            padding: 15px 0;
+-            font-size: 1.2rem;
+-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+-        }
+-
+-        /* Ask section */
+-        .ask-highlight {
+-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(240, 147, 251, 0.2));
+-            padding: 40px;
+-            border-radius: 20px;
+-            margin: 30px 0;
+-            text-align: center;
+-        }
+-
+-        .ask-amount {
+-            font-size: 3rem;
+-            font-weight: 700;
+-            background: var(--accent-gradient);
+-            -webkit-background-clip: text;
+-            -webkit-text-fill-color: transparent;
+-            background-clip: text;
+-        }
+-
+-        /* Responsive */
+-        @media (max-width: 768px) {
+-            .slide {
+-                padding: 30px;
+-            }
+-
+-            h1 {
+-                font-size: 2rem;
+-            }
+-
+-            h2 {
+-                font-size: 1.8rem;
+-            }
+-
+-            .stats-grid,
+-            .business-model-grid {
+-                grid-template-columns: 1fr;
+-            }
+-
+-            .framework-container {
+-                grid-template-columns: 1fr;
+-            }
+-
+-            .links-grid {
+-                grid-template-columns: 1fr;
+-            }
+-        }
+-
+-        /* Scrollbar styling */
+-        .slide::-webkit-scrollbar {
+-            width: 8px;
+-        }
+-
+-        .slide::-webkit-scrollbar-track {
+-            background: rgba(255, 255, 255, 0.05);
+-            border-radius: 4px;
+-        }
+-
+-        .slide::-webkit-scrollbar-thumb {
+-            background: rgba(255, 255, 255, 0.2);
+-            border-radius: 4px;
+-        }
+-
+-        .slide::-webkit-scrollbar-thumb:hover {
+-            background: rgba(255, 255, 255, 0.3);
+-        }
+-    </style>
++    <meta name="viewport" content="width=device-width, initial-scale=1.0">
++    <title>AIdeazz — Presentación (agosto 2026)</title>
++    <link rel="canonical" href="https://aideazz.xyz/pitch.html">
++    <meta http-equiv="refresh" content="0;url=/pitch.html?lang=es">
++    <meta name="robots" content="noindex, follow">
++    <link rel="icon" href="/favicon.ico?v=3" sizes="any">
+ </head>
+ <body>
+-    <div class="bg-animation"></div>
+-    <div class="orb orb1"></div>
+-    <div class="orb orb2"></div>
+-
+-    <div class="presentation">
+-        <!-- Diapositiva 1: Título -->
+-        <div class="slide active title-slide">
+-            <h1>AIdeazz</h1>
+-            <p class="subtitle">Asistentes Personales de IA Emocionalmente Inteligentes que Evolucionan Contigo</p>
+-            <p style="font-size: 1.1rem; color: var(--muted-text); margin-top: 20px;">
+-                <strong>Pre-Seed AI/EdTech</strong> | Con Base en Panamá | 6 Productos LIVE | Buscando $100K-500K
+-            </p>
+-            <div class="founder-info">
+-                <p>Elena Revicheva, Fundadora & CEO</p>
+-                <a href="https://aideazz.xyz" target="_blank" class="link-button">aideazz.xyz</a>
+-                <a href="https://lit.link/en/aideazz" target="_blank" class="link-button">Sobre Elena</a>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 2: Introducción -->
+-        <div class="slide slide-top">
+-            <h2>Introducción</h2>
+-            <p style="font-size: 1.4rem; line-height: 2;">
+-                AIdeazz es una <strong style="color: var(--accent-color);">startup pre-seed de AI/EdTech</strong> que construye Asistentes Personales de IA emocionalmente inteligentes (AIPAs) para familias expatriadas y estudiantes de idiomas en 19 países hispanohablantes. Fundada por Elena Revicheva, ingeniera de IA en solitario en Panamá (marzo 2025).
+-            </p>
+-            
+-            <div style="margin-top: 30px; background: rgba(102, 126, 234, 0.1); padding: 25px; border-radius: 15px; border: 1px solid rgba(102, 126, 234, 0.3);">
+-                <p style="font-size: 1.3rem; text-align: center; margin-bottom: 15px;"><strong>Ejecución Comprobada:</strong></p>
+-                <p style="font-size: 1.2rem; text-align: center;">
+-                    ✅ <strong>6 productos LIVE</strong> desplegados en <strong>7 meses</strong> (marzo-oct 2025)<br>
+-                    ✅ Construidos por <strong>&lt;$15K</strong> mediante "vibe coding" (desarrollo asistido por IA)<br>
+-                    ✅ <strong>98% de eficiencia de capital</strong> vs. equipos tradicionales
+-                </p>
+-            </div>
+-            
+-            <div style="margin-top: 30px; background: rgba(240, 147, 251, 0.1); padding: 25px; border-radius: 15px; border: 1px solid rgba(240, 147, 251, 0.3);">
+-                <p style="font-size: 1.3rem; text-align: center; margin-bottom: 15px;"><strong>Estado Actual:</strong></p>
+-                <p style="font-size: 1.2rem; text-align: center;">
+-                    📊 <strong>~10 usuarios activos</strong> (crecimiento orgánico, cero marketing)<br>
+-                    💳 <strong>Sistemas de pago listos</strong> (PayPal LIVE, crypto integrado)<br>
+-                    💰 <strong>Pre-ingresos</strong> | Buscando <strong>$100K-500K</strong> para activar monetización
+-                </p>
+-            </div>
+-            
+-            <div style="text-align: center; margin-top: 30px;">
+-                <a href="https://www.capcut.com/s/CXgM3XiNSKkniT0N/" target="_blank" class="link-button">📺 Ver Demo del Proyecto</a>
+-                <a href="https://www.capcut.com/s/CU4u6UjQIC9QydoB/" target="_blank" class="link-button">👩‍💼 Historia de Elena</a>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 3: El Problema -->
+-        <div class="slide slide-top">
+-            <h2>El Problema</h2>
+-            <p style="font-size: 1.3rem;">Por qué las soluciones de IA actuales fallan en conexión emocional:</p>
+-            <div class="problem-grid">
+-                <div class="problem-item">
+-                    <span class="icon-large">⚠️</span>
+-                    <p>La mayoría de los agentes de IA carecen de inteligencia emocional y memoria contextual</p>
+-                </div>
+-                <div class="problem-item">
+-                    <span class="icon-large">⚠️</span>
+-                    <p>Las familias expatriadas enfrentan estrés de adaptación sin herramientas empáticas</p>
+-                </div>
+-                <div class="problem-item">
+-                    <span class="icon-large">⚠️</span>
+-                    <p>Los usuarios no tienen propiedad ni voz en el comportamiento o evolución del agente</p>
+-                </div>
+-            </div>
+-            <p style="text-align: center; margin-top: 40px; font-size: 1.3rem;">
+-                Esto deja a millones sin IA que realmente comprenda y apoye sus necesidades emocionales.
+-            </p>
+-        </div>
+-
+-        <!-- Diapositiva 4: La Solución -->
+-        <div class="slide slide-top">
+-            <h2>La Solución — AIdeazz</h2>
+-            <h3 style="text-align: center;">IA Emocional Descentralizada + Propiedad Web3</h3>
+-            <div class="solution-grid">
+-                <div class="solution-item">
+-                    <span class="icon-large">🧠</span>
+-                    <p>Asistentes Personales de IA emocionalmente inteligentes (AIPAs) usando <strong>Vibe Coding</strong> 
+-                    <span style="color: #4ade80; font-weight: bold;">✅ LIVE</span></p>
+-                </div>
+-                <div class="solution-item">
+-                    <span class="icon-large">🎨</span>
+-                    <p>Identidad NFT vía ERC-721, actualizando a <strong>ERC-7857</strong> para agentes de IA 
+-                    <span style="color: #fbbf24; font-weight: bold;">🔮 Roadmap</span></p>
+-                </div>
+-                <div class="solution-item">
+-                    <span class="icon-large">🤝</span>
+-                    <p>Marco de ajuste emocional para crecimiento y adaptación de personalidad 
+-                    <span style="color: #4ade80; font-weight: bold;">✅ LIVE</span></p>
+-                </div>
+-                <div class="solution-item">
+-                    <span class="icon-large">🌐</span>
+-                    <p>Plataforma SocialFi para co-creación comunitaria y ciclos de retroalimentación 
+-                    <span style="color: #fbbf24; font-weight: bold;">🔮 Roadmap</span></p>
+-                </div>
+-            </div>
+-            <p style="text-align: center; margin-top: 40px; font-size: 1.3rem;">
+-                AIdeazz combina inteligencia emocional con propiedad descentralizada para crear compañeros de IA que crecen contigo.
+-            </p>
+-        </div>
+-
+-        <!-- Diapositiva 5: Marco Vibe Coding -->
+-        <div class="slide slide-top">
+-            <h2>Marco Vibe Coding</h2>
+-            <p style="font-size: 1.3rem;">La IA emocionalmente consciente necesita estructura — esta es la nuestra:</p>
+-            <div class="framework-container">
+-                <div class="framework-item">
+-                    <span class="icon-large">🎯</span>
+-                    <h3>Ajuste de Parámetros Afectivos</h3>
+-                    <p>Coeficientes de empatía, calidez de respuesta, modulación de tono</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">🧩</span>
+-                    <h3>Diseño de Memoria Contextual</h3>
+-                    <p>Retención de patrones de interacción emocional y contexto personal</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">🔁</span>
+-                    <h3>Matrices de Personalidad Adaptativa</h3>
+-                    <p>Rasgos de agente que evolucionan según comportamiento del usuario y ciclos de retroalimentación</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">📊</span>
+-                    <h3>Iteración Continua</h3>
+-                    <p>Cada interacción se alimenta en mejoras a nivel de sistema</p>
+-                </div>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 6: Agentes de IA en Vivo -->
+-        <div class="slide slide-top">
+-            <h2>🔥 Agentes de IA en Vivo</h2>
+-            <p style="font-size: 1.3rem;">AIPAs desplegados y funcionando con usuarios reales:</p>
+-            
+-            <div class="solution-grid">
+-                <div class="solution-item">
+-                    <span class="icon-large">🇪🇸</span>
+-                    <h3>EspaLuz AI Tutor</h3>
+-                    <p style="color: var(--accent-color); font-weight: bold;">~10 usuarios activos | Pre-ingresos</p>
+-                    <p style="margin-top: 10px;">Tutor bilingüe Español ↔ Inglés | Contexto familiar</p>
+-                    
+-                    <ul style="font-size: 0.9rem; text-align: left; margin: 15px 0 15px 20px; line-height: 1.8;">
+-                        <li><strong>Detección de 50+ emociones</strong> (choque cultural, ansiedad lingüística, nostalgia)</li>
+-                        <li><strong>Procesamiento de voz</strong> con latencia menor a 2 segundos</li>
+-                        <li><strong>Traducción OCR de imágenes</strong> (extraer texto de fotos)</li>
+-                        <li><strong>Multiplataforma</strong> (WhatsApp, Telegram, Web)</li>
+-                        <li><strong>Suscripciones PayPal</strong> integradas y funcionando</li>
+-                    </ul>
+-                    
+-                    <a href="https://wa.me/50766623757" target="_blank" class="link-button">💬 Probar en WhatsApp</a>
+-                    <a href="https://t.me/EspaLuzFamily_bot" target="_blank" class="link-button">📱 Probar en Telegram</a>
+-                </div>
+-                
+-                <div class="solution-item">
+-                    <span class="icon-large">📈</span>
+-                    <h3>ALGOM Alpha</h3>
+-                    <p style="color: var(--accent-color); font-weight: bold;">180 seguidores en X | Creciendo</p>
+-                    <p style="margin-top: 10px;">Asesor de crypto AI enseñando trading seguro a principiantes</p>
+-                    
+-                    <ul style="font-size: 0.9rem; text-align: left; margin: 15px 0 15px 20px; line-height: 1.8;">
+-                        <li><strong>Trading simulado autónomo</strong> con análisis de mercado en tiempo real</li>
+-                        <li><strong>5 exchanges integrados</strong> (Bybit, Binance, Kraken, etc.)</li>
+-                        <li><strong>Indicadores técnicos</strong> (MA, RSI, análisis de volumen)</li>
+-                        <li><strong>Auto-publicación</strong> de insights de trading en X diariamente</li>
+-                    </ul>
+-                    
+-                    <a href="https://twitter.com/reviceva" target="_blank" class="link-button">🐦 En vivo en X</a>
+-                </div>
+-            </div>
+-            
+-            <div style="text-align: center; margin-top: 30px;">
+-                <p style="color: var(--accent-color); font-size: 1.2rem; font-weight: bold;">
+-                    Estado: Infraestructura de pago lista • Activando monetización con financiamiento
+-                </p>
+-                <p style="font-size: 1rem; color: var(--muted-text); margin-top: 10px;">
+-                    6 productos desplegados | 50,000+ líneas de código en producción | Construidos en 7 meses por &lt;$15K
+-                </p>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 7: Tecnología e Infraestructura -->
+-        <div class="slide slide-top">
+-            <h2>Tecnología e Infraestructura</h2>
+-            <p style="font-size: 1.3rem;">Construido sobre infraestructura Web3 robusta:</p>
+-            <div class="links-grid">
+-                <div class="link-section">
+-                    <h4>🪙 AZ Token (ERC20)</h4>
+-                    <p>Operando en vivo en Polygon</p>
+-                    <p style="font-size: 0.8rem; color: var(--muted-text); margin-top: 5px;">
+-                        Contrato: 0x5F9cdccA7cE46198fad277A5914E7D545cb3afc5
+-                    </p>
+-                    <a href="https://dapp.quickswap.exchange/swap/v3/ETH/0x5F9cdccA7cE46198fad277A5914E7D545cb3afc5" target="_blank" class="link-button">Operar en QuickSwap</a>
+-                </div>
+-                <div class="link-section">
+-                    <h4>🎨 Colección NFT</h4>
+-                    <p>ERC-721 desplegado en Polygon</p>
+-                    <p style="font-size: 0.8rem; color: var(--muted-text); margin-top: 5px;">
+-                        Contrato: 0x771Cc6BDCF8E7660ddc7E3F68FBCE7Dc5d675769
+-                    </p>
+-                    <p style="color: var(--muted-text); font-style: italic;">vía Thirdweb</p>
+-                </div>
+-                <div class="link-section">
+-                    <h4>🏛️ Gobernanza DAO</h4>
+-                    <p>DAO en Polygon vía Decent</p>
+-                    <p style="font-size: 0.8rem; color: var(--muted-text); margin-top: 5px;">
+-                        DAO: 0x547d7aF7B55a92a65A1d015fAA4E75eeF4758190
+-                    </p>
+-                    <a href="https://app.decentdao.org/home?dao=matic%3A0x8301c6F34925580D2695E06fC212eDd8fA152535&page=1&size=10" target="_blank" class="link-button">Unirse al DAO</a>
+-                </div>
+-                <div class="link-section">
+-                    <h4>📄 Documentación</h4>
+-                    <a href="https://notion.so/AIdeazz-Whitepaper-v1-0-1e3032c5edd7809cb4f1cf8645b12dbc?pvs=21" target="_blank" class="link-button">Leer Whitepaper</a>
+-                </div>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 8: Oportunidad de Mercado -->
+-        <div class="slide slide-top">
+-            <h2>Oportunidad de Mercado</h2>
+-            <p style="font-size: 1.3rem; text-align: center; margin-bottom: 30px;">
+-                <strong style="color: var(--accent-color);">$37B+ TAM</strong> en la intersección de AI + EdTech + Web3:
+-            </p>
+-            
+-            <div class="stats-grid">
+-                <div class="stat-card">
+-                    <div class="stat-number">$25B+</div>
+-                    <div class="stat-label">Mercado de asistentes personales de IA para 2030</div>
+-                </div>
+-                <div class="stat-card">
+-                    <div class="stat-number">$12B+</div>
+-                    <div class="stat-label">Mercado global de aprendizaje de idiomas (2024)</div>
+-                </div>
+-                <div class="stat-card">
+-                    <div class="stat-number">280M+</div>
+-                    <div class="stat-label">Expatriados en todo el mundo necesitando adaptación lingüística y cultural</div>
+-                </div>
+-            </div>
+-            
+-            <div style="margin-top: 40px; text-align: center;">
+-                <p style="font-size: 1.3rem; margin-bottom: 15px;">
+-                    <strong>Mercados Objetivo:</strong>
+-                </p>
+-                <div class="solution-grid">
+-                    <div class="solution-item">
+-                        <span class="icon-large">✈️</span>
+-                        <h3>19 Países Hispanohablantes</h3>
+-                        <p>Panamá, Colombia, México, España, Argentina, Chile, Perú, Costa Rica, Ecuador, y 10 más</p>
+-                    </div>
+-                    <div class="solution-item">
+-                        <span class="icon-large">🔄</span>
+-                        <h3>Mercado de Doble Lado</h3>
+-                        <p><strong>Expatriados</strong> aprendiendo español (15M+) + <strong>Locales</strong> aprendiendo inglés (50M+) = <strong>2x oportunidad de ingresos</strong></p>
+-                    </div>
+-                </div>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 9: Modelo de Negocio -->
+-        <div class="slide slide-top">
+-            <h2>Modelo de Negocio</h2>
+-            <p style="font-size: 1.3rem; text-align: center;">Estrategia de ingresos lista para activar con financiamiento:</p>
+-            
+-            <div class="business-model-grid">
+-                <div class="feature-item" style="border: 2px solid var(--accent-color);">
+-                    <span class="icon-large">✅</span>
+-                    <h3>Suscripciones (LISTO AHORA)</h3>
+-                    <p style="margin-top: 10px;"><strong>Niveles:</strong> $15 Básico | $35 Familia | $75 Premium | $200-500 Empresa</p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">✅ PayPal LIVE y funcionando<br>✅ Crypto integrado (en pruebas)<br>⏳ Activando con financiamiento</p>
+-                </div>
+-                
+-                <div class="feature-item">
+-                    <span class="icon-large">🔮</span>
+-                    <h3>Marketplace de AIPAs</h3>
+-                    <p style="margin-top: 10px;"><strong>Cronograma:</strong> Q3-Q4 2026</p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">Comprar/vender AIPAs especializados<br>Mejoras emocionales y personalización<br>Regalías para creadores (agentes construidos por la comunidad)</p>
+-                    <p style="font-size: 0.85rem; color: var(--muted-text); margin-top: 10px; font-style: italic;">Requiere financiamiento para desarrollo frontend y contratos inteligentes</p>
+-                </div>
+-                
+-                <div class="feature-item">
+-                    <span class="icon-large">🔮</span>
+-                    <h3>Economía de Tokens</h3>
+-                    <p style="margin-top: 10px;"><strong>Cronograma:</strong> Q4 2026</p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">✅ AZ Token en vivo en QuickSwap<br>🔮 Activación de gobernanza<br>🔮 Recompensas de staking<br>🔮 Utilidad en la app</p>
+-                    <p style="font-size: 0.85rem; color: var(--muted-text); margin-top: 10px; font-style: italic;">Fundación construida, capa de utilidad requiere financiamiento</p>
+-                </div>
+-            </div>
+-            
+-            <p style="text-align: center; margin-top: 40px; font-size: 1.3rem;">
+-                <strong>Estrategia de Mercado:</strong> 19 países hispanohablantes × Doble lado (expatriados + locales) = <strong>2x oportunidad de ingresos</strong>
+-            </p>
+-            <p style="text-align: center; margin-top: 15px; font-size: 1.1rem; color: var(--accent-color);">
+-                Enfoque: Activar suscripciones primero → Escalar usuarios → Lanzar marketplace/utilidad de token
+-            </p>
+-        </div>
+-
+-        <!-- Diapositiva 10: Comunidad y Alianzas -->
+-        <div class="slide slide-top">
+-            <h2>Comunidad y Alianzas</h2>
+-            
+-            <!-- Sección de Membresías Estratégicas -->
+-            <div style="margin-bottom: 40px; background: rgba(102, 126, 234, 0.1); padding: 25px; border-radius: 15px; border: 1px solid rgba(102, 126, 234, 0.3);">
+-                <h3 style="color: var(--accent-color); text-align: center; margin-bottom: 20px;">🤝 Membresías Estratégicas</h3>
+-                <div class="solution-grid" style="margin-top: 20px;">
+-                    <div class="solution-item">
+-                        <span class="icon-large">🏢</span>
+-                        <h4>Innovation Smart District (ISD) Panamá</h4>
+-                        <p style="font-size: 0.9rem; margin-top: 10px;">
+-                            Soporte del ecosistema, credibilidad local, acceso a gobierno y líderes empresariales de Panamá
+-                        </p>
+-                        <a href="https://www.isdistrict.com/" target="_blank" class="link-button" style="margin-top: 10px;">Visitar ISD</a>
+-                    </div>
+-                    <div class="solution-item">
+-                        <span class="icon-large">🤖</span>
+-                        <h4>Decentralized AI Agent Alliance (DAIAA)</h4>
+-                        <p style="font-size: 0.9rem; margin-top: 10px;">
+-                            Miembro individual (fundadora), reconocimiento de la industria, red global de comunidad de agentes de IA
+-                        </p>
+-                        <a href="https://www.daiaa.org/" target="_blank" class="link-button" style="margin-top: 10px;">Visitar DAIAA</a>
+-                    </div>
+-                </div>
+-            </div>
+-            
+-            <!-- Sección de Canales de Comunidad -->
+-            <p style="font-size: 1.3rem;">Ecosistema en crecimiento en Web2 y Web3:</p>
+-            <div class="links-grid">
+-                <div class="link-section">
+-                    <h4>📱 Redes Sociales</h4>
+-                    <a href="https://www.youtube.com/@AIdeazz" target="_blank" class="link-button">YouTube</a>
+-                    <a href="https://x.com/reviceva" target="_blank" class="link-button">Twitter/X</a>
+-                    <a href="https://www.instagram.com/elena_revicheva/" target="_blank" class="link-button">Instagram</a>
+-                    <a href="https://www.linkedin.com/in/elenarevicheva/" target="_blank" class="link-button">LinkedIn</a>
+-                </div>
+-                <div class="link-section">
+-                    <h4>💬 Canales de Comunidad</h4>
+-                    <a href="https://t.me/EspaLuz" target="_blank" class="link-button">Telegram</a>
+-                    <a href="https://discord.gg/RutK6kwp" target="_blank" class="link-button">Discord</a>
+-                </div>
+-                <div class="link-section">
+-                    <h4>🌐 Social Web3</h4>
+-                    <a href="https://orb.club/@aideazz" target="_blank" class="link-button">Orb SocialFi</a>
+-                    <a href="https://farcaster.xyz/atuona" target="_blank" class="link-button">Warpcast</a>
+-                    <a href="https://mirror.xyz/0x116bB2352c3Bc5a671fe09f0CBfd9957Cb467dA5" target="_blank" class="link-button">Mirror</a>
+-                </div>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 11: Visión e Impacto -->
+-        <div class="slide slide-top">
+-            <h2>Visión e Impacto</h2>
+-            <p style="font-size: 1.3rem;">Democratizar la IA emocionalmente inteligente mediante diseño descentralizado:</p>
+-            <div class="framework-container">
+-                <div class="framework-item">
+-                    <span class="icon-large">🔄</span>
+-                    <h3>Relaciones en Evolución</h3>
+-                    <p>Agentes de IA que crecen y se adaptan con sus usuarios a lo largo del tiempo</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">🔐</span>
+-                    <h3>Privacidad Primero</h3>
+-                    <p>Datos de aprendizaje emocional seguros y encriptados vía ERC-7857</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">🧬</span>
+-                    <h3>Inteligencia Modular</h3>
+-                    <p>Sistemas de memoria componibles y capacidades en evolución</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">🌱</span>
+-                    <h3>Empoderamiento Humano</h3>
+-                    <p>Construido para crecimiento personal y resiliencia, no para reemplazo</p>
+-                </div>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 12: Hoja de Ruta de 12 Meses con Financiamiento -->
+-        <div class="slide slide-top">
+-            <h2>Hoja de Ruta de 12 Meses con Financiamiento</h2>
+-            <p style="font-size: 1.3rem; text-align: center; margin-bottom: 30px;">Camino claro de pre-seed a listo para Serie A:</p>
+-            
+-            <div class="framework-container">
+-                <div class="framework-item">
+-                    <span class="icon-large">Q1</span>
+-                    <h3>Meses 1-3: Activación</h3>
+-                    <p><strong>150 usuarios | 15 pagando | $365 MRR</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">Activar monetización, implementar analíticas, lanzar anuncios pagados dirigidos a grupos de expatriados en Panamá/Colombia</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">Q2</span>
+-                    <h3>Meses 4-6: Crecimiento</h3>
+-                    <p><strong>650 usuarios | 65 pagando | $1,800 MRR</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">Programa de referidos, expandir a México y Colombia, desarrollo de app móvil inicia</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">Q3</span>
+-                    <h3>Meses 7-9: Escala</h3>
+-                    <p><strong>1,970 usuarios | 197 pagando | $5,625 MRR</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">Lanzar apps iOS/Android, pilotos B2B con escuelas de idiomas, 5 países operacionales</p>
+-                </div>
+-                <div class="framework-item">
+-                    <span class="icon-large">Q4</span>
+-                    <h3>Meses 10-12: Preparación Serie A</h3>
+-                    <p><strong>4,800 usuarios | 480 pagando | $15,525 MRR</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">$186K ARR, 10 países validados, camino claro a $1M ARR</p>
+-                </div>
+-            </div>
+-            
+-            <div style="text-align: center; margin-top: 40px;">
+-                <p style="font-size: 1.1rem; color: var(--accent-color);">
+-                    <strong>Economía Unitaria Comprobada:</strong> CAC $30-65 | LTV $180-300 | LTV:CAC 4.6-6:1 | 10% conversión sostenida
+-                </p>
+-                <p style="font-size: 1rem; color: var(--muted-text); margin-top: 15px;">
+-                    ARPU Combinado: $25/mes (60% Básico $15, 30% Familia $35, 8% Premium $75, 2% Empresa $200-500)
+-                </p>
+-            </div>
+-        </div>
+-
+-        <!-- Diapositiva 13: La Solicitud -->
+-        <div class="slide slide-top">
+-            <h2>La Solicitud</h2>
+-            <p style="font-size: 1.3rem; text-align: center;">Buscando $100K-$500K pre-seed para activar monetización y escalar:</p>
+-            
+-            <div class="ask-highlight">
+-                <div class="ask-amount">Ronda Pre-Seed $100K-$500K</div>
+-                <p style="font-size: 1.2rem;">De ~10 usuarios hoy → 4,800 usuarios en 12 meses | Camino a $186K ARR</p>
+-            </div>
+-            
+-            <div class="business-model-grid" style="margin-top: 40px;">
+-                <div class="feature-item">
+-                    <span class="icon-large">⚙️</span>
+-                    <h3>40% Ingeniería</h3>
+-                    <p><strong>$40K-200K</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">1-2 ingenieros, app móvil (React Native), sistemas de analíticas, integración ERC-7857</p>
+-                </div>
+-                <div class="feature-item">
+-                    <span class="icon-large">📢</span>
+-                    <h3>30% Marketing</h3>
+-                    <p><strong>$30K-150K</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">Adquisición de usuarios (anuncios Facebook/Instagram), SEO, alianzas con influencers, expandir a 5-10 países</p>
+-                </div>
+-                <div class="feature-item">
+-                    <span class="icon-large">🏢</span>
+-                    <h3>20% Operaciones</h3>
+-                    <p><strong>$20K-100K</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">Cumplimiento legal (19 países), equipo de soporte al cliente, alianzas B2B</p>
+-                </div>
+-                <div class="feature-item">
+-                    <span class="icon-large">💰</span>
+-                    <h3>10% Reserva</h3>
+-                    <p><strong>$10K-50K</strong></p>
+-                    <p style="font-size: 0.9rem; margin-top: 10px;">Extensión de runway 12-18 meses, costos inesperados, planificación de contingencia</p>
+-                </div>
+-            </div>
+-            
+-            <p style="text-align: center; margin-top: 40px; font-size: 1.2rem;">
+-                <strong>Por Qué Esta es una Apuesta Inteligente:</strong> 6 apps construidas por &lt;$15K = <strong>98% reducción de costos</strong> vs. equipos tradicionales<br>
+-                <span style="color: var(--accent-color);">Cada dólar de inversión rinde 50x más</span>
+-            </p>
+-        </div>
+-
+-        <!-- Diapositiva 14: Contacto y Próximos Pasos -->
+-        <div class="slide slide-top">
+-            <h2>Construyamos Juntos la Era AIPA</h2>
+-            <p style="font-size: 1.3rem; text-align: center; margin-bottom: 30px;">
+-                ¿Listo para unirte a la revolución de IA emocionalmente inteligente?
+-            </p>
+-            
+-            <!-- Sección de Contacto Directo -->
+-            <div style="margin-bottom: 40px; background: rgba(240, 147, 251, 0.1); padding: 30px; border-radius: 15px; border: 1px solid rgba(240, 147, 251, 0.3); text-align: center;">
+-                <h3 style="color: var(--accent-color); margin-bottom: 20px;">📞 Contactar a Elena Revicheva</h3>
+-                <p style="font-size: 1.3rem; margin-bottom: 15px;">
+-                    <strong>📧 Email:</strong> <a href="mailto:aipa@aideazz.xyz" style="color: var(--link-color);">aipa@aideazz.xyz</a>
+-                </p>
+-                <p style="font-size: 1.3rem; margin-bottom: 20px;">
+-                    <strong>🌐 ENS:</strong> aideazz.eth
+-                </p>
+-                
+-                <!-- Botones de Contacto -->
+-                <div style="margin-top: 20px; margin-bottom: 20px;">
+-                    <a href="https://wa.me/50761666716" target="_blank" class="link-button" style="font-size: 1.1rem; margin: 5px;">💬 WhatsApp</a>
+-                    <a href="https://t.me/ElenaRevicheva" target="_blank" class="link-button" style="font-size: 1.1rem; margin: 5px;">📱 Telegram</a>
+-                </div>
+-                
+-                <a href="https://aideazz.xyz/portfolio" target="_blank" class="link-button" style="font-size: 1.1rem; margin: 5px;">🃏 Portafolio Empresarial Completo</a>
+-                <a href="https://wa.me/50766623757" target="_blank" class="link-button" style="font-size: 1.1rem; margin: 5px;">🧑‍🏫 Probar Demo EspaLuz</a>
+-            </div>
+-            
+-            <div class="links-grid">
+-
+-                
+-                <div class="link-section">
+-                    <h4>🌐 Plataforma y Demo</h4>
+-                    <a href="https://aideazz.xyz" target="_blank" class="link-button">🏠 Sitio Web Principal</a>
+-                    <a href="https://t.me/EspaLuzFamily_bot" target="_blank" class="link-button">📱 Demo en Vivo</a>
+-                </div>
+-                
+-                <div class="link-section">
+-                    <h4>🔗 Identidad Web3</h4>
+-                    <p style="color: var(--accent-color); font-size: 1.2rem; margin-bottom: 10px;">aideazz.eth</p>
+-                    <p style="font-size: 0.9rem; color: var(--muted-text);">Wallet Principal:<br>0x116bB2352c3Bc5a671fe09f0CBfd9957Cb467dA5</p>
+-                    <a href="https://notion.so/AIdeazz-Whitepaper-v1-0-1e3032c5edd7809cb4f1cf8645b12dbc?pvs=21" target="_blank" class="link-button">📄 Whitepaper</a>
+-                </div>
+-                
+-                <div class="link-section">
+-                    <h4>🚀 Involúcrate</h4>
+-                    <a href="https://t.me/EspaLuz" target="_blank" class="link-button">Unirse a Comunidad</a>
+-                    <a href="https://discord.gg/RutK6kwp" target="_blank" class="link-button">Discord</a>
+-                    <a href="https://dapp.quickswap.exchange/swap/v3/ETH/0x5F9cdccA7cE46198fad277A5914E7D545cb3afc5" target="_blank" class="link-button">Operar AZ Token</a>
+-                </div>
+-            </div>
+-            
+-            <div class="cta-section" style="margin-top: 50px;">
+-                <h3 style="color: var(--accent-color); margin-bottom: 20px;">🔥 Era AIPA Acuñada. ¿Tienes AIdeazz? Únete al registro.</h3>
+-                <a href="mailto:aipa@aideazz.xyz" class="cta-button">Conectemos</a>
+-            </div>
+-        </div>
+-    </div>
+-
+-    <!-- Navigation -->
+-    <div class="nav-arrows">
+-        <div class="nav-arrow" id="prevSlide">←</div>
+-        <div class="nav-arrow" id="nextSlide">→</div>
+-    </div>
+-
+-    <div class="nav-dots">
+-        <!-- Dots will be generated by JavaScript -->
+-    </div>
+-
++    <p>La presentación en español vive en el mismo deck (interruptor EN/ES). <a href="/pitch.html?lang=es">Abrir pitch.html en español</a> · <a href="https://aideazz.xyz/portfolio">Portafolio</a>.</p>
+     <script>
+-        let currentSlide = 0;
+-        const slides = document.querySelectorAll('.slide');
+-        const totalSlides = slides.length;
+-        const navDots = document.querySelector('.nav-dots');
+-
+-        // Generate navigation dots
+-        for (let i = 0; i < totalSlides; i++) {
+-            const dot = document.createElement('div');
+-            dot.classList.add('nav-dot');
+-            if (i === 0) dot.classList.add('active');
+-            dot.addEventListener('click', () => goToSlide(i));
+-            navDots.appendChild(dot);
+-        }
+-
+-        const dots = document.querySelectorAll('.nav-dot');
+-
+-        function updateSlide() {
+-            slides.forEach((slide, index) => {
+-                slide.classList.toggle('active', index === currentSlide);
+-            });
+-            
+-            dots.forEach((dot, index) => {
+-                dot.classList.toggle('active', index === currentSlide);
+-            });
+-        }
+-
+-        function goToSlide(slideIndex) {
+-            currentSlide = slideIndex;
+-            updateSlide();
+-        }
+-
+-        function nextSlide() {
+-            currentSlide = (currentSlide + 1) % totalSlides;
+-            updateSlide();
+-        }
+-
+-        function prevSlide() {
+-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+-            updateSlide();
+-        }
+-
+-        // Event listeners
+-        document.getElementById('nextSlide').addEventListener('click', nextSlide);
+-        document.getElementById('prevSlide').addEventListener('click', prevSlide);
+-
+-        // Keyboard navigation
+-        document.addEventListener('keydown', (e) => {
+-            if (e.key === 'ArrowRight') nextSlide();
+-            if (e.key === 'ArrowLeft') prevSlide();
+-            if (e.key >= '1' && e.key <= '9') {
+-                const slideIndex = parseInt(e.key) - 1;
+-                if (slideIndex < totalSlides) goToSlide(slideIndex);
+-            }
+-        });
+-
+-        // Touch/swipe support for mobile
+-        let touchStartX = 0;
+-        let touchEndX = 0;
+-
+-        document.addEventListener('touchstart', (e) => {
+-            touchStartX = e.changedTouches[0].screenX;
+-        });
+-
+-        document.addEventListener('touchend', (e) => {
+-            touchEndX = e.changedTouches[0].screenX;
+-            handleSwipe();
+-        });
+-
+-        function handleSwipe() {
+-            if (touchEndX < touchStartX - 50) nextSlide();
+-            if (touchEndX > touchStartX + 50) prevSlide();
+-        }
+-
+-        // Auto-progress timer (optional)
+-        let autoProgress = false;
+-        let progressInterval;
+-
+-        function toggleAutoProgress() {
+-            autoProgress = !autoProgress;
+-            if (autoProgress) {
+-                progressInterval = setInterval(nextSlide, 10000); // 10 seconds per slide
+-            } else {
+-                clearInterval(progressInterval);
+-            }
+-        }
+-
+-        // Press 'p' to toggle auto-progress
+-        document.addEventListener('keydown', (e) => {
+-            if (e.key === 'p') toggleAutoProgress();
+-        });
+-
+-        // Analytics for link clicks (optional)
+-        document.addEventListener('click', (e) => {
+-            if (e.target.tagName === 'A' && e.target.href) {
+-                console.log('Link clicked:', e.target.href);
+-                // Add analytics tracking here if needed
+-            }
+-        });
++        try { localStorage.setItem('pitchLang', 'es'); } catch (e) {}
++        location.replace('/pitch.html?lang=es');
+     </script>
+ </body>
+ </html>
+diff --git a/public/pitch.html b/public/pitch.html
+index 9c52c4e..d3d93ed 100644
+--- a/public/pitch.html
++++ b/public/pitch.html
+@@ -735,14 +735,14 @@
+     <!-- 1. HERO -->
+     <div class="slide active" data-slide>
+         <div class="shell" style="margin-top:60px;">
+-            <div class="hero-eyebrow">AIDEAZZ · MAY 2026 · PANAMA CITY</div>
++            <div class="hero-eyebrow">AIDEAZZ · AUGUST 2026 · PANAMA CITY</div>
+             <div class="flex-wrap" style="gap:8px;margin:10px 0 18px;">
+-                <span class="tag-mono" style="background:linear-gradient(135deg,rgba(255,176,0,0.15),rgba(255,0,110,0.10));border:1px solid rgba(255,176,0,0.5);color:#ffb000;padding:6px 12px;border-radius:999px;font-size:0.7rem;">● BRIGHT DATA · WEB DATA UNLOCKED · MAY 2026</span>
++                <span class="tag-mono" style="background:rgba(0,255,163,0.08);border:1px solid rgba(0,255,163,0.4);color:#00ffa3;padding:6px 12px;border-radius:999px;font-size:0.7rem;">● AI OPS WIKI · 12 CHAPTERS · LIVE</span>
+                 <span class="tag-mono" style="background:rgba(0,229,255,0.08);border:1px solid var(--border-cyan);color:#00e5ff;padding:6px 12px;border-radius:999px;font-size:0.7rem;">● OPEN TO FOUNDING AI HIRE ROLES</span>
+                 <span class="tag-mono" style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.4);color:#c084fc;padding:6px 12px;border-radius:999px;font-size:0.7rem;">● ACCELERATOR CONVERSATIONS</span>
+             </div>
+             <h1 data-i18n="hero.title">Adaptive AI agents <span class="serif">that help you</span><br><span class="grad">thrive on the go.</span></h1>
+-            <p class="lead" data-i18n="hero.lead">9 autonomous agents in production + AILA blueprint. 13 months. One developer. Under $15,000. All running 24/7 on shared infrastructure.</p>
++            <p class="lead" data-i18n="hero.lead">9 autonomous agents in production + AILA blueprint. One developer since Jan 2025. Under $15,000. The stack is still shipping — gates, wiki, outreach, concierge — on the same shared infrastructure.</p>
+             <p class="lead" data-i18n="hero.sub" style="margin-top:12px;font-size:1rem;color:var(--muted);max-width:720px;">Built to prove I can ship. <span style="color:#00e5ff;">Primary goal: join the right team as a founding AI / applied-AI engineer.</span> Investment is welcome — stable income is the mission.</p>
+ 
+             <div class="bento bento-4 mt-m">
+@@ -765,10 +765,10 @@
+             </div>
+ 
+             <div class="flex-wrap mt-l">
+-                <a href="https://aideazz.xyz" class="btn btn-primary">aideazz.xyz →</a>
+-                <a href="https://aideazz.xyz/portfolio" class="btn" data-i18n="hero.btn2">The Founder</a>
++                <a href="https://aideazz.xyz/portfolio" class="btn btn-primary" data-i18n="hero.btn2">Portfolio →</a>
++                <a href="https://aideazz.xyz/ai-ops-wiki.html" class="btn">AI Ops Wiki</a>
+                 <a href="https://wa.me/50766623757" class="btn" data-i18n="hero.btn3">Try Flagship EspaLuz</a>
+-                <a href="https://podcast.aideazz.xyz" class="btn" target="_blank" rel="noopener">AIdeazz Podcast</a>
++                <a href="https://aideazz.xyz/blog" class="btn" target="_blank" rel="noopener">Blog</a>
+             </div>
+         </div>
+     </div>
+@@ -805,7 +805,7 @@
+         <div class="shell">
+             <div class="strip"><span class="accent">03</span><span class="sep">//</span><span data-i18n="sol.label">THE SOLUTION</span></div>
+             <h2 data-i18n="sol.title">An ecosystem of <span class="serif">autonomous</span> agents,<br>each owning a <span class="grad">real problem</span> end-to-end.</h2>
+-            <p class="lead" data-i18n="sol.lead">Not a platform. Not a wrapper. Each agent is a production system: scraping, scoring, deciding, acting, notifying — 24/7, without human input.</p>
++            <p class="lead" data-i18n="sol.lead">Not a platform. Not a wrapper. Each agent is a production system: scraping, scoring, deciding, acting, notifying — 24/7. WhatsApp send is still a human click. Blog, wiki, email, and research loops are gated and logged.</p>
+ 
+             <div class="bento bento-2 mt-m">
+                 <div class="tile tile-glow">
+@@ -826,7 +826,7 @@
+                 <div class="tile tile-glow">
+                     <div class="tag-mono">EVALUATION</div>
+                     <h3 class="mt-s" data-i18n="sol.c4.t">Production-grade eval harness</h3>
+-                    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;" data-i18n="sol.c4.b">131-test, 4-layer pipeline. LLM-as-judge consistency scoring. $0.03/run. Regressions caught before deploy.</p>
++                    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;" data-i18n="sol.c4.b">131-test, 4-layer VJH harness ($0.03/run). Daily blog grounding gate: fail-closed on unsourced numbers, fail-open on cadence. Named failure modes live in the AI Ops Wiki (12 chapters).</p>
+                 </div>
+             </div>
+         </div>
+@@ -854,7 +854,7 @@
+                         <tr><td>EspaLuz Telegram</td><td>Bilingual tutor, structured lessons</td><td>Telegram</td><td><span class="pill pill-live"><span class="pill-dot"></span>LIVE</span></td></tr>
+                         <tr><td>EspaLuz Influencer</td><td>Automated social content EN/ES</td><td>Telegram</td><td><span class="pill pill-early"><span class="pill-dot"></span>EARLY</span></td></tr>
+                         <tr><td>CTO AIPA</td><td>GitHub webhook → diff → LLM review → comment</td><td>Telegram + API</td><td><span class="pill pill-live"><span class="pill-dot"></span>LIVE</span> <span style="color:var(--muted);font-size:0.72rem;">25 reviews</span></td></tr>
+-                        <tr><td>CMO AIPA</td><td>GEO+SEO, daily blog, UTM, lead triage</td><td>FastAPI + Telegram</td><td><span class="pill pill-live"><span class="pill-dot"></span>LIVE</span> <span style="color:var(--muted);font-size:0.72rem;">5 phases</span></td></tr>
++                        <tr><td>CMO AIPA</td><td>GEO+SEO, grounded daily blog, wiki, inbound concierge, outreach</td><td>Oracle + HubSpot + Telegram</td><td><span class="pill pill-live"><span class="pill-dot"></span>LIVE</span> <span style="color:var(--muted);font-size:0.72rem;">gated</span></td></tr>
+                         <tr><td>VibeJob Hunter</td><td>Autonomous job search, scoring, ATS automation</td><td>Telegram</td><td><span class="pill pill-wip"><span class="pill-dot"></span>VERIFYING</span></td></tr>
+                         <tr><td>OpenClaw Shortlist</td><td>YC AI company shortlist, voice interface</td><td>Telegram</td><td><span class="pill pill-live"><span class="pill-dot"></span>LIVE</span></td></tr>
+                         <tr><td>Algom Alpha / DragonTrade</td><td>Crypto research + auto-posting</td><td>X (Twitter)</td><td><span class="pill pill-wip"><span class="pill-dot"></span>FRAGILE</span></td></tr>
+@@ -990,103 +990,88 @@
+     <div class="slide" data-slide>
+         <div class="shell">
+             <div class="strip"><span class="accent">08</span><span class="sep">//</span><span>AGENT SPOTLIGHT</span></div>
+-            <h2>CMO AIPA <span class="serif">— autonomous</span><br><span class="grad">marketing engine, 5 phases.</span></h2>
++            <h2>CMO AIPA <span class="serif">— gated</span><br><span class="grad">marketing engine, still shipping.</span></h2>
+ 
+             <div class="spot mt-m">
+                 <div class="spot-head">
+                     <div>
+                         <div class="spot-name">CMO AIPA — GEO + SEO Engine</div>
+-                        <div class="spot-sub">Runs autonomously on Oracle. Daily content. Attribution. Lead triage. No human in the loop.</div>
++                        <div class="spot-sub">Runs on Oracle. Daily blog is grounded. Wiki publishes failure modes. Inbound drafts itself. WhatsApp send is still a human click.</div>
+                     </div>
+                     <div class="badges">
+                         <span class="pill pill-live"><span class="pill-dot"></span>LIVE</span>
+-                        <span class="pill pill-early"><span class="pill-dot"></span>5 PHASES</span>
++                        <span class="pill pill-early"><span class="pill-dot"></span>GATES + WIKI</span>
+                     </div>
+                 </div>
+ 
+                 <div class="bento bento-3">
+                     <div class="tile" style="border-color:var(--border-cyan);">
+-                        <div class="tag-mono">PHASE 01</div>
++                        <div class="tag-mono">01 / DISCOVERABILITY</div>
+                         <h3 class="mt-s">Structured data</h3>
+-                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">JSON-LD schema, OpenGraph, hreflang EN/ES, build-time sitemap with live Hashnode slugs.</p>
++                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">JSON-LD, OpenGraph, hreflang EN/ES, build-time sitemap. Money page is <span class="mono" style="color:var(--cyan);">/portfolio</span> — every surface links back.</p>
+                     </div>
+                     <div class="tile" style="border-color:var(--border-cyan);">
+-                        <div class="tag-mono">PHASE 02</div>
+-                        <h3 class="mt-s">Daily blog publisher</h3>
+-                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">GSC gap analysis selects topics. AI writes. Cross-posts to Dev.to. Hashnode primary.</p>
++                        <div class="tag-mono">02 / GROUNDING GATE</div>
++                        <h3 class="mt-s">Daily blog, fail-closed on claims</h3>
++                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">Own blog at aideazz.xyz/blog + Dev.to canonical. Unsourced numbers skip. Cadence salvages from measured evidence so the day still ships.</p>
+                     </div>
+                     <div class="tile" style="border-color:var(--border-cyan);">
+-                        <div class="tag-mono">PHASE 03</div>
+-                        <h3 class="mt-s">UTM attribution</h3>
+-                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">Every CTA tagged. Full-funnel tracking to Oracle. Source, medium, campaign in DB.</p>
++                        <div class="tag-mono">03 / DEDUP</div>
++                        <h3 class="mt-s">Token-overlap duplicate guard</h3>
++                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">Stops near-copies, not just identical slugs. Existing duplicates get a canonical — never deleted. Never canonicalise onto a fabricated-stack post.</p>
+                     </div>
+                     <div class="tile" style="border-color:var(--border-cyan);">
+-                        <div class="tag-mono">PHASE 04</div>
+-                        <h3 class="mt-s">AI lead triage</h3>
+-                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">Incoming leads scored by urgency. Dashboard for founder review. Auto-reply.</p>
++                        <div class="tag-mono">04 / CONCIERGE</div>
++                        <h3 class="mt-s">Inbound → draft → send</h3>
++                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">HubSpot chat + portfolio form → Telegram → drafted reply → Resend. 5-provider LLM chain so one vendor outage does not kill the inbox.</p>
+                     </div>
+                     <div class="tile" style="border-color:var(--border-cyan);">
+-                        <div class="tag-mono">PHASE 05</div>
+-                        <h3 class="mt-s">Cloudflare + redirects</h3>
+-                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">301 hygiene, apex canonical, 404 noindex. Search discoverability not an afterthought.</p>
++                        <div class="tag-mono">05 / OUTREACH</div>
++                        <h3 class="mt-s">One-click email, human WhatsApp</h3>
++                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">Resend from aipa@ with optional Cc and PDF attachments (magic-byte checked, local folder only). Elena still sends WhatsApp from the HubSpot note.</p>
+                     </div>
+                     <div class="tile" style="border-color:var(--border-cyan);background:linear-gradient(135deg,rgba(0,229,255,0.05),rgba(168,85,247,0.05));">
+-                        <div class="tag-mono">PHASE 06</div>
+-                        <h3 class="mt-s">Roadmapped</h3>
+-                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">WordPress-compatible blueprint for client deployments (fractional pitch asset).</p>
++                        <div class="tag-mono">06 / WIKI</div>
++                        <h3 class="mt-s">AI Ops Wiki · 12 chapters</h3>
++                        <p style="font-size:0.82rem;color:var(--muted);line-height:1.5;">Named failure modes from production — including <span class="mono">the prompt is a source</span>. Live at <a href="https://aideazz.xyz/ai-ops-wiki.html" class="link">/ai-ops-wiki.html</a>.</p>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+ 
+-    <!-- 9. BRIGHT DATA HACKATHON · WEB DATA UNLOCKED -->
++    <!-- 9. AUGUST 2026 · WHAT THE STACK LEARNED -->
+     <div class="slide" data-slide>
+         <div class="shell">
+-            <div class="strip"><span class="accent">09</span><span class="sep">//</span><span style="color:#ffb000;">BRIGHT DATA · WEB DATA UNLOCKED · TRACK 1 · GTM INTELLIGENCE</span></div>
+-            <h2>Claude itself <span class="serif">uses Bright Data</span> —<br><span class="grad">autonomously, in production.</span></h2>
+-            <p class="lead">The same <span class="mono" style="color:var(--cyan);">cto-aipa</span> Node process that runs the 9-agent ecosystem now exposes 4 Bright Data products to an autonomous Claude tool-use loop. The agent decides what to search, which pages to scrape, and when to stop. Built on top of an existing production system, not a tutorial demo.</p>
++            <div class="strip"><span class="accent">09</span><span class="sep">//</span><span data-i18n="aug.label">AUGUST 2026 · TECH THAT SHIPPED</span></div>
++            <h2 data-i18n="aug.title">The stack got <span class="serif">stricter</span> —<br><span class="grad">not louder.</span></h2>
++            <p class="lead" data-i18n="aug.lead">May was the Bright Data loop. June–August was gates, a wiki, and making sure a publish never claims a resume it did not attach. Same VM. Same 9 agents. Better engineering.</p>
+ 
+             <div class="bento bento-2 mt-m">
+-                <div class="tile tile-glow" style="border-color:rgba(255,176,0,0.35);background:linear-gradient(135deg,rgba(255,176,0,0.04),rgba(255,0,110,0.02));">
+-                    <div class="tag-mono" style="color:#ffb000;">4 PRODUCTS · ONE SHARED TOKEN</div>
+-                    <div class="feat"><span class="bullet" style="color:#ffb000;">01</span><div><strong>Web Unlocker</strong> <span class="mono" style="color:var(--muted);font-size:0.78rem;">→ bdFetch()</span><br><span style="font-size:0.82rem;color:var(--muted);">Auto-enriches every HubSpot deal with founder, tech stack, funding. Powers VibeJob Hunter LinkedIn Jobs (120/cycle).</span></div></div>
+-                    <div class="feat"><span class="bullet" style="color:#ffb000;">02</span><div><strong>SERP API</strong> <span class="mono" style="color:var(--muted);font-size:0.78rem;">→ bdSerpSearch() via WU proxy + brd_json=1</span><br><span style="font-size:0.82rem;color:var(--muted);">Replaced paid SerpAPI. One credential set, lower cost, same JSON shape.</span></div></div>
+-                    <div class="feat"><span class="bullet" style="color:#ffb000;">03</span><div><strong>Scraping Browser</strong> <span class="mono" style="color:var(--muted);font-size:0.78rem;">→ bdScrapingBrowserFetch() + bdSmartFetch() orchestrator</span><br><span style="font-size:0.82rem;color:var(--muted);">Try Web Unlocker first → escalate to Scraping Browser only when JS-gated or thin. Cost-aware by design.</span></div></div>
+-                    <div class="feat"><span class="bullet" style="color:#ffb000;">04</span><div><strong>MCP Server</strong> <span class="mono" style="color:var(--muted);font-size:0.78rem;">→ .mcp.json · @brightdata/mcp</span><br><span style="font-size:0.82rem;color:var(--muted);">Bright Data exposed directly to Claude Code IDE for in-editor live web research.</span></div></div>
++                <div class="tile tile-glow">
++                    <div class="tag-mono">FAIL-CLOSED ON CLAIMS</div>
++                    <h3 class="mt-s" data-i18n="aug.c1.t">Grounding gate + evidence fallback</h3>
++                    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;" data-i18n="aug.c1.b">Daily publisher refuses unsourced numbers. A leftover figure in the prompt is treated as a source — that is a named failure mode. Salvage rewrites against measured evidence; if that still fails, the day ships an evidence-only post. Silence is correct only when there is nothing to measure.</p>
+                 </div>
+-
+-                <div class="tile tile-glow" style="border-color:var(--border-cyan);background:linear-gradient(135deg,rgba(0,229,255,0.05),rgba(168,85,247,0.03));">
+-                    <div class="tag-mono" style="color:#00e5ff;">AUTONOMOUS CLAUDE LOOP · LIVE PROOF</div>
+-                    <h3 class="mt-s">/research_company decircle.io</h3>
+-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0 10px;">
+-                        <div style="text-align:center;padding:10px;background:rgba(0,229,255,0.05);border-radius:8px;border:1px solid var(--border-cyan);">
+-                            <div style="font-size:1.6rem;font-weight:800;color:#00e5ff;font-family:var(--mono);">86<span style="font-size:0.9rem;color:var(--muted);">s</span></div>
+-                            <div style="font-size:0.7rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.1em;">END-TO-END</div>
+-                        </div>
+-                        <div style="text-align:center;padding:10px;background:rgba(0,229,255,0.05);border-radius:8px;border:1px solid var(--border-cyan);">
+-                            <div style="font-size:1.6rem;font-weight:800;color:#00e5ff;font-family:var(--mono);">7</div>
+-                            <div style="font-size:0.7rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.1em;">BD CALLS (CLAUDE CHOSE)</div>
+-                        </div>
+-                        <div style="text-align:center;padding:10px;background:rgba(0,229,255,0.05);border-radius:8px;border:1px solid var(--border-cyan);">
+-                            <div style="font-size:1.6rem;font-weight:800;color:#00e5ff;font-family:var(--mono);">3</div>
+-                            <div style="font-size:0.7rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.1em;">TOOLS · 1 LOOP</div>
+-                        </div>
+-                    </div>
+-                    <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;">
+-                        <div class="tag-mono" style="font-size:0.62rem;color:var(--muted);margin-bottom:6px;">SENDABLE PITCH ANGLE — output to Telegram</div>
+-                        <p style="font-style:italic;font-size:0.88rem;line-height:1.5;color:var(--text);">"Saw you're hiring a Head of BD to build Midas's distribution engine — would a 2-week AI marketing sprint make sense?"</p>
+-                    </div>
+-                    <div class="tag-mono mt-m" style="color:#00e5ff;">3 TELEGRAM COMMANDS · /menu BUSINESS WIRING</div>
+-                    <div style="font-family:var(--mono);font-size:0.78rem;color:var(--muted);line-height:1.8;margin-top:6px;">
+-                        <span style="color:var(--cyan);">/research_company</span> &nbsp;→ CLIENT pitch + HOT/WARM/COLD verdict<br>
+-                        <span style="color:var(--cyan);">/research_employer</span> &nbsp;→ HIRING intel + application angle<br>
+-                        <span style="color:var(--cyan);">/research_competitor</span> &nbsp;→ SEO/AEO blog topic gaps
+-                    </div>
++                <div class="tile tile-glow">
++                    <div class="tag-mono">NAMED FAILURE MODES</div>
++                    <h3 class="mt-s" data-i18n="aug.c2.t">AI Ops Wiki · 12 chapters</h3>
++                    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;" data-i18n="aug.c2.b">Production incidents, one concept each — including <strong style="color:var(--text);">the prompt is a source</strong> and <strong style="color:var(--text);">git is not the origin</strong> (the live IPFS pin, not the git SHA, is what the public site is). No customer data. Verified from logs.</p>
++                    <div class="flex-wrap mt-s"><a href="https://aideazz.xyz/ai-ops-wiki.html" class="btn" target="_blank">Read the wiki</a></div>
++                </div>
++                <div class="tile tile-glow">
++                    <div class="tag-mono">OUTREACH THAT CANNOT LIE</div>
++                    <h3 class="mt-s" data-i18n="aug.c3.t">Cc + PDF on the one-click email</h3>
++                    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;" data-i18n="aug.c3.b">Resend MIME attach. PDFs only, from one folder, ≤5 MB, <span class="mono">%PDF-</span> magic-byte checked. If a listed file fails to load, the send is refused — the email never claims a resume it did not attach.</p>
++                </div>
++                <div class="tile tile-glow">
++                    <div class="tag-mono">INBOUND + DEDUP</div>
++                    <h3 class="mt-s" data-i18n="aug.c4.t">Concierge chain · duplicate guard</h3>
++                    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;" data-i18n="aug.c4.b">Portfolio form and HubSpot chat draft through a 5-provider LLM chain. Near-duplicate blog posts are blocked by token overlap, not slug equality. Old copies get a canonical tag — never a delete.</p>
+                 </div>
+             </div>
+ 
+-            <div class="honest mt-m"><span>honest scope:</span> The 9-agent production system and the Web Unlocker integration existed before the hackathon. Hackathon-week net-new: 3 more Bright Data products integrated under one shared credential set, the autonomous Claude tool-use loop in <span class="mono" style="color:var(--cyan);">src/research-agent.ts</span>, and the 3 operator-facing Telegram commands. Shipped, tested, verified live within hackathon week.</div>
++            <div class="honest mt-m"><span>still live from May:</span> Bright Data Web Unlocker + SERP + Scraping Browser behind an autonomous Claude loop (<span class="mono" style="color:var(--cyan);">/research_company</span>, <span class="mono" style="color:var(--cyan);">/research_employer</span>, <span class="mono" style="color:var(--cyan);">/research_competitor</span>). Hackathon proof, not the newest chapter. VibeJob Hunter eval harness (131 tests, 4 layers, $0.03/run) is still the scoring spine — delivery remains VERIFYING.</div>
+         </div>
+     </div>
+ 
+@@ -1101,7 +1086,7 @@
+                 <div class="tile tile-glow">
+                     <div class="tag-mono">VELOCITY</div>
+                     <h3 class="mt-s" data-i18n="meth.c1.t">Idea → deployed agent in days</h3>
+-                    <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;" data-i18n="meth.c1.b">Every agent was scoped, built, and shipped to production by one person. 9 systems shipped + AILA blueprint in 13 months is the proof.</p>
++                    <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;" data-i18n="meth.c1.b">Every agent was scoped, built, and shipped to production by one person. 9 systems + AILA blueprint since Jan 2025 is the proof.</p>
+                 </div>
+                 <div class="tile tile-glow">
+                     <div class="tag-mono">OWNERSHIP</div>
+@@ -1144,8 +1129,8 @@
+                     <div class="stat-sub" data-i18n="trac.s3">Code reviews by CTO AIPA across 3 repos</div>
+                 </div>
+                 <div class="tile tile-glow">
+-                    <div class="stat-big" data-count-to="5">5</div>
+-                    <div class="stat-sub" data-i18n="trac.s4">CMO phases autonomous — JSON-LD, blog, UTM, triage, redirects</div>
++                    <div class="stat-big" data-count-to="12">12</div>
++                    <div class="stat-sub" data-i18n="trac.s4">AI Ops Wiki chapters — named production failure modes, live</div>
+                 </div>
+                 <div class="tile tile-glow">
+                     <div class="stat-big" data-count-to="48" data-count-suffix="+">48+</div>
+@@ -1190,7 +1175,11 @@
+                 </div>
+                 <div class="tl-row">
+                     <div class="tl-yr">May 2026</div>
+-                    <div class="tl-txt" data-i18n="fnd.r4"><strong>9 production AI agents</strong> + AILA architecture blueprint. 13 months. Solo. Under $15,000. TypeScript, Python, SQL. 8+ AI services integrated. 50K+ lines across the ecosystem. <strong style="color:#ffb000;">Bright Data Web Data UNLOCKED hackathon submission shipped.</strong></div>
++                    <div class="tl-txt" data-i18n="fnd.r4"><strong>9 production AI agents</strong> + AILA architecture blueprint. Solo. Under $15,000. TypeScript, Python, SQL. Bright Data Web Data UNLOCKED loop shipped on the live VM.</div>
++                </div>
++                <div class="tl-row">
++                    <div class="tl-yr">Aug 2026</div>
++                    <div class="tl-txt" data-i18n="fnd.r5"><strong>Same stack, stricter:</strong> daily blog grounding gate (fail-closed on claims, fail-open on cadence), AI Ops Wiki (12 chapters), one-click outreach with Cc + PDF that refuses to send if the file is missing, inbound concierge on a 5-provider chain. Portfolio is the money page.</div>
+                 </div>
+             </div>
+ 
+@@ -1320,9 +1309,10 @@
+                     </div>
+                 </div>
+                 <div class="flex-wrap mt-m">
+-                    <a href="https://aideazz.xyz" class="btn btn-primary" target="_blank">aideazz.xyz</a>
+-                    <a href="https://aideazz.xyz/portfolio" class="btn" target="_blank" data-i18n="ask.btn.portfolio">Full Portfolio</a>
++                    <a href="https://aideazz.xyz/portfolio" class="btn btn-primary" target="_blank" data-i18n="ask.btn.portfolio">Portfolio →</a>
++                    <a href="https://aideazz.xyz/ai-ops-wiki.html" class="btn" target="_blank">AI Ops Wiki</a>
+                     <a href="/sop-ai-ops.html" class="btn" target="_blank" style="border-color:rgba(0,229,255,0.35);color:#00e5ff;">AI Operations SOP</a>
++                    <a href="https://aideazz.xyz/blog" class="btn" target="_blank">Blog</a>
+                     <a href="https://wa.me/50766623757" class="btn" target="_blank" data-i18n="ask.btn.demo">Try EspaLuz Demo</a>
+                     <a href="https://github.com/ElenaRevicheva" class="btn" target="_blank">GitHub</a>
+                 </div>
+@@ -1345,12 +1335,12 @@
+     // Translations (Spanish)
+     const translations = {
+         'hero.title': 'Agentes de IA adaptativos <span class="serif">que te ayudan a</span><br><span class="grad">prosperar en el camino.</span>',
+-        'hero.lead': '10 agentes autónomos. 13 meses. Una desarrolladora. Menos de $15,000. Todos funcionando 24/7 en producción sobre infraestructura compartida.',
++        'hero.lead': '9 agentes autónomos en producción + blueprint AILA. Una desarrolladora desde ene 2025. Menos de $15,000. El stack sigue entregando — gates, wiki, outreach, concierge — sobre la misma infraestructura compartida.',
+         'hero.stat1': 'Agentes en producción',
+         'hero.stat2': 'Tiempo de construcción solo',
+         'hero.stat3': 'Capital total invertido',
+         'hero.stat4': 'Costo mensual infra',
+-        'hero.btn2': 'La Fundadora',
++        'hero.btn2': 'Portafolio →',
+         'hero.btn3': 'Probar EspaLuz Insignia',
+         'prob.label': 'EL PROBLEMA',
+         'prob.title': 'La mayoría no puede pagar las herramientas<br>que usan los negocios de <span class="grad">alto rendimiento</span>.',
+@@ -1363,24 +1353,24 @@
+         'prob.c3.b': 'Fundadores y equipos pequeños no pueden pagar el ancho de banda de ingeniería que sus ideas requieren.',
+         'sol.label': 'LA SOLUCIÓN',
+         'sol.title': 'Un ecosistema de agentes <span class="serif">autónomos</span>,<br>cada uno dueño de un <span class="grad">problema real</span> de punta a punta.',
+-        'sol.lead': 'No es una plataforma. No es un wrapper. Cada agente es un sistema de producción: raspando, calificando, decidiendo, actuando, notificando — 24/7, sin input humano.',
+-        'sol.c1.t': 'Una VM. Una base de datos. 10 agentes.',
++        'sol.lead': 'No es una plataforma. No es un wrapper. Cada agente es un sistema de producción: raspando, calificando, decidiendo, actuando, notificando — 24/7. WhatsApp lo envía una humana. Blog, wiki, email e investigación están gated y registrados.',
++        'sol.c1.t': 'Una VM. Una base de datos. 9 agentes + blueprint.',
+         'sol.c1.b': 'Todos los agentes comparten una VM Oracle Cloud y una Oracle Autonomous Database. Coordinan a través de tablas compartidas. ~$0/mes en créditos gratuitos de Oracle.',
+         'sol.c2.t': 'Consciente del costo por diseño',
+         'sol.c2.b': 'Claude Opus 4 para rutas críticas. Groq Llama 3.3 70B (tier gratuito) para análisis estándar. Razonamiento explícito de costo por llamada.',
+         'sol.c3.t': 'Interfaces de voz en cada agente',
+         'sol.c3.b': 'Transcripción Groq Whisper. Accesible vía WhatsApp y Telegram — sin instalación de app. Latencia sub-2s en EspaLuz.',
+         'sol.c4.t': 'Arnés de evaluación grado producción',
+-        'sol.c4.b': '131 tests, 4 capas. Puntuación de consistencia LLM-como-juez. $0.03/run. Regresiones detectadas antes del despliegue.',
++        'sol.c4.b': '131 tests, 4 capas VJH ($0.03/run). Gate de grounding del blog diario: fail-closed en cifras sin fuente, fail-open en cadencia. Modos de falla nombrados en el AI Ops Wiki (12 capítulos).',
+         'ag.label': 'LO QUE ESTÁ EN VIVO',
+-        'ag.title': '10 agentes. <span class="grad">Todos en producción.</span>',
+-        'ag.lead': 'Cada agente corre 24/7 en Oracle Cloud, coordinando a través de tablas compartidas. Usuarios reales. Despliegues reales. Estado honesto.',
++        'ag.title': '9 agentes en producción. <span class="grad">1 blueprint.</span>',
++        'ag.lead': 'Cada agente corre 24/7 en Oracle Cloud, coordinando a través de tablas compartidas. Verificable vía <span class="mono" style="color:var(--cyan);">pm2 list</span> + <span class="mono" style="color:var(--cyan);">systemctl is-active</span>. Usuarios reales. Despliegues reales. AILA es el blueprint de la capa siguiente, aún no desplegado.',
+         'ag.th1': 'Agente', 'ag.th2': 'Función', 'ag.th3': 'Plataforma', 'ag.th4': 'Estado',
+         'meth.label': 'METODOLOGÍA',
+         'meth.title': 'Una desarrolladora entregando<br><span class="grad">lo que la mayoría no puede.</span>',
+         'meth.lead': 'Claude Code y Cursor son el entorno de desarrollo real — no un atajo, no ruedas de entrenamiento. El flujo de trabajo permanente.',
+         'meth.c1.t': 'Idea → agente desplegado en días',
+-        'meth.c1.b': 'Cada agente fue alcance, construido y desplegado a producción por una sola persona. 10 sistemas en 13 meses es la prueba.',
++        'meth.c1.b': 'Cada agente fue alcance, construido y desplegado a producción por una sola persona. 9 sistemas + blueprint AILA desde ene 2025 es la prueba.',
+         'meth.c2.t': 'Control arquitectónico total',
+         'meth.c2.b': 'Sin cajas negras. Sin comprensión delegada. Cada línea revisada, cada trade-off deliberado.',
+         'meth.c3.t': 'Iterando con usuarios reales',
+@@ -1392,7 +1382,7 @@
+         'trac.s1': 'Suscriptores pagos EspaLuz — retenidos desde 2025, cero marketing',
+         'trac.s2': 'Tests en arnés VJH — 4 capas, $0.03/run',
+         'trac.s3': 'Reviews por CTO AIPA en 3 repos',
+-        'trac.s4': 'Fases CMO autónomas — JSON-LD, blog, UTM, triaje, redirects',
++        'trac.s4': 'Capítulos del AI Ops Wiki — modos de falla de producción, en vivo',
+         'trac.s5': 'NFTs publicados por Atuona — pipeline automático',
+         'trac.s6': 'Endpoints ATS monitoreados por VibeJob Hunter',
+         'trac.s7': 'Líneas de código producción en el ecosistema',
+@@ -1402,7 +1392,8 @@
+         'fnd.r1': '<strong>Chief Legal Officer → Deputy CEO de Gobernanza Corporativa</strong> — infraestructura digital del e-government regional ruso. 7 años gobernanza a nivel junta, transformación digital empresarial, entornos altamente regulados. Decidía qué se construía y lo hacía rendir cuentas.',
+         'fnd.r2': '<strong>Reubicada en Ciudad de Panamá</strong> como madre soltera con una hija de un año. Sin red local, sin español, sin ingresos. Reconstruida desde cero.',
+         'fnd.r3': '<strong>Decisión:</strong> enseñarse a sí misma a construir sistemas de IA usando Claude Code y Cursor como metodología real — no como atajo.',
+-        'fnd.r4': '<strong>10 agentes de IA en producción.</strong> 13 meses. Solo. Menos de $15,000. TypeScript, Python, SQL. 8+ servicios de IA integrados. 50K+ líneas.',
++        'fnd.r4': '<strong>9 agentes de IA en producción</strong> + blueprint AILA. Solo. Menos de $15,000. TypeScript, Python, SQL. Loop Bright Data Web Data UNLOCKED enviado en la VM en vivo.',
++        'fnd.r5': '<strong>El mismo stack, más estricto:</strong> gate de grounding del blog diario, AI Ops Wiki (12 capítulos), outreach de un clic con Cc + PDF que se niega a enviar si falta el archivo, concierge inbound en cadena de 5 proveedores. El portafolio es la página de dinero.',
+         'ask.label': 'LA PETICIÓN · CONTACTO',
+         'ask.title': 'Lista para ser contratada.<br><span class="serif">Abierta a</span> <span class="grad">inversión alineada.</span>',
+         'ask.lead': 'El trabajo es real. Los sistemas están en vivo. La meta honesta es ingreso estable — primero unirme a un equipo digno, después inversión.',
+@@ -1411,10 +1402,21 @@
+         'ask.b.t': 'Fondear el ecosistema',
+         'ask.b.b': 'Arreglar tracking de pagos de EspaLuz. Verificar entrega de VibeJob Hunter. Contratar un ingeniero. Extender runway antes de que expiren créditos Oracle. Presupuesto pequeño de marketing.',
+         'hero.sub': 'Construido para probar que puedo entregar. <span style="color:#00e5ff;">Meta principal: unirme al equipo correcto como ingeniera de IA fundadora / aplicada.</span> Inversión bienvenida — ingreso estable es la misión.',
+-        'ask.btn.portfolio': 'Portafolio Completo',
++        'ask.btn.portfolio': 'Portafolio →',
+         'ask.btn.demo': 'Probar EspaLuz Demo',
+         'esp.sub': 'Español ↔ Inglés · contexto consciente de la familia · WhatsApp + Telegram + Web',
+         'esp.signal': 'Menos de 20 suscriptores pagos — pero han sido retenidos desde 2025 con <strong style="color:var(--text);">cero gasto en marketing</strong>. La gente pagó, se quedó, siguió usándolo. Esa es la señal de retención que vale la pena escalar.',
++        'aug.label': 'AGOSTO 2026 · TECH QUE SE ENTREGÓ',
++        'aug.title': 'El stack se volvió <span class="serif">más estricto</span> —<br><span class="grad">no más ruidoso.</span>',
++        'aug.lead': 'Mayo fue el loop Bright Data. Junio–agosto fueron gates, un wiki, y que un email nunca reclame un CV que no adjuntó. La misma VM. Los mismos 9 agentes. Mejor ingeniería.',
++        'aug.c1.t': 'Gate de grounding + fallback de evidencia',
++        'aug.c1.b': 'El publisher diario rechaza cifras sin fuente. Un número que quedó en el prompt se trata como fuente — es un modo de falla con nombre. El salvamento reescribe contra evidencia medida; si aún falla, el día publica solo evidencia. El silencio es correcto solo cuando no hay nada que medir.',
++        'aug.c2.t': 'AI Ops Wiki · 12 capítulos',
++        'aug.c2.b': 'Incidentes de producción, un concepto cada uno — incluyendo <strong style="color:var(--text);">the prompt is a source</strong> y <strong style="color:var(--text);">git is not the origin</strong> (el pin IPFS en vivo, no el SHA de git, es el sitio público). Sin datos de clientes. Verificado desde logs.',
++        'aug.c3.t': 'Cc + PDF en el email de un clic',
++        'aug.c3.b': 'Adjunto MIME vía Resend. Solo PDF, de una carpeta, ≤5 MB, magic-byte <span class="mono">%PDF-</span>. Si un archivo listado no carga, el envío se rechaza — el email nunca reclama un CV que no adjuntó.',
++        'aug.c4.t': 'Cadena concierge · guarda de duplicados',
++        'aug.c4.b': 'El formulario del portafolio y el chat de HubSpot borran por una cadena LLM de 5 proveedores. Casi-duplicados del blog se bloquean por overlap de tokens, no por slug. Las copias viejas reciben canonical — nunca un delete.',
+     };
+ 
+     const originalEn = {};
+@@ -1519,7 +1521,8 @@
+ 
+     // Init
+     saveOriginals();
+-    const saved = localStorage.getItem('pitchLang') || 'en';
++    const params = new URLSearchParams(location.search);
++    const saved = params.get('lang') || localStorage.getItem('pitchLang') || 'en';
+     if (saved === 'es') applyLang('es');
+ </script>
+ <script>
+-- 
+2.43.0
+
