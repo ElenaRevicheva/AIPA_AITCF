@@ -1,0 +1,40 @@
+From c39ff96ad0a1cc50e1ee1c0bae26b5b59b2d5dfa Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Wed, 26 Aug 2026 22:48:58 +0000
+Subject: [PATCH] fix(portfolio): Tell us about your project must flip then
+ scroll
+
+The punch CTA scrolled to #portfolio-inquiry-form while the card was
+still on the back face. The form lives on the front; scrollIntoView on
+a backface-hidden face lands on empty particle background. Service
+cards already called goToForm (flip, then scroll). The button now uses
+the same handler. Copy and layout unchanged.
+---
+ src/pages/BusinessCard.tsx | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/pages/BusinessCard.tsx b/src/pages/BusinessCard.tsx
+index 728264e..ba92b0b 100644
+--- a/src/pages/BusinessCard.tsx
++++ b/src/pages/BusinessCard.tsx
+@@ -143,13 +143,12 @@ function WhatIBuildBlock({ onCta }: { onCta?: () => void }) {
+         <p className="mt-4 text-center text-sm sm:text-base font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+           {t('whatIBuild.punch')}
+         </p>
++        {/* Same goToForm as the service cards. On the back face this MUST flip
++            first: the form lives on the front, and scrollIntoView on a
++            backface-hidden face lands on empty particle background. */}
+         <a
+           href="#portfolio-inquiry-form"
+-          onClick={(e) => {
+-            e.stopPropagation();
+-            e.preventDefault();
+-            scrollToPortfolioInquiry();
+-          }}
++          onClick={goToForm}
+           className="mt-4 inline-flex items-center justify-center gap-2 w-full sm:w-auto mx-auto px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-sm sm:text-base font-semibold text-white shadow-lg shadow-purple-500/25 transition-all"
+         >
+           {t('whatIBuild.punchCta')}
+-- 
+2.43.0
+

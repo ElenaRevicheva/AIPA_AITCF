@@ -72,3 +72,8 @@ grounding gate skip the daily blog on a day that had real evidence. Regenerates
 `public/ai-ops-wiki.html`, restamps the pin file, bumps `geo-manifest.json` date.
 `blog: no`. No `[skip ci]`.
 
+`0008-fix-portfolio-inquiry-cta-flip.patch` — "Tell us about your project" on the
+portfolio card back scrolled to a form on the hidden front face and landed on empty
+particles. Punch CTA now uses the same `goToForm` handler as the service cards
+(flip, then scroll). Copy and layout unchanged.
+
