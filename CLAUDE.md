@@ -78,6 +78,13 @@ deterministically** from the facts. Silence remains correct when there is
 nothing to measure (`< MIN_FACTS`). Silence is incorrect when the day produced
 evidence and the model decorated it.
 
+**26 Aug wiki: yes, blog: no.** This session earned a wiki chapter
+(`2026-08-26-prompt-poisoned-the-grounding-gate`, concept `the-prompt-is-a-source`).
+It hit production, transfers, is verified from Telegram + the live pin, and names a
+new failure mode. It does **not** earn a second blog post: today's daily article
+already shipped, and the pin 404 Elena saw is the existing `git-is-not-the-origin`
+chapter, not a new one. Marked `blog: no` so `wiki-ship.cjs` will not cross-post.
+
 **Wiki-worthy sessions still publish to the blog the same day**, even if the
 daily post already ran. `wiki-ship.cjs` (21:30 UTC) runs after the daily job
 (19:30 UTC) and publishes any incident marked `blog: yes` via

@@ -1,0 +1,477 @@
+From bbb9a58ee399e0410874b0f7d72f0fa732edf291 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Wed, 26 Aug 2026 20:24:51 +0000
+Subject: [PATCH] ai-ops-wiki: prompt-poisoned-the-grounding-gate (2026-08-26)
+
+New chapter and concept (the-prompt-is-a-source): a leftover $40 in the
+topic brief made the fail-closed grounding gate skip the daily blog on a
+day that had real evidence. Regenerated journal without [skip ci] so
+4everland rebuilds the pin. blog: no.
+---
+ .../concepts/the-prompt-is-a-source.md        |  17 ++
+ ...8-26-prompt-poisoned-the-grounding-gate.md |  13 ++
+ public/4everland-pin-stamp.txt                |   2 +-
+ public/ai-ops-wiki.html                       | 195 ++++++++++++++----
+ public/geo-manifest.json                      |   2 +-
+ 5 files changed, 189 insertions(+), 40 deletions(-)
+ create mode 100644 content/ai-ops-wiki/concepts/the-prompt-is-a-source.md
+ create mode 100644 content/ai-ops-wiki/incidents/2026-08-26-prompt-poisoned-the-grounding-gate.md
+
+diff --git a/content/ai-ops-wiki/concepts/the-prompt-is-a-source.md b/content/ai-ops-wiki/concepts/the-prompt-is-a-source.md
+new file mode 100644
+index 0000000..3707251
+--- /dev/null
++++ b/content/ai-ops-wiki/concepts/the-prompt-is-a-source.md
+@@ -0,0 +1,17 @@
++---
++title: The prompt is a source
++slug: the-prompt-is-a-source
++one_liner: A numbered claim in a system prompt is as much a source as a log line -- and a fail-closed gate will treat it that way.
++aka: poisoned brief; the prompt leaked into the output; flavour text that was not flavour
++---
++A verifier that refuses unsourced numbers is doing the right job. The model still has to write from *something*. If that something -- a topic brief, a few-shot example, a "write about X" paragraph -- contains a leftover figure, the model copies it. The gate then fires on a number that was never in the evidence file, and the pipeline skips even when the day produced plenty of real facts.
++
++The trap is treating the prompt as flavour text. The model does not. To the generator, a brief that says "BrightData $40/run" is a fact. To the gate, `$40` is unsourced. Both readings are locally correct. Cadence dies in the gap.
++
++Ordinary-life version: you ask someone to write the minutes from the meeting notes, and you also slide them last year's budget that still says the coffee machine costs forty dollars. They copy the forty. The auditor who only accepted numbers from the notes throws the minutes out. Nobody invented the forty. The briefing packet did.
++
++The defences are structural:
++
++1. **Grounded mode must not inject a numbered brief.** Derive the angle from measured evidence, or strip every digit from flavour text before it reaches the model.
++2. **Separate fail-closed on claims from fail-open on cadence.** Skipping is the right answer to a fake stack. It is the wrong answer to a poisoned prompt on a day that had evidence.
++3. **If the gate still fails, salvage, then fall back.** Rewrite unsourced numbers against the licensed set, then compose an evidence-only article so the day still ships. Silence remains correct only when there is nothing to measure.
+diff --git a/content/ai-ops-wiki/incidents/2026-08-26-prompt-poisoned-the-grounding-gate.md b/content/ai-ops-wiki/incidents/2026-08-26-prompt-poisoned-the-grounding-gate.md
+new file mode 100644
+index 0000000..dd54a52
+--- /dev/null
++++ b/content/ai-ops-wiki/incidents/2026-08-26-prompt-poisoned-the-grounding-gate.md
+@@ -0,0 +1,13 @@
++---
++title: The prompt poisoned the grounding gate
++slug: 2026-08-26-prompt-poisoned-the-grounding-gate
++date: 2026-08-26
++blog: no
++subtitle: A leftover $40 in the topic brief made a fail-closed verifier skip the daily blog on a day that had real evidence
++concepts: the-prompt-is-a-source, liveness-is-not-correctness, fabrication-under-degradation, silent-failure
++symptom: The 14:30 Panama cron ran on 26 August and Telegram reported the daily blog skipped -- Grounding gate, unsourced number(s): 40. The scheduler was not off. The mutex line on that message was leftover wording. Four generation attempts each carried a $40 that was not in the evidence file, and the publisher published nothing.
++root_cause: Fail-closed on claims and fail-open on cadence were never separated. After the 23 August Redis fabrication, the publisher collected real facts and then still injected a rotation brief that contained BrightData $40/run (and other leftover figures). The model copied 40. The gate correctly refused a number it could not license. All three readings were locally correct. Cadence died for about forty minutes on a day that had evidence. The white IPFS page opened at 20:10 UTC was the already-documented pin lag -- git-is-not-the-origin -- not a second outage; the host finished pinning at 20:12.
++fix: Grounded mode no longer injects the numbered brief. After four gate failures the publisher salvages licensed numbers, then composes an evidence-only article so the day still ships. A one-shot catch-up on afternoon process start covers a skip that already happened that day without firing a second post the next morning. The cron stays 14:30 America/Panama.
++verified: Telegram 26 Aug 19:31 UTC -- Daily blog SKIPPED / Grounding gate / unsourced number(s): 40. Topic brief in the publisher still contained the string BrightData $40/run. Catch-up published GitHub commit 77f2ee0 at 20:10:42Z, HTML 15098 bytes. 4everland production deploy succeeded 20:12:01Z. Live audit HTTP/2 200, title 55,193 Restarts in 10 Days: Debugging an AI Agent's Endless Loop, CID bafybeidmkpn4e5xojctg7mj2h42ery7ddmi3lyjvy7xgbomnpmla2jyp3y, A+ 93/100. Cron expression unchanged: 30 14 * * * America/Panama.
++rule: A prompt is a source. If a verifier is fail-closed on numbers, every number in the prompt has to be licensed or stripped. Skipping is the right answer to a fake claim and the wrong answer to a poisoned brief. Fail-closed on claims, fail-open on cadence -- those are two different decisions, and they must not share a skip path.
++---
+diff --git a/public/4everland-pin-stamp.txt b/public/4everland-pin-stamp.txt
+index 7603bcd..f3f8ae5 100644
+--- a/public/4everland-pin-stamp.txt
++++ b/public/4everland-pin-stamp.txt
+@@ -1 +1 @@
+-pinned 2026-08-21T21:05:00Z telegram-ops-dashboard wiki-ship
++pinned 2026-08-26T20:50:00Z prompt-poisoned-grounding-gate
+diff --git a/public/ai-ops-wiki.html b/public/ai-ops-wiki.html
+index 381570a..aad7178 100644
+--- a/public/ai-ops-wiki.html
++++ b/public/ai-ops-wiki.html
+@@ -24,8 +24,8 @@
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+ 
+-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AI Ops Wiki — concepts earned in production","author":{"@type":"Person","name":"Elena Revicheva","url":"https://aideazz.xyz/portfolio","jobTitle":"AI Engineer & Fractional CTO","sameAs":["https://linkedin.com/in/elenarevicheva","https://github.com/ElenaRevicheva","https://x.com/reviceva","https://dev.to/elenarevicheva"]},"dateModified":"2026-08-25","publisher":{"@type":"Organization","name":"AIdeazz","url":"https://aideazz.xyz"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://aideazz.xyz/ai-ops-wiki.html"}}</script>
+-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"DefinedTermSet","name":"AI Ops Wiki — production engineering concepts","url":"https://aideazz.xyz/ai-ops-wiki.html","description":"Named reliability and AI-operations concepts, each defined in plain language and linked to the production incident that taught it.","hasDefinedTerm":[{"@type":"DefinedTerm","name":"Acknowledgement is not completion","description":"A receipt proves delivery. It never proves processing.","url":"https://aideazz.xyz/ai-ops-wiki.html#ack-is-not-completion"},{"@type":"DefinedTerm","name":"Fabrication under degradation","description":"When the good model runs out, the fallback does not go quiet — it goes confident.","url":"https://aideazz.xyz/ai-ops-wiki.html#fabrication-under-degradation"},{"@type":"DefinedTerm","name":"Git is not the origin","description":"The repository is the source of the next pin. The live site is the current CID. They are not the same object.","url":"https://aideazz.xyz/ai-ops-wiki.html#git-is-not-the-origin"},{"@type":"DefinedTerm","name":"Idempotency","description":"Doing it twice produces the same result as doing it once.","url":"https://aideazz.xyz/ai-ops-wiki.html#idempotency"},{"@type":"DefinedTerm","name":"Liveness is not correctness","description":"A dead job announces itself. A job that runs perfectly and emits slightly wrong output never will.","url":"https://aideazz.xyz/ai-ops-wiki.html#liveness-is-not-correctness"},{"@type":"DefinedTerm","name":"Monotonic state machine","description":"States advance. They never regress.","url":"https://aideazz.xyz/ai-ops-wiki.html#monotonic-state-machine"},{"@type":"DefinedTerm","name":"Redundancy is not precedence","description":"Two systems that can both do the job is not a rule for which one should.","url":"https://aideazz.xyz/ai-ops-wiki.html#redundancy-is-not-precedence"},{"@type":"DefinedTerm","name":"Silent failure","description":"The system did something reasonable, and told nobody.","url":"https://aideazz.xyz/ai-ops-wiki.html#silent-failure"},{"@type":"DefinedTerm","name":"Single point of failure (SPOF)","description":"One component whose death kills the whole chain.","url":"https://aideazz.xyz/ai-ops-wiki.html#single-point-of-failure"},{"@type":"DefinedTerm","name":"Single source of truth","description":"Copy logic instead of calling it, and you have scheduled a bug for a date nobody will tell you about.","url":"https://aideazz.xyz/ai-ops-wiki.html#single-source-of-truth"},{"@type":"DefinedTerm","name":"Verify from logs, not config","description":"Configuration tells you what somebody intended. Logs tell you what happened.","url":"https://aideazz.xyz/ai-ops-wiki.html#verify-from-logs"}]}</script>
++  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AI Ops Wiki — concepts earned in production","author":{"@type":"Person","name":"Elena Revicheva","url":"https://aideazz.xyz/portfolio","jobTitle":"AI Engineer & Fractional CTO","sameAs":["https://linkedin.com/in/elenarevicheva","https://github.com/ElenaRevicheva","https://x.com/reviceva","https://dev.to/elenarevicheva"]},"dateModified":"2026-08-26","publisher":{"@type":"Organization","name":"AIdeazz","url":"https://aideazz.xyz"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://aideazz.xyz/ai-ops-wiki.html"}}</script>
++  <script type="application/ld+json">{"@context":"https://schema.org","@type":"DefinedTermSet","name":"AI Ops Wiki — production engineering concepts","url":"https://aideazz.xyz/ai-ops-wiki.html","description":"Named reliability and AI-operations concepts, each defined in plain language and linked to the production incident that taught it.","hasDefinedTerm":[{"@type":"DefinedTerm","name":"Acknowledgement is not completion","description":"A receipt proves delivery. It never proves processing.","url":"https://aideazz.xyz/ai-ops-wiki.html#ack-is-not-completion"},{"@type":"DefinedTerm","name":"Fabrication under degradation","description":"When the good model runs out, the fallback does not go quiet — it goes confident.","url":"https://aideazz.xyz/ai-ops-wiki.html#fabrication-under-degradation"},{"@type":"DefinedTerm","name":"Git is not the origin","description":"The repository is the source of the next pin. The live site is the current CID. They are not the same object.","url":"https://aideazz.xyz/ai-ops-wiki.html#git-is-not-the-origin"},{"@type":"DefinedTerm","name":"Idempotency","description":"Doing it twice produces the same result as doing it once.","url":"https://aideazz.xyz/ai-ops-wiki.html#idempotency"},{"@type":"DefinedTerm","name":"Liveness is not correctness","description":"A dead job announces itself. A job that runs perfectly and emits slightly wrong output never will.","url":"https://aideazz.xyz/ai-ops-wiki.html#liveness-is-not-correctness"},{"@type":"DefinedTerm","name":"Monotonic state machine","description":"States advance. They never regress.","url":"https://aideazz.xyz/ai-ops-wiki.html#monotonic-state-machine"},{"@type":"DefinedTerm","name":"Redundancy is not precedence","description":"Two systems that can both do the job is not a rule for which one should.","url":"https://aideazz.xyz/ai-ops-wiki.html#redundancy-is-not-precedence"},{"@type":"DefinedTerm","name":"Silent failure","description":"The system did something reasonable, and told nobody.","url":"https://aideazz.xyz/ai-ops-wiki.html#silent-failure"},{"@type":"DefinedTerm","name":"Single point of failure (SPOF)","description":"One component whose death kills the whole chain.","url":"https://aideazz.xyz/ai-ops-wiki.html#single-point-of-failure"},{"@type":"DefinedTerm","name":"Single source of truth","description":"Copy logic instead of calling it, and you have scheduled a bug for a date nobody will tell you about.","url":"https://aideazz.xyz/ai-ops-wiki.html#single-source-of-truth"},{"@type":"DefinedTerm","name":"The prompt is a source","description":"A numbered claim in a system prompt is as much a source as a log line -- and a fail-closed gate will treat it that way.","url":"https://aideazz.xyz/ai-ops-wiki.html#the-prompt-is-a-source"},{"@type":"DefinedTerm","name":"Verify from logs, not config","description":"Configuration tells you what somebody intended. Logs tell you what happened.","url":"https://aideazz.xyz/ai-ops-wiki.html#verify-from-logs"}]}</script>
+ 
+   <style>
+     /* ── A press run with two plates: ink, and one spot colour ──────────
+@@ -312,7 +312,7 @@
+     <div class="bar-in">
+       <span class="bar-lbl">Reading progress</span>
+       <span class="bar-track"><span class="bar-fill" id="barFill"></span></span>
+-      <span class="bar-count" id="barCount">0 / 44</span>
++      <span class="bar-count" id="barCount">0 / 48</span>
+     </div>
+   </div>
+ 
+@@ -321,7 +321,7 @@
+       <div class="mast-kick">AIdeazz AI Lab · Panama · Field Journal</div>
+       <h1 class="name"><span class="name-sm">AI Ops</span><span class="name-lg">WIKI</span></h1>
+       <div class="rules"><span></span><span></span></div>
+-      <div class="mast-meta">Rev 22 &nbsp;·&nbsp; 11 chapters &nbsp;·&nbsp; 11 entries &nbsp;·&nbsp; <b>11 cross-references</b> &nbsp;·&nbsp; 2026-08-25</div>
++      <div class="mast-meta">Rev 24 &nbsp;·&nbsp; 12 chapters &nbsp;·&nbsp; 12 entries &nbsp;·&nbsp; <b>12 cross-references</b> &nbsp;·&nbsp; 2026-08-26</div>
+       <p class="tagline">Debug it with me.</p>
+       <p class="lede first">Real outages on live production systems, set as chapters. Open one and it unfolds a beat at a time — the symptom, then your guess, then what was actually happening.</p>
+       <p class="lede">Commit to an answer before you turn the page. That is the whole difference between reading a postmortem and keeping one.</p>
+@@ -349,15 +349,99 @@
+           <span class="fold-tag">Part One</span>
+           <span class="fold-name">Contents</span>
+           <span class="fold-note">Each chapter is one outage on a system that was live at the time. Numbers verified from production logs, never from configuration.</span>
+-          <span class="fold-side"><span class="fold-count">11 chapters</span><span class="fold-mark" aria-hidden="true"></span></span>
++          <span class="fold-side"><span class="fold-count">12 chapters</span><span class="fold-mark" aria-hidden="true"></span></span>
+         </button>
+       </h2>
+       <div class="fold-body" id="contents-body"><div class="fold-in">
+ 
+-      <article class="ch" id="2026-08-25-guard-that-renamed-the-problem" style="--d:0">
++      <article class="ch" id="2026-08-26-prompt-poisoned-the-grounding-gate" style="--d:0">
+         <h3 class="ch-h">
+-          <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-25-guard-that-renamed-the-problem-body">
++          <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-26-prompt-poisoned-the-grounding-gate-body">
+             <span class="ch-num">I</span>
++            <span class="ch-txt">
++              <span class="ch-title">The prompt poisoned the grounding gate</span>
++              <span class="ch-sub">A leftover $40 in the topic brief made a fail-closed verifier skip the daily blog on a day that had real evidence</span>
++            </span>
++            <span class="ch-side">
++              <span class="ch-date">August 26, 2026</span>
++              <span class="ch-leader" aria-hidden="true"></span>
++              <span class="ch-open">Read<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
++            </span>
++          </button>
++        </h3>
++
++        <div class="ch-body" id="2026-08-26-prompt-poisoned-the-grounding-gate-body">
++          <div class="ch-in">
++            <div class="beat beat-open">
++              <div class="beat-lbl"><span class="beat-n">i</span> Symptom <em>What it looked like from outside</em></div>
++              <div class="beat-txt">The 14:30 Panama cron ran on 26 August and Telegram reported the daily blog skipped — Grounding gate, unsourced number(s): 40. The scheduler was not off. The mutex line on that message was leftover wording. Four generation attempts each carried a $40 that was not in the evidence file, and the publisher published nothing.</div>
++            </div>
++
++            <div class="gate" data-gate="0">
++              <p class="gate-q">You are on call and this lands. Where do you look first?</p>
++              <button class="gate-btn" type="button" aria-expanded="false" aria-controls="2026-08-26-prompt-poisoned-the-grounding-gate-b0">
++                <span>Show me what it really was</span>
++                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
++              </button>
++            </div>
++            <div class="beat beat-shut" id="2026-08-26-prompt-poisoned-the-grounding-gate-b0">
++              <div class="beat-in">
++                <div class="beat-lbl"><span class="beat-n">ii</span> Root cause <em>What was actually happening</em></div>
++                <div class="beat-txt">Fail-closed on claims and fail-open on cadence were never separated. After the 23 August Redis fabrication, the publisher collected real facts and then still injected a rotation brief that contained BrightData $40/run (and other leftover figures). The model copied 40. The gate correctly refused a number it could not license. All three readings were locally correct. Cadence died for about forty minutes on a day that had evidence. The white IPFS page opened at 20:10 UTC was the already-documented pin lag — git-is-not-the-origin — not a second outage; the host finished pinning at 20:12.</div>
++              </div>
++            </div>
++            <div class="gate" data-gate="1">
++              <p class="gate-q">You have found it. What do you change — and what do you deliberately leave alone?</p>
++              <button class="gate-btn" type="button" aria-expanded="false" aria-controls="2026-08-26-prompt-poisoned-the-grounding-gate-b1">
++                <span>Show me the fix</span>
++                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
++              </button>
++            </div>
++            <div class="beat beat-shut" id="2026-08-26-prompt-poisoned-the-grounding-gate-b1">
++              <div class="beat-in">
++                <div class="beat-lbl"><span class="beat-n">iii</span> The fix <em>What changed</em></div>
++                <div class="beat-txt">Grounded mode no longer injects the numbered brief. After four gate failures the publisher salvages licensed numbers, then composes an evidence-only article so the day still ships. A one-shot catch-up on afternoon process start covers a skip that already happened that day without firing a second post the next morning. The cron stays 14:30 America/Panama.</div>
++              </div>
++            </div>
++            <div class="gate" data-gate="2">
++              <p class="gate-q">It looks fixed. How would you prove it, without trusting the config?</p>
++              <button class="gate-btn" type="button" aria-expanded="false" aria-controls="2026-08-26-prompt-poisoned-the-grounding-gate-b2">
++                <span>Show me the proof</span>
++                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
++              </button>
++            </div>
++            <div class="beat beat-shut" id="2026-08-26-prompt-poisoned-the-grounding-gate-b2">
++              <div class="beat-in">
++                <div class="beat-lbl"><span class="beat-n">iv</span> Verified by <em>Proof, not hope</em></div>
++                <div class="beat-txt">Telegram 26 Aug 19:31 UTC — Daily blog SKIPPED / Grounding gate / unsourced number(s): 40. Topic brief in the publisher still contained the string BrightData $40/run. Catch-up published GitHub commit 77f2ee0 at 20:10:42Z, HTML 15098 bytes. 4everland production deploy succeeded 20:12:01Z. Live audit HTTP/2 200, title 55,193 Restarts in 10 Days: Debugging an AI Agent's Endless Loop, CID bafybeidmkpn4e5xojctg7mj2h42ery7ddmi3lyjvy7xgbomnpmla2jyp3y, A+ 93/100. Cron expression unchanged: 30 14 * * * America/Panama.</div>
++              </div>
++            </div>
++            <div class="gate" data-gate="3">
++              <p class="gate-q">Last one. What is the lesson that outlives this system?</p>
++              <button class="gate-btn" type="button" aria-expanded="false" aria-controls="2026-08-26-prompt-poisoned-the-grounding-gate-b3">
++                <span>Show me the rule</span>
++                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
++              </button>
++            </div>
++            <div class="beat beat-shut beat-rule" id="2026-08-26-prompt-poisoned-the-grounding-gate-b3">
++              <div class="beat-in">
++                <div class="beat-lbl"><span class="beat-n">v</span> The rule this earned <em>What generalises</em></div>
++                <div class="beat-txt">A prompt is a source. If a verifier is fail-closed on numbers, every number in the prompt has to be licensed or stripped. Skipping is the right answer to a fake claim and the wrong answer to a poisoned brief. Fail-closed on claims, fail-open on cadence — those are two different decisions, and they must not share a skip path.</div>
++              </div>
++            </div>
++
++            <div class="linkrow">
++              <span class="linkrow-lbl">Vocabulary earned</span>
++              <span class="chips"><a class="chip" href="#the-prompt-is-a-source">The prompt is a source</a><a class="chip" href="#liveness-is-not-correctness">Liveness is not correctness</a><a class="chip" href="#fabrication-under-degradation">Fabrication under degradation</a><a class="chip" href="#silent-failure">Silent failure</a></span>
++            </div>
++          </div>
++        </div>
++      </article>
++
++      <article class="ch" id="2026-08-25-guard-that-renamed-the-problem" style="--d:1">
++        <h3 class="ch-h">
++          <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-25-guard-that-renamed-the-problem-body">
++            <span class="ch-num">II</span>
+             <span class="ch-txt">
+               <span class="ch-title">The guard that renamed the problem instead of stopping it</span>
+               <span class="ch-sub">A duplicate-detection check tested for exact equality, so a reworded title was a new article — and when it did fire, it appended the date and published anyway</span>
+@@ -438,10 +522,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-08-23-blog-invented-its-stack" style="--d:1">
++      <article class="ch" id="2026-08-23-blog-invented-its-stack" style="--d:2">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-23-blog-invented-its-stack-body">
+-            <span class="ch-num">II</span>
++            <span class="ch-num">III</span>
+             <span class="ch-txt">
+               <span class="ch-title">The blog that invented its own infrastructure</span>
+               <span class="ch-sub">A publishing bot ran out of credit, fell to a weaker model, and spent ten weeks describing a database the system has never used</span>
+@@ -522,10 +606,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-08-23-wall-on-the-page" style="--d:2">
++      <article class="ch" id="2026-08-23-wall-on-the-page" style="--d:3">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-23-wall-on-the-page-body">
+-            <span class="ch-num">III</span>
++            <span class="ch-num">IV</span>
+             <span class="ch-txt">
+               <span class="ch-title">The wall was on the page, not the data</span>
+               <span class="ch-sub">A refusal from one interface was generalised into a property of the whole system, and sent the work down a billable path that was never needed</span>
+@@ -606,10 +690,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-08-22-precedence-deadlock" style="--d:3">
++      <article class="ch" id="2026-08-22-precedence-deadlock" style="--d:4">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-22-precedence-deadlock-body">
+-            <span class="ch-num">IV</span>
++            <span class="ch-num">V</span>
+             <span class="ch-txt">
+               <span class="ch-title">The model that drafted perfectly and lost every race</span>
+               <span class="ch-sub">A paid writer was healthy, producing correct replies, and having every one of them discarded on arrival</span>
+@@ -690,10 +774,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-08-21-git-ahead-of-pin" style="--d:4">
++      <article class="ch" id="2026-08-21-git-ahead-of-pin" style="--d:5">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-21-git-ahead-of-pin-body">
+-            <span class="ch-num">V</span>
++            <span class="ch-num">VI</span>
+             <span class="ch-txt">
+               <span class="ch-title">The blog post GitHub had and the live CID did not</span>
+               <span class="ch-sub">Dev.to and the portfolio advertised a canonical URL whose IPFS directory did not exist</span>
+@@ -774,10 +858,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-08-19-ack-trap" style="--d:5">
++      <article class="ch" id="2026-08-19-ack-trap" style="--d:6">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-19-ack-trap-body">
+-            <span class="ch-num">VI</span>
++            <span class="ch-num">VII</span>
+             <span class="ch-txt">
+               <span class="ch-title">The webhook that returned 200 while switched off</span>
+               <span class="ch-sub">A disabled workflow accepted every message and read none of them</span>
+@@ -858,10 +942,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-08-19-concierge-outage" style="--d:6">
++      <article class="ch" id="2026-08-19-concierge-outage" style="--d:7">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-19-concierge-outage-body">
+-            <span class="ch-num">VII</span>
++            <span class="ch-num">VIII</span>
+             <span class="ch-txt">
+               <span class="ch-title">The lead pipeline that answered nobody for four days</span>
+               <span class="ch-sub">A prepaid balance inside a hosted workflow tool was the single point of failure for every inbound lead</span>
+@@ -942,10 +1026,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-08-19-stage-never-moved" style="--d:7">
++      <article class="ch" id="2026-08-19-stage-never-moved" style="--d:8">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-08-19-stage-never-moved-body">
+-            <span class="ch-num">VIII</span>
++            <span class="ch-num">IX</span>
+             <span class="ch-txt">
+               <span class="ch-title">Answered leads that still looked untouched</span>
+               <span class="ch-sub">Sending a reply logged the activity but never moved the deal</span>
+@@ -1026,10 +1110,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-06-23-silent-graph" style="--d:8">
++      <article class="ch" id="2026-06-23-silent-graph" style="--d:9">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-06-23-silent-graph-body">
+-            <span class="ch-num">IX</span>
++            <span class="ch-num">X</span>
+             <span class="ch-txt">
+               <span class="ch-title">The graph that failed by staying quiet</span>
+               <span class="ch-sub">Two silent failures in one LangGraph pipeline — a stripped state key and a pause that never resumed</span>
+@@ -1110,10 +1194,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-05-25-engagement-loop" style="--d:9">
++      <article class="ch" id="2026-05-25-engagement-loop" style="--d:10">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-05-25-engagement-loop-body">
+-            <span class="ch-num">X</span>
++            <span class="ch-num">XI</span>
+             <span class="ch-txt">
+               <span class="ch-title">The engagement loop that never ran</span>
+               <span class="ch-sub">Configuration promised 32 engagements a day; the logs showed zero cycles had ever completed</span>
+@@ -1194,10 +1278,10 @@
+         </div>
+       </article>
+ 
+-      <article class="ch" id="2026-05-10-duplicate-posting" style="--d:10">
++      <article class="ch" id="2026-05-10-duplicate-posting" style="--d:11">
+         <h3 class="ch-h">
+           <button class="ch-btn" type="button" aria-expanded="false" aria-controls="2026-05-10-duplicate-posting-body">
+-            <span class="ch-num">XI</span>
++            <span class="ch-num">XII</span>
+             <span class="ch-txt">
+               <span class="ch-title">The milestone that posted twice</span>
+               <span class="ch-sub">The same update emitted twice, six minutes apart</span>
+@@ -1286,7 +1370,7 @@
+           <span class="fold-tag">Part Two · Appendix</span>
+           <span class="fold-name">The vocabulary</span>
+           <span class="fold-note">Each entry is a failure mode with a name. The name is what lets you recognise the same shape somewhere new, before it costs you a weekend.</span>
+-          <span class="fold-side"><span class="fold-count">11 entries</span><span class="fold-mark" aria-hidden="true"></span></span>
++          <span class="fold-side"><span class="fold-count">12 entries</span><span class="fold-mark" aria-hidden="true"></span></span>
+         </button>
+       </h2>
+       <div class="fold-body" id="vocabulary-body"><div class="fold-in">
+@@ -1334,7 +1418,7 @@
+               <span class="ch-sub">When the good model runs out, the fallback does not go quiet — it goes confident.</span>
+             </span>
+             <span class="ch-side">
+-              <span class="ch-date">1 case</span>
++              <span class="ch-date">2 cases</span>
+               <span class="ch-leader" aria-hidden="true"></span>
+               <span class="ch-open">Read<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+             </span>
+@@ -1357,7 +1441,7 @@
+ <p>The reputational asymmetry is the part worth internalising. A crash costs you an afternoon. Published fabrication costs you the credibility of everything true you ever wrote next to it — and it is discovered by the reader, not by you.</p></div>
+             <div class="linkrow">
+               <span class="linkrow-lbl">Learned the hard way in</span>
+-              <span class="chips"><a class="chip" href="#2026-08-23-blog-invented-its-stack">August 23, 2026 · The blog that invented its own infrastructure</a></span>
++              <span class="chips"><a class="chip" href="#2026-08-26-prompt-poisoned-the-grounding-gate">August 26, 2026 · The prompt poisoned the grounding gate</a><a class="chip" href="#2026-08-23-blog-invented-its-stack">August 23, 2026 · The blog that invented its own infrastructure</a></span>
+             </div>
+           </div>
+         </div>
+@@ -1437,7 +1521,7 @@
+               <span class="ch-sub">A dead job announces itself. A job that runs perfectly and emits slightly wrong output never will.</span>
+             </span>
+             <span class="ch-side">
+-              <span class="ch-date">1 case</span>
++              <span class="ch-date">2 cases</span>
+               <span class="ch-leader" aria-hidden="true"></span>
+               <span class="ch-open">Read<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+             </span>
+@@ -1456,7 +1540,7 @@
+ <p>The practical defence is to add one check that reads the <em>output</em> rather than the exit code, and to make it something a human would actually notice — a count that should be stable, a uniqueness constraint, a spot comparison against what shipped last time. You are not trying to verify everything. You are trying to have at least one signal that fails when the job succeeds incorrectly.</p></div>
+             <div class="linkrow">
+               <span class="linkrow-lbl">Learned the hard way in</span>
+-              <span class="chips"><a class="chip" href="#2026-08-25-guard-that-renamed-the-problem">August 25, 2026 · The guard that renamed the problem instead of stopping it</a></span>
++              <span class="chips"><a class="chip" href="#2026-08-26-prompt-poisoned-the-grounding-gate">August 26, 2026 · The prompt poisoned the grounding gate</a><a class="chip" href="#2026-08-25-guard-that-renamed-the-problem">August 25, 2026 · The guard that renamed the problem instead of stopping it</a></span>
+             </div>
+           </div>
+         </div>
+@@ -1548,7 +1632,7 @@
+               <span class="ch-sub">The system did something reasonable, and told nobody.</span>
+             </span>
+             <span class="ch-side">
+-              <span class="ch-date">6 cases</span>
++              <span class="ch-date">7 cases</span>
+               <span class="ch-leader" aria-hidden="true"></span>
+               <span class="ch-open">Read<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
+             </span>
+@@ -1566,7 +1650,7 @@
+ </ul></div>
+             <div class="linkrow">
+               <span class="linkrow-lbl">Learned the hard way in</span>
+-              <span class="chips"><a class="chip" href="#2026-08-25-guard-that-renamed-the-problem">August 25, 2026 · The guard that renamed the problem instead of stopping it</a><a class="chip" href="#2026-08-23-blog-invented-its-stack">August 23, 2026 · The blog that invented its own infrastructure</a><a class="chip" href="#2026-08-21-git-ahead-of-pin">August 21, 2026 · The blog post GitHub had and the live CID did not</a><a class="chip" href="#2026-08-19-concierge-outage">August 19, 2026 · The lead pipeline that answered nobody for four days</a><a class="chip" href="#2026-06-23-silent-graph">June 23, 2026 · The graph that failed by staying quiet</a><a class="chip" href="#2026-05-25-engagement-loop">May 25, 2026 · The engagement loop that never ran</a></span>
++              <span class="chips"><a class="chip" href="#2026-08-26-prompt-poisoned-the-grounding-gate">August 26, 2026 · The prompt poisoned the grounding gate</a><a class="chip" href="#2026-08-25-guard-that-renamed-the-problem">August 25, 2026 · The guard that renamed the problem instead of stopping it</a><a class="chip" href="#2026-08-23-blog-invented-its-stack">August 23, 2026 · The blog that invented its own infrastructure</a><a class="chip" href="#2026-08-21-git-ahead-of-pin">August 21, 2026 · The blog post GitHub had and the live CID did not</a><a class="chip" href="#2026-08-19-concierge-outage">August 19, 2026 · The lead pipeline that answered nobody for four days</a><a class="chip" href="#2026-06-23-silent-graph">June 23, 2026 · The graph that failed by staying quiet</a><a class="chip" href="#2026-05-25-engagement-loop">May 25, 2026 · The engagement loop that never ran</a></span>
+             </div>
+           </div>
+         </div>
+@@ -1635,10 +1719,45 @@
+         </div>
+       </article>
+ 
+-      <article class="ch term" id="verify-from-logs" style="--d:10">
++      <article class="ch term" id="the-prompt-is-a-source" style="--d:10">
+         <h3 class="ch-h">
+-          <button class="ch-btn" type="button" aria-expanded="false" aria-controls="verify-from-logs-body">
++          <button class="ch-btn" type="button" aria-expanded="false" aria-controls="the-prompt-is-a-source-body">
+             <span class="ch-num">11</span>
++            <span class="ch-txt">
++              <span class="ch-title">The prompt is a source</span>
++              <span class="ch-sub">A numbered claim in a system prompt is as much a source as a log line — and a fail-closed gate will treat it that way.</span>
++            </span>
++            <span class="ch-side">
++              <span class="ch-date">1 case</span>
++              <span class="ch-leader" aria-hidden="true"></span>
++              <span class="ch-open">Read<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>
++            </span>
++          </button>
++        </h3>
++        <div class="ch-body" id="the-prompt-is-a-source-body">
++          <div class="ch-in">
++            <div class="aka">a.k.a. poisoned brief; the prompt leaked into the output; flavour text that was not flavour</div>
++            <div class="prose"><p>A verifier that refuses unsourced numbers is doing the right job. The model still has to write from <em>something</em>. If that something — a topic brief, a few-shot example, a “write about X” paragraph — contains a leftover figure, the model copies it. The gate then fires on a number that was never in the evidence file, and the pipeline skips even when the day produced plenty of real facts.</p>
++<p>The trap is treating the prompt as flavour text. The model does not. To the generator, a brief that says “BrightData $40/run” is a fact. To the gate, `$40` is unsourced. Both readings are locally correct. Cadence dies in the gap.</p>
++<p>Ordinary-life version: you ask someone to write the minutes from the meeting notes, and you also slide them last year's budget that still says the coffee machine costs forty dollars. They copy the forty. The auditor who only accepted numbers from the notes throws the minutes out. Nobody invented the forty. The briefing packet did.</p>
++<p>The defences are structural:</p>
++<ol>
++<li><strong>Grounded mode must not inject a numbered brief.</strong> Derive the angle from measured evidence, or strip every digit from flavour text before it reaches the model.</li>
++<li><strong>Separate fail-closed on claims from fail-open on cadence.</strong> Skipping is the right answer to a fake stack. It is the wrong answer to a poisoned prompt on a day that had evidence.</li>
++<li><strong>If the gate still fails, salvage, then fall back.</strong> Rewrite unsourced numbers against the licensed set, then compose an evidence-only article so the day still ships. Silence remains correct only when there is nothing to measure.</li>
++</ol></div>
++            <div class="linkrow">
++              <span class="linkrow-lbl">Learned the hard way in</span>
++              <span class="chips"><a class="chip" href="#2026-08-26-prompt-poisoned-the-grounding-gate">August 26, 2026 · The prompt poisoned the grounding gate</a></span>
++            </div>
++          </div>
++        </div>
++      </article>
++
++      <article class="ch term" id="verify-from-logs" style="--d:11">
++        <h3 class="ch-h">
++          <button class="ch-btn" type="button" aria-expanded="false" aria-controls="verify-from-logs-body">
++            <span class="ch-num">12</span>
+             <span class="ch-txt">
+               <span class="ch-title">Verify from logs, not config</span>
+               <span class="ch-sub">Configuration tells you what somebody intended. Logs tell you what happened.</span>
+@@ -1682,14 +1801,14 @@
+     <footer>
+       <span>Kept by <a href="https://aideazz.xyz/portfolio">Elena Revicheva</a></span>
+       <span><a href="/sop-ai-ops.html">AI Ops Runbook</a></span>
+-      <span>Updated 2026-08-25</span>
++      <span>Updated 2026-08-26</span>
+     </footer>
+   </div>
+ 
+   <script>
+   (function(){
+     document.body.classList.remove('nojs');
+-    var total = 44, opened = 0;
++    var total = 48, opened = 0;
+     var fill = document.getElementById('barFill'), count = document.getElementById('barCount');
+     function tick(){ opened++; count.textContent = opened + ' / ' + total; fill.style.width = (opened/total*100) + '%'; }
+ 
+diff --git a/public/geo-manifest.json b/public/geo-manifest.json
+index 09bad7d..4109523 100644
+--- a/public/geo-manifest.json
++++ b/public/geo-manifest.json
+@@ -1,6 +1,6 @@
+ {
+   "geoPackage": "AIdeazz-GEO/v4-iron",
+-  "updated": "2026-08-25",
++  "updated": "2026-08-26",
+   "canonicalOrigin": "https://aideazz.xyz",
+   "intent": "Maximum GEO: redundant machine-readable identity, explicit crawler policy, and citable facts without relying on a single format.",
+   "preferredCitation": {
+-- 
+2.43.0
+

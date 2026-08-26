@@ -66,3 +66,9 @@ so the Telegram-ops HTML already in git is in the pin. Applied; live CID did not
 for the 21 Aug 2026 incident (56 skip-ci commits, then eligible SHAs, live CID unchanged).
 Regenerates `public/ai-ops-wiki.html` (Rev 14) and restamps the pin file. No `[skip ci]`.
 
+`0007-wiki-prompt-poisoned-the-grounding-gate.patch` — 26 Aug 2026 chapter + concept
+(`the-prompt-is-a-source`): a leftover `$40` in the topic brief made the fail-closed
+grounding gate skip the daily blog on a day that had real evidence. Regenerates
+`public/ai-ops-wiki.html`, restamps the pin file, bumps `geo-manifest.json` date.
+`blog: no`. No `[skip ci]`.
+
