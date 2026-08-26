@@ -15,6 +15,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 const assert = require("assert");
 
 const root = path.join(__dirname, "..");
@@ -229,6 +230,59 @@ check("skip Telegram no longer blames mutex for every skip", () => {
 check("cron is still 14:30 America/Panama", () => {
   assert.ok(publisher.includes('"30 14 * * *"'));
   assert.ok(publisher.includes('"America/Panama"'));
+});
+
+check("publisher catch-up is wired for a missed 14:30 window", () => {
+  assert.ok(publisher.includes("shouldCatchUpMissedDailyPost"));
+  assert.ok(publisher.includes("catch-up — today's 14:30 Panama window passed with no daily post"));
+});
+
+const {
+  shouldCatchUpMissedDailyPost,
+  wallClockInZone,
+} = require(path.join(root, "dist/daily-blog-publisher.js"));
+
+check("Panama 14:31 is past the cron, 13:00 is not", () => {
+  const after = wallClockInZone("America/Panama", new Date("2026-08-26T19:31:00.000Z"));
+  const before = wallClockInZone("America/Panama", new Date("2026-08-27T18:00:00.000Z"));
+  assert.equal(after.ymd, "2026-08-26");
+  assert.ok(after.minutes >= 14 * 60 + 30, String(after.minutes));
+  assert.equal(before.ymd, "2026-08-27");
+  assert.ok(before.minutes < 14 * 60 + 30, String(before.minutes));
+});
+
+check("catch-up is true after 14:30 when today has no daily post", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "blog-cache-"));
+  process.env.DAILY_BLOG_TOPIC_STATE_DIR = dir;
+  process.env.HASHNODE_TOPIC_STATE_DIR = dir;
+  assert.equal(shouldCatchUpMissedDailyPost(new Date("2026-08-26T19:31:00.000Z")), true);
+  assert.equal(shouldCatchUpMissedDailyPost(new Date("2026-08-27T18:00:00.000Z")), false);
+});
+
+check("catch-up is false once a daily post exists for that Panama date", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "blog-cache-"));
+  process.env.DAILY_BLOG_TOPIC_STATE_DIR = dir;
+  process.env.HASHNODE_TOPIC_STATE_DIR = dir;
+  fs.writeFileSync(
+    path.join(dir, "blog-posts-cache.json"),
+    JSON.stringify({
+      "today-post": { title: "Today", stream: "daily", publishedAt: "2026-08-26T19:45:00.000Z" },
+    }),
+  );
+  assert.equal(shouldCatchUpMissedDailyPost(new Date("2026-08-26T20:00:00.000Z")), false);
+});
+
+check("a field note the same day does not count as the daily post", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "blog-cache-"));
+  process.env.DAILY_BLOG_TOPIC_STATE_DIR = dir;
+  process.env.HASHNODE_TOPIC_STATE_DIR = dir;
+  fs.writeFileSync(
+    path.join(dir, "blog-posts-cache.json"),
+    JSON.stringify({
+      "field-note": { title: "Note", stream: "fieldnote", publishedAt: "2026-08-26T19:45:00.000Z" },
+    }),
+  );
+  assert.equal(shouldCatchUpMissedDailyPost(new Date("2026-08-26T20:00:00.000Z")), true);
 });
 
 if (failed) {

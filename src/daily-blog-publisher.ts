@@ -1453,6 +1453,70 @@ Write the article for developers and technical founders. Ground in AIdeazz reali
 //      Telegram with success / skip / failure outcome.
 // ============================================================================
 
+/**
+ * Panama wall-clock (or DAILY_BLOG_TZ). Used to decide whether today's 14:30
+ * window has already passed without a daily post.
+ */
+export function wallClockInZone(timeZone: string, now = new Date()): { ymd: string; minutes: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const g = (t: string): string => parts.find((p) => p.type === t)?.value ?? "0";
+  return {
+    ymd: `${g("year")}-${g("month")}-${g("day")}`,
+    minutes: Number(g("hour")) * 60 + Number(g("minute")),
+  };
+}
+
+function parseCronHourMinute(cronExpr: string): number | null {
+  const bits = cronExpr.trim().split(/\s+/);
+  if (bits.length < 2) return null;
+  const minute = Number(bits[0]);
+  const hour = Number(bits[1]);
+  if (!Number.isFinite(minute) || !Number.isFinite(hour)) return null;
+  return hour * 60 + minute;
+}
+
+/**
+ * Catch up a missed day without stealing tomorrow's slot.
+ *
+ * If we are already past 14:30 Panama and the cache has no daily post for
+ * today's Panama date (a skip does not write the cache), fire once on boot.
+ * A morning restart tomorrow is still before 14:30, so it waits for the cron.
+ */
+export function shouldCatchUpMissedDailyPost(now = new Date()): boolean {
+  if ((process.env.DAILY_BLOG_CATCHUP_ON_START ?? "true") !== "true") return false;
+  const cronExpr = (process.env.DAILY_BLOG_CRON ?? process.env.HASHNODE_DAILY_CRON) || "30 14 * * *";
+  const tz = (process.env.DAILY_BLOG_TZ ?? process.env.HASHNODE_DAILY_TZ) || "America/Panama";
+  const cronHm = parseCronHourMinute(cronExpr);
+  if (cronHm === null) return false;
+  const clock = wallClockInZone(tz, now);
+  if (clock.minutes < cronHm) return false;
+  try {
+    const cacheFile = getBlogPostCachePath();
+    if (!fs.existsSync(cacheFile)) return true;
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf8")) as Record<
+      string,
+      { publishedAt?: string; stream?: string }
+    >;
+    for (const v of Object.values(cache)) {
+      if (v?.stream && v.stream !== "daily") continue;
+      const t = v?.publishedAt ? Date.parse(v.publishedAt) : NaN;
+      if (!Number.isFinite(t)) continue;
+      if (wallClockInZone(tz, new Date(t)).ymd === clock.ymd) return false;
+    }
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 function recentPublishCutoffOk(): { ok: true } | { ok: false; reason: string; hoursAgo: number } {
   try {
     const cacheFile = getBlogPostCachePath();
@@ -1621,16 +1685,19 @@ export function startDailyBlogPublisher(deps: { anthropic: Anthropic; model: str
     : `Dev.to + aideazz.xyz cross-post — listed: ${dailyBlogIsDelisted() ? "no (DELISTED)" : "yes"}`;
   console.log(`📰 Daily blog: scheduled ${cronExpr} (${tz}) — mode: ${mode}`);
 
-  // Fire once immediately on startup when HASHNODE_DAILY_RUN_ON_START=true.
-  // Useful after deploys to publish without waiting for the next cron window.
-  if ((process.env.DAILY_BLOG_RUN_ON_START ?? process.env.HASHNODE_DAILY_RUN_ON_START) === "true") {
-    console.log("📰 Daily blog: DAILY_BLOG_RUN_ON_START=true — firing in 10s…");
+  const runOnStart = (process.env.DAILY_BLOG_RUN_ON_START ?? process.env.HASHNODE_DAILY_RUN_ON_START) === "true";
+  const catchUp = !runOnStart && shouldCatchUpMissedDailyPost();
+  if (runOnStart || catchUp) {
+    const why = runOnStart
+      ? "DAILY_BLOG_RUN_ON_START=true"
+      : "catch-up — today's 14:30 Panama window passed with no daily post";
+    console.log(`📰 Daily blog: ${why} — firing in 10s…`);
     setTimeout(async () => {
-      console.log("📰 Daily blog: startup run starting…");
+      console.log("📰 Daily blog: startup/catch-up run starting…");
       try {
         await runDailyBlogPost(deps);
       } catch (e) {
-        console.error("📰 Daily blog (startup run) error:", e);
+        console.error("📰 Daily blog (startup/catch-up run) error:", e);
       }
     }, 10_000);
   }
