@@ -1,0 +1,47 @@
+From 79b70a58f010b089c8b10e77a1ac3b1023449c0b Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Thu, 27 Aug 2026 11:59:49 +0000
+Subject: [PATCH] docs(sop): stack card leads with the five-provider LLM
+ waterfall (EN+ES)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The AI/LLMs stack card was the one surface still showing the old
+lineup (no Gemini, Grok as 'tier-3 failover'). It now leads with the
+fleet-wide waterfall — Claude · OpenAI · Gemini · Grok · Groq, ordered
+per use case — matching llm-resilience.ts and the rest of the page.
+---
+ public/sop-ai-ops-es.html | 2 +-
+ public/sop-ai-ops.html    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/public/sop-ai-ops-es.html b/public/sop-ai-ops-es.html
+index d33d87b..65213c9 100644
+--- a/public/sop-ai-ops-es.html
++++ b/public/sop-ai-ops-es.html
+@@ -2124,7 +2124,7 @@
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">IA / LLM</div>
+-        <div class="stack-tools"><span class="stack-chip">Claude Sonnet / Haiku</span><span class="stack-chip">Groq (inferencia de modelos abiertos — el id del modelo se resuelve mediante un único conmutador de flota, así que las deprecaciones del proveedor son un cambio de configuración de una línea)</span><span class="stack-chip">Grok (xAI, failover nivel 3)</span><span class="stack-chip">OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper) con reintentos + cadena de respaldo</span><span class="stack-chip">Bright Data (captura de transparencia publicitaria pública)</span><span class="stack-chip">Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro para la creatividad de Atlas</span><span class="stack-chip">LangChain</span><span class="stack-chip">LangGraph</span></div>
++        <div class="stack-tools"><span class="stack-chip"><strong>Cascada de cinco proveedores en cada producto</strong>&nbsp;— Claude · OpenAI · Gemini · Grok · Groq, orden por caso de uso; con cuatro de cinco caídos, el agente sigue respondiendo</span><span class="stack-chip">Claude Sonnet / Haiku (rutas de calidad)</span><span class="stack-chip">OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper)</span><span class="stack-chip">Gemini + Grok (xAI) en la cadena</span><span class="stack-chip">Groq inferencia de modelos abiertos — id del modelo vía un conmutador de flota; las deprecaciones son un cambio de config de una línea</span><span class="stack-chip">Bright Data (captura de transparencia publicitaria pública)</span><span class="stack-chip">Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro para la creatividad de Atlas</span><span class="stack-chip">LangChain</span><span class="stack-chip">LangGraph</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Generación de leads</div>
+diff --git a/public/sop-ai-ops.html b/public/sop-ai-ops.html
+index 4fa9ffe..c40ef56 100644
+--- a/public/sop-ai-ops.html
++++ b/public/sop-ai-ops.html
+@@ -2198,7 +2198,7 @@
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">AI / LLMs</div>
+-        <div class="stack-tools"><span class="stack-chip">Claude Sonnet / Haiku</span><span class="stack-chip">Groq (open-model inference — model id resolved via one fleet-wide switch, so provider deprecations are a one-line config change)</span><span class="stack-chip">Grok (xAI, tier-3 failover)</span><span class="stack-chip">OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper) with retry + provider-fallback chain</span><span class="stack-chip">Bright Data (public ad-transparency capture)</span><span class="stack-chip">Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro for Atlas creative</span><span class="stack-chip">LangChain</span><span class="stack-chip">LangGraph</span></div>
++        <div class="stack-tools"><span class="stack-chip"><strong>Five-provider waterfall on every product</strong>&nbsp;— Claude · OpenAI · Gemini · Grok · Groq, order set per use case; with four of five dark, the agent still answers</span><span class="stack-chip">Claude Sonnet / Haiku (quality paths)</span><span class="stack-chip">OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper)</span><span class="stack-chip">Gemini + Grok (xAI) in the chain</span><span class="stack-chip">Groq open-model inference — model id via one fleet-wide switch; provider deprecations are a one-line config change</span><span class="stack-chip">Bright Data (public ad-transparency capture)</span><span class="stack-chip">Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro for Atlas creative</span><span class="stack-chip">LangChain</span><span class="stack-chip">LangGraph</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Lead Gen</div>
+-- 
+2.43.0
+
