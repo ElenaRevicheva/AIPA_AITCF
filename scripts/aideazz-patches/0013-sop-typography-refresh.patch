@@ -1,0 +1,148 @@
+From 1e9e341de53d2de0e3cfaa267f0549e87e02e8b6 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Thu, 27 Aug 2026 12:43:43 +0000
+Subject: [PATCH] =?UTF-8?q?style(sop):=20typography=20refresh=20=E2=80=94?=
+ =?UTF-8?q?=20Space=20Grotesk=20display,=20gradient=20headings=20(EN+ES)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Display face moves to Space Grotesk (Plus Jakarta Sans fallback);
+section h2s get a white→lavender→cyan gradient; eyebrows go
+violet→cyan; headings balance-wrap, body text pretty-wraps; teal
+selection; underlined links with offset. CSS + one font link only —
+content unchanged.
+---
+ public/sop-ai-ops-es.html | 45 ++++++++++++++++++++++++++++++++++++++-
+ public/sop-ai-ops.html    | 45 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 88 insertions(+), 2 deletions(-)
+
+diff --git a/public/sop-ai-ops-es.html b/public/sop-ai-ops-es.html
+index 65213c9..0fcbd59 100644
+--- a/public/sop-ai-ops-es.html
++++ b/public/sop-ai-ops-es.html
+@@ -16,7 +16,7 @@
+   <link rel="alternate" hreflang="x-default" href="https://aideazz.xyz/sop-ai-ops.html" />
+   <link rel="preconnect" href="https://fonts.googleapis.com" />
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&family=JetBrains+Mono:wght@450;500;600&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap" rel="stylesheet" />
++  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&family=JetBrains+Mono:wght@450;500;600&family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap" rel="stylesheet" />
+ 
+   <script type="application/ld+json">
+   {"@context":"https://schema.org","@type":"TechArticle","headline":"Manual de operaciones de agentes de IA","author":{"@type":"Person","name":"Elena Revicheva"},"dateModified":"2026-08-27","publisher":{"@type":"Organization","name":"AIdeazz","url":"https://aideazz.xyz"},"inLanguage":"es"}
+@@ -1360,6 +1360,49 @@
+       pointer-events: none;
+     }
+     .b-card:hover::after, .rule-card:hover::after { transform: translateX(120%); }
++
++    /* ---- Typography refresh (Aug 2026): Space Grotesk display, gradient headings ---- */
++    :root { --display: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif; }
++    h1, h2, h3 { text-wrap: balance; }
++    p, li { text-wrap: pretty; }
++    .hero h1 {
++      letter-spacing: -0.05em;
++      font-weight: 700;
++    }
++    .section-head h2 {
++      letter-spacing: -0.035em;
++      background: linear-gradient(115deg, #ffffff 20%, #cfc7ff 62%, #6fe9dc 100%);
++      -webkit-background-clip: text;
++      background-clip: text;
++      color: transparent;
++    }
++    @supports not (background-clip: text) {
++      .section-head h2 { color: var(--text); background: none; }
++    }
++    .s-eyebrow {
++      background: linear-gradient(90deg, var(--violet), var(--cyan));
++      -webkit-background-clip: text;
++      background-clip: text;
++      color: transparent;
++      font-weight: 700;
++      letter-spacing: 0.22em;
++    }
++    .p-card h3, .rule-card h3, .faq-item h3, .pm-head h3 { letter-spacing: -0.025em; }
++    .b-num { letter-spacing: -0.045em; font-weight: 700; }
++    ::selection { background: rgba(46, 230, 214, 0.28); color: #ffffff; }
++    main a:not(.cta-primary):not(.cta-ghost):not(.stack-chip):not(.toc-out),
++    .exec-banner a, .callout a, .faq-item a, .pm-val a {
++      text-decoration: underline;
++      text-decoration-color: rgba(46, 230, 214, 0.35);
++      text-underline-offset: 3px;
++      text-decoration-thickness: 1px;
++      transition: text-decoration-color 0.2s ease;
++    }
++    main a:hover { text-decoration-color: var(--cyan); }
++    .hero-sub strong, .p-card strong, .callout strong, .exec-banner strong {
++      font-weight: 650;
++      color: var(--text);
++    }
+   </style>
+ 
+   <!-- Google tag (gtag.js) — this page shipped without it, so every visit to the
+diff --git a/public/sop-ai-ops.html b/public/sop-ai-ops.html
+index c40ef56..9d31eb8 100644
+--- a/public/sop-ai-ops.html
++++ b/public/sop-ai-ops.html
+@@ -28,7 +28,7 @@
+   <meta name="twitter:image" content="https://aideazz.xyz/og-image.png" />
+   <link rel="preconnect" href="https://fonts.googleapis.com" />
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&family=JetBrains+Mono:wght@450;500;600&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap" rel="stylesheet" />
++  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&family=JetBrains+Mono:wght@450;500;600&family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap" rel="stylesheet" />
+ 
+   <script type="application/ld+json">
+   {"@context":"https://schema.org","@type":"TechArticle","headline":"AI Agent Operations Runbook","author":{"@type":"Person","name":"Elena Revicheva","url":"https://aideazz.xyz/portfolio","jobTitle":"AI Engineer & Fractional CTO","sameAs":["https://linkedin.com/in/elenarevicheva","https://github.com/ElenaRevicheva","https://x.com/reviceva","https://dev.to/elenarevicheva"]},"dateModified":"2026-08-27","publisher":{"@type":"Organization","name":"AIdeazz","url":"https://aideazz.xyz","sameAs":["https://linkedin.com/in/elenarevicheva","https://github.com/ElenaRevicheva","https://x.com/reviceva","https://podcast.aideazz.xyz/"]},"mainEntityOfPage":{"@type":"WebPage","@id":"https://aideazz.xyz/sop-ai-ops.html"}}
+@@ -1417,6 +1417,49 @@
+       pointer-events: none;
+     }
+     .b-card:hover::after, .rule-card:hover::after { transform: translateX(120%); }
++
++    /* ---- Typography refresh (Aug 2026): Space Grotesk display, gradient headings ---- */
++    :root { --display: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif; }
++    h1, h2, h3 { text-wrap: balance; }
++    p, li { text-wrap: pretty; }
++    .hero h1 {
++      letter-spacing: -0.05em;
++      font-weight: 700;
++    }
++    .section-head h2 {
++      letter-spacing: -0.035em;
++      background: linear-gradient(115deg, #ffffff 20%, #cfc7ff 62%, #6fe9dc 100%);
++      -webkit-background-clip: text;
++      background-clip: text;
++      color: transparent;
++    }
++    @supports not (background-clip: text) {
++      .section-head h2 { color: var(--text); background: none; }
++    }
++    .s-eyebrow {
++      background: linear-gradient(90deg, var(--violet), var(--cyan));
++      -webkit-background-clip: text;
++      background-clip: text;
++      color: transparent;
++      font-weight: 700;
++      letter-spacing: 0.22em;
++    }
++    .p-card h3, .rule-card h3, .faq-item h3, .pm-head h3 { letter-spacing: -0.025em; }
++    .b-num { letter-spacing: -0.045em; font-weight: 700; }
++    ::selection { background: rgba(46, 230, 214, 0.28); color: #ffffff; }
++    main a:not(.cta-primary):not(.cta-ghost):not(.stack-chip):not(.toc-out),
++    .exec-banner a, .callout a, .faq-item a, .pm-val a {
++      text-decoration: underline;
++      text-decoration-color: rgba(46, 230, 214, 0.35);
++      text-underline-offset: 3px;
++      text-decoration-thickness: 1px;
++      transition: text-decoration-color 0.2s ease;
++    }
++    main a:hover { text-decoration-color: var(--cyan); }
++    .hero-sub strong, .p-card strong, .callout strong, .exec-banner strong {
++      font-weight: 650;
++      color: var(--text);
++    }
+   </style>
+ 
+   <!-- Google tag (gtag.js) — this page shipped without it, so every visit to the
+-- 
+2.43.0
+

@@ -77,6 +77,15 @@ portfolio card back scrolled to a form on the hidden front face and landed on em
 particles. Punch CTA now uses the same `goToForm` handler as the service cards
 (flip, then scroll). Copy and layout unchanged.
 
+`0013-sop-typography-refresh.patch` — SOP typography (EN+ES): Space Grotesk
+display face, gradient section headings + eyebrows, balanced heading wrap,
+teal selection, offset link underlines. CSS + one font link; content unchanged.
+
+`0012-sop-llm-waterfall-chip.patch` — the AI/LLMs stack card was the last surface
+showing the pre-waterfall lineup (no Gemini, Grok as "tier-3 failover"). Now
+leads with the fleet-wide five-provider waterfall (Claude · OpenAI · Gemini ·
+Grok · Groq, ordered per use case), matching `llm-resilience.ts`.
+
 `0011-sop-stack-chips.patch` — SOP Stack reference redesign (EN+ES): per-category
 gradient top edge + glowing marker, tools as rounded chips with hover tint,
 card lift + shine sweep. Content unchanged.
