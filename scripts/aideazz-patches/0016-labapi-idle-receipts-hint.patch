@@ -1,12 +1,9 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 302e8f6557ee8141d95f67df92edd8eab94e854b Mon Sep 17 00:00:00 2001
 From: Cursor Agent <cursoragent@cursor.com>
-Date: Thu, 27 Aug 2026 21:24:00 +0000
-Subject: [PATCH] feat(api): idle page says you get all 34 checks, not five tips
+Date: Thu, 27 Aug 2026 21:26:20 +0000
+Subject: [PATCH] feat(api): idle page says you get all 34 checks, not five
+ tips
 
-The empty /api landing looked identical before an audit, so the 34-check
-result UI was invisible until someone typed a URL and clicked Audit.
-Add one line under the form (EN+ES) that states the receipts are in the
-result. Engine, demo key, scoring unchanged.
 ---
  src/i18n/locales/en.json | 1 +
  src/i18n/locales/es.json | 1 +
@@ -14,7 +11,7 @@ result. Engine, demo key, scoring unchanged.
  3 files changed, 3 insertions(+)
 
 diff --git a/src/i18n/locales/en.json b/src/i18n/locales/en.json
-index 2c8eac4..b111111 100644
+index 2c8eac4..c77809b 100644
 --- a/src/i18n/locales/en.json
 +++ b/src/i18n/locales/en.json
 @@ -9,6 +9,7 @@
@@ -26,7 +23,7 @@ index 2c8eac4..b111111 100644
      "scoreLabel": "AI Visibility Score",
      "enginesTitle": "Can AI engines read this site?",
 diff --git a/src/i18n/locales/es.json b/src/i18n/locales/es.json
-index d6ed2b6..c222222 100644
+index d6ed2b6..fae1a6a 100644
 --- a/src/i18n/locales/es.json
 +++ b/src/i18n/locales/es.json
 @@ -9,6 +9,7 @@
@@ -38,10 +35,10 @@ index d6ed2b6..c222222 100644
      "scoreLabel": "Puntaje de Visibilidad IA",
      "enginesTitle": "¿Pueden los motores de IA leer este sitio?",
 diff --git a/src/pages/LabApi.tsx b/src/pages/LabApi.tsx
-index abcdef0..fedcba9 100644
+index ac9477b..f03ec2a 100644
 --- a/src/pages/LabApi.tsx
 +++ b/src/pages/LabApi.tsx
-@@ -268,7 +268,8 @@ export default function LabApi() {
+@@ -269,6 +269,7 @@ export default function LabApi() {
              </button>
            </form>
            <p className="mt-3 text-xs text-gray-400">{t("labApi.tryHint")}</p>
@@ -51,3 +48,4 @@ index abcdef0..fedcba9 100644
            </div>
 -- 
 2.43.0
+
