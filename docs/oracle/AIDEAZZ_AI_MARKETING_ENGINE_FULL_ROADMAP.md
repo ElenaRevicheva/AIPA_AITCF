@@ -1,8 +1,111 @@
 # AIdeazz AI Marketing Engine — Full Roadmap
-> Version: **July 21, 2026 (v25.0 — Atlas Service Loop: detect → sell → learn, closed)** — Atlas re-pointed at the lab's own 7 sellable services; weekly cheap-mode capture (~$10 lasts months); `GET /api/atlas/angle` shared intelligence endpoint; ENTER windows → Telegram **ready-to-run sales briefs**; HubSpot deal outcomes (staged/sent/replied/won per service) flow **back into Atlas** so it learns what converts; Atlas data published as AEO blog content on aideazz.xyz. See [§ July 21 update](#-update--july-21-2026--atlas-service-loop-detect--sell--learn-closed). Prior: **July 4, 2026 (v24.0 — consulting pay: Análisis técnico web via PagueloFacil)** — **`/pay/analisis-tecnico`** on [aideazz.xyz](https://aideazz.xyz/pay/analisis-tecnico); CTO AIPA **`POST /api/service-checkout`** + **`SVC:*`** PF webhook hook (`web_audit_prelim` **$200**, `web_audit_blueprint` **$500** after prelim); discovery-first → pay → deliver (Global Marine model). Docs: `docs/clients/SERVICE_PAYMENTS.md`. Deploy: `scripts/oracle-deploy-service-payments.sh`. Prior: **July 4, 2026 (v23.0 — `/go/wa` WhatsApp click adapter live)** — **`scripts/sync-atlas-ga4.mjs`** nightly cron on Oracle (`06:15 UTC`); posts `ga4_sessions` / `ga4_key_events` for `utm_campaign=atlas_*` → **`atlas_performance_events`**; first live row verified Jul 2 2026 (`ai_augmented_product_building`, 1 session). Atlas public UI banner polished (`atlas-shifted` `eb9e99c` — no Oracle ops text for clients). Prior: June 29, 2026 (v21.0 — **Atlas ↔ AIdeazz performance bridge** — closed-loop outcome tracking without rewriting Atlas capture/classify/brief/ship; **UTM tags + `concept_id`** on every Atlas export; Oracle **`atlas_performance_events`** ledger; **`POST /cto/api/performance-event`** + **`GET /cto/api/atlas-performance`** on CTO AIPA; Atlas UI reads aggregated ROAS/CPA/leads when hub is wired; **`scripts/sync-atlas-business-leads.mjs`** ingests `business_leads` where `utm_campaign LIKE 'atlas_%'`). Prior: May 18, 2026 (v20.0 — **Blog 404 resolved** (`/blog/post/:slug` Oracle endpoint + `BlogPost.tsx` parallel-fetch Dev.to + backend fallback); **fire-and-forget `/hashnode/daily-run`** (202 immediate, Opus runs background — no more nginx 60s timeout); **i18n Hashnode → Dev.to** (EN + ES footer/link strings); **topic dedup** (`getPublishedTopicIndices()` + `excludedIndices` in `pickTopicWithGscGap` — no more date-suffix titles); **dynamic sitemap** (`pushSitemapToGithub()` commits fresh `sitemap.xml` to `ElenaRevicheva/aideazz` after every publish; 4everland auto-deploys); **AI crawlers maxed** (9 new entries → 28 total explicit `robots.txt` signals). Prior: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
+> Version: **August 27, 2026 (v26.0 — the measurement layer repaired: 3-engine AI citation probe restored, orphan pages 75 → 0, GA4 conversions live)** — three subsystems were reporting confidently on things they could not see; `0%` meant *one engine was dead*, `form_submit: 0` meant *unmeasurable*, and the daily publisher was manufacturing one orphan page per day. All three fixed at the source and verified in production. See [§ August 27 update](#-update--august-27-2026--the-measurement-layer-repaired-what-the-engine-reported-vs-what-it-could-actually-see). Prior: **July 21, 2026 (v25.0 — Atlas Service Loop: detect → sell → learn, closed)** — Atlas re-pointed at the lab's own 7 sellable services; weekly cheap-mode capture (~$10 lasts months); `GET /api/atlas/angle` shared intelligence endpoint; ENTER windows → Telegram **ready-to-run sales briefs**; HubSpot deal outcomes (staged/sent/replied/won per service) flow **back into Atlas** so it learns what converts; Atlas data published as AEO blog content on aideazz.xyz. See [§ July 21 update](#-update--july-21-2026--atlas-service-loop-detect--sell--learn-closed). Prior: **July 4, 2026 (v24.0 — consulting pay: Análisis técnico web via PagueloFacil)** — **`/pay/analisis-tecnico`** on [aideazz.xyz](https://aideazz.xyz/pay/analisis-tecnico); CTO AIPA **`POST /api/service-checkout`** + **`SVC:*`** PF webhook hook (`web_audit_prelim` **$200**, `web_audit_blueprint` **$500** after prelim); discovery-first → pay → deliver (Global Marine model). Docs: `docs/clients/SERVICE_PAYMENTS.md`. Deploy: `scripts/oracle-deploy-service-payments.sh`. Prior: **July 4, 2026 (v23.0 — `/go/wa` WhatsApp click adapter live)** — **`scripts/sync-atlas-ga4.mjs`** nightly cron on Oracle (`06:15 UTC`); posts `ga4_sessions` / `ga4_key_events` for `utm_campaign=atlas_*` → **`atlas_performance_events`**; first live row verified Jul 2 2026 (`ai_augmented_product_building`, 1 session). Atlas public UI banner polished (`atlas-shifted` `eb9e99c` — no Oracle ops text for clients). Prior: June 29, 2026 (v21.0 — **Atlas ↔ AIdeazz performance bridge** — closed-loop outcome tracking without rewriting Atlas capture/classify/brief/ship; **UTM tags + `concept_id`** on every Atlas export; Oracle **`atlas_performance_events`** ledger; **`POST /cto/api/performance-event`** + **`GET /cto/api/atlas-performance`** on CTO AIPA; Atlas UI reads aggregated ROAS/CPA/leads when hub is wired; **`scripts/sync-atlas-business-leads.mjs`** ingests `business_leads` where `utm_campaign LIKE 'atlas_%'`). Prior: May 18, 2026 (v20.0 — **Blog 404 resolved** (`/blog/post/:slug` Oracle endpoint + `BlogPost.tsx` parallel-fetch Dev.to + backend fallback); **fire-and-forget `/hashnode/daily-run`** (202 immediate, Opus runs background — no more nginx 60s timeout); **i18n Hashnode → Dev.to** (EN + ES footer/link strings); **topic dedup** (`getPublishedTopicIndices()` + `excludedIndices` in `pickTopicWithGscGap` — no more date-suffix titles); **dynamic sitemap** (`pushSitemapToGithub()` commits fresh `sitemap.xml` to `ElenaRevicheva/aideazz` after every publish; 4everland auto-deploys); **AI crawlers maxed** (9 new entries → 28 total explicit `robots.txt` signals). Prior: May 14, 2026 (v19.0 — **HubSpot CRM v4 live** (contacts/companies/deals/notes + associations; CRM v4 PUT fix; multi-source fresh leads: HN + GitHub + Product Hunt); **Hashnode fully removed** (dev.to-only crosspost + `blog-posts-cache.json` Oracle-local cache; `/blog/posts` endpoint rebuilt); **Spanish translation pipeline** (`/blog/es-bundle/:slug` + `/blog/es-meta/:slug`; Hashnode removed from `fetchEnglishPost`); **Algom Alpha X credits recovered** (May 14 — `402 CreditsDepleted` fixed; `dragontrade-main` posting resumed); **Binance HTTP 451 geo-block** (Oracle IP restricted; `dragontrade-binance` in crash-loop — known issue); **Multi-agent HubSpot plan** (§5.6 — all 10 agents → unified CRM pipeline). Prior: April 28, 2026 (v18.0 — **VJH LangGraph gate bug fixed** (100% job discard → correct routing); **CTO AIPA warmup ramp** live (Week 1: 3/day, +2/wk, max 10); **3 new Telegram ops commands** (`/pending_leads`, `/add_email`, `/linkedin_draft`); **eval harness verified live** (117 passed / 14 skipped, 4.76s, $0 API cost); prior v17.0 Apr 26: **[aideazz](https://github.com/ElenaRevicheva/aideazz)** canonical site truth aligned with `/portfolio` + `/pitch.html`; **GEO v4 iron** — `geo-manifest.json`, `llms.txt` + `/.well-known/llms.txt`, `humans.txt`, `CITATION.cff`, expanded `robots.txt` AI crawlers, ItemList + WebPage JSON-LD, sitemap GEO URLs + stricter **`verify-seo.mjs`**; [Phase 1g](#phase-1g-canonical-truth--geo-v4-iron--april-26-2026) · prior [Phase 1f](#phase-1f-redirect-hygiene--hreflang--april-17-2026) Apr 17 www→apex · [Phase 1e](#phase-1e-build-time-sitemap-apex-robots--april-2026) · [Phase 1c addendum](#phase-1c-addendum-centralized-spa-meta--april-2026) | Prior: April 14, 2026 (Oracle wallet postmortem) | Built from: AutoSEO analysis + Manny Blueprint + CAREER_FOCUS v3 + SKILL.md
 > Purpose: Wire AIdeazz first. Showcase to every future client.
 
 **Who should read this:** **Business owners & clients** — start with [What is AIdeazz AI Lab](#what-is-aideazz-ai-lab--right-now-july-4-2026) below, then the public page [aideazz.xyz/sop-ai-ops.html](https://aideazz.xyz/sop-ai-ops.html). **Vibe coders & builders** — same section + [Document map](#document-map--phases-1-through-6-read-in-this-order). **Engineers** — full doc + [`ORACLE_ALL_PRODUCTS_RESILIENCE.md`](./ORACLE_ALL_PRODUCTS_RESILIENCE.md).
+
+---
+
+## ✅ UPDATE — August 27, 2026 — the measurement layer repaired: what the engine *reported* vs what it could actually *see*
+
+> Every finding below is the same shape, and it is worth naming once at the top: **a system reporting confidently on something it could not see.** Three separate subsystems returned a number that read as a real measurement and was in fact a blind spot. `0%` citations meant *one engine was dead*. `form_submit: 0` meant *submits are unmeasurable here*. `75 orphan pages` meant *the publisher had no link path at all*. None of them threw an error; all of them looked healthy. **Null is not zero** — and a blind spot that reports itself as a zero is worse than no number at all, because a zero gets planned against.
+
+### 1. AI citation probe — a third of it had been dark for ~3 weeks
+
+`gpt-4o-search-preview` was deprecated by OpenAI, so the `openai-search` leg returned HTTP 404 on every prompt. The weekly cron kept exiting 0 and posting a green summary. The tell was never an error — it was the **denominator**:
+
+```
+ 3 Aug  → measured: 18   engines: google-ai-overview, gemini-grounded, openai-search
+24 Aug  → measured: 12   engines: google-ai-overview, gemini-grounded, openai-search
+                     ↑ dropped by a third; the engine list never changed
+```
+
+**Verified by probing the provider, never by reading config.** `gpt-5-search-api` answers; `gpt-4o-mini-search-preview` is *still listed* in OpenAI's own `/v1/models` and 404s when called — **the vendor's manifest lied too**, which is the hard version of the existing rule. Only a real call is evidence.
+
+Fixed at the source *and* for the class of bug: `summarize()` now names any engine that held a key and still measured nothing as **BLIND**, so the next partial blackout announces itself instead of averaging away. Previously only the all-engines-dead case was loud.
+
+**Live run after the fix — 3 engines measuring, denominator restored 12 → 17:**
+
+```
+google-ai-overview   0/5 cited
+gemini-grounded      0/6 cited
+openai-search        0/6 cited      ← was 0/0
+0/17 AI answers, named without a link in 12%
+```
+
+Commit `004b6f1` (cto-aipa) · deployed to Oracle · `pm2 restart cto-aipa --update-env` · verified on the box.
+
+### 2. The publisher was manufacturing one orphan page per day
+
+Ahrefs' 25 Aug crawl: **Health Score 51 "Fair"**, 507 issues, and of 166 internal URLs **82 with errors vs 84 clean**. Top issue: **75 orphan pages, climbing +13 a week.**
+
+The cause was structural, not a bug — no line of code was wrong. `/blog/` is *deliberately* the React SPA shell (`fix-blog-index.mjs`), and every generated article linked only outward to `/`, `/blog`, `/about`, `/portfolio`. **Nothing in raw HTML ever linked *in* to an article.** Publishing daily therefore produced one new orphan per day.
+
+The fix is a **ring, not a "related posts" guess**: sort newest-first, then give post *i* links to posts *i+1 … i+12* (mod N). Fixed offsets mean every post receives **exactly 12 incoming links** — orphan count is zero *by construction*, not by luck — and link equity spreads evenly instead of pooling on the newest few. Plus a real static hub at [`/blog/archive/`](https://aideazz.xyz/blog/archive/) listing all 124, reachable from every article, so a JS-less crawler reaches everything in two hops.
+
+Verified against the **built HTML**, not the script's own claim:
+
+```
+posts analysed:       125
+min incoming links:    13
+ORPHANS (0 incoming):   0
+```
+
+Same pass repaired `href="/blog"` → `href="/blog/"` on all 124 pages — that no-slash link 301s, which is exactly what Ahrefs counted as **"129 pages link to a redirect."**
+
+Runs **first in `npm run build`**, so tomorrow's post is wired in automatically rather than needing a person to remember. Idempotent by markers, not appends: a second build reports `0 updated, 124 already current`. Commit `eda4006` (aideazz) · live 120s after push.
+
+### 3. GA4 could not attribute a lead — and the tag was never the problem
+
+`gtag.js` has been in `index.html` all along, but **nothing in the app ever called it.** Every event in the property came from Enhanced Measurement — `page_view`, `session_start`, `first_visit`, `scroll`, `user_engagement`. 28-day window: **2,404 sessions, 2,307 users, `keyEvents: 0`.**
+
+That also explains the missing submits. Enhanced Measurement listens for a **native** form submit; every form here calls `preventDefault()` and POSTs via `fetch`. The property read `form_start 13 / form_submit 0` — which looks like *13 people gave up* and actually meant *submits are structurally unmeasurable here*. And the key events that did exist (`purchase`, `close_convert_lead`, `qualify_lead`) were GA4 auto-provisioned defaults, all showing **"No stream data detected"** — configured, never fired.
+
+Four real events now emit and are registered as key events:
+
+| Event | Fires on | Counting |
+|---|---|---|
+| `generate_lead` | inquiry form success | ONCE_PER_SESSION |
+| `api_demo_run` | `/api` audit returns | ONCE_PER_EVENT |
+| `contact_whatsapp` | float chat click | ONCE_PER_SESSION |
+| `newsletter_signup` | double opt-in accepted | ONCE_PER_SESSION |
+
+`track()` never throws — an ad-blocker removing gtag is the normal case, and **analytics must not break the conversion it exists to observe**. No name, email or message body is ever sent: events record *that* something happened and *where it came from*, never *who*.
+
+**No synthetic traffic was injected to register them.** Firing a fake `generate_lead` would have corrupted the exact number the work exists to make trustworthy. They were created through the Admin API instead, which required enabling the Analytics Admin API on the Cloud project and moving the analytics service account from **Viewer → Marketer** — the *least* role that can manage key events (not Editor, not Administrator). Commit `01fb643` (aideazz).
+
+### 4. Google Business Profile → CRM, attributed end to end
+
+The GBP website link now carries UTMs:
+
+```
+https://aideazz.xyz/portfolio?utm_source=google-business-profile
+  &utm_medium=referral&utm_campaign=gbp_listing
+```
+
+`utm_medium=referral` deliberately, so GBP traffic stays separable in GA4 instead of blending into Organic Search. `InquiryForm` already reads `utm_source/medium/campaign/term/content` from the query string, so the chain closes: **Maps listing → `/portfolio` → HubSpot payload *and* the `generate_lead` key event, with a named source.** A lead from the listing is now an attributed conversion instead of "direct".
+
+### 5. What the audit found that is still open
+
+| Finding | Detail |
+|---|---|
+| **Entity ambiguity** | Ahrefs Brand Radar auto-analysed the domain and returned **Ko-fi, OnlyFans, Patreon** as the competitive set; a second run returned nothing at all. Schema is immaculate (14 types) — but **schema declares, prose decides**, and the classifier reads prose. This, not a penalty, is the likeliest reason a 100/100 answer-readiness score still yields a 0% citation rate. |
+| **Metadata hygiene** | 103 meta descriptions too long, 68 titles too long, 11 too short — all rising week over week. |
+| **hreflang** | `en` and `es` both point at the same URL; Spanish is a client-side toggle, not a distinct URL, so the annotation is invalid. |
+| **Core Web Vitals** | Unverified — PageSpeed API returned `429 quota exceeded`. Origin timing is fast (`TTFB 0.33s`, 37 KB) but that is **not** CWV and must not be quoted as such. |
+| **Bot Analytics** | Ahrefs collects it only via Cloudflare; aideazz.xyz is served by **BunnyCDN** with no Cloudflare proxy (`Server: BunnyCDN-*`, no `cf-ray`), so a Worker has nothing to observe. Not worth proxying a live site for an analytics panel — BunnyCDN's own logs answer the same question. |
+| **GSC** | Confirmed to exist as a **DNS-verified domain property** (`sc-domain:aideazz.xyz`, named in GA4's own recommendation panel). **Not yet linked to GA4** — a one-click link that would add query and landing-page data. |
+| **Reviews** | GBP has **0 reviews** and 5 total customer interactions. The single largest local-SEO lever, and the one thing that cannot be automated: it has to come from real customers. |
+
+### Named failure modes earned
+
+- **Silent failure** — an error caught and logged but not escalated is indistinguishable from success.
+- **Null is not zero** — "we measured 0" and "we could not measure" are different facts; watch the denominator.
+- **Capability discovery is not capability** — the vendor's model list advertised a model that 404s. Only a real call is evidence.
+- **Orphan pages** — publishing is not connecting.
+- **Zero by construction, not by luck** — a ring with fixed offsets makes "no orphans" arithmetic, not a heuristic that mostly works.
+- **You cannot attribute what you never instrumented** — attribution is a decision made *before* the traffic arrives, not a report run afterwards.
+- **Construct validity** — during this audit four tools were reported "absent" because the codebase was grepped for API keys, when Ahrefs, Search Console and the Google Business Profile were all in active use *through their interfaces*. Measuring "is there integration code" as a proxy for "is this capability real" is the same error as everything above, pointed inward.
 
 ---
 
