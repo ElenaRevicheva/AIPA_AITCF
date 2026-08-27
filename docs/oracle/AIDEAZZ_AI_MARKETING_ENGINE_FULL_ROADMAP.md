@@ -19,7 +19,10 @@
 | **Site / Tech SEO** | Static site on **BunnyCDN**; 141-URL sitemap; `www → apex` 301; 14 JSON-LD schema types; **0 orphan pages** (ring + [`/blog/archive/`](https://aideazz.xyz/blog/archive/), self-healing on every build) |
 | **GEO / AEO surfaces** | `robots.txt` with 30+ named AI crawlers · [`llms.txt`](https://aideazz.xyz/llms.txt) · `llms-full.txt` · `ai.txt` · `geo-manifest.json` |
 | **Audit product** | **AI Visibility Audit API** — 34 checks, 4 weighted categories; self-score **100/100 A+**; public demo on [aideazz.xyz/api](https://aideazz.xyz/api) |
-| **AI-citation measurement** | Weekly cron, **3 engines** (Google AI Overviews · Gemini grounded · OpenAI `gpt-5-search-api`); trend history at `/cto/v1/citations`; a dark engine now self-reports as **BLIND** |
+| **AI-citation measurement** | Weekly cron, **4 engines** (Google AI Overviews · Gemini grounded · OpenAI `gpt-5-search-api` · **Perplexity `sonar`**); trend history at `/cto/v1/citations`; a dark engine self-reports as **BLIND**; a 429 is retried, not recorded as a failed measurement |
+| **Competitor AI-answer research** | `scripts/competitor-probe.cjs` — Perplexity **Agent API** with the `web_search` tool; ranks the domains that own our buyer questions, from the URLs actually searched |
+| **Looker Studio** | Report **"AIdeazz — Organic Performance"** live on GA4 property `515154124` |
+| **Credential placement** | Telegram **`/pplxkey`** (and `/gmailpw`) — key arrives on STDIN, never argv, message deleted on read, and the helper **probes the provider before writing**. Helper committed at `scripts/set-pplx-stdin.sh` rather than living only on the box |
 | **Content** | Daily publisher, **125 posts**, token-overlap duplicate guard; AI Ops Wiki; **30 Dev.to cross-posts**, all canonical → aideazz.xyz |
 | **Analytics** | GA4 tag + **Data API** (service account, daily cron); **4 key events live** — `generate_lead`, `api_demo_run`, `contact_whatsapp`, `newsletter_signup` |
 | **CRM / automation** | HubSpot; **Make.com** Lead Concierge (15-min, `dlqCount: 0`); **n8n** (28 runs / 28 success / 0 fail, single workflow); 16 Oracle crons |
@@ -39,7 +42,7 @@
 
 ### ⚠️ Unverified — never claim these
 
-`Core Web Vitals` (PageSpeed API returned `429`; origin TTFB 0.33s is **not** CWV) · **Semrush, Looker Studio, Screaming Frog, Rank Tracker** — not in the stack · **Ahrefs Bot Analytics** — needs Cloudflare in the request path, site is BunnyCDN with no proxy.
+`Core Web Vitals` (PageSpeed API returned `429`; origin TTFB 0.33s is **not** CWV) · **Semrush, Screaming Frog, Rank Tracker** — not in the stack · **Ahrefs Bot Analytics** — needs Cloudflare in the request path, site is BunnyCDN with no proxy. (**Looker Studio moved to live** on 27 Aug — see the table above.)
 
 ### 🟡 Open, ranked by what they cost
 
@@ -141,6 +144,48 @@ https://aideazz.xyz/portfolio?utm_source=google-business-profile
 | **Bot Analytics** | Ahrefs collects it only via Cloudflare; aideazz.xyz is served by **BunnyCDN** with no Cloudflare proxy (`Server: BunnyCDN-*`, no `cf-ray`), so a Worker has nothing to observe. Not worth proxying a live site for an analytics panel — BunnyCDN's own logs answer the same question. |
 | **GSC** | Confirmed to exist as a **DNS-verified domain property** (`sc-domain:aideazz.xyz`, named in GA4's own recommendation panel). **Not yet linked to GA4** — a one-click link that would add query and landing-page data. |
 | **Reviews** | GBP has **0 reviews** and 5 total customer interactions. The single largest local-SEO lever, and the one thing that cannot be automated: it has to come from real customers. |
+
+### 6. Perplexity lit up the 4th engine — and the first non-zero citation rate
+
+`probePerplexity()` had been written and registered since the tracker was built. It was never broken; it was only ever missing a key. The blocker was not engineering — Elena is usually on a phone with no terminal, and a key pasted into a chat is a key that has to be rotated. Solved with **`/pplxkey`**, the same contract as `/gmailpw`: STDIN not argv, message deleted on read, and the helper **probes Perplexity before writing** (a `.env` holding a key that 401s is worse than an empty one — it looks configured and is not, which is precisely the trap the deprecated OpenAI model set the same morning).
+
+First run measured **1 of 6 and 429'd the rest**. A 429 is the most misleading error in this file, because the engine is authenticated and working perfectly; recording it as a failure would shrink the denominator for a reason unrelated to visibility. Added a fixed backoff retry (3s / 8s / 20s — Perplexity's 429 body carries no `Retry-After`, so there is nothing to honour).
+
+**Result — the first non-zero citation rate on any engine:**
+
+```
+google-ai-overview   0/6 cited (0%)
+gemini-grounded      0/6 cited (0%)
+openai-search        0/6 cited (0%)
+perplexity           1/6 cited (17%)   <- ours at position #2
+aideazz.xyz cited in 1/24 AI answers (4%)
+```
+
+Denominator across the day: **12 (blind) → 17 (repaired) → 24 (complete)**.
+
+### 7. Who actually owns our buyer questions — and why the 0% was misread
+
+New capability, and one the job market asks for by name. `scripts/competitor-probe.cjs` runs the **same** `DEFAULT_PROMPTS` through the Perplexity **Agent API** with the `web_search` tool, so the two datasets line up.
+
+Its own first run shipped a bug worth recording: it printed **"none identified"** over 27 real competitor domains per question, because the leaderboard was built from the model's `brands[]` array — which came back empty every time — instead of from the URLs the engine actually searched. The module's own comment already said *an assertion is a claim, a URL is evidence*; the code was not honouring it. Fixed to rank from `sources`.
+
+**The corrected result reframes the entire entity finding:**
+
+```
+--- who owns our questions ---
+   5x  linkedin.com
+   4x  dev.to
+   3x  geoptie.com · apify.com · foglift.io · github.com
+aideazz.xyz named in 3/6 AI answers to buyer questions
+```
+
+The two domains that own our buyer questions are **platforms we already publish on.** 30 Dev.to articles all canonical-tagged home; a LinkedIn presence. Our content is being cited — under *their* domain, not ours. **AI engines do not follow `rel=canonical`; they cite where they read it.** That is a very different problem from "invisible", and a fixable one: the 0% own-domain rate is an attribution-of-authority problem, not a retrieval problem.
+
+Update to the entity-ambiguity item below: Brand Radar's Ko-fi/OnlyFans/Patreon guess and this finding are the same story from two sides — the engines can find the content and cannot reliably attribute it to *this* domain as an entity.
+
+### 8. Looker Studio — live
+
+Report **"AIdeazz — Organic Performance"**, connected to GA4 property `515154124`, rendering real session data. It had never been used; there was no blocker beyond no client asking for a dashboard. Now the GA4 key events created earlier the same day have somewhere to be reported.
 
 ### Named failure modes earned
 
