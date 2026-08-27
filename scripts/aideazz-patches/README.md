@@ -77,6 +77,18 @@ portfolio card back scrolled to a form on the hidden front face and landed on em
 particles. Punch CTA now uses the same `goToForm` handler as the service cards
 (flip, then scroll). Copy and layout unchanged.
 
+`0010-sop-pitch-august-refresh.patch` — SOP (EN+ES) + pitch: emoji-free wiki CTA,
+hero CTA row (nine-systems dossier, podcast, film studio), proof ticker + scroll
+reveal, lab-table rows for every proof surface, grounded-blog copy, concierge
+step names Claude Fable 5 + watchdog, new step 7 (auto lead search → HubSpot
+autopilot: WhatsApp links, one-click email, auto stage moves, +4d follow-up
+tasks, delivered/opened from real Resend webhooks). Pitch gains Atlas row +
+radar CTA, HubSpot-autopilot tile, fleet watchdog, and drops stale claims
+(Opus 4 / Llama 3.3 / 25 reviews / 82→80+ commands). Numbers measured at HEAD
+(124 essays, 140 sitemap URLs, 1,004 commits) or dossier-attributed; fleet
+health proven live via fleet-verify GHA run 33066407534 (all checks passed).
+Dead `AILA` repo link → `hive`. No `[skip ci]`.
+
 `0009-pitch-august-2026-tech.patch` — actualize `public/pitch.html` to August 2026
 without a HUD/VC rewrite. Date, CMO (gates + wiki + concierge + outreach; drop
 Hashnode / "no human in the loop"), slide 09 (what shipped since May), traction
