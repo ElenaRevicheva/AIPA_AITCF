@@ -969,6 +969,84 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
     }
   });
 
+  /**
+   * /pplxkey <perplexity api key> — light up the 4th AI answer engine.
+   *
+   * Why this exists (27 Aug 2026): the citation probe measures three engines and
+   * `probePerplexity()` has been written and registered the whole time — it was
+   * only ever missing a key. Same constraint as /gmailpw: Elena is on her phone,
+   * and a key pasted into a chat window is a key that has to be rotated.
+   *
+   * Identical contract to /gmailpw, for identical reasons. The message is deleted
+   * before any await that could fail. The value goes to the helper on STDIN, never
+   * argv, so it cannot surface in `ps`. And the helper PROBES Perplexity before it
+   * writes anything — a .env holding a key that 401s is worse than an empty one,
+   * because it looks configured and is not. That is the same trap the deprecated
+   * OpenAI model set earlier the same day.
+   */
+  bot.command('pplxkey', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/pplxkey(@\S+)?\s*/i, '')
+      .trim();
+
+    // Delete FIRST — before anything that can throw and leave the key on screen.
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      /* older than 48h, or no delete rights — the reply below still warns her */
+    }
+
+    if (!raw) {
+      await ctx.reply(
+        'Usage: /pplxkey <your Perplexity API key>\n\n' +
+          'I delete your message immediately, never log the value, and test the key ' +
+          'against Perplexity before writing anything.\n\n' +
+          'Create or rotate one at console.perplexity.ai',
+      );
+      return;
+    }
+
+    const key = raw.replace(/\s+/g, '');
+    if (!key.startsWith('pplx-')) {
+      await ctx.reply(
+        'That does not start with "pplx-", so it is probably not the key. ' +
+          'Nothing was written. Your message is deleted — send again.',
+      );
+      return;
+    }
+
+    await ctx.reply('🔐 Message deleted. Testing the key against Perplexity before writing anything…');
+
+    const { spawn } = await import('child_process');
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn('/home/ubuntu/set-pplx-stdin.sh', [], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      child.stdin.write(key + '\n');
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 120_000);
+    });
+
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    if (result.startsWith('OK:')) {
+      await ctx.reply(
+        '✅ Perplexity is wired in.\n\n' + result + '\n\n' +
+          'Two things just became possible:\n' +
+          '• The weekly citation probe now measures FOUR engines, not three.\n' +
+          '• The competitor probe can run — it names which domains own the AI ' +
+          'answers to your buyer questions.\n\n' +
+          '⚠️ If you pasted a key into a chat earlier, rotate it at ' +
+          'console.perplexity.ai — that one is still live.',
+      );
+    } else {
+      await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the key and send again.');
+    }
+  });
+
   bot.command('status', async (ctx) => {
     await ctx.reply('🔍 Checking AIdeazz ecosystem...');
     
