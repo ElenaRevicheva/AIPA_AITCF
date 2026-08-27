@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Thu, 27 Aug 2026 21:24:00 +0000
+Subject: [PATCH] feat(api): idle page says you get all 34 checks, not five tips
+
+The empty /api landing looked identical before an audit, so the 34-check
+result UI was invisible until someone typed a URL and clicked Audit.
+Add one line under the form (EN+ES) that states the receipts are in the
+result. Engine, demo key, scoring unchanged.
+---
+ src/i18n/locales/en.json | 1 +
+ src/i18n/locales/es.json | 1 +
+ src/pages/LabApi.tsx     | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/src/i18n/locales/en.json b/src/i18n/locales/en.json
+index 2c8eac4..b111111 100644
+--- a/src/i18n/locales/en.json
++++ b/src/i18n/locales/en.json
+@@ -9,6 +9,7 @@
+     "tryButton": "Audit my site",
+     "tryLoading": "Auditing…",
+     "tryHint": "Enter any public URL. Runs on direct page reads — no SerpAPI, no scraping bills.",
++    "tryReceipts": "After you audit: score, top fixes, AND all 34 checks (what we saw + how to fix each). Not only five tips.",
+     "errorGeneric": "Couldn't audit that URL. Check it's public and reachable, then try again.",
+     "scoreLabel": "AI Visibility Score",
+     "enginesTitle": "Can AI engines read this site?",
+diff --git a/src/i18n/locales/es.json b/src/i18n/locales/es.json
+index d6ed2b6..c222222 100644
+--- a/src/i18n/locales/es.json
++++ b/src/i18n/locales/es.json
+@@ -9,6 +9,7 @@
+     "tryButton": "Auditar mi sitio",
+     "tryLoading": "Auditando…",
+     "tryHint": "Ingresa cualquier URL pública. Funciona leyendo la página directamente — sin SerpAPI, sin cuentas de scraping.",
++    "tryReceipts": "Después de auditar: puntaje, correcciones, Y las 34 verificaciones (qué vimos + cómo arreglar cada una). No solo cinco consejos.",
+     "errorGeneric": "No se pudo auditar esa URL. Verifica que sea pública y accesible, e inténtalo de nuevo.",
+     "scoreLabel": "Puntaje de Visibilidad IA",
+     "enginesTitle": "¿Pueden los motores de IA leer este sitio?",
+diff --git a/src/pages/LabApi.tsx b/src/pages/LabApi.tsx
+index abcdef0..fedcba9 100644
+--- a/src/pages/LabApi.tsx
++++ b/src/pages/LabApi.tsx
+@@ -268,7 +268,8 @@ export default function LabApi() {
+             </button>
+           </form>
+           <p className="mt-3 text-xs text-gray-400">{t("labApi.tryHint")}</p>
++          <p className="mt-2 text-sm font-medium text-purple-200">{t("labApi.tryReceipts")}</p>
+           <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
+             <ShieldCheck className="h-3.5 w-3.5" /> {t("labApi.badge")}
+           </div>
+-- 
+2.43.0

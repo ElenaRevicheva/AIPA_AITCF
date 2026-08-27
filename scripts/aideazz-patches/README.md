@@ -25,6 +25,10 @@ untouched. EN+ES strings. No `[skip ci]`.
 so 4everland cuts a new CID for the 0014 UI. No extra clone; Oracle
 `/home/ubuntu/aideazz` only. No `[skip ci]`.
 
+`0016-labapi-idle-receipts-hint.patch` — one visible line on the empty `/api`
+form: after you audit you get all 34 checks, not only five tips. The idle
+landing previously looked unchanged. EN+ES. No `[skip ci]`.
+
 `0001-geo-card-visibility-api.patch` shipped this way on July 17, 2026
 (aideazz commit `bfdcd0b`, Actions run 29620502489). Applied patches stay in
 the folder as a record — the relay script skips them via reverse-apply check.
