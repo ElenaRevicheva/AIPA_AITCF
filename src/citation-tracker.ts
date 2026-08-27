@@ -470,6 +470,37 @@ async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T)
   return results;
 }
 
+/**
+ * Retry a probe that was rate-limited rather than recording it as a failure.
+ *
+ * Why (27 Aug 2026): probes run concurrently, which a mature key absorbs and a
+ * fresh one does not. The first Perplexity run measured 1 of 6 and 429'd the
+ * rest -- and a 429 is the most misleading error in this file, because the
+ * engine is authenticated and working. Recording it as "failed" would shrink
+ * the denominator for a reason that has nothing to do with visibility, which
+ * is the exact confusion the BLIND warning exists to prevent.
+ *
+ * Backoff is fixed rather than header-driven: Perplexity's 429 body carries no
+ * Retry-After, so there is nothing to honour and guessing a header we cannot
+ * see would be worse than a conservative wait.
+ */
+const RATE_LIMIT_BACKOFF_MS = [3_000, 8_000, 20_000];
+
+async function withRetryOn429<T>(run: () => Promise<T>): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= RATE_LIMIT_BACKOFF_MS.length; attempt += 1) {
+    try {
+      return await run();
+    } catch (err: any) {
+      lastErr = err;
+      const msg = String(err?.message ?? err);
+      if (!msg.includes('HTTP 429') || attempt === RATE_LIMIT_BACKOFF_MS.length) throw err;
+      await new Promise((r) => setTimeout(r, RATE_LIMIT_BACKOFF_MS[attempt]));
+    }
+  }
+  throw lastErr;
+}
+
 export interface RunOptions {
   prompts?: string[];
   engines?: EngineId[];
@@ -497,7 +528,7 @@ export async function runCitationProbes(options: RunOptions = {}): Promise<Citat
   const jobs = active.flatMap((engine) => prompts.map((prompt) => ({ engine, prompt })));
   const probes = await mapWithConcurrency(jobs, PROBE_CONCURRENCY, async ({ engine, prompt }) => {
     try {
-      return evaluate(engine, prompt, await ENGINES[engine].run(prompt));
+      return evaluate(engine, prompt, await withRetryOn429(() => ENGINES[engine].run(prompt)));
     } catch (err: any) {
       return {
         engine,
