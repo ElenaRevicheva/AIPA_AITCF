@@ -83,6 +83,16 @@ const SCHEMA = {
   },
 } as const;
 
+/** bare hostname: strip scheme, www and path so counts group correctly. */
+function normaliseDomain(raw: string): string {
+  return String(raw || '')
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .split('/')[0]
+    ?.trim()
+    .toLowerCase() ?? '';
+}
+
 /** Build the request body. Exported so a --dry-run can print it without spending a call. */
 export function buildAgentRequest(prompt: string, trackedDomain: string) {
   const preset = (process.env.COMPETITOR_PPLX_PRESET || 'medium').trim();
@@ -175,16 +185,36 @@ export async function probeCompetitors(
     }
   }
 
+  // The leaderboard is built from the URLs the engine actually SEARCHED, not
+  // from the brands[] array it claimed. First live run, 27 Aug: search returned
+  // 27 real competitor domains per question and brands[] came back empty every
+  // time -- the tool call works, the structured field does not populate
+  // reliably alongside it. Building the ranking from brands[] threw the whole
+  // finding away and printed "none identified" over rich evidence.
+  //
+  // This is the module's own stated principle applied to its own output: an
+  // assertion is a claim, a URL is evidence. brands[] now only ENRICHES a row
+  // that the sources already earned.
+  const reasons = new Map<string, string>();
+  for (const p of probes) {
+    for (const b of p.brands) {
+      const d = normaliseDomain(b.domain);
+      if (d && b.why_cited && !reasons.has(d)) reasons.set(d, b.why_cited);
+    }
+  }
+
   const counts = new Map<string, { appearances: number; sampleReason: string }>();
   for (const p of probes) {
     // Count a domain once per question, not once per mention.
     const seen = new Set<string>();
-    for (const b of p.brands) {
-      const d = String(b.domain || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
-      if (!d || seen.has(d)) continue;
+    for (const url of p.sources) {
+      const d = normaliseDomain(url);
+      // Our own domain is the thing being measured, not a competitor.
+      if (!d || seen.has(d) || d.includes(trackedDomain)) continue;
       seen.add(d);
-      const cur = counts.get(d) ?? { appearances: 0, sampleReason: b.why_cited };
+      const cur = counts.get(d) ?? { appearances: 0, sampleReason: reasons.get(d) ?? '' };
       cur.appearances += 1;
+      if (!cur.sampleReason && reasons.has(d)) cur.sampleReason = reasons.get(d)!;
       counts.set(d, cur);
     }
   }
