@@ -362,7 +362,7 @@ async function resolveRedirect(uri: string, title: string): Promise<string> {
 async function probeOpenAiSearch(prompt: string): Promise<EngineAnswer> {
   const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) throw new Error('OPENAI_API_KEY not set');
-  const model = (process.env.CITATION_OPENAI_MODEL || 'gpt-4o-search-preview').trim();
+  const model = (process.env.CITATION_OPENAI_MODEL || 'gpt-5-search-api').trim();
 
   const data = await postJson(
     'https://api.openai.com/v1/chat/completions',
@@ -573,10 +573,18 @@ export function summarize(run: CitationRun): string {
   const perPath = (summary.byPrimaryPath ?? [])
     .map((p) => `${p.path} ${p.cited} (${p.citationRate}%)`)
     .join(' · ');
+  // A PARTIAL blackout used to be invisible. The all-engines-dead case above is loud,
+  // but an engine that held a key and still measured nothing just contributed 0/0 and
+  // let the total keep looking like a real number — which is how a deprecated OpenAI
+  // model hid here for three weeks while the cron exited 0 every Monday. Name it.
+  const dark = (summary.byEngine ?? []).filter((e) => e.probes === 0).map((e) => e.engine);
   return (
     `${run.domain} cited in ${summary.cited}/${summary.measured} AI answers (${summary.citationRate}%), ` +
     `money pages ${summary.citedPortfolio} (${summary.portfolioCitationRate}%)` +
     (perPath ? ` — ${perPath}` : '') +
-    `, named without a link in ${summary.mentionRate}%.`
+    `, named without a link in ${summary.mentionRate}%.` +
+    (dark.length
+      ? ` ⚠️ BLIND on ${dark.join(', ')} — measured nothing, so this run's 0% is "not measured", not "not cited".`
+      : '')
   );
 }
