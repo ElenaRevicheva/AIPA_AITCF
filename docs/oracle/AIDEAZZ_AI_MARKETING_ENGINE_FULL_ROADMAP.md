@@ -6,6 +6,51 @@
 
 ---
 
+## 📍 CURRENT STATE — 27 August 2026 — read this before anything below it
+
+> **Why this section exists.** This doc grew by accretion since April: eleven dated update sections stacked on top of a phase-based body. Corrections landed *after* the claims they corrected, so reading top-down you met "SerpAPI … is already paid for" (line ~274) roughly 2,500 lines before "that plan was **cancelled** 2026-08-11" (line ~2,774). The history is worth keeping — but the **current state has to come first**, or the doc does the exact thing this engine keeps being caught doing: reporting confidently on something it can no longer see.
+>
+> Everything in this table was verified in production on 27 Aug 2026 by probing the live system — never by reading config, and never from the sections below.
+
+### ✅ Live and verified
+
+| Layer | What is actually running |
+|---|---|
+| **Site / Tech SEO** | Static site on **BunnyCDN**; 141-URL sitemap; `www → apex` 301; 14 JSON-LD schema types; **0 orphan pages** (ring + [`/blog/archive/`](https://aideazz.xyz/blog/archive/), self-healing on every build) |
+| **GEO / AEO surfaces** | `robots.txt` with 30+ named AI crawlers · [`llms.txt`](https://aideazz.xyz/llms.txt) · `llms-full.txt` · `ai.txt` · `geo-manifest.json` |
+| **Audit product** | **AI Visibility Audit API** — 34 checks, 4 weighted categories; self-score **100/100 A+**; public demo on [aideazz.xyz/api](https://aideazz.xyz/api) |
+| **AI-citation measurement** | Weekly cron, **3 engines** (Google AI Overviews · Gemini grounded · OpenAI `gpt-5-search-api`); trend history at `/cto/v1/citations`; a dark engine now self-reports as **BLIND** |
+| **Content** | Daily publisher, **125 posts**, token-overlap duplicate guard; AI Ops Wiki; **30 Dev.to cross-posts**, all canonical → aideazz.xyz |
+| **Analytics** | GA4 tag + **Data API** (service account, daily cron); **4 key events live** — `generate_lead`, `api_demo_run`, `contact_whatsapp`, `newsletter_signup` |
+| **CRM / automation** | HubSpot; **Make.com** Lead Concierge (15-min, `dlqCount: 0`); **n8n** (28 runs / 28 success / 0 fail, single workflow); 16 Oracle crons |
+| **Local** | **Google Business Profile verified** (AIdeazz AI Lab, Panama), website link UTM-tagged → GA4 + HubSpot attribution |
+| **External SEO tooling** | **Ahrefs** free tier, weekly Site Audit (Health Score **51 "Fair"**, 507 issues); **GSC** domain property `sc-domain:aideazz.xyz` |
+| **Supply / enrichment** | **Bright Data** (SERP + enrichment); Hunter (owner sweep, monthly cron) |
+
+### 🔴 Dead or superseded — do NOT rely on anything below that says otherwise
+
+| Thing | Status | Replaced by |
+|---|---|---|
+| **SerpAPI** | **Cancelled 2026-08-11**, 0/1000 searches. Took down the Atlas lead machine (whole supply was `google_maps`) and the citation probe | **Bright Data** |
+| `gpt-4o-search-preview` | Deprecated by OpenAI — 404s | `gpt-5-search-api` |
+| `gpt-4o-mini-search-preview` | **Still listed in `/v1/models` and 404s when called.** The vendor's own manifest lies — only a real call is evidence | `gpt-5-search-api` |
+| Groq `llama-3.3-70b-versatile` ⚠️**[RETIRED by Groq, Aug 2026 — superseded by the 5-provider chains, ordered per use case]**, `llama-3.1-8b` | Retired by Groq, Aug 2026 | 5-provider chains, ordered per use case |
+| **Hashnode** | Removed 2026-05-14 | Dev.to only |
+
+### ⚠️ Unverified — never claim these
+
+`Core Web Vitals` (PageSpeed API returned `429`; origin TTFB 0.33s is **not** CWV) · **Semrush, Looker Studio, Screaming Frog, Rank Tracker** — not in the stack · **Ahrefs Bot Analytics** — needs Cloudflare in the request path, site is BunnyCDN with no proxy.
+
+### 🟡 Open, ranked by what they cost
+
+1. **Entity ambiguity** — Ahrefs Brand Radar auto-classified the domain's competitors as **Ko-fi, OnlyFans, Patreon**. Schema is immaculate; prose is what the classifier reads. Likeliest cause of a **0% citation rate** despite 100/100 answer-readiness.
+2. **GBP: 0 reviews**, 5 lifetime interactions — biggest local lever, cannot be automated.
+3. **Metadata hygiene** — 103 meta descriptions too long, 68 titles too long, all rising weekly.
+4. **GSC not linked to GA4** — one click, adds query + landing-page data.
+5. **hreflang** `en`/`es` both point at the same URL — invalid, ignored.
+
+---
+
 ## ✅ UPDATE — August 27, 2026 — the measurement layer repaired: what the engine *reported* vs what it could actually *see*
 
 > Every finding below is the same shape, and it is worth naming once at the top: **a system reporting confidently on something it could not see.** Three separate subsystems returned a number that read as a real measurement and was in fact a blind spot. `0%` citations meant *one engine was dead*. `form_submit: 0` meant *submits are unmeasurable here*. `75 orphan pages` meant *the publisher had no link path at all*. None of them threw an error; all of them looked healthy. **Null is not zero** — and a blind spot that reports itself as a zero is worse than no number at all, because a zero gets planned against.
@@ -271,6 +316,8 @@ The method that built all 96 audited prospects could not run: **`GOOGLE_PLACES_A
 is absent** from `.env`, and Hunter is on the **free tier (47 lookups left, resets
 Aug 20)** — a hard ceiling that can never feed a 1% funnel.
 
+> ⚠️ **SUPERSEDED (2026-08-11).** SerpAPI was **cancelled** with 0/1000 searches left and is not coming back. Its `google_maps` engine was the lead machine's *entire* supply, so this took the machine down. Replaced by **Bright Data**. See [§ CURRENT STATE](#-current-state--27-august-2026--read-this-before-anything-below-it). The paragraph below is kept as history.
+
 **SerpAPI's `google_maps` engine replaces Places entirely** and is already paid for
 (Starter plan, 180 searches left, ~20 businesses each). It returns local businesses
 with website and phone — the same shape Places gives. Emails are read from each
@@ -465,7 +512,7 @@ curl -s http://127.0.0.1:8095/healthz | grep performanceHub
 
 - **Canonical selling kit: `docs/selling/SELLING_KIT.md`** — positioning ("Production AI Builder"; Conversational AI Agent Builder WhatsApp·Telegram / AI Automation & Integration Architect / AI Search Visibility Architect GEO·AEO·Tech SEO), 3 priced offers ($1.5K WhatsApp agent entry / $800–5K automation / $500 GEO audit → $1.5K fix), paste-ready Upwork profile + 3 Fiverr gigs + proposal template + week-1 firing sequence. Market validation July 10: chatbot dev +71% YoY, AI integration +178%, 91% of LATAM conversational AI = WhatsApp, GEO/AEO budgets rising at 94% of CMOs.
 - **Channel truth:** marketplace-first (Upwork/Fiverr) is the primary channel; this engine is the background buyer-radar, NOT the funnel. July 10 HubSpot audit: 861 deals, 0 replied, 0 won — success metric is now ONLY buyer replies (`contractsent`). **Update July 16:** the VJH `detected_responses` gap fix (`ORACLE_ALL_PRODUCTS_RESILIENCE.md`) backfilled 49 real historical recruiter/client responses into `contractsent` — these are past events surfacing now (not new activity), but "0 contractsent ever" is retired. Still 0 `closedwon`.
-- **Discovery serves the kit (cto-aipa `48f38b1`, deployed + dry-run-verified):** SerpAPI re-subscribed (Starter 1,000/mo) as guarded fallback behind BrightData (`SERPAPI_RESERVE=200`); 4 new buying-intent queries mapped to offers (`whatsapp_agent`, `whatsapp_es` — Spanish hl=es, `automation_hire`, `geo_aeo`); classifier prompt sells the 3 offers and reads Spanish results; offer matcher routes whatsapp/telegram → agent build. First dry-run: 88 results → 1 genuine GEO/AEO buyer ($3,000 est).
+- ⚠️ **SUPERSEDED (2026-08-11) — the SerpAPI half of this bullet is dead; the offer/classifier work it describes is still live.** **Discovery serves the kit (cto-aipa `48f38b1`, deployed + dry-run-verified):** SerpAPI re-subscribed (Starter 1,000/mo) as guarded fallback behind BrightData (`SERPAPI_RESERVE=200`); 4 new buying-intent queries mapped to offers (`whatsapp_agent`, `whatsapp_es` — Spanish hl=es, `automation_hire`, `geo_aeo`); classifier prompt sells the 3 offers and reads Spanish results; offer matcher routes whatsapp/telegram → agent build. First dry-run: 88 results → 1 genuine GEO/AEO buyer ($3,000 est).
 
 ---
 
@@ -1397,7 +1444,7 @@ The first three rows are Phase 3 only. The last three rows are a **cross-phase s
 7. **GA4 (Jul 3):** same tagged URL → wait for nightly cron or run `node ~/cto-aipa/scripts/sync-atlas-ga4.mjs --dry-run` → `GET /api/atlas-performance` should show `ga4_sessions`.
 
 | Phase 4: Founder Outreach Pipeline | **COMPLETE (verified send path)** | Real Resend + Oracle; see “Phase 4 outreach — what is actually working” and Phase 4 section below. |
-| Phase 5: Lead Triage | **OPERATIONAL (Apr 2026)** | Oracle **`lead_triage`** + **`agent_outcomes`**; sources **`business_leads`** (site inquiries) + **`outreach_log`** (replies). Classification: **Groq** `llama-3.3-70b-versatile` → **Claude Haiku** fallback (**`TRIAGE_FALLBACK_MODEL`** / **`TRIAGE_SKIP_GROQ`**); **Sonnet** optional refine for high urgency. **`/leads/triage-status`**, **`POST /leads/triage-run`** (202 async or **`?wait=1`** sync), **`GET /leads/dashboard`** (unlock form or **`?secret=`**), Telegram **`/triage`**, cron **`TRIAGE_CRON`**. **Webhook hardening:** **`reviewCode`** → Haiku on Groq failure — shared process with triage. |
+| Phase 5: Lead Triage | **OPERATIONAL (Apr 2026)** | Oracle **`lead_triage`** + **`agent_outcomes`**; sources **`business_leads`** (site inquiries) + **`outreach_log`** (replies). Classification: **Groq** `llama-3.3-70b-versatile` ⚠️**[RETIRED by Groq, Aug 2026 — superseded by the 5-provider chains, ordered per use case]** → **Claude Haiku** fallback (**`TRIAGE_FALLBACK_MODEL`** / **`TRIAGE_SKIP_GROQ`**); **Sonnet** optional refine for high urgency. **`/leads/triage-status`**, **`POST /leads/triage-run`** (202 async or **`?wait=1`** sync), **`GET /leads/dashboard`** (unlock form or **`?secret=`**), Telegram **`/triage`**, cron **`TRIAGE_CRON`**. **Webhook hardening:** **`reviewCode`** → Haiku on Groq failure — shared process with triage. |
 | Phase 6: Showcase Package | NOT STARTED | Depends on all above running with live data |
 
 <a id="phase-4-honesty"></a>
@@ -1466,7 +1513,7 @@ This subsection is the honest answer to “is it an empty gun?” **The code pat
 | Task | Status | Details |
 |---|---|---|
 | Oracle `lead_triage` + indexes | DONE | `src/database.ts` — `saveTriagedLead`, `getUntriagedLeads`, `getRepliedOutreach`, `getTriagedLeads`; dedupe by `source_ref_id` + `source_table`. |
-| Classification | DONE | Groq `llama-3.3-70b-versatile` (12s timeout, no SDK retries); **Claude Haiku** fallback same JSON schema (**`TRIAGE_FALLBACK_MODEL`**); **Sonnet** optional refine for urgency ≥4. Optional **`TRIAGE_SKIP_GROQ`** on Oracle → Haiku-only (logs: `Using Claude Haiku (TRIAGE_SKIP_GROQ)`). |
+| Classification | DONE | Groq `llama-3.3-70b-versatile` ⚠️**[RETIRED by Groq, Aug 2026 — superseded by the 5-provider chains, ordered per use case]** (12s timeout, no SDK retries); **Claude Haiku** fallback same JSON schema (**`TRIAGE_FALLBACK_MODEL`**); **Sonnet** optional refine for urgency ≥4. Optional **`TRIAGE_SKIP_GROQ`** on Oracle → Haiku-only (logs: `Using Claude Haiku (TRIAGE_SKIP_GROQ)`). |
 | Groq TPM / huge inquiries | DONE | **Context clipped to 3600 chars** (`TRIAGE_CONTEXT_MAX_CHARS`); batch caps default **20** business + **10** outreach; **`TRIAGE_INTER_LEAD_DELAY_MS`** default **350ms** (spreads TPM). |
 | Telegram | DONE | `/triage`, `/triage_urgent` in `telegram-bot.ts`; daily brief after cron if `TELEGRAM_LEADS_DIGEST_CHAT_ID` set. |
 | HTTP | DONE | **`POST /leads/triage-run`** (Bearer **`LEAD_TRIAGE_SECRET`**): **default 202** + background run so clients/proxies do not socket hang-up; **`?wait=1`** or **`?sync=1`** for synchronous JSON. **`GET /leads/triage-status`** (no secret) — **`ready`** when triage can run. **`GET /leads/dashboard`** — if secret is configured, **no `?secret=`** serves an **HTML unlock form**; **`?secret=`** or successful unlock shows ranked leads (automation-friendly). |
