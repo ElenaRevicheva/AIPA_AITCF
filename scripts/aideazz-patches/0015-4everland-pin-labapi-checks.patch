@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Thu, 27 Aug 2026 21:14:49 +0000
+Subject: [PATCH] chore: 4everland pin stamp so /api 34-checks UI goes live
+
+No [skip ci]. Restamps public/4everland-pin-stamp.txt so 4everland
+rebuilds the CID that already contains LabApi checks + ?url= (54fecd9).
+---
+ public/4everland-pin-stamp.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/public/4everland-pin-stamp.txt b/public/4everland-pin-stamp.txt
+index f3f8ae5..84888dc 100644
+--- a/public/4everland-pin-stamp.txt
++++ b/public/4everland-pin-stamp.txt
+@@ -1 +1 @@
+-pinned 2026-08-26T20:50:00Z prompt-poisoned-grounding-gate
++pinned 2026-08-27T21:15:00Z labapi-34-checks
+-- 
+2.43.0
