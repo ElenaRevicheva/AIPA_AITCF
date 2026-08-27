@@ -1,0 +1,186 @@
+From bb1402fbd704aa3303eee7e6599674e77b924f62 Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Thu, 27 Aug 2026 21:06:16 +0000
+Subject: [PATCH] feat(api): show all 34 audit checks and honour ?url= share
+ links
+
+The money page already received the full AuditResult JSON; it rendered
+the grade and top five fixes and dropped the 34 evidence-backed checks
+outreach talks about. List every check (status, observation, fix) grouped
+by category. Honour /api?url= so an outreach link auto-runs on load and
+replaceState after a successful audit. Same engine, same demo key, $0.
+---
+ src/i18n/locales/en.json |  3 ++
+ src/i18n/locales/es.json |  3 ++
+ src/pages/LabApi.tsx     | 98 ++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 101 insertions(+), 3 deletions(-)
+
+diff --git a/src/i18n/locales/en.json b/src/i18n/locales/en.json
+index 05d389a..2c8eac4 100644
+--- a/src/i18n/locales/en.json
++++ b/src/i18n/locales/en.json
+@@ -17,6 +17,9 @@
+     "crawlUnknown": "Unknown",
+     "categoriesResultTitle": "Category breakdown",
+     "fixesTitle": "Top fixes, in priority order",
++    "checksTitle": "All {{count}} checks ({{passed}} passed)",
++    "checkFixPrefix": "Fix:",
++    "shareLabel": "Shareable link:",
+     "whatItChecksTitle": "What it checks",
+     "whatItChecksSub": "Four categories, weighted into one score — the same signals AI answer engines use to decide who gets cited.",
+     "cat1Title": "AI Crawler Access",
+diff --git a/src/i18n/locales/es.json b/src/i18n/locales/es.json
+index 9f5bd90..d6ed2b6 100644
+--- a/src/i18n/locales/es.json
++++ b/src/i18n/locales/es.json
+@@ -17,6 +17,9 @@
+     "crawlUnknown": "Desconocido",
+     "categoriesResultTitle": "Desglose por categoría",
+     "fixesTitle": "Principales correcciones, en orden de prioridad",
++    "checksTitle": "Las {{count}} verificaciones ({{passed}} aprobadas)",
++    "checkFixPrefix": "Cómo arreglarlo:",
++    "shareLabel": "Enlace para compartir:",
+     "whatItChecksTitle": "Qué evalúa",
+     "whatItChecksSub": "Cuatro categorías, ponderadas en un solo puntaje — las mismas señales que los motores de respuesta con IA usan para decidir a quién citar.",
+     "cat1Title": "Acceso de rastreadores IA",
+diff --git a/src/pages/LabApi.tsx b/src/pages/LabApi.tsx
+index 0235c50..ac9477b 100644
+--- a/src/pages/LabApi.tsx
++++ b/src/pages/LabApi.tsx
+@@ -15,6 +15,7 @@ import {
+   CheckCheck,
+   Sparkles,
+   Bot,
++  AlertTriangle,
+ } from "lucide-react";
+ import { useTranslation } from "react-i18next";
+ import LanguageSwitcher from "@/components/LanguageSwitcher";
+@@ -134,10 +135,13 @@ export default function LabApi() {
+     });
+   }, []);
+ 
+-  async function runAudit(e?: React.FormEvent) {
+-    e?.preventDefault();
+-    const target = url.trim();
++  const autoRan = React.useRef(false);
++
++  async function runAudit(e?: React.FormEvent | string) {
++    if (typeof e !== "string") e?.preventDefault();
++    const target = (typeof e === "string" ? e : url).trim();
+     if (!target || loading) return;
++    setUrl(target);
+     setLoading(true);
+     setError(null);
+     setResult(null);
+@@ -154,6 +158,12 @@ export default function LabApi() {
+         setResult(data as AuditResult);
+         // Proves the /api page works as a lead magnet, not just that it loaded.
+         track("api_demo_run", { score: (data as AuditResult)?.score });
++        // Shareable money-page link — same contract as the webhook docs page.
++        if (typeof window !== "undefined") {
++          const next = new URL(window.location.href);
++          next.searchParams.set("url", target);
++          window.history.replaceState(null, "", `${next.pathname}${next.search}`);
++        }
+       }
+     } catch {
+       setError(t("labApi.errorGeneric"));
+@@ -162,6 +172,18 @@ export default function LabApi() {
+     }
+   }
+ 
++  // /api?url=https://their-site.com auto-runs once on load (outreach share links).
++  React.useEffect(() => {
++    if (autoRan.current) return;
++    if (typeof window === "undefined") return;
++    const preset = new URLSearchParams(window.location.search).get("url");
++    if (!preset?.trim()) return;
++    autoRan.current = true;
++    void runAudit(preset.trim());
++    // runAudit is recreated each render; the ref is the once-guard.
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, []);
++
+   const categories = [
+     { icon: Bot, title: t("labApi.cat1Title"), desc: t("labApi.cat1Desc") },
+     { icon: Braces, title: t("labApi.cat2Title"), desc: t("labApi.cat2Desc") },
+@@ -360,6 +382,76 @@ export default function LabApi() {
+                     </ol>
+                   </div>
+                 )}
++
++                {/* Receipts: every check the engine already returned. Hidden until now. */}
++                {result.checks && result.checks.length > 0 && (
++                  <div>
++                    <div className="mb-3 text-sm font-semibold text-purple-200">
++                      {t("labApi.checksTitle", {
++                        count: result.checks.length,
++                        passed: result.checks.filter((c) => c.status === "pass").length,
++                      })}
++                    </div>
++                    <div className="space-y-5">
++                      {result.categories.map((cat) => {
++                        const items = result.checks.filter((c) => c.category === cat.id);
++                        if (items.length === 0) return null;
++                        return (
++                          <div key={cat.id}>
++                            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
++                              {cat.label}
++                            </div>
++                            <ul className="space-y-2">
++                              {items.map((c) => {
++                                const tone =
++                                  c.status === "pass"
++                                    ? "border-emerald-400/25 bg-emerald-500/[0.06]"
++                                    : c.status === "warn"
++                                      ? "border-amber-400/30 bg-amber-500/[0.06]"
++                                      : "border-red-400/30 bg-red-500/[0.06]";
++                                const icon =
++                                  c.status === "pass" ? (
++                                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" />
++                                  ) : c.status === "warn" ? (
++                                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-300" />
++                                  ) : (
++                                    <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-300" />
++                                  );
++                                return (
++                                  <li
++                                    key={c.id}
++                                    className={`rounded-lg border px-3 py-2 text-sm ${tone}`}
++                                  >
++                                    <div className="flex gap-2 font-medium text-white">
++                                      {icon}
++                                      <span>{c.label}</span>
++                                    </div>
++                                    <p className="mt-1 pl-6 text-xs text-gray-300">{c.detail}</p>
++                                    {c.fix ? (
++                                      <p className="mt-1 pl-6 text-xs text-purple-200">
++                                        {t("labApi.checkFixPrefix")} {c.fix}
++                                      </p>
++                                    ) : null}
++                                  </li>
++                                );
++                              })}
++                            </ul>
++                          </div>
++                        );
++                      })}
++                    </div>
++                  </div>
++                )}
++
++                <p className="text-xs text-gray-400">
++                  {t("labApi.shareLabel")}{" "}
++                  <a
++                    href={`${typeof window !== "undefined" ? window.location.pathname : "/api"}?url=${encodeURIComponent(result.url)}`}
++                    className="break-all text-purple-300 hover:text-white"
++                  >
++                    {`https://aideazz.xyz/api?url=${encodeURIComponent(result.url)}`}
++                  </a>
++                </p>
+               </motion.div>
+             )}
+           </AnimatePresence>
+-- 
+2.43.0
+

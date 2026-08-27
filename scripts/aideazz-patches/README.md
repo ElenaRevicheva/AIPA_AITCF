@@ -14,6 +14,13 @@ printf 'aideazz\nreason-%s\n' "$(date -u +%s)" > .deploy-trigger
 git add .deploy-trigger && git commit -m "deploy: aideazz (<what>)" && git push origin main
 ```
 
+`0014-labapi-show-checks-share-url.patch` — money page (`/api`, `LabApi.tsx`)
+already received the full 34-check JSON and only painted the grade + top five
+fixes. Renders every check (status, observation, fix) grouped by category, and
+honours `?url=` so `https://aideazz.xyz/api?url=https://their-site.com` auto-runs
+on load (same contract as the webhook docs page). Engine, demo key, and scoring
+untouched. EN+ES strings. No `[skip ci]`.
+
 `0001-geo-card-visibility-api.patch` shipped this way on July 17, 2026
 (aideazz commit `bfdcd0b`, Actions run 29620502489). Applied patches stay in
 the folder as a record — the relay script skips them via reverse-apply check.
