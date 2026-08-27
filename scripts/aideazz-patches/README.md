@@ -77,6 +77,10 @@ portfolio card back scrolled to a form on the hidden front face and landed on em
 particles. Punch CTA now uses the same `goToForm` handler as the service cards
 (flip, then scroll). Copy and layout unchanged.
 
+`0011-sop-stack-chips.patch` — SOP Stack reference redesign (EN+ES): per-category
+gradient top edge + glowing marker, tools as rounded chips with hover tint,
+card lift + shine sweep. Content unchanged.
+
 `0010-sop-pitch-august-refresh.patch` — SOP (EN+ES) + pitch: emoji-free wiki CTA,
 hero CTA row (nine-systems dossier, podcast, film studio), proof ticker + scroll
 reveal, lab-table rows for every proof surface, grounded-blog copy, concierge

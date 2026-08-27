@@ -1,0 +1,373 @@
+From 13af538050e02bdc04173645cc16ba0eb8a0b3af Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Thu, 27 Aug 2026 11:43:29 +0000
+Subject: [PATCH] =?UTF-8?q?style(sop):=20juicier=20stack=20reference=20?=
+ =?UTF-8?q?=E2=80=94=20gradient=20cards,=20chip=20pills=20(EN+ES)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Each stack category card gets a per-category gradient top edge and a
+glowing square marker; tools become individual rounded chips with
+hover tint; cards lift with a shine sweep on hover. Content unchanged.
+---
+ public/sop-ai-ops-es.html | 113 ++++++++++++++++++++++++++++----------
+ public/sop-ai-ops.html    | 112 ++++++++++++++++++++++++++++---------
+ 2 files changed, 170 insertions(+), 55 deletions(-)
+
+diff --git a/public/sop-ai-ops-es.html b/public/sop-ai-ops-es.html
+index d024b81..d33d87b 100644
+--- a/public/sop-ai-ops-es.html
++++ b/public/sop-ai-ops-es.html
+@@ -996,37 +996,92 @@
+     .stack-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+-      gap: 11px;
++      gap: 12px;
+     }
+     .stack-row {
+-      background: rgba(14, 16, 28, 0.65);
++      position: relative;
++      overflow: hidden;
++      background: linear-gradient(170deg, rgba(20, 22, 38, 0.85), rgba(11, 13, 24, 0.75));
+       border: 1px solid var(--border);
+-      border-radius: var(--radius-sm);
+-      padding: 15px 19px;
++      border-radius: var(--radius-md);
++      padding: 17px 19px 15px;
+       display: flex;
+-      gap: 17px;
+-      align-items: flex-start;
+-      transition: border-color 0.22s ease, box-shadow 0.22s ease;
++      flex-direction: column;
++      gap: 11px;
++      transition: border-color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease;
+     }
+-    .stack-row:hover {
+-      border-color: rgba(157, 140, 255, 0.22);
+-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
++    .stack-row::before {
++      content: '';
++      position: absolute;
++      top: 0; left: 0; right: 0;
++      height: 2px;
++      background: linear-gradient(90deg, var(--row-a, var(--violet)), var(--row-b, var(--cyan)) 55%, transparent);
++      opacity: 0.75;
++      transition: opacity 0.24s ease;
++    }
++    .stack-row::after {
++      content: '';
++      position: absolute;
++      inset: 0;
++      background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.05) 50%, transparent 58%);
++      transform: translateX(-120%);
++      transition: transform 0.7s ease;
++      pointer-events: none;
+     }
++    .stack-row:hover {
++      border-color: color-mix(in srgb, var(--row-a, var(--violet)) 42%, transparent);
++      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35), 0 0 30px color-mix(in srgb, var(--row-a, var(--violet)) 14%, transparent);
++      transform: translateY(-2px);
++    }
++    .stack-row:hover::after { transform: translateX(120%); }
++    .stack-row:nth-child(1)  { --row-a: #9d8cff; --row-b: #2ee6d6; }
++    .stack-row:nth-child(2)  { --row-a: #2ee6d6; --row-b: #5ee9b5; }
++    .stack-row:nth-child(3)  { --row-a: #ff7eb3; --row-b: #9d8cff; }
++    .stack-row:nth-child(4)  { --row-a: #ffc857; --row-b: #ff7eb3; }
++    .stack-row:nth-child(5)  { --row-a: #5ee9b5; --row-b: #2ee6d6; }
++    .stack-row:nth-child(6)  { --row-a: #9d8cff; --row-b: #ff7eb3; }
++    .stack-row:nth-child(7)  { --row-a: #2ee6d6; --row-b: #9d8cff; }
++    .stack-row:nth-child(8)  { --row-a: #ff7eb3; --row-b: #ffc857; }
++    .stack-row:nth-child(9)  { --row-a: #5ee9b5; --row-b: #9d8cff; }
++    .stack-row:nth-child(10) { --row-a: #ffc857; --row-b: #2ee6d6; }
+     .stack-cat {
+       font-family: var(--mono);
+       font-size: 10px;
+-      font-weight: 600;
+-      letter-spacing: 0.09em;
++      font-weight: 700;
++      letter-spacing: 0.11em;
+       text-transform: uppercase;
+-      color: #d4ccff;
+-      min-width: 148px;
++      color: var(--text);
++      display: inline-flex;
++      align-items: center;
++      gap: 8px;
++    }
++    .stack-cat::before {
++      content: '';
++      width: 7px;
++      height: 7px;
++      border-radius: 2px;
++      background: linear-gradient(135deg, var(--row-a, var(--violet)), var(--row-b, var(--cyan)));
++      box-shadow: 0 0 10px color-mix(in srgb, var(--row-a, var(--violet)) 55%, transparent);
+       flex-shrink: 0;
+-      padding-top: 3px;
+     }
+-    .stack-tools {
+-      font-size: 14px;
++    .stack-tools { display: flex; flex-wrap: wrap; gap: 7px; }
++    .stack-chip {
++      display: inline-flex;
++      align-items: center;
++      max-width: 100%;
++      padding: 5px 11px;
++      border-radius: 9px;
++      border: 1px solid var(--border);
++      background: rgba(255, 255, 255, 0.028);
++      font-size: 12.5px;
++      line-height: 1.5;
+       color: var(--t2);
+-      line-height: 1.55;
++      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
++    }
++    .stack-chip:hover {
++      color: var(--text);
++      border-color: color-mix(in srgb, var(--row-a, var(--violet)) 45%, transparent);
++      background: color-mix(in srgb, var(--row-a, var(--violet)) 9%, transparent);
+     }
+ 
+     /* Footer */
+@@ -1136,7 +1191,7 @@
+       .health-row { grid-template-columns: 1fr; gap: 7px; }
+       .h-action { width: fit-content; margin-top: 4px; }
+       .stack-grid { grid-template-columns: 1fr; }
+-      .stack-row { flex-direction: column; gap: 5px; }
++      .stack-row { padding: 15px 15px 13px; }
+       .stack-cat { min-width: unset; }
+       .pm-row { grid-template-columns: 1fr; }
+       .pm-lbl {
+@@ -2053,43 +2108,43 @@
+     <div class="stack-grid">
+       <div class="stack-row">
+         <div class="stack-cat">Gestión de procesos</div>
+-        <div class="stack-tools">PM2 · systemd · AWS Lambda + EventBridge</div>
++        <div class="stack-tools"><span class="stack-chip">PM2</span><span class="stack-chip">systemd</span><span class="stack-chip">AWS Lambda + EventBridge</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Bases de datos</div>
+-        <div class="stack-tools">Oracle Autonomous DB (conexión cifrada de grado empresarial, múltiples tablas) · PostgreSQL + pgvector (memoria semántica tutorías)</div>
++        <div class="stack-tools"><span class="stack-chip">Oracle Autonomous DB (conexión cifrada de grado empresarial, múltiples tablas)</span><span class="stack-chip">PostgreSQL + pgvector (memoria semántica tutorías)</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">CRM &amp; alcance</div>
+-        <div class="stack-tools">HubSpot CRM v3 + asociaciones v4 · Hunter.io · Resend</div>
++        <div class="stack-tools"><span class="stack-chip">HubSpot CRM v3 + asociaciones v4</span><span class="stack-chip">Hunter.io</span><span class="stack-chip">Resend</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Redes sociales</div>
+-        <div class="stack-tools">X API v2 (Account Activity, stream filtrado, worker de engagement) · Make.com · Telegram Bot API</div>
++        <div class="stack-tools"><span class="stack-chip">X API v2 (Account Activity, stream filtrado, worker de engagement)</span><span class="stack-chip">Make.com</span><span class="stack-chip">Telegram Bot API</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">IA / LLM</div>
+-        <div class="stack-tools">Claude Sonnet / Haiku · Groq (inferencia de modelos abiertos — el id del modelo se resuelve mediante un único conmutador de flota, así que las deprecaciones del proveedor son un cambio de configuración de una línea) · Grok (xAI, failover nivel 3) · OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper) con reintentos + cadena de respaldo · Bright Data (captura de transparencia publicitaria pública) · Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro para la creatividad de Atlas · LangChain · LangGraph</div>
++        <div class="stack-tools"><span class="stack-chip">Claude Sonnet / Haiku</span><span class="stack-chip">Groq (inferencia de modelos abiertos — el id del modelo se resuelve mediante un único conmutador de flota, así que las deprecaciones del proveedor son un cambio de configuración de una línea)</span><span class="stack-chip">Grok (xAI, failover nivel 3)</span><span class="stack-chip">OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper) con reintentos + cadena de respaldo</span><span class="stack-chip">Bright Data (captura de transparencia publicitaria pública)</span><span class="stack-chip">Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro para la creatividad de Atlas</span><span class="stack-chip">LangChain</span><span class="stack-chip">LangGraph</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Generación de leads</div>
+-        <div class="stack-tools">HN Algolia · GitHub REST · Product Hunt GraphQL · Bright Data (SERP API + Web Unlocker + Scraping Browser — reemplazó a SerpAPI de pago) — ~150–250 empresas nuevas netas/mes tras filtros</div>
++        <div class="stack-tools"><span class="stack-chip">HN Algolia</span><span class="stack-chip">GitHub REST</span><span class="stack-chip">Product Hunt GraphQL</span><span class="stack-chip">Bright Data (SERP API + Web Unlocker + Scraping Browser — reemplazó a SerpAPI de pago) — ~150–250 empresas nuevas netas/mes tras filtros</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Hosting / CDN</div>
+-        <div class="stack-tools">VM OCI Ubuntu (VM.Standard.E5.Flex, 12&nbsp;GB) · AWS Lambda · frontends IPFS 4everland · DNS Cloudflare</div>
++        <div class="stack-tools"><span class="stack-chip">VM OCI Ubuntu (VM.Standard.E5.Flex, 12&nbsp;GB)</span><span class="stack-chip">AWS Lambda</span><span class="stack-chip">frontends IPFS 4everland</span><span class="stack-chip">DNS Cloudflare</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Monitoreo</div>
+-        <div class="stack-tools">Driver salud cron · logs PM2 · CloudWatch · probes curl · keep‑alive OCI</div>
++        <div class="stack-tools"><span class="stack-chip">Driver salud cron</span><span class="stack-chip">logs PM2</span><span class="stack-chip">CloudWatch</span><span class="stack-chip">probes curl</span><span class="stack-chip">keep‑alive OCI</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Contenido y SEO</div>
+-        <div class="stack-tools">Blog diario bilingüe · crosspost dev.to · GA4 + medición Atlas (jul 2026) · Search Console · pack GEO · captura de leads → Oracle → HubSpot</div>
++        <div class="stack-tools"><span class="stack-chip">Blog diario bilingüe</span><span class="stack-chip">crosspost dev.to</span><span class="stack-chip">GA4 + medición Atlas (jul 2026)</span><span class="stack-chip">Search Console</span><span class="stack-chip">pack GEO</span><span class="stack-chip">captura de leads → Oracle → HubSpot</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Gestión de proyecto</div>
+-        <div class="stack-tools">API Trello (briefings Telegram diarios + semanales) · webhooks GitHub en la flota</div>
++        <div class="stack-tools"><span class="stack-chip">API Trello (briefings Telegram diarios + semanales)</span><span class="stack-chip">webhooks GitHub en la flota</span></div>
+       </div>
+     </div>
+   </div>
+diff --git a/public/sop-ai-ops.html b/public/sop-ai-ops.html
+index d4bd4d8..4fa9ffe 100644
+--- a/public/sop-ai-ops.html
++++ b/public/sop-ai-ops.html
+@@ -1025,32 +1025,92 @@
+     .stack-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+-      gap: 11px;
++      gap: 12px;
+     }
+     .stack-row {
+-      background: rgba(14, 16, 28, 0.65);
++      position: relative;
++      overflow: hidden;
++      background: linear-gradient(170deg, rgba(20, 22, 38, 0.85), rgba(11, 13, 24, 0.75));
+       border: 1px solid var(--border);
+-      border-radius: var(--radius-sm);
+-      padding: 15px 19px;
++      border-radius: var(--radius-md);
++      padding: 17px 19px 15px;
+       display: flex;
+-      gap: 17px;
+-      align-items: flex-start;
+-      transition: border-color 0.22s ease, box-shadow 0.22s ease;
++      flex-direction: column;
++      gap: 11px;
++      transition: border-color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease;
+     }
+-    .stack-row:hover {
+-      border-color: rgba(157, 140, 255, 0.22);
+-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
++    .stack-row::before {
++      content: '';
++      position: absolute;
++      top: 0; left: 0; right: 0;
++      height: 2px;
++      background: linear-gradient(90deg, var(--row-a, var(--violet)), var(--row-b, var(--cyan)) 55%, transparent);
++      opacity: 0.75;
++      transition: opacity 0.24s ease;
++    }
++    .stack-row::after {
++      content: '';
++      position: absolute;
++      inset: 0;
++      background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.05) 50%, transparent 58%);
++      transform: translateX(-120%);
++      transition: transform 0.7s ease;
++      pointer-events: none;
+     }
++    .stack-row:hover {
++      border-color: color-mix(in srgb, var(--row-a, var(--violet)) 42%, transparent);
++      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35), 0 0 30px color-mix(in srgb, var(--row-a, var(--violet)) 14%, transparent);
++      transform: translateY(-2px);
++    }
++    .stack-row:hover::after { transform: translateX(120%); }
++    .stack-row:nth-child(1)  { --row-a: #9d8cff; --row-b: #2ee6d6; }
++    .stack-row:nth-child(2)  { --row-a: #2ee6d6; --row-b: #5ee9b5; }
++    .stack-row:nth-child(3)  { --row-a: #ff7eb3; --row-b: #9d8cff; }
++    .stack-row:nth-child(4)  { --row-a: #ffc857; --row-b: #ff7eb3; }
++    .stack-row:nth-child(5)  { --row-a: #5ee9b5; --row-b: #2ee6d6; }
++    .stack-row:nth-child(6)  { --row-a: #9d8cff; --row-b: #ff7eb3; }
++    .stack-row:nth-child(7)  { --row-a: #2ee6d6; --row-b: #9d8cff; }
++    .stack-row:nth-child(8)  { --row-a: #ff7eb3; --row-b: #ffc857; }
++    .stack-row:nth-child(9)  { --row-a: #5ee9b5; --row-b: #9d8cff; }
++    .stack-row:nth-child(10) { --row-a: #ffc857; --row-b: #2ee6d6; }
+     .stack-cat {
+       font-family: var(--mono);
+       font-size: 10px;
+-      font-weight: 600;
+-      letter-spacing: 0.09em;
++      font-weight: 700;
++      letter-spacing: 0.11em;
+       text-transform: uppercase;
+-      color: #d4ccff;
+-      min-width: 148px;
++      color: var(--text);
++      display: inline-flex;
++      align-items: center;
++      gap: 8px;
++    }
++    .stack-cat::before {
++      content: '';
++      width: 7px;
++      height: 7px;
++      border-radius: 2px;
++      background: linear-gradient(135deg, var(--row-a, var(--violet)), var(--row-b, var(--cyan)));
++      box-shadow: 0 0 10px color-mix(in srgb, var(--row-a, var(--violet)) 55%, transparent);
+       flex-shrink: 0;
+-      padding-top: 3px;
++    }
++    .stack-tools { display: flex; flex-wrap: wrap; gap: 7px; }
++    .stack-chip {
++      display: inline-flex;
++      align-items: center;
++      max-width: 100%;
++      padding: 5px 11px;
++      border-radius: 9px;
++      border: 1px solid var(--border);
++      background: rgba(255, 255, 255, 0.028);
++      font-size: 12.5px;
++      line-height: 1.5;
++      color: var(--t2);
++      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
++    }
++    .stack-chip:hover {
++      color: var(--text);
++      border-color: color-mix(in srgb, var(--row-a, var(--violet)) 45%, transparent);
++      background: color-mix(in srgb, var(--row-a, var(--violet)) 9%, transparent);
+     }
+     /* FAQ — questions are full sentences, so they stack above the answer
+        instead of sharing the narrow label column the stack rows use. */
+@@ -1185,7 +1245,7 @@
+       .health-row { grid-template-columns: 1fr; gap: 7px; }
+       .h-action { width: fit-content; margin-top: 4px; }
+       .stack-grid { grid-template-columns: 1fr; }
+-      .stack-row { flex-direction: column; gap: 5px; }
++      .stack-row { padding: 15px 15px 13px; }
+       .stack-cat { min-width: unset; }
+       .pm-row { grid-template-columns: 1fr; }
+       .pm-lbl {
+@@ -2122,43 +2182,43 @@
+     <div class="stack-grid">
+       <div class="stack-row">
+         <div class="stack-cat">Process Mgmt</div>
+-        <div class="stack-tools">PM2 · systemd · AWS Lambda + EventBridge</div>
++        <div class="stack-tools"><span class="stack-chip">PM2</span><span class="stack-chip">systemd</span><span class="stack-chip">AWS Lambda + EventBridge</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Databases</div>
+-        <div class="stack-tools">Oracle Autonomous DB (enterprise-grade encrypted connection, multi-table estate) · PostgreSQL + pgvector (semantic memory for tutoring agents)</div>
++        <div class="stack-tools"><span class="stack-chip">Oracle Autonomous DB (enterprise-grade encrypted connection, multi-table estate)</span><span class="stack-chip">PostgreSQL + pgvector (semantic memory for tutoring agents)</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">CRM & Outreach</div>
+-        <div class="stack-tools">HubSpot CRM v3 + v4 associations · Hunter.io · Resend</div>
++        <div class="stack-tools"><span class="stack-chip">HubSpot CRM v3 + v4 associations</span><span class="stack-chip">Hunter.io</span><span class="stack-chip">Resend</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Social</div>
+-        <div class="stack-tools">X API v2 (Account Activity, filtered stream, engagement worker) · Make.com · Telegram Bot API</div>
++        <div class="stack-tools"><span class="stack-chip">X API v2 (Account Activity, filtered stream, engagement worker)</span><span class="stack-chip">Make.com</span><span class="stack-chip">Telegram Bot API</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">AI / LLMs</div>
+-        <div class="stack-tools">Claude Sonnet / Haiku · Groq (open-model inference — model id resolved via one fleet-wide switch, so provider deprecations are a one-line config change) · Grok (xAI, tier-3 failover) · OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper) with retry + provider-fallback chain · Bright Data (public ad-transparency capture) · Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro for Atlas creative · LangChain · LangGraph</div>
++        <div class="stack-tools"><span class="stack-chip">Claude Sonnet / Haiku</span><span class="stack-chip">Groq (open-model inference — model id resolved via one fleet-wide switch, so provider deprecations are a one-line config change)</span><span class="stack-chip">Grok (xAI, tier-3 failover)</span><span class="stack-chip">OpenAI (gpt-4o-mini + text-embedding-3-small + TTS / Whisper) with retry + provider-fallback chain</span><span class="stack-chip">Bright Data (public ad-transparency capture)</span><span class="stack-chip">Runway (Seedance 2.0 / Kling 3.0) + Flux 1.1 Pro for Atlas creative</span><span class="stack-chip">LangChain</span><span class="stack-chip">LangGraph</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Lead Gen</div>
+-        <div class="stack-tools">HN Algolia · GitHub REST · Product Hunt GraphQL · Bright Data (SERP API + Web Unlocker + Scraping Browser — replaced paid SerpAPI) — ~150–250 net-new companies/month after filtering</div>
++        <div class="stack-tools"><span class="stack-chip">HN Algolia</span><span class="stack-chip">GitHub REST</span><span class="stack-chip">Product Hunt GraphQL</span><span class="stack-chip">Bright Data (SERP API + Web Unlocker + Scraping Browser — replaced paid SerpAPI) — ~150–250 net-new companies/month after filtering</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Hosting / CDN</div>
+-        <div class="stack-tools">OCI Ubuntu VM (VM.Standard.E5.Flex, 12 GB) · AWS Lambda · 4everland IPFS frontends · Cloudflare DNS</div>
++        <div class="stack-tools"><span class="stack-chip">OCI Ubuntu VM (VM.Standard.E5.Flex, 12 GB)</span><span class="stack-chip">AWS Lambda</span><span class="stack-chip">4everland IPFS frontends</span><span class="stack-chip">Cloudflare DNS</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Monitoring</div>
+-        <div class="stack-tools">Cron health driver · PM2 logs · CloudWatch · curl probes · OCI keep-alive</div>
++        <div class="stack-tools"><span class="stack-chip">Cron health driver</span><span class="stack-chip">PM2 logs</span><span class="stack-chip">CloudWatch</span><span class="stack-chip">curl probes</span><span class="stack-chip">OCI keep-alive</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Content & SEO</div>
+-        <div class="stack-tools">Bilingual daily blog · dev.to crosspost · GA4 + Atlas campaign measure (Jul 2026) · Google Search Console · GEO pack · lead capture → Oracle → HubSpot</div>
++        <div class="stack-tools"><span class="stack-chip">Bilingual daily blog</span><span class="stack-chip">dev.to crosspost</span><span class="stack-chip">GA4 + Atlas campaign measure (Jul 2026)</span><span class="stack-chip">Google Search Console</span><span class="stack-chip">GEO pack</span><span class="stack-chip">lead capture → Oracle → HubSpot</span></div>
+       </div>
+       <div class="stack-row">
+         <div class="stack-cat">Project Mgmt</div>
+-        <div class="stack-tools">Trello API (daily + weekly Telegram briefings) · GitHub webhooks across the fleet</div>
++        <div class="stack-tools"><span class="stack-chip">Trello API (daily + weekly Telegram briefings)</span><span class="stack-chip">GitHub webhooks across the fleet</span></div>
+       </div>
+     </div>
+   </div>
+-- 
+2.43.0
+
