@@ -19,7 +19,7 @@
 
 import type { SourceId } from './community-store';
 
-export const LISTENER_VERSION = '1.0.0';
+export const LISTENER_VERSION = '1.1.0';
 
 const USER_AGENT =
   process.env.COMMUNITY_USER_AGENT?.trim() ||
@@ -443,17 +443,58 @@ You are writing a comment a real practitioner would leave. Rules, in priority or
 5. Only mention Elena's tool if it is directly relevant to what was asked. Irrelevant plugs are worse than no reply.
 6. If you mention it, you MUST include the full URL https://aideazz.xyz/api inline, and disclose it plainly in her own voice — "I built this" or "disclosure: it's mine". A mention without the URL is useless to both sides. Never hide the affiliation.
 7. No marketing language, no hype, no emoji, no "Great question!", no sign-off signature.
-8. Under 140 words. Plain sentences. No headings, no bullet lists unless the question is genuinely a list.
+8. Under 140 words. Plain sentences. No headings, no bullet lists unless the question is genuinely a list. Every sentence must be finished — never stop mid-clause.
 9. Match the language of the post. A Spanish post gets a Spanish reply, and the URL stays as-is.
 10. If the post does not genuinely warrant a reply from her — wrong topic, already answered, rage bait, a job ad, or she has nothing real to add — output exactly: SKIP
 
 Output only the reply text, or SKIP. Nothing else.`;
 
+/**
+ * 420 tokens used to be enough for a 140-word reply on a plain model. Reasoning
+ * models spend that budget thinking and return a clause that ends "GPT-4 with".
+ * Floor high enough that a finished reply can actually come out.
+ */
+const DRAFT_MAX_TOKENS = Math.max(
+  Number(process.env.COMMUNITY_DRAFT_MAX_TOKENS ?? 1536) || 1536,
+  1024,
+);
+
+/**
+ * A paste that ends mid-sentence is not a draft. The 28 Aug r/AI_UGC_Marketing
+ * reply stored "…isn't the whole story. GPT-4 with" — Elena could only paste
+ * the one finished sentence, and Reddit published that fragment.
+ *
+ * A complete reply may end on punctuation *or* on a URL (the prompt requires
+ * https://aideazz.xyz/api inline, and that path has no trailing period).
+ */
+export function isCompleteDraft(text: string): boolean {
+  const t = (text ?? '').trim();
+  if (!t || /^SKIP\b/i.test(t)) return false;
+  if (/https?:\/\/\S+$/i.test(t)) return true;
+  return /[.!?…]["'”’»)\]]?$/.test(t);
+}
+
+async function generateDraftText(
+  anthropic: any,
+  systemPrompt: string,
+  userPrompt: string,
+): Promise<string> {
+  const { claudeWithGroqFallback } = await import('./llm-resilience.js');
+  const text = await claudeWithGroqFallback(
+    anthropic,
+    process.env.COMMUNITY_DRAFT_MODEL?.trim() || 'claude-sonnet-5',
+    DRAFT_MAX_TOKENS,
+    systemPrompt,
+    userPrompt,
+    'community-listener/draft',
+  );
+  return (text ?? '').trim();
+}
+
 /** Returns the draft, or null when the model declines the thread. */
 export async function draftReply(thread: ScoredThread): Promise<string | null> {
   const mod: any = await import('@anthropic-ai/sdk');
   const Anthropic = mod?.default ?? mod?.Anthropic ?? mod;
-  const { claudeWithGroqFallback } = await import('./llm-resilience.js');
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'missing' });
 
   const userPrompt = [
@@ -464,16 +505,27 @@ export async function draftReply(thread: ScoredThread): Promise<string | null> {
     'Draft her reply, or output SKIP.',
   ].join('\n');
 
-  const text = await claudeWithGroqFallback(
-    anthropic,
-    process.env.COMMUNITY_DRAFT_MODEL?.trim() || 'claude-sonnet-5',
-    420,
-    DRAFT_SYSTEM,
-    userPrompt,
-    'community-listener/draft',
-  );
-  const clean = (text ?? '').trim();
+  let clean = await generateDraftText(anthropic, DRAFT_SYSTEM, userPrompt);
   if (!clean || /^SKIP\b/i.test(clean)) return null;
+
+  if (!isCompleteDraft(clean)) {
+    // One retry, told the previous ending, so it rewrites rather than appending.
+    console.warn(`[community-listener/draft] incomplete ending — retrying (${clean.slice(-80)})`);
+    const retryPrompt = [
+      userPrompt,
+      '',
+      'Your previous draft ended mid-sentence. That text is unusable.',
+      `Last characters: """${clean.slice(-160)}"""`,
+      'Rewrite the FULL reply from the start. Finish every sentence. Output only the reply, or SKIP.',
+    ].join('\n');
+    const retry = await generateDraftText(anthropic, DRAFT_SYSTEM, retryPrompt);
+    if (!retry || /^SKIP\b/i.test(retry)) return null;
+    if (!isCompleteDraft(retry)) {
+      console.warn(`[community-listener/draft] still incomplete after retry — not offering a torn paste`);
+      return null;
+    }
+    clean = retry;
+  }
 
   // A plug without a link is the worst of both worlds: it reads as self-promotion
   // and earns no citation. Elena reviews every draft anyway, so this warns rather

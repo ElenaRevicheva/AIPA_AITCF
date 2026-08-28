@@ -12,8 +12,13 @@
  */
 
 import type { Bot } from 'grammy';
-import type { ScoredThread } from './community-listener';
-import { draftWarnings } from './community-listener';
+import { isCompleteDraft, type ScoredThread } from './community-listener';
+import {
+  encodePastePayload,
+  communityDocumentFilename,
+  buildCommunityCard,
+  buildPostedConfirmation,
+} from './community-paste';
 import {
   attachDelivery,
   getOpportunity,
@@ -23,11 +28,28 @@ import {
   type SourceId,
 } from './community-store';
 
+export {
+  encodePastePayload,
+  communityDocumentFilename,
+  buildCommunityCard,
+  buildPostedConfirmation,
+} from './community-paste';
+
 const HS = 'https://api.hubapi.com';
 const SOURCES: SourceId[] = ['reddit', 'hackernews', 'indiehackers'];
+/** Telegram Bot API hard cap. A paste payload that would need slicing is sent as a file instead. */
+const TG_TEXT_MAX = 4096;
 
 function tgChat(): string | null {
   return process.env.COMMUNITY_TG_CHAT?.trim() || process.env.CONCIERGE_TG_CHAT?.trim() || null;
+}
+
+function pasteFile(filename: string, text: string): Blob {
+  const bytes = new Uint8Array(Buffer.from(text, 'utf8'));
+  if (typeof File === 'function') {
+    return new File([bytes], filename, { type: 'text/plain;charset=utf-8' });
+  }
+  return new Blob([bytes], { type: 'text/plain;charset=utf-8' });
 }
 
 /** Raw Bot API send so this works from cron without holding the grammY instance. */
@@ -35,6 +57,7 @@ async function sendTelegram(
   text: string,
   keyboard?: { text: string; callback_data: string }[][],
   parseMode?: 'HTML',
+  opts: { truncate?: boolean } = {},
 ): Promise<number | null> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = tgChat();
@@ -44,23 +67,72 @@ async function sendTelegram(
   }
   try {
     const { tgSafeText } = await import('./tg-text.js');
+    // Always strip lone surrogates. Never slice a paste payload — a cut is how
+    // a finished sentence plus "GPT-4 with" becomes the only thing on the clipboard.
+    const sanitized = tgSafeText(text, Number.MAX_SAFE_INTEGER);
+    if (sanitized.length > TG_TEXT_MAX) {
+      if (!opts.truncate) {
+        console.warn('[community] message exceeds Telegram cap — refusing to slice; send as .txt instead');
+        return null;
+      }
+    }
+    const payload = opts.truncate ? tgSafeText(sanitized, 4090) : sanitized;
+    if (payload.length > TG_TEXT_MAX) return null;
     const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        // Community posts are written by strangers and are full of emoji; a slice
-        // through one makes the Bot API reject the whole message. See tg-text.ts.
-        text: tgSafeText(text, 4090),
+        text: payload,
         disable_web_page_preview: true,
+        link_preview_options: { is_disabled: true },
         ...(parseMode ? { parse_mode: parseMode } : {}),
         ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
       }),
     });
     const j: any = await r.json();
+    if (!j?.ok) {
+      console.warn('[community] telegram send failed:', j?.description ?? r.status);
+      return null;
+    }
     return j?.result?.message_id ?? null;
   } catch (e: any) {
     console.warn('[community] telegram send failed:', e?.message ?? e);
+    return null;
+  }
+}
+
+async function sendTelegramDocument(
+  filename: string,
+  text: string,
+  caption: string,
+): Promise<number | null> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = tgChat();
+  if (!token || !chatId) return null;
+  try {
+    const form = new FormData();
+    form.set('chat_id', chatId);
+    form.set('caption', caption.slice(0, 1024));
+    form.set('disable_web_page_preview', 'true');
+    const file = pasteFile(filename, text);
+    if (typeof File === 'function' && file instanceof File) {
+      form.set('document', file);
+    } else {
+      form.append('document', file, filename);
+    }
+    const r = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
+      method: 'POST',
+      body: form,
+    });
+    const j: any = await r.json();
+    if (!j?.ok) {
+      console.warn('[community] telegram document failed:', j?.description ?? r.status);
+      return null;
+    }
+    return j?.result?.message_id ?? null;
+  } catch (e: any) {
+    console.warn('[community] telegram document send failed:', e?.message ?? e);
     return null;
   }
 }
@@ -114,36 +186,34 @@ async function completeHubSpotTask(taskId: string): Promise<void> {
   }
 }
 
-const esc = (s: string): string =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
 /**
- * Sent as Telegram HTML so the draft sits in a <pre> block, which Telegram
- * renders with a one-tap copy button. That is as close to "post it from
- * Telegram" as this can safely get: tap to copy, tap the link, paste, edit.
- *
- * The remaining manual step is the point, not friction to be removed. An
- * automated poster would need a Reddit write token, and automated
- * self-promotion is precisely what gets a *domain* — not just an account —
- * into Reddit's spam filter, after which every future mention of aideazz.xyz
- * is removed on sight, including ones other people write.
+ * Three messages on purpose. The card is HTML (title, link, buttons). The
+ * paste payload is a separate plain-text message so long-press Copy cannot
+ * tear. The .txt is the top that cannot be sliced by the 4096-char cap or a
+ * link preview. An automated poster would get the domain banned; this is
+ * still a human paste, just a complete one.
  */
-function card(thread: ScoredThread, draft: string): string {
-  // Warnings belong next to the draft, not only in the logs — the log is not
-  // where the decision to post gets made.
-  const warnings = draftWarnings(draft);
-  return [
-    `${thread.latam ? '🌎 LatAm · ' : ''}${esc(thread.channel)} · score ${thread.score}`,
-    ``,
-    `❓ <b>${esc(thread.title.slice(0, 300))}</b>`,
-    `🔗 <a href="${esc(thread.url)}">open the thread</a>`,
-    ``,
-    `✍️ Tap the draft to copy it, then open the link and paste. Edit it into your own words first:`,
-    `<pre>${esc(draft)}</pre>`,
-    ...(warnings.length ? ['', ...warnings.map(w => `⚠️ ${esc(w)}`)] : []),
-    ``,
-    `<i>Matched "${esc(thread.matchedQuery)}". The buttons below post nothing — they only record what you did, so this thread stops being offered.</i>`,
-  ].join('\n');
+async function deliverCopyPayload(
+  thread: ScoredThread,
+  draft: string,
+  keyboard: { text: string; callback_data: string }[][],
+): Promise<number | null> {
+  const paste = encodePastePayload(draft);
+  if (!isCompleteDraft(paste)) {
+    console.warn('[community] refusing to encode a torn paste:', paste.slice(-80));
+    return null;
+  }
+  const cardId = await sendTelegram(buildCommunityCard(thread, draft), keyboard, 'HTML', { truncate: true });
+  const pasteId = await sendTelegram(paste);
+  const fileId = await sendTelegramDocument(
+    communityDocumentFilename(thread.source, thread.externalId),
+    paste,
+    'Full reply (.txt) — open, Select All, Copy. Use this if the chat message looks cut off.',
+  );
+  if (!pasteId && !fileId) {
+    console.warn('[community] copy payload failed (neither plain text nor .txt landed)');
+  }
+  return cardId ?? pasteId ?? fileId;
 }
 
 export interface CycleResult {
@@ -217,7 +287,7 @@ export async function runCommunityCycle(options: { dryRun?: boolean } = {}): Pro
     if (!id) continue;
 
     const taskId = await createHubSpotTask(thread, draft);
-    const messageId = await sendTelegram(card(thread, draft), [
+    const messageId = await deliverCopyPayload(thread, draft, [
       [
         // "Posted" read as an instruction rather than a report — the first tap
         // was made expecting the reply to appear on Reddit. Neither button ever
@@ -225,7 +295,7 @@ export async function runCommunityCycle(options: { dryRun?: boolean } = {}): Pro
         { text: "✅ I've posted it", callback_data: `cm:posted:${id}` },
         { text: '🗑 Not worth it', callback_data: `cm:skip:${id}` },
       ],
-    ], 'HTML');
+    ]);
     await attachDelivery(id, taskId, messageId);
     if (messageId || taskId) delivered++;
   }
@@ -263,9 +333,14 @@ export function registerCommunityCallbacks(bot: Bot): void {
     await ctx.answerCallbackQuery({ text: action === 'posted' ? 'Logged as posted' : 'Skipped' });
     const stamp = new Date().toISOString().replace('T', ' ').slice(0, 16);
     await ctx.editMessageText(
-      `${action === 'posted' ? '✅ POSTED' : '🗑 SKIPPED'} · ${stamp} UTC\n` +
-        `${opp.source} · ${opp.title.slice(0, 200)}\n${opp.url}` +
-        (action === 'posted' ? `\n\n${opp.draft.slice(0, 3200)}` : ''),
+      buildPostedConfirmation({
+        posted: action === 'posted',
+        stamp,
+        source: opp.source,
+        title: opp.title,
+        url: opp.url,
+      }),
+      { link_preview_options: { is_disabled: true } },
     );
   });
 }
