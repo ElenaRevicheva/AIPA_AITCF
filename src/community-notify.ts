@@ -18,6 +18,8 @@ import {
   communityDocumentFilename,
   buildCommunityCard,
   buildPostedConfirmation,
+  COMMUNITY_BOARD_DEAL_NAME,
+  communityBoardDealUrl,
 } from './community-paste';
 import {
   attachDelivery,
@@ -35,6 +37,9 @@ export {
   communityDocumentFilename,
   buildCommunityCard,
   buildPostedConfirmation,
+  COMMUNITY_BOARD_DEAL_NAME,
+  communityBoardDealUrl,
+  HUBSPOT_PORTAL_ID,
 } from './community-paste';
 
 const HS = 'https://api.hubapi.com';
@@ -194,6 +199,188 @@ async function completeHubSpotTask(taskId: string): Promise<void> {
   }
 }
 
+const TASK_TO_DEAL = 216;
+const NOTE_TO_DEAL = 214;
+let cachedBoardDealId: string | null = null;
+
+/**
+ * One deal Elena can actually open on the phone. Completed orphan tasks are
+ * invisible in Due tasks, in Search → Tasks (open only), and in Search →
+ * Activity (which matches "DEV Community" emails). Notes on a deal named
+ * [COMMUNITY] show up under Search → Deals — the first tab on that screen.
+ */
+export async function ensureCommunityBoardDeal(): Promise<string | null> {
+  if (cachedBoardDealId) return cachedBoardDealId;
+  try {
+    const found = await hs('POST', '/crm/v3/objects/deals/search', {
+      filterGroups: [
+        {
+          filters: [
+            { propertyName: 'dealname', operator: 'EQ', value: COMMUNITY_BOARD_DEAL_NAME },
+          ],
+        },
+      ],
+      properties: ['dealname'],
+      limit: 1,
+    });
+    const existingId = found?.results?.[0]?.id ? String(found.results[0].id) : null;
+    if (existingId) {
+      cachedBoardDealId = existingId;
+      return existingId;
+    }
+    const created = await hs('POST', '/crm/v3/objects/deals', {
+      properties: {
+        dealname: COMMUNITY_BOARD_DEAL_NAME,
+        // Not qualifiedtobuy — that stage is 🔥 I Act TODAY (money queue).
+        dealstage: 'appointmentscheduled',
+        pipeline: 'default',
+        amount: '0',
+        hubspot_owner_id: process.env.HUBSPOT_OWNER_ID || '91612860',
+      },
+    });
+    cachedBoardDealId = created?.id ? String(created.id) : null;
+    return cachedBoardDealId;
+  } catch (e: any) {
+    console.warn('[community] hubspot board deal failed:', e?.message ?? e);
+    return null;
+  }
+}
+
+async function associateTaskToDeal(taskId: string, dealId: string): Promise<void> {
+  try {
+    await hs('PUT', `/crm/v4/objects/tasks/${taskId}/associations/deals/${dealId}`, [
+      { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: TASK_TO_DEAL },
+    ]);
+  } catch (e: any) {
+    console.warn('[community] hubspot task↔deal associate failed:', e?.message ?? e);
+  }
+}
+
+function pinMarker(source: string, externalId: string): string {
+  return `community-pin:${source}:${externalId}`;
+}
+
+async function dealAlreadyHasPin(dealId: string, marker: string): Promise<boolean> {
+  try {
+    const assoc = await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`);
+    const ids = (assoc?.results ?? []).map((r: any) => String(r.toObjectId || r.id || '')).filter(Boolean);
+    for (const noteId of ids.slice(0, 40)) {
+      const note = await hs('GET', `/crm/v3/objects/notes/${noteId}?properties=hs_note_body`);
+      const body = String(note?.properties?.hs_note_body || '');
+      if (body.includes(marker)) return true;
+    }
+  } catch (e: any) {
+    console.warn('[community] hubspot note scan failed:', e?.message ?? e);
+  }
+  return false;
+}
+
+async function pinPostedNote(
+  dealId: string,
+  thread: Pick<ScoredThread, 'source' | 'externalId' | 'channel' | 'title' | 'url'>,
+  extra?: string,
+): Promise<string | null> {
+  const marker = pinMarker(thread.source, thread.externalId);
+  if (await dealAlreadyHasPin(dealId, marker)) return null;
+  const stamp = new Date().toISOString().slice(0, 10);
+  const body = [
+    `✅ POSTED ${stamp} · ${thread.channel}`,
+    thread.title.slice(0, 200),
+    `Thread: ${thread.url}`,
+    extra || 'This reply counts in community stats.',
+    marker,
+  ].join('\n');
+  try {
+    const note = await hs('POST', '/crm/v3/objects/notes', {
+      properties: { hs_note_body: body, hs_timestamp: new Date().toISOString() },
+    });
+    if (!note?.id) return null;
+    await hs('PUT', `/crm/v4/objects/notes/${note.id}/associations/deals/${dealId}`, [
+      { associationCategory: 'HUBSPOT_DEFINED', associationTypeId: NOTE_TO_DEAL },
+    ]);
+    return String(note.id);
+  } catch (e: any) {
+    console.warn('[community] hubspot posted note failed:', e?.message ?? e);
+    return null;
+  }
+}
+
+export interface BoardPin {
+  dealId: string | null;
+  dealUrl: string | null;
+  taskId: string | null;
+  taskStatus: string | null;
+  noteId: string | null;
+}
+
+/**
+ * Put the reply on the one HubSpot record the mobile app can open: a Deal.
+ * Associates the [COMMUNITY] task (even if already Completed) and writes a
+ * timeline note when posted=true.
+ */
+export async function pinCommunityBoard(opts: {
+  thread: ScoredThread;
+  hsTaskId?: string | null;
+  posted?: boolean;
+  extra?: string;
+}): Promise<BoardPin> {
+  const empty: BoardPin = { dealId: null, dealUrl: null, taskId: opts.hsTaskId ?? null, taskStatus: null, noteId: null };
+  const dealId = await ensureCommunityBoardDeal();
+  if (!dealId) return empty;
+  if (opts.hsTaskId) await associateTaskToDeal(opts.hsTaskId, dealId);
+  let taskStatus: string | null = null;
+  if (opts.hsTaskId) {
+    try {
+      const task = await hs(
+        'GET',
+        `/crm/v3/objects/tasks/${opts.hsTaskId}?properties=hs_task_subject,hs_task_status`,
+      );
+      taskStatus = task?.properties?.hs_task_status ?? null;
+    } catch (e: any) {
+      console.warn('[community] hubspot task read failed:', e?.message ?? e);
+    }
+  }
+  const noteId = opts.posted ? await pinPostedNote(dealId, opts.thread, opts.extra) : null;
+  return {
+    dealId,
+    dealUrl: communityBoardDealUrl(dealId),
+    taskId: opts.hsTaskId ?? null,
+    taskStatus,
+    noteId,
+  };
+}
+
+/** Backfill: pin the already-posted follow-up and send Elena the Deal URL. */
+export async function pinBoardAndTellElena(opts: {
+  thread: ScoredThread;
+  hsTaskId?: string | null;
+}): Promise<BoardPin & { cardId: number | null }> {
+  const pin = await pinCommunityBoard({
+    thread: opts.thread,
+    hsTaskId: opts.hsTaskId ?? null,
+    posted: true,
+    extra: 'Pinned so the mobile app has a Deal to open. Tasks tab hides Completed.',
+  });
+  const cardId = await sendTelegram(
+    [
+      'The HubSpot needle is a Deal, not a Task.',
+      '',
+      `Search COMMUNITY → tap Deals (first tab) → ${COMMUNITY_BOARD_DEAL_NAME}`,
+      '',
+      'Ignore Search → Activity — that is matching DEV Community emails.',
+      'Ignore Search → Tasks — that list is open to-dos only.',
+      '',
+      pin.dealUrl || '(deal URL missing — HubSpot write failed)',
+      '',
+      `Timeline note: ✅ POSTED ${opts.thread.channel}`,
+    ].join('\n'),
+    undefined,
+    undefined,
+    { truncate: true },
+  );
+  return { ...pin, cardId };
+}
+
 /**
  * Three messages on purpose. The card is HTML (title, link, buttons). The
  * paste payload is a separate plain-text message so long-press Copy cannot
@@ -244,6 +431,8 @@ function postingKeyboard(id: string): { text: string; callback_data: string }[][
 export interface OfferResult {
   id: string | null;
   hsTaskId: string | null;
+  hsDealId?: string | null;
+  hsDealUrl?: string | null;
   cardId: number | null;
   pasteId: number | null;
   fileId: number | null;
@@ -284,11 +473,14 @@ export async function offerAndDeliverCommunityReply(
     return { id: null, hsTaskId: null, cardId: null, pasteId: null, fileId: null, status: 'queued', ok: false };
   }
   const hsTaskId = existing?.hsTaskId ?? (await createHubSpotTask(thread, paste));
+  const board = await pinCommunityBoard({ thread, hsTaskId, posted: false });
   const delivered = await deliverCommunityPaste(thread, paste, postingKeyboard(id));
   await attachDelivery(id, hsTaskId, delivered.cardId);
   return {
     id,
     hsTaskId,
+    hsDealId: board.dealId,
+    hsDealUrl: board.dealUrl,
     cardId: delivered.cardId,
     pasteId: delivered.pasteId,
     fileId: delivered.fileId,
@@ -347,6 +539,12 @@ export async function recordAlreadyPosted(
     }));
   await setStatus(id, 'posted');
   if (hsTaskId && existing?.hsTaskId) await completeHubSpotTask(hsTaskId);
+  const board = await pinCommunityBoard({
+    thread,
+    hsTaskId,
+    posted: true,
+    extra: 'Elena confirmed in Telegram. Attribution recorded on this deal timeline.',
+  });
   await attachDelivery(id, hsTaskId, existing?.tgMessageId ?? null);
   const stamp = new Date().toISOString().replace('T', ' ').slice(0, 16);
   const cardId = await sendTelegram(
@@ -356,12 +554,24 @@ export async function recordAlreadyPosted(
       source: thread.source,
       title: thread.title,
       url: thread.url,
-    }) + `\n\nLogged. [COMMUNITY] task closed. This reply now counts in community stats.`,
+      ...(board.dealUrl ? { hubspotDealUrl: board.dealUrl } : {}),
+    }) + `\n\nLogged. Open the Deal (Search → COMMUNITY → Deals). Tasks tab hides Completed.`,
     undefined,
     undefined,
     { truncate: true },
   );
-  return { id, hsTaskId, cardId, pasteId: null, fileId: null, status: 'posted', ok: true, stats: await stats() };
+  return {
+    id,
+    hsTaskId,
+    hsDealId: board.dealId,
+    hsDealUrl: board.dealUrl,
+    cardId,
+    pasteId: null,
+    fileId: null,
+    status: 'posted',
+    ok: true,
+    stats: await stats(),
+  };
 }
 
 export interface CycleResult {
@@ -454,6 +664,26 @@ export function registerCommunityCallbacks(bot: Bot): void {
     }
     await setStatus(id, action === 'posted' ? 'posted' : 'skipped');
     if (opp.hsTaskId) await completeHubSpotTask(opp.hsTaskId);
+    const board =
+      action === 'posted'
+        ? await pinCommunityBoard({
+            thread: {
+              source: opp.source,
+              externalId: opp.externalId,
+              url: opp.url,
+              title: opp.title,
+              body: opp.excerpt,
+              author: opp.author,
+              createdAt: Date.now(),
+              channel: opp.source,
+              score: opp.score,
+              matchedQuery: opp.matchedQuery,
+              latam: opp.latam,
+            },
+            hsTaskId: opp.hsTaskId ?? null,
+            posted: true,
+          })
+        : { dealUrl: null as string | null };
     await ctx.answerCallbackQuery({ text: action === 'posted' ? 'Logged as posted' : 'Skipped' });
     const stamp = new Date().toISOString().replace('T', ' ').slice(0, 16);
     await ctx.editMessageText(
@@ -463,6 +693,7 @@ export function registerCommunityCallbacks(bot: Bot): void {
         source: opp.source,
         title: opp.title,
         url: opp.url,
+        ...(board.dealUrl ? { hubspotDealUrl: board.dealUrl } : {}),
       }),
       { link_preview_options: { is_disabled: true } },
     );

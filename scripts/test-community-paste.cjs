@@ -114,6 +114,25 @@ check('POSTED confirmation does not splice the draft under the Reddit URL', () =
   assert.ok(!posted.includes(FULL.slice(0, 40)));
 });
 
+check('HubSpot needle is a Deal URL (0-3), not a Task URL (0-27)', () => {
+  const { communityBoardDealUrl, COMMUNITY_BOARD_DEAL_NAME } = require('../dist/community-paste.js');
+  const url = communityBoardDealUrl('1234567890');
+  assert.ok(url.includes('/record/0-3/1234567890'), url);
+  assert.ok(!url.includes('0-27'), 'task object type must not be used — mobile cannot open it');
+  assert.ok(COMMUNITY_BOARD_DEAL_NAME.startsWith('[COMMUNITY] Posted replies'));
+  const withDeal = buildPostedConfirmation({
+    posted: true,
+    stamp: '2026-08-28 13:00',
+    source: 'reddit',
+    title: thread.title,
+    url: thread.url,
+    hubspotDealUrl: url,
+  });
+  assert.ok(withDeal.includes(url));
+  assert.ok(withDeal.includes('Deal (not Tasks'));
+  assert.ok(!withDeal.includes('GPT-4 with browsing'));
+});
+
 check('.txt name is stable and paste-sized', () => {
   assert.strictEqual(communityDocumentFilename('reddit', '1vz7a0f'), 'reddit-1vz7a0f-reply.txt');
   const bytes = Buffer.from(encodePastePayload(FULL), 'utf8');

@@ -3,8 +3,8 @@
 # cannot workflow_dispatch, and they cannot SSH from the agent VM.
 #
 # Usage:
-#   echo "deliver-ugc-followup" > .community-trigger
-#   git add .community-trigger && git commit -m "community: deliver follow-up paste" && git push
+#   echo "pin-hubspot" > .community-trigger
+#   git add .community-trigger && git commit -m "community: pin HubSpot deal" && git push
 #   echo "# idle" > .community-trigger
 
 name: Community paste deploy + deliver (trigger file)
@@ -32,7 +32,8 @@ jobs:
             \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
             deliver|deliver-ugc-followup) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=deliver" >> "$GITHUB_OUTPUT" ;;
             record-posted) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=record-posted" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be deliver, deliver-ugc-followup, or record-posted, got '$LINE'"; exit 1 ;;
+            pin-hubspot) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=pin-hubspot" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be deliver, deliver-ugc-followup, record-posted, or pin-hubspot, got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -80,6 +81,7 @@ jobs:
             dist/community-store.js \
             scripts/community-deliver-one.cjs \
             scripts/community-ugc-followup.cjs \
+            scripts/hs-pin-community-board.cjs \
             ubuntu@170.9.242.90:/tmp/community-deploy/
 
           ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \

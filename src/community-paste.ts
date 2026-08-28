@@ -29,6 +29,17 @@ export function communityDocumentFilename(source: string, externalId: string): s
   return `${safe || 'community'}-reply.txt`;
 }
 
+/** Aldeazz portal. Deals (0-3) open in the HubSpot mobile app; tasks (0-27) do not. */
+export const HUBSPOT_PORTAL_ID = '51409153';
+
+/** One evergreen deal. Every posted reply is a note on this record — that is the needle. */
+export const COMMUNITY_BOARD_DEAL_NAME = '[COMMUNITY] Posted replies — agentic marketing';
+
+export function communityBoardDealUrl(dealId: string): string {
+  const id = String(dealId || '').replace(/[^\d]/g, '');
+  return `https://app.hubspot.com/contacts/${HUBSPOT_PORTAL_ID}/record/0-3/${id}`;
+}
+
 export function buildCommunityCard(thread: ScoredThread, draft: string, opts?: { withButtons?: boolean }): string {
   // Warnings stay on the card. The draft itself does not — stuffing it into a
   // <pre> here is what made mobile copy return a single sentence.
@@ -55,6 +66,7 @@ export function buildPostedConfirmation(input: {
   source: string;
   title: string;
   url: string;
+  hubspotDealUrl?: string;
 }): string {
   // Deliberately no draft here. Putting the reply after the thread URL is what
   // made Telegram draw a Reddit preview over the remaining sentences.
@@ -62,5 +74,12 @@ export function buildPostedConfirmation(input: {
     `${input.posted ? '✅ POSTED' : '🗑 SKIPPED'} · ${input.stamp} UTC`,
     `${input.source} · ${input.title.slice(0, 200)}`,
     input.url,
+    ...(input.hubspotDealUrl
+      ? [
+          '',
+          'HubSpot needle is this Deal (not Tasks, not the Activity search):',
+          input.hubspotDealUrl,
+        ]
+      : []),
   ].join('\n');
 }

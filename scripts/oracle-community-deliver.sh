@@ -3,7 +3,7 @@
 # Piped over SSH from .github/workflows/community-deliver-on-trigger.yml
 #
 # Usage (on Oracle):
-#   bash scripts/oracle-community-deliver.sh <git-ref> [deliver|record-posted]
+#   bash scripts/oracle-community-deliver.sh <git-ref> [deliver|record-posted|pin-hubspot]
 set -uo pipefail
 
 REF="${1:?git ref required}"
@@ -32,7 +32,7 @@ echo "--- checkout named source + scripts from FETCH_HEAD ---"
 git checkout FETCH_HEAD -- \
   src/community-paste.ts src/community-notify.ts src/community-listener.ts src/community-store.ts \
   scripts/community-deliver-one.cjs scripts/community-ugc-followup.cjs \
-  scripts/test-community-paste.cjs 2>&1 \
+  scripts/hs-pin-community-board.cjs scripts/test-community-paste.cjs 2>&1 \
   || echo "WARN: source checkout partial"
 
 echo "--- install compiled dist from /tmp/community-deploy (built on the runner) ---"
@@ -43,6 +43,7 @@ if [ -d /tmp/community-deploy ]; then
   cp -f /tmp/community-deploy/community-store.js dist/community-store.js
   cp -f /tmp/community-deploy/community-deliver-one.cjs scripts/community-deliver-one.cjs
   cp -f /tmp/community-deploy/community-ugc-followup.cjs scripts/community-ugc-followup.cjs
+  cp -f /tmp/community-deploy/hs-pin-community-board.cjs scripts/hs-pin-community-board.cjs
 else
   echo "WARN: /tmp/community-deploy missing — hoping tsc is on the box"
   npx --yes tsc --pretty false || { echo "FATAL: no compiled dist and tsc failed"; exit 1; }
@@ -54,6 +55,8 @@ grep -n "isCompleteDraft" dist/community-listener.js || { echo "FATAL: isComplet
 grep -n "I've posted it" dist/community-notify.js || { echo "FATAL: Posted button missing"; exit 1; }
 grep -n "recordAlreadyPosted" dist/community-notify.js || { echo "FATAL: recordAlreadyPosted missing"; exit 1; }
 grep -n "getOpportunityBySourceExternal" dist/community-store.js || { echo "FATAL: lookup missing"; exit 1; }
+grep -n "communityBoardDealUrl" dist/community-notify.js || { echo "FATAL: deal URL helper missing"; exit 1; }
+grep -n "record/0-3/" dist/community-paste.js || { echo "FATAL: deal object type 0-3 missing"; exit 1; }
 
 BEFORE=$(stat -c %Y dist/community-paste.js)
 echo "dist/community-paste.js mtime=$BEFORE"
@@ -84,6 +87,8 @@ console.log("ok — running process is newer than dist/community-paste.js");
 echo "--- $MODE ---"
 if [ "$MODE" = "record-posted" ]; then
   node scripts/community-deliver-one.cjs --already-posted | tee /tmp/community-deliver-one.log
+elif [ "$MODE" = "pin-hubspot" ]; then
+  node scripts/hs-pin-community-board.cjs | tee /tmp/community-deliver-one.log
 else
   node scripts/community-deliver-one.cjs | tee /tmp/community-deliver-one.log
 fi
