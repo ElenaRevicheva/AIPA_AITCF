@@ -18,6 +18,7 @@ const {
   communityDocumentFilename,
 } = require('../dist/community-paste.js');
 const { tgSafeText } = require('../dist/tg-text.js');
+const followup = require('./community-ugc-followup.cjs');
 
 const TORN =
   'You’re right that each model pulls from the sources it actually indexes, but “engine = UGC” isn’t the whole story. GPT-4 with';
@@ -111,6 +112,17 @@ check('.txt name is stable and paste-sized', () => {
   const bytes = Buffer.from(encodePastePayload(FULL), 'utf8');
   assert.ok(bytes.length > 200, `file too small (${bytes.length})`);
   assert.strictEqual(bytes.toString('utf8'), FULL);
+});
+
+check('UGC follow-up is a complete paste, not another "GPT-4 with" fragment', () => {
+  assert.strictEqual(isCompleteDraft(followup.draft), true);
+  const encoded = encodePastePayload(followup.draft);
+  assert.strictEqual(encoded, followup.draft.trim());
+  assert.ok(encoded.includes('GPT-4 with browsing'), 'second thought missing');
+  assert.ok(encoded.includes('https://aideazz.xyz/api'), 'audit URL missing');
+  assert.ok(!encoded.endsWith('GPT-4 with'), 'follow-up is torn');
+  const words = encoded.trim().split(/\s+/).length;
+  assert.ok(words <= 140, `follow-up is ${words} words`);
 });
 
 check('old HTML+slice encoder would have torn a long reply — we no longer do that', () => {

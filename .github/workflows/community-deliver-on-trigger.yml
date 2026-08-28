@@ -1,0 +1,87 @@
+# Named-file deploy of the community paste encoder + one Telegram paste.
+# Same trigger-file pattern as stage-prospect-on-trigger.yml: agent tokens
+# cannot workflow_dispatch, and they cannot SSH from the agent VM.
+#
+# Usage:
+#   echo "deliver-ugc-followup" > .community-trigger
+#   git add .community-trigger && git commit -m "community: deliver follow-up paste" && git push
+#   echo "# idle" > .community-trigger
+
+name: Community paste deploy + deliver (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".community-trigger"]
+
+jobs:
+  community-deliver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .community-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .community-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.community-trigger is empty"; exit 1; }
+          case "$LINE" in
+            \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+            deliver|deliver-ugc-followup) echo "skip=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be deliver or deliver-ugc-followup, got '$LINE'"; exit 1 ;;
+          esac
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.trigger.outputs.skip != 'true'
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Build encoder on the runner (Oracle often has no tsc)
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          npm ci
+          npx tsc --pretty false
+          node scripts/test-community-paste.cjs
+          test -f dist/community-paste.js
+          test -f dist/community-notify.js
+          test -f dist/community-listener.js
+
+      - name: Deploy named files + deliver paste on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+
+          ssh $SSHOPTS ubuntu@170.9.242.90 'mkdir -p /tmp/community-deploy'
+          scp $SSHOPTS \
+            dist/community-paste.js \
+            dist/community-notify.js \
+            dist/community-listener.js \
+            scripts/community-deliver-one.cjs \
+            scripts/community-ugc-followup.cjs \
+            ubuntu@170.9.242.90:/tmp/community-deploy/
+
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+            "$REF" < scripts/oracle-community-deliver.sh
+          RC=$?
+          echo "--- remote exit code: $RC ---"
+          rm -f ~/.ssh/oracle
+          exit $RC

@@ -29,10 +29,11 @@ export function communityDocumentFilename(source: string, externalId: string): s
   return `${safe || 'community'}-reply.txt`;
 }
 
-export function buildCommunityCard(thread: ScoredThread, draft: string): string {
+export function buildCommunityCard(thread: ScoredThread, draft: string, opts?: { withButtons?: boolean }): string {
   // Warnings stay on the card. The draft itself does not — stuffing it into a
   // <pre> here is what made mobile copy return a single sentence.
   const warnings = draftWarnings(draft);
+  const withButtons = opts?.withButtons !== false;
   return [
     `${thread.latam ? '🌎 LatAm · ' : ''}${esc(thread.channel)} · score ${thread.score}`,
     ``,
@@ -42,7 +43,9 @@ export function buildCommunityCard(thread: ScoredThread, draft: string): string 
     `✍️ The next messages are the <b>full</b> reply — long-press Copy on the plain-text one, or open the .txt if anything looks cut off. Paste into the thread, then edit it into your own words.`,
     ...(warnings.length ? ['', ...warnings.map(w => `⚠️ ${esc(w)}`)] : []),
     ``,
-    `<i>Matched "${esc(thread.matchedQuery)}". The buttons below post nothing — they only record what you did, so this thread stops being offered.</i>`,
+    withButtons
+      ? `<i>Matched "${esc(thread.matchedQuery)}". The buttons below post nothing — they only record what you did, so this thread stops being offered.</i>`
+      : `<i>Matched "${esc(thread.matchedQuery)}". Long-press Copy on the next message, or open the .txt. No logging buttons on this one.</i>`,
   ].join('\n');
 }
 

@@ -193,17 +193,22 @@ async function completeHubSpotTask(taskId: string): Promise<void> {
  * link preview. An automated poster would get the domain banned; this is
  * still a human paste, just a complete one.
  */
-async function deliverCopyPayload(
+export async function deliverCommunityPaste(
   thread: ScoredThread,
   draft: string,
-  keyboard: { text: string; callback_data: string }[][],
-): Promise<number | null> {
+  keyboard?: { text: string; callback_data: string }[][],
+): Promise<{ cardId: number | null; pasteId: number | null; fileId: number | null; ok: boolean }> {
   const paste = encodePastePayload(draft);
   if (!isCompleteDraft(paste)) {
     console.warn('[community] refusing to encode a torn paste:', paste.slice(-80));
-    return null;
+    return { cardId: null, pasteId: null, fileId: null, ok: false };
   }
-  const cardId = await sendTelegram(buildCommunityCard(thread, draft), keyboard, 'HTML', { truncate: true });
+  const cardId = await sendTelegram(
+    buildCommunityCard(thread, draft, { withButtons: Boolean(keyboard?.length) }),
+    keyboard,
+    'HTML',
+    { truncate: true },
+  );
   const pasteId = await sendTelegram(paste);
   const fileId = await sendTelegramDocument(
     communityDocumentFilename(thread.source, thread.externalId),
@@ -213,7 +218,16 @@ async function deliverCopyPayload(
   if (!pasteId && !fileId) {
     console.warn('[community] copy payload failed (neither plain text nor .txt landed)');
   }
-  return cardId ?? pasteId ?? fileId;
+  return { cardId, pasteId, fileId, ok: Boolean(pasteId || fileId) };
+}
+
+async function deliverCopyPayload(
+  thread: ScoredThread,
+  draft: string,
+  keyboard: { text: string; callback_data: string }[][],
+): Promise<number | null> {
+  const r = await deliverCommunityPaste(thread, draft, keyboard);
+  return r.cardId ?? r.pasteId ?? r.fileId;
 }
 
 export interface CycleResult {
