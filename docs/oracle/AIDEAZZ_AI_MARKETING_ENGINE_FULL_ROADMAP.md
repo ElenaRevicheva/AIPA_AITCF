@@ -23,6 +23,7 @@
 | **Competitor AI-answer research** | `scripts/competitor-probe.cjs` — Perplexity **Agent API** with the `web_search` tool; ranks the domains that own our buyer questions, from the URLs actually searched |
 | **Looker Studio** | Report **"AIdeazz — Organic Performance"** live on GA4 property `515154124` |
 | **Credential placement** | Telegram **`/pplxkey`** (and `/gmailpw`) — key arrives on STDIN, never argv, message deleted on read, and the helper **probes the provider before writing**. Helper committed at `scripts/set-pplx-stdin.sh` rather than living only on the box |
+| **Follow-up radar** | `VibeJobHunterAIPA_AIMCF/scripts/followup_radar.py` — reads Zoho + Gmail **READONLY**, decides *whose turn it is*, raises deduped **HubSpot tasks** and a Telegram digest. Daily cron 12:00 UTC |
 | **Content** | Daily publisher, **125 posts**, token-overlap duplicate guard; AI Ops Wiki; **30 Dev.to cross-posts**, all canonical → aideazz.xyz |
 | **Analytics** | GA4 tag + **Data API** (service account, daily cron); **4 key events live** — `generate_lead`, `api_demo_run`, `contact_whatsapp`, `newsletter_signup` |
 | **CRM / automation** | HubSpot; **Make.com** Lead Concierge (15-min, `dlqCount: 0`); **n8n** (28 runs / 28 success / 0 fail, single workflow); 16 Oracle crons |
@@ -187,6 +188,31 @@ Update to the entity-ambiguity item below: Brand Radar's Ko-fi/OnlyFans/Patreon 
 
 Report **"AIdeazz — Organic Performance"**, connected to GA4 property `515154124`, rendering real session data. It had never been used; there was no blocker beyond no client asking for a dashboard. Now the GA4 key events created earlier the same day have somewhere to be reported.
 
+### 9. The follow-up radar — the engine had no idea whose turn it was
+
+Elena could not recall which company "GTM Engineer / AI Engineer" was. It was Florencia Mayer at globaltalent.co: interviewed 21 Aug, files exchanged both ways, then **six days of silence with her own message last**. Nothing was broken. Nothing was watching.
+
+`response_detector.py` (built 23–24 Aug, multi-mailbox) is imported **only** by `orchestrator.py`, which runs under no cron and no PM2 — `autonomous_data/` has never held a stored result. Built, never fired. So this is deliberately *not* that, and it answers a different question. "Did they reply?" is not what loses opportunities. **"Whose turn is it, and for how long?"** is — and no event ever fires for an absence.
+
+**`scripts/followup_radar.py`** (VJH repo) pairs INBOX against Sent by normalised subject across **both** mailboxes and classifies:
+
+| Class | Meaning | HubSpot |
+|---|---|---|
+| **THEY wrote last** | a warm counterparty is waiting on her *now* | HIGH, due 4h |
+| **SHE wrote last** | gone quiet; a nudge is free | MEDIUM, due 24h |
+
+First run over 45 days: **286 two-way threads, 3 owed by her, 12 owed by them** — including a prospect reply unanswered for **32 days** (`service@fuerteamador.com`, replying to the AI-visibility outreach) and **two micro1 recruiter threads**, micro1 being #3 on her own 20 Aug income shortlist.
+
+**Landed in HubSpot, because Telegram is a notification and HubSpot is the playground.** Tasks are prefixed `[FOLLOWUP-RADAR]` per the existing `[STREAM-AGENT]` convention, associated to the contact, with the task shape copied from `community-notify.ts` rather than invented.
+
+**The engineering was the dedupe, not the create.** A daily cron blindly creating tasks manufactures ~15 duplicates a day and makes the queue worthless inside a week — the same shape as the blog near-duplicates. The task subject is deterministic and doubles as its own dedupe key; an open task with that subject means skip. Closing the task is the signal it is handled.
+
+Verified across three consecutive runs — `15 created` → `0 created / 14 open / 1 failed` → `0 created / 15 open / 0 failed`.
+
+**That middle run is the lesson.** HubSpot enforces a *secondly* rate limit and the unpaced version tripped it — **on the dedupe search**. It failed *safe* (an errored search skips rather than duplicating) but a skipped task is a **silently dropped follow-up**, which is exactly what the script exists to prevent. Safe is not the same as correct. Now paced at 0.3s with a 429 retry — the third instance of that same rate-limit lesson in one day, after the citation probe and Perplexity.
+
+Read-only by construction: IMAP is opened `readonly=True`, so it cannot alter, move or delete a message, and it never replies on anyone's behalf.
+
 ### Named failure modes earned
 
 - **Silent failure** — an error caught and logged but not escalated is indistinguishable from success.
@@ -196,6 +222,10 @@ Report **"AIdeazz — Organic Performance"**, connected to GA4 property `5151541
 - **Zero by construction, not by luck** — a ring with fixed offsets makes "no orphans" arithmetic, not a heuristic that mostly works.
 - **You cannot attribute what you never instrumented** — attribution is a decision made *before* the traffic arrives, not a report run afterwards.
 - **Construct validity** — during this audit four tools were reported "absent" because the codebase was grepped for API keys, when Ahrefs, Search Console and the Google Business Profile were all in active use *through their interfaces*. Measuring "is there integration code" as a proxy for "is this capability real" is the same error as everything above, pointed inward.
+- **Attribution of authority ≠ retrieval** — a 0% own-domain citation rate did not mean invisible. The content is retrieved and cited constantly; the credit lands on `dev.to` and `linkedin.com`. AI engines do not follow `rel=canonical` — canonicals tell Google which URL to *rank*, and say nothing to an answer engine about which brand deserves the credit.
+- **State vs. events** — an opportunity dies from something *not* arriving, and no event fires for an absence. `response_detector.py` was event-shaped and could never have caught a thread going quiet. You cannot detect an absence; you have to hold state and measure elapsed time against it. A queue needs an age, not just a count.
+- **Fail-safe is not fail-correct** — the rate-limited dedupe search refused rather than duplicating, which was the right direction to fail. It still silently dropped two real follow-ups. A system can be safe and still be losing money; the two words are not interchangeable.
+- **Built ≠ firing** — the recurring shape of this whole day. The citation probe's OpenAI leg, GA4's key events, the orphan-page link graph, `response_detector.py`, the prepared GBP photo pack: every one existed as code or as an asset, and none of them was running. Shipping is not deploying, and deploying is not scheduled.
 
 ---
 
