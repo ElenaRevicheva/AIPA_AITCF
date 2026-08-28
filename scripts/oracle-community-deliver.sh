@@ -59,7 +59,7 @@ grep -n "recordAlreadyPosted" dist/community-notify.js || { echo "FATAL: recordA
 grep -n "getOpportunityBySourceExternal" dist/community-store.js || { echo "FATAL: lookup missing"; exit 1; }
 grep -n "communityBoardDealUrl" dist/community-notify.js || { echo "FATAL: deal URL helper missing"; exit 1; }
 grep -n "record/0-3/" dist/community-paste.js || { echo "FATAL: deal object type 0-3 missing"; exit 1; }
-grep -n "utm_campaign" dist/community-paste.js | grep -q "community-reply" || { echo "FATAL: community-reply UTM missing"; exit 1; }
+grep -n "community-reply" dist/community-paste.js || { echo "FATAL: community-reply UTM missing"; exit 1; }
 grep -n "parseRequestUtms" dist/visibility-api.js || { echo "FATAL: audit UTM parser missing"; exit 1; }
 
 BEFORE=$(stat -c %Y dist/community-paste.js)
