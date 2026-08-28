@@ -22,9 +22,11 @@ import {
 import {
   attachDelivery,
   getOpportunity,
+  getOpportunityBySourceExternal,
   saveOpportunity,
   seenExternalIds,
   setStatus,
+  stats,
   type SourceId,
 } from './community-store';
 
@@ -153,17 +155,23 @@ async function hs(method: string, path: string, body?: unknown): Promise<any> {
  * Due in 12 hours, not 4 days like the outreach follow-ups: a community thread
  * is worth answering today or not at all.
  */
-async function createHubSpotTask(thread: ScoredThread, draft: string): Promise<string | null> {
+async function createHubSpotTask(
+  thread: ScoredThread,
+  draft: string,
+  opts?: { completed?: boolean; extra?: string },
+): Promise<string | null> {
   try {
     const due = new Date(Date.now() + 12 * 3600 * 1000);
+    const extra = opts?.extra ? `${opts.extra}\n\n` : '';
     const task = await hs('POST', '/crm/v3/objects/tasks', {
       properties: {
         hs_task_subject: `[COMMUNITY] Reply on ${thread.channel} — ${thread.title.slice(0, 70)}`,
         hs_task_body:
+          extra +
           `Thread: ${thread.url}\n` +
           `Matched: "${thread.matchedQuery}" · score ${thread.score}${thread.latam ? ' · LatAm' : ''}\n\n` +
           `Draft reply (review before posting — never paste blind):\n\n${draft}`,
-        hs_task_status: 'NOT_STARTED',
+        hs_task_status: opts?.completed ? 'COMPLETED' : 'NOT_STARTED',
         hs_task_priority: thread.latam ? 'HIGH' : 'MEDIUM',
         hs_timestamp: due.toISOString(),
         hubspot_owner_id: process.env.HUBSPOT_OWNER_ID || '91612860',
@@ -221,13 +229,139 @@ export async function deliverCommunityPaste(
   return { cardId, pasteId, fileId, ok: Boolean(pasteId || fileId) };
 }
 
-async function deliverCopyPayload(
+function postingKeyboard(id: string): { text: string; callback_data: string }[][] {
+  return [
+    [
+      // "Posted" read as an instruction rather than a report — the first tap
+      // was made expecting the reply to appear on Reddit. Neither button ever
+      // touches the platform; they only record what Elena already did.
+      { text: "✅ I've posted it", callback_data: `cm:posted:${id}` },
+      { text: '🗑 Not worth it', callback_data: `cm:skip:${id}` },
+    ],
+  ];
+}
+
+export interface OfferResult {
+  id: string | null;
+  hsTaskId: string | null;
+  cardId: number | null;
+  pasteId: number | null;
+  fileId: number | null;
+  status: 'queued' | 'posted' | 'skipped';
+  ok: boolean;
+}
+
+/**
+ * The whole attribution path. Save the row, park a HubSpot [COMMUNITY] task,
+ * then send the card WITH the green check. A paste without that button is a
+ * reply the marketing workout cannot count.
+ */
+export async function offerAndDeliverCommunityReply(
   thread: ScoredThread,
   draft: string,
-  keyboard: { text: string; callback_data: string }[][],
-): Promise<number | null> {
-  const r = await deliverCommunityPaste(thread, draft, keyboard);
-  return r.cardId ?? r.pasteId ?? r.fileId;
+): Promise<OfferResult> {
+  const paste = encodePastePayload(draft);
+  if (!isCompleteDraft(paste)) {
+    console.warn('[community] refusing to encode a torn paste:', paste.slice(-80));
+    return { id: null, hsTaskId: null, cardId: null, pasteId: null, fileId: null, status: 'queued', ok: false };
+  }
+  const existing = await getOpportunityBySourceExternal(thread.source, thread.externalId);
+  const id =
+    existing?.id ??
+    (await saveOpportunity({
+      source: thread.source,
+      externalId: thread.externalId,
+      url: thread.url,
+      title: thread.title,
+      author: thread.author,
+      score: thread.score,
+      matchedQuery: thread.matchedQuery,
+      latam: thread.latam,
+      excerpt: thread.body.slice(0, 2000),
+      draft: paste,
+    }));
+  if (!id) {
+    return { id: null, hsTaskId: null, cardId: null, pasteId: null, fileId: null, status: 'queued', ok: false };
+  }
+  const hsTaskId = existing?.hsTaskId ?? (await createHubSpotTask(thread, paste));
+  const delivered = await deliverCommunityPaste(thread, paste, postingKeyboard(id));
+  await attachDelivery(id, hsTaskId, delivered.cardId);
+  return {
+    id,
+    hsTaskId,
+    cardId: delivered.cardId,
+    pasteId: delivered.pasteId,
+    fileId: delivered.fileId,
+    status: existing?.status ?? 'queued',
+    ok: delivered.ok,
+  };
+}
+
+/**
+ * Elena said "I posted" in chat. Same writes the green check would have done:
+ * community_opportunities.status=posted, HubSpot [COMMUNITY] task completed,
+ * Telegram confirmation. Does not send another copy payload.
+ */
+export async function recordAlreadyPosted(
+  thread: ScoredThread,
+  draft: string,
+): Promise<OfferResult & { stats: Awaited<ReturnType<typeof stats>> }> {
+  const paste = encodePastePayload(draft);
+  let existing = await getOpportunityBySourceExternal(thread.source, thread.externalId);
+  let id = existing?.id ?? null;
+  if (!id) {
+    id = await saveOpportunity({
+      source: thread.source,
+      externalId: thread.externalId,
+      url: thread.url,
+      title: thread.title,
+      author: thread.author,
+      score: thread.score,
+      matchedQuery: thread.matchedQuery,
+      latam: thread.latam,
+      excerpt: thread.body.slice(0, 2000),
+      draft: paste,
+    });
+    if (!id) {
+      existing = await getOpportunityBySourceExternal(thread.source, thread.externalId);
+      id = existing?.id ?? null;
+    }
+  }
+  if (!id) {
+    return {
+      id: null,
+      hsTaskId: null,
+      cardId: null,
+      pasteId: null,
+      fileId: null,
+      status: 'queued',
+      ok: false,
+      stats: await stats(),
+    };
+  }
+  const hsTaskId =
+    existing?.hsTaskId ??
+    (await createHubSpotTask(thread, paste, {
+      completed: true,
+      extra: `✅ POSTED ${new Date().toISOString().slice(0, 10)} — Elena confirmed in Telegram (green-check path was missing on the one-shot paste). Attribution recorded.`,
+    }));
+  await setStatus(id, 'posted');
+  if (hsTaskId && existing?.hsTaskId) await completeHubSpotTask(hsTaskId);
+  await attachDelivery(id, hsTaskId, existing?.tgMessageId ?? null);
+  const stamp = new Date().toISOString().replace('T', ' ').slice(0, 16);
+  const cardId = await sendTelegram(
+    buildPostedConfirmation({
+      posted: true,
+      stamp,
+      source: thread.source,
+      title: thread.title,
+      url: thread.url,
+    }) + `\n\nLogged. [COMMUNITY] task closed. This reply now counts in community stats.`,
+    undefined,
+    undefined,
+    { truncate: true },
+  );
+  return { id, hsTaskId, cardId, pasteId: null, fileId: null, status: 'posted', ok: true, stats: await stats() };
 }
 
 export interface CycleResult {
@@ -286,32 +420,8 @@ export async function runCommunityCycle(options: { dryRun?: boolean } = {}): Pro
     }
     drafted++;
 
-    const id = await saveOpportunity({
-      source: thread.source,
-      externalId: thread.externalId,
-      url: thread.url,
-      title: thread.title,
-      author: thread.author,
-      score: thread.score,
-      matchedQuery: thread.matchedQuery,
-      latam: thread.latam,
-      excerpt: thread.body.slice(0, 2000),
-      draft,
-    });
-    if (!id) continue;
-
-    const taskId = await createHubSpotTask(thread, draft);
-    const messageId = await deliverCopyPayload(thread, draft, [
-      [
-        // "Posted" read as an instruction rather than a report — the first tap
-        // was made expecting the reply to appear on Reddit. Neither button ever
-        // touches the platform; they only record what Elena already did.
-        { text: "✅ I've posted it", callback_data: `cm:posted:${id}` },
-        { text: '🗑 Not worth it', callback_data: `cm:skip:${id}` },
-      ],
-    ]);
-    await attachDelivery(id, taskId, messageId);
-    if (messageId || taskId) delivered++;
+    const offered = await offerAndDeliverCommunityReply(thread, draft);
+    if (offered.ok || offered.hsTaskId) delivered++;
   }
 
   return {

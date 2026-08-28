@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * Deliver one complete, copy-ready community reply to Elena's Telegram.
- * Runs on Oracle (needs TELEGRAM_BOT_TOKEN + COMMUNITY_TG_CHAT / CONCIERGE_TG_CHAT).
+ * Deliver one complete, copy-ready community reply to Elena's Telegram,
+ * with the green-check attribution path (Oracle row + HubSpot [COMMUNITY] task).
  *
  *   node scripts/community-deliver-one.cjs
- *   node scripts/community-deliver-one.cjs scripts/community-ugc-followup.cjs
+ *   node scripts/community-deliver-one.cjs --already-posted
+ *   node scripts/community-deliver-one.cjs scripts/community-ugc-followup.cjs --already-posted
  */
 'use strict';
 
@@ -15,14 +16,21 @@ try {
   /* dotenv absent is fine when the process already has env */
 }
 
-const payloadPath = process.argv[2]
-  ? path.resolve(process.argv[2])
+const args = process.argv.slice(2).filter((a) => a !== '--');
+const alreadyPosted = args.includes('--already-posted');
+const payloadArg = args.find((a) => !a.startsWith('--'));
+const payloadPath = payloadArg
+  ? path.resolve(payloadArg)
   : path.join(__dirname, 'community-ugc-followup.cjs');
 
 const payload = require(payloadPath);
 const { isCompleteDraft } = require('../dist/community-listener.js');
 const { encodePastePayload } = require('../dist/community-paste.js');
-const { deliverCommunityPaste } = require('../dist/community-notify.js');
+const {
+  offerAndDeliverCommunityReply,
+  recordAlreadyPosted,
+} = require('../dist/community-notify.js');
+const { stats } = require('../dist/community-store.js');
 
 (async () => {
   const draft = encodePastePayload(payload.draft);
@@ -43,14 +51,30 @@ const { deliverCommunityPaste } = require('../dist/community-notify.js');
     matchedQuery: payload.matchedQuery || '',
     latam: Boolean(payload.latam),
   };
-  console.log(`--- delivering ${thread.channel} ${thread.externalId} (${draft.length} chars) ---`);
-  const result = await deliverCommunityPaste(thread, draft);
+
+  if (alreadyPosted) {
+    console.log(`--- recording POSTED ${thread.channel} ${thread.externalId} ---`);
+    const result = await recordAlreadyPosted(thread, draft);
+    console.log(JSON.stringify({ ...result, stats: result.stats }, null, 2));
+    if (!result.ok || result.status !== 'posted') {
+      console.error('failed to record posted attribution');
+      process.exit(1);
+    }
+    console.log(
+      `ok — posted=${result.stats.posted} queued=${result.stats.queued} hsTaskId=${result.hsTaskId} id=${result.id}`,
+    );
+    return;
+  }
+
+  console.log(`--- offering ${thread.channel} ${thread.externalId} (${draft.length} chars) with Posted button ---`);
+  const result = await offerAndDeliverCommunityReply(thread, draft);
   console.log(JSON.stringify(result));
   if (!result.ok) {
     console.error('Telegram copy payload did not land');
     process.exit(1);
   }
-  console.log('ok — long-press Copy on the plain-text message, or open the .txt');
+  const s = await stats();
+  console.log(`ok — green check is on the card. queued=${s.queued} posted=${s.posted}`);
 })().catch((e) => {
   console.error('community-deliver-one failed:', e.message);
   process.exit(1);

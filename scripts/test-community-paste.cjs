@@ -93,6 +93,13 @@ check('card does not embed the draft, so HTML copy cannot tear it', () => {
   assert.ok(!card.includes('<pre>'), 'old <pre> wrapper is back');
 });
 
+check('default card keeps the Posted / Skip buttons — that is the attribution path', () => {
+  const card = buildCommunityCard(thread, FULL);
+  assert.ok(card.includes('The buttons below post nothing'), 'green-check copy missing from default card');
+  const noButtons = buildCommunityCard(thread, FULL, { withButtons: false });
+  assert.ok(!noButtons.includes('The buttons below post nothing'));
+});
+
 check('POSTED confirmation does not splice the draft under the Reddit URL', () => {
   const posted = buildPostedConfirmation({
     posted: true,

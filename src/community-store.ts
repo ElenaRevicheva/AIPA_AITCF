@@ -196,6 +196,28 @@ export async function setStatus(id: string, status: OpportunityStatus): Promise<
   }
 }
 
+const FETCH_CLOBS = { EXCERPT: { type: oracledb.STRING }, DRAFT: { type: oracledb.STRING } };
+
+function mapRow(r: any): Opportunity {
+  return {
+    id: String(r.ID),
+    source: String(r.SOURCE) as SourceId,
+    externalId: String(r.EXTERNAL_ID),
+    url: String(r.URL ?? ''),
+    title: String(r.TITLE ?? ''),
+    author: String(r.AUTHOR ?? ''),
+    score: Number(r.SCORE ?? 0),
+    matchedQuery: String(r.MATCHED_QUERY ?? ''),
+    latam: Number(r.LATAM ?? 0) === 1,
+    excerpt: String(r.EXCERPT ?? ''),
+    draft: String(r.DRAFT ?? ''),
+    status: String(r.STATUS ?? 'queued') as OpportunityStatus,
+    hsTaskId: r.HS_TASK_ID ? String(r.HS_TASK_ID) : null,
+    tgMessageId: r.TG_MESSAGE_ID != null ? Number(r.TG_MESSAGE_ID) : null,
+    foundAt: r.FOUND_AT instanceof Date ? r.FOUND_AT.toISOString() : String(r.FOUND_AT ?? ''),
+  };
+}
+
 export async function getOpportunity(id: string): Promise<Opportunity | null> {
   let connection;
   try {
@@ -206,32 +228,39 @@ export async function getOpportunity(id: string): Promise<Opportunity | null> {
          FROM community_opportunities
         WHERE id = HEXTORAW(:id)`,
       { id },
-      {
-        outFormat: oracledb.OUT_FORMAT_OBJECT,
-        fetchInfo: { EXCERPT: { type: oracledb.STRING }, DRAFT: { type: oracledb.STRING } },
-      },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT, fetchInfo: FETCH_CLOBS },
     );
     const r = (result?.rows ?? [])[0];
-    if (!r) return null;
-    return {
-      id: String(r.ID),
-      source: String(r.SOURCE) as SourceId,
-      externalId: String(r.EXTERNAL_ID),
-      url: String(r.URL ?? ''),
-      title: String(r.TITLE ?? ''),
-      author: String(r.AUTHOR ?? ''),
-      score: Number(r.SCORE ?? 0),
-      matchedQuery: String(r.MATCHED_QUERY ?? ''),
-      latam: Number(r.LATAM ?? 0) === 1,
-      excerpt: String(r.EXCERPT ?? ''),
-      draft: String(r.DRAFT ?? ''),
-      status: String(r.STATUS ?? 'queued') as OpportunityStatus,
-      hsTaskId: r.HS_TASK_ID ? String(r.HS_TASK_ID) : null,
-      tgMessageId: r.TG_MESSAGE_ID != null ? Number(r.TG_MESSAGE_ID) : null,
-      foundAt: r.FOUND_AT instanceof Date ? r.FOUND_AT.toISOString() : String(r.FOUND_AT ?? ''),
-    };
+    return r ? mapRow(r) : null;
   } catch (err: any) {
     console.error('[community-store] read failed:', err?.message ?? err);
+    return null;
+  } finally {
+    if (connection) await connection.close().catch(() => undefined);
+  }
+}
+
+/** Lookup used when Elena says "I posted" in chat instead of tapping the green check. */
+export async function getOpportunityBySourceExternal(
+  source: SourceId,
+  externalId: string,
+): Promise<Opportunity | null> {
+  let connection;
+  try {
+    await ensureTable();
+    connection = await getPoolConnection();
+    const result: any = await connection.execute(
+      `SELECT RAWTOHEX(id) AS ID, source, external_id, url, title, author, score,
+              matched_query, latam, excerpt, draft, status, hs_task_id, tg_message_id, found_at
+         FROM community_opportunities
+        WHERE source = :source AND external_id = :externalId`,
+      { source, externalId: externalId.slice(0, 200) },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT, fetchInfo: FETCH_CLOBS },
+    );
+    const r = (result?.rows ?? [])[0];
+    return r ? mapRow(r) : null;
+  } catch (err: any) {
+    console.error('[community-store] source+external read failed:', err?.message ?? err);
     return null;
   } finally {
     if (connection) await connection.close().catch(() => undefined);

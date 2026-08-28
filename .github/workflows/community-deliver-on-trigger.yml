@@ -30,8 +30,9 @@ jobs:
           [ -n "$LINE" ] || { echo "::error::.community-trigger is empty"; exit 1; }
           case "$LINE" in
             \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
-            deliver|deliver-ugc-followup) echo "skip=false" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be deliver or deliver-ugc-followup, got '$LINE'"; exit 1 ;;
+            deliver|deliver-ugc-followup) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=deliver" >> "$GITHUB_OUTPUT" ;;
+            record-posted) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=record-posted" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be deliver, deliver-ugc-followup, or record-posted, got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -57,6 +58,7 @@ jobs:
           test -f dist/community-paste.js
           test -f dist/community-notify.js
           test -f dist/community-listener.js
+          test -f dist/community-store.js
 
       - name: Deploy named files + deliver paste on Oracle
         if: steps.trigger.outputs.skip != 'true'
@@ -75,12 +77,13 @@ jobs:
             dist/community-paste.js \
             dist/community-notify.js \
             dist/community-listener.js \
+            dist/community-store.js \
             scripts/community-deliver-one.cjs \
             scripts/community-ugc-followup.cjs \
             ubuntu@170.9.242.90:/tmp/community-deploy/
 
           ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
-            "$REF" < scripts/oracle-community-deliver.sh
+            "$REF" "${{ steps.trigger.outputs.mode }}" < scripts/oracle-community-deliver.sh
           RC=$?
           echo "--- remote exit code: $RC ---"
           rm -f ~/.ssh/oracle
