@@ -1,0 +1,152 @@
+From de7b6d5e5c7abb2e3419d58789858f8f96876dde Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 28 Aug 2026 15:14:36 +0000
+Subject: [PATCH] =?UTF-8?q?feat(api):=20persist=20community=20UTM=20tags?=
+ =?UTF-8?q?=20through=20audit=20=E2=86=92=20portfolio=20form?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Inbound utm_* on /api are stored for the session, sent with the audit
+POST (so cto-aipa can pin a HubSpot note), and carried onto the
+portfolio inquiry link. The form also reads sessionStorage so a later
+/portfolio visit in the same tab still closes the loop.
+
+No [skip ci].
+---
+ src/components/InquiryForm.tsx |  5 ++--
+ src/config/marketing.ts        | 45 ++++++++++++++++++++++++++++++++++
+ src/pages/LabApi.tsx           | 10 ++++++----
+ 3 files changed, 54 insertions(+), 6 deletions(-)
+
+diff --git a/src/components/InquiryForm.tsx b/src/components/InquiryForm.tsx
+index c55ad03..9aaf2b1 100644
+--- a/src/components/InquiryForm.tsx
++++ b/src/components/InquiryForm.tsx
+@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
+ import { Input } from "@/components/ui/input";
+ import { Textarea } from "@/components/ui/textarea";
+ import { Label } from "@/components/ui/label";
+-import { MARKETING_INQUIRY_PROXY_URL } from "@/config/marketing";
++import { MARKETING_INQUIRY_PROXY_URL, captureInboundUtms } from "@/config/marketing";
+ import { getRecaptchaSiteKey, getRecaptchaToken } from "@/lib/recaptcha";
+ import { Send, Loader2, CreditCard } from "lucide-react";
+ import { track } from "@/lib/analytics";
+@@ -44,7 +44,8 @@ const InquiryForm = ({ id = "inquiry-form", className }: InquiryFormProps) => {
+ 
+   useEffect(() => {
+     const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
+-    const next: Record<string, string> = {};
++    const stored = captureInboundUtms();
++    const next: Record<string, string> = { ...stored };
+     for (const k of keys) {
+       const v = searchParams.get(k);
+       if (v) next[k] = v;
+diff --git a/src/config/marketing.ts b/src/config/marketing.ts
+index 5821abd..9e918de 100644
+--- a/src/config/marketing.ts
++++ b/src/config/marketing.ts
+@@ -37,3 +37,48 @@ export const LAB_API_INQUIRY_LINK = portfolioInquiryLink({
+   utm_campaign: "visibility-api",
+   utm_content: "start-project",
+ });
++
++const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
++const UTM_STORE = "aideazz_utm_v1";
++
++/** Persist inbound UTMs so /api → /portfolio still closes the HubSpot loop. */
++export function captureInboundUtms(): Record<string, string> {
++  if (typeof window === "undefined") return {};
++  const next: Record<string, string> = {};
++  const params = new URLSearchParams(window.location.search);
++  for (const k of UTM_KEYS) {
++    const v = params.get(k);
++    if (v) next[k] = v;
++  }
++  if (Object.keys(next).length) {
++    try {
++      sessionStorage.setItem(UTM_STORE, JSON.stringify(next));
++    } catch {
++      /* private mode */
++    }
++    return next;
++  }
++  try {
++    const raw = sessionStorage.getItem(UTM_STORE);
++    if (!raw) return {};
++    const parsed = JSON.parse(raw) as Record<string, string>;
++    return parsed && typeof parsed === "object" ? parsed : {};
++  } catch {
++    return {};
++  }
++}
++
++/** Prefer the click's campaign over the generic lab-api CTA. */
++export function inquiryLinkFromInbound(fallback: string): string {
++  const utm = captureInboundUtms();
++  if (utm.utm_source && utm.utm_campaign) {
++    return portfolioInquiryLink({
++      utm_source: utm.utm_source,
++      utm_medium: utm.utm_medium || "community",
++      utm_campaign: utm.utm_campaign,
++      ...(utm.utm_content ? { utm_content: utm.utm_content } : {}),
++      ...(utm.utm_term ? { utm_term: utm.utm_term } : {}),
++    });
++  }
++  return fallback;
++}
+diff --git a/src/pages/LabApi.tsx b/src/pages/LabApi.tsx
+index f03ec2a..b8e4c01 100644
+--- a/src/pages/LabApi.tsx
++++ b/src/pages/LabApi.tsx
+@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
+ import LanguageSwitcher from "@/components/LanguageSwitcher";
+ import WhatsAppFloat from "@/components/WhatsAppFloat";
+ import { applyPageSeo, SITE_ORIGIN } from "@/lib/seo";
+-import { LAB_API_INQUIRY_LINK } from "@/config/marketing";
++import { LAB_API_INQUIRY_LINK, captureInboundUtms, inquiryLinkFromInbound } from "@/config/marketing";
+ import { track } from "@/lib/analytics";
+ 
+ /**
+@@ -133,6 +133,7 @@ export default function LabApi() {
+         "Free API and live tool: audit whether ChatGPT, Perplexity, Claude and Gemini can find, understand and quote your site. AEO, GEO and technical SEO scored in seconds.",
+       canonicalUrl: `${SITE_ORIGIN}/api`,
+     });
++    captureInboundUtms();
+   }, []);
+ 
+   const autoRan = React.useRef(false);
+@@ -146,10 +147,11 @@ export default function LabApi() {
+     setError(null);
+     setResult(null);
+     try {
++      const inbound = captureInboundUtms();
+       const res = await fetch(`${API_BASE}/v1/visibility`, {
+         method: "POST",
+         headers: { "Content-Type": "application/json", "X-API-Key": DEMO_KEY },
+-        body: JSON.stringify({ url: target }),
++        body: JSON.stringify({ url: target, ...inbound }),
+       });
+       const data = await res.json();
+       if (!res.ok) {
+@@ -224,7 +225,7 @@ export default function LabApi() {
+       <div className="relative z-10 mx-auto max-w-4xl px-5 py-10 sm:px-8">
+         {/* Top bar */}
+         <div className="mb-10 flex items-center justify-between">
+-          <Link to="/portfolio" className="text-sm text-purple-300 hover:text-white transition-colors">
++          <Link to={inquiryLinkFromInbound("/portfolio")} className="text-sm text-purple-300 hover:text-white transition-colors">
+             ← Elena Revicheva
+           </Link>
+           <LanguageSwitcher syncQueryParam />
+@@ -517,7 +518,7 @@ export default function LabApi() {
+           <h2 className="text-2xl font-bold text-white sm:text-3xl">{t("labApi.ctaTitle")}</h2>
+           <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-400">{t("labApi.ctaBody")}</p>
+           <Link
+-            to={LAB_API_INQUIRY_LINK}
++            to={inquiryLinkFromInbound(LAB_API_INQUIRY_LINK)}
+             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-7 py-3.5 font-semibold text-white shadow-lg shadow-purple-900/40 transition-all hover:from-purple-500 hover:to-pink-500"
+           >
+             {t("labApi.ctaButton")} <ArrowRight className="h-4 w-4" />
+-- 
+2.43.0
+

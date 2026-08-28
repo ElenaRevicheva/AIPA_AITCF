@@ -73,6 +73,65 @@ check('SKIP is not a paste', () => {
   assert.strictEqual(isCompleteDraft(''), false);
 });
 
+check('community paste stamps UTM tags so HubSpot can close the loop', () => {
+  const { communityAttributionUrl, stampCommunityAttribution, COMMUNITY_UTM_CAMPAIGN } = require('../dist/community-paste.js');
+  const tagged = encodePastePayload(FULL, { source: 'reddit', externalId: '1vz7a0f' });
+  assert.ok(tagged.includes('utm_source=reddit'), tagged);
+  assert.ok(tagged.includes('utm_medium=community'), tagged);
+  assert.ok(tagged.includes(`utm_campaign=${COMMUNITY_UTM_CAMPAIGN}`), tagged);
+  assert.ok(tagged.includes('utm_content=1vz7a0f'), tagged);
+  assert.ok(tagged.includes('GPT-4 with browsing'));
+  assert.ok(!tagged.includes('https://aideazz.xyz/api '), 'bare /api must be replaced');
+  assert.ok(isCompleteDraft(tagged), 'tagged URL at the end must still count as complete');
+  const url = communityAttributionUrl('reddit', '1vz7a0f');
+  assert.ok(url.startsWith('https://aideazz.xyz/api?'));
+  const again = stampCommunityAttribution(tagged, { source: 'reddit', externalId: '1vz7a0f' });
+  assert.strictEqual((again.match(/utm_campaign=/g) || []).length, 1, 'must not stack query strings');
+  const portfolio = stampCommunityAttribution(
+    'Talk at https://aideazz.xyz/portfolio please',
+    { source: 'hackernews', externalId: '123' },
+  );
+  assert.ok(portfolio.includes('utm_source=hackernews'));
+  assert.ok(portfolio.includes('#portfolio-inquiry-form'));
+  const followTagged = encodePastePayload(followup.draft, {
+    source: followup.source,
+    externalId: followup.externalId,
+  });
+  assert.ok(followTagged.includes('utm_content=1vz7a0f-followup'), followTagged);
+  assert.ok(isCompleteDraft(followTagged));
+});
+
+check('audit request reads UTMs from body, then query, then referer', () => {
+  const { parseRequestUtms } = require('../dist/visibility-api.js');
+  const fake = (over) => {
+    const headers = over.headers || {};
+    return {
+      body: over.body || {},
+      query: over.query || {},
+      header: (k) => headers[String(k).toLowerCase()],
+    };
+  };
+  const fromBody = parseRequestUtms(fake({
+    body: { utm_campaign: 'community-reply', utm_source: 'reddit', utm_content: '1vz7a0f' },
+    query: { utm_campaign: 'other' },
+    headers: { referer: 'https://aideazz.xyz/api?utm_campaign=from-referer' },
+  }));
+  assert.strictEqual(fromBody.utm_campaign, 'community-reply');
+  assert.strictEqual(fromBody.utm_source, 'reddit');
+  assert.strictEqual(fromBody.utm_content, '1vz7a0f');
+  const fromQuery = parseRequestUtms(fake({
+    query: { utm_campaign: 'community-reply', utm_medium: 'community' },
+  }));
+  assert.strictEqual(fromQuery.utm_campaign, 'community-reply');
+  assert.strictEqual(fromQuery.utm_medium, 'community');
+  const fromReferer = parseRequestUtms(fake({
+    headers: { referer: 'https://aideazz.xyz/api?utm_source=indiehackers&utm_campaign=community-reply&utm_content=abc' },
+  }));
+  assert.strictEqual(fromReferer.utm_source, 'indiehackers');
+  assert.strictEqual(fromReferer.utm_campaign, 'community-reply');
+  assert.strictEqual(fromReferer.utm_content, 'abc');
+});
+
 check('encodePastePayload is lossless — every sentence survives', () => {
   const encoded = encodePastePayload(FULL);
   assert.strictEqual(encoded, FULL);

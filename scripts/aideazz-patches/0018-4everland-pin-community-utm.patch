@@ -1,0 +1,21 @@
+From a0e80d5746339fa0a33f25390559f1c40419f86b Mon Sep 17 00:00:00 2001
+From: Cursor Agent <cursoragent@cursor.com>
+Date: Fri, 28 Aug 2026 15:14:41 +0000
+Subject: [PATCH] chore: 4everland pin stamp for community UTM attribution on
+ /api
+
+No [skip ci].
+---
+ public/4everland-pin-stamp.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/public/4everland-pin-stamp.txt b/public/4everland-pin-stamp.txt
+index 84888dc..704dca4 100644
+--- a/public/4everland-pin-stamp.txt
++++ b/public/4everland-pin-stamp.txt
+@@ -1 +1 @@
+-pinned 2026-08-27T21:15:00Z labapi-34-checks
++pinned 2026-08-28T15:20:00Z community-utm-attribution
+-- 
+2.43.0
+

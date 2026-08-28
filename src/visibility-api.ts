@@ -86,6 +86,40 @@ function isOwnProperty(url: string): boolean {
   }
 }
 
+export function parseRequestUtms(req: Request): {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+} {
+  const from = (v: unknown): string | undefined =>
+    typeof v === 'string' && v.trim() ? v.trim().slice(0, 80) : undefined;
+  const body = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, unknown>;
+  const q = req.query as Record<string, unknown>;
+  let refererUtms: Record<string, string> = {};
+  try {
+    const ref = req.header('referer');
+    if (ref) {
+      const u = new URL(ref);
+      for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const) {
+        const v = u.searchParams.get(k);
+        if (v) refererUtms[k] = v;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  const pick = (k: string) => from(body[k]) || from(q[k]) || refererUtms[k];
+  return {
+    ...(pick('utm_source') ? { utm_source: pick('utm_source') } : {}),
+    ...(pick('utm_medium') ? { utm_medium: pick('utm_medium') } : {}),
+    ...(pick('utm_campaign') ? { utm_campaign: pick('utm_campaign') } : {}),
+    ...(pick('utm_content') ? { utm_content: pick('utm_content') } : {}),
+    ...(pick('utm_term') ? { utm_term: pick('utm_term') } : {}),
+  };
+}
+
 function logAuditLead(params: {
   url: string;
   score: number;
@@ -93,15 +127,37 @@ function logAuditLead(params: {
   key: string;
   ip: string | undefined;
   referer: string | undefined;
+  utm?: {
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    utm_content?: string;
+  };
 }): void {
-  const { url, score, grade, key, ip, referer } = params;
+  const { url, score, grade, key, ip, referer, utm } = params;
   const keyLabel = key === DEMO_API_KEY ? 'demo' : `key:${key.slice(0, 8)}…`;
   const own = isOwnProperty(url);
+  const utmBit = utm?.utm_campaign
+    ? ` utm=${utm.utm_source || '-'}/${utm.utm_campaign}/${utm.utm_content || '-'}`
+    : '';
   // Structured stdout line — grep-able in pm2 logs: grep visibility-lead
   console.log(
-    `[visibility-lead] url=${url} score=${score} grade=${grade} key=${keyLabel} ip=${ip ?? '-'} referer=${referer ?? '-'}${own ? ' (own-property)' : ''}`,
+    `[visibility-lead] url=${url} score=${score} grade=${grade} key=${keyLabel} ip=${ip ?? '-'} referer=${referer ?? '-'}${utmBit}${own ? ' (own-property)' : ''}`,
   );
   if (own) return;
+
+  if (utm?.utm_campaign === 'community-reply') {
+    void import('./community-notify')
+      .then((m) =>
+        m.recordCommunityAuditAttribution({
+          auditedUrl: url,
+          score,
+          grade,
+          utm,
+        }),
+      )
+      .catch((e) => console.warn('[visibility-lead] community pin failed:', e?.message ?? e));
+  }
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.CONCIERGE_TG_CHAT?.trim();
@@ -112,8 +168,11 @@ function logAuditLead(params: {
   const text =
     `🔍 Visibility audit lead\n` +
     `${url} → ${score}/100 (${grade})\n` +
-    `via ${keyLabel}${referer ? `, from ${referer}` : ''}\n` +
-    `They just told you their site + their pain. Follow up: aideazz.xyz/api`;
+    `via ${keyLabel}${referer ? `, from ${referer}` : ''}` +
+    (utm?.utm_campaign
+      ? `\nUTM ${utm.utm_source || ''} ${utm.utm_campaign} ${utm.utm_content || ''}`.trimEnd()
+      : '') +
+    `\nThey just told you their site + their pain. Follow up: aideazz.xyz/api`;
   // Fire-and-forget: a Telegram hiccup must never fail or slow the audit response.
   fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
@@ -281,6 +340,7 @@ export function visibilityRouter(): Router {
 
     try {
       const result = await runVisibilityAudit(url);
+      const utm = parseRequestUtms(req);
       logAuditLead({
         url: result.finalUrl || url,
         score: result.score,
@@ -288,6 +348,7 @@ export function visibilityRouter(): Router {
         key,
         ip: req.ip ?? req.header('x-forwarded-for')?.split(',')[0]?.trim(),
         referer: req.header('referer') ?? undefined,
+        utm,
       });
       return res.json(result);
     } catch (err) {
@@ -467,7 +528,7 @@ async function run() {
   $('go').disabled = true; $('go').textContent = 'Auditing…';
   $('err').classList.add('hide'); $('out').classList.add('hide');
   try {
-    const r = await fetch(location.pathname, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': '${DEMO_API_KEY}' }, body: JSON.stringify({ url }) });
+    const r = await fetch(location.pathname, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': '${DEMO_API_KEY}' }, body: JSON.stringify({ url, utm_source: new URLSearchParams(location.search).get('utm_source') || undefined, utm_medium: new URLSearchParams(location.search).get('utm_medium') || undefined, utm_campaign: new URLSearchParams(location.search).get('utm_campaign') || undefined, utm_content: new URLSearchParams(location.search).get('utm_content') || undefined }) });
     const d = await r.json();
     if (!r.ok) throw new Error(d.message || d.error || ('HTTP ' + r.status));
     $('grade').textContent = d.grade;
@@ -494,9 +555,11 @@ async function run() {
       return '<div class="chk"><span class="st" style="color:' + col + '">' + ic + '</span>' + esc(c.label) +
         '<span class="d">' + esc(c.detail) + '</span>' + (c.fix ? '<span class="fx">→ ' + esc(c.fix) + '</span>' : '') + '</div>';
     }).join('');
-    const share = location.origin + location.pathname + '?url=' + encodeURIComponent(url);
+    const shareQs = new URLSearchParams(location.search);
+    shareQs.set('url', url);
+    const share = location.origin + location.pathname + '?' + shareQs.toString();
     $('share').textContent = share; $('share').href = share;
-    history.replaceState(null, '', '?url=' + encodeURIComponent(url));
+    history.replaceState(null, '', '?' + shareQs.toString());
     $('out').classList.remove('hide');
   } catch (e) {
     $('err').textContent = e.message; $('err').classList.remove('hide');

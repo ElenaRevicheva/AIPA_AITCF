@@ -33,7 +33,10 @@ const {
 const { stats } = require('../dist/community-store.js');
 
 (async () => {
-  const draft = encodePastePayload(payload.draft);
+  const draft = encodePastePayload(payload.draft, {
+    source: payload.source,
+    externalId: payload.externalId,
+  });
   if (!isCompleteDraft(draft)) {
     console.error('REFUSING torn paste — last 80 chars:', JSON.stringify(draft.slice(-80)));
     process.exit(1);

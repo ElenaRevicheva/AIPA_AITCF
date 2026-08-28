@@ -3,7 +3,7 @@
 # cannot workflow_dispatch, and they cannot SSH from the agent VM.
 #
 # Usage:
-#   echo "pin-hubspot" > .community-trigger
+#   echo "deploy-only" > .community-trigger
 #   git add .community-trigger && git commit -m "community: pin HubSpot deal" && git push
 #   echo "# idle" > .community-trigger
 
@@ -33,7 +33,8 @@ jobs:
             deliver|deliver-ugc-followup) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=deliver" >> "$GITHUB_OUTPUT" ;;
             record-posted) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=record-posted" >> "$GITHUB_OUTPUT" ;;
             pin-hubspot) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=pin-hubspot" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be deliver, deliver-ugc-followup, record-posted, or pin-hubspot, got '$LINE'"; exit 1 ;;
+            deploy-only) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=deploy-only" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be deliver, deliver-ugc-followup, record-posted, pin-hubspot, or deploy-only, got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -60,6 +61,7 @@ jobs:
           test -f dist/community-notify.js
           test -f dist/community-listener.js
           test -f dist/community-store.js
+          test -f dist/visibility-api.js
 
       - name: Deploy named files + deliver paste on Oracle
         if: steps.trigger.outputs.skip != 'true'
@@ -79,6 +81,7 @@ jobs:
             dist/community-notify.js \
             dist/community-listener.js \
             dist/community-store.js \
+            dist/visibility-api.js \
             scripts/community-deliver-one.cjs \
             scripts/community-ugc-followup.cjs \
             scripts/hs-pin-community-board.cjs \

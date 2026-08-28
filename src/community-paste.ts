@@ -20,8 +20,46 @@ import { draftWarnings } from './community-listener';
 const esc = (s: string): string =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-export function encodePastePayload(draft: string): string {
-  return (draft ?? '').replace(/^\uFEFF/, '').trim();
+export const COMMUNITY_AUDIT_URL = 'https://aideazz.xyz/api';
+export const COMMUNITY_PORTFOLIO_URL = 'https://aideazz.xyz/portfolio';
+export const COMMUNITY_UTM_CAMPAIGN = 'community-reply';
+
+export interface CommunityAttribution {
+  source: string;
+  externalId: string;
+}
+
+/** The tagged money-page URL a community paste must carry so HubSpot can close the loop. */
+export function communityAttributionUrl(
+  source: string,
+  externalId: string,
+  path: 'api' | 'portfolio' = 'api',
+): string {
+  const origin = path === 'portfolio' ? COMMUNITY_PORTFOLIO_URL : COMMUNITY_AUDIT_URL;
+  const u = new URL(origin);
+  u.searchParams.set('utm_source', String(source || 'community').slice(0, 40));
+  u.searchParams.set('utm_medium', 'community');
+  u.searchParams.set('utm_campaign', COMMUNITY_UTM_CAMPAIGN);
+  u.searchParams.set('utm_content', String(externalId || 'unknown').slice(0, 80));
+  if (path === 'portfolio') u.hash = 'portfolio-inquiry-form';
+  return u.toString();
+}
+
+const AIDEAZZ_PAGE =
+  /https?:\/\/(?:www\.)?aideazz\.xyz\/(api|portfolio)\/?(?:\?[^\s]*)?(?:#[^\s]*)?/gi;
+
+export function stampCommunityAttribution(draft: string, attribution: CommunityAttribution): string {
+  const taggedApi = communityAttributionUrl(attribution.source, attribution.externalId, 'api');
+  const taggedPortfolio = communityAttributionUrl(attribution.source, attribution.externalId, 'portfolio');
+  return draft.replace(AIDEAZZ_PAGE, (match, page: string) =>
+    page === 'portfolio' ? taggedPortfolio : taggedApi,
+  );
+}
+
+export function encodePastePayload(draft: string, attribution?: CommunityAttribution): string {
+  const trimmed = (draft ?? '').replace(/^\uFEFF/, '').trim();
+  if (!attribution?.source || !attribution?.externalId) return trimmed;
+  return stampCommunityAttribution(trimmed, attribution);
 }
 
 export function communityDocumentFilename(source: string, externalId: string): string {

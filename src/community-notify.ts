@@ -20,6 +20,8 @@ import {
   buildPostedConfirmation,
   COMMUNITY_BOARD_DEAL_NAME,
   communityBoardDealUrl,
+  communityAttributionUrl,
+  COMMUNITY_UTM_CAMPAIGN,
 } from './community-paste';
 import {
   attachDelivery,
@@ -40,6 +42,8 @@ export {
   COMMUNITY_BOARD_DEAL_NAME,
   communityBoardDealUrl,
   HUBSPOT_PORTAL_ID,
+  communityAttributionUrl,
+  COMMUNITY_UTM_CAMPAIGN,
 } from './community-paste';
 
 const HS = 'https://api.hubapi.com';
@@ -256,18 +260,25 @@ async function associateTaskToDeal(taskId: string, dealId: string): Promise<void
   }
 }
 
-function pinMarker(source: string, externalId: string): string {
-  return `community-pin:${source}:${externalId}`;
+function pinMarker(source: string, externalId: string, kind = 'posted'): string {
+  return `community-pin:${kind}:${source}:${externalId}`;
 }
 
-async function dealAlreadyHasPin(dealId: string, marker: string): Promise<boolean> {
+/** Pre-kind markers, so a second Posted click does not duplicate the 28 Aug notes. */
+function pinMarkers(source: string, externalId: string, kind = 'posted'): string[] {
+  const next = pinMarker(source, externalId, kind);
+  if (kind === 'posted') return [next, `community-pin:${source}:${externalId}`];
+  return [next];
+}
+
+async function dealAlreadyHasPin(dealId: string, markers: string[]): Promise<boolean> {
   try {
     const assoc = await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`);
     const ids = (assoc?.results ?? []).map((r: any) => String(r.toObjectId || r.id || '')).filter(Boolean);
     for (const noteId of ids.slice(0, 40)) {
       const note = await hs('GET', `/crm/v3/objects/notes/${noteId}?properties=hs_note_body`);
       const body = String(note?.properties?.hs_note_body || '');
-      if (body.includes(marker)) return true;
+      if (markers.some((m) => body.includes(m))) return true;
     }
   } catch (e: any) {
     console.warn('[community] hubspot note scan failed:', e?.message ?? e);
@@ -279,12 +290,15 @@ async function pinPostedNote(
   dealId: string,
   thread: Pick<ScoredThread, 'source' | 'externalId' | 'channel' | 'title' | 'url'>,
   extra?: string,
+  kind = 'posted',
 ): Promise<string | null> {
-  const marker = pinMarker(thread.source, thread.externalId);
-  if (await dealAlreadyHasPin(dealId, marker)) return null;
+  const markers = pinMarkers(thread.source, thread.externalId, kind);
+  const marker = markers[0];
+  if (await dealAlreadyHasPin(dealId, markers)) return null;
   const stamp = new Date().toISOString().slice(0, 10);
+  const headline = kind === 'audit' ? `🔍 AUDIT HIT ${stamp}` : `✅ POSTED ${stamp}`;
   const body = [
-    `✅ POSTED ${stamp} · ${thread.channel}`,
+    `${headline} · ${thread.channel}`,
     thread.title.slice(0, 200),
     `Thread: ${thread.url}`,
     extra || 'This reply counts in community stats.',
@@ -323,6 +337,7 @@ export async function pinCommunityBoard(opts: {
   hsTaskId?: string | null;
   posted?: boolean;
   extra?: string;
+  kind?: string;
 }): Promise<BoardPin> {
   const empty: BoardPin = { dealId: null, dealUrl: null, taskId: opts.hsTaskId ?? null, taskStatus: null, noteId: null };
   const dealId = await ensureCommunityBoardDeal();
@@ -340,7 +355,9 @@ export async function pinCommunityBoard(opts: {
       console.warn('[community] hubspot task read failed:', e?.message ?? e);
     }
   }
-  const noteId = opts.posted ? await pinPostedNote(dealId, opts.thread, opts.extra) : null;
+  const noteId = opts.posted
+    ? await pinPostedNote(dealId, opts.thread, opts.extra, opts.kind ?? 'posted')
+    : null;
   return {
     dealId,
     dealUrl: communityBoardDealUrl(dealId),
@@ -348,6 +365,54 @@ export async function pinCommunityBoard(opts: {
     taskStatus,
     noteId,
   };
+}
+
+export interface CommunityUtm {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+}
+
+function isCommunityUtm(utm: CommunityUtm | undefined): boolean {
+  return (utm?.utm_campaign || '').trim() === COMMUNITY_UTM_CAMPAIGN;
+}
+
+/**
+ * Someone ran the audit after clicking a tagged community link. Not a client
+ * deal (no email yet) — a note on the board deal so the click is visible.
+ */
+export async function recordCommunityAuditAttribution(opts: {
+  auditedUrl: string;
+  score: number;
+  grade: string;
+  utm?: CommunityUtm;
+}): Promise<void> {
+  if (!isCommunityUtm(opts.utm)) return;
+  const srcRaw = (opts.utm?.utm_source || 'reddit').toLowerCase();
+  const source = (
+    srcRaw === 'hackernews' || srcRaw === 'indiehackers' ? srcRaw : 'reddit'
+  ) as ScoredThread['source'];
+  const thread = {
+    source,
+    externalId: opts.utm?.utm_content || 'unknown',
+    url: communityAttributionUrl(opts.utm?.utm_source || 'community', opts.utm?.utm_content || 'unknown'),
+    title: `Audit ${opts.grade} ${opts.score}/100 — ${opts.auditedUrl}`,
+    body: '',
+    author: '',
+    createdAt: Date.now(),
+    channel: opts.utm?.utm_source || 'community',
+    score: 0,
+    matchedQuery: COMMUNITY_UTM_CAMPAIGN,
+    latam: false,
+  };
+  await pinCommunityBoard({
+    thread,
+    posted: true,
+    kind: 'audit',
+    extra: `AUDIT HIT ${opts.grade} ${opts.score}/100 on ${opts.auditedUrl}. Not a client yet — they have not filled the portfolio form.`,
+  });
 }
 
 /** Backfill: pin the already-posted follow-up and send Elena the Deal URL. */
@@ -393,7 +458,7 @@ export async function deliverCommunityPaste(
   draft: string,
   keyboard?: { text: string; callback_data: string }[][],
 ): Promise<{ cardId: number | null; pasteId: number | null; fileId: number | null; ok: boolean }> {
-  const paste = encodePastePayload(draft);
+  const paste = encodePastePayload(draft, thread);
   if (!isCompleteDraft(paste)) {
     console.warn('[community] refusing to encode a torn paste:', paste.slice(-80));
     return { cardId: null, pasteId: null, fileId: null, ok: false };
@@ -449,7 +514,7 @@ export async function offerAndDeliverCommunityReply(
   thread: ScoredThread,
   draft: string,
 ): Promise<OfferResult> {
-  const paste = encodePastePayload(draft);
+  const paste = encodePastePayload(draft, thread);
   if (!isCompleteDraft(paste)) {
     console.warn('[community] refusing to encode a torn paste:', paste.slice(-80));
     return { id: null, hsTaskId: null, cardId: null, pasteId: null, fileId: null, status: 'queued', ok: false };
@@ -498,7 +563,7 @@ export async function recordAlreadyPosted(
   thread: ScoredThread,
   draft: string,
 ): Promise<OfferResult & { stats: Awaited<ReturnType<typeof stats>> }> {
-  const paste = encodePastePayload(draft);
+  const paste = encodePastePayload(draft, thread);
   let existing = await getOpportunityBySourceExternal(thread.source, thread.externalId);
   let id = existing?.id ?? null;
   if (!id) {
