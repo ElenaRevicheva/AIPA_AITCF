@@ -1,0 +1,35 @@
+SUBJECT: Non-exclusive training licence — nine production AI systems, I keep the products
+TO: founders@hud.ai
+CC: (optional) Hansel / HUD GTM if you have the address from the DEV thread
+
+Hi,
+
+I want to license a copy of source I solely own to HUD Vendor, for model-training use, on a non-exclusive basis.
+
+I retain copyright, the brand, the domains, and the right to keep operating, improving and selling every product. Production systems stay up. CRM, chat logs, keys, and any third-party or client material are out of scope.
+
+What you would be grading is not a wound-down startup. It is nine systems one person built and has run unattended for fifteen months — Telegram/WhatsApp agents, a LangGraph job hunter with a 131-test eval harness, a five-provider LLM chain that survived a zero-balance outage, a GEO/AEO visibility engine, a daily grounded publisher, and an AI Ops wiki written from production incidents the day they happened.
+
+The public dossier (every figure read from the running systems the day it was written):
+https://webhook.aideazz.xyz/doc/nine-systems
+
+Buyer-facing hub:
+https://aideazz.xyz/portfolio
+
+Repos I will put through the value check at vendor.hud.ai/codebases (all public GitHub; I own them; no SPDX licence that would conflict):
+
+- https://github.com/ElenaRevicheva/AIPA_AITCF
+- https://github.com/ElenaRevicheva/aideazz
+- https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF
+- https://github.com/ElenaRevicheva/EspaLuzFamilybot
+- https://github.com/ElenaRevicheva/EspaLuzWhatsApp
+- https://github.com/ElenaRevicheva/dragontrade-agent
+
+I know your classic inbound is a private, often dead, closed-source repo. Mine are live and public. The training value is the production history, the design record, the evals, and the incident log — not "more public GitHub." If the automatic qualifier drops public repos, I would rather you look at the dossier than have the check fail closed.
+
+I am in Panama City. I can take a short call, and I will not sign anything that assigns copyright, is exclusive, or touches the running systems.
+
+Best regards,
+Elena Revicheva
+AIdeazz AI Lab · Panama City
+https://aideazz.xyz/portfolio

@@ -2896,6 +2896,13 @@
     "emailDraft": "docs/selling/drafts/turing-lazarus-rohit-email.txt",
     "dealId": "64227273846"
   },
+  "hud-vendor-founders": {
+    "company": "HUD Vendor — Human Union Data",
+    "email": "founders@hud.ai",
+    "emailDraft": "docs/selling/drafts/hud-vendor-founders-email.txt",
+    "playbook": "docs/selling/HUD_VENDOR_LICENSE.md",
+    "note": "Non-exclusive training licence. Elena submits at vendor.hud.ai/codebases (GitHub OAuth). Do not confuse with hud.io Cursor extension."
+  },
   "ai-native-b2b-marketplace": {
     "phone": "00000000000",
     "draft": "docs/selling/drafts/ai-native-b2b-marketplace-email.txt",
