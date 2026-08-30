@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 30 Aug 22:06 | HUD vendor connection explore | `docs/oracle/NOW.md` (main); `docs/selling/HUD_VENDOR_CONNECTION.md` on `cursor/hud-vendor-connection-8532` | pending |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,22 +107,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD estimator confirmed on Elena's screen: **public repos quote at $0**.
-  GitHub already Connected as `@ElenaRevicheva`. Packet updated on
-  `cursor/hud-vendor-license-1c49`. Agent cannot flip visibility (`admin: false`).
-- **NEXT:** Estimator is archiving 8 private repos (AIPA_AITCF first). Elena
-  waits for the number, then sends founders letter + finishes NDA. Do not
-  sign exclusive / copyright assignment. Say `sent HUD` + the figure.
-- **VERIFIED BY:** HUD copy on her screen — "Public repos come back at $0 — buyers
-  can already clone them." Oracle PAT already fetches private repos.
-- **RISK:** Private ≠ never-public. Disclose the flip date. Do not private-copy
-  while the parent stays public. Flipping `aideazz` risks 4everland / portfolio.
+- **DONE:** Vendor connection **already exists** (GitHub OAuth + 8-repo check).
+  No public DataVendor API. HUD REST is the evals product, not the licence.
+  Cloud egress kills TLS to `*.hud.ai` / `datavendor.ai`. Do not mint
+  `HUD_API_KEY`. Note: `docs/selling/HUD_VENDOR_CONNECTION.md` on
+  `cursor/hud-vendor-connection-8532` (PR #39). Packet stays on
+  `cursor/hud-vendor-license-1c49`.
+- **NEXT:** Elena waits for the number on `datavendor.ai/codebases/result`
+  (or HUD email to `aipa@aideazz.xyz`). Screenshot it. Say `HUD quoted $X`.
+  If it hangs / $0 → founders letter. Do not sign exclusive / assignment.
+- **VERIFIED BY:** HUD REST docs have no vendor/listing routes. Probe
+  22:05 UTC: all HUD hosts `SSL_ERROR_SYSCALL`. This token 404s the other
+  seven private repos (scope, not HUD failure).
+- **RISK:** A `HUD_API_KEY` looks like a connection and is the wrong
+  product. Private ≠ never-public — disclose the 30 Aug flip.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | 8 private repos archiving | **Elena: wait for number** → founders letter + NDA |
+| 1 | **HUD Vendor — non-exclusive training licence** | Connected. 8-repo check running. No vendor API. | **Elena: wait for number / email** → NDA or founders letter |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
@@ -195,7 +199,10 @@ work. Port what you want by hand; never reset.
 - Do **not** `source .env` — `FROM_EMAIL` has spaces and angle brackets; syntax error.
   Read keys with `grep`/`cut`.
 - After any deploy: restart, prove it from `journalctl`, **and check the OUTCOME.**
-- **hud.io ≠ hud.ai.** Cursor `Hud: Sign In` is a runtime-sensor plugin. The licence
-  buyer is HUD Vendor. Their estimator: **public = $0**. Flip five product repos;
-  keep `aideazz` public. Packet: `docs/selling/HUD_VENDOR_LICENSE.md` on
-  `cursor/hud-vendor-license-1c49`.
+- **hud.io ≠ hud.ai ≠ DataVendor API.** Cursor `Hud: Sign In` is a plugin.
+  The licence buyer is DataVendor (`datavendor.ai`). Their estimator:
+  **public = $0**. The published HUD REST/MCP is **evals**, not the quote.
+  Packet: `docs/selling/HUD_VENDOR_LICENSE.md` on
+  `cursor/hud-vendor-license-1c49`. Connection note:
+  `docs/selling/HUD_VENDOR_CONNECTION.md` on
+  `cursor/hud-vendor-connection-8532`.
