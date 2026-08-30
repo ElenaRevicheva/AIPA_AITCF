@@ -92,17 +92,26 @@ For each repo in the flip table:
 To undo: same menu → Public. Do that if HUD says previously-public code is still
 $0, or if a recruiter is blocked this week.
 
-### After they are private
+### After they are private — HUD may only show public repos
 
-1. HUD estimator → refresh the GitHub connection if the list still says public
-2. Tick the seven already-private repos plus `EspaLuz_Influencer` once flipped. Do not add `aideazz`
-3. Run **Bot quote**
-4. Send the founders letter the same hour — it now says they were public until
-   the flip date
-5. Say `sent HUD` plus the quote number, even if it is $0
+**Earned 30 Aug 2026.** After the five went private, HUD's list dropped them and
+kept only public leftovers (`aideazz`, `atuona`, …). The GitHub connection was
+**public-only**. Private repos are invisible until Elena reconnects and allows
+private access.
 
-If Bot quote already ran on the public set: ignore that $0. Flip, refresh,
-quote again.
+1. Do **not** Bot-quote that public leftover list
+2. On HUD, disconnect GitHub if there is a disconnect next to
+   `Connected @ElenaRevicheva`
+3. GitHub → Settings → Applications
+   (https://github.com/settings/applications and
+   https://github.com/settings/installations) → find **HUD** → Revoke or
+   Configure
+4. Back to https://vendor.hud.ai/codebases → Connect GitHub again
+5. When GitHub asks, allow **private repositories** / **All repositories**
+   (read is enough)
+6. The private product repos should reappear. Tick those. Then Bot quote
+7. Send the founders letter the same hour
+8. Say `sent HUD` plus the quote number, even if it is $0
 
 ---
 
