@@ -94,9 +94,22 @@ const NEEDS_TASK = new Set(['bounced', 'complained', 'suppressed', 'canceled']);
         out.duplicates++;
         continue;
       }
+      // last_event is one field for To+Cc. A Cc bounce must not stamp "nobody
+      // got it" over a delivery we already recorded (AfterQuery 30 Aug 2026).
+      if (status === 'bounced' && /ENTREGADO/i.test(body)) {
+        out.duplicates++;
+        continue;
+      }
       await hs('PATCH', `/crm/v3/objects/notes/${best.id}`, {
         properties: { hs_note_body: `${body}<br>${marker}<b>${stampFn(entry.to, when)}</b>` },
       });
+      const check = await hs('GET', `/crm/v3/objects/notes/${best.id}?properties=hs_note_body`);
+      const after = check.properties?.hs_note_body || '';
+      if (!after.includes(marker) && !after.includes(stampFn(entry.to, when))) {
+        await hs('PATCH', `/crm/v3/objects/notes/${best.id}`, {
+          properties: { hs_note_body: `${after}<br>${marker}<b>${stampFn(entry.to, when)}</b>` },
+        });
+      }
       out.stamped++;
 
       if (NEEDS_TASK.has(status)) {
