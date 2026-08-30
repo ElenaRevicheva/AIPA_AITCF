@@ -1,8 +1,10 @@
-TO: support@afterquery.com
-CC: founders@afterquery.com
-SUBJECT: Re-grade — repos were public at first submit, private as of 30 Aug 2026
+TO: atrium@afterquery.com
+CC: founders@afterquery.com, support@afterquery.com
+SUBJECT: Re: An update on your AfterQuery submission
 
 Hi,
+
+Thank you for the earlier reply on Atrium ("An update on your AfterQuery submission"). I have the thread in Zoho.
 
 I submitted a set of GitHub repos to Atrium while they were public. You declined.
 
