@@ -113,9 +113,9 @@ git log keeps the record.
   `HUD_API_KEY`. Note: `docs/selling/HUD_VENDOR_CONNECTION.md` on
   `cursor/hud-vendor-connection-8532` (PR #39). Packet stays on
   `cursor/hud-vendor-license-1c49`.
-- **NEXT:** Elena waits for the number on `datavendor.ai/codebases/result`
-  (or HUD email to `aipa@aideazz.xyz`). Screenshot it. Say `HUD quoted $X`.
-  If it hangs / $0 → founders letter. Do not sign exclusive / assignment.
+- **NEXT:** Elena waits for HUD’s number. Optional: **one disclosed Atrium
+  re-ask** (same account, flip date 30 Aug, do not pretend always-private).
+  Do not silent-resubmit. Do not new GitHub / private-copy.
 - **VERIFIED BY:** HUD REST docs have no vendor/listing routes. Probe
   22:05 UTC: all HUD hosts `SSL_ERROR_SYSCALL`. This token 404s the other
   seven private repos (scope, not HUD failure).
@@ -207,9 +207,9 @@ work. Port what you want by hand; never reset.
   `cursor/hud-vendor-license-1c49`. Connection note:
   `docs/selling/HUD_VENDOR_CONNECTION.md` on
   `cursor/hud-vendor-connection-8532`.
-- **No fourth Lazarus.** Codebase-for-training buyers that actually quote:
-  Lazarus (Turing), Atrium (AfterQuery), HUD. Lazarus: solo / no team+P&L
-  record. Atrium: rejected. Same filter will fire again (previously public,
-  solo). Hashseatic / VentrBox / Credtent are not a quote. Next dollars are
-  HUD’s number, then jobs (Rwazi / Plata / WAAS) and expert *labor*
-  (Mercor, AfterQuery Experts ≠ Atrium, Turing via Rohit).
+- **No fourth Lazarus.** Codebase buyers that quote: Lazarus, Atrium
+  (AfterQuery), HUD. Lazarus: solo / no team+P&L. Atrium rejected while
+  the trees were **public**. HUD saw them **already private** tonight.
+  Flip ≠ never-public. One disclosed Atrium re-ask is allowed. Silent
+  resubmit / new account / private-copy is not. Hashseatic is not a
+  quote. Next dollars: HUD number, then jobs, then expert labor.
