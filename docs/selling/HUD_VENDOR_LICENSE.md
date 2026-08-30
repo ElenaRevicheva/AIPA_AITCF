@@ -102,19 +102,16 @@ kept only public leftovers (`aideazz`, `atuona`, …). The GitHub connection was
 private access.
 
 1. Do **not** Bot-quote that public leftover list
-2. On HUD, disconnect GitHub if there is a disconnect next to
-   `Connected @ElenaRevicheva`
-3. GitHub → Settings → Applications
-   (https://github.com/settings/applications and
-   https://github.com/settings/installations) → find **HUD** → Revoke or
-   Configure
-4. Back to https://datavendor.ai/codebases/estimator → Connect GitHub again
-   (look for an app named **DataVendor** or **HUD**)
-5. When GitHub asks, allow **private repositories** / **All repositories**
-   (read is enough)
-6. The private product repos should reappear. Tick those. Then Bot quote
-7. Send the founders letter the same hour
-8. Say `sent HUD` plus the quote number, even if it is $0
+2. Reconnect alone is not enough if the grant stays public-only
+   (verified 30 Aug: Elena disconnected and reconnected — still public list)
+3. https://github.com/settings/installations → **DataVendor** or **HUD** →
+   **Configure** → Repository access → **All repositories** → Save
+   (not "Only select repositories" unless every private product repo is
+   in that list)
+4. If the GitHub popup never mentions private repos, their app cannot see
+   them. Stop looping. Send the founders letter, use **Submit a data
+   proposal**, and **Book a call**
+5. Say `sent HUD`
 
 ---
 

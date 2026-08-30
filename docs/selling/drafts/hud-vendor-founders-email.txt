@@ -1,30 +1,30 @@
-SUBJECT: Estimator says public = $0 — I will flip five product repos private and disclose they were public
+SUBJECT: GitHub connected — estimator still only sees my public repos
 TO: founders@hud.ai
 
 Hi,
 
-I am on vendor.hud.ai/codebases, GitHub connected as ElenaRevicheva. Your estimator is unambiguous: public repos come back at $0 because buyers can already clone them.
+I am on datavendor.ai as aipa@aideazz.xyz, org Aldeazz AI Lab. GitHub is connected as ElenaRevicheva. I disconnected and reconnected. The estimator still lists only public repos.
 
-I built in public on purpose — I have been job-searching without a salary since 2025, and the repos were the proof. I am ready to make the product codebases private so the tool can grade them, on the terms below.
+Your own copy says public repos come back at $0. I already made the product codebases private so you could grade them. They do not appear. I need you to either grant the GitHub connection private-repo access, or take this as a data proposal / opportunity.
 
-What I will flip to private for the quote (I solely own these; no SPDX licence that would conflict):
+Private repos I solely own (no SPDX licence that would conflict). They were public until 30 Aug 2026 — I am disclosing that:
 
 - https://github.com/ElenaRevicheva/AIPA_AITCF
 - https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF
 - https://github.com/ElenaRevicheva/EspaLuzFamilybot
 - https://github.com/ElenaRevicheva/EspaLuzWhatsApp
+- https://github.com/ElenaRevicheva/EspaLuz_Influencer
 - https://github.com/ElenaRevicheva/dragontrade-agent
+- https://github.com/ElenaRevicheva/AILA
+- https://github.com/ElenaRevicheva/atlas-captures
 
-I am telling you they were public until I flip them. Making them private does not un-clone GitHub Archive or anyone who already pulled. If previously-public production history is not what labs buy, I would rather you say so than have me take the hiring surface down for a number that will not pay.
-
-aideazz stays public. That repo is the 4everland deploy for https://aideazz.xyz/portfolio — the live products, the wiki, and the hiring face. I am not licensing the running systems, the CRM, chat logs, keys, or any third-party or client material.
+aideazz stays public. That repo deploys https://aideazz.xyz/portfolio. I am not licensing the running systems, CRM, chat logs, keys, or any third-party or client material.
 
 The offer is a non-exclusive licence to a copy of source I solely own, for model-training use. I retain copyright, the brand, the domains, and the right to keep operating, improving and selling it. AIdeazz AI Lab keeps running.
 
-Dossier (figures read from the running systems the day it was written):
-https://webhook.aideazz.xyz/doc/nine-systems
+Dossier: https://webhook.aideazz.xyz/doc/nine-systems
 
-If the honest path is "Submit a data proposal" rather than the private-code estimator, point me at that. I can take a short call from Panama City.
+I can take a short call from Panama City.
 
 Best regards,
 Elena Revicheva
