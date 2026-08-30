@@ -84,6 +84,20 @@ work. Port the files you want; never reset.
   forbids automated extraction. robots.txt allowing ≠ ToS permission.
 - **Wiki incident published** `2026-08-30-marked-done-before-anyone-read-them`, `blog: yes`.
 
+## 🖥️ Oracle checkout state — normal, but know it
+
+`cto-aipa` **deploys by `scp` of named files + `pm2 restart`, not by `git pull`** — so
+Oracle's git checkout is expected to sit behind `main` and that is not a fault. On
+30 Aug it was 15 commits behind (11 of them real `community-*` / `visibility-api` code
+from earlier sessions, already deployed by file). **Do not "fix" this with a blind
+`git pull` on Oracle** — that is how a running process and its disk silently disagree.
+`docs/oracle/NOW.md` and `CLAUDE.md` are copied over as named files so an agent working
+on the box can still read them.
+
+By contrast `VibeJobHunterAIPA_AIMCF` and `aideazz` **do** deploy by git and are kept
+exactly at `origin/main` — verified byte-identical 30 Aug.
+
+
 ## ⚠️ Standing traps
 
 - **Never `git add -A`** in cto-aipa. Named files only.
