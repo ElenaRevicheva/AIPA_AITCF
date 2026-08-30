@@ -1,0 +1,85 @@
+# Stage a hiring/licence outreach on Oracle (Zoho IMAP + HubSpot).
+# Cloud agents cannot reach imappro.zoho.com or api.hubapi.com.
+#
+# Usage:
+#   echo "afterquery-atrium-reask" > .hire-trigger
+#   git add .hire-trigger && git commit -m "hire: afterquery-atrium-reask" && git push
+#   echo "# idle" > .hire-trigger   # after a run
+
+name: Stage hiring/licence outreach (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".hire-trigger"]
+
+permissions:
+  contents: write
+
+jobs:
+  stage-hiring:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .hire-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .hire-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.hire-trigger is empty"; exit 1; }
+          case "$LINE" in
+            \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+            afterquery-atrium-reask) echo "job=$LINE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::unknown hire job '$LINE'"; exit 1 ;;
+          esac
+          echo "Hiring job: $LINE"
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY"
+            exit 1
+          fi
+
+      - name: Run on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- "$REF" < scripts/oracle-stage-afterquery-reask.sh
+          RC=$?
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/afterquery-reask-output.tar.gz /tmp/ 2>/dev/null \
+            && echo "--- pulled output ---" || echo "--- no tarball ---"
+          rm -f ~/.ssh/oracle
+          exit $RC
+
+      - name: Commit registry + drafts
+        if: success() && steps.trigger.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          if [ ! -f /tmp/afterquery-reask-output.tar.gz ]; then
+            echo "Nothing to commit"; exit 0
+          fi
+          tar -xzf /tmp/afterquery-reask-output.tar.gz -C .
+          # Never commit the raw IMAP json from /tmp if it landed at repo root
+          rm -f afterquery-zoho.json tmp/afterquery-zoho.json
+          git add docs/selling/outreach-registry.json \
+                  docs/selling/drafts/afterquery-atrium-reask-email.txt \
+                  docs/selling/drafts/afterquery-zoho-thread.txt
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"; exit 0
+          fi
+          git config user.name "aipa-staging[bot]"
+          git config user.email "aipa@aideazz.xyz"
+          git commit -m "selling: stage AfterQuery Atrium re-ask — registry + drafts"
+          git push origin HEAD:${{ github.ref_name }}

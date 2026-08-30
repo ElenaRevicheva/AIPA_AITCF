@@ -1,0 +1,31 @@
+TO: support@afterquery.com
+CC: founders@afterquery.com
+SUBJECT: Re-grade — repos were public at first submit, private as of 30 Aug 2026
+
+Hi,
+
+I submitted a set of GitHub repos to Atrium while they were public. You declined.
+
+On 30 Aug 2026 I changed the product repos to private so you could grade current visibility. I am disclosing that date. Private now is not the same as never-public. I am not hiding the first submit.
+
+Please re-grade these eight, which I solely own. No conflicting SPDX licence. Same offer: a non-exclusive licence to a copy of source, for model-training use. I retain copyright, the brand, the domains, and the right to keep operating and selling. Production systems, CRM, chat logs, keys, and any third-party or client material are out of scope.
+
+- https://github.com/ElenaRevicheva/AIPA_AITCF
+- https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF
+- https://github.com/ElenaRevicheva/EspaLuzFamilybot
+- https://github.com/ElenaRevicheva/EspaLuzWhatsApp
+- https://github.com/ElenaRevicheva/EspaLuz_Influencer
+- https://github.com/ElenaRevicheva/dragontrade-agent
+- https://github.com/ElenaRevicheva/AILA
+- https://github.com/ElenaRevicheva/atlas-captures
+
+aideazz stays public. That repo deploys https://aideazz.xyz/portfolio.
+
+Dossier: https://webhook.aideazz.xyz/doc/nine-systems
+
+If the first no was "public at submit," this is the re-ask. If it was a different filter, a one-line reason is enough.
+
+Best regards,
+Elena Revicheva
+AIdeazz AI Lab · Panama City
+https://aideazz.xyz/portfolio
