@@ -120,7 +120,8 @@ git log keeps the record.
   22:05 UTC: all HUD hosts `SSL_ERROR_SYSCALL`. This token 404s the other
   seven private repos (scope, not HUD failure).
 - **RISK:** A `HUD_API_KEY` looks like a connection and is the wrong
-  product. Private ≠ never-public — disclose the 30 Aug flip.
+  product. Private ≠ never-public — disclose the 30 Aug flip. Do **not**
+  hunt a fourth Lazarus. The category is three buyers; two already said no.
 
 ## 💰 MONEY QUEUE
 
@@ -206,3 +207,9 @@ work. Port what you want by hand; never reset.
   `cursor/hud-vendor-license-1c49`. Connection note:
   `docs/selling/HUD_VENDOR_CONNECTION.md` on
   `cursor/hud-vendor-connection-8532`.
+- **No fourth Lazarus.** Codebase-for-training buyers that actually quote:
+  Lazarus (Turing), Atrium (AfterQuery), HUD. Lazarus: solo / no team+P&L
+  record. Atrium: rejected. Same filter will fire again (previously public,
+  solo). Hashseatic / VentrBox / Credtent are not a quote. Next dollars are
+  HUD’s number, then jobs (Rwazi / Plata / WAAS) and expert *labor*
+  (Mercor, AfterQuery Experts ≠ Atrium, Turing via Rohit).
