@@ -110,9 +110,9 @@ git log keeps the record.
 - **DONE:** HUD estimator confirmed on Elena's screen: **public repos quote at $0**.
   GitHub already Connected as `@ElenaRevicheva`. Packet updated on
   `cursor/hud-vendor-license-1c49`. Agent cannot flip visibility (`admin: false`).
-- **NEXT:** Elena: do **not** Bot-quote the public set. Flip five product repos
-  Private (keep `aideazz` public). Refresh HUD → Bot quote those five. Send
-  `docs/selling/drafts/hud-vendor-founders-email.txt`. Say `sent HUD` + the number.
+- **NEXT:** Elena ticks the 7 already-private repos (the five + `AILA` +
+  `atlas-captures`), flips `EspaLuz_Influencer`, Bot-quotes those. Keep
+  `aideazz` public. Then founders letter. Say `sent HUD` + the number.
 - **VERIFIED BY:** HUD copy on her screen — "Public repos come back at $0 — buyers
   can already clone them." Oracle PAT already fetches private repos.
 - **RISK:** Private ≠ never-public. Disclose the flip date. Do not private-copy
@@ -122,7 +122,7 @@ git log keeps the record.
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Public = $0. GitHub Connected. | **Elena: flip 5 private** (not aideazz) → Bot quote → founders@ |
+| 1 | **HUD Vendor — non-exclusive training licence** | Five flipped. | **Elena: tick 7 + flip Influencer** → Bot quote → founders@ |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
