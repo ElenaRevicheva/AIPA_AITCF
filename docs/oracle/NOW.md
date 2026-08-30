@@ -107,22 +107,22 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD Vendor packet ready on `cursor/hud-vendor-license-1c49` (PR #38). Same
-  keep-ownership / non-exclusive terms as Lazarus. Cursor `Hud: Sign In` is **hud.io**,
-  not this deal — do not install that extension for the licence.
-- **NEXT:** Elena: Chrome → https://vendor.hud.ai/codebases (GitHub, read-only) + send
-  `docs/selling/drafts/hud-vendor-founders-email.txt` to founders@hud.ai. Say `sent HUD`.
-- **VERIFIED BY:** `gh repo list ElenaRevicheva` — every visible repo is public; packet
-  names the six to check and the ones that are client/thin. Agent cannot OAuth.
-- **RISK:** HUD's classic inbound is private/dead. Public live repos may fail the auto
-  qualifier — the founders letter is the fallback, not a second thought. Rwazi still
-  waiting on Elena (Ashby + Loom).
+- **DONE:** HUD estimator confirmed on Elena's screen: **public repos quote at $0**.
+  GitHub already Connected as `@ElenaRevicheva`. Packet updated on
+  `cursor/hud-vendor-license-1c49`. Agent cannot flip visibility (`admin: false`).
+- **NEXT:** Elena: do **not** Bot-quote the public set. Flip five product repos
+  Private (keep `aideazz` public). Refresh HUD → Bot quote those five. Send
+  `docs/selling/drafts/hud-vendor-founders-email.txt`. Say `sent HUD` + the number.
+- **VERIFIED BY:** HUD copy on her screen — "Public repos come back at $0 — buyers
+  can already clone them." Oracle PAT already fetches private repos.
+- **RISK:** Private ≠ never-public. Disclose the flip date. Do not private-copy
+  while the parent stays public. Flipping `aideazz` risks 4everland / portfolio.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Packet ready. Not hud.io. | **Elena: vendor.hud.ai/codebases** + founders@hud.ai |
+| 1 | **HUD Vendor — non-exclusive training licence** | Public = $0. GitHub Connected. | **Elena: flip 5 private** (not aideazz) → Bot quote → founders@ |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
@@ -182,5 +182,6 @@ work. Port what you want by hand; never reset.
   Read keys with `grep`/`cut`.
 - After any deploy: restart, prove it from `journalctl`, **and check the OUTCOME.**
 - **hud.io ≠ hud.ai.** Cursor `Hud: Sign In` is a runtime-sensor plugin. The licence
-  buyer is HUD Vendor at vendor.hud.ai. Packet: `docs/selling/HUD_VENDOR_LICENSE.md`
-  (on `cursor/hud-vendor-license-1c49` until merged).
+  buyer is HUD Vendor. Their estimator: **public = $0**. Flip five product repos;
+  keep `aideazz` public. Packet: `docs/selling/HUD_VENDOR_LICENSE.md` on
+  `cursor/hud-vendor-license-1c49`.
