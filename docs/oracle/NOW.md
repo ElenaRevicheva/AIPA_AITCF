@@ -107,22 +107,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** VJH pipeline repaired — jobs no longer burned at the processing cap, sources
-  scheduled round-robin, judge no longer vetoes Elena's own languages. NOW.md protocol
-  written and mirrored into `CLAUDE.md` + `.cursor/rules/now-md-shared-session.mdc`.
-- **NEXT:** Elena submits Rwazi (Ashby) and records the Loom. No agent work queued.
-- **VERIFIED BY:** `[crm_hub] HubSpot hiring deal posted: AI Engineer @ Rwazi` — 30 Aug
-  13:52 UTC. Judge regression 8/8. Evals 136 pass / 1 known fail.
-- **RISK:** the VJH outreach crash below is untouched and lives in the founder-email path.
+- **DONE:** HUD Vendor packet ready on `cursor/hud-vendor-license-1c49` (PR #38). Same
+  keep-ownership / non-exclusive terms as Lazarus. Cursor `Hud: Sign In` is **hud.io**,
+  not this deal — do not install that extension for the licence.
+- **NEXT:** Elena: Chrome → https://vendor.hud.ai/codebases (GitHub, read-only) + send
+  `docs/selling/drafts/hud-vendor-founders-email.txt` to founders@hud.ai. Say `sent HUD`.
+- **VERIFIED BY:** `gh repo list ElenaRevicheva` — every visible repo is public; packet
+  names the six to check and the ones that are client/thin. Agent cannot OAuth.
+- **RISK:** HUD's classic inbound is private/dead. Public live repos may fail the auto
+  qualifier — the founders letter is the fallback, not a second thought. Rwazi still
+  waiting on Elena (Ashby + Loom).
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
-| 2 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
-| 3 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
-| 4 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
+| 1 | **HUD Vendor — non-exclusive training licence** | Packet ready. Not hud.io. | **Elena: vendor.hud.ai/codebases** + founders@hud.ai |
+| 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
+| 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
+| 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
+| 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
@@ -177,3 +181,6 @@ work. Port what you want by hand; never reset.
 - Do **not** `source .env` — `FROM_EMAIL` has spaces and angle brackets; syntax error.
   Read keys with `grep`/`cut`.
 - After any deploy: restart, prove it from `journalctl`, **and check the OUTCOME.**
+- **hud.io ≠ hud.ai.** Cursor `Hud: Sign In` is a runtime-sensor plugin. The licence
+  buyer is HUD Vendor at vendor.hud.ai. Packet: `docs/selling/HUD_VENDOR_LICENSE.md`
+  (on `cursor/hud-vendor-license-1c49` until merged).
