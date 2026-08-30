@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-30 23:16 | Merge ENTREGADO fix + deploy cto_aipa | `main` merge; Oracle `cto-aipa` via `.deploy-trigger` | this commit |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,20 +107,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** AfterQuery **was delivered** to atrium@ + support@.
-  ENTREGADO missing = lost update (EMAILED PATCH), not failed
-  send. Fix (re-read before stamp; Cc bounce ≠ failed send) is
-  on `cursor/afterquery-resend-proof-8532`. **Not deployed** to
-  Oracle. `[LICENSE]` is a name tag, not a stream.
-- **NEXT:** Merge `cursor/afterquery-resend-proof-8532` onto
-  `main`, then `.deploy-trigger` = `cto_aipa`. Elena: rest.
-  HUD number still hers tomorrow.
-- **VERIFIED BY:** `cto-aipa-out-9.log` `email.delivered atrium@`
-  / `support@` → applied; `node scripts/test-resend-note-stamp.cjs`
-  `{ ok: true, bothKept: true }`.
-- **RISK:** Live Oracle still has the race until those two files
-  are scp’d + `pm2 restart`. Do not mint `HUD_API_KEY`. Do not
-  re-fire `.hire-trigger`.
+- **DONE:** AfterQuery delivered atrium@ + support@. ENTREGADO
+  lost-update **fixed and live**. Oracle `cto-aipa` at `a3e29b4`,
+  `dist/resend-webhook.js` has `patchNoteStamp`, PM2 created
+  23:16:37 after the file (23:16:35). Session closed. Elena rest.
+- **NEXT:** Elena tomorrow: HUD number; write atrium@ / support@
+  if not yet done. No deploy. No `.hire-trigger`.
+- **VERIFIED BY:** Deploy run 33341368302 OK. Live grep
+  `exports.patchNoteStamp` in `dist/resend-webhook.js`. PM2
+  online, uptime from 23:16:37Z, 0 unstable restarts.
+- **RISK:** Oracle HEAD is `a3e29b4` (one verify commit behind
+  `main` — docs/script only). Do not `git pull` on the box.
+  Do not mint `HUD_API_KEY`. Bounce-task copy on this deal is
+  still the old “nobody got it” text.
 
 ## 💰 MONEY QUEUE
 
