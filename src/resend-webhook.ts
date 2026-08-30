@@ -116,6 +116,8 @@ function stampFor(
   resendId?: string,
   /** 'PRIMER CONTACTO' | 'SEGUIMIENTO' — from the recorded send slug, never guessed. */
   kind?: string | null,
+  /** True when `to` is a Cc, not the ledger primary. A Cc bounce is not a failed send. */
+  isCc?: boolean,
 ): Stamp | null {
   const when = new Date().toISOString().slice(0, 10);
   const reason = String((data as { reason?: string }).reason || '').slice(0, 160);
@@ -130,6 +132,18 @@ function stampFor(
     case 'email.delivered':
       return { text: `✅ ${kindTag}ENTREGADO ${when} → ${to} (Resend confirmó la entrega${idSuffix})` };
     case 'email.bounced':
+      if (isCc) {
+        return {
+          text: `⛔ ${kindTag}REBOTE (Cc) ${when} → ${to}${reason ? ` — ${reason}` : ''} (esta COPIA no llegó; el To puede sí${idSuffix})`,
+          task: {
+            subject: `⛔ Cc rebotó (${to}) — el To puede haber llegado`,
+            body:
+              `Resend reportó rebote para el Cc ${to}${reason ? `: ${reason}` : ''}. ` +
+              `Eso no significa que el correo entero falló. El To puede haber sido entregado. ` +
+              `No buscar otra dirección solo por este Cc.`,
+          },
+        };
+      }
       return {
         text: `⛔ ${kindTag}REBOTE ${when} → ${to}${reason ? ` — ${reason}` : ''} (NO llegó${idSuffix})`,
         task: {
@@ -213,7 +227,9 @@ export async function findOutreachNote(dealId: string): Promise<{ id: string; bo
   }
   notes.sort((a, b) => (a.ts < b.ts ? 1 : -1)); // newest first
   const isOutreach = (b: string) =>
-    /FOLLOW-UP|MENSAJE|ENVIAR POR (WHATSAPP|EMAIL)|EMAIL FU|WHATSAPP FU|CLIENT-MANUAL/i.test(b);
+    /FOLLOW-UP|MENSAJE|ENVIAR POR (WHATSAPP|EMAIL)|SEND BY EMAIL|EMAIL FU|WHATSAPP FU|CLIENT-MANUAL|LICENSE|EMAILED|outreach-email/i.test(
+      b,
+    );
   const hit = notes.find(n => isOutreach(n.body)) || notes[0];
   return hit ? { id: hit.id, body: hit.body } : null;
 }
@@ -234,6 +250,35 @@ export function insertNoteStamp(body: string, stampHtml: string): string {
     return `${body.slice(0, cut)}${stampHtml}<br>${body.slice(cut)}`;
   }
   return `${stampHtml}<br>${body}`;
+}
+
+/**
+ * Write a stamp, then re-read. Two writers (webhook + EMAILED) used to PATCH from
+ * a stale body and wipe ENTREGADO — AfterQuery 30 Aug 2026. Retry against the
+ * fresh body instead of inventing a queue.
+ */
+export async function patchNoteStamp(
+  noteId: string,
+  stampHtml: string,
+  alreadyThere: (body: string) => boolean,
+  attempts = 4,
+): Promise<'applied' | 'duplicate'> {
+  for (let i = 0; i < attempts; i++) {
+    const n = (await hs('GET', `/crm/v3/objects/notes/${noteId}?properties=hs_note_body`)) as {
+      properties?: { hs_note_body?: string };
+    };
+    const body = n.properties?.hs_note_body || '';
+    if (alreadyThere(body)) return 'duplicate';
+    await hs('PATCH', `/crm/v3/objects/notes/${noteId}`, {
+      properties: { hs_note_body: insertNoteStamp(body, stampHtml) },
+    });
+    const check = (await hs('GET', `/crm/v3/objects/notes/${noteId}?properties=hs_note_body`)) as {
+      properties?: { hs_note_body?: string };
+    };
+    if (alreadyThere(check.properties?.hs_note_body || '')) return 'applied';
+  }
+  console.warn('[resend-webhook] note stamp lost after retries note=', noteId);
+  return 'applied';
 }
 
 /**
@@ -351,21 +396,31 @@ export async function applyResendEventToHubSpot(
   type: string,
   stamp: Stamp,
   engagementId?: string,
+  /** False for a Cc bounce — the To may have been delivered. */
+  flipEngagement?: boolean,
 ): Promise<'applied' | 'duplicate' | 'no-note'> {
   const best = await findOutreachNote(dealId);
   if (!best) return 'no-note';
 
   // A send that never arrived must not keep showing as SENT in the Emails tab.
-  if (engagementId && (type === 'email.bounced' || type === 'email.complained')) {
+  // A Cc bounce is not that — flipping the whole EMAIL row to BOUNCED made
+  // AfterQuery look undelivered while atrium@ and support@ had already landed.
+  if (
+    flipEngagement !== false &&
+    engagementId &&
+    (type === 'email.bounced' || type === 'email.complained')
+  ) {
     await updateEngagementStatus(engagementId, type === 'email.bounced' ? 'BOUNCED' : 'FAILED');
   }
 
   const marker = `<!-- resend:${resendId}:${type} -->`;
-  if (best.body.includes(marker)) return 'duplicate';
-
-  await hs('PATCH', `/crm/v3/objects/notes/${best.id}`, {
-    properties: { hs_note_body: insertNoteStamp(best.body, `${marker}<b>${stamp.text}</b>`) },
-  });
+  const stampHtml = `${marker}<b>${stamp.text}</b>`;
+  const outcome = await patchNoteStamp(
+    best.id,
+    stampHtml,
+    body => body.includes(marker) || body.includes(stamp.text),
+  );
+  if (outcome === 'duplicate') return 'duplicate';
 
   if (stamp.task) {
     const due = new Date();
@@ -425,7 +480,10 @@ export function registerResendWebhookRoutes(app: Express): void {
       // rather than guess.
       const slug = (hit as ResendLedgerEntry)?.slug;
       const kind = slug ? (/-fu$/i.test(slug) ? 'SEGUIMIENTO' : 'PRIMER CONTACTO') : null;
-      const stamp = stampFor(type, to, data, resendId, kind);
+      const ledgerTo = String((hit as ResendLedgerEntry)?.to || '').trim().toLowerCase();
+      const eventTo = to.trim().toLowerCase();
+      const isCc = Boolean(ledgerTo && eventTo && eventTo !== ledgerTo);
+      const stamp = stampFor(type, to, data, resendId, kind, isCc);
       if (!stamp) return;
       if (!hit?.dealId) {
         console.log(`[resend-webhook] ${type} for ${to} (${resendId}) — no matching deal, skipped`);
@@ -437,6 +495,7 @@ export function registerResendWebhookRoutes(app: Express): void {
         type,
         stamp,
         (hit as ResendLedgerEntry).engagementId,
+        !(type === 'email.bounced' && isCc),
       );
       console.log(`[resend-webhook] ${type} ${to} deal=${hit.dealId} → ${outcome}`);
     } catch (e) {

@@ -1,0 +1,154 @@
+{
+  "at": "2026-08-30T23:01:06.978Z",
+  "resendId": "d0721a1e-2eb2-48f0-b6b4-c15ce1743def",
+  "ledger": {
+    "dealId": "64465792824",
+    "slug": "afterquery-atrium-reask",
+    "to": "atrium@afterquery.com",
+    "subject": "Re: An update on your AfterQuery submission",
+    "engagementId": "116019368734",
+    "at": "2026-08-30T22:45:49.321Z"
+  },
+  "api": {
+    "status": 401,
+    "restrictedSendingKey": true,
+    "email": {
+      "statusCode": 401,
+      "message": "This API key is restricted to only send emails",
+      "name": "restricted_api_key"
+    }
+  },
+  "extraEndpoints": [
+    {
+      "url": "https://api.resend.com/emails/{id}/events",
+      "status": 401,
+      "json": {
+        "statusCode": 401,
+        "message": "This API key is restricted to only send emails",
+        "name": "restricted_api_key"
+      }
+    },
+    {
+      "url": "https://api.resend.com/emails/{id}?include=events",
+      "status": 401,
+      "json": {
+        "statusCode": 401,
+        "message": "This API key is restricted to only send emails",
+        "name": "restricted_api_key"
+      }
+    }
+  ],
+  "webhookLogHits": [
+    "cto-aipa-out-9.log: [go/outreach-email] sent afterquery-atrium-reask → atrium@afterquery.com resend=d0721a1e-2eb2-48f0-b6b4-c15ce1743def",
+    "cto-aipa-out-9.log: [resend-webhook] email.delivered support@afterquery.com deal=64465792824 → applied",
+    "cto-aipa-out-9.log: [resend-webhook] email.delivered atrium@afterquery.com deal=64465792824 → applied",
+    "cto-aipa-out-9.log: [resend-webhook] email.bounced founders@afterquery.com deal=64465792824 → applied",
+    "cto-aipa-out-9.log: [resend-webhook] email.clicked atrium@afterquery.com deal=64465792824 → applied",
+    "cto-aipa-out-9.log: [resend-webhook] email.clicked support@afterquery.com deal=64465792824 → applied",
+    "cto-aipa-out-9.log: [resend-webhook] email.clicked founders@afterquery.com deal=64465792824 → applied"
+  ],
+  "logFilesTried": [
+    "algom-poll-error.log",
+    "algom-poll-out.log",
+    "algom-stream-error.log",
+    "algom-stream-out.log",
+    "cto-aipa-error-0.log",
+    "cto-aipa-error-5.log",
+    "cto-aipa-error-6.log",
+    "cto-aipa-error-7.log",
+    "cto-aipa-error-8.log",
+    "cto-aipa-error-9.log",
+    "cto-aipa-out-0.log",
+    "cto-aipa-out-5.log",
+    "cto-aipa-out-6.log",
+    "cto-aipa-out-7.log",
+    "cto-aipa-out-8.log",
+    "cto-aipa-out-9.log",
+    "dragontrade-binance-error.log",
+    "dragontrade-binance-out.log",
+    "dragontrade-bybit-error.log",
+    "dragontrade-bybit-out.log",
+    "dragontrade-dashboard-error.log",
+    "dragontrade-dashboard-out.log",
+    "dragontrade-main-error.log",
+    "dragontrade-main-out.log",
+    "n8n-error.log",
+    "n8n-out.log",
+    "serpapi-jobs-error.log",
+    "serpapi-jobs-out.log",
+    "whitespace-error.log",
+    "whitespace-out.log",
+    "atlas-campaign-alert.log",
+    "atlas-ga4-sync.log",
+    "atlas-lead-machine.log",
+    "atlas-outcomes.log",
+    "citation-probe.log",
+    "concierge-selftest.log",
+    "followup-radar.log",
+    "hs-watch-manual-emails.log",
+    "hunter-sweep.log",
+    "resend-reconcile.log",
+    "wiki-ship.log"
+  ],
+  "hubspotNote": {
+    "stamps": [
+      "🔗 [PRIMER CONTACTO] CLIC EN ENLACE 2026-08-30 → founders@afterquery.com — señal REAL de interés, seguir hoy · Resend id d0721a1e-2eb2-48f0-b6b4-c15ce1743def",
+      "⛔ [PRIMER CONTACTO] REBOTE 2026-08-30 → founders@afterquery.com (NO llegó · Resend id d0721a1e-2eb2-48f0-b6b4-c15ce1743def)",
+      "📧 EMAILED 2026-08-30 from aipa@aideazz.xyz → atrium@afterquery.com"
+    ],
+    "markers": [],
+    "resendIds": [
+      "d0721a1e-2eb2-48f0-b6b4-c15ce1743def",
+      "d0721a1e-2eb2-48f0-b6b4-c15ce1743def",
+      "d0721a1e-2eb2-48f0-b6b4-c15ce1743def"
+    ],
+    "noteIds": [
+      116024127669
+    ],
+    "tasks": [
+      {
+        "id": "116019209505",
+        "subject": "⛔ Email rebotó → buscar otra dirección (founders@afterquery.com)",
+        "body": "Resend reportó rebote para founders@afterquery.com. El prospecto NO recibió nada — buscar otro correo en su sitio/IG/Google Business, actualizar el contacto en HubSpot y reenviar el FU.",
+        "status": "NOT_STARTED",
+        "priority": "HIGH"
+      },
+      {
+        "id": "116020762407",
+        "subject": "🔗 Hizo clic en el enlace → contactar hoy (support@afterquery.com)",
+        "body": "support@afterquery.com abrió el correo y además hizo clic en un enlace — es la señal de interés más fuerte que da el sistema (un clic es un acto humano, no un proxy). Vale la pena escribirle o llamarle hoy mismo, mientras el tema le resulta presente.",
+        "status": "NOT_STARTED",
+        "priority": "HIGH"
+      },
+      {
+        "id": "116021926554",
+        "subject": "🔗 Hizo clic en el enlace → contactar hoy (atrium@afterquery.com)",
+        "body": "atrium@afterquery.com abrió el correo y además hizo clic en un enlace — es la señal de interés más fuerte que da el sistema (un clic es un acto humano, no un proxy). Vale la pena escribirle o llamarle hoy mismo, mientras el tema le resulta presente.",
+        "status": "NOT_STARTED",
+        "priority": "HIGH"
+      },
+      {
+        "id": "116023966548",
+        "subject": "🔗 Hizo clic en el enlace → contactar hoy (founders@afterquery.com)",
+        "body": "founders@afterquery.com abrió el correo y además hizo clic en un enlace — es la señal de interés más fuerte que da el sistema (un clic es un acto humano, no un proxy). Vale la pena escribirle o llamarle hoy mismo, mientras el tema le resulta presente.",
+        "status": "NOT_STARTED",
+        "priority": "HIGH"
+      }
+    ],
+    "loggedEmail": {
+      "id": "116019368734",
+      "status": "BOUNCED",
+      "subject": "Re: An update on your AfterQuery submission",
+      "timestamp": "2026-08-30T22:45:48.323Z"
+    }
+  },
+  "verdict": {
+    "last_event": null,
+    "delivered": "yes",
+    "deliveredHow": "resend-email.delivered",
+    "opened": "no-open-event-click-is-not-an-open",
+    "clicked": "yes",
+    "bounced": "yes",
+    "note": "Resend last_event is one field for the whole message (To + every Cc). A bounce on one Cc can hide a delivery to the others. A click is a human act and proves that mailbox received the mail. An open is a soft pixel and may be a proxy. EMAILED is API accept, not delivery."
+  }
+}
