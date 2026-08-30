@@ -1,9 +1,11 @@
 # HUD Vendor — non-exclusive training licence
 
-**Status (30 Aug 2026, evening):** Elena is on the estimator. GitHub is
-**Connected** as `@ElenaRevicheva`. HUD's own screen: **public repos quote at
-$0**. A Cloud Agent cannot flip visibility (this token has no `admin` on the
-repos) and cannot finish OAuth.
+**Status (30 Aug 2026, 20:35 UTC):** Live site is **https://datavendor.ai**
+(HUD Vendor). Elena signed in with `aipa@aideazz.xyz` — that is correct; they
+do not offer GitHub login. Org **Aldeazz AI Lab** is mid-onboarding (legal
+address / NDA). Estimator at `/codebases/estimator` is Connected as
+`@ElenaRevicheva` but still lists **only public** repos. Do not Bot-quote
+that list.
 
 **What you keep:** copyright, brand, domains, and the right to keep operating,
 improving and selling every product. Production stays up. This is a licence of a
@@ -106,7 +108,8 @@ private access.
    (https://github.com/settings/applications and
    https://github.com/settings/installations) → find **HUD** → Revoke or
    Configure
-4. Back to https://vendor.hud.ai/codebases → Connect GitHub again
+4. Back to https://datavendor.ai/codebases/estimator → Connect GitHub again
+   (look for an app named **DataVendor** or **HUD**)
 5. When GitHub asks, allow **private repositories** / **All repositories**
    (read is enough)
 6. The private product repos should reappear. Tick those. Then Bot quote
