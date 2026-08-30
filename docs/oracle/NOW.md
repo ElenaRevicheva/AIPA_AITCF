@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-30 22:56 | AfterQuery Resend delivery/open proof (read-only) | Oracle Resend GET + webhook logs; no PM2 restart | this commit |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,27 +107,30 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** AfterQuery re-ask **sent** (Resend
-  `d0721a1e-2eb2-48f0-b6b4-c15ce1743def`). HubSpot note: `📧 EMAILED`
-  → `atrium@`; `⛔ REBOTE` → `founders@` (Cc); `🔗 CLIC` landed.
-  No `✅ ENTREGADO` stamp — that is `email.delivered`, not the
-  `[LICENSE]` prefix. `[LICENSE]` is a name tag, not a saved view.
-- **NEXT:** Pull Resend API + Oracle webhook lines for that id
-  (branch `cursor/afterquery-resend-proof-8532`). Still wait for
-  HUD’s number. Do **not** treat the founders@ bounce as “nobody
-  got it” — a click means at least one inbox received the mail.
-- **VERIFIED BY:** Elena’s HubSpot screenshots 30 Aug (note +
-  bounce/click tasks). Resend last_event still pending Oracle GET.
-- **RISK:** Bounce-task copy says “prospect received nothing” —
-  that is wrong for a Cc bounce. Do not mint `HUD_API_KEY`. Do
-  not re-fire `.hire-trigger` as `afterquery-atrium-reask`.
+- **DONE:** AfterQuery Resend proof (id
+  `d0721a1e-2eb2-48f0-b6b4-c15ce1743def`). Webhook applied
+  **delivered** `atrium@` + `support@`; **bounced** `founders@`;
+  **clicked** all three. **No `email.opened`.** Note lost the
+  ENTREGADO lines (lost update vs EMAILED). GET /emails 401 —
+  sending-only key. `[LICENSE]` is a name tag, not a stream.
+- **NEXT:** Elena: follow `atrium@` / `support@` clicks today.
+  Ignore the bounce-task line “prospect received nothing.” Still
+  wait for HUD’s number.
+- **VERIFIED BY:** `cto-aipa-out-9.log` lines `email.delivered
+  atrium@` / `support@` → applied; `email.clicked` ×3 → applied;
+  no `email.opened`. Report:
+  `docs/selling/_resend-email-proof.json` on
+  `cursor/afterquery-resend-proof-8532`.
+- **RISK:** HubSpot EMAIL status is BOUNCED because one Cc
+  bounced — that is the engagement flip, not the whole send.
+  Do not mint `HUD_API_KEY`. Do not re-fire `.hire-trigger`.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
 | 1 | **HUD Vendor — non-exclusive training licence** | Connected. 8-repo check running. | **Elena: wait for number** |
-| 1b | **AfterQuery Atrium re-ask** | **Sent.** founders@ bounced; click fired. No ENTREGADO stamp yet | **Agent: Resend proof** · Elena: follow the click, not the Cc bounce |
+| 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
