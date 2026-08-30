@@ -1,5 +1,5 @@
 {
-  "at": "2026-08-30T23:01:06.978Z",
+  "at": "2026-08-30T23:18:45.023Z",
   "resendId": "d0721a1e-2eb2-48f0-b6b4-c15ce1743def",
   "ledger": {
     "dealId": "64465792824",
@@ -45,7 +45,8 @@
     "cto-aipa-out-9.log: [resend-webhook] email.bounced founders@afterquery.com deal=64465792824 → applied",
     "cto-aipa-out-9.log: [resend-webhook] email.clicked atrium@afterquery.com deal=64465792824 → applied",
     "cto-aipa-out-9.log: [resend-webhook] email.clicked support@afterquery.com deal=64465792824 → applied",
-    "cto-aipa-out-9.log: [resend-webhook] email.clicked founders@afterquery.com deal=64465792824 → applied"
+    "cto-aipa-out-9.log: [resend-webhook] email.clicked founders@afterquery.com deal=64465792824 → applied",
+    "resend-reconcile.log: \"id\": \"d0721a1e-2eb2-48f0-b6b4-c15ce1743def\","
   ],
   "logFilesTried": [
     "algom-poll-error.log",
