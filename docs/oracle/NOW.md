@@ -110,10 +110,9 @@ git log keeps the record.
 - **DONE:** HUD estimator confirmed on Elena's screen: **public repos quote at $0**.
   GitHub already Connected as `@ElenaRevicheva`. Packet updated on
   `cursor/hud-vendor-license-1c49`. Agent cannot flip visibility (`admin: false`).
-- **NEXT:** HUD list is public-only. Elena: reconnect GitHub with **private**
-  access (settings/applications + settings/installations → HUD → revoke →
-  vendor.hud.ai/codebases again). Then tick the private product repos. Do not
-  quote the leftover public list.
+- **NEXT:** Live site is datavendor.ai (email login is correct). Estimator still
+  public-only — reconnect GitHub as **DataVendor/HUD** with private / All repos.
+  Finish org onboarding with her real Panama address (NDA). Do not quote public.
 - **VERIFIED BY:** HUD copy on her screen — "Public repos come back at $0 — buyers
   can already clone them." Oracle PAT already fetches private repos.
 - **RISK:** Private ≠ never-public. Disclose the flip date. Do not private-copy
