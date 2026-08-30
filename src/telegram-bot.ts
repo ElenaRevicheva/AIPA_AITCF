@@ -1047,6 +1047,96 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
     }
   });
 
+  /**
+   * /opspw <new password> — reset the /ops/ dashboard basic-auth password.
+   *
+   * Why this exists (30 Aug 2026): the password for webhook.aideazz.xyz/ops/ was
+   * lost. `.htpasswd-ops` stores a bcrypt hash, so it cannot be recovered — only
+   * replaced — and Elena is on her phone with no terminal.
+   *
+   * Same transport reasoning as /gmailpw: the bot is already gated by
+   * TELEGRAM_AUTHORIZED_USERS, the message is deleted before any await that could
+   * fail, and the value goes to the helper on STDIN rather than argv so it cannot
+   * appear in `ps`.
+   *
+   * ⚠️ This command is deliberately NARROWER than /gmailpw and /pplxkey, because
+   * it is more dangerous than either. Those write a .env as `ubuntu`; this writes
+   * /etc/nginx as root, and the thing it rewrites is the lock on the CRM
+   * dashboard. So: the username is hardcoded to `elena` (no arbitrary account can
+   * be created), and the helper backs up, writes, verifies against the LIVE
+   * endpoint, and rolls back on any failure. Anyone holding this Telegram account
+   * can reset that lock — that is the accepted trade for phone-only access, and
+   * it is the reason there is no general-purpose credential writer here.
+   */
+  bot.command('opspw', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/opspw(@\S+)?\s*/i, '')
+      .trim();
+
+    // Delete FIRST — before anything that can throw and leave the password on screen.
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      /* older than 48h, or no delete rights — the reply below still warns her */
+    }
+
+    if (!raw) {
+      await ctx.reply(
+        'Usage: /opspw <new password for the ops dashboard>\n\n' +
+          'At least 12 characters. I delete your message immediately, never log ' +
+          'the value, and roll back automatically if the dashboard does not come ' +
+          'back up with it.',
+      );
+      return;
+    }
+
+    // No .replace(/\s+/g,'') here, unlike the key commands — a password may
+    // legitimately contain spaces, and silently stripping them would set a
+    // password different from the one she typed.
+    const pw = raw;
+    if (pw.length < 12) {
+      await ctx.reply(
+        `That was ${pw.length} characters. Basic auth has no rate limit in front ` +
+          'of it, so use at least 12. Nothing was written — your message is ' +
+          'deleted, send again.',
+      );
+      return;
+    }
+
+    await ctx.reply('🔐 Message deleted. Backing up the current lock, then resetting and verifying…');
+
+    const { spawn } = await import('child_process');
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn('/home/ubuntu/set-opspw-stdin.sh', [], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      // STDIN only: never argv, so it cannot show up in `ps`.
+      child.stdin.write(pw + '\n');
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 90_000);
+    });
+
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    if (result.startsWith('OK:')) {
+      await ctx.reply(
+        '✅ Ops dashboard password reset.\n\n' + result + '\n\n' +
+          'Sign in at webhook.aideazz.xyz/ops/ with username `elena` and the ' +
+          'password you just sent. Save it in Chrome when it offers — that is ' +
+          'what was missing this time.\n\n' +
+          'This also covers the CRM data feed: /ops/ and /crm/webhook/ops share ' +
+          'the one password file, so the deals will load again.',
+      );
+    } else {
+      await ctx.reply(
+        '❌ ' + result + '\n\nThe old password is still in place — nothing was left half-changed.',
+      );
+    }
+  });
+
   bot.command('status', async (ctx) => {
     await ctx.reply('🔍 Checking AIdeazz ecosystem...');
     
