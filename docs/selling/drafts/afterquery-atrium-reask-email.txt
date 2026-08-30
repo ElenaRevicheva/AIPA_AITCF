@@ -1,0 +1,33 @@
+TO: atrium@afterquery.com
+CC: founders@afterquery.com, support@afterquery.com
+SUBJECT: Re: An update on your AfterQuery submission
+
+Hi,
+
+Thank you for the 25 August note. I have it in Zoho: you closed the current Atrium round because you reached target acquisition volume — and you said that is not a reflection of the work, and that you do not retain the codebase.
+
+I am writing so you have me on the list when a new round opens.
+
+On 30 August 2026 I made the eight product repos private. I am disclosing that date. When I first submitted, they were public. Private now is not the same as never-public. I am not hiding the first submit.
+
+Same eight, which I solely own. No conflicting SPDX licence. Offer unchanged: a non-exclusive licence to a copy of source, for model-training use. I retain copyright, the brand, the domains, and the right to keep operating and selling. Production systems, CRM, chat logs, keys, and any third-party or client material are out of scope.
+
+- https://github.com/ElenaRevicheva/AIPA_AITCF
+- https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF
+- https://github.com/ElenaRevicheva/EspaLuzFamilybot
+- https://github.com/ElenaRevicheva/EspaLuzWhatsApp
+- https://github.com/ElenaRevicheva/EspaLuz_Influencer
+- https://github.com/ElenaRevicheva/dragontrade-agent
+- https://github.com/ElenaRevicheva/AILA
+- https://github.com/ElenaRevicheva/atlas-captures
+
+aideazz stays public. That repo deploys https://aideazz.xyz/portfolio.
+
+Dossier: https://webhook.aideazz.xyz/doc/nine-systems
+
+If the next round is open, please re-grade. If it is still closed, a one-line "we will write when it opens" is enough.
+
+Best regards,
+Elena Revicheva
+AIdeazz AI Lab · Panama City
+https://aideazz.xyz/portfolio

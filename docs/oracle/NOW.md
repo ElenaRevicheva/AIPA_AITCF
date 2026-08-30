@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 30 Aug 22:36 | AfterQuery Zoho search + HubSpot stage | `docs/oracle/NOW.md` (main); hire-trigger / drafts on `cursor/afterquery-atrium-reask-8532` | pending |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,27 +107,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Vendor connection **already exists** (GitHub OAuth + 8-repo check).
-  No public DataVendor API. HUD REST is the evals product, not the licence.
-  Cloud egress kills TLS to `*.hud.ai` / `datavendor.ai`. Do not mint
-  `HUD_API_KEY`. Note: `docs/selling/HUD_VENDOR_CONNECTION.md` on
-  `cursor/hud-vendor-connection-8532` (PR #39). Packet stays on
-  `cursor/hud-vendor-license-1c49`.
-- **NEXT:** Elena waits for HUD’s number. Optional: **one disclosed Atrium
-  re-ask** (same account, flip date 30 Aug, do not pretend always-private).
-  Do not silent-resubmit. Do not new GitHub / private-copy.
-- **VERIFIED BY:** HUD REST docs have no vendor/listing routes. Probe
-  22:05 UTC: all HUD hosts `SSL_ERROR_SYSCALL`. This token 404s the other
-  seven private repos (scope, not HUD failure).
-- **RISK:** A `HUD_API_KEY` looks like a connection and is the wrong
-  product. Private ≠ never-public — disclose the 30 Aug flip. Do **not**
-  hunt a fourth Lazarus. The category is three buyers; two already said no.
+- **DONE:** Zoho IMAP (Oracle): AfterQuery wrote **25 Aug** from
+  `atrium@afterquery.com` — **round closed / volume filled**, not a
+  quality no; they do not retain the codebase. HubSpot staged: deal
+  `64465792824`, contact `atrium@`. Letter rewritten to match that
+  reply. Send slug on main.
+- **NEXT:** Elena clicks
+  https://webhook.aideazz.xyz/cto/go/outreach-email/afterquery-atrium-reask
+  then says `sent Atrium re-ask`. Still wait for HUD’s number.
+- **VERIFIED BY:** Oracle hire-trigger run 33339747306 — inbound 2,
+  subject “An update on your AfterQuery submission”.
+- **RISK:** Their no was **round closed**, not “was public”. Do not
+  tell them they rejected you for visibility. Private ≠ never-public
+  still goes in the letter. Do not mint `HUD_API_KEY`.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Connected. 8-repo check running. No vendor API. | **Elena: wait for number / email** → NDA or founders letter |
+| 1 | **HUD Vendor — non-exclusive training licence** | Connected. 8-repo check running. | **Elena: wait for number** |
+| 1b | **AfterQuery Atrium re-ask** | Round was **closed** (25 Aug). Deal + send link live | **Elena: click send** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |

@@ -2918,5 +2918,14 @@
     "emailDraft": "docs/selling/drafts/intelliops-bd-email.txt",
     "dealId": "64302436100",
     "cc": "natalie.adel@intelliopsautomation.com"
+  },
+  "afterquery-atrium-reask": {
+    "phone": "",
+    "company": "AfterQuery",
+    "email": "atrium@afterquery.com",
+    "cc": "founders@afterquery.com, support@afterquery.com",
+    "emailDraft": "docs/selling/drafts/afterquery-atrium-reask-email.txt",
+    "draft": "docs/selling/drafts/afterquery-atrium-reask-email.txt",
+    "dealId": "64465792824"
   }
 }
