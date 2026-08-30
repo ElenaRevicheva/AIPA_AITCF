@@ -27,3 +27,10 @@ node "$SCRIPT" "$ID"
 echo "--- wrote $OUT ($(wc -c < "$OUT") bytes) ---"
 head -c 4000 "$OUT"
 echo
+echo "=== verify live ENTREGADO fix ==="
+grep -n "patchNoteStamp\|lost after retries" "$AIPA_DIR/dist/resend-webhook.js" | head -8
+stat -c '%y %n' "$AIPA_DIR/dist/resend-webhook.js" "$AIPA_DIR/src/resend-webhook.ts"
+pm2 describe cto-aipa | grep -E 'status|uptime|script path|unstable|created at' | head -12
+echo "=== git HEAD ==="
+git -C "$AIPA_DIR" rev-parse --short HEAD
+git -C "$AIPA_DIR" log -1 --oneline
