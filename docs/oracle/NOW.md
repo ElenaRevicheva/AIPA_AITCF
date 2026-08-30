@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-08-30 22:56 | AfterQuery Resend delivery/open proof (read-only) | Oracle Resend GET + webhook logs; no PM2 restart | this commit |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,26 +107,27 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Zoho IMAP (Oracle): AfterQuery wrote **25 Aug** from
-  `atrium@afterquery.com` — **round closed / volume filled**, not a
-  quality no; they do not retain the codebase. HubSpot staged: deal
-  `64465792824`, contact `atrium@`. Letter rewritten to match that
-  reply. Send slug on main.
-- **NEXT:** Elena clicks
-  https://webhook.aideazz.xyz/cto/go/outreach-email/afterquery-atrium-reask
-  then says `sent Atrium re-ask`. Still wait for HUD’s number.
-- **VERIFIED BY:** Oracle hire-trigger run 33339747306 — inbound 2,
-  subject “An update on your AfterQuery submission”.
-- **RISK:** Their no was **round closed**, not “was public”. Do not
-  tell them they rejected you for visibility. Private ≠ never-public
-  still goes in the letter. Do not mint `HUD_API_KEY`.
+- **DONE:** AfterQuery re-ask **sent** (Resend
+  `d0721a1e-2eb2-48f0-b6b4-c15ce1743def`). HubSpot note: `📧 EMAILED`
+  → `atrium@`; `⛔ REBOTE` → `founders@` (Cc); `🔗 CLIC` landed.
+  No `✅ ENTREGADO` stamp — that is `email.delivered`, not the
+  `[LICENSE]` prefix. `[LICENSE]` is a name tag, not a saved view.
+- **NEXT:** Pull Resend API + Oracle webhook lines for that id
+  (branch `cursor/afterquery-resend-proof-8532`). Still wait for
+  HUD’s number. Do **not** treat the founders@ bounce as “nobody
+  got it” — a click means at least one inbox received the mail.
+- **VERIFIED BY:** Elena’s HubSpot screenshots 30 Aug (note +
+  bounce/click tasks). Resend last_event still pending Oracle GET.
+- **RISK:** Bounce-task copy says “prospect received nothing” —
+  that is wrong for a Cc bounce. Do not mint `HUD_API_KEY`. Do
+  not re-fire `.hire-trigger` as `afterquery-atrium-reask`.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
 | 1 | **HUD Vendor — non-exclusive training licence** | Connected. 8-repo check running. | **Elena: wait for number** |
-| 1b | **AfterQuery Atrium re-ask** | Round was **closed** (25 Aug). Deal + send link live | **Elena: click send** |
+| 1b | **AfterQuery Atrium re-ask** | **Sent.** founders@ bounced; click fired. No ENTREGADO stamp yet | **Agent: Resend proof** · Elena: follow the click, not the Cc bounce |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
@@ -207,8 +208,7 @@ work. Port what you want by hand; never reset.
   `docs/selling/HUD_VENDOR_CONNECTION.md` on
   `cursor/hud-vendor-connection-8532`.
 - **No fourth Lazarus.** Codebase buyers that quote: Lazarus, Atrium
-  (AfterQuery), HUD. Lazarus: solo / no team+P&L. Atrium rejected while
-  the trees were **public**. HUD saw them **already private** tonight.
-  Flip ≠ never-public. One disclosed Atrium re-ask is allowed. Silent
-  resubmit / new account / private-copy is not. Hashseatic is not a
-  quote. Next dollars: HUD number, then jobs, then expert labor.
+  (AfterQuery), HUD. Lazarus: solo / no team+P&L. Atrium **25 Aug**:
+  round closed (volume), not quality; they do not keep the trees. HUD
+  saw them already private tonight. Flip ≠ never-public. Hashseatic is
+  not a quote. Next dollars: HUD number, AfterQuery click follow-up, jobs.
