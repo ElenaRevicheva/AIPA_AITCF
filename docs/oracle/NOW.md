@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-30 23:05 | Fix Resend note lost-update (ENTREGADO wiped) | `src/resend-webhook.ts` `src/go-wa.ts` `scripts/resend-reconcile.cjs` — no Oracle deploy this claim | this commit |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,24 +107,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** AfterQuery Resend proof (id
-  `d0721a1e-2eb2-48f0-b6b4-c15ce1743def`). Webhook applied
-  **delivered** `atrium@` + `support@`; **bounced** `founders@`;
-  **clicked** all three. **No `email.opened`.** Note lost the
-  ENTREGADO lines (lost update vs EMAILED). GET /emails 401 —
-  sending-only key. `[LICENSE]` is a name tag, not a stream.
-- **NEXT:** Fix the lost-update on the outreach note (re-read
-  before PATCH) + Cc-bounce copy + backfill AfterQuery stamps.
-  Branch `cursor/afterquery-resend-proof-8532`. Elena: still
-  follow the clicks today. Still wait for HUD’s number.
-- **VERIFIED BY:** `cto-aipa-out-9.log` lines `email.delivered
-  atrium@` / `support@` → applied; `email.clicked` ×3 → applied;
-  no `email.opened`. Report:
-  `docs/selling/_resend-email-proof.json` on
-  `cursor/afterquery-resend-proof-8532`.
-- **RISK:** HubSpot EMAIL status is BOUNCED because one Cc
-  bounced — that is the engagement flip, not the whole send.
-  Do not mint `HUD_API_KEY`. Do not re-fire `.hire-trigger`.
+- **DONE:** AfterQuery **was delivered** to atrium@ + support@.
+  ENTREGADO missing = lost update (EMAILED PATCH), not failed
+  send. Fix (re-read before stamp; Cc bounce ≠ failed send) is
+  on `cursor/afterquery-resend-proof-8532`. **Not deployed** to
+  Oracle. `[LICENSE]` is a name tag, not a stream.
+- **NEXT:** Elena: write atrium@ / support@ today. HUD: wait for
+  number. Merge + named-file deploy of `resend-webhook` + `go-wa`
+  when a deployer is free — do not `git pull` on Oracle.
+- **VERIFIED BY:** `cto-aipa-out-9.log` `email.delivered atrium@`
+  / `support@` → applied; `node scripts/test-resend-note-stamp.cjs`
+  `{ ok: true, bothKept: true }`.
+- **RISK:** Live Oracle still has the race until those two files
+  are scp’d + `pm2 restart`. Do not mint `HUD_API_KEY`. Do not
+  re-fire `.hire-trigger`.
 
 ## 💰 MONEY QUEUE
 
