@@ -1,11 +1,10 @@
 # HUD Vendor — non-exclusive training licence
 
-**Status (30 Aug 2026, 20:35 UTC):** Live site is **https://datavendor.ai**
-(HUD Vendor). Elena signed in with `aipa@aideazz.xyz` — that is correct; they
-do not offer GitHub login. Org **Aldeazz AI Lab** is mid-onboarding (legal
-address / NDA). Estimator at `/codebases/estimator` is Connected as
-`@ElenaRevicheva` but still lists **only public** repos. Do not Bot-quote
-that list.
+**Status (30 Aug 2026, 20:45 UTC):** Estimator is **running**. Elena selected
+**8 private repos**. Screen: `datavendor.ai/codebases/result` — "Archiving 1 of
+8", reading `ElenaRevicheva/AIPA_AITCF`, 0% / 0 archived. Org onboarding
+(legal address / NDA) may still be incomplete. Wait for the number. Do not
+sign anything that assigns copyright or is exclusive.
 
 **What you keep:** copyright, brand, domains, and the right to keep operating,
 improving and selling every product. Production stays up. This is a licence of a
