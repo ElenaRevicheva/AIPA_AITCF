@@ -173,10 +173,24 @@ work. Port what you want by hand; never reset.
 - **Board-quality guards:** `board_hygiene.py`, `scripts/qualify_job_board.py`, weekly
   Telegram watch (Tue 06:00 Panama).
 - **Wiki incident published** `2026-08-30-marked-done-before-anyone-read-them`, `blog: yes`.
+- **`/opspw` — ops dashboard lock resettable from Telegram** (`2faf9a7`). The `/ops/`
+  password was lost; a bcrypt hash cannot be recovered, only replaced. Helper
+  `scripts/oracle-resilience/set-opspw-stdin.sh` → Oracle `/home/ubuntu/`, mode 700.
+  Backs up, writes bcrypt, verifies the LIVE endpoint two ways (new password 200 **and**
+  anonymous still 401), auto-rolls-back on either failure. Done in prod: 44→67 bytes,
+  hash now `$2y$`, rollback did not fire. **Username is hardcoded** — it cannot mint
+  accounts. Whoever holds the Telegram account can reset that lock; that is the accepted
+  trade for phone-only access, not an oversight.
 
 ## ⚠️ Standing traps
 
 - **Never `git add -A`** in cto-aipa. Named files only.
+- **Claude Code `Auto` mode blocks all credential-store work** — reading `.htpasswd`,
+  grepping `auth_basic`, and *editing your own permission list*. That last refusal is
+  deliberate: an agent cannot self-approve escalation. Do not try to slip it past by
+  renaming files or burying the logic in a compiled bundle. Ask Elena to switch the mode
+  selector (bottom-left) from `Auto` to `Manual` — every blocked command then succeeds on
+  the first try. Not `Bypass permissions`; that disarms everything session-wide.
 - Oracle runs VJH under `venv/bin/python` — bare `python3` dies on `pydantic_settings`.
 - Do **not** `source .env` — `FROM_EMAIL` has spaces and angle brackets; syntax error.
   Read keys with `grep`/`cut`.
