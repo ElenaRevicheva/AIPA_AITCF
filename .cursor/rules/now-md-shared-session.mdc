@@ -1,0 +1,53 @@
+---
+description: docs/oracle/NOW.md is the shared session between Cursor and Claude Code — read it first, update it when the money queue changes, and always push it to main
+alwaysApply: true
+---
+
+# `docs/oracle/NOW.md` — the shared session
+
+Cursor Cloud, Cursor Desktop and Claude Code all work this repo. **They cannot see each
+other's chats.** There is no shared conversation and no Claude MCP in Cursor. The only
+things all of them read are **HubSpot** and **`docs/oracle/NOW.md`**.
+
+NOW.md is not documentation. It is the working memory of whichever agent is not
+currently running. Write it as a handover note to a colleague who starts blind.
+
+## Rules
+
+1. **Read it first**, before any work, every session. It says what is already in flight,
+   whose move each item is, and what is known broken. Skipping it is how two agents solve
+   the same thing twice or undo each other.
+2. **Update it when the money queue changes** — an application sent, a deal armed, a
+   blocker found or cleared. Not for routine commits.
+3. **🚨 Push it to `main`. Always. Even when your work is on a branch.**
+4. **Keep it to one screen.** It is a queue, not a history. Delete finished lines; the
+   git log and `docs/` keep the record.
+
+## Why rule 3 is in capitals
+
+**Earned 30 Aug 2026.** NOW.md was created on 25 Aug on branch
+`cursor/intelliops-bd-money-play-abc0` and never merged. From `main` — which is what
+Claude Code reads and what Oracle runs — the file did not exist, so a second version was
+written from scratch five days later. Both agents were correct about their own branch and
+neither could see the other. Nothing was lost, but the coordination file had failed
+silently at its only job for five days.
+
+**A shared-state file on a branch the other tool never reads is a private note.**
+
+If the work must live on a branch, send the NOW.md update to `main` on its own, and say
+there that the branch exists and what is on it. Never leave the handover note inside the
+thing being handed over.
+
+## What goes in it
+
+- The money queue: what is in flight and **whose move it is** (Elena's vs the agent's)
+- Anything **open or known-broken** a new session must not assume works
+- Anything **stranded on a branch**, plus a warning if merging would delete work
+- Standing traps that keep costing time
+- What just landed, briefly, so nobody re-investigates a solved problem
+
+**Not** in it: architecture, post-mortems, or anything already in `docs/`, the memory
+files or the AI Ops Wiki. Link to those instead.
+
+> The same contract is in `CLAUDE.md` for Claude Code. If you change one, change both —
+> a rule that only one side can read is the bug this rule exists to prevent.
