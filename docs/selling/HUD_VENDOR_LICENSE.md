@@ -51,33 +51,32 @@ Do **not** make a private copy while the public parent stays up. That is the
 same code twice, and it looks like you are selling "private" what is still
 cloneable.
 
-### Flip to private — then quote these
+### Tick on the HUD quote (30 Aug evening — Elena's GitHub list)
 
-GitHub → repo → Settings → Danger Zone → Change repository visibility →
-Private. Confirm. Then refresh HUD and select only these.
+Already private. Tick **all** of these:
 
-| Repo | Why | Production if it goes private |
-|---|---|---|
-| `AIPA_AITCF` | Ops brain. 977 commits, 60k LOC | Oracle deploys by `scp` + PAT `git fetch`. Already documented as working on private repos |
-| `VibeJobHunterAIPA_AIMCF` | LangGraph + 131-test evals | Oracle holds `origin/main` via `GITHUB_TOKEN` — fetch should keep working |
-| `EspaLuzFamilybot` | Telegram advisor since May 2025 | Same PAT fetch; checkout named files, not blind pull |
-| `EspaLuzWhatsApp` | WhatsApp twin | Same |
-| `dragontrade-agent` | Smaller; include if the form is not picky | PM2 pull via the same token |
-
-### Leave public — do not flip
-
-| Repo | Why it stays public |
+| Repo | Why it can pay |
 |---|---|
-| **`aideazz`** | 4everland builds aideazz.xyz from public `main`. Private risks the **portfolio / wiki / blog** going stale. That is the hiring face and the money page |
-| `atuona` | Same 4everland path for atuona.xyz |
-| `aideazz-podcast` | 4everland feed |
-| `atlas-shifted`, `EspaLuz_Influencer`, `hive`, `aideazz-ops-dashboard`, `openclaw-vibejob-shortlist`, `ascent-saas-builder`, `aideazz-pitch-deck` | Thin or satellite — they dilute a quote |
-| `manukora-sop-brief`, `aw-client-report-portal` | Not solely-owned product source |
+| `AIPA_AITCF` | Main ops codebase |
+| `VibeJobHunterAIPA_AIMCF` | Job hunter + evals |
+| `EspaLuzFamilybot` | Telegram advisor |
+| `EspaLuzWhatsApp` | WhatsApp twin |
+| `dragontrade-agent` | Trading-education agent |
+| `AILA` | Already private. Her product (paused). Extra codebase |
+| `atlas-captures` | Already private. Ad-angle **data**, not just code. HUD buys data |
+
+One more flip, then tick it:
+
+| Repo | Why |
+|---|---|
+| `EspaLuz_Influencer` | Still public = $0. Live bot she owns. Flip → add to the same quote |
+
+Optional (thin — flip only if you want every extra listing): `atlas-shifted`.
+
+**Do not tick:** `hive` (fork, not yours), `openclaw-vibejob-shortlist` (MIT — already given away), `manukora-sop-brief` (job brief), `aw-client-report-portal` (client), `ascent-saas-builder` (Lovable), `aideazz-private-docs` (career/apps, not a product), `aideazz` / `atuona` / `aideazz-podcast` (keep public — they run the websites).
 
 Hiring proof that **survives** the flip: `https://aideazz.xyz/portfolio`,
-`https://webhook.aideazz.xyz/doc/nine-systems`, the live bots, the wiki. Resume
-GitHub links to the five become "source under NDA" — say that in Rwazi / Plata
-if a recruiter asks.
+`https://webhook.aideazz.xyz/doc/nine-systems`, the live bots, the wiki.
 
 ### How to flip (Elena, GitHub UI)
 
@@ -96,7 +95,7 @@ $0, or if a recruiter is blocked this week.
 ### After they are private
 
 1. HUD estimator → refresh the GitHub connection if the list still says public
-2. Select **only** the five (six) now-private repos. Do not add `aideazz`
+2. Tick the seven already-private repos plus `EspaLuz_Influencer` once flipped. Do not add `aideazz`
 3. Run **Bot quote**
 4. Send the founders letter the same hour — it now says they were public until
    the flip date
