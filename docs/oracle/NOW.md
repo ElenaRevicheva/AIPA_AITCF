@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 30 Aug 22:06 | HUD vendor connection explore | `docs/oracle/NOW.md` (main); `docs/selling/HUD_VENDOR_CONNECTION.md` on `cursor/hud-vendor-connection-8532` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
