@@ -1,0 +1,38 @@
+Searched at: 2026-08-30T22:39:54.663922+00:00
+IMAP ok: yes 
+Inbound AfterQuery: 2  Outbound: 0
+Reply from: Atrium by AfterQuery <atrium@afterquery.com>
+Reply subject: An update on your AfterQuery submission
+Reply date: 2026-08-25T21:26:40+00:00
+
+--- snippet (first inbound, truncated) ---
+An update on your AfterQuery submission.
+
+Atrium by AfterQuery
+
+
+AN UPDATE ON YOUR SUBMISSION
+
+Dear Elena,
+
+Thank you for submitting your codebase to AfterQuery, and for your patience during our review process.
+
+Unfortunately, we are unable to move forward with your submission at this time. We have reached our target acquisition volume and have consequently closed this current round.
+
+Please note that this decision is not a reflection of the quality of your work. Additionally, to protect your privacy and intellectual property, we want to assure you that we do not retain your codebase or utilize it for any model training.
+
+Should our requirements change or a new round open in the future, we will be sure to reach out.
+
+Thank you again for your time and for trusting us with your work.
+
+Sincerely,
+
+The team at AfterQuery
+
+Atrium by AfterQuery
+
+You're receiving this because you started a submission at atrium.afterquery.com https://atrium.afterquery.com.
+
+--- hits ---
+1. 2026-08-25T21:26:40+00:00 | INBOX | Atrium by AfterQuery <atrium@afterquery.com> → aipa@aideazz.xyz | An update on your AfterQuery submission
+2. 2026-08-21T16:32:20+00:00 | INBOX | Atrium by AfterQuery <atrium@afterquery.com> → aipa@aideazz.xyz | We've received your submission
