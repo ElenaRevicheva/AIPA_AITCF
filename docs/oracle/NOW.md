@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-08-30 23:05 | Fix Resend note lost-update (ENTREGADO wiped) | `src/resend-webhook.ts` `src/go-wa.ts` `scripts/resend-reconcile.cjs` — no Oracle deploy this claim | this commit |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -113,9 +113,10 @@ git log keeps the record.
   **clicked** all three. **No `email.opened`.** Note lost the
   ENTREGADO lines (lost update vs EMAILED). GET /emails 401 —
   sending-only key. `[LICENSE]` is a name tag, not a stream.
-- **NEXT:** Elena: follow `atrium@` / `support@` clicks today.
-  Ignore the bounce-task line “prospect received nothing.” Still
-  wait for HUD’s number.
+- **NEXT:** Fix the lost-update on the outreach note (re-read
+  before PATCH) + Cc-bounce copy + backfill AfterQuery stamps.
+  Branch `cursor/afterquery-resend-proof-8532`. Elena: still
+  follow the clicks today. Still wait for HUD’s number.
 - **VERIFIED BY:** `cto-aipa-out-9.log` lines `email.delivered
   atrium@` / `support@` → applied; `email.clicked` ×3 → applied;
   no `email.opened`. Report:
