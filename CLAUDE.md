@@ -4,10 +4,54 @@ Elena is learning on the go. Every session must leave her more hireable than it
 found her, and the work must be oriented at getting her paid. These rules are
 not optional politeness — they are the deliverable.
 
-**Live across Cursor and Claude Code:** there is no shared chat and no Claude
-MCP. The live layer is HubSpot + `docs/oracle/NOW.md`. Read that file at
-session start. Update it when the money queue changes. Push so the other
-tool sees it.
+---
+
+## `docs/oracle/NOW.md` — the shared session
+
+Cursor Cloud, Cursor Desktop and Claude Code all work this repo. **They cannot see
+each other's chats.** There is no shared conversation and no Claude MCP in Cursor.
+The only things all three read are **HubSpot** and **`docs/oracle/NOW.md`**.
+
+So NOW.md is not documentation. It is the working memory of whichever agent is not
+currently running. Treat it as a handover note to a colleague who starts blind.
+
+### The contract
+
+1. **Read it first.** Before any work, in every tool. It tells you what is already in
+   flight, whose move each item is, and what is known broken. Not reading it is how two
+   agents end up solving the same thing twice, or undoing each other.
+2. **Update it when the money queue changes** — an application sent, a deal armed, a
+   blocker found or cleared. Not for routine commits.
+3. **Push it to `main`, immediately.** See the hard rule below.
+4. **Keep it to one screen.** It is a queue, not a history. When something is done,
+   delete the line — the git log and `docs/` keep the record. If a section needs more
+   than a few lines, move the detail into a doc and leave a pointer.
+
+### 🚨 NOW.md lives on `main`. Always. No exceptions.
+
+**Earned 30 Aug 2026.** Cursor created NOW.md on 25 Aug on branch
+`cursor/intelliops-bd-money-play-abc0` and never merged it. From `main` — which is what
+Claude Code reads and what Oracle runs — the file did not exist, so a second version was
+written from scratch five days later. Both agents were correct about their own branch and
+neither could see the other.
+
+Nothing was lost, but the coordination file had silently failed at its only job for five
+days. **A shared-state file on a branch the other tool never reads is a private note.**
+
+If your work must live on a branch, the NOW.md update still goes to `main` on its own —
+say there that a branch exists and what is on it. Never leave the handover note inside
+the thing being handed over.
+
+### What belongs in it
+
+- The money queue: what is in flight and **whose move it is** (Elena's vs the agent's)
+- Anything **open or known-broken** that a new session must not assume works
+- Anything **stranded on a branch**, and the warning if merging it would delete work
+- Standing traps that keep costing time
+- What just landed, briefly — so nobody re-investigates a solved problem
+
+**Not** in it: architecture, post-mortems, or anything already in `docs/`, memory or the
+AI Ops Wiki. Link to those instead.
 
 ---
 
