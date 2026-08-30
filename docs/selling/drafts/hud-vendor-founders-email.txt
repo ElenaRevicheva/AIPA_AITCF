@@ -1,33 +1,30 @@
-SUBJECT: Non-exclusive training licence — nine production AI systems, I keep the products
+SUBJECT: Estimator says public = $0 — I will flip five product repos private and disclose they were public
 TO: founders@hud.ai
-CC: (optional) Hansel / HUD GTM if you have the address from the DEV thread
 
 Hi,
 
-I want to license a copy of source I solely own to HUD Vendor, for model-training use, on a non-exclusive basis.
+I am on vendor.hud.ai/codebases, GitHub connected as ElenaRevicheva. Your estimator is unambiguous: public repos come back at $0 because buyers can already clone them.
 
-I retain copyright, the brand, the domains, and the right to keep operating, improving and selling every product. Production systems stay up. CRM, chat logs, keys, and any third-party or client material are out of scope.
+I built in public on purpose — I have been job-searching without a salary since 2025, and the repos were the proof. I am ready to make the product codebases private so the tool can grade them, on the terms below.
 
-What you would be grading is not a wound-down startup. It is nine systems one person built and has run unattended for fifteen months — Telegram/WhatsApp agents, a LangGraph job hunter with a 131-test eval harness, a five-provider LLM chain that survived a zero-balance outage, a GEO/AEO visibility engine, a daily grounded publisher, and an AI Ops wiki written from production incidents the day they happened.
-
-The public dossier (every figure read from the running systems the day it was written):
-https://webhook.aideazz.xyz/doc/nine-systems
-
-Buyer-facing hub:
-https://aideazz.xyz/portfolio
-
-Repos I will put through the value check at vendor.hud.ai/codebases (all public GitHub; I own them; no SPDX licence that would conflict):
+What I will flip to private for the quote (I solely own these; no SPDX licence that would conflict):
 
 - https://github.com/ElenaRevicheva/AIPA_AITCF
-- https://github.com/ElenaRevicheva/aideazz
 - https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF
 - https://github.com/ElenaRevicheva/EspaLuzFamilybot
 - https://github.com/ElenaRevicheva/EspaLuzWhatsApp
 - https://github.com/ElenaRevicheva/dragontrade-agent
 
-I know your classic inbound is a private, often dead, closed-source repo. Mine are live and public. The training value is the production history, the design record, the evals, and the incident log — not "more public GitHub." If the automatic qualifier drops public repos, I would rather you look at the dossier than have the check fail closed.
+I am telling you they were public until I flip them. Making them private does not un-clone GitHub Archive or anyone who already pulled. If previously-public production history is not what labs buy, I would rather you say so than have me take the hiring surface down for a number that will not pay.
 
-I am in Panama City. I can take a short call, and I will not sign anything that assigns copyright, is exclusive, or touches the running systems.
+aideazz stays public. That repo is the 4everland deploy for https://aideazz.xyz/portfolio — the live products, the wiki, and the hiring face. I am not licensing the running systems, the CRM, chat logs, keys, or any third-party or client material.
+
+The offer is a non-exclusive licence to a copy of source I solely own, for model-training use. I retain copyright, the brand, the domains, and the right to keep operating, improving and selling it. AIdeazz AI Lab keeps running.
+
+Dossier (figures read from the running systems the day it was written):
+https://webhook.aideazz.xyz/doc/nine-systems
+
+If the honest path is "Submit a data proposal" rather than the private-code estimator, point me at that. I can take a short call from Panama City.
 
 Best regards,
 Elena Revicheva
