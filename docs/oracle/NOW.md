@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 30 Aug 22:36 | AfterQuery Zoho search + HubSpot stage | `docs/oracle/NOW.md` (main); hire-trigger / drafts on `cursor/afterquery-atrium-reask-8532` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
