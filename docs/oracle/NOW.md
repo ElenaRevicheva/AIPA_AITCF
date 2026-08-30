@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-08-30 23:16 | Merge ENTREGADO fix + deploy cto_aipa | `main` merge; Oracle `cto-aipa` via `.deploy-trigger` | this commit |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -112,9 +112,9 @@ git log keeps the record.
   send. Fix (re-read before stamp; Cc bounce ≠ failed send) is
   on `cursor/afterquery-resend-proof-8532`. **Not deployed** to
   Oracle. `[LICENSE]` is a name tag, not a stream.
-- **NEXT:** Elena: write atrium@ / support@ today. HUD: wait for
-  number. Merge + named-file deploy of `resend-webhook` + `go-wa`
-  when a deployer is free — do not `git pull` on Oracle.
+- **NEXT:** Merge `cursor/afterquery-resend-proof-8532` onto
+  `main`, then `.deploy-trigger` = `cto_aipa`. Elena: rest.
+  HUD number still hers tomorrow.
 - **VERIFIED BY:** `cto-aipa-out-9.log` `email.delivered atrium@`
   / `support@` → applied; `node scripts/test-resend-note-stamp.cjs`
   `{ ok: true, bothKept: true }`.
