@@ -248,6 +248,37 @@ the dashboard's `OpsRow`) → Respond to Webhook (**All Incoming Items**, not Fi
 | `webhook.aideazz.xyz/crm/` | n8n editor | n8n's own owner login |
 | `webhook.aideazz.xyz/crm/webhook/ops` | the data feed | **HTTP basic** (`.htpasswd-ops`) |
 | `webhook.aideazz.xyz/ops/` | React dashboard, `/var/www/ops` | **HTTP basic** (same file) |
+
+### Lost the ops password? Reset it — it cannot be recovered (30 Aug 2026)
+
+`.htpasswd-ops` stores a one-way hash, so there is nothing to read back. The only
+move is replacement, and there are two ways to do it:
+
+```bash
+# From a terminal — SSH in FIRST, then type plain commands. Do not try to do this
+# as one nested one-liner: PowerShell → ssh → remote bash is three parsers, each
+# eating a layer of quoting, and the pattern arrives mangled.
+ssh -t oracle-cto-aipa
+sudo grep -rn auth_basic_user_file /etc/nginx/     # derive the path, never assume it
+sudo cp /etc/nginx/.htpasswd-ops /etc/nginx/.htpasswd-ops.bak-$(date +%F)
+sudo htpasswd -B /etc/nginx/.htpasswd-ops elena    # -B = bcrypt; the default is MD5
+```
+
+**Or from Telegram, phone-only:** send `/opspw <new password>` to the CTO bot. It
+deletes the message, then `scripts/oracle-resilience/set-opspw-stdin.sh` (Oracle
+`/home/ubuntu/`, mode 700) backs up, writes bcrypt, and **verifies against the live
+endpoint two ways — new password returns 200 AND anonymous still returns 401 —
+rolling back automatically if either fails.**
+
+Both checks matter. A reset that *removes* the lock is indistinguishable from a
+working one when viewed from a browser that is already authenticated, so the
+anonymous 401 is the only thing that catches it. And derive the file from the live
+nginx config: a wrong path silently creates a second htpasswd file nginx never
+reads, and the reset looks successful while the old password stays live.
+
+⚠️ Whoever holds the Telegram account can reset this lock. That is the accepted
+trade for phone-only access, not an oversight — which is why `/opspw` hardcodes the
+username and cannot mint accounts.
 | `webhook.aideazz.xyz/crm/webhook/*` (all others) | future external webhooks | **none, deliberately** — Resend/HubSpot cannot type a password |
 
 Dashboard and feed share one origin on purpose: no CORS, and the browser sends
@@ -885,7 +916,7 @@ Every agent on this instance **must** have: (1) restart hardening, (2) a health-
 > **Rule going forward:** AILA is **paused deliberately** and Elena is returning to it. Work from `D:\aideazz\AILA` (branch `docs`) against `github.com/ElenaRevicheva/AILA`. Do **not** recreate a clone on Oracle — it is a planning repo, not a deployed process. If you meet the name "AELA" anywhere, it is the old name for this same repo.
 | 11 | **Atlas Shifted** (Marketing Strategist) | [atlas-shifted](https://github.com/ElenaRevicheva/atlas-shifted) | [live radar](https://webhook.aideazz.xyz/whitespace/atlas.html) | PM2 | `whitespace` (port 8095) | `http://127.0.0.1:8095/healthz` | via `webhook.aideazz.xyz/whitespace/` (nginx → :8095) | — | `D:\aideazz\whitespace` (Oracle `/home/ubuntu/whitespace`; folder ≠ repo). Data backup repo: `atlas-captures` |
 | 12 | **n8n** (ops/CRM automation engine) | *no repo — workflows live in n8n's own SQLite at `~/.n8n`* | [editor](https://webhook.aideazz.xyz/crm/) (n8n owner login) | PM2 | `n8n` (port 5678, **bound to 127.0.0.1**) | `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5678/` → 200 · executions: `sqlite3 ~/.n8n/database.sqlite "SELECT id,status FROM execution_entity ORDER BY id DESC LIMIT 5;"` | via `webhook.aideazz.xyz/crm/` (nginx → :5678) | — | No local checkout — n8n is installed globally (`npm i -g n8n`), workflows are edited in the browser. **Export workflows to git before any upgrade.** |
-| 13 | **Ops dashboard** (private CRM view) | [aideazz-ops-dashboard](https://github.com/ElenaRevicheva/aideazz-ops-dashboard) | [webhook.aideazz.xyz/ops/](https://webhook.aideazz.xyz/ops/) — **HTTP basic auth**, user `elena` | nginx static (`/var/www/ops`) | — (no process) | `curl -o /dev/null -w '%{http_code}' https://webhook.aideazz.xyz/ops/` → **401 expected** (200 would mean the lock is off) | served from `webhook.aideazz.xyz/ops/`, deliberately NOT on the public marketing site | — | `D:\aideazz\aideazz-ops-dashboard`. Deploy: `MSYS_NO_PATHCONV=1 npx vite build --base=/ops/` then `scp -r dist/* oracle:/var/www/ops/` |
+| 13 | **Ops dashboard** (private CRM view) | [aideazz-ops-dashboard](https://github.com/ElenaRevicheva/aideazz-ops-dashboard) | [webhook.aideazz.xyz/ops/](https://webhook.aideazz.xyz/ops/) — **HTTP basic auth**, user `elena`; password is a bcrypt hash — **not recoverable, only resettable** (`/opspw` in Telegram, or see the reset recipe in the n8n + ops dashboard section) | nginx static (`/var/www/ops`) | — (no process) | `curl -o /dev/null -w '%{http_code}' https://webhook.aideazz.xyz/ops/` → **401 expected** (200 would mean the lock is off) | served from `webhook.aideazz.xyz/ops/`, deliberately NOT on the public marketing site | — | `D:\aideazz\aideazz-ops-dashboard`. Deploy: `MSYS_NO_PATHCONV=1 npx vite build --base=/ops/` then `scp -r dist/* oracle:/var/www/ops/` |
 
 **Repos (8 on Oracle VM):** EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer, dragontrade-agent, VibeJobHunterAIPA_AIMCF, openclaw-vibejob-shortlist, AIPA_AITCF, AILA (8 repos for agents **on the VM**; 8+9 share AIPA_AITCF, 5+6 share VibeJobHunterAIPA_AIMCF). **Sprinter** uses the same **AIPA_AITCF** codebase path plus optional **`D:\aideazz\SprintBriefingAgent`** workspace for AWS packaging — runtime on **AWS Lambda**, not under `/home/ubuntu/` PM2/systemd.
 
