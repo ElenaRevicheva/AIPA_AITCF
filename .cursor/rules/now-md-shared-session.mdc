@@ -14,14 +14,25 @@ currently running. Write it as a handover note to a colleague who starts blind.
 
 ## Rules
 
-1. **Read it first**, before any work, every session. It says what is already in flight,
-   whose move each item is, and what is known broken. Skipping it is how two agents solve
-   the same thing twice or undo each other.
-2. **Update it when the money queue changes** — an application sent, a deal armed, a
-   blocker found or cleared. Not for routine commits.
+1. **Read it first**, before any work, every session — **PART 1 is the protocol, follow
+   it.** It says what is in flight, whose move each item is, and what is known broken.
+2. **Claim before you touch.** Add your row to the session board in PART 1 and push it
+   *before* editing shared code or restarting a service. Delete the row when you stop.
+   A claim older than 2h with no newer commit is dead — take it.
 3. **🚨 Push it to `main`. Always. Even when your work is on a branch.**
-4. **Keep it to one screen.** It is a queue, not a history. Delete finished lines; the
-   git log and `docs/` keep the record.
+4. **Never destroy:** no `--force`, never `reset`/`checkout --` a file you did not write
+   this session, never blind `git pull` on Oracle's `cto-aipa`. Same file both changed →
+   merge, do not overwrite; the version carrying a verification wins.
+5. **Catch the other's fall.** Run the five-item start-of-session check in PART 1 §4.
+   Every item on it is a failure that actually shipped — especially §4.3: confirm the last
+   change produced **output**, not just that it ran.
+6. **Check §6 DELIBERATE before "fixing" anything that looks broken.** Wellfound returning
+   zero, YC not being scraped, Oracle's checkout lagging and the failing Claude eval are
+   all intentional, and each has cost someone an investigation already.
+7. **Pause with a handoff block** — DONE / NEXT / VERIFIED BY / RISK. An agent that stops
+   without one has lost the work even if the code is committed.
+8. **Keep it to one screen per part.** It is a queue, not a history. Delete finished
+   lines; git log keeps the record.
 
 ## Why rule 3 is in capitals
 

@@ -17,15 +17,36 @@ currently running. Treat it as a handover note to a colleague who starts blind.
 
 ### The contract
 
-1. **Read it first.** Before any work, in every tool. It tells you what is already in
-   flight, whose move each item is, and what is known broken. Not reading it is how two
-   agents end up solving the same thing twice, or undoing each other.
-2. **Update it when the money queue changes** — an application sent, a deal armed, a
-   blocker found or cleared. Not for routine commits.
-3. **Push it to `main`, immediately.** See the hard rule below.
-4. **Keep it to one screen.** It is a queue, not a history. When something is done,
-   delete the line — the git log and `docs/` keep the record. If a section needs more
-   than a few lines, move the detail into a doc and leave a pointer.
+**PART 1 of NOW.md is the agent protocol. Follow it — it is not advisory.** In short:
+
+1. **Read it first.** Before any work, in every tool. What is in flight, whose move each
+   item is, what is known broken. Not reading it is how two agents solve the same thing
+   twice, or undo each other.
+2. **Claim before you touch.** Add your row to the session board and push it *before*
+   editing shared code or restarting a service; delete the row when you stop. There is no
+   file locking — this table is the substitute. A claim older than 2h with no newer commit
+   from that agent is dead; take it. If a row is live and you need those files, **work
+   somewhere else** rather than being careful.
+3. **Push to `main`, immediately.** See the hard rule below.
+4. **Never destroy.** No `--force`. Never `reset`/`checkout --` a file you did not write
+   this session. Never blind `git pull` on Oracle's `cto-aipa` (it deploys by named-file
+   `scp`, so its checkout is meant to lag). Same file changed by both → **merge, do not
+   overwrite**; the version carrying a verification wins. One deployer at a time — check a
+   service's uptime before restarting it.
+5. **Catch the other's fall.** Run the five-item start-of-session check in PART 1 §4 before
+   new work. Every item is a failure that shipped — above all §4.3: prove the last change
+   produced **output**, not merely that it ran.
+6. **Read §6 DELIBERATE before "fixing" anything that looks broken.** Wellfound at zero,
+   YC not scraped, Oracle lagging, the failing Claude eval — all intentional, all have
+   already cost someone an investigation.
+7. **Pause with a handoff block:** DONE / NEXT / VERIFIED BY / RISK. An agent that stops
+   without one has lost the work even if the code is committed.
+8. **Keep it to one screen per part.** A queue, not a history. Delete finished lines; the
+   git log and `docs/` keep the record.
+
+The same protocol is mirrored in `.cursor/rules/now-md-shared-session.mdc` for Cursor.
+**Change one, change both** — a rule only one side can read is the bug it exists to
+prevent.
 
 ### 🚨 NOW.md lives on `main`. Always. No exceptions.
 
