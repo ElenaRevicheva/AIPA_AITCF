@@ -2,12 +2,9 @@ Paste into DataVendor listing → Describe, then resubmit.
 PII-checked 31 Aug: no email, no @handle, no city, no personal name.
 Do not volunteer “were public until 30 Aug.” Do not paste Nine Systems.
 
-Operator only — not listing text: if Edit listing accepts >$12k on the
-four cap-hit repos, replace the Buy-now paragraph with:
-“Buy now: $89,481 — HUD’s own GitHub estimator point value for this same
-eight-repo bundle, run 31 Aug 2026 (44% Promising; range $61,067–$350,557).
-The $350k ceiling is an imputed-perfect scenario, not cash. Non-exclusive.”
-Do not paste this instruction block.
+Prices verified from Elena’s Edit form 31 Aug: form still $2,500–$12,000
+per repo (cannot type above the cap). She raised AITCF $10,910 → $12,000
+and left AILA $4,264 / atlas $4,137 / dragontrade $6,450. Buy now $74,851.
 
 --- TITLE ---
 AI tech + marketing co-founders: 8 private production repos (tool-use, MCP, scrape)
@@ -20,7 +17,7 @@ Non-exclusive training licence to copies of eight private production repos I sol
 
 These are genuine executive AI seats, not chatbots: a human remains on the last irreversible click; unsourced numbers are refused; and automation that produced volume with zero outcomes was removed.
 
-Buy now: $73,761. HUD’s own GitHub estimator, run 31 Aug 2026, scored this same eight-repo bundle at a $89,481 point value (44% Promising; range $61,067–$350,557). Four live products hit HUD’s $12,000/repo form cap, with HUD’s point scores for those four already higher. The $350k ceiling is an imputed-perfect scenario, not cash. Package conversation: $89,481 point value, non-exclusive.
+Buy now: $74,851. HUD’s own GitHub estimator, run 31 Aug 2026, scored this same eight-repo bundle at a $89,481 point value (44% Promising; range $61,067–$350,557). Five products sit at HUD’s $12,000/repo form cap; HUD’s point scores for four of those are already higher. The $350k ceiling is an imputed-perfect scenario, not cash. Package conversation: $89,481 point value, non-exclusive.
 
 AIPA_AITCF — AI Tech Co-Founder / CTO AIPA: Telegram control plane (/code, /fix → real GitHub PRs; human last click); CRM hub with HubSpot deal staging; fail-closed GEO/AEO publisher + live visibility audit; and a Monday Atlas lead machine that reads the Atlas snapshot, audits businesses against the live API, and stages qualified HubSpot contacts/deals with audit + angle + one-click send. The script never emails; the operator taps. Also includes the Atuona AI film compiler (/film build → VO + music → MP4; /films gallery) and five-provider LLM failover.
 

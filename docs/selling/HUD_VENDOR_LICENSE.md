@@ -2,11 +2,11 @@
 
 **Status (31 Aug 2026, afternoon Panama):** Call done. Listing
 `https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443`
-is **Ready** (Draft ✓ Review ✓; Active not yet). All mandatory checks
-passed (11/10). Buy now **$73,761**. HUD takes **20%** of a closed sale.
-**Do not raise every repo to $12k.** Raise only the four that hit the
-form cap, and only if Edit listing accepts >$12k. Prefer **Make private
-to opportunity buyers** over public **Go live** at $73k. Proposal ≠ cash.
+is **Ready**. Form still hard-caps **$2,500–$12,000/repo** — cannot type
+above it. Elena raised `AIPA_AITCF` $10,910 → **$12,000** and left AILA
+$4,264 / atlas $4,137 / dragontrade $6,450. Buy now **$74,851** (within
+DV’s $20k–$96k band). HUD takes **20%**. Prefer **Make private to
+opportunity buyers** over public **Go live**. Proposal ≠ cash.
 Non-exclusive only. Do not bank $350k.
 
 PII-clean Describe: `docs/selling/drafts/hud-vendor-listing-describe.txt`
@@ -15,44 +15,36 @@ PII-clean Describe: `docs/selling/drafts/hud-vendor-listing-describe.txt`
 
 ## After the call — several listings vs $12k
 
-The listing form suggested **$2,500–$12,000 per repository**. That is a
-band, not a law. HUD said she can price from her own estimate.
+The listing form is a **hard band: $2,500–$12,000 per repository**.
+Verified 31 Aug on Edit listing — the four HUD-scored-higher products
+cannot be typed above $12k. HUD said she can price from her own
+estimate; the form still will not take it. Package conversation remains
+the $89,481 point value.
 
-- **Floor is not $12k.** $12k is the *top* of the suggestion. AILA and
-  atlas-captures sit at HUD’s points (~$4k). Do not inflate them to $12k.
+- **Floor is not $12k.** AILA $4,264 and atlas-captures $4,137 stay at
+  HUD’s points (both 0 LOC on the snapshot). Do not inflate them.
 - **Several listings do not beat $12k.** One listing of eight repos at
   $12k each = $96k max. Eight listings of one repo at $12k each = $96k
   max. HUD’s 20% is the same.
 - **Several listings *do* make sense as buyer packs**, not as a cap
   trick. A lab that wants WhatsApp tool-use should not have to buy
   paused AILA. Do not put the same repo in two listings.
-- If the form now accepts prices above $12k, raise the four live
-  products toward HUD’s points ($17,020 / $16,735 / $16,662 / $13,303)
-  on the **existing** listing first. That is how you close the $15,720
-  gap to the $89,481 package point.
-- **Do not pad the other four.** AITCF $10,910, dragontrade $6,450,
-  AILA $4,264 (0 LOC, paused), atlas-captures $4,137 (0 LOC) are already
-  at HUD’s points. 8 × $12k = $96k of padded sticker, and two of those
-  cards already show 0 LOC.
+- **What she did:** raised only `AIPA_AITCF` $10,910 → $12,000 (live
+  exec seat, not a 0-LOC pad). Left dragontrade $6,450. Buy now
+  **$74,851**, inside DV’s $20k–$96k range. The $14,630 gap to $89,481
+  is the form cap, not a miss.
 
-### What to click today (Ready, not Active)
+### What to click now (Describe → Review)
 
-1. **Edit listing.** On the four at $12,000, try HUD’s points:
-   `VibeJobHunterAIPA_AIMCF` **$17,020**, `EspaLuzWhatsApp` **$16,735**,
-   `EspaLuz_Influencer` **$16,662**, `EspaLuzFamilybot` **$13,303**.
-   If the field rejects anything above $12k, leave them. Do not touch
-   the other four prices.
-2. If the four raise succeeds, the bundle becomes **$89,481**. Update
-   the Overview “Buy now” sentence to match (paste in
-   `docs/selling/drafts/hud-vendor-listing-describe.txt`).
-3. **Do not click Go live** while a HUD proposal may still arrive. A
-   public $73,761 Buy-now anchors under their own $89k point.
-4. Click **Make private to opportunity buyers** so HUD can transact
+1. Paste the corrected Describe from
+   `docs/selling/drafts/hud-vendor-listing-describe.txt` so Overview
+   says **$74,851**, not $73,761. Then submit Review.
+2. **Do not click Go live** while a HUD proposal may still arrive. A
+   public $74,851 Buy-now still anchors under their own $89k point.
+3. Click **Make private to opportunity buyers** so HUD can transact
    without a public sticker.
-5. Ignore **Run recommended checks** and **DV has not verified**.
-   32 not-gradable is AILA/atlas 0 LOC + missing Actions — it will not
-   sell more. HUD’s stamp is theirs, not a CI chase.
-6. Do **not** Archive.
+4. Ignore **Run recommended checks** and **DV has not verified**.
+5. Do **not** Archive. Do not try to type above $12k again.
 
 Suggested packs (only if HUD wants more than one SKU):
 
