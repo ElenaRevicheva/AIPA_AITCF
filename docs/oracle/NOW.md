@@ -108,17 +108,18 @@ git log keeps the record.
 ## 🤝 HANDOFF
 
 - **DONE:** Elena **sent Megan**. Tier 2 signed. Listing private. Go live
-  only if Megan says public helps. **datafactor.com is not a HUD clone
-  and not a fee-scam** — 8-person 2025 lab (OnePrompt overlap) that
-  sells *their* first-party interaction data. No vendor-submit. Do not
-  upload the 8 repos there.
-- **NEXT:** Wait for Megan. Keep AfterQuery + jobs moving. Refuse
-  exclusive on any HUD DSA.
-- **VERIFIED BY:** User: message to Megan sent. DataFactor: LinkedIn
-  `datafactor-labs`, domain sold Sedo 15 Feb 2026 for $12,900, copy
-  says first-party only / never resold.
-- **RISK:** Treating DataFactor as a second marketplace. Off-platform
-  HUD RFP contact. DSA exclusive. AfterQuery untouched.
+  only if Megan says public helps. **datafactor.com careers is hiring
+  theater** — 22 roles, Apply dead, no Ashby/Greenhouse/Lever, none of
+  those titles on LinkedIn Jobs. 8-person 2025 lab (OnePrompt overlap)
+  selling *their* first-party data. Not a HUD clone. Do not upload repos.
+- **NEXT:** Do not wait on DataFactor Apply and do not spray 22 roles.
+  Elena: AfterQuery + Rwazi + Plata. One `hello@` only if she still wants
+  the door. Refuse exclusive on any HUD DSA.
+- **VERIFIED BY:** User: Apply not active. Search: no ATS board; no
+  LinkedIn Jobs matching the listed titles. Domain Sedo 15 Feb 2026
+  $12,900. Funding-round claim has no public named round.
+- **RISK:** Treating dead Apply as "check back later". Confusing with
+  datafactor.it (Italy). Off-platform HUD RFP contact. DSA exclusive.
 
 ## 💰 MONEY QUEUE
 
