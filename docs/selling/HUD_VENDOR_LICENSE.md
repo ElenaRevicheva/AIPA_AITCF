@@ -51,6 +51,17 @@ say `sent HUD`.
 
 ---
 
+## Additional info (onboarding, optional)
+
+Paste-ready: `docs/selling/drafts/hud-vendor-additional-info.txt`
+(everything below the `---` in that file).
+
+Matching copy: HUD’s own $89,481 stack, tool expertise, exec seats,
+non-exclusive hard line. Do not volunteer “were public until 30 Aug.”
+Do not paste Nine Systems. After this screen: Confirm details → read NDA.
+
+---
+
 ## What HUD's estimator just told us (verbatim)
 
 > Find out what your codebase could be worth
