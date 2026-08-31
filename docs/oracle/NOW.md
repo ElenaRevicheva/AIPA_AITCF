@@ -107,18 +107,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD listing memo PDF is on `cursor/hud-vendor-license-1c49`
-  (`c2a2f7a`): 2 pages, 12 clickable URI annotations, not Nine
-  Systems. AfterQuery atrium@ + support@ still delivered; Oracle
-  deploy from that session is untouched.
-- **NEXT:** Elena: download
-  `docs/selling/attachments/HUD_Vendor_NonExclusive_Licence_Brief.pdf`
-  from PR #38, attach it on HUD Work samples with portfolio + /api,
-  never Nine Systems. Then NDA, Cal.com 9:40 Panama, founders@.
-  No deploy. No `.hire-trigger`.
-- **VERIFIED BY:** Deploy run 33341368302 OK. Live grep
-  `exports.patchNoteStamp` in `dist/resend-webhook.js`. PM2
-  online, uptime from 23:16:37Z, 0 unstable restarts.
+- **DONE:** HUD listing memo v2 on `cursor/hud-vendor-license-1c49`
+  (`a272410`): estimate screenshot embedded, no confession box,
+  `/codebases/result` is not a link. AfterQuery deploy untouched.
+- **NEXT:** Elena: download the PDF from PR #38, attach on HUD Work
+  samples with portfolio + /api, never Nine Systems. NDA, Cal.com
+  9:40 Panama, founders@. No deploy. No `.hire-trigger`.
+- **VERIFIED BY:** `node scripts/test-hud-vendor-brief-pdf.cjs` → 2
+  pages, 119kB, 10 live URIs, no `/codebases/result`, no "DO NOT
+  HIDE" copy.
 - **RISK:** Oracle HEAD is `a3e29b4` (one verify commit behind
   `main` — docs/script only). Do not `git pull` on the box.
   Do not mint `HUD_API_KEY`. Bounce-task copy on this deal is
