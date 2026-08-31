@@ -129,6 +129,45 @@ Non-exclusive means Lazarus and HUD can both pay.
 
 ---
 
+## Quote (verified from Elena's result screen, 30 Aug 2026)
+
+Their copy: price grows from $1,500 at score zero to $100,000 at the top.
+A measurement they could not take is **imputed**, not zeroed. The range is
+what the price would be if every imputed term scored nothing vs everything
+it could have scored. So **$61k is the cautious reading; $350k is the
+fantasy top**. Point **$89,481** is the midpoint they want her to book on.
+
+HUD's public marketing said seller keeps **80%** after a lab actually buys
+and she accepts. This screen transfers **no rights**.
+
+| Repo | Score | Point | Range |
+|---|---|---|---|
+| VibeJobHunterAIPA_AIMCF | 58% | $17,020 | $12,652–$50,565 |
+| EspaLuzWhatsApp | 57% | $16,735 | $12,440–$49,718 |
+| EspaLuz_Influencer | 57% | $16,662 | $12,878–$45,201 |
+| EspaLuzFamilybot | 52% | $13,303 | $10,830–$31,969 |
+| AIPA_AITCF | 47% | $10,910 | $5,469–$64,523 |
+| dragontrade-agent | 35% | $6,450 | $2,952–$47,160 |
+| AILA | 25% | $4,264 | $1,952–$31,176 |
+| atlas-captures | 24% | $4,137 | $1,893–$30,245 |
+| **Eight together** | **44%** | **$89,481** | **$61,067–$350,557** |
+
+Almost every repo has **test coverage imputed**. AIPA's LOC and docs were
+not measured, which is why the biggest ops repo is not the top number.
+AILA and atlas-captures are thin — they still added to the bundle.
+
+**Realistic proceeds (not the marketing top):** their $61k floor is the
+sum if every imputed measurement scores nothing. HUD's public copy: seller
+keeps 80% after a lab buys. 80% of $61k ≈ **$49k**. 80% of $89k ≈ **$72k**.
+AILA + atlas-captures may not sell (thin). Repos were public until 30 Aug —
+that can cut the private premium, or kill the match. Hope band if this
+converts: **$45k–$70k** after their cut. Haircut band: **$15k–$40k**.
+**$0** until a signed licence and money in the bank. **$350k is not a
+hope figure.** Non-exclusive can pay again later if a second lab buys.
+
+**Next:** Book a call on that page. Send the founders letter. Finish the
+NDA. Disclose they were public until 30 Aug. Do not sign exclusive.
+
 ## Founders letter
 
 Paste-ready: `docs/selling/drafts/hud-vendor-founders-email.txt`
@@ -143,7 +182,7 @@ Estimator copy (HUD, 30 Aug 2026): no rights transfer beyond the rough estimate.
 ## Cursor / hud.io — still the wrong company
 
 `Hud: Sign In` in Cursor is **hud.io** (runtime-sensor plugin). It does not
-value a codebase. The buyer is **vendor.hud.ai**.
+value a codebase. The buyer is **datavendor.ai** (HUD Vendor).
 
 ---
 
