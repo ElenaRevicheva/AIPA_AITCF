@@ -1,11 +1,6 @@
-Paste into DataVendor listing → Edit listing → Describe, then resubmit.
-PII-clean: no email, no social handle, no city, no personal name.
+Paste into DataVendor listing → Describe, then resubmit.
+PII-checked 31 Aug: no email, no @handle, no city, no personal name.
 Do not volunteer “were public until 30 Aug.” Do not paste Nine Systems.
-
-Why the listing is stuck: mandatory "Personal data scan" failed on TEXT
-(aipa@ email + @reviceva). Repo snapshots and secrets scan already passed.
-Do NOT archive. Do NOT chase "Run recommended checks" (CI/coverage) first —
-those are informational. Edit text → resubmit mandatory checks.
 
 --- TITLE ---
 AI tech + marketing co-founders: 8 private production repos (tool-use, MCP, scrape)
@@ -13,42 +8,33 @@ AI tech + marketing co-founders: 8 private production repos (tool-use, MCP, scra
 --- ONE-LINER ---
 Eight private production codebases I solely own — live AI tech co-founder (CRM, GEO/AEO, film, Monday Atlas to HubSpot) and live AI marketing co-founder (LangGraph + LinkedIn CMO), plus an X agent that posts, follows, and stages leads. Exec seats, not generic bots.
 
---- DESCRIPTION (Markdown) ---
-Non-exclusive training licence of **copies** of eight private production repos I solely own. I keep copyright, the AIdeazz AI Lab brand, the domains, and every product running. No copyright assignment. No exclusive. Production does not stop.
+--- DESCRIPTION ---
+Non-exclusive training licence to copies of eight private production repos I solely own. I retain all copyright, the AIdeazz AI Lab brand, domains, and every product running. No copyright assignment. No exclusivity. Production does not stop.
 
-These seats were built as **genuine execs**, not chatbots: a human is on the last irreversible click, unsourced numbers are refused, and a blast that produced volume with zero outcomes was removed.
+These are genuine executive AI seats, not chatbots: a human remains on the last irreversible click; unsourced numbers are refused; and automation that produced volume with zero outcomes was removed.
 
-**Buy now:** $73,761. HUD’s own GitHub estimator (31 Aug 2026) scored this same eight-repo bundle at a point of **$89,481** (44% Promising, range $61,067–$350,557). Four live products listed at the $12,000 per-repo form cap; HUD’s points on those four were already higher. The $350k top is imputed-perfect, not cash. Package conversation is the $89,481 point, non-exclusive.
+Buy now: $73,761. HUD’s own GitHub estimator, run 31 Aug 2026, scored this same eight-repo bundle at a $89,481 point value (44% Promising; range $61,067–$350,557). Four live products hit HUD’s $12,000/repo form cap, with HUD’s point scores for those four already higher. The $350k ceiling is an imputed-perfect scenario, not cash. Package conversation: $89,481 point value, non-exclusive.
 
-## Compound listing
+AIPA_AITCF — AI Tech Co-Founder / CTO AIPA: Telegram control plane (/code, /fix → real GitHub PRs; human last click); CRM hub with HubSpot deal staging; fail-closed GEO/AEO publisher + live visibility audit; and a Monday Atlas lead machine that reads the Atlas snapshot, audits businesses against the live API, and stages qualified HubSpot contacts/deals with audit + angle + one-click send. The script never emails; the operator taps. Also includes the Atuona AI film compiler (/film build → VO + music → MP4; /films gallery) and five-provider LLM failover.
 
-| Repo | What a lab is actually buying traces of |
-|---|---|
-| AIPA_AITCF | **AI Tech Co-Founder (CTO AIPA).** Telegram control plane (`/code` `/fix` open real GitHub PRs, human last click). **CRM hub:** form → HubSpot deal, multi-agent `POST /api/crm-event` (code patterns; the CRM dump is out of scope). **Marketing engine:** fail-closed daily GEO/AEO publisher + live visibility audit at `/api`. **Monday Atlas lead machine:** reads the Atlas snapshot, audits each business on that same API, opens a HubSpot contact+deal at act-today with audit + angle + one-click send on the note. The script never emails. The operator taps; HubSpot then runs sent-stage + follow-up. **AI film:** Atuona compiler in this repo — `/film build` (VO + music → mp4), `/films` gallery. Five-provider LLM chain (Anthropic zero → OpenAI in 2.4s, nothing dropped). |
-| VibeJobHunterAIPA_AIMCF | **AI Marketing Co-Founder (CMO AIPA) in the same repo as the hunter.** LangGraph job hunt, 131-test 4-layer eval, scrape + MCP. LinkedIn CMO posts + founder outreach. Scored routing: who is worth a letter vs who is noise. Auto-apply was removed after it produced volume and zero outcomes. Human on the last click. |
-| EspaLuzWhatsApp | Bilingual ES/EN WhatsApp commercial messaging — real tool-use, not a notebook |
-| EspaLuz_Influencer | Live publishing agent, grounded daily cadence, fail-closed on unsourced numbers |
-| EspaLuzFamilybot | Telegram family advisor, bilingual ES/EN, per-family memory + RAG |
-| dragontrade-agent | **Two seats in one tree.** Paper trading with a human on the last click (never live money). **Algom Alpha X agent:** scheduled posts, engagement loop (reply + follow real accounts), X lead search → HubSpot client deals. Rate-limits are real; irreversible money still requires the last click. |
-| atlas-captures | **Ad-angle time-series data, not just code.** Weekly Monday snapshot of which creative angles are observably running. Detect, not predict — it refuses to forecast. This is the data the Monday lead machine in AITCF reads, then qualifies on the live visibility API and stages into HubSpot. Live board: https://webhook.aideazz.xyz/whitespace/atlas.html |
-| AILA | Life-assistant codebase (paused) — governed longitudinal memory, distinct from the ops fleet |
+VibeJobHunterAIPA_AIMCF — AI Marketing Co-Founder / CMO AIPA + Job Hunter: LangGraph job hunt, scrape + MCP, 131-test / 4-layer eval, LinkedIn CMO content and founder outreach. Scored routing decides who deserves a letter vs. who is noise. Auto-apply was removed after producing volume with zero outcomes. Human on the last click.
 
-## Tool traces in the trees
+EspaLuzWhatsApp: emotionally intelligent bilingual ES/EN Spanish tutor for expats across 21 Spanish-speaking countries, with commercial WhatsApp messaging and real tool-use.
 
-LangGraph, WhatsApp Cloud API, Telegram Bot API, MCP servers, Playwright / Bright Data scrape, five-provider LLM failover, HubSpot APIs (patterns in code; the CRM dump is out of scope), Resend, X/Twitter engagement, ffmpeg film compile, PM2, TypeScript + Python.
+EspaLuz_Influencer: live publishing agent with grounded daily cadence and fail-closed handling of unsourced numbers.
 
-Also live, not in this licence: public AI Ops Wiki of named production failure modes, verified from logs.
+EspaLuzFamilybot: emotionally intelligent bilingual ES/EN Spanish tutor/advisor for expat families across 21 Spanish-speaking countries, running on Telegram with per-family memory + RAG and real tool-use.
 
-## Terms I will not move
+dragontrade-agent: two AI seats in one tree — paper trading with human last-click control (never live money) and the Algom Alpha X agent: scheduled posts, engagement loop, X lead search → HubSpot client deals. Rate limits are real; irreversible financial actions require the last click.
 
-- Non-exclusive licence of a copy
-- I keep copyright, brand, domains, products running
-- Out of scope: keys, HubSpot CRM contents, chat logs, customer PII, client material
+atlas-captures: ad-angle time-series data, not just code. Weekly snapshots of observable creative angles in-market. Detects, does not predict. Feeds the Monday lead machine in AITCF, which qualifies prospects through the live visibility API before staging them in HubSpot.
 
-## Proof
+AILA: paused life-assistant AI codebase with governed longitudinal memory, architecturally distinct from the ops fleet.
 
-- Hub: https://aideazz.xyz/portfolio
-- Audit API (GEO/AEO surface, and the Monday qualifier): https://aideazz.xyz/api
-- Atlas board: https://webhook.aideazz.xyz/whitespace/atlas.html
-- Wiki: https://aideazz.xyz/ai-ops-wiki.html
-- Podcast: https://podcast.aideazz.xyz/
+Tool traces: LangGraph, WhatsApp Cloud API, Telegram Bot API, MCP, Playwright / Bright Data, five-provider LLM failover, HubSpot APIs, Resend, X/Twitter engagement, ffmpeg, PM2, TypeScript + Python.
+
+Also live but outside this licence: the public AI Ops Wiki documenting named production failure modes verified from logs.
+
+Terms: non-exclusive licence to a copy. I retain copyright, brand, domains, and running products. Excluded: keys/credentials, HubSpot CRM contents, chat logs, customer PII, and client material.
+
+Proof: Hub — https://aideazz.xyz/portfolio · Audit API — https://aideazz.xyz/api · Atlas — https://webhook.aideazz.xyz/whitespace/atlas.html · Wiki — https://aideazz.xyz/ai-ops-wiki.html · Podcast — https://podcast.aideazz.xyz/
