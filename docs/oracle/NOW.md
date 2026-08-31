@@ -111,21 +111,23 @@ git log keeps the record.
   lost-update **fixed and live**. Oracle `cto-aipa` at `a3e29b4`,
   `dist/resend-webhook.js` has `patchNoteStamp`, PM2 created
   23:16:37 after the file (23:16:35). Session closed. Elena rest.
-- **NEXT:** Elena tomorrow: HUD number; write atrium@ / support@
-  if not yet done. No deploy. No `.hire-trigger`.
+- **NEXT:** HUD quote is in: **$89,481** point ($61k–$351k, 44%).
+  Elena: Book a call + founders letter + NDA. Also atrium@ /
+  support@ if not written. No deploy. No `.hire-trigger`.
 - **VERIFIED BY:** Deploy run 33341368302 OK. Live grep
   `exports.patchNoteStamp` in `dist/resend-webhook.js`. PM2
   online, uptime from 23:16:37Z, 0 unstable restarts.
 - **RISK:** Oracle HEAD is `a3e29b4` (one verify commit behind
   `main` — docs/script only). Do not `git pull` on the box.
   Do not mint `HUD_API_KEY`. Bounce-task copy on this deal is
-  still the old “nobody got it” text.
+  still the old “nobody got it” text. HUD $350k top is imputed
+  fantasy — do not bank it. Repos were public until 30 Aug.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Connected. 8-repo check running. | **Elena: wait for number** |
+| 1 | **HUD Vendor — non-exclusive training licence** | Quote **$89,481** point / 44% Promising | **Elena: Book a call** + founders@ + NDA |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
