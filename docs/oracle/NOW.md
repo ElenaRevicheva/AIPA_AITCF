@@ -107,24 +107,23 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Elena found HUD briefs at `datavendor.ai/briefs` (Tier 2).
-  Four HUD-posted RFPs; **Enterprise Codebase Data Opportunity $100,000
-  total** is the listing fit. Card Apply is dead — not DataFactor theater.
-  Apply = an offer. Do not email the lab off-platform (§4.1 RFP Party).
-- **NEXT:** Elena: open the $100k **title** (not the card Apply) and
-  screenshot the full brief. If Apply still dead inside, send Megan ping
-  (`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` on the HUD
-  branch). AfterQuery + Rwazi + Plata still move. Refuse exclusive DSA.
-- **VERIFIED BY:** User screenshot 31 Aug 12:51 Panama, logged in as
-  Aldeazz AI Lab Tier 2 Vendor. Four HUD cards; $100k on codebase brief.
-- **RISK:** Treating $100k as a cheque (brief budget can split). Applying
-  off-platform. Spraying all four briefs. Confusing with DataFactor jobs.
+- **DONE:** Elena opened the **$100k Enterprise Codebase** brief. It is a
+  **no-bid**. Must-haves (100 PRs, 10 contributors, 100k–10M LOC, >25%
+  tests, pre-AI human code) are a company monorepo. AITCF: 24 merged PRs,
+  71,693 LOC, 1 human + agents, created Oct 2025. Listing stays for
+  tool-use labs, not this RFP.
+- **NEXT:** Elena: send Megan no-bid ping (do not Apply). AfterQuery +
+  Rwazi + Plata still move. Refuse exclusive DSA.
+- **VERIFIED BY:** User pasted Must have + $5–100k/codebase + 0 applicants.
+  AITCF measured 31 Aug: 1078 commits (pass), 24 merged PRs, 71693 LOC.
+- **RISK:** Applying anyway / padding PRs or contributors. Treating $100k
+  as a cheque. Emailing the lab (§4.1). Confusing with DataFactor jobs.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. `/briefs` shows HUD **Enterprise Codebase $100k** (Apply on cards dead) | **Elena:** open that brief title + screenshot. If Apply still dead, ping Megan. Do not email the lab. $100k ≠ cheque |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. $100k codebase brief = **no-bid** (must-haves miss) | **Elena:** send Megan no-bid ping. Do not Apply. Listing stays for other matches |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
