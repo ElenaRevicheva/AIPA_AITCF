@@ -62,6 +62,8 @@ not the repo sale (§3.2 DSA is). HUD’s cap if they fail her: **$1,000**
 use restrictions / indemnity: **none** (§8.3 + §9.2). One rule: labs
 Megan introduces go through HUD; Lazarus/Turing stay off this board.
 After Finish: send `hud-vendor-megan-followup.txt`. Then `sent HUD Megan`.
+If Megan says public helps the proposal, **then** Go live. Do not Go
+live before she answers. Do not put hardship in the email.
 
 ### Recommended checks (22 failed) — do not chase
 
