@@ -93,6 +93,9 @@ mustInclude(text, [
   'paper trading',
   'Deputy CEO',
   'E-GOV OPERATOR',
+  'Russia',
+  'Fundery',
+  'executive bar in code',
 ]);
 mustNotInclude(text, [
   'Nine Systems',

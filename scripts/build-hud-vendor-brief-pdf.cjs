@@ -502,36 +502,39 @@ async function main() {
 
   newPage();
   label('WHO BUILT THIS');
-  ensure(78);
+  const who = [
+    'Two of the seats below were in Russia. Seven years as Deputy CEO and Chief Legal Officer of JSC E-GOV OPERATOR, Russia (2011-2018): board-level public-sector digital transformation, holding IT, legal and compliance in a regulated environment. Second Russia seat: Deputy CEO, Business Development at Fundery (fintech, 2017-2018). Then an operational co-founder seat at OmniBazaar.',
+    'This Lab is a deliberate pivot into applied AI engineering, not a hobby stack. Same standard I used to impose on vendors: measure at the edge, fail closed, write the failure down. The 131-test eval harness, five-provider LLM chain, fail-closed publisher, and public AI Ops Wiki are that executive bar in code. I am architect, reviewer, and on-call for the fleet.',
+  ];
+  const whoInner = maxW - 24;
+  const whoLines = [];
+  who.forEach((para, i) => {
+    wrapTo(para, 8, font, whoInner).forEach((ln) => whoLines.push(ln));
+    if (i !== who.length - 1) whoLines.push('');
+  });
+  const whoBoxH = 22 + whoLines.length * 10 + 12;
+  ensure(whoBoxH + 8);
   page.drawRectangle({
     x: left,
-    y: y - 64,
+    y: y - whoBoxH + 12,
     width: maxW,
-    height: 76,
+    height: whoBoxH,
     color: navy,
   });
-  page.drawRectangle({ x: left, y: y + 10, width: maxW, height: 3, color: gold });
+  page.drawRectangle({ x: left, y: y + 8, width: maxW, height: 3, color: gold });
   page.drawText('ELENA REVICHEVA  |  AIDEAZZ AI LAB  |  PANAMA', {
     x: left + 12,
-    y: y - 6,
+    y: y - 4,
     size: 8,
     font: fontB,
     color: gold,
   });
-  const who = [
-    'Seven years as Deputy CEO and Chief Legal Officer of JSC E-GOV OPERATOR (2011-2018): board-level public-sector digital transformation, holding IT, legal and compliance in a regulated environment. Then fintech (Fundery, Deputy CEO Business Development) and an operational co-founder seat at OmniBazaar.',
-    'This Lab is a deliberate pivot into applied AI engineering, not a hobby stack. Same standard I used to impose on vendors: measure at the edge, fail closed, write the failure down. The 131-test eval harness, five-provider LLM chain, fail-closed publisher, and public AI Ops Wiki are that executive bar in code. I am architect, reviewer, and on-call for the fleet.',
-  ];
-  let wy = y - 20;
-  for (const para of who) {
-    for (const line of wrapTo(para, 8, font, maxW - 24)) {
-      page.drawText(line, { x: left + 12, y: wy, size: 8, font, color: white });
-      wy -= 10;
-    }
-    wy -= 2;
+  let wy = y - 18;
+  for (const line of whoLines) {
+    if (line) page.drawText(line, { x: left + 12, y: wy, size: 8, font, color: white });
+    wy -= 10;
   }
-  y -= 80;
-  gap(6);
+  y -= whoBoxH + 6;
 
   label('WHY EACH SYSTEM EXISTS  -  AND HOW IT RUNS NOW');
   text(
