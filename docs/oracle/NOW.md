@@ -165,8 +165,19 @@ work. Port what you want by hand; never reset.
 - No Claude MCP in Cursor. Gmail MCP in Cursor needs auth. HubSpot from Cursor cloud
   agents routes through Oracle (no `api.hubapi.com` egress).
 
-## ✅ JUST LANDED (29–30 Aug)
+## ✅ JUST LANDED (29–31 Aug)
 
+- **🆕 Elena's own CRM is live: `webhook.aideazz.xyz/queue/`** (`2eff542`, 31 Aug).
+  Two cards — an employer to apply to and a client to contact — each with the draft
+  already written and one button. Reads table `daily_queue` in **our Oracle DB, not
+  HubSpot**: her states (`new/working/done/skipped`), because HubSpot has no urgency
+  field and VJH's real states were being stuffed into sales stages that mean something
+  else (`lead_parked` → `appointmentscheduled`). **The page makes ZERO HubSpot calls —
+  not even a read.** `hubspot_deal_id` is a deep-link only. Behind the same basic auth
+  as `/ops/`; **`/cto/` stays public on purpose** (one-click outreach links are opened
+  from email clients that cannot authenticate) — do not "secure" it.
+  **Client lane is empty: its feeder is not wired yet — that is the next increment,
+  not a bug.** Seeded with 10 live roles, 9 tailored.
 - **ai-native-builder.com wired into VJH** — densest source in the fleet, 72% gate pass
   vs ~21%. Memory: `project_ai_native_builder_source`.
 - **Three pipeline bugs fixed** (`36e985c`) after that source ran a full day producing
