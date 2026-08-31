@@ -197,6 +197,42 @@ export async function getQueue(lane: QueueLane, limit = 5): Promise<QueueItem[]>
   }
 }
 
+/** One record by id, for the record page. Returns null when it does not exist. */
+export async function getQueueItemById(id: string): Promise<QueueItem | null> {
+  await initDailyQueueTable();
+  const connection = await getPoolConnection();
+  try {
+    const res = await connection.execute(
+      `SELECT RAWTOHEX(id) AS id, lane, external_key, title, company, action_url, draft,
+              draft_tailored, draft_provider, draft_reason, score, status,
+              hubspot_deal_id, TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS created_at
+         FROM daily_queue WHERE id = HEXTORAW(:id)`,
+      { id: id.replace(/-/g, '') },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT, fetchInfo: FETCH_DRAFT },
+    );
+    const r = ((res.rows as Record<string, unknown>[]) || [])[0];
+    if (!r) return null;
+    return {
+      id: String(r.ID),
+      lane: String(r.LANE) as QueueLane,
+      externalKey: String(r.EXTERNAL_KEY ?? ''),
+      title: String(r.TITLE ?? ''),
+      company: String(r.COMPANY ?? ''),
+      actionUrl: String(r.ACTION_URL ?? ''),
+      draft: String(r.DRAFT ?? ''),
+      draftTailored: Number(r.DRAFT_TAILORED) === 1,
+      draftProvider: r.DRAFT_PROVIDER ? String(r.DRAFT_PROVIDER) : undefined,
+      draftReason: r.DRAFT_REASON ? String(r.DRAFT_REASON) : undefined,
+      score: r.SCORE == null ? undefined : Number(r.SCORE),
+      status: String(r.STATUS) as QueueStatus,
+      hubspotDealId: r.HUBSPOT_DEAL_ID ? String(r.HUBSPOT_DEAL_ID) : undefined,
+      createdAt: r.CREATED_AT ? String(r.CREATED_AT) : undefined,
+    };
+  } finally {
+    await connection.close();
+  }
+}
+
 /** Move an item into one of HER states. Writes nothing to HubSpot. */
 export async function setQueueStatus(id: string, status: QueueStatus): Promise<boolean> {
   await initDailyQueueTable();

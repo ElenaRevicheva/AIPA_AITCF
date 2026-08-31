@@ -14,7 +14,8 @@
  * hold a secret, so same-origin plus browser auth is the honest option.
  */
 import type { Express, Request, Response } from 'express';
-import { getQueue, setQueueStatus, getQueueCounts, type QueueStatus } from './daily-queue';
+import { getQueue, setQueueStatus, getQueueCounts, getQueueItemById, type QueueStatus } from './daily-queue';
+import { getRecordTimeline } from './record-timeline';
 import { QUEUE_PAGE } from './queue-page';
 
 const ALLOWED: QueueStatus[] = ['new', 'working', 'done', 'skipped'];
@@ -47,6 +48,28 @@ export function registerQueueRoutes(app: Express): void {
     } catch (e) {
       console.error('[queue] today failed:', e);
       res.status(500).json({ error: (e as Error).message?.slice(0, 200) });
+    }
+  });
+
+  // Record page data: history first, then the draft. The id is looked up server
+  // side rather than taking the email as a query param -- a recipient address is
+  // personal data and does not belong in a URL, a log line or a referrer header.
+  app.get('/queue/api/record/:id', async (req: Request, res: Response) => {
+    const id = String(req.params.id || '');
+    if (!/^[0-9A-Fa-f]{32}$/.test(id)) return res.status(400).json({ error: 'bad id' });
+    try {
+      const item = await getQueueItemById(id);
+      if (!item) return res.status(404).json({ error: 'not found' });
+      const timeline = await getRecordTimeline({
+        queueId: item.id,
+        dealId: item.hubspotDealId,
+        // Client records carry the recipient in `company`; hiring records do not.
+        email: item.lane === 'client' && item.company.includes('@') ? item.company : undefined,
+      });
+      return res.set('cache-control', 'no-store').json({ item, timeline });
+    } catch (e) {
+      console.error('[queue] record failed:', e);
+      return res.status(500).json({ error: (e as Error).message?.slice(0, 200) });
     }
   });
 

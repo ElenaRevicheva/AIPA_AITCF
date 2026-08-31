@@ -1,15 +1,18 @@
 /**
- * The /queue/ page markup.
+ * The /queue/ page markup — one CRM, all streams, HubSpot-shaped.
  *
- * Kept in its own module because it is a large template literal and mixing it
- * into the route file made both harder to read.
+ * Layout follows the Income ops dashboard Elena already reads (stat tiles, lane
+ * tabs, dense table) so the two feel like one product rather than two
+ * experiments.
  *
- * Layout follows the Income ops dashboard Elena already reads — stat tiles,
- * lane tabs, a dense table — so the two pages feel like one product. The
- * difference is what a row opens into: the ops dashboard could only ever link
- * out to HubSpot, because HubSpot is where the content lived. Here the draft is
- * in our own database, so a row expands in place into the letter itself plus
- * the one action that matters. Density from the dashboard, drafts from the queue.
+ * Opening a row shows HISTORY FIRST, then the draft, then the actions — her
+ * explicit choice, 31 Aug 2026, and the HubSpot instinct: opening a record means
+ * picking up a thread, so the first question is what has already happened. The
+ * draft below it is the answer to "and what do I do now". Acting before reading
+ * is how a second cold email reaches someone who already replied.
+ *
+ * The timeline is assembled from our own database (crm_event_log, outreach_log,
+ * daily_queue). The page still issues NO HubSpot call of any kind.
  */
 export const QUEUE_PAGE = `<!doctype html>
 <html lang="en"><head>
@@ -60,15 +63,27 @@ export const QUEUE_PAGE = `<!doctype html>
   .pill.ok{color:var(--ok);border-color:var(--ok)}
   .pill.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-soft)}
   .sc{font-variant-numeric:tabular-nums;font-weight:600}
-  .d{padding:0 14px 18px;background:var(--accent-soft)}
+  .d{padding:4px 14px 20px;background:var(--accent-soft)}
+  .sec{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);
+    font-weight:700;margin:14px 0 9px}
+  .tl{border-left:2px solid var(--line);margin:0 0 4px;padding:0 0 0 15px}
+  .ev{position:relative;padding:0 0 13px}
+  .ev:before{content:"";position:absolute;left:-21px;top:5px;width:9px;height:9px;border-radius:50%;
+    background:var(--mut);border:2px solid var(--bg)}
+  .ev.email:before{background:var(--client)}
+  .ev.queue:before{background:var(--accent)}
+  .ev .when{font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+  .ev .what{font-weight:600;font-size:14px}
+  .ev .more{font-size:13px;color:var(--mut)}
   pre{white-space:pre-wrap;font:13.5px/1.62 ui-sans-serif,system-ui,sans-serif;background:var(--card);
-    border:1px solid var(--line);border-radius:9px;padding:15px;margin:0 0 13px;max-height:400px;overflow:auto}
+    border:1px solid var(--line);border-radius:9px;padding:15px;margin:0 0 13px;max-height:360px;overflow:auto}
   .row{display:flex;gap:9px;flex-wrap:wrap}
   button,a.btn{font:14px/1 inherit;padding:10px 15px;border-radius:8px;border:1px solid var(--line);
     background:var(--card);color:var(--fg);cursor:pointer;text-decoration:none;display:inline-block}
   a.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
   button:hover,a.btn:hover{border-color:var(--fg)}
-  .empty{padding:30px 14px;color:var(--mut);text-align:center}
+  .empty{padding:26px 14px;color:var(--mut);text-align:center}
+  .quiet{color:var(--mut);font-size:13px;padding:2px 0 10px}
   footer{max-width:1120px;margin:24px auto 0;color:var(--mut);font-size:12px;
     border-top:1px solid var(--line);padding-top:12px}
   @media(max-width:760px){.hideS{display:none}h1{font-size:24px}}
@@ -81,12 +96,12 @@ export const QUEUE_PAGE = `<!doctype html>
   <th>Lane</th><th>What</th><th class="hideS">Who</th><th>Score</th>
   <th class="hideS">Draft</th><th class="hideS">Added</th>
 </tr></thead><tbody id="rows"></tbody></table>
-<footer>Reads the AIdeazz operational database only. HubSpot is never written to from this page.</footer>
+<footer>Reads the AIdeazz operational database only. HubSpot is never written to, or read from, by this page.</footer>
 </div>
 <script>
 var E=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
   return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
-var DATA={hiring:[],client:[],counts:{}}, TAB='all', OPEN=null;
+var DATA={hiring:[],client:[],counts:{}}, TAB='all', OPEN=null, RECORD=null;
 
 function load(){
   fetch('api/today',{credentials:'same-origin'}).then(function(r){
@@ -116,7 +131,7 @@ function render(){
   var ready=all.filter(function(x){return x.draftTailored;}).length;
   var done=(c.hiring_done||0)+(c.client_done||0)+(c.hiring_skipped||0)+(c.client_skipped||0);
   document.getElementById('sub').textContent=
-    'Two lanes — live from the AIdeazz database · '+(h+cl)+' open items';
+    'All streams — live from the AIdeazz database · '+(h+cl)+' open items';
   document.getElementById('tiles').innerHTML=
     tile('Employers',h,'to apply to')+
     tile('Clients',cl,'to contact')+
@@ -128,6 +143,19 @@ function render(){
   document.getElementById('rows').innerHTML = list.length
     ? list.map(function(p){ return row(p[0],p[1]); }).join('')
     : '<tr><td colspan="6" class="empty">Nothing waiting in this lane.</td></tr>';
+}
+
+function timelineHtml(){
+  if(!RECORD){ return '<div class="quiet">Loading history…</div>'; }
+  var t=RECORD.timeline||[];
+  if(!t.length){ return '<div class="quiet">No history yet — this record has not been contacted or moved.</div>'; }
+  return '<div class="tl">'+t.map(function(e){
+    return '<div class="ev '+E(e.source)+'">'+
+      '<div class="when">'+E(e.at)+'</div>'+
+      '<div class="what">'+E(e.title)+'</div>'+
+      (e.detail?'<div class="more">'+E(e.detail)+'</div>':'')+
+      '</div>';
+  }).join('')+'</div>';
 }
 
 function row(lane,x){
@@ -148,7 +176,10 @@ function row(lane,x){
     '<td class="hideS c">'+E(x.createdAt||'')+'</td></tr>';
   if(open){
     html+='<tr><td colspan="6" class="d">'+
-      (x.draft?'<pre id="d-'+x.id+'">'+E(x.draft)+'</pre>':'<div class="empty">No draft stored.</div>')+
+      '<div class="sec">History</div>'+
+      timelineHtml()+
+      '<div class="sec">Draft</div>'+
+      (x.draft?'<pre id="d-'+x.id+'">'+E(x.draft)+'</pre>':'<div class="quiet">No draft stored.</div>')+
       '<div class="row">'+
       (x.actionUrl?'<a class="btn primary" target="_blank" rel="noopener" href="'+E(x.actionUrl)+'">'+verb+'</a>':'')+
       (x.draft?'<button onclick="event.stopPropagation();cp(\\''+x.id+'\\')">Copy draft</button>':'')+
@@ -160,8 +191,14 @@ function row(lane,x){
   return html;
 }
 
-function tog(id){ OPEN=(OPEN===id)?null:id; render(); }
-function setTab(t){ TAB=t; OPEN=null; render(); }
+function tog(id){
+  if(OPEN===id){ OPEN=null; RECORD=null; render(); return; }
+  OPEN=id; RECORD=null; render();
+  fetch('api/record/'+id,{credentials:'same-origin'})
+    .then(function(r){ return r.ok?r.json():null; })
+    .then(function(d){ if(d && OPEN===id){ RECORD=d; render(); } });
+}
+function setTab(t){ TAB=t; OPEN=null; RECORD=null; render(); }
 function cp(id){
   var el=document.getElementById('d-'+id);
   if(el&&navigator.clipboard){ navigator.clipboard.writeText(el.textContent); }
@@ -169,7 +206,7 @@ function cp(id){
 function act(id,status){
   fetch('api/act',{method:'POST',credentials:'same-origin',
     headers:{'content-type':'application/json'},
-    body:JSON.stringify({id:id,status:status})}).then(function(){ OPEN=null; load(); });
+    body:JSON.stringify({id:id,status:status})}).then(function(){ OPEN=null; RECORD=null; load(); });
 }
 load();
 </script></body></html>`;
