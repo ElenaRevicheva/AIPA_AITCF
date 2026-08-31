@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-31 11:20 UTC | HUD work-sample PDF (replace Nine Systems) | Packet lives on `cursor/hud-vendor-license-1c49`: listing memo PDF + `HUD_VENDOR_LICENSE.md`. This file only. | this commit |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,13 +107,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** AfterQuery delivered atrium@ + support@. ENTREGADO
-  lost-update **fixed and live**. Oracle `cto-aipa` at `a3e29b4`,
-  `dist/resend-webhook.js` has `patchNoteStamp`, PM2 created
-  23:16:37 after the file (23:16:35). Session closed. Elena rest.
-- **NEXT:** HUD onboarding work samples: attach the listing memo
-  PDF from the HUD branch — **never** Nine Systems. Then NDA,
-  Cal.com 9:40 Panama, founders@. No deploy. No `.hire-trigger`.
+- **DONE:** HUD listing memo PDF is on `cursor/hud-vendor-license-1c49`
+  (`c2a2f7a`): 2 pages, 12 clickable URI annotations, not Nine
+  Systems. AfterQuery atrium@ + support@ still delivered; Oracle
+  deploy from that session is untouched.
+- **NEXT:** Elena: download
+  `docs/selling/attachments/HUD_Vendor_NonExclusive_Licence_Brief.pdf`
+  from PR #38, attach it on HUD Work samples with portfolio + /api,
+  never Nine Systems. Then NDA, Cal.com 9:40 Panama, founders@.
+  No deploy. No `.hire-trigger`.
 - **VERIFIED BY:** Deploy run 33341368302 OK. Live grep
   `exports.patchNoteStamp` in `dist/resend-webhook.js`. PM2
   online, uptime from 23:16:37Z, 0 unstable restarts.
