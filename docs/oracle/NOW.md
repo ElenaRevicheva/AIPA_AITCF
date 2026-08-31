@@ -175,6 +175,16 @@ work. Port what you want by hand; never reset.
 - **Board-quality guards:** `board_hygiene.py`, `scripts/qualify_job_board.py`, weekly
   Telegram watch (Tue 06:00 Panama).
 - **Wiki incident published** `2026-08-30-marked-done-before-anyone-read-them`, `blog: yes`.
+- **Hiring Notes now carry a REAL cover letter** (`0eeda5f`, live 31 Aug). Was the same
+  three sentences for all 185 jobs with `[Edit this stub…]` left in the body. Now drafted
+  against the actual posting via `src/cover-letter.ts`, wired at the single funnel point
+  `buildHiringActionPackage` — so serpapi_jobs, vjh_review and response_detector all get
+  it without touching the Python side. **The stub is the floor:** any failure keeps the
+  old stub and the Note says *why* it is boilerplate. Prefers Greenhouse/Ashby **public
+  JSON APIs** over scraping (Ashby's HTML yields ~33 chars). Coverage measured:
+  Greenhouse/Ashby/Wellfound/Torre tailor; weworkremotely 403s the honest UA → stub.
+  **Do not fix that with a spoofed UA.** VJH's Python `ContentGeneratorV2` is still dead
+  code (0 callers, 0 files) — left alone deliberately, not missed.
 - **`/opspw` — ops dashboard lock resettable from Telegram** (`2faf9a7`). The `/ops/`
   password was lost; a bcrypt hash cannot be recovered, only replaced. Helper
   `scripts/oracle-resilience/set-opspw-stdin.sh` → Oracle `/home/ubuntu/`, mode 700.

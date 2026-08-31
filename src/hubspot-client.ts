@@ -887,6 +887,13 @@ export function buildHiringActionPackage(input: {
   coverLetter?: string | undefined;
   notes?: string | undefined;
   source?: string | undefined;
+  /**
+   * Provenance of the letter, from `generateCoverLetter`. Optional so existing
+   * callers keep working. When the draft is boilerplate, the Note says so —
+   * a stub that looks like a tailored letter is the failure this whole change
+   * exists to end, and it would be invisible from the card.
+   */
+  letterMeta?: { tailored: boolean; provider?: string | undefined; reason?: string | undefined } | undefined;
 }): string {
   const extracted =
     (input.coverLetter || '').trim() ||
@@ -925,12 +932,17 @@ export function buildHiringActionPackage(input: {
       : '',
     input.source ? `<strong>Source:</strong> ${escHs(input.source)}` : '',
     '',
-    `<strong>--- COVER / OUTREACH LETTER (edit, then paste) ---</strong>`,
+    input.letterMeta?.tailored
+      ? `<strong>--- COVER LETTER — drafted against this posting${input.letterMeta.provider ? ` (${escHs(input.letterMeta.provider)})` : ''}. Read it, then paste. ---</strong>`
+      : `<strong>--- COVER / OUTREACH LETTER (edit, then paste) ---</strong>`,
+    input.letterMeta && !input.letterMeta.tailored && input.letterMeta.reason
+      ? `<em>⚠️ Boilerplate — not tailored to this posting: ${escHs(input.letterMeta.reason)}. Rewrite before sending.</em>`
+      : '',
     `<pre style="white-space:pre-wrap;font-family:inherit">${escHs(letter)}</pre>`,
     '',
     `<strong>--- CHECKLIST ---</strong>`,
     `[ ] Open Apply link`,
-    `[ ] Edit letter`,
+    input.letterMeta?.tailored ? `[ ] Read letter (drafted for this role — check it before sending)` : `[ ] Write the letter (the one below is boilerplate)`,
     `[ ] Attach resume`,
     `[ ] Submit`,
     `[ ] Move deal stage after you apply`,
@@ -1671,6 +1683,31 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
     // card (now that multiple agents — the bot's Remotive search + Path C — can find
     // the same job). Returns the existing deal instead of duplicating it.
     const dealName = `[${input.sourcePrefix || 'HIRING'}] ${input.jobTitle} @ ${input.company}`;
+
+    // Draft a letter for THIS posting when VJH did not supply one — which is
+    // every SerpAPI job by design ("No cover letter pre-generated for SerpAPI
+    // path") and, in practice, nearly all of them. Never throws: on any failure
+    // `letter` is '' and buildHiringActionPackage keeps its existing stub, so
+    // the deal, the Note and the apply link are unaffected.
+    let letterMeta: { tailored: boolean; provider?: string | undefined; reason?: string | undefined } | undefined;
+    let draftedLetter = input.coverLetter;
+    if (!draftedLetter?.trim()) {
+      const { generateCoverLetter } = await import('./cover-letter');
+      const drafted = await generateCoverLetter({
+        jobTitle: input.jobTitle,
+        company: input.company,
+        jobUrl: input.jobUrl,
+        score: input.score,
+        notes: input.notes,
+      });
+      if (drafted.letter) draftedLetter = drafted.letter;
+      letterMeta = { tailored: drafted.tailored, provider: drafted.provider, reason: drafted.reason };
+      console.log(
+        `[cover-letter] ${drafted.tailored ? `drafted via ${drafted.provider}` : `stub — ${drafted.reason}`}` +
+          ` (jd ${drafted.jdChars} chars): ${input.jobTitle.slice(0, 48)} @ ${input.company.slice(0, 32)}`,
+      );
+    }
+
     const actionPkg = buildHiringActionPackage({
       jobTitle: input.jobTitle,
       company: input.company,
@@ -1678,9 +1715,10 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       score: input.score,
       recruiterName: input.recruiterName,
       recruiterEmail: input.recruiterEmail,
-      coverLetter: input.coverLetter,
+      coverLetter: draftedLetter,
       notes: input.notes,
       source: input.source,
+      letterMeta,
     });
     const existing = await findDealByName(dealName);
     if (existing) {
