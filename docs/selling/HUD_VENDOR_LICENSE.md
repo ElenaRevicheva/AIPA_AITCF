@@ -56,14 +56,11 @@ the $89,481 point value.
 Paste: `docs/selling/drafts/hud-vendor-megan-followup.txt`
 From `aipa@aideazz.xyz`, **reply on the Cal.com / call thread**.
 
-**Tier 2 — she may Finish.** No upgrade fee in §§1–12. This paper is
-not the repo sale (§3.2 DSA is). HUD’s cap if they fail her: **$1,000**
-(§8.2). Her cap if she breaches non-circumvent / confidentiality /
-use restrictions / indemnity: **none** (§8.3 + §9.2). One rule: labs
-Megan introduces go through HUD; Lazarus/Turing stay off this board.
-After Finish: send `hud-vendor-megan-followup.txt`. Then `sent HUD Megan`.
-If Megan says public helps the proposal, **then** Go live. Do not Go
-live before she answers. Do not put hardship in the email.
+**Tier 2 — signed 31 Aug.** Other companies like HUD stay open.
+Non-circumvent (§4.1) is only **RFP Parties** (buyers posting projects
+on HUD) for access + two years — not a lock on the whole market.
+AfterQuery, Lazarus/Turing (pre-existing), and jobs continue. A lab
+Megan introduces goes through HUD. Do not exclusive-assign on a DSA.
 
 ### Recommended checks (22 failed) — do not chase
 
