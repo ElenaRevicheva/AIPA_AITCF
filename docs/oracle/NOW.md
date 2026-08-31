@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-31 16:25 UTC | HUD listing Ready — price advice | `docs/oracle/NOW.md` (main) | pending |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,23 +107,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD call 31 Aug. Proposal may follow. HUD takes **20%** of
-  a sale. Listing `e568b5c8-…` at **$73,761** (In review). $12k is the
-  per-repo *suggested ceiling*, not a floor. Do not split listings to
-  beat $12k — same max ($96k). Split only for different buyers.
-- **NEXT:** Elena: PII-clean Describe so personal-data scan passes.
-  Wait for HUD proposal. Non-exclusive only. Do not bank 80% of $89k.
-- **VERIFIED BY:** Elena on the call (20% + several listings + own
-  price). Listing screenshots: 8 snapshots passed; PII scan failed on
-  email/handle in listing text.
-- **RISK:** A proposal is not cash. $350k is imputed. Do not volunteer
-  were-public. AfterQuery deploy untouched.
+- **DONE:** HUD listing `e568b5c8-…` is **Ready** (Draft ✓ Review ✓).
+  All mandatory checks passed (11/10). Buy now still **$73,761**.
+  PII-clean body is live. Do **not** raise every repo to $12k.
+- **NEXT:** Elena: Edit listing — raise **only** the four cap-hit
+  products toward HUD points if the field accepts >$12k (bundle then
+  $89,481). Leave AILA/atlas/dragontrade/AITCF. Prefer **Make private
+  to opportunity buyers**; do not public **Go live** at $73k. Wait for
+  HUD proposal. Refuse exclusive.
+- **VERIFIED BY:** Owner screenshots 31 Aug ~11:17–11:19 Panama:
+  Ready, 11 passed / 40 measured / 32 not gradable. Four at $12k cap;
+  AILA $4,264 0 LOC; atlas $4,137 0 LOC.
+- **RISK:** Padding 0-LOC assets to $12k is a tell. Public Go live
+  anchors $73k under HUD’s $89k point. Proposal ≠ cash. $350k imputed.
+  Do not volunteer were-public. AfterQuery deploy untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Call done. Listing **$73,761** In review. HUD **20%**. Proposal pending | **Elena: PII-clean listing** → wait for proposal. Refuse exclusive |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Ready.** Mandatory checks passed. **$73,761**. HUD **20%**. Proposal pending | **Elena:** raise only 4 cap-hit repos if form allows; else leave. **Private to opportunity buyers**, not public Go live. Refuse exclusive |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
