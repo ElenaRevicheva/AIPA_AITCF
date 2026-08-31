@@ -2,14 +2,25 @@ Paste into DataVendor listing → Describe.
 Do not volunteer “were public until 30 Aug.” Do not paste Nine Systems.
 Buy now on the listing is $73,761 (form cap $12,000/repo). HUD package point is $89,481.
 
+Verified in prod before this paste:
+- AIPA_AITCF = AI Tech Co-Founder (CTO AIPA). Telegram persona + /code /fix with
+  human last click. HubSpot CRM hub `/api/crm-event`. GEO/AEO marketing engine
+  (daily fail-closed publisher, visibility audit). Atuona film compiler in this
+  same repo (`/film build` → mp4, `/films` gallery).
+- VibeJobHunterAIPA_AIMCF = AI Marketing Co-Founder (CMO AIPA) in the SAME repo
+  as the LangGraph hunter. LinkedIn CMO posts + founder outreach. 131-test eval.
+  Auto-apply was removed after volume/zero outcomes.
+
 --- TITLE ---
-8 private production repos: bilingual tool-use, LangGraph, MCP, scrape
+AI tech + marketing co-founders: 8 private production repos (tool-use, MCP, scrape)
 
 --- ONE-LINER ---
-Eight private production codebases I solely own — WhatsApp/Telegram commercial tool-use, LangGraph job hunter with 131-test evals, ops brain with 5-provider LLM failover, ad-angle scrape data.
+Eight private production codebases I solely own — AITCF is a live AI tech co-founder (CRM hub, GEO/AEO engine, automated film compiler); AIMCF is a live AI marketing co-founder (LangGraph hunt + LinkedIn CMO). Exec seats, not generic bots.
 
 --- DESCRIPTION (Markdown) ---
 Non-exclusive training licence of **copies** of eight private production repos I solely own. I keep copyright, the AIdeazz AI Lab brand, the domains, and every product running. No copyright assignment. No exclusive. Production does not stop.
+
+These two flagship repos were built as **genuine exec seats**, not chatbots: a human is on the last irreversible click, unsourced numbers are refused, and a blast that produced volume with zero outcomes was removed.
 
 **Buy now:** $73,761. HUD’s own GitHub estimator (31 Aug 2026) scored this same eight-repo bundle at a point of **$89,481** (44% Promising, range $61,067–$350,557). Four live products listed at the $12,000 per-repo form cap; HUD’s points on those four were already higher. The $350k top is imputed-perfect, not cash. Package conversation is the $89,481 point, non-exclusive.
 
@@ -17,18 +28,18 @@ Non-exclusive training licence of **copies** of eight private production repos I
 
 | Repo | What a lab is actually buying traces of |
 |---|---|
-| VibeJobHunterAIPA_AIMCF | LangGraph job hunter, 131-test 4-layer eval, human on the last click, scrape + MCP |
+| AIPA_AITCF | **AI Tech Co-Founder (CTO AIPA).** Telegram control plane (`/code` `/fix` open real GitHub PRs, human last click). **CRM hub:** form → HubSpot deal, multi-agent `POST /api/crm-event` (code patterns; the CRM dump is out of scope). **Marketing engine:** fail-closed daily GEO/AEO publisher + live visibility audit. **AI film:** Atuona compiler in this same repo — persist shots, `/film build` (VO + music → mp4), `/films` gallery. Five-provider LLM chain (Anthropic zero → OpenAI in 2.4s, nothing dropped). |
+| VibeJobHunterAIPA_AIMCF | **AI Marketing Co-Founder (CMO AIPA) in the same repo as the hunter.** LangGraph job hunt, 131-test 4-layer eval, scrape + MCP. LinkedIn CMO posts + founder outreach. Scored routing: who is worth a letter vs who is noise. Auto-apply was removed after it produced volume and zero outcomes. Human on the last click. |
 | EspaLuzWhatsApp | Bilingual ES/EN WhatsApp commercial messaging — real tool-use, not a notebook |
 | EspaLuz_Influencer | Live publishing agent, grounded daily cadence, fail-closed on unsourced numbers |
 | EspaLuzFamilybot | Telegram family advisor, bilingual ES/EN, per-family memory + RAG |
-| AIPA_AITCF | Ops brain: Telegram control plane, HubSpot ledger (code patterns only), 5-provider LLM chain (Anthropic zero → OpenAI in 2.4s, nothing dropped) |
 | dragontrade-agent | Human-on-last-click paper trading / finance-tool traces. Never live money |
 | AILA | Personal-AI codebase (paused) — governed longitudinal memory, distinct from the ops fleet |
 | atlas-captures | Ad-angle time-series **data**, not only code. Detect, not predict |
 
 ## Tool traces in the trees
 
-LangGraph, WhatsApp Cloud API, Telegram Bot API, MCP servers, Playwright scrape, five-provider LLM failover, HubSpot APIs (patterns in code; the CRM dump is out of scope), Resend, PM2, TypeScript + Python.
+LangGraph, WhatsApp Cloud API, Telegram Bot API, MCP servers, Playwright scrape, five-provider LLM failover, HubSpot APIs (patterns in code; the CRM dump is out of scope), Resend, ffmpeg film compile, PM2, TypeScript + Python.
 
 Also live, not in this licence: public AI Ops Wiki of named production failure modes, verified from logs.
 
@@ -41,7 +52,7 @@ Also live, not in this licence: public AI Ops Wiki of named production failure m
 ## Proof
 
 - Hub: https://aideazz.xyz/portfolio
-- Audit API: https://aideazz.xyz/api
+- Audit API (the marketing engine’s GEO/AEO surface): https://aideazz.xyz/api
 - Wiki: https://aideazz.xyz/ai-ops-wiki.html
 - Podcast: https://podcast.aideazz.xyz/
 - aipa@aideazz.xyz · Panama · UTC-5
