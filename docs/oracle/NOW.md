@@ -107,19 +107,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Elena **sent Megan**. Tier 2 signed. Listing private. Go live
-  only if Megan says public helps. **datafactor.com careers is hiring
-  theater** — 22 roles, Apply dead, no Ashby/Greenhouse/Lever, none of
-  those titles on LinkedIn Jobs. 8-person 2025 lab (OnePrompt overlap)
-  selling *their* first-party data. Not a HUD clone. Do not upload repos.
-- **NEXT:** Do not wait on DataFactor Apply and do not spray 22 roles.
-  Elena: AfterQuery + Rwazi + Plata. One `hello@` only if she still wants
-  the door. Refuse exclusive on any HUD DSA.
-- **VERIFIED BY:** User: Apply not active. Search: no ATS board; no
-  LinkedIn Jobs matching the listed titles. Domain Sedo 15 Feb 2026
-  $12,900. Funding-round claim has no public named round.
-- **RISK:** Treating dead Apply as "check back later". Confusing with
-  datafactor.it (Italy). Off-platform HUD RFP contact. DSA exclusive.
+- **DONE:** Elena found HUD briefs at `datavendor.ai/briefs` (Tier 2).
+  Four HUD-posted RFPs; **Enterprise Codebase Data Opportunity $100,000
+  total** is the listing fit. Card Apply is dead — not DataFactor theater.
+  Apply = an offer. Do not email the lab off-platform (§4.1 RFP Party).
+- **NEXT:** Elena: open the $100k **title** (not the card Apply) and
+  screenshot the full brief. If Apply still dead inside, send Megan ping
+  (`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` on the HUD
+  branch). AfterQuery + Rwazi + Plata still move. Refuse exclusive DSA.
+- **VERIFIED BY:** User screenshot 31 Aug 12:51 Panama, logged in as
+  Aldeazz AI Lab Tier 2 Vendor. Four HUD cards; $100k on codebase brief.
+- **RISK:** Treating $100k as a cheque (brief budget can split). Applying
+  off-platform. Spraying all four briefs. Confusing with DataFactor jobs.
 
 ## 💰 MONEY QUEUE
 
