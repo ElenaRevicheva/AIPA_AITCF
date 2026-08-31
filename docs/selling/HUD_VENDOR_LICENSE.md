@@ -56,13 +56,12 @@ the $89,481 point value.
 Paste: `docs/selling/drafts/hud-vendor-megan-followup.txt`
 From `aipa@aideazz.xyz`, **reply on the Cal.com / call thread**.
 
-**Tier 2 agreement — still do not Finish.** §§1–8 are on screen.
-§8.2: HUD’s cap is the greater of fees paid in 12 months or **$1,000**.
-§8.3: that cap **does not** apply to confidentiality, use restrictions,
-**non-circumvention**, indemnity, willful misconduct/fraud. So a §4.1
-bypass is uncapped (matches 4.2 → 9.2). Still need §9 in full + any
-Fees + remaining survival sections (10–12). Do not write “I signed”
-to Megan until she did.
+**Tier 2 — she may Finish.** No upgrade fee in §§1–12. This paper is
+not the repo sale (§3.2 DSA is). HUD’s cap if they fail her: **$1,000**
+(§8.2). Her cap if she breaches non-circumvent / confidentiality /
+use restrictions / indemnity: **none** (§8.3 + §9.2). One rule: labs
+Megan introduces go through HUD; Lazarus/Turing stay off this board.
+After Finish: send `hud-vendor-megan-followup.txt`. Then `sent HUD Megan`.
 
 ### Recommended checks (22 failed) — do not chase
 

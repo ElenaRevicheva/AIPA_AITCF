@@ -1,10 +1,10 @@
-SUBJECT: Listing is private to opportunity buyers — ready for the matches you mentioned
-TO: Megan (reply on the 31 Aug Cal.com / HUD thread — use the address she used on the call)
+SUBJECT: Listing is private to opportunity buyers — Tier 2 signed — ready for the matches you mentioned
+TO: Megan (reply on the 31 Aug Cal.com / HUD thread)
 FROM: Elena Revicheva <aipa@aideazz.xyz>
-CC: none unless the thread already includes founders@hud.ai
 
-Do not attach Nine Systems. Do not volunteer were-public. Do not mention
-recommended-check fails or $350k. Do not Go live.
+Send AFTER you click Finish on the vendor agreement. Do not attach Nine
+Systems. Do not volunteer were-public. Do not mention recommended-check
+fails, §9.2, or $350k. Do not Go live.
 
 ---
 
@@ -12,7 +12,9 @@ Hi Megan,
 
 Thank you for the call this morning, and for saying you currently have opportunities that may be a fit.
 
-I did not take the listing public. It is **private to opportunity buyers**, so you can match a lab without a public Buy-now sticker.
+I signed the vendor agreement for Tier 2, as you recommended.
+
+I did not take the listing public. It is private to opportunity buyers, so you can match a lab without a public Buy-now sticker.
 
 https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443
 
