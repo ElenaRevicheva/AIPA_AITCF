@@ -1,12 +1,13 @@
 # HUD Vendor — non-exclusive training licence
 
-**Status (31 Aug 2026):** Call done. Listing
+**Status (31 Aug 2026, afternoon Panama):** Call done. Listing
 `https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443`
-Buy now **$73,761**, In review. HUD takes **20%** of a closed sale.
-She may set her own prices and split listings. **$12,000 is the form’s
-per-repo suggested ceiling, not a floor.** Splitting listings does not
-raise that cap (8 × $12k = $96k either way). Split only for different
-buyers. Proposal ≠ cash. Non-exclusive only. Do not bank $350k.
+is **Ready** (Draft ✓ Review ✓; Active not yet). All mandatory checks
+passed (11/10). Buy now **$73,761**. HUD takes **20%** of a closed sale.
+**Do not raise every repo to $12k.** Raise only the four that hit the
+form cap, and only if Edit listing accepts >$12k. Prefer **Make private
+to opportunity buyers** over public **Go live** at $73k. Proposal ≠ cash.
+Non-exclusive only. Do not bank $350k.
 
 PII-clean Describe: `docs/selling/drafts/hud-vendor-listing-describe.txt`
 
@@ -29,6 +30,29 @@ band, not a law. HUD said she can price from her own estimate.
   products toward HUD’s points ($17,020 / $16,735 / $16,662 / $13,303)
   on the **existing** listing first. That is how you close the $15,720
   gap to the $89,481 package point.
+- **Do not pad the other four.** AITCF $10,910, dragontrade $6,450,
+  AILA $4,264 (0 LOC, paused), atlas-captures $4,137 (0 LOC) are already
+  at HUD’s points. 8 × $12k = $96k of padded sticker, and two of those
+  cards already show 0 LOC.
+
+### What to click today (Ready, not Active)
+
+1. **Edit listing.** On the four at $12,000, try HUD’s points:
+   `VibeJobHunterAIPA_AIMCF` **$17,020**, `EspaLuzWhatsApp` **$16,735**,
+   `EspaLuz_Influencer` **$16,662**, `EspaLuzFamilybot` **$13,303**.
+   If the field rejects anything above $12k, leave them. Do not touch
+   the other four prices.
+2. If the four raise succeeds, the bundle becomes **$89,481**. Update
+   the Overview “Buy now” sentence to match (paste in
+   `docs/selling/drafts/hud-vendor-listing-describe.txt`).
+3. **Do not click Go live** while a HUD proposal may still arrive. A
+   public $73,761 Buy-now anchors under their own $89k point.
+4. Click **Make private to opportunity buyers** so HUD can transact
+   without a public sticker.
+5. Ignore **Run recommended checks** and **DV has not verified**.
+   32 not-gradable is AILA/atlas 0 LOC + missing Actions — it will not
+   sell more. HUD’s stamp is theirs, not a CI chase.
+6. Do **not** Archive.
 
 Suggested packs (only if HUD wants more than one SKU):
 

@@ -2,6 +2,13 @@ Paste into DataVendor listing → Describe, then resubmit.
 PII-checked 31 Aug: no email, no @handle, no city, no personal name.
 Do not volunteer “were public until 30 Aug.” Do not paste Nine Systems.
 
+Operator only — not listing text: if Edit listing accepts >$12k on the
+four cap-hit repos, replace the Buy-now paragraph with:
+“Buy now: $89,481 — HUD’s own GitHub estimator point value for this same
+eight-repo bundle, run 31 Aug 2026 (44% Promising; range $61,067–$350,557).
+The $350k ceiling is an imputed-perfect scenario, not cash. Non-exclusive.”
+Do not paste this instruction block.
+
 --- TITLE ---
 AI tech + marketing co-founders: 8 private production repos (tool-use, MCP, scrape)
 
