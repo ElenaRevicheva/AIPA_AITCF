@@ -175,6 +175,20 @@ Optional (thin — flip only if you want every extra listing): `atlas-shifted`.
 
 **Do not tick:** `hive` (fork, not yours), `openclaw-vibejob-shortlist` (MIT — already given away), `manukora-sop-brief` (job brief), `aw-client-report-portal` (client), `ascent-saas-builder` (Lovable), `aideazz-private-docs` (career/apps, not a product), `aideazz` / `atuona` / `aideazz-podcast` (keep public — they run the websites).
 
+### Why not those three extra GitHubs (verified 31 Aug)
+
+Elena asked about adding `atlas-shifted`, `ascent-saas-builder`, and
+`openclaw-vibejob-shortlist` to the Ready 8-pack. Do not. HUD’s estimator
+is **public = $0**. The form still hard-caps $12k/repo. Reopening a
+Ready listing for a 9th snapshot delays the proposal for code a lab
+would discount anyway.
+
+| Repo | GitHub now | Why it stays off this listing |
+|---|---|---|
+| `openclaw-vibejob-shortlist` | **Public**, MIT, last push 23 Mar 2026, ~18k Python | MIT already grants anyone the right to use/copy/sell. README is an OpenClaw community write-up (name, LinkedIn, Panama). Complements `VibeJobHunterAIPA_AIMCF`, which is already in the pack. Flipping private does not un-issue MIT. |
+| `ascent-saas-builder` | **Public**, last push 1 Jan 2026 | Stock Lovable README (`Welcome to your Lovable project` + lovable.dev project URL). Description: EspaLuz SaaS beta built at Lovable. Production EspaLuz is already the three private bots. Committed `.env` in the tree — HUD’s secrets scan would likely fail. |
+| `atlas-shifted` | **Public**, real TS radar, last push 17 Aug 2026 | The only one that is a real product. Still public → HUD **$0** until flipped. The live board is already the proof URL on the listing; `atlas-captures` is already in the pack as the data. Optional **later SKU** (flip private first, own listing with captures) — do not splice into the Ready 8-pack tonight. |
+
 Hiring proof that **survives** the flip: `https://aideazz.xyz/portfolio`,
 `https://webhook.aideazz.xyz/doc/nine-systems`, the live bots, the wiki.
 
