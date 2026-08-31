@@ -107,8 +107,8 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD listing memo v2 on `cursor/hud-vendor-license-1c49`
-  (`a272410`): estimate screenshot embedded, no confession box,
+- **DONE:** HUD listing memo v3 on `cursor/hud-vendor-license-1c49`
+  (`20f6b8f`): pages 1-2 unchanged; 3-4 why/how: estimate screenshot embedded, no confession box,
   `/codebases/result` is not a link. AfterQuery deploy untouched.
 - **NEXT:** Elena: download the PDF from PR #38, attach on HUD Work
   samples with portfolio + /api, never Nine Systems. NDA, Cal.com
