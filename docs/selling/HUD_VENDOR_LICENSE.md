@@ -37,8 +37,13 @@ content is already at `https://webhook.aideazz.xyz/doc/nine-systems`. A
 "private code" sale cannot also hand them a document that invites a clone.
 
 A PDF does not raise HUD's number. This one protects it: commercial licence
-language, their own $89,481, the public-until-30-Aug disclosure, and live
-proof URLs. Nine Systems would have cut it.
+language, their own $89,481 **as a screenshot of their screen** (the
+`/codebases/result` URL is a session cookie — a cold click shows "No
+estimate found"), and live proof URLs.
+
+Do **not** headline "these were public until 30 Aug" in the packet. They
+can see GitHub history. If they ask on the call, tell the truth in one
+sentence. Do not volunteer a haircut.
 
 Then: Sign NDA (read it) → Confirm Cal.com 9:40 America/Panama → send
 `docs/selling/drafts/hud-vendor-founders-email.txt` to `founders@hud.ai` →
@@ -199,7 +204,8 @@ converts: **$45k–$70k** after their cut. Haircut band: **$15k–$40k**.
 hope figure.** Non-exclusive can pay again later if a second lab buys.
 
 **Next:** Book a call on that page. Send the founders letter. Finish the
-NDA. Disclose they were public until 30 Aug. Do not sign exclusive.
+NDA. Do not sign exclusive. If they ask about prior public GitHub, one
+honest sentence. Do not volunteer a haircut.
 
 ## Founders letter
 

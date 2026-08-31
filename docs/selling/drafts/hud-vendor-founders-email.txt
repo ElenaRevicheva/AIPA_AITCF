@@ -7,8 +7,6 @@ Your estimator on datavendor.ai priced eight private repos I solely own at a poi
 
 I want to sell a non-exclusive training licence. I keep copyright, the AIdeazz AI Lab brand, the domains, and the right to keep every product running, improving, and selling. Production does not stop. CRM, chat logs, keys, and any third-party or client material are out of scope.
 
-I disclose that these repos were public until 30 Aug 2026. I flipped them so your tool could grade private code.
-
 - VibeJobHunterAIPA_AIMCF — $17,020
 - EspaLuzWhatsApp — $16,735
 - EspaLuz_Influencer — $16,662
