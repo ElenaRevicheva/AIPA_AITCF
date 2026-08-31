@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-31 19:20 | Fermatix [LICENSE] HubSpot deal + click-to-send letter | `stage-hiring-outreach.cjs`, `.hire-trigger`, Oracle HubSpot write, `docs/selling/drafts/fermatix*` | this commit |
+| Cursor Cloud | 2026-08-31 19:20 | Fermatix [LICENSE] HubSpot deal + click-to-send letter | `stage-hiring-outreach.cjs`, `.hire-trigger`, Oracle HubSpot write, `docs/selling/drafts/fermatix*` | 54cc941 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -111,9 +111,10 @@ git log keeps the record.
   Codebase = git history. Coding = Harbor puzzles. **Agentic outside
   SWE** = closest *domain* (last-click, HubSpot SoR, MCP, marketing)
   and still Harbor *format* (offline stubs, 100 tool calls, FN/FP).
-- **NEXT:** Agent is staging Fermatix as `[LICENSE]` + one-click email
-  (Elena clicks; nothing sends until she does). Still: Megan ping
-  (three briefs), AfterQuery, Rwazi, Plata.
+- **NEXT:** Waiting on GitHub Action `hire-outreach-on-trigger` (branch
+  `cursor/fermatix-hubspot-deal-1c49`) to write the HubSpot deal. Elena
+  clicks SEND after the deal URL lands. Still: Megan ping (three briefs),
+  AfterQuery, Rwazi, Plata.
 - **VERIFIED BY:** User pasted agentic Must have: real tool use, SoR
   end state, named failure modes, **stubs OK if offline**, Harbor QC
   Required (build, bundle, FN/FP, live task).
