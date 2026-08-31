@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-08-31 11:20 UTC | HUD work-sample PDF (replace Nine Systems) | Packet lives on `cursor/hud-vendor-license-1c49`: listing memo PDF + `HUD_VENDOR_LICENSE.md`. This file only. | this commit |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -111,9 +111,9 @@ git log keeps the record.
   lost-update **fixed and live**. Oracle `cto-aipa` at `a3e29b4`,
   `dist/resend-webhook.js` has `patchNoteStamp`, PM2 created
   23:16:37 after the file (23:16:35). Session closed. Elena rest.
-- **NEXT:** HUD quote is in: **$89,481** point ($61k–$351k, 44%).
-  Elena: Book a call + founders letter + NDA. Also atrium@ /
-  support@ if not written. No deploy. No `.hire-trigger`.
+- **NEXT:** HUD onboarding work samples: attach the listing memo
+  PDF from the HUD branch — **never** Nine Systems. Then NDA,
+  Cal.com 9:40 Panama, founders@. No deploy. No `.hire-trigger`.
 - **VERIFIED BY:** Deploy run 33341368302 OK. Live grep
   `exports.patchNoteStamp` in `dist/resend-webhook.js`. PM2
   online, uptime from 23:16:37Z, 0 unstable restarts.
@@ -127,7 +127,7 @@ git log keeps the record.
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Quote **$89,481** point / 44% Promising | **Elena: Book a call** + founders@ + NDA |
+| 1 | **HUD Vendor — non-exclusive training licence** | Quote **$89,481** point / 44% Promising. Work-sample PDF on `cursor/hud-vendor-license-1c49` | **Elena: attach listing memo** (not Nine Systems) → NDA → Cal.com 9:40 → founders@ |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
