@@ -1,21 +1,17 @@
-Paste into DataVendor listing → Describe.
+Paste into DataVendor listing → Edit listing → Describe, then resubmit.
+PII-clean: no email, no social handle, no city, no personal name.
 Do not volunteer “were public until 30 Aug.” Do not paste Nine Systems.
-Buy now on the listing is $73,761 (form cap $12,000/repo). HUD package point is $89,481.
 
-Verified before this paste (code + Oracle cadence docs, not slogans):
-- Monday Atlas: capture ~14:00 UTC → Telegram briefs 15:15 → outcomes 15:30 →
-  atlas-lead-machine.cjs `0 16 * * 1`. Own visibility API qualifies the business.
-  HubSpot [CLIENT-ATLAS] contact+deal at qualifiedtobuy with note + one-click send.
-  Script does NOT email. Human tap. HubSpot then ⏳ Sent + +4d follow-up.
-  Data time-series is atlas-captures; the machine is AITCF.
-- dragontrade-agent = paper-trading last-click AND Algom Alpha on X @reviceva:
-  auto posts, engagement loop (reply + follow), X lead search → [CLIENT-ALGOM].
+Why the listing is stuck: mandatory "Personal data scan" failed on TEXT
+(aipa@ email + @reviceva). Repo snapshots and secrets scan already passed.
+Do NOT archive. Do NOT chase "Run recommended checks" (CI/coverage) first —
+those are informational. Edit text → resubmit mandatory checks.
 
 --- TITLE ---
 AI tech + marketing co-founders: 8 private production repos (tool-use, MCP, scrape)
 
 --- ONE-LINER ---
-Eight private production codebases I solely own — live AI tech co-founder (CRM, GEO/AEO, film, Monday Atlas→HubSpot) and live AI marketing co-founder (LangGraph + LinkedIn CMO), plus an X agent that posts, follows, and stages leads. Exec seats, not generic bots.
+Eight private production codebases I solely own — live AI tech co-founder (CRM, GEO/AEO, film, Monday Atlas to HubSpot) and live AI marketing co-founder (LangGraph + LinkedIn CMO), plus an X agent that posts, follows, and stages leads. Exec seats, not generic bots.
 
 --- DESCRIPTION (Markdown) ---
 Non-exclusive training licence of **copies** of eight private production repos I solely own. I keep copyright, the AIdeazz AI Lab brand, the domains, and every product running. No copyright assignment. No exclusive. Production does not stop.
@@ -28,14 +24,14 @@ These seats were built as **genuine execs**, not chatbots: a human is on the las
 
 | Repo | What a lab is actually buying traces of |
 |---|---|
-| AIPA_AITCF | **AI Tech Co-Founder (CTO AIPA).** Telegram control plane (`/code` `/fix` open real GitHub PRs, human last click). **CRM hub:** form → HubSpot deal, multi-agent `POST /api/crm-event` (code patterns; the CRM dump is out of scope). **Marketing engine:** fail-closed daily GEO/AEO publisher + live visibility audit at `/api`. **Monday Atlas lead machine:** reads the Atlas snapshot, audits each business on that same API, opens HubSpot `[CLIENT-ATLAS]` contact+deal at 🔥 I Act TODAY with audit + angle + one-click send on the note. The script never emails. She taps; HubSpot then runs ⏳ Sent + +4-day follow-up. **AI film:** Atuona compiler in this repo — `/film build` (VO + music → mp4), `/films` gallery. Five-provider LLM chain (Anthropic zero → OpenAI in 2.4s, nothing dropped). |
+| AIPA_AITCF | **AI Tech Co-Founder (CTO AIPA).** Telegram control plane (`/code` `/fix` open real GitHub PRs, human last click). **CRM hub:** form → HubSpot deal, multi-agent `POST /api/crm-event` (code patterns; the CRM dump is out of scope). **Marketing engine:** fail-closed daily GEO/AEO publisher + live visibility audit at `/api`. **Monday Atlas lead machine:** reads the Atlas snapshot, audits each business on that same API, opens a HubSpot contact+deal at act-today with audit + angle + one-click send on the note. The script never emails. The operator taps; HubSpot then runs sent-stage + follow-up. **AI film:** Atuona compiler in this repo — `/film build` (VO + music → mp4), `/films` gallery. Five-provider LLM chain (Anthropic zero → OpenAI in 2.4s, nothing dropped). |
 | VibeJobHunterAIPA_AIMCF | **AI Marketing Co-Founder (CMO AIPA) in the same repo as the hunter.** LangGraph job hunt, 131-test 4-layer eval, scrape + MCP. LinkedIn CMO posts + founder outreach. Scored routing: who is worth a letter vs who is noise. Auto-apply was removed after it produced volume and zero outcomes. Human on the last click. |
 | EspaLuzWhatsApp | Bilingual ES/EN WhatsApp commercial messaging — real tool-use, not a notebook |
 | EspaLuz_Influencer | Live publishing agent, grounded daily cadence, fail-closed on unsourced numbers |
 | EspaLuzFamilybot | Telegram family advisor, bilingual ES/EN, per-family memory + RAG |
-| dragontrade-agent | **Two seats in one tree.** Paper trading with a human on the last click (never live money). **Algom Alpha X agent on @reviceva:** scheduled posts, engagement loop (reply + follow real accounts), X lead search → HubSpot `[CLIENT-ALGOM]`. Rate-limits are real; irreversible money still requires the last click. |
+| dragontrade-agent | **Two seats in one tree.** Paper trading with a human on the last click (never live money). **Algom Alpha X agent:** scheduled posts, engagement loop (reply + follow real accounts), X lead search → HubSpot client deals. Rate-limits are real; irreversible money still requires the last click. |
 | atlas-captures | **Ad-angle time-series data, not just code.** Weekly Monday snapshot of which creative angles are observably running. Detect, not predict — it refuses to forecast. This is the data the Monday lead machine in AITCF reads, then qualifies on the live visibility API and stages into HubSpot. Live board: https://webhook.aideazz.xyz/whitespace/atlas.html |
-| AILA | Personal-AI codebase (paused) — governed longitudinal memory, distinct from the ops fleet |
+| AILA | Life-assistant codebase (paused) — governed longitudinal memory, distinct from the ops fleet |
 
 ## Tool traces in the trees
 
@@ -47,13 +43,12 @@ Also live, not in this licence: public AI Ops Wiki of named production failure m
 
 - Non-exclusive licence of a copy
 - I keep copyright, brand, domains, products running
-- Out of scope: `.env` / keys, HubSpot CRM, chat logs, customer PII, client material
+- Out of scope: keys, HubSpot CRM contents, chat logs, customer PII, client material
 
 ## Proof
 
 - Hub: https://aideazz.xyz/portfolio
-- Audit API (the marketing engine’s GEO/AEO surface, and the Monday qualifier): https://aideazz.xyz/api
+- Audit API (GEO/AEO surface, and the Monday qualifier): https://aideazz.xyz/api
 - Atlas board: https://webhook.aideazz.xyz/whitespace/atlas.html
 - Wiki: https://aideazz.xyz/ai-ops-wiki.html
 - Podcast: https://podcast.aideazz.xyz/
-- aipa@aideazz.xyz · Panama · UTC-5
