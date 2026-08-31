@@ -107,25 +107,23 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Two HUD briefs opened; **both no-bid** with the 8-pack.
-  Codebase RFP = company monorepo. **Long-horizon coding** = Harbor
-  tasksets (100+ tool calls, no live services, Claude Code/Codex traces,
-  dual-arch images). No `task.toml` in the trees. Listing stays for
-  live tool-use labs.
-- **NEXT:** Elena: send Megan no-bid ping covering **both** briefs.
-  Do not Apply. Do not start an unpaid Harbor build. AfterQuery +
-  Rwazi + Plata still move.
-- **VERIFIED BY:** User pasted coding Must have + Harbor QC (environment
-  build, bundle validation, FN/FP, taskset contents all Required).
-- **RISK:** Tooltip “own the project and get paid” reopening the
-  codebase brief — those must-haves are history, not a deliverable.
-  Wrapping live services into Harbor. Applying. Unpaid build.
+- **DONE:** Three HUD briefs opened. All **no-bid** with the 8-pack.
+  Codebase = git history. Coding = Harbor puzzles. **Agentic outside
+  SWE** = closest *domain* (last-click, HubSpot SoR, MCP, marketing)
+  and still Harbor *format* (offline stubs, 100 tool calls, FN/FP).
+- **NEXT:** Elena: send Megan ping covering **three** briefs. Do not
+  Apply. Do not stub HubSpot unpaid. AfterQuery + Rwazi + Plata move.
+- **VERIFIED BY:** User pasted agentic Must have: real tool use, SoR
+  end state, named failure modes, **stubs OK if offline**, Harbor QC
+  Required (build, bundle, FN/FP, live task).
+- **RISK:** Applying because tags say MCP/tool-use. Pointing a task at
+  live WhatsApp/HubSpot. Unpaid Harbor. Tooltip reopening codebase.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. Codebase + long-horizon coding briefs = **no-bid** | **Elena:** send Megan ping (both briefs). Do not Apply. Do not build Harbor unpaid |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. Three briefs **no-bid**; agentic-outside-SWE is domain-only | **Elena:** send Megan ping (three briefs). Do not Apply. Commissioned Harbor only |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
