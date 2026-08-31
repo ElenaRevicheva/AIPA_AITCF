@@ -1,22 +1,24 @@
-SUBJECT: I can see the $100k enterprise codebase brief — Apply is not sending
+SUBJECT: Opened the $100k codebase brief — I will not apply; listing is a different SKU
 TO: Megan (reply on the same 31 Aug Cal.com / HUD thread)
 FROM: Elena Revicheva <aipa@aideazz.xyz>
 
-Send only if opening the brief title still does not submit an offer.
+Send after reading the Must have list. Do not Apply to this brief.
 Do not attach Nine Systems. Do not volunteer were-public, 22 fails,
-§9.2, $350k, or hardship. Do not email the lab behind the brief.
+§9.2, $350k, Cursor commit counts, or hardship. Do not email the lab.
 
 ---
 
 Hi Megan,
 
-I can see four HUD briefs on datavendor.ai/briefs, including Enterprise Codebase Data Opportunity at $100,000 total.
+I opened Enterprise Codebase Data Opportunity ($100,000 total).
 
-Apply on the cards is not submitting on my side. The listing is already private to opportunity buyers:
+I will not apply. The must-haves are 10+ contributors, 100 merged PRs, 100k–10M LOC, >25% coverage, and primarily pre-AI human-written code. Mine is a solo 2025 production lab — live tool-use, MCP, WhatsApp/Telegram/CRM — not that enterprise-monorepo profile.
+
+The listing stays private to opportunity buyers for labs that want that production SKU:
 
 https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443
 
-That’s the eight private production repositories, non-exclusive training licence. Can you match it to that codebase brief, or tell me the click that actually sends the offer?
+Please keep matching those, not this brief.
 
 Elena Revicheva
 AIdeazz AI Lab

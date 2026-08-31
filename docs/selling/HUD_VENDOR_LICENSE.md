@@ -74,19 +74,44 @@ not a cheque.**
 
 | Brief (posted ~11–12 days) | Fit |
 |---|---|
-| **Enterprise Codebase Data Opportunity — $100,000 total** | **The listing.** “licenses private, production-grade software…” Open the **title**, screenshot the full brief, then Apply if it works. |
+| **Enterprise Codebase Data Opportunity — $100,000 total** | **No-bid.** Must-haves are a mid-size company repo, not the 8-pack. See scorecard below. |
 | Long-Horizon Agentic Tasks Outside SWE (tool-use, computer use, MCP) | Task/eval work, not the licence SKU. Adjacent to WhatsApp/Telegram/CRM/Atlas. Do not spray today. |
 | Long-Horizon Coding Tasks (Coding/SWE) | Task/eval work. Adjacent to the eight repos as environments. Do not spray today. |
 | Finance and Legal Knowledge Work Tasks | Skip. Not the product. |
 
-If card Apply is dead: open the $100k **title**. If Apply is still
-dead inside the brief, paste
-`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` on the Megan
-thread. **Do not email the lab** — HUD-posted briefs are §4.1 RFP
-Parties. Do not Go live just because Apply is dead; private-to-
-opportunity-buyers is already the matching state.
+**Do not Apply** to the $100k codebase brief. Do not pad PRs, fake
+contributors, or concatenate trees to clear 100k LOC. Paste
+`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` so Megan does
+not slot the listing into this RFP. **Do not email the lab** — HUD
+briefs are §4.1 RFP Parties. Listing stays private-to-opportunity-
+buyers for labs that want live tool-use, not a Fortune-500 monorepo.
 
 Refuse exclusive/assignment on any offer or later DSA.
+
+#### Enterprise codebase must-haves vs the 8-pack (31 Aug)
+
+Brief: `$5–100k/codebase`, 0 applicants, Open. Requirements apply to
+**every submission** (per repo, not the bundle). Measured on
+`AIPA_AITCF` (largest ops tree in this workspace) plus HUD’s own
+31 Aug snapshot for the rest.
+
+| Must have | Bar | AITCF (measured) | Call |
+|---|---|---|---|
+| Merged PRs | ≥100 | **24** merged / 39 total | Fail |
+| LOC | 100,000–10M | **71,693** tracked source (`.ts/.cjs/.sh/.py`); HUD: AILA + atlas-captures **0 LOC** | Fail |
+| Contributors | ≥10 | GitHub: Elena + cursoragent + anon + bot (**≠10 humans**) | Fail |
+| Commits | ≥1,000 | **1,078** | Pass |
+| Tests | >25% coverage | **1** test file here; HUD: coverage **imputed**, 32 not gradable | Fail |
+| Provenance | Primarily human-written, ideally pre-AI-coding era | Created **10 Oct 2025**; Cursor Agent is a co-author on the tree | Fail |
+
+Nice to have (Rust/Go/Cobol/Matlab/C++/backend Java): AITCF is
+TypeScript/JavaScript. AILA $4,264 and atlas-captures $4,137 sit
+**under the $5k/codebase floor**.
+
+The listing QC block on the brief (metadata, personal-data scan,
+secrets scan, snapshot) is the **listing text** pipeline — those
+required rows can pass while the codebase must-haves still fail.
+Informational complexity / pii qc llm do not change this no-bid.
 
 ### Recommended checks (22 failed) — do not chase
 
