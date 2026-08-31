@@ -1,10 +1,10 @@
 # HUD Vendor — non-exclusive training licence
 
-**Status (30 Aug 2026, 20:45 UTC):** Estimator is **running**. Elena selected
-**8 private repos**. Screen: `datavendor.ai/codebases/result` — "Archiving 1 of
-8", reading `ElenaRevicheva/AIPA_AITCF`, 0% / 0 archived. Org onboarding
-(legal address / NDA) may still be incomplete. Wait for the number. Do not
-sign anything that assigns copyright or is exclusive.
+**Status (30 Aug 2026, 19:32 Panama / 31 Aug 00:35 UTC):** Quote is **in**.
+8 private repos. Point estimate **$89,481**. Range **$61,067–$350,557**.
+Score **44% Promising**. Public discoverability: Not public. This is an
+estimator, not a payout. Next: Book a call + founders letter + finish NDA.
+Do not sign exclusive or copyright assignment. Do not bank the $350k top.
 
 **What you keep:** copyright, brand, domains, and the right to keep operating,
 improving and selling every product. Production stays up. This is a licence of a

@@ -1,32 +1,33 @@
-SUBJECT: GitHub connected — estimator still only sees my public repos
+SUBJECT: Quote is in — 8 private repos, point estimate $89,481 — I keep the products
 TO: founders@hud.ai
 
 Hi,
 
-I am on datavendor.ai as aipa@aideazz.xyz, org Aldeazz AI Lab. GitHub is connected as ElenaRevicheva. I disconnected and reconnected. The estimator still lists only public repos.
+The estimator finished on datavendor.ai/codebases/result for eight private repos I solely own.
 
-Your own copy says public repos come back at $0. I already made the product codebases private so you could grade them. They do not appear. I need you to either grant the GitHub connection private-repo access, or take this as a data proposal / opportunity.
+Point estimate $89,481. Range $61,067–$350,557. Score 44% Promising. Public discoverability: not public.
 
-Private repos I solely own (no SPDX licence that would conflict). They were public until 30 Aug 2026 — I am disclosing that:
+I am disclosing that these repos were public until 30 Aug 2026. I flipped them so the tool could grade private code. I retain copyright, the brand, the domains, and the right to keep operating, improving and selling every product. Production stays up. CRM, chat logs, keys, and any third-party or client material are out of scope. The offer is a non-exclusive licence to a copy of source, for model-training use.
 
-- https://github.com/ElenaRevicheva/AIPA_AITCF
-- https://github.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF
-- https://github.com/ElenaRevicheva/EspaLuzFamilybot
-- https://github.com/ElenaRevicheva/EspaLuzWhatsApp
-- https://github.com/ElenaRevicheva/EspaLuz_Influencer
-- https://github.com/ElenaRevicheva/dragontrade-agent
-- https://github.com/ElenaRevicheva/AILA
-- https://github.com/ElenaRevicheva/atlas-captures
+Repos in this quote (point estimates):
 
-aideazz stays public. That repo deploys https://aideazz.xyz/portfolio. I am not licensing the running systems, CRM, chat logs, keys, or any third-party or client material.
+- VibeJobHunterAIPA_AIMCF — $17,020
+- EspaLuzWhatsApp — $16,735
+- EspaLuz_Influencer — $16,662
+- EspaLuzFamilybot — $13,303
+- AIPA_AITCF — $10,910
+- dragontrade-agent — $6,450
+- AILA — $4,264
+- atlas-captures — $4,137
 
-The offer is a non-exclusive licence to a copy of source I solely own, for model-training use. I retain copyright, the brand, the domains, and the right to keep operating, improving and selling it. AIdeazz AI Lab keeps running.
+aideazz stays public. That repo deploys https://aideazz.xyz/portfolio.
 
 Dossier: https://webhook.aideazz.xyz/doc/nine-systems
 
-I can take a short call from Panama City.
+I clicked Book a call as well. I can take it from Panama City (UTC−5). I will not sign anything exclusive or that assigns copyright.
 
 Best regards,
 Elena Revicheva
 AIdeazz AI Lab · Panama City
+aipa@aideazz.xyz
 https://aideazz.xyz/portfolio
