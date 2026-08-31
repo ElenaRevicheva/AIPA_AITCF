@@ -117,8 +117,9 @@ git log keeps the record.
   Rwazi + Plata still move.
 - **VERIFIED BY:** User pasted coding Must have + Harbor QC (environment
   build, bundle validation, FN/FP, taskset contents all Required).
-- **RISK:** Wrapping Telegram/WhatsApp/HubSpot into a fake Harbor image
-  (brief forbids live services). Applying the repo listing. Unpaid build.
+- **RISK:** Tooltip “own the project and get paid” reopening the
+  codebase brief — those must-haves are history, not a deliverable.
+  Wrapping live services into Harbor. Applying. Unpaid build.
 
 ## 💰 MONEY QUEUE
 
