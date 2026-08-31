@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-08-31 19:20 | Fermatix [LICENSE] HubSpot deal + click-to-send letter | `stage-hiring-outreach.cjs`, `.hire-trigger`, Oracle HubSpot write, `docs/selling/drafts/fermatix*` | this commit |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -111,8 +111,9 @@ git log keeps the record.
   Codebase = git history. Coding = Harbor puzzles. **Agentic outside
   SWE** = closest *domain* (last-click, HubSpot SoR, MCP, marketing)
   and still Harbor *format* (offline stubs, 100 tool calls, FN/FP).
-- **NEXT:** Elena: send Megan ping covering **three** briefs. Do not
-  Apply. Do not stub HubSpot unpaid. AfterQuery + Rwazi + Plata move.
+- **NEXT:** Agent is staging Fermatix as `[LICENSE]` + one-click email
+  (Elena clicks; nothing sends until she does). Still: Megan ping
+  (three briefs), AfterQuery, Rwazi, Plata.
 - **VERIFIED BY:** User pasted agentic Must have: real tool use, SoR
   end state, named failure modes, **stubs OK if offline**, Harbor QC
   Required (build, bundle, FN/FP, live task).
@@ -125,6 +126,7 @@ git log keeps the record.
 |---|---|---|---|
 | 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. Three briefs **no-bid**; agentic-outside-SWE is domain-only | **Elena:** send Megan ping (three briefs). Do not Apply. Commissioned Harbor only |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
+| 1c | **Fermatix — non-exclusive royalty licence** | Staging `[LICENSE]` deal + `/go/outreach-email/fermatix` → `hi@fermatix.ai`. No GitHub in first email. Refuse exclusive. | **Agent:** creating HubSpot records. **Elena:** click SEND after the deal URL lands |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
