@@ -2,12 +2,13 @@
 
 **Status (31 Aug 2026, afternoon Panama):** Call done. Listing
 `https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443`
-is **Ready**. Form still hard-caps **$2,500–$12,000/repo** — cannot type
-above it. Elena raised `AIPA_AITCF` $10,910 → **$12,000** and left AILA
-$4,264 / atlas $4,137 / dragontrade $6,450. Buy now **$74,851** (within
-DV’s $20k–$96k band). HUD takes **20%**. Prefer **Make private to
-opportunity buyers** over public **Go live**. Proposal ≠ cash.
-Non-exclusive only. Do not bank $350k.
+is **Ready**. All **10 mandatory checks passed**. Recommended AI
+reviews: **22 failed, certification withheld — publishing unaffected**.
+Do not chase those. Form still hard-caps **$2,500–$12,000/repo**. Elena
+raised `AIPA_AITCF` $10,910 → **$12,000** and left AILA $4,264 / atlas
+$4,137 / dragontrade $6,450. Buy now **$74,851**. HUD takes **20%**.
+Prefer **Make private to opportunity buyers** over public **Go live**.
+Proposal ≠ cash. Non-exclusive only. Do not bank $350k.
 
 PII-clean Describe: `docs/selling/drafts/hud-vendor-listing-describe.txt`
 
@@ -44,7 +45,26 @@ the $89,481 point value.
 3. Click **Make private to opportunity buyers** so HUD can transact
    without a public sticker.
 4. Ignore **Run recommended checks** and **DV has not verified**.
+   Verified 31 Aug after she ran them: **22 failed, certification
+   withheld — publishing unaffected.** All 10 mandatory still passed.
+   Do not chase these before the proposal (breakdown in the quality
+   section below).
 5. Do **not** Archive. Do not try to type above $12k again.
+
+### Recommended checks (22 failed) — do not chase
+
+HUD’s own line: **certification withheld — publishing unaffected.**
+The 10 mandatory checks still passed. “DV has not verified” is this
+badge, not a publish block.
+
+| Check | Failed on | Why, and what not to do |
+|---|---|---|
+| codebase complexity | `atlas-captures`, `AILA` | Both show **0 LOC** on HUD’s snapshot. Correct fail. Do not pad prices or paste dummy code. |
+| pii qc llm | WhatsApp, Familybot, VJH, AITCF, dragontrade | LLM review of production CRM / WhatsApp / Telegram / X trees. Operator mailbox and HubSpot wiring live in source (e.g. `aipa@` in AITCF). Licence already excludes keys, CRM contents, chat logs, customer PII. Do **not** strip the product to please this check. If an AI-review note names **customer** messages or phones, that is a real cleanup; if it names the operator email or HubSpot, leave it. |
+| verify claims | all eight | Same snapshot that left **32 not gradable** (too little source, no Actions, no coverage report). An LLM cannot verify listing claims from that. Do not delete claims from the Describe. |
+| verify rarity | seven (not AITCF) | Rarity needs distinctive, readable source. 0-LOC + paused + previously-public trees look common to the reviewer. AITCF did **not** fail rarity. |
+
+Do not click **Run recommended checks** again tonight. More AI reviews will not move the mandatory gate or the `$74,851` sticker.
 
 Suggested packs (only if HUD wants more than one SKU):
 
