@@ -107,23 +107,24 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Elena opened the **$100k Enterprise Codebase** brief. It is a
-  **no-bid**. Must-haves (100 PRs, 10 contributors, 100k–10M LOC, >25%
-  tests, pre-AI human code) are a company monorepo. AITCF: 24 merged PRs,
-  71,693 LOC, 1 human + agents, created Oct 2025. Listing stays for
-  tool-use labs, not this RFP.
-- **NEXT:** Elena: send Megan no-bid ping (do not Apply). AfterQuery +
-  Rwazi + Plata still move. Refuse exclusive DSA.
-- **VERIFIED BY:** User pasted Must have + $5–100k/codebase + 0 applicants.
-  AITCF measured 31 Aug: 1078 commits (pass), 24 merged PRs, 71693 LOC.
-- **RISK:** Applying anyway / padding PRs or contributors. Treating $100k
-  as a cheque. Emailing the lab (§4.1). Confusing with DataFactor jobs.
+- **DONE:** Two HUD briefs opened; **both no-bid** with the 8-pack.
+  Codebase RFP = company monorepo. **Long-horizon coding** = Harbor
+  tasksets (100+ tool calls, no live services, Claude Code/Codex traces,
+  dual-arch images). No `task.toml` in the trees. Listing stays for
+  live tool-use labs.
+- **NEXT:** Elena: send Megan no-bid ping covering **both** briefs.
+  Do not Apply. Do not start an unpaid Harbor build. AfterQuery +
+  Rwazi + Plata still move.
+- **VERIFIED BY:** User pasted coding Must have + Harbor QC (environment
+  build, bundle validation, FN/FP, taskset contents all Required).
+- **RISK:** Wrapping Telegram/WhatsApp/HubSpot into a fake Harbor image
+  (brief forbids live services). Applying the repo listing. Unpaid build.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. $100k codebase brief = **no-bid** (must-haves miss) | **Elena:** send Megan no-bid ping. Do not Apply. Listing stays for other matches |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. Codebase + long-horizon coding briefs = **no-bid** | **Elena:** send Megan ping (both briefs). Do not Apply. Do not build Harbor unpaid |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
