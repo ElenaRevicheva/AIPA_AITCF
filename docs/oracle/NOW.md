@@ -107,24 +107,22 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Platform Access Agreement through **§8**. HUD’s liability
-  cap is **$1,000** (or fees paid). Cap does **not** cover her
-  non-circumvent / confidentiality / indemnity. §9 Remedies just
-  starting. Still do not Finish.
-- **NEXT:** Elena: Next → screenshot **§9 in full** (4.2 pointed at
-  9.2) plus Fees if any, then 10–12. Do not click Finish. Megan email
-  stays unsigned.
-- **VERIFIED BY:** Screenshot 31 Aug 12:18 Panama: §8.1–8.3, start of
-  §9 REMEDIES. No upgrade fee in §§1–8.
-- **RISK:** Signing before 9.2. Off-platform contact with HUD RFP
-  Parties (uncapped). Treating 6.2 as a training grant. AfterQuery
-  untouched.
+- **DONE:** Full Platform Access Agreement through §12.1. No upgrade
+  fee. HUD cap **$1,000**; vendor uncapped on §4/§10/§11/§6.3 via
+  §8.3+§9.2. She may Finish. Megan paste updated (signed + private).
+- **NEXT:** Elena: Finish the agreement, then reply to Megan on the
+  Cal.com thread with `docs/selling/drafts/hud-vendor-megan-followup.txt`.
+  Say `sent HUD Megan`. Do not Go live. Refuse exclusive on any DSA.
+- **VERIFIED BY:** Screenshots 31 Aug through §9.2 unlimited vendor
+  damages, §10 indemnity, §11 confidentiality, §12.1 entire agreement.
+- **RISK:** Off-platform contact with HUD RFP Parties (uncapped). DSA
+  later trying exclusive/assignment. AfterQuery untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Listing **private**. Tier 2 agreement through **§8** — do not Finish | **Elena:** screenshot §9 (and rest). Then we say sign or not |
+| 1 | **HUD Vendor — non-exclusive training licence** | Listing **private**. Tier 2 agreement **OK to Finish**. **$74,851** | **Elena:** Finish → send Megan paste. Then `sent HUD Megan`. Do not Go live |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
