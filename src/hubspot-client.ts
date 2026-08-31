@@ -1720,6 +1720,35 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       source: input.source,
       letterMeta,
     });
+    /**
+     * Mirror the job into Elena's own queue (her DB, her states).
+     *
+     * Deliberately never throws and never awaits into the caller's error path:
+     * a Postgres/Oracle hiccup must not lose a HubSpot deal. HubSpot stays the
+     * system of record; this is the system of engagement, and it is downstream
+     * of the record in every sense including failure.
+     */
+    const mirrorToQueue = async (dealIdForLink?: string | null): Promise<void> => {
+      try {
+        const { upsertQueueItem } = await import('./daily-queue');
+        await upsertQueueItem({
+          lane: 'hiring',
+          externalKey: input.jobUrl || dealName,
+          title: input.jobTitle,
+          company: input.company,
+          actionUrl: input.jobUrl,
+          draft: draftedLetter || '',
+          draftTailored: letterMeta?.tailored ?? Boolean(input.coverLetter?.trim()),
+          draftProvider: letterMeta?.provider,
+          draftReason: letterMeta?.reason,
+          score: input.score,
+          hubspotDealId: dealIdForLink || undefined,
+        });
+      } catch (e) {
+        console.warn('[daily-queue] hiring mirror failed (deal is safe):', (e as Error).message?.slice(0, 120));
+      }
+    };
+
     const existing = await findDealByName(dealName);
     if (existing) {
       console.log(`[HubSpot] Hiring deal already exists (${existing.id}) — refresh action note: ${dealName.slice(0, 64)}`);
@@ -1727,6 +1756,7 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       if (existing.id && contactId) await associateDealContact(existing.id, contactId);
       if (existing.id && companyId) await associateDealCompany(existing.id, companyId);
       if (existing.id) await addNoteToDeal(existing.id, actionPkg);
+      await mirrorToQueue(existing.id);
       const dup = { contactId, companyId, dealId: existing.id };
       if (input.crmMeta) {
         const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
@@ -1755,6 +1785,7 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
 
     // Always attach full action package (Apply link + letter + checklist)
     if (dealId) await addNoteToDeal(dealId, actionPkg);
+    await mirrorToQueue(dealId);
 
     console.log(`[HubSpot] ✅ Hiring deal pushed — "${input.jobTitle} @ ${input.company}" contact:${contactId} deal:${dealId}`);
     const out = { contactId, companyId, dealId };

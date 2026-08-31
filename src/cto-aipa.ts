@@ -33,6 +33,7 @@ import {
   verifyRecaptchaV3Token,
 } from './marketing-notify';
 import { registerGoWaRoutes } from './go-wa.js';
+import { registerQueueRoutes } from './queue-routes.js';
 import { registerResendWebhookRoutes } from './resend-webhook.js';
 import { registerServiceCheckoutRoutes } from './service-checkout.js';
 import {
@@ -2877,6 +2878,9 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
 
   // GET /go/wa — Atlas WhatsApp click tracking (public redirect → wa.me + ledger wa_clicks)
   registerGoWaRoutes(app, getMarketingClientIp);
+
+  // Elena's own CRM: two cards, her states, her database. Reads no HubSpot.
+  registerQueueRoutes(app);
 
   // POST /resend/webhook — delivered/bounced/complained → HubSpot note + task.
   // Acceptance by Resend is NOT delivery (Dental Connect was suppressed while the
