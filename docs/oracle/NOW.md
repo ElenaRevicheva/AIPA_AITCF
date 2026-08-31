@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-31 16:45 UTC | HUD Describe fact-check of Elena rewrite | `docs/oracle/NOW.md` (main) | pending |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,26 +107,25 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD Edit form is a **hard $2,500–$12,000/repo cap**. Elena
-  raised only `AIPA_AITCF` $10,910 → $12,000. Left AILA/atlas/dragontrade.
-  Buy now **$74,851** (inside DV $20k–$96k). Describe paste updated to
-  match. Thin repos not padded.
-- **NEXT:** Elena: paste the $74,851 Describe, submit Review. Then
-  **Make private to opportunity buyers**. Do not Go live. Wait for HUD
-  proposal. Refuse exclusive.
-- **VERIFIED BY:** Elena’s Edit-form paste 31 Aug: five repos at
-  $12,000; AILA $4,264; atlas $4,137; dragontrade $6,450; sum $74,851.
-- **RISK:** Overview still saying $73,761 would contradict the form.
-  Public Go live anchors under HUD’s $89k point. Proposal ≠ cash.
-  Do not volunteer were-public. Do **not** add `atlas-shifted` /
-  `ascent-saas-builder` / `openclaw-vibejob-shortlist` to this listing
-  (MIT / Lovable+`.env` / still-public $0). AfterQuery deploy untouched.
+- **DONE:** Elena’s formatted HUD Describe fact-checked. Prices/PII/proof
+  OK. Two wording fixes: not “independent benchmark”; heading is
+  repositories, not “8 production AI systems.” Canonical paste in
+  `docs/selling/drafts/hud-vendor-listing-describe.txt` on the HUD branch.
+- **NEXT:** Elena: paste that Describe (keep Title as co-founders line),
+  submit Review. Then **Make private to opportunity buyers**. Do not Go
+  live. Wait for HUD proposal. Refuse exclusive.
+- **VERIFIED BY:** $74,851 sum; HUD $89,481 / 44% / $61,067–$350,557;
+  no email/handle/city/name in the paste body. 21 countries = product
+  coverage, not a user census.
+- **RISK:** “Independent benchmark” would be HUD grading HUD. Public Go
+  live anchors under $89k. Do not add atlas-shifted/ascent/openclaw.
+  AfterQuery deploy untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Form hard-caps $12k/repo. Buy now **$74,851**. HUD **20%**. Proposal pending | **Elena:** paste $74,851 Describe → Review. **Private to opportunity buyers**, not public Go live. Refuse exclusive |
+| 1 | **HUD Vendor — non-exclusive training licence** | Buy now **$74,851**. Formatted Describe fact-checked. HUD **20%**. Proposal pending | **Elena:** paste corrected Describe → Review. **Private to opportunity buyers**, not public Go live. Refuse exclusive |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
