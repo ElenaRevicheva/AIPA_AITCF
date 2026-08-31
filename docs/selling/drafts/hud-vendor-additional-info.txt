@@ -1,35 +1,13 @@
 Paste into DataVendor onboarding → Additional info → "Anything else?"
-Plain text. Optional field. Matching copy, not a job hunt.
-Copy everything below the line. Do not volunteer “were public until 30 Aug.” Do not paste Nine Systems.
+HARD CAP 1000 characters. Copy everything below the line. Do not volunteer
+“were public until 30 Aug.” Do not paste Nine Systems.
 
 ---
+HUD estimator 31 Aug 2026: 8 private repos I solely own. Point $89,481 (44% Promising, $61,067-$350,557). Not public. $61k cautious. $350k imputed, not cash.
 
-Match me to labs training coding agents, tool-use, MCP, enterprise SWE, and scrape — buyers who need production traces they cannot get from a GitHub tutorial scrape.
+VibeJobHunterAIPA_AIMCF $17,020 58% LangGraph+131-test eval, human last click; EspaLuzWhatsApp $16,735 57% bilingual WhatsApp tool-use; EspaLuz_Influencer $16,662 57%; EspaLuzFamilybot $13,303 52% Telegram ES/EN; AIPA_AITCF $10,910 47% 5-provider LLM 2.4s failover, fail-closed publisher; dragontrade-agent $6,450 35%; AILA $4,264 25%; atlas-captures $4,137 24% ad-angle data.
 
-HUD’s own estimator (31 Aug 2026) already priced eight private production repos I solely own at a point of $89,481 (44% Promising, range $61,067–$350,557). Public discoverability: not public. I treat $61k as the cautious reading of their model. $350k is imputed-perfect, not cash I will cite.
+Tools: LangGraph, WhatsApp Cloud API, Telegram, MCP, Playwright, LLM failover, HubSpot APIs (code only), Resend, PM2, TS + Python. Wiki of named production failures (live, not in licence).
 
-HUD’s own stack:
-VibeJobHunterAIPA_AIMCF — $17,020 (58%) — LangGraph job hunter, 131-test 4-layer eval harness, human on the last click
-EspaLuzWhatsApp — $16,735 (57%) — bilingual ES/EN WhatsApp commercial messaging (real tool-use, not a notebook)
-EspaLuz_Influencer — $16,662 (57%) — live influencer bot, same bilingual commercial spine
-EspaLuzFamilybot — $13,303 (52%) — Telegram family advisor, bilingual ES/EN
-AIPA_AITCF — $10,910 (47%) — ops brain; five-provider LLM chain that absorbed a zero-balance Anthropic outage in 2.4 seconds and dropped nothing; fail-closed daily publisher (unsourced number = no post)
-dragontrade-agent — $6,450 (35%) — trading-education agent
-AILA — $4,264 (25%) — product codebase
-atlas-captures — $4,137 (24%) — ad-angle time-series data. HUD buys data, not only code.
-
-Tool expertise the traces actually contain: LangGraph, WhatsApp Cloud API / Business, Telegram Bot API, MCP servers, Playwright scrape, five-provider LLM failover, HubSpot APIs (patterns in code; the CRM dump is out of scope), Resend, PM2, TypeScript + Python production fleet.
-
-Also live, not in the licence: public AI Ops Wiki of named production failure modes, verified from logs.
-
-Operator: seven years Deputy CEO and Chief Legal Officer of JSC E-GOV OPERATOR, Russia (2011–2018) — board-level public-sector digital transformation (IT + legal + compliance). Second Russia seat: Deputy CEO, Business Development at Fundery (fintech, 2017–2018). Deliberate pivot into applied AI engineering. I am architect, reviewer, and on-call for the fleet. Panama, UTC-5.
-
-Terms I will not move: non-exclusive licence of a copy. I keep copyright, brand, domains, and every product running. No copyright assignment. No exclusive (Lazarus/Turing already has the same non-exclusive shape; exclusive would poison that second cheque). Out of scope: .env/keys, HubSpot CRM, chat logs, customer PII, client material.
-
-Call booked: 31 Aug 2026, 09:40 America/Panama.
-Listing memo attached on Work samples.
-Hub: https://aideazz.xyz/portfolio
-Audit API: https://aideazz.xyz/api
-Wiki: https://aideazz.xyz/ai-ops-wiki.html
-Podcast: https://podcast.aideazz.xyz/
-aipa@aideazz.xyz
+Non-exclusive licence of a copy. I keep copyright, brand, domains, products running. No assignment. No exclusive. Listing memo attached.
+https://aideazz.xyz/portfolio https://aideazz.xyz/api https://aideazz.xyz/ai-ops-wiki.html https://podcast.aideazz.xyz/ aipa@aideazz.xyz

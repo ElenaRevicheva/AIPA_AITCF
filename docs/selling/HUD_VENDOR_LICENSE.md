@@ -54,11 +54,11 @@ say `sent HUD`.
 ## Additional info (onboarding, optional)
 
 Paste-ready: `docs/selling/drafts/hud-vendor-additional-info.txt`
-(everything below the `---` in that file).
+(everything below the `---` in that file). **Hard cap 1000 characters.**
 
-Matching copy: HUD’s own $89,481 stack, tool expertise, exec seats,
-non-exclusive hard line. Do not volunteer “were public until 30 Aug.”
-Do not paste Nine Systems. After this screen: Confirm details → read NDA.
+Matching copy: HUD’s own $89,481 stack, tool expertise, non-exclusive
+hard line. Do not volunteer “were public until 30 Aug.” Do not paste
+Nine Systems. After this screen: Confirm details → read NDA.
 
 ---
 
