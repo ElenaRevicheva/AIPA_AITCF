@@ -124,7 +124,7 @@ git log keeps the record.
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Tier 2 signed. Listing **private** | **Megan:** match / say if Go live helps. Elena: AfterQuery + jobs. Do not upload repos to datafactor.com |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. `/briefs` shows HUD **Enterprise Codebase $100k** (Apply on cards dead) | **Elena:** open that brief title + screenshot. If Apply still dead, ping Megan. Do not email the lab. $100k ≠ cheque |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
