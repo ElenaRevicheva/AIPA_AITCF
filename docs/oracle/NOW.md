@@ -107,22 +107,24 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Elena **signed HUD Tier 2**. Listing still private. Megan
-  paste offers Go live only if it speeds a proposal. Non-exclusive
-  still holds: other buyers (AfterQuery, Lazarus/Turing, jobs) stay
-  open. Non-circumvent is **HUD RFP Parties only**, not the whole market.
-- **NEXT:** Elena: send Megan paste. Say `sent HUD Megan`. Go live only
-  if Megan says public helps. Keep AfterQuery + jobs moving. Refuse
+- **DONE:** Elena **sent Megan**. Tier 2 signed. Listing private. Go live
+  only if Megan says public helps. **datafactor.com is not a HUD clone
+  and not a fee-scam** — 8-person 2025 lab (OnePrompt overlap) that
+  sells *their* first-party interaction data. No vendor-submit. Do not
+  upload the 8 repos there.
+- **NEXT:** Wait for Megan. Keep AfterQuery + jobs moving. Refuse
   exclusive on any HUD DSA.
-- **VERIFIED BY:** User: signed Tier 2. Agreement §§4.1 / 6.2 / 3.2.
-- **RISK:** Contacting a lab she first met as a HUD RFP Party off-platform
-  (uncapped). DSA exclusive. AfterQuery untouched.
+- **VERIFIED BY:** User: message to Megan sent. DataFactor: LinkedIn
+  `datafactor-labs`, domain sold Sedo 15 Feb 2026 for $12,900, copy
+  says first-party only / never resold.
+- **RISK:** Treating DataFactor as a second marketplace. Off-platform
+  HUD RFP contact. DSA exclusive. AfterQuery untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Tier 2 signed.** Listing **private**. Will Go live if Megan says it speeds a proposal | **Elena:** send Megan paste. `sent HUD Megan`. Other buyers still open |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Tier 2 signed. Listing **private** | **Megan:** match / say if Go live helps. Elena: AfterQuery + jobs. Do not upload repos to datafactor.com |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
