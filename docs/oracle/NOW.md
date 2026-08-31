@@ -107,26 +107,24 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD recommended AI reviews: **22 failed, certification
-  withheld — publishing unaffected.** All 10 mandatory still passed.
-  Complexity fail = AILA + atlas 0 LOC. Claims/rarity = 32 not-gradable
-  snapshot. PII LLM = production CRM/WhatsApp trees, not the listing
-  text. Do not chase.
-- **NEXT:** Elena: paste cleared Describe if not already. Then **Make
-  private to opportunity buyers**. Do not Go live. Do not re-run
-  recommended checks. Wait for HUD proposal. Refuse exclusive.
-- **VERIFIED BY:** Elena’s Quality checks paste 31 Aug: 22 failed /
-  21 passed / 10 mandatory / 40 measured / 32 not gradable. HUD copy:
-  “certification withheld — publishing unaffected.”
-- **RISK:** Treating recommended fails as a publish block. Stripping
-  `aipa@` / HubSpot from source to please pii-qc-llm would gut the
-  product. Public Go live anchors under $89k. AfterQuery untouched.
+- **DONE:** Megan follow-up drafted. Listing is **private to
+  opportunity buyers**, not public. Paste:
+  `docs/selling/drafts/hud-vendor-megan-followup.txt`. Gmail MCP is
+  unauthenticated in Cursor Cloud — cannot send from here.
+- **NEXT:** Elena: reply to Megan on the 31 Aug Cal.com thread from
+  `aipa@aideazz.xyz` with that paste. Then say `sent HUD Megan`.
+  Do not Go live. Wait for her to match the opportunities she named.
+- **VERIFIED BY:** User: did not go live; made listing private.
+  Draft names listing `e568b5c8-…`, $74,851 vs HUD $89,481, non-exclusive.
+- **RISK:** Sending from a cold `founders@` instead of her thread loses
+  the call context. Do not mention 22 recommended fails. AfterQuery
+  untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Ready.** 10/10 mandatory. 22 recommended failed (cert withheld, publish OK). **$74,851** | **Elena:** private to opportunity buyers. Do **not** chase recommended checks. Do not Go live. Refuse exclusive |
+| 1 | **HUD Vendor — non-exclusive training licence** | Listing **private to opportunity buyers**. 10/10 mandatory. **$74,851** | **Elena:** send Megan follow-up from `aipa@` on the call thread. Then `sent HUD Megan`. Do not Go live |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
