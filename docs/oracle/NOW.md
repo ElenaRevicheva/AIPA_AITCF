@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-31 17:20 UTC | HUD Tier 2 agreement read | `docs/oracle/NOW.md` (main) | pending |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -107,24 +107,26 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Megan follow-up drafted. Listing is **private to
-  opportunity buyers**, not public. Paste:
-  `docs/selling/drafts/hud-vendor-megan-followup.txt`. Gmail MCP is
-  unauthenticated in Cursor Cloud — cannot send from here.
-- **NEXT:** Elena: reply to Megan on the 31 Aug Cal.com thread from
-  `aipa@aideazz.xyz` with that paste. Then say `sent HUD Megan`.
-  Do not Go live. Wait for her to match the opportunities she named.
-- **VERIFIED BY:** User: did not go live; made listing private.
-  Draft names listing `e568b5c8-…`, $74,851 vs HUD $89,481, non-exclusive.
-- **RISK:** Sending from a cold `founders@` instead of her thread loses
-  the call context. Do not mention 22 recommended fails. AfterQuery
+- **DONE:** Read HUD Platform Access Agreement §§1–7 from Elena’s
+  screenshots. Upgrade itself shows **no fee**. This paper is **not**
+  the repo sale (§3.2 DSA is). **Do not sign** until §§8–12 and **9.2**
+  (unlimited liability, cited from 4.2) are on screen.
+- **NEXT:** Elena: scroll to the end of the agreement. Screenshot any
+  Fees heading + §§8, 9, 10, 11, 12. Do **not** click Finish. Megan
+  email stays the unsigned private-listing paste until then.
+- **VERIFIED BY:** Tiering page “sign… Tier 2 activates once signature
+  verified” (no price). §4.1 non-circumvent = access + 2 years. §6.2
+  keep ownership + irrevocable platform licence. Survival 5.6 lists
+  4, 6, 8, 9.2, 10, 11, 12.
+- **RISK:** Signing blind on 9.2. Treating 6.2 as a training grant.
+  Using HUD RFP Parties to close Lazarus off-platform (4.1). AfterQuery
   untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Listing **private to opportunity buyers**. 10/10 mandatory. **$74,851** | **Elena:** send Megan follow-up from `aipa@` on the call thread. Then `sent HUD Megan`. Do not Go live |
+| 1 | **HUD Vendor — non-exclusive training licence** | Listing **private**. Tier 2 agreement **§§1–7 only** — do not sign yet | **Elena:** screenshot Fees + §8–§12 (esp. 9.2). Then we say sign or not. Megan email after that |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
