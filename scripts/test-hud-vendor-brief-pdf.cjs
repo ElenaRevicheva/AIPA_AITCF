@@ -91,6 +91,8 @@ mustInclude(text, [
   'pgvector',
   '131-test',
   'paper trading',
+  'Deputy CEO',
+  'E-GOV OPERATOR',
 ]);
 mustNotInclude(text, [
   'Nine Systems',
@@ -135,6 +137,7 @@ mustNotInclude(text, [
     'https://aideazz.xyz/portfolio#portfolio-inquiry-form',
     'https://aideazz.xyz/sop-ai-ops.html',
     'https://aideazz.xyz/blog',
+    'https://aideazz.xyz/ai-ops-wiki.html',
     'https://podcast.aideazz.xyz/',
     'mailto:aipa@aideazz.xyz',
     'https://cal.com/team/hud/talk-to-us-data-vendor-platform',

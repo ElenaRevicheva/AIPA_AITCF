@@ -439,8 +439,9 @@ async function main() {
     'https://webhook.aideazz.xyz/whitespace/atlas.html  (Atlas board)',
     'https://aideazz.xyz/portfolio#portfolio-inquiry-form',
     'https://aideazz.xyz/sop-ai-ops.html  (ops SOP)',
-    'https://aideazz.xyz/blog',
-    'https://podcast.aideazz.xyz/',
+    'https://aideazz.xyz/blog  (daily grounded publisher)',
+    'https://aideazz.xyz/ai-ops-wiki.html  (AI Ops Wiki  -  named failure modes)',
+    'https://podcast.aideazz.xyz/  (podcast)',
   ];
   for (const p of proofs) {
     ensure(11);
@@ -500,9 +501,41 @@ async function main() {
   );
 
   newPage();
+  label('WHO BUILT THIS');
+  ensure(78);
+  page.drawRectangle({
+    x: left,
+    y: y - 64,
+    width: maxW,
+    height: 76,
+    color: navy,
+  });
+  page.drawRectangle({ x: left, y: y + 10, width: maxW, height: 3, color: gold });
+  page.drawText('ELENA REVICHEVA  |  AIDEAZZ AI LAB  |  PANAMA', {
+    x: left + 12,
+    y: y - 6,
+    size: 8,
+    font: fontB,
+    color: gold,
+  });
+  const who = [
+    'Seven years as Deputy CEO and Chief Legal Officer of JSC E-GOV OPERATOR (2011-2018): board-level public-sector digital transformation, holding IT, legal and compliance in a regulated environment. Then fintech (Fundery, Deputy CEO Business Development) and an operational co-founder seat at OmniBazaar.',
+    'This Lab is a deliberate pivot into applied AI engineering, not a hobby stack. Same standard I used to impose on vendors: measure at the edge, fail closed, write the failure down. The 131-test eval harness, five-provider LLM chain, fail-closed publisher, and public AI Ops Wiki are that executive bar in code. I am architect, reviewer, and on-call for the fleet.',
+  ];
+  let wy = y - 20;
+  for (const para of who) {
+    for (const line of wrapTo(para, 8, font, maxW - 24)) {
+      page.drawText(line, { x: left + 12, y: wy, size: 8, font, color: white });
+      wy -= 10;
+    }
+    wy -= 2;
+  }
+  y -= 80;
+  gap(6);
+
   label('WHY EACH SYSTEM EXISTS  -  AND HOW IT RUNS NOW');
   text(
-    'Provenance for a training lab, not a hiring dossier. Each of these eight started as a real constraint on one operator, one server. Live products stay up. This packet licences a copy of source.',
+    'Each of these eight started as a real operating constraint, then was engineered to production standard. Live products stay up. This packet licences a copy of source.',
     9,
     font,
     ink
