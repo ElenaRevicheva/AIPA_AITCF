@@ -107,24 +107,23 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Elena found HUD briefs at `datavendor.ai/briefs` (Tier 2).
-  Four HUD-posted RFPs; **Enterprise Codebase Data Opportunity $100,000
-  total** is the listing fit. Card Apply is dead — not DataFactor theater.
-  Apply = an offer. Do not email the lab off-platform (§4.1 RFP Party).
-- **NEXT:** Elena: open the $100k **title** (not the card Apply) and
-  screenshot the full brief. If Apply still dead inside, send Megan ping
-  (`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` on the HUD
-  branch). AfterQuery + Rwazi + Plata still move. Refuse exclusive DSA.
-- **VERIFIED BY:** User screenshot 31 Aug 12:51 Panama, logged in as
-  Aldeazz AI Lab Tier 2 Vendor. Four HUD cards; $100k on codebase brief.
-- **RISK:** Treating $100k as a cheque (brief budget can split). Applying
-  off-platform. Spraying all four briefs. Confusing with DataFactor jobs.
+- **DONE:** Three HUD briefs opened. All **no-bid** with the 8-pack.
+  Codebase = git history. Coding = Harbor puzzles. **Agentic outside
+  SWE** = closest *domain* (last-click, HubSpot SoR, MCP, marketing)
+  and still Harbor *format* (offline stubs, 100 tool calls, FN/FP).
+- **NEXT:** Elena: send Megan ping covering **three** briefs. Do not
+  Apply. Do not stub HubSpot unpaid. AfterQuery + Rwazi + Plata move.
+- **VERIFIED BY:** User pasted agentic Must have: real tool use, SoR
+  end state, named failure modes, **stubs OK if offline**, Harbor QC
+  Required (build, bundle, FN/FP, live task).
+- **RISK:** Applying because tags say MCP/tool-use. Pointing a task at
+  live WhatsApp/HubSpot. Unpaid Harbor. Tooltip reopening codebase.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. `/briefs` shows HUD **Enterprise Codebase $100k** (Apply on cards dead) | **Elena:** open that brief title + screenshot. If Apply still dead, ping Megan. Do not email the lab. $100k ≠ cheque |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. Three briefs **no-bid**; agentic-outside-SWE is domain-only | **Elena:** send Megan ping (three briefs). Do not Apply. Commissioned Harbor only |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
@@ -219,3 +218,11 @@ work. Port what you want by hand; never reset.
   round closed (volume), not quality; they do not keep the trees. HUD
   saw them already private tonight. Flip ≠ never-public. Hashseatic is
   not a quote. Next dollars: HUD number, AfterQuery click follow-up, jobs.
+- **HUD lookalikes searched 31 Aug.** Still not a fourth quote: Hashseatic
+  / gitbuyer (you find the lab), FileYield / ThenAI / DataFactor (not
+  this SKU). TrainPlex.in = Indic mill, lower bar, excludes “fully
+  AI-generated” — metadata only, read paper, no GitHub tonight.
+  Fermatix (`hi@fermatix.ai`) sources private repos for royalties —
+  inbound later, refuse exclusive. Mercor/Surge/Scale = hours, not the
+  8-pack. Fleet/Chakra/Mechanize/Sharpe build gyms; they do not list
+  her GitHub.
