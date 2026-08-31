@@ -75,18 +75,23 @@ not a cheque.**
 | Brief (posted ~11–12 days) | Fit |
 |---|---|
 | **Enterprise Codebase Data Opportunity — $100,000 total** | **No-bid.** Must-haves are a mid-size company repo, not the 8-pack. See scorecard below. |
-| Long-Horizon Agentic Tasks Outside SWE (tool-use, computer use, MCP) | Task/eval work, not the licence SKU. Adjacent to WhatsApp/Telegram/CRM/Atlas. Do not spray today. |
-| Long-Horizon Coding Tasks (Coding/SWE) | Task/eval work. Adjacent to the eight repos as environments. Do not spray today. |
+| **Long-Horizon Coding Tasks** (Coding/SWE, Harbor) | **No-bid with the listing.** They buy sealed Harbor tasksets, not production repos. See below. |
+| Long-Horizon Agentic Tasks Outside SWE (tool-use, computer use, MCP) | Likely the same Harbor/no-live-services shape. Do not Apply until the Must have list is pasted. |
 | Finance and Legal Knowledge Work Tasks | Skip. Not the product. |
 
-**Do not Apply** to the $100k codebase brief. Do not pad PRs, fake
-contributors, or concatenate trees to clear 100k LOC. Paste
+**Do not Apply** the 8-pack to either opened brief. Do not pad PRs, fake
+contributors, concatenate trees, or wrap Telegram/WhatsApp/HubSpot into
+a fake Harbor image. Paste
 `docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` so Megan does
-not slot the listing into this RFP. **Do not email the lab** — HUD
-briefs are §4.1 RFP Parties. Listing stays private-to-opportunity-
-buyers for labs that want live tool-use, not a Fortune-500 monorepo.
+not slot the listing into these RFPs. **Do not email the lab.** Listing
+stays private-to-opportunity-buyers for labs that want live tool-use.
 
 Refuse exclusive/assignment on any offer or later DSA.
+
+Do not start an unpaid Harbor build. Anthropic credits are at zero;
+this brief needs 5 Opus traces + 5 GPT traces per task on Claude Code
+or Codex, dual-arch images, FN/FP QA agents, and Harbor bundle
+validation. That is a commissioned project, not an afternoon.
 
 #### Enterprise codebase must-haves vs the 8-pack (31 Aug)
 
@@ -112,6 +117,32 @@ The listing QC block on the brief (metadata, personal-data scan,
 secrets scan, snapshot) is the **listing text** pipeline — those
 required rows can pass while the codebase must-haves still fail.
 Informational complexity / pii qc llm do not change this no-bid.
+
+#### Long-horizon coding tasks vs the 8-pack (31 Aug)
+
+They are buying **Harbor-format eval tasks** that frontier models fail
+(`docs.hud.ai` Harbor adapter: `task.toml` + instruction + grader +
+environment image). Intended use: evaluation and training. Deployment:
+secure recipient-controlled upload. 0 applicants.
+
+| Must have | Why the 8-pack cannot Apply |
+|---|---|
+| Harbor format; bundle validation **Required** | No `task.toml` / Harbor bundle in the trees. Listing is GitHub zipballs. |
+| Environment build **Required**; x86 **and** ARM; no entrypoint on launch | No HUD environment image. |
+| Self-contained; **no live external services, no credentials** | AITCF / VJH / EspaLuz **are** Telegram, WhatsApp, HubSpot, Resend. Wrapping them would violate the brief. |
+| ≥100 tool calls; pass@1 < 0.5 with re-runs | Production traces are not Harbor trajectories. |
+| 5 traces × Opus 4.8/5 **and** 5 × GPT 5.5/5.6 on Claude Code or Codex | Not collected. Anthropic credits are at zero. |
+| No-op = 0, reference = 1; partial credit; anti-shortcut | Needs a designed grader, not a live product. |
+| FN/FP QA agent both false **Required**; taskset has ≥1 live task **Required** | No live Harbor task. |
+
+VJH’s 131 tests / 4-layer eval is a **job-hunt judge**, not a Harbor
+coding task. HUD QA agents (`docs.hud.ai/platform/qa-agents`) audit
+traces for grader mistakes and reward hacking — that pipeline only
+runs after a Harbor task exists.
+
+**Apply** would fail Required QC on day one (environment build, Harbor
+bundle, FN/FP, taskset contents). A paid commission to *author* tasks
+is a different conversation with Megan — do not start it unpaid.
 
 ### Recommended checks (22 failed) — do not chase
 
