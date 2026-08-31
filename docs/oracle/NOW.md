@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-08-31 16:40 UTC | HUD: why not those 3 extra repos | `docs/oracle/NOW.md` (main) | pending |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -118,7 +118,9 @@ git log keeps the record.
   $12,000; AILA $4,264; atlas $4,137; dragontrade $6,450; sum $74,851.
 - **RISK:** Overview still saying $73,761 would contradict the form.
   Public Go live anchors under HUD’s $89k point. Proposal ≠ cash.
-  Do not volunteer were-public. AfterQuery deploy untouched.
+  Do not volunteer were-public. Do **not** add `atlas-shifted` /
+  `ascent-saas-builder` / `openclaw-vibejob-shortlist` to this listing
+  (MIT / Lovable+`.env` / still-public $0). AfterQuery deploy untouched.
 
 ## 💰 MONEY QUEUE
 
@@ -200,11 +202,10 @@ work. Port what you want by hand; never reset.
 - After any deploy: restart, prove it from `journalctl`, **and check the OUTCOME.**
 - **hud.io ≠ hud.ai ≠ DataVendor API.** Cursor `Hud: Sign In` is a plugin.
   The licence buyer is DataVendor (`datavendor.ai`). Their estimator:
-  **public = $0**. The published HUD REST/MCP is **evals**, not the quote.
-  Packet: `docs/selling/HUD_VENDOR_LICENSE.md` on
-  `cursor/hud-vendor-license-1c49`. Connection note:
-  `docs/selling/HUD_VENDOR_CONNECTION.md` on
-  `cursor/hud-vendor-connection-8532`.
+  **public = $0**. REST/MCP is evals, not the quote. Do not add
+  `openclaw-vibejob-shortlist` (MIT), `ascent-saas-builder` (Lovable),
+  or `atlas-shifted` (still public) to the Ready 8-pack. Packet:
+  `docs/selling/HUD_VENDOR_LICENSE.md` on `cursor/hud-vendor-license-1c49`.
 - **No fourth Lazarus.** Codebase buyers that quote: Lazarus, Atrium
   (AfterQuery), HUD. Lazarus: solo / no team+P&L. Atrium **25 Aug**:
   round closed (volume), not quality; they do not keep the trees. HUD
