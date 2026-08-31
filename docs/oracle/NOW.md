@@ -107,14 +107,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD Additional-info paste on `cursor/hud-vendor-license-1c49`
-  (`2f569f0`). Matching copy: HUD’s own $89,481 stack, tools, exec seats,
-  non-exclusive hard line. Listing memo PDF still the work sample.
-- **NEXT:** Elena: paste Additional info (file below the `---`) → Confirm
-  details → read NDA → Cal.com 9:40 Panama → founders@. Never Nine
-  Systems. No deploy. No `.hire-trigger`.
-- **VERIFIED BY:** paste body 2,621 chars; grep of forbidden phrases
-  (`were public`, Nine Systems, Hire me, `/codebases/result`) = none.
+- **DONE:** HUD Additional-info paste capped at **1000 chars** on
+  `cursor/hud-vendor-license-1c49` (`ed6cf07`). HUD $89,481 stack +
+  tools + non-exclusive line. Operator bio dropped to fit the field.
+- **NEXT:** Elena: paste Additional info (file below the `---`, 1000
+  chars) → Confirm details → read NDA → Cal.com 9:40 Panama →
+  founders@. Never Nine Systems. No deploy.
+- **VERIFIED BY:** paste body **1000 characters / 1000 bytes**; grep of
+  `were public`, Nine Systems, Hire me, `/codebases/result` = none.
 - **RISK:** Do not volunteer “were public until 30 Aug.” $350k is
   imputed fantasy — do not bank it. Do not mint `HUD_API_KEY`. Do not
   `git pull` on Oracle. AfterQuery deploy untouched.
@@ -123,7 +123,7 @@ git log keeps the record.
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Quote **$89,481** / 44%. Paste: `docs/selling/drafts/hud-vendor-additional-info.txt` on the branch | **Elena: paste Additional info** → NDA → Cal.com 9:40 → founders@ |
+| 1 | **HUD Vendor — non-exclusive training licence** | Quote **$89,481** / 44%. 1000-char paste on the HUD branch | **Elena: paste Additional info** → NDA → Cal.com 9:40 → founders@ |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
