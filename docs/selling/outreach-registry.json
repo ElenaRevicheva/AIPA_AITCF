@@ -2903,7 +2903,13 @@
     "playbook": "docs/selling/HUD_VENDOR_LICENSE.md",
     "calCom": "https://cal.com/team/hud/talk-to-us-data-vendor-platform",
     "referralCode": "B46B3C3F",
-    "note": "Quote in $89,481 point / 44%. Non-exclusive only. Lab stays up. Elena: Confirm Cal.com 31 Aug 9:40 Panama + send founders letter. Referral B46B3C3F. Not hud.io."
+    "note": "Quote in $89,481 point / 44%. Non-exclusive only. Lab stays up. Work sample is HUD_Vendor_NonExclusive_Licence_Brief.pdf — never Nine Systems. Elena: Confirm Cal.com 31 Aug 9:40 Panama + send founders letter. Referral B46B3C3F. Not hud.io.",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/HUD_Vendor_NonExclusive_Licence_Brief.pdf",
+        "filename": "HUD_Vendor_NonExclusive_Licence_Brief.pdf"
+      }
+    ]
   },
   "ai-native-b2b-marketplace": {
     "phone": "00000000000",

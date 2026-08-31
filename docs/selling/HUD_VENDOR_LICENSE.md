@@ -1,15 +1,48 @@
 # HUD Vendor — non-exclusive training licence
 
-**Status (30 Aug 2026, 19:32 Panama / 31 Aug 00:35 UTC):** Quote is **in**.
-8 private repos. Point estimate **$89,481**. Range **$61,067–$350,557**.
-Score **44% Promising**. Public discoverability: Not public. This is an
-estimator, not a payout. Next: Book a call + founders letter + finish NDA.
-Do not sign exclusive or copyright assignment. Do not bank the $350k top.
+**Status (31 Aug 2026):** Quote is **in**. Work-sample PDF is **this listing
+memo**, not Nine Systems. 8 private repos. Point **$89,481**. Range
+**$61,067–$350,557**. Score **44% Promising**. Estimator, not a payout.
+Next: attach the PDF on onboarding → read NDA → Confirm Cal.com 9:40
+Panama → send founders letter. Do not sign exclusive. Do not bank $350k.
 
 **What you keep:** copyright, brand, domains, and the right to keep operating,
 improving and selling every product. Production stays up. This is a licence of a
 **copy of source you solely own**, for model-training use. Same offer already
 standing with Turing / Lazarus.
+
+---
+
+## Work samples (onboarding) — this PDF, never Nine Systems
+
+HUD's onboarding **Work samples** field is optional. Fill it with the buyer
+packet, not the job-hunt dossier.
+
+**Attach this file:**
+`docs/selling/attachments/HUD_Vendor_NonExclusive_Licence_Brief.pdf`
+
+Every URL in it is a real clickable PDF link (blue, underlined): DataVendor
+estimate, the seven proof surfaces, `mailto:aipa@aideazz.xyz`, and the
+Cal.com slot. Rebuild with
+`npm install pdf-lib --no-save && node scripts/build-hud-vendor-brief-pdf.cjs`.
+
+**Paste these two links only:**
+
+- `https://aideazz.xyz/portfolio`
+- `https://aideazz.xyz/api`
+
+**Do not attach** `Nine_Systems_And_Why_They_Exist_AIdeazz_1.pdf`. That file
+says the code is on GitHub, is AI-authored, and is a hiring dossier. Same
+content is already at `https://webhook.aideazz.xyz/doc/nine-systems`. A
+"private code" sale cannot also hand them a document that invites a clone.
+
+A PDF does not raise HUD's number. This one protects it: commercial licence
+language, their own $89,481, the public-until-30-Aug disclosure, and live
+proof URLs. Nine Systems would have cut it.
+
+Then: Sign NDA (read it) → Confirm Cal.com 9:40 America/Panama → send
+`docs/selling/drafts/hud-vendor-founders-email.txt` to `founders@hud.ai` →
+say `sent HUD`.
 
 ---
 
