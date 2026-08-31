@@ -1,8 +1,8 @@
-SUBJECT: Opened two briefs — neither fits the listing; please keep matching live tool-use
+SUBJECT: Three briefs opened — listing stays; agentic-outside-SWE is the domain match if you commission Harbor
 TO: Megan (reply on the same 31 Aug Cal.com / HUD thread)
 FROM: Elena Revicheva <aipa@aideazz.xyz>
 
-Send after reading both Must have lists. Do not Apply to either brief.
+Send after reading the three Must have lists. Do not Apply.
 Do not attach Nine Systems. Do not volunteer were-public, 22 fails,
 §9.2, $350k, Cursor commit counts, or hardship. Do not email the lab.
 
@@ -10,17 +10,19 @@ Do not attach Nine Systems. Do not volunteer were-public, 22 fails,
 
 Hi Megan,
 
-I opened two HUD briefs.
+I opened three HUD briefs.
 
 Enterprise Codebase Data Opportunity ($100,000 total) — I will not apply. The must-haves are 10+ contributors, 100 merged PRs, 100k–10M LOC, >25% coverage, and primarily pre-AI human-written code. Mine is a solo 2025 production lab, not that enterprise-monorepo profile.
 
-Long-Horizon Coding Tasks — I will not apply with this listing either. That brief wants Harbor-format tasksets (100+ tool-call trajectories, Claude Code/Codex traces, dual-arch images, no live services). I list live production systems (tool-use, MCP, WhatsApp/Telegram/CRM), not sealed eval environments.
+Long-Horizon Coding Tasks — I will not apply with this listing. That brief wants Harbor-format coding tasksets, not live production systems.
 
-The listing stays private to opportunity buyers for labs that want that production SKU:
+Long-Horizon Agentic Tasks Outside Software Engineering — this is the brief whose workflows I actually run (tool-use, MCP, CRM as the system of record, human on the last irreversible click). I still will not apply with the current listing: the must-haves are sealed Harbor environments, 100+ tool-call traces, and offline stubs — no live services. If you commission that as paid Harbor authoring, that is my lane. I will not start it unpaid.
+
+The listing stays private to opportunity buyers for labs that want the live production SKU:
 
 https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443
 
-Please keep matching those, not these two briefs. If you ever commission Harbor task authoring as paid project work, I can talk — I will not start that unpaid.
+Please keep matching those. Do not slot this listing into the three briefs above.
 
 Elena Revicheva
 AIdeazz AI Lab

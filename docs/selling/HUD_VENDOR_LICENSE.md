@@ -83,22 +83,24 @@ is a budget, not a cheque.**
 |---|---|
 | **Enterprise Codebase Data Opportunity — $100,000 total** | **No-bid.** Must-haves are a mid-size company repo, not the 8-pack. See scorecard below. |
 | **Long-Horizon Coding Tasks** (Coding/SWE, Harbor) | **No-bid with the listing.** They buy sealed Harbor tasksets, not production repos. See below. |
-| Long-Horizon Agentic Tasks Outside SWE (tool-use, computer use, MCP) | Likely the same Harbor/no-live-services shape. Do not Apply until the Must have list is pasted. |
+| **Long-Horizon Agentic Tasks Outside SWE** (tool-use, computer use, MCP) | **Closest domain, still no-bid with the listing.** Last-click / CRM / MCP is the *subject*. Harbor stubs + 100 tool calls is the *format*. See below. |
 | Finance and Legal Knowledge Work Tasks | Skip. Not the product. |
 
-**Do not Apply** the 8-pack to either opened brief. Do not pad PRs, fake
-contributors, concatenate trees, or wrap Telegram/WhatsApp/HubSpot into
-a fake Harbor image. Paste
-`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` so Megan does
-not slot the listing into these RFPs. **Do not email the lab.** Listing
-stays private-to-opportunity-buyers for labs that want live tool-use.
+**Do not Apply** the 8-pack to any of the three opened briefs. Do not
+pad PRs, fake contributors, concatenate trees, or wrap
+Telegram/WhatsApp/HubSpot into a live-connected image. **Stubs are
+allowed on the agentic brief only if the workflow still behaves** —
+that is a commissioned Harbor build, not an Apply of the repo listing.
+Paste `docs/selling/drafts/hud-vendor-megan-briefs-ping.txt`. **Do not
+email the lab.** Listing stays private-to-opportunity-buyers for labs
+that want live tool-use.
 
 Refuse exclusive/assignment on any offer or later DSA.
 
 Do not start an unpaid Harbor build. Anthropic credits are at zero;
-this brief needs 5 Opus traces + 5 GPT traces per task on Claude Code
-or Codex, dual-arch images, FN/FP QA agents, and Harbor bundle
-validation. That is a commissioned project, not an afternoon.
+both long-horizon briefs need Opus 4.8 Pass@5 traces, FN/FP QA agents,
+and Harbor bundle validation. That is a commissioned project, not an
+afternoon.
 
 #### Enterprise codebase must-haves vs the 8-pack (31 Aug)
 
@@ -150,6 +152,29 @@ runs after a Harbor task exists.
 **Apply** would fail Required QC on day one (environment build, Harbor
 bundle, FN/FP, taskset contents). A paid commission to *author* tasks
 is a different conversation with Megan — do not start it unpaid.
+
+#### Long-horizon agentic tasks outside SWE vs the 8-pack (31 Aug)
+
+Same Harbor Required QC as coding (environment build, bundle
+validation, FN/FP, live task, Opus 4.8 Pass@5 for certification).
+**Closest domain of the four.** Nice-to-have includes marketing and
+multi-system workflows. Must-have named failure modes map onto the
+listing thesis (human last click = premature irreversible action;
+fail-closed numbers; HubSpot as system of record; Atlas → audit API
+→ CRM). Tags: Enterprise Tool Use, Computer Use, MCP.
+
+| Must have | Call |
+|---|---|
+| Real tool use, not a chat transcript; ≥100 tool calls | Domain yes (live ops). Format no — no Harbor traces. |
+| Verifiable end state (filed doc / ledger / **populated system of record**) | HubSpot deal staging is the live analogue. Needs a **stubbed** CRM in-env. |
+| Partial credit across steps; named failure modes (skipped compliance, stale records, premature irreversible actions) | Product thesis matches. Grader does not exist. |
+| Self-contained and **offline**. No live services, no real accounts. **Stubs are fine if the workflow still behaves** | The opening. Still a build. Do not point the task at production WhatsApp/HubSpot. |
+| PII removed or consistently pseudonymised; documented licence rights | Licence already excludes customer PII. Do not ship real CRM/chat logs. |
+| Harbor bundle + environment build + FN/FP + ≥1 live task **Required** | Fail today. No `task.toml`. |
+
+Do **not** Apply the repo listing. Do **not** start stubbing HubSpot
+unpaid. If Megan commissions this brief as paid Harbor authoring,
+this is the one whose workflows Elena actually runs.
 
 ### Recommended checks (22 failed) — do not chase
 
