@@ -2927,5 +2927,145 @@
     "emailDraft": "docs/selling/drafts/afterquery-atrium-reask-email.txt",
     "draft": "docs/selling/drafts/afterquery-atrium-reask-email.txt",
     "dealId": "64465792824"
+  },
+  "dental-implants-dental-tourism-costa-rica-atlas": {
+    "company": "Dental Implants & Dental Tourism Costa Rica",
+    "email": "info@confidentalcr.com",
+    "score": 92,
+    "dealId": "64517814133",
+    "phone": "50688206932",
+    "emailDraft": "docs/selling/drafts/dental-implants-dental-tourism-costa-rica-atlas-email.txt",
+    "draft": "docs/selling/drafts/dental-implants-dental-tourism-costa-rica-atlas.txt"
+  },
+  "dental-implants-dental-tourism-costa-rica-atlas-fu": {
+    "company": "Dental Implants & Dental Tourism Costa Rica",
+    "email": "info@confidentalcr.com",
+    "score": 92,
+    "dealId": "64517814133",
+    "phone": "50688206932",
+    "emailDraft": "docs/selling/drafts/dental-implants-dental-tourism-costa-rica-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/dental-implants-dental-tourism-costa-rica-atlas-fu.txt"
+  },
+  "costa-rica-dental-tourism-smile-restoration-expe-atlas": {
+    "company": "Costa Rica Dental Tourism & Smile Restoration Experts",
+    "email": "clinic@prismadental.com",
+    "score": 95,
+    "dealId": "64517836070",
+    "phone": "50689015151",
+    "emailDraft": "docs/selling/drafts/costa-rica-dental-tourism-smile-restoration-expe-atlas-email.txt",
+    "draft": "docs/selling/drafts/costa-rica-dental-tourism-smile-restoration-expe-atlas.txt"
+  },
+  "costa-rica-dental-tourism-smile-restoration-expe-atlas-fu": {
+    "company": "Costa Rica Dental Tourism & Smile Restoration Experts",
+    "email": "clinic@prismadental.com",
+    "score": 95,
+    "dealId": "64517836070",
+    "phone": "50689015151",
+    "emailDraft": "docs/selling/drafts/costa-rica-dental-tourism-smile-restoration-expe-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/costa-rica-dental-tourism-smile-restoration-expe-atlas-fu.txt"
+  },
+  "san-juan-dentist-dental-tourism-atlas": {
+    "company": "San Juan Dentist - Dental Tourism",
+    "email": "info@dentalavenuecr.com",
+    "score": 85,
+    "dealId": "64517317790",
+    "phone": "50664362020",
+    "emailDraft": "docs/selling/drafts/san-juan-dentist-dental-tourism-atlas-email.txt",
+    "draft": "docs/selling/drafts/san-juan-dentist-dental-tourism-atlas.txt"
+  },
+  "san-juan-dentist-dental-tourism-atlas-fu": {
+    "company": "San Juan Dentist - Dental Tourism",
+    "email": "info@dentalavenuecr.com",
+    "score": 85,
+    "dealId": "64517317790",
+    "phone": "50664362020",
+    "emailDraft": "docs/selling/drafts/san-juan-dentist-dental-tourism-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/san-juan-dentist-dental-tourism-atlas-fu.txt"
+  },
+  "5-things-you-need-to-know-about-dental-tourism-i-atlas": {
+    "company": "5 Things You Need to Know About Dental Tourism in Costa Rica",
+    "email": "info@advancedentalcostarica.com",
+    "score": 90,
+    "dealId": "64517735773",
+    "phone": "50670594083",
+    "emailDraft": "docs/selling/drafts/5-things-you-need-to-know-about-dental-tourism-i-atlas-email.txt",
+    "draft": "docs/selling/drafts/5-things-you-need-to-know-about-dental-tourism-i-atlas.txt"
+  },
+  "5-things-you-need-to-know-about-dental-tourism-i-atlas-fu": {
+    "company": "5 Things You Need to Know About Dental Tourism in Costa Rica",
+    "email": "info@advancedentalcostarica.com",
+    "score": 90,
+    "dealId": "64517735773",
+    "phone": "50670594083",
+    "emailDraft": "docs/selling/drafts/5-things-you-need-to-know-about-dental-tourism-i-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/5-things-you-need-to-know-about-dental-tourism-i-atlas-fu.txt"
+  },
+  "dds-dental-atlas": {
+    "company": "DDS Dental",
+    "email": "ddsdental@ddsdentalcr.com",
+    "score": 41,
+    "dealId": "64505307914",
+    "emailDraft": "docs/selling/drafts/dds-dental-atlas-email.txt"
+  },
+  "dds-dental-atlas-fu": {
+    "company": "DDS Dental",
+    "email": "ddsdental@ddsdentalcr.com",
+    "score": 41,
+    "dealId": "64505307914",
+    "emailDraft": "docs/selling/drafts/dds-dental-atlas-fu-email.txt"
+  },
+  "nova-dental-costa-rica-dental-treatments-advance-atlas": {
+    "company": "Nova Dental Costa Rica Dental Treatments Advanced Center",
+    "email": "patients@novadentalcr.com",
+    "score": 91,
+    "dealId": "64517860468",
+    "phone": "50684246719",
+    "emailDraft": "docs/selling/drafts/nova-dental-costa-rica-dental-treatments-advance-atlas-email.txt",
+    "draft": "docs/selling/drafts/nova-dental-costa-rica-dental-treatments-advance-atlas.txt"
+  },
+  "nova-dental-costa-rica-dental-treatments-advance-atlas-fu": {
+    "company": "Nova Dental Costa Rica Dental Treatments Advanced Center",
+    "email": "patients@novadentalcr.com",
+    "score": 91,
+    "dealId": "64517860468",
+    "phone": "50684246719",
+    "emailDraft": "docs/selling/drafts/nova-dental-costa-rica-dental-treatments-advance-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/nova-dental-costa-rica-dental-treatments-advance-atlas-fu.txt"
+  },
+  "plastic-surgery-in-colombia-atlas": {
+    "company": "Plastic Surgery in Colombia",
+    "email": "info@drzamirpaez.com",
+    "score": 92,
+    "dealId": "64517410612",
+    "phone": "573243072998",
+    "emailDraft": "docs/selling/drafts/plastic-surgery-in-colombia-atlas-email.txt",
+    "draft": "docs/selling/drafts/plastic-surgery-in-colombia-atlas.txt"
+  },
+  "plastic-surgery-in-colombia-atlas-fu": {
+    "company": "Plastic Surgery in Colombia",
+    "email": "info@drzamirpaez.com",
+    "score": 92,
+    "dealId": "64517410612",
+    "phone": "573243072998",
+    "emailDraft": "docs/selling/drafts/plastic-surgery-in-colombia-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/plastic-surgery-in-colombia-atlas-fu.txt"
+  },
+  "cirujana-pl-stica-jenny-diaz-atlas": {
+    "company": "Cirujana Plástica Jenny Diaz",
+    "email": "jennydiazcirujanaplastica@gmail.com",
+    "score": 74,
+    "dealId": "64517188268",
+    "phone": "573174321486",
+    "emailDraft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas-email.txt",
+    "draft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas.txt"
+  },
+  "cirujana-pl-stica-jenny-diaz-atlas-fu": {
+    "company": "Cirujana Plástica Jenny Diaz",
+    "email": "jennydiazcirujanaplastica@gmail.com",
+    "score": 74,
+    "dealId": "64517188268",
+    "phone": "573174321486",
+    "emailDraft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas-fu.txt"
   }
 }
