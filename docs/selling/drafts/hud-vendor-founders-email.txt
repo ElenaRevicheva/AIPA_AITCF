@@ -1,15 +1,13 @@
-SUBJECT: Quote is in — 8 private repos, point estimate $89,481 — I keep the products
+SUBJECT: Non-exclusive licence — 8 repos, your quote $89,481 — AIdeazz stays mine and stays up
 TO: founders@hud.ai
 
 Hi,
 
-The estimator finished on datavendor.ai/codebases/result for eight private repos I solely own.
+Your estimator on datavendor.ai priced eight private repos I solely own at a point estimate of $89,481 (range $61,067–$350,557, score 44%).
 
-Point estimate $89,481. Range $61,067–$350,557. Score 44% Promising. Public discoverability: not public.
+I want to sell a non-exclusive training licence. I keep copyright, the AIdeazz AI Lab brand, the domains, and the right to keep every product running, improving, and selling. Production does not stop. CRM, chat logs, keys, and any third-party or client material are out of scope.
 
-I am disclosing that these repos were public until 30 Aug 2026. I flipped them so the tool could grade private code. I retain copyright, the brand, the domains, and the right to keep operating, improving and selling every product. Production stays up. CRM, chat logs, keys, and any third-party or client material are out of scope. The offer is a non-exclusive licence to a copy of source, for model-training use.
-
-Repos in this quote (point estimates):
+I disclose that these repos were public until 30 Aug 2026. I flipped them so your tool could grade private code.
 
 - VibeJobHunterAIPA_AIMCF — $17,020
 - EspaLuzWhatsApp — $16,735
@@ -20,14 +18,13 @@ Repos in this quote (point estimates):
 - AILA — $4,264
 - atlas-captures — $4,137
 
-aideazz stays public. That repo deploys https://aideazz.xyz/portfolio.
+aideazz stays public. It deploys https://aideazz.xyz/portfolio.
 
 Dossier: https://webhook.aideazz.xyz/doc/nine-systems
 
-I clicked Book a call as well. I can take it from Panama City (UTC−5). I will not sign anything exclusive or that assigns copyright.
+I will book the call on your result page. I will not sign exclusive terms or a copyright assignment.
 
-Best regards,
 Elena Revicheva
-AIdeazz AI Lab · Panama City
+AIdeazz AI Lab · Panama City · UTC−5
 aipa@aideazz.xyz
 https://aideazz.xyz/portfolio
