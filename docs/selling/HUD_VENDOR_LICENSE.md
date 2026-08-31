@@ -62,6 +62,32 @@ on HUD) for access + two years — not a lock on the whole market.
 AfterQuery, Lazarus/Turing (pre-existing), and jobs continue. A lab
 Megan introduces goes through HUD. Do not exclusive-assign on a DSA.
 
+### HUD briefs (`/briefs`) — found 31 Aug, 12:51 Panama
+
+Logged in as **Aldeazz AI Lab · Tier 2 Vendor**. Four HUD-posted
+cards. This is the real RFP board, not DataFactor careers.
+
+Apply on a DataVendor brief is an **offer**, not an interest click
+(`datavendor.ai/use-cases`). One brief can spawn several projects if
+the buyer accepts more than one vendor. **$100,000 total is a budget,
+not a cheque.**
+
+| Brief (posted ~11–12 days) | Fit |
+|---|---|
+| **Enterprise Codebase Data Opportunity — $100,000 total** | **The listing.** “licenses private, production-grade software…” Open the **title**, screenshot the full brief, then Apply if it works. |
+| Long-Horizon Agentic Tasks Outside SWE (tool-use, computer use, MCP) | Task/eval work, not the licence SKU. Adjacent to WhatsApp/Telegram/CRM/Atlas. Do not spray today. |
+| Long-Horizon Coding Tasks (Coding/SWE) | Task/eval work. Adjacent to the eight repos as environments. Do not spray today. |
+| Finance and Legal Knowledge Work Tasks | Skip. Not the product. |
+
+If card Apply is dead: open the $100k **title**. If Apply is still
+dead inside the brief, paste
+`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` on the Megan
+thread. **Do not email the lab** — HUD-posted briefs are §4.1 RFP
+Parties. Do not Go live just because Apply is dead; private-to-
+opportunity-buyers is already the matching state.
+
+Refuse exclusive/assignment on any offer or later DSA.
+
 ### Recommended checks (22 failed) — do not chase
 
 HUD’s own line: **certification withheld — publishing unaffected.**
