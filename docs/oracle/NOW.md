@@ -218,3 +218,11 @@ work. Port what you want by hand; never reset.
   round closed (volume), not quality; they do not keep the trees. HUD
   saw them already private tonight. Flip ≠ never-public. Hashseatic is
   not a quote. Next dollars: HUD number, AfterQuery click follow-up, jobs.
+- **HUD lookalikes searched 31 Aug.** Still not a fourth quote: Hashseatic
+  / gitbuyer (you find the lab), FileYield / ThenAI / DataFactor (not
+  this SKU). TrainPlex.in = Indic mill, lower bar, excludes “fully
+  AI-generated” — metadata only, read paper, no GitHub tonight.
+  Fermatix (`hi@fermatix.ai`) sources private repos for royalties —
+  inbound later, refuse exclusive. Mercor/Surge/Scale = hours, not the
+  8-pack. Fleet/Chakra/Mechanize/Sharpe build gyms; they do not list
+  her GitHub.
