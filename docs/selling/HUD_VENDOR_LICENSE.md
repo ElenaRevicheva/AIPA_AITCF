@@ -1,10 +1,44 @@
 # HUD Vendor — non-exclusive training licence
 
-**Status (31 Aug 2026):** Quote is **in**. Work-sample PDF is **this listing
-memo**, not Nine Systems. 8 private repos. Point **$89,481**. Range
-**$61,067–$350,557**. Score **44% Promising**. Estimator, not a payout.
-Next: attach the PDF on onboarding → read NDA → Confirm Cal.com 9:40
-Panama → send founders letter. Do not sign exclusive. Do not bank $350k.
+**Status (31 Aug 2026):** Call done. Listing
+`https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443`
+Buy now **$73,761**, In review. HUD takes **20%** of a closed sale.
+She may set her own prices and split listings. **$12,000 is the form’s
+per-repo suggested ceiling, not a floor.** Splitting listings does not
+raise that cap (8 × $12k = $96k either way). Split only for different
+buyers. Proposal ≠ cash. Non-exclusive only. Do not bank $350k.
+
+PII-clean Describe: `docs/selling/drafts/hud-vendor-listing-describe.txt`
+
+---
+
+## After the call — several listings vs $12k
+
+The listing form suggested **$2,500–$12,000 per repository**. That is a
+band, not a law. HUD said she can price from her own estimate.
+
+- **Floor is not $12k.** $12k is the *top* of the suggestion. AILA and
+  atlas-captures sit at HUD’s points (~$4k). Do not inflate them to $12k.
+- **Several listings do not beat $12k.** One listing of eight repos at
+  $12k each = $96k max. Eight listings of one repo at $12k each = $96k
+  max. HUD’s 20% is the same.
+- **Several listings *do* make sense as buyer packs**, not as a cap
+  trick. A lab that wants WhatsApp tool-use should not have to buy
+  paused AILA. Do not put the same repo in two listings.
+- If the form now accepts prices above $12k, raise the four live
+  products toward HUD’s points ($17,020 / $16,735 / $16,662 / $13,303)
+  on the **existing** listing first. That is how you close the $15,720
+  gap to the $89,481 package point.
+
+Suggested packs (only if HUD wants more than one SKU):
+
+1. **Exec seats** — `AIPA_AITCF` + `VibeJobHunterAIPA_AIMCF` (keep Atlas
+   machine with AITCF)
+2. **Bilingual tool-use** — the three EspaLuz repos
+3. **X + data** — `dragontrade-agent` + `atlas-captures`
+4. Leave **AILA** off a pack, or cheap add-on. It is paused, 25%.
+
+---
 
 **What you keep:** copyright, brand, domains, and the right to keep operating,
 improving and selling every product. Production stays up. This is a licence of a
