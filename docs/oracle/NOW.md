@@ -107,23 +107,25 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD estimator confirmed on Elena's screen: **public repos quote at $0**.
-  GitHub already Connected as `@ElenaRevicheva`. Packet updated on
-  `cursor/hud-vendor-license-1c49`. Agent cannot flip visibility (`admin: false`).
-- **NEXT:** HUD list is public-only. Elena: reconnect GitHub with **private**
-  access (settings/applications + settings/installations → HUD → revoke →
-  vendor.hud.ai/codebases again). Then tick the private product repos. Do not
-  quote the leftover public list.
-- **VERIFIED BY:** HUD copy on her screen — "Public repos come back at $0 — buyers
-  can already clone them." Oracle PAT already fetches private repos.
-- **RISK:** Private ≠ never-public. Disclose the flip date. Do not private-copy
-  while the parent stays public. Flipping `aideazz` risks 4everland / portfolio.
+- **DONE:** Elena found HUD briefs at `datavendor.ai/briefs` (Tier 2).
+  Four HUD-posted RFPs; **Enterprise Codebase Data Opportunity $100,000
+  total** is the listing fit. Card Apply is dead — not DataFactor theater.
+  Apply = an offer. Do not email the lab off-platform (§4.1 RFP Party).
+- **NEXT:** Elena: open the $100k **title** (not the card Apply) and
+  screenshot the full brief. If Apply still dead inside, send Megan ping
+  (`docs/selling/drafts/hud-vendor-megan-briefs-ping.txt` on the HUD
+  branch). AfterQuery + Rwazi + Plata still move. Refuse exclusive DSA.
+- **VERIFIED BY:** User screenshot 31 Aug 12:51 Panama, logged in as
+  Aldeazz AI Lab Tier 2 Vendor. Four HUD cards; $100k on codebase brief.
+- **RISK:** Treating $100k as a cheque (brief budget can split). Applying
+  off-platform. Spraying all four briefs. Confusing with DataFactor jobs.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Five flipped. | **Elena: tick 7 + flip Influencer** → Bot quote → founders@ |
+| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Tier 2 signed. Listing **private** | **Megan:** match / say if Go live helps. Elena: AfterQuery + jobs. Do not upload repos to datafactor.com |
+| 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
@@ -196,7 +198,14 @@ work. Port what you want by hand; never reset.
 - Do **not** `source .env` — `FROM_EMAIL` has spaces and angle brackets; syntax error.
   Read keys with `grep`/`cut`.
 - After any deploy: restart, prove it from `journalctl`, **and check the OUTCOME.**
-- **hud.io ≠ hud.ai.** Cursor `Hud: Sign In` is a runtime-sensor plugin. The licence
-  buyer is HUD Vendor. Their estimator: **public = $0**. Flip five product repos;
-  keep `aideazz` public. Packet: `docs/selling/HUD_VENDOR_LICENSE.md` on
-  `cursor/hud-vendor-license-1c49`.
+- **hud.io ≠ hud.ai ≠ DataVendor API.** Cursor `Hud: Sign In` is a plugin.
+  The licence buyer is DataVendor (`datavendor.ai`). Their estimator:
+  **public = $0**. REST/MCP is evals, not the quote. Do not add
+  `openclaw-vibejob-shortlist` (MIT), `ascent-saas-builder` (Lovable),
+  or `atlas-shifted` (still public) to the Ready 8-pack. Packet:
+  `docs/selling/HUD_VENDOR_LICENSE.md` on `cursor/hud-vendor-license-1c49`.
+- **No fourth Lazarus.** Codebase buyers that quote: Lazarus, Atrium
+  (AfterQuery), HUD. Lazarus: solo / no team+P&L. Atrium **25 Aug**:
+  round closed (volume), not quality; they do not keep the trees. HUD
+  saw them already private tonight. Flip ≠ never-public. Hashseatic is
+  not a quote. Next dollars: HUD number, AfterQuery click follow-up, jobs.

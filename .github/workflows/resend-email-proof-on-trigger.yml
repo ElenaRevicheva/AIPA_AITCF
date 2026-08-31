@@ -1,0 +1,87 @@
+# Read-only Resend delivery/open proof from Oracle.
+# Cloud agents have no RESEND_API_KEY and no api.resend.com egress.
+#
+# Usage:
+#   echo "d0721a1e-2eb2-48f0-b6b4-c15ce1743def" > .resend-proof-trigger
+#   git add .resend-proof-trigger && git commit -m "resend-proof: afterquery" && git push
+#   echo "# idle" > .resend-proof-trigger   # after a run
+
+name: Resend email proof (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".resend-proof-trigger"]
+
+permissions:
+  contents: write
+
+jobs:
+  resend-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .resend-proof-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .resend-proof-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.resend-proof-trigger is empty"; exit 1; }
+          case "$LINE" in
+            \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+          esac
+          if ! echo "$LINE" | grep -Eq '^[0-9a-fA-F-]{36}$'; then
+            echo "::error::trigger must be a Resend uuid or # idle"; exit 1
+          fi
+          echo "id=$LINE" >> "$GITHUB_OUTPUT"
+          echo "Looking up Resend id $LINE"
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY"
+            exit 1
+          fi
+
+      - name: Run proof on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+          ID: ${{ steps.trigger.outputs.id }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+          scp $SSHOPTS scripts/resend-email-proof.cjs ubuntu@170.9.242.90:/tmp/resend-email-proof.cjs
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+            "$REF" "$ID" < scripts/oracle-resend-email-proof.sh
+          RC=$?
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/resend-email-proof.json /tmp/resend-email-proof.json \
+            && echo "--- pulled proof ---" || echo "--- no proof json ---"
+          rm -f ~/.ssh/oracle
+          exit $RC
+
+      - name: Commit proof
+        if: success() && steps.trigger.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          if [ ! -f /tmp/resend-email-proof.json ]; then
+            echo "Nothing to commit"; exit 0
+          fi
+          mkdir -p docs/selling
+          cp /tmp/resend-email-proof.json docs/selling/_resend-email-proof.json
+          git add docs/selling/_resend-email-proof.json
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"; exit 0
+          fi
+          git config user.name "aipa-staging[bot]"
+          git config user.email "aipa@aideazz.xyz"
+          git commit -m "selling: Resend delivery/open proof ${{ steps.trigger.outputs.id }}"
+          git push origin HEAD:${{ github.ref_name }}

@@ -122,6 +122,8 @@ are logged as real HubSpot **EMAIL activities** (from/to must go in `hs_email_he
 `scripts/resend-reconcile.cjs` (cron :17 hourly) polls final status and stamps `⛔ SUPRIMIDO`.
 **No backfill of past sends — existing notes stay untouched, only new sends get this.**
 
+**30 Aug 2026 — two writers, one note.** `email.delivered` stamps `✅ ENTREGADO`, then the send path PATCHes `📧 EMAILED` from a stale body and can wipe the delivery mark. AfterQuery: Resend delivered `atrium@` + `support@`; the note lost ENTREGADO. Stamp writers now re-read before PATCH. A **Cc bounce is not a failed send** — do not read HubSpot EMAIL `BOUNCED` as “nobody got it” when the bouncing address is a copy.
+
 **🔎 Every signal is now traceable and typed (July 31 2026 — `9ec2619`, `ae4b334`, `d2dffff`).**
 Three upgrades to the same stamp, all in `src/resend-webhook.ts`:
 

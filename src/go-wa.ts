@@ -10,7 +10,7 @@ import {
   recordResendSend,
   logEmailEngagement,
   findOutreachNote,
-  insertNoteStamp,
+  patchNoteStamp,
   emailBodyToHtml,
 } from './resend-webhook.js';
 
@@ -498,9 +498,9 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
     // Stamp the OUTREACH note (the one with the audit + FU buttons), not whatever
     // note is newest — Elena's own typed notes were becoming the newest.
     const best = await findOutreachNote(p.dealId).catch(() => null);
-    if (best && !best.body.includes(`Resend:${resendId}`)) {
-      // Top of the note, under the FU buttons — a send stamp buried at the bottom
-      // of a long note is a stamp Elena never sees.
+    if (best) {
+      // Re-read inside patchNoteStamp so a delivery webhook that won the race
+      // is not wiped by this EMAILED write (AfterQuery 30 Aug 2026).
       const add =
         `<b>📧 EMAILED ${when} from aipa@aideazz.xyz → ${p.to}</b>` +
         // The note is the audit trail. Leaving the Cc out of it made the deal
@@ -511,11 +511,9 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
           ? `<br>Adjunto: ${p.attachments.map(a => a.filename).join(', ')}`
           : '') +
         `<br>Resend:${resendId} (one-click /go/outreach-email/${p.slug}).`;
-      await fetch(`https://api.hubapi.com/crm/v3/objects/notes/${best.id}`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ properties: { hs_note_body: insertNoteStamp(best.body, add) } }),
-      });
+      await patchNoteStamp(best.id, add, body => body.includes(`Resend:${resendId}`)).catch(e =>
+        console.warn('[go/outreach-email] EMAILED stamp failed:', (e as Error).message?.slice(0, 90)),
+      );
     }
   }
   // +4 day follow-up if none open
