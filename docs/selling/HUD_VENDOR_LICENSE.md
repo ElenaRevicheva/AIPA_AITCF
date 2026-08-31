@@ -54,37 +54,15 @@ the $89,481 point value.
 ### Megan follow-up (31 Aug, after private listing)
 
 Paste: `docs/selling/drafts/hud-vendor-megan-followup.txt`
-From `aipa@aideazz.xyz`, **reply on the Cal.com / call thread** (her address
-is on that invite; it is not in this repo). Do not attach Nine Systems.
-Do not mention recommended-check fails. After send: `sent HUD Megan`.
+From `aipa@aideazz.xyz`, **reply on the Cal.com / call thread**.
 
-**Do not sign the Tier 2 Platform Access Agreement yet.** Screenshots
-cover §§1–7 only. Missing: §§8, 9 (esp. **9.2 unlimited liability**
-cited from 4.2), 10, 11, 12, and any Fees heading. Survival (§5.6)
-keeps 4, 6, 8, 9.2, 10, 11, 12 alive after termination.
-
-What *is* visible and must not be confused:
-
-- Tiering page: sign to unlock Opportunities. **No upgrade fee shown.**
-  HUD’s **20%** is on a closed sale (call), likely the DSA/wallet, not
-  this paper. “Royalty-free / fully paid-up” in §6.2 is the licence
-  *she grants HUD* to host listings, not a $0 invoice from HUD.
-- This paper is **not** the sale of the eight repos. §3.2: Customer
-  Data only moves under a separate **Data Sharing Agreement**.
-- §6.2: she **keeps ownership**. HUD gets an irrevocable, sublicensable
-  platform licence to “Vendor Content” to operate the venue and match
-  Projects — not a training grant. The DSA is the training grant.
-  Refuse exclusive/assignment there, as before.
-- §4.1 **non-circumvent:** during access **and two years after**, no
-  off-platform contact with **RFP Parties** (entities posting projects)
-  for similar data/services. No pre-existing-relationship carve-out
-  visible. Lazarus/Turing stay off this board; labs Megan introduces
-  go through HUD. Breach of §4 is a material breach with **unlimited
-  liability under §9.2** — do not click Finish until that clause is
-  on screen.
-
-Next: Elena scrolls to the end, screenshots Fees + §8–§12, then we
-say yes or no. Do not write “I signed Tier 2” to Megan until she did.
+**Tier 2 agreement — still do not Finish.** §§1–8 are on screen.
+§8.2: HUD’s cap is the greater of fees paid in 12 months or **$1,000**.
+§8.3: that cap **does not** apply to confidentiality, use restrictions,
+**non-circumvention**, indemnity, willful misconduct/fraud. So a §4.1
+bypass is uncapped (matches 4.2 → 9.2). Still need §9 in full + any
+Fees + remaining survival sections (10–12). Do not write “I signed”
+to Megan until she did.
 
 ### Recommended checks (22 failed) — do not chase
 
