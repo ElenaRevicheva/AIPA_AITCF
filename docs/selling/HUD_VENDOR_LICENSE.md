@@ -51,6 +51,13 @@ the $89,481 point value.
    section below).
 5. Do **not** Archive. Do not try to type above $12k again.
 
+### Megan follow-up (31 Aug, after private listing)
+
+Paste: `docs/selling/drafts/hud-vendor-megan-followup.txt`
+From `aipa@aideazz.xyz`, **reply on the Cal.com / call thread** (her address
+is on that invite; it is not in this repo). Do not attach Nine Systems.
+Do not mention recommended-check fails. After send: `sent HUD Megan`.
+
 ### Recommended checks (22 failed) — do not chase
 
 HUD’s own line: **certification withheld — publishing unaffected.**
