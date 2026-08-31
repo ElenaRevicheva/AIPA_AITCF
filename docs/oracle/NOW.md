@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-08-31 16:25 UTC | HUD listing Ready — price advice | `docs/oracle/NOW.md` (main) | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
