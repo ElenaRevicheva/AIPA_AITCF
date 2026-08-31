@@ -68,7 +68,7 @@ async function load(){
   document.getElementById('sub').textContent=
     (d.counts.hiring_new||0)+' employers · '+(d.counts.client_new||0)+' clients waiting';
   document.getElementById('main').innerHTML=
-    card('hiring','Apply',d.hiring)+card('client','Send',d.client);
+    card('hiring','Apply',d.hiring)+card('client','Review & send',d.client);
 }
 function card(lane,verb,items){
   const label=lane==='hiring'?'Employer':'Client';

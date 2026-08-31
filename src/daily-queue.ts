@@ -30,6 +30,8 @@ export type QueueStatus = 'new' | 'working' | 'done' | 'skipped';
 export interface QueueItem {
   id: string;
   lane: QueueLane;
+  /** The dedupe key (job URL, or outreach slug). Used to match against the send ledger. */
+  externalKey: string;
   title: string;
   company: string;
   actionUrl: string;
@@ -164,7 +166,7 @@ export async function getQueue(lane: QueueLane, limit = 5): Promise<QueueItem[]>
   try {
     const res = await connection.execute(
       `SELECT * FROM (
-         SELECT RAWTOHEX(id) AS id, lane, title, company, action_url, draft,
+         SELECT RAWTOHEX(id) AS id, lane, external_key, title, company, action_url, draft,
                 draft_tailored, draft_provider, draft_reason, score, status,
                 hubspot_deal_id, TO_CHAR(created_at, 'YYYY-MM-DD HH24:MI') AS created_at
            FROM daily_queue
@@ -177,6 +179,7 @@ export async function getQueue(lane: QueueLane, limit = 5): Promise<QueueItem[]>
     return ((res.rows as Record<string, unknown>[]) || []).map(r => ({
       id: String(r.ID),
       lane: String(r.LANE) as QueueLane,
+      externalKey: String(r.EXTERNAL_KEY ?? ''),
       title: String(r.TITLE ?? ''),
       company: String(r.COMPANY ?? ''),
       actionUrl: String(r.ACTION_URL ?? ''),
