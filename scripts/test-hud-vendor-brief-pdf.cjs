@@ -86,6 +86,11 @@ mustInclude(text, [
   'atlas-captures',
   'aipa@aideazz.xyz',
   'Lazarus',
+  'WHY IT WAS BUILT',
+  'HOW IT RUNS NOW',
+  'pgvector',
+  '131-test',
+  'paper trading',
 ]);
 mustNotInclude(text, [
   'Nine Systems',
@@ -101,6 +106,8 @@ mustNotInclude(text, [
   'never-public',
   'GitHub Archive',
   'I flipped them to private',
+  'Would fit',
+  'whiteboard',
 ]);
 
 (async () => {

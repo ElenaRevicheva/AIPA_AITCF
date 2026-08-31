@@ -499,6 +499,110 @@ async function main() {
     muted
   );
 
+  newPage();
+  label('WHY EACH SYSTEM EXISTS  -  AND HOW IT RUNS NOW');
+  text(
+    'Provenance for a training lab, not a hiring dossier. Each of these eight started as a real constraint on one operator, one server. Live products stay up. This packet licences a copy of source.',
+    9,
+    font,
+    ink
+  );
+  gap(6);
+  text(
+    'Shared spine: one Oracle Cloud box, Telegram as the control room, HubSpot as the ledger, TypeScript where money/CRM state lives, Python where the ML stack lives, and a five-provider LLM chain so a zero-balance outage cannot stop the fleet. On 19 Aug Anthropic hit zero; the chain fell through to OpenAI in 2.4 seconds and nothing dropped.',
+    8,
+    font,
+    muted
+  );
+  gap(10);
+
+  const products = [
+    {
+      repo: 'EspaLuzFamilybot',
+      title: 'Bilingual expat advisor  -  Telegram',
+      why: 'Four people arrived in Panama at once without Spanish: a child, two retirees, one adult solving all of it. Language apps teach vocabulary on a schedule. The need was the sentence in front of you, plus which form, which queue, what you are actually agreeing to. Every arriving household has that first month.',
+      how: 'Live on Telegram. Per-family memory, not per-user: LangChain for the current conversation, pgvector RAG on Oracle Autonomous DB for everything durable ("which queue did I use last time?"). Voice in and out, image understanding for forms, payments wired for trials. Emotional intelligence before grammar. Designed for 21 Spanish-speaking countries, not Panama-only. Engineering is finished; families use it.',
+    },
+    {
+      repo: 'EspaLuzWhatsApp',
+      title: 'The same advisor  -  WhatsApp',
+      why: 'In Latin America WhatsApp is the internet. Telegram is where early adopters are. One advisor, two front ends, or the product only reaches half the household.',
+      how: 'Live on WhatsApp. Shared logic with the Telegram twin. Same memory, voice, and image path. Two clients over one brain so a family is one record, not two bots that forget each other.',
+    },
+    {
+      repo: 'EspaLuz_Influencer',
+      title: 'Publishing agent  -  blog, social, cadence',
+      why: 'One operator cannot also post to LinkedIn, Instagram, X and a blog every day. The Lab needed a public face without performing on social media. Only things that actually happened, or it is noise.',
+      how: 'Daily article at 14:30 Panama, cross-posted with canonical URLs. Bilingual social atoms on a schedule. Grounded generation: production evidence is collected before the model writes (uptimes, commits, CRM counts) and a number that cannot be traced is refused. Every link carries UTM and Atlas IDs.',
+    },
+    {
+      repo: 'VibeJobHunterAIPA_AIMCF',
+      title: 'Scored discovery with a human on the last click',
+      why: 'Mechanical search is volume. Judgment is not. The product problem is scored routing that a human can interrupt, plus a judge that can be audited instead of trusted.',
+      how: 'LangGraph state machine: gate, score, route, notify. SQLite checkpointing so a crash resumes. Auto-apply was removed after it produced volume and zero outcomes. Scoring is an LLM judge with two counterweights: a 131-test 4-layer eval harness (keyword, bias, golden-set, LLM-as-judge), and a feedback loop from real accept/reject reasons. Fails closed on an LLM outage. 11 sources, hourly.',
+    },
+    {
+      repo: 'AIPA_AITCF',
+      title: 'Ops brain  -  sales operation + fleet control',
+      why: 'No sales team, no Panama network, no budget, and eight systems that can break overnight. Customers and uptime both had to be software.',
+      how: 'Telegram is the control plane (82 commands, 08:00 briefing). HubSpot is the ledger. A webhook API is the front door. Form submission becomes a CRM record, a drafted reply, and a one-tap approval card. A synthetic lead hits the real pipeline daily at 07:45: silent on pass, alerting on failure. /code and /fix open real GitHub PRs; a human is on the last click. This repo also holds the Atuona automated film pipeline (clips in, mixed film out, nobody on a timeline) and the Atlas radar (detect, not predict).',
+    },
+    {
+      repo: 'dragontrade-agent',
+      title: 'Human-on-last-click paper trading',
+      why: 'An agent that can take an irreversible action needs a different design than a chatbot. Built to learn that constraint: trading education and paper trading only. Never live money.',
+      how: 'The agent proposes; a human disposes. Own dashboard. Paper trading only. Same last-click rule as the rest of the fleet.',
+    },
+    {
+      repo: 'atlas-captures',
+      title: 'Ad-angle time-series data',
+      why: 'Cold outreach with nothing to say fails. Public ad libraries are open data almost nobody reads systematically. A business will read a letter about their market, not a letter about the sender.',
+      how: 'Stored captures of which creative angle is observably running, and for how long. Detect, not predict: the system refuses to forecast. Weekly across seven service lanes. The live board is at https://webhook.aideazz.xyz/whitespace/atlas.html. This repo is the data HUD grades, not only the code.',
+    },
+    {
+      repo: 'AILA',
+      title: 'Personal AI  -  paused',
+      why: 'A life-scale assistant is a different product from the ops bots: governed longitudinal memory, safety, and continuity across months, not another Telegram command surface.',
+      how: 'Paused. Blueprint and inheritance notes exist (emotional/associative layers from Atuona; routing and persistence craft from AIPA). Thin in the HUD bundle because it is not the production control room. Included because it is a distinct private codebase.',
+    },
+  ];
+
+  const drawProduct = (p) => {
+    const whyLines = wrapTo(p.why, 8, font, maxW - 8);
+    const howLines = wrapTo(p.how, 8, font, maxW - 8);
+    const blockH = 22 + 12 + whyLines.length * 10.5 + 12 + howLines.length * 10.5 + 10;
+    ensure(blockH);
+    page.drawRectangle({
+      x: left,
+      y: y - blockH + 14,
+      width: maxW,
+      height: blockH,
+      color: white,
+      borderColor: rule,
+      borderWidth: 0.7,
+    });
+    page.drawRectangle({ x: left, y: y + 8, width: maxW, height: 3, color: gold });
+    page.drawText(toAscii(p.repo), { x: left + 8, y: y - 4, size: 8, font: fontB, color: gold });
+    page.drawText(toAscii(p.title), { x: left + 8, y: y - 16, size: 8, font: fontB, color: navy });
+    let ty = y - 30;
+    page.drawText('WHY IT WAS BUILT', { x: left + 8, y: ty, size: 6.5, font: fontB, color: teal });
+    ty -= 11;
+    for (const line of whyLines) {
+      page.drawText(line, { x: left + 8, y: ty, size: 8, font, color: ink });
+      ty -= 10.5;
+    }
+    ty -= 4;
+    page.drawText('HOW IT RUNS NOW', { x: left + 8, y: ty, size: 6.5, font: fontB, color: teal });
+    ty -= 11;
+    for (const line of howLines) {
+      drawLinkedLine(page, line, left + 8, ty, 8, font, ink);
+      ty -= 10.5;
+    }
+    y -= blockH + 8;
+  };
+
+  for (const p of products) drawProduct(p);
+
   const total = pages.length;
   pages.forEach((p, i) => footer(p, i + 1, total));
 
