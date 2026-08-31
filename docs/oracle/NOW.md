@@ -107,26 +107,23 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** HUD listing memo v3 on `cursor/hud-vendor-license-1c49`
-  (`20f6b8f`): pages 1-2 unchanged; 3-4 why/how: estimate screenshot embedded, no confession box,
-  `/codebases/result` is not a link. AfterQuery deploy untouched.
-- **NEXT:** Elena: download the PDF from PR #38, attach on HUD Work
-  samples with portfolio + /api, never Nine Systems. NDA, Cal.com
-  9:40 Panama, founders@. No deploy. No `.hire-trigger`.
-- **VERIFIED BY:** `node scripts/test-hud-vendor-brief-pdf.cjs` → 2
-  pages, 119kB, 10 live URIs, no `/codebases/result`, no "DO NOT
-  HIDE" copy.
-- **RISK:** Oracle HEAD is `a3e29b4` (one verify commit behind
-  `main` — docs/script only). Do not `git pull` on the box.
-  Do not mint `HUD_API_KEY`. Bounce-task copy on this deal is
-  still the old “nobody got it” text. HUD $350k top is imputed
-  fantasy — do not bank it. Repos were public until 30 Aug.
+- **DONE:** HUD Additional-info paste on `cursor/hud-vendor-license-1c49`
+  (`2f569f0`). Matching copy: HUD’s own $89,481 stack, tools, exec seats,
+  non-exclusive hard line. Listing memo PDF still the work sample.
+- **NEXT:** Elena: paste Additional info (file below the `---`) → Confirm
+  details → read NDA → Cal.com 9:40 Panama → founders@. Never Nine
+  Systems. No deploy. No `.hire-trigger`.
+- **VERIFIED BY:** paste body 2,621 chars; grep of forbidden phrases
+  (`were public`, Nine Systems, Hire me, `/codebases/result`) = none.
+- **RISK:** Do not volunteer “were public until 30 Aug.” $350k is
+  imputed fantasy — do not bank it. Do not mint `HUD_API_KEY`. Do not
+  `git pull` on Oracle. AfterQuery deploy untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Quote **$89,481** point / 44% Promising. Work-sample PDF on `cursor/hud-vendor-license-1c49` | **Elena: attach listing memo** (not Nine Systems) → NDA → Cal.com 9:40 → founders@ |
+| 1 | **HUD Vendor — non-exclusive training licence** | Quote **$89,481** / 44%. Paste: `docs/selling/drafts/hud-vendor-additional-info.txt` on the branch | **Elena: paste Additional info** → NDA → Cal.com 9:40 → founders@ |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
