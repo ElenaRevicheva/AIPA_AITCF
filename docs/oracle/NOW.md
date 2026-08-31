@@ -107,26 +107,24 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Read HUD Platform Access Agreement §§1–7 from Elena’s
-  screenshots. Upgrade itself shows **no fee**. This paper is **not**
-  the repo sale (§3.2 DSA is). **Do not sign** until §§8–12 and **9.2**
-  (unlimited liability, cited from 4.2) are on screen.
-- **NEXT:** Elena: scroll to the end of the agreement. Screenshot any
-  Fees heading + §§8, 9, 10, 11, 12. Do **not** click Finish. Megan
-  email stays the unsigned private-listing paste until then.
-- **VERIFIED BY:** Tiering page “sign… Tier 2 activates once signature
-  verified” (no price). §4.1 non-circumvent = access + 2 years. §6.2
-  keep ownership + irrevocable platform licence. Survival 5.6 lists
-  4, 6, 8, 9.2, 10, 11, 12.
-- **RISK:** Signing blind on 9.2. Treating 6.2 as a training grant.
-  Using HUD RFP Parties to close Lazarus off-platform (4.1). AfterQuery
+- **DONE:** Platform Access Agreement through **§8**. HUD’s liability
+  cap is **$1,000** (or fees paid). Cap does **not** cover her
+  non-circumvent / confidentiality / indemnity. §9 Remedies just
+  starting. Still do not Finish.
+- **NEXT:** Elena: Next → screenshot **§9 in full** (4.2 pointed at
+  9.2) plus Fees if any, then 10–12. Do not click Finish. Megan email
+  stays unsigned.
+- **VERIFIED BY:** Screenshot 31 Aug 12:18 Panama: §8.1–8.3, start of
+  §9 REMEDIES. No upgrade fee in §§1–8.
+- **RISK:** Signing before 9.2. Off-platform contact with HUD RFP
+  Parties (uncapped). Treating 6.2 as a training grant. AfterQuery
   untouched.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | Listing **private**. Tier 2 agreement **§§1–7 only** — do not sign yet | **Elena:** screenshot Fees + §8–§12 (esp. 9.2). Then we say sign or not. Megan email after that |
+| 1 | **HUD Vendor — non-exclusive training licence** | Listing **private**. Tier 2 agreement through **§8** — do not Finish | **Elena:** screenshot §9 (and rest). Then we say sign or not |
 | 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
 | 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
