@@ -68,9 +68,16 @@ Logged in as **Aldeazz AI Lab · Tier 2 Vendor**. Four HUD-posted
 cards. This is the real RFP board, not DataFactor careers.
 
 Apply on a DataVendor brief is an **offer**, not an interest click
-(`datavendor.ai/use-cases`). One brief can spawn several projects if
-the buyer accepts more than one vendor. **$100,000 total is a budget,
-not a cheque.**
+(`datavendor.ai/use-cases`). The Opportunities tooltip (31 Aug, 13:13
+Panama): *“Buyer requests for custom data that isn't on the market
+yet—clear demand signals. Apply to own the project and get paid for
+delivering it.”* That is true of **task** briefs (Harbor work you can
+author after award). It does **not** reopen the enterprise codebase
+RFP: those must-haves are a **verifiable history** (10 contributors,
+100 merged PRs, pre-AI provenance). You cannot deliver that as a
+future project without fabricating git. One brief can spawn several
+projects if the buyer accepts more than one vendor. **$100,000 total
+is a budget, not a cheque.**
 
 | Brief (posted ~11–12 days) | Fit |
 |---|---|
