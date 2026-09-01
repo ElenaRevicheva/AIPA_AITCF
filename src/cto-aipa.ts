@@ -35,6 +35,7 @@ import {
 import { registerGoWaRoutes } from './go-wa.js';
 import { registerQueueRoutes } from './queue-routes.js';
 import { startClientLaneSync } from './client-lane.js';
+import { startFeedbackSync } from './queue-feedback.js';
 import { registerResendWebhookRoutes } from './resend-webhook.js';
 import { registerServiceCheckoutRoutes } from './service-checkout.js';
 import {
@@ -2883,6 +2884,8 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
   // Elena's own CRM: two cards, her states, her database. Reads no HubSpot.
   registerQueueRoutes(app);
   startClientLaneSync();
+  // Close queue rows she has already decided on, from VJH's judge feedback.
+  startFeedbackSync();
 
   // POST /resend/webhook — delivered/bounced/complained → HubSpot note + task.
   // Acceptance by Resend is NOT delivery (Dental Connect was suppressed while the
