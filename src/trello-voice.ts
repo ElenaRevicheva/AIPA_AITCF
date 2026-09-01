@@ -207,11 +207,37 @@ const ES_MONTHS = ['enero','febrero','marzo','abril','mayo','junio',
 
 export function rollingMonthNames(now: Date = new Date()): string[] {
   const out: string[] = [];
-  for (const delta of [-1, 0, 1]) {
+  // CURRENT, +1, +2 -- never the previous month.
+  //
+  // Corrected 1 Sep 2026 after Elena described her actual flow: she is on the
+  // free plan and keeps exactly three month boards, which she RECYCLES BY
+  // RENAMING. When August ended she renamed "Kira Agosto" to "Kira Noviembre",
+  // so her boards became Septiembre / Octubre / Noviembre. A previous/current/
+  // next window names a board that no longer exists and misses the furthest one
+  // she actually plans into. Verified against the live account: Septiembre,
+  // Octubre, Noviembre -- no Agosto.
+  for (const delta of [0, 1, 2]) {
     const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + delta, 1));
     out.push(`${ES_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`);
   }
   return out;
+}
+
+/**
+ * Her REAL month boards, read from Trello. Prefer this over the computed window:
+ * she renames boards by hand, so the account is the only source of truth. Falls
+ * back to rollingMonthNames() if the API is unreachable, because a degraded hint
+ * is better than an empty prompt.
+ */
+export async function actualMonthBoardNames(): Promise<string[]> {
+  try {
+    const boards = await getAllBoards();
+    const re = new RegExp(`^kira\s+(${ES_MONTHS.join('|')})\s+\d{4}`, 'i');
+    const found = boards.map(b => b.name).filter(n => re.test(n.trim()));
+    return found.length ? found : rollingMonthNames().map(m => `Kira ${m.charAt(0).toUpperCase()}${m.slice(1)}`);
+  } catch {
+    return rollingMonthNames().map(m => `Kira ${m.charAt(0).toUpperCase()}${m.slice(1)}`);
+  }
 }
 
 /** Board keywords, with the month window computed rather than frozen. */
