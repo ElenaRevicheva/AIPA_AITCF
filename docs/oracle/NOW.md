@@ -140,6 +140,36 @@ git log keeps the record.
   replies to people; with no contact linked, a recruiter reply may land in Gmail and not
   attach to this deal. This is the shape of the Aug 23-24 miss — watch it.
 
+## 🏠 WHEN ELENA IS HOME — two things, in this order
+
+**1. ⏳ RESCUE THE CURSOR EVABOOT DRAFT — do this FIRST, before closing anything.**
+Cursor drafted preparation for the Evaboot role and it exists **only in an open Cursor chat
+window on the laptop**. Verified unrecoverable from disk: every Cursor database was searched
+— global storage plus all ten workspace stores, `cursorDiskKV` and `composerHeaders`
+included, every table and every column — **zero hits for "Evaboot"**. Not in git on any
+branch, not in the deal's HubSpot notes, not in any file.
+
+👉 **Copy the text out of that chat and paste it into the Evaboot HubSpot deal note**
+(deal `64517386099`) **or into a file in `docs/applications/`.** If that window closes
+first, it is gone and the work gets done twice. This is the exact failure that earned
+PART 1 §5.
+
+**2. 🔑 Unlock D: — one elevated line, then tell the agent.**
+Her own account has **read-only** on the root of D: — `BUILTIN\Users: ReadAndExecute` only,
+owner `NT AUTHORITY\SYSTEM`. That is almost certainly why a 1 TB drive sat 97.7% empty: any
+app saving to a top-level folder on D: gets Access Denied. In **PowerShell as Administrator**:
+
+    icacls D:\ /grant "ELENA\kirav:(OI)(CI)M"
+
+Then say so, and the agent finishes the job: create the Downloads and Videos folders on D:,
+move the files, and update the shell-folder registry so Windows genuinely relocates them
+rather than just pointing at them.
+
+Already done, no action needed: npm and pip caches deleted (1.91 GB), Playwright's 610
+browser files **moved** to D: rather than deleted (saving a ~700 MB re-download), and all
+three verified working from their new homes. C: free 106.5 → 108.4 GB. C: was never in
+danger at 45% free — the point was that growth now lands on the right disk.
+
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
@@ -149,7 +179,8 @@ git log keeps the record.
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
-| 6 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
+| 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
+| 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
