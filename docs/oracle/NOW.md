@@ -206,6 +206,20 @@ work. Port what you want by hand; never reset.
   accounts. Whoever holds the Telegram account can reset that lock; that is the accepted
   trade for phone-only access, not an oversight.
 
+## 🏥 Family / Cita — automated 1 Sep 2026
+
+- **`/cita` in Telegram** turns an IENDI clinic block into Trello cards: right
+  `Kira <Mes> <Año>` board, Cita column, **red = FAMILY**, Panama→UTC due dates,
+  column re-sorted. Takes a paste, a forwarded message, or a **voice note**.
+  Idempotent on name+due — re-sending changes nothing. `/citasort` re-sorts on demand.
+- **Nightly cron 05:30 UTC** (`scripts/sort-cita-lists.cjs`) keeps every Kira Cita
+  column in date order. It writes **only `pos`** — never content, dates, labels or
+  list — so it is safe against boards Elena edits by hand.
+- ⚠️ **Do not route this through `trello-voice.ts`.** Its `BOARD_KEYWORDS.kira_current_month`
+  is hardcoded to `mayo/junio/julio 2026` and is blind to September onward. `iendi-cita.ts`
+  resolves boards dynamically from the appointment's month. **That stale map is still
+  live for the other voice→Trello flows and is worth fixing separately.**
+
 ## ⚠️ Standing traps
 
 - **Never `git add -A`** in cto-aipa. Named files only.
