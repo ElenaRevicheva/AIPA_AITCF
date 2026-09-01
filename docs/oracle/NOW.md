@@ -263,9 +263,17 @@ work. Port what you want by hand; never reset.
   `Kira <Mes> <Año>` board, Cita column, **red = FAMILY**, Panama→UTC due dates,
   column re-sorted. Takes a paste, a forwarded message, or a **voice note**.
   Idempotent on name+due — re-sending changes nothing. `/citasort` re-sorts on demand.
-- **Nightly cron 05:30 UTC** (`scripts/sort-cita-lists.cjs`) keeps every Kira Cita
-  column in date order. It writes **only `pos`** — never content, dates, labels or
-  list — so it is safe against boards Elena edits by hand.
+- **HOURLY cron :47** (`scripts/sort-cita-lists.cjs`) keeps every Kira Cita column in
+  date order. It writes **only `pos`** — never content, dates, labels or list — so it
+  is safe against boards Elena edits by hand.
+- ⚠️ **The column drifts out of order between runs and it is NOT a sort bug.** 1 Sep:
+  4 of 22 cards were found at Trello *midpoint* positions (114688, 311296, 835584) —
+  the value Trello writes when a card is **dragged**. Our sort only ever writes exact
+  multiples of 65536, so a non-multiple pos is proof something else moved it: an
+  accidental long-press drag on mobile (easy while scrolling a 22-card column) or a
+  Butler rule. Re-running the sort fixed it immediately: `moved 4 of 22`, then
+  `out-of-order=0`. **Before debugging the sort, check whether positions are
+  multiples of 65536.**
 - ⚠️ **Do not route this through `trello-voice.ts`.** Its `BOARD_KEYWORDS.kira_current_month`
   is hardcoded to `mayo/junio/julio 2026` and is blind to September onward. `iendi-cita.ts`
   resolves boards dynamically from the appointment's month. **That stale map is still
