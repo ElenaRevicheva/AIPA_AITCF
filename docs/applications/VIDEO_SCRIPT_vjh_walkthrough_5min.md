@@ -28,11 +28,13 @@ figures from memory on camera. Unsure of a number → drop the sentence.
 | 2 | `src/langgraph_pipeline/nodes.py` | **line 19** |
 | 3 | `src/core/fit_gate.py` | **line 271**, `def iron_clad_fit` |
 | 4 | **Terminal**, in `VibeJobHunterAIPA_AIMCF` | prompt ready, nothing typed |
-| 5 | HubSpot → **Zapier** deal → Notes | ⚠️ **Zapier, not Evaboot** |
+| 5 | HubSpot → **Evaboot** deal → Notes | **their own card** — scroll to the newest note |
 | 6 | `aideazz.xyz/ai-ops-wiki.html` | loaded |
 
-⚠️ **Tab 5 must be Zapier.** Evaboot's note still shows the old stub — you'd be pointing at
-the exact failure you're narrating.
+✅ **Tab 5 is the EVABOOT deal** — `app.hubspot.com/contacts/51409153/deal/64517386099`.
+Showing them their own posting in your CRM beats showing them someone else's. The newest
+note (1 Sep) carries the tailored letter **and** a provenance block with both attempts.
+Scroll past the older stub note, or use it deliberately — see the narration below.
 
 **Terminal command to have ready (typed, NOT run):**
 
@@ -113,10 +115,23 @@ face at the start — they asked for facecam because they want to see you think.
 > credits are empty and the test says so out loud instead of quietly falling back and
 > pretending everything is fine. **A test that can't fail isn't telling you anything.**
 >
-> **[tab 5, HubSpot note]** Then the second check: I look at what it actually made. This card
-> is from this morning. Score, apply link, and a letter drafted against that specific
-> posting, quoting their own words back. If that letter still said "edit this stub," the
-> agent failed — even if every log was green.
+> **[tab 5, HubSpot — the Evaboot deal]** Then the second check: I look at what it actually
+> made. **This card is your job posting**, found by the agent on the thirty-first at 15:59
+> and scored seventy-three.
+>
+> **[scroll to the older note — the stub]** And here is the honest version. My tailored
+> letter-writer shipped at 17:54 that day, under two hours after this card was created. So
+> this is the last deal that got the old boilerplate. You are looking at the seam.
+>
+> **[scroll to the newest note]** I re-ran the same generator against your posting. First
+> attempt it refused — WeWorkRemotely blocks fetching, zero characters read, and it will not
+> write a confident letter with nothing to tailor against. So I handed it the posting text,
+> which is the documented fallback, and this is what came out.
+>
+> **[point at the provenance block]** And read that line: *openai answered after one
+> failure*. The failure is Claude — those credits have been empty since the seventeenth. The
+> chain absorbed it and nothing stopped. That is what observability looks like in the output
+> rather than in a dashboard.
 >
 > And it learns from me. When I reject something and write why — or just attach a screenshot
 > of the posting — that reason is read, including the image, and goes into the model's prompt
@@ -166,6 +181,10 @@ face at the start — they asked for facecam because they want to see you think.
 - **Slow down at 2:10.** That block is their hardest bullet and your strongest material.
 - **Don't read code aloud.** Scroll, point, say what it does in plain words.
 - The confessions are evidence, not apology. Deliver them level.
+- **Honesty rule for the Evaboot card:** do NOT say the pipeline produced that letter
+  automatically. Say you re-ran the generator and supplied the posting text because the board
+  blocks fetching. That is true, and it is a better story: it shows the generator fails closed,
+  the fallback chain works, and you can operate your own tooling live.
 - Overrunning? Cut the second bug story. Never cut the eval run or `fit_gate.py`.
 - Fluff a line and keep going. One honest take beats a fourth attempt — and it matches
   everything else you're saying.
