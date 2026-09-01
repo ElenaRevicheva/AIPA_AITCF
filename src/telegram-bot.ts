@@ -605,14 +605,14 @@ Type /menu for all commands! 🚀
         { cmd: '/forget', desc: 'Clear conversation memory', usage: '/forget\nStart fresh (keeps knowledge base)' },
       ]
     },
-    'wiring_research': {
+    'family': {
       title: '🏥 FAMILY & APPOINTMENTS',
       commands: [
         { cmd: '/cita', desc: 'Clinic appointments to Trello cards: right Kira month board, Cita column, red (family), Panama times, column re-sorted. Sending the same block twice changes nothing.', usage: 'Reply to the clinic message (or a voice note) with /cita — or paste it: /cita <block>' },
         { cmd: '/citasort', desc: 'Re-sort every Kira Cita column by date now. Writes card position only — never content, dates or labels.', usage: '/citasort' },
       ],
     },
-    'research_agents': {
+    'wiring_research': {
       title: '🔬 RESEARCH AGENTS',
       commands: [
         { cmd: '/research_company',    desc: '🔥 Autonomous Claude + Bright Data research on a prospect. Founder, pain signals, pitch angle, HOT/WARM/COLD. ~90s.', usage: '/research_company decircle.io' },
@@ -714,6 +714,9 @@ Or just ask me anything - I understand natural language!`;
           [
             { text: '🔍 Repos & Ideas', callback_data: 'menu:repos' },
             { text: '🧠 Personal AI ✨', callback_data: 'menu:personal_ai' },
+          ],
+          [
+            { text: '🏥 Family & Citas', callback_data: 'menu:family' },
           ],
           [
             { text: '📊 Business Wiring', callback_data: 'menu:wiring' },
@@ -829,8 +832,16 @@ Or just ask me anything - I understand natural language!`;
 /forget   - Clear conversation context (keeps knowledge base)
 /trello_analyze - Full Kanban analysis of all Trello boards
 
+🏥 FAMILY / CITAS
+/cita     - Clinic appointments → Trello cards (right Kira month board,
+            Cita column, red = family, sorted by date)
+  Reply to the clinic message — or a voice note — with /cita
+  Or paste it: /cita Cita programada para el...
+  Sending the same block twice changes nothing.
+/citasort - Re-sort every Kira Cita column by date now
+
 🎤 Voice → Trello — just speak naturally, no trigger phrase needed:
-  "Until June 20, call the car inspection and find the counteragent address"
+  "By the 20th, call the car inspection and find the counteragent address"
   → AI creates cards on the right board, right list, with due date
 
   "Move the court cards to next month's board"
