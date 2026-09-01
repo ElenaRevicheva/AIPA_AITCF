@@ -62,7 +62,7 @@ type CardCategory =
 type Urgency = 'urgent_today' | 'soon' | 'dated' | 'not_sure' | 'done';
 
 type BoardTarget =
-  | 'kira_current_month'   // Kira Mayo 2026 — personal life this month
+  | 'kira_current_month'   // the rolling "Kira <Mes> <Año>" boards — see rollingMonthNames()
   | 'kira_future'          // Kira Ano 2026 и дальше — long-term plans
   | 'vibejob'              // VibeJob AI Hunter — job search
   | 'aldeazz'              // Aldeazz Web3 Ecosystem — Web3/NFT/blockchain
@@ -171,7 +171,8 @@ const CATEGORY_COLOR_MAP: Record<CardCategory, TrelloColor> = {
 // Board name substrings for fuzzy matching (case-insensitive)
 // Verified against actual board names fetched from Trello API (May 2026)
 const BOARD_KEYWORDS: Record<BoardTarget, string[]> = {
-  // "Kira Mayo 2026" / "Kira Junio 2026" / "Kira Julio 2026" — month boards
+  // Month boards. These literals are a FLOOR only — rollingMonthNames() adds the
+  // current window at runtime. Do not add months here; they go stale silently.
   kira_current_month: ['mayo 2026', 'junio 2026', 'julio 2026', 'kira mayo', 'kira junio', 'kira julio', 'june 2026', 'july 2026'],
   // "Kira Ano 2026 и дальше"
   kira_future: ['ano 2026', 'año 2026', 'дальше', 'future', 'kira ano', 'and beyond', '2026 and'],
@@ -189,9 +190,45 @@ const BOARD_KEYWORDS: Record<BoardTarget, string[]> = {
   kira_finance: ['fin discipline', 'fin disci', 'shopping', 'expenses', 'фин дисц', 'финансы', 'бюджет', 'budget'],
 };
 
+/**
+ * The rolling month boards, derived from today's date — never a hardcoded list.
+ *
+ * Earned 1 Sep 2026: `BOARD_KEYWORDS.kira_current_month` was pinned to
+ * 'mayo/junio/julio 2026' and the LLM prompt stated outright that Elena "does
+ * NOT have boards for all 12 months", naming those three. From September that
+ * was simply false, so voice notes about September onward were routed to a June
+ * board or refused. A stale literal reads exactly like a fact.
+ *
+ * Elena keeps ~3 rolling month boards on the free plan, so previous/current/next
+ * is the right window. Returns lowercase Spanish, e.g. ['agosto 2026', ...].
+ */
+const ES_MONTHS = ['enero','febrero','marzo','abril','mayo','junio',
+  'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+export function rollingMonthNames(now: Date = new Date()): string[] {
+  const out: string[] = [];
+  for (const delta of [-1, 0, 1]) {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + delta, 1));
+    out.push(`${ES_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`);
+  }
+  return out;
+}
+
+/** Board keywords, with the month window computed rather than frozen. */
+function boardKeywordsFor(target: BoardTarget): string[] {
+  const base = BOARD_KEYWORDS[target];
+  if (target !== 'kira_current_month') return base;
+  const rolling = rollingMonthNames();
+  return Array.from(new Set([
+    ...base,
+    ...rolling,
+    ...rolling.map(m => 'kira ' + m.split(' ')[0]),
+  ]));
+}
+
 // List name substrings for fuzzy matching — verified against all 10 actual boards (May 2026)
 //
-// Boards with standard lists: Kira Mayo/Junio/Julio, VibeJob, Algom, Web3, EspaLuz
+// Boards with standard lists: the Kira month boards, VibeJob, Algom, Web3, EspaLuz
 // Boards with variant lists:
 //   - Algom / Web3 / EspaLuz: "In process. Does NOT depend on Me." → in_process_them
 //   - Kira FIN Discipline: "Купить / Оплатить СРОЧНО!!!" → just_for_today; "Купить / оплатить..." → todo_flow
@@ -368,7 +405,7 @@ function resolveBoard(boards: TrelloBoard[], target: BoardTarget, dueDate?: stri
     }
   }
 
-  const keywords = BOARD_KEYWORDS[target];
+  const keywords = boardKeywordsFor(target);
   return boards.find((b) => fuzzyMatch(b.name, keywords));
 }
 
@@ -413,7 +450,7 @@ function resolveMoveDestBoard(boards: TrelloBoard[], targetBoard: string): Trell
   }
 
   for (const key of KNOWN_BOARD_KEYS) {
-    if (BOARD_KEYWORDS[key].some((kw) => tb.includes(kw.toLowerCase()))) {
+    if (boardKeywordsFor(key).some((kw) => tb.includes(kw.toLowerCase()))) {
       const d = resolveBoard(boards, key);
       if (d) return d;
     }
@@ -549,12 +586,12 @@ You classify voice notes into Trello card metadata using HER EXACT system.
 
 ═══ ELENA'S BOARDS (exact real names) ═══
 IMPORTANT — month board rule: Elena is on a FREE Trello plan, so she keeps only ~3 rolling month boards
-at a time (e.g. "Kira Mayo 2026", "Kira Junio 2026", "Kira Julio 2026"). She does NOT have boards for
-all 12 months. Use boardTarget "kira_current_month" for ANY personal task within the next 3 months —
+at a time (right now: ${rollingMonthNames().map(m => `"Kira ${m.charAt(0).toUpperCase() + m.slice(1)}"`).join(', ')}).
+She does NOT have boards for all 12 months. Use boardTarget "kira_current_month" for ANY personal task within the next 3 months —
 the routing code will find the correct month board automatically. Use "kira_future" ONLY for tasks
 that are 4+ months away or have no specific month at all.
 
-- "Kira Mayo 2026" / "Kira Junio 2026" / "Kira Julio 2026" — rolling month boards (→ kira_current_month)
+- ${rollingMonthNames().map(m => `"Kira ${m.charAt(0).toUpperCase() + m.slice(1)}"`).join(' / ')} — rolling month boards (→ kira_current_month)
 - "Kira Ano 2026 и дальше" — tasks 4+ months away, no specific month, or multi-year goals (→ kira_future)
 - "Kira Horario del dia / Habits" — daily schedule, recurring routines, day-of-week habits
 - "Kira FIN Discipline / Shopping / Expenses" — finance, budget, purchases, payments, expenses (use kira_finance)
@@ -701,7 +738,7 @@ async function transcribeVoice(audioBuffer: Buffer, fileId: string): Promise<str
         'January, February, March, April, May, June, July, August, September, October, November, December.',
         'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena.',
         'Move card, create card, add card, archive card, move this card, add task, new task.',
-        'Trello card. Kira board. Kira Mayo. Kira Junio.',
+        'Trello card. Kira board. ' + rollingMonthNames().map(m => 'Kira ' + m.split(' ')[0]).join('. ') + '.',
       ].join(' '),
     });
     return typeof transcription === 'string' ? transcription : (transcription as { text: string }).text;

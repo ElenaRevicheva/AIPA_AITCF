@@ -86,6 +86,7 @@ import {
   formatVoiceTrelloReply,
   processMultiAction,
   formatMultiActionReply,
+  rollingMonthNames,
 } from './trello-voice';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
@@ -605,6 +606,13 @@ Type /menu for all commands! 🚀
       ]
     },
     'wiring_research': {
+      title: '🏥 FAMILY & APPOINTMENTS',
+      commands: [
+        { cmd: '/cita', desc: 'Clinic appointments to Trello cards: right Kira month board, Cita column, red (family), Panama times, column re-sorted. Sending the same block twice changes nothing.', usage: 'Reply to the clinic message (or a voice note) with /cita — or paste it: /cita <block>' },
+        { cmd: '/citasort', desc: 'Re-sort every Kira Cita column by date now. Writes card position only — never content, dates or labels.', usage: '/citasort' },
+      ],
+    },
+    'research_agents': {
       title: '🔬 RESEARCH AGENTS',
       commands: [
         { cmd: '/research_company',    desc: '🔥 Autonomous Claude + Bright Data research on a prospect. Founder, pain signals, pitch angle, HOT/WARM/COLD. ~90s.', usage: '/research_company decircle.io' },
@@ -630,8 +638,6 @@ Type /menu for all commands! 🚀
         { cmd: '/podcast_ai',  desc: 'AI-narrated episode from a topic — script → TTS → publish.', usage: '/podcast_ai solo founder attribution' },
         { cmd: '/briefing',    desc: 'Full business snapshot — agents, leads, EspaLuz, health.', usage: '/briefing' },
         { cmd: '/outcomes',    desc: 'What your AI agents did today — posts, leads, emails.', usage: '/outcomes' },
-        { cmd: '/cita',        desc: 'IENDI appointments → Trello cards on the right Kira month board, red (family), Cita column, sorted by date. Paste the clinic block, forward it, or reply to a voice note.', usage: 'Reply to the clinic message with: /cita' },
-        { cmd: '/citasort',    desc: 'Re-sort every Kira Cita column by date. Position only — never changes content.', usage: '/citasort' },
       ],
     },
     'wiring_pipeline': {
@@ -827,7 +833,7 @@ Or just ask me anything - I understand natural language!`;
   "Until June 20, call the car inspection and find the counteragent address"
   → AI creates cards on the right board, right list, with due date
 
-  "Move the court cards to Kira Junio"
+  "Move the court cards to next month's board"
   → Finds cards by name and moves them
 
   "Archive those cards" / "Заархивируй те карточки"
@@ -8057,7 +8063,7 @@ const WHISPER_PROMPT = [
   // Trello action vocabulary
   'Move card, create card, add card, archive card, move this card, add task, new task.',
   // Avoid common substitutions
-  'Trello card. Kira board. Kira Mayo. Kira Junio.',
+  'Trello card. Kira board. ' + rollingMonthNames().map(m => 'Kira ' + m.split(' ')[0]).join('. ') + '.',
 ].join(' ');
 
 async function transcribeAudio(filePath: string): Promise<string | null> {
