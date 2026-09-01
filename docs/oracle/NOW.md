@@ -220,6 +220,24 @@ work. Port what you want by hand; never reset.
   resolves boards dynamically from the appointment's month. **That stale map is still
   live for the other voice→Trello flows and is worth fixing separately.**
 
+## 🧠 VJH judge feedback — HOURLY, and the schedule lives only in crontab
+
+- `scripts/judge_feedback_sync.py` reads Elena's HubSpot notes **and screenshots**
+  (vision, cached per attachment) into `autonomous_data/judge_feedback.json`, which
+  `src/core/llm_judge.py:170` loads into the live judge prompt. Verified end to end
+  1 Sep 2026: file written 14:17, the India/Level AI reason present in it, log shows
+  `scanned 400 deals -> 12 positives, 12 negatives (8 carrying her reason, 5 read
+  from screenshots)` — and that count rose 7→8 between runs, so it is learning, not
+  merely executing.
+- **Cadence is `17 * * * *` — HOURLY, changed from daily.** ⚠️ **This schedule exists
+  ONLY in Oracle's crontab. It is in no repo.** Rebuild the box, restore an old cron
+  backup, or infer the cadence from the code, and it silently reverts to daily — a
+  19-hour learning lag that looks exactly like a working system. If you touch VJH
+  cron, preserve this line.
+- 🚫 **The `python3` in that cron is deliberately NOT the venv.** The script uses only
+  `urllib` and `json` and is verified working under a stripped `env -i`. Do not
+  "fix" it to `venv/bin/python`.
+
 ## ⚠️ Standing traps
 
 - **Never `git add -A`** in cto-aipa. Named files only.
