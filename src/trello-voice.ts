@@ -1173,7 +1173,21 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
  * RU:  перенеси, переместить, перемести, перенести, передвинь, положи,
  *      заархивируй, убери, скрой, отправь
  */
-const MGMT_RE = /\b(move|relocat|transfer|archive|archiv|mueve|muévelo|mover|trasladar|pasar|archivar|перенеси|переместить|перемести|перенести|передвинь|положи|заархивируй|убери|скрой|отправь)\b/i;
+/**
+ * Does this transcript ask to MANAGE existing cards (move/archive) rather than
+ * create one?
+ *
+ * WARNING: do NOT put \b back. JavaScript's \b is defined on ASCII word
+ * characters, so a Cyrillic letter is not a word character and \bперемести\b can
+ * never match ANY string. Every Russian move/archive command was silently falling
+ * through to "create a card" — including "Заархивируй те карточки", which is the
+ * example printed in the bot's own help text. Found 1 Sep 2026.
+ *
+ * Unicode lookarounds instead, with the u flag. Stems take \p{L}* so "archive",
+ * "archived", "заархивируй" and "перемести" all match, while the leading
+ * lookbehind still stops "remove" matching "move".
+ */
+const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|archiv\p{L}*|mueve|muévelo|mover|trasladar|pasar|перенес\p{L}*|переме\p{L}*|передвин\p{L}*|положи|заархивир\p{L}*|архивир\p{L}*|убери|скрой|отправь)(?![\p{L}\p{N}])/iu;
 
 export interface MultiActionItem {
   type: 'create' | 'move' | 'archive';
@@ -1219,21 +1233,19 @@ async function searchTrelloCards(query: string, boardHint?: string): Promise<Tre
   return filtered.length > 0 ? filtered : cards; // fall back to unfiltered if hint yielded nothing
 }
 
-/** Ask Claude Haiku to decompose the transcript into typed actions. */
+/**
+ * Decompose the transcript into typed actions.
+ *
+ * WARNING: this goes through the 5-provider chain, NOT a direct Anthropic call.
+ * It used to POST api.anthropic.com with claude-haiku directly. Anthropic has
+ * been at a zero balance since 17 Aug, so it returned [] for every message and
+ * the caller fell through to "create a card" — which is why "Archive this card"
+ * produced a card named "Archive this card". Completely silent: exactly the
+ * failure a five-provider chain exists to prevent, bypassed by a hand-rolled
+ * fetch that no chain could see. Found 1 Sep 2026.
+ */
 async function classifyMultiAction(transcript: string): Promise<_RawAction[]> {
-  const key = process.env.ANTHROPIC_API_KEY || '';
-  if (!key) return [];
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 500,
-        messages: [{
-          role: 'user',
-          content: `You manage Trello boards for Elena Revicheva (AI entrepreneur, Panama).
+  const prompt = `You manage Trello boards for Elena Revicheva (AI entrepreneur, Panama).
 
 Analyze this voice message and extract ALL Trello card management actions.
 Return ONLY a JSON array — no explanation, no markdown.
@@ -1282,20 +1294,24 @@ Rules:
 - For vague pronouns ("those", "them", "this", "it", "this one"), set cardQuery to "__recent__"
 - Note: Whisper may mishear "card" as "desk" or "task" — treat "this desk/task/item" as referring to a card
 
-Message: "${transcript}"`,
-        }],
-      }),
-    });
+Message: "${transcript}"`;
 
-    if (resp.ok) {
-      const data = await resp.json() as { content?: Array<{ text?: string }> };
-      const raw = (data?.content?.[0]?.text || '').trim().replace(/```json\n?|\n?```/g, '');
-      return JSON.parse(raw) as _RawAction[];
-    }
+  try {
+    const { completeWithProfileDetailed } = await import('./llm-resilience');
+    const { text, provider } = await completeWithProfileDetailed(
+      'classify', null, prompt, 700, 'trello-multiaction',
+    );
+    const cleaned = text.trim().replace(/```json\n?|\n?```/g, '');
+    const arr = cleaned.match(/\[[\s\S]*\]/);
+    const actions = JSON.parse(arr ? arr[0] : cleaned) as _RawAction[];
+    console.log(`[TrelloVoice] multi-action via ${provider}: ${Array.isArray(actions) ? actions.length : 0} action(s)`);
+    return Array.isArray(actions) ? actions : [];
   } catch (e) {
-    console.warn('[TrelloVoice] Multi-action classify failed:', e);
+    // Loud, never silent: falling through to CREATE is a real behaviour change
+    // and the operator must be able to see it in the log.
+    console.error('[TrelloVoice] multi-action classify FAILED — falling through to CREATE:', (e as Error).message?.slice(0, 180));
+    return [];
   }
-  return [];
 }
 
 /**
