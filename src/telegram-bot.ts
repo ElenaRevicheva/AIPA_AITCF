@@ -609,6 +609,7 @@ Type /menu for all commands! 🚀
       title: '🏥 FAMILY & APPOINTMENTS',
       commands: [
         { cmd: '/cita', desc: 'Clinic appointments to Trello cards: right Kira month board, Cita column, red (family), Panama times, column re-sorted. Sending the same block twice changes nothing.', usage: 'Reply to the clinic message (or a voice note) with /cita — or paste it: /cita <block>' },
+        { cmd: '/dated', desc: 'YOUR OWN dated item as an ORANGE (business) card, same dated column. Understands "next Tuesday 3pm". It states the date back to you and refuses rather than guessing.', usage: '/dated 20 October — send the Fermatix invoice' },
         { cmd: '/citasort', desc: 'Re-sort every Kira Cita column by date now. Writes card position only — never content, dates or labels.', usage: '/citasort' },
       ],
     },
@@ -838,6 +839,10 @@ Or just ask me anything - I understand natural language!`;
   Reply to the clinic message — or a voice note — with /cita
   Or paste it: /cita Cita programada para el...
   Sending the same block twice changes nothing.
+/dated    - YOUR OWN dated card, ORANGE = business
+  /dated 20 October — send the Fermatix licence invoice
+  /dated next Tuesday 3pm call with Igor
+  Understands relative dates. Tells you the date it read — check it.
 /citasort - Re-sort every Kira Cita column by date now
 
 🎤 Voice → Trello — just speak naturally, no trigger phrase needed:
@@ -1221,6 +1226,68 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
       const result = await createCitaCards(source);
       console.log(`[cita] parsed=${result.parsed} created=${result.created} skipped=${result.skipped} failed=${result.failed}`);
       await ctx.reply(formatCitaReply(result));
+    } catch (e) {
+      await ctx.reply('❌ ' + (e as Error).message.slice(0, 200) + '\n\nNothing was created.');
+    }
+  });
+
+  /**
+   * /dated — one of HER OWN dated items, in her words, as an ORANGE card.
+   *
+   * Same column as /cita, different colour: red is FAMILY, orange is BUSINESS in
+   * her system. The dated column answers "what happens on a date"; the colour
+   * answers "which part of my life".
+   *
+   * Clinic text is rigid enough to regex; this is not, because she dictates it.
+   * So the date goes through the provider chain and the reply STATES the date
+   * back to her. It refuses rather than guessing: a card silently dated wrong is
+   * only discovered on the day it mattered.
+   */
+  bot.command('dated', async (ctx) => {
+    const inline = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/dated(@\S+)?\s*/i, '').trim();
+    const replied = ctx.message?.reply_to_message as
+      | { text?: string; caption?: string; voice?: { file_id: string } }
+      | undefined;
+    let source = inline || replied?.text || replied?.caption || '';
+
+    if (!source && replied?.voice) {
+      await ctx.reply('🎤 Transcribing…');
+      try {
+        const file = await ctx.api.getFile(replied.voice.file_id);
+        const fileUrl = `https://api.telegram.org/file/bot${process.env.TELEGRAM_BOT_TOKEN}/${file.file_path}`;
+        const tempFile = `/tmp/dated_${Date.now()}.ogg`;
+        await downloadFile(fileUrl, tempFile);
+        const transcript = await transcribeAudio(tempFile);
+        try { fs.unlinkSync(tempFile); } catch { /* already gone */ }
+        if (!transcript) { await ctx.reply('❌ Could not transcribe. Send it as text.'); return; }
+        source = transcript;
+        await ctx.reply(`🎤 Heard: "${transcript.slice(0, 200)}"`);
+      } catch (e) {
+        await ctx.reply('❌ Voice download failed: ' + (e as Error).message.slice(0, 120));
+        return;
+      }
+    }
+
+    if (!source) {
+      await ctx.reply(
+        'Usage: /dated <what, and when>\n\n' +
+          'Examples:\n' +
+          '• /dated 20 October — send the Fermatix licence invoice\n' +
+          '• /dated next Tuesday 3pm call with Igor about the overlay\n' +
+          '• reply to a voice note with /dated\n\n' +
+          'Orange (business), in the dated column of the right Kira month board. ' +
+          'I will tell you the date I understood — check it.',
+      );
+      return;
+    }
+
+    await ctx.reply('📅 Reading the date…');
+    try {
+      const { createDatedCard, formatDatedReply } = await import('./iendi-cita');
+      const r = await createDatedCard(source);
+      console.log(`[dated] ok=${r.ok} board=${r.board || '-'} when=${r.whenLocal || '-'}`);
+      await ctx.reply(formatDatedReply(r));
     } catch (e) {
       await ctx.reply('❌ ' + (e as Error).message.slice(0, 200) + '\n\nNothing was created.');
     }
@@ -8006,6 +8073,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
           { command: 'trello_analyze', description: '📋 Full Kanban analysis of all Trello boards' },
           // FAMILY / APPOINTMENTS
           { command: 'cita', description: '🏥 IENDI appointments → Trello cards (paste, forward or voice)' },
+          { command: 'dated', description: '🟠 Your own dated business card (orange) on the right month board' },
           { command: 'citasort', description: '🔢 Re-sort every Kira Cita column by date' },
           // SETTINGS
           { command: 'alerts', description: '🔔 Toggle proactive alerts' },

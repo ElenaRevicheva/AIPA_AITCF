@@ -286,3 +286,141 @@ export function formatCitaReply(r: CitaResult): string {
   const probs = r.problems.length ? `\n\n⚠️ ${r.problems.slice(0, 5).join('\n⚠️ ')}` : '';
   return `${head}\n\n${boards}${probs}\n\nAll red (family), in the Cita column, sorted by date.`;
 }
+
+// ─── Dated business cards (/dated) ───────────────────────────────────────────
+
+/**
+ * Elena's own dated items, in her words, in the same Cita column — but ORANGE.
+ *
+ * `red` is FAMILY and `orange` is BUSINESS in her system (see trello-voice.ts).
+ * Keeping both in the dated column is deliberate: the column answers "what is
+ * happening on a date", and colour answers "which part of my life".
+ *
+ * Clinic text is rigid enough to regex. This is not — she dictates it. So the
+ * date is extracted by the provider chain, and the reply states the interpreted
+ * date back to her. A misread date on a card she will not look at again until it
+ * matters is the whole risk here, so it is surfaced rather than assumed.
+ */
+export interface DatedDraft {
+  title: string;
+  dateIso: string;      // YYYY-MM-DD, Panama local
+  time?: string | undefined;  // HH:MM 24h, Panama local
+  notes?: string | undefined;
+}
+
+const ORANGE = 'orange'; // BUSINESS
+
+async function orangeLabel(boardId: string): Promise<Label | null> {
+  const labels = await tGet<Label[]>(`/boards/${boardId}/labels`, { fields: 'name,color' });
+  return labels.find(l => l.color === ORANGE) || null;
+}
+
+/** Ask the chain for structured fields. Returns null rather than guessing a date. */
+export async function extractDated(text: string, today = new Date()): Promise<DatedDraft | null> {
+  const { completeWithProfileDetailed } = await import('./llm-resilience');
+  const todayPan = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Panama', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(today);
+  const sys = [
+    'Extract ONE dated item from the user text. Reply with JSON only, no prose.',
+    `Today is ${todayPan} in Panama (America/Panama, UTC-5).`,
+    'Fields: {"title": string, "dateIso": "YYYY-MM-DD", "time": "HH:MM" or null, "notes": string or null}',
+    'Resolve relative dates ("next Tuesday", "el 20", "in two weeks") against today.',
+    'title: short, imperative, what she must DO. Do not include the date in the title.',
+    'If you cannot determine a specific calendar date with confidence, reply exactly: {"dateIso": null}',
+    'Never invent a date. Never default to today.',
+  ].join('\n');
+  try {
+    const { text: out } = await completeWithProfileDetailed('classify', sys, text, 300, 'dated-extract');
+    const m = out.match(/\{[\s\S]*\}/);
+    if (!m) return null;
+    const j = JSON.parse(m[0]) as Partial<DatedDraft>;
+    if (!j.dateIso || !/^\d{4}-\d{2}-\d{2}$/.test(j.dateIso) || !j.title?.trim()) return null;
+    return {
+      title: j.title.trim().slice(0, 200),
+      dateIso: j.dateIso,
+      time: j.time && /^\d{2}:\d{2}$/.test(j.time) ? j.time : undefined,
+      notes: j.notes?.trim() || undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export interface DatedResult {
+  ok: boolean;
+  reason?: string;
+  board?: string;
+  title?: string;
+  whenLocal?: string;
+  url?: string;
+  fellBackToYearBoard?: boolean;
+}
+
+/**
+ * Create one orange dated card on the right board.
+ *
+ * If the month has no board — she keeps only three — it lands on
+ * "Kira Ano 2026 и дальше", her own long-horizon board, and the reply says so.
+ * Silently choosing a different month would be worse than refusing.
+ */
+export async function createDatedCard(text: string): Promise<DatedResult> {
+  const draft = await extractDated(text);
+  if (!draft) {
+    return { ok: false, reason: 'I could not read a specific date from that. Say it with a date — "20 October", "next Tuesday 3pm" — and I will not guess.' };
+  }
+  const [y, mo, d] = draft.dateIso.split('-').map(n => parseInt(n, 10));
+  if (!y || !mo || !d) return { ok: false, reason: 'bad date' };
+  const [hh, mm] = (draft.time || '09:00').split(':').map(n => parseInt(n, 10));
+  const dueIso = new Date(Date.UTC(y, mo - 1, d, (hh || 9) + PANAMA_OFFSET_HOURS, mm || 0)).toISOString();
+
+  const boards = await tGet<Board[]>('/members/me/boards', { fields: 'name', filter: 'open' });
+  let board = await boardForMonth(mo, y, boards);
+  let fellBack = false;
+  if (!board) {
+    board = boards.find(b => /kira\s+a[nñ]o/i.test(b.name)) || null;
+    fellBack = true;
+  }
+  if (!board) return { ok: false, reason: `No board for ${MONTH_NAME[mo]} ${y}, and no "Kira Ano" board to fall back to.` };
+
+  const list = await citaList(board.id);
+  if (!list) return { ok: false, reason: `No dated/Cita column on ${board.name}.` };
+  const orange = await orangeLabel(board.id);
+
+  const desc = [
+    `Fecha: ${d} de ${MONTH_NAME[mo]?.toLowerCase()} de ${y}${draft.time ? `, ${draft.time}` : ''}`,
+    draft.notes ? `Nota: ${draft.notes}` : '',
+    '',
+    `(from Telegram: "${text.slice(0, 300)}")`,
+  ].filter(Boolean).join('\n');
+
+  const card = await tSend<{ shortUrl: string }>('POST', '/cards', {
+    idList: list.id, name: draft.title, desc, due: dueIso, pos: 'bottom',
+    ...(orange ? { idLabels: orange.id } : {}),
+  });
+  try { await sortCitaList(list.id); } catch { /* ordering is cosmetic */ }
+
+  return {
+    ok: true,
+    board: board.name,
+    title: draft.title,
+    whenLocal: `${draft.dateIso}${draft.time ? ' ' + draft.time : ' (09:00 default)'}`,
+    url: card.shortUrl,
+    fellBackToYearBoard: fellBack,
+  };
+}
+
+export function formatDatedReply(r: DatedResult): string {
+  if (!r.ok) return `❌ ${r.reason}`;
+  return [
+    `✅ Orange (business) card created.`,
+    ``,
+    `📌 ${r.title}`,
+    `📅 ${r.whenLocal}  (Panama)`,
+    `📋 ${r.board}`,
+    r.fellBackToYearBoard ? `\n⚠️ No board for that month — put it on your long-horizon board instead.` : '',
+    r.url ? `\n${r.url}` : '',
+    ``,
+    `Check the date is right — I read it from your words.`,
+  ].filter(Boolean).join('\n');
+}
