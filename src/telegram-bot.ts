@@ -630,6 +630,8 @@ Type /menu for all commands! 🚀
         { cmd: '/podcast_ai',  desc: 'AI-narrated episode from a topic — script → TTS → publish.', usage: '/podcast_ai solo founder attribution' },
         { cmd: '/briefing',    desc: 'Full business snapshot — agents, leads, EspaLuz, health.', usage: '/briefing' },
         { cmd: '/outcomes',    desc: 'What your AI agents did today — posts, leads, emails.', usage: '/outcomes' },
+        { cmd: '/cita',        desc: 'IENDI appointments → Trello cards on the right Kira month board, red (family), Cita column, sorted by date. Paste the clinic block, forward it, or reply to a voice note.', usage: 'Reply to the clinic message with: /cita' },
+        { cmd: '/citasort',    desc: 'Re-sort every Kira Cita column by date. Position only — never changes content.', usage: '/citasort' },
       ],
     },
     'wiring_pipeline': {
@@ -1134,6 +1136,88 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
       await ctx.reply(
         '❌ ' + result + '\n\nThe old password is still in place — nothing was left half-changed.',
       );
+    }
+  });
+
+  /**
+   * /cita — IENDI appointment block → Trello cards, on the go.
+   *
+   * Why this exists (1 Sep 2026): the clinic sends a block of Spanish
+   * appointment lines. Turning it into Trello cards means parsing each date,
+   * converting Panama time to the UTC instant Trello stores, routing each one to
+   * the right monthly board, labelling it red for family, and re-sorting the
+   * column. That was 19 cards by hand and it recurs every few months.
+   *
+   * Three ways in, because she is usually on her phone:
+   *   /cita <paste>              — paste the block straight after the command
+   *   reply to the clinic message with /cita
+   *   reply to a VOICE note with /cita  — transcribed first
+   *
+   * Idempotent: cards are matched on name + due, so sending the same block twice
+   * creates nothing the second time. Existing cards are never modified — the only
+   * write to anything pre-existing is card position, when the column is re-sorted.
+   */
+  bot.command('cita', async (ctx) => {
+    const inline = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/cita(@\S+)?\s*/i, '').trim();
+    const replied = ctx.message?.reply_to_message as
+      | { text?: string; caption?: string; voice?: { file_id: string } }
+      | undefined;
+
+    let source = inline || replied?.text || replied?.caption || '';
+
+    // Voice route: transcribe the replied-to note first.
+    if (!source && replied?.voice) {
+      await ctx.reply('🎤 Transcribing the voice note…');
+      try {
+        const file = await ctx.api.getFile(replied.voice.file_id);
+        const fileUrl = `https://api.telegram.org/file/bot${process.env.TELEGRAM_BOT_TOKEN}/${file.file_path}`;
+        const tempFile = `/tmp/cita_${Date.now()}.ogg`;
+        await downloadFile(fileUrl, tempFile);
+        const transcript = await transcribeAudio(tempFile);
+        try { fs.unlinkSync(tempFile); } catch { /* already gone */ }
+        if (!transcript) { await ctx.reply('❌ Could not transcribe that. Send the text instead.'); return; }
+        source = transcript;
+        await ctx.reply(`🎤 Heard: "${transcript.slice(0, 220)}${transcript.length > 220 ? '…' : ''}"`);
+      } catch (e) {
+        await ctx.reply('❌ Voice download failed: ' + (e as Error).message.slice(0, 120));
+        return;
+      }
+    }
+
+    if (!source) {
+      await ctx.reply(
+        'Usage:\n' +
+          '• /cita <paste the clinic block>\n' +
+          '• reply to the clinic message with /cita\n' +
+          '• reply to a voice note with /cita\n\n' +
+          'I read every "Cita programada para el…" line, create the cards on the right ' +
+          'Kira month board in the Cita column, colour them red (family), and sort the ' +
+          'column by date. Sending the same block twice changes nothing.',
+      );
+      return;
+    }
+
+    await ctx.reply('📋 Reading the appointments…');
+    try {
+      const { createCitaCards, formatCitaReply } = await import('./iendi-cita');
+      const result = await createCitaCards(source);
+      console.log(`[cita] parsed=${result.parsed} created=${result.created} skipped=${result.skipped} failed=${result.failed}`);
+      await ctx.reply(formatCitaReply(result));
+    } catch (e) {
+      await ctx.reply('❌ ' + (e as Error).message.slice(0, 200) + '\n\nNothing was created.');
+    }
+  });
+
+  /** /citasort — put every Kira month board's Cita column back in date order, now. */
+  bot.command('citasort', async (ctx) => {
+    await ctx.reply('🔢 Sorting every Kira Cita column by date…');
+    try {
+      const { sortAllKiraCitaLists } = await import('./iendi-cita');
+      const lines = await sortAllKiraCitaLists();
+      await ctx.reply('✅ Done — position only, nothing else touched.\n\n' + lines.join('\n'));
+    } catch (e) {
+      await ctx.reply('❌ ' + (e as Error).message.slice(0, 200));
     }
   });
 
@@ -7825,7 +7909,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
       
       // Register commands with descriptions for Telegram's command menu
       try {
-        await bot!.api.setMyCommands([
+        const commandMenu = [
           // CURSOR-TWIN OPERATIONS
           { command: 'readfile', description: '📖 Read any file from your repos' },
           { command: 'editfile', description: '✏️ Edit files and commit to GitHub' },
@@ -7903,11 +7987,17 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
           { command: 'resume', description: '🔄 Restore last session' },
           { command: 'forget', description: '🧹 Clear conversation memory' },
           { command: 'trello_analyze', description: '📋 Full Kanban analysis of all Trello boards' },
+          // FAMILY / APPOINTMENTS
+          { command: 'cita', description: '🏥 IENDI appointments → Trello cards (paste, forward or voice)' },
+          { command: 'citasort', description: '🔢 Re-sort every Kira Cita column by date' },
           // SETTINGS
           { command: 'alerts', description: '🔔 Toggle proactive alerts' },
           { command: 'roadmap', description: '🛣️ View CTO AIPA roadmap' },
-        ]);
-        console.log(`   📋 Registered ${82} commands with Telegram`);
+        ];
+        await bot!.api.setMyCommands(commandMenu);
+        // Count the array rather than a literal: the previous hardcoded 82
+        // would have quietly become wrong the moment a command was added.
+        console.log(`   📋 Registered ${commandMenu.length} commands with Telegram`);
       } catch (err) {
         console.log(`   ⚠️ Could not register commands: ${err}`);
       }
