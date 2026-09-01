@@ -39,9 +39,13 @@ currently running. Treat it as a handover note to a colleague who starts blind.
 6. **Read §6 DELIBERATE before "fixing" anything that looks broken.** Wellfound at zero,
    YC not scraped, Oracle lagging, the failing Claude eval — all intentional, all have
    already cost someone an investigation.
-7. **Pause with a handoff block:** DONE / NEXT / VERIFIED BY / RISK. An agent that stops
+7. **A work product lives in a file or in HubSpot — never only in a chat.** A letter, brief,
+   application answer or set of findings goes to a committed file in `docs/` or a HubSpot note
+   on its deal, immediately. Chat is where work is discussed, not where it is kept — the other
+   agent cannot read it, the session board cannot see it, and closing the tab destroys it.
+8. **Pause with a handoff block:** DONE / NEXT / VERIFIED BY / RISK. An agent that stops
    without one has lost the work even if the code is committed.
-8. **Keep it to one screen per part.** A queue, not a history. Delete finished lines; the
+9. **Keep it to one screen per part.** A queue, not a history. Delete finished lines; the
    git log and `docs/` keep the record.
 
 The same protocol is mirrored in `.cursor/rules/now-md-shared-session.mdc` for Cursor.

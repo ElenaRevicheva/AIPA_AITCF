@@ -71,7 +71,27 @@ Every item below is a real failure that shipped. Two minutes, before any new wor
 4. **Is any claim on the board stale?** Older than 2h with no commit → release it.
 5. **Check the DELIBERATE list below before "fixing" anything that looks broken.**
 
-## 5. How to pause — the handoff block
+## 5. A work product lives in a file or in HubSpot — never only in a chat
+
+**Earned 1 Sep 2026.** Cursor drafted preparation for the Evaboot role and it existed
+only inside a Cursor chat window. Searched every Cursor database on the laptop — global
+storage plus all ten workspace stores, every table and column — **zero hits**. It is not
+recoverable, and the other agent would have rewritten it from nothing.
+
+A letter, a brief, an application answer, a plan, a set of findings — the moment it is
+something Elena would use, it goes to **one of two places**, immediately:
+
+- **a file** in `docs/` (committed and pushed to `main`), or
+- **a HubSpot note** on the deal it belongs to.
+
+Chat is where the work is *discussed*. It is not where the work is *kept*. A chat window
+is a private note with an expiry date: the other agent cannot read it, the session board
+cannot see it, and closing the tab destroys it.
+
+If you are mid-draft and it is not finished, still write it down — a rough file beats a
+perfect message nobody else can reach.
+
+## 6. How to pause — the handoff block
 
 When you stop mid-task, replace the HANDOFF section with exactly these four lines. An
 agent that pauses without one has lost the work, even if the code is committed.
@@ -81,7 +101,7 @@ agent that pauses without one has lost the work, even if the code is committed.
 - **VERIFIED BY:** the command or log line that proves the DONE claim
 - **RISK:** what will break or mislead if the next agent assumes wrongly
 
-## 6. 🚫 DELIBERATE — these look broken and are not. Do not "fix" them.
+## 7. 🚫 DELIBERATE — these look broken and are not. Do not "fix" them.
 
 | Thing | Why it is like that |
 |---|---|
@@ -92,7 +112,7 @@ agent that pauses without one has lost the work, even if the code is committed.
 | **`test_provider_chain[claude]` fails** | Anthropic credits are at zero. The eval is *correctly* reporting it. |
 | **AI-Jobs.net / BrightData LinkedIn dormant** | Measured lifetime yield ~0. Env flags exist to wake them. |
 
-## 7. What belongs in this file
+## 8. What belongs in this file
 
 The queue and whose move it is · what is open or known-broken · what is stranded on a
 branch · standing traps · what just landed, briefly.

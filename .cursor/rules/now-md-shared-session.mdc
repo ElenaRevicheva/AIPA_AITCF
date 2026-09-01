@@ -29,9 +29,16 @@ currently running. Write it as a handover note to a colleague who starts blind.
 6. **Check §6 DELIBERATE before "fixing" anything that looks broken.** Wellfound returning
    zero, YC not being scraped, Oracle's checkout lagging and the failing Claude eval are
    all intentional, and each has cost someone an investigation already.
-7. **Pause with a handoff block** — DONE / NEXT / VERIFIED BY / RISK. An agent that stops
+7. **A work product lives in a file or in HubSpot — never only in a chat.** Earned 1 Sep
+   2026: preparation for a role was drafted in a Cursor chat and existed nowhere else. Every
+   Cursor database on the laptop was searched — global storage plus all ten workspace stores,
+   every table and column — **zero hits**. Unrecoverable, and the other agent would have
+   rewritten it from nothing. A letter, brief, application answer, plan or set of findings
+   goes to a committed file in `docs/` or a HubSpot note on the deal, immediately. Chat is
+   where work is discussed, not where it is kept.
+8. **Pause with a handoff block** — DONE / NEXT / VERIFIED BY / RISK. An agent that stops
    without one has lost the work even if the code is committed.
-8. **Keep it to one screen per part.** It is a queue, not a history. Delete finished
+9. **Keep it to one screen per part.** It is a queue, not a history. Delete finished
    lines; git log keeps the record.
 
 ## Why rule 3 is in capitals
