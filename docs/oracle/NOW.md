@@ -107,31 +107,29 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Three HUD briefs opened. All **no-bid** with the 8-pack.
-  Codebase = git history. Coding = Harbor puzzles. **Agentic outside
-  SWE** = closest *domain* (last-click, HubSpot SoR, MCP, marketing)
-  and still Harbor *format* (offline stubs, 100 tool calls, FN/FP).
-- **NEXT:** Waiting on GitHub Action `hire-outreach-on-trigger` (branch
-  `cursor/fermatix-hubspot-deal-1c49`) to write the HubSpot deal. Elena
-  clicks SEND after the deal URL lands. Still: Megan ping (three briefs),
-  AfterQuery, Rwazi, Plata.
-- **VERIFIED BY:** User pasted agentic Must have: real tool use, SoR
-  end state, named failure modes, **stubs OK if offline**, Harbor QC
-  Required (build, bundle, FN/FP, live task).
-- **RISK:** Applying because tags say MCP/tool-use. Pointing a task at
-  live WhatsApp/HubSpot. Unpaid Harbor. Tooltip reopening codebase.
+- **DONE:** Zapier Sr TAM application submitted (1 Sep 06:12 EST) — all five free-text
+  answers drafted, resume attached. Self-learning loop **verified end-to-end**: her note
+  "i have just manually submitted" was parsed, and the role is now a learned positive in
+  `judge_feedback.json`. Screenshot reading confirmed live — 5 of 12 negatives this run
+  came from images she attached, not text.
+- **NEXT:** Rwazi Loom recording. Then Plata / Behram / WaaS from the queue.
+- **VERIFIED BY:** `ZAPIER in positives: ['Sr. Technical Account Manager @ Zapier @ Zapier']`
+  after running `scripts/judge_feedback_sync.py`; sync log `inspected 14, confirmed
+  applied-by-Elena 12`.
+- **RISK:** the Zapier deal has **Contacts (0)** and no owner. The response detector matches
+  replies to people; with no contact linked, a recruiter reply may land in Gmail and not
+  attach to this deal. This is the shape of the Aug 23-24 miss — watch it.
 
 ## 💰 MONEY QUEUE
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **HUD Vendor — non-exclusive training licence** | **Megan sent.** Listing **private**. Three briefs **no-bid**; agentic-outside-SWE is domain-only | **Elena:** send Megan ping (three briefs). Do not Apply. Commissioned Harbor only |
-| 1b | **AfterQuery Atrium re-ask** | **Delivered** atrium@ + support@. founders@ bounced. Clicks on all three. No open event | **Elena: contact atrium@ / support@ today** |
-| 1c | **Fermatix — non-exclusive royalty licence** | Staging `[LICENSE]` deal + `/go/outreach-email/fermatix` → `hi@fermatix.ai`. No GitHub in first email. Refuse exclusive. | **Agent:** creating HubSpot records. **Elena:** click SEND after the deal URL lands |
-| 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h, US-overlap) | All answers + comp drafted. Now a HubSpot Hiring deal | **Elena: paste & submit** + record the Loom |
+| 1 | **Zapier — Sr. Technical Account Manager** ($55–82.6K + bonus, remote South America, **PST hours**) | ✅ **SUBMITTED 1 Sep 06:12 EST.** VJH surfaced it 09:04 UTC, she applied within 3h. Deal `⏳ Sent`. Judge has learned it as a positive | **Waiting on them.** ⚠️ Deal has **Contacts (0)** — no person linked, so a recruiter reply may not auto-match. Add the recruiter contact if one writes |
+| 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h) | ✅ Applied — registered as a learned positive | **Elena: record the Loom** — they said "links or Looms beat resumes" |
 | 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
 | 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
+| 6 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
