@@ -1,0 +1,28 @@
+PASTE into DataVendor **Submit offer** on
+https://datavendor.ai/briefs/2b33c4c6-d983-4d16-a912-0241dede176c
+
+Do NOT use “Submit a listing” / “Submit an existing listing”.
+That attaches the eight-repo training-licence pack. Wrong SKU.
+
+---
+
+I want to author Harbor / HUD NL2Repo tasks for this brief — not attach my existing repo listing.
+
+Offer: one paid sample task at $600, then more if it passes your QC.
+
+What I will deliver for the sample:
+- spec (clear-document, named benchmark style)
+- golden repo that passes the behaviour tests
+- empty repo that does not
+- Harbor task (task.toml, environment, grader)
+- a real engineering scenario from a solo production lab (job-ingest gate / fail-closed publishing), fully offline — no live CRM, chat, or keys
+
+What I need from HUD on the sample, because I cannot fake the metric:
+- scaffold runs of Qwen3.8 Max and Opus 5 or Fable 5 (4–8 rollouts) so we can show the gap you require
+- I will not submit a task whose pass rates I have not measured
+
+I keep copyright. Non-exclusive. No assignment.
+
+Elena Revicheva
+AIdeazz AI Lab
+https://aideazz.xyz/portfolio
