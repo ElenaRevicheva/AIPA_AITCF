@@ -84,6 +84,7 @@ is a budget, not a cheque.**
 | **Enterprise Codebase Data Opportunity — $100,000 total** | **No-bid.** Must-haves are a mid-size company repo, not the 8-pack. See scorecard below. |
 | **Long-Horizon Coding Tasks** (Coding/SWE, Harbor) | **No-bid with the listing.** They buy sealed Harbor tasksets, not production repos. See below. |
 | **Long-Horizon Agentic Tasks Outside SWE** (tool-use, computer use, MCP) | **Closest domain, still no-bid with the listing.** Last-click / CRM / MCP is the *subject*. Harbor stubs + 100 tool calls is the *format*. See below. |
+| **NL2 Repo Tasks** ($600/task, Coding/SWE, Harbor, opened 2 Sep) | **No-bid tonight.** Looks like paid Harbor authoring. Still unpaid until Required QC + dual-model rollouts pass. See below. |
 | Finance and Legal Knowledge Work Tasks | Skip. Not the product. |
 
 **Do not Apply** the 8-pack to any of the three opened briefs. Do not
@@ -175,6 +176,30 @@ fail-closed numbers; HubSpot as system of record; Atlas → audit API
 Do **not** Apply the repo listing. Do **not** start stubbing HubSpot
 unpaid. If Megan commissions this brief as paid Harbor authoring,
 this is the one whose workflows Elena actually runs.
+
+#### NL2 Repo Tasks — $600/task (2 Sep)
+
+Not the 8-pack. They pay for **Harbor exam items**: a spec, a finished
+golden repo, a verifier, packed as `task.toml` + environment. 75% must
+be *clear* specs in an existing benchmark’s shape (NL2RepoBench /
+Doc2Repo / SWE-Marathon / RepoZero) with behaviour tests **1:1 with the
+spec**. 25% may be ambiguous vibe-coding markdown + rubric judge.
+Golden repo must pass all tests; empty repo must not.
+
+Looks like the “commissioned Harbor” line in the Megan ping. The catch:
+Required QC still runs **before** pay (environment build, Harbor bundle,
+FN/FP both false, ≥1 live task). Scaffold baseline wants **4–8 rollouts
+of Qwen3.8 Max and Opus 5 / Fable 5**. Qwen average ≤50%, Opus max
+>0.6, **every** task needs a ≥12.5% gap or they reject it. Anthropic
+credits are at zero; those rollouts cannot be run tonight.
+
+A real production story (job-hunt agent, fail-closed publisher) is
+allowed as the *scenario*. Live HubSpot / WhatsApp in the box is not.
+$600 can be spent on the dual-model runs before QC accepts.
+
+**Do not Apply. Do not start Harbor unpaid.** Tell Megan: one **paid**
+sample, with compute for the two models, then more. Do not email the
+lab. Listing stays private-to-opportunity-buyers.
 
 ### Recommended checks (22 failed) — do not chase
 
