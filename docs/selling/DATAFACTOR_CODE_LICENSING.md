@@ -96,6 +96,40 @@ offer. Only private repos carry licence value.
 > exclusivity — I'm evaluating more than one buyer and won't sign anything that
 > forecloses that.
 
+## What the chat established (2 Sep 2026) — on record
+
+Their support assistant, in writing:
+
+- **No account manager or manual upload needed.** The `/code-repos` password gate
+  is not the route in. Submit via **<https://datafactor.com/score>** — repo URL +
+  email + read-only token; for private repos the page lists what the token can
+  see and she picks which to score.
+- **"A fine-grained, read-only token is the right approach."** They had initially
+  suggested a *classic token with `repo` scope* — do NOT use that. GitHub's
+  classic `repo` scope is read **and write** across **every** repository owned by
+  the account, public and private, including the one she deliberately excluded.
+  Fine-grained + Contents: Read-only + only the 8 selected repos is the correct
+  grant, and they confirmed it works.
+- **"The assessment is free and non-binding."**
+- **Exclusivity: not answered in chat, escalated.** *"I do not have the licensing
+  exclusivity terms in the chat briefing, so I have flagged your question for a
+  teammate to reply here and by email in writing before any offer stage."*
+  She asked twice in the widget and got token answers both times — not evasion,
+  just routing, but it is why the question moved to email where a reply is
+  quotable.
+
+**Token hygiene for the submission:** name `datafactor-assessment`, expiry
+**7 days**, resource owner = her own account, *Only select repositories* → the 8,
+Permissions → **Contents: Read-only** (Metadata read-only self-enables and is
+required). Paste it into their page, **never into the chat widget** — support
+chats are logged and ticketed. **Revoke at github.com/settings/tokens the moment
+scoring finishes**, without waiting for expiry.
+
+**Free audit worth using:** the page lists the repositories the token can see.
+That list is an independent check of whether the scope is right. If a 9th repo
+appears — especially `aideazz-private-docs` — the token is wrong: stop, delete
+it, recreate.
+
 ## Questions for the scoping call, in order
 
 1. **Exclusive or non-exclusive**, in writing.
