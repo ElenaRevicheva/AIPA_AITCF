@@ -893,6 +893,170 @@ Or just ask me anything - I understand natural language!`;
   });
   
   // Handle command detail callbacks
+  /**
+   * Follow-up radar cleanup — the approve half of the loop.
+   *
+   * `scripts/followup_radar.py` (VJH) recomputes the radar from the mailbox every
+   * morning, so a dead thread reappears forever: Elena has been reading the same
+   * vanished contacts daily for over a month. It now PROPOSES the ones silent
+   * past a threshold and renders two buttons; this handler is the only thing that
+   * writes the ledger.
+   *
+   * Three properties that make an auto-cleaner safe to hand a mailbox:
+   *  - It never touches mail. "Clean" means "stop showing me this thread". The
+   *    ledger is one JSON file and every decision is reversible by editing it.
+   *  - Nothing is hidden without a tap. The radar can only ask.
+   *  - "Keep them" SNOOZES rather than doing nothing, so declining does not mean
+   *    being asked the same question again tomorrow. A prompt that repeats after
+   *    you answer it trains you to ignore prompts.
+   */
+  interface RadarItem { key: string; who: string; subject: string; age: number; stale?: boolean }
+  /**
+   * `kind` separates two different answers that were wrongly collapsed:
+   *   dismissed — hide this thread from the radar (permanent unless `until`)
+   *   kept      — keep showing it, just stop ASKING me to clear it
+   * Snoozing a KEPT thread removed from the radar the very thread she had just
+   * said she wanted to watch. Found 2 Sep 2026, by Elena refusing to tap it.
+   */
+  interface RadarLedgerRow { at: string; until?: string | null; who?: string; kind?: 'dismissed' | 'kept' }
+
+  const radarDir = (): string => process.env.RADAR_STATE_DIR || path.join(process.cwd(), 'data');
+  const radarProposal = (): { id: string; items: RadarItem[] } =>
+    JSON.parse(fs.readFileSync(path.join(radarDir(), 'radar-proposal.json'), 'utf8'));
+  const radarLedger = (): Record<string, RadarLedgerRow> => {
+    try { return JSON.parse(fs.readFileSync(path.join(radarDir(), 'radar-dismissed.json'), 'utf8')); }
+    catch { return {}; }
+  };
+  const radarSave = (l: Record<string, RadarLedgerRow>): void => {
+    fs.mkdirSync(radarDir(), { recursive: true });
+    fs.writeFileSync(path.join(radarDir(), 'radar-dismissed.json'), JSON.stringify(l, null, 2), 'utf8');
+  };
+  /**
+   * Rebuild the keyboard from what is STILL open, so a cleared row disappears.
+   *
+   * `showAll` widens it from the age-stale subset to every listed thread. The
+   * threshold decides what is PROPOSED, never what is POSSIBLE — Elena knows a
+   * contact has vanished long before a day counter agrees.
+   */
+  const radarKeyboard = (
+    pid: string, items: RadarItem[], ledger: Record<string, RadarLedgerRow>, showAll = false,
+  ) => {
+    const open = items.map((it, n) => ({ it, n })).filter(({ it }) => !ledger[it.key]);
+    const shown = showAll ? open : open.filter(({ it }) => it.stale);
+    const rows: { text: string; callback_data: string }[][] = shown.slice(0, 12).map(({ it, n }) => [{
+      text: `🧹 ${it.age}d  ${it.who.split('@')[0]?.slice(0, 18)}@${it.who.split('@').pop()?.slice(0, 14)}`,
+      callback_data: `rdrone:${pid}:${n}`,
+    }]);
+    const tail: { text: string; callback_data: string }[] = [];
+    if (!showAll && open.length > shown.length) {
+      tail.push({ text: `📋 Show all ${open.length}`, callback_data: `rdrall:${pid}` });
+    }
+    if (shown.length) {
+      tail.push({ text: `🧹 Clear ${shown.length}`, callback_data: showAll ? `rdrcleanall:${pid}` : `rdrclean:${pid}` });
+    }
+    if (open.length) tail.push({ text: 'Keep all', callback_data: `rdrkeep:${pid}` });
+    if (tail.length) rows.push(tail);
+    return { inline_keyboard: rows };
+  };
+
+  /** Widen the keyboard to every listed thread. */
+  bot.callbackQuery(/^rdrall:/, async (ctx) => {
+    const pid = (ctx.callbackQuery?.data || '').split(':')[1] || '';
+    try {
+      const proposal = radarProposal();
+      if (proposal.id !== pid) {
+        await ctx.answerCallbackQuery({ text: 'That radar message is out of date.', show_alert: true });
+        return;
+      }
+      await ctx.answerCallbackQuery({ text: 'Showing every thread — tap any to clear it.' });
+      await ctx.editMessageReplyMarkup({
+        reply_markup: radarKeyboard(pid, proposal.items, radarLedger(), true),
+      });
+    } catch (e) {
+      await ctx.answerCallbackQuery({ text: 'Failed: ' + (e as Error).message?.slice(0, 80), show_alert: true });
+    }
+  });
+
+  /**
+   * Clear ONE thread. All-or-nothing was the wrong granularity: being forced to
+   * keep a dead thread because a live one shares the batch is how the buttons
+   * stop getting used. The keyboard is rebuilt after each tap so a cleared row
+   * disappears and the remaining count stays honest.
+   */
+  bot.callbackQuery(/^rdrone:/, async (ctx) => {
+    const [, pid, idxRaw] = (ctx.callbackQuery?.data || '').split(':');
+    try {
+      const proposal = radarProposal();
+      if (proposal.id !== pid) {
+        await ctx.answerCallbackQuery({ text: 'That radar message is out of date — use the newest one.', show_alert: true });
+        return;
+      }
+      const item = proposal.items[Number(idxRaw)];
+      if (!item) { await ctx.answerCallbackQuery({ text: 'Already gone.' }); return; }
+
+      const ledger = radarLedger();
+      ledger[item.key] = { at: new Date().toISOString(), until: null, who: item.who, kind: 'dismissed' };
+      radarSave(ledger);
+
+      await ctx.answerCallbackQuery({ text: `Cleared ${item.who}` });
+      await ctx.editMessageReplyMarkup({ reply_markup: radarKeyboard(pid, proposal.items, ledger) });
+      console.log(`[radar] cleared one: ${item.who} (${item.age}d)`);
+    } catch (e) {
+      await ctx.answerCallbackQuery({ text: 'Failed: ' + (e as Error).message?.slice(0, 80), show_alert: true });
+    }
+  });
+
+  /**
+   * Bulk: clear everything still open, or keep everything.
+   *
+   * "Keep all" SNOOZES for two weeks rather than doing nothing. A prompt that
+   * repeats after you have answered it trains you to ignore prompts, and then
+   * the approval gate is theatre.
+   */
+  bot.callbackQuery(/^rdr(clean|cleanall|keep):/, async (ctx) => {
+    const data = ctx.callbackQuery?.data || '';
+    const action = data.startsWith('rdrkeep:') ? 'keep' : 'clean';
+    const pid = data.split(':')[1] || '';
+    try {
+      await ctx.answerCallbackQuery();
+      const proposal = radarProposal();
+      if (proposal.id !== pid) {
+        await ctx.reply('⚠️ That radar message is out of date — a newer one has replaced it.');
+        return;
+      }
+      const ledger = radarLedger();
+      const now = new Date();
+      const until = action === 'keep'
+        ? new Date(now.getTime() + 14 * 24 * 3600 * 1000).toISOString()
+        : null;
+      // "Clear N" clears exactly what its label counted. The proposal now holds
+      // every listed thread, so an unscoped bulk clear would wipe live ones too.
+      const openItems = proposal.items.filter(it => !ledger[it.key]);
+      const touched = action === 'keep' || data.startsWith('rdrcleanall:')
+        ? openItems
+        : openItems.filter(it => it.stale);
+      for (const it of touched) {
+        ledger[it.key] = {
+          at: now.toISOString(), until, who: it.who,
+          kind: action === 'keep' ? 'kept' : 'dismissed',
+        };
+      }
+      radarSave(ledger);
+
+      const names = touched.slice(0, 8).map(i => `  • ${i.who} (${i.age}d)`).join('\n');
+      await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
+      await ctx.reply(
+        action === 'clean'
+          ? `🧹 Cleared ${touched.length} thread(s):\n${names}\n\n` +
+            'Your mail is untouched — they just stop appearing. Reversible in data/radar-dismissed.json.'
+          : `👍 Keeping them. Snoozed 14 days so you are not asked again tomorrow:\n${names}`,
+      );
+      console.log(`[radar] ${action} ${touched.length} thread(s)`);
+    } catch (e) {
+      await ctx.reply('❌ Could not update the radar: ' + (e as Error).message?.slice(0, 140));
+    }
+  });
+
   bot.callbackQuery(/^cmd:/, async (ctx) => {
     const data = ctx.callbackQuery?.data || '';
     const cmdName = data.replace('cmd:', '');
