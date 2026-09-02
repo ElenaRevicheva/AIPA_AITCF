@@ -33,6 +33,18 @@ interface CardClassification {
   urgency: Urgency;
   boardTarget: BoardTarget;
   listTarget: ListTarget;
+  /**
+   * The board/column the user NAMED OUT LOUD, verbatim, when they named one.
+   *
+   * boardTarget is a fixed enum and literally cannot express "Kira Septiembre
+   * 2026", so an explicit instruction used to be collapsed into whichever enum
+   * the topic suggested: "Создай и занеси эту карточку Kira septiembre, колонка
+   * Cita" about a credit-card debt filed itself on the FINANCE board, and Elena
+   * then needed a second voice message to move it. These hints win over the
+   * enums whenever present. Found 1 Sep 2026.
+   */
+  boardNameHint?: string | null;
+  listNameHint?: string | null;
   labelColor: TrelloColor;
   dueDate: string | null;  // ISO date YYYY-MM-DD extracted from speech ("by Friday", "end of May") or null
   subtasks: string[] | null; // 2-5 subtask titles if task naturally decomposes; null for single-step tasks
@@ -701,6 +713,8 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "urgency": "urgent_today|soon|dated|not_sure|done",
   "boardTarget": "kira_current_month|kira_future|vibejob|aldeazz|espaluz|algom|kira_habits|kira_finance",
   "listTarget": "just_for_today|todo_flow|in_process_me|in_process_them|not_sure|dated|rules|done",
+  "boardNameHint": "EXACT board the user named out loud (e.g. \"Kira Septiembre\"), else null",
+  "listNameHint": "EXACT column the user named out loud (e.g. \"Cita\", \"Датировано\", \"Надо сделать\"), else null",
   "labelColor": "red|orange|purple|green|lime",
   "dueDate": "2026-05-31",
   "subtasks": null,
@@ -710,16 +724,33 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
 
 If isTask is false, still return the full JSON but the other fields can be empty/default.`;
 
-  const text = await claudeWithGroqFallback(
-    anthropic, 'claude-haiku-4-5-20251001', 768, systemPrompt, userPrompt, 'trello-voice/classify'
-  );
+  // Five-provider chain, not the old Anthropic->Groq pair. Anthropic has been at a
+  // zero balance since 17 Aug, so every classification was landing on one
+  // remaining provider and, when its reply did not parse, silently degrading to
+  // the fallback below -- which routes to kira_current_month/todo_flow and drops
+  // every hint the user spoke. That is why "занеси в Kira Octubre, колонка Cita"
+  // filed itself somewhere else with confidence 0.3. Found 1 Sep 2026.
+  const { completeWithProfileDetailed } = await import('./llm-resilience');
+  let text = '';
+  try {
+    const r = await completeWithProfileDetailed('classify', systemPrompt, userPrompt, 900, 'trello-voice/classify');
+    text = r.text;
+    console.log(`[TrelloVoice] classify via ${r.provider}`);
+  } catch (e) {
+    console.error('[TrelloVoice] classify chain FAILED:', (e as Error).message?.slice(0, 160));
+  }
 
   try {
-    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim()) as CardClassification;
+    // Take the outermost JSON object rather than trusting the whole reply: some
+    // providers wrap it in prose or a fenced block, and a strict parse turns a
+    // perfectly good classification into a silent fallback.
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    const block = cleaned.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(block ? block[0] : cleaned) as CardClassification;
     return reconcileUrgency(parsed);
   } catch {
     // Fallback classification if parsing fails
-    console.error('[TrelloVoice] Haiku parse failed, using fallback. Raw:', text);
+    console.error('[TrelloVoice] classify parse failed, using fallback. Raw:', text.slice(0, 400));
     return {
       isTask: true,
       title: cleanedText.slice(0, 60),
@@ -855,7 +886,13 @@ export async function handleVoiceToTrello(
     return { success: false, transcript, classification, error: `Trello board fetch failed: ${String(err)}` };
   }
 
-  const targetBoard = resolveBoard(boards, classification.boardTarget, classification.dueDate);
+  // A board she NAMED wins over the topic-derived enum. If she said where it
+  // goes, she is not guessing and neither should we.
+  const spokenBoard = classification.boardNameHint?.trim()
+    ? resolveMoveDestBoard(boards, classification.boardNameHint.trim())
+    : undefined;
+  if (spokenBoard) console.log(`[TrelloVoice] board from spoken name "${classification.boardNameHint}" -> ${spokenBoard.name}`);
+  const targetBoard = spokenBoard ?? resolveBoard(boards, classification.boardTarget, classification.dueDate);
   if (!targetBoard) {
     // Fallback: use Kira current month board
     const fallbackBoard = boards.find((b) => b.name.toLowerCase().includes('kira'));
@@ -875,7 +912,11 @@ export async function handleVoiceToTrello(
     return { success: false, transcript, classification, error: `Trello list fetch failed: ${String(err)}` };
   }
 
-  const targetList = resolveList(lists, classification.listTarget);
+  const spokenList = classification.listNameHint?.trim()
+    ? resolveMoveDestList(lists, classification.listNameHint.trim())
+    : undefined;
+  if (spokenList) console.log(`[TrelloVoice] list from spoken name "${classification.listNameHint}" -> ${spokenList.name}`);
+  const targetList = spokenList ?? resolveList(lists, classification.listTarget);
   if (!targetList) {
     return { success: false, transcript, classification, error: 'No suitable list found on board' };
   }
@@ -940,7 +981,13 @@ export async function createTrelloCardFromTranscript(
     return { success: false, transcript, classification, error: `Trello board fetch failed: ${String(err)}` };
   }
 
-  const targetBoard = resolveBoard(boards, classification.boardTarget, classification.dueDate);
+  // A board she NAMED wins over the topic-derived enum. If she said where it
+  // goes, she is not guessing and neither should we.
+  const spokenBoard = classification.boardNameHint?.trim()
+    ? resolveMoveDestBoard(boards, classification.boardNameHint.trim())
+    : undefined;
+  if (spokenBoard) console.log(`[TrelloVoice] board from spoken name "${classification.boardNameHint}" -> ${spokenBoard.name}`);
+  const targetBoard = spokenBoard ?? resolveBoard(boards, classification.boardTarget, classification.dueDate);
   if (!targetBoard) {
     const fallbackBoard = boards.find((b) => b.name.toLowerCase().includes('kira'));
     if (!fallbackBoard) {
@@ -959,7 +1006,11 @@ export async function createTrelloCardFromTranscript(
     return { success: false, transcript, classification, error: `Trello list fetch failed: ${String(err)}` };
   }
 
-  const targetList = resolveList(lists, classification.listTarget);
+  const spokenList = classification.listNameHint?.trim()
+    ? resolveMoveDestList(lists, classification.listNameHint.trim())
+    : undefined;
+  if (spokenList) console.log(`[TrelloVoice] list from spoken name "${classification.listNameHint}" -> ${spokenList.name}`);
+  const targetList = spokenList ?? resolveList(lists, classification.listTarget);
   if (!targetList) {
     return { success: false, transcript, classification, error: 'No suitable list found on board' };
   }
