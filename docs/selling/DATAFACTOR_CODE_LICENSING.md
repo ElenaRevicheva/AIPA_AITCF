@@ -130,6 +130,38 @@ That list is an independent check of whether the scope is right. If a 9th repo
 appears — especially `aideazz-private-docs` — the token is wrong: stop, delete
 it, recreate.
 
+## 🔑 THEY STORE THE TOKEN — the reason the narrow scope mattered
+
+From their own submission page, in the small print:
+
+> **Token captured for follow-up** — When you leave the token field, we save it
+> with this browser session and use it for read-only repository access **and sales
+> follow-up.**
+
+> Tokens ... **are saved when you leave this field** so our team can follow up
+> without asking you to paste it again.
+
+The token is **persisted**, not used-and-discarded. It stays live in their systems
+until it expires or is revoked.
+
+That is acceptable for a fine-grained, Contents:Read-only, 8-repo, 7-day token.
+It would have been serious for the token they first recommended: *"set Repository
+access to All repositories ... or a classic token with `repo` scope."* Following
+that advice would have left DataFactor **storing a read-write credential to the
+entire GitHub account** — every repo, including `aideazz-private-docs`, retained
+for sales follow-up.
+
+**Revoke at <https://github.com/settings/tokens> the moment the score arrives.**
+Do not wait out the expiry. A new one takes two minutes to issue.
+
+**Also ignore their "All repositories" instruction.** It is convenience advice so
+their listing shows everything. A token scoped to the 8 lists exactly the 8 and
+structurally cannot reach the excluded repo — narrower and correct, same outcome.
+
+**One submission, not eight:** *"We'll list everything it can see right here to
+pick from."* Paste one repo URL + email + token, then multi-select the portfolio.
+Scoring is *"structural analysis plus a Claude judgment pass"*, ~1 minute.
+
 ## Questions for the scoping call, in order
 
 1. **Exclusive or non-exclusive**, in writing.
