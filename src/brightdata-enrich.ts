@@ -126,13 +126,30 @@ export async function bdSerpSearch(
       return [];
     }
 
-    const text = await res.text();
+    let text = await res.text();
+
+    // BrightData intermittently answers 200 with an EMPTY body under load. One
+    // retry after a short pause recovers it; without this the caller reads the
+    // empty result as "nothing on the internet matches", which is the same
+    // silence that made the community listener look like a dead market for weeks.
+    if (!text.trim()) {
+      await new Promise(r => setTimeout(r, 1500));
+      const retry = await fetch(BD_API, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ zone, url, format: 'raw' }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      text = retry.ok ? await retry.text() : '';
+      if (text.trim()) console.log(`[BD-SERP] empty body recovered on retry for "${query.slice(0, 40)}"`);
+    }
+
     // BrightData with brd_json=1 returns JSON; parse defensively.
     let parsed: any;
     try {
       parsed = JSON.parse(text);
     } catch {
-      console.warn(`[BD-SERP] non-JSON response for "${query.slice(0, 40)}" — first 200 chars: ${text.slice(0, 200)}`);
+      console.warn(`[BD-SERP] non-JSON after retry for "${query.slice(0, 40)}" — ${text.length} bytes: ${text.slice(0, 120)}`);
       return [];
     }
 

@@ -17,6 +17,7 @@
  * business in Panama" is nearly empty, and Elena is actually there.
  */
 
+import { bdSerpSearch, isBrightDataConfigured } from './brightdata-enrich';
 import type { SourceId } from './community-store';
 
 export const LISTENER_VERSION = '1.1.0';
@@ -92,6 +93,22 @@ const ON_TOPIC_ES = /\bIA\b/;
 function isOnTopic(text: string): boolean {
   return ON_TOPIC.test(text) || ON_TOPIC_ES.test(text);
 }
+
+/**
+ * Communities that can match the keywords and can never contain a buyer.
+ *
+ * Earned 2 Sep 2026, the first run after routing Reddit reads through Bright
+ * Data. Google's `site:reddit.com` matches far more loosely than Reddit's own
+ * search did, so the very first scan returned r/aiwars, r/antiai, r/Epstein and
+ * r/walthamstow (local estate agents) at scores of 12-15. All four are
+ * technically about AI or business and none of them will ever hire her.
+ *
+ * Debate subs are the worst offenders: they discuss AI constantly and buy
+ * nothing. One of those in the queue teaches her to ignore the channel, which is
+ * the same way the old radar decayed into wallpaper.
+ */
+const NOISE_SUB =
+  /^r\/(aiwars|antiai|artisthate|defendingaiart|singularity|futurology|technology|news|worldnews|politics|conspiracy|epstein|memes|funny|askreddit|teenagers|showerthoughts|nostupidquestions|explainlikeimfive|todayilearned|homeassistant|selfhosted|localllama|stablediffusion|midjourney)$/i;
 
 const QUESTION_START =
   /^\s*(how|what|why|where|when|which|who|does|do|did|can|could|is|are|should|would|any(one|body)|has anyone|looking for|need help|advice|recomend|recomiend|cómo|como|qué|que|cuál|cual|alguien)\b/i;
@@ -204,6 +221,39 @@ async function searchReddit(spec: QuerySpec): Promise<RawThread[]> {
     });
     if (!res.ok) throw new Error(`reddit search ${res.status}`);
     return redditPostsFrom(await res.json(), spec.q);
+  }
+  // No OAuth app -> DO NOT fall back to reddit.com/search.rss. Measured 2 Sep
+  // 2026: that endpoint returns 403 (a 189KB block page) and 429 from this host.
+  // Reddit blocks unauthenticated search from datacenter IPs, and the listener
+  // reported the resulting nothing as "0 candidates" every hour for weeks --
+  // a blocked door and an empty room look identical from the log.
+  //
+  // Bright Data is already paid for, already configured, and already reads
+  // Reddit: probed live with these exact queries it returns real threads in
+  // 1.5-3.5s. Use it. The RSS path stays as a last resort for when Bright Data
+  // is unconfigured, so nothing silently loses a capability.
+  if (isBrightDataConfigured()) {
+    const hits = await bdSerpSearch(spec.q, { site: 'site:reddit.com', num: 25, tbs: 'qdr:w' });
+    const out: RawThread[] = [];
+    for (const h of hits) {
+      // https://www.reddit.com/r/<sub>/comments/<id>/<slug>/
+      const m = h.link.match(/reddit\.com\/r\/([^/]+)\/comments\/([a-z0-9]+)/i);
+      if (!m) continue;
+      out.push({
+        source: 'reddit',
+        externalId: m[2] || h.link,
+        url: h.link,
+        title: h.title || '',
+        body: h.description || '',
+        author: '',
+        // SERP gives no timestamp; the qdr:w filter already bounds it to a week.
+        createdAt: Date.now(),
+        channel: `r/${m[1]}`,
+      });
+    }
+    if (out.length) return out;
+    console.warn(`[community-listener] brightdata returned 0 reddit threads for "${spec.q.slice(0, 40)}"`);
+    return out;
   }
   return redditRssSearch(spec);
 }
@@ -623,6 +673,7 @@ export async function scanCommunities(options: ScanOptions = {}): Promise<ScanRe
             continue;
           }
           if (NOISE.test(thread.title)) continue;
+          if (NOISE_SUB.test(thread.channel)) continue;
           if (!isOnTopic(`${thread.title}\n${thread.body}`)) continue;
           const scored = scoreThread(thread, spec);
           if (scored.score < minScore) continue;
