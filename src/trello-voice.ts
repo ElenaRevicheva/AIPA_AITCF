@@ -598,6 +598,31 @@ function removeTriggerPhrase(transcript: string): string {
  * - dueDate is set but list isn't urgent/dated → correct to 'dated'
  * - no dueDate, listTarget is 'dated' → correct to 'todo_flow'
  */
+/**
+ * The label colour is DERIVED from the category, never taken from the model.
+ *
+ * Earned 2 Sep 2026. The schema asked the model for `category` AND `labelColor`
+ * as two independent fields, with nothing forcing them to agree — so a card
+ * could come back `category: business` wearing a red (family) label, and one
+ * did: "Оценить возможность изготовления фирменной футболки" (branded company
+ * T-shirts) was filed red.
+ *
+ * `CATEGORY_COLOR_MAP` had existed since May and was referenced by nothing. The
+ * mapping was documented, agreed, and unenforced.
+ *
+ * Category is a JUDGEMENT and belongs to the model. Colour is a LOOKUP and
+ * belongs to the code. Asking a model for both invites them to disagree, and
+ * the disagreement is silent because both values are individually plausible.
+ */
+function applyCategoryColor(c: CardClassification): CardClassification {
+  const derived = CATEGORY_COLOR_MAP[c.category];
+  if (!derived) return c;
+  if (c.labelColor !== derived) {
+    console.log(`[TrelloVoice] colour corrected: ${c.labelColor} -> ${derived} (category=${c.category})`);
+  }
+  return { ...c, labelColor: derived };
+}
+
 function reconcileUrgency(c: CardClassification): CardClassification {
   if (!c.dueDate) {
     // If NLP said 'dated' but there's no extracted date, push to todo_flow
@@ -710,6 +735,11 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "title": "Parent task title (used when subtasks is null)",
   "description": "Any extra detail from the speech, or empty string",
   "category": "family|business|spiritual|health|hobby",
+  // category rule: anything belonging to HER COMPANY -- brand, products, clients,
+  // income, marketing, merchandise -- is "business" even when the object sounds
+  // domestic. Branded T-shirts, business cards, office furniture and company
+  // phone plans are business, not family. "family" means her household and the
+  // people in it. (labelColor below is IGNORED and re-derived from category.)
   "urgency": "urgent_today|soon|dated|not_sure|done",
   "boardTarget": "kira_current_month|kira_future|vibejob|aldeazz|espaluz|algom|kira_habits|kira_finance",
   "listTarget": "just_for_today|todo_flow|in_process_me|in_process_them|not_sure|dated|rules|done",
@@ -747,7 +777,7 @@ If isTask is false, still return the full JSON but the other fields can be empty
     const cleaned = text.replace(/```json|```/g, '').trim();
     const block = cleaned.match(/\{[\s\S]*\}/);
     const parsed = JSON.parse(block ? block[0] : cleaned) as CardClassification;
-    return reconcileUrgency(parsed);
+    return applyCategoryColor(reconcileUrgency(parsed));
   } catch {
     // Fallback classification if parsing fails
     console.error('[TrelloVoice] classify parse failed, using fallback. Raw:', text.slice(0, 400));
