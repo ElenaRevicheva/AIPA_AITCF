@@ -132,8 +132,8 @@ git log keeps the record.
   "i have just manually submitted" was parsed, and the role is now a learned positive in
   `judge_feedback.json`. Screenshot reading confirmed live — 5 of 12 negatives this run
   came from images she attached, not text.
-- **NEXT:** Rwazi Loom. **HUD NL2Repo ($600/task): do not Apply** — same Harbor
-  QC as long-horizon coding; Anthropic still $0. Megan ping only.
+- **NEXT:** Elena: HUD NL2Repo — **Submit offer** (not the listing). Paste
+  `docs/selling/drafts/hud-nl2repo-offer.txt`. One $600 sample. Then Rwazi Loom.
 - **VERIFIED BY:** `ZAPIER in positives: ['Sr. Technical Account Manager @ Zapier @ Zapier']`
   after running `scripts/judge_feedback_sync.py`; sync log `inspected 14, confirmed
   applied-by-Elena 12`.
@@ -182,7 +182,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
-| 8 | **HUD — NL2 Repo Tasks** ($600/task, Harbor, 0 applicants) | Paid *task authoring*, not the 8-pack. Spec + golden repo + tests + Harbor box + Opus vs Qwen rollouts. Required QC before pay | **No-bid tonight.** Do not Apply. Megan: funded sample first |
+| 8 | **HUD — NL2 Repo Tasks** ($600/task, Harbor, 0 applicants) | Try as **author**, not the 8-pack. One sample offer. Do not attach listing `e568b5c8-…` | **Elena: Submit offer** (dark button). Paste `docs/selling/drafts/hud-nl2repo-offer.txt`. Then tell the agent “sent NL2Repo” |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
