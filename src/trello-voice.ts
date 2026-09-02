@@ -342,8 +342,20 @@ async function trelloPut<T>(endpoint: string, body: Record<string, string>): Pro
   return res.json() as Promise<T>;
 }
 
-async function moveCard(cardId: string, targetListId: string): Promise<TrelloCard> {
-  return trelloPut<TrelloCard>(`/cards/${cardId}`, { idList: targetListId });
+/**
+ * Move a card to a list.
+ *
+ * `idBoard` is REQUIRED when the destination list lives on a different board.
+ * Sending idList alone makes Trello reject the call ("list is not on the same
+ * board as the card"), which is every cross-board move — the common case here,
+ * since Elena dictates "перенеси эту карточку в Kira Septiembre" about a card
+ * that was just filed on the finance board. Found 1 Sep 2026: the failure was
+ * invisible because the caller swallowed it in an empty catch.
+ */
+async function moveCard(cardId: string, targetListId: string, targetBoardId?: string): Promise<TrelloCard> {
+  const body: Record<string, string> = { idList: targetListId };
+  if (targetBoardId) body.idBoard = targetBoardId;
+  return trelloPut<TrelloCard>(`/cards/${cardId}`, body);
 }
 
 async function getAllBoards(): Promise<TrelloBoard[]> {
@@ -1378,13 +1390,22 @@ export async function processMultiAction(
         }
 
         let moved = 0;
+        const moveErrors: string[] = [];
         for (const c of cards) {
-          try { await moveCard(c.id, destList.id); moved++; } catch { /* skip */ }
+          try {
+            await moveCard(c.id, destList.id, dest.id);
+            moved++;
+          } catch (e) {
+            // Never swallow: a move that fails for every card used to report
+            // `undefined`, which is indistinguishable from a bug in our own code.
+            moveErrors.push(e instanceof Error ? e.message.slice(0, 120) : String(e));
+          }
         }
 
         results.push({
           type: 'move', success: moved > 0, cardQuery: action.cardQuery,
           cards: cards.slice(0, moved), boardName: dest.name, listName: destList.name, movedCount: moved,
+          ...(moved === 0 ? { error: moveErrors[0] || 'Trello refused the move and gave no reason' } : {}),
         });
       } catch (err: unknown) {
         results.push({ type: 'move', success: false,
@@ -1407,13 +1428,20 @@ export async function processMultiAction(
         }
 
         let archived = 0;
+        const archErrors: string[] = [];
         for (const c of cards) {
-          try { await trelloPut<TrelloCard>(`/cards/${c.id}`, { closed: 'true' }); archived++; } catch { /* skip */ }
+          try {
+            await trelloPut<TrelloCard>(`/cards/${c.id}`, { closed: 'true' });
+            archived++;
+          } catch (e) {
+            archErrors.push(e instanceof Error ? e.message.slice(0, 120) : String(e));
+          }
         }
 
         results.push({
           type: 'archive', success: archived > 0, cardQuery: action.cardQuery,
           cards: cards.slice(0, archived), archivedCount: archived,
+          ...(archived === 0 ? { error: archErrors[0] || 'Trello refused the archive and gave no reason' } : {}),
         });
       } catch (err: unknown) {
         results.push({ type: 'archive', success: false,
