@@ -322,8 +322,17 @@ work. Port what you want by hand; never reset.
   saw them already private tonight. Flip ≠ never-public. Hashseatic is
   not a quote. Next dollars: HUD number, AfterQuery click follow-up, jobs.
 - **HUD lookalikes searched 31 Aug.** Still not a fourth quote: Hashseatic
-  / gitbuyer (you find the lab), FileYield / ThenAI / DataFactor (not
-  this SKU). TrainPlex.in = Indic mill, lower bar, excludes “fully
+  / gitbuyer (you find the lab), FileYield / ThenAI.
+  ⚠️ **DataFactor was mis-screened as "not this SKU" — it IS this SKU.**
+  Re-read from their own app bundle 2 Sep: *"Submit your repositories for a free
+  quality assessment… DataFactor may offer to pay you for the right to license
+  them to leading AI companies"*, *"A single strong repository can reach thousands
+  of dollars"*, *"Each repository is evaluated individually, then rolled up into
+  one portfolio score and a single payout estimate"*. Free, static, read-only;
+  *"Training rights exist only if you accept"*. **Caveat on exclusivity:** their
+  wording is *"You keep ownership of your code unless otherwise agreed"* —
+  ownership is NOT exclusivity, and an exclusive licence leaves ownership intact.
+  Non-exclusivity is unverified until it is in a contract. TrainPlex.in = Indic mill, lower bar, excludes “fully
   AI-generated” — metadata only, read paper, no GitHub tonight.
   Fermatix (`hi@fermatix.ai`) sources private repos for royalties —
   inbound later, refuse exclusive. Mercor/Surge/Scale = hours, not the
