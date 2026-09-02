@@ -1457,6 +1457,86 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
     }
   });
 
+  /**
+   * /redditapp <client_id> <client_secret> — unblock the community listener.
+   *
+   * Why (2 Sep 2026): the listener has reported "0 candidates" on every run since
+   * it shipped, which reads like "nobody on Reddit needs you today" and is
+   * actually "Reddit refused to talk to us". Measured from production: the RSS
+   * fallback returns 403 (a 189KB block page) and 429. Reddit blocks
+   * unauthenticated search from datacenter IPs.
+   *
+   * The OAuth path already exists in community-listener.ts and is simply missing
+   * REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET. Elena creates the app herself —
+   * account creation is hers alone — and hands the two strings over here.
+   *
+   * Same contract as /gmailpw: the message is deleted before any await that can
+   * fail, the values go to the helper on STDIN rather than argv so they cannot
+   * surface in `ps`, and nothing is written unless Reddit actually issues a token.
+   */
+  bot.command('redditapp', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/redditapp(@\S+)?\s*/i, '').trim();
+
+    try { await ctx.deleteMessage(); } catch { /* older than 48h, or no rights */ }
+
+    const parts = raw.split(/\s+/).filter(Boolean);
+    if (parts.length < 2) {
+      await ctx.reply(
+        '🔑 Usage: /redditapp <client_id> <client_secret>\n\n' +
+        'Get them at reddit.com/prefs/apps → "create another app…"\n' +
+        '  • type: script\n' +
+        '  • redirect uri: http://localhost:8080 (unused, but required)\n\n' +
+        'client_id is the short string under the app name; secret is labelled "secret".\n' +
+        'I delete your message immediately and never log the values.',
+      );
+      return;
+    }
+    const [id, secret] = parts;
+
+    await ctx.reply('🔐 Message deleted. Asking Reddit for a token before writing anything…');
+    try {
+      // Probe FIRST. A .env holding credentials that do not authenticate is worse
+      // than an empty one, because it looks configured and is not.
+      const auth = Buffer.from(`${id}:${secret}`).toString('base64');
+      const res = await fetch('https://www.reddit.com/api/v1/access_token', {
+        method: 'POST',
+        headers: {
+          authorization: `Basic ${auth}`,
+          'content-type': 'application/x-www-form-urlencoded',
+          'user-agent': 'AIdeazz-community-listener/1.0 (by /u/aideazz)',
+        },
+        body: 'grant_type=client_credentials',
+        signal: AbortSignal.timeout(30_000),
+      });
+      const body = (await res.text()).slice(0, 300);
+      if (!res.ok || !body.includes('access_token')) {
+        await ctx.reply(`❌ Reddit refused those credentials (${res.status}).\n\n${body.slice(0, 160)}\n\nNothing written. Check the app type is "script".`);
+        return;
+      }
+
+      const { spawn } = await import('child_process');
+      const out: string[] = [];
+      await new Promise<void>((resolve) => {
+        const child = spawn('/home/ubuntu/set-reddit-stdin.sh', [], { stdio: ['pipe', 'pipe', 'pipe'] });
+        child.stdin.write(`${id}\n${secret}\n`);
+        child.stdin.end();
+        child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+        child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+        child.on('close', () => resolve());
+        setTimeout(() => { try { child.kill(); } catch { /* gone */ } resolve(); }, 60_000);
+      });
+      const result = out.join('').trim().split('\n').pop() || '(no output)';
+      await ctx.reply(
+        result.startsWith('OK:')
+          ? `✅ Reddit is wired in.\n\n${result}\n\nThe community listener stops falling back to the blocked RSS endpoint. Next run is at :25 past the hour — it should stop reporting 0 candidates.`
+          : `❌ ${result}\n\nReddit accepted the credentials but writing them failed. Nothing changed.`,
+      );
+    } catch (e) {
+      await ctx.reply('❌ ' + (e as Error).message.slice(0, 180) + '\n\nNothing written.');
+    }
+  });
+
   /** /citasort — put every Kira month board's Cita column back in date order, now. */
   bot.command('citasort', async (ctx) => {
     await ctx.reply('🔢 Sorting every Kira Cita column by date…');
@@ -8237,6 +8317,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
           { command: 'trello_analyze', description: '📋 Full Kanban analysis of all Trello boards' },
           // FAMILY / APPOINTMENTS
           { command: 'cita', description: '🏥 IENDI appointments → Trello cards (paste, forward or voice)' },
+          { command: 'redditapp', description: '🔑 Wire Reddit OAuth so the community listener can actually search' },
           { command: 'dated', description: '🟠 Your own dated business card (orange) on the right month board' },
           { command: 'citasort', description: '🔢 Re-sort every Kira Cita column by date' },
           // SETTINGS
