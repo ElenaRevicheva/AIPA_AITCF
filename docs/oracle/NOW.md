@@ -245,6 +245,19 @@ work. Port what you want by hand; never reset.
 
 ## ✅ JUST LANDED (29–31 Aug)
 
+- **`/api` hero — 4-film reel + new copy (3 Sep, aideazz `15f35b6`).** Films are
+  orange → pomegranate → kiwi → pineapple, each natural fruit → cut open →
+  technical object, cross-dissolving in `HeroBackdrop.tsx`. Desktop only
+  (<860px gets no `src`), poster-first, `prefers-reduced-motion` kills film+canvas.
+  **Two traps, both already paid for:** (1) Runway drifts — the kiwi returns to
+  the rejected two-halves shape by 1.7s, so only 0–1.6s is usable; trim to the
+  good frames rather than re-prompting. (2) A grey background in a video comes
+  from a grey background in the SOURCE STILL — mask the still to black and
+  regenerate; masking the video clips the fruit when the camera pushes in.
+  Copy names both halves on purpose: *Google ranked your page* / *six crawlers
+  decide whether AI can quote it*. **Six is verified** against `AI_CRAWLERS` in
+  `src/visibility-audit.ts` — do not round it.
+
 - **🆕 Elena's own CRM is live: `webhook.aideazz.xyz/queue/`** (`2eff542`, 31 Aug).
   Two cards — an employer to apply to and a client to contact — each with the draft
   already written and one button. Reads table `daily_queue` in **our Oracle DB, not
