@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-03 11:20 | HUD NL2Repo — form insists on a delivery taskset | `docs/selling/harbor/nl2repo-fail-closed-gate/`, offer draft; NOW.md | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
