@@ -3067,5 +3067,14 @@
     "phone": "573174321486",
     "emailDraft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas-fu.txt"
+  },
+  "fermatix": {
+    "phone": "",
+    "draft": "docs/selling/drafts/fermatix-email.txt",
+    "company": "Fermatix",
+    "email": "hi@fermatix.ai",
+    "emailDraft": "docs/selling/drafts/fermatix-email.txt",
+    "dealId": "64531338321",
+    "cc": "aipa@aideazz.xyz"
   }
 }
