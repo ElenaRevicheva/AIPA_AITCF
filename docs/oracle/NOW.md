@@ -127,19 +127,35 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE:** Zapier Sr TAM application submitted (1 Sep 06:12 EST) — all five free-text
-  answers drafted, resume attached. Self-learning loop **verified end-to-end**: her note
-  "i have just manually submitted" was parsed, and the role is now a learned positive in
-  `judge_feedback.json`. Screenshot reading confirmed live — 5 of 12 negatives this run
-  came from images she attached, not text.
-- **NEXT:** Elena: HUD NL2Repo — **Submit offer** (not the listing). Paste
-  `docs/selling/drafts/hud-nl2repo-offer.txt`. One $600 sample. Then Rwazi Loom.
-- **VERIFIED BY:** `ZAPIER in positives: ['Sr. Technical Account Manager @ Zapier @ Zapier']`
-  after running `scripts/judge_feedback_sync.py`; sync log `inspected 14, confirmed
-  applied-by-Elena 12`.
-- **RISK:** the Zapier deal has **Contacts (0)** and no owner. The response detector matches
-  replies to people; with no contact linked, a recruiter reply may land in Gmail and not
-  attach to this deal. This is the shape of the Aug 23-24 miss — watch it.
+- **DONE:** NL2Repo offer form **insists** on a delivery taskset (red:
+  *Select at least one delivery taskset*). Artifacts upload on that page
+  is a different field and will not clear it. Harbor sample packed on
+  `cursor/hud-vendor-license-1c49`:
+  `docs/selling/harbor/nl2repo-fail-closed-gate.zip` (8 files, `task.toml`
+  inside the folder). Golden 9/9; empty 0/9 (false-positive closed).
+- **NEXT:** Taskset listing **created** 3 Sep (Add supply → Primary asset
+  type *Taskset* exists). It sits in **Proposals** with a *Publish
+  listing* action — a proposal is not inventory, so it must be published
+  or the offer picker stays empty. Then offer: refresh, select it, retype
+  1 × $600, paste Assumptions, Artifacts empty, Submit.
+  ⚠️ **Pricing is inside the Required "Listing metadata" gate** — a blank
+  price fails QC. Set $600 on the listing.
+  ⚠️ **The repo is private, so `raw.githubusercontent.com` 404s.** Download
+  the zip from the logged-in blob page — link is in
+  `docs/selling/drafts/hud-nl2repo-taskset-listing.txt` (HUD branch).
+- **VERIFIED BY:** `python3 scripts/test-nl2repo-fail-closed-gate.py` →
+  `PASS: golden… 9 passed` then `PASS: empty workspace failed`;
+  `node scripts/pack-nl2repo-harbor-zip.cjs` → 8 files, 5687 bytes.
+- **RISK:** the gap gate is per task — Qwen3.8 Max ave ≤50%, Opus/Fable max
+  >0.6, **every** task ≥12.5% gap. A nine-test Python CLI is probably **too
+  easy for Qwen**, so this exact item may fail the gap while still being a
+  valid Harbor task. That is the honest position in the Assumptions: the
+  sample proves the *format*; pass rates get measured on **their** scaffold.
+  Do not invent numbers. `FN/FP QA agent review` grades a subject trace, so
+  it cannot be pre-satisfied. Anthropic $0. Batch quotes must price the
+  stack spread (Python, JS/TS, Go, Java, Rust, C++, Swift, Kotlin) — twenty
+  Python CLIs would not be accepted. Full gate table in
+  `docs/selling/HUD_VENDOR_LICENSE.md` on `cursor/hud-vendor-license-1c49`.
 
 ## 🏠 WHEN ELENA IS HOME — two things, in this order
 
@@ -182,7 +198,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
-| 8 | **HUD — NL2 Repo Tasks** ($600/task, Harbor, 0 applicants) | Try as **author**, not the 8-pack. One sample offer. Do not attach listing `e568b5c8-…` | **Elena: Submit offer** (dark button). Paste `docs/selling/drafts/hud-nl2repo-offer.txt`. Then tell the agent “sent NL2Repo” |
+| 8 | **HUD — NL2 Repo Tasks** ($600/task) | Form filled 1×$600. Red: select a delivery **taskset**. Zip ready on HUD branch | **Elena: upload `nl2repo-fail-closed-gate.zip` as a new taskset listing, then select it and Submit. Not the eight-pack** |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
