@@ -7,10 +7,24 @@ NUMBERS (type these, do not leave the defaults)
 - Rate per task: 600
 Total should read $600. Brief budget is $600/task. Default 20 × $1250 is wrong.
 
-Delivery tasksets: leave empty. “No tasksets in your team yet” is expected.
-Do not attach the eight-repo listing. If Submit refuses without a taskset, stop and tell the agent — do not create a fake taskset of live HubSpot/WhatsApp.
+DELIVERY TASKSETS (the red error)
+The form will not submit until this picker has a HUD taskset. Artifacts
+(PDF / zip on the offer page) is a different field — uploading there
+does not clear the error.
 
-Artifacts: upload nothing. No Nine Systems PDF. No zip of GitHub.
+1. Keep this offer tab open.
+2. New tab: My listings → add inventory as a **taskset** (not GitHub
+   repos, not the $74,851 eight-pack).
+3. Upload docs/selling/harbor/nl2repo-fail-closed-gate.zip
+   (GitHub: https://github.com/ElenaRevicheva/AIPA_AITCF/raw/cursor/hud-vendor-license-1c49/docs/selling/harbor/nl2repo-fail-closed-gate.zip)
+   Title: NL2Repo sample — fail-closed number gate
+4. Wait until it shows on the team. Refresh the offer. Select that
+   taskset. Submit.
+
+If create-listing has no taskset type, stop and screenshot. Do not
+force the eight repos. Clicks: docs/selling/harbor/nl2repo-fail-closed-gate/README.md
+
+Artifacts on the offer: upload nothing. No Nine Systems PDF. No GitHub zip.
 
 ASSUMPTIONS (paste)
 

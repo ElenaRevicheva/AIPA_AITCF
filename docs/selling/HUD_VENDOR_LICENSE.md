@@ -197,9 +197,15 @@ A real production story (job-hunt agent, fail-closed publisher) is
 allowed as the *scenario*. Live HubSpot / WhatsApp in the box is not.
 $600 can be spent on the dual-model runs before QC accepts.
 
-**Do not Apply. Do not start Harbor unpaid.** Tell Megan: one **paid**
-sample, with compute for the two models, then more. Do not email the
-lab. Listing stays private-to-opportunity-buyers.
+**Submit offer, not the 8-pack listing.** The offer form refuses without
+a **delivery taskset** already in the org (red: *Select at least one
+delivery taskset*). That picker is not the Artifacts upload. Pack and
+upload `docs/selling/harbor/nl2repo-fail-closed-gate.zip` as a new
+**taskset** listing, then select it. Clicks:
+`docs/selling/harbor/nl2repo-fail-closed-gate/README.md`. Do not email
+the lab. The $74,851 listing stays private-to-opportunity-buyers.
+Required QC and Qwen/Opus rollouts still run after they accept; this
+zip is the sample item, not a measured gap.
 
 ### Recommended checks (22 failed) — do not chase
 
