@@ -15,9 +15,11 @@ does not clear the error.
 1. Keep this offer tab open.
 2. New tab: My listings → add inventory as a **taskset** (not GitHub
    repos, not the $74,851 eight-pack).
-3. Upload docs/selling/harbor/nl2repo-fail-closed-gate.zip
-   (GitHub: https://github.com/ElenaRevicheva/AIPA_AITCF/raw/cursor/hud-vendor-license-1c49/docs/selling/harbor/nl2repo-fail-closed-gate.zip)
-   Title: NL2Repo sample — fail-closed number gate
+3. Upload nl2repo-fail-closed-gate.zip. The repo is PRIVATE, so a raw
+   link 404s — open this page logged in and click "Download raw file":
+   https://github.com/ElenaRevicheva/AIPA_AITCF/blob/cursor/hud-vendor-license-1c49/docs/selling/harbor/nl2repo-fail-closed-gate.zip
+   Every listing field is paste-ready in
+   docs/selling/drafts/hud-nl2repo-taskset-listing.txt
 4. Wait until it shows on the team. Refresh the offer. Select that
    taskset. Submit.
 

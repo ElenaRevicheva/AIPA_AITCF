@@ -1,0 +1,85 @@
+DataVendor — create inventory as a TASKSET listing
+(This is the thing the offer form demands. It is not the 8-repo listing.)
+Do NOT attach GitHub repos. Do NOT touch listing e568b5c8-2f86-41dc-8338-5e9778cd3443.
+
+--- STEP 0: GET THE ZIP ---
+
+The repo is PRIVATE, so a raw link will 404. Open this page in the browser
+where you are logged into GitHub, then click "Download raw file":
+
+https://github.com/ElenaRevicheva/AIPA_AITCF/blob/cursor/hud-vendor-license-1c49/docs/selling/harbor/nl2repo-fail-closed-gate.zip
+
+File: nl2repo-fail-closed-gate.zip · 5,687 bytes · 8 files
+Inside: nl2repo-fail-closed-gate/task.toml, instruction.md,
+environment/Dockerfile, environment/spec.md, tests/test.sh,
+tests/test_behavior.py, solution/solve.sh, solution/failclosed.py
+
+--- ASSET TYPE ---
+
+Taskset (Harbor). If it asks for a format: Harbor. If it asks for an
+environment: Docker, x86, offline (no internet).
+If the only choice is "GitHub repository", STOP and screenshot.
+
+--- TITLE ---
+NL2Repo sample — fail-closed number gate (Harbor taskset, 1 task)
+
+--- ONE-LINER ---
+One offline Harbor NL2Repo task: a numbered clear-document spec, a golden solution that passes every behaviour test, and the same tests failing on an empty workspace.
+
+--- DESCRIPTION ---
+Harbor taskset, 1 task: nl2repo-fail-closed-gate
+
+Scope
+NL2RepoBench-style clear document. Eight numbered behaviours, each with a
+1:1 behaviour test. The agent receives the spec and an empty workspace and
+must build a small Python 3.12 command-line tool from the document alone.
+
+Scenario
+Drawn from a real solo production lab: a publishing pipeline that refuses
+to print a number it cannot source. Unknown number means print nothing and
+exit non-zero. Silence is correct; a guessed number is not.
+
+What is in the bundle
+- task.toml — Harbor config, offline (allow_internet = false), 1 CPU, 2G
+- instruction.md — the clear-document spec, eight numbered behaviours
+- environment/Dockerfile — python:3.12-slim, pytest pinned, spec only, no golden source in the image
+- tests/test.sh — pytest runner, writes reward to /logs/verifier/reward.txt
+- tests/test_behavior.py — nine behaviour tests, 1:1 with the spec
+- solution/ — golden implementation plus solve.sh
+
+Discrimination
+Golden solution: 9 of 9 tests pass. Empty workspace: 0 of 9 pass, so the
+grader cannot award credit for nothing. Both verified locally before upload.
+
+Deliberately excluded
+No network. No database. No live CRM, chat, or credentials. No customer
+data. No keys. The scenario is the subject; nothing production is in the box.
+
+Not measured here
+Scaffold rollouts (Qwen3.8 Max average, Opus 5 / Fable 5 max) are not
+included. Those pass rates must be measured on your scaffold; they are not
+estimated or asserted in this bundle.
+
+Terms
+Non-exclusive. I retain copyright. No assignment.
+
+--- TAGS ---
+harbor · nl2repo · python · cli · fail-closed · offline · single-task
+
+--- PRICE (only if the form forces one) ---
+600 USD. Same as the brief's per-task rate. Do not price it in the
+$2,500-$12,000 repo band — that band is for the codebase listing.
+
+--- VISIBILITY ---
+Private / to opportunity buyers if offered. This exists to appear in the
+offer form's Delivery tasksets picker, not to sit on the public market.
+
+--- AFTER IT SAVES ---
+Wait until it shows on the team (an environment build may spin — that is
+their QC, not a hang). Then go back to the offer tab, refresh, and the
+taskset should appear under Delivery tasksets. Select it.
+
+Offer numbers, retype if the page reloaded to the defaults:
+  Fixed fee 0 · Task count 1 · Rate per task 600 · total $600
+Assumptions paste: docs/selling/drafts/hud-nl2repo-offer.txt
+Artifacts on the offer: upload nothing.

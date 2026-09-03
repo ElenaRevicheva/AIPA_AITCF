@@ -11,18 +11,27 @@ Keep the offer tab open. Numbers stay: Fixed fee 0, Task count 1, Rate
 
 ## 1. Get the zip
 
-Prefer the already-packed file (same folder, one level up):
+The packed file is committed at:
 
     docs/selling/harbor/nl2repo-fail-closed-gate.zip
 
-GitHub (this branch):
+**This repo is private**, so a `raw.githubusercontent.com` link returns
+404. Open the file page in the browser where you are already logged into
+GitHub and click **Download raw file**:
 
-    https://github.com/ElenaRevicheva/AIPA_AITCF/raw/cursor/hud-vendor-license-1c49/docs/selling/harbor/nl2repo-fail-closed-gate.zip
+    https://github.com/ElenaRevicheva/AIPA_AITCF/blob/cursor/hud-vendor-license-1c49/docs/selling/harbor/nl2repo-fail-closed-gate.zip
 
-Save it to Desktop. Do **not** zip AIPA_AITCF. Do **not** zip the
-$74,851 listing.
+5,687 bytes, 8 files. Save it to Desktop. Do **not** zip AIPA_AITCF. Do
+**not** zip the $74,851 listing.
 
-If you must rebuild on Windows, in the repo root:
+Fallback, if the browser download misbehaves — from the local clone, pull
+just this folder off the branch (additive; it touches nothing on `main`):
+
+    git fetch origin cursor/hud-vendor-license-1c49
+    git checkout origin/cursor/hud-vendor-license-1c49 -- docs/selling/harbor
+
+The zip is then on disk at the path above. To rebuild it from the files
+instead, in the repo root:
 
     Compress-Archive -Path docs\selling\harbor\nl2repo-fail-closed-gate -DestinationPath $env:USERPROFILE\Desktop\nl2repo-fail-closed-gate.zip
 

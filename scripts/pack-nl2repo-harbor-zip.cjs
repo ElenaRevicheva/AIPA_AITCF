@@ -45,13 +45,21 @@ if (spec !== instruction) {
   process.exit(1);
 }
 
+// Fixed mtime so re-packing identical files yields an identical zip and does
+// not show up as a git change.
+const STAMP = new Date('2026-09-03T00:00:00Z');
+
 const staging = fs.mkdtempSync(path.join(os.tmpdir(), 'nl2repo-zip-'));
 const stagedTask = path.join(staging, FOLDER);
+const dirs = new Set([stagedTask]);
 for (const rel of FILES) {
   const dest = path.join(stagedTask, rel);
   fs.mkdirSync(path.dirname(dest), { recursive: true });
+  dirs.add(path.dirname(dest));
   fs.copyFileSync(path.join(TASK_DIR, rel), dest);
+  fs.utimesSync(dest, STAMP, STAMP);
 }
+for (const dir of dirs) fs.utimesSync(dir, STAMP, STAMP);
 
 if (fs.existsSync(OUT)) fs.unlinkSync(OUT);
 
