@@ -66,18 +66,28 @@ Non-exclusive. I retain copyright. No assignment.
 --- TAGS ---
 harbor · nl2repo · python · cli · fail-closed · offline · single-task
 
---- PRICE (only if the form forces one) ---
-600 USD. Same as the brief's per-task rate. Do not price it in the
-$2,500-$12,000 repo band — that band is for the codebase listing.
+--- PRICE — NOT OPTIONAL ---
+600 USD. Same as the brief's per-task rate.
+"Listing metadata" is a REQUIRED QC gate and it names pricing among the
+fields that must be PRESENT. A blank price fails a Required check.
+Do not price it in the $2,500-$12,000 repo band — that band is the
+codebase listing.
 
 --- VISIBILITY ---
 Private / to opportunity buyers if offered. This exists to appear in the
 offer form's Delivery tasksets picker, not to sit on the public market.
 
---- AFTER IT SAVES ---
-Wait until it shows on the team (an environment build may spin — that is
-their QC, not a hang). Then go back to the offer tab, refresh, and the
-taskset should appear under Delivery tasksets. Select it.
+--- FORM STEPS (verified 3 Sep) ---
+Intent → Describe → Capacity → Sample → Submit.
+Capacity: "Within 2 weeks" = 1. "Within 6 months" = 20.
+Sample: says optional. ATTACH THE ZIP ANYWAY — "Taskset contents (>=1
+live task)" is a Required gate, so an empty taskset fails QC.
+
+--- AFTER SUBMIT: IT IS A PROPOSAL, NOT YET INVENTORY ---
+It lands under **Proposals** as a data proposal with a **Publish listing**
+action. Until you publish, the offer form's Delivery tasksets picker stays
+empty. Publish it, then go back to the offer tab, refresh, and select it.
+An environment build may spin — that is their QC, not a hang.
 
 Offer numbers, retype if the page reloaded to the defaults:
   Fixed fee 0 · Task count 1 · Rate per task 600 · total $600

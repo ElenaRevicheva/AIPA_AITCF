@@ -207,6 +207,46 @@ the lab. The $74,851 listing stays private-to-opportunity-buyers.
 Required QC and Qwen/Opus rollouts still run after they accept; this
 zip is the sample item, not a measured gap.
 
+**Add supply → taskset exists.** Verified 3 Sep: `datavendor.ai/listings/new`
+runs Intent → Describe → Capacity → Sample → Submit, with **Primary asset
+type: Taskset** in the dropdown. It lands in **Proposals** as a *data
+proposal* with a **Publish listing** action — a proposal is not yet
+inventory, so publish it or the offer picker stays empty. Sample is
+labelled optional; attach the zip anyway, because *Taskset contents* is a
+**Required** gate (≥1 live task). Paste-ready fields:
+`docs/selling/drafts/hud-nl2repo-taskset-listing.txt`.
+
+##### The Required gates, read from the live listing (3 Sep)
+
+| Required check | Can we satisfy it before they run anything? |
+|---|---|
+| Listing metadata (title, summary, tags **and pricing**) | Yes — but **pricing must not be blank**. $600, matching the brief rate. |
+| Personal data scan · Secrets scan (listing text fields) | Yes. The Describe text carries no email, phone or key. `task.toml` holds `author_email` — that is the operator address, inside the bundle, not a listing text field. |
+| Environment build | Their build of `python:3.12-slim` + pinned pytest. Cannot be proven from here. |
+| Harbor bundle validation | Yes — `task.toml`, `instruction.md`, grader, `environment/` all present, one task per directory, name `nl2repo-fail-closed-gate` is letters/hyphens only. |
+| Taskset contents (≥1 live task) | Yes, once ingested. |
+| FN/FP QA agent review, both false | **No.** It grades the *latest subject trace*, so it cannot exist until an agent has run the task on their side. Nothing to pre-satisfy. |
+
+Everything else on that page is **Informational** — same class as the 22
+recommended checks on the codebase listing. Do not chase them.
+
+##### What this sample does *not* prove — say so, do not paper over it
+
+The gap requirement is per task: `Qwen3.8 Max ave_pass_ratio ≤ 50%`,
+`Opus 5 / Fable 5 max_pass_ratio > 0.6`, and **every** task needs
+`gap ≥ 12.5%` or it is rejected. A nine-test Python CLI is very likely
+**too easy for Qwen**, which means this exact item may fail the gap even
+though it is a well-formed Harbor task. That is expected and it is the
+honest position already in the Assumptions: the sample proves the
+*format*, and the pass rates get measured on **their** scaffold
+(claude-code preferred), not asserted by us. Do not invent numbers to
+make the sample look harder than it is.
+
+Also dataset-level, not per-task: technology-stack spread. A 20-task
+batch cannot be twenty Python CLIs — the brief names Python, JS/TS, Go,
+Java, Rust, C++, Swift, Kotlin across front-end, back-end, systems and
+full-stack. Price that spread into any batch quote.
+
 ### Recommended checks (22 failed) — do not chase
 
 HUD’s own line: **certification withheld — publishing unaffected.**
