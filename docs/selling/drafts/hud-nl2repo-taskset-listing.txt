@@ -106,6 +106,22 @@ I am also submitting an offer for one paid sample task at your $600 rate, with b
 
 Elena Revicheva · AIdeazz AI Lab · https://aideazz.xyz/portfolio
 
+--- 3 Sep: TWO DUPLICATE PROPOSALS EXIST. DO NOT PUBLISH THE SECOND ---
+
+Proposals now shows the same row twice, both type "Taskset", both green,
+both offering "Publish listing". That "Taskset" word is the PROPOSAL's
+asset type, not a HUD team-inventory taskset — publishing one does not
+create inventory, it creates a listing.
+
+One is already published: My listings has ONE Active listing at $600.
+Clicking Publish again would create a SECOND identical live listing —
+duplicate inventory in front of the same buyer, and the informational
+"verify rarity" / dedup checks read duplicates badly.
+
+So: leave both proposal rows alone. They are harmless unpublished drafts.
+If the row offers an archive or delete action, use it on both; if it only
+offers Publish, do nothing. Never publish twice.
+
 --- AFTER SUBMIT: IT IS A PROPOSAL, NOT YET INVENTORY ---
 It lands under **Proposals** as a data proposal with a **Publish listing**
 action. Until you publish, the offer form's Delivery tasksets picker stays
