@@ -133,11 +133,12 @@ git log keeps the record.
   `cursor/hud-vendor-license-1c49`:
   `docs/selling/harbor/nl2repo-fail-closed-gate.zip` (8 files, `task.toml`
   inside the folder). Golden 9/9; empty 0/9 (false-positive closed).
-- **NEXT:** Elena: keep the offer tab. New tab → **My listings** → add
-  inventory as a **taskset** (not the $74,851 eight-pack) → upload that
-  zip → wait until it shows → refresh offer → select it → Submit.
-  Clicks: `docs/selling/harbor/nl2repo-fail-closed-gate/README.md`.
-  If create-listing has no taskset type, screenshot and stop.
+- **NEXT:** Elena is creating the taskset listing now. Every field is
+  paste-ready in `docs/selling/drafts/hud-nl2repo-taskset-listing.txt`
+  (HUD branch). Then refresh the offer, select it, retype 1 × $600,
+  Submit. If create-listing has no taskset type, screenshot and stop.
+  ⚠️ **The repo is private, so `raw.githubusercontent.com` 404s.** She
+  must download from the logged-in blob page — link is in that file.
 - **VERIFIED BY:** `python3 scripts/test-nl2repo-fail-closed-gate.py` →
   `PASS: golden… 9 passed` then `PASS: empty workspace failed`;
   `node scripts/pack-nl2repo-harbor-zip.cjs` → 8 files, 5687 bytes.
