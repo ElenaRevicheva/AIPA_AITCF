@@ -182,7 +182,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
-| 8 | **HUD — NL2 Repo Tasks** ($600/task, Harbor, 0 applicants) | Try as **author**, not the 8-pack. One sample offer. Do not attach listing `e568b5c8-…` | **Elena: Submit offer** (dark button). Paste `docs/selling/drafts/hud-nl2repo-offer.txt`. Then tell the agent “sent NL2Repo” |
+| 8 | **HUD — NL2 Repo Tasks** ($600/task) | Offer form open. Defaults were 20 × $1250 — wrong. Fill 1 × $600 | **Elena: type 1 and 600, paste Assumptions, Submit offer. No listing, no zip** |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
