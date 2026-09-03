@@ -1,0 +1,69 @@
+NL2Repo — the one question that unblocks Submit offer
+Send to the HUD buyer contact on the brief (the "HUD · Buyer" card), or to
+Megan on the existing Cal.com / call thread from aipa@aideazz.xyz.
+
+Do NOT email the lab behind the brief. Do NOT attach the 8-repo listing.
+
+--- WHY THIS IS NEEDED (state of play, verified 3 Sep) ---
+
+My listings: "NL2Repo sample — fail-closed number gate (1 task)" is ACTIVE,
+$600, 1 task, Coding/SWE. Not draft, not in review.
+
+The listing has also been submitted to the NL2Repo opportunity with a buyer
+note.
+
+Submit offer still shows "No tasksets in your team yet" and the red
+"Select at least one delivery taskset". The Harbor zip is attached under
+Artifacts and that does not clear it.
+
+So the picker is not waiting on QC. It reads HUD tasksets from TEAM
+INVENTORY, and a Harbor-format zip attached to a DataVendor listing does
+not become team inventory. Their own Add-asset labels say it:
+  "HUD tasksets — Attach tasksets from your team inventory."
+  "Harbor tasksets — Upload a zip of Harbor-format tasks, validated per task."
+
+Two different registries. Nothing we can do in the vendor UI bridges them.
+
+--- SUBJECT ---
+
+NL2Repo: taskset listing is live — how do I get it into team inventory?
+
+--- MESSAGE (paste) ---
+
+Hi Megan,
+
+Short platform question on the NL2 Repo Tasks brief.
+
+My taskset listing is live: "NL2Repo sample — fail-closed number gate", one
+Harbor task, $600, Coding/SWE. I have also submitted it to the opportunity.
+It is one offline Harbor task in the shape the brief asks for: a
+clear-document spec in NL2RepoBench style, behaviour tests aligned
+one-to-one with the spec, a golden repo that passes them in full, and an
+empty repo that does not.
+
+Submit offer will not accept my bid. It says "No tasksets in your team yet"
+and asks me to select at least one delivery taskset. Attaching the Harbor
+zip under Artifacts does not clear it. From your own Add-asset labels, the
+picker reads HUD tasksets from team inventory, while what I uploaded is a
+Harbor-format zip on a listing — so the two are separate registries and I
+cannot bridge them from the vendor side.
+
+Either of these works for me:
+
+1. Accept the listing submission as my offer. It is one paid sample task at
+   your $600 rate, with batch pricing after your QC.
+2. Tell me how to push a Harbor bundle into HUD team inventory — a HUD org
+   invite, an API key, or the CLI command you prefer — and I will put the
+   taskset there and submit the offer properly.
+
+One note on the numbers, so there is no misunderstanding later: I have not
+asserted any pass rates. I have not run Qwen3.8 Max or Opus 5 / Fable 5
+rollouts, so the capability gap should be measured on your scaffold
+(claude-code preferred) rather than taken from me. The sample demonstrates
+the format; the difficulty is yours to measure.
+
+Non-exclusive. I retain copyright. No assignment.
+
+Elena Revicheva
+AIdeazz AI Lab
+https://aideazz.xyz/portfolio

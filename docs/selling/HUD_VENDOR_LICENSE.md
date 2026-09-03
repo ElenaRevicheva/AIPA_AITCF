@@ -243,14 +243,25 @@ form's *Delivery tasksets* picker reads team inventory, so it keeps saying
 *No tasksets in your team yet* even after the listing exists and has been
 submitted to the opportunity.
 
-The bundle should land in inventory once QC converts it — *Harbor bundle
-validation* and *Environment build* are both **Required**, and the submit
-dialog states the buyer sees a listing *"once it is live. Draft or
-in-review listings appear to the buyer after they pass checks and go
-live."* So the sequence is: publish → QC → live → inventory → picker.
-**Wait, do not force it.** Attaching the codebase pack to satisfy a picker
-would put a $74,851 repo bundle in front of a buyer shopping for exam
-items.
+**Not a QC delay — measured 3 Sep.** `My listings` reads **Active 2, In
+review 0, Draft 0**, with `NL2Repo sample — fail-closed number gate
+(1 task)` **Active** at **$600**, tag Coding/SWE, listed value $75,451.
+The listing is live *and* submitted to the opportunity, and the offer form
+**still** says *No tasksets in your team yet*. The Harbor zip attached
+under **Artifacts** does not clear the red line either — confirming
+Artifacts is a supporting-document field, not the picker.
+
+So the two registries never merge from the vendor UI: a Harbor zip on a
+DataVendor listing does not become a HUD team-inventory taskset. Getting
+into inventory needs the HUD side (org invite / API key / CLI push), which
+Elena does not have.
+
+**Do not force it.** Attaching the codebase pack to satisfy a picker would
+put a $74,851 repo bundle in front of a buyer shopping for exam items. The
+unblock is one platform question to the buyer contact:
+`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt` — accept the
+listing submission as the offer, or tell her how to push a Harbor bundle
+into HUD team inventory.
 
 **Submitting the listing to the opportunity is already a real bid.** Done
 3 Sep with the buyer note (one paid sample at their $600 rate, batch after
