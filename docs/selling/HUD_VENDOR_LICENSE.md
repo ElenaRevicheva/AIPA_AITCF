@@ -230,6 +230,35 @@ labelled optional; attach the zip anyway, because *Taskset contents* is a
 Everything else on that page is **Informational** — same class as the 22
 recommended checks on the codebase listing. Do not chase them.
 
+##### "Harbor taskset" ≠ "HUD taskset" — this is why the picker stays empty
+
+Read the Add-asset dialog's own labels (3 Sep):
+
+- **HUD tasksets** — *"Attach tasksets from your **team inventory**."*
+- **Harbor tasksets** — *"**Upload a zip** of Harbor-format tasks, validated per task."*
+
+Two different things. Uploading the zip attaches a **Harbor bundle to a
+listing**; it does not put a **HUD taskset in team inventory**. The offer
+form's *Delivery tasksets* picker reads team inventory, so it keeps saying
+*No tasksets in your team yet* even after the listing exists and has been
+submitted to the opportunity.
+
+The bundle should land in inventory once QC converts it — *Harbor bundle
+validation* and *Environment build* are both **Required**, and the submit
+dialog states the buyer sees a listing *"once it is live. Draft or
+in-review listings appear to the buyer after they pass checks and go
+live."* So the sequence is: publish → QC → live → inventory → picker.
+**Wait, do not force it.** Attaching the codebase pack to satisfy a picker
+would put a $74,851 repo bundle in front of a buyer shopping for exam
+items.
+
+**Submitting the listing to the opportunity is already a real bid.** Done
+3 Sep with the buyer note (one paid sample at their $600 rate, batch after
+QC, non-exclusive, no asserted pass rates). If the picker never populates
+because the offer form only accepts HUD-native tasksets, that route is not
+lost — say so to Megan and ask whether they want a formal offer, rather
+than inventing inventory.
+
 ##### What this sample does *not* prove — say so, do not paper over it
 
 The gap requirement is per task: `Qwen3.8 Max ave_pass_ratio ≤ 50%`,
