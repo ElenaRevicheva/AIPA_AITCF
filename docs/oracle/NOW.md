@@ -138,14 +138,18 @@ git log keeps the record.
   attached as the asset, tag Coding/SWE, Buy now **$600** (1 task × $600),
   plus the buyer note (paid sample, batch after QC, non-exclusive, no
   asserted pass rates). **That submission is already a bid.**
-- **NEXT:** the offer form still says *No tasksets in your team yet*, and
-  that is a **timing gate, not an error**. ⚠️ **"Harbor tasksets" (upload a
-  zip) ≠ "HUD tasksets" (team inventory)** — the picker reads inventory, so
-  it fills only after QC turns the listing live (*Harbor bundle validation*
-  and *Environment build* are Required). Check **My listings** for QC
-  state, then retry the offer: 0 / 1 / 600, Assumptions, Artifacts empty.
-  🚫 **Do not attach the 8-repo pack to clear the picker.** If it never
-  fills, tell Megan the listing is in and ask if they want a formal offer.
+- **NEXT:** 🚫 **Stop retrying Submit offer — it cannot be cleared from the
+  vendor UI.** Measured 3 Sep: `My listings` = **Active 2, In review 0,
+  Draft 0**, NL2Repo taskset **Active** at $600 — so the empty picker is
+  **not** a QC delay. **"Harbor tasksets" (upload a zip on a listing) ≠
+  "HUD tasksets" (team inventory)**, and the picker reads inventory. The
+  zip in **Artifacts** does not clear the red line either. Getting into
+  inventory needs the HUD side (org invite / API key / CLI), which Elena
+  does not have. **Elena: send the one platform question** —
+  `docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`: accept the
+  listing submission as the offer, or tell her how to push a Harbor bundle
+  into HUD team inventory. Buyer contact on the brief, or Megan on the
+  Cal.com thread. Do not email the lab.
   ⚠️ Pricing sits inside the Required "Listing metadata" gate — never blank.
   ⚠️ The repo is private, so `raw.githubusercontent.com` 404s; download the
   zip from the logged-in blob page. Pastes and gate table:
@@ -206,7 +210,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
-| 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing built + **submitted to the opportunity** 3 Sep, $600, Harbor zip attached, buyer note in. Offer form still blocked: its picker reads **team inventory**, which fills only after QC goes live | **Waiting on HUD QC.** Elena: check My listings, then retry Submit offer (0/1/600). Never attach the 8-pack to clear the picker |
+| 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
