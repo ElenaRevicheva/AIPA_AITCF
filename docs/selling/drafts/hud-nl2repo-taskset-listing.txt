@@ -83,6 +83,29 @@ Capacity: "Within 2 weeks" = 1. "Within 6 months" = 20.
 Sample: says optional. ATTACH THE ZIP ANYWAY — "Taskset contents (>=1
 live task)" is a Required gate, so an empty taskset fails QC.
 
+--- "SUBMIT AN EXISTING LISTING" ON THE BRIEF (optional, do it too) ---
+
+Two radios appear. Choose "NL2Repo sample — fail-closed number gate".
+NEVER choose "AI tech + marketing co-founders: 8 private produ..." —
+that is the $74,851 codebase pack and this brief does not buy repos.
+
+Dialog says: the buyer sees the listing once it is live; draft or
+in-review listings appear after they pass checks and go live. So
+submitting early is safe — QC still gates visibility.
+
+This is supply visibility only. It does NOT carry price or terms, so
+Submit offer is still required.
+
+NOTE TO THE BUYER (paste)
+
+One Harbor NL2Repo task in your required shape: a clear-document spec in NL2RepoBench style, behaviour tests aligned one-to-one with the spec, a golden repo that passes them in full, and an empty repo that does not. Offline environment — no network, no credentials, no customer data. The scenario comes from a real production publishing pipeline that refuses to print a number it cannot source, so it is not an invented puzzle.
+
+Pass rates are deliberately not asserted. I have not run Qwen3.8 Max or Opus 5 / Fable 5 rollouts, so the capability gap should be measured on your scaffold (claude-code preferred) rather than taken from me.
+
+I am also submitting an offer for one paid sample task at your $600 rate, with batch pricing after your QC. Non-exclusive. I retain copyright. No assignment.
+
+Elena Revicheva · AIdeazz AI Lab · https://aideazz.xyz/portfolio
+
 --- AFTER SUBMIT: IT IS A PROPOSAL, NOT YET INVENTORY ---
 It lands under **Proposals** as a data proposal with a **Publish listing**
 action. Until you publish, the offer form's Delivery tasksets picker stays
