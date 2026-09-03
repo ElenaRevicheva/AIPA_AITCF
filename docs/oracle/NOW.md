@@ -133,16 +133,24 @@ git log keeps the record.
   `cursor/hud-vendor-license-1c49`:
   `docs/selling/harbor/nl2repo-fail-closed-gate.zip` (8 files, `task.toml`
   inside the folder). Golden 9/9; empty 0/9 (false-positive closed).
-- **NEXT:** Taskset listing **created** 3 Sep (Add supply → Primary asset
-  type *Taskset* exists). It sits in **Proposals** with a *Publish
-  listing* action — a proposal is not inventory, so it must be published
-  or the offer picker stays empty. Then offer: refresh, select it, retype
-  1 × $600, paste Assumptions, Artifacts empty, Submit.
-  ⚠️ **Pricing is inside the Required "Listing metadata" gate** — a blank
-  price fails QC. Set $600 on the listing.
-  ⚠️ **The repo is private, so `raw.githubusercontent.com` 404s.** Download
-  the zip from the logged-in blob page — link is in
-  `docs/selling/drafts/hud-nl2repo-taskset-listing.txt` (HUD branch).
+- **DONE 3 Sep:** taskset listing **built and submitted to the NL2Repo
+  opportunity** — `NL2Repo sample — fail-closed number gate`, Harbor zip
+  attached as the asset, tag Coding/SWE, Buy now **$600** (1 task × $600),
+  plus the buyer note (paid sample, batch after QC, non-exclusive, no
+  asserted pass rates). **That submission is already a bid.**
+- **NEXT:** the offer form still says *No tasksets in your team yet*, and
+  that is a **timing gate, not an error**. ⚠️ **"Harbor tasksets" (upload a
+  zip) ≠ "HUD tasksets" (team inventory)** — the picker reads inventory, so
+  it fills only after QC turns the listing live (*Harbor bundle validation*
+  and *Environment build* are Required). Check **My listings** for QC
+  state, then retry the offer: 0 / 1 / 600, Assumptions, Artifacts empty.
+  🚫 **Do not attach the 8-repo pack to clear the picker.** If it never
+  fills, tell Megan the listing is in and ask if they want a formal offer.
+  ⚠️ Pricing sits inside the Required "Listing metadata" gate — never blank.
+  ⚠️ The repo is private, so `raw.githubusercontent.com` 404s; download the
+  zip from the logged-in blob page. Pastes and gate table:
+  `docs/selling/drafts/hud-nl2repo-taskset-listing.txt` and
+  `docs/selling/HUD_VENDOR_LICENSE.md` (HUD branch).
 - **VERIFIED BY:** `python3 scripts/test-nl2repo-fail-closed-gate.py` →
   `PASS: golden… 9 passed` then `PASS: empty workspace failed`;
   `node scripts/pack-nl2repo-harbor-zip.cjs` → 8 files, 5687 bytes.
@@ -198,7 +206,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
-| 8 | **HUD — NL2 Repo Tasks** ($600/task) | Form filled 1×$600. Red: select a delivery **taskset**. Zip ready on HUD branch | **Elena: upload `nl2repo-fail-closed-gate.zip` as a new taskset listing, then select it and Submit. Not the eight-pack** |
+| 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing built + **submitted to the opportunity** 3 Sep, $600, Harbor zip attached, buyer note in. Offer form still blocked: its picker reads **team inventory**, which fills only after QC goes live | **Waiting on HUD QC.** Elena: check My listings, then retry Submit offer (0/1/600). Never attach the 8-pack to clear the picker |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
