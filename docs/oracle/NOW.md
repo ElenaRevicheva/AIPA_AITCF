@@ -133,17 +133,29 @@ git log keeps the record.
   `cursor/hud-vendor-license-1c49`:
   `docs/selling/harbor/nl2repo-fail-closed-gate.zip` (8 files, `task.toml`
   inside the folder). Golden 9/9; empty 0/9 (false-positive closed).
-- **NEXT:** Elena is creating the taskset listing now. Every field is
-  paste-ready in `docs/selling/drafts/hud-nl2repo-taskset-listing.txt`
-  (HUD branch). Then refresh the offer, select it, retype 1 × $600,
-  Submit. If create-listing has no taskset type, screenshot and stop.
-  ⚠️ **The repo is private, so `raw.githubusercontent.com` 404s.** She
-  must download from the logged-in blob page — link is in that file.
+- **NEXT:** Taskset listing **created** 3 Sep (Add supply → Primary asset
+  type *Taskset* exists). It sits in **Proposals** with a *Publish
+  listing* action — a proposal is not inventory, so it must be published
+  or the offer picker stays empty. Then offer: refresh, select it, retype
+  1 × $600, paste Assumptions, Artifacts empty, Submit.
+  ⚠️ **Pricing is inside the Required "Listing metadata" gate** — a blank
+  price fails QC. Set $600 on the listing.
+  ⚠️ **The repo is private, so `raw.githubusercontent.com` 404s.** Download
+  the zip from the logged-in blob page — link is in
+  `docs/selling/drafts/hud-nl2repo-taskset-listing.txt` (HUD branch).
 - **VERIFIED BY:** `python3 scripts/test-nl2repo-fail-closed-gate.py` →
   `PASS: golden… 9 passed` then `PASS: empty workspace failed`;
   `node scripts/pack-nl2repo-harbor-zip.cjs` → 8 files, 5687 bytes.
-- **RISK:** Required QC + Qwen/Opus rollouts still run after they accept.
-  This zip is the sample item, not a measured model gap. Anthropic $0.
+- **RISK:** the gap gate is per task — Qwen3.8 Max ave ≤50%, Opus/Fable max
+  >0.6, **every** task ≥12.5% gap. A nine-test Python CLI is probably **too
+  easy for Qwen**, so this exact item may fail the gap while still being a
+  valid Harbor task. That is the honest position in the Assumptions: the
+  sample proves the *format*; pass rates get measured on **their** scaffold.
+  Do not invent numbers. `FN/FP QA agent review` grades a subject trace, so
+  it cannot be pre-satisfied. Anthropic $0. Batch quotes must price the
+  stack spread (Python, JS/TS, Go, Java, Rust, C++, Swift, Kotlin) — twenty
+  Python CLIs would not be accepted. Full gate table in
+  `docs/selling/HUD_VENDOR_LICENSE.md` on `cursor/hud-vendor-license-1c49`.
 
 ## 🏠 WHEN ELENA IS HOME — two things, in this order
 
