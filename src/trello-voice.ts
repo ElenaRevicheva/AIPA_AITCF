@@ -820,6 +820,36 @@ async function downloadTelegramVoice(fileId: string, botToken: string): Promise<
   return Buffer.from(arrayBuffer);
 }
 
+/**
+ * Repair the names Whisper reliably mishears.
+ *
+ * The vocabulary prompt is a SOFT bias -- it makes the right spelling more
+ * likely, never certain. "CTO AIPA" still came back as "STO APA" and was filed
+ * as a Trello card under that name. These are hard corrections applied after
+ * transcription, so a known mishearing cannot reach a card title.
+ *
+ * Only add a pair here after actually SEEING the left side in a transcript.
+ * Guessing at mishearings invents false corrections, which are worse than the
+ * original error because they look deliberate.
+ */
+const HEARD_AS: [RegExp, string][] = [
+  [/\bS[T7]O\s+AP+A\b/gi, "CTO AIPA"],
+  [/\bC\.?T\.?O\.?\s+A\.?I\.?P\.?A\.?\b/gi, "CTO AIPA"],
+  [/\bC[MN]O\s+AP+A\b/gi, "CMO AIPA"],
+  [/\b(?:ideas|idears|aideas)\b/gi, "AIdeazz"],
+  [/\bespa\s*luz\b/gi, "EspaLuz"],
+  [/\bvibe\s*job\b/gi, "VibeJob"],
+  [/\ba\s*tuona\b/gi, "Atuona"],
+  [/\balg[oa]m\b/gi, "Algom"],
+  [/\bAlic[ea]\b/g, "Alisa"],
+];
+
+function repairNames(text: string): string {
+  let out = text;
+  for (const [re, to] of HEARD_AS) out = out.replace(re, to);
+  return out;
+}
+
 async function transcribeVoice(audioBuffer: Buffer, fileId: string): Promise<string> {
   // Save to temp file (Groq SDK needs a file path or File object)
   const tmpPath = path.join('/tmp', `voice_${fileId}.ogg`);
@@ -835,12 +865,22 @@ async function transcribeVoice(audioBuffer: Buffer, fileId: string): Promise<str
       response_format: 'text',
       prompt: [
         'January, February, March, April, May, June, July, August, September, October, November, December.',
-        'Trello, HubSpot, VibeJob, EspaLuz, Algom, AIdeazz, Atuona, AIPA, Kira, Elena.',
+        // Her own product and place names. Whisper transcribes what it EXPECTS to
+        // hear, so anything absent here comes back mangled: "CTO AIPA" arrived as
+        // "STO APA" and was filed as a Trello card under that name (2 Sep 2026).
+        'CTO AIPA, CMO AIPA, AIdeazz, AIdeazz Lab, EspaLuz, VibeJob Hunter, Atlas Shifted,',
+        'Algom Alpha, Atuona, AILA, Whitespace, Trello, HubSpot, GitHub, Telegram, WhatsApp.',
+        'Elena Revicheva, Alisa, Kira.',
+        'Panama, Balboa, Clayton, Llano Bonito, Parkside, MEDUCA, ENSA, IDAAN, Banco General,',
+        'Poco a Poco, Tigo, Mas Movil, Panapass, Neurodesarrollo, Terapia Ocupacional.',
         'Move card, create card, add card, archive card, move this card, add task, new task.',
         'Trello card. Kira board. ' + rollingMonthNames().map(m => 'Kira ' + m.split(' ')[0]).join('. ') + '.',
       ].join(' '),
     });
-    return typeof transcription === 'string' ? transcription : (transcription as { text: string }).text;
+    const raw = typeof transcription === 'string' ? transcription : (transcription as { text: string }).text;
+    const fixed = repairNames(raw);
+    if (fixed !== raw) console.log('[TrelloVoice] name repair applied');
+    return fixed;
   } finally {
     // Clean up temp file
     try { fs.unlinkSync(tmpPath); } catch { /* ignore */ }
