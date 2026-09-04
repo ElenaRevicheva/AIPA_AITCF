@@ -1,2 +1,2 @@
-attach-files --slug=datastar-nda --dry-run
-retry-1788561217
+attach-files --slug=datastar-nda
+run-1788561267
