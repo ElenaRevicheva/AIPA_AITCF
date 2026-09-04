@@ -57,11 +57,17 @@ async function api(method, urlPath, { json, form } = {}) {
   return { ok: r.ok, status: r.status, json: parsed, text };
 }
 
-/** True when the Service Key can use the Files API at all. */
+/**
+ * True when the Service Key can use the Files API at all.
+ *
+ * Probes /files/v3/files/search, not /files/v3/files — the latter is not a GET
+ * route and answers 405 with an HTML body, which reads exactly like a broken
+ * key. Search is the readable endpoint, so a 403 here really is the scope.
+ */
 async function filesScopeOk() {
-  const r = await api('GET', '/files/v3/files?limit=1');
+  const r = await api('GET', '/files/v3/files/search?limit=1');
   if (r.ok) return { ok: true };
-  if (r.status === 403) {
+  if (r.status === 403 || r.status === 401) {
     return {
       ok: false,
       reason:
