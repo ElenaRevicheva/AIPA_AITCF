@@ -29,7 +29,9 @@ node -e "const k=require('fs').readFileSync('.env','utf8').match(/^HUBSPOT_API_K
 - Every deal: company + deal + **contact** + note (full MENSAJE + WhatsApp anchor) + task
 - **Contacts in Panama/LatAm:** search **both WhatsApp AND email** every time — WhatsApp is #1 channel; email still goes on the HubSpot contact (fallback when they redirect commercial proposals). Never stage WhatsApp-only if an email exists on the site.
 - HubSpot note: **always dual email options when email exists** — (1) HubSpot UI Email from **aipa@aideazz.xyz** (best CRM), (2) speed one-click `/go/outreach-email/{slug}` → Resend from **aipa@** + WhatsApp link. Refresh all: `node scripts/hs-ensure-aipa-email-links.cjs`.
-- Email sent from HubSpot UI is auto-detected by `hs-watch-manual-emails.cjs` (Oracle cron */10).
+- Email sent from HubSpot UI is auto-detected by `hs-watch-manual-emails.cjs` (Oracle cron */10) — its `WATCHED_PREFIXES` list is **keyed on the deal-name prefix**, so a new prefix is silently unwatched. Add yours in the same change.
+- 📎 **Any attachment goes INTO HubSpot too — never only into the Resend payload** (earned 4 Sep 2026, Datastar NDA). A file that exists only in the repo leaves a deal showing a letter that claims a document and carries none, and the HubSpot UI Email option has nothing to attach. `stage-hiring-outreach.cjs` uploads them automatically; backfill with `node scripts/hs-attach-deal-files.cjs --slug=<slug>` or, from a cloud agent, `echo "attach-files --slug=<slug>" > .hire-trigger`. Uploads are `access: PRIVATE` — a signed contract must never become a public URL. Needs the **`files`** scope, and Files **read** does not imply Files **write**.
+- A delivered letter must **close its own send-task**. `go-wa.ts` does it now; `hs-close-sent-send-tasks.cjs` sweeps older deals, closing one only when a note carries a real ENTREGADO/EMAILED stamp.
 
 ## Elena actions (human only)
 
