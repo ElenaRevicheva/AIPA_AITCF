@@ -133,13 +133,29 @@ git log keeps the record.
   `8-NT-2-781965 DV 90`, cédula **E-8-245573**, Costa del Este / Juan Díaz.
   Files + send text: `docs/selling/datastar/` on branch
   `cursor/datastar-nda-filled-ded9`.
-- **NEXT:** Elena: Reply All to `cquiroga@datastar.pa` using
-  `docs/selling/datastar/REPLY_cquiroga_NDA.txt` and attach
-  `NDA_Datastar_Elena_Revicheva_DRAFT.docx`. **Do not attach the cédula scan.**
+- **NEXT:** Elena: **sign the `.docx` in Word** (blank line above ELENA REVICHEVA
+  is the signing space), then Reply All to `cquiroga@datastar.pa` using
+  `docs/selling/datastar/REPLY_cquiroga_NDA.txt` with the signed **`.docx`**
+  attached — not a PDF; Datastar signs second and they make the PDF.
+  **Do not attach the cédula scan.**
 - **VERIFIED BY:** `node scripts/verify-datastar-nda-fill.cjs` → `PASS`
+  (5 guards, each tested by breaking it)
+- **⚠️ A cédula in `scripts/` would have shipped to DataVendor.** The verifier
+  first hard-coded `E-8-245573` as an assertion literal.
+  `build-license-bundle.cjs` drops `docs/selling/` but **ships `scripts/`**, so
+  her national ID was one bundle build away from a licensed corpus. Expected
+  values now live in `docs/selling/datastar/expected-fields.json` (inside a
+  dropped dir) and the verifier asserts both halves: `docs/selling/datastar/`
+  still in `DROP_DIRS`, and no script contains the cédula or RUC.
+  **Rule: an identifier belongs in dropped data, never in a shipped script.**
 - **RISK:** the number on the *back* of the carné (`AE1074827`, also in the MRZ)
   is the plastic serial. The cédula is **E-8-245573** on the *front*. Do not
   “correct” it. AIdeazz is a commercial name, not a S.A. — do not invent one.
+  Datastar's own box clips `Representante Legal` (fixed height + wrapped name);
+  that is in **their** template — `preview/original-page4.png` proves it. Left
+  untouched on purpose; do not silently restyle the counterparty's block.
+  Render with `scripts/datastar-nda-render.cjs` (LibreOffice on the real
+  `.docx`) — a text extract cannot show a clipped line.
 
 - **DONE 4 Sep — EspaLuz WhatsApp TUTOR-mode audio fixed** (EspaLuzWhatsApp `9029b1f`,
   live on Oracle 10:49:22 UTC). Users could not open the voice note in tutor mode;
