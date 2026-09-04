@@ -165,8 +165,26 @@ git log keeps the record.
      the same change.
   `[PARTNER]` was also labelled "Send **Hiring** email"; the lane now reads off
   the prefix instead of one `startsWith` test.
-- **The bridge gained a sweep mode** (no new workflow):
-  `echo "close-send-tasks --deal=<id> --dry-run" > .hire-trigger`.
+- **The bridge gained sweep + attach modes** (no new workflow):
+  `echo "close-send-tasks --deal=<id> --dry-run" > .hire-trigger` ·
+  `echo "attach-files --slug=<slug>" > .hire-trigger`.
+  (Trigger content must CHANGE to fire — add a second `retry-$(date +%s)` line;
+  only line one is read.)
+- **🔑 ONE THING ONLY ELENA CAN DO — add the `files` scope to the Service Key.**
+  The signed NDA reached Conrad and both Cc's, but the **CRM copy of the file is
+  not in HubSpot**: uploading returns 403. HubSpot → Development → Keys →
+  Service Keys → **`Aldeazz_Marketing_Engine`** → Scopes → tick **`files`** →
+  Save. Then `echo "attach-files --slug=datastar-nda" > .hire-trigger` backfills
+  it, and every future staged deal attaches its files automatically.
+  ⚠️ **Files READ does not imply Files WRITE** — `/files/v3/files/search`
+  answered 200 while `POST /files/v3/files` answered 403, so a scope preflight
+  looked green and the write still failed. Nothing else is blocked by this.
+- **⚠️ Attachments used to live ONLY in the repo + the Resend payload.** The deal
+  showed a letter claiming a signed NDA with no file on the record, and the
+  HubSpot UI Email option had nothing to attach. There was **no Files API call
+  anywhere in the codebase** before 4 Sep. `scripts/hs-files.cjs` +
+  `hs-attach-deal-files.cjs` fix it, wired into staging so it is no longer
+  something to remember. Rule now in `MANUAL_PROSPECT_PLAY.md`.
 - **NEXT:** Elena:
   (1) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
   paste the Carmi answer in Wellfound Messages (not Gmail). File:
@@ -348,7 +366,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 | 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
-| 9 | **Datastar NDA** (Oracle support for AIdeazz) | ✅ **SENT 4 Sep** — deal `64678307604`, ENTREGADO to all three, signed `.docx` attached, stage ⏳ Sent, send-task closed | **Waiting on Conrad's countersigned copy.** +4-day follow-up is open; his reply now auto-advances the deal |
+| 9 | **Datastar NDA** (Oracle support for AIdeazz) | ✅ **SENT 4 Sep** — deal `64678307604`, ENTREGADO to all three, stage ⏳ Sent, send-task closed, FU due 8 Sep. ⚠️ the file is **not yet in HubSpot** — upload needs the `files` scope | **Elena: tick `files` on the Service Key** (one setting), then the agent backfills. Otherwise: waiting on Conrad's countersigned copy |
 | 10 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Carmi asked Monday.com familiarity. Paste-ready answer in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: book the slot, paste the Carmi note in Wellfound.** $21–36k Monday.com SA. Do not claim Monday fluency — HubSpot + Make is the honest equivalent |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
