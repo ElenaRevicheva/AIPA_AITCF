@@ -20,20 +20,22 @@ Their live Wellfound posting as of 4 Sep: **Monday.com Solutions Architect**, re
 
 ---
 
-## Paste this into Wellfound Messages (after you book)
+## Paste this to Carmi in Wellfound (answers her actual question)
+
+She asked: *How familiar are you with Monday.com boards and automations?*
+Honest answer: Elena has not run Monday.com day-to-day. Equivalent is HubSpot + Make.com. Do not claim Monday fluency.
 
 ```
-Hi — thanks for the match. I just booked the interview.
+Hi Carmi — thanks for looking, and for the question.
 
-I'm Elena, based in Panama (UTC-5). I design and run the production automation for my own lab — outreach, CRM, publishing, all fail-closed — and I am glad to walk through how that maps to the role you matched me to.
+I have not run Monday.com as my daily board. What I have run, in production, is the same shape: HubSpot pipelines as the board, Make.com plus my own TypeScript/Python for the automations — status changes that draft outreach, write back delivery/opens, open follow-up tasks, and fail closed when a number is not real.
 
-See you then.
+So I am not a Monday.com power-user today. I am the person who designs those boards and the automations behind them, and I would be productive in Monday.com quickly because the model is the same.
+
+Happy to walk through a live board on a call if useful. Panama, UTC-5.
+
 Elena
 ```
-
-## Only if you already hit Reply in Gmail
-
-Same text. One send. Then still go back and **book the slot** — a Gmail reply does not move the Wellfound checklist off "Schedule your first interview".
 
 ---
 
