@@ -76,6 +76,14 @@ backups/make/
 # WA-draft backups from the Aug 4 Growth-Operator backfill (kept on disk, not in git)
 docs/selling/drafts/*.bak-*
 
+# A handwritten signature is reusable forever by anyone who gets the image, so
+# the signed NDA and any signature scan stay on disk and never enter git
+# history. The UNSIGNED draft is tracked on purpose — that is the deliverable
+# Elena signs. See docs/selling/datastar/README.md.
+docs/selling/datastar/*SIGNED*.docx
+docs/selling/datastar/*firma*.png
+docs/selling/datastar/*signature*.png
+
 # docs/strategy — private positioning material. Default-deny: this repo is
 # PUBLIC, and the strategy memo names real third-party businesses and an
 # individual. Only the already-published provenance page is tracked.

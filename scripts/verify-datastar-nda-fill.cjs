@@ -146,6 +146,38 @@ must(
 );
 must(replyText.includes("https://aideazz.xyz/portfolio"), "reply must link the portfolio");
 
+// A signature image is reusable forever by whoever holds it. The signed output
+// and any signature scan must be untrackable, and the unsigned draft must NOT
+// be caught by those same rules — it is the deliverable.
+const ignored = (p) => {
+  try {
+    execFileSync("git", ["check-ignore", "-q", p], { cwd: ROOT, stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+};
+for (const p of [
+  "docs/selling/datastar/NDA_Datastar_Elena_Revicheva_SIGNED.docx",
+  "docs/selling/datastar/firma-elena.png",
+  "docs/selling/datastar/signature.png",
+]) {
+  must(ignored(p), `${p} is NOT gitignored — a real signature could reach git history`);
+}
+must(
+  !ignored("docs/selling/datastar/NDA_Datastar_Elena_Revicheva_DRAFT.docx"),
+  "the unsigned deliverable is gitignored — it must stay tracked"
+);
+const tracked = execFileSync("git", ["ls-files", "docs/selling/datastar"], {
+  cwd: ROOT,
+  encoding: "utf8",
+})
+  .split("\n")
+  .filter(Boolean);
+for (const f of tracked) {
+  must(!/SIGNED|firma|signature/i.test(f), `signature material is tracked in git: ${f}`);
+}
+
 // The cédula must not leak into anything the licensing bundle ships.
 const bundleSrc = fs.readFileSync(path.join(ROOT, "scripts/build-license-bundle.cjs"), "utf8");
 const dropDirs = eval(bundleSrc.match(/const DROP_DIRS = (\[[\s\S]*?\]);/)[1]);
@@ -171,3 +203,4 @@ console.log("  signing space .............. both parties, both serialisations");
 console.log("  card serial not used ....... confirmed");
 console.log("  renderings current ......... pdf + 4 page previews");
 console.log("  cédula in licensed bundle .. no (docs/selling/ dropped, scripts/ clean)");
+console.log("  signature can reach git .... no (signed output + scans gitignored)");

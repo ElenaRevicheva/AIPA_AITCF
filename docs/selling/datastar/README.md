@@ -26,6 +26,9 @@ countersigned original. She reviews the party block, signs, then sends.
 | `expected-fields.json` | What the verifier asserts. Lives here, not in `scripts/` — see below |
 | `REPLY_cquiroga_NDA.txt` | Reply-all draft |
 
+Scripts: `scripts/datastar-nda-render.cjs` (read it), `scripts/datastar-nda-sign.py`
+(sign it), `scripts/verify-datastar-nda-fill.cjs` (check it before sending).
+
 **Word stays the deliverable.** Datastar has to sign it, so it must remain
 editable. The PDF is only so the document can be *read* — a `.docx` has no
 preview in Cursor (it reports *Binary file is not supported*, which says
@@ -45,13 +48,32 @@ page.
 
 ## How to sign it
 
-1. Open `NDA_Datastar_Elena_Revicheva_DRAFT.docx` in Word.
-2. Her signature box has a **blank line above `ELENA REVICHEVA`**. Put the
-   signature there — Insert → Pictures for a scanned signature, or Draw.
-3. The box is set to `spAutoFit`, so it grows to fit the image instead of
-   cropping it.
+In Word, which is the normal path:
+
+1. Open `NDA_Datastar_Elena_Revicheva_DRAFT.docx`.
+2. Her signature box has a **blank line above `ELENA REVICHEVA`**. Click into
+   that line and put the signature there — Insert → Pictures for a scanned
+   signature, or Draw.
+3. The box is `spAutoFit`, so it grows to fit the image instead of cropping it.
 4. Save as `.docx` and send. **Datastar signs after her, and they produce the
    PDF** — so do not flatten it to PDF first.
+
+Or without opening Word, given a PNG of the signature:
+
+```bash
+python3 scripts/datastar-nda-sign.py ~/firma-elena.png --height-mm 14
+```
+
+It writes `NDA_Datastar_Elena_Revicheva_SIGNED.docx` and never touches the
+unsigned draft. The image goes into the blank paragraph, so no existing line
+moves, and it is written into **both** serialisations — signing only
+`mc:Choice` leaves the signature invisible in any reader that picks
+`mc:Fallback`.
+
+**The signed file and any signature scan are gitignored.** A handwritten
+signature is reusable forever by whoever holds the image, so it stays on disk
+and never enters git history. The verifier asserts that, and asserts the
+*unsigned* draft is still tracked.
 
 Their box was already built this way: its first line is blank, which is where
 Conrad signs. Elena's box had no such line until 4 Sep — her name sat at the
