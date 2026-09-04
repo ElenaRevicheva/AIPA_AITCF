@@ -139,10 +139,10 @@ git log keeps the record.
   **Elena Revicheva, persona natural**, RUC `8-NT-2-781965 DV 90`, cédula
   **E-8-245573**. Docs: `docs/selling/datastar/`.
 - **NEXT:** Elena: (1) Datastar deal — click **➡️ SEND BY EMAIL**. One click is one send.
-  (2) Coconut VA Wellfound — read title + pay on the card first. Book the slot
-  *or* send the decline paste. Both are in
-  `docs/applications/2026-09-04_coconut_va_wellfound_reply.md`. Gmail Reply does
-  not book the slot. GHL Tech Specialist at $900–1.1k/mo is a skip.
+  (2) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
+  paste the Carmi answer in Wellfound Messages (not Gmail). File:
+  `docs/applications/2026-09-04_coconut_va_wellfound_reply.md`. GHL Tech
+  Specialist at $900–1.1k/mo is a skip.
 - **🚨 THE TRAP, and it nearly shipped: a signature image goes where the FLOW
   puts it, not where it looked right while editing.** Elena's returned file had
   her signature as an **inline** image in the body, so it rendered above
@@ -320,7 +320,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 | 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
 | 9 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | ✅ **ARMED one-click** 4 Sep — deal `64678307604`, signed `.docx` attached, Cc Adriana + Elena's gmail. Signature was on Datastar's side in her returned file; re-placed in hers | **Elena: click ➡️ SEND BY EMAIL on the deal.** No double-send guard |
-| 10 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Book / decline / scheduler-broken pastes in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: read title + pay, then book or decline.** Monday.com SA $21–36k = optional 20-min screen. GHL Tech Specialist $900–1.1k = skip |
+| 10 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Carmi asked Monday.com familiarity. Paste-ready answer in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: book the slot, paste the Carmi note in Wellfound.** $21–36k Monday.com SA. Do not claim Monday fluency — HubSpot + Make is the honest equivalent |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 

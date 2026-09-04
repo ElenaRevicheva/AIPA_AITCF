@@ -17,29 +17,37 @@ Their live Wellfound posting as of 4 Sep: **Monday.com Solutions Architect**, re
    - **Monday.com Solutions Architect** at $21–36k ($1.8–3k/month, 40h, 9–6 EST): below Zapier ($55–82.6k) and Evaboot ($70–120k). A 20-minute screen is cheap; a homework loop is not.
    - **Tech Specialist / GoHighLevel** at $900–1,100/month (20h, morning MST, posted 19 Aug — the same week you applied): skip. That is not the band, and GHL snapshots are not the stack. Use the decline paste below.
 3. Book the earliest weekday slot in **09:00–12:00 or 14:00–17:00 Panama** (10:00–13:00 or 15:00–18:00 EDT). Panama is UTC-5 with no DST; US East is still EDT in September.
-4. After the slot is confirmed, paste the short note below into the **Wellfound conversation** with Coconut VA (Messages), not into Gmail.
+4. After the slot is confirmed, paste the **Carmi note** below into the **Wellfound conversation** (Messages), not into Gmail. Fill in the booked time.
 5. If the Schedule button is missing: wellfound.com → Messages → Coconut VA → the interview prompt.
 
 ---
 
-## Paste this into Wellfound Messages (after you book)
+## Paste this to Carmi in Wellfound (answers her actual question)
+
+She asked: *How familiar are you with Monday.com boards and automations?*
+Honest answer: Elena has not run Monday.com day-to-day. Equivalent is HubSpot + Make.com. Do not claim Monday fluency.
 
 ```
-Hi — thanks for the match. I just booked the interview.
+Hi Carmi — thanks for looking, and for the question.
 
-I'm Elena, based in Panama (UTC-5). I design and run the production automation for my own lab — outreach, CRM, publishing, all fail-closed — and I am glad to walk through how that maps to the role you matched me to.
+I have not run Monday.com as my daily board. What I have run, in production, is the same shape: HubSpot pipelines as the board, Make.com plus my own TypeScript/Python for the automations — status changes that draft outreach, write back delivery/opens, open follow-up tasks, and fail closed when a number is not real.
 
-See you then.
+So I am not a Monday.com power-user today. I am the person who designs those boards and the automations behind them, and I would be productive in Monday.com quickly because the model is the same.
+
+Happy to walk through a live board on a call if useful. I booked {day} {time Panama}. Panama, UTC-5.
+
 Elena
 ```
 
+Replace `{day} {time Panama}` with the slot you just picked.
+
 ## Only if you already hit Reply in Gmail
 
-Same text. One send. Then still go back and **book the slot** — a Gmail reply does not move the Wellfound checklist off "Schedule your first interview".
+Same Carmi text. One send. Then still go back and **book the slot** — a Gmail reply does not move the Wellfound checklist off "Schedule your first interview".
 
 ## If the Schedule button is missing or broken
 
-Paste this in **Wellfound Messages** (not Gmail):
+Paste this in **Wellfound Messages** (not Gmail), then still send Carmi the Monday.com answer above:
 
 ```
 Hi — I got the match email and I am ready to interview. The scheduler in the email is not opening on my side. Could you send a fresh slot link, or two times that work for you? I am in Panama (UTC-5) and can do weekdays 09:00–12:00 or 14:00–17:00 Panama.
