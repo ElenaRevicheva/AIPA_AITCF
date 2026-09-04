@@ -127,10 +127,10 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 4 Sep — Datastar NDA is ARMED as one-click. Deal `64678307604`.**
+- **DONE 4 Sep — Datastar NDA SENT. Deal `64678307604`.**
   `https://app.hubspot.com/contacts/51409153/record/0-3/64678307604` ·
   send `https://webhook.aideazz.xyz/cto/go/outreach-email/datastar-nda`.
-  `[PARTNER] Datastar Panamá S.A. — NDA (Oracle/Nexsys)`, stage 🔥 I act TODAY,
+  `[PARTNER] Datastar Panamá S.A. — NDA (Oracle/Nexsys)`,
   company `56923599228` + contact `236844611933` (both already existed, reused),
   note `116366224737`, HIGH task `116387981992`. To `cquiroga@datastar.pa`,
   **Cc Adriana + `elena.revicheva2016@gmail.com`**, `.docx` attached (82,436 B).
@@ -138,8 +138,37 @@ git log keeps the record.
   the Resend webhook then stamps ENTREGADO / ABIERTO. Contracting party is
   **Elena Revicheva, persona natural**, RUC `8-NT-2-781965 DV 90`, cédula
   **E-8-245573**. Docs: `docs/selling/datastar/`.
-- **NEXT:** Elena: (1) Datastar deal — click **➡️ SEND BY EMAIL**. One click is one send.
-  (2) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
+- **✅ SENT 4 Sep by one-click.** Resend `809bdd7d-ffc6-4a00-bb7e-7063c20c17cf`,
+  **ENTREGADO confirmed to all three** (Conrad, Adriana, Elena's gmail), `.docx`
+  attached, deal now `decisionmakerboughtin` (⏳ Sent), send-task closed.
+  Waiting on Conrad's countersigned copy; the +4-day follow-up is open and his
+  reply now auto-advances the deal (prefix fix below).
+- **⚠️ The letter as sent says "lo que conversamos con Adriana y Pedro" and that
+  is unverified** — Pedro Olivares was only ever a **Cc** on the thread and wrote
+  nothing in it; "Nexsys" is inferred from his domain. **Deliberately NOT
+  corrected:** Pedro is not copied on the reply, it is the same idiom Adriana
+  opened with ("Según lo conversado"), and it sits in the covering email, not in
+  the NDA. A correction email would cost more than the line. **Do not repeat the
+  phrasing in the follow-up.** Adriana asked for the NDA; Pedro did not.
+- **🚨 Two faults that one screenshot caught, both fixed 4 Sep:**
+  1. **A delivered letter left its own send-task open** — three ENTREGADO stamps
+     and `Send Hiring email → Datastar Pan…` still due today. `go-wa.ts` now
+     closes the staged `Send …` task on a successful send (never the follow-up),
+     and `scripts/hs-close-sent-send-tasks.cjs` sweeps deals sent before the fix,
+     closing a task only when a note carries a real stamp. Verified: closed
+     `116387981992`, and a second run reports `Nothing to do`.
+  2. **`hs-watch-manual-emails.cjs` watched `CLIENT-MANUAL`/`CLIENT-ATLAS` only**,
+     so **every** deal from `stage-hiring-outreach.cjs` — `[PARTNER]`,
+     `[LICENSE]`, `[HIRING-MANUAL]` — was invisible to it: Conrad's reply would
+     not have moved this deal to 💬 or cancelled the follow-up. **Third time this
+     list has been the bug.** Add a writer that stages deals → add its prefix in
+     the same change.
+  `[PARTNER]` was also labelled "Send **Hiring** email"; the lane now reads off
+  the prefix instead of one `startsWith` test.
+- **The bridge gained a sweep mode** (no new workflow):
+  `echo "close-send-tasks --deal=<id> --dry-run" > .hire-trigger`.
+- **NEXT:** Elena:
+  (1) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
   paste the Carmi answer in Wellfound Messages (not Gmail). File:
   `docs/applications/2026-09-04_coconut_va_wellfound_reply.md`. GHL Tech
   Specialist at $900–1.1k/mo is a skip.
@@ -319,7 +348,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 | 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
-| 9 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | ✅ **ARMED one-click** 4 Sep — deal `64678307604`, signed `.docx` attached, Cc Adriana + Elena's gmail. Signature was on Datastar's side in her returned file; re-placed in hers | **Elena: click ➡️ SEND BY EMAIL on the deal.** No double-send guard |
+| 9 | **Datastar NDA** (Oracle support for AIdeazz) | ✅ **SENT 4 Sep** — deal `64678307604`, ENTREGADO to all three, signed `.docx` attached, stage ⏳ Sent, send-task closed | **Waiting on Conrad's countersigned copy.** +4-day follow-up is open; his reply now auto-advances the deal |
 | 10 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Carmi asked Monday.com familiarity. Paste-ready answer in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: book the slot, paste the Carmi note in Wellfound.** $21–36k Monday.com SA. Do not claim Monday fluency — HubSpot + Make is the honest equivalent |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
