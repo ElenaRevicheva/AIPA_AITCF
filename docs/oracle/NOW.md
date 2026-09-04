@@ -127,6 +127,30 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+- **DONE 4 Sep — EspaLuz WhatsApp TUTOR-mode audio fixed** (EspaLuzWhatsApp `9029b1f`,
+  live on Oracle 10:49:22 UTC). Users could not open the voice note in tutor mode;
+  translate mode was fine. Cause: `generate_tts_audio()` builds the reply from gTTS
+  speech (**24000 Hz**) with `create_pause_audio()` silence (**44100 Hz**) between
+  segments and **byte-concatenated** them into one mp3. An mp3 that changes sample
+  rate mid-stream is malformed — `Header missing`, `Queue input is backward in time`,
+  `Non-monotonic DTS`. Silence now matches gTTS at 24 kHz/64k, and concatenation goes
+  through ffmpeg's concat demuxer **with a re-encode** so any future mismatch is
+  normalised. Translate mode was never affected: one edge-tts source, no pauses.
+- **⚠️ THE TRAP, worth more than the fix: a tolerant tool in the middle of a pipeline
+  ERASES the evidence.** ffmpeg silently repaired the bad timestamps
+  (`changing to 164040`) and emitted an Opus file that passed *every* check —
+  valid OpusHead, EOS present, decodes with no warnings, real audio at −20 dB,
+  correct Content-Type, Twilio reporting `read` with `error_code: None`. Everything
+  downstream looked perfect because ffmpeg had already cleaned up after the fault.
+  **Run the producing pipeline with `ffmpeg -v warning` and read the DECODER's
+  complaints — do not probe the finished artifact and conclude it is healthy.**
+- **Two wrong diagnoses before the right one, both recorded in the EspaLuzWhatsApp
+  log:** the MP3-in-a-`.ogg`-filename bug (`677d322`) is real but unreachable on this
+  path, and byte-concatenation alone is harmless when segments share a format
+  (tested — byte-identical output). The defect needed BOTH. What cracked it was
+  Elena's isolation — *"translate works, tutor doesn't"* — which turned an
+  unfalsifiable hunt into a diff between two artifacts.
+
 - **DONE 3 Sep — `/api` rebuilt end to end (aideazz `a17c052`, cto-aipa `9513168`).**
   Four Runway films behind the hero, a full-bleed ticker, Elena's real A/Z logo
   (extracted from her own asset, masked so the violet→yellow gradient flows through
