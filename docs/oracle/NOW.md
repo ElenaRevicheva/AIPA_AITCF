@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-04 23:08 | IntelliOps addendum reply (26 Aug thread) | `docs/selling/intelliops/`, `docs/selling/drafts/intelliops-*`, `scripts/stage-hiring-outreach.cjs` (`--reuse-deal`), `.hire-trigger` after current mail-pull ends | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -368,6 +368,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
 | 9 | **Datastar NDA** (Oracle support for AIdeazz) | ✅ **SENT 4 Sep** — deal `64678307604`, ENTREGADO to all three, stage ⏳ Sent, send-task closed, FU due 8 Sep. ⚠️ the file is **not yet in HubSpot** — upload needs the `files` scope | **Elena: tick `files` on the Service Key** (one setting), then the agent backfills. Otherwise: waiting on Conrad's countersigned copy |
 | 10 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Carmi asked Monday.com familiarity. Paste-ready answer in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: book the slot, paste the Carmi note in Wellfound.** $21–36k Monday.com SA. Do not claim Monday fluency — HubSpot + Make is the honest equivalent |
+| 11 | **IntelliOps BD** (overlay commission, not a job) | 25 Aug four-remaining-items letter **already sent**. Nishant 26 Aug (Gmail): *start originating, then we revise*. **No v3 document exists.** Still do **not** countersign v2. New addendum+reply being staged on deal `64302436100` | **Agent (this session):** finish the addendum and one-click. **Elena:** do not tap the old `intelliops-bd` button — that resends the 25 Aug letter |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
