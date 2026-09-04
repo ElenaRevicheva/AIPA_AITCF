@@ -70,10 +70,36 @@ moves, and it is written into **both** serialisations — signing only
 `mc:Choice` leaves the signature invisible in any reader that picks
 `mc:Fallback`.
 
-**The signed file and any signature scan are gitignored.** A handwritten
-signature is reusable forever by whoever holds the image, so it stays on disk
-and never enters git history. The verifier asserts that, and asserts the
-*unsigned* draft is still tracked.
+**The signed file in this folder and any signature scan are gitignored.** A
+handwritten signature is reusable forever by whoever holds the image.
+
+⚠️ **One signed copy IS tracked, and has to be:**
+`docs/selling/attachments/04.09.2026_NDA_Datastar_Elena_Revicheva.docx`. The
+one-click send reads its attachments from that directory, so an untracked file
+means a button that refuses on click. The mitigation is containment, not
+absence: the repo is private, and `docs/selling/` is in `DROP_DIRS` of
+`build-license-bundle.cjs`, so it never reaches the DataVendor bundle. Do not
+move a signed document anywhere outside `docs/selling/`.
+
+## ⚠️ The signature was in the body, not in the box (fixed 4 Sep)
+
+Elena's returned file had the signature as an **inline image in the document
+body**, which flows to the left margin — so it rendered above *Conrado's* name
+in Datastar's box, and her own box was blank. Text was otherwise identical to
+the draft (98.5% match; the only additions were whitespace and a typed
+`04.09.2026`).
+
+Her signature was extracted and re-placed **inside her own box**, in both
+serialisations, with `scripts/datastar-nda-sign.py`. The typed date was dropped
+as redundant — the agreement already reads *"a los 4 días del mes de septiembre
+de 2026"*.
+
+Her original is kept unmodified as `AS_RECEIVED_from_Elena_04.09.2026.docx`.
+`preview/` holds the before and after renders.
+
+**The lesson is general: a floating or inline signature image lands wherever
+the flow puts it, not where it looked right while editing.** Always render the
+signature page and check which name the signature sits above.
 
 Their box was already built this way: its first line is blank, which is where
 Conrad signs. Elena's box had no such line until 4 Sep — her name sat at the
