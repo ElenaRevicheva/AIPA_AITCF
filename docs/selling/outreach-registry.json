@@ -3082,17 +3082,18 @@
   },
   "datastar-nda": {
     "phone": "",
+    "draft": "docs/selling/drafts/datastar-nda-email.txt",
     "company": "Datastar Panamá S.A.",
     "email": "cquiroga@datastar.pa",
-    "cc": "adriana.vargas@oracle.com, elena.revicheva2016@gmail.com",
     "emailDraft": "docs/selling/drafts/datastar-nda-email.txt",
-    "draft": "docs/selling/drafts/datastar-nda-email.txt",
+    "cc": "adriana.vargas@oracle.com, elena.revicheva2016@gmail.com",
     "attachments": [
       {
         "path": "docs/selling/attachments/04.09.2026_NDA_Datastar_Elena_Revicheva.docx",
         "filename": "04.09.2026_NDA_Datastar_Elena_Revicheva.docx"
       }
-    ]
+    ],
+    "dealId": "64678307604"
   },
   "fermatix": {
     "phone": "",
