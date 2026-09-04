@@ -288,6 +288,24 @@ work. Port what you want by hand; never reset.
 
 ## 🔴 OPEN — do not assume these work
 
+- 🚨 **DataVendor "Hansel" letter — DO NOT REPLY, DO NOT RE-UPLOAD (4 Sep).** An email
+  claims the 8-pack PII check is failing and the listing "cannot be sold or shown to
+  buyers". **The platform contradicts it:** listing is **Active** in the public catalog
+  with **Submit a PO** live, last QC run was **31 Aug (Run #4, `Completed`, 10/32
+  passed)**, and there are **0 purchases** — no "buyers reviewing right now". It asks her
+  to hunt for keys/tokens/connection strings and *reply by email*. Ask DataVendor for the
+  Run #4 breakdown **in-platform (Feedback)** instead.
+  **The PII itself is real** (230 third-party business addresses in `AIPA_AITCF` tracked
+  files) and the listing's own Terms already promise "Excluded: Customer PII" — so the
+  scrub is owed to the buyer regardless of who sent the letter.
+  **Credentials are clean: 0 real keys** in any repo, tracked or history (an earlier
+  ~49-key figure was a bad regex). Nothing to rotate.
+  ⚠️ The real 8-pack is **not** the local repo set: it includes `atlas-captures` (not
+  cloned here) and `dragontrade-agent`, and **excludes `aideazz` and `whitespace`**.
+  `AILA` and `atlas-captures` are **0 LOC** yet priced $8,401 combined.
+  Full detail + the fix: `docs/selling/DATAVENDOR_QC_2026-09-04.md`.
+  Scrubber: `scripts/build-license-bundle.cjs` (exports a copy, history-free, never
+  touches the working repos).
 - **Anthropic credits at zero** since 17 Aug. The 5-provider chain absorbs it; nothing is
   down. Elena tops up, or leave it on OpenAI.
 - **VJH outreach crash:** `[outreach] ERROR <company>: 'str' object has no attribute 'get'`
