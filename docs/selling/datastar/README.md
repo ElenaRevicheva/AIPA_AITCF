@@ -18,8 +18,24 @@ countersigned original. She reviews the party block, then sends.
 | --- | --- |
 | `NDA_Datastar_modelo_recibido.docx` | Their template, untouched (21 Jul 2026 mail) |
 | `NDA_Datastar_Elena_Revicheva_DRAFT.docx` | Same document, blanks filled — **attach this** |
+| `NDA_Datastar_Elena_Revicheva_DRAFT.pdf` | **Read the draft here.** Filled values highlighted |
+| `preview/page1.png`, `preview/page2.png` | Same pages as images, for anywhere a PDF will not open |
 | `NDA_Datastar_Elena_Revicheva_DRAFT.txt` | Plain-text extract so the fill can be grepped |
 | `REPLY_cquiroga_NDA.txt` | Reply-all draft |
+
+**A `.docx` does not preview in Cursor** — the editor reports *Binary file is not
+supported*, which says nothing about the file. Read the PDF or the PNGs instead.
+Datastar still gets the `.docx`, because they may want to edit and sign it.
+
+Regenerate the PDF after any edit to the document:
+
+```bash
+node scripts/datastar-nda-to-pdf.cjs
+```
+
+Its text comes from the `.txt`, which is extracted from the `.docx`, so the PDF
+cannot quietly disagree with the file that gets attached. It refuses to render
+if the signature block changes shape.
 
 ## What was filled, and from where
 

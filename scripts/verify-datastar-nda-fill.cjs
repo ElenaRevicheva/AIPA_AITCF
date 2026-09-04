@@ -22,6 +22,14 @@ const reply = path.join(
   "..",
   "docs/selling/datastar/REPLY_cquiroga_NDA.txt"
 );
+const pdf = path.join(
+  __dirname,
+  "..",
+  "docs/selling/datastar/NDA_Datastar_Elena_Revicheva_DRAFT.pdf"
+);
+const previews = ["page1.png", "page2.png"].map((f) =>
+  path.join(__dirname, "..", "docs/selling/datastar/preview", f)
+);
 
 const py = `
 import xml.etree.ElementTree as ET, re, sys
@@ -43,6 +51,18 @@ function must(cond, msg) {
 must(fs.existsSync(docx), "docx missing");
 must(fs.existsSync(txt), "txt extract missing");
 must(fs.existsSync(reply), "reply draft missing");
+must(fs.existsSync(pdf), "readable pdf missing — run scripts/datastar-nda-to-pdf.cjs");
+for (const p of previews) {
+  must(fs.existsSync(p), `preview image missing: ${path.basename(p)}`);
+}
+
+// The PDF is only trustworthy if it is not older than the document it renders.
+if (fs.existsSync(pdf) && fs.existsSync(txt)) {
+  must(
+    fs.statSync(pdf).mtimeMs >= fs.statSync(txt).mtimeMs,
+    "pdf is older than the txt extract — regenerate it"
+  );
+}
 
 must(!/\bx{4,}\b/.test(text), "leftover xxxx placeholder in docx");
 must(!text.includes("2025"), "boilerplate year 2025 still in docx");
@@ -90,3 +110,4 @@ console.log("cédula E-8-245573 (front of carné, not MRZ serial)");
 console.log("RUC 8-NT-2-781965 DV 90");
 console.log("date 4 septiembre 2026");
 console.log("placeholders remaining: 0");
+console.log("readable: NDA_Datastar_Elena_Revicheva_DRAFT.pdf + preview/page{1,2}.png");
