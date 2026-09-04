@@ -100,7 +100,8 @@ with dates.
 can tell whether it is working without asking a human", and who can "reason about
 failure states, retries, and what the system does when an upstream tool goes down
 at 2 AM". Those two sentences are the wiki's subject matter. Most candidates will
-assert they think this way; this is four years of dated evidence that she does.
+assert they think this way; this is dated, public evidence that she does --
+four months of it, 10 May to 4 September 2026.
 
 The last line matters most. Everyone applying will send a portfolio of successes.
 A public catalogue of your own production failures, with the log lines, is a
