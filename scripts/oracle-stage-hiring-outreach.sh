@@ -43,6 +43,35 @@ if [ "$SPEC" = "close-send-tasks" ]; then
   exit "$RC"
 fi
 
+# Mail-read mode: pull the IntelliOps thread from Zoho IMAP. Read-only against
+# the mailbox (readonly SELECT), writes nothing to HubSpot, and tars the result
+# back so an agent with no mail credentials and no IMAP egress can read it.
+if [ "$SPEC" = "intelliops-mail" ]; then
+  echo "--- fetching $REF ---"
+  git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
+  git checkout FETCH_HEAD -- scripts/intelliops-imap-pull.py 2>&1 \
+    || { echo "FATAL: checkout of the IMAP script failed"; exit 1; }
+
+  rm -rf /tmp/intelliops-mail
+  echo "--- python3 scripts/intelliops-imap-pull.py ---"
+  set +e
+  # Secrets are never printed by the script; it reports key NAMES only.
+  python3 scripts/intelliops-imap-pull.py 2>&1
+  RC=$?
+  set -e
+  echo "--- imap pull exit code: $RC ---"
+
+  if [ -d /tmp/intelliops-mail ]; then
+    tar -czf /tmp/intelliops-mail.tar.gz -C /tmp intelliops-mail
+    echo "--- packed $(stat -c %s /tmp/intelliops-mail.tar.gz) bytes ---"
+    ls -la /tmp/intelliops-mail | sed 's/^/      /'
+  else
+    echo "--- nothing to pack ---"
+  fi
+  rm -f /tmp/stage-hiring-output.tar.gz
+  exit "$RC"
+fi
+
 # Attach mode: upload a slug's attachments into HubSpot and hang them off the
 # deal's note. Reads the registry, writes only to HubSpot.
 if [ "$SPEC" = "attach-files" ]; then
