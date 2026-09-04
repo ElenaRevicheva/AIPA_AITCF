@@ -65,6 +65,14 @@ if [ "$SPEC" = "intelliops-mail" ]; then
     tar -czf /tmp/intelliops-mail.tar.gz -C /tmp intelliops-mail
     echo "--- packed $(stat -c %s /tmp/intelliops-mail.tar.gz) bytes ---"
     ls -la /tmp/intelliops-mail | sed 's/^/      /'
+    # The transcript goes to stdout because the build artifact cannot be
+    # downloaded by a cloud agent: the Actions blob host is not in its egress
+    # allowlist, so the log is the only channel that reaches it.
+    if [ -f /tmp/intelliops-mail/transcript.txt ]; then
+      echo "--- BEGIN TRANSCRIPT ---"
+      cat /tmp/intelliops-mail/transcript.txt
+      echo "--- END TRANSCRIPT ---"
+    fi
   else
     echo "--- nothing to pack ---"
   fi

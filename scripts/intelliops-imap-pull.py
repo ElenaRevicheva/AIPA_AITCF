@@ -70,6 +70,51 @@ def merge_envs() -> dict[str, str]:
     return merged
 
 
+def extract_doc_text(path: Path, ctype: str) -> str:
+    """Text of a saved attachment, using the stdlib only where possible.
+
+    A cloud agent cannot download the build artifact — the blob host is not in
+    its egress allowlist — so the text has to travel through the Actions log.
+    That means extraction happens HERE, on the box that has the file.
+    """
+    name = path.name.lower()
+    try:
+        if name.endswith((".txt", ".md")):
+            return path.read_text(encoding="utf-8", errors="replace")
+        if name.endswith(".docx"):
+            # stdlib: a .docx is a zip of XML. No python-docx needed.
+            import xml.etree.ElementTree as ET
+            from zipfile import ZipFile
+
+            W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+            with ZipFile(path) as z:
+                root = ET.fromstring(z.read("word/document.xml"))
+            out = []
+            for para in root.iter(f"{W}p"):
+                line = "".join(t.text or "" for t in para.iter(f"{W}t")).strip()
+                if line:
+                    out.append(line)
+            return "\n".join(out)
+        if name.endswith(".pdf") or ctype == "application/pdf":
+            import shutil
+            import subprocess
+
+            if shutil.which("pdftotext"):
+                r = subprocess.run(
+                    ["pdftotext", "-layout", str(path), "-"],
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
+                if r.returncode == 0:
+                    return r.stdout
+                return f"(pdftotext failed rc={r.returncode})"
+            return "(pdftotext not installed on this box — raw file is in the bundle)"
+    except Exception as e:  # noqa: BLE001 - the reason matters more than the type
+        return f"(extract failed: {e})"
+    return "(no extractor for this type)"
+
+
 def dec(val) -> str:
     if val is None:
         return ""
@@ -177,15 +222,17 @@ def walk_parts(msg: email.message.Message, uid: str, saved: list[dict]) -> str:
             safe = re.sub(r"[^A-Za-z0-9._-]+", "_", name or f"{uid}.bin")
             path = OUT / f"{uid}_{safe}"
             path.write_bytes(payload)
+            text = extract_doc_text(path, ctype)
             saved.append(
                 {
                     "filename": name or safe,
                     "path": str(path),
                     "bytes": len(payload),
                     "content_type": ctype,
+                    "text": text[:120000],
                 }
             )
-            print(f"doc {path.name} {len(payload)} bytes {ctype}")
+            print(f"doc {path.name} {len(payload)} bytes {ctype} text_chars={len(text)}")
             continue
         if "attachment" in disp.lower():
             continue
@@ -289,6 +336,31 @@ def main() -> int:
     index = {"ok": True, "accounts": [a["name"] for a in accs], "messages": uniq}
     (OUT / "index.json").write_text(json.dumps(index, indent=2) + "\n")
     print(f"wrote {OUT / 'index.json'} messages={len(uniq)} docs={sum(len(m['attachments']) for m in uniq)}")
+
+    # A readable transcript, oldest first, for the Actions log. The bundle is
+    # the archive; this is the only copy an agent without blob egress can read.
+    lines: list[str] = ["===== INTELLIOPS THREAD (oldest first) ====="]
+    for m in uniq:
+        lines.append("")
+        lines.append(f"--- {m['date']} | {m['account']}/{m['folder']} uid {m['uid']}")
+        lines.append(f"FROM: {m['from']}")
+        lines.append(f"TO:   {m['to']}")
+        if m.get("cc"):
+            lines.append(f"CC:   {m['cc']}")
+        lines.append(f"SUBJ: {m['subject']}")
+        if m["attachments"]:
+            lines.append("ATT:  " + ", ".join(f"{a['filename']} ({a['bytes']}B)" for a in m["attachments"]))
+        lines.append("")
+        lines.append((m.get("body") or "").strip()[:6000])
+    lines.append("")
+    lines.append("===== ATTACHED DOCUMENTS =====")
+    for m in uniq:
+        for a in m["attachments"]:
+            lines.append("")
+            lines.append(f"=== {a['filename']} ({a['bytes']}B) from {m['date']} — {m['subject']}")
+            lines.append(a.get("text") or "(no text)")
+    (OUT / "transcript.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"wrote {OUT / 'transcript.txt'} chars={sum(len(x) for x in lines)}")
     return 0
 
 
