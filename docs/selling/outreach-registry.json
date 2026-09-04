@@ -3093,5 +3093,14 @@
         "filename": "04.09.2026_NDA_Datastar_Elena_Revicheva.docx"
       }
     ]
+  },
+  "fermatix": {
+    "phone": "",
+    "draft": "docs/selling/drafts/fermatix-email.txt",
+    "company": "Fermatix",
+    "email": "hi@fermatix.ai",
+    "emailDraft": "docs/selling/drafts/fermatix-email.txt",
+    "dealId": "64531338321",
+    "cc": "aipa@aideazz.xyz"
   }
 }
