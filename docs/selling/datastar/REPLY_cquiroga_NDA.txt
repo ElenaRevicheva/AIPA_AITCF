@@ -3,7 +3,9 @@ CC: Adriana Vargas <adriana.vargas@oracle.com>; pedro.olivares <pedro.olivares@n
 SUBJECT: Re: Documentacion AIDEAZZ para NDA
 
 ATTACH: docs/selling/datastar/NDA_Datastar_Elena_Revicheva_DRAFT.docx
-(Reply All on Conrad’s 21 Jul 2026 mail. Do not attach the cédula.)
+(Reply All on Conrad’s 21 Jul 2026 mail. Sign it in Word FIRST — the blank line
+above ELENA REVICHEVA is the signing space. Send it as .docx, not PDF: they sign
+second and they produce the PDF. Do not attach the cédula.)
 
 ---
 
@@ -12,7 +14,8 @@ Conrad,
 Gracias por el modelo, y disculpa la demora en devolverlo.
 
 Lo revisé y estoy de acuerdo con el contenido. Adjunto el mismo NDA
-diligenciado con mis datos.
+diligenciado con mis datos y firmado de mi parte, en Word, para que
+puedan firmarlo ustedes.
 
 Una aclaración de forma, no de fondo: AIdeazz es el nombre comercial;
 la parte contratante soy yo, Elena Revicheva, persona natural extranjera

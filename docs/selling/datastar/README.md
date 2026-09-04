@@ -5,37 +5,95 @@ and asked Elena to review it and say if she is OK. Oracle (Adriana Vargas) and
 Nexsys (Pedro Olivares) are on the thread because they asked Datastar to issue
 the NDA so they can start supporting AIdeazz.
 
-**Elena’s move:** send `REPLY_cquiroga_NDA.txt` (Reply All) with
-`NDA_Datastar_Elena_Revicheva_DRAFT.docx` attached. **Do not attach the cédula
-scan.** The NDA already carries the ID number they need.
+**Elena’s move:** sign `NDA_Datastar_Elena_Revicheva_DRAFT.docx` in Word, then
+send `REPLY_cquiroga_NDA.txt` (Reply All) with the signed `.docx` attached.
+**Do not attach the cédula scan** — the NDA already carries the ID number they
+need. **Keep it as Word**, not PDF: Datastar signs second and they make the PDF.
 
 This is a draft of *their* template with the blanks filled. It is not a
-countersigned original. She reviews the party block, then sends.
+countersigned original. She reviews the party block, signs, then sends.
 
 ## Files
 
 | File | What |
 | --- | --- |
 | `NDA_Datastar_modelo_recibido.docx` | Their template, untouched (21 Jul 2026 mail) |
-| `NDA_Datastar_Elena_Revicheva_DRAFT.docx` | Same document, blanks filled — **attach this** |
-| `NDA_Datastar_Elena_Revicheva_DRAFT.pdf` | **Read the draft here.** Filled values highlighted |
-| `preview/page1.png`, `preview/page2.png` | Same pages as images, for anywhere a PDF will not open |
+| `NDA_Datastar_Elena_Revicheva_DRAFT.docx` | **The deliverable.** Blanks filled, signature space ready — sign this and attach it |
+| `NDA_Datastar_Elena_Revicheva_DRAFT.pdf` | LibreOffice render of that `.docx`, to read it |
+| `preview/page1..4.png` | Same pages as images, for anywhere a PDF will not open |
+| `preview/original-page4.png` | Their template's signature page, for comparison |
 | `NDA_Datastar_Elena_Revicheva_DRAFT.txt` | Plain-text extract so the fill can be grepped |
+| `expected-fields.json` | What the verifier asserts. Lives here, not in `scripts/` — see below |
 | `REPLY_cquiroga_NDA.txt` | Reply-all draft |
 
-**A `.docx` does not preview in Cursor** — the editor reports *Binary file is not
-supported*, which says nothing about the file. Read the PDF or the PNGs instead.
-Datastar still gets the `.docx`, because they may want to edit and sign it.
+**Word stays the deliverable.** Datastar has to sign it, so it must remain
+editable. The PDF is only so the document can be *read* — a `.docx` has no
+preview in Cursor (it reports *Binary file is not supported*, which says
+nothing about the file).
 
-Regenerate the PDF after any edit to the document:
+After any edit to the `.docx`:
 
 ```bash
-node scripts/datastar-nda-to-pdf.cjs
+node scripts/datastar-nda-render.cjs      # docx -> pdf + page PNGs
+node scripts/verify-datastar-nda-fill.cjs # fails if a rendering is stale
 ```
 
-Its text comes from the `.txt`, which is extracted from the `.docx`, so the PDF
-cannot quietly disagree with the file that gets attached. It refuses to render
-if the signature block changes shape.
+The render goes through **LibreOffice on the real `.docx`**, not a rebuild of
+the text. That distinction found a live fault: a text extract shows every word
+of the signature block and cannot show that one line of it is clipped off the
+page.
+
+## How to sign it
+
+1. Open `NDA_Datastar_Elena_Revicheva_DRAFT.docx` in Word.
+2. Her signature box has a **blank line above `ELENA REVICHEVA`**. Put the
+   signature there — Insert → Pictures for a scanned signature, or Draw.
+3. The box is set to `spAutoFit`, so it grows to fit the image instead of
+   cropping it.
+4. Save as `.docx` and send. **Datastar signs after her, and they produce the
+   PDF** — so do not flatten it to PDF first.
+
+Their box was already built this way: its first line is blank, which is where
+Conrad signs. Elena's box had no such line until 4 Sep — her name sat at the
+top of the box with nowhere to sign. Both serialisations were fixed (Word
+writes each text box twice, `mc:Choice` and `mc:Fallback`; fixing one leaves
+the other rendering the old layout).
+
+## ⚠️ Their template clips Conrad's own title — left alone on purpose
+
+Rendered, Datastar's signature box shows only:
+
+    Datastar Panamá S.A.
+    Conrado José Quiroga
+    Granillo
+
+**`Representante Legal` is missing.** His name wraps to two lines and the box
+has a fixed height (`noAutofit`, 98pt), so the third line falls outside it.
+
+This is **in the template they sent** — `preview/original-page4.png` shows the
+same clipping with the `xxxxx` placeholders still in it. It is not something
+the fill introduced.
+
+Not fixed here, deliberately: never quietly restyle the counterparty's
+signature block. It is one attribute away from correct (`noAutofit` →
+`spAutoFit`) and they can fix it in a second. If Elena wants to mention it,
+one line is enough:
+
+> Un detalle menor del formato: en el bloque de firma de Datastar, "Representante
+> Legal" queda fuera del cuadro de texto porque el nombre ocupa dos líneas.
+> Se corrige ajustando el cuadro para que crezca con el contenido.
+
+## ⚠️ Why `expected-fields.json` is in this folder and not in `scripts/`
+
+`scripts/build-license-bundle.cjs` drops `docs/selling/` from the DataVendor
+licensing bundle, but **ships `scripts/`**. The verifier originally hard-coded
+the cédula as an assertion literal, which would have carried her national ID
+into a corpus licensed to AI labs.
+
+The expected values now live here, inside a dropped directory, and the verifier
+asserts both halves of that: `docs/selling/datastar/` is still in `DROP_DIRS`,
+and neither script contains the cédula or the RUC. Both checks were tested by
+breaking them.
 
 ## What was filled, and from where
 
