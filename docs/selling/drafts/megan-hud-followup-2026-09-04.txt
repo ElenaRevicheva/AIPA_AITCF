@@ -57,6 +57,11 @@ What I most need to know is whether "Not DV quality certified" blocks an
 opportunity match. If it does, I will put those checks ahead of everything else
 this week.
 
+One practical question before I touch anything: if I edit the listing and
+re-upload the repositories, does that re-run QC, and does the listing stay
+visible in the catalog while it does? I would rather make one correct update
+than take a live listing out of the catalog to find out.
+
 My HUD estimator point of $89,481 still stands for the package conversation.
 
 Best regards,
