@@ -1,0 +1,130 @@
+# Stage a partner / NDA deal into HubSpot, from a Cursor cloud agent.
+#
+# Same trigger-file pattern as stage-prospect-on-trigger.yml, and for the same
+# reason: the HubSpot Service Key lives on the Oracle VM, a cloud agent's egress
+# allowlist excludes api.hubapi.com, and agent tokens get HTTP 403 on the
+# workflow_dispatch API. So a push is the only button an agent can press.
+#
+# Unlike the prospect play this takes a SPEC FILE rather than a domain: an NDA
+# reply is a specific letter to a named person with a Cc list and an attachment,
+# not a generated audit pitch.
+#
+# It commits the registry back to the triggering branch, which is load-bearing:
+# /go/outreach-email/{slug} resolves slugs from the committed registry, so a
+# staging run that is never committed leaves a dead email button.
+#
+# Usage:
+#   echo "docs/selling/datastar/hubspot-deal-spec.json --dry-run" > .nda-trigger
+#   git add .nda-trigger && git commit -m "nda: dry-run datastar" && git push
+#
+# Then drop --dry-run to create the records. Staging never sends anything — the
+# human gate is unchanged, Elena still has to click SEND on the note.
+
+name: Stage NDA / partner deal (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".nda-trigger"]
+
+permissions:
+  contents: write
+
+jobs:
+  stage-nda:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .nda-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .nda-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.nda-trigger is empty"; exit 1; }
+
+          # An idle trigger must be a clean no-op. The file keeps the last run's
+          # spec, so merging a branch that staged a deal would otherwise re-run
+          # on main and post a second note to a counterparty already in the CRM.
+          case "$LINE" in
+            \#*|none|idle) echo "Trigger is idle ('$LINE') — nothing to stage."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+          esac
+
+          SPEC=$(echo "$LINE" | awk '{print $1}')
+          case "$SPEC" in
+            docs/selling/*/*.json) ;;
+            *) echo "::error::spec must be a json file under docs/selling/, got '$SPEC'"; exit 1 ;;
+          esac
+          if echo "$SPEC" | grep -q '\.\.'; then echo "::error::no traversal in the spec path"; exit 1; fi
+          [ -f "$SPEC" ] || { echo "::error::spec '$SPEC' does not exist on this ref"; exit 1; }
+
+          # Allowlist the flags: this runs a CRM write with production credentials,
+          # so the trigger file must not smuggle arbitrary argv into node.
+          FLAGS=$(echo "$LINE" | cut -s -d' ' -f2-)
+          for f in $FLAGS; do
+            case "$f" in
+              --dry-run) ;;
+              *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
+            esac
+          done
+
+          echo "spec=$SPEC" >> "$GITHUB_OUTPUT"
+          echo "flags=$FLAGS" >> "$GITHUB_OUTPUT"
+          echo "Staging '$SPEC' with flags: ${FLAGS:-<none>}"
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      - name: Stage on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          REF: ${{ github.ref_name }}
+          SPEC: ${{ steps.trigger.outputs.spec }}
+          FLAGS: ${{ steps.trigger.outputs.flags }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+
+          # shellcheck disable=SC2086
+          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+            "$REF" "$SPEC" $FLAGS < scripts/oracle-stage-nda.sh
+          RC=$?
+          echo "--- remote exit code: $RC ---"
+
+          # shellcheck disable=SC2086
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/nda-stage-output.tar.gz /tmp/ 2>/dev/null \
+            && echo "--- pulled staging output ---" \
+            || echo "--- no staging output to pull (dry run, or the run failed) ---"
+
+          rm -f ~/.ssh/oracle
+          exit $RC
+
+      - name: Commit registry
+        if: success() && steps.trigger.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          if [ ! -f /tmp/nda-stage-output.tar.gz ]; then
+            echo "Nothing to commit — no files came back."; exit 0
+          fi
+          tar -xzf /tmp/nda-stage-output.tar.gz -C .
+          git add docs/selling/outreach-registry.json
+          if git diff --cached --quiet; then
+            echo "Nothing to commit — the registry is unchanged."; exit 0
+          fi
+          git config user.name "aipa-staging[bot]"
+          git config user.email "aipa@aideazz.xyz"
+          git commit \
+            -m "selling: stage ${{ steps.trigger.outputs.spec }} — registry dealId" \
+            -m "Committed from Oracle so /go/outreach-email/{slug} resolves the slug. Without this the email button 404s with 'Unknown outreach email slug'."
+          git push origin HEAD:${{ github.ref_name }}
