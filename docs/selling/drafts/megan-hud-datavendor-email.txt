@@ -1,0 +1,51 @@
+TO: megan@hud.ai
+SUBJECT: Listing is live, and someone is phishing your vendors as "Datavendor team"
+
+Hi Megan,
+
+Three things, one of which I think you will want today.
+
+1. SOMEONE IS PHISHING DATAVENDOR VENDORS.
+
+On 3 Sep this arrived at the address on my listing:
+
+From: hansel.tantohari@hud-data-services.com
+Subject: "Elena, your codebase is not sellable yet"
+
+It signs off "Hansel, Datavendor team". It says my PII check is failing, that the listing "cannot be sold or shown to buyers", and that buyers are reviewing codebases right now. It then asks me to search my private repositories for "API keys, tokens, connection strings" and to reply to that address with anything that looks like a false positive.
+
+Nothing in it matches the platform. My listing is Active in the catalog with Submit a PO live, my last QC run was 31 Aug, and the listing shows 0 purchases. The sending domain is neither hud.ai nor datavendor.ai. It is built to sit between them. My mail client filed it as bulk mail, so I doubt I am the only vendor who received it.
+
+I have not replied and will not. I am flagging it because the pretext uses your platform's name, it is well made, and it walks the recipient toward pasting live credentials into a reply. A vendor less suspicious than me would do it.
+
+2. I WENT LIVE, AS I OFFERED.
+
+The listing is public now:
+https://datavendor.ai/listings/e568b5c8-2f86-41dc-8338-5e9778cd3443
+
+3. ONE QUESTION, THE QC BREAKDOWN.
+
+Quality Reports shows Run #4 on 31 Aug at 10/32 passed, and the listing reads "Not DV quality certified". I cannot see which 22 checks failed. The row links back to the listing and I can find no detail view.
+
+Could you point me at the per-check breakdown, or send it?
+
+Two things I have already found myself and am fixing:
+
+PII. Third-party business email addresses sit in one repo's tracked files. My listing Terms already exclude Customer PII, so I am shipping a clean-room export: the licensed copy is built from a filtered, history-free tree, so neither customer data nor git history travels with it.
+
+AILA and atlas-captures display as 0 LOC while priced. Is that an ingest issue on your side, or should I re-upload them?
+
+What I most need to know is whether "Not DV quality certified" blocks an opportunity match. If it does, I will put those checks ahead of everything else this week.
+
+One practical question before I touch anything: if I edit the listing and re-upload the repositories, does that re-run QC, and does the listing stay visible in the catalog while it does? I would rather make one correct update than take a live listing out of the catalog to find out.
+
+My HUD estimator point of $89,481 still stands for the package conversation.
+
+Best regards,
+
+Elena Revicheva, AIdeazz Founder
+
++507 616 66 716
+WhatsApp https://wa.me/50761666716
+Telegram https://t.me/ElenaRevicheva
+https://aideazz.xyz/portfolio

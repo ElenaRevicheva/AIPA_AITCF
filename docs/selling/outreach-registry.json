@@ -3067,5 +3067,17 @@
     "phone": "573174321486",
     "emailDraft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas-fu-email.txt",
     "draft": "docs/selling/drafts/cirujana-pl-stica-jenny-diaz-atlas-fu.txt"
+  },
+  "megan-hud-datavendor": {
+    "company": "HUD / DataVendor - Megan Chang",
+    "email": "megan@hud.ai",
+    "dealId": "64673099185",
+    "emailDraft": "docs/selling/drafts/megan-hud-datavendor-email.txt"
+  },
+  "megan-hud-datavendor-fu": {
+    "company": "HUD / DataVendor - Megan Chang",
+    "email": "megan@hud.ai",
+    "dealId": "64673099185",
+    "emailDraft": "docs/selling/drafts/megan-hud-datavendor-fu-email.txt"
   }
 }

@@ -1,0 +1,23 @@
+TO: megan@hud.ai
+SUBJECT: Re: Listing is live, and someone is phishing your vendors as "Datavendor team"
+
+Hi Megan,
+
+Following up on the note I sent earlier this week.
+
+The part I would still like an answer to is the short one: does "Not DV quality certified" block an opportunity match, and can you send me the per-check breakdown behind Run #4 (10/32)? I can act on almost anything once I can see which checks failed.
+
+The listing is still live and unchanged, and I have deliberately not re-uploaded anything, because I do not know yet whether a re-upload keeps it visible in the catalog while QC re-runs.
+
+The phishing report stands on its own and needs nothing from me. If it is useful to whoever handles security at HUD, the sending domain was hud-data-services.com, signing as "Datavendor team", on 3 Sep. Happy to forward the raw message with full headers.
+
+My HUD estimator point of $89,481 is still open for the package conversation.
+
+Best regards,
+
+Elena Revicheva, AIdeazz Founder
+
++507 616 66 716
+WhatsApp https://wa.me/50761666716
+Telegram https://t.me/ElenaRevicheva
+https://aideazz.xyz/portfolio
