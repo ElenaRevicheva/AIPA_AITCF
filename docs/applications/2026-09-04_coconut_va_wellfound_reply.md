@@ -32,7 +32,7 @@ I have not run Monday.com as my daily board. What I have run, in production, is 
 
 So I am not a Monday.com power-user today. I am the person who designs those boards and the automations behind them, and I would be productive in Monday.com quickly because the model is the same.
 
-Happy to walk through a live board on a call if useful. Panama, UTC-5.
+I'm free Monday 3–6pm ET, Tuesday 11am–2pm ET, and Friday after 3pm ET.
 
 Elena
 ```
