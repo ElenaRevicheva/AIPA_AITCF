@@ -13,8 +13,11 @@
  *   addNoteAttachments(...)  — unions onto hs_attachment_ids, never replaces
  *
  * Needs the `files` scope on the Service Key, which the CRM scopes do not
- * imply. filesScopeOk() checks it so a caller can say so plainly rather than
- * failing on a 403 mid-write.
+ * imply. filesScopeOk() proves the API is reachable, but read and write are
+ * SEPARATE grants: search can answer 200 while upload answers 403. So the
+ * upload path carries its own actionable error rather than trusting the
+ * preflight — a preflight that cannot test the write it is gating is only
+ * half a check.
  */
 'use strict';
 
@@ -115,6 +118,21 @@ async function uploadOutreachFile(absPath, displayName) {
   );
 
   const r = await api('POST', '/files/v3/files', { form });
+  if (r.status === 403) {
+    // Reading and writing files are separate grants, and the read one is what
+    // the preflight can see. A raw HubSpot scope error here is unactionable, so
+    // it becomes the one instruction that fixes it.
+    const err = new Error(
+      'HubSpot refused the upload: the Service Key can READ files but not write them.\n' +
+        '  Fix (Elena, once): HubSpot → Settings → Integrations → Private Apps /' +
+        ' Development → Keys → Service Keys → Aldeazz_Marketing_Engine → Scopes →' +
+        ' tick `files` (write) → Save. Then re-run this attach.\n' +
+        '  Nothing else is blocked by this: the letter and its attachment already' +
+        ' went out through Resend; only the CRM copy of the file is missing.',
+    );
+    err.code = 'FILES_SCOPE';
+    throw err;
+  }
   if (!r.ok) throw new Error(`upload failed ${r.status}: ${r.text.slice(0, 200)}`);
   const id = r.json?.id;
   if (!id) throw new Error(`upload returned no id: ${r.text.slice(0, 160)}`);

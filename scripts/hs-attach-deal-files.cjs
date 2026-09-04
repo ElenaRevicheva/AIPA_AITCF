@@ -131,6 +131,10 @@ function targets() {
 
   console.log(`\n── uploaded ${uploaded} · newly attached ${attached} · skipped ${skipped}\n`);
 })().catch((e) => {
+  if (e.code === 'FILES_SCOPE') {
+    console.error(`\nBLOCKED — one scope short:\n${e.message}\n`);
+    process.exit(3);
+  }
   console.error('hs-attach-deal-files failed:', e.message);
   process.exit(1);
 });
