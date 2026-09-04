@@ -10,6 +10,29 @@ upload", that "the listing cannot be sold or shown to buyers", that buyers "are 
 codebases right now", and asked her to scrub emails/names/phones/**API keys, tokens,
 connection strings**, re-upload, and *"reply here"* if anything looked like a false positive.
 
+### ⛔ It is phishing. The sender domain settles it.
+
+**From: `hansel.tantohari@hud-data-services.com`** → to `aipa@aideazz.xyz`,
+Thu 3 Sep 2026 23:27 -0500.
+
+- The listing is on **`datavendor.ai`**. The mail signs *"Datavendor team"* but comes from
+  **`hud-data-services.com`** — which is neither DataVendor nor HUD.
+- That domain is a **blended lookalike**: "HUD" (the other buyer in her orbit) + generic
+  "data services". NOW.md already carries the trap `hud.io ≠ hud.ai ≠ DataVendor API`.
+  This is that confusion, weaponised.
+- The mail carries **Unsubscribe / Exclude** footers. A QC notice about one specific
+  listing does not ship with marketing unsubscribe links — that is bulk-send
+  infrastructure, i.e. a list, not a person.
+- The payload: send the target hunting through eight private repos for *keys, tokens and
+  connection strings*, then **"reply here"**. The reply is where the secrets would go.
+
+**Do not reply. Do not click Unsubscribe or Exclude** (both confirm a live mailbox).
+Mark as phishing; report it to DataVendor in-platform.
+
+**No breach is implied.** The listing sits in DataVendor's **public** catalog (title, org,
+price all visible) and `aipa@aideazz.xyz` is published on the site. Public listing +
+public address = a scrapeable target list.
+
 Checked against the platform itself:
 
 | Letter says | Platform shows |

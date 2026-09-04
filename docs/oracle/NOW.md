@@ -288,8 +288,16 @@ work. Port what you want by hand; never reset.
 
 ## 🔴 OPEN — do not assume these work
 
-- 🚨 **DataVendor "Hansel" letter — DO NOT REPLY, DO NOT RE-UPLOAD (4 Sep).** An email
-  claims the 8-pack PII check is failing and the listing "cannot be sold or shown to
+- 🚨 **DataVendor "Hansel" letter is PHISHING — DO NOT REPLY, DO NOT RE-UPLOAD (4 Sep).**
+  **From `hansel.tantohari@hud-data-services.com`** — signs *"Datavendor team"* but the
+  listing is on **`datavendor.ai`**, and that domain is neither DataVendor nor HUD. It is a
+  blended lookalike weaponising the `hud.io ≠ hud.ai ≠ DataVendor` trap already in §6. It
+  ships **Unsubscribe/Exclude** footers (bulk-send, not a person) and its payload is: hunt
+  your private repos for *keys, tokens, connection strings*, then **"reply here"**. That
+  reply is where the secrets go. **Do not click Unsubscribe or Exclude either** — both
+  confirm a live mailbox. Mark as phishing; report in-platform. No breach implied: the
+  listing is in the **public** catalog and `aipa@aideazz.xyz` is on the site.
+  It claims the 8-pack PII check is failing and the listing "cannot be sold or shown to
   buyers". **The platform contradicts it:** listing is **Active** in the public catalog
   with **Submit a PO** live, last QC run was **31 Aug (Run #4, `Completed`, 10/32
   passed)**, and there are **0 purchases** — no "buyers reviewing right now". It asks her
