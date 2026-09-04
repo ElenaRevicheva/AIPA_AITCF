@@ -288,6 +288,20 @@ work. Port what you want by hand; never reset.
 
 ## 🔴 OPEN — do not assume these work
 
+- ⚠️ **`fermatix` outreach row exists ONLY on Oracle's disk — not on `main` (found 4 Sep).**
+  Oracle's `outreach-registry.json` had **371** slugs, `main` had **370**. The extra is
+  `fermatix` (NOW.md §6: sources private repos for royalties, refuse exclusive). **Never
+  `scp` a whole `outreach-registry.json` over Oracle's** — it would delete this. Merge the
+  keys you need with a node one-liner instead, as done for the Megan rows. Someone should
+  commit `fermatix` (+ its draft) to `main` before it is lost.
+- ✅ **Megan (HUD/DataVendor) letter is ARMED as one-click (4 Sep).** Deal
+  `.../record/0-3/64673099185`. Send: `https://webhook.aideazz.xyz/cto/go/outreach-email/megan-hud-datavendor`
+  · FU: same URL + `-fu`. Both verified **HTTP 200** live, To `megan@hud.ai`. Registry rows
+  are on `main` **and** merged into Oracle's disk copy — the GitHub raw fallback is **dead
+  for this repo** (private repo, `fetchGithubRegistry` sends no auth token), so the Oracle
+  disk copy is the only path that works. No pm2 restart needed: the registry is read
+  per-request. ⚠️ A **duplicate draft of the same letter also sits in Zoho Drafts** — send
+  by ONE route, then delete the other, or Megan gets it twice.
 - 🚨 **DataVendor "Hansel" letter is PHISHING — DO NOT REPLY, DO NOT RE-UPLOAD (4 Sep).**
   **From `hansel.tantohari@hud-data-services.com`** — signs *"Datavendor team"* but the
   listing is on **`datavendor.ai`**, and that domain is neither DataVendor nor HUD. It is a
