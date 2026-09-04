@@ -127,6 +127,32 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+- **DONE 3 Sep — `/api` rebuilt end to end (aideazz `a17c052`, cto-aipa `9513168`).**
+  Four Runway films behind the hero, a full-bleed ticker, Elena's real A/Z logo
+  (extracted from her own asset, masked so the violet→yellow gradient flows through
+  it), and a stats band **counted from Oracle production logs**: 420+ audits,
+  14,000+ signals, 210+ sites, median 85 — floors rounded DOWN so they cannot expire.
+  Every check the API returns now carries a **`why it matters`** as well as a fix
+  (34 why / 4 fix on a live stripe.com response).
+  **Blueprint for repeating any of this: `docs/ATUONA_SITE_BUILD_BLUEPRINT.md`.**
+- **⚠️ TRAPS THAT COST TODAY — all four are in the blueprint §6, read it before
+  editing `LabApi.tsx` or trusting a deploy check:**
+  1. Editing source by **byte range** (`d[index(A):index(B)]`) destroyed code four
+     times, twice the same `ScoreRing`. One instance **blanked the live page for
+     every `?url=` audit link** — and looked fine to anyone who did not run an audit.
+     Match exact literals and assert `count == 1`.
+  2. `npm run build` **never typechecks** (esbuild strips types). Run `tsc --noEmit`.
+  3. `$?` after a pipeline is the **last** command's status — `tsc | head; echo $?`
+     printed 0 all session regardless of errors. Capture the status before any pipe.
+  4. A missing asset returns **200 with index.html** under the requested
+     content-type. Check the **size**, never the status.
+- **VERIFIED BY:** live production, not source — `aideazz.xyz/api?url=…` renders
+  (11,527 chars, score ring, 34 why), `az-mark.png` serves 77,346 bytes (not the
+  40,238-byte SPA fallback), and Oracle's `dist/visibility-audit.js` md5 matches
+  local.
+- **RISK:** the audit path can only be tested from production or curl — `API_BASE`
+  routes localhost to `:8098`, so a local preview always shows it failing.
+
 - **DONE:** NL2Repo offer form **insists** on a delivery taskset (red:
   *Select at least one delivery taskset*). Artifacts upload on that page
   is a different field and will not clear it. Harbor sample packed on
