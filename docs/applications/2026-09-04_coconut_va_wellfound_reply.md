@@ -37,6 +37,12 @@ Happy to walk through a live board on a call if useful. Panama, UTC-5.
 Elena
 ```
 
+Wellfound availability field (next week = 7–11 Sep; times in ET, job is EST; Panama is one hour behind):
+
+```
+I'm free Monday 3–6pm ET, Tuesday 11am–2pm ET, and Friday after 3pm ET
+```
+
 ---
 
 ## Ask on the call (before you invest more time)
