@@ -1,113 +1,173 @@
 #!/usr/bin/env node
 /**
- * Assert the filled Datastar NDA still contains Datastar's party,
- * Elena's verified identifiers, and zero leftover xxxxx blanks.
+ * Check the filled Datastar NDA before it is sent.
+ *
+ * Asserts that Datastar's own party block survived the fill, that Elena's
+ * identifiers are present, that no xxxxx blank is left, and that the readable
+ * renderings are not older than the document they claim to show.
+ *
+ * The expected values are NOT in this file. They live in
+ * docs/selling/datastar/expected-fields.json, because docs/selling/ is dropped
+ * by scripts/build-license-bundle.cjs while scripts/ ships — a cédula written
+ * into this script would have travelled into the DataVendor bundle.
  */
 const { execFileSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-const docx = path.join(
-  __dirname,
-  "..",
-  "docs/selling/datastar/NDA_Datastar_Elena_Revicheva_DRAFT.docx"
-);
-const txt = path.join(
-  __dirname,
-  "..",
-  "docs/selling/datastar/NDA_Datastar_Elena_Revicheva_DRAFT.txt"
-);
-const reply = path.join(
-  __dirname,
-  "..",
-  "docs/selling/datastar/REPLY_cquiroga_NDA.txt"
-);
-const pdf = path.join(
-  __dirname,
-  "..",
-  "docs/selling/datastar/NDA_Datastar_Elena_Revicheva_DRAFT.pdf"
-);
-const previews = ["page1.png", "page2.png"].map((f) =>
-  path.join(__dirname, "..", "docs/selling/datastar/preview", f)
-);
+const ROOT = path.join(__dirname, "..");
+const DIR = path.join(ROOT, "docs/selling/datastar");
 
-const py = `
-import xml.etree.ElementTree as ET, re, sys
-from zipfile import ZipFile
-path = sys.argv[1]
-with ZipFile(path) as z:
-    root = ET.fromstring(z.read("word/document.xml"))
-text = "".join(t.text or "" for t in root.iter("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t"))
-print(text)
-`;
+const docx = path.join(DIR, "NDA_Datastar_Elena_Revicheva_DRAFT.docx");
+const template = path.join(DIR, "NDA_Datastar_modelo_recibido.docx");
+const pdf = path.join(DIR, "NDA_Datastar_Elena_Revicheva_DRAFT.pdf");
+const txt = path.join(DIR, "NDA_Datastar_Elena_Revicheva_DRAFT.txt");
+const reply = path.join(DIR, "REPLY_cquiroga_NDA.txt");
+const fields = path.join(DIR, "expected-fields.json");
+const previews = [1, 2, 3, 4].map((n) => path.join(DIR, "preview", `page${n}.png`));
 
-const text = execFileSync("python3", ["-c", py, docx], { encoding: "utf8" });
 const failures = [];
-
-function must(cond, msg) {
+const must = (cond, msg) => {
   if (!cond) failures.push(msg);
+};
+
+function bail(msg) {
+  console.error("FAIL");
+  console.error(" -", msg);
+  process.exit(1);
 }
 
-must(fs.existsSync(docx), "docx missing");
-must(fs.existsSync(txt), "txt extract missing");
-must(fs.existsSync(reply), "reply draft missing");
-must(fs.existsSync(pdf), "readable pdf missing — run scripts/datastar-nda-to-pdf.cjs");
+if (!fs.existsSync(fields)) {
+  bail(`missing ${path.relative(ROOT, fields)} — cannot verify without the expected values`);
+}
+const expect = JSON.parse(fs.readFileSync(fields, "utf8"));
+
+/** Full visible text of a .docx, including text boxes. */
+function docxText(file) {
+  const py = `
+import sys, xml.etree.ElementTree as ET
+from zipfile import ZipFile
+W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+root = ET.fromstring(ZipFile(sys.argv[1]).read("word/document.xml"))
+print("".join(t.text or "" for t in root.iter(W + "t")))
+`;
+  return execFileSync("python3", ["-c", py, file], { encoding: "utf8" });
+}
+
+/** Paragraph text of every text box, in document order. */
+function docxTextBoxes(file) {
+  const py = `
+import sys, json, xml.etree.ElementTree as ET
+from zipfile import ZipFile
+W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+root = ET.fromstring(ZipFile(sys.argv[1]).read("word/document.xml"))
+out = []
+for tb in root.iter(W + "txbxContent"):
+    out.append(["".join(t.text or "" for t in p.iter(W + "t")) for p in tb.findall(W + "p")])
+print(json.dumps(out))
+`;
+  return JSON.parse(execFileSync("python3", ["-c", py, file], { encoding: "utf8" }));
+}
+
+for (const [file, label] of [
+  [docx, "filled docx"],
+  [template, "received template"],
+  [txt, "txt extract"],
+  [reply, "reply draft"],
+  [pdf, "readable pdf"],
+]) {
+  must(fs.existsSync(file), `${label} missing: ${path.relative(ROOT, file)}`);
+}
 for (const p of previews) {
-  must(fs.existsSync(p), `preview image missing: ${path.basename(p)}`);
+  must(fs.existsSync(p), `preview missing: ${path.basename(p)} — run scripts/datastar-nda-render.cjs`);
+}
+if (failures.length) {
+  console.error("FAIL");
+  for (const f of failures) console.error(" -", f);
+  process.exit(1);
 }
 
-// The PDF is only trustworthy if it is not older than the document it renders.
-if (fs.existsSync(pdf) && fs.existsSync(txt)) {
+const text = docxText(docx);
+
+must(!/\bx{4,}\b/.test(text), "leftover xxxx placeholder in the docx");
+must(text.includes(expect.cedula), `cédula ${expect.cedula} missing`);
+must(text.includes(expect.ruc), `RUC ${expect.ruc} missing`);
+must(text.includes(expect.signatureDate), "signature date missing");
+for (const s of expect.mustContain) {
+  must(text.includes(s), `missing required string: ${s}`);
+}
+for (const s of expect.mustNotContain) {
+  must(!text.includes(s), `must not appear in the NDA: ${s}`);
+}
+
+// Both parties need blank space above their name, or there is nowhere to sign.
+// Word serialises each text box twice (mc:Choice + mc:Fallback); a fix applied
+// to only one copy renders differently depending on the reader.
+const boxes = docxTextBoxes(docx);
+must(boxes.length === 4, `expected 4 text-box serialisations, found ${boxes.length}`);
+const elenaBoxes = boxes.filter((b) => b.some((l) => l.includes("ELENA REVICHEVA")));
+const datastarBoxes = boxes.filter((b) => b.some((l) => l.includes("Datastar")));
+must(elenaBoxes.length === 2, `expected 2 copies of Elena's box, found ${elenaBoxes.length}`);
+must(datastarBoxes.length === 2, `expected 2 copies of Datastar's box, found ${datastarBoxes.length}`);
+for (const b of elenaBoxes) {
+  must(b[0] === "", "Elena's signature box has no blank line for a signature");
+}
+for (const b of datastarBoxes) {
+  must(b[0] === "", "Datastar's signature box lost its blank signing line");
+}
+
+// Their template must come through untouched — it is the evidence for what we changed.
+const templateText = docxText(template);
+must(/\bx{4,}/.test(templateText), "received template no longer has its blanks — was it edited?");
+must(!templateText.includes(expect.cedula), "received template must stay unmodified");
+
+// A rendering older than the document is a rendering that lies.
+const docxTime = fs.statSync(docx).mtimeMs;
+must(
+  fs.statSync(pdf).mtimeMs >= docxTime,
+  "pdf is older than the docx — run scripts/datastar-nda-render.cjs"
+);
+for (const p of previews) {
   must(
-    fs.statSync(pdf).mtimeMs >= fs.statSync(txt).mtimeMs,
-    "pdf is older than the txt extract — regenerate it"
+    fs.statSync(p).mtimeMs >= docxTime,
+    `${path.basename(p)} is older than the docx — run scripts/datastar-nda-render.cjs`
   );
 }
 
-must(!/\bx{4,}\b/.test(text), "leftover xxxx placeholder in docx");
-must(!text.includes("2025"), "boilerplate year 2025 still in docx");
-must(text.includes("2026"), "year 2026 missing");
-must(text.includes("a los 4 días del mes de septiembre"), "signature date missing");
-
-must(text.includes("Datastar Panamá S.A"), "Datastar entity missing");
-must(text.includes("Conrado José Quiroga Granillo"), "Conrad name missing");
-must(text.includes("AAH248679"), "Conrad passport missing");
-must(text.includes("Oceanía Business Plaza Torre 2000"), "Datastar address missing");
-
-must(text.includes("Elena Revicheva"), "Elena name missing");
-must(text.includes("E-8-245573"), "cédula E-8-245573 missing");
-must(!text.includes("AE1074827"), "card serial AE1074827 must not be used as cédula");
-must(text.includes("8-NT-2-781965 DV 90"), "RUC missing");
-must(text.includes("Costa del Este"), "Costa del Este missing");
-must(text.includes("Juan Díaz") || text.includes("Juan Diaz"), "Juan Díaz missing");
-must(text.includes("portadora"), "portadora (feminine) missing");
-must(text.includes("en representación de"), "en representación de missing");
-must(text.includes("AIdeazz"), "commercial name missing");
-must(text.includes("ELENA REVICHEVA"), "signature entity missing");
-must(text.includes("persona natural extranjera"), "persona natural extranjera missing");
-must(text.includes("ocupación 21320 - Programadores Informáticos"), "occupation missing");
-
 const replyText = fs.readFileSync(reply, "utf8");
-must(replyText.includes("cquiroga@datastar.pa"), "reply To missing");
-must(replyText.includes("adriana.vargas@oracle.com"), "reply Cc Adriana missing");
-must(replyText.includes("pedro.olivares@nexsysla.com"), "reply Cc Pedro missing");
-must(replyText.includes("achavez@datastar.com.ar"), "reply Cc Alexander missing");
-must(replyText.includes("E-8-245573"), "reply states cédula");
-must(replyText.includes("8-NT-2-781965 DV 90"), "reply states RUC");
+for (const addr of expect.replyRecipients) {
+  must(replyText.includes(addr), `reply is missing recipient ${addr}`);
+}
+must(replyText.includes(expect.cedula), "reply should state the cédula");
+must(replyText.includes(expect.ruc), "reply should state the RUC");
 must(
-  /cédula/i.test(replyText) && /Do not attach the cédula/i.test(replyText),
-  "reply must warn not to attach the cédula scan"
+  /Do not attach the cédula/i.test(replyText),
+  "reply must carry the do-not-attach-the-cédula warning"
 );
-must(replyText.includes("https://aideazz.xyz/portfolio"), "reply must link portfolio");
+must(replyText.includes("https://aideazz.xyz/portfolio"), "reply must link the portfolio");
+
+// The cédula must not leak into anything the licensing bundle ships.
+const bundleSrc = fs.readFileSync(path.join(ROOT, "scripts/build-license-bundle.cjs"), "utf8");
+const dropDirs = eval(bundleSrc.match(/const DROP_DIRS = (\[[\s\S]*?\]);/)[1]);
+must(
+  dropDirs.some((d) => "docs/selling/datastar/".startsWith(d)),
+  "docs/selling/datastar/ is NOT dropped from the licensing bundle — the cédula would ship"
+);
+for (const f of ["scripts/verify-datastar-nda-fill.cjs", "scripts/datastar-nda-render.cjs"]) {
+  const src = fs.readFileSync(path.join(ROOT, f), "utf8");
+  must(!src.includes(expect.cedula), `${f} hard-codes the cédula and scripts/ ships in the bundle`);
+  must(!src.includes(expect.ruc), `${f} hard-codes the RUC and scripts/ ships in the bundle`);
+}
 
 if (failures.length) {
   console.error("FAIL");
   for (const f of failures) console.error(" -", f);
   process.exit(1);
 }
-console.log("PASS: Datastar NDA fill + reply draft");
-console.log("cédula E-8-245573 (front of carné, not MRZ serial)");
-console.log("RUC 8-NT-2-781965 DV 90");
-console.log("date 4 septiembre 2026");
-console.log("placeholders remaining: 0");
-console.log("readable: NDA_Datastar_Elena_Revicheva_DRAFT.pdf + preview/page{1,2}.png");
+
+console.log("PASS: Datastar NDA is ready to sign and send");
+console.log("  placeholders remaining ..... 0");
+console.log("  signing space .............. both parties, both serialisations");
+console.log("  card serial not used ....... confirmed");
+console.log("  renderings current ......... pdf + 4 page previews");
+console.log("  cédula in licensed bundle .. no (docs/selling/ dropped, scripts/ clean)");

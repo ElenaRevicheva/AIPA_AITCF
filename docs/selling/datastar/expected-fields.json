@@ -1,0 +1,40 @@
+{
+  "_comment": [
+    "Values the filled NDA must contain, and the strings it must NOT contain.",
+    "These live here, not in scripts/, on purpose: docs/selling/ is in DROP_DIRS of",
+    "scripts/build-license-bundle.cjs, so this file never reaches the DataVendor",
+    "bundle. A cédula hard-coded in a script under scripts/ would have shipped.",
+    "The verifier fails loudly if this file is absent rather than passing vacuously."
+  ],
+  "cedula": "E-8-245573",
+  "ruc": "8-NT-2-781965 DV 90",
+  "signatureDate": "a los 4 días del mes de septiembre de 2026",
+  "mustContain": [
+    "Datastar Panamá S.A",
+    "Conrado José Quiroga Granillo",
+    "AAH248679",
+    "Oceanía Business Plaza Torre 2000",
+    "Elena Revicheva",
+    "ELENA REVICHEVA",
+    "persona natural extranjera",
+    "de nacionalidad rusa",
+    "ocupación 21320 - Programadores Informáticos",
+    "Costa del Este",
+    "Calle Principal",
+    "Juan Díaz",
+    "AIdeazz",
+    "portadora",
+    "en representación de",
+    "2026"
+  ],
+  "mustNotContain": [
+    "AE1074827",
+    "2025"
+  ],
+  "replyRecipients": [
+    "cquiroga@datastar.pa",
+    "adriana.vargas@oracle.com",
+    "pedro.olivares@nexsysla.com",
+    "achavez@datastar.com.ar"
+  ]
+}
