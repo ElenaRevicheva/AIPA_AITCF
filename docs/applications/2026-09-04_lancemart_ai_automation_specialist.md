@@ -68,6 +68,47 @@ asking a human. He will recognise that immediately.
 If a shorter comment feels better for the format, cut to the first two paragraphs.
 Keep the sample rates and the null error code — the specifics are the credential.
 
+## STEP 1b — reply to your own comment with the receipts
+
+Post this as a REPLY to your own comment, not as a second top-level comment. A
+reply reads as "here is the evidence for what I just said"; a second comment on
+the same post reads as trying twice.
+
+```
+I write these up publicly as I hit them — aideazz.xyz/ai-ops-wiki.html
+20 incidents, 18 named failure modes, each with the log line that proved it.
+
+Three of them are your bullet points almost word for word:
+
+Resilience is opt-in. A fallback chain protects only the calls that route
+through it. Mine has five providers; one hand-rolled call bypassed the chain and
+sat on a dead vendor for two weeks while everything else failed over cleanly.
+That is your 2 AM upstream outage — and the chain did not save me from it,
+because the call never entered it.
+
+Acknowledgement is not completion. A receipt proves delivery, never processing.
+200 OK, and the thing never happened.
+
+Liveness is not correctness. A dead job announces itself. A job that runs
+perfectly and emits slightly wrong output never will.
+
+It is not a portfolio. It is the list of ways I have been wrong in production,
+with dates.
+```
+
+**Why this lands:** he asked for someone who "instruments what they build, so we
+can tell whether it is working without asking a human", and who can "reason about
+failure states, retries, and what the system does when an upstream tool goes down
+at 2 AM". Those two sentences are the wiki's subject matter. Most candidates will
+assert they think this way; this is four years of dated evidence that she does.
+
+The last line matters most. Everyone applying will send a portfolio of successes.
+A public catalogue of your own production failures, with the log lines, is a
+different category of claim — and it is the one he said he was screening for.
+
+**Verified before posting:** 20 incident files, 18 concept files, and all three
+one-liners quoted above are the exact text published on the site.
+
 ## STEP 2 — the Torre application
 
 Torre asks for expected compensation. **Do not leave it blank.**
