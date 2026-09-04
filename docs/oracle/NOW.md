@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-04 23:08 | IntelliOps addendum reply (26 Aug thread) | `docs/selling/intelliops/`, `docs/selling/drafts/intelliops-*`, `scripts/stage-hiring-outreach.cjs` (`--reuse-deal`), `.hire-trigger` after current mail-pull ends | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,6 +127,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+- **DONE 4 Sep — IntelliOps addendum staged, not sent.** Deal `64302436100`
+  (reused, not a second deal). Note `116421825140`, HIGH task `116425576481`.
+  Send: `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`
+  · To Nishant, **Cc Natalie + `elena.revicheva2016@gmail.com`**,
+  `ADDENDUM_No1_IntelliOps_BD.docx` (3,063 B). IMAP pull: 7 messages, 2 PDFs,
+  **no v3** — the 26 Aug mail is “originate first, revise later”. The addendum
+  writes the four remaining collectability items; they can sign it or accept
+  the same five clauses in a reply. Origination starts the same week they
+  accept, not before. Write-up: `docs/selling/intelliops/`.
+  Branch `cursor/intelliops-addendum-ded9` (PR). Oracle disk already has the
+  registry row — the button resolves. Files-scope write still 403.
 - **DONE 4 Sep — Datastar NDA SENT. Deal `64678307604`.**
   `https://app.hubspot.com/contacts/51409153/record/0-3/64678307604` ·
   send `https://webhook.aideazz.xyz/cto/go/outreach-email/datastar-nda`.
@@ -186,6 +197,9 @@ git log keeps the record.
   `hs-attach-deal-files.cjs` fix it, wired into staging so it is no longer
   something to remember. Rule now in `MANUAL_PROSPECT_PLAY.md`.
 - **NEXT:** Elena:
+  (0) **IntelliOps — tap** `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`.
+  Do not tap `intelliops-bd`. Do not countersign v2. Signature on the
+  addendum is optional; they can accept the five clauses in a reply.
   (1) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
   paste the Carmi answer in Wellfound Messages (not Gmail). File:
   `docs/applications/2026-09-04_coconut_va_wellfound_reply.md`. GHL Tech
@@ -209,6 +223,12 @@ git log keeps the record.
   `64531338321`) that §OPEN said lived only on Oracle's disk.** Union now reports
   `kept 0 Oracle-only`. **Search `.github/workflows/` and `git log --all` before
   building a bridge.**
+- **VERIFIED BY (IntelliOps):** Actions `33928557848` — `· reuse 64302436100`,
+  `✓ note 116421825140`, `✓ task 116425576481`, registry 374→375, Oracle
+  preview To/Cc/Adjunto 3,063 B. `verify-intelliops-addendum.cjs` PASS 42.
+- **RISK (IntelliOps):** the old slug still sends the 25 Aug letter. The CRM
+  copy of the addendum is not in HubSpot (files write 403). AIdeazz is a
+  nombre comercial — do not invent a company on their signature block.
 - **VERIFIED BY:** Actions run `33897131057` — `✓ deal 64678307604`, `✓ note`,
   `✓ task`, `registry merged`, then Oracle's own preview printing To/Cc/Adjunto.
   Oracle checkout `HEAD is now at 363ca78`, whose attachment blob
@@ -368,7 +388,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
 | 9 | **Datastar NDA** (Oracle support for AIdeazz) | ✅ **SENT 4 Sep** — deal `64678307604`, ENTREGADO to all three, stage ⏳ Sent, send-task closed, FU due 8 Sep. ⚠️ the file is **not yet in HubSpot** — upload needs the `files` scope | **Elena: tick `files` on the Service Key** (one setting), then the agent backfills. Otherwise: waiting on Conrad's countersigned copy |
 | 10 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Carmi asked Monday.com familiarity. Paste-ready answer in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: book the slot, paste the Carmi note in Wellfound.** $21–36k Monday.com SA. Do not claim Monday fluency — HubSpot + Make is the honest equivalent |
-| 11 | **IntelliOps BD** (overlay commission, not a job) | 25 Aug four-remaining-items letter **already sent**. Nishant 26 Aug (Gmail): *start originating, then we revise*. **No v3 document exists.** Still do **not** countersign v2. New addendum+reply being staged on deal `64302436100` | **Agent (this session):** finish the addendum and one-click. **Elena:** do not tap the old `intelliops-bd` button — that resends the 25 Aug letter |
+| 11 | **IntelliOps BD** (overlay commission, not a job) | Addendum **staged** 4 Sep on deal `64302436100`. No v3 exists — Nishant 26 Aug asked for unpaid origination first. Do **not** countersign v2. Do **not** tap the old `intelliops-bd` button | **Elena: tap** `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum` |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
@@ -376,13 +396,13 @@ Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{doc
 
 | Lane | Deal | Tap (full URL) |
 | --- | --- | --- |
-| Overlay commission (not a job) | IntelliOps BD | https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd |
+| Overlay commission (not a job) | IntelliOps addendum | https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum |
 | Job follow-up (applied on Torre) | BSS Groupe | https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace |
 
 BSS confirm page must show **Hire me**, **Adjunto: Elena_Revicheva_Resume.pdf**, and
 `https://aideazz.xyz/portfolio` twice. If HubSpot opens **Edit link**, paste the full URL.
 
-- IntelliOps deal `.../record/0-3/64302436100` — **do not countersign v2**
+- IntelliOps deal `.../record/0-3/64302436100` — **do not countersign v2**. New send is `intelliops-addendum`, not `intelliops-bd`
 - BSS deal `.../record/0-3/64302126655` — To: `contact@bssgroupe.com`
 - Catch-up: `docs/oracle/HANDOFF_2026-08-25_INTELLIOPS_BSS.md`
 
@@ -391,11 +411,15 @@ BSS confirm page must show **Hire me**, **Adjunto: Elena_Revicheva_Resume.pdf**,
 `cursor/datastar-nda-filled-ded9` (4 Sep) — filled Datastar NDA + reply-all draft
 in `docs/selling/datastar/`. New files only; merge is safe. Elena still has to send.
 
+`cursor/intelliops-addendum-ded9` (4 Sep) — addendum + covering email staged on
+deal `64302436100`. IMAP puller and `--reuse-deal` are on this branch; the
+registry row is already on Oracle disk. Merge is additive.
+
 `cursor/intelliops-bd-money-play-abc0`, last commit 25 Aug. Only there:
 `scripts/hs-email-link-deal.cjs`, `hs-fix-send-buttons.cjs`, `hs-intelliops-story.cjs`,
-`hs-note-intelliops-eval.cjs`, `intelliops-imap-pull.py`, `oracle-hs-note-intelliops.sh`.
+`hs-note-intelliops-eval.cjs`, `oracle-hs-note-intelliops.sh`.
 ⚠️ The branch is also **behind** `main` on many files — a naive merge would delete current
-work. Port what you want by hand; never reset.
+work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 
 ## 🔴 OPEN — do not assume these work
 
