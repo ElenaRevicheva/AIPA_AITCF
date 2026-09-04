@@ -1,1 +1,1 @@
-docs/selling/specs/datastar-nda.json --dry-run --attach-deal
+docs/selling/specs/datastar-nda.json --attach-deal
