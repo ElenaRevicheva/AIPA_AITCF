@@ -3079,5 +3079,19 @@
     "email": "megan@hud.ai",
     "dealId": "64673099185",
     "emailDraft": "docs/selling/drafts/megan-hud-datavendor-fu-email.txt"
+  },
+  "datastar-nda": {
+    "phone": "",
+    "company": "Datastar Panamá S.A.",
+    "email": "cquiroga@datastar.pa",
+    "cc": "adriana.vargas@oracle.com, elena.revicheva2016@gmail.com",
+    "emailDraft": "docs/selling/drafts/datastar-nda-email.txt",
+    "draft": "docs/selling/drafts/datastar-nda-email.txt",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/04.09.2026_NDA_Datastar_Elena_Revicheva.docx",
+        "filename": "04.09.2026_NDA_Datastar_Elena_Revicheva.docx"
+      }
+    ]
   }
 }
