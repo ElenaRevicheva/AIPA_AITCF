@@ -127,19 +127,44 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 4 Sep — Datastar NDA filled, reply-all draft ready.** Conrad asked on
-  21 Jul if Elena is OK with their model. Filled *their* template (not a rewrite).
-  Contracting party is **Elena Revicheva, persona natural**, RUC
-  `8-NT-2-781965 DV 90`, cédula **E-8-245573**, Costa del Este / Juan Díaz.
-  Files + send text: `docs/selling/datastar/` on branch
-  `cursor/datastar-nda-filled-ded9`.
-- **NEXT:** Elena: **sign the `.docx` in Word** (blank line above ELENA REVICHEVA
-  is the signing space), then Reply All to `cquiroga@datastar.pa` using
-  `docs/selling/datastar/REPLY_cquiroga_NDA.txt` with the signed **`.docx`**
-  attached — not a PDF; Datastar signs second and they make the PDF.
-  **Do not attach the cédula scan.**
-- **VERIFIED BY:** `node scripts/verify-datastar-nda-fill.cjs` → `PASS`
-  (5 guards, each tested by breaking it)
+- **DONE 4 Sep — Datastar NDA is ARMED as one-click. Deal `64678307604`.**
+  `https://app.hubspot.com/contacts/51409153/record/0-3/64678307604` ·
+  send `https://webhook.aideazz.xyz/cto/go/outreach-email/datastar-nda`.
+  `[PARTNER] Datastar Panamá S.A. — NDA (Oracle/Nexsys)`, stage 🔥 I act TODAY,
+  company `56923599228` + contact `236844611933` (both already existed, reused),
+  note `116366224737`, HIGH task `116387981992`. To `cquiroga@datastar.pa`,
+  **Cc Adriana + `elena.revicheva2016@gmail.com`**, `.docx` attached (82,436 B).
+  One click sends, moves to ⏳ Sent, stamps the note, opens a +4-day follow-up;
+  the Resend webhook then stamps ENTREGADO / ABIERTO. Contracting party is
+  **Elena Revicheva, persona natural**, RUC `8-NT-2-781965 DV 90`, cédula
+  **E-8-245573**. Docs: `docs/selling/datastar/`.
+- **NEXT:** Elena: open the deal and click **➡️ SEND BY EMAIL**. Nothing else.
+  ⚠️ **No double-send guard** — one click is one send.
+- **🚨 THE TRAP, and it nearly shipped: a signature image goes where the FLOW
+  puts it, not where it looked right while editing.** Elena's returned file had
+  her signature as an **inline** image in the body, so it rendered above
+  **Conrado's** name in Datastar's box while her own box sat blank — and Conrad
+  had nowhere to sign. The text extract is identical either way; only a RENDER
+  shows it. Fixed by extracting her signature and re-placing it inside her box
+  (`scripts/datastar-nda-sign.py`, both `mc:Choice` and `mc:Fallback`). Her
+  original kept as `AS_RECEIVED_from_Elena_04.09.2026.docx`; before/after in
+  `docs/selling/datastar/preview/`. **Always render the signature page and check
+  which name the signature sits above.**
+- **⚠️ I BUILT A SECOND HUBSPOT BRIDGE BEFORE FINDING THE ONE THAT EXISTED.**
+  `.hire-trigger` + `hire-outreach-on-trigger.yml` + `oracle-stage-hiring-outreach.sh`
+  were stranded on `cursor/fermatix-hubspot-deal-1c49`, unmerged — PART 1 §2, exactly.
+  Theirs is better (md5-snapshots `docs/selling` to pack only what a run touched;
+  unions the registry GitHub ∪ Oracle disk). Mine is deleted. **All of it is now on
+  `main`, plus the rescued `fermatix` spec, letter and registry row (deal
+  `64531338321`) that §OPEN said lived only on Oracle's disk.** Union now reports
+  `kept 0 Oracle-only`. **Search `.github/workflows/` and `git log --all` before
+  building a bridge.**
+- **VERIFIED BY:** Actions run `33897131057` — `✓ deal 64678307604`, `✓ note`,
+  `✓ task`, `registry merged`, then Oracle's own preview printing To/Cc/Adjunto.
+  Oracle checkout `HEAD is now at 363ca78`, whose attachment blob
+  `a4f3ebdf` is byte-identical to local (82,436 B) — the corrected file, not the
+  one with the signature on Datastar's side. `verify-datastar-nda-fill.cjs` PASS
+  (6 guards, each tested by breaking it); `test-outreach-attachments.cjs` 24 checks.
 - **⚠️ A cédula in `scripts/` would have shipped to DataVendor.** The verifier
   first hard-coded `E-8-245573` as an assertion literal.
   `build-license-bundle.cjs` drops `docs/selling/` but **ships `scripts/`**, so
@@ -291,7 +316,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 | 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
-| 9 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | Conrad’s 21 Jul model filled 4 Sep. Cédula E-8-245573, RUC 8-NT-2-781965 DV 90. Reply-all draft ready | **Elena: send** `docs/selling/datastar/REPLY_cquiroga_NDA.txt` + filled docx. Do not attach the cédula |
+| 9 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | ✅ **ARMED one-click** 4 Sep — deal `64678307604`, signed `.docx` attached, Cc Adriana + Elena's gmail. Signature was on Datastar's side in her returned file; re-placed in hers | **Elena: click ➡️ SEND BY EMAIL on the deal.** No double-send guard |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
@@ -322,12 +347,10 @@ work. Port what you want by hand; never reset.
 
 ## 🔴 OPEN — do not assume these work
 
-- ⚠️ **`fermatix` outreach row exists ONLY on Oracle's disk — not on `main` (found 4 Sep).**
-  Oracle's `outreach-registry.json` had **371** slugs, `main` had **370**. The extra is
-  `fermatix` (NOW.md §6: sources private repos for royalties, refuse exclusive). **Never
-  `scp` a whole `outreach-registry.json` over Oracle's** — it would delete this. Merge the
-  keys you need with a node one-liner instead, as done for the Megan rows. Someone should
-  commit `fermatix` (+ its draft) to `main` before it is lost.
+- ✅ **`fermatix` is rescued onto `main` (4 Sep)** — spec, letter and registry row
+  (deal `64531338321`). The staging union now reports `kept 0 Oracle-only`, so
+  Oracle and `main` agree. **Still never `scp` a whole `outreach-registry.json` over
+  Oracle's** — merge keys, as `oracle-stage-hiring-outreach.sh` does.
 - ✅ **Megan (HUD/DataVendor) letter is ARMED as one-click (4 Sep).** Deal
   `.../record/0-3/64673099185`. Send: `https://webhook.aideazz.xyz/cto/go/outreach-email/megan-hud-datavendor`
   · FU: same URL + `-fu`. Both verified **HTTP 200** live, To `megan@hud.ai`. Registry rows

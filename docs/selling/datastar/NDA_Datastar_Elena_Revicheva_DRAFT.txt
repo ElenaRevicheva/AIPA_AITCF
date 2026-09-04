@@ -1,0 +1,44 @@
+ACUERDO CONFIDENCIALIDAD
+
+Este Acuerdo de Confidencialidad mutua se realiza en Ciudad de Panamá, República de Panamá, entre Datastar Panamá S.A, sociedad organizada bajo las leyes de la República de Panamá, con domicilio en Corregimiento de SAN FRANCISCO, Calle Punta Colón, edificio: Oceanía Business Plaza Torre 2000, departamento: Piso 37 Oficina 37 F, Urbanización Punta Pacífica, representada por Conrado José Quiroga Granillo portador del pasaporte de identidad personal No. AAH248679, afiliadas, subsidiarias, accionistas, directores, ejecutivos, o empresa relacionada que pueda recibir la información o data de manera completa o parcial, o el análisis de dicha información denominada de aquí en adelante Parte Receptora, por una parte y por la otra, Elena Revicheva, de nacionalidad rusa, persona natural extranjera, ocupación 21320 - Programadores Informáticos, portadora de la cédula de identidad personal No. E-8-245573, en representación de ELENA REVICHEVA, persona natural inscrita en el Registro Único de Contribuyentes bajo RUC 8-NT-2-781965 DV 90 (nombre comercial AIdeazz), con afiliadas, subsidiarias o empresas relacionadas, todas con domicilio en la Urbanización Costa del Este, Calle Principal, Corregimiento Juan Díaz, Distrito Panamá, Provincia Panamá, República de Panamá, de aquí en adelante denominadas Parte Divulgadora, y en lo sucesivo de forma conjunta se denominarán las “Partes” se celebra el siguiente acuerdo de confidencialidad, en adelante el “Acuerdo”.
+
+1. Propósito. LAS PARTES manifiestan la intención ofrecer provisionamiento y servicios de tecnología respecto de la cual se ha divulgado y/o se puede divulgar información confidencial (según lo definido abajo) a la otra. Este acuerdo tiene por finalidad permitir a las partes discutir y evaluar diferentes alternativas protegiendo la información confidencial de la Contraparte contra su uso o divulgación no autorizada.
+
+2. Definición de la información confidencial. Se entiende por “información confidencial” a cualquier información oral, escrita, gráfica o legible por máquinas incluyendo, pero no limitado solamente, a la que se relaciona con patentes, usos de patente, investigación, planes, progresos de productos, características y especificaciones, documentación de productos incluyendo presentaciones y manuales de usuario, invenciones, procesos, diseños, dibujos, ingeniería, fórmulas, mercados, software (código fuente y código objeto), configuración de hardware, programas de computadora y otros equipos, algoritmos, planes de negocio, acuerdos con terceros, servicios, clientes, comercialización o las finanzas de la parte que divulga. La información se considera como confidencial cuando se identifica por escrito como tal, se expresa como propietaria, o bien, si es definida oralmente en el momento del acuerdo y ratifica por escrito dentro de un plazo no superior a 30 días corridos a partir de la fecha que se identificó como tal. Sin menosprecio de lo anterior, cualquier información proporcionada con posterioridad a la firma por cualquiera de las partes será considerada como confidencial.
+
+3. No divulgación de la información confidencial
+
+(a) LA PARTE RECEPTORA acuerda no utilizar ninguna información confidencial divulgada por la contraparte para su propio uso o para cualquier propósito con excepción de discusiones referentes y concernientes a la Evaluación. Ninguna de las partes divulgará o permitirá el acceso a cualquier información confidencial a terceros o a los empleados de la parte receptora que no estén involucrados en la Evaluación, con excepción de directores y ejecutivos. Cada parte acuerda que tomará todas las medidas razonables para evitar que sea de dominio público, proteger el secreto, evitar el acceso o uso de la información confidencial por personas distintas a las autorizadas en el presente acuerdo. Tales medidas incluirán, pero no se limitarán al mayor grado de cuidado que la parte receptora utiliza para proteger su propia información de naturaleza similar que le sea confidencial y que no podrá ser menor a los cuidados que normalmente se considerarían como razonables. Cada parte acuerda notificar por escrito al otro acerca de cualquier uso erróneo real o sospechado, malversación o acceso desautorizado de la información confidencial de la parte divulgadora.
+
+(b) excepciones. A pesar de lo anterior, ninguna de las partes tendrá responsabilidad respecto de la otra con respecto a cualquier información confidencial de la cual la parte receptora pueda probar que:
+(I) Era de dominio público cuando fue divulgado o bien llegó a ser de dominio público sin que la parte receptora hubiese cometido fallas, o hubiese sido producido por terceros.
+(II) Era información que no poseía ningún tipo de restricciones en el momento del acuerdo, según lo indicado en los documentos que posea el receptor en ese instante.
+(III) Se divulga con la aprobación escrita de la parte divulgadora de la información;
+(IV) Es conocida sin restricciones por la parte receptora, mediante una fuente distinta a la parte divulgadora sin romper el presente acuerdo ni violar los derechos que posee la parte divulgadora;
+(V) Se divulga conforme a la orden o al requisito de una corte, de algún organismo gubernamental, para lo cual la parte receptora deberá informar apenas sepa acerca de la notificación con el fin de permitir a la parte divulgadora realizar las gestiones necesarias para evitar o restringir el acceso a la información.
+
+4. Regreso de materiales. Cualquier material o documentos que hayan sido suministrado por una parte a la otra, utilizados para la Evaluación deberán ser devueltos puntualmente por la parte receptora en el plazo de diez (10) días después de que la Evaluación sea finalizada o rechazada, o bien, contados desde una solicitud escrita por la parte que cedió los materiales. El plazo se contará siempre a partir del primer evento registrado.
+
+5. Término. Las obligaciones de cada parte continuarán por un período de tiempo indefinido a contar de la firma del presente acuerdo.
+
+6. Sucesores. Los términos y las condiciones de este acuerdo se harán extensivos sobre los sucesores y subsidiarias de las partes, siempre y cuando se cuente con la autorización por escrito de la otra parte.
+
+7. Imposibilidades Legales. Si una o más provisiones del presente acuerdo son imposibles de aplicar bajo la ley vigente, las partes accederán a renegociar de buena fe esas disposiciones. En el caso que las partes no puedan alcanzar un acuerdo respecto de dicha disposición, entonces se procederá a excluir la disposición del acuerdo, en dicho caso se procederá a devolver todo material e información específico de ese punto, manteniéndose la confidencialidad acorde con lo expresado en el punto 5 del acuerdo.
+
+8. Empresas Independientes. LAS PARTES son empresas independientes y nada contenido en este acuerdo se interpretará como constitución de sociedad, joint ventures, co-propiedad o cualquier otra figura que represente una unión o empresa en común entre LAS PARTES.
+
+9. Jurisdicción. Este acuerdo y todos los actos y transacciones de conformidad a esto, derechos y obligaciones de las partes serán regidos e interpretados de acuerdo con las leyes de la república de Panamá. Cada una de las partes consiente a la jurisdicción exclusiva de las cortes competentes en la República de Panamá.
+
+10. Enmienda y renuncia. Cualquier término de este acuerdo se puede enmendar por escrito con el consentimiento de todas las partes. Cualquier enmienda o renuncia efectuada de acuerdo con esta sección se enmarcará en los términos señalados en el punto (6) Sucesores. La falta de no exigir cumplir ninguna disposición de este acuerdo por una parte no constituirá desistimiento de ningún tipo respecto del acuerdo. LAS PARTES han suscrito este acuerdo de confidencialidad en la fecha señalada en el primer párrafo del acuerdo. El presente Acuerdo se firma en dos (2) ejemplares de idéntico tenor y fecha, quedando uno en poder de cada parte a los 4 días del mes de septiembre de 2026.
+
+Datastar Panamá S.A.
+
+Conrado José Quiroga Granillo
+
+Representante Legal
+
+ELENA REVICHEVA
+
+Elena Revicheva
+
+Representante Legal
