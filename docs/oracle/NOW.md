@@ -127,6 +127,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+- **DONE 4 Sep — Datastar NDA filled, reply-all draft ready.** Conrad asked on
+  21 Jul if Elena is OK with their model. Filled *their* template (not a rewrite).
+  Contracting party is **Elena Revicheva, persona natural**, RUC
+  `8-NT-2-781965 DV 90`, cédula **E-8-245573**, Costa del Este / Juan Díaz.
+  Files + send text: `docs/selling/datastar/` on branch
+  `cursor/datastar-nda-filled-ded9`.
+- **NEXT:** Elena: Reply All to `cquiroga@datastar.pa` using
+  `docs/selling/datastar/REPLY_cquiroga_NDA.txt` and attach
+  `NDA_Datastar_Elena_Revicheva_DRAFT.docx`. **Do not attach the cédula scan.**
+- **VERIFIED BY:** `node scripts/verify-datastar-nda-fill.cjs` → `PASS`
+- **RISK:** the number on the *back* of the carné (`AE1074827`, also in the MRZ)
+  is the plastic serial. The cédula is **E-8-245573** on the *front*. Do not
+  “correct” it. AIdeazz is a commercial name, not a S.A. — do not invent one.
+
 - **DONE 4 Sep — EspaLuz WhatsApp TUTOR-mode audio fixed** (EspaLuzWhatsApp `9029b1f`,
   live on Oracle 10:49:22 UTC). Users could not open the voice note in tutor mode;
   translate mode was fine. Cause: `generate_tts_audio()` builds the reply from gTTS
@@ -261,6 +275,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 | 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
+| 9 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | Conrad’s 21 Jul model filled 4 Sep. Cédula E-8-245573, RUC 8-NT-2-781965 DV 90. Reply-all draft ready | **Elena: send** `docs/selling/datastar/REPLY_cquiroga_NDA.txt` + filled docx. Do not attach the cédula |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
@@ -279,6 +294,9 @@ BSS confirm page must show **Hire me**, **Adjunto: Elena_Revicheva_Resume.pdf**,
 - Catch-up: `docs/oracle/HANDOFF_2026-08-25_INTELLIOPS_BSS.md`
 
 ## 🌿 Stranded on the Cursor branch — do not lose, do not reset
+
+`cursor/datastar-nda-filled-ded9` (4 Sep) — filled Datastar NDA + reply-all draft
+in `docs/selling/datastar/`. New files only; merge is safe. Elena still has to send.
 
 `cursor/intelliops-bd-money-play-abc0`, last commit 25 Aug. Only there:
 `scripts/hs-email-link-deal.cjs`, `hs-fix-send-buttons.cjs`, `hs-intelliops-story.cjs`,
