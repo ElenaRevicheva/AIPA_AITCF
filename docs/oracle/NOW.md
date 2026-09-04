@@ -133,16 +133,28 @@ git log keeps the record.
   `cursor/hud-vendor-license-1c49`:
   `docs/selling/harbor/nl2repo-fail-closed-gate.zip` (8 files, `task.toml`
   inside the folder). Golden 9/9; empty 0/9 (false-positive closed).
-- **NEXT:** Taskset listing **created** 3 Sep (Add supply → Primary asset
-  type *Taskset* exists). It sits in **Proposals** with a *Publish
-  listing* action — a proposal is not inventory, so it must be published
-  or the offer picker stays empty. Then offer: refresh, select it, retype
-  1 × $600, paste Assumptions, Artifacts empty, Submit.
-  ⚠️ **Pricing is inside the Required "Listing metadata" gate** — a blank
-  price fails QC. Set $600 on the listing.
-  ⚠️ **The repo is private, so `raw.githubusercontent.com` 404s.** Download
-  the zip from the logged-in blob page — link is in
-  `docs/selling/drafts/hud-nl2repo-taskset-listing.txt` (HUD branch).
+- **DONE 3 Sep:** taskset listing **built and submitted to the NL2Repo
+  opportunity** — `NL2Repo sample — fail-closed number gate`, Harbor zip
+  attached as the asset, tag Coding/SWE, Buy now **$600** (1 task × $600),
+  plus the buyer note (paid sample, batch after QC, non-exclusive, no
+  asserted pass rates). **That submission is already a bid.**
+- **NEXT:** 🚫 **Stop retrying Submit offer — it cannot be cleared from the
+  vendor UI.** Measured 3 Sep: `My listings` = **Active 2, In review 0,
+  Draft 0**, NL2Repo taskset **Active** at $600 — so the empty picker is
+  **not** a QC delay. **"Harbor tasksets" (upload a zip on a listing) ≠
+  "HUD tasksets" (team inventory)**, and the picker reads inventory. The
+  zip in **Artifacts** does not clear the red line either. Getting into
+  inventory needs the HUD side (org invite / API key / CLI), which Elena
+  does not have. **Elena: send the one platform question** —
+  `docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`: accept the
+  listing submission as the offer, or tell her how to push a Harbor bundle
+  into HUD team inventory. Buyer contact on the brief, or Megan on the
+  Cal.com thread. Do not email the lab.
+  ⚠️ Pricing sits inside the Required "Listing metadata" gate — never blank.
+  ⚠️ The repo is private, so `raw.githubusercontent.com` 404s; download the
+  zip from the logged-in blob page. Pastes and gate table:
+  `docs/selling/drafts/hud-nl2repo-taskset-listing.txt` and
+  `docs/selling/HUD_VENDOR_LICENSE.md` (HUD branch).
 - **VERIFIED BY:** `python3 scripts/test-nl2repo-fail-closed-gate.py` →
   `PASS: golden… 9 passed` then `PASS: empty workspace failed`;
   `node scripts/pack-nl2repo-harbor-zip.cjs` → 8 files, 5687 bytes.
@@ -198,7 +210,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
 | 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
-| 8 | **HUD — NL2 Repo Tasks** ($600/task) | Form filled 1×$600. Red: select a delivery **taskset**. Zip ready on HUD branch | **Elena: upload `nl2repo-fail-closed-gate.zip` as a new taskset listing, then select it and Submit. Not the eight-pack** |
+| 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
