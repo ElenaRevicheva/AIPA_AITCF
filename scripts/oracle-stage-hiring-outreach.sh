@@ -43,6 +43,58 @@ if [ "$SPEC" = "close-send-tasks" ]; then
   exit "$RC"
 fi
 
+# Attach mode: upload a slug's attachments into HubSpot and hang them off the
+# deal's note. Reads the registry, writes only to HubSpot.
+if [ "$SPEC" = "attach-files" ]; then
+  echo "--- fetching $REF ---"
+  git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
+  git checkout FETCH_HEAD -- \
+    scripts/hs-attach-deal-files.cjs \
+    scripts/hs-files.cjs \
+    scripts/hs-env.cjs 2>&1 || { echo "FATAL: checkout of attach scripts failed"; exit 1; }
+
+  # The registry names the files; union GitHub's copy over the disk so a
+  # lagging checkout cannot hide the slug we were asked to attach.
+  git show "FETCH_HEAD:docs/selling/outreach-registry.json" > /tmp/gh-attach-registry.json 2>/dev/null \
+    || { echo "FATAL: GitHub registry missing on $REF"; exit 1; }
+  node -e '
+    const fs = require("fs");
+    const gh = JSON.parse(fs.readFileSync("/tmp/gh-attach-registry.json", "utf8"));
+    let disk = {};
+    try { disk = JSON.parse(fs.readFileSync("docs/selling/outreach-registry.json", "utf8")); } catch {}
+    const out = { ...disk, ...gh };
+    fs.writeFileSync("docs/selling/outreach-registry.json", JSON.stringify(out, null, 2) + "\n");
+    console.log("  registry keys:", Object.keys(out).length);
+  ' || exit 1
+
+  # And the files themselves must be on disk to be uploaded.
+  ATTACH_PATHS=$(node -e '
+    const fs=require("fs");
+    const reg=JSON.parse(fs.readFileSync("docs/selling/outreach-registry.json","utf8"));
+    const want=process.argv[1]||"";
+    const rows=Object.entries(reg).filter(([s,v])=>{
+      if(!v.attachments||!v.attachments.length) return false;
+      if(!want) return true;
+      return s===want || String(v.dealId||"")===want;
+    });
+    console.log([...new Set(rows.flatMap(([,v])=>v.attachments.map(a=>a.path)))].join(" "));
+  ' "$(printf '%s\n' "${FLAGS[@]}" | sed -n 's/^--\(slug\|deal\)=//p' | head -n1)")
+  if [ -n "$ATTACH_PATHS" ]; then
+    # shellcheck disable=SC2086
+    git checkout FETCH_HEAD -- $ATTACH_PATHS 2>&1 || { echo "FATAL: attachment checkout failed"; exit 1; }
+    echo "--- files on disk: $ATTACH_PATHS ---"
+  fi
+
+  echo "--- node scripts/hs-attach-deal-files.cjs ${FLAGS[*]-} ---"
+  set +e
+  node scripts/hs-attach-deal-files.cjs "${FLAGS[@]}" 2>&1
+  RC=$?
+  set -e
+  echo "--- attach exit code: $RC ---"
+  rm -f /tmp/stage-hiring-output.tar.gz /tmp/gh-attach-registry.json
+  exit "$RC"
+fi
+
 # Named files only. Oracle's checkout is meant to lag; never git pull.
 echo "--- fetching $REF ---"
 git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }

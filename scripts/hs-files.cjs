@@ -1,0 +1,159 @@
+/**
+ * hs-files.cjs — put a file INTO HubSpot and hang it off a note.
+ *
+ * Why this exists: outreach attachments lived only in the repo and travelled
+ * only through Resend. So a letter went out with the signed NDA attached, and
+ * the CRM record of that letter had no file on it — anyone opening the deal,
+ * or Elena sending the second option (HubSpot UI Email), had nothing to attach.
+ * The Datastar NDA, 4 Sep 2026, is the case that made it obvious.
+ *
+ * Two calls, both idempotent:
+ *   uploadOutreachFile(...)  — reuses an existing file of the same name in the
+ *                              same folder instead of creating a duplicate
+ *   addNoteAttachments(...)  — unions onto hs_attachment_ids, never replaces
+ *
+ * Needs the `files` scope on the Service Key, which the CRM scopes do not
+ * imply. filesScopeOk() checks it so a caller can say so plainly rather than
+ * failing on a 403 mid-write.
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const { hubspotKey, hubspotBase } = require('./hs-env.cjs');
+
+/** Where uploaded outreach attachments live in HubSpot's file manager. */
+const FOLDER_PATH = '/outreach-attachments';
+
+/** hs_attachment_ids is a SEMICOLON-separated list, not comma. */
+const ATTACH_SEP = ';';
+
+const MIME = {
+  '.pdf': 'application/pdf',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+};
+
+function authHeaders() {
+  const key = hubspotKey();
+  if (!key) throw new Error('HUBSPOT_API_KEY missing (environment or .env)');
+  return { Authorization: `Bearer ${key}` };
+}
+
+async function api(method, urlPath, { json, form } = {}) {
+  const headers = authHeaders();
+  if (json) headers['Content-Type'] = 'application/json';
+  const r = await fetch(`${hubspotBase()}${urlPath}`, {
+    method,
+    headers,
+    body: form || (json ? JSON.stringify(json) : undefined),
+  });
+  const text = await r.text();
+  let parsed = null;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    /* non-JSON is the finding */
+  }
+  return { ok: r.ok, status: r.status, json: parsed, text };
+}
+
+/** True when the Service Key can use the Files API at all. */
+async function filesScopeOk() {
+  const r = await api('GET', '/files/v3/files?limit=1');
+  if (r.ok) return { ok: true };
+  if (r.status === 403) {
+    return {
+      ok: false,
+      reason:
+        'the Service Key is missing the `files` scope — HubSpot → Development → Keys → ' +
+        'Service Keys → Aldeazz_Marketing_Engine → add `files`, then re-run',
+    };
+  }
+  return { ok: false, reason: `Files API returned ${r.status}: ${r.text.slice(0, 160)}` };
+}
+
+async function findExistingFile(name) {
+  const q = new URLSearchParams({ name, limit: '10' });
+  const r = await api('GET', `/files/v3/files/search?${q}`);
+  if (!r.ok) return null;
+  const hit = (r.json?.results || []).find(
+    (f) => f.name === path.parse(name).name || f.name === name,
+  );
+  return hit || null;
+}
+
+/**
+ * Upload one attachment. Returns { id, name, reused }.
+ * `access: PRIVATE` — a signed contract must not become a public URL.
+ */
+async function uploadOutreachFile(absPath, displayName) {
+  if (!fs.existsSync(absPath)) throw new Error(`no such file: ${absPath}`);
+  const name = displayName || path.basename(absPath);
+
+  const existing = await findExistingFile(name);
+  if (existing?.id) return { id: String(existing.id), name, reused: true };
+
+  const ext = path.extname(name).toLowerCase();
+  const form = new FormData();
+  form.append('file', new Blob([fs.readFileSync(absPath)], { type: MIME[ext] || 'application/octet-stream' }), name);
+  form.append('fileName', name);
+  form.append('folderPath', FOLDER_PATH);
+  form.append(
+    'options',
+    JSON.stringify({
+      access: 'PRIVATE',
+      overwrite: false,
+      duplicateValidationStrategy: 'RETURN_EXISTING',
+      duplicateValidationScope: 'EXACT_FOLDER',
+    }),
+  );
+
+  const r = await api('POST', '/files/v3/files', { form });
+  if (!r.ok) throw new Error(`upload failed ${r.status}: ${r.text.slice(0, 200)}`);
+  const id = r.json?.id;
+  if (!id) throw new Error(`upload returned no id: ${r.text.slice(0, 160)}`);
+  return { id: String(id), name, reused: false };
+}
+
+/** Union file ids onto a note. Returns { before, after, added }. */
+async function addNoteAttachments(noteId, fileIds) {
+  const cur = await api('GET', `/crm/v3/objects/notes/${noteId}?properties=hs_attachment_ids`);
+  if (!cur.ok) throw new Error(`note ${noteId} not readable: ${cur.text.slice(0, 160)}`);
+  const before = String(cur.json?.properties?.hs_attachment_ids || '')
+    .split(/[;,]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const after = [...new Set([...before, ...fileIds.map(String)])];
+  const added = after.filter((id) => !before.includes(id));
+  if (!added.length) return { before, after, added };
+
+  const r = await api('PATCH', `/crm/v3/objects/notes/${noteId}`, {
+    json: { properties: { hs_attachment_ids: after.join(ATTACH_SEP) } },
+  });
+  if (!r.ok) throw new Error(`note attach failed ${r.status}: ${r.text.slice(0, 200)}`);
+  return { before, after, added };
+}
+
+/** The outreach note on a deal — the one carrying the SEND anchor. */
+async function findOutreachNoteId(dealId) {
+  const assoc = await api('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`);
+  const ids = (assoc.json?.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
+  let fallback = null;
+  for (const id of ids) {
+    const n = await api('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`);
+    const body = n.json?.properties?.hs_note_body || '';
+    if (/SEND BY EMAIL/i.test(body)) return String(id);
+    if (!fallback) fallback = String(id);
+  }
+  return fallback;
+}
+
+module.exports = {
+  FOLDER_PATH,
+  ATTACH_SEP,
+  filesScopeOk,
+  uploadOutreachFile,
+  addNoteAttachments,
+  findOutreachNoteId,
+};

@@ -48,8 +48,8 @@ jobs:
           # Two shapes: a spec path to stage a deal, or the literal
           # close-send-tasks to sweep send-tasks whose letter already went out.
           # Both are HubSpot writes on Oracle, which is what this bridge is for.
-          if [ "$SPEC" = "close-send-tasks" ]; then
-            echo "Mode: close-send-tasks"
+          if [ "$SPEC" = "close-send-tasks" ] || [ "$SPEC" = "attach-files" ]; then
+            echo "Mode: $SPEC"
           elif echo "$SPEC" | grep -Eq '^docs/selling/specs/[a-z0-9-]+\.json$'; then
             [ -f "$SPEC" ] || { echo "::error::$SPEC is not in this commit"; exit 1; }
           else
@@ -62,9 +62,10 @@ jobs:
             case "$f" in
               # --attach-deal only fills dealId on an entry that already exists;
               # the script still refuses if that entry already points at a deal.
-              # --deal=<digits> scopes the send-task sweep to one deal.
+              # --deal=<digits>/--slug=<slug> scope a sweep or attach to one deal.
               --dry-run|--attach-deal|--all) ;;
               --deal=[0-9]*) ;;
+              --slug=[a-z0-9-]*) ;;
               *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
             esac
           done

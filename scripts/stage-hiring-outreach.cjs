@@ -361,6 +361,33 @@ async function main() {
     `  ✓ registry "${slug}" ${existing ? 'merged' : 'added'} (${before} → ${Object.keys(registry).length} entries)`,
   );
 
+  // 9 ── Put the attachments INTO HubSpot, not just into the Resend payload.
+  //      Without this the deal shows a letter that claims an attachment and
+  //      carries no file, and the HubSpot UI Email option — the one the play
+  //      calls the best CRM trail — has nothing to attach. Idempotent, so a
+  //      re-stage never duplicates a file.
+  if (attachments.length) {
+    try {
+      const { filesScopeOk, uploadOutreachFile, addNoteAttachments } = require('./hs-files.cjs');
+      const scope = await filesScopeOk();
+      if (!scope.ok) {
+        console.warn(`  ⚠ files not attached in HubSpot: ${scope.reason}`);
+      } else if (n.ok) {
+        const ids = [];
+        for (const a of attachments) {
+          const up = await uploadOutreachFile(path.join(ROOT, a.path), a.filename);
+          ids.push(up.id);
+          console.log(`  ${up.reused ? '·' : '✓'} hs file ${up.id} ${up.name}${up.reused ? ' (reused)' : ''}`);
+        }
+        const res = await addNoteAttachments(n.json.id, ids);
+        console.log(`  ✓ note ${n.json.id} attachments ${res.before.length} → ${res.after.length}`);
+      }
+    } catch (e) {
+      // A missing CRM copy is untidy; it must not undo a staged deal.
+      console.warn(`  ⚠ HubSpot file attach failed: ${e.message.slice(0, 140)}`);
+    }
+  }
+
   console.log(`\n  Deal:  https://app.hubspot.com/contacts/51409153/record/0-3/${dealId}`);
   console.log(`  Send:  ${sendUrl}\n`);
 }
