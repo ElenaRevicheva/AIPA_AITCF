@@ -214,8 +214,38 @@ const OUTREACH_ATTACH_DIR = 'docs/selling/attachments/';
 const OUTREACH_ATTACH_MAX_BYTES = 5 * 1024 * 1024;
 
 /**
- * Only PDFs under docs/selling/attachments/. Rejects `..`, absolute paths, and
- * anything that is not a .pdf — this list is what Resend will attach, so it is
+ * Attachment types this path will send, each pinned to the magic bytes that prove
+ * the file really is what its extension claims.
+ *
+ * `.docx` exists because a contract that the counterparty still has to SIGN cannot
+ * be a PDF — Datastar signs the NDA after Elena and produces the PDF themselves.
+ * Sending a flattened PDF would have made the attachment useless for its purpose.
+ *
+ * A `.docx` is a zip, so its magic is `PK\x03\x04` — shared with every other zip.
+ * That is weaker evidence than `%PDF-`, so the extension allowlist below stays the
+ * real gate and the magic check only catches a file that is not a zip at all.
+ */
+const OUTREACH_ATTACH_TYPES: Record<string, { magic: Buffer; contentType: string }> = {
+  pdf: { magic: Buffer.from('%PDF-', 'ascii'), contentType: 'application/pdf' },
+  docx: {
+    magic: Buffer.from([0x50, 0x4b, 0x03, 0x04]),
+    contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  },
+};
+const OUTREACH_ATTACH_EXT_RE = new RegExp(`\\.(${Object.keys(OUTREACH_ATTACH_TYPES).join('|')})$`, 'i');
+
+function outreachAttachExt(name: string): string {
+  return (name.match(OUTREACH_ATTACH_EXT_RE)?.[1] || '').toLowerCase();
+}
+
+/** Content type for a resolved attachment, by extension. */
+export function outreachAttachmentContentType(filename: string): string {
+  return OUTREACH_ATTACH_TYPES[outreachAttachExt(filename)]?.contentType || 'application/octet-stream';
+}
+
+/**
+ * Only allowlisted types under docs/selling/attachments/. Rejects `..`, absolute
+ * paths, and any other extension — this list is what Resend will attach, so it is
  * the choke point.
  */
 export function parseOutreachAttachmentSpec(raw: unknown): { relPath: string; filename: string } | null {
@@ -225,10 +255,13 @@ export function parseOutreachAttachmentSpec(raw: unknown): { relPath: string; fi
   if (!pathRaw.startsWith(OUTREACH_ATTACH_DIR)) return null;
   if (pathRaw.includes('..') || pathRaw.includes('\0')) return null;
   const base = path.posix.basename(pathRaw);
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.pdf$/i.test(base)) return null;
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.[A-Za-z0-9]{2,4}$/.test(base)) return null;
+  if (!outreachAttachExt(base)) return null;
   if (path.posix.normalize(pathRaw) !== pathRaw) return null;
   const wantName = String(rec.filename || base).trim();
-  if (!/^[A-Za-z0-9][A-Za-z0-9._ -]{0,120}\.pdf$/i.test(wantName)) return null;
+  if (!/^[A-Za-z0-9][A-Za-z0-9._ -]{0,120}\.[A-Za-z0-9]{2,4}$/.test(wantName)) return null;
+  // The name the recipient sees must not claim a different type than the file is.
+  if (outreachAttachExt(wantName) !== outreachAttachExt(base)) return null;
   return { relPath: pathRaw, filename: wantName };
 }
 
@@ -264,8 +297,10 @@ export async function resolveOutreachAttachments(
   for (const spec of specs) {
     const parsed = parseOutreachAttachmentSpec(spec);
     if (!parsed) return null;
+    const type = OUTREACH_ATTACH_TYPES[outreachAttachExt(parsed.filename)];
+    if (!type) return null;
     const buf = await readOutreachBinary(parsed.relPath);
-    if (!buf || buf.subarray(0, 5).toString('ascii') !== '%PDF-') return null;
+    if (!buf || !buf.subarray(0, type.magic.length).equals(type.magic)) return null;
     out.push({ filename: parsed.filename, bytes: buf.length, relPath: parsed.relPath });
   }
   return out;
@@ -358,8 +393,12 @@ async function buildOutreachEmailPayload(
  * 1) Local Oracle disk registry+drafts (fast path after git pull)
  * 2) GitHub main raw fallback — fixes the recurring UI 404 when agents stage
  *    locally but Oracle has not pulled yet (as long as GitHub is pushed).
+ *
+ * Exported so a letter can be inspected before it is sent — recipient, Cc and
+ * attachment list — without a send. Read-only: it touches no network but the
+ * registry fallback and sends nothing.
  */
-async function loadOutreachEmailBySlug(slug: string): Promise<OutreachEmailPayload | null> {
+export async function loadOutreachEmailBySlug(slug: string): Promise<OutreachEmailPayload | null> {
   try {
     let localReg: Record<string, OutreachRegistryEntry> | null = null;
     try {
@@ -462,7 +501,9 @@ async function sendOutreachEmailViaResend(p: OutreachEmailPayload): Promise<stri
     attachments.push({
       filename: a.filename,
       content: buf.toString('base64'),
-      content_type: 'application/pdf',
+      // Was hardcoded to application/pdf. A .docx labelled application/pdf either
+      // fails to open or opens as garbage, so the type follows the extension.
+      content_type: outreachAttachmentContentType(a.filename),
     });
   }
   const r = await fetch('https://api.resend.com/emails', {
