@@ -73,6 +73,21 @@ if [ "$SPEC" = "intelliops-mail" ]; then
       cat /tmp/intelliops-mail/transcript.txt
       echo "--- END TRANSCRIPT ---"
     fi
+    # A PDF whose text could not be extracted here still has to be readable by
+    # the agent, and the artifact route is closed to it. Small ones travel as
+    # base64 through the log, which is the same private channel as the
+    # transcript. Capped so a scanned 5 MB contract cannot flood the run.
+    for f in /tmp/intelliops-mail/*.pdf; do
+      [ -f "$f" ] || continue
+      SZ=$(stat -c %s "$f")
+      if [ "$SZ" -le 150000 ]; then
+        echo "--- BEGIN B64 $(basename "$f") $SZ ---"
+        base64 -w 200 "$f"
+        echo "--- END B64 $(basename "$f") ---"
+      else
+        echo "--- SKIP B64 $(basename "$f") $SZ bytes (over 150000 cap) ---"
+      fi
+    done
   else
     echo "--- nothing to pack ---"
   fi
