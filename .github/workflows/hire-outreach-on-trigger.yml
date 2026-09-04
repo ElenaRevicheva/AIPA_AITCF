@@ -66,6 +66,7 @@ jobs:
               # --deal=<digits>/--slug=<slug> scope a sweep or attach to one deal.
               --dry-run|--attach-deal|--all) ;;
               --deal=[0-9]*) ;;
+              --reuse-deal=[0-9]*) ;;
               --slug=[a-z0-9-]*) ;;
               *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
             esac

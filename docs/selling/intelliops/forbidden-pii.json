@@ -1,0 +1,12 @@
+{
+  "_comment": [
+    "Identifiers that must never appear in this addendum or in any script.",
+    "Lives under docs/selling/ so build-license-bundle.cjs drops it. Do not copy",
+    "these literals into scripts/ — that is the leak the Datastar verifier earned."
+  ],
+  "mustNotAppear": [
+    "E-8-245573",
+    "8-NT-2-781965",
+    "AE1074827"
+  ]
+}
