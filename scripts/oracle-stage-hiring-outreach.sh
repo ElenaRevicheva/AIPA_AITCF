@@ -25,6 +25,24 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
+# Sweep mode: close send-tasks whose letter demonstrably went out. Writes no
+# registry and creates nothing, so it skips the whole staging path below.
+if [ "$SPEC" = "close-send-tasks" ]; then
+  echo "--- fetching $REF ---"
+  git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
+  git checkout FETCH_HEAD -- \
+    scripts/hs-close-sent-send-tasks.cjs \
+    scripts/hs-env.cjs 2>&1 || { echo "FATAL: checkout of sweep script failed"; exit 1; }
+  echo "--- node scripts/hs-close-sent-send-tasks.cjs ${FLAGS[*]-} ---"
+  set +e
+  node scripts/hs-close-sent-send-tasks.cjs "${FLAGS[@]}" 2>&1
+  RC=$?
+  set -e
+  echo "--- sweep exit code: $RC ---"
+  rm -f /tmp/stage-hiring-output.tar.gz
+  exit "$RC"
+fi
+
 # Named files only. Oracle's checkout is meant to lag; never git pull.
 echo "--- fetching $REF ---"
 git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }

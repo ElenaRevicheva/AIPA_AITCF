@@ -215,7 +215,17 @@ async function main() {
   for (const a of attachments) console.log(`  · adjunto ${a.filename}`);
 
   const dealName = spec.dealName || `[HIRING-MANUAL] ${spec.name} — ${spec.company}`;
-  const lane = dealName.startsWith('[LICENSE]') ? 'Licence-lane' : 'Hiring-lane';
+  // Read the lane off the prefix instead of testing one value. A [PARTNER] deal
+  // was being labelled "Send Hiring email → …" on its task, which is the wrong
+  // lane in front of Elena on a legal NDA.
+  const LANES = {
+    LICENSE: 'Licence',
+    PARTNER: 'Partner',
+    'HIRING-MANUAL': 'Hiring',
+    'CLIENT-MANUAL': 'Client',
+  };
+  const prefix = (dealName.match(/^\[([A-Z-]+)\]/) || [])[1] || '';
+  const lane = LANES[prefix] || 'Outreach';
 
   if (DRY) {
     console.log(`  · would create company/contact/deal/note/task for ${spec.name} <${spec.email}>`);
@@ -313,7 +323,7 @@ async function main() {
   due.setHours(23, 59, 0, 0);
   const task = await hs('POST', '/crm/v3/objects/tasks', {
     properties: {
-      hs_task_subject: `Send ${lane.replace('-lane', '')} email → ${spec.company}`,
+      hs_task_subject: `Send ${lane} email → ${spec.company}`,
       hs_task_body:
         `Open the deal note → ➡️ SEND BY EMAIL (aipa@ → ${spec.email}). ` +
         `Or HubSpot UI Email from aipa@aideazz.xyz. Do not connect GitHub in this first email.`,

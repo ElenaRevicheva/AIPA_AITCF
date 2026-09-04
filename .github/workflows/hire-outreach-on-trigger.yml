@@ -45,18 +45,26 @@ jobs:
           esac
 
           SPEC=$(echo "$LINE" | awk '{print $1}')
-          if ! echo "$SPEC" | grep -Eq '^docs/selling/specs/[a-z0-9-]+\.json$'; then
-            echo "::error::spec path must be docs/selling/specs/<slug>.json, got '$SPEC'"
+          # Two shapes: a spec path to stage a deal, or the literal
+          # close-send-tasks to sweep send-tasks whose letter already went out.
+          # Both are HubSpot writes on Oracle, which is what this bridge is for.
+          if [ "$SPEC" = "close-send-tasks" ]; then
+            echo "Mode: close-send-tasks"
+          elif echo "$SPEC" | grep -Eq '^docs/selling/specs/[a-z0-9-]+\.json$'; then
+            [ -f "$SPEC" ] || { echo "::error::$SPEC is not in this commit"; exit 1; }
+          else
+            echo "::error::first token must be docs/selling/specs/<slug>.json or close-send-tasks, got '$SPEC'"
             exit 1
           fi
-          [ -f "$SPEC" ] || { echo "::error::$SPEC is not in this commit"; exit 1; }
 
           FLAGS=$(echo "$LINE" | cut -s -d' ' -f2-)
           for f in $FLAGS; do
             case "$f" in
               # --attach-deal only fills dealId on an entry that already exists;
               # the script still refuses if that entry already points at a deal.
-              --dry-run|--attach-deal) ;;
+              # --deal=<digits> scopes the send-task sweep to one deal.
+              --dry-run|--attach-deal|--all) ;;
+              --deal=[0-9]*) ;;
               *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
             esac
           done
