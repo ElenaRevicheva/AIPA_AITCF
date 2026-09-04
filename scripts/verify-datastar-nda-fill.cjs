@@ -174,8 +174,16 @@ const tracked = execFileSync("git", ["ls-files", "docs/selling/datastar"], {
 })
   .split("\n")
   .filter(Boolean);
+// Match the ignore patterns, not the word "signature" anywhere in a path: the
+// before/after page renders are legitimate evidence and their filenames happen
+// to contain it. What must never be tracked here is a signed document or a
+// signature SOURCE image.
 for (const f of tracked) {
-  must(!/SIGNED|firma|signature/i.test(f), `signature material is tracked in git: ${f}`);
+  const base = path.basename(f);
+  must(
+    !/SIGNED.*\.docx$/i.test(base) && !/^(firma|signature)[^/]*\.(png|jpe?g)$/i.test(base),
+    `signature material is tracked in git: ${f}`,
+  );
 }
 
 // The cédula must not leak into anything the licensing bundle ships.
