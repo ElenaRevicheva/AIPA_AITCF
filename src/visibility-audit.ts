@@ -33,6 +33,14 @@ export interface AuditCheck {
   detail: string;
   /** Concrete action that flips this check to pass. Only set when not passing. */
   fix?: string;
+  /**
+   * Why this check exists, in the reader's terms. Set on EVERY check, passing or
+   * not — a `fix` is only useful to someone already failing, and an audit that
+   * says nothing about the 30 things you got right teaches nothing and reads like
+   * a pass/fail list. Evergreen prose: never mention the observed value, or it
+   * stops being true for the next site.
+   */
+  why?: string;
 }
 
 export interface CategoryScore {
@@ -108,6 +116,74 @@ const AI_CRAWLERS: Array<{ engine: string; crawler: string }> = [
   { engine: 'Gemini (Google AI)', crawler: 'Google-Extended' },
   { engine: 'LLM training corpora', crawler: 'CCBot' },
 ];
+
+
+/**
+ * Why each check exists, keyed by id. Kept as a lookup attached once at the end
+ * rather than inline on 34 push() calls: one place to read, one place to edit, and
+ * a missing entry cannot silently change a check's status.
+ */
+const CHECK_WHY: Record<string, string> = {
+  'http-response':
+    "If the server does not hand back a readable page, nothing after this matters: no crawler ever sees the content.",
+  'robots-txt':
+    "robots.txt is the first file every crawler requests. When it is missing or malformed, each engine guesses -- and they guess differently.",
+  'llms-txt':
+    "The emerging convention for telling AI models what a site offers, in plain markdown they can read without parsing the HTML.",
+  'sitemap':
+    "A sitemap is how a crawler finds pages nothing links to prominently. Without one, deeper pages may never be fetched at all.",
+  'no-noindex':
+    "A noindex tag removes the page from engines entirely. One stray line can drop a page out of every answer engine at once.",
+  'json-ld':
+    "Structured data states facts in a form a machine does not have to infer. Inference is where engines get a business wrong.",
+  'schema-identity':
+    "Identity schema is how an engine knows WHO is speaking. Without it, the claims on the page are unattributed text.",
+  'schema-answer':
+    "Answer-shaped schema lets an engine lift a complete answer verbatim instead of paraphrasing the page and risking the meaning.",
+  'entity-links':
+    "sameAs links tie a page to profiles engines already trust. That is how a name becomes a recognised entity rather than a string.",
+  'open-graph':
+    "Open Graph is read by several AI retrievers, not only social previews. It is often the exact summary they end up quoting.",
+  'canonical':
+    "Duplicate URLs split how engines attribute content. A canonical picks the winner instead of leaving them to choose one.",
+  'html-lang':
+    "The lang attribute stops engines guessing the language, which is what causes a page to surface for the wrong audience.",
+  'meta-description':
+    "Frequently the exact sentence an engine reuses when summarising a page. Leaving it empty hands them the choice of words.",
+  'title':
+    "The strongest single signal of what a page is about, and usually the line shown next to a citation.",
+  'h1':
+    "One H1 tells an extractor which claim is the subject of the page. Several H1s make the topic ambiguous to a machine.",
+  'heading-structure':
+    "Answer engines extract section-level chunks. Headings are the seams they cut along.",
+  'question-headings':
+    "Headings written as literal questions match how people actually ask, which is what makes a passage quotable as an answer.",
+  'content-depth':
+    "Thin pages are rarely cited, because there is not enough substance to quote.",
+  'semantic-html':
+    "Landmark elements let an extractor separate real content from navigation and boilerplate.",
+  'extractable-facts':
+    "Lists and tables get lifted verbatim. The same facts buried in a paragraph get paraphrased, or dropped.",
+  'freshness-signal':
+    "Engines prefer recent sources. With no date, a current page competes as though it were undated.",
+  'https':
+    "Engines and browsers distrust plain HTTP, and some retrievers refuse to fetch it at all.",
+  'response-time':
+    "Slow responses get crawl budget cut, and AI retrievers time out before the page arrives.",
+  'page-weight':
+    "Several AI fetchers truncate very large documents, so anything past the cut is invisible to them.",
+  'viewport':
+    "Mobile rendering feeds how a page is evaluated, and a missing viewport reads as a page nobody maintains.",
+  'img-alt':
+    "Alt text is indexable content describing images a crawler cannot otherwise read at all.",
+  'ssr-content':
+    "Most AI crawlers do not execute JavaScript. If content only appears once the bundle runs, they receive an empty shell.",
+  'no-meta-refresh':
+    "Meta-refresh redirects confuse crawlers, which routinely end up recording the wrong destination.",
+};
+
+const CRAWLER_WHY =
+  "Every engine reads robots.txt under its own user-agent name. A blanket allow rule does not cover them, and blocking one removes the site from that engine alone.";
 
 const FETCH_UA =
   'Mozilla/5.0 (compatible; AIdeazzVisibilityBot/1.0; +https://aideazz.xyz/api)';
@@ -807,6 +883,14 @@ export async function runVisibilityAudit(inputUrl: string): Promise<AuditResult>
   });
 
   // ---- Scoring ------------------------------------------------------------
+  // Attach the evergreen 'why' to every check, passing or failing. Done here, once,
+  // after all pushes -- so adding a check later cannot forget it, it just arrives
+  // without a why rather than breaking.
+  for (const c of checks) {
+    const why = c.id.startsWith('crawler-') ? CRAWLER_WHY : CHECK_WHY[c.id];
+    if (why) c.why = why;
+  }
+
   const categories: CategoryScore[] = (Object.keys(CATEGORY_DEFS) as CategoryId[]).map((id) => {
     const def = CATEGORY_DEFS[id];
     const catChecks = checks.filter((c) => c.category === id);
