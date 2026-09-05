@@ -369,15 +369,25 @@ email:- lancemart.io@gmail.com"*
 That is a second gate cleared. He is moving it off LinkedIn and into his inbox,
 which is where he keeps things he intends to come back to.
 
-## 🚨 BEFORE SENDING — the artifacts must be shared, or he gets nothing
+## 🚨 BEFORE SENDING — one share pin to move (corrected 5 Sep)
+
+**Correction to an earlier version of this section.** It claimed the Monday Chain
+had never been shared and that Aryaman may have clicked a dead link in the DM.
+**That was wrong.** The claim came from reading the publish tool's generic
+"artifacts are private unless shared" boilerplate as if it were a status, plus a
+blocked browser navigation to `claude.ai` treated as a 404. Neither was evidence.
+
+Checked properly, by asking the artifact service for each artifact's own
+visibility state — the same discipline as everything else in this file: **verify at
+the edge, never from the config.**
 
 Artifacts are **private by default**. A link to a private artifact opens to
 nothing for the recipient.
 
 | Artifact | State | Action needed |
 |---|---|---|
-| **The Monday Chain** `780d2d14` | Published fresh 5 Sep, **never shared** | Open it → share menu → enable link sharing. **He may already have clicked the DM link and seen nothing.** |
-| **Nine Systems** `e5e81972` | Shared, but the share pin sits on the **24 Aug** version | Republished 5 Sep. Open it → **move the share pin to the current version**, or he reads the stale one |
+| **The Monday Chain** `780d2d14` | ✅ **Shared with anyone with the link, viewers see the CURRENT version** — confirmed 5 Sep from the artifact service | **Nothing to do.** The link already sent in the DM works. |
+| **Nine Systems** `e5e81972` | ⚠️ Shared, but the service reports *"viewers see a pinned earlier version, not this live version"* | **Move the share pin to the current version** — otherwise he reads the 24 Aug copy, with the pity pot, 9 incidents and 7 verticals |
 
 Both are one-tap in the artifact's own share menu. The agent cannot do it —
 there is no share action in the tooling.
