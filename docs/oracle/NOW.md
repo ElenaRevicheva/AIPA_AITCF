@@ -477,6 +477,29 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   **NEXT (UI only, cannot be scripted):** ① GitHub → grant the DataVendor App access to the
   8 `-licensed` repos · ② DataVendor → Add supply → new listing selecting them · ③ archive
   the OLD listing **only once the new one reads Active**.
+- 🛑 **DO NOT LIST THE `-licensed` REPOS YET — HUD estimate came back $28,073 vs $89,481
+  for the originals (5 Sep).** Score **16% "Early"** vs the originals' **44% "Promising"**.
+  Estimate `01a0734a-93a2-7bb2-b314-68b3024f79ef`.
+  **Cause: the clean-room export deleted 2,791 commits (→ 8).** HUD scores 97 points and
+  the price grows *exponentially* from $1,500 to $100,000; **Commits (13 pts) + Churn ×
+  complexity (5 pts) are history-derived** and both went to ~0.
+  **Named: optimising for the gate instead of the asset.** `history-free by construction`
+  satisfied "clean git history" and destroyed 69% of the estimated value.
+  ⚠️ **The copies are also QC-WORSE:** 4 now report `SOURCE LOC Unavailable` /
+  `Complexity Not measured` (`AIPA_AITCF`, `dragontrade-agent`, `AILA`, `atlas-captures`),
+  where the originals **passed** `codebase complexity` 6 of 8. The flagship
+  `AIPA_AITCF-licensed` scores **7% / $1,979** against its $12,000 listing price — ask
+  Megan; the 4 that measured cleanly are all Python-dominant, so it may be a platform
+  limit on TS/JS trees.
+  **FIX: scrub the history, do not delete it** — rebuild each `-licensed` repo from a
+  throwaway full clone via `git filter-repo --replace-text`, then force-push. Recovers 18
+  points and yields history *cleaner than the originals* (which still carry the Railway
+  password in theirs). Working repos still never touched. `git filter-repo` is NOT
+  installed — `pip install git-filter-repo` first.
+  Full detail: `docs/selling/DATAVENDOR_ESTIMATE_LICENSED_2026-09-05.md`.
+- ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
+  8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
+  that settings page, so verify via the DataVendor repo picker instead — faster and free.)
 - 🚫 **DELIVERY IS GITHUB, NOT ZIPS.** `Settings → Integrations` reads **GitHub · Connected —
   "Sell repositories you host on GitHub"**; assets are `ElenaRevicheva/<repo>` and
   `Repository snapshot` is mandatory. **There is no zip upload path for a codebase asset.**
