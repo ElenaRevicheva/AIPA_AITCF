@@ -500,6 +500,43 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 - ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
   8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
   that settings page, so verify via the DataVendor repo picker instead — faster and free.)
+- 🔄 **PLAN CHANGED — clean the LISTED repos IN PLACE; the `-licensed` copies are a fallback.**
+  Measured 5 Sep: **`pii_qc_llm` scans the HEAD SNAPSHOT, not git history.** Decisive test —
+  `dragontrade-agent`, which Megan reported as exactly **2 findings**: HEAD holds **2**
+  distinct third-party emails, history holds **4**. The count matches HEAD and not history.
+  **So a normal FORWARD COMMIT removing PII from HEAD passes the gate** — no history rewrite,
+  no force-push, no new listing, no archiving, and the repos keep their history and existing
+  measurements, so the **$89,481 valuation and the listing's standing survive**.
+  The `-licensed` route scored only **$38,346**, so in-place is worth ~**$51k** more.
+  Full analysis: `docs/selling/DATAVENDOR_CLEAN_IN_PLACE_OPTION.md`.
+- ❌ **CORRECTION — there is NO "JS/TS platform gap".** Earlier this session I concluded HUD
+  cannot measure SOURCE LOC for JS/TS repos. The listing's own QC record shows the
+  **originals PASSED** `codebase complexity` for `AIPA_AITCF` and `dragontrade-agent`. Only
+  my copies lost it — most likely because I dropped `dist-lambda/`, and HUD's note says LOC
+  counts *checked-in generated or vendored code*. Cleaning in place avoids it entirely.
+- ❌ **CORRECTION — `.wwebjs_auth/` is NOT the bulk of EspaLuzWhatsApp's 219 findings.**
+  Measured: **0 emails, 24 phone-shaped** inside it, against 27 and 769 repo-wide. It should
+  still leave git (47 MB authenticated session store) but the PII case was overstated.
+- 🔒 **IRON-CLAD CLEANING RULES (earned on `dragontrade-agent`, 5 Sep).**
+  **Never redact executable code to a broken literal.** Point it at the same env var the
+  running product already uses — provably present *because the product runs on it*.
+  `test-oracle-db.cjs` now reads `process.env.DATABASE_URL`, exactly as `db-config.js` does,
+  so it behaves identically on Oracle with no credential in the file. Redacting to
+  `REDACTED` would have silently broken it.
+  Also: **never delete from disk** (`git rm --cached` + `.gitignore` only — files stay
+  locally and on Oracle); docs/comments are free; any executable change needs a written
+  proof that nothing runs it.
+- 🗑️ **HUD estimations DELETED (5 Sep), listing untouched.** Both estimation records removed
+  from `datavendor.ai/estimations` (confirmed *"No estimations yet"*); the live listing still
+  reads **$74,851, 8 original assets, 0 purchases**.
+  ⚠️ **Deletion removes the RECORD, not necessarily HUD's server-side copies.** Those runs
+  reported *"8 archived · STORED ARCHIVE SIZE 209.9 MB"*, so HUD archived the repos. Getting
+  their copies purged requires ASKING them — already in
+  `docs/selling/drafts/megan-hud-qc-cleanup-2026-09-05.txt`.
+  **Still Elena's move:** delete the 8 `ElenaRevicheva/*-licensed` repos (the `gh` token lacks
+  `delete_repo`, so CLI cannot) and/or restrict the `hud` GitHub App's repo access. Full
+  scrubbed copies survive on disk at `D:/aideazz/_license-history/` (432 MB, all 8), so
+  deleting the GitHub copies loses nothing.
 - 🚫 **DELIVERY IS GITHUB, NOT ZIPS.** `Settings → Integrations` reads **GitHub · Connected —
   "Sell repositories you host on GitHub"**; assets are `ElenaRevicheva/<repo>` and
   `Repository snapshot` is mandatory. **There is no zip upload path for a codebase asset.**
