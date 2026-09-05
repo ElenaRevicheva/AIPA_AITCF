@@ -100,3 +100,72 @@ force-push into the `-licensed` repo.
 
 Nothing has been listed. The old listing is untouched and still Active. The 8 `-licensed`
 repos exist and are private but should **not** be listed in their current one-commit form.
+
+
+---
+
+# UPDATE — history rebuilt, 2,472 commits restored (5 Sep, later)
+
+`scripts/rebuild-license-history.cjs` rebuilt all 8 `-licensed` repos from throwaway
+full clones with `git-filter-repo`. Working repos untouched, proved by HEAD + dirty
+count identical before/after and remotes still pointing at the originals.
+
+| `-licensed` repo | Commits now | Was |
+| --- | ---: | ---: |
+| AIPA_AITCF | 940 | 1 |
+| VibeJobHunterAIPA_AIMCF | 561 | 1 |
+| EspaLuzWhatsApp | 389 | 1 |
+| EspaLuzFamilybot | 207 | 1 |
+| dragontrade-agent | 173 | 1 |
+| EspaLuz_Influencer | 126 | 1 |
+| AILA | 40 | 1 |
+| atlas-captures | 36 | 1 |
+| **Total** | **2,472** | 8 |
+
+`AIPA_AITCF` prunes 1,260 → 940 because ~320 commits touched **only** dropped paths
+(`docs/selling/` and friends); once those are gone the commits are empty and filter-repo
+removes them. Correct behaviour.
+
+## Verified by re-cloning FROM GitHub, not from the local tree
+
+`AIPA_AITCF-licensed`: 940 commits · 352 files · authors all `…@users.noreply.github.com`
+or `cursoragent`. Full-history grep: `E-8-245573` **0**, `AE1074827` **0**, both Railway
+passwords **0**, `proxy.rlwy.net` **0**, `VENTAS@ABOLU.NET` **0**, and `docs/selling/`,
+`docs/oracle/`, `dist-lambda/` **0** paths across every commit.
+
+## Four bugs found on the way — three would have shipped damage
+
+Validated on `dragontrade-agent` first, which is why they were caught at all.
+
+1. **Harvesting from `git log -p` picked up DIFF METADATA.** `4842332 100644` — a git
+   index line — was queued for replacement *as a phone number*.
+2. **`password==>REDACTED` and `...==>REDACTED`** were harvested from documentation
+   examples. Rewriting the word "password" everywhere is silent corruption that no PII
+   check would ever report.
+3. **Round numbers are MONEY, not phones.** `dragontrade-agent` is a trading repo and the
+   harvest wanted to rewrite `850000000000` and `25000000000` — market caps — into fake
+   Panama mobiles. Now rejects 5+ trailing zeros and long repeated-digit runs.
+4. **`--replace-text` is CASE-SENSITIVE.** Rules emitted from lowercased keys meant
+   `ventas@abolu.net` never matched the literal `VENTAS@ABOLU.NET`. **A real third-party
+   address survived while the log reported the rule as applied.**
+
+## The named lesson — one surface is not the surface
+
+An email lives in **three** places in a git repo, and each needs its own instrument:
+
+| Surface | Instrument | What was missed without it |
+| --- | --- | --- |
+| Author metadata | `--mailmap` | her personal gmail on every commit |
+| Commit message | `--replace-message` | 33 `Co-Authored-By` trailers |
+| File content | `--replace-text` | the addresses in the code |
+
+And the sharper version: **the verifier read three surfaces while the harvester read one.**
+So `admisiones@aip.edu.pa` — a school, in a commit message only — never got a replacement
+rule generated, and `--replace-message` had nothing to apply. The checker kept correctly
+reporting a finding the fixer was structurally unable to fix.
+
+> **A checker that inspects a wider world than the fixer writes rules for will report
+> findings forever.** Align the surfaces, not the verdicts.
+
+Also fixed: the canary list had only ever been a *checker*. Anything on it that is present
+in history is now **rewritten** — which is what removed the cédula.
