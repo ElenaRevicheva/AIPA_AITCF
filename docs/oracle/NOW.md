@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-05 11:54 | IntelliOps send URL on the deal (mobile) | `hs-post-deal-note.cjs`, deal `64302436100` description + send task + short note | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,13 +127,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **IN FLIGHT 5 Sep — send URL on the deal for HubSpot mobile.** Elena
-  wants to tap from the phone *inside the deal*. The briefing note’s
-  “SEND BY EMAIL” label is not a control on Android (HubSpot strips
-  `<a href>`). Putting the raw URL on three deal surfaces: About
-  `description`, the HIGH Send-task body (Next activity), and a short
-  newest note `docs/selling/intelliops/TAP_TO_SEND.md`. Do not tap
-  `intelliops-bd`. Do not countersign v2.
+- **DONE 5 Sep — send URL is on the deal for HubSpot mobile.** Android
+  strips `<a href>` so “SEND BY EMAIL” was not tappable. Actions
+  `33964604578`: `✓ create note 116418923178`, `✓ deal description`,
+  `✓ task 116425576481`. Elena: pull-to-refresh the deal → tap the
+  `https://webhook…/intelliops-addendum` line on the newest note, in
+  About, or in the HIGH Send task. Do not tap `intelliops-bd`. Do not
+  countersign v2.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
   Send note `116421825140`. Addendum section numbers match v2.
