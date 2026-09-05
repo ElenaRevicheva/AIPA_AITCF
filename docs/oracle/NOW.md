@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-05 11:50 | IntelliOps review note had no tappable send | `WHAT_WE_WANT.md`, `hs-post-deal-note.cjs`, deal `64302436100` note `116421568303` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,14 +127,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+- **IN FLIGHT 5 Sep — review note had no tappable send.** Elena opened
+  note `116421568303` (the briefing) on HubSpot mobile. That note said
+  “tap SEND BY EMAIL on the addendum note” and the send URL was a bare
+  `https://` line — HubSpot mobile does not make that a link. The real
+  `<a href>` lives on send note `116421825140`, a different screen.
+  Fix: markdown `[➡️ SEND BY EMAIL — tap this](url)` at the top and
+  bottom of `WHAT_WE_WANT.md`, and `hs-post-deal-note.cjs` now wraps
+  leftover bare URLs in `<a href>`. Re-post via hire-trigger. Meanwhile
+  she can tap the same URL from chat:
+  `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`,
   owner Elena, stage 🔥 I Act TODAY. Review note `116421568303`
   (`[INTELLIOPS REVIEW] 5 Sep 2026`). Addendum send note `116421825140`.
-  v1 and v2 Elena uploaded = the mailbox copies. Addendum section numbers
-  match v2. No rewrite. Simple-words file:
-  `docs/selling/intelliops/WHAT_WE_WANT.md`. Send:
-  `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`.
   Do not tap `intelliops-bd`. Do not countersign v2.
 - **DONE 4 Sep — Datastar NDA SENT. Deal `64678307604`.**
   `https://app.hubspot.com/contacts/51409153/record/0-3/64678307604` ·
