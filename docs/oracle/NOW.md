@@ -466,22 +466,48 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   matching or the $89,481 estimator valuation.** She confirmed waiting is free; guessing
   is not. Reply drafted: `docs/selling/drafts/megan-hud-qc-cleanup-2026-09-05.txt` —
   it also discloses the two live credentials and asks them to **purge the prior upload**.
-- ✅ **Scrubber now has a secrets pass; bundle built and verified (5 Sep).**
-  `scripts/build-license-bundle.cjs` previously had **no secret handling at all** — which
-  is how a "clean" bundle carried a live Postgres password. Added `URL_WITH_CREDENTIALS`,
-  PEM private keys, 13 vendor key shapes, `GENERIC_SECRET_ASSIGNMENT`, bearer tokens,
-  SQL `WITH PASSWORD 'x'` (no `=`, so the assignment rule never saw it), and DB proxy hosts.
-  Build: 1,445 files · 380 emails · 1,296 phones · 15 cred-URLs · 4 SQL passwords ·
-  **VERIFY clean, exit 0**. 7 zips at `D:/aideazz/_license-upload-2026-09-05/`, **0 `.git`
-  entries, 0 canary hits**. Non-destructive: 160 JS files parse, configs byte-identical,
-  model ids intact; the 4 files that fail to parse were **already broken in HEAD**.
+- ✅ **7 CLEANED REPOS ARE LIVE ON GITHUB (5 Sep). Elena's move is now the DataVendor UI.**
+  `ElenaRevicheva/{AIPA_AITCF,EspaLuzWhatsApp,VibeJobHunterAIPA_AIMCF,EspaLuzFamilybot,`
+  `dragontrade-agent,EspaLuz_Influencer,AILA}-licensed` — **all private, 1 commit each
+  (history-free), 0 canary hits, 0 wwebjs**, verified by re-cloning **from GitHub**, not
+  from the local tree. Built by `scripts/publish-license-repos.cjs --apply`.
+  **Working repos untouched — proved, not assumed:** all 7 HEADs and dirty counts byte-identical
+  before/after, remotes still point at the originals. The script only ever `git init`s inside
+  the exported bundle copy.
+  **NEXT (UI only, cannot be scripted):** ① GitHub → grant the DataVendor App access to the
+  7 `-licensed` repos · ② DataVendor → Add supply → new listing selecting them · ③ archive
+  the OLD listing **only once the new one reads Active**.
+- 🚫 **DELIVERY IS GITHUB, NOT ZIPS.** `Settings → Integrations` reads **GitHub · Connected —
+  "Sell repositories you host on GitHub"**; assets are `ElenaRevicheva/<repo>` and
+  `Repository snapshot` is mandatory. **There is no zip upload path for a codebase asset.**
+  Zips built earlier on 5 Sep were the wrong artifact and are deleted. Do not rebuild them.
+- 📋 **The QC per-check breakdown was NEVER missing** — the four rows under listing
+  **Owner only → Quality checks** are *collapsed accordions*. The 22 failures are **four**
+  checks: `verify claims` 8/8 · `verify rarity` 7/8 · `pii qc llm` 5/8 · `codebase complexity`
+  2/8. **Cleaning PII fixes only 5 of 22** — the badge stays off, and that is fine:
+  *"certification withheld — publishing unaffected"*, all mandatory checks already pass.
+  **Certification ≠ sellability.** Breakdown: `docs/selling/DATAVENDOR_QC_RUN4_BREAKDOWN.md`.
+- 🚨 **A LIVE WHATSAPP SESSION WAS COMMITTED.** `EspaLuzWhatsApp` tracks **378 files /
+  47.2 MB** of `.wwebjs_auth/session/` — a Chromium profile for an authenticated WhatsApp
+  Web session. Now dropped, along with `__pycache__/`, `node_modules/`, `*.pyc`, `*.ldb`,
+  `*.log`, `*.pid`, `*.sqlite`. It was invisible because **the scrub pass and the "independent"
+  verify pass shared one extension allowlist** — `.log`/`.jsonl`/`.tsv`/`.diff` were on
+  neither, so those files were copied byte-for-byte *and* never checked.
+  **Named: an allowlist shared by the fixer and the checker is one SPOF wearing two hats.**
+  Verify now **sniffs bytes** (NUL or >5% control chars ⇒ binary); scrub uses the same sniff
+  as a fallback. It caught a real address in a `.diff` on its first run.
+  Build now: 1,061 files · 1,234 dropped · 409 emails · 1,333 phones · 16 cred-URLs ·
+  **VERIFY clean, exit 0**. 161 JS parse, configs byte-identical, model ids intact; the only
+  2 Python failures were **already broken in HEAD**.
   ⚠️ Canary list is `D:/aideazz/_license-canaries.txt` — **outside every repo on purpose**;
   it holds the strings that must not ship, so committing it would defeat it.
-  ⚠️ New trap: the verify rule for cred-URLs needs `(?!REDACTED@)`, or the checker flags
-  the scrubber's own replacement and the gate can never go green.
-  ⚠️ The real 8-pack is **not** the local repo set: it includes `atlas-captures` (not
-  cloned here) and `dragontrade-agent`, and **excludes `aideazz` and `whitespace`**.
-  `AILA` and `atlas-captures` are **0 LOC** yet priced $8,401 combined.
+  ⚠️ Trap: the verify rule for cred-URLs needs `(?!REDACTED@)`, or the checker flags the
+  scrubber's own replacement and the gate can never go green.
+  ⚠️ `atlas-captures` (8th asset, $4,137) is **NOT** in the licensed set — no local clone,
+  and Elena said stop. It already **passes** `pii_qc_llm`, so the ORIGINAL can be attached
+  to the new listing as-is to keep 8 assets / $74,851. It is a 2-file DATA repo
+  (`capture.log` + `captures.jsonl`, 3.4 MB) — which is why it reads 0 LOC and fails
+  `codebase complexity`.
   Full detail: `docs/selling/DATAVENDOR_QC_2026-09-05.md` (4 Sep doc is banner-corrected).
 - **Anthropic credits at zero** since 17 Aug. The 5-provider chain absorbs it; nothing is
   down. Elena tops up, or leave it on OpenAI.
