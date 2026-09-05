@@ -151,47 +151,77 @@ have one.
 
 # STEP 3 — he replied. The DM. (5 Sep 2026)
 
-Under the comment, Aryaman wrote: *"DM me the details of what you have built and
-I'll take a closer look."* Gate cleared. The DM is now the artefact.
+## ⚠️ The mistake in the first draft of this DM, and why it mattered
 
-**Arc:** close the EspaLuz bug he already read → pivot to the system that maps to
-the exact process he described hiring for → hand him one page. He said twice he
-does not want a list, so the DM names no tools at all.
+The first version opened by retelling the EspaLuz bug and announcing "closed
+yesterday" as if it were news.
 
-## Mapping to what he actually asked for
+**He had already read that.** It is her comment — the one he replied to. And the
+comment already says it is fixed: *"Now the pieces are generated at one sample
+rate and the pipeline runs at a verbosity where the decoder's complaint is
+visible."* Past tense, already done.
 
-He wrote a precise spec. The page answers it in this order:
+So his reply — *"DM me the details of what you have built"* — is not "tell me more
+about that bug". It is **"that one was good; what else is there."** He is asking
+for the body of work. Spending the first third of the DM re-selling the thing he
+already bought wastes the only attention she gets.
 
-| His requirement | Where it is answered |
+**Read the chain as a whole:** his post asks for one shipped unattended system →
+her comment gives one → he asks what else. The DM answers *what else*, and only
+adds to EspaLuz the single fact that was **not** in the comment: it was three
+defects stacked, and it was closed by reproducing the fault, not inferring it.
+
+## What he is actually screening for
+
+| His requirement | What answers it |
 |---|---|
-| "a business process that currently runs on people and spreadsheets" | **§01** — the process was her plus a Telegram message |
-| "a correct map of how the work really happens, not how the SOP says it happens" | **§01** — the alert was correct every Monday and never actioned; the real cost was the two-hour last step |
-| "reason about failure states, retries, and what the system does when an upstream tool goes down at 2 AM" | **§06** — four named failure modes: supply cancelled, mid-chain stale data, per-failure-mode retries, partial blackout |
-| "instruments what they build, so we can tell whether it is working without asking a human" | **§08** daily drill (silent on pass) + **§04** counted rejections + **§07** the unflattering 8% |
-| "built something that ran unattended… someone actually depended on" | EspaLuz (real subscribers) and the chain (nobody starts it) |
+| "a business process that currently runs on people and spreadsheets" | The Monday chain — the process was her plus a Telegram message |
+| "a correct map of how the work really happens, not how the SOP says it happens" | The alert was correct every Monday and never actioned; the real cost was the two-hour last step |
+| "failure states, retries, upstream tool down at 2 AM" | Four named failure modes in the artifact, §06 |
+| "instruments what they build… without asking a human" | Daily drill silent on pass; counted rejections; the unflattering 8% |
+| "built something that ran unattended… someone actually depended on" | EspaLuz (paying subscribers) + the inventory below |
+| ❌ "a list of tools you have opened" | **No tool is named anywhere in the DM.** The inventory is systems and what each one decides |
+
+## The verified fleet (checked on the box, 5 Sep 2026)
+
+**15 application processes on one VPS** — 8 under pm2, 7 under systemd:
+
+```
+pm2       cto-aipa · whitespace · serpapi-jobs · n8n · algom-poll ·
+          algom-stream · dragontrade-main · dragontrade-dashboard
+systemd   espaluz-whatsapp · espaluz-familybot · espaluz-influencer ·
+          espaluz-payments-webhook · vibejobhunter · vibejobhunter-web ·
+          aw-portal
+```
+
+The DM names only the ones that mean something to **him** — an operator who
+automates D2C/B2C businesses and runs an AI EdTech company. Dragontrade, algom and
+n8n are left out on purpose: they are real, but they dilute.
 
 ## The supporting artifact
 
 **The Monday Chain** — https://claude.ai/code/artifact/780d2d14-b601-44f1-b26b-606b9b61265d
 
-Its spine is the whitespace thesis, because that is the non-obvious part: **the
-score is not how big the market is, it is how much room is left in it.** Real
-figures from the 31 Aug snapshot — 17% angle saturation scores **73**, 100%
-scores **0**.
+Division of labour: **the DM carries breadth, the artifact carries depth.** One
+system, taken all the way down — which is the shape his post asked for.
+
+Its spine is the whitespace thesis: **the score is not how big the market is, it is
+how much room is left in it.** 17% angle saturation scores **73**; 100% scores
+**0**.
 
 **Everything on it was verified from the live host on 5 Sep 2026 before publishing:**
 
 | Claim on the page | Verified by |
 |---|---|
 | Five chained Monday jobs, 08:00–11:00 Panama | Oracle `crontab -l` — five `* * 1` entries |
-| EspaLuz fault **reproduced**, not inferred: `sp.mp3` 24000 · `pa.mp3` 44100 · `mixed.mp3` → `Header missing` + `Invalid data found` | Cursor's Oracle `ffprobe` run over the 4 Sep files still in `/tmp` (NOW.md, run `33965958007`) |
-| §01: brief-not-campaign, 96 prospects at ~1% reply | `scripts/atlas-lead-machine.cjs` header, the "Why (Aug 1 2026)" block |
+| EspaLuz fault **reproduced**: `sp.mp3` 24000 · `pa.mp3` 44100 · `mixed.mp3` → `Header missing` + `Invalid data found` | Cursor's Oracle `ffprobe` run over the 4 Sep files still in `/tmp` (NOW.md, run `33965958007`) |
+| §01: brief-not-campaign, 96 prospects at ~1% reply | `scripts/atlas-lead-machine.cjs` header, "Why (Aug 1 2026)" block |
 | Saturation → score table (10 lanes) | `whitespace/data/brief.json`, snapshot `2026-08-31` |
 | `avoid` list — expat_language, 15 advertisers on urgency_scarcity | same file, `verticals[].avoid[]` |
 | `basis` = observed / launch_proxy / saturation_only | same file, `move.basis` |
 | absent_universe + wait_cost "BUILD NOW / 12pp" | `whitespace/data/intelligence.json` |
 | Lane picked = highest score **with a reachable ICP** | `pickLane()` + `ICP_BY_LANE` (3 of 16 lanes) |
-| Geo-pinned ICP queries (PTY / SJO / MDE / CUN / CTG) | `ICP_BY_LANE`, high-ticket set worked before the local tail |
+| Geo-pinned ICP queries (PTY / SJO / MDE / CUN / CTG) | `ICP_BY_LANE`, high-ticket set before the local tail |
 | Window threshold 60, dedup on lane+snapshot_date | `scripts/atlas-campaign-alert.cjs` |
 | Outcomes → lane scores, 7 lanes | `atlas-outcomes.log`: `pushed to Atlas: {"ok":true,"lanes":7}` |
 | staged 8 · looked at 20 · no-email 10 · already-in-CRM 4 · outside-band 1 | `atlas-lead-machine.log`, last run |
@@ -204,15 +234,17 @@ scores **0**.
 | API live, v1.2.0, typed `unfetchable_url` error | probed live: `/v1/health` + a real `POST /v1/visibility` |
 | 51 CLIENT-ATLAS deals · 2,266 deals · 1,203 contacts | HubSpot deals/contacts search API |
 | Daily drill PASS, 4 checks, 3557 ms | `concierge-selftest.log`, ran 5 Sep 12:45 UTC |
+| VJH outcomes → judge prompt, hourly | Oracle crontab `judge_feedback_sync.py`, `17 * * * *` |
+| 15 app processes on one VPS | `pm2 jlist` (8) + `systemctl --state=running` (7) |
 
 Prospect names, emails and WhatsApp numbers are **redacted** from the log excerpt
 on the page; no HubSpot record ids appear on it.
 
-**The thin-sample caveat is on the page, deliberately.** Advertiser counts are 1–15,
+**The thin-sample caveat is on the page deliberately.** Advertiser counts are 1–15,
 so "saturation 50% (1 advertisers)" is a direction, not a statistic. Saying so is
-what he is screening for; hiding it is what would get caught in an interview.
+what he is screening for; hiding it is what gets caught in an interview.
 
-### The EspaLuz claim is verified, not assumed
+### EspaLuz — verified live, not assumed
 
 - Three commits, 4 Sep: `677d322` (MP3 wearing a `.ogg` filename) → `77576d1`
   (double extension) → `9029b1f` (silence at 44.1 kHz against gTTS's 24 kHz).
@@ -220,45 +252,53 @@ what he is screening for; hiding it is what would get caught in an interview.
   by named-file `scp`, so the checkout lags by design. Do not "fix" it.
 - The fix **is** on the running box: `espaluz_bridge.py:1514` reads
   `anullsrc=r=24000:cl=mono`.
-- The deploy took: file mtime `10:48:22`, service `ActiveEnterTimestamp 10:49:22` —
-  the process is newer than the file.
+- Deploy took: file mtime `10:48:22`, service `ActiveEnterTimestamp 10:49:22`.
 - It produced **output**: seven `reply_audio_*.ogg` fetches returning 200 between
-  10:53 and 20:22 on 4 Sep, and **zero** `Header missing` / `Invalid data found`
-  decoder errors since the restart.
+  10:53 and 20:22 on 4 Sep, and **zero** decoder errors since the restart.
 
 ## The DM — send as plain text
 
 LinkedIn does not render Markdown, so there are no asterisks below. Send as-is.
 
 ```
-Thanks for reading the comment. Two things: closing that bug, then the system I
-would actually want you to judge.
+Thank you. I will not retell the tutor bug since you have read it — only the part
+that was not in the comment: it was three defects stacked in the same send path,
+and I closed it yesterday by reproducing the fault rather than inferring it. The
+speech segment probes at 24000 Hz, the silence at 44100, and the joined file
+refuses to decode at all. That is the fault the tolerant tool downstream had been
+quietly repairing for a month.
 
-ESPALUZ — CLOSED YESTERDAY.
+Here is the rest.
 
-Three defects stacked in one send path. The audio was an MP3 wearing a .ogg
-filename; the filename then carried two extensions; and underneath both, the real
-one — the reply is assembled by joining speech segments to generated silence, and
-the silence was being produced at 44.1 kHz against the speech's 24 kHz. An MP3
-whose sample rate changes mid-stream is malformed.
+WHAT RUNS UNATTENDED
 
-What isolated it was not a log line, it was a comparison. Translate mode played;
-tutor mode could not be opened at all — same bot, same send path, same carrier
-account. So the fault had to be in what the two modes produce, not in how they are
-delivered. That turned a month of looking into thirty seconds of fixing.
+Fifteen processes on one VPS, nobody starting any of them.
 
-I did not want to close it on the absence of an error, so I reproduced it from the
-actual files: the speech segment probes at 24000 Hz, the silence at 44100, and the
-joined file fails to decode outright — Header missing, Invalid data found when
-processing input. That is the fault the tolerant tool downstream had been quietly
-repairing for a month. Deployed yesterday; the fixed path has produced audio
-repeatedly since with no decoder complaint.
+The tutor you read about — bilingual, on WhatsApp and Telegram, with its own
+payments webhook and subscription state. Paying families depend on it daily.
 
-THE ONE THAT MATCHES YOUR POST.
+A job-discovery pipeline that pulls from several sources, scores every posting
+with an LLM judge, writes the survivors into a CRM, and feeds the real outcomes
+back into the judge's prompt every hour so it learns what I actually accept. It is
+also where I learned the most expensive lesson on this list: a source logged a
+healthy count every hour for a full day and delivered zero. Now I grep the result
+line, never the ran line.
+
+A market radar that reads what competitors are advertising across sixteen lanes
+each week and computes how crowded each persuasion angle is.
+
+A lead pipeline that turns that reading into qualified CRM records with drafted
+outreach, and refuses to create a record it could not qualify.
+
+An audit API, publicly documented, that scores a site's readiness to be cited by
+AI search. It is both a product and the qualification gate inside the lead
+pipeline — the same engine scores prospects and scores my own pages.
+
+THE ONE I WOULD WANT YOU TO JUDGE
 
 You described taking a process that runs on people and spreadsheets and building
-something that survives production. I have one of those, and the honest half is
-that my first version failed in exactly the way you would expect.
+something that survives production. The last two on that list are one chain, and
+the honest half is that my first version failed exactly the way you would expect.
 
 The weekly market read worked. Every Monday it found which service market was
 opening rather than saturated, wrote the angle, and messaged me: adapt this into a
@@ -272,14 +312,14 @@ a brief and started handing me the finished work: eight named businesses, each
 independently qualified, each with a drafted email and a send button. My step went
 from two hours to one tap.
 
-It is now five chained cron jobs and nobody starts it. I wrote it up rather than
-list it — how it decides which market is opening (a lane at 17 percent angle
-saturation scores 73; at 100 percent it scores 0), how it goes and finds the
-businesses inside that market, the gate that rejects most candidates with a
-counted reason, why retries are written per failure mode instead of wrapped around
-everything, and what it did the week a paid vendor was cancelled mid-quarter.
-There is one number on it that is not flattering, which is the point — you asked
-for instrumentation, not a portfolio.
+It is now five chained cron jobs. I wrote it up properly rather than list it — how
+it decides which market is opening (a lane at 17 percent angle saturation scores
+73; at 100 percent it scores 0), how it goes and finds the businesses inside that
+market, the gate that rejects most candidates with a counted reason, why retries
+are written per failure mode instead of wrapped around everything, and what it did
+the week a paid vendor was cancelled mid-quarter. There is one number on it that
+is not flattering, which is the point — you asked for instrumentation, not a
+portfolio.
 
 https://claude.ai/code/artifact/780d2d14-b601-44f1-b26b-606b9b61265d
 
@@ -289,22 +329,25 @@ Panama, UTC-5, remote, available now. I have also applied through Torre.
 ### If LinkedIn makes her connect first (300-character note)
 
 ```
-You asked me to DM — I cannot yet, so briefly: the EspaLuz voice bug from my
-comment closed yesterday (silence generated at 44.1 kHz against 24 kHz speech).
-Happy to send the full version plus a write-up of the unattended weekly lead
-chain I run. — Elena
+You asked me to DM about the tutor bug — happy to. Short version of the rest:
+fifteen unattended processes on one VPS, and one weekly chain that replaced a
+process which used to run on me and a Telegram message. Full write-up ready
+whenever you want it. — Elena
 ```
 
 ## Why this shape
 
-He said twice he does not want a list of tools, so the DM names none. He said the
-job is a process that runs on people and spreadsheets — so the pivot is not "here
-is my impressive system", it is "here is that exact process, and here is how my
-first attempt at it failed". Admitting the first version earned nothing for months
-is the strongest move available: it is the SOP-versus-reality skill he put first
-in his post, demonstrated on herself rather than asserted.
+He rejected "a list of tools you have opened" — so no tool is named. What he asked
+for is "the details of what you have built", and that is a list of **systems and
+what each one decides**, which is a different object entirely. Two of the five
+inventory lines carry a failure rather than a feature, so it cannot read as a brag
+sheet.
 
-The unflattering number (8% citation rate) stays in for the same reason. He is
+The pivot is deliberately self-critical. Admitting the first version earned nothing
+for months is the strongest move available: SOP-versus-reality is the skill he put
+**first** in his post, and this demonstrates it on herself instead of asserting it.
+
+The unflattering number (8% citation rate) stays for the same reason. He is
 screening for people who instrument their own work; a page of only good numbers
 reads as a portfolio, which is the category he rejected by name.
 
