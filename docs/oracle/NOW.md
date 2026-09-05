@@ -127,15 +127,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 5 Sep — ENTREGADO/ABIERTO are on the 25 Aug note, not the
-  email cards.** prove-stamps `33964942303`: note `115571559227` has
-  today’s ✅ ENTREGADO to Nishant, Natalie, Elena gmail and 👀 ABIERTO
-  to Nishant + Natalie (Resend `30f57283-…`). Elena was on Activity
-  **logged email** cards — those never carry the marks. Phone: Filter
-  Activity → **Notes** → open the **25 Aug** send note → look at the
-  **top**. `findOutreachNote` only scanned 8 oldest notes (16 on the
-  deal) so stamps missed the new addendum note. Fix is on the branch;
-  not deployed to Oracle. Do not countersign v2.
+- **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
+  had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
+  `33965178681` → `✓ update note 116418923178` with the verified
+  Resend lines (id `30f57283-…`). Close and reopen that same note.
+  Original stamps remain on 25 Aug note `115571559227`. Do not tap
+  `intelliops-bd`. Do not send again.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
   Send note `116421825140`. Addendum section numbers match v2.
