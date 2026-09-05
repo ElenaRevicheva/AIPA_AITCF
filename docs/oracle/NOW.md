@@ -195,13 +195,15 @@ git log keeps the record.
   `hs-attach-deal-files.cjs` fix it, wired into staging so it is no longer
   something to remember. Rule now in `MANUAL_PROSPECT_PLAY.md`.
 - **NEXT:** Elena:
-  (0) **IntelliOps — tap** `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`.
-  Do not tap `intelliops-bd`. Do not countersign v2. Signature on the
-  addendum is optional; they can accept the five clauses in a reply.
+  (0) **LanceMart — paste the LinkedIn DM to Aryaman.** He asked.
+  File: `docs/applications/2026-09-04_lancemart_ai_automation_specialist.md`
+  (STEP 3). Then Torre if he takes it further.
   (1) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
   paste the Carmi answer in Wellfound Messages (not Gmail). File:
   `docs/applications/2026-09-04_coconut_va_wellfound_reply.md`. GHL Tech
   Specialist at $900–1.1k/mo is a skip.
+  IntelliOps addendum is already sent. Do not tap `intelliops-bd`. Do not
+  countersign v2.
 - **🚨 THE TRAP, and it nearly shipped: a signature image goes where the FLOW
   puts it, not where it looked right while editing.** Elena's returned file had
   her signature as an **inline** image in the body, so it rendered above
