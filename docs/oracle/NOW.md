@@ -195,9 +195,11 @@ git log keeps the record.
   `hs-attach-deal-files.cjs` fix it, wired into staging so it is no longer
   something to remember. Rule now in `MANUAL_PROSPECT_PLAY.md`.
 - **NEXT:** Elena:
-  (0) **LanceMart — paste the LinkedIn DM to Aryaman.** He asked.
+  (0) **LanceMart — paste the rewritten DM.** It is from Oracle
+  ffprobe of the 4 Sep files still in `/tmp` (run `33965958007`):
+  `sp.mp3` 24000, `pa.mp3` 44100, `mixed.mp3` → `Header missing` +
+  `Invalid data found when processing input`. No generic stack.
   File: `docs/applications/2026-09-04_lancemart_ai_automation_specialist.md`
-  (STEP 3). Then Torre if he takes it further.
   (1) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
   paste the Carmi answer in Wellfound Messages (not Gmail). File:
   `docs/applications/2026-09-04_coconut_va_wellfound_reply.md`. GHL Tech
