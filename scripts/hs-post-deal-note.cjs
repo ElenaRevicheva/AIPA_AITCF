@@ -53,7 +53,12 @@ function mdToHtml(src) {
     esc(s)
       .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2">$1</a>');
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2">$1</a>')
+      // HubSpot mobile does not auto-linkify a bare URL. A review note that
+      // said "tap SEND BY EMAIL" with a raw https:// line had nothing to tap
+      // (IntelliOps, 5 Sep 2026). Remaining http(s) after the markdown pass
+      // become real <a href> tags.
+      .replace(/(?<!href=")(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
   const out = [];
   let inOl = false;
   let inUl = false;

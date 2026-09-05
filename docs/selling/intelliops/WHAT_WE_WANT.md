@@ -2,8 +2,9 @@
 
 Deal: `[HIRING-MANUAL] BD Expert @ IntelliOps Automation` · `64302436100`
 Stage: 🔥 I Act TODAY (Elena). Owner: Elena.
-**Send (not the old button):** https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum
-Do **not** tap `intelliops-bd` — that resends the already-sent 25 Aug letter.
+**[➡️ SEND BY EMAIL — tap this](https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum)**
+That is the confirm page. One tap sends from aipa@ to Nishant, Cc Natalie and your gmail, with the Word addendum.
+Do **not** tap anything that says `intelliops-bd` — that resends the already-sent 25 Aug letter.
 Do **not** countersign v2.
 
 Both PDFs Elena uploaded on 5 Sep were read in full (v1 = 256,614 B / 5 pages / 20 Aug; v2 = 34,064 B / 4 pages / 24 Aug). Extracts: `docs/selling/intelliops/source/`. Clause table: `docs/selling/intelliops/V1_VS_V2.md`.
@@ -67,4 +68,6 @@ Section numbers in `ADDENDUM_No1_IntelliOps_BD.docx` match this file. No rewrite
 
 ## Elena — one action
 
-Open this deal. Read this note. Tap **➡️ SEND BY EMAIL** on the addendum note (slug `intelliops-addendum`). Optional: sign the Word addendum first; they can also accept by reply. Do not sign their 24 August PDF.
+**[➡️ SEND BY EMAIL — tap this](https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum)**
+
+That is a real link, not an instruction. It opens the confirm page and sends the addendum. Optional: sign the Word file first; they can also accept the five clauses in a reply. Do not sign their 24 August PDF. Do not tap `intelliops-bd`.
