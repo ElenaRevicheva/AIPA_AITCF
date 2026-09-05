@@ -1,0 +1,209 @@
+#!/usr/bin/env node
+/**
+ * pii-guard.cjs — stop credentials and third-party PII from entering a licensed repo.
+ *
+ * Why this exists: cleaning the CONTENTS of a repo is worthless when the repo REGENERATES
+ * the problem. `docs/selling/` in AIPA_AITCF took 69 commits and 183 new files in 30 days,
+ * written by the outreach tooling itself. A one-time scrub would fail `pii_qc_llm` again
+ * within a week. The fix is a gate on the way in, not a sweep afterwards.
+ *
+ * Three modes:
+ *   node scripts/pii-guard.cjs                    scan STAGED files   (pre-commit hook)
+ *   node scripts/pii-guard.cjs --all [--repo D]   scan the whole HEAD (pre-listing check)
+ *   node scripts/pii-guard.cjs --install          install the hook into every listed repo
+ *
+ * Exit 0 = clean, 1 = findings, 2 = usage/error.
+ *
+ * Deliberately NOT checked here: phone numbers. Every phone pattern loose enough to catch
+ * a real number also catches record ids, epoch timestamps and market caps — three separate
+ * false-positive classes measured on this codebase. A guard that cries wolf gets disabled,
+ * and a disabled guard protects nothing. Phones are reported in --all as a WARNING only.
+ */
+const fs = require('fs');
+const path = require('path');
+const { execFileSync } = require('child_process');
+
+const argv = process.argv.slice(2);
+const has = (f) => argv.includes(f);
+const arg = (n, d) => { const i = argv.indexOf(n); return i >= 0 ? argv[i + 1] : d; };
+
+const REPOS = [
+  'D:/aideazz/ai-cofounders/cto-aipa',
+  'D:/aideazz/EspaLuzWhatsApp',
+  'D:/aideazz/VibeJobHunterAIPA_AIMCF',
+  'D:/aideazz/EspaLuzFamilybot',
+  'D:/aideazz/dragontrade-agent',
+  'D:/aideazz/EspaLuz_Influencer',
+  'D:/aideazz/AILA',
+  'D:/aideazz/atlas-captures',
+];
+const CANARIES = arg('--canaries', 'D:/aideazz/_license-canaries.txt');
+
+/* ------------------------------------------------------------------- detectors */
+
+/** Addresses that are not third-party personal data. Anything else is a finding. */
+const SAFE_EMAIL = new RegExp(
+  '@(' +
+  'example\\.(com|org|net)|test\\.com|localhost|' +
+  'sentry\\.io|schema\\.org|w3\\.org|npmjs\\.com|' +
+  'users\\.noreply\\.(github|replit)\\.com|' +
+  'aideazz\\.(xyz|com)|' +          // her own domain — not customer data
+  'anthropic\\.com|cursor\\.com' +  // agent noreply identities
+  ')$', 'i');
+const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+
+/** `postgres:password@host:port/db` in a README is an instruction, not a leak. */
+const PW_PLACEHOLDER = /^(password|passwd|pass|secret|token|user|admin|root|test|changeme|your[-_]?password|host|port|db|REDACTED|contact\d+|\.+)$/i;
+const URL_CRED_RE = /\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:([^@/\s"'`<>${}]{4,})@/g;
+const SQL_PW_RE = /\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"]([^'"\n\r]{4,200})['"]/gi;
+const PEM_RE = /-----BEGIN (?:[A-Z0-9 ]*)PRIVATE KEY-----[\s\\n"',]*[A-Za-z0-9+/]{40,}/g;
+/** Tight shapes only. A loose `re_[A-Za-z0-9]{20,}` once matched `re_getSomething`. */
+const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|(?:ghp|gho|ghu|ghs)_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,}|gsk_[A-Za-z0-9]{40,}|xox[bpaso]-\d{8,}-[A-Za-z0-9-]{20,}|re_[A-Za-z0-9]{8,}_[A-Za-z0-9]{20,}|pat-na1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})/g;
+/** Warning-only. See the header for why this is not a blocking rule. */
+const PHONE_RE = /(?<![\w+-])\+\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
+
+const canaries = fs.existsSync(CANARIES)
+  ? fs.readFileSync(CANARIES, 'utf8').split(/\r?\n/).map((s) => s.trim()).filter((s) => s && !s.startsWith('#'))
+  : [];
+
+function scan(text, rel) {
+  const out = [];
+  const push = (kind, v) => out.push({ kind, rel, sample: String(v).slice(0, 60) });
+
+  for (const m of text.match(EMAIL_RE) || []) {
+    if (SAFE_EMAIL.test(m) || m.includes('..') || m.split('@')[0].length > 40) continue;
+    push('third-party email', m);
+  }
+  let m;
+  URL_CRED_RE.lastIndex = 0;
+  while ((m = URL_CRED_RE.exec(text)) !== null) {
+    if (PW_PLACEHOLDER.test(m[1])) continue;
+    push('credential URL', m[0]);
+  }
+  SQL_PW_RE.lastIndex = 0;
+  while ((m = SQL_PW_RE.exec(text)) !== null) {
+    if (PW_PLACEHOLDER.test(m[1])) continue;
+    push('SQL password', m[0]);
+  }
+  for (const v of text.match(PEM_RE) || []) push('private key', v);
+  for (const v of text.match(VENDOR_RE) || []) push('API key', v);
+  for (const c of canaries) if (text.includes(c)) push('canary', c);
+  return out;
+}
+
+/** Binary sniff by CONTENT, never by extension — an extension allowlist is exactly what
+ *  let a committed browser session store and a 2.7 MB .jsonl through unchecked. */
+function isTextish(buf) {
+  if (!buf || !buf.length || buf.length > 32 * 1024 * 1024) return false;
+  const n = Math.min(8192, buf.length);
+  let odd = 0;
+  for (let i = 0; i < n; i++) {
+    const c = buf[i];
+    if (c === 0) return false;
+    if (c < 9 || (c > 13 && c < 32)) odd++;
+  }
+  return odd / n < 0.05;
+}
+
+const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28 });
+
+function report(findings, warnings, label) {
+  if (warnings.length) {
+    console.log(`\n  ⚠ ${warnings.length} phone-shaped string(s) — warning only, not blocking`);
+  }
+  if (!findings.length) { console.log(`✓ ${label}: clean`); return 0; }
+  console.error(`\n✖ ${label}: ${findings.length} finding(s)\n`);
+  const byKind = {};
+  for (const f of findings) (byKind[f.kind] = byKind[f.kind] || []).push(f);
+  for (const [kind, list] of Object.entries(byKind)) {
+    console.error(`  ${kind} (${list.length}):`);
+    for (const f of list.slice(0, 6)) console.error(`    ${f.rel}  →  ${f.sample}`);
+    if (list.length > 6) console.error(`    … and ${list.length - 6} more`);
+  }
+  return 1;
+}
+
+/* ----------------------------------------------------------------------- modes */
+
+if (has('--install')) {
+  const guard = path.resolve(__filename);
+  // `--skip` exists for one specific reason: `stage-manual-prospect.cjs` and
+  // `atlas-lead-machine.cjs` COMMIT LOCALLY, and they are what writes prospect data into
+  // docs/selling/. Installing the hook on cto-aipa before that directory is untracked
+  // would block Elena's live outreach tooling. Install it there LAST, once the source of
+  // the PII is gone — never gate a workflow against a condition it cannot yet satisfy.
+  // (GitHub Actions are unaffected either way: hooks are not cloned.)
+  const skip = (arg('--skip', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
+  let n = 0;
+  for (const repo of REPOS) {
+    if (skip.some((s) => repo.endsWith(s))) { console.log(`  SKIPPED (by request): ${path.basename(repo)}`); continue; }
+    const hooks = path.join(repo, '.git', 'hooks');
+    if (!fs.existsSync(hooks)) { console.log(`  skip (no .git): ${repo}`); continue; }
+    const hook = path.join(hooks, 'pre-commit');
+    // Fails CLOSED on findings, but OPEN if the guard itself is missing — a hook that
+    // blocks every commit because a path moved is a hook that gets deleted.
+    const body = `#!/bin/sh
+GUARD="${guard.replace(/\\/g, '/')}"
+if [ ! -f "$GUARD" ]; then
+  echo "pii-guard: guard script not found at $GUARD — commit allowed, but the gate is OFF" >&2
+  exit 0
+fi
+node "$GUARD" || {
+  echo "" >&2
+  echo "pii-guard BLOCKED this commit. These repos are licensed to DataVendor;" >&2
+  echo "a credential or third-party address here fails pii_qc_llm and makes the" >&2
+  echo "listing unsellable. Fix the finding, or 'git commit --no-verify' if you" >&2
+  echo "are certain it is a false positive." >&2
+  exit 1
+}
+`;
+    fs.writeFileSync(hook, body, 'utf8');
+    try { fs.chmodSync(hook, 0o755); } catch { /* windows */ }
+    console.log(`  installed → ${path.basename(repo)}/.git/hooks/pre-commit`);
+    n++;
+  }
+  console.log(`\n${n} hook(s) installed.`);
+  process.exit(0);
+}
+
+if (has('--all')) {
+  const repos = arg('--repo', null) ? [arg('--repo', null)] : REPOS;
+  let bad = 0;
+  for (const repo of repos) {
+    if (!fs.existsSync(path.join(repo, '.git'))) { console.log(`  skip (no .git): ${repo}`); continue; }
+    const files = git(['ls-files', '-z'], repo).split('\0').filter(Boolean);
+    const findings = [], warnings = [];
+    for (const rel of files) {
+      let buf;
+      try { buf = execFileSync('git', ['show', `HEAD:${rel}`], { cwd: repo, maxBuffer: 1 << 28 }); }
+      catch { continue; }
+      if (!isTextish(buf)) continue;
+      const t = buf.toString('utf8');
+      findings.push(...scan(t, rel));
+      warnings.push(...(t.match(PHONE_RE) || []));
+    }
+    if (report(findings, warnings, path.basename(repo))) bad++;
+  }
+  console.log(`\n${bad === 0 ? '✓ ALL REPOS CLEAN — safe to update the listing' : `✖ ${bad} repo(s) with findings — do NOT update the listing yet`}`);
+  process.exit(bad ? 1 : 0);
+}
+
+// Default: pre-commit mode — staged content only, so it is fast and only judges what you
+// are actually about to add.
+const repo = process.cwd();
+let staged;
+try { staged = git(['diff', '--cached', '--name-only', '-z', '--diff-filter=ACMR'], repo).split('\0').filter(Boolean); }
+catch { console.error('pii-guard: not a git repository'); process.exit(2); }
+if (!staged.length) process.exit(0);
+
+const findings = [], warnings = [];
+for (const rel of staged) {
+  let buf;
+  try { buf = execFileSync('git', ['show', `:${rel}`], { cwd: repo, maxBuffer: 1 << 28 }); }
+  catch { continue; }
+  if (!isTextish(buf)) continue;
+  const t = buf.toString('utf8');
+  findings.push(...scan(t, rel));
+  warnings.push(...(t.match(PHONE_RE) || []));
+}
+process.exit(report(findings, warnings, `staged (${staged.length} file(s))`));
