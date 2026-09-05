@@ -83,7 +83,8 @@ const DB_HOST_RE = /\b[a-z0-9-]+\.proxy\.(?:rlwy\.net|render\.com)\b/gi;
 const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})\b/g;
 
 const OWNER_ID_EMAIL = 'ElenaRevicheva@users.noreply.github.com';
-const OWNER_EMAILS = new Set(['elena.revicheva2016@gmail.com', 'aipa@aideazz.xyz', 'your-email@example.com']);
+const OWNER_EMAILS = new Set(['elena.revicheva2016@gmail.com', 'aipa@aideazz.xyz',
+  'elena@aideazz.xyz', 'elena@aideazz.com', 'your-email@example.com']);
 /** Passwords that are documentation, not credentials — `postgres:password@host:port/db`. */
 const PW_PLACEHOLDER = /^(password|passwd|pass|secret|token|user|admin|root|test|changeme|your[-_]?password|\.+|host|port|db)$/i;
 
@@ -114,6 +115,12 @@ function harvest(src, dataRepo) {
     .map((l) => l.slice(1))
     .join('\n');
 
+  // Keyed by the ORIGINAL spelling, not the lowercased one. filter-repo's --replace-text
+  // is CASE-SENSITIVE, so a rule written as `ventas@abolu.net` never matched the literal
+  // `VENTAS@ABOLU.NET` in the file — a real third-party address survived the first run
+  // while the log happily reported the rule as applied. Identity is decided
+  // case-insensitively; the rule is emitted once per distinct casing actually present.
+  const byLc = new Map();
   for (const m of diff.match(EMAIL_RE) || []) {
     if (SAFE_EMAIL.test(m)) continue;
     // `postgresql://user:pass@host` and doc placeholders like `...:...@...railway.app`
@@ -122,11 +129,13 @@ function harvest(src, dataRepo) {
     if (m.includes('..')) continue;
     if (m.split('@')[0].length > 40) continue;
     const lc = m.toLowerCase();
-    if (emails.has(lc)) continue;
-    // Her own addresses resolve to the same GitHub noreply identity the mailmap sets, so
-    // authorship stays coherent between commit metadata, messages and file content.
-    emails.set(lc, OWNER_EMAILS.has(lc) ? OWNER_ID_EMAIL
-      : `contact${String(emails.size + 1).padStart(3, '0')}@example.com`);
+    if (!byLc.has(lc)) {
+      // Her own addresses resolve to the same GitHub noreply identity the mailmap sets,
+      // so authorship stays coherent across metadata, messages and file content.
+      byLc.set(lc, OWNER_EMAILS.has(lc) ? OWNER_ID_EMAIL
+        : `contact${String(byLc.size + 1).padStart(3, '0')}@example.com`);
+    }
+    emails.set(m, byLc.get(lc));
   }
   for (const m of diff.match(dataRepo ? PHONE_E164_RE : PHONE_RE) || []) {
     const digits = m.replace(/[^0-9]/g, '');
@@ -158,6 +167,17 @@ function harvest(src, dataRepo) {
   }
   for (const m of diff.match(VENDOR_RE) || []) secrets.add(m);
   for (const m of diff.match(DB_HOST_RE) || []) secrets.add(m);
+
+  // 🚨 The canary list is not only a checker — anything on it that is PRESENT in this
+  // history must be REWRITTEN, not merely reported. AIPA_AITCF carries Elena's cédula
+  // (E-8-245573) and carné serial in old commits: the 4 Sep near-miss put the number in
+  // a verifier script, and `scripts/` ships. Dropping `docs/selling/` never touched it.
+  if (fs.existsSync(CANARIES)) {
+    for (const c of fs.readFileSync(CANARIES, 'utf8').split(/\r?\n/)) {
+      const v = c.trim();
+      if (v && !v.startsWith('#') && diff.includes(v)) secrets.add(v);
+    }
+  }
 
   return { emails, phones, secrets, bytes: diff.length };
 }
@@ -210,9 +230,7 @@ function rebuild([local, name]) {
   const mailmapFile = path.join(SCRATCH, `${name}.mailmap`);
   const ID = 'Elena Revicheva <ElenaRevicheva@users.noreply.github.com>';
   fs.writeFileSync(mailmapFile, [
-    `${ID} <elena.revicheva2016@gmail.com>`,
-    `${ID} <aipa@aideazz.xyz>`,
-    `${ID} <your-email@example.com>`,
+    ...[...OWNER_EMAILS].map((e) => `${ID} <${e}>`),
   ].join('\n') + '\n', 'utf8');
 
   console.log('   pass 0/2  normalising author identity…');
@@ -238,14 +256,29 @@ function verifyHistory(work) {
   const canaries = fs.existsSync(CANARIES)
     ? fs.readFileSync(CANARIES, 'utf8').split(/\r?\n/).map((s) => s.trim()).filter((s) => s && !s.startsWith('#'))
     : [];
-  const diff = run('git', ['log', '--all', '-p', '--no-color'], { cwd: work });
+  const raw = run('git', ['log', '--all', '-p', '--no-color'], { cwd: work });
+  // THREE SURFACES, checked separately. Scanning the raw `git log -p` as one blob made a
+  // Python decorator look like an address: on the diff line `+@app.route`, the `+` prefix
+  // became the local part and `app.route` the domain. Content must be read without the
+  // prefix; messages and author identity are their own surfaces and need their own reads.
+  const content = raw.split('\n')
+    .filter((l) => (l.startsWith('+') || l.startsWith('-')) && !/^(\+\+\+|---)/.test(l))
+    .map((l) => l.slice(1)).join('\n');
+  const messages = run('git', ['log', '--all', '--format=%B'], { cwd: work });
+  const authors = run('git', ['log', '--all', '--format=%an <%ae>%n%cn <%ce>'], { cwd: work });
+
   const bad = {};
   // Bot/vendor noreply addresses in Co-Authored-By trailers are not personal data.
   const BOT_EMAIL = /^(noreply@anthropic\.com|cursoragent@cursor\.com|.*@users\.noreply\.github\.com)$/i;
-  const emails = (diff.match(EMAIL_RE) || [])
-    .filter((m) => !SAFE_EMAIL.test(m) && !/@example\.com$/i.test(m) && !BOT_EMAIL.test(m)
+  const findEmails = (t) => (t.match(EMAIL_RE) || [])
+    .filter((m) => !SAFE_EMAIL.test(m) && !/^contact\d+@example\.com$/i.test(m)
+      && !/@example\.com$/i.test(m) && !BOT_EMAIL.test(m)
       && !m.includes('..') && m.split('@')[0].length <= 40);
-  if (emails.length) bad.emails = [...new Set(emails)].slice(0, 5);
+  for (const [label, text] of [['emails', content], ['emailsInMessages', messages], ['emailsInAuthors', authors]]) {
+    const hits = findEmails(text);
+    if (hits.length) bad[label] = [...new Set(hits)].slice(0, 5);
+  }
+  const diff = content;
   // Blunt, but not wrong: `postgresql://postgres:password@host:port/db` in a README is an
   // instruction, not a leak. Only an explicit, narrow placeholder list is exempt —
   // anything else still trips the gate, including anything the harvester talked itself
@@ -254,7 +287,8 @@ function verifyHistory(work) {
   const creds = [];
   let cm;
   while ((cm = credRe.exec(diff)) !== null) {
-    if (cm[1] === 'REDACTED' || PW_PLACEHOLDER.test(cm[1])) continue;
+    // `https://x-access-token:contact241@…` is our OWN placeholder landing inside a URL.
+    if (cm[1] === 'REDACTED' || /^contact\d+$/i.test(cm[1]) || PW_PLACEHOLDER.test(cm[1])) continue;
     creds.push(cm[0]);
   }
   if (creds.length) bad.credUrls = [...new Set(creds)].slice(0, 3);
