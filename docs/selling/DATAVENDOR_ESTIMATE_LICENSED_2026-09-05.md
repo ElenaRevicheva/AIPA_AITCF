@@ -169,3 +169,63 @@ reporting a finding the fixer was structurally unable to fix.
 
 Also fixed: the canary list had only ever been a *checker*. Anything on it that is present
 in history is now **rewritten** — which is what removed the cédula.
+
+---
+
+# RE-ESTIMATE after the history rebuild — $38,346 (estimate `01a07376-…`)
+
+| Run | Point | Score | Commits |
+| --- | ---: | ---: | ---: |
+| Originals, 31 Aug | $89,481 | 44% | full |
+| `-licensed`, no history | $28,073 | 16% | 8 |
+| **`-licensed`, scrubbed history** | **$38,346** | **23%** | **2,472** |
+
+Range now **$38,346 – $252,198**. Restoring history was worth **+$10,273** and +7 points,
+and `COMMITS AT REFS` reads **2,472**.
+
+## The remaining gap is a PLATFORM measurement gap, not our code
+
+| `-licensed` repo | Score | Point | SOURCE LOC | Primary language |
+| --- | ---: | ---: | --- | --- |
+| VibeJobHunterAIPA_AIMCF | 40% | $8,020 | 54,567 | Python |
+| EspaLuzWhatsApp | 38% | $7,428 | 26,994 | Python |
+| EspaLuzFamilybot | 37% | $7,138 | 28,427 | Python |
+| EspaLuz_Influencer | 36% | $6,907 | 4,028 | Python 75 / JS 25 |
+| **AIPA_AITCF** | **16%** | **$2,951** | **Unavailable** | **TypeScript** |
+| **dragontrade-agent** | **8%** | **$2,097** | **Unavailable** | **JavaScript** |
+| AILA | 6% | $1,909 | Unavailable | — |
+| atlas-captures | 6% | $1,897 | Unavailable | data |
+
+**Every Python repo measures. Every JS/TS-primary repo does not**, loses the 16-point
+`Complexity score` term, and lands at 6–16%.
+
+Ruled out: file size. `VibeJobHunterAIPA_AIMCF` carries a **4 MB PDF** and measured fine;
+`AIPA_AITCF`'s largest file is a 1 MB PNG. Ruled out: language detection — the report
+prints `TypeScript 70%, JavaScript 26%` for AIPA_AITCF, so Linguist sees it.
+
+**This is worth roughly $9,000.** If `AIPA_AITCF` and `dragontrade-agent` measured like
+the Python repos (~37%), they would price near $7,400 and $7,000 instead of $2,951 and
+$2,097 — putting the bundle around **$48,000** with no change to the code.
+
+`AIPA_AITCF` is the **$12,000 anchor of the listing** and HUD prices it at **$2,951**.
+That is the single most valuable question to put to Megan, and it is on their side.
+
+## Still unscored, and honest about it
+
+- **Test coverage — 0 of 20 points on all 8.** The largest single unscored term. It needs
+  real coverage reports committed. `AIPA_AITCF` scores CI pass rate 5.36/7, so CI signal
+  *is* read — coverage artefacts would be a genuine, earnable uplift.
+- **Pull requests — 0 of 20 on all 8.** Solo development; the originals have 0 too. Not a
+  regression, just 20 points nobody is scoring.
+- **Documentation volume.** Dropping `docs/selling/` and `docs/oracle/` removed real
+  documentation along with the PII it carried. Some of that is recoverable by *scrubbing*
+  `docs/oracle/` instead of dropping it — but it holds CRM ids and addresses, so it is
+  a deliberate trade, not an oversight.
+
+## Caveat on the comparison
+
+The $89,481 is a **31 Aug** figure for the **originals**, quoted from the listing. It was
+not re-run today, so part of the 44% → 23% delta may be estimator differences rather than
+our scrubbing. A like-for-like re-estimate of the originals would settle it — but it means
+re-archiving unscrubbed repos on DataVendor's servers, which cuts against having asked
+them to purge the prior upload. Not done for that reason.
