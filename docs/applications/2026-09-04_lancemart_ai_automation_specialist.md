@@ -118,18 +118,29 @@ This is not a second comment. It is the answer to that ask. Do not resend the co
 
 **Paste this into LinkedIn → Aryaman Upmanyu → Message:**
 
+Verified 5 Sep 12:24 UTC on the live VPS (Actions `33965958007`). `espaluz-whatsapp` active since 4 Sep 10:49:22 UTC, `NRestarts=0`. The 4 Sep repro files were still in `/tmp`. Do not invent a stack list around this.
+
 ```
-Hi Aryaman — you asked me to DM the details of what I built. Here they are.
+Hi Aryaman — you asked for the details. I went back to the machine.
 
-The tutor is a bilingual WhatsApp bot for expat families. It sends a daily lesson and can reply by voice. It runs unattended on one VPS. Real subscribers, not a demo.
+EspaLuz, WhatsApp tutor. systemd unit espaluz-whatsapp is active on the VPS, last restart 4 Sep 10:49 UTC, zero restarts since. Tutor-mode voice notes were unopenable for about a month. Translate mode on the same bot, same account, played.
 
-What I left out of the comment: the voice path is produce-then-assemble. Speech is generated at 24 kHz. A silence pad used to be generated at 44.1 kHz. Concatenating those two makes a stream WhatsApp will not open. ffmpeg sat in the middle and repaired the timestamps on the way through, so decode, container, and the carrier all returned healthy. The only signal that ever disagreed was a parent tapping play. That lasted about a month. The fix was to generate every piece at one sample rate and run the assembler where the decoder's complaint is visible. A tolerant tool in the middle had erased the evidence.
+The 4 Sep repro files are still on disk. I re-ran ffprobe on them today:
 
-I run the rest of the stack the same way — WhatsApp, Telegram, CRM, outreach — on that VPS, with health checks, automatic recovery, and a five-provider LLM fallback so a vendor outage is not an outage. I write the incidents as they happen: https://aideazz.xyz/ai-ops-wiki.html
+speech  /tmp/sp.mp3   → sample_rate=24000
+silence /tmp/pa.mp3   → sample_rate=44100
+splice  /tmp/mixed.mp3 → ffmpeg reports 24000 (first header), then:
 
-Live systems: https://aideazz.xyz/portfolio
+[mp3float] Header missing
+Error submitting packet to decoder: Invalid data found when processing input
 
-Happy to walk through either one if you want to look closer.
+After the fix the matching pair is both 24000 (/tmp/a_sp.mp3, /tmp/a_pa.mp3) and the join decodes clean. Live code now generates silence with anullsrc=r=24000 and concatenates through ffmpeg -ar 24000 -ac 1 -c:a libmp3lame -b:a 64k.
+
+The carrier had already said delivered. The decoder was the only place the fault was still visible.
+
+https://aideazz.xyz/ai-ops-wiki.html (the-repair-that-hid-the-fault)
+
+Happy to walk the two files if you want to look closer.
 
 Elena
 Panama
