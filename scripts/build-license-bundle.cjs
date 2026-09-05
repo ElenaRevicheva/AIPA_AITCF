@@ -40,8 +40,8 @@ const VERIFY_ONLY = argv.includes('--verify-only');
 
 /**
  * The 8-pack as it appears on the live listing (confirmed 4 Sep 2026).
- * `atlas-captures` has no local clone and reports 0 LOC on the listing; it stays in this
- * list so the omission shows up in the run log instead of being silently absent.
+ * All eight are cloned locally as of 5 Sep. `atlas-captures` reports 0 LOC on the listing
+ * because it is a DATA repo, not a codebase — see DATA_REPOS.
  */
 const REPOS = [
   'ai-cofounders/cto-aipa',      // = ElenaRevicheva/AIPA_AITCF   — 1890 findings
@@ -51,7 +51,7 @@ const REPOS = [
   'dragontrade-agent',           //                               —    2 findings
   'EspaLuz_Influencer',
   'AILA',
-  'atlas-captures',              // no local clone — expect "skip (no .git)"
+  'atlas-captures',              // DATA repo — 2 files, see DATA_REPOS
 ];
 
 /**
@@ -61,6 +61,28 @@ const REPOS = [
  * so the export can be matched to an asset without anyone having to remember the mapping.
  */
 const LISTING_NAME = { 'ai-cofounders/cto-aipa': 'AIPA_AITCF' };
+
+/**
+ * Repos whose DATA is the product, not incidental output. Two rules invert for these.
+ *
+ * `atlas-captures` is two files — `capture.log` and `captures.jsonl` — of ad-library
+ * time-series. The listing sells exactly that.
+ *
+ *  1. The `*.log` drop rule exists to remove runtime noise (bot.log, LevelDB logs). Here
+ *     `capture.log` IS the asset, so dropping it would ship an empty repo for $4,137.
+ *  2. The phone rule must be narrowed to E.164 (`+` required). The data is full of Meta Ad
+ *     Library IDs like `905438048824181` — 15 digits, which the ordinary phone pattern
+ *     matches and would rewrite into a fake number, destroying the identifiers the dataset
+ *     exists to provide. Same class of bug as the run that turned
+ *     `claude-haiku-4-5-20251001` into a phone number.
+ *
+ * Measured before deciding: the whole corpus holds 2 distinct advertiser emails and one
+ * real `+357…` number, all inside published ad copy. Those are still scrubbed. Everything
+ * else that "looks like" a phone is an ID or a date.
+ */
+const DATA_REPOS = new Set(['atlas-captures']);
+/** E.164 only — a leading `+` is what separates a phone number from a 15-digit record id. */
+const PHONE_E164_RE = /(?<![\w+-])(\+)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
 
 /**
  * Directories dropped from the bundle entirely. These are sales/ops working material —
@@ -223,14 +245,14 @@ const stats = {
   sqlPasswords: 0, dbHosts: 0,
 };
 
-function scrubPii(text) {
+function scrubPii(text, dataRepo) {
   let out = text.replace(EMAIL_RE, (m) => {
     if (SAFE_EMAIL.test(m)) return m;
     stats.emails++;
     return placeholderEmail(m);
   });
   out = out.replace(HS_ID_RE, (m, p) => { stats.hsids++; return `${p}000000000`; });
-  out = out.replace(PHONE_RE, (m, plus) => {
+  out = out.replace(dataRepo ? PHONE_E164_RE : PHONE_RE, (m, plus) => {
     const digits = m.replace(/[^0-9]/g, '');
     // Leave version strings, ports, timestamps and short numerics alone.
     if (digits.length < 9 || digits.length > 15) return m;
@@ -291,11 +313,14 @@ function scrubSecrets(text) {
   return out;
 }
 
-const scrub = (t) => scrubSecrets(scrubPii(t));
+const scrub = (t, dataRepo) => scrubSecrets(scrubPii(t, dataRepo));
 
-function keep(rel) {
+function keep(rel, repo) {
   const p = rel; // git ls-files always emits forward slashes
   if (DROP_DIRS.some((d) => p.startsWith(d))) return false;
+  // In a data repo the log IS the product. Everywhere else it is runtime output that can
+  // carry user messages and tokens from tracebacks.
+  if (DATA_REPOS.has(repo) && /\.(log|jsonl|csv|tsv)$/i.test(p)) return true;
   if (DROP_FILES.test(p)) return false;
   return true;
 }
@@ -314,7 +339,7 @@ function exportRepo(repo) {
 
   let kept = 0;
   for (const rel of files) {
-    if (!keep(rel)) { stats.dropped++; continue; }
+    if (!keep(rel, path.basename(repo))) { stats.dropped++; continue; }
     let buf;
     // Read from the commit, not the working tree: uncommitted local edits never ship.
     try { buf = execFileSync('git', ['show', `HEAD:${rel}`], { cwd: src, maxBuffer: 1 << 28 }); }
@@ -325,7 +350,7 @@ function exportRepo(repo) {
     // `.diff`, `.jsonl`, `.log` were all unscrubbed because nobody had thought to list them.
     // Sniffing the bytes closes the loop: every extension added to the allowlist was a bug
     // report, so stop maintaining the list as the primary gate.
-    if (TEXT_EXT.test(rel) || isTextishBuffer(buf)) fs.writeFileSync(target, scrub(buf.toString('utf8')), 'utf8');
+    if (TEXT_EXT.test(rel) || isTextishBuffer(buf)) fs.writeFileSync(target, scrub(buf.toString('utf8'), DATA_REPOS.has(path.basename(repo))), 'utf8');
     else fs.writeFileSync(target, buf);
     kept++; stats.files++;
   }

@@ -466,16 +466,16 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   matching or the $89,481 estimator valuation.** She confirmed waiting is free; guessing
   is not. Reply drafted: `docs/selling/drafts/megan-hud-qc-cleanup-2026-09-05.txt` —
   it also discloses the two live credentials and asks them to **purge the prior upload**.
-- ✅ **7 CLEANED REPOS ARE LIVE ON GITHUB (5 Sep). Elena's move is now the DataVendor UI.**
+- ✅ **ALL 8 CLEANED REPOS ARE LIVE ON GITHUB (5 Sep). Elena's move is now the DataVendor UI.**
   `ElenaRevicheva/{AIPA_AITCF,EspaLuzWhatsApp,VibeJobHunterAIPA_AIMCF,EspaLuzFamilybot,`
-  `dragontrade-agent,EspaLuz_Influencer,AILA}-licensed` — **all private, 1 commit each
+  `dragontrade-agent,EspaLuz_Influencer,AILA,atlas-captures}-licensed` — **all private, 1 commit each
   (history-free), 0 canary hits, 0 wwebjs**, verified by re-cloning **from GitHub**, not
   from the local tree. Built by `scripts/publish-license-repos.cjs --apply`.
   **Working repos untouched — proved, not assumed:** all 7 HEADs and dirty counts byte-identical
   before/after, remotes still point at the originals. The script only ever `git init`s inside
   the exported bundle copy.
   **NEXT (UI only, cannot be scripted):** ① GitHub → grant the DataVendor App access to the
-  7 `-licensed` repos · ② DataVendor → Add supply → new listing selecting them · ③ archive
+  8 `-licensed` repos · ② DataVendor → Add supply → new listing selecting them · ③ archive
   the OLD listing **only once the new one reads Active**.
 - 🚫 **DELIVERY IS GITHUB, NOT ZIPS.** `Settings → Integrations` reads **GitHub · Connected —
   "Sell repositories you host on GitHub"**; assets are `ElenaRevicheva/<repo>` and
@@ -503,11 +503,17 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   it holds the strings that must not ship, so committing it would defeat it.
   ⚠️ Trap: the verify rule for cred-URLs needs `(?!REDACTED@)`, or the checker flags the
   scrubber's own replacement and the gate can never go green.
-  ⚠️ `atlas-captures` (8th asset, $4,137) is **NOT** in the licensed set — no local clone,
-  and Elena said stop. It already **passes** `pii_qc_llm`, so the ORIGINAL can be attached
-  to the new listing as-is to keep 8 assets / $74,851. It is a 2-file DATA repo
-  (`capture.log` + `captures.jsonl`, 3.4 MB) — which is why it reads 0 LOC and fails
-  `codebase complexity`.
+  ✅ `atlas-captures` **is now in the licensed set** — cloned and pushed 5 Sep, so all
+  **8 of 8** assets have a clean copy. It is a **DATA repo** (`capture.log` +
+  `captures.jsonl`), which is why it reads 0 LOC and fails `codebase complexity`.
+  ⚠️ **`DATA_REPOS` exists for it and two rules INVERT.** (1) The `*.log` drop rule would
+  have deleted `capture.log` — in a data repo the log IS the product, and dropping it ships
+  an empty repo for $4,137. (2) The phone rule is narrowed to E.164 (`+` required) because
+  the file is full of **Meta Ad Library IDs** like `905438048824181` — 15 digits, which the
+  ordinary phone pattern matches and would rewrite, destroying the identifiers the dataset
+  exists to provide. Same bug class as `claude-haiku-4-5-20251001` becoming a phone number.
+  **Verified:** 3,279 jsonl lines all parse, line counts identical, **all 473 Ad Library IDs
+  byte-identical**; only 2 advertiser emails and one real `+357…` number were replaced.
   Full detail: `docs/selling/DATAVENDOR_QC_2026-09-05.md` (4 Sep doc is banner-corrected).
 - **Anthropic credits at zero** since 17 Aug. The 5-provider chain absorbs it; nothing is
   down. Elena tops up, or leave it on OpenAI.
