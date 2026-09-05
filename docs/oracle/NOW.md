@@ -500,6 +500,28 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 - ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
   8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
   that settings page, so verify via the DataVendor repo picker instead — faster and free.)
+- ✅ **`pii-guard.cjs` is live — the fix is now a GATE, not a sweep (5 Sep).**
+  Cleaning contents does not hold: **`docs/selling/` took 69 commits and 183 new files in
+  30 days**, written by the outreach tooling itself. Scrub it today, fail `pii_qc_llm`
+  again within a week, forever. So: gate it on the way in.
+  `node scripts/pii-guard.cjs` (staged, pre-commit) · `--all` (whole HEAD, all 8, the
+  pre-listing check) · `--install [--skip cto-aipa]`.
+  **Installed on 7 repos and verified blocking** a commit carrying a live-looking DSN.
+  ⚠️ **NOT on `cto-aipa` yet, on purpose** — `stage-manual-prospect.cjs` and
+  `atlas-lead-machine.cjs` **commit locally** and are what writes prospect data into
+  `docs/selling/`. The hook goes on there only once that directory is untracked. **Never
+  gate a workflow against a condition it cannot yet satisfy.**
+  🔒 **Hooks are local-only** — `.git/hooks/` is never tracked, cloned, pushed or pulled
+  (verified: `git ls-files .git/hooks` → 0). So no hook can affect Oracle, a cron, or a
+  GitHub Action. The Atlas weekly cron commits from `$WS/data` on Oracle and is untouched.
+- 📊 **BASELINE 5 Sep, `pii-guard --all`:** cto-aipa **1373** · EspaLuzWhatsApp **43** ·
+  VibeJobHunterAIPA_AIMCF **38** · EspaLuzFamilybot **31** · atlas-captures **19** ·
+  **✓ EspaLuz_Influencer, ✓ AILA, ✓ dragontrade-agent clean.**
+  `cto-aipa` is **91%** of all findings — `docs/selling/` is the whole problem.
+  ⚠️ `atlas-captures` REGENERATES: the Monday cron appends ad copy that can carry advertiser
+  addresses, and it pushes **from Oracle**, where no hook exists. The durable fix is a scrub
+  step inside the capture pipeline, not a one-time clean.
+  🚦 **Do NOT update the listing or tell Megan until `--all` is green.**
 - 🚨🔑 **A LIVE GITHUB TOKEN IS EMBEDDED IN ORACLE'S GIT REMOTE — REVOKE IT (5 Sep).**
   `/home/ubuntu/EspaLuzFamilybot/.git/config` has its origin as
   `https://x-access-token:ghp_<REDACTED>@github.com/ElenaRevicheva/EspaLuzFamilybot.git`.
