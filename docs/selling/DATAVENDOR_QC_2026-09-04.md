@@ -1,3 +1,22 @@
+> # ⛔ SUPERSEDED IN TWO PLACES — read `DATAVENDOR_QC_2026-09-05.md` first
+>
+> Megan Chang (DataVendor) replied on 5 Sep and overturned two verdicts below.
+> The rest of this document — the clean-room approach, the scrubber bugs, the
+> 8-pack inventory — still stands.
+>
+> 1. **§1 is WRONG: the "Hansel" letter is NOT phishing.**
+>    `hansel.tantohari@hud-data-services.com` is DataVendor's own new email
+>    campaign, confirmed by Megan. A mismatched sender domain is evidence, not
+>    proof. (Still never email a credential to anyone, vendor or not.)
+> 2. **§3 is WRONG: credentials were NOT clean.** Two **live** Railway
+>    PostgreSQL connection strings were in the corpus — one in `EspaLuzWhatsApp`
+>    HEAD, one in `dragontrade-agent` history. The scan searched only for vendor
+>    key formats, and a database URL is not one. **Absence of a vendor key is not
+>    absence of a credential.** Both passwords need rotating.
+>
+> Megan also settled the question that mattered: a repo failing `pii_qc_llm`
+> **cannot be sold**. The PII gate is the money gate.
+
 # DataVendor 8-pack — QC state and the "Hansel" letter (4 Sep 2026)
 
 Measured this session from the live listing + a full local scan. Nothing was uploaded,

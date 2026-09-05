@@ -1,0 +1,101 @@
+To:      megan@hud.ai
+Subject: Re: your QC feedback — PII cleaned, and two live credentials you are holding
+
+Hi Megan,
+
+Thank you — that reply did more for me in five lines than the vendor UI has all
+week. Three things back: an apology, a disclosure, and one question.
+
+1. THE CAMPAIGN EMAIL — MY MISREAD, AND ONE NOTE
+
+Understood, and sorry for the alarm. From my side the sending domain was neither
+hud.ai nor datavendor.ai, every claim in it contradicted what my dashboard showed
+(listing Active, last QC 31 Aug, 0 purchases), and it arrived filed as bulk mail.
+That combination is what I reacted to.
+
+The one thing I would still raise, as a vendor rather than a critic: the email
+asks the recipient to go looking through private repositories for API keys,
+tokens and connection strings, and to reply with what they find. That is a good
+instruction wrapped in a risky delivery — it trains vendors to put credentials
+in email, and it makes a future impersonation of that campaign very cheap. A
+link into the platform, where the findings already live, would do the same job.
+
+2. DISCLOSURE — THERE ARE TWO LIVE CREDENTIALS IN THE CORPUS YOU ALREADY HOLD
+
+Your scanner was right and my own earlier pass was wrong, so I want to be
+explicit rather than quiet about it.
+
+I had previously scanned these repos for credentials and concluded there were
+none. That scan only looked for vendor API-key formats — sk-ant-, ghp_, re_ and
+so on. A database connection string is not one of those shapes, so it found
+nothing and I believed it. Taking your finding types seriously and re-scanning
+for URL_WITH_CREDENTIALS specifically, I found:
+
+  - EspaLuzWhatsApp, in HEAD, scripts/migrations/export_railway_data.sh:
+    a live Railway PostgreSQL connection string, password in clear, and the
+    same password repeated in a PGPASSWORD export.
+  - dragontrade-agent, in git history: a second live Railway PostgreSQL
+    connection string.
+
+Plus several local database passwords committed across the EspaLuz repos.
+
+I am rotating both Railway credentials. But rotation does not undo distribution,
+so: could you please purge or quarantine the previously uploaded copies of those
+repositories on your side? Redacting my new upload does not remove the old one
+from your storage, and until the prior upload is gone those strings exist in a
+corpus that is being matched against buyer opportunities.
+
+If it is useful to your team, the miss is a clean one to name: absence of a
+vendor key is not absence of a credential. I would guess I am not the only
+vendor whose self-check has that hole.
+
+3. WHAT I HAVE ALREADY DONE
+
+The licensed copy is now built as a clean-room export rather than shipped from
+the working tree: each repo is exported from HEAD with no .git, sales and CRM
+directories dropped entirely, and then two scrub passes run — one for PII, one
+for secrets. A separate, deliberately blunter checker re-scans the OUTPUT
+afterwards, because a redactor should never grade its own work.
+
+Current build, across the seven repos I hold locally:
+
+  PII       380 email addresses, 1,296 phone numbers, 2 CRM record ids
+  SECRETS   15 credential URLs, 4 SQL passwords, 20 secret assignments,
+            1 bearer token, 5 database hostnames
+  RESULT    independent re-scan clean; 0 hits for any known-real value
+  INTACT    all 160 JS files parse, config files byte-identical, model
+            identifiers unchanged
+
+The four files that fail to parse in the bundle were already broken in the
+source repos — I checked rather than assumed.
+
+4. THE QUESTION
+
+I could not see the per-check breakdown anywhere in the vendor UI, so your email
+was the first per-repo detail I have had — that is why I asked. If there is a
+view that exposes it, I would like access; it would let me verify a fix before
+uploading rather than after.
+
+And on your recommendation to upload a new listing and archive the old one, one
+thing I want to get right the first time:
+
+  Does archiving the current listing forfeit anything it has accumulated —
+  its opportunity matching, its position, or the HUD estimator valuation?
+
+The estimator scored this bundle at $89,481, which is the number I would like to
+keep on the table for the package conversation. If archiving resets that, I would
+rather clean in place if the platform allows it. If archiving is genuinely
+neutral, I will upload the cleaned set this week.
+
+Two smaller items while I have you: AILA and atlas-captures both display as 0 LOC
+while priced — I would like to know whether that is an ingest issue on your side
+before I re-upload them.
+
+Best regards,
+
+Elena Revicheva, AIdeazz Founder
+
++507 616 66 716
+WhatsApp https://wa.me/50761666716
+Telegram https://t.me/ElenaRevicheva
+https://aideazz.xyz/portfolio

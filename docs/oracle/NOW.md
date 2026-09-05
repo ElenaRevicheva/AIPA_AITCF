@@ -439,32 +439,50 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   disk copy is the only path that works. No pm2 restart needed: the registry is read
   per-request. ⚠️ A **duplicate draft of the same letter also sits in Zoho Drafts** — send
   by ONE route, then delete the other, or Megan gets it twice.
-- 🚨 **DataVendor "Hansel" letter is PHISHING — DO NOT REPLY, DO NOT RE-UPLOAD (4 Sep).**
-  **From `hansel.tantohari@hud-data-services.com`** — signs *"Datavendor team"* but the
-  listing is on **`datavendor.ai`**, and that domain is neither DataVendor nor HUD. It is a
-  blended lookalike weaponising the `hud.io ≠ hud.ai ≠ DataVendor` trap already in §6. It
-  ships **Unsubscribe/Exclude** footers (bulk-send, not a person) and its payload is: hunt
-  your private repos for *keys, tokens, connection strings*, then **"reply here"**. That
-  reply is where the secrets go. **Do not click Unsubscribe or Exclude either** — both
-  confirm a live mailbox. Mark as phishing; report in-platform. No breach implied: the
-  listing is in the **public** catalog and `aipa@aideazz.xyz` is on the site.
-  It claims the 8-pack PII check is failing and the listing "cannot be sold or shown to
-  buyers". **The platform contradicts it:** listing is **Active** in the public catalog
-  with **Submit a PO** live, last QC run was **31 Aug (Run #4, `Completed`, 10/32
-  passed)**, and there are **0 purchases** — no "buyers reviewing right now". It asks her
-  to hunt for keys/tokens/connection strings and *reply by email*. Ask DataVendor for the
-  Run #4 breakdown **in-platform (Feedback)** instead.
-  **The PII itself is real** (230 third-party business addresses in `AIPA_AITCF` tracked
-  files) and the listing's own Terms already promise "Excluded: Customer PII" — so the
-  scrub is owed to the buyer regardless of who sent the letter.
-  **Credentials are clean: 0 real keys** in any repo, tracked or history (an earlier
-  ~49-key figure was a bad regex). Nothing to rotate.
+- ❌ **CORRECTED 5 Sep — the "Hansel" letter was NOT phishing. Two live credentials WERE
+  shipped.** Megan Chang (DataVendor) replied and overturned both 4 Sep verdicts. The old
+  entry said the opposite; do not act on any cached memory of it.
+  1. **`hansel.tantohari@hud-data-services.com` IS DataVendor** — *"we're recently testing
+     out a new email campaign and this email is indeed from us."* A mismatched sender
+     domain is **evidence, not proof**. Nothing was lost (Elena did not reply, did not
+     click), but the call was wrong. Standing rule unchanged: **never email a credential**,
+     to anyone, vendor included.
+  2. **Credentials were NOT clean.** The 4 Sep *"0 real credentials, 0 connection strings"*
+     was wrong in the dangerous direction. **Two LIVE Railway PostgreSQL connection
+     strings**: `EspaLuzWhatsApp/scripts/migrations/export_railway_data.sh` (in HEAD, plus
+     the same password in `PGPASSWORD`) and `dragontrade-agent` (in history). Both proxy
+     hosts still resolve. Plus local DB passwords across the EspaLuz repos.
+     🚨 **Elena must ROTATE both Railway passwords** — redaction does not undo distribution.
+     **Why it was missed:** the scan searched only **vendor key formats** (`sk-ant-`,
+     `re_`, `ghp_`…). A database URL is not one, so it returned zero and zero was read as
+     clean. **Named: a negative result is only as wide as the query.** Same shape as the
+     SerpAPI trap in §6 — a check whose *scope* is narrower than the *claim* made from it.
+- 🎯 **The PII gate IS the money gate (Megan, 5 Sep):** *"if the repo failed PII check, it
+  cannot be sell."* Not cosmetic. 5 repos fail `pii_qc_llm` — `AIPA_AITCF` (1890 findings),
+  `EspaLuzWhatsApp` (219), `VibeJobHunterAIPA_AIMCF` (144), `EspaLuzFamilybot` (37),
+  `dragontrade-agent` (2). Her instruction: **upload a NEW listing cleaned, ARCHIVE the
+  old**; the current listing may stay live while cleaning.
+  ⚠️ **Do NOT archive until Megan answers whether archiving forfeits the opportunity
+  matching or the $89,481 estimator valuation.** She confirmed waiting is free; guessing
+  is not. Reply drafted: `docs/selling/drafts/megan-hud-qc-cleanup-2026-09-05.txt` —
+  it also discloses the two live credentials and asks them to **purge the prior upload**.
+- ✅ **Scrubber now has a secrets pass; bundle built and verified (5 Sep).**
+  `scripts/build-license-bundle.cjs` previously had **no secret handling at all** — which
+  is how a "clean" bundle carried a live Postgres password. Added `URL_WITH_CREDENTIALS`,
+  PEM private keys, 13 vendor key shapes, `GENERIC_SECRET_ASSIGNMENT`, bearer tokens,
+  SQL `WITH PASSWORD 'x'` (no `=`, so the assignment rule never saw it), and DB proxy hosts.
+  Build: 1,445 files · 380 emails · 1,296 phones · 15 cred-URLs · 4 SQL passwords ·
+  **VERIFY clean, exit 0**. 7 zips at `D:/aideazz/_license-upload-2026-09-05/`, **0 `.git`
+  entries, 0 canary hits**. Non-destructive: 160 JS files parse, configs byte-identical,
+  model ids intact; the 4 files that fail to parse were **already broken in HEAD**.
+  ⚠️ Canary list is `D:/aideazz/_license-canaries.txt` — **outside every repo on purpose**;
+  it holds the strings that must not ship, so committing it would defeat it.
+  ⚠️ New trap: the verify rule for cred-URLs needs `(?!REDACTED@)`, or the checker flags
+  the scrubber's own replacement and the gate can never go green.
   ⚠️ The real 8-pack is **not** the local repo set: it includes `atlas-captures` (not
   cloned here) and `dragontrade-agent`, and **excludes `aideazz` and `whitespace`**.
   `AILA` and `atlas-captures` are **0 LOC** yet priced $8,401 combined.
-  Full detail + the fix: `docs/selling/DATAVENDOR_QC_2026-09-04.md`.
-  Scrubber: `scripts/build-license-bundle.cjs` (exports a copy, history-free, never
-  touches the working repos).
+  Full detail: `docs/selling/DATAVENDOR_QC_2026-09-05.md` (4 Sep doc is banner-corrected).
 - **Anthropic credits at zero** since 17 Aug. The 5-provider chain absorbs it; nothing is
   down. Elena tops up, or leave it on OpenAI.
 - **VJH outreach crash:** `[outreach] ERROR <company>: 'str' object has no attribute 'get'`
