@@ -308,15 +308,16 @@ danger at 45% free — the point was that growth now lands on the right disk.
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **Zapier — Sr. Technical Account Manager** ($55–82.6K + bonus, remote South America, **PST hours**) | ✅ **SUBMITTED 1 Sep 06:12 EST.** VJH surfaced it 09:04 UTC, she applied within 3h. Deal `⏳ Sent`. Judge has learned it as a positive | **Waiting on them.** ⚠️ Deal has **Contacts (0)** — no person linked, so a recruiter reply may not auto-match. Add the recruiter contact if one writes |
-| 2 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h) | ✅ Applied — registered as a learned positive | **Elena: record the Loom** — they said "links or Looms beat resumes" |
-| 3 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
-| 4 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
-| 5 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
-| 6 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
-| 7 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
-| 8 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
-| 9 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | ✅ **ARMED one-click** 4 Sep — deal `64678307604`, signed `.docx` attached, Cc Adriana + Elena's gmail. Signature was on Datastar's side in her returned file; re-placed in hers | **Elena: click ➡️ SEND BY EMAIL on the deal.** No double-send guard |
+| 1 | **LanceMart AI — AI Automation Specialist** (full-time, **remote anywhere**, deal `64602167197`) | 🔥 **The founder replied to her comment: "DM me the details of what you have built."** DM written + **The Monday Chain** artifact published and fact-checked against the live host — `docs/applications/2026-09-04_lancemart_ai_automation_specialist.md` STEP 3 | **Elena: paste the DM** (plain text, no Markdown — LinkedIn eats asterisks). Then apply on Torre, $4,500–6,000/mo |
+| 2 | **Zapier — Sr. Technical Account Manager** ($55–82.6K + bonus, remote South America, **PST hours**) | ✅ **SUBMITTED 1 Sep 06:12 EST.** VJH surfaced it 09:04 UTC, she applied within 3h. Deal `⏳ Sent`. Judge has learned it as a positive | **Waiting on them.** ⚠️ Deal has **Contacts (0)** — no person linked, so a recruiter reply may not auto-match. Add the recruiter contact if one writes |
+| 3 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h) | ✅ Applied — registered as a learned positive | **Elena: record the Loom** — they said "links or Looms beat resumes" |
+| 4 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
+| 5 | **Behram / AI Native Builder — LinkedIn comment** | Drafted, numbers verified | Elena: paste |
+| 6 | **Work at a Startup profile** | Every field paste-ready | Elena: create the account — agent cannot (credential boundary) |
+| 7 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
+| 8 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
+| 9 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
+| 10 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | ✅ **ARMED one-click** 4 Sep — deal `64678307604`, signed `.docx` attached, Cc Adriana + Elena's gmail. Signature was on Datastar's side in her returned file; re-placed in hers | **Elena: click ➡️ SEND BY EMAIL on the deal.** No double-send guard |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 

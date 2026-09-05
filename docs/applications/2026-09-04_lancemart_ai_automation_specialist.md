@@ -146,3 +146,166 @@ have one.
 - [ ] Apply on Torre with the note and the compensation range (STEP 2)
 - [ ] Attach `29.08.26_EN_Resume_Elena Revicheva.pdf`
 - [ ] Tell the agent "applied LanceMart" so the deal stage moves and VJH learns it
+
+---
+
+# STEP 3 — he replied. The DM. (5 Sep 2026)
+
+Under the comment, Aryaman wrote: *"DM me the details of what you have built and
+I'll take a closer look."* Gate cleared. The DM is now the artefact.
+
+**Arc:** close the EspaLuz bug he already read → pivot to the system that maps to
+the exact process he described hiring for → hand him one page. He said twice he
+does not want a list, so the DM names no tools at all.
+
+## Mapping to what he actually asked for
+
+He wrote a precise spec. The page answers it in this order:
+
+| His requirement | Where it is answered |
+|---|---|
+| "a business process that currently runs on people and spreadsheets" | **§01** — the process was her plus a Telegram message |
+| "a correct map of how the work really happens, not how the SOP says it happens" | **§01** — the alert was correct every Monday and never actioned; the real cost was the two-hour last step |
+| "reason about failure states, retries, and what the system does when an upstream tool goes down at 2 AM" | **§06** — four named failure modes: supply cancelled, mid-chain stale data, per-failure-mode retries, partial blackout |
+| "instruments what they build, so we can tell whether it is working without asking a human" | **§08** daily drill (silent on pass) + **§04** counted rejections + **§07** the unflattering 8% |
+| "built something that ran unattended… someone actually depended on" | EspaLuz (real subscribers) and the chain (nobody starts it) |
+
+## The supporting artifact
+
+**The Monday Chain** — https://claude.ai/code/artifact/780d2d14-b601-44f1-b26b-606b9b61265d
+
+Its spine is the whitespace thesis, because that is the non-obvious part: **the
+score is not how big the market is, it is how much room is left in it.** Real
+figures from the 31 Aug snapshot — 17% angle saturation scores **73**, 100%
+scores **0**.
+
+**Everything on it was verified from the live host on 5 Sep 2026 before publishing:**
+
+| Claim on the page | Verified by |
+|---|---|
+| Five chained Monday jobs, 08:00–11:00 Panama | Oracle `crontab -l` — five `* * 1` entries |
+| §01: brief-not-campaign, 96 prospects at ~1% reply | `scripts/atlas-lead-machine.cjs` header, the "Why (Aug 1 2026)" block |
+| Saturation → score table (10 lanes) | `whitespace/data/brief.json`, snapshot `2026-08-31` |
+| `avoid` list — expat_language, 15 advertisers on urgency_scarcity | same file, `verticals[].avoid[]` |
+| `basis` = observed / launch_proxy / saturation_only | same file, `move.basis` |
+| absent_universe + wait_cost "BUILD NOW / 12pp" | `whitespace/data/intelligence.json` |
+| Lane picked = highest score **with a reachable ICP** | `pickLane()` + `ICP_BY_LANE` (3 of 16 lanes) |
+| Geo-pinned ICP queries (PTY / SJO / MDE / CUN / CTG) | `ICP_BY_LANE`, high-ticket set worked before the local tail |
+| Window threshold 60, dedup on lane+snapshot_date | `scripts/atlas-campaign-alert.cjs` |
+| Outcomes → lane scores, 7 lanes | `atlas-outcomes.log`: `pushed to Atlas: {"ok":true,"lanes":7}` |
+| staged 8 · looked at 20 · no-email 10 · already-in-CRM 4 · outside-band 1 | `atlas-lead-machine.log`, last run |
+| dedup ledger 432 companies / 151 domains | same log (growing: 408 → 417 → 432) |
+| Retry only on 429, 1.5s × attempt, ≤6; 404 → null | `hs()` in `atlas-lead-machine.cjs` |
+| Supply probed for **balance**, not key existence, once per run | `serpHasQuota()` — free `serpapi.com/account` endpoint |
+| Fail-fast on a mid-chain failure | `whitespace/scripts/atlas-capture-cron.sh` guard |
+| Blackout guard: 0/0 ≠ 0% | `src/citation-tracker.ts:607-618`; live `HTTP 429` in `citation-probe.log` |
+| Citation probe: 4 engines, 2/24 cited (8%), 13% named-no-link | `citation-probe.log` summary line |
+| API live, v1.2.0, typed `unfetchable_url` error | probed live: `/v1/health` + a real `POST /v1/visibility` |
+| 51 CLIENT-ATLAS deals · 2,266 deals · 1,203 contacts | HubSpot deals/contacts search API |
+| Daily drill PASS, 4 checks, 3557 ms | `concierge-selftest.log`, ran 5 Sep 12:45 UTC |
+
+Prospect names, emails and WhatsApp numbers are **redacted** from the log excerpt
+on the page; no HubSpot record ids appear on it.
+
+**The thin-sample caveat is on the page, deliberately.** Advertiser counts are 1–15,
+so "saturation 50% (1 advertisers)" is a direction, not a statistic. Saying so is
+what he is screening for; hiding it is what would get caught in an interview.
+
+### The EspaLuz claim is verified, not assumed
+
+- Three commits, 4 Sep: `677d322` (MP3 wearing a `.ogg` filename) → `77576d1`
+  (double extension) → `9029b1f` (silence at 44.1 kHz against gTTS's 24 kHz).
+- ⚠️ Oracle's `EspaLuzWhatsApp` **git checkout is behind** at `24e5c15` — it deploys
+  by named-file `scp`, so the checkout lags by design. Do not "fix" it.
+- The fix **is** on the running box: `espaluz_bridge.py:1514` reads
+  `anullsrc=r=24000:cl=mono`.
+- The deploy took: file mtime `10:48:22`, service `ActiveEnterTimestamp 10:49:22` —
+  the process is newer than the file.
+- It produced **output**: seven `reply_audio_*.ogg` fetches returning 200 between
+  10:53 and 20:22 on 4 Sep, and **zero** `Header missing` / `Invalid data found`
+  decoder errors since the restart.
+
+## The DM — send as plain text
+
+LinkedIn does not render Markdown, so there are no asterisks below. Send as-is.
+
+```
+Thanks for reading the comment. Two things: closing that bug, then the system I
+would actually want you to judge.
+
+ESPALUZ — CLOSED YESTERDAY.
+
+Three defects stacked in one send path. The audio was an MP3 wearing a .ogg
+filename; the filename then carried two extensions; and underneath both, the real
+one — the reply is assembled by joining speech segments to generated silence, and
+the silence was being produced at 44.1 kHz against the speech's 24 kHz. An MP3
+whose sample rate changes mid-stream is malformed.
+
+What isolated it was not a log line, it was a comparison. Translate mode played;
+tutor mode could not be opened at all — same bot, same send path, same carrier
+account. So the fault had to be in what the two modes produce, not in how they are
+delivered. That turned a month of looking into thirty seconds of fixing. Deployed
+yesterday: the decoder error is gone from the logs and that path has served audio
+since.
+
+THE ONE THAT MATCHES YOUR POST.
+
+You described taking a process that runs on people and spreadsheets and building
+something that survives production. I have one of those, and the honest half is
+that my first version failed in exactly the way you would expect.
+
+The weekly market read worked. Every Monday it found which service market was
+opening rather than saturated, wrote the angle, and messaged me: adapt this into a
+campaign. It fired every week, was never down, and the log was green. It earned
+nothing for months — because "adapt this into a campaign" is two hours, and I did
+not have two hours on a Monday. The SOP said the operator acts on the alert. The
+real map was that the alert was always correct and never actioned.
+
+Making the alert louder would not have fixed it. So the system stopped handing me
+a brief and started handing me the finished work: eight named businesses, each
+independently qualified, each with a drafted email and a send button. My step went
+from two hours to one tap.
+
+It is now five chained cron jobs and nobody starts it. I wrote it up rather than
+list it — how it decides which market is opening (a lane at 17 percent angle
+saturation scores 73; at 100 percent it scores 0), how it goes and finds the
+businesses inside that market, the gate that rejects most candidates with a
+counted reason, why retries are written per failure mode instead of wrapped around
+everything, and what it did the week a paid vendor was cancelled mid-quarter.
+There is one number on it that is not flattering, which is the point — you asked
+for instrumentation, not a portfolio.
+
+https://claude.ai/code/artifact/780d2d14-b601-44f1-b26b-606b9b61265d
+
+Panama, UTC-5, remote, available now. I have also applied through Torre.
+```
+
+### If LinkedIn makes her connect first (300-character note)
+
+```
+You asked me to DM — I cannot yet, so briefly: the EspaLuz voice bug from my
+comment closed yesterday (silence generated at 44.1 kHz against 24 kHz speech).
+Happy to send the full version plus a write-up of the unattended weekly lead
+chain I run. — Elena
+```
+
+## Why this shape
+
+He said twice he does not want a list of tools, so the DM names none. He said the
+job is a process that runs on people and spreadsheets — so the pivot is not "here
+is my impressive system", it is "here is that exact process, and here is how my
+first attempt at it failed". Admitting the first version earned nothing for months
+is the strongest move available: it is the SOP-versus-reality skill he put first
+in his post, demonstrated on herself rather than asserted.
+
+The unflattering number (8% citation rate) stays in for the same reason. He is
+screening for people who instrument their own work; a page of only good numbers
+reads as a portfolio, which is the category he rejected by name.
+
+## Checklist
+
+- [x] Comment on the LinkedIn post (STEP 1) — done, he replied
+- [ ] **Send the DM (STEP 3)** — plain text above, artifact link included
+- [ ] Apply on Torre with the note and $4,500–6,000/month (STEP 2)
+- [ ] Attach `29.08.26_EN_Resume_Elena Revicheva.pdf` on Torre
+- [ ] Tell the agent "sent LanceMart DM" so the deal stage moves and VJH learns it
