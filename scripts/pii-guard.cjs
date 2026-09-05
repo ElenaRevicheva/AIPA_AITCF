@@ -60,8 +60,15 @@ const SAFE_EMAIL = new RegExp(
   ')$', 'i');
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 
-/** `postgres:password@host:port/db` in a README is an instruction, not a leak. */
+/**
+ * `postgres:password@host:port/db` in a README is an instruction, not a leak.
+ * TEMPLATE is separate and load-bearing: `${DB_PASSWORD}`, `{{secret}}`, `$(cmd)` and
+ * `<your-password>` are variable REFERENCES. Without this the guard blocks the very fix
+ * it asked for — it rejected `PASSWORD '${DB_PASSWORD}'`, which is the correct remediation
+ * of a hardcoded password. A gate that fails the fix teaches people to bypass the gate.
+ */
 const PW_PLACEHOLDER = /^(password|passwd|pass|secret|token|user|admin|root|test|changeme|your[-_]?password|host|port|db|REDACTED|contact\d+|\.+)$/i;
+const TEMPLATE = /[${}<>]|\{\{/;
 const URL_CRED_RE = /\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:([^@/\s"'`<>${}]{4,})@/g;
 const SQL_PW_RE = /\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"]([^'"\n\r]{4,200})['"]/gi;
 const PEM_RE = /-----BEGIN (?:[A-Z0-9 ]*)PRIVATE KEY-----[\s\\n"',]*[A-Za-z0-9+/]{40,}/g;
@@ -85,12 +92,12 @@ function scan(text, rel) {
   let m;
   URL_CRED_RE.lastIndex = 0;
   while ((m = URL_CRED_RE.exec(text)) !== null) {
-    if (PW_PLACEHOLDER.test(m[1])) continue;
+    if (PW_PLACEHOLDER.test(m[1]) || TEMPLATE.test(m[1])) continue;
     push('credential URL', m[0]);
   }
   SQL_PW_RE.lastIndex = 0;
   while ((m = SQL_PW_RE.exec(text)) !== null) {
-    if (PW_PLACEHOLDER.test(m[1])) continue;
+    if (PW_PLACEHOLDER.test(m[1]) || TEMPLATE.test(m[1])) continue;
     push('SQL password', m[0]);
   }
   for (const v of text.match(PEM_RE) || []) push('private key', v);
