@@ -213,7 +213,11 @@ async function main() {
     console.error(`slug "${slug}" already points at deal ${existing.dealId} — refusing to stage a second deal.`);
     process.exit(1);
   }
-  if (REUSE_DEAL && existing?.dealId) {
+  if (REUSE_DEAL && existing?.dealId && String(existing.dealId) !== REUSE_DEAL) {
+    console.error(`slug "${slug}" already points at deal ${existing.dealId}, not ${REUSE_DEAL}.`);
+    process.exit(1);
+  }
+  if (REUSE_DEAL && existing?.dealId && !DRY) {
     console.error(`slug "${slug}" already points at deal ${existing.dealId} — reuse already ran.`);
     process.exit(1);
   }
@@ -252,7 +256,8 @@ async function main() {
   if (DRY) {
     if (REUSE_DEAL) {
       console.log(`  · would REUSE deal ${REUSE_DEAL} (no second deal)`);
-      console.log(`  · would move that deal back to qualifiedtobuy so the new send is visible`);
+      if (existing?.dealId) console.log(`  · already staged on that deal — a live run would refuse`);
+      else console.log(`  · would move that deal back to qualifiedtobuy so the new send is visible`);
     } else {
       console.log(`  · would create company/contact/deal/note/task for ${spec.name} <${spec.email}>`);
       console.log(`  · deal name: ${dealName}`);

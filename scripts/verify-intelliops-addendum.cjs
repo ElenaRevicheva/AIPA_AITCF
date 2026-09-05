@@ -90,6 +90,17 @@ check('spec reuses the existing counterparty', spec.email === 'nishant.chaudhary
 check('spec attachment path', spec.attachments?.[0]?.path === 'docs/selling/attachments/ADDENDUM_No1_IntelliOps_BD.docx');
 const bundle = fs.readFileSync(path.join(ROOT, 'scripts/build-license-bundle.cjs'), 'utf8');
 check('docs/selling/ is still dropped from the licence bundle', /'docs\/selling\/'/.test(bundle));
+
+const want = fs.readFileSync(path.join(ROOT, 'docs/selling/intelliops/WHAT_WE_WANT.md'), 'utf8');
+const v2src = fs.readFileSync(path.join(ROOT, 'docs/selling/intelliops/source/v2-24-aug.txt'), 'utf8');
+const cmp = fs.readFileSync(path.join(ROOT, 'docs/selling/intelliops/V1_VS_V2.md'), 'utf8');
+check('briefing names the live send slug', /outreach-email\/intelliops-addendum/.test(want));
+check('briefing refuses the old button', /Do \*\*not\*\* tap `intelliops-bd`/.test(want));
+check('briefing lists the five simple asks', /If they ignore a lead/.test(want) && /not 20% after they subtract/.test(want) && /in dollars, to Panama/.test(want) && /12 months/.test(want) && /I keep AIdeazz/.test(want));
+check('v2 source still has the sponge list', /pass-through amounts, third-party costs, reimbursable expenses/.test(v2src));
+check('v2 source still has unbounded verification', /collection and verification/.test(v2src));
+check('comparison quotes the same sponge list', /pass-through amounts, third-party costs, reimbursable expenses/.test(cmp));
+check('addendum still cites the v2 section numbers', /amends Section 8/.test(txt) && /amends Section 6/.test(txt) && /amends Section 19/.test(txt) && /clarifies Section 16/.test(txt));
 check('spec body matches the draft body', draft.includes(spec.body.trim()));
 
 const DIST = path.join(ROOT, 'dist/go-wa.js');
@@ -112,7 +123,7 @@ const dry = execFileSync(
   { encoding: 'utf8', cwd: ROOT },
 );
 check('dry-run reuses the deal instead of creating one', /would REUSE deal 64302436100/.test(dry) && !/would create company\/contact\/deal/.test(dry));
-check('dry-run does not write a registry key', !registry['intelliops-addendum']);
+check('registry slug already points at the reused deal', registry['intelliops-addendum']?.dealId === '64302436100');
 
 if (failures.length) {
   console.error(`FAIL ${failures.length}  ${failures.join(' | ')}`);
