@@ -389,7 +389,28 @@ nothing for the recipient.
 | **The Monday Chain** `780d2d14` | ✅ **Shared with anyone with the link, viewers see the CURRENT version** — confirmed 5 Sep from the artifact service | **Nothing to do.** The link already sent in the DM works. |
 | **Nine Systems** `e5e81972` | ⚠️ Shared, but the service reports *"viewers see a pinned earlier version, not this live version"* | **Move the share pin to the current version** — otherwise he reads the 24 Aug copy, with the pity pot, 9 incidents and 7 verticals |
 
-### How to move the share pin (Anthropic docs, checked 5 Sep 2026)
+### ⚠️ The share pin could not be moved — Nine Systems was republished at a NEW url
+
+**Earned 5 Sep 2026.** The refreshed Nine Systems was published over
+`e5e81972`, but its Share dialog offered no version newer than **Version 13**,
+even after a reload — so the pin could not be pointed at the new content, and
+viewers would have kept reading the 24 Aug copy.
+
+Worse, the obvious fix is blocked by design: selecting **Latest** returns
+*"Can't switch to Latest while people outside your organization can open this
+artifact."* A public link may not auto-follow future publishes — sensible, since
+otherwise every edit would reach strangers with no review — so a public artifact
+**must** pin to a specific version, and that version has to actually exist in the list.
+
+**Resolution: publish to a new artifact.** `07f66895` has exactly one version,
+which is the current content, so there is no stale version to be pinned to.
+`e5e81972` is abandoned — do not send it.
+
+**Rule for next time:** for anything shared publicly, treat a republish as
+unreliable. Publish a **new** artifact and share that, or confirm the new version
+number appears in the Share dialog *before* assuming an update reached anyone.
+
+### How the share pin works (Anthropic docs, checked 5 Sep 2026)
 
 Every publish creates a **version**, and the share link stays pinned to whichever
 version is selected — so a republish is **invisible to viewers** until the pin is
@@ -490,7 +511,7 @@ Hi Aryaman,
 Thank you — here it is, shortest path first.
 
 If you only open one: Nine Systems and Why They Exist
-https://claude.ai/code/artifact/e5e81972-5892-4619-9e84-689ce70b1cec
+https://claude.ai/code/artifact/07f66895-59a7-4b5a-83d6-2ff498fc2948
 Engineering provenance for the nine systems I run — why each was started, how it
 was designed, what broke, and what that cost to learn. Every figure on it was
 read off the running machine today rather than from memory.
