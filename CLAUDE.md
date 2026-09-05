@@ -104,9 +104,26 @@ Oracle:
 
 **Verified:** building `main` and normalising CRLF→LF reproduces Oracle's live
 `dist/go-wa.js` exactly — md5 `e469dacf07a165a5df8931fde1dead26`. Attachments
-are constrained to `docs/selling/attachments/`, `.pdf` only, ≤5 MB, `%PDF-`
-magic-byte checked, and the payload is **refused** if a listed file fails to
-load — so an email never claims a resume it did not attach.
+are constrained to `docs/selling/attachments/`, ≤5 MB, magic-byte checked, and
+the payload is **refused** if a listed file fails to load — so an email never
+claims a resume it did not attach.
+
+**Updated 4 Sep 2026 — attachments are no longer PDF-only.** `.docx` is allowed
+(magic `PK\x03\x04`) because a contract the counterparty still has to SIGN
+cannot be flattened to PDF: Datastar signs the NDA after Elena and produces the
+PDF themselves. The Resend `content_type` follows the extension instead of being
+hardcoded to `application/pdf`, which had delivered an unopenable file. Gate
+tests: `node scripts/test-outreach-attachments.cjs` (24 checks — traversal,
+absolute paths, `.exe`/`.zip`, a display name claiming a different type than the
+file, a `.docx` that is not a zip). **Do not narrow this back to `.pdf`.**
+
+📎 **An attachment must also land IN HubSpot, not only in the Resend payload.**
+A file that exists only in the repo leaves a deal showing a letter that claims a
+document and carries none, and the HubSpot UI Email option has nothing to
+attach. `scripts/hs-files.cjs` uploads to `/outreach-attachments` with
+`access: PRIVATE`; `stage-hiring-outreach.cjs` does it for every staged deal;
+`hs-attach-deal-files.cjs --slug=<slug>` backfills. Needs the **`files`** scope
+on the Service Key — and Files **read** does not imply Files **write**.
 
 Still deploy **named files only** as a habit: Oracle's checkout sits at
 `d9270e6` with a dirty `src/go-wa.ts` (same content, now also on `main`), and

@@ -45,18 +45,28 @@ jobs:
           esac
 
           SPEC=$(echo "$LINE" | awk '{print $1}')
-          if ! echo "$SPEC" | grep -Eq '^docs/selling/specs/[a-z0-9-]+\.json$'; then
-            echo "::error::spec path must be docs/selling/specs/<slug>.json, got '$SPEC'"
+          # A spec path to stage a deal, or one of the named modes. All of them
+          # need credentials that live only on Oracle, which is what this
+          # bridge is for: close-send-tasks and attach-files write to HubSpot,
+          # intelliops-mail reads the Zoho mailbox read-only.
+          if [ "$SPEC" = "close-send-tasks" ] || [ "$SPEC" = "attach-files" ] || [ "$SPEC" = "intelliops-mail" ]; then
+            echo "Mode: $SPEC"
+          elif echo "$SPEC" | grep -Eq '^docs/selling/specs/[a-z0-9-]+\.json$'; then
+            [ -f "$SPEC" ] || { echo "::error::$SPEC is not in this commit"; exit 1; }
+          else
+            echo "::error::first token must be docs/selling/specs/<slug>.json, close-send-tasks, attach-files or intelliops-mail — got '$SPEC'"
             exit 1
           fi
-          [ -f "$SPEC" ] || { echo "::error::$SPEC is not in this commit"; exit 1; }
 
           FLAGS=$(echo "$LINE" | cut -s -d' ' -f2-)
           for f in $FLAGS; do
             case "$f" in
               # --attach-deal only fills dealId on an entry that already exists;
               # the script still refuses if that entry already points at a deal.
-              --dry-run|--attach-deal) ;;
+              # --deal=<digits>/--slug=<slug> scope a sweep or attach to one deal.
+              --dry-run|--attach-deal|--all) ;;
+              --deal=[0-9]*) ;;
+              --slug=[a-z0-9-]*) ;;
               *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
             esac
           done
@@ -98,8 +108,26 @@ jobs:
             && echo "--- pulled staging output ---" \
             || echo "--- no staging output to pull (dry run, or the run failed) ---"
 
+          # intelliops-mail returns a bundle instead of registry changes.
+          # shellcheck disable=SC2086
+          scp $SSHOPTS ubuntu@170.9.242.90:/tmp/intelliops-mail.tar.gz /tmp/ 2>/dev/null \
+            && echo "--- pulled mail bundle ---" || true
+
           rm -f ~/.ssh/oracle
           exit $RC
+
+      # The mail bundle is how an agent with no mail credentials and no IMAP
+      # egress reads the thread. Retention is ONE day on purpose: this is
+      # Elena's private mailbox, and a build artifact should not become a
+      # second copy of it. Private repo, so only collaborators can fetch it.
+      - name: Upload mail bundle
+        if: always() && steps.trigger.outputs.spec == 'intelliops-mail'
+        uses: actions/upload-artifact@v4
+        with:
+          name: intelliops-mail
+          path: /tmp/intelliops-mail.tar.gz
+          retention-days: 1
+          if-no-files-found: warn
 
       - name: Commit registry + drafts
         if: success() && steps.trigger.outputs.skip != 'true'

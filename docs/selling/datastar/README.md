@@ -1,17 +1,30 @@
-# Datastar NDA — filled draft (4 Sep 2026)
+# Datastar NDA — SENT 4 Sep 2026
 
 Conrad Quiroga (`cquiroga@datastar.pa`) sent Datastar’s mutual NDA on **21 Jul 2026**
-and asked Elena to review it and say if she is OK. Oracle (Adriana Vargas) and
-Nexsys (Pedro Olivares) are on the thread because they asked Datastar to issue
-the NDA so they can start supporting AIdeazz.
+and asked Elena to review it and say if she is OK.
 
-**Elena’s move:** sign `NDA_Datastar_Elena_Revicheva_DRAFT.docx` in Word, then
-send `REPLY_cquiroga_NDA.txt` (Reply All) with the signed `.docx` attached.
-**Do not attach the cédula scan** — the NDA already carries the ID number they
-need. **Keep it as Word**, not PDF: Datastar signs second and they make the PDF.
+**Who asked for it, precisely.** *Adriana Vargas (Oracle)* asked Datastar to issue
+the NDA — her 30 Jun 2026 mail: *“te hago envío del documento de AIDEAZZ para la
+generación del NDA por parte de Datastar y poder empezar a apoyar a Elena con su
+proyecto.”* **Pedro Olivares (`pedro.olivares@nexsysla.com`) was only ever a Cc
+on that thread** — twice, and he wrote nothing in it. “Nexsys” is inferred from
+his email domain; the thread never names his company. An earlier version of this
+file said Oracle *and Nexsys* asked for the NDA. They did not; Adriana did.
 
-This is a draft of *their* template with the blanks filled. It is not a
-countersigned original. She reviews the party block, signs, then sends.
+## ✅ Sent — deal `64678307604`
+
+Sent 4 Sep 2026 via the one-click button, Resend id
+`809bdd7d-ffc6-4a00-bb7e-7063c20c17cf`. Resend confirmed delivery to **all three**
+recipients: `cquiroga@datastar.pa`, `adriana.vargas@oracle.com`,
+`elena.revicheva2016@gmail.com`. The signed `.docx` went with it.
+
+⚠️ **The letter as sent contains one unverified claim:** *“seguimos con lo que
+conversamos con Adriana y Pedro.”* Nothing in the thread shows Elena spoke with
+Pedro. It was left alone deliberately — Pedro is not copied on the reply, the
+phrase is the same loose idiom Adriana opened with (*“Según lo conversado”*), and
+it appears in the covering email, not in the NDA, so it changes nothing in the
+agreement. **A follow-up email correcting it would be worse than the line.**
+Do not repeat the phrasing in the follow-up letter.
 
 ## Files
 

@@ -127,10 +127,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 4 Sep — Datastar NDA is ARMED as one-click. Deal `64678307604`.**
+- **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
+  had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
+  `33965178681` → `✓ update note 116418923178` with the verified
+  Resend lines (id `30f57283-…`). Close and reopen that same note.
+  Original stamps remain on 25 Aug note `115571559227`. Do not tap
+  `intelliops-bd`. Do not send again.
+- **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
+  Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
+  Send note `116421825140`. Addendum section numbers match v2.
+- **DONE 4 Sep — Datastar NDA SENT. Deal `64678307604`.**
   `https://app.hubspot.com/contacts/51409153/record/0-3/64678307604` ·
   send `https://webhook.aideazz.xyz/cto/go/outreach-email/datastar-nda`.
-  `[PARTNER] Datastar Panamá S.A. — NDA (Oracle/Nexsys)`, stage 🔥 I act TODAY,
+  `[PARTNER] Datastar Panamá S.A. — NDA (Oracle/Nexsys)`,
   company `56923599228` + contact `236844611933` (both already existed, reused),
   note `116366224737`, HIGH task `116387981992`. To `cquiroga@datastar.pa`,
   **Cc Adriana + `elena.revicheva2016@gmail.com`**, `.docx` attached (82,436 B).
@@ -138,8 +147,65 @@ git log keeps the record.
   the Resend webhook then stamps ENTREGADO / ABIERTO. Contracting party is
   **Elena Revicheva, persona natural**, RUC `8-NT-2-781965 DV 90`, cédula
   **E-8-245573**. Docs: `docs/selling/datastar/`.
-- **NEXT:** Elena: open the deal and click **➡️ SEND BY EMAIL**. Nothing else.
-  ⚠️ **No double-send guard** — one click is one send.
+- **✅ SENT 4 Sep by one-click.** Resend `809bdd7d-ffc6-4a00-bb7e-7063c20c17cf`,
+  **ENTREGADO confirmed to all three** (Conrad, Adriana, Elena's gmail), `.docx`
+  attached, deal now `decisionmakerboughtin` (⏳ Sent), send-task closed.
+  Waiting on Conrad's countersigned copy; the +4-day follow-up is open and his
+  reply now auto-advances the deal (prefix fix below).
+- **⚠️ The letter as sent says "lo que conversamos con Adriana y Pedro" and that
+  is unverified** — Pedro Olivares was only ever a **Cc** on the thread and wrote
+  nothing in it; "Nexsys" is inferred from his domain. **Deliberately NOT
+  corrected:** Pedro is not copied on the reply, it is the same idiom Adriana
+  opened with ("Según lo conversado"), and it sits in the covering email, not in
+  the NDA. A correction email would cost more than the line. **Do not repeat the
+  phrasing in the follow-up.** Adriana asked for the NDA; Pedro did not.
+- **🚨 Two faults that one screenshot caught, both fixed 4 Sep:**
+  1. **A delivered letter left its own send-task open** — three ENTREGADO stamps
+     and `Send Hiring email → Datastar Pan…` still due today. `go-wa.ts` now
+     closes the staged `Send …` task on a successful send (never the follow-up),
+     and `scripts/hs-close-sent-send-tasks.cjs` sweeps deals sent before the fix,
+     closing a task only when a note carries a real stamp. Verified: closed
+     `116387981992`, and a second run reports `Nothing to do`.
+  2. **`hs-watch-manual-emails.cjs` watched `CLIENT-MANUAL`/`CLIENT-ATLAS` only**,
+     so **every** deal from `stage-hiring-outreach.cjs` — `[PARTNER]`,
+     `[LICENSE]`, `[HIRING-MANUAL]` — was invisible to it: Conrad's reply would
+     not have moved this deal to 💬 or cancelled the follow-up. **Third time this
+     list has been the bug.** Add a writer that stages deals → add its prefix in
+     the same change.
+  `[PARTNER]` was also labelled "Send **Hiring** email"; the lane now reads off
+  the prefix instead of one `startsWith` test.
+- **The bridge gained sweep + attach modes** (no new workflow):
+  `echo "close-send-tasks --deal=<id> --dry-run" > .hire-trigger` ·
+  `echo "attach-files --slug=<slug>" > .hire-trigger`.
+  (Trigger content must CHANGE to fire — add a second `retry-$(date +%s)` line;
+  only line one is read.)
+- **🔑 ONE THING ONLY ELENA CAN DO — add the `files` scope to the Service Key.**
+  The signed NDA reached Conrad and both Cc's, but the **CRM copy of the file is
+  not in HubSpot**: uploading returns 403. HubSpot → Development → Keys →
+  Service Keys → **`Aldeazz_Marketing_Engine`** → Scopes → tick **`files`** →
+  Save. Then `echo "attach-files --slug=datastar-nda" > .hire-trigger` backfills
+  it, and every future staged deal attaches its files automatically.
+  ⚠️ **Files READ does not imply Files WRITE** — `/files/v3/files/search`
+  answered 200 while `POST /files/v3/files` answered 403, so a scope preflight
+  looked green and the write still failed. Nothing else is blocked by this.
+- **⚠️ Attachments used to live ONLY in the repo + the Resend payload.** The deal
+  showed a letter claiming a signed NDA with no file on the record, and the
+  HubSpot UI Email option had nothing to attach. There was **no Files API call
+  anywhere in the codebase** before 4 Sep. `scripts/hs-files.cjs` +
+  `hs-attach-deal-files.cjs` fix it, wired into staging so it is no longer
+  something to remember. Rule now in `MANUAL_PROSPECT_PLAY.md`.
+- **NEXT:** Elena:
+  (0) **LanceMart — paste the rewritten DM.** It is from Oracle
+  ffprobe of the 4 Sep files still in `/tmp` (run `33965958007`):
+  `sp.mp3` 24000, `pa.mp3` 44100, `mixed.mp3` → `Header missing` +
+  `Invalid data found when processing input`. No generic stack.
+  File: `docs/applications/2026-09-04_lancemart_ai_automation_specialist.md`
+  (1) Coconut VA — Carmi asked Monday.com familiarity. Book the slot, then
+  paste the Carmi answer in Wellfound Messages (not Gmail). File:
+  `docs/applications/2026-09-04_coconut_va_wellfound_reply.md`. GHL Tech
+  Specialist at $900–1.1k/mo is a skip.
+  IntelliOps addendum is already sent. Do not tap `intelliops-bd`. Do not
+  countersign v2.
 - **🚨 THE TRAP, and it nearly shipped: a signature image goes where the FLOW
   puts it, not where it looked right while editing.** Elena's returned file had
   her signature as an **inline** image in the body, so it rendered above
@@ -159,6 +225,13 @@ git log keeps the record.
   `64531338321`) that §OPEN said lived only on Oracle's disk.** Union now reports
   `kept 0 Oracle-only`. **Search `.github/workflows/` and `git log --all` before
   building a bridge.**
+- **VERIFIED BY (IntelliOps):** Actions `33962804536` — `✓ create note 116421568303`
+  on deal `64302436100`. Earlier stage `33928557848` — reuse + send note.
+  `verify-intelliops-addendum.cjs` PASS 49. Both PDFs quoted in
+  `docs/selling/intelliops/V1_VS_V2.md`.
+- **RISK (IntelliOps):** the old slug still sends the 25 Aug letter. The CRM
+  copy of the addendum is not in HubSpot (files write 403). AIdeazz is a
+  nombre comercial — do not invent a company on their signature block.
 - **VERIFIED BY:** Actions run `33897131057` — `✓ deal 64678307604`, `✓ note`,
   `✓ task`, `registry merged`, then Oracle's own preview printing To/Cc/Adjunto.
   Oracle checkout `HEAD is now at 363ca78`, whose attachment blob
@@ -308,7 +381,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 
 | # | Thing | State | Whose move |
 |---|---|---|---|
-| 1 | **LanceMart AI — AI Automation Specialist** (full-time, **remote anywhere**, deal `64602167197`) | 🔥 **The founder replied to her comment: "DM me the details of what you have built."** DM written + **The Monday Chain** artifact published and fact-checked against the live host — `docs/applications/2026-09-04_lancemart_ai_automation_specialist.md` STEP 3 | **Elena: paste the DM** (plain text, no Markdown — LinkedIn eats asterisks). Then apply on Torre, $4,500–6,000/mo |
+| 1 | **LanceMart AI — AI Automation Specialist** (full-time, **remote anywhere**, deal `64602167197`) | 🔥 **Founder replied to her comment: "DM me the details of what you have built."** DM written (EspaLuz close → the whitespace/Atlas system) + artifact **The Monday Chain** published, every figure re-verified off the live host. Cursor's Oracle ffprobe repro (`sp.mp3` 24000 / `pa.mp3` 44100 / `mixed.mp3` → `Header missing`) is folded into the DM. File: `docs/applications/2026-09-04_lancemart_ai_automation_specialist.md` §STEP 3 | **Elena: paste the DM** — plain text, LinkedIn eats Markdown. Then Torre, $4,500–6,000/mo |
 | 2 | **Zapier — Sr. Technical Account Manager** ($55–82.6K + bonus, remote South America, **PST hours**) | ✅ **SUBMITTED 1 Sep 06:12 EST.** VJH surfaced it 09:04 UTC, she applied within 3h. Deal `⏳ Sent`. Judge has learned it as a positive | **Waiting on them.** ⚠️ Deal has **Contacts (0)** — no person linked, so a recruiter reply may not auto-match. Add the recruiter contact if one writes |
 | 3 | **Rwazi — AI Engineer, Marketing & GTM Systems** (contractor, 25–40h) | ✅ Applied — registered as a learned positive | **Elena: record the Loom** — they said "links or Looms beat resumes" |
 | 4 | **Plata — Automation Stream Lead** | Cover letter written | Elena: send |
@@ -317,7 +390,9 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 7 | **Evaboot - Agentic Python Engineer** ($70-120K, remote, bootstrapped, team of 5) | VJH found it 31 Aug 15:59, score 73. Its note is the OLD stub - the deal predates the 17:54 cover-letter fix by under 2h. Cursor's prep is trapped in a chat window | **Elena: rescue the Cursor draft (see above).** Then the agent writes the application |
 | 8 | **James Onyemu (MONARCH / Delta State hotel)** | Reply drafted: paid-only, redirect to the hotel's AI-discoverability | Elena: send if she wants it |
 | 9 | **HUD — NL2 Repo Tasks** ($600/task) | ✅ Taskset listing **Active** $600 + **submitted to the opportunity** 3 Sep with buyer note. ❌ Submit offer is **not fixable from the vendor UI** — its picker reads HUD **team inventory**, and a Harbor zip on a listing never lands there | **Elena: send the inventory question** (`docs/selling/drafts/hud-nl2repo-taskset-inventory-ask.txt`). Never attach the 8-pack to clear the picker |
-| 10 | **Datastar NDA** (Oracle / Nexsys support for AIdeazz) | ✅ **ARMED one-click** 4 Sep — deal `64678307604`, signed `.docx` attached, Cc Adriana + Elena's gmail. Signature was on Datastar's side in her returned file; re-placed in hers | **Elena: click ➡️ SEND BY EMAIL on the deal.** No double-send guard |
+| 10 | **Datastar NDA** (Oracle support for AIdeazz) | ✅ **SENT 4 Sep** — deal `64678307604`, ENTREGADO to all three, stage ⏳ Sent, send-task closed, FU due 8 Sep. ⚠️ the file is **not yet in HubSpot** — upload needs the `files` scope | **Elena: tick `files` on the Service Key** (one setting), then the agent backfills. Otherwise: waiting on Conrad's countersigned copy |
+| 11 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Carmi asked Monday.com familiarity. Paste-ready answer in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: book the slot, paste the Carmi note in Wellfound.** $21–36k Monday.com SA. Do not claim Monday fluency — HubSpot + Make is the honest equivalent |
+| 12 | **IntelliOps BD** (overlay commission, not a job) | Addendum **staged** 4 Sep on deal `64302436100`. No v3 exists — Nishant 26 Aug asked for unpaid origination first. Do **not** countersign v2. Do **not** tap the old `intelliops-bd` button | **Elena: tap** `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum` |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
@@ -325,13 +400,13 @@ Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{doc
 
 | Lane | Deal | Tap (full URL) |
 | --- | --- | --- |
-| Overlay commission (not a job) | IntelliOps BD | https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-bd |
+| Overlay commission (not a job) | IntelliOps addendum | https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum |
 | Job follow-up (applied on Torre) | BSS Groupe | https://webhook.aideazz.xyz/cto/go/outreach-email/ai-native-b2b-marketplace |
 
 BSS confirm page must show **Hire me**, **Adjunto: Elena_Revicheva_Resume.pdf**, and
 `https://aideazz.xyz/portfolio` twice. If HubSpot opens **Edit link**, paste the full URL.
 
-- IntelliOps deal `.../record/0-3/64302436100` — **do not countersign v2**
+- IntelliOps deal `.../record/0-3/64302436100` — **do not countersign v2**. New send is `intelliops-addendum`, not `intelliops-bd`
 - BSS deal `.../record/0-3/64302126655` — To: `contact@bssgroupe.com`
 - Catch-up: `docs/oracle/HANDOFF_2026-08-25_INTELLIOPS_BSS.md`
 
@@ -340,11 +415,15 @@ BSS confirm page must show **Hire me**, **Adjunto: Elena_Revicheva_Resume.pdf**,
 `cursor/datastar-nda-filled-ded9` (4 Sep) — filled Datastar NDA + reply-all draft
 in `docs/selling/datastar/`. New files only; merge is safe. Elena still has to send.
 
+`cursor/intelliops-addendum-ded9` (4 Sep) — addendum + covering email staged on
+deal `64302436100`. IMAP puller and `--reuse-deal` are on this branch; the
+registry row is already on Oracle disk. Merge is additive.
+
 `cursor/intelliops-bd-money-play-abc0`, last commit 25 Aug. Only there:
 `scripts/hs-email-link-deal.cjs`, `hs-fix-send-buttons.cjs`, `hs-intelliops-story.cjs`,
-`hs-note-intelliops-eval.cjs`, `intelliops-imap-pull.py`, `oracle-hs-note-intelliops.sh`.
+`hs-note-intelliops-eval.cjs`, `oracle-hs-note-intelliops.sh`.
 ⚠️ The branch is also **behind** `main` on many files — a naive merge would delete current
-work. Port what you want by hand; never reset.
+work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 
 ## 🔴 OPEN — do not assume these work
 

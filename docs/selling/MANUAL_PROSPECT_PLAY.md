@@ -94,6 +94,17 @@ pattern WhatsApp's anti-spam targets, and **her number is a business asset** (si
 portfolio). Notes are back to direct `web.whatsapp.com/send` hrefs — laptop only, by design.
 
 **📧 The FU now ships on BOTH channels (July 26 2026).** Every deal note carries, at the top:
+> **Attachments must land in HubSpot too (earned 4 Sep 2026).** An attachment
+> that only exists in the repo and in the Resend payload leaves a deal showing a
+> letter that claims a document and carries no file — and the HubSpot UI Email
+> option, the one this play calls the best CRM trail, has nothing to attach.
+> `stage-hiring-outreach.cjs` now uploads every `attachments` entry into HubSpot
+> and hangs it off the note automatically. Backfill an older deal with
+> `node scripts/hs-attach-deal-files.cjs --slug=<slug>`, or from a cloud agent
+> `echo "attach-files --slug=<slug>" > .hire-trigger`. Needs the **`files`**
+> scope on the Service Key — CRM scopes do not imply it, and Files **read** does
+> not imply Files **write**.
+
 `✉️ EMAIL FU — aipa@aideazz.xyz ({address})` and `➡️ WHATSAPP FU (laptop)`. The email button
 needed **no server change**: the FU gets its own registry slug **`{slug}-fu`**
 (`email` + `emailDraft: docs/selling/drafts/{slug}-fu-email.txt`), which the existing

@@ -184,6 +184,7 @@ scores **0**.
 | Claim on the page | Verified by |
 |---|---|
 | Five chained Monday jobs, 08:00–11:00 Panama | Oracle `crontab -l` — five `* * 1` entries |
+| EspaLuz fault **reproduced**, not inferred: `sp.mp3` 24000 · `pa.mp3` 44100 · `mixed.mp3` → `Header missing` + `Invalid data found` | Cursor's Oracle `ffprobe` run over the 4 Sep files still in `/tmp` (NOW.md, run `33965958007`) |
 | §01: brief-not-campaign, 96 prospects at ~1% reply | `scripts/atlas-lead-machine.cjs` header, the "Why (Aug 1 2026)" block |
 | Saturation → score table (10 lanes) | `whitespace/data/brief.json`, snapshot `2026-08-31` |
 | `avoid` list — expat_language, 15 advertisers on urgency_scarcity | same file, `verticals[].avoid[]` |
@@ -244,9 +245,14 @@ whose sample rate changes mid-stream is malformed.
 What isolated it was not a log line, it was a comparison. Translate mode played;
 tutor mode could not be opened at all — same bot, same send path, same carrier
 account. So the fault had to be in what the two modes produce, not in how they are
-delivered. That turned a month of looking into thirty seconds of fixing. Deployed
-yesterday: the decoder error is gone from the logs and that path has served audio
-since.
+delivered. That turned a month of looking into thirty seconds of fixing.
+
+I did not want to close it on the absence of an error, so I reproduced it from the
+actual files: the speech segment probes at 24000 Hz, the silence at 44100, and the
+joined file fails to decode outright — Header missing, Invalid data found when
+processing input. That is the fault the tolerant tool downstream had been quietly
+repairing for a month. Deployed yesterday; the fixed path has produced audio
+repeatedly since with no decoder complaint.
 
 THE ONE THAT MATCHES YOUR POST.
 

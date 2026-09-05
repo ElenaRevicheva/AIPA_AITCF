@@ -75,8 +75,19 @@ async function hs(method, urlPath, body) {
  * both the name parser and the filter hard-coded CLIENT-MANUAL. Clínica Dental
  * Sanmartin replied and the deal sat in "🔥 I Act TODAY" with nothing detected.
  * Add a prefix by name only; every downstream rule already keys off the deal.
+ *
+ * Sep 4 2026 — the SAME failure, third time. Every deal staged by
+ * stage-hiring-outreach.cjs was invisible here: [PARTNER] (Datastar NDA),
+ * [LICENSE] (Fermatix, AfterQuery, HUD) and [HIRING-MANUAL] all carry the same
+ * one-click aipa@ button and expect the same reply, but none matched. Elena sent
+ * the Datastar NDA from HubSpot and the deal stayed in "🔥 I act TODAY" with the
+ * send task still open and no follow-up scheduled.
+ *
+ * The lesson this list keeps teaching: the watcher is keyed on a NAME, so every
+ * new deal-name prefix is silently unwatched until someone adds it here. When
+ * adding a writer that stages deals, add its prefix in the same change.
  */
-const WATCHED_PREFIXES = ['CLIENT-MANUAL', 'CLIENT-ATLAS'];
+const WATCHED_PREFIXES = ['CLIENT-MANUAL', 'CLIENT-ATLAS', 'PARTNER', 'LICENSE', 'HIRING-MANUAL'];
 const PREFIX_RE = new RegExp(`\\[(?:${WATCHED_PREFIXES.join('|')})\\]\\s+(.+?)\\s+—`);
 
 function isWatchedDeal(name) {

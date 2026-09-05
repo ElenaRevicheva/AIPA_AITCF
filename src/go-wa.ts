@@ -557,6 +557,39 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
       );
     }
   }
+  // The staged "Send … email → {company}" task is done the moment this send
+  // succeeds. Nothing used to close it, so a delivered letter left a HIGH task
+  // due today on the board — Datastar, 4 Sep: three ENTREGADO stamps on the note
+  // and "Send Hiring email → Datastar Pan…" still sitting in Next activity.
+  // Match only the staged send task; never the follow-up created just below.
+  try {
+    const assoc = (await fetch(
+      `https://api.hubapi.com/crm/v4/objects/deals/${p.dealId}/associations/tasks`,
+      { headers },
+    ).then(r => r.json())) as { results?: { toObjectId?: string; id?: string }[] };
+    for (const row of assoc.results || []) {
+      const taskId = row.toObjectId || row.id;
+      if (!taskId) continue;
+      const t = (await fetch(
+        `https://api.hubapi.com/crm/v3/objects/tasks/${taskId}?properties=hs_task_subject,hs_task_status`,
+        { headers },
+      ).then(r => r.json())) as { properties?: { hs_task_subject?: string; hs_task_status?: string } };
+      const subject = t.properties?.hs_task_subject || '';
+      const status = t.properties?.hs_task_status || '';
+      if (status === 'COMPLETED') continue;
+      if (!/^send\b/i.test(subject) || /follow-?up/i.test(subject)) continue;
+      await fetch(`https://api.hubapi.com/crm/v3/objects/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ properties: { hs_task_status: 'COMPLETED' } }),
+      });
+      console.log(`[go/outreach-email] closed send task ${taskId}: ${subject}`);
+    }
+  } catch (e) {
+    // A stale task is untidy, not wrong — never fail a delivered send over it.
+    console.warn('[go/outreach-email] send-task close failed:', (e as Error).message?.slice(0, 90));
+  }
+
   // +4 day follow-up if none open
   const due = new Date();
   due.setDate(due.getDate() + 4);
