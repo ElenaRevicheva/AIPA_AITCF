@@ -48,7 +48,15 @@ const SAFE_EMAIL = new RegExp(
   'sentry\\.io|schema\\.org|w3\\.org|npmjs\\.com|' +
   'users\\.noreply\\.(github|replit)\\.com|' +
   'aideazz\\.(xyz|com)|' +          // her own domain — not customer data
-  'anthropic\\.com|cursor\\.com' +  // agent noreply identities
+  'anthropic\\.com|cursor\\.com|' + // agent noreply identities
+  // Synthetic placeholder domains used in fixtures and .env.example. Not addresses of
+  // real people; flagging them trains the operator to ignore the guard.
+  'yourdomain\\.com|company\\.com|testcompany\\.com|startup\\.com|smallstartup\\.com|vc\\.com|' +
+  // ATS transactional senders. These live in FUNCTIONAL matching lists —
+  // greenhouse_email_verifier.py GREENHOUSE_SENDERS and response_detector.py compare
+  // INCOMING mail against them, so redacting one silently breaks employer-response
+  // detection. They are robot addresses of a public ATS, not personal data.
+  'greenhouse\\.io|greenhouse-mail\\.io|us\\.greenhouse-mail\\.io|getonbrd\\.com|scalearmycareers\\.com' +
   ')$', 'i');
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 
