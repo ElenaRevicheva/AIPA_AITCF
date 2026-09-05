@@ -84,7 +84,9 @@ const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30
 
 const OWNER_ID_EMAIL = 'ElenaRevicheva@users.noreply.github.com';
 const OWNER_EMAILS = new Set(['elena.revicheva2016@gmail.com', 'aipa@aideazz.xyz',
-  'elena@aideazz.xyz', 'elena@aideazz.com', 'your-email@example.com']);
+  'elena@aideazz.xyz', 'elena@aideazz.com', 'your-email@example.com',
+  // Replit stamps commits with its own per-user noreply identity.
+  '42326283-elenarevicheva2@users.noreply.replit.com']);
 /** Passwords that are documentation, not credentials — `postgres:password@host:port/db`. */
 const PW_PLACEHOLDER = /^(password|passwd|pass|secret|token|user|admin|root|test|changeme|your[-_]?password|\.+|host|port|db)$/i;
 
@@ -110,10 +112,17 @@ function harvest(src, dataRepo) {
   // harvested "4842332 100644" as a PHONE NUMBER from an index line. Commit headers
   // (Author:, Date:) are dropped here too; author identity is handled by --mailmap.
   const raw = run('git', ['log', '--all', '-p', '--no-color', '--no-renames'], { cwd: src });
-  const diff = raw.split('\n')
+  const content = raw.split('\n')
     .filter((l) => (l.startsWith('+') || l.startsWith('-')) && !/^(\+\+\+|---)/.test(l))
     .map((l) => l.slice(1))
     .join('\n');
+  // COMMIT MESSAGES ARE A SOURCE TOO. Harvesting only from diffs meant an address that
+  // appears solely in a message — `admisiones@aip.edu.pa` in EspaLuzFamilybot — got no
+  // replacement rule at all, so --replace-message had nothing to apply and it survived.
+  // The verify pass already reads three surfaces; the harvester has to read them as well,
+  // or it writes rules for a smaller world than the checker inspects.
+  const messages = run('git', ['log', '--all', '--format=%B'], { cwd: src });
+  const diff = content + '\n' + messages;
 
   // Keyed by the ORIGINAL spelling, not the lowercased one. filter-repo's --replace-text
   // is CASE-SENSITIVE, so a rule written as `ventas@abolu.net` never matched the literal
@@ -269,7 +278,9 @@ function verifyHistory(work) {
 
   const bad = {};
   // Bot/vendor noreply addresses in Co-Authored-By trailers are not personal data.
-  const BOT_EMAIL = /^(noreply@anthropic\.com|cursoragent@cursor\.com|.*@users\.noreply\.github\.com)$/i;
+  // Platform noreply addresses: GitHub web-UI commits, Replit, and the AI agents.
+  // These are machine identities, not personal data.
+  const BOT_EMAIL = /^(noreply@(anthropic|github)\.com|cursoragent@cursor\.com|.*@users\.noreply\.(github|replit)\.com)$/i;
   const findEmails = (t) => (t.match(EMAIL_RE) || [])
     .filter((m) => !SAFE_EMAIL.test(m) && !/^contact\d+@example\.com$/i.test(m)
       && !/@example\.com$/i.test(m) && !BOT_EMAIL.test(m)
