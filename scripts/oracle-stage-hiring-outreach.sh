@@ -64,6 +64,23 @@ if [ "$SPEC" = "close-send-tasks" ]; then
   exit "$RC"
 fi
 
+# Read-only: print EMAILED / ENTREGADO / ABIERTO lines on a deal's notes.
+if [ "$SPEC" = "prove-stamps" ]; then
+  echo "--- fetching $REF ---"
+  git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
+  git checkout FETCH_HEAD -- \
+    scripts/hs-prove-note-stamps.cjs \
+    scripts/hs-env.cjs 2>&1 || { echo "FATAL: checkout of prove-stamps failed"; exit 1; }
+  echo "--- node scripts/hs-prove-note-stamps.cjs ${FLAGS[*]-} ---"
+  set +e
+  node scripts/hs-prove-note-stamps.cjs "${FLAGS[@]}" 2>&1
+  RC=$?
+  set -e
+  echo "--- prove-stamps exit code: $RC ---"
+  rm -f /tmp/stage-hiring-output.tar.gz
+  exit "$RC"
+fi
+
 # Mail-read mode: pull the IntelliOps thread from Zoho IMAP. Read-only against
 # the mailbox (readonly SELECT), writes nothing to HubSpot, and tars the result
 # back so an agent with no mail credentials and no IMAP egress can read it.
