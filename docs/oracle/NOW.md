@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-05 12:02 | Prove IntelliOps ENTREGADO/ABIERTO on which note | `hs-prove-note-stamps.cjs`, deal `64302436100` (read-only) | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,12 +127,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **IN FLIGHT 5 Sep — where are ENTREGADO/ABIERTO?** Elena is on
-  Activity looking at **logged email** cards (6:57). Those cards are
-  the letter, not the audit trail. Stamps are written onto the
-  outreach **note**. Proving which note via `prove-stamps --deal=64302436100`.
-  On the phone: Filter Activity → Notes only → open **➡️ SEND BY EMAIL**.
-  Marks sit at the top of that note. ABIERTO only after an open.
+- **DONE 5 Sep — ENTREGADO/ABIERTO are on the 25 Aug note, not the
+  email cards.** prove-stamps `33964942303`: note `115571559227` has
+  today’s ✅ ENTREGADO to Nishant, Natalie, Elena gmail and 👀 ABIERTO
+  to Nishant + Natalie (Resend `30f57283-…`). Elena was on Activity
+  **logged email** cards — those never carry the marks. Phone: Filter
+  Activity → **Notes** → open the **25 Aug** send note → look at the
+  **top**. `findOutreachNote` only scanned 8 oldest notes (16 on the
+  deal) so stamps missed the new addendum note. Fix is on the branch;
+  not deployed to Oracle. Do not countersign v2.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
   Send note `116421825140`. Addendum section numbers match v2.
