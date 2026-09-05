@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-05 11:54 | IntelliOps send URL on the deal (mobile) | `hs-post-deal-note.cjs`, deal `64302436100` description + send task + short note | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,15 +127,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 5 Sep — review note now has a tappable send.** Elena opened
-  briefing note `116421568303` on HubSpot mobile and had nothing to tap:
-  the send URL was a bare `https://` line (mobile does not linkify it)
-  and “tap SEND BY EMAIL” pointed at a different note. Fixed and
-  re-posted: Actions `33964444604` → `✓ update note 116421568303`.
-  Close the note and reopen — blue **➡️ SEND BY EMAIL — tap this** at
-  top and under Elena — one action. Same URL from chat:
-  `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`.
-  Do not tap `intelliops-bd`. Do not countersign v2.
+- **IN FLIGHT 5 Sep — send URL on the deal for HubSpot mobile.** Elena
+  wants to tap from the phone *inside the deal*. The briefing note’s
+  “SEND BY EMAIL” label is not a control on Android (HubSpot strips
+  `<a href>`). Putting the raw URL on three deal surfaces: About
+  `description`, the HIGH Send-task body (Next activity), and a short
+  newest note `docs/selling/intelliops/TAP_TO_SEND.md`. Do not tap
+  `intelliops-bd`. Do not countersign v2.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
   Send note `116421825140`. Addendum section numbers match v2.
