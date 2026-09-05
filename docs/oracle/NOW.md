@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-05 12:07 | Copy today’s Resend stamps onto the tap note Elena has open | note `116418923178`, `TAP_TO_SEND.md` | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,15 +127,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 5 Sep — ENTREGADO/ABIERTO are on the 25 Aug note, not the
-  email cards.** prove-stamps `33964942303`: note `115571559227` has
-  today’s ✅ ENTREGADO to Nishant, Natalie, Elena gmail and 👀 ABIERTO
-  to Nishant + Natalie (Resend `30f57283-…`). Elena was on Activity
-  **logged email** cards — those never carry the marks. Phone: Filter
-  Activity → **Notes** → open the **25 Aug** send note → look at the
-  **top**. `findOutreachNote` only scanned 8 oldest notes (16 on the
-  deal) so stamps missed the new addendum note. Fix is on the branch;
-  not deployed to Oracle. Do not countersign v2.
+- **IN FLIGHT 5 Sep — copy today’s stamps onto tap note `116418923178`.**
+  Elena opened that note and only sees `EMAILED via HubSpot UI`. The
+  Resend ENTREGADO/ABIERTO (id `30f57283-…`) are on the 25 Aug note
+  `115571559227`. Re-posting `TAP_TO_SEND.md` with those verified
+  lines so the note she has open shows them. Do not tap `intelliops-bd`.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
   Send note `116421825140`. Addendum section numbers match v2.
