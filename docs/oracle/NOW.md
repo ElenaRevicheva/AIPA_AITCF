@@ -500,6 +500,38 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 - ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
   8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
   that settings page, so verify via the DataVendor repo picker instead — faster and free.)
+- 🚨🔑 **A LIVE GITHUB TOKEN IS EMBEDDED IN ORACLE'S GIT REMOTE — REVOKE IT (5 Sep).**
+  `/home/ubuntu/EspaLuzFamilybot/.git/config` has its origin as
+  `https://x-access-token:ghp_<REDACTED>@github.com/ElenaRevicheva/EspaLuzFamilybot.git`.
+  A **classic `ghp_` PAT in clear**, readable by anything that can read that file or run
+  `git remote -v` on the box. It is NOT in the repo, so DataVendor never flagged it — this
+  is separate from the listing work.
+  **Elena: revoke at https://github.com/settings/tokens, then re-point the remote** to SSH
+  or a fresh fine-grained token. Check the other Oracle checkouts for the same pattern.
+  ⚠️ It was printed into a Claude session transcript on 5 Sep while diagnosing the deploy
+  method — treat it as disclosed regardless.
+- ⚠️ **`EspaLuzFamilybot` DEPLOYS BY GIT.** A third one, beyond the two named in PART 1 §3.
+  Remote set, on `main`, HEAD tracks `origin`. **Removing a TRACKED file in a commit
+  DELETES it from Oracle on the next `git pull`.** `.gitignore` does not save an
+  already-tracked file.
+- 🛑 **EspaLuzFamilybot customer data is NOT cleaned — it needs a backup-first sequence.**
+  `subscribers.json`, `telegram_subscribers.json`, `discovered_subscription_ids.json`,
+  `telegram_phone_email_mapping.json`, `discovered_subscriptions.json` hold **real
+  subscriber emails and phones**. `main.py:841` **writes** `subscribers.json` at runtime,
+  and Oracle's `telegram_subscribers.json` already **DIFFERS from git** — the Oracle copy is
+  authoritative. `telegram_subscribers.json` is even in `.gitignore` yet still tracked.
+  **Naive `git rm --cached` + push would wipe live subscriber data on the next pull.**
+  Correct order: back up on Oracle → untrack in git → pull → verify restored. **31 real
+  addresses remain in this repo's HEAD because of this.**
+- ✅ **EspaLuzFamilybot credentials cleaned in place (`8ef5695`), zero runtime change.**
+  Credential URLs in HEAD **7 → 0**. Proven dead before removal: `main.py:28` runs
+  `load_dotenv()` *before* the imports at 104/115, and Oracle's live `.env` defines both
+  `DATABASE_URL` and `DATABASE_URL_UNIFIED`, so `os.getenv()` always returns the real value.
+  ⚠️ **Trap worth keeping:** `/proc/<pid>/environ` showed `DATABASE_URL` as **NOT SET** for
+  the running bot, which reads as "the fallback is load-bearing — do not touch." It is not.
+  `environ` is the snapshot at **exec time** and never shows what `load_dotenv()` adds
+  afterwards. Process environment alone says *don't touch*; source alone says *safe*.
+  **Only both together give the answer.**
 - 🔄 **PLAN CHANGED — clean the LISTED repos IN PLACE; the `-licensed` copies are a fallback.**
   Measured 5 Sep: **`pii_qc_llm` scans the HEAD SNAPSHOT, not git history.** Decisive test —
   `dragontrade-agent`, which Megan reported as exactly **2 findings**: HEAD holds **2**
