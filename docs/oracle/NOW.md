@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-05 12:07 | Copy today’s Resend stamps onto the tap note Elena has open | note `116418923178`, `TAP_TO_SEND.md` | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,11 +127,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **IN FLIGHT 5 Sep — copy today’s stamps onto tap note `116418923178`.**
-  Elena opened that note and only sees `EMAILED via HubSpot UI`. The
-  Resend ENTREGADO/ABIERTO (id `30f57283-…`) are on the 25 Aug note
-  `115571559227`. Re-posting `TAP_TO_SEND.md` with those verified
-  lines so the note she has open shows them. Do not tap `intelliops-bd`.
+- **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
+  had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
+  `33965178681` → `✓ update note 116418923178` with the verified
+  Resend lines (id `30f57283-…`). Close and reopen that same note.
+  Original stamps remain on 25 Aug note `115571559227`. Do not tap
+  `intelliops-bd`. Do not send again.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
   Send note `116421825140`. Addendum section numbers match v2.
