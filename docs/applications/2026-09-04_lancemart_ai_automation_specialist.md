@@ -389,7 +389,30 @@ nothing for the recipient.
 | **The Monday Chain** `780d2d14` | ✅ **Shared with anyone with the link, viewers see the CURRENT version** — confirmed 5 Sep from the artifact service | **Nothing to do.** The link already sent in the DM works. |
 | **Nine Systems** `e5e81972` | ⚠️ Shared, but the service reports *"viewers see a pinned earlier version, not this live version"* | **Move the share pin to the current version** — otherwise he reads the 24 Aug copy, with the pity pot, 9 incidents and 7 verticals |
 
-Both are one-tap in the artifact's own share menu. The agent cannot do it —
+### How to move the share pin (Anthropic docs, checked 5 Sep 2026)
+
+Every publish creates a **version**, and the share link stays pinned to whichever
+version is selected — so a republish is **invisible to viewers** until the pin is
+moved. This is a named control, not a hidden setting:
+
+1. Open the artifact
+2. Click **Share** in the page header
+3. Under **Shared version**, select **Latest**
+
+> "the link doesn't update until you select 'Latest' under Shared version"
+> — <https://code.claude.com/docs/en/artifacts> ·
+> <https://support.claude.com/en/articles/9547008-publish-and-share-artifacts>
+
+**Verify it as the recipient, not as the owner:** open the link in a
+private/incognito window. Logged in, you always see Latest, so the owner view can
+never tell you whether the pin moved — the same *measure at the edge* rule as the
+rest of this file.
+
+**Tell for Nine Systems:** the current version opens with **"What this document
+is"** and the header meta reads **"Built and run solo"**. The stale pinned version
+opens with **"Who built this"** and the expat / single-mother paragraph.
+
+The agent cannot do it — there is no share action in the tooling. The agent cannot do it —
 there is no share action in the tooling.
 
 ## What changed in Nine Systems, and why
