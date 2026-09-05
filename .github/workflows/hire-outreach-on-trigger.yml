@@ -49,12 +49,12 @@ jobs:
           # need credentials that live only on Oracle, which is what this
           # bridge is for: close-send-tasks and attach-files write to HubSpot,
           # intelliops-mail reads the Zoho mailbox read-only.
-          if [ "$SPEC" = "close-send-tasks" ] || [ "$SPEC" = "attach-files" ] || [ "$SPEC" = "intelliops-mail" ]; then
+          if [ "$SPEC" = "close-send-tasks" ] || [ "$SPEC" = "attach-files" ] || [ "$SPEC" = "intelliops-mail" ] || [ "$SPEC" = "post-note" ] || [ "$SPEC" = "prove-stamps" ]; then
             echo "Mode: $SPEC"
           elif echo "$SPEC" | grep -Eq '^docs/selling/specs/[a-z0-9-]+\.json$'; then
             [ -f "$SPEC" ] || { echo "::error::$SPEC is not in this commit"; exit 1; }
           else
-            echo "::error::first token must be docs/selling/specs/<slug>.json, close-send-tasks, attach-files or intelliops-mail — got '$SPEC'"
+            echo "::error::first token must be docs/selling/specs/<slug>.json, close-send-tasks, attach-files, intelliops-mail, post-note or prove-stamps — got '$SPEC'"
             exit 1
           fi
 
@@ -66,7 +66,9 @@ jobs:
               # --deal=<digits>/--slug=<slug> scope a sweep or attach to one deal.
               --dry-run|--attach-deal|--all) ;;
               --deal=[0-9]*) ;;
+              --reuse-deal=[0-9]*) ;;
               --slug=[a-z0-9-]*) ;;
+              --file=docs/selling/[A-Za-z0-9/._-]*.md) ;;
               *) echo "::error::flag '$f' is not allowed"; exit 1 ;;
             esac
           done

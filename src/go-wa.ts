@@ -538,7 +538,7 @@ async function markHubSpotAfterOutreachEmail(p: OutreachEmailPayload, resendId: 
   {
     // Stamp the OUTREACH note (the one with the audit + FU buttons), not whatever
     // note is newest — Elena's own typed notes were becoming the newest.
-    const best = await findOutreachNote(p.dealId).catch(() => null);
+    const best = await findOutreachNote(p.dealId, p.slug).catch(() => null);
     if (best) {
       // Re-read inside patchNoteStamp so a delivery webhook that won the race
       // is not wiped by this EMAILED write (AfterQuery 30 Aug 2026).

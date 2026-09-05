@@ -25,6 +25,27 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
+# Note mode: hang a markdown briefing on an existing deal. No new deal, no
+# send-task. Used so a review lives on the HubSpot record, not only in a chat.
+if [ "$SPEC" = "post-note" ]; then
+  echo "--- fetching $REF ---"
+  git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
+  NOTE_FILE=$(printf '%s\n' "${FLAGS[@]}" | sed -n 's/^--file=//p' | head -n1)
+  [ -n "$NOTE_FILE" ] || { echo "FATAL: post-note needs --file=docs/selling/....md"; exit 1; }
+  git checkout FETCH_HEAD -- \
+    scripts/hs-post-deal-note.cjs \
+    scripts/hs-env.cjs \
+    "$NOTE_FILE" 2>&1 || { echo "FATAL: checkout of note files failed"; exit 1; }
+  echo "--- node scripts/hs-post-deal-note.cjs ${FLAGS[*]-} ---"
+  set +e
+  node scripts/hs-post-deal-note.cjs "${FLAGS[@]}" 2>&1
+  RC=$?
+  set -e
+  echo "--- post-note exit code: $RC ---"
+  rm -f /tmp/stage-hiring-output.tar.gz
+  exit "$RC"
+fi
+
 # Sweep mode: close send-tasks whose letter demonstrably went out. Writes no
 # registry and creates nothing, so it skips the whole staging path below.
 if [ "$SPEC" = "close-send-tasks" ]; then
@@ -39,6 +60,23 @@ if [ "$SPEC" = "close-send-tasks" ]; then
   RC=$?
   set -e
   echo "--- sweep exit code: $RC ---"
+  rm -f /tmp/stage-hiring-output.tar.gz
+  exit "$RC"
+fi
+
+# Read-only: print EMAILED / ENTREGADO / ABIERTO lines on a deal's notes.
+if [ "$SPEC" = "prove-stamps" ]; then
+  echo "--- fetching $REF ---"
+  git fetch origin "$REF" 2>&1 || { echo "FATAL: fetch $REF failed"; exit 1; }
+  git checkout FETCH_HEAD -- \
+    scripts/hs-prove-note-stamps.cjs \
+    scripts/hs-env.cjs 2>&1 || { echo "FATAL: checkout of prove-stamps failed"; exit 1; }
+  echo "--- node scripts/hs-prove-note-stamps.cjs ${FLAGS[*]-} ---"
+  set +e
+  node scripts/hs-prove-note-stamps.cjs "${FLAGS[@]}" 2>&1
+  RC=$?
+  set -e
+  echo "--- prove-stamps exit code: $RC ---"
   rm -f /tmp/stage-hiring-output.tar.gz
   exit "$RC"
 fi

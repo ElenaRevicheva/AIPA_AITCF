@@ -210,7 +210,11 @@ async function hs(method: string, p: string, body?: unknown): Promise<unknown> {
  * her note instead of the one holding the audit and the FU buttons. Prefer a note
  * that actually carries outreach content; fall back to newest.
  */
-export async function findOutreachNote(dealId: string): Promise<{ id: string; body: string } | null> {
+export async function findOutreachNote(
+  dealId: string,
+  /** When set, prefer the note that actually carries this send's slug. */
+  slug?: string,
+): Promise<{ id: string; body: string } | null> {
   const assoc = (await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`)) as {
     results?: { toObjectId?: string; id?: string }[];
   };
@@ -218,7 +222,10 @@ export async function findOutreachNote(dealId: string): Promise<{ id: string; bo
   if (!ids.length) return null;
 
   const notes: { id: string; body: string; ts: string }[] = [];
-  for (const id of ids.slice(0, 8)) {
+  // IntelliOps 5 Sep 2026: 16 notes, association order is oldest first.
+  // slice(0, 8) never saw the new send note, so ENTREGADO landed on the
+  // 25 Aug letter instead of the addendum note Elena had open.
+  for (const id of ids) {
     const n = (await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`)) as {
       id: string;
       properties?: { hs_note_body?: string; hs_timestamp?: string };
@@ -230,7 +237,15 @@ export async function findOutreachNote(dealId: string): Promise<{ id: string; bo
     /FOLLOW-UP|MENSAJE|ENVIAR POR (WHATSAPP|EMAIL)|SEND BY EMAIL|EMAIL FU|WHATSAPP FU|CLIENT-MANUAL|LICENSE|EMAILED|outreach-email/i.test(
       b,
     );
-  const hit = notes.find(n => isOutreach(n.body)) || notes[0];
+  const slugHit =
+    slug &&
+    notes.find(
+      n =>
+        n.body.includes(`/outreach-email/${slug}`) ||
+        n.body.includes(`go/outreach-email/${slug}`) ||
+        n.body.includes(slug),
+    );
+  const hit = slugHit || notes.find(n => isOutreach(n.body)) || notes[0];
   return hit ? { id: hit.id, body: hit.body } : null;
 }
 
@@ -398,8 +413,9 @@ export async function applyResendEventToHubSpot(
   engagementId?: string,
   /** False for a Cc bounce — the To may have been delivered. */
   flipEngagement?: boolean,
+  slug?: string,
 ): Promise<'applied' | 'duplicate' | 'no-note'> {
-  const best = await findOutreachNote(dealId);
+  const best = await findOutreachNote(dealId, slug);
   if (!best) return 'no-note';
 
   // A send that never arrived must not keep showing as SENT in the Emails tab.
@@ -496,6 +512,7 @@ export function registerResendWebhookRoutes(app: Express): void {
         stamp,
         (hit as ResendLedgerEntry).engagementId,
         !(type === 'email.bounced' && isCc),
+        slug,
       );
       console.log(`[resend-webhook] ${type} ${to} deal=${hit.dealId} → ${outcome}`);
     } catch (e) {

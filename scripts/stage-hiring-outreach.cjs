@@ -37,6 +37,7 @@
  *
  * Usage:
  *   node scripts/stage-hiring-outreach.cjs <spec.json> [--dry-run] [--attach-deal]
+ *   node scripts/stage-hiring-outreach.cjs <spec.json> --reuse-deal=<id> [--dry-run]
  *
  * Spec: { slug, name, email, company, subject, body,
  *         title?, dealName?, domain?, cc?, note?, attachments?, draftFile? }
@@ -59,6 +60,13 @@
  * and verified before the deal existed, leaving only dealId missing. With
  * --attach-deal an existing entry is MERGED — fields are added, never dropped.
  * It still refuses outright if the slug already points at a deal.
+ *
+ * ── --reuse-deal=<id> ───────────────────────────────────────────────────────
+ * A new letter on a deal that already exists (IntelliOps: the 25 Aug letter
+ * went out; the 26 Aug reply needs a different slug, not a second deal).
+ * Uses that deal id, posts a fresh note + send-task, writes the new slug.
+ * Refuses if the slug already points at any deal — that path already ran.
+ * Cannot be combined with --attach-deal.
  */
 'use strict';
 
@@ -113,6 +121,16 @@ function validateAttachments(list) {
 function loadSpec() {
   const DRY = process.argv.includes('--dry-run');
   const ATTACH_DEAL = process.argv.includes('--attach-deal');
+  const reuseArg = process.argv.find(a => a.startsWith('--reuse-deal='));
+  const REUSE_DEAL = reuseArg ? reuseArg.slice('--reuse-deal='.length).trim() : '';
+  if (REUSE_DEAL && !/^[0-9]{6,}$/.test(REUSE_DEAL)) {
+    console.error('--reuse-deal must be a HubSpot deal id (digits)');
+    process.exit(1);
+  }
+  if (REUSE_DEAL && ATTACH_DEAL) {
+    console.error('--reuse-deal and --attach-deal cannot be combined');
+    process.exit(1);
+  }
   const specPath = process.argv.slice(2).find(a => !a.startsWith('--'));
   if (!specPath) {
     console.error('usage: node scripts/stage-hiring-outreach.cjs <spec.json> [--dry-run]');
@@ -135,7 +153,7 @@ function loadSpec() {
     .join(', ');
   const domain = String(spec.domain || spec.companyDomain || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
   const attachments = validateAttachments(spec.attachments);
-  return { DRY, ATTACH_DEAL, spec, slug, cc, domain, attachments, KEY };
+  return { DRY, ATTACH_DEAL, REUSE_DEAL, spec, slug, cc, domain, attachments, KEY };
 }
 function makeHs(KEY) {
   const headers = { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' };
@@ -178,21 +196,29 @@ async function upsertCompany(hs, spec, domain) {
 }
 
 async function main() {
-  const { DRY, ATTACH_DEAL, spec, slug, cc, domain, attachments, KEY } = loadSpec();
+  const { DRY, ATTACH_DEAL, REUSE_DEAL, spec, slug, cc, domain, attachments, KEY } = loadSpec();
   const hs = makeHs(KEY);
-  console.log(`\n── staging outreach: ${slug}${DRY ? ' (dry run)' : ''}\n`);
+  console.log(`\n── staging outreach: ${slug}${DRY ? ' (dry run)' : ''}${REUSE_DEAL ? ` (reuse deal ${REUSE_DEAL})` : ''}\n`);
 
   // 0 ── Registry guard FIRST: refuse before creating anything we'd have to undo.
   const registry = JSON.parse(fs.readFileSync(REGISTRY, 'utf8'));
   const before = Object.keys(registry).length;
   const existing = registry[slug];
-  if (existing && !ATTACH_DEAL) {
+  if (existing && !ATTACH_DEAL && !REUSE_DEAL) {
     console.error(`slug "${slug}" already in the registry (${before} entries) — refusing to overwrite.`);
     console.error('  If the entry is already correct and only needs its dealId, re-run with --attach-deal.');
     process.exit(1);
   }
-  if (existing?.dealId) {
+  if (existing?.dealId && !REUSE_DEAL) {
     console.error(`slug "${slug}" already points at deal ${existing.dealId} — refusing to stage a second deal.`);
+    process.exit(1);
+  }
+  if (REUSE_DEAL && existing?.dealId && String(existing.dealId) !== REUSE_DEAL) {
+    console.error(`slug "${slug}" already points at deal ${existing.dealId}, not ${REUSE_DEAL}.`);
+    process.exit(1);
+  }
+  if (REUSE_DEAL && existing?.dealId && !DRY) {
+    console.error(`slug "${slug}" already points at deal ${existing.dealId} — reuse already ran.`);
     process.exit(1);
   }
 
@@ -228,8 +254,14 @@ async function main() {
   const lane = LANES[prefix] || 'Outreach';
 
   if (DRY) {
-    console.log(`  · would create company/contact/deal/note/task for ${spec.name} <${spec.email}>`);
-    console.log(`  · deal name: ${dealName}`);
+    if (REUSE_DEAL) {
+      console.log(`  · would REUSE deal ${REUSE_DEAL} (no second deal)`);
+      if (existing?.dealId) console.log(`  · already staged on that deal — a live run would refuse`);
+      else console.log(`  · would move that deal back to qualifiedtobuy so the new send is visible`);
+    } else {
+      console.log(`  · would create company/contact/deal/note/task for ${spec.name} <${spec.email}>`);
+      console.log(`  · deal name: ${dealName}`);
+    }
     console.log(`  · owner: ${OWNER_ID}${domain ? `  company domain: ${domain}` : ''}`);
     console.log(`  · would ${existing ? 'MERGE' : 'add'} registry key "${slug}" (registry has ${before})`);
     console.log(`\n── dry run, nothing written to HubSpot\n`);
@@ -264,18 +296,37 @@ async function main() {
   }
 
   // 4 ── Deal. Starts in "I act TODAY" — the click is the outstanding action.
-  const d = await hs('POST', '/crm/v3/objects/deals', {
-    properties: {
-      dealname: dealName,
-      dealstage: 'qualifiedtobuy',
-      pipeline: 'default',
-      hubspot_owner_id: OWNER_ID,
-      description: `${lane} outreach. One-click send: ${PUBLIC_BASE}/go/outreach-email/${slug}`,
-    },
-  });
-  if (!d.ok) { console.error('  ✖ deal create failed:', d.text.slice(0, 200)); process.exit(1); }
-  const dealId = d.json.id;
-  console.log(`  ✓ deal    ${dealId}  ${dealName}`);
+  //      --reuse-deal hangs a new letter on an existing record (IntelliOps)
+  //      instead of opening a second deal for the same counterparty.
+  let dealId;
+  if (REUSE_DEAL) {
+    const got = await hs('GET', `/crm/v3/objects/deals/${REUSE_DEAL}?properties=dealname,dealstage`);
+    if (!got.ok) {
+      console.error(`  ✖ reuse deal ${REUSE_DEAL} not readable:`, got.text.slice(0, 200));
+      process.exit(1);
+    }
+    dealId = String(got.json.id);
+    const moved = await hs('PATCH', `/crm/v3/objects/deals/${dealId}`, {
+      properties: {
+        dealstage: 'qualifiedtobuy',
+        description: `${lane} outreach. One-click send: ${PUBLIC_BASE}/go/outreach-email/${slug}`,
+      },
+    });
+    console.log(`  · reuse   ${dealId}  ${got.json.properties?.dealname || ''}  stage→qualifiedtobuy ${moved.ok ? '✓' : '✖'}`);
+  } else {
+    const d = await hs('POST', '/crm/v3/objects/deals', {
+      properties: {
+        dealname: dealName,
+        dealstage: 'qualifiedtobuy',
+        pipeline: 'default',
+        hubspot_owner_id: OWNER_ID,
+        description: `${lane} outreach. One-click send: ${PUBLIC_BASE}/go/outreach-email/${slug}`,
+      },
+    });
+    if (!d.ok) { console.error('  ✖ deal create failed:', d.text.slice(0, 200)); process.exit(1); }
+    dealId = d.json.id;
+    console.log(`  ✓ deal    ${dealId}  ${dealName}`);
+  }
 
   // 5 ── Associations so the note, task and send stamp land on one record.
   const aDealContact = await hs('PUT', `/crm/v4/objects/deals/${dealId}/associations/contacts/${contactId}`, [
@@ -297,6 +348,9 @@ async function main() {
   const sendUrl = `${PUBLIC_BASE}/go/outreach-email/${slug}`;
   const noteBody =
     `<a href="${sendUrl}"><b>➡️ SEND BY EMAIL — aipa@aideazz.xyz (${esc(spec.email)})</b></a>` +
+    // HubSpot mobile often strips <a href> and leaves the label untappable.
+    // A raw https:// line is what Android linkifies on the phone.
+    `<br>${esc(sendUrl)}` +
     (cc ? `<br><b>Cc:</b> ${esc(cc)}` : '') +
     // Named on the note so the deal never understates what actually went out.
     (attachments.length ? `<br><b>Adjunto:</b> ${esc(attachments.map(x => x.filename).join(', '))}` : '') +
@@ -325,7 +379,9 @@ async function main() {
     properties: {
       hs_task_subject: `Send ${lane} email → ${spec.company}`,
       hs_task_body:
-        `Open the deal note → ➡️ SEND BY EMAIL (aipa@ → ${spec.email}). ` +
+        `${sendUrl}\n\n` +
+        `Tap that URL on the phone (HubSpot mobile does not make the note button a link). ` +
+        `Confirm page sends aipa@ → ${spec.email}. ` +
         `Or HubSpot UI Email from aipa@aideazz.xyz. Do not connect GitHub in this first email.`,
       hs_task_status: 'NOT_STARTED',
       hs_task_priority: 'HIGH',

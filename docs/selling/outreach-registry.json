@@ -3103,5 +3103,20 @@
     "emailDraft": "docs/selling/drafts/fermatix-email.txt",
     "dealId": "64531338321",
     "cc": "aipa@aideazz.xyz"
+  },
+  "intelliops-addendum": {
+    "phone": "",
+    "draft": "docs/selling/drafts/intelliops-addendum-email.txt",
+    "company": "IntelliOps Automation",
+    "email": "nishant.chaudhary@intelliopsautomation.com",
+    "emailDraft": "docs/selling/drafts/intelliops-addendum-email.txt",
+    "cc": "natalie.adel@intelliopsautomation.com, elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/ADDENDUM_No1_IntelliOps_BD.docx",
+        "filename": "ADDENDUM_No1_IntelliOps_BD.docx"
+      }
+    ],
+    "dealId": "64302436100"
   }
 }
