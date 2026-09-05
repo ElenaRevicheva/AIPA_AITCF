@@ -3,7 +3,10 @@
 Deal: `[HIRING-MANUAL] BD Expert @ IntelliOps Automation` · `64302436100`
 Stage: 🔥 I Act TODAY (Elena). Owner: Elena.
 **[➡️ SEND BY EMAIL — tap this](https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum)**
-That is the confirm page. One tap sends from aipa@ to Nishant, Cc Natalie and your gmail, with the Word addendum.
+
+https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum
+
+HubSpot mobile often hides the button and only linkifies a raw `https://` line. Tap that URL. Confirm page. Sends from aipa@ to Nishant, Cc Natalie and your gmail, with the Word addendum.
 Do **not** tap anything that says `intelliops-bd` — that resends the already-sent 25 Aug letter.
 Do **not** countersign v2.
 

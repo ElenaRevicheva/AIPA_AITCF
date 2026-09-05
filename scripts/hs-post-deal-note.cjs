@@ -127,11 +127,23 @@ function mdToHtml(src) {
 }
 
 const html = mdToHtml(md);
+// HubSpot mobile often strips <a href> and leaves the label, so a "SEND BY
+// EMAIL" button is not tappable. A raw https:// line on the deal About card
+// and on the HIGH send-task is what Android will actually linkify.
+const sendUrlMatch = md.match(
+  /https:\/\/webhook\.aideazz\.xyz\/cto\/go\/outreach-email\/[a-z0-9-]+/,
+);
+const sendUrl = sendUrlMatch ? sendUrlMatch[0] : '';
 console.log(`\n── post-note deal ${DEAL} ← ${FILE_REL}${DRY ? ' (dry run)' : ''}`);
 console.log(`  marker  ${marker}`);
 console.log(`  html    ${html.length} chars`);
+if (sendUrl) console.log(`  sendUrl ${sendUrl}`);
 
 if (DRY) {
+  if (sendUrl) {
+    console.log('  would PATCH deal description with that URL (About card on the phone)');
+    console.log('  would PATCH open Send-task body so Next activity carries the URL');
+  }
   console.log('── dry run, nothing written to HubSpot\n');
   process.exit(0);
 }
@@ -195,6 +207,47 @@ async function hs(method, p, body) {
     });
     console.log(`  ${n.ok ? '✓' : '✖'} create  note ${n.ok ? n.json.id : n.text.slice(0, 160)}`);
     if (!n.ok) process.exit(1);
+  }
+
+  if (sendUrl) {
+    const desc = await hs('PATCH', `/crm/v3/objects/deals/${DEAL}`, {
+      properties: {
+        description:
+          `SEND (tap this URL on the phone):\n${sendUrl}\n\n` +
+          `That is the confirm page. Do not tap intelliops-bd.`,
+      },
+    });
+    console.log(`  ${desc.ok ? '✓' : '✖'} deal    description ← send URL`);
+    if (!desc.ok) process.exit(1);
+
+    const tasks = await hs('GET', `/crm/v4/objects/deals/${DEAL}/associations/tasks`);
+    const taskIds = (tasks.json?.results || []).map((x) => x.toObjectId || x.id).filter(Boolean);
+    let patchedTasks = 0;
+    for (const tid of taskIds) {
+      const t = await hs(
+        'GET',
+        `/crm/v3/objects/tasks/${tid}?properties=hs_task_subject,hs_task_status,hs_task_body`,
+      );
+      const subject = t.json?.properties?.hs_task_subject || '';
+      const status = t.json?.properties?.hs_task_status || '';
+      if (status === 'COMPLETED') continue;
+      if (!/^send\b/i.test(subject) || /follow-?up/i.test(subject)) continue;
+      const body = t.json?.properties?.hs_task_body || '';
+      if (body.includes(sendUrl)) {
+        console.log(`  · task    ${tid} already has send URL`);
+        continue;
+      }
+      const up = await hs('PATCH', `/crm/v3/objects/tasks/${tid}`, {
+        properties: {
+          hs_task_body:
+            `${sendUrl}\n\nTap that URL. Confirm. ${body}`.slice(0, 65000),
+        },
+      });
+      console.log(`  ${up.ok ? '✓' : '✖'} task    ${tid} ${subject}`);
+      if (!up.ok) process.exit(1);
+      patchedTasks += 1;
+    }
+    if (!patchedTasks) console.log('  · task    no open Send-task to patch');
   }
   console.log(`  Deal: https://app.hubspot.com/contacts/51409153/record/0-3/${DEAL}\n`);
 })().catch((e) => {

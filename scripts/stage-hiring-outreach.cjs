@@ -348,6 +348,9 @@ async function main() {
   const sendUrl = `${PUBLIC_BASE}/go/outreach-email/${slug}`;
   const noteBody =
     `<a href="${sendUrl}"><b>➡️ SEND BY EMAIL — aipa@aideazz.xyz (${esc(spec.email)})</b></a>` +
+    // HubSpot mobile often strips <a href> and leaves the label untappable.
+    // A raw https:// line is what Android linkifies on the phone.
+    `<br>${esc(sendUrl)}` +
     (cc ? `<br><b>Cc:</b> ${esc(cc)}` : '') +
     // Named on the note so the deal never understates what actually went out.
     (attachments.length ? `<br><b>Adjunto:</b> ${esc(attachments.map(x => x.filename).join(', '))}` : '') +
@@ -376,7 +379,9 @@ async function main() {
     properties: {
       hs_task_subject: `Send ${lane} email → ${spec.company}`,
       hs_task_body:
-        `Open the deal note → ➡️ SEND BY EMAIL (aipa@ → ${spec.email}). ` +
+        `${sendUrl}\n\n` +
+        `Tap that URL on the phone (HubSpot mobile does not make the note button a link). ` +
+        `Confirm page sends aipa@ → ${spec.email}. ` +
         `Or HubSpot UI Email from aipa@aideazz.xyz. Do not connect GitHub in this first email.`,
       hs_task_status: 'NOT_STARTED',
       hs_task_priority: 'HIGH',
