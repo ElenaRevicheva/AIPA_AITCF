@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-05 12:02 | Prove IntelliOps ENTREGADO/ABIERTO on which note | `hs-prove-note-stamps.cjs`, deal `64302436100` (read-only) | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,13 +127,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 5 Sep — send URL is on the deal for HubSpot mobile.** Android
-  strips `<a href>` so “SEND BY EMAIL” was not tappable. Actions
-  `33964604578`: `✓ create note 116418923178`, `✓ deal description`,
-  `✓ task 116425576481`. Elena: pull-to-refresh the deal → tap the
-  `https://webhook…/intelliops-addendum` line on the newest note, in
-  About, or in the HIGH Send task. Do not tap `intelliops-bd`. Do not
-  countersign v2.
+- **IN FLIGHT 5 Sep — where are ENTREGADO/ABIERTO?** Elena is on
+  Activity looking at **logged email** cards (6:57). Those cards are
+  the letter, not the audit trail. Stamps are written onto the
+  outreach **note**. Proving which note via `prove-stamps --deal=64302436100`.
+  On the phone: Filter Activity → Notes only → open **➡️ SEND BY EMAIL**.
+  Marks sit at the top of that note. ABIERTO only after an open.
 - **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
   Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`.
   Send note `116421825140`. Addendum section numbers match v2.
