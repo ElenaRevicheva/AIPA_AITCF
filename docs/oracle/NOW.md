@@ -127,17 +127,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 4 Sep — IntelliOps addendum staged, not sent.** Deal `64302436100`
-  (reused, not a second deal). Note `116421825140`, HIGH task `116425576481`.
-  Send: `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`
-  · To Nishant, **Cc Natalie + `elena.revicheva2016@gmail.com`**,
-  `ADDENDUM_No1_IntelliOps_BD.docx` (3,063 B). IMAP pull: 7 messages, 2 PDFs,
-  **no v3** — the 26 Aug mail is “originate first, revise later”. The addendum
-  writes the four remaining collectability items; they can sign it or accept
-  the same five clauses in a reply. Origination starts the same week they
-  accept, not before. Write-up: `docs/selling/intelliops/`.
-  Branch `cursor/intelliops-addendum-ded9` (PR). Oracle disk already has the
-  registry row — the button resolves. Files-scope write still 403.
+- **DONE 5 Sep — both IntelliOps PDFs re-read; briefing is on the deal.**
+  Deal `64302436100` `[HIRING-MANUAL] BD Expert @ IntelliOps Automation`,
+  owner Elena, stage 🔥 I Act TODAY. Review note `116421568303`
+  (`[INTELLIOPS REVIEW] 5 Sep 2026`). Addendum send note `116421825140`.
+  v1 and v2 Elena uploaded = the mailbox copies. Addendum section numbers
+  match v2. No rewrite. Simple-words file:
+  `docs/selling/intelliops/WHAT_WE_WANT.md`. Send:
+  `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum`.
+  Do not tap `intelliops-bd`. Do not countersign v2.
 - **DONE 4 Sep — Datastar NDA SENT. Deal `64678307604`.**
   `https://app.hubspot.com/contacts/51409153/record/0-3/64678307604` ·
   send `https://webhook.aideazz.xyz/cto/go/outreach-email/datastar-nda`.
@@ -223,9 +221,10 @@ git log keeps the record.
   `64531338321`) that §OPEN said lived only on Oracle's disk.** Union now reports
   `kept 0 Oracle-only`. **Search `.github/workflows/` and `git log --all` before
   building a bridge.**
-- **VERIFIED BY (IntelliOps):** Actions `33928557848` — `· reuse 64302436100`,
-  `✓ note 116421825140`, `✓ task 116425576481`, registry 374→375, Oracle
-  preview To/Cc/Adjunto 3,063 B. `verify-intelliops-addendum.cjs` PASS 42.
+- **VERIFIED BY (IntelliOps):** Actions `33962804536` — `✓ create note 116421568303`
+  on deal `64302436100`. Earlier stage `33928557848` — reuse + send note.
+  `verify-intelliops-addendum.cjs` PASS 49. Both PDFs quoted in
+  `docs/selling/intelliops/V1_VS_V2.md`.
 - **RISK (IntelliOps):** the old slug still sends the 25 Aug letter. The CRM
   copy of the addendum is not in HubSpot (files write 403). AIdeazz is a
   nombre comercial — do not invent a company on their signature block.
