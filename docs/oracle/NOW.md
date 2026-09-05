@@ -514,6 +514,34 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   🔒 **Hooks are local-only** — `.git/hooks/` is never tracked, cloned, pushed or pulled
   (verified: `git ls-files .git/hooks` → 0). So no hook can affect Oracle, a cron, or a
   GitHub Action. The Atlas weekly cron commits from `$WS/data` on Oracle and is untouched.
+- 📈 **IN-PLACE CLEANING: 4 of 8 CLEAN (5 Sep).** ✓ `VibeJobHunterAIPA_AIMCF` ·
+  ✓ `dragontrade-agent` · ✓ `EspaLuz_Influencer` · ✓ `AILA`.
+  `EspaLuzWhatsApp` **43 → 18**, `cto-aipa` 1373 → 1370. Every change proved
+  behaviour-identical BEFORE it landed, never after.
+  **The method that made it safe:** for each credential, check `/proc/<pid>/environ` on
+  Oracle AND the repo's `load_dotenv()` ordering AND the live `.env`. `/proc` alone says
+  *don't touch* (it is an exec-time snapshot and never shows `load_dotenv()` additions);
+  source alone says *safe*. Only all three together give the answer.
+  ⚠️ **Never redact executable code to a broken literal** — point it at the env var the
+  product already uses. `VibeJobHunterAIPA_AIMCF`'s `FROM_EMAIL` fallback became
+  `aipa@aideazz.xyz`, not `REDACTED`, so even the unreachable branch stays valid.
+- 🛑 **THE REMAINING 4 ALL NEED ELENA'S DECISION — none is a scrub.**
+  1. **`cto-aipa` 1370** — `docs/selling/` (820 files, 1,306 addresses, 81%). Must MOVE, not
+     be cleaned: it regenerates. Proposed home `ElenaRevicheva/aideazz-private-docs`
+     (private, unlisted, already hers).
+  2. **`EspaLuzFamilybot` 31** — subscriber JSONs. `main.py:841` writes one at runtime and
+     Oracle's copy already differs from git. **Backup-first sequence required**; a plain
+     `git rm --cached` + push DELETES live customer data on the next pull.
+  3. **`EspaLuzWhatsApp` 18** — `espaluz_bridge.py` hardcodes real subscriber addresses
+     inside **live conditional logic** (`if email.lower() == "…"`), plus
+     `paypal_auto_detection.py` and `subscribers.json`. Redacting changes behaviour for
+     named customers. Proposed: move those identities to `.env` vars, same pattern as every
+     other fix.
+  4. **`atlas-captures` 19** — advertiser addresses inside scraped public ad copy.
+     ⚠️ **DataVendor already PASSES this repo on `pii_qc_llm`** — the guard is stricter than
+     the actual gate here. No work may be needed; scrubbing product data has a real cost.
+     If it is scrubbed, it must happen in the capture pipeline: the Monday cron appends new
+     ad copy and pushes **from Oracle**, where no hook exists.
 - 📊 **BASELINE 5 Sep, `pii-guard --all`:** cto-aipa **1373** · EspaLuzWhatsApp **43** ·
   VibeJobHunterAIPA_AIMCF **38** · EspaLuzFamilybot **31** · atlas-captures **19** ·
   **✓ EspaLuz_Influencer, ✓ AILA, ✓ dragontrade-agent clean.**
