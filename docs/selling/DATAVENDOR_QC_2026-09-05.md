@@ -168,6 +168,60 @@ Artifacts:
   anywhere would defeat the check it powers. Same rule as the cédula near-miss:
   an identifier belongs in dropped data, never in a shipped script.
 
+## 5b. 🚨 A live WhatsApp Web session was committed — and both passes were blind to it
+
+Found while checking why `atlas-captures` (a 2-file data repo) would be handled at all.
+
+`EspaLuzWhatsApp` tracks **378 files / 47.2 MB** under `.wwebjs_auth/session/` — a
+Chromium profile for an **authenticated WhatsApp Web session**: `Cache_Data`, Local
+Storage, Session Storage, IndexedDB, LevelDB. That is authentication material plus
+cached contact and message data, and it is almost certainly the bulk of that repo's
+219 PII findings.
+
+**It was invisible to both halves of the tool at once.** The scrub pass rewrote only
+files matching `TEXT_EXT`, and the verify pass *walked the same allowlist*. `.log`,
+`.ldb`, `.jsonl`, `.tsv` and `.diff` were on neither list — so those files were
+copied byte-for-byte **and then not checked**. A file nobody thought to name was
+both unscrubbed and unverified.
+
+> **Named failure mode: an allowlist shared by the fixer and the checker is a single
+> point of failure wearing two hats.** The independent verify pass was not
+> independent — it inherited the scrubber's assumption about where secrets live.
+
+Three fixes:
+
+1. **Dropped entirely** — `.wwebjs_auth/`, `__pycache__/`, `node_modules/`, `.venv/`,
+   and `*.pyc`, `*.ldb`, `*.pid`, `*.log`, `*.sqlite`, `*.db`. Compiled Python embeds
+   string literals, so a `.pyc` can carry a secret the `.py` no longer does.
+2. **Verify now sniffs bytes, not extensions** — NUL byte or >5% control characters
+   means binary; everything else is scanned whatever it is called.
+3. **Scrub uses the same sniff as a fallback**, so anything verify inspects, scrub
+   has already processed. Every extension previously added to that allowlist was a
+   bug report; it is no longer the primary gate.
+
+The sniff paid for itself on the first run: it immediately caught a real address in
+`scripts/espaluz-hotfixes/kinder-preference-fix.diff`, a file the allowlist had
+never looked at.
+
+**Effect on the bundle:** `EspaLuzWhatsApp` fell from **551 files to 169**, and total
+dropped rose from 846 to **1,234**. Nothing a buyer needs was lost.
+
+## 5c. Delivery is GitHub, not zips
+
+`Settings → Integrations` reads **GitHub · Connected — "Sell repositories you host on
+GitHub."** Assets are identified as `ElenaRevicheva/<repo>` and `Repository snapshot`
+is a mandatory check. **There is no zip upload path for a codebase asset**, so the
+zips built earlier on 5 Sep were the wrong artifact and have been deleted.
+
+The cleaned trees must exist as **GitHub repositories**.
+`scripts/publish-license-repos.cjs` pushes each to a **new private** repo, one commit,
+no history — gated on `--verify-only` exiting 0 and refusing any tree with a nested
+`.git`. New repos, never a history rewrite: `VibeJobHunterAIPA_AIMCF` and `aideazz`
+deploy from git and are held at `origin/main`.
+
+Full per-check breakdown, and why cleaning PII fixes only 5 of the 22 failures:
+`docs/selling/DATAVENDOR_QC_RUN4_BREAKDOWN.md`.
+
 ## 6. Open — Elena's move
 
 1. 🚨 **Rotate both Railway PostgreSQL passwords.** Credential action, hers alone.

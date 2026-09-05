@@ -55,6 +55,14 @@ const REPOS = [
 ];
 
 /**
+ * Local checkout path → the name the asset carries on the listing. Only one differs, but
+ * it is the one that matters: DataVendor lists it as `ElenaRevicheva/AIPA_AITCF` while the
+ * clone lives at `ai-cofounders/cto-aipa`. The bundle directory is named for the LISTING,
+ * so the export can be matched to an asset without anyone having to remember the mapping.
+ */
+const LISTING_NAME = { 'ai-cofounders/cto-aipa': 'AIPA_AITCF' };
+
+/**
  * Directories dropped from the bundle entirely. These are sales/ops working material —
  * CRM dumps, outreach registries, job applications. They carry the overwhelming majority
  * of the third-party PII and contain almost no code, so dropping them costs the buyer
@@ -67,9 +75,30 @@ const REPOS = [
 const DROP_DIRS = [
   'docs/selling/', 'docs/oracle/', 'docs/applications/', 'docs/interview/',
   'dist-lambda/', 'backups/', 'docs/hubspot/', 'docs/crm/',
+  // 🚨 A LIVE BROWSER SESSION STORE, COMMITTED. Found 5 Sep 2026: EspaLuzWhatsApp tracks
+  // 378 files / 47.2 MB of `.wwebjs_auth/session/` — a Chromium profile for an
+  // authenticated WhatsApp Web session (Cache_Data, Local Storage, IndexedDB, LevelDB).
+  // That is authentication material plus cached message and contact data, and it is almost
+  // certainly the bulk of that repo's 219 PII findings. A buyer needs none of it.
+  '.wwebjs_auth/', '.wwebjs_cache/',
+  // Runtime and build artefacts. Compiled Python embeds string literals, so a .pyc can
+  // carry a secret the .py no longer does.
+  '__pycache__/', 'node_modules/', '.venv/', 'venv/',
 ];
-const DROP_FILES = /(^|\/)(\.env(\..*)?|.*\.pem|.*\.p12|.*\.pfx|.*\.jks|.*\.ppk|.*\.key|id_rsa.*|outreach-registry\.json)$/i;
-const TEXT_EXT = /\.(ts|tsx|js|jsx|cjs|mjs|py|sh|json|md|txt|yml|yaml|html|css|sql|toml|ini|env\.example)$/i;
+const DROP_FILES = new RegExp(
+  '(^|/)(' +
+  '\\.env(\\..*)?|.*\\.pem|.*\\.p12|.*\\.pfx|.*\\.jks|.*\\.ppk|.*\\.key|id_rsa.*|' +
+  'outreach-registry\\.json|' +
+  // Runtime state and compiled output — never source, sometimes secret-bearing.
+  '.*\\.(pyc|pyo|ldb|pid|sqlite3?|db)|' +
+  // Logs are raw production output: user messages, addresses, tokens in tracebacks.
+  '.*\\.log' +
+  ')$', 'i');
+/**
+ * Extensions the SCRUB pass rewrites. Kept as an allowlist because scrubbing a binary
+ * would corrupt it. The VERIFY pass deliberately does NOT use this list — see isTextish().
+ */
+const TEXT_EXT = /\.(ts|tsx|js|jsx|cjs|mjs|py|sh|bat|ps1|json|jsonl|md|mdc|txt|yml|yaml|html|xml|css|sql|toml|ini|conf|cfg|service|nix|patch|csv|tsv|properties|env\.example)$/i;
 
 /* ------------------------------------------------------------------ PASS 1: PII */
 
@@ -274,7 +303,7 @@ function keep(rel) {
 function exportRepo(repo) {
   const src = path.join(REPOS_ROOT, repo);
   if (!fs.existsSync(path.join(src, '.git'))) return console.log(`  skip (no .git): ${repo}`);
-  const dest = path.join(OUT, repo.split('/').join('__'));
+  const dest = path.join(OUT, LISTING_NAME[repo] || repo.split('/').join('__'));
   fs.mkdirSync(dest, { recursive: true });
 
   // -z, not plain ls-files: git QUOTES paths containing non-ASCII ("CL\303\215NICA…"),
@@ -292,7 +321,11 @@ function exportRepo(repo) {
     catch { continue; }
     const target = path.join(dest, rel);
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    if (TEXT_EXT.test(rel)) fs.writeFileSync(target, scrub(buf.toString('utf8')), 'utf8');
+    // Scrub anything the verify pass would inspect. TEXT_EXT alone kept coming up short —
+    // `.diff`, `.jsonl`, `.log` were all unscrubbed because nobody had thought to list them.
+    // Sniffing the bytes closes the loop: every extension added to the allowlist was a bug
+    // report, so stop maintaining the list as the primary gate.
+    if (TEXT_EXT.test(rel) || isTextishBuffer(buf)) fs.writeFileSync(target, scrub(buf.toString('utf8')), 'utf8');
     else fs.writeFileSync(target, buf);
     kept++; stats.files++;
   }
@@ -315,6 +348,39 @@ const VERIFY_RULES = [
   ['vendor-key', (t) => (t.match(/\b(sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})/g) || [])],
 ];
 
+/**
+ * Is this file worth scanning, judged by CONTENT rather than by extension?
+ *
+ * The verify pass must not share the scrub pass's allowlist. On 5 Sep the allowlist had no
+ * `.jsonl`, `.log`, `.tsv` or `.conf`, so a 2.7 MB scraped-data file and a committed
+ * browser session store were neither scrubbed NOR checked — invisible to both halves at
+ * once. An extension list encodes an assumption about where secrets live; sniffing does not.
+ */
+function isTextishBuffer(buf) {
+  if (!buf || buf.length === 0 || buf.length > 64 * 1024 * 1024) return false;
+  const n = Math.min(8192, buf.length);
+  let odd = 0;
+  for (let i = 0; i < n; i++) {
+    const c = buf[i];
+    if (c === 0) return false;                                    // NUL ⇒ binary
+    if (c < 9 || (c > 13 && c < 32)) odd++;                       // control chars
+  }
+  return odd / n < 0.05;
+}
+
+function isTextish(fp) {
+  try {
+    const size = fs.statSync(fp).size;
+    if (size === 0 || size > 64 * 1024 * 1024) return false;
+    const fd = fs.openSync(fp, 'r');
+    try {
+      const buf = Buffer.alloc(Math.min(8192, size));
+      const n = fs.readSync(fd, buf, 0, buf.length, 0);
+      return isTextishBuffer(buf.subarray(0, n));
+    } finally { fs.closeSync(fd); }
+  } catch { return false; }
+}
+
 function verify() {
   const bad = [];
   const canaries = CANARIES && fs.existsSync(CANARIES)
@@ -324,7 +390,7 @@ function verify() {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
       const fp = path.join(dir, e.name);
       if (e.isDirectory()) { walk(fp); continue; }
-      if (!TEXT_EXT.test(e.name)) continue;
+      if (!isTextish(fp)) continue;
       const t = fs.readFileSync(fp, 'utf8');
       for (const [label, fn] of VERIFY_RULES) {
         const hits = fn(t);
