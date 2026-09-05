@@ -40,6 +40,15 @@ if [ "$SPEC" = "espaluz-audio-logs" ]; then
   echo "--- saved audio / repro files ---"
   ls -lt /tmp/*.{ogg,mp3,wav,opus,log} 2>/dev/null | head -20 || true
   ls -lt /home/ubuntu/EspaLuzWhatsApp/logs 2>/dev/null | head -20 || true
+  echo "--- ffprobe Sep 4 repro artifacts (sample rate + decoder warnings) ---"
+  for f in /tmp/sp.mp3 /tmp/pa.mp3 /tmp/mixed.mp3 /tmp/a_sp.mp3 /tmp/a_pa.mp3 /tmp/a_joined.mp3 /tmp/a_final.ogg /tmp/bytecat.mp3 /tmp/proper.mp3; do
+    [ -f "$f" ] || continue
+    echo "FILE $f"
+    ffprobe -hide_banner -v warning -show_entries stream=codec_name,sample_rate,channels,bit_rate -of default=noprint_wrappers=1 "$f" 2>&1 | head -20
+    echo "--- ffmpeg -v warning decode $f ---"
+    ffmpeg -v warning -i "$f" -f null - 2>&1 | tail -25
+    echo
+  done
   echo "--- pause/tts sample-rate in live code ---"
   grep -n "create_pause_audio\|generate_tts_audio\|24000\|44100\|concat" \
     /home/ubuntu/EspaLuzWhatsApp/*.py \
