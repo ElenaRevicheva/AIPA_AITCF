@@ -110,6 +110,33 @@ different category of claim — and it is the one he said he was screening for.
 **Verified before posting:** 20 incident files, 18 concept files, and all three
 one-liners quoted above are the exact text published on the site.
 
+## STEP 3 — the LinkedIn DM (5 Sep — he asked)
+
+He replied to Elena's comment: *"DM me the details of what you have built and I’ll take a closer look."*
+
+This is not a second comment. It is the answer to that ask. Do not resend the comment. Give the missing operating detail and one place he can verify.
+
+**Paste this into LinkedIn → Aryaman Upmanyu → Message:**
+
+```
+Hi Aryaman — you asked me to DM the details of what I built. Here they are.
+
+The tutor is a bilingual WhatsApp bot for expat families. It sends a daily lesson and can reply by voice. It runs unattended on one VPS. Real subscribers, not a demo.
+
+What I left out of the comment: the voice path is produce-then-assemble. Speech is generated at 24 kHz. A silence pad used to be generated at 44.1 kHz. Concatenating those two makes a stream WhatsApp will not open. ffmpeg sat in the middle and repaired the timestamps on the way through, so decode, container, and the carrier all returned healthy. The only signal that ever disagreed was a parent tapping play. That lasted about a month. The fix was to generate every piece at one sample rate and run the assembler where the decoder's complaint is visible. A tolerant tool in the middle had erased the evidence.
+
+I run the rest of the stack the same way — WhatsApp, Telegram, CRM, outreach — on that VPS, with health checks, automatic recovery, and a five-provider LLM fallback so a vendor outage is not an outage. I write the incidents as they happen: https://aideazz.xyz/ai-ops-wiki.html
+
+Live systems: https://aideazz.xyz/portfolio
+
+Happy to walk through either one if you want to look closer.
+
+Elena
+Panama
+```
+
+Do not add a tool list. Do not attach the resume in the first DM. Do not put compensation here — that belongs on Torre if he takes it further.
+
 ## STEP 2 — the Torre application
 
 Torre asks for expected compensation. **Do not leave it blank.**
@@ -142,7 +169,8 @@ have one.
 
 ## Checklist
 
-- [ ] Comment on the LinkedIn post (STEP 1) — this is the one he reads
+- [x] Comment on the LinkedIn post (STEP 1) — posted; Aryaman replied 5 Sep and asked for a DM
+- [ ] Paste the STEP 3 DM to Aryaman on LinkedIn
 - [ ] Apply on Torre with the note and the compensation range (STEP 2)
 - [ ] Attach `29.08.26_EN_Resume_Elena Revicheva.pdf`
 - [ ] Tell the agent "applied LanceMart" so the deal stage moves and VJH learns it
