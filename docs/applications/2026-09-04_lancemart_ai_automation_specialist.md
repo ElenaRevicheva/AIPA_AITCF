@@ -358,3 +358,151 @@ reads as a portfolio, which is the category he rejected by name.
 - [ ] Apply on Torre with the note and $4,500–6,000/month (STEP 2)
 - [ ] Attach `29.08.26_EN_Resume_Elena Revicheva.pdf` on Torre
 - [ ] Tell the agent "sent LanceMart DM" so the deal stage moves and VJH learns it
+
+---
+
+# STEP 4 — he asked for the portfolio by email (5 Sep 2026, 08:48)
+
+After the DM, Aryaman replied: *"Hey Elena, please share your portfolio at this
+email:- lancemart.io@gmail.com"*
+
+That is a second gate cleared. He is moving it off LinkedIn and into his inbox,
+which is where he keeps things he intends to come back to.
+
+## 🚨 BEFORE SENDING — the artifacts must be shared, or he gets nothing
+
+Artifacts are **private by default**. A link to a private artifact opens to
+nothing for the recipient.
+
+| Artifact | State | Action needed |
+|---|---|---|
+| **The Monday Chain** `780d2d14` | Published fresh 5 Sep, **never shared** | Open it → share menu → enable link sharing. **He may already have clicked the DM link and seen nothing.** |
+| **Nine Systems** `e5e81972` | Shared, but the share pin sits on the **24 Aug** version | Republished 5 Sep. Open it → **move the share pin to the current version**, or he reads the stale one |
+
+Both are one-tap in the artifact's own share menu. The agent cannot do it —
+there is no share action in the tooling.
+
+## What changed in Nine Systems, and why
+
+It was written 24 Aug for an **investor / introduction** audience. Two problems
+for a hiring manager reading it today.
+
+**1. It understated her badly.** Verified against production 5 Sep:
+
+| Said (24 Aug) | Actually (5 Sep) |
+|---|---|
+| Wiki: 9 incidents, 9 failure modes | **20 incidents, 18 concepts** |
+| Atlas: 7 verticals | **16 tracked lanes** |
+| Longest process up 27 days | **39 days** |
+| Sitemap 137 URLs | **156** |
+| Citation rate 0% | **8%** (2 of 24), +13% named-no-link |
+| CLIENT-ATLAS 35 deals | **51** · CRM total 2,266 deals / 1,203 contacts |
+| "eight systems" / "nine systems" (inconsistent) | **15 processes, 9 systems** |
+
+The wiki count is the one that mattered most — it more than doubled, and it is
+the single most persuasive asset for *this* reader, because a public dated
+catalogue of your own production failures is literally his stated screen.
+
+**2. Elena's call, and she was right: cut the pity pot.** Removed entirely:
+
+> ~~"I am an expat from Russia, living in Panama, a single mother… No team, no
+> funding, no manual coding background… these are working systems that solve real
+> problems and **have never been put in front of anyone who needed them**."~~
+
+And the Part 4 close, which asked the reader for **"an introduction to one
+business with the matching problem."**
+
+That framing is correct for an investor and actively harmful to a hiring
+manager: it invites sympathy where you want authority, leads with commercial
+non-validation, and asks the man currently evaluating you for a favour.
+Replaced with what the document is evidence *of*. Also softened three smaller
+instances (`no CS degree`, `a single mother building alone cannot also post…`,
+`No team · no funding` in the header).
+
+**Nothing dishonest was removed.** The AI-augmented disclosure stays in full
+("I did not type most of this code"), as does the 8% citation rate, the month
+EspaLuz was silently broken, and the day a source delivered zero while logging
+healthy. Confidence is not the same thing as omission — what went was
+self-diminishment, not fact.
+
+Added: the Monday Chain cross-link inside the Atlas entry, the EspaLuz sample-rate
+incident, the "grep the result line" incident, the grounding-gate incident, and
+three new rows in Part 3 (*grep the result line*, *retry the transient surface the
+real*, *automation that ends in a to-do list is not automated*).
+
+## ⚠️ Resume file gap
+
+The checklist says attach `29.08.26_EN_Resume_Elena Revicheva.pdf`. **That file is
+not on this machine.** The only resume PDF present is
+`docs/selling/attachments/15.07.26_EN_Resume_Elena_Revicheva_compressed.pdf`
+(July). There is also an untracked `docs/ELENA_REVICHEVA_RESUME_2026.md`.
+
+Either attach the July PDF, or pull the August one from wherever it lives. The
+email below works without an attachment — the links *are* the portfolio, and for
+this reader they are stronger than a CV.
+
+## The email — to lancemart.io@gmail.com
+
+**Subject:**
+
+```
+Elena Revicheva — portfolio (AI Automation Specialist)
+```
+
+**Body:**
+
+```
+Hi Aryaman,
+
+Thank you — here it is, shortest path first.
+
+If you only open one: Nine Systems and Why They Exist
+https://claude.ai/code/artifact/e5e81972-5892-4619-9e84-689ce70b1cec
+Engineering provenance for the nine systems I run — why each was started, how it
+was designed, what broke, and what that cost to learn. Every figure on it was
+read off the running machine today rather than from memory.
+
+The one taken all the way down: The Monday Chain
+https://claude.ai/code/artifact/780d2d14-b601-44f1-b26b-606b9b61265d
+Five chained cron jobs that decide which market is opening rather than crowded,
+go and find the businesses inside it, and stage eight qualified leads with
+drafted outreach. It covers the qualification gate that rejects most candidates
+with a counted reason, why retries are written per failure mode instead of
+wrapped around everything, and what happened the week a paid vendor was
+cancelled mid-quarter.
+
+The failure record: https://aideazz.xyz/ai-ops-wiki.html
+Twenty incidents, eighteen named failure modes, each with the log line that
+proved it, written the same day the thing broke. Most portfolios are a record of
+what worked. This is the other one.
+
+Live and clickable:
+  Portfolio        https://aideazz.xyz/portfolio
+  Free AI-visibility audit, my own API   https://aideazz.xyz/api
+  EspaLuz on WhatsApp                    https://wa.me/50766623757
+  Code                                   https://github.com/ElenaRevicheva
+
+Panama, UTC-5 year round, no daylight saving. Remote, available now.
+
+Best,
+Elena Revicheva
+AIdeazz AI Lab
+```
+
+## Why this shape
+
+Three links ranked by what he said he screens for, then the clickable proof, then
+one line of logistics. No cover-letter paragraph — the DM already did that work
+and he has read it. The failure record is given its own line and its own sentence
+because it is the asset that separates her from everyone else who will email him
+this week.
+
+## Checklist
+
+- [x] Comment on the LinkedIn post (STEP 1) — he replied
+- [x] Send the DM (STEP 3) — sent 08:42
+- [ ] **Share both artifacts** (see the red box above) — do this FIRST
+- [ ] **Email lancemart.io@gmail.com** with the text above
+- [ ] Decide on the resume attachment (July PDF, or fetch the August one)
+- [ ] Apply on Torre with $4,500–6,000/month (STEP 2)
+- [ ] Tell the agent "emailed LanceMart" so the deal stage moves and VJH learns it
