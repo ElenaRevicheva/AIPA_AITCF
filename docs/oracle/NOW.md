@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-06 14:00 UTC | daily radar Clean/Keep after the 7:00 digest | `src/telegram-bot.ts` `cto-aipa` named-file | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
