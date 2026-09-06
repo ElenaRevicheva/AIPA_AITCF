@@ -129,8 +129,9 @@ git log keeps the record.
 
 - **DONE 6 Sep — Clean/Keep are in Telegram now.** Not on the 7:00 text
   card (Telegram cannot grow a keyboard after send). New compact row
-  `message_id=5393` in AI_TCF_Aldeazz: `🧹 16 threads… tap Clean`. Actions
-  `34036785860` `posted=1 items=16 buttons=14 source=hubspot chat=…6862`.
+  `message_id=5393` then a second `5394` (if-missing stamp was deleted
+  before the check). Use the newest. Actions `34036785860` then
+  `34036944111` `posted=1 items=16 buttons=14 chat=…6862`.
   First force-post (`34036694170`) was a silent skip: leftover
   `radar-proposal.json` had 1 dismissed row. Real cron log is
   `/home/ubuntu/logs/followup-radar.log` (was not on the search path).
