@@ -126,6 +126,23 @@ check('proposal round-trips to disk', reloaded?.id === 'from-disk');
 check('openRadarItems drops dismissed keys', openRadarItems(notStale, ledger).length === 2);
 check('radarItemKey is stable', radarItemKey('A@B.com', 'Hello  there') === 'a@b.com|hello there');
 
+const {
+  itemKeyAliases,
+  dismissRadarItems,
+  radarButtonsSentToday,
+  markRadarButtonsSent,
+} = require(DIST);
+const byEmail = {};
+dismissRadarItems([notStale[2]], byEmail, { at: '2026-09-06T12:00:00Z', until: null, kind: 'dismissed', who: notStale[2].who });
+check('dismiss writes the email alias so tomorrow\'s Python key still matches',
+  !!byEmail['hello@cal.com'] && itemKeyAliases(notStale[2]).every((k) => byEmail[k]));
+check('hiding by email alias removes the thread',
+  openRadarItems([notStale[2]], { 'hello@cal.com': byEmail['hello@cal.com'] }).length === 0);
+
+markRadarButtonsSent(tmp, new Date('2026-09-06T15:00:00Z'));
+check('buttons-sent stamp is same-day', radarButtonsSentToday(tmp, new Date('2026-09-06T18:00:00Z')) === true);
+check('buttons-sent stamp expires next day', radarButtonsSentToday(tmp, new Date('2026-09-07T00:01:00Z')) === false);
+
 if (failures.length) {
   console.error('FAIL: ' + failures.join(' | '));
   process.exit(1);

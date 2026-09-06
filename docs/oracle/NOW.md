@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-06 12:51 | Ship radar Clean/Keep live — named-file only, no reset | `src/telegram-bot.ts`, `src/radar-cleanup.ts`, `scripts/oracle-radar-buttons.sh`. Not VJH/EspaLuz. | 12540db |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,14 +127,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 6 Sep — Follow-up radar Clean / Keep vanished because of a stale-only
-  keyboard gate, not because of the HUD listing edit.** HUD commits never
-  touched `telegram-bot.ts`. Today's card listed 3 threads (4–5d) and attached
-  **zero** buttons: `radarKeyboard` only rendered `item.stale`, and after a
-  successful clean-up nothing left is stale. Branch
-  `cursor/radar-clean-buttons-b9a9`: every listed thread gets buttons; `/radar`
-  (reply to today's card) puts them back. `node scripts/test-radar-cleanup.cjs`
-  → `PASS: 24`. Needs a `cto_aipa` deploy before `/radar` is live.
+- **IN FLIGHT 6 Sep — radar buttons going live by NAMED FILE, not `cto_aipa`
+  reset --hard.** Last full Oracle `cto_aipa` deploy was 4 Sep (`df7d7a7`).
+  Claude's 5–6 Sep work on this repo is docs / pii-guard / selling scripts —
+  already on GitHub `main`. A full `cto_aipa` deploy would `git reset --hard`
+  and could wipe Oracle's `docs/selling` dirty state. So: checkout only
+  `src/telegram-bot.ts` + `src/radar-cleanup.ts`, `npx tsc`, `pm2 restart`.
+  EspaLuz / VJH not pulled (Familybot pull can delete subscriber JSON).
+  After restart the bot posts one compact Clean/Keep row — not a second digest.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
   had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
   `33965178681` → `✓ update note 116418923178` with the verified

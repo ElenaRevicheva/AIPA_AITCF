@@ -23,6 +23,7 @@ on:
           - cto_aipa
           - atlas
           - fleet-verify
+          - radar_buttons
           - sprinter-aws
       deploy_files:
         description: Override files (checkout mode) — space-separated, from product repo main
@@ -71,6 +72,9 @@ jobs:
 
             if [ "$PRODUCT" = "fleet-verify" ]; then
               bash scripts/oracle-resilience/verify-fleet-health.sh
+            elif [ "$PRODUCT" = "radar_buttons" ]; then
+              chmod +x scripts/oracle-radar-buttons.sh
+              bash scripts/oracle-radar-buttons.sh
             else
               bash scripts/oracle-resilience/deploy-product.sh
             fi

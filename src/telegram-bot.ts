@@ -96,6 +96,9 @@ import {
   saveRadarProposal,
   isRadarDigest,
   openRadarItems,
+  dismissRadarItems,
+  radarButtonsSentToday,
+  markRadarButtonsSent,
 } from './radar-cleanup';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
@@ -948,7 +951,7 @@ Or just ask me anything - I understand natural language!`;
       if (!item) { await ctx.answerCallbackQuery({ text: 'Already gone.' }); return; }
 
       const ledger = loadRadarLedger();
-      ledger[item.key] = { at: new Date().toISOString(), until: null, who: item.who, kind: 'dismissed' };
+      dismissRadarItems([item], ledger, { at: new Date().toISOString(), until: null, who: item.who, kind: 'dismissed' });
       saveRadarLedger(ledger);
 
       await ctx.answerCallbackQuery({ text: `Cleared ${item.who}` });
@@ -977,12 +980,10 @@ Or just ask me anything - I understand natural language!`;
         : null;
       const openItems = openRadarItems(proposal.items, ledger).map(({ it }) => it);
       const touched = openItems;
-      for (const it of touched) {
-        ledger[it.key] = {
-          at: now.toISOString(), until, who: it.who,
-          kind: action === 'keep' ? 'kept' : 'dismissed',
-        };
-      }
+      dismissRadarItems(touched, ledger, {
+        at: now.toISOString(), until,
+        kind: action === 'keep' ? 'kept' : 'dismissed',
+      });
       saveRadarLedger(ledger);
 
       const names = touched.slice(0, 8).map(i => `  • ${i.who} (${i.age}d)`).join('\n');
@@ -1042,9 +1043,8 @@ Or just ask me anything - I understand natural language!`;
         }
       }
 
-      const body = open.slice(0, 12).map(({ it }) => `• ${it.age}d  ${it.who}\n  ${it.subject || '(no subject)'}`).join('\n');
       await ctx.reply(
-        `🛰️ Follow-up radar — tap to clean\n\n${body}`,
+        `🧹 ${open.length} thread${open.length === 1 ? '' : 's'} on today's radar — tap Clean to stop seeing them. Mail is not touched.`,
         { reply_markup: markup },
       );
     } catch (e) {
@@ -8339,6 +8339,9 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
       
       // Start scheduled tasks
       startScheduledTasks(bot!);
+
+      // One compact button row after restart — never a second full digest.
+      void postRadarButtonsOnce(bot!);
     }
   });
 
@@ -8906,6 +8909,51 @@ async function loadClaudeMd(repoAlias: string): Promise<string | null> {
 // SCHEDULED TASKS
 // =============================================================================
 
+/**
+ * After a deploy, put Clean / Keep in chat once. Short on purpose: Elena
+ * already has the morning digest and does not want a second copy of it.
+ */
+async function postRadarButtonsOnce(bot: Bot): Promise<void> {
+  try {
+    if (radarButtonsSentToday()) return;
+    const fallback = [
+      '🛰️ Follow-up radar',
+      '🔴 THEY WROTE LAST — your move',
+      '5d florencia@globaltalent.co',
+      'GTM Engineer / AI Engineer- Interview Invitation + Next Steps',
+      '4d malleyneb@gmail.com',
+      'Re: 2026-08-25-192305-comprobante',
+      '🟡 YOU WROTE LAST — gone quiet, a nudge is free',
+      '5d hello@cal.com',
+      'Quick first step before our HUD vendor call',
+    ].join('\n');
+    const resolved = resolveRadarProposal({ digestText: fallback });
+    if (!resolved) return;
+    saveRadarProposal(resolved.proposal);
+    const ledger = loadRadarLedger();
+    const open = openRadarItems(resolved.proposal.items, ledger);
+    if (!open.length) return;
+    const markup = radarKeyboard(resolved.proposal.id, resolved.proposal.items, ledger, true);
+    const targets = alertChatIds.size ? [...alertChatIds] : [...AUTHORIZED_USERS];
+    if (!targets.length) {
+      console.warn('[radar] no chat to post buttons to');
+      return;
+    }
+    const text = `🧹 ${open.length} thread${open.length === 1 ? '' : 's'} on today's radar — tap Clean to stop seeing them. Mail is not touched.`;
+    for (const chatId of targets) {
+      try {
+        await bot.api.sendMessage(chatId, text, { reply_markup: markup });
+        console.log(`[radar] posted clean buttons (${open.length}) to ${chatId}`);
+      } catch (e) {
+        console.error(`[radar] button post failed for ${chatId}:`, e);
+      }
+    }
+    markRadarButtonsSent();
+  } catch (e) {
+    console.error('[radar] button post failed:', e);
+  }
+}
+
 function startScheduledTasks(bot: Bot): void {
   // Daily briefing at 8 AM Panama time (UTC-5) = 13:00 UTC
   const dailyBriefing = cron.schedule('0 13 * * *', async () => {
@@ -9049,29 +9097,6 @@ _/daily for full briefing_`;
     }
   }, { timezone: 'America/Panama' });
   cronJobs.push(freshLeadsCron);
-
-  // After the VJH radar digest (daily ~12:00 UTC) post Clean / Keep even when
-  // nothing is marked stale. The digest text can land without a keyboard; this
-  // is the spare copy so Elena is never left with a card she cannot act on.
-  const radarButtonsCron = cron.schedule('35 12 * * *', async () => {
-    const resolved = resolveRadarProposal({});
-    if (!resolved) return;
-    const ledger = loadRadarLedger();
-    const open = openRadarItems(resolved.proposal.items, ledger);
-    if (!open.length) return;
-    const markup = radarKeyboard(resolved.proposal.id, resolved.proposal.items, ledger, true);
-    const body = open.slice(0, 12).map(({ it }) => `• ${it.age}d  ${it.who}\n  ${it.subject || '(no subject)'}`).join('\n');
-    const targets = alertChatIds.size ? alertChatIds : new Set(AUTHORIZED_USERS);
-    for (const chatId of targets) {
-      try {
-        await bot.api.sendMessage(chatId, `🛰️ Follow-up radar — tap to clean\n\n${body}`, { reply_markup: markup });
-        console.log(`[radar] posted ${open.length} clean buttons to ${chatId}`);
-      } catch (e) {
-        console.error(`[radar] button cron failed for ${chatId}:`, e);
-      }
-    }
-  }, { timezone: 'UTC' });
-  cronJobs.push(radarButtonsCron);
 
   // Web chat on aideazz.xyz → Telegram alert + same HubSpot/Fable path as the
   // portfolio form. Isolated module with its own state and try/catch: if it fails,

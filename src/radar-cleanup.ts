@@ -110,12 +110,59 @@ export function ledgerHides(row: RadarLedgerRow | undefined, now = new Date()): 
   return row.kind !== 'kept';
 }
 
+export function itemKeyAliases(it: RadarItem): string[] {
+  return [...new Set([
+    it.key,
+    it.who.trim().toLowerCase(),
+    radarItemKey(it.who, it.subject || ''),
+  ])];
+}
+
+export function ledgerHidesItem(
+  it: RadarItem,
+  ledger: Record<string, RadarLedgerRow>,
+  now = new Date(),
+): boolean {
+  return itemKeyAliases(it).some((k) => ledgerHides(ledger[k], now));
+}
+
+export function dismissRadarItems(
+  items: RadarItem[],
+  ledger: Record<string, RadarLedgerRow>,
+  row: RadarLedgerRow,
+): void {
+  for (const it of items) {
+    for (const k of itemKeyAliases(it)) {
+      ledger[k] = { ...row, who: it.who };
+    }
+  }
+}
+
 export function openRadarItems(
   items: RadarItem[],
   ledger: Record<string, RadarLedgerRow>,
   now = new Date(),
 ): { it: RadarItem; n: number }[] {
-  return items.map((it, n) => ({ it, n })).filter(({ it }) => !ledgerHides(ledger[it.key], now));
+  return items.map((it, n) => ({ it, n })).filter(({ it }) => !ledgerHidesItem(it, ledger, now));
+}
+
+const BUTTONS_SENT = 'radar-buttons-sent.json';
+
+export function radarButtonsSentToday(dir = radarDir(), now = new Date()): boolean {
+  try {
+    const raw = JSON.parse(fs.readFileSync(path.join(dir, BUTTONS_SENT), 'utf8'));
+    return raw?.date === now.toISOString().slice(0, 10);
+  } catch {
+    return false;
+  }
+}
+
+export function markRadarButtonsSent(dir = radarDir(), now = new Date()): void {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, BUTTONS_SENT), JSON.stringify({
+    date: now.toISOString().slice(0, 10),
+    at: now.toISOString(),
+  }, null, 2), 'utf8');
 }
 
 /**
