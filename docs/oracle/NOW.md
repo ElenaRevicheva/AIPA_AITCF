@@ -127,14 +127,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 6 Sep — daily radar buttons are on the clock.** VJH digest
-  7:00 Panama (fresh mail). cto-aipa cron `15 7 * * *` America/Panama
-  posts/edits Clean/Keep from that digest only. Cleared threads stay
-  gone. HubSpot is not a source. Actions `34037789702`: digest still
-  3, ledger hid them (`ok items=0` `edited=1` `buttons=0` on 5393 —
-  she had just tapped Clear). Restart skip=already-posted. Tomorrow
-  7:15 she gets buttons iff the digest has open threads. Do not
-  full-`cto_aipa` reset. Do not pull EspaLuz/VJH.
+- **DONE 6 Sep — daily radar buttons synced on GitHub `main` + Oracle.**
+  HEAD `d0c48bf`. Named-file only (`radar_buttons` `34037789702`):
+  `src/telegram-bot.ts` `src/radar-cleanup.ts` scripts. Cron
+  `15 7 * * *` America/Panama is in live `dist/`. Claude's
+  `docs/selling/` `pii-guard` HUD/DataVendor work was not checked
+  out and not reset. Oracle `docs/selling` dirty left in place.
+  Laptop is not this VM — `git pull origin main` there. Do not
+  merge `cursor/radar-clean-buttons-b9a9` over `main` (it is
+  behind). Do not full-`cto_aipa` reset. Do not pull EspaLuz/VJH.
+  Tomorrow: VJH digest 7:00, buttons 7:15 if anything is still open.
 - **DONE 6 Sep — radar Clean/Keep code live, named-file, no extra PII.**
   Fixtures `@example.com`. `docs/selling` dirty left in place.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
