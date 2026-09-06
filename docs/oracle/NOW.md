@@ -588,23 +588,29 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   addresses, and it pushes **from Oracle**, where no hook exists. The durable fix is a scrub
   step inside the capture pipeline, not a one-time clean.
   🚦 **Do NOT update the listing or tell Megan until `--all` is green.**
-- 🚨💾 **~400 LINES OF PRODUCTION CODE EXIST ONLY ON ORACLE — NOW BACKED UP (5 Sep).**
-  `/home/ubuntu/EspaLuzWhatsApp` is **4 commits behind** origin and carries **uncommitted**
-  edits to the files it is actually running:
-  `espaluz_bridge.py` **+68/−15**, `espaluz_neural_tts.py` **+325/−308**, modified
-  **4 Sep** while that checkout's git HEAD is from **16 Aug**. Roughly three weeks of live
-  hotfixes that are in **no** git history, on no remote, nowhere but that disk.
-  **Any `git pull`, `checkout` or `reset` there could destroy them.** There are already
-  **5 stashes**, two named `pre-pull` — this has bitten before.
-  ✅ **Backed up 5 Sep, two copies, nothing reverted:**
-  `/home/ubuntu/backups/espaluzwhatsapp-local-drift-20260905-2003.{patch,tar.gz}` and
-  `D:/aideazz/_backups/oracle-drift/` (1,291-line patch · 852 KB tarball). HEAD unchanged,
-  all 35 dirty entries left in place.
-  **NEXT (Elena's call):** reconcile that drift into git — review the patch, commit what is
-  real, then pull. **Until then, do NOT clean `espaluz_bridge.py` in git:** editing a file
-  that has three weeks of uncommitted production work on the box is how the work dies.
-  ⚠️ The 4 commits Oracle is behind do **not** touch any file Oracle has modified, so
-  `0257bd0` is safe to pull once the drift is reconciled.
+- ❌ **CORRECTION — there was NO unsaved production code on Oracle (6 Sep).** My 5 Sep alarm
+  was wrong. `espaluz_bridge.py` and `espaluz_neural_tts.py` on Oracle are **byte-identical
+  to `origin/main`**; the audio fix was already committed as `9029b1f`. Oracle's `git status`
+  showed them as `M` only because its **HEAD is stale (16 Aug) while its files are current**
+  — which is exactly what deploy-by-copy looks like. **I compared against a stale HEAD and
+  called it uncommitted work.** Only the 4 runtime data files genuinely differed, and those
+  are supposed to.
+  **Named: `git status` answers "different from MY HEAD", not "unsaved anywhere".** Against a
+  lagging checkout those are wildly different questions. Compare to `origin/main` before
+  declaring anything lost. (The backups taken then were harmless and are still on disk.)
+- ✅ **`EspaLuzWhatsApp` IS CLEAN (6 Sep) — 219 → 0. 6 of 8 done.**
+  Subscriber identities moved out of source into `.env` (`ADMIN_TEST_EMAIL`,
+  `ADMIN_CHECK_EMAIL_1/2`) behind one `_admin_email()` helper. They were hardcoded inside
+  `/admin/*` diagnostic routes (`if email.lower() == "…"`), and `paypal_auto_detection.py`
+  held a full payment record — email + PayPal subscription id + WhatsApp number — now read
+  from gitignored `known_paypal_subscribers.json`.
+  ⚠️ **The vars are ALREADY SET in Oracle's `.env`** (backed up first to
+  `/home/ubuntu/backups/EspaLuzWhatsApp.env.bak-20260906-0557`), so they are in place
+  *before* the new code ever runs there. `.env` is read at startup only — inert until the
+  next deploy+restart, then behaviour is identical.
+  **Untracked, never deleted:** `family_memory_data/` (82 KB of real customer conversation
+  history + profiles), `subscribers.json`, `subscription_info_shown.json` — mirrored on
+  Oracle, backed up twice. Bot uptime unchanged; nothing restarted.
 - 🚨🔑 **A LIVE GITHUB TOKEN IS EMBEDDED IN ORACLE'S GIT REMOTE — REVOKE IT (5 Sep).**
   `/home/ubuntu/EspaLuzFamilybot/.git/config` has its origin as
   `https://x-access-token:ghp_<REDACTED>@github.com/ElenaRevicheva/EspaLuzFamilybot.git`.
