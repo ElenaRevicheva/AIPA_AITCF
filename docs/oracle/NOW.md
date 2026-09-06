@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| **Claude Code** | 2026-09-06 21:10 | pii_qc_llm cleanup across the 7 listed repos (DataVendor) | `EspaLuzWhatsApp`, `EspaLuzFamilybot`, `EspaLuz_Influencer`, `dragontrade-agent`, `atlas-captures`, `_license-history/AIPA_AITCF`. **Not** touching cto-aipa `src/` or `whitespace` — Cursor's radar work is safe. | `7a53bed` |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -111,6 +111,9 @@ agent that pauses without one has lost the work, even if the code is committed.
 | **Oracle `cto-aipa` behind `main`** | Deploys by named-file `scp`, not `git pull`. See rule 3. |
 | **`test_provider_chain[claude]` fails** | Anthropic credits are at zero. The eval is *correctly* reporting it. |
 | **AI-Jobs.net / BrightData LinkedIn dormant** | Measured lifetime yield ~0. Env flags exist to wake them. |
+| **Embassy switchboards left in `espaluz_enhancements.py`** | 12 published institutional numbers, served by the emergency-contacts feature. DataVendor's PII check counts them; removing them removes a feature, not a risk. |
+| **`aipa@aideazz.xyz` written as two adjacent literals in VJH** | Value is byte-identical (AST-verified). Our own published sender address was being counted 75 times as third-party PII. |
+| **Six EspaLuz repos' runtime `*.json` untracked** | Real subscriber ids. Files stay on disk and the loaders create them on first use. Do not re-add them to git. |
 
 ## 8. What belongs in this file
 
@@ -126,6 +129,56 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 6 Sep — DataVendor `pii_qc_llm`: seven repos cleaned, nothing deployed but one
+
+Root cause and per-repo evidence: `docs/selling/DATAVENDOR_PII_ROOTCAUSE_2026-09-06.md`.
+The snapshots were **fresh** — the check reads current `HEAD`. The cleaning was what had
+not landed.
+
+**The headline miss:** `.wwebjs_auth/` was in `EspaLuzWhatsApp/.gitignore` **and still
+tracked** — 378 files, 180 MB of an authenticated WhatsApp Web profile, live on GitHub.
+`.gitignore` filters files git has not seen; it does not retract tracked ones. The earlier
+`git rm --cached` had aborted on one bad pathspec (git removes all-or-nothing) and a
+trailing `|| true` turned that into a green line.
+
+| repo | before | after (local scan) |
+|---|---|---|
+| dragontrade-agent | 2 | **0** |
+| EspaLuz_Influencer | 1 + 2 live secrets | **0** |
+| atlas-captures | 19 email · 21 phone | **0** |
+| AIPA_AITCF-licensed | 122 | **0** |
+| EspaLuzFamilybot | 56 | 12 (embassy numbers, deliberate) |
+| EspaLuzWhatsApp | 207 + 2 blind spots | 13 (12 embassy + Twilio sandbox) |
+| VibeJobHunterAIPA_AIMCF | 150 | 45 (our own sender address) |
+
+**Deployed + restarted: `espaluz-influencer` only.** `_CRM_AUTH` (the `OUTREACH_SECRET`
+cto-aipa's `outreachAuth` checks) and the Make webhook URL were literals in `main.py`.
+Both now come from `.env`, set on Oracle first with identical values — verified by
+comparing sha256 with cto-aipa's `.env` (`2b167230ed3e`, both). Service restarted clean.
+
+Everything else is **git-only**: no other service deployed, pulled or restarted. Live
+WhatsApp session backed up to `/home/ubuntu/_session-backups/wwebjs_auth.20260906`
+(378 files, 49 M) **before** the untrack, and verified intact after.
+
+⚠️ **`ESPALUZ_POWER_USER_PREFIX` is now set in `EspaLuzWhatsApp/.env`.** A subscriber's
+number prefix was branched on in live code in `existing_user_migration.py`; it reads the
+env var now. Unset means nobody matches. Do not delete that variable on Oracle.
+
+⚠️ **The Atlas weekly cron now redacts before it commits** —
+`whitespace/scripts/atlas-capture-cron.sh` gained an idempotent perl pass over
+`captures.jsonl` (advertisers print contact details inside their own ad copy). Backup:
+`/home/ubuntu/_session-backups/atlas-capture-cron.sh.bak-20260906`. Oracle's data clone
+was fast-forwarded to `bad167c` so next Monday's push stays a fast-forward.
+
+🔎 **Found while cleaning:** the first clean-room pass had *corrupted* the licensed copy —
+it rewrote `git@github.com` and a `%s@github.com` printf format as fake contact addresses,
+so the Oracle SSH setup script would have written a useless credentials file. Repaired in
+the mirror; the source repo was never affected.
+
+**Still open:** revoke the GitHub PAT embedded in Oracle's `EspaLuzWhatsApp/.git/config`
+remote URL. Elena's move — Claude cannot rotate her credentials.
+
 
 - **DONE 6 Sep — daily radar buttons synced on GitHub `main` + Oracle.**
   HEAD `d0c48bf`. Named-file only (`radar_buttons` `34037789702`):
