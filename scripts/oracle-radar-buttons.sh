@@ -42,6 +42,8 @@ grep -c "postRadarButtonsOnce" dist/telegram-bot.js
 grep -c "rdrcleanall" dist/radar-cleanup.js
 grep -c "discoverRadarProposal" dist/radar-cleanup.js
 grep -c "parseRadarDigest" dist/radar-cleanup.js
+grep -c "daily Clean/Keep after the morning digest" dist/telegram-bot.js
+grep -F -c "15 7 * * *" dist/telegram-bot.js
 
 echo "=== copy last digest into data/ without printing it ==="
 mkdir -p data
@@ -84,7 +86,7 @@ if [ "$COPIED" -eq 0 ]; then
     \( -iname '*radar*' -o -iname '*followup*' \) -type f 2>/dev/null || true)
 fi
 if [ "$COPIED" -eq 0 ]; then
-  echo "digest_source=none (will try HubSpot open tasks; leftover cleared proposal is ignored)"
+  echo "digest_source=none (HubSpot tasks are not a source; leftover cleared proposal is ignored)"
 fi
 
 echo "=== replace resurrected rows with today's digest only ==="

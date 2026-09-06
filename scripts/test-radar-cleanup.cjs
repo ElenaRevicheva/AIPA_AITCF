@@ -247,6 +247,12 @@ check('a HubSpot dump cannot out-vote today\'s digest',
   && fromDump.proposal.items.length === 3
   && !fromDump.proposal.items.some((it) => it.who === 'old@example.com'));
 
+const botSrc = fs.readFileSync(path.join(ROOT, 'src/telegram-bot.ts'), 'utf8');
+check('daily radar buttons are scheduled at 7:15 Panama after the 7:00 digest',
+  botSrc.includes("cron.schedule('15 7 * * *'")
+  && botSrc.includes('daily Clean/Keep after the morning digest')
+  && botSrc.includes("timezone: 'America/Panama'"));
+
 if (failures.length) {
   console.error('FAIL: ' + failures.join(' | '));
   process.exit(1);
