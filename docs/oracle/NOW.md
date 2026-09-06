@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-06 12:42 | Follow-up radar clean buttons missing in Telegram | `src/telegram-bot.ts`, new `src/radar-cleanup.ts` (cto-aipa). Not touching VJH. | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,6 +127,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+- **DONE 6 Sep — Follow-up radar Clean / Keep vanished because of a stale-only
+  keyboard gate, not because of the HUD listing edit.** HUD commits never
+  touched `telegram-bot.ts`. Today's card listed 3 threads (4–5d) and attached
+  **zero** buttons: `radarKeyboard` only rendered `item.stale`, and after a
+  successful clean-up nothing left is stale. Branch
+  `cursor/radar-clean-buttons-b9a9`: every listed thread gets buttons; `/radar`
+  (reply to today's card) puts them back. `node scripts/test-radar-cleanup.cjs`
+  → `PASS: 24`. Needs a `cto_aipa` deploy before `/radar` is live.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
   had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
   `33965178681` → `✓ update note 116418923178` with the verified

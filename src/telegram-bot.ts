@@ -88,6 +88,15 @@ import {
   formatMultiActionReply,
   rollingMonthNames,
 } from './trello-voice';
+import {
+  loadRadarLedger,
+  radarKeyboard,
+  resolveRadarProposal,
+  saveRadarLedger,
+  saveRadarProposal,
+  isRadarDigest,
+  openRadarItems,
+} from './radar-cleanup';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
 import { getHubSpotStats, pushLeadToHubSpot } from './hubspot-client';
@@ -659,6 +668,7 @@ Type /menu for all commands! 🚀
         { cmd: '/hubspot',         desc: 'HubSpot CRM — view or sync pipeline.', usage: '/hubspot sync' },
         { cmd: '/xlsx',            desc: 'Download pipeline spreadsheet.', usage: '/xlsx' },
         { cmd: '/cleanbiz',        desc: 'Remove test/fake pipeline entries.', usage: '/cleanbiz confirm' },
+        { cmd: '/radar',           desc: 'Put Clean / Keep buttons back on the Follow-up radar. Reply to today\'s card, or run alone.', usage: 'Reply to the radar message with /radar' },
         { cmd: '/espaluz',         desc: 'EspaLuz business pulse — trials, revenue.', usage: '/espaluz' },
         { cmd: '/outcome',         desc: 'Log what an agent did.', usage: '/outcome cmo post_published linkedin' },
       ],
@@ -896,97 +906,40 @@ Or just ask me anything - I understand natural language!`;
   /**
    * Follow-up radar cleanup — the approve half of the loop.
    *
-   * `scripts/followup_radar.py` (VJH) recomputes the radar from the mailbox every
-   * morning, so a dead thread reappears forever: Elena has been reading the same
-   * vanished contacts daily for over a month. It now PROPOSES the ones silent
-   * past a threshold and renders two buttons; this handler is the only thing that
-   * writes the ledger.
-   *
-   * Three properties that make an auto-cleaner safe to hand a mailbox:
-   *  - It never touches mail. "Clean" means "stop showing me this thread". The
-   *    ledger is one JSON file and every decision is reversible by editing it.
-   *  - Nothing is hidden without a tap. The radar can only ask.
-   *  - "Keep them" SNOOZES rather than doing nothing, so declining does not mean
-   *    being asked the same question again tomorrow. A prompt that repeats after
-   *    you answer it trains you to ignore prompts.
+   * VJH posts the digest text. These handlers are the only thing that writes
+   * the ledger. 6 Sep 2026: the keyboard used to render only for `stale`
+   * threads, so a successful clean-up left the next card with nothing to tap.
+   * Every listed thread now gets Clean / Keep. Reply to today's card with
+   * /radar to put the buttons back on that message.
    */
-  interface RadarItem { key: string; who: string; subject: string; age: number; stale?: boolean }
-  /**
-   * `kind` separates two different answers that were wrongly collapsed:
-   *   dismissed — hide this thread from the radar (permanent unless `until`)
-   *   kept      — keep showing it, just stop ASKING me to clear it
-   * Snoozing a KEPT thread removed from the radar the very thread she had just
-   * said she wanted to watch. Found 2 Sep 2026, by Elena refusing to tap it.
-   */
-  interface RadarLedgerRow { at: string; until?: string | null; who?: string; kind?: 'dismissed' | 'kept' }
-
-  const radarDir = (): string => process.env.RADAR_STATE_DIR || path.join(process.cwd(), 'data');
-  const radarProposal = (): { id: string; items: RadarItem[] } =>
-    JSON.parse(fs.readFileSync(path.join(radarDir(), 'radar-proposal.json'), 'utf8'));
-  const radarLedger = (): Record<string, RadarLedgerRow> => {
-    try { return JSON.parse(fs.readFileSync(path.join(radarDir(), 'radar-dismissed.json'), 'utf8')); }
-    catch { return {}; }
-  };
-  const radarSave = (l: Record<string, RadarLedgerRow>): void => {
-    fs.mkdirSync(radarDir(), { recursive: true });
-    fs.writeFileSync(path.join(radarDir(), 'radar-dismissed.json'), JSON.stringify(l, null, 2), 'utf8');
-  };
-  /**
-   * Rebuild the keyboard from what is STILL open, so a cleared row disappears.
-   *
-   * `showAll` widens it from the age-stale subset to every listed thread. The
-   * threshold decides what is PROPOSED, never what is POSSIBLE — Elena knows a
-   * contact has vanished long before a day counter agrees.
-   */
-  const radarKeyboard = (
-    pid: string, items: RadarItem[], ledger: Record<string, RadarLedgerRow>, showAll = false,
-  ) => {
-    const open = items.map((it, n) => ({ it, n })).filter(({ it }) => !ledger[it.key]);
-    const shown = showAll ? open : open.filter(({ it }) => it.stale);
-    const rows: { text: string; callback_data: string }[][] = shown.slice(0, 12).map(({ it, n }) => [{
-      text: `🧹 ${it.age}d  ${it.who.split('@')[0]?.slice(0, 18)}@${it.who.split('@').pop()?.slice(0, 14)}`,
-      callback_data: `rdrone:${pid}:${n}`,
-    }]);
-    const tail: { text: string; callback_data: string }[] = [];
-    if (!showAll && open.length > shown.length) {
-      tail.push({ text: `📋 Show all ${open.length}`, callback_data: `rdrall:${pid}` });
-    }
-    if (shown.length) {
-      tail.push({ text: `🧹 Clear ${shown.length}`, callback_data: showAll ? `rdrcleanall:${pid}` : `rdrclean:${pid}` });
-    }
-    if (open.length) tail.push({ text: 'Keep all', callback_data: `rdrkeep:${pid}` });
-    if (tail.length) rows.push(tail);
-    return { inline_keyboard: rows };
+  const loadLiveProposal = (digestText?: string | null) => {
+    const resolved = resolveRadarProposal({ digestText });
+    if (!resolved) throw new Error('No radar proposal on disk and no digest to parse.');
+    saveRadarProposal(resolved.proposal);
+    return resolved.proposal;
   };
 
-  /** Widen the keyboard to every listed thread. */
   bot.callbackQuery(/^rdrall:/, async (ctx) => {
     const pid = (ctx.callbackQuery?.data || '').split(':')[1] || '';
     try {
-      const proposal = radarProposal();
+      const proposal = loadLiveProposal((ctx.callbackQuery?.message as { text?: string } | undefined)?.text);
       if (proposal.id !== pid) {
         await ctx.answerCallbackQuery({ text: 'That radar message is out of date.', show_alert: true });
         return;
       }
       await ctx.answerCallbackQuery({ text: 'Showing every thread — tap any to clear it.' });
       await ctx.editMessageReplyMarkup({
-        reply_markup: radarKeyboard(pid, proposal.items, radarLedger(), true),
+        reply_markup: radarKeyboard(pid, proposal.items, loadRadarLedger(), true),
       });
     } catch (e) {
       await ctx.answerCallbackQuery({ text: 'Failed: ' + (e as Error).message?.slice(0, 80), show_alert: true });
     }
   });
 
-  /**
-   * Clear ONE thread. All-or-nothing was the wrong granularity: being forced to
-   * keep a dead thread because a live one shares the batch is how the buttons
-   * stop getting used. The keyboard is rebuilt after each tap so a cleared row
-   * disappears and the remaining count stays honest.
-   */
   bot.callbackQuery(/^rdrone:/, async (ctx) => {
     const [, pid, idxRaw] = (ctx.callbackQuery?.data || '').split(':');
     try {
-      const proposal = radarProposal();
+      const proposal = loadLiveProposal((ctx.callbackQuery?.message as { text?: string } | undefined)?.text);
       if (proposal.id !== pid) {
         await ctx.answerCallbackQuery({ text: 'That radar message is out of date — use the newest one.', show_alert: true });
         return;
@@ -994,9 +947,9 @@ Or just ask me anything - I understand natural language!`;
       const item = proposal.items[Number(idxRaw)];
       if (!item) { await ctx.answerCallbackQuery({ text: 'Already gone.' }); return; }
 
-      const ledger = radarLedger();
+      const ledger = loadRadarLedger();
       ledger[item.key] = { at: new Date().toISOString(), until: null, who: item.who, kind: 'dismissed' };
-      radarSave(ledger);
+      saveRadarLedger(ledger);
 
       await ctx.answerCallbackQuery({ text: `Cleared ${item.who}` });
       await ctx.editMessageReplyMarkup({ reply_markup: radarKeyboard(pid, proposal.items, ledger) });
@@ -1006,42 +959,31 @@ Or just ask me anything - I understand natural language!`;
     }
   });
 
-  /**
-   * Bulk: clear everything still open, or keep everything.
-   *
-   * "Keep all" SNOOZES for two weeks rather than doing nothing. A prompt that
-   * repeats after you have answered it trains you to ignore prompts, and then
-   * the approval gate is theatre.
-   */
   bot.callbackQuery(/^rdr(clean|cleanall|keep):/, async (ctx) => {
     const data = ctx.callbackQuery?.data || '';
     const action = data.startsWith('rdrkeep:') ? 'keep' : 'clean';
     const pid = data.split(':')[1] || '';
     try {
       await ctx.answerCallbackQuery();
-      const proposal = radarProposal();
+      const proposal = loadLiveProposal((ctx.callbackQuery?.message as { text?: string } | undefined)?.text);
       if (proposal.id !== pid) {
         await ctx.reply('⚠️ That radar message is out of date — a newer one has replaced it.');
         return;
       }
-      const ledger = radarLedger();
+      const ledger = loadRadarLedger();
       const now = new Date();
       const until = action === 'keep'
         ? new Date(now.getTime() + 14 * 24 * 3600 * 1000).toISOString()
         : null;
-      // "Clear N" clears exactly what its label counted. The proposal now holds
-      // every listed thread, so an unscoped bulk clear would wipe live ones too.
-      const openItems = proposal.items.filter(it => !ledger[it.key]);
-      const touched = action === 'keep' || data.startsWith('rdrcleanall:')
-        ? openItems
-        : openItems.filter(it => it.stale);
+      const openItems = openRadarItems(proposal.items, ledger).map(({ it }) => it);
+      const touched = openItems;
       for (const it of touched) {
         ledger[it.key] = {
           at: now.toISOString(), until, who: it.who,
           kind: action === 'keep' ? 'kept' : 'dismissed',
         };
       }
-      radarSave(ledger);
+      saveRadarLedger(ledger);
 
       const names = touched.slice(0, 8).map(i => `  • ${i.who} (${i.age}d)`).join('\n');
       await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } }).catch(() => {});
@@ -1054,6 +996,59 @@ Or just ask me anything - I understand natural language!`;
       console.log(`[radar] ${action} ${touched.length} thread(s)`);
     } catch (e) {
       await ctx.reply('❌ Could not update the radar: ' + (e as Error).message?.slice(0, 140));
+    }
+  });
+
+  /**
+   * /radar — put Clean / Keep back on today's digest.
+   *
+   * The morning card is posted by VJH as text. If nothing is marked stale the
+   * keyboard is omitted entirely, which is what Elena saw on 6 Sep. Reply to
+   * that card and this edits the buttons onto it. Run alone and it posts a
+   * fresh button row from the on-disk proposal or from a pasted digest.
+   */
+  bot.command('radar', async (ctx) => {
+    const replied = (ctx.message as { reply_to_message?: { message_id?: number; text?: string } } | undefined)
+      ?.reply_to_message;
+    const digestText = (replied?.text && isRadarDigest(replied.text))
+      ? replied.text
+      : ((ctx.message as { text?: string } | undefined)?.text || '').replace(/^\/radar(@\S+)?\s*/i, '').trim()
+        || undefined;
+    try {
+      const resolved = resolveRadarProposal({ digestText: digestText || replied?.text });
+      if (!resolved) {
+        await ctx.reply(
+          '🛰️ No radar threads to attach buttons to.\n\n' +
+          'Reply to today\'s Follow-up radar card with /radar — I will put Clean / Keep on that message.',
+        );
+        return;
+      }
+      saveRadarProposal(resolved.proposal);
+      const ledger = loadRadarLedger();
+      const markup = radarKeyboard(resolved.proposal.id, resolved.proposal.items, ledger, true);
+      const open = openRadarItems(resolved.proposal.items, ledger);
+      if (!open.length) {
+        await ctx.reply('🛰️ Every listed thread is already cleared or snoozed.');
+        return;
+      }
+
+      if (replied?.message_id && ctx.chat?.id) {
+        try {
+          await ctx.api.editMessageReplyMarkup(ctx.chat.id, replied.message_id, { reply_markup: markup });
+          await ctx.reply(`🧹 Clean / Keep are back on that radar card (${open.length} thread${open.length === 1 ? '' : 's'}).`);
+          return;
+        } catch (e) {
+          console.warn('[radar] could not edit original card, posting a new one:', (e as Error).message);
+        }
+      }
+
+      const body = open.slice(0, 12).map(({ it }) => `• ${it.age}d  ${it.who}\n  ${it.subject || '(no subject)'}`).join('\n');
+      await ctx.reply(
+        `🛰️ Follow-up radar — tap to clean\n\n${body}`,
+        { reply_markup: markup },
+      );
+    } catch (e) {
+      await ctx.reply('❌ Could not attach radar buttons: ' + (e as Error).message?.slice(0, 140));
     }
   });
 
@@ -8320,6 +8315,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
           { command: 'redditapp', description: '🔑 Wire Reddit OAuth so the community listener can actually search' },
           { command: 'dated', description: '🟠 Your own dated business card (orange) on the right month board' },
           { command: 'citasort', description: '🔢 Re-sort every Kira Cita column by date' },
+          { command: 'radar', description: '🧹 Put Clean / Keep buttons back on the Follow-up radar' },
           // SETTINGS
           { command: 'alerts', description: '🔔 Toggle proactive alerts' },
           { command: 'roadmap', description: '🛣️ View CTO AIPA roadmap' },
@@ -9053,6 +9049,29 @@ _/daily for full briefing_`;
     }
   }, { timezone: 'America/Panama' });
   cronJobs.push(freshLeadsCron);
+
+  // After the VJH radar digest (daily ~12:00 UTC) post Clean / Keep even when
+  // nothing is marked stale. The digest text can land without a keyboard; this
+  // is the spare copy so Elena is never left with a card she cannot act on.
+  const radarButtonsCron = cron.schedule('35 12 * * *', async () => {
+    const resolved = resolveRadarProposal({});
+    if (!resolved) return;
+    const ledger = loadRadarLedger();
+    const open = openRadarItems(resolved.proposal.items, ledger);
+    if (!open.length) return;
+    const markup = radarKeyboard(resolved.proposal.id, resolved.proposal.items, ledger, true);
+    const body = open.slice(0, 12).map(({ it }) => `• ${it.age}d  ${it.who}\n  ${it.subject || '(no subject)'}`).join('\n');
+    const targets = alertChatIds.size ? alertChatIds : new Set(AUTHORIZED_USERS);
+    for (const chatId of targets) {
+      try {
+        await bot.api.sendMessage(chatId, `🛰️ Follow-up radar — tap to clean\n\n${body}`, { reply_markup: markup });
+        console.log(`[radar] posted ${open.length} clean buttons to ${chatId}`);
+      } catch (e) {
+        console.error(`[radar] button cron failed for ${chatId}:`, e);
+      }
+    }
+  }, { timezone: 'UTC' });
+  cronJobs.push(radarButtonsCron);
 
   // Web chat on aideazz.xyz → Telegram alert + same HubSpot/Fable path as the
   // portfolio form. Isolated module with its own state and try/catch: if it fails,
