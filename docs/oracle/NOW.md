@@ -525,6 +525,29 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   ⚠️ **Never redact executable code to a broken literal** — point it at the env var the
   product already uses. `VibeJobHunterAIPA_AIMCF`'s `FROM_EMAIL` fallback became
   `aipa@aideazz.xyz`, not `REDACTED`, so even the unreachable branch stays valid.
+- ⛔ **`AIPA_AITCF` CANNOT BE CLEANED IN PLACE — measured 6 Sep. Use the mirror.**
+  `docs/selling/` is not notes, it is the **data plane of the live outreach system**:
+  · `outreach-registry.json` holds **369 recipient emails** and `src/go-wa.ts:60` fetches it
+    **from GitHub raw** — untrack it and one-click send stops working.
+  · `scripts/oracle-stage-hiring-outreach.sh:110,201` does
+    `git show FETCH_HEAD:docs/selling/outreach-registry.json` — a **git read, not a disk
+    read**, so `git rm --cached` breaks it even though the file stays on disk.
+  · **4 GitHub Actions** (`hire-outreach`, `evaluate-send-outreach`, `resend-email-proof`,
+    `stage-prospect`) read specs from a **fresh CI clone** and `git add -A docs/selling`
+    afterwards. CI has no laptop filesystem to fall back on.
+  · `docs/selling/drafts/` 381 emails / 668 files, 52 runtime references.
+  **Scrubbing it breaks sending; untracking it breaks CI and Oracle.** The PII IS the
+  working data. This is the one repo where the clean-room mirror is not a compromise —
+  it is the only correct answer.
+  ✅ **Plan: list `ElenaRevicheva/AIPA_AITCF-licensed`** (already built, 940 commits,
+  scrubbed history) for this ONE asset; the other 7 stay as the originals, cleaned in place.
+  🔬 **Likely score fix:** that mirror reported `SOURCE LOC: Unavailable` / `Complexity: not
+  measured` and scored 16%. HUD's own note says LOC counts *"checked-in generated or
+  vendored code"* — and the mirror **drops `dist-lambda/`**. Rebuild it keeping
+  `dist-lambda/` and re-estimate that repo alone before concluding anything.
+  🗓️ **Right architecture, later:** move the outreach data plane to `aideazz-private-docs`
+  and repoint `go-wa.ts`, the Oracle script and 4 workflows. That is a refactor of every
+  part of the money pipeline — not a thing to do mid-sale.
 - 🛑 **THE REMAINING 4 ALL NEED ELENA'S DECISION — none is a scrub.**
   1. **`cto-aipa` 1370** — `docs/selling/` (820 files, 1,306 addresses, 81%). Must MOVE, not
      be cleaned: it regenerates. Proposed home `ElenaRevicheva/aideazz-private-docs`
