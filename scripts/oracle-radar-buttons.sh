@@ -51,17 +51,38 @@ find /home/ubuntu/cto-aipa /home/ubuntu/VibeJobHunterAIPA_AIMCF /home/ubuntu/log
 echo "--- crontab radar ---"
 crontab -l 2>/dev/null | grep -i radar || true
 COPIED=0
-while IFS= read -r f; do
-  [ -n "$f" ] || continue
-  case "$f" in *.ts|*.js|*.cjs|*.d.ts|*.map) continue ;; esac
+DEST="$(pwd)/data/followup-radar.log"
+for f in \
+  /home/ubuntu/logs/followup-radar.log \
+  /home/ubuntu/VibeJobHunterAIPA_AIMCF/logs/followup-radar.log \
+  /tmp/followup-radar.log
+do
+  [ -f "$f" ] || continue
   if grep -q "Follow-up radar" "$f" && grep -Eq '[0-9]+d[[:space:]]+[^[:space:]]+@' "$f"; then
-    cp -f "$f" data/followup-radar.log
-    echo "digest_source=$(basename "$f") bytes=$(wc -c < "$f")"
+    if [ "$(readlink -f "$f")" != "$(readlink -f "$DEST")" ]; then
+      cp -f "$f" "$DEST"
+    fi
+    echo "digest_source=$f bytes=$(wc -c < "$f")"
     COPIED=1
     break
   fi
-done < <(find /home/ubuntu/cto-aipa /home/ubuntu/VibeJobHunterAIPA_AIMCF /home/ubuntu/logs /home/ubuntu/.pm2/logs /tmp \
-  \( -iname '*radar*' -o -iname '*followup*' \) -type f 2>/dev/null || true)
+done
+if [ "$COPIED" -eq 0 ]; then
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    case "$f" in *.ts|*.js|*.cjs|*.d.ts|*.map|*.md) continue ;; esac
+    case "$f" in */src/*|*/dist/*|*/scripts/*|*/docs/*) continue ;; esac
+    if grep -q "Follow-up radar" "$f" && grep -Eq '[0-9]+d[[:space:]]+[^[:space:]]+@' "$f"; then
+      if [ "$(readlink -f "$f")" != "$(readlink -f "$DEST")" ]; then
+        cp -f "$f" "$DEST"
+      fi
+      echo "digest_source=$f bytes=$(wc -c < "$f")"
+      COPIED=1
+      break
+    fi
+  done < <(find /home/ubuntu/logs /home/ubuntu/VibeJobHunterAIPA_AIMCF /home/ubuntu/.pm2/logs /tmp \
+    \( -iname '*radar*' -o -iname '*followup*' \) -type f 2>/dev/null || true)
+fi
 if [ "$COPIED" -eq 0 ]; then
   echo "digest_source=none (will try HubSpot open tasks; leftover cleared proposal is ignored)"
 fi
