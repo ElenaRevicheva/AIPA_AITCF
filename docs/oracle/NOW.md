@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-06 12:42 | Follow-up radar clean buttons missing in Telegram | `src/telegram-bot.ts`, new `src/radar-cleanup.ts` (cto-aipa). Not touching VJH. | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
