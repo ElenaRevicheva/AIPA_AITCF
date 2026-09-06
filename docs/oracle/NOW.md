@@ -550,6 +550,23 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   addresses, and it pushes **from Oracle**, where no hook exists. The durable fix is a scrub
   step inside the capture pipeline, not a one-time clean.
   🚦 **Do NOT update the listing or tell Megan until `--all` is green.**
+- 🚨💾 **~400 LINES OF PRODUCTION CODE EXIST ONLY ON ORACLE — NOW BACKED UP (5 Sep).**
+  `/home/ubuntu/EspaLuzWhatsApp` is **4 commits behind** origin and carries **uncommitted**
+  edits to the files it is actually running:
+  `espaluz_bridge.py` **+68/−15**, `espaluz_neural_tts.py` **+325/−308**, modified
+  **4 Sep** while that checkout's git HEAD is from **16 Aug**. Roughly three weeks of live
+  hotfixes that are in **no** git history, on no remote, nowhere but that disk.
+  **Any `git pull`, `checkout` or `reset` there could destroy them.** There are already
+  **5 stashes**, two named `pre-pull` — this has bitten before.
+  ✅ **Backed up 5 Sep, two copies, nothing reverted:**
+  `/home/ubuntu/backups/espaluzwhatsapp-local-drift-20260905-2003.{patch,tar.gz}` and
+  `D:/aideazz/_backups/oracle-drift/` (1,291-line patch · 852 KB tarball). HEAD unchanged,
+  all 35 dirty entries left in place.
+  **NEXT (Elena's call):** reconcile that drift into git — review the patch, commit what is
+  real, then pull. **Until then, do NOT clean `espaluz_bridge.py` in git:** editing a file
+  that has three weeks of uncommitted production work on the box is how the work dies.
+  ⚠️ The 4 commits Oracle is behind do **not** touch any file Oracle has modified, so
+  `0257bd0` is safe to pull once the drift is reconciled.
 - 🚨🔑 **A LIVE GITHUB TOKEN IS EMBEDDED IN ORACLE'S GIT REMOTE — REVOKE IT (5 Sep).**
   `/home/ubuntu/EspaLuzFamilybot/.git/config` has its origin as
   `https://x-access-token:ghp_<REDACTED>@github.com/ElenaRevicheva/EspaLuzFamilybot.git`.
