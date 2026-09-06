@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-06 13:50 UTC | radar resurrected Wednesday's cleared threads from HS tasks | `src/radar-cleanup.ts` `scripts/post-radar-buttons-now.cjs` `cto-aipa` named-file | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,13 +127,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **IN FLIGHT 6 Sep — those 16 buttons are a resurrection, not stale IMAP.**
-  Today's 7:00 digest only listed 3 live threads. Clean on 2 Sep wrote
-  `radar-dismissed.json` and hid them from Python. It does not complete
-  HubSpot `[FOLLOWUP-RADAR]` tasks. The force-post used those open tasks
-  as the item list (`posted=1 items=16` on `5393`/`5394`). Do not tap
-  Clear-all. Do not full-`cto_aipa` reset. Branch
-  `cursor/radar-buttons-now-b9a9`.
+- **DONE 6 Sep — 16 resurrected buttons replaced with today's 3.** Not
+  stale IMAP. Clean on 2 Sep hid them from the digest; HubSpot tasks
+  stayed open; the force-post used those tasks as the list. Actions
+  `34037301202`: `digest_items=3` `ledger_backfill=13` `edited=1`
+  `message_id=5393` and `5394` `buttons=5` `posted=0`. Look at those
+  two rows — they now match the 7:00 card. Do not tap Clear-all on
+  an old screenshot. Do not full-`cto_aipa` reset. Do not pull
+  EspaLuz/VJH. Branch `cursor/radar-buttons-now-b9a9`.
 - **DONE 6 Sep — radar Clean/Keep code live, named-file, no extra PII.**
   Fixtures `@example.com`. `docs/selling` dirty left in place.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
