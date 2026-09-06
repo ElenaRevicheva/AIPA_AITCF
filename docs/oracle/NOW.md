@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-06 13:50 UTC | radar resurrected Wednesday's cleared threads from HS tasks | `src/radar-cleanup.ts` `scripts/post-radar-buttons-now.cjs` `cto-aipa` named-file | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,18 +127,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 6 Sep — Clean/Keep are in Telegram now.** Not on the 7:00 text
-  card (Telegram cannot grow a keyboard after send). New compact row
-  `message_id=5393` then a second `5394` (if-missing stamp was deleted
-  before the check). Use the newest. Actions `34036785860` then
-  `34036944111` `posted=1 items=16 buttons=14 chat=…6862`.
-  First force-post (`34036694170`) was a silent skip: leftover
-  `radar-proposal.json` had 1 dismissed row. Real cron log is
-  `/home/ubuntu/logs/followup-radar.log` (was not on the search path).
-  Do not full-`cto_aipa` reset. Do not pull EspaLuz/VJH. Do not tap
-  Clear-all if she only wanted today's 3 — HS search was broader than
-  the digest; per-thread Clean is safe. Reply `/radar` on the 7:00 card
-  to put buttons on that message. Branch
+- **IN FLIGHT 6 Sep — those 16 buttons are a resurrection, not stale IMAP.**
+  Today's 7:00 digest only listed 3 live threads. Clean on 2 Sep wrote
+  `radar-dismissed.json` and hid them from Python. It does not complete
+  HubSpot `[FOLLOWUP-RADAR]` tasks. The force-post used those open tasks
+  as the item list (`posted=1 items=16` on `5393`/`5394`). Do not tap
+  Clear-all. Do not full-`cto_aipa` reset. Branch
   `cursor/radar-buttons-now-b9a9`.
 - **DONE 6 Sep — radar Clean/Keep code live, named-file, no extra PII.**
   Fixtures `@example.com`. `docs/selling` dirty left in place.
