@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| **Claude Code** | 2026-09-06 21:10 | pii_qc_llm cleanup across the 7 listed repos (DataVendor) | `EspaLuzWhatsApp`, `EspaLuzFamilybot`, `EspaLuz_Influencer`, `dragontrade-agent`, `atlas-captures`, `_license-history/AIPA_AITCF`. **Not** touching cto-aipa `src/` or `whitespace` — Cursor's radar work is safe. | `7a53bed` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
