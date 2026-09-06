@@ -59,11 +59,22 @@ const REPOS = [
 const DATA_REPOS = new Set(['atlas-captures']);
 
 /** Paths stripped from EVERY commit. Same list as the snapshot build. */
-const DROP_PATHS = [
+/**
+ * `--keep dist-lambda` exists because dropping generated code COSTS MONEY. HUD's estimator
+ * note says SOURCE LOC counts "checked-in generated or vendored code", and the mirror that
+ * dropped `dist-lambda/` reported `SOURCE LOC: Unavailable` and scored 16% while the
+ * ORIGINAL repo passed `codebase complexity`. 3 files, 173,562 lines, 4 emails, 0
+ * credentials — cheap to scrub, expensive to omit.
+ * The mirror should differ from the original ONLY by PII, never by my own tidiness.
+ */
+const KEEP = (arg('--keep', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
+
+const DROP_PATHS_ALL = [
   'docs/selling', 'docs/oracle', 'docs/applications', 'docs/interview',
   'dist-lambda', 'backups', 'docs/hubspot', 'docs/crm',
   '.wwebjs_auth', '.wwebjs_cache', '__pycache__', 'node_modules', '.venv', 'venv',
 ];
+const DROP_PATHS = DROP_PATHS_ALL.filter((d) => !KEEP.some((k) => d.replace(/\/$/, '') === k));
 const DROP_GLOBS = [
   '*.pyc', '*.pyo', '*.ldb', '*.pid', '*.sqlite', '*.sqlite3', '*.db',
   '*.pem', '*.p12', '*.pfx', '*.jks', '*.ppk', '*.key', '.env', '.env.*',
