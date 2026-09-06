@@ -518,6 +518,16 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
     canary-free, independently verified before upload.
   Phones were the obvious suspect and are **ruled out**: EspaLuz_Influencer and
   dragontrade-agent have zero E.164 numbers and both fail.
+  💡 **ELENA'S HYPOTHESIS, and it is the sharpest one available:** only `AIPA_AITCF` was
+  replaced in the edit — **the other seven kept their original 31 Aug attachment.** If a
+  quality run grades the snapshot captured when an asset was ATTACHED rather than a fresh
+  pull, then **none of today's cleaning has been seen by the check** and these results say
+  nothing about whether it worked. Fits the 5 dirty repos exactly.
+  ⚠️ It does not explain `atlas-captures` (passed 31 Aug, untouched, fails now) or the
+  mirror (attached today, fresh snapshot, fails). The version that fits everything is
+  **stale snapshots AND a stricter recommended check.**
+  **If Megan confirms stale snapshots: detach and re-attach all seven in ONE edit** to force
+  a fresh capture — deliberately, not by trial and error on a live listing.
   **NEXT: ask Megan for the per-repo findings again** —
   `docs/selling/drafts/megan-hud-after-cleaning-2026-09-06.txt`. The vendor UI does not
   expose them, and her 5 Sep list is the only thing that ever said what the check objects

@@ -46,15 +46,29 @@ Three results do not fit any theory I can test from my side:
 Only `AILA` passes, and `AILA` is the emptiest repo in the set. That pattern makes me think
 the check is objecting to something I have not identified rather than to the data I removed.
 
-TWO QUESTIONS
+THE QUESTION THAT DECIDES WHAT I DO NEXT
 
-  1. Could you send the current per-repo `pii_qc_llm` findings — the finding counts and
-     types, as before? I will act on them the same day.
+When I edited the listing I replaced one asset — AIPA_AITCF became AIPA_AITCF-licensed.
+The other seven kept their original attachment from 31 August.
 
-  2. Does "Run recommended checks" re-snapshot the repositories, or does it grade the
-     snapshot captured at the last edit? If it grades an older snapshot, some of these
-     failures may predate the cleaning and would clear on a fresh capture. Knowing which
-     would save us both a round trip.
+So: does a quality run grade a FRESH pull of each repository, or the snapshot captured
+when the asset was first attached?
+
+If it grades the original snapshot, then none of the work above has been seen by the
+check at all — those seven are still being graded on their 31 August state, and the
+result tells me nothing about whether the cleaning worked. In that case I would detach
+and re-attach all seven to force a fresh capture, and I would rather do that once,
+deliberately, than discover it by trial and error on a live listing.
+
+It would also explain why the only repo I did NOT clean, `atlas-captures`, and the only
+one that is brand new, `AIPA_AITCF-licensed`, both behave unlike the rest.
+
+AND THE ONE THING THAT WOULD SETTLE IT FASTEST
+
+Could you send the current per-repo `pii_qc_llm` findings — counts and types, as you did
+on 5 September? That list was the only thing that ever told me what the check actually
+objects to; the vendor UI shows me which repos failed but never why. I will act on it the
+same day it arrives.
 
 ONE THING STILL OUTSTANDING ON YOUR SIDE
 
