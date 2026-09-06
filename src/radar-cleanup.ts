@@ -69,6 +69,7 @@ export function radarLogCandidates(): string[] {
     ...radarDirCandidates(),
     path.join(process.cwd(), 'logs'),
     '/home/ubuntu/cto-aipa/logs',
+    '/home/ubuntu/logs',
     '/home/ubuntu/.pm2/logs',
     '/home/ubuntu/VibeJobHunterAIPA_AIMCF/logs',
     '/tmp',

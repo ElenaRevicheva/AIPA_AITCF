@@ -57,7 +57,7 @@ async function hsSearchRadarTasks(key) {
     filterGroups: [
       {
         filters: [
-          { propertyName: 'hs_task_subject', operator: 'CONTAINS_TOKEN', value: 'FOLLOWUP' },
+          { propertyName: 'hs_task_subject', operator: 'CONTAINS_TOKEN', value: 'FOLLOWUP-RADAR' },
           { propertyName: 'hs_task_status', operator: 'NEQ', value: 'COMPLETED' },
         ],
       },
@@ -174,6 +174,7 @@ async function main() {
   const logFiles = [
     path.join(process.cwd(), 'data/followup-radar.log'),
     path.join(process.cwd(), 'logs/followup-radar.log'),
+    '/home/ubuntu/logs/followup-radar.log',
     '/home/ubuntu/cto-aipa/logs/followup-radar.log',
   ];
   for (const file of logFiles) {

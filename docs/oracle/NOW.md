@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-06 13:40 UTC | 7am radar card still has no Clean/Keep — force-post | `src/radar-cleanup.ts` `src/telegram-bot.ts` `scripts/oracle-radar-buttons.sh` `cto-aipa` named-file | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,15 +127,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **IN FLIGHT 6 Sep — radar buttons still missing on the 7:00 card.** Elena's
-  screenshot is the original VJH text digest. Telegram will not grow a keyboard
-  on that `message_id`. Last named-file deploy compiled the handlers, but
-  `postRadarButtonsOnce` no-ops without `radar-proposal.json`, so no compact
-  row was sent. Do not full-`cto_aipa` reset. Do not pull EspaLuz/VJH.
-- **DONE 6 Sep — radar Clean/Keep code live, named-file, no extra PII.** Actions
-  `34035464695` OK. Oracle `cto-aipa` HEAD stayed `df7d7a7`; only two source
-  files checked out; `docs/selling` dirty state left in place. Bot uptime
-  39h → 4s. Fixtures are `@example.com`. EspaLuz/VJH not pulled.
+- **DONE 6 Sep — Clean/Keep are in Telegram now.** Not on the 7:00 text
+  card (Telegram cannot grow a keyboard after send). New compact row
+  `message_id=5393` in AI_TCF_Aldeazz: `🧹 16 threads… tap Clean`. Actions
+  `34036785860` `posted=1 items=16 buttons=14 source=hubspot chat=…6862`.
+  First force-post (`34036694170`) was a silent skip: leftover
+  `radar-proposal.json` had 1 dismissed row. Real cron log is
+  `/home/ubuntu/logs/followup-radar.log` (was not on the search path).
+  Do not full-`cto_aipa` reset. Do not pull EspaLuz/VJH. Do not tap
+  Clear-all if she only wanted today's 3 — HS search was broader than
+  the digest; per-thread Clean is safe. Reply `/radar` on the 7:00 card
+  to put buttons on that message. Branch
+  `cursor/radar-buttons-now-b9a9`.
+- **DONE 6 Sep — radar Clean/Keep code live, named-file, no extra PII.**
+  Fixtures `@example.com`. `docs/selling` dirty left in place.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
   had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
   `33965178681` → `✓ update note 116418923178` with the verified
