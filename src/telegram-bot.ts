@@ -100,7 +100,12 @@ import {
   dismissRadarItems,
   radarButtonsSentToday,
   markRadarButtonsSent,
+  loadRadarButtonsSent,
   radarChatTargets,
+  backfillLedgerEmailAliases,
+  extractLastRadarDigest,
+  parseRadarDigestLoose,
+  extractRadarTelegramMessageId,
 } from './radar-cleanup';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
@@ -8921,15 +8926,30 @@ async function postRadarButtonsOnce(bot: Bot): Promise<void> {
       console.warn('[radar] skip: already posted today');
       return;
     }
-    // Proposal comes from VJH's morning write, a followup-radar.log digest,
-    // or Elena replying /radar. Never bake counterparty addresses into src/.
-    const resolved = discoverRadarProposal({});
+    const ledger = loadRadarLedger();
+    if (backfillLedgerEmailAliases(ledger)) saveRadarLedger(ledger);
+
+    let digestText: string | undefined;
+    for (const file of [
+      '/home/ubuntu/logs/followup-radar.log',
+      path.join(process.cwd(), 'data/followup-radar.log'),
+    ]) {
+      if (!fs.existsSync(file)) continue;
+      const raw = fs.readFileSync(file, 'utf8');
+      const extracted = extractLastRadarDigest(raw);
+      if (extracted && parseRadarDigestLoose(extracted).length) {
+        digestText = extracted;
+        break;
+      }
+    }
+
+    // Today's VJH digest is the source of truth. HubSpot tasks are not.
+    const resolved = discoverRadarProposal({ digestText });
     if (!resolved) {
-      console.warn('[radar] skip: no proposal or digest on disk');
+      console.warn('[radar] skip: no open threads on today\'s digest');
       return;
     }
     saveRadarProposal(resolved.proposal);
-    const ledger = loadRadarLedger();
     const open = openRadarItems(resolved.proposal.items, ledger);
     if (!open.length) {
       console.warn('[radar] skip: every discovered thread is already cleared');
@@ -8942,17 +8962,39 @@ async function postRadarButtonsOnce(bot: Bot): Promise<void> {
       return;
     }
     const text = `🧹 ${open.length} thread${open.length === 1 ? '' : 's'} on today's radar — tap Clean to stop seeing them. Mail is not touched.`;
+
+    const editIds = [
+      ...(digestText ? [extractRadarTelegramMessageId(digestText) || 0] : []),
+      ...(loadRadarButtonsSent().message_ids || []),
+    ].filter((n) => n > 0);
+
     let posted = 0;
-    for (const chatId of targets) {
-      try {
-        await bot.api.sendMessage(chatId, text, { reply_markup: markup });
-        posted += 1;
-        console.log(`[radar] posted clean buttons (${open.length}) source=${resolved.source} chat=…${String(chatId).slice(-4)}`);
-      } catch (e) {
-        console.error(`[radar] button post failed for chat=…${String(chatId).slice(-4)}:`, (e as Error).message);
+    const usedIds: number[] = [];
+    for (const messageId of [...new Set(editIds)]) {
+      for (const chatId of targets) {
+        try {
+          await bot.api.editMessageReplyMarkup(chatId, messageId, { reply_markup: markup });
+          posted += 1;
+          usedIds.push(messageId);
+          console.log(`[radar] edited buttons (${open.length}) onto message_id=${messageId} chat=…${String(chatId).slice(-4)}`);
+        } catch (e) {
+          console.warn(`[radar] edit-miss message_id=${messageId}:`, (e as Error).message);
+        }
       }
     }
-    if (posted) markRadarButtonsSent();
+    if (!posted) {
+      for (const chatId of targets) {
+        try {
+          const sent = await bot.api.sendMessage(chatId, text, { reply_markup: markup });
+          posted += 1;
+          if (sent?.message_id) usedIds.push(sent.message_id);
+          console.log(`[radar] posted clean buttons (${open.length}) source=${resolved.source} chat=…${String(chatId).slice(-4)}`);
+        } catch (e) {
+          console.error(`[radar] button post failed for chat=…${String(chatId).slice(-4)}:`, (e as Error).message);
+        }
+      }
+    }
+    if (posted) markRadarButtonsSent(undefined, new Date(), { message_ids: usedIds });
     else console.warn('[radar] skip: send failed for every target');
   } catch (e) {
     console.error('[radar] button post failed:', e);
@@ -9057,6 +9099,14 @@ _/daily for full briefing_`;
   });
 
   cronJobs.push(dailyBriefing);
+
+  // Follow-up radar buttons — 7:15 AM Panama, 15 minutes after VJH's 7:00 text digest.
+  // The Python card is text-only. This is the approve half, on the same clock.
+  const radarButtons = cron.schedule('15 7 * * *', async () => {
+    console.log('[radar] daily Clean/Keep after the morning digest');
+    await postRadarButtonsOnce(bot);
+  }, { timezone: 'America/Panama' });
+  cronJobs.push(radarButtons);
 
   // Weekly Trello digest — Monday 9 AM Panama time
   const weeklyDigest = cron.schedule('0 9 * * 1', async () => {
