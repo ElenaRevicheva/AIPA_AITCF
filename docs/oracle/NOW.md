@@ -500,6 +500,19 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 - ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
   8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
   that settings page, so verify via the DataVendor repo picker instead — faster and free.)
+- 💡 **ANSWERED at last: what "Edit listing" does (6 Sep, read from the UI).** This is the
+  question Elena put to Megan on 4 Sep and never got a direct answer to. The confirm dialog
+  says it outright:
+  > *"Editing a live listing takes it off the catalog while quality checks re-run on your
+  > changes. Buyers will not see it until you republish after the checks pass."*
+  **So: editing DOES re-run QC, and the listing DOES leave the catalog while it runs.**
+  It comes back only when you republish after the checks pass.
+  ✅ **That makes the re-scan and the asset swap ONE operation, not two.**
+  ✅ **The cost of the window is measurable and it is zero:** the listing has **0 purchases
+  and no bids**. Nothing is lost by being off-catalog briefly.
+  ⚠️ The org switcher can render **"New organization"** for a moment on load — the owner
+  panel is missing until it resolves to **AIdeazz AI Lab**. Not a permissions problem.
+  🚫 Do **not** click `Edit listing` until ready to finish: it unpublishes on confirm.
 - 🟢 **EVERY ASSET THAT WOULD SHIP IS CLEAN (6 Sep). The listing set is READY.**
 
   | What gets listed | State |
