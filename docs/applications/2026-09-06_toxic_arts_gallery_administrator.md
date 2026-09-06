@@ -222,3 +222,92 @@ specifically. If she has not actually administered a Shopify store, change it to
 - [ ] Confirm or soften the "Shopify-class" line above
 - [ ] Send CL + gallery CV to sales@toxic-arts.com
 - [ ] Tell the agent "sent Toxic Arts" so deal `64716021571` moves to ⏳ Sent
+
+---
+
+# ✅ FINAL — the letter as sent (6 Sep 2026)
+
+**To** `sales@toxic-arts.com` · from Zoho · **Attach**
+`06.09.26_Gallery_CV_Elena Revicheva.pdf`
+
+**Subject**
+
+```
+Art Gallery Administrator — Elena Revicheva (I run my own online gallery)
+```
+
+The subject is deliberately not the generic one. `sales@` will collect dozens of
+identical "Art Gallery Administrator" emails; the parenthetical is the single most
+relevant true fact about her and it is what earns the open.
+
+**Body**
+
+```
+Dear Toxic Arts,
+
+I run a small online gallery of my own and I am a published poet, so I am applying
+from both sides of the desk — and before writing this I ran my own audit tool over
+your shop, the way I would in my first week.
+
+It scored 82 out of 100. What stood out first is something you have already got
+right: all six AI crawlers are allowed, eleven checks out of eleven. A surprising
+number of galleries have that wrong by accident and never find out, because nobody
+ever gets an error about it.
+
+Where citations are leaking is answer-readiness. There is no Product schema on the
+editions, so when a collector asks an assistant where to buy a print by one of your
+artists, there is nothing machine-readable for it to quote — no artist, price,
+edition size or availability. And there are no sameAs links tying the site to your
+Artsy storefront and your Instagram, so you read as three unconnected galleries
+rather than one. Small, additive fixes that do not touch the design. I wrote up the
+five I would start with:
+
+https://claude.ai/code/artifact/9a47b4d6-99e4-417f-81f2-54e683c682f3
+
+I did that because your post said initiative and attention to detail matter more
+than gallery experience, and this seemed more honest than a paragraph about my
+passion for contemporary art.
+
+My own gallery is ATUONA (atuona.xyz) — underground aesthetic, running since 2019:
+six short films, each with its own score, narration, generated poster and title
+cards, and 98 literary works released. I do the curation, the pipeline and the
+site. It taught me that an online gallery is really two jobs: keeping the inventory
+honest, and being findable. With Shopify running alongside Artsy in four
+currencies, the first is a daily discipline — and reconciling systems that quietly
+disagree is most of what I do.
+
+Straight with you on two things. I have not worked in a commercial gallery. And I
+am in Panama, so I can hold London afternoons — about 12:00 to 18:00 your time —
+but not a 9am start. Russian is my first language, my English is fluent and my
+Spanish is working-level.
+
+CV attached. I would love to talk.
+
+Elena Revicheva
+atuona.xyz · aideazz.xyz/api
+```
+
+## What changed from the earlier draft
+
+- **Opens with the poet credential.** "I run a small online gallery of my own and I
+  am a published poet, so I am applying from both sides of the desk." That sentence
+  does more for a contemporary gallery than the entire rest of the letter, and it
+  was missing until the CV rebuild surfaced it.
+- **98 literary works**, counted on the live site rather than copied from an old
+  CV. ATUONA correctly dated **since 2019**, not 2025.
+- The audit stays the opening move, and still **leads with what they got right**
+  (11/11 crawler access) before naming where citations leak.
+
+## 🚨 Blocking step before send
+
+The artifact `9a47b4d6` must be **shared** — Share → General access → Anyone with
+the link — then confirmed in a private window. It is a new artifact, so its only
+version is the current one and there is no share pin to fight. **If that link is
+dead the letter's entire opening collapses**, because the first thing it asks him
+to do is click it.
+
+## Next
+
+- [ ] Share the artifact, verify logged out
+- [ ] Send from Zoho with the CV attached
+- [ ] Tell the agent "sent Toxic Arts" so deal `64716021571` moves to ⏳ Sent
