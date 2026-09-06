@@ -23,8 +23,12 @@ pm2 describe cto-aipa 2>/dev/null | grep -E 'status|uptime|restarts' || true
 echo "=== fetch origin/main ==="
 git fetch origin main
 
-echo "=== named checkout: src/telegram-bot.ts src/radar-cleanup.ts ==="
-git checkout origin/main -- src/telegram-bot.ts src/radar-cleanup.ts
+echo "=== named checkout: radar sources + force-send (no reset) ==="
+git checkout origin/main -- \
+  src/telegram-bot.ts \
+  src/radar-cleanup.ts \
+  scripts/post-radar-buttons-now.cjs \
+  scripts/oracle-radar-buttons.sh
 
 echo "=== build (typescript is a devDep and was pruned on the last full deploy) ==="
 # Do not npm ci / prune — that would rewrite node_modules. Install tsc only.
@@ -36,14 +40,47 @@ fi
 echo "=== prove compiled output carries the buttons ==="
 grep -c "postRadarButtonsOnce" dist/telegram-bot.js
 grep -c "rdrcleanall" dist/radar-cleanup.js
+grep -c "discoverRadarProposal" dist/radar-cleanup.js
 grep -c "parseRadarDigest" dist/radar-cleanup.js
 
-echo "=== restart ==="
+echo "=== copy last digest into data/ without printing it ==="
+mkdir -p data
+COPIED=0
+for f in \
+  data/followup-radar.log \
+  logs/followup-radar.log \
+  /home/ubuntu/cto-aipa/logs/followup-radar.log \
+  /home/ubuntu/.pm2/logs/followup-radar-out.log \
+  /home/ubuntu/VibeJobHunterAIPA_AIMCF/autonomous_data/followup-radar.log \
+  /home/ubuntu/VibeJobHunterAIPA_AIMCF/logs/followup-radar.log \
+  /tmp/followup-radar.log
+do
+  if [ -f "$f" ] && grep -q "Follow-up radar" "$f"; then
+    cp -f "$f" data/followup-radar.log
+    echo "digest_source=$(basename "$f") bytes=$(wc -c < "$f")"
+    COPIED=1
+    break
+  fi
+done
+if [ "$COPIED" -eq 0 ]; then
+  echo "digest_source=none (will try proposal.json / HubSpot tasks)"
+fi
+rm -f data/radar-buttons-sent.json
+
+echo "=== force-post buttons NOW (addresses never printed) ==="
+SEND_RC=0
+node scripts/post-radar-buttons-now.cjs --force || SEND_RC=$?
+echo "force_post_exit=$SEND_RC"
+
+echo "=== restart so callback handlers match the new proposal ==="
 pm2 restart cto-aipa --update-env
 sleep 4
 echo "--- pm2 after ---"
 pm2 describe cto-aipa 2>/dev/null | grep -E 'status|uptime|restarts' || true
+echo "--- radar log lines (no addresses) ---"
+pm2 logs cto-aipa --lines 40 --nostream 2>/dev/null | grep -E '\[radar\]' || true
 
 echo "=== AFTER ==="
-git status --porcelain -- src/telegram-bot.ts src/radar-cleanup.ts src/radar-cleanup.ts
-echo "=== Done. docs/selling, .env, data/ untouched. ==="
+git status --porcelain -- src/telegram-bot.ts src/radar-cleanup.ts scripts/post-radar-buttons-now.cjs
+echo "=== Done. docs/selling, .env, data/ ledger left in place. ==="
+exit "$SEND_RC"

@@ -56,6 +56,47 @@ export function radarDirCandidates(): string[] {
   ].filter((d, i, all) => all.indexOf(d) === i);
 }
 
+/** Logs that may hold today's digest text. Read, never print — they contain addresses. */
+export function radarLogCandidates(): string[] {
+  const names = [
+    'followup-radar.log',
+    'followup-radar-out.log',
+    'followup_radar.log',
+    'radar-last-digest.txt',
+    'radar-digest.txt',
+  ];
+  const dirs = [
+    ...radarDirCandidates(),
+    path.join(process.cwd(), 'logs'),
+    '/home/ubuntu/cto-aipa/logs',
+    '/home/ubuntu/.pm2/logs',
+    '/home/ubuntu/VibeJobHunterAIPA_AIMCF/logs',
+    '/tmp',
+  ];
+  const out: string[] = [];
+  for (const dir of dirs) {
+    for (const name of names) out.push(path.join(dir, name));
+  }
+  return [...new Set(out)];
+}
+
+/** Every chat Elena actually reads. Preferring only alert-subscribers missed her. */
+export function radarChatTargets(env: NodeJS.ProcessEnv = process.env): number[] {
+  const ids = new Set<number>();
+  const add = (raw?: string | null) => {
+    if (!raw) return;
+    for (const part of String(raw).split(/[\s,]+/)) {
+      const n = Number(part.trim());
+      if (Number.isFinite(n) && n !== 0) ids.add(n);
+    }
+  };
+  add(env.TELEGRAM_AUTHORIZED_USERS);
+  add(env.TELEGRAM_ALERT_CHAT_IDS);
+  add(env.CONCIERGE_TG_CHAT);
+  add(env.COMMUNITY_TG_CHAT);
+  return [...ids];
+}
+
 export function radarDir(): string {
   for (const dir of radarDirCandidates()) {
     if (fs.existsSync(path.join(dir, PROPOSAL_NAME)) || fs.existsSync(path.join(dir, LEDGER_NAME))) {
@@ -290,4 +331,127 @@ export function resolveRadarProposal(opts: {
     };
   }
   return null;
+}
+
+/**
+ * Pull the last Follow-up radar card out of a cron / pm2 log. Stops before the
+ * next timestamped event so we do not swallow later pings.
+ */
+export function extractLastRadarDigest(text: string): string | null {
+  if (!text) return null;
+  const normalized = text.replace(/\r\n/g, '\n');
+  const headerRe = /^.*Follow-up radar.*$/gim;
+  let lastIndex = -1;
+  let match: RegExpExecArray | null;
+  while ((match = headerRe.exec(normalized))) lastIndex = match.index;
+  if (lastIndex < 0) return null;
+  const lineStart = normalized.lastIndexOf('\n', lastIndex - 1) + 1;
+  const lines = normalized.slice(lineStart).split('\n');
+  const kept: string[] = [];
+  let seenItem = false;
+  for (const line of lines.slice(0, 80)) {
+    if (
+      seenItem &&
+      /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(line) &&
+      !/Follow-up radar|WROTE LAST|\d+d\s+\S+@/i.test(line)
+    ) {
+      break;
+    }
+    if (seenItem && /^✅\s*POSTED/i.test(line)) break;
+    kept.push(line);
+    if (/^\d+d\s+\S+@/.test(line.trim())) seenItem = true;
+  }
+  const block = kept.join('\n');
+  return parseRadarDigest(block).length ? block : null;
+}
+
+export function extractRadarTelegramMessageId(text: string): number | null {
+  if (!text) return null;
+  const matches = [...text.matchAll(/message_id["\s:=]+(\d{3,})/gi)];
+  if (!matches.length) return null;
+  const last = matches[matches.length - 1];
+  const n = Number(last?.[1]);
+  return Number.isFinite(n) ? n : null;
+}
+
+export function itemsFromRadarJson(raw: unknown): RadarItem[] {
+  if (!raw || typeof raw !== 'object') return [];
+  const obj = raw as { items?: unknown; threads?: unknown; radar?: unknown };
+  const list = [obj.items, obj.threads, obj.radar].find(Array.isArray) as unknown[] | undefined;
+  if (!list?.length) return [];
+  const items: RadarItem[] = [];
+  for (const row of list) {
+    if (!row || typeof row !== 'object') continue;
+    const it = row as Record<string, unknown>;
+    const who = String(it.who || it.email || it.from || '').trim();
+    if (!who.includes('@')) continue;
+    const subject = String(it.subject || it.title || '');
+    const age = Number(it.age ?? it.days ?? it.age_days ?? 0);
+    items.push({
+      key: String(it.key || radarItemKey(who, subject)),
+      who,
+      subject,
+      age: Number.isFinite(age) ? age : 0,
+      stale: true,
+    });
+  }
+  return items;
+}
+
+/**
+ * Find today's threads without baking addresses into source. Order:
+ * on-disk proposal → supplied digest → last digest in a radar log → JSON dumps.
+ */
+export function discoverRadarProposal(opts: {
+  digestText?: string | null | undefined;
+  dir?: string;
+} = {}): { proposal: RadarProposal; source: 'file' | 'digest' | 'merged' | 'log' | 'json' } | null {
+  const dir = opts.dir || radarDir();
+  const known = resolveRadarProposal({ digestText: opts.digestText, dir });
+  if (known?.proposal.items.length) return known;
+
+  const names = [
+    'followup-radar.log',
+    'followup-radar-out.log',
+    'followup_radar.log',
+    'radar-last-digest.txt',
+    'radar-digest.txt',
+    PROPOSAL_NAME,
+  ];
+  const files = [
+    ...names.map((n) => path.join(dir, n)),
+    ...radarLogCandidates(),
+    ...radarDirCandidates().map((d) => path.join(d, PROPOSAL_NAME)),
+  ];
+  for (const file of files) {
+    if (!fs.existsSync(file)) continue;
+    let raw = '';
+    try {
+      raw = fs.readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+    if (file.endsWith('.json')) {
+      try {
+        const items = itemsFromRadarJson(JSON.parse(raw));
+        if (items.length) {
+          return { proposal: { id: newRadarProposalId(), items }, source: 'json' };
+        }
+      } catch {
+        /* not a proposal dump */
+      }
+    }
+    const extracted = extractLastRadarDigest(raw);
+    if (!extracted) continue;
+    const parsed = parseRadarDigest(extracted);
+    if (!parsed.length) continue;
+    if (known?.proposal.id) {
+      return {
+        proposal: { id: known.proposal.id, items: mergeRadarItems(known.proposal.items, parsed) },
+        source: 'merged',
+      };
+    }
+    return { proposal: { id: newRadarProposalId(), items: parsed }, source: 'log' };
+  }
+  return known;
 }

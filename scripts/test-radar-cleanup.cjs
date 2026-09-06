@@ -32,8 +32,13 @@ const {
   openRadarItems,
   mergeRadarItems,
   resolveRadarProposal,
+  discoverRadarProposal,
   saveRadarProposal,
   loadRadarProposal,
+  extractLastRadarDigest,
+  extractRadarTelegramMessageId,
+  itemsFromRadarJson,
+  radarChatTargets,
 } = require(DIST);
 
 const failures = [];
@@ -143,6 +148,47 @@ check('hiding by email alias removes the thread',
 markRadarButtonsSent(tmp, new Date('2026-09-06T15:00:00Z'));
 check('buttons-sent stamp is same-day', radarButtonsSentToday(tmp, new Date('2026-09-06T18:00:00Z')) === true);
 check('buttons-sent stamp expires next day', radarButtonsSentToday(tmp, new Date('2026-09-07T00:01:00Z')) === false);
+
+const LOG = [
+  '2026-09-06 12:00:00 INFO sending digest',
+  '📡 Follow-up radar',
+  '🔴 THEY WROTE LAST — your move',
+  '5d recruiter@example.com',
+  'Interview Invitation + Next Steps',
+  '4d billing@example.com',
+  'Re: 2026-08-25-receipt',
+  '🟡 YOU WROTE LAST — gone quiet, a nudge is free',
+  '5d hello@example.com',
+  'Quick first step before the vendor call',
+  'telegram message_id=424242',
+  '2026-09-06 12:32:00 INFO ✅ POSTED reddit',
+].join('\n');
+const extracted = extractLastRadarDigest(LOG);
+check('extracts the last digest from a cron log', extractLastRadarDigest(LOG) != null && parseRadarDigest(extracted).length === 3);
+check('extract ignores later POSTED lines', extracted && !/POSTED reddit/.test(extracted));
+check('reads message_id from the log window', extractRadarTelegramMessageId(LOG) === 424242);
+check('no message_id returns null', extractRadarTelegramMessageId('no ids here') === null);
+
+const logDir = fs.mkdtempSync(path.join(os.tmpdir(), 'radar-log-'));
+fs.writeFileSync(path.join(logDir, 'followup-radar.log'), LOG);
+const fromLog = discoverRadarProposal({ dir: logDir });
+check('discover stands up a proposal from followup-radar.log',
+  fromLog && fromLog.proposal.items.length === 3 && (fromLog.source === 'log' || fromLog.source === 'digest'));
+
+const jsonItems = itemsFromRadarJson({
+  threads: [{ email: 'ops@example.com', title: 'Ping', days: 6 }],
+});
+check('json dump with email/days normalises to a radar item',
+  jsonItems.length === 1 && jsonItems[0].who === 'ops@example.com' && jsonItems[0].age === 6);
+
+const chats = radarChatTargets({
+  TELEGRAM_AUTHORIZED_USERS: '111, 222',
+  CONCIERGE_TG_CHAT: '111',
+  COMMUNITY_TG_CHAT: '333',
+});
+check('chat targets union env ids and drop dupes',
+  chats.length === 3 && chats.includes(111) && chats.includes(333));
+check('chat targets ignore empty', radarChatTargets({}).length === 0);
 
 if (failures.length) {
   console.error('FAIL: ' + failures.join(' | '));

@@ -92,6 +92,7 @@ import {
   loadRadarLedger,
   radarKeyboard,
   resolveRadarProposal,
+  discoverRadarProposal,
   saveRadarLedger,
   saveRadarProposal,
   isRadarDigest,
@@ -99,6 +100,7 @@ import {
   dismissRadarItems,
   radarButtonsSentToday,
   markRadarButtonsSent,
+  radarChatTargets,
 } from './radar-cleanup';
 import type { TrelloCard } from './trello-voice';
 import { generateDailyBriefing, generateWeeklyDigest } from './board-briefing';
@@ -1016,7 +1018,7 @@ Or just ask me anything - I understand natural language!`;
       : ((ctx.message as { text?: string } | undefined)?.text || '').replace(/^\/radar(@\S+)?\s*/i, '').trim()
         || undefined;
     try {
-      const resolved = resolveRadarProposal({ digestText: digestText || replied?.text });
+      const resolved = discoverRadarProposal({ digestText: digestText || replied?.text });
       if (!resolved) {
         await ctx.reply(
           '🛰️ No radar threads to attach buttons to.\n\n' +
@@ -8915,32 +8917,43 @@ async function loadClaudeMd(repoAlias: string): Promise<string | null> {
  */
 async function postRadarButtonsOnce(bot: Bot): Promise<void> {
   try {
-    if (radarButtonsSentToday()) return;
-    // Proposal comes from VJH's morning write or from Elena replying /radar
-    // on the digest. Never bake counterparty addresses into this file — that
-    // is the PII Claude's cleanup exists to keep out of src/.
-    const resolved = resolveRadarProposal({});
-    if (!resolved) return;
+    if (!process.env.RADAR_FORCE_BUTTONS && radarButtonsSentToday()) {
+      console.warn('[radar] skip: already posted today');
+      return;
+    }
+    // Proposal comes from VJH's morning write, a followup-radar.log digest,
+    // or Elena replying /radar. Never bake counterparty addresses into src/.
+    const resolved = discoverRadarProposal({});
+    if (!resolved) {
+      console.warn('[radar] skip: no proposal or digest on disk');
+      return;
+    }
     saveRadarProposal(resolved.proposal);
     const ledger = loadRadarLedger();
     const open = openRadarItems(resolved.proposal.items, ledger);
-    if (!open.length) return;
+    if (!open.length) {
+      console.warn('[radar] skip: every discovered thread is already cleared');
+      return;
+    }
     const markup = radarKeyboard(resolved.proposal.id, resolved.proposal.items, ledger, true);
-    const targets = alertChatIds.size ? [...alertChatIds] : [...AUTHORIZED_USERS];
+    const targets = [...new Set([...radarChatTargets(), ...alertChatIds, ...AUTHORIZED_USERS])];
     if (!targets.length) {
-      console.warn('[radar] no chat to post buttons to');
+      console.warn('[radar] skip: no chat ids (AUTHORIZED / CONCIERGE / alerts)');
       return;
     }
     const text = `🧹 ${open.length} thread${open.length === 1 ? '' : 's'} on today's radar — tap Clean to stop seeing them. Mail is not touched.`;
+    let posted = 0;
     for (const chatId of targets) {
       try {
         await bot.api.sendMessage(chatId, text, { reply_markup: markup });
-        console.log(`[radar] posted clean buttons (${open.length}) to ${chatId}`);
+        posted += 1;
+        console.log(`[radar] posted clean buttons (${open.length}) source=${resolved.source} chat=…${String(chatId).slice(-4)}`);
       } catch (e) {
-        console.error(`[radar] button post failed for ${chatId}:`, e);
+        console.error(`[radar] button post failed for chat=…${String(chatId).slice(-4)}:`, (e as Error).message);
       }
     }
-    markRadarButtonsSent();
+    if (posted) markRadarButtonsSent();
+    else console.warn('[radar] skip: send failed for every target');
   } catch (e) {
     console.error('[radar] button post failed:', e);
   }
