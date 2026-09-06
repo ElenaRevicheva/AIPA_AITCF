@@ -1,83 +1,88 @@
 To:      megan@hud.ai
-Subject: Cleaned and re-uploaded — pii_qc_llm still fails on 7 of 8, and I cannot see why
+Subject: PII cleaned across all eight repos — what I removed, and the two things I kept on purpose
 
 Hi Megan,
 
-I did the work you recommended and re-submitted the listing. Mandatory checks pass and
-the listing is publishable, but `pii_qc_llm` still fails on seven of the eight repos —
-including two that were passing before I touched anything, and one repo that is brand new.
+I did the work you recommended, and I want to give you the detail rather than just
+"it's fixed", because two repos still carry findings and I kept them deliberately.
 
-I would rather ask than guess, so: could you send the per-repo findings again, the way you
-did on 5 September? That list was the only thing that told me what the check actually
-objects to, and the vendor UI does not expose it.
+WHAT WAS ACTUALLY WRONG
 
-WHAT I REMOVED
+Your check was reading current HEAD correctly the whole time — I confirmed that by
+reproducing your per-repo counts against my own working tree (dragontrade 2/2,
+atlas-captures 19/19 emails, exact matches). The problem was on my side: my earlier
+cleanup had not landed.
 
-Working from the finding types you named, across the five repos you listed plus two more:
+The largest single item: an authenticated WhatsApp Web session store — 378 files,
+180 MB of LevelDB records, cache and local storage — was committed. It had been in
+.gitignore since the day it was added, but .gitignore only filters files git has not
+seen yet; it never retracts something already tracked. That is what your two
+blind-spot findings ("314x <no_ext>, 8x .ldb ... unscanned bytes cannot be certified
+as clean") were pointing at. It is untracked now.
 
-  - Two LIVE PostgreSQL connection strings, passwords in clear. One was in HEAD. Both are
-    rotated now. Your scanner was right and my own earlier scan was wrong: I had searched
-    only for vendor API-key formats, and a database URL is not one of those shapes, so it
-    returned zero and I believed it.
-  - A committed browser session store: 378 files, 47 MB, an authenticated WhatsApp Web
-    profile including cache and local storage.
-  - Real customer data — conversation history, user profiles, subscriber records with
-    emails and phone numbers, and one customer's full payment record (email, PayPal
-    subscription id, WhatsApp number) hardcoded in source.
-  - Subscriber identities that were written into live conditional logic in the running
-    bridge; those now come from configuration.
-  - My own national ID and RUC, which had reached a script.
+The second thing worth naming: my own scrubber was generating findings. It had
+replaced my real address with a GitHub noreply address, and a noreply address is
+still an address to a detector — that single string was all 84 EMAIL findings in
+AIPA_AITCF-licensed. Same class of mistake with phone numbers: the harvester matched
+contiguous E.164 only, so every number written with spaces or brackets survived.
 
-None of it was deleted from the machines that need it — it is untracked, not destroyed —
-and no service was restarted at any point.
+WHAT WAS REMOVED
 
-WHAT I CANNOT EXPLAIN, AND WHY I AM ASKING
+  - Real subscriber identities: five WhatsApp ids (four Panama, one Nigeria) that
+    appeared in source, in a migration script, and in runtime state files. One was
+    written into a live conditional; that now reads from configuration.
+  - All runtime state holding customer ids — trial records, session files, analytics,
+    onboarding — untracked in both EspaLuz repos.
+  - A real PayPal subscription id, payer address and name sitting in a webhook test
+    fixture, now synthetic.
+  - 23 files of private correspondence with a payments vendor.
+  - Advertiser contact details that had been captured verbatim inside ad copy in the
+    Atlas dataset, plus a redaction step in the weekly job so they cannot return.
+  - 30 one-off operational scripts named after specific prospects, and 19 saved patch
+    artifacts, out of the licensed copy.
+  - An 85 MB tarball of the codebase committed inside the codebase, and stray
+    pre-refactor copies of main files.
+  - My personal resume documents, where nothing in the product reads them.
 
-Three results do not fit any theory I can test from my side:
+Two live credentials I found myself, which your check did not flag: a hardcoded
+shared secret and an inbound webhook URL in EspaLuz_Influencer. Both are in the
+environment now. I mention it because it cuts both ways — a passing PII check is not
+the same as a clean repository, and I would rather you hear that from me.
 
-  1. `atlas-captures` now FAILS `pii_qc_llm`. It PASSED on 31 August and I have not changed
-     a single byte of it since.
-  2. `EspaLuz_Influencer` FAILS. It was not on your 5 September list, and it contains no
-     third-party email addresses and no phone numbers that I can find.
-  3. `AIPA_AITCF-licensed` FAILS. That repository was created this week as a clean-room
-     copy specifically to satisfy this check — history rewritten, credentials and contact
-     data removed, verified by an independent re-scan before upload.
+WHAT I KEPT, AND WHY
 
-Only `AILA` passes, and `AILA` is the emptiest repo in the set. That pattern makes me think
-the check is objecting to something I have not identified rather than to the data I removed.
+Two categories will still show as findings, and I am not going to remove them:
 
-THE QUESTION THAT DECIDES WHAT I DO NEXT
+  1. Embassy and consulate switchboard numbers in both EspaLuz repos. These are
+     published institutional numbers that the product's emergency-contacts feature
+     serves to users. Removing them removes a feature, not a risk.
+  2. My own published business address, inside the email signatures, resume templates
+     and candidate profile that the job-hunting agent sends to employers. It is the
+     product's own outbound identity. Where I could remove it without changing
+     behaviour I did; rewriting working outbound email to satisfy a shape detector
+     would be damaging the asset to pass the gate.
 
-When I edited the listing I replaced one asset — AIPA_AITCF became AIPA_AITCF-licensed.
-The other seven kept their original attachment from 31 August.
+If either of those blocks a sale, tell me and we will talk about it — but I did not
+want to quietly mangle a working product and call it clean.
 
-So: does a quality run grade a FRESH pull of each repository, or the snapshot captured
-when the asset was first attached?
+WHERE IT STANDS
 
-If it grades the original snapshot, then none of the work above has been seen by the
-check at all — those seven are still being graded on their 31 August state, and the
-result tells me nothing about whether the cleaning worked. In that case I would detach
-and re-attach all seven to force a fresh capture, and I would rather do that once,
-deliberately, than discover it by trial and error on a live listing.
+Every repository is pushed. Measured against the same finding types your check uses,
+five of the eight now return zero, and the other three carry only the two categories
+above. I have re-run pii_qc_llm on the first repo and will work through the rest.
 
-It would also explain why the only repo I did NOT clean, `atlas-captures`, and the only
-one that is brand new, `AIPA_AITCF-licensed`, both behave unlike the rest.
+TWO ASKS
 
-AND THE ONE THING THAT WOULD SETTLE IT FASTEST
+1. The previously uploaded snapshots are still on your servers and still contain two
+   database credentials that I have since rotated. Rotation does not remove copies —
+   could you purge or quarantine those earlier uploads?
 
-Could you send the current per-repo `pii_qc_llm` findings — counts and types, as you did
-on 5 September? That list was the only thing that ever told me what the check actually
-objects to; the vendor UI shows me which repos failed but never why. I will act on it the
-same day it arrives.
+2. Test coverage shows as not gradable on all eight repos ("the snapshot carries no
+   coverage report"). I am generating those now. Is lcov.info at the repository root
+   the format you read, or do you prefer coverage.xml? I would rather ask once than
+   guess eight times.
 
-ONE THING STILL OUTSTANDING ON YOUR SIDE
-
-The earlier uploads are still on your servers, and they contain the two live database
-credentials described above. I have rotated them, but rotation does not remove the copies.
-Could you purge or quarantine the previously uploaded snapshots of those repositories?
-
-I am not going to tell you this is fixed until your check says so. My HUD estimator point
-of $89,481 remains open for the package conversation whenever the quality side is settled.
+My HUD estimator point of $89,481 remains open for the package conversation.
 
 Best regards,
 
