@@ -87,9 +87,9 @@ if [ "$COPIED" -eq 0 ]; then
   echo "digest_source=none (will try HubSpot open tasks; leftover cleared proposal is ignored)"
 fi
 
-echo "=== post buttons if missing (addresses never printed) ==="
+echo "=== replace resurrected rows with today's digest only ==="
 SEND_RC=0
-node scripts/post-radar-buttons-now.cjs --if-missing || SEND_RC=$?
+RADAR_EDIT_IDS="${RADAR_EDIT_IDS:-5393,5394}" node scripts/post-radar-buttons-now.cjs --replace || SEND_RC=$?
 echo "force_post_exit=$SEND_RC"
 
 echo "=== restart so callback handlers match the new proposal ==="

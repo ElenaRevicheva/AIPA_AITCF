@@ -25,13 +25,17 @@ const {
   discoverRadarProposal,
   saveRadarProposal,
   loadRadarLedger,
+  saveRadarLedger,
   radarKeyboard,
   openRadarItems,
   radarButtonsSentToday,
   markRadarButtonsSent,
+  loadRadarButtonsSent,
   radarChatTargets,
   extractRadarTelegramMessageId,
-  radarItemKey,
+  backfillLedgerEmailAliases,
+  parseRadarDigestLoose,
+  extractLastRadarDigest,
 } = require(DIST);
 
 function loadEnv() {
@@ -52,52 +56,6 @@ function maskChat(id) {
   return `…${String(id).slice(-4)}`;
 }
 
-async function hsSearchRadarTasks(key) {
-  const body = {
-    filterGroups: [
-      {
-        filters: [
-          { propertyName: 'hs_task_subject', operator: 'CONTAINS_TOKEN', value: 'FOLLOWUP-RADAR' },
-          { propertyName: 'hs_task_status', operator: 'NEQ', value: 'COMPLETED' },
-        ],
-      },
-    ],
-    properties: ['hs_task_subject', 'hs_task_body', 'hs_task_status', 'hs_timestamp'],
-    limit: 50,
-  };
-  const res = await fetch('https://api.hubapi.com/crm/v3/objects/tasks/search', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    console.warn(`hs: search ${res.status}`);
-    return [];
-  }
-  const json = await res.json();
-  const items = [];
-  const seen = new Set();
-  for (const t of json.results || []) {
-    const subj = String(t.properties?.hs_task_subject || '');
-    const blob = `${subj}\n${t.properties?.hs_task_body || ''}`;
-    if (!/FOLLOWUP-RADAR|Follow-up radar/i.test(blob)) continue;
-    const emails = blob.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) || [];
-    const who = emails.find((e) => !/@aideazz\./i.test(e) && !/@hubspot/i.test(e));
-    if (!who || seen.has(who.toLowerCase())) continue;
-    seen.add(who.toLowerCase());
-    const ageM = blob.match(/(\d+)\s*d(?:ays?)?\b/i);
-    const subject = subj.replace(/\[FOLLOWUP-RADAR\]/ig, '').trim().slice(0, 80);
-    items.push({
-      key: radarItemKey(who, subject),
-      who,
-      subject,
-      age: ageM ? Number(ageM[1]) : 0,
-      stale: true,
-    });
-  }
-  return items;
-}
-
 async function tg(token, method, payload) {
   const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
     method: 'POST',
@@ -111,50 +69,71 @@ async function tg(token, method, payload) {
   return json.result;
 }
 
+function digestFromKnownLogs() {
+  const files = [
+    '/home/ubuntu/logs/followup-radar.log',
+    path.join(process.cwd(), 'data/followup-radar.log'),
+    path.join(process.cwd(), 'logs/followup-radar.log'),
+    '/home/ubuntu/cto-aipa/logs/followup-radar.log',
+  ];
+  for (const file of files) {
+    if (!fs.existsSync(file)) continue;
+    const raw = fs.readFileSync(file, 'utf8');
+    const extracted = extractLastRadarDigest(raw);
+    const items = parseRadarDigestLoose(extracted || '');
+    if (items.length) return { file, items, raw: extracted };
+  }
+  return { file: '', items: [], raw: '' };
+}
+
 async function main() {
   loadEnv();
   const force = process.argv.includes('--force');
-  const ifMissing = process.argv.includes('--if-missing') || !force;
+  const replace = process.argv.includes('--replace');
+  const ifMissing = process.argv.includes('--if-missing') || (!force && !replace);
 
-  if (ifMissing && !force && radarButtonsSentToday()) {
+  if (ifMissing && !force && !replace && radarButtonsSentToday()) {
     console.log('skip=already-posted-today');
     return;
   }
 
-  let resolved = discoverRadarProposal({});
+  const ledger = loadRadarLedger();
+  const backfilled = backfillLedgerEmailAliases(ledger);
+  if (backfilled) {
+    saveRadarLedger(ledger);
+    console.log(`ledger_backfill=${backfilled}`);
+  }
+
+  const digest = digestFromKnownLogs();
+  console.log(`digest_items=${digest.items.length}`);
+
+  let resolved = discoverRadarProposal({ digestText: digest.items.length ? digest.raw : undefined });
+  if (digest.items.length) {
+    const emails = new Set(digest.items.map((it) => it.who.trim().toLowerCase()));
+    const base = resolved?.proposal.items || digest.items;
+    const items = base.filter((it) => emails.has(it.who.trim().toLowerCase()));
+    resolved = {
+      proposal: { id: resolved?.proposal.id || `rdr-${Date.now().toString(36)}`, items: items.length ? items : digest.items },
+      source: 'digest',
+    };
+  }
+
   if (resolved?.proposal.items.length) {
     console.log(`discover=${resolved.source} items=${resolved.proposal.items.length}`);
   } else {
     console.log('discover=none');
-    const key = env('HUBSPOT_API_KEY');
-    if (key) {
-      try {
-        const items = await hsSearchRadarTasks(key);
-        console.log(`hs_open_tasks=${items.length}`);
-        if (items.length) {
-          resolved = { proposal: { id: `rdr-${Date.now().toString(36)}`, items }, source: 'hubspot' };
-        }
-      } catch (e) {
-        console.warn(`hs: ${(e && e.message) || e}`);
-      }
-    } else {
-      console.log('hs=no-key');
-    }
   }
 
   if (!resolved?.proposal.items.length) {
-    console.error('FAIL: no open radar items (stale proposal ignored; no digest log; no HS tasks)');
-    process.exit(3);
+    if (!replace) {
+      console.error('FAIL: no open radar items from today\'s digest (HubSpot tasks are not a source)');
+      process.exit(3);
+    }
+  } else {
+    saveRadarProposal(resolved.proposal);
   }
 
-  saveRadarProposal(resolved.proposal);
-  const ledger = loadRadarLedger();
-  const open = openRadarItems(resolved.proposal.items, ledger);
-  if (!open.length) {
-    console.log('skip=all-cleared items=' + resolved.proposal.items.length);
-    return;
-  }
-
+  const open = resolved ? openRadarItems(resolved.proposal.items, ledger) : [];
   const token = env('TELEGRAM_BOT_TOKEN');
   const targets = radarChatTargets();
   if (!token) {
@@ -166,40 +145,41 @@ async function main() {
     process.exit(2);
   }
 
-  const markup = radarKeyboard(resolved.proposal.id, resolved.proposal.items, ledger, true);
+  const markup = resolved
+    ? radarKeyboard(resolved.proposal.id, resolved.proposal.items, ledger, true)
+    : { inline_keyboard: [] };
   const buttons = markup.inline_keyboard.flat().length;
-  const text = `🧹 ${open.length} thread${open.length === 1 ? '' : 's'} on today's radar — tap Clean to stop seeing them. Mail is not touched.`;
+  const text = open.length
+    ? `🧹 ${open.length} thread${open.length === 1 ? '' : 's'} on today's radar — tap Clean to stop seeing them. Mail is not touched.`
+    : '🧹 Those month-old threads were already cleared. Buttons now match today\'s digest only.';
+
+  const editIds = [
+    ...(process.env.RADAR_EDIT_IDS || '').split(/[\s,]+/).map((s) => Number(s)).filter((n) => n > 0),
+    ...(loadRadarButtonsSent().message_ids || []),
+    5393,
+    5394,
+  ].filter((n, i, all) => all.indexOf(n) === i);
 
   let edited = 0;
-  const logFiles = [
-    path.join(process.cwd(), 'data/followup-radar.log'),
-    path.join(process.cwd(), 'logs/followup-radar.log'),
-    '/home/ubuntu/logs/followup-radar.log',
-    '/home/ubuntu/cto-aipa/logs/followup-radar.log',
-  ];
-  for (const file of logFiles) {
-    if (!fs.existsSync(file)) continue;
-    const mid = extractRadarTelegramMessageId(fs.readFileSync(file, 'utf8'));
-    if (!mid) continue;
+  for (const messageId of editIds) {
     for (const chatId of targets) {
       try {
         await tg(token, 'editMessageReplyMarkup', {
           chat_id: chatId,
-          message_id: mid,
+          message_id: messageId,
           reply_markup: markup,
         });
         edited += 1;
-        console.log(`edited=1 message_id=${mid} chat=${maskChat(chatId)}`);
+        console.log(`edited=1 message_id=${messageId} buttons=${buttons} chat=${maskChat(chatId)}`);
       } catch (e) {
-        console.warn(`edit-miss chat=${maskChat(chatId)}: ${(e && e.message) || e}`);
+        console.warn(`edit-miss message_id=${messageId} chat=${maskChat(chatId)}: ${(e && e.message) || e}`);
       }
     }
-    break;
   }
 
   let posted = 0;
   let lastId = 0;
-  if (!edited) {
+  if (!replace && !edited && open.length) {
     for (const chatId of targets) {
       try {
         const sent = await tg(token, 'sendMessage', {
@@ -209,6 +189,7 @@ async function main() {
         });
         posted += 1;
         lastId = sent.message_id || lastId;
+        editIds.push(sent.message_id);
         console.log(`posted=1 items=${open.length} buttons=${buttons} source=${resolved.source} chat=${maskChat(chatId)} message_id=${sent.message_id}`);
       } catch (e) {
         console.error(`send-fail chat=${maskChat(chatId)}: ${(e && e.message) || e}`);
@@ -217,9 +198,13 @@ async function main() {
   }
 
   if (posted || edited) {
-    markRadarButtonsSent();
+    markRadarButtonsSent(undefined, new Date(), { message_ids: editIds });
     console.log(`ok items=${open.length} posted=${posted} edited=${edited} last_message_id=${lastId}`);
     return;
+  }
+  if (replace) {
+    console.error('FAIL: could not edit the resurrected button rows');
+    process.exit(4);
   }
   console.error('FAIL: telegram send produced no message');
   process.exit(4);

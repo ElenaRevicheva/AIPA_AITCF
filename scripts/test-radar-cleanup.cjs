@@ -40,6 +40,9 @@ const {
   extractRadarTelegramMessageId,
   itemsFromRadarJson,
   radarChatTargets,
+  ledgerHidesItem,
+  backfillLedgerEmailAliases,
+  parseRadarDigestLoose,
 } = require(DIST);
 
 const failures = [];
@@ -116,6 +119,11 @@ const proposalItems = [
 const merged = mergeRadarItems(proposalItems, parsed);
 check('merge keeps Python\'s key for a matched email', merged[0]?.key === 'python-key-1');
 check('merge still adds threads Python omitted', merged.some((it) => it.who === 'hello@example.com'));
+const resurrect = mergeRadarItems(
+  [...proposalItems, { key: 'old', who: 'old@example.com', subject: 'gone', age: 32, stale: true }],
+  parsed,
+);
+check('merge does not resurrect file-only leftovers', !resurrect.some((it) => it.who === 'old@example.com'));
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'radar-cleanup-'));
 saveRadarProposal({ id: 'from-disk', items: proposalItems }, tmp);
@@ -206,6 +214,38 @@ const rescued = discoverRadarProposal({ dir: leftover });
 check('today\'s log still wins over a leftover cleared proposal',
   rescued != null && rescued.proposal.items.some((it) => it.who === 'recruiter@example.com')
   && rescued.proposal.items.length >= 3);
+
+const wedKey = 'service@example.com|month old outreach';
+const wedLedger = {
+  [wedKey]: { at: '2026-09-02T12:00:00Z', until: null, kind: 'dismissed', who: 'service@example.com' },
+};
+const hsResurrect = { key: 'service@example.com|[followup-radar] they', who: 'service@example.com', subject: '[FOLLOWUP-RADAR] THEY', age: 32 };
+check('Wednesday Clean still hides a HubSpot task with a new key',
+  ledgerHidesItem(hsResurrect, wedLedger) === true);
+const emptyAliases = { [wedKey]: { at: '2026-09-02T12:00:00Z', until: null, kind: 'dismissed' } };
+check('email prefix on an old Python key is enough to hide',
+  ledgerHidesItem(hsResurrect, emptyAliases) === true);
+const filled = { ...emptyAliases };
+check('backfill writes the email alias', backfillLedgerEmailAliases(filled) === 1 && !!filled['service@example.com']);
+
+const loose = parseRadarDigestLoose('notify ok\n32 days waiting on ops@example.com (THEY)\n');
+check('loose log parse finds age+email without the card layout',
+  loose.length === 1 && loose[0].who === 'ops@example.com' && loose[0].age === 32);
+
+const hsDump = fs.mkdtempSync(path.join(os.tmpdir(), 'radar-hsdump-'));
+saveRadarProposal({
+  id: 'hs-dump',
+  items: [
+    { key: 'old', who: 'old@example.com', subject: 'month old', age: 32, stale: true },
+    { key: 'python-key-1', who: 'recruiter@example.com', subject: 'old subject', age: 9, stale: true },
+  ],
+}, hsDump);
+fs.writeFileSync(path.join(hsDump, 'followup-radar.log'), LOG);
+const fromDump = discoverRadarProposal({ dir: hsDump });
+check('a HubSpot dump cannot out-vote today\'s digest',
+  fromDump != null
+  && fromDump.proposal.items.length === 3
+  && !fromDump.proposal.items.some((it) => it.who === 'old@example.com'));
 
 if (failures.length) {
   console.error('FAIL: ' + failures.join(' | '));

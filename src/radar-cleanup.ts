@@ -165,7 +165,30 @@ export function ledgerHidesItem(
   ledger: Record<string, RadarLedgerRow>,
   now = new Date(),
 ): boolean {
-  return itemKeyAliases(it).some((k) => ledgerHides(ledger[k], now));
+  if (itemKeyAliases(it).some((k) => ledgerHides(ledger[k], now))) return true;
+  const who = it.who.trim().toLowerCase();
+  if (!who) return false;
+  for (const [k, row] of Object.entries(ledger)) {
+    if (!ledgerHides(row, now)) continue;
+    const rowWho = String(row.who || '').trim().toLowerCase();
+    if (rowWho && rowWho === who) return true;
+    const keyEmail = (k.split('|')[0] || '').trim().toLowerCase();
+    if (keyEmail === who) return true;
+  }
+  return false;
+}
+
+/** Older Clean writes stored only Python's key. Promote the email so a new key cannot resurrect the thread. */
+export function backfillLedgerEmailAliases(ledger: Record<string, RadarLedgerRow>): number {
+  let n = 0;
+  for (const [k, row] of Object.entries(ledger)) {
+    if (!row || !ledgerHides(row)) continue;
+    const email = String(row.who || k.split('|')[0] || '').trim().toLowerCase();
+    if (!email.includes('@') || ledger[email]) continue;
+    ledger[email] = { ...row, who: email };
+    n += 1;
+  }
+  return n;
 }
 
 export function dismissRadarItems(
@@ -199,11 +222,30 @@ export function radarButtonsSentToday(dir = radarDir(), now = new Date()): boole
   }
 }
 
-export function markRadarButtonsSent(dir = radarDir(), now = new Date()): void {
+export function loadRadarButtonsSent(dir = radarDir()): {
+  date?: string;
+  message_ids?: number[];
+} {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(dir, BUTTONS_SENT), 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+export function markRadarButtonsSent(
+  dir = radarDir(),
+  now = new Date(),
+  extra: { message_ids?: number[] } = {},
+): void {
   fs.mkdirSync(dir, { recursive: true });
+  const prev = loadRadarButtonsSent(dir);
+  const ids = [...new Set([...(extra.message_ids || []), ...(prev.message_ids || [])])]
+    .filter((n) => Number.isFinite(n));
   fs.writeFileSync(path.join(dir, BUTTONS_SENT), JSON.stringify({
     date: now.toISOString().slice(0, 10),
     at: now.toISOString(),
+    message_ids: ids,
   }, null, 2), 'utf8');
 }
 
@@ -279,6 +321,41 @@ export function parseRadarDigest(text: string): RadarItem[] {
   return items;
 }
 
+/**
+ * Looser log parse. VJH may write `32d a@b` on one line or `a@b … 32 days`
+ * inside a cron dump. Strict parse stays the Telegram-card contract.
+ */
+export function parseRadarDigestLoose(text: string): RadarItem[] {
+  const strict = parseRadarDigest(text);
+  if (strict.length) return strict;
+  const items: RadarItem[] = [];
+  const seen = new Set<string>();
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || !line.includes('@')) continue;
+    let age = 0;
+    let who = '';
+    const a = line.match(/^(\d+)\s*d(?:ays?)?\b[^\n]*?(\S+@\S+)/i);
+    const b = line.match(/(\S+@\S+)[^\n]*?(\d+)\s*d(?:ays?)?\b/i);
+    if (a) {
+      age = Number(a[1]);
+      who = a[2] || '';
+    } else if (b) {
+      who = b[1] || '';
+      age = Number(b[2]);
+    } else {
+      continue;
+    }
+    who = who.replace(/[<>]/g, '').replace(/[.,;:]+$/, '');
+    const key = who.toLowerCase();
+    if (!who.includes('@') || seen.has(key)) continue;
+    seen.add(key);
+    items.push({ key: radarItemKey(who, ''), who, subject: '', age, stale: true });
+  }
+  return items;
+}
+
 export function isRadarDigest(text: string | undefined | null): boolean {
   if (!text) return false;
   return /Follow-up radar/i.test(text) && /\d+d\s+\S+@\S+/.test(text);
@@ -304,9 +381,6 @@ export function mergeRadarItems(proposal: RadarItem[] | undefined, parsed: Radar
       out.push(p);
       seen.add(p.key);
     }
-  }
-  for (const it of proposal) {
-    if (!seen.has(it.key)) out.push({ ...it, stale: true });
   }
   return out;
 }
@@ -410,8 +484,10 @@ export function discoverRadarProposal(opts: {
 } = {}): { proposal: RadarProposal; source: 'file' | 'digest' | 'merged' | 'log' | 'json' } | null {
   const dir = opts.dir || radarDir();
   const ledger = loadRadarLedger(dir);
+  backfillLedgerEmailAliases(ledger);
   const known = resolveRadarProposal({ digestText: opts.digestText, dir });
   let items = known?.proposal.items ? [...known.proposal.items] : [];
+  let digestItems = opts.digestText ? parseRadarDigestLoose(opts.digestText) : [];
   let source: 'file' | 'digest' | 'merged' | 'log' | 'json' = known?.source || 'log';
 
   const names = [
@@ -446,12 +522,23 @@ export function discoverRadarProposal(opts: {
     }
     if (!extra.length) {
       const extracted = extractLastRadarDigest(raw);
-      if (extracted) {
-        extra = parseRadarDigest(extracted);
-        if (extra.length) source = items.length ? 'merged' : 'log';
+      extra = extracted ? parseRadarDigestLoose(extracted) : [];
+      if (!extra.length && raw.length < 20000 && (raw.match(/@/g) || []).length <= 20) {
+        extra = parseRadarDigestLoose(raw);
+      }
+      if (extra.length) {
+        digestItems = extra;
+        source = items.length ? 'merged' : 'log';
       }
     }
     if (extra.length) items = mergeRadarItems(items, extra);
+  }
+
+  if (digestItems.length) {
+    const emails = new Set(digestItems.map((d) => d.who.trim().toLowerCase()));
+    items = mergeRadarItems(items, digestItems)
+      .filter((it) => emails.has(it.who.trim().toLowerCase()));
+    source = known?.proposal.items.length ? 'merged' : source;
   }
 
   const open = openRadarItems(items, ledger);
