@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-06 12:51 | Ship radar Clean/Keep live — named-file only, no reset | `src/telegram-bot.ts`, `src/radar-cleanup.ts`, `scripts/oracle-radar-buttons.sh`. Not VJH/EspaLuz. | 12540db |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,14 +127,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **IN FLIGHT 6 Sep — radar buttons going live by NAMED FILE, not `cto_aipa`
-  reset --hard.** Last full Oracle `cto_aipa` deploy was 4 Sep (`df7d7a7`).
-  Claude's 5–6 Sep work on this repo is docs / pii-guard / selling scripts —
-  already on GitHub `main`. A full `cto_aipa` deploy would `git reset --hard`
-  and could wipe Oracle's `docs/selling` dirty state. So: checkout only
-  `src/telegram-bot.ts` + `src/radar-cleanup.ts`, `npx tsc`, `pm2 restart`.
-  EspaLuz / VJH not pulled (Familybot pull can delete subscriber JSON).
-  After restart the bot posts one compact Clean/Keep row — not a second digest.
+- **DONE 6 Sep — radar Clean/Keep live, named-file, no extra PII.** Actions
+  `34035464695` OK. Oracle `cto-aipa` HEAD stayed `df7d7a7`; only two source
+  files checked out; `docs/selling` dirty state left in place (IntelliOps
+  addendum + registry M). Bot uptime 39h → 4s. First two deploys failed on
+  missing `tsc` (devDep pruned 4 Sep). Real prospect addresses were removed
+  from `src/` and `scripts/` before this ship — fixtures are `@example.com`
+  so Claude's pii-guard / licensed mirror do not need a reclean. Tap the
+  compact Clean row, or reply `/radar` on today's digest. EspaLuz/VJH not pulled.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
   had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
   `33965178681` → `✓ update note 116418923178` with the verified
