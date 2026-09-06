@@ -81,13 +81,31 @@ const canaries = fs.existsSync(CANARIES)
   ? fs.readFileSync(CANARIES, 'utf8').split(/\r?\n/).map((s) => s.trim()).filter((s) => s && !s.startsWith('#'))
   : [];
 
+/**
+ * Paths where a third-party address is the POINT, not a leak.
+ *
+ * `docs/selling/` is the data plane of the live outreach system: `outreach-registry.json`
+ * maps slug → recipient and `src/go-wa.ts` fetches it from GitHub raw, four GitHub Actions
+ * read specs from a fresh CI clone, and `oracle-stage-hiring-outreach.sh` reads it via
+ * `git show FETCH_HEAD:…`. It cannot be scrubbed (sending breaks) or untracked (CI and
+ * Oracle break). AIPA_AITCF therefore ships to DataVendor as a cleaned MIRROR, and the
+ * guard must not shout about addresses that are supposed to be there.
+ *
+ * CREDENTIALS ARE STILL CHECKED HERE. An API key in a draft is a leak wherever it lands —
+ * only the "this address is personal data" rule is suspended, never the secret rules.
+ */
+const PII_EXEMPT = [/^docs\/selling\//, /^docs\/applications\//, /^docs\/interview\//];
+
 function scan(text, rel) {
   const out = [];
   const push = (kind, v) => out.push({ kind, rel, sample: String(v).slice(0, 60) });
+  const piiExempt = PII_EXEMPT.some((re) => re.test(rel || ''));
 
-  for (const m of text.match(EMAIL_RE) || []) {
-    if (SAFE_EMAIL.test(m) || m.includes('..') || m.split('@')[0].length > 40) continue;
-    push('third-party email', m);
+  if (!piiExempt) {
+    for (const m of text.match(EMAIL_RE) || []) {
+      if (SAFE_EMAIL.test(m) || m.includes('..') || m.split('@')[0].length > 40) continue;
+      push('third-party email', m);
+    }
   }
   let m;
   URL_CRED_RE.lastIndex = 0;

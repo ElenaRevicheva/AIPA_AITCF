@@ -145,8 +145,8 @@ git log keeps the record.
   **Cc Adriana + `elena.revicheva2016@gmail.com`**, `.docx` attached (82,436 B).
   One click sends, moves to ⏳ Sent, stamps the note, opens a +4-day follow-up;
   the Resend webhook then stamps ENTREGADO / ABIERTO. Contracting party is
-  **Elena Revicheva, persona natural**, RUC `8-NT-2-781965 DV 90`, cédula
-  **E-8-245573**. Docs: `docs/selling/datastar/`.
+  **Elena Revicheva, persona natural**; RUC and cédula
+  in `docs/selling/datastar/expected-fields.json` (a dropped dir). Docs: `docs/selling/datastar/`.
 - **✅ SENT 4 Sep by one-click.** Resend `809bdd7d-ffc6-4a00-bb7e-7063c20c17cf`,
   **ENTREGADO confirmed to all three** (Conrad, Adriana, Elena's gmail), `.docx`
   attached, deal now `decisionmakerboughtin` (⏳ Sent), send-task closed.
@@ -239,15 +239,15 @@ git log keeps the record.
   one with the signature on Datastar's side. `verify-datastar-nda-fill.cjs` PASS
   (6 guards, each tested by breaking it); `test-outreach-attachments.cjs` 24 checks.
 - **⚠️ A cédula in `scripts/` would have shipped to DataVendor.** The verifier
-  first hard-coded `E-8-245573` as an assertion literal.
+  first hard-coded her cédula as an assertion literal.
   `build-license-bundle.cjs` drops `docs/selling/` but **ships `scripts/`**, so
   her national ID was one bundle build away from a licensed corpus. Expected
   values now live in `docs/selling/datastar/expected-fields.json` (inside a
   dropped dir) and the verifier asserts both halves: `docs/selling/datastar/`
   still in `DROP_DIRS`, and no script contains the cédula or RUC.
   **Rule: an identifier belongs in dropped data, never in a shipped script.**
-- **RISK:** the number on the *back* of the carné (`AE1074827`, also in the MRZ)
-  is the plastic serial. The cédula is **E-8-245573** on the *front*. Do not
+- **RISK:** the number on the *back* of the carné (also in the MRZ)
+  is the plastic SERIAL, not the cédula — the cédula is on the *front*. Do not
   “correct” it. AIdeazz is a commercial name, not a S.A. — do not invent one.
   Datastar's own box clips `Representante Legal` (fixed height + wrapped name);
   that is in **their** template — `preview/original-page4.png` proves it. Left

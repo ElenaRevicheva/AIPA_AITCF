@@ -67,8 +67,8 @@ Found 5 Sep by re-scanning specifically for the types Megan named:
 | --- | --- | --- |
 | `EspaLuzWhatsApp/scripts/migrations/export_railway_data.sh` | Live Railway PostgreSQL connection string, password in clear, **in HEAD**, plus the same password in a `PGPASSWORD` export | 🚨 **ROTATE** |
 | `dragontrade-agent` (git history) | Second live Railway PostgreSQL connection string | 🚨 **ROTATE** |
-| `EspaLuzFamilybot`, `EspaLuzWhatsApp` | Local DB passwords (`EspaLuz2026!`, `espaluz_secure_2026`) across 9 files | Rotate on the Oracle box |
-| `dragontrade-agent/test-oracle-db.cjs` | `dragontrade_secure_2026` | Rotate on the Oracle box |
+| `EspaLuzFamilybot`, `EspaLuzWhatsApp` | Local DB passwords (two shared local-Postgres passwords; values in the canary file, not here) across 9 files | Rotate on the Oracle box |
+| `dragontrade-agent/test-oracle-db.cjs` | the dragontrade local-Postgres password | Rotate on the Oracle box |
 
 Both Railway proxy hostnames still resolve to live Railway IPs (checked passively
 by DNS; nothing was connected to).
