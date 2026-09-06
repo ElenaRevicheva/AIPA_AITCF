@@ -26,14 +26,12 @@ git fetch origin main
 echo "=== named checkout: src/telegram-bot.ts src/radar-cleanup.ts ==="
 git checkout origin/main -- src/telegram-bot.ts src/radar-cleanup.ts
 
-echo "=== build (local tsc — no npm ci, no prune, no npx download) ==="
-if [ -x node_modules/.bin/tsc ]; then
-  ./node_modules/.bin/tsc
-elif [ -f package.json ]; then
-  npm run build
-else
-  echo "FATAL: no local tsc and no package.json"; exit 1
+echo "=== build (typescript is a devDep and was pruned on the last full deploy) ==="
+# Do not npm ci / prune — that would rewrite node_modules. Install tsc only.
+if [ ! -x node_modules/.bin/tsc ]; then
+  npm install --no-save typescript@5.9.3
 fi
+./node_modules/.bin/tsc
 
 echo "=== prove compiled output carries the buttons ==="
 grep -c "postRadarButtonsOnce" dist/telegram-bot.js
