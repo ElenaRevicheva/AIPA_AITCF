@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-06 14:00 UTC | daily radar Clean/Keep after the 7:00 digest | `src/telegram-bot.ts` `cto-aipa` named-file | — |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,14 +127,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 6 Sep — 16 resurrected buttons replaced with today's 3.** Not
-  stale IMAP. Clean on 2 Sep hid them from the digest; HubSpot tasks
-  stayed open; the force-post used those tasks as the list. Actions
-  `34037301202`: `digest_items=3` `ledger_backfill=13` `edited=1`
-  `message_id=5393` and `5394` `buttons=5` `posted=0`. Look at those
-  two rows — they now match the 7:00 card. Do not tap Clear-all on
-  an old screenshot. Do not full-`cto_aipa` reset. Do not pull
-  EspaLuz/VJH. Branch `cursor/radar-buttons-now-b9a9`.
+- **DONE 6 Sep — daily radar buttons are on the clock.** VJH digest
+  7:00 Panama (fresh mail). cto-aipa cron `15 7 * * *` America/Panama
+  posts/edits Clean/Keep from that digest only. Cleared threads stay
+  gone. HubSpot is not a source. Actions `34037789702`: digest still
+  3, ledger hid them (`ok items=0` `edited=1` `buttons=0` on 5393 —
+  she had just tapped Clear). Restart skip=already-posted. Tomorrow
+  7:15 she gets buttons iff the digest has open threads. Do not
+  full-`cto_aipa` reset. Do not pull EspaLuz/VJH.
 - **DONE 6 Sep — radar Clean/Keep code live, named-file, no extra PII.**
   Fixtures `@example.com`. `docs/selling` dirty left in place.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
