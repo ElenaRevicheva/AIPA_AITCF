@@ -8916,18 +8916,10 @@ async function loadClaudeMd(repoAlias: string): Promise<string | null> {
 async function postRadarButtonsOnce(bot: Bot): Promise<void> {
   try {
     if (radarButtonsSentToday()) return;
-    const fallback = [
-      '🛰️ Follow-up radar',
-      '🔴 THEY WROTE LAST — your move',
-      '5d florencia@globaltalent.co',
-      'GTM Engineer / AI Engineer- Interview Invitation + Next Steps',
-      '4d malleyneb@gmail.com',
-      'Re: 2026-08-25-192305-comprobante',
-      '🟡 YOU WROTE LAST — gone quiet, a nudge is free',
-      '5d hello@cal.com',
-      'Quick first step before our HUD vendor call',
-    ].join('\n');
-    const resolved = resolveRadarProposal({ digestText: fallback });
+    // Proposal comes from VJH's morning write or from Elena replying /radar
+    // on the digest. Never bake counterparty addresses into this file — that
+    // is the PII Claude's cleanup exists to keep out of src/.
+    const resolved = resolveRadarProposal({});
     if (!resolved) return;
     saveRadarProposal(resolved.proposal);
     const ledger = loadRadarLedger();

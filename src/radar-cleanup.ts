@@ -199,8 +199,8 @@ function buttonWho(who: string): string {
  * Parse the digest the Python radar already posted. Format earned from the
  * live card (6 Sep 2026):
  *
- *   5d florencia@globaltalent.co
- *   GTM Engineer / AI Engineer- Interview Invitation + Next Steps
+ *   5d recruiter@example.com
+ *   Interview Invitation + Next Steps
  */
 export function parseRadarDigest(text: string): RadarItem[] {
   const items: RadarItem[] = [];

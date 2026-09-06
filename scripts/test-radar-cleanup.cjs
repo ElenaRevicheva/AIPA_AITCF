@@ -44,25 +44,26 @@ function check(name, cond) {
   else failures.push(name);
 }
 
-// The exact card Elena photographed at 12:32 UTC on 6 Sep 2026.
+// Same shape as the live card (age + address + subject). Addresses are
+// example.com — Claude's pii-guard treats those as fixtures, not people.
 const TODAYS_DIGEST = [
   '🛰️ Follow-up radar',
   '🔴 THEY WROTE LAST — your move',
-  '5d florencia@globaltalent.co',
-  'GTM Engineer / AI Engineer- Interview Invitation + Next Steps',
-  '4d malleyneb@gmail.com',
-  'Re: 2026-08-25-192305-comprobante',
+  '5d recruiter@example.com',
+  'Interview Invitation + Next Steps',
+  '4d billing@example.com',
+  'Re: 2026-08-25-receipt',
   '🟡 YOU WROTE LAST — gone quiet, a nudge is free',
-  '5d hello@cal.com',
-  'Quick first step before our HUD vendor call',
+  '5d hello@example.com',
+  'Quick first step before the vendor call',
 ].join('\n');
 
 const parsed = parseRadarDigest(TODAYS_DIGEST);
 check('parses three threads from today\'s card', parsed.length === 3);
-check('parses florencia', parsed[0]?.who === 'florencia@globaltalent.co' && parsed[0]?.age === 5);
-check('parses malleyneb', parsed[1]?.who === 'malleyneb@gmail.com' && parsed[1]?.age === 4);
-check('parses cal.com', parsed[2]?.who === 'hello@cal.com' && parsed[2]?.age === 5);
-check('subjects survive the parse', parsed[2]?.subject.includes('HUD vendor call'));
+check('parses first they-wrote', parsed[0]?.who === 'recruiter@example.com' && parsed[0]?.age === 5);
+check('parses second they-wrote', parsed[1]?.who === 'billing@example.com' && parsed[1]?.age === 4);
+check('parses you-wrote', parsed[2]?.who === 'hello@example.com' && parsed[2]?.age === 5);
+check('subjects survive the parse', parsed[2]?.subject.includes('vendor call'));
 check('isRadarDigest recognises the card', isRadarDigest(TODAYS_DIGEST) === true);
 check('isRadarDigest rejects a random ping', isRadarDigest('Visibility audit lead 82/100') === false);
 
@@ -104,11 +105,11 @@ check('an active Keep snooze hides only until the date',
   ledgerHides({ at: '2026-09-06T00:00:00Z', until: '2026-09-20T00:00:00Z', kind: 'kept' }, new Date('2026-09-06T12:00:00Z')) === true);
 
 const proposalItems = [
-  { key: 'python-key-1', who: 'florencia@globaltalent.co', subject: 'old subject', age: 9, stale: true },
+  { key: 'python-key-1', who: 'recruiter@example.com', subject: 'old subject', age: 9, stale: true },
 ];
 const merged = mergeRadarItems(proposalItems, parsed);
 check('merge keeps Python\'s key for a matched email', merged[0]?.key === 'python-key-1');
-check('merge still adds threads Python omitted', merged.some((it) => it.who === 'hello@cal.com'));
+check('merge still adds threads Python omitted', merged.some((it) => it.who === 'hello@example.com'));
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'radar-cleanup-'));
 saveRadarProposal({ id: 'from-disk', items: proposalItems }, tmp);
@@ -124,7 +125,7 @@ const reloaded = loadRadarProposal(tmp);
 check('proposal round-trips to disk', reloaded?.id === 'from-disk');
 
 check('openRadarItems drops dismissed keys', openRadarItems(notStale, ledger).length === 2);
-check('radarItemKey is stable', radarItemKey('A@B.com', 'Hello  there') === 'a@b.com|hello there');
+check('radarItemKey is stable', radarItemKey('A@example.com', 'Hello  there') === 'a@example.com|hello there');
 
 const {
   itemKeyAliases,
@@ -135,9 +136,9 @@ const {
 const byEmail = {};
 dismissRadarItems([notStale[2]], byEmail, { at: '2026-09-06T12:00:00Z', until: null, kind: 'dismissed', who: notStale[2].who });
 check('dismiss writes the email alias so tomorrow\'s Python key still matches',
-  !!byEmail['hello@cal.com'] && itemKeyAliases(notStale[2]).every((k) => byEmail[k]));
+  !!byEmail['hello@example.com'] && itemKeyAliases(notStale[2]).every((k) => byEmail[k]));
 check('hiding by email alias removes the thread',
-  openRadarItems([notStale[2]], { 'hello@cal.com': byEmail['hello@cal.com'] }).length === 0);
+  openRadarItems([notStale[2]], { 'hello@example.com': byEmail['hello@example.com'] }).length === 0);
 
 markRadarButtonsSent(tmp, new Date('2026-09-06T15:00:00Z'));
 check('buttons-sent stamp is same-day', radarButtonsSentToday(tmp, new Date('2026-09-06T18:00:00Z')) === true);
