@@ -514,7 +514,22 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   🔒 **Hooks are local-only** — `.git/hooks/` is never tracked, cloned, pushed or pulled
   (verified: `git ls-files .git/hooks` → 0). So no hook can affect Oracle, a cron, or a
   GitHub Action. The Atlas weekly cron commits from `$WS/data` on Oracle and is untouched.
-- 📈 **IN-PLACE CLEANING: 4 of 8 CLEAN (5 Sep).** ✓ `VibeJobHunterAIPA_AIMCF` ·
+- ✅ **`EspaLuzFamilybot` IS CLEAN (6 Sep) — 31 → 0, bot never restarted.**
+  Backed up FIRST, two copies:
+  `/home/ubuntu/backups/espaluzfamilybot-subscriber-data-20260906-0527.tar.gz` and
+  `D:/aideazz/_backups/espaluzfamilybot/`.
+  **Untracked, never deleted** (`git rm --cached` only): the 5 subscriber JSONs, plus
+  `backup_before_postgres/`, `data_backup/`, `fix_sub.py`, `restore_sub.py` — all with
+  **zero references from outside themselves**; the last two hardcode ONE customer's email
+  and PayPal subscription id, which is a payment record, not code a buyer needs.
+  🔒 **Mirrored the untrack ON ORACLE too.** This repo deploys by git pull, and
+  `subscribers.json` + `discovered_subscriptions.json` **matched git** there — so the next
+  pull would have silently DELETED live customer data. Untracked on both sides, an upstream
+  deletion is now a no-op. Restore script if anything ever removes them:
+  `/home/ubuntu/backups/restore-espaluz-subscriber-data.sh` (self-tested).
+  **Verified:** every file still on disk on Oracle, `espaluz-familybot.service` **active**,
+  uptime unchanged since 2 Sep — production was never touched.
+- 📈 **IN-PLACE CLEANING: 5 of 8 CLEAN (6 Sep).** ✓ `VibeJobHunterAIPA_AIMCF` ·
   ✓ `dragontrade-agent` · ✓ `EspaLuz_Influencer` · ✓ `AILA`.
   `EspaLuzWhatsApp` **43 → 18**, `cto-aipa` 1373 → 1370. Every change proved
   behaviour-identical BEFORE it landed, never after.
