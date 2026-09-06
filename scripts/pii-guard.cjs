@@ -94,7 +94,21 @@ const canaries = fs.existsSync(CANARIES)
  * CREDENTIALS ARE STILL CHECKED HERE. An API key in a draft is a leak wherever it lands —
  * only the "this address is personal data" rule is suspended, never the secret rules.
  */
-const PII_EXEMPT = [/^docs\/selling\//, /^docs\/applications\//, /^docs\/interview\//];
+const PII_EXEMPT = [
+  /^docs\/selling\//,       // outreach data plane: registry, drafts, specs, prospects
+  /^docs\/applications\//,  // job applications — names the employer by definition
+  /^docs\/interview\//,
+  /^docs\/oracle\//,        // NOW.md: the shared agent coordination file. Its entire job is
+                            // recording who owes what to whom, so it names counterparties.
+  /^docs\/hubspot\//, /^docs\/crm\//,
+];
+
+/**
+ * Every path above is ALSO in `build-license-bundle.cjs` DROP_DIRS, and that is the whole
+ * justification — an address here never reaches a buyer, so flagging it only trains the
+ * operator to reach for `--no-verify`. **Keep the two lists in step.** If a path is exempted
+ * here but not dropped there, this guard is quietly licensing PII.
+ */
 
 function scan(text, rel) {
   const out = [];

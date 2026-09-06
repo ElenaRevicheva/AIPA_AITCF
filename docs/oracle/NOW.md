@@ -500,6 +500,22 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 - ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
   8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
   that settings page, so verify via the DataVendor repo picker instead — faster and free.)
+- ✅ **GUARD IS ON ALL 8 REPOS INCLUDING `cto-aipa` (6 Sep) — and it does not block outreach.**
+  `docs/selling/`, `docs/applications/`, `docs/interview/` are exempt from the
+  **third-party email rule ONLY**. Those paths are the data plane of the live outreach
+  system, so addresses there are the point, not a leak. **Credential, key and canary rules
+  still apply there** — an API key in a draft is a leak wherever it lands.
+  **Both directions tested:** a draft with a real prospect email + phone in
+  `docs/selling/drafts/` **passes**; a connection string in the same path is **caught**.
+  That exemption took `cto-aipa` from **1372 → 186**, which is what finally made the real
+  problems visible — and there were three:
+  · **`.env.example` listed four REAL people** as example values, two of them customers,
+    in a file that ships. Now placeholders.
+  · **My own `DATAVENDOR_QC_2026-09-05.md` quoted two live passwords verbatim.**
+    Documentation of a credential is still the credential. Now described, not quoted.
+  · **`NOW.md` carried the cédula, carné serial and RUC as literals.** Guidance kept, values
+    now only in `docs/selling/datastar/expected-fields.json` — the rule this file already
+    states: an identifier belongs in dropped data.
 - ✅ **`pii-guard.cjs` is live — the fix is now a GATE, not a sweep (5 Sep).**
   Cleaning contents does not hold: **`docs/selling/` took 69 commits and 183 new files in
   30 days**, written by the outreach tooling itself. Scrub it today, fail `pii_qc_llm`
