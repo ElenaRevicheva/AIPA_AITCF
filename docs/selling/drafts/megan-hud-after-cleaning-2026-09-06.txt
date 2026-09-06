@@ -1,0 +1,89 @@
+To:      megan@hud.ai
+Subject: Cleaned and re-uploaded — pii_qc_llm still fails on 7 of 8, and I cannot see why
+
+Hi Megan,
+
+I did the work you recommended and re-submitted the listing. Mandatory checks pass and
+the listing is publishable, but `pii_qc_llm` still fails on seven of the eight repos —
+including two that were passing before I touched anything, and one repo that is brand new.
+
+I would rather ask than guess, so: could you send the per-repo findings again, the way you
+did on 5 September? That list was the only thing that told me what the check actually
+objects to, and the vendor UI does not expose it.
+
+WHAT I REMOVED
+
+Working from the finding types you named, across the five repos you listed plus two more:
+
+  - Two LIVE PostgreSQL connection strings, passwords in clear. One was in HEAD. Both are
+    rotated now. Your scanner was right and my own earlier scan was wrong: I had searched
+    only for vendor API-key formats, and a database URL is not one of those shapes, so it
+    returned zero and I believed it.
+  - A committed browser session store: 378 files, 47 MB, an authenticated WhatsApp Web
+    profile including cache and local storage.
+  - Real customer data — conversation history, user profiles, subscriber records with
+    emails and phone numbers, and one customer's full payment record (email, PayPal
+    subscription id, WhatsApp number) hardcoded in source.
+  - Subscriber identities that were written into live conditional logic in the running
+    bridge; those now come from configuration.
+  - My own national ID and RUC, which had reached a script.
+
+None of it was deleted from the machines that need it — it is untracked, not destroyed —
+and no service was restarted at any point.
+
+WHAT I CANNOT EXPLAIN, AND WHY I AM ASKING
+
+Three results do not fit any theory I can test from my side:
+
+  1. `atlas-captures` now FAILS `pii_qc_llm`. It PASSED on 31 August and I have not changed
+     a single byte of it since.
+  2. `EspaLuz_Influencer` FAILS. It was not on your 5 September list, and it contains no
+     third-party email addresses and no phone numbers that I can find.
+  3. `AIPA_AITCF-licensed` FAILS. That repository was created this week as a clean-room
+     copy specifically to satisfy this check — history rewritten, credentials and contact
+     data removed, verified by an independent re-scan before upload.
+
+Only `AILA` passes, and `AILA` is the emptiest repo in the set. That pattern makes me think
+the check is objecting to something I have not identified rather than to the data I removed.
+
+THE QUESTION THAT DECIDES WHAT I DO NEXT
+
+When I edited the listing I replaced one asset — AIPA_AITCF became AIPA_AITCF-licensed.
+The other seven kept their original attachment from 31 August.
+
+So: does a quality run grade a FRESH pull of each repository, or the snapshot captured
+when the asset was first attached?
+
+If it grades the original snapshot, then none of the work above has been seen by the
+check at all — those seven are still being graded on their 31 August state, and the
+result tells me nothing about whether the cleaning worked. In that case I would detach
+and re-attach all seven to force a fresh capture, and I would rather do that once,
+deliberately, than discover it by trial and error on a live listing.
+
+It would also explain why the only repo I did NOT clean, `atlas-captures`, and the only
+one that is brand new, `AIPA_AITCF-licensed`, both behave unlike the rest.
+
+AND THE ONE THING THAT WOULD SETTLE IT FASTEST
+
+Could you send the current per-repo `pii_qc_llm` findings — counts and types, as you did
+on 5 September? That list was the only thing that ever told me what the check actually
+objects to; the vendor UI shows me which repos failed but never why. I will act on it the
+same day it arrives.
+
+ONE THING STILL OUTSTANDING ON YOUR SIDE
+
+The earlier uploads are still on your servers, and they contain the two live database
+credentials described above. I have rotated them, but rotation does not remove the copies.
+Could you purge or quarantine the previously uploaded snapshots of those repositories?
+
+I am not going to tell you this is fixed until your check says so. My HUD estimator point
+of $89,481 remains open for the package conversation whenever the quality side is settled.
+
+Best regards,
+
+Elena Revicheva, AIdeazz Founder
+
++507 616 66 716
+WhatsApp https://wa.me/50761666716
+Telegram https://t.me/ElenaRevicheva
+https://aideazz.xyz/portfolio
