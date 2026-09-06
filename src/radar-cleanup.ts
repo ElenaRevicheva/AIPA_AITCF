@@ -399,16 +399,19 @@ export function itemsFromRadarJson(raw: unknown): RadarItem[] {
 }
 
 /**
- * Find today's threads without baking addresses into source. Order:
- * on-disk proposal → supplied digest → last digest in a radar log → JSON dumps.
+ * Find today's threads without baking addresses into source.
+ * A leftover proposal whose only rows are already cleared must not win —
+ * that is what hid the 6 Sep card (1 dismissed file row, 3 live threads).
  */
 export function discoverRadarProposal(opts: {
   digestText?: string | null | undefined;
   dir?: string;
 } = {}): { proposal: RadarProposal; source: 'file' | 'digest' | 'merged' | 'log' | 'json' } | null {
   const dir = opts.dir || radarDir();
+  const ledger = loadRadarLedger(dir);
   const known = resolveRadarProposal({ digestText: opts.digestText, dir });
-  if (known?.proposal.items.length) return known;
+  let items = known?.proposal.items ? [...known.proposal.items] : [];
+  let source: 'file' | 'digest' | 'merged' | 'log' | 'json' = known?.source || 'log';
 
   const names = [
     'followup-radar.log',
@@ -431,27 +434,32 @@ export function discoverRadarProposal(opts: {
     } catch {
       continue;
     }
+    let extra: RadarItem[] = [];
     if (file.endsWith('.json')) {
       try {
-        const items = itemsFromRadarJson(JSON.parse(raw));
-        if (items.length) {
-          return { proposal: { id: newRadarProposalId(), items }, source: 'json' };
-        }
+        extra = itemsFromRadarJson(JSON.parse(raw));
+        if (extra.length) source = items.length ? 'merged' : 'json';
       } catch {
-        /* not a proposal dump */
+        extra = [];
       }
     }
-    const extracted = extractLastRadarDigest(raw);
-    if (!extracted) continue;
-    const parsed = parseRadarDigest(extracted);
-    if (!parsed.length) continue;
-    if (known?.proposal.id) {
-      return {
-        proposal: { id: known.proposal.id, items: mergeRadarItems(known.proposal.items, parsed) },
-        source: 'merged',
-      };
+    if (!extra.length) {
+      const extracted = extractLastRadarDigest(raw);
+      if (extracted) {
+        extra = parseRadarDigest(extracted);
+        if (extra.length) source = items.length ? 'merged' : 'log';
+      }
     }
-    return { proposal: { id: newRadarProposalId(), items: parsed }, source: 'log' };
+    if (extra.length) items = mergeRadarItems(items, extra);
   }
-  return known;
+
+  const open = openRadarItems(items, ledger);
+  if (!open.length) return null;
+  return {
+    proposal: {
+      id: known?.proposal.id || newRadarProposalId(),
+      items,
+    },
+    source: known && source === 'log' && known.source !== 'file' ? known.source : source,
+  };
 }

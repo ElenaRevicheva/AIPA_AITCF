@@ -57,7 +57,7 @@ async function hsSearchRadarTasks(key) {
     filterGroups: [
       {
         filters: [
-          { propertyName: 'hs_task_subject', operator: 'CONTAINS_TOKEN', value: 'FOLLOWUP-RADAR' },
+          { propertyName: 'hs_task_subject', operator: 'CONTAINS_TOKEN', value: 'FOLLOWUP' },
           { propertyName: 'hs_task_status', operator: 'NEQ', value: 'COMPLETED' },
         ],
       },
@@ -122,22 +122,28 @@ async function main() {
   }
 
   let resolved = discoverRadarProposal({});
-  if (!resolved?.proposal.items.length) {
+  if (resolved?.proposal.items.length) {
+    console.log(`discover=${resolved.source} items=${resolved.proposal.items.length}`);
+  } else {
+    console.log('discover=none');
     const key = env('HUBSPOT_API_KEY');
     if (key) {
       try {
         const items = await hsSearchRadarTasks(key);
+        console.log(`hs_open_tasks=${items.length}`);
         if (items.length) {
           resolved = { proposal: { id: `rdr-${Date.now().toString(36)}`, items }, source: 'hubspot' };
         }
       } catch (e) {
         console.warn(`hs: ${(e && e.message) || e}`);
       }
+    } else {
+      console.log('hs=no-key');
     }
   }
 
   if (!resolved?.proposal.items.length) {
-    console.error('FAIL: no radar items (no proposal, no digest log, no open HS tasks)');
+    console.error('FAIL: no open radar items (stale proposal ignored; no digest log; no HS tasks)');
     process.exit(3);
   }
 

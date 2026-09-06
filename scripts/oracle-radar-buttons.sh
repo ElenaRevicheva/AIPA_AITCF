@@ -45,25 +45,24 @@ grep -c "parseRadarDigest" dist/radar-cleanup.js
 
 echo "=== copy last digest into data/ without printing it ==="
 mkdir -p data
+echo "--- radar paths (no contents) ---"
+find /home/ubuntu/cto-aipa /home/ubuntu/VibeJobHunterAIPA_AIMCF /home/ubuntu/.pm2/logs \
+  \( -iname '*radar*' -o -iname '*followup*' \) 2>/dev/null | head -40 || true
+echo "--- crontab radar ---"
+crontab -l 2>/dev/null | grep -i radar || true
 COPIED=0
-for f in \
-  data/followup-radar.log \
-  logs/followup-radar.log \
-  /home/ubuntu/cto-aipa/logs/followup-radar.log \
-  /home/ubuntu/.pm2/logs/followup-radar-out.log \
-  /home/ubuntu/VibeJobHunterAIPA_AIMCF/autonomous_data/followup-radar.log \
-  /home/ubuntu/VibeJobHunterAIPA_AIMCF/logs/followup-radar.log \
-  /tmp/followup-radar.log
-do
-  if [ -f "$f" ] && grep -q "Follow-up radar" "$f"; then
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  if grep -q "Follow-up radar" "$f"; then
     cp -f "$f" data/followup-radar.log
     echo "digest_source=$(basename "$f") bytes=$(wc -c < "$f")"
     COPIED=1
     break
   fi
-done
+done < <(find /home/ubuntu/cto-aipa /home/ubuntu/VibeJobHunterAIPA_AIMCF /home/ubuntu/.pm2/logs /tmp \
+  \( -iname '*radar*' -o -iname '*followup*' \) -type f 2>/dev/null || true)
 if [ "$COPIED" -eq 0 ]; then
-  echo "digest_source=none (will try proposal.json / HubSpot tasks)"
+  echo "digest_source=none (will try HubSpot open tasks; leftover cleared proposal is ignored)"
 fi
 rm -f data/radar-buttons-sent.json
 

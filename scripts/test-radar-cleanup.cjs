@@ -34,6 +34,7 @@ const {
   resolveRadarProposal,
   discoverRadarProposal,
   saveRadarProposal,
+  saveRadarLedger,
   loadRadarProposal,
   extractLastRadarDigest,
   extractRadarTelegramMessageId,
@@ -189,6 +190,22 @@ const chats = radarChatTargets({
 check('chat targets union env ids and drop dupes',
   chats.length === 3 && chats.includes(111) && chats.includes(333));
 check('chat targets ignore empty', radarChatTargets({}).length === 0);
+
+const leftover = fs.mkdtempSync(path.join(os.tmpdir(), 'radar-leftover-'));
+saveRadarProposal({
+  id: 'old-cleared',
+  items: [{ key: 'old@example.com|gone', who: 'old@example.com', subject: 'gone', age: 40, stale: true }],
+}, leftover);
+saveRadarLedger({
+  'old@example.com': { at: '2026-08-01T00:00:00Z', until: null, kind: 'dismissed', who: 'old@example.com' },
+}, leftover);
+check('a leftover cleared proposal alone is not a live digest',
+  discoverRadarProposal({ dir: leftover }) === null);
+fs.writeFileSync(path.join(leftover, 'followup-radar.log'), LOG);
+const rescued = discoverRadarProposal({ dir: leftover });
+check('today\'s log still wins over a leftover cleared proposal',
+  rescued != null && rescued.proposal.items.some((it) => it.who === 'recruiter@example.com')
+  && rescued.proposal.items.length >= 3);
 
 if (failures.length) {
   console.error('FAIL: ' + failures.join(' | '));
