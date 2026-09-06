@@ -500,6 +500,32 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 - ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
   8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
   that settings page, so verify via the DataVendor repo picker instead — faster and free.)
+- ❌ **CORRECTION — "0 failed" after the resubmit was NOT a pass (6 Sep).** I read the
+  post-resubmit panel as clean. It showed **11 passed, 0 failed**. Then Elena clicked
+  **Run recommended checks** and it became **18 passed, 25 FAILED**.
+  **The first run had only executed 11 of 43 checks — `pii_qc_llm` was not among them.**
+  Absence of a failure was absence of the check, and I reported it as success.
+  **Same failure mode as the 4 Sep credential scan: a negative result is only as wide as
+  the query.** Third time today. Count the checks that RAN before believing a green.
+- 🛑 **`pii_qc_llm` STILL FAILS on 7 of 8 — do NOT tell Megan it is fixed.**
+  `verify claims` 8/8 · `verify rarity` 8/8 · **`pii qc llm` 7/8** · `codebase complexity` 2.
+  Only **`AILA`** passes PII — the emptiest repo in the set.
+  ⚠️ Three results defeat every theory testable from here:
+  · **`atlas-captures` now FAILS** — it PASSED 31 Aug and has not been touched since.
+  · **`EspaLuz_Influencer` FAILS** — never on Megan's list, and has **0 third-party emails,
+    0 phone numbers** in HEAD.
+  · **`AIPA_AITCF-licensed` FAILS** — the clean-room mirror built for this check, scrubbed,
+    canary-free, independently verified before upload.
+  Phones were the obvious suspect and are **ruled out**: EspaLuz_Influencer and
+  dragontrade-agent have zero E.164 numbers and both fail.
+  **NEXT: ask Megan for the per-repo findings again** —
+  `docs/selling/drafts/megan-hud-after-cleaning-2026-09-06.txt`. The vendor UI does not
+  expose them, and her 5 Sep list is the only thing that ever said what the check objects
+  to. It also asks whether "Run recommended checks" re-snapshots or grades the snapshot
+  from the last edit — if the latter, some failures may predate the cleaning.
+  ✅ **Going live is still SAFE:** all mandatory checks pass and the panel says
+  *"certification withheld — publishing unaffected"*. It just will not unlock buyer
+  matching until PII passes.
 - 💡 **ANSWERED at last: what "Edit listing" does (6 Sep, read from the UI).** This is the
   question Elena put to Megan on 4 Sep and never got a direct answer to. The confirm dialog
   says it outright:
