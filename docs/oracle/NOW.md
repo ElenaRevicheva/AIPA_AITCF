@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-06 13:40 UTC | 7am radar card still has no Clean/Keep — force-post | `src/radar-cleanup.ts` `src/telegram-bot.ts` `scripts/oracle-radar-buttons.sh` `cto-aipa` named-file | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -127,14 +127,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-- **DONE 6 Sep — radar Clean/Keep live, named-file, no extra PII.** Actions
+- **IN FLIGHT 6 Sep — radar buttons still missing on the 7:00 card.** Elena's
+  screenshot is the original VJH text digest. Telegram will not grow a keyboard
+  on that `message_id`. Last named-file deploy compiled the handlers, but
+  `postRadarButtonsOnce` no-ops without `radar-proposal.json`, so no compact
+  row was sent. Do not full-`cto_aipa` reset. Do not pull EspaLuz/VJH.
+- **DONE 6 Sep — radar Clean/Keep code live, named-file, no extra PII.** Actions
   `34035464695` OK. Oracle `cto-aipa` HEAD stayed `df7d7a7`; only two source
-  files checked out; `docs/selling` dirty state left in place (IntelliOps
-  addendum + registry M). Bot uptime 39h → 4s. First two deploys failed on
-  missing `tsc` (devDep pruned 4 Sep). Real prospect addresses were removed
-  from `src/` and `scripts/` before this ship — fixtures are `@example.com`
-  so Claude's pii-guard / licensed mirror do not need a reclean. Tap the
-  compact Clean row, or reply `/radar` on today's digest. EspaLuz/VJH not pulled.
+  files checked out; `docs/selling` dirty state left in place. Bot uptime
+  39h → 4s. Fixtures are `@example.com`. EspaLuz/VJH not pulled.
 - **DONE 5 Sep — tap note now shows today’s ENTREGADO/ABIERTO.** Elena
   had note `116418923178` open (only `EMAILED via HubSpot UI`). Actions
   `33965178681` → `✓ update note 116418923178` with the verified
