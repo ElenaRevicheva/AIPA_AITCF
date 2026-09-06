@@ -500,6 +500,25 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 - ✅ **GitHub access was ALREADY granted** — the `hud` app sees all 28 repos including the
   8 new ones. No Configure step needed. (GitHub demands emailed sudo re-auth to even view
   that settings page, so verify via the DataVendor repo picker instead — faster and free.)
+- 🟢 **EVERY ASSET THAT WOULD SHIP IS CLEAN (6 Sep). The listing set is READY.**
+
+  | What gets listed | State |
+  | --- | --- |
+  | `EspaLuzWhatsApp` · `VibeJobHunterAIPA_AIMCF` · `EspaLuzFamilybot` · `dragontrade-agent` · `EspaLuz_Influencer` · `AILA` | **originals, cleaned in place** ✓ |
+  | `AIPA_AITCF` | **mirror `AIPA_AITCF-licensed`** — 945 commits, 353 files, guard clean, all canaries **0** across full history ✓ |
+  | `atlas-captures` | **original, untouched** — already passes DataVendor `pii_qc_llm` ✓ |
+
+  **`cto-aipa` itself still reports 158** and that is CORRECT and EXPECTED: it is the
+  working repo, not a listed asset. `docs/selling/` must keep its 369 recipient addresses
+  or one-click send stops working. **The mirror is what ships, and the mirror is clean.**
+  ⚠️ `dist-lambda/` is dropped from the mirror again — the experiment measured it and
+  keeping it did **not** restore `SOURCE LOC`; it only added 11.9 MB and 2 vendored
+  addresses. Question answered, change reverted.
+
+  **REMAINING BEFORE TELLING MEGAN:**
+  1. Re-run QC on the listing so DataVendor re-scans the six cleaned originals.
+  2. Swap the `AIPA_AITCF` asset for `AIPA_AITCF-licensed`.
+  3. Only then write her. **Do not claim clean before QC confirms it.**
 - ✅ **GUARD IS ON ALL 8 REPOS INCLUDING `cto-aipa` (6 Sep) — and it does not block outreach.**
   `docs/selling/`, `docs/applications/`, `docs/interview/` are exempt from the
   **third-party email rule ONLY**. Those paths are the data plane of the live outreach
