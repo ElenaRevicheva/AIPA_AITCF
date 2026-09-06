@@ -86,9 +86,8 @@ fi
 if [ "$COPIED" -eq 0 ]; then
   echo "digest_source=none (will try HubSpot open tasks; leftover cleared proposal is ignored)"
 fi
-rm -f data/radar-buttons-sent.json
 
-echo "=== force-post buttons NOW (addresses never printed) ==="
+echo "=== post buttons if missing (addresses never printed) ==="
 SEND_RC=0
 node scripts/post-radar-buttons-now.cjs --if-missing || SEND_RC=$?
 echo "force_post_exit=$SEND_RC"
