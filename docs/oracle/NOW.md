@@ -160,10 +160,19 @@ that would have said so.
 
 ⚠️ **ELENA'S MOVE, before Wed 9 Sep 20:06 UTC.** Regenerate the `CTO AIPA` token at
 github.com/settings/tokens, then on Oracle run `~/bin/github-token-set.sh` and paste it.
-The old token's live scopes were `admin:org, audit_log, delete:packages, copilot,
-codespace, gist, project, user, write:packages…` — far more than anything here uses. The
-new one needs **`repo` + `workflow` only**. Also delete the already-dead
-"Laptop Git access" token. If it lapses, the daily blog push, wiki-ship (21:30 UTC) and
+**Regenerate — do NOT delete.** The delete dialog says "Includes 1 SSH key":
+`oracle-whitespace-deploy` (`~/.ssh/id_ed25519_github`), a live deploy key for
+`atlas-shifted` created via `/repos/.../keys`. Deleting the token deletes the key.
+
+**"Update token" ≠ "Regenerate token".** Update saves **scope** changes and keeps the
+token **value** (nothing on Oracle breaks). Regenerate issues a new value + expiry and is
+the one that needs `github-token-set.sh` after. Expiry can only change by regenerating.
+
+Measured minimum scopes: **`repo` + `workflow`** — 6 of 8 repos are private, and
+cto-aipa/aideazz carry 10 workflow files between them. The token holds **19 of 21**
+scopes; zero code hits for gists, packages, orgs, projects, notifications, audit.
+**Elena decided 7 Sep to leave scopes as-is** — do not narrow them without asking.
+Deleting the already-dead "Laptop Git access" token is safe (no SSH key attached). If it lapses, the daily blog push, wiki-ship (21:30 UTC) and
 the Monday Atlas backup stop **quietly** — the jobs still run and still look green.
 
 **VERIFIED BY:** Telegram message_ids 5461/5463/5464; `crontab -l`; `cron` active;
