@@ -161,9 +161,8 @@ that would have said so.
 ⚠️ **ELENA'S MOVE, before Wed 9 Sep 20:06 UTC.** Regenerate the `CTO AIPA` token at
 github.com/settings/tokens, then on Oracle run `~/bin/github-token-set.sh` and paste it.
 The old token's live scopes were `admin:org, audit_log, delete:packages, copilot,
-codespace, gist, project, user, write:packages…` — far more than anything here uses. Scopes
-needed are **`repo` + `workflow` only** — the old one also carried `admin:org`,
-`delete:packages` and `audit_log`, which nothing here uses. Also delete the already-dead
+codespace, gist, project, user, write:packages…` — far more than anything here uses. The
+new one needs **`repo` + `workflow` only**. Also delete the already-dead
 "Laptop Git access" token. If it lapses, the daily blog push, wiki-ship (21:30 UTC) and
 the Monday Atlas backup stop **quietly** — the jobs still run and still look green.
 
