@@ -169,13 +169,26 @@ token 081**, **#099 to token 001**. Now reads the card's own `.nft-id` (what the
 handler 300 lines below already did). Behaviour-identical today, correct under any order.
 **Verified in Chrome: 0 mispaired of 99, 99 MINT slots, wallet + thirdweb mount intact.**
 
-**🔴 BLOCKER BEFORE DEPLOY — the daily publisher will break silently.**
-`src/atuona-creative-ai.ts:6369` splices new cards into index.html by matching
-`COLLECT SOUL</button>` then an exact whitespace literal, **with no else branch**. The new
-markup breaks that match, so `/create` would commit metadata and the poem would never
-appear. Fix before pushing: publisher appends to `content/poems.json` and the page is
-regenerated (`dist/` is gitignored, so 4everland already runs `vite build` — a `prebuild`
-hook can regenerate). **Confirm 4everland's build command before relying on that.**
+**✅ PUBLISHER BLOCKER CLEARED (7 Sep).** `npm run test:atuona-vault` — **24/24** against
+the real `index.html`, using the compiled `dist/atuona-vault-tree.js` that runs on Oracle.
+
+- **ADD** aims at one marker `<!-- VAULT:INSERT:ATUONA -->` and **throws** when it is
+  absent, then proves the poem is on the page before building the commit.
+- **REPLACE** located a card's end by the same indentation literal — the tree broke it
+  outright. Now counts **div depth**, so indentation cannot matter again; throws instead
+  of logging "cannot replace" and committing an unchanged page.
+- **MINT slot** splice had the same shape; now fails loudly, so a poem can never be
+  claimable in the vault and missing from MINT.
+- Pure helpers moved to `src/atuona-vault-tree.ts` (no imports, no env) — requiring
+  `atuona-creative-ai.ts` boots the bot graph and dies on a missing `GROQ_API_KEY`, which
+  would have forced the test to re-implement the publisher.
+- `prebuild` is now the full `vault:build`, so **every deploy re-derives the tree** from
+  index.html (rows re-sorted, year headers and tallies recomputed) and then verifies.
+  A poem inserted slightly wrong is normalised; a destructive one fails the build.
+
+**Still unconfirmed: 4everland's build command.** The self-healing regeneration assumes it
+runs `npm run build`. `dist/` is gitignored and thirdweb is a bare import, so it must —
+but confirm in the 4everland dashboard before relying on it.
 
 **Also open:** poem **#099's title, description and claim label are the literal string
 `Could not generate content.`** — a generator refusal published as art (commit `01f7db4`).
