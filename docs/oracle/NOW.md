@@ -548,6 +548,18 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
 
 ## 🔴 OPEN — do not assume these work
 
+- ⚠️ **Oracle's `aideazz` clone is in DETACHED HEAD (since 5 Sep) — cosmetic, but its
+  nightly push fails every night.** A `git pull --rebase` on 5 Sep left `(start)` in the
+  reflog with no `(finish)`, so the bookmark never went back on `main`. Local `main` is
+  frozen at 4 Sep and **18 behind** origin; two wiki-regeneration commits (5 + 6 Sep) sit
+  on no branch. The publisher runs `git push origin main`, which is stale → non-fast-forward.
+  **Do NOT panic-fix and do NOT reset.** Checked 7 Sep: the site is **fine** — aideazz.xyz
+  deploys from **GitHub `main` → 4everland, not from Oracle** (resilience doc, "Not on
+  Oracle SSH"), the live `ai-ops-wiki.html` is HTTP 200 and current through 2026-09-06, and
+  the stranded commits touch **only generated files** (`ai-ops-wiki.html`, `geo-manifest.json`,
+  sitemaps) whose content sources are **byte-identical** to origin/main. Nothing is lost or
+  unpublished. Repair when convenient: branch the detached HEAD first to preserve it, reattach
+  `main`, fast-forward, regenerate, push. Never `reset --hard`.
 - ✅ **`fermatix` is rescued onto `main` (4 Sep)** — spec, letter and registry row
   (deal `64531338321`). The staging union now reports `kept 0 Oracle-only`, so
   Oracle and `main` agree. **Still never `scp` a whole `outreach-registry.json` over
