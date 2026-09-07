@@ -1273,9 +1273,11 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
 
     if (!raw) {
       await ctx.reply(
-        'Usage: /ghtoken <your new GitHub token>\n\n' +
+        'Usage: /ghtoken <your new GitHub token>\n' +
+          '   or: /ghtoken sync   (re-copy the token already on the box into .env)\n\n' +
           'I delete your message immediately, never log the value, and test the token ' +
-          'against GitHub — and against every repo on the box — before writing anything.\n\n' +
+          'against GitHub — and against every repo on the box — before writing anything. ' +
+          'It lands in BOTH places that need it: the git wallet and GITHUB_TOKEN in .env.\n\n' +
           'Regenerate it at github.com/settings/tokens → CTO AIPA → Regenerate token.\n' +
           '⚠️ Regenerate, do NOT delete: deleting that token also deletes the ' +
           'oracle-whitespace-deploy SSH key.',
@@ -1284,15 +1286,26 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
     }
 
     const tok = raw.replace(/\s+/g, '');
-    if (!/^(ghp_|github_pat_)/.test(tok)) {
+    // "sync" re-copies the token already in the wallet into .env. It exists because the
+    // two can drift: git authenticates from the wallet, but seven compiled modules read
+    // process.env.GITHUB_TOKEN for GitHub API calls. Rotating one and not the other
+    // leaves those on a dead value, and they fail quietly.
+    const isSync = tok.toLowerCase() === 'sync';
+    if (!isSync && !/^(ghp_|github_pat_)/.test(tok)) {
       await ctx.reply(
         'That does not start with "ghp_" or "github_pat_", so it is probably not the ' +
-          'token. Nothing was written. Your message is deleted — send again.',
+          'token. Nothing was written. Your message is deleted — send again.\n\n' +
+          'Tip: send "/ghtoken sync" to re-copy the token already on the box into .env ' +
+          'without rotating anything.',
       );
       return;
     }
 
-    await ctx.reply('🔐 Message deleted. Testing the token against GitHub and all repos before writing anything…');
+    await ctx.reply(
+      isSync
+        ? '🔄 Re-syncing .env from the wallet — no rotation, nothing new written…'
+        : '🔐 Message deleted. Testing the token against GitHub and all repos before writing anything…',
+    );
 
     const { spawn } = await import('child_process');
     const out: string[] = [];
