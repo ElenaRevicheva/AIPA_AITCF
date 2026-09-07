@@ -148,6 +148,20 @@ New first-person **DNA** section; nav is `VAULT · DNA · MANIFEST · FILM STUDI
 - Generators: `scripts/{extract-poems,build-vault,build-dna}.mjs`, data in
   `content/poems.json`. index.html is now **generated between markers — do not hand-edit.**
 
+**🔒 IRON-CLAD: `npm run verify` — 10/10.** Ground truth is `content/poems.lock.json`,
+a SHA-256 per poem over number/status/title/verse/badge/description/price/note/claim
+button, taken **from the git tag**, not from a working file. `verify-vault.mjs` fails
+closed and is wired into **`prebuild`**, so a damaged page cannot deploy — the build
+stops and the previous version keeps serving. `test-vault-guards.mjs` corrupts a copy
+nine ways (deleted stanza · retitled card · retitled contents row · altered row number ·
+two claim buttons swapped · mint reverted to DOM position · poem removed · no-JS
+fallback dropped · MINT slot lost) and asserts every one is rejected, plus one control
+that must still PASS (all 99 reordered, content untouched). **The suite found a real
+hole on its first run** — the verifier hashed only the card's `<h2>` and never checked
+the title shown in the contents row. Both row title and row number are now locked.
+Position-independence proven at runtime: a fully reordered page (vault starting 027,
+028, 029) minted **0 mispaired of 99**.
+
 **🚨 THE MINT WAS KEYED ON DOM POSITION.** `enhanceAllMintingButtons()` set every token id
 from `String(index + 1)` — the card's *index*, not its number. Correct only by luck while
 the cards sat in order. The first cut of the tree reordered them and wired poem **#045 to
