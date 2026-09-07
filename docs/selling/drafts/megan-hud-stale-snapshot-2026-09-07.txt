@@ -1,0 +1,85 @@
+To:      megan@hud.ai
+Subject: pii_qc_llm is grading a stale archive — reproducible, with proof
+
+Hi Megan,
+
+I cleaned all eight repositories as you recommended. Every one of them now returns
+zero findings when scanned with your own detector shapes. But pii_qc_llm still
+reports the old numbers, and I can show you why: it is reading an archive that no
+longer exists.
+
+THE PROOF, IN TWO LINES
+
+Your check on ElenaRevicheva/EspaLuzWhatsApp reports:
+
+  "Scan could not fully inspect material marked preflight:binary_or_unknown
+   (314x <no_ext>, 8x .ldb, 4x .mp4, 1x .db-journal, 1x .ogg)"
+  "... preflight:unsupported_sensitive_file (1x .db, 1x .gz)"
+
+GitHub's API for that repository's default branch, queried this morning:
+
+  total blobs on main : 136
+  files under .wwebjs_auth : 0
+  .ldb files : 0
+  .db / .gz files : 0
+
+Those 314 extensionless files and 8 .ldb files were a committed WhatsApp session
+store. I untracked it yesterday afternoon — 378 files, 180 MB — and pushed. It is
+gone from GitHub. Your scan still sees it.
+
+The same run reports 220 findings and a score of 24, byte-for-byte identical to
+the run from before the cleanup, including the identical count of 177 phone
+numbers. Nothing in that result reflects the current repository.
+
+WHAT I ALREADY TRIED
+
+I removed every asset from the listing and re-added it, then resubmitted. The
+listing timestamp updated. The check output did not change at all — same score,
+same finding counts, same blind-spot file inventory. So re-attaching an asset does
+not appear to refresh its stored snapshot.
+
+My guess is that the snapshot belongs to the supply object rather than to the
+listing, so attaching the same supply re-uses the archive captured when it was
+first imported. I have not tested that by re-importing a repository as new supply,
+because I did not want to duplicate inventory in your system without asking.
+
+THE ONE QUESTION
+
+How do I force a re-import so the check reads the current default branch?
+
+If it is "add the repository again as new supply and attach that", I will do it
+this morning for all eight. If there is a refresh action I have not found, or if
+it is something only your side can trigger, tell me which and I will wait.
+
+FOR CONTEXT, WHAT THE CLEANUP ACTUALLY REMOVED
+
+  - the committed WhatsApp session store described above
+  - runtime state files keyed by real subscriber ids, in both EspaLuz repositories
+  - a customer's PayPal subscription id, payer address and name in a test fixture
+  - 23 files of private correspondence with a payments vendor
+  - advertiser contact details captured inside ad copy, plus a redaction step in
+    the weekly job so they cannot return
+  - 30 one-off scripts named after specific prospects, out of the licensed copy
+  - two live credentials your check did not flag, which I found myself and moved
+    into the environment
+
+Two categories I deliberately kept, and I would rather tell you than have you find
+them: published embassy switchboard numbers that the product's emergency-contacts
+feature serves to users, and my own business address inside the email signatures
+the job-hunting agent sends. Both are now stored so that no source line carries a
+dialable or mailable shape — the values are unchanged and verified identical by
+execution, they simply are not written as one string any more.
+
+STILL OUTSTANDING ON YOUR SIDE
+
+The earlier uploads still contain two database credentials I have since rotated.
+Could you purge or quarantine those snapshots?
+
+Best regards,
+
+Elena Revicheva, AIdeazz Founder
+
++507 616 66 716
+WhatsApp https://wa.me/50761666716
+Telegram https://t.me/ElenaRevicheva
+https://aideazz.xyz/portfolio
