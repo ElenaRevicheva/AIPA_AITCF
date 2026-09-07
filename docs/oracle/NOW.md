@@ -130,6 +130,44 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📖 7 Sep — atuona.xyz is a book now. BUILT + VERIFIED LOCALLY, **NOT DEPLOYED.**
+
+**Whose move: Elena's** (approve the deploy) **then the agent's** (fix the publisher first).
+
+**DONE.** The vault's 99 poems were one flat column — 145,617px tall, #045 forty-four
+poems down. Now PART I ATUONA (#047–#099) / PART II LITPROM (#001–#046), newest first,
+each poem a **named** row that opens in place. Page is **5,870px — 96% shorter**. Every
+poem stays in the DOM collapsed with CSS (134,184 verse chars readable by answer
+engines); `.nojs` = everything open. Permalink per poem (`/#p045`) + a find box.
+New first-person **DNA** section; nav is `VAULT · DNA · MANIFEST · FILM STUDIO · MINT`.
+
+- Local clone created: **`D:\aideazz\atuona`** (the resilience doc said none existed).
+- Commit `7687891` on `main` **local only — not pushed**.
+- Backups: `_backups/atuona.pre-vault-tree.20260907-2035/` (md5-verified) + GitHub tag
+  **`atuona-pre-vault-tree-20260907`** + branch `backup/atuona-pre-vault-tree-20260907`.
+- Generators: `scripts/{extract-poems,build-vault,build-dna}.mjs`, data in
+  `content/poems.json`. index.html is now **generated between markers — do not hand-edit.**
+
+**🚨 THE MINT WAS KEYED ON DOM POSITION.** `enhanceAllMintingButtons()` set every token id
+from `String(index + 1)` — the card's *index*, not its number. Correct only by luck while
+the cards sat in order. The first cut of the tree reordered them and wired poem **#045 to
+token 081**, **#099 to token 001**. Now reads the card's own `.nft-id` (what the hover
+handler 300 lines below already did). Behaviour-identical today, correct under any order.
+**Verified in Chrome: 0 mispaired of 99, 99 MINT slots, wallet + thirdweb mount intact.**
+
+**🔴 BLOCKER BEFORE DEPLOY — the daily publisher will break silently.**
+`src/atuona-creative-ai.ts:6369` splices new cards into index.html by matching
+`COLLECT SOUL</button>` then an exact whitespace literal, **with no else branch**. The new
+markup breaks that match, so `/create` would commit metadata and the poem would never
+appear. Fix before pushing: publisher appends to `content/poems.json` and the page is
+regenerated (`dist/` is gitignored, so 4everland already runs `vite build` — a `prebuild`
+hook can regenerate). **Confirm 4everland's build command before relying on that.**
+
+**Also open:** poem **#099's title, description and claim label are the literal string
+`Could not generate content.`** — a generator refusal published as art (commit `01f7db4`).
+Retitling is Elena's call; the poem body itself is real. And **44 of 99 cards carry no
+`onclick` in the HTML** — harmless today because the runtime wires all 99 on load.
+
 ### 🔑 7 Sep — the GitHub token now lives in ONE place, and it shouts before it dies
 
 **DONE.** The token was in three places and expiring in two days with nothing on the box

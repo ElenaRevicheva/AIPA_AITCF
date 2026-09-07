@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "aideazz-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "-s", "D:/aideazz/aideazz/dist", "-l", "4173"],
+      "port": 4173
+    },
+    {
+      "name": "atuona-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "D:/aideazz/atuona", "-l", "4174"],
+      "port": 4174
+    }
+  ]
+}
