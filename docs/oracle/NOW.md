@@ -130,11 +130,51 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔑 7 Sep — the GitHub token now lives in ONE place, and it shouts before it dies
+
+**DONE.** The token was in three places and expiring in two days with nothing on the box
+that would have said so.
+
+- **One location.** `credential.helper=store` → `~/.git-credentials` on Oracle (1 line,
+  mode 600). The global `url.https://x-access-token:TOKEN@github.com/.insteadOf` rule is
+  **removed**; no `.git/config` and no `origin` URL contains a secret. Verified by
+  `ls-remote` on all seven pushing repos: cto-aipa, aideazz, atlas-captures,
+  VibeJobHunterAIPA_AIMCF, EspaLuzWhatsApp, EspaLuzFamilybot, EspaLuz_Influencer — **7/7
+  AUTH_OK**. `whitespace/data` had **no origin at all** and now has one.
+- **`atlas-capture-cron.sh` no longer reads a token** (`grep -c GITHUB_TOKEN` = 0); it
+  pushes as `git push origin HEAD:main` and authenticates through the store. The contact
+  redaction pass added on 6 Sep is untouched (`grep -c contact-redacted` = 1).
+- **The alarm:** `scripts/github-token-watch.sh` (repo) → `/home/ubuntu/bin/` on Oracle,
+  cron `0 9 * * *`. Warns at ≤14 days, screams if the token is dead.
+- **The alarm checks its own delivery.** `curl` exiting 0 is not proof Telegram accepted
+  the message. It greps `"ok":true` and exits **3** if the alert could not be delivered —
+  a separate code from "token is fine". Tested four ways: cron-stripped env
+  (`env -i`) → delivered, message_id 5463; healthy → silent, exit 0; Telegram 401 → exit
+  3, logged `DELIVERY FAILED`; dead token → exit 2, delivered.
+
+⚠️ **ELENA'S MOVE, before Wed 9 Sep 20:06 UTC.** Regenerate the `CTO AIPA` token at
+github.com/settings/tokens and replace the one line in `~/.git-credentials`. Scopes
+needed are **`repo` + `workflow` only** — the old one also carried `admin:org`,
+`delete:packages` and `audit_log`, which nothing here uses. Also delete the already-dead
+"Laptop Git access" token. If it lapses, the daily blog push, wiki-ship (21:30 UTC) and
+the Monday Atlas backup stop **quietly** — the jobs still run and still look green.
+
+**VERIFIED BY:** Telegram message_ids 5461/5463/5464; `crontab -l`; `cron` active;
+`ls-remote` 7/7. Backups: `/home/ubuntu/_session-backups/git-configs.20260907`,
+`gitconfig.20260907`, `github-token-watch.sh.pre-hardening`.
+**RISK:** Oracle's `cto-aipa` push dry-run is rejected as non-fast-forward. That is the
+**deliberate** scp-deploy lag (PART 1 §7) — auth succeeded. Do **not** `git pull` it.
+
 ### ✅ 6 Sep — DataVendor `pii_qc_llm`: seven repos cleaned, nothing deployed but one
 
 Root cause and per-repo evidence: `docs/selling/DATAVENDOR_PII_ROOTCAUSE_2026-09-06.md`.
-The snapshots were **fresh** — the check reads current `HEAD`. The cleaning was what had
-not landed.
+
+> ❌ **Corrected 7 Sep.** This block originally said "the snapshots were **fresh** — the
+> check reads current `HEAD`". That is **wrong**. DataVendor grades a **stored snapshot
+> taken when the asset first joined a listing**; re-attaching inside the same listing does
+> not refresh it. The 6 Sep numbers only matched local `git ls-files` because the assets
+> had been re-attached minutes earlier — both explanations predicted the same counts. To
+> get a fresh capture you must attach the repo to a **brand-new listing**.
 
 **The headline miss:** `.wwebjs_auth/` was in `EspaLuzWhatsApp/.gitignore` **and still
 tracked** — 378 files, 180 MB of an authenticated WhatsApp Web profile, live on GitHub.
