@@ -10,6 +10,8 @@ import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import { persistShot, persistShotBytes, shotPublicUrl, buildFilm } from './atuona-film-compiler';
 import { grokComplete, groqModel } from './llm-resilience';
+import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
+export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
 import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
@@ -6361,28 +6363,29 @@ Use /translate to create one, or /publish will use Russian only.`);
       // Modify HTML: add NFT card to VAULT + gallery slot to MINT
       const nftCardHtml = createNFTCardHtml(pageId, pageNum, englishTitle, englishText, theme, description);
       
-      // Add NFT card to VAULT
-      if (!htmlContent.includes(`nft-id">#${pageId}`)) {
-        const aboutSection = htmlContent.indexOf('<section id="about"');
-        if (aboutSection > 0) {
-          const homeSection = htmlContent.slice(0, aboutSection);
-          const lastCardStart = homeSection.lastIndexOf('<div class="nft-card">');
-          
-          if (lastCardStart > 0) {
-            const afterLastCard = homeSection.slice(lastCardStart);
-            const collectButton = afterLastCard.indexOf('COLLECT SOUL</button>');
-            if (collectButton > 0) {
-              const afterButton = afterLastCard.slice(collectButton);
-              const closePattern = '</div>\n                        </div>\n                    </div>';
-              const closeIdx = afterButton.indexOf(closePattern);
-              
-              if (closeIdx > 0) {
-                const insertPoint = lastCardStart + collectButton + closeIdx + closePattern.length;
-                htmlContent = htmlContent.slice(0, insertPoint) + '\n' + nftCardHtml + htmlContent.slice(insertPoint);
-                console.log(`🎭 Atuona prepared NFT card #${pageId} for VAULT`);
-              }
-            }
+      // Add NFT card to VAULT — one marker, and a throw if it is missing.
+      {
+        const before = htmlContent;
+        const now = new Date();
+        const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+        const firstLine = englishText.split('\n').map(l => l.trim()).filter(Boolean)[0] ?? '';
+
+        htmlContent = insertPoemIntoVault(htmlContent, {
+          pageId,
+          title: englishTitle,
+          cardHtml: nftCardHtml,
+          dateStr,
+          firstLine,
+        });
+
+        if (htmlContent === before) {
+          console.log(`🎭 Atuona: #${pageId} already in the VAULT — left alone`);
+        } else {
+          // Prove it landed. The old code could no-op and still report success.
+          if (!htmlContent.includes(`id="p${pageId}"`) || !htmlContent.includes(`nft-id">#${pageId}<`)) {
+            throw new Error(`VAULT insert for #${pageId} did not take — refusing to commit a publish that loses the poem`);
           }
+          console.log(`🎭 Atuona placed NFT card #${pageId} in the VAULT tree`);
         }
       }
       
@@ -6401,19 +6404,31 @@ Use /translate to create one, or /publish will use Russian only.`);
       const gallerySectionEnd = htmlContent.indexOf('</section>', galleryStart);
       const mintSection = htmlContent.slice(galleryStart, gallerySectionEnd);
       
+      // Same defect as the VAULT splice had: three nested `if`s and no else, so a
+      // missed anchor dropped the MINT slot while the publish still reported
+      // success. The MINT grid is untouched by the vault tree so the anchors
+      // still hold, but a miss must now be loud rather than invisible.
       if (!mintSection.includes(`claimPoem(${pageNum},`)) {
         const lastSlotStart = mintSection.lastIndexOf('<div class="gallery-slot"');
-        if (lastSlotStart > 0) {
-          const afterLastSlot = mintSection.slice(lastSlotStart);
-          const slotClosePattern = '</div>\n                        </div>';
-          const slotCloseIdx = afterLastSlot.indexOf(slotClosePattern);
-          
-          if (slotCloseIdx > 0) {
-            const insertPoint = galleryStart + lastSlotStart + slotCloseIdx + slotClosePattern.length;
-            htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
-            console.log(`🎭 Atuona prepared gallery slot #${pageId} for MINT`);
-          }
+        const afterLastSlot = lastSlotStart > 0 ? mintSection.slice(lastSlotStart) : '';
+        const slotClosePattern = '</div>\n                        </div>';
+        const slotCloseIdx = afterLastSlot ? afterLastSlot.indexOf(slotClosePattern) : -1;
+
+        if (lastSlotStart <= 0 || slotCloseIdx <= 0) {
+          throw new Error(
+            `Could not place MINT slot #${pageId}: the gallery-slot anchor was not found in ` +
+            `#gallery. Refusing to commit a publish where the poem is claimable in the vault ` +
+            `but missing from MINT.`
+          );
         }
+
+        const insertPoint = galleryStart + lastSlotStart + slotCloseIdx + slotClosePattern.length;
+        htmlContent = htmlContent.slice(0, insertPoint) + newSlotHtml + htmlContent.slice(insertPoint);
+
+        if (!htmlContent.includes(`claimPoem(${pageNum},`)) {
+          throw new Error(`MINT slot #${pageId} did not take — refusing to commit a half-published poem`);
+        }
+        console.log(`🎭 Atuona prepared gallery slot #${pageId} for MINT`);
       }
       
       // =============================================================================
@@ -6725,44 +6740,10 @@ Use /update only for existing poems.`);
       // KEY FIX: REPLACE existing NFT card in VAULT (not add new!)
       // =============================================================================
       
-      // Find existing NFT card with this ID and replace it
-      const cardIdPattern = `nft-id">#${pageId}`;
-      if (htmlContent.includes(cardIdPattern)) {
-        // Find the start of the card containing this ID
-        const cardIdIndex = htmlContent.indexOf(cardIdPattern);
-        
-        // Search backwards to find '<div class="nft-card">'
-        let cardStart = cardIdIndex;
-        while (cardStart > 0) {
-          const checkStr = htmlContent.slice(cardStart - 50, cardStart + 20);
-          if (checkStr.includes('<div class="nft-card">')) {
-            cardStart = htmlContent.lastIndexOf('<div class="nft-card">', cardIdIndex);
-            break;
-          }
-          cardStart--;
-        }
-        
-        // Find the end of this card (closing divs pattern after COLLECT SOUL button)
-        const afterCardStart = htmlContent.slice(cardStart);
-        const collectButtonInCard = afterCardStart.indexOf('COLLECT SOUL</button>');
-        
-        if (collectButtonInCard > 0) {
-          const afterButton = afterCardStart.slice(collectButtonInCard);
-          // Look for the card closing pattern
-          const closePattern = '</div>\n                        </div>\n                    </div>';
-          const closeIdx = afterButton.indexOf(closePattern);
-          
-          if (closeIdx > 0) {
-            const cardEnd = cardStart + collectButtonInCard + closeIdx + closePattern.length;
-            
-            // Replace the entire card
-            htmlContent = htmlContent.slice(0, cardStart) + nftCardHtml.trim() + htmlContent.slice(cardEnd);
-            console.log(`✏️ Replaced NFT card #${pageId} in VAULT`);
-          }
-        }
-      } else {
-        console.log(`⚠️ NFT card #${pageId} not found in HTML, cannot replace`);
-      }
+      // Replace the card by depth-counted bounds. Throws if it cannot be found,
+      // rather than logging a warning and committing an unchanged page.
+      htmlContent = replacePoemCard(htmlContent, pageId, nftCardHtml);
+      console.log(`✏️ Replaced NFT card #${pageId} in VAULT`);
       
       // =============================================================================
       // KEY FIX: REPLACE existing gallery slot in MINT (not add new!)

@@ -18,7 +18,8 @@
     "eval:llm": "node scripts/eval-llm-chain.cjs",
     "concierge:selftest": "node scripts/concierge-selftest.cjs",
     "wiki:ship": "node scripts/wiki-ship.cjs",
-    "wiki:lint": "node scripts/wiki-ship.cjs --dry"
+    "wiki:lint": "node scripts/wiki-ship.cjs --dry",
+    "test:atuona-vault": "node scripts/test-atuona-vault-insert.cjs"
   },
   "keywords": [],
   "author": "Elena Revicheva",
