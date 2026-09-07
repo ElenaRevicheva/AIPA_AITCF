@@ -995,22 +995,57 @@ This doc is the **single map**: **Oracle VM paths** (above) + **where your autho
 
 **On your Windows dev machine:** every repo is cloned at the canonical path in the table above. Git credentials are configured locally — `git pull` and `git push` work without additional login.
 
-**On Oracle VM (`170.9.242.90`):** use **HTTPS + `GITHUB_TOKEN`** (PAT in `/home/ubuntu/cto-aipa/.env`). GitHub **deploy keys are one-repo-only** — the atlas key cannot pull private repos like `EspaLuzFamilybot`. Do **not** rely on `https://github.com/...` without credentials (fails with `could not read Username`).
+**On Oracle VM:** HTTPS + a classic PAT. GitHub **deploy keys are one-repo-only** — the atlas key cannot pull private repos like `EspaLuzFamilybot`. Do **not** rely on `https://github.com/...` without credentials (fails with `could not read Username`).
 
-**One-time fix (refresh PAT or after token rotation):**
+#### 🔑 The token has TWO homes, and both must be written (rewritten 7 Sep 2026)
 
-```bash
-# On Oracle VM — pass new PAT once (also updates cto-aipa/.env + ~/.git-credentials):
-TOKEN=ghp_YOUR_NEW_PAT bash ~/oracle-fix-git-https-auth.sh
+This is the whole lesson of the 7 Sep incident — full write-up:
+[`the-token-that-was-live-and-dead-at-once`](https://aideazz.xyz/ai-ops-wiki.html).
 
-# Or from Windows:
-scp -i ~/.ssh/ssh-key-2026-01-07private.key \
-  scripts/oracle-resilience/oracle-fix-git-https-auth.sh ubuntu@170.9.242.90:~/
-ssh -i ~/.ssh/ssh-key-2026-01-07private.key ubuntu@170.9.242.90 \
-  "TOKEN=ghp_YOUR_NEW_PAT bash ~/oracle-fix-git-https-auth.sh"
+| Home | Who reads it | Symptom if it is stale |
+|---|---|---|
+| `~/.git-credentials` (`credential.helper=store`, mode 600) | **git** — push, pull, `ls-remote`, all 7 repos | loud: pushes fail immediately |
+| `GITHUB_TOKEN` in `/home/ubuntu/cto-aipa/.env` | **7 compiled modules** for GitHub **API** calls — `podcast-publish`, `blog-static-pages`, `fresh-leads-ingest`, `cto-aipa`, `telegram-bot`, `atuona-creative-ai`, `atuona-film-compiler` | **silent**: `Bad credentials` into a log nobody reads |
+
+**Rotating only the wallet is the trap.** git keeps working perfectly, so nothing looks
+wrong, while every API call 401s. On 7 Sep that shipped a daily blog announcement whose
+aideazz.xyz page had never been created — Dev.to and Buffer succeeded, the page write 401'd.
+
+**Rotate from a phone — one message, writes BOTH, restarts the process:**
+
+```text
+/ghtoken <the new token>      # in the cto-aipa Telegram chat
+/ghtoken sync                 # re-copy the wallet's token into .env, no rotation
 ```
 
-**Verify:** `cd /home/ubuntu/EspaLuzFamilybot && git fetch origin main` (no username prompt).
+The message is deleted before any other await; the value reaches
+`~/set-ghtoken-stdin.sh` on **STDIN**, never argv, so it cannot appear in `ps`. The helper
+probes GitHub **before** writing, backs up `.env`, verifies all 7 repos, **restores the old
+wallet if any fail**, then schedules a *detached* `pm2 restart cto-aipa --update-env`
+(detached because it is a child of the process it restarts). Repo copy:
+`scripts/set-ghtoken-stdin.sh`.
+
+**From a terminal instead:** `ssh -t oracle-cto-aipa '~/bin/github-token-set.sh'` — same
+guarantees, hidden prompt. Repo copy: `scripts/github-token-set.sh`.
+
+**⚠️ REGENERATE, never DELETE.** The `CTO AIPA` token owns SSH key
+`oracle-whitespace-deploy` (`~/.ssh/id_ed25519_github`), a live deploy key created through
+the `repo` scope. Deleting the token deletes the key; regenerating keeps it.
+"Update token" saves **scope** changes and keeps the value — only "Regenerate" issues a new
+one. Measured minimum scopes: **`repo` + `workflow`** (6 of 8 repos are private; cto-aipa
+and aideazz carry 10 workflow files).
+
+**The expiry alarm:** `~/bin/github-token-watch.sh`, cron `0 9 * * *`. Warns at ≤14 days,
+screams if dead — and **verifies its own Telegram delivery** (`curl` exiting 0 only proves
+curl ran), exiting `3` when the alert itself could not be delivered. Repo copy:
+`scripts/github-token-watch.sh`. Log: `~/logs/github-token-watch.log`.
+
+**Deprecated:** `~/oracle-fix-git-https-auth.sh` — it took the token as `TOKEN=…` on the
+command line, which lands in shell history and `ps`. Do not use it.
+
+**Verify:** `cd /home/ubuntu/EspaLuzFamilybot && git fetch origin main` (no username
+prompt) **and** that the `.env` copy answers 200 — git working proves nothing about the
+API half.
 
 **EspaLuz deploy note:** runtime JSON (`subscribers.json`, `paguelofacil_payments.json`, trials) may differ from git — prefer `git fetch` + `git checkout origin/main -- <code-files>` for code-only deploys, or stash before pull. See `EspaLuzFamilybot/deploy/BACKUP_AND_ROLLBACK_PAGUELOFACIL_WA.md`.
 
@@ -1027,6 +1062,23 @@ Cursor Cloud Agents **cannot** SSH to Oracle. Deploy **all 11 agents** from your
 Registry: `scripts/oracle-resilience/oracle-products.conf` · universal deploy: `deploy-product.sh`
 
 **Not on Oracle SSH:** AILA (#10, not deployed) · [aideazz.xyz](https://aideazz.xyz) / [atuona.xyz](https://atuona.xyz) → push GitHub `main` → 4everland
+
+> **⚠️ But Oracle DOES hold an `aideazz` working clone at `/home/ubuntu/aideazz`, and it is
+> not the deployment source.** The site builds from GitHub `main` via 4everland; that clone
+> exists so `wiki-ship.cjs` (cron 21:30 UTC, `AIDEAZZ_REPO_PATH=/home/ubuntu/aideazz`) and
+> the daily blog can commit and push. **It must stay on branch `main`.** On 5 Sep 2026 a
+> `git pull --rebase` was interrupted — the reflog shows `(start)` with no `(finish)` — and
+> left it in **detached HEAD**. Two days of regeneration commits then landed on no branch,
+> `main` froze 18 commits behind, and every nightly `git push origin main` failed
+> non-fast-forward. Nothing published from that clone until it was reattached on 7 Sep.
+>
+> **Diagnose before you panic:** a broken clone here does **not** mean the site is down —
+> check the live URL first, because 4everland serves GitHub, not this box.
+> **Repair without destroying:** `git branch -f rescue/<date> <detached-sha>` and the same
+> for `main` FIRST, then `git fetch origin main && git checkout -B main origin/main`.
+> Both old tips survive as branches. **Never `reset --hard`** — the stranded commits exist
+> nowhere else. Rescue branches from the 7 Sep repair: `rescue/detached-20260907`,
+> `rescue/main-20260907`.
 
 Full guide: `scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md` · workflow: `.github/workflows/deploy-oracle.yml`
 
