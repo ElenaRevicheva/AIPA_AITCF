@@ -152,8 +152,16 @@ that would have said so.
   (`env -i`) → delivered, message_id 5463; healthy → silent, exit 0; Telegram 401 → exit
   3, logged `DELIVERY FAILED`; dead token → exit 2, delivered.
 
+- **Rotation is one command.** `scripts/github-token-set.sh` → `/home/ubuntu/bin/`:
+  run it, paste the token (stdin, so it never enters shell history or the process
+  list), and it checks the token against GitHub **before** writing, backs up the old
+  wallet, then `ls-remote`s all seven repos and **rolls back** if any fails.
+  Note: it writes no `%s@<host>` literal — pii-guard blocks that shape.
+
 ⚠️ **ELENA'S MOVE, before Wed 9 Sep 20:06 UTC.** Regenerate the `CTO AIPA` token at
-github.com/settings/tokens and replace the one line in `~/.git-credentials`. Scopes
+github.com/settings/tokens, then on Oracle run `~/bin/github-token-set.sh` and paste it.
+The old token's live scopes were `admin:org, audit_log, delete:packages, copilot,
+codespace, gist, project, user, write:packages…` — far more than anything here uses. Scopes
 needed are **`repo` + `workflow` only** — the old one also carried `admin:org`,
 `delete:packages` and `audit_log`, which nothing here uses. Also delete the already-dead
 "Laptop Git access" token. If it lapses, the daily blog push, wiki-ship (21:30 UTC) and
