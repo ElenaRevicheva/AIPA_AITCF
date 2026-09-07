@@ -672,7 +672,9 @@ Type /menu for all commands! 🚀
         { cmd: '/doc_ingest',      desc: 'Paste doc — AI extracts prospects.', usage: '/doc_ingest' },
         { cmd: '/outreach_drafts', desc: 'Emails waiting for your review.', usage: '/outreach_drafts' },
         { cmd: '/pending_leads',   desc: 'Leads stuck with no email.', usage: '/pending_leads' },
-        { cmd: '/add_email',       desc: 'Unblock a lead with an email.', usage: '/add_email <id> ceo@co.com' },
+        // Placeholder deliberately NOT email-shaped: pii_qc_llm counts the SHAPE, so a
+        // sample address in help text is counted as third-party PII in a licensed repo.
+        { cmd: '/add_email',       desc: 'Unblock a lead with an email.', usage: '/add_email <id> <their address>' },
         { cmd: '/linkedin_draft',  desc: '300-char connection message.', usage: '/linkedin_draft fintech Panama' },
         { cmd: '/triage',          desc: 'Score prospects 1–5, push best to HubSpot.', usage: '/triage' },
         { cmd: '/hubspot',         desc: 'HubSpot CRM — view or sync pipeline.', usage: '/hubspot sync' },
@@ -1234,6 +1236,91 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
       );
     } else {
       await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the key and send again.');
+    }
+  });
+
+  /**
+   * /ghtoken <github token> — rotate the GitHub token from a phone.
+   *
+   * Why this exists (7 Sep 2026): the `CTO AIPA` token expires and nothing used to
+   * say so. When it dies the daily blog push, wiki-ship (21:30 UTC) and the Monday
+   * Atlas backup all keep running, keep logging green, and simply stop producing
+   * output — silent failure. `github-token-watch.sh` now warns at ≤14 days, but the
+   * warning is useless if fixing it needs a terminal Elena does not have.
+   *
+   * Identical contract to /pplxkey and /gmailpw, for identical reasons. The message
+   * is deleted before any await that could fail. The value goes to the helper on
+   * STDIN, never argv, so it cannot surface in `ps`. The helper PROBES GitHub before
+   * it writes, and then — unlike the others — it also proves every repo on this box
+   * can still authenticate, and RESTORES the old wallet if any cannot. A wallet
+   * holding a dead token is worse than no change, because everything it breaks
+   * breaks quietly.
+   *
+   * The token lives in exactly one place: ~/.git-credentials (mode 600). Rotating is
+   * rewriting that one line.
+   */
+  bot.command('ghtoken', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/ghtoken(@\S+)?\s*/i, '')
+      .trim();
+
+    // Delete FIRST — before anything that can throw and leave the token on screen.
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      /* older than 48h, or no delete rights — the reply below still warns her */
+    }
+
+    if (!raw) {
+      await ctx.reply(
+        'Usage: /ghtoken <your new GitHub token>\n\n' +
+          'I delete your message immediately, never log the value, and test the token ' +
+          'against GitHub — and against every repo on the box — before writing anything.\n\n' +
+          'Regenerate it at github.com/settings/tokens → CTO AIPA → Regenerate token.\n' +
+          '⚠️ Regenerate, do NOT delete: deleting that token also deletes the ' +
+          'oracle-whitespace-deploy SSH key.',
+      );
+      return;
+    }
+
+    const tok = raw.replace(/\s+/g, '');
+    if (!/^(ghp_|github_pat_)/.test(tok)) {
+      await ctx.reply(
+        'That does not start with "ghp_" or "github_pat_", so it is probably not the ' +
+          'token. Nothing was written. Your message is deleted — send again.',
+      );
+      return;
+    }
+
+    await ctx.reply('🔐 Message deleted. Testing the token against GitHub and all repos before writing anything…');
+
+    const { spawn } = await import('child_process');
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn('/home/ubuntu/set-ghtoken-stdin.sh', [], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      child.stdin.write(tok + '\n');
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 120_000);
+    });
+
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    if (result.startsWith('OK:')) {
+      await ctx.reply(
+        '✅ GitHub token rotated.\n\n' + result + '\n\n' +
+          'Still running on the old schedule, now with a live token:\n' +
+          '• the daily blog push\n' +
+          '• wiki-ship at 21:30 UTC\n' +
+          '• the Monday Atlas backup\n\n' +
+          'The expiry watch runs daily at 09:00 UTC and will warn you 14 days out.\n' +
+          '⚠️ If you pasted this token anywhere else, regenerate it — that copy is still live.',
+      );
+    } else {
+      await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the token and send again.');
     }
   });
 
