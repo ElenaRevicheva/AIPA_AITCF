@@ -84,6 +84,26 @@ The rebuilt listing shows LOC figures that only make sense post-cleanup:
 Those drops are the five stray `main.py` copies and the untracked runtime state. The old
 listing's archive never saw them go.
 
+## ▶ SUBMITTED — 7 Sep 2026, ~07:10 Panama
+
+Elena asked me to submit; I did. The confirmation dialog said *"Submitting will run all
+quality checks again. The listing is locked while they run."* The page now reads
+**"Listing submitted — quality checks are running"** and **"Editing unlocks when quality
+checks finish."**
+
+Verified immediately before pressing it: **8 assets**, **$74,851**, title correct, both
+attestation checkboxes ticked, and the description carrying the corrected eval-suite count.
+
+The previous run took about an hour for a single repository, so allow time. The thing to
+read when it lands is the `pii_qc_llm` blind-spot line for `EspaLuzWhatsApp`:
+
+- **`4x .mp4`** → the snapshot is fresh and the cleanup is visible to them. Expect passes.
+- **`314x <no_ext>, 8x .ldb`** → their archive is cached per repository, nothing a vendor
+  can do from this side, and `drafts/megan-hud-stale-snapshot-2026-09-07.txt` goes out as
+  written.
+
+**The old listing is still live and must stay that way until this one passes.**
+
 ## Order of operations
 
 1. Elena presses **Submit for review** on the draft.
