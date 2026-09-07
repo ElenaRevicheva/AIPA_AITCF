@@ -1,122 +1,59 @@
 To:      megan@hud.ai
-Subject: Cleaned and relisted — 5 of 8 pass, and the 3 that fail look like a triage bug
+Subject: Cleaned and relisted — 5 of 8 now pass. Two questions.
 
 Hi Megan,
 
-I did what you recommended on 5 September: cleaned the PII and uploaded a new listing.
-Five of the eight repositories now pass pii_qc_llm. The three that still fail return
-evaluator fields saying the review stage did not run, so I would rather show you the
-numbers than keep guessing at them.
+I did what you recommended: cleaned the PII and uploaded a new listing. Five of the
+eight repositories now pass pii_qc_llm. The new listing is live, the old ones archived:
 
-The new listing is live: https://datavendor.ai/listings/d04a6a03-1276-443f-9460-68f982307651
-The earlier ones are archived.
+https://datavendor.ai/listings/d04a6a03-1276-443f-9460-68f982307651
 
-WHAT I REMOVED
+I have two questions, and your answers decide what I do next.
 
-None of it cosmetic. Across the eight repositories:
+1. DOES A FAILING REPOSITORY BLOCK ONLY ITSELF, OR THE WHOLE LISTING?
 
-  - A committed WhatsApp Web session store: 378 files, 180 MB, an authenticated browser
-    profile with LevelDB records, cache and service-worker data. It had been listed in
-    .gitignore since the day it was added, but .gitignore only filters files git has not
-    seen yet, so it stayed tracked and invisible in every clone.
-  - Runtime state keyed by real subscriber ids: trial records, session files, analytics
-    and onboarding data in both EspaLuz repositories.
-  - 19 customer voice recordings — real users speaking to the Spanish tutor — along with
-    the bot's generated replies, committed as files.
-  - A customer's PayPal subscription id, payer address and name, hardcoded in a webhook
-    test fixture.
-  - 23 files of private correspondence with a payments vendor.
-  - Seven resume PDFs. Your check reads PDFs; my own scanner skipped them as binary and
-    reported zero, which is how they survived three earlier passes.
-  - Advertiser contact details captured verbatim inside ad copy, plus a redaction step
-    added to my weekly capture job so they cannot come back. That job ran this morning
-    and produced zero new emails and zero new phone numbers.
-  - Two live credentials your check did not flag, which I found myself while looking: a
-    hardcoded shared secret and an inbound webhook URL. Both are in the environment now.
-    I mention it because it cuts both ways — a passing PII check is not the same thing
-    as a clean repository.
+You wrote "if the repo failed PII check, it cannot be sell" — repo, not listing. If only
+the repository is blocked, the five that pass are already matchable and I will leave
+things as they are. If the whole listing is blocked, I will split the five passing
+repositories into their own listing today and hold the other three back.
 
-THE THREE THAT STILL FAIL
+2. COULD YOU SEND THE FINDINGS WITH FILE LOCATIONS, AS YOU DID ON 5 SEPTEMBER?
 
-The evaluator block on each of them, from today's run:
+The report gives me types and counts but never tells me where. Inferring the detectors
+from counts alone has cost me four rounds — I removed things that were not the problem,
+and twice replaced a real value with a placeholder the detector counted just as readily.
+One list from you saves another week of that.
 
-  "triage_applied": false
-  "rows_judged": 0
-  "rows_rejected": 0
-  "findings_cleared": 0
-  "review_coverage": { "worklist_reach": 1, "triage_coverage": 0 }
+WHY I THINK THE THREE FAILURES ARE NOT REAL
 
-And on ElenaRevicheva/AIPA_AITCF-licensed specifically:
+Every one of them returns "triage_applied": false and "rows_judged": 0. On
+AIPA_AITCF-licensed, 24 rows were offered to the reviewer, none were judged, and of 132
+placeholder findings, zero were cleared. Nothing is marked "validated" — every remaining
+finding is a raw pattern hit.
 
-  "rows_offered": 24                  <- 24 rows offered to the reviewer
-  "rows_judged": 0                    <- none judged
-  "placeholder_findings_total": 132
-  "findings_cleared": 0               <- none of those 132 placeholders cleared
-  "findings_remaining_by_provenance": { "pattern": 5, "heuristic": 1, "validated": 0 }
+On 6 September the same check on EspaLuzWhatsApp returned "triage_applied": true,
+"rows_judged": 29, "findings_cleared": 48. So the reviewer cleared 48 false positives
+yesterday and judged nothing today.
 
-Nothing is "validated". Every remaining finding is a raw pattern or heuristic hit.
+One of those findings is mine, and I will own it: atlas-captures reports 44 IBANs. It
+holds no bank details. They are Meta Ad Library ids I had briefly prefixed with "id" —
+and "ID" is Indonesia's country code, so they took on an IBAN shape. Reverted the same
+hour.
 
-The same check on 6 September, on ElenaRevicheva/EspaLuzWhatsApp, returned:
+WHAT I REMOVED, BRIEFLY
 
-  "triage_applied": true
-  "rows_judged": 29
-  "rows_rejected": 16
-  "findings_cleared": 48
+A committed WhatsApp session store (378 files, 180 MB), runtime state keyed by real
+subscriber ids, 19 customer voice recordings, a customer's PayPal record, 23 files of
+private vendor correspondence, seven resume PDFs, and advertiser contact details inside
+captured ad copy. Also two live credentials your check did not flag, which I found
+myself — worth knowing, since a passing check is not the same as a clean repository.
 
-with the summary line "QC review rejected 48 detector finding(s) as false positives".
+ONE THING OUTSTANDING ON YOUR SIDE
 
-So yesterday the reviewer cleared 48 items on one repository, and today it judged zero
-rows on three.
+The earliest uploads still hold two database credentials. They are rotated, but rotation
+does not remove copies. Could you purge or quarantine those snapshots?
 
-ONE OF THOSE FINDINGS IS MINE, AND I WILL OWN IT
-
-ElenaRevicheva/atlas-captures reports 44 IBAN findings. That repository is two files and
-holds no bank details of any kind. The matches are Meta Ad Library ids — 15-digit public
-identifiers — which I had briefly prefixed with "id" while trying to stop them
-registering as phone numbers. "ID" is Indonesia's ISO country code, so the prefix gave
-every one of them the shape of an IBAN. My mistake, reverted the same hour.
-
-It is also a fair illustration of the problem below. I only discovered it by reading the
-report, because I have no way to know in advance what the detector will object to.
-
-TWO QUESTIONS, AND THEY DECIDE WHAT I DO NEXT
-
-1. Does a failing repository block only itself, or the whole listing?
-
-   Your note on 5 September said "if the repo failed PII check, it cannot be sell" —
-   repo, not listing. If only the repository is blocked, the five that pass are already
-   matchable and I will leave the listing as it stands. If the whole listing is blocked,
-   I will split the five passing repositories into their own listing today and hold the
-   other three back until this is resolved. I would rather ask you than rebuild on a
-   guess.
-
-2. Could you send the per-repo findings with the actual values or file locations, the
-   way you did on 5 September?
-
-   The report gives me types and counts but never a location. I have been inferring the
-   detectors from counts alone, and it has cost me four rounds: I removed things that
-   were not the problem, and twice replaced a real value with a placeholder the detector
-   counted just as readily. One list from you is worth more than another week of that.
-
-SOMETHING THAT MAY BE USEFUL TO YOU
-
-Re-attaching an asset does not refresh its stored snapshot. After I cleaned the files,
-the check still reported "314x <no_ext>, 8x .ldb" for a repository whose default branch
-held 136 files and none of those. Detaching the asset and adding it back changed
-nothing. Only building a brand-new listing produced a fresh capture.
-
-That is why there are four listings in my account. Not indecision — it was the only
-mechanism I could find that worked.
-
-STILL OUTSTANDING ON YOUR SIDE
-
-The earliest uploads still hold the two database credentials I described above. They are
-rotated now, but rotation does not remove copies. Could you purge or quarantine those
-snapshots?
-
-I will act on whatever the finding list says the same day it arrives. My HUD estimator
-point of $89,481 stays open for the package conversation once the quality side is
-settled.
+I will act on the finding list the same day it arrives.
 
 Best regards,
 
