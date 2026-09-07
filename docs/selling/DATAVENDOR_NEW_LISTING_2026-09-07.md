@@ -1,6 +1,6 @@
 # New DataVendor listing — built 7 Sep 2026, awaiting Elena's submit
 
-**Draft:** https://datavendor.ai/listings/35b705ff-4141-4c9d-bf10-777602ec1145/edit
+**Draft:** https://datavendor.ai/listings/35b705ff-4141-4c9d-bf10-777602ec1145  — saved, 8 assets, $74,851, awaiting **Submit for review**
 **Old listing (keep until the new one passes):** .../e568b5c8-2f86-41dc-8338-5e9778cd3443
 
 ## Why a new listing at all
@@ -42,19 +42,47 @@ Tag parity: AILA and AIPA_AITCF-licensed match the old listing exactly (verified
 edit screen). The other six were assigned from what each repo does — the old per-asset
 tags were not readable without navigating away and losing the draft.
 
-## ⚠️ Decide before submitting: AILA
+## ✅ AILA — resolved, merged 7 Sep
 
-`ElenaRevicheva/AILA` default branch holds **one file, README.md**. The content lives on
-the `docs` branch. The listing prices it at **$4,264** and describes it as a "paused
-life-assistant AI codebase with governed longitudinal memory".
+Elena chose to merge `docs` into `main` so the asset matches its description. Done, but
+**not as a plain merge** — git surfaced two conflicts and both sat exactly on a deliberate
+security decision from March 2026:
 
-A buyer who downloads it gets a README. This is very likely part of why `verify claims`
-fails. Three options, all Elena's call:
+- `2d358a7 security: remove schema specifics, domain enums, and criteria hints from public
+  docs` — replaced embedding dimensions, entity-type enums, unique-constraint details and
+  the three-layer model with vaguer prose.
+- `81554d6 Delete AELA_x_HIVE_INTEGRATION_NOTES.md` — removed that file from main entirely.
 
-1. Leave as is — same as the old listing, and it is the only asset that passes PII today.
-2. Merge `docs` into `main` so the asset matches the description — then it must be
-   PII-scanned first (`node scripts/pii-guard.cjs --listing` covers it).
-3. Drop AILA from the listing — total becomes $70,587.
+The `docs` branch still carried the **pre-scrub** text under the renamed path
+`docs/integrations/AILA_x_HIVE_INTEGRATION_NOTES.md`, so a naive merge would have silently
+undone both. Resolved to keep the March posture:
+
+- `README.md` → kept main's version, byte-identical to what it was before the merge.
+- `AILA_x_HIVE_INTEGRATION_NOTES.md` → stayed deleted. It documents integration with a
+  different product and is not needed for this asset to match its description.
+
+`origin/main` went from **1 file to 8**: the blueprint, entity store, judge, and the
+inheritance, symphony and marketing docs. Scanned before committing — **zero findings**;
+the one business address became the `[at]` form and the example DSN was already a
+`${DATABASE_URL}` placeholder. Merge commit `aa477b1`.
+
+Elena's working copy was never touched: it is still on `docs` with its one uncommitted
+`AILA_BLUEPRINT.md` change intact. The merge ran in a throwaway worktree, since removed.
+
+**The asset was then detached and re-attached in the draft** so DataVendor captured the new
+main — its card now reads `Updated 9/7/2026`, where before it read `4/2/2026`.
+
+## Proof the new captures are genuinely fresh
+
+The rebuilt listing shows LOC figures that only make sense post-cleanup:
+
+| asset | old listing | new draft |
+|---|---:|---:|
+| EspaLuzFamilybot | 28k LOC | **19k LOC** |
+| EspaLuzWhatsApp | 27k LOC | **26k LOC** |
+
+Those drops are the five stray `main.py` copies and the untracked runtime state. The old
+listing's archive never saw them go.
 
 ## Order of operations
 
