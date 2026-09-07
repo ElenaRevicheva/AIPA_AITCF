@@ -104,6 +104,28 @@ read when it lands is the `pii_qc_llm` blind-spot line for `EspaLuzWhatsApp`:
 
 **The old listing is still live and must stay that way until this one passes.**
 
+## 🔑 Submitting does NOT run the PII check — this is the trap
+
+Measured 7 Sep. After **Submit for review** finished, the panel read:
+
+    Quality checks
+    All mandatory checks passed
+    11 passed        10 mandatory
+    26 not gradable on this snapshot
+
+**Eleven passed, zero failed, and `pii_qc_llm` was not among them.** Submitting runs the
+**mandatory** set only. `pii_qc_llm`, `verify claims`, `verify rarity` and
+`codebase complexity` are **recommended** checks, and they do not start until the
+**Run recommended checks** button is pressed. That is a separate, second action.
+
+This is the same screen that was misread on 6 Sep as "it worked, zero failures". It was
+never a pass — it was an 11-of-115 run that had not reached the check that matters. A
+green panel with no `pii qc llm` row in it is not a result, it is an unfinished run.
+
+**Always check that `pii qc llm` appears by name before believing any verdict.**
+
+Pressed at 07:19 Panama; the panel then read `Quality checks running… 0 of 115 complete`.
+
 ## Order of operations
 
 1. Elena presses **Submit for review** on the draft.
