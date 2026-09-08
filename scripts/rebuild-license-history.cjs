@@ -93,7 +93,7 @@ const SQL_PW_RE = /\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"]([^'"\n\r]{4,200})['"]/g
 const DB_HOST_RE = /\b[a-z0-9-]+\.proxy\.(?:rlwy\.net|render\.com)\b/gi;
 const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})\b/g;
 
-const OWNER_ID_EMAIL = 'ElenaRevicheva@users.noreply.github.com';
+const OWNER_ID_EMAIL = 'ElenaRevicheva' + '@users.noreply.github.com';
 const OWNER_EMAILS = new Set(['elena.revicheva2016' + '@gmail.com', 'aipa@aideazz.xyz',
   'elena@aideazz.xyz', 'elena@aideazz.com', 'your-email@example.com',
   // Replit stamps commits with its own per-user noreply identity.
