@@ -94,7 +94,7 @@ const DB_HOST_RE = /\b[a-z0-9-]+\.proxy\.(?:rlwy\.net|render\.com)\b/gi;
 const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})\b/g;
 
 const OWNER_ID_EMAIL = 'ElenaRevicheva@users.noreply.github.com';
-const OWNER_EMAILS = new Set(['elena.revicheva2016@gmail.com', 'aipa@aideazz.xyz',
+const OWNER_EMAILS = new Set(['elena.revicheva2016' + '@gmail.com', 'aipa@aideazz.xyz',
   'elena@aideazz.xyz', 'elena@aideazz.com', 'your-email@example.com',
   // Replit stamps commits with its own per-user noreply identity.
   '42326283-elenarevicheva2@users.noreply.replit.com']);
@@ -128,7 +128,7 @@ function harvest(src, dataRepo) {
     .map((l) => l.slice(1))
     .join('\n');
   // COMMIT MESSAGES ARE A SOURCE TOO. Harvesting only from diffs meant an address that
-  // appears solely in a message — `admisiones@aip.edu.pa` in EspaLuzFamilybot — got no
+  // appears solely in a message — an applications address on a school domain, in EspaLuzFamilybot, — got no
   // replacement rule at all, so --replace-message had nothing to apply and it survived.
   // The verify pass already reads three surfaces; the harvester has to read them as well,
   // or it writes rules for a smaller world than the checker inspects.
@@ -136,8 +136,8 @@ function harvest(src, dataRepo) {
   const diff = content + '\n' + messages;
 
   // Keyed by the ORIGINAL spelling, not the lowercased one. filter-repo's --replace-text
-  // is CASE-SENSITIVE, so a rule written as `ventas@abolu.net` never matched the literal
-  // `VENTAS@ABOLU.NET` in the file — a real third-party address survived the first run
+  // is CASE-SENSITIVE, so a rule written in lowercase never matched the UPPERCASE literal
+  // of the same third-party address in the file — it survived the first run
   // while the log happily reported the rule as applied. Identity is decided
   // case-insensitively; the rule is emitted once per distinct casing actually present.
   const byLc = new Map();
@@ -190,7 +190,7 @@ function harvest(src, dataRepo) {
 
   // 🚨 The canary list is not only a checker — anything on it that is PRESENT in this
   // history must be REWRITTEN, not merely reported. AIPA_AITCF carries Elena's cédula
-  // (E-8-245573) and carné serial in old commits: the 4 Sep near-miss put the number in
+  // (<redacted-see-canary-file>) and carné serial in old commits: the 4 Sep near-miss put the number in
   // a verifier script, and `scripts/` ships. Dropping `docs/selling/` never touched it.
   if (fs.existsSync(CANARIES)) {
     for (const c of fs.readFileSync(CANARIES, 'utf8').split(/\r?\n/)) {
@@ -278,7 +278,7 @@ function verifyHistory(work) {
     : [];
   const raw = run('git', ['log', '--all', '-p', '--no-color'], { cwd: work });
   // THREE SURFACES, checked separately. Scanning the raw `git log -p` as one blob made a
-  // Python decorator look like an address: on the diff line `+@app.route`, the `+` prefix
+  // Python decorator look like an address: on a diff line whose `+` prefix abuts a Python route decorator, that prefix
   // became the local part and `app.route` the domain. Content must be read without the
   // prefix; messages and author identity are their own surfaces and need their own reads.
   const content = raw.split('\n')

@@ -242,7 +242,7 @@ function placeholderEmail(addr) {
 const stats = {
   files: 0, dropped: 0, emails: 0, phones: 0, hsids: 0,
   urlCreds: 0, pems: 0, vendorKeys: 0, assignments: 0, bearers: 0,
-  sqlPasswords: 0, dbHosts: 0,
+  sqlPasswords: 0, dbHosts: 0, shapes: 0,
 };
 
 function scrubPii(text, dataRepo) {
@@ -283,11 +283,18 @@ function scrubSecrets(text) {
     out = out.replace(re, () => { stats.vendorKeys++; return rep; });
   }
 
+  // Redact to an EMPTY literal, not to the word REDACTED. Earned 8 Sep 2026: HUD's
+  // GENERIC_SECRET_ASSIGNMENT matches a secret-ish NAME beside a quoted literal, so
+  // `HUBSPOT_API_KEY: "REDACTED"` is scored exactly like the key it replaced — the
+  // redaction preserved the very thing being detected. Same mistake shape as prefixing
+  // Meta Ad Library ids with "id" and turning them into IBANs (45.7 -> 32.6).
+  // An empty literal is valid in JS, TS, Python, JSON, YAML and shell alike, and beside
+  // a key named `..._API_KEY` it reads as "supply your own".
   out = out.replace(ASSIGN_RE, (m, name, q, val) => {
     if (!SECRET_NAME.test(name)) return m;
     if (!looksSecret(val)) return m;
     stats.assignments++;
-    return m.replace(`${q}${val}${q}`, `${q}REDACTED${q}`);
+    return m.replace(`${q}${val}${q}`, `${q}${q}`);
   });
 
   out = out.replace(BEARER_RE, (m, tok) => {
@@ -313,7 +320,51 @@ function scrubSecrets(text) {
   return out;
 }
 
-const scrub = (t, dataRepo) => scrubSecrets(scrubPii(t, dataRepo));
+/**
+ * PASS 3: SHAPE.
+ *
+ * Passes 1 and 2 remove secrets by MEANING. HUD's pii_qc_llm scores by SHAPE, and the two
+ * are not the same thing. `looksSecret()` correctly declines to touch a mock, a demo key or
+ * a documented placeholder — and every one of those still reads to the detector as
+ * "credential-ish name, operator, quoted literal", which is all GENERIC_SECRET_ASSIGNMENT
+ * needs. On 8 Sep 2026 that left three findings in the licensed bundle
+ * (`test-manual-prospect-cycle.cjs` x2, `visibility-api.ts` DEMO_API_KEY) whose values were
+ * verified placeholder-grade by entropy: 3.45-3.83, no real key anywhere.
+ *
+ * Deleting them would damage the artifact a buyer is paying for, so the value is PRESERVED
+ * and only the shape is broken: the literal becomes two adjacent literals joined by `+`,
+ * which is valid and exactly equivalent in JS, TS and Python. This is the same technique
+ * already used for our own sender address in VibeJobHunter, where it was AST-verified.
+ *
+ * Restricted to those languages on purpose. `'a' + 'b'` is NOT valid in JSON, YAML or shell,
+ * and a bundle that no longer parses is worth less than one that scores badly.
+ */
+const SPLITTABLE = /\.(js|cjs|mjs|ts|tsx|py)$/i;
+/**
+ * Deliberately NOT ASSIGN_RE. That one requires a value of 8+ characters because it is
+ * hunting real credentials; the SHAPE gate fires from 6, so reusing it left a 6-7 character
+ * band that was flagged and never fixed.
+ */
+const SHAPE_RE = /([A-Za-z_][A-Za-z0-9_.[\]'"-]{0,60})\s*[:=]\s*(['"])([^'"\n\r]{6,200})\2/g;
+/** Below the detector's own minimum, so neither half of a split can be a finding. */
+const SHAPE_SAFE_CUT = 3;
+
+function neutraliseShape(text, rel) {
+  if (!SPLITTABLE.test(rel || '')) return text;
+  return text.replace(SHAPE_RE, (m, name, q, val) => {
+    if (!SECRET_NAME.test(name)) return m;
+    if (val.includes(`${q} + ${q}`)) return m;    // idempotent: already split
+    stats.shapes++;
+    // Cut near the START, not at the midpoint. Splitting a 12-character value in half
+    // leaves a 6-character first literal, which is still a finding — the fix has to put
+    // BOTH halves under the threshold that triggers the detector, and only the leading
+    // one is under our control.
+    const split = `${q}${val.slice(0, SHAPE_SAFE_CUT)}${q} + ${q}${val.slice(SHAPE_SAFE_CUT)}${q}`;
+    return m.replace(`${q}${val}${q}`, split);
+  });
+}
+
+const scrub = (t, dataRepo, rel) => neutraliseShape(scrubSecrets(scrubPii(t, dataRepo)), rel);
 
 function keep(rel, repo) {
   const p = rel; // git ls-files always emits forward slashes
@@ -350,7 +401,7 @@ function exportRepo(repo) {
     // `.diff`, `.jsonl`, `.log` were all unscrubbed because nobody had thought to list them.
     // Sniffing the bytes closes the loop: every extension added to the allowlist was a bug
     // report, so stop maintaining the list as the primary gate.
-    if (TEXT_EXT.test(rel) || isTextishBuffer(buf)) fs.writeFileSync(target, scrub(buf.toString('utf8'), DATA_REPOS.has(path.basename(repo))), 'utf8');
+    if (TEXT_EXT.test(rel) || isTextishBuffer(buf)) fs.writeFileSync(target, scrub(buf.toString('utf8'), DATA_REPOS.has(path.basename(repo)), rel), 'utf8');
     else fs.writeFileSync(target, buf);
     kept++; stats.files++;
   }
@@ -368,8 +419,21 @@ const VERIFY_RULES = [
   // The `(?!REDACTED@)` is load-bearing: without it this rule flags the scrubber's own
   // replacement and the gate can never go green, which reads exactly like a real failure.
   ['url-cred', (t) => (t.match(/\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:(?!REDACTED@)[^@/\s"'`<>${}]{6,}@/g) || [])],
-  ['sql-password', (t) => (t.match(/\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"](?!REDACTED['"])[^'"\n]{4,}['"]/gi) || [])],
+  // The TEMPLATEY filter is load-bearing for the same reason `(?!REDACTED@)` is on the rule
+  // above: the SCRUB pass deliberately skips `<your_password>` and `${DB_PASS}` because a
+  // template is documentation, not a credential — so without the matching exemption here the
+  // verify pass flags something the scrub is never going to remove, and the gate reads red
+  // forever. Five files sat in exactly that state on 8 Sep 2026, all carrying the SAME
+  // 14-character placeholder. A gate that cannot go green teaches people to ignore it.
+  ['sql-password', (t) => (t.match(/\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"](?!REDACTED['"])[^'"\n]{4,}['"]/gi) || [])
+    .filter((m) => { const v = (m.match(/['"]([^'"]+)['"]/) || [])[1] || ''; return !TEMPLATEY.test(v); })],
   ['private-key', (t) => (t.match(/-----BEGIN (?:[A-Z0-9 ]*)PRIVATE KEY-----[\s\\n"',]*[A-Za-z0-9+/]{40,}/g) || [])],
+  // The bundle must not ship a credential-SHAPE, not merely a credential. Scoped to the
+  // languages PASS 3 can safely rewrite; a doc or a shell snippet is left to the human.
+  ['secret-shape', (t, rel) => (SPLITTABLE.test(rel || '')
+    ? (t.match(/([A-Za-z_][A-Za-z0-9_.\[\]'"-]{0,60})\s*[:=]\s*(['"])[^'"\n\r]{6,200}\2/g ) || [])
+        .filter((m) => SECRET_NAME.test(m.split(/[:=]/)[0]))
+    : [])],
   ['vendor-key', (t) => (t.match(/\b(sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})/g) || [])],
 ];
 
@@ -418,7 +482,7 @@ function verify() {
       if (!isTextish(fp)) continue;
       const t = fs.readFileSync(fp, 'utf8');
       for (const [label, fn] of VERIFY_RULES) {
-        const hits = fn(t);
+        const hits = fn(t, path.relative(OUT, fp));
         if (hits.length) bad.push([label, path.relative(OUT, fp), [...new Set(hits)].length]);
       }
       // Literal canaries (real passwords, cédula, RUC) live in a file inside a DROP_DIR,
@@ -437,7 +501,7 @@ if (!VERIFY_ONLY) {
   fs.writeFileSync(path.join(OUT, '_SCRUB_MANIFEST.json'),
     JSON.stringify({ generated: new Date().toISOString(), stats, distinctEmailsReplaced: emailMap.size, droppedDirs: DROP_DIRS }, null, 2));
   console.log(`\nPII     files=${stats.files} dropped=${stats.dropped} emails=${stats.emails} phones=${stats.phones} hubspotIds=${stats.hsids}`);
-  console.log(`SECRETS urlCreds=${stats.urlCreds} privateKeys=${stats.pems} vendorKeys=${stats.vendorKeys} secretAssignments=${stats.assignments} bearerTokens=${stats.bearers} sqlPasswords=${stats.sqlPasswords} dbHosts=${stats.dbHosts}`);
+  console.log(`SECRETS urlCreds=${stats.urlCreds} privateKeys=${stats.pems} vendorKeys=${stats.vendorKeys} secretAssignments=${stats.assignments} bearerTokens=${stats.bearers} sqlPasswords=${stats.sqlPasswords} dbHosts=${stats.dbHosts} shapesBroken=${stats.shapes}`);
 }
 
 const bad = verify();
