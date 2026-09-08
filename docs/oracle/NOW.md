@@ -131,6 +131,40 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 8 Sep — DataVendor: the listing is **NOT blocked**. STOP cleaning PII.
+
+**Megan Chang (Customer Operation Lead) answered both questions in writing:**
+
+1. *"A failing repository does not block the entire listing as long as the listing passes
+   mandatory QC checks. Once your listing is published, it has full visibility in our
+   inventory."* → **Do NOT split the five passing repos into their own listing.** That plan
+   is cancelled. All eight stay on `d04a6a03-1276-443f-9460-68f982307651`.
+2. *"I checked your current listing, and everything looks good! … our QC tool can sometimes
+   flag false positives. We are actively improving the tool and plan to launch a new version
+   in the next few days."* → **No finding list is coming, and none is needed.**
+
+🚫 **Do NOT run another PII cleaning round.** Evidence, not optimism:
+`node scripts/pii-guard.cjs --listing` reports **0 findings on all 8 assets** (re-verified
+8 Sep). The three "failures" returned `triage_applied: false` / `rows_judged: 0` — the
+reviewer that cleared 48 false positives on 6 Sep never ran on them, so every remaining
+finding is a raw pattern hit. Cleaning against a detector its own vendor is replacing is
+exactly how the IBAN round happened (score 45.7 → 32.6). The remaining binary blind spots
+are **images** — architecture diagrams, screenshots, a QR code. `atlas-captures` has zero
+binaries and still failed; `EspaLuz_Influencer` carries 43 and passes. Binaries are not the
+cause. Removing marketing screenshots would degrade the thing being sold.
+
+**Hansel Tantohari's "buyers can't see your listing" is STALE — do not act on it.** It is a
+sequenced newsletter (Unsubscribe/Exclude footer) from `hud-data-services.com`, not Megan's
+`hud.ai`/`datavendor.ai`; its original is dated 4 Sep, *before* the new listing; and it
+self-cancels: *"If you've already cleaned and re-uploaded, ignore this."* Megan is the human
+who actually looked. When two sources conflict, the one who checked the artifact wins.
+
+**Whose move: Elena's** — send `docs/selling/drafts/megan-reply-2026-09-08.txt`.
+**Still open on HUD's side (Megan did not answer):** purge/quarantine the earliest uploads,
+which still hold two **rotated** database credentials. Rotation does not remove copies.
+**The money is now on the DEMAND side, not QC.** "We will keep you posted" is passive; the
+reply asks what makes a listing match faster. A live listing with no buyer motion earns $0.
+
 ### 📖 8 Sep — atuona.xyz is a book, and it is **LIVE**. Nothing pending.
 
 **Whose move: Elena's, and only on the optional items below.** The work is shipped.
