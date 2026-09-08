@@ -83,10 +83,18 @@ const HUD = {
   // the fetch option `credentials:'same-origin'`, which is not a secret in any sense. A
   // guard that fires on ordinary code gets switched off, and a switched-off guard
   // protects nothing.
-  GENERIC_SECRET_ASSIGNMENT: /(?<![A-Za-z0-9])(?:password|passwd|pwd|secret|api_?key|access_?token|auth_?token|client_?secret|token)(?![A-Za-z0-9])\s*[:=]\s*["'][^"'\n]{6,}["']/gi,
+  GENERIC_SECRET_ASSIGNMENT: /(?<![A-Za-z0-9])(?:password|passwd|pwd|secret|api_?key|access_?token|auth_?token|client_?secret|token)(?![A-Za-z0-9])[ \t]*[:=][ \t]*["'][^"'\n]{6,}["']/gi,
   // HUD reports this separately from the assignment shape, at `heuristic` provenance:
   // a secret-ish keyword sitting next to a value of any kind, quoted or not.
-  SECRET_SECRET_KEYWORD: /(?<![A-Za-z0-9])(?:secret|passphrase|private_?key)(?![A-Za-z0-9])\s*[:=]\s*[^\s,;)\]}]{4,}/gi,
+  //
+  // ⚠️ Both detectors use [ \t]* around the operator, NOT \s*. `\s` matches a NEWLINE, so
+  // `\s*` let a match jump from the end of one line to the start of the next: Python's
+  //     if not OUTREACH_SECRET:
+  //         headers["Authorization"] = ...
+  // scored as a finding whose "value" was the following line. Three of the last four
+  // findings across the eight assets were that, and nothing else. An assignment lives on
+  // one line; a detector that spans lines invents findings that no fix can remove.
+  SECRET_SECRET_KEYWORD: /(?<![A-Za-z0-9])(?:secret|passphrase|private_?key)(?![A-Za-z0-9])[ \t]*[:=][ \t]*[^\s,;)\]}]{4,}/gi,
 };
 
 /**
@@ -127,6 +135,10 @@ const HUD_EXEMPT = {
     const v = valueOf.keyword(m);
     return /(process\.env|os\.getenv|os\.environ|getenv\s*\(|\$\()/i.test(v)  // env READ
       || /[<>`]/.test(v)                                                      // template/markup
+      // A value containing a call or a brace is an EXPRESSION, not a credential literal:
+      // `_env.get('OUTREACH_SECRET')`, `key_path.read_text(...)`, `${SECRET}`, `{'SET'`.
+      // Nobody's key contains a parenthesis.
+      || /[({]/.test(v)
       // `secret: string`, `secret: clientSecret` — a code reference, not a literal.
       // The no-digit and length conditions are load-bearing: without them an UNQUOTED
       // real value in .env.example style (`SECRET=hunter2xyzlivevalue`) reads as a bare
