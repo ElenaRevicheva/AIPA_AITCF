@@ -73,7 +73,20 @@ const HUD = {
   PHONE_NUMBER: /(?<![\w+.-])\+\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w.-])/g,
   URL_WITH_CREDENTIALS: /\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:[^@/\s"'`<>${}]{4,}@/g,
   AUTHORIZATION_BEARER_TOKEN: /\bBearer\s+[A-Za-z0-9._~+/=-]{20,}/g,
-  GENERIC_SECRET_ASSIGNMENT: /\b(?:password|passwd|secret|api_?key|access_?token|auth_?token|client_?secret)\b\s*[:=]\s*["'][^"'\n]{8,}["']/gi,
+  // ⚠️ Boundaries are (?<![A-Za-z0-9]) / (?![A-Za-z0-9]), NOT \b. Earned 8 Sep 2026.
+  // `\b` treats `_` as a word character, so `\bsecret\b` can never match inside
+  // PAYPAL_CLIENT_SECRET and `\bapi_?key\b` can never match inside OPENAI_API_KEY —
+  // which is how every environment variable on earth is written. This scanner reported
+  // 0 findings for three repos while HUD reported 1, 6 and 10. Underscore must be a
+  // separator here, not a letter. Do not "simplify" these back to \b.
+  // `credentials` is deliberately NOT a keyword here: its overwhelmingly common use is
+  // the fetch option `credentials:'same-origin'`, which is not a secret in any sense. A
+  // guard that fires on ordinary code gets switched off, and a switched-off guard
+  // protects nothing.
+  GENERIC_SECRET_ASSIGNMENT: /(?<![A-Za-z0-9])(?:password|passwd|pwd|secret|api_?key|access_?token|auth_?token|client_?secret|token)(?![A-Za-z0-9])\s*[:=]\s*["'][^"'\n]{6,}["']/gi,
+  // HUD reports this separately from the assignment shape, at `heuristic` provenance:
+  // a secret-ish keyword sitting next to a value of any kind, quoted or not.
+  SECRET_SECRET_KEYWORD: /(?<![A-Za-z0-9])(?:secret|passphrase|private_?key)(?![A-Za-z0-9])\s*[:=]\s*[^\s,;)\]}]{4,}/gi,
 };
 
 /** Reserved documentation domains — what HUD's triage clears as placeholder noise. */
