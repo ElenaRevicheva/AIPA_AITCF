@@ -131,105 +131,67 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 📖 7 Sep — atuona.xyz is a book now. BUILT + VERIFIED, **NOTHING IS LIVE.**
+### 📖 8 Sep — atuona.xyz is a book, and it is **LIVE**. Nothing pending.
 
-**Whose move: Elena's — one word, "deploy". Everything else is done and proven.**
+**Whose move: Elena's, and only on the optional items below.** The work is shipped.
 
-> **⏸ PAUSED 7 Sep ~21:00 UTC, Elena asleep. Read this block before touching anything.**
+> **⏸ PAUSED 8 Sep ~18:35 UTC, at Elena's request. Deployment is COMPLETE — do not
+> re-run the deploy steps from the 7 Sep version of this block; they are gone for a
+> reason.**
 >
-> **DONE** — Vault tree (PART I ATUONA #047–#099 / PART II LITPROM #001–#046, newest
-> first, named rows, 145,617px → 5,870px), first-person DNA section, nav
-> `VAULT · DNA · MANIFEST · FILM STUDIO · MINT`, content lock + 10/10 guard suite,
-> mint switched from DOM position to card identity, and BOTH publisher write paths
-> hardened (24/24).
+> **DONE — shipped to production and verified on the live site.**
+> · Vault as a book: PART I ATUONA (#047–#099) / PART II LITPROM (#001–#046), newest
+>   first, each poem a **named** row opening in place. **145,617px → 5,870px (96% shorter).**
+> · All 99 poems stay in the DOM collapsed with CSS — 134,184 verse chars still readable
+>   by answer engines. `.nojs` = everything open. Permalink per poem (`/#p045`) + find box.
+> · First-person **DNA** section; nav `VAULT · DNA · MANIFEST · FILM STUDIO · MINT`.
+> · Vault noun `moment` → **`fragment`** in all 58 places, from one file (`lib/words.mjs`).
+> · Type: **Syne** display / **Geologica** titles / **Geist Mono** verse + labels, tight
+>   display tracking, tabular numerals. DNA body set identically to `.nft-verse`.
+> · **Mint now keys on card identity, not DOM position.**
+> · Publisher (`atuona-creative-ai.ts`) can no longer lose a poem quietly.
+> · Facts corrected: `Fleek Deployed` → **`4everland Deployed`**; footer year → **2026**.
+> · **KEPT ON PURPOSE:** the glitch, moving symbols, red glow, gradient logo, all colours,
+>   and poem #099's title. See §7.
 >
-> **NEXT — two moves, IN THIS ORDER. Bot before site, always.**
-> 1. **Oracle**: `scp` compiled `dist/atuona-vault-tree.js` + `dist/atuona-creative-ai.js`
->    → `pm2 restart cto-aipa --update-env` → grep `dist/` for `VAULT:INSERT:ATUONA` and
->    check process start time is newer than the file.
-> 2. **Site**: `git push origin main` in `D:\aideazz\atuona` (3 commits) → wait 90–180s
->    → verify live: 99 rows, `#p045` lands, DNA section, 99 mint ids correct.
+> **VERIFIED BY — on https://atuona.xyz, not on a local build.**
+> `99 rows · 0 mispaired mints · 99 MINT slots · 134,184 verse chars · glitch textGlitch
+> running · DNA paragraph and poem verse both Geist Mono 14.08px/24.2176px · badges
+> IPFS / 4everland / Polygon / thirdweb · footer 2026`.
+> Bundle `assets/main-k9-fkyJZ.js` unchanged before and after — **only index.html moved**.
+> Guards: `npm run verify` (atuona) 10/10 · `npm run test:atuona-vault` (cto-aipa) 24/24 ·
+> baseline audit **NOTHING LOST** across 2,667 text lines.
+> Oracle: `dist/atuona-vault-tree.js` + `dist/atuona-creative-ai.js` scp'd, `pm2 restart
+> cto-aipa --update-env`, process start 25s newer than the files, old `closePattern`
+> splice gone (grep = 0).
 >
-> Never one without the other: site-only = the next daily poem silently vanishes
-> (old bot, new markup); bot-only = it throws on a marker that is not there yet.
+> **NEXT — all optional, none blocking. Elena's call.**
+> 1. #099's *description* still repeats `Could not generate content.` and its first line
+>    is the scaffolding `The translation:` — the title is deliberate, these two are not.
+> 2. Footer year is typed, so it goes stale again in January. ~4 lines to generate it.
+> 3. litprom.ru bio still reads "Gallery of Moments Creator" — her login, her edit.
+> 4. **This session earned a wiki chapter and has not been written.** Named failure mode:
+>    *position is not identity*. Verified numbers are all in this block. Standing rule
+>    (`feedback_auto_publish_wiki_blog`) says publish without asking — deferred only
+>    because she called the stop.
 >
-> **VERIFIED BY** — `npm run verify` (atuona) 10/10 · `npm run test:atuona-vault`
-> (cto-aipa) 24/24 · local `npm run build` produced `assets/main-k9-fkyJZ.js`, **byte-identical
-> hash to what atuona.xyz serves today** — so 4everland runs this exact build and the JS
-> bundle does not change at all; only `index.html` does. Reorder proof: a fully scrambled
-> page (vault starting 027, 028, 029) still minted **0 mispaired of 99**.
->
-> **RISK** —
-> · **4everland build minutes** read 800.02 min on 22 Aug with no quota page. If exhausted,
->   the push looks fine on GitHub and simply never rebuilds. Dashboard is Elena's
->   credential boundary. Tell: the live page does not change after ~3 min.
-> · **Poem #099 is titled `Could not generate content.`** — a generator refusal published as
->   art. It is ALREADY live, so it does not block the deploy. Retitling is Elena's call.
-> · Work is safe on GitHub branch **`vault-tree-and-dna`** (`5d48361`); `main` deliberately
->   untouched at `01f7db4`. 4everland deploys from `main` only, so the branch cannot deploy.
-> · Local clone `D:\aideazz\atuona` now exists (the resilience doc said none did) and has
->   been unshallowed to full history. `main` tracks `origin/main`.
+> **RISK / TRAPS**
+> · **`D:ideazztuona` now exists** — the resilience doc said no local checkout did.
+>   It is unshallowed, `main` tracks `origin/main`. Update the doc or the next agent
+>   clones a second copy.
+> · **index.html is GENERATED between markers** (`VAULT:TREE`, `DNA`, `TYPE`,
+>   `VAULT:INSERT:ATUONA`). Do not hand-edit those regions. `npm run vault:build`
+>   regenerates; `prebuild` runs it on every deploy, so a damaged page fails the build
+>   instead of shipping.
+> · **Any display face used for poem titles MUST cover Cyrillic.** Syne does not; 43
+>   Russian titles were silently falling back to Inter. That is why titles are Geologica.
+> · 4everland build minutes read 800.02 on 22 Aug with no quota page. If exhausted, a
+>   push looks fine on GitHub and simply never rebuilds. Tell: live page unchanged after
+>   ~3 min. Dashboard is Elena's credential boundary.
+> · Backups if anything must be undone: tag **`atuona-pre-vault-tree-20260907`**, branch
+>   `backup/atuona-pre-vault-tree-20260907`, local `_backups/atuona.pre-vault-tree.20260907-2035/`
+>   (md5-verified), Oracle `~/backups/atuona-vault-tree-20260908/`.
 
-**DONE.** The vault's 99 poems were one flat column — 145,617px tall, #045 forty-four
-poems down. Now PART I ATUONA (#047–#099) / PART II LITPROM (#001–#046), newest first,
-each poem a **named** row that opens in place. Page is **5,870px — 96% shorter**. Every
-poem stays in the DOM collapsed with CSS (134,184 verse chars readable by answer
-engines); `.nojs` = everything open. Permalink per poem (`/#p045`) + a find box.
-New first-person **DNA** section; nav is `VAULT · DNA · MANIFEST · FILM STUDIO · MINT`.
-
-- Local clone created: **`D:\aideazz\atuona`** (the resilience doc said none existed).
-- Commit `7687891` on `main` **local only — not pushed**.
-- Backups: `_backups/atuona.pre-vault-tree.20260907-2035/` (md5-verified) + GitHub tag
-  **`atuona-pre-vault-tree-20260907`** + branch `backup/atuona-pre-vault-tree-20260907`.
-- Generators: `scripts/{extract-poems,build-vault,build-dna}.mjs`, data in
-  `content/poems.json`. index.html is now **generated between markers — do not hand-edit.**
-
-**🔒 IRON-CLAD: `npm run verify` — 10/10.** Ground truth is `content/poems.lock.json`,
-a SHA-256 per poem over number/status/title/verse/badge/description/price/note/claim
-button, taken **from the git tag**, not from a working file. `verify-vault.mjs` fails
-closed and is wired into **`prebuild`**, so a damaged page cannot deploy — the build
-stops and the previous version keeps serving. `test-vault-guards.mjs` corrupts a copy
-nine ways (deleted stanza · retitled card · retitled contents row · altered row number ·
-two claim buttons swapped · mint reverted to DOM position · poem removed · no-JS
-fallback dropped · MINT slot lost) and asserts every one is rejected, plus one control
-that must still PASS (all 99 reordered, content untouched). **The suite found a real
-hole on its first run** — the verifier hashed only the card's `<h2>` and never checked
-the title shown in the contents row. Both row title and row number are now locked.
-Position-independence proven at runtime: a fully reordered page (vault starting 027,
-028, 029) minted **0 mispaired of 99**.
-
-**🚨 THE MINT WAS KEYED ON DOM POSITION.** `enhanceAllMintingButtons()` set every token id
-from `String(index + 1)` — the card's *index*, not its number. Correct only by luck while
-the cards sat in order. The first cut of the tree reordered them and wired poem **#045 to
-token 081**, **#099 to token 001**. Now reads the card's own `.nft-id` (what the hover
-handler 300 lines below already did). Behaviour-identical today, correct under any order.
-**Verified in Chrome: 0 mispaired of 99, 99 MINT slots, wallet + thirdweb mount intact.**
-
-**✅ PUBLISHER BLOCKER CLEARED (7 Sep).** `npm run test:atuona-vault` — **24/24** against
-the real `index.html`, using the compiled `dist/atuona-vault-tree.js` that runs on Oracle.
-
-- **ADD** aims at one marker `<!-- VAULT:INSERT:ATUONA -->` and **throws** when it is
-  absent, then proves the poem is on the page before building the commit.
-- **REPLACE** located a card's end by the same indentation literal — the tree broke it
-  outright. Now counts **div depth**, so indentation cannot matter again; throws instead
-  of logging "cannot replace" and committing an unchanged page.
-- **MINT slot** splice had the same shape; now fails loudly, so a poem can never be
-  claimable in the vault and missing from MINT.
-- Pure helpers moved to `src/atuona-vault-tree.ts` (no imports, no env) — requiring
-  `atuona-creative-ai.ts` boots the bot graph and dies on a missing `GROQ_API_KEY`, which
-  would have forced the test to re-implement the publisher.
-- `prebuild` is now the full `vault:build`, so **every deploy re-derives the tree** from
-  index.html (rows re-sorted, year headers and tallies recomputed) and then verifies.
-  A poem inserted slightly wrong is normalised; a destructive one fails the build.
-
-**Still unconfirmed: 4everland's build command.** The self-healing regeneration assumes it
-runs `npm run build`. `dist/` is gitignored and thirdweb is a bare import, so it must —
-but confirm in the 4everland dashboard before relying on it.
-
-**Also open:** poem **#099's title, description and claim label are the literal string
-`Could not generate content.`** — a generator refusal published as art (commit `01f7db4`).
-Retitling is Elena's call; the poem body itself is real. And **44 of 99 cards carry no
-`onclick` in the HTML** — harmless today because the runtime wires all 99 on load.
 
 ### 🔑 7 Sep — the GitHub token now lives in ONE place, and it shouts before it dies
 
