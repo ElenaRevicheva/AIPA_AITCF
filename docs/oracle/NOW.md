@@ -193,6 +193,50 @@ git log keeps the record.
 >   (md5-verified), Oracle `~/backups/atuona-vault-tree-20260908/`.
 
 
+### 🧬 8 Sep — 26 of the 99 NFT names are CORRUPTED on-chain. Root cause proven.
+
+**Whose move: Elena's — it needs her wallet. Diagnosis is finished; nothing else is blocked.**
+
+**Symptom:** some NFTs show in MetaMask with **no name and no text** (blank tile). Token 31
+is blank; token 29 (`Да, мой товарищ #030`) is fine.
+
+**Not the website.** Names come from IPFS CID `QmXheK9JHF52aNtFEUL2twzrTsSLSBmpNfVYGEpgpvZsgq`,
+burned into the contract (`tokenURI(31)` returns `ipfs://QmXheK.../31`). Predates the 8 Sep
+vault work; that deploy changed `index.html` only and left the JS bundle hash identical.
+
+**Root cause — a Windows-1252 round-trip during the original upload. Proven, not guessed:**
+
+```
+bytes destroyed in the names : 0x81  0x8F  0x90  0x9D
+Windows-1252 undefined bytes : 0x81  0x8D  0x8F  0x90  0x9D     <- exact match
+```
+
+Cyrillic is 2 bytes per letter. When the **trail** byte lands on one of those five, the letter
+is destroyed and becomes a lone surrogate, which MetaMask cannot render — so it draws nothing.
+Affected letters: **с Ё · э Ѝ · я Џ · А ѐ · Н ѝ**. `На сдачу` becomes `\udc9dа \udc81дачу`.
+
+**Where it did NOT happen:** all four source JSONs in the repo are clean (zero lone
+surrogates), and the generators write via Node `writeFileSync`, UTF-8 by default. The damage
+entered **between clean disk and IPFS pin** — a Windows shell/CLI step in the lazy-mint
+upload. `metadata/*.json` in the repo is a DIFFERENT, generic set ("Underground Poem #030"),
+not what is on chain.
+
+**Damaged (26 of 99), predicted from local titles — 16/16 of the ones the gateway served matched:**
+`#001 #006 #008 #011 #014 #015 #019 #020 #022 #025 #027 #028 #029 #031 #032 #034 #035 #036
+#039 #041 #045 #059 #090 #091 #093 #094`. The other 73 contain none of the five letters.
+
+**Fix (not started, needs her keys):** regenerate metadata from the clean repo titles, upload,
+repoint the contract. Contract ops are a credential boundary — an agent must not touch a live
+NFT contract. Verify any regeneration by scanning for code points U+DC80 to U+DCFF first.
+
+**Two traps this cost time on:**
+· `polygon-rpc.com` answers `{"error":"API key disabled, tenant disabled"}` — an error shaped
+  like data. Read as a result it says "no contract at this address", which is false. Use
+  `polygon-bor-rpc.publicnode.com` and check for an `error` key before trusting `result`.
+· **Never write a file in place.** `open(path,'w')` truncates before writing; an exception
+  mid-write leaves nothing. Write a temp file, then replace. This entry destroyed NOW.md once
+  (commit `83011bc`, restored in `c43974c`) by breaking that rule.
+
 ### 🔑 7 Sep — the GitHub token now lives in ONE place, and it shouts before it dies
 
 **DONE.** The token was in three places and expiring in two days with nothing on the box
