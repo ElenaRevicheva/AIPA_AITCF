@@ -208,6 +208,35 @@ Four detector bugs were fixed to get a trustworthy number. Each had made the sca
 4. **The guard flagged its own scrubber's output** (`user:REDACTED@`, `+50700000NN`), so
    the licensed repo could not be committed at all.
 
+## 🚨 8 Sep — the phone REDACTION was manufacturing PHONE_NUMBER findings
+
+Found by inspecting HUD's reported types one by one instead of trusting the local scan.
+HUD reported `PHONE_NUMBER` in two repos where `pii-guard` said **zero**. Cause:
+`build-license-bundle.cjs` replaced every phone with **`+50700000NN`** — a real-looking
+number, chosen so `wa.me/507…` stayed a valid link. That is still perfectly E.164-shaped,
+and HUD scores SHAPE. **14 distinct values across 6 files** in the licensed bundle.
+
+**Third instance of one mistake:** redacting a key to the word `REDACTED`; prefixing Ad
+Library ids with `id` and creating IBANs (45.7 → 32.6); and this. **A replacement that
+preserves the detected shape is not a redaction.** Now emits `[phone-redacted]`, with a
+`phone-e164` verify rule so the scrubber cannot reintroduce one.
+
+⚠️ **And I had made it invisible.** Hours earlier I added a `pii-guard` exemption waving
+`+50700000NN` through as "our own placeholder" — which is why the guard reported 0 phones
+while HUD reported findings. **REMOVED, and do not add it back.** Exempting your own
+output is only safe when that output carries NO shape: `user:REDACTED@` does not look like
+a credential; `+50700000NN` looks exactly like a phone.
+
+**Verified after the fix:** all eight assets **0 findings**; E.164 shapes in the licensed
+repo **0**; and a 10-case adversarial table confirms no exemption hides a real secret,
+phone, address or credentialled URL.
+
+**Residual, stated honestly:** `pii-guard`'s phone detector still requires a leading `+`,
+so `(507) 6670-7039` style numbers are not permanently guarded. A one-off separator-based
+sweep of all three failing repos returned **0** candidates, so nothing is hiding today —
+but that is a measurement, not a gate. Also note HUD's own reports show
+`"blind_spot_count": 0`, so the committed images are **not** costing anything.
+
 ## 🔒 8 Sep — PROVEN: "Re-run" does NOT refresh the snapshot. Only a NEW listing does.
 
 Measured, not inferred. `VibeJobHunterAIPA_AIMCF` was fixed and pushed to `origin/main`
