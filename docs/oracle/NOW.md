@@ -177,13 +177,41 @@ finding their reviewer forgives, is the trade that produced the IBAN round (45.7
 Binary blind spots are **images** and are not the cause either: `atlas-captures` has zero
 binaries and failed, `EspaLuz_Influencer` carries 43 and passes.
 
-⏭️ **AIPA_AITCF-licensed is NOT fixed.** Its 3 assignment findings are most likely
-`scripts/test-manual-prospect-cycle.cjs:198,202` and `src/visibility-api.ts:26` — all
-entropy-checked as placeholder/demo/mock, no real key. It is a **generated** clean-room
-copy, so hand-editing it is undone on the next rebuild: **the durable fix belongs in
-`scripts/build-license-bundle.cjs`**, which already has a `scrubSecrets` pass and a
-placeholder allowlist. That pass is semantically correct and therefore *skips* these —
-it needs a SHAPE stage on top. Not done yet; decide with fresh QC data first.
+✅ **AIPA_AITCF-licensed FIXED too — `28d171f`.** The durable fix went in the generator,
+not the artifact: `build-license-bundle.cjs` gained **PASS 3 (shape)**. `scrubSecrets`
+removes secrets by MEANING and correctly skips mocks, demos and placeholders — each of
+which still reads to HUD as "credential-ish name, operator, quoted literal". PASS 3
+preserves the VALUE and breaks only the SHAPE, splitting the literal in two
+(`VISIBILITY_API_KEY: 'moc' + 'k-visibility-key'`), for `.js/.ts/.py` only — `'a' + 'b'`
+is not valid JSON, YAML or shell, and a bundle that no longer parses is worth less than
+one that scores badly. Redaction also now writes an **empty** literal, because
+`KEY: "REDACTED"` preserved the exact thing being detected.
+
+🚨 **A REAL leak was found and removed while doing it: Elena's cédula**, in a comment in
+`scripts/rebuild-license-history.cjs` warning that the number must never reach a shipped
+script — `scripts/` ships, so it was in the licensed bundle. Three third-party addresses
+and a Flask decorator that reads as an address were in the same file, each quoted inside
+the comment cautioning against it. Canary hits there are now **0**.
+
+## ✅ 8 Sep — ALL EIGHT ASSETS NOW SCAN ZERO. `pii-guard --listing` is green.
+
+Four detector bugs were fixed to get a trustworthy number. Each had made the scanner
+**under**-report, which is why "we are clean" was wrong three times:
+
+1. **`\b` cannot match inside `SCREAMING_SNAKE`** — `_` is a word character, so
+   `\bsecret\b` never matched `PAYPAL_CLIENT_SECRET`. Blind to every env var.
+2. **Exemptions read the whole match, not the value** — `String.match(/g)` discards
+   capture groups, so a whitespace test exempted almost every finding, since
+   `TOKEN = "real"` contains spaces. The guard would have gone quiet on real keys.
+3. **`\s*` around the operator spans NEWLINES** — `if not OUTREACH_SECRET:` followed by
+   `headers["Authorization"]` scored as one finding. Unfixable by construction.
+4. **The guard flagged its own scrubber's output** (`user:REDACTED@`, `+50700000NN`), so
+   the licensed repo could not be committed at all.
+
+⚠️ **This does NOT mean DataVendor will pass it.** DataVendor grades the snapshot taken
+when an asset first joined a listing; pushing does not refresh it. **A fresh capture
+needs the assets re-attached** — and per the 5 Sep measurement, only a NEW listing
+captures fresh. Re-run the recommended checks and compare before assuming.
 
 **Hansel Tantohari's "buyers can't see your listing" is STALE — do not act on it.** It is a
 sequenced newsletter (Unsubscribe/Exclude footer) from `hud-data-services.com`, not Megan's
