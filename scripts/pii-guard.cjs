@@ -103,22 +103,44 @@ const HUD = {
  *    own triage cleared exactly this class as false positives when it ran;
  *  - a value carrying whitespace, a template, or a documented placeholder is documentation.
  */
+/**
+ * ⚠️ These receive the WHOLE match, not the value — `String.match` with /g returns full
+ * matches and discards capture groups. Getting that wrong once meant `secret: string` was
+ * never exempted (the test saw "secret: string", not "string") and, worse, that a
+ * whitespace test on the assignment shape exempted almost EVERY finding, because
+ * `TOKEN = "real"` contains spaces. Always narrow to the value first.
+ */
+const valueOf = {
+  /** `NAME = "value"` / `NAME:'value'` → value */
+  assignment: (m) => (m.match(/["']([^"']*)["']\s*$/) || [, ''])[1],
+  /** `secret: whatever` → whatever */
+  keyword: (m) => m.split(/[:=]/).slice(1).join(':').trim(),
+};
+
 const HUD_EXEMPT = {
-  URL_WITH_CREDENTIALS: (v) => /:REDACTED@$/.test(v),
-  AUTHORIZATION_BEARER_TOKEN: (v) => /^Bearer\s+[A-Z0-9_]+$/.test(v),
+  URL_WITH_CREDENTIALS: (m) => /:REDACTED@$/.test(m),
+  AUTHORIZATION_BEARER_TOKEN: (m) => /^Bearer\s+[A-Z0-9_]+$/.test(m),
   // The bundler rewrites every phone to `+50700000NN`. Flagging its own synthetic
   // placeholder is the same self-inflicted red gate as `user:REDACTED@`.
-  PHONE_NUMBER: (v) => /^\+50700000\d{2}$/.test(v),
-  SECRET_SECRET_KEYWORD: (v) =>
-    /(process\.env|os\.getenv|os\.environ|getenv\s*\(|\$\()/i.test(v)   // env READ
-    || /[<>`]/.test(v)                                                  // template / markup
-    || /^[A-Za-z_$][A-Za-z0-9_$.]*$/.test(v)                            // `secret: string`,
-                                                                        // `secret: clientSecret`
-                                                                        // — a code reference,
-                                                                        // not a literal
-    || /your[_-]|change[_-]?me|placeholder|example|redacted/i.test(v),
-  GENERIC_SECRET_ASSIGNMENT: (v) =>
-    /\s/.test(v) || /[${}<>]/.test(v) || /x{4,}|\.{3}|your[_-]|change[_-]?me|placeholder|example|redacted/i.test(v),
+  PHONE_NUMBER: (m) => /^\+50700000\d{2}$/.test(m),
+  SECRET_SECRET_KEYWORD: (m) => {
+    const v = valueOf.keyword(m);
+    return /(process\.env|os\.getenv|os\.environ|getenv\s*\(|\$\()/i.test(v)  // env READ
+      || /[<>`]/.test(v)                                                      // template/markup
+      // `secret: string`, `secret: clientSecret` — a code reference, not a literal.
+      // The no-digit and length conditions are load-bearing: without them an UNQUOTED
+      // real value in .env.example style (`SECRET=hunter2xyzlivevalue`) reads as a bare
+      // identifier and gets waved through. Credentials carry digits; type names do not.
+      || (/^[A-Za-z_$][A-Za-z0-9_$.]*$/.test(v) && !/\d/.test(v) && v.length <= 24)
+      || /your[_-]|change[_-]?me|placeholder|example|redacted/i.test(v);
+  },
+  GENERIC_SECRET_ASSIGNMENT: (m) => {
+    const v = valueOf.assignment(m);
+    if (!v) return false;
+    return /\s/.test(v)                          // a sentence, not a key
+      || /[${}<>]/.test(v)                       // template
+      || /x{4,}|\.{3}|your[_-]|change[_-]?me|placeholder|example|redacted/i.test(v);
+  },
 };
 
 /** Reserved documentation domains — what HUD's triage clears as placeholder noise. */
