@@ -130,9 +130,44 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 📖 7 Sep — atuona.xyz is a book now. BUILT + VERIFIED LOCALLY, **NOT DEPLOYED.**
+### 📖 7 Sep — atuona.xyz is a book now. BUILT + VERIFIED, **NOTHING IS LIVE.**
 
-**Whose move: Elena's** (approve the deploy) **then the agent's** (fix the publisher first).
+**Whose move: Elena's — one word, "deploy". Everything else is done and proven.**
+
+> **⏸ PAUSED 7 Sep ~21:00 UTC, Elena asleep. Read this block before touching anything.**
+>
+> **DONE** — Vault tree (PART I ATUONA #047–#099 / PART II LITPROM #001–#046, newest
+> first, named rows, 145,617px → 5,870px), first-person DNA section, nav
+> `VAULT · DNA · MANIFEST · FILM STUDIO · MINT`, content lock + 10/10 guard suite,
+> mint switched from DOM position to card identity, and BOTH publisher write paths
+> hardened (24/24).
+>
+> **NEXT — two moves, IN THIS ORDER. Bot before site, always.**
+> 1. **Oracle**: `scp` compiled `dist/atuona-vault-tree.js` + `dist/atuona-creative-ai.js`
+>    → `pm2 restart cto-aipa --update-env` → grep `dist/` for `VAULT:INSERT:ATUONA` and
+>    check process start time is newer than the file.
+> 2. **Site**: `git push origin main` in `D:\aideazz\atuona` (3 commits) → wait 90–180s
+>    → verify live: 99 rows, `#p045` lands, DNA section, 99 mint ids correct.
+>
+> Never one without the other: site-only = the next daily poem silently vanishes
+> (old bot, new markup); bot-only = it throws on a marker that is not there yet.
+>
+> **VERIFIED BY** — `npm run verify` (atuona) 10/10 · `npm run test:atuona-vault`
+> (cto-aipa) 24/24 · local `npm run build` produced `assets/main-k9-fkyJZ.js`, **byte-identical
+> hash to what atuona.xyz serves today** — so 4everland runs this exact build and the JS
+> bundle does not change at all; only `index.html` does. Reorder proof: a fully scrambled
+> page (vault starting 027, 028, 029) still minted **0 mispaired of 99**.
+>
+> **RISK** —
+> · **4everland build minutes** read 800.02 min on 22 Aug with no quota page. If exhausted,
+>   the push looks fine on GitHub and simply never rebuilds. Dashboard is Elena's
+>   credential boundary. Tell: the live page does not change after ~3 min.
+> · **Poem #099 is titled `Could not generate content.`** — a generator refusal published as
+>   art. It is ALREADY live, so it does not block the deploy. Retitling is Elena's call.
+> · Work is safe on GitHub branch **`vault-tree-and-dna`** (`5d48361`); `main` deliberately
+>   untouched at `01f7db4`. 4everland deploys from `main` only, so the branch cannot deploy.
+> · Local clone `D:\aideazz\atuona` now exists (the resilience doc said none did) and has
+>   been unshallowed to full history. `main` tracks `origin/main`.
 
 **DONE.** The vault's 99 poems were one flat column — 145,617px tall, #045 forty-four
 poems down. Now PART I ATUONA (#047–#099) / PART II LITPROM (#001–#046), newest first,
