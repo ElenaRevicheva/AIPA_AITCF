@@ -105,6 +105,7 @@ agent that pauses without one has lost the work, even if the code is committed.
 
 | Thing | Why it is like that |
 |---|---|
+| **atuona.xyz poem #099 is titled `Could not generate content.`** | **KEPT ON PURPOSE — Elena's call, 8 Sep 2026.** It started as a real generator refusal published as the artwork's name. She likes it: an error string as the title of a poem about a model that could not generate. Do not "fix" it, and do not let a retry overwrite it. Its *description* field still repeats the same string and its first line is the scaffolding `The translation:` — those are open, and hers to decide. |
 | **Wellfound returns 0 / dormant** | Its private GraphQL API changed. Not scraped harder on purpose — re-guessing a private endpoint every release is a treadmill, not a source. |
 | **YC Work at a Startup not scraped** | Its `/jobs` page *is* public and easy to parse. YC's ToS forbids automated extraction. robots.txt allowing ≠ ToS permission. |
 | **agentic-engineering-jobs.com not wired** | Newest posting 33 days old, 91% past its own expiry. Rejected on measurement. |
