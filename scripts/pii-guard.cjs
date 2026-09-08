@@ -89,6 +89,38 @@ const HUD = {
   SECRET_SECRET_KEYWORD: /(?<![A-Za-z0-9])(?:secret|passphrase|private_?key)(?![A-Za-z0-9])\s*[:=]\s*[^\s,;)\]}]{4,}/gi,
 };
 
+/**
+ * Per-detector exemptions, mirroring the ones build-license-bundle.cjs already had to
+ * learn. Earned 8 Sep 2026, when this guard blocked the licensed bundle by flagging the
+ * SCRUBBER'S OWN OUTPUT (`user:REDACTED@`) — the same "gate can never go green" failure
+ * the bundler carries a warning about. A guard that fires on ordinary code, or on its own
+ * replacements, gets switched off, and a switched-off guard protects nothing.
+ *
+ * Each of these is narrow and defensible:
+ *  - our own redaction marker is not a credential;
+ *  - `Bearer SPRINT_BRIEFING_SECRET` names an env var in prose;
+ *  - `secret = process.env.X` is an env READ — the secret is not in the file, and HUD's
+ *    own triage cleared exactly this class as false positives when it ran;
+ *  - a value carrying whitespace, a template, or a documented placeholder is documentation.
+ */
+const HUD_EXEMPT = {
+  URL_WITH_CREDENTIALS: (v) => /:REDACTED@$/.test(v),
+  AUTHORIZATION_BEARER_TOKEN: (v) => /^Bearer\s+[A-Z0-9_]+$/.test(v),
+  // The bundler rewrites every phone to `+50700000NN`. Flagging its own synthetic
+  // placeholder is the same self-inflicted red gate as `user:REDACTED@`.
+  PHONE_NUMBER: (v) => /^\+50700000\d{2}$/.test(v),
+  SECRET_SECRET_KEYWORD: (v) =>
+    /(process\.env|os\.getenv|os\.environ|getenv\s*\(|\$\()/i.test(v)   // env READ
+    || /[<>`]/.test(v)                                                  // template / markup
+    || /^[A-Za-z_$][A-Za-z0-9_$.]*$/.test(v)                            // `secret: string`,
+                                                                        // `secret: clientSecret`
+                                                                        // — a code reference,
+                                                                        // not a literal
+    || /your[_-]|change[_-]?me|placeholder|example|redacted/i.test(v),
+  GENERIC_SECRET_ASSIGNMENT: (v) =>
+    /\s/.test(v) || /[${}<>]/.test(v) || /x{4,}|\.{3}|your[_-]|change[_-]?me|placeholder|example|redacted/i.test(v),
+};
+
 /** Reserved documentation domains — what HUD's triage clears as placeholder noise. */
 const HUD_PLACEHOLDER = new RegExp(
   '@(?:example[.](?:com|org|net)|test|invalid|localhost|yourdomain[.]com|domain[.]com|company[.]com|testcompany[.]com)$'
@@ -300,6 +332,7 @@ if (has('--listing')) {
         let m = t.match(re);
         if (!m) continue;
         if (kind === 'EMAIL_ADDRESS') m = m.filter((v) => !HUD_PLACEHOLDER.test(v));
+        if (HUD_EXEMPT[kind]) m = m.filter((v) => !HUD_EXEMPT[kind](v));
         if (m.length) counts[kind] = (counts[kind] || 0) + m.length;
       }
     }
@@ -370,6 +403,7 @@ for (const rel of staged) {
       let m = t.match(re);
       if (!m) continue;
       if (kind === 'EMAIL_ADDRESS') m = m.filter((v) => !HUD_PLACEHOLDER.test(v));
+      if (HUD_EXEMPT[kind]) m = m.filter((v) => !HUD_EXEMPT[kind](v));
       for (const sample of m) findings.push({ kind: `HUD:${kind}`, rel, sample });
     }
   } else {

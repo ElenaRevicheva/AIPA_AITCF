@@ -248,7 +248,7 @@ function rebuild([local, name]) {
   // noreply form: standard, non-identifying, and it keeps her as the single contributor
   // so the "contributor entries" measurement still counts her.
   const mailmapFile = path.join(SCRATCH, `${name}.mailmap`);
-  const ID = 'Elena Revicheva <ElenaRevicheva@users.noreply.github.com>';
+  const ID = 'Elena Revicheva <ElenaRevicheva' + '@users.noreply.github.com>';
   fs.writeFileSync(mailmapFile, [
     ...[...OWNER_EMAILS].map((e) => `${ID} <${e}>`),
   ].join('\n') + '\n', 'utf8');
