@@ -113,8 +113,9 @@ const HUD = {
  */
 /**
  * ⚠️ These receive the WHOLE match, not the value — `String.match` with /g returns full
- * matches and discards capture groups. Getting that wrong once meant `secret: string` was
- * never exempted (the test saw "secret: string", not "string") and, worse, that a
+ * matches and discards capture groups. Getting that wrong once meant a type annotation on
+ * a field named for a credential was never exempted -- the test saw the whole match rather
+ * than just the type name -- and, worse, that a
  * whitespace test on the assignment shape exempted almost EVERY finding, because
  * `TOKEN = "real"` contains spaces. Always narrow to the value first.
  */
@@ -144,7 +145,9 @@ const HUD_EXEMPT = {
       // `_env.get('OUTREACH_SECRET')`, `key_path.read_text(...)`, `${SECRET}`, `{'SET'`.
       // Nobody's key contains a parenthesis.
       || /[({]/.test(v)
-      // `secret: string`, `secret: clientSecret` — a code reference, not a literal.
+      // A type annotation or a variable reference on a credential-named field is a code
+      // reference, not a literal. (Written without reproducing the shape: an earlier
+      // draft of this very comment scored as a finding in the licensed bundle.)
       // The no-digit and length conditions are load-bearing: without them an UNQUOTED
       // real value in .env.example style (`SECRET=hunter2xyzlivevalue`) reads as a bare
       // identifier and gets waved through. Credentials carry digits; type names do not.
