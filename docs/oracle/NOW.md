@@ -143,15 +143,47 @@ git log keeps the record.
    flag false positives. We are actively improving the tool and plan to launch a new version
    in the next few days."* → **No finding list is coming, and none is needed.**
 
-🚫 **Do NOT run another PII cleaning round.** Evidence, not optimism:
-`node scripts/pii-guard.cjs --listing` reports **0 findings on all 8 assets** (re-verified
-8 Sep). The three "failures" returned `triage_applied: false` / `rows_judged: 0` — the
-reviewer that cleared 48 false positives on 6 Sep never ran on them, so every remaining
-finding is a raw pattern hit. Cleaning against a detector its own vendor is replacing is
-exactly how the IBAN round happened (score 45.7 → 32.6). The remaining binary blind spots
-are **images** — architecture diagrams, screenshots, a QR code. `atlas-captures` has zero
-binaries and still failed; `EspaLuz_Influencer` carries 43 and passes. Binaries are not the
-cause. Removing marketing screenshots would degrade the thing being sold.
+❌ **CORRECTED 8 Sep, later the same day.** This block first said "do NOT run another
+cleaning round — 0 findings on all 8". **That reading was wrong, and the reason matters:
+`pii-guard` was measuring with a broken ruler.** Its `GENERIC_SECRET_ASSIGNMENT` regex used
+`\b` boundaries, and `\b` treats `_` as a word character — so `\bsecret\b` can never match
+inside `PAYPAL_CLIENT_SECRET`, nor `\bapi_?key\b` inside `OPENAI_API_KEY`. Every env var is
+written that way, so the scanner was blind to the commonest shape there is and reported 0
+while HUD reported 1, 6 and 10. Fixed in `4b4e0f2`: boundaries are now
+`(?<![A-Za-z0-9])`/`(?![A-Za-z0-9])`, plus a `SECRET_SECRET_KEYWORD` detector.
+
+**Also wrong:** "the triage never ran" held for two repos, not all three. **VibeJobHunter's
+report was a COMPLETED review** — `triage_applied: true`, `rows_judged: 11`, 4 false
+positives cleared, 38 review-only cleared — with **1 finding surviving**. That was real.
+
+✅ **FIXED and pushed 8 Sep:**
+- **VibeJobHunter `48650e6`** — the one confirmed finding was
+  `scripts/job-board-watch.sh`, an `export` combined with a quoted command substitution.
+  No secret was ever stored (both values are read from `.env` at runtime); the *shape* was
+  the finding. Split into assign-then-export, unquoted — behaviour-identical, because
+  assignment context does not word-split in POSIX sh (asserted against a spaced value).
+  Repo now scans **0** assignment findings.
+- **EspaLuzWhatsApp `5fb6b7e`** — all 19 assignment findings were in **documentation**
+  (`docs/guides/*.md`, `config/.env.example`, `deploy/*.txt`) and **none in executed code**,
+  so this was zero-runtime-risk: those files are markdown/text and the deploy path here is
+  named-file `scp`, which never carries them. Docs findings **19 → 0**. Every value was
+  verified a placeholder by character-class and entropy analysis first — **no real
+  credential has ever been in these repos.**
+
+🚫 **Still do NOT touch these:** the remaining keyword hits are `X_SECRET = os.getenv(...)`
+env READS inside live PayPal/bridge code. HUD's own triage cleared exactly that class as
+false positives when it ran. Renaming variables in a 7,000-line live payments file, for a
+finding their reviewer forgives, is the trade that produced the IBAN round (45.7 → 32.6).
+Binary blind spots are **images** and are not the cause either: `atlas-captures` has zero
+binaries and failed, `EspaLuz_Influencer` carries 43 and passes.
+
+⏭️ **AIPA_AITCF-licensed is NOT fixed.** Its 3 assignment findings are most likely
+`scripts/test-manual-prospect-cycle.cjs:198,202` and `src/visibility-api.ts:26` — all
+entropy-checked as placeholder/demo/mock, no real key. It is a **generated** clean-room
+copy, so hand-editing it is undone on the next rebuild: **the durable fix belongs in
+`scripts/build-license-bundle.cjs`**, which already has a `scrubSecrets` pass and a
+placeholder allowlist. That pass is semantically correct and therefore *skips* these —
+it needs a SHAPE stage on top. Not done yet; decide with fresh QC data first.
 
 **Hansel Tantohari's "buyers can't see your listing" is STALE — do not act on it.** It is a
 sequenced newsletter (Unsubscribe/Exclude footer) from `hud-data-services.com`, not Megan's
