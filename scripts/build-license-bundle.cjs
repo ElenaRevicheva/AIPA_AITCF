@@ -258,8 +258,17 @@ function scrubPii(text, dataRepo) {
     if (digits.length < 9 || digits.length > 15) return m;
     if (DATEISH.test(digits)) return m;
     stats.phones++;
-    // Preserve the original +/no-+ shape so `wa.me/507…` stays a valid link.
-    return `${plus}50700000${String(stable(m, 100)).padStart(2, '0')}`;
+    // ⚠️ This used to return `${plus}50700000NN`, preserving the +/no-+ shape so that
+    // `wa.me/507…` stayed a valid-looking link. That was the bug. A synthetic number is
+    // still PERFECTLY E.164-SHAPED, and HUD's pii_qc_llm scores shape, not meaning — so
+    // the redaction manufactured exactly the finding it existed to remove. 14 distinct
+    // values across 6 files in the licensed bundle, reported back to us as PHONE_NUMBER.
+    // Identical mistake to redacting a key to the literal word REDACTED, and to prefixing
+    // Meta Ad Library ids with "id" and turning them into IBANs (45.7 -> 32.6).
+    // A buyer loses nothing: a fake number is no more useful to them than a marker, and
+    // the marker is honest about what happened. Matches the `[contact-redacted]`
+    // convention already used by the Atlas capture cron.
+    return '[phone-redacted]';
   });
   return out;
 }
@@ -434,6 +443,10 @@ const VERIFY_RULES = [
     ? (t.match(/([A-Za-z_][A-Za-z0-9_.\[\]'"-]{0,60})\s*[:=]\s*(['"])[^'"\n\r]{6,200}\2/g ) || [])
         .filter((m) => SECRET_NAME.test(m.split(/[:=]/)[0]))
     : [])],
+  // No E.164 may survive in the bundle -- including one this scrubber wrote itself.
+  // The old phone replacement was a real-looking number, so the gate stayed green while
+  // HUD counted every one of them.
+  ['phone-e164', (t) => (t.match(/(?<![\w+.-])\+\d{1,3}[ .-]?\(?\d{2,4}\)?[ .-]?\d{3,4}[ .-]?\d{3,4}(?![\w.-])/g) || [])],
   ['vendor-key', (t) => (t.match(/\b(sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})/g) || [])],
 ];
 

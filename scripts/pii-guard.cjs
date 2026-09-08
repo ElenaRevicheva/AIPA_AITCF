@@ -128,9 +128,14 @@ const valueOf = {
 const HUD_EXEMPT = {
   URL_WITH_CREDENTIALS: (m) => /:REDACTED@$/.test(m),
   AUTHORIZATION_BEARER_TOKEN: (m) => /^Bearer\s+[A-Z0-9_]+$/.test(m),
-  // The bundler rewrites every phone to `+50700000NN`. Flagging its own synthetic
-  // placeholder is the same self-inflicted red gate as `user:REDACTED@`.
-  PHONE_NUMBER: (m) => /^\+50700000\d{2}$/.test(m),
+  // ❌ NO PHONE_NUMBER EXEMPTION. There was one here for a few hours on 8 Sep — it waved
+  // through the bundler's own `+50700000NN` replacement as "our placeholder". That was
+  // backwards. A synthetic number is still perfectly E.164-shaped, HUD scores SHAPE, and
+  // 14 distinct ones were sitting in the licensed bundle being counted as PHONE_NUMBER
+  // findings while this guard reported zero. Exempting your own output is only safe when
+  // that output carries NO shape — `user:REDACTED@` does not look like a credential, but
+  // `+50700000NN` looks exactly like a phone. The bundler now emits `[phone-redacted]`,
+  // so there is nothing to exempt. Do not add this back.
   SECRET_SECRET_KEYWORD: (m) => {
     const v = valueOf.keyword(m);
     return /(process\.env|os\.getenv|os\.environ|getenv\s*\(|\$\()/i.test(v)  // env READ
