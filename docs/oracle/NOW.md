@@ -208,10 +208,30 @@ Four detector bugs were fixed to get a trustworthy number. Each had made the sca
 4. **The guard flagged its own scrubber's output** (`user:REDACTED@`, `+50700000NN`), so
    the licensed repo could not be committed at all.
 
-⚠️ **This does NOT mean DataVendor will pass it.** DataVendor grades the snapshot taken
-when an asset first joined a listing; pushing does not refresh it. **A fresh capture
-needs the assets re-attached** — and per the 5 Sep measurement, only a NEW listing
-captures fresh. Re-run the recommended checks and compare before assuming.
+## 🔒 8 Sep — PROVEN: "Re-run" does NOT refresh the snapshot. Only a NEW listing does.
+
+Measured, not inferred. `VibeJobHunterAIPA_AIMCF` was fixed and pushed to `origin/main`
+(commit `48650e6`, repo scans **0** locally), then its `pii qc llm` was re-run from the
+listing page:
+
+| | before re-run | after re-run |
+|---|---|---|
+| score | 55 | **45.7** |
+| findings remaining | 1 | **5** |
+| `triage_applied` | true | **false** |
+| `rows_judged` | 11 | **0** |
+| `findings_cleared` | 4 | 0 |
+
+**1 remaining + 4 cleared = 5 raw findings. The re-run reports 5 raw findings.** The
+graded artifact is byte-identical; the score moved only because their triage stage ran
+the first time and not the second. The fix never reached what they grade.
+
+➡️ **Therefore: pushing to GitHub cannot fix a listing. Re-attaching inside a listing
+cannot either. Build a NEW listing to force a fresh capture.** Do not spend another
+round cleaning against a snapshot — it is frozen at the moment the asset first joined.
+
+⚠️ Their triage is also **non-deterministic**: same artifact, 55 one run and 45.7 the
+next, purely on whether the reviewer stage executed. A single run is not a measurement.
 
 **Hansel Tantohari's "buyers can't see your listing" is STALE — do not act on it.** It is a
 sequenced newsletter (Unsubscribe/Exclude footer) from `hud-data-services.com`, not Megan's
