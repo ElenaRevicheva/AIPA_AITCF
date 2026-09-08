@@ -1,0 +1,49 @@
+TO: Megan Chang, Customer Operation Lead (hud.ai / datavendor.ai)
+RE: AI tech + marketing co-founders — 8 private production repos
+DATE: 8 September 2026
+
+---
+
+Hi Megan,
+
+Thank you — that answers both questions, and it changes what I do next.
+
+Since a failing repository does not block the listing, I am NOT splitting the five
+passing repositories into a separate listing. I will leave all eight where they are.
+
+I am also holding off on another cleaning round until your new QC version ships. All
+eight repositories currently scan clean against the same detector shapes your report
+uses, and the three failures all came back with "triage_applied": false and
+"rows_judged": 0 — the reviewer stage that cleared 48 false positives on 6 September
+did not run on them at all. Cleaning against that would mean removing things that are
+not the problem, which has already cost me two rounds. Tell me when the new version is
+live and I will re-run it the same day.
+
+One item from my last note is still open on your side, and it is the only one I cannot
+fix myself:
+
+  The earliest uploads still contain two database credentials. They are rotated, so
+  they no longer work, but rotation does not remove the copies. Could you purge or
+  quarantine those earlier snapshots?
+
+And one question, since the listing is now fully visible:
+
+  Is there anything I can add that makes a listing match faster on the demand side —
+  fuller documentation, a sample extract, clearer licence terms, specific tags? I would
+  rather prepare it now than wait.
+
+Best regards,
+
+Elena Revicheva
+AIdeazz AI Lab
+
+---
+OPTIONAL — two lines to Hansel, only to stop the sequence:
+
+Hi Hansel,
+
+Already cleaned and re-uploaded — the new listing is d04a6a03. Megan confirmed on
+7 September that it passes mandatory QC and is fully visible, so nothing is blocked.
+
+Best,
+Elena
