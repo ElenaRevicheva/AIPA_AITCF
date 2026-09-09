@@ -320,7 +320,15 @@ function harvest(src, dataRepo) {
     while ((g = gr.exec(diff)) !== null) {
       const q = g[1], val = g[2];
       if (/[${}<>]/.test(val)) continue;                 // template, not a literal
-      shapes.set(g[0], g[0].replace(q + val + q, q + 'xx' + q));
+        // A credential contains no spaces. Without this the pattern spans TWO separate
+        // quote pairs in a shell pipeline -- grep -E '^X_SECRET=' .env | tr -d '\\r'
+        // reads as SECRET= followed by a long quoted value, and replacing it produced
+        // BROKEN SHELL in the licensed copy. Spaces mean it is not one literal.
+        if (/\s/.test(val)) continue;
+        // Empty, not a short token: the keyword rule needs four characters after the
+        // operator and 'xx' is four WITH the quotes, so it tripped that rule -- the fix
+        // creating a finding, again. An empty literal clears both thresholds.
+      shapes.set(g[0], g[0].replace(q + val + q, q + q));
     } }
   for (const re of [URL_CRED_RE, SQL_PW_RE]) {
     let m; re.lastIndex = 0;
