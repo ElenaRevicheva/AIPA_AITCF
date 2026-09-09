@@ -32,8 +32,23 @@ Mario Cuezzo posted `@channel` in `titan-proton-preonboarding-5`:
 Also: Hubstaff access may disappear temporarily during the screener changes.
 **That is expected and is not a fault.**
 
-**Actions:** check Hubstaff for any tracked time on Titan Proton and delete it.
-Do not track again until micro1 says onboarding has officially started.
+**✅ VERIFIED CLEAN 9 Sep 12:31** — Hubstaff desktop app checked. Timer
+`00:00:00` and not running · `Today: 0:00` · `Weekly: 0:00 / 40:00` · project row
+`Trainer | Project Prism -- Titan Proton` (Micro1 Inc.) shows `0:00`. **Nothing was
+tracked, so nothing needed erasing.** She is compliant and can say so if asked.
+
+**Then QUIT the Hubstaff app** rather than leaving it open and authenticated. The
+play button is one accidental click from the termination risk above. Remove the
+hazard instead of relying on remembering — a forcing function, same principle as
+the fail-closed publishing gate. Reopen only when micro1 says onboarding started.
+
+**Useful detail from the app:** micro1 has set a **40 h/week cap** on this project.
+A ceiling, not a promise of hours — but at $80/hour a full week is $3,200 and a
+full semi-monthly cycle about $6,400. Her $3,500/month floor is cleared by roughly
+eleven hours a week.
+
+**Exact project name for any support message:** `Trainer | Project Prism -- Titan
+Proton`, org `Micro1 Inc.` Her role is **Trainer**.
 
 **⚠️ `titan-proton-preonboarding-5` is ANNOUNCE-ONLY** — "Only certain people can
 post in this channel." Questions must go by DM (Brandon Rodrigues has a micro1
