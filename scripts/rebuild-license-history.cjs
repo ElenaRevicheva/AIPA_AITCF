@@ -147,6 +147,10 @@ const FIXED_RULES = [
   // is still an IP, which is exactly how our phone placeholder became 299 findings.
   'literal:170.9.242.90==>REDACTED_HOST',
   'literal:163.192.99.45==>REDACTED_HOST',
+  // The same address with its dots written as underscores, because that is how it
+  // appears inside a FILENAME -- and a filename is a surface of its own.
+  'literal:170_9_242_90==>REDACTED_HOST',
+  'literal:163_192_99_45==>REDACTED_HOST',
 ];
 
 /** `*.log` is runtime noise everywhere EXCEPT a data repo, where the log is the product. */
@@ -499,9 +503,25 @@ function rebuild([local, name]) {
   // --replace-text touches BLOBS ONLY. Her address survived in 33 Co-Authored-By trailers
   // until --replace-message was added: three different surfaces carry an email (author
   // metadata, commit message, file content) and each needs its own instrument.
-  console.log('   pass 2/2  rewriting blobs and commit messages…');
-  run('python', [FR, '--replace-text', rulesFile, '--replace-message', rulesFile, '--force'],
-    { cwd: work, stdio: 'pipe' });
+  // A PATH is a surface too, and it is the fourth one. `--replace-text` rewrites blob
+  // content, `--replace-message` rewrites commit messages, `--mailmap` rewrites author
+  // identity -- and none of them touch a filename. The Oracle address survived the first
+  // people-layer run inside `ORACLE_<addr>_PRODUCT_METRICS_REPORT.md`, with its dots
+  // written as underscores. Renaming needs its own instrument.
+  // Built FROM the same literals rather than restated, and restricted to patterns that
+  // are safe in a path, so the rename and the redaction can never disagree.
+  const nameSafe = FIXED_RULES
+    .map((r) => r.split('==>'))
+    .filter(([pat]) => pat.startsWith('literal:'))
+    .map(([pat, rep]) => [pat.slice(8), rep])
+    .filter(([lit]) => /^[A-Za-z0-9._-]+$/.test(lit));
+  const renameBody = 'return filename' + nameSafe
+    .map(([lit, rep]) => `.replace(b${JSON.stringify(lit)}, b${JSON.stringify(rep)})`)
+    .join('');
+
+  console.log('   pass 2/2  rewriting blobs, commit messages and filenames…');
+  run('python', [FR, '--replace-text', rulesFile, '--replace-message', rulesFile,
+    '--filename-callback', renameBody, '--force'], { cwd: work, stdio: 'pipe' });
 
   const after = run('git', ['rev-list', '--count', 'HEAD'], { cwd: work }).trim();
   console.log(`   commits: ${before} → ${after}`);
@@ -644,6 +664,20 @@ function verifyHistory(work) {
     .filter((x) => x && (custDirRe.test(x)
       || (custRe.test(x) && /[.](json|jsonl|csv|db|sqlite3?)([.][A-Za-z-]+)?$/i.test(x))));
   if (cust.length) bad.customerRecords = [...new Set(cust)].slice(0, 5);
+
+  // Fourth surface, gated: a redacted literal surviving inside a PATH.
+  // Derived from FIXED_RULES, not a generic address shape -- a generic one flags
+  // `WhatsApp Image 2025-09-15 at 14.15.27_92d791cd.jpg`, where the four groups are
+  // a clock, not an address. Precision beats reach in a gate that must stay trusted.
+  const pathLits = FIXED_RULES
+    .map((r) => r.split('==>')[0])
+    .filter((pat) => pat.startsWith('literal:'))
+    .map((pat) => pat.slice(8))
+    .filter((lit) => /^[A-Za-z0-9._-]+$/.test(lit));
+  const ipPaths = run('git', ['rev-list', '--objects', '--all'], { cwd: work })
+    .split(String.fromCharCode(10)).map((l) => l.slice(41))
+    .filter((x) => x && pathLits.some((lit) => x.includes(lit)));
+  if (ipPaths.length) bad.addressInPath = [...new Set(ipPaths)].slice(0, 3);
 
   return bad;
 }
