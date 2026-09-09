@@ -95,7 +95,7 @@ const LOG_GLOB = '*.log';
 // an EMAIL_ADDRESS finding -- AILA-licensed scored 7 of them, all `aipa@`. The working
 // repos keep the real address because the product sends from it; the licensed COPY
 // must not carry it.
-const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com)$/i;
+const SAFE_EMAIL = /^$/;   // deliberately matches nothing — see the note above
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const PHONE_RE = /(?<![\w+-])(\+?)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
 // The pattern above requires a 2-4 digit group after the country code, so a single-digit
@@ -111,6 +111,10 @@ const URL_CRED_RE = /\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:([^@/\s"'`<>
 // the SHAPE, and 40 survived the 9 Sep rewrite because nothing harvested them.
 const JWT_RE = /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{0,86}/g;
 const BEARER_TOK_RE = /\bBearer\s+([A-Za-z0-9._~+/=-]{20,})/g;
+// URL_CRED_RE excludes $ { } from the password, so `postgresql://u:${DB_PASSWORD}@host`
+// never matches it and the collapse below never fired. HUD's detector has no such
+// exclusion. This one is used ONLY to strip the credential segment, never to redact.
+const URL_CRED_SHAPE_RE = /\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:[^\s"'`<>@]{2,256}@/g;
 const SQL_PW_RE = /\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"]([^'"\n\r]{4,200})['"]/gi;
 const DB_HOST_RE = /\b[a-z0-9-]+\.proxy\.(?:rlwy\.net|render\.com)\b/gi;
 const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})\b/g;
@@ -285,7 +289,7 @@ function harvest(src, dataRepo) {
   // the finding, and a template password does not soften it. looksSecret() rightly
   // refuses to redact a ${VAR}, so instead collapse the credential segment away and keep
   // a URL the buyer can still read.
-  { let m; const cr = new RegExp(URL_CRED_RE.source, 'g');
+  { let m; const cr = new RegExp(URL_CRED_SHAPE_RE.source, 'g');
     while ((m = cr.exec(diff)) !== null) {
       const seg = m[0];                                  // scheme://user:pass@
       const at = seg.lastIndexOf('@');
