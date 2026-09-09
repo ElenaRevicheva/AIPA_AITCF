@@ -112,6 +112,49 @@ function die(m) { console.error(`\n✖ ${m}`); process.exit(1); }
  * filter-repo would apply a raw pattern with no length or date check, and those checks are
  * the only thing separating a phone number from a version string or an epoch timestamp.
  */
+/**
+ * Every blob in every ref, streamed in bounded chunks.
+ *
+ * EARNED 9 Sep 2026. Both harvest() and verifyHistory() read `git log --all -p`, which
+ * emits DIFF TEXT and omits binary files entirely. HUD's scanner reads RAW BLOBS. So the
+ * gate went green on a mirror whose history still carried 611 addresses, 258 phone
+ * numbers, 40 JWTs and 88 bearer tokens - every one inside content that `-p` never
+ * printed.
+ *
+ * Same mistake this file already records about commit messages, one level deeper:
+ * harvesting from a smaller surface than the checker inspects writes rules for a smaller
+ * world. Read blobs, not diffs.
+ */
+function forEachBlobChunk(src, onChunk, capBytes = 12 * 1024 * 1024, per = 120) {
+  let shas;
+  try {
+    shas = run('git', ['rev-list', '--all', '--objects'], { cwd: src })
+      .split(String.fromCharCode(10)).map((l) => l.slice(0, 40))
+      .filter((x) => /^[0-9a-f]{40}$/.test(x));
+  } catch { return 0; }
+  if (!shas.length) return 0;
+  const NL = String.fromCharCode(10);
+  const keep = [];
+  try {
+    const check = execFileSync('git', ['cat-file', '--batch-check=%(objectname) %(objecttype) %(objectsize)'],
+      { cwd: src, input: shas.join(NL), maxBuffer: 1 << 28 }).toString();
+    for (const line of check.split(NL)) {
+      const parts = line.split(' ');
+      if (parts[1] === 'blob' && Number(parts[2]) > 0 && Number(parts[2]) <= capBytes) keep.push(parts[0]);
+    }
+  } catch { return 0; }
+  let bytes = 0;
+  for (let i = 0; i < keep.length; i += per) {
+    try {
+      const out = execFileSync('git', ['cat-file', '--batch'],
+        { cwd: src, input: keep.slice(i, i + per).join(NL), maxBuffer: 1 << 29 });
+      bytes += out.length;
+      onChunk(out.toString('utf8'));
+    } catch { /* skip an unreadable batch rather than abort the rebuild */ }
+  }
+  return bytes;
+}
+
 function harvest(src, dataRepo) {
   const emails = new Map();
   const phones = new Set();
@@ -133,7 +176,7 @@ function harvest(src, dataRepo) {
   // The verify pass already reads three surfaces; the harvester has to read them as well,
   // or it writes rules for a smaller world than the checker inspects.
   const messages = run('git', ['log', '--all', '--format=%B'], { cwd: src });
-  const diff = content + '\n' + messages;
+  const corpus = content + '\n' + messages;
 
   // Keyed by the ORIGINAL spelling, not the lowercased one. filter-repo's --replace-text
   // is CASE-SENSITIVE, so a rule written in lowercase never matched the UPPERCASE literal
@@ -141,6 +184,7 @@ function harvest(src, dataRepo) {
   // while the log happily reported the rule as applied. Identity is decided
   // case-insensitively; the rule is emitted once per distinct casing actually present.
   const byLc = new Map();
+  const absorb = (diff) => {
   for (const m of diff.match(EMAIL_RE) || []) {
     if (SAFE_EMAIL.test(m)) continue;
     // `postgresql://user:pass@host` and doc placeholders like `...:...@...railway.app`
@@ -199,7 +243,13 @@ function harvest(src, dataRepo) {
     }
   }
 
-  return { emails, phones, secrets, bytes: diff.length };
+  };
+
+  absorb(corpus);
+  // ...and now the surface the checker actually inspects.
+  const blobBytes = forEachBlobChunk(src, absorb);
+
+  return { emails, phones, secrets, bytes: corpus.length + blobBytes };
 }
 
 function writeReplacements(file, { emails, phones, secrets }) {
@@ -316,6 +366,42 @@ function verifyHistory(work) {
   if (creds.length) bad.credUrls = [...new Set(creds)].slice(0, 3);
   const hits = canaries.filter((c) => diff.includes(c));
   if (hits.length) bad.canaries = hits;
+
+  // ── THE SURFACE THE CHECKER MUST SHARE WITH HUD ────────────────────────────
+  // Everything above reads `git log -p`, which prints diff text and omits binary
+  // files. HUD reads raw blobs. On 9 Sep 2026 this gate was green while the mirror's
+  // history still held 611 addresses, 258 phones, 40 JWTs and 88 bearer tokens.
+  const blobEmails = new Set(), blobCreds = new Set(), blobCanaries = new Set();
+  const blobPhones = new Set();
+  const OURS = /^\+?50700000[0-9]{2}$/;                 // our own replacement value
+  forEachBlobChunk(work, (t) => {
+    for (const m of findEmails(t)) blobEmails.add(m);
+    const cre = new RegExp(credRe.source, 'g');
+    let bm;
+    while ((bm = cre.exec(t)) !== null) {
+      if (bm[1] === 'REDACTED' || /^contact[0-9]+$/i.test(bm[1]) || PW_PLACEHOLDER.test(bm[1])) continue;
+      blobCreds.add(bm[0]);
+    }
+    // Phones, with the SAME guards the harvester applies — otherwise version strings
+    // and epoch timestamps turn this gate permanently red and it gets ignored.
+    for (const m of t.match(PHONE_RE) || []) {
+      const d = m.replace(/[^0-9]/g, '');
+      if (d.length < 9 || d.length > 15) continue;
+      if (DATEISH.test(d)) continue;
+      if (/\s/.test(m)) continue;
+      if (d.length >= 13 && !m.startsWith('+')) continue;
+      if (/0{5,}$/.test(d)) continue;
+      if (/([0-9]){7,}/.test(d)) continue;
+      if (OURS.test(m.replace(/[^0-9+]/g, ''))) continue;
+      blobPhones.add(m);
+    }
+    for (const c of canaries) if (t.includes(c)) blobCanaries.add(c);
+  });
+  if (blobEmails.size) bad.emailsInBlobs = [...blobEmails].slice(0, 5);
+  if (blobCreds.size) bad.credUrlsInBlobs = [...blobCreds].slice(0, 3);
+  if (blobPhones.size) bad.phonesInBlobs = [...blobPhones].slice(0, 5);
+  if (blobCanaries.size) bad.canariesInBlobs = [...blobCanaries];
+
   return bad;
 }
 
