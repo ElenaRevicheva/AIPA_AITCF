@@ -131,6 +131,50 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🚨 9 Sep 21:xx UTC — THE PII GATE WAS NEVER ABOUT EMAILS. Two separate things broke.
+
+**Read this before touching the licensed mirrors again.** The 9 Sep resubmission failed
+`pii_qc_llm` on all eight assets with **score 0**, and score 0 is not a PII verdict.
+
+**Thing 1 — HUD's grader did not run.** Every one of the eight carries the same two
+findings: `scan.failed` (summary: *"unknown error"*) and `agent_triage.not_attempted`.
+The evaluator block says `scan_complete: false`, `triage_status: "scan_incomplete"`,
+`confidence: 0`, and in HUD's own words **"Scan failed; the verdict carries no
+evidence."** A 2-file, 815-LOC repo (AILA) failed identically to a 987-commit one, so
+size and packaging are not the cause. `repo_archive_ready` **passed on all eight**,
+which contradicts their own "fix the artifact URI or packaging" remediation text.
+
+**`pii_qc_llm` is `mandatory: false`.** The two mandatory checks — `pii_clean` and
+`repo_archive_ready` — both PASS. The panel says it plainly: *"You can skip the review
+only if all the mandatory checks are passing."* **A failed `pii_qc_llm` cannot block
+going live.**
+
+**Thing 2 — and this one IS ours.** Our scrubber only ever hunted emails, phone numbers,
+credentials and tokens. HUD's LLM check hunts **people**. A wide-net history scan found a
+whole layer we never looked at:
+
+| what | where | why it matters |
+|---|---|---|
+| **17 résumé PDFs/DOCX** | VibeJobHunter history | binary — `git log -p` omits it and our scrubber **skips NUL-containing blobs on purpose**, so every gate we built was blind to it |
+| ~10 résumé `.md` files | VJH, AIPA_AITCF, dragontrade | full name, employers, education |
+| `docs/clients/global-marine-carta-arrigo-whatsapp.txt` | AIPA_AITCF | real client correspondence — the listing terms say client material is **excluded** |
+| `docs/job-search/`, `JOB_SEARCH.md` | AIPA_AITCF, VJH | her personal job hunt |
+| Oracle's **public IP**, 246 occurrences | 5 mirrors, incl. `.github/workflows/` | CLAUDE.md §3 forbids publishing IPs |
+| her daughter's first name, 1,000+ hits | EspaLuz mirrors | a **minor's** name |
+
+**Checked and deliberately NOT touched — these are false positives and redacting them
+would destroy the product:** 9–11 digit numbers are Unix timestamps and Facebook Ad
+Library IDs, not chat ids (one "hit" was inside `uv.lock`); `YYYY-MM-DD` strings are
+snapshot dates — atlas-captures **is** a time series, its dates are the product;
+`@classmethod` `@dataclass` `@pytest` `@smithy` `@octokit` are decorators and npm scopes,
+so handle redaction must be a curated denylist, never a regex; lat/long pairs are Panama
+city centroids used for geo-targeting.
+
+**The named lesson: a scanner that cannot open a file format is not a clean result, it is
+an unmeasured one.** We excluded binary blobs to stop phantom findings and thereby built
+a gate that was structurally incapable of seeing seventeen copies of her résumé.
+
+
 ### ✅ 9 Sep — EIGHT MIRRORS CLEAN, THREE INDEPENDENT GATES. Ready to attach.
 
 | mirror | commits | github |

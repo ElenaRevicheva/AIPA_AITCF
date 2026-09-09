@@ -73,6 +73,10 @@ const DROP_PATHS_ALL = [
   'docs/selling', 'docs/oracle', 'docs/applications', 'docs/interview',
   'dist-lambda', 'backups', 'docs/hubspot', 'docs/crm',
   '.wwebjs_auth', '.wwebjs_cache', '__pycache__', 'node_modules', '.venv', 'venv',
+  // Her own job hunt and her clients' words are not part of the product. The listing
+  // terms say client material is EXCLUDED, and `docs/clients/` shipped a real WhatsApp
+  // transcript anyway.
+  'docs/clients', 'docs/job-search', 'autonomous_data/resumes',
 ];
 const DROP_PATHS = DROP_PATHS_ALL.filter((d) => !KEEP.some((k) => d.replace(/\/$/, '') === k));
 const DROP_GLOBS = [
@@ -85,7 +89,44 @@ const DROP_GLOBS = [
     '*.tar.gz', '*.tgz', '*.tar', '*.zip', '*.7z', '*.rar',
   '*.pem', '*.p12', '*.pfx', '*.jks', '*.ppk', '*.key', '.env', '.env.*',
   'outreach-registry.json',
+  // -- THE BLIND SPOT THAT COST THE 9 SEP RESUBMISSION -----------------------
+  // We skip NUL-containing blobs on purpose (binary fed to a text scanner invents
+  // findings). That made every gate we built structurally incapable of seeing the
+  // SEVENTEEN copies of her resume sitting in VibeJobHunter's history as PDF and
+  // DOCX. `git log -p` omits binary too, so nothing anywhere could see them.
+  // A file format the scrubber cannot open must be REMOVED, never assumed clean.
+  // Verified before adding: these five extensions match 17 blobs across all eight
+  // mirrors and every one is a resume. No other repo ships a document at all.
+  '*.pdf', '*.docx', '*.doc', '*.rtf', '*.odt',
+  // Resume CONTENT, not resume CODE. `resume_selector.py` and `resume_formatter.py`
+  // are the product and are deliberately kept -- only the prose files go.
+  '*resume*.md', '*Resume*.md', '*RESUME*.md',
+  '*resume*.txt', '*Resume*.txt', '*RESUME*.txt',
+  'JOB_SEARCH.md', 'RESUME_BULLETS.md',
 ];
+// -- PEOPLE, NOT CREDENTIALS ---------------------------------------------
+// Everything else in this file hunts emails, phone numbers, keys and tokens.
+// HUD's `pii_qc_llm` hunts PEOPLE, which is why our three gates read zero while it
+// reported hundreds. These are the literals a name detector finds and a pattern
+// detector never will. `regex:` and `literal:` are filter-repo's own prefixes.
+//
+// Boundaries are [A-Za-z0-9_] and NOT a word-boundary escape: that escape counts `_`
+// as a word character, so it would rewrite the middle of an identifier such as
+// alisa_profile and break the code. The lowercase form needs the guard for a second
+// reason as well -- the English word `personalisation` literally contains the name.
+const FIXED_RULES = [
+  // A four-year-old's first name and age are hardcoded into the EspaLuz system prompt
+  // ("You're speaking with <name>, a 4-year-old child"), and her school appears beside
+  // it. A minor's identity is the one finding no triage step should ever dismiss.
+  'regex:(?<![A-Za-z0-9_])[Aa]lisa(?![A-Za-z0-9_])==>[child]',
+  // Oracle's public address, 246 occurrences, including inside `.github/workflows/`.
+  // CLAUDE.md section 3 forbids publishing hostnames and IPs; a buyer does not need
+  // the box. The replacement carries NO shape of its own -- an IP-shaped placeholder
+  // is still an IP, which is exactly how our phone placeholder became 299 findings.
+  'literal:170.9.242.90==>REDACTED_HOST',
+  'literal:163.192.99.45==>REDACTED_HOST',
+];
+
 /** `*.log` is runtime noise everywhere EXCEPT a data repo, where the log is the product. */
 const LOG_GLOB = '*.log';
 
@@ -383,6 +424,9 @@ function writeReplacements(file, { emails, phones, secrets, shapes }) {
     // contact001@example.com is still an address. Redact to a token, not a look-alike.
     lines.push(`${p}==>redacted-phone-${String(parseInt(crypto.createHash("sha1").update(p).digest("hex").slice(0, 8), 16) % 100).padStart(2, "0")}`);
   }
+  // Appended LAST so the harvested literals -- longer and more specific -- win any
+  // overlap. filter-repo applies rules in file order.
+  for (const r of FIXED_RULES) lines.push(r);
   fs.writeFileSync(file, lines.join('\n') + '\n', 'utf8');
   return lines.length;
 }
@@ -537,6 +581,34 @@ function verifyHistory(work) {
     if (blobJwt.size) bad.jwtInBlobs = [...blobJwt].slice(0, 3);
     if (blobBearer.size) bad.bearerInBlobs = [...blobBearer].slice(0, 3);
   if (blobCanaries.size) bad.canariesInBlobs = [...blobCanaries];
+
+  // -- THE PEOPLE LAYER, VERIFIED RATHER THAN ASSUMED -------------------------
+  // Needles are DERIVED from FIXED_RULES, never restated, so the scrubber and its
+  // gate cannot drift apart the way this file and build-license-bundle.cjs once did.
+  const peopleHits = new Set();
+  const needles = FIXED_RULES.map((r) => {
+    const pat = r.split('==>')[0];
+    if (pat.startsWith('literal:')) return { re: null, v: pat.slice(8) };
+    if (pat.startsWith('regex:')) return { re: new RegExp(pat.slice(6), 'g'), v: null };
+    return null;
+  }).filter(Boolean);
+  forEachBlobChunk(work, (t) => {
+    for (const n of needles) {
+      if (n.v) { if (t.includes(n.v)) peopleHits.add(n.v); continue; }
+      n.re.lastIndex = 0;
+      const m = n.re.exec(t);
+      if (m) peopleHits.add(m[0]);
+    }
+  });
+  if (peopleHits.size) bad.peopleInBlobs = [...peopleHits].slice(0, 5);
+
+  // A format this scrubber cannot open is not a clean file, it is an unmeasured one.
+  // Seventeen documents rode through every gate on 9 Sep because each gate reads text.
+  // The rule is therefore about the EXTENSION, checked on the path, not the bytes.
+  const docRe = /\.(pdf|docx|doc|rtf|odt)$/i;
+  const paths = run('git', ['rev-list', '--objects', '--all'], { cwd: work })
+    .split(String.fromCharCode(10)).map((l) => l.slice(41)).filter((x) => x && docRe.test(x));
+  if (paths.length) bad.unscannableDocs = [...new Set(paths)].slice(0, 5);
 
   return bad;
 }
