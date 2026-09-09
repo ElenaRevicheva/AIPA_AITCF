@@ -91,7 +91,11 @@ const LOG_GLOB = '*.log';
 
 // Kept in step with build-license-bundle.cjs on purpose. The two drifted, and this file
 // then blocked a push on Elena's OWN address while the bundler treated it as safe.
-const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com|users\.noreply\.(github|replit)\.com|aideazz\.(xyz|com)|anthropic\.com|cursor\.com)$/i;
+// NOTE: aideazz.xyz is deliberately NOT exempt. HUD counts our own business address as
+// an EMAIL_ADDRESS finding -- AILA-licensed scored 7 of them, all `aipa@`. The working
+// repos keep the real address because the product sends from it; the licensed COPY
+// must not carry it.
+const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com|users\.noreply\.(github|replit)\.com|anthropic\.com|cursor\.com)$/i;
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const PHONE_RE = /(?<![\w+-])(\+?)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
 const PHONE_E164_RE = /(?<![\w+-])(\+)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
@@ -195,6 +199,7 @@ function harvest(src, dataRepo) {
   const emails = new Map();
   const phones = new Set();
   const secrets = new Set();
+  const shapes = new Map();
   let stable = (s, n) => parseInt(crypto.createHash('sha1').update(s.toLowerCase()).digest('hex').slice(0, 8), 16) % n;
 
   // Keep ONLY added/removed CONTENT lines. `git log -p` also emits `diff --git`,
@@ -249,7 +254,10 @@ function harvest(src, dataRepo) {
     if (DATEISH.test(digits)) continue;                      // YYYYMMDD is a date
     // A literal containing whitespace is almost never a phone in this corpus; it is a
     // table cell or two adjacent numbers. Replacing it as one string corrupts both.
-    if (/\s/.test(m)) continue;
+    // Whitespace rejects table cells and adjacent numbers -- but E.164 is routinely
+    // written with spaces, and `+507 6662 3757` survived every rewrite because of this
+    // line. Reject spaces only when there is no leading +.
+    if (/\s/.test(m) && !m.startsWith('+')) continue;
     // 13-digit ms epoch timestamps read as phones. Real numbers here are <= 12 digits.
     if (digits.length >= 13 && !m.startsWith('+')) continue;
     // Round numbers are MONEY, not phones. dragontrade-agent is a trading repo, and the
@@ -267,6 +275,17 @@ function harvest(src, dataRepo) {
   const PLACEHOLDER = /^(your|example|placeholder|change[_-]?me|xxx+|dummy|sample|redacted|insert|here|password|passwd|secret|token|user|pass|admin|root|test|\.+)$/i;
   const looksSecret = (v) => v && v.length >= 8 && !/\s/.test(v) && !/[${}<>]/.test(v)
     && !PLACEHOLDER.test(v) && !/^\.+$/.test(v) && /[A-Za-z0-9]/.test(v);
+  // HUD scores `scheme://user:${DB_PASSWORD}@host` as URL_WITH_CREDENTIALS: the SHAPE is
+  // the finding, and a template password does not soften it. looksSecret() rightly
+  // refuses to redact a ${VAR}, so instead collapse the credential segment away and keep
+  // a URL the buyer can still read.
+  { let m; const cr = new RegExp(URL_CRED_RE.source, 'g');
+    while ((m = cr.exec(diff)) !== null) {
+      const seg = m[0];                                  // scheme://user:pass@
+      const at = seg.lastIndexOf('@');
+      const colon = seg.lastIndexOf(':', at);
+      if (colon > seg.indexOf('://') + 2) shapes.set(seg, seg.slice(0, colon) + '@');
+    } }
   for (const re of [URL_CRED_RE, SQL_PW_RE]) {
     let m; re.lastIndex = 0;
     while ((m = re.exec(diff)) !== null) if (looksSecret(m[1])) secrets.add(m[1]);
@@ -294,13 +313,14 @@ function harvest(src, dataRepo) {
   // ...and now the surface the checker actually inspects.
   const blobBytes = forEachBlobChunk(src, absorb);
 
-  return { emails, phones, secrets, bytes: corpus.length + blobBytes };
+  return { emails, phones, secrets, shapes, bytes: corpus.length + blobBytes };
 }
 
-function writeReplacements(file, { emails, phones, secrets }) {
+function writeReplacements(file, { emails, phones, secrets, shapes }) {
   const lines = [];
   // Longest first: filter-repo applies rules in order, and a short literal that is a
   // substring of a longer one would otherwise shadow it.
+  for (const [lit, rep] of [...(shapes || new Map())].sort((a, b) => b[0].length - a[0].length)) lines.push(`${lit}==>${rep}`);
   for (const s of [...secrets].sort((a, b) => b.length - a.length)) lines.push(`${s}==>REDACTED`);
   for (const [addr, rep] of [...emails].sort((a, b) => b[0].length - a[0].length)) lines.push(`${addr}==>${rep}`);
   for (const p of [...phones].sort((a, b) => b.length - a.length)) {
