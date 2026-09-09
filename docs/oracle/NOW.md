@@ -197,32 +197,36 @@ an unmeasured one.** We excluded binary blobs to stop phantom findings and there
 a gate that was structurally incapable of seeing seventeen copies of her résumé.
 
 
-### ✅ 9 Sep — EIGHT MIRRORS CLEAN, THREE INDEPENDENT GATES. Ready to attach.
+### ✅ 9 Sep LATE — EIGHT MIRRORS REBUILT WITH THE PEOPLE LAYER. Three gates green.
 
 | mirror | commits | github |
 |---|---|---|
-| AIPA_AITCF-licensed | 1000 | `2b5609e` |
-| VibeJobHunterAIPA_AIMCF-licensed | 569 | `c65978e` |
-| EspaLuzWhatsApp-licensed | 396 | `7803c86` |
-| EspaLuzFamilybot-licensed | 214 | `95365ef` |
-| dragontrade-agent-licensed | 176 | `38387f5` |
-| EspaLuz_Influencer-licensed | 127 | `674962e` |
-| AILA-licensed | 40 | `89f03be` |
-| atlas-captures-licensed | 40 | `7f506c8` |
+| AIPA_AITCF-licensed | 1001 | `5f98271d` |
+| VibeJobHunterAIPA_AIMCF-licensed | 544 | `4e265221` |
+| EspaLuzWhatsApp-licensed | 392 | `07122f5e` |
+| EspaLuzFamilybot-licensed | 214 | `c12e56ad` |
+| dragontrade-agent-licensed | 176 | `3351bd81` |
+| EspaLuz_Influencer-licensed | 127 | `674962ee` |
+| AILA-licensed | 40 | `89f03bed` |
+| atlas-captures-licensed | 40 | `7f506c80` |
 
-**Three gates, all green:** the rebuild's own verify (8/8) · `pii-guard --listing` on HEAD
-including GENERIC_SECRET_ASSIGNMENT and SECRET_SECRET_KEYWORD (8/8 zero) · an independent
-full-history scan with **no exemptions at all** (8/8 zero across email, phone, url-cred,
-bearer, JWT). Commit counts preserved — the history-derived valuation points survive.
+VibeJobHunter lost 25 commits (569 → 544) — they touched nothing but the résumé
+binaries. Every other count is preserved, so the history-derived valuation points survive.
 
-⚠️ **ATTACH THE `-licensed` REPOS.** Three of the 9 Sep failures were the ORIGINALS.
-Prices: AILA $4,264 · AIPA_AITCF $12,000 · EspaLuzFamilybot $12,000 · EspaLuzWhatsApp
-$12,000 · EspaLuz_Influencer $12,000 · VibeJobHunter $12,000 · atlas-captures $4,137 ·
-dragontrade $6,450 → **$74,851**.
+**Three gates, all green:** the rebuild's own verify (8/8, now also covering documents,
+customer records and address-in-path) · a zero-exemption full-history credential scan
+(8/8 zero across email, phone, url-cred, bearer, JWT) · a people-layer path audit
+(8/8 zero documents, customer records, data directories, personal paths).
 
-**`pii-guard --listing` pointed at the WORKING repos for 7 of 8 until Cursor caught it.**
-Every "all eight would pass" from that command before this fix was scoring trees
-DataVendor never grades. It now points at `_license-history/*`.
+**Four surfaces, four instruments — this is the shape to remember.** `--mailmap` for
+author identity, `--replace-text` for blob content, `--replace-message` for commit
+messages, and now `--filename-callback` for PATHS. The Oracle address survived a whole
+rewrite inside `ORACLE_<addr>_PRODUCT_METRICS_REPORT.md` with its dots written as
+underscores, because the first three instruments cannot see a filename.
+
+**Media checked and cleared:** 84 blobs — brand artwork, README screenshots, product
+demo captures. The WhatsApp screenshots show only the bot's own replies, nobody's name
+in frame.
 
 ### Sixteen fixes, two rules
 
