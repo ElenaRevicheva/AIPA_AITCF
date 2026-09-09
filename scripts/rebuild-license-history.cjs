@@ -77,6 +77,10 @@ const DROP_PATHS_ALL = [
   // terms say client material is EXCLUDED, and `docs/clients/` shipped a real WhatsApp
   // transcript anyway.
   'docs/clients', 'docs/job-search', 'autonomous_data/resumes',
+  // Whole directories of real end-user records. `family_memory_data/` holds
+  // conversation history and per-family profiles; the two backup folders are
+  // pre-migration dumps of the live subscriber tables.
+  'backup_before_postgres', 'data_backup', 'family_memory_data', 'test_family_data',
 ];
 const DROP_PATHS = DROP_PATHS_ALL.filter((d) => !KEEP.some((k) => d.replace(/\/$/, '') === k));
 const DROP_GLOBS = [
@@ -106,6 +110,18 @@ const DROP_GLOBS = [
   // only ever matches a file sitting at the repo root. `docs/JOB_SEARCH.md` survived
   // the first run for exactly this reason.
   '*JOB_SEARCH.md', '*RESUME_BULLETS.md',
+  // -- OTHER PEOPLE'S DATA. The highest-risk content in the whole bundle. -----
+  // `user_sessions.json` is REAL CHAT LOGS between real users and the bot, and
+  // `user_onboarding.json` holds their names, countries, spouses and children's
+  // ages. Redacting the addresses inside them was never enough -- a pseudonymised
+  // customer table is still a customer table, and the listing's own terms already
+  // say chat logs and customer PII are EXCLUDED.
+  // The buyer loses nothing: the code recreates every one of these on first run.
+  '*subscribers.json', '*user_sessions.json*', '*user_onboarding.json*',
+  '*user_trials.json', '*user_profiles.json', '*conversation_history.json',
+  '*family_relationships.json', '*learning_progress.json',
+  '*telegram_phone_email_mapping.json', '*telegram_subscribers.json',
+  '*discovered_subscription*.json', '*demo_sessions.json',
 ];
 // -- PEOPLE, NOT CREDENTIALS ---------------------------------------------
 // Everything else in this file hunts emails, phone numbers, keys and tokens.
@@ -615,6 +631,19 @@ function verifyHistory(work) {
   const paths = run('git', ['rev-list', '--objects', '--all'], { cwd: work })
     .split(String.fromCharCode(10)).map((l) => l.slice(41)).filter((x) => x && docRe.test(x));
   if (paths.length) bad.unscannableDocs = [...new Set(paths)].slice(0, 5);
+
+  // Other people's records, checked by PATH for the same reason: the content gate
+  // reads zero once the addresses inside are redacted, and a pseudonymised customer
+  // table still is one. Only the filename tells the truth about what a file holds.
+  const custRe = /(subscribers|user_sessions|user_onboarding|user_trials|user_profiles|conversation_history|family_relationships|learning_progress|telegram_subscribers|telegram_phone_email_mapping|demo_sessions|discovered_subscription)/i;
+  const custDirRe = /(^|[/])(backup_before_postgres|data_backup|family_memory_data|test_family_data)([/]|$)/i;
+  const cust = run('git', ['rev-list', '--objects', '--all'], { cwd: work })
+    .split(String.fromCharCode(10)).map((l) => l.slice(41))
+    // Extension-gated on purpose: the DATA file `subscribers.json` must go, a source
+    // file that merely handles subscribers must stay. Match the payload, not the topic.
+    .filter((x) => x && (custDirRe.test(x)
+      || (custRe.test(x) && /[.](json|jsonl|csv|db|sqlite3?)([.][A-Za-z-]+)?$/i.test(x))));
+  if (cust.length) bad.customerRecords = [...new Set(cust)].slice(0, 5);
 
   return bad;
 }
