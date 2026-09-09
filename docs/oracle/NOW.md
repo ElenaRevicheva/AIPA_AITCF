@@ -131,6 +131,35 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ❌ 9 Sep — Fermatix said NO: they do not accept AI-generated code
+
+Not PII. Not price. Not terms. Ilnur Faiziev (BD, Fermatix AI), verbatim: *"we're unable
+to accept AI-generated code from our partners, as this is a firm requirement for **many of
+our customers**. If you have codebases created without AI or with only minimal AI
+involvement, we'd be very happy to take a look."* Deal `64531338321` → **closed lost**.
+
+The four compliance answers were accepted without challenge. **The provenance dossier is
+what disqualified us** — it states plainly that Elena directs AI to write the code and that
+most commits carry her agent's authorship. That sentence converted a multi-week path (run
+their script, intro call, NDA, legal) into a two-email no. Correct outcome: the
+disqualifier was structural and would have surfaced eventually.
+
+**No honest way back on these eight.** "Minimal AI involvement" is not what they are, and
+claiming otherwise would be a misrepresentation inside a licence warranty.
+
+⚠️ **Treat as a MARKET constraint, not a Fermatix quirk.** "A firm requirement for many of
+our customers" means AI-training data buyers may require human-authored provenance. **Ask
+this question FIRST of the next licensing buyer** — before four answers and an attachment.
+One line, disqualifies in one round instead of three.
+
+✅ **Does NOT affect DataVendor/HUD.** Megan raised no authorship requirement and the
+listing passes mandatory QC. The PII work stands on its own and is still what that needs.
+
+🚫 **Their `repo_metadata_cli` does NOT clean PII** — it reports LOC, duplication, commits,
+PR stats and coverage estimates. No secret or PII detection at all, and an `--upload` flag
+that posts a CSV to their CRM. Not run. Nothing to gain from running it now.
+
+
 ### 🟢 8 Sep — DataVendor: the listing is **NOT blocked**. STOP cleaning PII.
 
 **Megan Chang (Customer Operation Lead) answered both questions in writing:**
