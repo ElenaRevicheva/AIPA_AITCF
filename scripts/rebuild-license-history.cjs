@@ -402,7 +402,12 @@ function verifyHistory(work) {
   // history still held 611 addresses, 258 phones, 40 JWTs and 88 bearer tokens.
   const blobEmails = new Set(), blobCreds = new Set(), blobCanaries = new Set();
   const blobPhones = new Set();
-  const OURS = /^\+?50700000[0-9]{2}$/;                 // our own replacement value
+  // UNANCHORED on purpose. Our replacement is +50700000NN, and when it lands beside an
+  // adjacent digit and a dot the composite reads as a NEW phone -- the 9 Sep run failed
+  // AIPA_AITCF on two such strings, both of them this scrubber's own output. Same trap as
+  // flagging user:REDACTED@ and the +50700000NN placeholder: a gate that fires on its own
+  // replacements can never go green. No real number contains this exact run.
+  const OURS = /50700000[0-9]{2}/;
   forEachBlobChunk(work, (t) => {
     for (const m of findEmails(t)) blobEmails.add(m);
     const cre = new RegExp(credRe.source, 'g');
