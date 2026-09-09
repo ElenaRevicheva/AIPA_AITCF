@@ -133,3 +133,112 @@ her systems watch. In August the response detector read Zoho only, was blind to
 Gmail, and a real interview request was missed
 (`project_vjh_detected_responses_gap`). **An unwatched channel is an unread
 channel** — phone notifications on that mailbox, at minimum.
+
+---
+
+# CONTRACT REVIEW — all 27 pages, read 9 Sep 2026
+
+Source: `deel-Elena Revicheva-contract-m5gqk9x.pdf` · REF **m5gqk9x** ·
+"micro1 HD Contractor Agreement v6". The contract lives at **payroll.micro1.ai**,
+a white-labelled Deel — same rails, micro1's front door.
+
+**Parties.** Micro1 Inc., 655 Montgomery St, San Francisco 94111,
+`accounting@micro1.ai` · Elena Revicheva, C. 124 Este, Panamá, `aipa@aideazz.xyz`.
+Signed by Alireza Ansarinik 7 Sep 20:28, by Elena **8 Sep 17:22:03**.
+
+## Exhibit A — Statement of Work 1 (money terms, confirmed)
+
+| Field | Value |
+|---|---|
+| Type | Pay As You Go |
+| **Rate** | **$80.00 per hour, USD** |
+| Scope | "Any AI model training task assigned by the project leadership" |
+| Invoice cycle | Semi-monthly, ends the 15th and the last of the month |
+| Payment due | After 5 days following cycle ending · **Pay before weekends: No** |
+| First payment date | 20 September 2026 |
+| Contract end date | Not specified |
+| **Termination notice period** | **5 days** |
+| Special clauses | (none) |
+
+## 🚨 DATED ACTION — arbitration opt-out closes ≈ 8 OCTOBER 2026
+
+**§11.15 Right to Opt Out.** Within **30 days of the Contractor signing**, she may
+opt out of the arbitration agreement by emailing **`legal@micro1.ai`** **from her
+own personal email address**, stating intent to opt out plus **name, phone number
+and city of residence**.
+
+- She signed **8 Sep 2026** → the window closes **≈ 8 Oct 2026**.
+- ⚠️ "An email sent by Contractor's representative or agent (including counsel)
+  **shall not be effective**." It must come from her personally.
+- The clause states she "will not be subject to retaliation of any kind."
+
+**Why it deserves a real decision.** The agreement waives jury trial *and*
+class/collective action (§11.4). For an unpaid-invoice dispute that barely matters
+— §11.12 caps her filing fee at federal-court cost and micro1 pays the rest, so
+individual arbitration is actually *cheaper* for her.
+
+The **class waiver** is the part with teeth. §6.5 explicitly names the **Illinois
+BIPA**, the **Texas CUBI Act** and **Washington's biometric law**, because she is
+granting rights over her **voiceprint and facial geometry**. Those statutes are
+exactly what generate biometric class actions. Opting out costs nothing and keeps
+the option open; staying in forecloses it. Her call — she is an ex-CLO — but it is
+free and it expires.
+
+## The three clauses that matter most for her specifically
+
+**1. §6.5 / §6.6 — voice and likeness, perpetual.** Irrevocable consent to use her
+voice, image, likeness, persona, voiceprint and facial geometry to train,
+fine-tune, benchmark and adversarially test AI — explicitly including "voice
+cloning, synthetic voice, and speech-generation models that reproduce or simulate
+Contractor's voice". **No additional compensation ever**, and she waives right of
+publicity, right of privacy, Moral Rights, **and the right to inspect or approve
+any use**. Industry-normal for AI-trainer work, but permanent and worth knowing.
+
+**2. §6A — never bring her own IP into this work.** Pre-existing materials she
+supplies become "Licensed Materials": micro1 gets a **perpetual, royalty-free,
+sublicensable licence for AI training**, surviving termination (§6A.6). She keeps
+ownership (§6A.4), but the licence is forever. **Do not use ATUONA poetry, AIdeazz
+code, or any portfolio asset in performing these Services.**
+
+**3. §10.3 — the one that will trip her operationally.** She is solely responsible
+for any third-party AI tool she uses, and must ensure **no Client Confidential
+Information reaches it "except as authorized by Client in writing."** Her whole
+workflow is Claude + Cursor. **Do not put micro1 work into any AI tool without
+written authorisation** — confidentiality is one of the few things carved *out* of
+the liability cap.
+
+## Asymmetries
+
+| | |
+|---|---|
+| **Uncapped liability** | §9.3 caps at 12 months' fees, but §9.2 carves out her §7 warranty breaches and §3 confidentiality — **uncapped exposure there**, plus §9.1 indemnity including their legal costs. Aggressive for a contractor. |
+| **Termination** | §8.3 — they may terminate **immediately, any reason or none**. She must give **5 business days** notice. |
+| **Expenses** | §2.2 — she bears all costs: software subscriptions, AI tools, cloud, compute, infrastructure, equipment. No reimbursement. |
+| **Monitoring** | §5.6 — she consented to activity-tracking software **on her personal devices** and monitoring of client comms tools. |
+| **Assignment** | §12.1 — she may not assign; micro1 may assign **without her consent**. |
+| **Physical risk** | §10.2 — for any in-person AI training she assumes all risk; micro1 not liable even for its own negligence. |
+| **Governing law** | §12.4 Delaware + US federal; arbitration under the FAA, in the county where she provided services. |
+| **Warranty §7.2** | She warranted she is "not currently employed by any foundational model company or other AI research or development organization." She *founded* AIdeazz rather than being employed by it — but note it before taking another AI role. |
+
+## ✅ What actually protects her — the answer to "where is the guarantee"
+
+- **§8.5(iii)** — on expiration or termination **for any reason**, "Client will pay
+  Contractor any accrued but unpaid fees due and payable pursuant to Section 2."
+- **§8.2** — even terminating for gross negligence or misconduct, micro1 still owes
+  "amounts accrued before the termination date."
+- **§2.4** — Deel is her **appointed limited payment agent**, named in the contract.
+  The rail is contractual, not discretionary.
+
+**Accrued hours are owed regardless of how it ends.** That, plus the named payment
+agent, is the guarantee — not the email address on any account.
+
+## ⚠️ §3.6 Publicity — affects the CV and LinkedIn
+
+She **may** state factually that she provides services to micro1. She **may not**
+disclose "description of the services, scope of work, commercial terms, name of any
+of Client's customers or other details of the parties' relationship."
+
+- ✅ `Contractor — micro1`
+- ❌ `AI Trainer, Titan Proton / Project Prism, $80/hr`
+
+Keep project names, the rate and any work description off every public document.
