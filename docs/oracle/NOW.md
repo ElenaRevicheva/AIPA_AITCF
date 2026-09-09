@@ -131,6 +131,42 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 9 Sep — ALL EIGHT MIRRORS AT ZERO. Attach the `-licensed` repos.
+
+Scanned across **full git history** with a checker holding **no exemptions at all** —
+emails, phones, credentialed URLs, bearer tokens, JWTs: **0 in every repo.** Commit
+counts preserved, so the history-derived valuation points survive.
+
+| mirror | commits | HUD scored | now |
+|---|---|---|---|
+| AIPA_AITCF-licensed | 997 | 1183 | **0** |
+| VibeJobHunterAIPA_AIMCF-licensed | 569 | 508 | **0** |
+| EspaLuzWhatsApp-licensed | 396 | 2680 | **0** |
+| EspaLuzFamilybot-licensed | 214 | — | **0** |
+| dragontrade-agent-licensed | 176 | — | **0** |
+| EspaLuz_Influencer-licensed | 127 | — | **0** |
+| atlas-captures-licensed | 40 | 422 | **0** |
+| AILA-licensed | 40 | 9 | **0** |
+
+⚠️ **ATTACH THE `-licensed` REPOS.** Three of the 9 Sep failures were the ORIGINALS.
+
+### The one rule that would have prevented all thirteen bugs
+
+**The fixer may hold exemptions. The checker may hold none.**
+
+Every failure today was an exemption correct for our tooling and invalid for HUD's:
+our placeholder values, our own domain, RFC 2606, vendor bot identities, `${VAR}`
+templates, all-caps env names in `Bearer` prose, our idea of what "is not really" an
+address or a phone. Each one made our scanner report clean while theirs reported
+hundreds.
+
+**And three times a FIX carried the defect it removed:** a phone redacted to a fake
+phone (`+50700000NN`, counted 299 times), a key redacted to the quoted word `REDACTED`
+(still a quoted literal beside a secret-ish name), and a password stripped to leave
+`user@host` (which reads as an address). **Check the replacement against EVERY
+detector, not only the one that flagged the original.**
+
+
 ### ✅ 9 Sep — ATTACH THE `-licensed` MIRRORS, NOT THE ORIGINALS
 
 **HUD shipped its new QC scanner** (Megan announced it 8 Sep). It reads **git history and
