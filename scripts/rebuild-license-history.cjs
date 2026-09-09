@@ -77,6 +77,12 @@ const DROP_PATHS_ALL = [
 const DROP_PATHS = DROP_PATHS_ALL.filter((d) => !KEEP.some((k) => d.replace(/\/$/, '') === k));
 const DROP_GLOBS = [
   '*.pyc', '*.pyo', '*.ldb', '*.pid', '*.sqlite', '*.sqlite3', '*.db',
+    // Compressed archives are a BLIND SPOT, not tidiness: filter-repo cannot scrub
+    // inside them and HUD reports unscannable bytes as an error. EspaLuzWhatsApp shipped
+    // an 85 MB codebase backup that GitHub warned about on push -- a duplicate of source
+    // the buyer already receives. Verified before removing: it contributes 0 LOC (binary)
+    // and no commit is lost, because both commits touching it also touch other files.
+    '*.tar.gz', '*.tgz', '*.tar', '*.zip', '*.7z', '*.rar',
   '*.pem', '*.p12', '*.pfx', '*.jks', '*.ppk', '*.key', '.env', '.env.*',
   'outreach-registry.json',
 ];
