@@ -48,11 +48,7 @@ product in production. If Fermatix wants exclusivity, tell me and I will price i
 Attached is the provenance dossier for all eight: what each system does, why it was
 built, and the numbers, read from the running systems.
 
-ON THE METADATA SCRIPT
-
-Send it. I run it against the repositories and return the output. I do not grant
-repository access, connect apps, or issue tokens. If the script needs something a
-read-only run cannot produce, tell me what it is and I will get it to you another way.
+Send the metadata script whenever you are ready — I will run it and return the output.
 
 For the call: I am in Panama City, UTC-5. Send two or three windows and I will confirm one.
 
