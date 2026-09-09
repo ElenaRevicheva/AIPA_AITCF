@@ -91,6 +91,11 @@ const PHONE_RE = /(?<![\w+-])(\+?)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-
 const PHONE_E164_RE = /(?<![\w+-])(\+)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
 const DATEISH = /^(19|20)\d{6}$/;
 const URL_CRED_RE = /\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:([^@/\s"'`<>${}]{3,256})@/g;
+// Signed tokens ride inside stored artifact URLs: the Atuona film pipeline kept Runway
+// task links whose JWTs carry a keyHash, a bucket and stage=prod. Expired, but HUD scores
+// the SHAPE, and 40 survived the 9 Sep rewrite because nothing harvested them.
+const JWT_RE = /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{0,86}/g;
+const BEARER_TOK_RE = /\bBearer\s+([A-Za-z0-9._~+/=-]{20,})/g;
 const SQL_PW_RE = /\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"]([^'"\n\r]{4,200})['"]/gi;
 const DB_HOST_RE = /\b[a-z0-9-]+\.proxy\.(?:rlwy\.net|render\.com)\b/gi;
 const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})\b/g;
@@ -258,6 +263,9 @@ function harvest(src, dataRepo) {
     let m; re.lastIndex = 0;
     while ((m = re.exec(diff)) !== null) if (looksSecret(m[1])) secrets.add(m[1]);
   }
+  for (const m of diff.match(JWT_RE) || []) secrets.add(m);
+  { let bm; const br = new RegExp(BEARER_TOK_RE.source, "g");
+    while ((bm = br.exec(diff)) !== null) if (!/^[A-Z0-9_]+$/.test(bm[1])) secrets.add(bm[1]); }
   for (const m of diff.match(VENDOR_RE) || []) secrets.add(m);
   for (const m of diff.match(DB_HOST_RE) || []) secrets.add(m);
 
@@ -402,6 +410,7 @@ function verifyHistory(work) {
   // history still held 611 addresses, 258 phones, 40 JWTs and 88 bearer tokens.
   const blobEmails = new Set(), blobCreds = new Set(), blobCanaries = new Set();
   const blobPhones = new Set();
+    const blobJwt = new Set(), blobBearer = new Set();
   // UNANCHORED on purpose. Our replacement is +50700000NN, and when it lands beside an
   // adjacent digit and a dot the composite reads as a NEW phone -- the 9 Sep run failed
   // AIPA_AITCF on two such strings, both of them this scrubber's own output. Same trap as
@@ -430,11 +439,16 @@ function verifyHistory(work) {
       if (OURS.test(m.replace(/[^0-9+]/g, ''))) continue;
       blobPhones.add(m);
     }
+      for (const m of t.match(JWT_RE) || []) blobJwt.add(m.slice(0, 20));
+      { let b2; const r2 = new RegExp(BEARER_TOK_RE.source, "g");
+        while ((b2 = r2.exec(t)) !== null) if (!/^[A-Z0-9_]+$/.test(b2[1]) && b2[1] !== "REDACTED") blobBearer.add(b2[1].slice(0, 14)); }
     for (const c of canaries) if (t.includes(c)) blobCanaries.add(c);
   });
   if (blobEmails.size) bad.emailsInBlobs = [...blobEmails].slice(0, 5);
   if (blobCreds.size) bad.credUrlsInBlobs = [...blobCreds].slice(0, 3);
   if (blobPhones.size) bad.phonesInBlobs = [...blobPhones].slice(0, 5);
+    if (blobJwt.size) bad.jwtInBlobs = [...blobJwt].slice(0, 3);
+    if (blobBearer.size) bad.bearerInBlobs = [...blobBearer].slice(0, 3);
   if (blobCanaries.size) bad.canariesInBlobs = [...blobCanaries];
 
   return bad;
