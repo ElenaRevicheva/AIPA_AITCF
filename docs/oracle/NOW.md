@@ -131,6 +131,46 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 9 Sep — ATTACH THE `-licensed` MIRRORS, NOT THE ORIGINALS
+
+**HUD shipped its new QC scanner** (Megan announced it 8 Sep). It reads **git history and
+raw blobs**, where the old one read current files. Elena's 9 Sep resubmission attached the
+**originals** for three assets and scored 2680 / 1037 / 729 / 559 findings.
+
+**Fix: all eight `-licensed` mirrors are rebuilt, verified and pushed.**
+
+| mirror | commits | emails | phones | jwt | bearer |
+|---|---|---|---|---|---|
+| AILA | 41 | 0 | 0 | 0 | 0 |
+| AIPA_AITCF | 990 | 0 | 0 | 0 | 0 |
+| EspaLuzFamilybot | 214 | 0 | 0 | 0 | 0 |
+| EspaLuzWhatsApp | 396 | 0 | 0 | 0 | 0 |
+| EspaLuz_Influencer | 127 | 0 | 0 | 0 | 0 |
+| VibeJobHunterAIPA_AIMCF | 570 | 0 | 0 | 0 | 0 |
+| atlas-captures | 40 | 0 | 0 | 0 | 0 |
+| dragontrade-agent | 176 | 0 | 0 | 0 | 0 |
+
+Commit counts preserved, so the history-derived valuation points survive — **no repeat of
+the 16% / $28,073 collapse.** The residual `url-cred` hits are all `${TOKEN}`, `REDACTED`,
+`contact008` (our own replacement) or `{token}` templates. Verified independently, not
+taken from the tool's own verdict.
+
+**FIVE gate bugs fixed in `rebuild-license-history.cjs`, all in the checking layer:**
+1. harvest + verify read `git log -p` (diff text, omits binaries) — HUD reads blobs → **under**-reported
+2. then feeding binary blobs to text scanners → phantom findings → **over**-reported
+3. the repeated-digit guard landed as a literal 0x01 control char, so it never matched
+4. the own-replacement guard was anchored, so `+50700000NN` beside a digit read as new
+5. JWT and bearer were harvested by nobody — 40 real Runway artifact tokens survived
+
+**Non-recurring by construction:** the runner refuses to push any repo whose verify fails.
+It blocked four repos, twice, correctly. Verify now reads the same surface as HUD.
+
+⚠️ **Open decision:** `EspaLuzWhatsApp-licensed` ships an **81 MB tarball**
+(`docs/archive/codebase_backup_*.tar.gz`). GitHub warns on push; filter-repo cannot scrub
+inside an archive; HUD reports unscannable bytes as an **error**. It duplicates the code the
+buyer already gets. Recommend adding it to DROP_PATHS — Elena's call.
+
+
 ### ❌ 9 Sep — Fermatix said NO: they do not accept AI-generated code
 
 Not PII. Not price. Not terms. Ilnur Faiziev (BD, Fermatix AI), verbatim: *"we're unable
