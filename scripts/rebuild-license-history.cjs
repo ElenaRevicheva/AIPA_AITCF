@@ -240,7 +240,10 @@ function harvest(src, dataRepo) {
     // `postgresql://user:pass@host` and doc placeholders like `...:...@...railway.app`
     // both match an email pattern. Neither is an address, and rewriting them as one
     // produces nonsense in the licensed copy.
-    if (m.includes('..')) continue;
+    // A fragment like ...@...railway.app is a redacted connection string, not an address --
+    // but HUD's pattern matches it and scored 18 in AIPA_AITCF. Ours is not the opinion
+    // that counts. Harvested; the replacement is a token, so nothing is swapped for a
+    // look-alike.
     if (m.split('@')[0].length > 40) continue;
     const lc = m.toLowerCase();
     if (!byLc.has(lc)) {
@@ -270,12 +273,15 @@ function harvest(src, dataRepo) {
     if (/\s/.test(m) && !m.startsWith('+')) continue;
     // 13-digit ms epoch timestamps read as phones. Real numbers here are <= 12 digits.
     if (digits.length >= 13 && !m.startsWith('+')) continue;
-    // Round numbers are MONEY, not phones. dragontrade-agent is a trading repo, and the
+    // These two guards exist for BARE digit runs -- market caps, epoch timestamps, version
+  // strings. A candidate carrying a leading + is a phone by construction, and +999999999
+  // and +1-555-555-5555 survived every rewrite because the guards fired on them too.
+  // Round numbers are MONEY, not phones. dragontrade-agent is a trading repo, and the
     // first harvest wanted to rewrite 850000000000 and 25000000000 — market caps and
     // position sizes — into fake Panama mobile numbers. No real phone ends in five zeros.
-    if (/0{5,}$/.test(digits)) continue;
+    if (/0{5,}$/.test(digits)) if (!m.startsWith('+')) continue;
     // Likewise a long run of one repeated digit is a placeholder or a padded constant.
-    if (/(\d)\1{7,}/.test(digits)) continue;
+    if (/(\d)\1{7,}/.test(digits)) if (!m.startsWith('+')) continue;
     phones.add(m);
   }
   // A captured "secret" still has to LOOK like one. The first run harvested the literal
