@@ -131,6 +131,49 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 9 Sep — EIGHT MIRRORS CLEAN, THREE INDEPENDENT GATES. Ready to attach.
+
+| mirror | commits | github |
+|---|---|---|
+| AIPA_AITCF-licensed | 1000 | `2b5609e` |
+| VibeJobHunterAIPA_AIMCF-licensed | 569 | `c65978e` |
+| EspaLuzWhatsApp-licensed | 396 | `7803c86` |
+| EspaLuzFamilybot-licensed | 214 | `95365ef` |
+| dragontrade-agent-licensed | 176 | `38387f5` |
+| EspaLuz_Influencer-licensed | 127 | `674962e` |
+| AILA-licensed | 40 | `89f03be` |
+| atlas-captures-licensed | 40 | `7f506c8` |
+
+**Three gates, all green:** the rebuild's own verify (8/8) · `pii-guard --listing` on HEAD
+including GENERIC_SECRET_ASSIGNMENT and SECRET_SECRET_KEYWORD (8/8 zero) · an independent
+full-history scan with **no exemptions at all** (8/8 zero across email, phone, url-cred,
+bearer, JWT). Commit counts preserved — the history-derived valuation points survive.
+
+⚠️ **ATTACH THE `-licensed` REPOS.** Three of the 9 Sep failures were the ORIGINALS.
+Prices: AILA $4,264 · AIPA_AITCF $12,000 · EspaLuzFamilybot $12,000 · EspaLuzWhatsApp
+$12,000 · EspaLuz_Influencer $12,000 · VibeJobHunter $12,000 · atlas-captures $4,137 ·
+dragontrade $6,450 → **$74,851**.
+
+**`pii-guard --listing` pointed at the WORKING repos for 7 of 8 until Cursor caught it.**
+Every "all eight would pass" from that command before this fix was scoring trees
+DataVendor never grades. It now points at `_license-history/*`.
+
+### Sixteen fixes, two rules
+
+**1. The fixer may hold exemptions. The checker may hold none.** Every under-report was an
+exemption correct for our tooling and invalid for HUD's: our placeholders, our domain,
+RFC 2606, vendor bots, `${VAR}` templates, all-caps env names in Bearer prose, our idea of
+what "is not really" an address.
+
+**2. A fix is new content, and new content gets scanned.** FIVE times a repair carried a
+defect: a phone redacted to a fake phone · a key redacted to the quoted word REDACTED · a
+password stripped to leave `user@host` · a value shortened to `'xx'`, which the
+neighbouring keyword rule counts at four characters · and an assignment pattern that
+matched across TWO quote pairs in a shell pipeline and shipped broken scripts.
+Check a replacement against EVERY detector, and check the MATCH did not span something the
+language treats as separate.
+
+
 ### ✅ 9 Sep — ALL EIGHT MIRRORS AT ZERO. Attach the `-licensed` repos.
 
 Scanned across **full git history** with a checker holding **no exemptions at all** —
