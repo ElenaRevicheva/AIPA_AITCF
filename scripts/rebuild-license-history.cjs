@@ -95,7 +95,7 @@ const LOG_GLOB = '*.log';
 // an EMAIL_ADDRESS finding -- AILA-licensed scored 7 of them, all `aipa@`. The working
 // repos keep the real address because the product sends from it; the licensed COPY
 // must not carry it.
-const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com|anthropic\.com|cursor\.com)$/i;
+const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com)$/i;
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const PHONE_RE = /(?<![\w+-])(\+?)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
 // The pattern above requires a 2-4 digit group after the country code, so a single-digit
@@ -297,8 +297,16 @@ function harvest(src, dataRepo) {
     while ((m = re.exec(diff)) !== null) if (looksSecret(m[1])) secrets.add(m[1]);
   }
   for (const m of diff.match(JWT_RE) || []) secrets.add(m);
+  // `Bearer SPRINT_BRIEFING_SECRET` names an env var in prose, so this file exempted it.
+  // HUD does not: it scored 78 AUTHORIZATION_BEARER_TOKEN on AIPA_AITCF, and 91 of these
+  // phrases are in the history. But the bare NAME must never become a secret rule --
+  // `SPRINT_BRIEFING_SECRET==>REDACTED` would rewrite process.env.SPRINT_BRIEFING_SECRET
+  // everywhere and silently break the code. Replace the PHRASE, keep the identifier.
   { let bm; const br = new RegExp(BEARER_TOK_RE.source, "g");
-    while ((bm = br.exec(diff)) !== null) if (!/^[A-Z0-9_]+$/.test(bm[1])) secrets.add(bm[1]); }
+    while ((bm = br.exec(diff)) !== null) {
+      if (/^[A-Z0-9_]+$/.test(bm[1])) shapes.set(bm[0], 'Bearer REDACTED');
+      else secrets.add(bm[1]);
+    } }
   for (const m of diff.match(VENDOR_RE) || []) secrets.add(m);
   for (const m of diff.match(DB_HOST_RE) || []) secrets.add(m);
 
