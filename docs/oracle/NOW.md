@@ -131,6 +131,42 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🚨 THE BUTTON. `Run checks again` DOES NOT RUN `pii_qc_llm`.
+
+**This is the one to remember, and I got it wrong for two hours before finding it.**
+
+The owner panel's **`Run checks again`** (right-hand Manage listing box) runs the
+**mandatory + informational** set only. It also **RESETS** the recommended results to
+`"status":"unknown"` and deletes their previous findings from the payload. So after
+pressing it the panel reads *"All mandatory checks passed / 11 passed"* with **zero
+failures and no `pii qc llm` row at all** — which looks like progress and is actually a
+cleared scoreboard.
+
+`pii_qc_llm` starts ONLY from a different button, far down the page in the **Quality
+checks** card, below the description and the asset list:
+
+> **Run recommended checks**  ·  *Included*
+
+Pressing it starts **115 sub-checks** (~1 hour) and the card reads
+`Quality checks running… N of 115 complete`.
+
+**How to tell which state you are in:**
+
+| panel says | what it means |
+|---|---|
+| `pii qc llm … failed`, score 0, `scan.failed` | it RAN and their scanner errored |
+| `pii qc llm` row absent, 8 rows at `unknown` | it was never started — press **Run recommended checks** |
+| `Quality checks running… N of 115` | the real run is in flight |
+
+**Correction to the earlier note in this file:** the "scanner wedged for 100 minutes" read
+was wrong. The 21:06 run genuinely errored (`scan.failed`, and that part stands). What
+followed was not a hang — `Run checks again` had reset those rows and nothing had been
+asked to run them. **`unknown` is not `pending`. It is `never started`.**
+
+Named concept: **a control that clears a result is not the control that produces one.**
+An empty scoreboard reads like a pass and is the absence of a measurement.
+
+
 ### 🚨 9 Sep 21:xx UTC — THE PII GATE WAS NEVER ABOUT EMAILS. Two separate things broke.
 
 **Read this before touching the licensed mirrors again.** The 9 Sep resubmission failed
