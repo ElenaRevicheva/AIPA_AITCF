@@ -95,9 +95,14 @@ const LOG_GLOB = '*.log';
 // an EMAIL_ADDRESS finding -- AILA-licensed scored 7 of them, all `aipa@`. The working
 // repos keep the real address because the product sends from it; the licensed COPY
 // must not carry it.
-const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com|users\.noreply\.(github|replit)\.com|anthropic\.com|cursor\.com)$/i;
+const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com|anthropic\.com|cursor\.com)$/i;
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const PHONE_RE = /(?<![\w+-])(\+?)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
+// The pattern above requires a 2-4 digit group after the country code, so a single-digit
+// area code slips past it: +57-1-275-2000 is a real embassy switchboard that survived
+// every rewrite. HUD's detector is looser than ours was. Harvest the union, keep the
+// guards -- they are what stop a version string becoming a phone number.
+const PHONE_LOOSE_RE = /(?<![\w+.-])\+\d[\d ().-]{7,16}\d(?![\w.-])/g;
 const PHONE_E164_RE = /(?<![\w+-])(\+)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
 const DATEISH = /^(19|20)\d{6}$/;
 const URL_CRED_RE = /\b[a-z][a-z0-9+.-]*:\/\/[A-Za-z0-9._%+-]{1,64}:([^@/\s"'`<>${}]{3,256})@/g;
@@ -248,7 +253,8 @@ function harvest(src, dataRepo) {
   // id is, while the strict pattern was letting real advertiser numbers through --
   // a dashed toll-free number and an 11-digit mobile survived the 9 Sep rewrite and
   // failed verify. Harvest with the loose pattern; let the guards do the protecting.
-  for (const m of diff.match(PHONE_RE) || []) {
+  const phoneHits = [].concat(diff.match(PHONE_RE) || [], diff.match(PHONE_LOOSE_RE) || []);
+  for (const m of phoneHits) {
     const digits = m.replace(/[^0-9]/g, '');
     if (digits.length < 9 || digits.length > 15) continue;   // versions, ports, short ids
     if (DATEISH.test(digits)) continue;                      // YYYYMMDD is a date
