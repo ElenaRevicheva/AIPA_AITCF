@@ -83,7 +83,9 @@ const DROP_GLOBS = [
 /** `*.log` is runtime noise everywhere EXCEPT a data repo, where the log is the product. */
 const LOG_GLOB = '*.log';
 
-const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com|users\.noreply\.github\.com)$/i;
+// Kept in step with build-license-bundle.cjs on purpose. The two drifted, and this file
+// then blocked a push on Elena's OWN address while the bundler treated it as safe.
+const SAFE_EMAIL = /@(example\.(com|org|net)|test\.com|localhost|sentry\.io|schema\.org|w3\.org|npmjs\.com|users\.noreply\.(github|replit)\.com|aideazz\.(xyz|com)|anthropic\.com|cursor\.com)$/i;
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const PHONE_RE = /(?<![\w+-])(\+?)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
 const PHONE_E164_RE = /(?<![\w+-])(\+)\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}(?![\w-])/g;
@@ -126,14 +128,14 @@ function die(m) { console.error(`\n✖ ${m}`); process.exit(1); }
  * world. Read blobs, not diffs.
  */
 function forEachBlobChunk(src, onChunk, capBytes = 12 * 1024 * 1024, per = 120) {
+  const NL = String.fromCharCode(10);
   let shas;
   try {
     shas = run('git', ['rev-list', '--all', '--objects'], { cwd: src })
-      .split(String.fromCharCode(10)).map((l) => l.slice(0, 40))
-      .filter((x) => /^[0-9a-f]{40}$/.test(x));
+      .split(NL).map((l) => l.slice(0, 40)).filter((x) => /^[0-9a-f]{40}$/.test(x));
   } catch { return 0; }
   if (!shas.length) return 0;
-  const NL = String.fromCharCode(10);
+
   const keep = [];
   try {
     const check = execFileSync('git', ['cat-file', '--batch-check=%(objectname) %(objecttype) %(objectsize)'],
@@ -143,14 +145,35 @@ function forEachBlobChunk(src, onChunk, capBytes = 12 * 1024 * 1024, per = 120) 
       if (parts[1] === 'blob' && Number(parts[2]) > 0 && Number(parts[2]) <= capBytes) keep.push(parts[0]);
     }
   } catch { return 0; }
+
   let bytes = 0;
   for (let i = 0; i < keep.length; i += per) {
+    let out;
     try {
-      const out = execFileSync('git', ['cat-file', '--batch'],
+      out = execFileSync('git', ['cat-file', '--batch'],
         { cwd: src, input: keep.slice(i, i + per).join(NL), maxBuffer: 1 << 29 });
-      bytes += out.length;
-      onChunk(out.toString('utf8'));
-    } catch { /* skip an unreadable batch rather than abort the rebuild */ }
+    } catch { continue; }
+
+    // Parse the batch stream object by object: header line, then payload bytes.
+    // ⚠️ Concatenating the whole stream and regexing it was wrong. Random bytes inside a
+    // BINARY blob form email- and phone-shaped strings — the 9 Sep run blocked four repos
+      // on four two-to-seven character strings that merely CONTAINED an @ or a run of
+      // digits, none of which exists as an address or a number anywhere.
+    // Binary content is a blind spot to declare, not a corpus to pattern-match.
+    let off = 0;
+    while (off < out.length) {
+      const nl = out.indexOf(10, off);
+      if (nl === -1) break;
+      const header = out.slice(off, nl).toString('utf8').split(' ');
+      const size = Number(header[2]);
+      if (!Number.isFinite(size)) break;
+      const start = nl + 1;
+      const payload = out.slice(start, start + size);
+      off = start + size + 1;
+      if (payload.includes(0)) continue;            // binary — skip, do not scan
+      bytes += payload.length;
+      onChunk(payload.toString('utf8'));
+    }
   }
   return bytes;
 }
