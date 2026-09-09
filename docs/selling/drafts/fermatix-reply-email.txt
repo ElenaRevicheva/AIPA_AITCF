@@ -4,7 +4,8 @@ SUBJECT: Re: Fermatix AI// Non-exclusive training licence
 
 Hi Ilnur,
 
-Answers in order.
+Answers in order. The attached dossier covers all eight in more depth — what each
+system does, why it was built, and numbers read from the running systems.
 
 1. WHERE THE REPOSITORIES COME FROM
 
@@ -23,8 +24,8 @@ their own licences. What I license is my source.
 3. AI-RELATED CODE AND DATA
 
 Substantially, yes — that is what they are. LangGraph agents, MCP tool use, a
-five-provider LLM failover chain, RAG memory, an eval suite of 137 tests with 129 fully
-offline, and bilingual assistants on WhatsApp and Telegram. One of the eight is a
+five-provider LLM failover chain, RAG memory, an eval suite of 137 tests, 129 of them
+fully offline, and bilingual assistants on WhatsApp and Telegram. One of the eight is a
 dataset rather than a codebase: ad-angle time series, 3,304 records back to June 2026.
 
 Excluded from delivery: keys and credentials, CRM contents, chat logs, customer personal
@@ -40,12 +41,8 @@ The same eight are also listed non-exclusively on DataVendor/HUD. Non-exclusive 
 model, not a fallback: I retain copyright, the AIdeazz brand, the domains, and every
 product in production. If Fermatix wants exclusivity, tell me and I will price it.
 
-Attached is the provenance dossier for all eight: what each system does, why it was
-built, and the numbers, read from the running systems.
-
 Send the metadata script whenever you are ready — I will run it and return the output.
-
-For the call: I am in Panama City, UTC-5. Send two or three windows and I will confirm one.
+For the call I am in Panama City, UTC-5; send two or three windows and I will confirm one.
 
 Best regards,
 
