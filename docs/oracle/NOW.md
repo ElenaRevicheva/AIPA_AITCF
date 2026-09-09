@@ -170,6 +170,28 @@ snapshot dates — atlas-captures **is** a time series, its dates are the produc
 so handle redaction must be a curated denylist, never a regex; lat/long pairs are Panama
 city centroids used for geo-targeting.
 
+### 🚨 AND THE BIGGEST ONE — the mirrors were shipping OTHER PEOPLE'S chat logs
+
+Found while checking what else the people-layer scan had missed. In the EspaLuz mirrors:
+
+- `user_sessions.json` — **real conversation history** between real users and the bot
+- `user_onboarding.json` — their **names, countries, spouses and their children's ages**
+- `family_memory_data/` — per-family profiles and relationships
+- `backup_before_postgres/`, `data_backup/` — pre-migration dumps of the live
+  subscriber tables, including a phone-to-email mapping
+
+**Every content gate read ZERO on these files**, because the addresses inside them had
+already been redacted to `redacted-contact-NNN`. That is the trap, and it is the sharper
+version of the same lesson: **a pseudonymised customer table is still a customer table,
+and no regex over its contents will ever say so. Only the FILENAME tells the truth about
+what a file holds.**
+
+The listing's own terms already say chat logs and customer PII are excluded — so this was
+a promise the artifact was not keeping. Dropped by glob; `verifyHistory` now fails on the
+path, extension-scoped so the data file `subscribers.json` goes while a source file that
+merely handles subscribers stays. **Match the payload, not the topic.** The buyer loses
+nothing: the code recreates all of these on first run.
+
 **The named lesson: a scanner that cannot open a file format is not a clean result, it is
 an unmeasured one.** We excluded binary blobs to stop phantom findings and thereby built
 a gate that was structurally incapable of seeing seventeen copies of her résumé.
