@@ -224,7 +224,13 @@ function harvest(src, dataRepo) {
     }
     emails.set(m, byLc.get(lc));
   }
-  for (const m of diff.match(dataRepo ? PHONE_E164_RE : PHONE_RE) || []) {
+  // Data repos used to harvest E.164 ONLY, so a 15-digit Ad Library id could never be
+  // rewritten into a fake phone. That guard is now redundant AND harmful: the length
+  // rule below already refuses any bare run of 13+ digits, which is exactly what an ad
+  // id is, while the strict pattern was letting real advertiser numbers through --
+  // a dashed toll-free number and an 11-digit mobile survived the 9 Sep rewrite and
+  // failed verify. Harvest with the loose pattern; let the guards do the protecting.
+  for (const m of diff.match(PHONE_RE) || []) {
     const digits = m.replace(/[^0-9]/g, '');
     if (digits.length < 9 || digits.length > 15) continue;   // versions, ports, short ids
     if (DATEISH.test(digits)) continue;                      // YYYYMMDD is a date
@@ -414,7 +420,8 @@ function verifyHistory(work) {
       if (/\s/.test(m)) continue;
       if (d.length >= 13 && !m.startsWith('+')) continue;
       if (/0{5,}$/.test(d)) continue;
-      if (/([0-9]){7,}/.test(d)) continue;
+        if (/([0-9])\1{7,}/.test(d)) continue;   // 8+ of the same digit
+        if (/^0{4,}/.test(d)) continue;                  // zero-padded placeholder
       if (OURS.test(m.replace(/[^0-9+]/g, ''))) continue;
       blobPhones.add(m);
     }
