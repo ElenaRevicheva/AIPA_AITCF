@@ -44,15 +44,19 @@ const REPOS = [
  * The EIGHT assets actually attached to the DataVendor listing. Note this is NOT
  * the same set as REPOS: cto-aipa itself is not listed — its clean-room mirror is.
  */
+// ⚠️ THESE MUST BE THE MIRRORS. Until 9 Sep 2026 seven of the eight pointed at the
+// WORKING repos, so `--listing` reported on trees DataVendor never grades and called the
+// set clean while the licensed history carried thousands of findings. The listed asset is
+// always `<name>-licensed`, and its checkout lives under _license-history/.
 const LISTING_ASSETS = [
-  ['AILA',                    'D:/aideazz/AILA'],
-  ['AIPA_AITCF-licensed',     'D:/aideazz/_license-history/AIPA_AITCF'],
-  ['EspaLuzFamilybot',        'D:/aideazz/EspaLuzFamilybot'],
-  ['EspaLuzWhatsApp',         'D:/aideazz/EspaLuzWhatsApp'],
-  ['EspaLuz_Influencer',      'D:/aideazz/EspaLuz_Influencer'],
-  ['VibeJobHunterAIPA_AIMCF', 'D:/aideazz/VibeJobHunterAIPA_AIMCF'],
-  ['atlas-captures',          'D:/aideazz/atlas-captures'],
-  ['dragontrade-agent',       'D:/aideazz/dragontrade-agent'],
+  ['AILA-licensed',                    'D:/aideazz/_license-history/AILA'],
+  ['AIPA_AITCF-licensed',              'D:/aideazz/_license-history/AIPA_AITCF'],
+  ['EspaLuzFamilybot-licensed',        'D:/aideazz/_license-history/EspaLuzFamilybot'],
+  ['EspaLuzWhatsApp-licensed',         'D:/aideazz/_license-history/EspaLuzWhatsApp'],
+  ['EspaLuz_Influencer-licensed',      'D:/aideazz/_license-history/EspaLuz_Influencer'],
+  ['VibeJobHunterAIPA_AIMCF-licensed', 'D:/aideazz/_license-history/VibeJobHunterAIPA_AIMCF'],
+  ['atlas-captures-licensed',          'D:/aideazz/_license-history/atlas-captures'],
+  ['dragontrade-agent-licensed',       'D:/aideazz/_license-history/dragontrade-agent'],
 ];
 
 /**

@@ -306,6 +306,22 @@ function harvest(src, dataRepo) {
       // a credential shape nor an address shape.
       if (colon > seg.indexOf('://') + 2) shapes.set(seg, seg.slice(0, seg.indexOf('://') + 3));
     } }
+  // GENERIC_SECRET_ASSIGNMENT: a credential-ish NAME beside a QUOTED LITERAL. HUD scores
+  // the shape, so a mock value counts exactly like a live key -- AIPA_AITCF-licensed still
+  // held three (`pat-na1-mock-key`, `mock-visibility-key`, the published DEMO_API_KEY).
+  // build-license-bundle.cjs already breaks these; the history rebuild did not.
+  //
+  // Shorten the VALUE rather than splitting it: `'x' + 'y'` is valid JS and Python but not
+  // shell, YAML or JSON, and filter-repo replaces bytes with no idea which it is looking at.
+  // A short literal is valid everywhere and carries no shape -- the detector needs six
+  // characters. Templates are left alone; looksSecret() already refuses those.
+  { const GSA = /(?<![A-Za-z0-9])(?:password|passwd|pwd|secret|api_?key|access_?token|auth_?token|client_?secret|token)(?![A-Za-z0-9])[ \t]*[:=][ \t]*(["'])([^"'\n]{6,})\1/gi;
+    let g; const gr = new RegExp(GSA.source, 'gi');
+    while ((g = gr.exec(diff)) !== null) {
+      const q = g[1], val = g[2];
+      if (/[${}<>]/.test(val)) continue;                 // template, not a literal
+      shapes.set(g[0], g[0].replace(q + val + q, q + 'xx' + q));
+    } }
   for (const re of [URL_CRED_RE, SQL_PW_RE]) {
     let m; re.lastIndex = 0;
     while ((m = re.exec(diff)) !== null) if (looksSecret(m[1])) secrets.add(m[1]);
@@ -476,7 +492,10 @@ function verifyHistory(work) {
   // AIPA_AITCF on two such strings, both of them this scrubber's own output. Same trap as
   // flagging user:REDACTED@ and the +50700000NN placeholder: a gate that fires on its own
   // replacements can never go green. No real number contains this exact run.
-  const OURS = /50700000[0-9]{2}/;
+  // Was: an exemption for our own +50700000NN replacement. That value is no longer
+  // generated -- replacements are redacted-phone-NN -- so exempting it is now a hole
+  // that would silently pass an old blob carrying the string. Matches nothing.
+  const OURS = /^$/;
   forEachBlobChunk(work, (t) => {
     for (const m of findEmails(t)) blobEmails.add(m);
     const cre = new RegExp(credRe.source, 'g');
