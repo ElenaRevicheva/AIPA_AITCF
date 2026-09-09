@@ -1,5 +1,5 @@
 TO: ilnur@fermatix.ai
-CC: aipa@aideazz.xyz
+CC: aipa@aideazz.xyz, elena.revicheva2016@gmail.com
 SUBJECT: Re: Fermatix AI// Non-exclusive training licence
 
 Hi Ilnur,
@@ -39,6 +39,9 @@ No licence has been granted to date.
 The same eight are also listed non-exclusively on DataVendor/HUD. Non-exclusive is the
 model, not a fallback: I retain copyright, the AIdeazz brand, the domains, and every
 product in production. If Fermatix wants exclusivity, tell me and I will price it.
+
+Attached is the provenance dossier for all eight: what each system does, why it was
+built, and the numbers, read from the running systems.
 
 ON THE METADATA SCRIPT
 

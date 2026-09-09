@@ -45,6 +45,9 @@ The same eight are also listed non-exclusively on DataVendor/HUD. Non-exclusive 
 model, not a fallback: I retain copyright, the AIdeazz brand, the domains, and every
 product in production. If Fermatix wants exclusivity, tell me and I will price it.
 
+Attached is the provenance dossier for all eight: what each system does, why it was
+built, and the numbers, read from the running systems.
+
 ON THE METADATA SCRIPT
 
 Send it. I run it against the repositories and return the output. I do not grant

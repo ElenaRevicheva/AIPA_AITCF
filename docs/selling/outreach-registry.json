@@ -3110,6 +3110,13 @@
     "company": "Fermatix",
     "email": "ilnur@fermatix.ai",
     "emailDraft": "docs/selling/drafts/fermatix-reply-email.txt",
-    "dealId": "64531338321"
+    "dealId": "64531338321",
+    "cc": "aipa@aideazz.xyz, elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/Nine_Systems_And_Why_They_Exist_AIdeazz.pdf",
+        "filename": "AIdeazz_Nine_Systems_Provenance_Dossier.pdf"
+      }
+    ]
   }
 }
