@@ -300,7 +300,11 @@ function harvest(src, dataRepo) {
       const seg = m[0];                                  // scheme://user:pass@
       const at = seg.lastIndexOf('@');
       const colon = seg.lastIndexOf(':', at);
-      if (colon > seg.indexOf('://') + 2) shapes.set(seg, seg.slice(0, colon) + '@');
+      // Drop the WHOLE credential segment, user included. Collapsing to `://user@host`
+      // left postgres@...railway.app, which reads as an email address -- the fix
+      // manufacturing the finding, for the third time today. `://host` carries neither
+      // a credential shape nor an address shape.
+      if (colon > seg.indexOf('://') + 2) shapes.set(seg, seg.slice(0, seg.indexOf('://') + 3));
     } }
   for (const re of [URL_CRED_RE, SQL_PW_RE]) {
     let m; re.lastIndex = 0;
