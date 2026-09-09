@@ -102,7 +102,10 @@ const DROP_GLOBS = [
   // are the product and are deliberately kept -- only the prose files go.
   '*resume*.md', '*Resume*.md', '*RESUME*.md',
   '*resume*.txt', '*Resume*.txt', '*RESUME*.txt',
-  'JOB_SEARCH.md', 'RESUME_BULLETS.md',
+  // Leading `*` is REQUIRED: --path-glob matches the whole path, so a bare filename
+  // only ever matches a file sitting at the repo root. `docs/JOB_SEARCH.md` survived
+  // the first run for exactly this reason.
+  '*JOB_SEARCH.md', '*RESUME_BULLETS.md',
 ];
 // -- PEOPLE, NOT CREDENTIALS ---------------------------------------------
 // Everything else in this file hunts emails, phone numbers, keys and tokens.
@@ -112,8 +115,11 @@ const DROP_GLOBS = [
 //
 // Boundaries are [A-Za-z0-9_] and NOT a word-boundary escape: that escape counts `_`
 // as a word character, so it would rewrite the middle of an identifier such as
-// alisa_profile and break the code. The lowercase form needs the guard for a second
-// reason as well -- the English word `personalisation` literally contains the name.
+// `<name>_profile` and break the code. NOTE: that example is deliberately written with a
+// placeholder -- an earlier version spelled the name out and this comment then became
+// the last surviving copy of it in the mirror. A comment describing a shape must never
+// contain the shape. The lowercase form needs the guard for a second reason as well:
+// the ordinary English word `personalisation` literally contains the name.
 const FIXED_RULES = [
   // A four-year-old's first name and age are hardcoded into the EspaLuz system prompt
   // ("You're speaking with <name>, a 4-year-old child"), and her school appears beside
