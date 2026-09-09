@@ -106,7 +106,9 @@ const SQL_PW_RE = /\b(?:PASSWORD|IDENTIFIED\s+BY)\s+['"]([^'"\n\r]{4,200})['"]/g
 const DB_HOST_RE = /\b[a-z0-9-]+\.proxy\.(?:rlwy\.net|render\.com)\b/gi;
 const VENDOR_RE = /\b(sk-ant-api\d{2}-[A-Za-z0-9_-]{20,}|sk-ant-[A-Za-z0-9_-]{30,}|sk-proj-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gsk_[A-Za-z0-9]{40,}|AIza[A-Za-z0-9_-]{35}|AKIA[0-9A-Z]{16}|\d{9,10}:AA[A-Za-z0-9_-]{32,})\b/g;
 
+// Author identity for --mailmap still needs a real address; blob CONTENT does not.
 const OWNER_ID_EMAIL = 'ElenaRevicheva' + '@users.noreply.github.com';
+const OWNER_TEXT_TOKEN = 'redacted-owner-contact';
 const OWNER_EMAILS = new Set(['elena.revicheva2016' + '@gmail.com', 'aipa@aideazz.xyz',
   'elena@aideazz.xyz', 'elena@aideazz.com', 'your-email@example.com',
   // Replit stamps commits with its own per-user noreply identity.
@@ -230,8 +232,8 @@ function harvest(src, dataRepo) {
     if (!byLc.has(lc)) {
       // Her own addresses resolve to the same GitHub noreply identity the mailmap sets,
       // so authorship stays coherent across metadata, messages and file content.
-      byLc.set(lc, OWNER_EMAILS.has(lc) ? OWNER_ID_EMAIL
-        : `contact${String(byLc.size + 1).padStart(3, '0')}@example.com`);
+      byLc.set(lc, OWNER_EMAILS.has(lc) ? OWNER_TEXT_TOKEN
+        : `redacted-contact-${String(byLc.size + 1).padStart(3, "0")}`);
     }
     emails.set(m, byLc.get(lc));
   }
@@ -303,7 +305,11 @@ function writeReplacements(file, { emails, phones, secrets }) {
   for (const [addr, rep] of [...emails].sort((a, b) => b[0].length - a[0].length)) lines.push(`${addr}==>${rep}`);
   for (const p of [...phones].sort((a, b) => b.length - a.length)) {
     const plus = p.startsWith('+') ? '+' : '';
-    lines.push(`${p}==>${plus}50700000${String(parseInt(crypto.createHash('sha1').update(p).digest('hex').slice(0, 8), 16) % 100).padStart(2, '0')}`);
+    // ⚠️ THE REPLACEMENT MUST NOT CARRY THE SHAPE IT REPLACES. Swapping a real number
+    // for +50700000NN produced 299 copies of one fake phone, and HUD counted every
+    // one -- the scrubber manufacturing the finding it removed. Same for emails:
+    // contact001@example.com is still an address. Redact to a token, not a look-alike.
+    lines.push(`${p}==>redacted-phone-${String(parseInt(crypto.createHash("sha1").update(p).digest("hex").slice(0, 8), 16) % 100).padStart(2, "0")}`);
   }
   fs.writeFileSync(file, lines.join('\n') + '\n', 'utf8');
   return lines.length;
