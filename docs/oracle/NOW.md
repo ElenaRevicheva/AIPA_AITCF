@@ -131,6 +131,39 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 10 Sep — HUD SAYS IT OUTRIGHT: *"certification withheld — publishing unaffected"*
+
+On listing `5f7b8392-a76b-46fa-9772-02f9daae7d6e` ("AI Tech + Marketing Co-Founders:
+8 Private Repos"), the Quality checks card reads:
+
+```
+25 failed     certification withheld -- publishing unaffected
+24 passed     18 mandatory
+48 measured   informational -- no verdict
+24 not gradable on this snapshot
+```
+
+**That grey line beside `25 failed` is the whole answer to "can I sell it".** The failures
+are `pii_qc_llm` ×8 and `verify_claims` ×8 — recommended checks. HUD's own label says
+they withhold a *certification badge*, not the sale.
+
+All **18 mandatory** checks pass, including the new `repo_git_history_present`.
+
+**The `Git history` mandatory error was HUD mid-deploy and is gone.** It read
+*"Deterministic check `repo_git_history_present` has no implementation"* with HUD's own
+note *"did not finish — not the listing's fault"*. Minutes later: all eight **passed**,
+*"The repository snapshot includes Git history."*
+
+🎯 **The decision that saved the sale:** that new mandatory check *requires* git
+history in the snapshot. Flattening the mirrors was the tempting way to kill PII — and
+it is what once cut the quote to **$28,073**. Had we flattened, this listing could not be
+published at all. **Scrub the history, never delete it** is now enforced by the market.
+
+⚠️ **Listing hygiene:** 10 listings exist. `Active 1` is only the $600 NL2Repo
+sample; **3 are In review** and all carry the same eight assets. Keep ONE, archive the
+other two, so inventory shows a single row.
+
+
 ### ✅ 10 Sep 09:1x — THE `Git history` BLOCKER WAS HUD MID-DEPLOY. It cleared itself.
 
 Listing `5f7b8392-a76b-46fa-9772-02f9daae7d6e` showed a red mandatory failure:
