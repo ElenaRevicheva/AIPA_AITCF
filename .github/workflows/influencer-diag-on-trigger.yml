@@ -31,8 +31,8 @@ jobs:
           [ -n "$LINE" ] || { echo "::error::.influencer-diag-trigger is empty"; exit 1; }
           case "$LINE" in
             \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
-            diag|fix|sync|cmo|cmo-fix) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, or # idle — got '$LINE'"; exit 1 ;;
+            diag|fix|sync|cmo|cmo-fix|geo) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, or # idle — got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -69,9 +69,16 @@ jobs:
               ubuntu@170.9.242.90:/tmp/patch-cmo-make-images.py
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fix-cmo-make-images.sh
-          elif [ "$MODE" = "cmo" ]; then
+          elif [ "$MODE" = "geo" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/patch-influencer-geo-rotation.py \
+              scripts/oracle-resilience/geo_api_promo.py \
+              ubuntu@170.9.242.90:/tmp/
+            scp -r $SSHOPTS \
+              scripts/oracle-resilience/geo-api-assets \
+              ubuntu@170.9.242.90:/tmp/geo-api-assets
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
-              "$MODE" < scripts/oracle-resilience/diag-cmo-make.sh
+              "$MODE" < scripts/oracle-resilience/fix-influencer-geo.sh
           else
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/diag-influencer-promo.sh
