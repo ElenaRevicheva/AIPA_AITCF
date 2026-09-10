@@ -5,6 +5,7 @@ Imported by main.py (Oracle). Does not start the bot. Secrets stay in .env.
 from __future__ import annotations
 
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -170,8 +171,9 @@ _POSTS = {
             "bars. Then the checks — pass/warn/fail — each with what we actually "
             "saw on the page and why that check exists. Shareable as "
             f"{API_URL}?url=https://your-site.com\n\n"
-            "I run it on my own properties first. The money page is /portfolio; "
-            "the tool buyers punch a domain into is /api. Direct page reads. "
+            "I run it on my own properties first. The money page is "
+            f"{PORTFOLIO}; the tool buyers punch a domain into is {API_URL}. "
+            "Direct page reads. "
             "Engine v1.2.0. Free demo key.\n\n"
             f"Your turn: {API_URL}\n{PORTFOLIO}"
         ),
@@ -183,7 +185,8 @@ _POSTS = {
             "y por qué existe ese chequeo. Se comparte: "
             f"{API_URL}?url=https://tu-sitio.com\n\n"
             "Lo corro primero en mis propias propiedades. La página de dinero es "
-            "/portfolio; la herramienta donde pegas el dominio es /api. Lectura "
+            f"{PORTFOLIO}; la herramienta donde pegas el dominio es {API_URL}. "
+            "Lectura "
             "directa. Motor v1.2.0. Demo gratis.\n\n"
             f"Tu turno: {API_URL}\n{PORTFOLIO}"
         ),
@@ -267,14 +270,34 @@ def _stem(image_url: str) -> str:
     return (image_url or "").rstrip("/").rsplit("/", 1)[-1]
 
 
+# LinkedIn/Instagram/Buffer treat a leading "/api" as relative to the first
+# URL in the post (usually the portfolio). That produced
+# aideazz.xyz/portfolio/api and aideazz.xyz/portfolio/portfolio/portfolio.
+_WRONG_API = re.compile(r"https?://aideazz\.xyz(?:/portfolio)+/api/?", re.I)
+_WRONG_PORT = re.compile(r"https?://aideazz\.xyz(?:/portfolio){2,}/?", re.I)
+_BARE_API = re.compile(r"(?<!aideazz\.xyz)/api(?=[\s.,;:!?)\]'\"\n]|$)")
+_BARE_PORT = re.compile(r"(?<!aideazz\.xyz)/portfolio(?=[\s.,;:!?)\]'\"\n]|$)")
+
+
+def canonicalize_aideazz_urls(text: str) -> str:
+    """Force the only two public destinations. Never emit a relative path."""
+    if not text:
+        return text
+    text = _WRONG_API.sub(API_URL, text)
+    text = _WRONG_PORT.sub(PORTFOLIO, text)
+    text = _BARE_API.sub(API_URL, text)
+    text = _BARE_PORT.sub(PORTFOLIO, text)
+    return text
+
+
 def maybe_geo_copy(campaign_type: str, image_url: str, promo: str, now: Optional[datetime] = None) -> str:
     geo_asset = "geo-api/" in (image_url or "") or _stem(image_url).startswith("geo-")
     if campaign_type == "espaluz" and not geo_asset:
-        return promo
+        return canonicalize_aideazz_urls(promo)
     if not geo_asset and campaign_type not in ("geo_api", "marketing_engine"):
-        return promo
+        return canonicalize_aideazz_urls(promo)
     if not geo_asset:
-        return promo
+        return canonicalize_aideazz_urls(promo)
     stem = _stem(image_url)
     pair = _POSTS.get(stem)
     if not pair:
@@ -296,7 +319,7 @@ def maybe_geo_copy(campaign_type: str, image_url: str, promo: str, now: Optional
             ),
         }
     lang = "es" if panama_today(now).toordinal() % 2 == 0 else "en"
-    return pair[lang]
+    return canonicalize_aideazz_urls(pair[lang])
 
 
 def local_geo_dir() -> str:

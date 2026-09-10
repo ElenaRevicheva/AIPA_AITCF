@@ -112,6 +112,11 @@ def test_copy_sells_the_api() -> None:
         text = g.maybe_geo_copy("marketing_engine", u, "OLD")
         assert "https://aideazz.xyz/api" in text
         assert "https://aideazz.xyz/portfolio" in text
+        assert "https://aideazz.xyz/portfolio/api" not in text
+        assert "https://aideazz.xyz/portfolio/portfolio" not in text
+        stripped = text.replace("https://aideazz.xyz/api", "").replace("https://aideazz.xyz/portfolio", "")
+        assert "/api" not in stripped
+        assert "/portfolio" not in stripped
         assert "34" in text
         assert text != "OLD"
     keep = g.maybe_geo_copy(
@@ -120,6 +125,22 @@ def test_copy_sells_the_api() -> None:
         "KEEP",
     )
     assert keep == "KEEP"
+
+
+def test_canonicalize_fixes_relative_and_doubled_paths() -> None:
+    raw = (
+        "See /api and /portfolio then "
+        "https://aideazz.xyz/portfolio/api and "
+        "https://aideazz.xyz/portfolio/portfolio/portfolio"
+    )
+    out = g.canonicalize_aideazz_urls(raw)
+    assert "https://aideazz.xyz/api" in out
+    assert "https://aideazz.xyz/portfolio" in out
+    assert "portfolio/api" not in out
+    assert "portfolio/portfolio" not in out
+    leftover = out.replace("https://aideazz.xyz/api", "").replace("https://aideazz.xyz/portfolio", "")
+    assert "/api" not in leftover
+    assert "/portfolio" not in leftover
 
 
 def test_hud_shapes_absent_from_new_source() -> None:
@@ -179,6 +200,7 @@ def test_patcher_hooks_both_send_functions() -> None:
     )
     out = _load_patcher().patch_source(sample)
     assert out.count("apply_lane(campaign_type, image_url)") == 2
+    assert out.count("canonicalize_aideazz_urls(promo)") == 2
     assert "day.toordinal() % 3" in out
     assert out.index("geo-grapes-citation.jpg") < out.index("me_01.jpg")
     _hud_scan("patched_sample", out)
@@ -191,6 +213,7 @@ def main() -> None:
         test_weighted_pool_fires_new_harder,
         test_apply_lane_keeps_make_router,
         test_copy_sells_the_api,
+        test_canonicalize_fixes_relative_and_doubled_paths,
         test_hud_shapes_absent_from_new_source,
         test_jpegs_fit_buffer_and_carry_no_exif_pii,
         test_patcher_hooks_both_send_functions,

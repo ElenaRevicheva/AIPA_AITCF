@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from geo_api_promo import GEO_PRIMARY  # noqa: E402
 
-IMPORT = "from geo_api_promo import apply_lane, maybe_geo_copy\n"
+IMPORT = "from geo_api_promo import apply_lane, maybe_geo_copy, canonicalize_aideazz_urls\n"
 
 NEW_CAMPAIGN_FN = '''def get_campaign_type_for_date(dt: datetime) -> str:
     """2/3 GEO/AEO/Tech SEO (marketing_engine payload) · 1/3 EspaLuz.
@@ -55,6 +55,12 @@ def _replace_function(src: str, name: str, new_fn: str) -> str:
 
 
 def _inject_import(src: str) -> str:
+    src = src.replace(
+        "from geo_api_promo import apply_lane, maybe_geo_copy\n",
+        IMPORT,
+    )
+    if "canonicalize_aideazz_urls" in src and "from geo_api_promo import" in src:
+        return src
     if "from geo_api_promo import" in src:
         return src
     lines = src.splitlines(keepends=True)
@@ -64,6 +70,20 @@ def _inject_import(src: str) -> str:
             insert_at = i + 1
     lines.insert(insert_at, IMPORT)
     return "".join(lines)
+
+
+def _ensure_canonicalize(src: str) -> str:
+    if src.count("canonicalize_aideazz_urls(promo)") >= 2:
+        return src
+    out = []
+    for line in src.splitlines(keepends=True):
+        out.append(line)
+        if re.match(r"[ \t]*promo = maybe_geo_copy\(", line) and "canonicalize_aideazz_urls" not in "".join(out[-3:]):
+            indent = re.match(r"[ \t]*", line).group(0)
+            nxt = f"{indent}promo = canonicalize_aideazz_urls(promo)\n"
+            if nxt not in out[-1:]:
+                out.append(nxt)
+    return "".join(out)
 
 
 def _inject_before_channel_send(src: str, fn: str) -> str:
@@ -85,6 +105,7 @@ def _inject_before_channel_send(src: str, fn: str) -> str:
     snippet = (
         f"{indent}campaign_type, image_url = apply_lane(campaign_type, image_url)\n"
         f"{indent}promo = maybe_geo_copy(campaign_type, image_url, promo)\n"
+        f"{indent}promo = canonicalize_aideazz_urls(promo)\n"
     )
     body2 = body[:line_start] + snippet + body[line_start:]
     return src[: m.start()] + body2 + src[m.end() :]
@@ -136,6 +157,7 @@ def patch_source(src: str) -> str:
     src = _ensure_local_search(src)
     src = _prepend_geo_images(src)
     src = _retitle_schedule_copy(src)
+    src = _ensure_canonicalize(src)
     return src
 
 
@@ -186,6 +208,7 @@ def _self_check() -> None:
     assert "day.toordinal() % 3" in out
     assert out.count("apply_lane(campaign_type, image_url)") == 2
     assert out.count("promo = maybe_geo_copy") == 2
+    assert out.count("canonicalize_aideazz_urls(promo)") == 2
     assert "geo-grapes-citation.jpg" in out
     assert out.index("geo-grapes-citation.jpg") < out.index("me_01.jpg")
     assert "2/3 GEO-API" in out or "day.toordinal() % 3" in out

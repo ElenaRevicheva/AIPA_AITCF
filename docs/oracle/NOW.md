@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 2026-09-10 21:36 UTC | Fix Influencer post URLs /api /portfolio | `geo_api_promo.py`, `espaluz-influencer` | this session |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -143,9 +143,11 @@ git log keeps the record.
 - Branch `cursor/fix-influencer-make-0841` (PR 50 vs `main`). Do not merge until Elena confirms IG/LI. Merging does not delete Claude work; NOW.md lives on `main`.
 - PII: new files have 0 HUD EMAIL/PHONE/Bearer/Make-URL shapes. Stills are **not** in Influencer git (HUD-listed). Rotation JSON + `main.py` bak stay in `/tmp`. Webhooks stay in `.env`. Frozen `-licensed` snapshots untouched.
 
-**NEXT (Elena, now):** Make **3044021 ON**. Send `/daily_promo` once in Telegram. **Do not click Make Run once.** Expect a fruit/dashboard still + copy that names `https://aideazz.xyz/api`. CMO **3543445** still: tap LinkedIn/Instagram once if you have not (same: no Run once).
+**IN FLIGHT:** Elena saw posts resolve to `aideazz.xyz/portfolio/api` and `…/portfolio/portfolio/portfolio`. Cause: copy said `/api` and `/portfolio`; LinkedIn/Buffer resolve those against the portfolio URL. Fix is absolute `https://aideazz.xyz/api` + `https://aideazz.xyz/portfolio` plus `canonicalize_aideazz_urls` on every send. Do not re-test until the geo Action is green.
 
-**NEXT (agent, only if Elena's post is wrong):** if Buffer/IG shows `me_25` + generic Groq copy, `apply_lane` did not reach the Make payload — fix send order, do not redeploy images.
+**NEXT (Elena, after geo Action green):** `/daily_promo` once. **Do not Make Run once.** Links must be exactly `https://aideazz.xyz/api` and `https://aideazz.xyz/portfolio`.
+
+**NEXT (agent):** if those two wrong URLs still appear, Groq copy is bypassing canonicalize — hook it earlier.
 
 **VERIFIED BY:** Action `34531884934` `patch contracts: PASS` + six GEO URLs HTTP 200; Action `34532463852` `FIRE_RESULT send_daily_promo OK` + `Sent to Make.com webhook. Response: 200` + Telegram `Read timed out`.
 
