@@ -214,9 +214,12 @@ def test_patcher_hooks_both_send_functions() -> None:
         "def send_automated_daily_promo():\n"
         "    promo, story, video_url, image_url, campaign_type = generate_scheduled_promo_bundle()\n"
         "    try:\n"
-        "        send_channel_promo_with_image(promo, image_url)\n"
+        "        try:\n"
+        "            send_channel_promo_with_image(promo, image_url)\n"
+        "            print('ok')\n"
+        "        except Exception as e:\n"
+        "            print(e)\n"
         "        payload = build_make_webhook_payload()\n"
-        "        print('ok')\n"
         "    except Exception as e:\n"
         "        print(e)\n\n"
         "def send_daily_promo(message):\n"
@@ -235,6 +238,10 @@ def test_patcher_hooks_both_send_functions() -> None:
         "    return 1\n"
     )
     out = _load_patcher().patch_source(sample)
+    import ast
+    ast.parse(out)
+    # Re-patch must stay valid: live main.py already has apply_lane inside try.
+    ast.parse(_load_patcher().patch_source(out))
     assert out.count("apply_lane(campaign_type, image_url)") == 2
     assert out.count("canonicalize_aideazz_urls(promo)") == 2
     assert "drop_leftover_story" in out

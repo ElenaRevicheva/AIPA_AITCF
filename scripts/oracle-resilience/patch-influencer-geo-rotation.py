@@ -172,20 +172,34 @@ def patch_source(src: str) -> str:
 def _ensure_story_wipe(src: str) -> str:
     if src.count("drop_leftover_story(") >= 2:
         return src
-    return src.replace(
-        "promo = canonicalize_aideazz_urls(promo)\n",
-        "promo = canonicalize_aideazz_urls(promo)\n"
-        "        story = drop_leftover_story(campaign_type, image_url, story)\n",
-    )
+    out = []
+    for line in src.splitlines(keepends=True):
+        out.append(line)
+        if re.match(r"[ \t]*promo = canonicalize_aideazz_urls\(promo\)\s*$", line):
+            indent = re.match(r"[ \t]*", line).group(0)
+            nxt = f"{indent}story = drop_leftover_story(campaign_type, image_url, story)\n"
+            if "drop_leftover_story" not in "".join(out[-3:]):
+                out.append(nxt)
+    return "".join(out)
 
 
 def _ensure_stamp_call(src: str) -> str:
-    if "stamp_make_payload(" in src:
+    if "stamp_make_payload(payload" in src:
         return src
+
+    def repl(match: re.Match) -> str:
+        line = match.group(0)
+        indent = re.match(r"[ \t]*", line).group(0)
+        return (
+            f"{line}\n"
+            f"{indent}payload = stamp_make_payload(payload, promo=promo, image_url=image_url)"
+        )
+
     return re.sub(
-        r"(payload\s*=\s*build_make_webhook_payload\([^)]*\))",
-        r"\1\n        payload = stamp_make_payload(payload, promo=promo, image_url=image_url)",
+        r"^([ \t]*payload\s*=\s*build_make_webhook_payload\([^)]*\))",
+        repl,
         src,
+        flags=re.M,
     )
 
 
@@ -213,9 +227,12 @@ def _self_check() -> None:
         "def send_automated_daily_promo():\n"
         "    promo, story, video_url, image_url, campaign_type = generate_scheduled_promo_bundle()\n"
         "    try:\n"
-        "        send_channel_promo_with_image(promo, image_url)\n"
+        "        try:\n"
+        "            send_channel_promo_with_image(promo, image_url)\n"
+        "            print('ok')\n"
+        "        except Exception as e:\n"
+        "            print(e)\n"
         "        payload = build_make_webhook_payload()\n"
-        "        print('ok')\n"
         "    except Exception as e:\n"
         "        print(e)\n\n"
         "def send_daily_promo(message):\n"
@@ -235,6 +252,7 @@ def _self_check() -> None:
     )
     out = patch_source(sample)
     ast.parse(out)
+    ast.parse(patch_source(out))
     assert "from geo_api_promo import apply_lane" in out
     assert "day.toordinal() % 3" in out
     assert out.count("apply_lane(campaign_type, image_url)") == 2
