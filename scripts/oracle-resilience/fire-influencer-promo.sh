@@ -34,6 +34,11 @@ print(f"panama={pan.isoformat()} geo_day={is_geo_day(now)}")
 print(f"next_geo_stem={next_geo_image({'geo_api_image_rotation_index': 0}).rsplit('/',1)[-1]}")
 PY
 
+PID=$(systemctl show espaluz-influencer -p MainPID --value)
+PYBIN=$(readlink -f "/proc/$PID/exe")
+echo "bot_pid=$PID bot_python=$PYBIN"
+[ -x "$PYBIN" ] || { echo "FATAL: cannot resolve bot python"; exit 1; }
+
 echo
 echo "=== stop bot (importing main.py while polling = Telegram 409) ==="
 trap 'sudo systemctl start espaluz-influencer; echo "trap: bot start rc=$?"' EXIT
@@ -44,7 +49,7 @@ systemctl is-active espaluz-influencer || true
 echo
 echo "=== FIRE send_daily_promo (slash-command path) ==="
 set +e
-timeout 90 python3 - <<'PY' | redact
+timeout 90 "$PYBIN" - <<'PY' | redact
 import os, sys, traceback
 os.chdir("/home/ubuntu/EspaLuz_Influencer")
 sys.path.insert(0, ".")
