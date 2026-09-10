@@ -40,7 +40,7 @@ def _inject_after_assignment(src: str, fn: str, var: str, snippet: str) -> str:
     if snippet.strip() in src and src.count(snippet.strip()) >= 1:
         # already in this file; still ensure inside this function
         pass
-    pattern = rf"(^def {re.escape(fn)}\(.*?(?=^def |\Z))"
+    pattern = rf"(^(?:async )?def {re.escape(fn)}\(.*?(?=^(?:async )?def |\Z))"
     m = re.search(pattern, src, flags=re.M | re.S)
     if not m:
         raise SystemExit(f"function {fn} not found")
@@ -94,7 +94,7 @@ def patch_file(path: Path) -> None:
 def _self_check() -> None:
     sample = (
         "import os\nfrom typing import Optional\n"
-        "def send_automated_daily_promo():\n"
+        "async def send_automated_daily_promo():\n"
         "    campaign_type = 'x'\n"
         "    image_url = 'u'\n"
         "    promo = 'p'\n"

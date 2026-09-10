@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # EspaLuz Influencer: 2/3 GEO-API (new images in front), 1/3 EspaLuz.
 # Piped over SSH (mode=geo). Never prints secrets. Does NOT POST a promo.
-set -uo pipefail
+set -euo pipefail
 
 MODE="${1:-geo}"
 DIR=/home/ubuntu/EspaLuz_Influencer
@@ -70,6 +70,8 @@ ls "$DIR/geo_api_images"
 
 echo
 echo "=== 2. patch main.py ==="
+echo "--- defs + image_url/promo/campaign hits ---"
+grep -nE '^(async )?def (send_automated_daily_promo|send_daily_promo)|image_url|campaign_type|^    promo =' "$DIR/main.py" | head -80
 python3 /tmp/patch-influencer-geo-rotation.py "$DIR/main.py"
 python3 -c "import ast,pathlib; ast.parse(pathlib.Path('$DIR/main.py').read_text())"
 python3 - <<'PY'
