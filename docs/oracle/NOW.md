@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-10 21:10 UTC | Influencer GEO/AEO 2/3 + API images | `espaluz-influencer`, `EspaLuz_Influencer/main.py`, `/var/www/influencer-images/geo-api/` | this session |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,36 +131,25 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT — 10 Sep 21:10 UTC — Influencer GEO/AEO 2/3 + API (Cursor Cloud)
+### 🟡 ELENA'S TAP — 10 Sep 21:30 UTC — Influencer `/daily_promo` (GEO day)
 
-**Ask:** EspaLuz Influencer schedule 2/3 GEO/AEO/Tech SEO (juicy `/api` promo),
-1/3 EspaLuz. Six new fruit/dashboard images in front of the existing pool,
-sized for Instagram+LinkedIn, current images kept.
+**DONE (Cursor Cloud, do not redo):**
+- Influencer images public: `https://webhook.aideazz.xyz/influencer-images/` (GitHub raw 404'd once the repo went private). `me_29.jpg` still **200**.
+- CMO images public: `…/influencer-images/cmo/marketing_engine_architecture_1.png` **200**. VJH `ad34fb3`. `vibejobhunter` was restarted 20:54 UTC.
+- Influencer schedule is **2/3 GEO/AEO/Tech-SEO → https://aideazz.xyz/api**, **1/3 EspaLuz**. Panama `ordinal % 3`: 0–1 GEO, 2 EspaLuz. Today 10 Sep Panama = GEO.
+- Six 1080px stills (4:5 / 1:1, EXIF stripped) at `…/influencer-images/geo-api/`. New stills weight **10×** any single `me_*.jpg`. Legacy `me_*` kept.
+- `apply_lane` + `maybe_geo_copy` live in `EspaLuz_Influencer/main.py` (git `b0a1c8d` PUSH_OK). Bot pid **3652166** since **21:30:01 UTC**.
+- Agent fire 21:29 UTC: `FIRE_RESULT send_daily_promo OK`, **Make webhook 200**. Telegram photo **timed out** (30s). Pre-swap log still said `me_25.jpg` — that is Groq rotation *before* `apply_lane`. Make should have the GEO still + `/api` copy if the hook ran.
+- Branch `cursor/fix-influencer-make-0841` (PR 50 vs `main`). Do not merge until Elena confirms IG/LI. Merging does not delete Claude work; NOW.md lives on `main`.
+- PII: new files have 0 HUD EMAIL/PHONE/Bearer/Make-URL shapes. Stills are **not** in Influencer git (HUD-listed). Rotation JSON + `main.py` bak stay in `/tmp`. Webhooks stay in `.env`. Frozen `-licensed` snapshots untouched.
 
-**CMO 3543445:** images live. Elena still taps LinkedIn/Instagram once (do
-not Make Run once).
+**NEXT (Elena, now):** Make **3044021 ON**. Send `/daily_promo` once in Telegram. **Do not click Make Run once.** Expect a fruit/dashboard still + copy that names `https://aideazz.xyz/api`. CMO **3543445** still: tap LinkedIn/Instagram once if you have not (same: no Run once).
 
-**Influencer 3044021:** images live; still turn ON then `/daily_promo` once.
+**NEXT (agent, only if Elena's post is wrong):** if Buffer/IG shows `me_25` + generic Groq copy, `apply_lane` did not reach the Make payload — fix send order, do not redeploy images.
 
-**NEXT (agent):** process 6 images to 4:5 / 1:1, host on CDN, rewrite
-Influencer lane to modulo-3, GEO copy that names https://aideazz.xyz/api.
+**VERIFIED BY:** Action `34531884934` `patch contracts: PASS` + six GEO URLs HTTP 200; Action `34532463852` `FIRE_RESULT send_daily_promo OK` + `Sent to Make.com webhook. Response: 200` + Telegram `Read timed out`.
 
-**Cause (journal 20:38:15 UTC):** CMO probed
-`raw.githubusercontent.com/.../assets/marketing_engine_architecture_1.png`
-(404, repo private), then sent `imageURL=""` so Make could “post text-only”.
-Instagram cannot. Telegram still said posting triggered.
-
-**DONE on Oracle 20:54:21 UTC:** VJH `assets/` at
-`https://webhook.aideazz.xyz/influencer-images/cmo/` —
-`marketing_engine_architecture_1.png` **200** image/png 720012 bytes, PNG
-magic probe PASS. `github_base` rewritten; `vibejobhunter` restarted pid
-**3644504**. VJH git `ad34fb3` PUSH_OK. Webhook stays in `.env`.
-
-**NEXT (Elena):** scenario 3543445 is already ON. Tap the CMO LinkedIn +
-Instagram button **once**. Do **not** click Make Run once — that replays
-the empty-image payload.
-
-**Influencer (3044021)** still waiting: turn ON, then `/daily_promo` once.
+**RISK:** Telegram “posting triggered” ≠ Buffer success. Empty `imageURL` = Instagram 400. One deployer at a time. Do not `git add` `content_memory.json` / `*.bak` / `.env` on EspaLuz_Influencer. Do not put Make URLs back in source.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
