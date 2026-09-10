@@ -1,0 +1,124 @@
+TO: megan@hud.ai
+CC: aipa@aideazz.xyz
+SUBJECT: Re: PII QC — the scan aborts before it writes findings (repro on two listings)
+
+Hi Megan,
+
+Thank you for the clear answers. Taking your two points in order, and then one
+thing I found while trying to act on the second.
+
+1. Failing repository vs whole listing — understood, and thank you for putting it
+in writing. All mandatory checks pass on the current listing, so I am proceeding
+on that basis.
+
+2. The findings with file locations, as on 5 September — I cannot send them,
+and the reason is the useful part: there are none. The scan aborts before it
+records where anything is. Every asset returns the same two findings and an
+empty evidence block.
+
+That is why four rounds of cleanup have not moved the score. I have not been
+able to act on the output because the output contains no locations to act on.
+
+Below are three things you can confirm yourself, in your own panel, without
+taking my word for anything. They reproduce on both of my current listings:
+
+  1e119ff6-fca3-4d1f-99a9-847dee93b697
+  5f7b8392-a76b-46fa-9772-02f9daae7d6e
+
+--------------------------------------------------------------------------
+ONE — two counters in the same result that cannot both be true
+
+VibeJobHunterAIPA_AIMCF-licensed, one run, same JSON:
+
+  summary : "The raw scan found 53 actionable finding(s)."
+  triage  : "119 finding(s) were offered for review and none were judged"
+
+119 findings offered for review, from a scan that found 53.
+
+atlas-captures-licensed is the same inconsistency in the other direction:
+123 found, 11 offered. Across the eight there is no consistent ratio between
+the two numbers — sometimes double, sometimes a twelfth. Both counters come
+from the same aborted run.
+
+TWO — the failure does not depend on repository size
+
+AILA-licensed is 9 files, 716 lines of source, 40 commits, roughly 1 MB.
+AIPA_AITCF-licensed is 1,001 commits and 59k LOC.
+
+Both return the identical error string, "unknown error", and both take minutes
+to produce it. A defect that behaves the same on nine files as on a thousand
+commits is not a function of what the repositories contain.
+
+THREE — three other checks pass on the same snapshot, in the same run
+
+  pii_clean            passed    (mandatory)
+  secrets_clean        passed    (mandatory)
+  repo_archive_ready   passed x8 (mandatory)
+
+Your deterministic PII check and your credentials check both complete and both
+pass on exactly the files pii_qc_llm scores 0. And pii_qc_llm's remediation
+reads "Re-run QC after fixing the listing artifact URI or packaging" — while
+repo_archive_ready, your own packaging check, passes on all eight in that run.
+
+--------------------------------------------------------------------------
+WHAT THE RESULT ITSELF SAYS
+
+Identical on all eight assets, on both listings — 16 asset-runs, no exceptions:
+
+  "scan_complete": false
+  "triage_status": "scan_incomplete"
+  "confidence": 0
+  "review_coverage": {}
+  "manual_review_suggested": true
+  notes: ["Scan failed; the verdict carries no evidence."]
+  remediation: "Re-run QC; do not treat this result as a reviewed verdict."
+
+agent_triage.not_attempted appears on every one. The review stage has not
+executed once, on any asset, in any listing.
+
+The detector stage is working, and it is deterministic. When it saw the
+freshly cleaned copies instead of the earlier capture, its counts moved:
+EspaLuzWhatsApp 74 -> 66, EspaLuzFamilybot 266 -> 245. So the cleanup is
+landing. It is the review stage that never runs, and the score is what your
+own text calls "the raw detector output rather than a completed review."
+
+Five of the eight are labelled "review-only PII label(s)" — your own category
+for labels needing judgement. The largest population in mine is my own name,
+which is also in the repository URL.
+
+--------------------------------------------------------------------------
+WHAT HAS BEEN REMOVED
+
+Since your 5 September findings, and going past them, the following are gone
+from every commit in history, not only from current files: credentials and
+tokens; 17 resume documents; a client's WhatsApp transcript; job-search
+documents; customer chat logs, family profiles and subscriber tables; a server
+IP address; and a child's first name. Verified by three independent scans
+before attaching, and the build refuses to publish an artifact that still
+contains any of them.
+
+--------------------------------------------------------------------------
+WHAT WOULD HELP
+
+Two things, whichever is easier:
+
+  1. The actual error behind "unknown error". If it names a file or a file
+     type, I will fix it the same day — the tooling is already built.
+
+  2. One run from your side on either listing once the new QC version ships,
+     so we can see whether the review stage completes.
+
+If the new version changes this on its own, ignore both.
+
+One more, unrelated and probably already known: on 5f7b8392 this morning, a new
+mandatory check briefly failed with "Deterministic check
+'repo_git_history_present' has no implementation". It cleared on its own within
+minutes and now passes on all eight. Flagging it in case the deploy ordering is
+worth a look.
+
+Happy to grant any access that makes this quicker.
+
+Best,
+Elena Revicheva
+AIdeazz AI Lab
+aideazz.xyz/portfolio
