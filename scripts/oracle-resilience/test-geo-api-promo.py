@@ -161,19 +161,52 @@ def test_caption_is_one_absolute_api_url() -> None:
 def test_stamp_blanks_leftover_make_fields() -> None:
     payload = {
         "promo": "See /api",
+        "linkedinBody": "See /api",
+        "bufferPostText": "See /api",
         "story": "THROWBACK: that graceful skip moment when your AI marketing engine just works",
+        "cta": "Your breakthrough awaits",
+        "audience": "general_professional",
         "potential": "2026-09-10",
         "link": "https://aideazz.xyz/portfolio",
         "imageURL": g.GEO_PRIMARY[4],
     }
     out = g.stamp_make_payload(payload)
     assert out["story"] == ""
+    assert out["cta"] == ""
+    assert out["audience"] == ""
     assert out["potential"] == ""
     assert out["link"] == "https://aideazz.xyz/api"
     assert "https://aideazz.xyz/api" in out["promo"]
+    assert "https://aideazz.xyz/api" in out["linkedinBody"]
     assert "https://aideazz.xyz/portfolio" not in out["promo"]
     assert "THROWBACK" not in out["promo"]
     assert "apiURL" not in out  # do not add keys Make concatenates
+
+
+def test_drop_leftover_story_keeps_dict() -> None:
+    geo_noon = datetime(2026, 9, 10, 17, 0, tzinfo=timezone.utc)
+    raw = {
+        "story": "THROWBACK: graceful skip",
+        "hook": "Your breakthrough awaits",
+        "audience": "general_professional",
+        "emotion": "insight",
+    }
+    out = g.drop_leftover_story(
+        "marketing_engine",
+        g.GEO_PRIMARY[0],
+        raw,
+    )
+    assert isinstance(out, dict)
+    assert out["story"] == ""
+    assert out["hook"] == ""
+    assert out["audience"] == ""
+    # EspaLuz day keeps the dict so story.get() still works.
+    keep = g.drop_leftover_story(
+        "espaluz",
+        "https://webhook.aideazz.xyz/influencer-images/image1.jpg",
+        raw,
+    )
+    assert keep == raw
 
 
 def test_hud_shapes_absent_from_new_source() -> None:
@@ -261,6 +294,7 @@ def main() -> None:
         test_canonicalize_fixes_relative_and_doubled_paths,
         test_caption_is_one_absolute_api_url,
         test_stamp_blanks_leftover_make_fields,
+        test_drop_leftover_story_keeps_dict,
         test_hud_shapes_absent_from_new_source,
         test_jpegs_fit_buffer_and_carry_no_exif_pii,
         test_patcher_hooks_both_send_functions,

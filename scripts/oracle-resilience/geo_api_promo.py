@@ -8,7 +8,7 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 from zoneinfo import ZoneInfo
 
 PUBLIC = "https://webhook.aideazz.xyz/influencer-images"
@@ -335,11 +335,27 @@ def is_geo_asset(image_url: str) -> bool:
     return "geo-api/" in (image_url or "") or _stem(image_url).startswith("geo-")
 
 
-def drop_leftover_story(campaign_type: str, image_url: str, story: str) -> str:
-    """Make concatenates `story` onto LinkedIn. GEO days must not send it."""
-    if is_geo_asset(image_url) or (
+def drop_leftover_story(
+    campaign_type: str,
+    image_url: str,
+    story: Union[str, Dict[str, Any], None],
+) -> Union[str, Dict[str, Any]]:
+    """Strip Groq leftover copy. `story` is a dict on the live bot — never replace it with a string."""
+    geo = is_geo_asset(image_url) or (
         campaign_type == "marketing_engine" and is_geo_day()
-    ):
+    )
+    if isinstance(story, dict):
+        if not geo:
+            return story
+        cleaned = dict(story)
+        for key in (
+            "story", "hook", "transformation", "cta", "emotion",
+            "audience", "emotional_state", "location", "day_theme",
+        ):
+            if key in cleaned:
+                cleaned[key] = ""
+        return cleaned
+    if geo:
         return ""
     return canonicalize_aideazz_urls(strip_concatenated_junk(story or ""))
 
@@ -385,10 +401,12 @@ def _rewrite_payload_value(value: str) -> str:
 
 _TEXT_KEYS = {
     "text", "caption", "message", "promo", "post", "body", "content", "description",
+    "linkedinbody", "bufferposttext",
 }
 _DANGER_KEYS = {
     "story", "stories", "storytext", "story_text", "potential", "hook", "cta",
     "greeting", "firstcomment", "first_comment", "extra", "old_promo", "throwback",
+    "transformation", "videodescription", "socialproof", "videotitle", "audience",
 }
 _LINK_KEYS = {
     "link", "url", "href", "canonical", "permalink", "shareurl", "share_url",

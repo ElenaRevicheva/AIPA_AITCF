@@ -131,7 +131,7 @@ echo
 echo "=== FIRE send_daily_promo (slash-command path) ==="
 set +e
 timeout 90 sudo -u "$UNIT_USER" --preserve-env=PYTHONPATH,VIRTUAL_ENV,PYTHONHOME,PYTHONUSERBASE \
-  "$PYBIN" - <<'PY' | redact
+  "$PYBIN" - <<'PY' | redact | tee /tmp/influencer-fire-out.txt
 import os, sys, traceback
 os.chdir("/home/ubuntu/EspaLuz_Influencer")
 sys.path.insert(0, ".")
@@ -190,6 +190,13 @@ PY
 RC=${PIPESTATUS[0]}
 set -e
 echo "python_rc=$RC"
+if grep -q "Failed to send to Make.com" /tmp/influencer-fire-out.txt; then
+  echo "FATAL: Make webhook failed — Telegram OK is not enough"
+  RC=1
+fi
+if ! grep -q "MAKE_STR\\|Sent to Make.com" /tmp/influencer-fire-out.txt; then
+  echo "WARN: no Make dump / send line in fire output"
+fi
 
 echo
 echo "=== restart bot ==="
