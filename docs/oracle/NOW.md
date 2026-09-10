@@ -141,8 +141,8 @@ private, so `raw.githubusercontent.com/.../me_29.jpg` is **404**. Telegram
 **DONE on Oracle 20:41:33 UTC:** images at
 `https://webhook.aideazz.xyz/influencer-images/…` return 200 from the box
 (`me_29.jpg` 251235 bytes); bot restarted (pid 3641513); Make hook GET 200.
-`git push` of EspaLuz_Influencer was rejected (remote ahead) — live disk has
-the fix; a later `checkout origin/main -- main.py` would revert it.
+GitHub `EspaLuz_Influencer` pushed `4022280` (rebased onto `438b261`
+secrets-out-of-source). The Make webhook and CRM bearer stay in `.env`, not git.
 
 **NEXT (Elena):** turn ON Make scenario 3044021 (`Immediately as data arrives`),
 then send `/daily_promo` once. Do not click Run once after sending.
