@@ -131,6 +131,40 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📩 10 Sep — MEGAN PII-QC LETTER IS ARMED ON THE HUD DEAL. Elena's tap.
+
+**Deal `64673099185`** — `[LICENSE-MANUAL] DataVendor/HUD — 8-repo training licence @ Megan`
+**Note `116688950378`** carries the one-click send.
+`https://app.hubspot.com/contacts/51409153/record/0-3/64673099185`
+
+Slug `megan-pii-qc-scan-aborts` → `megan@hud.ai`, Cc `aipa@aideazz.xyz` (the draft's own
+`CC:` line wins over the registry). Confirm screen verified live: **HTTP 200**, correct
+recipient, Cc and full body. Resend returns `entregado`/`abierto` to this deal
+automatically. **Nothing sends until she confirms.**
+
+Draft: `docs/selling/drafts/megan-pii-qc-scan-aborts-email.txt`
+
+**The argument** — three things Megan verifies in her own panel, no trust required:
+two counters in one result that cannot both be true (VJH: scan says **53** found, triage
+says **119** offered; atlas: 123 found, 11 offered) · an identical `"unknown error"` on a
+9-file repo and a 1,001-commit one · `pii_clean`, `secrets_clean` and
+`repo_archive_ready` all passing on the same snapshot, with `pii_qc_llm` blaming the
+packaging `repo_archive_ready` just certified.
+
+⚠️ **TRAP FOUND — the outreach registry has DRIFTED.** Oracle's
+`docs/selling/outreach-registry.json` held **392** entries; `main` holds **376**.
+Sixteen entries exist only on Oracle. **Never scp that file wholesale** — it would
+delete sixteen armed sends. This entry was merged key-by-key on the box after backing
+up to `/home/ubuntu/backups/outreach-registry.json.bak-20260910-152208`. Reconciling
+the 16 back into `main` is unclaimed work.
+
+⚠️ **The GitHub raw fallback in `go-wa.ts` cannot work.** It fetches
+`raw.githubusercontent.com/ElenaRevicheva/AIPA_AITCF/main/…` unauthenticated, and the
+repo is **private** → 404. Every slug resolves from Oracle's local disk only, so a new
+slug needs the draft scp'd and the registry key merged. The fallback comment claims it
+"fixes the recurring UI 404"; it does not.
+
+
 ### 🟢 10 Sep — HUD SAYS IT OUTRIGHT: *"certification withheld — publishing unaffected"*
 
 On listing `5f7b8392-a76b-46fa-9772-02f9daae7d6e` ("AI Tech + Marketing Co-Founders:
