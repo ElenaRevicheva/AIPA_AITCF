@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-10 20:52 UTC | CMO Make.com scenario 3543445 Instagram image | `vibejobhunter` / `vibejobhunter-web`, VJH `linkedin_cmo*.py`, Make 3543445 | this session |
+| Cursor Cloud | 2026-09-10 21:10 UTC | Influencer GEO/AEO 2/3 + API images | `espaluz-influencer`, `EspaLuz_Influencer/main.py`, `/var/www/influencer-images/geo-api/` | this session |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT — 10 Sep 20:52 UTC — CMO Make.com 3543445 (Cursor Cloud)
+### 🟡 IN FLIGHT — 10 Sep 21:10 UTC — Influencer GEO/AEO 2/3 + API (Cursor Cloud)
 
-**Elena screenshot (15:38 Panama):** scenario **Vibejobhunter + CMO AIPA**
-(`us2.make.com/…/3543445`) ran. Webhooks+Tools green. Buffer Instagram 400:
-"Instagram is all about the images!". CMO Telegram said posting triggered;
-Buffer published nothing usable. Same class as Influencer: a later fetch
-(Buffer) cannot see a private GitHub raw URL.
+**Ask:** EspaLuz Influencer schedule 2/3 GEO/AEO/Tech SEO (juicy `/api` promo),
+1/3 EspaLuz. Six new fruit/dashboard images in front of the existing pool,
+sized for Instagram+LinkedIn, current images kept.
 
-**Influencer (3044021) still waiting on Elena:** images live at
-`https://webhook.aideazz.xyz/influencer-images/…` (me_29.jpg 200). Turn that
-scenario ON, then `/daily_promo` once. Do not click Run once after sending.
+**CMO 3543445:** images live. Elena still taps LinkedIn/Instagram once (do
+not Make Run once).
 
-### 🟡 IN FLIGHT — 10 Sep 20:54 UTC — CMO Make.com 3543445 (Cursor Cloud)
+**Influencer 3044021:** images live; still turn ON then `/daily_promo` once.
+
+**NEXT (agent):** process 6 images to 4:5 / 1:1, host on CDN, rewrite
+Influencer lane to modulo-3, GEO copy that names https://aideazz.xyz/api.
 
 **Cause (journal 20:38:15 UTC):** CMO probed
 `raw.githubusercontent.com/.../assets/marketing_engine_architecture_1.png`
