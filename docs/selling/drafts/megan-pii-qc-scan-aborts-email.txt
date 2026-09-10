@@ -1,151 +1,57 @@
 TO: megan@hud.ai
 CC: aipa@aideazz.xyz
-SUBJECT: Re: Listing is live - thank you, and one thing that may help your team
+SUBJECT: Re: Listing is live - and why I cannot send you file locations
 
 Hi Megan,
 
-Thank you - genuinely. Your answers were clear, they arrived quickly, and they
-changed what I did next. Taking your two points in order.
+Thank you for the quick answers. The listing is live:
 
-The listing is live:
+https://datavendor.ai/listings/5f7b8392-a76b-46fa-9772-02f9daae7d6e
 
-  https://datavendor.ai/listings/5f7b8392-a76b-46fa-9772-02f9daae7d6e
-  AI Tech + Marketing Co-Founders: 8 Private Repos - $74,851, eight codebases
+1. Does a failing repository block the whole listing?
 
---------------------------------------------------------------------------
-1. "A failing repository does not block the entire listing as long as the
-   listing passes mandatory QC checks."
+Your answer was right, and it is now proven rather than assumed. The listing
+published with all 18 mandatory checks passing while pii_qc_llm was failing on
+all eight assets.
 
-You were right, and I am grateful you said it plainly before I spent more time
-on it. The listing published with all 18 mandatory checks passing while
-pii_qc_llm was still failing - so your answer is now demonstrated rather than
-assumed, and other vendors reading the same panel can be told the same thing
-with confidence.
+2. Can I send the findings with file locations, as on 5 September?
 
-For the record, the two mandatory checks closest to my worry both pass on
-exactly the snapshots pii_qc_llm scores 0 on:
+No - and not because I am withholding them. There are none. The scan stops
+before it writes any.
 
-  pii_clean            passed     (deterministic PII)
-  secrets_clean        passed     (credentials)
-  repo_archive_ready   passed x8  (packaging)
+That is the whole problem, and it explains why four rounds of cleanup changed
+nothing: there was never anything in the output to act on.
 
-Nothing needed from you here. I am only noting it so the thread carries it.
+Here is the clearest sign of it, from one asset's result:
 
---------------------------------------------------------------------------
-2. "I checked your current listing, and everything looks good! As you noted,
-   our QC tool can sometimes flag false positives."
+    "The raw scan found 53 actionable finding(s)."
+    "119 finding(s) were offered for review and none were judged"
 
-Thank you for checking it yourself - that carries more weight with me than any
-scan of my own, and it matches what three independent passes found on my side
-before I attached anything.
+53 found, 119 passed on for review. atlas-captures says the reverse: 123 found,
+11 passed on. Same run, same result object, two numbers that cannot both be
+right.
 
-On your request for the findings with file locations, as on 5 September: I would
-send them gladly, and I cannot, because there are none. pii_qc_llm stops before
-it records where anything is. That is why four rounds of cleanup have not moved
-the score - there has been nothing in the output for me to act on.
+It also does not depend on the repository. AILA-licensed is 9 files and 716
+lines of code. AIPA_AITCF-licensed is 1,001 commits and 59,000 lines. Both
+return the same "unknown error", and both take minutes to do it.
 
-Your phrase "false positives" may be slightly kinder to the tool than it
-deserves. From the outside it looks less like the detector mislabelling things
-and more like the run ending early, between detection and review, and then
-reporting the detector's raw tally as though it were a verdict.
+Every one of the eight, on two separate listings, carries the same line:
 
-I may well be reading it wrong, so here are three details you or your engineers
-can check directly. They reproduce on the live listing above and on a second one
-I kept as a control:
+    "Scan failed; the verdict carries no evidence."
 
-  live    5f7b8392-a76b-46fa-9772-02f9daae7d6e
-  draft   1e119ff6-fca3-4d1f-99a9-847dee93b697
+along with agent_triage.not_attempted - so the review stage has never run.
 
-ONE - two counters in the same result that do not agree
+What would help: the actual error behind "unknown error". If it names a file or
+a file type, I will fix it the same day. If your new QC version already handles
+this, ignore me.
 
-VibeJobHunterAIPA_AIMCF-licensed, one run, same JSON:
+For completeness, since your 5 September list: credentials, resume documents,
+client correspondence, customer chat logs and subscriber tables have been
+removed from every commit in history, not only from current files.
 
-  summary : "The raw scan found 53 actionable finding(s)."
-  triage  : "119 finding(s) were offered for review and none were judged"
+The second listing is a draft I kept as a control - it reproduces there too:
+https://datavendor.ai/listings/1e119ff6-fca3-4d1f-99a9-847dee93b697
 
-119 findings offered for review, from a scan reporting 53 found.
-atlas-captures-licensed shows it the other way round: 123 found, 11 offered.
-Across the eight there is no steady ratio between the two numbers. If both
-counters are written by the same pass, that mismatch may point straight at
-where it stops.
-
-TWO - the outcome does not vary with repository size
-
-AILA-licensed is 9 files, 716 lines of source, 40 commits, about 1 MB.
-AIPA_AITCF-licensed is 1,001 commits and 59k LOC.
-
-Both return the same "unknown error", and both take minutes to get there. That
-similarity across an eightyfold difference in size is what makes me think the
-repositories are not the variable.
-
-THREE - the suggested remedy points at something your own check clears
-
-pii_qc_llm advises "Re-run QC after fixing the listing artifact URI or
-packaging", while repo_archive_ready - your packaging check - passes on all
-eight in the same run. Probably just a generic remediation string attached to a
-generic error, but it did send me looking in the wrong place for a while.
-
-What the result says on all eight assets, on both listings - 16 runs, no
-exceptions:
-
-  "scan_complete": false
-  "triage_status": "scan_incomplete"
-  "confidence": 0
-  "review_coverage": {}
-  "manual_review_suggested": true
-  notes: ["Scan failed; the verdict carries no evidence."]
-
-And agent_triage.not_attempted on every one, so the review stage has not run
-once, on any asset, in any listing.
-
-The detector itself looks healthy and deterministic. When it saw the freshly
-cleaned copies rather than the earlier capture, its counts moved -
-EspaLuzWhatsApp 74 to 66, EspaLuzFamilybot 266 to 245 - so the cleanup is
-landing where it should. Five of the eight are labelled "review-only PII
-label(s)", your own category for labels needing judgement; the largest group in
-mine is my own name, which is also in the repository URL.
-
---------------------------------------------------------------------------
-WHAT HAS BEEN REMOVED
-
-Since your 5 September findings, and going beyond them, these are gone from
-every commit in history rather than only from current files: credentials and
-tokens; 17 resume documents; a client's WhatsApp transcript; job-search
-documents; customer chat logs, family profiles and subscriber tables; a server
-IP address; and a child's first name. Verified by three independent scans before
-attaching, and the build refuses to publish an artifact that still contains any
-of them. Some of that I found only because your 5 September list made me look
-properly, so thank you for that too.
-
---------------------------------------------------------------------------
-WHAT WOULD HELP - AND ONLY IF IT IS EASY
-
-You mentioned a new version of the QC tool within a few days. If it resolves
-this on its own, please ignore both of these.
-
-  1. The actual error behind "unknown error", if it is visible in your logs.
-     If it names a file or a file type, I will fix it the same day - the
-     tooling is already built and I am happy to do the work.
-
-  2. One run from your side on the live listing after the new version ships,
-     so we can see whether the review stage completes.
-
-The only thing that still costs anything is buyer-facing: a live listing showing
-eight red PII rows reads as unresolved to someone browsing inventory, even under
-your own label "certification withheld - publishing unaffected". I would rather
-raise that with you than quietly work around it, because it reflects on the tool
-rather than on the supply.
-
-One small thing you may already know: on the live listing this morning a new
-mandatory check briefly failed with "Deterministic check
-'repo_git_history_present' has no implementation". It cleared by itself within
-minutes and now passes on all eight. Mentioning it only in case the deploy
-ordering is worth a glance.
-
-Thank you again for being straightforward with me through this - it made a
-difference. Happy to grant any access that makes it quicker on your side.
-
-Best regards,
+Best,
 Elena Revicheva
 AIdeazz AI Lab
-aideazz.xyz/portfolio
