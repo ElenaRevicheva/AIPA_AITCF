@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 2026-09-10 20:40 UTC | Make.com daily_promo / EspaLuz Influencer webhook | `espaluz-influencer`, `EspaLuz_Influencer/main.py` (Oracle), Make scenario 3044021 | this session |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,14 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟡 IN FLIGHT — 10 Sep 20:40 UTC — Make.com daily_promo (Cursor Cloud)
+
+Elena's Make scenario **Emotionally Intelligent Free Organic Promo Engine**
+(`us2.make.com/.../3044021`) is stopped; `/daily_promo` still answers in Telegram
+but Make "Run once" times out waiting for webhook data. Diagnosis + fix on
+branch `cursor/fix-influencer-make-0841` (EspaLuz_Influencer lives on Oracle,
+not in this clone). Do not restart `espaluz-influencer` until this claim is gone.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
