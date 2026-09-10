@@ -26,13 +26,17 @@ GEO_PRIMARY = [
     f"{GEO_DIR}/geo-pomegranate-100-vs-72.jpg",
     f"{GEO_DIR}/geo-pomegranate-dashboard-2026.jpg",
 ]
-GEO_PRIMARY_WEIGHT = 5
+# Each new still appears this many times per cycle vs one slot for each me_*.jpg.
+# 10× → ~65% of GEO-day posts are the new fruit/dashboard cards; legacy stays in the pool.
+GEO_PRIMARY_WEIGHT = 10
 
 # Legacy marketing-engine cards — kept, never deleted, just less often.
 GEO_LEGACY = [f"{ME_DIR}/me_{i:02d}.jpg" for i in range(1, 33)]
 
 PANAMA = ZoneInfo("America/Panama")
-_MEMORY = Path(__file__).resolve().parent / "geo_api_rotation.json"
+# /tmp — never next to the bot. EspaLuz_Influencer is a HUD-listed tree;
+# a rotation index is not PII, but it must not become a tracked JSON blob.
+_MEMORY = Path(os.environ.get("GEO_API_MEMORY", "/tmp/espaluz-geo_api_rotation.json"))
 
 
 def _load_memory() -> dict:
@@ -89,8 +93,8 @@ def apply_lane(
     now: Optional[datetime] = None,
 ) -> Tuple[str, str]:
     if is_geo_day(now):
-        return "geo_api", next_geo_image(memory)
-    # EspaLuz day — keep the tutor/espaluz URL the old picker chose when it is one.
+        # Keep Make.com's existing marketing_engine router; swap the asset + copy.
+        return "marketing_engine", next_geo_image(memory)
     if old_url and "geo-api/" not in old_url and "/marketing_engine_images/" not in old_url:
         return "espaluz", old_url
     return "espaluz", old_url or f"{PUBLIC}/image1.jpg"
@@ -162,26 +166,26 @@ _POSTS = {
         "en": (
             "This is the question I ship, not a moodboard: can ChatGPT, Perplexity, "
             "Claude and Gemini find you, understand you, and quote you?\n\n"
-            "One POST. Score 0–100. Grade. Per-engine crawlability. Four category "
+            "One POST. Score 0–100. Grade. 34 checks. Per-engine crawlability. Four category "
             "bars. Then the checks — pass/warn/fail — each with what we actually "
             "saw on the page and why that check exists. Shareable as "
             f"{API_URL}?url=https://your-site.com\n\n"
             "I run it on my own properties first. The money page is /portfolio; "
             "the tool buyers punch a domain into is /api. Direct page reads. "
             "Engine v1.2.0. Free demo key.\n\n"
-            f"Your turn: {API_URL}"
+            f"Your turn: {API_URL}\n{PORTFOLIO}"
         ),
         "es": (
             "Esta es la pregunta que vendo, no un moodboard: ¿pueden ChatGPT, "
             "Perplexity, Claude y Gemini encontrarte, entenderte y citarte?\n\n"
-            "Un POST. Score 0–100. Nota. Crawlability por motor. Cuatro barras. "
+            "Un POST. Score 0–100. Nota. 34 chequeos. Crawlability por motor. Cuatro barras. "
             "Luego los chequeos — pass/warn/fail — con lo que vimos en la página "
             "y por qué existe ese chequeo. Se comparte: "
             f"{API_URL}?url=https://tu-sitio.com\n\n"
             "Lo corro primero en mis propias propiedades. La página de dinero es "
             "/portfolio; la herramienta donde pegas el dominio es /api. Lectura "
             "directa. Motor v1.2.0. Demo gratis.\n\n"
-            f"Tu turno: {API_URL}"
+            f"Tu turno: {API_URL}\n{PORTFOLIO}"
         ),
     },
     "geo-visibility-score-ui.jpg": {
@@ -215,7 +219,7 @@ _POSTS = {
             "a robots rule that blocks GPTBot while letting Googlebot through. "
             "My audit splits that: structured data (GEO) vs answer-readiness (AEO) "
             "vs crawler access vs the technical floor they all stand on.\n\n"
-            "I don't sell a mystery score. Every check has evidence and a why. "
+            "I don't sell a mystery score. 34 checks, each with evidence and a why. "
             "Paste the URL. Steal the fix list. Then hire me if you want it done.\n\n"
             f"{API_URL}\n{PORTFOLIO}"
         ),
@@ -226,7 +230,7 @@ _POSTS = {
             "a ClaudeBot, un robots que bloquea GPTBot y deja pasar a Googlebot. "
             "Mi auditoría parte eso: datos estructurados (GEO) vs AEO vs crawlers "
             "vs la base técnica.\n\n"
-            "No vendo un número misterioso. Cada chequeo trae evidencia y un porqué. "
+            "No vendo un número misterioso. 34 chequeos, cada uno con evidencia y un porqué. "
             "Pegas la URL. Te quedas la lista. Me contratas si quieres que lo haga.\n\n"
             f"{API_URL}\n{PORTFOLIO}"
         ),
@@ -264,7 +268,12 @@ def _stem(image_url: str) -> str:
 
 
 def maybe_geo_copy(campaign_type: str, image_url: str, promo: str, now: Optional[datetime] = None) -> str:
-    if campaign_type != "geo_api":
+    geo_asset = "geo-api/" in (image_url or "") or _stem(image_url).startswith("geo-")
+    if campaign_type == "espaluz" and not geo_asset:
+        return promo
+    if not geo_asset and campaign_type not in ("geo_api", "marketing_engine"):
+        return promo
+    if not geo_asset:
         return promo
     stem = _stem(image_url)
     pair = _POSTS.get(stem)
