@@ -36,8 +36,38 @@ PY
 
 PID=$(systemctl show espaluz-influencer -p MainPID --value)
 PYBIN=$(readlink -f "/proc/$PID/exe")
-echo "bot_pid=$PID bot_python=$PYBIN"
+UNIT_USER=$(systemctl show espaluz-influencer -p User --value)
+[ -n "$UNIT_USER" ] || UNIT_USER=ubuntu
+echo "bot_pid=$PID bot_python=$PYBIN unit_user=$UNIT_USER"
 [ -x "$PYBIN" ] || { echo "FATAL: cannot resolve bot python"; exit 1; }
+
+# Same module path as the running service. Do not print values (env may carry secrets).
+while IFS= read -r -d '' kv; do
+  case "$kv" in
+    PYTHONPATH=*|VIRTUAL_ENV=*|PYTHONHOME=*|PYTHONUSERBASE=*)
+      export "$kv"
+      echo "inherited ${kv%%=*} len=$(( ${#kv} - ${#kv%%=*} - 1 ))"
+      ;;
+  esac
+done < "/proc/$PID/environ"
+
+# Live process maps show where telebot actually lives (venv, user site, etc.).
+if ! "$PYBIN" -c "import telebot" 2>/dev/null; then
+  TBMAP=$(grep -aoE '/[^[:space:]]+/site-packages/' "/proc/$PID/maps" 2>/dev/null | sort -u | head -5 || true)
+  if [ -n "${TBMAP:-}" ]; then
+    export PYTHONPATH="$(printf '%s' "$TBMAP" | tr '\n' ':' | sed 's/:$//')${PYTHONPATH:+:$PYTHONPATH}"
+    echo "telebot via /proc/maps site-packages"
+  fi
+fi
+if ! "$PYBIN" -c "import telebot" 2>/dev/null; then
+  TB=$(find /home/ubuntu /usr/local /opt -path '*/site-packages/telebot/__init__.py' 2>/dev/null | head -1 || true)
+  if [ -n "${TB:-}" ]; then
+    export PYTHONPATH="$(dirname "$(dirname "$TB")")${PYTHONPATH:+:$PYTHONPATH}"
+    echo "telebot via find site-packages"
+  fi
+fi
+"$PYBIN" -c "import telebot" || { echo "FATAL: telebot still missing"; exit 1; }
+echo "telebot_ok"
 
 echo
 echo "=== stop bot (importing main.py while polling = Telegram 409) ==="
@@ -49,7 +79,8 @@ systemctl is-active espaluz-influencer || true
 echo
 echo "=== FIRE send_daily_promo (slash-command path) ==="
 set +e
-timeout 90 "$PYBIN" - <<'PY' | redact
+timeout 90 sudo -u "$UNIT_USER" --preserve-env=PYTHONPATH,VIRTUAL_ENV,PYTHONHOME,PYTHONUSERBASE \
+  "$PYBIN" - <<'PY' | redact
 import os, sys, traceback
 os.chdir("/home/ubuntu/EspaLuz_Influencer")
 sys.path.insert(0, ".")
