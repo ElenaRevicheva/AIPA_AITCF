@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-10 20:40 UTC | Make.com daily_promo / EspaLuz Influencer webhook | `espaluz-influencer`, `EspaLuz_Influencer/main.py` (Oracle), Make scenario 3044021 | this session |
+| Cursor Cloud | 2026-09-10 20:52 UTC | CMO Make.com scenario 3543445 Instagram image | `vibejobhunter` / `vibejobhunter-web`, VJH `linkedin_cmo*.py`, Make 3543445 | this session |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,21 +131,21 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT — 10 Sep 20:50 UTC — Make.com daily_promo (Cursor Cloud)
+### 🟡 IN FLIGHT — 10 Sep 20:52 UTC — CMO Make.com 3543445 (Cursor Cloud)
 
-**Cause (verified from Oracle journal 20:27 UTC):** EspaLuz_Influencer GitHub is
-private, so `raw.githubusercontent.com/.../me_29.jpg` is **404**. Telegram
-`send_photo` throws *before* the Make.com POST, so Buffer never runs. Scenario
-3044021 being stopped is the symptom, not the root.
+**Elena screenshot (15:38 Panama):** scenario **Vibejobhunter + CMO AIPA**
+(`us2.make.com/…/3543445`) ran. Webhooks+Tools green. Buffer Instagram 400:
+"Instagram is all about the images!". CMO Telegram said posting triggered;
+Buffer published nothing usable. Same class as Influencer: a later fetch
+(Buffer) cannot see a private GitHub raw URL.
 
-**DONE on Oracle 20:41:33 UTC:** images at
-`https://webhook.aideazz.xyz/influencer-images/…` return 200 from the box
-(`me_29.jpg` 251235 bytes); bot restarted (pid 3641513); Make hook GET 200.
-GitHub `EspaLuz_Influencer` pushed `4022280` (rebased onto `438b261`
-secrets-out-of-source). The Make webhook and CRM bearer stay in `.env`, not git.
+**Influencer (3044021) still waiting on Elena:** images live at
+`https://webhook.aideazz.xyz/influencer-images/…` (me_29.jpg 200). Turn that
+scenario ON, then `/daily_promo` once. Do not click Run once after sending.
 
-**NEXT (Elena):** turn ON Make scenario 3044021 (`Immediately as data arrives`),
-then send `/daily_promo` once. Do not click Run once after sending.
+**NEXT (agent):** diagnose VJH `linkedin_cmo*.py` imageURL on Oracle, point
+it at the public CDN, prove HTTP 200. Do not put `MAKE_WEBHOOK_URL_LINKEDIN`
+back in source.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
