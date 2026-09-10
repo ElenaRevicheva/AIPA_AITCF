@@ -143,14 +143,24 @@ Buffer published nothing usable. Same class as Influencer: a later fetch
 `https://webhook.aideazz.xyz/influencer-images/…` (me_29.jpg 200). Turn that
 scenario ON, then `/daily_promo` once. Do not click Run once after sending.
 
+### 🟡 IN FLIGHT — 10 Sep 20:54 UTC — CMO Make.com 3543445 (Cursor Cloud)
+
 **Cause (journal 20:38:15 UTC):** CMO probed
 `raw.githubusercontent.com/.../assets/marketing_engine_architecture_1.png`
 (404, repo private), then sent `imageURL=""` so Make could “post text-only”.
 Instagram cannot. Telegram still said posting triggered.
 
-**NEXT (agent):** copy VJH `assets/` to `/var/www/influencer-images/cmo/`,
-rewrite `github_base`, restart `vibejobhunter`, prove PNG 200. Do not POST
-a live promo. Do not put `MAKE_WEBHOOK_URL_LINKEDIN` back in source.
+**DONE on Oracle 20:54:21 UTC:** VJH `assets/` at
+`https://webhook.aideazz.xyz/influencer-images/cmo/` —
+`marketing_engine_architecture_1.png` **200** image/png 720012 bytes, PNG
+magic probe PASS. `github_base` rewritten; `vibejobhunter` restarted pid
+**3644504**. VJH git `ad34fb3` PUSH_OK. Webhook stays in `.env`.
+
+**NEXT (Elena):** scenario 3543445 is already ON. Tap the CMO LinkedIn +
+Instagram button **once**. Do **not** click Make Run once — that replays
+the empty-image payload.
+
+**Influencer (3044021)** still waiting: turn ON, then `/daily_promo` once.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
