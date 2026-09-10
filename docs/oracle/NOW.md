@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 2026-09-10 23:35 UTC | Influencer LinkedIn 404 links | `geo_api_promo.py` + EspaLuz_Influencer Make payload / fire | in flight |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,27 +131,22 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 ELENA'S TAP — 10 Sep 21:30 UTC — Influencer `/daily_promo` (GEO day)
+### 🔴 10 Sep 23:35 UTC — LinkedIn links still 404 (Elena retested)
 
-**DONE (Cursor Cloud, do not redo):**
-- Influencer images public: `https://webhook.aideazz.xyz/influencer-images/` (GitHub raw 404'd once the repo went private). `me_29.jpg` still **200**.
-- CMO images public: `…/influencer-images/cmo/marketing_engine_architecture_1.png` **200**. VJH `ad34fb3`. `vibejobhunter` was restarted 20:54 UTC.
-- Influencer schedule is **2/3 GEO/AEO/Tech-SEO → https://aideazz.xyz/api**, **1/3 EspaLuz**. Panama `ordinal % 3`: 0–1 GEO, 2 EspaLuz. Today 10 Sep Panama = GEO.
-- Six 1080px stills (4:5 / 1:1, EXIF stripped) at `…/influencer-images/geo-api/`. New stills weight **10×** any single `me_*.jpg`. Legacy `me_*` kept.
-- `apply_lane` + `maybe_geo_copy` live in `EspaLuz_Influencer/main.py` (git `b0a1c8d` PUSH_OK). Bot pid **3652166** since **21:30:01 UTC**.
-- Agent fire 21:29 UTC: `FIRE_RESULT send_daily_promo OK`, **Make webhook 200**. Telegram photo **timed out** (30s). Pre-swap log still said `me_25.jpg` — that is Groq rotation *before* `apply_lane`. Make should have the GEO still + `/api` copy if the hook ran.
-- Branch `cursor/fix-influencer-make-0841` (PR 50 vs `main`). Do not merge until Elena confirms IG/LI. Merging does not delete Claude work; NOW.md lives on `main`.
-- PII: new files have 0 HUD EMAIL/PHONE/Bearer/Make-URL shapes. Stills are **not** in Influencer git (HUD-listed). Rotation JSON + `main.py` bak stay in `/tmp`. Webhooks stay in `.env`. Frozen `-licensed` snapshots untouched.
+**DONE (do not redo the 21:38 absolute-URL fire — it failed in production):**
+- Elena's live LinkedIn post 404s on `aideazz.xyz`. Caption is GEO copy + leftover `potential: 2026-09-10` + `THROWBACK: graceful skip` + `lnkdl.in` wraps. Image is the pomegranate GEO still — so the image lane worked; the **link/caption payload did not**.
+- Root: Make concatenates extra fields (`story`, `potential`) and LinkedIn/Buffer glue two URLs into `/portfolio/api` (SPA 404). Absolute `/api` + `/portfolio` in the same caption was not enough.
+- Schedule still **2/3 GEO → `https://aideazz.xyz/api`**, 1/3 EspaLuz. Images stay on `webhook.aideazz.xyz/influencer-images/`. Branch `cursor/fix-influencer-make-0841` (PR 50). NOW.md on `main`.
 
-**URL bug (fixed + fired 21:38 UTC):** copy said `/api` and `/portfolio`; LinkedIn/Buffer resolved them against the portfolio URL → `…/portfolio/api` and `…/portfolio/portfolio/portfolio`. Now only absolute `https://aideazz.xyz/api` and `https://aideazz.xyz/portfolio`, plus `canonicalize_aideazz_urls` on every send.
+**IN FLIGHT:** one visible destination only (`https://aideazz.xyz/api`), blank `story`/`potential`/THROWBACK on the Make JSON, stamp existing `link`/`url` fields, dump `MAKE_STR` + live DEST HTTP from Oracle on the next fire.
 
-**NEXT (Elena):** check the post that just landed (Telegram photo OK, Make **200**). Those two URLs must be exact. **Do not Make Run once.** CMO **3543445** still: tap LinkedIn/Instagram once if you have not.
+**NEXT (Elena):** wait for the new post after this fire. Tap the link — it must open `https://aideazz.xyz/api`, not a 404. **Do not Make Run once.**
 
-**NEXT (agent):** if the new post still shows the doubled paths, Groq copy is bypassing canonicalize.
+**NEXT (agent):** read fire log `DEST` / `PROMO_URLS` / `BARE_PATHS` / `HAS_PORTFOLIO_API`. If `/api` itself 404s, that is 4everland, not the caption.
 
-**VERIFIED BY:** Action `34531884934` `patch contracts: PASS` + six GEO URLs HTTP 200; Action `34532463852` `FIRE_RESULT send_daily_promo OK` + `Sent to Make.com webhook. Response: 200` + Telegram `Read timed out`.
+**VERIFIED BY:** pending this fire. Prior: Action `34533306359` `FIRE_RESULT` rc=0 (wrong links still shipped).
 
-**RISK:** Telegram “posting triggered” ≠ Buffer success. Empty `imageURL` = Instagram 400. One deployer at a time. Do not `git add` `content_memory.json` / `*.bak` / `.env` on EspaLuz_Influencer. Do not put Make URLs back in source.
+**RISK:** Make 3044021 may still prepend its own greeting. Cloud agent cannot curl `aideazz.xyz` (SSL). Empty `imageURL` = IG 400. Do not `git add` `.env` / `content_memory.json` on EspaLuz_Influencer.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
