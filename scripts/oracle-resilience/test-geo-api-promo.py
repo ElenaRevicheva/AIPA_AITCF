@@ -111,10 +111,11 @@ def test_copy_sells_the_api() -> None:
     for u in g.GEO_PRIMARY:
         text = g.maybe_geo_copy("marketing_engine", u, "OLD")
         assert "https://aideazz.xyz/api" in text
-        assert "https://aideazz.xyz/portfolio" in text
         assert "https://aideazz.xyz/portfolio/api" not in text
         assert "https://aideazz.xyz/portfolio/portfolio" not in text
-        stripped = text.replace("https://aideazz.xyz/api", "").replace("https://aideazz.xyz/portfolio", "")
+        # One destination only — a second URL is what LinkedIn glued into a 404.
+        assert "https://aideazz.xyz/portfolio" not in text
+        stripped = text.replace("https://aideazz.xyz/api", "")
         assert "/api" not in stripped
         assert "/portfolio" not in stripped
         assert "34" in text
@@ -141,6 +142,38 @@ def test_canonicalize_fixes_relative_and_doubled_paths() -> None:
     leftover = out.replace("https://aideazz.xyz/api", "").replace("https://aideazz.xyz/portfolio", "")
     assert "/api" not in leftover
     assert "/portfolio" not in leftover
+
+
+def test_caption_is_one_absolute_api_url() -> None:
+    text = g.with_destinations(
+        "See /api and /portfolio then https://aideazz.xyz/portfolio\n"
+        "THROWBACK: that graceful skip moment\n"
+        "potential: 2026-09-10 leftover"
+    )
+    assert text.endswith("https://aideazz.xyz/api")
+    assert text.count("https://aideazz.xyz/api") == 1
+    assert "https://aideazz.xyz/portfolio" not in text
+    assert "THROWBACK" not in text
+    assert "potential:" not in text
+    assert g.bare_aideazz_paths(text) == []
+
+
+def test_stamp_blanks_leftover_make_fields() -> None:
+    payload = {
+        "promo": "See /api",
+        "story": "THROWBACK: that graceful skip moment when your AI marketing engine just works",
+        "potential": "2026-09-10",
+        "link": "https://aideazz.xyz/portfolio",
+        "imageURL": g.GEO_PRIMARY[4],
+    }
+    out = g.stamp_make_payload(payload)
+    assert out["story"] == ""
+    assert out["potential"] == ""
+    assert out["link"] == "https://aideazz.xyz/api"
+    assert "https://aideazz.xyz/api" in out["promo"]
+    assert "https://aideazz.xyz/portfolio" not in out["promo"]
+    assert "THROWBACK" not in out["promo"]
+    assert "apiURL" not in out  # do not add keys Make concatenates
 
 
 def test_hud_shapes_absent_from_new_source() -> None:
@@ -182,6 +215,7 @@ def test_patcher_hooks_both_send_functions() -> None:
         "    promo, story, video_url, image_url, campaign_type = generate_scheduled_promo_bundle()\n"
         "    try:\n"
         "        send_channel_promo_with_image(promo, image_url)\n"
+        "        payload = build_make_webhook_payload()\n"
         "        print('ok')\n"
         "    except Exception as e:\n"
         "        print(e)\n\n"
@@ -192,6 +226,8 @@ def test_patcher_hooks_both_send_functions() -> None:
         "        print('ok')\n"
         "    except Exception as e:\n"
         "        print(e)\n\n"
+        "def build_make_webhook_payload():\n"
+        "    return {'promo': promo, 'story': story, 'imageURL': image_url}\n\n"
         "marketing_engine_image_urls = [\n"
         "    'https://webhook.aideazz.xyz/influencer-images/marketing_engine_images/me_01.jpg',\n"
         "]\n\n"
@@ -201,6 +237,8 @@ def test_patcher_hooks_both_send_functions() -> None:
     out = _load_patcher().patch_source(sample)
     assert out.count("apply_lane(campaign_type, image_url)") == 2
     assert out.count("canonicalize_aideazz_urls(promo)") == 2
+    assert "drop_leftover_story" in out
+    assert out.count("stamp_make_payload(") >= 1
     assert "day.toordinal() % 3" in out
     assert out.index("geo-grapes-citation.jpg") < out.index("me_01.jpg")
     _hud_scan("patched_sample", out)
@@ -214,6 +252,8 @@ def main() -> None:
         test_apply_lane_keeps_make_router,
         test_copy_sells_the_api,
         test_canonicalize_fixes_relative_and_doubled_paths,
+        test_caption_is_one_absolute_api_url,
+        test_stamp_blanks_leftover_make_fields,
         test_hud_shapes_absent_from_new_source,
         test_jpegs_fit_buffer_and_carry_no_exif_pii,
         test_patcher_hooks_both_send_functions,

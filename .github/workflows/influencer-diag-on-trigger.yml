@@ -80,6 +80,10 @@ jobs:
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fix-influencer-geo.sh
           elif [ "$MODE" = "fire" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/geo_api_promo.py \
+              scripts/oracle-resilience/patch-influencer-geo-rotation.py \
+              ubuntu@170.9.242.90:/tmp/
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fire-influencer-promo.sh
           else

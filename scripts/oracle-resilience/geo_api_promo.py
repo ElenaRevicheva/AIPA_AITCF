@@ -169,26 +169,26 @@ _POSTS = {
             "Claude and Gemini find you, understand you, and quote you?\n\n"
             "One POST. Score 0–100. Grade. 34 checks. Per-engine crawlability. Four category "
             "bars. Then the checks — pass/warn/fail — each with what we actually "
-            "saw on the page and why that check exists. Shareable as "
-            f"{API_URL}?url=https://your-site.com\n\n"
-            "I run it on my own properties first. The money page is "
-            f"{PORTFOLIO}; the tool buyers punch a domain into is {API_URL}. "
+            "saw on the page and why that check exists. Shareable from the "
+            "audit form with ?url=https://your-site.com\n\n"
+            "I run it on my own properties first. The money page is the "
+            "portfolio; the tool buyers punch a domain into is the free audit. "
             "Direct page reads. "
             "Engine v1.2.0. Free demo key.\n\n"
-            f"Your turn: {API_URL}\n{PORTFOLIO}"
+            "Your turn:"
         ),
         "es": (
             "Esta es la pregunta que vendo, no un moodboard: ¿pueden ChatGPT, "
             "Perplexity, Claude y Gemini encontrarte, entenderte y citarte?\n\n"
             "Un POST. Score 0–100. Nota. 34 chequeos. Crawlability por motor. Cuatro barras. "
             "Luego los chequeos — pass/warn/fail — con lo que vimos en la página "
-            "y por qué existe ese chequeo. Se comparte: "
-            f"{API_URL}?url=https://tu-sitio.com\n\n"
+            "y por qué existe ese chequeo. Se comparte desde el formulario "
+            "con ?url=https://tu-sitio.com\n\n"
             "Lo corro primero en mis propias propiedades. La página de dinero es "
-            f"{PORTFOLIO}; la herramienta donde pegas el dominio es {API_URL}. "
-            "Lectura "
+            "el portfolio; la herramienta donde pegas el dominio es la auditoría "
+            "gratis. Lectura "
             "directa. Motor v1.2.0. Demo gratis.\n\n"
-            f"Tu turno: {API_URL}\n{PORTFOLIO}"
+            "Tu turno:"
         ),
     },
     "geo-visibility-score-ui.jpg": {
@@ -290,8 +290,62 @@ def canonicalize_aideazz_urls(text: str) -> str:
     return text
 
 
+def extract_aideazz_urls(text: str) -> List[str]:
+    return re.findall(r"https://aideazz\.xyz[^\s\"'<>]*", text or "")
+
+
+def bare_aideazz_paths(text: str) -> List[str]:
+    leftover = canonicalize_aideazz_urls(text or "")
+    for url in (API_URL, PORTFOLIO):
+        leftover = leftover.replace(url, "")
+    return re.findall(r"/(?:api|portfolio)\b", leftover)
+
+
+def strip_concatenated_junk(text: str) -> str:
+    """Drop leftover Make/Buffer fields that got glued onto the caption.
+
+    Live LinkedIn posts showed GEO copy + `potential: 2026-09-10` +
+    `THROWBACK: that 'graceful skip' moment…` — those are other payload
+    keys, not the promo.
+    """
+    if not text:
+        return text
+    text = re.split(r"(?i)\bTHROWBACK:", text, maxsplit=1)[0]
+    text = re.split(r"(?i)\bpotential:", text, maxsplit=1)[0]
+    text = re.sub(r"https://lnkdl\.in/\S+", "", text)
+    return text.strip()
+
+
+def with_destinations(body: str) -> str:
+    """Body + exactly one destination: https://aideazz.xyz/api
+
+    Two URLs on consecutive lines were glued by Buffer/LinkedIn into
+    /portfolio/api (404). Keep portfolio out of the visible caption.
+    """
+    body = strip_concatenated_junk(body or "")
+    body = canonicalize_aideazz_urls(body)
+    body = re.sub(r"https://aideazz\.xyz/api(?:\?[^\s]*)?", "", body)
+    body = re.sub(r"https://aideazz\.xyz/portfolio/?", "", body)
+    body = re.sub(r"[ \t]+\n", "\n", body)
+    body = re.sub(r"\n{3,}", "\n\n", body).strip()
+    return canonicalize_aideazz_urls(f"{body}\n\n{API_URL}")
+
+
+def is_geo_asset(image_url: str) -> bool:
+    return "geo-api/" in (image_url or "") or _stem(image_url).startswith("geo-")
+
+
+def drop_leftover_story(campaign_type: str, image_url: str, story: str) -> str:
+    """Make concatenates `story` onto LinkedIn. GEO days must not send it."""
+    if is_geo_asset(image_url) or (
+        campaign_type == "marketing_engine" and is_geo_day()
+    ):
+        return ""
+    return canonicalize_aideazz_urls(strip_concatenated_junk(story or ""))
+
+
 def maybe_geo_copy(campaign_type: str, image_url: str, promo: str, now: Optional[datetime] = None) -> str:
-    geo_asset = "geo-api/" in (image_url or "") or _stem(image_url).startswith("geo-")
+    geo_asset = is_geo_asset(image_url)
     if campaign_type == "espaluz" and not geo_asset:
         return canonicalize_aideazz_urls(promo)
     if not geo_asset and campaign_type not in ("geo_api", "marketing_engine"):
@@ -307,19 +361,125 @@ def maybe_geo_copy(campaign_type: str, image_url: str, promo: str, now: Optional
                 "This is not another 'AI will change marketing' post.\n\n"
                 "I ship a live audit: 34 checks on whether ChatGPT/Perplexity/Claude/"
                 "Gemini can find you, parse you, and quote you. Four weighted "
-                "categories. Evidence on every row. Free.\n\n"
-                f"{API_URL}\n{PORTFOLIO}"
+                "categories. Evidence on every row. Free."
             ),
             "es": (
                 "Esto no es otro post de 'la IA cambiará el marketing'.\n\n"
                 "Tengo una auditoría viva: 34 chequeos sobre si ChatGPT/Perplexity/"
                 "Claude/Gemini pueden encontrarte, entenderte y citarte. Cuatro "
-                "categorías. Evidencia en cada fila. Gratis.\n\n"
-                f"{API_URL}\n{PORTFOLIO}"
+                "categorías. Evidencia en cada fila. Gratis."
             ),
         }
     lang = "es" if panama_today(now).toordinal() % 2 == 0 else "en"
-    return canonicalize_aideazz_urls(pair[lang])
+    return with_destinations(pair[lang])
+
+
+def _rewrite_payload_value(value: str) -> str:
+    s = strip_concatenated_junk(value or "").strip()
+    if s in ("/api", "api", "aideazz.xyz/api"):
+        return API_URL
+    if s in ("/portfolio", "portfolio", "aideazz.xyz/portfolio"):
+        return PORTFOLIO
+    return canonicalize_aideazz_urls(s)
+
+
+_TEXT_KEYS = {
+    "text", "caption", "message", "promo", "post", "body", "content", "description",
+}
+_DANGER_KEYS = {
+    "story", "stories", "storytext", "story_text", "potential", "hook", "cta",
+    "greeting", "firstcomment", "first_comment", "extra", "old_promo", "throwback",
+}
+_LINK_KEYS = {
+    "link", "url", "href", "canonical", "permalink", "shareurl", "share_url",
+    "destination", "dest", "apiurl", "api_url",
+}
+
+
+def _recover_geo_promo(payload: dict, image_url: str) -> Optional[str]:
+    img = image_url or ""
+    if not is_geo_asset(img):
+        return None
+    return maybe_geo_copy("marketing_engine", img, "OLD")
+
+
+def stamp_make_payload(
+    payload: dict,
+    promo: Optional[str] = None,
+    image_url: Optional[str] = None,
+) -> dict:
+    """Rewrite the Make JSON so LinkedIn cannot inherit leftover fields or relative paths.
+
+    Do not add new keys Make might concatenate. Only rewrite what is already there,
+    plus recover a clean caption when the image is a GEO still.
+    """
+    if not isinstance(payload, dict):
+        return payload
+
+    def walk(obj):
+        if isinstance(obj, dict):
+            for key, val in list(obj.items()):
+                if isinstance(val, str):
+                    obj[key] = _rewrite_payload_value(val)
+                elif isinstance(val, (dict, list)):
+                    walk(val)
+        elif isinstance(obj, list):
+            for item in obj:
+                walk(item)
+
+    walk(payload)
+
+    img = image_url or payload.get("imageURL") or payload.get("image_url") or payload.get("imageUrl") or ""
+    recovered = promo or _recover_geo_promo(payload, img)
+    if recovered:
+        clean = recovered if API_URL in recovered else with_destinations(recovered)
+        clean = canonicalize_aideazz_urls(strip_concatenated_junk(clean))
+    else:
+        clean = None
+
+    wrote_text = False
+    for key, val in list(payload.items()):
+        lk = key.lower()
+        if lk in _DANGER_KEYS:
+            payload[key] = ""
+            continue
+        if lk in _LINK_KEYS:
+            payload[key] = API_URL
+            continue
+        if lk in ("portfoliourl", "portfolio_url") and isinstance(val, str):
+            payload[key] = PORTFOLIO
+            continue
+        if clean and lk in _TEXT_KEYS:
+            payload[key] = clean
+            wrote_text = True
+
+    if clean and not wrote_text:
+        payload["promo"] = clean
+        payload["text"] = clean
+    return payload
+
+
+def install_make_url_guard() -> None:
+    """Rewrite aideazz destinations on every outbound JSON POST (Make + CRM)."""
+    try:
+        import requests
+    except Exception:
+        return
+    if getattr(requests.post, "_geo_url_guard", False):
+        return
+    original = requests.post
+
+    def guarded(url, *args, **kwargs):
+        body = kwargs.get("json")
+        if isinstance(body, dict):
+            stamp_make_payload(body)
+        return original(url, *args, **kwargs)
+
+    guarded._geo_url_guard = True  # type: ignore[attr-defined]
+    requests.post = guarded  # type: ignore[assignment]
+
+
+install_make_url_guard()
 
 
 def local_geo_dir() -> str:

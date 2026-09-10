@@ -18,7 +18,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from geo_api_promo import GEO_PRIMARY  # noqa: E402
 
-IMPORT = "from geo_api_promo import apply_lane, maybe_geo_copy, canonicalize_aideazz_urls\n"
+IMPORT = (
+    "from geo_api_promo import apply_lane, maybe_geo_copy, "
+    "canonicalize_aideazz_urls, stamp_make_payload, drop_leftover_story\n"
+)
 
 NEW_CAMPAIGN_FN = '''def get_campaign_type_for_date(dt: datetime) -> str:
     """2/3 GEO/AEO/Tech SEO (marketing_engine payload) · 1/3 EspaLuz.
@@ -55,11 +58,13 @@ def _replace_function(src: str, name: str, new_fn: str) -> str:
 
 
 def _inject_import(src: str) -> str:
-    src = src.replace(
-        "from geo_api_promo import apply_lane, maybe_geo_copy\n",
+    src = re.sub(
+        r"from geo_api_promo import[^\n]+\n",
         IMPORT,
+        src,
+        count=1,
     )
-    if "canonicalize_aideazz_urls" in src and "from geo_api_promo import" in src:
+    if "stamp_make_payload" in src and "from geo_api_promo import" in src:
         return src
     if "from geo_api_promo import" in src:
         return src
@@ -106,6 +111,7 @@ def _inject_before_channel_send(src: str, fn: str) -> str:
         f"{indent}campaign_type, image_url = apply_lane(campaign_type, image_url)\n"
         f"{indent}promo = maybe_geo_copy(campaign_type, image_url, promo)\n"
         f"{indent}promo = canonicalize_aideazz_urls(promo)\n"
+        f"{indent}story = drop_leftover_story(campaign_type, image_url, story)\n"
     )
     body2 = body[:line_start] + snippet + body[line_start:]
     return src[: m.start()] + body2 + src[m.end() :]
@@ -158,7 +164,29 @@ def patch_source(src: str) -> str:
     src = _prepend_geo_images(src)
     src = _retitle_schedule_copy(src)
     src = _ensure_canonicalize(src)
+    src = _ensure_story_wipe(src)
+    src = _ensure_stamp_call(src)
     return src
+
+
+def _ensure_story_wipe(src: str) -> str:
+    if src.count("drop_leftover_story(") >= 2:
+        return src
+    return src.replace(
+        "promo = canonicalize_aideazz_urls(promo)\n",
+        "promo = canonicalize_aideazz_urls(promo)\n"
+        "        story = drop_leftover_story(campaign_type, image_url, story)\n",
+    )
+
+
+def _ensure_stamp_call(src: str) -> str:
+    if "stamp_make_payload(" in src:
+        return src
+    return re.sub(
+        r"(payload\s*=\s*build_make_webhook_payload\([^)]*\))",
+        r"\1\n        payload = stamp_make_payload(payload, promo=promo, image_url=image_url)",
+        src,
+    )
 
 
 def patch_file(path: Path) -> None:
@@ -186,6 +214,7 @@ def _self_check() -> None:
         "    promo, story, video_url, image_url, campaign_type = generate_scheduled_promo_bundle()\n"
         "    try:\n"
         "        send_channel_promo_with_image(promo, image_url)\n"
+        "        payload = build_make_webhook_payload()\n"
         "        print('ok')\n"
         "    except Exception as e:\n"
         "        print(e)\n\n"
@@ -196,6 +225,8 @@ def _self_check() -> None:
         "        print('ok')\n"
         "    except Exception as e:\n"
         "        print(e)\n\n"
+        "def build_make_webhook_payload():\n"
+        "    return {'promo': promo, 'story': story, 'imageURL': image_url}\n\n"
         "marketing_engine_image_urls = [\n"
         "    'https://webhook.aideazz.xyz/influencer-images/marketing_engine_images/me_01.jpg',\n"
         "]\n\n"
@@ -209,6 +240,8 @@ def _self_check() -> None:
     assert out.count("apply_lane(campaign_type, image_url)") == 2
     assert out.count("promo = maybe_geo_copy") == 2
     assert out.count("canonicalize_aideazz_urls(promo)") == 2
+    assert "drop_leftover_story" in out
+    assert "stamp_make_payload" in out
     assert "geo-grapes-citation.jpg" in out
     assert out.index("geo-grapes-citation.jpg") < out.index("me_01.jpg")
     assert "2/3 GEO-API" in out or "day.toordinal() % 3" in out

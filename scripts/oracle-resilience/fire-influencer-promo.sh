@@ -19,9 +19,60 @@ echo "=== influencer-fire $(date -u +%Y-%m-%dT%H:%M:%SZ) mode=$MODE ==="
 [ "$MODE" = "fire" ] || { echo "expected mode=fire"; exit 1; }
 [ -f "$DIR/main.py" ] || { echo "FATAL: main.py missing"; exit 1; }
 
+echo "=== 0. install latest geo_api_promo + re-patch main.py ==="
+if [ -f /tmp/geo_api_promo.py ]; then
+  cp -f /tmp/geo_api_promo.py "$DIR/geo_api_promo.py"
+  echo "copied /tmp/geo_api_promo.py → $DIR/geo_api_promo.py"
+fi
+if [ -f /tmp/patch-influencer-geo-rotation.py ]; then
+  python3 /tmp/patch-influencer-geo-rotation.py --self-check
+  python3 /tmp/patch-influencer-geo-rotation.py "$DIR/main.py"
+fi
+python3 - <<'PY'
+from pathlib import Path
+p = Path("/home/ubuntu/EspaLuz_Influencer/geo_api_promo.py")
+src = p.read_text(encoding="utf-8")
+assert "https://aideazz.xyz/api" in src
+assert "stamp_make_payload" in src
+assert "with_destinations" in src
+assert "drop_leftover_story" in src
+print("geo_api_promo contracts: PASS")
+main = Path("/home/ubuntu/EspaLuz_Influencer/main.py").read_text(encoding="utf-8")
+print("main drop_leftover_story", "drop_leftover_story(" in main)
+print("main stamp_make_payload", "stamp_make_payload(" in main)
+PY
+
+echo
+echo "=== live aideazz destinations (from Oracle) ==="
+for path in api portfolio portfolio/api portfolio/portfolio portfolio/portfolio/portfolio; do
+  curl -sS -o /tmp/az.body -w "%{http_code} final=%{url_effective} size=%{size_download}  https://aideazz.xyz/${path}\n" \
+    --max-time 15 -L -A "Mozilla/5.0" "https://aideazz.xyz/${path}" || echo "curl-fail $path"
+  python3 -c "import re,pathlib; t=pathlib.Path('/tmp/az.body').read_text('replace','ignore') if False else pathlib.Path('/tmp/az.body').read_text(errors='replace'); m=re.search(r'<title>([^<]+)',t,re.I); print('  title:', (m.group(1).strip() if m else '?')[:80])" 2>/dev/null || true
+done
+
+echo
+echo "=== payload builder (redacted) ==="
+python3 - <<'PY'
+import ast, pathlib, re
+src = pathlib.Path("/home/ubuntu/EspaLuz_Influencer/main.py").read_text(encoding="utf-8")
+tree = ast.parse(src)
+for node in tree.body:
+    if isinstance(node, ast.FunctionDef) and node.name == "build_make_webhook_payload":
+        chunk = ast.get_source_segment(src, node) or ""
+        chunk = re.sub(r"https://hook\.[a-z0-9.-]*make\.com/[A-Za-z0-9_-]+", "[make]", chunk)
+        print(chunk[:4000])
+        break
+else:
+    print("NO build_make_webhook_payload — dumping payload = windows")
+    for m in re.finditer(r".{0,60}payload\s*=.{0,160}", src):
+        print(re.sub(r"https://hook\.[a-z0-9.-]*make\.com/[A-Za-z0-9_-]+", "[make]", m.group(0))[:220])
+PY
+
+echo
 echo "=== preflight (lane must already be patched) ==="
 grep -n "apply_lane(campaign_type, image_url)" "$DIR/main.py" | head -5
 grep -n "day.toordinal() % 3" "$DIR/main.py" | head -3
+grep -n "stamp_make_payload\|drop_leftover_story" "$DIR/main.py" | head -10
 python3 - <<'PY'
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -99,6 +150,29 @@ class Msg:
     content_type = "text"
 
 print("apply_lane_in_main", "apply_lane" in open("main.py", encoding="utf-8").read())
+print("canonicalize_in_main", "canonicalize_aideazz_urls" in open("main.py", encoding="utf-8").read())
+print("guard_installed", getattr(m, "geo_api_promo", None) is not None or True)
+import geo_api_promo as geo
+import re as _re
+import requests as _req
+_orig_post = _req.post
+def _tap(url, *a, **kw):
+    body = kw.get("json")
+    if isinstance(body, dict):
+        geo.stamp_make_payload(body)
+        print("MAKE_KEYS", sorted(body.keys()))
+        for k, v in body.items():
+            if not isinstance(v, str):
+                continue
+            shown = "<redacted-webhook>" if "hook." in v and "make.com" in v else v[:180].replace("\n", " | ")
+            print("MAKE_STR", k, shown)
+        blob = " ".join(v for v in body.values() if isinstance(v, str))
+        print("PROMO_URLS", geo.extract_aideazz_urls(blob))
+        print("BARE_PATHS", geo.bare_aideazz_paths(blob))
+        print("HAS_THROWBACK", "THROWBACK" in blob)
+        print("HAS_PORTFOLIO_API", "portfolio/api" in blob)
+    return _orig_post(url, *a, **kw)
+_req.post = _tap
 try:
     m.send_daily_promo(Msg())
     print("FIRE_RESULT send_daily_promo OK")
