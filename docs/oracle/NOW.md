@@ -131,6 +131,39 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ NEW LISTING, FRESH SNAPSHOT — `1e119ff6-fca3-4d1f-99a9-847dee93b697`
+
+**The old listing could never have passed, and not because of the repos.** It was grading
+a frozen archive captured when the assets were attached. Proof: after a full rebuild it
+still reported VibeJobHunter at **569** commits and AIPA_AITCF at **1000**, while GitHub
+held **544** and **1001**. The PII counts came back byte-identical to the run before the
+rebuild — same archive, same numbers. **Pushing to GitHub never refreshes it. A re-run
+re-grades the photograph.**
+
+Only attaching the repos to a **NEW listing** takes a new photograph. Done:
+
+| repo | snapshot commits | GitHub | ✓ |
+|---|---|---|---|
+| AIPA_AITCF-licensed | 1001 | 1001 | fresh |
+| VibeJobHunterAIPA_AIMCF-licensed | 544 | 544 | fresh |
+| EspaLuzWhatsApp-licensed | 392 | 392 | fresh |
+| EspaLuzFamilybot-licensed | 214 | 214 | fresh |
+| dragontrade-agent-licensed | 176 | 176 | fresh |
+| EspaLuz_Influencer-licensed | 127 | 127 | fresh |
+| AILA-licensed | 40 | 40 | fresh |
+| atlas-captures-licensed | 40 | 40 | fresh |
+
+Status **Ready** — `All mandatory checks passed / 11 passed (10 mandatory)`. Price
+**$74,851**, which DataVendor's own band marks *Within DV's estimate* ($20,000–$96,000).
+`Run recommended checks` pressed; 115 sub-checks in flight, ~1 hour.
+
+**Do not press `Run checks again` while waiting** — it wipes the recommended results back
+to `unknown` (see the note below). **Go live** is available and is Elena's call.
+
+The old listing `5ebac623-74e4-4a31-8d9a-a4df8c4e3c40` should be archived once this one
+is live, so there are not two listings of the same eight assets.
+
+
 ### 🚨 THE BUTTON. `Run checks again` DOES NOT RUN `pii_qc_llm`.
 
 **This is the one to remember, and I got it wrong for two hours before finding it.**
