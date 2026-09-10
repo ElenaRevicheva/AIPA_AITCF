@@ -1,29 +1,33 @@
 TO: megan@hud.ai
 CC: aipa@aideazz.xyz
-SUBJECT: Re: PII QC — the scan aborts before it writes findings (repro on two listings)
+SUBJECT: Re: Listing is live — and one reproducible defect in pii_qc_llm
 
 Hi Megan,
 
-Thank you for the clear answers. Taking your two points in order, and then one
-thing I found while trying to act on the second.
+Thank you for the clear answers. The listing is live:
 
-1. Failing repository vs whole listing — understood, and thank you for putting it
-in writing. All mandatory checks pass on the current listing, so I am proceeding
-on that basis.
+  https://datavendor.ai/listings/5f7b8392-a76b-46fa-9772-02f9daae7d6e
+  AI Tech + Marketing Co-Founders: 8 Private Repos — $74,851, eight codebases
 
-2. The findings with file locations, as on 5 September — I cannot send them,
-and the reason is the useful part: there are none. The scan aborts before it
-records where anything is. Every asset returns the same two findings and an
-empty evidence block.
+So your point 1 is settled in practice, not just in principle: all 18 mandatory
+checks pass, and the listing published with pii_qc_llm failing on all eight
+assets. Thank you for stating it plainly beforehand — it saved me from waiting
+on a check that was never the gate.
 
-That is why four rounds of cleanup have not moved the score. I have not been
-able to act on the output because the output contains no locations to act on.
+This note is therefore not a request to be unblocked. It is a defect report from
+a vendor whose listing is already up, and it exists because of your point 2.
+
+You asked me to send the findings with file locations, as on 5 September. I
+cannot, and the reason is the useful part: there are none. pii_qc_llm aborts
+before it records where anything is. Four rounds of cleanup have not moved the
+score, because there is nothing in the output to act on.
 
 Below are three things you can confirm yourself, in your own panel, without
-taking my word for anything. They reproduce on both of my current listings:
+taking my word for anything. They reproduce on the live listing above and on a
+second one I kept as a control:
 
-  1e119ff6-fca3-4d1f-99a9-847dee93b697
-  5f7b8392-a76b-46fa-9772-02f9daae7d6e
+  live    5f7b8392-a76b-46fa-9772-02f9daae7d6e
+  draft   1e119ff6-fca3-4d1f-99a9-847dee93b697
 
 --------------------------------------------------------------------------
 ONE — two counters in the same result that cannot both be true
@@ -76,11 +80,11 @@ Identical on all eight assets, on both listings — 16 asset-runs, no exceptions
 agent_triage.not_attempted appears on every one. The review stage has not
 executed once, on any asset, in any listing.
 
-The detector stage is working, and it is deterministic. When it saw the
-freshly cleaned copies instead of the earlier capture, its counts moved:
-EspaLuzWhatsApp 74 -> 66, EspaLuzFamilybot 266 -> 245. So the cleanup is
-landing. It is the review stage that never runs, and the score is what your
-own text calls "the raw detector output rather than a completed review."
+The detector stage is working, and it is deterministic. When it saw the freshly
+cleaned copies instead of the earlier capture, its counts moved: EspaLuzWhatsApp
+74 -> 66, EspaLuzFamilybot 266 -> 245. So the cleanup lands. It is the review
+stage that never runs, and the score is what your own text calls "the raw
+detector output rather than a completed review."
 
 Five of the eight are labelled "review-only PII label(s)" — your own category
 for labels needing judgement. The largest population in mine is my own name,
@@ -93,25 +97,31 @@ Since your 5 September findings, and going past them, the following are gone
 from every commit in history, not only from current files: credentials and
 tokens; 17 resume documents; a client's WhatsApp transcript; job-search
 documents; customer chat logs, family profiles and subscriber tables; a server
-IP address; and a child's first name. Verified by three independent scans
-before attaching, and the build refuses to publish an artifact that still
-contains any of them.
+IP address; and a child's first name. Verified by three independent scans before
+attaching, and the build refuses to publish an artifact that still contains any
+of them.
 
 --------------------------------------------------------------------------
 WHAT WOULD HELP
 
 Two things, whichever is easier:
 
-  1. The actual error behind "unknown error". If it names a file or a file
-     type, I will fix it the same day — the tooling is already built.
+  1. The actual error behind "unknown error". If it names a file or a file type,
+     I will fix it the same day — the tooling is already built.
 
-  2. One run from your side on either listing once the new QC version ships,
+  2. One run from your side on the live listing once the new QC version ships,
      so we can see whether the review stage completes.
 
-If the new version changes this on its own, ignore both.
+If the new version resolves it on its own, ignore both.
 
-One more, unrelated and probably already known: on 5f7b8392 this morning, a new
-mandatory check briefly failed with "Deterministic check
+The one thing that does still cost something is buyer-facing: a live listing
+carrying eight red PII rows reads as unresolved to anyone browsing inventory,
+even though the rows carry your own label "certification withheld — publishing
+unaffected". That reflects on the tool more than on the supply, which is why I
+would rather report it than work around it.
+
+One more, unrelated and probably already known: on the live listing this
+morning, a new mandatory check briefly failed with "Deterministic check
 'repo_git_history_present' has no implementation". It cleared on its own within
 minutes and now passes on all eight. Flagging it in case the deploy ordering is
 worth a look.
