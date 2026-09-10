@@ -136,10 +136,16 @@ git log keeps the record.
 **Cause (verified from Oracle journal 20:27 UTC):** EspaLuz_Influencer GitHub is
 private, so `raw.githubusercontent.com/.../me_29.jpg` is **404**. Telegram
 `send_photo` throws *before* the Make.com POST, so Buffer never runs. Scenario
-3044021 being stopped is the symptom, not the root. Fix on
-`cursor/fix-influencer-make-0841`: public images on
-`webhook.aideazz.xyz/influencer-images/` + don't abort the webhook on a photo
-error. Do not restart `espaluz-influencer` from another session.
+3044021 being stopped is the symptom, not the root.
+
+**DONE on Oracle 20:41:33 UTC:** images at
+`https://webhook.aideazz.xyz/influencer-images/…` return 200 from the box
+(`me_29.jpg` 251235 bytes); bot restarted (pid 3641513); Make hook GET 200.
+`git push` of EspaLuz_Influencer was rejected (remote ahead) — live disk has
+the fix; a later `checkout origin/main -- main.py` would revert it.
+
+**NEXT (Elena):** turn ON Make scenario 3044021 (`Immediately as data arrives`),
+then send `/daily_promo` once. Do not click Run once after sending.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
