@@ -131,6 +131,54 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 10 Sep — `pii_qc_llm` IS NOT MANDATORY. Megan confirmed it in writing. Stop scrubbing.
+
+Read from the live listing payload of `1e119ff6-fca3-4d1f-99a9-847dee93b697`:
+
+| check | mandatory | status |
+|---|---|---|
+| `pii_clean` | **true** | passed |
+| `secrets_clean` | **true** | passed |
+| `repo_archive_ready` | **true** | passed ×8 |
+| `pii_qc_llm` | **false** | failed (`scan.failed`, crashed) |
+| `verify_claims`, `codebase_complexity`, all `*_tier` | false | reported / skipped |
+
+The owner panel says it in words: *"You can skip the review only if all the mandatory
+checks are passing."* They are. **Ready → Go live is available; the red PII row cannot
+stop it.**
+
+**Megan Chang (Customer Operation Lead), 10 Sep, in writing:**
+> "A failing repository does not block the entire listing as long as the listing passes
+> mandatory QC checks. Once your listing is published, it has full visibility in our
+> inventory." · "I checked your current listing, and everything looks good!" · "our QC
+> tool can sometimes flag false positives. We are actively improving the tool and plan to
+> launch a new version in the next few days."
+
+So `docs/selling/drafts/hud-pii-qc-scan-failed.md` is **superseded — do not send it.**
+She has already answered the question it asks.
+
+**Do NOT rebuild the mirrors again.** Three gates were green before attach; the snapshot
+on this listing matches GitHub commit-for-commit. Another rebuild photographs the same
+trees and hits the same crashed grader.
+
+### Listing copy — fixed 10 Sep after a Cursor review
+
+- **Title contradiction fixed.** Was "8 production repos" while the body said seven in
+  production, one paused. Now **"AI Tech + Marketing Co-Founders: 8 private repos, 7 live"**.
+- **Measured, not assumed:** atlas-captures-licensed really does hold **3,304** records
+  (`git show HEAD:captures.jsonl | wc -l`), and `docs/MEDIA_ASSETS.md` really is present
+  in EspaLuzWhatsApp-licensed and EspaLuzFamilybot-licensed. Cursor flagged both as
+  unverifiable risks; both check out. The MEDIA_ASSETS sentence now names those two repos
+  instead of "the EspaLuz repositories" — EspaLuz_Influencer-licensed does not carry it.
+- **Three honesty clauses added**, because the people-layer scrub changed what ships:
+  memory/session/subscriber tables recreate **empty** on first run; the WhatsApp Cloud API
+  code ships but the live session store does not; the EspaLuz country pack's institutional
+  phone numbers are redacted (feature intact, directory not).
+- **$89,481 re-framed** as measured on the ORIGINAL trees on 31 Aug, quoted as history.
+  Do not re-run the estimator on the licensed set to "prove" it — rewritten mirrors score
+  0 on test coverage and PRs and it can come back lower.
+
+
 ### ✅ NEW LISTING, FRESH SNAPSHOT — `1e119ff6-fca3-4d1f-99a9-847dee93b697`
 
 **The old listing could never have passed, and not because of the repos.** It was grading
