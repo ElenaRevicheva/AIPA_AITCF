@@ -3118,5 +3118,14 @@
         "filename": "AIdeazz_Nine_Systems_Provenance_Dossier.pdf"
       }
     ]
+  },
+  "megan-pii-qc-scan-aborts": {
+    "phone": "",
+    "draft": "docs/selling/drafts/megan-pii-qc-scan-aborts-email.txt",
+    "company": "DataVendor / HUD",
+    "email": "megan@hud.ai",
+    "emailDraft": "docs/selling/drafts/megan-pii-qc-scan-aborts-email.txt",
+    "dealId": "64673099185",
+    "cc": "aipa@aideazz.xyz"
   }
 }
