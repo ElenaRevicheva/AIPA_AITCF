@@ -131,13 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT — 10 Sep 20:40 UTC — Make.com daily_promo (Cursor Cloud)
+### 🟡 IN FLIGHT — 10 Sep 20:50 UTC — Make.com daily_promo (Cursor Cloud)
 
-Elena's Make scenario **Emotionally Intelligent Free Organic Promo Engine**
-(`us2.make.com/.../3044021`) is stopped; `/daily_promo` still answers in Telegram
-but Make "Run once" times out waiting for webhook data. Diagnosis + fix on
-branch `cursor/fix-influencer-make-0841` (EspaLuz_Influencer lives on Oracle,
-not in this clone). Do not restart `espaluz-influencer` until this claim is gone.
+**Cause (verified from Oracle journal 20:27 UTC):** EspaLuz_Influencer GitHub is
+private, so `raw.githubusercontent.com/.../me_29.jpg` is **404**. Telegram
+`send_photo` throws *before* the Make.com POST, so Buffer never runs. Scenario
+3044021 being stopped is the symptom, not the root. Fix on
+`cursor/fix-influencer-make-0841`: public images on
+`webhook.aideazz.xyz/influencer-images/` + don't abort the webhook on a photo
+error. Do not restart `espaluz-influencer` from another session.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
