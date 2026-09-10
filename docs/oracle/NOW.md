@@ -131,6 +131,43 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 10 Sep 09:1x — THE `Git history` BLOCKER WAS HUD MID-DEPLOY. It cleared itself.
+
+Listing `5f7b8392-a76b-46fa-9772-02f9daae7d6e` showed a red mandatory failure:
+
+> We couldn't complete these quality checks: Git history.
+> `Git history · needs attention · EspaLuz_Influencer-licensed · Mandatory`
+> **Deterministic check `repo_git_history_present` has no implementation**
+
+HUD's own wording on that row: ***"did not finish — not the listing's fault."*** This is
+the new QC version Megan said would ship "in the next few days" — a new **mandatory**
+check went live before its implementation did. Minutes later all eight rows read
+**passed** — *"The repository snapshot includes Git history."*
+
+**Status now: Ready. `All mandatory checks passed · 19 passed (18 mandatory)`.**
+
+| mandatory check | result |
+|---|---|
+| `pii_clean` | passed |
+| `secrets_clean` | passed |
+| `repo_archive_ready` | passed ×8 |
+| `repo_git_history_present` | passed ×8 |
+
+🎯 **The decision that paid off:** the mandatory set now contains a check that
+*requires* git history in the snapshot. Flattening the mirrors was the tempting shortcut
+for killing PII — and it is what once cut the quote to **$28,073**. Had we taken it, this
+new mandatory check would now fail and the listing could not be sold at all.
+**Scrub the history, never delete it.** That rule is now enforced by the marketplace.
+
+**Rule earned:** a red mandatory row that says *"not the listing's fault"* is a
+deploy in progress. Read the row before rebuilding anything — re-read in ten minutes
+first.
+
+⚠️ **THREE listings now exist for the same eight assets** — `5ebac623…`,
+`1e119ff6…` and `5f7b8392…` (current). Archive the first two once one is live, so
+inventory shows one row.
+
+
 ### ✅ 10 Sep — `pii_qc_llm` IS NOT MANDATORY. Megan confirmed it in writing. Stop scrubbing.
 
 Read from the live listing payload of `1e119ff6-fca3-4d1f-99a9-847dee93b697`:
