@@ -131,6 +131,29 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
+
+**https://datavendor.ai/listings/5f7b8392-a76b-46fa-9772-02f9daae7d6e**
+*AI Tech + Marketing Co-Founders: 8 Private Repos* — **$74,851**, eight `-licensed`
+codebases, **18/18 mandatory checks passed**.
+
+**It published with `pii_qc_llm` failing on all eight.** That is the empirical proof
+of Megan's point 1 — the PII check was never the gate. Two days went into a red row
+that had no authority to stop anything.
+
+Keep `1e119ff6…` as the control (draft). The older `5ebac623…` and the duplicates are
+archived; **Active 1** besides this is only the $600 NL2Repo sample.
+
+The Megan letter on deal `64673099185` (note `116688950378`) was **reframed around this**:
+it is no longer a request to be unblocked, it is a defect report from a live vendor. That
+is both more accurate and a stronger position. Confirm screen re-verified after the
+rewrite: HTTP 200, correct recipient and Cc, new subject
+*"Listing is live — and one reproducible defect in pii_qc_llm"*.
+
+**Money state: supply is published. The bottleneck is now demand, not QC.** Do not spend
+another session on PII.
+
+
 ### 📩 10 Sep — MEGAN PII-QC LETTER IS ARMED ON THE HUD DEAL. Elena's tap.
 
 **Deal `64673099185`** — `[LICENSE-MANUAL] DataVendor/HUD — 8-repo training licence @ Megan`
