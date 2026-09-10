@@ -43,7 +43,7 @@ jobs:
             exit 1
           fi
 
-      - name: Diagnose on Oracle
+      - name: Diagnose or fix on Oracle
         if: steps.trigger.outputs.skip != 'true'
         env:
           SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
@@ -54,8 +54,16 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
           chmod 600 ~/.ssh/oracle
           SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
-          ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
-            "$MODE" < scripts/oracle-resilience/diag-influencer-promo.sh
+          if [ "$MODE" = "fix" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/patch-influencer-make-images.py \
+              ubuntu@170.9.242.90:/tmp/patch-influencer-make-images.py
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/fix-influencer-make-images.sh
+          else
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/diag-influencer-promo.sh
+          fi
           RC=$?
           echo "--- remote exit code: $RC ---"
           rm -f ~/.ssh/oracle
