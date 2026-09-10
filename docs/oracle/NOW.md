@@ -143,9 +143,14 @@ Buffer published nothing usable. Same class as Influencer: a later fetch
 `https://webhook.aideazz.xyz/influencer-images/…` (me_29.jpg 200). Turn that
 scenario ON, then `/daily_promo` once. Do not click Run once after sending.
 
-**NEXT (agent):** diagnose VJH `linkedin_cmo*.py` imageURL on Oracle, point
-it at the public CDN, prove HTTP 200. Do not put `MAKE_WEBHOOK_URL_LINKEDIN`
-back in source.
+**Cause (journal 20:38:15 UTC):** CMO probed
+`raw.githubusercontent.com/.../assets/marketing_engine_architecture_1.png`
+(404, repo private), then sent `imageURL=""` so Make could “post text-only”.
+Instagram cannot. Telegram still said posting triggered.
+
+**NEXT (agent):** copy VJH `assets/` to `/var/www/influencer-images/cmo/`,
+rewrite `github_base`, restart `vibejobhunter`, prove PNG 200. Do not POST
+a live promo. Do not put `MAKE_WEBHOOK_URL_LINKEDIN` back in source.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
