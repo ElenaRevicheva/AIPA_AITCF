@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-10 23:35 UTC | Influencer LinkedIn 404 links | `geo_api_promo.py` + EspaLuz_Influencer Make payload / fire | in flight |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,22 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🔴 10 Sep 23:35 UTC — LinkedIn links still 404 (Elena retested)
+### 🟡 ELENA'S TAP — 10 Sep 23:46 UTC — new GEO post, one `/api` link
 
-**DONE (do not redo the 21:38 absolute-URL fire — it failed in production):**
-- Elena's live LinkedIn post 404s on `aideazz.xyz`. Caption is GEO copy + leftover `potential: 2026-09-10` + `THROWBACK: graceful skip` + `lnkdl.in` wraps. Image is the pomegranate GEO still — so the image lane worked; the **link/caption payload did not**.
-- Root: Make concatenates extra fields (`story`, `potential`) and LinkedIn/Buffer glue two URLs into `/portfolio/api` (SPA 404). Absolute `/api` + `/portfolio` in the same caption was not enough.
-- Schedule still **2/3 GEO → `https://aideazz.xyz/api`**, 1/3 EspaLuz. Images stay on `webhook.aideazz.xyz/influencer-images/`. Branch `cursor/fix-influencer-make-0841` (PR 50). NOW.md on `main`.
+**DONE:** Elena was right — the 21:38 fire still 404'd. Two bugs: (1) `/api` + `/portfolio` in one caption glued into `/portfolio/api` (HTTP 200 homepage HTML → SPA “Page not found”); (2) Make concatenates `audience=general_professional` + `cta` + Groq `story` (the `THROWBACK` / `¡Hola, …_explorer!` mash). Wiping `story` to `""` then crashed `story.get` so Make never ran.
 
-**IN FLIGHT:** one visible destination only (`https://aideazz.xyz/api`), blank `story`/`potential`/THROWBACK on the Make JSON, stamp existing `link`/`url` fields, dump `MAKE_STR` + live DEST HTTP from Oracle on the next fire.
+**This fire (Action `34543608312`):** `/api` is live **200** title *AI Visibility Audit*. Payload `text`/`linkedinBody`/`bufferPostText` = grapes GEO copy. `story`/`cta`/`audience` blank. `PROMO_URLS` only `https://aideazz.xyz/api`. `Sent to Make.com webhook. Response: 200`. Image `geo-grapes-citation.jpg`. Branch `cursor/fix-influencer-make-0841` (PR 50). NOW.md on `main`.
 
-**NEXT (Elena):** wait for the new post after this fire. Tap the link — it must open `https://aideazz.xyz/api`, not a 404. **Do not Make Run once.**
+**NEXT (Elena):** open the **new** LinkedIn/IG post (grapes, not the pomegranate one). Tap the link — it must be `https://aideazz.xyz/api`, not a 404. **Do not Make Run once.** Ignore the older mashed post.
 
-**NEXT (agent):** read fire log `DEST` / `PROMO_URLS` / `BARE_PATHS` / `HAS_PORTFOLIO_API`. If `/api` itself 404s, that is 4everland, not the caption.
+**NEXT (agent):** idle. Do not fire again unless Elena says the new post is still wrong.
 
-**VERIFIED BY:** pending this fire. Prior: Action `34533306359` `FIRE_RESULT` rc=0 (wrong links still shipped).
+**VERIFIED BY:** Action `34543608312` `PROMO_URLS ['https://aideazz.xyz/api', …]` + `HAS_PORTFOLIO_API False` + Make **200**.
 
-**RISK:** Make 3044021 may still prepend its own greeting. Cloud agent cannot curl `aideazz.xyz` (SSL). Empty `imageURL` = IG 400. Do not `git add` `.env` / `content_memory.json` on EspaLuz_Influencer.
+**RISK:** Make 3044021 ON or Buffer never posts. Hashtags still say #EspaLuz (random set). `videoURL` is still a YouTube. Empty `imageURL` = IG 400.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
