@@ -1,57 +1,108 @@
 TO: megan@hud.ai
 CC: aipa@aideazz.xyz
-SUBJECT: Re: Listing is live - and why I cannot send you file locations
+SUBJECT: Re: Listing is live - two things that would move it toward a sale
 
 Hi Megan,
 
-Thank you for the quick answers. The listing is live:
+Thank you for the clear answers. The listing went live on your guidance:
 
-https://datavendor.ai/listings/5f7b8392-a76b-46fa-9772-02f9daae7d6e
+  https://datavendor.ai/listings/5f7b8392-a76b-46fa-9772-02f9daae7d6e
+  AI Tech + Marketing Co-Founders: 8 Private Repos - $74,851, eight codebases
 
-1. Does a failing repository block the whole listing?
+Your two points first, then the two things I would like from you - both aimed at
+getting this in front of buyers rather than at the QC score itself.
 
-Your answer was right, and it is now proven rather than assumed. The listing
-published with all 18 mandatory checks passing while pii_qc_llm was failing on
-all eight assets.
+1. Failing repository vs whole listing - understood, and thank you for putting
+it in writing. It is now demonstrated rather than assumed: the listing published
+with all 18 mandatory checks passing while pii_qc_llm was failing on all eight
+assets.
 
-2. Can I send the findings with file locations, as on 5 September?
+2. The findings with file locations, as on 5 September - I cannot send them, and
+the reason is the useful part: there are none. The scan aborts before it records
+where anything is. Every asset returns the same two findings and an empty
+evidence block.
 
-No - and not because I am withholding them. There are none. The scan stops
-before it writes any.
+That is why four rounds of cleanup have not moved the score. I have not been
+able to act on the output because the output contains no locations to act on.
 
-That is the whole problem, and it explains why four rounds of cleanup changed
-nothing: there was never anything in the output to act on.
+--------------------------------------------------------------------------
+WHAT I AM ASKING FOR
 
-Here is the clearest sign of it, from one asset's result:
+One. The commercial one, and the reason for this email. You mentioned you would
+keep me posted on demand-side movement. I would like the listing put in front of
+buyers who match it, and I would value your judgement on anything that would
+make it easier to match - price, tags, how the eight assets are packaged, or the
+description. You see what buyers actually search for; I do not. If the $74,851
+buy-now is in the wrong place for this inventory, or the bundle should be split,
+I would rather hear it than guess.
 
-    "The raw scan found 53 actionable finding(s)."
-    "119 finding(s) were offered for review and none were judged"
+Two. The certification badge. A live listing showing eight failed PII rows reads
+as unresolved to anyone browsing, even under your own label "certification
+withheld - publishing unaffected". Either of these clears it:
 
-53 found, 119 passed on for review. atlas-captures says the reverse: 123 found,
-11 passed on. Same run, same result object, two numbers that cannot both be
-right.
+  - the actual error behind "unknown error" - if it names a file or a file type
+    I will fix it the same day, the tooling is already built;
+  - or one run from your side once the new QC version ships.
 
-It also does not depend on the repository. AILA-licensed is 9 files and 716
-lines of code. AIPA_AITCF-licensed is 1,001 commits and 59,000 lines. Both
-return the same "unknown error", and both take minutes to do it.
+If the new version resolves it on its own, ignore the second entirely.
 
-Every one of the eight, on two separate listings, carries the same line:
+--------------------------------------------------------------------------
+WHY I THINK THE SCORE IS NOT ABOUT MY FILES
 
-    "Scan failed; the verdict carries no evidence."
+Three things you can confirm yourself, in your own panel, without taking my word
+for anything. They reproduce on the live listing above and on a draft I kept as
+a control (1e119ff6-fca3-4d1f-99a9-847dee93b697).
 
-along with agent_triage.not_attempted - so the review stage has never run.
+ONE - two counters in the same result that cannot both be true
 
-What would help: the actual error behind "unknown error". If it names a file or
-a file type, I will fix it the same day. If your new QC version already handles
-this, ignore me.
+VibeJobHunterAIPA_AIMCF-licensed, one run, same JSON:
 
-For completeness, since your 5 September list: credentials, resume documents,
-client correspondence, customer chat logs and subscriber tables have been
-removed from every commit in history, not only from current files.
+  summary : "The raw scan found 53 actionable finding(s)."
+  triage  : "119 finding(s) were offered for review and none were judged"
 
-The second listing is a draft I kept as a control - it reproduces there too:
-https://datavendor.ai/listings/1e119ff6-fca3-4d1f-99a9-847dee93b697
+119 findings offered for review, from a scan that found 53.
+atlas-captures-licensed shows it reversed: 123 found, 11 offered. Across the
+eight there is no consistent ratio. Both counters come from the same run.
 
-Best,
+TWO - the failure does not depend on repository size
+
+AILA-licensed is 9 files, 716 lines of source, 40 commits.
+AIPA_AITCF-licensed is 1,001 commits and 59,000 lines.
+
+Both return the identical "unknown error", and both take minutes to produce it.
+
+THREE - three of your own checks pass on the same snapshot, in the same run
+
+  pii_clean            passed     (mandatory, deterministic PII)
+  secrets_clean        passed     (mandatory, credentials)
+  repo_archive_ready   passed x8  (mandatory, packaging)
+
+And pii_qc_llm's remediation reads "Re-run QC after fixing the listing artifact
+URI or packaging" - while repo_archive_ready, your packaging check, passes on
+all eight in that run.
+
+On every asset, on both listings, the result carries "scan_complete": false,
+"confidence": 0, and the note "Scan failed; the verdict carries no evidence."
+agent_triage.not_attempted appears on all of them, so the review stage has not
+run once.
+
+The detector itself is working. When it saw the freshly cleaned copies rather
+than the earlier capture, its counts moved - EspaLuzWhatsApp 74 to 66,
+EspaLuzFamilybot 266 to 245.
+
+--------------------------------------------------------------------------
+WHAT HAS BEEN REMOVED
+
+Since your 5 September findings, and going past them, these are gone from every
+commit in history rather than only from current files: credentials and tokens;
+17 resume documents; a client's WhatsApp transcript; job-search documents;
+customer chat logs, family profiles and subscriber tables; a server IP address;
+and a child's first name. Verified by three independent scans before attaching,
+and the build refuses to publish an artifact that still contains any of them.
+
+Happy to grant any access that makes this quicker on your side.
+
+Best regards,
 Elena Revicheva
 AIdeazz AI Lab
+aideazz.xyz/portfolio
