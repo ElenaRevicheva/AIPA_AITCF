@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 # Compile the /api YouTube film on Oracle using Atuona studio tools.
-# Piped over SSH (mode=api-film). Does NOT restart cto-aipa / influencer / VJH.
+# Piped over SSH (mode=api-film [start|publish|all]).
+# Does NOT restart cto-aipa / influencer / VJH.
 # Does NOT POST a promo. Does NOT write into the Atuona poetry gallery.
 set -uo pipefail
 
 MODE="${1:-api-film}"
+PHASE="${2:-all}"
 DIR=/home/ubuntu/aideazz-api-film
 SRC=/tmp/youtube-api-audit-film
 PUBLISH=/var/www/influencer-images/youtube
 PUBLIC=https://webhook.aideazz.xyz/influencer-images/youtube
+OUT12="$DIR/out/can-ai-find-and-cite-you-v12.mp4"
 
 redact() {
   sed -E \
@@ -17,12 +20,134 @@ redact() {
     -e 's#\b[0-9a-fA-F]{32,}\b#[REDACTED_HEX]#g'
 }
 
-echo "=== api-film $(date -u +%Y-%m-%dT%H:%M:%SZ) mode=$MODE ==="
+film_running() {
+  pgrep -f 'node /home/ubuntu/aideazz-api-film/kit/compile.mjs' >/dev/null 2>&1 \
+    || pgrep -f 'ffmpeg.*aideazz-api-film' >/dev/null 2>&1
+}
+
+status_film() {
+  echo "=== api-film status $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+  pgrep -af 'compile.mjs|ffmpeg.*aideazz-api-film' | redact || echo "(no film jobs)"
+  if [ -f "$DIR/compile.rc" ]; then
+    echo "compile.rc=$(tr -d ' \r\n' < "$DIR/compile.rc")"
+  else
+    echo "compile.rc=missing"
+  fi
+  if [ -f "$DIR/compile.log" ]; then
+    echo "----- compile.log tail -----"
+    tail -n 12 "$DIR/compile.log" | redact || true
+  fi
+  if [ -f "$OUT12" ]; then
+    echo "out-v12 $(ls -lh "$OUT12" | awk '{print $5}') dur=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT12" 2>/dev/null || echo 0)"
+  else
+    echo "out-v12 missing"
+  fi
+}
+
+publish_film() {
+  RC="${1:-1}"
+  echo
+  echo "=== 3. publish + probe ==="
+  sudo mkdir -p "$PUBLISH"
+  if [ "${RC:-1}" -eq 0 ] && [ -f "$OUT12" ]; then
+    sudo cp -f "$DIR/out/"*.mp4 "$PUBLISH/" 2>/dev/null || true
+    sudo cp -f "$DIR/out/"*.jpg "$PUBLISH/" 2>/dev/null || true
+    sudo cp -f "$DIR/out/"*.png "$PUBLISH/" 2>/dev/null || true
+    if [ -f "$DIR/kit/qr/api-cta-qr.png" ]; then
+      sudo cp -f "$DIR/kit/qr/api-cta-qr.png" "$DIR/kit/qr/api-cta-endcard.png" "$PUBLISH/"
+    fi
+    if [ -f /tmp/api-film-watch.html ]; then
+      sed "s/CACHEBUST/$(date -u +%Y%m%d%H%M%S)/g" \
+        /tmp/api-film-watch.html | sudo tee "$PUBLISH/watch.html" >/dev/null
+    fi
+  else
+    echo "SKIP publish — compile exit ${RC:-1} (keep live player / last good cut)"
+  fi
+  sudo chown -R www-data:www-data /var/www/influencer-images
+  sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
+  sudo find "$PUBLISH" -type f -exec chmod 644 {} \;
+  ls -lh "$PUBLISH" | redact
+  for u in \
+    "$PUBLIC/can-ai-find-and-cite-you-v12.mp4" \
+    "$PUBLIC/can-ai-find-and-cite-you.mp4" \
+    "$PUBLIC/can-ai-find-and-cite-you-poster.jpg" \
+    "$PUBLIC/watch.html" \
+    "$PUBLIC/api-cta-qr.png"
+  do
+    code=$(curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}" --max-time 20 -L "$u" || echo "curl-fail")
+    echo "$code  $u"
+  done
+  set +e
+  if [ -f "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" ]; then
+    ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
+      -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" | redact
+    ffmpeg -y -ss 7 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-grapes.jpg
+    ffmpeg -y -ss 22 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-crawlers.jpg
+    ffmpeg -y -ss 48 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-loom.jpg
+    printf 'frame-grapes bytes=%s\n' "$(wc -c < /tmp/api-film-frame-grapes.jpg 2>/dev/null || printf '0')"
+    printf 'frame-crawlers bytes=%s\n' "$(wc -c < /tmp/api-film-frame-crawlers.jpg 2>/dev/null || printf '0')"
+    printf 'frame-loom bytes=%s\n' "$(wc -c < /tmp/api-film-frame-loom.jpg 2>/dev/null || printf '0')"
+    DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" || echo 0)
+    printf 'v12-duration=%s\n' "$DUR"
+    awk -v d="$DUR" 'BEGIN { if (d+0 < 90) { print "FATAL: v12 shorter than 90s — stub, do not send Elena"; exit 1 } }' || RC=1
+  fi
+  echo "DONE api-film rc=${RC:-1}"
+  echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v12.mp4"
+  printf 'or %s/watch.html\n' "$PUBLIC"
+  printf 'Do not drop this mp4 into Atuona /films. That gallery is poetry.\n'
+  exit "${RC:-1}"
+}
+
+echo "=== api-film $(date -u +%Y-%m-%dT%H:%M:%SZ) mode=$MODE phase=$PHASE ==="
 [ "$MODE" = "api-film" ] || { echo "expected mode=api-film"; exit 1; }
+
+if [ "$PHASE" = "publish" ]; then
+  status_film
+  if film_running; then
+    echo "NOTREADY compile still running"
+    exit 2
+  fi
+  if [ ! -f "$DIR/compile.rc" ] && [ ! -f "$OUT12" ]; then
+    echo "NOTREADY no compile.rc and no out-v12"
+    exit 2
+  fi
+  RC=1
+  if [ -f "$DIR/compile.rc" ]; then
+    RC=$(tr -d ' \r\n' < "$DIR/compile.rc")
+  fi
+  if [ -f "$OUT12" ]; then
+    EXIST_DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT12" 2>/dev/null || echo 0)
+    awk -v d="$EXIST_DUR" 'BEGIN { exit (d+0 >= 90 ? 0 : 1) }' && RC=0
+  fi
+  if [ "${RC:-1}" -ne 0 ]; then
+    echo "FAIL compile rc=$RC — not publishing a stub"
+    exit 1
+  fi
+  publish_film 0
+fi
+
 [ -d "$SRC" ] || { echo "FATAL: $SRC missing — scp the film kit first"; exit 1; }
 [ -f "$SRC/compile.mjs" ] || { echo "FATAL: compile.mjs missing"; exit 1; }
 command -v ffmpeg >/dev/null && command -v ffprobe >/dev/null || { echo "FATAL: ffmpeg/ffprobe missing"; exit 1; }
 command -v node >/dev/null || { echo "FATAL: node missing"; exit 1; }
+
+if film_running; then
+  echo "compile already running — not restaging (would clobber the stitch)"
+  status_film
+  if [ "$PHASE" = "start" ]; then
+    echo "STARTED already-running"
+    exit 0
+  fi
+  while film_running; do
+    sleep 8
+    tail -n 2 "$DIR/compile.log" | redact || true
+  done
+  RC=$(tr -d ' \r\n' < "$DIR/compile.rc" 2>/dev/null || echo 1)
+  if [ -f "$OUT12" ]; then
+    awk -v d="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT12" 2>/dev/null || echo 0)" 'BEGIN { exit (d+0 >= 90 ? 0 : 1) }' && RC=0
+  fi
+  publish_film "$RC"
+fi
 
 echo
 echo "=== 0. keys present (names only) ==="
@@ -98,114 +223,44 @@ fi
 echo
 echo "=== 2. compile (cached Runway/TTS + new music mix). No service restart. ==="
 mkdir -p "$DIR/out"
-# node compile reads keys itself; do not source .env (FROM_EMAIL has spaces)
 set +e
 
-# A second api-film must not start while grapes/crawlers/xfade are still writing.
-wait_film_jobs() {
-  n=0
-  while pgrep -f 'node /home/ubuntu/aideazz-api-film/kit/compile.mjs' >/dev/null 2>&1 \
-    || pgrep -f 'ffmpeg.*aideazz-api-film' >/dev/null 2>&1; do
-    n=$((n + 1))
-    echo "waiting for existing api-film job (${n})"
-    pgrep -af 'compile.mjs|ffmpeg.*aideazz-api-film' | redact || true
-    if [ "$n" -gt 80 ]; then
-      echo "FATAL: existing api-film still running after 20m"
-      exit 1
-    fi
-    sleep 15
-  done
-}
-wait_film_jobs
-
-OUT12="$DIR/out/can-ai-find-and-cite-you-v12.mp4"
-REUSE=0
-if [ -f "$OUT12" ]; then
-  EXIST_DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT12" 2>/dev/null || echo 0)
-  echo "existing out v12 dur=${EXIST_DUR}"
-  awk -v d="$EXIST_DUR" 'BEGIN { exit (d+0 >= 90 ? 0 : 1) }' && REUSE=1
-fi
-
-if [ "$REUSE" -eq 1 ]; then
-  echo "reuse existing compile — skip node"
+if film_running; then
+  echo "compile already running after staging — not starting a second node"
+  status_film
+  RC=0
+elif [ -f "$OUT12" ] && awk -v d="$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT12" 2>/dev/null || echo 0)" 'BEGIN { exit (d+0 >= 90 ? 0 : 1) }'; then
+  echo "reuse existing compile $(ls -lh "$OUT12" | awk '{print $5}')"
+  echo 0 > "$DIR/compile.rc"
   RC=0
 else
-  # Detach so an SSH Broken pipe (v12, 4 min of xfade silence) cannot SIGHUP the stitch.
   rm -f "$DIR/compile.rc"
   : > "$DIR/compile.log"
   setsid nohup bash -c 'node /home/ubuntu/aideazz-api-film/kit/compile.mjs; echo $? > /home/ubuntu/aideazz-api-film/compile.rc' \
     >> "$DIR/compile.log" 2>&1 < /dev/null &
   echo $! > "$DIR/compile.pid"
   echo "compile pid=$(cat "$DIR/compile.pid") (survives SSH drop)"
-  while [ ! -f "$DIR/compile.rc" ]; do
-    if ! kill -0 "$(cat "$DIR/compile.pid")" 2>/dev/null && [ ! -f "$DIR/compile.rc" ]; then
-      echo 1 > "$DIR/compile.rc"
-      echo "WARN compile pid vanished without rc"
-      break
-    fi
-    sleep 8
-    tail -n 2 "$DIR/compile.log" | redact || true
-  done
-  RC=$(tr -d ' \r\n' < "$DIR/compile.rc" 2>/dev/null || echo 1)
-  echo "----- compile.log tail -----"
-  tail -n 40 "$DIR/compile.log" | redact || true
+  RC=0
 fi
-set -e
+
+if [ "$PHASE" = "start" ]; then
+  echo "STARTED phase=start rc=$RC music=${API_FILM_MUSIC:-unset}"
+  status_film
+  exit 0
+fi
+
+while [ ! -f "$DIR/compile.rc" ]; do
+  if ! film_running && [ ! -f "$DIR/compile.rc" ]; then
+    echo 1 > "$DIR/compile.rc"
+    echo "WARN compile vanished without rc"
+    break
+  fi
+  sleep 8
+  tail -n 2 "$DIR/compile.log" | redact || true
+done
+RC=$(tr -d ' \r\n' < "$DIR/compile.rc" 2>/dev/null || echo 1)
+echo "----- compile.log tail -----"
+tail -n 40 "$DIR/compile.log" | redact || true
 echo "compile exit $RC"
 echo "music used: ${API_FILM_MUSIC:-unset}"
-
-echo
-echo "=== 3. publish + probe ==="
-sudo mkdir -p "$PUBLISH"
-# Failed compile must not swap watch.html onto a missing -vN.
-if [ "${RC:-1}" -eq 0 ] && [ -f "$DIR/out/can-ai-find-and-cite-you-v12.mp4" ]; then
-  sudo cp -f "$DIR/out/"*.mp4 "$PUBLISH/" 2>/dev/null || true
-  sudo cp -f "$DIR/out/"*.jpg "$PUBLISH/" 2>/dev/null || true
-  sudo cp -f "$DIR/out/"*.png "$PUBLISH/" 2>/dev/null || true
-  if [ -f "$DIR/kit/qr/api-cta-qr.png" ]; then
-    sudo cp -f "$DIR/kit/qr/api-cta-qr.png" "$DIR/kit/qr/api-cta-endcard.png" "$PUBLISH/"
-  fi
-  if [ -f /tmp/api-film-watch.html ]; then
-    sed "s/CACHEBUST/$(date -u +%Y%m%d%H%M%S)/g" \
-      /tmp/api-film-watch.html | sudo tee "$PUBLISH/watch.html" >/dev/null
-  fi
-else
-  echo "SKIP publish — compile exit ${RC:-1} (keep live player / last good cut)"
-fi
-sudo chown -R www-data:www-data /var/www/influencer-images
-sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
-sudo find "$PUBLISH" -type f -exec chmod 644 {} \;
-ls -lh "$PUBLISH" | redact
-for u in \
-  "$PUBLIC/can-ai-find-and-cite-you-v12.mp4" \
-  "$PUBLIC/can-ai-find-and-cite-you.mp4" \
-  "$PUBLIC/can-ai-find-and-cite-you-poster.jpg" \
-  "$PUBLIC/watch.html" \
-  "$PUBLIC/api-cta-qr.png"
-do
-  code=$(curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}" --max-time 20 -L "$u" || echo "curl-fail")
-  echo "$code  $u"
-done
-# Never re-enable set -e after publish. v3 died on `t:`, v4 on `cho:` — both
-# after a real mp4 was already on disk. Acknowledgement is not completion.
-set +e
-if [ -f "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" ]; then
-  ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
-    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" | redact
-  ffmpeg -y -ss 7 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-grapes.jpg
-  ffmpeg -y -ss 22 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-crawlers.jpg
-  ffmpeg -y -ss 48 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-loom.jpg
-  BYTES=$(wc -c < /tmp/api-film-frame-grapes.jpg 2>/dev/null || printf '0')
-  printf 'frame-grapes bytes=%s\n' "$BYTES"
-  printf 'frame-crawlers bytes=%s\n' "$(wc -c < /tmp/api-film-frame-crawlers.jpg 2>/dev/null || printf '0')"
-  printf 'frame-loom bytes=%s\n' "$(wc -c < /tmp/api-film-frame-loom.jpg 2>/dev/null || printf '0')"
-  DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" || echo 0)
-  printf 'v12-duration=%s\n' "$DUR"
-  awk -v d="$DUR" 'BEGIN { if (d+0 < 60) { print "FATAL: v12 shorter than 60s — stub, do not send Elena"; exit 1 } }' || RC=1
-fi
-
-echo "DONE api-film rc=${RC:-1}"
-echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v12.mp4"
-printf 'or %s/watch.html\n' "$PUBLIC"
-printf 'Do not drop this mp4 into Atuona /films. That gallery is poetry.\n'
-exit "${RC:-1}"
+publish_film "$RC"

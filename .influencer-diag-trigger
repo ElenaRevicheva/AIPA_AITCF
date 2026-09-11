@@ -1,2 +1,2 @@
 api-film
-# v12 retry: nohup stitch after SSH Broken pipe; keep grape/insect/Loom/QR cut
+# v12 start+poll: detach compile so SSH banner timeout cannot kill the stitch

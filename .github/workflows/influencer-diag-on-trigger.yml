@@ -54,8 +54,35 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
           chmod 600 ~/.ssh/oracle
-          # ServerAlive keeps the pipe up during ffmpeg silence (v12 xfade died here: Broken pipe).
-          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25 -o ServerAliveInterval=30 -o ServerAliveCountMax=20"
+          # Short SSH sessions. v12 died on a 4-min xfade silence (Broken pipe);
+          # the retry then timed out on the banner. Retry connects; compile is detached.
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=40 -o ServerAliveInterval=20 -o ServerAliveCountMax=6"
+          ssh_retry() {
+            n=0
+            while [ "$n" -lt 6 ]; do
+              n=$((n + 1))
+              echo "ssh_retry $n: $*"
+              if ssh $SSHOPTS ubuntu@170.9.242.90 "$@"; then
+                return 0
+              fi
+              echo "ssh_retry $n failed"
+              sleep $((n * 8))
+            done
+            return 1
+          }
+          scp_retry() {
+            n=0
+            while [ "$n" -lt 6 ]; do
+              n=$((n + 1))
+              echo "scp_retry $n"
+              if scp $SSHOPTS "$@"; then
+                return 0
+              fi
+              echo "scp_retry $n failed"
+              sleep $((n * 8))
+            done
+            return 1
+          }
           if [ "$MODE" = "fix" ]; then
             scp $SSHOPTS \
               scripts/oracle-resilience/patch-influencer-make-images.py \
@@ -101,20 +128,48 @@ jobs:
               --out scripts/youtube-api-audit-film/loom/walkthrough.mp4 \
               || echo "WARN: runner could not download Loom"
             ls -lh scripts/youtube-api-audit-film/loom || true
-            ssh $SSHOPTS ubuntu@170.9.242.90 'rm -rf /tmp/youtube-api-audit-film'
-            scp -r $SSHOPTS \
+            ssh_retry 'rm -rf /tmp/youtube-api-audit-film' || exit 255
+            scp_retry -r \
               scripts/youtube-api-audit-film \
-              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film
-            scp $SSHOPTS \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film || exit 255
+            scp_retry \
               scripts/oracle-resilience/api-film-watch.html \
-              ubuntu@170.9.242.90:/tmp/api-film-watch.html
-            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
-              "$MODE" < scripts/oracle-resilience/run-api-audit-film.sh
+              ubuntu@170.9.242.90:/tmp/api-film-watch.html || exit 255
+            n=0
+            START_OK=0
+            while [ "$n" -lt 6 ]; do
+              n=$((n + 1))
+              echo "ssh start attempt $n"
+              if ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- api-film start \
+                < scripts/oracle-resilience/run-api-audit-film.sh; then
+                START_OK=1
+                break
+              fi
+              echo "ssh start attempt $n failed"
+              sleep $((n * 8))
+            done
+            [ "$START_OK" = "1" ] || { echo "FATAL: could not start compile on Oracle"; exit 255; }
+            RC=1
+            for i in $(seq 1 40); do
+              echo "=== publish poll $i ==="
+              set +e
+              ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- api-film publish \
+                < scripts/oracle-resilience/run-api-audit-film.sh
+              PRC=$?
+              set -e
+              echo "publish poll $i rc=$PRC"
+              if [ "$PRC" -eq 0 ]; then RC=0; break; fi
+              if [ "$PRC" -eq 2 ]; then sleep 20; continue; fi
+              if [ "$PRC" -eq 255 ]; then sleep 15; continue; fi
+              RC=$PRC
+              break
+            done
           else
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/diag-influencer-promo.sh
           fi
-          RC=$?
+          STEP_RC=$?
+          : "${RC:=$STEP_RC}"
           echo "--- remote exit code: $RC ---"
           rm -f ~/.ssh/oracle
           exit $RC
