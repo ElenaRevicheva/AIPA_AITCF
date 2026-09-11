@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 21:49 UTC | /api film v12 WITH voiceover (Oracle TTS stems or v11 donor) | youtube kit + GHA compile — not influencer/VJH | pending |
+| | | | | |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 21:32 UTC — v12 compiling on GitHub runner (do not send a link yet)
+### 🟢 11 Sep 22:25 UTC — /api film v12 is live
 
-**Elena:** full film — moving pomegranate, grapevine + What it checks + neurones, maracuya insects, shortened Loom, finishing slides, QR every shot, ~107s. v11 is not the cut.
+**DONE:** run 34652399156 `DONE 27.7MB, 115s` · `final mix with 11 voiceover stems` · `200 video/mp4 27657563` · `v12-duration=114.9s` · `200 text/html` watch.html.
 
-**Oracle SSH is down.** 34647132792 died mid-xfade (`Broken pipe`). 34648363197 and 34649045066 never reached the box (`banner exchange` timeout ×6). Do not encode on Oracle while sshd refuses banners.
+**ELENA:** https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
+and https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v12.mp4
 
-**THIS:** same picture, WITH voiceover. Pull Oracle `vo/v_*.mp3` (onyx stems from every earlier cut) or mux v11 audio. Never publish captions-only. Branch `cursor/youtube-api-promo-0841`.
+**NEXT:** idle `.influencer-diag-trigger`. Do not send v11. Do not Make Run once.
 
-**RISK:** Do not give Elena a link until `200 video/mp4` + `v12-duration` ≳ 90. Do not Make Run once.
+**VERIFIED BY:** Actions publish probe on 34652399156 (this Cloud VM cannot TLS to webhook).
+
+**RISK:** hard-refresh — nginx used to cache the old cut for 24h. Use the `-v12` URL, not the unversioned file.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
