@@ -171,6 +171,7 @@ def _tap(url, *a, **kw):
         print("BARE_PATHS", geo.bare_aideazz_paths(blob))
         print("HAS_THROWBACK", "THROWBACK" in blob)
         print("HAS_PORTFOLIO_API", "portfolio/api" in blob)
+        print("HAS_UTM", "utm_campaign=geo-api" in blob)
     return _orig_post(url, *a, **kw)
 _req.post = _tap
 try:

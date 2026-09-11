@@ -14,7 +14,15 @@ from zoneinfo import ZoneInfo
 PUBLIC = "https://webhook.aideazz.xyz/influencer-images"
 GEO_DIR = f"{PUBLIC}/geo-api"
 ME_DIR = f"{PUBLIC}/marketing_engine_images"
-API_URL = "https://aideazz.xyz/api"
+API_ORIGIN = "https://aideazz.xyz/api"
+# One URL, with campaign tags. Bare /api is invisible to the attribution
+# engine (no HubSpot inquiry UTM, no visibility-lead UTM line).
+API_URL = (
+    f"{API_ORIGIN}"
+    "?utm_source=linkedin"
+    "&utm_medium=influencer"
+    "&utm_campaign=geo-api"
+)
 PORTFOLIO = "https://aideazz.xyz/portfolio"
 
 # New fruit/dashboard stills — in FRONT of the legacy marketing-engine pool.
@@ -279,6 +287,9 @@ _BARE_API = re.compile(r"(?<!aideazz\.xyz)/api(?=[\s.,;:!?)\]'\"\n]|$)")
 _BARE_PORT = re.compile(r"(?<!aideazz\.xyz)/portfolio(?=[\s.,;:!?)\]'\"\n]|$)")
 
 
+_UNTAGGED_API = re.compile(r"https://aideazz\.xyz/api(?!\?)", re.I)
+
+
 def canonicalize_aideazz_urls(text: str) -> str:
     """Force the only two public destinations. Never emit a relative path."""
     if not text:
@@ -287,6 +298,9 @@ def canonicalize_aideazz_urls(text: str) -> str:
     text = _WRONG_PORT.sub(PORTFOLIO, text)
     text = _BARE_API.sub(API_URL, text)
     text = _BARE_PORT.sub(PORTFOLIO, text)
+    # Upgrade a bare /api (no query) to the tagged money-page URL.
+    # Leave ?url= share links alone.
+    text = _UNTAGGED_API.sub(API_URL, text)
     return text
 
 
@@ -317,7 +331,7 @@ def strip_concatenated_junk(text: str) -> str:
 
 
 def with_destinations(body: str) -> str:
-    """Body + exactly one destination: https://aideazz.xyz/api
+    """Body + exactly one destination: the tagged /api URL.
 
     Two URLs on consecutive lines were glued by Buffer/LinkedIn into
     /portfolio/api (404). Keep portfolio out of the visible caption.

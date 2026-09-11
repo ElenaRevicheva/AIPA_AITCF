@@ -107,15 +107,22 @@ def test_apply_lane_keeps_make_router() -> None:
     assert url2.endswith("image1.jpg")
 
 
+def test_api_url_is_tagged() -> None:
+    assert g.API_URL.startswith("https://aideazz.xyz/api?")
+    assert "utm_source=linkedin" in g.API_URL
+    assert "utm_medium=influencer" in g.API_URL
+    assert "utm_campaign=geo-api" in g.API_URL
+
+
 def test_copy_sells_the_api() -> None:
     for u in g.GEO_PRIMARY:
         text = g.maybe_geo_copy("marketing_engine", u, "OLD")
-        assert "https://aideazz.xyz/api" in text
+        assert g.API_URL in text
         assert "https://aideazz.xyz/portfolio/api" not in text
         assert "https://aideazz.xyz/portfolio/portfolio" not in text
         # One destination only — a second URL is what LinkedIn glued into a 404.
         assert "https://aideazz.xyz/portfolio" not in text
-        stripped = text.replace("https://aideazz.xyz/api", "")
+        stripped = text.replace(g.API_URL, "")
         assert "/api" not in stripped
         assert "/portfolio" not in stripped
         assert "34" in text
@@ -135,11 +142,11 @@ def test_canonicalize_fixes_relative_and_doubled_paths() -> None:
         "https://aideazz.xyz/portfolio/portfolio/portfolio"
     )
     out = g.canonicalize_aideazz_urls(raw)
-    assert "https://aideazz.xyz/api" in out
+    assert g.API_URL in out
     assert "https://aideazz.xyz/portfolio" in out
     assert "portfolio/api" not in out
     assert "portfolio/portfolio" not in out
-    leftover = out.replace("https://aideazz.xyz/api", "").replace("https://aideazz.xyz/portfolio", "")
+    leftover = out.replace(g.API_URL, "").replace("https://aideazz.xyz/portfolio", "")
     assert "/api" not in leftover
     assert "/portfolio" not in leftover
 
@@ -150,8 +157,8 @@ def test_caption_is_one_absolute_api_url() -> None:
         "THROWBACK: that graceful skip moment\n"
         "potential: 2026-09-10 leftover"
     )
-    assert text.endswith("https://aideazz.xyz/api")
-    assert text.count("https://aideazz.xyz/api") == 1
+    assert text.endswith(g.API_URL)
+    assert text.count(g.API_URL) == 1
     assert "https://aideazz.xyz/portfolio" not in text
     assert "THROWBACK" not in text
     assert "potential:" not in text
@@ -175,9 +182,9 @@ def test_stamp_blanks_leftover_make_fields() -> None:
     assert out["cta"] == ""
     assert out["audience"] == ""
     assert out["potential"] == ""
-    assert out["link"] == "https://aideazz.xyz/api"
-    assert "https://aideazz.xyz/api" in out["promo"]
-    assert "https://aideazz.xyz/api" in out["linkedinBody"]
+    assert out["link"] == g.API_URL
+    assert g.API_URL in out["promo"]
+    assert g.API_URL in out["linkedinBody"]
     assert "https://aideazz.xyz/portfolio" not in out["promo"]
     assert "THROWBACK" not in out["promo"]
     assert "apiURL" not in out  # do not add keys Make concatenates
@@ -287,6 +294,7 @@ def test_patcher_hooks_both_send_functions() -> None:
 def main() -> None:
     # Import name: file is patch-influencer-geo-rotation.py (hyphens). Load via runpy.
     tests = [
+        test_api_url_is_tagged,
         test_schedule_2_of_3,
         test_weighted_pool_fires_new_harder,
         test_apply_lane_keeps_make_router,
