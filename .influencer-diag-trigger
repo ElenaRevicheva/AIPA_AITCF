@@ -1,2 +1,2 @@
 api-film
-# v12 start+poll: detach compile so SSH banner timeout cannot kill the stitch
+# v12 compile on GitHub runner — Oracle sshd banner-timeout; publish mp4 after

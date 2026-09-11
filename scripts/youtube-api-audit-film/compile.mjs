@@ -797,7 +797,7 @@ async function main() {
   process.stderr.write('xfade concat...\n');
   await execFileP('ffmpeg', ['-y', ...inputs, '-filter_complex', fc.replace(/;$/, ''), '-map', `[${vlab}]`, '-map', `[${alab}]`, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', body], {
     maxBuffer: 1 << 27,
-    timeout: 480000,
+    timeout: 900000,
   });
 
   const LEN = await dur(body);
