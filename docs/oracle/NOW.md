@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 2026-09-11 00:33 UTC | Influencer /api UTM tags | `geo_api_promo.py` + Oracle fire | in flight |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 ELENA'S TAP — 10 Sep 23:46 UTC — new GEO post, one `/api` link
+### 🟡 11 Sep 00:33 UTC — tagging Influencer `/api` so clicks attribute
 
-**DONE:** Elena was right — the 21:38 fire still 404'd. Two bugs: (1) `/api` + `/portfolio` in one caption glued into `/portfolio/api` (HTTP 200 homepage HTML → SPA “Page not found”); (2) Make concatenates `audience=general_professional` + `cta` + Groq `story` (the `THROWBACK` / `¡Hola, …_explorer!` mash). Wiping `story` to `""` then crashed `story.get` so Make never ran.
+**DONE:** Link itself is fixed (Elena confirmed). Bare `https://aideazz.xyz/api` is **not** counted — attribution needs `utm_*`. Adding `?utm_source=linkedin&utm_medium=influencer&utm_campaign=geo-api` (still one URL). Branch `cursor/fix-influencer-make-0841`.
 
-**This fire (Action `34543608312`):** `/api` is live **200** title *AI Visibility Audit*. Payload `text`/`linkedinBody`/`bufferPostText` = grapes GEO copy. `story`/`cta`/`audience` blank. `PROMO_URLS` only `https://aideazz.xyz/api`. `Sent to Make.com webhook. Response: 200`. Image `geo-grapes-citation.jpg`. Branch `cursor/fix-influencer-make-0841` (PR 50). NOW.md on `main`.
+**NEXT (Elena):** after this fire, the **new** post’s link must include those three query params. Run an audit or submit the portfolio form — that is when HubSpot/Telegram see the campaign. A page-open alone still writes nothing. **Do not Make Run once.**
 
-**NEXT (Elena):** open the **new** LinkedIn/IG post (grapes, not the pomegranate one). Tap the link — it must be `https://aideazz.xyz/api`, not a 404. **Do not Make Run once.** Ignore the older mashed post.
+**NEXT (agent):** fire, then confirm `HAS_UTM True` + Make 200. Idle.
 
-**NEXT (agent):** idle. Do not fire again unless Elena says the new post is still wrong.
+**VERIFIED BY:** pending this fire. Prior: Action `34543608312` untagged `/api` Make 200.
 
-**VERIFIED BY:** Action `34543608312` `PROMO_URLS ['https://aideazz.xyz/api', …]` + `HAS_PORTFOLIO_API False` + Make **200**.
-
-**RISK:** Make 3044021 ON or Buffer never posts. Hashtags still say #EspaLuz (random set). `videoURL` is still a YouTube. Empty `imageURL` = IG 400.
+**RISK:** Instagram clicks will also carry `utm_source=linkedin` (same caption). Make 3044021 still prepends “¡Hola, explorer!”.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
