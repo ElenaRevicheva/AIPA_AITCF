@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 20:32 UTC | /api film v10 — restore moving glowing grapevine + crawlers + Loom + slides | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 20:40 UTC | /api film v11 — QR on every shot; wait for v10 job then fire | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 20:32 UTC — v9 lost the picture. Restoring grapevine + rest.
+### 🟡 IN FLIGHT 11 Sep 20:40 UTC — v11 QR on every shot (v10 still compiling)
 
-**Elena:** v9 has no grapevine (moving/glowing), no insects on maracuya, no shortened Loom, no earlier slides.
+**Elena:** QR she made, on every shot. Fruit still moving. What it checks on the grapevine.
 
-**THIS:** salvage moving grapes from v2 + neuron glow (do not trust still cache). Keep crawlers. Loom + first-video slides visible. Publish `-v10`. Branch `cursor/youtube-api-promo-0841`.
+**THIS:** corner QR overlay on intro + every beat. Publish `-v11` after Actions `34645181835` (v10) exits. Do not fire a second `api-film` until then. Branch `cursor/youtube-api-promo-0841`.
 
-**RISK:** Do not Make Run once. Do not wipe split/crawlers until a replacement exists. Do not send v7. Do not fire a second `api-film` while one is running.
+**RISK:** Two `api-film` jobs clobber Oracle. Do not Make Run once. Do not send v7/v9. Do not send v10 if v11 is about to land.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
