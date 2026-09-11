@@ -139,15 +139,17 @@ do
   echo "$code  $u"
 done
 if [ -f "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" ]; then
+  set +e
   ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
     -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" | redact
-  ffmpeg -y -ss 3 -i "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" -frames:v 1 /tmp/api-film-frame-split.jpg 2>/dev/null
-  ffmpeg -y -ss 12 -i "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" -frames:v 1 /tmp/api-film-frame-crawlers.jpg 2>/dev/null
-  echo "frame-split bytes=$(wc -c < /tmp/api-film-frame-split.jpg 2>/dev/null || echo 0)"
+  ffmpeg -y -ss 3 -i "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-split.jpg
+  echo "frame-split bytes=$(wc -c < /tmp/api-film-frame-split.jpg)"
+  set -e
 fi
 
 echo
 echo "=== DONE api-film rc=$RC ==="
-echo "ELENA: watch $PUBLIC/can-ai-find-and-cite-you-v3.mp4  (or $PUBLIC/watch.html)"
+echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v3.mp4"
+echo "or ${PUBLIC}/watch.html"
 echo "Do not drop this mp4 into Atuona /films — that gallery is poetry."
 exit $RC
