@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 19:51 UTC | /api film v7 — restore grapes, neuron glow, What it checks overlay | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 20:03 UTC | /api film v8 — tiny checks waterfall Loom peek; xfade SAR so cut is not 12s | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 19:51 UTC — film v7 grapevine restore
+### 🟡 IN FLIGHT 11 Sep 20:03 UTC — film v8 (tiny waterfall Loom + xfade fix)
 
-**Elena:** restore the grapevine shot; grapes moving and glowing with neurones; overlay the "What it checks" chapter text. VO/captions on existing beats stay.
+**Elena:** Loom in the check-results waterfall — show it just a little. Grapes stay.
 
-**THIS:** new Runway grapes (wipe `clips/grapes.mp4` only). Salvage+glow if credits empty. Publish `-v7`. Keep split/crawlers/hand/dashboard. Branch `cursor/youtube-api-promo-0841`.
+**v7 is a 12s stub.** Actions `34641425711` built all 13 beats then xfade died after grapes (`DONE 6.2MB, 12s`). Do not send `-v7`.
 
-**RISK:** Do not Make Run once. Do not wipe split/crawlers. Do not tell Elena `-v7` until `200 video/mp4`.
+**THIS:** checks Loom peek 1.0s @ ~21s (waterfall). Sequential walk stays capped. Conform SAR on xfade; refuse body < 60s. Publish `-v8`. Keep fruit/grapes. Branch `cursor/youtube-api-promo-0841`.
+
+**RISK:** Do not Make Run once. Do not wipe split/crawlers/grapes. Do not tell Elena `-v8` until duration ≳ 90s and `200 video/mp4`.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
