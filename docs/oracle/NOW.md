@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 10:26 UTC | YouTube CTA film for aideazz.xyz/api | docs/selling/youtube-api-audit, scripts/youtube-api-audit-film.mjs — no Oracle restart | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
