@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 16:27 UTC | /api YouTube film remix — native 1080p, new Loom, QR | compile.mjs + Oracle api-film (not influencer/VJH) | (this commit) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,21 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 STOPPED 11 Sep 15:53 UTC — /api film: do not paste the unversioned mp4
+### 🟡 IN FLIGHT 11 Sep 16:27 UTC — /api film remix, native 1080p
 
-**DONE:** Oracle already had the 40.6MB Loom cut. Elena's paste URL is cached 24h in Chrome (`max-age=86400`). Published `watch.html` + `-v2` + `-20260911` filenames. nginx youtube/ is `no-store`. Actions `34618686457` HEAD: watch.html `200 text/html`; both new mp4s `40646845`.
+**Elena:** grapevine out · Google/ChatGPT on the split fruit · bot names on the passionfruit crawlers · new shorter Loom · 2026 chill house · QR outro. VO/captions unchanged.
 
-**Watch (Chrome has never seen these):**
-`https://webhook.aideazz.xyz/influencer-images/youtube/watch.html`
-`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4`
+**THIS SESSION:** Luma Ray 3.2 1080p for fruit (Runway 720p was the mush). No setpts stretch. New filename `-v3`. Influencer/VJH stay paused.
 
-**NEXT (Elena):** open watch.html or v2. Skip to 0:42 for live /api. Incognito also works on the old filename. **Do not Make Run once.**
-
-**NEXT (agent):** claim empty. Do not restart influencer/VJH.
-
-**VERIFIED BY:** `34618686457` watch.html `Content-Type: text/html` `Cache-Control: no-store`; v2/dated `Content-Length: 40646845`.
-
-**RISK:** Ctrl-R on the unversioned URL cannot beat a 24h freshness lifetime already stored in the browser.
+**RISK:** Luma spend + nginx youtube/ already no-store. Do not Make Run once.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
