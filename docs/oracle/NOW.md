@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 19:15 UTC | /api film v6 — shorten Loom, add first-video slides, moving site | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 19:21 UTC | /api film v6 concat SAR fix (hero still 0:1 vs Loom 15709:15711) | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 19:15 UTC — film v6 (short Loom, slides, moving site)
+### 🟡 IN FLIGHT 11 Sep 19:21 UTC — film v6 concat SAR fix
 
-**Elena:** one more moving shot of the live website; shorten the Loom (results scroll too long); add the first-video slides. VO/captions stay.
+**v5 still the last good cut.** Actions `34637870952` on `c66567f` died at hero concat: still SAR `0:1` vs Loom `15709:15711`. Fruit + website clip OK. `-v6.mp4` 404. That run also wrote `watch.html` onto the missing v6.
 
-**THIS:** cap Loom at ~20s, never loop; UI beats lead with walkthrough.html slides; new `website` clip (live-hero + short Loom). Wipe UI clips only. Keep fruit.
+**THIS:** `concatClips` now `setsar=1`; publish `watch.html` only if compile exit 0. Fire `api-film`. Keep fruit. Branch `cursor/youtube-api-promo-0841`.
 
-**RISK:** Do not Make Run once. Do not wipe split/crawlers.
+**RISK:** Do not Make Run once. Do not wipe split/crawlers. Do not tell Elena `-v6` until HEAD is `200 video/mp4`.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
