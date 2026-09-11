@@ -62,10 +62,24 @@ echo
 echo "=== 3. restart vibejobhunter (owns Telegram + CMO send) ==="
 # web server does not own the bot; do not bounce it unless we touched it
 # One-deployer: skip bounce if this unit entered in the last 10 minutes.
-enter_usec=$(systemctl show vibejobhunter -p ActiveEnterTimestampUSec --value)
-enter_usec=${enter_usec:-0}
-now_s=$(date +%s)
-age_s=$(( now_s - enter_usec / 1000000 ))
+# Parse ActiveEnterTimestamp (human UTC). ActiveEnterTimestampUSec is not a
+# Unix epoch on this box — it produced age_s≈1.7e9 and bounced twice.
+age_s=$(python3 - <<'PY'
+from datetime import datetime, timezone
+import subprocess
+ts = subprocess.check_output(
+    ["systemctl", "show", "vibejobhunter", "-p", "ActiveEnterTimestamp", "--value"],
+    text=True,
+).strip()
+if not ts or ts == "n/a":
+    print(10**9)
+    raise SystemExit(0)
+dt = datetime.strptime(ts.replace(" UTC", ""), "%a %Y-%m-%d %H:%M:%S").replace(
+    tzinfo=timezone.utc
+)
+print(int((datetime.now(timezone.utc) - dt).total_seconds()))
+PY
+)
 echo "vibejobhunter age_s=$age_s"
 if [ "$age_s" -lt 600 ]; then
   echo "SKIP restart — entered ${age_s}s ago (one-deployer, 10m)"
