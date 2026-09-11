@@ -1,2 +1,2 @@
 api-film
-# v12 with voiceover: Oracle TTS stems if SSH is up, else v11 donor audio
+# v12 pairwise xfade — runner OOM'd (143) on the 16-clip graph; VO stems already work

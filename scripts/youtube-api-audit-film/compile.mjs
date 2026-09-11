@@ -783,30 +783,30 @@ async function main() {
     return Math.max(0, s - k * XFADE_D);
   };
 
-  const inputs = seq.flatMap((c) => ['-i', c]);
-  let fc = '';
-  for (let i = 0; i < seq.length; i++) {
-    // Same SAR trap as v6 hero concat: grapes setsar=1 vs Runway 15709:15711 truncated the xfade to ~12s.
-    fc += `[${i}:v]fps=${FPS},format=yuv420p,scale=${WX}:${HY}:force_original_aspect_ratio=decrease,pad=${WX}:${HY}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,setpts=PTS-STARTPTS[vx${i}];`;
-    fc += `[${i}:a]aformat=sample_rates=44100:channel_layouts=stereo,aresample=44100,asetpts=PTS-STARTPTS[ax${i}];`;
+  // Pairwise xfade — one 16-input 1080p graph OOMs the GitHub runner (exit 143).
+  const normV = `fps=${FPS},format=yuv420p,scale=${WX}:${HY}:force_original_aspect_ratio=decrease,pad=${WX}:${HY}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,setpts=PTS-STARTPTS`;
+  const normA = `aformat=sample_rates=44100:channel_layouts=stereo,aresample=44100,asetpts=PTS-STARTPTS`;
+  async function xfadeTwo(aPath, bPath, dest) {
+    const da = await dur(aPath);
+    const ofs = Math.max(0, da - XFADE_D).toFixed(3);
+    const fc =
+      `[0:v]${normV}[v0];[1:v]${normV}[v1];[0:a]${normA}[a0];[1:a]${normA}[a1];` +
+      `[v0][v1]xfade=transition=fade:duration=${XFADE_D}:offset=${ofs}[v];` +
+      `[a0][a1]acrossfade=d=${XFADE_D}[a]`;
+    await execFileP(
+      'ffmpeg',
+      ['-y', '-i', aPath, '-i', bPath, '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
+      { maxBuffer: 1 << 26, timeout: 180000 },
+    );
+    return dest;
   }
-  let vlab = 'vx0',
-    alab = 'ax0',
-    merged = durs[0];
+  let body = seq[0];
   for (let k = 1; k < seq.length; k++) {
-    const ofs = Math.max(0, merged - XFADE_D).toFixed(3);
-    fc += `[${vlab}][vx${k}]xfade=transition=fade:duration=${XFADE_D}:offset=${ofs}[vc${k}];`;
-    fc += `[${alab}][ax${k}]acrossfade=d=${XFADE_D}[ac${k}];`;
-    vlab = `vc${k}`;
-    alab = `ac${k}`;
-    merged += durs[k] - XFADE_D;
+    const next = path.join(W, `xf_${String(k).padStart(2, '0')}.mp4`);
+    process.stderr.write(`xfade pair ${k}/${seq.length - 1} +${path.basename(seq[k])}\n`);
+    await xfadeTwo(body, seq[k], next);
+    body = next;
   }
-  const body = path.join(W, 'body.mp4');
-  process.stderr.write('xfade concat...\n');
-  await execFileP('ffmpeg', ['-y', ...inputs, '-filter_complex', fc.replace(/;$/, ''), '-map', `[${vlab}]`, '-map', `[${alab}]`, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', body], {
-    maxBuffer: 1 << 27,
-    timeout: 900000,
-  });
 
   const LEN = await dur(body);
   process.stderr.write(`xfade body ${LEN.toFixed(1)}s (expect ${expect.toFixed(1)}s)\n`);
