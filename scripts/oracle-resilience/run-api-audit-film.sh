@@ -53,34 +53,27 @@ fi
 [ -f "$DIR/kit/compile.mjs" ] || { echo "FATAL: compile.mjs missing in kit"; exit 1; }
 
 echo
-echo "=== 1a. public stills for Luma 1080p (Luma fetches HTTP, not data URIs) ==="
-sudo mkdir -p "$PUBLISH/stills"
-sudo cp -f "$DIR/kit/fruit/"*.jpg "$PUBLISH/stills/"
-sudo chown -R www-data:www-data "$PUBLISH/stills"
-sudo chmod 644 "$PUBLISH/stills/"*.jpg
-export API_FILM_STILL_BASE="$PUBLIC/stills"
-ls -lh "$PUBLISH/stills"
-
-echo
-echo "=== 1b. Elena's muted Loom walkthrough (new share — always refetch if id changed) ==="
+echo "=== 1a. Elena's muted Loom (prefer raw-url so it is not a 4MB preview) ==="
 mkdir -p "$DIR/loom"
 rm -f "$DIR/loom/walkthrough.mp4"
 python3 "$DIR/kit/fetch-loom.py" --force --out "$DIR/loom/walkthrough.mp4"
 [ -f "$DIR/loom/walkthrough.mp4" ] || { echo "FATAL: Loom walkthrough missing"; exit 1; }
 export API_FILM_LOOM="$DIR/loom/walkthrough.mp4"
 ls -lh "$API_FILM_LOOM"
-ffprobe -v error -show_entries format=duration:stream=width,height -of default=nw=1 "$API_FILM_LOOM" || true
+ffprobe -v error -show_entries format=duration:stream=width,height,bit_rate -of default=nw=1 "$API_FILM_LOOM" || true
 
 echo
-echo "=== 1c. wipe 720p Runway fruit cache so Luma 1080p regenerates ==="
+echo "=== 1b. wipe Luma clips — regenerate fruit on Runway (the look Elena liked) ==="
 rm -f "$DIR/clips/grapes.mp4" "$DIR/clips/split.mp4" "$DIR/clips/crawlers.mp4" "$DIR/clips/hand.mp4"
 mkdir -p "$DIR/clips"
 
 echo
-echo "=== 1d. Pixabay 2026 chill house (not Tropical Cocktail, not Atuona poetry beds) ==="
+echo "=== 1c. Pixabay 2026 chillout (not Tropical Cocktail, not Distant Horizon dreamy) ==="
 echo "Atuona poetry library (do NOT pick from here):"
 ls /home/ubuntu/cto-aipa/data/atuona/films/music 2>/dev/null | redact || echo "(missing)"
-rm -f "$DIR/music/SELECTED.path" "$DIR/music/fresh-tropical-cocktail-pixabay.mp3"
+rm -f "$DIR/music/SELECTED.path" \
+  "$DIR/music/fresh-tropical-cocktail-pixabay.mp3" \
+  "$DIR/music/distant-horizon-chill-house-pixabay.mp3"
 export API_FILM_DIR="$DIR"
 export API_FILM_PUBLISH="$DIR/out"
 export API_FILM_MUSIC_DIR="$DIR/music"
@@ -129,7 +122,7 @@ sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
 sudo find "$PUBLISH" -type f -exec chmod 644 {} \;
 ls -lh "$PUBLISH" | redact
 for u in \
-  "$PUBLIC/can-ai-find-and-cite-you-v3.mp4" \
+  "$PUBLIC/can-ai-find-and-cite-you-v4.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you-poster.jpg" \
   "$PUBLIC/watch.html" \
@@ -138,18 +131,18 @@ do
   code=$(curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}" --max-time 20 -L "$u" || echo "curl-fail")
   echo "$code  $u"
 done
-if [ -f "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" ]; then
+if [ -f "$PUBLISH/can-ai-find-and-cite-you-v4.mp4" ]; then
   set +e
   ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
-    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" | redact
-  ffmpeg -y -ss 3 -i "$PUBLISH/can-ai-find-and-cite-you-v3.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-split.jpg
+    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v4.mp4" | redact
+  ffmpeg -y -ss 3 -i "$PUBLISH/can-ai-find-and-cite-you-v4.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-split.jpg
   echo "frame-split bytes=$(wc -c < /tmp/api-film-frame-split.jpg)"
   set -e
 fi
 
 echo
 echo "=== DONE api-film rc=$RC ==="
-echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v3.mp4"
+echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v4.mp4"
 echo "or ${PUBLIC}/watch.html"
 echo "Do not drop this mp4 into Atuona /films — that gallery is poetry."
 exit $RC

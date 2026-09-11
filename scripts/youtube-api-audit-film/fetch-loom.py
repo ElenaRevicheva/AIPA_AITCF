@@ -17,11 +17,12 @@ from pathlib import Path
 
 LOOM_ID = "f4a4a4cf12e34fb2b7984ab1663a2386"
 TRANSCODE = f"https://www.loom.com/api/campaigns/sessions/{LOOM_ID}/transcoded-url"
+RAW = f"https://www.loom.com/api/campaigns/sessions/{LOOM_ID}/raw-url"
 
 
-def transcoded_url() -> str:
+def post_url(endpoint: str) -> str:
     req = urllib.request.Request(
-        TRANSCODE,
+        endpoint,
         data=b"{}",
         method="POST",
         headers={
@@ -36,8 +37,24 @@ def transcoded_url() -> str:
     data = json.loads(body)
     url = data.get("url") or data.get("cdnUrl") or ""
     if not url:
-        raise SystemExit("Loom transcode JSON had no url: " + body[:240])
+        raise RuntimeError("no url in " + body[:240])
     return url
+
+
+def transcoded_url() -> str:
+    return post_url(TRANSCODE)
+
+
+def best_url() -> str:
+    """Prefer raw (original screen capture) over the tiny transcoded preview."""
+    try:
+        url = post_url(RAW)
+        print("loom using raw-url")
+        return url
+    except Exception as e:
+        print(f"WARN loom raw-url: {type(e).__name__}: {e}")
+        print("loom falling back to transcoded-url")
+        return transcoded_url()
 
 
 def main() -> int:
@@ -59,7 +76,7 @@ def main() -> int:
         return 0
     print(f"loom id {LOOM_ID}")
     try:
-        url = transcoded_url()
+        url = best_url()
     except Exception as e:
         print(f"FATAL loom transcode: {type(e).__name__}: {e}")
         return 1

@@ -2,7 +2,7 @@
 
 Promo + product walkthrough for **https://aideazz.xyz/api**
 Compiled with the Atuona Film Studio stack already wired into this repo
-(Luma Ray 3.2 native 1080p image→video, onyx TTS, ffmpeg xfade / ducked music).
+(Runway Gen-4.5 image→video, onyx TTS, ffmpeg xfade / ducked music). Luma is burned.
 
 **Do not drop this file into `atuona.xyz/aifilmstudio`.** That gallery is poetry.
 
@@ -17,8 +17,8 @@ Open a filename Chrome has never cached:
 Player (QR is a real clickable link on this page):
 https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
 
-Direct 1080p file:
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v3.mp4
+Direct file (open this, not the unversioned mp4, not v3):
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v4.mp4
 
 Poster:
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-poster.jpg
@@ -55,7 +55,7 @@ Counted from production logs on Oracle Cloud: 420+ audits · 14,000+ signals · 
 
 Want it wired into your stack? https://aideazz.xyz/portfolio#portfolio-inquiry-form
 
-Music: chill house instrumental from Pixabay (credit the title shown in the compile log — Tropical Cocktail is burned)
+Music: 2026 chillout / organic house from Pixabay (credit the title in the compile log — Tropical Cocktail and Distant Horizon are burned)
 
 AIdeazz Lab · Elena Revicheva
 ```

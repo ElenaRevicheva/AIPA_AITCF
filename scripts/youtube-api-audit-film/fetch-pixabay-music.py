@@ -27,19 +27,19 @@ ENV_FILE = os.environ.get("CTO_ENV", "/home/ubuntu/cto-aipa/.env")
 DEST_DIR = Path(os.environ.get("API_FILM_MUSIC_DIR", "/home/ubuntu/aideazz-api-film/music"))
 SELECTED = DEST_DIR / "SELECTED.path"
 
-# Elena: Tropical Cocktail was not "latest 2026 chillout". Prefer chill/organic house
-# published in 2026 (Distant Horizon Apr 2026, Chill House Mar 2026).
+# Elena: Tropical Cocktail ≠ 2026 chillout; Distant Horizon was Dreamy and got burned.
+# Prefer organic/sunset chill house published in 2026, instrumental, not sad.
 CANDIDATES = [
     {
-        "page": "https://pixabay.com/music/search/distant%20horizon%20chill%20house/",
-        "dest": "distant-horizon-chill-house-pixabay.mp3",
-        "expect": "Distant Horizon",
+        "page": "https://pixabay.com/music/search/chillout%20lounge%202026/",
+        "dest": "chillout-lounge-2026-pixabay.mp3",
+        "expect": "Chillout",
         "search": True,
     },
     {
-        "page": "https://pixabay.com/music/search/chill%20house%20deep%20house/",
-        "dest": "chill-house-deep-house-pixabay.mp3",
-        "expect": "Chill House",
+        "page": "https://pixabay.com/music/search/organic%20house%20sunset/",
+        "dest": "organic-house-sunset-pixabay.mp3",
+        "expect": "Organic House",
         "search": True,
     },
     {
@@ -48,15 +48,21 @@ CANDIDATES = [
         "expect": "Sunset Groove",
         "search": True,
     },
+    {
+        "page": "https://pixabay.com/music/search/chill%20house%20deep%20house/",
+        "dest": "chill-house-deep-house-pixabay.mp3",
+        "expect": "Chill House",
+        "search": True,
+    },
 ]
 
 REJECT_MOOD = re.compile(
     r"dark|drone|suspense|horror|trailer|epic|trap|phonk|restless|chasing|aggressive|"
-    r"noisy|sad|melanchol|meditat|vocal|lyrics|singing|choir|morning.?light|tropical.?cocktail",
+    r"noisy|sad|melanchol|meditat|dreamy|vocal|lyrics|singing|choir|morning.?light|tropical.?cocktail|distant.?horizon",
     re.I,
 )
 WANT_MOOD = re.compile(
-    r"chill|house|lounge|organic|sunset|groove|horizon|deep.?house|electronic",
+    r"chill|house|lounge|organic|sunset|groove|deep.?house",
     re.I,
 )
 
@@ -252,6 +258,10 @@ def main() -> int:
         blob = (summary + " " + str(audio.get("name", ""))).lower()
         if re.search(r"vocal|lyrics|singing|choir", blob):
             print("reject: has vocals")
+            continue
+        # Distant Horizon matched WANT (chill house) AND Dreamy — that exception burned.
+        if re.search(r"dreamy|tropical.?cocktail|distant.?horizon|morning.?light", blob):
+            print("reject: burned or dreamy")
             continue
         if REJECT_MOOD.search(blob) and not WANT_MOOD.search(blob):
             print("reject: mood tags are dark/sad/noisy")
