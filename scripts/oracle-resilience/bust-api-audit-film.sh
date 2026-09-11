@@ -39,25 +39,22 @@ ls -lh "$PUBLISH/$STABLE" "$PUBLISH/$FRESH"
 
 echo
 echo "=== 2. nginx: youtube/ must NOT inherit max-age=86400 ==="
-if sudo grep -q "location /influencer-images/youtube/" "$NGINX_SITE" 2>/dev/null; then
-  echo "youtube location already present"
-else
-  BAK="${NGINX_SITE}.bak.youtube-nocache-$(date -u +%Y%m%d%H%M%S)"
-  sudo cp "$NGINX_SITE" "$BAK"
-  echo "backup $BAK"
-  sudo cat "$NGINX_SITE" > /tmp/webhook.nginx.old
-  python3 - <<'PY'
+echo "--- locations in $NGINX_SITE ---"
+sudo grep -n "influencer-images" "$NGINX_SITE" | redact || true
+BAK="${NGINX_SITE}.bak.youtube-nocache-$(date -u +%Y%m%d%H%M%S)"
+sudo cp "$NGINX_SITE" "$BAK"
+sudo cat "$NGINX_SITE" > /tmp/webhook.nginx.old
+python3 - <<'PY'
 from pathlib import Path
 src = Path("/tmp/webhook.nginx.old").read_text(encoding="utf-8")
 block = '''
-    # YouTube promo mp4s change in place. The parent /influencer-images/
-    # location sends Cache-Control max-age=86400, so a browser keeps the
-    # previous cut for a full day. This location must win (more specific).
-    location /influencer-images/youtube/ {
+    # YouTube promo mp4s change in place. Parent /influencer-images/ sends
+    # Cache-Control max-age=86400 (24h). ^~ so this prefix wins over the parent.
+    location ^~ /influencer-images/youtube/ {
         alias /var/www/influencer-images/youtube/;
         autoindex off;
-        add_header Cache-Control "no-cache, must-revalidate";
-        add_header X-Content-Type-Options nosniff;
+        add_header Cache-Control "no-cache, must-revalidate" always;
+        add_header X-Content-Type-Options nosniff always;
         types {
             video/mp4 mp4;
             image/jpeg jpg jpeg;
@@ -66,24 +63,34 @@ block = '''
     }
 
 '''
+# Drop a previous (non-^~) youtube location so we do not duplicate.
+import re
+src = re.sub(
+    r"\n    location(?: \^~)? /influencer-images/youtube/ \{.*?\n    \}\n",
+    "\n",
+    src,
+    flags=re.S,
+)
 needle = "    location /influencer-images/"
 idx = src.find(needle)
 if idx < 0:
     raise SystemExit("could not find location /influencer-images/ in nginx site")
 Path("/tmp/webhook.nginx.new").write_text(src[:idx] + block + src[idx:], encoding="utf-8")
 print("wrote /tmp/webhook.nginx.new")
+print("youtube locations in new file:", src[:idx].count("youtube/") + (src[idx:].count("youtube/")))
 PY
-  sudo cp /tmp/webhook.nginx.new "$NGINX_SITE"
-  if sudo nginx -t; then
-    sudo systemctl reload nginx
-    echo "nginx reloaded — youtube/ is no-cache"
-  else
-    echo "nginx -t FAILED — restoring backup"
-    sudo cp "$BAK" "$NGINX_SITE"
-    sudo nginx -t
-    exit 1
-  fi
+sudo cp /tmp/webhook.nginx.new "$NGINX_SITE"
+if sudo nginx -t; then
+  sudo systemctl reload nginx
+  echo "nginx reloaded — youtube/ is ^~ no-cache"
+else
+  echo "nginx -t FAILED — restoring backup"
+  sudo cp "$BAK" "$NGINX_SITE"
+  sudo nginx -t
+  exit 1
 fi
+echo "--- locations after ---"
+sudo grep -n "influencer-images" "$NGINX_SITE" | redact || true
 
 echo
 echo "=== 3. public HEAD (Content-Length is the tell) ==="

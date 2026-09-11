@@ -1,2 +1,2 @@
 api-film-bust
-# Elena still sees the cached 22MB cut — new filename + youtube/ no-cache
+# retry: ^~ youtube location — first insert still served parent max-age=86400
