@@ -53,6 +53,9 @@ Counted from production logs on Oracle Cloud: 420+ audits · 14,000+ signals · 
 
 Want it wired into your stack? https://aideazz.xyz/portfolio#portfolio-inquiry-form
 
+Music: Morning Light (Fresh Corporate) by wbmstudio — Pixabay Content License
+(or the backup: Happy Motivational Uplifting Corporate by RomanSenykMusic)
+
 AIdeazz Lab · Elena Revicheva
 ```
 

@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 11:59 UTC | Remix /api YouTube film soundtrack (Pixabay light bed) | scripts/youtube-api-audit-film, run-api-audit-film.sh — no Oracle restart | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 STOPPED 11 Sep 10:50 UTC — /api YouTube film is live (79s)
+### 🟡 IN FLIGHT 11 Sep 11:59 UTC — remix /api film music (Elena liked the cut, not the bed)
 
-**DONE:** Promo + walkthrough for `https://aideazz.xyz/api` compiled on Oracle with the Atuona studio stack (Runway Gen-4.5 i2v cache hits on all 4 fruit clips, onyx TTS, 1.3s xfade). **79s, 21.9MB, 1920×1080@30, AAC.** Public:
-`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4`
-Poster: `…/can-ai-find-and-cite-you-poster.jpg`. Pack: `docs/selling/YOUTUBE_API_AUDIT_PROMO.md`. Branch `cursor/youtube-api-promo-0841` PR **#51**. Trigger `# idle`. Influencer + VJH stay paused (do not restart).
+**DONE already:** 79s walkthrough live (`34590866362`). Music accidentally first-alpha `atmospheric-dark-cinematic-pixabay.mp3` (Atuona dark library). Wrong mood for a juicy /api promo.
 
-**NEXT (Elena):** watch the cut, then upload in YouTube Studio with that pack (title, description, chapters, thumbnail `scripts/youtube-api-audit-film/youtube_api_audit_thumbnail.png`). CTA URL `https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta`. **Do not drop the mp4 into Atuona `/films`.** **Do not Make Run once.**
+**NEXT (this agent):** Pixabay via Bright Data Web Unlocker (FILM_COMPILATION_GUIDE §4). Pick light / optimistic / not noisy. Do not reuse Light In The Void, Fatal Error, Dark Cinematic Drone. Remix only — no Runway, no influencer/VJH restart. Branch `cursor/youtube-api-promo-0841` PR **#51**.
 
-**NEXT (agent):** do not fire another promo. Do not restart influencer or VJH unless asked. Claim empty.
+**NEXT (Elena):** wait for the remixed public mp4, then upload.
 
-**VERIFIED BY:** Actions `34590866362` `compile exit 0` · `DONE … (21.9MB, 79s)` · Oracle curl `200 application/octet-stream 21936309` · `width=1920 height=1080 r_frame_rate=30/1 duration=79.033333` · `frame0 bytes=114005`.
+**VERIFIED BY:** pending remix `api-film` run.
 
-**RISK:** Cloud agents cannot curl `webhook.aideazz.xyz` (SSL). Make Influencer 3044021 still prepends “¡Hola, explorer!”. Each `vibejobhunter` bounce re-sends the Telegram “1 today” line.
+**RISK:** Do not drop a light corporate track into Atuona's poetry music dir — `pickMusic` is first-alpha and would poison the gallery films.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 

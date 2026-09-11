@@ -33,8 +33,10 @@ const W = path.join(BASE, 'work');
 const VODIR = path.join(BASE, 'vo');
 const CLIPDIR = path.join(BASE, 'clips');
 const ENV_FILE = process.env.CTO_ENV || '/home/ubuntu/cto-aipa/.env';
-const MUSIC_DIR = '/home/ubuntu/cto-aipa/data/atuona/films/music';
-const BURNED_MUSIC = /light in the void|fatal error|dark-cinematic-drone/i;
+const ATUONA_MUSIC_DIR = '/home/ubuntu/cto-aipa/data/atuona/films/music';
+const FILM_MUSIC_DIR = path.join(BASE, 'music');
+// Poetry beds (FILM_COMPILATION_GUIDE table) + the first-alpha dark track this promo already burned.
+const BURNED_MUSIC = /light in the void|fatal error|dark-cinematic-drone|atmospheric-dark-cinematic/i;
 const PUBLISH = process.env.API_FILM_PUBLISH || path.join(BASE, 'out');
 const PUBLIC = 'https://webhook.aideazz.xyz/influencer-images/youtube';
 
@@ -249,12 +251,17 @@ async function bakeCaption(src, dest, caption, clipDur) {
 }
 
 function pickMusic() {
-  try {
-    const files = fs.readdirSync(MUSIC_DIR).filter((f) => /\.(mp3|m4a|wav)$/i.test(f) && !BURNED_MUSIC.test(f));
-    if (files.length) return path.join(MUSIC_DIR, files[0]);
-    const any = fs.readdirSync(MUSIC_DIR).filter((f) => /\.(mp3|m4a|wav)$/i.test(f));
-    if (any.length) return path.join(MUSIC_DIR, any[0]);
-  } catch {}
+  const pinned = (process.env.API_FILM_MUSIC || '').trim();
+  if (pinned && fs.existsSync(pinned) && fs.statSync(pinned).size > 20000) return pinned;
+  const lightName = /morning-light|fresh-corporate|uplifting|motivational|optimistic|hopeful/i;
+  for (const dir of [FILM_MUSIC_DIR, ATUONA_MUSIC_DIR]) {
+    try {
+      const files = fs.readdirSync(dir).filter((f) => /\.(mp3|m4a|wav)$/i.test(f) && !BURNED_MUSIC.test(f));
+      const light = files.filter((f) => lightName.test(f));
+      const pick = light[0] || files[0];
+      if (pick) return path.join(dir, pick);
+    } catch {}
+  }
   return null;
 }
 
@@ -404,7 +411,8 @@ async function main() {
   process.stderr.write(`music ${music}\n`);
 
   const voAt = voInfo.map((v) => ({ file: v.file, t: +(segStart(v.segIndex) + LEAD).toFixed(2) }));
-  let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.28,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
+  // Light corporate beds sit in the vocal midrange — keep them under the onyx VO.
+  let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.20,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
   const vl = [];
   if (voAt.length) {
     voAt.forEach((v, k) => {

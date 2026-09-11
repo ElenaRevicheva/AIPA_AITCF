@@ -38,7 +38,7 @@ PY
 
 echo
 echo "=== 1. stage work dir (outside the repo) ==="
-mkdir -p "$DIR"/{work,vo,clips,kit}
+mkdir -p "$DIR"/{work,vo,clips,kit,music}
 rm -rf "$DIR/kit"
 mkdir -p "$DIR/kit"
 cp -a "$SRC"/. "$DIR/kit/"
@@ -47,10 +47,28 @@ ls "$DIR/kit/fruit"
 ls "$DIR/kit/ui"
 
 echo
-echo "=== 2. compile (Runway i2v + onyx TTS + xfade). This is the studio. ==="
+echo "=== 1b. Pixabay light bed (Bright Data unlocker — FILM_COMPILATION_GUIDE §4) ==="
+echo "Atuona poetry library (do NOT pick from here):"
+ls /home/ubuntu/cto-aipa/data/atuona/films/music 2>/dev/null | redact || echo "(missing)"
 export API_FILM_DIR="$DIR"
 export API_FILM_PUBLISH="$DIR/out"
+export API_FILM_MUSIC_DIR="$DIR/music"
 export CTO_ENV="$ENVF"
+set +e
+python3 "$DIR/kit/fetch-pixabay-music.py"
+MUSIC_RC=$?
+set -e
+if [ "$MUSIC_RC" -ne 0 ]; then
+  echo "FATAL: Pixabay fetch failed rc=$MUSIC_RC"
+  exit "$MUSIC_RC"
+fi
+if [ -f "$DIR/music/SELECTED.path" ]; then
+  export API_FILM_MUSIC="$(head -n1 "$DIR/music/SELECTED.path" | tr -d '\r')"
+  echo "API_FILM_MUSIC=$API_FILM_MUSIC"
+fi
+
+echo
+echo "=== 2. compile (cached Runway/TTS + new music mix). No service restart. ==="
 mkdir -p "$DIR/out"
 # node compile reads keys itself; do not source .env (FROM_EMAIL has spaces)
 set +e
@@ -58,6 +76,7 @@ node "$DIR/kit/compile.mjs"
 RC=$?
 set -e
 echo "compile exit $RC"
+echo "music used: ${API_FILM_MUSIC:-unset}"
 
 echo
 echo "=== 3. publish + probe ==="

@@ -98,6 +98,7 @@ poem's visuals is the one mistake a viewer notices instantly.
 - Track length doesn't need to exceed the film — the mixer loops it (`-stream_loop -1`) —
   but ≥2:30 keeps the loop unnoticeable.
 - Land the mp3 in `data/atuona/films/music/` (recreate the dir if it got wiped).
+- **Product films invert the mood.** The YouTube `/api` promo wants *Light / Optimistic / Uplifting / Laid Back*, not Dark/Drone. Put those mp3s in the film work dir (`/home/ubuntu/aideazz-api-film/music/`), never in this poetry library — `pickMusic` is first-alpha and a corporate bed would leak into gallery films.
 
 ## 5. The settings that make it FLOW (don't regress these)
 
