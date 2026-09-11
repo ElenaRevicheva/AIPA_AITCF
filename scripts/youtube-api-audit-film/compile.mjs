@@ -588,6 +588,7 @@ const BEATS = [
       'Pomegranate halves breathe; circuit traces pulse cyan then magenta. Numbers 100 and 72 stay exactly where they are — do not morph, do not duplicate, do not add new numerals. Slow push. No extra fruit. No grapevine.',
     vo: 'Google ranked your page. In 2026 that is just half of the fruit.',
     cap: 'Google ranked your page —\nin 2026 that is just half of the fruit.',
+    clipDur: 7.8,
     labels: [
       { text: 'GOOGLE', x: 'W*0.16', y: 'H*0.78', color: '0x7DFFB3', size: 72 },
       { text: 'CHATGPT', x: 'W*0.58', y: 'H*0.68', color: '0xFF7AE0', size: 72 },
@@ -601,6 +602,7 @@ const BEATS = [
       'Three glass crawlers WALK across the passionfruit pulp — legs shift, bodies orbit a few centimetres, purple cores pulse. Pulp glistens. Tiny living motion. Do not spawn a fourth crawler. No extra fruit. Do not invent text or names.',
     vo: 'Six crawlers decide whether ChatGPT, Claude, Gemini and Perplexity can quote you.',
     cap: 'Six crawlers decide who gets cited.',
+    clipDur: 8.2,
     labels: [
       { text: 'GPTBot', x: 'W*0.08+36*sin(2*PI*t/2.3)', y: 'H*0.06+18*cos(2*PI*t/1.9)', color: '0x7DFFFB', size: 42 },
       { text: 'ClaudeBot', x: 'W*0.62+36*sin(2*PI*t/2.1+1)', y: 'H*0.06+16*cos(2*PI*t/2.4+0.4)', color: '0xFFB347', size: 42 },
@@ -615,6 +617,7 @@ const BEATS = [
       'Water droplets fall. The glass HUD stays locked to the fruit. The hand is still. No extra hands, no blood, no new UI panels, no changing the 100 score.',
     vo: 'This is the free AI visibility audit at aideazz.xyz/api.',
     cap: 'Free AI visibility audit\naideazz.xyz/api',
+    clipDur: 6.5,
   },
   {
     id: 'dashboard',
@@ -624,6 +627,7 @@ const BEATS = [
       'Juice droplets fall. The glass AI visibility dashboard stays locked to the fruit. The hand is still. Numbers stay 100. No extra hands, no blood, no new UI panels. Slow prestige product film.',
     vo: 'Counted from production logs: four hundred and twenty audits, fourteen thousand signals, two hundred and ten sites, median eighty-five.',
     cap: '420+ audits · 14,000+ signals · median 85',
+    clipDur: 11.2,
     slide: [
       { text: 'CAN AI FIND AND CITE YOU', y: 'H*0.05', size: 68, color: 'white' },
       { text: 'Google ranked your page — in 2026 that is just half of the fruit', y: 'H*0.16', size: 44, color: '0xFDE68A' },
@@ -654,13 +658,13 @@ const BEATS = [
     liveHold: 2.0,
     loomMax: 0,
   },
-  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 0, liveHold: 1.2 },
-  { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 0 },
-  { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 0 },
-  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 0 },
-  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 0 },
-  { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.', loomMax: 0 },
-  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api', loomMax: 0 },
+  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 0, liveHold: 1.2, clipDur: 9.2 },
+  { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 0, clipDur: 6.5 },
+  { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 0, clipDur: 8.2 },
+  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 0, clipDur: 8.0 },
+  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 0, clipDur: 10.3 },
+  { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.', loomMax: 0, clipDur: 9.5 },
+  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api', loomMax: 0, clipDur: 6.5 },
 ];
 
 async function main() {
@@ -725,8 +729,12 @@ async function main() {
       vd = 0;
     if (b.vo) {
       voFile = path.join(VODIR, `v_${b.id}.mp3`);
-      if (!(fs.existsSync(voFile) && fs.statSync(voFile).size > 1000)) await tts(b.vo, voFile);
-      vd = await dur(voFile);
+      if (!(fs.existsSync(voFile) && fs.statSync(voFile).size > 1000)) {
+        if (OPENAI) await tts(b.vo, voFile);
+        else process.stderr.write(`WARN no OPENAI for ${b.id} — need cached vo or donor film audio\n`);
+      }
+      if (fs.existsSync(voFile) && fs.statSync(voFile).size > 1000) vd = await dur(voFile);
+      else voFile = null;
     }
     let raw = path.join(CLIPDIR, `${b.id}.mp4`);
     const clipDur = b.clipDur || (b.vo ? Math.max(6.5, LEAD + vd + TAIL) : 5.5);
@@ -805,15 +813,42 @@ async function main() {
   if (LEN < 60 || LEN < expect * 0.7) {
     throw new Error(`xfade truncated: body ${LEN.toFixed(1)}s expect ${expect.toFixed(1)}s — refusing to publish a stub`);
   }
-  let music = pickMusic();
-  if (!music) music = await makeDrone(path.join(W, 'drone.mp3'));
-  process.stderr.write(`music ${music}\n`);
-
+  fs.mkdirSync(PUBLISH, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const final = path.join(PUBLISH, `${SLUG}-${stamp}.mp4`);
+  const stable = path.join(PUBLISH, `${SLUG}.mp4`);
+  const v12 = path.join(PUBLISH, `${SLUG}-v12.mp4`);
+  const targetDur = Number(process.env.API_FILM_TARGET_DUR || 107);
   const voAt = voInfo.map((v) => ({ file: v.file, t: +(segStart(v.segIndex) + LEAD).toFixed(2) }));
-  // Chillout-energy beds can sit up a hair vs the sad piano; sidechain still ducks under VO.
-  let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.22,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
-  const vl = [];
-  if (voAt.length) {
+  const donor = (process.env.API_FILM_AUDIO_FROM || '').trim();
+  const haveVo = voAt.length > 0;
+  if (!haveVo && !(donor && fs.existsSync(donor))) {
+    throw new Error('voiceover required — no TTS files and no API_FILM_AUDIO_FROM (previous cut with VO)');
+  }
+
+  if (!haveVo) {
+    const ad = await dur(donor);
+    const take = Math.min(targetDur || ad, ad, LEN);
+    const pts = (take / LEN).toFixed(6);
+    process.stderr.write(`vo donor ${donor} ${ad.toFixed(1)}s — same onyx VO as the earlier cuts, picture fit to ${take.toFixed(1)}s\n`);
+    await execFileP(
+      'ffmpeg',
+      [
+        '-y', '-v', 'error', '-i', body, '-i', donor,
+        '-filter_complex',
+        `[0:v]setpts=${pts}*PTS,fps=${FPS},format=yuv420p,setsar=1[v];[1:a]aformat=sample_rates=44100:channel_layouts=stereo,afade=t=in:st=0:d=0.4,afade=t=out:st=${(take - 1.2).toFixed(2)}:d=1.2[a]`,
+        '-map', '[v]', '-map', '[a]', '-t', take.toFixed(2),
+        '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final,
+      ],
+      { maxBuffer: 1 << 27, timeout: 300000 },
+    );
+  } else {
+    let music = pickMusic();
+    if (!music) music = await makeDrone(path.join(W, 'drone.mp3'));
+    process.stderr.write(`music ${music}\n`);
+    let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.22,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
+    const vl = [];
     voAt.forEach((v, k) => {
       const idx = k + 2;
       mf += `[${idx}:a]aresample=44100,aformat=channel_layouts=stereo,adelay=${Math.round(v.t * 1000)}:all=1[v${k}];`;
@@ -821,26 +856,21 @@ async function main() {
     });
     mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=1.9,asplit=2[vsc][vmix];`;
     mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];[premix]loudnorm=I=-16:TP=-1.5:LRA=11[a]`;
-  } else {
-    mf += `[music]loudnorm=I=-16:TP=-1.5:LRA=11[a]`;
+    const mixIn = ['-i', body, '-stream_loop', '-1', '-i', music];
+    voAt.forEach((v) => mixIn.push('-i', v.file));
+    process.stderr.write(`final mix with ${voAt.length} voiceover stems\n`);
+    await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   }
-  const mixIn = ['-i', body, '-stream_loop', '-1', '-i', music];
-  voAt.forEach((v) => mixIn.push('-i', v.file));
-  fs.mkdirSync(PUBLISH, { recursive: true });
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const final = path.join(PUBLISH, `${SLUG}-${stamp}.mp4`);
-  const stable = path.join(PUBLISH, `${SLUG}.mp4`);
-  process.stderr.write('final mix...\n');
-  await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
+
   fs.copyFileSync(final, stable);
-  const v12 = path.join(PUBLISH, `${SLUG}-v12.mp4`);
   fs.copyFileSync(final, v12);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
-  console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
+  const outDur = await dur(final);
+  console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${outDur.toFixed(0)}s)`);
   console.log(`PUBLIC ${PUBLIC}/${path.basename(v12)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);

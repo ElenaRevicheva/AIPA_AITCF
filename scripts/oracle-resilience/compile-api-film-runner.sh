@@ -20,22 +20,37 @@ unset API_FILM_FORCE_FRUIT
 echo "=== runner-compile $(date -u +%Y-%m-%dT%H:%M:%SZ) dir=$DIR ==="
 command -v ffmpeg && command -v ffprobe && command -v node || { echo FATAL: ffmpeg/node; exit 1; }
 [ -f "$KIT/compile.mjs" ] || { echo "FATAL: $KIT/compile.mjs missing"; exit 1; }
-[ -n "${OPENAI_API_KEY:-}" ] || { echo "FATAL: OPENAI_API_KEY missing on runner"; exit 1; }
+if [ -n "${OPENAI_API_KEY:-}" ]; then
+  echo "OPENAI_API_KEY: yes"
+else
+  echo "OPENAI_API_KEY: NO — will use cached vo stems or previous-cut donor audio"
+fi
 
 mkdir -p "$DIR"/{src,clips,work,vo,out,music,loom,frames}
 cd "$DIR"
 
 echo
-echo "=== 0. download published cuts for motion salvage ==="
-for id in v2 v5; do
+echo "=== 0. download published cuts for motion salvage + voiceover donor ==="
+for id in v2 v5 v11; do
   url="$PUBLIC/can-ai-find-and-cite-you-${id}.mp4"
   echo "GET $url"
-  curl -fsSL --retry 4 --retry-delay 4 --max-time 120 -o "src/${id}.mp4" "$url"
+  curl -fsSL --retry 4 --retry-delay 4 --max-time 180 -o "src/${id}.mp4" "$url"
   ls -lh "src/${id}.mp4"
   ffprobe -v error -show_entries format=duration,size -of default=nw=1 "src/${id}.mp4"
 done
 [ "$(stat -c%s src/v2.mp4)" -gt 1000000 ] || { echo FATAL: v2 too small; exit 1; }
 [ "$(stat -c%s src/v5.mp4)" -gt 1000000 ] || { echo FATAL: v5 too small; exit 1; }
+[ "$(stat -c%s src/v11.mp4)" -gt 1000000 ] || { echo FATAL: v11 voiceover donor too small; exit 1; }
+export API_FILM_AUDIO_FROM="$DIR/src/v11.mp4"
+export API_FILM_TARGET_DUR=107
+echo "voiceover donor $API_FILM_AUDIO_FROM (same onyx VO as earlier cuts)"
+
+if [ -n "${API_FILM_VO_DIR:-}" ] && [ -d "$API_FILM_VO_DIR" ]; then
+  mkdir -p "$DIR/vo"
+  cp -f "$API_FILM_VO_DIR"/*.mp3 "$DIR/vo/" 2>/dev/null || true
+  echo "cached vo stems:"
+  ls -lh "$DIR/vo" || true
+fi
 
 echo
 echo "=== 1. extract moving pomegranate + maracuya insects ==="

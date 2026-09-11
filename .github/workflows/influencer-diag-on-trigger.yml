@@ -123,6 +123,23 @@ jobs:
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/bust-api-audit-film.sh
           elif [ "$MODE" = "api-film" ]; then
+            # Prefer Oracle's cached onyx TTS stems (same VO as every earlier cut).
+            mkdir -p "${RUNNER_TEMP}/oracle-vo"
+            n=0
+            while [ "$n" -lt 4 ]; do
+              n=$((n + 1))
+              echo "pull vo stems attempt $n"
+              if scp $SSHOPTS \
+                'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film/vo/v_*.mp3' \
+                "${RUNNER_TEMP}/oracle-vo/"; then
+                echo "pulled vo stems:"
+                ls -lh "${RUNNER_TEMP}/oracle-vo" || true
+                export API_FILM_VO_DIR="${RUNNER_TEMP}/oracle-vo"
+                break
+              fi
+              echo "pull vo stems attempt $n failed"
+              sleep $((n * 12))
+            done
             sudo apt-get update -qq
             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
             bash scripts/oracle-resilience/compile-api-film-runner.sh
