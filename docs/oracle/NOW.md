@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 21:32 UTC | /api film v12 compile on GitHub runner — Oracle SSH down | youtube kit + GHA compile — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 21:49 UTC | /api film v12 WITH voiceover (Oracle TTS stems or v11 donor) | youtube kit + GHA compile — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -137,7 +137,7 @@ git log keeps the record.
 
 **Oracle SSH is down.** 34647132792 died mid-xfade (`Broken pipe`). 34648363197 and 34649045066 never reached the box (`banner exchange` timeout ×6). Do not encode on Oracle while sshd refuses banners.
 
-**THIS:** compile on the Actions runner (salvage moving pomegranate + insects from published v2/v5, grape still + neurone glow, Loom, slides, QR). Then a short scp publish. Branch `cursor/youtube-api-promo-0841`.
+**THIS:** same picture, WITH voiceover. Pull Oracle `vo/v_*.mp3` (onyx stems from every earlier cut) or mux v11 audio. Never publish captions-only. Branch `cursor/youtube-api-promo-0841`.
 
 **RISK:** Do not give Elena a link until `200 video/mp4` + `v12-duration` ≳ 90. Do not Make Run once.
 
