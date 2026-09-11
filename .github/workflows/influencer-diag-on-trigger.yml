@@ -54,7 +54,8 @@ jobs:
           install -m 700 -d ~/.ssh
           printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
           chmod 600 ~/.ssh/oracle
-          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+          # ServerAlive keeps the pipe up during ffmpeg silence (v12 xfade died here: Broken pipe).
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25 -o ServerAliveInterval=30 -o ServerAliveCountMax=20"
           if [ "$MODE" = "fix" ]; then
             scp $SSHOPTS \
               scripts/oracle-resilience/patch-influencer-make-images.py \

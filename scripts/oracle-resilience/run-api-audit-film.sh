@@ -100,8 +100,56 @@ echo "=== 2. compile (cached Runway/TTS + new music mix). No service restart. ==
 mkdir -p "$DIR/out"
 # node compile reads keys itself; do not source .env (FROM_EMAIL has spaces)
 set +e
-node "$DIR/kit/compile.mjs"
-RC=$?
+
+# A second api-film must not start while grapes/crawlers/xfade are still writing.
+wait_film_jobs() {
+  n=0
+  while pgrep -f 'node /home/ubuntu/aideazz-api-film/kit/compile.mjs' >/dev/null 2>&1 \
+    || pgrep -f 'ffmpeg.*aideazz-api-film' >/dev/null 2>&1; do
+    n=$((n + 1))
+    echo "waiting for existing api-film job (${n})"
+    pgrep -af 'compile.mjs|ffmpeg.*aideazz-api-film' | redact || true
+    if [ "$n" -gt 80 ]; then
+      echo "FATAL: existing api-film still running after 20m"
+      exit 1
+    fi
+    sleep 15
+  done
+}
+wait_film_jobs
+
+OUT12="$DIR/out/can-ai-find-and-cite-you-v12.mp4"
+REUSE=0
+if [ -f "$OUT12" ]; then
+  EXIST_DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$OUT12" 2>/dev/null || echo 0)
+  echo "existing out v12 dur=${EXIST_DUR}"
+  awk -v d="$EXIST_DUR" 'BEGIN { exit (d+0 >= 90 ? 0 : 1) }' && REUSE=1
+fi
+
+if [ "$REUSE" -eq 1 ]; then
+  echo "reuse existing compile — skip node"
+  RC=0
+else
+  # Detach so an SSH Broken pipe (v12, 4 min of xfade silence) cannot SIGHUP the stitch.
+  rm -f "$DIR/compile.rc"
+  : > "$DIR/compile.log"
+  setsid nohup bash -c 'node /home/ubuntu/aideazz-api-film/kit/compile.mjs; echo $? > /home/ubuntu/aideazz-api-film/compile.rc' \
+    >> "$DIR/compile.log" 2>&1 < /dev/null &
+  echo $! > "$DIR/compile.pid"
+  echo "compile pid=$(cat "$DIR/compile.pid") (survives SSH drop)"
+  while [ ! -f "$DIR/compile.rc" ]; do
+    if ! kill -0 "$(cat "$DIR/compile.pid")" 2>/dev/null && [ ! -f "$DIR/compile.rc" ]; then
+      echo 1 > "$DIR/compile.rc"
+      echo "WARN compile pid vanished without rc"
+      break
+    fi
+    sleep 8
+    tail -n 2 "$DIR/compile.log" | redact || true
+  done
+  RC=$(tr -d ' \r\n' < "$DIR/compile.rc" 2>/dev/null || echo 1)
+  echo "----- compile.log tail -----"
+  tail -n 40 "$DIR/compile.log" | redact || true
+fi
 set -e
 echo "compile exit $RC"
 echo "music used: ${API_FILM_MUSIC:-unset}"
