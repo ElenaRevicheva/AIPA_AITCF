@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 21:21 UTC | /api film v12 start+poll after SSH banner timeout | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 21:32 UTC | /api film v12 compile on GitHub runner — Oracle SSH down | youtube kit + GHA compile — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 21:21 UTC — v12 start+poll (do not send a link yet)
+### 🟡 IN FLIGHT 11 Sep 21:32 UTC — v12 compiling on GitHub runner (do not send a link yet)
 
 **Elena:** full film — moving pomegranate, grapevine + What it checks + neurones, maracuya insects, shortened Loom, finishing slides, QR every shot, ~107s. v11 is not the cut.
 
-**DONE (not published):** run 34647132792 built every chapter then SSH `Broken pipe` mid-xfade. Retry 34648363197 never reached Oracle (`Connection timed out during banner exchange`).
+**Oracle SSH is down.** 34647132792 died mid-xfade (`Broken pipe`). 34648363197 and 34649045066 never reached the box (`banner exchange` timeout ×6). Do not encode on Oracle while sshd refuses banners.
 
-**THIS:** detach compile (`api-film start`) then short `publish` polls. Branch `cursor/youtube-api-promo-0841`.
+**THIS:** compile on the Actions runner (salvage moving pomegranate + insects from published v2/v5, grape still + neurone glow, Loom, slides, QR). Then a short scp publish. Branch `cursor/youtube-api-promo-0841`.
 
-**RISK:** Do not give Elena a link until `DONE` + `200 video/mp4` + `v12-duration` ≳ 90. Do not Make Run once. Do not fire a second job if compile.mjs is still running.
+**RISK:** Do not give Elena a link until `200 video/mp4` + `v12-duration` ≳ 90. Do not Make Run once.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
