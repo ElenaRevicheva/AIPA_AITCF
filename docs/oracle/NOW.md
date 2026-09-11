@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-11 00:33 UTC | Influencer /api UTM tags | `geo_api_promo.py` + Oracle fire | in flight |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,17 +131,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 11 Sep 00:33 UTC — tagging Influencer `/api` so clicks attribute
+### 🟡 ELENA'S TAP — 11 Sep 00:36 UTC — tagged `/api` post is live
 
-**DONE:** Link itself is fixed (Elena confirmed). Bare `https://aideazz.xyz/api` is **not** counted — attribution needs `utm_*`. Adding `?utm_source=linkedin&utm_medium=influencer&utm_campaign=geo-api` (still one URL). Branch `cursor/fix-influencer-make-0841`.
+**DONE:** Influencer destination is now `https://aideazz.xyz/api?utm_source=linkedin&utm_medium=influencer&utm_campaign=geo-api`. Action `34547160520`: `HAS_UTM True`, `PROMO_URLS` only that tagged URL, Make **200**. Image `geo-pomegranate-audit-hand.jpg`. Still one URL (no `/portfolio/api` glue). Branch `cursor/fix-influencer-make-0841`. NOW.md on `main`.
 
-**NEXT (Elena):** after this fire, the **new** post’s link must include those three query params. Run an audit or submit the portfolio form — that is when HubSpot/Telegram see the campaign. A page-open alone still writes nothing. **Do not Make Run once.**
+**NEXT (Elena):** open the **newest** post (pomegranate + hand). The link must show the three `utm_*` params. Then **run an audit** or submit the portfolio form — a page-open alone still writes nothing. **Do not Make Run once.**
 
-**NEXT (agent):** fire, then confirm `HAS_UTM True` + Make 200. Idle.
+**NEXT (agent):** idle.
 
-**VERIFIED BY:** pending this fire. Prior: Action `34543608312` untagged `/api` Make 200.
+**VERIFIED BY:** Action `34547160520` `HAS_UTM True` + Make 200.
 
-**RISK:** Instagram clicks will also carry `utm_source=linkedin` (same caption). Make 3044021 still prepends “¡Hola, explorer!”.
+**RISK:** Instagram clicks carry `utm_source=linkedin` (same caption). Make still prepends “¡Hola, explorer!”. Community board still only pins `utm_campaign=community-reply`; this campaign lands on inquiry UTMs + the visibility-lead Telegram line.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
