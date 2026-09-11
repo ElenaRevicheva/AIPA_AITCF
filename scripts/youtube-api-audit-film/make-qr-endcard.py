@@ -69,19 +69,21 @@ def compose_card(qr: Image.Image) -> Image.Image:
     qr_r = qr.resize((qr_h, qr_h), Image.Resampling.LANCZOS)
     img.paste(qr_r, (1040, (H - qr_h) // 2))
 
-    title = font(54, mono=True)
-    sub = font(28)
+    title = font(58, mono=True)
+    sub = font(36)
     urlf = font(22, mono=True)
-    tiny = font(18)
+    tiny = font(24)
 
-    draw.text((96, 220), "SCAN  ·  AUDIT  ·  FREE", font=title, fill=CYAN)
-    draw.text((96, 310), "Can AI find and cite you?", font=sub, fill=WHITE)
-    draw.text((96, 370), "Paste any URL. 34 signals. No signup.", font=sub, fill=MUTED)
+    draw.text((96, 200), "SCAN  ·  AUDIT  ·  FREE", font=title, fill=CYAN)
+    draw.text((96, 292), "Can AI find and cite you?", font=sub, fill=WHITE)
+    draw.text((96, 356), "Paste any URL. 34 signals. No signup.", font=sub, fill=MUTED)
     # URL as readable text so the CTA works even if nobody scans.
-    draw.rounded_rectangle((90, 470, 980, 560), radius=18, outline=CITRUS, width=2)
-    draw.text((112, 498), "aideazz.xyz/api", font=font(36, mono=True), fill=CITRUS)
-    draw.text((96, 600), CTA.replace("https://", ""), font=urlf, fill=MUTED)
-    draw.text((96, 860), "AIDEAZZ LAB  ·  11.09.2026", font=tiny, fill=MAGENTA)
+    draw.rounded_rectangle((90, 460, 980, 560), radius=18, outline=CITRUS, width=3)
+    draw.text((112, 486), "aideazz.xyz/api", font=font(44, mono=True), fill=CITRUS)
+    utm = CTA.replace("https://", "")
+    draw.text((96, 590), "aideazz.xyz/api?utm_source=youtube", font=urlf, fill=MUTED)
+    draw.text((96, 622), "&utm_medium=video&utm_campaign=api-audit-cta", font=urlf, fill=MUTED)
+    draw.text((96, 850), "AIDEAZZ LAB  ·  11.09.2026", font=tiny, fill=MAGENTA)
     return img
 
 

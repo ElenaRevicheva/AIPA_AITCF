@@ -192,8 +192,8 @@ async function makeCard(titleRaw, subRaw, outFile, d, titleSize, bgImage, noFade
   let draw = `drawtext=fontfile=${MONO}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=${titleSize}:x=(w-text_w)/2:y=(h-text_h)/2-26`;
   if (subRaw && subRaw.trim()) {
     const sFile = outFile + '_s.txt';
-    fs.writeFileSync(sFile, wrap(caps(subRaw), 56, 2));
-    draw += `,drawtext=fontfile=${MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=22:line_spacing=10:x=(w-text_w)/2:y=(h/2)+48`;
+    fs.writeFileSync(sFile, wrap(caps(subRaw), 40, 2));
+    draw += `,drawtext=fontfile=${MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=38:line_spacing=14:x=(w-text_w)/2:y=(h/2)+64`;
   }
   const fades = `${noFadeIn ? '' : 'fade=t=in:st=0:d=0.8,'}fade=t=out:st=${(d - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
   if (bgImage && fs.existsSync(bgImage)) {
@@ -349,9 +349,9 @@ function labelFilter(labels) {
   return labels
     .map((L) => {
       const col = L.color || '0x7DFFFB';
-      const fs = L.size || 42;
+      const fs = L.size || 64;
       const escaped = String(L.text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/:/g, '\\:');
-      return `drawtext=fontfile=${SANS}:text='${escaped}':fontcolor=${col}:fontsize=${fs}:borderw=2:bordercolor=black@0.65:box=1:boxcolor=black@0.45:boxborderw=14:x=${L.x}:y=${L.y}`;
+      return `drawtext=fontfile=${SANS}:text='${escaped}':fontcolor=${col}:fontsize=${fs}:borderw=4:bordercolor=black@0.65:box=1:boxcolor=black@0.45:boxborderw=20:x=${L.x}:y=${L.y}`;
     })
     .join(',');
 }
@@ -363,10 +363,10 @@ async function overlaySlide(src, dest, lines) {
   }
   const parts = lines.map((L, i) => {
     const tf = dest + `_s${i}.txt`;
-    fs.writeFileSync(tf, wrap(L.text, 62, 2));
+    fs.writeFileSync(tf, wrap(L.text, 40, 2));
     const col = L.color || 'white';
-    const fsze = L.size || 32;
-    return `drawtext=fontfile=${SANS}:textfile=${tf}:expansion=none:fontcolor=${col}:fontsize=${fsze}:line_spacing=8:box=1:boxcolor=black@0.50:boxborderw=16:x=(w-text_w)/2:y=${L.y}`;
+    const fsze = L.size || 52;
+    return `drawtext=fontfile=${SANS}:textfile=${tf}:expansion=none:fontcolor=${col}:fontsize=${fsze}:line_spacing=12:box=1:boxcolor=black@0.50:boxborderw=22:x=(w-text_w)/2:y=${L.y}`;
   });
   await execFileP(
     'ffmpeg',
@@ -445,10 +445,10 @@ async function bakeCaption(src, dest, caption, clipDur) {
     return dest;
   }
   const txt = dest + '.txt';
-  fs.writeFileSync(txt, wrap(caption, 48, 5));
+  fs.writeFileSync(txt, wrap(caption, 28, 5));
   const fo = (clipDur - 1.0).toFixed(2);
   const alpha = `if(lt(t,0.7),t/0.7,if(gt(t,${fo}),max(0,(${clipDur.toFixed(2)}-t)/1.0),1))`;
-  const draw = `drawtext=fontfile=${FONT}:textfile=${txt}:expansion=none:fontcolor=white:fontsize=28:line_spacing=8:box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=h-text_h-48:alpha='${alpha}'`;
+  const draw = `drawtext=fontfile=${FONT}:textfile=${txt}:expansion=none:fontcolor=white:fontsize=52:line_spacing=16:box=1:boxcolor=black@0.55:boxborderw=24:x=(w-text_w)/2:y=h-text_h-28:alpha='${alpha}'`;
   await execFileP(
     'ffmpeg',
     ['-y', '-i', src, '-vf', draw, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'copy', dest],
@@ -492,10 +492,10 @@ const BEATS = [
     cap: null,
     clipDur: 7.2,
     slide: [
-      { text: 'WHAT IT CHECKS', y: 'H*0.08', size: 48, color: 'white' },
-      { text: 'The same four weights that build the score', y: 'H*0.17', size: 26, color: '0xFDE68A' },
-      { text: 'AI Crawler Access     ·     Structured Data (GEO)', y: 'H*0.78', size: 28, color: 'white' },
-      { text: 'Answer-Readiness (AEO)     ·     Technical Foundation', y: 'H*0.87', size: 28, color: 'white' },
+      { text: 'WHAT IT CHECKS', y: 'H*0.06', size: 72, color: 'white' },
+      { text: 'The same four weights that build the score', y: 'H*0.16', size: 44, color: '0xFDE68A' },
+      { text: 'AI Crawler Access     ·     Structured Data (GEO)', y: 'H*0.74', size: 48, color: 'white' },
+      { text: 'Answer-Readiness (AEO)     ·     Technical Foundation', y: 'H*0.85', size: 48, color: 'white' },
     ],
   },
   {
@@ -507,8 +507,8 @@ const BEATS = [
     vo: 'Google ranked your page. In 2026 that is just half of the fruit.',
     cap: 'Google ranked your page —\nin 2026 that is just half of the fruit.',
     labels: [
-      { text: 'GOOGLE', x: 'W*0.16', y: 'H*0.78', color: '0x7DFFB3', size: 48 },
-      { text: 'CHATGPT', x: 'W*0.58', y: 'H*0.68', color: '0xFF7AE0', size: 48 },
+      { text: 'GOOGLE', x: 'W*0.16', y: 'H*0.78', color: '0x7DFFB3', size: 72 },
+      { text: 'CHATGPT', x: 'W*0.58', y: 'H*0.68', color: '0xFF7AE0', size: 72 },
     ],
   },
   {
@@ -520,9 +520,9 @@ const BEATS = [
     vo: 'Six crawlers decide whether ChatGPT, Claude, Gemini and Perplexity can quote you.',
     cap: 'Six crawlers decide who gets cited.',
     labels: [
-      { text: 'GPTBot', x: 'W*0.20+48*sin(2*PI*t/2.3)', y: 'H*0.08+22*cos(2*PI*t/1.9)', color: '0x7DFFFB', size: 34 },
-      { text: 'ClaudeBot', x: 'W*0.66+42*sin(2*PI*t/2.1+1)', y: 'H*0.07+20*cos(2*PI*t/2.4+0.4)', color: '0xFFB347', size: 34 },
-      { text: 'PerplexityBot', x: '(W-text_w)/2+36*sin(2*PI*t/2.6)', y: 'H*0.40+24*cos(2*PI*t/2.2)', color: '0xFF7AE0', size: 34 },
+      { text: 'GPTBot', x: 'W*0.20+48*sin(2*PI*t/2.3)', y: 'H*0.08+22*cos(2*PI*t/1.9)', color: '0x7DFFFB', size: 56 },
+      { text: 'ClaudeBot', x: 'W*0.66+42*sin(2*PI*t/2.1+1)', y: 'H*0.07+20*cos(2*PI*t/2.4+0.4)', color: '0xFFB347', size: 56 },
+      { text: 'PerplexityBot', x: '(W-text_w)/2+36*sin(2*PI*t/2.6)', y: 'H*0.40+24*cos(2*PI*t/2.2)', color: '0xFF7AE0', size: 56 },
     ],
   },
   {
@@ -543,9 +543,9 @@ const BEATS = [
     vo: 'Counted from production logs: four hundred and twenty audits, fourteen thousand signals, two hundred and ten sites, median eighty-five.',
     cap: '420+ audits · 14,000+ signals · median 85',
     slide: [
-      { text: 'CAN AI FIND AND CITE YOU', y: 'H*0.07', size: 44, color: 'white' },
-      { text: 'Google ranked your page — in 2026 that is just half of the fruit', y: 'H*0.16', size: 26, color: '0xFDE68A' },
-      { text: '420+ audits   ·   14,000+ signals   ·   210+ sites   ·   median 85', y: 'H*0.86', size: 28, color: 'white' },
+      { text: 'CAN AI FIND AND CITE YOU', y: 'H*0.05', size: 68, color: 'white' },
+      { text: 'Google ranked your page — in 2026 that is just half of the fruit', y: 'H*0.16', size: 44, color: '0xFDE68A' },
+      { text: '420+ audits   ·   14,000+ signals   ·   210+ sites   ·   median 85', y: 'H*0.84', size: 48, color: 'white' },
     ],
   },
   {
@@ -610,7 +610,7 @@ async function main() {
 
   const cover = path.join(HERE, 'fruit/geo-pomegranate-100-vs-72.jpg');
   const seq = [];
-  seq.push(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 52, cover, true));
+  seq.push(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 60, cover, true));
 
   const loomPath = findLoom();
   const loomRaw = loomPath ? await dur(loomPath) : 0;
@@ -729,15 +729,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v8 = path.join(PUBLISH, `${SLUG}-v8.mp4`);
-  fs.copyFileSync(final, v8);
+  const v9 = path.join(PUBLISH, `${SLUG}-v9.mp4`);
+  fs.copyFileSync(final, v9);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v8)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v9)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
