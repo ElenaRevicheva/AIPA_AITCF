@@ -215,7 +215,7 @@ async function makeCard(titleRaw, subRaw, outFile, d, titleSize, bgImage, noFade
 
 async function fillClip(src, dest, seconds, startAt) {
   const ss = Math.max(0, startAt || 0);
-  const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p`;
+  const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p,setsar=1`;
   // Never loop. The 65s Loom's long tail is the results scroll Elena called too long.
   await execFileP(
     'ffmpeg',
@@ -226,14 +226,21 @@ async function fillClip(src, dest, seconds, startAt) {
 }
 
 async function concatClips(parts, dest) {
-  if (parts.length === 1) {
-    fs.copyFileSync(parts[0], dest);
+  const usable = parts.filter((p) => fs.existsSync(p) && fs.statSync(p).size > 1000);
+  if (!usable.length) throw new Error('concat: no parts');
+  if (usable.length === 1) {
+    fs.copyFileSync(usable[0], dest);
     return dest;
   }
-  const inputs = parts.flatMap((p) => ['-i', p]);
+  const inputs = usable.flatMap((p) => ['-i', p]);
   let fc = '';
-  for (let i = 0; i < parts.length; i++) fc += `[${i}:v][${i}:a]`;
-  fc += `concat=n=${parts.length}:v=1:a=1[v][a]`;
+  for (let i = 0; i < usable.length; i++) {
+    // Conform fps/pix/SAR before concat. v6 died here: still SAR 0:1 vs Loom 15709:15711.
+    fc += `[${i}:v]fps=${FPS},format=yuv420p,scale=${WX}:${HY}:force_original_aspect_ratio=decrease,pad=${WX}:${HY}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,setpts=PTS-STARTPTS[v${i}];`;
+    fc += `[${i}:a]aformat=sample_rates=44100:channel_layouts=stereo,aresample=44100,asetpts=PTS-STARTPTS[a${i}];`;
+  }
+  for (let i = 0; i < usable.length; i++) fc += `[v${i}][a${i}]`;
+  fc += `concat=n=${usable.length}:v=1:a=1[v][a]`;
   await execFileP('ffmpeg', ['-y', ...inputs, '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest], { maxBuffer: 1 << 26, timeout: 180000 });
   return dest;
 }
@@ -269,7 +276,7 @@ async function buildUiClip(b, clipDur, loomState) {
 
   if (livePath && fs.existsSync(livePath) && remain > 0.55 && b.liveHold !== 0) {
     const hold = Math.min(b.liveHold || 1.2, remain * 0.28);
-    if (hold >= 0.55) {
+    if (hold >= 1.0) {
       const p = path.join(W, `live_${b.id}.mp4`);
       await stillToClip(livePath, p, hold);
       parts.push(p);
@@ -312,7 +319,7 @@ async function buildUiClip(b, clipDur, loomState) {
 
 async function stillToClip(src, dest, seconds) {
   // Hold, don't zoom — UI type must stay readable. Fruit motion comes from Runway.
-  const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p`;
+  const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p,setsar=1`;
   await execFileP(
     'ffmpeg',
     ['-y', '-loop', '1', '-i', src, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', seconds.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
@@ -506,7 +513,7 @@ const BEATS = [
     liveHold: 1.5,
     loomMax: 6.8,
   },
-  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 2.2, liveHold: 0.9 },
+  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 2.2, liveHold: 1.2 },
   { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 2.2 },
   { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 2.0 },
   { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 2.4 },

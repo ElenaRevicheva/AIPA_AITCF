@@ -108,17 +108,21 @@ echo "music used: ${API_FILM_MUSIC:-unset}"
 echo
 echo "=== 3. publish + probe ==="
 sudo mkdir -p "$PUBLISH"
-if ls "$DIR/out"/*.mp4 >/dev/null 2>&1; then
+# Failed compile must not swap watch.html onto a missing -vN. v6 concat
+# failed and the player 404'd while v5 was still on disk.
+if [ "${RC:-1}" -eq 0 ] && [ -f "$DIR/out/can-ai-find-and-cite-you-v6.mp4" ]; then
   sudo cp -f "$DIR/out/"*.mp4 "$PUBLISH/" 2>/dev/null || true
   sudo cp -f "$DIR/out/"*.jpg "$PUBLISH/" 2>/dev/null || true
   sudo cp -f "$DIR/out/"*.png "$PUBLISH/" 2>/dev/null || true
-fi
-if [ -f "$DIR/kit/qr/api-cta-qr.png" ]; then
-  sudo cp -f "$DIR/kit/qr/api-cta-qr.png" "$DIR/kit/qr/api-cta-endcard.png" "$PUBLISH/"
-fi
-if [ -f /tmp/api-film-watch.html ]; then
-  sed "s/CACHEBUST/$(date -u +%Y%m%d%H%M%S)/g" \
-    /tmp/api-film-watch.html | sudo tee "$PUBLISH/watch.html" >/dev/null
+  if [ -f "$DIR/kit/qr/api-cta-qr.png" ]; then
+    sudo cp -f "$DIR/kit/qr/api-cta-qr.png" "$DIR/kit/qr/api-cta-endcard.png" "$PUBLISH/"
+  fi
+  if [ -f /tmp/api-film-watch.html ]; then
+    sed "s/CACHEBUST/$(date -u +%Y%m%d%H%M%S)/g" \
+      /tmp/api-film-watch.html | sudo tee "$PUBLISH/watch.html" >/dev/null
+  fi
+else
+  echo "SKIP publish — compile exit ${RC:-1} (keep live player / v5)"
 fi
 sudo chown -R www-data:www-data /var/www/influencer-images
 sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
