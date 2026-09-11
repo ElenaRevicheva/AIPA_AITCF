@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 20:32 UTC | /api film v10 — restore moving glowing grapevine + crawlers + Loom + slides | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 11 Sep 20:14 UTC — /api film v9 live (larger burned-in text)
+### 🟡 IN FLIGHT 11 Sep 20:32 UTC — v9 lost the picture. Restoring grapevine + rest.
 
-**Elena watches:**
-https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v9.mp4
+**Elena:** v9 has no grapevine (moving/glowing), no insects on maracuya, no shortened Loom, no earlier slides.
 
-**DONE:** captions 28→52, labels/overlays scaled, QR type larger. Wording frozen. Grapes kept.
+**THIS:** salvage moving grapes from v2 + neuron glow (do not trust still cache). Keep crawlers. Loom + first-video slides visible. Publish `-v10`. Branch `cursor/youtube-api-promo-0841`.
 
-**NEXT:** Elena watches v9. Do not send v7 (12s stub).
-
-**VERIFIED BY:** Actions `34642780034` `DONE … (8.4MB, 101s)` `xfade body 101.4s` `200 video/mp4 8385374` `v9-duration=93.300000` `ui loom checks 1.0s @21.0`
-
-**RISK:** Do not Make Run once. Do not fire a second `api-film` while one is running. Branch `cursor/youtube-api-promo-0841`.
+**RISK:** Do not Make Run once. Do not wipe split/crawlers until a replacement exists. Do not send v7. Do not fire a second `api-film` while one is running.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
