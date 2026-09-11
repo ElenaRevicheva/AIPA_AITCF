@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 20:06 UTC | /api film v9 — larger burned-in text (captions + labels). Wait for v8 job to finish before firing | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 20:06 UTC — film v9 (larger burned-in text)
+### 🟢 11 Sep 20:14 UTC — /api film v9 live (larger burned-in text)
 
-**Elena:** all on-screen text bigger — VO captions and overlay labels. Wording frozen.
+**Elena watches:**
+https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v9.mp4
 
-**v7 is a 12s stub.** Do not send `-v7`. v8 (`34642189568`) still compiling — do not fire a second `api-film` until that job exits. Then publish `-v9`.
+**DONE:** captions 28→52, labels/overlays scaled, QR type larger. Wording frozen. Grapes kept.
 
-**THIS:** bump drawtext + QR endcard fonts. Keep grapes/fruit. Branch `cursor/youtube-api-promo-0841`.
+**NEXT:** Elena watches v9. Do not send v7 (12s stub).
 
-**RISK:** Two `api-film` jobs on Oracle clobber `/home/ubuntu/aideazz-api-film/`. Do not Make Run once. Do not tell Elena a cut until duration ≳ 90s and `200 video/mp4` on `-v9`.
+**VERIFIED BY:** Actions `34642780034` `DONE … (8.4MB, 101s)` `xfade body 101.4s` `200 video/mp4 8385374` `v9-duration=93.300000` `ui loom checks 1.0s @21.0`
+
+**RISK:** Do not Make Run once. Do not fire a second `api-film` while one is running. Branch `cursor/youtube-api-promo-0841`.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
