@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 17:11 UTC | restore Runway /api film + Elena's list (no Luma) | compile.mjs, Oracle api-film — not influencer/VJH | (this commit) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,21 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 STOPPED 11 Sep 16:46 UTC — /api film v3 is live. Elena watches v3, not the old URL
+### 🟡 IN FLIGHT 11 Sep 17:11 UTC — restore Runway cut, apply Elena's list only
 
-**DONE:** Grapevine out. Google/ChatGPT on the split fruit. Bot names on the crawlers. New Loom at 1x. Distant Horizon chill house. QR outro. VO/captions frozen. `34622562553` compile exit 0, public HEAD `200 video/mp4 71347119`, 80s, 1920×1080. Actions then 127 on a probe line — file is on disk.
+**Elena:** Luma v3 is ugly. Come back to Runway. Then: no grapevine · Google/ChatGPT on 100/72 · bot names on maracuya · new Loom · 2026 chillout (not Distant Horizon dreamy) · QR. VO/captions frozen.
 
-**Watch:**
-`https://webhook.aideazz.xyz/influencer-images/youtube/watch.html`
-`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v3.mp4`
+**THIS SESSION:** restore `8b0c669` Runway pipeline, overlays + QR + new Loom, publish `-v4`. Wipe Luma clips. Influencer/VJH stay paused.
 
-**NEXT (Elena):** open v3 / watch.html. YouTube End Screen over the last 7s so the QR is clickable. **Do not Make Run once.**
-
-**NEXT (agent):** claim empty. Do not restart influencer/VJH. Do not recompile unless she wants another pass.
-
-**VERIFIED BY:** `34622562553` `DONE … (71.3MB, 80s, w=1920)` + `200 video/mp4 71347119`.
-
-**RISK:** Old unversioned URL still stale in browsers that cached it. Luma returned 1280 and we lanczos'd to 1920.
+**RISK:** Do not Make Run once. Do not use Luma.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
