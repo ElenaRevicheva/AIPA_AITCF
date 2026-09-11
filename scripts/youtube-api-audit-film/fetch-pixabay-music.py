@@ -27,35 +27,36 @@ ENV_FILE = os.environ.get("CTO_ENV", "/home/ubuntu/cto-aipa/.env")
 DEST_DIR = Path(os.environ.get("API_FILM_MUSIC_DIR", "/home/ubuntu/aideazz-api-film/music"))
 SELECTED = DEST_DIR / "SELECTED.path"
 
-# Elena: Morning Light was too calm/sad. Want chillout energy, juicy, fresh, no singing.
+# Elena: Tropical Cocktail was not "latest 2026 chillout". Prefer chill/organic house
+# published in 2026 (Distant Horizon Apr 2026, Chill House Mar 2026).
 CANDIDATES = [
     {
-        "page": "https://pixabay.com/music/search/fresh%20tropical%20cocktail/",
-        "dest": "fresh-tropical-cocktail-pixabay.mp3",
-        "expect": "Fresh Tropical Cocktail",
+        "page": "https://pixabay.com/music/search/distant%20horizon%20chill%20house/",
+        "dest": "distant-horizon-chill-house-pixabay.mp3",
+        "expect": "Distant Horizon",
         "search": True,
     },
     {
-        "page": "https://pixabay.com/music/search/tropical%20paradise%20summer%20house/",
-        "dest": "tropical-paradise-house-pixabay.mp3",
-        "expect": "Tropical Paradise",
+        "page": "https://pixabay.com/music/search/chill%20house%20deep%20house/",
+        "dest": "chill-house-deep-house-pixabay.mp3",
+        "expect": "Chill House",
         "search": True,
     },
     {
-        "page": "https://pixabay.com/music/search/lounge%20background%20music/",
-        "dest": "lounge-background-pixabay.mp3",
-        "expect": "Lounge Background Music",
+        "page": "https://pixabay.com/music/search/chill%20house%20sunset%20groove/",
+        "dest": "chill-house-sunset-groove-pixabay.mp3",
+        "expect": "Sunset Groove",
         "search": True,
     },
 ]
 
 REJECT_MOOD = re.compile(
     r"dark|drone|suspense|horror|trailer|epic|trap|phonk|restless|chasing|aggressive|"
-    r"noisy|sad|melanchol|meditat|vocal|lyrics|singing|choir|morning.?light",
+    r"noisy|sad|melanchol|meditat|vocal|lyrics|singing|choir|morning.?light|tropical.?cocktail",
     re.I,
 )
 WANT_MOOD = re.compile(
-    r"tropical|chill|lounge|fresh|cocktail|groovy|house|summer|upbeat|positive|bright",
+    r"chill|house|lounge|organic|sunset|groove|horizon|deep.?house|electronic",
     re.I,
 )
 

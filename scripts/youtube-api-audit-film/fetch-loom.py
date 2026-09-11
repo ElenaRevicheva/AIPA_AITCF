@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Download Elena's muted /api Loom walkthrough as mp4.
 
-Public share: https://www.loom.com/share/8dfbc2ec71c343bd9b06a64949e61b68
+Public share: https://www.loom.com/share/f4a4a4cf12e34fb2b7984ab1663a2386
 POST /api/campaigns/sessions/{id}/transcoded-url → signed CDN mp4.
 This VM often cannot TLS to loom.com; the GitHub Actions runner and Oracle can.
 """
@@ -12,11 +12,10 @@ import json
 import ssl
 import subprocess
 import sys
-import urllib.error
 import urllib.request
 from pathlib import Path
 
-LOOM_ID = "8dfbc2ec71c343bd9b06a64949e61b68"
+LOOM_ID = "f4a4a4cf12e34fb2b7984ab1663a2386"
 TRANSCODE = f"https://www.loom.com/api/campaigns/sessions/{LOOM_ID}/transcoded-url"
 
 
@@ -44,11 +43,19 @@ def transcoded_url() -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
+    ap.add_argument("--force", action="store_true")
     args = ap.parse_args()
     dest = Path(args.out)
     dest.parent.mkdir(parents=True, exist_ok=True)
-    if dest.exists() and dest.stat().st_size > 200000:
-        print(f"loom cache hit {dest} {dest.stat().st_size} bytes")
+    id_file = dest.with_suffix(".id")
+    cached_id = id_file.read_text().strip() if id_file.exists() else ""
+    if (
+        not args.force
+        and dest.exists()
+        and dest.stat().st_size > 200000
+        and cached_id == LOOM_ID
+    ):
+        print(f"loom cache hit {dest} {dest.stat().st_size} bytes id={LOOM_ID}")
         return 0
     print(f"loom id {LOOM_ID}")
     try:
@@ -83,6 +90,7 @@ def main() -> int:
         tmp.unlink(missing_ok=True)
         return 1
     tmp.replace(dest)
+    id_file.write_text(LOOM_ID + "\n")
     print(f"loom saved {dest} {size} bytes")
     return 0
 
