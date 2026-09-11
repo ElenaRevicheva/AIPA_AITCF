@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 15:51 UTC | Elena still sees old /api mp4 at unversioned URL | nginx youtube/ + watch.html (not influencer/VJH) | (this commit) |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,16 +131,21 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 15:51 UTC — Elena's browser still has the old /api mp4
+### 🟢 STOPPED 11 Sep 15:53 UTC — /api film: do not paste the unversioned mp4
 
-**WHY:** she pastes `…/can-ai-find-and-cite-you.mp4`. That URL already returned `Cache-Control: public, max-age=86400`, so Chrome will not even ask Oracle until the 24h window dies. Disk and public HEAD already serve the 40.6MB Loom cut.
+**DONE:** Oracle already had the 40.6MB Loom cut. Elena's paste URL is cached 24h in Chrome (`max-age=86400`). Published `watch.html` + `-v2` + `-20260911` filenames. nginx youtube/ is `no-store`. Actions `34618686457` HEAD: watch.html `200 text/html`; both new mp4s `40646845`.
 
-**THIS SESSION:** `watch.html` + dated filename + nginx `no-store` + proof frames at 0:00 / 0:42 / 1:10. Influencer/VJH stay paused.
-
-**Watch (new cache key):**
+**Watch (Chrome has never seen these):**
+`https://webhook.aideazz.xyz/influencer-images/youtube/watch.html`
 `https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4`
 
-**RISK:** the unversioned URL cannot be unstuck from a browser that already played it. Incognito or v2 only.
+**NEXT (Elena):** open watch.html or v2. Skip to 0:42 for live /api. Incognito also works on the old filename. **Do not Make Run once.**
+
+**NEXT (agent):** claim empty. Do not restart influencer/VJH.
+
+**VERIFIED BY:** `34618686457` watch.html `Content-Type: text/html` `Cache-Control: no-store`; v2/dated `Content-Length: 40646845`.
+
+**RISK:** Ctrl-R on the unversioned URL cannot beat a 24h freshness lifetime already stored in the browser.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
