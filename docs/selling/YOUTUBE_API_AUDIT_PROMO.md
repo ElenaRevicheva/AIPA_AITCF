@@ -12,7 +12,7 @@ Compiled with the Atuona Film Studio stack already wired into this repo
 
 Shorter than 30s is a Short or an ad — no room to show the form. Two to three minutes is an explainer; retention usually dies unless someone searched for a tutorial. Production on this stack is minutes on Oracle (Runway 5s clips + ffmpeg), not a shoot day.
 
-Verified 11 Sep 2026, Actions `34597075800` remix: **Morning Light (Fresh Corporate)** by wbmstudio (Pixabay). 22.0MB, 1920×1080 30fps, AAC, HTTP 200. Same 79s picture, new bed. First cut (`34590866362`) had used Atuona's dark `atmospheric-dark-cinematic` by accident.
+Verified 11 Sep 2026, Actions `34616631936`: Elena's muted Loom + live `/api` stills, bed **Tropical Cocktail** by The_Mountain. 40.6MB, 79s, 1920×1080 30fps, AAC, HTTP 200. VO and captions unchanged. Morning Light was too calm and is burned.
 
 ## Watch
 
@@ -53,7 +53,7 @@ Counted from production logs on Oracle Cloud: 420+ audits · 14,000+ signals · 
 
 Want it wired into your stack? https://aideazz.xyz/portfolio#portfolio-inquiry-form
 
-Music: Pixabay Content License — chillout / tropical instrumental (no vocals). Exact title is in the Oracle remix log; Morning Light was rejected as too calm.
+Music: Tropical Cocktail by The_Mountain — Pixabay Content License (instrumental, no vocals)
 
 AIdeazz Lab · Elena Revicheva
 ```
