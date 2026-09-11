@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 17:11 UTC | restore Runway /api film + Elena's list (no Luma) | compile.mjs, Oracle api-film — not influencer/VJH | (this commit) |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 17:11 UTC — restore Runway cut, apply Elena's list only
+### 🟢 11 Sep 17:24 UTC — /api YouTube **v4 is live**. Elena opens watch.html, not v3.
 
-**Elena:** Luma v3 is ugly. Come back to Runway. Then: no grapevine · Google/ChatGPT on 100/72 · bot names on maracuya · new Loom · 2026 chillout (not Distant Horizon dreamy) · QR. VO/captions frozen.
+**DONE:** Runway restore published. 31.2MB, 77s, 1920×1080. No grapes. GOOGLE/CHATGPT on 100/72. GPTBot/ClaudeBot/PerplexityBot on crawlers. Loom `f4a4a4cf` (transcoded 4.1MB). Bed: Chillout Lounge by Oleg-Mazur (Uplifting). QR outro. VO frozen. Branch `cursor/youtube-api-promo-0841`.
 
-**THIS SESSION:** restore `8b0c669` Runway pipeline, overlays + QR + new Loom, publish `-v4`. Wipe Luma clips. Influencer/VJH stay paused.
+**NEXT:** Elena watches `…/watch.html` or `…/can-ai-find-and-cite-you-v4.mp4`. Runway credits died after `split.mp4` — crawlers + hand are labeled stills. Top up Runway, then api-film wiping only those two clips.
 
-**RISK:** Do not Make Run once. Do not use Luma.
+**VERIFIED BY:** Actions `34627010979` `DONE … (31.2MB, 77s)` + `200 video/mp4 31224376` on `-v4`. Job 127 was probe `cho` after publish.
+
+**RISK:** Do not open unversioned/v3. Do not Make Run once. Do not recompile without Runway credits.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
