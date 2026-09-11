@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 19:15 UTC | /api film v6 — shorten Loom, add first-video slides, moving site | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 11 Sep 18:51 UTC — /api YouTube **v5 is live**. Elena opens watch.html / `-v5.mp4`.
+### 🟡 IN FLIGHT 11 Sep 19:15 UTC — film v6 (short Loom, slides, moving site)
 
-**DONE:** 36.5MB, 87s, 1920. GOOGLE/CHATGPT lower. Crawlers = salvaged v2 Runway walk (credits still 400) + orbiting bot names. Dashboard shot covered with first-video slide copy (still — same credit miss). Split cache kept. Job green.
+**Elena:** one more moving shot of the live website; shorten the Loom (results scroll too long); add the first-video slides. VO/captions stay.
 
-**NEXT:** Elena watches v5. Top up Runway to replace dashboard still with motion; do not wipe split or salvaged crawlers.
+**THIS:** cap Loom at ~20s, never loop; UI beats lead with walkthrough.html slides; new `website` clip (live-hero + short Loom). Wipe UI clips only. Keep fruit.
 
-**VERIFIED BY:** Actions `34635292256` `DONE … (36.5MB, 87s)` + `200 video/mp4 36502524` on `-v5`. `salvage crawlers … v2.mp4 ss=15.0 t=7.0 5.6MB`.
-
-**RISK:** Do not open v4/v3. Do not Make Run once. Salvage window 15s+7s of v2 — if insects look like the wrong beat, nudge `API_FILM_CRAWLERS_SS`.
+**RISK:** Do not Make Run once. Do not wipe split/crawlers.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
