@@ -398,8 +398,43 @@ async function salvageWindow(dest, envSrc, envSs, envT, fallbackSrc, fallbackSs,
 }
 
 async function salvageCrawlers(dest) {
-  // v2 still has the Runway walk (grapes+split before it). Window measured from that cut.
-  return salvageWindow(dest, 'API_FILM_CRAWLERS_SRC', 'API_FILM_CRAWLERS_SS', 'API_FILM_CRAWLERS_T', '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4', '15.0', '7.0', 'crawlers');
+  if (
+    await salvageWindow(
+      dest,
+      'API_FILM_CRAWLERS_SRC',
+      'API_FILM_CRAWLERS_SS',
+      'API_FILM_CRAWLERS_T',
+      '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4',
+      '15.0',
+      '7.0',
+      'crawlers-v2',
+    )
+  ) {
+    return true;
+  }
+  return salvageWindow(
+    dest,
+    'API_FILM_CRAWLERS_SRC2',
+    'API_FILM_CRAWLERS_SS2',
+    'API_FILM_CRAWLERS_T2',
+    '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v5.mp4',
+    '11.0',
+    '7.0',
+    'crawlers-v5',
+  );
+}
+
+async function fruitSway(src, dest, seconds) {
+  const take = Math.max(5.5, seconds || 7);
+  const isImg = /\.(jpg|jpeg|png|webp)$/i.test(src);
+  const motion = `scale=${WX + 88}:${HY + 88}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:'(in_w-out_w)/2+40*sin(2*PI*t/2.3)':'(in_h-out_h)/2+22*cos(2*PI*t/1.8)',fps=${FPS},format=yuv420p,setsar=1`;
+  const inputs = isImg ? ['-loop', '1', '-i', src] : ['-i', src];
+  await execFileP(
+    'ffmpeg',
+    ['-y', ...inputs, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', `[0:v]${motion}[v]`, '-map', '[v]', '-map', '1:a', '-t', take.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
+    { maxBuffer: 1 << 26, timeout: 180000 },
+  );
+  return dest;
 }
 
 async function salvageGrapes(dest) {
@@ -567,9 +602,9 @@ const BEATS = [
     vo: 'Six crawlers decide whether ChatGPT, Claude, Gemini and Perplexity can quote you.',
     cap: 'Six crawlers decide who gets cited.',
     labels: [
-      { text: 'GPTBot', x: 'W*0.20+48*sin(2*PI*t/2.3)', y: 'H*0.08+22*cos(2*PI*t/1.9)', color: '0x7DFFFB', size: 56 },
-      { text: 'ClaudeBot', x: 'W*0.66+42*sin(2*PI*t/2.1+1)', y: 'H*0.07+20*cos(2*PI*t/2.4+0.4)', color: '0xFFB347', size: 56 },
-      { text: 'PerplexityBot', x: '(W-text_w)/2+36*sin(2*PI*t/2.6)', y: 'H*0.40+24*cos(2*PI*t/2.2)', color: '0xFF7AE0', size: 56 },
+      { text: 'GPTBot', x: 'W*0.08+36*sin(2*PI*t/2.3)', y: 'H*0.06+18*cos(2*PI*t/1.9)', color: '0x7DFFFB', size: 42 },
+      { text: 'ClaudeBot', x: 'W*0.62+36*sin(2*PI*t/2.1+1)', y: 'H*0.06+16*cos(2*PI*t/2.4+0.4)', color: '0xFFB347', size: 42 },
+      { text: 'PerplexityBot', x: 'W*0.32+28*sin(2*PI*t/2.6)', y: 'H*0.86+12*cos(2*PI*t/2.2)', color: '0xFF7AE0', size: 42 },
     ],
   },
   {
@@ -641,25 +676,27 @@ async function main() {
       if (!b) continue;
       const still = path.join(HERE, b.still);
       const raw = path.join(CLIPDIR, `${b.id}.mp4`);
-      const forceGrapes = b.id === 'grapes' && process.env.API_FILM_FORCE_GRAPES === '1';
-      if (!forceGrapes && fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
+      const forceFruit = (b.id === 'grapes' || b.id === 'crawlers') && process.env.API_FILM_FORCE_FRUIT === '1';
+      if (!forceFruit && fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
         process.stderr.write(`runway cache hit ${b.id}\n`);
         continue;
       }
-      if (forceGrapes) process.stderr.write('grapes rebuild — What it checks on moving/growing vine + neurones\n');
+      if (forceFruit) process.stderr.write(`${b.id} rebuild — do not reuse a still cache\n`);
       try {
         await runwayI2V(still, b.motion, raw);
       } catch (e) {
         process.stderr.write(`WARN runway ${b.id}: ${e.message}\n`);
         if (b.id === 'crawlers' && (await salvageCrawlers(raw))) {
-          process.stderr.write('crawlers salvaged from the v2 Runway walk\n');
-        } else if (b.id === 'grapes' && (await salvageGrapes(raw))) {
-          const pulsed = raw + '.glow.mp4';
-          await neuronPulse(raw, pulsed, b.clipDur || 8.0, { grow: true });
-          fs.renameSync(pulsed, raw);
-          process.stderr.write('grapes salvaged + neuron glow + grow\n');
+          const swayed = raw + '.sway.mp4';
+          await fruitSway(raw, swayed, b.clipDur || 8.2);
+          fs.renameSync(swayed, raw);
+          process.stderr.write('crawlers salvaged + sway so insects keep moving\n');
+        } else if (b.id === 'crawlers') {
+          process.stderr.write('crawlers still+sway — insects stay in frame\n');
+          await fruitSway(still, raw, b.clipDur || 8.2);
         } else if (b.id === 'grapes') {
-          process.stderr.write('grapes still+grow+glow fallback\n');
+          // v2 salvage at 4.6s is pomegranate/title, not this vine. Use the grape still.
+          process.stderr.write('grapes from grape still + grow + neuron glow\n');
           await neuronPulse(still, raw, b.clipDur || 8.0, { sway: true, grow: true });
         } else {
           process.stderr.write(`still fallback ${b.id}\n`);
@@ -697,6 +734,7 @@ async function main() {
       raw = await buildUiClip(b, clipDur, loomState);
     } else if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
       if (b.id === 'grapes') await neuronPulse(still, raw, clipDur, { sway: true, grow: true });
+      else if (b.id === 'crawlers') await fruitSway(still, raw, clipDur);
       else await stillToClip(still, raw, 5.5);
     }
     const nat = await dur(raw);
@@ -795,15 +833,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v11 = path.join(PUBLISH, `${SLUG}-v11.mp4`);
-  fs.copyFileSync(final, v11);
+  const v12 = path.join(PUBLISH, `${SLUG}-v12.mp4`);
+  fs.copyFileSync(final, v12);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v11)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v12)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);

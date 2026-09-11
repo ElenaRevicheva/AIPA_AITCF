@@ -63,8 +63,8 @@ ls -lh "$API_FILM_LOOM"
 ffprobe -v error -show_entries format=duration:stream=width,height,bit_rate -of default=nw=1 "$API_FILM_LOOM" || true
 
 echo
-echo "=== 1b. keep moving fruit (pomegranate/maracuya). Rebuild grapes glow+grow. Regen UI + loomwalk ==="
-export API_FILM_FORCE_GRAPES=1
+echo "=== 1b. keep pomegranate clips. Rebuild grapes (vine still) + crawlers (insects). Regen UI + loomwalk ==="
+export API_FILM_FORCE_FRUIT=1
 rm -f "$DIR/clips/hero.mp4" "$DIR/clips/form.mp4" "$DIR/clips/auditing.mp4" \
   "$DIR/clips/score.mp4" "$DIR/clips/checks.mp4" "$DIR/clips/categories.mp4" \
   "$DIR/clips/cta.mp4" "$DIR/clips/website.mp4" "$DIR/clips/loomwalk.mp4"
@@ -110,7 +110,7 @@ echo
 echo "=== 3. publish + probe ==="
 sudo mkdir -p "$PUBLISH"
 # Failed compile must not swap watch.html onto a missing -vN.
-if [ "${RC:-1}" -eq 0 ] && [ -f "$DIR/out/can-ai-find-and-cite-you-v11.mp4" ]; then
+if [ "${RC:-1}" -eq 0 ] && [ -f "$DIR/out/can-ai-find-and-cite-you-v12.mp4" ]; then
   sudo cp -f "$DIR/out/"*.mp4 "$PUBLISH/" 2>/dev/null || true
   sudo cp -f "$DIR/out/"*.jpg "$PUBLISH/" 2>/dev/null || true
   sudo cp -f "$DIR/out/"*.png "$PUBLISH/" 2>/dev/null || true
@@ -129,7 +129,7 @@ sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
 sudo find "$PUBLISH" -type f -exec chmod 644 {} \;
 ls -lh "$PUBLISH" | redact
 for u in \
-  "$PUBLIC/can-ai-find-and-cite-you-v11.mp4" \
+  "$PUBLIC/can-ai-find-and-cite-you-v12.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you-poster.jpg" \
   "$PUBLIC/watch.html" \
@@ -141,23 +141,23 @@ done
 # Never re-enable set -e after publish. v3 died on `t:`, v4 on `cho:` — both
 # after a real mp4 was already on disk. Acknowledgement is not completion.
 set +e
-if [ -f "$PUBLISH/can-ai-find-and-cite-you-v11.mp4" ]; then
+if [ -f "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" ]; then
   ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
-    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v11.mp4" | redact
-  ffmpeg -y -ss 7 -i "$PUBLISH/can-ai-find-and-cite-you-v11.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-grapes.jpg
-  ffmpeg -y -ss 22 -i "$PUBLISH/can-ai-find-and-cite-you-v11.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-crawlers.jpg
-  ffmpeg -y -ss 48 -i "$PUBLISH/can-ai-find-and-cite-you-v11.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-loom.jpg
+    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" | redact
+  ffmpeg -y -ss 7 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-grapes.jpg
+  ffmpeg -y -ss 22 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-crawlers.jpg
+  ffmpeg -y -ss 48 -i "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-loom.jpg
   BYTES=$(wc -c < /tmp/api-film-frame-grapes.jpg 2>/dev/null || printf '0')
   printf 'frame-grapes bytes=%s\n' "$BYTES"
   printf 'frame-crawlers bytes=%s\n' "$(wc -c < /tmp/api-film-frame-crawlers.jpg 2>/dev/null || printf '0')"
   printf 'frame-loom bytes=%s\n' "$(wc -c < /tmp/api-film-frame-loom.jpg 2>/dev/null || printf '0')"
-  DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$PUBLISH/can-ai-find-and-cite-you-v11.mp4" || echo 0)
-  printf 'v11-duration=%s\n' "$DUR"
-  awk -v d="$DUR" 'BEGIN { if (d+0 < 60) { print "FATAL: v11 shorter than 60s — stub, do not send Elena"; exit 1 } }' || RC=1
+  DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$PUBLISH/can-ai-find-and-cite-you-v12.mp4" || echo 0)
+  printf 'v12-duration=%s\n' "$DUR"
+  awk -v d="$DUR" 'BEGIN { if (d+0 < 60) { print "FATAL: v12 shorter than 60s — stub, do not send Elena"; exit 1 } }' || RC=1
 fi
 
 echo "DONE api-film rc=${RC:-1}"
-echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v11.mp4"
+echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v12.mp4"
 printf 'or %s/watch.html\n' "$PUBLIC"
 printf 'Do not drop this mp4 into Atuona /films. That gallery is poetry.\n'
 exit "${RC:-1}"
