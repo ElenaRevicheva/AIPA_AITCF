@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 15:44 UTC | Cache-bust /api YouTube mp4 (nginx max-age=86400) | nginx youtube location, versioned mp4 — no service restart except nginx reload | pending |
+| Cursor Cloud | 11 Sep 15:51 UTC | Elena still sees old /api mp4 at unversioned URL | nginx youtube/ + watch.html (not influencer/VJH) | (this commit) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 15:44 UTC — Elena sees the OLD film at the stable URL
+### 🟡 IN FLIGHT 11 Sep 15:51 UTC — Elena's browser still has the old /api mp4
 
-**Cause:** nginx `Cache-Control: public, max-age=86400` on `/influencer-images/`. Browser kept the 22MB Morning Light cut.
+**WHY:** she pastes `…/can-ai-find-and-cite-you.mp4`. That URL already returned `Cache-Control: public, max-age=86400`, so Chrome will not even ask Oracle until the 24h window dies. Disk and public HEAD already serve the 40.6MB Loom cut.
 
-**NEXT:** versioned filename `…/can-ai-find-and-cite-you-v2.mp4` plus a `/influencer-images/youtube/` location with `no-cache`. Do not recompile. Do not restart influencer/VJH.
+**THIS SESSION:** `watch.html` + dated filename + nginx `no-store` + proof frames at 0:00 / 0:42 / 1:10. Influencer/VJH stay paused.
 
-**VERIFIED BY:** pending `api-film-bust` run.
+**Watch (new cache key):**
+`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4`
 
-**RISK:** nginx reload. Check `nginx -t` first.
+**RISK:** the unversioned URL cannot be unstuck from a browser that already played it. Incognito or v2 only.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
