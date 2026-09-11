@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 19:21 UTC | /api film v6 concat SAR fix (hero still 0:1 vs Loom 15709:15711) | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 19:21 UTC — film v6 concat SAR fix
+### 🟢 11 Sep 19:25 UTC — /api YouTube v6 is live
 
-**v5 still the last good cut.** Actions `34637870952` on `c66567f` died at hero concat: still SAR `0:1` vs Loom `15709:15711`. Fruit + website clip OK. `-v6.mp4` 404. That run also wrote `watch.html` onto the missing v6.
+Elena opens **watch.html** (not v5 / v4 / the unversioned mp4):
+https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v6.mp4
 
-**THIS:** `concatClips` now `setsar=1`; publish `watch.html` only if compile exit 0. Fire `api-film`. Keep fruit. Branch `cursor/youtube-api-promo-0841`.
+Short Loom (first 20s, no loop), first-video slides, live-site shot, QR. VO/captions unchanged. Branch `cursor/youtube-api-promo-0841`.
 
-**RISK:** Do not Make Run once. Do not wipe split/crawlers. Do not tell Elena `-v6` until HEAD is `200 video/mp4`.
+**VERIFIED BY:** Actions `34638369236` `DONE … (27.5MB, 95s)` · `compile exit 0` · `200 video/mp4 27542001` on `-v6.mp4`. Fruit cache hits. `ui loom website 6.7s @0.4 no-loop`.
+
+**RISK:** nginx caches the unversioned file. Do not Make Run once. Do not wipe split/crawlers.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
