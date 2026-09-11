@@ -55,7 +55,7 @@ Counted from production logs on Oracle Cloud: 420+ audits · 14,000+ signals · 
 
 Want it wired into your stack? https://aideazz.xyz/portfolio#portfolio-inquiry-form
 
-Music: 2026 chillout / organic house from Pixabay (credit the title in the compile log — Tropical Cocktail and Distant Horizon are burned)
+Music: Chillout Lounge - Chillout Enigmatic Music by Oleg-Mazur (Pixabay, mood Uplifting). Tropical Cocktail and Distant Horizon are burned.
 
 AIdeazz Lab · Elena Revicheva
 ```

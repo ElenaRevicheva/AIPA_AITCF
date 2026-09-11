@@ -131,18 +131,19 @@ do
   code=$(curl -sS -o /dev/null -w "%{http_code} %{content_type} %{size_download}" --max-time 20 -L "$u" || echo "curl-fail")
   echo "$code  $u"
 done
+# Never re-enable set -e after publish. v3 died on `t:`, v4 on `cho:` — both
+# after a real mp4 was already on disk. Acknowledgement is not completion.
+set +e
 if [ -f "$PUBLISH/can-ai-find-and-cite-you-v4.mp4" ]; then
-  set +e
   ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
     -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v4.mp4" | redact
   ffmpeg -y -ss 3 -i "$PUBLISH/can-ai-find-and-cite-you-v4.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-split.jpg
-  echo "frame-split bytes=$(wc -c < /tmp/api-film-frame-split.jpg)"
-  set -e
+  BYTES=$(wc -c < /tmp/api-film-frame-split.jpg 2>/dev/null || printf '0')
+  printf 'frame-split bytes=%s\n' "$BYTES"
 fi
 
-echo
-echo "=== DONE api-film rc=$RC ==="
-echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v4.mp4"
-echo "or ${PUBLIC}/watch.html"
-echo "Do not drop this mp4 into Atuona /films — that gallery is poetry."
-exit $RC
+printf '\nDONE api-film rc=%s\n' "${RC:-1}"
+printf 'ELENA: watch %s/can-ai-find-and-cite-you-v4.mp4\n' "$PUBLIC"
+printf 'or %s/watch.html\n' "$PUBLIC"
+printf 'Do not drop this mp4 into Atuona /films. That gallery is poetry.\n'
+exit "${RC:-1}"
