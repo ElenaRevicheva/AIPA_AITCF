@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 21:13 UTC | /api film v12 stitch retry (SSH died mid-xfade) | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 21:21 UTC | /api film v12 start+poll after SSH banner timeout | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 21:13 UTC — v12 stitch retry after SSH Broken pipe
+### 🟡 IN FLIGHT 11 Sep 21:21 UTC — v12 start+poll (do not send a link yet)
 
-**Elena:** wants the full film (moving pomegranate, grapevine + What it checks + neurones, maracuya insects, shortened Loom, finishing slides, QR every shot) at ~107s. v11 is not the cut. Do not send v11.
+**Elena:** full film — moving pomegranate, grapevine + What it checks + neurones, maracuya insects, shortened Loom, finishing slides, QR every shot, ~107s. v11 is not the cut.
 
-**DONE (compile, not published):** run 34647132792 built grapes from grape still + glow, salvaged crawlers+sway from v2 ss=15, loomwalk 16s, finishing slides, QR every shot, xfade expect 114.7s. SSH `Broken pipe` at xfade — no `-v12` published.
+**DONE (not published):** run 34647132792 built every chapter then SSH `Broken pipe` mid-xfade. Retry 34648363197 never reached Oracle (`Connection timed out during banner exchange`).
 
-**THIS:** re-fire `api-film` with nohup + SSH keepalive so the stitch survives silence. Branch `cursor/youtube-api-promo-0841`.
+**THIS:** detach compile (`api-film start`) then short `publish` polls. Branch `cursor/youtube-api-promo-0841`.
 
 **RISK:** Do not give Elena a link until `DONE` + `200 video/mp4` + `v12-duration` ≳ 90. Do not Make Run once. Do not fire a second job if compile.mjs is still running.
 
