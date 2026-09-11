@@ -1,0 +1,112 @@
+# Diagnose EspaLuz Influencer → Make.com from Oracle.
+# Cloud agents cannot SSH and cannot clone EspaLuz_Influencer (private, out of
+# this token's scope). This trigger SSHes, prints a redacted diagnosis to the
+# log (the only channel the agent can read), and never prints secrets.
+#
+# Usage:
+#   echo "diag" > .influencer-diag-trigger
+#   git add .influencer-diag-trigger && git commit -m "diag: influencer make webhook" && git push
+#   echo "# idle" > .influencer-diag-trigger
+
+name: Influencer Make.com diagnosis (trigger file)
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+    paths: [".influencer-diag-trigger"]
+
+jobs:
+  influencer-diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Parse .influencer-diag-trigger
+        id: trigger
+        run: |
+          set -euo pipefail
+          LINE=$(head -n1 .influencer-diag-trigger | tr -d '\r' | xargs || true)
+          [ -n "$LINE" ] || { echo "::error::.influencer-diag-trigger is empty"; exit 1; }
+          case "$LINE" in
+            \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
+            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film|api-film-bust) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, api-film-bust, or # idle — got '$LINE'"; exit 1 ;;
+          esac
+
+      - name: Require ORACLE_SSH_KEY
+        if: steps.trigger.outputs.skip != 'true'
+        run: |
+          if [ -z "${{ secrets.ORACLE_SSH_KEY }}" ]; then
+            echo "::error::Add ORACLE_SSH_KEY — see scripts/oracle-resilience/CLOUD_AGENT_DEPLOY.md"
+            exit 1
+          fi
+
+      - name: Diagnose or fix on Oracle
+        if: steps.trigger.outputs.skip != 'true'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          MODE: ${{ steps.trigger.outputs.mode }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+          if [ "$MODE" = "fix" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/patch-influencer-make-images.py \
+              ubuntu@170.9.242.90:/tmp/patch-influencer-make-images.py
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/fix-influencer-make-images.sh
+          elif [ "$MODE" = "sync" ]; then
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/sync-influencer-git.sh
+          elif [ "$MODE" = "cmo-fix" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/patch-cmo-make-images.py \
+              ubuntu@170.9.242.90:/tmp/patch-cmo-make-images.py
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/fix-cmo-make-images.sh
+          elif [ "$MODE" = "geo" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/patch-influencer-geo-rotation.py \
+              scripts/oracle-resilience/geo_api_promo.py \
+              ubuntu@170.9.242.90:/tmp/
+            scp -r $SSHOPTS \
+              scripts/oracle-resilience/geo-api-assets \
+              ubuntu@170.9.242.90:/tmp/geo-api-assets
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/fix-influencer-geo.sh
+          elif [ "$MODE" = "fire" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/geo_api_promo.py \
+              scripts/oracle-resilience/patch-influencer-geo-rotation.py \
+              ubuntu@170.9.242.90:/tmp/
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/fire-influencer-promo.sh
+          elif [ "$MODE" = "api-film-bust" ]; then
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/bust-api-audit-film.sh
+          elif [ "$MODE" = "api-film" ]; then
+            mkdir -p scripts/youtube-api-audit-film/loom
+            python3 scripts/youtube-api-audit-film/fetch-loom.py \
+              --out scripts/youtube-api-audit-film/loom/walkthrough.mp4 \
+              || echo "WARN: runner could not download Loom"
+            ls -lh scripts/youtube-api-audit-film/loom || true
+            ssh $SSHOPTS ubuntu@170.9.242.90 'rm -rf /tmp/youtube-api-audit-film'
+            scp -r $SSHOPTS \
+              scripts/youtube-api-audit-film \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/run-api-audit-film.sh
+          else
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/diag-influencer-promo.sh
+          fi
+          RC=$?
+          echo "--- remote exit code: $RC ---"
+          rm -f ~/.ssh/oracle
+          exit $RC
