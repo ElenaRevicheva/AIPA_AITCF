@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 20:03 UTC | /api film v8 — tiny checks waterfall Loom peek; xfade SAR so cut is not 12s | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 20:06 UTC | /api film v9 — larger burned-in text (captions + labels). Wait for v8 job to finish before firing | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 20:03 UTC — film v8 (tiny waterfall Loom + xfade fix)
+### 🟡 IN FLIGHT 11 Sep 20:06 UTC — film v9 (larger burned-in text)
 
-**Elena:** Loom in the check-results waterfall — show it just a little. Grapes stay.
+**Elena:** all on-screen text bigger — VO captions and overlay labels. Wording frozen.
 
-**v7 is a 12s stub.** Actions `34641425711` built all 13 beats then xfade died after grapes (`DONE 6.2MB, 12s`). Do not send `-v7`.
+**v7 is a 12s stub.** Do not send `-v7`. v8 (`34642189568`) still compiling — do not fire a second `api-film` until that job exits. Then publish `-v9`.
 
-**THIS:** checks Loom peek 1.0s @ ~21s (waterfall). Sequential walk stays capped. Conform SAR on xfade; refuse body < 60s. Publish `-v8`. Keep fruit/grapes. Branch `cursor/youtube-api-promo-0841`.
+**THIS:** bump drawtext + QR endcard fonts. Keep grapes/fruit. Branch `cursor/youtube-api-promo-0841`.
 
-**RISK:** Do not Make Run once. Do not wipe split/crawlers/grapes. Do not tell Elena `-v8` until duration ≳ 90s and `200 video/mp4`.
+**RISK:** Two `api-film` jobs on Oracle clobber `/home/ubuntu/aideazz-api-film/`. Do not Make Run once. Do not tell Elena a cut until duration ≳ 90s and `200 video/mp4` on `-v9`.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
