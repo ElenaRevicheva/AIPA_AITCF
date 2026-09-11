@@ -17,8 +17,8 @@ Open a filename Chrome has never cached:
 Player (QR is a real clickable link on this page):
 https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
 
-Direct file (open this, not the unversioned mp4, not v3):
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v4.mp4
+Direct file (open this, not v4 / v3 / unversioned):
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v5.mp4
 
 Poster:
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-poster.jpg

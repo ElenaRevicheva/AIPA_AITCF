@@ -315,6 +315,48 @@ function labelFilter(labels) {
     .join(',');
 }
 
+async function overlaySlide(src, dest, lines) {
+  if (!lines || !lines.length) {
+    fs.copyFileSync(src, dest);
+    return dest;
+  }
+  const parts = lines.map((L, i) => {
+    const tf = dest + `_s${i}.txt`;
+    fs.writeFileSync(tf, wrap(L.text, 62, 2));
+    const col = L.color || 'white';
+    const fsze = L.size || 32;
+    return `drawtext=fontfile=${SANS}:textfile=${tf}:expansion=none:fontcolor=${col}:fontsize=${fsze}:line_spacing=8:box=1:boxcolor=black@0.50:boxborderw=16:x=(w-text_w)/2:y=${L.y}`;
+  });
+  await execFileP(
+    'ffmpeg',
+    ['-y', '-i', src, '-vf', parts.join(','), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'copy', dest],
+    { maxBuffer: 1 << 26, timeout: 120000 },
+  );
+  return dest;
+}
+
+async function salvageCrawlers(dest) {
+  const src = process.env.API_FILM_CRAWLERS_SRC || '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4';
+  if (!fs.existsSync(src) || fs.statSync(src).size < 1e6) return false;
+  // v2 still has the Runway walk (grapes+split before it). Window measured from that cut.
+  const ss = process.env.API_FILM_CRAWLERS_SS || '15.0';
+  const t = process.env.API_FILM_CRAWLERS_T || '7.0';
+  try {
+    await execFileP(
+      'ffmpeg',
+      ['-y', '-ss', ss, '-i', src, '-t', t, '-an', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', dest],
+      { maxBuffer: 1 << 26, timeout: 120000 },
+    );
+    if (fs.existsSync(dest) && fs.statSync(dest).size > 20000) {
+      process.stderr.write(`salvage crawlers ${src} ss=${ss} t=${t} ${(fs.statSync(dest).size / 1e6).toFixed(1)}MB\n`);
+      return true;
+    }
+  } catch (e) {
+    process.stderr.write(`WARN salvage crawlers: ${e.message}\n`);
+  }
+  return false;
+}
+
 async function overlayLabels(src, dest, labels) {
   if (!labels || !labels.length) {
     fs.copyFileSync(src, dest);
@@ -380,8 +422,8 @@ const BEATS = [
     vo: 'Google ranked your page. In 2026 that is just half of the fruit.',
     cap: 'Google ranked your page —\nin 2026 that is just half of the fruit.',
     labels: [
-      { text: 'GOOGLE', x: 'W*0.22', y: 'H*0.55', color: '0x7DFFB3', size: 56 },
-      { text: 'CHATGPT', x: 'W*0.58', y: 'H*0.08', color: '0xFF7AE0', size: 56 },
+      { text: 'GOOGLE', x: 'W*0.16', y: 'H*0.78', color: '0x7DFFB3', size: 48 },
+      { text: 'CHATGPT', x: 'W*0.58', y: 'H*0.68', color: '0xFF7AE0', size: 48 },
     ],
   },
   {
@@ -389,13 +431,13 @@ const BEATS = [
     kind: 'runway',
     still: 'fruit/geo-passionfruit-crawlers.jpg',
     motion:
-      'Three glass crawlers shift weight on passionfruit pulp, purple cores pulse. Pulp glistens. Tiny orbit. Do not spawn a fourth crawler. No extra fruit. Do not invent text.',
+      'Three glass crawlers WALK across the passionfruit pulp — legs shift, bodies orbit a few centimetres, purple cores pulse. Pulp glistens. Tiny living motion. Do not spawn a fourth crawler. No extra fruit. Do not invent text or names.',
     vo: 'Six crawlers decide whether ChatGPT, Claude, Gemini and Perplexity can quote you.',
     cap: 'Six crawlers decide who gets cited.',
     labels: [
-      { text: 'GPTBot', x: 'W*0.22', y: 'H*0.05', color: '0x7DFFFB', size: 34 },
-      { text: 'ClaudeBot', x: 'W*0.68', y: 'H*0.05', color: '0xFFB347', size: 34 },
-      { text: 'PerplexityBot', x: '(W-text_w)/2', y: 'H*0.40', color: '0xFF7AE0', size: 34 },
+      { text: 'GPTBot', x: 'W*0.20+48*sin(2*PI*t/2.3)', y: 'H*0.08+22*cos(2*PI*t/1.9)', color: '0x7DFFFB', size: 34 },
+      { text: 'ClaudeBot', x: 'W*0.66+42*sin(2*PI*t/2.1+1)', y: 'H*0.07+20*cos(2*PI*t/2.4+0.4)', color: '0xFFB347', size: 34 },
+      { text: 'PerplexityBot', x: '(W-text_w)/2+36*sin(2*PI*t/2.6)', y: 'H*0.40+24*cos(2*PI*t/2.2)', color: '0xFF7AE0', size: 34 },
     ],
   },
   {
@@ -406,6 +448,20 @@ const BEATS = [
       'Water droplets fall. The glass HUD stays locked to the fruit. The hand is still. No extra hands, no blood, no new UI panels, no changing the 100 score.',
     vo: 'This is the free AI visibility audit at aideazz.xyz/api.',
     cap: 'Free AI visibility audit\naideazz.xyz/api',
+  },
+  {
+    id: 'dashboard',
+    kind: 'runway',
+    still: 'fruit/geo-pomegranate-dashboard-2026.jpg',
+    motion:
+      'Juice droplets fall. The glass AI visibility dashboard stays locked to the fruit. The hand is still. Numbers stay 100. No extra hands, no blood, no new UI panels. Slow prestige product film.',
+    vo: 'Counted from production logs: four hundred and twenty audits, fourteen thousand signals, two hundred and ten sites, median eighty-five.',
+    cap: '420+ audits · 14,000+ signals · median 85',
+    slide: [
+      { text: 'CAN AI FIND AND CITE YOU', y: 'H*0.07', size: 44, color: 'white' },
+      { text: 'Google ranked your page — in 2026 that is just half of the fruit', y: 'H*0.16', size: 26, color: '0xFDE68A' },
+      { text: '420+ audits   ·   14,000+ signals   ·   210+ sites   ·   median 85', y: 'H*0.86', size: 28, color: 'white' },
+    ],
   },
   { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.' },
   { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.' },
@@ -424,7 +480,9 @@ async function main() {
 
   if (RUNWAY) {
     process.stderr.write('Runway Gen-4.5 image→video (one at a time — parallel THROTTLEs)\n');
-    for (const b of BEATS.filter((x) => x.kind === 'runway')) {
+    for (const id of ['crawlers', 'dashboard', 'hand', 'split']) {
+      const b = BEATS.find((x) => x.id === id && x.kind === 'runway');
+      if (!b) continue;
       const still = path.join(HERE, b.still);
       const raw = path.join(CLIPDIR, `${b.id}.mp4`);
       if (fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
@@ -434,8 +492,13 @@ async function main() {
       try {
         await runwayI2V(still, b.motion, raw);
       } catch (e) {
-        process.stderr.write(`WARN runway ${b.id}: ${e.message} — still fallback\n`);
-        await stillToClip(still, raw, 5.5);
+        process.stderr.write(`WARN runway ${b.id}: ${e.message}\n`);
+        if (b.id === 'crawlers' && (await salvageCrawlers(raw))) {
+          process.stderr.write('crawlers salvaged from the v2 Runway walk\n');
+        } else {
+          process.stderr.write(`still fallback ${b.id}\n`);
+          await stillToClip(still, raw, 5.5);
+        }
       }
     }
   }
@@ -475,8 +538,10 @@ async function main() {
     await normalizeVideo(raw, norm, normDur);
     const labeled = path.join(W, `lb_${b.id}.mp4`);
     await overlayLabels(norm, labeled, b.labels);
+    const slid = path.join(W, `sl_${b.id}.mp4`);
+    await overlaySlide(labeled, slid, b.slide);
     const baked = path.join(W, `fc_${String(i).padStart(2, '0')}.mp4`);
-    await bakeCaption(labeled, baked, b.cap, normDur);
+    await bakeCaption(slid, baked, b.cap, normDur);
     seq.push(baked);
     if (voFile) voInfo.push({ segIndex: i + 1, file: voFile });
     process.stderr.write(`beat ${i + 1}/${BEATS.length} ${b.id} dur=${normDur.toFixed(1)} vo=${b.vo ? vd.toFixed(1) : '-'}\n`);
@@ -543,15 +608,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v4 = path.join(PUBLISH, `${SLUG}-v4.mp4`);
-  fs.copyFileSync(final, v4);
+  const v5 = path.join(PUBLISH, `${SLUG}-v5.mp4`);
+  fs.copyFileSync(final, v5);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v4)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v5)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
