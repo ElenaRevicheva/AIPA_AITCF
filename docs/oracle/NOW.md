@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 20:40 UTC | /api film v11 — QR on every shot; wait for v10 job then fire | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 20:40 UTC — v11 QR on every shot (v10 still compiling)
+### 🟢 11 Sep 20:49 UTC — /api film v11 live (QR on every shot)
 
-**Elena:** QR she made, on every shot. Fruit still moving. What it checks on the grapevine.
+**Elena watches:**
+https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v11.mp4
 
-**THIS:** corner QR overlay on intro + every beat. Publish `-v11` after Actions `34645181835` (v10) exits. Do not fire a second `api-film` until then. Branch `cursor/youtube-api-promo-0841`.
+**DONE:** CTA QR in the corner of every shot. Moving fruit (pomegranate, grapevine with What it checks + neurones, maracuya), then shortened Loom, then finishing slides.
 
-**RISK:** Two `api-film` jobs clobber Oracle. Do not Make Run once. Do not send v7/v9. Do not send v10 if v11 is about to land.
+**NEXT:** Elena watches v11. Do not send v7 or v9.
+
+**VERIFIED BY:** Actions `34645586652` `DONE … (9.9MB, 115s)` `200 video/mp4 9857772` `v11-duration=106.800000` `qr bug on every shot` `grapes salvaged + neuron glow + grow` (v10 `34645181835` also: `ui loom loomwalk 16.0s`)
+
+**RISK:** Actions job exited 2 on the old `echo`/`ffmpeg` `cho:` parse after a real publish. Film is on disk. Do not Make Run once.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
