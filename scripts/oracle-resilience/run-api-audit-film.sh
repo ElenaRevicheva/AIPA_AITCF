@@ -63,8 +63,10 @@ ls -lh "$API_FILM_LOOM"
 ffprobe -v error -show_entries format=duration:stream=width,height,bit_rate -of default=nw=1 "$API_FILM_LOOM" || true
 
 echo
-echo "=== 1b. keep split.mp4 (already Runway). Regen crawlers + dashboard only ==="
-rm -f "$DIR/clips/grapes.mp4" "$DIR/clips/crawlers.mp4" "$DIR/clips/dashboard.mp4"
+echo "=== 1b. keep fruit clips. Regen UI only (short Loom + first-video slides) ==="
+rm -f "$DIR/clips/hero.mp4" "$DIR/clips/form.mp4" "$DIR/clips/auditing.mp4" \
+  "$DIR/clips/score.mp4" "$DIR/clips/checks.mp4" "$DIR/clips/categories.mp4" \
+  "$DIR/clips/cta.mp4" "$DIR/clips/website.mp4"
 mkdir -p "$DIR/clips"
 ls -lh "$DIR/clips" || true
 
@@ -123,7 +125,7 @@ sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
 sudo find "$PUBLISH" -type f -exec chmod 644 {} \;
 ls -lh "$PUBLISH" | redact
 for u in \
-  "$PUBLIC/can-ai-find-and-cite-you-v5.mp4" \
+  "$PUBLIC/can-ai-find-and-cite-you-v6.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you-poster.jpg" \
   "$PUBLIC/watch.html" \
@@ -135,16 +137,16 @@ done
 # Never re-enable set -e after publish. v3 died on `t:`, v4 on `cho:` — both
 # after a real mp4 was already on disk. Acknowledgement is not completion.
 set +e
-if [ -f "$PUBLISH/can-ai-find-and-cite-you-v5.mp4" ]; then
+if [ -f "$PUBLISH/can-ai-find-and-cite-you-v6.mp4" ]; then
   ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
-    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v5.mp4" | redact
-  ffmpeg -y -ss 3 -i "$PUBLISH/can-ai-find-and-cite-you-v5.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-split.jpg
+    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v6.mp4" | redact
+  ffmpeg -y -ss 3 -i "$PUBLISH/can-ai-find-and-cite-you-v6.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-split.jpg
   BYTES=$(wc -c < /tmp/api-film-frame-split.jpg 2>/dev/null || printf '0')
   printf 'frame-split bytes=%s\n' "$BYTES"
 fi
 
 printf '\nDONE api-film rc=%s\n' "${RC:-1}"
-printf 'ELENA: watch %s/can-ai-find-and-cite-you-v5.mp4\n' "$PUBLIC"
+printf 'ELENA: watch %s/can-ai-find-and-cite-you-v6.mp4\n' "$PUBLIC"
 printf 'or %s/watch.html\n' "$PUBLIC"
 printf 'Do not drop this mp4 into Atuona /films. That gallery is poetry.\n'
 exit "${RC:-1}"

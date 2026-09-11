@@ -216,9 +216,10 @@ async function makeCard(titleRaw, subRaw, outFile, d, titleSize, bgImage, noFade
 async function fillClip(src, dest, seconds, startAt) {
   const ss = Math.max(0, startAt || 0);
   const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p`;
+  // Never loop. The 65s Loom's long tail is the results scroll Elena called too long.
   await execFileP(
     'ffmpeg',
-    ['-y', '-ss', ss.toFixed(3), '-stream_loop', '-1', '-i', src, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', seconds.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
+    ['-y', '-ss', ss.toFixed(3), '-i', src, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', seconds.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
     { maxBuffer: 1 << 26, timeout: 180000 },
   );
   return dest;
@@ -253,28 +254,56 @@ function findLoom() {
 async function buildUiClip(b, clipDur, loomState) {
   const parts = [];
   let remain = clipDur;
-  if (b.liveStill) {
-    const stillPath = path.join(HERE, b.liveStill);
-    if (fs.existsSync(stillPath)) {
-      const hold = Math.min(1.8, Math.max(1.2, clipDur * 0.28));
-      const p = path.join(W, `still_${b.id}.mp4`);
-      await stillToClip(stillPath, p, hold);
+  const slidePath = path.join(HERE, b.still);
+  const livePath = b.liveStill ? path.join(HERE, b.liveStill) : null;
+
+  // First-video walkthrough slides lead. They are the prepared 1920×1080 scenes.
+  if (fs.existsSync(slidePath) && b.slideHold !== 0) {
+    const hold = Math.min(b.slideHold || 2.2, Math.max(1.5, remain * 0.36));
+    const p = path.join(W, `slide_${b.id}.mp4`);
+    await stillToClip(slidePath, p, hold);
+    parts.push(p);
+    remain -= hold;
+    process.stderr.write(`ui slide ${b.id} ${hold.toFixed(1)}s ${b.still}\n`);
+  }
+
+  if (livePath && fs.existsSync(livePath) && remain > 0.55 && b.liveHold !== 0) {
+    const hold = Math.min(b.liveHold || 1.2, remain * 0.28);
+    if (hold >= 0.55) {
+      const p = path.join(W, `live_${b.id}.mp4`);
+      await stillToClip(livePath, p, hold);
       parts.push(p);
       remain -= hold;
-      process.stderr.write(`ui still ${b.id} ${hold.toFixed(1)}s ${b.liveStill}\n`);
+      process.stderr.write(`ui live ${b.id} ${hold.toFixed(1)}s ${b.liveStill}\n`);
     }
   }
-  if (loomState.path && remain > 0.5) {
-    const slice = path.join(W, `loom_${b.id}.mp4`);
-    if (loomState.t + remain > loomState.end - 0.2) loomState.t = 0.4;
-    await fillClip(loomState.path, slice, remain, loomState.t);
-    loomState.t += remain;
-    parts.push(slice);
-    process.stderr.write(`ui loom ${b.id} ${remain.toFixed(1)}s @${(loomState.t - remain).toFixed(1)}\n`);
-  } else if (!parts.length) {
-    const still = path.join(HERE, b.still);
-    await stillToClip(still, path.join(W, `fb_${b.id}.mp4`), clipDur);
-    parts.push(path.join(W, `fb_${b.id}.mp4`));
+
+  const loomMax = b.loomMax === 0 ? 0 : b.loomMax || 2.5;
+  if (loomState.path && loomMax > 0 && remain > 0.45) {
+    const avail = loomState.end - loomState.t;
+    if (avail > 0.45) {
+      const take = Math.min(remain, loomMax, avail);
+      const slice = path.join(W, `loom_${b.id}.mp4`);
+      await fillClip(loomState.path, slice, take, loomState.t);
+      loomState.t += take;
+      parts.push(slice);
+      remain -= take;
+      process.stderr.write(`ui loom ${b.id} ${take.toFixed(1)}s @${(loomState.t - take).toFixed(1)} no-loop\n`);
+    } else {
+      process.stderr.write(`ui loom ${b.id} skipped — useful window used up\n`);
+    }
+  }
+
+  if (remain > 0.35) {
+    const padSrc = fs.existsSync(slidePath) ? slidePath : livePath && fs.existsSync(livePath) ? livePath : slidePath;
+    const p = path.join(W, `pad_${b.id}.mp4`);
+    await stillToClip(padSrc, p, remain);
+    parts.push(p);
+  }
+  if (!parts.length) {
+    const fb = path.join(W, `fb_${b.id}.mp4`);
+    await stillToClip(slidePath, fb, clipDur);
+    parts.push(fb);
   }
   const raw = path.join(CLIPDIR, `${b.id}.mp4`);
   await concatClips(parts, raw);
@@ -292,10 +321,12 @@ async function stillToClip(src, dest, seconds) {
   return dest;
 }
 
-async function normalizeVideo(src, dest, clipDur) {
+async function normalizeVideo(src, dest, clipDur, opts = {}) {
   const nat = await dur(src);
-  const factor = (clipDur / nat).toFixed(5);
-  const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=decrease,pad=${WX}:${HY}:(ow-iw)/2:(oh-ih)/2:black,setpts=${factor}*PTS,fps=${FPS},format=yuv420p`;
+  const vfCore = `scale=${WX}:${HY}:force_original_aspect_ratio=decrease,pad=${WX}:${HY}:(ow-iw)/2:(oh-ih)/2:black,fps=${FPS},format=yuv420p`;
+  const vf = opts.pad
+    ? `${vfCore.replace(',format=yuv420p', '')},tpad=stop_mode=clone:stop_duration=${Math.max(0, clipDur - nat).toFixed(3)},format=yuv420p`
+    : `scale=${WX}:${HY}:force_original_aspect_ratio=decrease,pad=${WX}:${HY}:(ow-iw)/2:(oh-ih)/2:black,setpts=${(clipDur / nat).toFixed(5)}*PTS,fps=${FPS},format=yuv420p`;
   await execFileP(
     'ffmpeg',
     ['-y', '-i', src, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', clipDur.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
@@ -463,13 +494,25 @@ const BEATS = [
       { text: '420+ audits   ·   14,000+ signals   ·   210+ sites   ·   median 85', y: 'H*0.86', size: 28, color: 'white' },
     ],
   },
-  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.' },
-  { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.' },
-  { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.' },
-  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.' },
-  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.' },
-  { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.' },
-  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api' },
+  {
+    id: 'website',
+    kind: 'ui',
+    still: 'ui/ui-hero.png',
+    liveStill: 'ui/live-hero.png',
+    vo: null,
+    cap: null,
+    clipDur: 10,
+    slideHold: 1.8,
+    liveHold: 1.5,
+    loomMax: 6.8,
+  },
+  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 2.2, liveHold: 0.9 },
+  { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 2.2 },
+  { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 2.0 },
+  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 2.4 },
+  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 0 },
+  { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.', loomMax: 0 },
+  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api', loomMax: 1.6 },
 ];
 
 async function main() {
@@ -508,8 +551,10 @@ async function main() {
   seq.push(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 52, cover, true));
 
   const loomPath = findLoom();
-  const loomState = { path: loomPath, t: 0.4, end: loomPath ? await dur(loomPath) : 0 };
-  process.stderr.write(loomPath ? `loom ${loomPath} dur=${loomState.end.toFixed(1)}s\n` : 'WARN no Loom walkthrough — UI stills only\n');
+  const loomRaw = loomPath ? await dur(loomPath) : 0;
+  const loomUseful = loomPath ? Math.min(loomRaw, Number(process.env.API_FILM_LOOM_END || 20)) : 0;
+  const loomState = { path: loomPath, t: 0.4, end: loomUseful };
+  process.stderr.write(loomPath ? `loom ${loomPath} dur=${loomRaw.toFixed(1)}s useful=${loomUseful.toFixed(1)}s (no loop, no results-scroll tail)\n` : 'WARN no Loom walkthrough — UI stills only\n');
 
   const voInfo = [];
   for (let i = 0; i < BEATS.length; i++) {
@@ -524,7 +569,7 @@ async function main() {
       vd = await dur(voFile);
     }
     let raw = path.join(CLIPDIR, `${b.id}.mp4`);
-    const clipDur = b.vo ? Math.max(6.5, LEAD + vd + TAIL) : 5.5;
+    const clipDur = b.clipDur || (b.vo ? Math.max(6.5, LEAD + vd + TAIL) : 5.5);
     if (b.kind === 'ui') {
       raw = await buildUiClip(b, clipDur, loomState);
     } else {
@@ -535,7 +580,7 @@ async function main() {
     const nat = await dur(raw);
     const normDur = b.kind === 'ui' ? clipDur : b.vo ? Math.max(nat, LEAD + vd + TAIL) : Math.min(Math.max(nat, 4.8), 6.2);
     const norm = path.join(W, `n_${b.id}.mp4`);
-    await normalizeVideo(raw, norm, normDur);
+    await normalizeVideo(raw, norm, normDur, { pad: b.kind === 'ui' });
     const labeled = path.join(W, `lb_${b.id}.mp4`);
     await overlayLabels(norm, labeled, b.labels);
     const slid = path.join(W, `sl_${b.id}.mp4`);
@@ -608,15 +653,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v5 = path.join(PUBLISH, `${SLUG}-v5.mp4`);
-  fs.copyFileSync(final, v5);
+  const v6 = path.join(PUBLISH, `${SLUG}-v6.mp4`);
+  fs.copyFileSync(final, v6);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v5)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v6)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
