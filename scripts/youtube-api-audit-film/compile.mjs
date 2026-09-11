@@ -457,6 +457,22 @@ async function neuronPulse(src, dest, seconds, { sway, grow } = {}) {
   return dest;
 }
 
+async function overlayQrBug(src, dest) {
+  const qr = path.join(HERE, 'qr/api-cta-qr.png');
+  if (!fs.existsSync(qr) || !fs.existsSync(src)) {
+    if (src !== dest && fs.existsSync(src)) fs.copyFileSync(src, dest);
+    return dest;
+  }
+  // Bottom-right, clear of centred captions. Loop the PNG for the whole shot.
+  const fc = `[1:v]scale=168:168[qr];[0:v][qr]overlay=W-w-28:H-h-36:shortest=1[v]`;
+  await execFileP(
+    'ffmpeg',
+    ['-y', '-i', src, '-loop', '1', '-i', qr, '-filter_complex', fc, '-map', '[v]', '-map', '0:a', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'copy', dest],
+    { maxBuffer: 1 << 26, timeout: 120000 },
+  );
+  return dest;
+}
+
 async function overlayLabels(src, dest, labels) {
   if (!labels || !labels.length) {
     fs.copyFileSync(src, dest);
@@ -655,7 +671,7 @@ async function main() {
 
   const cover = path.join(HERE, 'fruit/geo-pomegranate-100-vs-72.jpg');
   const seq = [];
-  seq.push(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 60, cover, true));
+  seq.push(await overlayQrBug(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 60, cover, true), path.join(W, 'card_intro_qr.mp4')));
 
   const loomPath = findLoom();
   const loomRaw = loomPath ? await dur(loomPath) : 0;
@@ -697,7 +713,9 @@ async function main() {
     await overlaySlide(labeled, slid, b.slide);
     const baked = path.join(W, `fc_${String(i).padStart(2, '0')}.mp4`);
     await bakeCaption(slid, baked, b.cap, normDur);
-    seq.push(baked);
+    const withQr = path.join(W, `qr_${String(i).padStart(2, '0')}.mp4`);
+    await overlayQrBug(baked, withQr);
+    seq.push(withQr);
     if (voFile) voInfo.push({ segIndex: i + 1, file: voFile });
     if (b.id === 'grapes') process.stderr.write('chapter What it checks on moving/growing grapes + neurones\n');
     if (b.id === 'loomwalk') process.stderr.write('chapter Elena Loom shortened (no results-scroll tail)\n');
@@ -707,7 +725,7 @@ async function main() {
   const qrCard = path.join(HERE, 'qr/api-cta-endcard.png');
   if (!fs.existsSync(qrCard)) throw new Error('missing QR end card ' + qrCard);
   seq.push(await stillToClip(qrCard, path.join(W, 'card_qr.mp4'), 5.8));
-  process.stderr.write(`qr outro 5.8s ${CTA}\n`);
+  process.stderr.write(`qr bug on every shot; qr outro 5.8s ${CTA}\n`);
 
   const durs = [];
   for (const c of seq) durs.push(await dur(c));
@@ -777,15 +795,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v10 = path.join(PUBLISH, `${SLUG}-v10.mp4`);
-  fs.copyFileSync(final, v10);
+  const v11 = path.join(PUBLISH, `${SLUG}-v11.mp4`);
+  fs.copyFileSync(final, v11);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v10)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v11)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
