@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 15:25 UTC | Wire Elena Loom + live /api stills; juicier Pixabay bed | scripts/youtube-api-audit-film — no Oracle restart | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,17 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 15:25 UTC — Loom walkthrough + juicier bed
+### 🟢 STOPPED 11 Sep 15:35 UTC — Loom + Tropical Cocktail in the /api film
 
-**DONE already:** 79s cut live. Elena liked VO/captions, not Morning Light (too calm/sad) and not the HTML mock UI.
+**DONE:** Same 79s VO/captions. UI is Elena's muted Loom (`8dfbc2ec…`, 26.5s) plus her three live `/api` stills (hero, categories, citrus CTA — chrome/taskbar/snipping tool cropped). Bed: Pixabay **Tropical Cocktail** by The_Mountain (Uplifting, instrumental). Public:
+`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4`
+Pack: `docs/selling/YOUTUBE_API_AUDIT_PROMO.md`. PR **#51**. Trigger `# idle`. Influencer + VJH paused.
 
-**NEXT (this agent):** keep VO + burn-in captions. Replace UI beats with Elena's muted Loom (`8dfbc2ec71c343bd9b06a64949e61b68`) plus her three live `/api` screenshots (crop chrome/taskbar/snipping tool). New Pixabay bed: chillout energy, juicy/fresh, instrumental, not noisy. Branch `cursor/youtube-api-promo-0841` PR **#51**. No influencer/VJH restart.
+**NEXT (Elena):** hard-refresh the mp4, then upload. Credit Tropical Cocktail / The_Mountain. CTA `https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta`. **Do not drop into Atuona `/films`.** **Do not Make Run once.**
 
-**NEXT (Elena):** wait for the remixed public mp4 (hard-refresh).
+**NEXT (agent):** do not fire another promo. Claim empty.
 
-**VERIFIED BY:** pending `api-film` run.
+**VERIFIED BY:** Actions `34616631936` `compile exit 0` · `loom … dur=26.5s` · `SELECTED …/fresh-tropical-cocktail-pixabay.mp3` · `name Tropical Cocktail` · `DONE … (40.6MB, 79s)` · Oracle curl `200 application/octet-stream 40646845`.
 
-**RISK:** This VM cannot TLS to loom.com — download on the Actions runner or Oracle. Do not rewrite VO strings.
+**RISK:** Loom is 26.5s so UI beats wrap the walkthrough. Cloud agents cannot TLS to loom.com or webhook.aideazz.xyz.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
