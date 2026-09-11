@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 15:44 UTC | Cache-bust /api YouTube mp4 (nginx max-age=86400) | nginx youtube location, versioned mp4 — no service restart except nginx reload | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 STOPPED 11 Sep 15:35 UTC — Loom + Tropical Cocktail in the /api film
+### 🟡 IN FLIGHT 11 Sep 15:44 UTC — Elena sees the OLD film at the stable URL
 
-**DONE:** Same 79s VO/captions. UI is Elena's muted Loom (`8dfbc2ec…`, 26.5s) plus her three live `/api` stills (hero, categories, citrus CTA — chrome/taskbar/snipping tool cropped). Bed: Pixabay **Tropical Cocktail** by The_Mountain (Uplifting, instrumental). Public:
-`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4`
-Pack: `docs/selling/YOUTUBE_API_AUDIT_PROMO.md`. PR **#51**. Trigger `# idle`. Influencer + VJH paused.
+**Cause:** nginx `Cache-Control: public, max-age=86400` on `/influencer-images/`. Browser kept the 22MB Morning Light cut.
 
-**NEXT (Elena):** hard-refresh the mp4, then upload. Credit Tropical Cocktail / The_Mountain. CTA `https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta`. **Do not drop into Atuona `/films`.** **Do not Make Run once.**
+**NEXT:** versioned filename `…/can-ai-find-and-cite-you-v2.mp4` plus a `/influencer-images/youtube/` location with `no-cache`. Do not recompile. Do not restart influencer/VJH.
 
-**NEXT (agent):** do not fire another promo. Claim empty.
+**VERIFIED BY:** pending `api-film-bust` run.
 
-**VERIFIED BY:** Actions `34616631936` `compile exit 0` · `loom … dur=26.5s` · `SELECTED …/fresh-tropical-cocktail-pixabay.mp3` · `name Tropical Cocktail` · `DONE … (40.6MB, 79s)` · Oracle curl `200 application/octet-stream 40646845`.
-
-**RISK:** Loom is 26.5s so UI beats wrap the walkthrough. Cloud agents cannot TLS to loom.com or webhook.aideazz.xyz.
+**RISK:** nginx reload. Check `nginx -t` first.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
