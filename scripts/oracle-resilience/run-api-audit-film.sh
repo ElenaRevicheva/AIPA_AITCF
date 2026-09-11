@@ -63,10 +63,10 @@ ls -lh "$API_FILM_LOOM"
 ffprobe -v error -show_entries format=duration:stream=width,height,bit_rate -of default=nw=1 "$API_FILM_LOOM" || true
 
 echo
-echo "=== 1b. keep fruit clips except grapes (v7 regen). Wipe UI + grapes only ==="
+echo "=== 1b. keep fruit clips including grapes glow. Regen UI only ==="
 rm -f "$DIR/clips/hero.mp4" "$DIR/clips/form.mp4" "$DIR/clips/auditing.mp4" \
   "$DIR/clips/score.mp4" "$DIR/clips/checks.mp4" "$DIR/clips/categories.mp4" \
-  "$DIR/clips/cta.mp4" "$DIR/clips/website.mp4" "$DIR/clips/grapes.mp4"
+  "$DIR/clips/cta.mp4" "$DIR/clips/website.mp4"
 mkdir -p "$DIR/clips"
 ls -lh "$DIR/clips" || true
 
@@ -109,7 +109,7 @@ echo
 echo "=== 3. publish + probe ==="
 sudo mkdir -p "$PUBLISH"
 # Failed compile must not swap watch.html onto a missing -vN.
-if [ "${RC:-1}" -eq 0 ] && [ -f "$DIR/out/can-ai-find-and-cite-you-v7.mp4" ]; then
+if [ "${RC:-1}" -eq 0 ] && [ -f "$DIR/out/can-ai-find-and-cite-you-v8.mp4" ]; then
   sudo cp -f "$DIR/out/"*.mp4 "$PUBLISH/" 2>/dev/null || true
   sudo cp -f "$DIR/out/"*.jpg "$PUBLISH/" 2>/dev/null || true
   sudo cp -f "$DIR/out/"*.png "$PUBLISH/" 2>/dev/null || true
@@ -121,14 +121,14 @@ if [ "${RC:-1}" -eq 0 ] && [ -f "$DIR/out/can-ai-find-and-cite-you-v7.mp4" ]; th
       /tmp/api-film-watch.html | sudo tee "$PUBLISH/watch.html" >/dev/null
   fi
 else
-  echo "SKIP publish — compile exit ${RC:-1} (keep live player / v6)"
+  echo "SKIP publish — compile exit ${RC:-1} (keep live player / last good cut)"
 fi
 sudo chown -R www-data:www-data /var/www/influencer-images
 sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
 sudo find "$PUBLISH" -type f -exec chmod 644 {} \;
 ls -lh "$PUBLISH" | redact
 for u in \
-  "$PUBLIC/can-ai-find-and-cite-you-v7.mp4" \
+  "$PUBLIC/can-ai-find-and-cite-you-v8.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you.mp4" \
   "$PUBLIC/can-ai-find-and-cite-you-poster.jpg" \
   "$PUBLIC/watch.html" \
@@ -140,16 +140,19 @@ done
 # Never re-enable set -e after publish. v3 died on `t:`, v4 on `cho:` — both
 # after a real mp4 was already on disk. Acknowledgement is not completion.
 set +e
-if [ -f "$PUBLISH/can-ai-find-and-cite-you-v7.mp4" ]; then
+if [ -f "$PUBLISH/can-ai-find-and-cite-you-v8.mp4" ]; then
   ffprobe -v error -show_entries format=duration:stream=codec_name,width,height,r_frame_rate,bit_rate \
-    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v7.mp4" | redact
-  ffmpeg -y -ss 7 -i "$PUBLISH/can-ai-find-and-cite-you-v7.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-grapes.jpg
+    -of default=nw=1 "$PUBLISH/can-ai-find-and-cite-you-v8.mp4" | redact
+  ffmpeg -y -ss 7 -i "$PUBLISH/can-ai-find-and-cite-you-v8.mp4" -frames:v 1 -update 1 /tmp/api-film-frame-grapes.jpg
   BYTES=$(wc -c < /tmp/api-film-frame-grapes.jpg 2>/dev/null || printf '0')
   printf 'frame-grapes bytes=%s\n' "$BYTES"
+  DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$PUBLISH/can-ai-find-and-cite-you-v8.mp4" || echo 0)
+  printf 'v8-duration=%s\n' "$DUR"
+  awk -v d="$DUR" 'BEGIN { if (d+0 < 60) { print "FATAL: v8 shorter than 60s — stub, do not send Elena"; exit 1 } }' || RC=1
 fi
 
-printf '\nDONE api-film rc=%s\n' "${RC:-1}"
-printf 'ELENA: watch %s/can-ai-find-and-cite-you-v7.mp4\n' "$PUBLIC"
+echo "DONE api-film rc=${RC:-1}"
+echo "ELENA: watch ${PUBLIC}/can-ai-find-and-cite-you-v8.mp4"
 printf 'or %s/watch.html\n' "$PUBLIC"
 printf 'Do not drop this mp4 into Atuona /films. That gallery is poetry.\n'
 exit "${RC:-1}"

@@ -287,15 +287,18 @@ async function buildUiClip(b, clipDur, loomState) {
 
   const loomMax = b.loomMax === 0 ? 0 : b.loomMax || 2.5;
   if (loomState.path && loomMax > 0 && remain > 0.45) {
-    const avail = loomState.end - loomState.t;
+    // checks may jump to the results waterfall (past the sequential walk cap).
+    const startAt = b.loomAt != null ? b.loomAt : loomState.t;
+    const hardEnd = b.loomAt != null ? startAt + loomMax + 0.35 : loomState.end;
+    const avail = hardEnd - startAt;
     if (avail > 0.45) {
       const take = Math.min(remain, loomMax, avail);
       const slice = path.join(W, `loom_${b.id}.mp4`);
-      await fillClip(loomState.path, slice, take, loomState.t);
-      loomState.t += take;
+      await fillClip(loomState.path, slice, take, startAt);
+      if (b.loomAt == null) loomState.t += take;
       parts.push(slice);
       remain -= take;
-      process.stderr.write(`ui loom ${b.id} ${take.toFixed(1)}s @${(loomState.t - take).toFixed(1)} no-loop\n`);
+      process.stderr.write(`ui loom ${b.id} ${take.toFixed(1)}s @${startAt.toFixed(1)} no-loop\n`);
     } else {
       process.stderr.write(`ui loom ${b.id} skipped — useful window used up\n`);
     }
@@ -560,8 +563,8 @@ const BEATS = [
   { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 2.2, liveHold: 1.2 },
   { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 2.2 },
   { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 2.0 },
-  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 2.4 },
-  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 0 },
+  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 1.2 },
+  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 1.0, loomAt: 21 },
   { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.', loomMax: 0 },
   { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api', loomMax: 1.6 },
 ];
@@ -660,6 +663,8 @@ async function main() {
 
   const durs = [];
   for (const c of seq) durs.push(await dur(c));
+  const expect = durs.reduce((a, b) => a + b, 0) - XFADE_D * Math.max(0, seq.length - 1);
+  process.stderr.write(`xfade ${seq.length} clips durs=${durs.map((d) => d.toFixed(1)).join('+')} expect=${expect.toFixed(1)}s\n`);
   const segStart = (k) => {
     let s = 0;
     for (let i = 0; i < k; i++) s += durs[i];
@@ -668,13 +673,18 @@ async function main() {
 
   const inputs = seq.flatMap((c) => ['-i', c]);
   let fc = '';
-  let vlab = '0:v',
-    alab = '0:a',
+  for (let i = 0; i < seq.length; i++) {
+    // Same SAR trap as v6 hero concat: grapes setsar=1 vs Runway 15709:15711 truncated the xfade to ~12s.
+    fc += `[${i}:v]fps=${FPS},format=yuv420p,scale=${WX}:${HY}:force_original_aspect_ratio=decrease,pad=${WX}:${HY}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,setpts=PTS-STARTPTS[vx${i}];`;
+    fc += `[${i}:a]aformat=sample_rates=44100:channel_layouts=stereo,aresample=44100,asetpts=PTS-STARTPTS[ax${i}];`;
+  }
+  let vlab = 'vx0',
+    alab = 'ax0',
     merged = durs[0];
   for (let k = 1; k < seq.length; k++) {
     const ofs = Math.max(0, merged - XFADE_D).toFixed(3);
-    fc += `[${vlab}][${k}:v]xfade=transition=fade:duration=${XFADE_D}:offset=${ofs}[vc${k}];`;
-    fc += `[${alab}][${k}:a]acrossfade=d=${XFADE_D}[ac${k}];`;
+    fc += `[${vlab}][vx${k}]xfade=transition=fade:duration=${XFADE_D}:offset=${ofs}[vc${k}];`;
+    fc += `[${alab}][ax${k}]acrossfade=d=${XFADE_D}[ac${k}];`;
     vlab = `vc${k}`;
     alab = `ac${k}`;
     merged += durs[k] - XFADE_D;
@@ -687,6 +697,10 @@ async function main() {
   });
 
   const LEN = await dur(body);
+  process.stderr.write(`xfade body ${LEN.toFixed(1)}s (expect ${expect.toFixed(1)}s)\n`);
+  if (LEN < 60 || LEN < expect * 0.7) {
+    throw new Error(`xfade truncated: body ${LEN.toFixed(1)}s expect ${expect.toFixed(1)}s — refusing to publish a stub`);
+  }
   let music = pickMusic();
   if (!music) music = await makeDrone(path.join(W, 'drone.mp3'));
   process.stderr.write(`music ${music}\n`);
@@ -715,15 +729,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v7 = path.join(PUBLISH, `${SLUG}-v7.mp4`);
-  fs.copyFileSync(final, v7);
+  const v8 = path.join(PUBLISH, `${SLUG}-v8.mp4`);
+  fs.copyFileSync(final, v8);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v7)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v8)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
