@@ -32,8 +32,8 @@ jobs:
           [ -n "$LINE" ] || { echo "::error::.influencer-diag-trigger is empty"; exit 1; }
           case "$LINE" in
             \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
-            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film|api-film-bust) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, api-film-bust, or # idle — got '$LINE'"; exit 1 ;;
+            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film|api-film-bust|api-film-music) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, api-film-bust, api-film-music, or # idle — got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -116,6 +116,29 @@ jobs:
               ubuntu@170.9.242.90:/tmp/
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fire-influencer-promo.sh
+          elif [ "$MODE" = "api-film-music" ]; then
+            ssh_retry 'mkdir -p /tmp/youtube-api-audit-film /tmp/api-film-out' || exit 255
+            scp_retry \
+              scripts/youtube-api-audit-film/fetch-pixabay-music.py \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film/fetch-pixabay-music.py || exit 255
+            scp_retry \
+              scripts/oracle-resilience/api-film-watch.html \
+              ubuntu@170.9.242.90:/tmp/api-film-watch.html || exit 255
+            n=0
+            REMIX_OK=0
+            while [ "$n" -lt 6 ]; do
+              n=$((n + 1))
+              echo "ssh remix attempt $n"
+              if ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- api-film-music \
+                < scripts/oracle-resilience/remix-api-film-music.sh; then
+                REMIX_OK=1
+                RC=0
+                break
+              fi
+              echo "ssh remix attempt $n failed"
+              sleep $((n * 8))
+            done
+            [ "$REMIX_OK" = "1" ] || { echo "FATAL: remix SSH failed"; exit 255; }
           elif [ "$MODE" = "api-film-bust" ]; then
             scp $SSHOPTS \
               scripts/oracle-resilience/api-film-watch.html \

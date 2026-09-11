@@ -31,6 +31,24 @@ SELECTED = DEST_DIR / "SELECTED.path"
 # Prefer organic/sunset chill house published in 2026, instrumental, not sad.
 CANDIDATES = [
     {
+        "page": "https://pixabay.com/music/search/joyful%20chill%20house%202026/",
+        "dest": "joyful-chill-house-2026-pixabay.mp3",
+        "expect": "Joyful Chill",
+        "search": True,
+    },
+    {
+        "page": "https://pixabay.com/music/search/energetic%20chillout%202026/",
+        "dest": "energetic-chillout-2026-pixabay.mp3",
+        "expect": "Energetic",
+        "search": True,
+    },
+    {
+        "page": "https://pixabay.com/music/search/feel%20good%20lounge%202026/",
+        "dest": "feel-good-lounge-2026-pixabay.mp3",
+        "expect": "Feel Good",
+        "search": True,
+    },
+    {
         "page": "https://pixabay.com/music/search/chillout%20lounge%202026/",
         "dest": "chillout-lounge-2026-pixabay.mp3",
         "expect": "Chillout",
@@ -58,11 +76,12 @@ CANDIDATES = [
 
 REJECT_MOOD = re.compile(
     r"dark|drone|suspense|horror|trailer|epic|trap|phonk|restless|chasing|aggressive|"
-    r"noisy|sad|melanchol|meditat|dreamy|vocal|lyrics|singing|choir|morning.?light|tropical.?cocktail|distant.?horizon",
+    r"noisy|sad|melanchol|meditat|dreamy|enigmatic|vocal|lyrics|singing|choir|"
+    r"morning.?light|tropical.?cocktail|distant.?horizon",
     re.I,
 )
 WANT_MOOD = re.compile(
-    r"chill|house|lounge|organic|sunset|groove|deep.?house",
+    r"chill|house|lounge|organic|sunset|groove|deep.?house|joyful|feel.?good|energetic|upbeat|summer",
     re.I,
 )
 
