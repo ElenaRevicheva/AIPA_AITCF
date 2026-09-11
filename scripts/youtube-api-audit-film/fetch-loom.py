@@ -4,6 +4,9 @@
 Public share: https://www.loom.com/share/f4a4a4cf12e34fb2b7984ab1663a2386
 POST /api/campaigns/sessions/{id}/transcoded-url → signed CDN mp4.
 This VM often cannot TLS to loom.com; the GitHub Actions runner and Oracle can.
+
+Prefer raw-url (original capture). If that URL 200s a stub (we saw 230 bytes),
+fall through to transcoded-url. A URL is not a file.
 """
 from __future__ import annotations
 
@@ -18,6 +21,7 @@ from pathlib import Path
 LOOM_ID = "f4a4a4cf12e34fb2b7984ab1663a2386"
 TRANSCODE = f"https://www.loom.com/api/campaigns/sessions/{LOOM_ID}/transcoded-url"
 RAW = f"https://www.loom.com/api/campaigns/sessions/{LOOM_ID}/raw-url"
+MIN_BYTES = 200000
 
 
 def post_url(endpoint: str) -> str:
@@ -41,47 +45,8 @@ def post_url(endpoint: str) -> str:
     return url
 
 
-def transcoded_url() -> str:
-    return post_url(TRANSCODE)
-
-
-def best_url() -> str:
-    """Prefer raw (original screen capture) over the tiny transcoded preview."""
-    try:
-        url = post_url(RAW)
-        print("loom using raw-url")
-        return url
-    except Exception as e:
-        print(f"WARN loom raw-url: {type(e).__name__}: {e}")
-        print("loom falling back to transcoded-url")
-        return transcoded_url()
-
-
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--out", required=True)
-    ap.add_argument("--force", action="store_true")
-    args = ap.parse_args()
-    dest = Path(args.out)
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    id_file = dest.with_suffix(".id")
-    cached_id = id_file.read_text().strip() if id_file.exists() else ""
-    if (
-        not args.force
-        and dest.exists()
-        and dest.stat().st_size > 200000
-        and cached_id == LOOM_ID
-    ):
-        print(f"loom cache hit {dest} {dest.stat().st_size} bytes id={LOOM_ID}")
-        return 0
-    print(f"loom id {LOOM_ID}")
-    try:
-        url = best_url()
-    except Exception as e:
-        print(f"FATAL loom transcode: {type(e).__name__}: {e}")
-        return 1
-    print("loom cdn url ok")
-    tmp = dest.with_suffix(".part")
+def curl_to(url: str, tmp: Path) -> int:
+    tmp.unlink(missing_ok=True)
     try:
         subprocess.check_call(
             [
@@ -98,18 +63,62 @@ def main() -> int:
             ]
         )
     except subprocess.CalledProcessError as e:
-        print(f"FATAL loom curl rc={e.returncode}")
+        print(f"WARN loom curl rc={e.returncode}")
         tmp.unlink(missing_ok=True)
-        return 1
-    size = tmp.stat().st_size if tmp.exists() else 0
-    if size < 200000:
-        print(f"FATAL loom mp4 too small ({size})")
+        return 0
+    return tmp.stat().st_size if tmp.exists() else 0
+
+
+def peek(tmp: Path) -> str:
+    if not tmp.exists():
+        return ""
+    raw = tmp.read_bytes()[:180]
+    return raw.decode("utf-8", "replace").replace("\n", " ")
+
+
+def sources() -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    for name, endpoint in (("raw-url", RAW), ("transcoded-url", TRANSCODE)):
+        try:
+            url = post_url(endpoint)
+            print(f"loom {name} cdn url ok")
+            out.append((name, url))
+        except Exception as e:
+            print(f"WARN loom {name}: {type(e).__name__}: {e}")
+    return out
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--force", action="store_true")
+    args = ap.parse_args()
+    dest = Path(args.out)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    id_file = dest.with_suffix(".id")
+    cached_id = id_file.read_text().strip() if id_file.exists() else ""
+    if (
+        not args.force
+        and dest.exists()
+        and dest.stat().st_size > MIN_BYTES
+        and cached_id == LOOM_ID
+    ):
+        print(f"loom cache hit {dest} {dest.stat().st_size} bytes id={LOOM_ID}")
+        return 0
+    print(f"loom id {LOOM_ID}")
+    tmp = dest.with_suffix(".part")
+    for name, url in sources():
+        print(f"loom downloading {name}")
+        size = curl_to(url, tmp)
+        if size >= MIN_BYTES:
+            tmp.replace(dest)
+            id_file.write_text(LOOM_ID + "\n")
+            print(f"loom saved {dest} {size} bytes via {name}")
+            return 0
+        print(f"WARN {name} too small ({size}) peek={peek(tmp)!r}")
         tmp.unlink(missing_ok=True)
-        return 1
-    tmp.replace(dest)
-    id_file.write_text(LOOM_ID + "\n")
-    print(f"loom saved {dest} {size} bytes")
-    return 0
+    print("FATAL loom: neither raw-url nor transcoded-url produced an mp4")
+    return 1
 
 
 if __name__ == "__main__":
