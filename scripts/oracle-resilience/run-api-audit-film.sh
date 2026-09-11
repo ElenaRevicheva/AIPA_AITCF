@@ -49,8 +49,9 @@ ls "$DIR/kit/ui"
 echo
 echo "=== 2. compile (Runway i2v + onyx TTS + xfade). This is the studio. ==="
 export API_FILM_DIR="$DIR"
-export API_FILM_PUBLISH="$PUBLISH"
+export API_FILM_PUBLISH="$DIR/out"
 export CTO_ENV="$ENVF"
+mkdir -p "$DIR/out"
 # node compile reads keys itself; do not source .env (FROM_EMAIL has spaces)
 set +e
 node "$DIR/kit/compile.mjs"
@@ -61,6 +62,9 @@ echo "compile exit $RC"
 echo
 echo "=== 3. publish + probe ==="
 sudo mkdir -p "$PUBLISH"
+if ls "$DIR/out"/*.mp4 >/dev/null 2>&1; then
+  sudo cp -f "$DIR/out"/*.mp4 "$DIR/out"/*.jpg "$PUBLISH/" 2>/dev/null || sudo cp -f "$DIR/out"/*.mp4 "$PUBLISH/"
+fi
 sudo chown -R www-data:www-data /var/www/influencer-images
 sudo find "$PUBLISH" -type d -exec chmod 755 {} \;
 sudo find "$PUBLISH" -type f -exec chmod 644 {} \;

@@ -1,2 +1,2 @@
 api-film
-# Oracle Atuona studio: Runway i2v + onyx TTS + /api walkthrough
+# retry: sequential Runway + write to ~/out then sudo publish

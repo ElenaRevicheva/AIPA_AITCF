@@ -35,7 +35,7 @@ const CLIPDIR = path.join(BASE, 'clips');
 const ENV_FILE = process.env.CTO_ENV || '/home/ubuntu/cto-aipa/.env';
 const MUSIC_DIR = '/home/ubuntu/cto-aipa/data/atuona/films/music';
 const BURNED_MUSIC = /light in the void|fatal error|dark-cinematic-drone/i;
-const PUBLISH = process.env.API_FILM_PUBLISH || '/var/www/influencer-images/youtube';
+const PUBLISH = process.env.API_FILM_PUBLISH || path.join(BASE, 'out');
 const PUBLIC = 'https://webhook.aideazz.xyz/influencer-images/youtube';
 
 const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
@@ -156,7 +156,7 @@ async function runwayI2V(stillPath, promptText, destMp4) {
   if (!create.ok) throw new Error(`Runway create ${create.status}: ${createText.slice(0, 240)}`);
   const { id } = JSON.parse(createText);
   process.stderr.write(`runway job ${id} ${path.basename(stillPath)}\n`);
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 30; i++) {
     await new Promise((r) => setTimeout(r, 20000));
     const st = await fetch(`${RUNWAY_API}/tasks/${id}`, {
       headers: { Authorization: `Bearer ${RUNWAY}`, 'X-Runway-Version': RUNWAY_VER },
@@ -175,7 +175,7 @@ async function runwayI2V(stillPath, promptText, destMp4) {
       return destMp4;
     }
     if (j.status === 'FAILED') throw new Error(`Runway FAILED: ${j.failure || raw.slice(0, 200)}`);
-    process.stderr.write(`runway ${id} ${j.status} (${i + 1}/16)\n`);
+    process.stderr.write(`runway ${id} ${j.status} (${i + 1}/30)\n`);
   }
   throw new Error('Runway poll timeout');
 }
@@ -315,29 +315,27 @@ const BEATS = [
 ];
 
 async function main() {
-  for (const d of [BASE, W, VODIR, CLIPDIR]) fs.mkdirSync(d, { recursive: true });
+  for (const d of [BASE, W, VODIR, CLIPDIR, PUBLISH]) fs.mkdirSync(d, { recursive: true });
   fs.writeFileSync(path.join(BASE, 'ffmpeg-commands.log'), '');
   process.stderr.write(`=== api-audit-film ${new Date().toISOString()} ===\n`);
   process.stderr.write(`OPENAI ${OPENAI ? 'yes' : 'NO'} RUNWAY ${RUNWAY ? 'yes' : 'NO'}\n`);
 
   if (RUNWAY) {
-    process.stderr.write('Runway Gen-4.5 image→video (parallel, same as /visualize runway)\n');
-    await Promise.all(
-      BEATS.filter((b) => b.kind === 'runway').map(async (b) => {
-        const still = path.join(HERE, b.still);
-        const raw = path.join(CLIPDIR, `${b.id}.mp4`);
-        if (fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
-          process.stderr.write(`runway cache hit ${b.id}\n`);
-          return;
-        }
-        try {
-          await runwayI2V(still, b.motion, raw);
-        } catch (e) {
-          process.stderr.write(`WARN runway ${b.id}: ${e.message} — still fallback\n`);
-          await stillToClip(still, raw, 5.5);
-        }
-      }),
-    );
+    process.stderr.write('Runway Gen-4.5 image→video (one at a time — parallel THROTTLEs)\n');
+    for (const b of BEATS.filter((x) => x.kind === 'runway')) {
+      const still = path.join(HERE, b.still);
+      const raw = path.join(CLIPDIR, `${b.id}.mp4`);
+      if (fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
+        process.stderr.write(`runway cache hit ${b.id}\n`);
+        continue;
+      }
+      try {
+        await runwayI2V(still, b.motion, raw);
+      } catch (e) {
+        process.stderr.write(`WARN runway ${b.id}: ${e.message} — still fallback\n`);
+        await stillToClip(still, raw, 5.5);
+      }
+    }
   }
 
   const cover = path.join(HERE, 'fruit/geo-pomegranate-100-vs-72.jpg');
