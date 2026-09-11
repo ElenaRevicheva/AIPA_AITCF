@@ -53,7 +53,7 @@ Counted from production logs on Oracle Cloud: 420+ audits · 14,000+ signals · 
 
 Want it wired into your stack? https://aideazz.xyz/portfolio#portfolio-inquiry-form
 
-Music: Morning Light (Fresh Corporate) by wbmstudio — Pixabay Content License
+Music: Pixabay Content License — chillout / tropical instrumental (no vocals). Exact title is in the Oracle remix log; Morning Light was rejected as too calm.
 
 AIdeazz Lab · Elena Revicheva
 ```

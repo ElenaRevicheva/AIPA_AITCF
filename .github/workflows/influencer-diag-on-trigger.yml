@@ -88,6 +88,11 @@ jobs:
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fire-influencer-promo.sh
           elif [ "$MODE" = "api-film" ]; then
+            mkdir -p scripts/youtube-api-audit-film/loom
+            python3 scripts/youtube-api-audit-film/fetch-loom.py \
+              --out scripts/youtube-api-audit-film/loom/walkthrough.mp4 \
+              || echo "WARN: runner could not download Loom"
+            ls -lh scripts/youtube-api-audit-film/loom || true
             ssh $SSHOPTS ubuntu@170.9.242.90 'rm -rf /tmp/youtube-api-audit-film'
             scp -r $SSHOPTS \
               scripts/youtube-api-audit-film \

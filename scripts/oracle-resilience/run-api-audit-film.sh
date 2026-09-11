@@ -53,7 +53,21 @@ fi
 [ -f "$DIR/kit/compile.mjs" ] || { echo "FATAL: compile.mjs missing in kit"; exit 1; }
 
 echo
-echo "=== 1b. Pixabay light bed (Bright Data unlocker — FILM_COMPILATION_GUIDE §4) ==="
+echo "=== 1a. Elena's muted Loom walkthrough ==="
+mkdir -p "$DIR/loom"
+if [ -f "$DIR/kit/loom/walkthrough.mp4" ]; then
+  cp -f "$DIR/kit/loom/walkthrough.mp4" "$DIR/loom/walkthrough.mp4"
+fi
+if [ ! -f "$DIR/loom/walkthrough.mp4" ]; then
+  python3 "$DIR/kit/fetch-loom.py" --out "$DIR/loom/walkthrough.mp4"
+fi
+[ -f "$DIR/loom/walkthrough.mp4" ] || { echo "FATAL: Loom walkthrough missing"; exit 1; }
+export API_FILM_LOOM="$DIR/loom/walkthrough.mp4"
+ls -lh "$API_FILM_LOOM"
+ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$API_FILM_LOOM" || true
+
+echo
+echo "=== 1b. Pixabay chillout-energy bed (Bright Data — FILM_COMPILATION_GUIDE §4) ==="
 echo "Atuona poetry library (do NOT pick from here):"
 ls /home/ubuntu/cto-aipa/data/atuona/films/music 2>/dev/null | redact || echo "(missing)"
 export API_FILM_DIR="$DIR"

@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 15:25 UTC | Wire Elena Loom + live /api stills; juicier Pixabay bed | scripts/youtube-api-audit-film — no Oracle restart | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 STOPPED 11 Sep 12:07 UTC — /api YouTube film remixed with light Pixabay bed
+### 🟡 IN FLIGHT 11 Sep 15:25 UTC — Loom walkthrough + juicier bed
 
-**DONE:** Same 79s /api walkthrough, new soundtrack. Pixabay *Morning Light (Fresh Corporate)* by wbmstudio (tags: Light / Optimistic / Laid Back / Uplifting). Bright Data unlocker → CDN mp3 into `/home/ubuntu/aideazz-api-film/music/` only — not the Atuona poetry library. Public:
-`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4`
-Pack: `docs/selling/YOUTUBE_API_AUDIT_PROMO.md`. Branch `cursor/youtube-api-promo-0841` PR **#51**. Trigger `# idle`. Influencer + VJH stay paused.
+**DONE already:** 79s cut live. Elena liked VO/captions, not Morning Light (too calm/sad) and not the HTML mock UI.
 
-**NEXT (Elena):** watch the remixed cut (hard-refresh the mp4), then upload in YouTube Studio with the pack. Credit the track. CTA `https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta`. **Do not drop the mp4 into Atuona `/films`.** **Do not Make Run once.**
+**NEXT (this agent):** keep VO + burn-in captions. Replace UI beats with Elena's muted Loom (`8dfbc2ec71c343bd9b06a64949e61b68`) plus her three live `/api` screenshots (crop chrome/taskbar/snipping tool). New Pixabay bed: chillout energy, juicy/fresh, instrumental, not noisy. Branch `cursor/youtube-api-promo-0841` PR **#51**. No influencer/VJH restart.
 
-**NEXT (agent):** do not fire another promo. Do not restart influencer or VJH unless asked. Claim empty.
+**NEXT (Elena):** wait for the remixed public mp4 (hard-refresh).
 
-**VERIFIED BY:** Actions `34597075800` `compile exit 0` · `SELECTED …/morning-light-fresh-corporate-pixabay.mp3` · `music …morning-light…` · `DONE … (22.0MB, 79s)` · Oracle curl `200 application/octet-stream 22011914` · `duration=79.033333` · `frame0 bytes=114005`.
+**VERIFIED BY:** pending `api-film` run.
 
-**RISK:** First remix `34596940701` died because `scp -r` nested the kit — dest is now wiped first. Cloud agents cannot curl `webhook.aideazz.xyz` (SSL).
+**RISK:** This VM cannot TLS to loom.com — download on the Actions runner or Oracle. Do not rewrite VO strings.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 

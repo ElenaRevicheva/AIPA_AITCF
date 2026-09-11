@@ -36,7 +36,7 @@ const ENV_FILE = process.env.CTO_ENV || '/home/ubuntu/cto-aipa/.env';
 const ATUONA_MUSIC_DIR = '/home/ubuntu/cto-aipa/data/atuona/films/music';
 const FILM_MUSIC_DIR = path.join(BASE, 'music');
 // Poetry beds (FILM_COMPILATION_GUIDE table) + the first-alpha dark track this promo already burned.
-const BURNED_MUSIC = /light in the void|fatal error|dark-cinematic-drone|atmospheric-dark-cinematic/i;
+const BURNED_MUSIC = /light in the void|fatal error|dark-cinematic-drone|atmospheric-dark-cinematic|morning-light-fresh-corporate/i;
 const PUBLISH = process.env.API_FILM_PUBLISH || path.join(BASE, 'out');
 const PUBLIC = 'https://webhook.aideazz.xyz/influencer-images/youtube';
 
@@ -209,6 +209,74 @@ async function makeCard(titleRaw, subRaw, outFile, d, titleSize, bgImage, noFade
   return outFile;
 }
 
+async function fillClip(src, dest, seconds, startAt) {
+  const ss = Math.max(0, startAt || 0);
+  const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p`;
+  await execFileP(
+    'ffmpeg',
+    ['-y', '-ss', ss.toFixed(3), '-stream_loop', '-1', '-i', src, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', `[0:v]${vf}[v]`, '-map', '[v]', '-map', '1:a', '-t', seconds.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
+    { maxBuffer: 1 << 26, timeout: 180000 },
+  );
+  return dest;
+}
+
+async function concatClips(parts, dest) {
+  if (parts.length === 1) {
+    fs.copyFileSync(parts[0], dest);
+    return dest;
+  }
+  const inputs = parts.flatMap((p) => ['-i', p]);
+  let fc = '';
+  for (let i = 0; i < parts.length; i++) fc += `[${i}:v][${i}:a]`;
+  fc += `concat=n=${parts.length}:v=1:a=1[v][a]`;
+  await execFileP('ffmpeg', ['-y', ...inputs, '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest], { maxBuffer: 1 << 26, timeout: 180000 });
+  return dest;
+}
+
+function findLoom() {
+  const cands = [
+    process.env.API_FILM_LOOM,
+    path.join(HERE, 'loom/walkthrough.mp4'),
+    path.join(BASE, 'loom/walkthrough.mp4'),
+    path.join(BASE, 'kit/loom/walkthrough.mp4'),
+  ].filter(Boolean);
+  for (const p of cands) {
+    if (fs.existsSync(p) && fs.statSync(p).size > 200000) return p;
+  }
+  return null;
+}
+
+async function buildUiClip(b, clipDur, loomState) {
+  const parts = [];
+  let remain = clipDur;
+  if (b.liveStill) {
+    const stillPath = path.join(HERE, b.liveStill);
+    if (fs.existsSync(stillPath)) {
+      const hold = Math.min(1.8, Math.max(1.2, clipDur * 0.28));
+      const p = path.join(W, `still_${b.id}.mp4`);
+      await stillToClip(stillPath, p, hold);
+      parts.push(p);
+      remain -= hold;
+      process.stderr.write(`ui still ${b.id} ${hold.toFixed(1)}s ${b.liveStill}\n`);
+    }
+  }
+  if (loomState.path && remain > 0.5) {
+    const slice = path.join(W, `loom_${b.id}.mp4`);
+    if (loomState.t + remain > loomState.end - 0.2) loomState.t = 0.4;
+    await fillClip(loomState.path, slice, remain, loomState.t);
+    loomState.t += remain;
+    parts.push(slice);
+    process.stderr.write(`ui loom ${b.id} ${remain.toFixed(1)}s @${(loomState.t - remain).toFixed(1)}\n`);
+  } else if (!parts.length) {
+    const still = path.join(HERE, b.still);
+    await stillToClip(still, path.join(W, `fb_${b.id}.mp4`), clipDur);
+    parts.push(path.join(W, `fb_${b.id}.mp4`));
+  }
+  const raw = path.join(CLIPDIR, `${b.id}.mp4`);
+  await concatClips(parts, raw);
+  return raw;
+}
+
 async function stillToClip(src, dest, seconds) {
   // Hold, don't zoom — UI type must stay readable. Fruit motion comes from Runway.
   const vf = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p`;
@@ -253,7 +321,7 @@ async function bakeCaption(src, dest, caption, clipDur) {
 function pickMusic() {
   const pinned = (process.env.API_FILM_MUSIC || '').trim();
   if (pinned && fs.existsSync(pinned) && fs.statSync(pinned).size > 20000) return pinned;
-  const lightName = /morning-light|fresh-corporate|uplifting|motivational|optimistic|hopeful/i;
+  const lightName = /tropical|cocktail|lounge|paradise|chill|fresh-tropical/i;
   for (const dir of [FILM_MUSIC_DIR, ATUONA_MUSIC_DIR]) {
     try {
       const files = fs.readdirSync(dir).filter((f) => /\.(mp3|m4a|wav)$/i.test(f) && !BURNED_MUSIC.test(f));
@@ -312,13 +380,13 @@ const BEATS = [
     vo: 'This is the free AI visibility audit at aideazz.xyz/api.',
     cap: 'Free AI visibility audit\naideazz.xyz/api',
   },
-  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.' },
+  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.' },
   { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.' },
   { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.' },
   { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.' },
   { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.' },
-  { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.' },
-  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api' },
+  { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.' },
+  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api' },
 ];
 
 async function main() {
@@ -349,11 +417,15 @@ async function main() {
   const seq = [];
   seq.push(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 52, cover, true));
 
+  const loomPath = findLoom();
+  const loomState = { path: loomPath, t: 0.4, end: loomPath ? await dur(loomPath) : 0 };
+  process.stderr.write(loomPath ? `loom ${loomPath} dur=${loomState.end.toFixed(1)}s\n` : 'WARN no Loom walkthrough — UI stills only\n');
+
   const voInfo = [];
   for (let i = 0; i < BEATS.length; i++) {
     const b = BEATS[i];
     const still = path.join(HERE, b.still);
-    if (!fs.existsSync(still)) throw new Error('missing still ' + still);
+    if (!fs.existsSync(still) && b.kind !== 'ui') throw new Error('missing still ' + still);
     let voFile = null,
       vd = 0;
     if (b.vo) {
@@ -361,19 +433,24 @@ async function main() {
       if (!(fs.existsSync(voFile) && fs.statSync(voFile).size > 1000)) await tts(b.vo, voFile);
       vd = await dur(voFile);
     }
-    const raw = path.join(CLIPDIR, `${b.id}.mp4`);
-    if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
-      await stillToClip(still, raw, b.kind === 'ui' ? 6.5 : 5.5);
+    let raw = path.join(CLIPDIR, `${b.id}.mp4`);
+    const clipDur = b.vo ? Math.max(6.5, LEAD + vd + TAIL) : 5.5;
+    if (b.kind === 'ui') {
+      raw = await buildUiClip(b, clipDur, loomState);
+    } else {
+      if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
+        await stillToClip(still, raw, 5.5);
+      }
     }
     const nat = await dur(raw);
-    const clipDur = b.vo ? Math.max(nat, LEAD + vd + TAIL) : Math.min(Math.max(nat, 4.8), 6.2);
+    const normDur = b.kind === 'ui' ? clipDur : b.vo ? Math.max(nat, LEAD + vd + TAIL) : Math.min(Math.max(nat, 4.8), 6.2);
     const norm = path.join(W, `n_${b.id}.mp4`);
-    await normalizeVideo(raw, norm, clipDur);
+    await normalizeVideo(raw, norm, normDur);
     const baked = path.join(W, `fc_${String(i).padStart(2, '0')}.mp4`);
-    await bakeCaption(norm, baked, b.cap, clipDur);
+    await bakeCaption(norm, baked, b.cap, normDur);
     seq.push(baked);
     if (voFile) voInfo.push({ segIndex: i + 1, file: voFile });
-    process.stderr.write(`beat ${i + 1}/${BEATS.length} ${b.id} dur=${clipDur.toFixed(1)} vo=${b.vo ? vd.toFixed(1) : '-'}\n`);
+    process.stderr.write(`beat ${i + 1}/${BEATS.length} ${b.id} dur=${normDur.toFixed(1)} vo=${b.vo ? vd.toFixed(1) : '-'}\n`);
   }
   seq.push(await makeCard(OUTRO_TITLE, OUTRO_SUB, path.join(W, 'card_outro.mp4'), 4.4, 48, cover, false));
 
@@ -411,8 +488,8 @@ async function main() {
   process.stderr.write(`music ${music}\n`);
 
   const voAt = voInfo.map((v) => ({ file: v.file, t: +(segStart(v.segIndex) + LEAD).toFixed(2) }));
-  // Light corporate beds sit in the vocal midrange — keep them under the onyx VO.
-  let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.20,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
+  // Chillout-energy beds can sit up a hair vs the sad piano; sidechain still ducks under VO.
+  let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.22,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
   const vl = [];
   if (voAt.length) {
     voAt.forEach((v, k) => {

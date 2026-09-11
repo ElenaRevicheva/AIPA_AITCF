@@ -4,9 +4,9 @@
 Follows docs/atuona/FILM_COMPILATION_GUIDE.md §4:
   Bright Data Web Unlocker → JSON-LD AudioObject.contentUrl → plain curl the CDN mp3.
 
-Mood for THIS film (product promo, not Atuona poetry):
-  want Light / Optimistic / Positive / Inspiring / Laid Back / Uplifting
-  reject Dark / Drone / Suspense / Epic trailer / restless chasing EDM
+Mood for THIS film (product promo, fruit + live /api walkthrough):
+  want chillout energy / tropical / lounge / fresh / juicy — instrumental
+  reject sad / meditative / dark / drone / vocals / Morning Light (already burned)
 
 Do NOT write into data/atuona/films/music/ — that library is first-alpha and
 would leak a corporate bed into the poetry gallery.
@@ -27,28 +27,35 @@ ENV_FILE = os.environ.get("CTO_ENV", "/home/ubuntu/cto-aipa/.env")
 DEST_DIR = Path(os.environ.get("API_FILM_MUSIC_DIR", "/home/ubuntu/aideazz-api-film/music"))
 SELECTED = DEST_DIR / "SELECTED.path"
 
-# Ordered by mood-tag fit. Tags from the Pixabay track pages (not auditioned).
-# 1) Morning Light — Light, Optimistic, Positive, Laid Back, Dreamy, Bright, Hopeful, Elegant/Smooth
-# 2) Happy Motivational — gentle guitar+piano, Bright, Clean, Optimistic (backup)
+# Elena: Morning Light was too calm/sad. Want chillout energy, juicy, fresh, no singing.
 CANDIDATES = [
     {
-        "page": "https://pixabay.com/music/corporate-morning-light-fresh-corporate-459811/",
-        "dest": "morning-light-fresh-corporate-pixabay.mp3",
-        "expect": "Morning Light",
+        "page": "https://pixabay.com/music/search/fresh%20tropical%20cocktail/",
+        "dest": "fresh-tropical-cocktail-pixabay.mp3",
+        "expect": "Fresh Tropical Cocktail",
+        "search": True,
     },
     {
-        "page": "https://pixabay.com/music/corporate-happy-motivational-uplifting-corporate-148119/",
-        "dest": "happy-motivational-uplifting-corporate-pixabay.mp3",
-        "expect": "Happy Motivational",
+        "page": "https://pixabay.com/music/search/tropical%20paradise%20summer%20house/",
+        "dest": "tropical-paradise-house-pixabay.mp3",
+        "expect": "Tropical Paradise",
+        "search": True,
+    },
+    {
+        "page": "https://pixabay.com/music/search/lounge%20background%20music/",
+        "dest": "lounge-background-pixabay.mp3",
+        "expect": "Lounge Background Music",
+        "search": True,
     },
 ]
 
 REJECT_MOOD = re.compile(
-    r"dark|drone|suspense|horror|trailer|epic|trap|phonk|restless|chasing|aggressive|noisy",
+    r"dark|drone|suspense|horror|trailer|epic|trap|phonk|restless|chasing|aggressive|"
+    r"noisy|sad|melanchol|meditat|vocal|lyrics|singing|choir|morning.?light",
     re.I,
 )
 WANT_MOOD = re.compile(
-    r"light|optimistic|positive|inspiring|uplifting|hopeful|laid.?back|bright|gentle|fresh",
+    r"tropical|chill|lounge|fresh|cocktail|groovy|house|summer|upbeat|positive|bright",
     re.I,
 )
 
@@ -170,6 +177,26 @@ def curl_mp3(url: str, dest: Path) -> None:
     tmp.replace(dest)
 
 
+def resolve_track_page(html: str, expect: str) -> str | None:
+    """Turn a Pixabay search page into a /music/<slug>/ URL."""
+    hrefs = re.findall(r'href="(/music/[a-z0-9-]+-\d+/)"', html, re.I)
+    if not hrefs:
+        hrefs = re.findall(r'href="(https://(?:www\.)?pixabay\.com/music/[a-z0-9-]+-\d+/)"', html, re.I)
+    tokens = [t for t in re.split(r"[^a-z0-9]+", expect.lower()) if len(t) > 3]
+    ranked = []
+    for h in hrefs:
+        slug = h.lower()
+        score = sum(1 for t in tokens if t in slug)
+        ranked.append((score, h))
+    ranked.sort(reverse=True)
+    if not ranked:
+        return None
+    best = ranked[0][1]
+    if best.startswith("http"):
+        return best
+    return "https://pixabay.com" + best
+
+
 def main() -> int:
     token = read_env("BRIGHTDATA_API_TOKEN")
     zone = read_env("BRIGHTDATA_ZONE") or "web_unlocker1"
@@ -197,6 +224,17 @@ def main() -> int:
         if "Just a moment" in html[:800] or "cf-browser-verification" in html:
             print("unlocker returned Cloudflare challenge — skip")
             continue
+        if cand.get("search") or "/music/search/" in cand["page"]:
+            track = resolve_track_page(html, cand["expect"])
+            if not track:
+                print("search page had no /music/ track link")
+                continue
+            print(f"search → {track}")
+            try:
+                html = unlock(track, token, zone)
+            except Exception as e:
+                print(f"track unlocker fail: {type(e).__name__}")
+                continue
         audio = audio_from_ld(ld_blocks(html))
         if not audio or not audio.get("contentUrl"):
             # last-ditch: first cdn.pixabay.com/download/audio URL in the html
@@ -211,8 +249,11 @@ def main() -> int:
         print(f"name {audio.get('name', '?')}")
         print(f"tags {summary or '(none parsed)'}")
         blob = (summary + " " + str(audio.get("name", ""))).lower()
+        if re.search(r"vocal|lyrics|singing|choir", blob):
+            print("reject: has vocals")
+            continue
         if REJECT_MOOD.search(blob) and not WANT_MOOD.search(blob):
-            print("reject: mood tags are dark/noisy")
+            print("reject: mood tags are dark/sad/noisy")
             continue
         try:
             curl_mp3(content, dest)
