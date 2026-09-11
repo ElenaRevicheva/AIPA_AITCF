@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 19:51 UTC | /api film v7 — restore grapes, neuron glow, What it checks overlay | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,17 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 11 Sep 19:25 UTC — /api YouTube v6 is live
+### 🟡 IN FLIGHT 11 Sep 19:51 UTC — film v7 grapevine restore
 
-Elena opens **watch.html** (not v5 / v4 / the unversioned mp4):
-https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v6.mp4
+**Elena:** restore the grapevine shot; grapes moving and glowing with neurones; overlay the "What it checks" chapter text. VO/captions on existing beats stay.
 
-Short Loom (first 20s, no loop), first-video slides, live-site shot, QR. VO/captions unchanged. Branch `cursor/youtube-api-promo-0841`.
+**THIS:** new Runway grapes (wipe `clips/grapes.mp4` only). Salvage+glow if credits empty. Publish `-v7`. Keep split/crawlers/hand/dashboard. Branch `cursor/youtube-api-promo-0841`.
 
-**VERIFIED BY:** Actions `34638369236` `DONE … (27.5MB, 95s)` · `compile exit 0` · `200 video/mp4 27542001` on `-v6.mp4`. Fruit cache hits. `ui loom website 6.7s @0.4 no-loop`.
-
-**RISK:** nginx caches the unversioned file. Do not Make Run once. Do not wipe split/crawlers.
+**RISK:** Do not Make Run once. Do not wipe split/crawlers. Do not tell Elena `-v7` until `200 video/mp4`.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
