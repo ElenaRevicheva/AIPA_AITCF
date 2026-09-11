@@ -45,6 +45,12 @@ cp -a "$SRC"/. "$DIR/kit/"
 ls -la "$DIR/kit" | head -20
 ls "$DIR/kit/fruit"
 ls "$DIR/kit/ui"
+if [ ! -f "$DIR/kit/fetch-pixabay-music.py" ] && [ -f "$DIR/kit/youtube-api-audit-film/fetch-pixabay-music.py" ]; then
+  echo "WARN: scp nested the kit — flattening"
+  cp -a "$DIR/kit/youtube-api-audit-film/." "$DIR/kit/"
+fi
+[ -f "$DIR/kit/fetch-pixabay-music.py" ] || { echo "FATAL: fetch-pixabay-music.py missing in kit"; exit 1; }
+[ -f "$DIR/kit/compile.mjs" ] || { echo "FATAL: compile.mjs missing in kit"; exit 1; }
 
 echo
 echo "=== 1b. Pixabay light bed (Bright Data unlocker — FILM_COMPILATION_GUIDE §4) ==="

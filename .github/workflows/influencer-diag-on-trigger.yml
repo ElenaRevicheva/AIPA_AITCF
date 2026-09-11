@@ -88,6 +88,7 @@ jobs:
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fire-influencer-promo.sh
           elif [ "$MODE" = "api-film" ]; then
+            ssh $SSHOPTS ubuntu@170.9.242.90 'rm -rf /tmp/youtube-api-audit-film'
             scp -r $SSHOPTS \
               scripts/youtube-api-audit-film \
               ubuntu@170.9.242.90:/tmp/youtube-api-audit-film
