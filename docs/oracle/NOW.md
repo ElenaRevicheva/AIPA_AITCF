@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 11:59 UTC | Remix /api YouTube film soundtrack (Pixabay light bed) | scripts/youtube-api-audit-film, run-api-audit-film.sh — no Oracle restart | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,17 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 11:59 UTC — remix /api film music (Elena liked the cut, not the bed)
+### 🟢 STOPPED 11 Sep 12:07 UTC — /api YouTube film remixed with light Pixabay bed
 
-**DONE already:** 79s walkthrough live (`34590866362`). Music accidentally first-alpha `atmospheric-dark-cinematic-pixabay.mp3` (Atuona dark library). Wrong mood for a juicy /api promo.
+**DONE:** Same 79s /api walkthrough, new soundtrack. Pixabay *Morning Light (Fresh Corporate)* by wbmstudio (tags: Light / Optimistic / Laid Back / Uplifting). Bright Data unlocker → CDN mp3 into `/home/ubuntu/aideazz-api-film/music/` only — not the Atuona poetry library. Public:
+`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4`
+Pack: `docs/selling/YOUTUBE_API_AUDIT_PROMO.md`. Branch `cursor/youtube-api-promo-0841` PR **#51**. Trigger `# idle`. Influencer + VJH stay paused.
 
-**NEXT (this agent):** Pixabay via Bright Data Web Unlocker (FILM_COMPILATION_GUIDE §4). Pick light / optimistic / not noisy. Do not reuse Light In The Void, Fatal Error, Dark Cinematic Drone. Remix only — no Runway, no influencer/VJH restart. Branch `cursor/youtube-api-promo-0841` PR **#51**.
+**NEXT (Elena):** watch the remixed cut (hard-refresh the mp4), then upload in YouTube Studio with the pack. Credit the track. CTA `https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta`. **Do not drop the mp4 into Atuona `/films`.** **Do not Make Run once.**
 
-**NEXT (Elena):** wait for the remixed public mp4, then upload.
+**NEXT (agent):** do not fire another promo. Do not restart influencer or VJH unless asked. Claim empty.
 
-**VERIFIED BY:** pending remix `api-film` run.
+**VERIFIED BY:** Actions `34597075800` `compile exit 0` · `SELECTED …/morning-light-fresh-corporate-pixabay.mp3` · `music …morning-light…` · `DONE … (22.0MB, 79s)` · Oracle curl `200 application/octet-stream 22011914` · `duration=79.033333` · `frame0 bytes=114005`.
 
-**RISK:** Do not drop a light corporate track into Atuona's poetry music dir — `pickMusic` is first-alpha and would poison the gallery films.
+**RISK:** First remix `34596940701` died because `scp -r` nested the kit — dest is now wiped first. Cloud agents cannot curl `webhook.aideazz.xyz` (SSL).
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 

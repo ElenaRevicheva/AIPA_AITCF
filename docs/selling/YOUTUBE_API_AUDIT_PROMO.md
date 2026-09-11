@@ -12,7 +12,7 @@ Compiled with the Atuona Film Studio stack already wired into this repo
 
 Shorter than 30s is a Short or an ad — no room to show the form. Two to three minutes is an explainer; retention usually dies unless someone searched for a tutorial. Production on this stack is minutes on Oracle (Runway 5s clips + ffmpeg), not a shoot day.
 
-Verified 11 Sep 2026, Actions `34590866362`: 21.9MB, 1920×1080 30fps, AAC, HTTP 200, frame 0 = title card.
+Verified 11 Sep 2026, Actions `34597075800` remix: **Morning Light (Fresh Corporate)** by wbmstudio (Pixabay). 22.0MB, 1920×1080 30fps, AAC, HTTP 200. Same 79s picture, new bed. First cut (`34590866362`) had used Atuona's dark `atmospheric-dark-cinematic` by accident.
 
 ## Watch
 
@@ -54,7 +54,6 @@ Counted from production logs on Oracle Cloud: 420+ audits · 14,000+ signals · 
 Want it wired into your stack? https://aideazz.xyz/portfolio#portfolio-inquiry-form
 
 Music: Morning Light (Fresh Corporate) by wbmstudio — Pixabay Content License
-(or the backup: Happy Motivational Uplifting Corporate by RomanSenykMusic)
 
 AIdeazz Lab · Elena Revicheva
 ```
