@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 18:45 UTC | /api film v5 — lower labels, moving crawlers, slide shot | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 18:45 UTC — film v5 (Elena: labels lower, insects move, extra slide shot)
+### 🟢 11 Sep 18:51 UTC — /api YouTube **v5 is live**. Elena opens watch.html / `-v5.mp4`.
 
-**DONE last:** v4 live. Split is Runway. Crawlers/hand were stills (credits died).
+**DONE:** 36.5MB, 87s, 1920. GOOGLE/CHATGPT lower. Crawlers = salvaged v2 Runway walk (credits still 400) + orbiting bot names. Dashboard shot covered with first-video slide copy (still — same credit miss). Split cache kept. Job green.
 
-**THIS:** lower GOOGLE/CHATGPT · regenerate crawlers on Runway (labels orbit with the bugs) · extra dashboard shot covered with first-video slide copy (Claude 3 Sep `/api` hero: 420+/14k/210+/median 85). Keep split.mp4. Influencer/VJH paused.
+**NEXT:** Elena watches v5. Top up Runway to replace dashboard still with motion; do not wipe split or salvaged crawlers.
 
-**RISK:** Runway credits. Do not Make Run once. Do not wipe split.mp4.
+**VERIFIED BY:** Actions `34635292256` `DONE … (36.5MB, 87s)` + `200 video/mp4 36502524` on `-v5`. `salvage crawlers … v2.mp4 ss=15.0 t=7.0 5.6MB`.
+
+**RISK:** Do not open v4/v3. Do not Make Run once. Salvage window 15s+7s of v2 — if insects look like the wrong beat, nudge `API_FILM_CRAWLERS_SS`.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
