@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 16:27 UTC | /api YouTube film remix — native 1080p, new Loom, QR | compile.mjs + Oracle api-film (not influencer/VJH) | (this commit) |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,21 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 16:27 UTC — /api film remix, native 1080p
+### 🟢 STOPPED 11 Sep 16:46 UTC — /api film v3 is live. Elena watches v3, not the old URL
 
-**Elena:** grapevine out · Google/ChatGPT on the split fruit · bot names on the passionfruit crawlers · new shorter Loom · 2026 chill house · QR outro. VO/captions unchanged.
+**DONE:** Grapevine out. Google/ChatGPT on the split fruit. Bot names on the crawlers. New Loom at 1x. Distant Horizon chill house. QR outro. VO/captions frozen. `34622562553` compile exit 0, public HEAD `200 video/mp4 71347119`, 80s, 1920×1080. Actions then 127 on a probe line — file is on disk.
 
-**THIS SESSION:** Luma Ray 3.2 1080p for fruit (Runway 720p was the mush). No setpts stretch. New filename `-v3`. Influencer/VJH stay paused.
+**Watch:**
+`https://webhook.aideazz.xyz/influencer-images/youtube/watch.html`
+`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v3.mp4`
 
-**RISK:** Luma spend + nginx youtube/ already no-store. Do not Make Run once.
+**NEXT (Elena):** open v3 / watch.html. YouTube End Screen over the last 7s so the QR is clickable. **Do not Make Run once.**
+
+**NEXT (agent):** claim empty. Do not restart influencer/VJH. Do not recompile unless she wants another pass.
+
+**VERIFIED BY:** `34622562553` `DONE … (71.3MB, 80s, w=1920)` + `200 video/mp4 71347119`.
+
+**RISK:** Old unversioned URL still stale in browsers that cached it. Luma returned 1280 and we lanczos'd to 1920.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
