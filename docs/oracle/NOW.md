@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 20:57 UTC | /api film v12 — real grapevine + maracuya insects; QR on every shot | youtube kit + Oracle api-film — not influencer/VJH | pending |
+| Cursor Cloud | 11 Sep 21:13 UTC | /api film v12 stitch retry (SSH died mid-xfade) | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 11 Sep 20:57 UTC — v12 must actually SHOW grapevine + maracuya insects
+### 🟡 IN FLIGHT 11 Sep 21:13 UTC — v12 stitch retry after SSH Broken pipe
 
-**Elena:** v11 is not the cut. No grapevine/What it checks, no maracuya insects. She wants the correct link to the full film.
+**Elena:** wants the full film (moving pomegranate, grapevine + What it checks + neurones, maracuya insects, shortened Loom, finishing slides, QR every shot) at ~107s. v11 is not the cut. Do not send v11.
 
-**THIS:** grapes from the grape still + glow/grow (v2 salvage is the wrong fruit). Force crawlers salvage from v2/v5. QR every shot. Publish `-v12`. Branch `cursor/youtube-api-promo-0841`.
+**DONE (compile, not published):** run 34647132792 built grapes from grape still + glow, salvaged crawlers+sway from v2 ss=15, loomwalk 16s, finishing slides, QR every shot, xfade expect 114.7s. SSH `Broken pipe` at xfade — no `-v12` published.
 
-**RISK:** Do not give Elena `-v11`. Do not Make Run once. Do not fire while another `api-film` is running.
+**THIS:** re-fire `api-film` with nohup + SSH keepalive so the stitch survives silence. Branch `cursor/youtube-api-promo-0841`.
+
+**RISK:** Do not give Elena a link until `DONE` + `200 video/mp4` + `v12-duration` ≳ 90. Do not Make Run once. Do not fire a second job if compile.mjs is still running.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
