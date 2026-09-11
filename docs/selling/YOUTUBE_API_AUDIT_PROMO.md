@@ -16,11 +16,20 @@ Verified 11 Sep 2026, Actions `34616631936`: Elena's muted Loom + live `/api` st
 
 ## Watch
 
-The stable URL is cached by browsers for 24h (nginx `max-age=86400` on `/influencer-images/`). Use the versioned file until that expires:
+The filename ending in `.mp4` (no `-v2`) is stuck for up to 24h in any browser that already played it. Nginx used to send `Cache-Control: public, max-age=86400`. Ctrl-R will not help. Open one of these instead:
 
+Player (always fetches the new cut):
+https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
+
+Direct file (new cache key):
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4
 
-Stable (may still show the previous cut in a browser that already opened it):
+Dated copy:
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-20260911.mp4
+
+The first ~40 seconds still open on grapes — VO and captions were not changed. Skip to **0:42** for the live `/api` walkthrough. Soundtrack is Tropical Cocktail (not the sad piano).
+
+Unversioned (stale in browsers that already opened it; incognito works):
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4
 
 Poster (frame 0 = title card, never black):

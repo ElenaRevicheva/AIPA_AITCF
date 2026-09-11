@@ -88,6 +88,9 @@ jobs:
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fire-influencer-promo.sh
           elif [ "$MODE" = "api-film-bust" ]; then
+            scp $SSHOPTS \
+              scripts/oracle-resilience/api-film-watch.html \
+              ubuntu@170.9.242.90:/tmp/api-film-watch.html
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/bust-api-audit-film.sh
           elif [ "$MODE" = "api-film" ]; then
