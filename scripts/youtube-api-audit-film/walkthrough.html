@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AIdeazz Lab API — walkthrough scenes</title>
+  <style>
+    :root { --violet:#7c3aed; --gold:#facc15; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1920px; height: 1080px; overflow: hidden; background: #020617; color: #fff;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    body { background:
+      radial-gradient(1200px 600px at 70% -10%, rgba(124,58,237,.28), transparent 55%),
+      radial-gradient(900px 500px at 10% 110%, rgba(250,204,21,.08), transparent 50%),
+      #020617; }
+    .scene { display: none; width: 1920px; height: 1080px; padding: 56px 88px 48px; position: relative; }
+    .scene.on { display: flex; flex-direction: column; }
+    .step { position: absolute; top: 28px; right: 88px; font-family: ui-monospace, DejaVu Sans Mono, monospace;
+      font-size: 13px; letter-spacing: .28em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+    .brand { display: flex; align-items: baseline; gap: 2px; font-size: 36px; letter-spacing: -.02em; }
+    .ai { font-weight: 650; background: linear-gradient(115deg,#7c3aed,#facc15 50%,#7c3aed);
+      background-size: 220%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .deazz { font-weight: 300; }
+    .tail { margin-top: 10px; display: flex; align-items: center; gap: 10px;
+      font-family: ui-monospace, DejaVu Sans Mono, monospace; font-size: 12px; letter-spacing: .4em; text-transform: uppercase; color: rgba(255,255,255,.85); }
+    .tail hr { width: 24px; border: 0; height: 1px; }
+    .kicker { margin-top: 48px; text-align: center; color: #fde68a; font-size: 22px; font-weight: 500; }
+    h1 { text-align: center; margin-top: 18px; font-size: 72px; line-height: 1.05; font-weight: 700; letter-spacing: -.03em; }
+    .sub { text-align: center; margin: 22px auto 0; max-width: 980px; color: #9ca3af; font-size: 22px; line-height: 1.45; }
+    .card { margin: 40px auto 0; width: 980px; border: 1px solid rgba(255,255,255,.12); background: rgba(15,23,42,.72);
+      backdrop-filter: blur(16px); border-radius: 22px; padding: 28px 32px; }
+    .try { color: #e9d5ff; font-weight: 650; font-size: 18px; margin-bottom: 14px; }
+    .row { display: flex; gap: 12px; }
+    input { flex: 1; border-radius: 14px; border: 1px solid rgba(255,255,255,.12); background: rgba(2,6,23,.7);
+      color: #fff; font-size: 20px; padding: 16px 18px 16px 18px; outline: none; }
+    input:focus { border-color: rgba(167,139,250,.7); }
+    button { border: 0; border-radius: 14px; background: #fff; color: #020617; font-weight: 700; font-size: 18px;
+      padding: 16px 28px; cursor: default; white-space: nowrap; }
+    button.busy { opacity: .5; }
+    .hint { margin-top: 14px; color: #9ca3af; font-size: 14px; }
+    .receipt { margin-top: 10px; color: #e9d5ff; font-size: 16px; font-weight: 600; }
+    .badge { margin-top: 14px; display: inline-flex; gap: 8px; align-items: center; border-radius: 999px;
+      background: rgba(16,185,129,.12); color: #6ee7b7; font-size: 13px; font-weight: 650; padding: 6px 12px; }
+    .urlbar { font-family: ui-monospace, DejaVu Sans Mono, monospace; font-size: 15px; color: rgba(255,255,255,.55);
+      letter-spacing: .04em; margin-bottom: 10px; }
+    .grid4 { margin-top: 36px; display: grid; grid-template-columns: repeat(4,1fr); gap: 28px; text-align: center; }
+    .stat-l { font-family: ui-monospace, DejaVu Sans Mono, monospace; font-size: 11px; letter-spacing: .18em;
+      text-transform: uppercase; color: rgba(255,255,255,.45); }
+    .stat-n { margin-top: 8px; font-size: 48px; font-weight: 400; font-family: "Times New Roman", Georgia, serif; }
+    .stat-note { margin-top: 22px; text-align: center; font-family: ui-monospace, DejaVu Sans Mono, monospace;
+      font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.3); }
+    .cats { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .cat { border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); border-radius: 18px; padding: 22px 24px; }
+    .cat h3 { font-size: 20px; margin-bottom: 8px; }
+    .cat p { color: #9ca3af; font-size: 15px; line-height: 1.4; }
+    .scorewrap { display: flex; gap: 36px; align-items: center; }
+    .ring { width: 180px; height: 180px; position: relative; flex-shrink: 0; }
+    .ring svg { transform: rotate(-90deg); }
+    .ring .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .ring .num b { font-size: 52px; }
+    .ring .num s { font-size: 18px; color: #34d399; text-decoration: none; font-weight: 700; }
+    .ring .num u { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; text-decoration: none; }
+    .engines { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 8px; }
+    .eng { border-radius: 10px; padding: 10px 12px; font-size: 14px; display: flex; gap: 8px; align-items: center; }
+    .ok { border: 1px solid rgba(52,211,153,.35); background: rgba(16,185,129,.12); color: #a7f3d0; }
+    .bars { margin-top: 8px; }
+    .bar-row { margin-bottom: 12px; }
+    .bar-row .lab { display: flex; justify-content: space-between; font-size: 14px; color: #d1d5db; margin-bottom: 4px; }
+    .track { height: 8px; background: rgba(255,255,255,.1); border-radius: 99px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 99px; }
+    .checks { margin-top: 8px; display: grid; gap: 10px; }
+    .ck { border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,.03); }
+    .ck .h { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .ck .lbl { font-weight: 650; }
+    .st { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+    .pass { color: #6ee7b7; } .fail { color: #fca5a5; } .warn { color: #fcd34d; }
+    .why, .fix { margin-top: 6px; font-size: 14px; color: #d1d5db; line-height: 1.4; }
+    .fix { color: #fde68a; }
+    h2.sec { color: #e9d5ff; font-size: 18px; margin: 22px 0 10px; }
+    .cta { margin: auto; text-align: center; }
+    .cta h1 { font-size: 64px; }
+    .cta .url { margin-top: 28px; font-family: ui-monospace, DejaVu Sans Mono, monospace; font-size: 42px; letter-spacing: .06em; color: #facc15; }
+    .cta .btn { margin: 32px auto 0; display: inline-block; background: #fff; color: #020617; font-weight: 800;
+      font-size: 22px; padding: 18px 36px; border-radius: 16px; }
+    .cta .fine { margin-top: 18px; color: #9ca3af; font-size: 18px; }
+  </style>
+</head>
+<body>
+<section class="scene on" id="hero">
+  <div class="step">Product · 01 / 05 · What it is</div>
+  <div>
+    <div class="brand"><span class="ai">AI</span><span class="deazz">deazz</span></div>
+    <div class="tail"><hr style="background:#8b5cf6"> AI LAB <hr style="background:#facc15"></div>
+  </div>
+  <p class="kicker">Google ranked your page — and in 2026 that's just half of the fruit</p>
+  <h1>Can AI find and<br>cite you?</h1>
+  <p class="sub">Six crawlers decide whether ChatGPT, Claude, Gemini and Perplexity can quote your site. We read your page directly and score all thirty-four signals — no scraping vendor, no signup.</p>
+  <div class="grid4">
+    <div><div class="stat-l">Audits run</div><div class="stat-n">420+</div></div>
+    <div><div class="stat-l">Signals measured</div><div class="stat-n">14,000+</div></div>
+    <div><div class="stat-l">Sites scored</div><div class="stat-n">210+</div></div>
+    <div><div class="stat-l">Median score</div><div class="stat-n">85</div></div>
+  </div>
+  <p class="stat-note">Counted from production logs on Oracle Cloud · 34 signals every audit</p>
+</section>
+
+<section class="scene" id="form">
+  <div class="step">Product · 02 / 05 · How it works</div>
+  <div class="urlbar">aideazz.xyz/api</div>
+  <div class="brand"><span class="ai">AI</span><span class="deazz">deazz</span></div>
+  <p class="kicker" style="margin-top:28px">Paste any public URL. Direct page reads. Free.</p>
+  <h1 style="font-size:52px;margin-top:8px">Try it live</h1>
+  <div class="card">
+    <div class="try">Try it live</div>
+    <div class="row">
+      <input value="" placeholder="yourwebsite.com" id="urlbox">
+      <button id="go">Audit my site →</button>
+    </div>
+    <p class="hint">Enter any public URL. Runs on direct page reads.</p>
+    <p class="receipt">After you audit: your score, the priority fixes, and all 34 checks — what we actually saw on your page, why each one matters, and how to fix the ones that fail. Free key: 20 audits</p>
+    <div class="badge">Free · No signup · No scraping cost</div>
+  </div>
+</section>
+
+<section class="scene" id="auditing">
+  <div class="step">Product · 03 / 05 · How it works</div>
+  <div class="urlbar">aideazz.xyz/api</div>
+  <div class="card" style="margin-top:220px">
+    <div class="try">Try it live</div>
+    <div class="row">
+      <input value="yourwebsite.com">
+      <button class="busy">Auditing…</button>
+    </div>
+    <p class="hint">Reading the page · scoring 34 signals · GPTBot, ClaudeBot, PerplexityBot, Google-Extended…</p>
+  </div>
+</section>
+
+<section class="scene" id="score">
+  <div class="step">Product · 04 / 05 · What you get</div>
+  <div class="urlbar">aideazz.xyz/api · result</div>
+  <div class="scorewrap">
+    <div class="ring">
+      <svg width="180" height="180" viewBox="0 0 128 128">
+        <circle cx="64" cy="64" r="54" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+        <circle cx="64" cy="64" r="54" fill="none" stroke="#34d399" stroke-width="10" stroke-linecap="round"
+          stroke-dasharray="339.3" stroke-dashoffset="50.9"/>
+      </svg>
+      <div class="num"><b>85</b><s>A</s><u>AI Visibility Score</u></div>
+    </div>
+    <div>
+      <div style="font-size:28px;font-weight:700">yourwebsite.com</div>
+      <p style="margin-top:8px;color:#d1d5db;font-size:18px;max-width:720px">A finished audit looks like this: one score, then whether each engine can even read the site.</p>
+      <h2 class="sec">Can AI engines read this site?</h2>
+      <div class="engines">
+        <div class="eng ok">✓ ChatGPT / GPTBot</div>
+        <div class="eng ok">✓ Claude / ClaudeBot</div>
+        <div class="eng ok">✓ Perplexity</div>
+        <div class="eng ok">✓ Gemini</div>
+        <div class="eng ok">✓ Google-Extended</div>
+        <div class="eng ok">✓ Common Crawl</div>
+      </div>
+    </div>
+  </div>
+  <h2 class="sec">Category breakdown</h2>
+  <div class="bars" style="max-width:920px">
+    <div class="bar-row"><div class="lab"><span>AI Crawler Access</span><span>92/100</span></div>
+      <div class="track"><div class="fill" style="width:92%;background:#34d399"></div></div></div>
+    <div class="bar-row"><div class="lab"><span>Structured Data (GEO)</span><span>78/100</span></div>
+      <div class="track"><div class="fill" style="width:78%;background:#a3e635"></div></div></div>
+    <div class="bar-row"><div class="lab"><span>Answer-Readiness (AEO)</span><span>71/100</span></div>
+      <div class="track"><div class="fill" style="width:71%;background:#a3e635"></div></div></div>
+    <div class="bar-row"><div class="lab"><span>Technical Foundation</span><span>88/100</span></div>
+      <div class="track"><div class="fill" style="width:88%;background:#34d399"></div></div></div>
+  </div>
+  <p class="stat-note" style="text-align:left;margin-top:18px">Four categories, weighted into one score — the same signals AI answer engines use to decide who gets cited. The 85 / A here is the published median, not a named customer.</p>
+</section>
+
+<section class="scene" id="checks">
+  <div class="step">Product · 05 / 05 · Checks, why, fixes</div>
+  <div class="urlbar">aideazz.xyz/api · all 34 checks</div>
+  <h1 style="font-size:40px;text-align:left;margin:0 0 8px">Not five tips. Every check.</h1>
+  <p class="sub" style="text-align:left;margin:0 0 18px;max-width:1100px">What we actually saw on the page, why it matters, and how to fix the ones that fail.</p>
+  <div class="checks" style="max-width:1100px">
+    <div class="ck">
+      <div class="h"><span class="lbl">robots.txt allows GPTBot, ClaudeBot, PerplexityBot</span><span class="st pass">Pass</span></div>
+      <div class="why">Why it matters: if the crawler is blocked, the model never sees you — ranking on Google cannot save the citation.</div>
+    </div>
+    <div class="ck">
+      <div class="h"><span class="lbl">llms.txt present</span><span class="st fail">Fail</span></div>
+      <div class="why">Why it matters: this is the file answer engines look for when they want your official summary.</div>
+      <div class="fix">Fix: publish /llms.txt at the site root naming who you are, what you offer, and the canonical URLs to quote.</div>
+    </div>
+    <div class="ck">
+      <div class="h"><span class="lbl">JSON-LD Organization / Person identity</span><span class="st warn">Warn</span></div>
+      <div class="why">Why it matters: machines need a named entity, not just a pretty homepage, before they will attribute an answer to you.</div>
+      <div class="fix">Fix: add Organization JSON-LD with name, url, sameAs (LinkedIn, Wikipedia, Crunchbase).</div>
+    </div>
+    <div class="ck">
+      <div class="h"><span class="lbl">Question-style headings (FAQ signal)</span><span class="st fail">Fail</span></div>
+      <div class="why">Why it matters: answer engines match questions to question-shaped content.</div>
+      <div class="fix">Fix: add an FAQ whose H2/H3s are the literal questions customers ask.</div>
+    </div>
+  </div>
+</section>
+
+<section class="scene" id="categories">
+  <div class="step">The 34 signals · four categories</div>
+  <h1 style="font-size:48px;text-align:left;margin:0">What it checks</h1>
+  <p class="sub" style="text-align:left;margin:12px 0 24px">The same four weights that build the score.</p>
+  <div class="cats">
+    <div class="cat"><h3>AI Crawler Access</h3><p>Can GPTBot, ClaudeBot, PerplexityBot and Google-Extended actually reach your pages? robots.txt, llms.txt, sitemap, indexability.</p></div>
+    <div class="cat"><h3>Structured Data (GEO)</h3><p>Can machines understand what you are? JSON-LD schema, Organization/Person identity, Open Graph, canonical, meta.</p></div>
+    <div class="cat"><h3>Answer-Readiness (AEO)</h3><p>Will an answer engine quote you? Titles, single H1, question-style headings, content depth, extractable lists and facts.</p></div>
+    <div class="cat"><h3>Technical Foundation</h3><p>HTTPS, speed, mobile viewport, and content in raw HTML that JS-only crawlers can see.</p></div>
+  </div>
+  <div class="card" style="margin-top:28px">
+    <div class="try">Use it as an API</div>
+    <p class="hint" style="color:#d1d5db;font-size:16px">One authenticated endpoint. Send a URL, get structured JSON — score, per-engine access, every check, prioritized fixes. Demo key on the page. 20 free audits / hour.</p>
+  </div>
+</section>
+
+<section class="scene" id="cta">
+  <div class="cta">
+    <p class="kicker">Free · No signup · Direct page reads</p>
+    <h1>Run yours now</h1>
+    <div class="url">aideazz.xyz/api</div>
+    <div class="btn">Audit my site →</div>
+    <p class="fine">Then start a project if you want it wired into the stack.</p>
+  </div>
+</section>
+<script>
+  const order = ['hero','form','auditing','score','checks','categories','cta'];
+  function show(id){
+    document.querySelectorAll('.scene').forEach(s => s.classList.toggle('on', s.id === id));
+  }
+  const q = new URLSearchParams(location.search).get('scene');
+  if (q && document.getElementById(q)) show(q);
+  window.showScene = show;
+  window.scenes = order;
+</script>
+</body>
+</html>

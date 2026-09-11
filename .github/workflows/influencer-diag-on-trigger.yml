@@ -18,6 +18,7 @@ on:
 jobs:
   influencer-diag:
     runs-on: ubuntu-latest
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,8 +32,8 @@ jobs:
           [ -n "$LINE" ] || { echo "::error::.influencer-diag-trigger is empty"; exit 1; }
           case "$LINE" in
             \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
-            diag|fix|sync|cmo|cmo-fix|geo|fire) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, or # idle — got '$LINE'"; exit 1 ;;
+            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, or # idle — got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -86,6 +87,12 @@ jobs:
               ubuntu@170.9.242.90:/tmp/
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/fire-influencer-promo.sh
+          elif [ "$MODE" = "api-film" ]; then
+            scp -r $SSHOPTS \
+              scripts/youtube-api-audit-film \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film
+            ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
+              "$MODE" < scripts/oracle-resilience/run-api-audit-film.sh
           else
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/diag-influencer-promo.sh
