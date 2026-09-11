@@ -8,7 +8,7 @@ Compiled with the Atuona Film Studio stack already wired into this repo
 
 ## Length (this cut)
 
-VO and caption **wording** on existing beats are unchanged; burned-in type is **larger** (VO captions, fruit labels, chapter overlays, QR end card). Grapevine is back: berries move, neural traces glow, and the “What it checks” chapter sits on that shot. Checks waterfall Loom is a **1 second peek**, not a long scroll. Fruit labels (Google / ChatGPT, bot names) are burned onto the picture, not spoken. QR outro.
+VO and caption **wording** on existing beats are unchanged. Cut order: moving pomegranate, moving/growing grapevine with neurones and the **What it checks** chapter on that shot, moving maracuya crawlers, then Elena's shortened Loom, then the finishing slides. Fruit labels stay burned onto the picture. QR outro.
 
 ## Watch
 
@@ -17,8 +17,8 @@ Open a filename Chrome has never cached:
 Player (QR is a real clickable link on this page):
 https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
 
-Direct file (open this, not v8 / v7 / v6):
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v9.mp4
+Direct file (open this, not v9 / v8 / v7):
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v10.mp4
 
 Poster:
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-poster.jpg

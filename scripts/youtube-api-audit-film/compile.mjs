@@ -403,20 +403,51 @@ async function salvageCrawlers(dest) {
 }
 
 async function salvageGrapes(dest) {
-  // v2 opener after the title card: grapevine Runway walk, before the split fruit.
-  return salvageWindow(dest, 'API_FILM_GRAPES_SRC', 'API_FILM_GRAPES_SS', 'API_FILM_GRAPES_T', '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4', '4.6', '5.4', 'grapes');
+  // Prefer the v7 stub (intro + grapevine) then the v2 Runway walk.
+  if (
+    await salvageWindow(
+      dest,
+      'API_FILM_GRAPES_SRC',
+      'API_FILM_GRAPES_SS',
+      'API_FILM_GRAPES_T',
+      '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4',
+      '4.6',
+      '5.4',
+      'grapes-v2',
+    )
+  ) {
+    return true;
+  }
+  return salvageWindow(
+    dest,
+    'API_FILM_GRAPES_SRC2',
+    'API_FILM_GRAPES_SS2',
+    'API_FILM_GRAPES_T2',
+    '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v7.mp4',
+    '4.5',
+    '6.8',
+    'grapes-v7',
+  );
 }
 
-async function neuronPulse(src, dest, seconds, { sway } = {}) {
+async function neuronPulse(src, dest, seconds, { sway, grow } = {}) {
   const take = Math.max(4.8, seconds || 6.2);
   const isImg = /\.(jpg|jpeg|png|webp)$/i.test(src);
-  const motion = sway
-    ? `scale=${WX + 96}:${HY + 96}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:'(in_w-out_w)/2+40*sin(2*PI*t/3.1)':'(in_h-out_h)/2+24*cos(2*PI*t/2.6)',fps=${FPS},format=yuv420p,setsar=1`
-    : `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p,setsar=1`;
+  let motion;
+  if (grow) {
+    const pan = sway
+      ? `'(in_w-out_w)/2+28*sin(2*PI*t/3.1)':'(in_h-out_h)/2-10*t+14*cos(2*PI*t/2.6)'`
+      : `'(in_w-out_w)/2':'(in_h-out_h)/2-10*t'`;
+    motion = `scale=${WX + 180}:${HY + 180}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:${pan},fps=${FPS},format=yuv420p,setsar=1`;
+  } else if (sway) {
+    motion = `scale=${WX + 96}:${HY + 96}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:'(in_w-out_w)/2+40*sin(2*PI*t/3.1)':'(in_h-out_h)/2+24*cos(2*PI*t/2.6)',fps=${FPS},format=yuv420p,setsar=1`;
+  } else {
+    motion = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p,setsar=1`;
+  }
   const fc =
-    `[0:v]${motion},eq=saturation=1.22:contrast=1.05:brightness=0.03,split=2[base][hot];` +
-    `[hot]eq=brightness=0.30:saturation=1.6,hue=h='275+20*sin(2*PI*t/1.5)',gblur=sigma=7[glow];` +
-    `[base][glow]blend=all_mode=screen:all_opacity=0.28,setsar=1[v]`;
+    `[0:v]${motion},eq=saturation=1.28:contrast=1.08:brightness=0.04,split=2[base][hot];` +
+    `[hot]eq=brightness=0.38:saturation=1.7,hue=h='275+35*sin(2*PI*t/1.25)',gblur=sigma=8[glow];` +
+    `[base][glow]blend=all_mode=screen:all_opacity=0.40,setsar=1[v]`;
   const inputs = isImg ? ['-loop', '1', '-i', src] : ['-i', src];
   await execFileP(
     'ffmpeg',
@@ -490,12 +521,12 @@ const BEATS = [
       'The grape cluster SWAYS on the vine. Individual berries shift a few millimetres. Dew slides. Neural constellation traces on each grape GLOW and fire — cyan then magenta pulses travel berry to berry like neurones. Slow prestige product film. There is only THIS cluster. No knife, no hand, no extra fruit, no text, no logo, no second vine.',
     vo: null,
     cap: null,
-    clipDur: 7.2,
+    clipDur: 8.0,
     slide: [
-      { text: 'WHAT IT CHECKS', y: 'H*0.06', size: 72, color: 'white' },
-      { text: 'The same four weights that build the score', y: 'H*0.16', size: 44, color: '0xFDE68A' },
-      { text: 'AI Crawler Access     ·     Structured Data (GEO)', y: 'H*0.74', size: 48, color: 'white' },
-      { text: 'Answer-Readiness (AEO)     ·     Technical Foundation', y: 'H*0.85', size: 48, color: 'white' },
+      { text: 'WHAT IT CHECKS', y: 'H*0.05', size: 56, color: 'white' },
+      { text: 'The same four weights that build the score', y: 'H*0.14', size: 32, color: '0xFDE68A' },
+      { text: 'AI Crawler Access     ·     Structured Data (GEO)', y: 'H*0.82', size: 36, color: 'white' },
+      { text: 'Answer-Readiness (AEO)     ·     Technical Foundation', y: 'H*0.90', size: 36, color: 'white' },
     ],
   },
   {
@@ -549,24 +580,36 @@ const BEATS = [
     ],
   },
   {
+    id: 'loomwalk',
+    kind: 'ui',
+    still: 'ui/ui-hero.png',
+    vo: null,
+    cap: null,
+    clipDur: 16,
+    slideHold: 0,
+    liveHold: 0,
+    loomMax: 16,
+    loomAt: 0.4,
+  },
+  {
     id: 'website',
     kind: 'ui',
     still: 'ui/ui-hero.png',
     liveStill: 'ui/live-hero.png',
     vo: null,
     cap: null,
-    clipDur: 10,
-    slideHold: 1.8,
-    liveHold: 1.5,
-    loomMax: 6.8,
+    clipDur: 8,
+    slideHold: 2.4,
+    liveHold: 2.0,
+    loomMax: 0,
   },
-  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 2.2, liveHold: 1.2 },
-  { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 2.2 },
-  { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 2.0 },
-  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 1.2 },
-  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 1.0, loomAt: 21 },
+  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 0, liveHold: 1.2 },
+  { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 0 },
+  { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 0 },
+  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 0 },
+  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 0 },
   { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.', loomMax: 0 },
-  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api', loomMax: 1.6 },
+  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api', loomMax: 0 },
 ];
 
 async function main() {
@@ -582,10 +625,12 @@ async function main() {
       if (!b) continue;
       const still = path.join(HERE, b.still);
       const raw = path.join(CLIPDIR, `${b.id}.mp4`);
-      if (fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
+      const forceGrapes = b.id === 'grapes' && process.env.API_FILM_FORCE_GRAPES === '1';
+      if (!forceGrapes && fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
         process.stderr.write(`runway cache hit ${b.id}\n`);
         continue;
       }
+      if (forceGrapes) process.stderr.write('grapes rebuild — What it checks on moving/growing vine + neurones\n');
       try {
         await runwayI2V(still, b.motion, raw);
       } catch (e) {
@@ -594,12 +639,12 @@ async function main() {
           process.stderr.write('crawlers salvaged from the v2 Runway walk\n');
         } else if (b.id === 'grapes' && (await salvageGrapes(raw))) {
           const pulsed = raw + '.glow.mp4';
-          await neuronPulse(raw, pulsed, b.clipDur || 7.2, { sway: false });
+          await neuronPulse(raw, pulsed, b.clipDur || 8.0, { grow: true });
           fs.renameSync(pulsed, raw);
-          process.stderr.write('grapes salvaged from v2 + neuron glow\n');
+          process.stderr.write('grapes salvaged + neuron glow + grow\n');
         } else if (b.id === 'grapes') {
-          process.stderr.write('grapes still+sway+glow fallback\n');
-          await neuronPulse(still, raw, b.clipDur || 7.2, { sway: true });
+          process.stderr.write('grapes still+grow+glow fallback\n');
+          await neuronPulse(still, raw, b.clipDur || 8.0, { sway: true, grow: true });
         } else {
           process.stderr.write(`still fallback ${b.id}\n`);
           await stillToClip(still, raw, 5.5);
@@ -635,7 +680,7 @@ async function main() {
     if (b.kind === 'ui') {
       raw = await buildUiClip(b, clipDur, loomState);
     } else if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
-      if (b.id === 'grapes') await neuronPulse(still, raw, clipDur, { sway: true });
+      if (b.id === 'grapes') await neuronPulse(still, raw, clipDur, { sway: true, grow: true });
       else await stillToClip(still, raw, 5.5);
     }
     const nat = await dur(raw);
@@ -654,6 +699,9 @@ async function main() {
     await bakeCaption(slid, baked, b.cap, normDur);
     seq.push(baked);
     if (voFile) voInfo.push({ segIndex: i + 1, file: voFile });
+    if (b.id === 'grapes') process.stderr.write('chapter What it checks on moving/growing grapes + neurones\n');
+    if (b.id === 'loomwalk') process.stderr.write('chapter Elena Loom shortened (no results-scroll tail)\n');
+    if (b.id === 'website') process.stderr.write('chapter finishing slides\n');
     process.stderr.write(`beat ${i + 1}/${BEATS.length} ${b.id} dur=${normDur.toFixed(1)} vo=${b.vo ? vd.toFixed(1) : '-'}\n`);
   }
   const qrCard = path.join(HERE, 'qr/api-cta-endcard.png');
@@ -729,15 +777,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v9 = path.join(PUBLISH, `${SLUG}-v9.mp4`);
-  fs.copyFileSync(final, v9);
+  const v10 = path.join(PUBLISH, `${SLUG}-v10.mp4`);
+  fs.copyFileSync(final, v10);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v9)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v10)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
