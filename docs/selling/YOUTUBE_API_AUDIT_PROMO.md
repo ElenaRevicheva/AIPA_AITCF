@@ -6,6 +6,14 @@ Compiled with the Atuona Film Studio stack already wired into this repo
 
 **Do not drop this file into `atuona.xyz/aifilmstudio`.** That gallery is poetry.
 
+## Length (this cut)
+
+**79 seconds** (1:19). That is the usual length for a YouTube promo that also teaches the product: hook in the first 3s, what it is, how it works, hard CTA.
+
+Shorter than 30s is a Short or an ad — no room to show the form. Two to three minutes is an explainer; retention usually dies unless someone searched for a tutorial. Production on this stack is minutes on Oracle (Runway 5s clips + ffmpeg), not a shoot day.
+
+Verified 11 Sep 2026, Actions `34590866362`: 21.9MB, 1920×1080 30fps, AAC, HTTP 200, frame 0 = title card.
+
 ## Watch
 
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4
@@ -50,19 +58,21 @@ AIdeazz Lab · Elena Revicheva
 
 ### Chapters
 
+Computed from beat durations + 1.3s xfade. Watch once and nudge if a line lands a second early.
+
 ```
 0:00 Can AI find and cite you?
-0:05 Half of the fruit
-0:12 Six crawlers
+0:03 Half of the fruit
+0:13 Six crawlers
 0:20 What the product is
-0:28 Paste a URL
-0:36 The score
-0:48 All 34 checks
-1:00 Four categories
-1:10 Run yours — aideazz.xyz/api
+0:25 Paste a URL
+0:33 Audit my site
+0:38 The score lands
+0:45 Which engines can read you
+0:52 All 34 checks
+1:01 Four categories
+1:09 Run yours — aideazz.xyz/api
 ```
-
-Adjust timestamps after you watch the cut.
 
 ### Tags
 

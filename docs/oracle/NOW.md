@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 11 Sep 10:26 UTC | YouTube CTA film for aideazz.xyz/api | docs/selling/youtube-api-audit, scripts/youtube-api-audit-film.mjs — no Oracle restart | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 STOPPED 11 Sep — Influencer + VJH/CMO synced, Elena asked to pause
+### 🟢 STOPPED 11 Sep 10:50 UTC — /api YouTube film is live (79s)
 
-**DONE today (do not redo):**
-- **Influencer:** 2/3 GEO → tagged `https://aideazz.xyz/api?utm_source=linkedin&utm_medium=influencer&utm_campaign=geo-api`, 1/3 EspaLuz. Six stills on `webhook.aideazz.xyz/influencer-images/geo-api/`. Make leftover fields blanked (`story` stays a dict). Fire `34547160520` `HAS_UTM True` Make **200**. Elena confirmed the untagged `/api` link opened. Oracle `geo` `34547616339`. Branch `cursor/fix-influencer-make-0841` (PR 50, draft).
-- **VJH / CMO 3543445:** GitHub raw 404 after the repo went private. CDN `webhook.aideazz.xyz/influencer-images/cmo/` — architecture PNG **200**/720012, sprinter.jpg **200**, PNG magic PASS (`34547732009`). Live `linkedin_cmo_v4.py` already public. Helpers still had raw URLs (UTF-8 BOM crashed `ast.parse`); BOM-safe rewrite `34547850451` wrote `patch_select_image.py` / `fix_selected_image.py` / `run_marketing_engine_four_image_test.py`, `all CMO targets: no github-raw`, VJH git **`5bc2d09` `PUSH_OK`**. `vibejobhunter` **00:46:13 UTC** (second bounce — `ActiveEnterTimestampUSec` is not a Unix epoch on this box; skip now parses the human timestamp). Do not click Make Run once.
+**DONE:** Promo + walkthrough for `https://aideazz.xyz/api` compiled on Oracle with the Atuona studio stack (Runway Gen-4.5 i2v cache hits on all 4 fruit clips, onyx TTS, 1.3s xfade). **79s, 21.9MB, 1920×1080@30, AAC.** Public:
+`https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4`
+Poster: `…/can-ai-find-and-cite-you-poster.jpg`. Pack: `docs/selling/YOUTUBE_API_AUDIT_PROMO.md`. Branch `cursor/youtube-api-promo-0841` PR **#51**. Trigger `# idle`. Influencer + VJH stay paused (do not restart).
 
-**NEXT (Elena):** rest. Newest Influencer post (pomegranate + hand) should carry the three `utm_*`. Audit or portfolio form to land on the ledger. CMO: tap LinkedIn/Instagram once if you have not. **Do not Make Run once.**
+**NEXT (Elena):** watch the cut, then upload in YouTube Studio with that pack (title, description, chapters, thumbnail `scripts/youtube-api-audit-film/youtube_api_audit_thumbnail.png`). CTA URL `https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta`. **Do not drop the mp4 into Atuona `/films`.** **Do not Make Run once.**
 
 **NEXT (agent):** do not fire another promo. Do not restart influencer or VJH unless asked. Claim empty.
 
-**VERIFIED BY:** Oracle `geo` `34547616339`; `cmo-fix` `34547732009` + `34547850451` (CDN 200, `patch contracts: PASS`, VJH `5bc2d09` `PUSH_OK`). Trigger `# idle`.
+**VERIFIED BY:** Actions `34590866362` `compile exit 0` · `DONE … (21.9MB, 79s)` · Oracle curl `200 application/octet-stream 21936309` · `width=1920 height=1080 r_frame_rate=30/1 duration=79.033333` · `frame0 bytes=114005`.
 
-**RISK:** Make Influencer 3044021 still prepends “¡Hola, explorer!”. IG clicks inherit `utm_source=linkedin`. Community board still only pins `community-reply`. VJH cron `17 * * * *` lives only on the box. Each `vibejobhunter` bounce re-sends the “Telegram notification sent (1 today)” line — do not bounce again.
+**RISK:** Cloud agents cannot curl `webhook.aideazz.xyz` (SSL). Make Influencer 3044021 still prepends “¡Hola, explorer!”. Each `vibejobhunter` bounce re-sends the Telegram “1 today” line.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
