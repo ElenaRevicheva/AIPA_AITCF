@@ -8,7 +8,7 @@ Compiled with the Atuona Film Studio stack already wired into this repo
 
 ## Length (this cut)
 
-VO and captions are unchanged. Grapevine shot is gone. Fruit labels (Google / ChatGPT, bot names) are burned onto the picture, not spoken. New shorter Loom. QR outro.
+VO and captions on existing beats are unchanged. Grapevine is back: berries move, neural traces glow, and the “What it checks” chapter sits on that shot. Fruit labels (Google / ChatGPT, bot names) are burned onto the picture, not spoken. Short Loom. QR outro.
 
 ## Watch
 
@@ -17,8 +17,8 @@ Open a filename Chrome has never cached:
 Player (QR is a real clickable link on this page):
 https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
 
-Direct file (open this, not v5 / v4 / v3):
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v6.mp4
+Direct file (open this, not v6 / v5 / v4):
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v7.mp4
 
 Poster:
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-poster.jpg
@@ -66,16 +66,17 @@ Computed from beat durations + 1.3s xfade. Watch once and nudge if a line lands 
 
 ```
 0:00 Can AI find and cite you?
-0:03 Half of the fruit
-0:13 Six crawlers
-0:20 What the product is
-0:25 Paste a URL
-0:33 Audit my site
-0:38 The score lands
-0:45 Which engines can read you
-0:52 All 34 checks
-1:01 Four categories
-1:09 Run yours — aideazz.xyz/api
+0:04 What it checks (grapevine)
+0:11 Half of the fruit
+0:20 Six crawlers
+0:27 What the product is
+0:32 Paste a URL
+0:40 Audit my site
+0:45 The score lands
+0:52 Which engines can read you
+0:59 All 34 checks
+1:08 Four categories
+1:16 Run yours — aideazz.xyz/api
 ```
 
 ### Tags

@@ -373,12 +373,11 @@ async function overlaySlide(src, dest, lines) {
   return dest;
 }
 
-async function salvageCrawlers(dest) {
-  const src = process.env.API_FILM_CRAWLERS_SRC || '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4';
+async function salvageWindow(dest, envSrc, envSs, envT, fallbackSrc, fallbackSs, fallbackT, label) {
+  const src = process.env[envSrc] || fallbackSrc;
   if (!fs.existsSync(src) || fs.statSync(src).size < 1e6) return false;
-  // v2 still has the Runway walk (grapes+split before it). Window measured from that cut.
-  const ss = process.env.API_FILM_CRAWLERS_SS || '15.0';
-  const t = process.env.API_FILM_CRAWLERS_T || '7.0';
+  const ss = process.env[envSs] || fallbackSs;
+  const t = process.env[envT] || fallbackT;
   try {
     await execFileP(
       'ffmpeg',
@@ -386,13 +385,42 @@ async function salvageCrawlers(dest) {
       { maxBuffer: 1 << 26, timeout: 120000 },
     );
     if (fs.existsSync(dest) && fs.statSync(dest).size > 20000) {
-      process.stderr.write(`salvage crawlers ${src} ss=${ss} t=${t} ${(fs.statSync(dest).size / 1e6).toFixed(1)}MB\n`);
+      process.stderr.write(`salvage ${label} ${src} ss=${ss} t=${t} ${(fs.statSync(dest).size / 1e6).toFixed(1)}MB\n`);
       return true;
     }
   } catch (e) {
-    process.stderr.write(`WARN salvage crawlers: ${e.message}\n`);
+    process.stderr.write(`WARN salvage ${label}: ${e.message}\n`);
   }
   return false;
+}
+
+async function salvageCrawlers(dest) {
+  // v2 still has the Runway walk (grapes+split before it). Window measured from that cut.
+  return salvageWindow(dest, 'API_FILM_CRAWLERS_SRC', 'API_FILM_CRAWLERS_SS', 'API_FILM_CRAWLERS_T', '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4', '15.0', '7.0', 'crawlers');
+}
+
+async function salvageGrapes(dest) {
+  // v2 opener after the title card: grapevine Runway walk, before the split fruit.
+  return salvageWindow(dest, 'API_FILM_GRAPES_SRC', 'API_FILM_GRAPES_SS', 'API_FILM_GRAPES_T', '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4', '4.6', '5.4', 'grapes');
+}
+
+async function neuronPulse(src, dest, seconds, { sway } = {}) {
+  const take = Math.max(4.8, seconds || 6.2);
+  const isImg = /\.(jpg|jpeg|png|webp)$/i.test(src);
+  const motion = sway
+    ? `scale=${WX + 96}:${HY + 96}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:'(in_w-out_w)/2+40*sin(2*PI*t/3.1)':'(in_h-out_h)/2+24*cos(2*PI*t/2.6)',fps=${FPS},format=yuv420p,setsar=1`
+    : `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p,setsar=1`;
+  const fc =
+    `[0:v]${motion},eq=saturation=1.22:contrast=1.05:brightness=0.03,split=2[base][hot];` +
+    `[hot]eq=brightness=0.30:saturation=1.6,hue=h='275+20*sin(2*PI*t/1.5)',gblur=sigma=7[glow];` +
+    `[base][glow]blend=all_mode=screen:all_opacity=0.28,setsar=1[v]`;
+  const inputs = isImg ? ['-loop', '1', '-i', src] : ['-i', src];
+  await execFileP(
+    'ffmpeg',
+    ['-y', ...inputs, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', fc, '-map', '[v]', '-map', '1:a', '-t', take.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
+    { maxBuffer: 1 << 26, timeout: 180000 },
+  );
+  return dest;
 }
 
 async function overlayLabels(src, dest, labels) {
@@ -451,6 +479,22 @@ async function makeDrone(out) {
 }
 
 const BEATS = [
+  {
+    id: 'grapes',
+    kind: 'runway',
+    still: 'fruit/geo-grapes-citation.jpg',
+    motion:
+      'The grape cluster SWAYS on the vine. Individual berries shift a few millimetres. Dew slides. Neural constellation traces on each grape GLOW and fire — cyan then magenta pulses travel berry to berry like neurones. Slow prestige product film. There is only THIS cluster. No knife, no hand, no extra fruit, no text, no logo, no second vine.',
+    vo: null,
+    cap: null,
+    clipDur: 7.2,
+    slide: [
+      { text: 'WHAT IT CHECKS', y: 'H*0.08', size: 48, color: 'white' },
+      { text: 'The same four weights that build the score', y: 'H*0.17', size: 26, color: '0xFDE68A' },
+      { text: 'AI Crawler Access     ·     Structured Data (GEO)', y: 'H*0.78', size: 28, color: 'white' },
+      { text: 'Answer-Readiness (AEO)     ·     Technical Foundation', y: 'H*0.87', size: 28, color: 'white' },
+    ],
+  },
   {
     id: 'split',
     kind: 'runway',
@@ -530,7 +574,7 @@ async function main() {
 
   if (RUNWAY) {
     process.stderr.write('Runway Gen-4.5 image→video (one at a time — parallel THROTTLEs)\n');
-    for (const id of ['crawlers', 'dashboard', 'hand', 'split']) {
+    for (const id of ['grapes', 'crawlers', 'dashboard', 'hand', 'split']) {
       const b = BEATS.find((x) => x.id === id && x.kind === 'runway');
       if (!b) continue;
       const still = path.join(HERE, b.still);
@@ -545,6 +589,14 @@ async function main() {
         process.stderr.write(`WARN runway ${b.id}: ${e.message}\n`);
         if (b.id === 'crawlers' && (await salvageCrawlers(raw))) {
           process.stderr.write('crawlers salvaged from the v2 Runway walk\n');
+        } else if (b.id === 'grapes' && (await salvageGrapes(raw))) {
+          const pulsed = raw + '.glow.mp4';
+          await neuronPulse(raw, pulsed, b.clipDur || 7.2, { sway: false });
+          fs.renameSync(pulsed, raw);
+          process.stderr.write('grapes salvaged from v2 + neuron glow\n');
+        } else if (b.id === 'grapes') {
+          process.stderr.write('grapes still+sway+glow fallback\n');
+          await neuronPulse(still, raw, b.clipDur || 7.2, { sway: true });
         } else {
           process.stderr.write(`still fallback ${b.id}\n`);
           await stillToClip(still, raw, 5.5);
@@ -579,13 +631,16 @@ async function main() {
     const clipDur = b.clipDur || (b.vo ? Math.max(6.5, LEAD + vd + TAIL) : 5.5);
     if (b.kind === 'ui') {
       raw = await buildUiClip(b, clipDur, loomState);
-    } else {
-      if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
-        await stillToClip(still, raw, 5.5);
-      }
+    } else if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
+      if (b.id === 'grapes') await neuronPulse(still, raw, clipDur, { sway: true });
+      else await stillToClip(still, raw, 5.5);
     }
     const nat = await dur(raw);
-    const normDur = b.kind === 'ui' ? clipDur : b.vo ? Math.max(nat, LEAD + vd + TAIL) : Math.min(Math.max(nat, 4.8), 6.2);
+    let normDur;
+    if (b.kind === 'ui') normDur = clipDur;
+    else if (b.clipDur) normDur = b.clipDur;
+    else if (b.vo) normDur = Math.max(nat, LEAD + vd + TAIL);
+    else normDur = Math.min(Math.max(nat, 4.8), 6.2);
     const norm = path.join(W, `n_${b.id}.mp4`);
     await normalizeVideo(raw, norm, normDur, { pad: b.kind === 'ui' });
     const labeled = path.join(W, `lb_${b.id}.mp4`);
@@ -660,15 +715,15 @@ async function main() {
   process.stderr.write('final mix...\n');
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   fs.copyFileSync(final, stable);
-  const v6 = path.join(PUBLISH, `${SLUG}-v6.mp4`);
-  fs.copyFileSync(final, v6);
+  const v7 = path.join(PUBLISH, `${SLUG}-v7.mp4`);
+  fs.copyFileSync(final, v7);
   const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${LEN.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v6)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v7)}`);
   console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
