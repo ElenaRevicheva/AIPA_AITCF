@@ -41,8 +41,13 @@ def patch_text(src: str) -> tuple[str, int]:
     return out, n
 
 
+def read_text(path: Path) -> str:
+    """utf-8-sig strips a leading U+FEFF so Windows-saved helpers stay parseable."""
+    return path.read_text(encoding="utf-8-sig")
+
+
 def patch_file(path: Path) -> int:
-    original = path.read_text(encoding="utf-8")
+    original = read_text(path)
     updated, n = patch_text(original)
     if n == 0:
         if NEW_ASSETS in original:
@@ -61,6 +66,18 @@ def patch_file(path: Path) -> int:
     return n
 
 
+def remaining_github_raw(root: Path) -> list[str]:
+    leftover: list[str] = []
+    for rel in TARGETS:
+        p = root / rel
+        if not p.exists():
+            continue
+        text = read_text(p)
+        if OLD_ASSETS in text or OLD_ROOT_SPRINTER in text:
+            leftover.append(rel)
+    return leftover
+
+
 def _self_check() -> None:
     sample = f'github_base = "{OLD_ASSETS}"\nurl = "{OLD_ROOT_SPRINTER}"\n'
     out, n = patch_text(sample)
@@ -68,6 +85,10 @@ def _self_check() -> None:
     assert OLD_ASSETS not in out
     assert NEW_SPRINTER in out
     assert n >= 2
+    bom_src = "\ufeff" + f'github_base = "{OLD_ASSETS}"\n'
+    bom_out, bom_n = patch_text(bom_src.lstrip("\ufeff"))
+    assert bom_n == 1
+    ast.parse(bom_out)
     ast.parse("github_base = %r\n" % NEW_ASSETS)
     print("self-check ok")
 
@@ -78,13 +99,26 @@ if __name__ == "__main__":
         raise SystemExit(0)
     root = Path(sys.argv[1] if len(sys.argv) > 1 else "/home/ubuntu/VibeJobHunterAIPA_AIMCF")
     total = 0
+    errors = 0
     for rel in TARGETS:
         p = root / rel
         if not p.exists():
             print(f"skip missing {rel}")
             continue
-        total += patch_file(p)
+        try:
+            total += patch_file(p)
+        except SyntaxError as exc:
+            errors += 1
+            print(f"WARN: skip {rel}: {exc}")
     if total == 0:
         print("nothing rewritten (already patched or prefixes gone)")
     else:
         print(f"total replacements={total}")
+    leftover = remaining_github_raw(root)
+    if leftover:
+        print("FAIL: github-raw still in: " + ", ".join(leftover))
+        raise SystemExit(1)
+    if errors:
+        print(f"FAIL: {errors} file(s) could not be parsed")
+        raise SystemExit(1)
+    print("all CMO targets: no github-raw assets prefix")

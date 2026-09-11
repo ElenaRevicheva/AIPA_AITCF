@@ -1,2 +1,2 @@
 cmo-fix
-# verify VJH CMO public images; no new post
+# re-run VJH CMO helpers after BOM-safe patcher; skip restart if <10m

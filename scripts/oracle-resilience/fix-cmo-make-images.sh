@@ -47,12 +47,12 @@ ls -1 "$WEBROOT" | head -25
 
 echo
 echo "=== 2. patch CMO sources ==="
-python3 /tmp/patch-cmo-make-images.py "$DIR"
-python3 -c "import ast,pathlib; ast.parse(pathlib.Path('$DIR/src/notifications/linkedin_cmo_v4.py').read_text())"
+python3 /tmp/patch-cmo-make-images.py "$DIR" || { echo "FATAL: patcher failed"; exit 1; }
+python3 -c "import ast,pathlib; ast.parse(pathlib.Path('$DIR/src/notifications/linkedin_cmo_v4.py').read_text(encoding='utf-8-sig'))"
 echo "syntax ok"
 python3 - <<'PY'
 from pathlib import Path
-src = Path("/home/ubuntu/VibeJobHunterAIPA_AIMCF/src/notifications/linkedin_cmo_v4.py").read_text()
+src = Path("/home/ubuntu/VibeJobHunterAIPA_AIMCF/src/notifications/linkedin_cmo_v4.py").read_text(encoding="utf-8-sig")
 assert "https://webhook.aideazz.xyz/influencer-images/cmo" in src
 assert "raw.githubusercontent.com/ElenaRevicheva/VibeJobHunterAIPA_AIMCF/main/assets" not in src
 print("patch contracts: PASS")
@@ -61,11 +61,23 @@ PY
 echo
 echo "=== 3. restart vibejobhunter (owns Telegram + CMO send) ==="
 # web server does not own the bot; do not bounce it unless we touched it
-sudo systemctl restart vibejobhunter
-sleep 4
-systemctl is-active vibejobhunter
-systemctl show vibejobhunter -p ActiveEnterTimestamp -p MainPID -p SubState
-journalctl -u vibejobhunter --since "20 seconds ago" --no-pager | redact | tail -20
+# One-deployer: skip bounce if this unit entered in the last 10 minutes.
+enter_usec=$(systemctl show vibejobhunter -p ActiveEnterTimestampUSec --value)
+enter_usec=${enter_usec:-0}
+now_s=$(date +%s)
+age_s=$(( now_s - enter_usec / 1000000 ))
+echo "vibejobhunter age_s=$age_s"
+if [ "$age_s" -lt 600 ]; then
+  echo "SKIP restart — entered ${age_s}s ago (one-deployer, 10m)"
+  systemctl is-active vibejobhunter
+  systemctl show vibejobhunter -p ActiveEnterTimestamp -p MainPID -p SubState
+else
+  sudo systemctl restart vibejobhunter
+  sleep 4
+  systemctl is-active vibejobhunter
+  systemctl show vibejobhunter -p ActiveEnterTimestamp -p MainPID -p SubState
+  journalctl -u vibejobhunter --since "20 seconds ago" --no-pager | redact | tail -20
+fi
 
 echo
 echo "=== 4. public image HTTP proof (the file Instagram 400'd on) ==="
