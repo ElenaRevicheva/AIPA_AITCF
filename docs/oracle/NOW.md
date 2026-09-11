@@ -131,17 +131,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 ELENA'S TAP — 11 Sep 00:36 UTC — tagged `/api` post is live
+### 🟢 STOPPED 11 Sep — Influencer + VJH/CMO, Elena asked to pause
 
-**DONE:** Influencer destination is now `https://aideazz.xyz/api?utm_source=linkedin&utm_medium=influencer&utm_campaign=geo-api`. Action `34547160520`: `HAS_UTM True`, `PROMO_URLS` only that tagged URL, Make **200**. Image `geo-pomegranate-audit-hand.jpg`. Still one URL (no `/portfolio/api` glue). Branch `cursor/fix-influencer-make-0841`. NOW.md on `main`.
+**DONE today (do not redo):**
+- **Influencer:** 2/3 GEO → tagged `https://aideazz.xyz/api?utm_source=linkedin&utm_medium=influencer&utm_campaign=geo-api`, 1/3 EspaLuz. Six stills on `webhook.aideazz.xyz/influencer-images/geo-api/`. Make leftover fields blanked (`story` stays a dict). Fire `34547160520` `HAS_UTM True` Make **200**. Elena confirmed the untagged `/api` link opened. Branch `cursor/fix-influencer-make-0841` (PR 50, draft).
+- **VJH / CMO 3543445:** GitHub raw 404 after the repo went private. Images served from `webhook.aideazz.xyz/influencer-images/cmo/` (architecture PNG **200**). `linkedin_cmo_v4.py` patched on Oracle; VJH git push was `ad34fb3`. `vibejobhunter` restarted 10 Sep 20:54 UTC. Do not click Make Run once.
 
-**NEXT (Elena):** open the **newest** post (pomegranate + hand). The link must show the three `utm_*` params. Then **run an audit** or submit the portfolio form — a page-open alone still writes nothing. **Do not Make Run once.**
+**NEXT (Elena):** rest. Newest Influencer post (pomegranate + hand) should carry the three `utm_*`. Audit or portfolio form to land on the ledger. CMO: tap LinkedIn/Instagram once if you have not. **Do not Make Run once.**
 
-**NEXT (agent):** idle.
+**NEXT (agent):** do not fire another promo. Do not restart influencer or VJH unless asked. Claim empty.
 
-**VERIFIED BY:** Action `34547160520` `HAS_UTM True` + Make 200.
+**VERIFIED BY:** pending this stop’s Oracle `geo` then `cmo-fix` (idempotent, no new posts). Git: branch + `origin/main` NOW.md.
 
-**RISK:** Instagram clicks carry `utm_source=linkedin` (same caption). Make still prepends “¡Hola, explorer!”. Community board still only pins `utm_campaign=community-reply`; this campaign lands on inquiry UTMs + the visibility-lead Telegram line.
+**RISK:** Make Influencer 3044021 still prepends “¡Hola, explorer!”. IG clicks inherit `utm_source=linkedin`. Community board still only pins `community-reply`. VJH cron `17 * * * *` lives only on the box.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
