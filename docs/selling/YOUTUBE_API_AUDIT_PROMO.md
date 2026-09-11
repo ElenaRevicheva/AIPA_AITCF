@@ -16,6 +16,11 @@ Verified 11 Sep 2026, Actions `34616631936`: Elena's muted Loom + live `/api` st
 
 ## Watch
 
+The stable URL is cached by browsers for 24h (nginx `max-age=86400` on `/influencer-images/`). Use the versioned file until that expires:
+
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4
+
+Stable (may still show the previous cut in a browser that already opened it):
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you.mp4
 
 Poster (frame 0 = title card, never black):
