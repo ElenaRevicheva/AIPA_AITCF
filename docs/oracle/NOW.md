@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 11 Sep 22:38 UTC | /api film v13 music remix — keep v12 picture+VO, joyful 2026 chillout | youtube kit + Oracle remix — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,18 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 11 Sep 22:25 UTC — /api film v12 is live
+### 🟡 IN FLIGHT 11 Sep 22:38 UTC — v13 music only (picture+VO stay)
 
-**DONE:** run 34652399156 `DONE 27.7MB, 115s` · `final mix with 11 voiceover stems` · `200 video/mp4 27657563` · `v12-duration=114.9s` · `200 text/html` watch.html.
+**Elena:** v12 picture is good. Cover it with juicy trendy 2026 energetic joyful chillout. v12 runner mix used the drone (Pixabay failed without Bright Data).
 
-**ELENA:** https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
-and https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v12.mp4
+**THIS:** remix on Oracle (Bright Data + `vo/v_*.mp3` + published v12 video). New bed, same 11 onyx stems, publish `-v13`. Branch `cursor/youtube-api-promo-0841`.
 
-**NEXT:** idle `.influencer-diag-trigger`. Do not send v11. Do not Make Run once.
-
-**VERIFIED BY:** Actions publish probe on 34652399156 (this Cloud VM cannot TLS to webhook).
-
-**RISK:** hard-refresh — nginx used to cache the old cut for 24h. Use the `-v12` URL, not the unversioned file.
+**RISK:** Do not recompile the picture. Do not Make Run once. Do not send v11. Do not reuse Oleg-Mazur enigmatic lounge.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
