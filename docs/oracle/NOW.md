@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 11 Sep 20:57 UTC | /api film v12 — real grapevine + maracuya insects; QR on every shot | youtube kit + Oracle api-film — not influencer/VJH | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,19 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 11 Sep 20:49 UTC — /api film v11 live (QR on every shot)
+### 🟡 IN FLIGHT 11 Sep 20:57 UTC — v12 must actually SHOW grapevine + maracuya insects
 
-**Elena watches:**
-https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v11.mp4
+**Elena:** v11 is not the cut. No grapevine/What it checks, no maracuya insects. She wants the correct link to the full film.
 
-**DONE:** CTA QR in the corner of every shot. Moving fruit (pomegranate, grapevine with What it checks + neurones, maracuya), then shortened Loom, then finishing slides.
+**THIS:** grapes from the grape still + glow/grow (v2 salvage is the wrong fruit). Force crawlers salvage from v2/v5. QR every shot. Publish `-v12`. Branch `cursor/youtube-api-promo-0841`.
 
-**NEXT:** Elena watches v11. Do not send v7 or v9.
-
-**VERIFIED BY:** Actions `34645586652` `DONE … (9.9MB, 115s)` `200 video/mp4 9857772` `v11-duration=106.800000` `qr bug on every shot` `grapes salvaged + neuron glow + grow` (v10 `34645181835` also: `ui loom loomwalk 16.0s`)
-
-**RISK:** Actions job exited 2 on the old `echo`/`ffmpeg` `cho:` parse after a real publish. Film is on disk. Do not Make Run once.
+**RISK:** Do not give Elena `-v11`. Do not Make Run once. Do not fire while another `api-film` is running.
 
 ### 🟢 10 Sep — THE LISTING IS LIVE. `status: "live"`.
 
