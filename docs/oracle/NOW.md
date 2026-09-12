@@ -135,7 +135,7 @@ git log keeps the record.
 
 **DONE:** v14 now calls **deepseek-flash** (the wallet `/deepseekkey` wrote). Earlier kit used `deepseek-chat` — wrong meter. Still requires the Oracle key; no silent skip.
 
-**NEXT:** re-fired after Flash returned empty `content` (34701960980). Parser now reads `reasoning_content`, max_tokens 1024.
+**NEXT:** Flash spent (grape line landed). Seedance 429 on Replicate — retry with backoff. Elena's DeepSeek balance is $1.99; not a wallet miss.
 
 **VERIFIED BY:** pending `USED DeepSeek on all 5 fruit shots` + `200 video/mp4` on `-v14`.
 
