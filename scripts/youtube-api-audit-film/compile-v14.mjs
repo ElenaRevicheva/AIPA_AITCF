@@ -68,6 +68,7 @@ function readEnvKey(n) {
 const OPENAI = (process.env.OPENAI_API_KEY || readEnvKey('OPENAI_API_KEY')).trim();
 const REPLICATE = (process.env.REPLICATE_API_TOKEN || readEnvKey('REPLICATE_API_TOKEN')).trim();
 const DEEPSEEK = (process.env.DEEPSEEK_API_KEY || readEnvKey('DEEPSEEK_API_KEY')).trim();
+const DEEPSEEK_MODEL = (process.env.DEEPSEEK_MODEL || readEnvKey('DEEPSEEK_MODEL') || 'deepseek-flash').trim();
 
 const caps = (s) => (s || '').toUpperCase();
 const track = (s) => caps(s).split('').join(' ');
@@ -166,7 +167,8 @@ async function deepseekMotion(motion) {
   fs.writeFileSync(
     body,
     JSON.stringify({
-      model: 'deepseek-chat',
+      model: DEEPSEEK_MODEL,
+      max_tokens: 200,
       temperature: 0.4,
       messages: [
         {
@@ -671,7 +673,7 @@ async function main() {
   for (const d of [BASE, W, VODIR, CLIPDIR, PUBLISH]) fs.mkdirSync(d, { recursive: true });
   fs.writeFileSync(path.join(BASE, 'ffmpeg-commands.log'), '');
   process.stderr.write(`=== api-audit-film ${CUT} ${new Date().toISOString()} ===\n`);
-  process.stderr.write(`OPENAI ${OPENAI ? 'yes' : 'NO'} REPLICATE ${REPLICATE ? 'yes' : 'NO'} DEEPSEEK ${DEEPSEEK ? 'yes' : 'NO'}\n`);
+  process.stderr.write(`OPENAI ${OPENAI ? 'yes' : 'NO'} REPLICATE ${REPLICATE ? 'yes' : 'NO'} DEEPSEEK ${DEEPSEEK ? `yes ${DEEPSEEK_MODEL}` : 'NO'}\n`);
 
   const fruitReady = process.env.API_FILM_FRUIT_READY === '1';
   const fruitIds = ['grapes', 'crawlers', 'dashboard', 'hand', 'split'];

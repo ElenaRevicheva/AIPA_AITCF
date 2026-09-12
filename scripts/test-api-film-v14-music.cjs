@@ -65,6 +65,7 @@ const wf = fs.readFileSync(workflow, 'utf8');
 const director = path.join(root, 'scripts/youtube-api-audit-film/direct-fruit-v14.mjs');
 ok('DeepSeek fruit director exists', fs.existsSync(director));
 ok('director refuses to skip DeepSeek', fs.readFileSync(director, 'utf8').includes('will not skip DeepSeek'));
+ok('director spends the Flash wallet', fs.readFileSync(director, 'utf8').includes("deepseek-flash"));
 ok('v14 compile talks Seedance', /seedance-2\.5|Seedance 2\.5/.test(src14));
 ok('v14 compile requires DeepSeek', /will not skip DeepSeek|will not silently skip/.test(src14));
 ok('v14 compile does not call Runway I2V', !/async function runwayI2V/.test(src14));

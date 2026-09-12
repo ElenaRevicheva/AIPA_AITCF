@@ -30,6 +30,7 @@ function readEnvKey(n) {
 }
 
 const DEEPSEEK = (process.env.DEEPSEEK_API_KEY || readEnvKey('DEEPSEEK_API_KEY')).trim();
+const DEEPSEEK_MODEL = (process.env.DEEPSEEK_MODEL || readEnvKey('DEEPSEEK_MODEL') || 'deepseek-flash').trim();
 const REPLICATE = (process.env.REPLICATE_API_TOKEN || readEnvKey('REPLICATE_API_TOKEN')).trim();
 
 const FRUIT = [
@@ -95,7 +96,8 @@ async function deepseekMotion(id, motion) {
   fs.writeFileSync(
     body,
     JSON.stringify({
-      model: 'deepseek-chat',
+      model: DEEPSEEK_MODEL,
+      max_tokens: 200,
       temperature: 0.4,
       messages: [
         {
@@ -202,7 +204,7 @@ async function main() {
   if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing — Seedance cannot shoot DeepSeek\'s motion');
   for (const d of [BASE, CLIPDIR, W]) fs.mkdirSync(d, { recursive: true });
   process.stderr.write(`=== v14 DeepSeek director ${new Date().toISOString()} ===\n`);
-  process.stderr.write('DEEPSEEK yes REPLICATE yes\n');
+  process.stderr.write(`DEEPSEEK yes model=${DEEPSEEK_MODEL} REPLICATE yes\n`);
   const credit = [];
   for (const b of FRUIT) {
     const still = path.join(HERE, b.still);
