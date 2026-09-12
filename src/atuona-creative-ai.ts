@@ -20,6 +20,19 @@ import {
   visualizeMenuLines,
   visualizeStatusLines,
 } from './atuona-video-pins';
+import {
+  imageHelpLine,
+  imagePinGrade,
+  imageStatusLines,
+  imagineCommandDescription,
+  imagineDefaultLine,
+  imagineHelpLines,
+  imagineMenuLines,
+  parseImageProvider,
+  type AddedImageProvider,
+  type ImageCommandProvider,
+} from './atuona-image-pins';
+import { runAddedImageProviders } from './atuona-image-waterfall';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
 export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
 import * as fs from 'fs';
@@ -114,6 +127,8 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 // 🎨 AI MODEL CONFIGURATION - LATEST & BEST (June 2026)
 // =============================================================================
 // Images: Flux Pro 1.1 Ultra > Flux 1.1 Pro; Reels 9:16 = Flux or center-crop from 16:9 (photoreal, no DALL-E)
+//   Additive stills after Flux: Luma uni-1-max → Gemini 3.1 Flash Image → Runway gen4_image
+//   (src/atuona-image-pins.ts). Video ids do not paint stills. /visualize luma stays video.
 // Video: multi-provider, operator-selectable via `/visualize <provider> NNN`:
 //   • luma   → Luma Ray 3 Direct API  → Luma via Replicate (fallback)
 //   • runway → Runway Gen-4.5 image_to_video
@@ -177,6 +192,238 @@ async function cropLandscapeStillTo916Center(imageUrl: string): Promise<Buffer> 
     .extract({ left, top: 0, width: cropW, height: h })
     .jpeg({ quality: 92, mozjpeg: true })
     .toBuffer();
+}
+
+/** Additive stills after Flux (Luma uni-1-max → Gemini Flash Image → Runway gen4_image). */
+async function tryAddedStills(
+  prompt: string,
+  aspectRatio: string,
+  prefer?: AddedImageProvider
+): Promise<{ url: string; modelUsed: string } | null> {
+  const extra = await runAddedImageProviders({
+    prompt,
+    aspectRatio,
+    lumaApiKey,
+    lumaApiUrl: LUMA_API_URL,
+    runwayApiKey,
+    geminiApiKey,
+    ...(prefer ? { prefer } : {}),
+  });
+  return extra ? { url: extra.url, modelUsed: extra.modelUsed } : null;
+}
+
+/** Same Flux 2 → Ultra → Pro rungs as /visualize — used by /imagine page commands only. */
+async function runFluxStillOnce(
+  prompt: string,
+  aspectRatio: string,
+  safetyTolerance = 5
+): Promise<{ url: string; modelUsed: string } | null> {
+  if (!replicate) return null;
+  const tol = Math.min(6, Math.max(1, Math.round(safetyTolerance)));
+  const extractUrl = (output: any): string | null => {
+    if (!output) return null;
+    const outputStr = String(output);
+    if (outputStr.startsWith('http')) return outputStr;
+    if (Array.isArray(output) && output.length > 0) {
+      const first = String(output[0]);
+      if (first.startsWith('http')) return first;
+    }
+    const obj = output as any;
+    const possibleUrl = obj?.url || obj?.output || obj?.uri;
+    if (possibleUrl && String(possibleUrl).startsWith('http')) return String(possibleUrl);
+    return null;
+  };
+  if (IMAGE_MODELS.flux2Pro) {
+    try {
+      const url = extractUrl(await replicate.run(
+        IMAGE_MODELS.flux2Pro as `${string}/${string}`,
+        { input: { prompt, aspect_ratio: aspectRatio, output_format: 'jpg' } }
+      ));
+      if (url) return { url, modelUsed: 'Flux 2 Pro' };
+    } catch (e: any) {
+      console.log('Flux 2 Pro unavailable (/imagine)...', e?.message);
+    }
+  }
+  try {
+    const url = extractUrl(await replicate.run(
+      IMAGE_MODELS.fluxUltra as `${string}/${string}`,
+      {
+        input: {
+          prompt,
+          aspect_ratio: aspectRatio,
+          output_format: 'jpg',
+          output_quality: 95,
+          safety_tolerance: tol,
+          prompt_upsampling: false,
+          raw: false,
+        },
+      }
+    ));
+    if (url) return { url, modelUsed: 'Flux 1.1 Pro Ultra' };
+  } catch (e: any) {
+    console.log('Flux Ultra unavailable (/imagine)...', e?.message);
+  }
+  try {
+    const url = extractUrl(await replicate.run(
+      IMAGE_MODELS.fluxPro as `${string}/${string}`,
+      {
+        input: {
+          prompt,
+          aspect_ratio: aspectRatio,
+          output_format: 'webp',
+          output_quality: 90,
+          safety_tolerance: tol,
+          prompt_upsampling: false,
+        },
+      }
+    ));
+    if (url) return { url, modelUsed: 'Flux 1.1 Pro' };
+  } catch (e: any) {
+    console.log('Flux Pro unavailable (/imagine)...', e?.message);
+  }
+  return null;
+}
+
+async function generateStillForPrompt(
+  prompt: string,
+  aspectRatio: string,
+  prefer: ImageCommandProvider | null
+): Promise<{ url: string; modelUsed: string } | null> {
+  const addedPrefer = prefer && prefer !== 'flux' ? prefer : undefined;
+  if (prefer && prefer !== 'flux') {
+    const extra = await tryAddedStills(prompt, aspectRatio, addedPrefer);
+    if (extra) return extra;
+    return runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
+  }
+  const flux = await runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
+  if (flux) return flux;
+  return tryAddedStills(prompt, aspectRatio);
+}
+
+/** `/imagine [engine] NNN` — still only. Does not start video. */
+async function runImaginePageStill(
+  ctx: Context,
+  pageId: string,
+  prefer: ImageCommandProvider | null
+): Promise<void> {
+  const engine = prefer ? imagePinGrade(prefer) : 'Flux 2 Pro';
+  await ctx.reply(`🎨 *Starting still for Page #${pageId}*\n\n_${engine} — no video. Fetching page…_`, { parse_mode: 'Markdown' });
+  try {
+    const { title, theme, englishText, russianText } = await fetchPagePoemContent(pageId);
+    const combinedForKnowledge = `${title}\n${theme}\n${englishText}\n${russianText}`.slice(0, 12000);
+    const englishExcerpt = englishText.slice(0, 3500);
+    const russianExcerpt = russianText ? russianText.slice(0, 2200) : '';
+    await ctx.reply(
+      '🧠 *Knowledge pass:* reading this page and selecting which modules from the embedded base apply…',
+      { parse_mode: 'Markdown' }
+    );
+    const deepKb = await getDeepKnowledgeForVisuals({
+      combinedText: combinedForKnowledge,
+      title,
+      theme,
+      englishExcerpt,
+      russianExcerpt,
+      characterVoice: creativeSession.activeVoice,
+      maxSections: 7,
+    });
+    await ctx.reply('🎨 *Generating cinematic prompt...*', { parse_mode: 'Markdown' });
+    const metaphorHint = creativeMemory.recentMetaphors?.length
+      ? `RECENT METAPHORS FROM THE BOOK (prefer these over generic props): ${creativeMemory.recentMetaphors.slice(-5).join(' | ')}`
+      : '';
+    const characterContext = characterMemories
+      ? `CHARACTERS:\n- Kira: ${characterMemories.kira?.slice(0, 6).join('; ') || '—'}\n- Ule: ${characterMemories.ule?.slice(0, 6).join('; ') || '—'}`
+      : '';
+    const plotContext = creativeSession?.plotThreads?.length
+      ? `PLOT THREADS: ${creativeSession.plotThreads.slice(0, 5).join('; ')}`
+      : '';
+    const cinematicPrompt = `You write ONE image-generation prompt for ATUONA (underground poetry NFT / film stills).
+
+CURRENT CREATIVE MOOD: ${emotionalState.currentMood} — let it color the light, the body language, the tension of the frame.
+${ATUONA_AESTHETIC_DIRECTIVE}
+
+PRIMARY SOURCE (read all of this — visuals MUST follow the poem's specific images, metaphors, and emotional weight, not a generic "tropical tech" mood):
+TITLE: "${title}"
+THEME: ${theme}
+
+ENGLISH TEXT:
+${englishExcerpt}
+${russianExcerpt ? `\nRUSSIAN (for extra imagery/meaning):\n${russianExcerpt}\n` : ''}
+
+CONTEXT FROM MEMORY (use if it fits the lines above; do not override the poem):
+${characterContext}
+${plotContext}
+${metaphorHint}
+
+REFERENCE KNOWLEDGE (subtext only — pick at most ONE echo from these excerpts, e.g. a color plane, compositional idea, or named parallel; do not build a second scene from art history):
+${deepKb.formatted}
+
+BALANCE (non-negotiable):
+- At least ~70% of the visual must be anchored in the poem's title + lines (who, where, what happens, dominant mood). Knowledge base is seasoning, not a replacement setting.
+- Do not lead with Tahiti, Paradise, or Gauguin's palette unless the poem text clearly centers Polynesia/exile/painting. Urban/digital/Moscow/interior poems stay in that world.
+- If the TITLE names an animal or object (e.g. dog / собака / red dog), treat it as metaphor or symbol unless the poem literally describes a real animal — never default to a cute, toy, or cartoon animal.
+- One coherent photoreal frame — not collage, not "wall becomes Gauguin" unless the poem says so.
+
+VISUAL RULES:
+1. The scene must illustrate THIS poem's concrete imagery and mood — not a default beach, not default flowers, not a default laptop unless the poem clearly says so.
+2. Vary composition: interior / urban / abstract light / body / object / landscape — whatever the TEXT demands.
+3. ${VISUAL_HARD_EXCLUSIONS}
+
+ALCOHOL: never show drinks, bars, bottles (Kira is in recovery).
+
+OUTPUT: One dense English prompt (120–220 words) describing a single photorealistic cinematic frame. Return ONLY the prompt. No quotes, no preamble.`;
+    let imagePrompt = await createContent(cinematicPrompt, 500, true);
+    imagePrompt = `${imagePrompt.trim()}\n\n${VISUAL_HARD_EXCLUSIONS.trim()}`;
+    await ctx.reply(`🎨 *Cinematic Prompt:*\n\n_${imagePrompt.substring(0, 300)}..._`, { parse_mode: 'Markdown' });
+    const caption = await createContent(
+      `Write a caption (max 150 chars) for ATUONA — underground literature, not aesthetic content.\nTitle: "${title}"\nTheme: ${theme}\nText: "${englishText.substring(0, 600)}"\nRules: grow from THIS title and lines. Simple words. No hashtags. English.`,
+      100,
+      true
+    );
+    await ctx.reply(`🎨 *Generating still with ${engine}...*\n\n_This takes 30-60 seconds..._`, { parse_mode: 'Markdown' });
+    const still = await generateStillForPrompt(imagePrompt, '16:9', prefer);
+    if (!still) {
+      await ctx.reply(`❌ No still from ${engine}. Set REPLICATE_API_TOKEN, LUMA_API_KEY, GEMINI_API_KEY, or RUNWAY_API_KEY.`);
+      return;
+    }
+    await ctx.replyWithPhoto(still.url, {
+      caption: `🎨 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9\n🎨 ${still.modelUsed}\n\n_${caption}_`,
+      parse_mode: 'Markdown',
+    });
+    const vertical = await generateStillForPrompt(imagePrompt, '9:16', prefer);
+    if (vertical) {
+      await ctx.replyWithPhoto(vertical.url, {
+        caption: `📱 *Reels 9:16*\n\n🎨 ${vertical.modelUsed}\n\n_${caption}_`,
+        parse_mode: 'Markdown',
+      });
+    }
+    const existingIdx = visualizations.findIndex((v) => v.pageId === pageId);
+    const visualization: PageVisualization = {
+      pageId,
+      pageTitle: title,
+      imagePrompt,
+      caption,
+      hashtags: ['#ATUONA', '#AIFilm'],
+      createdAt: new Date().toISOString(),
+      status: 'image_done',
+      imageUrlHorizontal: still.url,
+    };
+    if (vertical?.url) visualization.imageUrlVertical = vertical.url;
+    const existing = existingIdx >= 0 ? visualizations[existingIdx] : undefined;
+    if (existing) {
+      visualizations[existingIdx] = {
+        ...existing,
+        ...visualization,
+        status: existing.videoUrlHorizontal ? existing.status : 'image_done',
+      };
+    } else {
+      visualizations.push(visualization);
+    }
+    saveState();
+    await ctx.reply(`✅ *Still saved for #${pageId}*\n\n🎨 ${still.modelUsed}\n\nVideo is separate: \`/visualize ${pageId}\``, { parse_mode: 'Markdown' });
+  } catch (error: any) {
+    console.error('Imagine page still error:', error);
+    await ctx.reply(`❌ Error: ${error.message || 'Unknown error'}`);
+  }
 }
 
 // =============================================================================
@@ -5405,11 +5652,16 @@ _Pages: \`/deepseek\`. Video: \`/visualize deepseek 048\`._
 *Pick your video engine:*
 ${visualizeHelpLines('052')}
 
+*Stills only (no video):*
+\`${imagineDefaultLine('052')}\`
+${imagineHelpLines('052')}
+
 _Default chain when Luma is dry: Omni Flash → Runway._
 
 *What it creates:*
 🎨 Flux 2 Pro image (16:9 YouTube) - newest, BEST quality!
 📱 Flux 2 Pro image (9:16 Instagram)
+🎨 Extra stills if Flux misses: ${imageHelpLine()}
 🎬 Cinematic video from your chosen engine + Director's Cut
 📝 Caption + hashtags auto-generated
 
@@ -5640,6 +5892,8 @@ _Just click any command to see what it does!_
 ━━━━━━━━━━━━━━━━━━━━
 /visualize 048 - 🎥 Image+video (default: Luma)
 ${visualizeMenuLines('048')}
+${imagineDefaultLine('048')}
+${imagineMenuLines('048')}
 /film build - 🎬✨ AUTO-ASSEMBLE shots → one film (VO+music)
 /gallery - 🖼 All visualizations
 /film - 🎬 Film compilation status
@@ -9062,22 +9316,66 @@ Translate this to Spanish, keeping the emotional quality:
   // 🎨 IMAGE GENERATION (Placeholder for future DALL-E integration)
   // ==========================================================================
 
-  // /imagine - Generate image for chapter (placeholder)
+  // /imagine - Page stills (same style as /visualize) or free-text DALL-E
   atuonaBot.command('imagine', async (ctx) => {
     const description = ctx.message?.text?.replace('/imagine', '').trim();
     
     if (!description) {
       await ctx.reply(`🎨 *Image Generation*
 
-Generate NFT artwork for chapters:
+Still for a page (no video):
 
+\`${imagineDefaultLine('048')}\`
+\`/imagine last\` - Last published page
+
+🎛️ *Choose your image engine:*
+${imagineHelpLines('048')}
+
+_Free-text (DALL-E / prompt only):_
 \`/imagine A woman looking at a Gauguin painting in a dark gallery\`
 
-⚠️ *Note:* Full image generation requires DALL-E API key.
-Currently: Generates image prompts only.
-
-Set OPENAI_API_KEY for full functionality.`, { parse_mode: 'Markdown' });
+📊 *Status*
+🎨 Flux: ${replicate ? '✅ Flux 2 Pro / 1.1 Ready' : '❌ Set REPLICATE_API_TOKEN'}
+${imageStatusLines({
+        luma: Boolean(lumaApiKey),
+        omni: Boolean(geminiApiKey),
+        runway: Boolean(runwayApiKey),
+      })}`, { parse_mode: 'Markdown' });
       return;
+    }
+
+    {
+      const parts = description.split(/\s+/);
+      const maybeImage = parseImageProvider(parts[0] ?? '');
+      const maybeVideo = parseVideoProvider(parts[0] ?? '');
+      if (maybeVideo && !maybeImage) {
+        await ctx.reply(
+          `🎬 *${maybeVideo}* is a video engine.\n\nUse \`/visualize ${maybeVideo} ${parts[1] || '048'}\` for the clip.\nStills: \`/imagine flux 048\` · \`/imagine luma 048\` · \`/imagine omni 048\` · \`/imagine runway 048\`.`,
+          { parse_mode: 'Markdown' }
+        );
+        return;
+      }
+      const pageToken = maybeImage ? (parts[1] || '') : (parts[0] || '');
+      const isPageToken = pageToken === 'last' || pageToken === 'all' || /^\d{1,3}$/.test(pageToken);
+      if (maybeImage && parts.length < 2) {
+        await ctx.reply(`🎨 Provider *${maybeImage}* selected — now add a page, e.g. \`/imagine ${maybeImage} 048\` or \`/imagine ${maybeImage} last\`.`, { parse_mode: 'Markdown' });
+        return;
+      }
+      if (isPageToken) {
+        if (pageToken === 'all') {
+          await ctx.reply('🎨 *Batch stills coming soon!*\n\nFor now, imagine one page at a time.', { parse_mode: 'Markdown' });
+          return;
+        }
+        let pageId = pageToken === 'last' ? String(bookState.currentPage - 1).padStart(3, '0') : pageToken;
+        const pageNum = parseInt(pageId, 10);
+        if (isNaN(pageNum)) {
+          await ctx.reply('❌ Invalid page number. Use `/imagine 048`, `/imagine last`, or `/imagine luma 048`.', { parse_mode: 'Markdown' });
+          return;
+        }
+        pageId = String(pageNum).padStart(3, '0');
+        await runImaginePageStill(ctx, pageId, maybeImage);
+        return;
+      }
     }
     
     try {
@@ -9150,13 +9448,28 @@ _Generating image with DALL-E 3... (30-60 seconds)_`, { parse_mode: 'Markdown' }
           }
         } catch (dalleError: any) {
           console.error('DALL-E error:', dalleError);
-          await ctx.reply(`❌ DALL-E Error: ${dalleError.message || 'Unknown error'}
+          const extra = await tryAddedStills(imagePrompt, '1:1');
+          if (extra) {
+            await ctx.replyWithPhoto(extra.url, {
+              caption: `🎨 *Generated for ATUONA*\n\n_"${description}"_\n\n🎨 ${extra.modelUsed} (after DALL-E)`,
+              parse_mode: 'Markdown'
+            });
+          } else {
+            await ctx.reply(`❌ DALL-E Error: ${dalleError.message || 'Unknown error'}
 
 Use this prompt manually:
 \`${imagePrompt}\``, { parse_mode: 'Markdown' });
+          }
         }
       } else {
-        await ctx.reply(`🎨 *Optimized Image Prompt*
+        const extra = await tryAddedStills(imagePrompt, '1:1');
+        if (extra) {
+          await ctx.replyWithPhoto(extra.url, {
+            caption: `🎨 *Generated for ATUONA*\n\n_"${description}"_\n\n🎨 ${extra.modelUsed}`,
+            parse_mode: 'Markdown'
+          });
+        } else {
+          await ctx.reply(`🎨 *Optimized Image Prompt*
 
 \`${imagePrompt}\`
 
@@ -9167,6 +9480,7 @@ Use this prompt in:
 • Stable Diffusion
 
 _Set OPENAI_API_KEY for automatic generation!_`, { parse_mode: 'Markdown' });
+        }
       }
       
     } catch (error) {
@@ -9199,6 +9513,8 @@ ${visualizeHelpLines('048')}
 
 Each visualization creates:
 🎨 Flux 2 Pro image (newest, BEST quality!)
+🎨 Stills only: ${imagineDefaultLine('048')}
+${imagineHelpLines('048')}
 🎬 Cinematic video from your chosen engine (9 sec)
 🎬✨ Director's Cut (fashion/editorial layer via Modify Video)
 📱 Instagram format (9:16 vertical)
@@ -9208,6 +9524,11 @@ Each visualization creates:
 📊 *Status*
 Visualizations: ${visualizations.length} pages
 🎨 Flux: ${replicate ? '✅ Flux 2 Pro / 1.1 Ready' : '❌ Set REPLICATE_API_TOKEN'}
+${imageStatusLines({
+        luma: Boolean(lumaApiKey),
+        omni: Boolean(geminiApiKey),
+        runway: Boolean(runwayApiKey),
+      })}
 ${visualizeStatusLines({
         luma: Boolean(lumaApiKey),
         omni: Boolean(geminiApiKey),
@@ -9583,6 +9904,15 @@ Return ONLY the motion direction. No preamble.`;
             }
           } catch (verticalFluxError: any) {
             console.error('Flux vertical (9:16) error:', verticalFluxError.message);
+            const extraVertical = await tryAddedStills(imagePrompt, '9:16');
+            if (extraVertical) {
+              visualization.imageUrlVertical = extraVertical.url;
+              await ctx.replyWithPhoto(extraVertical.url, {
+                caption: `📱 *Instagram Reel Format (9:16)*\n\n🎨 ${extraVertical.modelUsed} (after Flux)\n\n_${caption}_\n\n${hashtags.join(' ')}`,
+                parse_mode: 'Markdown'
+              });
+              return;
+            }
             if (!visualization.imageUrlHorizontal) return;
             await ctx.reply(
               `⚠️ Flux 9:16 didn’t pass — using **center crop** from your Flux 16:9 still (same shot, photoreal, no DALL-E).`,
@@ -9654,21 +9984,76 @@ Free tier limit reached. Options:
               await new Promise(resolve => setTimeout(resolve, 3000));
               await generateVerticalForReels();
             } else {
-              await ctx.reply(
-                `❌ Flux failed after retry.\n\n_Prompt saved — try again or use in an external tool:_\n\`${imagePrompt.substring(0, 400)}...\``,
-                { parse_mode: 'Markdown' }
-              );
+              const extra = await tryAddedStills(imagePrompt, '16:9');
+              if (extra) {
+                lastModelUsed = extra.modelUsed;
+                visualization.imageUrlHorizontal = extra.url;
+                visualization.status = 'image_done';
+                await ctx.replyWithPhoto(extra.url, {
+                  caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9\n🎨 ${extra.modelUsed} (after Flux)\n\n_${caption}_`,
+                  parse_mode: 'Markdown'
+                });
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                await generateVerticalForReels();
+              } else {
+                await ctx.reply(
+                  `❌ Flux failed after retry.\n\n_Prompt saved — try again or use in an external tool:_\n\`${imagePrompt.substring(0, 400)}...\``,
+                  { parse_mode: 'Markdown' }
+                );
+              }
             }
           } catch (retryErr: any) {
             console.error('Flux horizontal retry error:', retryErr);
-            await ctx.reply(
-              `❌ Flux failed (including retry).\n\n_${String(retryErr.message || fluxError.message).slice(0, 200)}_\n\n_Prompt:_ \`${imagePrompt.substring(0, 350)}...\``,
-              { parse_mode: 'Markdown' }
-            );
+            const extra = await tryAddedStills(imagePrompt, '16:9');
+            if (extra) {
+              lastModelUsed = extra.modelUsed;
+              visualization.imageUrlHorizontal = extra.url;
+              visualization.status = 'image_done';
+              await ctx.replyWithPhoto(extra.url, {
+                caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9\n🎨 ${extra.modelUsed} (after Flux)\n\n_${caption}_`,
+                parse_mode: 'Markdown'
+              });
+              await new Promise(resolve => setTimeout(resolve, 3000));
+              await generateVerticalForReels();
+            } else {
+              await ctx.reply(
+                `❌ Flux failed (including retry).\n\n_${String(retryErr.message || fluxError.message).slice(0, 200)}_\n\n_Prompt:_ \`${imagePrompt.substring(0, 350)}...\``,
+                { parse_mode: 'Markdown' }
+              );
+            }
           }
         }
       } else {
-        await ctx.reply(`⚠️ *Flux Pro not configured*\n\nSet REPLICATE_API_TOKEN for best quality images.\n\n🎨 *Generated Prompt:*\n\`${imagePrompt}\`\n\nUse this in Midjourney or other tools!`, { parse_mode: 'Markdown' });
+        const extra = await tryAddedStills(imagePrompt, '16:9');
+        if (extra) {
+          visualization.imageUrlHorizontal = extra.url;
+          visualization.status = 'image_done';
+          await ctx.replyWithPhoto(extra.url, {
+            caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube Format (16:9)\n🎨 Generated with ${extra.modelUsed}\n\n_${caption}_`,
+            parse_mode: 'Markdown'
+          });
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          const extraV = await tryAddedStills(imagePrompt, '9:16');
+          if (extraV) {
+            visualization.imageUrlVertical = extraV.url;
+            await ctx.replyWithPhoto(extraV.url, {
+              caption: `📱 *Instagram Reel Format (9:16)*\n\n🎨 ${extraV.modelUsed}\n\n_${caption}_\n\n${hashtags.join(' ')}`,
+              parse_mode: 'Markdown'
+            });
+          } else if (visualization.imageUrlHorizontal) {
+            try {
+              const cropBuf = await cropLandscapeStillTo916Center(visualization.imageUrlHorizontal);
+              await ctx.replyWithPhoto(new InputFile(cropBuf, `atuona-reel-${pageId}.jpg`), {
+                caption: `📱 *Reels 9:16* — cropped from 16:9\n\n_${caption}_\n\n${hashtags.join(' ')}`,
+                parse_mode: 'Markdown'
+              });
+            } catch (cropErr: any) {
+              console.error('Reels crop error (no Flux):', cropErr);
+            }
+          }
+        } else {
+          await ctx.reply(`⚠️ *Flux Pro not configured*\n\nSet REPLICATE_API_TOKEN for best quality images.\n\n🎨 *Generated Prompt:*\n\`${imagePrompt}\`\n\nUse this in Midjourney or other tools!`, { parse_mode: 'Markdown' });
+        }
       }
 
       /** Luma/Runway poll in the background — final summary must wait or it shows Video: ⏳ while the clip is still rendering. */
@@ -11024,7 +11409,7 @@ ${elenaLang === 'english'
           { command: 'videostatus', description: '⏳ Video progress' },
           { command: 'post', description: '📱 Post to Instagram / YouTube' },
           { command: 'spanish', description: '🇪🇸 Content in Spanish' },
-          { command: 'imagine', description: '🎨 Create AI image' },
+          { command: 'imagine', description: imagineCommandDescription() },
           { command: 'export', description: '📤 Download all content' },
           { command: 'import_backup', description: '📥 Restore backup' },
           { command: 'status', description: '📈 Book & API status' },
