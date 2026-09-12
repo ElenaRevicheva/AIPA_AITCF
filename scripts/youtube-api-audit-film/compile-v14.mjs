@@ -16,7 +16,11 @@ import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
+
+const require = createRequire(import.meta.url);
+const { extractDeepseekLine } = require('./deepseek-motion-parse.cjs');
 
 const execFileP0 = promisify(execFile);
 async function execFileP(cmd, args, opts) {
@@ -168,7 +172,7 @@ async function deepseekMotion(motion) {
     body,
     JSON.stringify({
       model: DEEPSEEK_MODEL,
-      max_tokens: 200,
+      max_tokens: 1024,
       temperature: 0.4,
       messages: [
         {
@@ -198,10 +202,11 @@ async function deepseekMotion(motion) {
       ],
       { timeout: 50000, maxBuffer: 1 << 20 },
     );
-    const line = JSON.parse(stdout)?.choices?.[0]?.message?.content?.trim();
-    if (line && line.length > 20 && line.length < 600) {
-      process.stderr.write(`deepseek motion ${line.slice(0, 120)}\n`);
-      return line;
+    const parsed = extractDeepseekLine(stdout);
+    process.stderr.write(`deepseek raw finish=${parsed.finish} contentLen=${parsed.contentLen} reasoningLen=${parsed.reasoningLen}\n`);
+    if (parsed.line && parsed.line.length >= 20 && parsed.line.length <= 600) {
+      process.stderr.write(`deepseek motion ${parsed.line.slice(0, 120)}\n`);
+      return parsed.line;
     }
     throw new Error('DeepSeek returned an empty or unusable motion line');
   } catch (e) {

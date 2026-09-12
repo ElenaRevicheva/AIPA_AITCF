@@ -62,6 +62,25 @@ const run = fs.readFileSync(runner, 'utf8');
 const pub = fs.readFileSync(publish, 'utf8');
 const wf = fs.readFileSync(workflow, 'utf8');
 
+const { extractDeepseekLine } = require(path.join(root, 'scripts/youtube-api-audit-film/deepseek-motion-parse.cjs'));
+ok(
+  'Flash empty content uses reasoning_content',
+  extractDeepseekLine({
+    choices: [{ message: { content: '', reasoning_content: 'thinking\nThe grape cluster sways a few millimetres; dew slides.' }, finish_reason: 'stop' }],
+  }).line.includes('grape cluster sways'),
+);
+ok(
+  'Flash API error is not a silent skip',
+  (() => {
+    try {
+      extractDeepseekLine({ error: { message: 'Model Not Exist' } });
+      return false;
+    } catch (e) {
+      return /Model Not Exist/.test(e.message);
+    }
+  })(),
+);
+
 const director = path.join(root, 'scripts/youtube-api-audit-film/direct-fruit-v14.mjs');
 ok('DeepSeek fruit director exists', fs.existsSync(director));
 ok('director refuses to skip DeepSeek', fs.readFileSync(director, 'utf8').includes('will not skip DeepSeek'));
