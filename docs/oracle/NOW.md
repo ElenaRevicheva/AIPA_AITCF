@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 13:40 UTC | Pin Atuona stills waterfall (same vendors as video, image grades) | `src/atuona-image-pins.ts`, `src/atuona-image-waterfall.ts`, `src/atuona-creative-ai.ts` — branch `cursor/atuona-image-pins-0841`. No Oracle deploy until pins land. | pending |
+| | | | | |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 13:40 UTC — image pins (`cursor/atuona-image-pins-0841`)
+### 🟢 12 Sep 13:50 UTC — `/imagine` engine commands on PR #53 (not deployed)
 
-**DONE:** video pins live. Stills are still Flux-only.
+**DONE:** Same-style stills menu as `/visualize`. Flux ladder + video tokens untouched. Extra painters after Flux: Luma uni-1-max → Gemini 3.1 Flash Image → Runway gen4_image. Branch `cursor/atuona-image-pins-0841`.
 
-**NEXT:** pin stills: Flux 2 → Ultra → Pro → Luma `uni-1-max` → Gemini `gemini-3.1-flash-image` → Runway `gen4_image`. Do not steal `/visualize luma` (video). Ray / Veo / Kling-video / Seedance / DeepSeek do not paint pixels.
+**NEXT:** Elena review PR #53. Named `atuona` deploy when she wants it on `/menu`. Do not `cto_aipa` hard-reset.
 
-**VERIFIED BY:** pending `node scripts/test-atuona-image-pins.cjs`
+**VERIFIED BY:** `node scripts/test-atuona-image-pins.cjs` (21) + video pins (8) + visualize-deepseek (13)
 
-**RISK:** Do not `cto_aipa` hard-reset. Do not rewrite `/visualize deepseek`.
+**RISK:** `/visualize luma` is still Ray video. Veo/Kling/Seedance/DeepSeek have no stills API — `/imagine veo` points at `/visualize veo`.
 
 ### 🟢 12 Sep 13:22 UTC — today's Atuona encodings synced (git = Oracle = local)
 
