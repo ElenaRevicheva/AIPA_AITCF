@@ -195,11 +195,41 @@ async function cropLandscapeStillTo916Center(imageUrl: string): Promise<Buffer> 
 }
 
 /** Additive stills after Flux (Luma uni-1-max → Gemini Flash Image → Runway gen4_image). */
+type DeliverableStill = {
+  url: string;
+  modelUsed: string;
+  bytes?: Buffer;
+  filename?: string;
+};
+
+function photoFromStill(still: DeliverableStill): string | InputFile {
+  if (still.bytes !== undefined && still.bytes.length > 0) {
+    return new InputFile(still.bytes, still.filename ?? 'atuona-still.jpg');
+  }
+  return still.url;
+}
+
+function stillFromAdded(extra: {
+  url: string;
+  modelUsed: string;
+  bytes?: Buffer;
+  filename?: string;
+}): DeliverableStill | null {
+  if (!extra.url && !(extra.bytes && extra.bytes.length)) return null;
+  const out: DeliverableStill = { url: extra.url || '', modelUsed: extra.modelUsed };
+  if (extra.bytes && extra.bytes.length) {
+    out.bytes = extra.bytes;
+    if (extra.filename) out.filename = extra.filename;
+  }
+  return out;
+}
+
 async function tryAddedStills(
   prompt: string,
   aspectRatio: string,
-  prefer?: AddedImageProvider
-): Promise<{ url: string; modelUsed: string } | null> {
+  prefer?: AddedImageProvider,
+  persistStem?: string
+): Promise<DeliverableStill | null> {
   const extra = await runAddedImageProviders({
     prompt,
     aspectRatio,
@@ -208,8 +238,9 @@ async function tryAddedStills(
     runwayApiKey,
     geminiApiKey,
     ...(prefer ? { prefer } : {}),
+    ...(persistStem ? { persistStem } : {}),
   });
-  return extra ? { url: extra.url, modelUsed: extra.modelUsed } : null;
+  return extra ? stillFromAdded(extra) : null;
 }
 
 /** Same Flux 2 → Ultra → Pro rungs as /visualize — used by /imagine page commands only. */
@@ -287,17 +318,18 @@ async function runFluxStillOnce(
 async function generateStillForPrompt(
   prompt: string,
   aspectRatio: string,
-  prefer: ImageCommandProvider | null
-): Promise<{ url: string; modelUsed: string } | null> {
+  prefer: ImageCommandProvider | null,
+  persistStem?: string
+): Promise<DeliverableStill | null> {
   const addedPrefer = prefer && prefer !== 'flux' ? prefer : undefined;
   if (prefer && prefer !== 'flux') {
-    const extra = await tryAddedStills(prompt, aspectRatio, addedPrefer);
+    const extra = await tryAddedStills(prompt, aspectRatio, addedPrefer, persistStem);
     if (extra) return extra;
     return runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
   }
   const flux = await runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
   if (flux) return flux;
-  return tryAddedStills(prompt, aspectRatio);
+  return tryAddedStills(prompt, aspectRatio, undefined, persistStem);
 }
 
 /** `/imagine [engine] NNN` — still only. Does not start video. */
@@ -380,18 +412,18 @@ OUTPUT: One dense English prompt (120–220 words) describing a single photoreal
       true
     );
     await ctx.reply(`🎨 *Generating still with ${engine}...*\n\n_This takes 30-60 seconds..._`, { parse_mode: 'Markdown' });
-    const still = await generateStillForPrompt(imagePrompt, '16:9', prefer);
-    if (!still) {
+    const still = await generateStillForPrompt(imagePrompt, '16:9', prefer, `${pageId}-still`);
+    if (!still || (!still.url && !(still.bytes && still.bytes.length))) {
       await ctx.reply(`❌ No still from ${engine}. Set REPLICATE_API_TOKEN, LUMA_API_KEY, GEMINI_API_KEY, or RUNWAY_API_KEY.`);
       return;
     }
-    await ctx.replyWithPhoto(still.url, {
+    await ctx.replyWithPhoto(photoFromStill(still), {
       caption: `🎨 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9\n🎨 ${still.modelUsed}\n\n_${caption}_`,
       parse_mode: 'Markdown',
     });
-    const vertical = await generateStillForPrompt(imagePrompt, '9:16', prefer);
-    if (vertical) {
-      await ctx.replyWithPhoto(vertical.url, {
+    const vertical = await generateStillForPrompt(imagePrompt, '9:16', prefer, `${pageId}-still-v`);
+    if (vertical && (vertical.url || (vertical.bytes && vertical.bytes.length))) {
+      await ctx.replyWithPhoto(photoFromStill(vertical), {
         caption: `📱 *Reels 9:16*\n\n🎨 ${vertical.modelUsed}\n\n_${caption}_`,
         parse_mode: 'Markdown',
       });
@@ -9449,7 +9481,7 @@ _Generating image with DALL-E 3... (30-60 seconds)_`, { parse_mode: 'Markdown' }
           console.error('DALL-E error:', dalleError);
           const extra = await tryAddedStills(imagePrompt, '1:1');
           if (extra) {
-            await ctx.replyWithPhoto(extra.url, {
+            await ctx.replyWithPhoto(photoFromStill(extra), {
               caption: `🎨 *Generated for ATUONA*\n\n_"${description}"_\n\n🎨 ${extra.modelUsed} (after DALL-E)`,
               parse_mode: 'Markdown'
             });
@@ -9463,7 +9495,7 @@ Use this prompt manually:
       } else {
         const extra = await tryAddedStills(imagePrompt, '1:1');
         if (extra) {
-          await ctx.replyWithPhoto(extra.url, {
+          await ctx.replyWithPhoto(photoFromStill(extra), {
             caption: `🎨 *Generated for ATUONA*\n\n_"${description}"_\n\n🎨 ${extra.modelUsed}`,
             parse_mode: 'Markdown'
           });
@@ -9906,7 +9938,7 @@ Return ONLY the motion direction. No preamble.`;
             const extraVertical = await tryAddedStills(imagePrompt, '9:16');
             if (extraVertical) {
               visualization.imageUrlVertical = extraVertical.url;
-              await ctx.replyWithPhoto(extraVertical.url, {
+              await ctx.replyWithPhoto(photoFromStill(extraVertical), {
                 caption: `📱 *Instagram Reel Format (9:16)*\n\n🎨 ${extraVertical.modelUsed} (after Flux)\n\n_${caption}_\n\n${hashtags.join(' ')}`,
                 parse_mode: 'Markdown'
               });
@@ -9988,7 +10020,7 @@ Free tier limit reached. Options:
                 lastModelUsed = extra.modelUsed;
                 visualization.imageUrlHorizontal = extra.url;
                 visualization.status = 'image_done';
-                await ctx.replyWithPhoto(extra.url, {
+                await ctx.replyWithPhoto(photoFromStill(extra), {
                   caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9\n🎨 ${extra.modelUsed} (after Flux)\n\n_${caption}_`,
                   parse_mode: 'Markdown'
                 });
@@ -10008,7 +10040,7 @@ Free tier limit reached. Options:
               lastModelUsed = extra.modelUsed;
               visualization.imageUrlHorizontal = extra.url;
               visualization.status = 'image_done';
-              await ctx.replyWithPhoto(extra.url, {
+              await ctx.replyWithPhoto(photoFromStill(extra), {
                 caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9\n🎨 ${extra.modelUsed} (after Flux)\n\n_${caption}_`,
                 parse_mode: 'Markdown'
               });
@@ -10027,7 +10059,7 @@ Free tier limit reached. Options:
         if (extra) {
           visualization.imageUrlHorizontal = extra.url;
           visualization.status = 'image_done';
-          await ctx.replyWithPhoto(extra.url, {
+          await ctx.replyWithPhoto(photoFromStill(extra), {
             caption: `🎬 *Page #${pageId}: ${title}*\n\n📺 YouTube Format (16:9)\n🎨 Generated with ${extra.modelUsed}\n\n_${caption}_`,
             parse_mode: 'Markdown'
           });
@@ -10035,7 +10067,7 @@ Free tier limit reached. Options:
           const extraV = await tryAddedStills(imagePrompt, '9:16');
           if (extraV) {
             visualization.imageUrlVertical = extraV.url;
-            await ctx.replyWithPhoto(extraV.url, {
+            await ctx.replyWithPhoto(photoFromStill(extraV), {
               caption: `📱 *Instagram Reel Format (9:16)*\n\n🎨 ${extraV.modelUsed}\n\n_${caption}_\n\n${hashtags.join(' ')}`,
               parse_mode: 'Markdown'
             });
