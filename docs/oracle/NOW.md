@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 14:16 UTC | Named /imagine engines stay exclusive — Flux only if that API is unpaid | `src/atuona-image-waterfall.ts`, `src/atuona-creative-ai.ts` — branch `cursor/imagine-exclusive-engine-0841`. Named `atuona` deploy after. | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟡 IN FLIGHT 12 Sep 14:16 UTC — named `/imagine` must not hop vendors
+
+**DONE:** Omni inline bytes live. Remaining hole: `/imagine luma` still tried Omni then Runway before Flux, so a Luma miss could come back as Gemini.
+
+**NEXT:** exclusive try order (`luma`→Luma only). Flux only when that wallet/API misses. Honest Telegram line before Flux. Do not rewrite `/visualize luma`.
+
+**VERIFIED BY:** pending `addedImageTryOrder` + named atuona deploy.
+
+**RISK:** Do not `cto_aipa` hard-reset. #099 title stays.
 
 ### 🟢 12 Sep 14:11 UTC — `/imagine omni` keeps Gemini pixels. LIVE.
 
