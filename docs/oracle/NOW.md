@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 12 Sep 13:50 UTC — `/imagine` engine commands on PR #53 (not deployed)
+### 🟡 IN FLIGHT 12 Sep 13:50 UTC — refresh `/menu` + sync image encodings
 
-**DONE:** Same-style stills menu as `/visualize`. Flux ladder + video tokens untouched. Extra painters after Flux: Luma uni-1-max → Gemini 3.1 Flash Image → Runway gen4_image. Branch `cursor/atuona-image-pins-0841`.
+**DONE:** PR #53 has `/imagine` engine lines. Leftover Creative Tools one-liner still in menu. Not on Oracle.
 
-**NEXT:** Elena review PR #53. Named `atuona` deploy when she wants it on `/menu`. Do not `cto_aipa` hard-reset.
+**NEXT:** drop leftover `/imagine - Create AI image`, land encodings on `main`, named `atuona` deploy. Do not `cto_aipa`.
 
-**VERIFIED BY:** `node scripts/test-atuona-image-pins.cjs` (21) + video pins (8) + visualize-deepseek (13)
+**VERIFIED BY:** pending Actions VERIFY + `/imagine 048` in dist
 
-**RISK:** `/visualize luma` is still Ray video. Veo/Kling/Seedance/DeepSeek have no stills API — `/imagine veo` points at `/visualize veo`.
+**RISK:** Do not rewrite `/visualize deepseek`. Image files must be in `PRODUCT_atuona_DEFAULT_FILES` or Oracle will not check them out.
 
 ### 🟢 12 Sep 13:22 UTC — today's Atuona encodings synced (git = Oracle = local)
 
