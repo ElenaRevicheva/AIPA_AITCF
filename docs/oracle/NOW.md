@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 11:58 UTC — live /menu refresh in flight (named `atuona` deploy)
+### 🟡 12 Sep 12:00 UTC — /menu refresh retry (vault-tree was missing on Oracle)
 
-**DONE:** Additive studio is on PR #52. Landing the same three files on `main` + a new `atuona` product (checkout those files, `npm run build`, `pm2 restart cto-aipa --update-env`). Does **not** `reset --hard` Oracle.
+**DONE:** First `atuona` deploy (run 34692410759) checked out 2 src files and `tsc` died: `Cannot find module './atuona-vault-tree'`. Process was **not** restarted (uptime still 3.7d). Named-file list now includes `src/atuona-vault-tree.ts`.
 
-**NEXT:** Elena: create DeepSeek key at https://platform.deepseek.com/api_keys — **do not paste it in chat**. Put on Oracle `.env` as `DEEPSEEK_API_KEY=` + `DEEPSEEK_MODEL=deepseek-flash`. Then say "key is on Oracle". Seedance needs no new key (`REPLICATE_API_TOKEN`). Steps: `docs/oracle/DEEPSEEK_ATUONA_KEY.md`.
+**NEXT:** Retry `atuona` trigger. Then Elena: DeepSeek key at https://platform.deepseek.com/api_keys — **do not paste it in chat**. Steps: `docs/oracle/DEEPSEEK_ATUONA_KEY.md`. Seedance needs no new key.
 
-**VERIFIED BY:** pending Actions `atuona` deploy — grep live `dist/atuona-creative-ai.js` for `visualize seedance`.
+**VERIFIED BY:** pending — `VERIFY: dist has visualize seedance` in the next Actions log.
 
-**RISK:** Full `cto_aipa` trigger still hard-resets the box. Use product `atuona` only. DeepSeek is a no-op until the key is on Oracle; `/visualize seedance` works without it.
+**RISK:** Do not fire `cto_aipa` (hard-reset). Oracle src still lags; only named Atuona files are updated.
 
 ### 🟢 11 Sep 22:40 UTC — /api film v13 is live (joyful chill house)
 
