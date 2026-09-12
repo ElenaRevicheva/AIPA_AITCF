@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 12:00 UTC | Retry Atuona /menu deploy — first run failed tsc (Oracle lacked `atuona-vault-tree.ts`) | `src/atuona-creative-ai.ts`, `src/llm-resilience.ts`, `src/atuona-vault-tree.ts`, `.deploy-trigger` | fcabd91 failed; retrying |
+| Cursor Cloud | 12 Sep 12:15 UTC | Add /deepseekkey (same contract as /pplxkey) so Elena can wire DeepSeek from Telegram | `src/atuona-creative-ai.ts`, `src/telegram-bot.ts`, `scripts/set-deepseek-stdin.sh` | menu deploy 34692523388 green |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
