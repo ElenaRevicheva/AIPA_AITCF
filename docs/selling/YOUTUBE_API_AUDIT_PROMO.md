@@ -8,7 +8,7 @@ Compiled with the Atuona Film Studio stack already wired into this repo
 
 ## Length (this cut)
 
-VO and caption **wording** on existing beats are unchanged. Cut order: moving pomegranate, moving/growing grapevine with neurones and the **What it checks** chapter on that shot, moving maracuya crawlers, then Elena's shortened Loom, then the finishing slides. The CTA QR sits on **every shot**. Fruit labels stay burned onto the picture. QR outro.
+v14 middle is a **new fruit cut**: mango, papaya, dragon fruit, pineapple, starfruit. Not grapes, not pomegranate, not passionfruit. Then Elena's shortened Loom, then the finishing slides. The CTA QR sits on **every shot**. Fruit labels stay burned onto the picture. QR outro.
 
 ## Watch
 
@@ -17,8 +17,11 @@ Open a filename Chrome has never cached:
 Player (QR is a real clickable link on this page):
 https://webhook.aideazz.xyz/influencer-images/youtube/watch.html
 
-Direct file (open this, not v11 / v9 / v7):
-https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v12.mp4
+Direct file (v13 is live until v14 publishes):
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v13.mp4
+
+v14 (do not send until `200 video/mp4` on this URL):
+https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v14.mp4
 
 Poster:
 https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-poster.jpg
@@ -55,7 +58,9 @@ Counted from production logs on Oracle Cloud: 420+ audits · 14,000+ signals · 
 
 Want it wired into your stack? https://aideazz.xyz/portfolio#portfolio-inquiry-form
 
-Music: Chillout Lounge - Chillout Enigmatic Music by Oleg-Mazur (Pixabay, mood Uplifting). Tropical Cocktail and Distant Horizon are burned.
+Music (v13, live): Chill House by Kulakovka (Pixabay). Burned: Tropical Cocktail, Distant Horizon, Morning Light, Oleg-Mazur Chillout Enigmatic, Kulakovka Chill House, poetry beds (Light In The Void, Fatal Error, Dark Cinematic Drone).
+
+v14 (in flight): juicy unused Pixabay — first pin is Under the Mango Sky, then Tropical House Beach Party. Do not reuse a burned bed. Do not fall back to brown-noise drone.
 
 AIdeazz Lab · Elena Revicheva
 ```
@@ -66,7 +71,7 @@ Computed from beat durations + 1.3s xfade. Watch once and nudge if a line lands 
 
 ```
 0:00 Can AI find and cite you?
-0:04 What it checks (grapevine)
+0:04 What it checks (mango cut)
 0:11 Half of the fruit
 0:20 Six crawlers
 0:27 What the product is
@@ -87,7 +92,7 @@ Computed from beat durations + 1.3s xfade. Watch once and nudge if a line lands 
 
 ```
 # first line of .influencer-diag-trigger
-api-film
+api-film-v14
 ```
 
 Oracle work dir `/home/ubuntu/aideazz-api-film/` (never inside the repo).

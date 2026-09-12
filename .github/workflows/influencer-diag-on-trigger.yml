@@ -18,7 +18,7 @@ on:
 jobs:
   influencer-diag:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,8 +32,8 @@ jobs:
           [ -n "$LINE" ] || { echo "::error::.influencer-diag-trigger is empty"; exit 1; }
           case "$LINE" in
             \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
-            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film|api-film-bust|api-film-music) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, api-film-bust, api-film-music, or # idle — got '$LINE'"; exit 1 ;;
+            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film|api-film-bust|api-film-music|api-film-v14) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, api-film-bust, api-film-music, api-film-v14, or # idle — got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -50,6 +50,9 @@ jobs:
           SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
           MODE: ${{ steps.trigger.outputs.mode }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BRIGHTDATA_API_TOKEN: ${{ secrets.BRIGHTDATA_API_TOKEN }}
         run: |
           set -uo pipefail
           install -m 700 -d ~/.ssh
@@ -145,6 +148,103 @@ jobs:
               ubuntu@170.9.242.90:/tmp/api-film-watch.html
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/bust-api-audit-film.sh
+          elif [ "$MODE" = "api-film-v14" ]; then
+            # DeepSeek + Seedance run on Oracle (that is where the keys live).
+            # Runner stitches VO + juicy Pixabay. Do not skip DeepSeek.
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
+            CLIP_DIR="${RUNNER_TEMP}/aideazz-api-film-v14/clips"
+            MUSIC_DIR="${RUNNER_TEMP}/aideazz-api-film-v14/music"
+            mkdir -p "$CLIP_DIR" "$MUSIC_DIR"
+            ssh_retry 'mkdir -p /tmp/youtube-api-audit-film-v14 /home/ubuntu/aideazz-api-film-v14/clips /tmp/api-film-v14-music' || exit 1
+            scp_retry -r \
+              scripts/youtube-api-audit-film/. \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/ || exit 1
+            echo "=== Oracle: NEW cut-fruit stills (mango/papaya/dragon/pineapple/starfruit — not grapes) ==="
+            ssh $SSHOPTS ubuntu@170.9.242.90 \
+              'export CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/paint-v14-fruits.mjs' \
+              || { echo FATAL: new v14 fruit stills missed; exit 1; }
+            mkdir -p scripts/youtube-api-audit-film/fruit
+            scp_retry \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-mango.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-papaya.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-dragonfruit.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-pineapple.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-starfruit.jpg' \
+              scripts/youtube-api-audit-film/fruit/ || { echo FATAL: stills did not come back from Oracle; exit 1; }
+            ls -lh scripts/youtube-api-audit-film/fruit/v14-*.jpg
+            for f in mango papaya dragonfruit pineapple starfruit; do
+              [ -f "scripts/youtube-api-audit-film/fruit/v14-${f}.jpg" ] || { echo "FATAL: missing v14-${f}.jpg"; exit 1; }
+            done
+            if ls scripts/youtube-api-audit-film/fruit/v14-*.jpg | grep -Eiq 'grape|pomegranate|passion'; then
+              echo FATAL: a v14 still is named after grapes
+              exit 1
+            fi
+            echo "v13 grape/pomegranate stills may stay on disk for the old compile — v14 does not use them"
+            echo "=== Oracle: DeepSeek directs, Seedance shoots ==="
+            ssh $SSHOPTS ubuntu@170.9.242.90 \
+              'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v14 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/direct-fruit-v14.mjs' \
+              || { echo FATAL: DeepSeek/Seedance fruit missed — not publishing a silent skip; exit 1; }
+            scp_retry \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/mango.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/papaya.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/dragon.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/pineapple.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/starfruit.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/deepseek-motion-v14.txt' \
+              "$CLIP_DIR/" || exit 1
+            mv -f "$CLIP_DIR/deepseek-motion-v14.txt" "${RUNNER_TEMP}/aideazz-api-film-v14/deepseek-motion-v14.txt" 2>/dev/null || true
+            ls -lh "$CLIP_DIR"
+            echo "----- DeepSeek motion lines (no keys) -----"
+            cat "${RUNNER_TEMP}/aideazz-api-film-v14/deepseek-motion-v14.txt" || cat "$CLIP_DIR/deepseek-motion-v14.txt" || true
+            export API_FILM_FRUIT_READY=1
+            MUSIC_OK=0
+            if ssh_retry 'mkdir -p /tmp/api-film-v14-music /tmp/youtube-api-audit-film-v14'; then
+              scp_retry \
+                scripts/youtube-api-audit-film/fetch-pixabay-music.py \
+                ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fetch-pixabay-music.py || true
+              if ssh $SSHOPTS ubuntu@170.9.242.90 'export API_FILM_MUSIC_DIR=/tmp/api-film-v14-music CTO_ENV=/home/ubuntu/cto-aipa/.env; rm -f /tmp/api-film-v14-music/SELECTED.path; python3 /tmp/youtube-api-audit-film-v14/fetch-pixabay-music.py'; then
+                scp_retry \
+                  'ubuntu@170.9.242.90:/tmp/api-film-v14-music/*' \
+                  "$MUSIC_DIR/" || true
+                if [ -f "$MUSIC_DIR/SELECTED.path" ]; then
+                  REMOTE_MP3=$(head -n1 "$MUSIC_DIR/SELECTED.path" | tr -d '\r')
+                  LOCAL_MP3=$(ls -1 "$MUSIC_DIR"/v14-*.mp3 "$MUSIC_DIR"/*.mp3 2>/dev/null | head -n1 || true)
+                  if [ -n "$LOCAL_MP3" ] && [ -f "$LOCAL_MP3" ]; then
+                    echo "$LOCAL_MP3" > "$MUSIC_DIR/SELECTED.path"
+                    export API_FILM_MUSIC="$LOCAL_MP3"
+                    MUSIC_OK=1
+                    echo "pixabay via Oracle → $API_FILM_MUSIC"
+                    ls -lh "$API_FILM_MUSIC"
+                    [ -f "$MUSIC_DIR/SELECTED.credit" ] && echo "CREDIT $(cat "$MUSIC_DIR/SELECTED.credit")"
+                  fi
+                fi
+              fi
+            fi
+            if [ "$MUSIC_OK" != "1" ]; then
+              echo "Oracle Pixabay pull missed — trying Bright Data on the runner"
+              export API_FILM_MUSIC_DIR="$MUSIC_DIR"
+              export CTO_ENV="${GITHUB_WORKSPACE}/.env"
+              python3 scripts/youtube-api-audit-film/fetch-pixabay-music.py
+              export API_FILM_MUSIC="$(head -n1 "$MUSIC_DIR/SELECTED.path" | tr -d '\r')"
+            fi
+            [ -n "${API_FILM_MUSIC:-}" ] && [ -f "$API_FILM_MUSIC" ] || { echo FATAL: no juicy Pixabay bed; exit 1; }
+            echo "=== Oracle: stitch VO + NEW fruit + music (keys live here, not on the runner) ==="
+            scp_retry \
+              scripts/oracle-resilience/compile-api-film-v14-runner.sh \
+              scripts/oracle-resilience/api-film-watch-v14.html \
+              ubuntu@170.9.242.90:/tmp/ || exit 1
+            ssh $SSHOPTS ubuntu@170.9.242.90 \
+              'export CTO_ENV=/home/ubuntu/cto-aipa/.env API_FILM_DIR=/home/ubuntu/aideazz-api-film-v14 API_FILM_PUBLISH=/home/ubuntu/aideazz-api-film-v14/out API_FILM_FRUIT_READY=1; if [ -f /tmp/api-film-v14-music/SELECTED.path ]; then export API_FILM_MUSIC="$(head -n1 /tmp/api-film-v14-music/SELECTED.path | tr -d "\r")"; fi; cp -f /tmp/api-film-watch-v14.html /tmp/youtube-api-audit-film-v14/api-film-watch-v14.html 2>/dev/null || true; bash /tmp/compile-api-film-v14-runner.sh' \
+              || { echo FATAL: Oracle v14 compile missed; exit 1; }
+            mkdir -p "${RUNNER_TEMP}/aideazz-api-film-v14/out"
+            scp_retry \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14-poster.jpg' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/watch-v14.html' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/api-cta-qr.png' \
+              "${RUNNER_TEMP}/aideazz-api-film-v14/out/" || true
+            RC=0
           elif [ "$MODE" = "api-film" ]; then
             # Prefer Oracle's cached onyx TTS stems (same VO as every earlier cut).
             mkdir -p "${RUNNER_TEMP}/oracle-vo"
@@ -176,6 +276,65 @@ jobs:
           echo "--- remote exit code: $RC ---"
           rm -f ~/.ssh/oracle
           exit $RC
+
+      - name: Upload /api film v14
+        if: steps.trigger.outputs.skip != 'true' && steps.trigger.outputs.mode == 'api-film-v14'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-film-v14
+          path: |
+            ${{ runner.temp }}/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4
+            ${{ runner.temp }}/aideazz-api-film-v14/out/watch-v14.html
+            ${{ runner.temp }}/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14-poster.jpg
+            ${{ runner.temp }}/aideazz-api-film-v14/out/api-cta-qr.png
+          if-no-files-found: ignore
+
+      - name: Publish /api film v14 to Oracle
+        if: steps.trigger.outputs.skip != 'true' && steps.trigger.outputs.mode == 'api-film-v14'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=40 -o ServerAliveInterval=20 -o ServerAliveCountMax=6"
+          # Prefer Oracle's own out/ if compile ran there; else runner temp.
+          n=0
+          while [ "$n" -lt 6 ]; do
+            n=$((n + 1))
+            echo "publish v14 ssh attempt $n"
+            if ssh $SSHOPTS ubuntu@170.9.242.90 'test -f /home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4'; then
+              ssh $SSHOPTS ubuntu@170.9.242.90 'mkdir -p /tmp/api-film-out-v14 && cp -f /home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4 /home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14-poster.jpg /home/ubuntu/aideazz-api-film-v14/out/watch-v14.html /home/ubuntu/aideazz-api-film-v14/out/api-cta-qr.png /tmp/api-film-out-v14/ 2>/dev/null; true'
+              ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' \
+                < scripts/oracle-resilience/publish-api-film-v14.sh
+              PRC=$?
+              echo "publish v14 rc=$PRC"
+              rm -f ~/.ssh/oracle
+              exit "$PRC"
+            fi
+            OUT="${RUNNER_TEMP}/aideazz-api-film-v14/out"
+            if [ -f "$OUT/can-ai-find-and-cite-you-v14.mp4" ]; then
+              ssh $SSHOPTS ubuntu@170.9.242.90 'mkdir -p /tmp/api-film-out-v14 && rm -f /tmp/api-film-out-v14/*' \
+                && scp $SSHOPTS \
+                  "$OUT/can-ai-find-and-cite-you-v14.mp4" \
+                  "$OUT/can-ai-find-and-cite-you-v14-poster.jpg" \
+                  "$OUT/api-cta-qr.png" \
+                  "$OUT/watch-v14.html" \
+                  ubuntu@170.9.242.90:/tmp/api-film-out-v14/ \
+                && ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' \
+                  < scripts/oracle-resilience/publish-api-film-v14.sh
+              PRC=$?
+              echo "publish v14 rc=$PRC"
+              rm -f ~/.ssh/oracle
+              exit "$PRC"
+            fi
+            echo "publish v14 attempt $n — file not ready"
+            sleep $((n * 10))
+          done
+          rm -f ~/.ssh/oracle
+          echo "WARN: v14 not on Oracle yet — film may be in the api-film-v14 artifact"
+          exit 1
 
       - name: Upload /api film
         if: steps.trigger.outputs.skip != 'true' && steps.trigger.outputs.mode == 'api-film'
