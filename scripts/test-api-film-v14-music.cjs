@@ -114,7 +114,9 @@ ok('legacy BURNED lists Kulakovka', /kulakovka/i.test(src12));
 
 ok('runner fetches Pixabay before compile', run.includes('fetch-pixabay-music.py'));
 ok('runner work dir is aideazz-api-film-v14', run.includes('aideazz-api-film-v14'));
+ok('runner does not delete new fruit clips', /rm -f "\$DIR"\/clips\/\{grapes/.test(run) && !/rm -f "\$DIR"\/clips\/\{grapes,split,crawlers,hand,dashboard,mango/.test(run));
 ok('runner does not restart cto-aipa', !/pm2 restart/.test(run));
+ok('workflow stitches v14 on Oracle', wf.includes('Oracle: stitch VO + NEW fruit') && wf.includes('compile-api-film-v14-runner.sh'));
 ok('publisher copies only v14', pub.includes('can-ai-find-and-cite-you-v14.mp4') && !/cp -f "\$SRC\/"\*\.mp4/.test(pub));
 ok('publisher does not overwrite v13', !/v13\.mp4/.test(pub) || pub.includes('do not overwrite v13'));
 ok('workflow accepts api-film-v14', /api-film-v14/.test(wf));

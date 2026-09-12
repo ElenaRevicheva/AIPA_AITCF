@@ -229,8 +229,22 @@ jobs:
               export API_FILM_MUSIC="$(head -n1 "$MUSIC_DIR/SELECTED.path" | tr -d '\r')"
             fi
             [ -n "${API_FILM_MUSIC:-}" ] && [ -f "$API_FILM_MUSIC" ] || { echo FATAL: no juicy Pixabay bed; exit 1; }
-            bash scripts/oracle-resilience/compile-api-film-v14-runner.sh
-            RC=$?
+            echo "=== Oracle: stitch VO + NEW fruit + music (keys live here, not on the runner) ==="
+            scp_retry \
+              scripts/oracle-resilience/compile-api-film-v14-runner.sh \
+              scripts/oracle-resilience/api-film-watch-v14.html \
+              ubuntu@170.9.242.90:/tmp/ || exit 1
+            ssh $SSHOPTS ubuntu@170.9.242.90 \
+              'export CTO_ENV=/home/ubuntu/cto-aipa/.env API_FILM_DIR=/home/ubuntu/aideazz-api-film-v14 API_FILM_PUBLISH=/home/ubuntu/aideazz-api-film-v14/out API_FILM_FRUIT_READY=1; if [ -f /tmp/api-film-v14-music/SELECTED.path ]; then export API_FILM_MUSIC="$(head -n1 /tmp/api-film-v14-music/SELECTED.path | tr -d "\r")"; fi; cp -f /tmp/api-film-watch-v14.html /tmp/youtube-api-audit-film-v14/api-film-watch-v14.html 2>/dev/null || true; bash /tmp/compile-api-film-v14-runner.sh' \
+              || { echo FATAL: Oracle v14 compile missed; exit 1; }
+            mkdir -p "${RUNNER_TEMP}/aideazz-api-film-v14/out"
+            scp_retry \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14-poster.jpg' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/watch-v14.html' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/out/api-cta-qr.png' \
+              "${RUNNER_TEMP}/aideazz-api-film-v14/out/" || true
+            RC=0
           elif [ "$MODE" = "api-film" ]; then
             # Prefer Oracle's cached onyx TTS stems (same VO as every earlier cut).
             mkdir -p "${RUNNER_TEMP}/oracle-vo"

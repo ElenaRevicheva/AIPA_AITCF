@@ -27,9 +27,13 @@ command -v ffmpeg && command -v ffprobe && command -v node || { echo FATAL: ffmp
 [ -f "$KIT/fetch-pixabay-music.py" ] || { echo "FATAL: fetch-pixabay-music.py missing"; exit 1; }
 
 mkdir -p "$DIR"/{work,vo-v14,clips,out,music,loom}
-# Fresh VO + fruit — do not reuse v13 stems or leftover Runway clips.
-rm -f "$DIR"/clips/{grapes,split,crawlers,hand,dashboard,mango,papaya,dragon,pineapple,starfruit}.mp4
-rm -f "$DIR/music/SELECTED.path"
+# Drop leftover v13 grape/pomegranate clips only. Keep mango/papaya/dragon/pineapple/starfruit
+# — those are the new DeepSeek-directed cut. An earlier fire scp'd them here, then this
+# rm deleted them and the runner (no keys) failed "v14 requires DEEPSEEK_API_KEY".
+rm -f "$DIR"/clips/{grapes,split,crawlers,hand,dashboard}.mp4
+if [ -z "${API_FILM_MUSIC:-}" ]; then
+  rm -f "$DIR/music/SELECTED.path"
+fi
 
 echo
 echo "=== 0. keys present (names only) ==="
