@@ -28,7 +28,7 @@ command -v ffmpeg && command -v ffprobe && command -v node || { echo FATAL: ffmp
 
 mkdir -p "$DIR"/{work,vo-v14,clips,out,music,loom}
 # Fresh VO + fruit — do not reuse v13 stems or leftover Runway clips.
-rm -f "$DIR"/clips/{grapes,split,crawlers,hand,dashboard}.mp4
+rm -f "$DIR"/clips/{grapes,split,crawlers,hand,dashboard,mango,papaya,dragon,pineapple,starfruit}.mp4
 rm -f "$DIR/music/SELECTED.path"
 
 echo
@@ -78,9 +78,9 @@ else
 fi
 [ -n "${API_FILM_MUSIC:-}" ] && [ -f "$API_FILM_MUSIC" ] || { echo FATAL: no selected music; exit 1; }
 
-if [ -f "$DIR/clips/grapes.mp4" ] && [ -f "$DIR/clips/crawlers.mp4" ]; then
+if [ -f "$DIR/clips/mango.mp4" ] && [ -f "$DIR/clips/papaya.mp4" ]; then
   export API_FILM_FRUIT_READY=1
-  echo "API_FILM_FRUIT_READY=1 (DeepSeek+Seedance clips present)"
+  echo "API_FILM_FRUIT_READY=1 (DeepSeek+Seedance NEW fruit clips present)"
 fi
 
 echo

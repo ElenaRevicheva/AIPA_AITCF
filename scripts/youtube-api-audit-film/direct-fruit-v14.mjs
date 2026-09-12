@@ -13,6 +13,7 @@ import { fileURLToPath } from 'url';
 
 const require = createRequire(import.meta.url);
 const { extractDeepseekLine } = require('./deepseek-motion-parse.cjs');
+const { FRUIT } = require('./fruit-v14-spec.cjs');
 
 const execFileP0 = promisify(execFile);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -36,39 +37,6 @@ function readEnvKey(n) {
 const DEEPSEEK = (process.env.DEEPSEEK_API_KEY || readEnvKey('DEEPSEEK_API_KEY')).trim();
 const DEEPSEEK_MODEL = (process.env.DEEPSEEK_MODEL || readEnvKey('DEEPSEEK_MODEL') || 'deepseek-flash').trim();
 const REPLICATE = (process.env.REPLICATE_API_TOKEN || readEnvKey('REPLICATE_API_TOKEN')).trim();
-
-const FRUIT = [
-  {
-    id: 'grapes',
-    still: 'fruit/geo-grapes-citation.jpg',
-    motion:
-      'The grape cluster SWAYS on the vine. Individual berries shift a few millimetres. Dew slides. Neural constellation traces on each grape GLOW and fire — cyan then magenta pulses travel berry to berry like neurones. Slow prestige product film. There is only THIS cluster. No knife, no hand, no extra fruit, no text, no logo, no second vine.',
-  },
-  {
-    id: 'split',
-    still: 'fruit/geo-pomegranate-100-vs-72.jpg',
-    motion:
-      'Pomegranate halves breathe; circuit traces pulse cyan then magenta. Numbers 100 and 72 stay exactly where they are — do not morph, do not duplicate, do not add new numerals. Slow push. No extra fruit. No grapevine.',
-  },
-  {
-    id: 'crawlers',
-    still: 'fruit/geo-passionfruit-crawlers.jpg',
-    motion:
-      'Three glass crawlers WALK across the passionfruit pulp — legs shift, bodies orbit a few centimetres, purple cores pulse. Pulp glistens. Tiny living motion. Do not spawn a fourth crawler. No extra fruit. Do not invent text or names.',
-  },
-  {
-    id: 'hand',
-    still: 'fruit/geo-pomegranate-audit-hand.jpg',
-    motion:
-      'Water droplets fall. The glass HUD stays locked to the fruit. The hand is still. No extra hands, no blood, no new UI panels, no changing the 100 score.',
-  },
-  {
-    id: 'dashboard',
-    still: 'fruit/geo-pomegranate-dashboard-2026.jpg',
-    motion:
-      'Juice droplets fall. The glass AI visibility dashboard stays locked to the fruit. The hand is still. Numbers stay 100. No extra hands, no blood, no new UI panels. Slow prestige product film.',
-  },
-];
 
 function dataUri(file) {
   const buf = fs.readFileSync(file);
@@ -244,7 +212,10 @@ async function main() {
   const credit = [];
   for (const b of FRUIT) {
     const still = path.join(HERE, b.still);
-    if (!fs.existsSync(still)) throw new Error('missing still ' + still);
+    if (!fs.existsSync(still)) throw new Error('missing NEW v14 still ' + still + ' — run paint-v14-fruits.mjs first');
+    if (/grape|pomegranate|passionfruit/i.test(`${b.still} ${b.id}`)) {
+      throw new Error('old fruit leaked into v14 director: ' + b.id);
+    }
     const raw = path.join(CLIPDIR, `${b.id}.mp4`);
     if (fs.existsSync(raw)) fs.unlinkSync(raw);
     const motion = await deepseekMotion(b.id, b.motion);

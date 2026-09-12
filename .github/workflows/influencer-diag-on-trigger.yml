@@ -160,16 +160,20 @@ jobs:
             scp_retry -r \
               scripts/youtube-api-audit-film/. \
               ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/ || exit 1
+            echo "=== Oracle: Flux paints NEW fruits (no grapes) ==="
+            ssh $SSHOPTS ubuntu@170.9.242.90 \
+              'export CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/paint-v14-fruits.mjs' \
+              || { echo FATAL: new v14 fruit stills missed; exit 1; }
             echo "=== Oracle: DeepSeek directs, Seedance shoots ==="
             ssh $SSHOPTS ubuntu@170.9.242.90 \
               'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v14 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/direct-fruit-v14.mjs' \
               || { echo FATAL: DeepSeek/Seedance fruit missed — not publishing a silent skip; exit 1; }
             scp_retry \
-              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/grapes.mp4' \
-              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/split.mp4' \
-              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/crawlers.mp4' \
-              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/hand.mp4' \
-              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/dashboard.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/mango.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/papaya.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/dragon.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/pineapple.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/starfruit.mp4' \
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/deepseek-motion-v14.txt' \
               "$CLIP_DIR/" || exit 1
             mv -f "$CLIP_DIR/deepseek-motion-v14.txt" "${RUNNER_TEMP}/aideazz-api-film-v14/deepseek-motion-v14.txt" 2>/dev/null || true

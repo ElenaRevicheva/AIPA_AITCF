@@ -21,6 +21,7 @@ import { fileURLToPath } from 'url';
 
 const require = createRequire(import.meta.url);
 const { extractDeepseekLine } = require('./deepseek-motion-parse.cjs');
+const { FRUIT: V14_FRUIT } = require('./fruit-v14-spec.cjs');
 
 const execFileP0 = promisify(execFile);
 async function execFileP(cmd, args, opts) {
@@ -572,11 +573,10 @@ function pickMusic() {
 
 const BEATS = [
   {
-    id: 'grapes',
+    id: 'mango',
     kind: 'seedance',
-    still: 'fruit/geo-grapes-citation.jpg',
-    motion:
-      'The grape cluster SWAYS on the vine. Individual berries shift a few millimetres. Dew slides. Neural constellation traces on each grape GLOW and fire — cyan then magenta pulses travel berry to berry like neurones. Slow prestige product film. There is only THIS cluster. No knife, no hand, no extra fruit, no text, no logo, no second vine.',
+    still: V14_FRUIT[0].still,
+    motion: V14_FRUIT[0].motion,
     vo: null,
     cap: null,
     clipDur: 8.0,
@@ -588,11 +588,10 @@ const BEATS = [
     ],
   },
   {
-    id: 'split',
+    id: 'papaya',
     kind: 'seedance',
-    still: 'fruit/geo-pomegranate-100-vs-72.jpg',
-    motion:
-      'Pomegranate halves breathe; circuit traces pulse cyan then magenta. Numbers 100 and 72 stay exactly where they are — do not morph, do not duplicate, do not add new numerals. Slow push. No extra fruit. No grapevine.',
+    still: V14_FRUIT[1].still,
+    motion: V14_FRUIT[1].motion,
     vo: 'Google ranked your page. In 2026 that is just half of the fruit.',
     cap: 'Google ranked your page —\nin 2026 that is just half of the fruit.',
     clipDur: 7.8,
@@ -602,11 +601,10 @@ const BEATS = [
     ],
   },
   {
-    id: 'crawlers',
+    id: 'dragon',
     kind: 'seedance',
-    still: 'fruit/geo-passionfruit-crawlers.jpg',
-    motion:
-      'Three glass crawlers WALK across the passionfruit pulp — legs shift, bodies orbit a few centimetres, purple cores pulse. Pulp glistens. Tiny living motion. Do not spawn a fourth crawler. No extra fruit. Do not invent text or names.',
+    still: V14_FRUIT[2].still,
+    motion: V14_FRUIT[2].motion,
     vo: 'Six crawlers decide whether ChatGPT, Claude, Gemini and Perplexity can quote you.',
     cap: 'Six crawlers decide who gets cited.',
     clipDur: 8.2,
@@ -617,21 +615,19 @@ const BEATS = [
     ],
   },
   {
-    id: 'hand',
+    id: 'pineapple',
     kind: 'seedance',
-    still: 'fruit/geo-pomegranate-audit-hand.jpg',
-    motion:
-      'Water droplets fall. The glass HUD stays locked to the fruit. The hand is still. No extra hands, no blood, no new UI panels, no changing the 100 score.',
+    still: V14_FRUIT[3].still,
+    motion: V14_FRUIT[3].motion,
     vo: 'This is the free AI visibility audit at aideazz.xyz/api.',
     cap: 'Free AI visibility audit\naideazz.xyz/api',
     clipDur: 6.5,
   },
   {
-    id: 'dashboard',
+    id: 'starfruit',
     kind: 'seedance',
-    still: 'fruit/geo-pomegranate-dashboard-2026.jpg',
-    motion:
-      'Juice droplets fall. The glass AI visibility dashboard stays locked to the fruit. The hand is still. Numbers stay 100. No extra hands, no blood, no new UI panels. Slow prestige product film.',
+    still: V14_FRUIT[4].still,
+    motion: V14_FRUIT[4].motion,
     vo: 'Counted from production logs: four hundred and twenty audits, fourteen thousand signals, two hundred and ten sites, median eighty-five.',
     cap: '420+ audits · 14,000+ signals · median 85',
     clipDur: 11.2,
@@ -681,7 +677,7 @@ async function main() {
   process.stderr.write(`OPENAI ${OPENAI ? 'yes' : 'NO'} REPLICATE ${REPLICATE ? 'yes' : 'NO'} DEEPSEEK ${DEEPSEEK ? `yes ${DEEPSEEK_MODEL}` : 'NO'}\n`);
 
   const fruitReady = process.env.API_FILM_FRUIT_READY === '1';
-  const fruitIds = ['grapes', 'crawlers', 'dashboard', 'hand', 'split'];
+  const fruitIds = V14_FRUIT.map((f) => f.id);
   const haveFruit = fruitIds.every((id) => {
     const p = path.join(CLIPDIR, `${id}.mp4`);
     return fs.existsSync(p) && fs.statSync(p).size > 20000;
@@ -703,7 +699,7 @@ async function main() {
     }
   }
 
-  const cover = path.join(HERE, 'fruit/geo-pomegranate-100-vs-72.jpg');
+  const cover = path.join(HERE, V14_FRUIT[0].still);
   const seq = [];
   seq.push(await overlayQrBug(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 60, cover, true), path.join(W, 'card_intro_qr.mp4')));
 
@@ -734,8 +730,7 @@ async function main() {
     if (b.kind === 'ui') {
       raw = await buildUiClip(b, clipDur, loomState);
     } else if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
-      if (b.id === 'grapes') await neuronPulse(still, raw, clipDur, { sway: true, grow: true });
-      else if (b.id === 'crawlers') await fruitSway(still, raw, clipDur);
+      if (b.id === 'mango' || b.id === 'dragon') await fruitSway(still, raw, clipDur);
       else await stillToClip(still, raw, 5.5);
     }
     const nat = await dur(raw);
@@ -756,7 +751,7 @@ async function main() {
     await overlayQrBug(baked, withQr);
     seq.push(withQr);
     if (voFile) voInfo.push({ segIndex: i + 1, file: voFile });
-    if (b.id === 'grapes') process.stderr.write('chapter What it checks on moving/growing grapes + neurones\n');
+    if (b.id === 'mango') process.stderr.write('chapter What it checks on a new mango cut — not grapes\n');
     if (b.id === 'loomwalk') process.stderr.write('chapter Elena Loom shortened (no results-scroll tail)\n');
     if (b.id === 'website') process.stderr.write('chapter finishing slides\n');
     process.stderr.write(`beat ${i + 1}/${BEATS.length} ${b.id} dur=${normDur.toFixed(1)} vo=${b.vo ? vd.toFixed(1) : '-'}\n`);
