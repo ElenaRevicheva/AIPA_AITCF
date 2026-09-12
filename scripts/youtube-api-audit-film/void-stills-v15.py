@@ -23,46 +23,88 @@ UA = "AIdeazzApiFilmV15/1.0 (https://aideazz.xyz/portfolio; aipa@aideazz.xyz)"
 BANNED = re.compile(r"grape|pomegranate|passionfruit|maracuya|vine|raisin", re.I)
 CTX = ssl.create_default_context()
 
+# Pins first (v14 lesson): Commons search from Oracle can return zero hits
+# that pass the name filter. Special:FilePath is the path that already worked.
 FRUIT = [
     {
         "id": "mango",
         "whole": "v15-mango-whole.jpg",
         "cut": "v15-mango-cut.jpg",
-        "must": re.compile(r"mango", re.I),
-        "whole_q": ["whole ripe mango fruit", "Mangifera indica whole fruit"],
+        "must": re.compile(r"mango|mangifera", re.I),
+        "whole_q": ["mango fruit", "Mangifera indica fruit"],
         "cut_q": ["mango fruit cut open cross section", "sliced ripe mango golden flesh"],
+        "whole_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Mango.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Mangifera%20indica%20fruit.jpg",
+        ],
+        "cut_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Mangoes%20-%20single%20and%20halved.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Ataulfo%20mango%20cut.jpg",
+        ],
     },
     {
         "id": "papaya",
         "whole": "v15-papaya-whole.jpg",
         "cut": "v15-papaya-cut.jpg",
         "must": re.compile(r"papaya|carica", re.I),
-        "whole_q": ["whole papaya fruit Carica", "ripe papaya whole"],
+        "whole_q": ["papaya fruit", "Carica papaya fruit"],
         "cut_q": ["papaya fruit cut in half black seeds", "papaya cross section"],
+        "whole_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Papaya%20fruit.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Carica%20papaya%20-%20papaya.jpg",
+        ],
+        "cut_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Papaya%20cross%20section%20BNC.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Carica%20papaya%20-%20Papaya%20fruits%20cross-section.jpg",
+        ],
     },
     {
         "id": "dragon",
         "whole": "v15-dragon-whole.jpg",
         "cut": "v15-dragon-cut.jpg",
         "must": re.compile(r"dragon|pitaya|hylocereus|pitahaya", re.I),
-        "whole_q": ["whole dragon fruit pitaya", "Hylocereus undatus whole fruit"],
+        "whole_q": ["dragon fruit pitaya", "Hylocereus undatus fruit"],
         "cut_q": ["dragon fruit pitaya cut open", "hylocereus undatus cross section"],
+        "whole_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Pitaya%20fruit.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Hylocereus%20undatus%20red%20pitaya.jpg",
+        ],
+        "cut_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Pitaya%20cross%20section%20ed2.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Hylocereus%20undatus%20cut.jpg",
+        ],
     },
     {
         "id": "pineapple",
         "whole": "v15-pineapple-whole.jpg",
         "cut": "v15-pineapple-cut.jpg",
         "must": re.compile(r"pineapple|ananas", re.I),
-        "whole_q": ["whole pineapple fruit Ananas", "ripe pineapple standing"],
+        "whole_q": ["pineapple fruit", "Ananas comosus fruit"],
         "cut_q": ["pineapple fruit cut cross section", "ananas comosus sliced"],
+        "whole_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Pineapple.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Ananas%20comosus.jpg",
+        ],
+        "cut_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Pineapple%20and%20cross%20section.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Ananas%20comosus%20cross%20section.jpg",
+        ],
     },
     {
         "id": "starfruit",
         "whole": "v15-starfruit-whole.jpg",
         "cut": "v15-starfruit-cut.jpg",
         "must": re.compile(r"starfruit|carambola|averrhoa", re.I),
-        "whole_q": ["whole starfruit carambola", "Averrhoa carambola whole fruit"],
+        "whole_q": ["starfruit carambola", "Averrhoa carambola fruit"],
         "cut_q": ["starfruit carambola slices", "averrhoa carambola fruit slices"],
+        "whole_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Carambola%20starfruit.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Averrhoa%20carambola%20fruit.jpg",
+        ],
+        "cut_pins": [
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Averrhoa%20carambola%20slices.jpg",
+            "https://commons.wikimedia.org/wiki/Special:FilePath/Carambola%20starfruit.jpg",
+        ],
     },
 ]
 
@@ -159,7 +201,12 @@ def fetch_kind(item: dict, kind: str) -> Path:
     dest = DEST_DIR / item[kind]
     raw = dest.with_suffix(".src.jpg")
     queries = item["whole_q" if kind == "whole" else "cut_q"]
+    pins = item["whole_pins" if kind == "whole" else "cut_pins"]
     urls = []
+    for pin in pins:
+        if banned(pin):
+            raise SystemExit(f"pin leaked banned fruit: {pin}")
+        urls.append(pin)
     for q in queries:
         if banned(q):
             raise SystemExit(f"search leaked banned fruit: {q}")

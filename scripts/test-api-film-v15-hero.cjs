@@ -95,6 +95,8 @@ ok('hero-clip is not Ken Burns-only', !/Ken Burns/.test(srcHero) || srcHero.incl
 ok('void stills pad onto #08050e', srcVoid.includes('08050e'));
 ok('void stills fetch whole+cut', srcVoid.includes('whole') && srcVoid.includes('cut') && srcVoid.includes('VOID READY'));
 ok('void stills never name a grape dest', !/v15-grape|geo-grapes|passionfruit\.jpg|pomegranate\.jpg/.test(srcVoid));
+ok('void stills pin Commons FilePath first', srcVoid.includes('Special:FilePath') && srcVoid.includes('whole_pins') && srcVoid.includes('cut_pins'));
+ok('void stills pin mango whole and cut', srcVoid.includes('Mango.jpg') && srcVoid.includes('Ataulfo'));
 
 ok('director refuses to skip DeepSeek', dir.includes('will not skip DeepSeek') || dir.includes('will not pretend DeepSeek'));
 ok('director spends the Flash wallet', dir.includes('deepseek-flash'));
