@@ -133,7 +133,7 @@ git log keeps the record.
 
 ### 🟡 IN FLIGHT 12 Sep 15:05 UTC — fresh /api YouTube film v14
 
-**DONE:** First v14 fires could skip DeepSeek (key is on Oracle, not the GH runner). That was wrong. Fruit director now **requires** `DEEPSEEK_API_KEY` on Oracle; Seedance shoots those lines. No silent skip.
+**DONE:** v14 now calls **deepseek-flash** (the wallet `/deepseekkey` wrote). Earlier kit used `deepseek-chat` — wrong meter. Still requires the Oracle key; no silent skip.
 
 **NEXT:** Actions `api-film-v14` after DeepSeek fruit. Publish `-v14.mp4` only. Keep v13. No `cto_aipa`.
 
