@@ -135,9 +135,9 @@ git log keeps the record.
 
 **DONE:** v13 live (Kulakovka Chill House). Kit on `cursor/youtube-api-v14-0841`: Seedance 2.5 + DeepSeek motion, juicy unused Pixabay (Mango Sky first — not Kulakovka, not Oleg-Mazur, not Tropical Cocktail). Compile writes `-v14.mp4` only.
 
-**NEXT:** fire `api-film-v14`. Publish `can-ai-find-and-cite-you-v14.mp4` only. Keep v13 on disk. No `cto_aipa`. No Influencer/VJH restart.
+**NEXT:** wait for Actions `api-film-v14` (trigger fired on `cursor/youtube-api-v14-0841`). Publish `can-ai-find-and-cite-you-v14.mp4` only. Keep v13 on disk. No `cto_aipa`. No Influencer/VJH restart.
 
-**VERIFIED BY:** pending `200 video/mp4` on the `-v14` URL.
+**VERIFIED BY:** pending `200 video/mp4` on the `-v14` URL. Kit tests: `node scripts/test-api-film-v14-music.cjs` (29 checks).
 
 **RISK:** Do not salvage v2/v5 as the picture. Do not write `can-ai-find-and-cite-you-v13.mp4`. Runway is unpaid. Brown-noise drone is refused.
 
