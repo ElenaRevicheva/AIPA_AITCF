@@ -92,8 +92,12 @@ Computed from beat durations + 1.3s xfade. Watch once and nudge if a line lands 
 
 ```
 # first line of .influencer-diag-trigger
-api-film-v14
+api-film-v15
 ```
 
-Oracle work dir `/home/ubuntu/aideazz-api-film/` (never inside the repo).
+v15 look: `/api` hero language (black void, whole→cut, gold–violet field).
+DeepSeek Flash directs. Seedance shoots when Replicate has credit; otherwise
+`hero-clip-v15.mjs` — not Ken Burns. Writes `-v15` only. Keeps v13 and v14.
+
+Oracle work dir `/home/ubuntu/aideazz-api-film-v15/` (never inside the repo).
 Does not restart cto-aipa, influencer, or vibejobhunter.

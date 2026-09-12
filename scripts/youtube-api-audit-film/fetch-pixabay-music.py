@@ -43,6 +43,10 @@ BURNED = re.compile(
     r"chill.?house(?!.{0,40}(tropical|mango|beach.?party|summer))",
     re.I,
 )
+# v15 must not reuse the v14 Mango Sky bed.
+if os.environ.get("API_FILM_CUT") == "v15":
+    BURNED = re.compile(BURNED.pattern + r"|under.?the.?mango.?sky|dariocoiro", re.I)
+
 REJECT_MOOD = re.compile(
     r"dark|drone|suspense|horror|trailer|epic|trap|phonk|restless|chasing|aggressive|"
     r"noisy|sad|melanchol|meditat|dreamy|enigmatic|vocal|lyrics|singing|choir|"
@@ -57,7 +61,9 @@ WANT_MOOD = re.compile(
 )
 
 # Pinned track pages first (real 2026 Pixabay URLs). Search pages are fallbacks.
-# Dest names are v14-* so a leftover joyful-chill-house-2026-pixabay.mp3 cannot win.
+# Dest names are cut-prefixed so a leftover joyful-chill-house-2026-pixabay.mp3 cannot win.
+# v15 dests are v15-* so a cached v14 Mango Sky file cannot win by filename.
+_DEST_CUT = "v15" if os.environ.get("API_FILM_CUT") == "v15" else "v14"
 CANDIDATES = [
     {
         "page": "https://pixabay.com/music/soft-house-under-the-mango-sky-495373/",
@@ -102,6 +108,8 @@ CANDIDATES = [
         "search": True,
     },
 ]
+for _cand in CANDIDATES:
+    _cand["dest"] = re.sub(r"^v14-", f"{_DEST_CUT}-", _cand["dest"])
 
 
 def is_burned(blob: str) -> bool:
