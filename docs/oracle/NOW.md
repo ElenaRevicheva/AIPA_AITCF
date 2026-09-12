@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 15:40 UTC | v14 middle is NEW cut fruit (mango/papaya/dragon/pineapple/starfruit). Flux 402 blocked grapes leftover. Commons stills + DeepSeek. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v14-0841`. No cto_aipa. | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +130,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 15:40 UTC — v14 middle must not be grapes
+### 🟢 12 Sep 16:09 UTC — /api YouTube v14 is live. New fruit middle. DeepSeek directed.
 
-**DONE:** Elena asked why grapes again. Flux 2 Pro on Replicate is **402 insufficient credit**, so the new mango/papaya/dragon/pineapple/starfruit stills never painted and the old grape cut stayed. Fetcher now pulls **cut** Commons photos of those five fruits. DeepSeek Flash still writes motion. Seedance shoots if credited; else juice-cut of the NEW stills. v13 untouched.
+**DONE:** `can-ai-find-and-cite-you-v14.mp4` published. Middle is cut mango / papaya / dragon fruit / pineapple / starfruit — not grapes. DeepSeek Flash wrote all 5 motion lines. QR on every shot + 5.8s outro. Music: Under the Mango Sky. v13 kept. Branch `cursor/youtube-api-v14-0841`.
 
-**NEXT:** `api-film-v14` fire on `cursor/youtube-api-v14-0841`. Need log `READY mango,papaya,dragon,pineapple,starfruit stills (no grapes)` then `200 video/mp4` on `-v14`.
+**NEXT:** Elena watches v14. Replicate wallet is empty (Flux/Seedance 402) — juice-cut used the new stills. Top Replicate if she wants Seedance I2V later.
 
-**VERIFIED BY:** pending that log + the mp4. Last Flux fire: run 34702383682 `FAIL: Flux HTTP 402`.
+**VERIFIED BY:** run 34703405924 `USED DeepSeek on all 5 fruit shots`, `qr bug on every shot; qr outro 5.8s`, `200 video/mp4 27564655` on `-v14.mp4`, `V14_OK dur=114.9`.
 
-**RISK:** Do not reuse `geo-grapes` / pomegranate / passionfruit stills. Do not write `can-ai-find-and-cite-you-v13.mp4`. Brown-noise drone is refused. Replicate wallet is empty — Flux/Seedance will 402 until Elena tops Replicate (DeepSeek wallet is fine).
+**RISK:** `watch.html` now points at v14. Do not overwrite v13. Do not idle-fire `api-film-v14` again unless she asks.
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
