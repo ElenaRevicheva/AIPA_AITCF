@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 13:50 UTC | Refresh Atuona /menu + sync image encodings to main + named atuona deploy | `src/atuona-creative-ai.ts`, `src/atuona-image-pins.ts`, `src/atuona-image-waterfall.ts`, `oracle-products.conf` — PR #53 → main, product `atuona` (no cto_aipa reset) | pending |
+| Cursor Cloud | 12 Sep 14:10 UTC | Omni stills: Gemini returned pixels, we skipped inline bytes, Flux painted #099 | `src/atuona-image-waterfall.ts`, `src/atuona-creative-ai.ts`, `src/cto-aipa.ts` — branch `cursor/fix-omni-inline-0841`. Named `atuona` deploy after the fix. | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,25 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 13:50 UTC — refresh `/menu` + sync image encodings
+### 🟡 IN FLIGHT 12 Sep 14:10 UTC — `/imagine omni` skipped Gemini pixels
 
-**DONE:** PR #53 has `/imagine` engine lines. Leftover Creative Tools one-liner still in menu. Not on Oracle.
+**DONE:** `/imagine omni 099` (9:00 AM Panama) announced Gemini 3.1 Flash Image, then delivered **Flux 2 Pro**. Poem title `Could not generate content.` is DELIBERATE (§7), not the miss. Extractor only accepted `fileUri`; Flash Image returns `inlineData` and we threw `inline bytes only — skipped`.
 
-**NEXT:** drop leftover `/imagine - Create AI image`, land encodings on `main`, named `atuona` deploy. Do not `cto_aipa`.
+**NEXT:** persist inline bytes, send Telegram `InputFile`, serve jpg on `/films/shots`. Do not fall through to Flux when Gemini returned pixels. Do not change #099's title.
 
-**VERIFIED BY:** pending Actions VERIFY + `/imagine 048` in dist
+**VERIFIED BY:** Discord caption `🎨 Flux 2 Pro` after `Generating still with Gemini`. Code: `extractGeminiImageUrl` + throw in `src/atuona-image-waterfall.ts`.
 
-**RISK:** Do not rewrite `/visualize deepseek`. Image files must be in `PRODUCT_atuona_DEFAULT_FILES` or Oracle will not check them out.
+**RISK:** Do not treat #099 title as a bug. Do not `cto_aipa` hard-reset.
+
+### 🟢 12 Sep 13:57 UTC — `/imagine` menu live; encodings synced
+
+**DONE:** Named `atuona` deploy [34697838572](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34697838572): checkout included image pins, `VERIFY: dist has … imagine Flux default`, `pm2 restart`. Leftover Creative Tools `/imagine` one-liner gone. Blobs match `main` ↔ PR #53.
+
+**NEXT:** Omni inline fix (above). Laptop: `git pull` on `main`.
+
+**VERIFIED BY:** Actions 34697838572 VERIFY + restart. Hashes equal for six encoding files.
+
+**RISK:** Do not `cto_aipa` hard-reset. `/visualize luma` stays video.
 
 ### 🟢 12 Sep 13:22 UTC — today's Atuona encodings synced (git = Oracle = local)
 
