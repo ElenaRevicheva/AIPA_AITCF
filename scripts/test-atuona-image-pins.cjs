@@ -98,6 +98,48 @@ ok('inline extractor returns png bytes', (() => {
 ok('inline extractor accepts snake_case inline_data', extractGeminiInlineImage(snakeOnly)?.mime === 'image/jpeg');
 ok('url extractor still accepts fileUri', extractGeminiImageUrl(fileUriOnly) === 'https://example.com/still.png');
 
+ok('addedImageTryOrder exported', waterfall.includes('export function addedImageTryOrder'));
+ok('named prefer is exclusive (no hop)', waterfall.includes('if (prefer && all.includes(prefer)) return [prefer]'));
+ok('named miss announces Flux fallback', src.includes('falling to Flux 2 Pro'));
+ok('named path uses detailed attempt', src.includes('runAddedImageProvidersDetailed'));
+
+function addedImageTryOrder(prefer) {
+  const all = ['luma', 'omni', 'runway'];
+  if (prefer && all.includes(prefer)) return [prefer];
+  return all;
+}
+ok('luma command tries luma only', addedImageTryOrder('luma').join(',') === 'luma');
+ok('omni command tries omni only', addedImageTryOrder('omni').join(',') === 'omni');
+ok('runway command tries runway only', addedImageTryOrder('runway').join(',') === 'runway');
+ok('default added waterfall is luma then omni then runway', addedImageTryOrder().join(',') === 'luma,omni,runway');
+
+function extractLumaImageUrl(statusData) {
+  const asset = statusData?.assets?.image;
+  if (typeof asset === 'string' && /^https?:\/\//i.test(asset)) return asset.trim();
+  if (asset?.url && /^https?:\/\//i.test(asset.url)) return String(asset.url).trim();
+  const out = statusData?.output;
+  if (Array.isArray(out)) {
+    const typed = out.find((o) => o?.type === 'image' && (o.url || o.uri));
+    const u = typed?.url || typed?.uri || out.find((o) => o?.url)?.url;
+    if (u && /^https?:\/\//i.test(u)) return String(u).trim();
+  }
+  return null;
+}
+function extractRunwayImageUrl(task) {
+  const out = task?.output;
+  if (Array.isArray(out)) {
+    for (const item of out) {
+      if (typeof item === 'string' && /^https?:\/\//i.test(item)) return item.trim();
+      if (item?.url && /^https?:\/\//i.test(item.url)) return String(item.url).trim();
+      if (item?.uri && /^https?:\/\//i.test(item.uri)) return String(item.uri).trim();
+    }
+  }
+  return null;
+}
+ok('luma extractor accepts assets.image object url', extractLumaImageUrl({ assets: { image: { url: 'https://cdn.luma/still.jpg' } } }) === 'https://cdn.luma/still.jpg');
+ok('luma extractor accepts output type image', extractLumaImageUrl({ output: [{ type: 'image', url: 'https://cdn.luma/out.jpg' }] }) === 'https://cdn.luma/out.jpg');
+ok('runway extractor accepts output uri object', extractRunwayImageUrl({ output: [{ uri: 'https://cdn.runway/still.jpg' }] }) === 'https://cdn.runway/still.jpg');
+
 if (fails.length) {
   console.error(`\nFAILED ${fails.length}:\n- ${fails.join('\n- ')}`);
   process.exit(1);

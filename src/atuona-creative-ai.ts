@@ -32,7 +32,7 @@ import {
   type AddedImageProvider,
   type ImageCommandProvider,
 } from './atuona-image-pins';
-import { runAddedImageProviders } from './atuona-image-waterfall';
+import { runAddedImageProviders, runAddedImageProvidersDetailed } from './atuona-image-waterfall';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
 export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
 import * as fs from 'fs';
@@ -319,12 +319,25 @@ async function generateStillForPrompt(
   prompt: string,
   aspectRatio: string,
   prefer: ImageCommandProvider | null,
-  persistStem?: string
+  persistStem?: string,
+  onNamedMiss?: (why: string) => Promise<void>
 ): Promise<DeliverableStill | null> {
   const addedPrefer = prefer && prefer !== 'flux' ? prefer : undefined;
-  if (prefer && prefer !== 'flux') {
-    const extra = await tryAddedStills(prompt, aspectRatio, addedPrefer, persistStem);
-    if (extra) return extra;
+  if (prefer && prefer !== 'flux' && addedPrefer) {
+    const { result, miss } = await runAddedImageProvidersDetailed({
+      prompt,
+      aspectRatio,
+      lumaApiKey,
+      lumaApiUrl: LUMA_API_URL,
+      runwayApiKey,
+      geminiApiKey,
+      prefer: addedPrefer,
+      ...(persistStem ? { persistStem } : {}),
+    });
+    const named = result ? stillFromAdded(result) : null;
+    if (named) return named;
+    const why = miss || `${imagePinGrade(prefer)} returned no still`;
+    if (onNamedMiss) await onNamedMiss(why);
     return runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
   }
   const flux = await runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
@@ -412,7 +425,21 @@ OUTPUT: One dense English prompt (120–220 words) describing a single photoreal
       true
     );
     await ctx.reply(`🎨 *Generating still with ${engine}...*\n\n_This takes 30-60 seconds..._`, { parse_mode: 'Markdown' });
-    const still = await generateStillForPrompt(imagePrompt, '16:9', prefer, `${pageId}-still`);
+    const announceNamedMiss = prefer && prefer !== 'flux'
+      ? async (why: string) => {
+        await ctx.reply(
+          `⚠️ *${engine} missed* — falling to Flux 2 Pro.\n\n_${why.slice(0, 180)}_`,
+          { parse_mode: 'Markdown' }
+        );
+      }
+      : undefined;
+    const still = await generateStillForPrompt(
+      imagePrompt,
+      '16:9',
+      prefer,
+      `${pageId}-still`,
+      ...(announceNamedMiss ? [announceNamedMiss] : [])
+    );
     if (!still || (!still.url && !(still.bytes && still.bytes.length))) {
       await ctx.reply(`❌ No still from ${engine}. Set REPLICATE_API_TOKEN, LUMA_API_KEY, GEMINI_API_KEY, or RUNWAY_API_KEY.`);
       return;
@@ -421,7 +448,13 @@ OUTPUT: One dense English prompt (120–220 words) describing a single photoreal
       caption: `🎨 *Page #${pageId}: ${title}*\n\n📺 YouTube 16:9\n🎨 ${still.modelUsed}\n\n_${caption}_`,
       parse_mode: 'Markdown',
     });
-    const vertical = await generateStillForPrompt(imagePrompt, '9:16', prefer, `${pageId}-still-v`);
+    const vertical = await generateStillForPrompt(
+      imagePrompt,
+      '9:16',
+      prefer,
+      `${pageId}-still-v`,
+      ...(announceNamedMiss ? [announceNamedMiss] : [])
+    );
     if (vertical && (vertical.url || (vertical.bytes && vertical.bytes.length))) {
       await ctx.replyWithPhoto(photoFromStill(vertical), {
         caption: `📱 *Reels 9:16*\n\n🎨 ${vertical.modelUsed}\n\n_${caption}_`,
