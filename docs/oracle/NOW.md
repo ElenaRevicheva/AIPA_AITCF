@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 13:16 UTC | Pin Atuona /visualize engines so a grade bump is one file; bump Omni 1.1 + Kling 3.0; honest /visualize deepseek | `src/atuona-video-pins.ts`, `src/atuona-creative-ai.ts` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
