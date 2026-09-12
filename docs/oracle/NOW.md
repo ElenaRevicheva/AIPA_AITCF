@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 15:05 UTC | Fresh /api YouTube film v14 (DeepSeek/Seedance + juicy unused Pixabay). Do not overwrite v13 or Atuona. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v14-0841`. No cto_aipa. | pending |
+| Cursor Cloud | 12 Sep 15:40 UTC | v14 middle is NEW cut fruit (mango/papaya/dragon/pineapple/starfruit). Flux 402 blocked grapes leftover. Commons stills + DeepSeek. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v14-0841`. No cto_aipa. | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 15:05 UTC — fresh /api YouTube film v14
+### 🟡 IN FLIGHT 12 Sep 15:40 UTC — v14 middle must not be grapes
 
-**DONE:** v14 now calls **deepseek-flash** (the wallet `/deepseekkey` wrote). Earlier kit used `deepseek-chat` — wrong meter. Still requires the Oracle key; no silent skip.
+**DONE:** Elena asked why grapes again. Flux 2 Pro on Replicate is **402 insufficient credit**, so the new mango/papaya/dragon/pineapple/starfruit stills never painted and the old grape cut stayed. Fetcher now pulls **cut** Commons photos of those five fruits. DeepSeek Flash still writes motion. Seedance shoots if credited; else juice-cut of the NEW stills. v13 untouched.
 
-**NEXT:** v14 middle is a NEW fruit cut (mango, papaya, dragon fruit, pineapple, starfruit). Flux paints, DeepSeek Flash directs, Seedance shoots. No grapes. Balance is fine ($1.99).
+**NEXT:** `api-film-v14` fire on `cursor/youtube-api-v14-0841`. Need log `READY mango,papaya,dragon,pineapple,starfruit stills (no grapes)` then `200 video/mp4` on `-v14`.
 
-**VERIFIED BY:** pending `USED DeepSeek on all 5 fruit shots` + `200 video/mp4` on `-v14`.
+**VERIFIED BY:** pending that log + the mp4. Last Flux fire: run 34702383682 `FAIL: Flux HTTP 402`.
 
-**RISK:** Do not salvage v2/v5 as the picture. Do not write `can-ai-find-and-cite-you-v13.mp4`. Runway is unpaid. Brown-noise drone is refused.
+**RISK:** Do not reuse `geo-grapes` / pomegranate / passionfruit stills. Do not write `can-ai-find-and-cite-you-v13.mp4`. Brown-noise drone is refused. Replicate wallet is empty — Flux/Seedance will 402 until Elena tops Replicate (DeepSeek wallet is fine).
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
