@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 13:20 UTC — /visualize pins (Omni 1.1 + Kling 3.0)
+### 🟢 12 Sep 13:18 UTC — /visualize pins live (Omni 1.1 + Kling 3.0)
 
-**DONE:** `src/atuona-video-pins.ts` is the only file to bump when a vendor ships a new grade. `/visualize luma` etc. stay. Live `/visualize deepseek` video path kept. Pins: Luma ray-3.2, Omni `gemini-omni-1.1-flash`, Runway gen4.5, Veo 3.1, Kling `kwaivgi/kling-v3-video`, Seedance 2.5, DeepSeek video (Seedance shoots, DeepSeek label).
+**DONE:** Named `atuona` deploy [34696046633](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34696046633): checkout included `src/atuona-video-pins.ts`, `VERIFY: dist has visualize seedance and visualize deepseek`, `pm2 restart`. `/menu` now reads pins.
 
-**NEXT:** Deploy named `atuona` (includes `atuona-video-pins.ts`). Then Elena `/menu` — Omni/Kling grades update; `/visualize deepseek 048` unchanged.
+**NEXT:** Elena `/menu` in Atuona — Omni 1.1 Flash + Kling Video 3.0. `/visualize deepseek 048` unchanged.
 
-**VERIFIED BY:** `node scripts/test-atuona-video-pins.cjs` (8) + `node scripts/test-visualize-deepseek.cjs` (13).
+**VERIFIED BY:** Actions 34696046633 checkout line + VERIFY + Done.
 
-**RISK:** Do not rewrite `/visualize deepseek` into a text-only director. Contract forbids that.
+**RISK:** Do not rewrite `/visualize deepseek` into a text-only director. Next grade bump = `src/atuona-video-pins.ts` only.
 
 ### 🟢 12 Sep 12:54 UTC — `/visualize deepseek` shoots a clip. LIVE.
 
