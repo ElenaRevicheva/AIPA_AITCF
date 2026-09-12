@@ -141,27 +141,13 @@ async function deepseekMotion(id, motion) {
   return parsed.line;
 }
 
-async function seedanceI2V(stillPath, promptText, destMp4) {
-  if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing — Seedance 2.5 needs it to shoot DeepSeek\'s line');
-  const bodyFile = destMp4 + '.seedance.json';
-  fs.writeFileSync(
-    bodyFile,
-    JSON.stringify({
-      input: {
-        prompt: `Cinematic fragment. ${MOTION_ANCHOR} ${promptText}`.slice(0, 900),
-        image: dataUri(stillPath),
-        duration: 8,
-        resolution: '720p',
-        aspect_ratio: '16:9',
-        generate_audio: false,
-      },
-    }),
-  );
+async function seedanceCreate(bodyFile) {
   const create = await execFileP0(
     'curl',
     [
       '-sS',
-      '--fail-with-body',
+      '-w',
+      '\nHTTP:%{http_code}',
       '-m',
       '120',
       '-X',
@@ -178,7 +164,33 @@ async function seedanceI2V(stillPath, promptText, destMp4) {
     ],
     { timeout: 130000, maxBuffer: 1 << 24 },
   );
-  let j = JSON.parse(create.stdout || '{}');
+  const raw = create.stdout || '';
+  const http = (raw.match(/HTTP:(\d+)\s*$/) || [])[1] || '';
+  const body = raw.replace(/\nHTTP:\d+\s*$/, '');
+  if (http === '429') throw new Error('Seedance 429 rate limit');
+  if (http && http !== '200' && http !== '201') {
+    throw new Error(`Seedance create HTTP ${http}: ${body.slice(0, 200)}`);
+  }
+  return JSON.parse(body || '{}');
+}
+
+async function seedanceI2VOnce(stillPath, promptText, destMp4) {
+  if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing — Seedance 2.5 needs it to shoot DeepSeek\'s line');
+  const bodyFile = destMp4 + '.seedance.json';
+  fs.writeFileSync(
+    bodyFile,
+    JSON.stringify({
+      input: {
+        prompt: `Cinematic fragment. ${MOTION_ANCHOR} ${promptText}`.slice(0, 900),
+        image: dataUri(stillPath),
+        duration: 8,
+        resolution: '720p',
+        aspect_ratio: '16:9',
+        generate_audio: false,
+      },
+    }),
+  );
+  let j = await seedanceCreate(bodyFile);
   const getUrl = j.urls?.get || (j.id ? `https://api.replicate.com/v1/predictions/${j.id}` : '');
   process.stderr.write(`seedance job ${j.id || '?'} ${path.basename(stillPath)} status=${j.status || '?'}\n`);
   for (let i = 0; i < 36; i++) {
@@ -206,6 +218,23 @@ async function seedanceI2V(stillPath, promptText, destMp4) {
   throw new Error('Seedance poll timeout');
 }
 
+async function seedanceI2V(stillPath, promptText, destMp4) {
+  let last = new Error('Seedance never started');
+  for (let attempt = 1; attempt <= 6; attempt++) {
+    try {
+      return await seedanceI2VOnce(stillPath, promptText, destMp4);
+    } catch (e) {
+      last = e;
+      const msg = e.message || '';
+      if (!/429|rate.?limit/i.test(msg) || attempt === 6) throw e;
+      const wait = attempt * 25;
+      process.stderr.write(`seedance 429 — wait ${wait}s (attempt ${attempt}/6)\n`);
+      await new Promise((r) => setTimeout(r, wait * 1000));
+    }
+  }
+  throw last;
+}
+
 async function main() {
   if (!DEEPSEEK) throw new Error('DEEPSEEK_API_KEY missing — v14 will not pretend DeepSeek directed this');
   if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing — Seedance cannot shoot DeepSeek\'s motion');
@@ -221,6 +250,7 @@ async function main() {
     const motion = await deepseekMotion(b.id, b.motion);
     await seedanceI2V(still, motion, raw);
     credit.push(`${b.id}: ${motion}`);
+    await new Promise((r) => setTimeout(r, 8000));
   }
   const log = path.join(BASE, 'deepseek-motion-v14.txt');
   fs.writeFileSync(log, credit.join('\n') + '\n');
