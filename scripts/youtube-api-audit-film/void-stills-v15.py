@@ -119,6 +119,40 @@ def get(url: str, timeout: int = 45) -> bytes:
         return resp.read()
 
 
+def resolve_file(title: str) -> str:
+    """Turn a Commons File: title into a download URL. FilePath 404s are common."""
+    name = title if title.startswith("File:") else f"File:{title}"
+    qs = urllib.parse.urlencode(
+        {
+            "action": "query",
+            "titles": name,
+            "prop": "imageinfo",
+            "iiprop": "url|mime",
+            "iiurlwidth": "1920",
+            "format": "json",
+            "origin": "*",
+        }
+    )
+    try:
+        raw = get("https://commons.wikimedia.org/w/api.php?" + qs)
+        data = json.loads(raw.decode("utf-8", "replace"))
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
+        print(f"resolve fail {name}: {e}", file=sys.stderr)
+        return ""
+    pages = (data.get("query") or {}).get("pages") or {}
+    for page in pages.values():
+        if page.get("missing") is not None:
+            continue
+        info = (page.get("imageinfo") or [{}])[0]
+        url = info.get("thumburl") or info.get("url") or ""
+        mime = info.get("mime") or ""
+        if url and mime.startswith("image/") and not banned(f"{name} {url}"):
+            print(f"resolved {name} → {url}", file=sys.stderr)
+            return url
+    print(f"resolve miss {name}", file=sys.stderr)
+    return ""
+
+
 def commons_search(query: str) -> list[dict]:
     qs = urllib.parse.urlencode(
         {
@@ -206,7 +240,38 @@ def fetch_kind(item: dict, kind: str) -> Path:
     for pin in pins:
         if banned(pin):
             raise SystemExit(f"pin leaked banned fruit: {pin}")
-        urls.append(pin)
+        if pin.startswith("http"):
+            resolved = pin
+            if "Special:FilePath/" in pin:
+                title = urllib.parse.unquote(pin.split("Special:FilePath/", 1)[1])
+                resolved = resolve_file(title) or pin
+            urls.append(resolved)
+        else:
+            resolved = resolve_file(pin)
+            if resolved:
+                urls.append(resolved)
+    if kind == "cut":
+        v14_name = {
+            "mango": "v14-mango.jpg",
+            "papaya": "v14-papaya.jpg",
+            "dragon": "v14-dragonfruit.jpg",
+            "pineapple": "v14-pineapple.jpg",
+            "starfruit": "v14-starfruit.jpg",
+        }.get(item["id"])
+        for folder in (
+            Path("/tmp/youtube-api-audit-film-v14/fruit"),
+            Path("/tmp/youtube-api-audit-film/fruit"),
+            HERE / "fruit",
+        ):
+            local = folder / v14_name if v14_name else None
+            if local and local.exists() and local.stat().st_size > 20000:
+                print(f"local v14 cut {local}", file=sys.stderr)
+                raw_local = dest.with_suffix(".src.jpg")
+                raw_local.write_bytes(local.read_bytes())
+                to_void(raw_local, dest)
+                raw_local.unlink(missing_ok=True)
+                print(f"void {dest.name} {dest.stat().st_size} bytes (from v14 cut)", file=sys.stderr)
+                return dest
     for q in queries:
         if banned(q):
             raise SystemExit(f"search leaked banned fruit: {q}")

@@ -1,2 +1,2 @@
 api-film-v15
-# retry: pin Commons FilePath stills — search returned zero mango wholes. Do not overwrite v13/v14.
+# retry: resolve Commons File: via API + reuse v14 cuts on Oracle. Do not overwrite v13/v14.

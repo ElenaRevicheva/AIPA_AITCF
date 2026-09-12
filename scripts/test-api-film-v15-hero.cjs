@@ -97,6 +97,8 @@ ok('void stills fetch whole+cut', srcVoid.includes('whole') && srcVoid.includes(
 ok('void stills never name a grape dest', !/v15-grape|geo-grapes|passionfruit\.jpg|pomegranate\.jpg/.test(srcVoid));
 ok('void stills pin Commons FilePath first', srcVoid.includes('Special:FilePath') && srcVoid.includes('whole_pins') && srcVoid.includes('cut_pins'));
 ok('void stills pin mango whole and cut', srcVoid.includes('Mango.jpg') && srcVoid.includes('Ataulfo'));
+ok('void stills resolve FilePath via Commons API', srcVoid.includes('resolve_file') && srcVoid.includes('resolve miss'));
+ok('void stills can reuse v14 cut JPEGs on Oracle', srcVoid.includes('v14-mango.jpg') && srcVoid.includes('from v14 cut'));
 
 ok('director refuses to skip DeepSeek', dir.includes('will not skip DeepSeek') || dir.includes('will not pretend DeepSeek'));
 ok('director spends the Flash wallet', dir.includes('deepseek-flash'));
