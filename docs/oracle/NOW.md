@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 11:39 UTC | Additive Atuona only: Opus 5 + DeepSeek Flash + Seedance 2.5 | `src/atuona-creative-ai.ts` (+ small `deepseekComplete` in llm-resilience). Keep Groq/Grok/Luma/Kling/`/film`. No Oracle deploy | pending |
+| | | | | |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 12 Sep 11:37 UTC — Atuona DeepSeek/Seedance wiring aborted
+### 🟡 IN FLIGHT 12 Sep 11:39 UTC — additive Atuona only (Opus 5 + DeepSeek + Seedance)
 
-**DONE:** Elena said stop + restore. Working tree put back to `main`. No Atuona files changed. No `pm2 restart`. Oracle untouched.
+**DONE:** first attempt overwrote the text waterfall; Elena stopped it; files were restored to `main`.
 
-**NEXT:** leave Atuona as it is (Opus 4.8 → Groq → Grok; video Luma/Omni/Kling/Veo/Runway).
+**NEXT:** add only: `claude-opus-5`, DeepSeek V4.1 Flash as an extra fallback, `/visualize seedance`. Do not remove Groq/Grok/Luma/Kling/`/film`.
 
-**VERIFIED BY:** `git diff origin/main` is empty for `src/atuona-creative-ai.ts`, `src/atuona-film-compiler.ts`, `src/llm-resilience.ts`.
+**VERIFIED BY:** pending.
 
-**RISK:** do not resume the `cursor/atuona-deepseek-seedance-0841` wiring unless she asks again.
+**RISK:** do not `pm2 restart` until she confirms.
 
 ### 🟢 11 Sep 22:40 UTC — /api film v13 is live (joyful chill house)
 
