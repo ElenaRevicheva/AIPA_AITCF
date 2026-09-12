@@ -258,9 +258,13 @@ jobs:
               scripts/youtube-api-audit-film/. \
               ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v15/ || exit 1
             echo "=== Oracle: black-void stills (whole+cut, v15-* only — not grapes) ==="
-            ssh $SSHOPTS ubuntu@170.9.242.90 \
-              'export CTO_ENV=/home/ubuntu/cto-aipa/.env; python3 /tmp/youtube-api-audit-film-v15/void-stills-v15.py' \
-              || { echo FATAL: v15 void stills missed; exit 1; }
+            if ssh $SSHOPTS ubuntu@170.9.242.90 'for f in mango papaya dragon pineapple starfruit; do test -s /tmp/youtube-api-audit-film-v15/fruit/v15-${f}-whole.jpg && test -s /tmp/youtube-api-audit-film-v15/fruit/v15-${f}-cut.jpg || exit 1; done'; then
+              echo "REUSE v15 stills already on Oracle"
+            else
+              ssh $SSHOPTS ubuntu@170.9.242.90 \
+                'export CTO_ENV=/home/ubuntu/cto-aipa/.env; python3 /tmp/youtube-api-audit-film-v15/void-stills-v15.py' \
+                || { echo FATAL: v15 void stills missed; exit 1; }
+            fi
             mkdir -p scripts/youtube-api-audit-film/fruit
             scp_retry \
               'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v15/fruit/v15-mango-whole.jpg' \
@@ -285,9 +289,13 @@ jobs:
             fi
             echo "v13 grape stills and v14 grocery stills may stay on disk — v15 does not use them"
             echo "=== Oracle: DeepSeek Flash directs, Seedance or HeroBackdrop ==="
-            ssh $SSHOPTS ubuntu@170.9.242.90 \
-              'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v15 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v15/direct-fruit-v15.mjs' \
-              || { echo FATAL: DeepSeek/Seedance/hero fruit missed — not publishing a silent skip; exit 1; }
+            if ssh $SSHOPTS ubuntu@170.9.242.90 'for f in mango papaya dragon pineapple starfruit; do test -s /home/ubuntu/aideazz-api-film-v15/clips/${f}.mp4 || exit 1; done'; then
+              echo "REUSE v15 fruit clips already on Oracle — skip DeepSeek remake"
+            else
+              ssh $SSHOPTS ubuntu@170.9.242.90 \
+                'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v15 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v15/direct-fruit-v15.mjs' \
+                || { echo FATAL: DeepSeek/Seedance/hero fruit missed — not publishing a silent skip; exit 1; }
+            fi
             scp_retry \
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/clips/mango.mp4' \
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/clips/papaya.mp4' \

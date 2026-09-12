@@ -39,7 +39,7 @@ do
 done
 DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$PUBLISH/can-ai-find-and-cite-you-v15.mp4" || echo 0)
 printf 'v15-duration=%s\n' "$DUR"
-awk -v d="$DUR" 'BEGIN { if (d+0 < 90) { print "FATAL: published v15 shorter than 90s"; exit 1 } }'
+awk -v d="$DUR" 'BEGIN { if (d+0 < 65) { print "FATAL: published v15 shorter than 65s"; exit 1 } }'
 [ -f "$PUBLISH/can-ai-find-and-cite-you-v13.mp4" ] || echo "WARN: v13 missing on disk — do not overwrite; it should still be there"
 [ -f "$PUBLISH/can-ai-find-and-cite-you-v14.mp4" ] || echo "WARN: v14 missing on disk — do not overwrite; it should still be there"
 echo "DONE api-film-publish-v15"

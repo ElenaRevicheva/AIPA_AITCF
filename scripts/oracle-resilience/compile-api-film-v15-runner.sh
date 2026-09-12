@@ -103,7 +103,8 @@ for banned in can-ai-find-and-cite-you.mp4 can-ai-find-and-cite-you-v12.mp4 can-
 done
 DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$V15" || echo 0)
 echo "v15-duration=$DUR"
-awk -v d="$DUR" 'BEGIN { if (d+0 < 90) { print "FATAL: v15 shorter than 90s — stub"; exit 1 } }'
+# No Loom: the how-to cut is ~73s. 90s was the Loom-era stub gate.
+awk -v d="$DUR" 'BEGIN { if (d+0 < 65) { print "FATAL: v15 shorter than 65s — stub"; exit 1 } }'
 
 STAMP=$(date -u +%Y%m%d%H%M%S)
 WATCH_SRC=""

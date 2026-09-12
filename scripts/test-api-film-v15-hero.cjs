@@ -118,14 +118,17 @@ ok('runner does not delete new fruit clips', /rm -f "\$DIR"\/clips\/\{grapes/.te
 ok('runner does not restart cto-aipa', !/pm2 restart/.test(run));
 ok('runner does not fetch Loom', !run.includes('fetch-loom.py') && run.includes('no Loom'));
 ok('runner refuses a v14 clobber in out/', run.includes('can-ai-find-and-cite-you-v14.mp4') && run.includes('must not touch older cuts'));
+ok('runner allows a no-Loom ~73s cut', run.includes('shorter than 65s') && !run.includes('shorter than 90s'));
 
 ok('publisher copies only v15', pub.includes('can-ai-find-and-cite-you-v15.mp4') && !/cp -f "\$SRC\/"\*\.mp4/.test(pub));
 ok('publisher does not overwrite v13', pub.includes('do not overwrite v13'));
 ok('publisher does not overwrite v14', pub.includes('do not overwrite v14'));
+ok('publisher allows a no-Loom ~73s cut', pub.includes('shorter than 65s') && !pub.includes('shorter than 90s'));
 ok('watch page plays v15', html.includes('can-ai-find-and-cite-you-v15.mp4') && !html.includes('can-ai-find-and-cite-you-v14.mp4?v='));
 
 ok('workflow accepts api-film-v15', /api-film-v15/.test(wf));
 ok('workflow runs void-stills-v15.py', wf.includes('void-stills-v15.py'));
+ok('workflow reuses Oracle stills/clips when present', wf.includes('REUSE v15 stills') && wf.includes('REUSE v15 fruit clips'));
 ok('workflow leak-check is v15-* only', wf.includes('v15-*.jpg') && wf.includes('v15-${f}-cut.jpg'));
 ok('workflow runs DeepSeek fruit on Oracle', wf.includes('direct-fruit-v15.mjs'));
 ok('workflow stitches v15 on Oracle', wf.includes('compile-api-film-v15-runner.sh') && wf.includes('Oracle: stitch VO + void fruit'));
