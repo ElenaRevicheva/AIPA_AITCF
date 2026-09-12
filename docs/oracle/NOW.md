@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 12:40 UTC | Atuona: put DeepSeek on /menu as a writing model (not only /deepseekkey) | `src/atuona-creative-ai.ts`, `docs/oracle/NOW.md`, `.deploy-trigger` | pending |
+| _(free)_ | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,11 +131,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 12:40 UTC — DeepSeek on /menu (writing). Seedance stays film.
+### 🟢 12 Sep 12:41 UTC — DeepSeek is on /menu. Seedance is `/visualize seedance NNN`.
 
-Elena topped up Seedance (`/visualize seedance 048`, Replicate). The other wired model is **DeepSeek V4.1 Flash** — *text*, not video. It was a silent Claude fallback + `/deepseekkey` under Status.
+**DONE:** run 34694360629 `VERIFY: dist has visualize seedance and /deepseek` + pm2 restart.
 
-**NEXT:** named-file `atuona` deploy of `/deepseek` + menu lines. Elena: `/deepseekkey sk-…` in Atuona if Flash still says no key. Do not paste the key in chat.
+- **Film (Seedance 2.5, Replicate top-up):** `/visualize seedance 048` (or `last`). 2–5 min. Needs a published page.
+- **Writing (DeepSeek Flash):** `/deepseekkey sk-…` once in Atuona, then `/deepseek` or `/create deepseek`. Not a video model.
+
+**NEXT:** Elena uses those two commands. Do not paste keys in chat.
+
+**VERIFIED BY:** Actions 34694360629 VERIFY line + restart.
+
+**RISK:** Empty `/visualize` is help, not a render. Seedance without a page number does nothing.
 
 ### 🟢 12 Sep 12:17 UTC — /deepseekkey is live (same contract as /pplxkey)
 
