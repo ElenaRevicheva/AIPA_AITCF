@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Cursor Cloud | 12 Sep 16:30 UTC | v15 /api promo: /api hero patterns + DeepSeek Flash + mango/papaya/dragon/pineapple/starfruit. Do not overwrite v13/v14. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
