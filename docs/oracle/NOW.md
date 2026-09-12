@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 12:40 UTC | Atuona: put DeepSeek on /menu as a writing model (not only /deepseekkey) | `src/atuona-creative-ai.ts`, `docs/oracle/NOW.md`, `.deploy-trigger` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,12 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟡 12 Sep 12:40 UTC — DeepSeek must show on /menu (writing), Seedance already does (film)
+
+Elena topped up Seedance. The *other* wired model is **DeepSeek V4.1 Flash** — text, not video. It was only a silent Claude fallback plus `/deepseekkey` buried under Status, so /menu did not read as a model she can pick.
+
+**NEXT:** `/deepseek` + `/create deepseek` on the menu and Telegram slash list; named-file `atuona` deploy.
 
 ### 🟢 12 Sep 12:17 UTC — /deepseekkey is live (same contract as /pplxkey)
 
