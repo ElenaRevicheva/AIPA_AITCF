@@ -131,11 +131,11 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 12:40 UTC — DeepSeek must show on /menu (writing), Seedance already does (film)
+### 🟡 12 Sep 12:40 UTC — DeepSeek on /menu (writing). Seedance stays film.
 
-Elena topped up Seedance. The *other* wired model is **DeepSeek V4.1 Flash** — text, not video. It was only a silent Claude fallback plus `/deepseekkey` buried under Status, so /menu did not read as a model she can pick.
+Elena topped up Seedance (`/visualize seedance 048`, Replicate). The other wired model is **DeepSeek V4.1 Flash** — *text*, not video. It was a silent Claude fallback + `/deepseekkey` under Status.
 
-**NEXT:** `/deepseek` + `/create deepseek` on the menu and Telegram slash list; named-file `atuona` deploy.
+**NEXT:** named-file `atuona` deploy of `/deepseek` + menu lines. Elena: `/deepseekkey sk-…` in Atuona if Flash still says no key. Do not paste the key in chat.
 
 ### 🟢 12 Sep 12:17 UTC — /deepseekkey is live (same contract as /pplxkey)
 
