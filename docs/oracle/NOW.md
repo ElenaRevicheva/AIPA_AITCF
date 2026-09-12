@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 13:50 UTC | Refresh Atuona /menu + sync image encodings to main + named atuona deploy | `src/atuona-creative-ai.ts`, `src/atuona-image-pins.ts`, `src/atuona-image-waterfall.ts`, `oracle-products.conf` — PR #53 → main, product `atuona` (no cto_aipa reset) | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -145,7 +145,7 @@ git log keeps the record.
 
 **DONE:** `origin/main` pins commit `66cb75d`. Oracle deploy 34696046633. Local + PR #52 encoding blobs match main.
 
-**NEXT:** image pins (above).
+**NEXT:** PR #53 when she wants stills on `/menu`.
 
 **VERIFIED BY:** blob hashes + Actions 34696046633.
 
