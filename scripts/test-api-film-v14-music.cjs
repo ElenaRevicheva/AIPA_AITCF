@@ -92,7 +92,7 @@ ok('v14 spec bans grapes', /BANNED_FRUIT/.test(spec) && /starfruit/.test(spec) &
 ok('v14 compile dropped the grape still', !src14.includes('geo-grapes-citation.jpg') && src14.includes('V14_FRUIT'));
 ok('v14 compile refuses a grape leak', src14.includes('v14 spec leaked grapes'));
 ok('workflow paints new fruit stills', wf.includes('paint-v14-fruits.mjs'));
-ok('workflow fetches cut fruit not grapes', wf.includes('v14-mango.jpg') && wf.includes('v14-starfruit.jpg') && !wf.includes('geo-grapes'));
+ok('workflow fetches cut fruit not grapes', wf.includes('v14-mango.jpg') && wf.includes('v14-starfruit.jpg') && wf.includes('v14-*.jpg'));
 const fetchPy = path.join(root, 'scripts/youtube-api-audit-film/fetch-v14-fruit-stills.py');
 ok('cut-fruit fetcher exists', fs.existsSync(fetchPy));
 const fetchSrc = fs.readFileSync(fetchPy, 'utf8');

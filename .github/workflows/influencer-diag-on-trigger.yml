@@ -172,11 +172,15 @@ jobs:
               'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-pineapple.jpg' \
               'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-starfruit.jpg' \
               scripts/youtube-api-audit-film/fruit/ || { echo FATAL: stills did not come back from Oracle; exit 1; }
-            ls -lh scripts/youtube-api-audit-film/fruit/
-            if ls scripts/youtube-api-audit-film/fruit | grep -Eiq 'grape|pomegranate|passion'; then
-              echo FATAL: grape/pomegranate still leaked into v14 fruit dir
+            ls -lh scripts/youtube-api-audit-film/fruit/v14-*.jpg
+            for f in mango papaya dragonfruit pineapple starfruit; do
+              [ -f "scripts/youtube-api-audit-film/fruit/v14-${f}.jpg" ] || { echo "FATAL: missing v14-${f}.jpg"; exit 1; }
+            done
+            if ls scripts/youtube-api-audit-film/fruit/v14-*.jpg | grep -Eiq 'grape|pomegranate|passion'; then
+              echo FATAL: a v14 still is named after grapes
               exit 1
             fi
+            echo "v13 grape/pomegranate stills may stay on disk for the old compile — v14 does not use them"
             echo "=== Oracle: DeepSeek directs, Seedance shoots ==="
             ssh $SSHOPTS ubuntu@170.9.242.90 \
               'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v14 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/direct-fruit-v14.mjs' \
