@@ -13,7 +13,9 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC = path.join(__dirname, '..', 'src', 'atuona-creative-ai.ts');
+const PINS = path.join(__dirname, '..', 'src', 'atuona-video-pins.ts');
 const src = fs.readFileSync(SRC, 'utf8');
+const pins = fs.readFileSync(PINS, 'utf8');
 
 let pass = 0;
 const fails = [];
@@ -27,20 +29,21 @@ const ok = (name, cond, detail) => {
   }
 };
 
-const deepseekParse = src.match(
-  /if \(\[([^\]]+)\]\.includes\(t\)\) return 'deepseek';/,
-);
 ok(
-  'parseVideoProvider maps deepseek / ds / dsflash',
-  !!deepseekParse &&
-    deepseekParse[1].includes("'deepseek'") &&
-    deepseekParse[1].includes("'ds'") &&
-    deepseekParse[1].includes("'dsflash'"),
+  'pins map deepseek / ds / dsflash',
+  pins.includes("id: 'deepseek'") &&
+    pins.includes("'ds'") &&
+    pins.includes("'dsflash'"),
 );
 
 ok(
   'VideoProvider union includes deepseek',
-  /type VideoProvider = [^;]*'deepseek'/.test(src),
+  /export type VideoProvider = [^;]*'deepseek'/.test(pins),
+);
+
+ok(
+  'studio imports parseVideoProvider from pins (no rewire on grade bump)',
+  src.includes("from './atuona-video-pins'") && src.includes('visualizeMenuLines'),
 );
 
 const dsBranch = src.slice(
@@ -79,13 +82,16 @@ ok(
 
 ok(
   '/visualize help lists DeepSeek as video',
-  src.includes('\\`/visualize deepseek 048\\` - DeepSeek video') &&
-    src.includes('/visualize deepseek 048 - 🎬 DeepSeek video'),
+  pins.includes("grade: 'DeepSeek video'") &&
+    src.includes('visualizeMenuLines') &&
+    src.includes('visualizeHelpLines'),
 );
 
 ok(
   'menu slash command points at DeepSeek video',
-  src.includes("description: '🎥 Image+video — DeepSeek: /visualize deepseek 048'"),
+  src.includes('visualizeCommandDescription()') &&
+    pins.includes("'deepseek'") &&
+    pins.includes('DeepSeek video'),
 );
 
 ok(

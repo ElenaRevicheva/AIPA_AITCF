@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 13:16 UTC | Pin /visualize engines (one file to bump grade). Keep live `/visualize deepseek` video. Bump Omni 1.1 + Kling 3.0 | `src/atuona-video-pins.ts`, `src/atuona-creative-ai.ts` | pending |
+| | | | | |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟡 12 Sep 13:20 UTC — /visualize pins (Omni 1.1 + Kling 3.0)
+
+**DONE:** `src/atuona-video-pins.ts` is the only file to bump when a vendor ships a new grade. `/visualize luma` etc. stay. Live `/visualize deepseek` video path kept. Pins: Luma ray-3.2, Omni `gemini-omni-1.1-flash`, Runway gen4.5, Veo 3.1, Kling `kwaivgi/kling-v3-video`, Seedance 2.5, DeepSeek video (Seedance shoots, DeepSeek label).
+
+**NEXT:** Deploy named `atuona` (includes `atuona-video-pins.ts`). Then Elena `/menu` — Omni/Kling grades update; `/visualize deepseek 048` unchanged.
+
+**VERIFIED BY:** `node scripts/test-atuona-video-pins.cjs` (8) + `node scripts/test-visualize-deepseek.cjs` (13).
+
+**RISK:** Do not rewrite `/visualize deepseek` into a text-only director. Contract forbids that.
 
 ### 🟢 12 Sep 12:54 UTC — `/visualize deepseek` shoots a clip. LIVE.
 
