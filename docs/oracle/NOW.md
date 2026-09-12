@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 11:39 UTC | Additive Atuona only: Opus 5 + DeepSeek Flash + Seedance 2.5 | `src/atuona-creative-ai.ts` (+ small `deepseekComplete` in llm-resilience). Keep Groq/Grok/Luma/Kling/`/film`. No Oracle deploy | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
