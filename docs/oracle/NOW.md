@@ -130,15 +130,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 12 Sep 16:09 UTC — /api YouTube v14 is live. New fruit middle. DeepSeek directed.
+### 🟡 12 Sep 16:22 UTC — Elena: v14 fruit is fine, motion is ugly. `/api` hero explored.
 
-**DONE:** `can-ai-find-and-cite-you-v14.mp4` published. Middle is cut mango / papaya / dragon fruit / pineapple / starfruit — not grapes. DeepSeek Flash wrote all 5 motion lines. QR on every shot + 5.8s outro. Music: Under the Mango Sky. v13 kept. Branch `cursor/youtube-api-v14-0841`.
+**DONE:** v14 is live but she rejected the look: natural stills, no movement, not tech. Exploration of the live `/api` backdrop is in `docs/selling/API_HERO_BACKDROP.md` (branch `cursor/youtube-api-v14-0841`). It is four Runway films (orange → pomegranate → kiwi → pineapple, whole → cut → technical object) + veil + scintillating canvas (`HeroBackdrop.tsx`, aideazz `15f35b6`). v14 used Commons photos + ffmpeg wobble because Seedance 402.
 
-**NEXT:** Elena watches v14. Replicate wallet is empty (Flux/Seedance 402) — juice-cut used the new stills. Top Replicate if she wants Seedance I2V later.
+**NEXT:** Elena's — say whether to remake the middle with the `/api` pipeline (black-void stills + real I2V). Needs Runway on her account or Replicate topped.
 
-**VERIFIED BY:** run 34703405924 `USED DeepSeek on all 5 fruit shots`, `qr bug on every shot; qr outro 5.8s`, `200 video/mp4 27564655` on `-v14.mp4`, `V14_OK dur=114.9`.
+**VERIFIED BY:** aideazz `HeroBackdrop.tsx` + commits `15f35b6` / `7d4e323` / `28a535e`. v14 `juice-cut` log on 34703405924.
 
-**RISK:** `watch.html` now points at v14. Do not overwrite v13. Do not idle-fire `api-film-v14` again unless she asks.
+**RISK:** Do not “fix” v14 with more Ken Burns. That is the thing she called ugly. Mosaic panels already rejected on `/api` (`9fc2ba3`).
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
