@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 13:40 UTC | Pin Atuona stills waterfall (same vendors as video, image grades) | `src/atuona-image-pins.ts`, `src/atuona-image-waterfall.ts`, `src/atuona-creative-ai.ts` — branch `cursor/atuona-image-pins-0841`. No Oracle deploy until pins land. | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,25 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟡 IN FLIGHT 12 Sep 13:40 UTC — image pins (`cursor/atuona-image-pins-0841`)
+
+**DONE:** video pins live. Stills are still Flux-only.
+
+**NEXT:** pin stills: Flux 2 → Ultra → Pro → Luma `uni-1-max` → Gemini `gemini-3.1-flash-image` → Runway `gen4_image`. Do not steal `/visualize luma` (video). Ray / Veo / Kling-video / Seedance / DeepSeek do not paint pixels.
+
+**VERIFIED BY:** pending `node scripts/test-atuona-image-pins.cjs`
+
+**RISK:** Do not `cto_aipa` hard-reset. Do not rewrite `/visualize deepseek`.
+
 ### 🟢 12 Sep 13:22 UTC — today's Atuona encodings synced (git = Oracle = local)
 
-**DONE:** `origin/main` `bb1c6e1` / pins commit `66cb75d`. Oracle deploy 34696046633 checked out those src files and restarted. Local + PR #52 encoding blobs match main (`atuona-video-pins.ts`, `atuona-creative-ai.ts`, `llm-resilience.ts`, `telegram-bot.ts`, `set-deepseek-stdin.sh`). Only leftover was `.env.example` pin comments on the PR branch — synced.
+**DONE:** `origin/main` pins commit `66cb75d`. Oracle deploy 34696046633. Local + PR #52 encoding blobs match main.
 
-**NEXT:** Other task. Do not `cto_aipa` hard-reset. Do not rewrite `/visualize deepseek`.
+**NEXT:** image pins (above).
 
-**VERIFIED BY:** git blob hashes equal main↔feature for the six encoding files; Actions 34696046633 VERIFY + restart.
+**VERIFIED BY:** blob hashes + Actions 34696046633.
 
-**RISK:** Oracle checkout still lags on unrelated files (named-file deploy). That is deliberate.
+**RISK:** Oracle checkout lags on unrelated files (named-file deploy). Deliberate.
 
 ### 🟢 12 Sep 13:18 UTC — /visualize pins live (Omni 1.1 + Kling 3.0)
 
