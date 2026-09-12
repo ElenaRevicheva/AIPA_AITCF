@@ -1050,7 +1050,14 @@ async function startCTOAIPA() {
   const FILMS_KEY = process.env.ATUONA_FILMS_KEY?.trim() || '';
   const filmsAuthOk = (req: Request) => !FILMS_KEY || String(req.query.key || '') === FILMS_KEY;
   const safeFilmName = (n: string) => (/^[A-Za-z0-9._-]+\.mp4$/.test(n) ? n : '');
-  const safeShotName = (n: string) => (/^[A-Za-z0-9._-]+\.mp4$/.test(n) ? n : '');
+  const safeShotName = (n: string) => (/^[A-Za-z0-9._-]+\.(mp4|jpe?g|png|webp)$/i.test(n) ? n : '');
+  const shotContentType = (n: string): string => {
+    const lower = n.toLowerCase();
+    if (lower.endsWith('.png')) return 'image/png';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+    return 'video/mp4';
+  };
 
   app.get('/films/shots/:name', (req: Request, res: Response) => {
     if (!filmsAuthOk(req)) { res.status(401).send('Unauthorized'); return; }
@@ -1059,7 +1066,7 @@ async function startCTOAIPA() {
     const file = path.join(shotsDir(), name);
     if (!fs.existsSync(file)) { res.status(404).send('Not found'); return; }
     const stat = fs.statSync(file);
-    res.setHeader('Content-Type', 'video/mp4');
+    res.setHeader('Content-Type', shotContentType(name));
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Cache-Control', 'public, max-age=86400');
     const range = req.headers.range;

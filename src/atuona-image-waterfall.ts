@@ -1,7 +1,13 @@
 /**
  * Additive stills — Luma / Gemini / Runway after the existing Flux ladder.
  * Does not call Flux. `/visualize luma` stays video.
+ *
+ * Gemini 3.1 Flash Image returns inline base64, not a public fileUri.
+ * Persist those bytes (do not skip) and hand them to Telegram as InputFile.
  */
+import fs from 'fs';
+import path from 'path';
+import { shotsDir } from './atuona-film-compiler';
 import {
   imagePinGrade,
   imagePinModel,
@@ -15,6 +21,14 @@ export type ImageGenResult = {
   url: string;
   modelUsed: string;
   grade: string;
+  bytes?: Buffer;
+  mime?: string;
+  filename?: string;
+};
+
+export type GeminiInlineImage = {
+  bytes: Buffer;
+  mime: string;
 };
 
 const RUNWAY_API_URL = 'https://api.dev.runwayml.com/v1';
@@ -55,6 +69,54 @@ export function extractGeminiImageUrl(payload: any): string | null {
     if (isHttpUrl(uri)) return String(uri).trim();
   }
   return null;
+}
+
+/** Flash Image returns `inlineData` / `inline_data`. A missing fileUri is not a miss. */
+export function extractGeminiInlineImage(payload: any): GeminiInlineImage | null {
+  const parts = payload?.candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) return null;
+  for (const part of parts) {
+    const inline = part?.inlineData || part?.inline_data;
+    const data = inline?.data;
+    if (typeof data !== 'string' || data.length < 32) continue;
+    const bytes = Buffer.from(data, 'base64');
+    if (bytes.length < 32) continue;
+    const mime = String(inline?.mimeType || inline?.mime_type || 'image/jpeg');
+    return { bytes, mime };
+  }
+  return null;
+}
+
+function extFromMime(mime: string): 'jpg' | 'png' | 'webp' {
+  const m = mime.toLowerCase();
+  if (m.includes('png')) return 'png';
+  if (m.includes('webp')) return 'webp';
+  return 'jpg';
+}
+
+function safeStillStem(stem: string | undefined): string {
+  const cleaned = (stem || '').replace(/[^A-Za-z0-9._-]/g, '').slice(0, 80);
+  return cleaned || `gemini-${Date.now()}`;
+}
+
+function stillPublicUrl(filename: string): string {
+  const base = (process.env.CTO_AIPA_PUBLIC_URL || 'https://webhook.aideazz.xyz/cto').replace(/\/$/, '');
+  const key = process.env.ATUONA_FILMS_KEY?.trim();
+  const q = key ? `?key=${encodeURIComponent(key)}` : '';
+  return `${base}/films/shots/${encodeURIComponent(filename)}${q}`;
+}
+
+/** Write Gemini stills next to video shots. Never overwrite `{pageId}.mp4`. */
+export function persistGeminiStillBytes(
+  buf: Buffer,
+  mime: string,
+  stem?: string
+): { url: string; filename: string } {
+  const filename = `${safeStillStem(stem)}.${extFromMime(mime)}`;
+  const dest = path.join(shotsDir(), filename);
+  fs.writeFileSync(dest, buf);
+  console.log(`🎨 persistGeminiStill ${filename}: saved ${(buf.length / 1e6).toFixed(2)}MB → ${dest}`);
+  return { url: stillPublicUrl(filename), filename };
 }
 
 export function runwayRatioForAspect(aspectRatio: string): string {
@@ -124,8 +186,10 @@ async function tryGeminiImage(opts: {
   geminiApiKey: string;
   prompt: string;
   aspectRatio: string;
+  persistStem?: string;
 }): Promise<ImageGenResult> {
   const model = imagePinModel('omni');
+  const grade = imagePinGrade('omni');
   const url = `${GEMINI_API_URL}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(opts.geminiApiKey)}`;
   const resp = await fetch(url, {
     method: 'POST',
@@ -145,10 +209,22 @@ async function tryGeminiImage(opts: {
   }
   const payload = JSON.parse(text);
   const imageUrl = extractGeminiImageUrl(payload);
-  if (!imageUrl) {
-    throw new Error('Gemini image returned no public URL (inline bytes only — skipped)');
+  if (imageUrl) {
+    return { url: imageUrl, modelUsed: grade, grade };
   }
-  return { url: imageUrl, modelUsed: imagePinGrade('omni'), grade: imagePinGrade('omni') };
+  const inline = extractGeminiInlineImage(payload);
+  if (!inline) {
+    throw new Error('Gemini image returned no image parts');
+  }
+  const saved = persistGeminiStillBytes(inline.bytes, inline.mime, opts.persistStem);
+  return {
+    url: saved.url,
+    modelUsed: grade,
+    grade,
+    bytes: inline.bytes,
+    mime: inline.mime,
+    filename: saved.filename,
+  };
 }
 
 async function tryRunwayImage(opts: {
@@ -214,6 +290,8 @@ export type AddedImageDeps = {
   geminiApiKey: string | null;
   /** `/imagine luma 048` — try this vendor first, then the rest. */
   prefer?: AddedImageProvider;
+  /** Optional shots/ filename stem, e.g. `099-still`. Never `{pageId}` alone (that is the mp4). */
+  persistStem?: string;
 };
 
 /** Luma uni-1-max → Gemini Flash Image → Runway gen4_image. Flux is not in this function. */
@@ -240,6 +318,7 @@ export async function runAddedImageProviders(deps: AddedImageDeps): Promise<Imag
           geminiApiKey: deps.geminiApiKey,
           prompt: deps.prompt,
           aspectRatio: deps.aspectRatio,
+          ...(deps.persistStem ? { persistStem: deps.persistStem } : {}),
         });
       }
       if (id === 'runway' && deps.runwayApiKey) {
