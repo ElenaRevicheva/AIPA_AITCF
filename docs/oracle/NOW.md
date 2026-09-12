@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| _(free)_ | — | — | — | — |
+| Cursor Cloud | 12 Sep 12:52 UTC | `/visualize deepseek` shoots a clip | `src/atuona-creative-ai.ts`, `.deploy-trigger` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,18 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟡 12 Sep 12:52 UTC — `/visualize deepseek` is a video command
+
+Elena wants a clip when she taps visualize with DeepSeek. `/visualize deepseek 048` now shoots (Seedance first, then the chain). Telegram copy says DeepSeek video — no “text only” lecture. Flash key is optional (motion). Replicate token shoots.
+
+**NEXT:** named-file `atuona` deploy. Elena: `/visualize deepseek 048` (or `last`).
+
 ### 🟢 12 Sep 12:41 UTC — DeepSeek is on /menu. Seedance is `/visualize seedance NNN`.
-
-**DONE:** run 34694360629 `VERIFY: dist has visualize seedance and /deepseek` + pm2 restart.
-
-- **Film (Seedance 2.5, Replicate top-up):** `/visualize seedance 048` (or `last`). 2–5 min. Needs a published page.
-- **Writing (DeepSeek Flash):** `/deepseekkey sk-…` once in Atuona, then `/deepseek` or `/create deepseek`. Not a video model.
-
-**NEXT:** Elena uses those two commands. Do not paste keys in chat.
-
-**VERIFIED BY:** Actions 34694360629 VERIFY line + restart.
-
-**RISK:** Empty `/visualize` is help, not a render. Seedance without a page number does nothing.
 
 ### 🟢 12 Sep 12:17 UTC — /deepseekkey is live (same contract as /pplxkey)
 
