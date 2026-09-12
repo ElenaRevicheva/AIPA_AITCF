@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 12 Sep 18:07 UTC | v15 fruit after the first still: Runway I2V + /api canvas. Keep whole stills. No grocery cut. | `direct-fruit-v15.mjs`, `hero-clip-v15.mjs`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | a1c6e80 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟢 12 Sep 17:49 UTC — v15 how-to cut is LIVE. No Loom. 73.2s.
+### 🟡 12 Sep 17:58 UTC — Elena: first fruit still is fine; after that is ugly.
 
-**DONE:** Elena: watch `https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v15.mp4` (player `…/watch.html`). Fruit middle + how-to slides (open → paste → score → 34 checks → fix). Trigger idle. Branch `cursor/youtube-api-v15-0841`. Do not overwrite v13/v14.
+**DONE:** She is right. DeepSeek wrote motion. Seedance 402. We xfaded to a Commons cut + a screensaver field. That is not the `/api` reel (Runway I2V + live canvas).
 
-**NEXT:** Elena watches and says keep / change. Hard-refresh if the old 114.9s Loom cut is cached.
+**NEXT:** Keep the whole-fruit first picture. Shoot Runway Gen-4.5 from that still (same path as the site). Overlay gold–white–violet independent-phase field + prism + veil. Never show the grocery cut. Fail if Runway misses — do not publish another still. How-to slides stay. Do not overwrite v13/v14.
 
-**VERIFIED BY:** Actions [34708620107](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34708620107): `REUSE v15 fruit clips`, `DONE … (20.1MB, 73s)`, `V15_OK dur=73.200000`, `200 video/mp4 20107445` on `-v15.mp4`. v14 `27564655` and v13 `27768561` still 200.
+**VERIFIED BY:** pending fire. Live `-v15.mp4` is still the 73s still-xfade cut.
 
-**RISK:** nginx may cache the old 24.5MB Loom file in a browser. The published file is 20.1MB / 73.2s. Do not remake fruit clips (director unlinks them). Do not overwrite v13/v14.
+**RISK:** Runway spend on Elena's account (same wallet as `/visualize runway`). 5×10s jobs. Do not reuse `engine-v15.txt` unless it says `runway`.
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
