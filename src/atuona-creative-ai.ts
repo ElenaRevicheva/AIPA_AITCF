@@ -10,6 +10,16 @@ import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import { persistShot, persistShotBytes, shotPublicUrl, buildFilm } from './atuona-film-compiler';
 import { grokComplete, groqModel, deepseekComplete, deepseekConfigured } from './llm-resilience';
+import {
+  parseVideoProvider,
+  providerGrade,
+  type VideoProvider,
+  videoPinModel,
+  visualizeCommandDescription,
+  visualizeHelpLines,
+  visualizeMenuLines,
+  visualizeStatusLines,
+} from './atuona-video-pins';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
 export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
 import * as fs from 'fs';
@@ -110,6 +120,8 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 //   • veo    → Google Veo 3.1 (Gemini API, native audio) — needs GEMINI_API_KEY
 //   • omni     → Gemini Omni Flash (Interactions API, image→video + native audio)
 //   • seedance → ByteDance Seedance 2.5 via Replicate (additive; `/visualize seedance NNN`)
+//   • deepseek → `/visualize deepseek NNN` — operator-facing DeepSeek film. Flash writes
+//     motion when keyed; Seedance (then the chain) shoots the clip. No DeepSeek pixel API.
 //   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Omni Flash → Kling v2.6 → Seedance 2.5 → Veo 3.1 → Runway.
 //   On moderation failure, auto-retries once with a video-safe keyframe (editorial shadow/silhouette still).
 //   When a provider is named explicitly and fails, we fall back through the chain
@@ -129,43 +141,16 @@ const IMAGE_MODELS = {
 };
 
 const VIDEO_MODELS = {
-  /** Luma full-quality tier. Ray 3 (Mar 2026): native 1080p, ~3x cheaper, 16-bit HDR, best-in-class
-   *  video-to-video. Same Dream Machine API as Ray 2 — drop-in model swap. Override: LUMA_VIDEO_MODEL.
-   *  Fallback chain (Replicate, Runway) catches any Ray-3 enum/schema surprise → safe to ship. */
-  lumaDirect: (process.env.LUMA_VIDEO_MODEL || 'ray-3.2').trim(),
-  /** Max output resolution for I2V (540p | 720p | 1080p | 4k). 1080p = best default; 4k = slower/more credits */
+  /** Ids come from src/atuona-video-pins.ts — bump the pin, not these call sites. */
+  lumaDirect: videoPinModel('luma'),
   lumaResolution: '1080p' as const,
-  /** Replicate-hosted Luma fallback. luma/ray-3.2 confirmed live on Replicate (June 2026): 1080p,
-   *  native HDR option. NOTE: ray-3.x i2v uses start_image + duration 5 (schema differs from ray-2).
-   *  Override: REPLICATE_LUMA_MODEL (legacy ray-2 input shape auto-detected). */
   lumaReplicate: (process.env.REPLICATE_LUMA_MODEL || 'luma/ray-3.2').trim(),
-  /** Runway image→video — gen4.5 is the highest Runway model on /v1/image_to_video (docs.dev.runwayml.com) */
-  runwayImageToVideo: 'gen4.5',
-  /** Google Veo 3.1 model id on the Gemini API. Override: VEO_MODEL (e.g. veo-3.1-fast-generate-preview). */
-  veoModel: (process.env.VEO_MODEL || 'veo-3.1-generate-preview').trim(),
-  /** Gemini Omni Flash — Interactions API image→video. Override: GEMINI_OMNI_MODEL. */
-  omniModel: (process.env.GEMINI_OMNI_MODEL || 'gemini-omni-flash-preview').trim(),
-  /** Kling image→video via Replicate (kwaivgi namespace, existing REPLICATE_API_TOKEN — no new key).
-   *  v2.6 (latest): 1080p + NATIVE SYNCHRONIZED AUDIO (dialogue/ambient/sfx in one pass).
-   *  Override: KLING_REPLICATE_MODEL. */
-  klingReplicate: (process.env.KLING_REPLICATE_MODEL || 'kwaivgi/kling-v2.6').trim(),
-  /** ByteDance Seedance 2.5 — additive long-take i2v. Override: SEEDANCE_REPLICATE_MODEL. */
-  seedanceReplicate: (process.env.SEEDANCE_REPLICATE_MODEL || 'bytedance/seedance-2.5').trim(),
+  runwayImageToVideo: videoPinModel('runway'),
+  veoModel: videoPinModel('veo'),
+  omniModel: videoPinModel('omni'),
+  klingReplicate: videoPinModel('kling'),
+  seedanceReplicate: videoPinModel('seedance'),
 };
-
-/** Canonical video provider ids selectable from `/visualize <provider> NNN`. */
-type VideoProvider = 'luma' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance';
-/** Map operator aliases → canonical provider id. Returns null if the token isn't a provider. */
-function parseVideoProvider(token: string): VideoProvider | null {
-  const t = token.toLowerCase();
-  if (['luma', 'ray', 'ray2', 'ray3', 'ray-3', 'dream', 'dreammachine'].includes(t)) return 'luma';
-  if (['runway', 'gen4', 'gen45', 'gen-4', 'gen4.5', 'runwayml'].includes(t)) return 'runway';
-  if (['veo', 'veo3', 'veo31'].includes(t)) return 'veo';
-  if (['omni', 'omniflash', 'gemini-omni', 'gemini', 'google'].includes(t)) return 'omni';
-  if (['kling', 'kuaishou', 'kwaivgi'].includes(t)) return 'kling';
-  if (['seedance', 'seedance25', 'seedance-2.5', 'seedance2.5', 'seedance2', 'bytedance', 'doubao'].includes(t)) return 'seedance';
-  return null;
-}
 
 function googleVideoOmniOnly(): boolean {
   const v = (process.env.GOOGLE_VIDEO_OMNI_ONLY || process.env.ATUONA_GOOGLE_VIDEO || '').trim().toLowerCase();
@@ -3760,12 +3745,30 @@ console.log(`   Temperature (all modes): ${AI_CONFIG.poetryTemperature}`);
  * @param creativity - `true` = poetry/creative, `false` = structured but still temp 0.9, `'conversation'` = chat.
  * Images/video have no API temperature; prompts from this path carry creativity. Flux/Luma/Runway are not sampled here.
  */
-async function createContent(prompt: string, maxTokens: number = 2000, creativity: boolean | 'conversation' = false): Promise<string> {
+async function createContent(
+  prompt: string,
+  maxTokens: number = 2000,
+  creativity: boolean | 'conversation' = false,
+  prefer?: 'deepseek',
+): Promise<string> {
   const temperature = creativity === 'conversation'
     ? AI_CONFIG.conversationTemperature
     : creativity === true
       ? AI_CONFIG.poetryTemperature
       : AI_CONFIG.standardTemperature;
+
+  if (prefer === 'deepseek') {
+    if (deepseekConfigured()) {
+      try {
+        const ds = await deepseekComplete(null, prompt, maxTokens, 'atuona/generate-deepseek', { temperature });
+        if (ds && ds.trim()) return ds;
+      } catch (dsErr: any) {
+        console.warn('⚠️ Atuona: preferred DeepSeek failed, falling through to Claude (' + (dsErr?.message || dsErr) + ')');
+      }
+    } else {
+      console.warn('⚠️ Atuona: DeepSeek preferred but not keyed — using Claude/Groq');
+    }
+  }
   
   const readClaudeText = (response: { content: Array<{ type: string; text?: string }> }) => {
     const text = response.content
@@ -4115,6 +4118,21 @@ interface VideoGenerationResult {
   needsPolling?: boolean;
 }
 
+/** Telegram label for the clip that just landed. `/visualize deepseek` is DeepSeek film. */
+function visualizeEngineLabel(
+  provider: VideoGenerationResult['provider'],
+  selected: VideoProvider | null,
+): string {
+  if (selected === 'deepseek') return 'DeepSeek';
+  if (provider === 'omni') return 'Gemini Omni Flash';
+  if (provider === 'veo') return 'Google Veo 3.1';
+  if (provider === 'kling') return 'Kling';
+  if (provider === 'seedance') return 'Seedance 2.5';
+  if (provider === 'runway') return 'Runway Gen-4.5';
+  if (provider === 'luma-direct') return 'Luma ray-3.2';
+  return 'Luma via Replicate';
+}
+
 type VideoGenerationOptions = {
   /** Skip Luma Direct resubmit (used after a Luma render-time failure). */
   skipLumaDirect?: boolean;
@@ -4127,6 +4145,8 @@ type VideoGenerationOptions = {
   sensual?: boolean;
   /** Providers already tried (explicit `/visualize omni` etc.) — skip in alternate chain. */
   excludeProviders?: VideoProvider[];
+  /** Operator-facing name when the named engine retries the chain. */
+  fallbackFrom?: string;
 };
 
 /** Luma via Replicate — shared by default chain and alternate fallback. */
@@ -4292,8 +4312,9 @@ async function runExplicitProviderFallback(
   options: VideoGenerationOptions
 ): Promise<VideoGenerationResult> {
   const errSnippet = options.sensual ? 'sensual scene — encoding keyframe' : 'trying alternate chain';
+  const who = options.fallbackFrom || failedProvider;
   await ctx.reply(
-    `🔁 *${failedProvider} unavailable* — ${errSnippet}\n\n_Kling → Luma → Veo → Runway…_`,
+    `🔁 *${who} unavailable* — ${errSnippet}\n\n_Kling → Luma → Veo → Runway…_`,
     { parse_mode: 'Markdown' }
   );
 
@@ -4348,6 +4369,18 @@ async function generateVideo(
     const seedance = await trySeedance(imageUrl, prompt, ctx);
     if (seedance.success) return seedance;
     return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'seedance', options);
+  } else if (preferredProvider === 'deepseek') {
+    const seedance = await trySeedance(
+      imageUrl,
+      prompt,
+      ctx,
+      '🎬 *Generating video with DeepSeek...*\n\n_Image-to-video · native audio · 2–5 minutes..._',
+    );
+    if (seedance.success) return seedance;
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'seedance', {
+      ...options,
+      fallbackFrom: 'DeepSeek',
+    });
   } else if (preferredProvider === 'runway') {
     if (runwayApiKey) {
       const rw = await tryRunway(imageUrl, prompt, ctx);
@@ -4770,7 +4803,7 @@ async function tryKling(
   const safeMotion = sanitizeMotionForVideoProviders(prompt);
   try {
     // Kling v2.6: native synchronized audio (dialogue/ambient/sfx generated with the video)
-    const klingHasNativeAudio = /v2\.6|v2-6/i.test(VIDEO_MODELS.klingReplicate);
+    const klingHasNativeAudio = /v2\.6|v2-6|v3/i.test(VIDEO_MODELS.klingReplicate);
     await ctx.reply(
       `🎬 *Generating video with Kling...*\n\n_${VIDEO_MODELS.klingReplicate} · stylized/arthouse${klingHasNativeAudio ? ' · native audio' : ''} · takes 2–4 minutes..._`,
       { parse_mode: 'Markdown' }
@@ -4811,7 +4844,8 @@ async function tryKling(
 async function trySeedance(
   imageUrl: string,
   prompt: string,
-  ctx: Context
+  ctx: Context,
+  announce?: string,
 ): Promise<VideoGenerationResult> {
   if (!replicate) {
     return { success: false, provider: 'seedance', error: 'Seedance needs REPLICATE_API_TOKEN' };
@@ -4822,7 +4856,8 @@ async function trySeedance(
   const resolution = process.env.SEEDANCE_RESOLUTION === '480p' ? '480p' : '720p';
   try {
     await ctx.reply(
-      `🎬 *Generating video with Seedance 2.5...*\n\n_${VIDEO_MODELS.seedanceReplicate} · native audio · ${resolution} · ${duration}s · takes 2–5 minutes..._`,
+      announce ||
+        `🎬 *Generating video with Seedance 2.5...*\n\n_${VIDEO_MODELS.seedanceReplicate} · native audio · ${resolution} · ${duration}s · takes 2–5 minutes..._`,
       { parse_mode: 'Markdown' }
     );
     const out = await replicate.run(
@@ -5317,9 +5352,13 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 → \`/endcollab\` to finish
 
 *Generate new content:*
+\`/create\` → Next page with Claude Opus 5 (default)
+\`/deepseek\` or \`/create deepseek\` → Next page with DeepSeek Flash
 \`/scene описание сцены\` → Creates full scene
 \`/expand короткая фраза\` → Expands into paragraph
 \`/dialogue\` → Creates character conversation
+
+_Pages: \`/deepseek\`. Video: \`/visualize deepseek 048\`._
 
 *Character voices:*
 \`/voice kira\` → Write as Kira
@@ -5364,12 +5403,7 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 \`/visualize last\` → Last published page
 
 *Pick your video engine:*
-\`/visualize luma 052\` → Luma ray-3.2 (HDR cinematic)
-\`/visualize omni 052\` → Gemini Omni Flash (native audio, conversational edit path)
-\`/visualize runway 052\` → Runway Gen-4.5
-\`/visualize veo 052\` → Google Veo 3.1 (native audio)
-\`/visualize kling 052\` → Kling v2.6 (stylized/arthouse, native audio)
-\`/visualize seedance 052\` → Seedance 2.5 (long-take + native audio)
+${visualizeHelpLines('052')}
 
 _Default chain when Luma is dry: Omni Flash → Runway._
 
@@ -5445,11 +5479,11 @@ See: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/ATUONA-BOOK-ROADMAP.md
 *Voices:* /voice, /dialogue, /character
 *Story:* /recap, /threads, /addthread, /resolve, /arc
 *Writing:* /collab, /endcollab, /expand, /scene, /ending, /whatif
-*Import:* /import, /create, /inspire
+*Import:* /import, /create, /create deepseek, /deepseek, /inspire
 *Publish:* /preview, /publish, /setpage
 *Drafts:* /draft, /read
 *Proactive:* /proactive, /dailyinspire, /history
-*Film:* /visualize (luma · omni · veo · runway · kling · seedance), /gallery, /film, /videostatus
+*Film:* /visualize (luma · omni · veo · runway · kling · seedance · deepseek), /gallery, /film, /videostatus
 *Social:* /post
 *Export:* /export, /import_backup
 *Tools:* /spanish, /imagine
@@ -5559,7 +5593,11 @@ _Just click any command to see what it does!_
 /import - 📝 Russian text → English
 /translate - 🔄 Adjust translation
 /queue - 📋 Check import queue
-/create - 🎨 AI generates new content
+/create - 🎨 Next page (Claude Opus 5, default)
+/create deepseek - ✍️ Next page with DeepSeek Flash
+/deepseek - ✍️ Same — tap to write with DeepSeek
+/visualize deepseek 048 - 🎬 DeepSeek video for that page
+/deepseekkey - 🔑 Paste the DeepSeek key (message is deleted)
 /inspire - 💡 Random creative spark
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -5601,12 +5639,7 @@ _Just click any command to see what it does!_
 🎬 *AI FILM STUDIO*
 ━━━━━━━━━━━━━━━━━━━━
 /visualize 048 - 🎥 Image+video (default: Luma)
-/visualize luma 048 - 🎬 Luma ray-3.2 (HDR cinematic)
-/visualize omni 048 - ✨ Gemini Omni Flash (native audio)
-/visualize runway 048 - 🎬 Runway Gen-4.5
-/visualize veo 048 - 🎬 Google Veo 3.1 (native audio)
-/visualize kling 048 - 🎬 Kling v2.6 (stylized/arthouse, native audio)
-/visualize seedance 048 - 🎬 Seedance 2.5 (long-take + native audio)
+${visualizeMenuLines('048')}
 /film build - 🎬✨ AUTO-ASSEMBLE shots → one film (VO+music)
 /gallery - 🖼 All visualizations
 /film - 🎬 Film compilation status
@@ -5629,7 +5662,6 @@ _Just click any command to see what it does!_
 📊 *STATUS & FIX*
 ━━━━━━━━━━━━━━━━━━━━
 /status - 📈 Book & API status
-/deepseekkey - 🔑 Wire DeepSeek Flash (tap, then paste the key)
 /style - 🎨 My writing style guide
 /fixgallery - 🔧 Fix gallery issues
     `;
@@ -5716,7 +5748,10 @@ _Just click any command to see what it does!_
 🌐 Website: atuona.xyz
 📦 Repo: github.com/ElenaRevicheva/atuona
 
-_Use /create to write the next page!_
+✍️ DeepSeek Flash: ${deepseekConfigured() ? '✅ tap /deepseek to write the next page' : '⚪ /deepseekkey sk-… then /deepseek'}
+🎬 DeepSeek video: ${replicate ? '✅ /visualize deepseek 048' : '⚪ Set REPLICATE_API_TOKEN'}
+
+_Use /create (Claude) or /deepseek (Flash) to write. /visualize deepseek 048 for video._
     `;
     await ctx.reply(statusMessage, { parse_mode: 'Markdown' });
   });
@@ -6244,9 +6279,26 @@ Total: ${importQueue.length} pages
 Use /batch to process queue.`, { parse_mode: 'Markdown' });
   });
   
-  // /create - Generate next page
-  atuonaBot.command('create', async (ctx) => {
-    const customPrompt = ctx.message?.text?.replace('/create', '').trim();
+  // /create - Generate next page (Claude Opus 5). /create deepseek or /deepseek → DeepSeek Flash.
+  const handleCreateCommand = async (ctx: Context) => {
+    const rawText = ctx.message?.text || '';
+    const fromDeepseekCmd = /^\/deepseek(?!key)/i.test(rawText);
+    const rawArg = rawText.replace(/^\/(?:create|deepseek)(@\S+)?/i, '').trim();
+    const preferDeepSeek = fromDeepseekCmd || /^deepseek\b/i.test(rawArg);
+    const customPrompt = preferDeepSeek && !fromDeepseekCmd
+      ? rawArg.replace(/^deepseek\b/i, '').trim()
+      : rawArg;
+
+    if (preferDeepSeek && !deepseekConfigured()) {
+      await ctx.reply(
+        '✍️ *DeepSeek Flash* needs a key to write the next page.\n\n' +
+          'In *this* chat send:\n`/deepseekkey sk-…`\n\n' +
+          'Create the key at https://platform.deepseek.com/api_keys — do not paste it in Cursor.\n' +
+          'For video: `/visualize deepseek 048`',
+        { parse_mode: 'Markdown' },
+      );
+      return;
+    }
     
     // 🧠 EMOTIONAL INTELLIGENCE: Select creative mood
     const timeOfDay = new Date().getHours();
@@ -6270,7 +6322,7 @@ Use /batch to process queue.`, { parse_mode: 'Markdown' });
 
       await ctx.reply(
         `📝 Creating page #${String(bookState.currentPage).padStart(3, '0')}…\n\n` +
-        `_Mood: ${creativeMood} | Voice: ${creativeSession.activeVoice}_\n` +
+        `_Writer: ${preferDeepSeek ? 'DeepSeek Flash' : 'Claude Opus 5'} · Mood: ${creativeMood} | Voice: ${creativeSession.activeVoice}_\n` +
         `🔄 _Modules today: ${createKeys.join(', ')}_`,
         { parse_mode: 'Markdown' }
       );
@@ -6351,7 +6403,7 @@ CRITICAL REQUIREMENTS:
 
 Raw. Honest. Mix Russian and English where emotionally true. End on breath — hope allowed, comfort not required.`;
 
-      const pageContent = await createContent(createPrompt, 2000, true);
+      const pageContent = await createContent(createPrompt, 2000, true, preferDeepSeek ? 'deepseek' : undefined);
       
       extractAndTrackFromResponse(pageContent, 'create');
       updateEmotionalMemory(detectedTone, creativeMood, 'create');
@@ -6399,7 +6451,8 @@ ${content.substring(0, 1500)}${content.length > 1500 ? '...' : ''}
 ✅ Page created! Use:
 • /preview - See full page
 • /publish - Send to atuona.xyz
-• /create - Generate different version`;
+• /create - Generate different version (Claude)
+• /deepseek - Generate different version (DeepSeek)`;
 
       await ctx.reply(previewMessage, { parse_mode: 'Markdown' });
       
@@ -6407,7 +6460,9 @@ ${content.substring(0, 1500)}${content.length > 1500 ? '...' : ''}
       console.error('Create error:', error);
       await ctx.reply('❌ Error creating page. Try again!');
     }
-  });
+  };
+  atuonaBot.command('create', handleCreateCommand);
+  atuonaBot.command('deepseek', handleCreateCommand);
   
   // /preview - Full preview with both languages
   atuonaBot.command('preview', async (ctx) => {
@@ -9140,12 +9195,7 @@ Create stunning visuals for your book pages:
 \`/visualize all\` - Queue all pages for visualization
 
 🎛️ *Choose your video engine:*
-\`/visualize luma 048\` - Luma ray-3.2 (HDR, cinematic)
-\`/visualize omni 048\` - Gemini Omni Flash (native audio)
-\`/visualize runway 048\` - Runway Gen-4.5
-\`/visualize veo 048\` - Google Veo 3.1 (native audio)
-\`/visualize kling 048\` - Kling v2.6 (stylized/arthouse, native audio)
-\`/visualize seedance 048\` - Seedance 2.5 (long-take + native audio)
+${visualizeHelpLines('048')}
 
 Each visualization creates:
 🎨 Flux 2 Pro image (newest, BEST quality!)
@@ -9158,16 +9208,19 @@ Each visualization creates:
 📊 *Status*
 Visualizations: ${visualizations.length} pages
 🎨 Flux: ${replicate ? '✅ Flux 2 Pro / 1.1 Ready' : '❌ Set REPLICATE_API_TOKEN'}
-🎬 Luma ray-3.2 (Direct): ${lumaApiKey ? '✅ Ready' : '⚪ Set LUMA_API_KEY'}
+${visualizeStatusLines({
+        luma: Boolean(lumaApiKey),
+        omni: Boolean(geminiApiKey),
+        runway: Boolean(runwayApiKey),
+        veo: Boolean(geminiApiKey),
+        kling: Boolean(replicate),
+        seedance: Boolean(replicate),
+        deepseek: Boolean(replicate),
+      })}
+✍️ DeepSeek Flash: ${deepseekConfigured() ? '✅ /deepseek' : '⚪ /deepseekkey then /deepseek'}
 🎬 Luma (Replicate): ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
-🎬 Gemini Omni Flash: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
-🎬 Seedance 2.5: ${replicate ? '✅ via Replicate' : '⚪ Set REPLICATE_API_TOKEN'}
-✍️ DeepSeek V4.1 Flash: ${deepseekConfigured() ? '✅ additive text fallback' : '⚪ Set DEEPSEEK_API_KEY'}
-🎬 Runway Gen-4.5: ${runwayApiKey ? '✅ Ready' : '⚪ Set RUNWAY_API_KEY'}
-🎬 Google Veo 3.1: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
-🎬 Kling: ${replicate ? '✅ via Replicate' : '⚪ Set REPLICATE_API_TOKEN'}
 
-_Default chain: Luma ray-3.2 → Replicate → Omni → Kling v2.6 → Veo 3.1 → Runway (on moderation: chiaroscuro keyframe retry)_
+_Default chain: ${providerGrade('luma')} → Replicate → ${providerGrade('omni')} → ${providerGrade('kling')} → ${providerGrade('veo')} → ${providerGrade('runway')} (on moderation: chiaroscuro keyframe retry)_
 _Name a provider to pick it; it falls back through the chain if it fails._
 _Director's Cut: Modify Video (fashion/editorial) auto-runs after base video_ 🚀`, { parse_mode: 'Markdown' });
       return;
@@ -9312,7 +9365,8 @@ ALCOHOL: never show drinks, bars, bottles (Kira is in recovery).
 
 OUTPUT: One dense English prompt (120–220 words) describing a single photorealistic cinematic frame. Return ONLY the prompt. No quotes, no preamble.`;
 
-      let imagePrompt = await createContent(cinematicPrompt, 500, true);
+      const dsPrefer = selectedProvider === 'deepseek' ? 'deepseek' as const : undefined;
+      let imagePrompt = await createContent(cinematicPrompt, 500, true, dsPrefer);
       imagePrompt = `${imagePrompt.trim()}\n\n${VISUAL_HARD_EXCLUSIONS.trim()}`;
       
       await ctx.reply(`🎨 *Cinematic Prompt:*\n\n_${imagePrompt.substring(0, 300)}..._`, { parse_mode: 'Markdown' });
@@ -9332,7 +9386,7 @@ Rules:
 - If it sounds like a caption — rewrite it
 - In English. No hashtags.`;
       
-      const caption = await createContent(captionPrompt, 100, true);
+      const caption = await createContent(captionPrompt, 100, true, dsPrefer);
       
       const motionPromptInput = `TITLE: "${title}"
 THEME: ${theme}
@@ -9353,7 +9407,9 @@ Hard rules:
 - Do NOT describe sex acts, nudity with genitals, or graphic intimacy — circle around desire instead.
 
 Return ONLY the motion direction. No preamble.`;
-      let motionPrompt = sanitizeMotionForVideoProviders(await createContent(motionPromptInput, 200, true));
+      let motionPrompt = sanitizeMotionForVideoProviders(
+        await createContent(motionPromptInput, 200, true, dsPrefer),
+      );
       
       // Generate hashtags
       const hashtags = ['#ATUONA', '#AIFilm', '#VibeCoding', '#UndergroundArt', '#ParadiseFound', '#AIGenerated', '#DigitalArt', '#BookToFilm'];
@@ -9679,11 +9735,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
         if (videoResult.success) {
           // Ready URL providers (Replicate, Veo, Kling, Omni) → direct delivery.
           if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance')) {
-            const providerLabel = videoResult.provider === 'omni' ? 'Gemini Omni Flash'
-              : videoResult.provider === 'veo' ? 'Google Veo 3.1'
-              : videoResult.provider === 'kling' ? 'Kling'
-              : videoResult.provider === 'seedance' ? 'Seedance 2.5'
-              : 'Luma via Replicate';
+            const providerLabel = visualizeEngineLabel(videoResult.provider, selectedProvider);
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
             saveState();
@@ -9784,11 +9836,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                 });
 
                 if (fb.success && fb.videoUrl) {
-                  const providerLabel = fb.provider === 'omni' ? 'Gemini Omni Flash'
-                    : fb.provider === 'veo' ? 'Google Veo 3.1'
-                    : fb.provider === 'kling' ? 'Kling v2.6'
-                    : fb.provider === 'seedance' ? 'Seedance 2.5'
-                    : 'Luma via Replicate';
+                  const providerLabel = visualizeEngineLabel(fb.provider, selectedProvider);
                   await deliverFallbackVideo(fb.videoUrl, providerLabel);
                   return true;
                 }
@@ -10967,9 +11015,10 @@ ${elenaLang === 'english'
           { command: 'menu', description: '📋 Full command menu' },
           { command: 'help', description: '📖 Vibe coder guide' },
           { command: 'ritual', description: '🔄 Begin daily writing flow' },
-          { command: 'create', description: '🎨 AI generates new content' },
+          { command: 'create', description: '🎨 Next page — Claude Opus 5' },
+          { command: 'deepseek', description: '✍️ Next page — DeepSeek Flash' },
           { command: 'publish', description: '🚀 Push page to atuona.xyz' },
-          { command: 'visualize', description: '🎥 Image+video — try: omni|luma|veo|runway|kling|seedance 048' },
+          { command: 'visualize', description: visualizeCommandDescription() },
           { command: 'gallery', description: '🖼 All visualizations' },
           { command: 'film', description: '🎞 Film compilation status' },
           { command: 'videostatus', description: '⏳ Video progress' },
