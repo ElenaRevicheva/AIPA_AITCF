@@ -18,7 +18,7 @@ on:
 jobs:
   influencer-diag:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,8 +32,8 @@ jobs:
           [ -n "$LINE" ] || { echo "::error::.influencer-diag-trigger is empty"; exit 1; }
           case "$LINE" in
             \#*|none|idle) echo "Trigger idle — skip."; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0 ;;
-            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film|api-film-bust|api-film-music) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
-            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, api-film-bust, api-film-music, or # idle — got '$LINE'"; exit 1 ;;
+            diag|fix|sync|cmo|cmo-fix|geo|fire|api-film|api-film-bust|api-film-music|api-film-v14) echo "skip=false" >> "$GITHUB_OUTPUT"; echo "mode=$LINE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::first token must be diag, fix, sync, cmo, cmo-fix, geo, fire, api-film, api-film-bust, api-film-music, api-film-v14, or # idle — got '$LINE'"; exit 1 ;;
           esac
 
       - name: Require ORACLE_SSH_KEY
@@ -50,6 +50,9 @@ jobs:
           SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
           MODE: ${{ steps.trigger.outputs.mode }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BRIGHTDATA_API_TOKEN: ${{ secrets.BRIGHTDATA_API_TOKEN }}
         run: |
           set -uo pipefail
           install -m 700 -d ~/.ssh
@@ -145,6 +148,39 @@ jobs:
               ubuntu@170.9.242.90:/tmp/api-film-watch.html
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/bust-api-audit-film.sh
+          elif [ "$MODE" = "api-film-v14" ]; then
+            ssh_retry 'mkdir -p /tmp/youtube-api-audit-film-v14 /tmp/api-film-out-v14' || true
+            scp_retry -r \
+              scripts/youtube-api-audit-film/. \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/ || true
+            scp_retry \
+              scripts/oracle-resilience/api-film-watch-v14.html \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/api-film-watch-v14.html || true
+            scp_retry \
+              scripts/oracle-resilience/api-film-watch-v14.html \
+              ubuntu@170.9.242.90:/tmp/api-film-watch-v14.html || true
+            n=0
+            ORACLE_OK=0
+            while [ "$n" -lt 3 ]; do
+              n=$((n + 1))
+              echo "oracle v14 compile attempt $n"
+              if ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' \
+                < scripts/oracle-resilience/compile-api-film-v14-runner.sh; then
+                ORACLE_OK=1
+                RC=0
+                break
+              fi
+              echo "oracle v14 compile attempt $n failed"
+              sleep $((n * 12))
+            done
+            if [ "$ORACLE_OK" != "1" ]; then
+              echo "Oracle v14 compile missed — runner fallback (needs Replicate + Bright Data + OpenAI)"
+              sudo apt-get update -qq
+              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
+              export CTO_ENV="${GITHUB_WORKSPACE}/.env"
+              bash scripts/oracle-resilience/compile-api-film-v14-runner.sh
+              RC=$?
+            fi
           elif [ "$MODE" = "api-film" ]; then
             # Prefer Oracle's cached onyx TTS stems (same VO as every earlier cut).
             mkdir -p "${RUNNER_TEMP}/oracle-vo"
@@ -176,6 +212,65 @@ jobs:
           echo "--- remote exit code: $RC ---"
           rm -f ~/.ssh/oracle
           exit $RC
+
+      - name: Upload /api film v14
+        if: steps.trigger.outputs.skip != 'true' && steps.trigger.outputs.mode == 'api-film-v14'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-film-v14
+          path: |
+            ${{ runner.temp }}/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4
+            ${{ runner.temp }}/aideazz-api-film-v14/out/watch-v14.html
+            ${{ runner.temp }}/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14-poster.jpg
+            ${{ runner.temp }}/aideazz-api-film-v14/out/api-cta-qr.png
+          if-no-files-found: ignore
+
+      - name: Publish /api film v14 to Oracle
+        if: steps.trigger.outputs.skip != 'true' && steps.trigger.outputs.mode == 'api-film-v14'
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+        run: |
+          set -uo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/oracle
+          chmod 600 ~/.ssh/oracle
+          SSHOPTS="-i $HOME/.ssh/oracle -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=40 -o ServerAliveInterval=20 -o ServerAliveCountMax=6"
+          # Prefer Oracle's own out/ if compile ran there; else runner temp.
+          n=0
+          while [ "$n" -lt 6 ]; do
+            n=$((n + 1))
+            echo "publish v14 ssh attempt $n"
+            if ssh $SSHOPTS ubuntu@170.9.242.90 'test -f /home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4'; then
+              ssh $SSHOPTS ubuntu@170.9.242.90 'mkdir -p /tmp/api-film-out-v14 && cp -f /home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14.mp4 /home/ubuntu/aideazz-api-film-v14/out/can-ai-find-and-cite-you-v14-poster.jpg /home/ubuntu/aideazz-api-film-v14/out/watch-v14.html /home/ubuntu/aideazz-api-film-v14/out/api-cta-qr.png /tmp/api-film-out-v14/ 2>/dev/null; true'
+              ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' \
+                < scripts/oracle-resilience/publish-api-film-v14.sh
+              PRC=$?
+              echo "publish v14 rc=$PRC"
+              rm -f ~/.ssh/oracle
+              exit "$PRC"
+            fi
+            OUT="${RUNNER_TEMP}/aideazz-api-film-v14/out"
+            if [ -f "$OUT/can-ai-find-and-cite-you-v14.mp4" ]; then
+              ssh $SSHOPTS ubuntu@170.9.242.90 'mkdir -p /tmp/api-film-out-v14 && rm -f /tmp/api-film-out-v14/*' \
+                && scp $SSHOPTS \
+                  "$OUT/can-ai-find-and-cite-you-v14.mp4" \
+                  "$OUT/can-ai-find-and-cite-you-v14-poster.jpg" \
+                  "$OUT/api-cta-qr.png" \
+                  "$OUT/watch-v14.html" \
+                  ubuntu@170.9.242.90:/tmp/api-film-out-v14/ \
+                && ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' \
+                  < scripts/oracle-resilience/publish-api-film-v14.sh
+              PRC=$?
+              echo "publish v14 rc=$PRC"
+              rm -f ~/.ssh/oracle
+              exit "$PRC"
+            fi
+            echo "publish v14 attempt $n — file not ready"
+            sleep $((n * 10))
+          done
+          rm -f ~/.ssh/oracle
+          echo "WARN: v14 not on Oracle yet — film may be in the api-film-v14 artifact"
+          exit 1
 
       - name: Upload /api film
         if: steps.trigger.outputs.skip != 'true' && steps.trigger.outputs.mode == 'api-film'

@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 /**
- * YouTube promo + walkthrough for aideazz.xyz/api
+ * YouTube promo v14 for aideazz.xyz/api — absolutely fresh cut.
  *
- * Uses the Atuona Film Studio stack that already ships in this repo:
- *   Runway Gen-4.5 image→video (same path as /visualize runway)
+ *   DeepSeek (when keyed) writes the motion line; Seedance 2.5 shoots I2V.
  *   OpenAI TTS tts-1 / onyx / 0.9 via curl (node fetch hangs on Oracle)
  *   ffmpeg: 1920×1080 30fps, slow-mo not freeze, 1.3s xfade, mono title cards,
  *   intro MUST NOT fade in from black, sidechain-ducked music, loudnorm −16 LUFS
+ *   Music: juicy unused Pixabay (Mango Sky / tropical house). No drone fallback.
  *
- * Never build inside the git checkout. Work dir: /home/ubuntu/aideazz-api-film/
- * Publish: /var/www/influencer-images/youtube/  (NOT the Atuona poetry gallery)
- *
+ * Never build inside the git checkout. Work dir: /home/ubuntu/aideazz-api-film-v14/
+ * Publish ONLY can-ai-find-and-cite-you-v14.mp4 — never v13 / v12 / unversioned.
  * Copy scripts/atuona-film3.mjs settings — do not re-invent the chains.
  */
 import fs from 'fs';
@@ -28,15 +27,14 @@ async function execFileP(cmd, args, opts) {
 }
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const BASE = process.env.API_FILM_DIR || '/home/ubuntu/aideazz-api-film';
+const BASE = process.env.API_FILM_DIR || '/home/ubuntu/aideazz-api-film-v14';
 const W = path.join(BASE, 'work');
-const VODIR = path.join(BASE, 'vo');
+const VODIR = path.join(BASE, 'vo-v14');
 const CLIPDIR = path.join(BASE, 'clips');
 const ENV_FILE = process.env.CTO_ENV || '/home/ubuntu/cto-aipa/.env';
-const ATUONA_MUSIC_DIR = '/home/ubuntu/cto-aipa/data/atuona/films/music';
 const FILM_MUSIC_DIR = path.join(BASE, 'music');
-// Poetry beds + every /api promo bed already published (v13 = Kulakovka Chill House).
-const BURNED_MUSIC = /light in the void|fatal error|dark-cinematic-drone|atmospheric-dark-cinematic|morning-light-fresh-corporate|tropical-cocktail|fresh-tropical|distant-horizon|oleg-mazur|chillout-enigmatic|chillout-lounge|joyful-chill|kulakovka/i;
+// Poetry beds (FILM_COMPILATION_GUIDE table) + the first-alpha dark track this promo already burned.
+const BURNED_MUSIC = /light in the void|fatal error|dark-cinematic-drone|atmospheric-dark-cinematic|morning-light-fresh-corporate|tropical-cocktail|fresh-tropical|distant-horizon/i;
 const PUBLISH = process.env.API_FILM_PUBLISH || path.join(BASE, 'out');
 const PUBLIC = 'https://webhook.aideazz.xyz/influencer-images/youtube';
 
@@ -48,17 +46,16 @@ const SANS = fs.existsSync('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
 const CTA = 'https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta';
 const XFADE_D = 1.3, LEAD = 0.7, TAIL = 1.9, SPEED = 0.9;
 const WX = 1920, HY = 1080, FPS = 30;
-const RUNWAY_API = 'https://api.dev.runwayml.com/v1';
-const RUNWAY_VER = '2024-11-06';
-const RUNWAY_MODEL = 'gen4.5';
+const SEEDANCE_MODEL = 'bytedance/seedance-2.5';
 const MOTION_ANCHOR =
   'Premium live-action product film, natural film grain, slow prestige pacing, tactile atmosphere. Subtle motion only; do not invent new objects, people, animals, logos, or text. No cartoon, 3D, Pixar, or toy mascots.';
 
 const FILM_TITLE = 'CAN AI FIND AND CITE YOU';
-const FILM_SUB = '11.09.2026  ·  AIDEAZZ.XYZ/API  ·  FREE AUDIT';
+const FILM_SUB = '12.09.2026  ·  AIDEAZZ.XYZ/API  ·  FREE AUDIT';
 const OUTRO_TITLE = 'AIDEAZZ.XYZ/API';
 const OUTRO_SUB = 'AUDIT MY SITE  ·  FREE  ·  NO SIGNUP';
 const SLUG = 'can-ai-find-and-cite-you';
+const CUT = 'v14';
 
 function readEnvKey(n) {
   try {
@@ -69,7 +66,8 @@ function readEnvKey(n) {
   }
 }
 const OPENAI = (process.env.OPENAI_API_KEY || readEnvKey('OPENAI_API_KEY')).trim();
-const RUNWAY = (process.env.RUNWAY_API_KEY || readEnvKey('RUNWAY_API_KEY')).trim();
+const REPLICATE = (process.env.REPLICATE_API_TOKEN || readEnvKey('REPLICATE_API_TOKEN')).trim();
+const DEEPSEEK = (process.env.DEEPSEEK_API_KEY || readEnvKey('DEEPSEEK_API_KEY')).trim();
 
 const caps = (s) => (s || '').toUpperCase();
 const track = (s) => caps(s).split('').join(' ');
@@ -143,47 +141,136 @@ function dataUri(file) {
   return `data:${mime};base64,${buf.toString('base64')}`;
 }
 
-async function runwayI2V(stillPath, promptText, destMp4) {
-  if (!RUNWAY) throw new Error('RUNWAY_API_KEY missing');
-  const body = {
-    model: RUNWAY_MODEL,
-    promptImage: dataUri(stillPath),
-    promptText: `5-second fragment. ${MOTION_ANCHOR} ${promptText}`.slice(0, 900),
-    duration: 5,
-    watermark: false,
-    ratio: '1280:720',
-  };
-  const create = await fetch(`${RUNWAY_API}/image_to_video`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${RUNWAY}`, 'Content-Type': 'application/json', 'X-Runway-Version': RUNWAY_VER },
-    body: JSON.stringify(body),
-  });
-  const createText = await create.text();
-  if (!create.ok) throw new Error(`Runway create ${create.status}: ${createText.slice(0, 240)}`);
-  const { id } = JSON.parse(createText);
-  process.stderr.write(`runway job ${id} ${path.basename(stillPath)}\n`);
-  for (let i = 0; i < 30; i++) {
-    await new Promise((r) => setTimeout(r, 20000));
-    const st = await fetch(`${RUNWAY_API}/tasks/${id}`, {
-      headers: { Authorization: `Bearer ${RUNWAY}`, 'X-Runway-Version': RUNWAY_VER },
-    });
-    const raw = await st.text();
-    if (!st.ok) {
-      process.stderr.write(`runway poll HTTP ${st.status}\n`);
-      continue;
+function extractHttpUrl(value) {
+  if (!value) return '';
+  if (typeof value === 'string' && value.startsWith('http')) return value;
+  if (Array.isArray(value)) return extractHttpUrl(value[0]);
+  if (typeof value === 'object') {
+    if (typeof value.url === 'function') {
+      try {
+        const u = value.url();
+        return extractHttpUrl(typeof u === 'string' ? u : u && u.href);
+      } catch {
+        /* ignore */
+      }
     }
-    const j = JSON.parse(raw);
-    if (j.status === 'SUCCEEDED' && j.output?.[0]) {
-      const url = String(j.output[0]);
+    return extractHttpUrl(value.url || value.uri || value.href);
+  }
+  return '';
+}
+
+async function deepseekMotion(motion) {
+  if (!DEEPSEEK) return motion;
+  const body = path.join(W, `deepseek-motion-${Date.now()}.json`);
+  fs.mkdirSync(W, { recursive: true });
+  fs.writeFileSync(
+    body,
+    JSON.stringify({
+      model: 'deepseek-chat',
+      temperature: 0.4,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You write image-to-video motion for ByteDance Seedance 2.5. One or two English sentences. Subtle prestige motion only. Do not invent objects, people, text, or logos. Return only the motion line.',
+        },
+        { role: 'user', content: motion },
+      ],
+    }),
+  );
+  try {
+    const { stdout } = await execFileP0(
+      'curl',
+      [
+        '-sS',
+        '--fail-with-body',
+        '-m',
+        '45',
+        'https://api.deepseek.com/chat/completions',
+        '-H',
+        `Authorization: Bearer ${DEEPSEEK}`,
+        '-H',
+        'Content-Type: application/json',
+        '-d',
+        `@${body}`,
+      ],
+      { timeout: 50000, maxBuffer: 1 << 20 },
+    );
+    const line = JSON.parse(stdout)?.choices?.[0]?.message?.content?.trim();
+    if (line && line.length > 20 && line.length < 600) {
+      process.stderr.write(`deepseek motion ${line.slice(0, 120)}\n`);
+      return line;
+    }
+  } catch (e) {
+    process.stderr.write(`WARN DeepSeek motion missed — using the still's written line (${e.message})\n`);
+  }
+  return motion;
+}
+
+async function seedanceI2V(stillPath, promptText, destMp4) {
+  if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing — Seedance 2.5 needs it');
+  const bodyFile = destMp4 + '.seedance.json';
+  fs.mkdirSync(path.dirname(destMp4), { recursive: true });
+  fs.writeFileSync(
+    bodyFile,
+    JSON.stringify({
+      input: {
+        prompt: `Cinematic fragment. ${MOTION_ANCHOR} ${promptText}`.slice(0, 900),
+        image: dataUri(stillPath),
+        duration: 8,
+        resolution: '720p',
+        aspect_ratio: '16:9',
+        generate_audio: false,
+      },
+    }),
+  );
+  const create = await execFileP0(
+    'curl',
+    [
+      '-sS',
+      '--fail-with-body',
+      '-m',
+      '120',
+      '-X',
+      'POST',
+      `https://api.replicate.com/v1/models/${SEEDANCE_MODEL}/predictions`,
+      '-H',
+      `Authorization: Bearer ${REPLICATE}`,
+      '-H',
+      'Content-Type: application/json',
+      '-H',
+      'Prefer: wait=60',
+      '-d',
+      `@${bodyFile}`,
+    ],
+    { timeout: 130000, maxBuffer: 1 << 24 },
+  );
+  let j = JSON.parse(create.stdout || '{}');
+  const getUrl = j.urls?.get || (j.id ? `https://api.replicate.com/v1/predictions/${j.id}` : '');
+  process.stderr.write(`seedance job ${j.id || '?'} ${path.basename(stillPath)} status=${j.status || '?'}\n`);
+  for (let i = 0; i < 36; i++) {
+    if (j.status === 'succeeded') {
+      const url = extractHttpUrl(j.output);
+      if (!url) throw new Error('Seedance succeeded without a video URL');
       await execFileP0('curl', ['-sS', '-L', '-o', destMp4, url], { timeout: 120000 });
-      if (!fs.existsSync(destMp4) || fs.statSync(destMp4).size < 10000) throw new Error('runway download empty');
-      process.stderr.write(`runway ok ${path.basename(destMp4)} ${(fs.statSync(destMp4).size / 1e6).toFixed(1)}MB\n`);
+      if (!fs.existsSync(destMp4) || fs.statSync(destMp4).size < 10000) throw new Error('seedance download empty');
+      process.stderr.write(`seedance ok ${path.basename(destMp4)} ${(fs.statSync(destMp4).size / 1e6).toFixed(1)}MB\n`);
       return destMp4;
     }
-    if (j.status === 'FAILED') throw new Error(`Runway FAILED: ${j.failure || raw.slice(0, 200)}`);
-    process.stderr.write(`runway ${id} ${j.status} (${i + 1}/30)\n`);
+    if (j.status === 'failed' || j.status === 'canceled') {
+      throw new Error(`Seedance ${j.status}: ${j.error || JSON.stringify(j).slice(0, 200)}`);
+    }
+    if (!getUrl) throw new Error(`Seedance create had no poll URL: ${JSON.stringify(j).slice(0, 200)}`);
+    await new Promise((r) => setTimeout(r, 10000));
+    const polled = await execFileP0(
+      'curl',
+      ['-sS', '--fail-with-body', '-m', '30', '-H', `Authorization: Bearer ${REPLICATE}`, getUrl],
+      { timeout: 40000, maxBuffer: 1 << 20 },
+    );
+    j = JSON.parse(polled.stdout || '{}');
+    process.stderr.write(`seedance ${j.id || '?'} ${j.status} (${i + 1}/36)\n`);
   }
-  throw new Error('Runway poll timeout');
+  throw new Error('Seedance poll timeout');
 }
 
 async function makeCard(titleRaw, subRaw, outFile, d, titleSize, bgImage, noFadeIn) {
@@ -376,54 +463,6 @@ async function overlaySlide(src, dest, lines) {
   return dest;
 }
 
-async function salvageWindow(dest, envSrc, envSs, envT, fallbackSrc, fallbackSs, fallbackT, label) {
-  const src = process.env[envSrc] || fallbackSrc;
-  if (!fs.existsSync(src) || fs.statSync(src).size < 1e6) return false;
-  const ss = process.env[envSs] || fallbackSs;
-  const t = process.env[envT] || fallbackT;
-  try {
-    await execFileP(
-      'ffmpeg',
-      ['-y', '-ss', ss, '-i', src, '-t', t, '-an', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', dest],
-      { maxBuffer: 1 << 26, timeout: 120000 },
-    );
-    if (fs.existsSync(dest) && fs.statSync(dest).size > 20000) {
-      process.stderr.write(`salvage ${label} ${src} ss=${ss} t=${t} ${(fs.statSync(dest).size / 1e6).toFixed(1)}MB\n`);
-      return true;
-    }
-  } catch (e) {
-    process.stderr.write(`WARN salvage ${label}: ${e.message}\n`);
-  }
-  return false;
-}
-
-async function salvageCrawlers(dest) {
-  if (
-    await salvageWindow(
-      dest,
-      'API_FILM_CRAWLERS_SRC',
-      'API_FILM_CRAWLERS_SS',
-      'API_FILM_CRAWLERS_T',
-      '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4',
-      '15.0',
-      '7.0',
-      'crawlers-v2',
-    )
-  ) {
-    return true;
-  }
-  return salvageWindow(
-    dest,
-    'API_FILM_CRAWLERS_SRC2',
-    'API_FILM_CRAWLERS_SS2',
-    'API_FILM_CRAWLERS_T2',
-    '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v5.mp4',
-    '11.0',
-    '7.0',
-    'crawlers-v5',
-  );
-}
-
 async function fruitSway(src, dest, seconds) {
   const take = Math.max(5.5, seconds || 7);
   const isImg = /\.(jpg|jpeg|png|webp)$/i.test(src);
@@ -435,34 +474,6 @@ async function fruitSway(src, dest, seconds) {
     { maxBuffer: 1 << 26, timeout: 180000 },
   );
   return dest;
-}
-
-async function salvageGrapes(dest) {
-  // Prefer the v7 stub (intro + grapevine) then the v2 Runway walk.
-  if (
-    await salvageWindow(
-      dest,
-      'API_FILM_GRAPES_SRC',
-      'API_FILM_GRAPES_SS',
-      'API_FILM_GRAPES_T',
-      '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v2.mp4',
-      '4.6',
-      '5.4',
-      'grapes-v2',
-    )
-  ) {
-    return true;
-  }
-  return salvageWindow(
-    dest,
-    'API_FILM_GRAPES_SRC2',
-    'API_FILM_GRAPES_SS2',
-    'API_FILM_GRAPES_T2',
-    '/var/www/influencer-images/youtube/can-ai-find-and-cite-you-v7.mp4',
-    '4.5',
-    '6.8',
-    'grapes-v7',
-  );
 }
 
 async function neuronPulse(src, dest, seconds, { sway, grow } = {}) {
@@ -541,32 +552,21 @@ async function bakeCaption(src, dest, caption, clipDur) {
 
 function pickMusic() {
   const pinned = (process.env.API_FILM_MUSIC || '').trim();
-  if (pinned && fs.existsSync(pinned) && fs.statSync(pinned).size > 20000) return pinned;
-  const lightName = /chill|house|sunset|groove|organic|lounge/i;
-  for (const dir of [FILM_MUSIC_DIR, ATUONA_MUSIC_DIR]) {
-    try {
-      const files = fs.readdirSync(dir).filter((f) => /\.(mp3|m4a|wav)$/i.test(f) && !BURNED_MUSIC.test(f));
-      const light = files.filter((f) => lightName.test(f));
-      const pick = light[0] || files[0];
-      if (pick) return path.join(dir, pick);
-    } catch {}
-  }
+  if (pinned && fs.existsSync(pinned) && fs.statSync(pinned).size > 20000 && !BURNED_MUSIC.test(pinned)) return pinned;
+  const juicyName = /v14-|mango|tropical|juicy|papaya|brazilian|beach-party|summer/i;
+  try {
+    const files = fs.readdirSync(FILM_MUSIC_DIR).filter((f) => /\.(mp3|m4a|wav)$/i.test(f) && !BURNED_MUSIC.test(f));
+    const juicy = files.filter((f) => juicyName.test(f));
+    const pick = juicy[0] || files[0];
+    if (pick) return path.join(FILM_MUSIC_DIR, pick);
+  } catch {}
   return null;
-}
-
-async function makeDrone(out) {
-  await execFileP(
-    'ffmpeg',
-    ['-y', '-f', 'lavfi', '-i', 'anoisesrc=color=brown:d=180:r=44100,lowpass=f=180,volume=0.35', '-f', 'lavfi', '-i', 'sine=frequency=55:duration=180', '-filter_complex', '[0:a][1:a]amix=inputs=2:weights=3 1,alimiter=limit=0.6[a]', '-map', '[a]', '-t', '180', out],
-    { timeout: 60000 },
-  );
-  return out;
 }
 
 const BEATS = [
   {
     id: 'grapes',
-    kind: 'runway',
+    kind: 'seedance',
     still: 'fruit/geo-grapes-citation.jpg',
     motion:
       'The grape cluster SWAYS on the vine. Individual berries shift a few millimetres. Dew slides. Neural constellation traces on each grape GLOW and fire — cyan then magenta pulses travel berry to berry like neurones. Slow prestige product film. There is only THIS cluster. No knife, no hand, no extra fruit, no text, no logo, no second vine.',
@@ -582,7 +582,7 @@ const BEATS = [
   },
   {
     id: 'split',
-    kind: 'runway',
+    kind: 'seedance',
     still: 'fruit/geo-pomegranate-100-vs-72.jpg',
     motion:
       'Pomegranate halves breathe; circuit traces pulse cyan then magenta. Numbers 100 and 72 stay exactly where they are — do not morph, do not duplicate, do not add new numerals. Slow push. No extra fruit. No grapevine.',
@@ -596,7 +596,7 @@ const BEATS = [
   },
   {
     id: 'crawlers',
-    kind: 'runway',
+    kind: 'seedance',
     still: 'fruit/geo-passionfruit-crawlers.jpg',
     motion:
       'Three glass crawlers WALK across the passionfruit pulp — legs shift, bodies orbit a few centimetres, purple cores pulse. Pulp glistens. Tiny living motion. Do not spawn a fourth crawler. No extra fruit. Do not invent text or names.',
@@ -611,7 +611,7 @@ const BEATS = [
   },
   {
     id: 'hand',
-    kind: 'runway',
+    kind: 'seedance',
     still: 'fruit/geo-pomegranate-audit-hand.jpg',
     motion:
       'Water droplets fall. The glass HUD stays locked to the fruit. The hand is still. No extra hands, no blood, no new UI panels, no changing the 100 score.',
@@ -621,7 +621,7 @@ const BEATS = [
   },
   {
     id: 'dashboard',
-    kind: 'runway',
+    kind: 'seedance',
     still: 'fruit/geo-pomegranate-dashboard-2026.jpg',
     motion:
       'Juice droplets fall. The glass AI visibility dashboard stays locked to the fruit. The hand is still. Numbers stay 100. No extra hands, no blood, no new UI panels. Slow prestige product film.',
@@ -670,37 +670,28 @@ const BEATS = [
 async function main() {
   for (const d of [BASE, W, VODIR, CLIPDIR, PUBLISH]) fs.mkdirSync(d, { recursive: true });
   fs.writeFileSync(path.join(BASE, 'ffmpeg-commands.log'), '');
-  process.stderr.write(`=== api-audit-film ${new Date().toISOString()} ===\n`);
-  process.stderr.write(`OPENAI ${OPENAI ? 'yes' : 'NO'} RUNWAY ${RUNWAY ? 'yes' : 'NO'}\n`);
+  process.stderr.write(`=== api-audit-film ${CUT} ${new Date().toISOString()} ===\n`);
+  process.stderr.write(`OPENAI ${OPENAI ? 'yes' : 'NO'} REPLICATE ${REPLICATE ? 'yes' : 'NO'} DEEPSEEK ${DEEPSEEK ? 'yes' : 'NO'}\n`);
 
-  if (RUNWAY) {
-    process.stderr.write('Runway Gen-4.5 image→video (one at a time — parallel THROTTLEs)\n');
+  if (REPLICATE) {
+    process.stderr.write('Seedance 2.5 image→video (one at a time). DeepSeek directs motion when keyed.\n');
     for (const id of ['grapes', 'crawlers', 'dashboard', 'hand', 'split']) {
-      const b = BEATS.find((x) => x.id === id && x.kind === 'runway');
+      const b = BEATS.find((x) => x.id === id && x.kind === 'seedance');
       if (!b) continue;
       const still = path.join(HERE, b.still);
       const raw = path.join(CLIPDIR, `${b.id}.mp4`);
-      const forceFruit = (b.id === 'grapes' || b.id === 'crawlers') && process.env.API_FILM_FORCE_FRUIT === '1';
-      if (!forceFruit && fs.existsSync(raw) && fs.statSync(raw).size > 20000) {
-        process.stderr.write(`runway cache hit ${b.id}\n`);
-        continue;
-      }
-      if (forceFruit) process.stderr.write(`${b.id} rebuild — do not reuse a still cache\n`);
+      if (fs.existsSync(raw)) fs.unlinkSync(raw);
+      process.stderr.write(`${b.id} rebuild — v14 does not reuse a still cache\n`);
       try {
-        await runwayI2V(still, b.motion, raw);
+        const motion = await deepseekMotion(b.motion);
+        await seedanceI2V(still, motion, raw);
       } catch (e) {
-        process.stderr.write(`WARN runway ${b.id}: ${e.message}\n`);
-        if (b.id === 'crawlers' && (await salvageCrawlers(raw))) {
-          const swayed = raw + '.sway.mp4';
-          await fruitSway(raw, swayed, b.clipDur || 8.2);
-          fs.renameSync(swayed, raw);
-          process.stderr.write('crawlers salvaged + sway so insects keep moving\n');
-        } else if (b.id === 'crawlers') {
-          process.stderr.write('crawlers still+sway — insects stay in frame\n');
+        process.stderr.write(`WARN seedance ${b.id}: ${e.message}\n`);
+        if (b.id === 'crawlers') {
+          process.stderr.write('crawlers still+sway — insects stay in frame (no v2 salvage)\n');
           await fruitSway(still, raw, b.clipDur || 8.2);
         } else if (b.id === 'grapes') {
-          // v2 salvage at 4.6s is pomegranate/title, not this vine. Use the grape still.
-          process.stderr.write('grapes from grape still + grow + neuron glow\n');
+          process.stderr.write('grapes from grape still + grow + neuron glow (no v2 salvage)\n');
           await neuronPulse(still, raw, b.clipDur || 8.0, { sway: true, grow: true });
         } else {
           process.stderr.write(`still fallback ${b.id}\n`);
@@ -708,6 +699,8 @@ async function main() {
         }
       }
     }
+  } else {
+    process.stderr.write('WARN REPLICATE missing — fruit stills will sway in ffmpeg, not Seedance\n');
   }
 
   const cover = path.join(HERE, 'fruit/geo-pomegranate-100-vs-72.jpg');
@@ -815,9 +808,8 @@ async function main() {
   }
   fs.mkdirSync(PUBLISH, { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const final = path.join(PUBLISH, `${SLUG}-${stamp}.mp4`);
-  const stable = path.join(PUBLISH, `${SLUG}.mp4`);
-  const v12 = path.join(PUBLISH, `${SLUG}-v12.mp4`);
+  const final = path.join(PUBLISH, `${SLUG}-${CUT}-${stamp}.mp4`);
+  const v14 = path.join(PUBLISH, `${SLUG}-v14.mp4`);
   const targetDur = Number(process.env.API_FILM_TARGET_DUR || 107);
   const voAt = voInfo.map((v) => ({ file: v.file, t: +(segStart(v.segIndex) + LEAD).toFixed(2) }));
   const donor = (process.env.API_FILM_AUDIO_FROM || '').trim();
@@ -844,8 +836,8 @@ async function main() {
       { maxBuffer: 1 << 27, timeout: 300000 },
     );
   } else {
-    let music = pickMusic();
-    if (!music) music = await makeDrone(path.join(W, 'drone.mp3'));
+    const music = pickMusic();
+    if (!music) throw new Error('juicy unused Pixabay bed required — refusing brown-noise drone');
     process.stderr.write(`music ${music}\n`);
     let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.22,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
     const vl = [];
@@ -862,19 +854,18 @@ async function main() {
     await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', final], { maxBuffer: 1 << 27, timeout: 300000 });
   }
 
-  fs.copyFileSync(final, stable);
-  fs.copyFileSync(final, v12);
-  const poster = path.join(PUBLISH, `${SLUG}-poster.jpg`);
+  fs.copyFileSync(final, v14);
+  const poster = path.join(PUBLISH, `${SLUG}-v14-poster.jpg`);
   await execFileP('ffmpeg', ['-y', '-i', final, '-frames:v', '1', '-update', '1', poster], { timeout: 30000 });
   const qrSrc = path.join(HERE, 'qr/api-cta-qr.png');
   if (fs.existsSync(qrSrc)) fs.copyFileSync(qrSrc, path.join(PUBLISH, 'api-cta-qr.png'));
   fs.copyFileSync(qrCard, path.join(PUBLISH, 'api-cta-endcard.png'));
   const outDur = await dur(final);
   console.log(`DONE ${path.basename(final)} (${(fs.statSync(final).size / 1e6).toFixed(1)}MB, ${outDur.toFixed(0)}s)`);
-  console.log(`PUBLIC ${PUBLIC}/${path.basename(v12)}`);
-  console.log(`STABLE ${PUBLIC}/${path.basename(stable)}`);
+  console.log(`PUBLIC ${PUBLIC}/${path.basename(v14)}`);
   console.log(`POSTER ${PUBLIC}/${path.basename(poster)}`);
   console.log(`CTA ${CTA}`);
+  console.log('v13 and unversioned files were not written');
 }
 
 main().catch((e) => {
