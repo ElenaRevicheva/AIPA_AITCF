@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 12:15 UTC | Add /deepseekkey (same contract as /pplxkey) so Elena can wire DeepSeek from Telegram | `src/atuona-creative-ai.ts`, `src/telegram-bot.ts`, `scripts/set-deepseek-stdin.sh` | menu deploy 34692523388 green |
+| | | | | |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 12:15 UTC — /deepseekkey (phone wire, same as /pplxkey)
+### 🟢 12 Sep 12:17 UTC — /deepseekkey is live (same contract as /pplxkey)
 
-**DONE:** Live `/menu` refresh took. Run 34692523388: `VERIFY: dist has visualize seedance` + `pm2 restart`. Seedance is on the live menu.
+**DONE:** `/deepseekkey` on Atuona + CTO AIPA. Run 34693255309: `VERIFY: dist has visualize seedance and deepseekkey` + restart. Menu Seedance line also live (34692523388).
 
-**NEXT:** Land `/deepseekkey` on Atuona + CTO bot. Elena taps it, pastes the key, bot deletes the message, probes DeepSeek, writes `.env`, restarts `--update-env`. Do not paste the key in chat.
+**NEXT:** Elena: create key at https://platform.deepseek.com/api_keys then in Atuona send `/deepseekkey sk-…`. Do not paste the key in Cursor.
 
-**VERIFIED BY:** run 34692523388 log line `VERIFY: dist has visualize seedance`.
+**VERIFIED BY:** Actions 34693255309 `VERIFY: dist has visualize seedance and deepseekkey`.
 
-**RISK:** Last cto-aipa restart 12:01 UTC — do not stack another deploy until ≥10 min later.
+**RISK:** Command only works after she pastes the key on the same line. Empty `/deepseekkey` just prints usage. Seedance needs no key.
 
 ### 🟢 11 Sep 22:40 UTC — /api film v13 is live (joyful chill house)
 
