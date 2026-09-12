@@ -38,27 +38,49 @@ function isHttpUrl(s: unknown): s is string {
   return typeof s === 'string' && /^https?:\/\//i.test(s.trim());
 }
 
+function urlFromUnknown(v: unknown): string | null {
+  if (isHttpUrl(v)) return v.trim();
+  if (v && typeof v === 'object') {
+    const o = v as { url?: unknown; uri?: unknown; href?: unknown };
+    if (isHttpUrl(o.url)) return String(o.url).trim();
+    if (isHttpUrl(o.uri)) return String(o.uri).trim();
+    if (isHttpUrl(o.href)) return String(o.href).trim();
+  }
+  return null;
+}
+
 export function extractLumaImageUrl(statusData: any): string | null {
-  const asset = statusData?.assets?.image;
-  if (isHttpUrl(asset)) return asset.trim();
+  const fromAsset = urlFromUnknown(statusData?.assets?.image);
+  if (fromAsset) return fromAsset;
+  const images = statusData?.assets?.images;
+  if (Array.isArray(images)) {
+    for (const img of images) {
+      const u = urlFromUnknown(img);
+      if (u) return u;
+    }
+  }
   const out = statusData?.output;
   if (Array.isArray(out)) {
-    const img =
-      out.find((o: any) => o?.type === 'image' && isHttpUrl(o?.url)) ||
-      out.find((o: any) => isHttpUrl(o?.url));
-    if (img?.url) return String(img.url).trim();
-    const first = out[0];
-    if (isHttpUrl(first)) return first.trim();
+    const typed = out.find((o: any) => o?.type === 'image');
+    const fromTyped = urlFromUnknown(typed) || urlFromUnknown(typed?.url);
+    if (fromTyped) return fromTyped;
+    for (const item of out) {
+      const u = urlFromUnknown(item);
+      if (u) return u;
+    }
   }
-  if (isHttpUrl(out)) return String(out).trim();
-  return null;
+  return urlFromUnknown(out) || urlFromUnknown(statusData?.image) || urlFromUnknown(statusData?.url);
 }
 
 export function extractRunwayImageUrl(task: any): string | null {
   const out = task?.output;
-  if (Array.isArray(out) && isHttpUrl(out[0])) return String(out[0]).trim();
-  if (isHttpUrl(out)) return String(out).trim();
-  return null;
+  if (Array.isArray(out)) {
+    for (const item of out) {
+      const u = urlFromUnknown(item);
+      if (u) return u;
+    }
+  }
+  return urlFromUnknown(out) || urlFromUnknown(task?.artifacts?.[0]) || urlFromUnknown(task?.url);
 }
 
 export function extractGeminiImageUrl(payload: any): string | null {
@@ -288,51 +310,85 @@ export type AddedImageDeps = {
   lumaApiUrl: string;
   runwayApiKey: string | null;
   geminiApiKey: string | null;
-  /** `/imagine luma 048` — try this vendor first, then the rest. */
+  /** `/imagine luma 048` — that vendor only. Flux is the unpaid fallback, not Omni/Runway. */
   prefer?: AddedImageProvider;
   /** Optional shots/ filename stem, e.g. `099-still`. Never `{pageId}` alone (that is the mp4). */
   persistStem?: string;
 };
 
-/** Luma uni-1-max → Gemini Flash Image → Runway gen4_image. Flux is not in this function. */
-export async function runAddedImageProviders(deps: AddedImageDeps): Promise<ImageGenResult | null> {
-  let order: AddedImageProvider[] = ['luma', 'omni', 'runway'];
-  if (deps.prefer && order.includes(deps.prefer)) {
-    order = [deps.prefer, ...order.filter((id) => id !== deps.prefer)];
-  }
+/** Named `/imagine luma` is Luma only. No prefer = Luma → Omni → Runway after Flux misses. */
+export function addedImageTryOrder(prefer?: AddedImageProvider): AddedImageProvider[] {
+  const all: AddedImageProvider[] = ['luma', 'omni', 'runway'];
+  if (prefer && all.includes(prefer)) return [prefer];
+  return all;
+}
+
+export type AddedImageAttempt = {
+  result: ImageGenResult | null;
+  miss: string | null;
+};
+
+function keyMissing(id: AddedImageProvider): string {
+  if (id === 'luma') return 'LUMA_API_KEY missing';
+  if (id === 'omni') return 'GEMINI_API_KEY missing';
+  return 'RUNWAY_API_KEY missing';
+}
+
+/** Luma / Gemini / Runway only. Flux is not in this function. */
+export async function runAddedImageProvidersDetailed(deps: AddedImageDeps): Promise<AddedImageAttempt> {
+  const order = addedImageTryOrder(deps.prefer);
+  let miss: string | null = null;
 
   for (const id of order) {
     try {
-      if (id === 'luma' && deps.lumaApiKey) {
+      if (id === 'luma') {
+        if (!deps.lumaApiKey) { miss = keyMissing(id); continue; }
         console.log('Trying Luma stills (additive)...');
-        return await tryLumaImage({
-          lumaApiUrl: deps.lumaApiUrl,
-          lumaApiKey: deps.lumaApiKey,
-          prompt: deps.prompt,
-          aspectRatio: deps.aspectRatio,
-        });
+        return {
+          result: await tryLumaImage({
+            lumaApiUrl: deps.lumaApiUrl,
+            lumaApiKey: deps.lumaApiKey,
+            prompt: deps.prompt,
+            aspectRatio: deps.aspectRatio,
+          }),
+          miss: null,
+        };
       }
-      if (id === 'omni' && deps.geminiApiKey) {
+      if (id === 'omni') {
+        if (!deps.geminiApiKey) { miss = keyMissing(id); continue; }
         console.log('Trying Gemini Flash Image (additive)...');
-        return await tryGeminiImage({
-          geminiApiKey: deps.geminiApiKey,
-          prompt: deps.prompt,
-          aspectRatio: deps.aspectRatio,
-          ...(deps.persistStem ? { persistStem: deps.persistStem } : {}),
-        });
+        return {
+          result: await tryGeminiImage({
+            geminiApiKey: deps.geminiApiKey,
+            prompt: deps.prompt,
+            aspectRatio: deps.aspectRatio,
+            ...(deps.persistStem ? { persistStem: deps.persistStem } : {}),
+          }),
+          miss: null,
+        };
       }
-      if (id === 'runway' && deps.runwayApiKey) {
+      if (id === 'runway') {
+        if (!deps.runwayApiKey) { miss = keyMissing(id); continue; }
         console.log('Trying Runway Gen-4 Image (additive)...');
-        return await tryRunwayImage({
-          runwayApiKey: deps.runwayApiKey,
-          prompt: deps.prompt,
-          aspectRatio: deps.aspectRatio,
-        });
+        return {
+          result: await tryRunwayImage({
+            runwayApiKey: deps.runwayApiKey,
+            prompt: deps.prompt,
+            aspectRatio: deps.aspectRatio,
+          }),
+          miss: null,
+        };
       }
     } catch (err: any) {
-      console.log(`${id} stills unavailable...`, err?.message);
+      miss = String(err?.message || `${id} stills unavailable`);
+      console.log(`${id} stills unavailable...`, miss);
     }
   }
 
-  return null;
+  return { result: null, miss };
+}
+
+export async function runAddedImageProviders(deps: AddedImageDeps): Promise<ImageGenResult | null> {
+  const { result } = await runAddedImageProvidersDetailed(deps);
+  return result;
 }
