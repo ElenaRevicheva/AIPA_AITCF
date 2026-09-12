@@ -5629,10 +5629,76 @@ _Just click any command to see what it does!_
 📊 *STATUS & FIX*
 ━━━━━━━━━━━━━━━━━━━━
 /status - 📈 Book & API status
+/deepseekkey - 🔑 Wire DeepSeek Flash (tap, then paste the key)
 /style - 🎨 My writing style guide
 /fixgallery - 🔧 Fix gallery issues
     `;
     await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
+  });
+
+  /**
+   * /deepseekkey <sk-…> — wire DeepSeek V4.1 Flash from the phone.
+   * Identical contract to CTO /pplxkey: delete first, STDIN helper, probe before write.
+   */
+  atuonaBot.command('deepseekkey', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/deepseekkey(@\S+)?\s*/i, '')
+      .trim();
+
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      /* older than 48h, or no delete rights */
+    }
+
+    if (!raw) {
+      await ctx.reply(
+        'Usage: /deepseekkey <your DeepSeek API key>\n\n' +
+          'I delete your message immediately, never log the value, and test the key ' +
+          'against DeepSeek before writing anything.\n\n' +
+          'Create one at https://platform.deepseek.com/api_keys — not chat.deepseek.com.',
+      );
+      return;
+    }
+
+    const key = raw.replace(/\s+/g, '');
+    if (!key.startsWith('sk-')) {
+      await ctx.reply(
+        'That does not start with "sk-", so it is probably not the key. ' +
+          'Nothing was written. Your message is deleted — send again.',
+      );
+      return;
+    }
+
+    await ctx.reply('🔐 Message deleted. Testing the key against DeepSeek before writing anything…');
+
+    const { spawn } = await import('child_process');
+    const helper = '/home/ubuntu/set-deepseek-stdin.sh';
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn(helper, [], { stdio: ['pipe', 'pipe', 'pipe'] });
+      child.stdin.write(key + '\n');
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 120_000);
+    });
+
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    if (result.startsWith('OK:')) {
+      await ctx.reply(
+        '✅ DeepSeek is wired in.\n\n' + result + '\n\n' +
+          'Restarting cto-aipa with --update-env so /create actually uses Flash. ' +
+          'The bot will go quiet for a few seconds.\n\n' +
+          '⚠️ If you pasted this key anywhere else, rotate it at platform.deepseek.com/api_keys.',
+      );
+      setTimeout(() => {
+        spawn('pm2', ['restart', 'cto-aipa', '--update-env'], { detached: true, stdio: 'ignore' }).unref();
+      }, 2000);
+    } else {
+      await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the key and send again.');
+    }
   });
   
   // /status - Book status
@@ -10913,6 +10979,7 @@ ${elenaLang === 'english'
           { command: 'export', description: '📤 Download all content' },
           { command: 'import_backup', description: '📥 Restore backup' },
           { command: 'status', description: '📈 Book & API status' },
+          { command: 'deepseekkey', description: '🔑 Wire DeepSeek API key (message is deleted)' },
           { command: 'style', description: '🎨 My writing style guide' },
           { command: 'fixgallery', description: '🔧 Fix gallery issues' },
         ]);
