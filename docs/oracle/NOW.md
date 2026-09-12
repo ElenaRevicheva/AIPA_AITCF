@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 14:10 UTC | Omni stills: Gemini returned pixels, we skipped inline bytes, Flux painted #099 | `src/atuona-image-waterfall.ts`, `src/atuona-creative-ai.ts`, `src/cto-aipa.ts` — branch `cursor/fix-omni-inline-0841`. Named `atuona` deploy after the fix. | pending |
+| | | | | |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,23 +131,23 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 14:10 UTC — `/imagine omni` skipped Gemini pixels
+### 🟢 12 Sep 14:11 UTC — `/imagine omni` keeps Gemini pixels. LIVE.
 
-**DONE:** `/imagine omni 099` (9:00 AM Panama) announced Gemini 3.1 Flash Image, then delivered **Flux 2 Pro**. Poem title `Could not generate content.` is DELIBERATE (§7), not the miss. Extractor only accepted `fileUri`; Flash Image returns `inlineData` and we threw `inline bytes only — skipped`.
+**DONE:** 9:00 AM `/imagine omni 099` announced Gemini then Flux 2 Pro painted — we skipped `inlineData`. Fix on `main` (`63ebe41`). Named `atuona` deploy [34698535446](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34698535446): checkout included `atuona-image-waterfall.ts` + `cto-aipa.ts`, `VERIFY: … and Gemini inline stills`, `pm2 restart` (`cto-aipa` pid 4132673, uptime 0s). #099 title stays (§7).
 
-**NEXT:** persist inline bytes, send Telegram `InputFile`, serve jpg on `/films/shots`. Do not fall through to Flux when Gemini returned pixels. Do not change #099's title.
+**NEXT:** Elena `/imagine omni 099` again. Caption must say **Gemini 3.1 Flash Image**, not Flux 2 Pro.
 
-**VERIFIED BY:** Discord caption `🎨 Flux 2 Pro` after `Generating still with Gemini`. Code: `extractGeminiImageUrl` + throw in `src/atuona-image-waterfall.ts`.
+**VERIFIED BY:** Actions 34698535446 VERIFY + restart. Contract `node scripts/test-atuona-image-pins.cjs` (32). Runtime persist wrote `099-still.png`, not `099.mp4`.
 
-**RISK:** Do not treat #099 title as a bug. Do not `cto_aipa` hard-reset.
+**RISK:** Do not `cto_aipa` hard-reset. Do not "fix" #099's title.
 
 ### 🟢 12 Sep 13:57 UTC — `/imagine` menu live; encodings synced
 
-**DONE:** Named `atuona` deploy [34697838572](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34697838572): checkout included image pins, `VERIFY: dist has … imagine Flux default`, `pm2 restart`. Leftover Creative Tools `/imagine` one-liner gone. Blobs match `main` ↔ PR #53.
+**DONE:** Named `atuona` deploy [34697838572](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34697838572). Leftover Creative Tools `/imagine` one-liner gone.
 
-**NEXT:** Omni inline fix (above). Laptop: `git pull` on `main`.
+**NEXT:** Omni retry (above). Laptop: `git pull` on `main`.
 
-**VERIFIED BY:** Actions 34697838572 VERIFY + restart. Hashes equal for six encoding files.
+**VERIFIED BY:** Actions 34697838572 VERIFY + restart.
 
 **RISK:** Do not `cto_aipa` hard-reset. `/visualize luma` stays video.
 
