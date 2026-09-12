@@ -630,6 +630,7 @@ Type /menu for all commands! 🚀
         { cmd: '/cita', desc: 'Clinic appointments to Trello cards: right Kira month board, Cita column, red (family), Panama times, column re-sorted. Sending the same block twice changes nothing.', usage: 'Reply to the clinic message (or a voice note) with /cita — or paste it: /cita <block>' },
         { cmd: '/dated', desc: 'YOUR OWN dated item as an ORANGE (business) card, same dated column. Understands "next Tuesday 3pm". It states the date back to you and refuses rather than guessing.', usage: '/dated 20 October — send the Fermatix invoice' },
         { cmd: '/citasort', desc: 'Re-sort every Kira Cita column by date now. Writes card position only — never content, dates or labels.', usage: '/citasort' },
+        { cmd: '/deepseekkey', desc: 'Wire DeepSeek V4.1 Flash for Atuona. Message is deleted; key is probed before write.', usage: '/deepseekkey sk-…' },
       ],
     },
     'wiring_research': {
@@ -1234,6 +1235,74 @@ _Try it now! Just tap the command above._`, { parse_mode: 'Markdown' });
           '⚠️ If you pasted a key into a chat earlier, rotate it at ' +
           'console.perplexity.ai — that one is still live.',
       );
+    } else {
+      await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the key and send again.');
+    }
+  });
+
+  /**
+   * /deepseekkey <sk-…> — wire DeepSeek V4.1 Flash into Atuona from a phone.
+   *
+   * Identical contract to /pplxkey: delete first, STDIN helper, probe before write.
+   * After a verified write, restart cto-aipa --update-env so process.env sees it.
+   */
+  bot.command('deepseekkey', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/deepseekkey(@\S+)?\s*/i, '')
+      .trim();
+
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      /* older than 48h, or no delete rights */
+    }
+
+    if (!raw) {
+      await ctx.reply(
+        'Usage: /deepseekkey <your DeepSeek API key>\n\n' +
+          'I delete your message immediately, never log the value, and test the key ' +
+          'against DeepSeek before writing anything.\n\n' +
+          'Create one at https://platform.deepseek.com/api_keys — not chat.deepseek.com.',
+      );
+      return;
+    }
+
+    const key = raw.replace(/\s+/g, '');
+    if (!key.startsWith('sk-')) {
+      await ctx.reply(
+        'That does not start with "sk-", so it is probably not the key. ' +
+          'Nothing was written. Your message is deleted — send again.',
+      );
+      return;
+    }
+
+    await ctx.reply('🔐 Message deleted. Testing the key against DeepSeek before writing anything…');
+
+    const { spawn } = await import('child_process');
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn('/home/ubuntu/set-deepseek-stdin.sh', [], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      child.stdin.write(key + '\n');
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 120_000);
+    });
+
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    if (result.startsWith('OK:')) {
+      await ctx.reply(
+        '✅ DeepSeek is wired in.\n\n' + result + '\n\n' +
+          'Restarting cto-aipa with --update-env so Atuona actually uses Flash. ' +
+          'The bot will go quiet for a few seconds.\n\n' +
+          '⚠️ If you pasted this key anywhere else, rotate it at platform.deepseek.com/api_keys.',
+      );
+      setTimeout(() => {
+        spawn('pm2', ['restart', 'cto-aipa', '--update-env'], { detached: true, stdio: 'ignore' }).unref();
+      }, 2000);
     } else {
       await ctx.reply('❌ ' + result + '\n\nNothing changed. Check the key and send again.');
     }
@@ -8420,6 +8489,7 @@ ${claudeMd.substring(0, 3500)}${claudeMd.length > 3500 ? '...(truncated)' : ''}
           // FAMILY / APPOINTMENTS
           { command: 'cita', description: '🏥 IENDI appointments → Trello cards (paste, forward or voice)' },
           { command: 'redditapp', description: '🔑 Wire Reddit OAuth so the community listener can actually search' },
+          { command: 'deepseekkey', description: '🔑 Wire DeepSeek Flash for Atuona (message is deleted)' },
           { command: 'dated', description: '🟠 Your own dated business card (orange) on the right month board' },
           { command: 'citasort', description: '🔢 Re-sort every Kira Cita column by date' },
           { command: 'radar', description: '🧹 Put Clean / Keep buttons back on the Follow-up radar' },

@@ -5,43 +5,41 @@ Atuona already calls DeepSeek V4.1 Flash (`deepseek-flash` at
 is a no-op. Opus 5 → remapped Groq → Grok still run. Seedance does **not**
 need this key — it uses the existing `REPLICATE_API_TOKEN`.
 
-**Never paste the key in a chat.** A key in a chat has to be rotated.
+**Never paste the key in Cursor, Slack, or email.** A key in those windows
+has to be rotated. Telegram `/deepseekkey` is the intended path: the bot
+deletes the message before it does anything else.
 
-## What you do (phone is fine)
+## What you do (phone — tap this)
+
+Same contract as `/pplxkey`.
 
 1. Open **https://platform.deepseek.com/api_keys** — the API console, not
    chat.deepseek.com.
 2. Create a key. Copy it once (`sk-…`). It is shown only at creation.
-3. Top up balance if the wallet is empty. An empty wallet returns HTTP 402
-   and Atuona will skip DeepSeek the same as a missing key.
-4. On Oracle, in `/home/ubuntu/cto-aipa/.env` (gitignored), add:
+3. Top up if the wallet is empty (HTTP 402 still writes the key; Flash
+   stays unused until there is balance).
+4. In Telegram, Atuona or CTO AIPA, send:
 
-   ```
-   DEEPSEEK_API_KEY=sk-…
-   DEEPSEEK_MODEL=deepseek-flash
-   ```
+   `/deepseekkey sk-…`
 
-   If a line already exists, replace it. Do not commit `.env`.
-5. Tell the agent **"key is on Oracle"** — do not send the value. The agent
-   restarts `cto-aipa` with `--update-env` so the process actually sees it.
-   `pm2 restart` without `--update-env` keeps the old empty env.
+   Or tap `/deepseekkey` in the slash menu, paste the key, send.
+5. The bot deletes your message, probes DeepSeek, writes Oracle `.env`,
+   then restarts `cto-aipa --update-env`.
 
-There is no `/deepseekkey` command yet. Same phone pattern as `/pplxkey` can
-be added later if typing into `.env` is the blocker.
+Atuona: https://t.me/Atuona_AI_CCF_AIdeazz_bot
+
+CTO AIPA: https://t.me/aitcf_aideazz_bot
 
 ## What you do not do
 
-- Do not put the key in Telegram, Slack, or this chat.
-- Do not put it in GitHub Actions secrets unless we add a write-path that
-  needs it. The bot reads Oracle `.env` only.
+- Do not put the key in Cursor, Slack, or email.
+- Do not put it in GitHub Actions secrets. The bot reads Oracle `.env` only.
 - Do not change `DEEPSEEK_MODEL` to the retired ids (`deepseek-v4-flash`,
   `deepseek-v4-pro`). Those now route to Flash anyway; use `deepseek-flash`.
 
 ## How you know it worked
 
-After the `--update-env` restart, Atuona boot logs:
-
-`DeepSeek: deepseek-flash (additive fallback)`
-
-instead of `⚪ set DEEPSEEK_API_KEY`. A `/create` that misses Opus then
-tries DeepSeek before Groq.
+The bot replies `✅ DeepSeek is wired in.` After the restart, Atuona boot
+logs `DeepSeek: deepseek-flash (additive fallback)` instead of
+`⚪ set DEEPSEEK_API_KEY`. A `/create` that misses Opus then tries DeepSeek
+before Groq.

@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 12:00 UTC — /menu refresh retry (vault-tree was missing on Oracle)
+### 🟡 12 Sep 12:15 UTC — /deepseekkey (phone wire, same as /pplxkey)
 
-**DONE:** First `atuona` deploy (run 34692410759) checked out 2 src files and `tsc` died: `Cannot find module './atuona-vault-tree'`. Process was **not** restarted (uptime still 3.7d). Named-file list now includes `src/atuona-vault-tree.ts`.
+**DONE:** Live `/menu` refresh took. Run 34692523388: `VERIFY: dist has visualize seedance` + `pm2 restart`. Seedance is on the live menu.
 
-**NEXT:** Retry `atuona` trigger. Then Elena: DeepSeek key at https://platform.deepseek.com/api_keys — **do not paste it in chat**. Steps: `docs/oracle/DEEPSEEK_ATUONA_KEY.md`. Seedance needs no new key.
+**NEXT:** Land `/deepseekkey` on Atuona + CTO bot. Elena taps it, pastes the key, bot deletes the message, probes DeepSeek, writes `.env`, restarts `--update-env`. Do not paste the key in chat.
 
-**VERIFIED BY:** pending — `VERIFY: dist has visualize seedance` in the next Actions log.
+**VERIFIED BY:** run 34692523388 log line `VERIFY: dist has visualize seedance`.
 
-**RISK:** Do not fire `cto_aipa` (hard-reset). Oracle src still lags; only named Atuona files are updated.
+**RISK:** Last cto-aipa restart 12:01 UTC — do not stack another deploy until ≥10 min later.
 
 ### 🟢 11 Sep 22:40 UTC — /api film v13 is live (joyful chill house)
 
