@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /**
- * Paint NEW v14 fruit stills with Flux 2 Pro. Not grapes / pomegranate / passionfruit.
- * Runs on Oracle (REPLICATE_API_TOKEN). Writes fruit/v14-*.jpg next to this script.
+ * v14 fruit stills. Flux 2 Pro is optional — Replicate returned 402 (no credit),
+ * which is why grapes stayed: the painter never wrote new files.
+ *
+ * Default: Wikimedia Commons CUT tropical fruit (mango / papaya / dragon fruit /
+ * pineapple / starfruit). Set API_FILM_TRY_FLUX=1 to spend Replicate if topped up.
  */
 import fs from 'fs';
 import path from 'path';
@@ -12,10 +15,11 @@ import { fileURLToPath } from 'url';
 
 const execFileP0 = promisify(execFile);
 const require = createRequire(import.meta.url);
-const { FRUIT } = require('./fruit-v14-spec.cjs');
+const { FRUIT, BANNED_FRUIT } = require('./fruit-v14-spec.cjs');
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ENV_FILE = process.env.CTO_ENV || '/home/ubuntu/cto-aipa/.env';
 const FLUX = (process.env.FLUX2_MODEL || 'black-forest-labs/flux-2-pro').trim();
+const TRY_FLUX = process.env.API_FILM_TRY_FLUX === '1';
 
 function readEnvKey(n) {
   try {
@@ -44,6 +48,23 @@ function extractHttpUrl(value) {
     return extractHttpUrl(value.url || value.uri || value.href);
   }
   return '';
+}
+
+function stillPath(b) {
+  return path.join(HERE, b.still);
+}
+
+function assertNewFruit() {
+  for (const b of FRUIT) {
+    if (BANNED_FRUIT.test(`${b.still} ${b.id}`)) throw new Error('v14 spec leaked an old fruit: ' + b.id);
+  }
+}
+
+function allStillsReady() {
+  return FRUIT.every((b) => {
+    const dest = stillPath(b);
+    return fs.existsSync(dest) && fs.statSync(dest).size > 20000;
+  });
 }
 
 async function fluxOnce(prompt, dest) {
@@ -87,6 +108,7 @@ async function fluxOnce(prompt, dest) {
   const http = (raw.match(/HTTP:(\d+)\s*$/) || [])[1] || '';
   const body = raw.replace(/\nHTTP:\d+\s*$/, '');
   if (http === '429') throw new Error('Flux 429 rate limit');
+  if (http === '402' || /Insufficient credit/i.test(body)) throw new Error(`Flux HTTP 402: ${body.slice(0, 160)}`);
   if (http && http !== '200' && http !== '201') throw new Error(`Flux HTTP ${http}: ${body.slice(0, 200)}`);
   let j = JSON.parse(body || '{}');
   const getUrl = j.urls?.get || (j.id ? `https://api.replicate.com/v1/predictions/${j.id}` : '');
@@ -126,6 +148,7 @@ async function flux(prompt, dest) {
       return await fluxOnce(prompt, dest);
     } catch (e) {
       last = e;
+      if (/402|Insufficient credit/i.test(e.message)) throw e;
       if (!/429|rate.?limit/i.test(e.message) || attempt === 6) throw e;
       const wait = attempt * 25;
       process.stderr.write(`flux 429 — wait ${wait}s (attempt ${attempt}/6)\n`);
@@ -135,25 +158,46 @@ async function flux(prompt, dest) {
   throw last;
 }
 
-async function main() {
-  if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing — cannot paint new v14 fruit');
-  process.stderr.write(`=== v14 Flux fruit stills ${new Date().toISOString()} ===\n`);
+async function fetchCutFruit() {
+  const py = path.join(HERE, 'fetch-v14-fruit-stills.py');
+  if (!fs.existsSync(py)) throw new Error('fetch-v14-fruit-stills.py missing');
+  process.stderr.write('fetching CUT tropical fruit stills from Wikimedia Commons (no grapes)\n');
+  await execFileP0('python3', [py], {
+    timeout: 180000,
+    maxBuffer: 1 << 20,
+    env: { ...process.env, API_FILM_FRUIT_DIR: path.join(HERE, 'fruit') },
+  });
+}
+
+async function paintWithFlux() {
+  if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing');
   process.stderr.write(`FLUX ${FLUX}\n`);
   for (const b of FRUIT) {
-    if (/grape|pomegranate|passionfruit|maracuya/i.test(`${b.still} ${b.id}`)) {
-      throw new Error('v14 spec leaked an old fruit: ' + b.id);
-    }
-    const dest = path.join(HERE, b.still);
+    const dest = stillPath(b);
     fs.mkdirSync(path.dirname(dest), { recursive: true });
-    if (fs.existsSync(dest) && fs.statSync(dest).size > 20000 && process.env.API_FILM_KEEP_FRUIT_STILLS === '1') {
-      process.stderr.write(`keep ${b.still}\n`);
-      continue;
-    }
     process.stderr.write(`paint ${b.id} → ${b.still}\n`);
     await flux(b.paint, dest);
     await new Promise((r) => setTimeout(r, 8000));
   }
   process.stderr.write(`PAINTED ${FRUIT.length} new v14 fruit stills (no grapes)\n`);
+}
+
+async function main() {
+  assertNewFruit();
+  process.stderr.write(`=== v14 fruit stills ${new Date().toISOString()} ===\n`);
+  if (TRY_FLUX && REPLICATE) {
+    try {
+      await paintWithFlux();
+    } catch (e) {
+      process.stderr.write(`Flux missed (${e.message.slice(0, 160)}) — Commons cut fruit instead\n`);
+      await fetchCutFruit();
+    }
+  } else {
+    process.stderr.write('Flux skipped (Replicate 402 last run / API_FILM_TRY_FLUX unset) — Commons cut fruit\n');
+    await fetchCutFruit();
+  }
+  if (!allStillsReady()) throw new Error('new v14 fruit stills missed — refusing grapes');
+  process.stderr.write(`READY ${FRUIT.map((f) => f.id).join(',')} stills (no grapes)\n`);
 }
 
 main().catch((e) => {

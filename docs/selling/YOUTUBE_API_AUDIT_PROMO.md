@@ -8,7 +8,7 @@ Compiled with the Atuona Film Studio stack already wired into this repo
 
 ## Length (this cut)
 
-VO and caption **wording** on existing beats are unchanged. Cut order: moving pomegranate, moving/growing grapevine with neurones and the **What it checks** chapter on that shot, moving maracuya crawlers, then Elena's shortened Loom, then the finishing slides. The CTA QR sits on **every shot**. Fruit labels stay burned onto the picture. QR outro.
+v14 middle is a **new fruit cut**: mango, papaya, dragon fruit, pineapple, starfruit. Not grapes, not pomegranate, not passionfruit. Then Elena's shortened Loom, then the finishing slides. The CTA QR sits on **every shot**. Fruit labels stay burned onto the picture. QR outro.
 
 ## Watch
 
@@ -71,7 +71,7 @@ Computed from beat durations + 1.3s xfade. Watch once and nudge if a line lands 
 
 ```
 0:00 Can AI find and cite you?
-0:04 What it checks (grapevine)
+0:04 What it checks (mango cut)
 0:11 Half of the fruit
 0:20 Six crawlers
 0:27 What the product is

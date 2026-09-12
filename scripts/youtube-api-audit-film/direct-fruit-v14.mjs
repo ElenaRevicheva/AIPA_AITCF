@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * v14 fruit director — DeepSeek writes motion, Seedance 2.5 shoots.
- * Runs on Oracle where DEEPSEEK_API_KEY and REPLICATE_API_TOKEN live.
- * Refuses to skip. No ffmpeg sway. No Runway. Does not touch v13.
+ * Runs on Oracle where DEEPSEEK_API_KEY lives.
+ * Refuses to skip DeepSeek. Seedance shoots when Replicate has credit;
+ * otherwise juice-cuts the NEW tropical stills (not grapes). No Runway. Does not touch v13.
  */
 import fs from 'fs';
 import path from 'path';
@@ -194,6 +195,7 @@ async function seedanceI2V(stillPath, promptText, destMp4) {
     } catch (e) {
       last = e;
       const msg = e.message || '';
+      if (/402|Insufficient credit/i.test(msg)) throw e;
       if (!/429|rate.?limit/i.test(msg) || attempt === 6) throw e;
       const wait = attempt * 25;
       process.stderr.write(`seedance 429 — wait ${wait}s (attempt ${attempt}/6)\n`);
@@ -203,12 +205,66 @@ async function seedanceI2V(stillPath, promptText, destMp4) {
   throw last;
 }
 
+const JUICE_HUE = { mango: 40, papaya: 18, dragon: 310, pineapple: 52, starfruit: 78 };
+
+async function juiceCut(stillPath, destMp4, id) {
+  const h = JUICE_HUE[id] || 30;
+  const fc =
+    `[0:v]scale=2008:1128:force_original_aspect_ratio=increase,crop=1920:1080:` +
+    `'(in_w-out_w)/2+36*sin(2*PI*t/2.8)':'(in_h-out_h)/2+20*cos(2*PI*t/2.1)',` +
+    `fps=30,format=yuv420p,setsar=1,eq=saturation=1.32:contrast=1.10:brightness=0.03,split=2[base][hot];` +
+    `[hot]eq=brightness=0.28:saturation=1.55,hue=h='${h}+18*sin(2*PI*t/1.4)',gblur=sigma=7[glow];` +
+    `[base][glow]blend=all_mode=screen:all_opacity=0.32,vignette=PI/5,setsar=1[v]`;
+  await execFileP0(
+    'ffmpeg',
+    [
+      '-y',
+      '-loop',
+      '1',
+      '-i',
+      stillPath,
+      '-f',
+      'lavfi',
+      '-i',
+      'anullsrc=channel_layout=stereo:sample_rate=44100',
+      '-filter_complex',
+      fc,
+      '-map',
+      '[v]',
+      '-map',
+      '1:a',
+      '-t',
+      '8.00',
+      '-c:v',
+      'libx264',
+      '-preset',
+      'veryfast',
+      '-crf',
+      '18',
+      '-pix_fmt',
+      'yuv420p',
+      '-c:a',
+      'aac',
+      '-ar',
+      '44100',
+      '-ac',
+      '2',
+      destMp4,
+    ],
+    { timeout: 180000, maxBuffer: 1 << 26 },
+  );
+  if (!fs.existsSync(destMp4) || fs.statSync(destMp4).size < 20000) {
+    throw new Error('juice-cut empty for ' + id);
+  }
+  process.stderr.write(`juice-cut ${id} on NEW still (Seedance wallet empty / rate-limited)\n`);
+  return destMp4;
+}
+
 async function main() {
   if (!DEEPSEEK) throw new Error('DEEPSEEK_API_KEY missing — v14 will not pretend DeepSeek directed this');
-  if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing — Seedance cannot shoot DeepSeek\'s motion');
   for (const d of [BASE, CLIPDIR, W]) fs.mkdirSync(d, { recursive: true });
   process.stderr.write(`=== v14 DeepSeek director ${new Date().toISOString()} ===\n`);
-  process.stderr.write(`DEEPSEEK yes model=${DEEPSEEK_MODEL} REPLICATE yes\n`);
+  process.stderr.write(`DEEPSEEK yes model=${DEEPSEEK_MODEL} REPLICATE ${REPLICATE ? 'yes' : 'NO'}\n`);
   const credit = [];
   for (const b of FRUIT) {
     const still = path.join(HERE, b.still);
@@ -219,7 +275,15 @@ async function main() {
     const raw = path.join(CLIPDIR, `${b.id}.mp4`);
     if (fs.existsSync(raw)) fs.unlinkSync(raw);
     const motion = await deepseekMotion(b.id, b.motion);
-    await seedanceI2V(still, motion, raw);
+    try {
+      if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing');
+      await seedanceI2V(still, motion, raw);
+    } catch (e) {
+      const msg = e.message || '';
+      if (!/402|Insufficient credit|429|rate.?limit|REPLICATE_API_TOKEN missing/i.test(msg)) throw e;
+      process.stderr.write(`Seedance missed for ${b.id} (${msg.slice(0, 120)}) — juice-cut NEW still\n`);
+      await juiceCut(still, raw, b.id);
+    }
     credit.push(`${b.id}: ${motion}`);
     await new Promise((r) => setTimeout(r, 8000));
   }

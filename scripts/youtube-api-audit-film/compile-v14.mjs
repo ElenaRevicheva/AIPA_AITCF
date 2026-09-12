@@ -682,20 +682,28 @@ async function main() {
     const p = path.join(CLIPDIR, `${id}.mp4`);
     return fs.existsSync(p) && fs.statSync(p).size > 20000;
   });
+  if (V14_FRUIT.some((f) => /grape|pomegranate|passionfruit/i.test(`${f.id} ${f.still}`))) {
+    throw new Error('v14 spec leaked grapes — refusing to compile');
+  }
   if (fruitReady && haveFruit) {
-    process.stderr.write('fruit clips already directed by DeepSeek + shot by Seedance — not rebuilding\n');
+    process.stderr.write('fruit clips already directed by DeepSeek on NEW tropical stills — not rebuilding\n');
   } else {
     if (!DEEPSEEK) throw new Error('v14 requires DEEPSEEK_API_KEY — will not silently skip');
-    if (!REPLICATE) throw new Error('v14 requires REPLICATE_API_TOKEN so Seedance can shoot DeepSeek\'s motion');
-    process.stderr.write('DeepSeek directs. Seedance 2.5 shoots. No ffmpeg sway fallback.\n');
+    process.stderr.write('DeepSeek directs. Seedance 2.5 shoots when credited; else juice-cut NEW stills.\n');
     for (const id of fruitIds) {
       const b = BEATS.find((x) => x.id === id && x.kind === 'seedance');
       if (!b) continue;
       const still = path.join(HERE, b.still);
+      if (!fs.existsSync(still)) throw new Error('missing NEW v14 still ' + still);
       const raw = path.join(CLIPDIR, `${b.id}.mp4`);
       if (fs.existsSync(raw)) fs.unlinkSync(raw);
       const motion = await deepseekMotion(b.motion);
-      await seedanceI2V(still, motion, raw);
+      try {
+        await seedanceI2V(still, motion, raw);
+      } catch (e) {
+        process.stderr.write(`Seedance missed ${id} (${(e.message || '').slice(0, 100)}) — juice-cut NEW still\n`);
+        await neuronPulse(still, raw, 8.0, { sway: true, grow: id === 'mango' || id === 'starfruit' });
+      }
     }
   }
 

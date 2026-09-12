@@ -160,10 +160,23 @@ jobs:
             scp_retry -r \
               scripts/youtube-api-audit-film/. \
               ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/ || exit 1
-            echo "=== Oracle: Flux paints NEW fruits (no grapes) ==="
+            echo "=== Oracle: NEW cut-fruit stills (mango/papaya/dragon/pineapple/starfruit — not grapes) ==="
             ssh $SSHOPTS ubuntu@170.9.242.90 \
               'export CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/paint-v14-fruits.mjs' \
               || { echo FATAL: new v14 fruit stills missed; exit 1; }
+            mkdir -p scripts/youtube-api-audit-film/fruit
+            scp_retry \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-mango.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-papaya.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-dragonfruit.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-pineapple.jpg' \
+              'ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fruit/v14-starfruit.jpg' \
+              scripts/youtube-api-audit-film/fruit/ || { echo FATAL: stills did not come back from Oracle; exit 1; }
+            ls -lh scripts/youtube-api-audit-film/fruit/
+            if ls scripts/youtube-api-audit-film/fruit | grep -Eiq 'grape|pomegranate|passion'; then
+              echo FATAL: grape/pomegranate still leaked into v14 fruit dir
+              exit 1
+            fi
             echo "=== Oracle: DeepSeek directs, Seedance shoots ==="
             ssh $SSHOPTS ubuntu@170.9.242.90 \
               'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v14 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/direct-fruit-v14.mjs' \

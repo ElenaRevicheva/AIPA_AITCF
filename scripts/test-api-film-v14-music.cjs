@@ -66,8 +66,8 @@ const { extractDeepseekLine } = require(path.join(root, 'scripts/youtube-api-aud
 ok(
   'Flash empty content uses reasoning_content',
   extractDeepseekLine({
-    choices: [{ message: { content: '', reasoning_content: 'thinking\nThe grape cluster sways a few millimetres; dew slides.' }, finish_reason: 'stop' }],
-  }).line.includes('grape cluster sways'),
+    choices: [{ message: { content: '', reasoning_content: 'thinking\nThe mango flesh glistens; juice beads slide.' }, finish_reason: 'stop' }],
+  }).line.includes('mango flesh glistens'),
 );
 ok(
   'Flash API error is not a silent skip',
@@ -88,8 +88,19 @@ ok('director spends the Flash wallet', fs.readFileSync(director, 'utf8').include
 ok('Seedance retries HTTP 429', fs.readFileSync(director, 'utf8').includes('seedance 429'));
 const spec = fs.readFileSync(path.join(root, 'scripts/youtube-api-audit-film/fruit-v14-spec.cjs'), 'utf8');
 ok('v14 middle is mango/papaya/pineapple not grapes', /mango/.test(spec) && /papaya/.test(spec) && /pineapple/.test(spec) && !/geo-grapes/.test(spec));
+ok('v14 spec bans grapes', /BANNED_FRUIT/.test(spec) && /starfruit/.test(spec) && /dragon/.test(spec));
 ok('v14 compile dropped the grape still', !src14.includes('geo-grapes-citation.jpg') && src14.includes('V14_FRUIT'));
+ok('v14 compile refuses a grape leak', src14.includes('v14 spec leaked grapes'));
 ok('workflow paints new fruit stills', wf.includes('paint-v14-fruits.mjs'));
+ok('workflow fetches cut fruit not grapes', wf.includes('v14-mango.jpg') && wf.includes('v14-starfruit.jpg') && !wf.includes('geo-grapes'));
+const fetchPy = path.join(root, 'scripts/youtube-api-audit-film/fetch-v14-fruit-stills.py');
+ok('cut-fruit fetcher exists', fs.existsSync(fetchPy));
+const fetchSrc = fs.readFileSync(fetchPy, 'utf8');
+ok('fetcher dests are v14 tropical cuts', /v14-mango\.jpg/.test(fetchSrc) && /v14-papaya\.jpg/.test(fetchSrc) && /v14-dragonfruit\.jpg/.test(fetchSrc) && /v14-pineapple\.jpg/.test(fetchSrc) && /v14-starfruit\.jpg/.test(fetchSrc));
+ok('fetcher never names a grape file', !/v14-grape|geo-grapes|passionfruit\.jpg|pomegranate\.jpg/.test(fetchSrc));
+ok('fetcher searches mango papaya pineapple', /mango/.test(fetchSrc) && /papaya/.test(fetchSrc) && /pineapple/.test(fetchSrc));
+ok('painter falls back when Flux 402', fs.readFileSync(path.join(root, 'scripts/youtube-api-audit-film/paint-v14-fruits.mjs'), 'utf8').includes('fetch-v14-fruit-stills.py'));
+ok('director juice-cuts NEW stills if Seedance 402', fs.readFileSync(director, 'utf8').includes('juice-cut NEW still'));
 ok('v14 compile talks Seedance', /seedance-2\.5|Seedance 2\.5/.test(src14));
 ok('v14 compile requires DeepSeek', /will not skip DeepSeek|will not silently skip/.test(src14));
 ok('v14 compile does not call Runway I2V', !/async function runwayI2V/.test(src14));

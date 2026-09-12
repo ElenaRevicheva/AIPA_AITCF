@@ -80,7 +80,7 @@ fi
 
 if [ -f "$DIR/clips/mango.mp4" ] && [ -f "$DIR/clips/papaya.mp4" ]; then
   export API_FILM_FRUIT_READY=1
-  echo "API_FILM_FRUIT_READY=1 (DeepSeek+Seedance NEW fruit clips present)"
+  echo "API_FILM_FRUIT_READY=1 (DeepSeek-directed NEW fruit clips present — mango/papaya/… not grapes)"
 fi
 
 echo
