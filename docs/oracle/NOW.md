@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 14:16 UTC | Named /imagine engines stay exclusive — Flux only if that API is unpaid | `src/atuona-image-waterfall.ts`, `src/atuona-creative-ai.ts` — branch `cursor/imagine-exclusive-engine-0841`. Named `atuona` deploy after. | pending |
+| | | | | |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 14:16 UTC — named `/imagine` must not hop vendors
+### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
-**DONE:** Omni inline bytes live. Remaining hole: `/imagine luma` still tried Omni then Runway before Flux, so a Luma miss could come back as Gemini.
+**DONE:** `/imagine luma|omni|runway` paints that vendor only. Flux is the unpaid fallback and Telegram says so. First deploy 34698863118 refused (uptime 391s < 10m). Retry [34699075497](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34699075497): `VERIFY: … and exclusive imagine engines`, `pm2 restart` (`cto-aipa` pid 4135047, uptime 0s). Blobs match `main` ↔ `cursor/imagine-exclusive-engine-0841`.
 
-**NEXT:** exclusive try order (`luma`→Luma only). Flux only when that wallet/API misses. Honest Telegram line before Flux. Do not rewrite `/visualize luma`.
+**NEXT:** Elena `/imagine luma 048` — caption Luma uni-1-max, or a Flux line that admits the miss. Laptop: `git pull` on `main`.
 
-**VERIFIED BY:** pending `addedImageTryOrder` + named atuona deploy.
+**VERIFIED BY:** Actions 34699075497 VERIFY + restart. `node scripts/test-atuona-image-pins.cjs` (43). Four file hashes equal.
 
-**RISK:** Do not `cto_aipa` hard-reset. #099 title stays.
+**RISK:** Do not `cto_aipa` hard-reset. `/visualize luma` stays video. #099 title stays.
 
 ### 🟢 12 Sep 14:11 UTC — `/imagine omni` keeps Gemini pixels. LIVE.
 
