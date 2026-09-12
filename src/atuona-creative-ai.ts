@@ -5910,7 +5910,6 @@ ${imagineMenuLines('048')}
 🌍 *CREATIVE TOOLS*
 ━━━━━━━━━━━━━━━━━━━━
 /spanish - 🇪🇸 Content in Spanish
-/imagine - 🎨 Create AI image
 
 ━━━━━━━━━━━━━━━━━━━━
 📊 *STATUS & FIX*

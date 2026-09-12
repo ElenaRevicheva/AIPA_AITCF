@@ -40,6 +40,7 @@ ok('DALL-E /imagine path still present', src.includes("model: 'dall-e-3'"));
 ok('imagine parses image provider', src.includes('parseImageProvider'));
 ok('imagine page still runner', src.includes('runImaginePageStill'));
 ok('menu lists imagine default + engines', src.includes('imagineDefaultLine') && src.includes('imagineMenuLines'));
+ok('menu dropped leftover Create AI image one-liner', !src.includes('/imagine - 🎨 Create AI image'));
 ok('video pin luma is still ray-3.2', video.includes("fallback: 'ray-3.2'"));
 ok('/visualize luma not rewritten as image', src.includes('parseVideoProvider') && video.includes("id: 'luma'"));
 ok('veo/kling/seedance/deepseek stay video-only in video pins',
