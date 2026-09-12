@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 16:30 UTC | v15 /api promo: /api hero patterns + DeepSeek Flash + mango/papaya/dragon/pineapple/starfruit. Do not overwrite v13/v14. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | pending |
+| Cursor Cloud | 12 Sep 16:42 UTC | v15 /api promo firing on Oracle — hero language + DeepSeek Flash. Do not overwrite v13/v14. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | 9e01c73 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 16:22 UTC — Elena: v14 fruit is fine, motion is ugly. `/api` hero explored.
+### 🟡 12 Sep 16:42 UTC — v15 fired. Waiting for the mp4.
 
-**DONE:** v14 is live but she rejected the look: natural stills, no movement, not tech. Exploration of the live `/api` backdrop is in `docs/selling/API_HERO_BACKDROP.md` (branch `cursor/youtube-api-v14-0841`). It is four Runway films (orange → pomegranate → kiwi → pineapple, whole → cut → technical object) + veil + scintillating canvas (`HeroBackdrop.tsx`, aideazz `15f35b6`). v14 used Commons photos + ffmpeg wobble because Seedance 402.
+**DONE:** v15 kit on `cursor/youtube-api-v15-0841`. Same fruits as rejected v14, `/api` hero language (void stills, whole→cut, gold–violet field). DeepSeek Flash directs. Fired `api-film-v15` (`9e01c73`). Local gates 52 + 51. v13/v14 stay.
 
-**NEXT:** Elena's — say whether to remake the middle with the `/api` pipeline (black-void stills + real I2V). Needs Runway on her account or Replicate topped.
+**NEXT:** wait for Actions: `VOID READY` → `USED DeepSeek on all 5` → `V15_OK` → `200 video/mp4` on `-v15.mp4`. Then idle the trigger and give Elena the URL.
 
-**VERIFIED BY:** aideazz `HeroBackdrop.tsx` + commits `15f35b6` / `7d4e323` / `28a535e`. v14 `juice-cut` log on 34703405924.
+**VERIFIED BY:** pending the Actions result line. Local: `node scripts/test-api-film-v15-hero.cjs` (52).
 
-**RISK:** Do not “fix” v14 with more Ken Burns. That is the thing she called ugly. Mosaic panels already rejected on `/api` (`9fc2ba3`).
+**RISK:** Do not overwrite v13/v14. Do not Ken-Burns grocery stills. Replicate wallet empty → expect hero-clip fallback, not Seedance. Mosaic already rejected.
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
