@@ -25,7 +25,7 @@ jobs:
           PRODUCT=$(head -n1 .deploy-trigger | tr -d '[:space:]')
           SLUG=$(sed -n '2p' .deploy-trigger | tr -d '[:space:]')
           case "$PRODUCT" in
-            whatsapp|telegram|influencer|dragontrade|vjh|vjh_web|openclaw|cto_aipa|atlas|fleet-verify|aideazz|blog_html|radar_buttons)
+            whatsapp|telegram|influencer|dragontrade|vjh|vjh_web|openclaw|cto_aipa|atuona|atlas|fleet-verify|aideazz|blog_html|radar_buttons)
               echo "product=$PRODUCT" >> "$GITHUB_OUTPUT"
               echo "slug=$SLUG" >> "$GITHUB_OUTPUT" ;;
             *)

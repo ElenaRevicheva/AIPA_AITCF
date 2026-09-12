@@ -21,6 +21,7 @@ on:
           - vjh_web
           - openclaw
           - cto_aipa
+          - atuona
           - atlas
           - fleet-verify
           - radar_buttons

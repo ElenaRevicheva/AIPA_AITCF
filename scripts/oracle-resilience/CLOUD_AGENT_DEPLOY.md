@@ -48,7 +48,8 @@ Verify: `git fetch origin main` in each product dir — no username prompt.
 | **vjh** | VibeJob Hunter loop | `main.py`, claude helpers |
 | **vjh_web** | CMO FastAPI :8080 | `web_app.py`, `main.py` |
 | **openclaw** | OpenClaw gateway | git pull + restart |
-| **cto_aipa** | CTO AIPA + Atuona (PM2) | git pull + npm build + PM2 |
+| **cto_aipa** | CTO AIPA + Atuona (PM2) | `reset --hard` + npm build + PM2 — last resort |
+| **atuona** | Atuona named files only (PM2) | checkout 2 src files + `npm run build` + PM2 — no hard reset |
 | **atlas** | Atlas Shifted radar (PM2) | git pull + PM2 whitespace |
 | **fleet-verify** | Health check all — **no deploy** | — |
 | **sprinter-aws** | AWS Lambda (not Oracle SSH) | builds + `deploy-lambda.mjs` |
