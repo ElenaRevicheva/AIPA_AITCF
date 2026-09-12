@@ -131,6 +131,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 12 Sep 13:22 UTC — today's Atuona encodings synced (git = Oracle = local)
+
+**DONE:** `origin/main` `bb1c6e1` / pins commit `66cb75d`. Oracle deploy 34696046633 checked out those src files and restarted. Local + PR #52 encoding blobs match main (`atuona-video-pins.ts`, `atuona-creative-ai.ts`, `llm-resilience.ts`, `telegram-bot.ts`, `set-deepseek-stdin.sh`). Only leftover was `.env.example` pin comments on the PR branch — synced.
+
+**NEXT:** Other task. Do not `cto_aipa` hard-reset. Do not rewrite `/visualize deepseek`.
+
+**VERIFIED BY:** git blob hashes equal main↔feature for the six encoding files; Actions 34696046633 VERIFY + restart.
+
+**RISK:** Oracle checkout still lags on unrelated files (named-file deploy). That is deliberate.
+
 ### 🟢 12 Sep 13:18 UTC — /visualize pins live (Omni 1.1 + Kling 3.0)
 
 **DONE:** Named `atuona` deploy [34696046633](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34696046633): checkout included `src/atuona-video-pins.ts`, `VERIFY: dist has visualize seedance and visualize deepseek`, `pm2 restart`. `/menu` now reads pins.
