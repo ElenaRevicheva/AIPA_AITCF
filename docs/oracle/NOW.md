@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 17:07 UTC | v15 no-Loom how-to slides + fruit hero. Firing. Do not overwrite v13/v14. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | a1658d3 |
+| Cursor Cloud | 12 Sep 17:32 UTC | v15 73s how-to compiled; 90s gate blocked publish. Dropping gate to 65s + re-fire. | `compile-api-film-v15-runner.sh`, `publish-api-film-v15.sh`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | 7e83092 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 17:07 UTC — v15 no Loom. How-to slides + 34 checks. Firing.
+### 🟡 12 Sep 17:32 UTC — v15 73s how-to is real. 90s stub gate blocked publish.
 
-**DONE:** Elena: no Loom. How-to slides teach `/api` (open → paste → score → 34 checks → fix). Fruit middle stays. Fired `a1658d3`. Gates 61.
+**DONE:** Run `34707257708` compiled `DONE …-v15-…mp4 (20.1MB, 73s)` + `V15_OK`, then `FATAL: v15 shorter than 90s — stub`. Loom-era leftover. Live `-v15.mp4` is still the wrong 114.9s Loom cut.
 
-**NEXT:** wait for `V15_OK` + `200 video/mp4` on `-v15.mp4`. Idle trigger. Give Elena the URL.
+**NEXT:** gate is 65s. Re-fire `api-film-v15` (reuse Oracle stills/clips). Prove `200 video/mp4` ~73s. Idle trigger. Give Elena the URL. Do not touch v13/v14.
 
-**VERIFIED BY:** pending Actions. Local: `node scripts/test-api-film-v15-hero.cjs` (61). Howto ffmpeg graph OK.
+**VERIFIED BY:** pending Actions on `7e83092`. Local: `node scripts/test-api-film-v15-hero.cjs` (64). v14 gates 51 (untouched).
 
-**RISK:** Older loom compile (`acf3568`) may still finish and write `-v15` first — this cut overwrites that file only. Do not touch v13/v14.
+**RISK:** Director unlinks clips if called — workflow must skip remake when the five mp4s exist. Do not overwrite v13/v14.
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
