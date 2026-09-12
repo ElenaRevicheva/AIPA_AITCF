@@ -246,8 +246,8 @@ jobs:
               "${RUNNER_TEMP}/aideazz-api-film-v14/out/" || true
             RC=0
           elif [ "$MODE" = "api-film-v15" ]; then
-            # DeepSeek Flash + Seedance / HeroBackdrop on Oracle (keys live there).
-            # Do not Ken Burns grocery stills. Do not touch v13 or v14.
+            # DeepSeek Flash + Runway Gen-4.5 from the WHOLE still (same camera as /api).
+            # Do not xfade a Commons cut. Do not touch v13 or v14.
             sudo apt-get update -qq
             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
             CLIP_DIR="${RUNNER_TEMP}/aideazz-api-film-v15/clips"
@@ -288,13 +288,14 @@ jobs:
               exit 1
             fi
             echo "v13 grape stills and v14 grocery stills may stay on disk — v15 does not use them"
-            echo "=== Oracle: DeepSeek Flash directs, Seedance or HeroBackdrop ==="
-            if ssh $SSHOPTS ubuntu@170.9.242.90 'for f in mango papaya dragon pineapple starfruit; do test -s /home/ubuntu/aideazz-api-film-v15/clips/${f}.mp4 || exit 1; done'; then
-              echo "REUSE v15 fruit clips already on Oracle — skip DeepSeek remake"
+            echo "=== Oracle: DeepSeek Flash directs, Runway Gen-4.5 shoots the whole still ==="
+            if ssh $SSHOPTS ubuntu@170.9.242.90 'test -s /home/ubuntu/aideazz-api-film-v15/clips/engine-v15.txt && grep -q "^runway$" /home/ubuntu/aideazz-api-film-v15/clips/engine-v15.txt && for f in mango papaya dragon pineapple starfruit; do test -s /home/ubuntu/aideazz-api-film-v15/clips/${f}.mp4 || exit 1; done'; then
+              echo "REUSE v15 Runway fruit clips already on Oracle"
             else
+              echo "REMAKE v15 fruit — previous clips were still-xfade, not Runway"
               ssh $SSHOPTS ubuntu@170.9.242.90 \
                 'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v15 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v15/direct-fruit-v15.mjs' \
-                || { echo FATAL: DeepSeek/Seedance/hero fruit missed — not publishing a silent skip; exit 1; }
+                || { echo FATAL: Runway fruit missed — not publishing another still xfade; exit 1; }
             fi
             scp_retry \
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/clips/mango.mp4' \
@@ -302,6 +303,7 @@ jobs:
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/clips/dragon.mp4' \
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/clips/pineapple.mp4' \
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/clips/starfruit.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/clips/engine-v15.txt' \
               'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v15/deepseek-motion-v15.txt' \
               "$CLIP_DIR/" || exit 1
             mv -f "$CLIP_DIR/deepseek-motion-v15.txt" "${RUNNER_TEMP}/aideazz-api-film-v15/deepseek-motion-v15.txt" 2>/dev/null || true

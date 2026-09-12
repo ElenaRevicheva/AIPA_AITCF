@@ -82,7 +82,7 @@ ok('v15 compile dropped grape stills', !src15.includes('geo-grapes-citation.jpg'
 ok('v15 compile refuses a grape leak', src15.includes('v15 spec leaked grapes'));
 ok('v15 writes only -v15.mp4', src15.includes('${SLUG}-v15.mp4') && !src15.includes('${SLUG}-v14.mp4') && !src15.includes('${SLUG}-v12.mp4'));
 ok('v15 poster is -v15-poster', src15.includes('${SLUG}-v15-poster.jpg') && !src15.includes('${SLUG}-v14-poster.jpg'));
-ok('v15 compile uses hero-clip not Ken Burns fallback', src15.includes('renderHeroClip') && src15.includes('hero-clip fallback'));
+ok('v15 compile refuses a Commons-cut fallback', src15.includes('Will not xfade a Commons cut') && !src15.includes('hero-clip fallback'));
 ok('v15 compile does not call neuronPulse', !/neuronPulse\(/.test(src15));
 ok('v15 has no Loom walkthrough', !src15.includes('loomwalk') && !src15.includes('findLoom') && !src15.includes('fetch-loom'));
 ok('v15 how-to slides replace UI stills', src15.includes("kind: 'howto'") && src15.includes('makeHowToClip') && src15.includes('ALL THIRTY-FOUR CHECKS'));
@@ -91,11 +91,12 @@ ok('v15 34-check columns add to 34', (src15.match(/'HTTP 200'/) && src15.include
 ok('v15 VO dir is vo-v15', src15.includes('vo-v15'));
 ok('v15 compile requires DeepSeek', /will not skip DeepSeek|will not silently skip/.test(src15));
 ok('v15 compile spends Flash', src15.includes('deepseek-flash') || src15.includes('DEEPSEEK_MODEL'));
-ok('v15 compile talks Seedance', /seedance-2\.5|Seedance 2\.5/.test(src15));
+ok('v15 compile talks Runway not Seedance as the camera', src15.includes('Runway Gen-4.5') && !src15.includes('hero-clip fallback'));
 ok('v15 never salvages v2/v5 picture', !/can-ai-find-and-cite-you-v2\.mp4/.test(src15));
 
-ok('hero-clip is whole→cut + field', srcHero.includes('whole') && srcHero.includes('xfade') && srcHero.includes('geq'));
-ok('hero-clip is not Ken Burns-only', !/Ken Burns/.test(srcHero) || srcHero.includes('Not Ken Burns'));
+ok('hero-clip keeps the whole still then dissolves into Runway', srcHero.includes('WHOLE = 2.4') && srcHero.includes('bodyMp4') && srcHero.includes('xfade'));
+ok('hero-clip field is independent-phase not a shared wave', srcHero.includes('12.9898') && srcHero.includes('gold') && srcHero.includes('prism'));
+ok('hero-clip refuses a Commons cut still', srcHero.includes('must not use a Commons cut still'));
 ok('void stills pad onto #08050e', srcVoid.includes('08050e'));
 ok('void stills fetch whole+cut', srcVoid.includes('whole') && srcVoid.includes('cut') && srcVoid.includes('VOID READY'));
 ok('void stills never name a grape dest', !/v15-grape|geo-grapes|passionfruit\.jpg|pomegranate\.jpg/.test(srcVoid));
@@ -106,8 +107,9 @@ ok('void stills can reuse v14 cut JPEGs on Oracle', srcVoid.includes('v14-mango.
 
 ok('director refuses to skip DeepSeek', dir.includes('will not skip DeepSeek') || dir.includes('will not pretend DeepSeek'));
 ok('director spends the Flash wallet', dir.includes('deepseek-flash'));
-ok('director Seedance retries HTTP 429', dir.includes('seedance 429'));
-ok('director falls back to HeroBackdrop not Ken Burns', dir.includes('HeroBackdrop') && dir.includes('renderHeroClip') && !dir.includes('juice-cut NEW still'));
+ok('director shoots Runway from the whole still', dir.includes('runwayI2V') && dir.includes('gen4.5') && dir.includes('b.whole'));
+ok('director does not fall back to a grocery cut', !dir.includes('renderHeroClip') && dir.includes('will not publish another still xfade') && !dir.includes('juice-cut NEW still'));
+ok('director stamps engine-v15 as runway', dir.includes('engine-v15.txt') && dir.includes('runway'));
 
 ok('v14 compile is untouched (still writes -v14)', src14.includes('${SLUG}-v14.mp4'));
 
@@ -128,7 +130,8 @@ ok('watch page plays v15', html.includes('can-ai-find-and-cite-you-v15.mp4') && 
 
 ok('workflow accepts api-film-v15', /api-film-v15/.test(wf));
 ok('workflow runs void-stills-v15.py', wf.includes('void-stills-v15.py'));
-ok('workflow reuses Oracle stills/clips when present', wf.includes('REUSE v15 stills') && wf.includes('REUSE v15 fruit clips'));
+ok('workflow reuses Oracle stills when present', wf.includes('REUSE v15 stills'));
+ok('workflow remakes fruit unless engine is runway', wf.includes('engine-v15.txt') && wf.includes('REMAKE v15 fruit') && wf.includes('REUSE v15 Runway fruit clips'));
 ok('workflow leak-check is v15-* only', wf.includes('v15-*.jpg') && wf.includes('v15-${f}-cut.jpg'));
 ok('workflow runs DeepSeek fruit on Oracle', wf.includes('direct-fruit-v15.mjs'));
 ok('workflow stitches v15 on Oracle', wf.includes('compile-api-film-v15-runner.sh') && wf.includes('Oracle: stitch VO + void fruit'));

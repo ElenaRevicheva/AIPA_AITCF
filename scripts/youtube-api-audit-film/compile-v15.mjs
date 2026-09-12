@@ -2,7 +2,8 @@
 /**
  * YouTube promo v15 for aideazz.xyz/api — /api hero language + DeepSeek Flash.
  *
- *   DeepSeek (when keyed) writes the motion line; Seedance 2.5 shoots I2V.
+ *   DeepSeek writes the motion line; Runway Gen-4.5 shoots I2V from the whole still
+ *   (same camera as aideazz.xyz/api). Canvas field overlays after the first picture.
  *   OpenAI TTS tts-1 / onyx / 0.9 via curl (node fetch hangs on Oracle)
  *   ffmpeg: 1920×1080 30fps, slow-mo not freeze, 1.3s xfade, mono title cards,
  *   intro MUST NOT fade in from black, sidechain-ducked music, loudnorm −16 LUFS
@@ -19,8 +20,6 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
-import { renderHeroClip } from './hero-clip-v15.mjs';
-
 const require = createRequire(import.meta.url);
 const { extractDeepseekLine } = require('./deepseek-motion-parse.cjs');
 const { FRUIT: V15_FRUIT } = require('./fruit-v15-spec.cjs');
@@ -181,7 +180,7 @@ async function deepseekMotion(motion) {
         {
           role: 'system',
           content:
-            'You write image-to-video motion for ByteDance Seedance 2.5, matching the aideazz.xyz/api hero: black void, whole fruit then cut then technical traces. One or two English sentences. Do not invent objects, people, text, or logos. Return only the motion line.',
+            'You write image-to-video motion for Runway Gen-4.5, matching the aideazz.xyz/api hero: black void, whole fruit then it opens then technical traces. One or two English sentences. Do not invent objects, people, text, or logos. Return only the motion line.',
         },
         { role: 'user', content: motion },
       ],
@@ -542,7 +541,7 @@ function pickMusic() {
 const BEATS = [
   {
     id: 'mango',
-    kind: 'seedance',
+    kind: 'runway',
     still: V15_FRUIT[0].still,
     whole: V15_FRUIT[0].whole,
     motion: V15_FRUIT[0].motion,
@@ -558,7 +557,7 @@ const BEATS = [
   },
   {
     id: 'papaya',
-    kind: 'seedance',
+    kind: 'runway',
     still: V15_FRUIT[1].still,
     whole: V15_FRUIT[1].whole,
     motion: V15_FRUIT[1].motion,
@@ -572,7 +571,7 @@ const BEATS = [
   },
   {
     id: 'dragon',
-    kind: 'seedance',
+    kind: 'runway',
     still: V15_FRUIT[2].still,
     whole: V15_FRUIT[2].whole,
     motion: V15_FRUIT[2].motion,
@@ -587,7 +586,7 @@ const BEATS = [
   },
   {
     id: 'pineapple',
-    kind: 'seedance',
+    kind: 'runway',
     still: V15_FRUIT[3].still,
     whole: V15_FRUIT[3].whole,
     motion: V15_FRUIT[3].motion,
@@ -597,7 +596,7 @@ const BEATS = [
   },
   {
     id: 'starfruit',
-    kind: 'seedance',
+    kind: 'runway',
     still: V15_FRUIT[4].still,
     whole: V15_FRUIT[4].whole,
     motion: V15_FRUIT[4].motion,
@@ -693,27 +692,9 @@ async function main() {
     throw new Error('v15 spec leaked grapes — refusing to compile');
   }
   if (fruitReady && haveFruit) {
-    process.stderr.write('fruit clips already directed by DeepSeek on black-void stills — not rebuilding\n');
+    process.stderr.write('fruit clips already directed — Runway from the whole still + canvas. not rebuilding\n');
   } else {
-    if (!DEEPSEEK) throw new Error('v15 requires DEEPSEEK_API_KEY — will not silently skip');
-    process.stderr.write('DeepSeek Flash directs. Seedance 2.5 shoots when credited; else HeroBackdrop clip (not Ken Burns).\n');
-    for (const id of fruitIds) {
-      const b = BEATS.find((x) => x.id === id && x.kind === 'seedance');
-      if (!b) continue;
-      const still = path.join(HERE, b.still);
-      const whole = path.join(HERE, b.whole);
-      if (!fs.existsSync(still)) throw new Error('missing v15 cut still ' + still);
-      if (!fs.existsSync(whole)) throw new Error('missing v15 whole still ' + whole);
-      const raw = path.join(CLIPDIR, `${b.id}.mp4`);
-      if (fs.existsSync(raw)) fs.unlinkSync(raw);
-      const motion = await deepseekMotion(b.motion);
-      try {
-        await seedanceI2V(still, motion, raw);
-      } catch (e) {
-        process.stderr.write(`Seedance missed ${id} (${(e.message || '').slice(0, 100)}) — hero-clip fallback\n`);
-        await renderHeroClip({ whole, cut: still, dest: raw, seconds: 8 });
-      }
-    }
+    throw new Error('v15 fruit clips missing — run direct-fruit-v15.mjs (Runway from the whole still). Will not xfade a Commons cut.');
   }
 
   const cover = path.join(HERE, V15_FRUIT[0].still);
@@ -743,13 +724,10 @@ async function main() {
     if (b.kind === 'howto') {
       raw = await makeHowToClip(b, raw, clipDur);
     } else if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
-      if (b.kind === 'seedance') {
-        const whole = path.join(HERE, b.whole);
-        if (!fs.existsSync(whole)) throw new Error('missing v15 whole still for hero clip ' + whole);
-        await renderHeroClip({ whole, cut: still, dest: raw, seconds: clipDur });
-      } else {
-        await stillToClip(still, raw, 5.5);
+      if (b.kind === 'runway') {
+        throw new Error('missing Runway fruit clip for ' + b.id + ' — will not fall back to a Commons cut still');
       }
+      await stillToClip(still, raw, 5.5);
     }
     const nat = await dur(raw);
     let normDur;

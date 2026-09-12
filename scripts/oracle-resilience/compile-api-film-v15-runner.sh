@@ -49,7 +49,7 @@ def present(k):
     if os.environ.get(k, "").strip():
         return True
     return any(line.startswith(k+"=") and line.split("=",1)[1].strip() for line in text.splitlines())
-for k in ("OPENAI_API_KEY", "REPLICATE_API_TOKEN", "DEEPSEEK_API_KEY", "BRIGHTDATA_API_TOKEN"):
+for k in ("OPENAI_API_KEY", "RUNWAY_API_KEY", "DEEPSEEK_API_KEY", "BRIGHTDATA_API_TOKEN"):
     print(f"{k}: {'yes' if present(k) else 'NO'}")
 PY
 
@@ -80,9 +80,9 @@ else
 fi
 [ -n "${API_FILM_MUSIC:-}" ] && [ -f "$API_FILM_MUSIC" ] || { echo FATAL: no selected music; exit 1; }
 
-if [ -f "$DIR/clips/mango.mp4" ] && [ -f "$DIR/clips/papaya.mp4" ]; then
+if [ -f "$DIR/clips/engine-v15.txt" ] && grep -q '^runway$' "$DIR/clips/engine-v15.txt" && [ -f "$DIR/clips/mango.mp4" ] && [ -f "$DIR/clips/papaya.mp4" ]; then
   export API_FILM_FRUIT_READY=1
-  echo "API_FILM_FRUIT_READY=1 (DeepSeek-directed void fruit clips present)"
+  echo "API_FILM_FRUIT_READY=1 (Runway from the whole still + canvas)"
 fi
 
 echo

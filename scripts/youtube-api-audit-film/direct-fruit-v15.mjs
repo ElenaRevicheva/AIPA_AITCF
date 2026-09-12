@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 /**
- * v15 director — DeepSeek Flash writes motion (the wallet /deepseekkey wired).
- * Seedance 2.5 shoots the black-void CUT still when Replicate has credit.
- * Otherwise: HeroBackdrop language (whole→cut + field), not Ken Burns.
+ * v15 director — the /api hero pipeline, not a still xfade.
+ *
+ * 1. Keep the WHOLE still (Elena: first picture is fine).
+ * 2. DeepSeek Flash writes the motion line.
+ * 3. Runway Gen-4.5 image→video from that whole still — same camera as
+ *    aideazz.xyz/api (HeroBackdrop reel). Not Seedance. Not a Commons cut.
+ * 4. finishApiHeroClip: 2.4s whole head → 1.2s dissolve → Runway body
+ *    + gold–white–violet independent-phase field + prism + veil.
+ *
+ * Fails if Runway misses. A written motion line on a grocery cut is not a film.
  * Does not touch v13 or v14.
  */
 import fs from 'fs';
@@ -11,7 +18,7 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
-import { renderHeroClip } from './hero-clip-v15.mjs';
+import { finishApiHeroClip } from './hero-clip-v15.mjs';
 
 const require = createRequire(import.meta.url);
 const { extractDeepseekLine } = require('./deepseek-motion-parse.cjs');
@@ -23,9 +30,11 @@ const BASE = process.env.API_FILM_DIR || '/home/ubuntu/aideazz-api-film-v15';
 const CLIPDIR = path.join(BASE, 'clips');
 const W = path.join(BASE, 'work');
 const ENV_FILE = process.env.CTO_ENV || '/home/ubuntu/cto-aipa/.env';
-const SEEDANCE_MODEL = 'bytedance/seedance-2.5';
+const RUNWAY_API = 'https://api.dev.runwayml.com/v1';
+const RUNWAY_VER = '2024-11-06';
+const RUNWAY_MODEL = 'gen4.5';
 const MOTION_ANCHOR =
-  'Premium live-action product film in a pure black void. Natural film grain, slow prestige pacing. Whole fruit first, then the cut, then technical traces. Do not invent people, logos, or readable text. No cartoon, 3D, Pixar, or toy mascots.';
+  'Premium live-action product film in a pure black void. Natural film grain, slow prestige pacing. The fruit stays this fruit. Then it opens and technical traces appear — glass HUD, cyan-to-magenta fibre, no readable text. No knife, no blade, no hand, no tool. No cartoon, 3D, Pixar, or toy mascots.';
 
 function readEnvKey(n) {
   try {
@@ -38,30 +47,12 @@ function readEnvKey(n) {
 
 const DEEPSEEK = (process.env.DEEPSEEK_API_KEY || readEnvKey('DEEPSEEK_API_KEY')).trim();
 const DEEPSEEK_MODEL = (process.env.DEEPSEEK_MODEL || readEnvKey('DEEPSEEK_MODEL') || 'deepseek-flash').trim();
-const REPLICATE = (process.env.REPLICATE_API_TOKEN || readEnvKey('REPLICATE_API_TOKEN')).trim();
+const RUNWAY = (process.env.RUNWAY_API_KEY || readEnvKey('RUNWAY_API_KEY')).trim();
 
 function dataUri(file) {
   const buf = fs.readFileSync(file);
   const mime = file.endsWith('.png') ? 'image/png' : 'image/jpeg';
   return `data:${mime};base64,${buf.toString('base64')}`;
-}
-
-function extractHttpUrl(value) {
-  if (!value) return '';
-  if (typeof value === 'string' && value.startsWith('http')) return value;
-  if (Array.isArray(value)) return extractHttpUrl(value[0]);
-  if (typeof value === 'object') {
-    if (typeof value.url === 'function') {
-      try {
-        const u = value.url();
-        return extractHttpUrl(typeof u === 'string' ? u : u && u.href);
-      } catch {
-        /* ignore */
-      }
-    }
-    return extractHttpUrl(value.url || value.uri || value.href);
-  }
-  return '';
 }
 
 async function deepseekMotion(id, motion) {
@@ -77,7 +68,7 @@ async function deepseekMotion(id, motion) {
         {
           role: 'system',
           content:
-            'You write image-to-video motion for ByteDance Seedance 2.5, matching the aideazz.xyz/api hero: black void, whole fruit then cut then technical traces. One or two English sentences. Do not invent objects, people, text, or logos. Return only the motion line.',
+            'You write image-to-video motion for Runway Gen-4.5, matching the aideazz.xyz/api hero: black void, whole fruit then it opens then technical traces. One or two English sentences. Say no knife, no blade, no hand, no tool. Do not invent people, text, or logos. Return only the motion line.',
         },
         { role: 'user', content: motion },
       ],
@@ -111,132 +102,79 @@ async function deepseekMotion(id, motion) {
   return parsed.line;
 }
 
-async function seedanceCreate(bodyFile) {
-  const create = await execFileP0(
-    'curl',
-    [
-      '-sS',
-      '-w',
-      '\nHTTP:%{http_code}',
-      '-m',
-      '120',
-      '-X',
-      'POST',
-      `https://api.replicate.com/v1/models/${SEEDANCE_MODEL}/predictions`,
-      '-H',
-      `Authorization: Bearer ${REPLICATE}`,
-      '-H',
-      'Content-Type: application/json',
-      '-H',
-      'Prefer: wait=60',
-      '-d',
-      `@${bodyFile}`,
-    ],
-    { timeout: 130000, maxBuffer: 1 << 24 },
-  );
-  const raw = create.stdout || '';
-  const http = (raw.match(/HTTP:(\d+)\s*$/) || [])[1] || '';
-  const body = raw.replace(/\nHTTP:\d+\s*$/, '');
-  if (http === '429') throw new Error('Seedance 429 rate limit');
-  if (http && http !== '200' && http !== '201') {
-    throw new Error(`Seedance create HTTP ${http}: ${body.slice(0, 200)}`);
-  }
-  return JSON.parse(body || '{}');
-}
-
-async function seedanceI2VOnce(stillPath, promptText, destMp4) {
-  if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing');
-  const bodyFile = destMp4 + '.seedance.json';
-  fs.writeFileSync(
-    bodyFile,
-    JSON.stringify({
-      input: {
-        prompt: `Cinematic fragment. ${MOTION_ANCHOR} ${promptText}`.slice(0, 900),
-        image: dataUri(stillPath),
-        duration: 8,
-        resolution: '720p',
-        aspect_ratio: '16:9',
-        generate_audio: false,
-      },
-    }),
-  );
-  let j = await seedanceCreate(bodyFile);
-  const getUrl = j.urls?.get || (j.id ? `https://api.replicate.com/v1/predictions/${j.id}` : '');
-  process.stderr.write(`seedance job ${j.id || '?'} ${path.basename(stillPath)} status=${j.status || '?'}\n`);
+async function runwayI2V(stillPath, promptText, destMp4) {
+  if (!RUNWAY) throw new Error('RUNWAY_API_KEY missing — /api hero is Runway, will not fake it with a still');
+  const body = {
+    model: RUNWAY_MODEL,
+    promptImage: dataUri(stillPath),
+    promptText: `9-12 second fragment. ${MOTION_ANCHOR} ${promptText}`.slice(0, 900),
+    duration: 10,
+    watermark: false,
+    ratio: '1280:720',
+  };
+  const create = await fetch(`${RUNWAY_API}/image_to_video`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${RUNWAY}`,
+      'Content-Type': 'application/json',
+      'X-Runway-Version': RUNWAY_VER,
+    },
+    body: JSON.stringify(body),
+  });
+  const createText = await create.text();
+  if (!create.ok) throw new Error(`Runway create ${create.status}: ${createText.slice(0, 240)}`);
+  const { id } = JSON.parse(createText);
+  process.stderr.write(`runway job ${id} ${path.basename(stillPath)}\n`);
   for (let i = 0; i < 36; i++) {
-    if (j.status === 'succeeded') {
-      const url = extractHttpUrl(j.output);
-      if (!url) throw new Error('Seedance succeeded without a video URL');
+    await new Promise((r) => setTimeout(r, 20000));
+    const st = await fetch(`${RUNWAY_API}/tasks/${id}`, {
+      headers: { Authorization: `Bearer ${RUNWAY}`, 'X-Runway-Version': RUNWAY_VER },
+    });
+    const raw = await st.text();
+    if (!st.ok) {
+      process.stderr.write(`runway poll HTTP ${st.status}\n`);
+      continue;
+    }
+    const j = JSON.parse(raw);
+    if (j.status === 'SUCCEEDED' && j.output?.[0]) {
+      const url = String(j.output[0]);
       await execFileP0('curl', ['-sS', '-L', '-o', destMp4, url], { timeout: 120000 });
-      if (!fs.existsSync(destMp4) || fs.statSync(destMp4).size < 10000) throw new Error('seedance download empty');
-      process.stderr.write(`seedance ok ${path.basename(destMp4)} ${(fs.statSync(destMp4).size / 1e6).toFixed(1)}MB\n`);
+      if (!fs.existsSync(destMp4) || fs.statSync(destMp4).size < 10000) throw new Error('runway download empty');
+      process.stderr.write(`runway ok ${path.basename(destMp4)} ${(fs.statSync(destMp4).size / 1e6).toFixed(1)}MB\n`);
       return destMp4;
     }
-    if (j.status === 'failed' || j.status === 'canceled') {
-      throw new Error(`Seedance ${j.status}: ${j.error || JSON.stringify(j).slice(0, 200)}`);
-    }
-    if (!getUrl) throw new Error(`Seedance create had no poll URL: ${JSON.stringify(j).slice(0, 200)}`);
-    await new Promise((r) => setTimeout(r, 10000));
-    const polled = await execFileP0(
-      'curl',
-      ['-sS', '--fail-with-body', '-m', '30', '-H', `Authorization: Bearer ${REPLICATE}`, getUrl],
-      { timeout: 40000, maxBuffer: 1 << 20 },
-    );
-    j = JSON.parse(polled.stdout || '{}');
-    process.stderr.write(`seedance ${j.id || '?'} ${j.status} (${i + 1}/36)\n`);
+    if (j.status === 'FAILED') throw new Error(`Runway FAILED: ${j.failure || raw.slice(0, 200)}`);
+    process.stderr.write(`runway ${id} ${j.status} (${i + 1}/36)\n`);
   }
-  throw new Error('Seedance poll timeout');
-}
-
-async function seedanceI2V(stillPath, promptText, destMp4) {
-  let last = new Error('Seedance never started');
-  for (let attempt = 1; attempt <= 4; attempt++) {
-    try {
-      return await seedanceI2VOnce(stillPath, promptText, destMp4);
-    } catch (e) {
-      last = e;
-      const msg = e.message || '';
-      if (/402|Insufficient credit/i.test(msg)) throw e;
-      if (!/429|rate.?limit/i.test(msg) || attempt === 4) throw e;
-      const wait = attempt * 20;
-      process.stderr.write(`seedance 429 — wait ${wait}s (attempt ${attempt}/4)\n`);
-      await new Promise((r) => setTimeout(r, wait * 1000));
-    }
-  }
-  throw last;
+  throw new Error('Runway poll timeout');
 }
 
 async function main() {
   if (!DEEPSEEK) throw new Error('DEEPSEEK_API_KEY missing — v15 will not pretend DeepSeek directed this');
+  if (!RUNWAY) throw new Error('RUNWAY_API_KEY missing — will not publish another still xfade as the /api hero');
   for (const d of [BASE, CLIPDIR, W]) fs.mkdirSync(d, { recursive: true });
-  process.stderr.write(`=== v15 DeepSeek Flash director ${new Date().toISOString()} ===\n`);
-  process.stderr.write(`DEEPSEEK yes model=${DEEPSEEK_MODEL} REPLICATE ${REPLICATE ? 'yes' : 'NO'}\n`);
+  process.stderr.write(`=== v15 Runway director ${new Date().toISOString()} ===\n`);
+  process.stderr.write(`DEEPSEEK yes model=${DEEPSEEK_MODEL} RUNWAY yes (Seedance not the camera)\n`);
   const credit = [];
   for (const b of FRUIT) {
     if (BANNED_FRUIT.test(`${b.still} ${b.id}`)) throw new Error('old fruit leaked into v15: ' + b.id);
-    const cut = path.join(HERE, b.still);
     const whole = path.join(HERE, b.whole);
-    if (!fs.existsSync(cut) || !fs.existsSync(whole)) {
-      throw new Error('missing v15 void stills for ' + b.id + ' — run void-stills-v15.py first');
+    if (!fs.existsSync(whole)) {
+      throw new Error('missing v15 whole still for ' + b.id + ' — run void-stills-v15.py first');
     }
     const raw = path.join(CLIPDIR, `${b.id}.mp4`);
+    const body = path.join(W, `${b.id}-runway.mp4`);
     if (fs.existsSync(raw)) fs.unlinkSync(raw);
+    if (fs.existsSync(body)) fs.unlinkSync(body);
     const motion = await deepseekMotion(b.id, b.motion);
-    try {
-      if (!REPLICATE) throw new Error('REPLICATE_API_TOKEN missing');
-      await seedanceI2V(cut, motion, raw);
-    } catch (e) {
-      const msg = e.message || '';
-      if (!/402|Insufficient credit|429|rate.?limit|REPLICATE_API_TOKEN missing/i.test(msg)) throw e;
-      process.stderr.write(`Seedance missed for ${b.id} (${msg.slice(0, 100)}) — HeroBackdrop clip, not Ken Burns\n`);
-      await renderHeroClip({ whole, cut, dest: raw, seconds: 8 });
-    }
+    await runwayI2V(whole, motion, body);
+    await finishApiHeroClip({ whole, bodyMp4: body, dest: raw });
     credit.push(`${b.id}: ${motion}`);
-    await new Promise((r) => setTimeout(r, 4000));
   }
   const log = path.join(BASE, 'deepseek-motion-v15.txt');
   fs.writeFileSync(log, credit.join('\n') + '\n');
-  process.stderr.write(`USED DeepSeek on all ${FRUIT.length} fruit shots. ${log}\n`);
+  fs.writeFileSync(path.join(CLIPDIR, 'engine-v15.txt'), 'runway\n');
+  process.stderr.write(`USED Runway on all ${FRUIT.length} fruit shots from the whole still. ${log}\n`);
 }
 
 main().catch((e) => {
