@@ -2,8 +2,11 @@
 
 Atuona already calls DeepSeek V4.1 Flash (`deepseek-flash` at
 `https://api.deepseek.com`). Until `DEEPSEEK_API_KEY` is on Oracle, that rung
-is a no-op. Opus 5 → remapped Groq → Grok still run. Seedance does **not**
-need this key — it uses the existing `REPLICATE_API_TOKEN`.
+is a no-op. Opus 5 → remapped Groq → Grok still run.
+
+**Video:** `/visualize deepseek 048` shoots a clip. The Flash key is optional
+there (motion). The clip uses the existing `REPLICATE_API_TOKEN` — same wallet
+as Seedance. `/visualize seedance 048` is the Seedance-named path.
 
 **Never paste the key in Cursor, Slack, or email.** A key in those windows
 has to be rotated. Telegram `/deepseekkey` is the intended path: the bot
