@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 11:58 UTC | Refresh live Atuona /menu (Seedance) via named-file `atuona` deploy — not `cto_aipa` hard-reset | `src/atuona-creative-ai.ts`, `src/llm-resilience.ts`, `.env.example`, `scripts/oracle-resilience/*`, `.deploy-trigger` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 11:39 UTC — additive Atuona only (Opus 5 + DeepSeek + Seedance)
+### 🟡 12 Sep 11:58 UTC — live /menu refresh in flight (named `atuona` deploy)
 
-**DONE:** first attempt overwrote the text waterfall; Elena stopped it; files were restored to `main`.
+**DONE:** Additive studio is on PR #52. Landing the same three files on `main` + a new `atuona` product (checkout those files, `npm run build`, `pm2 restart cto-aipa --update-env`). Does **not** `reset --hard` Oracle.
 
-**NEXT:** add only: `claude-opus-5`, DeepSeek V4.1 Flash as an extra fallback, `/visualize seedance`. Do not remove Groq/Grok/Luma/Kling/`/film`.
+**NEXT:** Elena: create DeepSeek key at https://platform.deepseek.com/api_keys — **do not paste it in chat**. Put on Oracle `.env` as `DEEPSEEK_API_KEY=` + `DEEPSEEK_MODEL=deepseek-flash`. Then say "key is on Oracle". Seedance needs no new key (`REPLICATE_API_TOKEN`). Steps: `docs/oracle/DEEPSEEK_ATUONA_KEY.md`.
 
-**VERIFIED BY:** pending.
+**VERIFIED BY:** pending Actions `atuona` deploy — grep live `dist/atuona-creative-ai.js` for `visualize seedance`.
 
-**RISK:** do not `pm2 restart` until she confirms.
+**RISK:** Full `cto_aipa` trigger still hard-resets the box. Use product `atuona` only. DeepSeek is a no-op until the key is on Oracle; `/visualize seedance` works without it.
 
 ### 🟢 11 Sep 22:40 UTC — /api film v13 is live (joyful chill house)
 

@@ -494,3 +494,48 @@ async function lastResortOpenAI(
   console.warn(`[${label}] OpenAI last resort returned ${text.length} chars`);
   return text;
 }
+
+const DEEPSEEK_KEY = () => process.env.DEEPSEEK_API_KEY?.trim() || '';
+const DEEPSEEK_MODEL = () => (process.env.DEEPSEEK_MODEL || 'deepseek-flash').trim();
+const DEEPSEEK_BASE = () => (process.env.DEEPSEEK_API_BASE || 'https://api.deepseek.com').trim().replace(/\/$/, '');
+
+export function deepseekConfigured(): boolean {
+  return Boolean(DEEPSEEK_KEY());
+}
+
+/** DeepSeek V4.1 Flash (`deepseek-flash`). Additive helper — does not change quality/classify/bulk. */
+export async function deepseekComplete(
+  systemPrompt: string | null,
+  userPrompt: string,
+  maxTokens: number,
+  label: string,
+  opts?: { imageUrl?: string; temperature?: number },
+): Promise<string> {
+  const key = DEEPSEEK_KEY();
+  if (!key) throw new Error('DEEPSEEK_API_KEY missing');
+  const userContent = opts?.imageUrl
+    ? [
+        { type: 'image_url', image_url: { url: opts.imageUrl } },
+        { type: 'text', text: userPrompt },
+      ]
+    : userPrompt;
+  const messages = systemPrompt
+    ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }]
+    : [{ role: 'user', content: userContent }];
+  const res = await fetch(`${DEEPSEEK_BASE()}/chat/completions`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: DEEPSEEK_MODEL(),
+      messages,
+      max_tokens: Math.min(maxTokens, 8192),
+      temperature: opts?.temperature ?? 0.9,
+    }),
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!res.ok) throw new Error(`DeepSeek ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+  const text = data.choices?.[0]?.message?.content?.trim() || '';
+  if (text) console.warn(`[${label}] DeepSeek (${DEEPSEEK_MODEL()}) returned ${text.length} chars`);
+  return text;
+}

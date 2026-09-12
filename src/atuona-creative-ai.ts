@@ -9,7 +9,7 @@ import Replicate from 'replicate';
 import { getRelevantMemory, saveMemory } from './database';
 import { Octokit } from '@octokit/rest';
 import { persistShot, persistShotBytes, shotPublicUrl, buildFilm } from './atuona-film-compiler';
-import { grokComplete, groqModel } from './llm-resilience';
+import { grokComplete, groqModel, deepseekComplete, deepseekConfigured } from './llm-resilience';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
 export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
 import * as fs from 'fs';
@@ -108,12 +108,13 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 //   • luma   → Luma Ray 3 Direct API  → Luma via Replicate (fallback)
 //   • runway → Runway Gen-4.5 image_to_video
 //   • veo    → Google Veo 3.1 (Gemini API, native audio) — needs GEMINI_API_KEY
-//   • omni   → Gemini Omni Flash (Interactions API, image→video + native audio)
-//   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Omni Flash → Kling v2.6 → Veo 3.1 → Runway.
+//   • omni     → Gemini Omni Flash (Interactions API, image→video + native audio)
+//   • seedance → ByteDance Seedance 2.5 via Replicate (additive; `/visualize seedance NNN`)
+//   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Omni Flash → Kling v2.6 → Seedance 2.5 → Veo 3.1 → Runway.
 //   On moderation failure, auto-retries once with a video-safe keyframe (editorial shadow/silhouette still).
 //   When a provider is named explicitly and fails, we fall back through the chain
 //   and label the delivered clip with the provider that actually produced it (honest labeling).
-// Text: Claude Opus 4 (best creative), Llama 3.3 70B (fast fallback)
+// Text: Claude Opus 5 → DeepSeek V4.1 Flash (if keyed) → Groq (live id) → Grok. Existing rungs stay.
 // Voice: Whisper-1 (best transcription)
 // =============================================================================
 const IMAGE_MODELS = {
@@ -148,10 +149,12 @@ const VIDEO_MODELS = {
    *  v2.6 (latest): 1080p + NATIVE SYNCHRONIZED AUDIO (dialogue/ambient/sfx in one pass).
    *  Override: KLING_REPLICATE_MODEL. */
   klingReplicate: (process.env.KLING_REPLICATE_MODEL || 'kwaivgi/kling-v2.6').trim(),
+  /** ByteDance Seedance 2.5 — additive long-take i2v. Override: SEEDANCE_REPLICATE_MODEL. */
+  seedanceReplicate: (process.env.SEEDANCE_REPLICATE_MODEL || 'bytedance/seedance-2.5').trim(),
 };
 
 /** Canonical video provider ids selectable from `/visualize <provider> NNN`. */
-type VideoProvider = 'luma' | 'runway' | 'veo' | 'omni' | 'kling';
+type VideoProvider = 'luma' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance';
 /** Map operator aliases → canonical provider id. Returns null if the token isn't a provider. */
 function parseVideoProvider(token: string): VideoProvider | null {
   const t = token.toLowerCase();
@@ -160,6 +163,7 @@ function parseVideoProvider(token: string): VideoProvider | null {
   if (['veo', 'veo3', 'veo31'].includes(t)) return 'veo';
   if (['omni', 'omniflash', 'gemini-omni', 'gemini', 'google'].includes(t)) return 'omni';
   if (['kling', 'kuaishou', 'kwaivgi'].includes(t)) return 'kling';
+  if (['seedance', 'seedance25', 'seedance-2.5', 'seedance2.5', 'seedance2', 'bytedance', 'doubao'].includes(t)) return 'seedance';
   return null;
 }
 
@@ -3723,13 +3727,18 @@ function stopProactiveScheduler(): void {
 // AI MODELS - Using the BEST for underground poetry translation
 // =============================================================================
 
-// Primary: Claude Opus 4 - Best for nuanced literary translation
-// Fallback: Llama 3.3 70B via Groq - Fast and free
+// Primary: Claude Opus 5. Groq Llama 3.3 70B was shut down 16 Aug 2026 — remap
+// that dead id only; Grok and the rest of the rungs stay.
+const DEAD_GROQ_IDS = new Set(['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']);
+function atuonaGroqModel(): string {
+  const raw = (process.env.ATUONA_GROQ_MODEL || process.env.GROQ_MODEL || groqModel()).trim();
+  return DEAD_GROQ_IDS.has(raw) ? 'openai/gpt-oss-120b' : raw;
+}
+
 /** All text generation uses the same sampling: max creativity for ATUONA. Grounding (page text, knowledge, hard rules in prompts) limits hallucinations — not low temperature. */
 const AI_CONFIG = {
-  primaryModel: 'claude-opus-4-8',
-  // Getter, not a literal: resolves through the fleet-wide GROQ_MODEL switch.
-  get fallbackModel(): string { return groqModel(); },
+  primaryModel: (process.env.ATUONA_TEXT_MODEL || 'claude-opus-5').trim(),
+  get fallbackModel(): string { return atuonaGroqModel(); },
   poetryTemperature: 0.9,
   conversationTemperature: 0.9,
   /** Routers, theme tags, etc. — same as poetry (was 0.7). */
@@ -3737,8 +3746,10 @@ const AI_CONFIG = {
 };
 
 console.log('🎭 Atuona AI Config:');
-console.log(`   Primary: ${AI_CONFIG.primaryModel} (Claude Opus 4 - BEST)`);
-console.log(`   Fallback: ${AI_CONFIG.fallbackModel} (Groq)`);
+console.log(`   Primary: ${AI_CONFIG.primaryModel} (Claude Opus 5)`);
+console.log(`   DeepSeek: ${deepseekConfigured() ? 'deepseek-flash (additive fallback)' : '⚪ set DEEPSEEK_API_KEY'}`);
+console.log(`   Groq: ${AI_CONFIG.fallbackModel}`);
+console.log(`   Grok: unchanged last resort`);
 console.log(`   Temperature (all modes): ${AI_CONFIG.poetryTemperature}`);
 
 // =============================================================================
@@ -3756,16 +3767,37 @@ async function createContent(prompt: string, maxTokens: number = 2000, creativit
       ? AI_CONFIG.poetryTemperature
       : AI_CONFIG.standardTemperature;
   
+  const readClaudeText = (response: { content: Array<{ type: string; text?: string }> }) => {
+    const text = response.content
+      .filter((b): b is { type: 'text'; text: string } => b.type === 'text' && !!b.text)
+      .map(b => b.text)
+      .join('')
+      .trim();
+    return text || 'Could not generate content.';
+  };
+
   try {
-    const response = await anthropic.messages.create({
-      model: AI_CONFIG.primaryModel,
-      max_tokens: maxTokens,
-      temperature: temperature,
-      messages: [{ role: 'user', content: prompt }]
-    });
-    
-    const firstContent = response.content[0];
-    return firstContent && firstContent.type === 'text' ? firstContent.text : 'Could not generate content.';
+    try {
+      const response = await anthropic.messages.create({
+        model: AI_CONFIG.primaryModel,
+        max_tokens: maxTokens,
+        temperature: temperature,
+        messages: [{ role: 'user', content: prompt }]
+      });
+      return readClaudeText(response);
+    } catch (tempErr: any) {
+      // Opus 5 400s on temperature — retry the same call without it, then keep the old fallbacks.
+      const msg = String(tempErr?.error?.error?.message || tempErr?.message || '');
+      if (tempErr?.status === 400 && /temperature/i.test(msg)) {
+        const response = await anthropic.messages.create({
+          model: AI_CONFIG.primaryModel,
+          max_tokens: maxTokens,
+          messages: [{ role: 'user', content: prompt }]
+        });
+        return readClaudeText(response);
+      }
+      throw tempErr;
+    }
   } catch (claudeError: any) {
     const errorMessage = claudeError?.error?.error?.message || claudeError?.message || '';
     const st = claudeError?.status;
@@ -3773,17 +3805,30 @@ async function createContent(prompt: string, maxTokens: number = 2000, creativit
     const shouldFallback = errorMessage.includes('credit') || errorMessage.includes('billing')
       || st === 400 || st === 404 || st === 429 || st === 503 || st === 529;
     if (shouldFallback) {
-      console.log('⚠️ Atuona: Claude unavailable (' + (st || errorMessage.slice(0, 40)) + '), falling back to Groq...');
+      console.log('⚠️ Atuona: Claude unavailable (' + (st || errorMessage.slice(0, 40)) + '), falling back...');
+
+      if (deepseekConfigured()) {
+        try {
+          const ds = await deepseekComplete(null, prompt, maxTokens, 'atuona/generate', { temperature });
+          if (ds && ds.trim()) return ds;
+        } catch (dsErr: any) {
+          console.warn('⚠️ Atuona: DeepSeek Flash failed (' + (dsErr?.message || dsErr) + '), trying Groq...');
+        }
+      } else {
+        console.log('⚠️ Atuona: falling back to Groq...');
+      }
 
       try {
         const groqResponse = await groq.chat.completions.create({
           model: AI_CONFIG.fallbackModel,
           messages: [{ role: 'user', content: prompt }],
-          max_tokens: maxTokens,
+          max_tokens: Math.max(maxTokens, 300),
           temperature: temperature
         });
 
-        return groqResponse.choices[0]?.message?.content || 'Could not generate content.';
+        const groqText = groqResponse.choices[0]?.message?.content?.trim();
+        if (groqText) return groqText;
+        console.warn('⚠️ Atuona: Groq returned empty, trying Grok...');
       } catch (groqError: any) {
         // Tier 3: Grok (xAI). Groq's free tier caps (daily TPD + 12k TPM) can't handle large /create
         // prompts — that 429/413 is what broke page creation. Grok's big context keeps Atuona alive
@@ -3797,6 +3842,13 @@ async function createContent(prompt: string, maxTokens: number = 2000, creativit
         }
         throw groqError;
       }
+      try {
+        const grokText = await grokComplete(null, prompt, maxTokens, 'atuona/generate');
+        if (grokText && grokText.trim()) return grokText;
+      } catch (grokError: any) {
+        console.error('Atuona Grok last-resort error:', grokError?.message || grokError);
+      }
+      return 'Could not generate content.';
     }
     throw claudeError;
   }
@@ -4058,7 +4110,7 @@ interface VideoGenerationResult {
   success: boolean;
   videoUrl?: string;
   taskId?: string;
-  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'none';
+  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
@@ -4157,6 +4209,11 @@ async function runAlternateVideoChain(
   if (!exclude.has('kling') && replicate) {
     const kling = await tryKling(imageUrl, safeMotion, ctx);
     if (kling.success) return kling;
+  }
+
+  if (!exclude.has('seedance') && replicate) {
+    const seedance = await trySeedance(imageUrl, safeMotion, ctx);
+    if (seedance.success) return seedance;
   }
 
   if (!exclude.has('luma')) {
@@ -4287,6 +4344,10 @@ async function generateVideo(
     const kling = await tryKling(imageUrl, prompt, ctx);
     if (kling.success) return kling;
     return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'kling', options);
+  } else if (preferredProvider === 'seedance') {
+    const seedance = await trySeedance(imageUrl, prompt, ctx);
+    if (seedance.success) return seedance;
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'seedance', options);
   } else if (preferredProvider === 'runway') {
     if (runwayApiKey) {
       const rw = await tryRunway(imageUrl, prompt, ctx);
@@ -4394,11 +4455,19 @@ async function generateVideo(
   if (replicate) {
     const kling = await tryKling(imageUrl, safeMotion, ctx);
     if (kling.success) return kling;
-    console.log('⚠️ Kling failed, trying Veo 3.1...');
-    await ctx.reply(`⚠️ Kling unavailable${kling.error ? ` (${kling.error.substring(0, 80)})` : ''}, trying Google Veo 3.1...`);
+    console.log('⚠️ Kling failed, trying Seedance 2.5...');
+    await ctx.reply(`⚠️ Kling unavailable${kling.error ? ` (${kling.error.substring(0, 80)})` : ''}, trying Seedance 2.5...`);
   }
 
-  // ========== 2d. GOOGLE VEO 3.1 ==========
+  // ========== 2d. SEEDANCE 2.5 (additive — after the engines that already work) ==========
+  if (replicate) {
+    const seedance = await trySeedance(imageUrl, safeMotion, ctx);
+    if (seedance.success) return seedance;
+    console.log('⚠️ Seedance failed, trying Veo 3.1...');
+    await ctx.reply(`⚠️ Seedance unavailable${seedance.error ? ` (${seedance.error.substring(0, 80)})` : ''}, trying Google Veo 3.1...`);
+  }
+
+  // ========== 2e. GOOGLE VEO 3.1 ==========
   if (geminiApiKey && !googleVideoOmniOnly()) {
     const veo = await generateWithVeo(imageUrl, safeMotion, ctx);
     if (veo.success) return veo;
@@ -4735,6 +4804,57 @@ async function tryKling(
   } catch (klingErr: any) {
     console.error('Kling error:', klingErr.message);
     return { success: false, provider: 'kling', error: klingErr.message };
+  }
+}
+
+/** Seedance 2.5 image→video via existing REPLICATE_API_TOKEN. Additive — does not replace Kling/Luma. */
+async function trySeedance(
+  imageUrl: string,
+  prompt: string,
+  ctx: Context
+): Promise<VideoGenerationResult> {
+  if (!replicate) {
+    return { success: false, provider: 'seedance', error: 'Seedance needs REPLICATE_API_TOKEN' };
+  }
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  const rawDur = parseInt(process.env.SEEDANCE_DURATION || '10', 10);
+  const duration = Number.isFinite(rawDur) ? Math.min(30, Math.max(4, rawDur)) : 10;
+  const resolution = process.env.SEEDANCE_RESOLUTION === '480p' ? '480p' : '720p';
+  try {
+    await ctx.reply(
+      `🎬 *Generating video with Seedance 2.5...*\n\n_${VIDEO_MODELS.seedanceReplicate} · native audio · ${resolution} · ${duration}s · takes 2–5 minutes..._`,
+      { parse_mode: 'Markdown' }
+    );
+    const out = await replicate.run(
+      VIDEO_MODELS.seedanceReplicate as `${string}/${string}`,
+      {
+        input: {
+          prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
+          image: imageUrl,
+          duration,
+          resolution,
+          aspect_ratio: '16:9',
+          generate_audio: true,
+        },
+      }
+    );
+    let videoUrl: string | null = null;
+    if (out != null) {
+      const s = Array.isArray(out) ? String(out[0]) : String(out);
+      if (s.startsWith('http')) videoUrl = s;
+      if (!videoUrl && typeof out === 'object') {
+        const o = out as { url?: () => URL };
+        if (typeof o.url === 'function') { try { videoUrl = o.url().href; } catch { /* ignore */ } }
+      }
+    }
+    if (videoUrl && videoUrl.startsWith('http')) {
+      console.log('✅ Seedance via Replicate succeeded:', videoUrl.substring(0, 80) + '…');
+      return { success: true, videoUrl, provider: 'seedance', needsPolling: false };
+    }
+    return { success: false, provider: 'seedance', error: 'Seedance returned invalid output' };
+  } catch (seedanceErr: any) {
+    console.error('Seedance error:', seedanceErr.message);
+    return { success: false, provider: 'seedance', error: seedanceErr.message };
   }
 }
 
@@ -5249,6 +5369,7 @@ Example: \`/visualize 052\` → creates visuals for page 52`, { parse_mode: 'Mar
 \`/visualize runway 052\` → Runway Gen-4.5
 \`/visualize veo 052\` → Google Veo 3.1 (native audio)
 \`/visualize kling 052\` → Kling v2.6 (stylized/arthouse, native audio)
+\`/visualize seedance 052\` → Seedance 2.5 (long-take + native audio)
 
 _Default chain when Luma is dry: Omni Flash → Runway._
 
@@ -5328,7 +5449,7 @@ See: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/ATUONA-BOOK-ROADMAP.md
 *Publish:* /preview, /publish, /setpage
 *Drafts:* /draft, /read
 *Proactive:* /proactive, /dailyinspire, /history
-*Film:* /visualize (luma · omni · veo · runway · kling), /gallery, /film, /videostatus
+*Film:* /visualize (luma · omni · veo · runway · kling · seedance), /gallery, /film, /videostatus
 *Social:* /post
 *Export:* /export, /import_backup
 *Tools:* /spanish, /imagine
@@ -5485,6 +5606,7 @@ _Just click any command to see what it does!_
 /visualize runway 048 - 🎬 Runway Gen-4.5
 /visualize veo 048 - 🎬 Google Veo 3.1 (native audio)
 /visualize kling 048 - 🎬 Kling v2.6 (stylized/arthouse, native audio)
+/visualize seedance 048 - 🎬 Seedance 2.5 (long-take + native audio)
 /film build - 🎬✨ AUTO-ASSEMBLE shots → one film (VO+music)
 /gallery - 🖼 All visualizations
 /film - 🎬 Film compilation status
@@ -8957,6 +9079,7 @@ Create stunning visuals for your book pages:
 \`/visualize runway 048\` - Runway Gen-4.5
 \`/visualize veo 048\` - Google Veo 3.1 (native audio)
 \`/visualize kling 048\` - Kling v2.6 (stylized/arthouse, native audio)
+\`/visualize seedance 048\` - Seedance 2.5 (long-take + native audio)
 
 Each visualization creates:
 🎨 Flux 2 Pro image (newest, BEST quality!)
@@ -8972,6 +9095,8 @@ Visualizations: ${visualizations.length} pages
 🎬 Luma ray-3.2 (Direct): ${lumaApiKey ? '✅ Ready' : '⚪ Set LUMA_API_KEY'}
 🎬 Luma (Replicate): ${replicate ? '✅ Available' : '⚪ Set REPLICATE_API_TOKEN'}
 🎬 Gemini Omni Flash: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
+🎬 Seedance 2.5: ${replicate ? '✅ via Replicate' : '⚪ Set REPLICATE_API_TOKEN'}
+✍️ DeepSeek V4.1 Flash: ${deepseekConfigured() ? '✅ additive text fallback' : '⚪ Set DEEPSEEK_API_KEY'}
 🎬 Runway Gen-4.5: ${runwayApiKey ? '✅ Ready' : '⚪ Set RUNWAY_API_KEY'}
 🎬 Google Veo 3.1: ${geminiApiKey ? '✅ Ready' : '⚪ Set GEMINI_API_KEY'}
 🎬 Kling: ${replicate ? '✅ via Replicate' : '⚪ Set REPLICATE_API_TOKEN'}
@@ -9487,10 +9612,11 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
 
         if (videoResult.success) {
           // Ready URL providers (Replicate, Veo, Kling, Omni) → direct delivery.
-          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni')) {
+          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance')) {
             const providerLabel = videoResult.provider === 'omni' ? 'Gemini Omni Flash'
               : videoResult.provider === 'veo' ? 'Google Veo 3.1'
               : videoResult.provider === 'kling' ? 'Kling'
+              : videoResult.provider === 'seedance' ? 'Seedance 2.5'
               : 'Luma via Replicate';
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
@@ -9595,6 +9721,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
                   const providerLabel = fb.provider === 'omni' ? 'Gemini Omni Flash'
                     : fb.provider === 'veo' ? 'Google Veo 3.1'
                     : fb.provider === 'kling' ? 'Kling v2.6'
+                    : fb.provider === 'seedance' ? 'Seedance 2.5'
                     : 'Luma via Replicate';
                   await deliverFallbackVideo(fb.videoUrl, providerLabel);
                   return true;
@@ -10776,7 +10903,7 @@ ${elenaLang === 'english'
           { command: 'ritual', description: '🔄 Begin daily writing flow' },
           { command: 'create', description: '🎨 AI generates new content' },
           { command: 'publish', description: '🚀 Push page to atuona.xyz' },
-          { command: 'visualize', description: '🎥 Image+video — try: omni|luma|veo|runway|kling 048' },
+          { command: 'visualize', description: '🎥 Image+video — try: omni|luma|veo|runway|kling|seedance 048' },
           { command: 'gallery', description: '🖼 All visualizations' },
           { command: 'film', description: '🎞 Film compilation status' },
           { command: 'videostatus', description: '⏳ Video progress' },
