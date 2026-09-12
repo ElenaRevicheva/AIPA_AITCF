@@ -58,18 +58,23 @@ fi
 
 echo
 echo "=== 1c. juicy unused Pixabay (not Kulakovka, not Oleg-Mazur, not Tropical Cocktail) ==="
-set +e
-python3 "$KIT/fetch-pixabay-music.py"
-MUSIC_RC=$?
-set -e
-if [ "$MUSIC_RC" -ne 0 ]; then
-  echo "FATAL: juicy Pixabay fetch failed rc=$MUSIC_RC — refusing drone"
-  exit "$MUSIC_RC"
-fi
-if [ -f "$DIR/music/SELECTED.path" ]; then
-  export API_FILM_MUSIC="$(head -n1 "$DIR/music/SELECTED.path" | tr -d '\r')"
-  echo "API_FILM_MUSIC=$API_FILM_MUSIC"
-  [ -f "$DIR/music/SELECTED.credit" ] && echo "CREDIT $(cat "$DIR/music/SELECTED.credit")"
+if [ -n "${API_FILM_MUSIC:-}" ] && [ -f "$API_FILM_MUSIC" ]; then
+  echo "API_FILM_MUSIC already staged $API_FILM_MUSIC"
+  ls -lh "$API_FILM_MUSIC"
+else
+  set +e
+  python3 "$KIT/fetch-pixabay-music.py"
+  MUSIC_RC=$?
+  set -e
+  if [ "$MUSIC_RC" -ne 0 ]; then
+    echo "FATAL: juicy Pixabay fetch failed rc=$MUSIC_RC — refusing drone"
+    exit "$MUSIC_RC"
+  fi
+  if [ -f "$DIR/music/SELECTED.path" ]; then
+    export API_FILM_MUSIC="$(head -n1 "$DIR/music/SELECTED.path" | tr -d '\r')"
+    echo "API_FILM_MUSIC=$API_FILM_MUSIC"
+    [ -f "$DIR/music/SELECTED.credit" ] && echo "CREDIT $(cat "$DIR/music/SELECTED.credit")"
+  fi
 fi
 [ -n "${API_FILM_MUSIC:-}" ] && [ -f "$API_FILM_MUSIC" ] || { echo FATAL: no selected music; exit 1; }
 

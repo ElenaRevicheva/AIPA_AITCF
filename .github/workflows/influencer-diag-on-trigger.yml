@@ -149,38 +149,45 @@ jobs:
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/bust-api-audit-film.sh
           elif [ "$MODE" = "api-film-v14" ]; then
-            ssh_retry 'mkdir -p /tmp/youtube-api-audit-film-v14 /tmp/api-film-out-v14' || true
-            scp_retry -r \
-              scripts/youtube-api-audit-film/. \
-              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/ || true
-            scp_retry \
-              scripts/oracle-resilience/api-film-watch-v14.html \
-              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/api-film-watch-v14.html || true
-            scp_retry \
-              scripts/oracle-resilience/api-film-watch-v14.html \
-              ubuntu@170.9.242.90:/tmp/api-film-watch-v14.html || true
-            n=0
-            ORACLE_OK=0
-            while [ "$n" -lt 3 ]; do
-              n=$((n + 1))
-              echo "oracle v14 compile attempt $n"
-              if ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' \
-                < scripts/oracle-resilience/compile-api-film-v14-runner.sh; then
-                ORACLE_OK=1
-                RC=0
-                break
+            # Compile on the runner (xfade died on long Oracle SSH). Short SSH
+            # only to unlock a juicy unused Pixabay bed (Bright Data lives on Oracle).
+            sudo apt-get update -qq
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
+            MUSIC_DIR="${RUNNER_TEMP}/aideazz-api-film-v14/music"
+            mkdir -p "$MUSIC_DIR"
+            MUSIC_OK=0
+            if ssh_retry 'mkdir -p /tmp/api-film-v14-music /tmp/youtube-api-audit-film-v14'; then
+              scp_retry \
+                scripts/youtube-api-audit-film/fetch-pixabay-music.py \
+                ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/fetch-pixabay-music.py || true
+              if ssh $SSHOPTS ubuntu@170.9.242.90 'export API_FILM_MUSIC_DIR=/tmp/api-film-v14-music CTO_ENV=/home/ubuntu/cto-aipa/.env; rm -f /tmp/api-film-v14-music/SELECTED.path; python3 /tmp/youtube-api-audit-film-v14/fetch-pixabay-music.py'; then
+                scp_retry \
+                  'ubuntu@170.9.242.90:/tmp/api-film-v14-music/*' \
+                  "$MUSIC_DIR/" || true
+                if [ -f "$MUSIC_DIR/SELECTED.path" ]; then
+                  REMOTE_MP3=$(head -n1 "$MUSIC_DIR/SELECTED.path" | tr -d '\r')
+                  LOCAL_MP3=$(ls -1 "$MUSIC_DIR"/v14-*.mp3 "$MUSIC_DIR"/*.mp3 2>/dev/null | head -n1 || true)
+                  if [ -n "$LOCAL_MP3" ] && [ -f "$LOCAL_MP3" ]; then
+                    echo "$LOCAL_MP3" > "$MUSIC_DIR/SELECTED.path"
+                    export API_FILM_MUSIC="$LOCAL_MP3"
+                    MUSIC_OK=1
+                    echo "pixabay via Oracle → $API_FILM_MUSIC"
+                    ls -lh "$API_FILM_MUSIC"
+                    [ -f "$MUSIC_DIR/SELECTED.credit" ] && echo "CREDIT $(cat "$MUSIC_DIR/SELECTED.credit")"
+                  fi
+                fi
               fi
-              echo "oracle v14 compile attempt $n failed"
-              sleep $((n * 12))
-            done
-            if [ "$ORACLE_OK" != "1" ]; then
-              echo "Oracle v14 compile missed — runner fallback (needs Replicate + Bright Data + OpenAI)"
-              sudo apt-get update -qq
-              sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
-              export CTO_ENV="${GITHUB_WORKSPACE}/.env"
-              bash scripts/oracle-resilience/compile-api-film-v14-runner.sh
-              RC=$?
             fi
+            if [ "$MUSIC_OK" != "1" ]; then
+              echo "Oracle Pixabay pull missed — trying Bright Data on the runner"
+              export API_FILM_MUSIC_DIR="$MUSIC_DIR"
+              export CTO_ENV="${GITHUB_WORKSPACE}/.env"
+              python3 scripts/youtube-api-audit-film/fetch-pixabay-music.py
+              export API_FILM_MUSIC="$(head -n1 "$MUSIC_DIR/SELECTED.path" | tr -d '\r')"
+            fi
+            [ -n "${API_FILM_MUSIC:-}" ] && [ -f "$API_FILM_MUSIC" ] || { echo FATAL: no juicy Pixabay bed; exit 1; }
+            bash scripts/oracle-resilience/compile-api-film-v14-runner.sh
+            RC=$?
           elif [ "$MODE" = "api-film" ]; then
             # Prefer Oracle's cached onyx TTS stems (same VO as every earlier cut).
             mkdir -p "${RUNNER_TEMP}/oracle-vo"
