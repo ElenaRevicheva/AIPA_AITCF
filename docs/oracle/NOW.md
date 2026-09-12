@@ -133,11 +133,11 @@ git log keeps the record.
 
 ### 🟡 IN FLIGHT 12 Sep 15:05 UTC — fresh /api YouTube film v14
 
-**DONE:** v13 live (Kulakovka Chill House). Kit on `cursor/youtube-api-v14-0841`: Seedance 2.5 + DeepSeek motion, juicy unused Pixabay (Mango Sky first — not Kulakovka, not Oleg-Mazur, not Tropical Cocktail). Compile writes `-v14.mp4` only.
+**DONE:** First v14 fires could skip DeepSeek (key is on Oracle, not the GH runner). That was wrong. Fruit director now **requires** `DEEPSEEK_API_KEY` on Oracle; Seedance shoots those lines. No silent skip.
 
-**NEXT:** wait for Actions `api-film-v14` (trigger fired on `cursor/youtube-api-v14-0841`). Publish `can-ai-find-and-cite-you-v14.mp4` only. Keep v13 on disk. No `cto_aipa`. No Influencer/VJH restart.
+**NEXT:** Actions `api-film-v14` after DeepSeek fruit. Publish `-v14.mp4` only. Keep v13. No `cto_aipa`.
 
-**VERIFIED BY:** pending `200 video/mp4` on the `-v14` URL. Kit tests: `node scripts/test-api-film-v14-music.cjs` (29 checks).
+**VERIFIED BY:** pending log line `USED DeepSeek on all 5 fruit shots` plus `200 video/mp4` on the `-v14` URL.
 
 **RISK:** Do not salvage v2/v5 as the picture. Do not write `can-ai-find-and-cite-you-v13.mp4`. Runway is unpaid. Brown-noise drone is refused.
 
