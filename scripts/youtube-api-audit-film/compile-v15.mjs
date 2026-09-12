@@ -472,46 +472,6 @@ async function overlaySlide(src, dest, lines) {
   return dest;
 }
 
-async function fruitSway(src, dest, seconds) {
-  const take = Math.max(5.5, seconds || 7);
-  const isImg = /\.(jpg|jpeg|png|webp)$/i.test(src);
-  const motion = `scale=${WX + 88}:${HY + 88}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:'(in_w-out_w)/2+40*sin(2*PI*t/2.3)':'(in_h-out_h)/2+22*cos(2*PI*t/1.8)',fps=${FPS},format=yuv420p,setsar=1`;
-  const inputs = isImg ? ['-loop', '1', '-i', src] : ['-i', src];
-  await execFileP(
-    'ffmpeg',
-    ['-y', ...inputs, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', `[0:v]${motion}[v]`, '-map', '[v]', '-map', '1:a', '-t', take.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
-    { maxBuffer: 1 << 26, timeout: 180000 },
-  );
-  return dest;
-}
-
-async function neuronPulse(src, dest, seconds, { sway, grow } = {}) {
-  const take = Math.max(4.8, seconds || 6.2);
-  const isImg = /\.(jpg|jpeg|png|webp)$/i.test(src);
-  let motion;
-  if (grow) {
-    const pan = sway
-      ? `'(in_w-out_w)/2+28*sin(2*PI*t/3.1)':'(in_h-out_h)/2-10*t+14*cos(2*PI*t/2.6)'`
-      : `'(in_w-out_w)/2':'(in_h-out_h)/2-10*t'`;
-    motion = `scale=${WX + 180}:${HY + 180}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:${pan},fps=${FPS},format=yuv420p,setsar=1`;
-  } else if (sway) {
-    motion = `scale=${WX + 96}:${HY + 96}:force_original_aspect_ratio=increase,crop=${WX}:${HY}:'(in_w-out_w)/2+40*sin(2*PI*t/3.1)':'(in_h-out_h)/2+24*cos(2*PI*t/2.6)',fps=${FPS},format=yuv420p,setsar=1`;
-  } else {
-    motion = `scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},format=yuv420p,setsar=1`;
-  }
-  const fc =
-    `[0:v]${motion},eq=saturation=1.28:contrast=1.08:brightness=0.04,split=2[base][hot];` +
-    `[hot]eq=brightness=0.38:saturation=1.7,hue=h='275+35*sin(2*PI*t/1.25)',gblur=sigma=8[glow];` +
-    `[base][glow]blend=all_mode=screen:all_opacity=0.40,setsar=1[v]`;
-  const inputs = isImg ? ['-loop', '1', '-i', src] : ['-i', src];
-  await execFileP(
-    'ffmpeg',
-    ['-y', ...inputs, '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100', '-filter_complex', fc, '-map', '[v]', '-map', '1:a', '-t', take.toFixed(2), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', '44100', '-ac', '2', dest],
-    { maxBuffer: 1 << 26, timeout: 180000 },
-  );
-  return dest;
-}
-
 async function overlayQrBug(src, dest) {
   const qr = path.join(HERE, 'qr/api-cta-qr.png');
   if (!fs.existsSync(qr) || !fs.existsSync(src)) {
