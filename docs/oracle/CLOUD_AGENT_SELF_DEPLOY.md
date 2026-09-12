@@ -50,7 +50,7 @@ Same choices as the phone workflow — registry lives in `scripts/oracle-resilie
 | `vjh_web` | CMO FastAPI :8080 |
 | `openclaw` | OpenClaw gateway |
 | `cto_aipa` | CTO AIPA + Atuona (`reset --hard` → `npm ci && npm run build` → PM2). Wipes a dirty Oracle checkout — last resort. |
-| `atuona` | Named-file Atuona only: checkout `src/atuona-creative-ai.ts` + `src/llm-resilience.ts` + `.env.example`, `npm run build`, `pm2 restart cto-aipa --update-env`. Does **not** reset the box. |
+| `atuona` | Named-file Atuona only: checkout `src/atuona-creative-ai.ts` + `src/llm-resilience.ts` + `src/atuona-vault-tree.ts` + `.env.example`, `npm run build`, `pm2 restart cto-aipa --update-env`. Does **not** reset the box. |
 | `atlas` | Atlas Shifted radar |
 | `aideazz` | **Patch relay (added July 17, 2026):** the box `git am`'s every `scripts/aideazz-patches/*.patch` onto the aideazz repo's `main` and pushes (4everland auto-deploys aideazz.xyz). Exists because cloud agents get 403 pushing to the aideazz repo directly; the box's PAT can. See `scripts/aideazz-patches/README.md`. |
 | `blog_html` | **Re-put one cached article** via GitHub Contents API (`pushOneArticleHtml`, same channel as the daily publisher — author Elena, no `[skip ci]`). Second line of `.deploy-trigger` is the slug. |

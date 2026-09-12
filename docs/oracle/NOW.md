@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 11:58 UTC | Refresh live Atuona /menu (Seedance) via named-file `atuona` deploy — not `cto_aipa` hard-reset | `src/atuona-creative-ai.ts`, `src/llm-resilience.ts`, `.env.example`, `scripts/oracle-resilience/*`, `.deploy-trigger` | pending |
+| Cursor Cloud | 12 Sep 12:00 UTC | Retry Atuona /menu deploy — first run failed tsc (Oracle lacked `atuona-vault-tree.ts`) | `src/atuona-creative-ai.ts`, `src/llm-resilience.ts`, `src/atuona-vault-tree.ts`, `.deploy-trigger` | fcabd91 failed; retrying |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
