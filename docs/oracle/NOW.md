@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 13:16 UTC | Pin Atuona /visualize engines so a grade bump is one file; bump Omni 1.1 + Kling 3.0; honest /visualize deepseek | `src/atuona-video-pins.ts`, `src/atuona-creative-ai.ts` | pending |
+| Cursor Cloud | 12 Sep 13:16 UTC | Pin /visualize engines (one file to bump grade). Keep live `/visualize deepseek` video. Bump Omni 1.1 + Kling 3.0 | `src/atuona-video-pins.ts`, `src/atuona-creative-ai.ts` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,18 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟢 12 Sep 12:54 UTC — `/visualize deepseek` shoots a clip. LIVE.
+
+**DONE:** `/visualize deepseek 048` (or `last`) is a video command. Telegram says *Generating video with DeepSeek* and labels the clip DeepSeek. Deploy [34694919199](https://github.com/ElenaRevicheva/AIPA_AITCF/actions/runs/34694919199): `VERIFY: dist has visualize seedance and visualize deepseek` + `pm2 restart` (`cto-aipa` pid 4117706, uptime 0s).
+
+**NEXT:** Elena taps `/visualize deepseek 048` in Atuona. 2–5 min. Do not paste the DeepSeek key in Cursor.
+
+**VERIFIED BY:** Actions 34694919199 VERIFY line + `[cto-aipa](1) ✓`. Contract: `node scripts/test-visualize-deepseek.cjs` (12 checks).
+
+**RISK:** The clip uses the Replicate wallet (Seedance first; Kling/Luma/Veo/Runway if Seedance misses). `/visualize seedance 048` is unchanged.
+
+### 🟢 12 Sep 12:41 UTC — DeepSeek is on /menu. Seedance is `/visualize seedance NNN`.
 
 ### 🟢 12 Sep 12:17 UTC — /deepseekkey is live (same contract as /pplxkey)
 
