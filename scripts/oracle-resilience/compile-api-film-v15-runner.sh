@@ -54,12 +54,9 @@ for k in ("OPENAI_API_KEY", "REPLICATE_API_TOKEN", "DEEPSEEK_API_KEY", "BRIGHTDA
 PY
 
 echo
-echo "=== 1. Elena Loom (same walkthrough, new picture around it) ==="
-python3 "$KIT/fetch-loom.py" --force --out "$DIR/loom/walkthrough.mp4" || true
-if [ -f "$DIR/loom/walkthrough.mp4" ]; then
-  export API_FILM_LOOM="$DIR/loom/walkthrough.mp4"
-  ls -lh "$API_FILM_LOOM"
-fi
+echo "=== 1. no Loom — how-to slides show how to use /api ==="
+unset API_FILM_LOOM
+rm -f "$DIR/loom/walkthrough.mp4"
 
 echo
 echo "=== 1c. juicy unused Pixabay (Mango Sky burned — Beach Party or later) ==="

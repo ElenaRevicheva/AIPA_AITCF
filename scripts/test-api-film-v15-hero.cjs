@@ -84,6 +84,10 @@ ok('v15 writes only -v15.mp4', src15.includes('${SLUG}-v15.mp4') && !src15.inclu
 ok('v15 poster is -v15-poster', src15.includes('${SLUG}-v15-poster.jpg') && !src15.includes('${SLUG}-v14-poster.jpg'));
 ok('v15 compile uses hero-clip not Ken Burns fallback', src15.includes('renderHeroClip') && src15.includes('hero-clip fallback'));
 ok('v15 compile does not call neuronPulse', !/neuronPulse\(/.test(src15));
+ok('v15 has no Loom walkthrough', !src15.includes('loomwalk') && !src15.includes('findLoom') && !src15.includes('fetch-loom'));
+ok('v15 how-to slides replace UI stills', src15.includes("kind: 'howto'") && src15.includes('makeHowToClip') && src15.includes('ALL THIRTY-FOUR CHECKS'));
+ok('v15 check grid has crawler + GEO + AEO + TECH', src15.includes('CRAWLERS') && src15.includes("'GEO'") && src15.includes("'AEO'") && src15.includes("'TECH'"));
+ok('v15 34-check columns add to 34', (src15.match(/'HTTP 200'/) && src15.includes('Question H2') && src15.includes('No refresh')));
 ok('v15 VO dir is vo-v15', src15.includes('vo-v15'));
 ok('v15 compile requires DeepSeek', /will not skip DeepSeek|will not silently skip/.test(src15));
 ok('v15 compile spends Flash', src15.includes('deepseek-flash') || src15.includes('DEEPSEEK_MODEL'));
@@ -112,6 +116,7 @@ ok('runner compiles compile-v15.mjs', run.includes('compile-v15.mjs'));
 ok('runner sets API_FILM_CUT=v15', run.includes('API_FILM_CUT=v15'));
 ok('runner does not delete new fruit clips', /rm -f "\$DIR"\/clips\/\{grapes/.test(run) && !/rm -f "\$DIR"\/clips\/\{grapes,split,crawlers,hand,dashboard,mango/.test(run));
 ok('runner does not restart cto-aipa', !/pm2 restart/.test(run));
+ok('runner does not fetch Loom', !run.includes('fetch-loom.py') && run.includes('no Loom'));
 ok('runner refuses a v14 clobber in out/', run.includes('can-ai-find-and-cite-you-v14.mp4') && run.includes('must not touch older cuts'));
 
 ok('publisher copies only v15', pub.includes('can-ai-find-and-cite-you-v15.mp4') && !/cp -f "\$SRC\/"\*\.mp4/.test(pub));

@@ -10,6 +10,7 @@
  *
  * Never build inside the git checkout. Work dir: /home/ubuntu/aideazz-api-film-v15/
  * Publish ONLY can-ai-find-and-cite-you-v15.mp4 — never v14 / v13 / unversioned.
+ * No Loom. How-to slides show how to use /api and the 34 checks.
  * Copy scripts/atuona-film3.mjs settings — do not re-invent the chains.
  */
 import fs from 'fs';
@@ -341,79 +342,85 @@ async function concatClips(parts, dest) {
   return dest;
 }
 
-function findLoom() {
-  const cands = [
-    process.env.API_FILM_LOOM,
-    path.join(HERE, 'loom/walkthrough.mp4'),
-    path.join(BASE, 'loom/walkthrough.mp4'),
-    path.join(BASE, 'kit/loom/walkthrough.mp4'),
-  ].filter(Boolean);
-  for (const p of cands) {
-    if (fs.existsSync(p) && fs.statSync(p).size > 200000) return p;
-  }
-  return null;
-}
+/** The 34 live checks in src/visibility-audit.ts — four columns, shown fast. */
+const CHECK_COLS = [
+  {
+    head: 'CRAWLERS',
+    items: ['HTTP 200', 'robots.txt', 'GPTBot', 'SearchBot', 'ClaudeBot', 'Perplexity', 'Gemini', 'CCBot', 'llms.txt', 'sitemap', 'indexable'],
+  },
+  {
+    head: 'GEO',
+    items: ['JSON-LD', 'Identity schema', 'FAQ / Article', 'sameAs links', 'Open Graph', 'Canonical', 'Language'],
+  },
+  {
+    head: 'AEO',
+    items: ['Meta description', 'Title tag', 'Exactly one H1', 'H2 / H3', 'Question H2', '300+ words', 'Landmarks', 'Lists / tables', 'Dates'],
+  },
+  {
+    head: 'TECH',
+    items: ['HTTPS', 'Under 1.5s', 'HTML size', 'Viewport', 'Alt text', 'Raw HTML', 'No refresh'],
+  },
+];
 
-async function buildUiClip(b, clipDur, loomState) {
-  const parts = [];
-  let remain = clipDur;
-  const slidePath = path.join(HERE, b.still);
-  const livePath = b.liveStill ? path.join(HERE, b.liveStill) : null;
-
-  // First-video walkthrough slides lead. They are the prepared 1920×1080 scenes.
-  if (fs.existsSync(slidePath) && b.slideHold !== 0) {
-    const hold = Math.min(b.slideHold || 2.2, Math.max(1.5, remain * 0.36));
-    const p = path.join(W, `slide_${b.id}.mp4`);
-    await stillToClip(slidePath, p, hold);
-    parts.push(p);
-    remain -= hold;
-    process.stderr.write(`ui slide ${b.id} ${hold.toFixed(1)}s ${b.still}\n`);
+async function makeHowToClip(b, dest, seconds) {
+  const take = Math.max(4.6, seconds);
+  const bg = path.join(HERE, (V15_FRUIT[0] && V15_FRUIT[0].still) || '');
+  const draws = [];
+  const add = (name, text, spec) => {
+    const f = path.join(W, `ht_${b.id}_${name}.txt`);
+    fs.mkdirSync(W, { recursive: true });
+    fs.writeFileSync(f, text);
+    draws.push(
+      `drawtext=fontfile=${spec.font || SANS}:textfile=${f}:expansion=none:fontcolor=${spec.color}:fontsize=${spec.size}:line_spacing=${spec.ls || 10}:x=${spec.x}:y=${spec.y}`,
+    );
+  };
+  if (b.step) add('step', b.step, { color: '0xFDE68A', size: 34, x: '72', y: '64', font: MONO });
+  if (b.howTitle) add('title', b.howTitle, { color: 'white', size: b.titleSize || 68, x: '72', y: b.step ? '118' : '72' });
+  if (b.howSub) add('sub', b.howSub, { color: '0xFDE68A', size: 40, x: '72', y: b.step ? '210' : '160' });
+  if (b.howBody) add('body', b.howBody, { color: '0xE5E7EB', size: 36, ls: 16, x: '72', y: b.step ? '300' : '250' });
+  if (b.columns) {
+    b.columns.forEach((col, i) => {
+      const x = 72 + i * 460;
+      add(`h${i}`, col.head, { color: '0x7DFFFB', size: 28, x: String(x), y: '300', font: MONO });
+      add(`c${i}`, col.items.join('\n'), { color: 'white', size: 26, ls: 8, x: String(x), y: '348' });
+    });
   }
-
-  if (livePath && fs.existsSync(livePath) && remain > 0.55 && b.liveHold !== 0) {
-    const hold = Math.min(b.liveHold || 1.2, remain * 0.28);
-    if (hold >= 1.0) {
-      const p = path.join(W, `live_${b.id}.mp4`);
-      await stillToClip(livePath, p, hold);
-      parts.push(p);
-      remain -= hold;
-      process.stderr.write(`ui live ${b.id} ${hold.toFixed(1)}s ${b.liveStill}\n`);
-    }
-  }
-
-  const loomMax = b.loomMax === 0 ? 0 : b.loomMax || 2.5;
-  if (loomState.path && loomMax > 0 && remain > 0.45) {
-    // checks may jump to the results waterfall (past the sequential walk cap).
-    const startAt = b.loomAt != null ? b.loomAt : loomState.t;
-    const hardEnd = b.loomAt != null ? startAt + loomMax + 0.35 : loomState.end;
-    const avail = hardEnd - startAt;
-    if (avail > 0.45) {
-      const take = Math.min(remain, loomMax, avail);
-      const slice = path.join(W, `loom_${b.id}.mp4`);
-      await fillClip(loomState.path, slice, take, startAt);
-      if (b.loomAt == null) loomState.t += take;
-      parts.push(slice);
-      remain -= take;
-      process.stderr.write(`ui loom ${b.id} ${take.toFixed(1)}s @${startAt.toFixed(1)} no-loop\n`);
-    } else {
-      process.stderr.write(`ui loom ${b.id} skipped — useful window used up\n`);
-    }
-  }
-
-  if (remain > 0.35) {
-    const padSrc = fs.existsSync(slidePath) ? slidePath : livePath && fs.existsSync(livePath) ? livePath : slidePath;
-    const p = path.join(W, `pad_${b.id}.mp4`);
-    await stillToClip(padSrc, p, remain);
-    parts.push(p);
-  }
-  if (!parts.length) {
-    const fb = path.join(W, `fb_${b.id}.mp4`);
-    await stillToClip(slidePath, fb, clipDur);
-    parts.push(fb);
-  }
-  const raw = path.join(CLIPDIR, `${b.id}.mp4`);
-  await concatClips(parts, raw);
-  return raw;
+  const box = `drawbox=x=64:y=52:w=1792:h=976:color=black@0.42:t=fill,drawbox=x=64:y=52:w=8:h=976:color=0xFDE68A@0.95:t=fill`;
+  const field =
+    `geq=r='if(eq(mod(X\\,12)\\,0)*eq(mod(Y\\,12)\\,0)\\,28+70*(X/${WX})\\,0)':` +
+    `g='if(eq(mod(X\\,12)\\,0)*eq(mod(Y\\,12)\\,0)\\,40+36*(1-abs(2*X/${WX}-1))\\,0)':` +
+    `b='if(eq(mod(X\\,12)\\,0)*eq(mod(Y\\,12)\\,0)\\,24+90*(X/${WX})\\,0)'`;
+  const plate = bg && fs.existsSync(bg)
+    ? `[0:v]scale=${WX}:${HY}:force_original_aspect_ratio=increase,crop=${WX}:${HY},fps=${FPS},eq=saturation=0.78:brightness=-0.28[base];[base]split[fr][hot];[hot]${field},gblur=sigma=1[glow];[fr][glow]blend=all_mode=screen:all_opacity=0.28[lit]`
+    : `[0:v]fps=${FPS},format=yuv420p[lit]`;
+  const fc = `${plate};[lit]${box},${draws.join(',')},format=yuv420p,setsar=1[v]`;
+  const videoIn = bg && fs.existsSync(bg)
+    ? ['-loop', '1', '-i', bg]
+    : ['-f', 'lavfi', '-i', `color=c=0x08050e:s=${WX}x${HY}:r=${FPS}`];
+  await execFileP(
+    'ffmpeg',
+    [
+      '-y',
+      ...videoIn,
+      '-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=44100',
+      '-filter_complex', fc,
+      '-map', '[v]',
+      '-map', '1:a',
+      '-t', take.toFixed(2),
+      '-c:v', 'libx264',
+      '-preset', 'veryfast',
+      '-crf', '18',
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac',
+      '-ar', '44100',
+      '-ac', '2',
+      dest,
+    ],
+    { maxBuffer: 1 << 26, timeout: 180000 },
+  );
+  if (!fs.existsSync(dest) || fs.statSync(dest).size < 20000) throw new Error('howto clip empty ' + dest);
+  process.stderr.write(`howto ${b.id} ${take.toFixed(1)}s — no Loom\n`);
+  return dest;
 }
 
 async function stillToClip(src, dest, seconds) {
@@ -604,36 +611,70 @@ const BEATS = [
     ],
   },
   {
-    id: 'loomwalk',
-    kind: 'ui',
-    still: 'ui/ui-hero.png',
-    vo: null,
-    cap: null,
-    clipDur: 16,
-    slideHold: 0,
-    liveHold: 0,
-    loomMax: 16,
-    loomAt: 0.4,
+    id: 'use',
+    kind: 'howto',
+    step: 'HOW TO USE IT  ·  STEP 1',
+    howTitle: 'Open aideazz.xyz/api',
+    howSub: 'Free. No signup. No scraping bill.',
+    howBody: 'A public page. Paste any URL.\nWe read it directly — thirty-four signals.',
+    vo: 'Open aideazz.xyz/api. Free. No signup.',
+    cap: 'Open aideazz.xyz/api',
+    clipDur: 5.4,
   },
   {
-    id: 'website',
-    kind: 'ui',
-    still: 'ui/ui-hero.png',
-    liveStill: 'ui/live-hero.png',
-    vo: null,
-    cap: null,
-    clipDur: 8,
-    slideHold: 2.4,
-    liveHold: 2.0,
-    loomMax: 0,
+    id: 'paste',
+    kind: 'howto',
+    step: 'HOW TO USE IT  ·  STEP 2',
+    howTitle: 'Type yourwebsite.com',
+    howSub: 'Click  Audit my site',
+    howBody: 'That is the whole form.\nOne box. One button.',
+    vo: 'Type yourwebsite.com. Click Audit my site.',
+    cap: 'Paste the URL. Audit my site.',
+    clipDur: 5.4,
   },
-  { id: 'hero', kind: 'ui', still: 'ui/ui-hero.png', liveStill: 'ui/live-hero.png', vo: 'Paste a public URL. We read the page directly — thirty-four signals, no signup, no scraping bill.', cap: '34 signals. Direct page reads. No signup.', loomMax: 0, liveHold: 1.2, clipDur: 9.2 },
-  { id: 'form', kind: 'ui', still: 'ui/ui-form.png', vo: 'Type yourwebsite.com. Click Audit my site.', cap: 'Paste the URL. Audit my site.', loomMax: 0, clipDur: 6.5 },
-  { id: 'auditing', kind: 'ui', still: 'ui/ui-auditing.png', vo: 'Seconds later the score lands — and whether each engine can even read the site.', cap: 'Auditing… 34 signals.', loomMax: 0, clipDur: 8.2 },
-  { id: 'score', kind: 'ui', still: 'ui/ui-score.png', vo: 'One AI Visibility Score, then GPTBot, ClaudeBot, Perplexity, Gemini, Google-Extended.', cap: 'Score, then which engines can read you.', loomMax: 0, clipDur: 8.0 },
-  { id: 'checks', kind: 'ui', still: 'ui/ui-checks.png', vo: 'Every check shows what we saw, why it matters, and how to fix the ones that fail. Not five tips. All thirty-four.', cap: 'What we saw. Why it matters. How to fix it.', loomMax: 0, clipDur: 10.3 },
-  { id: 'categories', kind: 'ui', still: 'ui/ui-categories.png', liveStill: 'ui/live-categories.png', vo: 'Crawler access. Structured data. Answer-readiness. Technical foundation. Same weights as the live API.', cap: 'Four categories. One score.', loomMax: 0, clipDur: 9.5 },
-  { id: 'cta', kind: 'ui', still: 'ui/ui-cta.png', liveStill: 'ui/live-cta.png', vo: 'Free. Run yours now. aideazz.xyz/api', cap: 'aideazz.xyz/api', loomMax: 0, clipDur: 6.5 },
+  {
+    id: 'engines',
+    kind: 'howto',
+    step: 'HOW TO USE IT  ·  STEP 3',
+    howTitle: 'The score lands in seconds',
+    howSub: 'One number. Six engines. Four weights.',
+    howBody: 'GPTBot  ·  ClaudeBot  ·  Perplexity\nGemini  ·  Google-Extended  ·  CCBot',
+    vo: 'Seconds later: one score, then which engines can even read the site.',
+    cap: 'Score. Then who can read you.',
+    clipDur: 6.2,
+  },
+  {
+    id: 'grid',
+    kind: 'howto',
+    step: 'ALL THIRTY-FOUR CHECKS',
+    howTitle: 'Not five tips. The full list.',
+    columns: CHECK_COLS,
+    vo: 'Thirty-four checks. Crawlers, structured data, answer-readiness, technical foundation.',
+    cap: '34 checks. Four categories.',
+    clipDur: 7.6,
+  },
+  {
+    id: 'read',
+    kind: 'howto',
+    step: 'HOW TO READ A CHECK',
+    howTitle: 'What we saw. Why it matters. The fix.',
+    howSub: 'Every line is evidence — not a vibe.',
+    howBody: 'Pass, warn, or fail.\nA failing check names the action that flips it.',
+    vo: 'Each check shows what we saw, why it matters, and how to fix the ones that fail.',
+    cap: 'Saw. Why. Fix.',
+    clipDur: 6.4,
+  },
+  {
+    id: 'run',
+    kind: 'howto',
+    step: 'YOUR TURN',
+    howTitle: 'Run yours now',
+    howSub: 'aideazz.xyz/api',
+    howBody: 'Free. No signup.\nScan the QR — or type the URL.',
+    vo: 'Free. Run yours now. aideazz.xyz/api',
+    cap: 'aideazz.xyz/api',
+    clipDur: 5.6,
+  },
 ];
 
 async function main() {
@@ -679,17 +720,13 @@ async function main() {
   const seq = [];
   seq.push(await overlayQrBug(await makeCard(FILM_TITLE, FILM_SUB, path.join(W, 'card_intro.mp4'), 4.4, 60, cover, true), path.join(W, 'card_intro_qr.mp4')));
 
-  const loomPath = findLoom();
-  const loomRaw = loomPath ? await dur(loomPath) : 0;
-  const loomUseful = loomPath ? Math.min(loomRaw, Number(process.env.API_FILM_LOOM_END || 20)) : 0;
-  const loomState = { path: loomPath, t: 0.4, end: loomUseful };
-  process.stderr.write(loomPath ? `loom ${loomPath} dur=${loomRaw.toFixed(1)}s useful=${loomUseful.toFixed(1)}s (no loop, no results-scroll tail)\n` : 'WARN no Loom walkthrough — UI stills only\n');
+  process.stderr.write('no Loom — how-to slides for /api + 34 checks\n');
 
   const voInfo = [];
   for (let i = 0; i < BEATS.length; i++) {
     const b = BEATS[i];
-    const still = path.join(HERE, b.still);
-    if (!fs.existsSync(still) && b.kind !== 'ui') throw new Error('missing still ' + still);
+    const still = b.still ? path.join(HERE, b.still) : '';
+    if (b.kind !== 'howto' && !fs.existsSync(still)) throw new Error('missing still ' + still);
     let voFile = null,
       vd = 0;
     if (b.vo) {
@@ -703,8 +740,8 @@ async function main() {
     }
     let raw = path.join(CLIPDIR, `${b.id}.mp4`);
     const clipDur = b.clipDur || (b.vo ? Math.max(6.5, LEAD + vd + TAIL) : 5.5);
-    if (b.kind === 'ui') {
-      raw = await buildUiClip(b, clipDur, loomState);
+    if (b.kind === 'howto') {
+      raw = await makeHowToClip(b, raw, clipDur);
     } else if (!(fs.existsSync(raw) && fs.statSync(raw).size > 20000)) {
       if (b.kind === 'seedance') {
         const whole = path.join(HERE, b.whole);
@@ -716,12 +753,12 @@ async function main() {
     }
     const nat = await dur(raw);
     let normDur;
-    if (b.kind === 'ui') normDur = clipDur;
+    if (b.kind === 'howto') normDur = clipDur;
     else if (b.clipDur) normDur = b.clipDur;
     else if (b.vo) normDur = Math.max(nat, LEAD + vd + TAIL);
     else normDur = Math.min(Math.max(nat, 4.8), 6.2);
     const norm = path.join(W, `n_${b.id}.mp4`);
-    await normalizeVideo(raw, norm, normDur, { pad: b.kind === 'ui' });
+    await normalizeVideo(raw, norm, normDur, { pad: b.kind === 'howto' });
     const labeled = path.join(W, `lb_${b.id}.mp4`);
     await overlayLabels(norm, labeled, b.labels);
     const slid = path.join(W, `sl_${b.id}.mp4`);
@@ -733,8 +770,8 @@ async function main() {
     seq.push(withQr);
     if (voFile) voInfo.push({ segIndex: i + 1, file: voFile });
     if (b.id === 'mango') process.stderr.write('chapter What it checks on a new mango cut — not grapes\n');
-    if (b.id === 'loomwalk') process.stderr.write('chapter Elena Loom shortened (no results-scroll tail)\n');
-    if (b.id === 'website') process.stderr.write('chapter finishing slides\n');
+    if (b.id === 'use') process.stderr.write('chapter how to use /api — no Loom\n');
+    if (b.id === 'grid') process.stderr.write('chapter 34 checks shown\n');
     process.stderr.write(`beat ${i + 1}/${BEATS.length} ${b.id} dur=${normDur.toFixed(1)} vo=${b.vo ? vd.toFixed(1) : '-'}\n`);
   }
   const qrCard = path.join(HERE, 'qr/api-cta-endcard.png');
