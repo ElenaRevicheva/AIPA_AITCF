@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 14:51 UTC | Fresh /api YouTube film v14 (DeepSeek/Seedance). Do not overwrite v13 or Atuona. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v14-0841`. No cto_aipa. | pending |
+| Cursor Cloud | 12 Sep 15:05 UTC | Fresh /api YouTube film v14 (DeepSeek/Seedance + juicy unused Pixabay). Do not overwrite v13 or Atuona. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v14-0841`. No cto_aipa. | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 IN FLIGHT 12 Sep 14:51 UTC — fresh /api YouTube film v14
+### 🟡 IN FLIGHT 12 Sep 15:05 UTC — fresh /api YouTube film v14
 
-**DONE:** v13 live (joyful chill house). Named `/imagine` exclusive live. Do not overwrite those.
+**DONE:** v13 live (Kulakovka Chill House). Kit on `cursor/youtube-api-v14-0841`: Seedance 2.5 + DeepSeek motion, juicy unused Pixabay (Mango Sky first — not Kulakovka, not Oleg-Mazur, not Tropical Cocktail). Compile writes `-v14.mp4` only.
 
-**NEXT:** new picture via DeepSeek director + Seedance 2.5. Publish `can-ai-find-and-cite-you-v14.mp4` only. Keep v13 on disk. No `cto_aipa`. No Influencer/VJH restart.
+**NEXT:** fire `api-film-v14`. Publish `can-ai-find-and-cite-you-v14.mp4` only. Keep v13 on disk. No `cto_aipa`. No Influencer/VJH restart.
 
 **VERIFIED BY:** pending `200 video/mp4` on the `-v14` URL.
 
-**RISK:** Do not salvage v2/v5 as the picture. Do not write `can-ai-find-and-cite-you-v13.mp4`. Runway is unpaid.
+**RISK:** Do not salvage v2/v5 as the picture. Do not write `can-ai-find-and-cite-you-v13.mp4`. Runway is unpaid. Brown-noise drone is refused.
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
