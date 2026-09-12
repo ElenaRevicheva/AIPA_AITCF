@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 12 Sep 16:42 UTC | v15 /api promo firing on Oracle — hero language + DeepSeek Flash. Do not overwrite v13/v14. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | 9e01c73 |
+| Cursor Cloud | 12 Sep 17:07 UTC | v15 no-Loom how-to slides + fruit hero. Firing. Do not overwrite v13/v14. | `scripts/youtube-api-audit-film/`, branch `cursor/youtube-api-v15-0841`. No cto-aipa. | a1658d3 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟡 12 Sep 16:42 UTC — v15 fired. Waiting for the mp4.
+### 🟡 12 Sep 17:07 UTC — v15 no Loom. How-to slides + 34 checks. Firing.
 
-**DONE:** v15 kit on `cursor/youtube-api-v15-0841`. Same fruits as rejected v14, `/api` hero language (void stills, whole→cut, gold–violet field). DeepSeek Flash directs. Fired `api-film-v15` (`9e01c73`). Local gates 52 + 51. v13/v14 stay.
+**DONE:** Elena: no Loom. How-to slides teach `/api` (open → paste → score → 34 checks → fix). Fruit middle stays. Fired `a1658d3`. Gates 61.
 
-**NEXT:** wait for Actions: `VOID READY` → `USED DeepSeek on all 5` → `V15_OK` → `200 video/mp4` on `-v15.mp4`. Then idle the trigger and give Elena the URL.
+**NEXT:** wait for `V15_OK` + `200 video/mp4` on `-v15.mp4`. Idle trigger. Give Elena the URL.
 
-**VERIFIED BY:** pending the Actions result line. Local: `node scripts/test-api-film-v15-hero.cjs` (52).
+**VERIFIED BY:** pending Actions. Local: `node scripts/test-api-film-v15-hero.cjs` (61). Howto ffmpeg graph OK.
 
-**RISK:** Do not overwrite v13/v14. Do not Ken-Burns grocery stills. Replicate wallet empty → expect hero-clip fallback, not Seedance. Mosaic already rejected.
+**RISK:** Older loom compile (`acf3568`) may still finish and write `-v15` first — this cut overwrites that file only. Do not touch v13/v14.
 
 ### 🟢 12 Sep 14:22 UTC — named `/imagine` is exclusive. LIVE. encodings synced.
 
