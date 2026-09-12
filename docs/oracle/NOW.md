@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| | | | | |
+| Cursor Cloud | 12 Sep 11:30 UTC | Wire DeepSeek V4.1 Flash + Seedance 2.5 into Atuona film studio | `src/atuona-creative-ai.ts`, `src/atuona-film-compiler.ts`, `src/llm-resilience.ts`, new `src/atuona-film-providers.ts` — branch `cursor/atuona-deepseek-seedance-0841`, no Oracle deploy this session | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟡 IN FLIGHT 12 Sep 11:30 UTC — DeepSeek + Seedance into Atuona (branch)
+
+**DONE:** inspecting / wiring on `cursor/atuona-deepseek-seedance-0841`. Not on Oracle yet.
+
+**NEXT:** finish `/visualize seedance` + DeepSeek Flash as vision motion + text fallback. Do not `pm2 restart`.
+
+**VERIFIED BY:** pending unit tests on `src/atuona-film-providers.ts`.
+
+**RISK:** merging this branch does not add `DEEPSEEK_API_KEY` to Oracle `.env`. Seedance uses existing `REPLICATE_API_TOKEN`.
 
 ### 🟢 11 Sep 22:40 UTC — /api film v13 is live (joyful chill house)
 
