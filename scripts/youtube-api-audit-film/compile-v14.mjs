@@ -160,7 +160,7 @@ function extractHttpUrl(value) {
 }
 
 async function deepseekMotion(motion) {
-  if (!DEEPSEEK) return motion;
+  if (!DEEPSEEK) throw new Error('DEEPSEEK_API_KEY missing — v14 will not skip DeepSeek');
   const body = path.join(W, `deepseek-motion-${Date.now()}.json`);
   fs.mkdirSync(W, { recursive: true });
   fs.writeFileSync(
@@ -201,10 +201,10 @@ async function deepseekMotion(motion) {
       process.stderr.write(`deepseek motion ${line.slice(0, 120)}\n`);
       return line;
     }
+    throw new Error('DeepSeek returned an empty or unusable motion line');
   } catch (e) {
-    process.stderr.write(`WARN DeepSeek motion missed — using the still's written line (${e.message})\n`);
+    throw new Error(`DeepSeek motion failed: ${e.message}`);
   }
-  return motion;
 }
 
 async function seedanceI2V(stillPath, promptText, destMp4) {
@@ -673,34 +673,27 @@ async function main() {
   process.stderr.write(`=== api-audit-film ${CUT} ${new Date().toISOString()} ===\n`);
   process.stderr.write(`OPENAI ${OPENAI ? 'yes' : 'NO'} REPLICATE ${REPLICATE ? 'yes' : 'NO'} DEEPSEEK ${DEEPSEEK ? 'yes' : 'NO'}\n`);
 
-  if (REPLICATE) {
-    process.stderr.write('Seedance 2.5 image→video (one at a time). DeepSeek directs motion when keyed.\n');
-    for (const id of ['grapes', 'crawlers', 'dashboard', 'hand', 'split']) {
+  const fruitReady = process.env.API_FILM_FRUIT_READY === '1';
+  const fruitIds = ['grapes', 'crawlers', 'dashboard', 'hand', 'split'];
+  const haveFruit = fruitIds.every((id) => {
+    const p = path.join(CLIPDIR, `${id}.mp4`);
+    return fs.existsSync(p) && fs.statSync(p).size > 20000;
+  });
+  if (fruitReady && haveFruit) {
+    process.stderr.write('fruit clips already directed by DeepSeek + shot by Seedance — not rebuilding\n');
+  } else {
+    if (!DEEPSEEK) throw new Error('v14 requires DEEPSEEK_API_KEY — will not silently skip');
+    if (!REPLICATE) throw new Error('v14 requires REPLICATE_API_TOKEN so Seedance can shoot DeepSeek\'s motion');
+    process.stderr.write('DeepSeek directs. Seedance 2.5 shoots. No ffmpeg sway fallback.\n');
+    for (const id of fruitIds) {
       const b = BEATS.find((x) => x.id === id && x.kind === 'seedance');
       if (!b) continue;
       const still = path.join(HERE, b.still);
       const raw = path.join(CLIPDIR, `${b.id}.mp4`);
       if (fs.existsSync(raw)) fs.unlinkSync(raw);
-      process.stderr.write(`${b.id} rebuild — v14 does not reuse a still cache\n`);
-      try {
-        const motion = await deepseekMotion(b.motion);
-        await seedanceI2V(still, motion, raw);
-      } catch (e) {
-        process.stderr.write(`WARN seedance ${b.id}: ${e.message}\n`);
-        if (b.id === 'crawlers') {
-          process.stderr.write('crawlers still+sway — insects stay in frame (no v2 salvage)\n');
-          await fruitSway(still, raw, b.clipDur || 8.2);
-        } else if (b.id === 'grapes') {
-          process.stderr.write('grapes from grape still + grow + neuron glow (no v2 salvage)\n');
-          await neuronPulse(still, raw, b.clipDur || 8.0, { sway: true, grow: true });
-        } else {
-          process.stderr.write(`still fallback ${b.id}\n`);
-          await stillToClip(still, raw, 5.5);
-        }
-      }
+      const motion = await deepseekMotion(b.motion);
+      await seedanceI2V(still, motion, raw);
     }
-  } else {
-    process.stderr.write('WARN REPLICATE missing — fruit stills will sway in ffmpeg, not Seedance\n');
   }
 
   const cover = path.join(HERE, 'fruit/geo-pomegranate-100-vs-72.jpg');

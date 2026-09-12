@@ -62,7 +62,11 @@ const run = fs.readFileSync(runner, 'utf8');
 const pub = fs.readFileSync(publish, 'utf8');
 const wf = fs.readFileSync(workflow, 'utf8');
 
+const director = path.join(root, 'scripts/youtube-api-audit-film/direct-fruit-v14.mjs');
+ok('DeepSeek fruit director exists', fs.existsSync(director));
+ok('director refuses to skip DeepSeek', fs.readFileSync(director, 'utf8').includes('will not skip DeepSeek'));
 ok('v14 compile talks Seedance', /seedance-2\.5|Seedance 2\.5/.test(src14));
+ok('v14 compile requires DeepSeek', /will not skip DeepSeek|will not silently skip/.test(src14));
 ok('v14 compile does not call Runway I2V', !/async function runwayI2V/.test(src14));
 ok('v14 writes only -v14.mp4', src14.includes('${SLUG}-v14.mp4') && !src14.includes('${SLUG}-v12.mp4') && !src14.includes('${SLUG}.mp4'));
 ok('v14 refuses brown-noise drone as the bed', src14.includes('juicy unused Pixabay') && !/async function makeDrone/.test(src14));
@@ -78,5 +82,6 @@ ok('runner does not restart cto-aipa', !/pm2 restart/.test(run));
 ok('publisher copies only v14', pub.includes('can-ai-find-and-cite-you-v14.mp4') && !/cp -f "\$SRC\/"\*\.mp4/.test(pub));
 ok('publisher does not overwrite v13', !/v13\.mp4/.test(pub) || pub.includes('do not overwrite v13'));
 ok('workflow accepts api-film-v14', /api-film-v14/.test(wf));
+ok('workflow runs DeepSeek fruit on Oracle', wf.includes('direct-fruit-v14.mjs'));
 
 console.log(`\n${n} checks passed`);

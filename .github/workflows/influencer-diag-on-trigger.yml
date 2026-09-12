@@ -149,12 +149,34 @@ jobs:
             ssh $SSHOPTS ubuntu@170.9.242.90 'bash -s' -- \
               "$MODE" < scripts/oracle-resilience/bust-api-audit-film.sh
           elif [ "$MODE" = "api-film-v14" ]; then
-            # Compile on the runner (xfade died on long Oracle SSH). Short SSH
-            # only to unlock a juicy unused Pixabay bed (Bright Data lives on Oracle).
+            # DeepSeek + Seedance run on Oracle (that is where the keys live).
+            # Runner stitches VO + juicy Pixabay. Do not skip DeepSeek.
             sudo apt-get update -qq
             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ffmpeg
+            CLIP_DIR="${RUNNER_TEMP}/aideazz-api-film-v14/clips"
             MUSIC_DIR="${RUNNER_TEMP}/aideazz-api-film-v14/music"
-            mkdir -p "$MUSIC_DIR"
+            mkdir -p "$CLIP_DIR" "$MUSIC_DIR"
+            ssh_retry 'mkdir -p /tmp/youtube-api-audit-film-v14 /home/ubuntu/aideazz-api-film-v14/clips /tmp/api-film-v14-music' || exit 1
+            scp_retry -r \
+              scripts/youtube-api-audit-film/. \
+              ubuntu@170.9.242.90:/tmp/youtube-api-audit-film-v14/ || exit 1
+            echo "=== Oracle: DeepSeek directs, Seedance shoots ==="
+            ssh $SSHOPTS ubuntu@170.9.242.90 \
+              'export API_FILM_DIR=/home/ubuntu/aideazz-api-film-v14 CTO_ENV=/home/ubuntu/cto-aipa/.env; node /tmp/youtube-api-audit-film-v14/direct-fruit-v14.mjs' \
+              || { echo FATAL: DeepSeek/Seedance fruit missed — not publishing a silent skip; exit 1; }
+            scp_retry \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/grapes.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/split.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/crawlers.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/hand.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/clips/dashboard.mp4' \
+              'ubuntu@170.9.242.90:/home/ubuntu/aideazz-api-film-v14/deepseek-motion-v14.txt' \
+              "$CLIP_DIR/" || exit 1
+            mv -f "$CLIP_DIR/deepseek-motion-v14.txt" "${RUNNER_TEMP}/aideazz-api-film-v14/deepseek-motion-v14.txt" 2>/dev/null || true
+            ls -lh "$CLIP_DIR"
+            echo "----- DeepSeek motion lines (no keys) -----"
+            cat "${RUNNER_TEMP}/aideazz-api-film-v14/deepseek-motion-v14.txt" || cat "$CLIP_DIR/deepseek-motion-v14.txt" || true
+            export API_FILM_FRUIT_READY=1
             MUSIC_OK=0
             if ssh_retry 'mkdir -p /tmp/api-film-v14-music /tmp/youtube-api-audit-film-v14'; then
               scp_retry \
