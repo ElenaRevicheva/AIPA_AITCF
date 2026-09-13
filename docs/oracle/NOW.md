@@ -133,7 +133,7 @@ git log keeps the record.
 
 ### 📄 13 Sep — Toptal two-page CV is ready to upload.
 
-**DONE:** Polished 2-page Letter PDF at `docs/applications/13.09.26_EN_Resume_Elena_Revicheva_Toptal.pdf` (31,844 B). Specialty, live API load, no target-roles footer, no 600 applications.
+**DONE:** Polished 2-page Letter PDF at `docs/applications/13.09.26_EN_Resume_Elena_Revicheva_Toptal.pdf` (32,877 B). Proof Hub added (portfolio-first + Atlas, wiki, SOP, blog, podcast, EspaLuz WA, Atuona).
 **NEXT:** Elena uploads that PDF on the Toptal resubmit. Do not upload the 29 Aug three-pager.
 **VERIFIED BY:** `pdfinfo` Pages=2; `pdftotext` has 420+ audits / 1,900+ deals / 19 countries / 130-test / fluent English.
 **RISK:** Rebuild needs `pdf-lib` + `@pdf-lib/fontkit` (not added to package.json). Do not bump 130-test to 137. Claude Code still owns the v17 film kit.
