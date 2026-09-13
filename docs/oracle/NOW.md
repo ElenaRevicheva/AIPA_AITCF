@@ -191,11 +191,12 @@ of burned-in text. If Cursor wanted a NEW mango shot, it must re-run
 `direct-fruit-v15.mjs`; the restore did not re-shoot.
 
 
-### 📩 13 Sep — Harsh Patel (Surat, equity-only broadcaster): reply drafted. Elena's tap.
+### 📩 13 Sep — Harsh Patel (Surat, equity-only broadcaster): reply ARMED in HubSpot. Elena's tap.
 
 **DONE:** Declined equity-only and left the door open. Research + email + LinkedIn text are in `docs/selling/drafts/harsh-patel-equity-inbound.md`. Gmail draft created, **not sent**. The only real door is the hospital he named (AI visibility audit 91/A, 5 small fixes).
-**NEXT:** Elena sends it. Open a HubSpot deal **only** if the hospital itself writes in. No calls, no free work.
-**RISK:** Do not treat him as a lead. No company, no budget, affiliate-code poster.
+**ARMED:** CLIENT-MANUAL deal `65000298271`. Note carries `…/cto/go/outreach-email/harsh-patel-equity-reply`. Registry key merged on Oracle **key-by-key**, never scp'd whole (§ registry drift).
+**NEXT:** Elena taps the button → Send. If the hospital writes in, open a separate Mahavir deal. No calls, no free work.
+**RISK:** A Gmail draft of the same letter exists. Send once. Do not treat Harsh himself as a lead.
 
 ### 🟡 12 Sep 18:08 UTC — v15 fruit remake blocked. Runway wallet empty.
 

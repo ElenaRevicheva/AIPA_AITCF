@@ -3127,5 +3127,14 @@
     "emailDraft": "docs/selling/drafts/megan-pii-qc-scan-aborts-email.txt",
     "dealId": "64673099185",
     "cc": "aipa@aideazz.xyz"
+  },
+  "harsh-patel-equity-reply": {
+    "phone": "",
+    "draft": "docs/selling/drafts/harsh-patel-equity-reply-email.txt",
+    "company": "Harsh Patel — Startups (Surat)",
+    "email": "harsh.entrepreneur@zohomail.in",
+    "emailDraft": "docs/selling/drafts/harsh-patel-equity-reply-email.txt",
+    "dealId": "65000298271",
+    "score": 91
   }
 }

@@ -1,8 +1,11 @@
 # Inbound — Harsh Patel ("Harsh Entrepreneur"), Surat · 13 Sep 2026
 
-**Status:** reply drafted, NOT sent. Gmail draft created to his Zoho address. Elena's tap.
+**Status:** reply ARMED, NOT sent. Elena's tap.
 **Decision (Elena):** decline equity-only, leave the door open.
-**Not in HubSpot on purpose** — no budget signal, so no deal. Create one only if the hospital writes in.
+**HubSpot (Elena asked, 13 Sep):** CLIENT-MANUAL deal `65000298271` at *I Act TODAY*. Company `58433881090`, Contact `248233482413`, Note `116861374616` (send button), HIGH task `116843043195`.
+**One-click:** `https://webhook.aideazz.xyz/cto/go/outreach-email/harsh-patel-equity-reply`. Draft: `harsh-patel-equity-reply-email.txt`. Sends from aipa@aideazz.xyz.
+⚠️ A **Gmail draft** of the same letter also exists. Send from ONE place only.
+If the **hospital** writes in, open a separate deal for Mahavir Cancer Hospital.
 
 ---
 

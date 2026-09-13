@@ -1,0 +1,34 @@
+TO: harsh.entrepreneur@zohomail.in
+SUBJECT: Re: equity collaboration — an honest answer, and one open door
+
+Hi Harsh,
+
+Thank you for writing, and for being so clear about what you are looking for. I will be just as clear.
+
+I can't take on equity-only work right now. I build and run my own AI products, and at this stage I can't afford to work without pay. So I'm not the right fit as an unpaid co-founder, engineer or volunteer for the ideas you listed.
+
+I'd still like to keep the door open, in three ways:
+
+1. Paid, fixed-scope work. You asked for a quote. These are my fixed prices, all delivered by me with no subcontracted parts:
+   - AI search visibility audit + scorecard: $250
+   - Audit + structured data and FAQ fixes: $500
+   - Full implementation with a before/after report: $1,200
+   - One AI automation workflow (for example lead capture -> CRM -> notification): from $800
+   - Hourly: $45
+   Scope is agreed in writing before any work starts.
+
+2. The cancer hospital. This one genuinely fits my work. Today I ran my AI visibility check on mahavircancer.com. It scores 91/100: the site is well built, and the crawlers for ChatGPT, Claude, Perplexity and Gemini can all read it. It found a few small fixes: no llms.txt file, two H1 headings on the homepage, alt text on only 10 of 23 images, and about 1.9 seconds to load the page.
+
+   To answer your question about value: a good score means AI assistants can read the site. It does not show whether they actually recommend the hospital when a patient's family asks where to get cancer treatment in Surat. That is what I measure and improve. If the hospital team is interested, they are welcome to write to me directly and I will send a short written proposal.
+
+3. Later. If one of your ideas raises funding or starts earning, I'd be glad to quote the build then.
+
+On the rest: I'm not looking to sell on an ecommerce site, and I don't need a fundraising list, but thank you. Written communication suits me too, so email is best.
+
+My work: https://aideazz.xyz/portfolio
+
+Warm regards,
+Elena Revicheva
+AIdeazz
+
+P.S. For a hospital, the quickest win is usually a patient-questions FAQ page with proper structured data. Then AI assistants quote accurate answers about treatments and appointments instead of guessing. It is a small, fixed-price job.
