@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-13 ~15:30 | v19 rendering: five fruit shots generated in the /api hero language (Flux 2 Pro → DeepSeek → Seedance) cut around the real Playwright walkthrough. v18 is LIVE and must not be overwritten. | Oracle `/home/ubuntu/aideazz-api-film-v19/`, `/var/www/influencer-images/youtube/`. No PM2/systemd service touched. | 429f264 |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,49 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟢 13 Sep — /api PROMO v19 IS LIVE, and a Make promo scenario is built but OFF
+
+**https://webhook.aideazz.xyz/influencer-images/youtube/watch.html** → v19, 62.7s.
+**v18 and v16 are untouched and still 200** — rollback is one line in `watch.html`.
+
+The film is now a **walkthrough**: five fruit shots generated in the /api hero language
+(Flux 2 Pro still → DeepSeek Flash motion → Seedance 2.5 i2v) wrapped around a real
+Playwright recording of the real tool — real URL typed, real audit, real 100/A+ score,
+real "All 34 checks". Nothing on screen is a mockup. Kit: `/home/ubuntu/aideazz-api-film-v19/`.
+
+**Four things earned, all measured:**
+
+1. **The type was DejaVu** — ffmpeg's default face — while the site loads Instrument
+   Serif / Bricolage Grotesque / Manrope. The real fonts are now on Oracle in
+   `aideazz-api-film-v19/fonts/` (**Google's legacy-UA endpoint serves EOT, which
+   freetype cannot read — pull the OFL TTFs from the google/fonts repo instead**).
+2. **The QR was unscannable, and size was only half of it.** It was being resampled
+   **bilinear**, which softens the module edges a decoder reads. `flags=neighbor` +
+   236px (420px on the CTA). Proven by decoding 8/8 frames out of the *published* mp4 —
+   it fails at 640×360, which is physics, not a bug.
+3. **Text was ghosting through every dissolve** because all headlines are centred and
+   nothing faded them out. `FILM_COMPILATION_GUIDE.md` §5 already said to do this. Now
+   in the shared draw helper, so it cannot be forgotten again.
+4. **Prompt order decides the subject.** "A ripe golden mango" inside a look block
+   written around a glowing citrus core returned an **orange**. Subject first, look
+   second, plus an explicit "it is NOT a citrus".
+
+⚠️ **Runway is OUT OF CREDITS** (`image_to_video` → *"You do not have enough credits"*,
+key is valid). It made the site's own reel, so it was first choice. **Replicate is under
+$5** — it throttles at 6 req/min with that warning attached.
+
+📦 **Make scenario `6262353` — "AIdeazz — /api promo → YouTube + social" — created OFF.**
+Webhook `https://hook.us2.make.com/n78wclxkur1g5huj19hm3942y8t7viq6` → Buffer to YouTube
++ LinkedIn/Instagram. Full payload, channel ids and the open risks are in
+**`docs/oracle/MAKE_API_PROMO_SCENARIO.md`**. Whose move: **Elena's** — activating it
+publishes to three public channels, and the YouTube leg is untested because Buffer's
+YouTube path is **Shorts (vertical)** while every cut is 1920×1080 landscape.
+
+🪤 **Make's edge blocks python `urllib`** — 403 `error code: 1010` on every endpoint and
+for `Token`, `Bearer` and `x-imt-api-key` alike, which reads exactly like a dead token.
+The same token over node `fetch` returns 200. **Identical failure across three auth
+schemes is not an auth problem.**
 
 ### 📄 13 Sep — Toptal two-page CV is ready to upload.
 
