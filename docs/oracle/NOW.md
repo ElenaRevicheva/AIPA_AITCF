@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-13 ~11:40 | v17: rebuilding the /api promo from scratch on the REAL website hero reel (`aideazz/public/media/*.mp4`) — v16 rejected as ugly | Oracle `/home/ubuntu/aideazz-api-film-v17/`, new `compile-v17.mjs`, `/var/www/influencer-images/youtube/`. No PM2/systemd service touched. | 429f264 |
+| Claude Code | 2026-09-13 ~15:30 | v19 rendering: five fruit shots generated in the /api hero language (Flux 2 Pro → DeepSeek → Seedance) cut around the real Playwright walkthrough. v18 is LIVE and must not be overwritten. | Oracle `/home/ubuntu/aideazz-api-film-v19/`, `/var/www/influencer-images/youtube/`. No PM2/systemd service touched. | 429f264 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
