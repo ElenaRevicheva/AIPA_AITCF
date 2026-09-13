@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-12 ~23:45 | Re-grading the /api YouTube promo (v15→v16): chillout music + tech-trendy treatment on the how-to slides to match hero-clip-v15 | Oracle `/home/ubuntu/aideazz-api-film-v15/`, `/tmp/youtube-api-audit-film-v15/compile-v15.mjs`, `/var/www/influencer-images/youtube/`. No PM2/systemd service touched. | — |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,66 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟢 13 Sep — /api PROMO v16 IS LIVE. The film no longer ends in silence.
+
+**https://webhook.aideazz.xyz/influencer-images/youtube/watch.html** → now serves
+`can-ai-find-and-cite-you-v16.mp4`. **v15 is untouched and still 200** — roll back by
+pointing `watch.html` at it. Published copies backed up to
+`/home/ubuntu/backups/youtube-published-20260913/`; the three edited kit files to
+`/home/ubuntu/backups/api-film-kit-20260912/`.
+
+**DONE — two real defects, both fixed in `compile-v15.mjs`, both measured:**
+
+1. **The last 7.4s had NO AUDIO.** v15 was video 73.2s / audio **65.8s** — the QR end
+   card, the only frame that asks for the click, played silent. Cause:
+   **`sidechaincompress` ends with its SHORTEST input**, and its sidechain key was the
+   voiceover bus, which ran out at 65.8s. The ducker therefore cut the music bed at the
+   last word of narration. Fix: `apad` on the key branch (`[vscraw]apad[vsc]`) so the
+   duck stage runs the full length. v16 is video 73.20s / audio **73.21s**, end card
+   measures **−17.8 dB** (was silence), integrated **−15.4 LUFS**.
+2. **The how-to half was a slide deck.** It froze ONE Commons still, reused it for all
+   six slides, drew a 1792×976 black card with a gold rule, and ran a `geq` dot field
+   **with no `T` in it** — so the dots never moved. Fix: each slide now plays its OWN
+   **moving Seedance fruit clip** under a gradient veil (no box edges), with the real
+   HeroBackdrop canvas — `renderFieldLoop` from `hero-clip-v15.mjs`, now exported and
+   actually called — screen-blended at 0.22, plus vignette and drop-shadowed type.
+
+🔎 **`hero-clip-v15.mjs` was DEAD CODE.** The runner asserts it exists, but
+`compile-v15.mjs` never imported it — so the faithful ffmpeg port of the site's canvas
+was never once applied to a frame. It is now the single source of truth for the field.
+
+🎵 Music is **"Tropical Chill" / JonasBlakewood** (Pixabay, mood *Uplifting*,
+instrumental), per Elena's ask for juicy energetic chillout. Both chill beds are ~63s
+against a 73s film, so the bed is **crossfaded into itself** to 123.7s
+(`music/v15-chill-tropical-seamless.mp3`) — `-stream_loop` alone would have put a hard
+seam under the end card.
+
+⚠️ **A self-inflicted trap worth remembering:** the first two chillout candidates were
+both rejected as "burned bed" because the **dest FILENAMES chosen for them** contained
+`energetic-chillout` and `chillout-lounge`, which are BURNED patterns. `BURNED` is tested
+against a blob that includes the dest name, so *naming a candidate after what you are
+searching for* rejects it. Same shape as the 8 Sep `+50700000NN` incident: **the checker
+tripping on the fixer's own output.**
+
+🚨 **`fruit/v15-mango-whole.jpg` IS A PHOTOGRAPH OF A PERSON**, not a mango — a bad
+Commons download. It only feeds Seedance I2V so it has never reached a published frame,
+but delete it before someone shoots from it. Unchecked.
+
+⚠️ **The whole kit lives ONLY in `/tmp/youtube-api-audit-film-v15/`** — not in any git
+repo (the runner's `$GITHUB_WORKSPACE/scripts/youtube-api-audit-film` path does not exist
+on Oracle). A reboot clears `/tmp` and the pipeline is gone. Committing it is unclaimed
+work.
+
+**NEXT:** Elena watches v16 and says whether the back half now earns the front half.
+**VERIFIED BY:** `ffprobe` streams 73.20/73.21; `volumedetect -ss 65` → −17.8 dB;
+`curl` watch.html **200**, v16 Range **206**, v15 **200**; frames pulled from the
+*published* file at 0s/44s/70s.
+**RISK:** `clips/mango.mp4` had been deleted mid-reshoot (only `.seedance.json` left) and
+was restored from `work/n_mango.mp4` — the normalized take from the 17:49 render, clean
+of burned-in text. If Cursor wanted a NEW mango shot, it must re-run
+`direct-fruit-v15.mjs`; the restore did not re-shoot.
+
 
 ### 📩 13 Sep — Harsh Patel (Surat, equity-only broadcaster): reply drafted. Elena's tap.
 
