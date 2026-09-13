@@ -131,6 +131,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📄 13 Sep — Toptal resume review is in a file, not only in chat.
+
+**DONE:** Reviewed `29.08.26_EN_Resume_Elena Revicheva.pdf` against Toptal Stage 1 and work since 29 Aug.
+**NEXT:** Elena rewrites to two pages from `docs/applications/2026-09-13_toptal_resume_review.md`, then submits. Do not re-upload the 29 Aug PDF.
+**VERIFIED BY:** PDF text matches `docs/ELENA_REVICHEVA_RESUME_2026-08.md`; API load numbers are the 3 Sep Oracle floors already in this file (420+ / 14,000+ / 210+ / median 85).
+**RISK:** Do not put DataVendor $74,851, Datastar, or “600+ applications” on the Toptal profile. Do not bump 130-test to 137 until counted. Claude Code still owns the v17 film kit — this session did not touch it.
+
 ### 🟢 13 Sep — /api PROMO v16 IS LIVE. The film no longer ends in silence.
 
 **https://webhook.aideazz.xyz/influencer-images/youtube/watch.html** → now serves
@@ -1386,6 +1393,7 @@ danger at 45% free — the point was that growth now lands on the right disk.
 | 10 | **Datastar NDA** (Oracle support for AIdeazz) | ✅ **SENT 4 Sep** — deal `64678307604`, ENTREGADO to all three, stage ⏳ Sent, send-task closed, FU due 8 Sep. ⚠️ the file is **not yet in HubSpot** — upload needs the `files` scope | **Elena: tick `files` on the Service Key** (one setting), then the agent backfills. Otherwise: waiting on Conrad's countersigned copy |
 | 11 | **Coconut VA — Wellfound match** | Applied ~19 Aug, matched 3 Sep. Carmi asked Monday.com familiarity. Paste-ready answer in `docs/applications/2026-09-04_coconut_va_wellfound_reply.md` | **Elena: book the slot, paste the Carmi note in Wellfound.** $21–36k Monday.com SA. Do not claim Monday fluency — HubSpot + Make is the honest equivalent |
 | 12 | **IntelliOps BD** (overlay commission, not a job) | Addendum **staged** 4 Sep on deal `64302436100`. No v3 exists — Nishant 26 Aug asked for unpaid origination first. Do **not** countersign v2. Do **not** tap the old `intelliops-bd` button | **Elena: tap** `https://webhook.aideazz.xyz/cto/go/outreach-email/intelliops-addendum` |
+| 13 | **Toptal — fresh profile** | 29 Aug PDF reviewed 13 Sep. It is a founder CV, not a Toptal freelancer profile. Review + paste-ready headline/projects: `docs/applications/2026-09-13_toptal_resume_review.md` | **Elena: rewrite to two pages using that file, then submit.** Do not upload the 29 Aug PDF again. Add the 3 Sep API load (420+ audits / 210+ sites). Drop “600+ applications” and the target-roles footer |
 
 Drafts in `docs/applications/`. Resume: `29.08.26_EN_Resume_Elena Revicheva.{docx,pdf}`.
 
