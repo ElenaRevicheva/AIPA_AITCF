@@ -220,8 +220,8 @@ async function main() {
 
   project(
     'EspaLuz — paying WhatsApp / Telegram tutor',
-    null,
-    null,
+    'https://wa.me/50766623757',
+    'wa.me/50766623757',
     'Bilingual relocation and language tutor on WhatsApp and Telegram. Persistent per-student memory (RAG + pgvector). PayPal subscriptions. Early users in 19 countries. I am the architect and the on-call.'
   );
 
@@ -233,6 +233,30 @@ async function main() {
   );
 
   newPage();
+
+  section('Proof Hub');
+  const proofs = [
+    { label: 'Portfolio', url: 'https://aideazz.xyz/portfolio', show: 'aideazz.xyz/portfolio' },
+    { label: 'Atlas', url: 'https://webhook.aideazz.xyz/whitespace/atlas.html', show: 'atlas.html' },
+    { label: 'Wiki', url: 'https://aideazz.xyz/ai-ops-wiki.html', show: 'ai-ops-wiki.html' },
+    { label: 'Ops SOP', url: 'https://aideazz.xyz/sop-ai-ops.html', show: 'sop-ai-ops.html' },
+    { label: 'Blog', url: 'https://aideazz.xyz/blog', show: 'aideazz.xyz/blog' },
+    { label: 'Podcast', url: 'https://podcast.aideazz.xyz/', show: 'podcast.aideazz.xyz' },
+    { label: 'EspaLuz WA', url: 'https://wa.me/50766623757', show: 'wa.me/50766623757' },
+    { label: 'Atuona Studio', url: 'https://atuona.xyz/aifilmstudio/', show: 'atuona.xyz/aifilmstudio' },
+  ];
+  const colW = CONTENT_W / 2;
+  const labelW = 92;
+  proofs.forEach((p, i) => {
+    if (i % 2 === 0) ensure(16);
+    const col = i % 2;
+    const x = MARGIN_X + col * colW;
+    const rowY = y;
+    drawText(p.label, { x, y: rowY, size: 7.5, font: bold, color: INK });
+    linkText(p.show, p.url, x + labelW, rowY, 7.2, regular, LINK);
+    if (col === 1 || i === proofs.length - 1) y -= 13;
+  });
+  y -= 8;
 
   section('How I work');
   para(
