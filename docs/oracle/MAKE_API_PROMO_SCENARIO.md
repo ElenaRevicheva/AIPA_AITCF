@@ -1,4 +1,63 @@
-# /api promo → YouTube + social (Make scenario `6262353`)
+# /api promo → YouTube + social (Make)
+
+## STATE, 13 Sep 2026
+
+| scenario | state | does |
+|---|---|---|
+| `6262097` **Daily YouTube Promotion via Buffer** | **ACTIVE**, daily 09:00 (14:00 UTC) | Buffer → LinkedIn + Instagram, rotating the two YouTube links by day-of-month parity. **Proven: both channels returned `sent`.** |
+| `6263197` **Daily YouTube Upload — NEEDS a working YouTube connection** | **STOPPED** | `youtube:uploadVideo` v4, unmapped. Blocked on OAuth, see below. |
+
+## 🚫 ALL FOURTEEN YouTube connections in Make are DEAD
+
+`POST /connections/{id}/test` returns **424** *"The request failed due to failure of a
+previous request"* for every one of them (`5473103, 5473760, 5473773, 5473982, 5474427,
+5474448, 5476318, 5485601, 5485605, 5487504, 5487585, 5487596, 5487612, 5487643`).
+
+**The control proves the endpoint is fine**, not the test: telegram ×6, buffer ×3 and
+hubspotcrm all return **`200 {"verified": true}`** through the same call. That is almost
+certainly why there are fourteen — each one broke, another was made, none was ever
+verified.
+
+**Only Elena can fix this** (Google OAuth consent, credential boundary):
+Make → Connections → Add → YouTube → sign in → Allow. **One** working connection is
+enough; the other thirteen should be deleted.
+
+## ✅ The YouTube module identifier, finally
+
+**`youtube:uploadVideo`, version 4.** Make accepts it (`PATCH` 200).
+
+Nineteen name/version guesses failed first. The way to get it is **the public template
+library**, which is readable over the API when `/apps*` is not:
+
+```
+GET /templates/public?pg[limit]=100&pg[offset]=N   → find one whose usedApps has "youtube"
+GET /templates/public/{id}/blueprint               → real module names + versions
+```
+Template `11079` ("Upload new videos to YouTube and LinkedIn automatically") yields
+`google-sheets:watchRows, google-drive:getAFile, youtube:uploadVideo, linkedin:createVideoPost`.
+Note `/templates/{id}/blueprint` (non-public) returns 403 — use the `public` path.
+
+## 🚫 Buffer's API CANNOT publish landscape video to YouTube
+
+Verbatim, after fixing two earlier errors it raised (`categoryId` required, then
+`thumbnailUrl` unsupported):
+
+> **"Video must be vertical (portrait orientation) for YouTube Shorts."**
+
+Buffer's YouTube path is **Shorts only**. Every cut is 1920×1080 landscape, so Buffer is
+right for LinkedIn/Instagram promotion and cannot be the YouTube uploader. Two ways
+forward: render 1080×1920 portrait cuts for Shorts, or use `youtube:uploadVideo` once a
+connection exists.
+
+Also note the legacy Make module `buffer:ActionCreateStatus` v2 has **no YouTube title
+field** — Buffer returns *"You have to add a title to your YouTube video."* and extra
+mapper keys are ignored. The title only exists on the newer Buffer GraphQL API, under
+`metadata.youtube.title` (`YoutubePostMetadataInput`: categoryId, embeddable,
+isAiGenerated, license, madeForKids, notifySubscribers, privacy, title).
+
+---
+
+# Original build note (scenario `6262353`, since deleted as redundant)
 
 Built 13 Sep 2026 over the Make REST API from Oracle. **Created OFF. Nothing has been
 published.**
