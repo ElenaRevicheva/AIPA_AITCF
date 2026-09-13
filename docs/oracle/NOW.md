@@ -131,6 +131,12 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📩 13 Sep — Harsh Patel (Surat, equity-only broadcaster): reply drafted. Elena's tap.
+
+**DONE:** Declined equity-only and left the door open. Research + email + LinkedIn text are in `docs/selling/drafts/harsh-patel-equity-inbound.md`. Gmail draft created, **not sent**. The only real door is the hospital he named (AI visibility audit 91/A, 5 small fixes).
+**NEXT:** Elena sends it. Open a HubSpot deal **only** if the hospital itself writes in. No calls, no free work.
+**RISK:** Do not treat him as a lead. No company, no budget, affiliate-code poster.
+
 ### 🟡 12 Sep 18:08 UTC — v15 fruit remake blocked. Runway wallet empty.
 
 **DONE:** Elena: first still is fine; after that was a grocery-cut xfade. Code now shoots Runway from the whole still + `/api` canvas, and refuses a still fallback. Fire `34710230680` (`a1c6e80`): `DEEPSEEK yes … RUNWAY yes` then `Runway create 400: You do not have enough credits`. Did not publish. Trigger idle. Live `-v15.mp4` is still the 73s still-xfade.
