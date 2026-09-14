@@ -24,6 +24,7 @@ on:
           - atuona
           - atlas
           - atlas-diagnose
+          - atlas-patch
           - fleet-verify
           - radar_buttons
           - sprinter-aws

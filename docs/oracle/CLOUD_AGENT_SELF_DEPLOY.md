@@ -56,6 +56,7 @@ Same choices as the phone workflow — registry lives in `scripts/oracle-resilie
 | `blog_html` | **Re-put one cached article** via GitHub Contents API (`pushOneArticleHtml`, same channel as the daily publisher — author Elena, no `[skip ci]`). Second line of `.deploy-trigger` is the slug. |
 | `fleet-verify` | **Health check only — deploys nothing.** Runs `verify-fleet-health.sh` across all 9 products + EspaLuz memory-persistence audit. |
 | `atlas-diagnose` | **Read-only Atlas cron dump — deploys nothing.** SSH-prints `/home/ubuntu/whitespace/data/capture.log` error slice, sqlite snapshot dates, jsonl size, crontab. Use when Telegram says `classify.js FAILED`. |
+| `atlas-patch` | **Apply `scripts/atlas-patches/*.patch` on Oracle `/home/ubuntu/whitespace`, rebuild `dist/`, rerun classify→brief→concept, push `atlas-shifted`.** Cloud agents cannot push that repo (403). |
 
 ## Safety properties (same guarantees as the phone flow)
 

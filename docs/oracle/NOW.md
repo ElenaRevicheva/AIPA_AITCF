@@ -131,14 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🔴 14 Sep — Atlas Monday classify.js FAILED. Cursor Cloud in flight.
+### 🔴 14 Sep — Atlas Monday classify.js FAILED. Fix in flight (atlas-patch).
 
-Telegram ⚠️ `classify.js FAILED — radar.sqlite NOT rebuilt, dashboard still shows the previous day's data.` Product lives on Oracle at `/home/ubuntu/whitespace` (repo `atlas-shifted`, PM2 `whitespace:8095`). Not cloning it. Diagnosing through `.deploy-trigger` `atlas-diagnose` → SSH dump of `data/capture.log` + sqlite snapshot dates. Do not restart `whitespace` or re-run the cron until that log is in the Actions output.
+Verified from Oracle `capture.log` (Actions run 34854629553): capture wrote 12 ads (`jsonl=3316`), then
+`[llm] embeddings 429` ×3 with **"You have no credits remaining"** → `failed to embed captured ads` → Telegram 5616.
+`radar.sqlite` still **2026-09-07**. OpenAI embeddings are a documented SPOF; the Jul 12 retry treated quota as a transient 429.
 
-**DONE:** session claimed.
-**NEXT:** Oracle capture.log error line, then a durable classify fix (embeddings are OpenAI-only — documented SPOF).
-**VERIFIED BY:** this claim row.
-**RISK:** a second agent re-running `atlas-capture-cron.sh` while classify is being diagnosed will race the JSONL.
+**DONE:** diagnose. **NEXT:** `atlas-patch` — Gemini embeddings failover + lexical fallback, rerun classify→brief→concept on the box.
+**VERIFIED BY:** capture.log lines 10517–10529; `/api/atlas` `expected_snapshot_date=2026-09-14` vs `sqlite_snapshot=2026-09-07`.
+**RISK:** mixing Gemini/lexical angle_version with last week's OpenAI `v1` makes one week of velocity noisy. Stale board is worse. Do not `git pull` whitespace.
 
 ### 🟢 13 Sep — /api PROMO v19 IS LIVE, and a Make promo scenario is built but OFF
 

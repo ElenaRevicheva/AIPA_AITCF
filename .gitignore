@@ -31,8 +31,10 @@ data/places-live-test.txt
 *.backup
 backup_*/
 
-# Patch files
+# Patch files (except the Oracle patch-relay folders)
 *.patch
+!scripts/aideazz-patches/*.patch
+!scripts/atlas-patches/*.patch
 
 # One-time fix scripts (legacy, should not return)
 fix_*.py
