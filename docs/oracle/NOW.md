@@ -131,18 +131,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ✅ 14 Sep — Atlas Monday radar rebuilt. Encoding pinned so lexical cannot be lost.
+### ✅ 14 Sep — Atlas Monday radar rebuilt. Lead machine ran and staged **0**.
 
-Telegram was right. Capture wrote 12 ads (`jsonl=3316`); classify died on OpenAI embeddings **429 "You have no credits remaining"** (retried as a rate limit). `radar.sqlite` was frozen at **2026-09-07**.
+Telegram was right. Capture wrote 12 ads (`jsonl=3316`); classify died on OpenAI embeddings **429 "You have no credits remaining"**. `radar.sqlite` was frozen at **2026-09-07**. Fix live (`atlas-shifted` `8c2a9f3`/`ab84566`/`cdf284c`): quota hard-down → Gemini → **`v1-lexical`**. Board: `snapshot_date=2026-09-14`.
 
-Fix live on Oracle `/home/ubuntu/whitespace` and on `atlas-shifted` `main` (`8c2a9f3`, `ab84566`, **`cdf284c` LF pin**): quota is a hard-down → Gemini `gemini-embedding-001` → lexical fallback. Both embedding wallets are empty today, so this snapshot is **`v1-lexical`**. Board API: `snapshot_date=2026-09-14` matching expected.
+The **lead machine is a different cron** (`0 16 * * 1`, `LEAD_MAX_NEW=8`). It ran today at 16:01 UTC, read this morning's `concepts.json` (`whatsapp_ai_agents` score 60 / `pain_point`), and **staged 0** — Bright Data SERP empty/timeout/"query recently failed". HubSpot `[CLIENT-ATLAS]` created today: **0**. Last HubSpot batch was **7 Sep** (8 deals); that run's git publish failed (`non-fast-forward`) because Oracle `cto-aipa` is **detached HEAD**, so one-click send buttons 404. Sep 7 drafts are still staged on the box.
 
-Encoding three-way (Actions `34862074633`, no classify rerun, no PM2 restart): Oracle src **==** `origin/main` blobs (`llm.ts` `04ef862c…`, `classify.ts` `447eb871…`), all LF, gitignored `dist/` still has `v1-lexical`. AIPA patches on the box are the same LF bytes. `core.autocrlf=false` `core.eol=lf`. Product **`atlas-encoding-sync`** on branch `cursor/atlas-classify-failed-1e36` (PR 59) — not yet on this `main` checkout.
-
-**DONE:** Monday board unstale; classify no longer exits 1 on embedding quota; LF pinned across git / Oracle src+dist / patch relay.
-**NEXT:** Elena tops up OpenAI (platform.openai.com billing) so next Monday is vectors, not lexical. Merge PR 59 when ready so `PRODUCT_atlas` post-pull fail-closes if dist loses lexical.
-**VERIFIED BY:** Actions `34855100217` / `34855366033` / `34862074633`; `ATLAS CLASSIFY DONE · 3316 ads · version=v1-lexical`; three-way `MATCH src/llm.ts` + `MATCH src/classify.ts`; `ab84566..cdf284c` on atlas-shifted.
-**RISK:** this week's ENTER/WATCH scores are lexical, not OpenAI-v1 — do not compare them to last Monday as if the classifier were the same. Gemini embed also 429 quota. Oracle whitespace still has a dirty `scripts/atlas-capture-cron.sh` (pre-existing) — that, not CRLF, is what would block `git pull --ff-only` on an `atlas` deploy.
+**DONE:** Monday board unstale; lexical pinned LF; lead-machine cron still installed and fired.
+**NEXT:** do not assume today's 8 HubSpot notes exist. Rescue Sep 7 drafts onto `main` (box is detached HEAD — named-file commit, not `git pull`). Retry lead machine only after Bright Data SERP returns rows. Elena still tops up OpenAI for next Monday's vectors.
+**VERIFIED BY:** Actions `34868379673`; log `done · staged 0`; HubSpot `created_today=0`; `concepts.json` mtime 14:25.
+**RISK:** radar working ≠ leads in HubSpot. Detached HEAD on `cto-aipa` will keep killing Monday draft publish even when staging succeeds.
 
 ### 🟢 13 Sep — /api PROMO v19 IS LIVE, and a Make promo scenario is built but OFF
 
