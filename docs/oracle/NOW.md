@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-14 14:20 | Atlas Monday `classify.js` FAILED (Telegram) | Oracle `/home/ubuntu/whitespace` via `atlas-diagnose` (read-only); AIPA_AITCF workflow/trigger | this commit |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,15 +131,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🔴 14 Sep — Atlas Monday classify.js FAILED. Fix in flight (atlas-patch).
+### ✅ 14 Sep — Atlas Monday radar rebuilt. OpenAI embeddings had no credits.
 
-Verified from Oracle `capture.log` (Actions run 34854629553): capture wrote 12 ads (`jsonl=3316`), then
-`[llm] embeddings 429` ×3 with **"You have no credits remaining"** → `failed to embed captured ads` → Telegram 5616.
-`radar.sqlite` still **2026-09-07**. OpenAI embeddings are a documented SPOF; the Jul 12 retry treated quota as a transient 429.
+Telegram was right. Capture wrote 12 ads (`jsonl=3316`); classify died on OpenAI embeddings **429 "You have no credits remaining"** (retried as a rate limit). `radar.sqlite` was frozen at **2026-09-07**.
 
-**DONE:** diagnose. **NEXT:** `atlas-patch` — Gemini embeddings failover + lexical fallback, rerun classify→brief→concept on the box.
-**VERIFIED BY:** capture.log lines 10517–10529; `/api/atlas` `expected_snapshot_date=2026-09-14` vs `sqlite_snapshot=2026-09-07`.
-**RISK:** mixing Gemini/lexical angle_version with last week's OpenAI `v1` makes one week of velocity noisy. Stale board is worse. Do not `git pull` whitespace.
+Fix live on Oracle `/home/ubuntu/whitespace` and on `atlas-shifted` `main` (`8c2a9f3`, `ab84566`): quota is a hard-down → Gemini `gemini-embedding-001` → lexical fallback. Both embedding wallets are empty today, so this snapshot is **`v1-lexical`**. Board API: `snapshot_date=2026-09-14` matching expected.
+
+**DONE:** Monday board unstale; classify no longer exits 1 on embedding quota.
+**NEXT:** Elena tops up OpenAI (platform.openai.com billing) so next Monday is vectors, not lexical.
+**VERIFIED BY:** Actions `34855100217` / `34855366033`; `ATLAS CLASSIFY DONE · 3316 ads · version=v1-lexical`; `/api/atlas` sqlite 2026-09-14.
+**RISK:** this week's ENTER/WATCH scores are lexical, not OpenAI-v1 — do not compare them to last Monday as if the classifier were the same. Gemini embed also 429 quota.
 
 ### 🟢 13 Sep — /api PROMO v19 IS LIVE, and a Make promo scenario is built but OFF
 
