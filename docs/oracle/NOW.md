@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 2026-09-14 16:35Z | Retry Atlas Monday lead machine after Bright Data top-up | Oracle `atlas-lead-machine.cjs` (HubSpot writes, no PM2 restart) | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
