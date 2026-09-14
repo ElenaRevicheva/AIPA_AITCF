@@ -12,4 +12,7 @@ classify → brief → concept so `radar.sqlite` is today's snapshot, and pushes
 429 *You have no credits remaining*. The Jul 12 retry treated that as a
 transient rate limit, then `classify.js` exited 1 and the cron skipped
 brief/concept. Fail over to Gemini `text-embedding-004`, then a lexical
-prototype-overlap fallback so Monday still rebuilds the board.
+`0002-gemini-embedding-001.patch` — same day: `text-embedding-004` 404'd
+(`not found for API version v1beta`). Try `gemini-embedding-001`, then
+`gemini-embedding-2`, then the old id.
+

@@ -99,7 +99,7 @@ const patch = fs.readFileSync(require('path').join(__dirname, 'atlas-patches/000
 check('patch mentions isEmbedQuotaError', patch.includes('isEmbedQuotaError'));
 check('patch mentions text-embedding-004', patch.includes('text-embedding-004'));
 check('patch mentions v1-lexical', patch.includes('v1-lexical'));
-check('patch fails over to Gemini on quota', patch.includes('failing over to Gemini'));
+check('patch mentions gemini-embedding-001', fs.existsSync(require('path').join(__dirname, 'atlas-patches/0002-gemini-embedding-001.patch')) && fs.readFileSync(require('path').join(__dirname, 'atlas-patches/0002-gemini-embedding-001.patch'), 'utf8').includes('gemini-embedding-001'));
 
 if (failed) {
   console.error(`\n${failed} check(s) failed`);

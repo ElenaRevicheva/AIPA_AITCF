@@ -60,8 +60,8 @@ fi
 ./node_modules/.bin/tsc -p tsconfig.json
 grep -q 'isEmbedQuotaError' dist/llm.js
 grep -q 'v1-lexical' dist/classify.js
-grep -q 'text-embedding-004' dist/llm.js
-echo "VERIFY: dist has quota detector, lexical fallback, Gemini embeddings"
+grep -q 'gemini-embedding-001' dist/llm.js
+echo "VERIFY: dist has quota detector, lexical fallback, Gemini embedding-001"
 
 echo "=== classify → brief → concept (capture already wrote 2026-09-14 JSONL) ==="
 node dist/classify.js
