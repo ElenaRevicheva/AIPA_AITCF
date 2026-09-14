@@ -23,6 +23,7 @@ on:
           - cto_aipa
           - atuona
           - atlas
+          - atlas-diagnose
           - fleet-verify
           - radar_buttons
           - sprinter-aws
@@ -54,6 +55,7 @@ jobs:
           host: 170.9.242.90
           username: ubuntu
           key: ${{ secrets.ORACLE_SSH_KEY }}
+          command_timeout: 10m
           script_stop: true
           envs: PRODUCT,DEPLOY_FILES,DISPATCH_NOTES
           script: |
@@ -76,6 +78,14 @@ jobs:
             elif [ "$PRODUCT" = "radar_buttons" ]; then
               chmod +x scripts/oracle-radar-buttons.sh
               bash scripts/oracle-radar-buttons.sh
+            elif [ "$PRODUCT" = "atlas-diagnose" ]; then
+              chmod +x scripts/oracle-atlas-cron-diagnose.sh 2>/dev/null || true
+              if [ -x scripts/oracle-atlas-cron-diagnose.sh ]; then
+                bash scripts/oracle-atlas-cron-diagnose.sh
+              else
+                echo "atlas-diagnose script missing on origin/main; use trigger-file workflow"
+                exit 1
+              fi
             else
               bash scripts/oracle-resilience/deploy-product.sh
             fi
