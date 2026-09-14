@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-14 15:22Z | Atlas encoding sync so lexical classify is not lost to CRLF | `/home/ubuntu/whitespace` src+dist (no PM2 restart), `scripts/atlas-patches`, atlas-shifted `.gitattributes` | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,16 +131,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ✅ 14 Sep — Atlas Monday radar rebuilt. OpenAI embeddings had no credits.
+### ✅ 14 Sep — Atlas Monday radar rebuilt. Encoding pinned so lexical cannot be lost.
 
 Telegram was right. Capture wrote 12 ads (`jsonl=3316`); classify died on OpenAI embeddings **429 "You have no credits remaining"** (retried as a rate limit). `radar.sqlite` was frozen at **2026-09-07**.
 
-Fix live on Oracle `/home/ubuntu/whitespace` and on `atlas-shifted` `main` (`8c2a9f3`, `ab84566`): quota is a hard-down → Gemini `gemini-embedding-001` → lexical fallback. Both embedding wallets are empty today, so this snapshot is **`v1-lexical`**. Board API: `snapshot_date=2026-09-14` matching expected.
+Fix live on Oracle `/home/ubuntu/whitespace` and on `atlas-shifted` `main` (`8c2a9f3`, `ab84566`, **`cdf284c` LF pin**): quota is a hard-down → Gemini `gemini-embedding-001` → lexical fallback. Both embedding wallets are empty today, so this snapshot is **`v1-lexical`**. Board API: `snapshot_date=2026-09-14` matching expected.
 
-**DONE:** Monday board unstale; classify no longer exits 1 on embedding quota.
-**NEXT:** Elena tops up OpenAI (platform.openai.com billing) so next Monday is vectors, not lexical.
-**VERIFIED BY:** Actions `34855100217` / `34855366033`; `ATLAS CLASSIFY DONE · 3316 ads · version=v1-lexical`; `/api/atlas` sqlite 2026-09-14.
-**RISK:** this week's ENTER/WATCH scores are lexical, not OpenAI-v1 — do not compare them to last Monday as if the classifier were the same. Gemini embed also 429 quota.
+Encoding three-way (Actions `34862074633`, no classify rerun, no PM2 restart): Oracle src **==** `origin/main` blobs (`llm.ts` `04ef862c…`, `classify.ts` `447eb871…`), all LF, gitignored `dist/` still has `v1-lexical`. AIPA patches on the box are the same LF bytes. `core.autocrlf=false` `core.eol=lf`. Product **`atlas-encoding-sync`** on branch `cursor/atlas-classify-failed-1e36` (PR 59) — not yet on this `main` checkout.
+
+**DONE:** Monday board unstale; classify no longer exits 1 on embedding quota; LF pinned across git / Oracle src+dist / patch relay.
+**NEXT:** Elena tops up OpenAI (platform.openai.com billing) so next Monday is vectors, not lexical. Merge PR 59 when ready so `PRODUCT_atlas` post-pull fail-closes if dist loses lexical.
+**VERIFIED BY:** Actions `34855100217` / `34855366033` / `34862074633`; `ATLAS CLASSIFY DONE · 3316 ads · version=v1-lexical`; three-way `MATCH src/llm.ts` + `MATCH src/classify.ts`; `ab84566..cdf284c` on atlas-shifted.
+**RISK:** this week's ENTER/WATCH scores are lexical, not OpenAI-v1 — do not compare them to last Monday as if the classifier were the same. Gemini embed also 429 quota. Oracle whitespace still has a dirty `scripts/atlas-capture-cron.sh` (pre-existing) — that, not CRLF, is what would block `git pull --ff-only` on an `atlas` deploy.
 
 ### 🟢 13 Sep — /api PROMO v19 IS LIVE, and a Make promo scenario is built but OFF
 
