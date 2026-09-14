@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 2026-09-14 14:20 | Atlas Monday `classify.js` FAILED (Telegram) | Oracle `/home/ubuntu/whitespace` via `atlas-diagnose` (read-only); AIPA_AITCF workflow/trigger | this commit |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🔴 14 Sep — Atlas Monday classify.js FAILED. Cursor Cloud in flight.
+
+Telegram ⚠️ `classify.js FAILED — radar.sqlite NOT rebuilt, dashboard still shows the previous day's data.` Product lives on Oracle at `/home/ubuntu/whitespace` (repo `atlas-shifted`, PM2 `whitespace:8095`). Not cloning it. Diagnosing through `.deploy-trigger` `atlas-diagnose` → SSH dump of `data/capture.log` + sqlite snapshot dates. Do not restart `whitespace` or re-run the cron until that log is in the Actions output.
+
+**DONE:** session claimed.
+**NEXT:** Oracle capture.log error line, then a durable classify fix (embeddings are OpenAI-only — documented SPOF).
+**VERIFIED BY:** this claim row.
+**RISK:** a second agent re-running `atlas-capture-cron.sh` while classify is being diagnosed will race the JSONL.
 
 ### 🟢 13 Sep — /api PROMO v19 IS LIVE, and a Make promo scenario is built but OFF
 
