@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Cursor Cloud | 2026-09-14 15:22Z | Atlas encoding sync so lexical classify is not lost to CRLF | `/home/ubuntu/whitespace` src+dist (no PM2 restart), `scripts/atlas-patches`, atlas-shifted `.gitattributes` | pending |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
