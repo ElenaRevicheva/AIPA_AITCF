@@ -11,6 +11,7 @@ AIPA_DIR=/home/ubuntu/cto-aipa
 if [[ ! -d "$AIPA_DIR/.git" ]]; then AIPA_DIR=/home/ubuntu/AIPA_AITCF; fi
 PATCH_DIR="$AIPA_DIR/scripts/atlas-patches"
 WS=/home/ubuntu/whitespace
+NORM="$AIPA_DIR/scripts/oracle-resilience/lib/lf-normalize.py"
 
 if [[ ! -d "$WS/.git" ]]; then
   echo "FATAL: Atlas checkout missing at $WS"
@@ -20,6 +21,20 @@ fi
 echo "=== whitespace before ==="
 git -C "$WS" log -1 --format='%h %ci %s'
 git -C "$WS" status -sb | head -10
+
+echo "=== pin LF (patches + git config) so apply cannot write CRLF src ==="
+git -C "$WS" config core.autocrlf false
+git -C "$WS" config core.eol lf
+if [[ -f "$NORM" ]]; then
+  shopt -s nullglob
+  PRE_PATCHES=("$PATCH_DIR"/*.patch)
+  if [[ ${#PRE_PATCHES[@]} -gt 0 ]]; then
+    python3 "$NORM" --strip "${PRE_PATCHES[@]}"
+    python3 "$NORM" --check "${PRE_PATCHES[@]}"
+  fi
+else
+  echo "WARN: $NORM missing — applying patches as-is"
+fi
 
 shopt -s nullglob
 PATCHES=("$PATCH_DIR"/*.patch)
@@ -42,6 +57,9 @@ for p in "${PATCHES[@]}"; do
   fi
   if git apply --check "$p" 2>/dev/null; then
     git apply "$p"
+    if [[ -f "$NORM" ]]; then
+      python3 "$NORM" --strip src/classify.ts src/llm.ts
+    fi
     git add src/classify.ts src/llm.ts
     git commit -m "$SUBJECT"
     APPLIED=$((APPLIED + 1))
@@ -58,10 +76,14 @@ if [[ ! -x node_modules/.bin/tsc ]]; then
   npm install --no-save typescript@5.7.2
 fi
 ./node_modules/.bin/tsc -p tsconfig.json
+if [[ -f "$NORM" ]]; then
+  python3 "$NORM" --strip src/classify.ts src/llm.ts dist/classify.js dist/llm.js
+  python3 "$NORM" --check src/classify.ts src/llm.ts dist/classify.js dist/llm.js
+fi
 grep -q 'isEmbedQuotaError' dist/llm.js
 grep -q 'v1-lexical' dist/classify.js
 grep -q 'gemini-embedding-001' dist/llm.js
-echo "VERIFY: dist has quota detector, lexical fallback, Gemini embedding-001"
+echo "VERIFY: dist has quota detector, lexical fallback, Gemini embedding-001 (LF)"
 
 echo "=== classify → brief → concept (capture already wrote 2026-09-14 JSONL) ==="
 node dist/classify.js

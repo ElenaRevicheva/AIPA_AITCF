@@ -88,4 +88,45 @@ else
 fi
 
 echo ""
+echo "=== encoding (CRLF trap — lexical lives in gitignored dist/) ==="
+python3 - <<'PY' || true
+from pathlib import Path
+files = [
+    "src/llm.ts",
+    "src/classify.ts",
+    "dist/llm.js",
+    "dist/classify.js",
+]
+ws = Path("/home/ubuntu/whitespace")
+for rel in files:
+    p = ws / rel
+    if not p.is_file():
+        print(f"MISSING {rel}")
+        continue
+    data = p.read_bytes()
+    bom = data.startswith(b"\xef\xbb\xbf")
+    body = data[3:] if bom else data
+    crlf = body.count(b"\r\n")
+    lf = body.count(b"\n") - crlf
+    lone = body.count(b"\r") - crlf
+    flags = []
+    if b"v1-lexical" in data:
+        flags.append("v1-lexical")
+    if b"isEmbedQuotaError" in data:
+        flags.append("quota")
+    if b"gemini-embedding-001" in data:
+        flags.append("gemini-001")
+    status = "LF" if (not bom and crlf == 0 and lone == 0) else "CRLF"
+    print(f"{status} {rel} bytes={len(data)} crlf={crlf} lf={lf} lone_cr={lone} bom={int(bom)} markers={','.join(flags) or '-'}")
+PY
+if [[ -d "$WS/.git" ]]; then
+  echo -n "core.autocrlf="; git -C "$WS" config --get core.autocrlf || echo unset
+  echo -n "core.eol="; git -C "$WS" config --get core.eol || echo unset
+  for f in src/llm.ts src/classify.ts; do
+    echo -n "hash-object $f "; git -C "$WS" hash-object "$f" 2>/dev/null || echo missing
+    echo -n "HEAD:$f "; git -C "$WS" rev-parse "HEAD:$f" 2>/dev/null || echo missing
+  done
+fi
+
+echo ""
 echo "=== diagnose done ==="

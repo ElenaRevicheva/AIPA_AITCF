@@ -1,2 +1,7 @@
 # Shell scripts must use LF so they run on Oracle (Linux)
 scripts/oracle-resilience/*.sh text eol=lf
+scripts/oracle-resilience/lib/*.py text eol=lf
+# Atlas patch relay: CRLF patches apply as CRLF src on Oracle and a later
+# git checkout looks like the lexical classify workaround vanished.
+scripts/atlas-patches/*.patch text eol=lf
+scripts/atlas-patches/*.md text eol=lf

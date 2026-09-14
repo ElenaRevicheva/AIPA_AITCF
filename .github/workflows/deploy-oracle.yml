@@ -25,6 +25,7 @@ on:
           - atlas
           - atlas-diagnose
           - atlas-patch
+          - atlas-encoding-sync
           - fleet-verify
           - radar_buttons
           - sprinter-aws
@@ -87,6 +88,12 @@ jobs:
                 echo "atlas-diagnose script missing on origin/main; use trigger-file workflow"
                 exit 1
               fi
+            elif [ "$PRODUCT" = "atlas-patch" ]; then
+              chmod +x scripts/oracle-resilience/push-atlas-patch.sh
+              bash scripts/oracle-resilience/push-atlas-patch.sh
+            elif [ "$PRODUCT" = "atlas-encoding-sync" ]; then
+              chmod +x scripts/oracle-resilience/sync-atlas-encoding.sh
+              bash scripts/oracle-resilience/sync-atlas-encoding.sh
             else
               bash scripts/oracle-resilience/deploy-product.sh
             fi
