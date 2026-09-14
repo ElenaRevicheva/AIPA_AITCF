@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Cursor Cloud | 2026-09-14 16:35Z | Retry Atlas Monday lead machine after Bright Data top-up | Oracle `atlas-lead-machine.cjs` (HubSpot writes, no PM2 restart) | pending |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -138,7 +138,7 @@ Telegram was right. Capture wrote 12 ads (`jsonl=3316`); classify died on OpenAI
 The **lead machine is a different cron** (`0 16 * * 1`, `LEAD_MAX_NEW=8`). It ran today at 16:01 UTC, read this morning's `concepts.json` (`whatsapp_ai_agents` score 60 / `pain_point`), and **staged 0** — Bright Data SERP empty/timeout/"query recently failed". HubSpot `[CLIENT-ATLAS]` created today: **0**. Last HubSpot batch was **7 Sep** (8 deals); that run's git publish failed (`non-fast-forward`) because Oracle `cto-aipa` is **detached HEAD**, so one-click send buttons 404. Sep 7 drafts are still staged on the box.
 
 **DONE:** Monday board unstale; lexical pinned LF; lead-machine cron still installed and fired.
-**NEXT:** do not assume today's 8 HubSpot notes exist. Rescue Sep 7 drafts onto `main` (box is detached HEAD — named-file commit, not `git pull`). Retry lead machine only after Bright Data SERP returns rows. Elena still tops up OpenAI for next Monday's vectors.
+**NEXT:** Bright Data is funded ($10.96 Web Unlocker) and a 16:35 UTC retry still staged 0 — not a wallet problem. Do not assume today's 8 HubSpot notes exist. Rescue Sep 7 drafts onto `main` (box is detached HEAD). Elena still tops up OpenAI for next Monday's vectors.
 **VERIFIED BY:** Actions `34868379673`; log `done · staged 0`; HubSpot `created_today=0`; `concepts.json` mtime 14:25.
 **RISK:** radar working ≠ leads in HubSpot. Detached HEAD on `cto-aipa` will keep killing Monday draft publish even when staging succeeds.
 
