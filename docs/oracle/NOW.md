@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-14 ~17:10 | EspaLuz Influencer Instagram posts failing ("provided image does not appear to be valid"): 34 me_* images padded to 4:5 (backups kept), milestone image still on dead GitHub raw URL | Oracle `/home/ubuntu/EspaLuz_Influencer/cto_milestone_module.py`, `scripts/fire_one_marketing_image_post.py`, `espaluz-influencer` restart, `/var/www/influencer-images/`, Make scenario `3044021` | fa5f1f8 |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,43 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🔴 15 Sep — EspaLuz Influencer → Instagram: FIXED in code, Make scenario `3044021` still OFF. Elena's move.
+
+Symptom: Buffer `400: The provided image does not appear to be valid`, Make then set
+scenario `3044021` (*Emotionally Intelligent Free Organic Promo Engine*) to
+`active:false, invalid:true`. It fails at the **first** Buffer module (Instagram) —
+`ops 3` on failure vs `ops 4` on success — so LinkedIn was never the problem.
+
+**Two independent causes, both now fixed:**
+
+1. **34 images too tall for Instagram.** All `me_01…me_32.jpg` plus
+   `marketing_engine_architecture.png` / `marketing_engine_workflow.png` were
+   **784×1168 = 0.671**; Instagram's floor is **0.8 (4:5)**. Padded to 1080×1350 with a
+   blurred fill — never cropped, they carry text. **Originals, byte-identical at
+   784×1168: `/home/ubuntu/backups/influencer-images-20260914/` (34 files).**
+   Verified: 48/48 referenced URLs now 200 and in range.
+2. **Milestone image still on GitHub raw.** `4022280` (Cursor, 10 Sep) moved me_* and
+   geo images to `webhook.aideazz.xyz` when the repo went private for the HUD licence,
+   but **missed `cto_milestone_module.py`**, which still built
+   `raw.githubusercontent.com/.../sprinter.jpg` → **404**. Fixed in EspaLuz_Influencer
+   **`6a7d6e9`** (+ same dead base in `scripts/fire_one_marketing_image_post.py`).
+   Pushed, `espaluz-influencer` restarted, process start newer than file.
+
+**Whose move — Elena's.** Two posts are queued on hook `1357073`:
+- `2edfbddc…` (12 Sep) — its payload has the **dead GitHub URL baked in**. The code fix
+  cannot change an already-queued payload; it will fail again. Delete it.
+- `8dff111d…` (14 Sep) — GEO image, 1080×1350, valid. **Re-activating the scenario
+  publishes it to Instagram + LinkedIn immediately.**
+
+⚠️ **A test that proves nothing:** Buffer's GraphQL API *accepted* the original 784×1168
+image when scheduling. It validates at publish, not creation — only the legacy Buffer
+module inside Make validates at creation. Do not use a GraphQL schedule as proof an
+image will post.
+
+🪤 **Recurrence trap:** the repo's own `marketing_engine_images/` still holds the
+**784×1168** originals (Telegram accepts any ratio, so the bot is fine). If anyone
+re-copies repo → `/var/www/influencer-images/`, Instagram breaks again.
 
 ### ✅ 14 Sep — Atlas Monday radar rebuilt. Lead machine ran and staged **0**.
 
