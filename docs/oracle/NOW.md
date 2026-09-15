@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-15 ~14:30 | Sync the Influencer Instagram fix to all three places: commit the 33 padded images into EspaLuz_Influencer (repo still holds 784x1168 copies), push, fast-forward the laptop clone | Oracle `/home/ubuntu/EspaLuz_Influencer/marketing_engine_images/` + 2 root PNGs, GitHub `EspaLuz_Influencer` main, laptop `D:ideazz\EspaLuz_Influencer`. No service restart. | a7ab31e |
+| — | — | — | — | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,44 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟢 15 Sep — EspaLuz Influencer → Instagram: FIXED and SYNCED on laptop, GitHub and Oracle
+
+**All three at EspaLuz_Influencer `62f4c82`.** Commits: `6a7d6e9` (milestone image off
+GitHub raw), `a257d9d` (33 padded images into the repo), `62f4c82` (the last one,
+`marketing_engine_workflow.png`). Laptop fast-forwarded; its stash (`3fdcb21`, empty) and
+untracked `content_memory.json` untouched and backed up in
+`cto-aipa/backups/espaluz-influencer-laptop-20260915/`. **34 image originals:**
+`/home/ubuntu/backups/influencer-images-20260914/`. Make `3044021` active, valid, queue 0.
+
+**Proven so far:** 15 Sep 15:29 run → Buffer Instagram `sent` 15:29:14, LinkedIn `sent`
+15:29:38, bot journal 0 errors since restart. **But that post was EspaLuz** (manual
+`/daily_promo`), whose tutor images were never broken — it proves the path, not the fix.
+
+**Real schedule (the docs said odd/even — wrong since `83bd2e4`, 11 Sep):** Panama
+`ordinal % 3` → **2 = EspaLuz, 0/1 = GEO**, one post/day at 18:00 Panama. 15 Sep EspaLuz ·
+16, 17 GEO · 18 EspaLuz · 19, 20 GEO · 21 EspaLuz. Help texts in `main.py` 1278/1296/1467/
+1527 still say odd/even.
+
+**When the fixes actually get exercised:**
+- Repaired `me_*` cards — GEO pool is 6 GEO images ×10 then `me_01…me_32`. Counter
+  `/tmp/espaluz-geo_api_rotation.json` = **12**, so first `me_*` on Instagram ≈ **27 Nov**.
+- `sprinter.jpg` milestone — only survives on an **even EspaLuz** date (next **24 Sep**) with
+  a pending CTO milestone.
+
+⚠️ **Open, Elena's call — none changed:**
+1. **No same-day guard.** Manual `/daily_promo` records nothing the 18:00 cron reads → a
+   second EspaLuz post goes out tonight.
+2. **Milestones get consumed without being posted on even GEO dates** (next 20 Sep).
+   `apply_lane` swaps the image to GEO, `maybe_geo_copy` then replaces the milestone
+   caption with GEO copy, and `mark_milestone_posted` still runs. Code-verified, not yet
+   observed.
+3. **GEO counter lives in `/tmp`** (`GEO_API_MEMORY` unset). `PrivateTmp=no`, so a service
+   restart does **not** reset it — a VM reboot does, and restarts the rotation at 0.
+
+🪤 `marketing_engine_workflow.png` also exists in `/var/www/influencer-images/cmo/` at
+784×1168 — another product's copy, deliberately untouched. A same-name `find | head -1`
+picked it once and silently skipped the real file; resolve by exact path.
 
 ### 🔴 15 Sep — EspaLuz Influencer → Instagram: FIXED in code, Make scenario `3044021` still OFF. Elena's move.
 
