@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Claude Code | 2026-09-14 ~17:10 | EspaLuz Influencer Instagram posts failing ("provided image does not appear to be valid"): 34 me_* images padded to 4:5 (backups kept), milestone image still on dead GitHub raw URL | Oracle `/home/ubuntu/EspaLuz_Influencer/cto_milestone_module.py`, `scripts/fire_one_marketing_image_post.py`, `espaluz-influencer` restart, `/var/www/influencer-images/`, Make scenario `3044021` | fa5f1f8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
