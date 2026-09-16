@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| Claude Code | 2026-09-16 ~19:30 | VJH lanes: make the judge + scoring prompt serve AI PM / Solutions Architect / Systems Consultant / Chief AI Officer + enriched no-coding AI roles; one shared role list + every-layer test; strip cover-letter text from judge feedback. Built in a git worktree, dry-run replay only — no restart, no HubSpot writes until Elena says deploy | Oracle worktree `/home/ubuntu/vjh-lanes-wt` (branch `claude/vjh-ai-roles-lanes`). Live `/home/ubuntu/VibeJobHunterAIPA_AIMCF` untouched. | 8695121 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
