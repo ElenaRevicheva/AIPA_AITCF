@@ -1,8 +1,9 @@
 # VJH target lanes — dry-run replay (16–17 Sep 2026)
 
-**Status: built, tested, NOT deployed.** Branch `claude/vjh-ai-roles-lanes` on
-`VibeJobHunterAIPA_AIMCF` (commits `28d6068`, `10d5894`, `40b32e9`). Live service untouched,
-no HubSpot writes. Deploy waits on Elena.
+**Status: DEPLOYED 17 Sep 2026 14:27 UTC on Elena's go.** Commits `28d6068`, `10d5894`,
+`40b32e9` fast-forwarded to `VibeJobHunterAIPA_AIMCF` `main`; GitHub = Oracle = laptop.
+`vibejobhunter` and PM2 `serpapi-jobs` restarted; 16 May orphan ingest stopped.
+(The replay below ran before deploy, on a branch, with no HubSpot writes.)
 
 ## What broke
 

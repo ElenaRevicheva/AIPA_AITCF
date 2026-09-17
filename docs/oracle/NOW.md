@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-16 ~19:30 (updated 09-17) | VJH lanes: BUILT + TESTED, NOT DEPLOYED. Branch `claude/vjh-ai-roles-lanes` (28d6068, 10d5894, 40b32e9) pushed. 413 lane tests pass; replay: 20 of 51 vetoed jobs now pass. Waiting on Elena's deploy go — results in `docs/oracle/VJH_LANES_REPLAY_2026-09-16.md` | Oracle worktree `/home/ubuntu/vjh-lanes-wt`. Live `/home/ubuntu/VibeJobHunterAIPA_AIMCF` untouched — do not edit judge/gate/matcher files there meanwhile. | 40b32e9 (VJH) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,29 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🟢 17 Sep 14:27 UTC — VJH judge now serves AI PM / Solutions Architect / Chief AI Officer lanes. DEPLOYED.
+
+**DONE.** One lane registry `src/core/target_lanes.py` (8 lanes, 120+ titles) rendered into
+the LLM judge and the scoring prompt; gates, Torre/Remotive/Himalayas/Get on Board/Bright Data
+search the new lanes; "N+ years" of overall experience is met (only hand-coding years count
+against); size = employees of certain big enterprises only, no reputation, no guesses;
+feedback sync strips the cover-letter bot note. VJH `main` = `40b32e9` on **GitHub = Oracle
+= laptop** (`D:\aideazz\VibeJobHunterAIPA_AIMCF`). Worktree + branch removed. The 16 May
+orphan `serpapi_jobs_ingest.py` (pre-Bright-Data code, no parent, output to a dead pipe) was
+**stopped** with Elena's OK. Detail + replay: `docs/oracle/VJH_LANES_REPLAY_2026-09-16.md`.
+**VERIFIED BY.** 413 lane tests pass in the live dir. `journalctl` after restart: verdicts
+carry a criterion number (`judge OK: 3. …` → surfaced Zapier Sr. Technical Account Manager).
+PM2 log: `'chief AI officer remote startup' → 10 results`, run `Done — new jobs: 29`.
+Feedback sync: 12/12, cover-letter pollution 0 (backup `judge_feedback.json.bak-20260917-predeploy`).
+**NEXT / RISK.**
+- **The name `serpapi-jobs` is historical — the engine is Bright Data.** SerpAPI is cancelled.
+- Bright Data returns a non-JSON body for ~3–5 queries per run (`Expecting value: line 1
+  column 1`), for days, before this change. Those queries silently yield nothing. Open.
+- OpenAI (judge provider #1) returns 429 intermittently; fallback models answer, so borderline
+  verdicts differ run to run. Open.
+- `vibejobhunter` journal logs full Telegram `getUpdates` URLs, bot token included (httpx INFO
+  logging). Open — lower httpx log level.
 
 ### 🟢 15 Sep — EspaLuz Influencer → Instagram: FIXED and SYNCED on laptop, GitHub and Oracle
 
