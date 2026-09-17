@@ -152,8 +152,11 @@ rebased onto the blog publisher's commits) and `d9dd131` (cto-aipa).
 **NEXT / RISK.**
 - **Railway is no longer listed** in the resume (fleet migrated to Oracle). If EspaLuz's
   database is still on Railway, say so and it goes back in.
-- 4everland rebuild was still serving the old PDFs at the time of writing — re-check
-  `https://aideazz.xyz/Elena_Revicheva_Resume.pdf` is ~10 KB, not 4 MB.
+- ~~4everland rebuild~~ **LIVE and verified 17 Sep 19:2x UTC.** GitHub deployment
+  `8a696fb` → `success` 3 s after push; the live PDFs are byte-identical to local
+  (md5 `f78f41bc…` EN, `733d5893…` ES), and the built bundle serves
+  `?v=20260917` for both languages. Site took ~4 min, not the ~2 the resilience doc
+  quotes — poll, do not assume.
 
 ### 🟢 17 Sep 14:27 UTC — VJH judge now serves AI PM / Solutions Architect / Chief AI Officer lanes. DEPLOYED.
 
