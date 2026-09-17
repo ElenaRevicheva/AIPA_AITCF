@@ -130,6 +130,31 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 17 Sep — EN + ES resumes rebuilt: API + GEO/AEO added, written for business owners
+
+**DONE.** `aideazz` `scripts/generate_resume.py` now renders **both** PDFs from ONE content
+dict (EN + ES), so they cannot drift again; ES renders at 0.93 scale so both stay two pages.
+Added, each verified live first: the **AI Visibility Audit API** (34 checks, 4 weighted
+categories, 6 AI-crawler verdicts, demo key), the **AI search visibility engine** (structured
+data, llms.txt, GEO manifest, 146 pages, grounding gate, duplicate detection, weekly citation
+probe), the **AI Ops Wiki** (21 incidents / 18 concepts) and the VJH judge registry + 413
+tests. Rewritten for **business owners and HR** (plain-language "What I do for a business",
+one plain sentence per project, technical stack moved down and labelled), headline is
+product/solutions-first, target roles are her lanes, header says **available in person in
+Panama City**. Cache-buster bumped to `?v=20260917` in `src/pages/BusinessCard.tsx`.
+Copies added as outreach attachments: `docs/selling/attachments/17.09.26_{EN,ES}_Resume_Elena_Revicheva.pdf`
+(the 15.07 one is kept, nothing deleted). July originals backed up at
+`D:\aideazz\_backups\resume-20260917\`.
+**VERIFIED BY.** Regenerated locally, 2 pages each; a probe of the July text confirmed every
+fact survived the rewrite — Atlas Shifted, GA4, LinkedIn/Instagram and "250+ outreach
+messages" were dropped in the first pass and **restored**. Committed `8a696fb` (aideazz,
+rebased onto the blog publisher's commits) and `d9dd131` (cto-aipa).
+**NEXT / RISK.**
+- **Railway is no longer listed** in the resume (fleet migrated to Oracle). If EspaLuz's
+  database is still on Railway, say so and it goes back in.
+- 4everland rebuild was still serving the old PDFs at the time of writing — re-check
+  `https://aideazz.xyz/Elena_Revicheva_Resume.pdf` is ~10 KB, not 4 MB.
+
 ### 🟢 17 Sep 14:27 UTC — VJH judge now serves AI PM / Solutions Architect / Chief AI Officer lanes. DEPLOYED.
 
 **DONE.** One lane registry `src/core/target_lanes.py` (8 lanes, 120+ titles) rendered into
