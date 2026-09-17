@@ -1,7 +1,7 @@
 # VJH target lanes — dry-run replay (16–17 Sep 2026)
 
 **Status: built, tested, NOT deployed.** Branch `claude/vjh-ai-roles-lanes` on
-`VibeJobHunterAIPA_AIMCF` (commits `28d6068`, `10d5894`). Live service untouched,
+`VibeJobHunterAIPA_AIMCF` (commits `28d6068`, `10d5894`, `40b32e9`). Live service untouched,
 no HubSpot writes. Deploy waits on Elena.
 
 ## What broke
@@ -31,7 +31,8 @@ The judge's feedback file taught it from VJH's own cover-letter text: 10 of 12
   under $3,000/month; no guesses. Scorer loses +15 Staff/Principal, gains -25 for
   CS-degree/leetcode/hand-coding.
 - Gates (`job_gate`, `fit_gate`) accept every lane title; Torre, Remotive, Himalayas,
-  Get on Board and Bright Data search the new lanes (+4 paid Bright Data queries / 12h).
+  Get on Board and Bright Data (the ingest still named `serpapi_jobs_ingest.py`) search
+  the new lanes (+4 paid Bright Data queries / 12h).
 - `judge_feedback_sync.py` strips the current cover-letter bot note.
 - `evals/test_target_lanes.py`: every lane title through every layer — 413 passed.
   Full evals in the worktree: 528 passed; 3 provider-chain tests fail only because
@@ -65,9 +66,31 @@ large enterprise or outsourcing (Hexaware, TransUnion, Bankrate, Fulcrum, Conch,
 - Judge's first provider (OpenAI) returned 429 in an eval probe today; the chain fell
   through and verdicts still came back. Not fixed here.
 
+## 17 Sep — Elena's answers applied (commit `40b32e9`)
+
+- **Years of experience:** "N+ years" of overall, management, product, consulting or AI
+  experience is MET (seven executive years plus AI building), in both the judge and the
+  scorer. Only years of hand-writing code on a mainly-coding job count against — the rule
+  `fit_gate` already applied. Replay 3: Kenility (5+ yrs) and Shivsys (7+ yrs) pass;
+  no job of 51 rejected for years; 19 pass.
+- **No SerpAPI.** Verified in code: `serpapi_jobs_ingest.py` has called only Bright Data
+  since 31 May; nothing in `src/` or `scripts/` calls serpapi.com. The name is historical.
+  Docstring now says so; the unused `SERPAPI_KEY` read is removed.
+- **Why verdicts flip between runs:** temperature is already 0. The flips come from the
+  provider chain — OpenAI rate-limits some calls, so a different model judges those jobs.
+
+### ⚠️ Orphan process from 16 May — needs Elena's OK to stop
+
+Two copies of the ingest are running on Oracle:
+- PM2 `serpapi-jobs`, started 18 Aug — the real one, Bright Data, logging to `~/.pm2/logs`.
+- A second copy started **16 May 2026**, before the Bright Data switch, parent = systemd
+  (orphaned, not PM2). It still runs the May code from memory (SerpAPI), and its output
+  goes to a pipe nobody reads, so whatever it does is invisible. SerpAPI is cancelled, so it
+  most likely finds nothing, but that cannot be proven from logs. Recommend stopping it.
+
 ## To deploy (only on Elena's go)
 
 Merge branch → `main`; `git pull` in `/home/ubuntu/VibeJobHunterAIPA_AIMCF`; restart
-`vibejobhunter` (systemd) and `serpapi-jobs` (PM2 — check the two stale processes first);
-run `scripts/judge_feedback_sync.py` once; prove from `journalctl` that a judge verdict
-line carries a criterion number.
+`vibejobhunter` (systemd) and PM2 `serpapi-jobs` (the Bright Data ingest); stop the
+16 May orphan if approved; run `scripts/judge_feedback_sync.py` once; prove from
+`journalctl` that a judge verdict line carries a criterion number.

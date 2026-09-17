@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-16 ~19:30 (updated 09-17) | VJH lanes: BUILT + TESTED, NOT DEPLOYED. Branch `claude/vjh-ai-roles-lanes` (28d6068, 10d5894) pushed. 413 lane tests pass; replay: 20 of 51 vetoed jobs now pass. Waiting on Elena's deploy go — results in `docs/oracle/VJH_LANES_REPLAY_2026-09-16.md` | Oracle worktree `/home/ubuntu/vjh-lanes-wt`. Live `/home/ubuntu/VibeJobHunterAIPA_AIMCF` untouched — do not edit judge/gate/matcher files there meanwhile. | 10d5894 (VJH) |
+| Claude Code | 2026-09-16 ~19:30 (updated 09-17) | VJH lanes: BUILT + TESTED, NOT DEPLOYED. Branch `claude/vjh-ai-roles-lanes` (28d6068, 10d5894, 40b32e9) pushed. 413 lane tests pass; replay: 20 of 51 vetoed jobs now pass. Waiting on Elena's deploy go — results in `docs/oracle/VJH_LANES_REPLAY_2026-09-16.md` | Oracle worktree `/home/ubuntu/vjh-lanes-wt`. Live `/home/ubuntu/VibeJobHunterAIPA_AIMCF` untouched — do not edit judge/gate/matcher files there meanwhile. | 40b32e9 (VJH) |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
