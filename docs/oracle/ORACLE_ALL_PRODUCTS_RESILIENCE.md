@@ -1006,6 +1006,12 @@ This is the whole lesson of the 7 Sep incident — full write-up:
 |---|---|---|
 | `~/.git-credentials` (`credential.helper=store`, mode 600) | **git** — push, pull, `ls-remote`, all 7 repos | loud: pushes fail immediately |
 | `GITHUB_TOKEN` in `/home/ubuntu/cto-aipa/.env` | **7 compiled modules** for GitHub **API** calls — `podcast-publish`, `blog-static-pages`, `fresh-leads-ingest`, `cto-aipa`, `telegram-bot`, `atuona-creative-ai`, `atuona-film-compiler` | **silent**: `Bad credentials` into a log nobody reads |
+| 🆕 `GITHUB_TOKEN` in the **AWS Lambda env** (`sprint-briefing-agent`, us-east-1) — **THIRD HOME, off this VM** | the **morning Sprint Briefing** repo section | **worse than silent — it LIES**: every repo 401s, so the briefing reports *"no new commits"* on days with dozens of pushes, and tells you to go fix a token that is already valid everywhere else |
+
+**⚠️ `/ghtoken` writes the first two homes only.** The Lambda is off-box and is not touched
+by the Telegram rotation command, so it goes stale on its own schedule. This has now bitten
+twice — **19 Jun 2026** and again **18 Sep 2026** (see §"Sprinter token" below). After any
+rotation, also run: `GH=<valid-pat> python scripts/update-sprinter-token.py`.
 
 **Rotating only the wallet is the trap.** git keeps working perfectly, so nothing looks
 wrong, while every API call 401s. On 7 Sep that shipped a daily blog announcement whose
@@ -1349,6 +1355,40 @@ Returns last 5 diary entries + up to 15 pending tasks per user from `knowledge_b
 
 **Code path:** `src/sprint-briefing/knowledge-context.ts` — checks `SPRINT_KNOWLEDGE_API_URL` first (HTTP proxy), then falls back to `ORACLE_WALLET_S3_BUCKET` (oracle-thin, disabled in practice), then thick-mode pool (server only).
 
+### 🕐 FRESHNESS WINDOW — added 18 Sep 2026, enforced SERVER-SIDE
+
+`/sprint-knowledge` used to return the newest N rows **with no time limit**, so a voice note
+from a month earlier was read out as "while you were offline", and one-line reminders
+("add beluxe real estate to HubSpot", 44 days old) were briefed as pending every morning.
+
+Now: **voice notes and diary = last 48h, tasks = last 14 days**, each line stamped `(12h ago)`
+/ `(3d ago)`. Override per call: `?voiceHours=` (1–168) and `?taskDays=` (1–90). When the
+window is empty the endpoint says so explicitly, which stops the model inventing a personal
+section. Measured on deploy: context **3,050 → 298 chars**.
+
+**⚠️ The window MUST live here, not in the Lambda.** The Lambda receives rendered text with
+no timestamps, so it cannot filter by age — and it cannot read Oracle directly (see the wallet
+password note above). Any future "only show me recent X" rule belongs in this endpoint.
+
+Deploy of this file = `npm run build` → `scp dist/cto-aipa.js` (+ `dist/trello-kanban.js`,
+`dist/sprint-briefing/synthesize.js`) → **`pm2 restart cto-aipa --update-env`**. Backup of the
+replaced files: `/home/ubuntu/backups/cto-aipa-presprint-20260918/`.
+
+### 📋 WHICH TRELLO CARDS THE BRIEFING READS — rewritten 18 Sep 2026
+
+It used to match any list named "today"/"doing"/"active" on **all ten open boards**, so every
+briefing recited **27 cards of which none had been touched in 30 days** — the youngest 119
+days, the oldest 553 ("CoinGecko AZ Token", "Web3 site builder"). Board-wide totals that day:
+**775 open cards, 660 idle for 90+ days.**
+
+`src/trello-kanban.ts` now reads **only the CURRENT month board** — matched by month name in
+**America/Panama** time, because Elena keeps exactly three month boards and *recycles them by
+renaming* (`Kira Septiembre 2026`), so ids are worthless as keys — and within it only the lists
+**"Just for Today"** and **"To Dos" / "Надо сделать"**. **`Cita` is never read** (family/medical),
+nor is the "Not sure's / To-do or not?" maybe-pile. Project boards (AIdeazz AI Lab, EspaLuz,
+VibeJob) are backlogs, not day plans, and are deliberately out of scope. Payload **1,666 → 187
+chars**. If no month board matches, it returns empty — silence beats reciting a year-old backlog.
+
 ### Row format in `knowledge_base`
 
 Oracle thick mode returns rows as **arrays**, not objects. `getKnowledgeByCategory` returns:
@@ -1438,6 +1478,37 @@ Claude Opus encodings reviewed and kept. Real defects, not cosmetic: PagueloFaci
 | **OpenClaw** | ✅ Clean | No hardcoded dead model ID. |
 
 **Current entitled Claude model IDs** (keep these): Opus `claude-opus-4-8` · Sonnet `claude-sonnet-4-6` / `claude-sonnet-4-5-20250929` · Haiku `claude-haiku-4-5-20251001`. **Dead (will 404):** anything `*-20250514`, `claude-3-*`, `claude-2*`, `claude-instant*`, `claude-3-5-haiku-20241022`. Probe a key: `curl https://api.anthropic.com/v1/messages -H "x-api-key: $K" -H "anthropic-version: 2023-06-01" -d '{"model":"<id>","max_tokens":4,"messages":[{"role":"user","content":"hi"}]}'`.
+
+### 🔁 18 Sep 2026 — the SAME Lambda token died again, plus two more stale layers
+
+**It recurred because `/ghtoken` cannot reach AWS.** Probed, not assumed: Oracle's token was
+**valid** (200, scopes intact, expires 2027-07-07, identical in both on-box homes) while the
+Lambda's own copy — last set **24 Jun** — returned **401 Bad credentials** on every repo. The
+briefing therefore announced *"no new commits"* on a day with 12 pushes to `aideazz`, 9 to
+`VibeJobHunterAIPA_AIMCF` and 48 to `AIPA_AITCF`, and named fixing the token as the day's most
+critical action — the one thing that was already fine on the VM.
+
+Two further staleness layers were found in the same pass:
+
+1. **The deployed bundle was a 24 Jun build.** The 16 Jul fleet-wide Groq switch (`ced31f5`)
+   never reached it, so it still asked for **`llama-3.3-70b-versatile`** (killed Aug 2026) and
+   fell through to paid OpenAI on *every* run — two 404s per briefing. That silent fallback is
+   what drained the OpenAI credits that turned the briefing text-only on 18 Sep.
+   Fixed: `SPRINT_BRIEFING_GROQ_MODEL` + `GROQ_MODEL` = `openai/gpt-oss-120b` in the Lambda env,
+   and the bundle rebuilt from current source. Verified: `[sprint] Groq narrative succeeded`.
+2. **A Lambda env var is not the same as a redeploy.** Setting the model var alone would not have
+   helped if the June bundle had read a different var name — always confirm the *bundle* date
+   (`get_function` → zip entry mtime), not just the config.
+
+**Rebuild used (matches the June recipe, externals widened):**
+`npx esbuild src/lambda/sprint-briefing-aws.ts --bundle --platform=node --target=node20 --format=cjs --external:oracledb --external:@aws-sdk/* --outfile=dist-lambda/sprint/lambda-pkg/handler.js`
+→ zip `handler.js` at the zip root → boto3 `update_function_code`. 3.7 MB → 1.28 MB because the
+Node 20 runtime already ships `@aws-sdk` v3 and `oracledb` is only imported on the dead
+thin-mode path. **Rollback = `dist-lambda/sprint/handler-ROLLBACK-20260918.zip`** (the exact
+bytes that were live before), committed alongside.
+
+**Force-test protocol (unchanged):** set `SPRINT_BRIEFING_FORCE=1`, invoke, **remove the var**.
+Dedup otherwise returns `{"ok":true,"skipped":true}` once the day's briefing has been sent.
 
 **✅ Resolved (June 19 2026):** Sprinter Lambda `GITHUB_TOKEN` was expired (every `/repos/...` query 401'd, repo section degraded). Refreshed the Lambda env var (`aws lambda update-function-configuration`, us-east-1, function `sprint-briefing-agent`) with the valid Oracle `.env` `GITHUB_TOKEN` (user ElenaRevicheva, `repo` scope, verified 200). Native invoke confirmed: dedup OK, `/sprint-knowledge` proxy OK (4369 chars), Trello OK, **no more GitHub 401**. To refresh again: `GH=<valid-pat> py scripts/update-sprinter-token.py` (merges env, preserves all 18 vars). **Durability — RESOLVED June 19 2026 (commit `e52f6a1`):** the Lambda's narrative gen now carries a free **`gemini-2.5-flash` fallback** in BOTH steps (`clusterSignalsWithGroq` + `writeBriefingNarrative`, `src/sprint-briefing/synthesize.ts`). It was Claude→Groq only — and Anthropic credits are permanently dry, so it effectively rode on Groq alone and died on Groq-capped mornings. Now **Claude → Groq → Gemini**; `GEMINI_API_KEY` added to the Lambda env (19 vars). Rebuild recipe (no committed build script): `npx esbuild src/lambda/sprint-briefing-aws.ts --bundle --platform=node --target=node20 --format=cjs --external:@aws-sdk/signature-v4-crt --external:encoding` → zip the single `handler.js` → `update-function-code` (boto3/`py`; AWS creds in `~/.aws`, no CLI installed). Back up the prior `dist-lambda/sprint/handler-fixed.zip` first. Test-invoke validates the bundle even under quota exhaustion (reaching the Gemini call proves it loaded).
 
