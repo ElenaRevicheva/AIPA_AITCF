@@ -130,6 +130,40 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 18 Sep — Sprint Briefing: voice is back, and it now reads TODAY, not 2024
+
+**DONE.** Four separate staleness layers, all fixed and verified by probe:
+1. **Voice** — OpenAI TTS was 429 (credits). Elena topped up; the Lambda's own key probes 200.
+2. **GitHub "Bad credentials" across 12 repos was FALSE.** Oracle's token is valid (200, expires
+   2027-07-07, same in both on-box homes). The **Lambda has a THIRD copy**, last set 24 Jun,
+   401 on every repo — so the briefing said "no new commits" on a day with 69 pushes. Replaced.
+   **`/ghtoken` does not reach AWS**: after any rotation also run
+   `GH=<pat> python scripts/update-sprinter-token.py`.
+3. **The deployed bundle was a 24 Jun build** — the 16 Jul fleet Groq switch never reached it, so
+   it asked for the dead `llama-3.3-70b-versatile`, 404'd twice and fell through to paid OpenAI
+   **every run**. That is what drained the credits. Env now `openai/gpt-oss-120b`; bundle rebuilt
+   from source. Log now reads `[sprint] Groq narrative succeeded`.
+4. **Stale inputs.** It recited 27 Trello cards from ten boards, **none touched in 30 days**
+   (oldest 553d, "CoinGecko AZ Token"); board-wide **775 open cards, 660 idle 90+ days**. And
+   `/sprint-knowledge` had no time limit, so month-old voice notes were "while you were offline".
+   Now: **current month board only** (`Kira Septiembre 2026`), lists **Just for Today + To Dos**,
+   **Cita never read**; voice notes **48h**, tasks **14 days**, each line age-stamped.
+   Payloads: Trello 1,666 → 187 chars; personal context 3,050 → 298 chars.
+
+**VERIFIED BY.** Forced Lambda invoke `{"ok":true}` in 47s with `Groq narrative succeeded`;
+live `/sprint-knowledge` returns the window header and "no voice notes in the window" instead of
+old ones; a widened `?voiceHours=720&taskDays=90` call still shows the 44-day-old task, proving
+the data is filtered, not missing. Commits `b8b12d2`, `c1ec987`. Lambda rollback zip:
+`dist-lambda/sprint/handler-ROLLBACK-20260918.zip`. Oracle file backup:
+`/home/ubuntu/backups/cto-aipa-presprint-20260918/`.
+
+**NEXT / RISK.**
+- Tomorrow 8am Panama is the real test: it should open with Elena's own last-48h voice notes (or
+  say there were none), then the September board, then **her building work** — named commits.
+- **Durable fix still open:** make `/ghtoken` update the Lambda env too, so the third home cannot
+  rot again. Oracle already holds AWS creds (`AWS_ACCESS_KEY_ID` in `.env`, Sprinter-only).
+- If a briefing ever looks wrong again, check the **bundle date**, not just the env vars.
+
 ### 🟢 17 Sep — EN + ES resumes rebuilt: API + GEO/AEO added, written for business owners
 
 **DONE.** `aideazz` `scripts/generate_resume.py` now renders **both** PDFs from ONE content
