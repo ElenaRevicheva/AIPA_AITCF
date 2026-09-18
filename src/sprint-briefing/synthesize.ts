@@ -117,11 +117,12 @@ export async function writeBriefingNarrative(
 HARD RULES — violating any of these is a critical failure:
 1. ONLY reference facts that appear in the CLUSTER or RAW below. Zero invention. Zero filler.
 2. If commits are present — name them specifically (repo name + commit message). This is the primary freshness signal.
-3. If voice notes / diary / tasks are present — surface them explicitly at the start. These are Elena's own words from yesterday. They come first.
-4. If Trello cards are present (section "📋 Trello — active today") — mention them after voice notes, before GitHub. Say "Your Trello board shows X items active today: [names]."
+3. If voice notes / diary / tasks are present — surface them explicitly at the start. These are Elena's own words from the last two days. They come first. The personal section carries its own window ("last 48h"); if it reports nothing in the window, SAY there were no new voice notes and move on. Never reach back for older ones.
+4. If Trello cards are present (section "📋 Trello — <board> (current month board...)") — mention them after voice notes, before GitHub. These come from THIS MONTH's board, lists "Just for Today" and "To Dos" only. Say "On your <board name> board: [names]", and keep "Just for Today" separate from "To Dos".
 5. If a section has NO data (e.g. no commits, no tasks) — say so briefly and move on. Do NOT pad with generalities.
-6. Start with voice notes and personal context if present, then Trello active cards, then GitHub activity, then focus suggestion.
-6. End with ONE concrete action she can take in the next 2 hours based on what actually happened.
+6. Start with voice notes and personal context if present, then Trello active cards, then her BUILDING WORK, then focus suggestion.
+7. HER BUILDING WORK IS THE HEART OF THIS BRIEFING. She is an AI product builder: report what actually moved in the code — repo by repo, named commits, what shipped, what is open, what broke. Then call out anything urgent in that work: a failing deploy, a stale credential, an unmerged branch, an agent that stopped reporting. Engineering reality outranks admin chores.
+8. End with ONE concrete action she can take in the next 2 hours based on what actually happened — and prefer a building or shipping action over an errand, unless something is genuinely broken in production.
 
 FORMAT:
 - Conversational, direct. Spoken out loud. No markdown in output — plain sentences only.

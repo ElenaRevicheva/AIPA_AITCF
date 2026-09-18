@@ -2471,35 +2471,71 @@ async function startCTOAIPA() {
       const { getKnowledgeByCategory } = await import('./database');
       // Oracle thick mode returns rows as arrays: [id, category, title, content, tags, project, source, created_at]
       // SELECT RAWTOHEX(id) as id, category, title, content, tags, project, source, created_at
-      type KbRow = string[];
-      const lines: string[] = ['### Personal context (Oracle knowledge_base)'];
+      type KbRow = (string | Date | null)[];
+
+      // 2026-09-18 FRESHNESS WINDOW. This endpoint took the newest N rows with no time
+      // limit, so a voice note from a month ago was read out as "while you were offline"
+      // and month-old one-liners ("add beluxe real estate to HubSpot") were briefed as
+      // pending every single morning. Elena's rule: voice notes from yesterday, two days
+      // at most. Old rows stay in the knowledge base — they are simply not today's news.
+      const voiceHours = Math.max(1, Math.min(168, parseInt(String(req.query.voiceHours || '48'), 10) || 48));
+      const taskDays = Math.max(1, Math.min(90, parseInt(String(req.query.taskDays || '14'), 10) || 14));
+      const now = Date.now();
+      const voiceCutoff = now - voiceHours * 60 * 60 * 1000;
+      const taskCutoff = now - taskDays * 24 * 60 * 60 * 1000;
+      const createdAt = (row: KbRow): number => {
+        const v = row[7];
+        if (!v) return 0;
+        const t = v instanceof Date ? v.getTime() : Date.parse(String(v));
+        return Number.isFinite(t) ? t : 0;
+      };
+      // created_at 0 means the row carries no usable date — treat it as OLD rather than
+      // fresh, so an unparseable timestamp can never smuggle stale text into the briefing.
+      const fresherThan = (cutoff: number) => (row: KbRow) => createdAt(row) >= cutoff;
+      const ageLabel = (row: KbRow): string => {
+        const t = createdAt(row);
+        if (!t) return '';
+        const h = Math.round((now - t) / 3_600_000);
+        return h < 24 ? ` (${h}h ago)` : ` (${Math.round(h / 24)}d ago)`;
+      };
+
+      const lines: string[] = [
+        '### Personal context (Oracle knowledge_base)',
+        `Window: voice notes and diary from the last ${voiceHours}h; tasks from the last ${taskDays} days.`,
+        'Anything older is deliberately excluded — it is not news.',
+      ];
       for (const uid of userIds) {
-        const diary = await getKnowledgeByCategory(uid, 'diary', 5) as KbRow[];
-        const tasks = await getKnowledgeByCategory(uid, 'task', 15) as KbRow[];
-        const voiceNotes = await getKnowledgeByCategory(uid, 'voice_note', 10) as KbRow[];
+        const diary = ((await getKnowledgeByCategory(uid, 'diary', 25)) as KbRow[]).filter(fresherThan(voiceCutoff)).slice(0, 5);
+        const tasks = ((await getKnowledgeByCategory(uid, 'task', 60)) as KbRow[]).filter(fresherThan(taskCutoff)).slice(0, 12);
+        const voiceNotes = ((await getKnowledgeByCategory(uid, 'voice_note', 40)) as KbRow[]).filter(fresherThan(voiceCutoff)).slice(0, 10);
         if (diary?.length) {
           lines.push(`User ${uid} recent diary:`);
           for (const row of diary) {
-            const t = (row[2] || '').slice(0, 80);
-            const c = (row[3] || '').slice(0, 200);
-            if (t || c) lines.push(`- ${t}: ${c}`);
+            const t = String(row[2] || '').slice(0, 80);
+            const c = String(row[3] || '').slice(0, 200);
+            if (t || c) lines.push(`- ${t}: ${c}${ageLabel(row)}`);
           }
         }
         if (tasks?.length) {
-          lines.push(`User ${uid} pending tasks:`);
+          lines.push(`User ${uid} pending tasks (last ${taskDays} days):`);
           for (const row of tasks) {
-            const t = (row[2] || '').slice(0, 120);
-            const c = (row[3] || '').slice(0, 200);
-            if (t) lines.push(`- ${t}${c && c !== t ? ': ' + c : ''}`);
+            const t = String(row[2] || '').slice(0, 120);
+            const c = String(row[3] || '').slice(0, 200);
+            if (t) lines.push(`- ${t}${c && c !== t ? ': ' + c : ''}${ageLabel(row)}`);
           }
         }
         if (voiceNotes?.length) {
-          lines.push(`User ${uid} recent voice notes (from Telegram voice messages):`);
+          lines.push(`User ${uid} voice notes from the last ${voiceHours}h (Telegram):`);
           for (const row of voiceNotes) {
-            const t = (row[2] || '').slice(0, 120);
-            const c = (row[3] || '').slice(0, 300);
-            if (t) lines.push(`- ${t}${c && c !== t ? ': ' + c : ''}`);
+            const t = String(row[2] || '').slice(0, 120);
+            const c = String(row[3] || '').slice(0, 300);
+            if (t) lines.push(`- ${t}${c && c !== t ? ': ' + c : ''}${ageLabel(row)}`);
           }
+        }
+        if (!diary.length && !tasks.length && !voiceNotes.length) {
+          // Say the silence out loud. Without this the model fills the gap from the
+          // digest and invents a personal section that was never recorded.
+          lines.push(`User ${uid}: no voice notes, diary entries or tasks in the window. Say so plainly; do not substitute older items.`);
         }
       }
       res.json({ ok: true, context: lines.join('\n') });
