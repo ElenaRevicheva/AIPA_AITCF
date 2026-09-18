@@ -91,25 +91,43 @@ GitHub: https://github.com/ElenaRevicheva
 
 ### 7. A creative project using GenAI from concept to final output
 
-> I wrote, generated and shipped a product film for my own AI Visibility Audit API — concept
-> to published video, alone, in a few days.
+*(Tools verified against the actual build on 18 Sep 2026: `aideazz-api-film-v19/kit/compile-v19.mjs`
+and `generate-hero-fruits.mjs` — FLUX 2 Pro via Replicate, Runway `gen4.5`, ByteDance Seedance 2.5
+via Replicate, OpenAI `tts-1` voice "onyx", ffmpeg drawtext with the site's own .ttf fonts,
+sidechain ducking, QR overlay + end card, and the guard that refuses to compile a silent promo.)*
+
+> A product film for my own AI Visibility Audit API — concept to published video, made alone in a
+> few days.
 >
-> The idea was to explain a technical product without a single line of explanation: fruit,
-> sliced open, as a metaphor for looking inside your website the way an AI assistant does. I
-> wrote the script with Claude, generated the images, then generated the motion with AI video
-> models, using several providers because no single one gives you every shot you want. I
-> assembled the film, added a soundtrack that matched the pace, and put a scannable QR code on
-> every shot so a viewer can reach the product from a paused frame. Typography follows my
-> site's own fonts, so the film and the landing page look like one brand.
+> The idea was to explain a technical product without explaining: fruit, sliced open, as a metaphor
+> for looking inside a website the way an AI assistant does.
 >
-> I did all of it myself: concept, script, prompts, model selection, generation, editing,
-> sound, on-screen text and the final publish.
+> What I used, and for what:
 >
-> The result is live on YouTube, and it does not need me any more: a Make.com automation
-> publishes it on a schedule to LinkedIn, Instagram and YouTube, rotating between two cuts so
-> the channel never repeats itself on consecutive days. The film went through nineteen
-> versions, and most of those versions came from watching the output honestly and saying "that
-> shot is ugly" — which, to me, is the actual job.
+> - **Claude** — script, voiceover copy and the shot list; **DeepSeek** for prompt variants.
+> - **FLUX 2 Pro** (via Replicate) — the hero stills. Each fruit is a specific prompt: glass sphere,
+>   suspended liquid, a vertical beam of light through the middle.
+> - **Runway Gen-4.5** — image-to-motion for the main shots, driven through their API rather than
+>   the web UI, so the whole film rebuilds unattended.
+> - **ByteDance Seedance 2.5** (via Replicate) — my second motion engine, switchable per shot,
+>   because no single video model gives you every move you want. One environment variable swaps it.
+> - **OpenAI TTS** (`tts-1`, voice "onyx") — the narration.
+> - **FFmpeg** — the whole edit: crossfades between shots, on-screen type drawn in my product
+>   site's own font files so the film and the landing page are one brand, the QR code composited
+>   onto every shot plus an end card, and the music sidechain-ducked under the voice so the
+>   narration always sits on top.
+> - **Make.com + Buffer** — publishing.
+>
+> I made every decision and every asset: concept, script, prompts, model choice, generation, edit,
+> sound, typography and the final publish. It took nineteen versions, and most of the improvement
+> came from watching the output honestly and rejecting shots — not from better prompts.
+>
+> One detail I am proud of: the compiler refuses to build if the music file is missing, because I
+> shipped a silent promo once. Now that failure is impossible.
+>
+> The film is live on YouTube and runs without me: a Make.com automation publishes it on a schedule
+> to LinkedIn, Instagram and YouTube, rotating between two cuts so the channel never repeats itself
+> two days running.
 
 ### 8. A GenAI workflow, prompt system or agent you built to solve a production problem
 
