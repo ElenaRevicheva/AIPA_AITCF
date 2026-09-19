@@ -130,6 +130,34 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 19 Sep — wiki-ship was silently dead for 15 days; fixed. Pitch deck + micro1 CV.
+
+**DONE.**
+- **wiki-ship unwedged.** A rebase interrupted on **4 Sep 21:30** left `.git/rebase-merge` in
+  Oracle's `/home/ubuntu/aideazz`. Every night after, `git pull --rebase` failed, a bare
+  `catch {}` swallowed it, the push was rejected, and only `wiki-ship.log` knew. **11 refreshes
+  (8–18 Sep) stranded; live geo-manifest frozen at 2026-09-07.** Stuck commits parked on branch
+  `wiki-ship-stuck-20260919` (generated files only), clone realigned to origin/main, script
+  fixed (`7a042db`): sync-before-generate, no swallowed rebase, **Telegram alert on every fatal
+  path**. Verified: pushed `89e340d`, live geo-manifest now `2026-09-19`.
+- **Pitch deck** `aideazz.xyz/pitch.html`: new slide **08b "Products anyone can use"** — API,
+  podcast, blog, wiki + a verified "how they connect" line, EN+ES. **Additive only** (82 lines
+  added, 0 removed, round-trip checked). 16 slides. Backup: `D:\aideazz\_backups\pitch-20260919\`.
+- **micro1 CV** (Arts, Media & Design — PowerPoint review, $150–350/hr):
+  `docs/applications/19.09.26_EN_Resume_Elena_Revicheva_micro1.pdf`, one page, deck linked.
+
+**AUDIT — how the AEO/GEO engine's parts actually connect (verified 19 Sep):**
+- ✅ build sessions → wiki incidents → wiki-ship → site + blog + Dev.to (was broken 4–19 Sep)
+- ✅ all **11** podcast episodes link to their blog post
+- ✅ llms.txt / sitemap / geo-manifest list the blog and wiki
+- ❌ **podcast is invisible to AI crawlers** — absent from llms.txt, geo-manifest AND sitemap
+- ❌ **X is not a posting channel** — Buffer has LinkedIn, Instagram, YouTube (TikTok locked);
+  X is only a profile link in geo-manifest. Instagram/YouTube profiles are not in geo-manifest.
+- 📉 **Outcome:** last citation probe — aideazz.xyz cited in **1 of 23** AI answers (4%, Perplexity
+  only); `/api` and the wiki cited **0** times; named without a link in 13%.
+
+**NEXT.** Add the podcast to llms.txt / geo-manifest / sitemap (additive). Decide on X.
+
 ### 🟢 18 Sep — Sprint Briefing: voice is back, and it now reads TODAY, not 2024
 
 **DONE.** Four separate staleness layers, all fixed and verified by probe:
