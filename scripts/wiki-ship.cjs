@@ -37,7 +37,80 @@ const DRY = process.argv.includes('--dry');
 const NO_BLOG = process.argv.includes('--no-blog');
 
 const say = (icon, msg) => console.log(`${icon} ${msg}`);
-const die = (msg) => { console.error(`\n✖ ${msg}\n`); process.exit(1); };
+
+/**
+ * LOUD failure (2026-09-19). A rebase interrupted on 4 Sep 21:30 left
+ * `.git/rebase-merge` behind; every night after, `git pull --rebase` failed
+ * instantly, a bare `catch {}` swallowed it, the push was rejected, and the only
+ * witness was a log file nobody reads. Eleven nights of wiki + AEO surface
+ * refreshes (8–18 Sep) never reached the site. Every fatal path now pings
+ * Telegram — the same bot and chat the citation probe already uses.
+ */
+function alertTelegram(text) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chat = process.env.CONCIERGE_TG_CHAT?.trim();
+  if (!token || !chat || DRY) return;
+  try {
+    execFileSync('curl', ['-s', '-m', '20', '-X', 'POST',
+      `https://api.telegram.org/bot${token}/sendMessage`,
+      '-d', `chat_id=${chat}`, '--data-urlencode', `text=${text.slice(0, 3500)}`], { stdio: 'pipe' });
+  } catch { /* the alert must never be the thing that crashes the run */ }
+}
+const die = (msg) => {
+  console.error(`\n✖ ${msg}\n`);
+  alertTelegram(`🛑 wiki-ship FAILED — AI Ops Wiki / blog NOT published\n\n${msg}`);
+  process.exit(1);
+};
+
+/** The only paths this script may ever write. Shared by the pre-flight sync and the commit. */
+const OWNED_PATHS = [
+  'public/ai-ops-wiki.html',
+  'public/geo-manifest.json',
+  'public/llms.txt',
+  'public/.well-known/llms.txt',
+  'public/sitemap.xml',
+  'public/sitemap.txt',
+  'public/portfolio-sitemap.xml',
+  'content/ai-ops-wiki',
+];
+
+/**
+ * Start every run on the live tip of main, BEFORE generating anything.
+ *
+ * The outputs here are regenerated from the Markdown corpus every run, so a local
+ * commit that never got pushed is disposable — as long as it touched only files
+ * this script owns. Anything else means a human's work is on this box, and the run
+ * stops loudly rather than guess.
+ */
+function syncSiteRepo() {
+  const gitDir = path.join(SITE, '.git');
+  if (fs.existsSync(path.join(gitDir, 'rebase-merge')) || fs.existsSync(path.join(gitDir, 'rebase-apply'))) {
+    if (DRY) { say('!', 'a stale rebase is in progress — a real run would clear it'); }
+    else {
+      git(['rebase', '--quit']);
+      say('!', 'cleared a stale in-progress rebase (--quit, HEAD not moved)');
+      alertTelegram('⚠️ wiki-ship cleared a stale in-progress rebase in the site repo. Recovered automatically; worth knowing it happened.');
+    }
+  }
+  git(['fetch', '-q', 'origin']);
+  const ahead = git(['rev-list', 'origin/main..HEAD']).split('\n').filter(Boolean);
+  if (!ahead.length) {
+    if (!DRY) git(['merge', '--ff-only', '-q', 'origin/main']);
+    say('✓', `site repo on origin/main (${git(['rev-parse', '--short', 'origin/main'])})`);
+    return;
+  }
+  const touched = git(['diff', '--name-only', 'origin/main...HEAD']).split('\n').filter(Boolean);
+  const foreign = touched.filter(f => !OWNED_PATHS.some(o => f === o || f.startsWith(o + '/')));
+  if (foreign.length) {
+    die(`site repo has ${ahead.length} unpushed commit(s) touching files wiki-ship does not own:\n` +
+        `${foreign.slice(0, 8).join('\n')}\nRefusing to discard them. Push or move them, then re-run.`);
+  }
+  if (DRY) { say('!', `${ahead.length} stranded wiki-only commit(s) — a real run would realign to origin/main`); return; }
+  const backup = `wiki-ship-backup-${new Date().toISOString().slice(0, 10)}`;
+  git(['branch', '-f', backup, 'HEAD']);
+  git(['reset', '-q', '--hard', 'origin/main']);
+  say('!', `${ahead.length} stranded wiki-only commit(s) parked on ${backup}; realigned to origin/main (they regenerate below)`);
+}
 
 function run(cmd, args, opts = {}) {
   return execFileSync(cmd, args, { cwd: SITE, encoding: 'utf8', stdio: 'pipe', ...opts });
@@ -51,6 +124,7 @@ function main() {
   if (!fs.existsSync(path.join(SITE, 'content', 'ai-ops-wiki'))) {
     die(`no wiki corpus at ${SITE}/content/ai-ops-wiki — set AIDEAZZ_REPO_PATH`);
   }
+  try { syncSiteRepo(); } catch (e) { die(`could not sync the site repo to origin/main: ${String(e.message || e).slice(0, 400)}`); }
 
   // 1 ── Lint. Fail closed: never publish a corpus that does not check out.
   try {
@@ -98,16 +172,7 @@ function main() {
    * this script is ever allowed to touch, so listing them is both simpler and
    * safer: it cannot accidentally stage somebody else's work in progress.
    */
-  const OWNED = [
-    'public/ai-ops-wiki.html',
-    'public/geo-manifest.json',
-    'public/llms.txt',
-    'public/.well-known/llms.txt',
-    'public/sitemap.xml',
-    'public/sitemap.txt',
-    'public/portfolio-sitemap.xml',
-    'content/ai-ops-wiki',
-  ].filter(p => fs.existsSync(path.join(SITE, p)));
+  const OWNED = OWNED_PATHS.filter(p => fs.existsSync(path.join(SITE, p)));
 
   const dirty = git(['status', '--porcelain', '--', ...OWNED])
     .split('\n').map(l => l.trim()).filter(Boolean);
@@ -123,8 +188,20 @@ function main() {
       `Regenerated from the Markdown corpus; revision line, sitemap and\n` +
       `geo-manifest date recomputed. Pushed without [skip ci] so the site\n` +
       `actually rebuilds.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>`]);
-    try { execSync('git pull --rebase -q origin main', { cwd: SITE, stdio: 'pipe' }); } catch { /* nothing upstream */ }
-    execSync('git push -q origin main', { cwd: SITE, stdio: 'pipe' });
+    // A failed rebase is NOT "nothing upstream". Swallowing it here is what wedged the
+    // repo from 4 to 19 Sep. Abort it cleanly and fail loudly; the next run's
+    // syncSiteRepo() realigns and regenerates, so nothing is lost.
+    try {
+      execSync('git pull --rebase -q origin main', { cwd: SITE, stdio: 'pipe' });
+    } catch (e) {
+      try { execSync('git rebase --abort', { cwd: SITE, stdio: 'pipe' }); } catch { /* no rebase to abort */ }
+      die(`rebase onto origin/main failed: ${String(e.stderr || e.message || e).slice(0, 400)}`);
+    }
+    try {
+      execSync('git push -q origin main', { cwd: SITE, stdio: 'pipe' });
+    } catch (e) {
+      die(`push rejected: ${String(e.stderr || e.message || e).slice(0, 400)}`);
+    }
     say('✓', `pushed ${git(['rev-parse', '--short', 'HEAD'])} — 4everland will rebuild`);
   }
 
