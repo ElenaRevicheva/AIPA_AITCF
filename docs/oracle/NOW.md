@@ -156,7 +156,13 @@ git log keeps the record.
 - 📉 **Outcome:** last citation probe — aideazz.xyz cited in **1 of 23** AI answers (4%, Perplexity
   only); `/api` and the wiki cited **0** times; named without a link in 13%.
 
-**NEXT.** Add the podcast to llms.txt / geo-manifest / sitemap (additive). Decide on X.
+**NEXT.** Decide on X (not a posting channel). Consider adding the citation result to the runbook.
+
+**Also 19 Sep, later:** podcast + Visibility API now in the main site's GEO layer (`dcaa2b8`:
+llms.txt, `.well-known` mirror — which had silently lost the wiki line — geo-manifest endpoints,
+robots cross-host sitemap). Runbook `sop-ai-ops(.es).html` refreshed (`b98a76f`): "Updated" 27 Aug →
+19 Sep, essays 150+, wiki 21/18, sitemap 173, 20 months, Perplexity named, Sprinter row, plus one
+new callout on this week's two silent failures. Backups: `D:\aideazz\_backups\{geo,runbook}-20260919\`.
 
 ### 🟢 18 Sep — Sprint Briefing: voice is back, and it now reads TODAY, not 2024
 
