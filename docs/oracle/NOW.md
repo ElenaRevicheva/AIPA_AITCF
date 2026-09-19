@@ -151,12 +151,18 @@ git log keeps the record.
 - ✅ all **11** podcast episodes link to their blog post
 - ✅ llms.txt / sitemap / geo-manifest list the blog and wiki
 - ❌ **podcast is invisible to AI crawlers** — absent from llms.txt, geo-manifest AND sitemap
-- ❌ **X is not a posting channel** — Buffer has LinkedIn, Instagram, YouTube (TikTok locked);
-  X is only a profile link in geo-manifest. Instagram/YouTube profiles are not in geo-manifest.
+- ✅ **X IS a posting channel — CORRECTION.** Not via Buffer (LinkedIn/Instagram/YouTube only) but
+  via **Algom Alpha** on the X API directly: `dragontrade-main` logged a tweet 19 Sep 03:08 UTC,
+  134 posts. An earlier line here said "X is not a posting channel" — that was wrong (checked
+  Buffer only). Instagram/YouTube profiles are still absent from geo-manifest.
 - 📉 **Outcome:** last citation probe — aideazz.xyz cited in **1 of 23** AI answers (4%, Perplexity
   only); `/api` and the wiki cited **0** times; named without a link in 13%.
 
-**NEXT.** Decide on X (not a posting channel). Consider adding the citation result to the runbook.
+**Then (19 Sep, `6b511e9`):** pitch hero → SEPTEMBER 2026, 21 incidents, API pill + button, 20 mo; runbook
+EN+ES gets an **"AI Visibility layer — September 2026"** section with the lab's own surfaces audited by
+the API that day. Verified on PLAIN URLs + content hash (earlier checks used `?cb=`, which hides caches).
+**NEXT.** ⚠️ **atuona.xyz scores 69/C with 0/6 AI crawlers allowed** (structured data 31) — the runbook
+says "fix queued", so it must be fixed. Citation result (1/23) still not published — Elena's call.
 
 **Also 19 Sep, later:** podcast + Visibility API now in the main site's GEO layer (`dcaa2b8`:
 llms.txt, `.well-known` mirror — which had silently lost the wiki line — geo-manifest endpoints,
