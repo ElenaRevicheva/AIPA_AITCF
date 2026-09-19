@@ -161,7 +161,22 @@ git log keeps the record.
 **Then (19 Sep, `6b511e9`):** pitch hero → SEPTEMBER 2026, 21 incidents, API pill + button, 20 mo; runbook
 EN+ES gets an **"AI Visibility layer — September 2026"** section with the lab's own surfaces audited by
 the API that day. Verified on PLAIN URLs + content hash (earlier checks used `?cb=`, which hides caches).
-**NEXT.** ⚠️ **atuona.xyz scores 69/C with 0/6 AI crawlers allowed** (structured data 31) — the runbook
+### 🟢 19 Sep — atuona.xyz made citable by AI: 69/C → 93/A+, crawlers 0/6 → 6/6
+
+The film studio rendered its films with JavaScript, so crawlers saw "Loading films…", and the site
+had **no robots.txt, llms.txt, sitemap, JSON-LD, Open Graph, meta description or canonical**.
+Added (additive, 29 lines, 0 removed, full `npm run build` verified): robots.txt allowing AI
+crawlers + sitemap; llms.txt naming the six films; sitemap.xml; identity JSON-LD (WebSite /
+Organization / Person, Elena as founder); on `/aifilmstudio/` a CollectionPage + ItemList of six
+**VideoObjects** and a `<noscript>` film list. Then meta descriptions trimmed to ~135 chars and one
+clear H1 per page (film page had none; the homepage's second H1 was inside a hidden modal — both
+keep their inline styles, nothing renders differently). Commits `1991d914`, `e8eaa69a`.
+Home **93/A+**, film studio **89/A**. Backup: `D:ideazz\_backupstuona-geo-20260919\`.
+**Left for Elena (visible design):** question-shaped headings + a short FAQ and more body copy on
+`/aifilmstudio/` would close the last checks (schema-answer, question-headings, content-depth).
+**Also:** the poetry vault holds **99** poems — her CVs say 98.
+
+**SUPERSEDED.** ⚠️ ~~atuona.xyz scores 69/C with 0/6 AI crawlers allowed~~ (structured data 31) — the runbook
 says "fix queued", so it must be fixed. Citation result (1/23) still not published — Elena's call.
 
 **Also 19 Sep, later:** podcast + Visibility API now in the main site's GEO layer (`dcaa2b8`:
