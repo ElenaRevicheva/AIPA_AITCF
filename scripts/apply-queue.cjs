@@ -24,7 +24,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { hubspotKey, hubspotBase } = require(path.join(__dirname, 'hs-env.cjs'));
+const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
 
 const args = process.argv.slice(2);
 const argOf = (name, dflt) => {
@@ -201,4 +201,31 @@ ${cards}
   console.log(`✓ ${rows.length} jobs → ${OUT}`);
   console.log(`  ${tailored} tailored · ${boiler} boilerplate · ${noLetter} without a draft letter · ${noLink} without an apply link`);
   console.log('  HubSpot was only read. VJH untouched.');
+
+  // --telegram: deliver the page itself to Elena's private chat. Scheduled runs happen on Oracle,
+  // where a file on disk helps nobody — Telegram is where she already reads the fleet. The page
+  // carries company names and letters, so it goes to the private chat and nowhere else.
+  if (args.includes('--telegram')) {
+    // read through hs-env: these scripts run from cron with a bare environment, so .env is the
+    // only reliable source — process.env was empty on the first Oracle run.
+    const token = envValue('TELEGRAM_BOT_TOKEN');
+    const chat = (envValue('CONCIERGE_TG_CHAT') || '').trim();
+    if (!token || !chat) { console.warn('  ! TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT missing — not sent'); return; }
+    // The caption has to explain itself: it arrives at 8am with no conversation around it.
+    const caption = `📋 Your apply queue — ${rows.length} job${rows.length === 1 ? '' : 's'}\n\n` +
+      `These are the roles VJH already scored and marked "YOU act TODAY" in HubSpot. ` +
+      `Tap the file below and it opens as one page — apply link + cover letter for each, ` +
+      `so you don't have to open every HubSpot record one by one.\n\n` +
+      `${tailored} have a tailored letter · ${boiler} boilerplate (rewrite first) · ${noLetter} no letter yet\n\n` +
+      `⚠️ Nothing was submitted. This is a worklist — you apply, in your own words.`;
+    const form = new FormData();
+    form.append('chat_id', chat);
+    form.append('caption', caption);
+    form.append('document', new Blob([html], { type: 'text/html' }),
+      `apply-queue-${new Date().toISOString().slice(0, 10)}.html`);
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, { method: 'POST', body: form });
+    const out = await res.json().catch(() => ({}));
+    console.log(out.ok ? '  ✓ sent to Telegram' : `  ! Telegram failed: ${String(out.description || res.status).slice(0, 120)}`);
+    if (!out.ok) process.exitCode = 1;   // a silent non-delivery is exactly what we do not want
+  }
 })().catch((e) => { console.error('✖', e.message); process.exit(1); });
