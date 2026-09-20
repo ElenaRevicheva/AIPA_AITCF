@@ -130,6 +130,58 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔴 20 Sep — VJH NO LONGER HUNTS GENERIC "AI ENGINEER". Do not add those titles back.
+
+**DONE.** Elena's instruction — *"the 99 percent require manual coding skills and 5 plus years"* —
+and her own labelling data agreed, so this was measured, not just obeyed:
+
+| | engineer-titled | share |
+|---|---|---|
+| ACT-TODAY queue | 22 of 35 | **62%** |
+| her **negatives** in `judge_feedback.json` | 7 of 12 | **58%** |
+| her **positives** | 2 of 12 | **17%** |
+
+Her own recorded reasons are one shape: *"5-8 years of experience, strong Python and backend
+skills"*, *"4+ years as an AI Engineer … MLOps"*, *"8+ years"*, *"Senior-level backend software
+development, Node.js, TypeScript, AWS, CI/CD"*.
+
+Three layers, because one was not enough (see RISK):
+1. **`target_lanes.py`** — the builder lane dropped 8 generic titles (AI Engineer, Applied AI
+   Engineer, AI Agents / Agentic AI Engineer, Founding AI Engineer, AI Product Engineer, LLM
+   Application Engineer, Prompt Engineer) and **kept the integration half**: AI Automation /
+   Solutions / Integration Engineer, Forward Deployed Engineer, AI Builder. Renamed
+   **BUILDER / INTEGRATION**, and given a `not` clause the LLM judge now reads. 4 titles
+   traceable to her actual positives added to lanes 2 and 4.
+2. **`fit_gate.py`** — a **TITLE veto**, for the reason the DevOps veto above it already states:
+   the search path judges a short snippet with the requirements missing, so the `heavy` phrase
+   list never sees "5+ years". A title veto holds when the description is unreadable.
+3. **`serpapi_jobs_ingest.py`** — it carries its **own hardcoded query list**, which the lane cut
+   did not reach: the restart log still said `Querying Google Jobs: 'AI engineer founding team
+   remote'`. Its own comment notes every query is **a paid search twice a day**, so two of
+   sixteen were *paying* to generate her rejections. Swapped **1:1** (count and bill unchanged)
+   for `AI automation specialist remote latin america` and
+   `technical account manager AI automation remote` — both from roles she marked positive.
+
+**Also:** `apply-queue.cjs` hides the 17 already-banked engineer deals from the morning page.
+**Read-only** — the deals are untouched in HubSpot, the hidden count is printed on the page, in
+the console and in the Telegram caption, and `--all` shows all 35.
+
+**VERIFIED BY.** 21/21 must-block titles blocked, 16/16 must-survive titles survive. Eval suite
+**529 passed** locally, **397 passed** on Oracle; the 2 `test_provider_chain[claude]` failures are
+the documented zero-credits ones (§7). `serpapi-jobs` restarted and the live log shows
+`Querying Google Jobs: 'AI automation specialist remote latin america'` with **0** occurrences of
+either retired query. Queue: 35 read → **18 shown, 17 hidden**. All files hash-identical on
+laptop / GitHub / Oracle. Backups: `_backups/vjh-lanes-20260920/` and
+`/home/ubuntu/backups/vjh-lanes-20260920/`. VJH commits `5c50c09`, `2681f9e`.
+
+**RISK / TRAP FOR THE NEXT AGENT.** **A lane cut alone does nothing.** Targeting lives in *three*
+places — the lane registry, the fit gate, and each ingest script's own query list. Changing one
+and declaring victory is how `'AI engineer founding team remote'` kept running after the lane was
+emptied. Also: two regressions were caught only because the veto was tested before deploy —
+`Forward-Deployed AI Engineer` (deliberately kept) and `Senior Manager, AI Engineering` (a
+management role) both contain the substring `ai engineer`. The allowlist that rescues them must
+survive any future edit; hard SWE titles can never be rescued by it.
+
 ### 🟢 20 Sep — apply queue lands in Telegram every morning 08:15 Panama. LIVE.
 
 **DONE.**
