@@ -23,6 +23,7 @@
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
 
@@ -174,6 +175,64 @@ async function hs(url, init = {}) {
   const boiler = rows.filter((r) => r.letter && r.boilerplate).length;
   const noLetter = rows.filter((r) => !r.letter).length;   // older notes carry no letter at all
   const noLink = rows.filter((r) => !r.url).length;
+  // ── PERPLEXITY RESEARCH (2026-09-20) ──────────────────────────────────────
+  // The Perplexity API key already lives in cto-aipa/.env and was sitting unused. Probed live
+  // before building this: HTTP 200, 11 citations, ~$0.005/query on sonar.
+  //
+  // Why it earns its keep: a letter that says nothing about the company is why a strong
+  // candidate gets screened out, and 7 of today's 18 jobs have a boilerplate letter or none.
+  //
+  // Three rules:
+  //   · CACHED by company — a company researched once is never paid for twice.
+  //   · FAILS SOFT and LOUD — a Perplexity outage must never blank the morning page, but a
+  //     silent skip is the failure mode this repo keeps getting bitten by, so misses are counted
+  //     and printed.
+  //   · CITED — every brief carries its sources. Nothing here goes in a letter unverified.
+  const PPLX = envValue('PERPLEXITY_API_KEY');
+  const CACHE = path.join(os.homedir(), '.apply-queue-research.json');
+  let cache = {};
+  try { cache = JSON.parse(fs.readFileSync(CACHE, 'utf8')); } catch { /* first run */ }
+  let spent = 0, researched = 0, cached = 0, failed = 0;
+
+  async function research(company, title) {
+    if (!company) return null;
+    const key = company.toLowerCase().trim();
+    if (cache[key]) { cached++; return cache[key]; }
+    const prompt = `Company: ${company}. Role being applied for: ${title || 'unspecified'}.\n\n`
+      + 'Answer in exactly this format, nothing else:\n'
+      + 'BRIEF: two sentences on what this company actually does and who pays them.\n'
+      + 'ANGLE: one sentence naming the single most relevant thing about them for a candidate '
+      + 'whose background is building and operating production AI automation — AI agents, CRM and '
+      + 'outreach automation, multi-provider LLM fallback chains, and making companies visible to '
+      + 'AI search (GEO/AEO). Be specific to this company; if you cannot find enough about them, '
+      + 'write ANGLE: (not enough public information) rather than inventing something.';
+    try {
+      const res = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${PPLX}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'sonar', max_tokens: 220, temperature: 0.2,
+          messages: [{ role: 'user', content: prompt }] }),
+      });
+      if (!res.ok) { failed++; return null; }
+      const j = await res.json();
+      const text = j.choices?.[0]?.message?.content || '';
+      spent += j.usage?.cost?.total_cost || 0;
+      const out = {
+        brief: (text.match(/BRIEF:\s*([\s\S]*?)(?=\nANGLE:|$)/i) || [])[1]?.trim() || text.trim(),
+        angle: (text.match(/ANGLE:\s*([\s\S]*)/i) || [])[1]?.trim() || '',
+        sources: (j.search_results || j.citations || [])
+          .map((c) => (typeof c === 'string' ? c : c.url)).filter(Boolean).slice(0, 4),
+      };
+      cache[key] = out; researched++;
+      return out;
+    } catch { failed++; return null; }
+  }
+
+  if (PPLX && !args.includes('--no-research')) {
+    for (const r of rows) r.research = await research(r.company, r.title);
+    try { fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1)); } catch { /* cache is optional */ }
+  }
+
   /**
    * One ready-to-paste instruction per job for an agentic browser (Comet, or any assistant that
    * can drive a page). The point is that she pastes ONE thing and the repetitive fields are done.
@@ -210,6 +269,11 @@ async function hs(url, init = {}) {
       `· GitHub: ${p.github}`,
       `· Portfolio: ${p.portfolio}`,
       '',
+      r.research && (r.research.brief || r.research.angle)
+        ? `ABOUT THEM (researched, with sources — use it only if a field asks why this company):\n`
+          + `${r.research.brief}\n${r.research.angle ? `Relevant angle: ${r.research.angle}\n` : ''}`
+        : '',
+      r.research ? '' : '',
       r.letter && !r.boilerplate
         ? 'COVER LETTER — paste this text exactly into the cover letter field, unchanged:\n\n' + r.letter
         : 'COVER LETTER: leave the cover-letter and any long free-text field EMPTY. I write those myself.',
@@ -237,6 +301,7 @@ async function hs(url, init = {}) {
       </div>
     </div>
     ${r.boilerplate ? `<p class="flag">⚠️ The draft letter is <b>boilerplate</b>${r.thin ? ` — the job page gave only ${esc(r.thin)} characters` : ''}. Rewrite it before sending.</p>` : ''}
+    ${r.research && (r.research.brief || r.research.angle) ? `<div class="rsrch"><b>About them</b> — ${esc(r.research.brief)}${r.research.angle ? `<br><b>Your angle:</b> ${esc(r.research.angle)}` : ''}${r.research.sources && r.research.sources.length ? `<div class="src">${r.research.sources.map((u, n) => `<a href="${esc(u)}" target="_blank" rel="noopener">source ${n + 1}</a>`).join(' · ')}</div>` : ''}</div>` : ''}
     <div class="actions">
       ${r.url ? `<a class="btn go" href="${esc(r.url)}" target="_blank" rel="noopener">Open &amp; apply ↗</a>`
               : '<span class="btn dead">no apply link in the note</span>'}
@@ -271,6 +336,9 @@ async function hs(url, init = {}) {
  .btn:hover{border-color:var(--cy)} .btn.go{background:var(--cy);color:#04121a;border-color:var(--cy);font-weight:600}
  .btn.ghost{background:transparent} .btn.dead{opacity:.5;cursor:default}
  .btn.cm{border-color:rgba(0,229,255,.45);color:var(--cy)} .btn.cm:hover{background:rgba(0,229,255,.08)}
+ .rsrch{background:#101620;border-left:2px solid var(--cy);border-radius:0 8px 8px 0;padding:10px 12px;margin:11px 0 0;font-size:13.5px;color:#c3cbdb}
+ .rsrch b{color:var(--ink)} .src{margin-top:6px;font-size:11.5px}
+ .src a{color:var(--mut);text-decoration:none;border-bottom:1px dotted #39405400} .src a:hover{color:var(--cy)}
  .letter{display:none;white-space:pre-wrap;background:#0f1319;border:1px solid #222735;border-radius:8px;padding:12px;margin-top:12px;font:12.5px/1.6 ui-monospace,Consolas,monospace;color:#cfd6e4;max-height:340px;overflow:auto}
  .letter.open{display:block}
  .prompt{background:#111722;border:1px dashed #2b3142;border-radius:10px;padding:12px;margin:0 0 18px;color:var(--mut);font-size:13px}
@@ -308,6 +376,12 @@ ${cards}
   console.log(`✓ ${rows.length} jobs → ${OUT}`);
   console.log(`  ${tailored} tailored · ${boiler} boilerplate · ${noLetter} without a draft letter · ${noLink} without an apply link`);
   if (hiddenEngineer) console.log(`  ${hiddenEngineer} generic AI-Engineer role(s) hidden — still in HubSpot, --all shows them`);
+  if (PPLX && !args.includes('--no-research')) {
+    console.log(`  research: ${researched} new · ${cached} from cache · ${failed} failed · $${spent.toFixed(4)} spent`);
+    if (failed) console.log(`  ! ${failed} company brief(s) missing — Perplexity refused or errored. The page is still complete otherwise.`);
+  } else if (!PPLX) {
+    console.log('  ! PERPLEXITY_API_KEY not found — company briefs skipped');
+  }
   console.log('  HubSpot was only read. VJH untouched.');
 
   // --telegram: deliver the page itself to Elena's private chat. Scheduled runs happen on Oracle,
