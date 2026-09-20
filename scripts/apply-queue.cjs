@@ -145,6 +145,31 @@ async function hs(url, init = {}) {
     });
   }
 
+  // ── HIDE THE GENERIC-ENGINEER BACKLOG (2026-09-20) ────────────────────────
+  // VJH stopped searching for these today, but the deals it already banked are still sitting
+  // in "YOU act TODAY" — 22 of 35 this morning. Filtering them here is READ-ONLY: the deals
+  // stay untouched in HubSpot, they just don't fill her morning page. Same rule as
+  // fit_gate.swe_titled, deliberately including its allowlist so "Forward-Deployed AI
+  // Engineer" and "Senior Manager, AI Engineering" are not swept up with them.
+  // `--all` shows everything again.
+  const engineerTitled = (t) => {
+    const s = (t || '').toLowerCase();
+    const hardSwe = ['software engineer', 'machine learning engineer', 'ml engineer',
+      'ai/ml engineer', 'data engineer', 'research engineer', 'founding engineer'].some((k) => s.includes(k));
+    const ok = !hardSwe && (
+      ['automation engineer', 'solutions engineer', 'integration engineer',
+        'forward deployed', 'forward-deployed'].some((k) => s.includes(k))
+      || (s.includes('engineering') && ['manager', 'director', 'head of', 'vp ', 'chief'].some((k) => s.includes(k))));
+    return hardSwe || (!ok && ['ai engineer', 'ai agents engineer', 'gen ai engineer',
+      'genai engineer', 'llm engineer'].some((k) => s.includes(k)));
+  };
+  let hiddenEngineer = 0;
+  if (!args.includes('--all')) {
+    for (let i = rows.length - 1; i >= 0; i--) {
+      if (engineerTitled(rows[i].title)) { rows.splice(i, 1); hiddenEngineer++; }
+    }
+  }
+
   const tailored = rows.filter((r) => r.letter && !r.boilerplate).length;
   const boiler = rows.filter((r) => r.letter && r.boilerplate).length;
   const noLetter = rows.filter((r) => !r.letter).length;   // older notes carry no letter at all
@@ -255,7 +280,7 @@ async function hs(url, init = {}) {
 <header>
   <h1>Apply queue — ${rows.length} jobs waiting</h1>
   <div class="sub">From HubSpot stage “${esc(STAGE)}” · generated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} ·
-  <b>${tailored}</b> tailored letter${tailored === 1 ? '' : 's'} · <b>${boiler}</b> boilerplate (rewrite before sending) · <b>${noLetter}</b> with no draft letter${noLink ? ` · ${noLink} missing an apply link` : ''}</div>
+  <b>${tailored}</b> tailored letter${tailored === 1 ? '' : 's'} · <b>${boiler}</b> boilerplate (rewrite before sending) · <b>${noLetter}</b> with no draft letter${noLink ? ` · ${noLink} missing an apply link` : ''}${hiddenEngineer ? `<br><span style="color:var(--warn)">${hiddenEngineer} generic AI-Engineer role${hiddenEngineer === 1 ? '' : 's'} hidden</span> — 5+ years hand-coding, not your lane. Still in HubSpot, nothing deleted; run with <code style="color:var(--mut)">--all</code> to see them.` : ''}</div>
 </header>
 <div class="wrap">
   <div class="prompt"><b style="color:var(--ink)">Working this with Comet (or any browser assistant)?</b>
@@ -282,6 +307,7 @@ ${cards}
   fs.writeFileSync(OUT, html, 'utf8');
   console.log(`✓ ${rows.length} jobs → ${OUT}`);
   console.log(`  ${tailored} tailored · ${boiler} boilerplate · ${noLetter} without a draft letter · ${noLink} without an apply link`);
+  if (hiddenEngineer) console.log(`  ${hiddenEngineer} generic AI-Engineer role(s) hidden — still in HubSpot, --all shows them`);
   console.log('  HubSpot was only read. VJH untouched.');
 
   // --telegram: deliver the page itself to Elena's private chat. Scheduled runs happen on Oracle,
@@ -299,6 +325,7 @@ ${cards}
       `Tap the file below and it opens as one page — apply link + cover letter for each, ` +
       `so you don't have to open every HubSpot record one by one.\n\n` +
       `${tailored} have a tailored letter · ${boiler} boilerplate (rewrite first) · ${noLetter} no letter yet\n\n` +
+      (hiddenEngineer ? `🚫 ${hiddenEngineer} generic AI-Engineer role${hiddenEngineer === 1 ? '' : 's'} hidden — 5+ years hand-coding, not your lane. Nothing was deleted.\n\n` : '') +
       `⚠️ Nothing was submitted. This is a worklist — you apply, in your own words.`;
     const form = new FormData();
     form.append('chat_id', chat);
