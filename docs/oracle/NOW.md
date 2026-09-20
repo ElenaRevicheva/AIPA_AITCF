@@ -130,6 +130,42 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 20 Sep — apply queue lands in Telegram every morning 08:15 Panama. LIVE.
+
+**DONE.**
+- **`scripts/apply-queue.cjs` is scheduled.** Cron `15 13 * * *` on Oracle (08:15 Panama,
+  15 min after the 13:00 UTC Sprint Briefing). Reads the `qualifiedtobuy` deals — the
+  "🔥 YOU act TODAY" queue — and sends **one HTML page** to the private Telegram chat:
+  apply link + score + cover letter per job, so Elena stops opening 35 HubSpot records
+  one at a time.
+- **Read-only, by construction.** Only `/search` and `/batch/read` POSTs. VJH is untouched;
+  no deal is written, no stage moved, nothing submitted. Output is written outside the repo.
+- **The bug worth knowing:** `--telegram` read `process.env`, which is **empty under cron**.
+  The first Oracle run printed `TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT missing`, sent
+  nothing, and **still exited 0** next to a successful-looking page. Now routed through
+  `envValue()` in `hs-env.cjs` — the same `.env` reader the HubSpot key already uses.
+- **Caption rewritten.** It arrives at 8am with no conversation around it, so it now states
+  where the list came from, that the attachment opens as one page, and that nothing was
+  submitted. (The first version said "Apply queue — 35 jobs waiting" and meant nothing to
+  a reader who had not been in the chat.)
+
+**VERIFIED BY.** Run on Oracle under `env -i` — a stripped, cron-identical environment:
+`read 35 of 35 deals ... ✓ sent to Telegram`. Cron **appended, never replaced**: backup at
+`/home/ubuntu/backups/crontab-20260920.bak` taken first, 22 → 23 lines, `diff` shows one
+added line, and every one of the 22 original entries re-matched with `grep -Fqx`.
+Script identical across all three homes — `19b68285d88347ca420bce96a66f834651388744` on
+laptop, GitHub `main` and Oracle (Oracle normalised CRLF→LF; backup
+`apply-queue.cjs.pre-lf-20260920.bak`).
+
+**NEXT (Elena's move).** Open tomorrow's 08:15 Telegram file and work down it. 12 of the 35
+have **no draft letter** and 3 are **boilerplate** — those need her words, not a paste.
+
+**RISK.** VJH's ingest is a **continuous 12h loop** (`time.sleep(12*60*60)` in
+`serpapi_jobs_ingest.py`), not a clocked morning cycle — so 08:15 is anchored to *her*
+morning read, not to a cycle boundary. The queue reflects HubSpot state at send time, which
+is correct either way. If the page ever arrives empty, check `/home/ubuntu/logs/apply-queue.log`
+**before** assuming VJH stopped finding jobs.
+
 ### 🟢 19 Sep — wiki-ship was silently dead for 15 days; fixed. Pitch deck + micro1 CV.
 
 **DONE.**
