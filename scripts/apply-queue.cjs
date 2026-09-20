@@ -429,11 +429,45 @@ ${cards}
  const COMET = ${JSON.stringify(rows.map((r) => cometPrompt(r)))};
  // take the button element rather than guessing its position — adding a button used to
  // silently shift an nth-child selector onto the wrong one.
- function flash(b){ if(!b) return; const t=b.textContent; b.textContent='Copied ✓'; setTimeout(()=>b.textContent=t,1400); }
- function copyLetter(i,b){ navigator.clipboard.writeText(LETTERS[i]).then(()=>flash(b)); }
- function copyComet(i,b){ navigator.clipboard.writeText(COMET[i]).then(()=>flash(b)); }
+ function flash(b,msg){ if(!b) return; const t=b.dataset.label||(b.dataset.label=b.textContent); b.textContent=msg||'Copied ✓'; setTimeout(()=>b.textContent=t,1600); }
+ // Elena reads this page on her PHONE, opened from a Telegram attachment — which is a file://
+ // URL, NOT a secure context, so navigator.clipboard is unavailable or throws there. The first
+ // version would have failed SILENTLY on the device she actually uses. Three tiers, and the last
+ // one always works: show the text selected so she can long-press and copy.
+ function copyText(text,b){
+   const done=()=>flash(b);
+   if(navigator.clipboard&&window.isSecureContext){
+     navigator.clipboard.writeText(text).then(done).catch(()=>legacy(text,b)); return;
+   }
+   legacy(text,b);
+ }
+ function legacy(text,b){
+   try{
+     const ta=document.createElement('textarea');
+     ta.value=text; ta.setAttribute('readonly','');
+     ta.style.cssText='position:fixed;top:0;left:0;opacity:0';
+     document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,text.length);
+     const ok=document.execCommand('copy'); document.body.removeChild(ta);
+     if(ok){ flash(b); return; }
+   }catch(e){}
+   reveal(text,b);
+ }
+ function reveal(text,b){
+   let box=document.getElementById('fallbackbox');
+   if(!box){
+     box=document.createElement('div'); box.id='fallbackbox';
+     box.innerHTML='<div style="font:13px sans-serif;color:#ffb020;margin:0 0 6px">Your browser blocked the clipboard. Long-press the text below → Select all → Copy.</div><textarea id="fbta" style="width:100%;height:42vh;background:#0f1319;color:#cfd6e4;border:1px solid #2b3142;border-radius:8px;padding:10px;font:12px ui-monospace,monospace"></textarea><button onclick="this.parentNode.remove()" style="margin-top:8px;font:13px sans-serif;background:#1d2430;color:#e8eaf0;border:1px solid #2b3142;border-radius:8px;padding:8px 14px">Close</button>';
+     box.style.cssText='position:fixed;inset:auto 0 0 0;background:#151922;border-top:1px solid #2b3142;padding:14px;z-index:99';
+     document.body.appendChild(box);
+   }
+   const ta=document.getElementById('fbta');
+   ta.value=text; ta.focus(); ta.select();
+   flash(b,'Copy it below ↓');
+ }
+ function copyLetter(i,b){ copyText(LETTERS[i],b); }
+ function copyComet(i,b){ copyText(COMET[i],b); }
  const ORDER = ${JSON.stringify(computerWorkOrder())};
- function copyOrder(b){ navigator.clipboard.writeText(ORDER).then(()=>flash(b)); }
+ function copyOrder(b){ copyText(ORDER,b); }
 </script>
 </body></html>`;
 
