@@ -75,3 +75,42 @@ downstream of that step is already built and running.
 - `scripts/apply-queue.cjs` — the queue page and the prompt generator
 - Cron on Oracle: `15 13 * * *` → Telegram, 08:15 Panama, 15 min after the Sprint Briefing
 - `docs/oracle/NOW.md` — 20 Sep handoff
+
+
+---
+
+# ADDENDUM — the page itself, finally read (20 Sep, late)
+
+Read at last by driving the **installed Comet over CDP** (`--remote-debugging-port`), after
+WebFetch 403'd and headless Chrome hit a Cloudflare challenge. **Everything above this line was
+written from secondary sources — search results describing Comet — not from the page.** That
+cost a rebuild: per-job browser prompts were built first, then redone as a batch work order once
+Computer turned out to be a different product.
+
+## What perplexity.ai/gen/computer/job-applications actually advertises
+
+Six capabilities, verbatim from the page: *Profile Analysis* (parse LinkedIn into a candidate
+summary), *Role Matching* (scan boards, filter by location/seniority), *Resume Tailoring*
+(rewrite the resume per role, mirror JD keywords, ATS-format), *Connect Your Tools* (Sheets,
+Gmail, Notion, Docs), *Remember & Learn* (across sessions), *Monitor & Alert* (ping on high-fit
+postings). Framing: *"Paste your profile, step away, come back to a full pipeline."*
+
+## Verdict: it is a COMPETITOR to VJH, not a component of it
+
+| Computer | VJH today | Winner |
+|---|---|---|
+| Profile Analysis | 8-lane registry tuned from her own labels | VJH |
+| Role Matching | Bright Data + JobGate + fit_gate + LLM judge + feedback loop | VJH |
+| **Resume Tailoring** | **cover letters only — one static resume PDF for every role** | **Computer — REAL GAP** |
+| Connect Your Tools | HubSpot + Telegram + Resend | VJH (a CRM beats a spreadsheet) |
+| Remember & Learn | `judge_feedback.json` -> judge prompt | VJH |
+| Monitor & Alert | 08:15 Telegram daily | tie |
+
+**Five of six already exist and are better here.** Do NOT rebuild the pipeline against Computer,
+and do not let it drive the search — it has none of her lane tuning or rejection history.
+
+**The single thing worth taking is per-role resume tailoring.** She passes interviews but is
+screened out before them, and an ATS reads the RESUME, not the cover letter. That is the gap.
+
+Note also what the page does NOT lead with: form-filling. That belongs to the Comet browser, a
+separate product. Aiming at form-filling was aiming at the wrong half.
