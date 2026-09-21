@@ -1,0 +1,73 @@
+{
+  "generated_by": "scripts/build_tailored_cv.py --emit-rules",
+  "note": "Lane rules live in build_tailored_cv.py. Do NOT hand-edit this file and do NOT re-implement the rules anywhere else - read this instead.",
+  "default": "builder",
+  "rules": [
+    {
+      "lane": "evaluation",
+      "pattern": "\\beval|red.?team|annotat|ai train(er|ing)|quality review|llm judge"
+    },
+    {
+      "lane": "geo",
+      "pattern": "\\bgeo\\b|\\baeo\\b|seo|search visibility|answer engine|content market"
+    },
+    {
+      "lane": "exec_support",
+      "pattern": "chief of staff|executive assistant|\\bea\\b|executive support"
+    },
+    {
+      "lane": "leadership",
+      "pattern": "chief ai|head of ai|vp .*ai|director .*ai|ai lead(ership)?\\b|transformation|senior manager.*(ai|engineering)|engineering manager|manager, ai engineering"
+    },
+    {
+      "lane": "pm",
+      "pattern": "product manager|product owner|program manager|product lead|\\bpm\\b|product develop"
+    },
+    {
+      "lane": "architect",
+      "pattern": "architect|consultant|solutions|advisor|customer engineer|account manager"
+    },
+    {
+      "lane": "automation",
+      "pattern": "automation|workflow|\\bops\\b|operations|n8n|make\\.com|zapier|rpa"
+    },
+    {
+      "lane": "builder",
+      "pattern": "engineer|developer|builder|forward.?deployed|integration"
+    }
+  ],
+  "lanes": {
+    "pm": {
+      "label": "AI Product & Program Management",
+      "cv": "CV_Elena_Revicheva_pm.pdf"
+    },
+    "architect": {
+      "label": "AI Solutions Architecture & Consulting",
+      "cv": "CV_Elena_Revicheva_architect.pdf"
+    },
+    "leadership": {
+      "label": "AI Leadership & Transformation",
+      "cv": "CV_Elena_Revicheva_leadership.pdf"
+    },
+    "automation": {
+      "label": "AI Automation & Operations",
+      "cv": "CV_Elena_Revicheva_automation.pdf"
+    },
+    "builder": {
+      "label": "AI-Augmented Builder / Integration",
+      "cv": "CV_Elena_Revicheva_builder.pdf"
+    },
+    "geo": {
+      "label": "GEO / AEO / AI Search Visibility",
+      "cv": "CV_Elena_Revicheva_geo.pdf"
+    },
+    "evaluation": {
+      "label": "Expert AI Evaluation & Training",
+      "cv": "CV_Elena_Revicheva_evaluation.pdf"
+    },
+    "exec_support": {
+      "label": "AI-Qualified Executive Support",
+      "cv": "CV_Elena_Revicheva_exec_support.pdf"
+    }
+  }
+}
