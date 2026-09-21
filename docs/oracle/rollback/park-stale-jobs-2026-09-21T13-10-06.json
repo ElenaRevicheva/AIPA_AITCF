@@ -1,0 +1,104 @@
+{
+  "ranAt": "2026-09-21T13:10:06.381Z",
+  "cutoffDays": 60,
+  "fromStage": "qualifiedtobuy",
+  "toStage": "appointmentscheduled",
+  "moved": [
+    {
+      "id": "61514040207",
+      "name": "[HIRING-VJH-LEAD] AI Engineer @ Hitss Solutions S.A. de C.V.",
+      "created": "2026-06-24T02:04:23.238Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "61634804276",
+      "name": "[HIRING-VJH-LEAD] Team8 Stealth Start-Up: AI Digital Health Forward Deployed Software Engineer @ Team8",
+      "created": "2026-06-26T05:46:07.846Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "61669900646",
+      "name": "[HIRING-VJH-LEAD] AI Process Engineer @ Mutt Data",
+      "created": "2026-06-26T18:09:09.153Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "61744050090",
+      "name": "[HIRING-VJH-LEAD] Senior AI Engineer @ Paper",
+      "created": "2026-06-29T07:05:15.708Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "61845441959",
+      "name": "[HIRING-VJH-LEAD] AI Engineer @ Distillery",
+      "created": "2026-06-29T19:29:24.886Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62130173490",
+      "name": "[HIRING-VJH-LEAD] Senior Manager, AI Engineering @ HackerOne",
+      "created": "2026-07-02T17:40:31.740Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62181619608",
+      "name": "[HIRING-VJH-LEAD] Mid-Level Software Engineer (Agents & Automation) @ Velozient",
+      "created": "2026-07-03T20:40:16.598Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62346185598",
+      "name": "[HIRING-VJH-LEAD] AI Automation Engineer, In-House MarTech Video SaaS @ Vidalytics",
+      "created": "2026-07-07T13:08:02.555Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62390913572",
+      "name": "[HIRING-VJH-LEAD] AI Engineer (Freelance) @ Multiplica Talent",
+      "created": "2026-07-08T08:03:41.817Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62398606942",
+      "name": "[HIRING-VJH-LEAD] Senior AI Software Engineer - Python, Java, Rust, Go, C++, TypeScript @ AquSag Technologies",
+      "created": "2026-07-08T12:10:05.061Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62401819507",
+      "name": "[HIRING-VJH-LEAD] AI Workflow Automation Engineer @ Bitovi",
+      "created": "2026-07-08T13:11:38.002Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62404539962",
+      "name": "[HIRING-VJH-LEAD] Mid or Senior AI Developer (Python / React) @ SkillzPage",
+      "created": "2026-07-08T15:14:45.291Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62559042927",
+      "name": "[HIRING-VJH-LEAD] Technical AI Product Manager @ Coin Market Cap",
+      "created": "2026-07-12T10:35:02.893Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62831711884",
+      "name": "[HIRING-VJH-LEAD] ServiceNow AI Engineer @ ElementSkill",
+      "created": "2026-07-20T12:34:14.013Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62891297136",
+      "name": "[HIRING-VJH-SERP-LEAD] AI Automation Engineer @ Cosuno @ Cosuno",
+      "created": "2026-07-21T08:42:51.290Z",
+      "fromStage": "qualifiedtobuy"
+    },
+    {
+      "id": "62977155076",
+      "name": "[HIRING-VJH-LEAD] Applied AI Engineer (Automation) @ Fusemachines",
+      "created": "2026-07-21T18:35:16.329Z",
+      "fromStage": "qualifiedtobuy"
+    }
+  ]
+}
