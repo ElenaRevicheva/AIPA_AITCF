@@ -130,6 +130,61 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔴 21 Sep — TAILORED CV PER LANE, ONTO THE HIRING DEAL. Built, deployed, **BLOCKED on one scope tick.**
+
+**ELENA'S MOVE, 30 seconds, and everything downstream is already running:**
+HubSpot → Settings → Integrations → Private Apps / Development → Keys → Service Keys →
+**Aldeazz_Marketing_Engine** → Scopes → tick **`files` (write)** → Save.
+Then it self-heals at the next 13:30 UTC cron; nothing else is needed.
+
+**WHY.** VJH tailors the cover LETTER for every job and then attaches **the same static resume
+to all of them**. An ATS reads the résumé. The deal showed a letter arguing she is a product
+manager next to a CV headed "AI Automation Architect". This is the one capability of six that
+Perplexity Computer had and VJH did not (see `docs/applications/2026-09-20_comet_*.md`).
+
+**DONE.**
+- **`scripts/build_tailored_cv.py`** — tailoring by **SELECTION, never generation**. A fact bank
+  of pre-written, verified bullets tagged by lane; tailoring chooses which appear, in what order,
+  and which pre-written profile opens the page. **No model writes a sentence**, so there is
+  nothing to hallucinate — same rule as `incident-to-blog.cjs`. A `BANNED` list is asserted
+  against the rendered PDF on every build ("8+ years as a product manager", "fluent Spanish", …).
+  8 lanes → **8 one-page CVs**, all verified single-page, 0 banned claims.
+- **`scripts/hs-attach-cv.cjs`** — attaches the right lane CV to each ACT-TODAY deal's note.
+  **Additive only:** the sole write is a UNION onto `hs_attachment_ids`, so it can add and never
+  remove. No deal property, stage or letter touched. Idempotent. Cron **`30 13 * * *`**
+  (08:30 Panama, after the apply queue). `--dry-run` reads only.
+- **Lane rules are NOT duplicated.** Python emits `cv-by-lane/lanes.json`; the Node script reads
+  it. A second copy would be a second source of truth — exactly how targeting silently stopped
+  matching on 20 Sep.
+- **`.gitattributes`: `*.pdf binary`** — committing the CVs warned *"LF will be replaced by CRLF"*
+  on every PDF. Blobs verified intact, but the next checkout would have rewritten bytes inside
+  them and produced resumes that no longer open.
+
+**⚠️ TWO TRAPS THE DRY RUN CAUGHT — BOTH WOULD HAVE BEEN REAL DAMAGE:**
+1. **The ACT-TODAY stage is SHARED.** Of **61** deals there, only **36** are jobs; the rest are
+   `[CLIENT-ATLAS]` / `[CLIENT-CTO-INGEST]` **sales prospects** — dental clinics, medical
+   tourism, yacht charters. Unfiltered, this would have stapled her résumé onto a dental
+   clinic's prospect record. Now filtered to `*HIRING-VJH*`, same as apply-queue. **Never query
+   that stage without the prefix filter.**
+2. **`filesScopeOk()` proves READ only.** Read and write are **separate HubSpot grants**, so the
+   preflight returns `ok:true` and every upload then 403s — the first real run failed 36 times
+   with the same message. Now write-probed once up front, failing with one actionable line.
+
+**VERIFIED BY.** Dry run: 36 HIRING deals, **0** prospect rows leaked. Real run: **0 attached,
+0 modified**, failed closed on the scope. Script hash `4f9158ad` identical on laptop / GitHub /
+Oracle; 8 PDFs on Oracle, `pm.pdf` md5 `aad5c6d3` matching. Cron appended, backup
+`crontab-20260921.bak`, 23 → 24 lines, all 23 originals re-matched.
+
+**NUMBERS re-verified 21 Sep** (not copied from an older CV): **15 long-running services**
+(8 PM2 + 7 systemd) **+ 20 cron jobs**, 529 passing tests, 5-provider chain, 1,898 records,
+34 checks in 4 categories, 21 published incidents. **The old "9 / 10 / 11 / 12 agents" figures
+disagreed across sources and are no longer used anywhere.**
+
+**RISK.** The 8 lane CVs are committed PDFs — regenerate with
+`python scripts/build_tailored_cv.py --build-all-lanes` after editing the fact bank, and never
+hand-edit a PDF. Adding a fact means verifying it first; the build asserts the banned claims but
+it cannot know whether a new sentence is true.
+
 ### 🔴 20 Sep — VJH NO LONGER HUNTS GENERIC "AI ENGINEER". Do not add those titles back.
 
 **DONE.** Elena's instruction — *"the 99 percent require manual coding skills and 5 plus years"* —
