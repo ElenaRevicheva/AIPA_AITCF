@@ -1,0 +1,13 @@
+Paste into DataVendor onboarding → Additional info → "Anything else?"
+HARD CAP 1000 characters. Copy everything below the line. Do not volunteer
+“were public until 30 Aug.” Do not paste Nine Systems.
+
+---
+HUD estimator 31 Aug 2026: 8 private repos I solely own. Point $89,481 (44% Promising, $61,067-$350,557). Not public. $61k cautious. $350k imputed, not cash.
+
+VibeJobHunterAIPA_AIMCF $17,020 58% LangGraph+131-test eval, human last click; EspaLuzWhatsApp $16,735 57% bilingual WhatsApp tool-use; EspaLuz_Influencer $16,662 57%; EspaLuzFamilybot $13,303 52% Telegram ES/EN; AIPA_AITCF $10,910 47% 5-provider LLM 2.4s failover, fail-closed publisher; dragontrade-agent $6,450 35%; AILA $4,264 25%; atlas-captures $4,137 24% ad-angle data.
+
+Tools: LangGraph, WhatsApp Cloud API, Telegram, MCP, Playwright, LLM failover, HubSpot APIs (code only), Resend, PM2, TS + Python. Wiki of named production failures (live, not in licence).
+
+Non-exclusive licence of a copy. I keep copyright, brand, domains, products running. No assignment. No exclusive. Listing memo attached.
+https://aideazz.xyz/portfolio https://aideazz.xyz/api https://aideazz.xyz/ai-ops-wiki.html https://podcast.aideazz.xyz/ aipa@aideazz.xyz

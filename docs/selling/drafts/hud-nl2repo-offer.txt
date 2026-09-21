@@ -1,0 +1,41 @@
+DataVendor offer form — NL2 Repo Tasks
+https://datavendor.ai/briefs/2b33c4c6-d983-4d16-a912-0241dede176c/offer
+
+NUMBERS (type these, do not leave the defaults)
+- Fixed fee: 0
+- Task count: 1
+- Rate per task: 600
+Total should read $600. Brief budget is $600/task. Default 20 × $1250 is wrong.
+
+DELIVERY TASKSETS (the red error)
+The form will not submit until this picker has a HUD taskset. Artifacts
+(PDF / zip on the offer page) is a different field — uploading there
+does not clear the error.
+
+1. Keep this offer tab open.
+2. New tab: My listings → add inventory as a **taskset** (not GitHub
+   repos, not the $74,851 eight-pack).
+3. Upload nl2repo-fail-closed-gate.zip. The repo is PRIVATE, so a raw
+   link 404s — open this page logged in and click "Download raw file":
+   https://github.com/ElenaRevicheva/AIPA_AITCF/blob/cursor/hud-vendor-license-1c49/docs/selling/harbor/nl2repo-fail-closed-gate.zip
+   Every listing field is paste-ready in
+   docs/selling/drafts/hud-nl2repo-taskset-listing.txt
+4. Wait until it shows on the team. Refresh the offer. Select that
+   taskset. Submit.
+
+If create-listing has no taskset type, stop and screenshot. Do not
+force the eight repos. Clicks: docs/selling/harbor/nl2repo-fail-closed-gate/README.md
+
+Artifacts on the offer: upload nothing. No Nine Systems PDF. No GitHub zip.
+
+ASSUMPTIONS (paste)
+
+One paid sample task at $600, then more only if it passes your QC.
+
+I will author Harbor / HUD NL2Repo items — not attach my existing repo listing. Sample delivery: a clear-document spec in a named benchmark style, a golden repo that passes the behaviour tests, an empty repo that does not, and a Harbor task (task.toml, environment, grader). Scenario from a real solo production lab (job-ingest gate / fail-closed publishing), fully offline: no live CRM, chat, or keys.
+
+Timeline: sample starts when the offer is accepted. I will not invent Qwen / Opus pass rates. I need HUD scaffold runs of Qwen3.8 Max and Opus 5 or Fable 5 (4–8 rollouts) on that sample so the gap you require can be measured. After the sample passes, I can quote a batch (for example 20) at the same $600/task.
+
+Tooling: Claude Code as the preferred scaffold, Harbor format, x86 environment. I keep copyright. Non-exclusive. No assignment.
+
+Elena Revicheva · AIdeazz AI Lab · https://aideazz.xyz/portfolio
