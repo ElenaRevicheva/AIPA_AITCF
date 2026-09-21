@@ -9,10 +9,14 @@ Films produced with this pipeline:
 | 17.06.2026 | *Between Compile and Run* | `scripts/atuona-film-final.mjs` | Light In The Void (Dark Cinematic Ambient) |
 | 19.06.2026 | *Stanzas* | `scripts/atuona-montage.mjs` | Fatal Error |
 | 02.07.2026 | *The Secret Exhibition* | `scripts/atuona-film3.mjs` | Dark Cinematic Drone Deep Bass Ambient |
+| 03–04.07.2026 | *Reprint* · *Recovered* | work dirs `atuona-film4/5` on Oracle | Melancholic Ambient (Universfield) · Atmospheric Dark Cinematic |
+| 21.09.2026 | *Paradise Is Compiled* — 19 clips **+ 20 stills turned into video shots** | `scripts/atuona-film7.mjs` + `scripts/atuona-still-motion.py` | Red Lips (Sensual Noir Lo-Fi Beat) — WBM Studio |
 
-The canonical, most current reference is **`scripts/atuona-film3.mjs`** — copy it, change the
-constants at the top (`FILM_TITLE`, `MOMENTS`, `SLUG`, `MUSIC`, `POEM_OF`), and run.
-Never re-invent the ffmpeg chains: every setting below was a real iteration.
+The canonical, most current reference is **`scripts/atuona-film7.mjs`** (film3's pipeline + stills-as-shots,
+gallery walls for vertical stills, motion-interpolated slow-mo, verify-before-publish). For clips-only films
+`scripts/atuona-film3.mjs` is still the simplest start: change the constants at the top and run.
+Never re-invent the ffmpeg chains: every setting below was a real iteration. Film #7's full record
+(file→poem evidence, translations, stanza table): `docs/atuona/FILM7_PARADISE_IS_COMPILED.md`.
 
 ---
 
@@ -133,6 +137,43 @@ Each of these was a real iteration; the exact filter strings are in `scripts/atu
   (`volume=1.9`, `asplit` for sidechain + mix), then **`loudnorm I=-16:TP=-1.5:LRA=11`**,
   aac 192k, `-t <bodyLen>` so the looped music is trimmed exactly.
 
+## 5b. Stills → video shots (film #7, 21.09.2026)
+
+When the folder holds images as well as clips, the images go in as **moving shots**, not a slideshow.
+`scripts/atuona-still-motion.py` (runs in a venv in the film work dir: `numpy opencv-python-headless onnxruntime`,
+model `onnx-community/depth-anything-v2-small` `onnx/model.onnx`, 99 MB):
+
+1. `depth <model> work/depth stills/*.jpg` — monocular depth per still (~3 s each on Oracle's CPU; nothing leaves
+   the server, no per-image fee). Review a colorized sheet before rendering: bright = near.
+2. Each shot is a JSON spec: `look` (framing path), `zoom`, `truck` (px of parallax at the nearest depth),
+   `focal` (depth that stays put — the subject), `dolly` (extra magnification of near pixels), `rot`, `crop`
+   (frames out baked text / letterbox), `fx` list: `shimmer` + `caustics` + `bubbles` (water), `dust` (light-gated,
+   only visible in light shafts), `drips`, `flow` (smoke drift, masked), `flicker` (lamp / screen / fluorescent,
+   masked), plus moving film grain on everything.
+3. Vertical 9:16 stills are **not** cropped to 16:9 — they become gallery walls (4 × 300×533, 2 or 3 × 405×720),
+   each panel moving on its own, panels fading in one by one.
+4. `film7.mjs --probe` renders first/middle/last frames of every still shot for review in one minute; the full
+   render is `node film7.mjs` (writes `work/final.mp4`), publishing is a separate `node film7.mjs --publish`.
+
+**Settings that held up:** truck 15–26 px and dolly 0.04–0.11 on full-frame stills (checked at full res on the
+hardest depth edge — a hand reaching through a net — no tearing), 6–7 px on wall panels. Depth is **dilated then
+blurred** before reprojection so the subject's silhouette carries its own edge and the background stretches instead
+of the subject tearing. Grain 0.014 (0.028 made a 6.5 s test 39 Mbps). Slow-mo above ×1.3 uses
+`minterpolate=mi_mode=mci` (real in-between frames, ~3–4 fps on Oracle) instead of duplicated frames.
+
+**Errors to avoid:**
+- The bot's videos are generated from a separate **"video-safe keyframe"**, not from the Telegram stills — so a
+  still is new material, never a duplicate of a clip. Do not try to match-cut a still to "its" clip's first frame.
+- AI image-to-video (Luma/Kling/Seedance) is the wrong tool for "make the stills move": it re-draws the picture,
+  costs per clip, and refuses the nude stills (that is why the bot makes the video-safe keyframe at all).
+- `ssh host 'nohup cmd &'` keeps ssh attached unless stdin is detached — use `nohup cmd </dev/null >log 2>&1 &`.
+- Oracle is shared with live bots: `renice -n 10` the render processes.
+- The Bright Data **MCP** token 401'd on 21.09; the Web Unlocker call with `BRIGHTDATA_API_TOKEN` from the cto-aipa
+  `.env` (below) still worked — Pixabay search pages are server-rendered HTML (title, artist, duration), and the
+  mood/genre chips are on each track page (`class="tag--…"`), JSON-LD has the CDN `contentUrl`.
+- Baked-in text in stills (`Underground Poem 015` caption, a magazine corner mark, letterbox bars): frame it out with
+  `crop`; inpaint only a genuine typo (`UNDERGGROUND`).
+
 ## 6. Run, verify, publish
 
 ```bash
@@ -166,3 +207,7 @@ Verification checklist (all against the file in `out/`):
 13. Trusting `data/atuona/` to persist — keep Desktop copies of every film.
 14. Forgetting `touch -d` when restoring old films (breaks gallery ordering).
 15. `git add -A` in this repo — commit only the files you touched.
+16. Dropping the stills, or cropping 9:16 stills into 16:9 — animate them (§5b) and give verticals a wall.
+17. Writing the render straight into `out/` — it is live the moment it lands; render to `work/`, verify, then publish.
+18. After publishing, the static film list on atuona.xyz (`public/llms.txt`, the `ItemList` JSON-LD and the
+    `<noscript>` list in `public/aifilmstudio/index.html`) still names the old count — add the new film there too.
