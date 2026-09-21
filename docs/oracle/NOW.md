@@ -130,6 +130,49 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 21 Sep — 16 stale job leads parked out of ACT TODAY. The judge learned NOTHING from it.
+
+**DONE.** 36 HIRING deals sat in "🔥 I Act TODAY"; **16 were 62–89 days old**. Parked via
+`scripts/hs-park-stale-jobs.cjs --days 60`. **20 remain.**
+
+**🚨 THE TRAP — READ THIS BEFORE EVER MOVING A DEAL IN BULK.** The obvious destination is
+`closedlost` ("❌ No fit / Rejected / ghosted"). **DO NOT USE IT.** VJH learns from HubSpot
+outcomes, and in `judge_feedback_sync.py`:
+
+```
+POSITIVE_STAGES = {"presentationscheduled", "contractsent", "closedwon"}
+NEGATIVE_STAGES = {"closedlost"}
+```
+
+Moving 16 deals Elena never looked at into `closedlost` would have fed the judge **16 false
+negatives** — teaching it she rejects roles she never saw, including a *Technical AI Product
+Manager* that scored **97**. That is worse than a cluttered queue: it silently corrupts her
+targeting, and nobody would notice for weeks.
+
+They went to **`appointmentscheduled`** ("🤖 AI working — ignore"), which is in **neither** set
+and is already VJH's parked bucket (`sweep_parked_borderline.py` → `PARKED_STAGE`). Nothing
+promotes deals back out of it, so parking is stable.
+
+**VERIFIED BY — measured, not asserted.** `judge_feedback.json` snapshotted before
+(`/home/ubuntu/backups/judge_feedback.pre-park-20260921.json`), then `judge_feedback_sync.py`
+re-run after:
+
+| | before | after |
+|---|---|---|
+| negatives | 12 | **12** |
+| positives | 10 | **10** |
+| new negatives introduced | — | **0** |
+| parked deals leaked into negatives | — | **0** |
+
+**UNDO.** `node scripts/hs-park-stale-jobs.cjs --rollback docs/oracle/rollback/park-stale-jobs-2026-09-21T13-10-06.json`
+— restores every one of the 16 to its original stage. The rollback file is written **before**
+any change, so a crash mid-run still leaves a complete undo list. Only `dealstage` was
+written: no note, letter, attachment or deal was deleted.
+
+**Also safe by construction:** HIRING stream only. The ACT-TODAY stage is shared with
+`[CLIENT-ATLAS]` / `[CLIENT-CTO-INGEST]` **sales prospects** (25 of the 61 deals there) and
+none were touched.
+
 ### 🔴 21 Sep — TAILORED CV PER LANE, ONTO THE HIRING DEAL. Built, deployed, **BLOCKED on one scope tick.**
 
 **ELENA'S MOVE, 30 seconds, and everything downstream is already running:**
