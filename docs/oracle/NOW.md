@@ -130,6 +130,38 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🟢 21 Sep — CV + COVER LETTER NOW SIT ON ALL 20 "I ACT TODAY" DEALS. Verified in HubSpot.
+
+Elena ticked `files.write` on the `Aldeazz_Marketing_Engine` Service Key, and
+`scripts/hs-attach-cv.cjs` ran: **attached 20 · failed 0**. Read back from HubSpot afterwards,
+not trusted from the script's own log:
+
+| | |
+|---|---|
+| letter **+ CV** both present | **20** |
+| letter only | 0 |
+| neither | 0 |
+
+Runs itself daily at **13:30 UTC / 08:30 Panama**, after the apply queue, so new deals get
+theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
+
+### 📅 HubSpot is retiring ALL numbered API versions — v4 Mar 2027, v1–v3 Sep 2027. DO NOT ACT YET.
+
+The Service Key page warns *"called HubSpot API versions that won't be supported after March
+2027 or September 2027"*. **It is not because our code is old.** We are entirely on v3/v4 —
+zero v1/v2 anywhere in cto-aipa or VJH (the one v1 hit is inside a third-party `hive` OAuth
+library we do not call). HubSpot is moving everything to **date-based versioning**:
+
+- **v4 → unsupported 30 Mar 2027** · **v1/v2/v3 → unsupported Sep 2027**
+- Same Sep 2027 date for legacy private apps (the other banner in that UI).
+- Exposure: cto-aipa 306 × `/crm/v3`, 134 × `/crm/v4`, 5 × `/files/v3`; VJH 11 + 1 + 2.
+
+**Why nothing is being changed now:** HubSpot's own note says the **March 2027** release *"will
+include full per-endpoint replacement documentation for every legacy API"* — the migration
+target does not exist yet, so rewriting ~460 call sites would be guessing. Also "unsupported"
+means no bug fixes or security updates, **not** switched off; nothing breaks on those dates.
+Revisit when the DBV docs ship. Do not re-investigate before then.
+
 ### 🟢 21 Sep — 16 stale job leads parked out of ACT TODAY. The judge learned NOTHING from it.
 
 **DONE.** 36 HIRING deals sat in "🔥 I Act TODAY"; **16 were 62–89 days old**. Parked via
@@ -173,12 +205,12 @@ written: no note, letter, attachment or deal was deleted.
 `[CLIENT-ATLAS]` / `[CLIENT-CTO-INGEST]` **sales prospects** (25 of the 61 deals there) and
 none were touched.
 
-### 🔴 21 Sep — TAILORED CV PER LANE, ONTO THE HIRING DEAL. Built, deployed, **BLOCKED on one scope tick.**
+### 🟢 21 Sep — TAILORED CV PER LANE. Built, deployed, **UNBLOCKED and live** (see entry above).
 
-**ELENA'S MOVE, 30 seconds, and everything downstream is already running:**
-HubSpot → Settings → Integrations → Private Apps / Development → Keys → Service Keys →
-**Aldeazz_Marketing_Engine** → Scopes → tick **`files` (write)** → Save.
-Then it self-heals at the next 13:30 UTC cron; nothing else is needed.
+**DONE 21 Sep:** `files.write` was ticked on the **Aldeazz_Marketing_Engine** Service Key and
+the attach ran — 20/20 deals now carry both the letter and the matching CV. Note for the next
+agent: HubSpot's `filesScopeOk()` preflight only proves READ; read and write are separate
+grants, which is why the first run 403'd on every upload despite a green preflight.
 
 **WHY.** VJH tailors the cover LETTER for every job and then attaches **the same static resume
 to all of them**. An ATS reads the résumé. The deal showed a letter arguing she is a product
