@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 21 Sep 16:29 | Atuona film #7 from the 20.09 Desktop clips + stills | Oracle `/home/ubuntu/atuona-film7/` (new), `data/atuona/films/out/` (add only), `scripts/atuona-film7.mjs` (new), `docs/atuona/FILM_COMPILATION_GUIDE.md`. No PM2 restart. | — |
+| Claude Code | 21 Sep 16:29 (upd 20:05) | Atuona film #7 from the 20.09 Desktop clips + stills — **built, NOT published: Elena reviews first, publishes only on her yes** | Oracle `/home/ubuntu/atuona-film7/` (new), `data/atuona/films/out/` (add only), `scripts/atuona-film7.mjs` (new), `docs/atuona/FILM_COMPILATION_GUIDE.md`. No PM2 restart. | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push

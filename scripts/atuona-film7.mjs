@@ -305,9 +305,13 @@ async function main() {
   await pool(2, stillTasks);
 
   // 3. normalize every segment + burn its text
+  //    --reuse keeps finished work/seg_NN.mp4; --reseg=23,24 re-renders only those (0-based) — e.g. after a text fix
+  const reuse = process.argv.includes('--reuse');
+  const reseg = ((process.argv.find(a => a.startsWith('--reseg=')) || '').slice(8)).split(',').filter(Boolean).map(Number);
   const segFiles = [];
   const segTasks = plan.map((p, i) => async () => {
     const out = path.join(W, `seg_${String(i).padStart(2, '0')}.mp4`);
+    if (reuse && !reseg.includes(i) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segFiles[i] = out; return; }
     let draw = '';
     if (p.seg.stanza) { const txt = path.join(W, `p_${i}.txt`); fs.writeFileSync(txt, wrap(STANZAS[p.seg.stanza].text, 50, 7)); draw = textDraw(txt, p.d); }
     if (p.seg.code) draw += codeDraw(i, p.seg.code, p.d);
@@ -346,7 +350,7 @@ async function main() {
   let mf = `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.30,afade=t=in:st=0:d=2,afade=t=out:st=${(LEN - 3).toFixed(2)}:d=3[music];`;
   const vl = []; voAt.forEach((v, k) => { mf += `[${k + 2}:a]aresample=44100,aformat=channel_layouts=stereo,adelay=${Math.round(v.t * 1000)}:all=1[v${k}];`; vl.push(`[v${k}]`); });
   mf += `${vl.join('')}amix=inputs=${vl.length}:normalize=0:dropout_transition=0,volume=1.9,asplit=2[vsc][vmix];`;
-  mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];[premix]loudnorm=I=-16:TP=-1.5:LRA=11[a]`;
+  mf += `[music][vsc]sidechaincompress=threshold=0.02:ratio=10:attack=5:release=300[ducked];[ducked][vmix]amix=inputs=2:normalize=0:dropout_transition=0[premix];[premix]loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.79:level=false[a]`; // limiter: single-pass loudnorm let the true peak reach -0.2 dBFS
   const mixIn = ['-i', body, '-stream_loop', '-1', '-i', MUSIC]; voAt.forEach(v => mixIn.push('-i', v.file));
   await execFileP('ffmpeg', ['-y', '-v', 'error', ...mixIn, '-filter_complex', mf, '-map', '0:v', '-map', '[a]', '-t', LEN.toFixed(2), '-c:v', 'copy', '-c:a', 'aac', '-ar', '44100', '-b:a', '192k', '-movflags', '+faststart', final], { maxBuffer: 1 << 27, timeout: 900000 });
   fs.writeFileSync(path.join(W, 'timeline.json'), JSON.stringify(plan.map((p, i) => ({ i: i + 1, what: p.seg.clip || p.seg.still || p.seg.wall, stanza: p.seg.stanza || null, start: +segStart(i + 1).toFixed(2), dur: +p.d.toFixed(2), vo_at: p.vo ? +(segStart(i + 1) + LEAD).toFixed(2) : null })), null, 1));

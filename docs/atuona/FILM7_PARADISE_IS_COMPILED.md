@@ -71,12 +71,12 @@ line by line, and the fragments are cut verbatim from them. **Elena: correct any
 | 2 | still 09-19 14:55 H (underwater, mice) | #015 | How many reeds like these we've seen — / as many dead who stitched strange mice, / who, dying, read aloud: I love you, mouse — / but never breathed a word that you would burn. |
 | 3 | `atuona-base7` (in the reeds) | #015 | What kind of children are you, / drowned in the blue … |
 | 4 | still 09-20 13:02 H (stairs) | #024 | I was only running to you, / skipping every floor. / I was burning out in you, / no longer feeling my skin. |
-| 5 | `atuona-base8` (Veo) | #024 | Let all that smoldered scatter with the day. / Even without a body, you and I will sing it to the end. |
+| 5 | `atuona-base8` (Veo) | #024 | Let all that smoldered scatter with the day. / Even without a body, / you and I will sing it to the end. |
 | 6 | still 09-20 14:31 H (feathers) | #037 | As if everyone, waking at dawn, / were shaking smoky incense out of their feathers. |
-| 7 | `0qjJIwPU` (smoke, candles) | #022 | Wild tales curl / in the sad smoke of a Sobranie. / No shame, no conscience — / you stub yourself out with repentance. |
+| 7 | `atuona-base21` (Seedance, the tunnel; the fog clip `0qjJIwPU` opens #022 wordless) | #022 | Wild tales curl / in the sad smoke of a Sobranie. / No shame, no conscience — / you stub yourself out with repentance. |
 | 8 | still 09-20 17:35 H (alone at the wall) | #022 | Soon we'll be over again, / and there's no way back / in the deep pool of loneliness … |
 | 9 | `atuona-base6` | #020 | Give me back a little more of myself, / squandered for nothing. |
-| 10 | `1Lj18KI5` | #066 | There is no painting. Never was. / Gauguin left only coordinates — / latitude of pain, longitude of hope. |
+| 10 | `1Lj18KI5` | #066 | there is no painting. Never was. / Gauguin left only coordinates — / latitude of pain, longitude of hope. |
 | 11 | diptych: ribcage lilies + lilies over face | #099 | Behind her eyelids — yellow lilies. / Not the ones they sent her in Paris. / These grow straight out of her chest. / Roots push into ribs. |
 | 12 | `wuwBPZpT` | #099 | The lilies keep growing. |
 | 13 | `kXMf1WTY` (code on a screen) | #091 | Paradise is not found. / Paradise is compiled from what you have. |
