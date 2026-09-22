@@ -21,7 +21,7 @@ const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
 const MONO = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
 const XFADE_D = 1.3, LEAD = 0.7, TAIL = 1.9, MI_FROM = 1.3;
 const FILM_TITLE = 'Could not generate content.';   // #099's title, kept as-is (Elena, 22.09.2026)
-const MOMENTS = '20.09.2026  ·  atuona.xyz Gallery  ·  Moments #099 #015 #024 #037 #022 #020 #066 #091';
+const MOMENTS = '20.09.2026  ·  atuona.xyz Gallery  ·  Fragments #099 #015 #024 #037 #022 #020 #066 #091';
 const OUTRO_SUB = 'atuona.xyz // Paradise.js  ·  by Kira Velerevich';
 const SLUG = 'could-not-generate-content';
 const GRAIN = 0.014;

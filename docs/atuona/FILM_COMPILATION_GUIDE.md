@@ -10,13 +10,18 @@ Films produced with this pipeline:
 | 19.06.2026 | *Stanzas* | `scripts/atuona-montage.mjs` | Fatal Error |
 | 02.07.2026 | *The Secret Exhibition* | `scripts/atuona-film3.mjs` | Dark Cinematic Drone Deep Bass Ambient |
 | 03–04.07.2026 | *Reprint* · *Recovered* | work dirs `atuona-film4/5` on Oracle | Melancholic Ambient (Universfield) · Atmospheric Dark Cinematic |
-| 21.09.2026 | *Paradise Is Compiled* — 19 clips **+ 20 stills turned into video shots** | `scripts/atuona-film7.mjs` + `scripts/atuona-still-motion.py` | Red Lips (Sensual Noir Lo-Fi Beat) — WBM Studio |
+| 21.09.2026 | *Could not generate content.* (working title *Paradise Is Compiled*) — 19 clips **+ 20 stills turned into video shots** | `scripts/atuona-film7.mjs` + `scripts/atuona-still-motion.py` | Red Lips (Sensual Noir Lo-Fi Beat) — WBM Studio |
+| 22.09.2026 | Film #8 — **17 NEW generated videos, no stills in the cut** (poems drawn from ATUONA + LITPROM) | `scripts/atuona-film8-gen.mjs` + `scripts/atuona-film8-vo.py` + `scripts/atuona-film8.mjs` | The Ritual — Tribal Trap Fusion (Saturn-3-Music) |
 
 The canonical, most current reference is **`scripts/atuona-film7.mjs`** (film3's pipeline + stills-as-shots,
 gallery walls for vertical stills, motion-interpolated slow-mo, verify-before-publish). For clips-only films
 `scripts/atuona-film3.mjs` is still the simplest start: change the constants at the top and run.
 Never re-invent the ffmpeg chains: every setting below was a real iteration. Film #7's full record
 (file→poem evidence, translations, stanza table): `docs/atuona/FILM7_PARADISE_IS_COMPILED.md`.
+
+**To make a film from NEW generations instead of existing clips** (film #8): §5c, scripts `atuona-film8-*`, record
+`docs/atuona/FILM8_2026-09-22.md`, every prompt in `docs/atuona/film8-plan.json`. Engine pins + which accounts are
+funded: `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md`.
 
 ---
 
@@ -126,7 +131,7 @@ Each of these was a real iteration; the exact filter strings are in `scripts/atu
   Offset formula: track running `merged` duration — `offset_k = merged − 1.3`,
   then `merged += dur_k − 1.3`. The xfade concat is a full re-encode; give it a long timeout.
 - **Title cards** mirror the atuona.xyz site header: MONO font, UPPERCASE, per-letter tracking.
-  Intro = film title (size 40, 4.4s) + subtitle `DD.MM.YYYY · ATUONA.XYZ GALLERY · MOMENTS #…`
+  Intro = film title (size 40, 4.4s) + subtitle `DD.MM.YYYY · ATUONA.XYZ GALLERY · FRAGMENTS #…` — **Fragments, never "Moments"** (Elena, 22.09.2026)
   over a **darkened cover image** (`eq=brightness=-0.36:saturation=0.8`);
   outro = `A T U O N A` (size 56, 4.2s) + `atuona.xyz // Paradise.js · by Kira Velerevich`.
 - **⚠️ INTRO CARD MUST NOT FADE IN FROM BLACK** (Elena, 02.07.2026): the gallery's `<video>`
@@ -178,6 +183,50 @@ of the subject tearing. Grain 0.014 (0.028 made a 6.5 s test 39 Mbps). Slow-mo a
 - Baked-in text in stills (`Underground Poem 015` caption, a magazine corner mark, letterbox bars): frame it out with
   `crop`; inpaint only a genuine typo (`UNDERGGROUND`).
 
+## 5c. New generations, video only (film #8, 22.09.2026)
+
+When the brief is "absolutely new videos, no stills in the cut": the stills still exist, but only as **start frames and
+character references** — inputs to image-to-video, never shots. Work dir `/home/ubuntu/atuona-<name>/`, same as ever.
+
+1. **Draw the poems, don't choose them** — `random.Random(<date seed>)` over `content/poems.json` (atuona repo), whose
+   `venue` field is the chapter: **ATUONA** #047–#099 (English, self-published) and **LITPROM** #001–#046 (Russian,
+   Redkollegiya). "From both chapters" = sample each. Exclude the previous film's poems. Record the seed.
+2. **Stanzas are hers.** The plan builder refuses to write the plan unless every ATUONA stanza is a substring of the poem's
+   `verse` (whitespace-normalised). LITPROM is Russian-only → a line-for-line translation of her exact lines, profanity kept,
+   printed next to the Russian in the film record so she can correct it.
+3. **Characters first.** One Flux 2 Max portrait per recurring character (`img/kira_ref.jpg`…), then every keyframe is
+   Flux 2 Max with that portrait in `input_images` — the same face survives 17 shots. Keyframes 16:9, 2 MP,
+   `safety_tolerance` 5. Look + negative prompt live once in the plan and are appended to every prompt.
+4. **`atuona-film8-gen.mjs` is the only way money leaves.** It prices every job from the vendor's per-second price BEFORE
+   sending it, refuses anything that would pass `BUDGET_USD`, appends every job to `ledger.jsonl` (refusals unbilled), and
+   downloads the output at once (Replicate delivery URLs expire). `node gen.mjs image <id>` · `video <shot> [engine]` ·
+   `ledger`. It retries Replicate's throttle (below $5 of credit: 6 creates/min, burst 1).
+5. **Bake-off before you spend.** Render ONE shot for 5 s on every candidate engine (~$4.50), send her a labelled grid
+   video, let her pick. Film #8: Wan 2.7 for emotional close shots, Grok Imagine 1.5 for wide ones (§ record for results).
+6. **Fit the shot to the voice, not the voice to the shot.** Render the voice first, then set each shot's duration to
+   `LEAD + voice + TAIL` (≤15 s on Wan/Grok) so nothing needs slow-motion; `trim` in the plan drops an off-plan tail.
+7. **Voice:** `gpt-4o-mini-tts` with acting direction (`instructions`), not `tts-1`: **cedar** for Ule/narrator (low, dry,
+   restrained menace), **marin** for Kira (husky, exhausted, defiant, "never sweet"). `atuona-film8-vo.py`.
+8. **Review every clip before compiling** — a sheet of frames at 30/70 % per clip. Engines drift: Grok's s07 panned off the
+   objects onto a stranger at 8.5 s; Wan turned Kira's scar into a fresh red wound on close-ups (her call).
+   **No stock props (Elena, 22.09.2026):** "no generic glasses with alcohol, generic cell phones and watches — it is
+   underground luxury full of sex and poems". A nightstand of glass + phone + watch is a product shot; s05 and s07 were
+   re-shot as people in the story (her in the silk, him leaving). An object earns a frame only if the poem names it AND it
+   sits on a body or inside the scene's desire.
+9. **Compile:** `node film8.mjs` (film7's settings: 1.3 s dissolves, stanzas full-width at the bottom, ducked music,
+   loudnorm + limiter, title card on frame 0) → verify → her yes → `node film8.mjs --publish` →
+   `python scripts/atuona-add-film-to-site.py` for the atuona.xyz static lists.
+
+**Engines as measured on one shot (s06, 22.09.2026)** — Wan 2.7 `$0.10/s` boldest · Grok Imagine 1.5 `$0.08/s` realistic,
+cheapest (**send the image inline as a data URI** — it rejects URLs without a file extension: "Invalid image format") ·
+HappyHorse `$0.14/s` · Veo 3.1 Fast · Kling 3.0 Omni `$0.168/s` most faithful, least motion · **Seedance 2.5 refused it**.
+
+**The line.** Adult here means implied: wet silk, bare backs and shoulders, bodies in water, light on skin, raw faces.
+**A provider refusal is final for that prompt** — re-phrase into that register; never re-route to a more permissive model
+or strip the reference to push it through (tried once for a nude keyframe from a reference photo: the permission gate
+blocked it as weakening a safety control, and the route was removed from the tool). Flux 2 refuses nudity whenever a
+photo of a person is the INPUT.
+
 ## 6. Run, verify, publish
 
 ```bash
@@ -214,4 +263,11 @@ Verification checklist (all against the file in `out/`):
 16. Dropping the stills, or cropping 9:16 stills into 16:9 — animate them (§5b) and give verticals a wall.
 17. Writing the render straight into `out/` — it is live the moment it lands; render to `work/`, verify, then publish.
 18. After publishing, the static film list on atuona.xyz (`public/llms.txt`, the `ItemList` JSON-LD and the
-    `<noscript>` list in `public/aifilmstudio/index.html`) still names the old count — add the new film there too.
+    `<noscript>` list in `public/aifilmstudio/index.html`) still names the old count — add the new film there too:
+    `python scripts/atuona-add-film-to-site.py D:/aideazz/atuona <published file> <YYYY-MM-DD> "<Title>"` (asserts every match).
+19. Spending on paid renders without a price check and a cap — use `atuona-film8-gen.mjs` (`BUDGET_USD`, `ledger.jsonl`).
+20. Assuming Replicate bills the card — it is **prepaid credit**; below $5 it throttles to 6 jobs/min. Check before a batch.
+21. Parallel jobs writing one cache file — 6 keyframes crashed on a half-written `uploads.json`; write atomically.
+22. Re-routing a refused shot to a more permissive engine — re-phrase it instead (§5c, the line).
+23. `ffmpeg` inside a `while read` loop eats the loop's stdin (it ate one character per title) — always `-nostdin`.
+24. Compiling without looking — sample every clip; engines drift off the plan mid-shot.

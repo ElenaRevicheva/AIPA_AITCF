@@ -12,9 +12,9 @@
       "039 Когда застенье (Beyond the Wall)"
     ]
   },
-  "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro from practical light sources, deep blacks, humid tropical air. Adult underground arthouse erotica in the tradition of Roversi, Saudek and Newton: real skin with pores, sweat and water on skin, sheer wet fabric, raw emotion on the face. No text, no letters, no watermark, no logo.",
-  "motion_look": "Photoreal live-action, 35mm film grain, slow deliberate cinematic camera, natural physics and breathing, the same woman from the start frame throughout, her face and body unchanged, no text on screen.",
-  "negative": "cartoon, anime, CGI, 3D render, plastic skin, airbrushed, deformed hands, extra fingers, morphing face, identity change, text, subtitles, letters, watermark, logo, fast cuts",
+  "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro from practical light sources, deep blacks, humid tropical air. Luxurious, sensual underground arthouse cinema in the tradition of Roversi, Saudek and Newton: real skin with pores, sweat and water on skin, silk and velvet, raw adult emotion on the face. No text, no letters, no watermark, no logo.",
+  "motion_look": "Photoreal live-action, 35mm film grain, slow deliberate cinematic camera, natural physics, real breathing, the same people as in the start frame, faces and bodies unchanged, no text on screen.",
+  "negative": "cartoon, anime, CGI, 3D render, plastic skin, airbrushed, cute, sweet, deformed hands, extra fingers, morphing face, identity change, extra people, text, subtitles, letters, watermark, logo, fast cuts",
   "characters": {
     "kira": "a Russian woman of about 32: high cheekbones, grey-green eyes, straight dark-chestnut hair falling past her shoulders, pale skin, full lips, a thin old scar through her left eyebrow, slender and strong",
     "ule": "a Norwegian man of about 50: tall and lean, ash-blond hair swept back and grey at the temples, pale blue eyes, a short trimmed greying beard, beige tweed jacket over an open white shirt, blue jeans"
@@ -29,7 +29,385 @@
       "aspect": "3:4",
       "seed": 80802,
       "prompt": "Character reference portrait. A Norwegian man of about 50: tall and lean, ash-blond hair swept back and grey at the temples, pale blue eyes, a short trimmed greying beard, beige tweed jacket over an open white shirt. He looks just past the lens, polite, sober, unreadable. Soft window light from the left, dark background, head and shoulders, sharp focus on the eyes."
+    },
+    "k01": {
+      "refs": [],
+      "aspect": "16:9",
+      "seed": 80801,
+      "prompt": "Aerial film still at dusk over Hiva Oa: a private jet descends into a narrow airstrip cut like a knife-wound into the flank of a black volcanic mountain, dense wet jungle on both sides, heavy low clouds, rain haze, a sliver of dark Pacific. No people."
+    },
+    "k02": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80802,
+      "prompt": "On the wet airstrip beside the jet, the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — stands in warm tropical rain in a cream silk blouse soaked dark and clinging to her skin, cream tailored trousers, a black leather Hermès bag at her feet, hair wet on her neck. She tips her head back, eyes closed, lips parted to the heavy air, one hand at her open collar. Steam rises off the black tarmac; jungle and cloud behind her."
+    },
+    "k03": {
+      "refs": [
+        "ule_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80803,
+      "prompt": "By a battered jeep on black volcanic gravel, the man from the reference image — same face, greying beard, ash-blond swept-back hair — lifts a leather suitcase into the back, sweat darkening his open white shirt, his beige tweed jacket over one arm, a cigarette at his lips. Wet jungle, a black mountain in cloud behind him, flat grey light."
+    },
+    "k04": {
+      "refs": [
+        "kira_ref",
+        "ule_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80804,
+      "prompt": "Inside an old jeep crawling along a road of black volcanic gravel through mist: the woman from the first reference image (grey-green eyes, dark-chestnut hair, scar through her left eyebrow) and the man from the second reference image (greying beard, ash-blond swept-back hair). She sits in the passenger seat in her soaked cream silk, her temple against the rain-streaked window; he drives, his forearms tanned and wet. Through the windshield the huge dark mountain Temetiu disappears into cloud."
+    },
+    "k05": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80825,
+      "prompt": "Night in an old colonial hotel room on Hiva Oa, rain streaming down the wooden shutters, a ceiling fan turning slowly. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — sits cross-legged in the middle of a rumpled white bed under a mosquito net, in a black silk robe sliding off one bare shoulder, wet hair on her neck. A slim matte-black laptop with no logo lies open in the silk sheets and throws cold blue light up onto her face and throat; the rest of the room is deep amber shadow."
+    },
+    "k06": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80806,
+      "prompt": "3 AM, the same hotel room drowned in deep crimson light from a red-shaded lamp. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — reclines on rumpled white sheets on an iron bed, posed like Manet's Olympia: propped on pillows, a thin black velvet ribbon at her throat, a red hibiscus behind her ear, a white silk sheet drawn across her body, bare shoulders and long bare legs, one hand resting on her hip. She stares straight into the lens, unashamed and exhausted. Cold blue light from an open laptop at the foot of the bed cuts across her skin; a mosquito net hangs in folds; sweat on her collarbone."
+    },
+    "k07": {
+      "refs": [
+        "kira_ref",
+        "ule_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80827,
+      "prompt": "3 AM, the hotel room drowned in deep crimson light from a red-shaded lamp, white silk sheets in disorder: the woman from the first reference image (grey-green eyes, dark-chestnut hair, scar through her left eyebrow) and the man from the second reference image (greying beard, ash-blond swept-back hair). She lies on her stomach across the bed, her bare back and shoulders glistening with sweat, a thin black velvet ribbon at her throat, her cheek on the pillow, eyes open and fixed on him. He sits on the edge of the bed with his back to her, broad shoulders, buttoning his white shirt, his face turned away toward the dark window. A mosquito net hangs in folds; the cold blue glow of an open laptop on the floor lights the edge of the sheets. The intimacy is over and he is already leaving."
+    },
+    "k08": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80808,
+      "prompt": "4 AM. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — sits on the floor against the iron bed in a black silk slip, bare legs drawn up, a laptop on her knees, lit by crimson lamplight and the cold blue screen; lines of code reflected in her eyes; sweat at her temples; jaw set, obsessive."
+    },
+    "k09": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80809,
+      "prompt": "Underwater in dark green-black water, the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — sinks slowly with her arms open, a long white silk slip blooming around her like smoke, her hair drifting, surrounded by floating shards of an antique mirror that catch thin shafts of light from far above, a length of red velvet drifting past."
+    },
+    "k10": {
+      "refs": [
+        "ule_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80810,
+      "prompt": "In a dark room, the man from the reference image — same face, greying beard, ash-blond swept-back hair — sits deep in a blood-red velvet armchair, lit only from behind by red light, his face half in shadow, exhaling a slow thick ring of vapour; eyes glinting; a crystal glass in his hand."
+    },
+    "k11": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80811,
+      "prompt": "An abandoned colonial ballroom at night with a vast black-and-white checkerboard marble floor and tall guttering candles. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — walks barefoot toward the camera across the checkerboard in a long black silk gown with a bare back and a deep slit, powerful and unhurried; low camera angle."
+    },
+    "k12": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80812,
+      "prompt": "the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — climbs a narrow spiral stone staircase toward a blinding white skylight, seen from below and behind: the bare back of her black silk gown, bare feet on worn stone, one hand pressed to the wall, straining upward, wingless, into the light."
+    },
+    "k13": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80813,
+      "prompt": "A stone cellar like a dungeon, lit by candles. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — faces a tall tarnished antique mirror, bare shoulders, wet hair, mascara running with tears, staring hard at herself; her reflection stares back."
+    },
+    "k14": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80814,
+      "prompt": "Extreme close-up in candlelight: a woman's hand twisting a heavy gold ring on her finger; her other hand white-knuckled on a rusted iron railing; fire flaring in the dark behind; sweat on her skin."
+    },
+    "k15": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80815,
+      "prompt": "Night, the carved wooden doorframe of an old Marquesan house, Maison du Jouir: deep carvings of figures and words cut into dark breadfruit wood, lit by a torch. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — traces the carvings with her fingertips, her face in profile, lips parted, sweat on her throat."
+    },
+    "k16": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80816,
+      "prompt": "Dawn on a beach of pure black volcanic sand under the cliffs of Hiva Oa. Heavy Pacific surf pours white foam over the black sand. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — walks along the waterline, seen from behind, in a soaked black silk slip clinging to her body, barefoot, wet hair, cliffs in mist."
+    },
+    "k17": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "16:9",
+      "seed": 80817,
+      "prompt": "Dawn. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — stands in the surf up to her thighs, facing the camera, her black silk slip soaked, one strap fallen from her shoulder, wet hair across her face, the sun breaking over the black cliffs behind her; her face fierce and unafraid, eyes locked on the lens."
     }
   },
-  "shots": {}
+  "shots": {
+    "s01": {
+      "poem": "092",
+      "start": "k01",
+      "duration": 10,
+      "motion": "The jet sinks slowly into the gash in the mountain as the camera drifts down behind it through rain haze; clouds crawl over the jungle; awe and menace.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "Hiva Oa doesn't accept guests. It eats them."
+        }
+      ],
+      "engine": "grok"
+    },
+    "s02": {
+      "poem": "092",
+      "start": "k02",
+      "duration": 12,
+      "motion": "Warm rain streams over her face and throat; the soaked silk clings and darkens as she breathes deeply; she draws her wet hand slowly down her throat to her open collar; the camera circles her slowly; heat, surrender, unease.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "First — just the wetness that wraps your skin like a second, unwanted body."
+        }
+      ],
+      "engine": "wan"
+    },
+    "s03": {
+      "poem": "092",
+      "start": "k03",
+      "duration": 10,
+      "motion": "He lifts the suitcase slowly, as if the island were draining him; he stops, wipes his brow with the back of his wrist and looks up at the mountain; smoke drifts from his cigarette into the humid air.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "His movements had gotten slower, like the island was draining something vital from him."
+        }
+      ],
+      "engine": "grok"
+    },
+    "s04": {
+      "poem": "092",
+      "start": "k04",
+      "duration": 12,
+      "motion": "The jeep lurches over black gravel; her reflection trembles in the rain-streaked glass; the mountain looms and vanishes in the mist; she closes her eyes; his hands tighten on the wheel.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "The road to Atuona isn't a road. It's a scar on the island's body that refuses to heal."
+        }
+      ],
+      "engine": "grok"
+    },
+    "s05": {
+      "poem": "092",
+      "start": "k05",
+      "duration": 10,
+      "motion": "She types, stops, deletes, stares at the screen with the cold light on her face; the ceiling fan turns; rain runs down the shutters; she presses a key hard, half-closes the laptop and exhales, a bitter smile, eyes still on the dark screen.",
+      "vo": [
+        {
+          "voice": "kira",
+          "text": "I found paradise. It turned out to be a predator."
+        }
+      ],
+      "engine": "wan"
+    },
+    "s06": {
+      "poem": "071",
+      "start": "k06",
+      "duration": 13,
+      "motion": "She holds the stare into the lens and breathes slowly; the silk sheet rises and falls with her breath; sweat beads on her collarbone; the mosquito net sways in the fan's air; the laptop light flickers across her skin; the camera creeps in toward her eyes. Charged, unashamed, luxurious.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "Manet's naked truth that blew Paris apart.\nA prostitute staring straight at you,\nthe way my code looks at me at 3 AM"
+        }
+      ],
+      "engine": "wan"
+    },
+    "s07": {
+      "poem": "071",
+      "start": "k07",
+      "duration": 13,
+      "motion": "His hand rests on her bare calf, then slowly withdraws; he turns his face away toward the dark window and does not look back; she watches him, lips parted, breath uneven, her fingers tightening in the satin; the crimson light breathes; the mosquito net stirs in the fan air.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "Objects tell better stories than people.\nUle's empty whiskey glass — his way of not being a father.\nCursor at 4 AM — how you don't call your dealer."
+        }
+      ],
+      "engine": "wan"
+    },
+    "s08": {
+      "poem": "071",
+      "start": "k08",
+      "duration": 15,
+      "motion": "Code scrolls in the reflection of her eyes; she bites her lip and types faster; the red light pulses; her breathing quickens; a slow push-in until only her eyes fill the frame.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "Paradise isn't where demons die.\nIt's where they finally get API keys.\nThe beast doesn't sleep.\nIt just waits for your next commit."
+        }
+      ],
+      "engine": "wan"
+    },
+    "s09": {
+      "poem": "007",
+      "start": "k09",
+      "duration": 12,
+      "motion": "She sinks in slow motion; the silk blooms and ripples around her; the mirror shards turn and flash; a string of bubbles escapes her lips; the light shafts sway; peace and danger.",
+      "vo": [
+        {
+          "voice": "kira",
+          "text": "In the velvet Looking-Glass of the bottom,\nwhere Alice spreads out the shards,"
+        }
+      ],
+      "engine": "grok"
+    },
+    "s10": {
+      "poem": "007",
+      "start": "k10",
+      "duration": 10,
+      "motion": "He exhales a slow ring of vapour that widens and drifts toward the camera; a second ring follows through the first; his face surfaces from the shadow for a moment, then sinks back into it.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "our night Satan vapes,\nblowing smoke rings as a run-up for obituaries."
+        }
+      ],
+      "engine": "grok"
+    },
+    "s11": {
+      "poem": "007",
+      "start": "k11",
+      "duration": 13,
+      "motion": "She walks slowly and deliberately across the checkerboard toward the lens, bare feet on cold marble, the silk moving like liquid; candle flames bend as she passes; she never blinks.",
+      "vo": [
+        {
+          "voice": "kira",
+          "text": "Beyond the greedy longing\nthat devours what is left of the Self,\nsmoothly, to spite every last dick,\na new pawn, I march to queen."
+        }
+      ],
+      "engine": "grok"
+    },
+    "s12": {
+      "poem": "007",
+      "start": "k12",
+      "duration": 14,
+      "motion": "She climbs step by step toward the white light, slow and exhausted, the gown trailing on the stone; light floods over her shoulders; the camera rises with her.",
+      "vo": [
+        {
+          "voice": "kira",
+          "text": "Look at me, my father,\nhow, wingless, I crawl into the sky.\nThe sober ending of my story\ncuts You out of the plot."
+        }
+      ],
+      "engine": "grok"
+    },
+    "s13": {
+      "poem": "039",
+      "start": "k13",
+      "duration": 12,
+      "motion": "She steps closer to the mirror and stares into her own eyes; a tear runs; her jaw tightens; the candle flames tremble; the camera drifts past her shoulder into the reflection.",
+      "vo": [
+        {
+          "voice": "kira",
+          "text": "Look, look yourself in the face!\nThere are tears and pain, and you just take it,"
+        }
+      ],
+      "engine": "wan"
+    },
+    "s14": {
+      "poem": "039",
+      "start": "k14",
+      "duration": 10,
+      "motion": "She twists the ring hard, again and again; her other hand clenches the iron railing; the fire behind flares up and sparks rise.",
+      "vo": [
+        {
+          "voice": "kira",
+          "text": "so twist the ring,\nand burn, gripping the rail!"
+        }
+      ],
+      "engine": "grok"
+    },
+    "s15": {
+      "poem": "095",
+      "start": "k15",
+      "duration": 11,
+      "motion": "Her fingertips move slowly along the carved grooves; torchlight flickers across the wood and her face; she leans closer, as if listening to the wood.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "He cut insults into the wood\nsharp enough to make the bishop sweat\nand the colonial clerk reach for his pistol."
+        }
+      ],
+      "engine": "wan"
+    },
+    "s16": {
+      "poem": "095",
+      "start": "k16",
+      "duration": 13,
+      "motion": "She walks slowly along the waterline; the foam rushes over her ankles and drains back, leaving the sand black; the wet silk clings and moves with her; the wind lifts her hair; the camera follows her.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "She walks the black volcanic sand of the Marquesas\nthat the Pacific keeps trying to bleach\nand never succeeds."
+        }
+      ],
+      "engine": "grok"
+    },
+    "s17": {
+      "poem": "095",
+      "start": "k17",
+      "duration": 13,
+      "motion": "A wave breaks against her and she does not move; spray and wind; she pushes the wet hair from her face and looks straight into the lens without blinking as the sun breaks over the ridge.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "The sand stays black.\nSo does she."
+        },
+        {
+          "voice": "kira",
+          "text": "I will not whiten."
+        }
+      ],
+      "engine": "wan"
+    },
+    "b06": {
+      "poem": "071",
+      "start": "k06",
+      "duration": 5,
+      "motion": "She holds the stare into the lens and breathes slowly; the silk sheet rises and falls with her breath; sweat beads on her collarbone; the mosquito net sways in the fan's air; the laptop light flickers across her skin; the camera creeps in toward her eyes. Charged, unashamed, luxurious.",
+      "vo": [
+        {
+          "voice": "ule",
+          "text": "Manet's naked truth that blew Paris apart.\nA prostitute staring straight at you,\nthe way my code looks at me at 3 AM"
+        }
+      ],
+      "duration_by_engine": {
+        "veo": 6
+      },
+      "note": "engine bake-off: same start frame + motion on every engine, 5s"
+    }
+  }
 }

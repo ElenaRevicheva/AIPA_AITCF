@@ -83,19 +83,27 @@ async function curlJson(args) {
 }
 async function upload(file) {   // local file -> Replicate file URL (cached by content hash)
   const hash = crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex').slice(0, 16);
-  const cache = fs.existsSync(UPLOADS) ? JSON.parse(fs.readFileSync(UPLOADS, 'utf8')) : {};
-  if (cache[hash]) return cache[hash];
+  // parallel runs share this cache: read tolerantly, write atomically (a half-written file crashed 6 keyframes)
+  const readCache = () => { try { return JSON.parse(fs.readFileSync(UPLOADS, 'utf8')); } catch { return {}; } };
+  const hit = readCache()[hash]; if (hit) return hit;
   const type = file.endsWith('.png') ? 'image/png' : 'image/jpeg';
   const r = await curlJson(['-X', 'POST', '-F', `content=@${file};type=${type};filename=${path.basename(file)}`, 'https://api.replicate.com/v1/files']);
   const url = r?.urls?.get; if (!url) throw new Error('upload failed: ' + JSON.stringify(r).slice(0, 300));
-  cache[hash] = url; fs.writeFileSync(UPLOADS, JSON.stringify(cache, null, 1));
+  const cache = { ...readCache(), [hash]: url }, tmp = `${UPLOADS}.${process.pid}`;
+  fs.writeFileSync(tmp, JSON.stringify(cache, null, 1)); fs.renameSync(tmp, UPLOADS);
   return url;
 }
 async function predict(model, input, label) {
   const body = path.join(BASE, 'raw', `${label}.request.json`);
   fs.writeFileSync(body, JSON.stringify({ input }, null, 1));
-  let p = await curlJson(['-X', 'POST', '-H', 'Content-Type: application/json', '-H', 'Prefer: wait=5', '--data-binary', `@${body}`,
-    `https://api.replicate.com/v1/models/${model}/predictions`]);
+  let p;
+  for (let attempt = 1; ; attempt++) {   // under $5 of credit Replicate allows 6 creates/min, burst 1 — wait it out
+    p = await curlJson(['-X', 'POST', '-H', 'Content-Type: application/json', '-H', 'Prefer: wait=5', '--data-binary', `@${body}`,
+      `https://api.replicate.com/v1/models/${model}/predictions`]);
+    if (p.id || !/throttled/i.test(String(p.detail)) || attempt >= 8) break;
+    process.stderr.write(`  ${label}: throttled, retry ${attempt} in 15s\n`);
+    await new Promise(r => setTimeout(r, 15000));
+  }
   if (!p.id) throw new Error('create failed: ' + JSON.stringify(p).slice(0, 400));
   process.stderr.write(`  ${label}: ${model} prediction ${p.id}\n`);
   const t0 = Date.now();
@@ -142,7 +150,9 @@ async function video(shotId, engineOverride) {
     duration: shot.duration_by_engine?.[engineId] ?? shot.duration };
   const usd = eng.perSec(o) * o.duration;
   guard(usd, `video ${shotId} on ${engineId}`);
-  o.start = shot.start ? await resolveImg(shot.start) : undefined;
+  // grok validates the URL's file extension and Replicate file URLs have none -> send the JPEG inline as a data URI
+  const inline = ref => `data:image/jpeg;base64,${fs.readFileSync(path.join(BASE, 'img', `${ref}.jpg`)).toString('base64')}`;
+  o.start = shot.start ? (engineId === 'grok' ? inline(shot.start) : await resolveImg(shot.start)) : undefined;
   o.end = shot.end ? await resolveImg(shot.end) : undefined;
   o.refs = [];
   for (const r of (engineId === 'kling' ? shot.refs || [] : [])) o.refs.push(await resolveImg(r));
