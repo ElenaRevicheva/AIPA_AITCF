@@ -4,11 +4,18 @@
 #
 # Same contract as set-deepseek-stdin.sh. The value arrives on STDIN and never
 # touches argv, so it cannot appear in `ps`; the curl Authorization header is
-# passed via --config on stdin for the same reason. Nothing is written unless
-# Venice accepts the key. A .env holding a key that 401s is worse than an empty one.
+# passed via --config on stdin for the same reason.
+#
+# ⚠️ THE PROBE MUST REQUIRE AUTH. Venice's /models endpoint is PUBLIC (22 Sep 2026:
+# 200 with no key at all, and 200 with a deliberately fake key), so probing it
+# "verified" anything at all and wrote keys that could not spend a cent.
+# /api_keys/rate_limits needs the key, so that is the probe.
+#
+# VENICE_ENV_FILE overrides the target file, so this script can be tested
+# without touching the live .env.
 set -euo pipefail
 
-ENV_FILE=/home/ubuntu/cto-aipa/.env
+ENV_FILE="${VENICE_ENV_FILE:-/home/ubuntu/cto-aipa/.env}"
 read -r KEY || true
 KEY="$(printf '%s' "${KEY:-}" | tr -d '[:space:]')"
 
@@ -17,22 +24,25 @@ if [ -z "$KEY" ]; then
 fi
 
 # --- probe before write -----------------------------------------------------
-# Models list: cheapest authenticated call Venice has; we only care about the status.
 CODE="$(printf 'header = "Authorization: Bearer %s"\n' "$KEY" | curl -sS \
   --config - \
   -o /tmp/venice-probe.$$ -w '%{http_code}' \
   --max-time 60 \
-  'https://api.venice.ai/api/v1/models?type=image' || echo 000)"
-MODELS="$(grep -o '"id"' /tmp/venice-probe.$$ 2>/dev/null | wc -l || echo 0)"
+  'https://api.venice.ai/api/v1/api_keys/rate_limits' || echo 000)"
+BAL="$(grep -o '"balances"[^}]*}' /tmp/venice-probe.$$ 2>/dev/null | head -c 120 || true)"
 rm -f /tmp/venice-probe.$$
 
 case "$CODE" in
   200) : ;;
-  401|403) echo "ERR: Venice rejected that key (HTTP $CODE). Nothing written. Check it at venice.ai/settings/api"; exit 0 ;;
-  402)     echo "ERR: Venice says the account has no credits (HTTP 402). Nothing written — add credits at venice.ai/pricing, then resend."; exit 0 ;;
-  429)     echo "ERR: rate limited (HTTP 429). Nothing written. Wait a moment and resend."; exit 0 ;;
-  000)     echo "ERR: could not reach api.venice.ai from the box. Nothing written."; exit 0 ;;
-  *)       echo "ERR: unexpected HTTP $CODE from Venice. Nothing written."; exit 0 ;;
+  401|403)
+    echo "ERR: Venice refused that key (HTTP $CODE). Nothing written."
+    echo "     Venice answers 401 for BOTH a wrong key AND a key that is not allowed to spend."
+    echo "     Check at venice.ai/settings/api: the key exists, its spend limit is above \$0, and the account has API credits."
+    exit 0 ;;
+  402) echo "ERR: Venice says no balance (HTTP 402). Nothing written — add credits at venice.ai/pricing, then resend."; exit 0 ;;
+  429) echo "ERR: rate limited (HTTP 429). Nothing written. Wait a moment and resend."; exit 0 ;;
+  000) echo "ERR: could not reach api.venice.ai from the box. Nothing written."; exit 0 ;;
+  *)   echo "ERR: unexpected HTTP $CODE from Venice. Nothing written."; exit 0 ;;
 esac
 
 # --- write (idempotent: replace existing lines, else append) ----------------
@@ -44,4 +54,4 @@ printf 'VENICE_IMAGE_MODEL=venice-sd35\n' >> "$TMP"
 cat "$TMP" > "$ENV_FILE"
 rm -f "$TMP"
 
-echo "OK: key verified (HTTP $CODE, $MODELS image models visible) and written to .env — /imagine venice works after cto-aipa restarts with --update-env."
+echo "OK: key verified against an authenticated endpoint (HTTP $CODE) and written to .env — /imagine venice works after cto-aipa restarts with --update-env. ${BAL}"

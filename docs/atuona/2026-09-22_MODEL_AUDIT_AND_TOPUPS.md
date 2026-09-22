@@ -97,3 +97,14 @@ After a key change: `pm2 restart cto-aipa --update-env`.
 
 **Note for the next agent:** a nude still from Venice can enter a film the way film #8's glitches do — as a still. It cannot
 be animated: Wan, Kling and Seedance each run their own check on the first frame (Seedance refused even the clothed Olympia).
+
+### Venice troubleshooting (22 Sep, from a real failure)
+
+- **`/models` is PUBLIC.** It returns 200 with no key at all and 200 with a fake key. The first version of
+  `set-venice-stdin.sh` probed it and therefore "verified" every key handed to it — including a deliberately fake one, which
+  it then wrote over Elena's real key (restored from its own backup). The probe is now `GET /api_keys/rate_limits`, which
+  requires auth, and the script takes `VENICE_ENV_FILE` so it can be tested without touching the live `.env`.
+- **Venice answers 401 for a key that cannot spend**, not 402. Elena's key is real (tail matches her dashboard) yet chat,
+  image generation, `/api_keys` and `/api_keys/rate_limits` all return `401 Authentication failed`, while her account shows
+  1,000 Venice Credits and the key row reads `$0.00 / $0.00 · 0.00 DIEM / mo`. So a 401 means *either* wrong key *or*
+  no spend allowance — check the key's limit and whether the credits are API credits before assuming the key is wrong.

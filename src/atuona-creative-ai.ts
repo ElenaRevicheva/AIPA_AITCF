@@ -380,7 +380,12 @@ async function runVeniceStill(
     });
     if (!r.ok) {
       const txt = (await r.text()).slice(0, 200);
-      return { url: null, why: `Venice ${r.status}: ${txt}` };
+      // Venice answers 401 (not 402) when the key is valid but the account has no USD credits / staked DIEM:
+      // listing models still returns 200, so "the key works" is not proof that inference works (22 Sep 2026).
+      const funds = r.status === 401 || r.status === 402
+        ? ' — Venice needs a positive USD balance for inference: add credits at venice.ai/settings/api'
+        : '';
+      return { url: null, why: `Venice ${r.status}: ${txt}${funds}` };
     }
     if (r.headers.get('x-venice-is-content-violation') === 'true') {
       return { url: null, why: 'Venice refused this prompt (content violation)' };
