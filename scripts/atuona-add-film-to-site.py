@@ -1,7 +1,7 @@
 """Add a newly published film to atuona.xyz's static film lists (llms.txt, JSON-LD ItemList, <noscript>).
 
 Usage: python scripts/atuona-add-film-to-site.py <atuona-repo> <published-file.mp4> <YYYY-MM-DD> "<Title>"
-Additive: one new entry at the top of each list, "six" -> "seven" in the counts. Nothing else is rewritten.
+Additive: one new entry at the top of each list, the count word bumped by one (read from the page's numberOfItems).
 Line endings are preserved byte-for-byte (files are read and written with newline='').
 """
 import json, re, sys, html
@@ -9,7 +9,7 @@ from pathlib import Path
 
 repo, fname, date, title = Path(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4]
 url = f"https://webhook.aideazz.xyz/cto/films/{fname}"
-OLD_N, NEW_N = 6, 7
+WORDS = {5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten", 11: "eleven", 12: "twelve"}
 
 def rd(p): return (repo / p).open(encoding="utf-8", newline="").read()
 def wr(p, s): (repo / p).open("w", encoding="utf-8", newline="").write(s)
@@ -26,11 +26,18 @@ def patch_jsonld(s, where, fn):
     fn(data)
     return s[:m.start(2)] + json.dumps(data, ensure_ascii=False) + s[m.end(2):]
 
+_studio = rd("public/aifilmstudio/index.html")
+_m = re.search(r'"numberOfItems": (\d+)', _studio)
+if not _m: raise SystemExit("studio page: numberOfItems not found")
+OLD_N = int(_m.group(1)); NEW_N = OLD_N + 1
+o, n = WORDS[OLD_N], WORDS[NEW_N]
+O, Nw = o.capitalize(), n.capitalize()
+
 # ---- public/llms.txt
 p = "public/llms.txt"; s = rd(p)
 if fname in s: raise SystemExit(f"{p}: already lists {fname}")
-s = swap(s, "six finished short films", "seven finished short films", 1, p)
-s = swap(s, "AI Film Studio — six finished films", "AI Film Studio — seven finished films", 1, p)
+s = swap(s, f"{o} finished short films", f"{n} finished short films", 1, p)
+s = swap(s, f"AI Film Studio — {o} finished films", f"AI Film Studio — {n} finished films", 1, p)
 eol = "\r\n" if "\r\n" in s else "\n"
 s = swap(s, f"## Films{eol}{eol}", f"## Films{eol}{eol}- [{title}]({url}) — released {date}{eol}", 1, p)
 wr(p, s)
@@ -38,9 +45,9 @@ wr(p, s)
 # ---- public/aifilmstudio/index.html
 p = "public/aifilmstudio/index.html"; s = rd(p)
 if fname in s: raise SystemExit(f"{p}: already lists {fname}")
-s = swap(s, "Six short films", "Seven short films", 1, p)
-s = swap(s, "six finished AI films", "seven finished AI films", 1, p)
-s = swap(s, "Six finished short films", "Seven finished short films", 2, p)  # og:description + JSON-LD
+s = swap(s, f"{O} short films", f"{Nw} short films", 1, p)
+s = swap(s, f"{o} finished AI films", f"{n} finished AI films", 1, p)
+s = swap(s, f"{O} finished short films", f"{Nw} finished short films", 2, p)  # og:description + JSON-LD
 def studio(d):
     page = next(g for g in d["@graph"] if g.get("@type") == "CollectionPage")
     lst = page["mainEntity"]
@@ -61,7 +68,7 @@ wr(p, s)
 
 # ---- index.html (home)
 p = "index.html"; s = rd(p)
-s = swap(s, "six short films made with AI", "seven short films made with AI", 1, p)
-s = swap(s, "six finished short films", "seven finished short films", 3, p)  # og:description + 2 in JSON-LD
+s = swap(s, f"{o} short films made with AI", f"{n} short films made with AI", 1, p)
+s = swap(s, f"{o} finished short films", f"{n} finished short films", 3, p)  # og:description + 2 in JSON-LD
 wr(p, s)
 print("ok:", fname, date, title)

@@ -11,7 +11,7 @@ Films produced with this pipeline:
 | 02.07.2026 | *The Secret Exhibition* | `scripts/atuona-film3.mjs` | Dark Cinematic Drone Deep Bass Ambient |
 | 03–04.07.2026 | *Reprint* · *Recovered* | work dirs `atuona-film4/5` on Oracle | Melancholic Ambient (Universfield) · Atmospheric Dark Cinematic |
 | 21.09.2026 | *Could not generate content.* (working title *Paradise Is Compiled*) — 19 clips **+ 20 stills turned into video shots** | `scripts/atuona-film7.mjs` + `scripts/atuona-still-motion.py` | Red Lips (Sensual Noir Lo-Fi Beat) — WBM Studio |
-| 22.09.2026 | Film #8 — **17 NEW generated videos, no stills in the cut** (poems drawn from ATUONA + LITPROM) | `scripts/atuona-film8-gen.mjs` + `scripts/atuona-film8-vo.py` + `scripts/atuona-film8.mjs` | The Ritual — Tribal Trap Fusion (Saturn-3-Music) |
+| 22.09.2026 | *Crimson Escape* (film #8, 3:53) — **18 NEW generated video shots + 2 glitch inserts** (poems drawn from ATUONA + LITPROM) | `scripts/atuona-film8-gen.mjs` + `scripts/atuona-film8-vo.py` + `scripts/atuona-film8.mjs` | The Ritual — Tribal Trap Fusion (Saturn-3-Music) |
 
 The canonical, most current reference is **`scripts/atuona-film7.mjs`** (film3's pipeline + stills-as-shots,
 gallery walls for vertical stills, motion-interpolated slow-mo, verify-before-publish). For clips-only films

@@ -159,7 +159,11 @@ async function main() {
   seq.push({ file: await makeCard('ATUONA', OUTRO_SUB, path.join(W, 'card_outro.mp4'), 4.2, 56) });
 
   // 3. transition chain: 1.3 s dissolves, but a near-hard cut into and out of a glitch (it must snap, not fade)
-  const durs = []; for (const c of seq) durs.push(await dur(c.file));
+  // VIDEO-stream length, not the container's: each segment's video ends ~0.1 s before its audio, and summed container
+  // lengths drifted ~0.6 s by s06 — harmless under a 1.3 s dissolve, fatal under the 0.1 s glitch cut (the xfade offset
+  // landed past the end of the video and the film stopped at 58.8 s). The same drift also placed late voices late.
+  const vdur = async f => { const { stdout } = await execFileP0('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=duration', '-of', 'default=nw=1:nk=1', f]); const d = parseFloat(stdout.trim()); if (!(d > 0)) throw new Error('no video duration: ' + f); return d; };
+  const durs = []; for (const c of seq) durs.push(await vdur(c.file));
   const joinD = seq.map((c, k) => k === 0 ? 0 : (c.glitch || seq[k - 1].glitch) ? GLITCH_XF : XFADE_D);
   const segStart = k => { let s = 0; for (let i = 0; i < k; i++) s += durs[i] - joinD[i + 1]; return Math.max(0, s); };
   const inputs = seq.flatMap(c => ['-i', c.file]); let fc = ''; let vlab = '0:v', alab = '0:a', merged = durs[0];
