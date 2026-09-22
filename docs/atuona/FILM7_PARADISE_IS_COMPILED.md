@@ -100,3 +100,30 @@ smoke drift at the window, lamp/screen flicker) → moving grain. The nine verti
 (4 panels for #015's four renders, a diptych for #099's lilies, a triptych to close) instead of being cropped to 16:9.
 Baked-in text is framed out, never painted over, except the misspelled `UNDERGGROUND` on 09-20 07:46 V
 (inpainted — it would read as a typo on screen).
+
+## 6. Verified 22 Sep — is it the true poem text? (Elena's question, 21 Sep)
+
+**Stanzas vs the poems** (script compare, stanza text against the atuona repo):
+- English poems #066 #091 #099 — **every fragment is a verbatim substring** of the poem's `English Text`. The one
+  difference was #066 capitalising *There*; restored to the poem's lowercase *there*.
+- Russian poems #015 #024 #037 #022 #020 — **every source line is verbatim** in the poem's `Poem Text`
+  (`atuona-complete-with-dates.json`). **The English on screen and in the voice is a translation made for this film,
+  not Elena's words** (§2). It is the only part of the film she did not write.
+
+**The images and videos came from each poem's real text** (Oracle PM2 logs, `cto-aipa-out-*.log`). For every
+render in this film, the run that produced it logged the poem body being found before any prompt was written:
+- #020 → `✅ Found poem text for #020 in atuona-complete-with-dates.json: Верни мне чуть больше себя…`, then
+  `persistShot 020` and Director's Cut `xJycIP8b` (the clips used here).
+- #022 → `✅ Found poem text for #022 …: Вьются шальные повести В грустном дыму Собрания…`, then `persistShot 022`
+  and DC `0qjJIwPU`.
+- #015 / #024 / #037 → same `Found poem text` line before their renders.
+- #066 / #091 / #099 carry full `English Text` + `Russian Text` in `metadata/NNN.json`, so no fallback is needed.
+- The log also holds two **older** #020/#022 runs that found no body and fell back to generic keys
+  (`atuona, gauguin, fusion, atlas`). **Neither produced a clip in this film.**
+
+**`/visualize kling 056`**: `metadata/056.json` (*Охотничий пес*) has both `English Text` (2,236 chars) and
+`Russian Text` (2,131 chars), and `fetchPagePoemContent()` puts both into the prompt. It gets the real poem.
+**One open gap:** for #001–#046 the bot translates the Russian on the fly and cuts it at **1,000 chars** first.
+Five poems are longer (#003 1424 · #019 1030 · #030 1038 · #031 1179 · #046 1231), so their English excerpt
+loses the ending. The Russian (cut at 2,200) still reaches the prompt whole. Not fixed — a bot change needs its own
+Teach → Plan → Confirm.

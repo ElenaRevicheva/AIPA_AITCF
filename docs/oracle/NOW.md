@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 21 Sep 16:29 (taken over 22 Sep 01:45 — first session died on 529s) | Atuona film #7 — **publishing** (Elena: "finish the movie"), then the static film list on atuona.xyz | Oracle `/home/ubuntu/atuona-film7/` (new), `data/atuona/films/out/` (add only), `scripts/atuona-film7.mjs` (new), `docs/atuona/FILM_COMPILATION_GUIDE.md`. No PM2 restart. | — |
+| Claude Code | 21 Sep 16:29 (taken over 22 Sep 01:45 — first session died on 529s) | Atuona film #7 — **verified, waiting for Elena's yes to publish** (permission gate blocked `--publish` as a production deploy) | Oracle `/home/ubuntu/atuona-film7/` (new), `data/atuona/films/out/` (add only), `scripts/atuona-film7.mjs` (new), `docs/atuona/FILM_COMPILATION_GUIDE.md`. No PM2 restart. | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +130,21 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🎬 22 Sep — Film #7 *Paradise Is Compiled* is FINISHED and VERIFIED. Not live yet: waiting for Elena's yes.
+
+- **DONE:** `/home/ubuntu/atuona-film7/work/final.mp4`: 188.4s, h264 1280×720 30fps + aac, **−16.0 LUFS, peak −2.0 dBFS**,
+  frame 0 = title card. md5 `c1fc2136e3115c24107ace11df93780b`, the same as the Desktop copy
+  `paradise-is-compiled-21-09-2026-REVIEW.mp4`. The poem-text check she asked for is in
+  `docs/atuona/FILM7_PARADISE_IS_COMPILED.md` §6: English fragments verbatim, Russian source lines verbatim, and every clip
+  came from a run that logged `Found poem text`.
+- **NEXT:** on her yes → `cd /home/ubuntu/atuona-film7 && node film7.mjs --publish` → check that `films.json` lists it and a
+  Range request returns **206** → add it to atuona.xyz `public/llms.txt`, the `ItemList` JSON-LD and the `<noscript>` list
+  in `public/aifilmstudio/index.html` (six → **seven**). The file name gets its timestamp at publish, so that edit cannot
+  be written in advance.
+- **VERIFIED BY:** `ffprobe` + `ebur128` on final.mp4; `grep "Found poem text for #0NN"` across `~/.pm2/logs/cto-aipa-out-*.log`.
+- **RISK:** the English for #015 #020 #022 #024 #037 is **our translation**, not her words (§2 of the film doc).
+  Anything in `out/` goes live the moment it lands.
 
 ### 🟢 21 Sep — CV + COVER LETTER NOW SIT ON ALL 20 "I ACT TODAY" DEALS. Verified in HubSpot.
 
