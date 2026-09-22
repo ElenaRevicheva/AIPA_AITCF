@@ -20,6 +20,9 @@ set -euo pipefail
 ENV_FILE="${VENICE_ENV_FILE:-/home/ubuntu/cto-aipa/.env}"
 read -r KEY || true
 KEY="$(printf '%s' "${KEY:-}" | tr -d '[:space:]')"
+# Venice's dashboard shows the key as an env line ("VENICE_INFERENCE_KEY=<value>"), and people paste the whole thing.
+# Accept that, `export NAME=value`, and quoted values — store only the value.
+KEY="$(printf '%s' "$KEY" | sed -E 's/^export//; s/^[A-Za-z_][A-Za-z0-9_]*[:=]//; s/^["'"'"']//; s/["'"'"']$//')"
 
 if [ -z "$KEY" ]; then
   echo "ERR: empty key on stdin"; exit 0
