@@ -72,3 +72,28 @@ Wan and Grok rendered 17 film shots through the same inputs.
 
 **Incident:** the 13 new lines pushed `/menu` past Telegram's 4096-char limit → `400 Bad Request: message is too long` → the bot
 answered nothing. Fixed 15:49 UTC with `replyChunked()` (split at line breaks).
+
+## 6. Venice.ai — the adult-permitting stills engine (added 22 Sep, LIVE 20:03 UTC)
+
+Elena asked for a provider whose **own terms** permit adult work, after a nude keyframe was refused by Flux 2 (its guard
+against nudity generated from a person's photo) and re-routing that refusal was blocked and removed. Checked live:
+
+| Provider | Their own terms | |
+|---|---|---|
+| **Venice.ai** | "photorealistic, stylized, and **uncensored** models"; image API has `safe_mode` — "*If enabled, this will blur images classified as having adult content*" (default on, caller may disable). Bans minors and any "name, voice, image, or likeness without their consent". | ✅ wired |
+| Replicate | bans "non-consensual nudity or illegal pornographic content"; says the service can produce pornographic output that it does not monitor → the blockers are the **model makers**, not the platform | 🟡 model-dependent |
+| Civitai | now bans "pornography… depicting nudity or explicit sexual acts" and likenesses of real people | ❌ |
+| RunPod (self-host) | lists "pornography or graphic adult content" as unauthorised, "lifetime ban" | ❌ |
+
+**Wiring:** `/imagine venice 048` (safe mode ON) and `/imagine venice18 048` (the vendor's own `safe_mode:false`) — two
+separate commands so adult mode is never hit by accident. Venice's own API (`POST /api/v1/image/generate`, base64 out,
+persisted next to the video shots), never a fallback target, `VENICE_IMAGE_MODEL` default `venice-sd35`.
+**Key:** `/venicekey <key>` — message deleted, key on STDIN to `/home/ubuntu/set-venice-stdin.sh` (repo copy:
+`scripts/oracle-resilience/`), probed against Venice, written to `.env` with a backup; nothing written if Venice refuses it.
+After a key change: `pm2 restart cto-aipa --update-env`.
+
+**Still hers to do:** sign up at venice.ai, add credits (100 credits = $1), create the key at venice.ai/settings/api, send
+`/venicekey`. Until then the command answers "VENICE_API_KEY missing". **No Venice call has been made yet.**
+
+**Note for the next agent:** a nude still from Venice can enter a film the way film #8's glitches do — as a still. It cannot
+be animated: Wan, Kling and Seedance each run their own check on the first frame (Seedance refused even the clothed Olympia).

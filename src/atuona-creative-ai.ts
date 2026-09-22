@@ -33,13 +33,15 @@ import {
   imagineMenuLines,
   imagePinModel,
   isReplicateImageProvider,
+  isVeniceImageProvider,
   parseImageProvider,
   replicateImageInput,
   type AddedImageProvider,
   type ImageCommandProvider,
   type ReplicateImageProvider,
+  type VeniceImageProvider,
 } from './atuona-image-pins';
-import { runAddedImageProviders, runAddedImageProvidersDetailed } from './atuona-image-waterfall';
+import { runAddedImageProviders, runAddedImageProvidersDetailed, persistGeminiStillBytes } from './atuona-image-waterfall';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
 export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
 import * as fs from 'fs';
@@ -343,6 +345,60 @@ async function replyChunked(ctx: Context, text: string, opts: Parameters<Context
   if (buf.trim()) await ctx.reply(buf, opts);
 }
 
+/**
+ * Venice.ai stills (`/imagine venice`, `/imagine venice18`). Venice's own API, not Replicate: POST /api/v1/image/generate,
+ * Bearer VENICE_API_KEY (paste it with /venicekey), image comes back base64 and is persisted next to the video shots.
+ * `safe_mode` is the vendor's own documented switch — ON for `venice`, OFF for `venice18`, which is why adult work lives
+ * behind its own command instead of a flag someone hits by accident.
+ */
+async function runVeniceStill(
+  id: VeniceImageProvider,
+  prompt: string,
+  aspectRatio: string,
+  persistStem?: string
+): Promise<{ url: string | null; bytes?: Buffer; filename?: string; why?: string }> {
+  const key = process.env.VENICE_API_KEY?.trim();
+  if (!key) return { url: null, why: 'VENICE_API_KEY missing — paste it with /venicekey' };
+  const base = (process.env.VENICE_API_BASE || 'https://api.venice.ai/api/v1').replace(/\/$/, '');
+  const [width, height] = aspectRatio === '9:16' ? [720, 1280] : aspectRatio === '1:1' ? [1024, 1024] : [1280, 720];
+  const body = {
+    model: imagePinModel(id),
+    prompt: prompt.slice(0, 7400),
+    width,
+    height,
+    format: 'jpeg',
+    safe_mode: id !== 'venice18',
+    hide_watermark: true,
+  };
+  try {
+    console.log(`Trying ${imagePinGrade(id)} (${body.model}, safe_mode=${body.safe_mode})...`);
+    const r = await fetch(`${base}/image/generate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(180_000),
+    });
+    if (!r.ok) {
+      const txt = (await r.text()).slice(0, 200);
+      return { url: null, why: `Venice ${r.status}: ${txt}` };
+    }
+    if (r.headers.get('x-venice-is-content-violation') === 'true') {
+      return { url: null, why: 'Venice refused this prompt (content violation)' };
+    }
+    const j = (await r.json()) as { images?: string[] };
+    const b64 = j?.images?.[0];
+    if (!b64) return { url: null, why: 'Venice returned no image' };
+    const bytes = Buffer.from(b64, 'base64');
+    const { url, filename } = persistGeminiStillBytes(bytes, 'image/jpeg', persistStem || `venice-${Date.now()}`);
+    const blurred = r.headers.get('x-venice-is-blurred') === 'true';
+    console.log(`✅ ${imagePinGrade(id)} still: ${(bytes.length / 1e6).toFixed(2)}MB${blurred ? ' (blurred by safe mode)' : ''}`);
+    return { url, bytes, filename, ...(blurred ? { why: 'safe mode blurred it — /imagine venice18 renders it unblurred' } : {}) };
+  } catch (e: any) {
+    console.error(`${imagePinGrade(id)} error:`, e?.message);
+    return { url: null, why: String(e?.message || 'error').slice(0, 180) };
+  }
+}
+
 /** One Replicate stills run for a named engine (22 Sep 2026 additions). Input = pins' replicateImageInput(); safety knobs untouched. */
 async function runReplicateStill(
   id: ReplicateImageProvider,
@@ -372,6 +428,17 @@ async function generateStillForPrompt(
 ): Promise<DeliverableStill | null> {
   // Replicate stills (Seedream, GPT Image 2, Grok, Nano Banana Pro, Imagen 4, Ideogram, Qwen, Wan, Hunyuan): named-only,
   // and a miss falls back to Flux exactly like a Luma/Omni/Runway miss.
+  if (prefer && isVeniceImageProvider(prefer)) {
+    const v = await runVeniceStill(prefer, prompt, aspectRatio, persistStem);
+    if (v.url) {
+      const still: DeliverableStill = { url: v.url, modelUsed: imagePinGrade(prefer) };
+      if (v.bytes) { still.bytes = v.bytes; if (v.filename) still.filename = v.filename; }
+      if (v.why && onNamedMiss) await onNamedMiss(v.why);   // e.g. safe mode blurred it
+      return still;
+    }
+    if (onNamedMiss) await onNamedMiss(v.why || `${imagePinGrade(prefer)} returned no still`);
+    return runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
+  }
   if (prefer && isReplicateImageProvider(prefer)) {
     const still = await runReplicateStill(prefer, prompt, aspectRatio);
     if (still.url) return { url: still.url, modelUsed: imagePinGrade(prefer) };
@@ -6088,7 +6155,7 @@ _Just click any command to see what it does!_
 /create deepseek - ✍️ Next page with DeepSeek Flash
 /deepseek - ✍️ Same — tap to write with DeepSeek
 /visualize deepseek 048 - 🎬 DeepSeek video for that page
-/deepseekkey - 🔑 Paste the DeepSeek key (message is deleted)
+/deepseekkey - 🔑 Paste the DeepSeek key (message is deleted)\n/venicekey - 🔑 Paste the Venice key (message is deleted)
 /inspire - 💡 Random creative spark
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -6164,6 +6231,46 @@ ${imagineMenuLines('048')}
    * /deepseekkey <sk-…> — wire DeepSeek V4.1 Flash from the phone.
    * Identical contract to CTO /pplxkey: delete first, STDIN helper, probe before write.
    */
+  /**
+   * /venicekey <key> — wire Venice.ai stills from the phone. Same contract as /deepseekkey:
+   * delete the message first, key travels on STDIN to the helper, probe before write.
+   */
+  atuonaBot.command('venicekey', async (ctx) => {
+    const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
+      .replace(/^\/venicekey(@\S+)?\s*/i, '')
+      .trim();
+    try { await ctx.deleteMessage(); } catch { /* older than 48h, or no delete rights */ }
+    if (!raw) {
+      await ctx.reply(
+        'Usage: /venicekey <your Venice API key>\n\n' +
+          'I delete your message immediately, never log the value, and test the key against Venice before writing anything.\n\n' +
+          'Create one at https://venice.ai/settings/api (sign up at venice.ai, add credits at venice.ai/pricing).',
+      );
+      return;
+    }
+    const key = raw.replace(/\s+/g, '');
+    await ctx.reply('🔐 Message deleted. Testing the key against Venice before writing anything…');
+    const { spawn } = await import('child_process');
+    const out: string[] = [];
+    await new Promise<void>((resolve) => {
+      const child = spawn('/home/ubuntu/set-venice-stdin.sh', [], { stdio: ['pipe', 'pipe', 'pipe'] });
+      child.stdin.write(key + '\n');
+      child.stdin.end();
+      child.stdout.on('data', (d: Buffer) => out.push(d.toString()));
+      child.stderr.on('data', (d: Buffer) => out.push(d.toString()));
+      child.on('close', () => resolve());
+      setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 120_000);
+    });
+    const result = out.join('').trim().split('\n').pop() || '(no output)';
+    await ctx.reply(
+      result.startsWith('OK:')
+        ? '✅ Venice is wired in.\n\n' + result + '\n\n_Restarting picks it up: `/imagine venice 048` (safe mode) · `/imagine venice18 048` (adult).' +
+          '\nA key change needs one `pm2 restart cto-aipa --update-env` — ask CTO._'
+        : '❌ Venice did not accept that key, so nothing was written.\n\n' + result,
+      { parse_mode: 'Markdown' },
+    );
+  });
+
   atuonaBot.command('deepseekkey', async (ctx) => {
     const raw = ((ctx.message as { text?: string } | undefined)?.text || '')
       .replace(/^\/deepseekkey(@\S+)?\s*/i, '')

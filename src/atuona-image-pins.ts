@@ -14,7 +14,10 @@ dotenv.config({ override: true });
 /** Stills engines on Replicate, added 22 Sep 2026 (newest per vendor, checked live that day). Named-only: a miss falls back to Flux. */
 export type ReplicateImageProvider =
   'seedream' | 'gpt' | 'grok' | 'nanopro' | 'imagen4' | 'ideogram' | 'qwen' | 'wan' | 'hunyuan';
-export type ImageCommandProvider = 'flux' | 'luma' | 'omni' | 'runway' | ReplicateImageProvider;
+/** Venice.ai: its own API, not Replicate. `venice18` sends the vendor's documented safe_mode:false (adult work is a
+ *  feature of that product, on Elena's own account) — a separate command so it is never picked by accident. */
+export type VeniceImageProvider = 'venice' | 'venice18';
+export type ImageCommandProvider = 'flux' | 'luma' | 'omni' | 'runway' | ReplicateImageProvider | VeniceImageProvider;
 export type AddedImageProvider = 'luma' | 'omni' | 'runway';
 
 export type ImagePin = {
@@ -36,10 +39,16 @@ function envOr(name: string, fallback: string): string {
 export const IMAGE_PIN_ORDER: readonly ImageCommandProvider[] = [
   'flux', 'luma', 'omni', 'runway',
   'seedream', 'gpt', 'grok', 'nanopro', 'imagen4', 'ideogram', 'qwen', 'wan', 'hunyuan',
+  'venice', 'venice18',
 ];
 
 export const REPLICATE_IMAGE_IDS: readonly ReplicateImageProvider[] =
   ['seedream', 'gpt', 'grok', 'nanopro', 'imagen4', 'ideogram', 'qwen', 'wan', 'hunyuan'];
+
+export const VENICE_IMAGE_IDS: readonly VeniceImageProvider[] = ['venice', 'venice18'];
+export function isVeniceImageProvider(id: string | null | undefined): id is VeniceImageProvider {
+  return id === 'venice' || id === 'venice18';
+}
 
 export function isReplicateImageProvider(id: string | null | undefined): id is ReplicateImageProvider {
   return !!id && (REPLICATE_IMAGE_IDS as readonly string[]).includes(id);
@@ -121,6 +130,12 @@ export const IMAGE_PINS: Record<ImageCommandProvider, ImagePin> = {
     emoji: '🎨', env: 'WAN_IMAGE_MODEL', fallback: 'wan-video/wan-2.7-image-pro', kind: 'image' },
   hunyuan: { id: 'hunyuan', aliases: ['hunyuan', 'tencent'], grade: 'Hunyuan Image 3 (Tencent)',
     emoji: '🎨', env: 'HUNYUAN_IMAGE_MODEL', fallback: 'tencent/hunyuan-image-3', kind: 'image' },
+  // Venice.ai — its own API (VENICE_API_KEY, /venicekey). Adult work is permitted by that vendor's product;
+  // `venice18` flips their own safe_mode switch. Never a fallback target: both are named-only.
+  venice: { id: 'venice', aliases: ['venice', 'venicesafe'], grade: 'Venice SD3.5 (safe mode on)',
+    emoji: '🎨', env: 'VENICE_IMAGE_MODEL', fallback: 'venice-sd35', kind: 'image' },
+  venice18: { id: 'venice18', aliases: ['venice18', 'veniceadult', 'venice-adult'], grade: 'Venice SD3.5 — ADULT (safe mode off)',
+    emoji: '🔞', env: 'VENICE_IMAGE_MODEL', fallback: 'venice-sd35', kind: 'image' },
 };
 
 export function imagePinModel(id: ImageCommandProvider): string {

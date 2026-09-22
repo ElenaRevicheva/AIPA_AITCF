@@ -144,6 +144,8 @@ git log keeps the record.
 - **🚫 THE LINE:** a nude keyframe refused by Flux 2 (a person's photo as input) was pushed through a permissive model once; the
   permission gate blocked it, it was deleted, the route removed. Elena asked three times to use that image — declined each time.
   Refusals get re-phrased, never re-routed. Her own published film #7 stills are hers to use.
+- **Venice.ai wired (20:03 UTC)** — `/imagine venice` (safe) · `/imagine venice18` (their own safe_mode off) · `/venicekey` to paste the key.
+  The one provider checked today whose terms permit adult work; audit doc §6. **Unused until Elena adds her key + credits.**
 - **Money:** Replicate is **PREPAID** (ran out once mid-film; <$5 → 6 jobs/min). Luma, Runway, Anthropic empty — links in
   `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md`.
 - **Open, hers:** nothing on film #8 — s08 was re-rendered clean after her $10 top-up. The published film #7
