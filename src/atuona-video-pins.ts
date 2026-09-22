@@ -13,7 +13,7 @@ dotenv.config({ override: true });
  * then the current video chain runs.
  */
 
-export type VideoProvider = 'luma' | 'omni' | 'runway' | 'veo' | 'kling' | 'seedance' | 'deepseek';
+export type VideoProvider = 'luma' | 'omni' | 'runway' | 'veo' | 'kling' | 'seedance' | 'wan' | 'grok' | 'deepseek';
 
 export type VideoPin = {
   id: VideoProvider;
@@ -40,6 +40,8 @@ export const VIDEO_PIN_ORDER: readonly VideoProvider[] = [
   'veo',
   'kling',
   'seedance',
+  'wan',
+  'grok',
   'deepseek',
 ];
 
@@ -96,6 +98,26 @@ export const VIDEO_PINS: Record<VideoProvider, VideoPin> = {
     emoji: '🎬',
     env: 'SEEDANCE_REPLICATE_MODEL',
     fallback: 'bytedance/seedance-2.5',
+    kind: 'video',
+  },
+  // Wan + Grok added 22 Sep 2026 after the film #8 bake-off (docs/atuona/FILM8_2026-09-22.md §4):
+  // Wan was the boldest on Kira's close shots; Grok the cheapest realistic wide shots. Both via REPLICATE_API_TOKEN.
+  wan: {
+    id: 'wan',
+    aliases: ['wan', 'wan2.7', 'wan27', 'wan-2.7', 'alibaba'],
+    grade: 'Wan 2.7 (bold emotional close-ups)',
+    emoji: '🎬',
+    env: 'WAN_REPLICATE_MODEL',
+    fallback: 'wan-video/wan-2.7-i2v',
+    kind: 'video',
+  },
+  grok: {
+    id: 'grok',
+    aliases: ['grok', 'grok-imagine', 'grokimagine', 'xai', 'imagine15'],
+    grade: 'Grok Imagine Video 1.5 (realistic, cheapest)',
+    emoji: '🎬',
+    env: 'GROK_VIDEO_REPLICATE_MODEL',
+    fallback: 'xai/grok-imagine-video-1.5',
     kind: 'video',
   },
   deepseek: {

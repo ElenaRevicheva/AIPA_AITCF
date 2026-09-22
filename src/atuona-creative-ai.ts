@@ -135,6 +135,8 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 //   • veo    → Google Veo 3.1 (Gemini API, native audio) — needs GEMINI_API_KEY
 //   • omni     → Gemini Omni Flash (Interactions API, image→video + native audio)
 //   • seedance → ByteDance Seedance 2.5 via Replicate (additive; `/visualize seedance NNN`)
+//   • wan      → Alibaba Wan 2.7 i2v via Replicate (additive 22 Sep 2026; `/visualize wan NNN`) — bold close-ups
+//   • grok     → xAI Grok Imagine Video 1.5 via Replicate (additive 22 Sep 2026; `/visualize grok NNN`) — cheapest realistic
 //   • deepseek → `/visualize deepseek NNN` — operator-facing DeepSeek film. Flash writes
 //     motion when keyed; Seedance (then the chain) shoots the clip. No DeepSeek pixel API.
 //   Default `/visualize NNN` chain: Luma Ray 3 Direct → Luma Replicate → Omni Flash → Kling v2.6 → Seedance 2.5 → Veo 3.1 → Runway.
@@ -169,6 +171,8 @@ const VIDEO_MODELS = {
   omniModel: videoPinModel('omni'),
   klingReplicate: videoPinModel('kling'),
   seedanceReplicate: videoPinModel('seedance'),
+  wanReplicate: videoPinModel('wan'),
+  grokReplicate: videoPinModel('grok'),
 };
 
 function googleVideoOmniOnly(): boolean {
@@ -4429,7 +4433,7 @@ interface VideoGenerationResult {
   success: boolean;
   videoUrl?: string;
   taskId?: string;
-  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance' | 'none';
+  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance' | 'wan' | 'grok' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
@@ -4444,6 +4448,8 @@ function visualizeEngineLabel(
   if (provider === 'veo') return 'Google Veo 3.1';
   if (provider === 'kling') return 'Kling';
   if (provider === 'seedance') return 'Seedance 2.5';
+  if (provider === 'wan') return 'Wan 2.7';
+  if (provider === 'grok') return 'Grok Imagine 1.5';
   if (provider === 'runway') return 'Runway Gen-4.5';
   if (provider === 'luma-direct') return 'Luma ray-3.2';
   return 'Luma via Replicate';
@@ -4685,6 +4691,14 @@ async function generateVideo(
     const seedance = await trySeedance(imageUrl, prompt, ctx);
     if (seedance.success) return seedance;
     return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'seedance', options);
+  } else if (preferredProvider === 'wan') {
+    const wan = await tryWan(imageUrl, prompt, ctx);
+    if (wan.success) return wan;
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'wan', options);
+  } else if (preferredProvider === 'grok') {
+    const grok = await tryGrok(imageUrl, prompt, ctx);
+    if (grok.success) return grok;
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'grok', options);
   } else if (preferredProvider === 'deepseek') {
     const seedance = await trySeedance(
       imageUrl,
@@ -5206,6 +5220,81 @@ async function trySeedance(
   } catch (seedanceErr: any) {
     console.error('Seedance error:', seedanceErr.message);
     return { success: false, provider: 'seedance', error: seedanceErr.message };
+  }
+}
+
+/** Replicate returns a URL string, an array, or a FileOutput with .url(). */
+function replicateVideoUrl(out: unknown): string | null {
+  if (out == null) return null;
+  const s = Array.isArray(out) ? String(out[0]) : String(out);
+  if (s.startsWith('http')) return s;
+  const o = out as { url?: () => URL };
+  if (typeof o.url === 'function') { try { return o.url().href; } catch { /* ignore */ } }
+  return null;
+}
+
+/** Wan 2.7 image→video via REPLICATE_API_TOKEN (additive, 22 Sep 2026). Boldest on emotional close shots in the film #8 test. */
+async function tryWan(imageUrl: string, prompt: string, ctx: Context): Promise<VideoGenerationResult> {
+  if (!replicate) return { success: false, provider: 'wan', error: 'Wan needs REPLICATE_API_TOKEN' };
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  const rawDur = parseInt(process.env.WAN_DURATION || '10', 10);
+  const duration = Number.isFinite(rawDur) ? Math.min(15, Math.max(2, rawDur)) : 10;
+  try {
+    await ctx.reply(`🎬 *Generating video with Wan 2.7...*\n\n_${VIDEO_MODELS.wanReplicate} · 720p · ${duration}s · takes 2–5 minutes..._`, { parse_mode: 'Markdown' });
+    const out = await replicate.run(VIDEO_MODELS.wanReplicate as `${string}/${string}`, {
+      input: {
+        prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
+        negative_prompt: 'cartoon, CGI, 3D render, plastic skin, deformed hands, extra fingers, morphing face, text, watermark, logo',
+        first_frame: imageUrl,
+        duration,
+        resolution: '720p',
+      },
+    });
+    const videoUrl = replicateVideoUrl(out);
+    if (videoUrl) {
+      console.log('✅ Wan via Replicate succeeded:', videoUrl.substring(0, 80) + '…');
+      return { success: true, videoUrl, provider: 'wan', needsPolling: false };
+    }
+    return { success: false, provider: 'wan', error: 'Wan returned invalid output' };
+  } catch (wanErr: any) {
+    console.error('Wan error:', wanErr.message);
+    return { success: false, provider: 'wan', error: wanErr.message };
+  }
+}
+
+/** Grok Imagine Video 1.5 image→video via REPLICATE_API_TOKEN (additive, 22 Sep 2026). Cheapest realistic engine in the film #8 test. */
+async function tryGrok(imageUrl: string, prompt: string, ctx: Context): Promise<VideoGenerationResult> {
+  if (!replicate) return { success: false, provider: 'grok', error: 'Grok needs REPLICATE_API_TOKEN' };
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  const rawDur = parseInt(process.env.GROK_VIDEO_DURATION || '10', 10);
+  const duration = Number.isFinite(rawDur) ? Math.min(15, Math.max(1, rawDur)) : 10;
+  try {
+    await ctx.reply(`🎬 *Generating video with Grok Imagine 1.5...*\n\n_${VIDEO_MODELS.grokReplicate} · 720p · ${duration}s · takes 1–4 minutes..._`, { parse_mode: 'Markdown' });
+    // Grok validates the image URL's file extension; a URL without one is sent inline instead (film #8: "Invalid image format").
+    let image = imageUrl;
+    if (!/\.(jpe?g|png|webp)(\?|$)/i.test(imageUrl)) {
+      const r = await fetch(imageUrl, { signal: AbortSignal.timeout(30_000) });
+      const type = r.headers.get('content-type') || 'image/jpeg';
+      image = `data:${type};base64,${Buffer.from(await r.arrayBuffer()).toString('base64')}`;
+    }
+    const out = await replicate.run(VIDEO_MODELS.grokReplicate as `${string}/${string}`, {
+      input: {
+        prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`,
+        image,
+        duration,
+        resolution: '720p',
+        aspect_ratio: '16:9',
+      },
+    });
+    const videoUrl = replicateVideoUrl(out);
+    if (videoUrl) {
+      console.log('✅ Grok Imagine via Replicate succeeded:', videoUrl.substring(0, 80) + '…');
+      return { success: true, videoUrl, provider: 'grok', needsPolling: false };
+    }
+    return { success: false, provider: 'grok', error: 'Grok returned invalid output' };
+  } catch (grokErr: any) {
+    console.error('Grok video error:', grokErr.message);
+    return { success: false, provider: 'grok', error: grokErr.message };
   }
 }
 
@@ -5804,7 +5893,7 @@ See: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/ATUONA-BOOK-ROADMAP.md
 *Publish:* /preview, /publish, /setpage
 *Drafts:* /draft, /read
 *Proactive:* /proactive, /dailyinspire, /history
-*Film:* /visualize (luma · omni · veo · runway · kling · seedance · deepseek), /gallery, /film, /videostatus
+*Film:* /visualize (luma · omni · veo · runway · kling · seedance · wan · grok · deepseek), /gallery, /film, /videostatus
 *Social:* /post
 *Export:* /export, /import_backup
 *Tools:* /spanish, /imagine
@@ -9604,6 +9693,8 @@ ${visualizeStatusLines({
         veo: Boolean(geminiApiKey),
         kling: Boolean(replicate),
         seedance: Boolean(replicate),
+        wan: Boolean(replicate),
+        grok: Boolean(replicate),
         deepseek: Boolean(replicate),
       })}
 ✍️ DeepSeek Flash: ${deepseekConfigured() ? '✅ /deepseek' : '⚪ /deepseekkey then /deepseek'}
@@ -10187,7 +10278,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
 
         if (videoResult.success) {
           // Ready URL providers (Replicate, Veo, Kling, Omni) → direct delivery.
-          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance')) {
+          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance' || videoResult.provider === 'wan' || videoResult.provider === 'grok')) {
             const providerLabel = visualizeEngineLabel(videoResult.provider, selectedProvider);
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';
