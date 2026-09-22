@@ -22,6 +22,9 @@ import {
   isReplicateVideoProvider,
   replicateVideoInput,
   type ReplicateVideoProvider,
+  isVeniceVideoProvider,
+  veniceVideoSpec,
+  type VeniceVideoProvider,
 } from './atuona-video-pins';
 import {
   imageHelpLine,
@@ -4565,7 +4568,7 @@ interface VideoGenerationResult {
   videoUrl?: string;
   taskId?: string;
   provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance' | 'wan' | 'grok'
-    | 'sora' | 'pixverse' | 'happyhorse' | 'hailuo' | 'none';
+    | 'sora' | 'pixverse' | 'happyhorse' | 'hailuo' | 'venice' | 'venice18' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
@@ -4582,7 +4585,9 @@ function visualizeEngineLabel(
   if (provider === 'seedance') return 'Seedance 2.5';
   if (provider === 'wan') return 'Wan 2.7';
   if (provider === 'grok') return 'Grok Imagine 1.5';
-  if (isReplicateVideoProvider(provider)) return providerGrade(provider).split(' (')[0] ?? providerGrade(provider);
+  if (isReplicateVideoProvider(provider) || isVeniceVideoProvider(provider)) {
+    return providerGrade(provider).split(' (')[0] ?? providerGrade(provider);
+  }
   if (provider === 'runway') return 'Runway Gen-4.5';
   if (provider === 'luma-direct') return 'Luma ray-3.2';
   return 'Luma via Replicate';
@@ -4832,6 +4837,10 @@ async function generateVideo(
     const grok = await tryGrok(imageUrl, prompt, ctx);
     if (grok.success) return grok;
     return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'grok', options);
+  } else if (preferredProvider && isVeniceVideoProvider(preferredProvider)) {
+    const vv = await tryVeniceVideo(preferredProvider, imageUrl, prompt, ctx, pageId);
+    if (vv.success) return vv;
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, preferredProvider, options);
   } else if (preferredProvider && isReplicateVideoProvider(preferredProvider)) {
     const rv = await tryReplicateVideo(preferredProvider, imageUrl, prompt, ctx);
     if (rv.success) return rv;
@@ -5394,6 +5403,137 @@ async function tryReplicateVideo(
   } catch (err: any) {
     console.error(`${id} video error:`, err.message);
     return { success: false, provider: id, error: err.message };
+  }
+}
+
+/**
+ * Venice.ai image→video (`/visualize venice 048`, `/visualize venice18 048`). Additive, 22 Sep 2026.
+ *
+ * Venice is the one engine here that is NOT a single call and NOT a hosted URL:
+ *   POST /video/quote     → what this render will cost, BEFORE any money moves
+ *   POST /video/queue     → { queue_id }
+ *   POST /video/retrieve  → JSON {status: PROCESSING} … until it answers with the mp4 BYTES
+ * So we quote, cap, poll, then write the bytes into the shots dir and return our own URL —
+ * the rest of the pipeline (delivery, persistShot, Director's Cut) is untouched.
+ *
+ * The start frame is sent INLINE as a data URI, never as our /films/shots URL: that URL carries
+ * ATUONA_FILMS_KEY in the query string, and a key does not belong in a third party's request log.
+ */
+async function tryVeniceVideo(
+  id: VeniceVideoProvider,
+  imageUrl: string,
+  prompt: string,
+  ctx: Context,
+  pageId?: string
+): Promise<VideoGenerationResult> {
+  const key = process.env.VENICE_API_KEY?.trim();
+  if (!key) return { success: false, provider: id, error: 'Venice needs VENICE_API_KEY — paste it with /venicekey' };
+  const base = (process.env.VENICE_API_BASE || 'https://api.venice.ai/api/v1').replace(/\/$/, '');
+  const { model, resolution, duration, aspectRatio } = veniceVideoSpec(id);
+  const capUsd = Number(process.env.VENICE_VIDEO_MAX_USD || 3);
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  const headers = { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
+  const post = (path: string, body: unknown, ms = 120_000) =>
+    fetch(`${base}${path}`, { method: 'POST', headers, body: JSON.stringify(body), signal: AbortSignal.timeout(ms) });
+
+  try {
+    // Start frame inline (see note above).
+    const r = await fetch(imageUrl, { signal: AbortSignal.timeout(60_000) });
+    if (!r.ok) return { success: false, provider: id, error: `could not read the start frame (HTTP ${r.status})` };
+    const mime = r.headers.get('content-type') || 'image/jpeg';
+    const imageData = `data:${mime};base64,${Buffer.from(await r.arrayBuffer()).toString('base64')}`;
+
+    const body: Record<string, unknown> = {
+      model,
+      prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 900)}`,
+      negative_prompt: 'cartoon, CGI, 3D render, plastic skin, deformed hands, extra fingers, morphing face, text, watermark, logo',
+      image_url: imageData,
+      duration,
+      resolution,
+      aspect_ratio: aspectRatio,
+    };
+
+    // ---- 1. Quote. Venice prices video per model/length/resolution and will not tell you up front otherwise.
+    let quoted = '';
+    try {
+      const q = await post('/video/quote', body, 60_000);
+      if (q.ok) {
+        const qj: any = await q.json();
+        // Venice answers `{"quote":0.52}` — a bare dollar number under `quote` (probed live 22 Sep 2026).
+        // The other names are kept as a belt: a cap that reads a field the vendor does not send is not a cap,
+        // it is a cap-shaped comment, and it would pass any price through in silence.
+        const usd = Number(
+          (typeof qj?.quote === 'number' ? qj.quote : qj?.quote?.usd)
+          ?? qj?.price_usd ?? qj?.cost_usd ?? qj?.usd ?? qj?.price ?? NaN,
+        );
+        if (Number.isFinite(usd)) {
+          quoted = ` · ~$${usd.toFixed(2)}`;
+          if (usd > capUsd) {
+            return {
+              success: false, provider: id,
+              error: `Venice quoted $${usd.toFixed(2)} for ${duration} at ${resolution} — over the $${capUsd} cap. ` +
+                `Nothing was queued. Raise VENICE_VIDEO_MAX_USD or shorten VENICE_VIDEO_DURATION.`,
+            };
+          }
+        }
+      }
+    } catch { /* a quote that does not answer must not block the render */ }
+
+    await ctx.reply(
+      `🎬 *Generating video with ${providerGrade(id).split(' (')[0]}...*\n\n_${model} · ${resolution} · ${duration}${quoted} · Venice credits · 2–6 minutes..._`,
+      { parse_mode: 'Markdown' },
+    );
+
+    // ---- 2. Queue.
+    const qres = await post('/video/queue', body);
+    if (!qres.ok) {
+      const txt = (await qres.text()).slice(0, 220);
+      const hint = qres.status === 402 ? ' — top up at venice.ai/settings/billing'
+        : qres.status === 422 ? ' — Venice refused this prompt under its own content policy'
+        : qres.status === 401 ? ' — key rejected; re-paste with /venicekey'
+        : '';
+      return { success: false, provider: id, error: `Venice ${qres.status}${hint}: ${txt}` };
+    }
+    const queued = (await qres.json()) as { queue_id?: string; download_url?: string };
+    if (!queued?.queue_id) return { success: false, provider: id, error: 'Venice queued nothing (no queue_id)' };
+    console.log(`🎬 Venice queued ${model} → ${queued.queue_id}`);
+
+    // ---- 3. Poll until it hands back bytes (or a private-model download_url).
+    const deadline = Date.now() + Number(process.env.VENICE_VIDEO_TIMEOUT_MS || 900_000);
+    let bytes: Buffer | null = null;
+    while (Date.now() < deadline && !bytes) {
+      await new Promise((s) => setTimeout(s, 10_000));
+      const pr = await post('/video/retrieve', { model, queue_id: queued.queue_id }, 180_000);
+      if (!pr.ok) {
+        if (pr.status >= 500 || pr.status === 429) continue;   // transient; keep waiting
+        return { success: false, provider: id, error: `Venice retrieve ${pr.status}: ${(await pr.text()).slice(0, 180)}` };
+      }
+      const ct = pr.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        const st = (await pr.json()) as { status?: string; download_url?: string };
+        if (st?.download_url) {
+          const dl = await fetch(st.download_url, { signal: AbortSignal.timeout(180_000) });
+          if (dl.ok) bytes = Buffer.from(await dl.arrayBuffer());
+        }
+        continue;                                             // PROCESSING
+      }
+      bytes = Buffer.from(await pr.arrayBuffer());
+    }
+    if (queued.download_url && !bytes) {
+      const dl = await fetch(queued.download_url, { signal: AbortSignal.timeout(180_000) });
+      if (dl.ok) bytes = Buffer.from(await dl.arrayBuffer());
+    }
+    if (!bytes?.length) return { success: false, provider: id, error: 'Venice did not return a video in time' };
+
+    // ---- 4. Bytes → a URL the rest of the pipeline already knows how to use.
+    //         The stem is prefixed, so this can never overwrite `{pageId}.mp4` (the base cut /film build reads).
+    const stem = `venice-${pageId || 'shot'}-${Date.now()}`;
+    if (!persistShotBytes(stem, bytes)) return { success: false, provider: id, error: 'could not save the Venice video' };
+    console.log(`✅ Venice video ${model}: ${(bytes.length / 1e6).toFixed(2)}MB → ${stem}.mp4`);
+    return { success: true, videoUrl: shotPublicUrl(stem), provider: id, needsPolling: false };
+  } catch (err: any) {
+    console.error(`Venice video error (${id}):`, err?.message);
+    return { success: false, provider: id, error: String(err?.message || 'error').slice(0, 200) };
   }
 }
 
@@ -9910,6 +10050,8 @@ ${visualizeStatusLines({
         pixverse: Boolean(replicate),
         happyhorse: Boolean(replicate),
         hailuo: Boolean(replicate),
+        venice: Boolean(process.env.VENICE_API_KEY?.trim()),
+        venice18: Boolean(process.env.VENICE_API_KEY?.trim()),
         deepseek: Boolean(replicate),
       })}
 ✍️ DeepSeek Flash: ${deepseekConfigured() ? '✅ /deepseek' : '⚪ /deepseekkey then /deepseek'}
@@ -10493,7 +10635,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
 
         if (videoResult.success) {
           // Ready URL providers (Replicate, Veo, Kling, Omni) → direct delivery.
-          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance' || videoResult.provider === 'wan' || videoResult.provider === 'grok' || isReplicateVideoProvider(videoResult.provider))) {
+          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance' || videoResult.provider === 'wan' || videoResult.provider === 'grok' || isReplicateVideoProvider(videoResult.provider) || isVeniceVideoProvider(videoResult.provider))) {
             const providerLabel = visualizeEngineLabel(videoResult.provider, selectedProvider);
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';

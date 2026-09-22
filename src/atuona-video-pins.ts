@@ -16,7 +16,42 @@ dotenv.config({ override: true });
 export type VideoProvider =
   | 'luma' | 'omni' | 'runway' | 'veo' | 'kling' | 'seedance' | 'wan' | 'grok'
   | 'sora' | 'pixverse' | 'happyhorse' | 'hailuo'
+  | 'venice' | 'venice18'
   | 'deepseek';
+
+/**
+ * Venice.ai video — its OWN API (VENICE_API_KEY), not Replicate, and not one call:
+ * POST /video/queue → poll POST /video/retrieve → mp4 BYTES (no hosted URL).
+ *
+ * ⚠️ HONEST NOTE, do not quietly "fix" this into an image-style safe/adult pair.
+ * The image API has a documented `safe_mode` switch, so `/imagine venice` vs `/imagine venice18`
+ * is one flag. The VIDEO API HAS NO SUCH FLAG. Venice instead marks models in /models
+ * (`model_spec.uncensored: true` — 44 of 138 on 22 Sep 2026, the whole Wan 3.0 family among them).
+ * So here the two commands differ by MODEL TIER, and `venice18` is a label of intent and cost,
+ * not a different filter. Venice's own content policy still applies to both (HTTP 422).
+ */
+export type VeniceVideoProvider = 'venice' | 'venice18';
+export const VENICE_VIDEO_IDS: readonly VeniceVideoProvider[] = ['venice', 'venice18'];
+export function isVeniceVideoProvider(id: string | null | undefined): id is VeniceVideoProvider {
+  return id === 'venice' || id === 'venice18';
+}
+
+/**
+ * Per-tier render settings, read from Venice's live model constraints on 22 Sep 2026:
+ * wan-3-0-image-to-video → 480p/720p/1080p, 2s/5s/10s/15s/20s/25s/30s, aspect_ratio supported;
+ * wan-3-0-pro-image-to-video → 1080p/2k/4k, same durations. Env overrides win.
+ */
+export function veniceVideoSpec(id: VeniceVideoProvider): {
+  model: string; resolution: string; duration: string; aspectRatio: string;
+} {
+  const pro = id === 'venice18';
+  return {
+    model: videoPinModel(id),
+    resolution: envOr('VENICE_VIDEO_RESOLUTION', pro ? '1080p' : '720p'),
+    duration: envOr('VENICE_VIDEO_DURATION', '5s'),
+    aspectRatio: envOr('VENICE_VIDEO_ASPECT', '16:9'),
+  };
+}
 
 /** Generic Replicate image→video engines (22 Sep 2026): one runner, per-model input below. */
 export type ReplicateVideoProvider = 'sora' | 'pixverse' | 'happyhorse' | 'hailuo';
@@ -65,6 +100,8 @@ export const VIDEO_PIN_ORDER: readonly VideoProvider[] = [
   'pixverse',
   'happyhorse',
   'hailuo',
+  'venice',
+  'venice18',
   'deepseek',
 ];
 
@@ -179,6 +216,27 @@ export const VIDEO_PINS: Record<VideoProvider, VideoPin> = {
     emoji: '🎬',
     env: 'HAILUO_REPLICATE_MODEL',
     fallback: 'minimax/hailuo-2.3',
+    kind: 'video',
+  },
+  // Venice.ai video — own API + own credits (VENICE_API_KEY via /venicekey), never a fallback target.
+  // Same family, two tiers: 1080p standard vs 2K "pro". See the note on VeniceVideoProvider above for
+  // why this pair is NOT the safe/adult switch that the /imagine pair is.
+  venice: {
+    id: 'venice',
+    aliases: ['venice', 'venicevideo', 'venicevid'],
+    grade: 'Venice · Wan 3.0 (720p, vendor-uncensored)',
+    emoji: '🎬',
+    env: 'VENICE_VIDEO_MODEL',
+    fallback: 'wan-3-0-image-to-video',
+    kind: 'video',
+  },
+  venice18: {
+    id: 'venice18',
+    aliases: ['venice18', 'veniceadult', 'venice-adult', 'venicepro'],
+    grade: 'Venice · Wan 3.0 Pro — ADULT LANE (1080p/2K)',
+    emoji: '🔞',
+    env: 'VENICE_VIDEO_PRO_MODEL',
+    fallback: 'wan-3-0-pro-image-to-video',
     kind: 'video',
   },
   deepseek: {

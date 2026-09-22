@@ -92,8 +92,8 @@ persisted next to the video shots), never a fallback target, `VENICE_IMAGE_MODEL
 `scripts/oracle-resilience/`), probed against Venice, written to `.env` with a backup; nothing written if Venice refuses it.
 After a key change: `pm2 restart cto-aipa --update-env`.
 
-**Still hers to do:** sign up at venice.ai, add credits (100 credits = $1), create the key at venice.ai/settings/api, send
-`/venicekey`. Until then the command answers "VENICE_API_KEY missing". **No Venice call has been made yet.**
+**Status 22 Sep:** done and proven — `/imagine venice18 019` rendered `019-still.jpg` (0.17 MB) and `019-still-v.jpg`
+(0.21 MB) on her own key, balance then `$9.9496845`. (Superseded: the earlier "no Venice call has been made yet".)
 
 **Note for the next agent:** a nude still from Venice can enter a film the way film #8's glitches do — as a still. It cannot
 be animated: Wan, Kling and Seedance each run their own check on the first frame (Seedance refused even the clothed Olympia).
@@ -102,9 +102,62 @@ be animated: Wan, Kling and Seedance each run their own check on the first frame
 
 - **`/models` is PUBLIC.** It returns 200 with no key at all and 200 with a fake key. The first version of
   `set-venice-stdin.sh` probed it and therefore "verified" every key handed to it — including a deliberately fake one, which
-  it then wrote over Elena's real key (restored from its own backup). The probe is now `GET /api_keys/rate_limits`, which
-  requires auth, and the script takes `VENICE_ENV_FILE` so it can be tested without touching the live `.env`.
+  it then wrote over Elena's real key (restored from its own backup). The probe is now a **1-token chat completion** —
+  `/api_keys/*` can be admin-only and would reject a perfectly good inference key, whereas "can this key run inference?"
+  is the actual question — and the script takes `VENICE_ENV_FILE` so it can be tested without touching the live `.env`.
 - **Venice answers 401 for a key that cannot spend**, not 402. Elena's key is real (tail matches her dashboard) yet chat,
   image generation, `/api_keys` and `/api_keys/rate_limits` all return `401 Authentication failed`, while her account shows
   1,000 Venice Credits and the key row reads `$0.00 / $0.00 · 0.00 DIEM / mo`. So a 401 means *either* wrong key *or*
   no spend allowance — check the key's limit and whether the credits are API credits before assuming the key is wrong.
+
+## 7. Venice VIDEO — `/visualize venice` / `/visualize venice18` (added 22 Sep, LIVE 22:34 UTC)
+
+Elena: *"If it worked wire venice into imagine and visualise commands inside bot."* Stills were already live; this is the
+video half. **Verified with a real paid render, not a compile.**
+
+**Venice video is not shaped like every other engine here.** Three differences, each one a trap:
+
+1. **It is a queue, not a call.** `POST /video/quote` → `POST /video/queue` (`{queue_id}`) → poll `POST /video/retrieve`
+   until it stops answering JSON `{status:"PROCESSING"}` and answers **the mp4 bytes**. Measured: `est 466s`, actually
+   **119s** for 5s @720p.
+2. **It hands back BYTES, not a URL.** Every other provider returns a hosted link. The bytes are written into the shots
+   dir via the existing `persistShotBytes()` under a **prefixed** stem (`venice-<page>-<ts>`) so they can never land on
+   `{pageId}.mp4` and overwrite the base cut `/film build` reads, then served back as our own `/films/shots/…` URL.
+   Downstream (delivery, persistShot, Director's Cut) is unchanged.
+3. **The start frame goes as an inline data URI, never as our shots URL** — that URL carries `ATUONA_FILMS_KEY` in the
+   query string, and a key does not belong in a third party's request log.
+
+**Verified 22 Sep 22:35 UTC** (start frame `019-still.jpg`, the Venice still from earlier the same day):
+
+| | |
+|---|---|
+| quote | `{"quote":0.52}` → **$0.52** |
+| queue | `200 {"model":"wan-3-0-image-to-video","queue_id":"01a0cb41-…"}` |
+| render | **119s** (Venice's own estimate said 466s) |
+| output | **5.20 MB**, `h264 1280x720 30fps`, **5.038s**, **with an AAC audio track** (Wan 3.0 scores natively) |
+| balance | `9.9496845` → **`9.429369`** — moved by exactly the quoted $0.52 |
+
+### ⚠️ The cap that was not a cap
+
+The runner quotes before queueing and refuses anything over `VENICE_VIDEO_MAX_USD` (default $3). Written from the docs,
+it read `price_usd` / `cost_usd` / `usd` / `price`. **Venice actually answers `{"quote":0.52}`** — a bare dollar number
+under `quote`. Every one of those reads was `undefined`, the value fell through to `NaN`, `Number.isFinite(NaN)` is
+false, and the cap passed **every** price through in silence. It only surfaced because the probe printed the raw body.
+A guard that reads a field the vendor does not send is not a guard; it is a guard-shaped comment. Fixed and redeployed.
+
+### The 18 in `venice18` does NOT mean the same thing here as in `/imagine`
+
+For stills, `venice` vs `venice18` is one documented switch: the vendor's own `safe_mode`. **The video API has no such
+flag.** Venice instead marks models in `/models` — `model_spec.uncensored: true`, on **44 of 138** video models
+(22 Sep), the whole Wan 3.0 family among them. So on `/visualize` the two commands differ by **model tier**:
+
+- `/visualize venice <page>` → `wan-3-0-image-to-video`, 720p
+- `/visualize venice18 <page>` → `wan-3-0-pro-image-to-video`, 1080p (the family also offers 2K/4K)
+
+`venice18` is a label of **intent and cost**, not a different filter, and Venice's own content policy still applies to
+both (HTTP 422 `content violation`). Do not "fix" this into a safe/adult pair — it would be a lie in the menu.
+
+Env knobs: `VENICE_VIDEO_MODEL`, `VENICE_VIDEO_PRO_MODEL`, `VENICE_VIDEO_RESOLUTION`, `VENICE_VIDEO_DURATION` (default
+`5s`), `VENICE_VIDEO_ASPECT` (`16:9`), `VENICE_VIDEO_MAX_USD` (`3`), `VENICE_VIDEO_TIMEOUT_MS` (`900000`).
+**Cost note:** $0.52 per 5s ≈ **$0.104/s** — roughly Sora-2-Pro territory and ~7× Grok. A 3-minute film of Venice video
+would be ~$19, so this is the engine for the shots that need it, not the default.

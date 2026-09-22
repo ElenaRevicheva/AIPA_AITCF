@@ -275,3 +275,16 @@ Verification checklist (all against the file in `out/`):
 22. Re-routing a refused shot to a more permissive engine — re-phrase it instead (§5c, the line).
 23. `ffmpeg` inside a `while read` loop eats the loop's stdin (it ate one character per title) — always `-nostdin`.
 24. Compiling without looking — sample every clip; engines drift off the plan mid-shot.
+25. Assuming every engine answers with a hosted URL — **Venice answers with the mp4 bytes**, and returns them from a
+    *queue*, not the call you made (`/video/quote` → `/video/queue` → poll `/video/retrieve`). Write the bytes under a
+    **prefixed** stem (`venice-<page>-<ts>`), never `{pageId}.mp4`, or the render overwrites the base cut this guide's
+    `/film build` step reads. Wired as `/visualize venice` (720p) and `/visualize venice18` (1080p Pro).
+26. Writing a price cap against field names from the docs and never printing the raw body — Venice replies
+    `{"quote":0.52}`, so a cap reading `price_usd`/`cost_usd`/`usd`/`price` got `NaN` and let **every** price through
+    silently. Print the vendor's actual response once before trusting any guard built on its shape.
+27. Sending a shots URL to a third-party API as the start frame — `/films/shots/…` carries `ATUONA_FILMS_KEY` in the
+    query string. Send the image **inline as a data URI** so the key never reaches the vendor's logs.
+28. Reading `uncensored` as "no filter" — Venice flags 44 of 138 video models `model_spec.uncensored: true`, but its own
+    content policy still returns **422** on a refused prompt, and the video API has **no `safe_mode` switch** (only the
+    image API does). `venice18` on `/visualize` is a *tier*, not a second filter setting. See
+    `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md` §7.
