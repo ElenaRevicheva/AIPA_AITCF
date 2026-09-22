@@ -144,11 +144,19 @@ git log keeps the record.
 - **🚫 THE LINE:** a nude keyframe refused by Flux 2 (a person's photo as input) was pushed through a permissive model once; the
   permission gate blocked it, it was deleted, the route removed. Elena asked three times to use that image — declined each time.
   Refusals get re-phrased, never re-routed. Her own published film #7 stills are hers to use.
-- **⚠️ Venice key 401s.** Her key is stored and real, but every authenticated Venice endpoint refuses it while the dashboard
-  shows 1,000 credits and the key reads `$0.00 / $0.00` — her move: raise the key's spend limit / confirm API credits, or make a
-  new key. Venice's `/models` is PUBLIC, so it can never be used as a key probe (audit doc).
-- **Venice.ai wired (20:03 UTC)** — `/imagine venice` (safe) · `/imagine venice18` (their own safe_mode off) · `/venicekey` to paste the key.
-  The one provider checked today whose terms permit adult work; audit doc §6. **Unused until Elena adds her key + credits.**
+- **✅ Venice is LIVE on both commands — key resolved, stills AND video proven with real renders.** (The earlier 401 was a
+  truncated paste, 42 chars vs 63; `/models` is PUBLIC so it can never be a key probe — the probe is now a 1-token chat completion.)
+  - **Stills (20:03 UTC):** `/imagine venice` (their `safe_mode` on) · `/imagine venice18` (off) · `/venicekey` to paste a key.
+    Proven: `019-still.jpg` 0.17 MB + `019-still-v.jpg` 0.21 MB. Model cap is **1500 chars**, not the API's 7500 → prompts are trimmed.
+  - **Video (22:34 UTC, `2a2a87c`):** `/visualize venice` (Wan 3.0, 720p) · `/visualize venice18` (Wan 3.0 Pro, 1080p).
+    Proven with money: quote **$0.52** → **119s** → **5.20 MB h264 1280x720 5.038s with a native AAC track**; balance
+    `9.9496845 → 9.429369`, moved by exactly the quote. **$0.104/s — ~7× Grok**, so it is the engine for shots that need it, not a default.
+  - **🚨 A guard that was not guarding:** the pre-render price cap read `price_usd`/`cost_usd`/`usd`/`price`; Venice answers
+    **`{"quote":0.52}`**, so the value was always `NaN` and the cap let **every** price through in silence. Fixed. Print the
+    vendor's raw body once before trusting any guard built on its shape.
+  - **🚫 Do not "fix" `venice18` on `/visualize` into a safe/adult pair.** The VIDEO API has **no `safe_mode`** (only the image API
+    does). Venice marks **44 of 138** video models `uncensored: true`; there `18` is a **tier**, not a filter, and 422 still applies.
+  - Remaining Venice balance **$9.43**. Full contract + traps: audit doc §6–§7, guide traps 25–28.
 - **Money:** Replicate is **PREPAID** (ran out once mid-film; <$5 → 6 jobs/min). Luma, Runway, Anthropic empty — links in
   `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md`.
 - **Open, hers:** nothing on film #8 — s08 was re-rendered clean after her $10 top-up. The published film #7
