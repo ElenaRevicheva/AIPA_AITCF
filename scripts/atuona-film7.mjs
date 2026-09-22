@@ -1,4 +1,4 @@
-// "PARADISE IS COMPILED" — Atuona film #7 from the 20.09.2026 Desktop folder: 19 clips + 20 stills, nothing else.
+// "COULD NOT GENERATE CONTENT." (working title "Paradise Is Compiled") — Atuona film #7 from the 20.09.2026 Desktop folder: 19 clips + 20 stills, nothing else.
 // Stills become video shots via still_motion.py (scripts/atuona-still-motion.py): depth-based 2.5D camera + atmosphere.
 // Pipeline = scripts/atuona-film3.mjs (voice locked to its segment, 1.3s dissolves, serif stanzas, mono cards,
 // ducked music, loudnorm) + still shots + gallery walls for the 9 verticals + motion-interpolated slow-mo.
@@ -20,10 +20,10 @@ const PY = BASE + '/venv/bin/python', SM = BASE + '/still_motion.py';
 const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
 const MONO = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
 const XFADE_D = 1.3, LEAD = 0.7, TAIL = 1.9, MI_FROM = 1.3;
-const FILM_TITLE = 'PARADISE IS COMPILED';
+const FILM_TITLE = 'Could not generate content.';   // #099's title, kept as-is (Elena, 22.09.2026)
 const MOMENTS = '20.09.2026  ·  atuona.xyz Gallery  ·  Moments #099 #015 #024 #037 #022 #020 #066 #091';
 const OUTRO_SUB = 'atuona.xyz // Paradise.js  ·  by Kira Velerevich';
-const SLUG = 'paradise-is-compiled';
+const SLUG = 'could-not-generate-content';
 const GRAIN = 0.014;
 
 const LOG = BASE + '/ffmpeg-commands.log';
@@ -225,8 +225,11 @@ function codeDraw(i, lines, clipDur) {
 
 async function makeCard(titleRaw, subRaw, outFile, d, titleSize, bgVideo, noFadeIn) {
   const tFile = outFile + '_t.txt'; fs.writeFileSync(tFile, track(titleRaw));
-  let draw = `drawtext=fontfile=${MONO}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=${titleSize}:x=(w-text_w)/2:y=(h-text_h)/2-26`;
-  if (subRaw && subRaw.trim()) { const sFile = outFile + '_s.txt'; fs.writeFileSync(sFile, wrap(caps(subRaw), 56, 2)); draw += `,drawtext=fontfile=${MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=20:line_spacing=10:x=(w-text_w)/2:y=(h/2)+40`; }
+  // a long tracked title shrinks to fit 1180px (DejaVuSansMono advance = 0.602 em) instead of running off the frame
+  const size = Math.min(titleSize, Math.floor(1180 / (track(titleRaw).length * 0.602)));
+  let draw = `drawtext=fontfile=${MONO}:textfile=${tFile}:expansion=none:fontcolor=white:fontsize=${size}:x=(w-text_w)/2:y=(h-text_h)/2-26`;
+  // one drawtext per subtitle line: a multi-line drawtext centres the block but left-aligns line 2 under line 1
+  if (subRaw && subRaw.trim()) wrap(caps(subRaw), 56, 2).split('\n').forEach((line, k) => { const sFile = `${outFile}_s${k}.txt`; fs.writeFileSync(sFile, line); draw += `,drawtext=fontfile=${MONO}:textfile=${sFile}:expansion=none:fontcolor=0xBBBBBB:fontsize=20:x=(w-text_w)/2:y=(h/2)+40+${k * 33}`; });
   // noFadeIn: frame 0 is the full title card, so the gallery <video> poster is never black
   const fades = `${noFadeIn ? '' : 'fade=t=in:st=0:d=0.8,'}fade=t=out:st=${(d - 0.8).toFixed(2)}:d=0.8,format=yuv420p`;
   if (bgVideo) {

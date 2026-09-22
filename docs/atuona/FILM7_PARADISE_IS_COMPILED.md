@@ -1,12 +1,14 @@
-# Film #7 — *Paradise Is Compiled* (material of 20.09.2026)
+# Film #7 — *Could not generate content.* (material of 20.09.2026; working title *Paradise Is Compiled*)
 
 **Material = exactly Elena's Desktop folder** `June_July_September 2026 Atuona AI Film studio videos/20.09.2026 AI Film video`
 — 19 videos + 20 stills, **all used, nothing added** (Elena, 21.09.2026: "these exact videos and images … not anything else").
 The stills are turned into video shots by `scripts/atuona-still-motion.py` (2.5D depth reprojection + atmosphere);
 the compile is `scripts/atuona-film7.mjs`. Work dir on Oracle: `/home/ubuntu/atuona-film7/`.
 
-Title from #091: *"Paradise is not found. Paradise is compiled from what you have."* — the film is literally
-compiled from what the folder had, and the stills that "could not move" now move.
+**Title (Elena, 22.09.2026): #099's own title, *Could not generate content.*,** chosen over *Frozen* (#015),
+*The Threshold* (#066) and *Code and Canvas* (#091). The film opens on #099's man at the monitor with that error on the
+screen, so the title is also the first shot. The working title came from #091's line *"Paradise is compiled from what you
+have"*, which still closes the film. Published file slug: `could-not-generate-content-<stamp>.mp4`.
 
 ## 1. Which poem each file belongs to (evidence, not guesses)
 
