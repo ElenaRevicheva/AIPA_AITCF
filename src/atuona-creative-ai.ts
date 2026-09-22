@@ -4838,7 +4838,26 @@ async function generateVideo(
     if (grok.success) return grok;
     return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'grok', options);
   } else if (preferredProvider && isVeniceVideoProvider(preferredProvider)) {
-    const vv = await tryVeniceVideo(preferredProvider, imageUrl, prompt, ctx, pageId);
+    // Venice end to end: its own image engine draws the start frame, its own video engine animates it.
+    //
+    // ⚠️ THE BOUNDARY, do not blur it. This is NOT "Flux refused, so try Venice" — that is re-routing a refusal and
+    // stays off-limits. Flux is never asked in this lane at all; the frame is drawn by the vendor whose own product
+    // permits the register, from the same gallery prompt, on Elena's own paid account. Ask a stricter engine first
+    // and then hand its refusal here and you have broken the rule, whatever the code looks like.
+    let frame = imageUrl;
+    if (options.galleryImagePrompt) {
+      const vf = await runVeniceStill(preferredProvider, options.galleryImagePrompt, '16:9', `venice-frame-${pageId || 'shot'}`);
+      if (vf.url) {
+        frame = vf.url;
+        await ctx.reply(
+          `🖼️ *Start frame drawn by ${imagePinGrade(preferredProvider)}* — not Flux, and not re-encoded for stricter engines.`,
+          { parse_mode: 'Markdown' },
+        );
+      } else if (vf.why) {
+        await ctx.reply(`⚠️ Venice could not draw the start frame (${vf.why}) — animating the gallery still instead.`);
+      }
+    }
+    const vv = await tryVeniceVideo(preferredProvider, frame, prompt, ctx, pageId);
     if (vv.success) return vv;
     return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, preferredProvider, options);
   } else if (preferredProvider && isReplicateVideoProvider(preferredProvider)) {
@@ -5431,7 +5450,11 @@ async function tryVeniceVideo(
   const base = (process.env.VENICE_API_BASE || 'https://api.venice.ai/api/v1').replace(/\/$/, '');
   const { model, resolution, duration, aspectRatio } = veniceVideoSpec(id);
   const capUsd = Number(process.env.VENICE_VIDEO_MAX_USD || 3);
-  const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  // The motion line goes to Venice UNSCRUBBED. `sanitizeMotionForVideoProviders()` swaps words like "nipple" for
+  // "shadow" because Replicate's model makers refuse them; Venice's own product does not, and running their scrubber
+  // on this vendor's input is the premature-sanitization bug from 22 Sep. Venice's own policy still applies — a prompt
+  // it will not take comes back 422, which is the vendor saying no, and a 422 is final for that prompt.
+  const motion = prompt.replace(/\s{2,}/g, ' ').trim();
   const headers = { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
   const post = (path: string, body: unknown, ms = 120_000) =>
     fetch(`${base}${path}`, { method: 'POST', headers, body: JSON.stringify(body), signal: AbortSignal.timeout(ms) });
@@ -5445,7 +5468,7 @@ async function tryVeniceVideo(
 
     const body: Record<string, unknown> = {
       model,
-      prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 900)}`,
+      prompt: `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${motion.substring(0, 1400)}`,
       negative_prompt: 'cartoon, CGI, 3D render, plastic skin, deformed hands, extra fingers, morphing face, text, watermark, logo',
       image_url: imageData,
       duration,
@@ -10615,7 +10638,13 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
         };
 
         // Sensual pages: encode chiaroscuro keyframe for video APIs; gallery still stays erotic for Telegram.
-        if (sensualPage && replicate) {
+        //
+        // NOT in the Venice lane. That softened pass exists because most video engines refuse the gallery still —
+        // it is a concession to the STRICTEST consumer, and running it here flattened the input three steps before
+        // the engine that did not need it (22 Sep: `/visualize venice18 048` animated a chiaroscuro Flux frame and
+        // Venice was never actually asked for anything). Sanitise at the boundary it is for, not at the source.
+        // `generateVideo` builds the Venice lane's start frame with Venice's own image engine instead.
+        if (sensualPage && replicate && !isVeniceVideoProvider(selectedProvider)) {
           const safeFrame = await generateVideoSafeKeyframe(imagePrompt, title, ctx);
           if (safeFrame) {
             videoImageUrl = safeFrame;
