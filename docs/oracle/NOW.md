@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 22 Sep 11:20 | Atuona film #8 — NEW video generations (no stills in the cut), 3–4 min, adult-art register of film #7 | Oracle `/home/ubuntu/atuona-film8/` (new), provider APIs (paid renders), `scripts/atuona-film8*` (new). No PM2 restart, no bot code change. | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
