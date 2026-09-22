@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 21 Sep 16:29 (taken over 22 Sep 01:45 — first session died on 529s) | Atuona film #7, retitled *Could not generate content.* — **with Elena for review; publishes only on her "publish"** | Oracle `/home/ubuntu/atuona-film7/` (new), `data/atuona/films/out/` (add only), `scripts/atuona-film7.mjs` (new), `docs/atuona/FILM_COMPILATION_GUIDE.md`. No PM2 restart. | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,22 +130,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🎬 22 Sep — Film #7 retitled *Could not generate content.* (Elena's pick) — WITH ELENA FOR REVIEW. Not live.
+### 🎬 22 Sep — Film #7 *Could not generate content.* is LIVE (Elena: "Do that and publish the video")
 
-- **DONE:** Elena asked to rename it after one of its poems and to see it before publishing. She picked #099's own title.
-  Re-cut on Oracle (intro card only, all 33 segments reused): `/home/ubuntu/atuona-film7/work/final.mp4`, 188.4s,
-  h264 1280×720 + aac, **−16.0 LUFS, peak −2.0 dBFS**, md5 `8f172a4f4d3bdd739d94dbeb49623661`. Frame 0 = the title card,
-  which dissolves into the #099 monitor showing the same words. Desktop copy
-  `could-not-generate-content-22-09-2026-REVIEW.mp4`, same md5; a 480p phone preview was sent to her in chat.
-  The earlier *Paradise Is Compiled* cut is kept at `work/final_paradise-is-compiled.mp4`. Poem-text check:
-  `docs/atuona/FILM7_PARADISE_IS_COMPILED.md` §6.
-- **NEXT:** wait for her notes → re-cut the named segment (`node film7.mjs --reuse --reseg=N`). On her explicit
-  **"publish"**: `node film7.mjs --publish` → `films.json` lists it and a Range request returns 206 →
-  `python scripts/atuona-add-film-to-site.py D:/aideazz/atuona <published file> <date> "Could not generate content."`
-  (dry-run tested: 7 items, new film first, counts six → seven, JSON-LD round-trip lossless) → push the atuona repo.
-- **VERIFIED BY:** `ffprobe` + `ebur128` on final.mp4; frames at 0 / 3.6 / 5.5s viewed.
-- **RISK:** the auto-mode gate blocks `--publish` as a production deploy. **It needs her "publish" in chat, not an
-  agent's inference.** The English for #015 #020 #022 #024 #037 is our translation, not her words.
+- **Live:** `out/could-not-generate-content-2026-09-22T10-50-15.mp4` (md5 `7bf02576…`, 188.4s, −16.0 LUFS, peak −2.0 dBFS).
+  `films.json` lists **7**, this one first; public Range request → **206**. atuona.xyz static lists updated (atuona `603003ba`:
+  llms.txt, ItemList JSON-LD, noscript, six → seven). Desktop copy `…-PUBLISHED.mp4`, same md5.
+- **Her two changes:** title = #099's own title (was *Paradise Is Compiled*); stanzas now run across the whole width at the
+  bottom (`spread()` + full-width band, `--stanza-preview` to check before a render). Both are rules in the film guide now.
+- **Open, hers to decide:** the gallery shows *Could Not Generate Content*, because `filmTitle()` in `src/cto-aipa.ts`
+  title-cases every file name. Fixing it = a server change + a PM2 restart. The English of #015 #020 #022 #024 #037 is our
+  translation (`docs/atuona/FILM7_PARADISE_IS_COMPILED.md` §2). Two superseded `…-REVIEW.mp4` copies (86 MB each) are still on
+  her Desktop; not deleted.
+- **Oracle disk is 91% full** (4.1 GB free on `/`). `/home/ubuntu/atuona-film7/work/` holds three rollback cuts; clear them
+  only with her go-ahead.
 ### 🟢 21 Sep — CV + COVER LETTER NOW SIT ON ALL 20 "I ACT TODAY" DEALS. Verified in HubSpot.
 
 Elena ticked `files.write` on the `Aldeazz_Marketing_Engine` Service Key, and
