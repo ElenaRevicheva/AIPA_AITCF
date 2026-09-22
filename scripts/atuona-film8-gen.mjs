@@ -44,7 +44,9 @@ const ENGINES = {
   wan: {
     model: 'wan-video/wan-2.7-i2v', perSec: () => 0.10,
     input: o => ({ prompt: o.prompt, negative_prompt: o.negative, first_frame: o.start, ...(o.end ? { last_frame: o.end } : {}),
-      duration: o.duration, resolution: '720p' }),
+      duration: o.duration, resolution: '720p',
+      // Wan rewrites the prompt by default; on s08 that rewrite kept adding cuts to Kira's face -> plan `expand: false`
+      enable_prompt_expansion: o.expand !== false }),
   },
   happyhorse: {
     model: 'alibaba/happyhorse-1.0', perSec: () => 0.14,

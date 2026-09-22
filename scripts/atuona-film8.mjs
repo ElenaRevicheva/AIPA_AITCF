@@ -20,9 +20,9 @@ const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf';
 const MONO = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf';
 const XFADE_D = 1.3, LEAD = 0.7, TAIL = 1.9, MI_FROM = 1.3, VO_GAP = 0.6;
 const PLAN = JSON.parse(fs.readFileSync(BASE + '/plan.json', 'utf8'));
-const FILM_TITLE = process.env.FILM_TITLE || 'Hungry Earth';
+const FILM_TITLE = process.env.FILM_TITLE || 'Crimson Escape';   // #071's title — Elena, 22.09.2026
 const SLUG = FILM_TITLE.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const MOMENTS = '22.09.2026  ·  atuona.xyz Gallery  ·  Fragments  ·  ATUONA #092 #071 #095  ·  LITPROM #007 #039';   // Elena: they are FRAGMENTS, never moments
+const MOMENTS = '22.09.2026  ·  atuona.xyz Gallery  ·  Fragments\nATUONA #092 #071 #095  ·  LITPROM #007 #039';   // Elena: they are FRAGMENTS, never moments
 const OUTRO_SUB = 'atuona.xyz // Paradise.js  ·  by Kira Velerevich';
 const COVER_SHOT = 's09';   // the underwater fall through the mirror shards, darkened behind the title
 

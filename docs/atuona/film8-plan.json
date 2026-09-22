@@ -14,7 +14,7 @@
   },
   "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro from practical light sources, deep blacks, humid tropical air. Luxurious, sensual underground arthouse cinema in the tradition of Roversi, Saudek and Newton: real skin with pores, sweat and water on skin, silk and velvet, raw adult emotion on the face. No text, no letters, no watermark, no logo.",
   "motion_look": "Photoreal live-action, 35mm film grain, slow deliberate cinematic camera, natural physics, real breathing, the same people as in the start frame, faces and bodies unchanged, no text on screen.",
-  "negative": "cartoon, anime, CGI, 3D render, plastic skin, airbrushed, cute, sweet, deformed hands, extra fingers, morphing face, identity change, extra people, text, subtitles, letters, watermark, logo, fast cuts",
+  "negative": "cartoon, anime, CGI, 3D render, plastic skin, airbrushed, cute, sweet, deformed hands, extra fingers, morphing face, identity change, extra people, text, subtitles, letters, watermark, logo, fast cuts, blood, bleeding, fresh wound, open cut, red scar, bruise, injury",
   "characters": {
     "kira": "a Russian woman of about 32: high cheekbones, grey-green eyes, straight dark-chestnut hair falling past her shoulders, pale skin, full lips, a thin old scar through her left eyebrow, slender and strong",
     "ule": "a Norwegian man of about 50: tall and lean, ash-blond hair swept back and grey at the temples, pale blue eyes, a short trimmed greying beard, beige tweed jacket over an open white shirt, blue jeans"
@@ -46,20 +46,20 @@
     },
     "k03": {
       "refs": [
-        "ule_ref"
+        "ule_ref2"
       ],
       "aspect": "16:9",
-      "seed": 80803,
-      "prompt": "By a battered jeep on black volcanic gravel, the man from the reference image — same face, greying beard, ash-blond swept-back hair — lifts a leather suitcase into the back, sweat darkening his open white shirt, his beige tweed jacket over one arm, a cigarette at his lips. Wet jungle, a black mountain in cloud behind him, flat grey light."
+      "seed": 80853,
+      "prompt": "By a battered jeep on black volcanic gravel, the man from the reference image — same face, ash-blond swept-back hair, light golden stubble, pale blue eyes — lifts a leather suitcase into the back, sweat darkening his open white shirt, his beige tweed jacket over one arm, a cigarette at his lips. Wet jungle, a black mountain in cloud behind him, flat grey light."
     },
     "k04": {
       "refs": [
         "kira_ref",
-        "ule_ref"
+        "ule_ref2"
       ],
       "aspect": "16:9",
-      "seed": 80804,
-      "prompt": "Inside an old jeep crawling along a road of black volcanic gravel through mist: the woman from the first reference image (grey-green eyes, dark-chestnut hair, scar through her left eyebrow) and the man from the second reference image (greying beard, ash-blond swept-back hair). She sits in the passenger seat in her soaked cream silk, her temple against the rain-streaked window; he drives, his forearms tanned and wet. Through the windshield the huge dark mountain Temetiu disappears into cloud."
+      "seed": 80854,
+      "prompt": "Inside an old jeep crawling along a road of black volcanic gravel through mist: the woman from the first reference image (grey-green eyes, dark-chestnut hair, scar through her left eyebrow) and the man from the second reference image (ash-blond swept-back hair, light golden stubble, pale blue eyes). She sits in the passenger seat in her soaked cream silk, her temple against the rain-streaked window; he drives, his forearms tanned and wet. Through the windshield the huge dark mountain Temetiu disappears into cloud."
     },
     "k05": {
       "refs": [
@@ -71,28 +71,28 @@
     },
     "k06": {
       "refs": [
-        "kira_ref"
+        "kira_ref_healed"
       ],
       "aspect": "16:9",
-      "seed": 80806,
-      "prompt": "3 AM, the same hotel room drowned in deep crimson light from a red-shaded lamp. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — reclines on rumpled white sheets on an iron bed, posed like Manet's Olympia: propped on pillows, a thin black velvet ribbon at her throat, a red hibiscus behind her ear, a white silk sheet drawn across her body, bare shoulders and long bare legs, one hand resting on her hip. She stares straight into the lens, unashamed and exhausted. Cold blue light from an open laptop at the foot of the bed cuts across her skin; a mosquito net hangs in folds; sweat on her collarbone."
+      "seed": 80906,
+      "prompt": "3 AM, a colonial hotel room on Hiva Oa drowned in deep crimson light from a red-shaded lamp. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, a faint, pale, long-healed hairline scar through her left eyebrow (no redness, no fresh wound) — reclines full-length across the white sheets of an iron bed, posed exactly like Manet's Olympia: propped on two white pillows, her body turned toward the camera, a white silk sheet drawn across her body, bare shoulders, bare arms and long bare legs crossed at the ankle, her left hand resting on her hip, a thin black velvet ribbon at her throat, a red hibiscus in her hair, a single gold bangle on her wrist. She stares straight into the lens — calm, unashamed, sovereign. At the foot of the bed a black cat arches its back, as in Manet's painting; beside it an open laptop throws cold blue light across her skin. A mosquito net hangs in folds; sweat on her collarbone."
     },
     "k07": {
       "refs": [
         "kira_ref",
-        "ule_ref"
+        "ule_ref2"
       ],
       "aspect": "16:9",
-      "seed": 80827,
-      "prompt": "3 AM, the hotel room drowned in deep crimson light from a red-shaded lamp, white silk sheets in disorder: the woman from the first reference image (grey-green eyes, dark-chestnut hair, scar through her left eyebrow) and the man from the second reference image (greying beard, ash-blond swept-back hair). She lies on her stomach across the bed, her bare back and shoulders glistening with sweat, a thin black velvet ribbon at her throat, her cheek on the pillow, eyes open and fixed on him. He sits on the edge of the bed with his back to her, broad shoulders, buttoning his white shirt, his face turned away toward the dark window. A mosquito net hangs in folds; the cold blue glow of an open laptop on the floor lights the edge of the sheets. The intimacy is over and he is already leaving."
+      "seed": 80877,
+      "prompt": "3 AM, the hotel room drowned in deep crimson light from a red-shaded lamp, white silk sheets in disorder: the woman from the first reference image (grey-green eyes, dark-chestnut hair, scar through her left eyebrow) and the man from the second reference image (ash-blond swept-back hair, light golden stubble, pale blue eyes). She lies on her stomach across the bed, her bare back and shoulders glistening with sweat, a thin black velvet ribbon at her throat, her cheek on the pillow, eyes open and fixed on him. He sits on the edge of the bed with his back to her, broad shoulders, buttoning his white shirt, his face turned away toward the dark window. A mosquito net hangs in folds; the cold blue glow of an open laptop on the floor lights the edge of the sheets. The intimacy is over and he is already leaving."
     },
     "k08": {
       "refs": [
-        "kira_ref"
+        "kira_ref_healed"
       ],
       "aspect": "16:9",
-      "seed": 80808,
-      "prompt": "4 AM. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — sits on the floor against the iron bed in a black silk slip, bare legs drawn up, a laptop on her knees, lit by crimson lamplight and the cold blue screen; lines of code reflected in her eyes; sweat at her temples; jaw set, obsessive."
+      "seed": 80858,
+      "prompt": "4 AM. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, a faint, pale, long-healed hairline scar through her left eyebrow (no redness, no fresh wound) — sits on the floor against the iron bed in a black silk slip, bare legs drawn up, a laptop on her knees, lit by crimson lamplight and the cold blue screen; lines of code reflected in her eyes; sweat at her temples; jaw set, obsessive."
     },
     "k09": {
       "refs": [
@@ -104,11 +104,11 @@
     },
     "k10": {
       "refs": [
-        "ule_ref"
+        "ule_ref2"
       ],
       "aspect": "16:9",
-      "seed": 80810,
-      "prompt": "In a dark room, the man from the reference image — same face, greying beard, ash-blond swept-back hair — sits deep in a blood-red velvet armchair, lit only from behind by red light, his face half in shadow, exhaling a slow thick ring of vapour; eyes glinting; a crystal glass in his hand."
+      "seed": 80860,
+      "prompt": "In a dark room, the man from the reference image — same face, ash-blond swept-back hair, light golden stubble, pale blue eyes — sits deep in a blood-red velvet armchair, lit only from behind by red light, his face half in shadow, exhaling a slow thick ring of vapour; eyes glinting; one hand resting on the velvet armrest."
     },
     "k11": {
       "refs": [
@@ -128,11 +128,11 @@
     },
     "k13": {
       "refs": [
-        "kira_ref"
+        "kira_ref_healed"
       ],
       "aspect": "16:9",
-      "seed": 80813,
-      "prompt": "A stone cellar like a dungeon, lit by candles. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — faces a tall tarnished antique mirror, bare shoulders, wet hair, mascara running with tears, staring hard at herself; her reflection stares back."
+      "seed": 80913,
+      "prompt": "A stone cellar like a dungeon, lit by many candles. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, a faint, pale, long-healed hairline scar through her left eyebrow (no redness, no fresh wound) — stands in a black silk slip facing a tall tarnished antique mirror, wet hair, tears on her cheeks, staring hard at herself; her reflection stares back."
     },
     "k14": {
       "refs": [
@@ -160,11 +160,24 @@
     },
     "k17": {
       "refs": [
-        "kira_ref"
+        "kira_ref_healed"
       ],
       "aspect": "16:9",
-      "seed": 80817,
-      "prompt": "Dawn. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, the thin scar through her left eyebrow — stands in the surf up to her thighs, facing the camera, her black silk slip soaked, one strap fallen from her shoulder, wet hair across her face, the sun breaking over the black cliffs behind her; her face fierce and unafraid, eyes locked on the lens."
+      "seed": 80867,
+      "prompt": "Dawn. the woman from the reference image — same face, grey-green eyes, dark-chestnut hair, a faint, pale, long-healed hairline scar through her left eyebrow (no redness, no fresh wound) — stands in the surf up to her thighs, facing the camera, her black silk slip soaked, one strap fallen from her shoulder, wet hair across her face, the sun breaking over the black cliffs behind her; her face fierce and unafraid, eyes locked on the lens."
+    },
+    "ule_ref2": {
+      "aspect": "3:4",
+      "seed": 80852,
+      "prompt": "Character reference portrait. A strikingly handsome Norwegian billionaire of about 45 — an oligarch with old-money calm: tall, athletic, broad-shouldered, a strong jaw with light golden stubble, ash-blond hair swept back, piercing pale blue eyes, sun-tanned skin, a slow confident half-smile that is more dangerous than friendly. A bespoke beige tweed jacket over an open white shirt, the collar open to his chest. He looks straight into the lens, magnetic, composed, sexual. Soft window light from the left, dark background, head and shoulders, sharp focus on the eyes."
+    },
+    "kira_ref_healed": {
+      "refs": [
+        "kira_ref"
+      ],
+      "aspect": "3:4",
+      "seed": 80851,
+      "prompt": "The same woman from the reference image — identical face, eyes, hair, lighting and framing. Change only one thing: the scar through her left eyebrow is now a faint, pale, long-healed thin white line, barely visible, with no redness, no cut and no blood."
     }
   },
   "shots": {
@@ -237,7 +250,7 @@
       "poem": "071",
       "start": "k06",
       "duration": 13,
-      "motion": "She holds the stare into the lens and breathes slowly; the silk sheet rises and falls with her breath; sweat beads on her collarbone; the mosquito net sways in the fan's air; the laptop light flickers across her skin; the camera creeps in toward her eyes. Charged, unashamed, luxurious.",
+      "motion": "She holds the stare into the lens and breathes slowly; the silk rises and falls with her breath; the black cat at the foot of the bed arches and settles; sweat beads on her collarbone; the mosquito net sways in the fan's air; the laptop light flickers across her skin; the camera creeps in toward her eyes. Charged, unashamed, luxurious.",
       "vo": [
         {
           "voice": "ule",
@@ -250,7 +263,7 @@
       "poem": "071",
       "start": "k07",
       "duration": 13,
-      "motion": "His hand rests on her bare calf, then slowly withdraws; he turns his face away toward the dark window and does not look back; she watches him, lips parted, breath uneven, her fingers tightening in the satin; the crimson light breathes; the mosquito net stirs in the fan air.",
+      "motion": "He stands at the edge of the bed fastening his cuff, looks at her one last time, then turns away toward the door and does not look back; she watches him from the pillow, lips parted, breath uneven, her fingers tightening in the satin; the crimson light breathes.",
       "vo": [
         {
           "voice": "ule",
@@ -270,7 +283,8 @@
           "text": "Paradise isn't where demons die.\nIt's where they finally get API keys.\nThe beast doesn't sleep.\nIt just waits for your next commit."
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "expand": false
     },
     "s09": {
       "poem": "007",
@@ -391,7 +405,8 @@
           "text": "I will not whiten."
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "trim": 9.8
     },
     "b06": {
       "poem": "071",
