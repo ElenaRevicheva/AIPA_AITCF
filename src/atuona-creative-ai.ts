@@ -19,6 +19,9 @@ import {
   visualizeHelpLines,
   visualizeMenuLines,
   visualizeStatusLines,
+  isReplicateVideoProvider,
+  replicateVideoInput,
+  type ReplicateVideoProvider,
 } from './atuona-video-pins';
 import {
   imageHelpLine,
@@ -28,9 +31,13 @@ import {
   imagineDefaultLine,
   imagineHelpLines,
   imagineMenuLines,
+  imagePinModel,
+  isReplicateImageProvider,
   parseImageProvider,
+  replicateImageInput,
   type AddedImageProvider,
   type ImageCommandProvider,
+  type ReplicateImageProvider,
 } from './atuona-image-pins';
 import { runAddedImageProviders, runAddedImageProvidersDetailed } from './atuona-image-waterfall';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
@@ -323,6 +330,39 @@ async function runFluxStillOnce(
   return null;
 }
 
+/** Telegram rejects a message over 4096 chars ("Bad Request: message is too long") and the command then answers
+ *  nothing — /menu did exactly that after 13 engines were added on 22 Sep 2026. Split at line breaks and send in order;
+ *  every menu/help line is self-contained Markdown, so no bold or code span is cut in half. */
+async function replyChunked(ctx: Context, text: string, opts: Parameters<Context['reply']>[1] = {}): Promise<void> {
+  const LIMIT = 3900;
+  let buf = '';
+  for (const line of text.split('\n')) {
+    if (buf && buf.length + 1 + line.length > LIMIT) { await ctx.reply(buf, opts); buf = line; }
+    else buf = buf ? `${buf}\n${line}` : line;
+  }
+  if (buf.trim()) await ctx.reply(buf, opts);
+}
+
+/** One Replicate stills run for a named engine (22 Sep 2026 additions). Input = pins' replicateImageInput(); safety knobs untouched. */
+async function runReplicateStill(
+  id: ReplicateImageProvider,
+  prompt: string,
+  aspectRatio: string
+): Promise<{ url: string | null; why?: string }> {
+  if (!replicate) return { url: null, why: 'REPLICATE_API_TOKEN missing' };
+  const model = imagePinModel(id);
+  try {
+    console.log(`Trying ${imagePinGrade(id)} (${model})...`);
+    const out = await replicate.run(model as `${string}/${string}`, { input: replicateImageInput(id, prompt, aspectRatio) });
+    const url = replicateVideoUrl(out);   // same output shapes as video: URL string, array, or FileOutput
+    if (url) { console.log(`✅ ${imagePinGrade(id)} still:`, url.slice(0, 80) + '…'); return { url }; }
+    return { url: null, why: `${imagePinGrade(id)} returned no image` };
+  } catch (e: any) {
+    console.error(`${imagePinGrade(id)} error:`, e?.message);
+    return { url: null, why: String(e?.message || 'error').slice(0, 180) };
+  }
+}
+
 async function generateStillForPrompt(
   prompt: string,
   aspectRatio: string,
@@ -330,7 +370,15 @@ async function generateStillForPrompt(
   persistStem?: string,
   onNamedMiss?: (why: string) => Promise<void>
 ): Promise<DeliverableStill | null> {
-  const addedPrefer = prefer && prefer !== 'flux' ? prefer : undefined;
+  // Replicate stills (Seedream, GPT Image 2, Grok, Nano Banana Pro, Imagen 4, Ideogram, Qwen, Wan, Hunyuan): named-only,
+  // and a miss falls back to Flux exactly like a Luma/Omni/Runway miss.
+  if (prefer && isReplicateImageProvider(prefer)) {
+    const still = await runReplicateStill(prefer, prompt, aspectRatio);
+    if (still.url) return { url: still.url, modelUsed: imagePinGrade(prefer) };
+    if (onNamedMiss) await onNamedMiss(still.why || `${imagePinGrade(prefer)} returned no still`);
+    return runFluxStillOnce(prompt, aspectRatio, aspectRatio === '9:16' ? 6 : 5);
+  }
+  const addedPrefer = prefer && prefer !== 'flux' ? (prefer as AddedImageProvider) : undefined;
   if (prefer && prefer !== 'flux' && addedPrefer) {
     const { result, miss } = await runAddedImageProvidersDetailed({
       prompt,
@@ -4433,7 +4481,8 @@ interface VideoGenerationResult {
   success: boolean;
   videoUrl?: string;
   taskId?: string;
-  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance' | 'wan' | 'grok' | 'none';
+  provider: 'luma-direct' | 'luma-replicate' | 'runway' | 'veo' | 'omni' | 'kling' | 'seedance' | 'wan' | 'grok'
+    | 'sora' | 'pixverse' | 'happyhorse' | 'hailuo' | 'none';
   error?: string;
   needsPolling?: boolean;
 }
@@ -4450,6 +4499,7 @@ function visualizeEngineLabel(
   if (provider === 'seedance') return 'Seedance 2.5';
   if (provider === 'wan') return 'Wan 2.7';
   if (provider === 'grok') return 'Grok Imagine 1.5';
+  if (isReplicateVideoProvider(provider)) return providerGrade(provider).split(' (')[0] ?? providerGrade(provider);
   if (provider === 'runway') return 'Runway Gen-4.5';
   if (provider === 'luma-direct') return 'Luma ray-3.2';
   return 'Luma via Replicate';
@@ -4699,6 +4749,10 @@ async function generateVideo(
     const grok = await tryGrok(imageUrl, prompt, ctx);
     if (grok.success) return grok;
     return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, 'grok', options);
+  } else if (preferredProvider && isReplicateVideoProvider(preferredProvider)) {
+    const rv = await tryReplicateVideo(preferredProvider, imageUrl, prompt, ctx);
+    if (rv.success) return rv;
+    return runExplicitProviderFallback(imageUrl, prompt, ctx, pageId, preferredProvider, options);
   } else if (preferredProvider === 'deepseek') {
     const seedance = await trySeedance(
       imageUrl,
@@ -5231,6 +5285,33 @@ function replicateVideoUrl(out: unknown): string | null {
   const o = out as { url?: () => URL };
   if (typeof o.url === 'function') { try { return o.url().href; } catch { /* ignore */ } }
   return null;
+}
+
+/** Sora 2 Pro / PixVerse v6 / HappyHorse 1.0 / Hailuo 2.3 image→video via REPLICATE_API_TOKEN (additive, 22 Sep 2026). */
+async function tryReplicateVideo(
+  id: ReplicateVideoProvider,
+  imageUrl: string,
+  prompt: string,
+  ctx: Context
+): Promise<VideoGenerationResult> {
+  if (!replicate) return { success: false, provider: id, error: `${providerGrade(id)} needs REPLICATE_API_TOKEN` };
+  const safeMotion = sanitizeMotionForVideoProviders(prompt);
+  const model = videoPinModel(id);
+  try {
+    await ctx.reply(`🎬 *Generating video with ${providerGrade(id).split(' (')[0]}...*\n\n_${model} · takes 2–6 minutes..._`, { parse_mode: 'Markdown' });
+    const out = await replicate.run(model as `${string}/${string}`, {
+      input: replicateVideoInput(id, imageUrl, `Cinematic fragment. ${VIDEO_MOTION_ANCHOR} ${safeMotion.substring(0, 350)}`),
+    });
+    const videoUrl = replicateVideoUrl(out);
+    if (videoUrl) {
+      console.log(`✅ ${id} via Replicate succeeded:`, videoUrl.substring(0, 80) + '…');
+      return { success: true, videoUrl, provider: id, needsPolling: false };
+    }
+    return { success: false, provider: id, error: `${id} returned invalid output` };
+  } catch (err: any) {
+    console.error(`${id} video error:`, err.message);
+    return { success: false, provider: id, error: err.message };
+  }
 }
 
 /** Wan 2.7 image→video via REPLICATE_API_TOKEN (additive, 22 Sep 2026). Boldest on emotional close shots in the film #8 test. */
@@ -5801,7 +5882,7 @@ _Pages: \`/deepseek\`. Video: \`/visualize deepseek 048\`._
 • /update 047 ru = REPLACE #047 in Russian (original)`, { parse_mode: 'Markdown' });
       
     } else if (topic === 'film' || topic === 'visual' || topic === 'video') {
-      await ctx.reply(`🎬 *AI Film Studio Help*
+      await replyChunked(ctx, `🎬 *AI Film Studio Help*
 
 *Create visuals for a page:*
 \`/visualize 052\` → Specific page (default: Luma)
@@ -5893,7 +5974,7 @@ See: github.com/ElenaRevicheva/AIPA_AITCF/blob/main/ATUONA-BOOK-ROADMAP.md
 *Publish:* /preview, /publish, /setpage
 *Drafts:* /draft, /read
 *Proactive:* /proactive, /dailyinspire, /history
-*Film:* /visualize (luma · omni · veo · runway · kling · seedance · wan · grok · deepseek), /gallery, /film, /videostatus
+*Film:* /visualize (luma · omni · veo · runway · kling · seedance · wan · grok · sora · pixverse · happyhorse · hailuo · deepseek), /gallery, /film, /videostatus
 *Social:* /post
 *Export:* /export, /import_backup
 *Tools:* /spanish, /imagine
@@ -6076,7 +6157,7 @@ ${imagineMenuLines('048')}
 /style - 🎨 My writing style guide
 /fixgallery - 🔧 Fix gallery issues
     `;
-    await ctx.reply(menuMessage, { parse_mode: 'Markdown' });
+    await replyChunked(ctx, menuMessage, { parse_mode: 'Markdown' });
   });
 
   /**
@@ -9507,7 +9588,7 @@ ${imageStatusLines({
       const maybeVideo = parseVideoProvider(parts[0] ?? '');
       if (maybeVideo && !maybeImage) {
         await ctx.reply(
-          `🎬 *${maybeVideo}* is a video engine.\n\nUse \`/visualize ${maybeVideo} ${parts[1] || '048'}\` for the clip.\nStills: \`/imagine flux 048\` · \`/imagine luma 048\` · \`/imagine omni 048\` · \`/imagine runway 048\`.`,
+          `🎬 *${maybeVideo}* is a video engine.\n\nUse \`/visualize ${maybeVideo} ${parts[1] || '048'}\` for the clip.\nStills: \`/imagine <engine> 048\` — flux · luma · omni · runway · seedream · gpt · grok · nanopro · imagen4 · ideogram · qwen · wan · hunyuan (all in /menu).`,
           { parse_mode: 'Markdown' }
         );
         return;
@@ -9695,6 +9776,10 @@ ${visualizeStatusLines({
         seedance: Boolean(replicate),
         wan: Boolean(replicate),
         grok: Boolean(replicate),
+        sora: Boolean(replicate),
+        pixverse: Boolean(replicate),
+        happyhorse: Boolean(replicate),
+        hailuo: Boolean(replicate),
         deepseek: Boolean(replicate),
       })}
 ✍️ DeepSeek Flash: ${deepseekConfigured() ? '✅ /deepseek' : '⚪ /deepseekkey then /deepseek'}
@@ -10278,7 +10363,7 @@ Use \`/gallery\` to see all visualizations!`, { parse_mode: 'Markdown' });
 
         if (videoResult.success) {
           // Ready URL providers (Replicate, Veo, Kling, Omni) → direct delivery.
-          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance' || videoResult.provider === 'wan' || videoResult.provider === 'grok')) {
+          if (videoResult.videoUrl && (videoResult.provider === 'luma-replicate' || videoResult.provider === 'veo' || videoResult.provider === 'kling' || videoResult.provider === 'omni' || videoResult.provider === 'seedance' || videoResult.provider === 'wan' || videoResult.provider === 'grok' || isReplicateVideoProvider(videoResult.provider))) {
             const providerLabel = visualizeEngineLabel(videoResult.provider, selectedProvider);
             visualization.videoUrlHorizontal = videoResult.videoUrl;
             visualization.status = 'complete';

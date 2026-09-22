@@ -13,7 +13,26 @@ dotenv.config({ override: true });
  * then the current video chain runs.
  */
 
-export type VideoProvider = 'luma' | 'omni' | 'runway' | 'veo' | 'kling' | 'seedance' | 'wan' | 'grok' | 'deepseek';
+export type VideoProvider =
+  | 'luma' | 'omni' | 'runway' | 'veo' | 'kling' | 'seedance' | 'wan' | 'grok'
+  | 'sora' | 'pixverse' | 'happyhorse' | 'hailuo'
+  | 'deepseek';
+
+/** Generic Replicate image→video engines (22 Sep 2026): one runner, per-model input below. */
+export type ReplicateVideoProvider = 'sora' | 'pixverse' | 'happyhorse' | 'hailuo';
+export const REPLICATE_VIDEO_IDS: readonly ReplicateVideoProvider[] = ['sora', 'pixverse', 'happyhorse', 'hailuo'];
+export function isReplicateVideoProvider(id: string | null | undefined): id is ReplicateVideoProvider {
+  return !!id && (REPLICATE_VIDEO_IDS as readonly string[]).includes(id);
+}
+/** Input per model — prompt, start frame, length, size only (schemas read from Replicate 22 Sep 2026; no safety knobs). */
+export function replicateVideoInput(id: ReplicateVideoProvider, imageUrl: string, prompt: string): Record<string, unknown> {
+  switch (id) {
+    case 'sora': return { prompt, input_reference: imageUrl, seconds: 8, resolution: 'standard', aspect_ratio: 'landscape' };
+    case 'pixverse': return { prompt, image: imageUrl, duration: 8, quality: '720p' };
+    case 'happyhorse': return { prompt, image: imageUrl, duration: 8, resolution: '720p' };
+    case 'hailuo': return { prompt, first_frame_image: imageUrl, duration: 6, resolution: '768p' };
+  }
+}
 
 export type VideoPin = {
   id: VideoProvider;
@@ -42,6 +61,10 @@ export const VIDEO_PIN_ORDER: readonly VideoProvider[] = [
   'seedance',
   'wan',
   'grok',
+  'sora',
+  'pixverse',
+  'happyhorse',
+  'hailuo',
   'deepseek',
 ];
 
@@ -118,6 +141,44 @@ export const VIDEO_PINS: Record<VideoProvider, VideoPin> = {
     emoji: '🎬',
     env: 'GROK_VIDEO_REPLICATE_MODEL',
     fallback: 'xai/grok-imagine-video-1.5',
+    kind: 'video',
+  },
+  // Replicate prices 22 Sep 2026: Sora 2 Pro $0.30–0.50/s (8 s ≈ $2.40+), PixVerse v6 $0.05–0.23/s,
+  // HappyHorse $0.14/s @720p, Hailuo 2.3 $0.28–0.56 per clip.
+  sora: {
+    id: 'sora',
+    aliases: ['sora', 'sora2', 'sora-2', 'sora2pro', 'openai'],
+    grade: 'OpenAI Sora 2 Pro (premium, ~$2.40/clip)',
+    emoji: '🎬',
+    env: 'SORA_REPLICATE_MODEL',
+    fallback: 'openai/sora-2-pro',
+    kind: 'video',
+  },
+  pixverse: {
+    id: 'pixverse',
+    aliases: ['pixverse', 'pixverse6', 'pixverse-v6'],
+    grade: 'PixVerse v6 (physics, fast)',
+    emoji: '🎬',
+    env: 'PIXVERSE_REPLICATE_MODEL',
+    fallback: 'pixverse/pixverse-v6',
+    kind: 'video',
+  },
+  happyhorse: {
+    id: 'happyhorse',
+    aliases: ['happyhorse', 'happy-horse', 'horse'],
+    grade: 'HappyHorse 1.0 (Alibaba)',
+    emoji: '🎬',
+    env: 'HAPPYHORSE_REPLICATE_MODEL',
+    fallback: 'alibaba/happyhorse-1.0',
+    kind: 'video',
+  },
+  hailuo: {
+    id: 'hailuo',
+    aliases: ['hailuo', 'minimax', 'hailuo23'],
+    grade: 'Hailuo 2.3 (realistic human motion)',
+    emoji: '🎬',
+    env: 'HAILUO_REPLICATE_MODEL',
+    fallback: 'minimax/hailuo-2.3',
     kind: 'video',
   },
   deepseek: {
