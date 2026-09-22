@@ -6267,13 +6267,20 @@ ${imagineMenuLines('048')}
       setTimeout(() => { try { child.kill(); } catch { /* already gone */ } resolve(); }, 120_000);
     });
     const result = out.join('').trim().split('\n').pop() || '(no output)';
+    const stored = result.startsWith('OK:');
     await ctx.reply(
-      result.startsWith('OK:')
-        ? '✅ Venice is wired in.\n\n' + result + '\n\n_Restarting picks it up: `/imagine venice 048` (safe mode) · `/imagine venice18 048` (adult).' +
-          '\nA key change needs one `pm2 restart cto-aipa --update-env` — ask CTO._'
+      stored
+        ? '✅ Venice is wired in.\n\n' + result +
+          '\n\n_Reloading myself in a few seconds — then `/imagine venice 048` (safe mode) · `/imagine venice18 048` (adult)._'
         : '❌ Venice did not accept that key, so nothing was written.\n\n' + result,
       { parse_mode: 'Markdown' },
     );
+    // .env is read once at boot, so a key written now is invisible until a restart — do it after replying,
+    // detached, so she never has to come back and ask for one.
+    if (stored) {
+      const reload = spawn('bash', ['-lc', 'sleep 3; pm2 restart cto-aipa --update-env'], { detached: true, stdio: 'ignore' });
+      reload.unref();
+    }
   });
 
   atuonaBot.command('deepseekkey', async (ctx) => {

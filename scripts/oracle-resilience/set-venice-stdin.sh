@@ -6,10 +6,12 @@
 # touches argv, so it cannot appear in `ps`; the curl Authorization header is
 # passed via --config on stdin for the same reason.
 #
-# ⚠️ THE PROBE MUST REQUIRE AUTH. Venice's /models endpoint is PUBLIC (22 Sep 2026:
-# 200 with no key at all, and 200 with a deliberately fake key), so probing it
-# "verified" anything at all and wrote keys that could not spend a cent.
-# /api_keys/rate_limits needs the key, so that is the probe.
+# ⚠️ THE PROBE MUST REQUIRE AUTH, AND MUST BE THE THING WE ACTUALLY NEED. Venice's
+# /models endpoint is PUBLIC (22 Sep 2026: 200 with no key at all, and 200 with a
+# deliberately fake key), so probing it verified nothing and wrote keys that could not
+# spend a cent. /api_keys/* may be admin-only, which would reject a perfectly good
+# inference key. So the probe is a 1-token chat completion: if that succeeds, the key
+# can run inference, which is the whole point.
 #
 # VENICE_ENV_FILE overrides the target file, so this script can be tested
 # without touching the live .env.
@@ -24,12 +26,15 @@ if [ -z "$KEY" ]; then
 fi
 
 # --- probe before write -----------------------------------------------------
+PROBE_MODEL="${VENICE_PROBE_MODEL:-venice-uncensored}"
 CODE="$(printf 'header = "Authorization: Bearer %s"\n' "$KEY" | curl -sS \
   --config - \
   -o /tmp/venice-probe.$$ -w '%{http_code}' \
-  --max-time 60 \
-  'https://api.venice.ai/api/v1/api_keys/rate_limits' || echo 000)"
-BAL="$(grep -o '"balances"[^}]*}' /tmp/venice-probe.$$ 2>/dev/null | head -c 120 || true)"
+  --max-time 90 \
+  -H 'Content-Type: application/json' \
+  -d "{\"model\":\"$PROBE_MODEL\",\"messages\":[{\"role\":\"user\",\"content\":\"ok\"}],\"max_tokens\":1}" \
+  'https://api.venice.ai/api/v1/chat/completions' || echo 000)"
+BAL="$(grep -o '"error"[^,}]*' /tmp/venice-probe.$$ 2>/dev/null | head -c 120 || true)"
 rm -f /tmp/venice-probe.$$
 
 case "$CODE" in
