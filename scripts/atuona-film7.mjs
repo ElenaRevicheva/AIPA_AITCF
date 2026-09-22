@@ -205,10 +205,27 @@ async function renderStill(seg, d) {
   return out;
 }
 
-function textDraw(lines, clipDur) {
+// Stanzas run across the whole width at the bottom (Elena, 22.09.2026 — a 50-column block in a small box sat in the
+// middle of the frame). Verse lines are joined, in order, into the fewest screen lines that fit STANZA_COLS, choosing
+// the cut that keeps the lines most even; each line is centred inside a full-width band that fades with the text.
+const STANZA_SIZE = 22, STANZA_COLS = 92;
+function spread(text, maxCols = STANZA_COLS) {
+  const verse = String(text).replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean);
+  const len = g => g.join(' ').length;
+  // every way to cut the verse lines from `from` on into n consecutive groups
+  const parts = (from, n) => n === 1 ? [[verse.slice(from)]]
+    : Array.from({ length: verse.length - from - n + 1 }, (_, k) => from + k + 1)
+        .flatMap(cut => parts(cut, n - 1).map(rest => [verse.slice(from, cut), ...rest]));
+  for (let n = 1; n <= verse.length; n++) {
+    const fits = parts(0, n).filter(p => p.every(g => len(g) <= maxCols));
+    if (fits.length) return fits.sort((a, b) => Math.max(...a.map(len)) - Math.max(...b.map(len)))[0].map(g => g.join(' ')).join('\n');
+  }
+  return wrap(verse.join(' '), maxCols, 7);   // one verse line wider than the frame: plain wrap
+}
+function textDraw(lines, clipDur, opaque) {
   const fo = (clipDur - 1.0).toFixed(2);
-  const alpha = `if(lt(t,0.7),t/0.7,if(gt(t,${fo}),max(0,(${clipDur.toFixed(2)}-t)/1.0),1))`;
-  return `,drawtext=fontfile=${FONT}:textfile=${lines}:expansion=none:fontcolor=white:fontsize=22:line_spacing=6:box=1:boxcolor=black@0.5:boxborderw=14:x=(w-text_w)/2:y=h-text_h-30:alpha='${alpha}'`;
+  const alpha = opaque ? '1' : `if(lt(t,0.7),t/0.7,if(gt(t,${fo}),max(0,(${clipDur.toFixed(2)}-t)/1.0),1))`;
+  return `,drawtext=fontfile=${FONT}:textfile=${lines}:expansion=none:fontcolor=white:fontsize=${STANZA_SIZE}:line_spacing=9:text_align=C:x=0:y=h-text_h-26:box=1:boxw=1280:boxborderw=22|0|26|0:boxcolor=black@0.42:shadowcolor=black@0.6:shadowx=0:shadowy=1:alpha='${alpha}'`;
 }
 function codeDraw(i, lines, clipDur) {
   // git lines appear one by one (monospace — they are code), all fade out with the segment
@@ -258,8 +275,29 @@ async function main() {
     return;
   }
   for (const d of [W, SC, SPECS]) fs.mkdirSync(d, { recursive: true });
-  fs.writeFileSync(LOG, '');
   const STANZAS = JSON.parse(fs.readFileSync(BASE + '/stanzas.json', 'utf8'));
+
+  // --stanza-preview: every stanza in the current layout over frame 0 of its built segment (text-free there: the
+  // alpha starts at 0), plus each screen line's width in pixels. Renders nothing into the film.
+  if (process.argv.includes('--stanza-preview')) {
+    const PV = path.join(W, 'stanza-preview'); fs.mkdirSync(PV, { recursive: true });
+    const tl = JSON.parse(fs.readFileSync(path.join(W, 'timeline.json'), 'utf8')).filter(s => s.stanza);
+    for (const s of tl) {
+      const txt = path.join(PV, `${s.stanza}.txt`), lines = spread(STANZAS[s.stanza].text);
+      fs.writeFileSync(txt, lines);
+      const seg = path.join(W, `seg_${String(s.i - 1).padStart(2, '0')}.mp4`);
+      await execFileP('ffmpeg', ['-nostdin', '-v', 'error', '-y', '-i', seg, '-frames:v', '1', '-vf', 'null' + textDraw(txt, 99, true), path.join(PV, `${s.stanza}.png`)]);
+      const widths = [];
+      for (const [k, line] of lines.split('\n').entries()) {
+        const lf = path.join(PV, `${s.stanza}_w${k}.txt`); fs.writeFileSync(lf, line);
+        const r = await execFileP0('ffmpeg', ['-nostdin', '-f', 'lavfi', '-i', 'color=c=black:s=1800x80', '-vf', `drawtext=fontfile=${FONT}:textfile=${lf}:expansion=none:fontcolor=white:fontsize=${STANZA_SIZE}:x=10:y=20,bbox=min_val=40`, '-frames:v', '1', '-f', 'null', '-'], { maxBuffer: 1 << 24 }).catch(e => e);
+        widths.push(+((String(r.stderr).match(/ w:(\d+)/) || [])[1] || -1));
+      }
+      console.log(`${s.stanza} ${lines.split('\n').length} line(s), widest ${Math.max(...widths)}px of 1280 | ${lines.replace(/\n/g, ' ⏎ ')}`);
+    }
+    console.log('PREVIEW', PV); return;
+  }
+  fs.writeFileSync(LOG, '');
 
   // every clip and every still exactly once
   const used = SEQ.filter(s => s.clip).map(s => s.clip).sort();
@@ -316,7 +354,7 @@ async function main() {
     const out = path.join(W, `seg_${String(i).padStart(2, '0')}.mp4`);
     if (reuse && !reseg.includes(i) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segFiles[i] = out; return; }
     let draw = '';
-    if (p.seg.stanza) { const txt = path.join(W, `p_${i}.txt`); fs.writeFileSync(txt, wrap(STANZAS[p.seg.stanza].text, 50, 7)); draw = textDraw(txt, p.d); }
+    if (p.seg.stanza) { const txt = path.join(W, `p_${i}.txt`); fs.writeFileSync(txt, spread(STANZAS[p.seg.stanza].text)); draw = textDraw(txt, p.d); }
     if (p.seg.code) draw += codeDraw(i, p.seg.code, p.d);
     let vf, inArgs;
     if (p.seg.clip) {

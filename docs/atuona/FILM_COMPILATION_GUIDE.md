@@ -115,7 +115,11 @@ Each of these was a real iteration; the exact filter strings are in `scripts/atu
   stuck frame — e.g. an open mouth).
 - **Normalize:** `scale=1280:720:force_original_aspect_ratio=decrease,pad=…` , 30fps, yuv420p,
   libx264 `-preset veryfast -crf 20`, aac 44.1kHz stereo.
-- **Poem text:** DejaVuSerif 22, `box=1:boxcolor=black@0.5`, bottom band, fade in 0.7s,
+- **Poem text runs ACROSS THE WHOLE WIDTH at the bottom** (Elena, 22.09.2026 — a narrow 50-column block in a small
+  box read as "placed in the centre"). Join the verse lines, in order, into the fewest screen lines that fit ~92 cols
+  (balanced), each centred in a full-width band: `text_align=C:x=0:boxw=1280:boxborderw=22|0|26|0:boxcolor=black@0.42`
+  (ffmpeg ≥ 6.1). `spread()` + `node film7.mjs --stanza-preview` (renders every stanza + its pixel width, builds nothing).
+  DejaVuSerif 22, fade in 0.7s,
   fade out over the clip's last 1.0s (so stanzas never overlap a dissolve).
   Escape commas inside drawtext expressions (`if(lt(t\,0.7)…)`); use `textfile=` + `expansion=none`.
 - **Transitions:** `xfade=transition=fade:duration=1.3` + `acrossfade=d=1.3` (0.8 felt cutty).

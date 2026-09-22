@@ -65,7 +65,7 @@ line by line, and the fragments are cut verbatim from them. **Elena: correct any
 **#020 Ничья — Nobody's**
 > Give me back a little more of myself, / squandered for nothing, / and the mast from the ship / that pissed away its anchors. …
 
-## 3. Stanzas used (voice = OpenAI `tts-1` / `onyx` / speed 0.9; text = DejaVuSerif 22, bottom band)
+## 3. Stanzas used (voice = OpenAI `tts-1` / `onyx` / speed 0.9; text = DejaVuSerif 22, full-width band at the bottom, verse lines joined — Elena 22.09)
 
 | # | Over | Poem | Fragment |
 |---|---|---|---|
