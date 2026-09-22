@@ -205,7 +205,8 @@
           "text": "First — just the wetness that wraps your skin like a second, unwanted body."
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "slow": 1.2
     },
     "s03": {
       "poem": "092",
@@ -231,7 +232,8 @@
           "text": "The road to Atuona isn't a road. It's a scar on the island's body that refuses to heal."
         }
       ],
-      "engine": "grok"
+      "engine": "grok",
+      "slow": 1.2
     },
     "s05": {
       "poem": "092",
@@ -244,7 +246,8 @@
           "text": "I found paradise. It turned out to be a predator."
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "slow": 1.2
     },
     "s06": {
       "poem": "071",
@@ -257,7 +260,9 @@
           "text": "Manet's naked truth that blew Paris apart.\nA prostitute staring straight at you,\nthe way my code looks at me at 3 AM"
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "slow": 1.2,
+      "glitch_before": "glitch/olympia_crimson_v1.jpg"
     },
     "s07": {
       "poem": "071",
@@ -270,7 +275,8 @@
           "text": "Objects tell better stories than people.\nUle's empty whiskey glass — his way of not being a father.\nCursor at 4 AM — how you don't call your dealer."
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "slow": 1.2
     },
     "s08": {
       "poem": "071",
@@ -284,7 +290,8 @@
         }
       ],
       "engine": "wan",
-      "expand": false
+      "expand": false,
+      "slow": 1.2
     },
     "s09": {
       "poem": "007",
@@ -297,7 +304,9 @@
           "text": "In the velvet Looking-Glass of the bottom,\nwhere Alice spreads out the shards,"
         }
       ],
-      "engine": "grok"
+      "engine": "grok",
+      "slow": 1.2,
+      "glitch_before": "glitch/underwater_net_film7.jpg"
     },
     "s10": {
       "poem": "007",
@@ -323,7 +332,8 @@
           "text": "Beyond the greedy longing\nthat devours what is left of the Self,\nsmoothly, to spite every last dick,\na new pawn, I march to queen."
         }
       ],
-      "engine": "grok"
+      "engine": "grok",
+      "slow": 1.2
     },
     "s12": {
       "poem": "007",
@@ -336,7 +346,8 @@
           "text": "Look at me, my father,\nhow, wingless, I crawl into the sky.\nThe sober ending of my story\ncuts You out of the plot."
         }
       ],
-      "engine": "grok"
+      "engine": "grok",
+      "slow": 1.2
     },
     "s13": {
       "poem": "039",
@@ -349,7 +360,8 @@
           "text": "Look, look yourself in the face!\nThere are tears and pain, and you just take it,"
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "slow": 1.2
     },
     "s14": {
       "poem": "039",
@@ -362,7 +374,8 @@
           "text": "so twist the ring,\nand burn, gripping the rail!"
         }
       ],
-      "engine": "grok"
+      "engine": "grok",
+      "slow": 1.2
     },
     "s15": {
       "poem": "095",
@@ -375,7 +388,8 @@
           "text": "He cut insults into the wood\nsharp enough to make the bishop sweat\nand the colonial clerk reach for his pistol."
         }
       ],
-      "engine": "wan"
+      "engine": "wan",
+      "slow": 1.2
     },
     "s16": {
       "poem": "095",
@@ -388,7 +402,8 @@
           "text": "She walks the black volcanic sand of the Marquesas\nthat the Pacific keeps trying to bleach\nand never succeeds."
         }
       ],
-      "engine": "grok"
+      "engine": "grok",
+      "slow": 1.2
     },
     "s17": {
       "poem": "095",
@@ -406,7 +421,8 @@
         }
       ],
       "engine": "wan",
-      "trim": 9.8
+      "trim": 9.8,
+      "slow": 1.2
     },
     "b06": {
       "poem": "071",
@@ -423,6 +439,15 @@
         "veo": 6
       },
       "note": "engine bake-off: same start frame + motion on every engine, 5s"
+    },
+    "s13b": {
+      "poem": "039",
+      "engine": "wan",
+      "clip": "v1/s13__wan.mp4",
+      "ss": 4.0,
+      "slow": 1.2,
+      "vo": [],
+      "note": "Elena 22.09: the earlier mirror render with dark liquid running from her eyes, right after the mirror shot, no voice"
     }
   }
 }

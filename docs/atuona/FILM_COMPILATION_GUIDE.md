@@ -217,6 +217,10 @@ character references** — inputs to image-to-video, never shots. Work dir `/hom
    loudnorm + limiter, title card on frame 0) → verify → her yes → `node film8.mjs --publish` →
    `python scripts/atuona-add-film-to-site.py` for the atuona.xyz static lists.
 
+10. **Plan knobs in `film8.mjs`:** `slow` (1.2 = 20 % slower; AI video breathes far too fast — interpolated above 1.12×),
+   `ss`/`trim` (use part of a clip), `clip` (reuse an earlier render as an extra shot, e.g. `s13b`), `vo: []` (no voice, no stanza),
+   `glitch_before` (a still flashed ~1.2 s as an arthouse glitch with near-hard cuts either side — `makeGlitch()`).
+
 **Engines as measured on one shot (s06, 22.09.2026)** — Wan 2.7 `$0.10/s` boldest · Grok Imagine 1.5 `$0.08/s` realistic,
 cheapest (**send the image inline as a data URI** — it rejects URLs without a file extension: "Invalid image format") ·
 HappyHorse `$0.14/s` · Veo 3.1 Fast · Kling 3.0 Omni `$0.168/s` most faithful, least motion · **Seedance 2.5 refused it**.

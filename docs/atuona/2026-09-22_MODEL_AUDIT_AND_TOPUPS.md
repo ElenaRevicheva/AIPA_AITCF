@@ -28,7 +28,7 @@ an OpenAI TTS call, and the bot's own PM2 logs. Nothing below is from memory.
 | Runway | `gen4_image` | `gen4_image` | ✅ current |
 
 **Upgrade = 2 pin strings** (Kling → omni, Flux → max). Both take the bot's existing inputs unchanged. Deploy needs a
-build + `pm2 restart cto-aipa --update-env` — **not done yet, waiting for Elena's go.**
+build + `pm2 restart cto-aipa --update-env` — **deployed 13:26 UTC 22 Sep (commit `8e93895`), on Elena's go.**
 
 ## 2. Money — which accounts can render today
 
@@ -38,7 +38,7 @@ build + `pm2 restart cto-aipa --update-env` — **not done yet, waiting for Elen
 | **Runway** | `/visualize runway`, `/imagine runway` | 🔴 **4 credits** (~$0.04) — `GET /v1/organization` `creditBalance: 4` | https://dev.runwayml.com → Billing |
 | **Anthropic** | Atuona `/create` default (Claude Opus 5) + prompt writing | 🔴 **zero** (known, NOW.md §7) — the bot falls back to other models | https://console.anthropic.com/settings/billing |
 | DeepSeek | `/create deepseek`, `/visualize deepseek` director | 🟡 **$1.93** | https://platform.deepseek.com/top_up |
-| Replicate | Kling, Seedance, Flux (all images) | 🟢 card-billed, last success 20 Sep 23:32 | https://replicate.com/account/billing (no top-up; it bills the card) |
+| Replicate | Kling, Seedance, Wan, Grok, Flux + every engine added today | 🟡 **PREPAID credit** (corrected: it is not card-billed) — ran out once during film #8 (`Insufficient credit`); below $5 it throttles to 6 jobs/min | https://replicate.com/account/billing |
 | Google | Veo 3.1, Omni, Gemini images | 🟢 postpaid Cloud billing, Veo rendered film #7's `atuona-base8` | https://console.cloud.google.com/billing |
 | OpenAI | narration voice (TTS) | 🟢 TTS call returned real audio today (was "no credits" earlier) | https://platform.openai.com/settings/organization/billing |
 | xAI | Grok fallback for `/create` | 🟢 key active (no balance endpoint) | https://console.x.ai |
@@ -60,3 +60,15 @@ Luma and Runway only matter for `/visualize luma|runway` and for Director's Cut.
 Replicate's last 15 jobs (20 Sep): `flux-2-pro` **2 of 6 flagged** ("input or output was flagged as sensitive"),
 `seedance-2.5` **1 of 3 flagged**, `kling-v3-video` 0 of 1, `flux-1.1-pro-ultra` 0 of 6. The bot already retries a
 flagged still with a chiaroscuro "video-safe keyframe" — so plan every sensual shot with a second, safer phrasing.
+
+## 5. Wired into the bot the same day (Elena: "I want them all") — LIVE 15:43 UTC
+
+`/visualize` (12 engines + the DeepSeek director): the 6 above + **Wan 2.7**, **Grok Imagine Video 1.5**, **Sora 2 Pro** (~$2.40/clip),
+**PixVerse v6**, **HappyHorse 1.0**, **Hailuo 2.3**. `/imagine` (13): Flux 2 Max, Luma, Omni, Runway + **Seedream 5 Pro**,
+**GPT Image 2**, **Grok Imagine Image 2**, **Nano Banana Pro**, **Imagen 4 Ultra**, **Ideogram v4**, **Qwen Image 2512**,
+**Wan 2.7 Image Pro**, **Hunyuan Image 3**. All via Replicate, named-only, fall back like the old ones, vendor safety defaults.
+Commits `94ad48a`, `ec734bf`. **First live call of each is unverified** — they were compiled, schema-checked and menu-checked;
+Wan and Grok rendered 17 film shots through the same inputs.
+
+**Incident:** the 13 new lines pushed `/menu` past Telegram's 4096-char limit → `400 Bad Request: message is too long` → the bot
+answered nothing. Fixed 15:49 UTC with `replyChunked()` (split at line breaks).
