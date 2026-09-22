@@ -1,0 +1,35 @@
+{
+  "film": "Atuona film #8 (working title: I Will Not Whiten)",
+  "poems": {
+    "draw": "random.Random(20260922).sample: 3 from ATUONA (#047-#099) + 2 from LITPROM (#001-#046), film #7 poems excluded (content/poems.json venue field)",
+    "ATUONA": [
+      "092 Hungry Earth",
+      "071 Crimson Escape",
+      "095 The Secret Exhibition"
+    ],
+    "LITPROM": [
+      "007 Папе (To Dad)",
+      "039 Когда застенье (Beyond the Wall)"
+    ]
+  },
+  "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro from practical light sources, deep blacks, humid tropical air. Adult underground arthouse erotica in the tradition of Roversi, Saudek and Newton: real skin with pores, sweat and water on skin, sheer wet fabric, raw emotion on the face. No text, no letters, no watermark, no logo.",
+  "motion_look": "Photoreal live-action, 35mm film grain, slow deliberate cinematic camera, natural physics and breathing, the same woman from the start frame throughout, her face and body unchanged, no text on screen.",
+  "negative": "cartoon, anime, CGI, 3D render, plastic skin, airbrushed, deformed hands, extra fingers, morphing face, identity change, text, subtitles, letters, watermark, logo, fast cuts",
+  "characters": {
+    "kira": "a Russian woman of about 32: high cheekbones, grey-green eyes, straight dark-chestnut hair falling past her shoulders, pale skin, full lips, a thin old scar through her left eyebrow, slender and strong",
+    "ule": "a Norwegian man of about 50: tall and lean, ash-blond hair swept back and grey at the temples, pale blue eyes, a short trimmed greying beard, beige tweed jacket over an open white shirt, blue jeans"
+  },
+  "images": {
+    "kira_ref": {
+      "aspect": "3:4",
+      "seed": 80801,
+      "prompt": "Character reference portrait. A Russian woman of about 32: high cheekbones, grey-green eyes, straight dark-chestnut hair falling past her shoulders, pale skin, full lips, a thin old scar through her left eyebrow. Bare shoulders, a thin black silk camisole strap. She looks straight into the lens, calm and tired, lips slightly parted. Soft window light from the left, dark background, head and shoulders, sharp focus on the eyes."
+    },
+    "ule_ref": {
+      "aspect": "3:4",
+      "seed": 80802,
+      "prompt": "Character reference portrait. A Norwegian man of about 50: tall and lean, ash-blond hair swept back and grey at the temples, pale blue eyes, a short trimmed greying beard, beige tweed jacket over an open white shirt. He looks just past the lens, polite, sober, unreadable. Soft window light from the left, dark background, head and shoulders, sharp focus on the eyes."
+    }
+  },
+  "shots": {}
+}
