@@ -20,7 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 21 Sep 16:29 (taken over 22 Sep 01:45 — first session died on 529s) | Atuona film #7 — **verified, waiting for Elena's yes to publish** (permission gate blocked `--publish` as a production deploy) | Oracle `/home/ubuntu/atuona-film7/` (new), `data/atuona/films/out/` (add only), `scripts/atuona-film7.mjs` (new), `docs/atuona/FILM_COMPILATION_GUIDE.md`. No PM2 restart. | — |
+| Claude Code | 21 Sep 16:29 (taken over 22 Sep 01:45 — first session died on 529s) | Atuona film #7, retitled *Could not generate content.* — **with Elena for review; publishes only on her "publish"** | Oracle `/home/ubuntu/atuona-film7/` (new), `data/atuona/films/out/` (add only), `scripts/atuona-film7.mjs` (new), `docs/atuona/FILM_COMPILATION_GUIDE.md`. No PM2 restart. | — |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,21 +131,22 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🎬 22 Sep — Film #7 *Paradise Is Compiled* is FINISHED and VERIFIED. Not live yet: waiting for Elena's yes.
+### 🎬 22 Sep — Film #7 retitled *Could not generate content.* (Elena's pick) — WITH ELENA FOR REVIEW. Not live.
 
-- **DONE:** `/home/ubuntu/atuona-film7/work/final.mp4`: 188.4s, h264 1280×720 30fps + aac, **−16.0 LUFS, peak −2.0 dBFS**,
-  frame 0 = title card. md5 `c1fc2136e3115c24107ace11df93780b`, the same as the Desktop copy
-  `paradise-is-compiled-21-09-2026-REVIEW.mp4`. The poem-text check she asked for is in
-  `docs/atuona/FILM7_PARADISE_IS_COMPILED.md` §6: English fragments verbatim, Russian source lines verbatim, and every clip
-  came from a run that logged `Found poem text`.
-- **NEXT:** on her yes → `cd /home/ubuntu/atuona-film7 && node film7.mjs --publish` → check that `films.json` lists it and a
-  Range request returns **206** → add it to atuona.xyz `public/llms.txt`, the `ItemList` JSON-LD and the `<noscript>` list
-  in `public/aifilmstudio/index.html` (six → **seven**). The file name gets its timestamp at publish, so that edit cannot
-  be written in advance.
-- **VERIFIED BY:** `ffprobe` + `ebur128` on final.mp4; `grep "Found poem text for #0NN"` across `~/.pm2/logs/cto-aipa-out-*.log`.
-- **RISK:** the English for #015 #020 #022 #024 #037 is **our translation**, not her words (§2 of the film doc).
-  Anything in `out/` goes live the moment it lands.
-
+- **DONE:** Elena asked to rename it after one of its poems and to see it before publishing. She picked #099's own title.
+  Re-cut on Oracle (intro card only, all 33 segments reused): `/home/ubuntu/atuona-film7/work/final.mp4`, 188.4s,
+  h264 1280×720 + aac, **−16.0 LUFS, peak −2.0 dBFS**, md5 `8f172a4f4d3bdd739d94dbeb49623661`. Frame 0 = the title card,
+  which dissolves into the #099 monitor showing the same words. Desktop copy
+  `could-not-generate-content-22-09-2026-REVIEW.mp4`, same md5; a 480p phone preview was sent to her in chat.
+  The earlier *Paradise Is Compiled* cut is kept at `work/final_paradise-is-compiled.mp4`. Poem-text check:
+  `docs/atuona/FILM7_PARADISE_IS_COMPILED.md` §6.
+- **NEXT:** wait for her notes → re-cut the named segment (`node film7.mjs --reuse --reseg=N`). On her explicit
+  **"publish"**: `node film7.mjs --publish` → `films.json` lists it and a Range request returns 206 →
+  `python scripts/atuona-add-film-to-site.py D:/aideazz/atuona <published file> <date> "Could not generate content."`
+  (dry-run tested: 7 items, new film first, counts six → seven, JSON-LD round-trip lossless) → push the atuona repo.
+- **VERIFIED BY:** `ffprobe` + `ebur128` on final.mp4; frames at 0 / 3.6 / 5.5s viewed.
+- **RISK:** the auto-mode gate blocks `--publish` as a production deploy. **It needs her "publish" in chat, not an
+  agent's inference.** The English for #015 #020 #022 #024 #037 is our translation, not her words.
 ### 🟢 21 Sep — CV + COVER LETTER NOW SIT ON ALL 20 "I ACT TODAY" DEALS. Verified in HubSpot.
 
 Elena ticked `files.write` on the `Aldeazz_Marketing_Engine` Service Key, and
