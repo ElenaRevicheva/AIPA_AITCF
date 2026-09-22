@@ -157,6 +157,10 @@ git log keeps the record.
   - **🚫 Do not "fix" `venice18` on `/visualize` into a safe/adult pair.** The VIDEO API has **no `safe_mode`** (only the image API
     does). Venice marks **44 of 138** video models `uncensored: true`; there `18` is a **tier**, not a filter, and 422 still applies.
   - Remaining Venice balance **$9.43**. Full contract + traps: audit doc §6–§7, guide traps 25–28.
+  - **Published (both live, verified 200):** wiki chapter `2026-09-22-the-spending-cap-that-could-never-fire` + new concept
+    `vacuous-guard` on aideazz.xyz/ai-ops-wiki.html, and the blog/Dev.to pair
+    `aideazz.xyz/blog/the-spending-cap-that-could-never-fire-field-note`. Written vendor-anonymised and with no mention of the
+    adult lane — it is a cost-guard incident on her ops credential, keep it that way.
 - **Money:** Replicate is **PREPAID** (ran out once mid-film; <$5 → 6 jobs/min). Luma, Runway, Anthropic empty — links in
   `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md`.
 - **Open, hers:** nothing on film #8 — s08 was re-rendered clean after her $10 top-up. The published film #7
