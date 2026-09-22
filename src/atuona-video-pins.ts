@@ -83,10 +83,10 @@ export const VIDEO_PINS: Record<VideoProvider, VideoPin> = {
   kling: {
     id: 'kling',
     aliases: ['kling', 'kling3', 'kling-v3', 'kuaishou', 'kwaivgi'],
-    grade: 'Kling Video 3.0 (stylized/arthouse, native audio)',
+    grade: 'Kling 3.0 Omni (arthouse, reference images, native audio)',
     emoji: '🎬',
     env: 'KLING_REPLICATE_MODEL',
-    fallback: 'kwaivgi/kling-v3-video',
+    fallback: 'kwaivgi/kling-v3-omni-video',
     kind: 'video',
   },
   seedance: {

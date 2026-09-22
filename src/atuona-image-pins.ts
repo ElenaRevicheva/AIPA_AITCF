@@ -36,10 +36,10 @@ export const IMAGE_PINS: Record<ImageCommandProvider, ImagePin> = {
   flux: {
     id: 'flux',
     aliases: ['flux', 'flux2', 'flux-2', 'bfl'],
-    grade: 'Flux 2 Pro',
+    grade: 'Flux 2 Max',
     emoji: '🎨',
     env: 'FLUX2_MODEL',
-    fallback: 'black-forest-labs/flux-2-pro',
+    fallback: 'black-forest-labs/flux-2-max',
     kind: 'image',
   },
   luma: {
@@ -115,9 +115,9 @@ export function imageHelpLine(): string {
   return (['luma', 'omni', 'runway'] as const).map((id) => IMAGE_PINS[id].grade).join(' → ');
 }
 
-/** `/imagine 048 - 🎨 Image (default: Flux 2 Pro)` then per-engine lines. */
+/** `/imagine 048 - 🎨 Image (default: Flux 2 Max)` then per-engine lines. */
 export function imagineDefaultLine(page = '048'): string {
-  return `/imagine ${page} - 🎨 Image (default: Flux 2 Pro)`;
+  return `/imagine ${page} - 🎨 Image (default: ${IMAGE_PINS.flux.grade})`;
 }
 
 export function imagineMenuLines(page = '048'): string {

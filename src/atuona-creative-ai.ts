@@ -145,15 +145,19 @@ const geminiApiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY |
 // Voice: Whisper-1 (best transcription)
 // =============================================================================
 const IMAGE_MODELS = {
-  // Flux 2 Pro (Nov 2025, BFL) — newest workhorse: stronger photoreal + prompt adherence.
+  // Flux 2 top tier (BFL): flux-2-max since 22 Sep 2026 (was flux-2-pro) — highest-fidelity FLUX.2, same inputs.
   // Top tier; if it errors/unavailable, we fall back to the proven Flux 1.1 chain below.
   // Override / disable via FLUX2_MODEL (set empty string to skip Flux 2 entirely).
-  flux2Pro: (process.env.FLUX2_MODEL ?? 'black-forest-labs/flux-2-pro').trim(),
+  flux2Pro: (process.env.FLUX2_MODEL ?? 'black-forest-labs/flux-2-max').trim(),
   // Flux 1.1 Pro - Best photorealistic images, try Ultra first then Pro (proven fallback chain)
   fluxUltra: 'black-forest-labs/flux-1.1-pro-ultra',  // Highest quality
   fluxPro: 'black-forest-labs/flux-1.1-pro',          // Excellent fallback
   fluxDev: 'black-forest-labs/flux-dev',              // Free tier option
 };
+/** Name of the Flux 2 tier actually pinned — captions and logs never claim Pro while Max runs. */
+const FLUX2_NAME = /flux-2-max/.test(IMAGE_MODELS.flux2Pro) ? 'Flux 2 Max'
+  : /flux-2-pro/.test(IMAGE_MODELS.flux2Pro) ? 'Flux 2 Pro'
+  : (IMAGE_MODELS.flux2Pro.split('/').pop() || 'Flux 2');
 
 const VIDEO_MODELS = {
   /** Ids come from src/atuona-video-pins.ts — bump the pin, not these call sites. */
@@ -270,9 +274,9 @@ async function runFluxStillOnce(
         IMAGE_MODELS.flux2Pro as `${string}/${string}`,
         { input: { prompt, aspect_ratio: aspectRatio, output_format: 'jpg' } }
       ));
-      if (url) return { url, modelUsed: 'Flux 2 Pro' };
+      if (url) return { url, modelUsed: FLUX2_NAME };
     } catch (e: any) {
-      console.log('Flux 2 Pro unavailable (/imagine)...', e?.message);
+      console.log(`${FLUX2_NAME} unavailable (/imagine)...`, e?.message);
     }
   }
   try {
@@ -351,7 +355,7 @@ async function runImaginePageStill(
   pageId: string,
   prefer: ImageCommandProvider | null
 ): Promise<void> {
-  const engine = prefer ? imagePinGrade(prefer) : 'Flux 2 Pro';
+  const engine = prefer ? imagePinGrade(prefer) : FLUX2_NAME;
   await ctx.reply(`🎨 *Starting still for Page #${pageId}*\n\n_${engine} — no video. Fetching page…_`, { parse_mode: 'Markdown' });
   try {
     const { title, theme, englishText, russianText } = await fetchPagePoemContent(pageId);
@@ -428,7 +432,7 @@ OUTPUT: One dense English prompt (120–220 words) describing a single photoreal
     const announceNamedMiss = prefer && prefer !== 'flux'
       ? async (why: string) => {
         await ctx.reply(
-          `⚠️ *${engine} missed* — falling to Flux 2 Pro.\n\n_${why.slice(0, 180)}_`,
+          `⚠️ *${engine} missed* — falling to ${FLUX2_NAME}.\n\n_${why.slice(0, 180)}_`,
           { parse_mode: 'Markdown' }
         );
       }
@@ -5724,8 +5728,8 @@ ${imagineHelpLines('052')}
 _Default chain when Luma is dry: Omni Flash → Runway._
 
 *What it creates:*
-🎨 Flux 2 Pro image (16:9 YouTube) - newest, BEST quality!
-📱 Flux 2 Pro image (9:16 Instagram)
+🎨 ${FLUX2_NAME} image (16:9 YouTube) - newest, BEST quality!
+📱 ${FLUX2_NAME} image (9:16 Instagram)
 🎨 Extra stills if Flux misses: ${imageHelpLine()}
 🎬 Cinematic video from your chosen engine + Director's Cut
 📝 Caption + hashtags auto-generated
@@ -9399,7 +9403,7 @@ _Free-text (DALL-E / prompt only):_
 \`/imagine A woman looking at a Gauguin painting in a dark gallery\`
 
 📊 *Status*
-🎨 Flux: ${replicate ? '✅ Flux 2 Pro / 1.1 Ready' : '❌ Set REPLICATE_API_TOKEN'}
+🎨 Flux: ${replicate ? `✅ ${FLUX2_NAME} / 1.1 Ready` : '❌ Set REPLICATE_API_TOKEN'}
 ${imageStatusLines({
         luma: Boolean(lumaApiKey),
         omni: Boolean(geminiApiKey),
@@ -9576,7 +9580,7 @@ Create stunning visuals for your book pages:
 ${visualizeHelpLines('048')}
 
 Each visualization creates:
-🎨 Flux 2 Pro image (newest, BEST quality!)
+🎨 ${FLUX2_NAME} image (newest, BEST quality!)
 🎨 Stills only: ${imagineDefaultLine('048')}
 ${imagineHelpLines('048')}
 🎬 Cinematic video from your chosen engine (9 sec)
@@ -9587,7 +9591,7 @@ ${imagineHelpLines('048')}
 ━━━━━━━━━━━━━━━━━━━━
 📊 *Status*
 Visualizations: ${visualizations.length} pages
-🎨 Flux: ${replicate ? '✅ Flux 2 Pro / 1.1 Ready' : '❌ Set REPLICATE_API_TOKEN'}
+🎨 Flux: ${replicate ? `✅ ${FLUX2_NAME} / 1.1 Ready` : '❌ Set REPLICATE_API_TOKEN'}
 ${imageStatusLines({
         luma: Boolean(lumaApiKey),
         omni: Boolean(geminiApiKey),
@@ -9812,7 +9816,7 @@ Return ONLY the motion direction. No preamble.`;
       
       // Generate image with Flux Pro via Replicate (with retry for rate limits)
       if (replicate) {
-        await ctx.reply('🎨 *Generating image with Flux 2 Pro...*\n\n_This takes 30-60 seconds..._', { parse_mode: 'Markdown' });
+        await ctx.reply(`🎨 *Generating image with ${FLUX2_NAME}...*\n\n_This takes 30-60 seconds..._`, { parse_mode: 'Markdown' });
         
         // Track which model was used for display
         let lastModelUsed = 'Flux Pro';
@@ -9830,16 +9834,16 @@ Return ONLY the motion direction. No preamble.`;
             try {
               console.log(`Flux attempt ${attempt}/${maxRetries} for ${aspectRatio} (safety_tolerance=${tol})`);
               
-              // Quality ladder: Flux 2 Pro (newest) → Flux 1.1 Pro Ultra → Flux 1.1 Pro.
+              // Quality ladder: Flux 2 (FLUX2_NAME) → Flux 1.1 Pro Ultra → Flux 1.1 Pro.
               let output: any = null;
               let modelUsed = '';
 
-              // Try Flux 2 Pro first (best 2026 quality). Conservative input so a schema
+              // Try Flux 2 first (best 2026 quality). Conservative input so a schema
               // surprise just falls through to the proven Flux 1.1 chain, never breaks the run.
               let flux2Ok = false;
               if (IMAGE_MODELS.flux2Pro) {
                 try {
-                  console.log('Trying Flux 2 Pro...');
+                  console.log(`Trying ${FLUX2_NAME}...`);
                   output = await replicate.run(
                     IMAGE_MODELS.flux2Pro as `${string}/${string}`,
                     {
@@ -9850,11 +9854,11 @@ Return ONLY the motion direction. No preamble.`;
                       }
                     }
                   );
-                  modelUsed = 'Flux 2 Pro';
+                  modelUsed = FLUX2_NAME;
                   lastModelUsed = modelUsed;
                   flux2Ok = true;
                 } catch (flux2Error: any) {
-                  console.log('Flux 2 Pro unavailable, falling back to Flux 1.1 Pro Ultra...', flux2Error.message);
+                  console.log(`${FLUX2_NAME} unavailable, falling back to Flux 1.1 Pro Ultra...`, flux2Error.message);
                 }
               }
 
