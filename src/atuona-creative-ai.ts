@@ -361,9 +361,20 @@ async function runVeniceStill(
   if (!key) return { url: null, why: 'VENICE_API_KEY missing — paste it with /venicekey' };
   const base = (process.env.VENICE_API_BASE || 'https://api.venice.ai/api/v1').replace(/\/$/, '');
   const [width, height] = aspectRatio === '9:16' ? [720, 1280] : aspectRatio === '1:1' ? [1024, 1024] : [1280, 720];
+  // venice-sd35 caps the prompt at 1500 chars (the 7500 in the docs is the API-wide max, not the model's).
+  // Atuona's cinematic prompts are far longer, so trim at the last sentence end that fits — a mid-word cut
+  // changes the image, and the opening sentences carry the scene.
+  const maxPrompt = Number(process.env.VENICE_PROMPT_MAX || 1450);
+  let venicePrompt = prompt.trim();
+  if (venicePrompt.length > maxPrompt) {
+    const cut = venicePrompt.slice(0, maxPrompt);
+    const stop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '), cut.lastIndexOf('\n'));
+    venicePrompt = (stop > maxPrompt * 0.6 ? cut.slice(0, stop + 1) : cut).trim();
+    console.log(`Venice: prompt ${prompt.length} → ${venicePrompt.length} chars (model cap 1500)`);
+  }
   const body = {
     model: imagePinModel(id),
-    prompt: prompt.slice(0, 7400),
+    prompt: venicePrompt,
     width,
     height,
     format: 'jpeg',
