@@ -219,7 +219,9 @@
           "text": "His movements had gotten slower, like the island was draining something vital from him."
         }
       ],
-      "engine": "grok"
+      "engine": "grok",
+      "skip": true,
+      "skip_note": "Elena 22.09.2026: cut from the film (Ule smoking by the jeep, then driving Kira)"
     },
     "s04": {
       "poem": "092",
@@ -233,7 +235,9 @@
         }
       ],
       "engine": "grok",
-      "slow": 1.2
+      "slow": 1.2,
+      "skip": true,
+      "skip_note": "Elena 22.09.2026: cut from the film (Ule smoking by the jeep, then driving Kira)"
     },
     "s05": {
       "poem": "092",
@@ -247,7 +251,8 @@
         }
       ],
       "engine": "wan",
-      "slow": 1.2
+      "slow": 1.2,
+      "glitch_before": "glitch/lilies_over_face_film7.jpg"
     },
     "s06": {
       "poem": "071",
@@ -276,7 +281,8 @@
         }
       ],
       "engine": "wan",
-      "slow": 1.2
+      "slow": 1.2,
+      "glitch_before": "glitch/two_women_corridor_film7.jpg"
     },
     "s08": {
       "poem": "071",
@@ -422,7 +428,8 @@
       ],
       "engine": "wan",
       "trim": 9.8,
-      "slow": 1.2
+      "slow": 1.2,
+      "glitch_after": "glitch/corridor_profile_film7.jpg"
     },
     "b06": {
       "poem": "071",

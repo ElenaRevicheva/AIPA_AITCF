@@ -3,7 +3,7 @@
 // voice from vo.py (scripts/atuona-film8-vo.py). Pipeline = film7's: voice locked to its shot, 1.3 s dissolves, stanzas across
 // the full width at the bottom, mono title cards, music ducked under the voice, loudnorm + limiter.
 // Run on Oracle:  cd /home/ubuntu/atuona-film8 && node film8.mjs            (writes work/final.mp4 — NOT published)
-//                 node film8.mjs --reuse [--reseg=3,4]                      (re-cut only those segments)
+//                 node film8.mjs --reuse [--reseg=s06,s13]                   (re-cut only those shots)
 //                 node film8.mjs --stanza-preview                            (every stanza over its shot + pixel widths)
 //                 node film8.mjs --publish                                   (copies the verified final into films/out)
 import fs from 'fs';
@@ -101,7 +101,8 @@ async function main() {
     console.log('PUBLISHED', dest); return;
   }
   fs.mkdirSync(W, { recursive: true });
-  const SHOTS = Object.entries(PLAN.shots).filter(([k]) => /^s\d\d[a-z]?$/.test(k)).sort(([a], [b]) => a.localeCompare(b));
+  // plan `skip: true` keeps a shot on record but out of the cut (Elena dropped s03/s04 — Ule smoking, then driving)
+  const SHOTS = Object.entries(PLAN.shots).filter(([k, s]) => /^s\d\d[a-z]?$/.test(k) && !s.skip).sort(([a], [b]) => a.localeCompare(b));
 
   // every planned shot is a rendered video (no stills, nothing missing)
   const missing = SHOTS.filter(([sid, s]) => !fs.existsSync(clipOf(sid, s))).map(([sid, s]) => `${sid}__${s.engine}`);
@@ -134,11 +135,12 @@ async function main() {
 
   // 2. normalize every segment + burn its stanza (clip audio replaced by silence: voice + music are the soundtrack)
   const reuse = process.argv.includes('--reuse');
-  const reseg = ((process.argv.find(a => a.startsWith('--reseg=')) || '').slice(8)).split(',').filter(Boolean).map(Number);
+  const reseg = ((process.argv.find(a => a.startsWith('--reseg=')) || '').slice(8)).split(',').filter(Boolean);   // shot ids, e.g. --reseg=s06,s13
   const segFiles = [];
   await pool(2, plan.map((p, i) => async () => {
-    const out = path.join(W, `seg_${String(i).padStart(2, '0')}.mp4`);
-    if (reuse && !reseg.includes(i) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segFiles[i] = out; return; }
+    // keyed by shot id, not position: dropping a shot must not renumber (and so re-render) everything after it
+    const out = path.join(W, `seg_${p.sid}.mp4`);
+    if (reuse && !reseg.includes(p.sid) && fs.existsSync(out) && fs.statSync(out).size > 10000) { segFiles[i] = out; return; }
     const stanza = stanzaOf(p.shot), txt = path.join(W, `p_${i}.txt`);
     if (stanza) fs.writeFileSync(txt, spread(stanza));
     const interp = p.factor >= MI_FROM ? 'minterpolate=fps=30:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1' : 'fps=30';
@@ -155,6 +157,7 @@ async function main() {
   for (const [i, p] of plan.entries()) {
     if (p.shot.glitch_before) seq.push({ file: await makeGlitch(path.join(BASE, 'img', p.shot.glitch_before), path.join(W, `glitch_${p.sid}.mp4`)), glitch: true });
     seqOfShot[i] = seq.length; seq.push({ file: segFiles[i] });
+    if (p.shot.glitch_after) seq.push({ file: await makeGlitch(path.join(BASE, 'img', p.shot.glitch_after), path.join(W, `glitch_after_${p.sid}.mp4`)), glitch: true });
   }
   seq.push({ file: await makeCard('ATUONA', OUTRO_SUB, path.join(W, 'card_outro.mp4'), 4.2, 56) });
 

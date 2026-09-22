@@ -132,7 +132,7 @@ git log keeps the record.
 
 ### 🎬 22 Sep — Film #8 *Crimson Escape* LIVE · Atuona bot now has every newest engine
 
-- **Film:** `out/crimson-escape-2026-09-22T16-32-00.mp4` (md5 `aa0ca25d…`, 3:53, −15.8 LUFS, peak −1.8 dBFS). `films.json` lists **8**,
+- **Film:** `out/crimson-escape-2026-09-22T16-32-00.mp4` — **republished 17:54 UTC** (md5 `57e71d2b…`, **3:36**, 16 shots, 5 glitch inserts, −15.7 LUFS, peak −1.9 dBFS; first cut kept at `/home/ubuntu/backups/crimson-escape-v1-1632.mp4`). `films.json` lists **8**,
   first; public Range → 206; Desktop copy `…-PUBLISHED.mp4`. atuona.xyz lists → eight (atuona `7fdb5835`). 18 generated shots
   (Wan 2.7 close, Grok Imagine 1.5 wide) + 2 glitch inserts; poems drawn by seed from ATUONA + LITPROM. Record:
   `docs/atuona/FILM8_2026-09-22.md`; method: guide §5c.
@@ -146,7 +146,7 @@ git log keeps the record.
   Refusals get re-phrased, never re-routed. Her own published film #7 stills are hers to use.
 - **Money:** Replicate is **PREPAID** (ran out once mid-film; <$5 → 6 jobs/min). Luma, Runway, Anthropic empty — links in
   `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md`.
-- **Open, hers:** s08 still shows small scratches (re-render ~$1.50 with `expand:false` once there is credit). The published film #7
+- **Open, hers:** nothing on film #8 — s08 was re-rendered clean after her $10 top-up. The published film #7
   still says MOMENTS on its card (her call: leave it).
 ### 🎬 22 Sep — Film #7 *Could not generate content.* is LIVE (Elena: "Do that and publish the video")
 
