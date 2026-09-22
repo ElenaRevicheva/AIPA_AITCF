@@ -231,6 +231,36 @@ or strip the reference to push it through (tried once for a nude keyframe from a
 blocked it as weakening a safety control, and the route was removed from the tool). Flux 2 refuses nudity whenever a
 photo of a person is the INPUT.
 
+### 5d. The engine list as it stands 22.09.2026 (what you can click tonight)
+
+Everything below is wired into the bot, **named-only** — you pick it, it never gets picked for you, and if it misses the
+old chain still catches the shot.
+
+**Video — `/visualize <engine> <page>` (14):** `luma` · `omni` · `runway` · `veo` · `kling` · `seedance` · `wan` · `grok` ·
+`sora` · `pixverse` · `happyhorse` · `hailuo` · **`venice`** · **`venice18`** (+ `deepseek` as a director that writes the
+motion line and hands off).
+
+**Stills — `/imagine <engine> <page>` (15):** `flux` · `luma` · `omni` · `runway` · `seedream` · `gpt` · `grok` · `nanopro` ·
+`imagen4` · `ideogram` · `qwen` · `wan` · `hunyuan` · **`venice`** · **`venice18`**.
+
+**Venice is the newcomer and it does not behave like the others.** Its own API, its own prepaid balance
+(`/venicekey` to paste a key), and for video it is a **queue**: quote → queue → poll → it hands back the **mp4 bytes**,
+not a link. Measured on the first real render, 22.09.2026: **$0.52 → 119 s → 5.20 MB, h264 1280x720, 5.04 s, with a
+native AAC track**; the balance moved by exactly the quote. That is **~$0.104/s — about 7x Grok**, so treat it as a
+chosen instrument for the shots that need it, not a default; a 3-minute film of it is roughly $19.
+
+⚠️ **`venice18` means two different things on the two commands, and only one of them is a filter.**
+
+| | `/imagine venice18` | `/visualize venice18` |
+|---|---|---|
+| what changes | the vendor's own documented `safe_mode` switch, **off** | the **model tier**: Wan 3.0 Pro, 1080p instead of 720p |
+| is it an adult switch? | yes — that is exactly what the flag does | **no.** The video API has no `safe_mode` at all |
+| what still applies | Venice's content policy (HTTP 422 on a refused prompt) | the same policy, unchanged |
+
+Venice marks 44 of its 138 video models `uncensored: true` (the whole Wan 3.0 family), which is why the video lane is
+less restricted than Replicate's — but "less restricted" is not "no rules", and **nothing on the adult side has been
+tested with an actual explicit prompt yet.** Do not write a claim into this guide that a render has not proven.
+
 ## 6. Run, verify, publish
 
 ```bash
