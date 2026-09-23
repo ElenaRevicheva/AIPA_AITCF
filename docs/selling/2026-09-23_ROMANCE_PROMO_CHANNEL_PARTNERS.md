@@ -42,7 +42,9 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
    from *Crimson Escape* (film #8), framed as a Kira-and-Ule dark romance. Existing
    footage only, no new credits.
 2. Send to #1–#4 (shape A) and #5–#6 (shape B). Six messages, not sixty.
-3. Log each as a HubSpot deal the day it is sent.
+3. Log each as a HubSpot deal the day it is sent, with **follow-ups scheduled as HubSpot
+   tasks before the first send: day 0, day 5, day 12.** One touch then silence is what
+   killed CLIENT-MANUAL and CLIENT-ATLAS (`2026-09-23_CLIENT_STREAMS_AUDIT.md`).
 4. **Stop rule, 30 days after the last send:** at least one yes (menu, white-label, or a
    paid trial). Otherwise drop the channel.
 
