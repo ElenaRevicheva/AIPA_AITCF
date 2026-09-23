@@ -161,3 +161,15 @@ Env knobs: `VENICE_VIDEO_MODEL`, `VENICE_VIDEO_PRO_MODEL`, `VENICE_VIDEO_RESOLUT
 `5s`), `VENICE_VIDEO_ASPECT` (`16:9`), `VENICE_VIDEO_MAX_USD` (`3`), `VENICE_VIDEO_TIMEOUT_MS` (`900000`).
 **Cost note:** $0.52 per 5s ≈ **$0.104/s** — roughly Sora-2-Pro territory and ~7× Grok. A 3-minute film of Venice video
 would be ~$19, so this is the engine for the shots that need it, not the default.
+
+### 7b. First run through the bot, and the fix it forced (22 Sep, 23:22 UTC, `217be55`)
+
+Elena's `/visualize venice18 048`: message showed `~$1.18` before the render (the quote parse fix, proven in production);
+log `🎬 Venice queued wan-3-0-pro-image-to-video` → `persistShotBytes venice-048-1790118491254: saved 6.9MB` (prefixed stem,
+base cut untouched); balance `9.429369 → 8.249369`, exactly $1.18. **Pro tier = $0.236/s**, 2.3x the 720p tier.
+
+But the transcript showed the start frame came from **Flux 2 Max**, then a softened "video-safe keyframe" pass, then a
+motion scrubber — all built for the strictest engines, all upstream of Venice. Fixed: in the Venice lane the start frame is
+drawn by Venice's own image engine (`venice`→safe_mode on, `venice18`→off), the softened pass is skipped, the motion line is
+not scrubbed. Guide §5d + trap 29. **Not yet re-run after the fix** — the next real `/visualize venice18` is the proof, and it
+must print *"Start frame drawn by Venice…"*.

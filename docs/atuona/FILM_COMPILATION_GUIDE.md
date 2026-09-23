@@ -253,13 +253,29 @@ chosen instrument for the shots that need it, not a default; a 3-minute film of 
 
 | | `/imagine venice18` | `/visualize venice18` |
 |---|---|---|
-| what changes | the vendor's own documented `safe_mode` switch, **off** | the **model tier**: Wan 3.0 Pro, 1080p instead of 720p |
-| is it an adult switch? | yes — that is exactly what the flag does | **no.** The video API has no `safe_mode` at all |
+| what changes | the vendor's own documented `safe_mode` switch, **off** | the **model tier**: Wan 3.0 Pro, 1080p instead of 720p — and the **start frame** (below) |
+| is it an adult switch? | yes — that is exactly what the flag does | not by itself: the video API has no `safe_mode`. What it animates is decided by the frame it is handed |
 | what still applies | Venice's content policy (HTTP 422 on a refused prompt) | the same policy, unchanged |
 
 Venice marks 44 of its 138 video models `uncensored: true` (the whole Wan 3.0 family), which is why the video lane is
 less restricted than Replicate's — but "less restricted" is not "no rules", and **nothing on the adult side has been
 tested with an actual explicit prompt yet.** Do not write a claim into this guide that a render has not proven.
+
+**The Venice lane draws its own start frame (fixed 22.09.2026 late, `217be55`).** The first `/visualize venice18 048`
+cost $1.18 and animated a chiaroscuro **Flux** frame — Venice was never actually asked for anything. Three steps upstream
+of it were all written for the *strictest* video engines: the Flux gallery still, a second deliberately softened
+"video-safe keyframe" pass, and a motion scrubber that swaps words like *nipple* for *shadow*. Swapping the video engine
+changed nothing because the constraint was never at the video step — **premature sanitisation**: the input degraded for
+the most restrictive consumer before anyone knew which consumer it was for. Now, in the Venice lane only:
+
+- the start frame is drawn by **Venice's own image engine** from the same gallery prompt
+  (`/visualize venice` → `safe_mode` on, `/visualize venice18` → off), and the bot says so in a line of its own:
+  *"Start frame drawn by Venice SD3.5 — ADULT (safe mode off) — not Flux"*. **No such line = the frame came from elsewhere.**
+- the softened keyframe pass is skipped, and the motion line goes unscrubbed (≤1400 chars)
+- every other engine behaves exactly as before
+
+**The boundary this does not cross:** Flux is never asked in the Venice lane. "Flux refused, so hand it to Venice" would be
+re-routing a refusal and stays off-limits whatever the code looks like. Venice's own 422 is final for that prompt.
 
 ## 6. Run, verify, publish
 
@@ -318,3 +334,6 @@ Verification checklist (all against the file in `out/`):
     content policy still returns **422** on a refused prompt, and the video API has **no `safe_mode` switch** (only the
     image API does). `venice18` on `/visualize` is a *tier*, not a second filter setting. See
     `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md` §7.
+29. Wiring a permissive engine at the END of a chain built for the strictest one — it can only animate what it is handed.
+    `/visualize venice18` first ran on a softened Flux frame and a word-scrubbed motion line ($1.18, nothing new). Sanitise at
+    the boundary it is for, not at the source (§5d).

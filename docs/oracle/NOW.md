@@ -156,7 +156,12 @@ git log keeps the record.
     vendor's raw body once before trusting any guard built on its shape.
   - **🚫 Do not "fix" `venice18` on `/visualize` into a safe/adult pair.** The VIDEO API has **no `safe_mode`** (only the image API
     does). Venice marks **44 of 138** video models `uncensored: true`; there `18` is a **tier**, not a filter, and 422 still applies.
-  - Remaining Venice balance **$9.43**. Full contract + traps: audit doc §6–§7, guide traps 25–28.
+  - **23:22 UTC `217be55` — the Venice lane now draws its OWN start frame.** Elena's first `/visualize venice18 048`
+    ($1.18, Pro = $0.236/s) animated a softened **Flux** frame with a word-scrubbed motion line — three steps built for the
+    strictest engines ran before Venice ever saw it. Now: Venice image engine draws the frame, no softened pass, no scrub,
+    Venice lane only. **Unproven until the next real render prints "Start frame drawn by Venice…".** Flux is never asked
+    in this lane — handing a Flux refusal to Venice would be re-routing a refusal, and stays off-limits.
+  - Remaining Venice balance **$8.25**. Full contract + traps: audit doc §6–§7b, guide §5d + traps 25–29.
   - **Published (both live, verified 200):** wiki chapter `2026-09-22-the-spending-cap-that-could-never-fire` + new concept
     `vacuous-guard` on aideazz.xyz/ai-ops-wiki.html, and the blog/Dev.to pair
     `aideazz.xyz/blog/the-spending-cap-that-could-never-fire-field-note`. Written vendor-anonymised and with no mention of the
