@@ -15,7 +15,7 @@ Trabajo de forma nativa con IA: encuadro el problema, delego la implementación 
 
 Antes de la IA fui Deputy CEO y Chief Legal Officer de un operador nacional de gobierno electrónico durante siete años. Por eso empiezo siempre por el problema de negocio y el riesgo de cumplimiento, algo que en una empresa cripto regulada importa. También construí un agente de trading educativo que opera solo en modo simulado, porque ningún agente debería ejecutar una acción financiera irreversible sin una persona.
 
-Una aclaración honesta: vivo en Ciudad de Panamá (UTC−5, una hora menos que Buenos Aires). Si la posición admite una persona fuera de Argentina, por ejemplo como contractor, me encantaría conversar. Trabajo en producción con Python y TypeScript, y me adapto rápido a Go o Java.
+Una aclaración honesta: vivo en Ciudad de Panamá (UTC−5, dos horas menos que Buenos Aires). Si la posición admite una persona fuera de Argentina, por ejemplo como contractor, me encantaría conversar. Trabajo en producción con Python y TypeScript, y me adapto rápido a Go o Java.
 
 Adjunto mis casos de estudio. Todo es verificable en vivo: aideazz.xyz/portfolio y aideazz.xyz/ai-ops-wiki.html.
 
