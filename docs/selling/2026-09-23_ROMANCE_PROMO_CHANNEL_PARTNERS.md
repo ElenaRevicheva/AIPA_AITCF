@@ -41,7 +41,10 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
 1. **Sample first — nothing is sent without it.** A 30-second vertical (9:16) trailer cut
    from *Crimson Escape* (film #8), framed as a Kira-and-Ule dark romance. Existing
    footage only, no new credits.
-2. Send to #1–#4 (shape A) and #5–#6 (shape B). Six messages, not sixty.
+2. **Hard cap (Elena, 23 Sep): maximum 5 targets.** #1–#4 (shape A) and #5 Social
+   Butterfly PR (shape B). #6–#8 are reserves only — used to replace a target that
+   closes or has no reachable contact, never added on top. Follow-ups to the same five
+   do not count as new outreach.
 3. Log each as a HubSpot deal the day it is sent, with **follow-ups scheduled as HubSpot
    tasks before the first send: day 0, day 5, day 12.** One touch then silence is what
    killed CLIENT-MANUAL and CLIENT-ATLAS (`2026-09-23_CLIENT_STREAMS_AUDIT.md`).
