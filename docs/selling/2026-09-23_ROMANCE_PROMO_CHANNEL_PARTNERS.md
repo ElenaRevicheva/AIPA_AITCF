@@ -41,6 +41,12 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
 1. **Sample first — nothing is sent without it.** A 30-second vertical (9:16) trailer cut
    from *Crimson Escape* (film #8), framed as a Kira-and-Ule dark romance. Existing
    footage only, no new credits.
+   **✅ Cut 23 Sep:** `crimson-escape-book-trailer-sample-9x16.mp4`, 31.8 s, 1080x1920,
+   h264 + AAC, 33.7 MB. On Elena's Desktop and on Oracle `~/trailer-sample/` with its
+   `build.sh` (re-runnable: 9 raw shots from film #8, two voice lines with captions,
+   title card, end card "Your book deserves a film · cinematic book trailers ·
+   atuona.xyz", film #8's Pixabay music ducked under the voice). **Waiting on Elena's
+   yes or changes.** Needs a public link (unlisted YouTube/Drive) before any send.
 2. **Hard cap (Elena, 23 Sep): maximum 5 targets.** #1–#4 (shape A) and #5 Social
    Butterfly PR (shape B). #6–#8 are reserves only — used to replace a target that
    closes or has no reachable contact, never added on top. Follow-ups to the same five
