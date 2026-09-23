@@ -3,6 +3,18 @@
 **Status 9 Sep 2026:** contract signed in Deel. **Onboarding has NOT started.**
 Project is paused while micro1 modifies the screener.
 
+**🟢 23 Sep 2026 — FIRST micro1 MONEY, read from her Zoho inbox (read-only IMAP):**
+- 17 Sep 22:13 UTC `payroll.micro1.ai` — "Your other was approved" (a payment of type *Other*, not hours).
+- 18 Sep 22:13 — "You've been paid!" by Micro1 Inc. into her micro1 Balance.
+- 18 Sep 22:30 — withdrawal confirmed: **$317.00, bank transfer USD, estimated arrival 23 Sep 2026.**
+  → Check the bank account today. What the $317 was for is NOT stated in the email; ask micro1 before
+  describing it anywhere.
+- talent.micro1.ai "Applied" tab, 23 Sep: **Video Annotation Specialist = Selected** (the Titan Proton
+  onboarding email of 8 Sep 16:19 is that selection); Arts, Media & Design = Not selected;
+  Product Owner = Did not qualify; Enterprise AI Workflow Expert = Not selected.
+- The onboarding email holds the `elre993@expert.micro1.ai` temporary password — never copy it into
+  any file or chat; she changes it on first login and turns on 2FA.
+
 ## The contract (as Elena read it in Deel)
 
 | | |
