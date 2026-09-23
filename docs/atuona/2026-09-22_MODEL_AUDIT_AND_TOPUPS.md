@@ -158,7 +158,7 @@ flag.** Venice instead marks models in `/models` — `model_spec.uncensored: tru
 both (HTTP 422 `content violation`). Do not "fix" this into a safe/adult pair — it would be a lie in the menu.
 
 Env knobs: `VENICE_VIDEO_MODEL`, `VENICE_VIDEO_PRO_MODEL`, `VENICE_VIDEO_RESOLUTION`, `VENICE_VIDEO_DURATION` (default
-`5s`), `VENICE_VIDEO_ASPECT` (`16:9`), `VENICE_VIDEO_MAX_USD` (`3`), `VENICE_VIDEO_TIMEOUT_MS` (`900000`).
+`10s` since 23 Sep — §7c), `VENICE_VIDEO_ASPECT` (`16:9`), `VENICE_VIDEO_MAX_USD` (`3`), `VENICE_VIDEO_TIMEOUT_MS` (`900000`).
 **Cost note:** $0.52 per 5s ≈ **$0.104/s** — roughly Sora-2-Pro territory and ~7× Grok. A 3-minute film of Venice video
 would be ~$19, so this is the engine for the shots that need it, not the default.
 
@@ -173,3 +173,21 @@ motion scrubber — all built for the strictest engines, all upstream of Venice.
 drawn by Venice's own image engine (`venice`→safe_mode on, `venice18`→off), the softened pass is skipped, the motion line is
 not scrubbed. Guide §5d + trap 29. **Not yet re-run after the fix** — the next real `/visualize venice18` is the proof, and it
 must print *"Start frame drawn by Venice…"*.
+
+### 7c. Length → 10 seconds (23 Sep, 10:31 UTC)
+
+Elena: *"can the video be longer?"* → chose **"Always 10 seconds"**. Both Wan 3.0 tiers accept 2/5/10/15/20/25/30s.
+Venice's own quotes, 23 Sep, free (quote only, nothing queued):
+
+| length | `venice` 720p | `venice18` 1080p Pro |
+|---|---|---|
+| 5s | $0.52 | $1.18 |
+| **10s (now)** | **$1.04** | **$2.37** |
+| 15s | $1.56 | $3.55 |
+| 20s | $2.08 | $4.73 |
+| 30s | $3.12 | $7.10 |
+
+10s keeps both tiers under the **$3** `VENICE_VIDEO_MAX_USD` cap, which is unchanged — 15s+ Pro and 30s 720p would be
+refused before any money moves. Telegram is not the limit: uploads ≤49 MB go as a file, and 30s@1080p ≈ 42 MB (from the
+measured 1.39 MB/s). The default was changed **in code** (`veniceVideoSpec`), not as an Oracle-only `.env` line, so git,
+laptop and box carry one value. Verified on Oracle with its real env: both specs report `"duration":"10s"`.

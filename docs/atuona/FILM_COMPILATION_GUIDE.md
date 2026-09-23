@@ -248,6 +248,8 @@ motion line and hands off).
 not a link. Measured on the first real render, 22.09.2026: **$0.52 → 119 s → 5.20 MB, h264 1280x720, 5.04 s, with a
 native AAC track**; the balance moved by exactly the quote. That is **~$0.104/s — about 7x Grok**, so treat it as a
 chosen instrument for the shots that need it, not a default; a 3-minute film of it is roughly $19.
+**Length: 10 s per render since 23.09.2026** — $1.04 (720p) / $2.37 (Pro); up to 30 s exists, but 15 s+ Pro trips the
+$3 cap and long single takes drift. 10–15 s is the film sweet spot (film #8 shots were all ≤15 s, cut to the voice).
 
 ⚠️ **`venice18` means two different things on the two commands, and only one of them is a filter.**
 

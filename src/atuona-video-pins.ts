@@ -40,6 +40,13 @@ export function isVeniceVideoProvider(id: string | null | undefined): id is Veni
  * Per-tier render settings, read from Venice's live model constraints on 22 Sep 2026:
  * wan-3-0-image-to-video → 480p/720p/1080p, 2s/5s/10s/15s/20s/25s/30s, aspect_ratio supported;
  * wan-3-0-pro-image-to-video → 1080p/2k/4k, same durations. Env overrides win.
+ *
+ * Length is 10s (Elena, 23 Sep 2026: "Always 10 seconds"). Venice's own quotes that day, 16:9:
+ *   720p   5s $0.52 · 10s $1.04 · 15s $1.56 · 20s $2.08 · 30s $3.12
+ *   Pro    5s $1.18 · 10s $2.37 · 15s $3.55 · 20s $4.73 · 30s $7.10
+ * 10s keeps both tiers under the $3 VENICE_VIDEO_MAX_USD cap. Longer is not free in another way too:
+ * AI video drifts more the longer one take runs (film #8: Grok panned off at 8.5s), so 10–15s is the film sweet spot.
+ * The default lives HERE, not only in Oracle's .env, so git, laptop and box cannot disagree about it.
  */
 export function veniceVideoSpec(id: VeniceVideoProvider): {
   model: string; resolution: string; duration: string; aspectRatio: string;
@@ -48,7 +55,7 @@ export function veniceVideoSpec(id: VeniceVideoProvider): {
   return {
     model: videoPinModel(id),
     resolution: envOr('VENICE_VIDEO_RESOLUTION', pro ? '1080p' : '720p'),
-    duration: envOr('VENICE_VIDEO_DURATION', '5s'),
+    duration: envOr('VENICE_VIDEO_DURATION', '10s'),
     aspectRatio: envOr('VENICE_VIDEO_ASPECT', '16:9'),
   };
 }

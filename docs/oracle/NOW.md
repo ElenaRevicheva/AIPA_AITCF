@@ -161,6 +161,8 @@ git log keeps the record.
     strictest engines ran before Venice ever saw it. Now: Venice image engine draws the frame, no softened pass, no scrub,
     Venice lane only. **Unproven until the next real render prints "Start frame drawn by Venice…".** Flux is never asked
     in this lane — handing a Flux refusal to Venice would be re-routing a refusal, and stays off-limits.
+  - **23 Sep 10:31 UTC — Venice videos are now 10 s** (Elena: "Always 10 seconds"): $1.04 at 720p, $2.37 Pro, both under
+    the unchanged $3 cap. Default changed in code, not `.env`. Quotes for every length: audit doc §7c.
   - Remaining Venice balance **$8.25**. Full contract + traps: audit doc §6–§7b, guide §5d + traps 25–29.
   - **Published (both live, verified 200):** wiki chapter `2026-09-22-the-spending-cap-that-could-never-fire` + new concept
     `vacuous-guard` on aideazz.xyz/ai-ops-wiki.html, and the blog/Dev.to pair
