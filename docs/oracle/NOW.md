@@ -214,6 +214,19 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
+### 🟢 23 Sep — 8 micro1 roles staged as `[HIRING-MICRO1]` deals · lane CVs corrected
+- `scripts/stage-micro1-deals.cjs` created 8 ACT-TODAY deals (owner Elena, company micro1, apply
+  note + lane CV + task). Read back: 8/8. Scan of all 364 jobs: `docs/applications/2026-09-23_micro1_job_scan.md`.
+  **micro1 forms pre-fill "Your rate: $1/hour"** — every note says so.
+- `[HIRING-MICRO1]` is NOT touched by the apply-kit fill/audit (`*HIRING-VJH*` only) — micro1 needs no
+  letter. Judge feedback DOES learn from it (token HIRING) — intended.
+- **CV honesty fix:** lane CVs said "live 18 months" / "two years building". Git: VJH first commit
+  2025-11-09, EspaLuz 2025-05-14. `build_tailored_cv.py` now says "since November 2025" / "since May
+  2025"; all 8 rebuilt; the 4 already in HubSpot replaced IN PLACE (`hs-replace-cv-files.cjs`, same
+  file id → every deal note corrected; downloaded back and read). **Open, Elena's:** builder / pm /
+  leadership / geo / exec_support CVs claim EspaLuz reached "paying subscribers" — unverified by me.
+- `hs-files.cjs findExistingFile` was dead: HubSpot file search 400s on names ≥20 chars. Now 19-char prefix.
+
 ### 📅 HubSpot is retiring ALL numbered API versions — v4 Mar 2027, v1–v3 Sep 2027. DO NOT ACT YET.
 
 The Service Key page warns *"called HubSpot API versions that won't be supported after March

@@ -76,7 +76,7 @@ BANNED = [
 # EVERY body is verified. Adding a fact means verifying it first.
 FACTS = [
     (['pm', 'architect', 'leadership', 'automation', 'builder', 'evaluation'],
-     'Owned an autonomous job-and-lead pipeline 0&#8209;to&#8209;1, live 18 months.',
+     'Owned an autonomous job-and-lead pipeline 0&#8209;to&#8209;1, live since November 2025.',
      'Sourcing, the scoring rubric, the LLM judge, and the CRM it writes into. '
      '<b>1,898 records</b> processed. I set the success metric and then acted on it: when '
      'outcome data showed one role category produced <b>58% of rejections but only 17% of '
@@ -154,7 +154,7 @@ LANES = {
         'headline': 'Technical Product Owner — AI &amp; Agentic Platforms | Forward-Deployed',
         'profile':
             'Seven years as a <b>Deputy CEO</b> owning digital transformation at board level, then '
-            'two years building and operating <b>AI products end to end</b> — I write the roadmap, '
+            'building and operating <b>AI products end to end</b> since May 2025 — I write the roadmap, '
             'ship it, carry the pager, and answer to the numbers. What I do daily is data pipelines '
             'and ML infrastructure with an agent on top, sold to operators who buy an outcome, not '
             'a model. I hold the architecture conversation with engineers and then explain the '
@@ -174,7 +174,7 @@ LANES = {
         'headline': 'AI Leadership — strategy, adoption and the systems underneath it',
         'profile':
             'Seven years as <b>Deputy CEO</b> leading digital transformation at board level across '
-            'IT, legal and compliance in a heavily regulated environment — then two years building '
+            'IT, legal and compliance in a heavily regulated environment — then, since May 2025, building '
             'the AI systems myself rather than delegating them. I can set the AI strategy and also '
             'tell you honestly which parts of it will fail, because I have operated them.',
     },
@@ -219,7 +219,7 @@ LANES = {
         'headline': 'AI Chief of Staff — executive operations, automated',
         'profile':
             'Seven years as a <b>Deputy CEO</b>, so I know what an executive actually needs handled '
-            'before being asked — and two years building the AI systems that handle it. I automate '
+            'before being asked — and, since May 2025, I have built the AI systems that handle it. I automate '
             'the operations rather than merely coordinating them.',
     },
 }

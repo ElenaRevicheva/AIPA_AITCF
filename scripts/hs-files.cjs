@@ -91,7 +91,10 @@ async function filesScopeOk() {
 }
 
 async function findExistingFile(name) {
-  const q = new URLSearchParams({ name, limit: '10' });
+  // HubSpot's file search 400s on a name of 20 characters or more ("Name has a limit of 20
+  // characters for searching"), and every CV name is longer — so this lookup never found anything
+  // and the "reused" branch was dead. Search on the first 19, then match the exact name below.
+  const q = new URLSearchParams({ name: path.parse(name).name.slice(0, 19), limit: '50' });
   const r = await api('GET', `/files/v3/files/search?${q}`);
   if (!r.ok) return null;
   const hit = (r.json?.results || []).find(
