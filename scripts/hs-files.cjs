@@ -45,11 +45,20 @@ function authHeaders() {
 async function api(method, urlPath, { json, form } = {}) {
   const headers = authHeaders();
   if (json) headers['Content-Type'] = 'application/json';
-  const r = await fetch(`${hubspotBase()}${urlPath}`, {
-    method,
-    headers,
-    body: form || (json ? JSON.stringify(json) : undefined),
-  });
+  // A daily run walks every deal back to back and trips HubSpot's burst limit. A 429 is
+  // "wait", not "empty" — so wait and ask again rather than hand the caller a refusal.
+  let r;
+  for (let attempt = 0; ; attempt++) {
+    r = await fetch(`${hubspotBase()}${urlPath}`, {
+      method,
+      headers,
+      body: form || (json ? JSON.stringify(json) : undefined),
+    });
+    if (r.status !== 429 || attempt >= 4) break;
+    const wait = Number(r.headers.get('retry-after')) * 1000 || 1500 * (attempt + 1);
+    await r.text();
+    await new Promise((res) => setTimeout(res, wait));
+  }
   const text = await r.text();
   let parsed = null;
   try {
@@ -162,6 +171,9 @@ async function addNoteAttachments(noteId, fileIds) {
 /** The outreach note on a deal — the one carrying the SEND anchor. */
 async function findOutreachNoteId(dealId) {
   const assoc = await api('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`);
+  // A refused lookup must not read as "this deal has no notes". On 22 Sep that is exactly how
+  // 7 deals — Addi among them — went without a CV while the log said "skipped", not "failed".
+  if (!assoc.ok) throw new Error(`note lookup failed ${assoc.status}: ${assoc.text.slice(0, 120)}`);
   const ids = (assoc.json?.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
   let fallback = null;
   for (const id of ids) {

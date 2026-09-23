@@ -200,6 +200,14 @@ not trusted from the script's own log:
 Runs itself daily at **13:30 UTC / 08:30 Panama**, after the apply queue, so new deals get
 theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
+**23 Sep — the daily run skipped 7 deals and called it normal.** The 22 Sep cron logged
+`no note 7 · failed 0`, yet those deals *had* notes (Addi's letter was right there). A refused
+HubSpot lookup (likely 429 burst limit) read as "no notes". Fixed in `scripts/hs-files.cjs`:
+429 → wait and retry; a failed lookup now **throws** (counted as `failed`, exit 1). Re-ran from
+the laptop: `attached 2 · already had it 20 · no note 0 · failed 0` — **22/22**; Addi's note
+read back with `CV_Elena_Revicheva_pm.pdf`. **Oracle still runs the OLD `hs-files.cjs`** —
+scp awaits Elena's yes (cron script only, no PM2 restart needed).
+
 ### 📅 HubSpot is retiring ALL numbered API versions — v4 Mar 2027, v1–v3 Sep 2027. DO NOT ACT YET.
 
 The Service Key page warns *"called HubSpot API versions that won't be supported after March
