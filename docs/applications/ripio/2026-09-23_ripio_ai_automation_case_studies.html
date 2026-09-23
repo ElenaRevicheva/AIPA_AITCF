@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Elena Revicheva — AI Automation Case Studies</title>
+<style>
+  @page { size: A4; margin: 13mm 14mm 12mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1c2230; font-size: 9.3pt; line-height: 1.38; margin: 0; }
+  a { color: #1d4ed8; text-decoration: none; }
+  header { border-bottom: 2px solid #1c2230; padding-bottom: 6px; margin-bottom: 8px; }
+  h1 { font-size: 17pt; margin: 0; letter-spacing: -0.2px; }
+  .role { font-size: 10.5pt; font-weight: 600; color: #3b4458; margin-top: 1px; }
+  .contact { font-size: 8.6pt; color: #4b5568; margin-top: 3px; }
+  .lede { margin: 7px 0 9px; font-size: 9.6pt; }
+  h2 { font-size: 10.5pt; text-transform: uppercase; letter-spacing: 0.6px; margin: 10px 0 5px; color: #1c2230; border-bottom: 1px solid #c9ced8; padding-bottom: 2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.9pt; }
+  th { text-align: left; background: #eef1f6; padding: 4px 6px; font-size: 8.4pt; text-transform: uppercase; letter-spacing: 0.4px; }
+  td { padding: 4px 6px; vertical-align: top; border-bottom: 1px solid #e3e6ec; }
+  td:first-child { width: 29%; font-weight: 600; color: #2a3346; }
+  .case { margin: 0 0 7px; page-break-inside: avoid; }
+  .case h3 { font-size: 9.8pt; margin: 0 0 2px; }
+  .case .meta { font-size: 8.3pt; color: #5a6376; margin-bottom: 2px; }
+  .case p { margin: 2px 0; }
+  ul { margin: 2px 0 2px 16px; padding: 0; }
+  li { margin: 1px 0; }
+  .principles td:first-child { width: 33%; }
+  .foot { margin-top: 8px; font-size: 8.3pt; color: #5a6376; border-top: 1px solid #c9ced8; padding-top: 4px; }
+  .pb { page-break-before: always; }
+  strong { color: #121826; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Elena Revicheva</h1>
+  <div class="role">AI Automation Engineer · case studies for Ripio</div>
+  <div class="contact">Panama City (UTC−5) · <a href="https://aideazz.xyz/portfolio">aideazz.xyz/portfolio</a> · Incident record: <a href="https://aideazz.xyz/ai-ops-wiki.html">aideazz.xyz/ai-ops-wiki.html</a> · Python · TypeScript · LLM APIs · GitHub Actions</div>
+</header>
+
+<p class="lede">I design, build and run a fleet of LLM agents and automations alone, on one Oracle Cloud server, for my own
+AI lab. Each one replaced manual work I was doing by hand. I build <strong>AI-native</strong>: I frame the problem, delegate the
+implementation to coding agents (Claude Code, Cursor), and I own the correctness of what comes back. That last part
+takes most of my hours, and your posting asks for it directly. Before this I was Deputy CEO and Chief Legal Officer in
+e-government for seven years, so I start from the business process and the compliance risk, not from the tool.</p>
+
+<h2>Your requirements → where I have done it</h2>
+<table>
+  <tr><th>Ripio asks for</th><th>Evidence, in production</th></tr>
+  <tr><td>Find and automate manual processes</td><td>Job search, CRM hygiene, lead response, daily publishing and a morning status briefing all used to be done by hand and now run unattended. I pick targets by measuring the hours spent, and I remove automation when it does not pay off (case 2).</td></tr>
+  <tr><td>Agents and bots on LLMs, integrated with chat, internal APIs and third parties</td><td>A Telegram control plane with 110+ commands, WhatsApp and Telegram assistants, and integrations with the HubSpot CRM, Resend email, GitHub (the bot opens real pull requests) and Bright Data. My chat surface is Telegram and WhatsApp; the same pattern applies to Slack.</td></tr>
+  <tr><td>Business need before the solution</td><td>Each system starts as a written problem statement. Example: the ad-intelligence tool is "detect, not predict": it reports only what can be checked, because a forecast cannot be verified.</td></tr>
+  <tr><td>End to end, CI/CD, production monitoring</td><td>A GitHub Actions deploy workflow covers 12 services plus a fleet-verify job. PM2 process supervision. Scheduled read-back audits that alert on Telegram. A synthetic lead goes through the real pipeline every morning and alerts only if it fails.</td></tr>
+  <tr><td>AI in the dev loop: context, harness, agent self-correction</td><td>A 534-test eval suite on the job engine, with offline layers that run before every rule change. A shared-memory protocol lets two coding agents that cannot see each other work one repo safely. A generation gate retries and salvages instead of publishing unverified figures (case 3).</td></tr>
+  <tr><td>Work with Infra and Security</td><td>Attachment gate with 24 tests (path traversal, magic bytes, a file claiming the wrong type). CRM files stored private. Leak scan before anything is published. Credentials never pass through the agents. No irreversible action without a human click.</td></tr>
+  <tr><td>Backend languages</td><td>Python (LangGraph, FastAPI) and TypeScript in production. Repos: 1,640 commits (ops agent), 578 (job engine), 3,513 (web and content engine).</td></tr>
+</table>
+
+<h2>Case studies</h2>
+
+<div class="case">
+  <h3>1 · Inbound lead concierge: form → CRM → drafted reply → one-tap approval</h3>
+  <div class="meta">TypeScript · HubSpot API · Telegram · Resend · webhook API</div>
+  <p>A form submission becomes a CRM record and an LLM-drafted reply, which arrive on my phone as an approval card. One tap sends it, and delivery and open events are written back to the deal. Two systems can write the reply, and redundancy alone means the faster one always wins. So a <strong>cached health verdict decides precedence</strong>, with a 5-minute grace period and a 20-minute safety net. The approval card is the product: a human stays on the last click of anything that reaches a customer.</p>
+</div>
+
+<div class="case">
+  <h3>2 · Job-discovery engine: LangGraph, LLM judge, human interrupt, outcome feedback</h3>
+  <div class="meta">Python · LangGraph · SQLite checkpointing · pytest</div>
+  <ul>
+    <li>State machine: gate → score → route → notify, checkpointed so a crash resumes instead of restarting.</li>
+    <li>An LLM judge scores fit, and a <strong>trust clamp</strong> limits how far keyword rules can overrule it. That clamp fixed an incident where keyword bonuses were silently outvoting a correct "no".</li>
+    <li>A feedback loop reads what I actually did in the CRM, including my typed reasons, and writes it back into the judge's prompt. It <strong>fails closed</strong> when the LLM is down: no score is better than a made-up one.</li>
+    <li>It originally auto-applied. I measured the result, <strong>volume and zero outcomes</strong>, and removed that feature.</li>
+  </ul>
+</div>
+
+<div class="pb"></div>
+
+<div class="case">
+  <h3>3 · Correctness of agent output: the part I treat as the real job</h3>
+  <div class="meta">Harness · context management · self-correction</div>
+  <ul>
+    <li><strong>Grounded generation:</strong> the daily article generator collects production evidence first (commits, uptimes, CRM counts). A gate rejects any figure it cannot trace, then retries up to 4 times with a different angle, and salvages sourced paragraphs instead of discarding the draft.</li>
+    <li><strong>Context across agents:</strong> two coding agents work the same repo without seeing each other's chats. A shared file acts as their working memory: a claim board before touching files, a handoff block (done / next / verified by / risk), and a start-of-session check that the last change produced output, not just that it ran.</li>
+    <li><strong>Read-back verification.</strong> This week an audit that reads the CRM back showed a pipeline reporting success while only 11 of 23 job records had a real cover letter. A refused API call was being logged as "no data". I added retry-on-429, made failed lookups raise, added a self-healing job every 2 hours and a daily audit with alerts. Result: 19 of 23 complete, and the remaining 4 proven to be closed postings.</li>
+  </ul>
+</div>
+
+<div class="case">
+  <h3>4 · Five-provider LLM chain, ordered per use case</h3>
+  <div class="meta">Claude · OpenAI · Gemini · Groq · Grok</div>
+  <p>One API key is a single point of failure for the whole operation. On 19 Aug 2026 my primary provider's balance hit zero, and the chain fell through to the next provider in 2.4 seconds with no lost request. The lesson that took longer: <strong>the order must differ by use case</strong>. Reasoning models can return empty strings under low token budgets, so a classification chain that leads with one fails silently. Client-facing copy leads with the strongest model; classification leads with the cheapest one that clears the bar.</p>
+</div>
+
+<div class="case">
+  <h3>5 · Crypto-adjacent work</h3>
+  <p><strong>DragonTrade:</strong> a trading-education agent that runs on paper trading only. I built it to learn how to run an agent that must never take an irreversible financial action without a human. <strong>ATUONA:</strong> an NFT art gallery I designed and built, with wallet-connect drops and an automated AI film pipeline behind it (8 films live).</p>
+</div>
+
+<h2>Principles I would bring to Ripio's internal tooling</h2>
+<table class="principles">
+  <tr><td>Measure at the edge, not the source</td><td>A commit is not a deploy, and an accepted email is not a delivered one. Verify where the request actually lands.</td></tr>
+  <tr><td>Unmeasured is not zero</td><td>A tracker exits non-zero when it cannot measure, so "nothing counted" never looks like "nothing happened".</td></tr>
+  <tr><td>Fail open or closed, per system</td><td>Alerting fails open: a duplicate beats silence. Publishing and money fail closed.</td></tr>
+  <tr><td>Every record names its author</td><td>Many agents write to one CRM, and a source prefix turns provenance into a filter.</td></tr>
+  <tr><td>Write the failure down</td><td>A public incident record: 22 incidents and 19 named failure modes, each with the measured number that proves it.</td></tr>
+</table>
+
+<p class="foot">Figures re-read from the running systems and repositories on 23 September 2026. Code on GitHub. I am happy to walk
+through any of it live, including the parts that broke. · Elena Revicheva · <a href="https://aideazz.xyz/portfolio">aideazz.xyz/portfolio</a></p>
+
+</body>
+</html>
