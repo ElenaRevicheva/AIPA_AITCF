@@ -200,13 +200,19 @@ not trusted from the script's own log:
 Runs itself daily at **13:30 UTC / 08:30 Panama**, after the apply queue, so new deals get
 theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
-**23 Sep — the daily run skipped 7 deals and called it normal.** The 22 Sep cron logged
-`no note 7 · failed 0`, yet those deals *had* notes (Addi's letter was right there). A refused
-HubSpot lookup (likely 429 burst limit) read as "no notes". Fixed in `scripts/hs-files.cjs`:
-429 → wait and retry; a failed lookup now **throws** (counted as `failed`, exit 1). Re-ran from
-the laptop: `attached 2 · already had it 20 · no note 0 · failed 0` — **22/22**; Addi's note
-read back with `CV_Elena_Revicheva_pm.pdf`. **Oracle still runs the OLD `hs-files.cjs`** —
-scp awaits Elena's yes (cron script only, no PM2 restart needed).
+**23 Sep — APPLY KIT IS NOW SELF-HEALING + AUDITED. 19/23 complete (read back from HubSpot).**
+- Found: 7 deals skipped as "no note" (a refused lookup read as empty — fixed in `hs-files.cjs`:
+  429 retry, failed lookup throws) and **11 deals carrying a STUB letter**, not a letter
+  (`backfill-cover-letters.cjs` only looks at the 100 newest deals; JS boards return 4–24 chars).
+- `scripts/hs-fill-apply-kit.cjs --apply` writes a real letter (same `generateCoverLetter`, same
+  verified facts) for any ACT-TODAY hiring deal with no real letter; unreadable posting → one
+  Bright Data render. **Additive: adds a new "✅ READY TO SEND" note + lane CV, never rewrites.**
+  First run wrote 7 (2 via render).
+- `scripts/hs-audit-apply-kit.cjs --telegram` reads every deal back; Telegram on any gap (fired, 200).
+- **Oracle cron:** `10 */2` fill → attach-cv · `45 13` audit. Crontab backup in `~/backups/`.
+- **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
+  own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
+  (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
 ### 📅 HubSpot is retiring ALL numbered API versions — v4 Mar 2027, v1–v3 Sep 2027. DO NOT ACT YET.
 
