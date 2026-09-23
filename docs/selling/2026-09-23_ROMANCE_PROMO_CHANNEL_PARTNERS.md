@@ -55,6 +55,29 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
 - Adjust after the first two replies. Do not publish a price anywhere until one partner
   has reacted to it.
 
+## Draft message (shape A — edit the first line per company)
+
+> Subject: A cinematic trailer for your dark-romance authors
+>
+> Hi [name],
+>
+> I've seen your [blitzes / cover reveals] for dark-romance releases. I make short
+> cinematic book trailers in exactly that mood — dark, luxurious, sensual, never
+> explicit. 30 seconds, vertical, ready for TikTok and Reels. Here is one: [sample link].
+>
+> Would you like to add trailers to your menu? I produce them, you sell them to your
+> authors, and we share the revenue. I can make the first one free for one of your
+> upcoming releases, so you can see how your authors react.
+>
+> Elena Revicheva — poet and AI film director, atuona.xyz
+> Portfolio: aideazz.xyz/portfolio
+>
+> P.S. I also make AI music videos and short brand films in the same style, if any of
+> your authors need launch visuals beyond the trailer.
+
+**Shape B change:** replace the second paragraph with "I can produce trailers under your
+brand for your clients, at a fixed wholesale price, and you bill them as you like."
+
 ## Line that does not move
 
 Implied, never explicit. Original characters only — never a real person's face, likeness
