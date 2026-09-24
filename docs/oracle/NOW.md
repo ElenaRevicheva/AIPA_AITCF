@@ -233,10 +233,16 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - Proof: test deal moved 19:49:11Z → task created 19:49:13Z (HIGH, owner 91612860) + email in her Zoho 14:49 Panama.
   Test deal + task archived afterwards.
 - ⚠️ Starter's simple workflow creates the task **unassociated** to the deal (deal→tasks = []). Tasks list only.
-- 🚨 **Blind spot:** only VJH `response_detector` moves deals to `contractsent`, and only HIRING ones. Client/partner
-  outreach (~193 deals in ⏳ Sent, 2 in They replied on 24 Sep) has NO reply detector → the radar never fires for
-  product outreach. Fix proposed (match inbound Zoho/Gmail to Sent deals by contact email / company domain →
-  move to contractsent); **awaiting Elena's yes** — touches VJH on Oracle.
+- ✅ **Blind spot CLOSED 24 Sep 20:27 UTC — `scripts/reply-radar.py` (Oracle cron `*/10`).** Reads Zoho + Gmail
+  (Inbox/Notification/Newsletter/Spam, read-only). Any sender matching a HubSpot CONTACT email, or a COMPANY domain
+  (not free-mail / platform), on ANY deal → note on the deal + email to aipa@ + (open non-HIRING deal) move to
+  They replied, else a HIGH task LINKED to the deal. Skips no-reply / bulk / auto-submitted mail; role mailboxes
+  (support@, team@, recruitment@…) and platforms (torre.ai, getonbrd…) count only as a real reply ("Re:" / In-Reply-To).
+  60-day dry run: 313 raw → **73** after tuning (~1/day), nearly all real people.
+  Proof on a real reply: Hospital CIMA (31 Jul, never seen) → deal to They replied, 1 note, Reply Radar email in
+  Zoho 20:25 UTC, HubSpot workflow email too. Clock `--init` 20:23 UTC — no history alerts. Ignore list:
+  `data/reply-radar-ignore.txt` (Oracle). Resend needs a named User-Agent (Cloudflare 1010 on Python-urllib).
+  **RISK:** failures only reach `~/logs/reply-radar.log` — no alert yet if a mailbox login dies.
 - Also: 132 deals have no `[PREFIX]`, 57 created in the last 30 days — an unprefixed writer exists. Not traced yet.
 
 ### 🟢 23 Sep — 8 micro1 roles staged as `[HIRING-MICRO1]` deals · lane CVs corrected
