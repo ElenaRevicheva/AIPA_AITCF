@@ -153,6 +153,12 @@ stage… Done. Let me verify: I open the record and check the association and th
 
 **Workflows:** your API key cannot see whether your Starter plan includes the Workflows builder (the
 check returns 403). **Before the interview, open Automation → Workflows yourself.**
+
+**✅ Checked by Elena 24 Sep 14:17 (screenshot):** Automation Overview shows **0 native automations** on
+every object (contacts, companies, deals, forms, email, ads, tickets); "Upgrade to Professional" is shown;
+HubSpot now points to **Agent Hub** ("your new home for automation — workflows and agents"). Say it as a
+strength: *"My portal's Automation Overview shows zero native workflows, because all my automation runs
+through the HubSpot API from my own agents."* Rehearse the builder via **Open Agent Hub → Workflows**.
 - If it opens: click through building one (don't turn it on).
 - If it asks you to upgrade: say so honestly in the interview — "my plan doesn't include Workflows, so
   my automation runs through the API; here is how I'd build the same logic in the Workflows builder…"
