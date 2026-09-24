@@ -85,3 +85,7 @@ tahititourisme.com (Centre Culturel Paul Gauguin). No contact addresses were col
   an underground poetry film for ASVOFF*. Asks when the call opens and whether AI-made work is eligible; links
   atuona.xyz/aifilmstudio/ (200). FilmFreeway ASVOFF page returned 403 to us, so no deadline is claimed in the letter.
   Next: when she replies, submit via filmfreeway.com/ASVOFF.
+- **24 Sep, later — Diane letter rewritten** from atuona.xyz's own words (same Gmail draft id, still NOT sent). Every claim
+  checked against the atuona repo: pen name Kira Velerevich and "do not translate myself for anyone's comfort" (DNA
+  section, index.html); 99 fragments, 46 LITPROM, 53 self-published (DNA ledger); Olympia/3 AM (#071 *Crimson Escape*);
+  black sand + "I will not whiten" (#095, Act V of film #8); backstage/organza/failed bids (#099, dated 2026-09-07).
