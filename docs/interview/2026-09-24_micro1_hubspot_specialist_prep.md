@@ -3,7 +3,8 @@
 **Role:** HubSpot Specialist, contractor, remote, $28–92/h. Complete real HubSpot workflows
 on screen, record them, write prompts + rubrics from them, review outputs.
 **HubSpot deal:** `[HIRING-MICRO1] HubSpot Specialist @ micro1` (I Act TODAY).
-**CV to upload:** `docs/applications/cv-by-lane/CV_Elena_Revicheva_crm.pdf` (sent to Elena on Telegram 24 Sep).
+**CV to upload:** `CV_Elena_Revicheva_crm.pdf` — attached to the deal's note in HubSpot (24 Sep). CVs live in
+HubSpot, never in the Atuona bot.
 
 You have done micro1's AI interview before ("Great work on your interview", Titan Proton next
 steps, background check). Same format: the AI asks, you answer out loud, camera on.
