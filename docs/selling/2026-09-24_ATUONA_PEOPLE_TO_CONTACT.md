@@ -89,3 +89,8 @@ tahititourisme.com (Centre Culturel Paul Gauguin). No contact addresses were col
   checked against the atuona repo: pen name Kira Velerevich and "do not translate myself for anyone's comfort" (DNA
   section, index.html); 99 fragments, 46 LITPROM, 53 self-published (DNA ledger); Olympia/3 AM (#071 *Crimson Escape*);
   black sand + "I will not whiten" (#095, Act V of film #8); backstage/organza/failed bids (#099, dated 2026-09-07).
+- **24 Sep — Diane staged in HubSpot, one click.** Deal `[ATUONA-ART] ASVOFF … Diane Pernet — film submission` (Act TODAY
+  stage) + company + contact + note with ✉️ button → `/go/outreach-email/atuona-asvoff-diane-pernet` (aipa@ via Resend,
+  reply-to her Gmail) + HIGH send task. Script `scripts/stage-atuona-contact.cjs`, data `docs/selling/atuona-contacts.json`.
+  Draft scp'd + row merged into Oracle's registry (413 → 414, backup `~/backups/outreach-registry.pre-atuona-diane-*`);
+  preview GET → 200 with To/Subject/body. **Two send paths now exist (HubSpot button and the Gmail draft) — send ONE.**

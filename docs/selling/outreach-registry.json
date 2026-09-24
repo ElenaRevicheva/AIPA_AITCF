@@ -3176,5 +3176,13 @@
     "email": "hello@valentinepr.net",
     "emailDraft": "docs/selling/drafts/trailer-valentine-pr-email.txt",
     "dealId": "65230517271"
+  },
+  "atuona-asvoff-diane-pernet": {
+    "phone": "",
+    "draft": "docs/selling/drafts/atuona-asvoff-diane-pernet-email.txt",
+    "company": "ASVOFF - A Shaded View on Fashion Film",
+    "email": "diane@asvoff.com",
+    "emailDraft": "docs/selling/drafts/atuona-asvoff-diane-pernet-email.txt",
+    "dealId": "65224705431"
   }
 }

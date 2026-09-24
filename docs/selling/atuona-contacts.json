@@ -1,0 +1,18 @@
+{
+  "_note": "Atuona AI Film Studio contacts (art, fashion film, festivals). Staged by scripts/stage-atuona-contact.cjs. Research + tiers: docs/selling/2026-09-24_ATUONA_PEOPLE_TO_CONTACT.md. Address source is recorded per row.",
+  "contacts": [
+    {
+      "slug": "atuona-asvoff-diane-pernet",
+      "company": "ASVOFF - A Shaded View on Fashion Film",
+      "domain": "asvoff.com",
+      "firstname": "Diane",
+      "lastname": "Pernet",
+      "jobtitle": "Founder/Director, ASVOF/ASVOFF",
+      "email": "diane@asvoff.com",
+      "emailSource": "Instagram @asvof contact card, screenshot by Elena 24 Sep 2026",
+      "subject": "Crimson Escape: a poetry film from Atuona, for ASVOFF",
+      "ask": "Festival submission of Crimson Escape; asks when the call opens and whether AI-made work is eligible",
+      "draft": "docs/selling/drafts/atuona-asvoff-diane-pernet-email.txt"
+    }
+  ]
+}
