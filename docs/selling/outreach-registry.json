@@ -3184,5 +3184,29 @@
     "email": "diane@asvoff.com",
     "emailDraft": "docs/selling/drafts/atuona-asvoff-diane-pernet-email.txt",
     "dealId": "65224705431"
+  },
+  "atuona-sasha-stiles": {
+    "phone": "",
+    "draft": "docs/selling/drafts/atuona-sasha-stiles-email.txt",
+    "company": "Sasha Stiles Studio",
+    "email": "sasha@sashastiles.com",
+    "emailDraft": "docs/selling/drafts/atuona-sasha-stiles-email.txt",
+    "dealId": "65232470154"
+  },
+  "atuona-expanded-anika-meier": {
+    "phone": "",
+    "draft": "docs/selling/drafts/atuona-expanded-anika-meier-email.txt",
+    "company": "EXPANDED.ART",
+    "email": "info@expanded.art",
+    "emailDraft": "docs/selling/drafts/atuona-expanded-anika-meier-email.txt",
+    "dealId": "65218818157"
+  },
+  "atuona-gazelli-mila-askarova": {
+    "phone": "",
+    "draft": "docs/selling/drafts/atuona-gazelli-mila-askarova-email.txt",
+    "company": "Gazelli Art House",
+    "email": "info@gazelliarthouse.com",
+    "emailDraft": "docs/selling/drafts/atuona-gazelli-mila-askarova-email.txt",
+    "dealId": "65215324254"
   }
 }

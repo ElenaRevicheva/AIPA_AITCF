@@ -47,7 +47,7 @@ const CONTACTS = JSON.parse(fs.readFileSync(path.join(root, 'docs/selling/atuona
   const out = [];
   for (const c of CONTACTS) {
     const who = `${c.firstname} ${c.lastname}`;
-    const dealName = `[ATUONA-ART] ${c.company} — ${who} — film submission`;
+    const dealName = `[ATUONA-ART] ${c.company} — ${who} — ${c.purpose || 'film submission'}`;
     const raw = fs.readFileSync(path.join(root, c.draft), 'utf8');
     const to = (raw.match(/^TO:\s*(.+)$/m) || [])[1]?.trim();
     if (to !== c.email) throw new Error(`${c.slug}: draft TO (${to}) ≠ data email (${c.email})`);

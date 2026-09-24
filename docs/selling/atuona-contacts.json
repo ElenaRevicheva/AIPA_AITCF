@@ -13,6 +13,48 @@
       "subject": "Crimson Escape: a poetry film from Atuona, for ASVOFF",
       "ask": "Festival submission of Crimson Escape; asks when the call opens and whether AI-made work is eligible",
       "draft": "docs/selling/drafts/atuona-asvoff-diane-pernet-email.txt"
+    },
+    {
+      "slug": "atuona-sasha-stiles",
+      "company": "Sasha Stiles Studio",
+      "domain": "sashastiles.com",
+      "firstname": "Sasha",
+      "lastname": "Stiles",
+      "jobtitle": "Poet and AI artist (A LIVING POEM, MoMA)",
+      "email": "sasha@sashastiles.com",
+      "emailSource": "sashastiles.com homepage, published as \"sasha at sashastiles dot com\", read 24 Sep 2026",
+      "subject": "A poet to a poet: films from Atuona",
+      "purpose": "peer note",
+      "ask": "Peer note: would she watch one film, and does she know a room where poem-films belong",
+      "draft": "docs/selling/drafts/atuona-sasha-stiles-email.txt"
+    },
+    {
+      "slug": "atuona-expanded-anika-meier",
+      "company": "EXPANDED.ART",
+      "domain": "expanded.art",
+      "firstname": "Anika",
+      "lastname": "Meier",
+      "jobtitle": "Curator, EXPANDED.ART",
+      "email": "info@expanded.art",
+      "emailSource": "expanded.art imprint page (general inbox, managing director Johann König), read 24 Sep 2026; letter asks it be passed to Anika",
+      "subject": "For Anika Meier: poem-films from Atuona",
+      "purpose": "curator note",
+      "ask": "Would she watch Crimson Escape; consideration for a future show or collection",
+      "draft": "docs/selling/drafts/atuona-expanded-anika-meier-email.txt"
+    },
+    {
+      "slug": "atuona-gazelli-mila-askarova",
+      "company": "Gazelli Art House",
+      "domain": "gazelliarthouse.com",
+      "firstname": "Mila",
+      "lastname": "Askarova",
+      "jobtitle": "Founder, Gazelli Art House",
+      "email": "info@gazelliarthouse.com",
+      "emailSource": "gazelliarthouse.com/contact (general inquiries, all three galleries), read 24 Sep 2026; letter asks it be passed to Mila",
+      "subject": "For Mila Askarova: poem-films from Atuona",
+      "purpose": "gallery note",
+      "ask": "Would she or the GAZELL.iO team watch Crimson Escape; a place in the digital programme",
+      "draft": "docs/selling/drafts/atuona-gazelli-mila-askarova-email.txt"
     }
   ]
 }

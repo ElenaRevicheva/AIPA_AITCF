@@ -94,3 +94,10 @@ tahititourisme.com (Centre Culturel Paul Gauguin). No contact addresses were col
   reply-to her Gmail) + HIGH send task. Script `scripts/stage-atuona-contact.cjs`, data `docs/selling/atuona-contacts.json`.
   Draft scp'd + row merged into Oracle's registry (413 → 414, backup `~/backups/outreach-registry.pre-atuona-diane-*`);
   preview GET → 200 with To/Subject/body. **Two send paths now exist (HubSpot button and the Gmail draft) — send ONE.**
+- **24 Sep — 3 more staged, one click each (NOT sent):** Sasha Stiles (`sasha@sashastiles.com`, her homepage), Anika Meier
+  via `info@expanded.art` (EXPANDED.ART imprint; letter asks the inbox to pass it on), Mila Askarova via
+  `info@gazelliarthouse.com` (Gazelli contact page). Slugs `atuona-sasha-stiles`, `atuona-expanded-anika-meier`,
+  `atuona-gazelli-mila-askarova`; Oracle registry 414 → 417 (backup kept); all 3 previews → 200.
+  **Not staged, and why:** Kate Vass — site says "Artist Submissions are currently closed". Centre Culturel Paul Gauguin —
+  only a phone and a contact form are public, no address. CIFRA, Niio, Berlin Fashion Film — submission portals, not email.
+  Christie's, Nick Knight, Refik Anadol, Paul Trillo, the brands — no verified address and no acceptance to show yet.
