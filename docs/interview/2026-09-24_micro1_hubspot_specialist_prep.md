@@ -159,6 +159,15 @@ every object (contacts, companies, deals, forms, email, ads, tickets); "Upgrade 
 HubSpot now points to **Agent Hub** ("your new home for automation — workflows and agents"). Say it as a
 strength: *"My portal's Automation Overview shows zero native workflows, because all my automation runs
 through the HubSpot API from my own agents."* Rehearse the builder via **Open Agent Hub → Workflows**.
+
+**✅ Starter workflow builder, seen by Elena 24 Sep 14:24 (Agent Hub → Create → Workflow):**
+- Triggers (3): CRM record created · Property value changed · On a schedule — "Want more triggers? Upgrade".
+- Actions (5): Delay · Send internal email notification · Add to static segment · Create task · Run custom agent.
+- NOT on Starter: if/then branches, set property value, owner rotation, fuller trigger/action library.
+- Practice draft: trigger Deal stage → 🔥I Act TODAY; Create task (3 business days, deal owner); Delay 3 days;
+  internal notification. **Left Unpublished** ("Interview practice") — delete after the interview.
+- Say: *"On Starter I have simple workflows — three triggers, five actions. Branching, set-property and owner
+  rotation need Professional, so I built those through the HubSpot API."*
 - If it opens: click through building one (don't turn it on).
 - If it asks you to upgrade: say so honestly in the interview — "my plan doesn't include Workflows, so
   my automation runs through the API; here is how I'd build the same logic in the Workflows builder…"
