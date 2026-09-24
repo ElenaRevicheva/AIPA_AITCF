@@ -45,8 +45,14 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
    h264 + AAC, 33.7 MB. On Elena's Desktop and on Oracle `~/trailer-sample/` with its
    `build.sh` (re-runnable: 9 raw shots from film #8, two voice lines with captions,
    title card, end card "Your book deserves a film · cinematic book trailers ·
-   atuona.xyz", film #8's Pixabay music ducked under the voice). **Waiting on Elena's
-   yes or changes.** Needs a public link (unlisted YouTube/Drive) before any send.
+   atuona.xyz", film #8's Pixabay music ducked under the voice).
+   **✅ v2 approved by Elena 24 Sep** ("It is good") after one change: lettering is now
+   dark-luxury — Cinzel (letter-spaced caps) for titles, Cormorant Garamond italic for
+   captions, ivory `#EDE3D1` + crimson `#C8323F` (both Google Fonts, OFL — free for
+   commercial use; in `~/trailer-sample/fonts/`). v1 script kept as `build.v1.sh`.
+   Delivered to her via the Atuona Telegram bot (the Claude app cannot deliver files).
+   **Next: a public link.** Do NOT drop it into `data/atuona/films/out/` — `/films` lists
+   that folder, so it would appear in the public gallery as film #9.
 2. **Hard cap (Elena, 23 Sep): maximum 5 targets.** #1–#4 (shape A) and #5 Social
    Butterfly PR (shape B). #6–#8 are reserves only — used to replace a target that
    closes or has no reachable contact, never added on top. Follow-ups to the same five
@@ -85,6 +91,19 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
 >
 > P.S. I also make AI music videos and short brand films in the same style, if any of
 > your authors need launch visuals beyond the trailer.
+
+### Personalised first lines (the rest of the message stays as above)
+
+1. **Dark Romance Reads** — "Your whole list is dark romance, so I'll keep this short: your
+   authors' covers already sell the mood; a 30-second film sells it on TikTok."
+2. **Xpresso Book Tours** — "I saw your dark-romance blitz sign-ups. A blitz is a week of
+   posts; a trailer is the one post that moves."
+3. **Give Me Books Promotions** — "You book romance promos six weeks ahead, which is exactly
+   the lead time a trailer needs."
+4. **Enticing Journey Book Promotions** — "Your services page has everything an author
+   needs for launch week except a film."
+5. **Social Butterfly PR** (shape B) — "You represent erotic romance and romantic suspense
+   authors. I make trailers in that register — sensual, never explicit — under your brand."
 
 **Shape B change:** replace the second paragraph with "I can produce trailers under your
 brand for your clients, at a fixed wholesale price, and you bill them as you like."
