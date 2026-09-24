@@ -51,6 +51,7 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
    captions, ivory `#EDE3D1` + crimson `#C8323F` (both Google Fonts, OFL — free for
    commercial use; in `~/trailer-sample/fonts/`). v1 script kept as `build.v1.sh`.
    Delivered to her via the Atuona Telegram bot (the Claude app cannot deliver files).
+   **v3 (24 Sep, Elena):** end card points to `atuona.xyz/aifilmstudio`, not `atuona.xyz`; end card 4.2 s, total 32.7 s. v1/v2 scripts kept as `build.v1.sh`/`build.v2.sh`. An unlisted Short of v2 exists (superseded) — v3 needs its own upload.
    **Next: a public link.** Do NOT drop it into `data/atuona/films/out/` — `/films` lists
    that folder, so it would appear in the public gallery as film #9.
 2. **Hard cap (Elena, 23 Sep): maximum 5 targets.** #1–#4 (shape A) and #5 Social
@@ -86,7 +87,7 @@ Lower fit (ad/newsletter platforms, not service shops): romance.io
 > authors, and we share the revenue. I can make the first one free for one of your
 > upcoming releases, so you can see how your authors react.
 >
-> Elena Revicheva — poet and AI film director, atuona.xyz
+> Elena Revicheva — poet and AI film director · AI Film Studio: atuona.xyz/aifilmstudio
 > Portfolio: aideazz.xyz/portfolio
 >
 > P.S. I also make AI music videos and short brand films in the same style, if any of
