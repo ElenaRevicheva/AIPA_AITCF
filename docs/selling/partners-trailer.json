@@ -1,0 +1,59 @@
+{
+  "_note": "Romance promo partners, addresses read from each company own page on 24 Sep 2026. Staged by scripts/stage-partner-trailer.cjs. Social Butterfly PR replaced by Valentine PR (site 404).",
+  "partners": [
+    {
+      "slug": "trailer-dark-romance-reads",
+      "company": "Dark Romance Reads",
+      "domain": "darkromancereads.com",
+      "email": "admin@darkromancereads.com",
+      "shape": "menu",
+      "subject": "A cinematic trailer for your dark-romance authors",
+      "greeting": "Hi,",
+      "opener": "Your whole list is dark romance, so I'll keep this short: your authors' covers already sell the mood; a 30-second film sells it on TikTok.",
+      "what": "promo menu"
+    },
+    {
+      "slug": "trailer-xpresso-book-tours",
+      "company": "Xpresso Book Tours",
+      "domain": "xpressobooktours.com",
+      "email": "events@xpressobooktours.com",
+      "shape": "menu",
+      "subject": "A cinematic trailer for your dark-romance blitzes",
+      "greeting": "Hi Giselle,",
+      "opener": "I saw your dark-romance blitz sign-ups. A blitz is a week of posts; a trailer is the one post that moves.",
+      "what": "services"
+    },
+    {
+      "slug": "trailer-give-me-books",
+      "company": "Give Me Books Promotions",
+      "domain": "givemebookspr.com",
+      "email": "promotions@givemebookspr.com",
+      "shape": "menu",
+      "subject": "A cinematic trailer for your romance launches",
+      "greeting": "Hi,",
+      "opener": "You book romance promos six weeks ahead, which is exactly the lead time a trailer needs.",
+      "what": "promotions"
+    },
+    {
+      "slug": "trailer-enticing-journey",
+      "company": "Enticing Journey Book Promotions",
+      "domain": "enticingjourneybookpromotions.com",
+      "email": "promotions@enticingjourneybookpromotions.com",
+      "shape": "menu",
+      "subject": "The one thing missing from your launch services",
+      "greeting": "Hi,",
+      "opener": "Your services page has everything an author needs for launch week except a film.",
+      "what": "services"
+    },
+    {
+      "slug": "trailer-valentine-pr",
+      "company": "Valentine PR",
+      "domain": "valentinepr.net",
+      "email": "hello@valentinepr.net",
+      "shape": "white-label",
+      "subject": "Cinematic trailers for your authors, under your brand",
+      "greeting": "Hi,",
+      "opener": "You already create teasers and ad graphics for your authors. A 30-second film is the next format, and it is the one TikTok and Reels reward."
+    }
+  ]
+}

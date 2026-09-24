@@ -1,6 +1,24 @@
 # Romance promo companies — channel partners for cinematic book trailers
 
-**23 Sep 2026.** Researched with Elena in a Claude Code session. Status: **not contacted yet.**
+**23 Sep 2026.** Researched with Elena in a Claude Code session.
+**Status 24 Sep: staged in HubSpot CLIENT-MANUAL style, not sent.** 5 deals
+`[PARTNER-TRAILER] …` at "I Act TODAY", each with a note carrying the one-click
+✉️ ENVIAR POR EMAIL button (sends from aipa@aideazz.xyz via Resend; the send moves the deal
+to Sent, stamps the note, closes the Send task and books a +4 day follow-up). Staged by
+`scripts/stage-partner-trailer.cjs` (idempotent); letters in
+`docs/selling/drafts/trailer-*-email.txt`. Sample (v3, unlisted):
+https://youtube.com/shorts/UudO7lUfJKA
+
+| Partner | Address (read from their own page 24 Sep) | Shape |
+|---|---|---|
+| Dark Romance Reads | admin@darkromancereads.com (Author Portal page) | menu |
+| Xpresso Book Tours (Giselle) | events@xpressobooktours.com (Contact page) | menu |
+| Give Me Books Promotions | promotions@givemebookspr.com (Promotions page) | menu |
+| Enticing Journey | promotions@enticingjourneybookpromotions.com (Services page) | menu |
+| Valentine PR | hello@valentinepr.net (About page) | white-label |
+
+**Social Butterfly PR swapped for reserve #6 Valentine PR:** socialbutterflypr.net returned
+404 on every page (24 Sep). A reserve replaces, never adds.
 
 ## The idea in one line
 

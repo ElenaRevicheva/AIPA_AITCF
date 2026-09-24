@@ -3136,5 +3136,45 @@
     "emailDraft": "docs/selling/drafts/harsh-patel-equity-reply-email.txt",
     "dealId": "65000298271",
     "score": 91
+  },
+  "trailer-dark-romance-reads": {
+    "phone": "",
+    "draft": "docs/selling/drafts/trailer-dark-romance-reads-email.txt",
+    "company": "Dark Romance Reads",
+    "email": "admin@darkromancereads.com",
+    "emailDraft": "docs/selling/drafts/trailer-dark-romance-reads-email.txt",
+    "dealId": "65236295597"
+  },
+  "trailer-xpresso-book-tours": {
+    "phone": "",
+    "draft": "docs/selling/drafts/trailer-xpresso-book-tours-email.txt",
+    "company": "Xpresso Book Tours",
+    "email": "events@xpressobooktours.com",
+    "emailDraft": "docs/selling/drafts/trailer-xpresso-book-tours-email.txt",
+    "dealId": "65229755905"
+  },
+  "trailer-give-me-books": {
+    "phone": "",
+    "draft": "docs/selling/drafts/trailer-give-me-books-email.txt",
+    "company": "Give Me Books Promotions",
+    "email": "promotions@givemebookspr.com",
+    "emailDraft": "docs/selling/drafts/trailer-give-me-books-email.txt",
+    "dealId": "65229038659"
+  },
+  "trailer-enticing-journey": {
+    "phone": "",
+    "draft": "docs/selling/drafts/trailer-enticing-journey-email.txt",
+    "company": "Enticing Journey Book Promotions",
+    "email": "promotions@enticingjourneybookpromotions.com",
+    "emailDraft": "docs/selling/drafts/trailer-enticing-journey-email.txt",
+    "dealId": "65238954658"
+  },
+  "trailer-valentine-pr": {
+    "phone": "",
+    "draft": "docs/selling/drafts/trailer-valentine-pr-email.txt",
+    "company": "Valentine PR",
+    "email": "hello@valentinepr.net",
+    "emailDraft": "docs/selling/drafts/trailer-valentine-pr-email.txt",
+    "dealId": "65230517271"
   }
 }
