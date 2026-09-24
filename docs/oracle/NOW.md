@@ -226,6 +226,10 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   file id → every deal note corrected; downloaded back and read). **Open, Elena's:** builder / pm /
   leadership / geo / exec_support CVs claim EspaLuz reached "paying subscribers" — unverified by me.
 - `hs-files.cjs findExistingFile` was dead: HubSpot file search 400s on names ≥20 chars. Now 19-char prefix.
+- **24 Sep — new `language` lane** (`CV_Elena_Revicheva_language.pdf`): the Russian Bilingual deal had the AI-evals CV
+  (Elena: "non sense"). Facts from atuona `content/poems.json`: 46 Russian poems (LITPROM 2019–2025) + 53 English.
+  Lane rule `bilingual|language expert|linguist|transcription|audio recording|voice record` runs FIRST — those titles
+  previously fell through to `builder`. A lane may now override the Technical Foundation block.
 
 ### 📅 HubSpot is retiring ALL numbered API versions — v4 Mar 2027, v1–v3 Sep 2027. DO NOT ACT YET.
 

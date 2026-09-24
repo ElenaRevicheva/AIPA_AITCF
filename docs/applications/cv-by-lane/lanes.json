@@ -4,6 +4,10 @@
   "default": "builder",
   "rules": [
     {
+      "lane": "language",
+      "pattern": "bilingual|language expert|language evaluator|linguist|transcription|audio recording|voice record"
+    },
+    {
       "lane": "evaluation",
       "pattern": "\\beval|red.?team|annotat|ai train(er|ing)|quality review|llm judge"
     },
@@ -64,6 +68,10 @@
     "evaluation": {
       "label": "Expert AI Evaluation & Training",
       "cv": "CV_Elena_Revicheva_evaluation.pdf"
+    },
+    "language": {
+      "label": "Russian\u2013English Bilingual Language Expert",
+      "cv": "CV_Elena_Revicheva_language.pdf"
     },
     "exec_support": {
       "label": "AI-Qualified Executive Support",

@@ -42,7 +42,7 @@ const ROLES = [
           'Rubric-based review of AI-written technical content; uses AI coding tools daily (Claude Code, Cursor).'],
     gap: 'Prefers 3+ yrs as Software Engineer / Solutions Architect. Real figure: production engineering since May 2025 (~16 months). Say it straight.' },
   { title: 'AI trainer', id: '972f4b3e-07a1-4a00-bd6a-b16da1f61461', pay: '$100–180/h', rate: 130, cv: 'CV_Elena_Revicheva_evaluation.pdf',
-    fit: ['Domain expertise named in the posting: law and writing — CLO 7 yrs, 98 published literary works.',
+    fit: ['Domain expertise named in the posting: law and writing — CLO 7 yrs, 99 published poems (46 in Russian, 53 in English).',
           'Critique AI outputs, write rationales, author prompts — same work as her eval harness and LLM judge.'],
     gap: 'Broad pool — the specific numbers (534 tests, 20 of 51 wrong rejections caught) make the difference.' },
   { title: 'GitHub Specialist', id: '2ba22339-ccb7-4f5e-961b-18939149cffe', pay: '$90–175/h', rate: 120, cv: 'CV_Elena_Revicheva_evaluation.pdf',
@@ -55,11 +55,11 @@ const ROLES = [
     gap: 'Low floor ($28). Ask near the top of the range.' },
   { title: 'Senior AI Trainer (robotic-arm video annotation)', id: '21b6f2ad-63a8-47d4-9fd7-31667bf3dbb1', pay: '$50–90/h', rate: 80, cv: 'CV_Elena_Revicheva_evaluation.pdf',
     fit: ['Frame-accurate start/end timestamps and event segmentation; Latin America eligible.',
-          'Already SELECTED for micro1 Video Annotation Specialist (Titan Proton); her film pipeline verifies every render frame by frame.'],
+          'Already SELECTED for micro1 Video Annotation Specialist (Titan Proton); her film pipeline verifies every render before release.'],
     gap: 'Not the $14–36 "Senior AI Trainer" also listed — this link is the $50–90 one.' },
-  { title: 'Russian Bilingual Expert', id: 'c732f04d-3d0e-410f-ba42-781cd9f09915', pay: '$30–65/h', rate: 60, cv: 'CV_Elena_Revicheva_evaluation.pdf',
+  { title: 'Russian Bilingual Expert', id: 'c732f04d-3d0e-410f-ba42-781cd9f09915', pay: '$30–65/h', rate: 60, cv: 'CV_Elena_Revicheva_language.pdf',
     fit: ['Native Russian + fluent English: rate nativeness/fluency of Russian audio, justify in English.',
-          'Podcast host (11 episodes); published author — ear for intonation and register.'],
+          'Published author in both languages: 46 poems in Russian (LITPROM, 2019–2025) and 53 in English — ear for intonation and register.'],
     gap: 'Lowest pay of the eight, but the easiest yes.' },
 ];
 

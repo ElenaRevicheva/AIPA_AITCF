@@ -69,6 +69,10 @@ BANNED = [
     'machine learning engineer',
     'phd',
     'computer science degree',
+    'native english',
+    'certified translator',
+    'degree in linguistics',
+    'phonetics degree',
 ]
 
 # ─── the fact bank ────────────────────────────────────────────────────────────
@@ -139,6 +143,42 @@ FACTS = [
      'Automation that runs a business when nobody is watching.',
      'Finding customers, qualifying them, drafting the reply, updating the CRM and reporting what '
      'happened — designed, deployed, and still on call for it.'),
+
+    # ── language lane (23-24 Sep 2026). Verified from atuona content/poems.json (venue + date),
+    #    docs/atuona/FILM_COMPILATION_GUIDE.md, FILM8_2026-09-22.md and the Nine Systems dossier.
+    (['language'],
+     'Published author in Russian.',
+     '<b>46 poems</b> written in Russian and published on the LITPROM literary portal through its '
+     'editorial board, 2019–2025. Stress, rhythm and register are the material I work in.'),
+
+    (['language'],
+     'Published author in English as well.',
+     '<b>53 poems</b> written in English, published in my own ATUONA gallery, Dec 2024 – Sep 2026 — '
+     'so I hear the difference between a native line and a translated one from both sides.'),
+
+    (['language'],
+     'Seven years of professional work in Russian, where one word changes the meaning.',
+     'Seven years as Deputy CEO and Chief Legal Officer of a Russian public-sector e-government '
+     'operator: drafting and negotiating contracts and regulatory positions, presenting to boards '
+     'and regulators.'),
+
+    (['language'],
+     'Spoken audio, mixed and measured.',
+     'My automated film pipeline locks each narration line to its clip, ducks music under the voice '
+     'and normalises the mix to broadcast loudness (−16 LUFS; the latest film measured −15.7). '
+     '<b>8 films</b> published, each render verified before release.'),
+
+    (['language'],
+     'Written justifications that another reviewer can check.',
+     'I built a scoring rubric and an AI judge, then replayed <b>51</b> rejected items: <b>20</b> were '
+     'wrong, caught before release. I also keep a public record of <b>22</b> written incident '
+     'analyses — what happened, why, and the named pattern — the same discipline an evaluation '
+     'rationale needs.'),
+
+    (['language'],
+     'Language technology, built and used by real learners.',
+     'EspaLuz, a bilingual Spanish–English AI tutor on WhatsApp and Telegram, with voice in and '
+     'voice out and per-family memory. Selected by micro1 for the Titan Proton human-data project.'),
 
     (['exec_support', 'leadership', 'pm'],
      'Board-level operating experience.',
@@ -214,6 +254,27 @@ LANES = {
             'before this means I can also explain why a failure matters commercially, not just '
             'that a test went red.',
     },
+    'language': {
+        'label': 'Russian–English Bilingual Language Expert',
+        'headline': 'Russian–English Bilingual Expert — native Russian, published author in both languages',
+        'profile':
+            'Native Russian speaker, born and educated in Russia, who has written, published and '
+            'worked professionally in Russian for over a decade, and who works in English every day. '
+            'I listen for what makes speech sound native — stress, intonation, rhythm and register — '
+            'the same things I shape in verse. And I write every judgement down in plain English, '
+            'with the reason, so another reviewer can check it.',
+        'work_heading': 'LANGUAGE WORK — published, professional, and measured',
+        'foundation_heading': 'LANGUAGE &amp; AUDIO TOOLKIT',
+        'foundation':
+            '<b>Russian:</b> native — stress, intonation, rhythm, register (legal, literary, '
+            'conversational) &nbsp;·&nbsp; <b>English:</b> fluent, daily professional and literary use '
+            '&nbsp;·&nbsp; <b>Audio:</b> FFmpeg, voice/music mixing, loudness normalisation (LUFS), '
+            'frame-accurate timing &nbsp;·&nbsp; <b>Evaluation:</b> rubric design, written rationales, '
+            'review of AI-generated text and speech output.',
+        'languages':
+            '<b>Languages:</b> <b>Russian (native)</b> · <b>English (fluent)</b> · '
+            'Spanish (working — resident in Panama) · French (elementary)',
+    },
     'exec_support': {
         'label': 'AI-Qualified Executive Support',
         'headline': 'AI Chief of Staff — executive operations, automated',
@@ -226,6 +287,9 @@ LANES = {
 
 # Title keywords → lane. First match wins; order matters (most specific first).
 LANE_RULES = [
+    # Language roles first: "Russian Bilingual Expert" matched no rule and fell to 'builder'.
+    ('language', r'bilingual|language expert|language evaluator|linguist|transcription'
+                 r'|audio recording|voice record'),
     ('evaluation', r'\beval|red.?team|annotat|ai train(er|ing)|quality review|llm judge'),
     ('geo', r'\bgeo\b|\baeo\b|seo|search visibility|answer engine|content market'),
     ('exec_support', r'chief of staff|executive assistant|\bea\b|executive support'),
@@ -289,12 +353,13 @@ def build(title: str, company: str, lane: str, out: Path):
     s.append(Paragraph('PROFILE', st_h))
     s.append(Paragraph(cfg['profile'], st_b))
 
-    s.append(Paragraph('SELECTED WORK — shipped, live, and measured', st_h))
+    s.append(Paragraph(cfg.get('work_heading', 'SELECTED WORK — shipped, live, and measured'), st_h))
     for _tags, lead, body in pick_facts(lane):
         s.append(Paragraph(f'<b>{lead}</b> {body}', st_bul, bulletText='▪'))
 
-    s.append(Paragraph('TECHNICAL FOUNDATION', st_h))
-    s.append(Paragraph(
+    # A lane may replace the engineering block: a language CV listing pgvector is noise.
+    s.append(Paragraph(cfg.get('foundation_heading', 'TECHNICAL FOUNDATION'), st_h))
+    s.append(Paragraph(cfg.get('foundation') or
         '<b>Data:</b> SQL, PostgreSQL, Oracle Autonomous Database, pgvector, ingestion pipelines, '
         'RAG retrieval &nbsp;·&nbsp; <b>AI:</b> Claude, OpenAI, Gemini, Grok, Groq; multi-provider '
         'routing; agent orchestration; prompt systems; eval harnesses &nbsp;·&nbsp; '
@@ -316,8 +381,9 @@ def build(title: str, company: str, lane: str, out: Path):
         'Presidential Program for Executive Management, RANEPA Moscow (2015) &nbsp;·&nbsp; '
         'MA Social Psychology, Penza State University (2018) &nbsp;·&nbsp; '
         'Polkadot Blockchain Academy, PBA-X Wave 3 (2025)<br/>'
-        '<b>Languages:</b> Russian (native) · English (fluent) · '
-        '<b>Spanish (working — resident in Panama)</b> · French (elementary)', st_b))
+        + cfg.get('languages',
+                  '<b>Languages:</b> Russian (native) · English (fluent) · '
+                  '<b>Spanish (working — resident in Panama)</b> · French (elementary)'), st_b))
 
     doc.build(s)
     return out
