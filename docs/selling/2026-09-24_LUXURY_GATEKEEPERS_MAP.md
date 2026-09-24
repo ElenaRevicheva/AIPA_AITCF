@@ -18,6 +18,17 @@ prospects, $0 — `2026-09-23_CLIENT_STREAMS_AUDIT.md`).
 | **Niio** — art streaming | Hotels (Hilton partnership), luxury homes, F&B, **superyachts** (has a dedicated page) | **Open Call** for original video art: https://www.niio.com/site/niio-open-call/ · artists: https://www.niio.com/site/artists/ · yachts: https://www.niio.com/site/superyacht/ | How and how much artists are paid |
 | **Resolume Footage** — curated VJ packs | VJs and venues playing clubs / events | Curated from hand-picked artists, ~30 loops per pack: https://www.resolume.com/footage | Submission route and revenue split |
 
+**Niio Open Call — terms as pasted by Elena from their page, 24 Sep:** Artcasts shown in
+high-end hotels, offices and to private collectors on 4K screens; venues pay screening fees;
+**artists get 30% of the monthly program subscription fee** (shared among participating
+artists — per-artist formula not stated). Submission: Niio account → upload high-res
+**HD/4K single-channel** video + full artwork description → submit to the Curatorial
+Committee. Curators include bitforms gallery; artists include Quayola, Casey REAS, Ori
+Gersht. Support: the support address on their page. **Still unknown:** AI-made work
+accepted? sensual (non-explicit) work accepted? exclusivity? deadline?
+**Read:** a curated credential first, a small shared-pool income second — not a salary.
+⚠️ Our raw shots are 1280x720 — HD needs at least an upscale to 1920x1080.
+
 Both are a **screen, not a cold email**, and one acceptance reaches every venue on the platform.
 Needs: 3–5 loopable 10–20 s clips, no text, no faces of real people, implied not explicit.
 
