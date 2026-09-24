@@ -77,3 +77,11 @@ curating.org + CIFRA (Anika Meier) · opencall.cifra.com · berlinfashionfilm.aw
 fadmagazine.com (Gazelli NY, 18 Aug 2026) · katevassgalerie.com · theartnewspaper.com (Christie's AI sale) ·
 fashionista.com (SHOWstudio 25 yrs) · myfacehunter.com (Agent Provocateur F/W 2026) · npr.org (DATALAND) ·
 tahititourisme.com (Centre Culturel Paul Gauguin). No contact addresses were collected. Look each one up at send time.
+
+## Log
+
+- **24 Sep — Diane Pernet (ASVOFF).** Address `diane@asvoff.com` (from her Instagram contact card, screenshot by
+  Elena). **Gmail DRAFT created in elena.revicheva2016@gmail.com — NOT sent; Elena sends.** Subject *Crimson Escape:
+  an underground poetry film for ASVOFF*. Asks when the call opens and whether AI-made work is eligible; links
+  atuona.xyz/aifilmstudio/ (200). FilmFreeway ASVOFF page returned 403 to us, so no deadline is claimed in the letter.
+  Next: when she replies, submit via filmfreeway.com/ASVOFF.
