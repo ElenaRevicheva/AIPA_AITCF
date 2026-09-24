@@ -49,7 +49,7 @@ const ROLES = [
     fit: ['Screen-record GitHub workflows + write prompts and rubrics.',
           'GitHub Actions deploy workflow over 12 services; 1,640 / 578 / 3,513 commits across three repos; a bot that opens real pull requests.'],
     gap: 'You must do branch → commit → PR → review → merge BY HAND in the GitHub UI on camera. Practise once before the interview.' },
-  { title: 'HubSpot Specialist', id: '5d640e1d-8b4f-4e8f-8f08-53cf71c17dc8', pay: '$28–92/h', rate: 80, cv: 'CV_Elena_Revicheva_automation.pdf',
+  { title: 'HubSpot Specialist', id: '5d640e1d-8b4f-4e8f-8f08-53cf71c17dc8', pay: '$28–92/h', rate: 80, cv: 'CV_Elena_Revicheva_crm.pdf',
     fit: ['Screen-record HubSpot workflows (contacts, deals, pipelines, tasks, reporting, automation) + rubrics.',
           '"Current access to HubSpot" — paid HubSpot Starter account, used daily; CRM written by ten agents with source prefixes.'],
     gap: 'Low floor ($28). Ask near the top of the range.' },
