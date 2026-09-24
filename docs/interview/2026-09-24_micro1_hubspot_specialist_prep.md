@@ -126,3 +126,42 @@ Service Key (API access) · "validate at entry" · "one owner per record"
 - Speak slowly. Short sentences. A number beats an adjective.
 - If you do not know: "I have not used that feature. Here is how I would find out and do it: …"
 - Do not argue with the AI interviewer's framing. Answer, give one real example, stop.
+
+---
+
+## 6. The exercise — screen share (added 24 Sep, second agent)
+
+The invite says **"AI Interview + Exercise"**, up to 48 min, and **"be ready to share your screen"**.
+Expect to do a small HubSpot task live and talk while you do it.
+
+**Likely tasks** (the focus areas they listed): create a contact + company and associate them ·
+create a deal in the right pipeline and stage · move a deal and add a task · build a filtered view
+or a simple report · describe (or build) a workflow.
+
+**How to do it on camera — say each step out loud:**
+"I'm opening Contacts. I search first so I don't create a duplicate. Not found, so I create it…
+Now I associate it with the company… I check the deal is in the right pipeline, not only the right
+stage… Done. Let me verify: I open the record and check the association and the task due date."
+→ **Always finish by checking your own work on screen.** That is the habit their rubric rewards.
+
+**🔒 Privacy — your portal holds real people's names and emails (2,640 deals, 1,998 companies on 24 Sep).**
+- Share **only the HubSpot browser window**, not the whole screen. Close Gmail, Zoho, WhatsApp, Telegram.
+- Do the exercise on a **test record** you create for it ("Test Contact — Interview", domain `example.com`).
+- Don't open lists of real prospects on camera. If they ask to see your pipeline, show the **board with
+  stage names**, collapsed, not individual client records.
+- Delete the test records after the interview.
+
+**Workflows:** your API key cannot see whether your Starter plan includes the Workflows builder (the
+check returns 403). **Before the interview, open Automation → Workflows yourself.**
+- If it opens: click through building one (don't turn it on).
+- If it asks you to upgrade: say so honestly in the interview — "my plan doesn't include Workflows, so
+  my automation runs through the API; here is how I'd build the same logic in the Workflows builder…"
+
+**20-minute rehearsal, the day before:** create a test contact → company → associate → deal in
+"🔥I Act TODAY" → task due in 3 days → open the deal and verify all of it → delete everything.
+Do it once while talking out loud. Then the exercise is something you have already done.
+
+**⚠️ Check your CV before the interview.** `CV_Elena_Revicheva_crm.pdf` says "EspaLuz — **paying**
+WhatsApp / Telegram tutor… PayPal subscriptions", "early users in 19 countries", and "Operational
+Co-Founder — OmniBazaar 2024–2025". The interviewer can ask about any line. If any is not true, tell
+the agent and it will be rebuilt before you start.
