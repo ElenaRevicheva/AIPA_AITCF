@@ -1,0 +1,44 @@
+# Where the luxury gatekeepers are — Atuona AI Film Studio
+
+**24 Sep 2026.** Elena asked where to find the people who sell to the very rich (brands,
+clubs, venues, galleries, event producers, yacht and villa managers). Status: **map only —
+nothing started.** The book-trailer partner test runs until **24 Oct**; do not open a
+second front before it reads out.
+
+## The rule that sorts every option
+
+Prefer doors where **we are screened or listed and the buyer comes to us** (her repeatable
+win is passing screens) over doors where **we write to strangers** (0.85% reply, 180
+prospects, $0 — `2026-09-23_CLIENT_STREAMS_AUDIT.md`).
+
+## Tier 1 — curated platforms that already sell screen art to luxury spaces
+
+| Door | Who buys through it | How in | Unverified |
+|---|---|---|---|
+| **Niio** — art streaming | Hotels (Hilton partnership), luxury homes, F&B, **superyachts** (has a dedicated page) | **Open Call** for original video art: https://www.niio.com/site/niio-open-call/ · artists: https://www.niio.com/site/artists/ · yachts: https://www.niio.com/site/superyacht/ | How and how much artists are paid |
+| **Resolume Footage** — curated VJ packs | VJs and venues playing clubs / events | Curated from hand-picked artists, ~30 loops per pack: https://www.resolume.com/footage | Submission route and revenue split |
+
+Both are a **screen, not a cold email**, and one acceptance reaches every venue on the platform.
+Needs: 3–5 loopable 10–20 s clips, no text, no faces of real people, implied not explicit.
+
+## Tier 2 — where the gatekeepers physically gather (trade fairs)
+
+| Gatekeeper | Where | Signal |
+|---|---|---|
+| Niche perfume brands | **Esxence**, Milan (2026: 3–6 June, 400+ brands, 108 new) | New brands need launch films |
+| Lingerie brands | Lingerie trade fairs (Paris, New York) | Seasonal collection launches |
+| Yacht charter brokers | Charter shows (Mediterranean spring, Caribbean December) | Fleet marketing before season |
+
+Exhibitor lists are public — that is a list of brands **with a launch budget this season**.
+Still outreach, but signal-based.
+
+## Tier 3 — Panama, in person
+
+Rooftop bars, members' clubs, marinas. **Walk-in beats email** for venue owners.
+⚠️ HubSpot already holds 3 Panama yacht-charter deals from ATLAS (unsent, WhatsApp-agent
+pitch). Do not recycle them cold with a new offer.
+
+## Not doing
+
+Rich individuals commissioning private sexual films → a real person's likeness. The line
+does not move.
