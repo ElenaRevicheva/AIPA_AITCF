@@ -130,6 +130,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎬 24 Sep — Book-trailer partner test: 5 deals staged, one-click, NOT sent (Elena's move)
+
+- **DONE:** 5 `[PARTNER-TRAILER]` deals at "I Act TODAY", each with a note button → `/go/outreach-email/trailer-*` (aipa@ via
+  Resend). `scripts/stage-partner-trailer.cjs`, data `docs/selling/partners-trailer.json`, plan
+  `docs/selling/2026-09-23_ROMANCE_PROMO_CHANNEL_PARTNERS.md`. **Hard cap 5 (Elena)** — do not add targets.
+- **VERIFIED BY:** all 5 preview pages → 200 with the right To/Subject and the sample link (GET only; nothing sent).
+- **🚨 KNOWN-BROKEN:** the go-wa **GitHub registry fallback cannot work** — the repo is private, so the raw registry URL is
+  **404**. A slug staged on `main` alone gives "Unknown outreach email slug". Rows must reach Oracle's disk: I scp'd the 5
+  drafts + merged 5 rows into Oracle's registry (backup `~/backups/outreach-registry.pre-trailer-*.json`). Oracle's registry
+  has **~31 rows `main` does not** — never overwrite it with `main`'s copy; merge.
+- **RISK:** re-running the stage script is safe (skips existing deals) but re-sync to Oracle is manual.
+
 ### 🎬 22 Sep — Film #8 *Crimson Escape* LIVE · Atuona bot now has every newest engine
 
 - **Film:** `out/crimson-escape-2026-09-22T16-32-00.mp4` — **republished 17:54 UTC** (md5 `57e71d2b…`, **3:36**, 16 shots, 5 glitch inserts, −15.7 LUFS, peak −1.9 dBFS; first cut kept at `/home/ubuntu/backups/crimson-escape-v1-1632.mp4`). `films.json` lists **8**,
