@@ -226,6 +226,19 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
+### 🟢 24 Sep — HubSpot workflow "Reply Radar" is LIVE (Elena built it in the UI; proven with a test deal)
+- Trigger: deal stage → `contractsent` (💬 They replied). Actions: create task (title = deal name, HIGH, assigned
+  to Elena — NOT "owner": many deals have `hubspot_owner_id = null`) + internal email "A prospect replied".
+  First-time-only enrollment; the 131 deals already in the stage did not fire.
+- Proof: test deal moved 19:49:11Z → task created 19:49:13Z (HIGH, owner 91612860) + email in her Zoho 14:49 Panama.
+  Test deal + task archived afterwards.
+- ⚠️ Starter's simple workflow creates the task **unassociated** to the deal (deal→tasks = []). Tasks list only.
+- 🚨 **Blind spot:** only VJH `response_detector` moves deals to `contractsent`, and only HIRING ones. Client/partner
+  outreach (~193 deals in ⏳ Sent, 2 in They replied on 24 Sep) has NO reply detector → the radar never fires for
+  product outreach. Fix proposed (match inbound Zoho/Gmail to Sent deals by contact email / company domain →
+  move to contractsent); **awaiting Elena's yes** — touches VJH on Oracle.
+- Also: 132 deals have no `[PREFIX]`, 57 created in the last 30 days — an unprefixed writer exists. Not traced yet.
+
 ### 🟢 23 Sep — 8 micro1 roles staged as `[HIRING-MICRO1]` deals · lane CVs corrected
 - `scripts/stage-micro1-deals.cjs` created 8 ACT-TODAY deals (owner Elena, company micro1, apply
   note + lane CV + task). Read back: 8/8. Scan of all 364 jobs: `docs/applications/2026-09-23_micro1_job_scan.md`.
