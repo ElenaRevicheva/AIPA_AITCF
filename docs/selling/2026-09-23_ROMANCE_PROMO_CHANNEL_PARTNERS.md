@@ -1,7 +1,7 @@
 # Romance promo companies — channel partners for cinematic book trailers
 
 **23 Sep 2026.** Researched with Elena in a Claude Code session.
-**Status 24 Sep: staged in HubSpot CLIENT-MANUAL style, not sent.** 5 deals
+**✅ SENT 24 Sep — all 5**, verified in Oracle logs (`[go/outreach-email] sent trailer-… resend=…` ×5). **Stop-rule date: 24 Oct 2026** (at least one yes, else drop). 5 deals
 `[PARTNER-TRAILER] …` at "I Act TODAY", each with a note carrying the one-click
 ✉️ ENVIAR POR EMAIL button (sends from aipa@aideazz.xyz via Resend; the send moves the deal
 to Sent, stamps the note, closes the Send task and books a +4 day follow-up). Staged by
