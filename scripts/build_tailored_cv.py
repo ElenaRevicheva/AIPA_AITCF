@@ -275,6 +275,19 @@ LANES = {
             '<b>Languages:</b> <b>Russian (native)</b> · <b>English (fluent)</b> · '
             'Spanish (working — resident in Panama) · French (elementary)',
     },
+    # 24 Sep 2026 — "HubSpot Specialist" (micro1) matched no lane and fell to 'builder'.
+    # Numbers are the ones on the 13 Sep Toptal CV; the send behaviour is read from src/go-wa.ts.
+    'crm': {
+        'label': 'HubSpot CRM &amp; Sales Operations',
+        'headline': 'HubSpot CRM &amp; Sales-Ops Automation — pipelines, workflows, clean data',
+        'profile':
+            'I run my own sales operation in HubSpot and automate it end to end: deals, companies, '
+            'contacts, notes and tasks written by agents through the API, pipeline stages named for '
+            'who acts next, and one-click approved sends that move the deal, close the task and book '
+            'the follow-up by themselves. <b>1,900+ deals and 1,411 companies</b> in the portal I '
+            'administer. I document every workflow so someone else can run it, and I audit it from '
+            'live records, not from what the dashboard claims.',
+    },
     'exec_support': {
         'label': 'AI-Qualified Executive Support',
         'headline': 'AI Chief of Staff — executive operations, automated',
@@ -290,6 +303,7 @@ LANE_RULES = [
     # Language roles first: "Russian Bilingual Expert" matched no rule and fell to 'builder'.
     ('language', r'bilingual|language expert|language evaluator|linguist|transcription'
                  r'|audio recording|voice record'),
+    ('crm', r'hubspot|\bcrm\b|salesforce|revops|revenue op|sales op'),
     ('evaluation', r'\beval|red.?team|annotat|ai train(er|ing)|quality review|llm judge'),
     ('geo', r'\bgeo\b|\baeo\b|seo|search visibility|answer engine|content market'),
     ('exec_support', r'chief of staff|executive assistant|\bea\b|executive support'),
@@ -435,6 +449,12 @@ def main():
         base = Path(__file__).resolve().parents[1] / 'docs' / 'applications' / 'cv-by-lane'
         base.mkdir(parents=True, exist_ok=True)
         if args.build_all_lanes:
+            # 24 Sep 2026: the lane PDFs are rendered by scripts/build-lane-cv.cjs on the Toptal
+            # design Elena approved. This reportlab path printed "■" for every bullet and had no
+            # dated experience — building here would overwrite the good files with the old ones.
+            print('lane PDFs moved to scripts/build-lane-cv.cjs — rules emitted only')
+            args.build_all_lanes = False
+        if args.build_all_lanes:
             for lane, cfg in LANES.items():
                 p = base / f'CV_Elena_Revicheva_{lane}.pdf'
                 build(cfg['label'], '', lane, p)
@@ -448,8 +468,13 @@ def main():
                     'NOT re-implement the rules anywhere else - read this instead.',
             'default': 'builder',
             'rules': [{'lane': l, 'pattern': p} for l, p in LANE_RULES],
-            'lanes': {l: {'label': c['label'], 'cv': f'CV_Elena_Revicheva_{l}.pdf'}
+            # headline + profile ride along so scripts/build-lane-cv.cjs (the PDF renderer since
+            # 24 Sep) reads the verified prose from HERE instead of keeping a second copy.
+            'lanes': {l: {'label': c['label'], 'headline': c['headline'], 'profile': c['profile'],
+                          'foundation': c.get('foundation'), 'languages': c.get('languages'),
+                          'cv': f'CV_Elena_Revicheva_{l}.pdf'}
                       for l, c in LANES.items()},
+            'facts': [{'tags': t, 'lead': lead, 'body': body} for t, lead, body in FACTS],
         }, indent=2), encoding='utf-8')
         print(f'rules: {base / "lanes.json"}')
         return

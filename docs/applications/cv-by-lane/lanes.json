@@ -8,6 +8,10 @@
       "pattern": "bilingual|language expert|language evaluator|linguist|transcription|audio recording|voice record"
     },
     {
+      "lane": "crm",
+      "pattern": "hubspot|\\bcrm\\b|salesforce|revops|revenue op|sales op"
+    },
+    {
       "lane": "evaluation",
       "pattern": "\\beval|red.?team|annotat|ai train(er|ing)|quality review|llm judge"
     },
@@ -43,39 +47,254 @@
   "lanes": {
     "pm": {
       "label": "AI Product & Program Management",
+      "headline": "Technical Product Owner \u2014 AI &amp; Agentic Platforms | Forward-Deployed",
+      "profile": "Seven years as a <b>Deputy CEO</b> owning digital transformation at board level, then building and operating <b>AI products end to end</b> since May 2025 \u2014 I write the roadmap, ship it, carry the pager, and answer to the numbers. What I do daily is data pipelines and ML infrastructure with an agent on top, sold to operators who buy an outcome, not a model. I hold the architecture conversation with engineers and then explain the trade-off to the person signing the cheque, in the same meeting.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_pm.pdf"
     },
     "architect": {
       "label": "AI Solutions Architecture & Consulting",
+      "headline": "AI Solutions Architect \u2014 production systems, agentic automation, integrations",
+      "profile": "I design AI and automation solutions and then stay on call for them. Seven years at board level before this, so I can scope against a business outcome rather than a wishlist, and say no to the parts that will not pay for themselves. Everything I describe below is running in production, not a prototype.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_architect.pdf"
     },
     "leadership": {
       "label": "AI Leadership & Transformation",
+      "headline": "AI Leadership \u2014 strategy, adoption and the systems underneath it",
+      "profile": "Seven years as <b>Deputy CEO</b> leading digital transformation at board level across IT, legal and compliance in a heavily regulated environment \u2014 then, since May 2025, building the AI systems myself rather than delegating them. I can set the AI strategy and also tell you honestly which parts of it will fail, because I have operated them.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_leadership.pdf"
     },
     "automation": {
       "label": "AI Automation & Operations",
+      "headline": "AI Automation Architect \u2014 agents, workflows and the operations around them",
+      "profile": "I build the automation that runs a business when nobody is watching: finding customers, qualifying them, drafting the reply, updating the CRM, reporting what happened. I design it, deploy it, and stay on call for it \u2014 and I instrument it, so every claim about it is a number I can show.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_automation.pdf"
     },
     "builder": {
       "label": "AI-Augmented Builder / Integration",
+      "headline": "AI-Augmented Builder \u2014 production AI products, agents and integrations",
+      "profile": "I ship and operate production AI products by directing AI coding tools \u2014 that is the workflow, not a gap to hide, and it is why one person sustains this much surface area. Seven years as a Deputy CEO before it, so the systems are built against a business outcome rather than for their own sake.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_builder.pdf"
     },
     "geo": {
       "label": "GEO / AEO / AI Search Visibility",
+      "headline": "GEO / AEO Engineer \u2014 making businesses quotable by AI assistants",
+      "profile": "I make companies findable and quotable in AI answers, and I measure it rather than assert it: structured data, AI-crawler access, answer-ready content, and a recurring citation probe across Google AI Overviews, Gemini, OpenAI search and Perplexity. I built the scoring API that grades it, so the method is inspectable.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_geo.pdf"
     },
     "evaluation": {
       "label": "Expert AI Evaluation & Training",
+      "headline": "AI Evaluation \u2014 evals, red-teaming, and ship/no-ship judgement",
+      "profile": "I evaluate AI systems for a living because I operate them: I write the harnesses, set the gates, and decide when a model is good enough to ship. Seven years at board level before this means I can also explain why a failure matters commercially, not just that a test went red.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_evaluation.pdf"
     },
     "language": {
       "label": "Russian\u2013English Bilingual Language Expert",
+      "headline": "Russian\u2013English Bilingual Expert \u2014 native Russian, published author in both languages",
+      "profile": "Native Russian speaker, born and educated in Russia, who has written, published and worked professionally in Russian for over a decade, and who works in English every day. I listen for what makes speech sound native \u2014 stress, intonation, rhythm and register \u2014 the same things I shape in verse. And I write every judgement down in plain English, with the reason, so another reviewer can check it.",
+      "foundation": "<b>Russian:</b> native \u2014 stress, intonation, rhythm, register (legal, literary, conversational) &nbsp;\u00b7&nbsp; <b>English:</b> fluent, daily professional and literary use &nbsp;\u00b7&nbsp; <b>Audio:</b> FFmpeg, voice/music mixing, loudness normalisation (LUFS), frame-accurate timing &nbsp;\u00b7&nbsp; <b>Evaluation:</b> rubric design, written rationales, review of AI-generated text and speech output.",
+      "languages": "<b>Languages:</b> <b>Russian (native)</b> \u00b7 <b>English (fluent)</b> \u00b7 Spanish (working \u2014 resident in Panama) \u00b7 French (elementary)",
       "cv": "CV_Elena_Revicheva_language.pdf"
+    },
+    "crm": {
+      "label": "HubSpot CRM &amp; Sales Operations",
+      "headline": "HubSpot CRM &amp; Sales-Ops Automation \u2014 pipelines, workflows, clean data",
+      "profile": "I run my own sales operation in HubSpot and automate it end to end: deals, companies, contacts, notes and tasks written by agents through the API, pipeline stages named for who acts next, and one-click approved sends that move the deal, close the task and book the follow-up by themselves. <b>1,900+ deals and 1,411 companies</b> in the portal I administer. I document every workflow so someone else can run it, and I audit it from live records, not from what the dashboard claims.",
+      "foundation": null,
+      "languages": null,
+      "cv": "CV_Elena_Revicheva_crm.pdf"
     },
     "exec_support": {
       "label": "AI-Qualified Executive Support",
+      "headline": "AI Chief of Staff \u2014 executive operations, automated",
+      "profile": "Seven years as a <b>Deputy CEO</b>, so I know what an executive actually needs handled before being asked \u2014 and, since May 2025, I have built the AI systems that handle it. I automate the operations rather than merely coordinating them.",
+      "foundation": null,
+      "languages": null,
       "cv": "CV_Elena_Revicheva_exec_support.pdf"
     }
-  }
+  },
+  "facts": [
+    {
+      "tags": [
+        "pm",
+        "architect",
+        "leadership",
+        "automation",
+        "builder",
+        "evaluation"
+      ],
+      "lead": "Owned an autonomous job-and-lead pipeline 0&#8209;to&#8209;1, live since November 2025.",
+      "body": "Sourcing, the scoring rubric, the LLM judge, and the CRM it writes into. <b>1,898 records</b> processed. I set the success metric and then acted on it: when outcome data showed one role category produced <b>58% of rejections but only 17% of positives</b>, I cut it from targeting in a day and re-pointed the paid search queries. Roadmap from measured reality, not opinion."
+    },
+    {
+      "tags": [
+        "pm",
+        "architect",
+        "geo",
+        "automation",
+        "builder"
+      ],
+      "lead": "Shipped a public scoring API 0&#8209;to&#8209;1.",
+      "body": "<b>34 automated checks in 4 weighted categories</b>, returning a grade and a prioritised fix list. I designed the weighting \u2014 the judgement call of what counts and how much \u2014 and the output a non-technical buyer can act on."
+    },
+    {
+      "tags": [
+        "evaluation",
+        "pm",
+        "architect",
+        "builder",
+        "geo"
+      ],
+      "lead": "Evals as a ship gate, not a vanity metric.",
+      "body": "<b>529 passing tests</b> across unit, integration and golden-set layers, running in about a minute at $0 API cost. It is how I answer \"is the model good enough to ship\" with evidence rather than a feeling."
+    },
+    {
+      "tags": [
+        "architect",
+        "builder",
+        "automation",
+        "leadership",
+        "evaluation"
+      ],
+      "lead": "Non-determinism handled in the architecture.",
+      "body": "Every LLM call runs a <b>five-provider fallback chain</b> ordered per use case across six products. When a provider deprecated the model I depended on, the fleet kept serving and the migration was a config change, not an outage."
+    },
+    {
+      "tags": [
+        "evaluation",
+        "pm",
+        "leadership"
+      ],
+      "lead": "Abstention designed in, over hallucination.",
+      "body": "Research features return \"not enough public information\" rather than invent \u2014 in the last production run, <b>2 of 18</b> correctly refused. Where customers make decisions on the output, a confident wrong answer costs more than a blank one."
+    },
+    {
+      "tags": [
+        "architect",
+        "automation",
+        "builder",
+        "leadership",
+        "geo",
+        "exec_support"
+      ],
+      "lead": "I run the fleet, not just the code.",
+      "body": "<b>15 long-running services and 20 scheduled jobs</b> on a single cloud VM at $0/month infrastructure, 24/7. I am the architect, the reviewer and the on-call \u2014 three-layer recovery so failures heal without me."
+    },
+    {
+      "tags": [
+        "pm",
+        "leadership",
+        "exec_support",
+        "architect"
+      ],
+      "lead": "Forward-deployed by default.",
+      "body": "I run my own discovery, onboarding and follow-up through a CRM I built the automation for, so I hear the problem behind the request and know which version of it someone will pay for."
+    },
+    {
+      "tags": [
+        "geo",
+        "pm",
+        "automation"
+      ],
+      "lead": "Built the discovery engine that makes a business quotable by AI assistants.",
+      "body": "Structured data, AI-crawler access, answer-ready content and daily automated publishing \u2014 measured with a weekly citation probe across Google AI Overviews, Gemini, OpenAI search and Perplexity, plus first-touch-to-CRM attribution."
+    },
+    {
+      "tags": [
+        "pm",
+        "builder",
+        "leadership",
+        "exec_support",
+        "geo"
+      ],
+      "lead": "Took a product from a personal problem to paying subscribers.",
+      "body": "A bilingual AI tutor built from my own family's need as an expat in Panama, through to billing \u2014 persistent per-user memory, voice, OCR, subscriptions. Early revenue, honestly small; included because I owned it from problem to paid."
+    },
+    {
+      "tags": [
+        "leadership",
+        "pm",
+        "architect",
+        "evaluation",
+        "geo",
+        "exec_support"
+      ],
+      "lead": "I publish my own postmortems.",
+      "body": "<b>21 incident write-ups</b> in a public AI Ops wiki \u2014 you can read how I reason about failure before you interview me."
+    },
+    {
+      "tags": [
+        "automation",
+        "builder",
+        "exec_support",
+        "geo"
+      ],
+      "lead": "Automation that runs a business when nobody is watching.",
+      "body": "Finding customers, qualifying them, drafting the reply, updating the CRM and reporting what happened \u2014 designed, deployed, and still on call for it."
+    },
+    {
+      "tags": [
+        "language"
+      ],
+      "lead": "Published author in Russian.",
+      "body": "<b>46 poems</b> written in Russian and published on the LITPROM literary portal through its editorial board, 2019\u20132025. Stress, rhythm and register are the material I work in."
+    },
+    {
+      "tags": [
+        "language"
+      ],
+      "lead": "Published author in English as well.",
+      "body": "<b>53 poems</b> written in English, published in my own ATUONA gallery, Dec 2024 \u2013 Sep 2026 \u2014 so I hear the difference between a native line and a translated one from both sides."
+    },
+    {
+      "tags": [
+        "language"
+      ],
+      "lead": "Seven years of professional work in Russian, where one word changes the meaning.",
+      "body": "Seven years as Deputy CEO and Chief Legal Officer of a Russian public-sector e-government operator: drafting and negotiating contracts and regulatory positions, presenting to boards and regulators."
+    },
+    {
+      "tags": [
+        "language"
+      ],
+      "lead": "Spoken audio, mixed and measured.",
+      "body": "My automated film pipeline locks each narration line to its clip, ducks music under the voice and normalises the mix to broadcast loudness (\u221216 LUFS; the latest film measured \u221215.7). <b>8 films</b> published, each render verified before release."
+    },
+    {
+      "tags": [
+        "language"
+      ],
+      "lead": "Written justifications that another reviewer can check.",
+      "body": "I built a scoring rubric and an AI judge, then replayed <b>51</b> rejected items: <b>20</b> were wrong, caught before release. I also keep a public record of <b>22</b> written incident analyses \u2014 what happened, why, and the named pattern \u2014 the same discipline an evaluation rationale needs."
+    },
+    {
+      "tags": [
+        "language"
+      ],
+      "lead": "Language technology, built and used by real learners.",
+      "body": "EspaLuz, a bilingual Spanish\u2013English AI tutor on WhatsApp and Telegram, with voice in and voice out and per-family memory. Selected by micro1 for the Titan Proton human-data project."
+    },
+    {
+      "tags": [
+        "exec_support",
+        "leadership",
+        "pm"
+      ],
+      "lead": "Board-level operating experience.",
+      "body": "Seven years as Deputy CEO running digital transformation across IT, legal and compliance in a heavily regulated environment \u2014 comfortable being the person who names the trade-off in front of people who did not want to hear it."
+    }
+  ]
 }
