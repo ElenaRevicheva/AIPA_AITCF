@@ -150,3 +150,9 @@ Sources: Wikipedia *Groupe Artémis*; TPG/CAA release (2023); familyofficehub (K
 - **25 Sep — Niio staged (NOT sent):** `atuona-niio-open-call` → `support@niio.com` (decoded from the Open Call page). Asks:
   AI-made work accepted? sensual-not-explicit OK for venues? silent loops preferred? Unblocks the submission (artists share
   30% of program subscription fees). Masters are 1280x720 — upscale to 1920x1080 before submitting.
+- **25 Sep — Niio SENT (Elena).**
+- **25 Sep — Berlin Fashion Film staged (NOT sent):** `atuona-berlin-fashion-film` → `contact@berlinfashionfilmfestival.net`.
+  Asks whether *Crimson Escape* meets "fashion prominently" and which category: Digital Fashion & AI (€140) or Rising Star
+  VFX/CGI/Animation & AI (€50, spec work allowed, ≤5 paid fashion clients). Regular deadline **28 Oct**, final 28 Dec; max 12 min.
+  CIFRA *RestArt Reality*: deadline **1 Nov 23:59 GST**, portal only — submit film #7 there, no email needed.
+  Resolume Footage: no public artist-submission route found — skipped.

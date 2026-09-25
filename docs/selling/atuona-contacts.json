@@ -83,6 +83,20 @@
       "purpose": "open call questions",
       "ask": "AI-made work accepted? sensual-not-explicit OK for venues? silent loops preferred? (unblocks the Niio submission: artists share 30% of program subscription fees)",
       "draft": "docs/selling/drafts/atuona-niio-open-call-email.txt"
+    },
+    {
+      "slug": "atuona-berlin-fashion-film",
+      "company": "Berlin Fashion Film Festival",
+      "domain": "berlinfashionfilmfestival.net",
+      "firstname": "BFFF",
+      "lastname": "Team",
+      "jobtitle": "Festival team, Berlin Fashion Film Festival",
+      "email": "contact@berlinfashionfilmfestival.net",
+      "emailSource": "berlinfashionfilmfestival.net homepage, read 25 Sep 2026",
+      "subject": "Before I submit: which category fits a poem-film made with AI?",
+      "purpose": "category question before submitting",
+      "ask": "Does Crimson Escape meet \"fashion prominently\"? Digital Fashion & AI (EUR 140) or Rising Star VFX/CGI/Animation & AI (EUR 50)? Regular deadline 28 Oct 2026",
+      "draft": "docs/selling/drafts/atuona-berlin-fashion-film-email.txt"
     }
   ]
 }

@@ -3224,5 +3224,13 @@
     "email": "support@niio.com",
     "emailDraft": "docs/selling/drafts/atuona-niio-open-call-email.txt",
     "dealId": "65215836735"
+  },
+  "atuona-berlin-fashion-film": {
+    "phone": "",
+    "draft": "docs/selling/drafts/atuona-berlin-fashion-film-email.txt",
+    "company": "Berlin Fashion Film Festival",
+    "email": "contact@berlinfashionfilmfestival.net",
+    "emailDraft": "docs/selling/drafts/atuona-berlin-fashion-film-email.txt",
+    "dealId": "65219473799"
   }
 }
