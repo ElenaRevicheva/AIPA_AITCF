@@ -101,3 +101,25 @@ tahititourisme.com (Centre Culturel Paul Gauguin). No contact addresses were col
   **Not staged, and why:** Kate Vass — site says "Artist Submissions are currently closed". Centre Culturel Paul Gauguin —
   only a phone and a contact form are public, no address. CIFRA, Niio, Berlin Fashion Film — submission portals, not email.
   Christie's, Nick Knight, Refik Anadol, Paul Trillo, the brands — no verified address and no acceptance to show yet.
+
+## 25 Sep — the Pinault / Ponant / Bezos claims, checked
+
+Elena pasted a paragraph (source unknown, reads AI-written). Verdict per claim:
+
+| Claim | Verdict | Evidence |
+|---|---|---|
+| Pinault's Artémis owns Ponant | ✅ true | Ponant Explorations Group is owned by Artémis (Seatrade Cruise; Wikipedia *Compagnie du Ponant*) |
+| Ponant took over *The Paul Gauguin* | ✅ true, 2019 | Ponant acquired Paul Gauguin Cruises in 2019 (Cruise Trade News, Travel Weekly) |
+| …"refitted explicitly" for "ultra-exclusive" runs into Atuona | ❌ overstated | Atuona is one stop on one of six itineraries (14 nights, Papeete round trip, 330 guests, from ~USD 8,150 pp; departures e.g. 20 Jun and 15 Aug 2026). Upscale, not ultra-exclusive |
+| Bezos's *Koru* expedition to Atuona, May 2026, "highly publicised" | ❌ not found | *Koru* + *Abeona* were reported in **Tahiti** in May 2026 and in **Fiji** 24 Jun. No source puts them in the Marquesas |
+| Lauren Sánchez aboard it | ❌ not found | She was at the Met Gala in New York on 4 May 2026; a Fiji snorkelling trip is reported. "Billionaire in her own right" is also unsupported |
+
+**What is usable:** the ship named after Gauguin calls at Atuona and its guests visit the Gauguin cultural centre.
+Paul Gauguin Cruises runs an **onboard enrichment programme** (guest lecturers, including artists speaking on Gauguin;
+past rosters include National Geographic photographers and wildlife filmmakers). That is a public, screened door:
+**pitch Elena as an enrichment guest artist** — ATUONA films screened on the Marquesas voyages, a talk on the poems.
+Unverified: how lecturers are chosen and whether it pays in fees or in passage. Pinault himself is not a door. Christie's
+is also an Artémis company, so that door (Nicole Sales Giles) sits in the same group.
+
+**Not doing:** approaching Bezos or Sánchez, or tracking private yachts to reach anyone. There is no public door,
+and following someone's movements to pitch them is surveillance, not outreach.
