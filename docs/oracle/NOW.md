@@ -130,6 +130,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎬 25 Sep — Atuona art outreach: 5 letters staged one-click in HubSpot, NOT sent (Elena's move)
+
+- **DONE:** `[ATUONA-ART]` deals + note button (aipa@ via Resend, reply-to her Gmail) + HIGH task for Diane Pernet (ASVOFF),
+  Sasha Stiles, Anika Meier (via info@expanded.art), Mila Askarova (via info@gazelliarthouse.com), Paul Gauguin Cruises
+  (mediarelations@, guest-artist pitch for the Marquesas voyages). Script `scripts/stage-atuona-contact.cjs`, data
+  `docs/selling/atuona-contacts.json`, letters `docs/selling/drafts/atuona-*-email.txt` (hand-written; the script writes
+  no text). Research, tiers, Pinault/Artémis door map, log: `docs/selling/2026-09-24_ATUONA_PEOPLE_TO_CONTACT.md`.
+- **VERIFIED BY:** 5 rows merged into Oracle's registry (413 → 418, backups `~/backups/outreach-registry.pre-atuona-*`);
+  every `/go/outreach-email/atuona-*` preview GET → 200 with the right To + body. Nothing sent.
+- **RISK:** Diane's letter ALSO exists as a Gmail draft — one send only. Pinault group = one company at a time. Bezos/Sánchez
+  "Atuona May 2026" claims are unsourced — never use them. Kate Vass has submissions closed — do not stage.
+
 ### 🎬 24 Sep — Book-trailer partner test: 5 deals staged, one-click, NOT sent (Elena's move)
 
 - **DONE:** 5 `[PARTNER-TRAILER]` deals at "I Act TODAY", each with a note button → `/go/outreach-email/trailer-*` (aipa@ via

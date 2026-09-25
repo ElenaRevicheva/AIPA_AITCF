@@ -4,6 +4,8 @@ This adds **named people** to `2026-09-24_LUXURY_GATEKEEPERS_MAP.md`, which list
 fairs, Panama). Status: **research only. Nothing has been sent.** The same rule applies here: the book-trailer test
 runs until **24 Oct**. Before then, only the screened doors below (open calls and festivals) are open, not cold letters.
 
+**Shared doc (phone-readable, same content + a live contact log):** https://claude.ai/code/artifact/0877b70e-bac4-467f-a292-b2b402e515ae
+
 ## What we bring (verified from the repo, 24 Sep)
 
 - **8 films** in the gallery at atuona.xyz/aifilmstudio. The newest is *Crimson Escape*, 3:36, made from 16 generated
