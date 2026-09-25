@@ -55,6 +55,20 @@
       "purpose": "gallery note",
       "ask": "Would she or the GAZELL.iO team watch Crimson Escape; a place in the digital programme",
       "draft": "docs/selling/drafts/atuona-gazelli-mila-askarova-email.txt"
+    },
+    {
+      "slug": "atuona-paul-gauguin-cruises",
+      "company": "Paul Gauguin Cruises",
+      "domain": "pgcruises.com",
+      "firstname": "Media Relations",
+      "lastname": "Team",
+      "jobtitle": "Public Relations Department, Paul Gauguin Cruises (Ponant Explorations Group / Artemis)",
+      "email": "mediarelations@pgcruises.com",
+      "emailSource": "pgcruises.com/press/media-public-relations, read 25 Sep 2026; no public address for the enrichment programme, letter asks to be passed on (GM Susan Robison is named as its owner in their 2025 enrichment release)",
+      "subject": "A poet from Atuona, for your Marquesas voyages",
+      "purpose": "guest artist pitch",
+      "ask": "Guest artist on Marquesas voyages: a screening and talk the evening before Atuona. Asks who curates enrichment and what the role involves (pay/passage unverified)",
+      "draft": "docs/selling/drafts/atuona-paul-gauguin-cruises-email.txt"
     }
   ]
 }

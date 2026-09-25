@@ -3208,5 +3208,13 @@
     "email": "info@gazelliarthouse.com",
     "emailDraft": "docs/selling/drafts/atuona-gazelli-mila-askarova-email.txt",
     "dealId": "65215324254"
+  },
+  "atuona-paul-gauguin-cruises": {
+    "phone": "",
+    "draft": "docs/selling/drafts/atuona-paul-gauguin-cruises-email.txt",
+    "company": "Paul Gauguin Cruises",
+    "email": "mediarelations@pgcruises.com",
+    "emailDraft": "docs/selling/drafts/atuona-paul-gauguin-cruises-email.txt",
+    "dealId": "65255885637"
   }
 }

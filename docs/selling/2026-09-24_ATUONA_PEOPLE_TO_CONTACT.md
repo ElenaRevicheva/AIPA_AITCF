@@ -123,3 +123,23 @@ is also an Artémis company, so that door (Nicole Sales Giles) sits in the same 
 
 **Not doing:** approaching Bezos or Sánchez, or tracking private yachts to reach anyone. There is no public door,
 and following someone's movements to pitch them is surveillance, not outreach.
+
+## 25 Sep — Paul Gauguin Cruises staged + the Artémis map
+
+**Staged (NOT sent):** `atuona-paul-gauguin-cruises` → `mediarelations@pgcruises.com` (their Media & PR page; no public
+enrichment address, letter asks to be passed on). Pitch: screening + talk on the Marquesas voyages, the evening before
+Atuona. Hooks, all verified: #092 *Hungry Earth* opens on Hiva Oa and is Act I of *Crimson Escape*; #095 is about the
+Maison du Jouir doorframes, which the Centre Culturel Paul Gauguin reconstructs; precedent = painter Kim McDonald sailed
+as their guest lecturer on Gauguin (pgcruises.com blog). Pay/passage **unverified** — the letter asks. Oracle 417 → 418, preview 200.
+
+**Artémis (Pinault family office) — one door at a time, never five at once:**
+
+| Artémis company | Door for Atuona | When |
+|---|---|---|
+| Ponant Explorations Group → **Paul Gauguin Cruises** | Guest artist, Marquesas voyages | **Now** (staged) |
+| Ponant Explorations Group → Ponant Explorations | `presse@ponant.com` (listed on pgcruises media page) | Only if PGC is silent ~2 weeks, or to extend a yes |
+| **Christie's** (owned by Artémis) | Digital art sales (Nicole Sales Giles) | After an acceptance or a PGC yes — "sailing as Paul Gauguin Cruises' guest artist" is the credential |
+| Pinault Collection (Bourse de Commerce, Palazzo Grassi) | No open call; collects established artists | Aspirational |
+| Kering (40.9%: Gucci, Saint Laurent, Bottega…) · CAA (majority since 2023) · Château Latour | No door for this work | No |
+
+Sources: Wikipedia *Groupe Artémis*; TPG/CAA release (2023); familyofficehub (Kering 40.9%, Puma sold Jan 2026).
