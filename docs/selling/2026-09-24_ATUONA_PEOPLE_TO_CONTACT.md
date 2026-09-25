@@ -145,3 +145,8 @@ as their guest lecturer on Gauguin (pgcruises.com blog). Pay/passage **unverifie
 | Kering (40.9%: Gucci, Saint Laurent, Bottega…) · CAA (majority since 2023) · Château Latour | No door for this work | No |
 
 Sources: Wikipedia *Groupe Artémis*; TPG/CAA release (2023); familyofficehub (Kering 40.9%, Puma sold Jan 2026).
+- **25 Sep — SENT (Elena):** Diane, Sasha, Mila (24 Sep), Anika and Paul Gauguin Cruises (25 Sep). All 5 deals at Sent with
+  follow-up tasks. HubSpot logged a link click on Anika's and PGC's letters (could be a person or a mail scanner).
+- **25 Sep — Niio staged (NOT sent):** `atuona-niio-open-call` → `support@niio.com` (decoded from the Open Call page). Asks:
+  AI-made work accepted? sensual-not-explicit OK for venues? silent loops preferred? Unblocks the submission (artists share
+  30% of program subscription fees). Masters are 1280x720 — upscale to 1920x1080 before submitting.

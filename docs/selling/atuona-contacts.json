@@ -69,6 +69,20 @@
       "purpose": "guest artist pitch",
       "ask": "Guest artist on Marquesas voyages: a screening and talk the evening before Atuona. Asks who curates enrichment and what the role involves (pay/passage unverified)",
       "draft": "docs/selling/drafts/atuona-paul-gauguin-cruises-email.txt"
+    },
+    {
+      "slug": "atuona-niio-open-call",
+      "company": "Niio",
+      "domain": "niio.com",
+      "firstname": "Niio",
+      "lastname": "Support",
+      "jobtitle": "Support / Open Call questions, Niio art streaming",
+      "email": "support@niio.com",
+      "emailSource": "niio.com/site/niio-open-call (\"contact … at any time if you have any questions\"), Cloudflare-protected address decoded 25 Sep 2026",
+      "subject": "Niio Open Call: a few questions before I submit",
+      "purpose": "open call questions",
+      "ask": "AI-made work accepted? sensual-not-explicit OK for venues? silent loops preferred? (unblocks the Niio submission: artists share 30% of program subscription fees)",
+      "draft": "docs/selling/drafts/atuona-niio-open-call-email.txt"
     }
   ]
 }

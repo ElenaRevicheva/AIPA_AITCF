@@ -3216,5 +3216,13 @@
     "email": "mediarelations@pgcruises.com",
     "emailDraft": "docs/selling/drafts/atuona-paul-gauguin-cruises-email.txt",
     "dealId": "65255885637"
+  },
+  "atuona-niio-open-call": {
+    "phone": "",
+    "draft": "docs/selling/drafts/atuona-niio-open-call-email.txt",
+    "company": "Niio",
+    "email": "support@niio.com",
+    "emailDraft": "docs/selling/drafts/atuona-niio-open-call-email.txt",
+    "dealId": "65215836735"
   }
 }
