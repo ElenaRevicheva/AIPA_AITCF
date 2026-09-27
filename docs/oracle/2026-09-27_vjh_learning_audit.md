@@ -43,3 +43,39 @@ their notes and attachments) and from Oracle (`judge_feedback.json`, `judge_feed
 4. **Proof by replay** — the gate re-run over all decisions: share of her rejections it now blocks, and positives it
    wrongly blocks (must stay 0). Becomes an eval test in `evals/`.
 5. **Weekly precision metric** to Telegram — of deals VJH put in 🔥 I Act TODAY, how many she applied to vs rejected.
+
+---
+
+## Deeper dig (same day) — the learning EXISTS; it is wired where it cannot decide
+
+Correction to the section above: the loop is real and was proven end to end on 1 Sep 2026 (memory
+`project_vjh_self_learning`): her note + screenshot → `judge_feedback_sync.py` (hourly, `17 * * * *`) →
+gpt-4o-mini reads the image → `judge_feedback.json` → `_feedback_block()` in the live judge prompt. Location is
+also not "only a hint": `iron_clad_fit` has a hard `COUNTRY_LOCK` (hand-written, not learned).
+
+Every learning mechanism in VJH `main` (34 branches checked — nothing learning-related stranded):
+
+| Mechanism | State in production (27 Sep) |
+|---|---|
+| Notes + screenshots → judge prompt | ✅ runs hourly; ⚠️ 8-day window, 12 examples |
+| LLM judge (`judge_fit`) — the ONLY reader of her lessons | runs at the LangGraph submit node + runner + borderline rescue: **16 verdicts in 7 days**; none of the 11 vetoes cites a learned lesson — all cite fixed criteria (2, 3c, 3e, 3h, 4) |
+| Google-Jobs ingest (`serpapi_jobs_ingest.py`) — creates most deals | `iron_clad_fit` + salary floor decide 🔥 I Act TODAY; the judge is asked **only when the gate says NO** (rescue), **never to veto a gate-pass** |
+| Hourly scorer (`job_matcher.py` "AI Analysis …/100") | its own prompt — **does not read `judge_feedback.json`**; 22 analyses in 7 days |
+| `learning_metrics` table ("track what works") | defined in `database_models.py`, **written by no code — 0 rows** in both prod DBs (`job_listings`, `interviews` also 0) |
+| "Success prediction model" (`response_detector.py`) | saves 385 `detected_responses`; **no model reads them** |
+| Rule edits after her feedback (fit_gate / job_gate / lanes) | ✅ the evolution that actually changed behaviour — but by agents hand-editing code (e.g. `18d3bf1` Georgia IT, `5c50c09` generic AI Engineer), not by VJH |
+
+**So:** her lessons reach one component (the judge), which sits on the smallest path and is told they cannot
+override its fixed criteria; the path that fills 🔥 I Act TODAY never asks it.
+
+## Fix — build on what exists (not a rewrite)
+
+1. **Judge on every door into 🔥 I Act TODAY** — Google-Jobs ingest asks the judge on a gate-PASS too (veto, not
+   only rescue); the hourly scorer's prompt gets the same `_feedback_block()`.
+2. **Full memory** — cursor-based sync over all decisions (no 400-deal window); prompt gets a compact
+   "lessons by reason" summary of ALL rejections + the 12 most recent examples.
+3. **Lessons → enforced rules** with provenance (country list excluding Panama, born-in / citizenship, CS degree /
+   manual coding, tool not in her stack, closed posting, pay below floor, company rejected 3+ times).
+4. **Screenshot prompt v4** — also extract location / eligibility / closed / pay.
+5. **Proof** — replay over all decisions (rejections caught, applied jobs wrongly blocked = 0) as an eval test;
+   finally WRITE `learning_metrics` weekly and send the precision number to Telegram.
