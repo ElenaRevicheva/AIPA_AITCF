@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 16:25 | Voice→Trello: edits to DESCRIPTION create new cards ("отредактировать" not recognised) | cto-aipa `src/trello-voice.ts` (+ dist), `pm2 restart cto-aipa`; her cards WqGGMmWD (desc), Fx8IOjJn + 4qEGUIS0 (archive) | cto-aipa `HEAD` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -248,6 +247,17 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
+
+### 🟢 28 Sep 16:23 UTC — Voice→Trello: a spoken DESCRIPTION correction edits the card · cto-aipa `3124c60`
+
+- **Was (11:12–11:14 Panama, after c34354e):** "Отредактирую эту задачу…" / "…ты должен отредактировать… доктор Фернандо Агилар"
+  → 2 NEW cards (one on the September board). Update knew date/time/name only; "отредактировать"/"edit" not in `MGMT_RE`.
+- **Now:** `MGMT_RE` + edit-/clarif-/редакт-/уточн-/описани-/aclar-/modific-; update `newDescription` (the statement, not the
+  instruction; Cyrillic name searched in Latin); never edits an ARCHIVED card; board hint = boards matching ALL words.
+- **VERIFIED BY:** test 15/15 (laptop + Oracle); READ-ONLY dry run of her two messages ×3 on Oracle: session edit 3/3; named edit →
+  exactly 1 open card (the real one) 3/3. Deployed hash identical laptop = Oracle; `pm2 restart cto-aipa` 16:23:24.
+- **Her data:** WqGGMmWD desc → "Cita con el Dr. Fernando Aguilar, nefrólogo. This appointment is for my stepfather Marshall."
+  (due kept Oct 15 15:30); Fx8IOjJn + 4qEGUIS0 ARCHIVED. A garbled voice note (11:13) was saved as a diary entry — left as is.
 
 ### 🟢 28 Sep 16:08 UTC — Voice→Trello: dates land on the day + time she says; a spoken correction EDITS the card · cto-aipa `c34354e`
 
