@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-09-28 17:30 | Auto tailored CV + technical-defense note on every NEW I Act TODAY hiring deal | cto-aipa `scripts/hs-fill-apply-kit.cjs`, `scripts/build-lane-cv.cjs`, new `scripts/lib/job-tailor.cjs` + `docs/interview/defense-bank.json`; Oracle: CV build deps (pdf-lib/fonts) | cto-aipa `HEAD` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
