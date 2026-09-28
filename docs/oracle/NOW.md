@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 17:30 | Auto tailored CV + technical-defense note on every NEW I Act TODAY hiring deal | cto-aipa `scripts/hs-fill-apply-kit.cjs`, `scripts/build-lane-cv.cjs`, new `scripts/lib/job-tailor.cjs` + `docs/interview/defense-bank.json`; Oracle: CV build deps (pdf-lib/fonts) | cto-aipa `HEAD` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -248,6 +247,19 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
+
+### 🟢 28 Sep 20:17 UTC — Every NEW I-Act-TODAY hiring deal: tailored CV + 🛡️ TECHNICAL DEFENSE note · cto-aipa `ec7fddd`, VJH `c372fb8` `37556cc`
+
+- **What:** `hs-fill-apply-kit.cjs` (cron every 2 h) → `scripts/lib/job-tailor.cjs` SELECTS (no generation): lane CV + the posting's
+  title as headline + the 3 most relevant verified blocks, built on Oracle (`~/cv-build-deps` pdf-lib 1.17.1, `~/cv-build-fonts`
+  → Liberation Sans); note = "Who writes the code?" + best matches from `docs/interview/defense-bank.json` (18 verified answers).
+  Runs for deals created ≥ 28 Sep; `--backfill` / `--only=<id>` for older ones (the 20 existing deals were NOT backfilled — Elena's call).
+- **VJH protected FIRST:** tested on the real templates, the defense note would have MASKED her rejection reason and the READY
+  note read as "her reason: ✅ READY TO SEND"; also an Aug "🟡 [BORDERLINE] Promoted…" note. `_KIT_NOTE` skips all three (0 ledger
+  entries were affected). The enhancement was paused on Oracle (20:07, before the 20:10 cron) until that fix was live.
+- **VERIFIED BY:** tests 27/27 (tailor) + 15/15 (letters) + VJH 19/19; dry run on 20 real deals → 20 CVs built, 0 failures; fired on
+  Glean (`--only`): note + tailored CV (PRIVATE) read back from HubSpot; VJH's own code on that deal's notes skips 3 of 4, reason ''.
+- **Known limit:** summary + "available for" stay the lane's (selection only); top roles still deserve a hand kit (KIRA/Niuro).
 
 ### 📨 28 Sep — Niuro "AI Operations & Growth Lead" (GetOnBoard, LATAM-only remote, USD 2,500–3,500): kit READY — Elena's move
 
