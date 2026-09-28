@@ -43,11 +43,16 @@ const COMET_PROFILE = {
   linkedin: 'https://linkedin.com/in/elenarevicheva',
   github: 'https://github.com/ElenaRevicheva',
   portfolio: 'https://aideazz.xyz/portfolio',
-  headline: 'AI Automation Architect — production AI systems, agentic automation, GEO/AEO',
-  experience: '7 years Deputy CEO (board-level digital transformation) + 2 years building and '
-    + 'operating production AI systems hands-on',
+  // 28 Sep 2026: "2 years building … hands-on" was wrong (git dates the first AI repo to May 2025)
+  // and sold her solo; the title is now her real one and the experience line carries her approved
+  // positioning — Elena + her AI environment as one operating unit.
+  headline: 'Founder & AI Product and Solutions Lead, AIdeazz.xyz',
+  experience: '7 years as Deputy CEO and Chief Legal Officer (board-level digital transformation in '
+    + 'regulated e-government) + production AI systems since May 2025, built through my AI-native '
+    + 'development environment: specialized agents handle much of the implementation, I own '
+    + 'requirements, architecture, evaluation, deployment and production decisions',
   notice: 'Available immediately',
-  languages: 'English (fluent), Russian (native), Spanish (working)',
+  languages: 'English (fluent), Russian (native), Spanish (intermediate)',
 };
 
 const args = process.argv.slice(2);
@@ -56,6 +61,8 @@ const argOf = (name, dflt) => {
   return i >= 0 && args[i + 1] ? args[i + 1] : dflt;
 };
 const LIMIT = parseInt(argOf('--limit', '50'), 10);
+// HubSpot portal for the per-card deal link (the same one stage-hiring-outreach.cjs prints).
+const HS_PORTAL = envValue('HUBSPOT_PORTAL_ID') || '51409153';
 const STAGE = argOf('--stage', 'qualifiedtobuy');
 const OUT = argOf('--out', path.join(process.env.USERPROFILE || process.env.HOME || '.',
   'OneDrive', 'Desktop', 'apply-queue.html'));
@@ -67,6 +74,25 @@ const strip = (html) => String(html || '')
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   .replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
 
+/**
+ * Keep the LETTER only (28 Sep 2026). "Copy letter" and the Comet prompt were carrying VJH's
+ * scaffolding after it — "--- CHECKLIST --- [ ] Open Apply link … Extra notes … Approve in Telegram:
+ * /approve_vjh_…" — straight into an application form. The hand-written READY notes also open with
+ * the apply link and an eligibility line, and end with a kit footer.
+ */
+function cleanLetter(letter) {
+  let l = String(letter || '');
+  const stops = [/-{2,}\s*CHECKLIST\b/i, /\bCHECKLIST\s*-{2,}/i, /\bExtra notes:/i, /CV for this lane is attached/i,
+    /Tailored CV attached/i, /The 27 Sep auto-drafted letter/i, /\bKit: docs\//i, /⚠️\s*NEEDS MANUAL APPLY/i,
+    /Approve in Telegram:/i];
+  for (const re of stops) {
+    const k = l.search(re);
+    if (k > 0) l = l.slice(0, k);
+  }
+  l = l.replace(/^(?:\s*(?:Apply(?: on [^:\n]+| \(direct\))?:\s*\S+|Eligibility:[^\n]*|Panama:[^\n]*)[ \t]*\n)+/i, '');
+  return l.trim();
+}
+
 /** The note is one blob: marker, apply URL, source, then the letter after a "COVER" divider. */
 function parseNote(body) {
   const text = strip(body);
@@ -76,6 +102,7 @@ function parseNote(body) {
   const cut = text.search(/COVER\s*\/?\s*(OUTREACH)?\s*LETTER|COVER LETTER/i);
   let letter = cut >= 0 ? text.slice(cut).replace(/^[^\n]*\n?/, '').trim() : '';
   letter = letter.replace(/^-{2,}\s*/, '').replace(/\(edit,\s*then paste\)\s*-*\s*/i, '').trim();
+  letter = cleanLetter(letter);
   const boilerplate = /Boilerplate\s*—?\s*not tailored|returned only \d+ chars/i.test(text);
   const thin = (text.match(/only (\d+) chars/i) || [])[1] || '';
   return { url, source, score, letter, boilerplate, thin };
@@ -114,11 +141,14 @@ async function hs(url, init = {}) {
     const assoc = await hs(`${base}/crm/v3/objects/deals/${d.id}/associations/notes?limit=20`);
     const ids = (assoc.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
     let note = { url: '', source: '', score: '', letter: '', boilerplate: false, thin: '' };
+    let defense = false;
     if (ids.length) {
       const batch = await hs(`${base}/crm/v3/objects/notes/batch/read`, {
         method: 'POST',
         body: JSON.stringify({ properties: ['hs_note_body', 'hs_timestamp'], inputs: ids.map((id) => ({ id })) }),
       });
+      // 28 Sep 2026: new deals carry a tailored CV + technical-defense note (hs-fill-apply-kit.cjs).
+      defense = (batch.results || []).some((n) => /TECHNICAL DEFENSE/.test(n.properties.hs_note_body || ''));
       // A deal can carry several notes, and the apply link and the letter are not always in the
       // same one. Picking a single "best" note silently dropped 7 real letters on the first run,
       // so merge field-by-field, newest note first, and never overwrite a value already found.
@@ -142,6 +172,7 @@ async function hs(url, init = {}) {
       title: (at > 0 ? titleCompany.slice(0, at) : titleCompany).replace(/^Apply to\s+/i, '').trim(),
       company: at > 0 ? titleCompany.slice(at + 3).trim() : '',
       created: (d.properties.createdate || '').slice(0, 10),
+      defense,
       ...note,
     });
   }
@@ -353,6 +384,7 @@ async function hs(url, init = {}) {
         ${r.source ? `<span class="pill">${esc(r.source)}</span>` : ''}
         ${r.prefix.includes('UNVERIFIED') ? '<span class="pill bad">unverified</span>' : ''}
         ${!r.letter ? '<span class="pill bad">no draft letter</span>' : ''}
+        ${r.defense ? '<span class="pill">🛡️ tailored CV + defense in HubSpot</span>' : ''}
       </div>
     </div>
     ${r.boilerplate ? `<p class="flag">⚠️ The draft letter is <b>boilerplate</b>${r.thin ? ` — the job page gave only ${esc(r.thin)} characters` : ''}. Rewrite it before sending.</p>` : ''}
@@ -360,6 +392,7 @@ async function hs(url, init = {}) {
     <div class="actions">
       ${r.url ? `<a class="btn go" href="${esc(r.url)}" target="_blank" rel="noopener">Open &amp; apply ↗</a>`
               : '<span class="btn dead">no apply link in the note</span>'}
+      <a class="btn" href="https://app.hubspot.com/contacts/${esc(HS_PORTAL)}/record/0-3/${esc(r.id)}" target="_blank" rel="noopener">HubSpot deal ↗</a>
       <button class="btn cm" onclick="copyComet(${i},this)">Copy Comet prompt</button>
       ${r.letter ? `<button class="btn" onclick="copyLetter(${i},this)">Copy letter</button>` : ''}
       <button class="btn" onclick="this.closest('.card').classList.toggle('done')">Mark done</button>
@@ -409,7 +442,8 @@ async function hs(url, init = {}) {
   <div class="prompt" style="border-style:solid;border-color:rgba(0,229,255,.35)">
     <b style="color:var(--ink)">Perplexity <u>Computer</u> — do the whole queue at once</b><br>
     Computer is the cloud agent at <a href="https://www.perplexity.ai/gen/computer/job-applications" target="_blank" rel="noopener" style="color:var(--cy)">perplexity.ai/gen/computer</a>
-    (Max plan). It is <b style="color:var(--ink)">not</b> the Comet browser: it takes one goal and runs the batch unwatched.
+    (<b style="color:var(--warn)">needs the paid Max plan — without it, skip this box; the per-job Comet prompts below are free</b>).
+    It is <b style="color:var(--ink)">not</b> the Comet browser: it takes one goal and runs the batch unwatched.
     So this is <b style="color:var(--ink)">one</b> work order for all ${rows.length} jobs — details, links, angles and letters —
     ending in a rule that it must report a table of what it filled and what it left blank.
     It is told, three times, <b style="color:var(--ink)">not to submit anything</b>.
