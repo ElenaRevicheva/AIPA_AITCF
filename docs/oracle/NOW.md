@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-27 22:00 | VJH learning: connect lessons to every door into I Act TODAY | VJH `scripts/judge_feedback_sync.py`, `src/core/llm_judge.py`, `src/core/learned_rules.py` (new), `src/search/serpapi_jobs_ingest.py`, `src/langgraph_pipeline/nodes.py`; restart `vibejobhunter` + `serpapi-jobs` | d2947cd |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -238,6 +237,28 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
+
+### 🟢 28 Sep — VJH now LEARNS from her rejections (not just quotes them) — VJH `main` `9349b7b`, deployed + restarted 01:13 UTC
+- Her lessons now DECIDE: `src/core/learned_rules.py` + the judge run on EVERY door into 🔥 I Act TODAY
+  (Google-Jobs ingest on Bright Data — "SerpAPI/SERP" is only the legacy name — and LangGraph submit). The ingest
+  used to send every gate-pass straight to I Act TODAY; the judge only rescued gate-NOs.
+- Permanent memory: `autonomous_data/judge_decisions.json` = ALL 554 decided deals (was: 400 newest-modified = 8 days).
+  Rules with provenance in `learned_rules.json`; weekly precision in `learning_metrics` (first rows ever).
+- Proof: `scripts/replay_learning.py --judge 20` — rules block 0/35 applications; judge 19/20 → 20/20 on her
+  rejections, 2/20 → 2/20 on her applications. Oracle evals 546 pass (only the deliberate `[claude]` fails).
+- **Pre-existing judge bug fixed on the way:** it vetoed LATAM roles as "LATAM may exclude Panama" (Fin, 3/3, even
+  with no feedback and an explicit prompt line). Now enforced in code (`latam_veto_is_wrong`): a location veto on a
+  LATAM/Americas/worldwide listing is overruled + logged (`location veto OVERRULED`) unless a roster / "X only" excludes Panama.
+- Final replay: rules 0/35 applications blocked; judge approves 4/20 of her applications (was 2/20); the one rejection
+  it no longer catches (Storyblok) was rejected as CLOSED — the `closed_posting` rule catches that on real posting text.
+- 🚨 **Trap:** prompt pieces interact — lessons + location-heavy examples turned SILENCE on location into a veto
+  (Rove Concepts, applied). Fixed with a reminder nearest the job. **Re-run the replay after ANY judge-prompt change.**
+- Oracle VJH checkout is now clean at `origin/main` (HEAD had lagged at `40b32e9` since 20 Sep: files were copied).
+  Deploy VJH with `git fetch && git merge --ff-only origin/main`, then restart `vibejobhunter` + `serpapi-jobs`.
+- 🔒 **Open, Elena's:** the Telegram bot token is written to the VJH journal ~8,500×/day (httpx logs getUpdates URLs).
+  Rotate it in BotFather; then set httpx logging to WARNING. Also open: Dice queries still target generic engineer
+  roles; 29% of Bright Data searches fail silently (no retry). See `docs/oracle/2026-09-27_vjh_search_targets_from_prod.md`.
+- Audit + numbers: `docs/oracle/2026-09-27_vjh_learning_audit.md`.
 
 ### 🟢 24 Sep — HubSpot workflow "Reply Radar" is LIVE (Elena built it in the UI; proven with a test deal)
 - Trigger: deal stage → `contractsent` (💬 They replied). Actions: create task (title = deal name, HIGH, assigned
