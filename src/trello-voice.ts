@@ -47,6 +47,7 @@ interface CardClassification {
   listNameHint?: string | null;
   labelColor: TrelloColor;
   dueDate: string | null;  // ISO date YYYY-MM-DD extracted from speech ("by Friday", "end of May") or null
+  dueTime?: string | null; // 24h "HH:MM" in Panama time when a time was spoken ("3 y 30 pm" → "15:30"), else null
   subtasks: string[] | null; // 2-5 subtask titles if task naturally decomposes; null for single-step tasks
   confidence: number;      // 0-1, how certain the AI is
   reasoning: string;       // AI explanation for routing decision
@@ -382,6 +383,39 @@ async function getBoardLabels(boardId: string): Promise<TrelloLabel[]> {
   return trelloGet<TrelloLabel[]>(`/boards/${boardId}/labels`);
 }
 
+// ── Due dates: her calendar is America/Panama (UTC-5, no DST) ─────────────────
+// Trello stores `due` as a UTC INSTANT and shows it in the viewer's zone. A bare "2026-10-15" is
+// midnight UTC = 14 Oct 19:00 in Panama, and the spoken time was never sent at all. Seen 28 Sep 2026:
+// "Cita ... 15 de octubre, 3 y 30 pm" became a card showing "14 окт.".
+const PANAMA_OFFSET = '-05:00';
+
+function normTime(t?: string | null): string | null {
+  const m = (t || '').trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  const h = Number(m[1]), mi = Number(m[2]);
+  return h <= 23 && mi <= 59 ? `${String(h).padStart(2, '0')}:${m[2]}` : null;
+}
+
+/** Today's date in Panama, not in UTC — after 19:00 Panama the UTC date is already tomorrow. */
+export function panamaToday(now: Date = new Date()): string {
+  return now.toLocaleDateString('en-CA', { timeZone: 'America/Panama' });
+}
+
+/** A Panama date (+ optional spoken time) as the UTC instant Trello expects. No time → midday, so the
+ *  card can never shift to the previous or next day. */
+export function toTrelloDue(date: string, time?: string | null): string {
+  return new Date(`${date}T${normTime(time) ?? '12:00'}:00${PANAMA_OFFSET}`).toISOString();
+}
+
+/** "October 15, 3:30 PM" (Panama) for the Telegram reply — the day the card will SHOW in Trello. */
+export function formatDueForReply(date: string, time?: string | null): string {
+  const d = new Date(toTrelloDue(date, time));
+  const day = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'America/Panama' });
+  return normTime(time)
+    ? `${day}, ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Panama' })}`
+    : day;
+}
+
 async function createCard(
   listId: string,
   name: string,
@@ -389,6 +423,7 @@ async function createCard(
   labelIds: string[],
   dueDate?: string | null,
   pos: 'top' | 'bottom' = 'top',
+  dueTime?: string | null,
 ): Promise<TrelloCard> {
   const body: Record<string, string> = {
     idList: listId,
@@ -397,7 +432,7 @@ async function createCard(
     idLabels: labelIds.join(','),
     pos,
   };
-  if (dueDate) body.due = dueDate;
+  if (dueDate) body.due = /^\d{4}-\d{2}-\d{2}$/.test(dueDate) ? toTrelloDue(dueDate, dueTime) : dueDate;
   return trelloPost<TrelloCard>('/cards', body);
 }
 
@@ -653,7 +688,7 @@ function reconcileUrgency(c: CardClassification): CardClassification {
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-async function classifyCard(rawTranscript: string): Promise<CardClassification> {
+export async function classifyCard(rawTranscript: string): Promise<CardClassification> {
   const cleanedText = removeTriggerPhrase(rawTranscript);
 
   const systemPrompt = `You are a personal assistant for Elena Revicheva — AI builder, executive, and mother in Panama.
@@ -703,7 +738,7 @@ List routing logic:
 - Unsure if needed → "not_sure"
 - Standing rule/habit → "rules"`;
 
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD Panama time reference
+  const today = panamaToday(); // YYYY-MM-DD in Panama — toISOString() was UTC, a day ahead after 19:00
 
   const userPrompt = `Classify this voice note:
 "${cleanedText}"
@@ -723,6 +758,11 @@ For dueDate: extract any date mentioned in the text.
 - "by Monday" → the upcoming Monday's date
 - No date mentioned → null
 Return date as YYYY-MM-DD string, or null.
+
+For dueTime: if a clock time is spoken ("3:30 pm", "3 y 30 pm", "a las tres y media", "15:30", "в 15:30"),
+return it as 24-hour "HH:MM" in Panama time ("3 y 30 pm" → "15:30"). No time spoken → null.
+If a time is repeated with stumbles ("3 y 30 pm, 3, 3, 3 pm"), use the most complete one — the one with
+minutes ("15:30"). Only an explicit correction ("no, a las 4", "actually 4 pm") replaces it.
 
 For subtasks: does this voice note describe a MULTI-STEP task with 2-5 clearly distinct actions?
 - YES → list each as a short imperative title in "subtasks" (e.g. ["Design slides", "Set up demo env", "Send invites"])
@@ -747,6 +787,7 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "listNameHint": "EXACT column the user named out loud (e.g. \"Cita\", \"Датировано\", \"Надо сделать\"), else null",
   "labelColor": "red|orange|purple|green|lime",
   "dueDate": "2026-05-31",
+  "dueTime": "15:30",
   "subtasks": null,
   "confidence": 0.90,
   "reasoning": "One sentence: why this board + list + color"
@@ -1003,6 +1044,7 @@ export async function handleVoiceToTrello(
       classification.title,
       classification.description || `Voice note: ${new Date().toLocaleString('en-US', { timeZone: 'America/Panama' })}`,
       labelId ? [labelId] : [],
+      classification.dueDate, 'top', classification.dueTime,
     );
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
@@ -1122,7 +1164,7 @@ export async function createTrelloCardFromTranscript(
     const createdCards: TrelloCard[] = [];
     for (const subtaskTitle of subtasks) {
       try {
-        const c = await createCard(targetList.id, subtaskTitle, descBase, labels, classification.dueDate, 'bottom');
+        const c = await createCard(targetList.id, subtaskTitle, descBase, labels, classification.dueDate, 'bottom', classification.dueTime);
         createdCards.push(c);
         console.log(`[TrelloVoice] ✅ Subtask card: "${c.name}"`);
       } catch (err) {
@@ -1145,7 +1187,7 @@ export async function createTrelloCardFromTranscript(
   // Single card
   let card: TrelloCard;
   try {
-    card = await createCard(targetList.id, classification.title, descBase, labels, classification.dueDate);
+    card = await createCard(targetList.id, classification.title, descBase, labels, classification.dueDate, 'top', classification.dueTime);
   } catch (err) {
     return { success: false, transcript, classification, error: `Card creation failed: ${String(err)}` };
   }
@@ -1217,8 +1259,7 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
   let dueLine = '';
   if (classification.dueDate) {
     try {
-      const d = new Date(`${classification.dueDate}T12:00:00`);
-      dueLine = `📅 Due: ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
+      dueLine = `📅 Due: ${formatDueForReply(classification.dueDate, classification.dueTime)}`;
     } catch {
       dueLine = `📅 Due: ${classification.dueDate}`;
     }
@@ -1320,10 +1361,18 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
  * "archived", "заархивируй" and "перемести" all match, while the leading
  * lookbehind still stops "remove" matching "move".
  */
-const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|archiv\p{L}*|mueve|muévelo|mover|trasladar|pasar|перенес\p{L}*|переме\p{L}*|передвин\p{L}*|положи|заархивир\p{L}*|архивир\p{L}*|убери|скрой|отправь)(?![\p{L}\p{N}])/iu;
+// 2026-09-28: correction vocabulary added — "Appointment should be changed to 15th of October" never
+// reached the action classifier, so it became a NEW card instead of an edit to the one just made.
+const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|archiv\p{L}*|mueve|muévelo|mover|trasladar|pasar|перенес\p{L}*|переме\p{L}*|передвин\p{L}*|положи|заархивир\p{L}*|архивир\p{L}*|убери|скрой|отправь|change|changed|changing|reschedul\p{L}*|postpon\p{L}*|updat\p{L}*|correct\p{L}*|cambi\p{L}*|reprogram\p{L}*|posterg\p{L}*|измен\p{L}*|поменя\p{L}*|исправ\p{L}*)(?![\p{L}\p{N}])/iu;
+
+/** True when a transcript must go to the action classifier (move / archive / update) first. */
+export function isManagementCommand(transcript: string): boolean {
+  return MGMT_RE.test(transcript);
+}
 
 export interface MultiActionItem {
-  type: 'create' | 'move' | 'archive';
+  type: 'create' | 'move' | 'archive' | 'update';
+  detail?: string | undefined;          // update: what changed, e.g. "📅 October 15, 3:30 PM"
   success: boolean;
   description?: string | undefined;
   cardQuery?: string | undefined;
@@ -1336,7 +1385,10 @@ export interface MultiActionItem {
 }
 
 interface _RawAction {
-  type: 'create' | 'move' | 'archive';
+  type: 'create' | 'move' | 'archive' | 'update';
+  newDueDate?: string | null;   // update: YYYY-MM-DD (Panama)
+  newDueTime?: string | null;   // update: "HH:MM" 24h (Panama)
+  newTitle?: string | null;     // update: only when she renames the card
   description?: string;
   cardQuery?: string;
   sourceBoardHint?: string;
@@ -1377,7 +1429,7 @@ async function searchTrelloCards(query: string, boardHint?: string): Promise<Tre
  * failure a five-provider chain exists to prevent, bypassed by a hand-rolled
  * fetch that no chain could see. Found 1 Sep 2026.
  */
-async function classifyMultiAction(transcript: string): Promise<_RawAction[]> {
+export async function classifyMultiAction(transcript: string): Promise<_RawAction[]> {
   const prompt = `You manage Trello boards for Elena Revicheva (AI entrepreneur, Panama).
 
 Analyze this voice message and extract ALL Trello card management actions.
@@ -1387,8 +1439,19 @@ Action schema:
 [
   {"type":"create","description":"full task description to create as a new card"},
   {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"BOARD_KEY or exact board name","targetList":"the column the user named, or null"},
-  {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"}
+  {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"},
+  {"type":"update","cardQuery":"search term or __recent__","newDueDate":"YYYY-MM-DD or null","newDueTime":"HH:MM 24h or null","newTitle":"new card name or null"}
 ]
+
+UPDATE — changing an EXISTING card's date, time or name (NOT moving it to another board or column):
+- "should be changed to 15th of October, 3.30 pm", "reschedule to Friday", "the appointment is at 4, not 3",
+  "cambia la cita al 15 a las 3 y media", "перенеси на 15 октября в 15:30" → "update".
+- A DATE or TIME after "move"/"change"/"перенеси" is an update. A BOARD or COLUMN after "move" is a move.
+- Right after a card was created, a correction about "the appointment", "it", "the card", "the date" refers to
+  that card: set cardQuery to "__recent__".
+- newDueDate as YYYY-MM-DD (today in Panama is ${panamaToday()}; a month without a year is the next such date).
+  newDueTime as 24-hour "HH:MM" in Panama time ("3.30 pm" → "15:30"); null if no time was said.
+- Do NOT also emit a "create" for the same correction.
 
 targetBoard rules:
   Prefer one of these exact keys when it fits:
@@ -1535,6 +1598,49 @@ export async function processMultiAction(
       continue;
     }
 
+    // ── UPDATE (28 Sep 2026) ────────────────────────────────────────────────
+    // A correction edits EXACTLY ONE card: the one just created (__recent__) or the single search hit.
+    // Two or more candidates → ask, never guess — this is her daughter's medical calendar.
+    if (action.type === 'update' && action.cardQuery) {
+      try {
+        const cards = action.cardQuery === '__recent__'
+          ? recentCards
+          : await searchTrelloCards(action.cardQuery, action.sourceBoardHint ?? undefined);
+        if (cards.length !== 1) {
+          results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
+            error: cards.length === 0
+              ? `No card found for "${action.cardQuery}"`
+              : `${cards.length} cards match — say which one: ${cards.slice(0, 4).map(c => `"${c.name}"`).join(', ')}` });
+          continue;
+        }
+        const card = cards[0]!;
+        const body: Record<string, string> = {};
+        let when = '';
+        const newDate = action.newDueDate && /^\d{4}-\d{2}-\d{2}$/.test(action.newDueDate) ? action.newDueDate : null;
+        // Only a time was said ("make it 4 pm"): keep the card's own Panama date.
+        const baseDate = newDate ?? (card.due ? panamaToday(new Date(card.due)) : null);
+        if (baseDate && (newDate || action.newDueTime)) {
+          body.due = toTrelloDue(baseDate, action.newDueTime);
+          when = formatDueForReply(baseDate, action.newDueTime);
+        }
+        if (action.newTitle && action.newTitle.trim()) body.name = action.newTitle.trim();
+        if (!Object.keys(body).length) {
+          results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
+            error: 'No new date, time or name was understood — nothing changed' });
+          continue;
+        }
+        await trelloPut<TrelloCard>(`/cards/${card.id}`, body);
+        const back = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'name,id,shortUrl,due' });
+        const ok = !body.due || (back.due ? new Date(back.due).toISOString() === body.due : false);
+        results.push({ type: 'update', success: ok, cardQuery: action.cardQuery, cards: [back],
+          detail: [when && `📅 ${when}`, body.name && `✏️ "${body.name}"`].filter(Boolean).join(' · '),
+          ...(ok ? {} : { error: `Trello saved a different date (${back.due ?? 'none'})` }) });
+      } catch (err: unknown) {
+        results.push({ type: 'update', success: false, error: err instanceof Error ? err.message : String(err) });
+      }
+      continue;
+    }
+
     // ── ARCHIVE ─────────────────────────────────────────────────────────────
     if (action.type === 'archive' && action.cardQuery) {
       try {
@@ -1596,6 +1702,13 @@ export function formatMultiActionReply(results: MultiActionItem[]): string {
         r.cards?.forEach(c => lines.push(`  • [${c.name}](${c.shortUrl})`));
       } else {
         lines.push(`❌ Move failed${r.cardQuery ? ` ("${r.cardQuery}")` : ''}: ${r.error}`);
+      }
+    } else if (r.type === 'update') {
+      if (r.success) {
+        r.cards?.forEach(c => lines.push(`✏️ *Card updated:* [${c.name}](${c.shortUrl})`));
+        if (r.detail) lines.push(`  ${r.detail}`);
+      } else {
+        lines.push(`❌ Update failed${r.cardQuery && r.cardQuery !== '__recent__' ? ` ("${r.cardQuery}")` : ''}: ${r.error}`);
       }
     } else if (r.type === 'archive') {
       if (r.success) {
