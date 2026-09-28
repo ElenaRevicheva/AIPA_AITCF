@@ -30,9 +30,23 @@
  */
 import { completeWithProfileDetailed } from './llm-resilience';
 
+/**
+ * Elena's operating model, in her approved words (28 Sep 2026). Every letter carries it.
+ *
+ * Why: the first fact used to read "Builds and operates production AI systems solo", so every
+ * letter sold Elena alone and the employer discovered the agents in the interview — a strength
+ * that surfaces late reads as something that was hidden. The product is Elena + the AI
+ * environment she built, stated up front.
+ */
+export const OPERATING_MODEL =
+  'I operate an AI-native development environment where specialized agents handle much of the ' +
+  'implementation execution. I own requirements, architecture, orchestration, evaluation, ' +
+  'deployment, monitoring and production decisions.';
+
 /** Verified positioning. EDIT HERE — never let the model invent a claim. */
 const VERIFIED_FACTS = `
-- Builds and operates production AI systems solo: 10 live agents on a single VPS under PM2, each with health checks and automatic recovery.
+- Her operating model (quote it verbatim): "${OPERATING_MODEL}"
+- That environment runs 15 long-running production services (8 under PM2, 7 under systemd) on one cloud VM, every one set to restart automatically. Counted on the server 28 Sep 2026.
 - Designs multi-provider LLM fallback chains (five providers) so a single vendor outage or an exhausted balance cannot take a product down.
 - Ships agentic automation end-to-end: Telegram and WhatsApp bots, CRM pipelines, lead triage and scoring, outreach automation, webhook services.
 - Specialises in GEO / AEO / technical SEO — making sites and content legible to AI answer engines, measured with a citation probe across multiple engines.
@@ -169,6 +183,30 @@ function looksUnfinished(text: string): boolean {
   return /\[(edit|insert|add|your|company|role|tbd|todo|xx)/i.test(text) || /\bTODO\b/.test(text);
 }
 
+/** A letter that sells her as working alone contradicts the operating model. */
+export function describesHerAlone(text: string): boolean {
+  return /\b(solo|single-?handed(ly)?|by myself|on my own|all by hand)\b/i.test(text);
+}
+
+/**
+ * The prompt asks for the operating-model sentence verbatim; this makes it true even when the
+ * model paraphrases or drops it. A prompt is a request, the code is the guarantee — so the
+ * sentence is inserted as its own paragraph after the opening one when it is missing.
+ */
+export function ensureOperatingModel(letter: string): string {
+  const flat = (s: string) => s.replace(/\s+/g, ' ').trim();
+  if (flat(letter).includes(OPERATING_MODEL)) return letter;
+  const paras = letter.trim().split(/\n\s*\n/);
+  if (paras.length > 1) {
+    paras.splice(1, 0, OPERATING_MODEL);
+    return paras.join('\n\n');
+  }
+  const m = letter.match(/^[\s\S]*?[.!?](\s|$)/);
+  const head = m ? m[0].trim() : letter.trim();
+  const rest = letter.trim().slice(head.length).trim();
+  return [head, OPERATING_MODEL, rest].filter(Boolean).join('\n\n');
+}
+
 /**
  * Draft a letter for one job. Never throws — failure is `letter: ''`.
  */
@@ -206,6 +244,7 @@ export async function generateCoverLetter(input: {
     '- If the job asks for something the candidate does not demonstrably have, do not claim it. Say nothing about it, or name the nearest thing she has actually done.',
     '- No placeholders of any kind. The output is pasted as-is into an application form.',
     '- No flattery about the company, no "I am passionate about", no filler.',
+    '- The second paragraph MUST contain her operating-model sentence exactly as given in the facts, word for word. Never describe her as working alone, solo or single-handed, and never apologise for or minimise her use of AI — it is how she works.',
     '',
     'STYLE: 150-220 words. Plain, direct, specific. Four short paragraphs at most.',
     'Open with the role. Then the two or three things from the verified facts that most directly match THIS posting, said concretely. Close with a short availability line.',
@@ -234,14 +273,17 @@ export async function generateCoverLetter(input: {
       900,
       'cover-letter',
     );
-    const letter = text.trim();
-    if (letter.length < 120) {
-      return { letter: '', tailored: false, jdChars, reason: `model returned ${letter.length} chars` };
+    const draft = text.trim();
+    if (draft.length < 120) {
+      return { letter: '', tailored: false, jdChars, reason: `model returned ${draft.length} chars` };
     }
-    if (looksUnfinished(letter)) {
+    if (looksUnfinished(draft)) {
       return { letter: '', tailored: false, jdChars, reason: 'model left a placeholder in the draft' };
     }
-    return { letter, tailored: true, provider, jdChars };
+    if (describesHerAlone(draft)) {
+      return { letter: '', tailored: false, jdChars, reason: 'draft described her as working alone' };
+    }
+    return { letter: ensureOperatingModel(draft), tailored: true, provider, jdChars };
   } catch (e) {
     return {
       letter: '',
