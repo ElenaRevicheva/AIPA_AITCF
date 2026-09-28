@@ -19,7 +19,7 @@ her ≥ USD 3,000/month floor for an employee seat. LATAM agencies as partners o
 **Recommended:** low priority. If she wants to try, it costs one short email: ask role, modality and pay, and attach the creative CV
 (`docs/applications/cv-by-lane/CV_Elena_Revicheva_creative.pdf`). Invest more only if the answer clears her floor.
 
-## Inquiry email (Spanish; Elena sends it from her own mail)
+## Inquiry email (Spanish) — STAGED in HubSpot 28 Sep: deal `[HIRING-MANUAL] Creative AI / content role — Marketo Studio (Panama)`, one-click ➡️ SEND BY EMAIL (from aipa@aideazz.xyz, creative CV attached), HIGH task. Spec: `docs/applications/2026-09-28_marketo_studio_spec.json`
 
 **Para:** mijalassis@marketostudio.com
 **Asunto:** CV — Elena Revicheva · producción de contenido y video con IA (Panamá)

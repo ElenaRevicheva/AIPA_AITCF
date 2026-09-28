@@ -3104,6 +3104,153 @@
     "dealId": "64531338321",
     "cc": "aipa@aideazz.xyz"
   },
+  "intelliops-addendum": {
+    "phone": "",
+    "draft": "docs/selling/drafts/intelliops-addendum-email.txt",
+    "company": "IntelliOps Automation",
+    "email": "nishant.chaudhary@intelliopsautomation.com",
+    "emailDraft": "docs/selling/drafts/intelliops-addendum-email.txt",
+    "cc": "natalie.adel@intelliopsautomation.com, elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/ADDENDUM_No1_IntelliOps_BD.docx",
+        "filename": "ADDENDUM_No1_IntelliOps_BD.docx"
+      }
+    ],
+    "dealId": "64302436100"
+  },
+  "flikier-dental-institute-costa-rica-dental-impla-atlas": {
+    "company": "Flikier Dental Institute: Costa Rica Dental Implants",
+    "email": "info@dentalinstitutecr.com",
+    "score": 43,
+    "dealId": "64739750584",
+    "emailDraft": "docs/selling/drafts/flikier-dental-institute-costa-rica-dental-impla-atlas-email.txt"
+  },
+  "flikier-dental-institute-costa-rica-dental-impla-atlas-fu": {
+    "company": "Flikier Dental Institute: Costa Rica Dental Implants",
+    "email": "info@dentalinstitutecr.com",
+    "score": 43,
+    "dealId": "64739750584",
+    "emailDraft": "docs/selling/drafts/flikier-dental-institute-costa-rica-dental-impla-atlas-fu-email.txt"
+  },
+  "10-reasons-to-have-a-plastic-surgery-in-colombia-atlas": {
+    "company": "10 Reasons to Have a Plastic Surgery in Colombia in 2024",
+    "email": "consultoriadaviddelgado@gmail.com",
+    "score": 95,
+    "dealId": "64756276375",
+    "phone": "573118537405",
+    "emailDraft": "docs/selling/drafts/10-reasons-to-have-a-plastic-surgery-in-colombia-atlas-email.txt",
+    "draft": "docs/selling/drafts/10-reasons-to-have-a-plastic-surgery-in-colombia-atlas.txt"
+  },
+  "10-reasons-to-have-a-plastic-surgery-in-colombia-atlas-fu": {
+    "company": "10 Reasons to Have a Plastic Surgery in Colombia in 2024",
+    "email": "consultoriadaviddelgado@gmail.com",
+    "score": 95,
+    "dealId": "64756276375",
+    "phone": "573118537405",
+    "emailDraft": "docs/selling/drafts/10-reasons-to-have-a-plastic-surgery-in-colombia-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/10-reasons-to-have-a-plastic-surgery-in-colombia-atlas-fu.txt"
+  },
+  "find-plastic-surgeons-and-cosmetic-professionals-atlas": {
+    "company": "Find plastic surgeons and cosmetic professionals",
+    "email": "inbound@crisalix.com",
+    "score": 79,
+    "dealId": "64732064098",
+    "emailDraft": "docs/selling/drafts/find-plastic-surgeons-and-cosmetic-professionals-atlas-email.txt"
+  },
+  "find-plastic-surgeons-and-cosmetic-professionals-atlas-fu": {
+    "company": "Find plastic surgeons and cosmetic professionals",
+    "email": "inbound@crisalix.com",
+    "score": 79,
+    "dealId": "64732064098",
+    "emailDraft": "docs/selling/drafts/find-plastic-surgeons-and-cosmetic-professionals-atlas-fu-email.txt"
+  },
+  "my-medical-vacations-medical-tourism-cancun-mexi-atlas": {
+    "company": "My Medical Vacations: Medical Tourism Cancun Mexico",
+    "email": "info@mymedicalvacations.com",
+    "score": 87,
+    "dealId": "64744947788",
+    "phone": "5219982432021",
+    "emailDraft": "docs/selling/drafts/my-medical-vacations-medical-tourism-cancun-mexi-atlas-email.txt",
+    "draft": "docs/selling/drafts/my-medical-vacations-medical-tourism-cancun-mexi-atlas.txt"
+  },
+  "my-medical-vacations-medical-tourism-cancun-mexi-atlas-fu": {
+    "company": "My Medical Vacations: Medical Tourism Cancun Mexico",
+    "email": "info@mymedicalvacations.com",
+    "score": 87,
+    "dealId": "64744947788",
+    "phone": "5219982432021",
+    "emailDraft": "docs/selling/drafts/my-medical-vacations-medical-tourism-cancun-mexi-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/my-medical-vacations-medical-tourism-cancun-mexi-atlas-fu.txt"
+  },
+  "discover-the-benefits-of-medical-tourism-at-hosp-atlas": {
+    "company": "Discover the benefits of Medical Tourism at Hospital Galenia",
+    "email": "info@hospitalgalenia.com",
+    "score": 82,
+    "dealId": "64742070908",
+    "phone": "529982224363",
+    "emailDraft": "docs/selling/drafts/discover-the-benefits-of-medical-tourism-at-hosp-atlas-email.txt",
+    "draft": "docs/selling/drafts/discover-the-benefits-of-medical-tourism-at-hosp-atlas.txt"
+  },
+  "discover-the-benefits-of-medical-tourism-at-hosp-atlas-fu": {
+    "company": "Discover the benefits of Medical Tourism at Hospital Galenia",
+    "email": "info@hospitalgalenia.com",
+    "score": 82,
+    "dealId": "64742070908",
+    "phone": "529982224363",
+    "emailDraft": "docs/selling/drafts/discover-the-benefits-of-medical-tourism-at-hosp-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/discover-the-benefits-of-medical-tourism-at-hosp-atlas-fu.txt"
+  },
+  "all-inclusive-plastic-surgery-packages-in-cancun-atlas": {
+    "company": "All-Inclusive Plastic Surgery Packages in Cancun, Mexico",
+    "email": "info@plasticsurgeryriviera.com",
+    "score": 93,
+    "dealId": "64744638474",
+    "phone": "525596623668",
+    "emailDraft": "docs/selling/drafts/all-inclusive-plastic-surgery-packages-in-cancun-atlas-email.txt",
+    "draft": "docs/selling/drafts/all-inclusive-plastic-surgery-packages-in-cancun-atlas.txt"
+  },
+  "all-inclusive-plastic-surgery-packages-in-cancun-atlas-fu": {
+    "company": "All-Inclusive Plastic Surgery Packages in Cancun, Mexico",
+    "email": "info@plasticsurgeryriviera.com",
+    "score": 93,
+    "dealId": "64744638474",
+    "phone": "525596623668",
+    "emailDraft": "docs/selling/drafts/all-inclusive-plastic-surgery-packages-in-cancun-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/all-inclusive-plastic-surgery-packages-in-cancun-atlas-fu.txt"
+  },
+  "top-10-clinics-in-cancun-atlas": {
+    "company": "Top 10 Clinics in Cancun",
+    "email": "info@medicaldepartures.com",
+    "score": 91,
+    "dealId": "64733149713",
+    "emailDraft": "docs/selling/drafts/top-10-clinics-in-cancun-atlas-email.txt"
+  },
+  "top-10-clinics-in-cancun-atlas-fu": {
+    "company": "Top 10 Clinics in Cancun",
+    "email": "info@medicaldepartures.com",
+    "score": 91,
+    "dealId": "64733149713",
+    "emailDraft": "docs/selling/drafts/top-10-clinics-in-cancun-atlas-fu-email.txt"
+  },
+  "panama-yacht-rental-atlas": {
+    "company": "Panama Yacht rental",
+    "email": "sales@panamagemcharters.com",
+    "score": 90,
+    "dealId": "64743551299",
+    "phone": "50769987727",
+    "emailDraft": "docs/selling/drafts/panama-yacht-rental-atlas-email.txt",
+    "draft": "docs/selling/drafts/panama-yacht-rental-atlas.txt"
+  },
+  "panama-yacht-rental-atlas-fu": {
+    "company": "Panama Yacht rental",
+    "email": "sales@panamagemcharters.com",
+    "score": 90,
+    "dealId": "64743551299",
+    "phone": "50769987727",
+    "emailDraft": "docs/selling/drafts/panama-yacht-rental-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/panama-yacht-rental-atlas-fu.txt"
+  },
   "fermatix-reply": {
     "phone": "",
     "draft": "docs/selling/drafts/fermatix-reply-email.txt",
@@ -3136,6 +3283,128 @@
     "emailDraft": "docs/selling/drafts/harsh-patel-equity-reply-email.txt",
     "dealId": "65000298271",
     "score": 91
+  },
+  "46-viking-luxury-yacht-charter-panama-atlas": {
+    "company": "46' Viking Luxury Yacht Charter Panama",
+    "email": "info@thepanamatoursite.com",
+    "score": 87,
+    "dealId": "65160161431",
+    "emailDraft": "docs/selling/drafts/46-viking-luxury-yacht-charter-panama-atlas-email.txt"
+  },
+  "46-viking-luxury-yacht-charter-panama-atlas-fu": {
+    "company": "46' Viking Luxury Yacht Charter Panama",
+    "email": "info@thepanamatoursite.com",
+    "score": 87,
+    "dealId": "65160161431",
+    "emailDraft": "docs/selling/drafts/46-viking-luxury-yacht-charter-panama-atlas-fu-email.txt"
+  },
+  "panam-yacht-adventures-atlas": {
+    "company": "Panamá Yacht Adventures",
+    "email": "info@panamayachtadventures.com",
+    "score": 75,
+    "dealId": "65152144734",
+    "phone": "50767373910",
+    "emailDraft": "docs/selling/drafts/panam-yacht-adventures-atlas-email.txt",
+    "draft": "docs/selling/drafts/panam-yacht-adventures-atlas.txt"
+  },
+  "panam-yacht-adventures-atlas-fu": {
+    "company": "Panamá Yacht Adventures",
+    "email": "info@panamayachtadventures.com",
+    "score": 75,
+    "dealId": "65152144734",
+    "phone": "50767373910",
+    "emailDraft": "docs/selling/drafts/panam-yacht-adventures-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/panam-yacht-adventures-atlas-fu.txt"
+  },
+  "top-10-de-cl-nicas-veterinarias-en-ciudad-de-pan-atlas": {
+    "company": "TOP 10 de Clínicas Veterinarias en Ciudad de Panamá",
+    "email": "tienda@wawisdogfood.com",
+    "score": 91,
+    "dealId": "65161526290",
+    "phone": "50761066511",
+    "emailDraft": "docs/selling/drafts/top-10-de-cl-nicas-veterinarias-en-ciudad-de-pan-atlas-email.txt",
+    "draft": "docs/selling/drafts/top-10-de-cl-nicas-veterinarias-en-ciudad-de-pan-atlas.txt"
+  },
+  "top-10-de-cl-nicas-veterinarias-en-ciudad-de-pan-atlas-fu": {
+    "company": "TOP 10 de Clínicas Veterinarias en Ciudad de Panamá",
+    "email": "tienda@wawisdogfood.com",
+    "score": 91,
+    "dealId": "65161526290",
+    "phone": "50761066511",
+    "emailDraft": "docs/selling/drafts/top-10-de-cl-nicas-veterinarias-en-ciudad-de-pan-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/top-10-de-cl-nicas-veterinarias-en-ciudad-de-pan-atlas-fu.txt"
+  },
+  "cl-nica-veterinaria-en-panam-atlas": {
+    "company": "Clínica veterinaria en Panamá",
+    "email": "soporte@blackdogpanama.com",
+    "score": 98,
+    "dealId": "65160388532",
+    "phone": "50762579183",
+    "emailDraft": "docs/selling/drafts/cl-nica-veterinaria-en-panam-atlas-email.txt",
+    "draft": "docs/selling/drafts/cl-nica-veterinaria-en-panam-atlas.txt"
+  },
+  "cl-nica-veterinaria-en-panam-atlas-fu": {
+    "company": "Clínica veterinaria en Panamá",
+    "email": "soporte@blackdogpanama.com",
+    "score": 98,
+    "dealId": "65160388532",
+    "phone": "50762579183",
+    "emailDraft": "docs/selling/drafts/cl-nica-veterinaria-en-panam-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/cl-nica-veterinaria-en-panam-atlas-fu.txt"
+  },
+  "veterinaria-knino-cl-nica-veterinaria-con-urgenc-atlas": {
+    "company": "Veterinaria Knino: Clínica Veterinaria con Urgencias en Panamá",
+    "email": "info@veterinariaknino.com",
+    "score": 82,
+    "dealId": "65153534015",
+    "phone": "50767888569",
+    "emailDraft": "docs/selling/drafts/veterinaria-knino-cl-nica-veterinaria-con-urgenc-atlas-email.txt",
+    "draft": "docs/selling/drafts/veterinaria-knino-cl-nica-veterinaria-con-urgenc-atlas.txt"
+  },
+  "veterinaria-knino-cl-nica-veterinaria-con-urgenc-atlas-fu": {
+    "company": "Veterinaria Knino: Clínica Veterinaria con Urgencias en Panamá",
+    "email": "info@veterinariaknino.com",
+    "score": 82,
+    "dealId": "65153534015",
+    "phone": "50767888569",
+    "emailDraft": "docs/selling/drafts/veterinaria-knino-cl-nica-veterinaria-con-urgenc-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/veterinaria-knino-cl-nica-veterinaria-con-urgenc-atlas-fu.txt"
+  },
+  "vale-motors-taller-automotriz-de-lujo-en-panam-atlas": {
+    "company": "Vale Motors: Taller Automotriz de Lujo en Panamá",
+    "email": "team@vale-motors.com",
+    "score": 97,
+    "dealId": "65160460083",
+    "phone": "50764310419",
+    "emailDraft": "docs/selling/drafts/vale-motors-taller-automotriz-de-lujo-en-panam-atlas-email.txt",
+    "draft": "docs/selling/drafts/vale-motors-taller-automotriz-de-lujo-en-panam-atlas.txt"
+  },
+  "vale-motors-taller-automotriz-de-lujo-en-panam-atlas-fu": {
+    "company": "Vale Motors: Taller Automotriz de Lujo en Panamá",
+    "email": "team@vale-motors.com",
+    "score": 97,
+    "dealId": "65160460083",
+    "phone": "50764310419",
+    "emailDraft": "docs/selling/drafts/vale-motors-taller-automotriz-de-lujo-en-panam-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/vale-motors-taller-automotriz-de-lujo-en-panam-atlas-fu.txt"
+  },
+  "taller-mec-nico-ctg-atlas": {
+    "company": "Taller Mecánico CTG",
+    "email": "tallermecanicocgt@gmail.com",
+    "score": 73,
+    "dealId": "65161631903",
+    "phone": "50765712992",
+    "emailDraft": "docs/selling/drafts/taller-mec-nico-ctg-atlas-email.txt",
+    "draft": "docs/selling/drafts/taller-mec-nico-ctg-atlas.txt"
+  },
+  "taller-mec-nico-ctg-atlas-fu": {
+    "company": "Taller Mecánico CTG",
+    "email": "tallermecanicocgt@gmail.com",
+    "score": 73,
+    "dealId": "65161631903",
+    "phone": "50765712992",
+    "emailDraft": "docs/selling/drafts/taller-mec-nico-ctg-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/taller-mec-nico-ctg-atlas-fu.txt"
   },
   "trailer-dark-romance-reads": {
     "phone": "",
@@ -3233,6 +3502,134 @@
     "emailDraft": "docs/selling/drafts/atuona-berlin-fashion-film-email.txt",
     "dealId": "65219473799"
   },
+  "inmopanama-atlas": {
+    "company": "InmoPanama",
+    "email": "info@inmopanama.com",
+    "score": 74,
+    "dealId": "65335457928",
+    "emailDraft": "docs/selling/drafts/inmopanama-atlas-email.txt"
+  },
+  "inmopanama-atlas-fu": {
+    "company": "InmoPanama",
+    "email": "info@inmopanama.com",
+    "score": 74,
+    "dealId": "65335457928",
+    "emailDraft": "docs/selling/drafts/inmopanama-atlas-fu-email.txt"
+  },
+  "servmor-realty-official-site-atlas": {
+    "company": "Servmor Realty Official Site",
+    "email": "info@servmorrealty.com",
+    "score": 54,
+    "dealId": "65313643587",
+    "emailDraft": "docs/selling/drafts/servmor-realty-official-site-atlas-email.txt"
+  },
+  "servmor-realty-official-site-atlas-fu": {
+    "company": "Servmor Realty Official Site",
+    "email": "info@servmorrealty.com",
+    "score": 54,
+    "dealId": "65313643587",
+    "emailDraft": "docs/selling/drafts/servmor-realty-official-site-atlas-fu-email.txt"
+  },
+  "grupo-tribaldos-l-deres-inmobiliarios-en-panam-atlas": {
+    "company": "Grupo Tribaldos: líderes inmobiliarios en Panamá",
+    "email": "ventas@grupotribaldos.com",
+    "score": 74,
+    "dealId": "65318959958",
+    "phone": "50763555573",
+    "emailDraft": "docs/selling/drafts/grupo-tribaldos-l-deres-inmobiliarios-en-panam-atlas-email.txt",
+    "draft": "docs/selling/drafts/grupo-tribaldos-l-deres-inmobiliarios-en-panam-atlas.txt"
+  },
+  "grupo-tribaldos-l-deres-inmobiliarios-en-panam-atlas-fu": {
+    "company": "Grupo Tribaldos: líderes inmobiliarios en Panamá",
+    "email": "ventas@grupotribaldos.com",
+    "score": 74,
+    "dealId": "65318959958",
+    "phone": "50763555573",
+    "emailDraft": "docs/selling/drafts/grupo-tribaldos-l-deres-inmobiliarios-en-panam-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/grupo-tribaldos-l-deres-inmobiliarios-en-panam-atlas-fu.txt"
+  },
+  "contadores-p-blicos-autorizados-panam-atlas": {
+    "company": "Contadores Públicos Autorizados Panamá",
+    "email": "info@contadorespanama.com",
+    "score": 91,
+    "dealId": "65327169923",
+    "phone": "5072036770",
+    "emailDraft": "docs/selling/drafts/contadores-p-blicos-autorizados-panam-atlas-email.txt",
+    "draft": "docs/selling/drafts/contadores-p-blicos-autorizados-panam-atlas.txt"
+  },
+  "contadores-p-blicos-autorizados-panam-atlas-fu": {
+    "company": "Contadores Públicos Autorizados Panamá",
+    "email": "info@contadorespanama.com",
+    "score": 91,
+    "dealId": "65327169923",
+    "phone": "5072036770",
+    "emailDraft": "docs/selling/drafts/contadores-p-blicos-autorizados-panam-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/contadores-p-blicos-autorizados-panam-atlas-fu.txt"
+  },
+  "contadores-en-panam-atlas": {
+    "company": "Contadores en Panamá",
+    "email": "enquiries@topazserv.com",
+    "score": 84,
+    "dealId": "65325726503",
+    "phone": "5072635252",
+    "emailDraft": "docs/selling/drafts/contadores-en-panam-atlas-email.txt",
+    "draft": "docs/selling/drafts/contadores-en-panam-atlas.txt"
+  },
+  "contadores-en-panam-atlas-fu": {
+    "company": "Contadores en Panamá",
+    "email": "enquiries@topazserv.com",
+    "score": 84,
+    "dealId": "65325726503",
+    "phone": "5072635252",
+    "emailDraft": "docs/selling/drafts/contadores-en-panam-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/contadores-en-panam-atlas-fu.txt"
+  },
+  "grupo-aduanero-kam-corretaje-de-aduana-en-panam-atlas": {
+    "company": "Grupo Aduanero Kam: Corretaje de Aduana en Panamá",
+    "email": "grupotrafico@gakam.com",
+    "score": 91,
+    "dealId": "65329043533",
+    "emailDraft": "docs/selling/drafts/grupo-aduanero-kam-corretaje-de-aduana-en-panam-atlas-email.txt"
+  },
+  "grupo-aduanero-kam-corretaje-de-aduana-en-panam-atlas-fu": {
+    "company": "Grupo Aduanero Kam: Corretaje de Aduana en Panamá",
+    "email": "grupotrafico@gakam.com",
+    "score": 91,
+    "dealId": "65329043533",
+    "emailDraft": "docs/selling/drafts/grupo-aduanero-kam-corretaje-de-aduana-en-panam-atlas-fu-email.txt"
+  },
+  "empresas-de-log-stica-en-panam-atlas": {
+    "company": "Empresas de Logística en Panamá",
+    "email": "info@apexpanama.com",
+    "score": 91,
+    "dealId": "65316617003",
+    "emailDraft": "docs/selling/drafts/empresas-de-log-stica-en-panam-atlas-email.txt"
+  },
+  "empresas-de-log-stica-en-panam-atlas-fu": {
+    "company": "Empresas de Logística en Panamá",
+    "email": "info@apexpanama.com",
+    "score": 91,
+    "dealId": "65316617003",
+    "emailDraft": "docs/selling/drafts/empresas-de-log-stica-en-panam-atlas-fu-email.txt"
+  },
+  "panama-pacifico-j-cain-co-atlas": {
+    "company": "Panama Pacifico - J. Cain & Co.",
+    "email": "jc@jcain.com",
+    "score": 97,
+    "dealId": "65322780583",
+    "phone": "5074312600",
+    "emailDraft": "docs/selling/drafts/panama-pacifico-j-cain-co-atlas-email.txt",
+    "draft": "docs/selling/drafts/panama-pacifico-j-cain-co-atlas.txt"
+  },
+  "panama-pacifico-j-cain-co-atlas-fu": {
+    "company": "Panama Pacifico - J. Cain & Co.",
+    "email": "jc@jcain.com",
+    "score": 97,
+    "dealId": "65322780583",
+    "phone": "5074312600",
+    "emailDraft": "docs/selling/drafts/panama-pacifico-j-cain-co-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/panama-pacifico-j-cain-co-atlas-fu.txt"
+  },
   "atuona-bogomolov-podmostki": {
     "phone": "",
     "draft": "docs/selling/drafts/bogomolov-letter-ru.txt",
@@ -3240,5 +3637,19 @@
     "email": "konbog75@yandex.ru",
     "emailDraft": "docs/selling/drafts/bogomolov-letter-ru.txt",
     "dealId": "65314108507"
+  },
+  "marketo-studio-2026-09": {
+    "phone": "",
+    "draft": "docs/selling/drafts/marketo-studio-2026-09-email.txt",
+    "company": "Marketo Studio",
+    "email": "mijalassis@marketostudio.com",
+    "emailDraft": "docs/selling/drafts/marketo-studio-2026-09-email.txt",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/CV_Elena_Revicheva_Creative_AI.pdf",
+        "filename": "CV_Elena_Revicheva_Creative_AI.pdf"
+      }
+    ],
+    "dealId": "65375163554"
   }
 }
