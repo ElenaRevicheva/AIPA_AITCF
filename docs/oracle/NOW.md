@@ -238,6 +238,17 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
+### 🔴 28 Sep 13:30 UTC — the Bright Data door runs WITHOUT gate, lessons, judge and evidence (Elena's go needed)
+
+PM2 `serpapi-jobs` runs on **system `python3`**, which lacks `pydantic_settings` + `sqlalchemy`. Emulated load
+(`runpy`, no search run): `JobGate available: False`; `learned_rules` / `llm_judge` / `database_models` → ModuleNotFoundError.
+`serpapi_jobs_ingest.py` catches those and logs at DEBUG, so production (INFO) shows nothing: this door has ONLY
+`iron_clad_fit` + pay floor. Claims "judge on every door" (9349b7b) and "evidence saved at decision time" (5782f3d)
+are TRUE on the LangGraph door, FALSE here. Proof it bites: job_listings newest row 12:22 while SERP deals kept landing
+to 13:05; 103 HIRING deals since 27 Sep, mostly parked junk, each with an AI-drafted letter.
+**Fix (not applied — waiting for Elena):** run `serpapi-jobs` on `venv/bin/python` (same as the `vibejobhunter` service),
+`pm2 save`. Note: every `serpapi-jobs` restart runs one paid Bright Data cycle (~119 queries).
+
 ### 🟢 28 Sep — VJH can now MEASURE the judge on real postings (evidence memory) · VJH `5782f3d` → `e4c7314`
 
 - **DONE — connected, nothing rebuilt:** `job_listings` + `add_job_listing()` (Dec 2025, 0 callers) now hold the posting each
