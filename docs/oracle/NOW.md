@@ -238,6 +238,14 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
+### 💡 28 Sep — PROPOSED, not built (Elena's call): RAG "similar past decisions" for the VJH judge
+
+EspaLuz RAG is live and proven (`espaluz_rag.py`: text-embedding-3-small → pgvector, top-3 above 0.75 similarity;
+prod: 497 rows, 9 sessions, newest 27 Sep, 0 RAG errors in 7 days). For VJH: embed each decided posting (job_listings,
+121 today) and show the judge her K most SIMILAR past decisions instead of the 12 most RECENT (retrieval-augmented
+few-shot). Reuse the EspaLuz embed pattern; SQLite + plain cosine is enough at this size (no pgvector needed); ~$0.02 to
+embed everything. Ship ONLY if the replay, leave-one-out (a job never retrieves itself), beats 14/20 + 8/18.
+
 ### 🟢 28 Sep 13:41 UTC — Bright Data door FIXED: `serpapi-jobs` now runs on the venv (gate, lessons, judge, evidence load)
 
 PM2 `serpapi-jobs` runs on **system `python3`**, which lacks `pydantic_settings` + `sqlalchemy`. Emulated load
