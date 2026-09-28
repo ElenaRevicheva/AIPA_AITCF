@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 15:10 | "Elena + AIPA" positioning: letters, 11 lane CVs, no-AI veto | cto-aipa `src/cover-letter.ts` (+ dist, `pm2 restart cto-aipa`), `scripts/build-lane-cv.cjs`, `scripts/build_tailored_cv.py`, `docs/applications/cv-by-lane/*`, HubSpot CV files; VJH `llm_judge.py`, `fit_gate.py` (+ restart `vibejobhunter`, `serpapi-jobs`) | cto-aipa `HEAD` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -238,6 +237,33 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
+
+### 🟢 28 Sep — "Elena + AIPA = one operating unit" is LIVE in letters, all 11 lane CVs and the judge
+
+Elena approved both sentences. cto-aipa `2f61908` (letters) + `e6c3754` (CVs); VJH `ffe173b` + `4c94e9a` + `06bae98`.
+- **DONE — letters:** `src/cover-letter.ts` first fact was "Builds and operates production AI systems **solo**". Now
+  `OPERATING_MODEL` is quoted verbatim in paragraph 2; `ensureOperatingModel()` inserts it if the model drops it; a draft
+  saying solo/single-handed/on my own is refused. System count re-counted on the server: **15** long-running services
+  (8 PM2 + 7 systemd), all auto-restart (replaces "10 live agents"). Deployed `dist/cover-letter.js`, `pm2 restart cto-aipa`.
+- **DONE — CVs:** `THROUGH_LINE` (bold, opens every Summary) + `OPERATING_MODEL` (opens How I work) live in
+  `build_tailored_cv.py` → `lanes.json`. All 11 PDFs rebuilt (Segoe UI), on Oracle, and **8 replaced in HubSpot in place**
+  (same file ids; geo/creative/exec_support were never uploaded — they go up fresh on first use).
+- **DONE — judge:** `fit_gate.no_ai_allowed()` parks a job that STATES AI may not be used in the work or hiring test
+  (application-form-only bans do not veto); AI-native/AI-first counts as AI work; judge disqualifier (v) + "ONE operating
+  unit". `pay_veto_is_wrong()` overrules a "6 Pay" veto when the listing states no pay — except on an AI-ban listing.
+- **VERIFIED BY:** `node scripts/test-cover-letter-model.cjs` 15/15 (laptop + Oracle); live letter on Oracle for the Agent
+  posting → sentence present, no "solo", 170 words. HubSpot download of builder + crm CVs = md5 IDENTICAL to local.
+  `evals/test_no_ai_gate.py` 17/17; Oracle evals 494 passed; live judge probe 3 runs `ALL PASS` (AI-ban → judge rejects
+  alone; AI-native → approve; app-form-only ban → approve 4/4, control 4/4).
+- **RISK / OPEN — the replay cannot measure over-filtering.** `replay_learning.py --judge` feeds the judge **empty
+  evidence** for applications (`_evidence()` = '' — no posting, no location) and **all 20/20** sampled applications
+  predate the 20 Sep targeting change. So "applications approved 3–4/20" is not a real measure; gpt-4.1-mini and gpt-4o
+  score 1/20 on it (model is not the cause). The real signal is production: **12 vetoes / 5 OK in 7 days**, and some
+  reasons are wrong on their face (Allied Revenue "US Mountain Time incompatible with UTC-5"). NEXT: store posting text +
+  location in the ledger so the replay judges what the judge saw, then measure before touching the judge again.
+- **RISK — letters still decorate.** The live Agent letter claimed "experience in executive support and financial
+  analysis" — not in VERIFIED_FACTS. Pre-existing; the prompt says facts-only and the model ignores it.
+- Letters already on the 21 ACT-TODAY deals were NOT regenerated (Elena's call).
 
 ### 🟢 28 Sep — CREATIVE AI lane is live in VJH + a creative lane CV — VJH `61321d3`, cto-aipa `22040a5`
 
