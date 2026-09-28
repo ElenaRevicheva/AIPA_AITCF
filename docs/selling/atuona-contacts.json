@@ -97,6 +97,20 @@
       "purpose": "category question before submitting",
       "ask": "Does Crimson Escape meet \"fashion prominently\"? Digital Fashion & AI (EUR 140) or Rising Star VFX/CGI/Animation & AI (EUR 50)? Regular deadline 28 Oct 2026",
       "draft": "docs/selling/drafts/atuona-berlin-fashion-film-email.txt"
+    },
+    {
+      "slug": "atuona-bogomolov-podmostki",
+      "company": "Theatre on Malaya Bronnaya",
+      "domain": "mbronnaya.ru",
+      "firstname": "Konstantin",
+      "lastname": "Bogomolov",
+      "jobtitle": "Artistic director, Theatre on Malaya Bronnaya (since 2019); director, poet",
+      "email": "konbog75@yandex.ru",
+      "emailSource": "his own Instagram post (two vacancies: theatre chronicler + his personal text/video person), screenshot by Elena 28 Sep 2026: \"Пишите. На почту konbog75@yandex.ru\"",
+      "subject": "Не на вакансию. «Подмостки»",
+      "purpose": "poet note (LITPROM)",
+      "ask": "NOT a job application (Elena is in Panama, will not go to Russia). One LITPROM poem, #035 Подмостки (2019), verbatim from atuona content/poems.json. Asks nothing; leaves one door: a poetry evening at Bronnaya. No AI, no films on purpose. Elena: click the LITPROM profile link before sending (it did not load from the agent's side).",
+      "draft": "docs/selling/drafts/bogomolov-letter-ru.txt"
     }
   ]
 }

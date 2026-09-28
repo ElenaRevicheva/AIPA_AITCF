@@ -3232,5 +3232,13 @@
     "email": "contact@berlinfashionfilmfestival.net",
     "emailDraft": "docs/selling/drafts/atuona-berlin-fashion-film-email.txt",
     "dealId": "65219473799"
+  },
+  "atuona-bogomolov-podmostki": {
+    "phone": "",
+    "draft": "docs/selling/drafts/bogomolov-letter-ru.txt",
+    "company": "Theatre on Malaya Bronnaya",
+    "email": "konbog75@yandex.ru",
+    "emailDraft": "docs/selling/drafts/bogomolov-letter-ru.txt",
+    "dealId": "65314108507"
   }
 }

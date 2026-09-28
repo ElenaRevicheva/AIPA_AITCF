@@ -131,6 +131,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎭 28 Sep — Bogomolov poet note staged one-click in HubSpot, NOT sent (Elena's move)
+
+- **DONE:** `[ATUONA-ART] Theatre on Malaya Bronnaya — Konstantin Bogomolov — poet note (LITPROM)` deal + contact + note
+  button + HIGH task, via `stage-atuona-contact.cjs` (row in `atuona-contacts.json`). Letter
+  `docs/selling/drafts/bogomolov-letter-ru.txt`: NOT a job application (she is in Panama, will not go to Russia) — LITPROM
+  poem #035 «Подмостки» verbatim, asks nothing, no AI/films on purpose. Address from his own Instagram vacancy post.
+- **VERIFIED BY:** Oracle registry merged 436 → 437 (backup `~/backups/outreach-registry.pre-bogomolov-*`), draft scp'd;
+  `/go/outreach-email/atuona-bogomolov-podmostki` GET → 200 with To, Subject, poem, LITPROM link. Nothing sent.
+- **RISK:** LITPROM profile link (from atuona.xyz) did not load from the agent side — Elena clicks it before sending.
+
 ### 🎬 25 Sep — Atuona art outreach: 5 letters staged one-click in HubSpot, NOT sent (Elena's move)
 
 - **DONE:** `[ATUONA-ART]` deals + note button (aipa@ via Resend, reply-to her Gmail) + HIGH task for Diane Pernet (ASVOFF),
