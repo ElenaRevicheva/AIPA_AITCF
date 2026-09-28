@@ -79,3 +79,28 @@ override its fixed criteria; the path that fills 🔥 I Act TODAY never asks it.
 4. **Screenshot prompt v4** — also extract location / eligibility / closed / pay.
 5. **Proof** — replay over all decisions (rejections caught, applied jobs wrongly blocked = 0) as an eval test;
    finally WRITE `learning_metrics` weekly and send the precision number to Telegram.
+
+---
+
+## ✅ Built and deployed 28 Sep 2026 (VJH `38d65d2` → `5ee5af0` → `6f130f2` → `cb9ea92`)
+
+Local repo → GitHub `main` → Oracle (`git merge --ff-only`; Oracle's HEAD first re-aligned from `40b32e9` to
+`18d3bf1` after proving every tracked file on disk already equalled it — no file content touched; backup
+`~/backups/vjh-pre-learning-20260928-0043`). Restarted `vibejobhunter` (systemd) + `serpapi-jobs` (PM2) 00:57 UTC.
+
+- **Permanent memory:** `autonomous_data/judge_decisions.json` — 554 decided deals, 370 rejections, 35 with her reason.
+- **Rules learned** (`autonomous_data/learned_rules.json`, each with `taught_by`): closed_posting (Byldd, Storyblok) ·
+  eligibility born_in / citizenship / w2_only (HireLATAM, Tech9) · country_code_list (micro1) · tools_not_hers
+  airtable, monday.com · rejected_companies jerry ai, stripe · out_of_field_titles growth marketing & paid media.
+- **Judge prompt** now carries lessons from ALL rejections, may reject on them only when the listing STATES the fact,
+  and ends with a reminder that silence on location is not a restriction.
+- **Every door into 🔥 I Act TODAY:** Google-Jobs ingest (Bright Data) = iron_clad + pay floor + learned rules + judge
+  veto; LangGraph submit = learned rules + iron_clad + judge.
+- **`learning_metrics`:** 8 weekly rows written (first ever). Precision (applied ÷ decided, VJH-found): 0.143 · 0.3 ·
+  0.6 · 0.133 for the weeks of 31 Aug → 21 Sep. This is the number that must rise.
+- **Replay proof** (`scripts/replay_learning.py --judge 20`, Oracle): rules catch 12/370 rejections, wrongly block 0/35
+  applications; judge on her rejections 19/20 → **20/20**, on her applications 2/20 → **2/20** (same jobs).
+- **Evals:** 13 new tests; Oracle suite **546 passed**, 1 failed = the deliberate `[claude]` (credits 0).
+- **Found by the new eval:** the SERP-LEAD note template ("VJH SerpAPI found this job") was being learned as her reason.
+- **Found by the replay:** lessons + location-heavy examples together turned silence on location into a veto (Rove
+  Concepts, applied, 2/2) — fixed by a reminder placed nearest the job; re-run the replay after any prompt change.
