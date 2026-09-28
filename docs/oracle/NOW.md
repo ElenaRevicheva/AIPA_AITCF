@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-09-28 13:35 | serpapi-jobs → venv Python (Elena: "Yes, make things done") | PM2 `serpapi-jobs` interpreter + `pm2 save` | VJH `e4c7314` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
