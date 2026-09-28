@@ -288,6 +288,20 @@ LANES = {
             'administer. I document every workflow so someone else can run it, and I audit it from '
             'live records, not from what the dashboard claims.',
     },
+    # 28 Sep 2026 — creative AI lane (Elena: "Make step 2"). Facts: 8 films on the live gallery
+    # (webhook.../cto/films.json), 99 poems in atuona content/poems.json (46 RU LITPROM, 53 EN),
+    # film #8 record docs/atuona/FILM8_2026-09-22.md, engine list NOW.md 22 Sep.
+    'creative': {
+        'label': 'Creative AI &amp; Generative Media',
+        'headline': 'Creative Technologist — generative AI film, image and audio, from concept to published work',
+        'profile':
+            'I direct generative models the way a producer directs a crew: concept and narrative, '
+            'shot design, model choice, edit, mix and release. I also built the machinery — an '
+            'automated pipeline that turns my own written universe (<b>99 published poems</b>) into '
+            'finished films — so I can budget it, scale it and keep it running. <b>8 films</b> are '
+            'published. Seven years as a Deputy CEO before this means creative work delivered '
+            'against a brief and a budget.',
+    },
     'exec_support': {
         'label': 'AI-Qualified Executive Support',
         'headline': 'AI Chief of Staff — executive operations, automated',
@@ -303,6 +317,11 @@ LANE_RULES = [
     # Language roles first: "Russian Bilingual Expert" matched no rule and fell to 'builder'.
     ('language', r'bilingual|language expert|language evaluator|linguist|transcription'
                  r'|audio recording|voice record'),
+    # 2026-09-28: creative AI lane (mirrors VJH src/core/target_lanes.py). Before 'leadership' and
+    # 'builder', which would otherwise take "AI Creative Technology Lead" / "Creative AI Engineer".
+    ('creative', r'creative technolog|creative ai|generative ai (producer|creative|artist)|'
+                 r'ai (video|film|content production|creative)|filmmaker|genai (production|content)|'
+                 r'innovation producer|generative ai content'),
     ('crm', r'hubspot|\bcrm\b|salesforce|revops|revenue op|sales op'),
     ('evaluation', r'\beval|red.?team|annotat|ai train(er|ing)|quality review|llm judge'),
     ('geo', r'\bgeo\b|\baeo\b|seo|search visibility|answer engine|content market'),

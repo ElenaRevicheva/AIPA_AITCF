@@ -8,6 +8,10 @@
       "pattern": "bilingual|language expert|language evaluator|linguist|transcription|audio recording|voice record"
     },
     {
+      "lane": "creative",
+      "pattern": "creative technolog|creative ai|generative ai (producer|creative|artist)|ai (video|film|content production|creative)|filmmaker|genai (production|content)|innovation producer|generative ai content"
+    },
+    {
       "lane": "crm",
       "pattern": "hubspot|\\bcrm\\b|salesforce|revops|revenue op|sales op"
     },
@@ -116,6 +120,14 @@
       "foundation": null,
       "languages": null,
       "cv": "CV_Elena_Revicheva_crm.pdf"
+    },
+    "creative": {
+      "label": "Creative AI &amp; Generative Media",
+      "headline": "Creative Technologist \u2014 generative AI film, image and audio, from concept to published work",
+      "profile": "I direct generative models the way a producer directs a crew: concept and narrative, shot design, model choice, edit, mix and release. I also built the machinery \u2014 an automated pipeline that turns my own written universe (<b>99 published poems</b>) into finished films \u2014 so I can budget it, scale it and keep it running. <b>8 films</b> are published. Seven years as a Deputy CEO before this means creative work delivered against a brief and a budget.",
+      "foundation": null,
+      "languages": null,
+      "cv": "CV_Elena_Revicheva_creative.pdf"
     },
     "exec_support": {
       "label": "AI-Qualified Executive Support",

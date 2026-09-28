@@ -78,10 +78,26 @@ const PROJECTS = {
     show: 'aideazz.xyz/ai-ops-wiki.html',
     body: 'Every model call in the fleet has an ordered fallback (Anthropic, OpenAI, Gemini, Grok, Groq). When Groq deprecated the models I used, the fleet kept serving — a config change, not an outage. The daily publisher will not print a number it cannot trace; if the model decorated the facts, the day stayed silent. A 130-test eval harness (unit, integration, golden-set) runs in under a minute at $0 API cost.',
   },
+  // 28 Sep 2026 — creative lane. Verified: 8 films on the live gallery (films.json); film #8
+  // record docs/atuona/FILM8_2026-09-22.md (3:36, 16 shots, −15.7 LUFS); 99 poems in atuona
+  // content/poems.json; bot engines + the price-cap incident in NOW.md 22 Sep and the AI Ops Wiki.
+  film: {
+    title: 'ATUONA AI Film Studio — 8 published films',
+    url: 'https://atuona.xyz/aifilmstudio/',
+    show: 'atuona.xyz/aifilmstudio',
+    body: 'Each film is made end to end by a pipeline I built: poems from my own ATUONA universe (99 published, in Russian and English) become shots generated per type after a model bake-off; narration is locked to each clip, music is ducked under the voice and the mix is normalised to broadcast loudness; every render is verified before release. The latest, Crimson Escape, runs 3:36 from 16 newly generated shots at −15.7 LUFS.',
+  },
+  studio: {
+    title: 'Generative production bot — a dozen models, one director',
+    url: 'https://aideazz.xyz/ai-ops-wiki.html',
+    show: 'aideazz.xyz/ai-ops-wiki.html',
+    body: 'A Telegram production bot that drives a dozen video and a dozen image models, with an LLM acting as director and a pre-render budget guard. When that guard could never fire — it read a price field the vendor never sends — I found it, fixed it, and published the postmortem.',
+  },
 };
 
 /** Which project leads is the only tailoring — the text never changes. */
 const ORDER = {
+  creative: ['film', 'studio', 'api', 'chain'],
   crm: ['loop', 'api', 'chain', 'espaluz'],
   automation: ['loop', 'chain', 'api', 'espaluz'],
   exec_support: ['loop', 'chain', 'espaluz', 'api'],
@@ -102,6 +118,12 @@ const AVAILABLE = {
     'Written rationales and rubrics another reviewer can check',
     'Bilingual content and localisation where register matters',
   ],
+  creative: [
+    'Generative video and image production: concept, shot design, model choice, iteration',
+    'Automated edit, narration, mix and publishing pipelines',
+    'Creative world-building and writing in English and Russian',
+    'Multi-model production on a budget, with cost guards and fallbacks',
+  ],
   default: [
     'Production LLM systems with fallback, evals and on-call ownership',
     'CRM and approved-send outreach (HubSpot, Resend, human-in-the-loop)',
@@ -111,6 +133,7 @@ const AVAILABLE = {
 };
 
 const STACK = {
+  creative: 'Video: Wan, Grok Imagine, Kling, Runway, Luma  ·  Image: Flux, Seedream, Ideogram  ·  Audio: TTS narration, mixing, loudness (LUFS)  ·  FFmpeg  ·  LLM direction (DeepSeek, GPT)  ·  TypeScript  ·  Python  ·  Telegram bot orchestration  ·  Oracle Cloud (OCI)',
   crm: 'HubSpot (CRM, pipelines, associations, tasks, files, API)  ·  Make  ·  Resend  ·  Python  ·  TypeScript  ·  Node.js  ·  PostgreSQL  ·  Playwright  ·  Oracle Cloud (OCI)',
   default: 'Python  ·  TypeScript  ·  Node.js  ·  FastAPI  ·  LangGraph  ·  RAG (pgvector)  ·  HubSpot  ·  Make  ·  Resend  ·  Playwright  ·  PostgreSQL  ·  Docker  ·  Oracle Cloud (OCI)',
 };
