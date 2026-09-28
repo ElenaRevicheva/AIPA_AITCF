@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-28 22:40 | Company brief -> HubSpot note; apply queue = new-first worklist, Telegram only when new | scripts/apply-queue.cjs, scripts/hs-fill-apply-kit.cjs, scripts/lib/company-research.cjs (new), Oracle crontab line for apply-queue | f5ee2ef |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -264,11 +263,15 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
 ### ✅ 28 Sep — Niuro SUBMITTED by Elena on GetOnBoard. Deal → ⏳ Sent, her "I applied" note added (VJH learns it), follow-up task 5 Oct.
 
-### 🟢 28 Sep — apply queue fixed + deployed (`ab33a79`, backup `backups/apply-queue.cjs.pre-clean-20260928` on Oracle)
-"Copy letter" no longer carries CHECKLIST / "Approve in Telegram" junk; `COMET_PROFILE` no longer claims "2 years building";
-each card links its HubSpot deal + 🛡️ badge. Verified by an Oracle preview build: 13 letters, 0 junk, 13 briefs from cache, $0.
-**Measured, not fixed yet:** 10 daily sends since 20 Sep, only 0–2 new jobs/day (≈90% repeat); Elena downloaded 3. The
-Perplexity brief lives only in the HTML, not in HubSpot. Proposed (awaiting her yes): brief → deal note; Telegram only when new.
+### 🟢 28 Sep — apply queue = productive worklist; company brief lives ON the HubSpot deal (`05bd98a`, VJH `a3a1eda`)
+- **Deal = the record.** `hs-fill-apply-kit.cjs` adds a `🔎 COMPANY BRIEF` note (Perplexity, cited, cached — `scripts/lib/company-research.cjs`)
+  to every ACT-TODAY hiring deal. **19 written, rerun adds 0.** The note has NO `https://`/href on purpose: every note reader takes the
+  first link as the APPLY link. VJH `_KIT_NOTE` skips it (taught FIRST). Test: `node scripts/test-company-brief.cjs` (23).
+- **Page = a view, rebuilt daily.** New jobs first, "still waiting" after, closed postings set aside (`scripts/lib/posting-state.cjs`,
+  VJH's phrase list copied + drift test); same job twice folded (lovasit.com + Lovas IT); how-to box; Comet prompts UNCHANGED (11/11 intact).
+- **Telegram only when a job is new** (`~/.apply-queue-seen.json`, seeded 28 Sep with 12 deals). Quiet path verified.
+  ⚠️ **§4.3 check owed:** the SEND path is proven only when the next new job arrives — grep `sent to Telegram (N new)` in `~/logs/apply-queue.log`.
+- Backups on Oracle: `backups/apply-queue.cjs.pre-newonly-20260928`, `backups/hs-fill-apply-kit.cjs.pre-brief-20260928`, `backups/apply-queue-research.json.20260928`.
 
 ### 📨 28 Sep — Niuro "AI Operations & Growth Lead" (GetOnBoard, LATAM-only remote, USD 2,500–3,500): kit READY — Elena's move
 
