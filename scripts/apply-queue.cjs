@@ -5,6 +5,16 @@
  *   node scripts/apply-queue.cjs                 → writes the page to the Desktop
  *   node scripts/apply-queue.cjs --out <path>    → somewhere else
  *   node scripts/apply-queue.cjs --limit 50      → how many deals (default 50)
+ *   --telegram     send the page to Elena — ONLY when at least one job is new since the last send
+ *   --seed-seen    mark everything on today's page as already seen (no send)
+ *   --no-liveness  skip the "is the posting still open?" check · --no-research  skip Perplexity
+ *
+ * PRODUCTIVE, NOT REPEATED (28 Sep 2026). Measured: 10 sends since 20 Sep, 0–2 new jobs each (≈90%
+ * repeat), the same posting three times, deals up to 67 days old. Now: new jobs on top, one card
+ * per job (duplicates folded under it), closed postings set aside, and Telegram stays quiet on days
+ * with nothing new. "Seen" = ~/.apply-queue-seen.json, written only after a successful send.
+ * The HubSpot deal is the record (letter, tailored CV, 🛡️ defense, 🔎 brief — hs-fill-apply-kit.cjs);
+ * this page is a view of it, rebuilt every morning.
  *
  * SAFETY — this script is READ-ONLY and additive:
  *   · It never writes to HubSpot. The only POSTs are /search and /batch/read, which are
@@ -26,6 +36,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
+const { BRIEF_MARK, createResearcher, decodeSafe } = require(path.join(__dirname, 'lib', 'company-research.cjs'));
+const { checkAll } = require(path.join(__dirname, 'lib', 'posting-state.cjs'));
 
 /**
  * COMET_PROFILE — the standing answers an ATS form asks every single time.
@@ -141,7 +153,7 @@ async function hs(url, init = {}) {
     const assoc = await hs(`${base}/crm/v3/objects/deals/${d.id}/associations/notes?limit=20`);
     const ids = (assoc.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
     let note = { url: '', source: '', score: '', letter: '', boilerplate: false, thin: '' };
-    let defense = false;
+    let defense = false, brief = false;
     if (ids.length) {
       const batch = await hs(`${base}/crm/v3/objects/notes/batch/read`, {
         method: 'POST',
@@ -149,10 +161,13 @@ async function hs(url, init = {}) {
       });
       // 28 Sep 2026: new deals carry a tailored CV + technical-defense note (hs-fill-apply-kit.cjs).
       defense = (batch.results || []).some((n) => /TECHNICAL DEFENSE/.test(n.properties.hs_note_body || ''));
+      const isBrief = (n) => strip(n.properties.hs_note_body).includes(BRIEF_MARK);
+      brief = (batch.results || []).some(isBrief);
       // A deal can carry several notes, and the apply link and the letter are not always in the
       // same one. Picking a single "best" note silently dropped 7 real letters on the first run,
       // so merge field-by-field, newest note first, and never overwrite a value already found.
-      const parsed = (batch.results || [])
+      // The 🔎 brief is always the NEWEST note and is about the company — never the apply link or letter.
+      const parsed = (batch.results || []).filter((n) => !isBrief(n))
         .sort((a, b) => String(b.properties.hs_timestamp || '').localeCompare(String(a.properties.hs_timestamp || '')))
         .map((n) => parseNote(n.properties.hs_note_body));
       for (const p of parsed) {
@@ -169,10 +184,11 @@ async function hs(url, init = {}) {
     rows.push({
       id: d.id,
       prefix,
-      title: (at > 0 ? titleCompany.slice(0, at) : titleCompany).replace(/^Apply to\s+/i, '').trim(),
-      company: at > 0 ? titleCompany.slice(at + 3).trim() : '',
+      title: (at > 0 ? titleCompany.slice(0, at) : titleCompany).replace(/^(Apply to|Job Application for)\s+/i, '').trim(),
+      company: decodeSafe(at > 0 ? titleCompany.slice(at + 3).trim() : ''),
       created: (d.properties.createdate || '').slice(0, 10),
       defense,
+      brief,
       ...note,
     });
   }
@@ -202,6 +218,66 @@ async function hs(url, init = {}) {
     }
   }
 
+  // ── ONE CARD PER JOB, NEW FIRST, DEAD LINKS SET ASIDE (2026-09-28) ─────────
+  // Elena: "the link itself should work but in a productive way, not stale duplicates". Still
+  // READ-ONLY: no deal is merged or moved — the page only folds and orders what HubSpot holds.
+  const normCompany = (c) => decodeSafe(c).toLowerCase().replace(/[^a-z0-9]/g, '')
+    .replace(/(com|careers|inc|llc|ltd|io|co)$/, '');
+  const normTitle = (t) => String(t || '').replace(/\s@\s.*$/, '').toLowerCase()
+    .replace(/\([^)]*\)?/g, ' ').replace(/\bcontract\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+  for (const r of rows) {
+    // "Resident Solutions Architect at Glean" @ Glean → the company once, not twice.
+    const same = (m, c) => (normCompany(c) === normCompany(r.company) ? '' : m);
+    r.title = r.title.replace(/\s+@\s+([^@]+)$/, same).replace(/\s+at\s+([^@]+)$/i, same).trim();
+  }
+  // Same title at the same company = one job. "lovasit.com" and "Lovas IT" were two deals, one posting.
+  // Keep the card with a real letter; the rest become "also in HubSpot as …" links under it.
+  const byJob = new Map();
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    const k = `${normTitle(r.title)}|${normCompany(r.company)}`;
+    const keep = byJob.get(k);
+    if (!keep) { byJob.set(k, r); continue; }
+    const better = r.letter && !r.boilerplate && !(keep.letter && !keep.boilerplate);
+    const [winner, loser] = better ? [r, keep] : [keep, r];
+    winner.dupes = [...(winner.dupes || []), ...(loser.dupes || []), { id: loser.id, company: loser.company }];
+    delete loser.dupes;
+    if (better) rows[rows.indexOf(keep)] = r;
+    byJob.set(k, winner);
+    rows.splice(i--, 1);
+  }
+  // Same title at DIFFERENT companies is usually one role pushed by several recruiters — flag, don't fold.
+  const byTitle = new Map();
+  for (const r of rows) {
+    const t = normTitle(r.title);
+    if (t) byTitle.set(t, [...(byTitle.get(t) || []), r]);
+  }
+  for (const list of byTitle.values()) {
+    if (list.length > 1) for (const r of list) r.alsoAt = list.filter((x) => x !== r).map((x) => x.company);
+  }
+  // Is the posting still open? VJH checked once, when it found the job; postings close later.
+  let liveness = { open: 0, closed: 0, unknown: 0 };
+  if (!args.includes('--no-liveness')) {
+    const states = await checkAll(rows.map((r) => r.url));
+    rows.forEach((r, i) => { r.posting = states[i]; liveness[states[i].state]++; });
+  }
+  // New = never on a page that reached Telegram. Written only after a successful send (or --seed-seen).
+  const SEEN_FILE = path.join(os.homedir(), '.apply-queue-seen.json');
+  let seen = {};
+  try { seen = JSON.parse(fs.readFileSync(SEEN_FILE, 'utf8')); } catch { /* first run: all new */ }
+  const today = new Date().toISOString().slice(0, 10);
+  for (const r of rows) {
+    r.isNew = !seen[r.id];
+    r.closed = !!(r.posting && r.posting.state === 'closed');
+    r.waitingDays = r.created ? Math.max(0, Math.round((Date.parse(today) - Date.parse(r.created)) / 86400000)) : null;
+  }
+  const rank = (r) => (r.closed ? 2 : r.isNew ? 0 : 1);
+  rows.sort((a, b) => rank(a) - rank(b) || String(b.created).localeCompare(String(a.created)));
+  const nNew = rows.filter((r) => rank(r) === 0).length;
+  const nWaiting = rows.filter((r) => rank(r) === 1).length;
+  const nClosed = rows.filter((r) => r.closed).length;
+  const nDupes = rows.reduce((s, r) => s + (r.dupes || []).length, 0);
+
   const tailored = rows.filter((r) => r.letter && !r.boilerplate).length;
   const boiler = rows.filter((r) => r.letter && r.boilerplate).length;
   const noLetter = rows.filter((r) => !r.letter).length;   // older notes carry no letter at all
@@ -219,50 +295,16 @@ async function hs(url, init = {}) {
   //     silent skip is the failure mode this repo keeps getting bitten by, so misses are counted
   //     and printed.
   //   · CITED — every brief carries its sources. Nothing here goes in a letter unverified.
+  //
+  // 28 Sep 2026: the research itself moved to scripts/lib/company-research.cjs, unchanged, so the
+  // apply kit can write the same brief onto the HubSpot deal. Same cache file: paid for once.
   const PPLX = envValue('PERPLEXITY_API_KEY');
-  const CACHE = path.join(os.homedir(), '.apply-queue-research.json');
-  let cache = {};
-  try { cache = JSON.parse(fs.readFileSync(CACHE, 'utf8')); } catch { /* first run */ }
-  let spent = 0, researched = 0, cached = 0, failed = 0;
-
-  async function research(company, title) {
-    if (!company) return null;
-    const key = company.toLowerCase().trim();
-    if (cache[key]) { cached++; return cache[key]; }
-    const prompt = `Company: ${company}. Role being applied for: ${title || 'unspecified'}.\n\n`
-      + 'Answer in exactly this format, nothing else:\n'
-      + 'BRIEF: two sentences on what this company actually does and who pays them.\n'
-      + 'ANGLE: one sentence naming the single most relevant thing about them for a candidate '
-      + 'whose background is building and operating production AI automation — AI agents, CRM and '
-      + 'outreach automation, multi-provider LLM fallback chains, and making companies visible to '
-      + 'AI search (GEO/AEO). Be specific to this company; if you cannot find enough about them, '
-      + 'write ANGLE: (not enough public information) rather than inventing something.';
-    try {
-      const res = await fetch('https://api.perplexity.ai/chat/completions', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${PPLX}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'sonar', max_tokens: 220, temperature: 0.2,
-          messages: [{ role: 'user', content: prompt }] }),
-      });
-      if (!res.ok) { failed++; return null; }
-      const j = await res.json();
-      const text = j.choices?.[0]?.message?.content || '';
-      spent += j.usage?.cost?.total_cost || 0;
-      const out = {
-        brief: (text.match(/BRIEF:\s*([\s\S]*?)(?=\nANGLE:|$)/i) || [])[1]?.trim() || text.trim(),
-        angle: (text.match(/ANGLE:\s*([\s\S]*)/i) || [])[1]?.trim() || '',
-        sources: (j.search_results || j.citations || [])
-          .map((c) => (typeof c === 'string' ? c : c.url)).filter(Boolean).slice(0, 4),
-      };
-      cache[key] = out; researched++;
-      return out;
-    } catch { failed++; return null; }
-  }
-
+  const researcher = createResearcher(PPLX);
   if (PPLX && !args.includes('--no-research')) {
-    for (const r of rows) r.research = await research(r.company, r.title);
-    try { fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1)); } catch { /* cache is optional */ }
+    for (const r of rows) r.research = await researcher.research(r.company, r.title);
+    researcher.save();
   }
+  const { spent, researched, cached, failed } = researcher.stats;
 
   /**
    * One ready-to-paste instruction per job for an agentic browser (Comet, or any assistant that
@@ -331,9 +373,10 @@ async function hs(url, init = {}) {
    * Same three rules as the per-job prompts, and one addition: an async agent finishes unwatched,
    * so it must report back a table rather than leave her guessing what it touched.
    */
+  const openRows = rows.filter((r) => !r.closed);   // never send an agent to a posting that says it is closed
   const computerWorkOrder = () => {
     const p = COMET_PROFILE;
-    const jobs = rows.map((r, i) => {
+    const jobs = openRows.map((r, i) => {
       const bits = [`${i + 1}. ${r.title}${r.company && !(r.title || '').toLowerCase().includes(r.company.toLowerCase()) ? ` — ${r.company}` : ''}`,
         `   URL: ${r.url || '(none — skip)'}`];
       if (r.research?.angle) bits.push(`   Angle: ${r.research.angle}`);
@@ -342,10 +385,10 @@ async function hs(url, init = {}) {
         : `   Cover letter: NONE — leave free-text blank, do not write one.`);
       return bits.join('\n');
     }).join('\n');
-    const letters = rows.map((r, i) => (r.letter && !r.boilerplate
+    const letters = openRows.map((r, i) => (r.letter && !r.boilerplate
       ? `----- LETTER ${i + 1} (${r.company || r.title}) -----\n${r.letter}` : '')).filter(Boolean).join('\n\n');
     return [
-      `Goal: pre-fill ${rows.length} job applications for me. Do NOT submit any of them.`,
+      `Goal: pre-fill ${openRows.length} job applications for me. Do NOT submit any of them.`,
       '',
       'MY DETAILS — use verbatim, never paraphrase:',
       `· ${p.name} · ${p.email} · ${p.phone}`,
@@ -355,7 +398,7 @@ async function hs(url, init = {}) {
       `· Notice: ${p.notice} · Languages: ${p.languages}`,
       `· ${p.linkedin} · ${p.github} · ${p.portfolio}`,
       '',
-      `THE ${rows.length} JOBS:`,
+      `THE ${openRows.length} JOBS:`,
       jobs,
       '',
       'FOR EACH JOB: open the URL, fill every field you can from MY DETAILS, paste the matching',
@@ -374,37 +417,57 @@ async function hs(url, init = {}) {
     ].join('\n');
   };
 
-  const cards = rows.map((r, i) => `
+  const dealLink = (id) => `https://app.hubspot.com/contacts/${esc(HS_PORTAL)}/record/0-3/${esc(id)}`;
+  const agePill = (r) => (r.waitingDays == null ? ''
+    : r.waitingDays >= 21 ? `<span class="pill bad">found ${r.waitingDays} days ago — may be filled</span>`
+      : `<span class="pill">found ${r.waitingDays === 0 ? 'today' : r.waitingDays === 1 ? 'yesterday' : `${r.waitingDays} days ago`}</span>`);
+  const card = (r, i) => `
   <article class="card${r.boilerplate ? ' warn' : ''}" data-i="${i}">
     <div class="top">
       <div><h2>${esc(r.title) || '(untitled)'}</h2><div class="co">${esc(r.company)}</div></div>
       <div class="badges">
+        ${r.isNew && !r.closed ? '<span class="pill new">🆕 new</span>' : ''}
+        ${agePill(r)}
         ${r.score ? `<span class="pill">score ${esc(r.score)}</span>` : ''}
-        <span class="pill">${esc(r.created)}</span>
         ${r.source ? `<span class="pill">${esc(r.source)}</span>` : ''}
         ${r.prefix.includes('UNVERIFIED') ? '<span class="pill bad">unverified</span>' : ''}
         ${!r.letter ? '<span class="pill bad">no draft letter</span>' : ''}
         ${r.defense ? '<span class="pill">🛡️ tailored CV + defense in HubSpot</span>' : ''}
+        ${r.brief ? '<span class="pill">🔎 brief in HubSpot</span>' : ''}
       </div>
     </div>
+    ${r.closed ? `<p class="flag">⛔ This posting looks closed — ${esc(r.posting.why)}. Open it once to be sure; if it is, move the HubSpot deal to <b>Lost</b>.</p>` : ''}
     ${r.boilerplate ? `<p class="flag">⚠️ The draft letter is <b>boilerplate</b>${r.thin ? ` — the job page gave only ${esc(r.thin)} characters` : ''}. Rewrite it before sending.</p>` : ''}
+    ${r.dupes && r.dupes.length ? `<p class="dup">↳ The same job is also in HubSpot as ${r.dupes.map((d) => `<a href="${dealLink(d.id)}" target="_blank" rel="noopener">${esc(d.company)} deal ↗</a>`).join(', ')}. Apply once, then move the extra deal to Lost.</p>` : ''}
+    ${r.alsoAt && r.alsoAt.length ? `<p class="dup">↳ Same title also listed by ${esc(r.alsoAt.join(', '))} — often one role pushed by several recruiters. Pick the one closest to the real employer.</p>` : ''}
     ${r.research && (r.research.brief || r.research.angle) ? `<div class="rsrch"><b>About them</b> — ${esc(r.research.brief)}${r.research.angle ? `<br><b>Your angle:</b> ${esc(r.research.angle)}` : ''}${r.research.sources && r.research.sources.length ? `<div class="src">${r.research.sources.map((u, n) => `<a href="${esc(u)}" target="_blank" rel="noopener">source ${n + 1}</a>`).join(' · ')}</div>` : ''}</div>` : ''}
     <div class="actions">
       ${r.url ? `<a class="btn go" href="${esc(r.url)}" target="_blank" rel="noopener">Open &amp; apply ↗</a>`
               : '<span class="btn dead">no apply link in the note</span>'}
-      <a class="btn" href="https://app.hubspot.com/contacts/${esc(HS_PORTAL)}/record/0-3/${esc(r.id)}" target="_blank" rel="noopener">HubSpot deal ↗</a>
+      <a class="btn" href="${dealLink(r.id)}" target="_blank" rel="noopener">HubSpot deal ↗</a>
       <button class="btn cm" onclick="copyComet(${i},this)">Copy Comet prompt</button>
       ${r.letter ? `<button class="btn" onclick="copyLetter(${i},this)">Copy letter</button>` : ''}
-      <button class="btn" onclick="this.closest('.card').classList.toggle('done')">Mark done</button>
       ${r.letter ? `<button class="btn ghost" onclick="this.closest('.card').querySelector('.letter').classList.toggle('open')">Show letter</button>` : ''}
+      <button class="btn ghost" onclick="this.closest('.card').classList.add('done')" title="Hides it on this screen only — HubSpot decides what comes back tomorrow">Hide</button>
     </div>
     ${r.letter ? `<pre class="letter" id="l${i}">${esc(r.letter)}</pre>` : ''}
-  </article>`).join('\n');
+  </article>`;
+  const idx = new Map(rows.map((r, i) => [r, i]));
+  const group = (list) => list.map((r) => card(r, idx.get(r))).join('\n');
+  const newRows = rows.filter((r) => rank(r) === 0);
+  const waitRows = rows.filter((r) => rank(r) === 1);
+  const closedRows = rows.filter((r) => rank(r) === 2);
+  const cards = [
+    newRows.length ? `<h3 class="sec">🆕 New since your last queue <span>${newRows.length}</span></h3>${group(newRows)}`
+      : '<h3 class="sec">🆕 Nothing new since your last queue</h3>',
+    waitRows.length ? `<h3 class="sec">⏳ Still waiting <span>${waitRows.length}</span></h3><p class="secsub">Already sent to you on an earlier day. Apply — or move the HubSpot deal to Lost, and it stops coming back.</p>${group(waitRows)}` : '',
+    closedRows.length ? `<details class="closed"><summary>⛔ ${closedRows.length} posting${closedRows.length === 1 ? '' : 's'} look${closedRows.length === 1 ? 's' : ''} closed — check once, then move the deal to Lost</summary>${group(closedRows)}</details>` : '',
+  ].join('\n');
 
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Apply queue — ${rows.length} jobs</title>
+<title>Apply queue — ${nNew} new · ${nWaiting} waiting</title>
 <style>
  :root{--bg:#0d0f14;--card:#151922;--ink:#e8eaf0;--mut:#8b93a7;--cy:#00e5ff;--warn:#ffb020;--ok:#27c093}
  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,Segoe UI,Roboto,sans-serif}
@@ -412,13 +475,20 @@ async function hs(url, init = {}) {
  h1{margin:0 0 4px;font-size:19px;letter-spacing:.02em} .sub{color:var(--mut);font-size:13px}
  .wrap{max-width:900px;margin:0 auto;padding:18px 20px 60px}
  .card{background:var(--card);border:1px solid #222735;border-radius:12px;padding:16px;margin:0 0 14px}
- .card.warn{border-color:rgba(255,176,32,.45)} .card.done{opacity:.35}
+ .card.warn{border-color:rgba(255,176,32,.45)} .card.done{display:none}
  .top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
  h2{margin:0;font-size:16px;font-weight:600} .co{color:var(--mut);font-size:13px;margin-top:2px}
  .badges{display:flex;gap:6px;flex-wrap:wrap}
  .pill{font-size:11px;color:var(--mut);border:1px solid #2b3142;border-radius:99px;padding:3px 9px}
  .pill.bad{color:var(--warn);border-color:rgba(255,176,32,.5)}
+ .pill.new{color:#04121a;background:var(--ok);border-color:var(--ok);font-weight:600}
  .flag{color:var(--warn);font-size:13px;margin:10px 0 0}
+ .dup{color:var(--mut);font-size:13px;margin:8px 0 0} .dup a{color:var(--cy)}
+ .sec{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:26px 0 10px} .sec span{color:var(--ink)}
+ .secsub{color:var(--mut);font-size:13px;margin:-4px 0 12px}
+ details.closed summary{cursor:pointer;color:var(--warn);margin:26px 0 12px;font-size:14px}
+ .how{background:#101a16;border:1px solid rgba(39,192,147,.35);border-radius:10px;padding:12px 14px;margin:0 0 6px;font-size:13.5px;color:#c3cbdb}
+ .how b{color:var(--ink)} .how ol{margin:6px 0 0;padding-left:20px} .how li{margin:4px 0}
  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
  .btn{font:13px inherit;background:#1d2430;color:var(--ink);border:1px solid #2b3142;border-radius:8px;padding:7px 12px;cursor:pointer;text-decoration:none;display:inline-block}
  .btn:hover{border-color:var(--cy)} .btn.go{background:var(--cy);color:#04121a;border-color:var(--cy);font-weight:600}
@@ -430,33 +500,29 @@ async function hs(url, init = {}) {
  .letter{display:none;white-space:pre-wrap;background:#0f1319;border:1px solid #222735;border-radius:8px;padding:12px;margin-top:12px;font:12.5px/1.6 ui-monospace,Consolas,monospace;color:#cfd6e4;max-height:340px;overflow:auto}
  .letter.open{display:block}
  .prompt{background:#111722;border:1px dashed #2b3142;border-radius:10px;padding:12px;margin:0 0 18px;color:var(--mut);font-size:13px}
- .prompt code{color:var(--ink);display:block;margin-top:6px;font:12.5px ui-monospace,Consolas,monospace;white-space:pre-wrap}
- .done-count{color:var(--ok)}
+ details.prompt summary{cursor:pointer;color:var(--ink)}
 </style></head><body>
 <header>
-  <h1>Apply queue — ${rows.length} jobs waiting</h1>
-  <div class="sub">From HubSpot stage “${esc(STAGE)}” · generated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} ·
-  <b>${tailored}</b> tailored letter${tailored === 1 ? '' : 's'} · <b>${boiler}</b> boilerplate (rewrite before sending) · <b>${noLetter}</b> with no draft letter${noLink ? ` · ${noLink} missing an apply link` : ''}${hiddenEngineer ? `<br><span style="color:var(--warn)">${hiddenEngineer} generic AI-Engineer role${hiddenEngineer === 1 ? '' : 's'} hidden</span> — 5+ years hand-coding, not your lane. Still in HubSpot, nothing deleted; run with <code style="color:var(--mut)">--all</code> to see them.` : ''}</div>
+  <h1>Apply queue — ${nNew} new · ${nWaiting} waiting${nClosed ? ` · ${nClosed} look closed` : ''}</h1>
+  <div class="sub">From HubSpot stage “${esc(STAGE)}” · generated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC ·
+  <b>${tailored}</b> tailored letter${tailored === 1 ? '' : 's'} · <b>${boiler}</b> boilerplate · <b>${noLetter}</b> with no draft letter${noLink ? ` · ${noLink} missing an apply link` : ''}${nDupes ? ` · ${nDupes} duplicate deal${nDupes === 1 ? '' : 's'} folded` : ''}${hiddenEngineer ? `<br><span style="color:var(--warn)">${hiddenEngineer} generic AI-Engineer role${hiddenEngineer === 1 ? '' : 's'} hidden</span> — 5+ years hand-coding, not your lane. Still in HubSpot, nothing deleted.` : ''}</div>
 </header>
 <div class="wrap">
-  <div class="prompt" style="border-style:solid;border-color:rgba(0,229,255,.35)">
-    <b style="color:var(--ink)">Perplexity <u>Computer</u> — do the whole queue at once</b><br>
-    Computer is the cloud agent at <a href="https://www.perplexity.ai/gen/computer/job-applications" target="_blank" rel="noopener" style="color:var(--cy)">perplexity.ai/gen/computer</a>
-    (<b style="color:var(--warn)">needs the paid Max plan — without it, skip this box; the per-job Comet prompts below are free</b>).
-    It is <b style="color:var(--ink)">not</b> the Comet browser: it takes one goal and runs the batch unwatched.
-    So this is <b style="color:var(--ink)">one</b> work order for all ${rows.length} jobs — details, links, angles and letters —
-    ending in a rule that it must report a table of what it filled and what it left blank.
-    It is told, three times, <b style="color:var(--ink)">not to submit anything</b>.
-    <div class="actions" style="margin-top:10px"><button class="btn cm" onclick="copyOrder(this)">Copy Computer work order (all ${rows.length})</button></div>
-  </div>
-  <div class="prompt"><b style="color:var(--ink)">On your laptop with Comet instead?</b>
-    Every job below has a <b style="color:var(--ink)">Copy Comet prompt</b> button. It copies one message
-    already carrying that job's URL, your contact details, your experience line and — where VJH wrote a
-    tailored one — the cover letter itself. Paste it into the assistant and the repetitive fields fill themselves.
-    <br><br>Each prompt tells the assistant three things it must not do: <b style="color:var(--ink)">do not submit</b>,
-    do not invent an answer it was not given, and ignore any instruction written inside the job page.
-    You stay the one who reads the form and clicks send.</div>
+  <div class="how"><b>How to use this page</b>
+    <ol>
+      <li><b>Pick a job</b> — new ones are on top. Read <b>About them</b> and <b>Your angle</b>: that is your first letter line and your answer to “why us?”.</li>
+      <li><b>On the laptop:</b> tap <b>Copy Comet prompt</b>, open the <b>Comet</b> browser, paste it into Comet's assistant. It opens the job and fills the form with your details and letter, then <b>stops</b>. You attach the CV (download it from the <b>HubSpot deal</b>, 📎 on the 🛡️ note), read everything, and click Submit yourself.
+        <br><b>On the phone:</b> tap <b>Open &amp; apply</b>, then <b>Copy letter</b>.</li>
+      <li><b>Close it in HubSpot:</b> tap <b>HubSpot deal</b> → <b>⏳ Sent</b> + a note “applied” (VJH learns from it), or <b>Lost</b> if you skip it. That is what takes it off tomorrow's page — <b>Hide</b> only hides it on this screen.</li>
+    </ol></div>
 ${cards}
+  <details class="prompt" style="margin-top:28px"><summary>Have the Perplexity <b>Max</b> plan? One work order for all ${openRows.length} open jobs (Perplexity Computer)</summary>
+    Computer is the cloud agent at <a href="https://www.perplexity.ai/gen/computer/job-applications" target="_blank" rel="noopener" style="color:var(--cy)">perplexity.ai/gen/computer</a> —
+    <b style="color:var(--warn)">paid Max plan only; without it, ignore this box — the per-job Comet prompts above are free</b>.
+    It is not the Comet browser: it takes one goal and runs the batch unwatched, then must report a table of what it filled and left blank.
+    It is told, three times, <b style="color:var(--ink)">not to submit anything</b>.
+    <div class="actions" style="margin-top:10px"><button class="btn cm" onclick="copyOrder(this)">Copy Computer work order (${openRows.length} jobs)</button></div>
+  </details>
 </div>
 <script>
  const LETTERS = ${JSON.stringify(rows.map((r) => r.letter || ''))};
@@ -516,25 +582,49 @@ ${cards}
   } else if (!PPLX) {
     console.log('  ! PERPLEXITY_API_KEY not found — company briefs skipped');
   }
+  console.log(`  ${nNew} new · ${nWaiting} still waiting · ${nClosed} look closed · ${nDupes} duplicate deal(s) folded`
+    + (args.includes('--no-liveness') ? '' : ` · links: ${liveness.open} open / ${liveness.closed} closed / ${liveness.unknown} unknown`));
   console.log('  HubSpot was only read. VJH untouched.');
+
+  // Everything on this page — duplicates included — counts as seen once it has reached her.
+  // Pruned to today's queue: a deal that leaves "I Act TODAY" and comes back is new again.
+  const markSeen = () => {
+    const ids = rows.flatMap((r) => [r.id, ...(r.dupes || []).map((d) => d.id)]);
+    const next = Object.fromEntries(ids.map((id) => [id, seen[id] || today]));
+    try { fs.writeFileSync(SEEN_FILE, JSON.stringify(next, null, 1)); } catch (e) { console.warn(`  ! could not save ${SEEN_FILE}: ${e.message}`); }
+    return ids.length;
+  };
+  if (args.includes('--seed-seen')) {
+    console.log(`  seeded ${SEEN_FILE} with ${markSeen()} deal(s) — only jobs added after this reach Telegram`);
+  }
 
   // --telegram: deliver the page itself to Elena's private chat. Scheduled runs happen on Oracle,
   // where a file on disk helps nobody — Telegram is where she already reads the fleet. The page
   // carries company names and letters, so it goes to the private chat and nowhere else.
+  // 28 Sep 2026: ONLY when something is new. The same 12–16 jobs every morning taught her to stop
+  // opening it — a repeat message is how the one new job inside it gets missed.
   if (args.includes('--telegram')) {
+    const fresh = rows.filter((r) => r.isNew && !r.closed);
+    if (!fresh.length) {
+      markSeen();
+      console.log(`  · nothing new since the last send — Telegram stays quiet (${nWaiting} still waiting; page at ${OUT})`);
+      return;
+    }
     // read through hs-env: these scripts run from cron with a bare environment, so .env is the
     // only reliable source — process.env was empty on the first Oracle run.
     const token = envValue('TELEGRAM_BOT_TOKEN');
     const chat = (envValue('CONCIERGE_TG_CHAT') || '').trim();
-    if (!token || !chat) { console.warn('  ! TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT missing — not sent'); return; }
+    if (!token || !chat) { console.warn('  ! TELEGRAM_BOT_TOKEN or CONCIERGE_TG_CHAT missing — not sent'); process.exitCode = 1; return; }
     // The caption has to explain itself: it arrives at 8am with no conversation around it.
-    const caption = `📋 Your apply queue — ${rows.length} job${rows.length === 1 ? '' : 's'}\n\n` +
-      `These are the roles VJH already scored and marked "YOU act TODAY" in HubSpot. ` +
-      `Tap the file below and it opens as one page — apply link + cover letter for each, ` +
-      `so you don't have to open every HubSpot record one by one.\n\n` +
-      `${tailored} have a tailored letter · ${boiler} boilerplate (rewrite first) · ${noLetter} no letter yet\n\n` +
-      (hiddenEngineer ? `🚫 ${hiddenEngineer} generic AI-Engineer role${hiddenEngineer === 1 ? '' : 's'} hidden — 5+ years hand-coding, not your lane. Nothing was deleted.\n\n` : '') +
-      `⚠️ Nothing was submitted. This is a worklist — you apply, in your own words.`;
+    const line = (r) => `🆕 ${r.title}${r.company && !r.title.toLowerCase().includes(r.company.toLowerCase()) ? ` — ${r.company}` : ''}`;
+    const listed = fresh.slice(0, 6).map(line).join('\n') + (fresh.length > 6 ? `\n…and ${fresh.length - 6} more` : '');
+    const caption = Array.from(
+      `📋 Apply queue — ${fresh.length} new job${fresh.length === 1 ? '' : 's'}\n\n${listed}\n\n`
+      + (nWaiting ? `⏳ ${nWaiting} still waiting from earlier days${nClosed ? ` · ⛔ ${nClosed} look closed` : ''}\n\n` : '')
+      + 'Open the file: new jobs are on top, each with its apply link, letter, Comet prompt and HubSpot deal '
+      + '(tailored CV, defense, company brief). Done with one? Move the deal to ⏳ Sent or Lost — it leaves the queue.\n\n'
+      + '⚠️ Nothing was submitted. You apply, in your own words.',
+    ).slice(0, 1000).join('');   // Telegram caps captions at 1024; cut on whole characters, never mid-emoji
     const form = new FormData();
     form.append('chat_id', chat);
     form.append('caption', caption);
@@ -542,7 +632,8 @@ ${cards}
       `apply-queue-${new Date().toISOString().slice(0, 10)}.html`);
     const res = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, { method: 'POST', body: form });
     const out = await res.json().catch(() => ({}));
-    console.log(out.ok ? '  ✓ sent to Telegram' : `  ! Telegram failed: ${String(out.description || res.status).slice(0, 120)}`);
-    if (!out.ok) process.exitCode = 1;   // a silent non-delivery is exactly what we do not want
+    console.log(out.ok ? `  ✓ sent to Telegram (${fresh.length} new)` : `  ! Telegram failed: ${String(out.description || res.status).slice(0, 120)}`);
+    if (out.ok) markSeen();
+    else process.exitCode = 1;   // a silent non-delivery is exactly what we do not want; not marked seen, so it retries tomorrow
   }
 })().catch((e) => { console.error('✖', e.message); process.exit(1); });

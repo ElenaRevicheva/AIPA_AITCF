@@ -16,6 +16,8 @@
  *   2. If the posting was unreadable, render it once through the Bright Data Web Unlocker (the
  *      same zone ingest already uses) and hand that text to the generator as its context.
  *   3. ADD a new note "✅ READY TO SEND — cover letter" on the deal, with the lane CV attached.
+ *   Also, on EVERY ACT-TODAY hiring deal (28 Sep 2026): a "🔎 COMPANY BRIEF" note (Perplexity, cited,
+ *   cached — scripts/lib/company-research.cjs) and, on new deals, the tailored CV + 🛡️ defense note.
  *
  * RULES IT WILL NOT BREAK:
  *   · Additive. It never rewrites or deletes an existing note — the stub stays underneath.
@@ -42,6 +44,11 @@ const { execFileSync } = require('child_process');
 const { uploadOutreachFile, addNoteAttachments } = require(path.join(__dirname, 'hs-files.cjs'));
 const { generateCoverLetter, fetchJobDescription } = require(path.join(ROOT, 'dist/cover-letter.js'));
 const tailor = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
+// ── Company brief (28 Sep 2026, Elena: "the HubSpot deal stays the source of truth, always fresh") ──
+// The Perplexity brief used to live only inside the morning HTML page. Now every ACT-TODAY hiring deal
+// gets it as a "🔎 COMPANY BRIEF" note — same research, same cache, so a company is paid for once.
+const { BRIEF_MARK, createResearcher, renderBriefHtml } = require(path.join(__dirname, 'lib', 'company-research.cjs'));
+const researcher = createResearcher(process.env.PERPLEXITY_API_KEY);
 
 const APPLY = process.argv.includes('--apply');
 // ── Tailored CV + technical-defense note (28 Sep 2026, Elena) ────────────────────────────────
@@ -171,6 +178,22 @@ async function defensePass(d, bodies, title, company, jobUrl) {
   return cvPath ? 'added' : 'added-no-cv';
 }
 
+/** 🔎 COMPANY BRIEF note for one deal. No date gate: briefs are cached and cost ~$0.005 per new company. */
+async function briefPass(d, bodies, title, company) {
+  if (bodies.some((b) => text(b).includes(BRIEF_MARK))) return 'had';
+  const r = await researcher.research(company, title);
+  const html = renderBriefHtml({ company, research: r });
+  if (!html) return 'none';
+  if (APPLY) {
+    await hs('POST', '/crm/v3/objects/notes', {
+      properties: { hs_note_body: html, hs_timestamp: new Date().toISOString() },
+      associations: [{ to: { id: d.id }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] }],
+    });
+  }
+  console.log(`  ${APPLY ? '🔎 added' : '· would add'} brief ${company.slice(0, 22).padEnd(24)} ${title.slice(0, 40)}`);
+  return 'added';
+}
+
 (async () => {
   if (!HS) { console.log('ABORT — HUBSPOT_API_KEY missing'); process.exit(1); }
   const search = await hs('POST', '/crm/v3/objects/deals/search', {
@@ -186,6 +209,7 @@ async function defensePass(d, bodies, title, company, jobUrl) {
 
   let ok = 0, wrote = 0, unreadable = 0, failed = 0;
   const defense = { added: 0, 'added-no-cv': 0, had: 0, old: 0, failed: 0 };
+  const brief = { added: 0, had: 0, none: 0, failed: 0 };
   const cvIds = new Map();
   for (const d of deals) {
     if (ONLY && String(d.id) !== ONLY) continue;
@@ -197,7 +221,11 @@ async function defensePass(d, bodies, title, company, jobUrl) {
         ? (await hs('POST', '/crm/v3/objects/notes/batch/read', { properties: ['hs_note_body'], inputs: ids.map((id) => ({ id })) })).results || []
         : [];
       const bodies = notes.map((n) => n.properties.hs_note_body || '');
-      const jobUrl = bodies.map(jobUrlOf).find(Boolean);
+      // The brief carries no link by design; skipping it here too means a future edit to it can never
+      // hand a source page to the letter generator as "the posting".
+      const jobUrl = bodies.filter((b) => !text(b).includes(BRIEF_MARK)).map(jobUrlOf).find(Boolean);
+      try { brief[await briefPass(d, bodies, title, company)]++; }
+      catch (e) { brief.failed++; console.log(`  ✖ brief ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
       // Defense first: new deals arrive WITH a letter, so it must not sit behind the letter skip.
       try { defense[await defensePass(d, bodies, title, company, jobUrl)]++; }
       catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
@@ -243,5 +271,9 @@ async function defensePass(d, bodies, title, company, jobUrl) {
   console.log(`  already had a letter ${ok} · ${APPLY ? 'wrote' : 'would write'} ${wrote} · posting unreadable ${unreadable} · failed ${failed}`);
   console.log(`  defense: ${APPLY ? 'added' : 'would add'} ${defense.added} (+${defense['added-no-cv']} without a CV) · already had ${defense.had}`
     + ` · older than ${DEFENSE_SINCE.toISOString().slice(0, 10)} ${defense.old} · failed ${defense.failed}`);
+  researcher.save();
+  const rs = researcher.stats;
+  console.log(`  brief: ${APPLY ? 'added' : 'would add'} ${brief.added} · already had ${brief.had} · nothing found ${brief.none}`
+    + ` · failed ${brief.failed} · research ${rs.researched} new / ${rs.cached} cached / ${rs.failed} failed · $${rs.spent.toFixed(4)}`);
   if (failed) process.exitCode = 1;
 })().catch((e) => { console.log('FAILED — ' + String(e.message).slice(0, 200)); process.exit(1); });
