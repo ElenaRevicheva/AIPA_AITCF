@@ -248,6 +248,13 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
+### ⚠️ TRAP (28 Sep) — Oracle's `docs/selling/outreach-registry.json` runs AHEAD of `main`
+
+Atlas writes prospect entries on the box and never commits them: on 28 Sep Oracle had 437 keys, `main` 390. **Never stage on the
+laptop and copy the registry up** — it would delete those entries. Stage ON Oracle (`stage-hiring-outreach.cjs`), then bring
+Oracle's copy to `main` only after checking it is a strict superset (0 keys only on main, 0 conflicting). Done that way for
+Marketo Studio (`5de845e`, 390 → 438). 📨 Elena's move: click ➡️ SEND BY EMAIL on `[HIRING-MANUAL] … Marketo Studio (Panama)`.
+
 ### 🟢 28 Sep 16:23 UTC — Voice→Trello: a spoken DESCRIPTION correction edits the card · cto-aipa `3124c60`
 
 - **Was (11:12–11:14 Panama, after c34354e):** "Отредактирую эту задачу…" / "…ты должен отредактировать… доктор Фернандо Агилар"
