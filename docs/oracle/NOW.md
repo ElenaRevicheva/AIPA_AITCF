@@ -238,6 +238,20 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
+### 🟢 28 Sep 15:30 UTC — Oracle disk 95% → 72% (13 GB free). Nothing of any product touched.
+
+- **Logs COMPRESSED, not deleted** (`~/.pm2/logs/*.gz`, each original removed only after `zcat | wc -c` = original bytes):
+  4 old DragonTrade Bybit/Binance logs 5.5 GB → 260 MB; live `dragontrade-main-out.log` 3.0 GB → 52 MB archive
+  `dragontrade-main-out.2026-01-16_to_2026-09-28.log.gz`, live file emptied in place (bot same PID, still writing).
+  **The Bybit/Binance BOTS STAY** (Elena, 28 Sep): paused on purpose (X credits not topped up), not in PM2; code in
+  `~/dragontrade-agent` untouched (git clean), results live in their DB + `stream_state.json` / `engagement_state.json`.
+- **Download caches cleared** with their own commands: npm (ubuntu 355 MB, root 1.7 GB), pip 359 MB. KEPT: `ms-playwright`
+  (browsers the bots use), `~/.npm/_npx`, `~/.cache/n8n`.
+- **NOT touched:** film folders (`atuona-film*`, `aideazz-api-film*`, `/tmp/atuona-hd`), backups, the systemd journal (holds
+  VJH judge verdicts), any code/DB/state. All 15 services verified running after.
+- **OPEN (needs Elena's go — installs/config):** no log rotation exists (`pm2-logrotate` absent), so logs grow forever;
+  journald will grow to its default cap (~4.5 GB). Film working folders ~7.6 GB need a per-film check before any cleanup.
+
 ### 🟡 28 Sep — RAG "similar past decisions" for the VJH judge: BUILT + LIVE MEMORY, switched OFF (did not beat baseline) · VJH `45f6411`
 
 EspaLuz RAG is live and proven (`espaluz_rag.py`: text-embedding-3-small → pgvector, top-3 above 0.75 similarity;
