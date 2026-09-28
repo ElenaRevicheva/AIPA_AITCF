@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-09-27 22:00 | VJH learning: connect lessons to every door into I Act TODAY | VJH `scripts/judge_feedback_sync.py`, `src/core/llm_judge.py`, `src/core/learned_rules.py` (new), `src/search/serpapi_jobs_ingest.py`, `src/langgraph_pipeline/nodes.py`; restart `vibejobhunter` + `serpapi-jobs` | d2947cd |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
