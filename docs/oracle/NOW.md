@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-09-28 15:10 | "Elena + AIPA" positioning: letters, 11 lane CVs, no-AI veto | cto-aipa `src/cover-letter.ts` (+ dist, `pm2 restart cto-aipa`), `scripts/build-lane-cv.cjs`, `scripts/build_tailored_cv.py`, `docs/applications/cv-by-lane/*`, HubSpot CV files; VJH `llm_judge.py`, `fit_gate.py` (+ restart `vibejobhunter`, `serpapi-jobs`) | cto-aipa `HEAD` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
