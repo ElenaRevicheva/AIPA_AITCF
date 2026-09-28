@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 16:05 | Voice→Trello: due date lands a day early + a correction creates a new card | cto-aipa `src/trello-voice.ts` (+ dist), `pm2 restart cto-aipa`; Elena's Trello card WqGGMmWD (fix due) + o4Fp10na (archive) | cto-aipa `HEAD` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -238,6 +237,17 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
+
+### 🟢 28 Sep 16:08 UTC — Voice→Trello: dates land on the day + time she says; a spoken correction EDITS the card · cto-aipa `c34354e`
+
+- **Was:** "Cita … 15 de octubre, 3 y 30 pm" → card due `2026-10-15` bare = midnight UTC = **14 Oct 19:00 Panama**, time dropped;
+  "Appointment should be changed to …" → a SECOND card (no update action; "changed" never matched `MGMT_RE`).
+- **Now:** `toTrelloDue()` (Panama date + HH:MM → UTC; no time = midday), `panamaToday()`, `dueTime` from the classifier; new
+  `update` action edits EXACTLY ONE card (the one just created, or a single search hit — 2+ matches → asks), reads it back.
+- **VERIFIED BY:** `node scripts/test-trello-voice-dates.cjs` 11/11 (laptop + Oracle); dry run of her two real transcripts on Oracle,
+  3 runs each: create → `2026-10-15T20:30Z` "October 15, 3:30 PM" 3/3; correction → `update __recent__ 2026-10-15 15:30` 3/3.
+  Deployed `dist/trello-voice.js` (backup `backups/pre-trello-dates-20260928-1620/`), `pm2 restart cto-aipa`.
+- **Her data fixed:** card `WqGGMmWD` due was Oct 14 19:00 → **Oct 15 15:30 Panama** (read back); duplicate `o4Fp10na` ARCHIVED (restorable).
 
 ### 📨 28 Sep — KIRA (Bjak) Technical Product Manager, AI Finance App: CV + letter READY in HubSpot — Elena's move: submit
 
