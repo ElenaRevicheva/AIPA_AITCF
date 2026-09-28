@@ -261,6 +261,14 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   Glean (`--only`): note + tailored CV (PRIVATE) read back from HubSpot; VJH's own code on that deal's notes skips 3 of 4, reason ''.
 - **Known limit:** summary + "available for" stay the lane's (selection only); top roles still deserve a hand kit (KIRA/Niuro).
 
+### ✅ 28 Sep — Niuro SUBMITTED by Elena on GetOnBoard. Deal → ⏳ Sent, her "I applied" note added (VJH learns it), follow-up task 5 Oct.
+
+### 🟢 28 Sep — apply queue fixed + deployed (`ab33a79`, backup `backups/apply-queue.cjs.pre-clean-20260928` on Oracle)
+"Copy letter" no longer carries CHECKLIST / "Approve in Telegram" junk; `COMET_PROFILE` no longer claims "2 years building";
+each card links its HubSpot deal + 🛡️ badge. Verified by an Oracle preview build: 13 letters, 0 junk, 13 briefs from cache, $0.
+**Measured, not fixed yet:** 10 daily sends since 20 Sep, only 0–2 new jobs/day (≈90% repeat); Elena downloaded 3. The
+Perplexity brief lives only in the HTML, not in HubSpot. Proposed (awaiting her yes): brief → deal note; Telegram only when new.
+
 ### 📨 28 Sep — Niuro "AI Operations & Growth Lead" (GetOnBoard, LATAM-only remote, USD 2,500–3,500): kit READY — Elena's move
 
 Tailored CV (`--job=…niuro_ai_ops_growth_lead.json`; UPDATED after review: eval loop told as a METHOD — new `evalloop` block, no
