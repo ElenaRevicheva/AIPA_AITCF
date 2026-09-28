@@ -138,7 +138,7 @@ git log keeps the record.
   poem #035 «Подмостки» verbatim, asks nothing, no AI/films on purpose. Address from his own Instagram vacancy post.
 - **VERIFIED BY:** Oracle registry merged 436 → 437 (backup `~/backups/outreach-registry.pre-bogomolov-*`), draft scp'd;
   `/go/outreach-email/atuona-bogomolov-podmostki` GET → 200 with To, Subject, poem, LITPROM link. Nothing sent.
-- **RISK:** LITPROM profile link (from atuona.xyz) did not load from the agent side — Elena clicks it before sending.
+- **RISK:** none open. LITPROM link confirmed by Elena; http:// on purpose (their https cert fails).
 
 ### 🎬 25 Sep — Atuona art outreach: 5 letters staged one-click in HubSpot, NOT sent (Elena's move)
 
