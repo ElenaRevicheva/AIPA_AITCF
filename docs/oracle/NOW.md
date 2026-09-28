@@ -263,15 +263,16 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
 ### ✅ 28 Sep — Niuro SUBMITTED by Elena on GetOnBoard. Deal → ⏳ Sent, her "I applied" note added (VJH learns it), follow-up task 5 Oct.
 
-### 🔴 28 Sep (late) — the queue was mostly DEAD: 7 of 11 cards closed or not open to her. Elena's move on cleanup.
-Checked by hand in her Chrome while firing one application. Closed: 4 Torre (lovasit/Lovas IT, Iclivia, Actian, Logical
-Paradigm — Torre's banner changed to "This job post is closed."), Leland (WWR redirects to home), Scale Army (Ashby "Job not
-found"). Not open to her: Addi (native Colombian Spanish), Robots & Pencils (US/Canada), Glean (US timezone), HireLATAM
-(born-in-LATAM, her own reason). Only open + eligible: **Georgia IT, $60/h contract, EST — Dice needs HER sign-in.**
-**Fixed:** VJH `b755f13` adds the Torre phrase (verified: on 5/5 closed, absent on 4 API-open) + cto `1862a13` mirror;
-vibejobhunter restarted 22:38 UTC, 0 errors. Page now shows "4 look closed". Existing sweep
-(`VJH scripts/sweep_i_act_today.py`, dry run) → 7 rejects (5 DEAD + DevUps, Rwazi INELIGIBLE). **`--apply` awaits her yes.**
-Known gaps (not fixed): Ashby + WWR closures are invisible server-side (JS shell / 403). 7 `[HIRING-MICRO1]` deals sit in I Act TODAY.
+### 🟢 28 Sep (late) — daily sweep of CLOSED jobs is live, and it cannot teach the judge (VJH `84a2ff0`…`16f6b71`)
+The queue was 7/11 dead or ineligible (checked by hand in her Chrome). Now: cron `55 12 * * *` runs the EXISTING
+`VJH scripts/sweep_i_act_today.py --apply --dead-only`; evidence = page text, Ashby board API, Greenhouse job API (404).
+Every move sets Closed Lost Reason `AUTO-SWEEP …`; `judge_feedback_sync` keeps those OUT of her ledger (a clean-up is
+not her choice). First run 17 moved; **ledger/rules/examples byte-identical before vs after** (557 / 370 / 35).
+Queue 19 → 2 (Georgia IT $60/h — needs HER Dice sign-in; HireLATAM). Backups: `crontab.bak-20260928-sweep`,
+`autonomous_data/*.pre-sweep-20260928.json`, `sweep_undo_*.json`. Torre closed banner fixed (`b755f13`).
+⚠️ **Security:** the first board check sent the HubSpot key to api.ashbyhq.com + boards-api.greenhouse.io (~24 GETs,
+TLS, dry runs only). Fixed `16f6b71` + test. **Rotating the HubSpot key is Elena's call.**
+Known: `test_provider_chain` also fails on OpenAI/Groq 401 in the test env (live judge verified working 16:49 UTC).
 
 ### 🟢 28 Sep — apply queue = productive worklist; company brief lives ON the HubSpot deal (`05bd98a`, VJH `a3a1eda`)
 - **Deal = the record.** `hs-fill-apply-kit.cjs` adds a `🔎 COMPANY BRIEF` note (Perplexity, cited, cached — `scripts/lib/company-research.cjs`)
