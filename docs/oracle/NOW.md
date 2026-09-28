@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 14:00 | VJH RAG similar-decisions for the judge (Elena: "Yes, go") | VJH new `src/core/decision_memory.py`, `src/core/llm_judge.py`, `scripts/judge_feedback_sync.py`, `scripts/replay_learning.py`; restart `vibejobhunter` + `serpapi-jobs` only if the replay wins | VJH `e4c7314` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -239,13 +238,18 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
-### 💡 28 Sep — PROPOSED, not built (Elena's call): RAG "similar past decisions" for the VJH judge
+### 🟡 28 Sep — RAG "similar past decisions" for the VJH judge: BUILT + LIVE MEMORY, switched OFF (did not beat baseline) · VJH `45f6411`
 
 EspaLuz RAG is live and proven (`espaluz_rag.py`: text-embedding-3-small → pgvector, top-3 above 0.75 similarity;
 prod: 497 rows, 9 sessions, newest 27 Sep, 0 RAG errors in 7 days). For VJH: embed each decided posting (job_listings,
 121 today) and show the judge her K most SIMILAR past decisions instead of the 12 most RECENT (retrieval-augmented
 few-shot). Reuse the EspaLuz embed pattern; SQLite + plain cosine is enough at this size (no pgvector needed); ~$0.02 to
 embed everything. Ship ONLY if the replay, leave-one-out (a job never retrieves itself), beats 14/20 + 8/18.
+**RESULT (same 38 real decisions, 2 runs each):** recent (production) 14/20 + 8,9/18 · similar 14/20 + 6,6/18 ·
+similar_applied 14/20 + 7,7/18 → **OFF** (`VJH_JUDGE_EXAMPLES` unset = recent; prompt unchanged, pinned by a test).
+Memory is live and hourly: `decision_embeddings` in the app DB, 109 embedded on first run. **NEXT:** once ~20 applications +
+20 rejections exist since 28 Sep, `VJH_JUDGE_EXAMPLES=similar venv/bin/python scripts/replay_learning.py --judge 20
+--since 2026-09-28`; flip in `.env` only if it wins. DB backup `vibejobhunter.db.bak-20260928-rag`.
 
 ### 🟢 28 Sep 13:41 UTC — Bright Data door FIXED: `serpapi-jobs` now runs on the venv (gate, lessons, judge, evidence load)
 
