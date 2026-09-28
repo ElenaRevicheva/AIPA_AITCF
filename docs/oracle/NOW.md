@@ -238,7 +238,7 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
-### 🟢 28 Sep 15:30 UTC — Oracle disk 95% → 72% (13 GB free). Nothing of any product touched.
+### 🟢 28 Sep 15:45 UTC — Oracle disk 95% → 69% (14 GB free) + log growth stopped. Nothing of any product touched.
 
 - **Logs COMPRESSED, not deleted** (`~/.pm2/logs/*.gz`, each original removed only after `zcat | wc -c` = original bytes):
   4 old DragonTrade Bybit/Binance logs 5.5 GB → 260 MB; live `dragontrade-main-out.log` 3.0 GB → 52 MB archive
@@ -249,8 +249,13 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   (browsers the bots use), `~/.npm/_npx`, `~/.cache/n8n`.
 - **NOT touched:** film folders (`atuona-film*`, `aideazz-api-film*`, `/tmp/atuona-hd`), backups, the systemd journal (holds
   VJH judge verdicts), any code/DB/state. All 15 services verified running after.
-- **OPEN (needs Elena's go — installs/config):** no log rotation exists (`pm2-logrotate` absent), so logs grow forever;
-  journald will grow to its default cap (~4.5 GB). Film working folders ~7.6 GB need a per-film check before any cleanup.
+- **PREVENTION DONE (Elena: "Stop it happening again"), disk now 69% / 14 GB free:**
+  `pm2-logrotate` 3.0.0 installed — max_size 50M, retain 10, compress, daily 00:00 UTC (`pm2 conf pm2-logrotate`).
+  Journal capped: `/etc/systemd/journald.conf.d/99-aideazz-size.conf` `SystemMaxUse=1G` (was 2.1 GB → 1010 MB, keeps from
+  8 Sep); full export first: `~/backups/journal-2026-08-10_to_2026-09-28.log.gz` (3,468,638 lines = source, token masked, 600).
+  VJH `b38836e`: httpx logger → WARNING in `src/main.py` — the Telegram getUpdates URL carried the bot TOKEN into the journal
+  ~8,640×/day; after restart 0 token lines, 0 errors, bot polling (6 HTTPS conns). **VERIFY tomorrow:** rotated
+  `*__*.log.gz` files exist in `~/.pm2/logs` after 00:00 UTC. Film working folders (~7.6 GB) still need a per-film check.
 
 ### 🟡 28 Sep — RAG "similar past decisions" for the VJH judge: BUILT + LIVE MEMORY, switched OFF (did not beat baseline) · VJH `45f6411`
 
