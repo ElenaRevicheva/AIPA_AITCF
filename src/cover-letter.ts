@@ -149,7 +149,8 @@ async function fetchStructured(jobUrl: string): Promise<string> {
  * back to the stub, never a reason to fail the deal write — the Note and the
  * apply link are useful even when the letter is boilerplate.
  */
-async function fetchJobDescription(jobUrl?: string): Promise<string> {
+/** Exported 28 Sep 2026: the apply kit tailors the CV and defense note to the same posting text. */
+export async function fetchJobDescription(jobUrl?: string): Promise<string> {
   if (!jobUrl || !/^https?:\/\//i.test(jobUrl)) return '';
 
   const structured = await fetchStructured(jobUrl);

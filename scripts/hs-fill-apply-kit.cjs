@@ -37,10 +37,25 @@ try {
   }
 } catch { /* env already in the process (cron) */ }
 
+const os = require('os');
+const { execFileSync } = require('child_process');
 const { uploadOutreachFile, addNoteAttachments } = require(path.join(__dirname, 'hs-files.cjs'));
-const { generateCoverLetter } = require(path.join(ROOT, 'dist/cover-letter.js'));
+const { generateCoverLetter, fetchJobDescription } = require(path.join(ROOT, 'dist/cover-letter.js'));
+const tailor = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
 
 const APPLY = process.argv.includes('--apply');
+// ── Tailored CV + technical-defense note (28 Sep 2026, Elena) ────────────────────────────────
+// Every NEW ACT-TODAY hiring deal gets a CV tailored to its posting and a short defense note, both
+// assembled by SELECTION from verified material (scripts/lib/job-tailor.cjs). Deals created before
+// DEFENSE_SINCE are left alone unless --backfill (or --only=<dealId>) says otherwise.
+const DEFENSE_MARK = '🛡️ TECHNICAL DEFENSE';
+const DEFENSE_SINCE = new Date('2026-09-28T00:00:00Z');
+const BACKFILL = process.argv.includes('--backfill');
+const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').split('=')[1] || '';
+const AUTO_DIR = path.join(ROOT, 'docs', 'applications', 'cv-by-job', 'auto');
+const BUILDER = path.join(__dirname, 'build-lane-cv.cjs');
+const CV_NODE_PATH = process.env.CV_BUILD_NODE_PATH || path.join(os.homedir(), 'cv-build-deps', 'node_modules');
+const CV_FONTS = process.env.CV_FONT_DIR || path.join(os.homedir(), 'cv-build-fonts');
 const STAGE = 'qualifiedtobuy';
 const HS = process.env.HUBSPOT_API_KEY;
 const CV_DIR = path.join(ROOT, 'docs', 'applications', 'cv-by-lane');
@@ -109,7 +124,51 @@ function laneFor(title) {
   const rules = JSON.parse(fs.readFileSync(path.join(CV_DIR, 'lanes.json'), 'utf8'));
   const hit = rules.rules.find((x) => new RegExp(x.pattern, 'i').test(title));
   const lane = hit ? hit.lane : rules.default;
-  return { lane, cv: rules.lanes[lane].cv };
+  return { lane, cv: rules.lanes[lane].cv, headline: rules.lanes[lane].headline };
+}
+
+/**
+ * Tailored CV + defense note for one deal. Returns a short status word for the log. Never throws
+ * past its own try: a failure here must not stop the letter pass below.
+ */
+async function defensePass(d, bodies, title, company, jobUrl) {
+  if (bodies.some((b) => text(b).includes(DEFENSE_MARK))) return 'had';
+  const created = new Date(d.properties.createdate || 0);
+  if (!BACKFILL && !ONLY && created < DEFENSE_SINCE) return 'old';
+  let jd = '';
+  try { jd = await fetchJobDescription(jobUrl); } catch { jd = ''; }
+  if (jd.length < 200) jd = (await renderPosting(jobUrl)) || jd;
+  const { lane, headline } = laneFor(title);
+  const job = tailor.tailorJob({ title, company, jd, lane, laneHeadline: headline });
+  fs.mkdirSync(AUTO_DIR, { recursive: true });
+  const jobPath = path.join(AUTO_DIR, job.cv.replace(/\.pdf$/, '.json'));
+  fs.writeFileSync(jobPath, JSON.stringify({ ...job, _deal: d.id, _jd_chars: jd.length }, null, 2));
+  let cvPath = null, cvWhy = '';
+  try {
+    execFileSync(process.execPath, [BUILDER, `--job=${jobPath}`], {
+      env: { ...process.env, NODE_PATH: CV_NODE_PATH, CV_FONT_DIR: CV_FONTS },
+      timeout: 120_000, stdio: 'pipe',
+    });
+    cvPath = path.join(AUTO_DIR, job.cv);
+    if (!fs.existsSync(cvPath)) { cvPath = null; cvWhy = 'builder wrote no file'; }
+  } catch (e) {
+    cvWhy = String((e.stderr && e.stderr.toString()) || e.message).trim().split('\n').pop().slice(0, 120);
+  }
+  const bank = tailor.loadBank();
+  const entries = tailor.pickDefense({ title, jd }, bank);
+  const html = tailor.renderDefenseHtml({
+    title, company, entries, frame: bank.frame, cvName: cvPath ? job.cv : '', mark: DEFENSE_MARK,
+  }) + (cvPath ? '' : `<p><em>Tailored CV not built (${esc(cvWhy)}); the lane CV on the letter note applies.</em></p>`);
+  if (APPLY) {
+    const note = await hs('POST', '/crm/v3/objects/notes', {
+      properties: { hs_note_body: html, hs_timestamp: new Date().toISOString() },
+      associations: [{ to: { id: d.id }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] }],
+    });
+    if (cvPath) await addNoteAttachments(note.id, [(await uploadOutreachFile(cvPath, job.cv)).id]);
+  }
+  console.log(`  ${APPLY ? '🛡️ added' : '· would add'} ${company.slice(0, 22).padEnd(24)} ${title.slice(0, 40).padEnd(42)}`
+    + ` jd=${jd.length} cv=${cvPath ? job.order.join('/') : 'NONE ' + cvWhy} qa=${entries.map((e) => e.id).join(',')}`);
+  return cvPath ? 'added' : 'added-no-cv';
 }
 
 (async () => {
@@ -119,15 +178,17 @@ function laneFor(title) {
       { propertyName: 'dealstage', operator: 'EQ', value: STAGE },
       { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: '*HIRING-VJH*' },
     ] }],
-    properties: ['dealname'],
+    properties: ['dealname', 'createdate'],
     limit: 100,
   });
   const deals = search.results || [];
   console.log(`[${new Date().toISOString().slice(0, 16)}] fill ${APPLY ? 'APPLY' : 'DRY RUN'} — ${deals.length} ACT TODAY hiring deals`);
 
   let ok = 0, wrote = 0, unreadable = 0, failed = 0;
+  const defense = { added: 0, 'added-no-cv': 0, had: 0, old: 0, failed: 0 };
   const cvIds = new Map();
   for (const d of deals) {
+    if (ONLY && String(d.id) !== ONLY) continue;
     const { title, company } = parseDeal(d.properties.dealname);
     try {
       const assoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/notes?limit=50`);
@@ -136,9 +197,12 @@ function laneFor(title) {
         ? (await hs('POST', '/crm/v3/objects/notes/batch/read', { properties: ['hs_note_body'], inputs: ids.map((id) => ({ id })) })).results || []
         : [];
       const bodies = notes.map((n) => n.properties.hs_note_body || '');
+      const jobUrl = bodies.map(jobUrlOf).find(Boolean);
+      // Defense first: new deals arrive WITH a letter, so it must not sit behind the letter skip.
+      try { defense[await defensePass(d, bodies, title, company, jobUrl)]++; }
+      catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
       if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) { ok++; continue; }
 
-      const jobUrl = bodies.map(jobUrlOf).find(Boolean);
       let drafted = await generateCoverLetter({ jobTitle: title, company, jobUrl });
       let via = 'direct';
       if (!drafted.letter && drafted.jdChars < 200) {
@@ -177,5 +241,7 @@ function laneFor(title) {
     }
   }
   console.log(`  already had a letter ${ok} · ${APPLY ? 'wrote' : 'would write'} ${wrote} · posting unreadable ${unreadable} · failed ${failed}`);
+  console.log(`  defense: ${APPLY ? 'added' : 'would add'} ${defense.added} (+${defense['added-no-cv']} without a CV) · already had ${defense.had}`
+    + ` · older than ${DEFENSE_SINCE.toISOString().slice(0, 10)} ${defense.old} · failed ${defense.failed}`);
   if (failed) process.exitCode = 1;
 })().catch((e) => { console.log('FAILED — ' + String(e.message).slice(0, 200)); process.exit(1); });

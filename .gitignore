@@ -90,3 +90,6 @@ docs/selling/datastar/*signature*.png
 docs/strategy/*
 !docs/strategy/aideazz-provenance.html
 !docs/strategy/aideazz-provenance.standalone.html
+
+# Auto-built per-deal CVs (hs-fill-apply-kit on Oracle); rebuilt from the job JSON on demand
+docs/applications/cv-by-job/auto/
