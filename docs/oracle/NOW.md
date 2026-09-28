@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 13:35 | serpapi-jobs → venv Python (Elena: "Yes, make things done") | PM2 `serpapi-jobs` interpreter + `pm2 save` | VJH `e4c7314` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -239,7 +238,7 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
-### 🔴 28 Sep 13:30 UTC — the Bright Data door runs WITHOUT gate, lessons, judge and evidence (Elena's go needed)
+### 🟢 28 Sep 13:41 UTC — Bright Data door FIXED: `serpapi-jobs` now runs on the venv (gate, lessons, judge, evidence load)
 
 PM2 `serpapi-jobs` runs on **system `python3`**, which lacks `pydantic_settings` + `sqlalchemy`. Emulated load
 (`runpy`, no search run): `JobGate available: False`; `learned_rules` / `llm_judge` / `database_models` → ModuleNotFoundError.
@@ -247,8 +246,13 @@ PM2 `serpapi-jobs` runs on **system `python3`**, which lacks `pydantic_settings`
 `iron_clad_fit` + pay floor. Claims "judge on every door" (9349b7b) and "evidence saved at decision time" (5782f3d)
 are TRUE on the LangGraph door, FALSE here. Proof it bites: job_listings newest row 12:22 while SERP deals kept landing
 to 13:05; 103 HIRING deals since 27 Sep, mostly parked junk, each with an AI-drafted letter.
-**Fix (not applied — waiting for Elena):** run `serpapi-jobs` on `venv/bin/python` (same as the `vibejobhunter` service),
-`pm2 save`. Note: every `serpapi-jobs` restart runs one paid Bright Data cycle (~119 queries).
+**DONE (Elena: "Yes, make things done"):** `pm2 start venv/bin/python --interpreter none -- src/search/serpapi_jobs_ingest.py`
+(same name, cwd, log files, PYTHONUNBUFFERED=1). ⚠️ `pm2 restart --interpreter <full path>` does NOT work — PM2 wrapped the
+script in its JS launcher (`SyntaxError ... ProcessContainerForkBun.js`); `--interpreter none` is the way. `pm2 save` run
+(dump was stale since 13 Aug; backup `~/.pm2/dump.pm2.bak-20260928-venv`; saved list = running list, 8 processes).
+**VERIFIED BY** first cycle: `Done — new jobs: 5`, `GATE REJECT` ×5 (news articles, X posts, a US AE — no longer deals), 0 errors.
+No job passed the gate, so no evidence row yet from this door — check `select count(*) from job_listings where ats_type='serpapi_jobs'`
+after the next cycles. Every `serpapi-jobs` restart runs one paid Bright Data cycle (18 queries).
 
 ### 🟢 28 Sep — VJH can now MEASURE the judge on real postings (evidence memory) · VJH `5782f3d` → `e4c7314`
 
