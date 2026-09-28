@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-09-28 14:00 | VJH RAG similar-decisions for the judge (Elena: "Yes, go") | VJH new `src/core/decision_memory.py`, `src/core/llm_judge.py`, `scripts/judge_feedback_sync.py`, `scripts/replay_learning.py`; restart `vibejobhunter` + `serpapi-jobs` only if the replay wins | VJH `e4c7314` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
