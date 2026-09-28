@@ -2,10 +2,11 @@
   "mcpServers": {
     "Bright Data": {
       "command": "npx",
-      "args": ["@brightdata/mcp"],
+      "args": ["-y", "--prefer-offline", "@brightdata/mcp@2.11.3"],
       "env": {
         "API_TOKEN": "${BRIGHTDATA_API_TOKEN}",
         "WEB_UNLOCKER_ZONE": "${BRIGHTDATA_ZONE}",
+        "BROWSER_ZONE": "${BRIGHTDATA_BROWSER_ZONE}",
         "GROUPS": "browser,advanced_scraping"
       }
     }
