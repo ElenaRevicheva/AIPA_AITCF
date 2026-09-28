@@ -1,0 +1,14 @@
+{
+  "_note": "One application's CV (scripts/build-lane-cv.cjs --job=this). Base = the pm lane CV; only headline, summary, project order and 'available for' change. Every sentence is from the verified CV text or from production checks on 28 Sep 2026 (see docs/oracle/NOW.md).",
+  "base_lane": "pm",
+  "cv": "CV_Elena_Revicheva_KIRA_TPM_AI_Finance.pdf",
+  "headline": "Technical Product Manager — AI products where correctness and trust come first",
+  "profile": "Seven years at board level as Deputy CEO and Chief Legal Officer of a public-sector e-government operator — IT, legal and compliance in a heavily regulated environment — and Deputy CEO for business development at a fintech. Since May 2025 I have owned AI products end to end: roadmap, acceptance criteria, trade-offs, launch and the on-call. My rule for AI is that it earns its place: a human approves every outbound send, no number is published unless it traces back to a record, and a model's decisions are measured against real human decisions before I rely on them.",
+  "order": ["judge", "chain", "loop"],
+  "available": [
+    "AI product ownership in regulated, high-consequence domains",
+    "LLM features framed as evals: offline replay on real decisions, human review, fail-closed defaults",
+    "Design reviews with engineering: failure modes, retries, idempotent writes, read-back audits",
+    "Compliance-aware product decisions (Chief Legal Officer background, blockchain regulation)"
+  ]
+}

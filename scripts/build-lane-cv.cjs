@@ -78,6 +78,15 @@ const PROJECTS = {
     show: 'aideazz.xyz/ai-ops-wiki.html',
     body: 'Every model call in the fleet has an ordered fallback (Anthropic, OpenAI, Gemini, Grok, Groq). When Groq deprecated the models I used, the fleet kept serving — a config change, not an outage. The daily publisher will not print a number it cannot trace; if the model decorated the facts, the day stayed silent. A 130-test eval harness (unit, integration, golden-set) runs in under a minute at $0 API cost.',
   },
+  // 28 Sep 2026 — verified on Oracle the same day: replay of the judge on 38 of her real decisions
+  // WITH the posting each was made on (14/20 rejections, 8/18 applications agree); the RAG variant
+  // scored 6-7/18 and ships OFF; location/pay/AI-ban guards are code, not prompt (VJH d2b9aa7..45f6411).
+  judge: {
+    title: 'AI screening judge — measured on real decisions before it ships',
+    url: 'https://aideazz.xyz/ai-ops-wiki.html',
+    show: 'aideazz.xyz/ai-ops-wiki.html',
+    body: 'An LLM judge screens the jobs my search agent finds; what the model may not decide is enforced in code — a location or pay it misreads is overruled from the posting itself. Each of my own decisions is stored with the posting it was made on, and the judge is measured against them: 14 of 20 rejections and 8 of 18 applications agree. A retrieval (RAG) upgrade scored lower on that test, so it ships switched off.',
+  },
   // 28 Sep 2026 — creative lane. Verified: 8 films on the live gallery (films.json); film #8
   // record docs/atuona/FILM8_2026-09-22.md (3:36, 16 shots, −15.7 LUFS); 99 poems in atuona
   // content/poems.json; bot engines + the price-cap incident in NOW.md 22 Sep and the AI Ops Wiki.
@@ -170,9 +179,12 @@ function wrap(font, text, size, maxW) {
   return lines;
 }
 
-async function buildLane(lane) {
-  const cfg = LANES_JSON.lanes[lane];
-  if (!cfg) throw new Error(`unknown lane: ${lane}`);
+async function buildLane(lane, job = null) {
+  // --job=<file.json> (28 Sep 2026): ONE application's CV = a lane CV with its own headline, summary
+  // and project order. Everything else — design, project blocks, proof hub — is the lane's, unchanged.
+  const base = LANES_JSON.lanes[lane];
+  if (!base) throw new Error(`unknown lane: ${lane}`);
+  const cfg = job ? { ...base, ...job } : base;
   const headline = plain(cfg.headline);
   const [title, ...rest] = headline.split(' — ');
   const tagline = rest.join(' — ');
@@ -306,7 +318,7 @@ async function buildLane(lane) {
       project({ title: plain(f.lead), body: plain(f.body) });
     }
   } else {
-    for (const k of ORDER[lane] || ORDER.default) project(PROJECTS[k]);
+    for (const k of (job && job.order) || ORDER[lane] || ORDER.default) project(PROJECTS[k]);
   }
   roleLine('Operational Co-Founder — OmniBazaar, decentralised e-commerce  ·  2024–2025');
 
@@ -328,7 +340,7 @@ async function buildLane(lane) {
   y -= 8;
 
   section('Available for');
-  for (const line of AVAILABLE[lane] || AVAILABLE.default) {
+  for (const line of (job && job.available) || AVAILABLE[lane] || AVAILABLE.default) {
     ensure(16);
     drawText('–  ' + line, { y, size: 8.8, font: regular });
     y -= 14;
@@ -372,13 +384,20 @@ async function buildLane(lane) {
   pdf.setTitle(`Elena Revicheva — ${title}`);
   pdf.setAuthor('Elena Revicheva');
   pdf.setCreator('scripts/build-lane-cv.cjs');
-  const out = path.join(CV_DIR, cfg.cv);
+  const out = job ? path.join(path.dirname(job._path), job.cv) : path.join(CV_DIR, cfg.cv);
   const bytes = await pdf.save();
   fs.writeFileSync(out, bytes);
   return { lane, file: cfg.cv, pages: n, bytes: bytes.length };
 }
 
 (async () => {
+  const jobArg = (process.argv.find((a) => a.startsWith('--job=')) || '').split('=')[1];
+  if (jobArg) {
+    const job = { ...JSON.parse(fs.readFileSync(jobArg, 'utf8')), _path: path.resolve(jobArg) };
+    const r = await buildLane(job.base_lane, job);
+    console.log(`  job ${job.cv}  ${r.pages} page(s)  ${r.bytes} bytes  (base lane ${job.base_lane})`);
+    return;
+  }
   const one = (process.argv.find((a) => a.startsWith('--lane=')) || '').split('=')[1];
   const lanes = one ? [one] : Object.keys(LANES_JSON.lanes);
   for (const l of lanes) {

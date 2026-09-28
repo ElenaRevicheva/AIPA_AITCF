@@ -238,6 +238,16 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
 
+### 📨 28 Sep — KIRA (Bjak) Technical Product Manager, AI Finance App: CV + letter READY in HubSpot — Elena's move: submit
+
+- **Panama OK:** posting live (Ashby API), "remote role · we hire globally · multiple countries and time zones", no country rule.
+- **In HubSpot** on the `[HIRING-VJH-LEAD] … @ Bjakcareer` deal (I Act TODAY): new ✅ READY TO SEND note — hand-written letter
+  (operating-model sentence verbatim, every claim sourced), direct Ashby apply link, tailored CV attached (PRIVATE).
+- **Kit:** `docs/applications/2026-09-28_KIRA_TPM_AI_Finance_APPLICATION.md` (letter, claim→source table, honest gaps, the
+  words they will test). CV: `build-lane-cv.cjs --job=docs/applications/cv-by-job/2026-09-28_kira_tpm_ai_finance.json`
+  (new `--job` option = a lane CV with its own headline/summary/order; new verified `judge` project block).
+- **NEXT (Elena):** open the Ashby link, attach the CV from the HubSpot note, paste the letter, submit, move the deal to Sent.
+
 ### 🟢 28 Sep 15:45 UTC — Oracle disk 95% → 69% (14 GB free) + log growth stopped. Nothing of any product touched.
 
 - **Logs COMPRESSED, not deleted** (`~/.pm2/logs/*.gz`, each original removed only after `zcat | wc -c` = original bytes):
