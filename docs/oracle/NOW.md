@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-09-28 12:05 | VJH evidence memory: judge replay on the posting the judge saw | VJH `scripts/judge_feedback_sync.py`, `scripts/replay_learning.py`, `src/database/database_models.py`, `src/search/serpapi_jobs_ingest.py`, new `scripts/link_evidence.py`; restart `serpapi-jobs` | VJH `06bae98` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
