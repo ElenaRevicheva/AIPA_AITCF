@@ -2687,8 +2687,13 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   **Verified:** 3,279 jsonl lines all parse, line counts identical, **all 473 Ad Library IDs
   byte-identical**; only 2 advertiser emails and one real `+357…` number were replaced.
   Full detail: `docs/selling/DATAVENDOR_QC_2026-09-05.md` (4 Sep doc is banner-corrected).
-- **Anthropic credits at zero** since 17 Aug. The 5-provider chain absorbs it; nothing is
-  down. Elena tops up, or leave it on OpenAI.
+- **Anthropic credits at zero** since 17 Aug. The 5-provider chain (`VJH src/utils/llm_chain.py`) absorbs it
+  **only where it is used** — verified 28 Sep: OpenAI, Gemini, Groq, Grok answer live; Claude 400.
+  ⚠️ **Corrected 28 Sep: something WAS down.** `linkedin_cmo_v4.py` calls Claude directly → every daily LinkedIn
+  post since at least 9 Sep (journal start) shipped as a TEMPLATE while logging "sent successfully".
+  `response_detector.py` retries dead Claude Sonnet ~300×/day before the chain answers (works, wasteful).
+  Fix proposed (route both through `llm_chain.complete`) — awaiting Elena. Run `test_provider_chain` on
+  ORACLE only: the laptop `.env` keys are stale and give false 401s.
 - **VJH outreach crash:** `[outreach] ERROR <company>: 'str' object has no attribute 'get'`
   — real, in the founder-email path, needs its own session.
 - **~50 duplicate blog pages** need canonical consolidation. **Canonical only — never
