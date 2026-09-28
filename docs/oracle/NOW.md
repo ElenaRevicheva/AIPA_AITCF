@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 01:50 | Creative AI lane (step 2): VJH lane + CV | VJH `target_lanes/fit_gate/job_monitor/llm_judge/serpapi_jobs_ingest`; restart `vibejobhunter` + `serpapi-jobs`; cto-aipa `docs/applications/cv-by-lane/`, `scripts/build-lane-cv.cjs`, `scripts/build_tailored_cv.py` | VJH `c71971e` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -238,6 +237,29 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
+
+### 🟢 28 Sep — CREATIVE AI lane is live in VJH + a creative lane CV — VJH `61321d3`, cto-aipa `22040a5`
+
+- **DONE:** 9th lane `CREATIVE AI & GENERATIVE MEDIA SYSTEMS` (12 titles: Creative Technologist, AI Video Producer,
+  AI Filmmaker, Generative AI Producer…). Wired into `target_lanes`, `fit_gate` (title + AI-work check), judge WHO SHE IS,
+  Remotive + Torre terms, and 2 Bright Data queries. Plain Video Editor / Video Producer / Motion Graphics / Social Media
+  Content Creator stay OFF-lane. `CV_Elena_Revicheva_creative.pdf` (2 pp: films, production bot, API, fallback chain) is on
+  Oracle, and `lanes.json` routes creative titles to it, so the 2-hourly apply-kit cron attaches it automatically.
+- **VERIFIED BY:** live-judge probe on Oracle `/tmp/creative_probe.py` → `ALL PASS` (Creative Technologist ✔, AI Video
+  Producer ✔, Video Editor ✘). `replay_learning.py --judge 20` unchanged: 19/20 rejections, 4/20 approvals, rules block
+  0/35 applications. `serpapi-jobs` log: `Querying Google Jobs: 'creative technologist generative AI remote'` and
+  `'AI video producer remote'` → `10 results` each. Apply-kit dry run on Oracle: 21 deals, failed 0.
+- **CAUGHT ON THE WAY:** the probe found `iron_clad_fit` parking "AI Video Producer": a real creative posting names video
+  models, not Claude/Cursor, and `ai_aug` matched none of it. The lane eval passed 445/445 anyway because its
+  NEUTRAL_DESC names Claude, Cursor and GPT (a vacuous guard). Fixed in `61321d3` with a real creative posting in the eval:
+  6/12 fail without the fix.
+- **NEXT (Elena):** which of the 8 films go in a 3-film reel for applications (link list, no re-render).
+- **RISK:** the PDF uses **Segoe UI**, not Noto Sans, because Noto is installed nowhere (laptop or Oracle). It was built from
+  a scratch `pdf-lib` install via `NODE_PATH`; `pdf-lib` is not in this repo's package.json. Same design as the other lane CVs.
+- **TRAPS SEEN, NOT FIXED:** (1) Bright Data "Google Jobs" is organic web search with `site:` filters, so a creative
+  query returns "Field Application Engineer, South East Asia" and similar noise. The gates park it; the source is loose.
+  (2) `job_monitor` logs "N gate-passing jobs left UNSEEN" counting jobs ALREADY seen: `639 left UNSEEN` + `0 NEW` means
+  nothing new, not a stall. (3) Torre timed out at 20s on the first post-restart cycle (0 jobs).
 
 ### 🟢 28 Sep — VJH now LEARNS from her rejections (not just quotes them) — VJH `main` `9349b7b`, deployed + restarted 01:13 UTC
 - Her lessons now DECIDE: `src/core/learned_rules.py` + the judge run on EVERY door into 🔥 I Act TODAY
