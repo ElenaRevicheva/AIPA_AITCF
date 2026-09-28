@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-09-28 01:50 | Creative AI lane (step 2): VJH lane + CV | VJH `target_lanes/fit_gate/job_monitor/llm_judge/serpapi_jobs_ingest`; restart `vibejobhunter` + `serpapi-jobs`; cto-aipa `docs/applications/cv-by-lane/`, `scripts/build-lane-cv.cjs`, `scripts/build_tailored_cv.py` | VJH `c71971e` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
