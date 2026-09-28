@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-09-28 12:05 | VJH evidence memory: judge replay on the posting the judge saw | VJH `scripts/judge_feedback_sync.py`, `scripts/replay_learning.py`, `src/database/database_models.py`, `src/search/serpapi_jobs_ingest.py`, new `scripts/link_evidence.py`; restart `serpapi-jobs` | VJH `06bae98` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -238,6 +237,24 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 - **Open, Elena's call:** 4 gaps are CLOSED postings — TRM Labs + Outpost are absent from their
   own Ashby boards; Scale Army + one HireLATAM are dead links. No letter is possible. Park them
   (`hs-park-stale-jobs.cjs`, never `closedlost`) and the audit goes green.
+
+### 🟢 28 Sep — VJH can now MEASURE the judge on real postings (evidence memory) · VJH `5782f3d` → `e4c7314`
+
+- **DONE — connected, nothing rebuilt:** `job_listings` + `add_job_listing()` (Dec 2025, 0 callers) now hold the posting each
+  decision was made on. Bright Data door records at decision time; LangGraph checkpoints (11,262 jobs) are copied read-only by
+  `scripts/link_evidence.py`, run by the hourly `judge_feedback_sync.py` (ledger now keeps each deal's `Job URL`).
+  **Cron line for the sync switched `python3` → `venv/bin/python`** (system python3 has no SQLAlchemy/LangGraph; backup
+  `~/crontab.bak-20260928-evidence`). `replay_learning.py --judge N [--since D] [--show]` judges only decisions with a posting.
+- **FIXED from what the real replay showed:** LATAM overrule now asks the gate (`fit_gate.location_excludes_her`) — it had
+  released "U.S. only", "Brazil and Portugal", "GMT-8 to GMT-6"; Torre's "Remote — LATAM / Americas" is VJH's OWN default
+  (`is_source_default_location`) — the judge is told "not stated by the employer", gates unchanged; judge + lesson label now
+  say coding THROUGH her AI environment is her work (was read as "she does not code").
+- **VERIFIED BY:** live replay after `e4c7314`: rejections caught **14/20**, applications approved **8/18**, rules block 0/35
+  (on blank postings it had read 19/20 + 4/20 — that number measured the blank). Oracle evals 510 passed.
+- **RISK:** agreement is ~55% on every model tried (4o-mini 14+8, 4.1-mini 15+9, 4o 19+3, 4.1 5+15 of 20+18) — the sample is
+  pre-20-Sep decisions, many rejected for reasons no posting shows (closed, scam, employer page). Do NOT swap models or keep
+  rewording the prompt on this sample. NEXT: her decisions from now on carry evidence automatically; re-measure with
+  `--since 2026-09-28` once ~20 of each exist. **Oracle disk is 95% full (2.3 GB free).**
 
 ### 🟢 28 Sep — "Elena + AIPA = one operating unit" is LIVE in letters, all 11 lane CVs and the judge
 
