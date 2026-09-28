@@ -137,6 +137,7 @@ export interface TrelloCard {
   due?: string | null;
   idBoard?: string;
   idList?: string;
+  closed?: boolean;
 }
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -1363,7 +1364,7 @@ export function formatVoiceTrelloReply(result: VoiceTrelloResult): string {
  */
 // 2026-09-28: correction vocabulary added — "Appointment should be changed to 15th of October" never
 // reached the action classifier, so it became a NEW card instead of an edit to the one just made.
-const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|archiv\p{L}*|mueve|muévelo|mover|trasladar|pasar|перенес\p{L}*|переме\p{L}*|передвин\p{L}*|положи|заархивир\p{L}*|архивир\p{L}*|убери|скрой|отправь|change|changed|changing|reschedul\p{L}*|postpon\p{L}*|updat\p{L}*|correct\p{L}*|cambi\p{L}*|reprogram\p{L}*|posterg\p{L}*|измен\p{L}*|поменя\p{L}*|исправ\p{L}*)(?![\p{L}\p{N}])/iu;
+const MGMT_RE = /(?<![\p{L}\p{N}])(move|moving|relocat\p{L}*|transfer\p{L}*|archiv\p{L}*|mueve|muévelo|mover|trasladar|pasar|перенес\p{L}*|переме\p{L}*|передвин\p{L}*|положи|заархивир\p{L}*|архивир\p{L}*|убери|скрой|отправь|change|changed|changing|reschedul\p{L}*|postpon\p{L}*|updat\p{L}*|correct\p{L}*|cambi\p{L}*|reprogram\p{L}*|posterg\p{L}*|измен\p{L}*|поменя\p{L}*|исправ\p{L}*|edit\p{L}*|clarif\p{L}*|редакт\p{L}*|отредакт\p{L}*|уточн\p{L}*|подправ\p{L}*|описани\p{L}*|modific\p{L}*|aclar\p{L}*)(?![\p{L}\p{N}])/iu;
 
 /** True when a transcript must go to the action classifier (move / archive / update) first. */
 export function isManagementCommand(transcript: string): boolean {
@@ -1389,6 +1390,7 @@ interface _RawAction {
   newDueDate?: string | null;   // update: YYYY-MM-DD (Panama)
   newDueTime?: string | null;   // update: "HH:MM" 24h (Panama)
   newTitle?: string | null;     // update: only when she renames the card
+  newDescription?: string | null; // update: the corrected description, in her words (replaces the old one)
   description?: string;
   cardQuery?: string;
   sourceBoardHint?: string;
@@ -1397,11 +1399,11 @@ interface _RawAction {
 }
 
 /** Search Trello cards by text, optionally restricted to a board. */
-async function searchTrelloCards(query: string, boardHint?: string): Promise<TrelloCard[]> {
+export async function searchTrelloCards(query: string, boardHint?: string): Promise<TrelloCard[]> {
   const data = await trelloGet<{ cards?: TrelloCard[] }>('/search', {
     query,
     modelTypes: 'cards',
-    card_fields: 'name,id,shortUrl,idList,idBoard,due',
+    card_fields: 'name,id,shortUrl,idList,idBoard,due,closed',
     cards_limit: '15',
   });
   const cards = data?.cards ?? [];
@@ -1409,11 +1411,10 @@ async function searchTrelloCards(query: string, boardHint?: string): Promise<Tre
 
   const boards = await getAllBoards();
   const hintWords = boardHint.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-  const matchIds = new Set(
-    boards
-      .filter(b => hintWords.some(w => b.name.toLowerCase().includes(w)))
-      .map(b => b.id),
-  );
+  // "Kira Octubre": "kira" alone matches EVERY Kira board, so boards matching ALL the words win (28 Sep 2026).
+  const all = boards.filter(b => hintWords.every(w => b.name.toLowerCase().includes(w)));
+  const any = boards.filter(b => hintWords.some(w => b.name.toLowerCase().includes(w)));
+  const matchIds = new Set((all.length ? all : any).map(b => b.id));
   const filtered = matchIds.size > 0 ? cards.filter(c => matchIds.has(c.idBoard ?? '')) : cards;
   return filtered.length > 0 ? filtered : cards; // fall back to unfiltered if hint yielded nothing
 }
@@ -1440,8 +1441,17 @@ Action schema:
   {"type":"create","description":"full task description to create as a new card"},
   {"type":"move","cardQuery":"search term to find cards","sourceBoardHint":"board name or null","targetBoard":"BOARD_KEY or exact board name","targetList":"the column the user named, or null"},
   {"type":"archive","cardQuery":"search term to find cards","sourceBoardHint":"board name or null"},
-  {"type":"update","cardQuery":"search term or __recent__","newDueDate":"YYYY-MM-DD or null","newDueTime":"HH:MM 24h or null","newTitle":"new card name or null"}
+  {"type":"update","cardQuery":"search term or __recent__","sourceBoardHint":"board name or null","newDueDate":"YYYY-MM-DD or null","newDueTime":"HH:MM 24h or null","newTitle":"new card name or null","newDescription":"corrected description or null"}
 ]
+
+UPDATE also covers the DESCRIPTION ("edit this task", "make it clear that…", "отредактируй задачу", "это описание…",
+"уточни, что…", "aclara que…"): put the corrected text in newDescription, in her own words and language — it REPLACES
+the old description. Write the STATEMENT itself, not her instruction to you: drop "making it clear that", "edit it so",
+"уточни, что", "aclara que" ("make it clear the appointment is not for Kira but for my stepfather Marshall" →
+"The appointment is for my stepfather Marshall, not for Kira."). When she names the card ("задача в Kira octubre, Cita, доктор Фернандо Агилар"), cardQuery is the
+card's distinctive words written the way the card most likely spells them — a person's name spoken in Cyrillic goes in
+Latin letters ("Fernando Aguilar") — and sourceBoardHint is the board she named ("Kira Octubre"). Never emit a
+"create" for a message that edits a card, and never create a card that DESCRIBES an edit.
 
 UPDATE — changing an EXISTING card's date, time or name (NOT moving it to another board or column):
 - "should be changed to 15th of October, 3.30 pm", "reschedule to Friday", "the appointment is at 4, not 3",
@@ -1603,9 +1613,11 @@ export async function processMultiAction(
     // Two or more candidates → ask, never guess — this is her daughter's medical calendar.
     if (action.type === 'update' && action.cardQuery) {
       try {
-        const cards = action.cardQuery === '__recent__'
+        const found = action.cardQuery === '__recent__'
           ? recentCards
           : await searchTrelloCards(action.cardQuery, action.sourceBoardHint ?? undefined);
+        // Never edit an archived card: an archived duplicate is exactly what a correction must not revive.
+        const cards = found.filter(c => !c.closed);
         if (cards.length !== 1) {
           results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
             error: cards.length === 0
@@ -1614,6 +1626,13 @@ export async function processMultiAction(
           continue;
         }
         const card = cards[0]!;
+        // __recent__ comes from the bot's own memory, which does not know if she archived the card since.
+        const live = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'closed,due,name' });
+        if (live.closed) {
+          results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
+            error: `"${card.name}" is archived — say the name of the card to edit` });
+          continue;
+        }
         const body: Record<string, string> = {};
         let when = '';
         const newDate = action.newDueDate && /^\d{4}-\d{2}-\d{2}$/.test(action.newDueDate) ? action.newDueDate : null;
@@ -1624,16 +1643,18 @@ export async function processMultiAction(
           when = formatDueForReply(baseDate, action.newDueTime);
         }
         if (action.newTitle && action.newTitle.trim()) body.name = action.newTitle.trim();
+        if (action.newDescription && action.newDescription.trim()) body.desc = action.newDescription.trim();
         if (!Object.keys(body).length) {
           results.push({ type: 'update', success: false, cardQuery: action.cardQuery,
-            error: 'No new date, time or name was understood — nothing changed' });
+            error: 'No new date, time, name or description was understood — nothing changed' });
           continue;
         }
         await trelloPut<TrelloCard>(`/cards/${card.id}`, body);
         const back = await trelloGet<TrelloCard>(`/cards/${card.id}`, { fields: 'name,id,shortUrl,due' });
         const ok = !body.due || (back.due ? new Date(back.due).toISOString() === body.due : false);
         results.push({ type: 'update', success: ok, cardQuery: action.cardQuery, cards: [back],
-          detail: [when && `📅 ${when}`, body.name && `✏️ "${body.name}"`].filter(Boolean).join(' · '),
+          detail: [when && `📅 ${when}`, body.name && `✏️ "${body.name}"`,
+            body.desc && `📝 "${body.desc.slice(0, 120)}"`].filter(Boolean).join(' · '),
           ...(ok ? {} : { error: `Trello saved a different date (${back.due ?? 'none'})` }) });
       } catch (err: unknown) {
         results.push({ type: 'update', success: false, error: err instanceof Error ? err.message : String(err) });

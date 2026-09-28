@@ -29,6 +29,11 @@ check('her correction reaches the action classifier', v.isManagementCommand('App
 check('Spanish correction too', v.isManagementCommand('Cambia la cita al 15 de octubre'));
 check('Russian correction too', v.isManagementCommand('Измени дату на 15 октября'));
 check('a plain new task still does not', !v.isManagementCommand('Cita Dr. Fernando Aguilar nefrólogo 15 de octubre'));
+// 28 Sep 11:12-11:14 Panama: three description corrections, each became a NEW card.
+check('"Отредактирую эту задачу…" reaches the action classifier', v.isManagementCommand('Отредактирую эту задачу, making it clear that the appointment is not for Kira, but for my stepfather Marshall.'));
+check('"…ты должен отредактировать…" reaches it', v.isManagementCommand('Я имела в виду задачу, которую ты должен отредактировать, что это задача в Kira octubre'));
+check('"edit the card" reaches it', v.isManagementCommand('Please edit the card: it is for Marshall'));
+check('"aclara que…" reaches it', v.isManagementCommand('Aclara que la cita es para Marshall'));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
