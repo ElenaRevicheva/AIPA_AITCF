@@ -2,6 +2,8 @@
   "generated_by": "scripts/build_tailored_cv.py --emit-rules",
   "note": "Lane rules live in build_tailored_cv.py. Do NOT hand-edit this file and do NOT re-implement the rules anywhere else - read this instead.",
   "default": "builder",
+  "through_line": "I design intelligent systems and the experience around them \u2014 from the agents that run a business to the films they make.",
+  "operating_model": "I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions.",
   "rules": [
     {
       "lane": "language",

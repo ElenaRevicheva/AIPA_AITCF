@@ -290,6 +290,9 @@ async function buildLane(lane) {
   addPage(true);
 
   section('Summary');
+  // 28 Sep 2026 — the through-line opens every lane: one person, one pattern (lanes.json).
+  para(plain(LANES_JSON.through_line), bold, 9.2, 12);
+  y -= 2;
   para(plain(cfg.profile), regular, 9, 12);
   y -= 6;
 
@@ -320,7 +323,7 @@ async function buildLane(lane) {
 
   section('How I work');
   para(
-    'I am the architect, the reviewer and the on-call. I judge a new data source by running it through the live gate before integrating it: the source added in August cleared 76% against ~21% for the rest of the fleet. I write the failure down and name it — clients can read how I debug before they hire me.',
+    plain(LANES_JSON.operating_model) + ' I judge a new data source by running it through the live gate before integrating it: the source added in August cleared 76% against ~21% for the rest of the fleet. I write the failure down and name it — clients can read how I debug before they hire me.',
   );
   y -= 8;
 

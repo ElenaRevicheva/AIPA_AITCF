@@ -187,6 +187,18 @@ FACTS = [
      'front of people who did not want to hear it.'),
 ]
 
+# ─── who she is, once, on every CV (Elena approved both sentences, 28 Sep 2026) ─────
+# THROUGH_LINE opens every Summary: one person with one pattern, not two careers glued together
+# (AI operations + AI film). OPERATING_MODEL opens "How I work": Elena + the AI environment she
+# built is one operating unit, stated up front instead of discovered in the interview.
+# The same OPERATING_MODEL string lives in src/cover-letter.ts; scripts/test-cover-letter-model.cjs
+# fails if the two ever drift apart.
+THROUGH_LINE = ('I design intelligent systems and the experience around them — from the agents '
+                'that run a business to the films they make.')
+OPERATING_MODEL = ('I operate an AI-native development environment where specialized agents handle '
+                   'much of the implementation execution. I own requirements, architecture, '
+                   'orchestration, evaluation, deployment, monitoring and production decisions.')
+
 # ─── lane definitions: headline + opening paragraph + fact ordering ───────────
 LANES = {
     'pm': {
@@ -384,7 +396,7 @@ def build(title: str, company: str, lane: str, out: Path):
     s.append(HRFlowable(width='100%', thickness=0.7, color=ACCENT, spaceBefore=1, spaceAfter=4))
 
     s.append(Paragraph('PROFILE', st_h))
-    s.append(Paragraph(cfg['profile'], st_b))
+    s.append(Paragraph(f'<b>{THROUGH_LINE}</b> {cfg["profile"]} {OPERATING_MODEL}', st_b))
 
     s.append(Paragraph(cfg.get('work_heading', 'SELECTED WORK — shipped, live, and measured'), st_h))
     for _tags, lead, body in pick_facts(lane):
@@ -486,6 +498,8 @@ def main():
             'note': 'Lane rules live in build_tailored_cv.py. Do NOT hand-edit this file and do '
                     'NOT re-implement the rules anywhere else - read this instead.',
             'default': 'builder',
+            'through_line': THROUGH_LINE,
+            'operating_model': OPERATING_MODEL,
             'rules': [{'lane': l, 'pattern': p} for l, p in LANE_RULES],
             # headline + profile ride along so scripts/build-lane-cv.cjs (the PDF renderer since
             # 24 Sep) reads the verified prose from HERE instead of keeping a second copy.

@@ -55,5 +55,11 @@ const src = fs.readFileSync(dist, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').repla
 check('dist no longer says "production AI systems solo"', !/production AI systems solo/.test(src));
 check('dist carries the 15-service count', /15 long-running production services/.test(src));
 
+// 7. The CVs and the letters say the same sentence (two homes: TS here, Python for the CVs).
+const lanes = JSON.parse(fs.readFileSync(
+  path.join(__dirname, '..', 'docs', 'applications', 'cv-by-lane', 'lanes.json'), 'utf8'));
+check('lane CVs carry the identical operating-model sentence', lanes.operating_model === OPERATING_MODEL);
+check('lane CVs carry the through-line', /^I design intelligent systems/.test(lanes.through_line || ''));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
