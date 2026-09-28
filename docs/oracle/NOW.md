@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-09-28 22:40 | Company brief -> HubSpot note; apply queue = new-first worklist, Telegram only when new | scripts/apply-queue.cjs, scripts/hs-fill-apply-kit.cjs, scripts/lib/company-research.cjs (new), Oracle crontab line for apply-queue | f5ee2ef |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
