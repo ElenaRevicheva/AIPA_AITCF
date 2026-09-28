@@ -250,7 +250,8 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
 ### 📨 28 Sep — Niuro "AI Operations & Growth Lead" (GetOnBoard, LATAM-only remote, USD 2,500–3,500): kit READY — Elena's move
 
-Tailored CV (`--job=docs/applications/cv-by-job/2026-09-28_niuro_ai_ops_growth_lead.json`, automation lane) + hand-written letter
+Tailored CV (`--job=…niuro_ai_ops_growth_lead.json`; UPDATED after review: eval loop told as a METHOD — new `evalloop` block, no
+14/20 numbers; delivery backed by her e-gov record) + interview prep `docs/interview/NIURO_TECHNICAL_DEFENSE.md` (15 Q) + letter
 (salary ask USD 3,500) on the `[HIRING-VJH-LEAD] … @ Niuro` deal as a ✅ READY TO SEND note. Kit:
 `docs/applications/2026-09-28_Niuro_AI_Ops_Growth_Lead_APPLICATION.md`. Also: her healthcare-SEO "experience" answer polished to
 1,909 chars (`docs/applications/2026-09-28_experience_paragraph_POLISHED.md`; removed "solo", stale counts, unverified GA4 claims).

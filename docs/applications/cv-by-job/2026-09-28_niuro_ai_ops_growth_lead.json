@@ -4,11 +4,11 @@
   "cv": "CV_Elena_Revicheva_Niuro_AI_Ops_Growth_Lead.pdf",
   "headline": "AI Operations & Growth Lead — AI agents, automation and measured business outcomes",
   "profile": "Seven years as Deputy CEO and Chief Legal Officer running large digital-transformation programs at board level, and Deputy CEO for business development at a fintech. Since May 2025 I have built and run AI systems in production — agents, workflow automation, a CRM growth loop and a public API, 15 long-running services on one cloud VM — and I own them from problem to measured result. My agents learn from recorded human decisions, and I measure every change against those decisions before it ships.",
-  "order": ["judge", "loop", "chain"],
+  "order": ["evalloop", "loop", "chain"],
   "available": [
     "AI agents and workflow automation that clear an operational bottleneck, owned to a measured result",
     "Evals and feedback loops: offline replay on real decisions before a change ships",
     "Agent context and memory design (RAG + pgvector in production), MCP and API integrations",
-    "Client delivery and account growth in English, prioritized by KPIs"
+    "Delivery ownership, evidenced: 7 years of vendor coordination, operational delivery and board-level cost and performance reporting in regulated e-government"
   ]
 }

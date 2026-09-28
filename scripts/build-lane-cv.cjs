@@ -87,6 +87,16 @@ const PROJECTS = {
     show: 'aideazz.xyz/ai-ops-wiki.html',
     body: 'An LLM judge screens the jobs my search agent finds; what the model may not decide is enforced in code — a location or pay it misreads is overruled from the posting itself. Each of my own decisions is stored with the posting it was made on, and the judge is measured against them: 14 of 20 rejections and 8 of 18 applications agree. A retrieval (RAG) upgrade scored lower on that test, so it ships switched off.',
   },
+  // 28 Sep 2026 — the same system told as a METHOD, no small-sample numbers (ChatGPT review for Niuro:
+  // 14/20 + 8/18 reads as ~55% to an employer and distracts from the loop itself). Verified: evidence
+  // memory (job_listings + LangGraph checkpoints), replay_learning.py, fit_gate/llm_judge code guards
+  // for location, pay and AI bans, RAG A/B 6-7/18 vs 8-9/18 → shipped OFF (VJH 5782f3d..45f6411).
+  evalloop: {
+    title: 'AI evaluation & feedback loop — changes tested before release',
+    url: 'https://aideazz.xyz/ai-ops-wiki.html',
+    show: 'aideazz.xyz/ai-ops-wiki.html',
+    body: 'My job-search agent learns every hour from the decisions I record in the CRM. Each decision is stored with the posting it was made on and replayed as an offline evaluation set before a judge change ships. Hard constraints such as location and pay are enforced by deterministic rules, not left to the model. A proposed RAG upgrade scored lower on that evaluation set, so I kept it disabled rather than ship a more complex, less accurate system.',
+  },
   // 28 Sep 2026 — creative lane. Verified: 8 films on the live gallery (films.json); film #8
   // record docs/atuona/FILM8_2026-09-22.md (3:36, 16 shots, −15.7 LUFS); 99 poems in atuona
   // content/poems.json; bot engines + the price-cap incident in NOW.md 22 Sep and the AI Ops Wiki.
