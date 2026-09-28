@@ -263,6 +263,16 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
 ### ✅ 28 Sep — Niuro SUBMITTED by Elena on GetOnBoard. Deal → ⏳ Sent, her "I applied" note added (VJH learns it), follow-up task 5 Oct.
 
+### 🔴 28 Sep (late) — the queue was mostly DEAD: 7 of 11 cards closed or not open to her. Elena's move on cleanup.
+Checked by hand in her Chrome while firing one application. Closed: 4 Torre (lovasit/Lovas IT, Iclivia, Actian, Logical
+Paradigm — Torre's banner changed to "This job post is closed."), Leland (WWR redirects to home), Scale Army (Ashby "Job not
+found"). Not open to her: Addi (native Colombian Spanish), Robots & Pencils (US/Canada), Glean (US timezone), HireLATAM
+(born-in-LATAM, her own reason). Only open + eligible: **Georgia IT, $60/h contract, EST — Dice needs HER sign-in.**
+**Fixed:** VJH `b755f13` adds the Torre phrase (verified: on 5/5 closed, absent on 4 API-open) + cto `1862a13` mirror;
+vibejobhunter restarted 22:38 UTC, 0 errors. Page now shows "4 look closed". Existing sweep
+(`VJH scripts/sweep_i_act_today.py`, dry run) → 7 rejects (5 DEAD + DevUps, Rwazi INELIGIBLE). **`--apply` awaits her yes.**
+Known gaps (not fixed): Ashby + WWR closures are invisible server-side (JS shell / 403). 7 `[HIRING-MICRO1]` deals sit in I Act TODAY.
+
 ### 🟢 28 Sep — apply queue = productive worklist; company brief lives ON the HubSpot deal (`05bd98a`, VJH `a3a1eda`)
 - **Deal = the record.** `hs-fill-apply-kit.cjs` adds a `🔎 COMPANY BRIEF` note (Perplexity, cited, cached — `scripts/lib/company-research.cjs`)
   to every ACT-TODAY hiring deal. **19 written, rerun adds 0.** The note has NO `https://`/href on purpose: every note reader takes the
