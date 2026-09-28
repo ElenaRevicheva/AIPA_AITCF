@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-09-28 16:25 | Voice→Trello: edits to DESCRIPTION create new cards ("отредактировать" not recognised) | cto-aipa `src/trello-voice.ts` (+ dist), `pm2 restart cto-aipa`; her cards WqGGMmWD (desc), Fx8IOjJn + 4qEGUIS0 (archive) | cto-aipa `HEAD` |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
