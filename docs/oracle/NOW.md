@@ -158,6 +158,10 @@ git log keeps the record.
   My earlier link-check order `5CA2DEE6…` is marked `void_test`.
 - **Seen, not touched:** `espaluz-webhook.service` (old PayPal unit) is in `activating auto-restart` — `espaluz-payments-webhook` owns :5000.
 - **RISK:** no delivery-time promise on the page (Elena's call). After paying, the client lands on PagueloFacil's receipt (no RETURN_URL).
+- **SYNC CHECK 29 Sep (Claude Code):** local = GitHub on cto-aipa/aideazz/VJH/EspaLuz×2/atuona; Oracle `dist/` = build of `main` for all 9
+  modules changed since 27 Sep; receiver md5 = repo; restarts newer than files; VJH Oracle = origin. **Oracle `~/aideazz` was 3 behind
+  (incl. both diagnostic pay-page commits) → `merge --ff-only` to `5d8f178`** before the 21:30 wiki-ship push. Live bundle shows the
+  diagnostic EN+ES. Test deal 65452839079 got a ⚠️ TEST PAYMENT — NOT REVENUE note.
 
 ### 💼 29 Sep — Allied Revenue RevOps & GTM Systems Lead ($5–6k, remote): staged, NOT applied (Elena's move)
 
