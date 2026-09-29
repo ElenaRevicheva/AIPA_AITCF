@@ -2692,7 +2692,12 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   ⚠️ **Corrected 28 Sep: something WAS down.** `linkedin_cmo_v4.py` calls Claude directly → every daily LinkedIn
   post since at least 9 Sep (journal start) shipped as a TEMPLATE while logging "sent successfully".
   `response_detector.py` retries dead Claude Sonnet ~300×/day before the chain answers (works, wasteful).
-  Fix proposed (route both through `llm_chain.complete`) — awaiting Elena. Run `test_provider_chain` on
+  **FIXED 29 Sep 00:42 UTC (VJH `11bd8d2` + `2fd2a28`, vibejobhunter restarted):** both LinkedIn paths fall
+  through to `llm_chain.complete` before any template (proof: a generate-only run on Oracle → "generated via
+  openai (waterfall)", 1,964 chars); reply detector has a 6h circuit breaker on "credit balance" and no longer
+  drops to keywords without a Claude key. Test: `evals/test_provider_bypass.py`. Unverified "131 tests" claim
+  removed from the post prompt (600+ checks, measured). ⚠️ §4.3 owed: breaker trip line
+  `skipping Claude for 6h` in the journal after the next reply check. Run `test_provider_chain` on
   ORACLE only: the laptop `.env` keys are stale and give false 401s.
 - **VJH outreach crash:** `[outreach] ERROR <company>: 'str' object has no attribute 'get'`
   — real, in the founder-email path, needs its own session.
