@@ -275,7 +275,14 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 ### 🟢 29 Sep — "nothing to apply for": Torre was discarding 610 LATAM jobs/cycle. Budget 20s → 90s (VJH `5af1858`)
 Measured: Torre delivered 430–470 jobs/cycle until 16 Sep; ~0 since 25 Sep ("timeout after 20s"). `_search_torre`
 takes 24–27s on Oracle and `asyncio.wait_for` discards everything on timeout (same as the ATS sweep, 30 Jul).
-One number changed; vibejobhunter restarted 09:48 UTC. ⚠️ §4.3: confirm "Torre.ai (LATAM): ~610 jobs" in the next cycles.
+One number changed; vibejobhunter restarted 09:48 UTC. ✅ **Proven 09:49:** "Torre.ai (LATAM): 610 jobs" → 35 new →
+1 to I Act TODAY (Program Manager - AI @ SIPEngines; kit filled 10:10: brief + defense + tailored CV).
+**Bright Data door, same day (VJH `0a980de`, serpapi-jobs restarted):** 14 remote-only queries now carry "latin america"
+(edited in place, 18 queries, same bill) + on-lane titles are read in full with the existing `enrich_with_state` before
+the gate. First run: 3 postings read (≈160 → 8,000 chars), 1 closed skipped, **1 to I Act TODAY (AI Growth Automation
+Engineer @ Clara)** — the door's first since its gate went live. ⚠️ Bright Data API itself flaky 29 Sep: 8/17 queries
+timed out or returned empty (4/18 before the change). **Balance $3.95, ~$0.50/day → ~8 days**; Elena not topping up yet.
+Cert notice (proxy ports 22225/33335) does NOT apply: all our calls are the API on 443; whitespace uses 9222.
 Also measured (not changed): Bright Data door — 98 parked jobs re-read in full → 77 off-lane, 17 gate-NO, 1 pass;
 15 of 18 `JOBS_QUERIES` never say LATAM. The "N gate-passing jobs left UNSEEN" log line counts already-seen jobs too
 (misleading wording, not a stall). Actionable now: 7 `[HIRING-MICRO1]` roles + Georgia IT (Dice sign-in).
