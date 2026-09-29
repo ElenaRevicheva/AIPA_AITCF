@@ -144,10 +144,20 @@ git log keeps the record.
 - **VERIFIED BY:** `node scripts/test-diagnostic-delivery.cjs` 39/39; live-vs-main drift diff = only my lines; 5 dist files md5 = local build;
   proc 17:20:04 > files 17:20:01; on Oracle: order read returns `page_url`, real scan 86/A → prep note with draft; catalog lists the new title.
   Backups `~/backups/pre-diagnostic-call-20260929-1642/`, `~/backups/pre-diagnostic-v2-20260929-1720/`.
-- **NEXT (Elena):** one real test payment — the email / HubSpot / Telegram chain has NEVER run in production (0 paid orders ever).
-  Expect: email in the page's language, deal in 🔥 I act TODAY with prep note + task, Telegram "💳 PAID — Quick AI Growth Operator Diagnostic".
-  Pending order `5CA2DEE6…` "INTERNAL LINK TEST" is my link check, not a client.
-- **RISK:** no delivery-time promise on the page (Elena's call). The PF receipt page is where a client lands after paying (no RETURN_URL).
+- **🚨 FIXED 29 Sep 17:39–17:43 UTC — AIdeazz service payments had NEVER been matched to an order** (all SKUs). Her real $100
+  test (approved 17:29) logged `approved but no user id … no_user_id`: PagueloFacil's webhook does NOT echo PARM_1, the only thing
+  the forwarder looked at. Now: links carry `Ref <order id>` in the description (which IS echoed); the forwarder
+  (`deploy/espaluz-familybot/aideazz_service_payments.py` → `~/EspaLuzFamilybot/`, the ONE receiver for every PagueloFacil payment
+  on the account) claims descriptions starting "AIdeazz"; `/internal/service-paid` matches by Ref, else amount + payer email
+  (ambiguous → Telegram alert). Then 401: the receiver sent its own `INTERNAL_WEBHOOK_SECRET`; CTO AIPA checks `OUTREACH_SECRET`
+  (the one both hold) — forwarder now sends that first. cto-aipa `d516f99`, `30c6221`. Tests: `test-diagnostic-delivery.cjs` 46,
+  `test-service-payment-forwarder.py` 9. Backups `~/backups/pre-payment-match-20260929-1739/`.
+- **VERIFIED END-TO-END (her real payment, replayed into the receiver):** `matched order 5CA364BF… by amount + payer email` →
+  `delivered: email=true scan=100 deal=65452839079 task=117684032287`; read back from HubSpot: deal in `qualifiedtobuy`, $100, prep note,
+  HIGH task. **⚠️ That $100 is Elena's OWN test payment — never report it as client revenue** (it is in `agent_outcomes` as `service_paid`).
+  My earlier link-check order `5CA2DEE6…` is marked `void_test`.
+- **Seen, not touched:** `espaluz-webhook.service` (old PayPal unit) is in `activating auto-restart` — `espaluz-payments-webhook` owns :5000.
+- **RISK:** no delivery-time promise on the page (Elena's call). After paying, the client lands on PagueloFacil's receipt (no RETURN_URL).
 
 ### 💼 29 Sep — Allied Revenue RevOps & GTM Systems Lead ($5–6k, remote): staged, NOT applied (Elena's move)
 
