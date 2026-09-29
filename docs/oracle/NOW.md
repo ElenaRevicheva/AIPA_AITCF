@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 29 Sep 19:00 | hand-staged job deals = same kit as auto (letter too) + creative facts in the letter generator | `src/cover-letter.ts`, `scripts/hs-fill-apply-kit.cjs`, new `scripts/stage-manual-job.cjs`, pm2 `cto-aipa` restart | 3a36bb8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
