@@ -75,11 +75,14 @@ const PROJECTS = {
     show: 'wa.me/50766623757',
     body: 'Bilingual relocation and language tutor on WhatsApp and Telegram. Persistent per-student memory (RAG + pgvector). PayPal subscriptions. Early users in 19 countries. I am the architect and the on-call.',
   },
+  // 29 Sep 2026 review: "every model call" overclaimed (two features bypassed the chain until 28 Sep) and
+  // listed a wrong order; "130-test ... $0 API cost" was unverified (649 passing 29 Sep, live provider
+  // checks cost cents); "76% vs ~21%" was on CLAUDE.md's unverified list — job_monitor.py records 72.4% vs ~5.6%.
   chain: {
     title: 'Fail-closed publishing and a five-provider LLM chain',
     url: 'https://aideazz.xyz/ai-ops-wiki.html',
     show: 'aideazz.xyz/ai-ops-wiki.html',
-    body: 'Every model call in the fleet has an ordered fallback (Anthropic, OpenAI, Gemini, Grok, Groq). When Groq deprecated the models I used, the fleet kept serving — a config change, not an outage. The daily publisher will not print a number it cannot trace; if the model decorated the facts, the day stayed silent. A 130-test eval harness (unit, integration, golden-set) runs in under a minute at $0 API cost.',
+    body: 'My agents\' model calls go through an ordered five-provider fallback (OpenAI, Gemini, Groq, Grok, Claude): a live probe on 28 Sep 2026 had four answering while Claude had no credits. When Groq deprecated the models I used, the fleet kept serving — a config change, not an outage. The daily publisher will not print a number it cannot trace; if the model decorated the facts, the day stayed silent. A 600+ test eval suite (unit, integration, golden-set) runs in under a minute.',
   },
   // 28 Sep 2026 — verified on Oracle the same day: replay of the judge on 38 of her real decisions
   // WITH the posting each was made on (14/20 rejections, 8/18 applications agree); the RAG variant
@@ -348,7 +351,7 @@ async function buildLane(lane, job = null) {
 
   section('How I work');
   para(
-    plain(LANES_JSON.operating_model) + ' I judge a new data source by running it through the live gate before integrating it: the source added in August cleared 76% against ~21% for the rest of the fleet. I write the failure down and name it — clients can read how I debug before they hire me.',
+    plain(LANES_JSON.operating_model) + ' I judge a new data source by running it through the live gate before integrating it: the source added in August cleared 72% against ~6% for the rest of the fleet. I write the failure down and name it — clients can read how I debug before they hire me.',
   );
   y -= 8;
 
