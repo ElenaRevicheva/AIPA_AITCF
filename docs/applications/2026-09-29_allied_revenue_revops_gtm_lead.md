@@ -95,6 +95,23 @@ Compensation: **$5,500/month** (inside their range; Elena may move it).
 ### I. English / US teams
 Honest: working English, written daily; no prior US B2B client engagements. Do not claim otherwise.
 
+## Application questions — answers as given 29 Sep (verified facts only; no Clay/Instantly claim)
+
+### Q1. HubSpot 1,000 → Clay 840 → Instantly 610: investigate and verify the fix
+I would reconcile hop by hop with record IDs, not totals. Export the 1,000 HubSpot contact IDs, the 840 Clay rows and the 610 Instantly leads, join them on contact ID and email, and put every missing record in a bucket by where it dropped. The 160 not enriched: no match, missing domain or name, credits or rate limits, or a filter in the table. The 230 not in Instantly: invalid or catch-all emails, duplicates, existing leads, suppression or blocklist, or a field-mapping error in the push. Each bucket gets a count and five records checked by hand. Then I fix the cause, re-run only the affected slice, and verify from the receiving end: Instantly's own lead list must match the expected IDs, not the sync log saying it ran. I have not used Clay or Instantly; I run this same reconciliation on HubSpot, Hunter enrichment and Resend sending in my own stack.
+
+### Q2. Workflow connecting 3+ systems with an LLM
+My apply kit connects four systems: a LangGraph job-search agent, HubSpot, the Perplexity API (an LLM with web search) and a PDF builder. Goal: every qualified opportunity lands in the CRM ready to act on, with a tailored CV, an interview defense note and a cited company brief, so no deal waits on manual research. The problem I found in testing: the brief carried source links, and every script that reads those deal notes takes the first link as the apply link, so the brief would have silently replaced real apply links with Wikipedia pages. I made the note link-free by design and added tests that fail if it ever carries one. Verified in HubSpot, not in the logs: 19 briefs written, a second run added 0 (no duplicates), and every apply link on the rebuilt worklist was unchanged.
+
+### Q3. A subtle error found in a live GTM system
+In July I audited every automation writing to our HubSpot: 175 deals from 14 days, grouped by source and checked against the server logs of the systems that should have produced them. Trial sign-ups from our language-learning product had never reached HubSpot: a missing secret in one service's environment made the push return early, with no error and no log line. 28 real trial users, the oldest from July 2025, were invisible. Before marking it fixed I made a live call matching the production payload, confirmed the record in HubSpot itself, and backfilled all 28 as deals. The same audit found a second source posting to the wrong port and getting a 404 every night for two weeks; I confirmed that fix in the receiving service's log. My rule since: check the destination, not the sender's success branch.
+
+### Q4. Years of hands-on RevOps / GTM operations
+Just over one year hands-on, since May 2025, running my own company's GTM stack every day: HubSpot pipelines and automation through the API, outreach sending and tracking, and lead intake with human approval. It is my own operation, not RevOps for external clients. Before that I spent seven years as Deputy CEO and Chief Legal Officer, where I owned delivery and board-level reporting; that is leadership experience, not hands-on RevOps.
+
+### Q5. Five hours overlapping 9:00–17:00 US Mountain
+Yes. I am in Panama (UTC-5, no daylight saving): 9:00–17:00 Mountain is 10:00–18:00 my time now and 11:00–19:00 after 1 November, so I can cover the full window, not just five hours.
+
 ## Profile summary — polished 29 Sep (1,743 chars, limit 2,000)
 
 Deals figure checked in HubSpot 29 Sep: 2,860 total → "2,800+". 11,000+, 420+, 100/100 are Elena's figures, not re-checked.
