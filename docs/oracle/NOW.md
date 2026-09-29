@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-29 17:40 | Diagnostic SKU v2: rename, after-payment automation, FIX paid orders never reaching HubSpot | cto-aipa `src/service-checkout.ts`, `src/aideazz-service-catalog.ts`, `src/hubspot-client.ts` (1 gate line), Oracle dist + `pm2 restart cto-aipa`; aideazz `ServicePay.tsx`, en/es locales | 8cf2e84 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,18 +130,24 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 💳 29 Sep — $100 "1:1 diagnostic call with Elena" is a PagueloFacil option, BEFORE the $200 audit (EN + ES)
+### 💳 29 Sep — $100 "Quick AI Growth Operator Diagnostic" LIVE before the $200 audit (EN + ES) + paid orders now reach HubSpot
 
-- **DONE:** new SKU `diagnostic_call` ($100) in `src/aideazz-service-catalog.ts` (cto-aipa `98e1098`, live on Oracle 16:42 UTC);
-  paid-email next step is per-SKU (call → "Elena will write to agree date and time"). Site (aideazz `1b70949`): portfolio/home
-  inquiry form shows the call button ABOVE the unchanged audit button; `/pay/analisis-tecnico` lists it first. $200/$500 untouched.
-- **VERIFIED BY:** Oracle dist md5 = local build (`23afd41…`, `cadc3ac…`), process start 16:42:38 > file 16:42:35;
-  public `/cto/api/service-catalog` lists `diagnostic_call 100`; live POST → PagueloFacil link, amount 100. Backup of the
-  previous two dist files: `~/backups/pre-diagnostic-call-20260929-1642/`. EspaLuz SVC forwarder is SKU-agnostic (no change).
-- **NEXT (Elena):** real test payment from aideazz.xyz/portfolio → expect Telegram "💳 Servicio pagado" + HubSpot
-  `[CLIENT-SERVICE-PAID]` deal + both emails. A pending order `5CA2DEE6…` named "INTERNAL LINK TEST" is my deploy check — not a client.
-- **RISK:** copy promises a live video call + a pre-call review of her site and AI answers; no duration and no credit toward the
-  audit promised — both are Elena's call. Paid-confirmation email is Spanish-only (pre-existing, same for the audits).
+- **Flow (Elena's):** client pays $100 on `/pay/analisis-tecnico` (3-question intake: website, how customers reach them, typical sale)
+  → she runs the diagnostic → emails the written results + a Calendly **one-off meeting** link (45 min; her plan has only 1 event type)
+  → call. $100 credited if they continue. Code: cto-aipa `32227cf` (`src/diagnostic-delivery.ts`, `src/paid-order-hubspot.ts`), site aideazz `5d8f178`.
+- **After payment, automatic:** client email in their language (`lng=` of the pay page) · $0 visibility scan of their site · HubSpot deal
+  `[CLIENT-SERVICE-PAID] …` in 🔥 I act TODAY + prep note (answers, scan, deck's 6 fit criteria + 6 modules, DRAFT results email with a
+  `[paste one-off Calendly link]` slot) + HIGH task · Telegram. Nothing generated.
+- **🚨 FIXED, never exercised:** every paid order (the $200/$500 audits too) went through `pushLeadToHubSpot`, whose prospect gate
+  returns `outside Elena skill ICP` → no deal, silently. Paid orders now use `paid-order-hubspot.ts`; `hubspot-client.ts` is UNCHANGED
+  (the PII pre-commit hook flags its pre-existing test addresses — do not "fix" by `--no-verify`).
+- **VERIFIED BY:** `node scripts/test-diagnostic-delivery.cjs` 39/39; live-vs-main drift diff = only my lines; 5 dist files md5 = local build;
+  proc 17:20:04 > files 17:20:01; on Oracle: order read returns `page_url`, real scan 86/A → prep note with draft; catalog lists the new title.
+  Backups `~/backups/pre-diagnostic-call-20260929-1642/`, `~/backups/pre-diagnostic-v2-20260929-1720/`.
+- **NEXT (Elena):** one real test payment — the email / HubSpot / Telegram chain has NEVER run in production (0 paid orders ever).
+  Expect: email in the page's language, deal in 🔥 I act TODAY with prep note + task, Telegram "💳 PAID — Quick AI Growth Operator Diagnostic".
+  Pending order `5CA2DEE6…` "INTERNAL LINK TEST" is my link check, not a client.
+- **RISK:** no delivery-time promise on the page (Elena's call). The PF receipt page is where a client lands after paying (no RETURN_URL).
 
 ### 💼 29 Sep — Allied Revenue RevOps & GTM Systems Lead ($5–6k, remote): staged, NOT applied (Elena's move)
 
