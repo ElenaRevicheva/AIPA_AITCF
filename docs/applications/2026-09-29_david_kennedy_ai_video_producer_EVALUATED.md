@@ -1,7 +1,9 @@
 # AI Video Producer (Senior) — David Kennedy Recruitment → EVALUATED; Elena APPLYING (29 Sep 2026)
 
-- Posting: https://jobee.pro/jobs/8043de3f-a90c-4ab0-bee2-0647771681d5 (mirror of a Himalayas listing; original needs an
-  account). Client: an unnamed "fast-growing international AI company", R&D team. Europe/LATAM remote, full-time
+- **Apply here (free, no account):** https://davidkennedyrecruitment.teamtailor.com/jobs/8383688-ai-video-producer-senior-level
+  — the recruiter's own posting, 383 locations in ~80 countries incl. **Panama**. Found via Himalayas
+  (https://himalayas.app/companies/david-kennedy-recruitment/jobs/ai-video-producer-senior-level — its "Mexico only" tag
+  is wrong). Jobee (paid) only mirrored it: https://jobee.pro/jobs/8043de3f-a90c-4ab0-bee2-0647771681d5 . Client: an unnamed "fast-growing international AI company", R&D team. Europe/LATAM remote, full-time
   freelancer → possibly B2B. Pay: "competitive" (not stated). Published ~18 Sep, closes 17 Nov 2026.
 - **UPDATE 29 Sep: Elena is comfortable with explicit content and chose to apply.** Deal `[HIRING-MANUAL] AI Video Producer - Senior-Level @ David Kennedy Recruitment` (65474651953): hand-written letter (`…_COVER_LETTER.txt`), tailored CV films-first, kit defense + `…_VIDEO_DEFENSE.md`, brief, HIGH task. Gaps 2–3 below still stand — never claim them.
 
