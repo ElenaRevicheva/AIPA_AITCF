@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-09-29 16:45 | $100 diagnostic call SKU before the $200 audit (pay page + portfolio button) | cto-aipa `src/aideazz-service-catalog.ts`, `src/service-checkout.ts`, Oracle `dist/` of both + `pm2 restart cto-aipa`; aideazz `ServicePay.tsx`, `InquiryForm.tsx`, en/es locales | 7c8ebe6 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
