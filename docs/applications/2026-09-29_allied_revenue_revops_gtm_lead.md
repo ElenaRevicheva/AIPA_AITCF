@@ -91,3 +91,23 @@ Compensation: **$5,500/month** (inside their range; Elena may move it).
 
 ### I. English / US teams
 Honest: working English, written daily; no prior US B2B client engagements. Do not claim otherwise.
+
+## Profile summary — polished 29 Sep (1,743 chars, limit 2,000)
+
+Deals figure checked in HubSpot 29 Sep: 2,860 total → "2,800+". 11,000+, 420+, 100/100 are Elena's figures, not re-checked.
+
+```
+For seven years I was Deputy CEO and Chief Legal Officer of a government digital-services operator, leading large-scale digital transformation: vendor coordination, operational delivery, and board-level cost and performance reporting. It taught me to start with the workflow and the business constraint, not the technology.
+
+Since May 2025 I have built and run AI systems in production: 15 long-running services on Oracle Cloud. I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions. Three systems are most relevant here:
+
+CTO AIPA (AI operations and RevOps): a HubSpot CRM with 2,800+ deals and automated source and pipeline attribution. An AI lead concierge drafts replies to inbound inquiries; a human approves each one before it is sent and logged.
+
+VibeJobHunter (discovery and qualification): a LangGraph pipeline that has processed 11,000+ opportunities, with an evaluation harness, human decision gates, and a feedback loop that learns from accept/reject decisions in the CRM. Every change is measured against those decisions before it ships.
+
+CMO AIPA (AI marketing): a GEO/AEO and technical-SEO engine with bilingual publishing and structured data for AI search visibility. It scores my own site 100/100 and has run 420+ audits.
+
+The pattern is consistent: study the workflow, find the real bottleneck, ship a focused solution, measure the result, keep human judgment where mistakes are costly, then harden what works. I run growth the same way, as an outcome-driven system, not a checklist.
+
+I build with Cursor and Claude Code, alongside my own AI CTO agent.
+```
