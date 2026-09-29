@@ -57,7 +57,10 @@ async function sendServicePaidEmails(order: NonNullable<Awaited<ReturnType<typeo
     await send(
       order.client_email,
       `Pago recibido — ${title} · AIdeazz`,
-      `Gracias por su pago.\n\n${summary}\n\nElena Revicheva comenzará el trabajo tras confirmar sus respuestas al cuestionario técnico (si aún no las envió).\n\nAIdeazz · aideazz.xyz`,
+      `Gracias por su pago.\n\n${summary}\n\n${
+        product?.paidNextStepEs ||
+        'Elena Revicheva comenzará el trabajo tras confirmar sus respuestas al cuestionario técnico (si aún no las envió).'
+      }\n\nAIdeazz · aideazz.xyz`,
     ).catch(e => console.error('[service-paid] client email:', e));
   }
 }

@@ -4,6 +4,7 @@
  */
 
 export type ServiceSku =
+  | 'diagnostic_call'
   | 'web_audit_prelim'
   | 'web_audit_blueprint';
 
@@ -20,9 +21,25 @@ export interface ServiceProduct {
   pfDescription: string;
   /** Blueprint requires prior prelim unless override query param */
   requiresPrelim?: boolean;
+  /** Next-step line in the client's "payment received" email (default: the audit questionnaire line) */
+  paidNextStepEs?: string;
 }
 
 export const SERVICE_PRODUCTS: Record<ServiceSku, ServiceProduct> = {
+  diagnostic_call: {
+    sku: 'diagnostic_call',
+    amount: '100.00',
+    amountUsd: 100,
+    titleEn: '1:1 diagnostic call with Elena',
+    titleEs: 'Llamada de diagnóstico 1:1 con Elena',
+    descriptionEn:
+      'A live video call with Elena before you commit to an audit. She reviews your website and how AI assistants describe your business beforehand, so the call goes to your questions — and you leave knowing whether an audit is worth it for you.',
+    descriptionEs:
+      'Una videollamada en vivo con Elena antes de comprometerse con una auditoría. Ella revisa antes su sitio web y cómo los asistentes de IA describen su negocio, para que la llamada se dedique a sus preguntas — y usted sepa si una auditoría vale la pena en su caso.',
+    pfDescription: 'AIdeazz — Llamada de diagnóstico 1:1 con Elena',
+    paidNextStepEs:
+      'Elena Revicheva le escribirá a este correo para acordar la fecha y hora de la videollamada.',
+  },
   web_audit_prelim: {
     sku: 'web_audit_prelim',
     amount: '200.00',
