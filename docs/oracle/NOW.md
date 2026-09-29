@@ -263,6 +263,14 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
 ### ✅ 28 Sep — Niuro SUBMITTED by Elena on GetOnBoard. Deal → ⏳ Sent, her "I applied" note added (VJH learns it), follow-up task 5 Oct.
 
+### 🟢 29 Sep — "nothing to apply for": Torre was discarding 610 LATAM jobs/cycle. Budget 20s → 90s (VJH `5af1858`)
+Measured: Torre delivered 430–470 jobs/cycle until 16 Sep; ~0 since 25 Sep ("timeout after 20s"). `_search_torre`
+takes 24–27s on Oracle and `asyncio.wait_for` discards everything on timeout (same as the ATS sweep, 30 Jul).
+One number changed; vibejobhunter restarted 09:48 UTC. ⚠️ §4.3: confirm "Torre.ai (LATAM): ~610 jobs" in the next cycles.
+Also measured (not changed): Bright Data door — 98 parked jobs re-read in full → 77 off-lane, 17 gate-NO, 1 pass;
+15 of 18 `JOBS_QUERIES` never say LATAM. The "N gate-passing jobs left UNSEEN" log line counts already-seen jobs too
+(misleading wording, not a stall). Actionable now: 7 `[HIRING-MICRO1]` roles + Georgia IT (Dice sign-in).
+
 ### 🟢 28 Sep (late) — daily sweep of CLOSED jobs is live, and it cannot teach the judge (VJH `84a2ff0`…`16f6b71`)
 The queue was 7/11 dead or ineligible (checked by hand in her Chrome). Now: cron `55 12 * * *` runs the EXISTING
 `VJH scripts/sweep_i_act_today.py --apply --dead-only`; evidence = page text, Ashby board API, Greenhouse job API (404).
