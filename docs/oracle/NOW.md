@@ -276,6 +276,14 @@ theirs unasked. Lane match: pm 7 · builder 8 · automation 3 · architect 2.
 
 ### ✅ 28 Sep — Niuro SUBMITTED by Elena on GetOnBoard. Deal → ⏳ Sent, her "I applied" note added (VJH learns it), follow-up task 5 Oct.
 
+### ✅ 29 Sep — Allied Revenue kit reviewed + finished (other session's `74cd5bb` verified; `1cb5513`, VJH `debac32`)
+Checked in HubSpot: brief + 🛡️ defense + tailored CV really on the deal. Gap it left: the new "📌 JOB POSTING" note was
+read by VJH as "her reason" (proved on the committed script) → added to `_KIT_NOTE`. CV numbers were stale in THREE
+sources — `build-lane-cv.cjs` PROJECTS.loop, `build_tailored_cv.py` (→ `lanes.json` via `--emit-rules`) and
+`defense-bank.json` → live HubSpot counts (2,800+ deals / 1,300+ contacts / 2,100+ companies) + the July audit story;
+11 lane CVs + the Allied CV rebuilt (2 pages each), Allied CV replaced in HubSpot in place. Answer bank: "131 tests" /
+"Claude→Groq" / "$0.03 a run" corrected. **Open — Elena's call:** the films through-line on non-creative CVs.
+
 ### 🟢 29 Sep — "nothing to apply for": Torre was discarding 610 LATAM jobs/cycle. Budget 20s → 90s (VJH `5af1858`)
 Measured: Torre delivered 430–470 jobs/cycle until 16 Sep; ~0 since 25 Sep ("timeout after 20s"). `_search_torre`
 takes 24–27s on Oracle and `asyncio.wait_for` discards everything on timeout (same as the ATS sweep, 30 Jul).
