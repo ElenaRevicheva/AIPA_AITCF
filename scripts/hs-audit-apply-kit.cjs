@@ -14,6 +14,7 @@
 
 const path = require('path');
 const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
+const { jobDealFilterGroups, isJobDeal } = require(path.join(__dirname, 'lib', 'hiring-deals.cjs'));
 
 const TELEGRAM = process.argv.includes('--telegram');
 const STAGE = 'qualifiedtobuy';
@@ -49,8 +50,10 @@ async function auditDeal(d) {
   const assoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/notes`);
   const ids = (assoc.results || []).map((r) => r.toObjectId);
   let letter = false, cv = false, cvName = '';
-  for (const id of ids) {
-    const n = await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_attachment_ids`);
+  const notes = [];
+  for (const id of ids) notes.push(await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_attachment_ids`));
+  if (!isJobDeal(d.properties.dealname, notes.map((n) => n.properties?.hs_note_body))) return null;
+  for (const n of notes) {
     const body = stripHtml(n.properties?.hs_note_body);
     const at0 = STUB_RE.test(body);
     const at = body.search(LETTER_RE);
@@ -77,17 +80,15 @@ async function telegram(text) {
 
 (async () => {
   const search = await hs('POST', '/crm/v3/objects/deals/search', {
-    filterGroups: [{ filters: [
-      { propertyName: 'dealstage', operator: 'EQ', value: STAGE },
-      { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: '*HIRING-VJH*' },
-    ] }],
+    // VJH deals AND hand-staged jobs (29 Sep 2026) — recruiter-outreach deals return null below.
+    filterGroups: jobDealFilterGroups(STAGE),
     properties: ['dealname'],
     limit: 100,
   });
   const deals = search.results || [];
   const rows = [];
   for (const d of deals) {
-    try { rows.push(await auditDeal(d)); }
+    try { const r = await auditDeal(d); if (r) rows.push(r); }
     catch (e) { rows.push({ id: d.id, name: d.properties.dealname, error: e.message }); }
   }
 
@@ -96,13 +97,13 @@ async function telegram(text) {
     const mark = r.error ? '✖ ERR ' : `${r.letter ? '✓' : '✖'}L ${r.cv ? '✓' : '✖'}CV`;
     console.log(`  ${mark}  ${String(r.name).slice(0, 60).padEnd(62)} ${r.error || r.cvName || ''}`);
   }
-  console.log(`\n${deals.length} deals · complete ${rows.length - gaps.length} · gaps ${gaps.length}`);
+  console.log(`\n${rows.length} job deals · complete ${rows.length - gaps.length} · gaps ${gaps.length}`);
 
   if (gaps.length) {
     process.exitCode = 1;
     if (TELEGRAM) {
       const lines = gaps.map((g) => `• ${String(g.name).slice(0, 70)} — ${g.error ? 'audit error' : [!g.letter && 'no letter', !g.cv && 'no CV'].filter(Boolean).join(' + ')}`);
-      await telegram(`⚠️ Apply kit gap: ${gaps.length} of ${deals.length} ACT TODAY job deals are missing a cover letter or CV\n\n${lines.join('\n')}`);
+      await telegram(`⚠️ Apply kit gap: ${gaps.length} of ${rows.length} ACT TODAY job deals are missing a cover letter or CV\n\n${lines.join('\n')}`);
     }
   }
 })().catch((e) => { console.error(e.message); process.exit(1); });

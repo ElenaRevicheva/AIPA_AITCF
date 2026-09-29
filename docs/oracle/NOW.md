@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 29 Sep 19:40 | VJH Himalayas source searched nothing (wrong endpoint ignores q; every job same URL/id) | VJH `src/autonomous/job_monitor.py` `_search_himalayas`, systemd `vibejobhunter` restart | 2cf2441 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,22 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🏔️ 29 Sep — VJH's Himalayas source had searched NOTHING; fixed · hand-staged jobs now in the queue + audit too
+
+- **DONE (VJH `06f6329`):** `_search_himalayas` called `/jobs/api`, which ignores `q`/`limit` → the 20 newest jobs on the whole
+  site every run; and read the link from `url`/`applyUrl` (Himalayas sends `applicationLink`) → every job had the same URL/id.
+  Now `/jobs/api/search`, 13 lane queries, 4 concurrent, 8 s cap, budget 20→40 s; location = Himalayas' real restriction
+  (97 of 240 are US-only — were labelled "worldwide").
+- **VERIFIED BY:** isolated run on Oracle 240 unique jobs / 1.0 s, both David Kennedy video jobs present; live after restart
+  `19:25:06 ✅ Himalayas: 240 jobs found (13/13 searches answered)`; pytest 669 passed, 2 failed = provider_chain claude
+  (DELIBERATE) + groq (HTTP 429 rate limit, external).
+- **DONE (cto-aipa):** `scripts/lib/hiring-deals.cjs` = the ONE definition of a job deal (VJH, or HIRING-MANUAL with the
+  📌 JOB POSTING mark). `apply-queue.cjs` + `hs-audit-apply-kit.cjs` use it → morning queue 9 jobs incl. 4 hand-staged;
+  audit 9 job deals. Deployed (backups `~/backups/pre-jobdeal-helper-20260929/`). Mid-Level video job staged + kitted.
+- **NOT changed on purpose:** `hs-attach-cv.cjs` (kit already attaches the lane CV) and `hs-park-stale-jobs.cjs` (age-parking
+  hand-picked jobs would hide Elena's own choices — ask her first).
+- **RISK:** Himalayas location tags can be wrong ("Mexico only" on a job whose recruiter lists Panama) — the description says so.
 
 ### 🧰 29 Sep — Hand-staged job deals now get the SAME kit as automatic ones (letter included)
 

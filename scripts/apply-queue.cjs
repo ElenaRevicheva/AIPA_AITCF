@@ -38,6 +38,7 @@ const path = require('path');
 const { hubspotKey, hubspotBase, envValue } = require(path.join(__dirname, 'hs-env.cjs'));
 const { BRIEF_MARK, createResearcher, decodeSafe } = require(path.join(__dirname, 'lib', 'company-research.cjs'));
 const { checkAll } = require(path.join(__dirname, 'lib', 'posting-state.cjs'));
+const { jobDealFilterGroups, isJobDeal } = require(path.join(__dirname, 'lib', 'hiring-deals.cjs'));
 
 /**
  * COMET_PROFILE — the standing answers an ATS form asks every single time.
@@ -136,10 +137,8 @@ async function hs(url, init = {}) {
   const search = await hs(`${base}/crm/v3/objects/deals/search`, {
     method: 'POST',
     body: JSON.stringify({
-      filterGroups: [{ filters: [
-        { propertyName: 'dealstage', operator: 'EQ', value: STAGE },
-        { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: '*HIRING-VJH*' },
-      ] }],
+      // VJH deals AND hand-staged jobs (29 Sep 2026) — recruiter-outreach deals are dropped below.
+      filterGroups: jobDealFilterGroups(STAGE),
       properties: ['dealname', 'createdate', 'hs_object_id'],
       sorts: [{ propertyName: 'createdate', direction: 'DESCENDING' }],
       limit: Math.min(LIMIT, 100),
@@ -153,13 +152,14 @@ async function hs(url, init = {}) {
     const assoc = await hs(`${base}/crm/v3/objects/deals/${d.id}/associations/notes?limit=20`);
     const ids = (assoc.results || []).map((r) => r.toObjectId || r.id).filter(Boolean);
     let note = { url: '', source: '', score: '', letter: '', boilerplate: false, thin: '' };
-    let defense = false, brief = false;
+    let defense = false, brief = false, bodies = [];
     if (ids.length) {
       const batch = await hs(`${base}/crm/v3/objects/notes/batch/read`, {
         method: 'POST',
         body: JSON.stringify({ properties: ['hs_note_body', 'hs_timestamp'], inputs: ids.map((id) => ({ id })) }),
       });
       // 28 Sep 2026: new deals carry a tailored CV + technical-defense note (hs-fill-apply-kit.cjs).
+      bodies = (batch.results || []).map((n) => n.properties.hs_note_body || '');
       defense = (batch.results || []).some((n) => /TECHNICAL DEFENSE/.test(n.properties.hs_note_body || ''));
       const isBrief = (n) => strip(n.properties.hs_note_body).includes(BRIEF_MARK);
       brief = (batch.results || []).some(isBrief);
@@ -177,6 +177,7 @@ async function hs(url, init = {}) {
         if (!note.letter && p.letter) { note.letter = p.letter; note.boilerplate = p.boilerplate; note.thin = p.thin; }
       }
     }
+    if (!isJobDeal(d.properties.dealname, bodies)) continue; // a recruiter-outreach deal, not a job
     const raw = d.properties.dealname || '';
     const prefix = (raw.match(/^\[([^\]]+)\]/) || [])[1] || '';
     const titleCompany = raw.replace(/^\[[^\]]+\]\s*/, '');
