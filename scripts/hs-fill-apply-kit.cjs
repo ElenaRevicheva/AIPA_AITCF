@@ -56,6 +56,8 @@ const APPLY = process.argv.includes('--apply');
 // assembled by SELECTION from verified material (scripts/lib/job-tailor.cjs). Deals created before
 // DEFENSE_SINCE are left alone unless --backfill (or --only=<dealId>) says otherwise.
 const DEFENSE_MARK = '🛡️ TECHNICAL DEFENSE';
+// Opt-in for a hand-staged [HIRING-MANUAL] job deal: a note line "📌 JOB POSTING: <code>url</code>".
+const JOB_MARK = '📌 JOB POSTING';
 const DEFENSE_SINCE = new Date('2026-09-28T00:00:00Z');
 const BACKFILL = process.argv.includes('--backfill');
 const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').split('=')[1] || '';
@@ -197,10 +199,10 @@ async function briefPass(d, bodies, title, company) {
 (async () => {
   if (!HS) { console.log('ABORT — HUBSPOT_API_KEY missing'); process.exit(1); }
   const search = await hs('POST', '/crm/v3/objects/deals/search', {
-    filterGroups: [{ filters: [
+    filterGroups: ['*HIRING-VJH*', '*HIRING-MANUAL*'].map((value) => ({ filters: [
       { propertyName: 'dealstage', operator: 'EQ', value: STAGE },
-      { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value: '*HIRING-VJH*' },
-    ] }],
+      { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value },
+    ] })),
     properties: ['dealname', 'createdate'],
     limit: 100,
   });
@@ -221,6 +223,11 @@ async function briefPass(d, bodies, title, company) {
         ? (await hs('POST', '/crm/v3/objects/notes/batch/read', { properties: ['hs_note_body'], inputs: ids.map((id) => ({ id })) })).results || []
         : [];
       const bodies = notes.map((n) => n.properties.hs_note_body || '');
+      // A hand-staged job (29 Sep 2026: Allied Revenue was staged by hand and got no CV or defense) joins
+      // only when a note carries JOB_MARK. [HIRING-MANUAL] also names recruiter-outreach deals, and a CV
+      // headed with a recruiter's name is worse than none. Manual deals bring their own material: no letter.
+      const manual = /HIRING-MANUAL/.test(d.properties.dealname);
+      if (manual && !bodies.some((b) => text(b).includes(JOB_MARK))) continue;
       // The brief carries no link by design; skipping it here too means a future edit to it can never
       // hand a source page to the letter generator as "the posting".
       const jobUrl = bodies.filter((b) => !text(b).includes(BRIEF_MARK)).map(jobUrlOf).find(Boolean);
@@ -229,6 +236,7 @@ async function briefPass(d, bodies, title, company) {
       // Defense first: new deals arrive WITH a letter, so it must not sit behind the letter skip.
       try { defense[await defensePass(d, bodies, title, company, jobUrl)]++; }
       catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
+      if (manual) continue;
       if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) { ok++; continue; }
 
       let drafted = await generateCoverLetter({ jobTitle: title, company, jobUrl });

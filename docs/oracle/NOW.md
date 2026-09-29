@@ -138,6 +138,10 @@ git log keeps the record.
 - **VERIFIED BY:** VJH log 25 Sep 01:06 — found, scored 64, then `judge VETO … US Mountain Time incompatible with UTC-5`
   → discarded. 9–5 MDT = 10–18 Panama. Another data point for the judge RISK below.
 - **RISK:** gaps are real (no 3+ yrs RevOps, no external B2B clients, no Clay/Instantly/Salesforce) — never claim them.
+- **TRAP (fixed 29 Sep):** the apply kit (tailored CV + 🛡️ defense + 🔎 brief) only saw `*HIRING-VJH*` deals, so this
+  hand-staged deal got none. `hs-fill-apply-kit.cjs` now also takes `[HIRING-MANUAL]` deals at I Act TODAY **that carry
+  a `📌 JOB POSTING: <code>url</code>` note line** (recruiter-outreach deals share the prefix and must stay out); no
+  letter for manual deals. Staging a job by hand = add that line, then `--apply --only=<dealId>` on Oracle.
 
 ### 🎭 28 Sep — Bogomolov poet note staged one-click in HubSpot, NOT sent (Elena's move)
 
