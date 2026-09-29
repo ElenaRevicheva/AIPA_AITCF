@@ -1,0 +1,22 @@
+SUBJECT: Senior AI Video Producer — Elena Revicheva (portfolio: 8 AI films)
+
+Hello David Kennedy Recruitment team,
+
+I am applying for the Senior AI Video Producer role. My portfolio is eight published AI films, each made end to end, from concept and prompting through edit, mix and release: https://atuona.xyz/aifilmstudio/
+
+The newest, Crimson Escape (3:36, 16 shots), shows how I work:
+
+- Engine choice by test, not habit. I ran the same keyframe through six video models (Wan 2.7, Grok Imagine 1.5, HappyHorse, Veo 3.1 Fast, Kling 3.0 Omni, Seedance 2.5) and cast them by shot type: Wan for emotional close-ups, Grok for wide shots.
+- Character consistency. Each of the two leads is fixed by one reference portrait, and every keyframe is generated from it, so the same two people carry the whole film.
+- Finishing to delivery. Directed voice lines, music chosen by measurement, loudness mastered to -15.7 LUFS, retiming with motion interpolation where a performance felt rushed, and shots re-rendered when a detail read wrong on review.
+- Budget control. The pipeline prices every job before it runs and stops at a hard cap; the finished film cost about $18 in generation.
+
+The register of my work is adult: sensual, luxurious, underground. I am comfortable with explicit NSFW content and with Companion Mode work.
+
+I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions. That is also why I built the production machinery behind the films: a bot that drives 12 video engines and 13 image engines from one command, and the compile scripts that assemble each cut. I work autonomously, write down what I learn, and would bring that habit to your R&D team.
+
+I am based in Panama (UTC-5) and available for a full-time freelance engagement.
+
+Best regards,
+Elena Revicheva
+https://atuona.xyz/aifilmstudio/ · https://aideazz.xyz/portfolio

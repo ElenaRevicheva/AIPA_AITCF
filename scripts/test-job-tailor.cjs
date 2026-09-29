@@ -74,5 +74,11 @@ check('"KPIs" (plural) still counts as KPI',
 check('"creative problem solving" does not pull the film answer',
   !t.pickDefense({ title: 'AI Engineer', jd: 'creative problem solving, generative AI' }, bank).some((e) => e.id === 'creative'));
 
+// ── creative lane: the films always lead (29 Sep, a real "AI Video Producer" posting scored film 1) ──
+check('creative job with only generic studio words still puts the films first',
+  t.tailorJob({ title: 'AI Video Producer - Senior-Level', company: 'X',
+    jd: 'Own AI video production. Prompting workflows, generative tools, image model pipeline, production automation, budget.',
+    ...lane('creative') }).order[0] === 'film');
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

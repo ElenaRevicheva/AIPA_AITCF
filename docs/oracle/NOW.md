@@ -130,6 +130,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎬 29 Sep — Senior AI Video Producer (David Kennedy Recruitment, explicit/Companion Mode): full kit staged, NOT applied (Elena's move)
+
+- **DONE:** deal 65474651953 at I Act TODAY: posting + gaps note, hand-written letter, kit 🛡️ defense + brief, video-specific
+  defense, HIGH task. Files `docs/applications/2026-09-29_david_kennedy_ai_video_producer_*`. Elena is OK with explicit
+  content (her call, 29 Sep). Never claim 4 yrs video, Premiere/AE, ComfyUI.
+- **FIXED:** `job-tailor.cjs` — a creative-lane job always leads with the films (this posting scored film 1 on narrow tags
+  and the CV shipped without the 8 films). Test added, 28/28, deployed to Oracle; this CV rebuilt films-first and swapped
+  onto the defense note (`CV_Elena_Revicheva_Senior_AI_Video_Producer.pdf` — new name: the uploader REUSES a same-named file).
+- **TRAPS:** (1) any note containing the text `🛡️ TECHNICAL DEFENSE` makes the kit think the defense exists — never quote
+  that mark in a hand-written note. (2) The generator's letter for a creative job was generic and claimed "leading teams" —
+  creative letters stay hand-written from FILM8 facts.
+
 ### 💳 29 Sep — $100 "Quick AI Growth Operator Diagnostic" LIVE before the $200 audit (EN + ES) + paid orders now reach HubSpot
 
 - **Flow (Elena's):** client pays $100 on `/pay/analisis-tecnico` (3-question intake: website, how customers reach them, typical sale)

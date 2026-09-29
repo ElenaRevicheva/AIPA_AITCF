@@ -93,7 +93,10 @@ function tailorJob({ title, company, jd, lane, laneHeadline }) {
     k, score: hits(text, PROJECT_TAGS[k]), rank: base.includes(k) ? base.indexOf(k) : 99,
   }));
   scored.sort((a, b) => b.score - a.score || a.rank - b.rank);
-  const order = scored.slice(0, 3).map((x) => x.k);
+  let order = scored.slice(0, 3).map((x) => x.k);
+  // A creative-lane job is judged on the portfolio, so the films always lead (29 Sep 2026: an "AI Video
+  // Producer" posting scored film 1 on narrow tags and the CV shipped without the eight films).
+  if (lane === 'creative') order = ['film', ...scored.map((x) => x.k).filter((k) => k !== 'film')].slice(0, 3);
   const tagline = String(laneHeadline || '').split(' — ').slice(1).join(' — ');
   const head = cleanTitle(title) || String(laneHeadline || '').split(' — ')[0];
   return {
