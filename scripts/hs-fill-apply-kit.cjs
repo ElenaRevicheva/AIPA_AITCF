@@ -42,7 +42,7 @@ try {
 const os = require('os');
 const { execFileSync } = require('child_process');
 const { uploadOutreachFile, addNoteAttachments } = require(path.join(__dirname, 'hs-files.cjs'));
-const { generateCoverLetter, fetchJobDescription } = require(path.join(ROOT, 'dist/cover-letter.js'));
+const { generateCoverLetter, fetchJobDescription, generateRoleDefense } = require(path.join(ROOT, 'dist/cover-letter.js'));
 const tailor = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
 // ── Company brief (28 Sep 2026, Elena: "the HubSpot deal stays the source of truth, always fresh") ──
 // The Perplexity brief used to live only inside the morning HTML page. Now every ACT-TODAY hiring deal
@@ -180,6 +180,44 @@ async function defensePass(d, bodies, title, company, jobUrl) {
   return cvPath ? 'added' : 'added-no-cv';
 }
 
+// ── 🎯 ROLE DEFENSE (29 Sep 2026, Elena: "profound, not generic, tech savvy but still clear for me … on the go,
+// no matter laptop or cell"). The 🛡️ note is keyword-picked from a fixed bank; this one is written for THIS posting
+// from verified facts only (generateRoleDefense rejects any number not in the evidence). It is also the phone card:
+// it opens with the clickable apply link and says where the letter and the tailored CV are. Every job deal, no date gate.
+const ROLE_MARK = '🎯 ROLE DEFENSE';
+async function rolePass(d, bodies, title, company, jobUrl) {
+  if (bodies.some((b) => text(b).includes(ROLE_MARK))) return 'had';
+  if (!jobUrl) return 'nolink';
+  let jd = '';
+  try { jd = await fetchJobDescription(jobUrl); } catch { jd = ''; }
+  if (jd.length < 200) jd = (await renderPosting(jobUrl)) || jd;
+  const bank = tailor.loadBank().entries
+    .map((e) => `Q: ${e.q}\nA: ${e.a}${e.push ? `\nIf pushed: ${e.push}` : ''}`).join('\n\n');
+  const r = await generateRoleDefense({ jobTitle: title, company, jd, bank });
+  if (!r.defense) { console.log(`  ✖ role ${company.slice(0, 22).padEnd(24)} ${title.slice(0, 40)} — ${r.reason}`); return 'failed'; }
+  const { pitch, questions, gaps } = r.defense;
+  const html = [
+    `<strong>${ROLE_MARK} — ${esc(title)} @ ${esc(company)}</strong>`,
+    `<p>📱 <a href="${esc(jobUrl)}"><strong>👉 APPLY HERE</strong></a> · letter: the ✅ READY TO SEND note · tailored CV: attached to the 🛡️ note</p>`,
+    pitch ? `<p><em>Why you, in one line:</em> ${esc(pitch)}</p>` : '',
+    '<p><strong>Questions THIS posting will raise</strong></p>',
+    ...questions.map((x, i) => `<p><strong>${i + 1}. ${esc(x.q)}</strong>${x.why ? `<br><em>(because: ${esc(x.why)})</em>` : ''}<br>${esc(x.a)}</p>`),
+    gaps.length ? '<p><strong>Honest gaps — say it before they find it</strong></p>' : '',
+    ...gaps.map((g) => `<p>⚠️ <strong>They ask: ${esc(g.posting_line)}</strong><br>${esc(g.say)}</p>`),
+    `<p><em>Written for this posting from verified facts only (${esc(r.provider || 'llm')}); any number not in the facts is rejected in code.</em></p>`,
+  ].filter(Boolean).join('');
+  if (APPLY) {
+    await hs('POST', '/crm/v3/objects/notes', {
+      properties: { hs_note_body: html, hs_timestamp: new Date().toISOString() },
+      associations: [{ to: { id: d.id }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] }],
+    });
+  } else {
+    console.log(html.replace(/<\/p>/g, '\n').replace(/<br>/g, '\n').replace(/<[^>]+>/g, '').slice(0, 12000));
+  }
+  console.log(`  ${APPLY ? '🎯 added' : '· would add'} role ${company.slice(0, 22).padEnd(24)} ${title.slice(0, 40).padEnd(42)} q=${questions.length} gaps=${gaps.length}`);
+  return 'added';
+}
+
 /** 🔎 COMPANY BRIEF note for one deal. No date gate: briefs are cached and cost ~$0.005 per new company. */
 async function briefPass(d, bodies, title, company) {
   if (bodies.some((b) => text(b).includes(BRIEF_MARK))) return 'had';
@@ -212,6 +250,7 @@ async function briefPass(d, bodies, title, company) {
   let ok = 0, wrote = 0, unreadable = 0, failed = 0;
   const defense = { added: 0, 'added-no-cv': 0, had: 0, old: 0, failed: 0 };
   const brief = { added: 0, had: 0, none: 0, failed: 0 };
+  const role = { added: 0, had: 0, nolink: 0, failed: 0 };
   const cvIds = new Map();
   for (const d of deals) {
     if (ONLY && String(d.id) !== ONLY) continue;
@@ -237,6 +276,8 @@ async function briefPass(d, bodies, title, company) {
       // Defense first: new deals arrive WITH a letter, so it must not sit behind the letter skip.
       try { defense[await defensePass(d, bodies, title, company, jobUrl)]++; }
       catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
+      try { role[await rolePass(d, bodies, title, company, jobUrl)]++; }
+      catch (e) { role.failed++; console.log(`  ✖ role ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
       if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) { ok++; continue; }
 
       let drafted = await generateCoverLetter({ jobTitle: title, company, jobUrl });
@@ -279,6 +320,7 @@ async function briefPass(d, bodies, title, company) {
   console.log(`  already had a letter ${ok} · ${APPLY ? 'wrote' : 'would write'} ${wrote} · posting unreadable ${unreadable} · failed ${failed}`);
   console.log(`  defense: ${APPLY ? 'added' : 'would add'} ${defense.added} (+${defense['added-no-cv']} without a CV) · already had ${defense.had}`
     + ` · older than ${DEFENSE_SINCE.toISOString().slice(0, 10)} ${defense.old} · failed ${defense.failed}`);
+  console.log(`  role defense: ${APPLY ? 'added' : 'would add'} ${role.added} · already had ${role.had} · no apply link ${role.nolink} · failed ${role.failed}`);
   researcher.save();
   const rs = researcher.stats;
   console.log(`  brief: ${APPLY ? 'added' : 'would add'} ${brief.added} · already had ${brief.had} · nothing found ${brief.none}`

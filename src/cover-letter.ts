@@ -300,3 +300,192 @@ export async function generateCoverLetter(input: {
     };
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// ROLE DEFENSE (29 Sep 2026, Elena: "profound, not generic, tech savvy but still clear for me").
+// The 🛡️ note picks from an 18-answer bank by keyword, so every deal got the same few questions.
+// This asks a model which questions THIS posting will raise and answers them from the verified
+// facts + the bank ONLY. Guarded in CODE, because the first dry run (gpt-4o-mini) invented
+// "I track audience engagement", misstated her budget control and made up a degree requirement:
+//   · every answer must quote the evidence line it rests on — verbatim, checked as a substring;
+//   · every gap must quote the posting line it answers — verbatim, checked the same way;
+//   · a number in an answer that is not in the evidence rejects the draft;
+//   · "alone" language or a team-leadership claim rejects the draft.
+// Model: ROLE_DEFENSE_MODEL (default gpt-4.1) called directly — the quality chain lands on
+// gpt-4o-mini while Claude has no credits, and that is too shallow for this job.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+export interface RoleDefense {
+  pitch: string;
+  questions: { q: string; why: string; a: string; evidence: string[] }[];
+  gaps: { posting_line: string; say: string }[];
+}
+
+const numbersIn = (s: string): string[] =>
+  (s.match(/\d[\d,.]*\d|\d/g) || []).map((n) => n.replace(/[.,]$/, '').replace(/,/g, ''));
+
+/** Numbers in `text` that do not appear in `evidence`. */
+export function ungroundedNumbers(text: string, evidence: string): string[] {
+  const allowed = new Set(numbersIn(evidence));
+  return [...new Set(numbersIn(text))].filter((n) => !allowed.has(n));
+}
+
+/** Loose-but-honest substring test: case, spacing, quote and dash styles do not matter; words do. */
+export function norm(s: string): string {
+  return String(s || '').toLowerCase()
+    .replace(/[‘’“”"'`]/g, '').replace(/[–—-]/g, ' ')
+    .replace(/[^a-z0-9%$.,/ ]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+export function quotedIn(quote: string, source: string): boolean {
+  const src = norm(source);
+  const q = norm(quote);
+  if (q.length >= 12 && src.includes(q)) return true;
+  // A model sometimes re-types a short section label in front of an exact fact ("CREATIVE: directs…").
+  // Drop a leading label of up to 60 characters ending in ':' and test the fact itself.
+  const m = String(quote || '').match(/^[^:]{1,60}:\s*([\s\S]+)$/);
+  const rest = m && m[1] ? norm(m[1]) : '';
+  return rest.length >= 12 && src.includes(rest);
+}
+
+async function openaiJson(system: string, user: string, modelOverride?: string): Promise<{ text: string; provider: string }> {
+  const key = (process.env.OPENAI_API_KEY || '').trim();
+  const model = (modelOverride || process.env.ROLE_DEFENSE_MODEL || 'gpt-4.1').trim();
+  if (!key) throw new Error('no OPENAI_API_KEY');
+  // Reasoning models (gpt-5, o-series) reject `temperature`.
+  const reasoning = /^(gpt-5|o\d)/.test(model);
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ model, ...(reasoning ? {} : { temperature: 0.2 }), response_format: { type: 'json_object' },
+      messages: [{ role: 'system', content: system }, { role: 'user', content: user }] }),
+    signal: AbortSignal.timeout(reasoning ? 240_000 : 90_000),
+  });
+  const j = (await r.json()) as { choices?: { message?: { content?: string } }[]; error?: { message?: string } };
+  if (!r.ok) throw new Error(`openai ${r.status}: ${j.error?.message || ''}`.slice(0, 160));
+  return { text: j.choices?.[0]?.message?.content || '', provider: `openai:${model}` };
+}
+
+export async function generateRoleDefense(input: {
+  jobTitle: string;
+  company: string;
+  jd: string;
+  bank: string;
+}): Promise<{ defense: RoleDefense | null; provider?: string; reason?: string }> {
+  const jd = String(input.jd || '').slice(0, MAX_JD_CHARS);
+  if (jd.length < MIN_JD_CHARS) return { defense: null, reason: `posting too short (${jd.length} chars)` };
+  // Internal routing labels ("CREATIVE (use for …):") are for the letter prompt, not facts to quote.
+  const evidence = `${VERIFIED_FACTS.replace(/^- CREATIVE[^:]*:\s*/gm, '- ')}\n\n${input.bank}`;
+
+  const system = [
+    'You prepare a candidate for an interview for ONE specific job. Truth beats polish.',
+    'The EVIDENCE is about the candidate; the POSTING is about the job. Never quote the POSTING as evidence. If the evidence cannot answer a question, do not ask that question.',
+    'Use ONLY the EVIDENCE about the candidate. Never invent a tool, employer, client, metric, habit, number, year or result.',
+    'For every answer, copy into "evidence" the exact sentence(s) from EVIDENCE it rests on, word for word. An answer you cannot back with a verbatim quote must not be written — turn it into a gap instead.',
+    'Requirements: list EVERY requirement the POSTING states (requirements, qualifications, "who you are", must-haves), each copied word for word into "posting_line". Never add one the posting does not state. For each, put in "met_by" a verbatim EVIDENCE quote that proves she meets it, or "" if nothing in the evidence clearly does. Be strict: a related skill is not the requirement.',
+    'Every number you write must appear in the EVIDENCE. Never claim she leads, manages or builds teams. Never describe her as working alone or solo.',
+    'Depth: each answer = what she did, how it works in plain words (the mechanism), the verified result, and what it means for THIS job. 3-5 short sentences.',
+    'Clarity: she reads this on a phone before a call. Short sentences, plain words; explain a technical term in a few words the first time.',
+    'Everything she will SAY (pitch, answers, gap answers) is in the first person ("I"), never "she".',
+    'Return one JSON object only.',
+  ].join('\n');
+  const user = [
+    `JOB: ${input.jobTitle} at ${input.company}`,
+    '', 'POSTING:', jd,
+    '', 'EVIDENCE ABOUT THE CANDIDATE (the only source):', evidence,
+    '',
+    'Return: {"pitch": "one sentence, why she fits THIS role, from the evidence",',
+    ' "questions": [{"q": "a question THIS posting makes an interviewer ask - name its duty, tool or domain",',
+    '   "why": "the posting phrase that triggers it", "a": "her first-person answer", "evidence": ["verbatim quote from EVIDENCE", "..."]}],',
+    ' "requirements": [{"posting_line": "verbatim requirement from the POSTING", "met_by": "verbatim EVIDENCE quote, or empty",',
+    '   "say": "if not met: her honest first-person line - name the gap plainly, then the nearest real thing she has done"}]}',
+    'Give 5 questions, the most specific to this posting first, and every stated requirement.',
+  ].join('\n');
+
+  let lastReason = '';
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const u = attempt ? `${user}\n\nYour previous draft was rejected: ${lastReason}. Fix exactly that.` : user;
+      let out: { text: string; provider: string };
+      try { out = await openaiJson(system, u); }
+      catch { out = await completeWithProfileDetailed('quality', system, u, 2400, 'role-defense'); }
+      const raw = out.text.trim();
+      if (process.env.ROLE_DEBUG) console.log(`[role-defense attempt ${attempt}] ${lastReason}\n${raw.slice(0, 6000)}`);
+      const j = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)) as RoleDefense;
+      const problems: string[] = [];
+      const questions = (j.questions || []).filter((x) => x && x.q && x.a).slice(0, 6).filter((x) => {
+        const quotes = (x.evidence || []).filter(Boolean);
+        const bad = quotes.filter((qq) => !quotedIn(qq, evidence));
+        if (!quotes.length || bad.length) {
+          problems.push(`answer "${x.q.slice(0, 50)}" has ${quotes.length ? 'a quote not in the evidence: ' + String(bad[0]).slice(0, 60) : 'no evidence quote'}`);
+          return false;
+        }
+        return true;
+      });
+      // A requirement counts as MET only when its quote really is in the evidence — code decides, not
+      // the model's optimism (gpt-4.1 twice returned "no gaps" for a posting whose first requirement
+      // she does not meet). Everything else is a gap, and a gap needs an honest line to say.
+      type Req = { posting_line?: string; met_by?: string; say?: string };
+      const reqs = ((j as unknown as { requirements?: Req[] }).requirements || []).filter((r) => r && r.posting_line);
+      const gaps: { posting_line: string; say: string }[] = [];
+      const claimedMet: { line: string; proof: string }[] = [];
+      const HONEST = 'Say plainly that I have not done this yet, then name the nearest real thing I have done.';
+      for (const r of reqs) {
+        const line = String(r.posting_line);
+        if (!quotedIn(line, jd)) { problems.push(`requirement "${line.slice(0, 50)}" is not a line of the posting`); continue; }
+        if (r.met_by && quotedIn(r.met_by, evidence)) { claimedMet.push({ line, proof: String(r.met_by) }); continue; }
+        gaps.push({ posting_line: line, say: String(r.say || HONEST) });
+      }
+      if (!reqs.length) problems.push('no requirements listed — list every requirement the posting states');
+      if (questions.length < (attempt < 2 ? 4 : 3)) { lastReason = `only ${questions.length} grounded answers. ${problems.slice(0, 3).join('; ')}`; continue; }
+      // A dropped item is a silent loss (a whole honest gap vanished this way on the first real run):
+      // retry with the exact problem; only the last attempt keeps just what verified.
+      if (problems.length && attempt < 2) {
+        lastReason = `${problems.slice(0, 4).join('; ')}. Quotes must be copied character for character`;
+        continue;
+      }
+      const spoken = [j.pitch || '', ...questions.map((x) => x.a), ...gaps.map((x) => x.say)].join('\n');
+      const badNums = ungroundedNumbers(spoken, evidence);
+      if (badNums.length) { lastReason = `numbers not in the evidence: ${badNums.join(', ')}`; continue; }
+      if (describesHerAlone(spoken)) { lastReason = 'described her as working alone'; continue; }
+      if (/\b(led|lead|leading|managed|managing|built)\s+(a\s+|the\s+|my\s+)?team/i.test(spoken)) { lastReason = 'claimed team leadership'; continue; }
+
+      // INDEPENDENT REVIEW (gpt-5, a reasoning model — not the drafter grading itself). Quotes prove a
+      // sentence exists, not that the answer stays inside it: the drafter attached a real quote to "I call
+      // for a camera … I always weigh the cost", and marked "a filmmaker first … from somewhere real" as met
+      // by "directs generative AI films". The reviewer drops every answer with a claim the evidence does
+      // not support, and judges EVERY stated requirement met / not met, writing the honest line for gaps.
+      const allReqs = reqs.map((r) => String(r.posting_line)).filter((l) => quotedIn(l, jd));
+      let kept = questions, finalGaps = gaps, reviewer = '';
+      try {
+        const revSys = [
+          'You are a strict reviewer protecting a job candidate from saying anything untrue in an interview.',
+          'ANSWERS: an answer is supported only if EVERY claim in it (actions, habits, methods, results) is stated in the EVIDENCE. General reasoning she never evidenced ("I weigh the cost", "I track metrics") is NOT supported.',
+          'REQUIREMENTS: met only if the EVIDENCE states it explicitly. A related skill is not the requirement. Years, named software, on-set/agency/client/brand experience and domains must be explicit.',
+          'For every requirement NOT met, write "say": what she would SAY out loud, in natural first-person speech: "I haven\'t done X yet. What I have done is Y." — X is the requirement in plain words, Y the nearest real thing from the EVIDENCE. Never "I haven\'t claimed/stated". No number that is not in the EVIDENCE.',
+          'Return JSON only.',
+        ].join('\n');
+        const revUser = `EVIDENCE:\n${evidence}\n\nANSWERS:\n${questions.map((x, i) => `${i}. Q: ${x.q}\n   A: ${x.a}`).join('\n')}\n\nREQUIREMENTS:\n${allReqs.map((l, i) => `${i}. ${l}`).join('\n')}\n\nReturn {"answers":[{"i":0,"supported":true,"unsupported_claim":""}],"requirements":[{"i":0,"met":false,"say":""}]}`;
+        const rv = await openaiJson(revSys, revUser, (process.env.ROLE_REVIEW_MODEL || 'gpt-5').trim());
+        reviewer = rv.provider;
+        const rj = JSON.parse(rv.text.slice(rv.text.indexOf('{'), rv.text.lastIndexOf('}') + 1)) as {
+          answers?: { i: number; supported: boolean; unsupported_claim?: string }[];
+          requirements?: { i: number; met: boolean; say?: string }[];
+        };
+        const dropped = (rj.answers || []).filter((a) => a.supported === false);
+        kept = questions.filter((_, i) => !dropped.some((d) => d.i === i));
+        if (kept.length < 3) {
+          lastReason = `answers made claims the evidence does not support: ${dropped.map((d) => d.unsupported_claim).filter(Boolean).slice(0, 3).join('; ')}. Answer only with what the evidence states`;
+          continue;
+        }
+        finalGaps = (rj.requirements || []).filter((r) => r.met === false && allReqs[r.i]).map((r) => {
+          const say = String(r.say || HONEST);
+          return { posting_line: allReqs[r.i] as string, say: ungroundedNumbers(say, evidence).length ? HONEST : say };
+        });
+      } catch { /* reviewer unavailable: keep the mechanically checked draft rather than drop the note */ }
+      return { defense: { pitch: String(j.pitch || ''), questions: kept.slice(0, 5), gaps: finalGaps },
+        provider: reviewer ? `${out.provider} + review ${reviewer}` : out.provider };
+    } catch (e) {
+      lastReason = (e instanceof Error ? e.message : String(e)).slice(0, 160);
+    }
+  }
+  return { defense: null, reason: lastReason };
+}
