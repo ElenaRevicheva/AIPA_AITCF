@@ -296,7 +296,7 @@ LANES = {
             'I run my own sales operation in HubSpot and automate it end to end: deals, companies, '
             'contacts, notes and tasks written by agents through the API, pipeline stages named for '
             'who acts next, and one-click approved sends that move the deal, close the task and book '
-            'the follow-up by themselves. <b>1,900+ deals and 1,411 companies</b> in the portal I '
+            'the follow-up by themselves. <b>2,800+ deals and 2,100+ companies</b> in the portal I '
             'administer. I document every workflow so someone else can run it, and I audit it from '
             'live records, not from what the dashboard claims.',
     },

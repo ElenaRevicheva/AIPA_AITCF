@@ -245,7 +245,7 @@
         "pipeline management"
       ],
       "q": "Walk me through your CRM automation.",
-      "a": "My acquisition loop runs in production: research, qualify, draft, one human tap, send, then delivery and opens written back to HubSpot — 1,900+ deals so far. Every writer tags its deals with a source prefix, and a daily read-back audit re-reads HubSpot to prove the notes and attachments really landed.",
+      "a": "My acquisition loop runs in production: research, qualify, draft, one human tap, send, then delivery and opens written back to HubSpot — 2,800+ deals so far. Every writer tags its deals with a source prefix, and a daily read-back audit re-reads HubSpot to prove the notes and attachments really landed.",
       "push": "Why read back? — Because 'the API said OK' is not proof: reconciliation checks the result, not the request."
     },
     {

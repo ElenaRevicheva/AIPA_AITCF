@@ -22,7 +22,7 @@ right."* That is the whole NOW.md §4.3 discipline ("prove output, not that it r
 |---|---|
 | Strong HubSpot | Deals, contacts, companies, notes, tasks, associations, owners, Files API, stage automation — by API, daily |
 | 2+ related systems | Make (paid plan, live LLM workflow), Resend, Hunter (enrichment), Bright Data (search/scrape), Buffer |
-| LLM in business workflows, structured output, fallbacks, human review | Lead Concierge, grounding gates, Claude→Groq fallback, 131-test eval harness, drafts always go to a human |
+| LLM in business workflows, structured output, fallbacks, human review | Lead Concierge, grounding gates, 5-provider LLM fallback chain, 600+ check eval suite, drafts always go to a human |
 | APIs, webhooks, JSON, mapping | All of the above is her own API + webhook wiring |
 | Monitor, trace to source, verify the fix | July 16 fleet audit (below) |
 | Duplicates, deliverability | Near-duplicate detection (56/121 pages), dead-sender bounce fix |
@@ -38,6 +38,9 @@ right."* That is the whole NOW.md §4.3 discipline ("prove output, not that it r
 not years → worth 20 minutes. Odds honest: low-moderate. Salary floor cleared by a wide margin.
 
 ## Answer bank — paste and trim to the question asked
+
+_29 Sep review: "131 tests" (unverified, on CLAUDE.md's list) → 600+ checks (649 passing that day); "Claude→Groq" → the
+5-provider chain verified live 28 Sep (4 of 5 answer; Claude has no credits); an unverified "$0.03 a run" removed._
 
 Keep each answer 4–6 sentences. Numbers below are from logs/HubSpot, not memory.
 
@@ -61,8 +64,8 @@ confirmed in the receiving service's log. The lesson I apply since: check the de
 ### C. LLM workflow with structured output, validation, fallback and human review
 Our inbound lead workflow runs in Make: a new HubSpot contact triggers an LLM that drafts a reply, and the draft goes
 to a human in Telegram before anything is sent. No model output reaches a customer unreviewed. In our code, model calls
-fall back from Claude to Groq when the primary fails, and an evaluation suite of 131 tests across 4 layers checks the
-outputs for about $0.03 a run. For generated articles I added a grounding gate: every number must come from a
+walk a five-provider fallback chain (OpenAI, Gemini, Groq, Grok, Claude) when one fails, and an evaluation suite of
+600+ automated checks guards the scoring, routing and judge. For generated articles I added a grounding gate: every number must come from a
 collected evidence bundle or the paragraph is rejected. When the gate once fired four times in a row, the cause was
 the prompt itself carrying unverified figures, so I stripped numbers from the brief rather than loosening the gate.
 

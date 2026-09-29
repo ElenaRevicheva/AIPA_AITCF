@@ -64,7 +64,10 @@ const PROJECTS = {
   },
   loop: {
     title: 'Approved-send growth loop — HubSpot + Resend',
-    body: 'The acquisition loop I run in production: research, qualify, draft, one human tap, send, then delivery and open written back to the CRM. 1,900+ deals, 989 contacts, 1,411 companies attributed by the agents. Send is fail-closed: if a PDF or signed .docx fails to load, the email is refused so it cannot claim an attachment it did not carry.',
+    // 29 Sep 2026: counts from the live HubSpot API that day (2,870 deals · 1,371 contacts · 2,127
+    // companies), rounded down like the API block. Audit sentence: docs/interview/
+    // MICRO1_AI_WORKFLOW_SPECIALIST_PREP.md + the 16 Jul log-verified audit.
+    body: 'The acquisition loop I run in production: research, qualify, draft, one human tap, send, then delivery and open written back to the CRM. 2,800+ deals, 1,300+ contacts, 2,100+ companies attributed by the agents. Send is fail-closed: if a PDF or signed .docx fails to load, the email is refused so it cannot claim an attachment it did not carry. I audit the CRM from the receiving end, not the sender\'s log: that found a trial-signup → HubSpot integration silently broken since launch — 28 real users never recorded; root-caused, fixed, backfilled all 28.',
   },
   espaluz: {
     title: 'EspaLuz — paying WhatsApp / Telegram tutor',
