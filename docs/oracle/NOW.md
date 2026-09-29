@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 29 Sep 20:00 | every job deal fully stuffed: link + tailored letter + tailored CV + ROLE-specific defense; audit enforces it | `scripts/hs-fill-apply-kit.cjs`, `scripts/hs-audit-apply-kit.cjs`, `src/cover-letter.ts`, pm2 `cto-aipa` restart | 488676d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
