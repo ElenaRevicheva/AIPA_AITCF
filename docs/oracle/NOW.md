@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-09-29 16:45 | $100 diagnostic call SKU before the $200 audit (pay page + portfolio button) | cto-aipa `src/aideazz-service-catalog.ts`, `src/service-checkout.ts`, Oracle `dist/` of both + `pm2 restart cto-aipa`; aideazz `ServicePay.tsx`, `InquiryForm.tsx`, en/es locales | 7c8ebe6 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,19 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 💳 29 Sep — $100 "1:1 diagnostic call with Elena" is a PagueloFacil option, BEFORE the $200 audit (EN + ES)
+
+- **DONE:** new SKU `diagnostic_call` ($100) in `src/aideazz-service-catalog.ts` (cto-aipa `98e1098`, live on Oracle 16:42 UTC);
+  paid-email next step is per-SKU (call → "Elena will write to agree date and time"). Site (aideazz `1b70949`): portfolio/home
+  inquiry form shows the call button ABOVE the unchanged audit button; `/pay/analisis-tecnico` lists it first. $200/$500 untouched.
+- **VERIFIED BY:** Oracle dist md5 = local build (`23afd41…`, `cadc3ac…`), process start 16:42:38 > file 16:42:35;
+  public `/cto/api/service-catalog` lists `diagnostic_call 100`; live POST → PagueloFacil link, amount 100. Backup of the
+  previous two dist files: `~/backups/pre-diagnostic-call-20260929-1642/`. EspaLuz SVC forwarder is SKU-agnostic (no change).
+- **NEXT (Elena):** real test payment from aideazz.xyz/portfolio → expect Telegram "💳 Servicio pagado" + HubSpot
+  `[CLIENT-SERVICE-PAID]` deal + both emails. A pending order `5CA2DEE6…` named "INTERNAL LINK TEST" is my deploy check — not a client.
+- **RISK:** copy promises a live video call + a pre-call review of her site and AI answers; no duration and no credit toward the
+  audit promised — both are Elena's call. Paid-confirmation email is Spanish-only (pre-existing, same for the audits).
 
 ### 💼 29 Sep — Allied Revenue RevOps & GTM Systems Lead ($5–6k, remote): staged, NOT applied (Elena's move)
 
