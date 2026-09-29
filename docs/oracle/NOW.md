@@ -2696,7 +2696,8 @@ work. Port what you want by hand; never reset. The IMAP puller is now on `main`.
   through to `llm_chain.complete` before any template (proof: a generate-only run on Oracle → "generated via
   openai (waterfall)", 1,964 chars); reply detector has a 6h circuit breaker on "credit balance" and no longer
   drops to keywords without a Claude key. Test: `evals/test_provider_bypass.py`. Unverified "131 tests" claim
-  removed from the post prompt (600+ checks, measured). ⚠️ §4.3 owed: breaker trip line
+  removed from the post prompt (600+ checks, measured). ✅ **Live proof 29 Sep 01:00 UTC:** the daily post went out
+  "tech-update post generated via openai (waterfall)" → "LinkedIn post sent successfully!". ⚠️ §4.3 still owed: breaker trip line
   `skipping Claude for 6h` in the journal after the next reply check. Run `test_provider_chain` on
   ORACLE only: the laptop `.env` keys are stale and give false 401s.
 - **VJH outreach crash:** `[outreach] ERROR <company>: 'str' object has no attribute 'get'`
