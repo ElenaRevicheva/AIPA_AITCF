@@ -225,7 +225,8 @@ async function briefPass(d, bodies, title, company) {
       const bodies = notes.map((n) => n.properties.hs_note_body || '');
       // A hand-staged job (29 Sep 2026: Allied Revenue was staged by hand and got no CV or defense) joins
       // only when a note carries JOB_MARK. [HIRING-MANUAL] also names recruiter-outreach deals, and a CV
-      // headed with a recruiter's name is worse than none. Manual deals bring their own material: no letter.
+      // headed with a recruiter's name is worse than none. From then on a hand-staged job gets exactly what
+      // an automatic one gets — brief, tailored CV, defense AND the letter (Elena, 29 Sep 2026).
       const manual = /HIRING-MANUAL/.test(d.properties.dealname);
       if (manual && !bodies.some((b) => text(b).includes(JOB_MARK))) continue;
       // The brief carries no link by design; skipping it here too means a future edit to it can never
@@ -236,7 +237,6 @@ async function briefPass(d, bodies, title, company) {
       // Defense first: new deals arrive WITH a letter, so it must not sit behind the letter skip.
       try { defense[await defensePass(d, bodies, title, company, jobUrl)]++; }
       catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
-      if (manual) continue;
       if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) { ok++; continue; }
 
       let drafted = await generateCoverLetter({ jobTitle: title, company, jobUrl });

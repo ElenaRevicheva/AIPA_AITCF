@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 29 Sep 19:00 | hand-staged job deals = same kit as auto (letter too) + creative facts in the letter generator | `src/cover-letter.ts`, `scripts/hs-fill-apply-kit.cjs`, new `scripts/stage-manual-job.cjs`, pm2 `cto-aipa` restart | 3a36bb8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,19 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🧰 29 Sep — Hand-staged job deals now get the SAME kit as automatic ones (letter included)
+
+- **DONE:** `scripts/stage-manual-job.cjs --url= --title= --company= [--info=]` → `[HIRING-MANUAL] <title> @ <company>` at
+  I act TODAY with the `📌 JOB POSTING` opt-in + HIGH task. `hs-fill-apply-kit.cjs` now runs the LETTER pass for them too
+  (was brief + CV + defense only). Cron (every 2h) picks them up; `--apply --only=<id>` for now. Letter generator
+  (`src/cover-letter.ts`) gained 5 verified CREATIVE facts (FILM8) + a rule: never claim leading teams / unlisted tools or years.
+- **VERIFIED BY:** tests cover-letter 15/15, job-tailor 28/28; Oracle backup `~/backups/pre-manual-kit-20260929-1854/`;
+  `dist/cover-letter.js` 18:55:31 < pm2 cto-aipa 18:55:38, live page 200. First real run — Space Generative Filmmaker
+  (deal 65459691822): brief ✓, defense + CV `film/studio/api` ✓, letter ✓ (on-topic, no invented claims), read back from HubSpot.
+- **TRAPS:** a note containing "cover letter" or the 🛡️ defense mark = kit skips that step (stager refuses such --info).
+  Space's real application = 3 questions + rate, drafted in `docs/applications/2026-09-29_space_generative_filmmaker_ANSWERS.md`
+  — Q2 is Elena's to write.
 
 ### 🎬 29 Sep — Senior AI Video Producer (David Kennedy Recruitment, explicit/Companion Mode): full kit staged, NOT applied (Elena's move)
 

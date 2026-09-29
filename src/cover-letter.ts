@@ -53,6 +53,11 @@ const VERIFIED_FACTS = `
 - Writes and operates the observability around her own systems: incident write-ups, verification from production logs rather than configuration.
 - Former Deputy CEO; comfortable owning delivery, priorities and stakeholder communication, not only the code.
 - Portfolio and live systems: https://aideazz.xyz/portfolio
+- CREATIVE (use for film, video, generative-media or creative roles): directs generative AI films end to end, from concept and prompting through edit, mix and release. 8 published films: https://atuona.xyz/aifilmstudio/ . The latest, Crimson Escape, runs 3:36 from 16 generated shots, mastered to -15.7 LUFS.
+- CREATIVE: chooses video engines by a bake-off, not habit: the same keyframe and motion run on six models (Wan 2.7, Grok Imagine 1.5, HappyHorse, Veo 3.1 Fast, Kling 3.0 Omni, Seedance 2.5), then each cast by shot type (Wan for emotional close-ups, Grok for wide shots).
+- CREATIVE: keeps characters consistent across a film by fixing each lead with one reference portrait and generating every keyframe from it; re-renders a shot when a detail reads wrong on review.
+- CREATIVE: built the production machinery behind the films: a bot that drives a dozen video and a dozen image models from one command, with an LLM as director and a pre-render budget cap (Crimson Escape cost about $18 in generation).
+- CREATIVE: a poet (pen name Kira Velerevich): 99 poems in Russian and English, 46 published by the LITPROM editorial board; the films are made from them.
 `.trim();
 
 const MIN_JD_CHARS = 200;
@@ -243,6 +248,7 @@ export async function generateCoverLetter(input: {
     'HARD RULES:',
     '- Use ONLY the verified facts supplied about the candidate. Never invent an employer, a metric, a year, a technology or a credential.',
     '- If the job asks for something the candidate does not demonstrably have, do not claim it. Say nothing about it, or name the nearest thing she has actually done.',
+    '- Never claim she leads, manages or builds teams, and never name tools, editors or years of experience that are not in the facts.',
     '- No placeholders of any kind. The output is pasted as-is into an application form.',
     '- No flattery about the company, no "I am passionate about", no filler.',
     '- The second paragraph MUST contain her operating-model sentence exactly as given in the facts, word for word. Never describe her as working alone, solo or single-handed, and never apologise for or minimise her use of AI — it is how she works.',
