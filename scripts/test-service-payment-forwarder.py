@@ -10,7 +10,9 @@ import os
 import sys
 from unittest import mock
 
-os.environ.setdefault("INTERNAL_WEBHOOK_SECRET", "test")
+# Mirrors Oracle: the receiver's INTERNAL_WEBHOOK_SECRET is EspaLuz's own; CTO AIPA accepts OUTREACH_SECRET.
+os.environ["INTERNAL_WEBHOOK_SECRET"] = "espaluz-own"
+os.environ["OUTREACH_SECRET"] = "cto-accepts"
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "deploy", "espaluz-familybot"))
 import aideazz_service_payments as s  # noqa: E402
 
@@ -19,16 +21,23 @@ fails = 0
 
 
 class _Resp:
-    status_code = 200
-    text = "{}"
+    def __init__(self, code):
+        self.status_code = code
+        self.text = "{}" if code == 200 else '{"error":"Unauthorized"}'
 
     def json(self):
         return {"ok": True}
 
 
+auth_seen = []
+
+
 def _post(url, json=None, headers=None, timeout=None):
+    auth_seen.append(headers["Authorization"])
+    if headers["Authorization"] != "Bearer cto-accepts":
+        return _Resp(401)
     sent.append(json)
-    return _Resp()
+    return _Resp(200)
 
 
 def ok(cond, name):
@@ -61,6 +70,15 @@ with mock.patch.object(s.requests, "post", side_effect=_post):
 
     r = s.intercept_service_webhook(dict(paid, status=0, authStatus="05", messageSys="Declined"))
     ok(r.get("reason") == "not_approved", "declined AIdeazz payment is not forwarded as paid")
+
+    # 29 Sep 2026: the receiver sent its own INTERNAL_WEBHOOK_SECRET -> every call 401.
+    auth_seen.clear()
+    r = s.intercept_service_webhook(paid)
+    ok(r.get("processed") is True and auth_seen == ["Bearer cto-accepts"], "OUTREACH_SECRET (the shared one) is sent first")
+    auth_seen.clear()
+    with mock.patch.object(s, "_CTO_SECRETS", ["espaluz-own", "cto-accepts"]):
+        r = s.intercept_service_webhook(paid)
+    ok(r.get("processed") is True and len(auth_seen) == 2, "a 401 is retried once with the other secret")
 
 print(f"\nforwarder: {fails} failed")
 sys.exit(1 if fails else 0)

@@ -26,6 +26,17 @@ INTERNAL_SECRET = os.getenv("INTERNAL_WEBHOOK_SECRET", "").strip() or os.getenv(
     "OUTREACH_SECRET", ""
 ).strip()
 
+# CTO AIPA checks INTERNAL_WEBHOOK_SECRET, else OUTREACH_SECRET — in ITS own env. This
+# process's INTERNAL_WEBHOOK_SECRET is EspaLuz's own and differs (29 Sep 2026: every call
+# got 401). OUTREACH_SECRET is the one both hold; the other is tried once on a 401.
+_CTO_SECRETS = [
+    s
+    for s in dict.fromkeys(
+        [os.getenv("OUTREACH_SECRET", "").strip(), os.getenv("INTERNAL_WEBHOOK_SECRET", "").strip()]
+    )
+    if s
+]
+
 
 def _parse_svc_parm1(value: str) -> Optional[Dict[str, str]]:
     val = str(value or "").strip()
@@ -87,27 +98,31 @@ def intercept_service_webhook(payload: Dict[str, Any]) -> Optional[Dict[str, Any
             "order_id": parsed["order_id"],
         }
 
-    if not INTERNAL_SECRET:
+    if not _CTO_SECRETS:
         logger.error("Aideazz SVC: INTERNAL_WEBHOOK_SECRET / OUTREACH_SECRET missing")
         return {"processed": False, "reason": "no_internal_secret", "svc": True}
 
     try:
-        resp = requests.post(
-            CTO_INTERNAL_URL,
-            json={
-                "order_id": parsed["order_id"],
-                "cod_oper": cod_oper,
-                "sku": parsed["sku"],
-                "description": description[:300],
-                "total_pay": str(payload.get("totalPay") or payload.get("requestPayAmount") or ""),
-                "payer_email": str(payload.get("email") or ""),
-            },
-            headers={
-                "Authorization": f"Bearer {INTERNAL_SECRET}",
-                "Content-Type": "application/json",
-            },
-            timeout=20,
-        )
+        body_out = {
+            "order_id": parsed["order_id"],
+            "cod_oper": cod_oper,
+            "sku": parsed["sku"],
+            "description": description[:300],
+            "total_pay": str(payload.get("totalPay") or payload.get("requestPayAmount") or ""),
+            "payer_email": str(payload.get("email") or ""),
+        }
+        for secret in _CTO_SECRETS:
+            resp = requests.post(
+                CTO_INTERNAL_URL,
+                json=body_out,
+                headers={
+                    "Authorization": f"Bearer {secret}",
+                    "Content-Type": "application/json",
+                },
+                timeout=20,
+            )
+            if resp.status_code != 401:
+                break
         if resp.status_code == 200:
             body = resp.json()
             return {
