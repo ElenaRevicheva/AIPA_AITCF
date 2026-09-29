@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-09-29 17:40 | Diagnostic SKU v2: rename, after-payment automation, FIX paid orders never reaching HubSpot | cto-aipa `src/service-checkout.ts`, `src/aideazz-service-catalog.ts`, `src/hubspot-client.ts` (1 gate line), Oracle dist + `pm2 restart cto-aipa`; aideazz `ServicePay.tsx`, en/es locales | 8cf2e84 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
