@@ -130,6 +130,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 💼 29 Sep — Allied Revenue RevOps & GTM Systems Lead ($5–6k, remote): staged, NOT applied (Elena's move)
+
+- **DONE:** `[HIRING-MANUAL] RevOps & GTM Systems Lead — Allied Revenue` at I Act TODAY: note (apply link, examples,
+  honest gaps), CV_crm.pdf attached as a HubSpot file, HIGH task. Answer bank A–I:
+  `docs/applications/2026-09-29_allied_revenue_revops_gtm_lead.md`. No cover letter; Get on Board questions only.
+- **VERIFIED BY:** VJH log 25 Sep 01:06 — found, scored 64, then `judge VETO … US Mountain Time incompatible with UTC-5`
+  → discarded. 9–5 MDT = 10–18 Panama. Another data point for the judge RISK below.
+- **RISK:** gaps are real (no 3+ yrs RevOps, no external B2B clients, no Clay/Instantly/Salesforce) — never claim them.
+
 ### 🎭 28 Sep — Bogomolov poet note staged one-click in HubSpot, NOT sent (Elena's move)
 
 - **DONE:** `[ATUONA-ART] Theatre on Malaya Bronnaya — Konstantin Bogomolov — poet note (LITPROM)` deal + contact + note
