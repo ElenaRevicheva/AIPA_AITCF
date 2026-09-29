@@ -116,6 +116,21 @@ const ok = (cond, name) => {
     require('fs').readFileSync(path.join(__dirname, '..', 'src', 'diagnostic-delivery.ts'), 'utf8');
   ok(!/pushLeadToHubSpot\s*\(/.test(src), 'no paid-order path calls pushLeadToHubSpot()');
 
+  // ── which order a PagueloFacil payment belongs to (its webhook never echoes PARM_1) ──
+  const m = await import(dist('service-payment-match.js'));
+  const id = '5CA364BF84CA355AE063B858000A380F';
+  ok(m.orderRefFromDescription(`AIdeazz  Diagnstico rpido AI Growth Operator  Ref ${id}  AIdeazz AI Lab`) === id, 'Ref <id> survives the accent-stripped echo');
+  ok(m.orderRefFromDescription('AIdeazz  Diagnstico rpido AI Growth Operator  AIdeazz AI Lab') === null, 'no Ref (links before 29 Sep) → null');
+  ok(m.orderRefFromDescription(`Ref ${id.toLowerCase()}`) === id, 'lower-case hex normalised');
+  const cands = [
+    { id: 'A', client_email: 'aipa@aideazz.xyz' },
+    { id: 'B', client_email: 'Payer@Example.com' },
+  ];
+  ok(m.pickOrderForPayment(cands, 'payer@example.com').id === 'B', 'two candidates → the one with the payer email');
+  ok(m.pickOrderForPayment(cands, 'someone@example.com').id === null, 'two candidates, no email match → ambiguous, no guess');
+  ok(m.pickOrderForPayment([{ id: 'C', client_email: 'client@example.com' }], 'other@example.com').id === 'C', 'one candidate → it (payer may use another email at checkout)');
+  ok(m.pickOrderForPayment([], 'nobody@example.com').id === null, 'no candidate → null (Telegram alert, never silence)');
+
   if (process.argv.includes('--scan')) {
     const { runVisibilityAudit } = await import(dist('visibility-audit.js'));
     const target = process.argv[process.argv.indexOf('--scan') + 1] || 'https://aideazz.xyz';

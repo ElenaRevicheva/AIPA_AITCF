@@ -63,8 +63,15 @@ def intercept_service_webhook(payload: Dict[str, Any]) -> Optional[Dict[str, Any
         payload.get("PARM_1") or payload.get("parm_1") or payload.get("parm1") or ""
     ).strip()
     parsed = _parse_svc_parm1(parm)
+    description = str(payload.get("description") or payload.get("CDSC") or "").strip()
     if not parsed:
-        return None
+        # PagueloFacil never echoes PARM_1 in its webhook (29 Sep 2026, first real paid
+        # order). It does echo the description, accents stripped. Every AIdeazz service
+        # link's description starts with "AIdeazz" (EspaLuz's start with "EspaLuz"), and
+        # new ones carry "Ref <order id>" — CTO AIPA resolves the order from it.
+        if not description.lower().startswith("aideazz"):
+            return None
+        parsed = {"sku": "", "order_id": ""}
 
     cod_oper = str(payload.get("codOper") or payload.get("relatedTx") or "")
     if not cod_oper:
@@ -91,6 +98,9 @@ def intercept_service_webhook(payload: Dict[str, Any]) -> Optional[Dict[str, Any
                 "order_id": parsed["order_id"],
                 "cod_oper": cod_oper,
                 "sku": parsed["sku"],
+                "description": description[:300],
+                "total_pay": str(payload.get("totalPay") or payload.get("requestPayAmount") or ""),
+                "payer_email": str(payload.get("email") or ""),
             },
             headers={
                 "Authorization": f"Bearer {INTERNAL_SECRET}",

@@ -8,10 +8,13 @@ import {
   getServiceOrderById,
   markServiceOrderPaid,
   clientHasPaidSku,
+  findPendingServiceOrders,
+  findServiceOrderIdByCodOper,
 } from './database.js';
 import { getServiceProduct, listPublicServiceProducts, parseSvcParm1 } from './aideazz-service-catalog.js';
 import { createServicePaymentLink, pagueloFacilConfigured } from './paguelofacil-client.js';
 import { getResendApiKey } from './marketing-notify.js';
+import { orderRefFromDescription, pickOrderForPayment } from './service-payment-match.js';
 
 type CorsFn = (req: Request, res: Response, next: NextFunction) => void;
 type SiteCheckFn = (req: Request) => boolean;
@@ -238,25 +241,54 @@ export function registerServiceCheckoutRoutes(
     });
   });
 
-  /** Called from EspaLuz payments webhook (Python) after PagueloFacil approves SVC:* */
+  /**
+   * Called by the PagueloFacil webhook receiver on Oracle (Flask :5000, shared by every
+   * PagueloFacil payment on the account) once it recognises an AIdeazz service payment.
+   * With order_id when the description carried "Ref <id>"; without it for links created
+   * before that existed — then the order is matched by amount + payer email.
+   */
   app.post('/internal/service-paid', opts.internalAuth, async (req, res) => {
-    const { order_id, cod_oper, sku } = req.body as {
+    const { order_id, cod_oper, sku, total_pay, payer_email, description } = req.body as {
       order_id?: string;
       cod_oper?: string;
       sku?: string;
+      total_pay?: string | number;
+      payer_email?: string;
+      description?: string;
     };
-    if (!order_id || !cod_oper) {
-      res.status(400).json({ error: 'order_id and cod_oper required' });
+    if (!cod_oper) {
+      res.status(400).json({ error: 'cod_oper required' });
       return;
     }
 
-    const existing = await getServiceOrderById(order_id);
+    let orderId = String(order_id || '').trim() || orderRefFromDescription(description) || '';
+    if (!orderId) {
+      const already = await findServiceOrderIdByCodOper(cod_oper);
+      if (already) {
+        res.json({ ok: true, duplicate: true, order_id: already });
+        return;
+      }
+      const amount = Number(total_pay);
+      const candidates = Number.isFinite(amount) && amount > 0 ? await findPendingServiceOrders(amount) : [];
+      const pick = pickOrderForPayment(candidates, payer_email);
+      if (!pick.id) {
+        console.error(`[service-paid] UNMATCHED payment ${cod_oper} $${total_pay}: ${pick.reason}`);
+        notifyTelegramUnmatchedPayment({ cod_oper, total_pay, payer_email, description, reason: pick.reason }).catch(() => {});
+        res.status(404).json({ error: 'no_matching_order', reason: pick.reason });
+        return;
+      }
+      orderId = pick.id;
+      console.log(`[service-paid] payment ${cod_oper} matched order ${orderId} by ${pick.reason}`);
+    }
+    const order_id_resolved = orderId;
+
+    const existing = await getServiceOrderById(order_id_resolved);
     if (!existing) {
       res.status(404).json({ error: 'Order not found' });
       return;
     }
     if (existing.status === 'paid') {
-      res.json({ ok: true, duplicate: true, order_id });
+      res.json({ ok: true, duplicate: true, order_id: order_id_resolved });
       return;
     }
     if (sku && existing.sku !== sku) {
@@ -264,13 +296,13 @@ export function registerServiceCheckoutRoutes(
       return;
     }
 
-    const updated = await markServiceOrderPaid({ orderIdHex: order_id, pfCodOper: cod_oper });
+    const updated = await markServiceOrderPaid({ orderIdHex: order_id_resolved, pfCodOper: cod_oper });
     if (!updated) {
       res.status(500).json({ error: 'Failed to mark paid' });
       return;
     }
 
-    const order = await getServiceOrderById(order_id);
+    const order = await getServiceOrderById(order_id_resolved);
     if (order) {
       setImmediate(() => {
         sendServicePaidEmails(order).catch(() => {});
@@ -292,8 +324,32 @@ export function registerServiceCheckoutRoutes(
       });
     }
 
-    res.json({ ok: true, order_id });
+    res.json({ ok: true, order_id: order_id_resolved });
   });
+}
+
+async function notifyTelegramUnmatchedPayment(p: {
+  cod_oper: string;
+  total_pay?: string | number | undefined;
+  payer_email?: string | undefined;
+  description?: string | undefined;
+  reason: string;
+}) {
+  const msg = [
+    '⚠️ PagueloFacil payment received but NOT matched to an order',
+    `$${p.total_pay ?? '?'} · ${p.payer_email || 'no email'} · ${p.cod_oper}`,
+    p.description ? `"${p.description.slice(0, 120)}"` : '',
+    `Why: ${p.reason}`,
+    'The money is in PagueloFacil — deliver by hand and tell Claude the order.',
+  ]
+    .filter(Boolean)
+    .join('\n');
+  try {
+    const { sendTelegramBroadcast } = await import('./telegram-bot.js');
+    await sendTelegramBroadcast(msg, { parseMode: false });
+  } catch (e) {
+    console.error('[service-paid] telegram (unmatched):', e);
+  }
 }
 
 export { parseSvcParm1 };

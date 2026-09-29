@@ -32,7 +32,10 @@ export async function createServicePaymentLink(params: {
     return { success: false, error: 'PAGUELOFACIL_CCLW not configured on CTO AIPA' };
   }
 
-  const desc = `${params.product.pfDescription} — ${params.clientLabel}`.slice(0, 150);
+  // PagueloFacil's webhook never echoes PARM_1 — but it does echo this description
+  // (accents stripped, ASCII kept). "Ref <order id>" is how the payment finds its order.
+  // Ref goes before the client label so the 150-char cut can never remove it.
+  const desc = `${params.product.pfDescription} — Ref ${params.orderIdHex} — ${params.clientLabel}`.slice(0, 150);
   const body = new URLSearchParams({
     CCLW: cclw,
     CMTN: params.product.amount,

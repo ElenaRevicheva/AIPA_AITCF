@@ -3488,6 +3488,58 @@ async function clientHasPaidSku(clientEmail: string, sku: string): Promise<boole
   }
 }
 
+/**
+ * Pending orders of one amount from the last `sinceHours` — candidates for a PagueloFacil
+ * payment whose webhook carried no order reference (it never echoes PARM_1).
+ */
+async function findPendingServiceOrders(
+  amountUsd: number,
+  sinceHours = 72,
+): Promise<Array<{ id: string; sku: string; client_email: string | null }>> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) AS id, sku, client_email FROM service_orders
+       WHERE status = 'pending' AND amount_usd = :amount
+         AND created_at > CURRENT_TIMESTAMP - NUMTODSINTERVAL(:hours, 'HOUR')
+       ORDER BY created_at DESC`,
+      { amount: amountUsd, hours: sinceHours },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT },
+    );
+    return ((result.rows as any[]) || []).map(r => ({
+      id: r.ID ?? r.id,
+      sku: r.SKU ?? r.sku,
+      client_email: r.CLIENT_EMAIL ?? r.client_email ?? null,
+    }));
+  } catch (err) {
+    console.error('findPendingServiceOrders error:', err);
+    return [];
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
+/** The order already marked paid with this PagueloFacil operation code, if any (idempotency). */
+async function findServiceOrderIdByCodOper(codOper: string): Promise<string | null> {
+  let connection;
+  try {
+    connection = await getPoolConnection();
+    const result = await connection.execute(
+      `SELECT RAWTOHEX(id) AS id FROM service_orders WHERE pf_cod_oper = :cod FETCH FIRST 1 ROWS ONLY`,
+      { cod: codOper.slice(0, 120) },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT },
+    );
+    const row = (result.rows as any[])?.[0];
+    return row ? (row.ID ?? row.id) : null;
+  } catch (err) {
+    console.error('findServiceOrderIdByCodOper error:', err);
+    return null;
+  } finally {
+    if (connection) await connection.close();
+  }
+}
+
 initServiceOrdersTable().catch((e: any) =>
   console.error('❌ service_orders init error:', e?.message?.slice(0, 200)),
 );
@@ -3592,4 +3644,6 @@ export {
   markServiceOrderPaid,
   getServiceOrderById,
   clientHasPaidSku,
+  findPendingServiceOrders,
+  findServiceOrderIdByCodOper,
 };
