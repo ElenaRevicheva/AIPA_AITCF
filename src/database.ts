@@ -3426,6 +3426,7 @@ async function getServiceOrderById(orderIdHex: string): Promise<{
   notes: string | null;
   pf_link_code: string | null;
   pf_cod_oper: string | null;
+  page_url: string | null;
   created_at: Date;
   paid_at: Date | null;
 } | null> {
@@ -3434,7 +3435,7 @@ async function getServiceOrderById(orderIdHex: string): Promise<{
     connection = await getPoolConnection();
     const result = await connection.execute(
       `SELECT RAWTOHEX(id) AS id, sku, amount_usd, status, client_name, client_email,
-              company_name, notes, pf_link_code, pf_cod_oper, created_at, paid_at
+              company_name, notes, pf_link_code, pf_cod_oper, page_url, created_at, paid_at
        FROM service_orders WHERE RAWTOHEX(id) = :orderId`,
       { orderId: orderIdHex },
       {
@@ -3455,6 +3456,7 @@ async function getServiceOrderById(orderIdHex: string): Promise<{
       notes: row.NOTES ?? row.notes ?? null,
       pf_link_code: row.PF_LINK_CODE ?? row.pf_link_code ?? null,
       pf_cod_oper: row.PF_COD_OPER ?? row.pf_cod_oper ?? null,
+      page_url: row.PAGE_URL ?? row.page_url ?? null,
       created_at: row.CREATED_AT ?? row.created_at,
       paid_at: row.PAID_AT ?? row.paid_at ?? null,
     };

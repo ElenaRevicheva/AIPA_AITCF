@@ -53,14 +53,12 @@ async function sendServicePaidEmails(order: NonNullable<Awaited<ReturnType<typeo
       console.error('[service-paid] team email:', e),
     );
   }
-  if (order.client_email) {
+  // The diagnostic sends its own client email (their language, next steps, credit) — diagnostic-delivery.ts
+  if (order.client_email && order.sku !== 'diagnostic_call') {
     await send(
       order.client_email,
       `Pago recibido — ${title} · AIdeazz`,
-      `Gracias por su pago.\n\n${summary}\n\n${
-        product?.paidNextStepEs ||
-        'Elena Revicheva comenzará el trabajo tras confirmar sus respuestas al cuestionario técnico (si aún no las envió).'
-      }\n\nAIdeazz · aideazz.xyz`,
+      `Gracias por su pago.\n\n${summary}\n\nElena Revicheva comenzará el trabajo tras confirmar sus respuestas al cuestionario técnico (si aún no las envió).\n\nAIdeazz · aideazz.xyz`,
     ).catch(e => console.error('[service-paid] client email:', e));
   }
 }
@@ -87,17 +85,30 @@ async function notifyTelegramServicePaid(order: NonNullable<Awaited<ReturnType<t
 async function pushServicePaidToHubSpot(order: NonNullable<Awaited<ReturnType<typeof getServiceOrderById>>>) {
   if (!order.client_email?.trim()) return;
   try {
-    const { pushLeadToHubSpot } = await import('./hubspot-client.js');
+    // Not pushLeadToHubSpot: its prospect gate dropped every paid order — see paid-order-hubspot.ts
+    const { createPaidOrderDeal, addTaskToDeal } = await import('./paid-order-hubspot.js');
     const product = getServiceProduct(order.sku);
-    await pushLeadToHubSpot({
-      name: order.client_name || order.company_name || 'Service client',
+    const title = product?.titleEn || order.sku;
+    const pushed = await createPaidOrderDeal({
+      orderId: order.id,
+      service: title,
+      amountUsd: order.amount_usd,
+      name: order.client_name,
       email: order.client_email,
-      company: order.company_name || undefined,
-      source: 'aideazz_service_checkout',
-      painPoint: `[PAID] ${product?.titleEn || order.sku} — client paid $${order.amount_usd}, seeking delivery of contracted analysis`,
-      amount: order.amount_usd,
-      sourcePrefix: 'CLIENT-SERVICE-PAID',
+      company: order.company_name,
+      website: null,
+      notes: order.notes,
     });
+    if (pushed.dealId) {
+      await addTaskToDeal(pushed.dealId, {
+        subject: `Deliver ${title} → ${order.company_name || order.client_name || 'client'} (paid $${order.amount_usd})`,
+        body: `Paid order ${order.id}. Their notes are in the deal description. Deliver, then move the deal to Won.`,
+        priority: 'HIGH',
+        due: new Date(Date.now() + 24 * 3600 * 1000),
+      });
+    } else {
+      console.error(`[service-paid] hubspot: NO deal created for paid order ${order.id}`);
+    }
   } catch (e) {
     console.error('[service-paid] hubspot:', e);
   }
@@ -263,8 +274,14 @@ export function registerServiceCheckoutRoutes(
     if (order) {
       setImmediate(() => {
         sendServicePaidEmails(order).catch(() => {});
-        notifyTelegramServicePaid(order).catch(() => {});
-        pushServicePaidToHubSpot(order).catch(() => {});
+        if (order.sku === 'diagnostic_call') {
+          import('./diagnostic-delivery.js')
+            .then(d => d.deliverDiagnosticAfterPayment(order))
+            .catch(e => console.error('[service-paid] diagnostic delivery:', e));
+        } else {
+          notifyTelegramServicePaid(order).catch(() => {});
+          pushServicePaidToHubSpot(order).catch(() => {});
+        }
         import('./database.js')
           .then(db =>
             db.saveAgentOutcome('aideazz', 'service_paid', { sku: order.sku, order_id: order.id }, 'verified_delivered', {

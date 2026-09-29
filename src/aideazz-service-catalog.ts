@@ -21,8 +21,6 @@ export interface ServiceProduct {
   pfDescription: string;
   /** Blueprint requires prior prelim unless override query param */
   requiresPrelim?: boolean;
-  /** Next-step line in the client's "payment received" email (default: the audit questionnaire line) */
-  paidNextStepEs?: string;
 }
 
 export const SERVICE_PRODUCTS: Record<ServiceSku, ServiceProduct> = {
@@ -30,15 +28,13 @@ export const SERVICE_PRODUCTS: Record<ServiceSku, ServiceProduct> = {
     sku: 'diagnostic_call',
     amount: '100.00',
     amountUsd: 100,
-    titleEn: '1:1 diagnostic call with Elena',
-    titleEs: 'Llamada de diagnóstico 1:1 con Elena',
+    titleEn: 'Quick AI Growth Operator Diagnostic',
+    titleEs: 'Diagnóstico rápido AI Growth Operator',
     descriptionEn:
-      'A live video call with Elena before you commit to an audit. She reviews your website and how AI assistants describe your business beforehand, so the call goes to your questions — and you leave knowing whether an audit is worth it for you.',
+      'Whether an AI Growth Operator would pay off for your business — and which modules exactly. Elena scans how AI search sees your site and checks your answers against the fit criteria; you get the results in writing plus a 45-minute video call to go through them. The $100 is credited if you continue.',
     descriptionEs:
-      'Una videollamada en vivo con Elena antes de comprometerse con una auditoría. Ella revisa antes su sitio web y cómo los asistentes de IA describen su negocio, para que la llamada se dedique a sus preguntas — y usted sepa si una auditoría vale la pena en su caso.',
-    pfDescription: 'AIdeazz — Llamada de diagnóstico 1:1 con Elena',
-    paidNextStepEs:
-      'Elena Revicheva le escribirá a este correo para acordar la fecha y hora de la videollamada.',
+      'Si un AI Growth Operator le resultaría rentable a su negocio — y qué módulos exactamente. Elena analiza cómo ve su sitio la búsqueda con IA y contrasta sus respuestas con los criterios de encaje; recibe los resultados por escrito y una videollamada de 45 minutos para revisarlos. Los $100 se abonan si decide continuar.',
+    pfDescription: 'AIdeazz — Diagnóstico rápido AI Growth Operator',
   },
   web_audit_prelim: {
     sku: 'web_audit_prelim',
