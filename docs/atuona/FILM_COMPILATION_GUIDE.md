@@ -279,6 +279,41 @@ the most restrictive consumer before anyone knew which consumer it was for. Now,
 **The boundary this does not cross:** Flux is never asked in the Venice lane. "Flux refused, so hand it to Venice" would be
 re-routing a refusal and stays off-limits whatever the code looks like. Venice's own 422 is final for that prompt.
 
+## 5e. Commercial promo films — the AI Growth Operator promo (30.09.2026)
+
+A client-facing ad, not a poem film: *She Asked ChatGPT Before She Messaged Your Yacht* (AIdeazz AI Lab). Plan, prompts,
+gates and spend: `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_SHOTLIST.md` + `aigo-promo-plan.json`. Tools:
+`scripts/aigo-promo-gen.mjs` (a **copy** of `atuona-film8-gen.mjs` — same `BUDGET_USD` guard + `ledger.jsonl`, own folder
+`~/aigo-promo`), `scripts/aigo-promo-roughcut.py` (picture laid to the narration), `scripts/aigo-promo-vo-*.py` (voices).
+
+**Character continuity is a chain, never a hope.** Two people recur (a New York woman, a Panamanian owner-captain):
+1. **Lock the faces first** — candidate portraits on 3 still models, the client picks one per person (`R1.jpg`, `R2.jpg`).
+2. **Every keyframe is built WITH the locked face passed in** (`input_images` / `image_input`) + outfit views.
+3. **Every video STARTS from its approved keyframe** (`start_image` / `image` / `first_frame_image`); Kling also takes
+   `reference_images` during motion.
+4. **Contact sheet vs the locked faces before any motion is bought.** Stills cost cents; motion costs dollars.
+
+**Engines, measured on the same payoff frame (5 s, 1080p, no audio):**
+
+| Engine | Where | $ / 5 s | Verdict for realistic people |
+|---|---|---|---|
+| **Venice Wan 3.0 Pro** | Venice API (quote→queue→retrieve) | $1.18 | **held her identity best** — chosen for the face shots |
+| **Hailuo 2.3** | Replicate `minimax/hailuo-2.3` (6 s) | $0.56 | natural, face holds — best value |
+| **Kling 3.0 Omni** | Replicate, pro 1080p | $1.12 | most cinematic; face drifted mid-shot (3 refs incl. HIS face — likely the cause) |
+| **Luma ray-3.2** | Replicate | ≈$1.20 | she turned away, face changed — weakest |
+| **Runway Gen-4.5** | Replicate `runwayml/gen-4.5` ($0.12/s) | $0.60 | beautiful wides; **invents a different person after ~3.5 s** — use only the first 3 s |
+| Veo 3.1 / Seedance 2.5 | Replicate | — | **refused** an innocent realistic frame ("flagged as sensitive", E005) — not billed |
+| Sora 2 Pro | Replicate w/ OpenAI key | — | **HTTP 404 on `/v1/videos`** — our OpenAI org has no Sora video access |
+
+**Stills:** GPT Image 2 (high, $0.128) made the chosen faces and every keyframe; Nano Banana Pro ($0.15) the most natural
+skin; Flux 2 Max aged a "40-year-old" to ~60. **Voice:** OpenAI `gpt-4o-mini-tts` read as robotic to the client →
+ElevenLabs v3 and MiniMax Speech 2.8 HD on Replicate ($0.10 / 1k chars). Every take is transcribed back before anyone hears it.
+
+**Real vs generated — the rule that keeps an ad honest.** "The people in this film are AI. The product screens are
+real." → generate only people and places; every product/app screen is a **real capture** (phone recordings, screenshots),
+cropped or blurred for names, numbers and private chats. Landscapes may be real stock **only if the clip is really that
+place** (see recap 36). The whole first pass (faces → keyframes → 7-engine test → 8 shots → 5 fixes) cost **$19.90**.
+
 ## 6. Run, verify, publish
 
 ```bash
@@ -339,3 +374,19 @@ Verification checklist (all against the file in `out/`):
 29. Wiring a permissive engine at the END of a chain built for the strictest one — it can only animate what it is handed.
     `/visualize venice18` first ran on a softened Flux frame and a word-scrubbed motion line ($1.18, nothing new). Sanitise at
     the boundary it is for, not at the source (§5d).
+30. Generating each scene from text and hoping the faces match — lock reference faces first, pass them into every keyframe,
+    start every video from its keyframe (§5e).
+31. Trusting a clip past its first seconds — Runway Gen-4.5 invented a different woman after ~3.5 s; engines also flip
+    a skipper to face the stern. Sample every clip (start / middle / end) before it goes in the cut.
+32. `gemini-3.8-flash-tts` **speaks acting notes aloud** ("Say warmly…") and rejects `systemInstruction`; put direction in
+    OpenAI TTS's separate `instructions` field, or use a model that listens to it. Transcribe every take.
+33. Luma (and Grok) reject Replicate file URLs (`video.start_frame: Unsupported content type`) — send the start frame inline.
+34. Sora 2 via Replicate fails with an **empty** error when the OpenAI org has no video access — the direct API says 404.
+35. Words like "curled on a sofa, legs tucked under her" + silk trip GPT Image 2's filter on an innocent portrait — neutral
+    posture words pass. Re-phrase; never re-route (recap 22).
+36. Stock "San Blas" footage that was filmed elsewhere: Pexels location metadata said Atlanta / Indonesia / Philippines /
+    Paris, "Panama" was only an SEO tag; Pixabay's "117+ San Blas" was fuzzy matching (San Francisco, San José). A clip
+    is Panama only if its page says so AND a local confirms it.
+37. A styled QR (rounded modules, gradient) may not decode with standard readers — threshold it to black/white to verify
+    the URL, and test-decode frames from the exported video at the size it plays.
+38. Showing a phone screen recording raw — cut the home screen and any chat list / drawer with private titles before use.
