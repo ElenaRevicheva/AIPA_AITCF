@@ -13,6 +13,10 @@ folder (`…_PROMO_BRIEF.md`); v1 of this script (dental story) is in git histor
 | Reveal | **Keep** — "The people in this film are AI. The product screens are real." |
 | Length | Agent's call for the niche → **main film ~85–90 s (16:9) + Short ~27 s (9:16)** — reasoning below |
 | Money | Approve every dollar of video spend with her first |
+| Title | **She Asked ChatGPT Before She Messaged Your Yacht** (the ChatGPT + yacht pairing is distinctive). Narration keeps "boats" — "yachts" sounds like ad copy when spoken |
+| Thumbnail | **SHE ASKED AI FIRST** |
+| Pronunciation | AIdeazz = **"ay-eye-DEAZ"** → write `A-I-deaz` in every TTS script |
+| Narrator | **Male** |
 
 **Why ~85–90 s + a Short (not 1:40).** A charter owner meets this film in three places. (1) A link inside our outreach email
 or WhatsApp, opened on a phone between trips: it has to finish on a phone and hook in the first line. (2) The YouTube
@@ -84,6 +88,30 @@ Charter companies in the AI answer: blurred. The client charter in the story: fi
 | B | **Real screen captures.** v19 audit take (or atuona.xyz); an AI-assistant answer; one **test inquiry** through the site → the email, the Telegram draft and the HubSpot stamp; an existing 8 AM brief. | $0 | the test inquiry writes one test deal to HubSpot and sends one email; deleted after filming |
 | C | **Generated shots.** About 9 (scenes 1, 3 ×3, 5, 7, 8, 10 + thumbnail), because 5 of the 12 scenes are real screens. Film #8 = 17 shots ≈ $18. Every job is priced before rendering; film #8's generator enforces a hard cap. | est. $12–20 | spend |
 | D | **Edit.** Music (a fresh Pixabay chill-tropical bed — v13–v19 already used "Tropical Chill"); site fonts; fade text before dissolves; `apad` on the ducking key (the v15 silent-end bug). | $0 | — |
+
+## 5b. Production log (30 Sep)
+
+**Test inquiry — DONE, real path, Elena's OK.** Submitted through the real form on aideazz.xyz/portfolio as a fictional
+charter OWNER ("Marco Rivera", allowlisted test inbox `kiravelerevich@gmail.com`). A *guest* asking "is your catamaran
+free?" would be off-topic for the AIdeazz concierge (it drafts replies for AIdeazz), so the real screens show **our
+operator running on our own site**. Scene 7 carries a small caption saying so. Oracle log trail:
+`HubSpot Created deal … [CLIENT-CTO-INQUIRY] Marco Rivera — outreach` → `email.delivered for kiravelerevich@gmail.com`
+(the "We received your inquiry" receipt) → `owner ping DELIVERED` → `draft a24e60b8e60173c6 … TG card DELIVERED`.
+The card is labelled **Gemini**: Claude, OpenAI *and* Make's Anthropic key are all out of credits, so the 5-provider
+fallback wrote it. **This deal is a filming prop — delete it after capture.**
+
+**🚨 The draft invented a price.** *"A good first step would be a focused audit … This typically costs $1,500."*
+`src/concierge-prompt.ts` contains no prices at all, so the model made the number up. The real ladder is $100 / $200 / $500.
+→ **Scene 8 becomes the real thing:** Elena corrects the price line in Telegram (reply-to-edit) and sends. "The AI drafts.
+You decide." — filmed on a real catch, not staged. **Do not send the draft unedited** (it only goes to her own test
+inbox, but the screen must not show a price we don't offer). The prompt fix is proposed separately and needs her go.
+
+**Voice samples — DONE (~$0.01, Gemini key on Oracle, `~/aigo-promo/voice/vo_samples.py`).** 4 male samples:
+`gemini-3.8-flash-tts` Algieba / Charon (~19 s, ≈158 wpm → film ≈ 80 s) and `gemini-2.5-pro-preview-tts` Charon /
+Algieba (~25 s, ≈120 wpm → film ≈ 1:45 unless sped up). Each one was transcribed back to check what it said.
+🪤 **`gemini-3.8-flash-tts` reads acting notes ALOUD** ("Read this as a warm…" / "Say warmly…" were both spoken) and
+rejects `systemInstruction` (`400 Developer instruction is not enabled for this model`). Give it the script only; use
+2.5-pro for the "Say …:" style cue. Never trust a TTS take without a transcript check.
 
 ## 6. For interviews and sales calls, not the film
 

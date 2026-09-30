@@ -136,8 +136,14 @@ git log keeps the record.
   ~80 s + 30 s Short, lines taken from the 53-page `28.09.2026 AI Growth Operator.pdf`. Elena's rules: **never her
   name or "solo"** (credit AIdeazz AI Lab + AI Growth Operator), realistic AI narrator, keep the "people are AI,
   screens are real" reveal. This is the *operator* film. It reuses the real audit take from the live /api film v19; it does not remake it.
-- **NEXT:** Elena approves the text + says how "AIdeazz" is pronounced → voice samples (cents) → test-inquiry capture
-  (writes 1 test HubSpot deal, deleted after) → priced shot list (~$12–20). **Each step needs her go. No $ without it.**
+- **UPDATE 30 Sep 13:25 UTC:** text approved (v2.1). Title *She Asked ChatGPT Before She Messaged Your Yacht*, male voice,
+  "ay-eye-DEAZ". 4 voice samples made (~$0.01), she picks. **Test inquiry sent through the real form** →
+  `[CLIENT-CTO-INQUIRY] Marco Rivera — outreach` = **FILMING PROP, do not work it, delete after capture.**
+- **🚨 KNOWN-BROKEN:** that concierge draft quoted **"$1,500"**. `src/concierge-prompt.ts` has NO prices, so the model
+  invents them for real leads too. The fix (put the real $100/$200/$500 ladder in the prompt, or forbid prices) is
+  proposed and **awaits Elena's go** (shared code + Oracle deploy).
+- **NEXT:** Elena picks a voice; corrects the price line in the Telegram draft (reply-to-edit) and sends, which is the scene-8
+  footage → priced shot list (~$12–20). **Each step needs her go. No $ without it.**
 - **VERIFIED BY:** live audit 30 Sep 11:07 UTC — 34 checks, 100/A+ (aideazz.xyz), 93/A+ with 3 fixes (atuona.xyz);
   every script claim traced to code in the file's §4.
 - **RISK:** inbound creates NO follow-up task (only outbound +4d) — never script "automatic follow-up". OpenAI has no
