@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 30 Sep 14:20 | Concierge price guard (Elena's go): catalog prices in prompt + off-catalog ⚠️ on TG card | `src/concierge-prompt.ts`, `src/concierge.ts`, new test; Oracle `dist/` + `pm2 restart cto-aipa`; Make prompt sync | 09d86f8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
