@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 30 Sep 14:30 | Concierge rules: Lab framing (AIdeazz AI Lab + AI Growth Operator, never solo) — Elena's ask | `src/concierge-prompt.ts`, test; Oracle `dist/` + `pm2 restart cto-aipa`; Make prompt sync | 0d2dde5 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,16 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🏛️ 30 Sep — Concierge speaks for AIdeazz AI Lab, never "solo" (Elena: "Nobody will pay a solo builder") · LIVE
+
+- **DONE:** `CONCIERGE_RULES` identity = *AIdeazz AI Lab installs an AI Growth Operator inside the tools a business already uses — not another CRM*,
+  founded by Elena. Branch B says "the Lab is not hiring". New voice rule: speak for the Lab ("we", "our work"); never solo/freelancer/one-person —
+  **and never invent staff, team size, clients or case studies**. Test file now 26 checks.
+- **VERIFIED BY:** Oracle md5 `e991477de5a3` = local; file 14:14:54 < process 14:14:59 online; Make 5633833 + 5953877 VERIFIED, 0 drift;
+  live self-test draft: *"gracias por contactarnos… Podemos ofrecerte un diagnóstico rápido de $100… nuestro trabajo"*.
+- **NEXT (Elena's go):** the same "solo" framing is still in `community-listener.ts` (public replies), `podcast-feed.ts` (public page/RSS/FAQ ×8),
+  podcast prompts ×3, `daily-blog-publisher.ts:407`, and "11 products solo" facts in `cto-aipa.ts:148`, `telegram-bot.ts:280`, `atuona-creative-ai.ts`.
 
 ### 💲 30 Sep — Concierge drafts may only quote catalog prices (was: invented "$1,500") · LIVE
 

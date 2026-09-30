@@ -27,7 +27,13 @@ for (const n of catalog) check(`rules name $${n}`, CONCIERGE_RULES.includes(`$${
 check('rules link the diagnostic pay page', CONCIERGE_RULES.includes('/pay/analisis-tecnico?sku=diagnostic_call'));
 check('rules forbid any other price', /ONLY prices that exist/.test(CONCIERGE_RULES));
 check('rules: larger work is scoped after the diagnostic, no number', /scoped and priced after the diagnostic/.test(CONCIERGE_RULES));
-check('rules no longer say "solo"', !/\bsolo\b/i.test(CONCIERGE_RULES));
+// Lab framing (Elena, Sep 30 2026: "Nobody will pay a solo builder, it sounds weak").
+const identity = CONCIERGE_RULES.split('\n\n')[0];
+check('identity is the Lab, not a person', /^You are the lead concierge for AIdeazz AI Lab/.test(identity), identity.slice(0, 80));
+check('identity sells the product: AI Growth Operator, not another CRM', /installs an AI Growth Operator inside the tools .* not another CRM/.test(identity));
+check('identity never says solo / she ships', !/\bsolo\b|she ships|executive-turned/i.test(identity));
+check('drafts must speak for the Lab and never call it solo', /Speak for the Lab/.test(CONCIERGE_RULES) && /Never describe the Lab or Elena as solo/.test(CONCIERGE_RULES));
+check('and never invent a team either', /never invent staff, team size, clients or case studies/.test(CONCIERGE_RULES));
 check('no unresolved ${…} in the rules', !CONCIERGE_RULES.includes('${'));
 
 // 2. Enforcement — off-catalog amounts are found, catalog amounts and plain numbers are not.
