@@ -273,6 +273,12 @@
         "v_r2_helm"
       ],
       "prompt": "Use the reference images as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Dawn in Flamenco Marina on the Amador Causeway, Panama City, golden-pink light and soft mist on calm water. He stands at the helm of his catamaran in the correct position: BEHIND the wheel, FACING FORWARD toward the bow, the wheel between him and the bow, as a skipper stands to steer; the camera is to the side of the helm, seeing him in three-quarter profile. He glances down at the phone in his left hand (screen facing away from camera) with a quiet confident smile; a coffee cup in the holder by the wheel. Black linen shirt. Behind him, across the Bay of Panama, the real Panama City skyline: the twisted spiral F&F Tower among the high-rises of Punta Paitilla and Punta Pacifica, and several large cargo ships and tankers anchored in the bay, waiting to enter the Panama Canal. Humid tropical air, palm trees along the Amador Causeway. Medium shot."
+    },
+    "k_g8b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [],
+      "prompt": "Aerial drone view at golden hour over the San Blas islands (Guna Yala), Panama: tiny flat islets covered in coconut palms with white sand and a few palm-thatched Guna huts with bamboo walls; glass-clear shallow turquoise reef water with coral patches; a traditional Guna ulu dugout canoe with two paddlers gliding near an islet; a luxury white sailing catamaran anchored in the lagoon; on the horizon, the green jungle-covered mountains of the Panamanian mainland under soft clouds. Natural documentary realism."
     }
   },
   "shots": {
@@ -386,13 +392,21 @@
       "duration": 6,
       "audio": false,
       "motion": "At the helm at dawn, one hand on the wheel, he reads the drafted reply on his phone, gives a quiet confident smile and taps once with his thumb; soft mist drifts over the bay, ships at anchor behind him. Slow orbit."
+    },
+    "G8b": {
+      "start": "k_g8b",
+      "engine": "runway",
+      "duration": 5,
+      "audio": false,
+      "motion": "Slow forward drone flight descending over the palm islets toward the anchored white catamaran; the ulu canoe glides past below; gentle ripples on the reef, golden hour. Documentary realism."
     }
   },
   "decisions": {
     "R1": "r1_gpt_a (Elena, 30 Sep: \"Woman fine\")",
     "R2": "r2_p2_gpt_a (Elena, 30 Sep: \"this one\") - ~39, black linen, stubble",
     "engines": "Venice Wan 3.0 Pro for faces (G2 G4 G5 G6 G9; $7.07 Venice wallet, 5 x $1.18) + Runway Gen-4.5 via Replicate for wides (G1 G3 G8) - Elena 30 Sep",
-    "screens": "Owner approval = Telegram (real product); guest channel = WhatsApp (real screenshot) - Elena 30 Sep"
+    "screens": "Owner approval = Telegram (real product); guest channel = WhatsApp (real screenshot) - Elena 30 Sep",
+    "san_blas": "B - AI re-render with authentic Guna Yala detail (Elena 30 Sep); no free real San Blas footage exists"
   },
   "motion_look": "Natural, realistic human motion, real skin and fabric physics, golden-hour light, gentle water movement, smooth slow gimbal camera, cinematic 24fps feel. The people stay exactly the same persons throughout.",
   "negative": "morphing face, identity change, different person, extra fingers, distorted hands, warping, flicker, text, subtitles, logos, watermark, cartoon, CGI look, plastic skin, fast camera, jitter"

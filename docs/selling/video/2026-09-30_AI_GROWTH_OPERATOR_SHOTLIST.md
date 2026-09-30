@@ -219,3 +219,11 @@ San Blas Sailing, a luxury all-inclusive charter + map card → blur the names.
 (ElevenLabs v3 Roger/Mark/Drew/James, MiniMax magnetic/trustworthy) · later: fresh test inquiry → HubSpot deal screenshot + 8 AM brief.
 **Next (all $0):** v2 cut — new shots, S1 blurred, S2 WhatsApp crop, Telegram screens, QR (→ /api) on every non-people frame,
 logo on the end card, new voice, Pixabay music shortlist.
+
+**CUT v2 — built 30 Sep** (`scripts/aigo-promo-roughcut-v2.py` + `aigo-promo-cut2-audio.py` → Oracle `~/aigo-promo/cut2/AIGO_cut_v2.mp4`,
+90.2 s, narration MiniMax #5 loudness-normalised −16 LUFS). Real screens from `captures/safe/` — private text blurred by MANUAL
+pixel boxes (Gemini's auto-boxes landed on the wrong lines → rejected) or cropped; Resend id blurred (internal id). S3 = real 1080p
+Playwright recording of the live /api audit on atuona.xyz (93). Real Panama stock: Causeway/Biomuseo (34734), Bocas sunset (346372).
+G8b Guna Yala drone ($0.60). QR test-decoded from 4 exported frames → `https://aideazz.xyz/api`. Voice samples ≈$0.26 total.
+**Spend: generation $20.62 + voices ≈$0.26 ≈ $20.90 of $30.** Still to do: Pixabay music (no vocals, her ear), 8 AM brief
+(her screenshot tomorrow), delete test deal 65531490170 (her OK), final grade, 9:16 Short, thumbnail title.
