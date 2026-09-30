@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 30 Sep 14:30 | Concierge rules: Lab framing (AIdeazz AI Lab + AI Growth Operator, never solo) — Elena's ask | `src/concierge-prompt.ts`, test; Oracle `dist/` + `pm2 restart cto-aipa`; Make prompt sync | 0d2dde5 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
