@@ -19,7 +19,7 @@ picture so far.**
 
 ## 1. The look — elite marine lifestyle, never "toyish"
 
-- **Stills first.** Every shot starts as one photoreal still (Flux 2 Max, $0.066). Elena approves the still BEFORE
+- **Stills first.** Every shot starts as one photoreal still (the Gate-1 winner of Nano Banana Pro / GPT Image 2 / Flux 2 Max, $0.13–0.15). Elena approves the still BEFORE
   any motion is bought — the look and the faces are fixed for cents, not dollars.
 - **Quiet wealth, not bling.** Linen, cashmere, teak, brushed steel, natural light. No gold-chain luxury, no
   champagne-spray clichés, no staged stock smiles.
@@ -61,17 +61,17 @@ sunglasses on the face).
 
 Every generated clip = **5 s**. Durations follow the recorded narration.
 
-| # | Line | What we see | Refs | Engine | $ |
+| # | Line | What we see | Refs | Engine | $ (5 s) |
 |---|---|---|---|---|---|
-| **G1** | 1 — midnight | Heavy snow falling past the floor-to-ceiling windows of a Tribeca penthouse at night, the Manhattan skyline glittering beyond, and inside, warm lamplight on **her** silhouette at a laptop. Motion: very slow push-in, snow drifting. | — (silhouette) | Grok | 0.40 |
-| **G2** | 1 — midnight | **Meet her.** Close-up at a Calacatta marble kitchen island in her Tribeca penthouse, 11:47 pm, laptop glow on her face, reading glasses, the cream cashmere wrap, a glass of red wine, the snowy window soft behind. Motion: slow dolly-in, she types, glances at the screen. | R1 | Wan | 0.50 |
-| **G3** | 3 — Friday, at sea | A white 50-ft luxury sailing catamaran anchored off a tiny palm islet in San Blas at night, full moon, low deck lights; **the owner** alone on the aft deck coiling a line; his phone sealed in a clear dry bag lights up unseen on the cockpit table. Motion: slow lateral move along the deck. | R2 | Grok | 0.40 |
-| **G4** | 3 — Monday | Morning, a Panama City marina with the skyline behind; the owner on the stern with a coffee, reading his phone, a small sigh; he lowers it and looks out at the water — **she is gone.** Motion: slow push-in. | R2 | Wan | 0.50 |
-| **G5** | 7 — rewind: she writes | **The same woman, same night, same kitchen** (rhymes with G2 on purpose), over-the-shoulder typing into a charter website's contact form; screen soft, unreadable. Motion: gentle push, she clicks send, a small smile. | R1 | Wan | 0.50 |
-| **G6** | 8 — the human yes | Dawn at the marina, golden-pink mist on calm water; the owner at the helm with a coffee reads his phone and taps once, a quiet capable smile. Motion: slow orbit around the helm. | R2 (+ref in motion) | Kling | 0.84 |
-| **G8** | 10 — arrival | Drone view: the catamaran over turquoise and deep-blue water between palm islets at golden hour. Motion: slow forward flight, gentle descent. | — | Grok | 0.40 |
-| **G7** | 10 — **THE PAYOFF** | Golden hour, San Blas. Framed on **her**: she steps from the tender onto the swim platform, the cream cashmere wrap over her shoulders in the breeze, pauses, looks up at the boat and the islet — the same slow smile we saw at midnight. The owner's hand reaches in to steady her; friends soft and out of focus behind. We recognize her before anyone says a word. Motion: slow gimbal move that settles on her face. | R1 + R2 (+refs in motion) | Kling | 0.84 |
-| **G9** | 10 — the life | Sunset on the front trampoline net: **she** laughs with friends, glasses catching the low sun, light spray, the owner at the helm soft behind. Motion: slow push-in, a clink, hair in the breeze. | R1 + R2 | Wan | 0.50 |
+| **G1** | 1 — midnight | Heavy snow falling past the floor-to-ceiling windows of a Tribeca penthouse at night, the Manhattan skyline glittering beyond, and inside, warm lamplight on **her** silhouette at a laptop. Motion: very slow push-in, snow drifting. | — (silhouette) | Gate-3 winner | 1.12–2.00 |
+| **G2** | 1 — midnight | **Meet her.** Close-up at a Calacatta marble kitchen island in her Tribeca penthouse, 11:47 pm, laptop glow on her face, reading glasses, the cream cashmere wrap, a glass of red wine, the snowy window soft behind. Motion: slow dolly-in, she types, glances at the screen. | R1 | Gate-3 winner | 1.12–2.00 |
+| **G3** | 3 — Friday, at sea | A white 50-ft luxury sailing catamaran anchored off a tiny palm islet in San Blas at night, full moon, low deck lights; **the owner** alone on the aft deck coiling a line; his phone sealed in a clear dry bag lights up unseen on the cockpit table. Motion: slow lateral move along the deck. | R2 | Gate-3 winner | 1.12–2.00 |
+| **G4** | 3 — Monday | Morning, a Panama City marina with the skyline behind; the owner on the stern with a coffee, reading his phone, a small sigh; he lowers it and looks out at the water — **she is gone.** Motion: slow push-in. | R2 | Gate-3 winner | 1.12–2.00 |
+| **G5** | 7 — rewind: she writes | **The same woman, same night, same kitchen** (rhymes with G2 on purpose), over-the-shoulder typing into a charter website's contact form; screen soft, unreadable. Motion: gentle push, she clicks send, a small smile. | R1 | Gate-3 winner | 1.12–2.00 |
+| **G6** | 8 — the human yes | Dawn at the marina, golden-pink mist on calm water; the owner at the helm with a coffee reads his phone and taps once, a quiet capable smile. Motion: slow orbit around the helm. | R2 (+ref in motion) | Gate-3 winner | 1.12–2.00 |
+| **G8** | 10 — arrival | Drone view: the catamaran over turquoise and deep-blue water between palm islets at golden hour. Motion: slow forward flight, gentle descent. | — | Gate-3 winner | 1.12–2.00 |
+| **G7** | 10 — **THE PAYOFF** | Golden hour, San Blas. Framed on **her**: she steps from the tender onto the swim platform, the cream cashmere wrap over her shoulders in the breeze, pauses, looks up at the boat and the islet — the same slow smile we saw at midnight. The owner's hand reaches in to steady her; friends soft and out of focus behind. We recognize her before anyone says a word. Motion: slow gimbal move that settles on her face. | R1 + R2 (+refs in motion) | Gate-3 winner | 1.12–2.00 |
+| **G9** | 10 — the life | Sunset on the front trampoline net: **she** laughs with friends, glasses catching the low sun, light spray, the owner at the helm soft behind. Motion: slow push-in, a clink, hair in the breeze. | R1 + R2 | Gate-3 winner | 1.12–2.00 |
 
 Edit order for line 10: **G8 → G7 → G9** (arrive, recognize her, live it).
 
