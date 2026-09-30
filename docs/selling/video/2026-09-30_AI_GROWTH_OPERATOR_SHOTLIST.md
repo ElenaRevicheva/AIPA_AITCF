@@ -179,3 +179,17 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   answer (names blurred) · S2 WhatsApp screenshot (Elena) · S3 clean /api audit recording (atuona.xyz, domain cropped) ·
   S7 8 AM brief (Elena). Still to do: Pixabay music shortlist (no vocals), blur her email + the link preview with her name
   in the phone screens, 9:16 Short, thumbnail title, final grade.
+
+## 6. Elena's review of rough cut v1 (30 Sep) — the fix list
+
+1. Her AI question must be SHOWN: she asks e.g. *where can I book a yacht in Bocas del Toro or San Blas* and the AI answers.
+2. G5 (she writes, 0:52): her arms are awkwardly placed → re-render.
+3. G1 opens on a woman in a BLACK dress, then "another woman" appears → G1 must be HER (R1, cream wrap) or nobody.
+4. G6: the captain drives from the wrong side (faces the stern) → re-render with correct helm orientation.
+5. Telegram → WhatsApp (open: the real approval card lives in Telegram — see answer in chat; never fake a product screen).
+6. Show the HubSpot CRM (real deal record).
+7. Her QR (decodes to `https://aideazz.xyz/api` — verified 30 Sep, needs a B/W threshold for OpenCV; test-decode final
+   frames) on EVERY frame that has no man/woman video: cards, real screens, end card.
+8. Voice: more natural, verse sounds robotic → samples on ElevenLabs v3 / MiniMax Speech 2.8 HD / Chatterbox (all on Replicate).
+9. AIdeazz AI Lab logo (her PNG, transparent) on the final page.
+10. Idea: the woman uses her PHONE instead of the laptop.
