@@ -137,4 +137,7 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   Files: Oracle `~/aigo-promo/img/r1_{nano,gpt,flux}_{a,b}.jpg`, `r2_{nano,gpt,flux}.jpg`; contact sheet sent to Elena.
   Claude's read: Nano = most natural (her A/B already look like one woman; best him); GPT = most luxurious NY (r1_gpt_a
   strongest portrait), his reads a bit "model"; Flux = her OFF-BRIEF (reads 55–60), him good but older.
-  **Awaiting Elena's pick** (one face each + keyframe model) before Gate 1b.
+  **Elena picked HER = `r1_gpt_a`** ("Woman fine") → locked as Oracle `img/R1.jpg`. Asked for more versions of him.
+- **Gate 1 round 2 (him) — DONE.** 3 looks × (nano, gpt) = 6/6, $0.83; **total picture spend $1.97**. Claude's pick `r2_m2_gpt`
+  (~42, salt-and-pepper, navy overshirt + white tee — premium owner, same model family as her); alts `r2_m2_nano`, `r2_m1_gpt`.
+  **Awaiting Elena's pick for him** before Gate 1b ($0.45).
