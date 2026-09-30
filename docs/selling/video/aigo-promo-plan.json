@@ -77,11 +77,41 @@
       "engine": "gpt",
       "aspect": "3:4",
       "prompt": "Portrait of a Latin American man about forty who owns and runs a small luxury sailing-catamaran charter business in Panama: broad-shouldered, deeply tanned, close-cropped dark hair, a short dark beard, kind eyes with sun creases, sun-browned forearms. He wears an olive-green lightweight technical shirt with the sleeves pushed up and a minimal steel dive watch. He stands on the teak deck of his catamaran in soft golden morning light, turquoise water and palm islets softly out of focus behind him. Understated, capable, premium-casual, trustworthy — a real person, not a model. Editorial portrait realism, head and shoulders, 85mm lens. He wears no captain's hat, no uniform, no epaulettes, no gold chains, and no sunglasses."
+    },
+    "r2_p1_gpt_a": {
+      "engine": "gpt",
+      "aspect": "3:4",
+      "prompt": "Portrait of a strikingly handsome, magnetic Panamanian man about thirty-six, the captain-owner of a luxury sailing-catamaran charter business: warm bronze skin, thick dark wavy hair swept back, a short well-groomed beard, deep brown eyes, a confident magnetic smile, athletic swimmer's build. He wears an ivory linen shirt unbuttoned at the collar with the sleeves rolled on tanned forearms, a slim leather bracelet and a minimal steel watch, sunglasses tucked into the shirt — effortless 2026 resort-casual style. He stands at the helm of his catamaran at golden hour, warm low sun on his face, turquoise water and San Blas palm islets softly out of focus behind him. Confident, charismatic, warm and a little flirtatious, direct eye contact — the man guests book the boat for, classy not cheesy. GQ editorial portrait realism, head and shoulders, 85mm lens. No captain's hat, no uniform, no epaulettes, no gold chains."
+    },
+    "r2_p1_gpt_b": {
+      "engine": "gpt",
+      "aspect": "3:4",
+      "prompt": "Portrait of a strikingly handsome, magnetic Panamanian man about thirty-six, the captain-owner of a luxury sailing-catamaran charter business: warm bronze skin, thick dark wavy hair swept back, a short well-groomed beard, deep brown eyes, a confident magnetic smile, athletic swimmer's build. He wears an ivory linen shirt unbuttoned at the collar with the sleeves rolled on tanned forearms, a slim leather bracelet and a minimal steel watch, sunglasses tucked into the shirt — effortless 2026 resort-casual style. He stands at the helm of his catamaran at golden hour, warm low sun on his face, turquoise water and San Blas palm islets softly out of focus behind him. Confident, charismatic, warm and a little flirtatious, direct eye contact — the man guests book the boat for, classy not cheesy. GQ editorial portrait realism, head and shoulders, 85mm lens. No captain's hat, no uniform, no epaulettes, no gold chains."
+    },
+    "r2_p2_gpt_a": {
+      "engine": "gpt",
+      "aspect": "3:4",
+      "prompt": "Portrait of a strikingly handsome, magnetic Panamanian man about thirty-nine, the captain-owner of a luxury sailing-catamaran charter business: ruggedly handsome, sun-bronzed skin, short dark hair with a touch of grey at the temples, designer stubble, a strong jawline, intense warm eyes, a slow confident half-smile, fit and broad-shouldered. He wears a black linen shirt open at the collar with the sleeves pushed up and a steel dive watch, sunglasses tucked into the shirt — effortless 2026 resort-casual style. He stands at the helm of his catamaran at golden hour, warm low sun on his face, turquoise water and San Blas palm islets softly out of focus behind him. Confident, charismatic, warm and a little flirtatious, direct eye contact — the man guests book the boat for, classy not cheesy. GQ editorial portrait realism, head and shoulders, 85mm lens. No captain's hat, no uniform, no epaulettes, no gold chains."
+    },
+    "r2_p2_gpt_b": {
+      "engine": "gpt",
+      "aspect": "3:4",
+      "prompt": "Portrait of a strikingly handsome, magnetic Panamanian man about thirty-nine, the captain-owner of a luxury sailing-catamaran charter business: ruggedly handsome, sun-bronzed skin, short dark hair with a touch of grey at the temples, designer stubble, a strong jawline, intense warm eyes, a slow confident half-smile, fit and broad-shouldered. He wears a black linen shirt open at the collar with the sleeves pushed up and a steel dive watch, sunglasses tucked into the shirt — effortless 2026 resort-casual style. He stands at the helm of his catamaran at golden hour, warm low sun on his face, turquoise water and San Blas palm islets softly out of focus behind him. Confident, charismatic, warm and a little flirtatious, direct eye contact — the man guests book the boat for, classy not cheesy. GQ editorial portrait realism, head and shoulders, 85mm lens. No captain's hat, no uniform, no epaulettes, no gold chains."
+    },
+    "r2_p3_gpt_a": {
+      "engine": "gpt",
+      "aspect": "3:4",
+      "prompt": "Portrait of a strikingly handsome, magnetic Panamanian man about thirty-seven, the captain-owner of a luxury sailing-catamaran charter business: Afro-Panamanian, deep brown skin, close-cropped hair, a neat short beard, a bright confident smile, tall athletic build. He wears a sky-blue linen shirt open at the collar with the sleeves rolled and a minimal steel watch, sunglasses tucked into the shirt — effortless 2026 resort-casual style. He stands at the helm of his catamaran at golden hour, warm low sun on his face, turquoise water and San Blas palm islets softly out of focus behind him. Confident, charismatic, warm and a little flirtatious, direct eye contact — the man guests book the boat for, classy not cheesy. GQ editorial portrait realism, head and shoulders, 85mm lens. No captain's hat, no uniform, no epaulettes, no gold chains."
+    },
+    "r2_p3_gpt_b": {
+      "engine": "gpt",
+      "aspect": "3:4",
+      "prompt": "Portrait of a strikingly handsome, magnetic Panamanian man about thirty-seven, the captain-owner of a luxury sailing-catamaran charter business: Afro-Panamanian, deep brown skin, close-cropped hair, a neat short beard, a bright confident smile, tall athletic build. He wears a sky-blue linen shirt open at the collar with the sleeves rolled and a minimal steel watch, sunglasses tucked into the shirt — effortless 2026 resort-casual style. He stands at the helm of his catamaran at golden hour, warm low sun on his face, turquoise water and San Blas palm islets softly out of focus behind him. Confident, charismatic, warm and a little flirtatious, direct eye contact — the man guests book the boat for, classy not cheesy. GQ editorial portrait realism, head and shoulders, 85mm lens. No captain's hat, no uniform, no epaulettes, no gold chains."
     }
   },
   "shots": {},
   "decisions": {
     "R1": "r1_gpt_a (Elena, 30 Sep: \"Woman fine\")",
-    "R2": "pending - round 2: 3 looks x (nano, gpt)"
+    "R2": "pending - round 3 (Elena: \"handsome sexy Panamanian captain-business owner, casual 2026\"): 3 looks x 2 takes on gpt"
   }
 }

@@ -140,4 +140,7 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   **Elena picked HER = `r1_gpt_a`** ("Woman fine") → locked as Oracle `img/R1.jpg`. Asked for more versions of him.
 - **Gate 1 round 2 (him) — DONE.** 3 looks × (nano, gpt) = 6/6, $0.83; **total picture spend $1.97**. Claude's pick `r2_m2_gpt`
   (~42, salt-and-pepper, navy overshirt + white tee — premium owner, same model family as her); alts `r2_m2_nano`, `r2_m1_gpt`.
-  **Awaiting Elena's pick for him** before Gate 1b ($0.45).
+  Elena: "No. Still not iron clad. He needs to be handsome sexy Panamanian captain-business owner, casual 2026."
+- **Gate 1 round 3 (him) — DONE.** 3 looks × 2 takes on GPT Image 2 = 6/6, $0.77; **total picture spend $2.74**. A/B takes
+  already hold one identity per look. Claude's pick `r2_p2_gpt_a` (~39, black linen, stubble — pairs with her); alts `p1`
+  (sexiest), `p3_gpt_a` (Afro-Panamanian). **Awaiting Elena's pick** before Gate 1b ($0.45).
