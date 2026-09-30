@@ -159,3 +159,9 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   Sora 2 Pro (OpenAI key, 1792×1024 start) · Hailuo 2.3 1080p · Seedance 2.5 720p · **Venice Wan 3.0 Pro 1080p on her Venice wallet**
   (quote-before-queue, same flow as Atuona's `tryVeniceVideo`). Worst-case $8.82, step cap `BUDGET_USD=13.40`. Runway excluded
   (4 credits) — next round only if none of the 7 satisfies her.
+- **Gate 3 — RESULT.** 4 takes: Kling $1.12 · Venice $1.18 (Venice wallet) · Luma $1.20 (2nd try — 1st failed on our side:
+  Replicate file URL rejected, fixed by inlining the start frame) · Hailuo $0.56. **Refused, not billed:** Veo 3.1 + Seedance
+  ("flagged as sensitive" on an innocent frame), Sora 2 Pro (OpenAI answers **HTTP 404 on /v1/videos** for our key — the
+  account has no Sora video access). **Total picture spend $8.46.** Claude's read: Venice holds her identity best (pick);
+  Hailuo = best value; Kling most cinematic but face drifts mid-shot; Luma loses her (turns away, face changes).
+  Comparison: Oracle `~/aigo-promo/review/G7_engine_compare.mp4` (2×2). **Awaiting Elena's pick.**

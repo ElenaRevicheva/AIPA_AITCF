@@ -224,10 +224,11 @@ async function video(shotId, engineOverride) {
   const o = o0;
   const usd = eng.perVideo ? eng.perVideo(o) : eng.perSec(o) * o.duration;
   guard(usd, `video ${shotId} on ${engineId}`);
-  // grok validates the URL's file extension and Replicate file URLs have none -> send the JPEG inline as a data URI
+  // grok validates the URL's file extension and Replicate file URLs have none -> send the JPEG inline as a data URI.
+  // luma too: its API rejects Replicate file URLs ("video.start_frame: Unsupported content type", 30 Sep).
   const inline = ref => `data:image/jpeg;base64,${fs.readFileSync(path.join(BASE, 'img', `${ref}.jpg`)).toString('base64')}`;
   const startRef = shot.start_by_engine?.[engineId] ?? shot.start;
-  o.start = startRef ? (engineId === 'grok' ? inline(startRef) : await resolveImg(startRef)) : undefined;
+  o.start = startRef ? ((engineId === 'grok' || engineId === 'luma') ? inline(startRef) : await resolveImg(startRef)) : undefined;
   o.end = shot.end ? await resolveImg(shot.end) : undefined;
   o.refs = [];
   for (const r of (engineId === 'kling' ? shot.refs || [] : [])) o.refs.push(await resolveImg(r));
