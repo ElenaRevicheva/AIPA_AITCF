@@ -130,3 +130,11 @@ Generator = `scripts/aigo-promo-gen.mjs` (a copy of film #8's, same money guard)
 **Before Gate 1:** Replicate (all engines + stills run there) is prepaid and throttles below $5 — Elena checks
 https://replicate.com/account/billing. **≥ $30** covers the worst case. Prices read 30 Sep (Wan 3 Prime, stills: model
 pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any change is reported before spending.
+
+## 5. Gate log
+
+- **Gate 1 — DONE 30 Sep 16:37 UTC.** 9/9 rendered, 0 refused; ledger **$1.13** (step cap $1.50); Replicate credit before: $38.03.
+  Files: Oracle `~/aigo-promo/img/r1_{nano,gpt,flux}_{a,b}.jpg`, `r2_{nano,gpt,flux}.jpg`; contact sheet sent to Elena.
+  Claude's read: Nano = most natural (her A/B already look like one woman; best him); GPT = most luxurious NY (r1_gpt_a
+  strongest portrait), his reads a bit "model"; Flux = her OFF-BRIEF (reads 55–60), him good but older.
+  **Awaiting Elena's pick** (one face each + keyframe model) before Gate 1b.
