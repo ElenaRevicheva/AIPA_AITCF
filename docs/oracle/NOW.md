@@ -143,8 +143,7 @@ git log keeps the record.
 - **VERIFIED BY:** Oracle VJH ff to `6c072e6`, evals 673 passed / 1 failed (`provider_chain[claude]`, DELIBERATE); restart 15:05:39 >
   file 15:04:05, active, cycle started; live import: own copy `blocked: True`, recruiter `False`. Concierge after all changes:
   Elena's edited send 14:53 → `Resend accepted` → deal "Sent" → HubSpot EMAIL activity 117734509427.
-- **Filming props to delete after capture (with Elena's OK):** CLIENT deals 65506583887 + 65493437251 (Marco Rivera),
-  junk HIRING deal 65501789817.
+- **Filming props DELETED 30 Sep (Elena's OK):** 65506583887, 65493437251, 65501789817 → DELETE 204, read-back 404.
 
 ### 🏛️ 30 Sep — Concierge speaks for AIdeazz AI Lab, never "solo" (Elena: "Nobody will pay a solo builder") · LIVE
 
@@ -170,6 +169,7 @@ git log keeps the record.
   *"starting with a Quick AI Growth Operator Diagnostic for $100"*. Make scenarios 5633833 + 5953877:
   `sync-make-prompts --apply` → both "written and VERIFIED", re-check 0 drift. Backups:
   `~/backups/pre-price-guard-20260930-*`, Make `backups/make/blueprint-*-2026-09-30T14-08*`.
+- **Elena 30 Sep: KEEP the ⚠️ PRICE CHECK** (it was added without her ask; she approved it after).
 - **SEEN, not touched:** OpenAI drafts use markdown links `[here](url)`, which show up raw in the plain-text email
   (`stripMarkdown` handles bold/italic, not links). This is Elena's call.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
