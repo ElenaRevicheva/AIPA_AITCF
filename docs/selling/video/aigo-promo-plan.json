@@ -214,6 +214,47 @@
         "R1"
       ],
       "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. YouTube thumbnail frame: tight close-up of her face at night lit only by the cool glow of a laptop screen, intrigued, eyes on the screen, the cream cashmere wrap, a dark penthouse and blurred snowy city lights behind her; the right third of the frame is empty dark space for a title."
+    },
+    "k_g1b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. Exterior night view looking in through the floor-to-ceiling windows of her Tribeca penthouse: heavy snow falling past the glass, the glittering Manhattan skyline reflected in it. Inside, in warm lamplight, SHE sits curled on a cream sofa by the window in her cream cashmere wrap, her face softly lit by the glow of the phone in her hands. Only her — no other person. Wide establishing shot, she is clearly the same woman."
+    },
+    "k_g2b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. 11:47 pm in her Tribeca penthouse: she sits upright on a cushioned window bench by a snowy floor-to-ceiling window, wearing the cream cashmere wrap over a high-neck ivory knit top, holding her phone in both hands and typing, its soft glow on her face (the screen faces away from camera). A glass of red wine on a side table, Manhattan lights softly out of focus behind her. Curious, hopeful expression. Natural, elegant hands. Medium close-up, editorial."
+    },
+    "k_g5b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. The same night on the same window bench: a closer shot, she holds her phone in one hand, thumb about to tap send, a small satisfied smile; the phone screen is turned away from camera. The cream cashmere wrap over the high-neck ivory knit top, relaxed posture, natural hands. Warm lamplight, city lights softly out of focus behind her. Editorial."
+    },
+    "k_g6b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R2",
+        "v_r2_helm"
+      ],
+      "prompt": "Use the reference images as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Dawn in a Panama City marina, golden-pink light and soft mist on calm water. He stands at the helm of his catamaran in the correct position: BEHIND the wheel, FACING FORWARD toward the bow (the front of the boat), the wheel between him and the bow, exactly as a skipper stands to steer. The camera is to the side of the helm, seeing him in three-quarter profile. He glances down at the phone in his left hand (screen facing away from camera) with a quiet confident smile; a coffee cup sits in the holder by the wheel. Black linen shirt. Medium shot."
+    },
+    "k_thumb2": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. YouTube thumbnail frame: tight close-up of her face at night lit only by the cool glow of her phone screen, intrigued, eyes on the phone, the cream cashmere wrap, a dark penthouse and blurred snowy city lights behind her; the right third of the frame is empty dark space for a title."
     }
   },
   "shots": {
@@ -297,7 +338,8 @@
   "decisions": {
     "R1": "r1_gpt_a (Elena, 30 Sep: \"Woman fine\")",
     "R2": "r2_p2_gpt_a (Elena, 30 Sep: \"this one\") - ~39, black linen, stubble",
-    "engines": "Venice Wan 3.0 Pro for faces (G2 G4 G5 G6 G9; $7.07 Venice wallet, 5 x $1.18) + Runway Gen-4.5 via Replicate for wides (G1 G3 G8) - Elena 30 Sep"
+    "engines": "Venice Wan 3.0 Pro for faces (G2 G4 G5 G6 G9; $7.07 Venice wallet, 5 x $1.18) + Runway Gen-4.5 via Replicate for wides (G1 G3 G8) - Elena 30 Sep",
+    "screens": "Owner approval = Telegram (real product); guest channel = WhatsApp (real screenshot) - Elena 30 Sep"
   },
   "motion_look": "Natural, realistic human motion, real skin and fabric physics, golden-hour light, gentle water movement, smooth slow gimbal camera, cinematic 24fps feel. The people stay exactly the same persons throughout.",
   "negative": "morphing face, identity change, different person, extra fingers, distorted hands, warping, flicker, text, subtitles, logos, watermark, cartoon, CGI look, plastic skin, fast camera, jitter"

@@ -193,3 +193,10 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
 8. Voice: more natural, verse sounds robotic → samples on ElevenLabs v3 / MiniMax Speech 2.8 HD / Chatterbox (all on Replicate).
 9. AIdeazz AI Lab logo (her PNG, transparent) on the final page.
 10. Idea: the woman uses her PHONE instead of the laptop.
+
+**Fixes round — GO (Elena: "1 - yes. 2. Go fixes. 3 yes").** Decision: owner approval stays **Telegram** (real product),
+guest channel = **WhatsApp** (real screenshot). New stills on GPT Image 2 with refs: `k_g1b` (HER at the snowy window, phone —
+replaces the woman in black), `k_g2b` (asks AI on her phone), `k_g5b` (sends, natural hands), `k_g6b` (behind the wheel facing the
+bow), `k_thumb2` — 5/5 OK after 2 refusals ("curled on a sofa, legs tucked" + silk tripped GPT's filter; neutral wording passed,
+refusals not billed). Ledger **$16.80**. Voice round 3: ElevenLabs v3 (Roger, Mark, Drew, James) + MiniMax 2.8 HD (magnetic,
+trustworthy) — 6/6 transcript-clean, ≈$0.15 (outside the gen ledger). `scripts/aigo-promo-vo-round3.py`.
