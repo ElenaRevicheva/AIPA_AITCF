@@ -255,6 +255,24 @@
         "R1"
       ],
       "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. YouTube thumbnail frame: tight close-up of her face at night lit only by the cool glow of her phone screen, intrigued, eyes on the phone, the cream cashmere wrap, a dark penthouse and blurred snowy city lights behind her; the right third of the frame is empty dark space for a title."
+    },
+    "k_g4b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R2",
+        "v_r2_helm"
+      ],
+      "prompt": "Use the reference images as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Monday morning in Flamenco Marina on the Amador Causeway, Panama City: he sits on the stern steps of his catamaran with a coffee, looking at his phone (screen facing away from camera) with a small disappointed sigh, the same black linen shirt. Behind him, across the Bay of Panama, the real Panama City skyline: the twisted spiral F&F Tower among the high-rises of Punta Paitilla and Punta Pacifica, and several large cargo ships and tankers anchored in the bay, waiting to enter the Panama Canal. Humid tropical air, palm trees along the Amador Causeway. Soft morning haze. Medium shot."
+    },
+    "k_g6c": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R2",
+        "v_r2_helm"
+      ],
+      "prompt": "Use the reference images as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Dawn in Flamenco Marina on the Amador Causeway, Panama City, golden-pink light and soft mist on calm water. He stands at the helm of his catamaran in the correct position: BEHIND the wheel, FACING FORWARD toward the bow, the wheel between him and the bow, as a skipper stands to steer; the camera is to the side of the helm, seeing him in three-quarter profile. He glances down at the phone in his left hand (screen facing away from camera) with a quiet confident smile; a coffee cup in the holder by the wheel. Black linen shirt. Behind him, across the Bay of Panama, the real Panama City skyline: the twisted spiral F&F Tower among the high-rises of Punta Paitilla and Punta Pacifica, and several large cargo ships and tankers anchored in the bay, waiting to enter the Panama Canal. Humid tropical air, palm trees along the Amador Causeway. Medium shot."
     }
   },
   "shots": {

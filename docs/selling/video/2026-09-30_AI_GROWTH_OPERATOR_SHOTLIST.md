@@ -200,3 +200,12 @@ replaces the woman in black), `k_g2b` (asks AI on her phone), `k_g5b` (sends, na
 bow), `k_thumb2` — 5/5 OK after 2 refusals ("curled on a sofa, legs tucked" + silk tripped GPT's filter; neutral wording passed,
 refusals not billed). Ledger **$16.80**. Voice round 3: ElevenLabs v3 (Roger, Mark, Drew, James) + MiniMax 2.8 HD (magnetic,
 trustworthy) — 6/6 transcript-clean, ≈$0.15 (outside the gen ledger). `scripts/aigo-promo-vo-round3.py`.
+
+**"Go Panama" (Elena, 30 Sep).** Stills `k_g4b` + `k_g6c` (Flamenco Marina / Amador, twisted F&F tower, cargo ships anchored for the
+Canal) — 2/2, $0.26; ledger **$17.06** (+≈$0.15 voice). WhatsApp S2 = her screenshot cropped to the bubble only (header with her
+name/photo removed): `captures/elena-phone-20260930-take3/S2_whatsapp_crop.jpg`.
+**Real-footage audit:** Pixabay "san blas panama" (117+) is fuzzy matching — San Francisco/San José/Murcia, NO San Blas.
+Pexels "San Blas Islands": location metadata = Atlanta / Indonesia / Philippines / Paris; "Panama" is only an SEO tag next to
+Honduras, Dominican Republic, Tuvalu → **rejected, would mislead**. Genuinely titled-Panama Pixabay 4K clips: 34734 Causeway Panama
+City 25s · 371077 + 371076 Panama City architecture 21s · 371074 Ciudad de Panamá 11s · 346372 Sunset Bocas del Toro 47s. No free
+San Blas footage exists → San Blas stays AI with authentic Guna Yala detail, or Elena's own footage.
