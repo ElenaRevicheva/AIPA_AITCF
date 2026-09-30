@@ -30,7 +30,49 @@ still shows the whole loop with real screens. The 1:40 cut is dropped.
 The villain is not a competitor. It is the gap between Friday night at sea and Monday morning in the marina.
 Visual spine: grey snowy midnight (where the guest is) → turquoise Caribbean (where she wants to be).
 
-## 2. MAIN FILM — 16:9, ~85–90 s, ~211 spoken words (v2.1: Elena's narration polish, 30 Sep)
+## 🔒 FINAL NARRATION — locked by Elena, 30 Sep 2026 (verbatim; do not edit without her)
+
+**She Asked ChatGPT Before She Messaged Your Yacht**
+
+> Your next charter guest is planning at midnight.
+> She isn't calling you. She's asking an AI.
+> It suggests the boats it can understand.
+> If it can't understand your website, you may not make the list.
+> Some guests message you directly. Friday night — you're at sea.
+> You reply Monday. She's already booked the boat that answered first.
+> [ON SCREEN: GOOD OPPORTUNITIES QUIETLY AGE OUT.]
+> Nobody wakes up wanting AI. You want more bookings.
+> Rewind.
+> Same guest. Same question.
+> This time, you have an AI Growth Operator.
+> [ON SCREEN: SAME GUEST. SAME QUESTION.]
+> First, it checks what AI can actually understand about your website.
+> Thirty-four checks. One score. The fixes that matter.
+> When she writes, she hears back right away.
+> And a reply is already drafted on your phone.
+> The AI drafts. You decide.
+> One tap — sent. And the conversation is logged in your CRM.
+> Every morning, you know who's new, who's warm, and who's starting to slip away.
+> AIdeazz AI Lab doesn't sell you another CRM.
+> We install an AI Growth Operator inside the tools you already use — and run it with you.
+> The people in this film are AI.
+> The product screens are real.
+> [ON SCREEN: AIdeazz AI Lab · MADE IN OUR OWN AI FILM STUDIO]
+> What does AI see when it looks at your business?
+> Find out free at aideazz dot X-Y-Z slash A-P-I.
+>
+> END CARD — AI GROWTH OPERATOR · by AIdeazz AI Lab · FREE AI VISIBILITY AUDIT · aideazz.xyz/api ·
+> Dramatization: people generated with AI
+
+**Length (Elena, final):** the natural ~1:44 stays. Do not cut it to force 80 s: the first 15–20 s matter far more than
+82 vs 102. The end card carries **no $100 line**. Keep "The people in this film are AI. The product screens are real."
+It does three jobs at once: disclosure, credibility, and proof of the Lab's own AI production capability.
+
+**Recorded (30 Sep):** Oracle `~/aigo-promo/voice/full_verse/` — `s01…s12.mp3` + `narration_verse_full.mp3` **104.4 s**,
+every line transcript-clean (0 retakes). Lines 2–3 were re-recorded to the final wording; take 1 is kept as
+`s02_take1.mp3` / `s03_take1.mp3` / `narration_verse_take1.mp3`.
+
+## 2. Shot guide — picture per scene (narration column superseded by the 🔒 FINAL text above)
 
 | # | Time | Picture | Narrator / on-screen text |
 |---|---|---|---|

@@ -2,7 +2,7 @@
 # Runs on Oracle in ~/aigo-promo/voice. One file per scene (film #8 method) so each line can be placed and
 # retaken on its own, plus a joined preview with the film's pauses. Every line is transcribed back and
 # checked for its key words; a line that is LEAKED or MISSING must be retaken before it goes in the edit.
-import base64, json, os, subprocess, urllib.request
+import base64, json, os, subprocess, sys, urllib.request
 
 ENV = os.path.expanduser("~/cto-aipa/.env")
 def env(name):
@@ -19,10 +19,12 @@ BASE = ("Confident, charismatic male narrator in his mid-thirties. Premium brand
 LINES = [
     ("s01", "Your next charter guest is planning at midnight. She isn't calling you. She's asking an AI.",
      "Open intimate and intriguing, like sharing a secret.", ["midnight", "asking an ai"], 0.6),
-    ("s02", "It suggests the boats it can understand. If it can't read your website, you're not on the list.",
-     "Matter-of-fact, a little sting on 'not on the list'.", ["boats", "not on the list"], 0.8),
-    ("s03", "Some guests still write. Friday night — you're at sea. You reply Monday. She's already booked the boat that answered first.",
-     "Storytelling; let 'She's already booked' land with regret.", ["friday", "monday", "answered first"], 1.2),
+    ("s02", "It suggests the boats it can understand. If it can't understand your website, you may not make the list.",
+     "Matter-of-fact, a little sting on 'may not make the list'. Say 'boats' crisply, rhymes with 'coats'.",
+     ["boats", "make the list"], 0.8),
+    ("s03", "Some guests message you directly. Friday night — you're at sea. You reply Monday. She's already booked the boat that answered first.",
+     "Storytelling; let 'She's already booked' land with regret. Say 'answered' fully, with a clear -ed.",
+     ["directly", "monday", "answered first"], 1.2),
     ("s04", "Nobody wakes up wanting AI. You want more bookings.",
      "Slow, quiet authority. The film's thesis.", ["nobody wakes up", "more bookings"], 1.0),
     ("s05", "Rewind. Same guest. Same question. This time, you have an AI Growth Operator.",
@@ -52,9 +54,18 @@ def duration(path):
                                 capture_output=True, text=True).stdout.strip())
 
 os.makedirs(OUT, exist_ok=True)
+ONLY = next((a.split("=", 1)[1].split(",") for a in sys.argv if a.startswith("--only=")), None)
 concat, total, bad = [], 0.0, 0
 for scene, text, extra, keys, pause in LINES:
     mp3 = f"{OUT}/{scene}.mp3"
+    if ONLY and scene not in ONLY and os.path.exists(mp3):
+        d = duration(mp3); total += d + pause; concat.append(mp3)
+        print(f"KEPT {scene} {d:.1f}s (existing take)")
+        if pause:
+            sil = f"{OUT}/_sil_{scene}.mp3"
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", str(pause), "-b:a", "160k", sil], check=True)
+            concat.append(sil)
+        continue
     open(mp3, "wb").write(post("https://api.openai.com/v1/audio/speech",
                                {"model": MODEL, "voice": VOICE, "input": text, "instructions": f"{BASE} {extra}",
                                 "response_format": "mp3"}, {"Authorization": f"Bearer {OPENAI}"}))
