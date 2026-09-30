@@ -130,6 +130,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🐛 30 Sep — Our OWN inquiry notification became a HIRING deal (found by the promo test; NOT fixed, Elena's go)
+
+- **SEEN:** the portfolio-form copy email *"[AIdeazz] Inquiry — Marco Rivera"* was ingested as a job lead →
+  `[cover-letter] drafted via openai … [AIdeazz] Inquiry — Marco Rivera @ Aideazz` → `Created deal 65501789817
+  ([HIRING-VJH-LEAD] [AIdeazz] Inquiry — Marco Rivera @ Aideazz)`. **Every real client inquiry can do the same**: a fake
+  job deal plus OpenAI spend, and it pollutes the job queue and VJH learning. Likely VJH's Gmail job-lead scan (it reads
+  Gmail since the Aug 23 gap fix). The fix belongs in the VJH repo: skip subjects starting `[AIdeazz] Inquiry`.
+- **Filming props to delete after capture (with Elena's OK):** CLIENT deals 65506583887 + 65493437251 (Marco Rivera),
+  junk HIRING deal 65501789817.
+
 ### 🏛️ 30 Sep — Concierge speaks for AIdeazz AI Lab, never "solo" (Elena: "Nobody will pay a solo builder") · LIVE
 
 - **DONE:** `CONCIERGE_RULES` identity = *AIdeazz AI Lab installs an AI Growth Operator inside the tools a business already uses — not another CRM*,
