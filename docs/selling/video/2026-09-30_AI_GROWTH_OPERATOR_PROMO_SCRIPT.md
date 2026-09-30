@@ -113,6 +113,18 @@ Algieba (~25 s, ≈120 wpm → film ≈ 1:45 unless sped up). Each one was trans
 rejects `systemInstruction` (`400 Developer instruction is not enabled for this model`). Give it the script only; use
 2.5-pro for the "Say …:" style cue. Never trust a TTS take without a transcript check.
 
+**OpenAI voices (Elena topped up, 30 Sep).** `gpt-4o-mini-tts-2025-12-15` (film #8's engine) takes direction in a separate
+`instructions` field, so nothing leaks. Round 1: cedar 20.4 s · onyx 19.1 s · ash 22.8 s (ash dropped "is").
+**Round 2 (Elena: "more juicy, confident, still professional, mid-30s–40, not older"):** OpenAI verse 22.8 s · echo 18.3 s
+· ash 21.6 s; Gemini 2.5-pro Puck 22.0 s · Orus 21.4 s · Fenrir 21.6 s. All clean: no direction spoken, all key lines
+present. Scripts `scripts/aigo-promo-vo-openai.py`, `scripts/aigo-promo-vo-round2.py`.
+
+**Phone captures (Elena, 30 Sep)** → Oracle `~/aigo-promo/captures/elena-phone-20260930/`: 01 Telegram new-inquiry card ·
+02 Gemini draft (**shows $1,500 — blur**) · 03 ✅ Send now / ✏️ Edit / 🗑 Skip buttons (the link preview shows Elena's name
+— crop it) · 04 Gmail reply (**$1,500 — do not use**) · 05 internal inquiry copy. She sent the unedited draft (test inbox
+only). Log proof: `Resend accepted` → `deal moved to "Sent"` → `HubSpot EMAIL activity 117709291844`.
+**Cleanest scene 8:** after the price fix, one fresh test inquiry → a correct draft → she taps ✏️ Edit or Send → new captures.
+
 ## 6. For interviews and sales calls, not the film
 
 The film says *"The AI drafts. You decide."* and never names the concept. The named concept is **human-in-the-loop**.

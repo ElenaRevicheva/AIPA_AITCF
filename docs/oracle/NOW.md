@@ -146,10 +146,15 @@ git log keeps the record.
   footage → priced shot list (~$12–20). **Each step needs her go. No $ without it.**
 - **VERIFIED BY:** live audit 30 Sep 11:07 UTC — 34 checks, 100/A+ (aideazz.xyz), 93/A+ with 3 fixes (atuona.xyz);
   every script claim traced to code in the file's §4.
-- **RISK:** inbound creates NO follow-up task (only outbound +4d) — never script "automatic follow-up". OpenAI has no
-  credits, so film #8's `gpt-4o-mini-tts` voice is blocked until she tops up.
+- **RISK:** inbound creates NO follow-up task (only outbound +4d) — never script "automatic follow-up".
+- **30 Sep ~14:00 UTC:** OpenAI topped up (verified live). **13 male voice samples** exist, all transcript-clean: 4 Gemini,
+  3 OpenAI (cedar/onyx/ash), and round 2 "confident mid-30s" (OpenAI verse/echo/ash + Gemini 2.5-pro Puck/Orus/Fenrir).
+  Scripts `scripts/aigo-promo-vo-*.py`; audio in Oracle `~/aigo-promo/voice/`. **Elena picks.**
+- **Test lead loop CLOSED:** Elena tapped ✅ Send now on the **unedited** draft (with the invented $1,500) → her own test inbox
+  only. Log: `Resend accepted` → `deal moved to "Sent"` → `HubSpot EMAIL activity … logged`. Her 5 phone screenshots are in
+  Oracle `~/aigo-promo/captures/elena-phone-20260930/`. Files 02 + 04 show the $1,500 line: blur it or never use them.
 
-### 🎯 29 Sep — EVERY job deal is fully stuffed and the audit proves it (7/7) · ⚠️ OpenAI OUT OF CREDITS (Elena's move)
+### 🎯 29 Sep — EVERY job deal is fully stuffed and the audit proves it (7/7) · ✅ OpenAI credits RESTORED 30 Sep
 
 - **DONE:** each I-act-TODAY job deal (VJH or hand-staged) = clickable apply link + tailored letter + TAILORED CV + 🛡️ defense
   + NEW **🎯 ROLE DEFENSE** (`generateRoleDefense`, src/cover-letter.ts): the questions THIS posting raises, answered from verified
@@ -159,7 +164,8 @@ git log keeps the record.
   📱 APPLY link = the phone card. `hs-audit-apply-kit.cjs` checks all 5 parts, Telegram names what is missing.
 - **VERIFIED BY:** `node scripts/hs-audit-apply-kit.cjs` on Oracle → `7 job deals · complete 7 · gaps 0`; notes read back from HubSpot.
   HireLATAM + Georgia IT → closedlost with Elena's reason (her call). VJH `026419e`: 🎯 notes never read as her rejection reason.
-- **🚨 OpenAI API: "429 You have no credits remaining"** (spent by today's role-defense regenerations: gpt-4.1 + gpt-5 on every
+- **✅ RESOLVED 30 Sep — Elena topped up; a live `gpt-4.1-mini` completion from Oracle returned "OK" (~13:44 UTC).** Was:
+  **🚨 OpenAI API: "429 You have no credits remaining"** (spent by today's role-defense regenerations: gpt-4.1 + gpt-5 on every
   deal, 4 rounds). Kit still works via Gemini (draft + review). Anything else on OPENAI_API_KEY (TTS voices, embeddings, the
   quality chain's 2nd step) is degraded until Elena tops up at platform.openai.com/settings/organization/billing.
 - **Scope (Elena):** 🎯 role notes live ONLY on I-act-TODAY deals — the kit searches that stage only; the 2 written on
