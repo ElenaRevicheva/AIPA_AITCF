@@ -3651,5 +3651,14 @@
       }
     ],
     "dealId": "65375163554"
+  },
+  "megan-demand-nudge": {
+    "phone": "",
+    "draft": "docs/selling/drafts/megan-demand-nudge-email.txt",
+    "company": "DataVendor / HUD",
+    "email": "megan@hud.ai",
+    "emailDraft": "docs/selling/drafts/megan-demand-nudge-email.txt",
+    "dealId": "64673099185",
+    "cc": "aipa@aideazz.xyz"
   }
 }

@@ -144,8 +144,13 @@ git log keeps the record.
 - ⚠️ **A SECOND DataVendor account exists since today:** Gmail got *"Welcome to Datavendor"* 20:01 UTC (to
   elena.revicheva2016@gmail). The listing lives on the **aipa@aideazz.xyz** account (password reset there 20:25 UTC).
   Log in as aipa@ to see the listing; a fresh Gmail account would not hold it.
-- **Drafted, NOT sent:** `docs/selling/drafts/megan-demand-nudge-2026-09-30.txt` — demand only, zero PII talk:
-  "do buyers ask for agentic TS/Python systems? if the bundle is the wrong shape, I'll split/reprice".
+- **ARMED one-click, NOT sent:** slug `megan-demand-nudge` → `https://webhook.aideazz.xyz/cto/go/outreach-email/megan-demand-nudge`
+  in deal note `117765279572`. Draft `docs/selling/drafts/megan-demand-nudge-email.txt` — demand only, zero PII talk.
+  Registry key merged ON Oracle (backup in `~/backups/`, 438→439) and on `main`; confirm page probed HTTP 200, To/Cc correct.
+- **Firecrawl (X post @v_garg_s 30 Sep, "hiring for literally all roles") — NOT staged.** All 34 Ashby roles are
+  SF/Toronto onsite or hybrid 3+ days, US/CA work auth, no US sponsorship → hard reject by her own location rules.
+  Closest content match (Content Marketer = GEO/AEO, $200–223k SF / C$158–175k Toronto) is still Toronto-hybrid,
+  Canada sponsorship "case-by-case". VJH had already parked 2 Firecrawl deals at stage 1. Stage only if Elena says she'd relocate.
 - **PII is closed. Do not reopen it.** Listing `5f7b8392…` went live 10 Sep with 18/18 mandatory checks while
   `pii_qc_llm` failed on all 8 — that check has no authority (see memory `project_datavendor_pii_gate`).
 
