@@ -107,6 +107,30 @@
       "engine": "gpt",
       "aspect": "3:4",
       "prompt": "Portrait of a strikingly handsome, magnetic Panamanian man about thirty-seven, the captain-owner of a luxury sailing-catamaran charter business: Afro-Panamanian, deep brown skin, close-cropped hair, a neat short beard, a bright confident smile, tall athletic build. He wears a sky-blue linen shirt open at the collar with the sleeves rolled and a minimal steel watch, sunglasses tucked into the shirt — effortless 2026 resort-casual style. He stands at the helm of his catamaran at golden hour, warm low sun on his face, turquoise water and San Blas palm islets softly out of focus behind him. Confident, charismatic, warm and a little flirtatious, direct eye contact — the man guests book the boat for, classy not cheesy. GQ editorial portrait realism, head and shoulders, 85mm lens. No captain's hat, no uniform, no epaulettes, no gold chains."
+    },
+    "v_r1_deck": {
+      "engine": "gpt",
+      "aspect": "2:3",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference image as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. Now she is in Panama: full-length at golden hour on the teak deck of a luxury white sailing catamaran anchored off a San Blas palm islet, turquoise water all around. She wears a flowing ivory linen resort dress, her cream cashmere wrap over her shoulders lifting in the sea breeze, thin gold stud earrings, a slim gold watch, flat leather sandals. Relaxed and radiant, a slow smile, warm low sun on her face. Editorial luxury travel photography."
+    },
+    "v_r1_profile": {
+      "engine": "gpt",
+      "aspect": "3:4",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference image as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. Her profile at the floor-to-ceiling window of her Tribeca penthouse at night, snow falling outside over the glittering Manhattan skyline, warm lamplight, the ivory silk blouse and cream cashmere wrap, thoughtful, looking out at the city. Head and shoulders, 85mm lens."
+    },
+    "v_r2_helm": {
+      "engine": "gpt",
+      "aspect": "2:3",
+      "refs": [
+        "R2"
+      ],
+      "prompt": "Use the reference image as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Full-length at the helm of his luxury sailing catamaran at dawn in a Panama City marina, golden-pink light and soft mist on calm water, the city skyline softly out of focus behind. The same black linen shirt open at the collar with the sleeves pushed up, dark linen trousers, a steel dive watch, a coffee cup resting by the wheel. Confident, relaxed, handsome — effortless 2026 resort-casual. Editorial luxury travel photography."
     }
   },
   "shots": {},
