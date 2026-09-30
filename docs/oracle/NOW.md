@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 30 Sep 14:20 | Concierge price guard (Elena's go): catalog prices in prompt + off-catalog ⚠️ on TG card | `src/concierge-prompt.ts`, `src/concierge.ts`, new test; Oracle `dist/` + `pm2 restart cto-aipa`; Make prompt sync | 09d86f8 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,6 +130,25 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 💲 30 Sep — Concierge drafts may only quote catalog prices (was: invented "$1,500") · LIVE
+
+- **DONE (`f1d3118`, Elena's go):** `src/concierge-prompt.ts` reads the $100 / $200 / $500 ladder FROM
+  `aideazz-service-catalog.ts` into the rules. It adds "ONLY prices that exist", sets the $100 diagnostic as the first
+  step, and says larger work is "scoped after the diagnostic, no number". `findOffCatalogPrices()` scans every draft;
+  an off-catalog amount puts **⚠️ PRICE CHECK** on the Telegram card and the HubSpot note (the draft is warned about,
+  never rewritten). "solo" was dropped from the rules. Reply-to now comes from `.env` only: pii-guard blocked the
+  hard-coded Gmail, and Oracle has `CONCIERGE_REPLY_TO` set, so behaviour is unchanged.
+- **VERIFIED BY:** `node scripts/test-concierge-prices.cjs` 22/22, locally and on Oracle. Before the change, live
+  `dist/` equalled the build of `main`. After it, Oracle md5 = local (`828ca30e15da` / `4a31ec227d1c`), and
+  file 14:10:23 < process start 14:10:26. **Output proof:** the self-test draft `31e34a5c6dd00a12` (openai) says
+  *"starting with a Quick AI Growth Operator Diagnostic for $100"*. Make scenarios 5633833 + 5953877:
+  `sync-make-prompts --apply` → both "written and VERIFIED", re-check 0 drift. Backups:
+  `~/backups/pre-price-guard-20260930-*`, Make `backups/make/blueprint-*-2026-09-30T14-08*`.
+- **SEEN, not touched:** OpenAI drafts use markdown links `[here](url)`, which show up raw in the plain-text email
+  (`stripMarkdown` handles bold/italic, not links). This is Elena's call.
+- **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
+  defence; the human at ✅ Send is the last.
+
 ### 🎬 30 Sep — AI Growth Operator YouTube promo: script v2 written, NOTHING rendered (Elena's move)
 
 - **DONE:** `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`. Yacht-charter story in two timelines,
@@ -140,9 +158,7 @@ git log keeps the record.
 - **UPDATE 30 Sep 13:25 UTC:** text approved (v2.1). Title *She Asked ChatGPT Before She Messaged Your Yacht*, male voice,
   "ay-eye-DEAZ". 4 voice samples made (~$0.01), she picks. **Test inquiry sent through the real form** →
   `[CLIENT-CTO-INQUIRY] Marco Rivera — outreach` = **FILMING PROP, do not work it, delete after capture.**
-- **🚨 KNOWN-BROKEN:** that concierge draft quoted **"$1,500"**. `src/concierge-prompt.ts` has NO prices, so the model
-  invents them for real leads too. The fix (put the real $100/$200/$500 ladder in the prompt, or forbid prices) is
-  proposed and **awaits Elena's go** (shared code + Oracle deploy).
+- **✅ FIXED 30 Sep (see the 💲 block below):** that draft's invented "$1,500" price.
 - **NEXT:** Elena picks a voice; corrects the price line in the Telegram draft (reply-to-edit) and sends, which is the scene-8
   footage → priced shot list (~$12–20). **Each step needs her go. No $ without it.**
 - **VERIFIED BY:** live audit 30 Sep 11:07 UTC — 34 checks, 100/A+ (aideazz.xyz), 93/A+ with 3 fixes (atuona.xyz);

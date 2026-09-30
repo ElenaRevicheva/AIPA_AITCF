@@ -16,7 +16,7 @@ folder (`…_PROMO_BRIEF.md`); v1 of this script (dental story) is in git histor
 | Title | **She Asked ChatGPT Before She Messaged Your Yacht** (the ChatGPT + yacht pairing is distinctive). Narration keeps "boats" — "yachts" sounds like ad copy when spoken |
 | Thumbnail | **SHE ASKED AI FIRST** |
 | Pronunciation | AIdeazz = **"ay-eye-DEAZ"** → write `A-I-deaz` in every TTS script |
-| Narrator | **Male** |
+| Narrator | **Male — OpenAI `gpt-4o-mini-tts` voice "verse"** with the round-2 "confident mid-30s" direction (Elena's pick) |
 
 **Why ~85–90 s + a Short (not 1:40).** A charter owner meets this film in three places. (1) A link inside our outreach email
 or WhatsApp, opened on a phone between trips: it has to finish on a phone and hook in the first line. (2) The YouTube
@@ -124,6 +124,13 @@ present. Scripts `scripts/aigo-promo-vo-openai.py`, `scripts/aigo-promo-vo-round
 — crop it) · 04 Gmail reply (**$1,500 — do not use**) · 05 internal inquiry copy. She sent the unedited draft (test inbox
 only). Log proof: `Resend accepted` → `deal moved to "Sent"` → `HubSpot EMAIL activity 117709291844`.
 **Cleanest scene 8:** after the price fix, one fresh test inquiry → a correct draft → she taps ✏️ Edit or Send → new captures.
+**Price fix is LIVE (30 Sep, `f1d3118`)** — see NOW.md 💲. A fresh test now drafts the $100 diagnostic.
+
+**Full narration v1 — verse (30 Sep).** `scripts/aigo-promo-vo-full.py` → Oracle `~/aigo-promo/voice/full_verse/`
+(one mp3 per scene plus `narration_verse_full.mp3`). **101.7 s** with pauses: verse reads at ≈135 wpm, over the
+85–90 s target. Retake flags from the transcript: s02 "boats" was heard as "bots"; s03 "answered first" was heard as
+"answer first" ("at C" is only the transcriber mishearing "at sea"). s10 came out as "AI ideas, AI Lab", which is the
+ay-eye-DEAZ pronunciation landing.
 
 ## 6. For interviews and sales calls, not the film
 
