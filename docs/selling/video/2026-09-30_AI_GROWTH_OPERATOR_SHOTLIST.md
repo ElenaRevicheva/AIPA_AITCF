@@ -227,3 +227,16 @@ Playwright recording of the live /api audit on atuona.xyz (93). Real Panama stoc
 G8b Guna Yala drone ($0.60). QR test-decoded from 4 exported frames → `https://aideazz.xyz/api`. Voice samples ≈$0.26 total.
 **Spend: generation $20.62 + voices ≈$0.26 ≈ $20.90 of $30.** Still to do: Pixabay music (no vocals, her ear), 8 AM brief
 (her screenshot tomorrow), delete test deal 65531490170 (her OK), final grade, 9:16 Short, thumbnail title.
+
+**MUSIC SHORTLIST — 30 Sep (for Elena's ear, nothing downloaded yet).** Scanned ~120 Pixabay tracks across 16 tropical/chill/lounge
+queries. **Trap found: most Pixabay tropical tracks are "Content ID Registered"** (JSON-LD `additionalProperty`) → on YouTube they
+trigger a copyright claim (ads/revenue to the artist until disputed with the Pixabay licence). A client-facing promo must not start
+life with a claim, so the shortlist is **not-registered only**, instrumental by title/tags, and excludes every bed earlier films used.
+1. Tropical House — BerryDeep · 2:24 · Aug 2026 · chill, floating · pixabay.com/music/house-tropical-house-592396/
+2. Chillout Music — The_Mountain · 2:29 · Jul 2026 · calm lounge · pixabay.com/music/beats-chillout-chillout-music-576561/
+3. Sunset Chill Nature — finley-chill · 2:50 · May 2026 · elegant, floating · pixabay.com/music/pop-sunset-chill-nature-529994/
+4. Deep House — ElectroAnimals · 2:35 · Aug 2026 · more pulse, lifestyle · pixabay.com/music/deep-house-deep-house-591279/
+5. Disrot – Solstice — Disrots · 2:39 · 2024 · elegant, glamorous · pixabay.com/music/beats-disrot-solstice-220584/
+Rejected: Paradise Sunset (499036) carries a vocal tag; sunset-house-grooves tracks tag "Vocal House"; Luna / Island Tropical House /
+rediskasound tracks = Content ID registered. After her pick: download (≈3–6 MB mp3, her OK), transcript-check for words,
+`scripts/aigo-promo-music-mix.py` (sidechain duck under the voice, apad to picture). Thumbnail draft: `deliverables/AIGO_thumbnail_v1.jpg`.
