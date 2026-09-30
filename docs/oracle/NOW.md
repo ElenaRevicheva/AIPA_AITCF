@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 30 Sep 15:05 | VJH: never read our own @aideazz.xyz mail as an employer reply (Elena's go) — one entry in the existing sender blocklist | VJH `src/autonomous/response_detector.py`, new test; Oracle VJH `git pull` + `systemctl restart vibejobhunter` | 815139c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
