@@ -1,0 +1,25 @@
+TO: megan@hud.ai
+CC: aipa@aideazz.xyz
+SUBJECT: Re: Listing is live - two things that would move it toward a sale.
+
+Hi Megan,
+
+A short follow-up on my 10 September note - no QC questions this time.
+
+The opportunity emails are arriving (today: COBOL Enterprise Codebase). That one
+is not a fit for me and I will not respond to it - my inventory is TypeScript and
+Python, production AI-agent systems, not COBOL.
+
+Which is the question: are buyers asking for what I list? Agentic systems in
+production - multi-agent orchestration, CRM and email automation, LLM routing with
+fallbacks, a bilingual WhatsApp tutoring product.
+
+If an opportunity like that is open, or likely, I would like to respond to it
+directly. If the $74,851 bundle is the wrong shape for how buyers shop, tell me
+and I will split or reprice it this week.
+
+Listing: https://datavendor.ai/listings/5f7b8392-a76b-46fa-9772-02f9daae7d6e
+
+Best regards,
+Elena Revicheva
+AIdeazz AI Lab

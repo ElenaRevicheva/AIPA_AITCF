@@ -130,6 +130,25 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📭 30 Sep — HUD/DataVendor: Megan has NOT replied since 8 Sep. The ball is hers, 20 days. (Elena's move: nudge or wait)
+
+- **VERIFIED BY:** read-only IMAP sweep of every Zoho folder (Inbox/Sent/Notification/Newsletter/Spam) since 28 Aug
+  for `hud.ai`/`datavendor`/`Megan`, plus Gmail. Last thread message = **Sent #144, 10 Sep 11:10 Panama**, Elena →
+  Megan, *"Listing is live - two things that would move it toward a sale."* (sent by hand from Zoho, NOT the armed
+  Resend slug `megan-pii-qc-scan-aborts` — that one never fired; note `116688950378` carries no EMAILED stamp).
+  Megan's last words: **8 Sep** — *"we will keep you posted if there's any movement on the demand side."*
+  reply-radar watches Zoho every 10 min, so a reply would have paged her.
+- **COBOL Enterprise Codebase opportunity (30 Sep, `team@datavendor.ai`, Zoho *Newsletter*)** = broadcast to all
+  vendors. **Not a fit — do not respond:** needs COBOL, 10+ contributors, 1,000+ commits, 50+ merged PRs,
+  >25% test coverage, *primarily human-written pre-AI*. Ours are TS/Python, solo + AI (Fermatix's exact objection).
+- ⚠️ **A SECOND DataVendor account exists since today:** Gmail got *"Welcome to Datavendor"* 20:01 UTC (to
+  elena.revicheva2016@gmail). The listing lives on the **aipa@aideazz.xyz** account (password reset there 20:25 UTC).
+  Log in as aipa@ to see the listing; a fresh Gmail account would not hold it.
+- **Drafted, NOT sent:** `docs/selling/drafts/megan-demand-nudge-2026-09-30.txt` — demand only, zero PII talk:
+  "do buyers ask for agentic TS/Python systems? if the bundle is the wrong shape, I'll split/reprice".
+- **PII is closed. Do not reopen it.** Listing `5f7b8392…` went live 10 Sep with 18/18 mandatory checks while
+  `pii_qc_llm` failed on all 8 — that check has no authority (see memory `project_datavendor_pii_gate`).
+
 ### ✅ 30 Sep — Our OWN inquiry notification became a HIRING deal → FIXED in VJH `6c072e6` (Elena: "Job Hunter should not read business inquiries like employment options")
 
 - **SEEN:** the portfolio-form copy email *"[AIdeazz] Inquiry — Marco Rivera"* was ingested as a job lead →
