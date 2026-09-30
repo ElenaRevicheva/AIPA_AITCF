@@ -130,6 +130,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎬 30 Sep — AI Growth Operator YouTube promo: script v2 written, NOTHING rendered (Elena's move)
+
+- **DONE:** `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`. Yacht-charter story in two timelines,
+  ~80 s + 30 s Short, lines taken from the 53-page `28.09.2026 AI Growth Operator.pdf`. Elena's rules: **never her
+  name or "solo"** (credit AIdeazz AI Lab + AI Growth Operator), realistic AI narrator, keep the "people are AI,
+  screens are real" reveal. This is the *operator* film. It reuses the real audit take from the live /api film v19; it does not remake it.
+- **NEXT:** Elena approves the text + says how "AIdeazz" is pronounced → voice samples (cents) → test-inquiry capture
+  (writes 1 test HubSpot deal, deleted after) → priced shot list (~$12–20). **Each step needs her go. No $ without it.**
+- **VERIFIED BY:** live audit 30 Sep 11:07 UTC — 34 checks, 100/A+ (aideazz.xyz), 93/A+ with 3 fixes (atuona.xyz);
+  every script claim traced to code in the file's §4.
+- **RISK:** inbound creates NO follow-up task (only outbound +4d) — never script "automatic follow-up". OpenAI has no
+  credits, so film #8's `gpt-4o-mini-tts` voice is blocked until she tops up.
+
 ### 🎯 29 Sep — EVERY job deal is fully stuffed and the audit proves it (7/7) · ⚠️ OpenAI OUT OF CREDITS (Elena's move)
 
 - **DONE:** each I-act-TODAY job deal (VJH or hand-staged) = clickable apply link + tailored letter + TAILORED CV + 🛡️ defense

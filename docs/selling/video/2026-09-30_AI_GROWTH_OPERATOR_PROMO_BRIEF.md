@@ -1,5 +1,8 @@
 # AI Growth Operator — YouTube promo: deep dive + creative brief (DRAFT, 30 Sep 2026)
 
+> **Superseded for story, voice, credit and length by `2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`** (Elena, 30 Sep:
+> yacht charter · AI narrator · never her name — credit AIdeazz AI Lab · ~80 s + 30 s Short). The claims audit below still holds.
+
 Sources: `AI_Growth_Operator_Elena_Revicheva.pdf` (7-slide offer deck) and `Elena_Revicheva_AI_Professional_Outlook.pdf`
 (7-slide positioning deck), both uploaded by Elena 29 Sep. Live checks run the same night are marked ✅.
 
