@@ -33,8 +33,8 @@ Elena (30 Sep): *"elite, luxurious, super realistic, super human yacht marine li
 
 | Ref | Who | Portrait prompt (subject first) |
 |---|---|---|
-| **R1 — the guest** | New York, early 40s | Portrait of a woman in her early forties, elegant and intelligent, shoulder-length dark-blonde hair, minimal makeup, delicate gold studs, cream cashmere sweater, warm lamplight on her face, calm curious eyes, looking just off camera. |
-| **R2 — the owner-captain** | Panama, about 40 | Portrait of a Latin American man about forty, sun-tanned, short dark hair and a neat short beard, calm confident eyes with faint smile lines, crisp white linen shirt with sleeves rolled, steel dive watch, soft morning sea light behind him. |
+| **R1 — the guest (a WOMAN)** | Woman, New York, early 40s — Elena, 30 Sep: the guest is a woman | Portrait of a woman in her early forties, elegant and intelligent, shoulder-length dark-blonde hair, minimal makeup, delicate gold studs, cream cashmere sweater, warm lamplight on her face, calm curious eyes, looking just off camera. |
+| **R2 — the owner-captain (a man)** | Man, Panama, about 40 | Portrait of a Latin American man about forty, sun-tanned, short dark hair and a neat short beard, calm confident eyes with faint smile lines, crisp white linen shirt with sleeves rolled, steel dive watch, soft morning sea light behind him. |
 
 ## 3. The shots — 9 generated + 7 real
 
