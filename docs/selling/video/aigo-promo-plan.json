@@ -216,9 +216,32 @@
       "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. YouTube thumbnail frame: tight close-up of her face at night lit only by the cool glow of a laptop screen, intrigued, eyes on the screen, the cream cashmere wrap, a dark penthouse and blurred snowy city lights behind her; the right third of the frame is empty dark space for a title."
     }
   },
-  "shots": {},
+  "shots": {
+    "G7": {
+      "start": "k_g7",
+      "start_by_engine": {
+        "sora": "k_g7_sora"
+      },
+      "refs": [
+        "R1",
+        "v_r1_deck",
+        "R2"
+      ],
+      "mode": "pro",
+      "audio": false,
+      "duration": 5,
+      "duration_by_engine": {
+        "veo31": 4,
+        "sora": 4,
+        "hailuo": 6
+      },
+      "motion": "THE PAYOFF. She steps from the small wooden tender up onto the swim platform of the catamaran, taking his steadying hand; the cream cashmere wrap and ivory linen dress lift in the sea breeze; she looks up at the boat and the palm islet and breaks into a slow, warm smile of arrival. Slow gimbal move that settles on her face."
+    }
+  },
   "decisions": {
     "R1": "r1_gpt_a (Elena, 30 Sep: \"Woman fine\")",
     "R2": "r2_p2_gpt_a (Elena, 30 Sep: \"this one\") - ~39, black linen, stubble"
-  }
+  },
+  "motion_look": "Natural, realistic human motion, real skin and fabric physics, golden-hour light, gentle water movement, smooth slow gimbal camera, cinematic 24fps feel. The people stay exactly the same persons throughout.",
+  "negative": "morphing face, identity change, different person, extra fingers, distorted hands, warping, flicker, text, subtitles, logos, watermark, cartoon, CGI look, plastic skin, fast camera, jitter"
 }

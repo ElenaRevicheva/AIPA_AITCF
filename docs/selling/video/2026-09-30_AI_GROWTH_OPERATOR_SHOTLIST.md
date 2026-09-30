@@ -155,3 +155,7 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   Luma direct key rejected by `/credits` ("Not authenticated") but **Luma ray-3.2 runs on Replicate**; Venice key works, balance
   needs an admin key (last known ≈$8.25 on 22 Sep). Replicate also has **Sora 2 Pro** (billed to OpenAI via our key: $0.30/s 720p,
   $0.50/s 1792×1024), **Hailuo 2.3** ($0.28–0.56/video), **Veo 3.1** ($0.40/s with audio, $0.20/s without), Kling Omni, Seedance.
+- **Gate 3 GO (Elena: "Go 3").** Payoff G7 on 7 engines: Kling 3.0 Omni pro + face refs · Veo 3.1 1080p · Luma ray-3.2 1080p ·
+  Sora 2 Pro (OpenAI key, 1792×1024 start) · Hailuo 2.3 1080p · Seedance 2.5 720p · **Venice Wan 3.0 Pro 1080p on her Venice wallet**
+  (quote-before-queue, same flow as Atuona's `tryVeniceVideo`). Worst-case $8.82, step cap `BUDGET_USD=13.40`. Runway excluded
+  (4 credits) — next round only if none of the 7 satisfies her.

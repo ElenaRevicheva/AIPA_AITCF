@@ -63,7 +63,27 @@ const ENGINES = {
     input: o => ({ prompt: o.prompt, negative_prompt: o.negative, image: o.start, ...(o.end ? { last_frame: o.end } : {}),
       duration: o.duration, resolution: '720p', aspect_ratio: '16:9', generate_audio: false }),
   },
+  // ---- promo top tier (schemas + page prices read 30 Sep 2026; ambiguous tiers priced at the HIGH one) ----
+  veo31: {   // page lists $0.40/s and $0.20/s (audio / no audio) — guard at $0.40
+    model: 'google/veo-3.1', perSec: () => 0.40,
+    input: o => ({ prompt: o.prompt, negative_prompt: o.negative, image: o.start, duration: o.duration,
+      resolution: '1080p', aspect_ratio: '16:9', generate_audio: false }),
+  },
+  luma: {    // ray-3.2 is priced per video by resolution/length; 1080p 5s guarded at the $1.20 tier
+    model: 'luma/ray-3.2', perVideo: () => 1.20,
+    input: o => ({ prompt: o.prompt, start_image: o.start, duration: o.duration, resolution: '1080p', aspect_ratio: '16:9', hdr: false }),
+  },
+  sora: {    // billed to OpenAI through our key ($0.50/s at 1792x1024); start image must be exactly that size
+    model: 'openai/sora-2-pro', perSec: () => 0.50,
+    input: o => ({ prompt: o.prompt, input_reference: o.start, seconds: o.duration, resolution: 'high', aspect_ratio: 'landscape',
+      openai_api_key: OPENAI_KEY }),
+  },
+  hailuo: {  // $0.28 768p / $0.49 1080p per 6s video — guard at $0.56
+    model: 'minimax/hailuo-2.3', perVideo: () => 0.56,
+    input: o => ({ prompt: o.prompt, first_frame_image: o.start, duration: o.duration, resolution: '1080p', prompt_optimizer: false }),
+  },
 };
+const OPENAI_KEY = (fs.readFileSync('/home/ubuntu/cto-aipa/.env', 'utf8').match(/^OPENAI_API_KEY=(.*)$/m) || [])[1]?.replace(/["\s]/g, '');
 // Stills. Prices = the Replicate model pages on 30 Sep 2026, rounded UP (the guard must never under-count).
 // Flux: $0.04/run + $0.03 per output MP + $0.03 per input MP. Nano Banana Pro: $0.15 at 2K (+ allowance per input
 // image). GPT Image 2: $0.128 at high quality. Every model takes the locked reference faces as input images.
@@ -157,17 +177,57 @@ async function image(id) {
   console.log(`OK image ${id} (${engineId}) -> ${dest} (~$${e.usd.toFixed(3)}; spent $${spent().toFixed(2)} of $${BUDGET})`);
 }
 
+// Venice (Elena's own prepaid wallet) — the same flow as the Atuona bot's tryVeniceVideo(): QUOTE first, refuse over
+// the cap, then queue, poll /video/retrieve until it answers with the mp4 bytes. Wan 3.0 Pro = Venice's 1080p tier.
+async function veniceVideo(shotId, shot, o) {
+  const key = (fs.readFileSync('/home/ubuntu/cto-aipa/.env', 'utf8').match(/^VENICE_API_KEY=(.*)$/m) || [])[1]?.replace(/["\s]/g, '');
+  if (!key) throw new Error('VENICE_API_KEY missing');
+  const base = 'https://api.venice.ai/api/v1', model = 'wan-3-0-pro-image-to-video';
+  const post = (p, body) => {   // execFile cannot pipe stdin -> the body goes through a file, like predict() does
+    const f = path.join(BASE, 'raw', `${shotId}__venice${p.replace(/\//g, '_')}.request.json`);
+    fs.writeFileSync(f, JSON.stringify(body));
+    return run('curl', ['-s', '-m', '180', '-X', 'POST', '-H', `Authorization: Bearer ${key}`, '-H', 'Content-Type: application/json',
+      '--data-binary', `@${f}`, `${base}${p}`], { maxBuffer: 1 << 28 });
+  };
+  const src = shot.start_by_engine?.venice ?? shot.start;
+  const body = { model, prompt: o.prompt, negative_prompt: o.negative,
+    image_url: `data:image/jpeg;base64,${fs.readFileSync(path.join(BASE, 'img', `${src}.jpg`)).toString('base64')}`,
+    duration: `${o.duration}s`, resolution: '1080p', aspect_ratio: '16:9' };
+  const q = await post('/video/quote', body);
+  const usd = Number((q.stdout.match(/"quote"\s*:\s*([\d.]+)/) || [])[1]);
+  if (!Number.isFinite(usd)) throw new Error('Venice gave no quote: ' + q.stdout.slice(0, 200));
+  guard(usd, `video ${shotId} on venice (quoted)`);
+  const qr = await post('/video/queue', body);
+  const qid = (qr.stdout.match(/"queue_id"\s*:\s*"([^"]+)"/) || [])[1];
+  if (!qid) { record({ kind: 'video', id: shotId, engine: 'venice', model, status: 'failed', usd: 0, error: qr.stdout.slice(0, 200) });
+    console.log(`FAIL ${shotId}__venice: ${qr.stdout.slice(0, 200)}`); process.exitCode = 2; return; }
+  process.stderr.write(`  ${shotId}__venice: ${model} queue ${qid} (quoted $${usd})\n`);
+  const dest = path.join(BASE, 'clips', `${shotId}__venice.mp4`), t0 = Date.now();
+  while (Date.now() - t0 < 20 * 60 * 1000) {
+    await new Promise(r => setTimeout(r, 10000));
+    const { stdout } = await run('curl', ['-s', '-m', '180', '-X', 'POST', '-H', `Authorization: Bearer ${key}`, '-H', 'Content-Type: application/json',
+      '--data-binary', JSON.stringify({ model, queue_id: qid }), `${base}/video/retrieve`, '-o', dest + '.part', '-w', '%{http_code} %{content_type}'], { maxBuffer: 1 << 20 });
+    if (/video|octet/.test(stdout) && fs.existsSync(dest + '.part') && fs.statSync(dest + '.part').size > 10000) { fs.renameSync(dest + '.part', dest); break; }
+  }
+  const ok = fs.existsSync(dest);
+  record({ kind: 'video', id: shotId, engine: 'venice', model, seconds: o.duration, status: ok ? 'succeeded' : 'failed', usd: ok ? usd : 0, error: ok ? null : 'timeout', prediction: qid });
+  console.log(ok ? `OK ${shotId}__venice -> ${dest} (~$${usd.toFixed(2)}; spent $${spent().toFixed(2)} of $${BUDGET})` : `FAIL ${shotId}__venice: no video in 20 min`);
+}
+
 async function video(shotId, engineOverride) {
   const shot = PLAN.shots[shotId]; if (!shot) throw new Error('no plan.shots.' + shotId);
   const engineId = engineOverride || shot.engine || 'kling';
-  const eng = ENGINES[engineId]; if (!eng) throw new Error('unknown engine ' + engineId);
-  const o = { ...shot, prompt: [shot.motion, PLAN.motion_look].filter(Boolean).join(' '), negative: PLAN.negative,
+  const o0 = { ...shot, prompt: [shot.motion, PLAN.motion_look].filter(Boolean).join(' '), negative: PLAN.negative,
     duration: shot.duration_by_engine?.[engineId] ?? shot.duration };
-  const usd = eng.perSec(o) * o.duration;
+  if (engineId === 'venice') return veniceVideo(shotId, shot, o0);
+  const eng = ENGINES[engineId]; if (!eng) throw new Error('unknown engine ' + engineId);
+  const o = o0;
+  const usd = eng.perVideo ? eng.perVideo(o) : eng.perSec(o) * o.duration;
   guard(usd, `video ${shotId} on ${engineId}`);
   // grok validates the URL's file extension and Replicate file URLs have none -> send the JPEG inline as a data URI
   const inline = ref => `data:image/jpeg;base64,${fs.readFileSync(path.join(BASE, 'img', `${ref}.jpg`)).toString('base64')}`;
-  o.start = shot.start ? (engineId === 'grok' ? inline(shot.start) : await resolveImg(shot.start)) : undefined;
+  const startRef = shot.start_by_engine?.[engineId] ?? shot.start;
+  o.start = startRef ? (engineId === 'grok' ? inline(startRef) : await resolveImg(startRef)) : undefined;
   o.end = shot.end ? await resolveImg(shot.end) : undefined;
   o.refs = [];
   for (const r of (engineId === 'kling' ? shot.refs || [] : [])) o.refs.push(await resolveImg(r));
