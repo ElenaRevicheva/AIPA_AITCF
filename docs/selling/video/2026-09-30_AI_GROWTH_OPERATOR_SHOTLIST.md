@@ -251,3 +251,14 @@ mp3 encoder padding → picture ran 0.6 s long; v3 times by DECODED length + one
 face → moved upper-left. **Verified:** QR decodes → `https://aideazz.xyz/api` from 3 exported v3 frames (0:10, 1:01, 1:26); −15.6 LUFS;
 Gemini listen: every word intelligible, clean fade-out. **$0 spent in v3.** Thumbnail v2 EN + ES in `deliverables/`.
 Rebuild text only: `OVERLAY_ONLY=1 python3 aigo-promo-cut3.py` (≈1 min) then the music mix.
+
+**MUSIC v2 SHORTLIST — Elena on v3: "not stylish deep house or chill out - very generic. Not 2026 electro trendy."** #1 BerryDeep = bright
+arpeggiated stock house → OUT. Re-scan of 701 Pixabay tracks across 26 beach-club genres (organic / afro / melodic deep house, Tulum, Mykonos,
+Ibiza, Balearic, nu disco, lounge, fashion house): **66 % are Content ID registered** — the most stylish 2026 organic/afro house (OpenMindAudio
+catalogue) is almost all registered. Not-registered, 2026, instrumental by tags:
+1. Soul Chill House — Rockot · 3:07 · Aug 2026 · organic soulful deep house · pixabay.com/music/soft-house-soul-chill-house-587986/
+2. Gold on the Water — DARIOCOIRO · 4:27 · Mar 2026 · afro house, tribal percussion · pixabay.com/music/soft-house-gold-on-the-water-493518/
+3. Dark Deep House — -SunSet- · 2:58 · Jul 2026 · dark groovy fashion deep house · pixabay.com/music/deep-house-dark-deep-house-562926/
+4. Sunlit Balearic Downtempo Sunset Lounge — PWLPL · 2:33 · Jun 2026 · Balearic, nylon guitar · pixabay.com/music/latin-sunlit-balearic-downtempo-sunset-lounge-543135/
+5. Modern Deep House — ArtIssizm · 2:54 · 17 Sep 2026 · progressive/melodic deep house · pixabay.com/music/deep-house-modern-deep-house-602927/
+Swap = download + Gemini vocal check + `aigo-promo-music-mix.py <new.mp3>` (≈1 min; picture untouched).
