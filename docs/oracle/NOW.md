@@ -143,6 +143,8 @@ git log keeps the record.
 - **🚨 OpenAI API: "429 You have no credits remaining"** (spent by today's role-defense regenerations: gpt-4.1 + gpt-5 on every
   deal, 4 rounds). Kit still works via Gemini (draft + review). Anything else on OPENAI_API_KEY (TTS voices, embeddings, the
   quality chain's 2nd step) is degraded until Elena tops up at platform.openai.com/settings/organization/billing.
+- **Scope (Elena):** 🎯 role notes live ONLY on I-act-TODAY deals — the kit searches that stage only; the 2 written on
+  HireLATAM/Georgia IT before she rejected them were removed (48 hiring deals checked, 7 kept).
 - **RISK:** Gemini writes longer, looser answers than gpt-4.1 — the code guards still apply, the depth may be lower until credits return.
 
 ### 🏔️ 29 Sep — VJH's Himalayas source had searched NOTHING; fixed · hand-staged jobs now in the queue + audit too
