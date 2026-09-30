@@ -164,4 +164,8 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   ("flagged as sensitive" on an innocent frame), Sora 2 Pro (OpenAI answers **HTTP 404 on /v1/videos** for our key — the
   account has no Sora video access). **Total picture spend $8.46.** Claude's read: Venice holds her identity best (pick);
   Hailuo = best value; Kling most cinematic but face drifts mid-shot; Luma loses her (turns away, face changes).
-  Comparison: Oracle `~/aigo-promo/review/G7_engine_compare.mp4` (2×2). **Awaiting Elena's pick.**
+  Comparison: Oracle `~/aigo-promo/review/G7_engine_compare.mp4` (2×2).
+- **ENGINE DECISION (Elena, 30 Sep): Venice Wan 3.0 Pro** ("first let us go with venice"). The G7 payoff = the Venice take.
+  Runway Gen-4.5 IS on Replicate (`runwayml/gen-4.5`, Runway API list price 12 credits/s = $0.12/s) — kept as an option for
+  a later round; no Runway top-up needed. Step 4 = the other 8 shots on Venice, 5 s 1080p ≈ $1.18 each = $9.44; motion
+  prompts shown to Elena for approval before any render.
