@@ -1,26 +1,54 @@
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
-W,H=1280,720
-im=Image.open('k_thumb2.jpg').convert('RGB').resize((W,H),Image.LANCZOS)
-im=ImageEnhance.Contrast(im).enhance(1.08)
-# darken the right half so text pops
-grad=Image.new('L',(W,H),0); g=ImageDraw.Draw(grad)
-for x in range(W):
-    a=int(max(0,min(1,(x-520)/360))*150); g.line([(x,0),(x,H)],fill=a)
-im=Image.composite(Image.new('RGB',(W,H),(4,6,10)),im,grad)
-d=ImageDraw.Draw(im)
-def bold(sz,w=b'ExtraBold'):
-    f=ImageFont.truetype('Manrope-var.ttf',sz); f.set_variation_by_name(w); return f
-serif=lambda sz: ImageFont.truetype('InstrumentSerif-Regular.ttf',sz)
-GOLD=(230,200,138); X=668
-def shadow_text(xy,t,f,fill):
-    x,y=xy
-    sh=Image.new('RGBA',(W,H),(0,0,0,0)); ds=ImageDraw.Draw(sh); ds.text((x+4,y+5),t,font=f,fill=(0,0,0,200))
-    sh=sh.filter(ImageFilter.GaussianBlur(6)); im.paste(sh,(0,0),sh); ImageDraw.Draw(im).text((x,y),t,font=f,fill=fill)
-shadow_text((X,170),'SHE ASKED',bold(100),(255,255,255))
-shadow_text((X,290),'AI FIRST',bold(128),GOLD)
-d=ImageDraw.Draw(im)
-d.line([(X+6,452),(X+170,452)],fill=GOLD,width=4)
-shadow_text((X,478),'Was your yacht on the list?',serif(50),(235,235,235))
-shadow_text((X,600),'AI GROWTH OPERATOR  ·  AIdeazz AI Lab',bold(26,b'SemiBold'),(200,200,200))
-im.save('thumb_v1.jpg',quality=92)
-print(im.size)
+# AI Growth Operator promo - YouTube thumbnail v2, EN + ES (Elena 30 Sep: "stylish - like HubSpot UI and my own website").
+# Website half: Instrument Serif headline with the gold italic accent, letter-spaced mono eyebrow, dot grid on #030711.
+# HubSpot half: the white rounded status chip (slate text, orange status dot) carrying the hook question.
+# usage: python aigo-promo-thumbnail.py <dir with k_thumb2.jpg, fonts, brand_logo.png> <out_dir>
+import os, sys
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+
+D, OUT = sys.argv[1], sys.argv[2]; os.makedirs(OUT, exist_ok=True)
+W, H = 1280, 720
+GOLD, SLATE, ORANGE = (237, 184, 103), (51, 71, 91), (255, 92, 53)
+MONO = "C:/Windows/Fonts/consola.ttf"
+def f(path, size): return ImageFont.truetype(path, size)
+def manrope(size, wt=b"SemiBold"):
+    x = ImageFont.truetype(f"{D}/Manrope-var.ttf", size); x.set_variation_by_name(wt); return x
+def tw(font, t): return font.getbbox(t)[2]
+
+def base():
+    im = Image.open(f"{D}/k_thumb2.jpg").convert("RGB").resize((W, H), Image.LANCZOS)
+    im = ImageEnhance.Contrast(im).enhance(1.08).convert("RGBA")
+    shade = Image.new("L", (W, H), 0); g = ImageDraw.Draw(shade)
+    for x in range(W): g.line([(x, 0), (x, H)], fill=int(max(0, min(1, (x - 500) / 330)) * 225))
+    im = Image.composite(Image.new("RGBA", (W, H), (3, 7, 17, 255)), im, shade)
+    dots = Image.new("RGBA", (W, H), (0, 0, 0, 0)); dd = ImageDraw.Draw(dots)
+    for y in range(12, H, 24):
+        for x in range(12, W, 24):
+            a = int(max(0, min(1, (x - 640) / 250)) * 30)
+            if a: dd.ellipse((x - 1, y - 1, x + 1, y + 1), fill=(255, 255, 255, a))
+    im.alpha_composite(dots); return im
+
+def halo_text(im, xy, text, font, fill):
+    sh = Image.new("RGBA", im.size, (0, 0, 0, 0)); ImageDraw.Draw(sh).text((xy[0] + 3, xy[1] + 5), text, font=font, fill=(0, 0, 0, 200))
+    im.alpha_composite(sh.filter(ImageFilter.GaussianBlur(7))); ImageDraw.Draw(im).text(xy, text, font=font, fill=fill)
+
+def make(lang, eyebrow, l1, l2, chip, name):
+    im = base(); X, R = 668, 1244
+    d = ImageDraw.Draw(im); m = f(MONO, 21); x = X
+    for ch in eyebrow: d.text((x, 150), ch, font=m, fill=GOLD); x += tw(m, ch) + 5
+    size = 124                                                        # largest serif size where both lines fit the column
+    while tw(f(f"{D}/InstrumentSerif-Italic.ttf", size), l2) > R - X or tw(f(f"{D}/InstrumentSerif-Regular.ttf", size), l1) > R - X: size -= 2
+    halo_text(im, (X, 188), l1, f(f"{D}/InstrumentSerif-Regular.ttf", size), (255, 255, 255))
+    halo_text(im, (X, 188 + int(size * 1.02)), l2, f(f"{D}/InstrumentSerif-Italic.ttf", size), GOLD)
+    y = 188 + int(size * 2.2) + 26; cf = manrope(25); cw = tw(cf, chip) + 78; ch_ = 58
+    sh = Image.new("RGBA", im.size, (0, 0, 0, 0)); ImageDraw.Draw(sh).rounded_rectangle((X + 2, y + 6, X + cw + 2, y + ch_ + 6), ch_ // 2, fill=(0, 0, 0, 150))
+    im.alpha_composite(sh.filter(ImageFilter.GaussianBlur(8)))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle((X, y, X + cw, y + ch_), ch_ // 2, fill=(255, 255, 255), outline=(203, 214, 226), width=2)
+    d.ellipse((X + 24, y + ch_ // 2 - 7, X + 38, y + ch_ // 2 + 7), fill=ORANGE)
+    d.text((X + 52, y + (ch_ - 25) // 2 - 5), chip, font=cf, fill=SLATE)
+    lg = Image.open(f"{D}/brand_logo.png").convert("RGBA"); lg = lg.crop(lg.getbbox()); lw = 230
+    lg = lg.resize((lw, round(lg.height * lw / lg.width)), Image.LANCZOS); im.alpha_composite(lg, (X - 6, H - lg.height - 40))
+    im.convert("RGB").save(f"{OUT}/{name}", quality=93); print(name, "serif", size)
+
+make("en", "AI GROWTH OPERATOR", "She asked", "AI first.", "Was your yacht on the list?", "AIGO_thumbnail_v2_EN.jpg")
+make("es", "AI GROWTH OPERATOR", "Le preguntó", "a la IA primero.", "¿Tu yate estaba en la lista?", "AIGO_thumbnail_v2_ES.jpg")

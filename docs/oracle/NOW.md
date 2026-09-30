@@ -199,18 +199,18 @@ git log keeps the record.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
   defence; the human at ✅ Send is the last.
 
-### 🎬 30 Sep — AI Growth Operator YouTube promo: 14 shots rendered, rough cut v1 reviewed, fixing v2 (Elena's moves)
+### 🎬 30 Sep — AI Growth Operator YouTube promo: CUT v3 delivered for Elena's review (Spanish text, music, HubSpot)
 
-- **DONE:** narration LOCKED by Elena (verbatim in `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`). Identity-locked
-  faces R1/R2 (GPT Image 2), 10+7 keyframes, 7-engine test, all shots (Venice Wan 3.0 Pro faces, Hailuo, Runway wides). Rough cut v1
-  sent; her 10-point review applied (phone not laptop, real ChatGPT answer, Panama City skyline, correct helm, WhatsApp for the guest,
-  Telegram stays for owner approval — real product, QR → /api on non-people frames, logo, natural voice). **Spend $19.90 of $30 cap.**
-  Full log + next steps: `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_SHOTLIST.md` §5–6. Tools: `scripts/aigo-promo-*.{mjs,py}`,
-  Oracle `~/aigo-promo/`. Film-making lessons folded into `docs/atuona/FILM_COMPILATION_GUIDE.md` §5e + recap 30–38.
-- **NEXT:** Elena: Pixabay download OK, San Blas A/B, voice pick. Then v2 cut ($0).
-- **VERIFIED BY:** `node gen.mjs ledger` on Oracle = $19.90; every clip reviewed start/middle/end; QR decoded → `https://aideazz.xyz/api`.
-- **RISK:** never put her name/face/private chats on screen (crop S1 0–13 s, S2 header); free "San Blas" stock is NOT San Blas
-  (guide recap 36); Venice wallet ≈ $1.17 (< 1 shot).
+- **DONE:** narration LOCKED (English, `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`); all shots rendered, real
+  screens privacy-safe. **Cut v3** = Oracle `~/aigo-promo/cut3/AIGO_cut_v3.mp4` (90.17 s): on-screen text Spanish + restyled to the
+  /api page look, music = her pick BerryDeep "Tropical House" (Pixabay, NOT Content ID registered, no vocals), B9 = real HubSpot deal.
+  Thumbnail v2 EN/ES + caption files EN/ES in `docs/selling/video/deliverables/`. **Spend ≈ $20.90 of $30; v3 cost $0.**
+  Log: `…_SHOTLIST.md` (CUT v3). Film lessons: `docs/atuona/FILM_COMPILATION_GUIDE.md` §5e.
+- **NEXT (Elena):** review v3 · pick thumbnail EN or ES · OK to delete test deal 65531490170 (it is ON SCREEN in B9 — delete only
+  after the film is final). **Then (agent):** 9:16 Short ~30 s, YouTube title/description sheet; upload only with her explicit go.
+- **VERIFIED BY:** QR decoded → `https://aideazz.xyz/api` from 3 exported v3 frames; picture 90.167 s vs voice 90.158 s; −15.6 LUFS.
+- **RISK:** Pixabay tropical tracks are mostly Content ID registered → YouTube claim; check the page's JSON-LD before swapping music.
+  Never her name/face/private chats on screen. `pkill -f`/`pgrep -f` over ssh match their own command line (cost a failed run).
 
 ### 🎯 29 Sep — EVERY job deal is fully stuffed and the audit proves it (7/7) · ✅ OpenAI credits RESTORED 30 Sep
 

@@ -240,3 +240,14 @@ life with a claim, so the shortlist is **not-registered only**, instrumental by 
 Rejected: Paradise Sunset (499036) carries a vocal tag; sunset-house-grooves tracks tag "Vocal House"; Luna / Island Tropical House /
 rediskasound tracks = Content ID registered. After her pick: download (≈3–6 MB mp3, her OK), transcript-check for words,
 `scripts/aigo-promo-music-mix.py` (sidechain duck under the voice, apad to picture). Thumbnail draft: `deliverables/AIGO_thumbnail_v1.jpg`.
+
+**CUT v3 — built 30 Sep** (`scripts/aigo-promo-es-assets.py` local PIL → `aigo-promo-cut3.py` → `aigo-promo-music-mix.py` → `aigo-promo-srt.py`;
+Oracle `~/aigo-promo/cut3/AIGO_cut_v3.mp4`, 90.17 s, 1080p). Elena's calls: music **#1 BerryDeep "Tropical House"** (`music/`, 4.6 MB, not Content ID
+registered, Gemini: no vocals); **all on-screen text Spanish + restyled** to the /api page (Instrument Serif + gold italic accent, mono eyebrow,
+dot grid #030711, glass cards) with a HubSpot touch (status chip, orange→magenta ring on the CTA); **B9 = real HubSpot deal screen** ("do not
+wait for Telegram, use HubSpot"; her name blurred in the stage label). **Sync fix:** v2 timed blocks by ffprobe's container duration, which counts
+mp3 encoder padding → picture ran 0.6 s long; v3 times by DECODED length + one frame clock → picture 90.167 s vs voice 90.158 s.
+**Caught in the frame check:** the s03 title over bright Panama sky was unreadable (halo only) → glass card; titles then covered the captain's
+face → moved upper-left. **Verified:** QR decodes → `https://aideazz.xyz/api` from 3 exported v3 frames (0:10, 1:01, 1:26); −15.6 LUFS;
+Gemini listen: every word intelligible, clean fade-out. **$0 spent in v3.** Thumbnail v2 EN + ES in `deliverables/`.
+Rebuild text only: `OVERLAY_ONLY=1 python3 aigo-promo-cut3.py` (≈1 min) then the music mix.

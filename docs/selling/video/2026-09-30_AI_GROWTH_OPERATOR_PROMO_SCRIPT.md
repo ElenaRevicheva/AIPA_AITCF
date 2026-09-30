@@ -188,3 +188,14 @@ Use it with a technical buyer or an interviewer:
 > workflow stays controlled and auditable."
 
 **Open question:** how is **AIdeazz** pronounced? The narrator must say it right: "AI-deas", "eye-DEEZ", or something else.
+
+## 🇪🇸 Spanish on-screen text — Elena, 30 Sep: "captions in Spanish", "stylish like HubSpot UI and my website"
+
+The narration stays **English** (locked above). Everything written on screen is **Spanish**: burned-in captions on the footage,
+and the three text cards (thesis, reveal, end). Source of truth for every string + its timing: `scripts/aigo-promo-es-assets.py`
+(burned-in) and `scripts/aigo-promo-srt.py` (YouTube caption files EN + ES, `deliverables/AIGO_promo_{en,es}.srt`).
+- **Tú**, as on the /api hero the film sends people to ("¿Puede la IA encontrarte y citarte?"). The /pay page uses *usted* — switch if she prefers.
+- **"AI Growth Operator" stays English**, as on her own Spanish pages (`/pay/analisis-tecnico?lng=es`). "Thirty-four checks" → **"34 señales"** (the site's own wording).
+- Cards: *Nadie se despierta queriendo IA. / Tú quieres más reservas.* · *Las personas de esta película son IA. / Las pantallas del producto son reales.* ·
+  end: *¿Qué ve la IA cuando mira tu negocio?* + Auditoría de visibilidad en IA · 34 señales · gratis + **aideazz.xyz/api** + *Dramatización: personas generadas con IA.*
+- Titles: *Las buenas oportunidades / se enfrían en silencio.* · *Misma clienta. / Misma pregunta.* (no duplicate caption under the second).
