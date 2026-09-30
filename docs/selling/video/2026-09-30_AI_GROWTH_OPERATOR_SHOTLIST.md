@@ -171,3 +171,11 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
 - **Gate 4 GO (Elena: "use 7 usd in venice and fall back to runway").** Venice wallet $7.07 (her screenshot) = 5 shots.
   Venice Wan 3.0 Pro for the faces: G2 G4 G5 G6 G9 ($5.90). Runway Gen-4.5 via Replicate ($0.12/s) for the wides: G1 G3 G8
   ($1.80). Motion prompts = the 8 lines shown to her. Step cap `BUDGET_USD=16.50`.
+- **Gate 4 — DONE.** 8/8, 0 refused; **total video generation $16.16** (Venice $7.08 incl. the G7 test take → Venice
+  wallet ≈ $0 left; Replicate ≈ $9.08; OpenAI $0). Review: all faces consistent; **G1 Runway invents a different woman +
+  readable screen after ~3.5 s → only its first 3 s are used**; G3 trimmed before he turns away.
+- **Rough assembly v1 — sent 30 Sep.** `scripts/aigo-promo-roughcut.py` → Oracle `~/aigo-promo/rough/AIGO_rough_cut_v1.mp4`
+  (1080p, 104.4 s = narration) + `_review720.mp4`. 25 segments. Placeholders still to capture (all $0): S1 AI assistant
+  answer (names blurred) · S2 WhatsApp screenshot (Elena) · S3 clean /api audit recording (atuona.xyz, domain cropped) ·
+  S7 8 AM brief (Elena). Still to do: Pixabay music shortlist (no vocals), blur her email + the link preview with her name
+  in the phone screens, 9:16 Short, thumbnail title, final grade.
