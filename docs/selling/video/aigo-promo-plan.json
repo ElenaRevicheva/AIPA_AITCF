@@ -236,11 +236,68 @@
         "hailuo": 6
       },
       "motion": "THE PAYOFF. She steps from the small wooden tender up onto the swim platform of the catamaran, taking his steadying hand; the cream cashmere wrap and ivory linen dress lift in the sea breeze; she looks up at the boat and the palm islet and breaks into a slow, warm smile of arrival. Slow gimbal move that settles on her face."
+    },
+    "G1": {
+      "start": "k_g1",
+      "engine": "runway",
+      "duration": 5,
+      "audio": false,
+      "motion": "Very slow push-in toward the lit penthouse window through heavily falling snow; inside, the woman sits at the laptop, barely moving; Manhattan lights twinkle. Calm, cinematic."
+    },
+    "G2": {
+      "start": "k_g2",
+      "engine": "venice",
+      "duration": 5,
+      "audio": false,
+      "motion": "She types on the laptop, pauses, and glances at the screen with a curious, hopeful half-smile; soft laptop glow on her face; snow drifts past the window behind her. Slow dolly-in."
+    },
+    "G3": {
+      "start": "k_g3",
+      "engine": "runway",
+      "duration": 5,
+      "audio": false,
+      "motion": "Moonlit anchorage: he coils a line on the aft deck, unaware; on the cockpit table the phone in its clear dry bag lights up with a message, then fades. Gentle swell, slow lateral camera move."
+    },
+    "G4": {
+      "start": "k_g4",
+      "engine": "venice",
+      "duration": 5,
+      "audio": false,
+      "motion": "He reads his phone, exhales, lowers it slowly and looks out over the water — the booking is gone. Slow push-in on his face, morning marina soft behind."
+    },
+    "G5": {
+      "start": "k_g5",
+      "engine": "venice",
+      "duration": 5,
+      "audio": false,
+      "motion": "Over her shoulder: she finishes typing, her finger hovers, then she clicks send and leans back with a small satisfied smile. The laptop screen stays soft and unreadable; snow outside."
+    },
+    "G6": {
+      "start": "k_g6",
+      "engine": "venice",
+      "duration": 5,
+      "audio": false,
+      "motion": "At the helm at dawn he reads the drafted reply on his phone, gives a quiet confident smile and taps once with his thumb; golden-pink mist drifts over the calm marina. Slow orbit."
+    },
+    "G8": {
+      "start": "k_g8",
+      "engine": "runway",
+      "duration": 5,
+      "audio": false,
+      "motion": "Slow forward drone flight descending toward the white catamaran as it glides over turquoise water between palm islets; long soft wake, golden hour."
+    },
+    "G9": {
+      "start": "k_g9",
+      "engine": "venice",
+      "duration": 5,
+      "audio": false,
+      "motion": "Sunset on the bow net: she laughs with her friends as they clink glasses, wind in her hair, light sea spray; he smiles at the helm behind them. Slow push-in."
     }
   },
   "decisions": {
     "R1": "r1_gpt_a (Elena, 30 Sep: \"Woman fine\")",
-    "R2": "r2_p2_gpt_a (Elena, 30 Sep: \"this one\") - ~39, black linen, stubble"
+    "R2": "r2_p2_gpt_a (Elena, 30 Sep: \"this one\") - ~39, black linen, stubble",
+    "engines": "Venice Wan 3.0 Pro for faces (G2 G4 G5 G6 G9; $7.07 Venice wallet, 5 x $1.18) + Runway Gen-4.5 via Replicate for wides (G1 G3 G8) - Elena 30 Sep"
   },
   "motion_look": "Natural, realistic human motion, real skin and fabric physics, golden-hour light, gentle water movement, smooth slow gimbal camera, cinematic 24fps feel. The people stay exactly the same persons throughout.",
   "negative": "morphing face, identity change, different person, extra fingers, distorted hands, warping, flicker, text, subtitles, logos, watermark, cartoon, CGI look, plastic skin, fast camera, jitter"

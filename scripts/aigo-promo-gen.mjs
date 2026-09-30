@@ -78,6 +78,10 @@ const ENGINES = {
     input: o => ({ prompt: o.prompt, input_reference: o.start, seconds: o.duration, resolution: 'high', aspect_ratio: 'landscape',
       openai_api_key: OPENAI_KEY }),
   },
+  runway: {  // Runway Gen-4.5 on Replicate: $0.12/s (page, 30 Sep) — Elena's fallback when the Venice wallet runs out
+    model: 'runwayml/gen-4.5', perSec: () => 0.12,
+    input: o => ({ prompt: o.prompt, image: o.start, duration: o.duration, aspect_ratio: '16:9' }),
+  },
   hailuo: {  // $0.28 768p / $0.49 1080p per 6s video — guard at $0.56
     model: 'minimax/hailuo-2.3', perVideo: () => 0.56,
     input: o => ({ prompt: o.prompt, first_frame_image: o.start, duration: o.duration, resolution: '1080p', prompt_optimizer: false }),
@@ -228,7 +232,7 @@ async function video(shotId, engineOverride) {
   // luma too: its API rejects Replicate file URLs ("video.start_frame: Unsupported content type", 30 Sep).
   const inline = ref => `data:image/jpeg;base64,${fs.readFileSync(path.join(BASE, 'img', `${ref}.jpg`)).toString('base64')}`;
   const startRef = shot.start_by_engine?.[engineId] ?? shot.start;
-  o.start = startRef ? ((engineId === 'grok' || engineId === 'luma') ? inline(startRef) : await resolveImg(startRef)) : undefined;
+  o.start = startRef ? ((engineId === 'grok' || engineId === 'luma' || engineId === 'runway') ? inline(startRef) : await resolveImg(startRef)) : undefined;
   o.end = shot.end ? await resolveImg(shot.end) : undefined;
   o.refs = [];
   for (const r of (engineId === 'kling' ? shot.refs || [] : [])) o.refs.push(await resolveImg(r));

@@ -167,5 +167,7 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   Comparison: Oracle `~/aigo-promo/review/G7_engine_compare.mp4` (2×2).
 - **ENGINE DECISION (Elena, 30 Sep): Venice Wan 3.0 Pro** ("first let us go with venice"). The G7 payoff = the Venice take.
   Runway Gen-4.5 IS on Replicate (`runwayml/gen-4.5`, Runway API list price 12 credits/s = $0.12/s) — kept as an option for
-  a later round; no Runway top-up needed. Step 4 = the other 8 shots on Venice, 5 s 1080p ≈ $1.18 each = $9.44; motion
-  prompts shown to Elena for approval before any render.
+  a later round; no Runway top-up needed.
+- **Gate 4 GO (Elena: "use 7 usd in venice and fall back to runway").** Venice wallet $7.07 (her screenshot) = 5 shots.
+  Venice Wan 3.0 Pro for the faces: G2 G4 G5 G6 G9 ($5.90). Runway Gen-4.5 via Replicate ($0.12/s) for the wides: G1 G3 G8
+  ($1.80). Motion prompts = the 8 lines shown to her. Step cap `BUDGET_USD=16.50`.
