@@ -1,4 +1,4 @@
-# AI Growth Operator promo — PRICED SHOT LIST v2 (for Elena's approval, 30 Sep 2026)
+# AI Growth Operator promo — PRICED SHOT LIST v3 (for Elena's approval, 30 Sep 2026)
 
 Film: **She Asked ChatGPT Before She Messaged Your Yacht** · narration LOCKED + recorded (verse, 1:44) — see
 `2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`. **Nothing is generated until Elena approves that step. $0 spent on
@@ -39,7 +39,7 @@ picture so far.**
 
 | Ref | Who | Reference prompt (subject first) |
 |---|---|---|
-| **R1 — the guest, a woman (PROTAGONIST)** | Woman, New York, early 40s | Portrait of a woman in her early forties, elegant and intelligent, shoulder-length dark-blonde hair with a soft side part, minimal makeup, thin gold stud earrings, a cream cashmere wrap over a simple black top, warm lamplight, calm curious eyes, looking just off camera. |
+| **R1 — the guest, a woman (PROTAGONIST)** | Woman, **luxurious New York**, early 40s (Elena: "luxurious style New York woman") | Portrait of a strikingly elegant New York woman in her early forties, Tribeca quiet luxury: sleek shoulder-length dark-blonde hair with a soft side part, luminous natural skin, refined minimal makeup, thin gold stud earrings and a slim gold watch, an ivory silk blouse under a cream cashmere wrap, no logos; poised, confident, magnetic; warm penthouse lamplight; Vogue-portrait realism, looking just off camera. |
 | **R2 — the owner (second character)** | Man, Panama, about 40 | Portrait of a Latin American man about forty who owns and runs a small luxury charter business: sun-weathered skin, short dark hair, a neat short beard, calm capable eyes with faint smile lines; washed navy linen overshirt, sleeves pushed up, a minimal steel watch; soft morning sea light. **Negative: no captain's hat, no uniform, no epaulettes, no white captain costume, no gold chains, no sunglasses on the face.** |
 
 **Continuity anchors for HER** (so the payoff is instant): the same face, the same dark-blonde side-parted hair,
@@ -63,8 +63,8 @@ Every generated clip = **5 s**. Durations follow the recorded narration.
 
 | # | Line | What we see | Refs | Engine | $ |
 |---|---|---|---|---|---|
-| **G1** | 1 — midnight | Exterior: a West Village brownstone at night, heavy snow, one warm lit window with **her** silhouette at a laptop. Motion: very slow push-in, snow drifting. | — (silhouette) | Grok | 0.40 |
-| **G2** | 1 — midnight | **Meet her.** Close-up at a marble kitchen island, 11:47 pm, laptop glow on her face, reading glasses, the cream cashmere wrap, a glass of red wine, the snowy window soft behind. Motion: slow dolly-in, she types, glances at the screen. | R1 | Wan | 0.50 |
+| **G1** | 1 — midnight | Heavy snow falling past the floor-to-ceiling windows of a Tribeca penthouse at night, the Manhattan skyline glittering beyond, and inside, warm lamplight on **her** silhouette at a laptop. Motion: very slow push-in, snow drifting. | — (silhouette) | Grok | 0.40 |
+| **G2** | 1 — midnight | **Meet her.** Close-up at a Calacatta marble kitchen island in her Tribeca penthouse, 11:47 pm, laptop glow on her face, reading glasses, the cream cashmere wrap, a glass of red wine, the snowy window soft behind. Motion: slow dolly-in, she types, glances at the screen. | R1 | Wan | 0.50 |
 | **G3** | 3 — Friday, at sea | A white 50-ft luxury sailing catamaran anchored off a tiny palm islet in San Blas at night, full moon, low deck lights; **the owner** alone on the aft deck coiling a line; his phone sealed in a clear dry bag lights up unseen on the cockpit table. Motion: slow lateral move along the deck. | R2 | Grok | 0.40 |
 | **G4** | 3 — Monday | Morning, a Panama City marina with the skyline behind; the owner on the stern with a coffee, reading his phone, a small sigh; he lowers it and looks out at the water — **she is gone.** Motion: slow push-in. | R2 | Wan | 0.50 |
 | **G5** | 7 — rewind: she writes | **The same woman, same night, same kitchen** (rhymes with G2 on purpose), over-the-shoulder typing into a charter website's contact form; screen soft, unreadable. Motion: gentle push, she clicks send, a small smile. | R1 | Wan | 0.50 |
@@ -74,8 +74,25 @@ Every generated clip = **5 s**. Durations follow the recorded narration.
 | **G9** | 10 — the life | Sunset on the front trampoline net: **she** laughs with friends, glasses catching the low sun, light spray, the owner at the helm soft behind. Motion: slow push-in, a clink, hair in the breeze. | R1 + R2 | Wan | 0.50 |
 
 Edit order for line 10: **G8 → G7 → G9** (arrive, recognize her, live it).
-**Engine choice** = Elena's film #8 grid: Wan for faces and emotion, Grok for wides and landscape, Kling where
-identity, hands and phones must stay exact (G6, G7).
+
+### Engines — v3: only the newest top tier, 1080p (Elena: "super realistic, juicy, human, 2026 latest model")
+
+v2 used budget engines (Wan 2.7 $0.10/s, Grok 1.5 $0.08/s). v3 uses only the current top tier, verified live on 30 Sep
+(Replicate model pages + API, Google `models.list` on our key):
+
+| Engine | Start frame | Reference faces in motion | Res. | 5 s shot |
+|---|---|---|---|---|
+| **Veo 3.1** (Google flagship) | ✅ `image` | ✅ `reference_images` | 1080p | **$2.00** |
+| **Kling 3.0 Omni** (pro) | ✅ `start_image` | ✅ up to 7 `reference_images` | 1080p | **$1.12** |
+| **Seedance 2.5** (updated 25 Aug) | ✅ `image` | ✅ `reference_images` | 720p | **$1.16** |
+| **Wan 3 Prime** (new Wan generation) | ✅ `image` | — | 1080p | **$1.40** |
+
+Stills (faces + keyframes): **Nano Banana Pro** $0.15 · **GPT Image 2** (high) $0.128 · **Flux 2 Max** ≈ $0.13 with a
+reference face. The face candidates are made on all three; Elena picks the most human, and that model makes the rest.
+
+**How the engine is chosen: a side-by-side on the payoff shot.** The approved G7 keyframe is rendered once on each of
+the four engines ($5.68). Elena watches the four and picks by eye. **The winning take IS the final G7** — nothing
+is wasted — and the winner renders the other 8 shots.
 
 **Real screens — $0** (the "product screens are real" promise):
 
@@ -89,22 +106,23 @@ identity, hands and phones must stay exact (G6, G7).
 | S6 | 8 | Draft card → ✏️ Edit → "✅ Your edited version was SENT" | ✅ have (take 2 #03–05) |
 | S7 | 9 | Telegram 8 AM morning brief (NEW / ACTIVE / AGING), names blurred | **Elena** — 1 screenshot at 8 AM |
 
-## 4. The money — step by step, each step needs Elena's "go"
+## 4. The money — step by step, each step needs Elena's "go" (v3, top tier)
 
 | Gate | What happens | Cost | Running total |
 |---|---|---|---|
-| 0 | Elena approves this v2 | $0 | $0 |
-| 1 | **Lock identity:** 3 candidate portraits for her + 3 for him (6 stills) → she picks one of each | $0.40 | $0.40 |
-| 1b | Identity views from the chosen faces: her full-length in resort linen with the wrap + her profile; his full-length on deck (3 stills) | $0.20 | $0.60 |
-| 2 | 7 reference-conditioned keyframes (G2–G9 with people) + G1 + G8 + thumbnail (10 stills) → **contact sheet** vs R1/R2; re-roll only the rejects | $0.66 | $1.26 |
-| 3 | **One motion test: G7, the payoff, on Kling** — is she unmistakably the midnight woman? | $0.84 | $2.10 |
-| 4 | The other 8 motion shots | $4.04 | **$6.14** |
-| — | Retake reserve (a shot that fails is re-rolled once) | up to $5.00 | ≤ $11.14 |
+| 0 | Elena approves this v3 | $0 | $0 |
+| 1 | **Lock identity:** 6 candidate faces for her (2 each on Nano Banana Pro / GPT Image 2 / Flux 2 Max) + 3 for him (1 each) → she picks one of each, and the most human model | $1.23 | $1.23 |
+| 1b | Identity views from the chosen faces: her full-length in resort linen with the wrap + her profile; his full-length on deck (3 stills) | $0.45 | $1.68 |
+| 2 | 10 reference-conditioned keyframes + thumbnail → **contact sheet** vs R1/R2; re-roll only rejects | $1.50 | $3.18 |
+| 3 | **Engine side-by-side on G7, the payoff:** Veo 3.1 · Kling 3.0 Omni · Seedance 2.5 · Wan 3 Prime → she picks by eye; the winning take is the final G7 | $5.68 | $8.86 |
+| 4 | The other 8 shots on the winner — Kling $8.96 · Seedance $9.28 · Wan 3 Prime $11.20 · Veo $16.00 | $8.96–16.00 | **$17.82–24.86** |
+| — | Retake reserve | up to $5 | — |
 | 5 | Music + sound (Pixabay, licence-free), edit, grade, subtitles, 16:9 master + 9:16 Short + thumbnail | $0 | — |
 
-**Expected spend ≈ $6–8. Hard cap in the generator: $12** (`BUDGET_USD=12` — any job that would cross it is refused).
-Already spent on this film: voice samples + narration ≈ $0.10.
+**Expected ≈ $18–25 depending on the engine she picks at Gate 3. Hard cap in the generator: $30.**
+Optional saving: the 3 shots without faces (G1 snow window, G3 moonlit boat, G8 drone) on Wan 3 at $0.50 each saves
+$1.86–4.50 — her call at Gate 3. Already spent on this film: voice samples + narration ≈ $0.10.
 
-**Before Gate 1:** Replicate is prepaid (Flux + all four video engines run on it) and throttles below $5 — Elena
-checks https://replicate.com/account/billing shows **≥ $12**. Prices were read from Replicate's model pages on 22 Sep;
-they are re-read on render day and any change is reported before spending.
+**Before Gate 1:** Replicate (all engines + stills run there) is prepaid and throttles below $5 — Elena checks
+https://replicate.com/account/billing. **≥ $30** covers the worst case. Prices read 30 Sep (Wan 3 Prime, stills: model
+pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any change is reported before spending.
