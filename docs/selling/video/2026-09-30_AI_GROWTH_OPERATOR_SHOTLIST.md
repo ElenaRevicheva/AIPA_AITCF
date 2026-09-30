@@ -143,4 +143,6 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
   Elena: "No. Still not iron clad. He needs to be handsome sexy Panamanian captain-business owner, casual 2026."
 - **Gate 1 round 3 (him) — DONE.** 3 looks × 2 takes on GPT Image 2 = 6/6, $0.77; **total picture spend $2.74**. A/B takes
   already hold one identity per look. Claude's pick `r2_p2_gpt_a` (~39, black linen, stubble — pairs with her); alts `p1`
-  (sexiest), `p3_gpt_a` (Afro-Panamanian). **Awaiting Elena's pick** before Gate 1b ($0.45).
+  (sexiest), `p3_gpt_a` (Afro-Panamanian).
+- **IDENTITY LOCKED (Elena, 30 Sep):** R1 = `r1_gpt_a` → `img/R1.jpg`; **R2 = `r2_p2_gpt_a` → `img/R2.jpg`**. Both from GPT Image 2.
+  Next: Gate 1b (identity views, ≈ $0.38 on GPT Image 2 with the refs passed in) — needs her go.
