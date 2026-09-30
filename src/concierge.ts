@@ -20,6 +20,7 @@ import * as express from 'express';
 import type { Express, Request, Response } from 'express';
 import type { Bot } from 'grammy';
 import { getResendApiKey } from './marketing-notify';
+import { findOffCatalogPrices, CATALOG_PRICES_LABEL } from './concierge-prompt';
 
 const DRAFT_DIR = path.join(process.cwd(), 'data', 'concierge');
 
@@ -176,7 +177,10 @@ async function sendReplyEmail(d: ConciergeDraft): Promise<string | null> {
   const apiKey = getResendApiKey();
   if (!apiKey) throw new Error('RESEND_API_KEY not set');
   const from = process.env.CONCIERGE_FROM?.trim() || 'Elena Revicheva <aipa@aideazz.xyz>';
-  const replyTo = process.env.CONCIERGE_REPLY_TO?.trim() || 'elena.revicheva2016@gmail.com';
+  // Reply-to comes from .env only. A personal inbox written into source is PII in a repo
+  // licensed to DataVendor (pii-guard blocks the commit), and Oracle has always set this var.
+  const replyTo = process.env.CONCIERGE_REPLY_TO?.trim() || undefined;
+  if (!replyTo) console.warn('[concierge] CONCIERGE_REPLY_TO unset — sending without reply-to; replies land in the From mailbox');
   const html = `<div style="white-space:pre-wrap;font-family:inherit;">${escHtml(d.draft)}</div>`;
   // Send multipart (text + html). HTML-only is a spam signal from an unestablished sender —
   // real people's mail clients produce both, bulk senders often don't. The draft is already
@@ -184,7 +188,7 @@ async function sendReplyEmail(d: ConciergeDraft): Promise<string | null> {
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: [d.email], subject: d.subject, html, text: d.draft, reply_to: replyTo }),
+    body: JSON.stringify({ from, to: [d.email], subject: d.subject, html, text: d.draft, ...(replyTo ? { reply_to: replyTo } : {}) }),
   });
   if (!r.ok) throw new Error(`Resend ${r.status}: ${(await r.text()).slice(0, 200)}`);
   const body = (await r.json().catch(() => ({}))) as { id?: string };
@@ -587,8 +591,20 @@ export function registerConciergeRoutes(app: Express): void {
     // a lie whenever Anthropic was dry — and the routing decision is exactly the
     // thing Elena needs to see to know whether the waterfall is doing its job.
     const writtenBy = draftedHere ? `✍️ Draft (${draftedHere.provider}, ${draftedHere.ms}ms)` : '✍️ Fable 5 draft (Make)';
+    // A price the business does not sell must never look send-ready (Sep 30 2026: a
+    // draft quoted "$1,500" for nothing on the catalog). Warn, never rewrite — the
+    // human at the ✅ button is the gate; this just makes sure she sees it.
+    const offCatalog = findOffCatalogPrices(draft);
+    const priceWarning = offCatalog.length
+      ? `⚠️ PRICE CHECK — this draft quotes ${offCatalog.map((n) => `$${n.toLocaleString('en-US')}`).join(', ')}, ` +
+        `which is not a price you sell (${CATALOG_PRICES_LABEL}). Edit before sending.\n\n`
+      : '';
+    if (offCatalog.length) {
+      console.warn(`[concierge] ⚠️ off-catalog price in draft ${d.id} for ${d.email}: ${offCatalog.join(', ')}`);
+    }
     const tgMessageId = await sendTelegram(
       (selfTest ? `🧪 SELF-TEST — pipeline check, do NOT send\n\n` : '') +
+        priceWarning +
         `📨 New lead: ${d.name} <${d.email}>\n` +
         (inquiry ? `\n💬 They wrote:\n${inquiry.slice(0, 500)}\n` : '') +
         `\n${writtenBy}:\n──────────\n${draft}\n──────────\n📧 Subject: ${subject}`,
@@ -626,6 +642,7 @@ export function registerConciergeRoutes(app: Express): void {
           s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
         const pendingNote =
           `<strong>✍️ PENDING CONCIERGE DRAFT — review in Telegram or edit here, then send</strong><br>` +
+          (priceWarning ? `<strong>${esc(priceWarning.trim())}</strong><br><br>` : '') +
           `To: ${esc(d.email)}<br>Subject: ${esc(d.subject)}<br><br>` +
           (d.inquiry ? `<strong>They wrote:</strong><br>${esc(d.inquiry.slice(0, 800))}<br><br>` : '') +
           `<strong>Draft:</strong><br><pre style="white-space:pre-wrap;font-family:inherit">${esc(d.draft)}</pre><br>` +
