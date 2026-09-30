@@ -117,11 +117,15 @@ is wasted — and the winner renders the other 8 shots.
 | 3 | **Engine side-by-side on G7, the payoff:** Veo 3.1 · Kling 3.0 Omni · Seedance 2.5 · Wan 3 Prime → she picks by eye; the winning take is the final G7 | $5.68 | $8.86 |
 | 4 | The other 8 shots on the winner — Kling $8.96 · Seedance $9.28 · Wan 3 Prime $11.20 · Veo $16.00 | $8.96–16.00 | **$17.82–24.86** |
 | — | Retake reserve | up to $5 | — |
-| 5 | Music + sound (Pixabay, licence-free), edit, grade, subtitles, 16:9 master + 9:16 Short + thumbnail | $0 | — |
+| 5 | **Music (Elena, 30 Sep): Pixabay, modern 2026 chillout, tropical style, instrumental — NO vocals / no words.** Shortlist for her ear; never reuse "Tropical Chill" (JonasBlakewood) or "Chill House" (Kulakovka) from the /api films, or film #8's "The Ritual". Plus sound (waves, keyboard, WhatsApp ping), edit, grade, subtitles, 16:9 master + 9:16 Short + thumbnail | $0 | — |
 
 **Expected ≈ $18–25 depending on the engine she picks at Gate 3. Hard cap in the generator: $30.**
 Optional saving: the 3 shots without faces (G1 snow window, G3 moonlit boat, G8 drone) on Wan 3 at $0.50 each saves
 $1.86–4.50 — her call at Gate 3. Already spent on this film: voice samples + narration ≈ $0.10.
+
+**Gate 1 GO (30 Sep):** Elena topped Replicate up → credit **$38.03** before any render (her billing screenshot, 11:28 Panama).
+Generator = `scripts/aigo-promo-gen.mjs` (a copy of film #8's, same money guard) → Oracle `~/aigo-promo/`; plan =
+`aigo-promo-plan.json`. Gate 1 ran with its own step cap `BUDGET_USD=1.5`.
 
 **Before Gate 1:** Replicate (all engines + stills run there) is prepaid and throttles below $5 — Elena checks
 https://replicate.com/account/billing. **≥ $30** covers the worst case. Prices read 30 Sep (Wan 3 Prime, stills: model
