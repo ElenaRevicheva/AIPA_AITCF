@@ -351,6 +351,41 @@
       "duration": 5,
       "audio": false,
       "motion": "Sunset on the bow net: she laughs with her friends as they clink glasses, wind in her hair, light sea spray; he smiles at the helm behind them. Slow push-in."
+    },
+    "G1b": {
+      "start": "k_g1b",
+      "engine": "runway",
+      "duration": 5,
+      "audio": false,
+      "motion": "Very slow push-in toward the lit penthouse window through heavily falling snow; inside, she sits on the sofa in her cream wrap, the phone glowing in her hands; Manhattan lights twinkle. Calm and cinematic. Only her in the room."
+    },
+    "G2b": {
+      "start": "k_g2b",
+      "engine": "hailuo",
+      "duration": 6,
+      "audio": false,
+      "motion": "She types on her phone with her thumbs, pauses, and reads the screen with a curious, hopeful half-smile; soft phone glow on her face; snow drifts past the window behind her. Slow dolly-in, natural hand movement."
+    },
+    "G5b": {
+      "start": "k_g5b",
+      "engine": "hailuo",
+      "duration": 6,
+      "audio": false,
+      "motion": "She taps send on her phone with her thumb, lowers it slightly and smiles to herself, satisfied; warm lamplight, city lights softly out of focus behind her. Subtle, natural movement."
+    },
+    "G4b": {
+      "start": "k_g4b",
+      "engine": "hailuo",
+      "duration": 6,
+      "audio": false,
+      "motion": "He reads his phone, exhales, lowers it slowly and looks out across the bay toward the Panama City skyline and the anchored ships — the booking is gone. Slow push-in on his face."
+    },
+    "G6c": {
+      "start": "k_g6c",
+      "engine": "hailuo",
+      "duration": 6,
+      "audio": false,
+      "motion": "At the helm at dawn, one hand on the wheel, he reads the drafted reply on his phone, gives a quiet confident smile and taps once with his thumb; soft mist drifts over the bay, ships at anchor behind him. Slow orbit."
     }
   },
   "decisions": {

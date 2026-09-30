@@ -175,27 +175,18 @@ git log keeps the record.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
   defence; the human at ✅ Send is the last.
 
-### 🎬 30 Sep — AI Growth Operator YouTube promo: script v2 written, NOTHING rendered (Elena's move)
+### 🎬 30 Sep — AI Growth Operator YouTube promo: 14 shots rendered, rough cut v1 reviewed, fixing v2 (Elena's moves)
 
-- **DONE:** `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`. Yacht-charter story in two timelines,
-  ~80 s + 30 s Short, lines taken from the 53-page `28.09.2026 AI Growth Operator.pdf`. Elena's rules: **never her
-  name or "solo"** (credit AIdeazz AI Lab + AI Growth Operator), realistic AI narrator, keep the "people are AI,
-  screens are real" reveal. This is the *operator* film. It reuses the real audit take from the live /api film v19; it does not remake it.
-- **UPDATE 30 Sep 13:25 UTC:** text approved (v2.1). Title *She Asked ChatGPT Before She Messaged Your Yacht*, male voice,
-  "ay-eye-DEAZ". 4 voice samples made (~$0.01), she picks. **Test inquiry sent through the real form** →
-  `[CLIENT-CTO-INQUIRY] Marco Rivera — outreach` = **FILMING PROP, do not work it, delete after capture.**
-- **✅ FIXED 30 Sep (see the 💲 block below):** that draft's invented "$1,500" price.
-- **NEXT:** Elena picks a voice; corrects the price line in the Telegram draft (reply-to-edit) and sends, which is the scene-8
-  footage → priced shot list (~$12–20). **Each step needs her go. No $ without it.**
-- **VERIFIED BY:** live audit 30 Sep 11:07 UTC — 34 checks, 100/A+ (aideazz.xyz), 93/A+ with 3 fixes (atuona.xyz);
-  every script claim traced to code in the file's §4.
-- **RISK:** inbound creates NO follow-up task (only outbound +4d) — never script "automatic follow-up".
-- **30 Sep ~14:00 UTC:** OpenAI topped up (verified live). **13 male voice samples** exist, all transcript-clean: 4 Gemini,
-  3 OpenAI (cedar/onyx/ash), and round 2 "confident mid-30s" (OpenAI verse/echo/ash + Gemini 2.5-pro Puck/Orus/Fenrir).
-  Scripts `scripts/aigo-promo-vo-*.py`; audio in Oracle `~/aigo-promo/voice/`. **Elena picks.**
-- **Test lead loop CLOSED:** Elena tapped ✅ Send now on the **unedited** draft (with the invented $1,500) → her own test inbox
-  only. Log: `Resend accepted` → `deal moved to "Sent"` → `HubSpot EMAIL activity … logged`. Her 5 phone screenshots are in
-  Oracle `~/aigo-promo/captures/elena-phone-20260930/`. Files 02 + 04 show the $1,500 line: blur it or never use them.
+- **DONE:** narration LOCKED by Elena (verbatim in `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`). Identity-locked
+  faces R1/R2 (GPT Image 2), 10+7 keyframes, 7-engine test, all shots (Venice Wan 3.0 Pro faces, Hailuo, Runway wides). Rough cut v1
+  sent; her 10-point review applied (phone not laptop, real ChatGPT answer, Panama City skyline, correct helm, WhatsApp for the guest,
+  Telegram stays for owner approval — real product, QR → /api on non-people frames, logo, natural voice). **Spend $19.90 of $30 cap.**
+  Full log + next steps: `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_SHOTLIST.md` §5–6. Tools: `scripts/aigo-promo-*.{mjs,py}`,
+  Oracle `~/aigo-promo/`. Film-making lessons folded into `docs/atuona/FILM_COMPILATION_GUIDE.md` §5e + recap 30–38.
+- **NEXT:** Elena: Pixabay download OK, San Blas A/B, voice pick. Then v2 cut ($0).
+- **VERIFIED BY:** `node gen.mjs ledger` on Oracle = $19.90; every clip reviewed start/middle/end; QR decoded → `https://aideazz.xyz/api`.
+- **RISK:** never put her name/face/private chats on screen (crop S1 0–13 s, S2 header); free "San Blas" stock is NOT San Blas
+  (guide recap 36); Venice wallet ≈ $1.17 (< 1 shot).
 
 ### 🎯 29 Sep — EVERY job deal is fully stuffed and the audit proves it (7/7) · ✅ OpenAI credits RESTORED 30 Sep
 

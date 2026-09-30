@@ -209,3 +209,13 @@ Pexels "San Blas Islands": location metadata = Atlanta / Indonesia / Philippines
 Honduras, Dominican Republic, Tuvalu → **rejected, would mislead**. Genuinely titled-Panama Pixabay 4K clips: 34734 Causeway Panama
 City 25s · 371077 + 371076 Panama City architecture 21s · 371074 Ciudad de Panamá 11s · 346372 Sunset Bocas del Toro 47s. No free
 San Blas footage exists → San Blas stays AI with authentic Guna Yala detail, or Elena's own footage.
+
+**"Go motion" — DONE.** G1b Runway ($0.60) + G2b G5b G4b G6c Hailuo ($0.56 each) = $2.84 → ledger **$19.90**. All 5 pass:
+same woman throughout G1b (no stranger), phone shots natural, G4b/G6c show Panama City (F&F tower, Canal ships), G6c helm correct.
+**S1 ChatGPT recording (Elena's phone, 74 s)** → `captures/elena-phone-20260930-take3/S1_chatgpt_recording.mp4`. Use 13–74 s only:
+0–13 s = home screen + ChatGPT drawer with her PRIVATE chat list → never use. Real answer names Catamaran Adventures San Blas,
+San Blas Sailing, a luxury all-inclusive charter + map card → blur the names.
+**Pending Elena:** Pixabay download OK (5 × 1080p, 313 MB) · San Blas A (her footage) / B (AI Guna Yala re-render ≈$0.73) · voice pick
+(ElevenLabs v3 Roger/Mark/Drew/James, MiniMax magnetic/trustworthy) · later: fresh test inquiry → HubSpot deal screenshot + 8 AM brief.
+**Next (all $0):** v2 cut — new shots, S1 blurred, S2 WhatsApp crop, Telegram screens, QR (→ /api) on every non-people frame,
+logo on the end card, new voice, Pixabay music shortlist.
