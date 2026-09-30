@@ -166,6 +166,10 @@ present. Scripts `scripts/aigo-promo-vo-openai.py`, `scripts/aigo-promo-vo-round
 — crop it) · 04 Gmail reply (**$1,500 — do not use**) · 05 internal inquiry copy. She sent the unedited draft (test inbox
 only). Log proof: `Resend accepted` → `deal moved to "Sent"` → `HubSpot EMAIL activity 117709291844`.
 **Cleanest scene 8:** after the price fix, one fresh test inquiry → a correct draft → she taps ✏️ Edit or Send → new captures.
+**✅ Scene 8 captured for real (take 2, 30 Sep).** Fresh inquiry → openai draft quoting the **$100 diagnostic** in the Lab voice, but with one
+overclaim ("relevant case studies") → Elena used ✏️ Edit → **"✅ Your edited version was SENT"** → clean reply in Gmail. This is the film's
+"The AI drafts. You decide." moment, and it happened, it was not staged. Oracle `~/aigo-promo/captures/elena-phone-20260930-take2/` 01–07
+(01 = the "We received your inquiry" receipt). Crop: her email address and the link preview carrying her name.
 **Price fix is LIVE (30 Sep, `f1d3118`)** — see NOW.md 💲. A fresh test now drafts the $100 diagnostic.
 
 **Full narration v1 — verse (30 Sep).** `scripts/aigo-promo-vo-full.py` → Oracle `~/aigo-promo/voice/full_verse/`

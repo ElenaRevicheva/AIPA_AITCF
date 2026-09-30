@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 30 Sep 15:05 | VJH: never read our own @aideazz.xyz mail as an employer reply (Elena's go) — one entry in the existing sender blocklist | VJH `src/autonomous/response_detector.py`, new test; Oracle VJH `git pull` + `systemctl restart vibejobhunter` | 815139c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,13 +130,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🐛 30 Sep — Our OWN inquiry notification became a HIRING deal (found by the promo test; NOT fixed, Elena's go)
+### ✅ 30 Sep — Our OWN inquiry notification became a HIRING deal → FIXED in VJH `6c072e6` (Elena: "Job Hunter should not read business inquiries like employment options")
 
 - **SEEN:** the portfolio-form copy email *"[AIdeazz] Inquiry — Marco Rivera"* was ingested as a job lead →
   `[cover-letter] drafted via openai … [AIdeazz] Inquiry — Marco Rivera @ Aideazz` → `Created deal 65501789817
   ([HIRING-VJH-LEAD] [AIdeazz] Inquiry — Marco Rivera @ Aideazz)`. **Every real client inquiry can do the same**: a fake
   job deal plus OpenAI spend, and it pollutes the job queue and VJH learning. Likely VJH's Gmail job-lead scan (it reads
-  Gmail since the Aug 23 gap fix). The fix belongs in the VJH repo: skip subjects starting `[AIdeazz] Inquiry`.
+  Gmail since the Aug 23 gap fix).
+- **FIX:** ONE entry `"@" "aideazz.xyz"` in VJH's existing `BLOCKED_SENDER_DOMAINS` (no new mechanism). Both paths — orchestrator
+  and `check_for_responses_and_alert` — skip blocked senders BEFORE the HubSpot push and the Telegram alert. The Lead Concierge
+  (cto-aipa) is untouched: it does not import the detector.
+- **VERIFIED BY:** Oracle VJH ff to `6c072e6`, evals 673 passed / 1 failed (`provider_chain[claude]`, DELIBERATE); restart 15:05:39 >
+  file 15:04:05, active, cycle started; live import: own copy `blocked: True`, recruiter `False`. Concierge after all changes:
+  Elena's edited send 14:53 → `Resend accepted` → deal "Sent" → HubSpot EMAIL activity 117734509427.
 - **Filming props to delete after capture (with Elena's OK):** CLIENT deals 65506583887 + 65493437251 (Marco Rivera),
   junk HIRING deal 65501789817.
 
