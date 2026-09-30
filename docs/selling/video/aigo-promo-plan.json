@@ -131,6 +131,89 @@
         "R2"
       ],
       "prompt": "Use the reference image as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Full-length at the helm of his luxury sailing catamaran at dawn in a Panama City marina, golden-pink light and soft mist on calm water, the city skyline softly out of focus behind. The same black linen shirt open at the collar with the sleeves pushed up, dark linen trousers, a steel dive watch, a coffee cup resting by the wheel. Confident, relaxed, handsome — effortless 2026 resort-casual. Editorial luxury travel photography."
+    },
+    "k_g1": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [],
+      "prompt": "Exterior night view from outside a Tribeca penthouse: heavy snow falling past floor-to-ceiling windows, the glittering Manhattan skyline reflected in the glass, and inside one warm lamplit room where a woman sits alone at a marble kitchen island with an open laptop, seen as an elegant silhouette. Wide establishing shot."
+    },
+    "k_g2": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. 11:47 pm at the Calacatta marble island of her Tribeca penthouse kitchen: the soft glow of an open laptop on her face (the screen faces away from camera), a glass of red wine beside her, the cream cashmere wrap over the ivory silk blouse. She is typing, curious and hopeful; snowy windows and city lights softly out of focus behind her. Medium close-up."
+    },
+    "k_g3": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R2",
+        "v_r2_helm"
+      ],
+      "prompt": "Use the reference images as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Night at sea in San Blas under a full moon: his luxury white sailing catamaran anchored off a tiny palm islet, low warm deck lights; he stands alone on the aft deck coiling a line in the same black linen shirt; on the cockpit table beside him a phone sealed in a clear waterproof dry bag glows with a notification he does not see. Moonlight on the water, wide cinematic shot."
+    },
+    "k_g4": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R2",
+        "v_r2_helm"
+      ],
+      "prompt": "Use the reference images as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Monday morning in a Panama City marina, the city skyline behind in soft haze: he sits on the stern steps of his catamaran with a coffee, looking at his phone (screen facing away from camera) with a small disappointed sigh, the same black linen shirt. Medium shot, natural morning light."
+    },
+    "k_g5": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. The same night in the same penthouse kitchen, over-the-shoulder from behind her right shoulder: she types an inquiry into a charter company's website on her laptop; the laptop screen is softly out of focus with no readable text; her hand on the trackpad, the cream cashmere wrap, snowy windows beyond. She is about to click send, a small smile in her profile."
+    },
+    "k_g6": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R2",
+        "v_r2_helm"
+      ],
+      "prompt": "Use the reference images as his exact identity: the same man with the identical face, features, stubble and hair — do not change his face. Dawn at the marina, golden-pink light and soft mist on calm water: he stands at the helm of his catamaran with a coffee cup by the wheel, reading his phone (screen facing away from camera), thumb about to tap, a quiet confident smile. The same black linen shirt. Medium shot."
+    },
+    "k_g7": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1",
+        "v_r1_deck",
+        "R2"
+      ],
+      "prompt": "Use the reference images as the exact identities of both people: the same woman and the same man, identical faces — do not change their faces. THE PAYOFF — golden hour in San Blas: she steps from a small wooden tender onto the swim platform of the white catamaran, the ivory linen dress and her cream cashmere wrap lifting in the breeze, her face turned toward camera in warm low sun, looking up at the boat and the palm islet with a slow smile of arrival. The man in the black linen shirt, partly in frame, reaches down to steady her hand. Two friends soft and out of focus behind on the tender. Medium shot framed on her face and shoulders, turquoise water. She must be instantly recognisable as the woman in the reference."
+    },
+    "k_g8": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [],
+      "prompt": "Aerial drone view at golden hour: a luxury white sailing catamaran gliding over clear turquoise and deep-blue water between tiny palm-covered San Blas islets with white sand, a long soft wake, no people visible in detail."
+    },
+    "k_g9": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1",
+        "v_r1_deck",
+        "R2"
+      ],
+      "prompt": "Use the reference images as the exact identities of both people: the same woman and the same man, identical faces — do not change their faces. Sunset on the front trampoline net of the catamaran: she laughs with two friends, glasses of white wine catching the low sun, light sea spray, the cream cashmere wrap on her shoulders, her face clearly visible; behind them, soft and out of focus, the man in the black linen shirt at the helm. Warm golden light, medium shot."
+    },
+    "k_thumb": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut — do not change her face. YouTube thumbnail frame: tight close-up of her face at night lit only by the cool glow of a laptop screen, intrigued, eyes on the screen, the cream cashmere wrap, a dark penthouse and blurred snowy city lights behind her; the right third of the frame is empty dark space for a title."
     }
   },
   "shots": {},

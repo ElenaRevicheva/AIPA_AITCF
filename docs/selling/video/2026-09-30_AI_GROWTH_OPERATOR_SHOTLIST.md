@@ -147,4 +147,11 @@ pages; Veo / Kling / Seedance: 22 Sep audit) and re-read on render day; any chan
 - **IDENTITY LOCKED (Elena, 30 Sep):** R1 = `r1_gpt_a` → `img/R1.jpg`; **R2 = `r2_p2_gpt_a` → `img/R2.jpg`**. Both from GPT Image 2.
 - **Gate 1b — DONE (Elena: "yes").** 3 views on GPT Image 2 with refs passed in: `v_r1_profile` (NY night), `v_r1_deck` (Panama
   payoff look: ivory linen dress + the cashmere wrap), `v_r2_helm` (dawn, skyline) — 3/3, $0.38; **total picture spend $3.12**.
-  Identity holds in all three (checked side by side with R1/R2). Keyframes → GPT Image 2 with refs. Next: Gate 2 — needs her go.
+  Identity holds in all three (checked side by side with R1/R2).
+- **Gate 2 — DONE (Elena: "yeah. make it fire").** 10 keyframes (G1–G9 + thumbnail) on GPT Image 2 with R1/R2 + outfit views
+  passed in: 10/10, $1.28; **total picture spend $4.40**. Identity consistent across G2/G5/G7/G9/thumb (her), G3/G4/G6 (him);
+  no generated text on screens. Contact sheet sent.
+- **Gate 3 proposal (Elena asked for her Venice / Runway / Luma).** Wallets 30 Sep: Runway `creditBalance 4` (≈$0.04 — empty);
+  Luma direct key rejected by `/credits` ("Not authenticated") but **Luma ray-3.2 runs on Replicate**; Venice key works, balance
+  needs an admin key (last known ≈$8.25 on 22 Sep). Replicate also has **Sora 2 Pro** (billed to OpenAI via our key: $0.30/s 720p,
+  $0.50/s 1792×1024), **Hailuo 2.3** ($0.28–0.56/video), **Veo 3.1** ($0.40/s with audio, $0.20/s without), Kling Omni, Seedance.
