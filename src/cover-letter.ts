@@ -314,6 +314,13 @@ export async function generateCoverLetter(input: {
 // Model: ROLE_DEFENSE_MODEL (default gpt-4.1) called directly — the quality chain lands on
 // gpt-4o-mini while Claude has no credits, and that is too shallow for this job.
 // ─────────────────────────────────────────────────────────────────────────────────────────────
+const ROLE_PROFILE = `
+- I am based in Panama (UTC-5) and work fully remote; US Eastern, Central and Mountain business hours overlap my working day.
+- My English is fluent at a professional level; I write and present in English every day.
+- I work with APIs, webhooks and JSON daily: every system I run calls HubSpot, Resend, Telegram and other APIs and exchanges JSON.
+- I am comfortable working with explicit adult (NSFW) content for creative projects (Elena, 29 Sep 2026).
+`.trim();
+
 export interface RoleDefense {
   pitch: string;
   questions: { q: string; why: string; a: string; evidence: string[] }[];
@@ -373,7 +380,10 @@ export async function generateRoleDefense(input: {
   const jd = String(input.jd || '').slice(0, MAX_JD_CHARS);
   if (jd.length < MIN_JD_CHARS) return { defense: null, reason: `posting too short (${jd.length} chars)` };
   // Internal routing labels ("CREATIVE (use for …):") are for the letter prompt, not facts to quote.
-  const evidence = `${VERIFIED_FACTS.replace(/^- CREATIVE[^:]*:\s*/gm, '- ')}\n\n${input.bank}`;
+  // ROLE_PROFILE: plain facts about HER (not projects) that the reviewer otherwise cannot see, so it turned
+  // them into false "gaps" ("I haven't committed to overlapping Mountain Time", "I haven't handled JSON").
+  // Only the role defense gets them; the letter never volunteers them.
+  const evidence = `${VERIFIED_FACTS.replace(/^- CREATIVE[^:]*:\s*/gm, '- ')}\n${ROLE_PROFILE}\n\n${input.bank}`;
 
   const system = [
     'You prepare a candidate for an interview for ONE specific job. Truth beats polish.',
@@ -406,7 +416,13 @@ export async function generateRoleDefense(input: {
       const u = attempt ? `${user}\n\nYour previous draft was rejected: ${lastReason}. Fix exactly that.` : user;
       let out: { text: string; provider: string };
       try { out = await openaiJson(system, u); }
-      catch { out = await completeWithProfileDetailed('quality', system, u, 2400, 'role-defense'); }
+      catch (oe) {
+        // Logged, not swallowed: a silent fallback is how the Mid-Level video posting kept failing on the
+        // chain's broken JSON while the real cause (the OpenAI error) was invisible.
+        console.warn(`[role-defense] ${String((oe as Error)?.message || oe).slice(0, 200)} — falling back to the quality chain`);
+        // 2,400 tokens cut Gemini's JSON off mid-array (29 Sep, OpenAI out of credits) — room for the whole object.
+        out = await completeWithProfileDetailed('quality', system, u, 8000, 'role-defense');
+      }
       const raw = out.text.trim();
       if (process.env.ROLE_DEBUG) console.log(`[role-defense attempt ${attempt}] ${lastReason}\n${raw.slice(0, 6000)}`);
       const j = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1)) as RoleDefense;
@@ -443,7 +459,12 @@ export async function generateRoleDefense(input: {
         continue;
       }
       const spoken = [j.pitch || '', ...questions.map((x) => x.a), ...gaps.map((x) => x.say)].join('\n');
-      const badNums = ungroundedNumbers(spoken, evidence);
+      // Claims about HER come only from the evidence. A gap line may also repeat the posting's own numbers
+      // ("Stable Diffusion / AUTOMATIC1111", "4 years") — that is naming the requirement, not a claim.
+      const badNums = [
+        ...ungroundedNumbers([j.pitch || '', ...questions.map((x) => x.a)].join('\n'), evidence),
+        ...ungroundedNumbers(gaps.map((x) => x.say).join('\n'), `${evidence}\n${jd}`),
+      ];
       if (badNums.length) { lastReason = `numbers not in the evidence: ${badNums.join(', ')}`; continue; }
       if (describesHerAlone(spoken)) { lastReason = 'described her as working alone'; continue; }
       if (/\b(led|lead|leading|managed|managing|built)\s+(a\s+|the\s+|my\s+)?team/i.test(spoken)) { lastReason = 'claimed team leadership'; continue; }
@@ -453,18 +474,28 @@ export async function generateRoleDefense(input: {
       // for a camera … I always weigh the cost", and marked "a filmmaker first … from somewhere real" as met
       // by "directs generative AI films". The reviewer drops every answer with a claim the evidence does
       // not support, and judges EVERY stated requirement met / not met, writing the honest line for gaps.
-      const allReqs = reqs.map((r) => String(r.posting_line)).filter((l) => quotedIn(l, jd));
-      let kept = questions, finalGaps = gaps, reviewer = '';
+      // Nice-to-haves are not requirements: the first real run listed 23 "gaps" on one posting, six of
+      // them "…is an advantage". A phone card with 23 warnings is not usable, so they are dropped here.
+      const NICE = /\b(advantage|a plus|nice to have|nice-to-have|preferred|bonus|desirable|ideally)\b/i;
+      const allReqs = reqs.map((r) => String(r.posting_line)).filter((l) => quotedIn(l, jd) && !NICE.test(l));
+      let kept = questions, finalGaps = gaps.filter((g) => !NICE.test(g.posting_line)), reviewer = '';
       try {
         const revSys = [
           'You are a strict reviewer protecting a job candidate from saying anything untrue in an interview.',
           'ANSWERS: an answer is supported only if EVERY claim in it (actions, habits, methods, results) is stated in the EVIDENCE. General reasoning she never evidenced ("I weigh the cost", "I track metrics") is NOT supported.',
-          'REQUIREMENTS: met only if the EVIDENCE states it explicitly. A related skill is not the requirement. Years, named software, on-set/agency/client/brand experience and domains must be explicit.',
+          'REQUIREMENTS, two kinds. HARD (years of experience, named software, credentials, seniority level, on-set/agency/client/brand work, a domain, a language level): met only if the EVIDENCE states it explicitly; a related skill is not the requirement. SOFT (a capability, mindset or way of working, e.g. consistency, autonomy, experimentation, owning production end to end, prompting, a portfolio): met when the EVIDENCE shows her actually doing it — including through the ANSWERS you marked supported.',
+          'Willingness, availability, time-zone, language and comfort requirements are answered by the EVIDENCE profile lines — mark them met when a profile line covers them. A portfolio or track-record line is met when the EVIDENCE lists published work. Never produce a gap line that runs down her own work ("not high-quality by your standard").',
           'For every requirement NOT met, write "say": what she would SAY out loud, in natural first-person speech: "I haven\'t done X yet. What I have done is Y." — X is the requirement in plain words, Y the nearest real thing from the EVIDENCE. Never "I haven\'t claimed/stated". No number that is not in the EVIDENCE.',
           'Return JSON only.',
         ].join('\n');
         const revUser = `EVIDENCE:\n${evidence}\n\nANSWERS:\n${questions.map((x, i) => `${i}. Q: ${x.q}\n   A: ${x.a}`).join('\n')}\n\nREQUIREMENTS:\n${allReqs.map((l, i) => `${i}. ${l}`).join('\n')}\n\nReturn {"answers":[{"i":0,"supported":true,"unsupported_claim":""}],"requirements":[{"i":0,"met":false,"say":""}]}`;
-        const rv = await openaiJson(revSys, revUser, (process.env.ROLE_REVIEW_MODEL || 'gpt-5').trim());
+        let rv: { text: string; provider: string };
+        try { rv = await openaiJson(revSys, revUser, (process.env.ROLE_REVIEW_MODEL || 'gpt-5').trim()); }
+        catch (re) {
+          // Never skip the review silently: fall back to the chain (Gemini when OpenAI has no credits).
+          console.warn(`[role-defense] review: ${String((re as Error)?.message || re).slice(0, 120)} — reviewing via the quality chain`);
+          rv = await completeWithProfileDetailed('quality', revSys, revUser, 6000, 'role-review');
+        }
         reviewer = rv.provider;
         const rj = JSON.parse(rv.text.slice(rv.text.indexOf('{'), rv.text.lastIndexOf('}') + 1)) as {
           answers?: { i: number; supported: boolean; unsupported_claim?: string }[];
@@ -476,10 +507,13 @@ export async function generateRoleDefense(input: {
           lastReason = `answers made claims the evidence does not support: ${dropped.map((d) => d.unsupported_claim).filter(Boolean).slice(0, 3).join('; ')}. Answer only with what the evidence states`;
           continue;
         }
-        finalGaps = (rj.requirements || []).filter((r) => r.met === false && allReqs[r.i]).map((r) => {
-          const say = String(r.say || HONEST);
-          return { posting_line: allReqs[r.i] as string, say: ungroundedNumbers(say, evidence).length ? HONEST : say };
-        });
+        // A requirement a supported answer already addresses is met — the answer IS the proof.
+        const answered = (l: string) => kept.some((x) => x.why && (quotedIn(x.why, l) || quotedIn(l, x.why)));
+        finalGaps = (rj.requirements || []).filter((r) => r.met === false && allReqs[r.i] && !answered(allReqs[r.i] as string))
+          .sort((a, b) => a.i - b.i).slice(0, 8).map((r) => {
+            const say = String(r.say || HONEST);
+            return { posting_line: allReqs[r.i] as string, say: ungroundedNumbers(say, `${evidence}\n${jd}`).length ? HONEST : say };
+          });
       } catch { /* reviewer unavailable: keep the mechanically checked draft rather than drop the note */ }
       return { defense: { pitch: String(j.pitch || ''), questions: kept.slice(0, 5), gaps: finalGaps },
         provider: reviewer ? `${out.provider} + review ${reviewer}` : out.provider };

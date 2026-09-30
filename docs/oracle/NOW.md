@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 29 Sep 20:00 | every job deal fully stuffed: link + tailored letter + tailored CV + ROLE-specific defense; audit enforces it | `scripts/hs-fill-apply-kit.cjs`, `scripts/hs-audit-apply-kit.cjs`, `src/cover-letter.ts`, pm2 `cto-aipa` restart | 488676d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,21 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🎯 29 Sep — EVERY job deal is fully stuffed and the audit proves it (7/7) · ⚠️ OpenAI OUT OF CREDITS (Elena's move)
+
+- **DONE:** each I-act-TODAY job deal (VJH or hand-staged) = clickable apply link + tailored letter + TAILORED CV + 🛡️ defense
+  + NEW **🎯 ROLE DEFENSE** (`generateRoleDefense`, src/cover-letter.ts): the questions THIS posting raises, answered from verified
+  facts only — verbatim evidence quotes checked in code, posting lines checked verbatim, no number outside the evidence, nice-to-haves
+  dropped, max 8 honest gaps ("I haven't done X yet. What I have done is Y."), then an INDEPENDENT review (gpt-5; Gemini fallback)
+  drops unsupported claims. ROLE_PROFILE (Panama UTC-5, English, APIs/JSON daily, NSFW comfort) stops false gaps. Opens with
+  📱 APPLY link = the phone card. `hs-audit-apply-kit.cjs` checks all 5 parts, Telegram names what is missing.
+- **VERIFIED BY:** `node scripts/hs-audit-apply-kit.cjs` on Oracle → `7 job deals · complete 7 · gaps 0`; notes read back from HubSpot.
+  HireLATAM + Georgia IT → closedlost with Elena's reason (her call). VJH `026419e`: 🎯 notes never read as her rejection reason.
+- **🚨 OpenAI API: "429 You have no credits remaining"** (spent by today's role-defense regenerations: gpt-4.1 + gpt-5 on every
+  deal, 4 rounds). Kit still works via Gemini (draft + review). Anything else on OPENAI_API_KEY (TTS voices, embeddings, the
+  quality chain's 2nd step) is degraded until Elena tops up at platform.openai.com/settings/organization/billing.
+- **RISK:** Gemini writes longer, looser answers than gpt-4.1 — the code guards still apply, the depth may be lower until credits return.
 
 ### 🏔️ 29 Sep — VJH's Himalayas source had searched NOTHING; fixed · hand-staged jobs now in the queue + audit too
 
