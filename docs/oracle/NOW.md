@@ -130,6 +130,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎨 1 Oct — AI Growth Operator client deck: 8 pages, Outlook design, own images · DONE (Elena's to use; nothing sent)
+- **File:** `docs/selling/ai-growth-operator-deck/AIdeazz_AI_Growth_Operator_2026.pdf` (4.8 MB, 5 links). Source + rebuild in that
+  folder's `README.md`; what was kept/excluded from her 2 source files (28 Sep notebook + 29 Sep deck) in `EVALUATION.md`.
+- **Rules it follows:** AIdeazz AI Lab brand, verified floors only (same as Outlook), NO client results, NO "14 days", no personal
+  data from the notebook (test-lead names, a named prospect). Art: 11 images, ~$1, Flux false-flagged one → redone on Seedream.
+- **Open:** not yet in her Desktop `2 Decks` folder (she wants exactly 2 AIGO PDFs there — ask before adding/replacing);
+  no Spanish edition yet; not linked from the site.
+
 ### 📨 1 Oct — Megan got a DUPLICATE on 30 Sep; the demand nudge is still UNSENT. Old links disarmed. Firecrawl applied.
 - **What went out:** 30 Sep 23:06 UTC Elena tapped the OLD 10 Sep slug `megan-pii-qc-scan-aborts` (body = the letter she had
   already sent by hand 10 Sep). Logged: `[go/outreach-email] sent megan-pii-qc-scan-aborts … resend=01a0f492…`, HubSpot EMAIL
