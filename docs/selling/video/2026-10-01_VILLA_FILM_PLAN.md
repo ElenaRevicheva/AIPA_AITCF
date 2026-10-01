@@ -155,3 +155,11 @@ lower third) → New Year → end card. Fixes in the frame check: question card 
 QR decodes on ChatGPT split, waves, plane, drone, end card. −15.7 LUFS, every word clear, no vocals.
 Music (Elena: "super cool electro, latest 2026"): A Musinova "Minimal Techno House" (609083, 23/28 Sep 2026) · B WATERMEL0N "Afro Beat
 Vibes" (587778, Aug 2026) — both NOT Content ID registered, full-track no vocals. Her pick pending.
+
+## v2 (1 Oct) — more REAL Panama marine footage (Elena: "did you include live spectacular real marine footage?" → "1+2")
+v1 had only 1.1 s of real footage (Pixabay 351939). Pexels search (12 queries, 176 clips) filtered by the clip's location field —
+most "Panama" results are SEO tags on footage filmed elsewhere (uploader locations Atlanta / Paris / Indonesia). Kept, location = Panamá:
+`pexels_19078232` jungle island + reef + mangroves (4K, same creator/shoot as "Isla Iguana, Panama" 19078391) · `pexels_3473599` top-down
+beach, wooden boats, palms, reef channel (1080p). Honest caveat: real Panama, not certified Bocas (Isla Iguana is Pacific; its rocky
+shots not used). Placement: 351939 extended 1.1 → 1.6 s + reversed 0.8 s under "Rebobina" · real island 1.8 s opening the arrival (ICP card
+starts on it) · real beach 1.6 s opening s12 before New Year. QR decodes on all three. Cost $0. `cut1/VILLA_v2_{A_musinova,B_watermelon}.mp4`.

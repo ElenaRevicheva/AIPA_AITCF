@@ -255,7 +255,7 @@ def title(fn, l1, l2, size, left=60, y=60):
     d = ImageDraw.Draw(im)
     for k, runs in enumerate((r1, r2)): draw_runs(d, 30 + (cw - runs_w(runs)) // 2, 30 + py - size // 8 + k * (size + gap), runs)
     im.save(f"{OUT}/{fn}"); return {"file": fn, "x": left, "y": y}
-manifest["titles"].append({"line": "s03", "t0": 6.10, "t1": None, **title("title_s03.png", "Las buenas oportunidades", "se enfrían en silencio.", 80)})
+manifest["titles"].append({"line": "s03", "t0": 6.20, "t1": None, **title("title_s03.png", "Las buenas oportunidades", "se enfrían en silencio.", 80)})
 def title_question(fn, size=64, left=56, y=56):
     # Elena, 1 Oct: next to "Misma pregunta" show the question to ChatGPT, clearly - the user bubble mirrors the real ChatGPT UI.
     # Two-line bubble keeps the card narrow: the k_g2b push-in brings her face toward the upper-left.
@@ -273,7 +273,7 @@ def title_question(fn, size=64, left=56, y=56):
     d.rounded_rectangle((x0, by, x0 + bw, by + bh), 26, fill=(244, 244, 244, 255))
     for k, l in enumerate(ql): d.text((x0 + 28, by + 12 + k * qlh), l, font=qf, fill=(20, 20, 24))
     im.save(f"{OUT}/{fn}"); return {"file": fn, "x": W - im.width - 26 if left is None else left, "y": y}
-manifest["titles"].append({"line": "s05", "t0": 2.20, "t1": 6.00, **title_question("title_s05.png", left=None)})   # on her still (after the 2.1 s rewind); right: her face is left
+manifest["titles"].append({"line": "s05", "t0": 2.25, "t1": 6.00, **title_question("title_s05.png", left=None)})   # on her still (after the 2.1 s rewind); right: her face is left
 
 # ---------- opening title (Elena, 1 Oct): the film's name, large, on the very first shot ----------
 # Left-aligned: through the 3.6 s push-in she sits centre/right, the left (curtain, dark window) stays clear.
@@ -295,7 +295,7 @@ manifest["absolute"] = [{"a": 0.25, "z": 4.0, "file": "title_open.png", "x": 0, 
 # ---------- ICP card (Elena's wording, 1 Oct): who the AI Growth Operator is for - over the sunset + Guna Yala drone (no people) ----------
 ICP_ROWS = ["Chárter de yates y villas de lujo", "Turismo médico y cirugía estética", "Clínicas dentales — implantes y carillas", "Reubicación, visas e inmigración"]
 ICP_CHIPS = ["Ventas de alto valor", "Clientes internacionales", "Conversaciones por WhatsApp"]
-def icp_card(a0=3.95, z=7.45):   # seconds into the s10 block = the boat-transfer drone (no people); villa-cut.py adds the block start
+def icp_card(a0=3.55, z=7.45):   # seconds into the s10 block = the boat-transfer drone (no people); villa-cut.py adds the block start
     X, Y, px = 60, 56, 54; rf = font(SERIF, 64); cf = manrope(26, b"SemiBold"); m = font(MONO, 24)
     chips_w = sum(tw(cf, c) + 56 for c in ICP_CHIPS) + 14 * (len(ICP_CHIPS) - 1)
     cw = max(max(tw(rf, r) for r in ICP_ROWS) + 46, chips_w) + 2 * px; ch = 64 + len(ICP_ROWS) * 80 + 24 + 54 + 46

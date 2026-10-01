@@ -41,6 +41,11 @@ def clip(name, d, start=0.0, qr=False, src=None, grade=""):
 def reverse(name, d, speed=3.0):
     n = nframes(d)
     run_video([["-i", f"{CL}/{name}.mp4"]], f"[0:v]{FIT},reverse,setpts=PTS/{speed},fps={FPS},eq=saturation=0.55:contrast=1.1[v]", n)
+SURF = "eq=brightness=-0.10:contrast=1.08:saturation=1.15"   # real white surf, darkened so the serif captions read
+def reverse_src(src, ss, srcdur, d, grade=""):
+    # a real stock clip played backwards for the rewind beat
+    n = nframes(d); sp = srcdur / (n / FPS)
+    run_video([["-ss", str(ss), "-t", str(srcdur), "-i", src]], f"[0:v]{FIT},reverse,setpts=PTS/{sp:.4f},fps={FPS},tpad=stop_mode=clone:stop_duration=1" + (f",{grade}" if grade else "") + ",eq=saturation=0.7:contrast=1.1[v]", n)
 def still(img, d):
     n = nframes(d)
     run_video([loop(f"{B}/img/{img}.jpg")], f"[0:v]{FIT},scale={W*2}:{H*2},zoompan=z='min(zoom+0.0006,1.08)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={n}:s={W}x{H}:fps={FPS}[v]", n)
@@ -77,12 +82,12 @@ b = INTRO + blk["s01"]; clip("V1__hailuo", 4.0); clip("V2__kling", 3.2); split_r
 b = blk["s02"]; split_rec(48.0, 8.5, 3.3); split_still("S1_chatgpt_answer", b - 3.3)
 # B3 — she writes on WhatsApp (over the real HubSpot list) -> Sunday: the host at sea with another family -> the real Caribbean
 # coast (passing days) -> Wednesday on his dock, too late + "las buenas oportunidades se enfrían en silencio"
-b = blk["s03"]; split_still("S2_whatsapp", 1.95); clip("V3__hailuo", 2.6); clip("351939", 1.1, start=12.0, qr=True, src=f"{B}/stock/351939_large.mp4", grade="eq=brightness=-0.10:contrast=1.08:saturation=1.15")   # white surf: darker so the caption reads
-clip("V4__hailuo", b - 5.65)
+b = blk["s03"]; split_still("S2_whatsapp", 1.95); clip("V3__hailuo", 2.6); clip("351939", 1.6, start=12.0, qr=True, src=f"{B}/stock/351939_large.mp4", grade=SURF)   # Elena: give the real footage room
+clip("V4__hailuo", b - 6.15)
 # B4 — the thesis
 card_png("card_s04.png", blk["s04"])
 # B5 — rewind: Wednesday -> Sunday backwards -> her again, same question (card on the right, her face is left)
-b = blk["s05"]; reverse("V4__hailuo", 1.1); reverse("V3__hailuo", 1.0); still("k_v2", b - 2.1)
+b = blk["s05"]; reverse("V4__hailuo", 0.8); reverse_src(f"{B}/stock/351939_large.mp4", 12.0, 2.4, 0.8, grade=SURF); reverse("V3__hailuo", 0.6); still("k_v2", b - 2.2)
 # B6 — the real audit
 b = blk["s06"]; split_audit(9.4, 5.4, 2.5); split_audit(15.2, 3.4, 1.9); split_audit(20.0, 90.0, b - 4.4)
 # B7 — she writes, the kids lean in -> she hears back (real email) -> the host gets the lead (real Telegram card)
@@ -93,10 +98,13 @@ b = blk["s08"]; clip("V7__hailuo", b - 3.9); split_still("S6a_tg_send_edit_skip"
 split_still("S9_hubspot_deal", blk["s09"], zoom=0.00012)
 # B10 — Elena: "charter flight -> boat transfer -> over-water villa": the private plane over Bocas -> the airstrip, the host welcomes
 # them -> the boat transfer (drone, ICP card) -> THE PAYOFF on the villa dock, her face
-b = blk["s10"]; clip("V13__hailuo", 2.0, qr=True); clip("V14__hailuo", 1.9); clip("V8__hailuo", 3.6, qr=True); clip("V9__kling", b - 7.5, start=1.9)   # from 1.9 s she turns to camera, smiling
+b = blk["s10"]; clip("V13__hailuo", 1.8, qr=True); clip("V14__hailuo", 1.7)
+clip("px19078232", 1.8, start=2.0, qr=True, src=f"{B}/stock/pexels_19078232.mp4")   # REAL Panama: jungle island, reef, mangroves (Pexels, 4K)
+clip("V8__hailuo", 2.2, start=1.0, qr=True); clip("V9__kling", b - 7.5, start=1.9)   # from 1.9 s she turns to camera, smiling
 # B11 — the villa morning, the reveal as a lower third · B12 — New Year over the bay -> the split end card, big QR
 clip("V12__hailuo", blk["s11"])
-b = blk["s12"]; clip("V10__kling", 3.0); card_png("card_s12.png", b - 3.0)
+b = blk["s12"]; clip("px3473599", 1.6, start=3.0, qr=True, src=f"{B}/stock/pexels_3473599.mp4")   # REAL Panama: boats, palms, reef channel
+clip("V10__kling", 2.2); card_png("card_s12.png", b - 3.8)
 
 pic = f"{OUTD}/picture.mp4"
 if not OVERLAY_ONLY:
