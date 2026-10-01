@@ -1,5 +1,5 @@
 # AI Growth Operator promo - lay the chosen Pixabay track under the MiniMax narration. Runs on Oracle in ~/aigo-promo.
-# usage: python3 aigo-promo-music-mix.py <music.mp3> [start_s=0] [out=cut3/AIGO_cut_v3.mp4] [picture=cut2/picture.mp4]
+# usage: python3 aigo-promo-music-mix.py <music.mp3> [start_s=0] [out=cut3/AIGO_cut_v3.mp4] [picture=cut2/picture.mp4] [voice=cut2/voice.m4a]
 # The voice stays king: the bed is sidechain-ducked by the narration (drops ~10 dB while he speaks, breathes back up in
 # the pauses and under the end card), fades in over 1 s, fades out over the last 5 s of picture (3 s read as abrupt, v4 check). Voice and bed are both
 # apad-ed to the picture length, so a short track or a short voice file can never cut the picture.
@@ -9,7 +9,7 @@ music = sys.argv[1]
 start = float(sys.argv[2]) if len(sys.argv) > 2 else 0.0
 final = os.path.join(B, sys.argv[3] if len(sys.argv) > 3 else "cut3/AIGO_cut_v3.mp4")
 picture = os.path.join(B, sys.argv[4] if len(sys.argv) > 4 else "cut2/picture.mp4")
-voice = os.path.join(B, "cut2/voice.m4a")
+voice = os.path.join(B, sys.argv[5] if len(sys.argv) > 5 else "cut2/voice.m4a")   # 5th arg: another film's voice track
 os.makedirs(os.path.dirname(final), exist_ok=True)
 dur = lambda p: float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", p], capture_output=True, text=True).stdout)
 T = dur(picture)

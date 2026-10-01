@@ -39,3 +39,15 @@ for a business owner — is the most valuable.**"
 3. **On-screen language** — English (the /api films are English), or Spanish captions like the yacht film?
 4. **Music = v19's "Follow Me" by BerryDeep — ⚠️ Content ID REGISTERED** (Pixabay JSON-LD, checked 1 Oct). Fine on the website, WhatsApp,
    LinkedIn; on YouTube it will draw a copyright claim (clearable with the Pixabay licence). Keep it, or keep it only for non-YouTube use?
+
+## ✅ Elena's decisions (1 Oct) + build
+"I approve all your suggestions": narration = the 13 lines above (LOCKED) · voice = the OLD films' (OpenAI tts-1 / onyx / 0.9) ·
+Spanish captions in the yacht type · music = NOT v19's (Content ID) → **"Modern Deep House" by ArtIssizm** (Pixabay 602927, 17 Sep 2026,
+not Content ID registered, whole-track check: no vocals; drop at ~0:45 lands on "Behind that score: thirty-four checks", offset 13.0 s) ·
+text format/style = the yacht film's, not the old one. "Make it fire super juicy."
+- VO `scripts/apim-vo.py` (13 lines, $0.017; every take transcribed back — a01 retaken: "find and cite" heard as "insight").
+- NEW real recording `scripts/apim-rec-groups.mjs` → Oracle `rec/S4_audit_groups.mp4`: a guided live audit of atuona.xyz (93/A+) that
+  glides to and holds on each group — engines, breakdown, top fixes, crawler rows, the FAILING answer-schema row + fix, question-headings
+  FAIL + fix, lists FAIL + fix, HTTPS/786 ms, content-without-JS. (The S3 recording only ever reached the crawler rows.)
+- Assets `scripts/apim-assets.py` (local) · assembly `scripts/apim-cut.py` (Oracle `~/aigo-promo/apim/cut1/`). v2: push-in on every audit
+  screen + gold frame on each failing row and its fix; score shot reframed on the 93 ring; v13 crawler clip's burned-in English cropped.

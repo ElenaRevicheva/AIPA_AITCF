@@ -199,6 +199,12 @@ git log keeps the record.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
   defence; the human at ✅ Send is the last.
 
+### 🎬 1 Oct — /api film: ONE film from v13 + v19 + yacht screens — IN BUILD (Claude Code)
+
+- Plan + Elena's decisions: `docs/selling/video/2026-10-01_API_FILM_MERGE_PLAN.md`. Kit: `scripts/apim-*.{py,mjs}`, Oracle `~/aigo-promo/apim/`.
+- **QUEUED NEXT (Elena, 1 Oct):** two more films in the yacht film's approach for her ICP — (1) charters / villas, luxury tourism;
+  (2) immigration lawyers. Plan each with her before any spend.
+
 ### 🎬 1 Oct — AI Growth Operator YouTube promo: FILM APPROVED by Elena (cut v7) — not uploaded yet
 
 - **DONE:** narration LOCKED (English). **Cut v4** = Oracle `~/aigo-promo/cut4/AIGO_cut_v4.mp4` (90.17 s): Spanish captions in brand type,
