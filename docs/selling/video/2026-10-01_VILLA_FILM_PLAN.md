@@ -125,3 +125,9 @@ Elena: "we need the image of husband too" → hb1 (portrait of the husband alrea
 Picking husband A = no regeneration; B or C = re-make v_family + k_v9 + k_v10 (≈ $0.38).
 Keyframe self-check: k_v3 — the host at the wheel turns to camera while pointing to the reef (guiding guests; may read as the
 "wrong-way helm" Elena flagged on the yacht) → offer a re-shoot ($0.128) with him facing the bow.
+
+## Recast (1 Oct) — Elena: "man — second option. but woman — I choose woman with dark black hair. not this one"
+Mother → **E** (m5_gpt, long dark waves, silk, emeralds) as R1; husband → **B** (hb2_gpt) as RH. First-cast images kept in
+`~/aigo-villa/img/_superseded/` (never deleted). Re-made v_family, k_v1, k_v2, k_v6, k_v9, k_v10 with the new refs (Toronto wardrobe =
+her cream silk shirt, as in her reference) → +$0.77 → **ledger $3.58 of $12**. Sheet `deliverables/VILLA_recast_E_husbandB.jpg`.
+Next: Elena locks narration v2, OK on the k_v3 helm re-shoot ($0.128), then Gate 3 motion.
