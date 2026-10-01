@@ -199,19 +199,17 @@ git log keeps the record.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
   defence; the human at ✅ Send is the last.
 
-### 🎬 30 Sep — AI Growth Operator YouTube promo: CUT v3.1 delivered for Elena's review (Spanish text, Rockot music, HubSpot)
+### 🎬 1 Oct — AI Growth Operator YouTube promo: CUT v4 delivered for Elena's review
 
-- **DONE:** narration LOCKED (English, `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_PROMO_SCRIPT.md`); all shots rendered, real
-  screens privacy-safe. **Cut v3** = Oracle `~/aigo-promo/cut3/AIGO_cut_v3.mp4` (90.17 s): on-screen text Spanish + restyled to the
-  /api page look, B9 = real HubSpot deal. **v3.1** (`cut3/AIGO_cut_v3_1.mp4`) music = Rockot "Soul Chill House" (her call: BerryDeep was
-  "generic"; DARIOCOIRO rejected — sung lyrics despite the instrumental tag). Mixer level-matches by measured LUFS.
-  Thumbnail v2 EN/ES + caption files EN/ES in `docs/selling/video/deliverables/`. **Spend ≈ $20.90 of $30; v3 cost $0.**
-  Log: `…_SHOTLIST.md` (CUT v3). Film lessons: `docs/atuona/FILM_COMPILATION_GUIDE.md` §5e.
-- **NEXT (Elena):** review v3 · pick thumbnail EN or ES · OK to delete test deal 65531490170 (it is ON SCREEN in B9 — delete only
-  after the film is final). **Then (agent):** 9:16 Short ~30 s, YouTube title/description sheet; upload only with her explicit go.
-- **VERIFIED BY:** QR decoded → `https://aideazz.xyz/api` from 3 exported v3 frames; picture 90.167 s vs voice 90.158 s; −15.6 LUFS.
-- **RISK:** Pixabay tropical tracks are mostly Content ID registered → YouTube claim; check the page's JSON-LD before swapping music.
-  Never her name/face/private chats on screen. `pkill -f`/`pgrep -f` over ssh match their own command line (cost a failed run).
+- **DONE:** narration LOCKED (English). **Cut v4** = Oracle `~/aigo-promo/cut4/AIGO_cut_v4.mp4` (90.17 s): Spanish captions in brand type,
+  every real screen split half-screen / half big QR, her ChatGPT recording at real length, real Bocas sunset back (+ under the reveal), English
+  kinetic "who's new / warm / slipping away" on HubSpot, music = DARIOCOIRO with vocals removed (demucs, verified no voice). Spend ≈ $20.90 of
+  $30; v3→v4 cost $0. Log: `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_SHOTLIST.md` (CUT v3 → v4). Thumbnails/SRT: `…/video/deliverables/`.
+- **NEXT (Elena):** review v4 · thumbnail EN or ES · "tú" OK · OK to delete test deal 65531490170 (ON SCREEN — only after the film is final).
+  **Then (agent):** 9:16 Short ~30 s + YouTube upload sheet; upload only with her explicit go.
+- **VERIFIED BY:** QR decodes → `https://aideazz.xyz/api` on every split frame, 3 scenic frames, end card; picture 90.167 s = voice 90.158 s; −15.7 LUFS.
+- **RISK:** Pixabay "instrumental" tags lie (DARIOCOIRO sings) — listen/transcribe; 66 % of trendy tracks are Content ID registered. ChatGPT recording
+  shows business names from 57 s. Never her name/face/private chats. `pgrep -f`/`pkill -f` over ssh match their own command line.
 
 ### 🎯 29 Sep — EVERY job deal is fully stuffed and the audit proves it (7/7) · ✅ OpenAI credits RESTORED 30 Sep
 

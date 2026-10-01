@@ -269,3 +269,18 @@ tide… hands on your body"). Tags are not evidence; listen. Rockot = no vocals 
 NY midnight, bass enters ~0:16–0:19 as the story cuts to sea, breakdown 1:16–1:35 sits under the reveal + end card. **Mixer now level-matches**
 (measured −16.7 LUFS vs BerryDeep −8.7 — a fixed −17 dB would have buried it): bed −25.7 LUFS = v3's approved balance → gain −9.0 dB.
 Final −15.7 LUFS; Gemini listen: every word clear, no vocals, clean fade. Oracle `cut3/AIGO_cut_v3_1.mp4`; v3 BerryDeep kept as `AIGO_cut_v3_berrydeep.mp4`.
+
+**CUT v4 — 1 Oct** (`scripts/aigo-promo-v4-assets.py` local → Oracle `v4/` → `aigo-promo-cut4.py` → `aigo-promo-music-mix.py`; `cut4/AIGO_cut_v4.mp4`,
+90.17 s, $0). Elena on v3.1: captions "ugly"; QR must be LARGE ("half the screen the HubSpot screenshot, half the QR"); the sunset was cool —
+why not used; "who's new / who's warm…" as English words in brand style; "let us try DARIOCOIRO"; "where is my ChatGPT recording?".
+- **Captions** → brand type: Instrument Serif, key phrase gold italic, soft halo + bottom scrim, no box. Max width 1180 px so they end left of the corner QR.
+- **Every real screen SPLIT**: phone/page left (rounded, shadow), QR 470 px right (audit: 380) + "ESCANEA · AUDITORÍA GRATIS" + URL. Scenic QR 250 → 300 px.
+  End card split: QR 560 px. Reveal card now laid over the REAL Bocas del Toro sunset (dimmed). Sunset in B10: 1.8 s → 3.2 s.
+- **ChatGPT recording**: was 3.6 s at 7× (easy to miss). Now typing 26→50 s on "she's asking an AI", then 48→56.5 s (sent → "Searching the web"
+  → first answer lines) on "it suggests the boats", then the blurred-names screenshot. **Business names first appear at 57 s** — never use past 56.5 s unblurred.
+- **B9**: HubSpot left; right "EVERY MORNING / Who's *new.* / Who's *warm.* / Who's *slipping away.*" timed to the voice's pauses, Spanish mono labels.
+- **Music**: DARIOCOIRO "Gold on the Water" **with the vocals removed** — demucs htdemucs on Oracle (`~/aigo-promo/venv-demucs`, 1.1 GB, $0, 3.5 min CPU);
+  the vocal stem averaged −20 dB (real singing). Instrumental checked: chorus 0:58–1:38 = NO VOICE; full track no voice, "full, polished afro/organic house".
+  Final-mix listen flagged faint breathy texture (not words) at a few points. Fade-out 3 → 5 s. Level-matched −14.3 → gain −11.4 dB; final −15.7 LUFS.
+- **Caught in the frame check:** wide serif captions ran into the corner QR and the scrim dimmed it → QR failed to decode at 1:06 → captions narrowed,
+  scrim stops short of the QR → decodes at 0:20 / 1:06 / 1:08 + every split frame + end card.

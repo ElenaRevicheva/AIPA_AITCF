@@ -1,7 +1,7 @@
 # AI Growth Operator promo - lay the chosen Pixabay track under the MiniMax narration. Runs on Oracle in ~/aigo-promo.
 # usage: python3 aigo-promo-music-mix.py <music.mp3> [start_s=0] [out=cut3/AIGO_cut_v3.mp4] [picture=cut2/picture.mp4]
 # The voice stays king: the bed is sidechain-ducked by the narration (drops ~10 dB while he speaks, breathes back up in
-# the pauses and under the end card), fades in over 1 s, fades out over the last 3 s of picture. Voice and bed are both
+# the pauses and under the end card), fades in over 1 s, fades out over the last 5 s of picture (3 s read as abrupt, v4 check). Voice and bed are both
 # apad-ed to the picture length, so a short track or a short voice file can never cut the picture.
 import os, sys, subprocess, json
 B = os.path.expanduser("~/aigo-promo")
@@ -24,7 +24,7 @@ graph = (
     f"[1:a]aresample=44100,aformat=channel_layouts=stereo,apad=whole_dur={T},atrim=duration={T},asplit=2[v][vkey];"
     f"[2:a]aresample=44100,aformat=channel_layouts=stereo,atrim=start={start},asetpts=PTS-STARTPTS,"
     f"apad=whole_dur={T},atrim=duration={T},volume={BED_DB}dB,"
-    f"afade=t=in:st=0:d=1,afade=t=out:st={T-3:.2f}:d=3[bed];"
+    f"afade=t=in:st=0:d=1,afade=t=out:st={T-5:.2f}:d=5[bed];"
     f"[bed][vkey]sidechaincompress=threshold=0.02:ratio=8:attack=80:release=700:makeup=1[ducked];"
     f"[v][ducked]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.89[out]"
 )
