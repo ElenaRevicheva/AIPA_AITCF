@@ -199,3 +199,26 @@ and the three text cards (thesis, reveal, end). Source of truth for every string
 - Cards: *Nadie se despierta queriendo IA. / Tú quieres más reservas.* · *Las personas de esta película son IA. / Las pantallas del producto son reales.* ·
   end: *¿Qué ve la IA cuando mira tu negocio?* + Auditoría de visibilidad en IA · 34 señales · gratis + **aideazz.xyz/api** + *Dramatización: personas generadas con IA.*
 - Titles: *Las buenas oportunidades / se enfrían en silencio.* · *Misma clienta. / Misma pregunta.* (no duplicate caption under the second).
+
+## 📋 ICP list on the sunset — DRAFT for Elena's approval (1 Oct 2026, not rendered)
+
+Elena: "here across the screen — without wiping or stopping the existing text — add our ICP in a juicy, clear list: for whom the AI Growth
+Operator is. Firstly approve this text with me." Source: the ICP memory (shape: sale > $2,000 · online leads · closes on WhatsApp ·
+international clients; 4 costumes: luxury charters/villas · medical tourism · dental · relocation/immigration). Narration + captions unchanged.
+Placement: upper-left glass card over the sky, held across the sunset + Guna Yala drone (no people, 1:04–1:09, ≈4.4 s), lines building one by one.
+
+**ES (recommended — matches the captions)**
+> PARA QUIÉN ES
+> Chárter de yates y villas de lujo
+> Turismo médico y cirugía estética
+> Clínicas dentales: implantes y carillas
+> Reubicación, visas e inmigración
+> *Ventas desde $2,000 · clientes internacionales · cierras por WhatsApp*
+
+**EN (alternative — matches the "who's new / warm" words)**
+> BUILT FOR
+> Yacht charters & luxury villas
+> Medical tourism & cosmetic surgery
+> Dental clinics — implants & veneers
+> Relocation, visas & immigration
+> *Sales from $2,000 · international clients · closed on WhatsApp*
