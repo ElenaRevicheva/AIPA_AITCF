@@ -1,12 +1,13 @@
 """Render the deck in both languages:
-    aigo.html -> AIdeazz_AI_Growth_Operator_2026.pdf (English)
+    aigo.html    -> AIdeazz_AI_Growth_Operator_2026.pdf     (English)
+    aigo-es.html -> AIdeazz_AI_Growth_Operator_2026_ES.pdf  (Spanish; built by make-es.py)
 
 1. Each slide's photographic background (+ .bake layers) is screenshotted alone (?bg=N) at 2x and
    saved as bg/sN.jpg. Soft alpha overlays exported as PDF shadings draw hairline artifacts in
    some viewers, so backgrounds are raster on purpose.
 2. The deck prints over those JPEGs (?raster=1). Text, cards, icons and links stay vector,
    so the PDF is searchable and every link is clickable.
-Usage: python render.py   (needs Chrome or Edge, Pillow, PyMuPDF for the check)
+Usage: python make-es.py && python render.py   (needs Chrome or Edge, Pillow, PyMuPDF for the check)
 """
 import os, subprocess
 from pathlib import Path
@@ -14,7 +15,8 @@ from PIL import Image
 import fitz
 
 HERE = Path(__file__).resolve().parent
-DECKS = [('aigo.html', 'AIdeazz_AI_Growth_Operator_2026.pdf')]
+DECKS = [('aigo.html', 'AIdeazz_AI_Growth_Operator_2026.pdf'),
+         ('aigo-es.html', 'AIdeazz_AI_Growth_Operator_2026_ES.pdf')]
 SLIDES = 8
 BROWSER = next(p for p in [os.environ.get('CHROME_PATH'),
                            r'C:\Program Files\Google\Chrome\Application\chrome.exe',

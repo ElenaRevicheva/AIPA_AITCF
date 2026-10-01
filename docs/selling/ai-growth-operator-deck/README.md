@@ -1,7 +1,12 @@
 # AI Growth Operator — 8-page client deck (October 2026)
 
-**Deliverable:** `AIdeazz_AI_Growth_Operator_2026.pdf` — 16:9, 8 pages, ~4.8 MB (under the 5 MB outreach-attachment cap),
-selectable text, 5 clickable links (email, free audit at aideazz.xyz/api, WhatsApp, portfolio, AI Ops Wiki).
+**Deliverables:** `AIdeazz_AI_Growth_Operator_2026.pdf` (English) and `AIdeazz_AI_Growth_Operator_2026_ES.pdf` (Spanish) — 16:9,
+8 pages, ~4.8 MB each (under the 5 MB outreach-attachment cap), selectable text, 5 clickable links (email, free audit at
+aideazz.xyz/api, WhatsApp, portfolio, AI Ops Wiki). Copies `…_EN.pdf` / `…_ES.pdf` sit in Elena's Desktop `2 Decks 01.10.2026`
+folder; the old 29 Sep 7-slide deck was moved to its `old/` subfolder (not deleted).
+
+**Spanish edition:** `python make-es.py` builds `aigo-es.html` from an explicit EN→ES pair list and FAILS on any untranslated
+string. Formal "usted". "AI Growth Operator" stays the product name. Spanish-only size tweaks live in that script.
 
 **Content source:** Elena's two files of 28–29 Sep (`28.09.2026 AI Growth Operator.pdf` notebook + the 7-slide dark deck), read
 in full and evaluated in `EVALUATION.md` — what was kept, what is internal only, what is personal data, what is unproven.
@@ -27,7 +32,7 @@ November. Never add client results, "installed in 14 days", or per-niche revenue
 ## Rebuild
 
 ```bash
-python render.py            # needs Chrome or Edge, Pillow, PyMuPDF; fonts are local
+python make-es.py && python render.py   # needs Chrome or Edge, Pillow, PyMuPDF; fonts are local
 ```
 
 Art (one-off, on Oracle, from `~/cto-aipa`):

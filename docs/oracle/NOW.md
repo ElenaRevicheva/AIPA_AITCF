@@ -135,8 +135,8 @@ git log keeps the record.
   folder's `README.md`; what was kept/excluded from her 2 source files (28 Sep notebook + 29 Sep deck) in `EVALUATION.md`.
 - **Rules it follows:** AIdeazz AI Lab brand, verified floors only (same as Outlook), NO client results, NO "14 days", no personal
   data from the notebook (test-lead names, a named prospect). Art: 11 images, ~$1, Flux false-flagged one → redone on Seedream.
-- **Open:** not yet in her Desktop `2 Decks` folder (she wants exactly 2 AIGO PDFs there — ask before adding/replacing);
-  no Spanish edition yet; not linked from the site.
+- **EN + ES done** (`make-es.py`, fails on untranslated text). Desktop `2 Decks 01.10.2026`: `AIdeazz_AI_Growth_Operator_2026_EN/ES.pdf`
+  added, old 29 Sep deck moved to `old/` (Elena's OK). **Open:** not linked from the site; not attached to any deal yet.
 
 ### 📨 1 Oct — Megan got a DUPLICATE on 30 Sep; the demand nudge is still UNSENT. Old links disarmed. Firecrawl applied.
 - **What went out:** 30 Sep 23:06 UTC Elena tapped the OLD 10 Sep slug `megan-pii-qc-scan-aborts` (body = the letter she had
