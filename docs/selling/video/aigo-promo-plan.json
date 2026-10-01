@@ -279,6 +279,18 @@
       "aspect": "16:9",
       "refs": [],
       "prompt": "Aerial drone view at golden hour over the San Blas islands (Guna Yala), Panama: tiny flat islets covered in coconut palms with white sand and a few palm-thatched Guna huts with bamboo walls; glass-clear shallow turquoise reef water with coral patches; a traditional Guna ulu dugout canoe with two paddlers gliding near an islet; a luxury white sailing catamaran anchored in the lagoon; on the horizon, the green jungle-covered mountains of the Panamanian mainland under soft clouds. Natural documentary realism."
+    },
+    "k_g9b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1",
+        "v_r1_deck",
+        "R2",
+        "v_r2_helm",
+        "k_g9"
+      ],
+      "prompt": "Use the reference images as the exact identities of both people: the same woman and the same man, identical faces, do not change their faces. The last reference image is ONLY for the two friends, their wardrobe, the wine glasses and the sunset light; the man's position must be different from it. Sunset sail on the luxury white catamaran, the boat moving toward the LEFT of the frame. The camera is beside the boat, looking across the deck from the side. Foreground, on the front trampoline net: she laughs with her two friends (one with sunglasses and dark hair, one with long brunette hair), clinking glasses of white wine, the cream cashmere wrap on her shoulders, wind in her hair, her face clearly visible. Background, at the raised helm station, the man in the black linen shirt steers the yacht CORRECTLY: he stands BEHIND the wheel in strict SIDE PROFILE, FACING the direction of travel (toward the LEFT of the frame, toward the bow and the open sea ahead), BOTH hands on the wheel, his eyes on the horizon ahead. He does NOT face the camera and does NOT turn toward the women; the wheel is in front of him, between him and the bow. Warm golden light, gentle sea spray, medium-wide shot."
     }
   },
   "shots": {
@@ -399,6 +411,13 @@
       "duration": 5,
       "audio": false,
       "motion": "Slow forward drone flight descending over the palm islets toward the anchored white catamaran; the ulu canoe glides past below; gentle ripples on the reef, golden hour. Documentary realism."
+    },
+    "G9b": {
+      "start": "k_g9b",
+      "engine": "hailuo",
+      "duration": 6,
+      "audio": false,
+      "motion": "Sunset sail: she laughs with her two friends as they clink glasses, wind in her hair, light sea spray; behind them he steers in side profile, both hands on the wheel, eyes on the sea ahead, never turning toward the camera. The catamaran glides forward. Slow gentle push-in."
     }
   },
   "decisions": {

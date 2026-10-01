@@ -294,3 +294,12 @@ DARIOCOIRO instrumental, Rockot). Every track scored 8–9/10 "premium", control
 It DID catch vocals in 9 "instrumental"-tagged tracks → used as a vocal filter only. Log: Oracle `music/screen_scores_2026-10-01.json`.
 New vocal-free shortlist (not offered before): cornist Deep House Track 543501 · WATERMEL0N Afro Beat Vibes 587778 · MeditativeTiger L'Essence de la
 Nuit 367308 · max_graf_von_stark Cigarette Break with a View of the Sea 355012 · NewEraMusic Summer Beach House 553956.
+
+**CUT v5 FINAL MIX — 1 Oct** (`cut5/AIGO_cut_v5.mp4`, 90.17 s). Elena: "the toast scene is super, we need it, but the captain should drive correctly" →
+**G9b re-shot ($0.688):** keyframe `k_g9b` (GPT Image 2, refs R1 + v_r1_deck + R2 + v_r2_helm + k_g9 for the friends/light only): camera beside the
+boat, captain at the raised helm in SIDE PROFILE facing the direction of travel, both hands on the wheel, eyes ahead — then Hailuo 2.3 6 s. Checked
+frame by frame: first 2.5 s used (toast + her face + correct helm); after ~2.8 s the camera drifts behind the women and her face turns away.
+B10 now: Bocas sunset 2.8 → G8b 1.6 → G7 from 1.7 s (ends on her recognition smile) 3.3 → G9b 2.5. **Ledger $21.31 of $30** (+ voices ≈$0.26).
+**Music = her pick #1 cornist "Deep House Track" (543501)**, 2:57, not Content ID registered; whole-track check: no vocals (soft "aah" synth pads =
+texture). Structure: intro 0–0:48, drop 0:48 → lands on "When she writes, she hears back right away" (film 0:45–0:48), offset 0.
+Level-matched −18.6 → gain −7.1 dB; final −15.7 LUFS; listen: every word clear, smooth fade. QR decodes at 0:19 / 1:06 / 1:08.
