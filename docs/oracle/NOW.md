@@ -199,7 +199,7 @@ git log keeps the record.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
   defence; the human at ✅ Send is the last.
 
-### 🎬 1 Oct — AI Growth Operator YouTube promo: CUT v7 delivered (title, ICP card, HubSpot slot, emerald yacht wardrobe) — Elena reviewing
+### 🎬 1 Oct — AI Growth Operator YouTube promo: FILM APPROVED by Elena (cut v7) — not uploaded yet
 
 - **DONE:** narration LOCKED (English). **Cut v4** = Oracle `~/aigo-promo/cut4/AIGO_cut_v4.mp4` (90.17 s): Spanish captions in brand type,
   every real screen split half-screen / half big QR, her ChatGPT recording at real length, real Bocas sunset back (+ under the reveal), English
@@ -209,7 +209,9 @@ git log keeps the record.
   towers + music cornist "Deep House Track" (no vocals, drop on "she hears back right away").
 - **v6–v7:** `cut5/AIGO_cut_v7.mp4` — opening title, ChatGPT question bubble, ICP card (her wording), real HubSpot deals list behind
   WhatsApp (HIRING + name blurred), emerald-silk boarding + toast re-shoot (ledger $22.82 of $30). Log: shotlist CUT v6/v7.
-- **NEXT (Elena):** review v7 · thumbnail EN or ES · "tú" OK · OK to delete test deal 65531490170 (ON SCREEN — only after the film is final).
+- **APPROVED 1 Oct** ("this video is fine"). Master: laptop `docs/selling/video/deliverables/AIGO_FINAL_2026-10-01_1080p.mp4` (untracked)
+  + Oracle `cut5/`; md5 89e91e42…8f37. Upload sheet: `docs/selling/video/2026-10-01_AIGO_YOUTUBE_UPLOAD_SHEET.md`.
+- **NEXT (Elena):** thumbnail EN or ES · who uploads + visibility · OK the 9:16 Short plan · "tú" OK · OK to delete test deal 65531490170 (ON SCREEN — only after the film is final).
   **Then (agent):** 9:16 Short ~30 s + YouTube upload sheet; upload only with her explicit go.
 - **VERIFIED BY:** QR decodes → `https://aideazz.xyz/api` on every split frame, 3 scenic frames, end card; picture 90.167 s = voice 90.158 s; −15.7 LUFS.
 - **RISK:** Pixabay "instrumental" tags lie (DARIOCOIRO sings) — listen/transcribe; 66 % of trendy tracks are Content ID registered. ChatGPT recording
