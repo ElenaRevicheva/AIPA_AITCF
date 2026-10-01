@@ -291,7 +291,7 @@ the end of the line (ends on her face). Regenerate-without-captain offered (GPT 
 (2) the Biomuseo causeway clip → Pixabay 371076 Panama City towers drone from 14 s (QR decodes at 0:19 / 0:20). (3) DARIOCOIRO instrumental "not fine".
 **Music screen — calibration FAILED, honestly:** Gemini pre-listened 28 Content-ID-free candidates + 3 controls (her rejected BerryDeep, the rejected
 DARIOCOIRO instrumental, Rockot). Every track scored 8–9/10 "premium", controls included → the scorer cannot tell premium from generic; her ear decides.
-It DID catch vocals in 9 "instrumental"-tagged tracks → used as a vocal filter only. Log: Oracle `music/screen_scores_2026-10-01.json`.
+It DID flag vocals in **7** tracks whose Pixabay tags did not mention vocals (corrected 1 Oct — first reported as "9 instrumental-tagged"; the scores file shows 7 `vocals: true`, 2 of them titled "instrumental") → used as a vocal filter only. Log: Oracle `music/screen_scores_2026-10-01.json`.
 New vocal-free shortlist (not offered before): cornist Deep House Track 543501 · WATERMEL0N Afro Beat Vibes 587778 · MeditativeTiger L'Essence de la
 Nuit 367308 · max_graf_von_stark Cigarette Break with a View of the Sea 355012 · NewEraMusic Summer Beach House 553956.
 
