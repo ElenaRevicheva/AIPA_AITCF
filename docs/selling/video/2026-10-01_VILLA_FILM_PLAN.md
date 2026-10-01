@@ -139,3 +139,9 @@ appears and the villa for luxurious guests — not a yacht" · **"charter = a PL
   looked CGI → re-made on Nano Banana Pro as a real air-to-air photo · boat "charter day" (k_v11) dropped — the charter is the flight.
 - Motion running (Hailuo $0.56 each): V3 V4 V6 V7 V8 V12 V14. Pending her budget call: V1, V13 (Hailuo) + V2/V9/V10 (Kling pro $1.12 each)
   = ≈ $12.90 total vs the $12 cap → A: cap $13 · B: Kling only V9/V10, V2 on Hailuo, drop V1 (≈ $11.80).
+- **Wardrobe (Elena: "not so bland — more juicy, more luxurious, still casual, fitting tropical marine and villa"):** batch stopped before
+  any family shot was animated (V3, V4 host-only were already submitted). Re-dressed: DAY tangerine silk wrap · cobalt linen · palm-print
+  shirt · hot-pink sundress · emerald silk · saffron linen + panama; MORNING turquoise print silk kimono; NYE liquid-gold slip dress, ivory
+  jacket, fuchsia sparkle, deep red. Host keeps his natural linen. Re-made v_family, k_v14, k_v9, k_v12, k_v10 ($0.64); bland takes kept in
+  `_superseded/`. k_v13 plane (Nano) — 2nd take had the chase-plane window + camera in frame → 3rd take clean ($0.15).
+  **Ledger $6.41 of $12.** Sheet `deliverables/VILLA_wardrobe_juicy.jpg`. Remaining motion needs her budget call (A $13.69 / C $12.57 / B $11.45).
