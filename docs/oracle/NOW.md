@@ -211,7 +211,11 @@ git log keeps the record.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
   defence; the human at ✅ Send is the last.
 
-### 🎬 1 Oct — /api film: ONE film from v13 + v19 + yacht screens — v2 DELIVERED for Elena's review
+### 🎬 1 Oct — /api film (v13 + v19 + yacht screens): APPROVED for YouTube by Elena — not uploaded yet
+
+- Master laptop `docs/selling/video/deliverables/AIGO_API_FINAL_2026-10-01_1080p.mp4` (md5 28d5b971…8a31); upload sheet FILM 2 in
+  `docs/selling/video/2026-10-01_AIGO_YOUTUBE_UPLOAD_SHEET.md`. **No automated YouTube upload works** (14 dead Make YouTube connections;
+  Buffer = vertical Shorts only) → YouTube Studio by hand, or via her logged-in Chrome with her go.
 
 - Plan + Elena's decisions: `docs/selling/video/2026-10-01_API_FILM_MERGE_PLAN.md`. Kit: `scripts/apim-*.{py,mjs}`, Oracle `~/aigo-promo/apim/`.
 - **QUEUED NEXT (Elena, 1 Oct):** two more films in the yacht film's approach for her ICP — (1) charters / villas, luxury tourism;
