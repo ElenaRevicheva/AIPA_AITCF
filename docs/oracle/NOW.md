@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-01 19:45 | CV summary written per job (role-defense pitch) | scripts/hs-fill-apply-kit.cjs, scripts/lib/job-tailor.cjs; 🛡️ CV attachments on the 11 I-Act-TODAY deals | 46772b7 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
