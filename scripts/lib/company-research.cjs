@@ -79,7 +79,7 @@ function createResearcher(apiKey, { cacheFile = CACHE } = {}) {
     } catch { stats.failed++; return null; }
   }
 
-  /** Re-read before writing: the kit (every 2h at :10) and the page (13:15) can overlap. */
+  /** Re-read before writing: the kit (every 10 min since 1 Oct, flock-guarded) and the page (13:15) can overlap. */
   function save() {
     if (!Object.keys(fresh).length) return;
     let disk = {};

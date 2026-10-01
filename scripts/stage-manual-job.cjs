@@ -12,7 +12,7 @@
  * WHAT IT DOES: creates `[HIRING-MANUAL] <title> @ <company>` in 🔥 I act TODAY (the ` @ ` is what the
  * kit parses), a note that opens with `📌 JOB POSTING: <code>url</code>` (the kit's opt-in — recruiter-
  * outreach deals share the prefix and must stay out), any --info lines, and a HIGH "Apply" task.
- * It writes NO CV, letter or defense itself: hs-fill-apply-kit.cjs does, on Oracle (cron every 2h,
+ * It writes NO CV, letter or defense itself: hs-fill-apply-kit.cjs does, on Oracle (cron every 10 min,
  * or at once with `--apply --only=<dealId>`), exactly as for an automatic deal.
  *
  * Idempotent: an existing deal with the same name is reported, not duplicated.
