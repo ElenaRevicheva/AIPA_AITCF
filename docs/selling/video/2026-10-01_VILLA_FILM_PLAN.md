@@ -45,3 +45,13 @@ Runway $0.60 / Kling for faces) ≈ $6–8 · voice ≈ $0.10 · music $0 → **
 ## Decisions for Elena
 1. Story **A** or **B**? 2. Location: **Pedasí / Playa Venao** or **Isla Contadora**? 3. Narration: approve or edit.
 4. OK to run the fresh villa test inquiry through the live Lead Concierge (creates a test deal I delete afterwards)?
+
+## $0 groundwork (1 Oct, while decisions are pending)
+- **Real-footage check (Pixabay, 12 queries):** NO genuine Pedasí / Playa Venao / Contadora / Pearl Islands / Azuero / Coiba footage.
+  Real coastal Panama exists only for **Bocas del Toro**: the sunset Elena liked (346372, 47 s) + "Ocean waves, Caribbean coast, Panama"
+  (351939, 44 s). → **Recommendation changes to a Bocas del Toro over-water / jungle-beach villa** — real footage carries the location,
+  AI shots carry the people (same split as the yacht film). Pedasí/Contadora would be 100 % AI scenery.
+- **Her phone tasks, ready to copy:** ChatGPT question — *"What is the best luxury villa to rent in Bocas del Toro, Panama, for 10 people
+  for a 40th birthday?"* (A) or *"…for a family of 8 over New Year?"* (B). WhatsApp guest line — *"Hi! Is the villa free Dec 28 – Jan 4? We're 10."*
+- **Test inquiry text for the Lead Concierge** (sent only with her OK): *"Hi — we'd like to book your villa for 10 guests, Dec 28 to Jan 4,
+  for a 40th birthday. Is it available, and what's included?"*
