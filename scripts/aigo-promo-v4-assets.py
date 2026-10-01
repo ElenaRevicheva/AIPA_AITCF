@@ -73,11 +73,20 @@ manifest = {"layout": {}, "captions": [], "titles": [], "kinetic": [], "scrim": 
 
 # ---------- split frames for every real phone screen ----------
 for f in sorted(os.listdir(SAFE)):
-    if not f.startswith("safe_S") or f.startswith("safe_S9"): continue
+    if not f.startswith("safe_S") or f.startswith("safe_S9") or f.startswith("safe_S2_"): continue
     im = backdrop(); qr_block(im, 1400, 170, 470)
     ph = rounded(fit(Image.open(f"{SAFE}/{f}").convert("RGB"), L["maxw"], L["maxh"]), 34)
     shadowed_paste(im, ph, L["cx"] - ph.width // 2, L["top"] + (L["maxh"] - ph.height) // 2)
     im.convert("RGB").save(f"{OUT}/split_{f[5:-4]}.png")
+
+# S2 (Elena, 1 Oct: "fill the space around the little WhatsApp"): her REAL HubSpot deals list as the base (Fresh today / ACTIVE /
+# AGING views; "HIRING" tab + her name in a stage label blurred), the guest's WhatsApp message floating over it - the lead lands.
+im = backdrop(); qr_block(im, 1400, 170, 470)
+hub = rounded(fit(Image.open(f"{SAFE}/hub_deals_list.jpg").convert("RGB"), 980, 600), 22)
+shadowed_paste(im, hub, 70, 130)
+wa = rounded(fit(Image.open(f"{SAFE}/safe_S2_whatsapp.jpg").convert("RGB"), 700, 400), 28)
+shadowed_paste(im, wa, 70 + hub.width - wa.width + 40, 130 + hub.height - 70, blur=26, alpha=200, dy=18)
+im.convert("RGB").save(f"{OUT}/split_S2_whatsapp.png")
 
 # panels with an empty left zone, for the two VIDEO screens (filled by ffmpeg) + their rounded-corner masks
 rw, rh = round(864 * 840 / 1610), 840                                     # ChatGPT recording, status + nav bars cropped
@@ -243,7 +252,24 @@ def title(fn, l1, l2, size, left=60, y=60):
     for k, runs in enumerate((r1, r2)): draw_runs(d, 30 + (cw - runs_w(runs)) // 2, 30 + py - size // 8 + k * (size + gap), runs)
     im.save(f"{OUT}/{fn}"); return {"file": fn, "x": left, "y": y}
 manifest["titles"].append({"line": "s03", "t0": 6.10, "t1": None, **title("title_s03.png", "Las buenas oportunidades", "se enfrían en silencio.", 80)})
-manifest["titles"].append({"line": "s05", "t0": 1.10, "t1": 3.40, **title("title_s05.png", "Misma clienta.", "Misma pregunta.", 92)})
+def title_question(fn, size=64, left=56, y=56):
+    # Elena, 1 Oct: next to "Misma pregunta" show the question to ChatGPT, clearly - the user bubble mirrors the real ChatGPT UI.
+    # Two-line bubble keeps the card narrow: the k_g2b push-in brings her face toward the upper-left.
+    s, it = font(SERIF, size), font(ITALIC, size); r1, r2 = [("Misma clienta.", s, WHITE)], [("Misma pregunta a ChatGPT:", it, GOLD)]
+    ql = ["¿Cuál es el mejor servicio de yates", "para ir a San Blas?"]; qf = manrope(30, b"Medium"); qlh = 40
+    px, py, gap = 52, 30, 8; bw, bh = max(tw(qf, l) for l in ql) + 56, len(ql) * qlh + 30
+    cw = max(runs_w(r1), runs_w(r2), bw) + 2 * px; ch = 2 * size + gap + 26 + bh + 2 * py + 10
+    im = Image.new("RGBA", (cw + 60, ch + 60), (0, 0, 0, 0))
+    sh = Image.new("RGBA", im.size, (0, 0, 0, 0)); ImageDraw.Draw(sh).rounded_rectangle((30, 38, 30 + cw, 38 + ch), 28, fill=(0, 0, 0, 140))
+    im.alpha_composite(sh.filter(ImageFilter.GaussianBlur(14))); ImageDraw.Draw(im).rounded_rectangle((30, 30, 30 + cw, 30 + ch), 28, fill=(9, 14, 30, 200))
+    rim = Image.new("RGBA", im.size, (0, 0, 0, 0)); ImageDraw.Draw(rim).rounded_rectangle((30, 30, 30 + cw, 30 + ch), 28, outline=(255, 255, 255, 40), width=2); im.alpha_composite(rim)
+    d = ImageDraw.Draw(im); x0 = 30 + px
+    draw_runs(d, x0, 30 + py - size // 8, r1); draw_runs(d, x0, 30 + py - size // 8 + size + gap, r2)
+    by = 30 + py + 2 * size + gap + 22
+    d.rounded_rectangle((x0, by, x0 + bw, by + bh), 26, fill=(244, 244, 244, 255))
+    for k, l in enumerate(ql): d.text((x0 + 28, by + 12 + k * qlh), l, font=qf, fill=(20, 20, 24))
+    im.save(f"{OUT}/{fn}"); return {"file": fn, "x": left, "y": y}
+manifest["titles"].append({"line": "s05", "t0": 1.10, "t1": 5.60, **title_question("title_s05.png")})
 
 # ---------- opening title (Elena, 1 Oct): the film's name, large, on the very first shot ----------
 # Left-aligned: through the 3.6 s push-in she sits centre/right, the left (curtain, dark window) stays clear.
@@ -263,6 +289,35 @@ def opening():
     return im
 opening().save(f"{OUT}/title_open.png")
 manifest["absolute"] = [{"a": 0.25, "z": 3.55, "file": "title_open.png", "x": 0, "y": 0}]
+
+# ---------- ICP card (Elena's wording, 1 Oct): who the AI Growth Operator is for - over the sunset + Guna Yala drone (no people) ----------
+ICP_ROWS = ["Chárter de yates y villas de lujo", "Turismo médico y cirugía estética", "Clínicas dentales — implantes y carillas", "Reubicación, visas e inmigración"]
+ICP_CHIPS = ["Ventas de alto valor", "Clientes internacionales", "Conversaciones por WhatsApp"]
+def icp_card(a0=64.55, z=68.75):
+    X, Y, px = 60, 56, 54; rf = font(SERIF, 64); cf = manrope(26, b"SemiBold"); m = font(MONO, 24)
+    chips_w = sum(tw(cf, c) + 56 for c in ICP_CHIPS) + 14 * (len(ICP_CHIPS) - 1)
+    cw = max(max(tw(rf, r) for r in ICP_ROWS) + 46, chips_w) + 2 * px; ch = 64 + len(ICP_ROWS) * 80 + 24 + 54 + 46
+    bg = layer(); sh = layer(); ImageDraw.Draw(sh).rounded_rectangle((X, Y + 8, X + cw, Y + ch + 8), 30, fill=(0, 0, 0, 150))
+    bg.alpha_composite(sh.filter(ImageFilter.GaussianBlur(16)))
+    comp(bg, lambda d: d.rounded_rectangle((X, Y, X + cw, Y + ch), 30, fill=(9, 14, 30, 205)))
+    comp(bg, lambda d: d.rounded_rectangle((X, Y, X + cw, Y + ch), 30, outline=(255, 255, 255, 42), width=2))
+    spaced(ImageDraw.Draw(bg), X + px, Y + 34, "PARA NEGOCIOS COMO", m, GOLD, 7)
+    bb = bg.getbbox(); bg.crop(bb).save(f"{OUT}/icp_0.png"); items = [{"a": a0, "z": z, "file": "icp_0.png", "x": bb[0], "y": bb[1]}]
+    for i, r in enumerate(ICP_ROWS):
+        im = layer(); d = ImageDraw.Draw(im); y = Y + 86 + i * 80
+        d.rounded_rectangle((X + px, y + 30, X + px + 14, y + 34), 2, fill=GOLD)
+        d.text((X + px + 34, y), r, font=rf, fill=WHITE)
+        b = im.getbbox(); im.crop(b).save(f"{OUT}/icp_{i+1}.png")
+        items.append({"a": a0 + 0.25 + 0.4 * i, "z": z, "file": f"icp_{i+1}.png", "x": b[0], "y": b[1]})
+    im = layer(); d = ImageDraw.Draw(im); x = X + px; y = Y + 86 + len(ICP_ROWS) * 80 + 18
+    for c in ICP_CHIPS:   # HubSpot-style status chips
+        w_ = tw(cf, c) + 56
+        comp(im, lambda dd, x=x, w_=w_: dd.rounded_rectangle((x, y, x + w_, y + 50), 25, fill=(237, 184, 103, 34), outline=GOLD, width=2))
+        ImageDraw.Draw(im).text((x + 28, y + 9), c, font=cf, fill=GOLD); x += w_ + 14
+    b = im.getbbox(); im.crop(b).save(f"{OUT}/icp_5.png")
+    items.append({"a": a0 + 0.25 + 0.4 * len(ICP_ROWS) + 0.1, "z": z, "file": "icp_5.png", "x": b[0], "y": b[1]})
+    return items
+manifest["absolute"] += icp_card()
 
 json.dump(manifest, open(f"{OUT}/manifest.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print(len(manifest["captions"]), "captions,", len(manifest["kinetic"]), "kinetic,", len([f for f in os.listdir(OUT) if f.startswith("split_")]), "split frames ->", OUT)

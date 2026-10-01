@@ -303,3 +303,13 @@ B10 now: Bocas sunset 2.8 → G8b 1.6 → G7 from 1.7 s (ends on her recognition
 **Music = her pick #1 cornist "Deep House Track" (543501)**, 2:57, not Content ID registered; whole-track check: no vocals (soft "aah" synth pads =
 texture). Structure: intro 0–0:48, drop 0:48 → lands on "When she writes, she hears back right away" (film 0:45–0:48), offset 0.
 Level-matched −18.6 → gain −7.1 dB; final −15.7 LUFS; listen: every word clear, smooth fade. QR decodes at 0:19 / 1:06 / 1:08.
+
+**CUT v6 — 1 Oct** (`cut5/AIGO_cut_v6.mp4`, $0). Elena's adds: (1) opening title "She Asked ChatGPT Before She Messaged *Your Yacht*" on the first shot,
+left (she sits centre/right through the push-in); (2) "Misma pregunta" → "Misma pregunta a ChatGPT:" + a ChatGPT-style user bubble
+"¿Cuál es el mejor servicio de yates para ir a San Blas?" (card narrowed twice so it clears her face during the k_g2b push-in);
+(3) ICP card over sunset + drone, her wording verbatim: PARA NEGOCIOS COMO / Chárter de yates y villas de lujo / Turismo médico y cirugía estética /
+Clínicas dentales — implantes y carillas / Reubicación, visas e inmigración / chips: Ventas de alto valor · Clientes internacionales ·
+Conversaciones por WhatsApp — rows build one by one; (4) S2 slot: her REAL HubSpot Deals list (Screenshot 2026-10-01 053235, browser chrome
+cropped, "HIRING" tab + "(Elena's part)" blurred) with the WhatsApp message floating over it. NOT used: the deal-record screenshot — it shows
+her name, her email and "TEST PAYMENT — NOT CLIENT REVENUE". QR decodes on S2, sunset, drone. Overlays now support film-clock items (`absolute`).
+**Pending Elena:** yacht wardrobe re-shoot (she boards in the same cream wrap as the apartment) — proposal ≈ $1.50, awaiting her pick.
