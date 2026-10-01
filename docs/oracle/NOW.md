@@ -130,6 +130,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📨 1 Oct — Megan got a DUPLICATE on 30 Sep; the demand nudge is still UNSENT. Old links disarmed. Firecrawl applied.
+- **What went out:** 30 Sep 23:06 UTC Elena tapped the OLD 10 Sep slug `megan-pii-qc-scan-aborts` (body = the letter she had
+  already sent by hand 10 Sep). Logged: `[go/outreach-email] sent megan-pii-qc-scan-aborts … resend=01a0f492…`, HubSpot EMAIL
+  117785683492, Resend `delivered` + `opened`. Detection WORKED — I told her twice it was still her move without re-reading the deal.
+- **Fix:** the HUD deal carried 3 live Megan send links (4 Sep, 4 Sep -fu, 10 Sep). All disarmed in notes 116375972009 +
+  116688950378 (backup `~/backups/hud-deal-notes-before-disarm-20261001.json`). Only live link: `megan-demand-nudge`.
+  **Do not send it before ~6 Oct** — she just received and opened a letter.
+- **Firecrawl Legal Ops:** Elena applied 1 Oct → ⏳ Sent + her "I applied" note (VJH learns it) + task 8 Oct.
+
 ### 🎨 1 Oct — Professional Outlook deck: 8-page PDF, nature-tech + HubSpot-UI style · DONE (Elena's to send; nothing sent)
 
 - **File:** `docs/applications/professional-outlook/Elena_Revicheva_Professional_Outlook_2026.pdf` (3.8 MB, under the 5 MB
