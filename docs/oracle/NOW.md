@@ -263,8 +263,9 @@ git log keeps the record.
   Buffer = vertical Shorts only) → YouTube Studio by hand, or via her logged-in Chrome with her go.
 
 - Plan + Elena's decisions: `docs/selling/video/2026-10-01_API_FILM_MERGE_PLAN.md`. Kit: `scripts/apim-*.{py,mjs}`, Oracle `~/aigo-promo/apim/`.
-- **ICP film #2 villa + charter: CUT v1 delivered** (Oracle `~/aigo-villa/cut1/`, plan `docs/selling/video/2026-10-01_VILLA_FILM_PLAN.md`,
-  ledger $13.69 of $14) — Elena picks music A/B. **NEXT film: immigration lawyers** (plan with her before any spend).
+- **ICP film #2 villa + charter: APPROVED FINAL** (afro house; ledger $13.69 of $14). All 3 films + captions + thumbnails + upload sheet
+  are in her Desktop folder `API promo campaign	.09.2026 API video for YouTube campaign`; she uploads. **NEXT: immigration lawyers film**
+  (plan with her before any spend). Delete test deal 65538820526 (Andrés Morales) — the villa film does not show it.
 
 ### 🎬 1 Oct — AI Growth Operator YouTube promo: FILM APPROVED by Elena (cut v7) — not uploaded yet
 
