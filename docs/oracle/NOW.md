@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-01 18:15 | Apply kit for ANY [HIRING-*] deal + Comet prompt on the deal | scripts/lib/hiring-deals.cjs, hs-fill-apply-kit.cjs, apply-queue.cjs, new lib/comet-prompt.cjs; VJH scripts/judge_feedback_sync.py (_KIT_NOTE) | c20b5d5 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
