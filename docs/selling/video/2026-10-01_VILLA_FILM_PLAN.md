@@ -107,3 +107,9 @@ Draft = the real $100 diagnostic, no invented price ✔. **Blur on screen:** the
 4. ChatGPT screen recording: *"What's the best family villa with a private boat charter in Bocas del Toro, Panama, for New Year? We're 8, with kids and grandparents."*
 5. WhatsApp screenshot of the guest line: *"Hi! Is the villa + boat free Dec 28 – Jan 4? We're 8, with kids and grandparents."*
 6. HubSpot app: screenshot the "Andrés Morales" deal.
+
+## Gate 1 — faces (1 Oct; Elena: "are you moving?" + reuse the yacht ChatGPT recording, WhatsApp and HubSpot screenshots)
+Real screens: **reuse the yacht film's** ChatGPT recording, WhatsApp and HubSpot screenshots (Elena: "nobody will pay much attention") →
+no phone tasks. Generator: Oracle `~/aigo-villa/` (gen.mjs copy, own ledger, cap $12). 4 candidates, GPT Image 2 3:4 → **$0.51**
+(first try at 4:5 was rejected by the model before billing). Sheet: `deliverables/VILLA_gate1_faces.jpg` — mother A (olive, dark waves) ·
+mother B (auburn) · host A (Afro-Caribbean Bocas, 40s–50s) · host B (tanned, open linen shirt). **Awaiting Elena's pick.**
