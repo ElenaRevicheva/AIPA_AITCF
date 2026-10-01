@@ -151,6 +151,12 @@ git log keeps the record.
   SF/Toronto onsite or hybrid 3+ days, US/CA work auth, no US sponsorship → hard reject by her own location rules.
   Closest content match (Content Marketer = GEO/AEO, $200–223k SF / C$158–175k Toronto) is still Toronto-hybrid,
   Canada sponsorship "case-by-case". VJH had already parked 2 Firecrawl deals at stage 1. Stage only if Elena says she'd relocate.
+- **EXCEPTION, STAGED 1 Oct: Firecrawl Legal Operations Manager** — deal `65557225024` (I act TODAY). Ashby location =
+  "Remote (Americas, UTC-3 to UTC-10)", form has NO work-auth question (body text still says US auth). Fits her CLO years.
+  Kit via `stage-manual-job.cjs` + `hs-fill-apply-kit.cjs --only` → audit `complete 10 · gaps 0`. Form answers (4 required Qs)
+  hand-written from verified facts: note `117817495872` + `docs/applications/2026-10-01_firecrawl_legal_ops_manager_APPLICATION.md`.
+  **Elena's move:** fill the two `[ELENA: …]` E-GOV-era lines, then apply. ⚠️ The kit's generated letter is generic and the
+  CV (automation lane) puts CLO on page 2 — the "quick note" in the answers note replaces the letter. No legal lane exists.
 - **PII is closed. Do not reopen it.** Listing `5f7b8392…` went live 10 Sep with 18/18 mandatory checks while
   `pii_qc_llm` failed on all 8 — that check has no authority (see memory `project_datavendor_pii_gate`).
 
