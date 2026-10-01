@@ -51,3 +51,10 @@ text format/style = the yacht film's, not the old one. "Make it fire super juicy
   FAIL + fix, lists FAIL + fix, HTTPS/786 ms, content-without-JS. (The S3 recording only ever reached the crawler rows.)
 - Assets `scripts/apim-assets.py` (local) · assembly `scripts/apim-cut.py` (Oracle `~/aigo-promo/apim/cut1/`). v2: push-in on every audit
   screen + gold frame on each failing row and its fix; score shot reframed on the 93 ring; v13 crawler clip's burned-in English cropped.
+
+## v2 delivered (1 Oct) — `~/aigo-promo/apim/cut1/AIGO_API_merged_v2.mp4`, 90.58 s
+v1 frame check → fixed in v2: audit text too small for an owner (→ push-in 1.08–1.15 + gold frame on each failing row + its Fix line,
+and on "Top fixes"); "one score" showed the input box, not the ring (→ crop moved 236 px down onto the 93); v13 crawler clip had burned-in
+English at the foot (→ bottom 13 % cropped); GRUPO 1 label landed on the robots (→ starts with the audit screen).
+Verified: picture 90.583 s = voice 90.584 s; QR decodes on the audit split, the crawler shot and the fixes split; −16.9 LUFS; listen —
+every word clear, no vocals, clean fade. Spend this film: VO $0.017 (+ Gemini checks ≈ cents); music free.
