@@ -58,3 +58,12 @@ and on "Top fixes"); "one score" showed the input box, not the ring (→ crop mo
 English at the foot (→ bottom 13 % cropped); GRUPO 1 label landed on the robots (→ starts with the audit screen).
 Verified: picture 90.583 s = voice 90.584 s; QR decodes on the audit split, the crawler shot and the fixes split; −16.9 LUFS; listen —
 every word clear, no vocals, clean fade. Spend this film: VO $0.017 (+ Gemini checks ≈ cents); music free.
+
+## v3 (1 Oct) — "iron-clad check": is the old films' explainer data there, understandable for a business owner?
+Elena sent 4 frames of the old films (pomegranate title; 72/100 "half the fruit"; "Not five tips. Every check." PASS/FAIL/WARN rows;
+"What it checks" four categories with what each covers). Check against v2: title ✅ (Spanish) · pomegranate ✅ · four groups ⚠ names +
+points only, NOT what each covers · every-check/fix ⚠ real rows highlighted but the fix text is small English. → v3 (text layer only, $0):
+group labels now say what each group checks (robots.txt · llms.txt · sitemap / schema · identity · Open Graph / question titles · lists /
+HTTPS · speed · mobile · no-JS — from `src/visibility-audit.ts`); a plain-Spanish **FALTA / ARREGLO** card under each failing atuona.xyz
+row (answer-rich schema, question headings, lists); scoreboard "31 de 34 señales aprobadas · 3 por corregir" on the fixes screen (the
+page's own "All 34 checks (31 passed)"). `cut1/AIGO_API_merged_v3.mp4`, 90.58 s.

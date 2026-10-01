@@ -111,12 +111,39 @@ def eyebrow(fn, text, sub=None):
     im = layer(); d = ImageDraw.Draw(im); spaced(d, 74, 70, text, font(MONO, 26), GOLD, 7)
     if sub: spaced(d, 74, 108, sub, font(MONO, 20), (185, 188, 200), 5)
     return crop_save(im, fn)
-for line, fn, t, sub in (("a07", "eb_g1.png", "GRUPO 1 · ACCESO DE LOS RASTREADORES DE IA · 25 PUNTOS", "CHATGPT · CLAUDE · GEMINI · PERPLEXITY — CADA UNO CON SU PROPIO ROBOT"),
-                         ("a08", "eb_g2.png", "GRUPO 2 · DATOS ESTRUCTURADOS (GEO) · 25 PUNTOS", "QUIÉN ERES Y QUÉ VENDES, EN EL IDIOMA DE LAS MÁQUINAS"),
-                         ("a09", "eb_g3.png", "GRUPO 3 · RESPUESTAS LISTAS PARA CITAR (AEO) · 30 PUNTOS", "EL QUE MÁS PESA"),
-                         ("a10", "eb_g4.png", "GRUPO 4 · BASE TÉCNICA · 20 PUNTOS", "RÁPIDO · SEGURO · LEGIBLE SIN JAVASCRIPT"),
+for line, fn, t, sub in (("a07", "eb_g1.png", "GRUPO 1 · ACCESO DE LOS RASTREADORES DE IA · 25 PUNTOS", "¿PUEDEN ENTRAR? ROBOTS.TXT · LLMS.TXT · SITEMAP · PÁGINA INDEXABLE"),
+                         ("a08", "eb_g2.png", "GRUPO 2 · DATOS ESTRUCTURADOS (GEO) · 25 PUNTOS", "¿SABEN QUIÉN ERES Y QUÉ VENDES? SCHEMA · IDENTIDAD · OPEN GRAPH"),
+                         ("a09", "eb_g3.png", "GRUPO 3 · RESPUESTAS LISTAS PARA CITAR (AEO) · 30 PUNTOS", "EL QUE MÁS PESA: PREGUNTAS COMO TÍTULOS · LISTAS · CONTENIDO CITABLE"),
+                         ("a10", "eb_g4.png", "GRUPO 4 · BASE TÉCNICA · 20 PUNTOS", "HTTPS · VELOCIDAD · MÓVIL · CONTENIDO SIN JAVASCRIPT"),
                          ("a11", "eb_fix.png", "LAS CORRECCIONES, EN ORDEN DE PRIORIDAD", "LO QUE VIMOS · POR QUÉ IMPORTA · CÓMO ARREGLARLO")):
     man["line_items"].append({"line": line, "t0": 3.45 if line == "a07" else 0.0, "t1": None, **eyebrow(fn, t, sub)})   # g1 waits for the audit screen
+
+# ---------- callouts: the real failing checks + fixes of the atuona.xyz audit, in plain Spanish (Elena 1 Oct: "understandable and
+# attractive for a business owner" - the real rows are English and small). Under the audit window, above the captions.
+def callout(fn, rows, x=70, y=762, w=1080):
+    # bottom stays above a two-line caption (top ≈ 882); text auto-shrinks so it can never run past the card
+    lf = font(MONO, 20); lh = 38; lw = max(spaced_w(lf, r[0], 4) for r in rows) + 24
+    size = 28
+    while size > 20 and max(tw(manrope(size, b"SemiBold"), r[2]) for r in rows) > w - 34 - lw - 30: size -= 1
+    vf = manrope(size, b"SemiBold"); h = 22 + len(rows) * lh + 10
+    im = glass_card(x, y, w, h, alpha=228); d = ImageDraw.Draw(im)
+    comp(im, lambda dd: dd.rounded_rectangle((x, y, x + 8, y + h), 4, fill=GOLD))
+    for i, (label, color, text) in enumerate(rows):
+        yy = y + 16 + i * lh; spaced(d, x + 34, yy + 6, label, lf, color, 4); d.text((x + 34 + lw, yy), text, font=vf, fill=WHITE)
+    return crop_save(im, fn)
+WARN, OK = (255, 170, 90), (110, 220, 150)
+man["line_items"].append({"line": "a08", "t0": 3.2, "t1": None, **callout("co_g2.png", [
+    ("FALTA", WARN, "Datos que la IA pueda citar tal cual (FAQ / Servicio)"),
+    ("ARREGLO", GOLD, "Marca tus preguntas u oferta con schema FAQPage o Service")])})
+man["line_items"].append({"line": "a09", "t0": 0.4, "t1": 5.25, **callout("co_g3a.png", [
+    ("FALTA", WARN, "Títulos escritos como preguntas"),
+    ("ARREGLO", GOLD, "Preguntas frecuentes con las preguntas reales de tus clientes")])})
+man["line_items"].append({"line": "a09", "t0": 5.6, "t1": None, **callout("co_g3b.png", [
+    ("FALTA", WARN, "Listas o tablas"),
+    ("ARREGLO", GOLD, "Servicios, precios y pasos en listas: la IA los copia tal cual")])})
+man["line_items"].append({"line": "a11", "t0": 0.3, "t1": None, **callout("co_score.png", [
+    ("RESULTADO", OK, "31 de 34 señales aprobadas  ·  3 por corregir"),
+    ("ORDEN", GOLD, "Primero lo que más te acerca a ser citado")])})
 
 # ---------- "Haz la tuya gratis." on the starfruit ----------
 def title(fn, l1, l2, size, left=60, y=60):
