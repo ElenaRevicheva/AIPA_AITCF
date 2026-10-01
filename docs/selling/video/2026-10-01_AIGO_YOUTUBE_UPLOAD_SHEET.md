@@ -97,3 +97,50 @@ The audit shown is a real, live run on atuona.xyz (93/100, 31 of 34 passed). The
 Music: "Modern Deep House" by ArtIssizm (Pixabay Content License — not Content ID registered).
 ```
 Chapters ≥ 10 s each (10 / 11 / 10 / 15 / 18 / 10 / 16), first at 0:00. **Altered or synthetic content: YES** (one AI-generated person).
+
+---
+
+# FILM 3 — "She Asked ChatGPT Before She Booked Your Island" (villa + charter, Bocas del Toro) — APPROVED by Elena, 1 Oct 2026
+
+| What | Where |
+|---|---|
+| Master 1080p, 94.4 s, −15.6 LUFS | Desktop campaign folder `01.10.26 Villa + Charter Promotion.mp4` · laptop `deliverables/VILLA_FINAL_2026-10-01_1080p.mp4` (untracked) · Oracle `~/aigo-villa/cut1/` · md5 `7253d8df068f8d243cb6ecc3ca0799a5` |
+| Captions EN / ES | `Villa captions EN.srt` · `Villa captions ES.srt` (repo `deliverables/VILLA_promo_{en,es}.srt`) |
+| Thumbnail | `Villa thumbnail EN.jpg` / `ES.jpg` — her arrival smile, "She asked AI before she booked." |
+
+**Title:** `She Asked ChatGPT Before She Booked Your Island | AI Growth Operator for Villas & Charters` (90 chars)
+
+**Description**
+```
+Your next guests are planning New Year — three generations, one island. She isn't calling you. She's asking an AI.
+It suggests the villas and charters it can understand. If it can't understand your website, you may not make the list.
+
+AIdeazz AI Lab doesn't sell you another CRM. We install an AI Growth Operator inside the tools you already use — and run it with you:
+• AI visibility audit — 34 checks, one score, the fixes that matter
+• When a guest writes, she hears back right away — and a reply is already drafted on your phone
+• The AI drafts, you decide: one tap to send, and the conversation is logged in your CRM
+• Every morning: who's new, who's warm, and who's starting to slip away
+
+▶ Free AI visibility audit: https://aideazz.xyz/api
+▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio
+
+Built for: luxury villas & charters (flights, boat transfers) · medical tourism & cosmetic surgery · dental clinics · relocation, visas & immigration.
+
+— ES —
+Ella le preguntó a ChatGPT antes de reservar tu isla. ¿Tu villa estaba en la lista?
+AIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de las herramientas que ya usas, y lo operamos contigo.
+▶ Auditoría de visibilidad en IA, gratis (34 señales): https://aideazz.xyz/api
+
+0:00 She asks ChatGPT at midnight
+0:17 Sunday at sea, Wednesday reply
+0:33 Rewind — same family, same question
+0:49 Instant reply, one tap, every morning
+1:08 Charter flight, boat transfer, the villa
+1:23 Free AI visibility audit
+
+The people in this film are AI-generated. The product screens are real (private details blurred). Made in our own AI film studio.
+Real Panama footage: Pixabay (Caribbean coast) and Pexels. Music: "Afro Beat Vibes" by -WATERMEL0N- (Pixabay Content License — not Content ID registered).
+```
+Chapters ≥ 10 s each (17 / 16 / 16 / 19 / 15 / 11), first at 0:00. **Altered or synthetic content: YES.**
+Tags: AI Growth Operator, luxury villa marketing, charter marketing, Bocas del Toro, Panama, AI visibility audit, GEO, AEO,
+ChatGPT recommendations, WhatsApp automation, HubSpot CRM, AIdeazz AI Lab.
