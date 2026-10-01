@@ -284,3 +284,13 @@ why not used; "who's new / who's warm…" as English words in brand style; "let 
   Final-mix listen flagged faint breathy texture (not words) at a few points. Fade-out 3 → 5 s. Level-matched −14.3 → gain −11.4 dB; final −15.7 LUFS.
 - **Caught in the frame check:** wide serif captions ran into the corner QR and the scrim dimmed it → QR failed to decode at 1:06 → captions narrowed,
   scrim stops short of the QR → decodes at 0:20 / 1:06 / 1:08 + every split frame + end card.
+
+**CUT v5 picture — 1 Oct** (`scripts/aigo-promo-cut5.py` = cut4 + 2 fixes; Oracle `cut5/picture_es.mp4`, 90.167 s). Elena on v4: (1) the toast shot G9 —
+the captain stands at the helm FACING the guests (the wrong-way helm she flagged in v1, never fixed in G9) → **G9 OUT, $0**; THE PAYOFF G7 holds to
+the end of the line (ends on her face). Regenerate-without-captain offered (GPT Image 2 edit $0.128 + Hailuo $0.56 ≈ $0.69) — her call.
+(2) the Biomuseo causeway clip → Pixabay 371076 Panama City towers drone from 14 s (QR decodes at 0:19 / 0:20). (3) DARIOCOIRO instrumental "not fine".
+**Music screen — calibration FAILED, honestly:** Gemini pre-listened 28 Content-ID-free candidates + 3 controls (her rejected BerryDeep, the rejected
+DARIOCOIRO instrumental, Rockot). Every track scored 8–9/10 "premium", controls included → the scorer cannot tell premium from generic; her ear decides.
+It DID catch vocals in 9 "instrumental"-tagged tracks → used as a vocal filter only. Log: Oracle `music/screen_scores_2026-10-01.json`.
+New vocal-free shortlist (not offered before): cornist Deep House Track 543501 · WATERMEL0N Afro Beat Vibes 587778 · MeditativeTiger L'Essence de la
+Nuit 367308 · max_graf_von_stark Cigarette Break with a View of the Sea 355012 · NewEraMusic Summer Beach House 553956.
