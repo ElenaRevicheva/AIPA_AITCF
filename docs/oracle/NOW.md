@@ -199,15 +199,15 @@ git log keeps the record.
 - **RISK:** the guard misses a price written in words ("fifteen hundred dollars"). The prompt is the first line of
   defence; the human at ✅ Send is the last.
 
-### 🎬 1 Oct — AI Growth Operator YouTube promo: CUT v5 picture built (toast shot out, towers clip in) — music pick pending
+### 🎬 1 Oct — AI Growth Operator YouTube promo: CUT v5 delivered (toast re-shot, towers, cornist music) — Elena reviewing
 
 - **DONE:** narration LOCKED (English). **Cut v4** = Oracle `~/aigo-promo/cut4/AIGO_cut_v4.mp4` (90.17 s): Spanish captions in brand type,
   every real screen split half-screen / half big QR, her ChatGPT recording at real length, real Bocas sunset back (+ under the reveal), English
   kinetic "who's new / warm / slipping away" on HubSpot, music = DARIOCOIRO with vocals removed (demucs, verified no voice). Spend ≈ $20.90 of
   $30; v3→v4 cost $0. Log: `docs/selling/video/2026-09-30_AI_GROWTH_OPERATOR_SHOTLIST.md` (CUT v3 → v4). Thumbnails/SRT: `…/video/deliverables/`.
-- **v5:** `cut5/picture_es.mp4` = v4 minus G9 (captain faces guests), Biomuseo → 371076 towers. Music: DARIOCOIRO-instr rejected; new
-  shortlist in the shotlist log. Mix = `aigo-promo-music-mix.py <track> 0 cut5/AIGO_cut_v5.mp4 cut5/picture_es.mp4`.
-- **NEXT (Elena):** pick music · toast-shot regenerate ≈$0.69 yes/no · thumbnail EN or ES · "tú" OK · OK to delete test deal 65531490170 (ON SCREEN — only after the film is final).
+- **v5:** `cut5/AIGO_cut_v5.mp4` = v4 + toast re-shot as G9b (captain in profile, eyes ahead; $0.688 → ledger $21.31) + Biomuseo → 371076
+  towers + music cornist "Deep House Track" (no vocals, drop on "she hears back right away").
+- **NEXT (Elena):** review v5 · thumbnail EN or ES · "tú" OK · OK to delete test deal 65531490170 (ON SCREEN — only after the film is final).
   **Then (agent):** 9:16 Short ~30 s + YouTube upload sheet; upload only with her explicit go.
 - **VERIFIED BY:** QR decodes → `https://aideazz.xyz/api` on every split frame, 3 scenic frames, end card; picture 90.167 s = voice 90.158 s; −15.7 LUFS.
 - **RISK:** Pixabay "instrumental" tags lie (DARIOCOIRO sings) — listen/transcribe; 66 % of trendy tracks are Content ID registered. ChatGPT recording

@@ -112,9 +112,11 @@ b = blk["s08"]; clip("G6c__hailuo", b - 3.9); split_still("S6a_tg_send_edit_skip
 split_still("S8_hubspot_activity", 1.4)
 # B9 — every morning: HubSpot + the English kinetic words (overlay pass)
 split_still("S9_hubspot_deal", blk["s09"], zoom=0.00012)
-# B10 — the real sunset at length -> Guna Yala -> THE PAYOFF (holds; the toast shot G9 is out)
-b = blk["s10"]; clip("346372", 3.2, start=8.0, qr=True, src=f"{STOCK}/346372_medium.mp4")
-clip("G8b__runway", 1.8, qr=True); clip("G7__venice", b - 5.0)
+# B10 — the real sunset -> Guna Yala -> THE PAYOFF (from 1.7 s, ends on her face) -> the toast, re-shot as G9b: the captain
+# steers in side profile, eyes ahead (Elena: "the scene is super, but the captain should drive correctly"); first 2.5 s only -
+# after that the camera drifts behind the women and her face turns away
+b = blk["s10"]; clip("346372", 2.8, start=8.0, qr=True, src=f"{STOCK}/346372_medium.mp4")
+clip("G8b__runway", 1.6, qr=True); clip("G7__venice", 3.3, start=1.7); clip("G9b__hailuo", b - 7.7)
 # B11 — the reveal over the real sunset · B12 — split end card, big QR
 reveal(blk["s11"]); card_png("card_s12.png", blk["s12"])
 
