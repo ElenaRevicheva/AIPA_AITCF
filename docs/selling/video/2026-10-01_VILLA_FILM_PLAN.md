@@ -88,3 +88,22 @@ her face** → New Year's Eve on the villa terrace, fireworks over the bay.
 ### Spend gates (each one asked before it runs)
 Gate 1 faces: her ×2 + host ×2 + family group ×1 = 5 × $0.128 ≈ **$0.64** → Gate 2 keyframes ≈ $1.3 → Gate 3 motion ≈ $6 → voice ≈ $0.10.
 **Total ≈ $8.**
+
+## ✅ Location FINAL: **Bocas del Toro** (Elena: "Bocas del Toro — fine") — but **NOT the yacht film's Bocas shots** ("they must be different")
+→ the yacht sunset 346372 is OUT; real footage = the Caribbean-coast waves 351939 + fresh AI Bocas scenery (over-water / jungle-beach villa).
+
+## ✅ Test inquiry SENT (1 Oct, her OK: "Ok — to send charter-villa inquiry") — through the real portfolio form
+Fictional villa + charter owner "Andrés Morales", Bocas del Toro, test inbox kiravelerevich@gmail.com. **Verified in the cto-aipa log:**
+`[HubSpot] Created deal 65538820526 ([CLIENT-CTO-INQUIRY] Andrés Morales — outreach)` · `Make concierge webhook → 200` ·
+`draft 95d76bfd19f48348 stored … TG card DELIVERED (msg 6718)` · `pending draft mirrored to 1 HubSpot deal(s)`.
+Draft = the real $100 diagnostic, no invented price ✔. **Blur on screen:** the Calendly link carries her name (`elena_revicheva`).
+⚠️ Same log: `claude: 400 … Your credit balance is too low` → the concierge is running on the OpenAI fallback (Anthropic API credits empty).
+**Delete deal 65538820526 after the film is final.**
+
+## Her phone tasks (≈10 min, then I build the screens)
+1. Telegram: screenshot the new-inquiry card (msg 6718) and the draft with ✅ Send / ✏️ Edit / Skip.
+2. Tap **✅ Send** (goes to the test inbox only) → screenshot the "sent" confirmation.
+3. Gmail (kiravelerevich@gmail.com): screenshot "We received your inquiry".
+4. ChatGPT screen recording: *"What's the best family villa with a private boat charter in Bocas del Toro, Panama, for New Year? We're 8, with kids and grandparents."*
+5. WhatsApp screenshot of the guest line: *"Hi! Is the villa + boat free Dec 28 – Jan 4? We're 8, with kids and grandparents."*
+6. HubSpot app: screenshot the "Andrés Morales" deal.
