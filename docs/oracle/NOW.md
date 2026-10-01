@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-01 21:10 | Outlook deck ES edition + aideazz.xyz/api footer "About" → deck PDF (EN/ES) | docs/applications/professional-outlook/*; aideazz repo: src/pages/LabApi.tsx, src/i18n/locales/{en,es}.json, public/*.pdf | 44f6e20 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
