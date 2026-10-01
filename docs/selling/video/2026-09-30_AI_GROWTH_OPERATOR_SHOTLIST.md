@@ -313,3 +313,10 @@ Conversaciones por WhatsApp — rows build one by one; (4) S2 slot: her REAL Hub
 cropped, "HIRING" tab + "(Elena's part)" blurred) with the WhatsApp message floating over it. NOT used: the deal-record screenshot — it shows
 her name, her email and "TEST PAYMENT — NOT CLIENT REVENUE". QR decodes on S2, sunset, drone. Overlays now support film-clock items (`absolute`).
 **Pending Elena:** yacht wardrobe re-shoot (she boards in the same cream wrap as the apartment) — proposal ≈ $1.50, awaiting her pick.
+
+**CUT v7 — 1 Oct** (`cut5/AIGO_cut_v7.mp4`, 90.17 s). Elena: "she steps into the yacht in the same clothing as in the apartment — she should wear
+super cool, juicy, luxury yacht clothing" → wardrobe **B, emerald silk** (her pick from A Riviera white / B emerald silk / C black & gold).
+Chain: `v_r1_yacht` wardrobe ref (R1 + v_r1_deck; GPT Image 2) → `k_g7b` boarding + `k_g9c` toast (k_g9b as the scene to keep: captain in side
+profile) → Hailuo 2.3 `G7b`, `G9c`. Spend $0.128 + 2×$0.128 + 2×$0.56 = $1.50 → **ledger $22.82 of $30** (+ voices ≈$0.26).
+Frame check: G7b used 1.6–4.9 s (step aboard → his hand → her smile, face recognisable); **G9c first 2.5 s only — a hallucinated "X" logo
+appears on the hull from ~4.5 s** (models invent brand marks on blank surfaces; check every take to the end). QR / sync / LUFS unchanged.
