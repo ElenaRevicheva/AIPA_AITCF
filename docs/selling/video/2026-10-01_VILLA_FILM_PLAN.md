@@ -55,3 +55,36 @@ Runway $0.60 / Kling for faces) ≈ $6–8 · voice ≈ $0.10 · music $0 → **
   for a 40th birthday?"* (A) or *"…for a family of 8 over New Year?"* (B). WhatsApp guest line — *"Hi! Is the villa free Dec 28 – Jan 4? We're 10."*
 - **Test inquiry text for the Lead Concierge** (sent only with her OK): *"Hi — we'd like to book your villa for 10 guests, Dec 28 to Jan 4,
   for a 40th birthday. Is it available, and what's included?"*
+
+## ✅ Elena's decisions (1 Oct): **B — the family New Year** · **charter + villa together** (not only villa) · **Isla Contadora**
+Contadora has no real footage → island scenery is AI (like San Blas in the yacht film); real Panama City footage carries the departure.
+
+### Narration v2 (DRAFT — villa + charter, family, Contadora; Elena edits and locks)
+**Working title:** *She Asked ChatGPT Before She Booked Your Island*
+> Your next guests are planning New Year — three generations, one island. She isn't calling you. She's asking an AI.
+> It suggests the villas and charters it can understand. If it can't understand your website, you may not make the list.
+> Some guests message you directly. Sunday — you're out at sea with another family. You reply Wednesday. She's already booked the island stay that answered first.
+> [ON SCREEN: GOOD OPPORTUNITIES QUIETLY AGE OUT.]
+> Nobody wakes up wanting AI. You want more bookings.
+> Rewind. Same family. Same question. This time, you have an AI Growth Operator.
+> First, it checks what AI can actually understand about your website. Thirty-four checks. One score. The fixes that matter.
+> When she writes, she hears back right away. And a reply is already drafted on your phone.
+> The AI drafts. You decide. One tap — sent. And the conversation is logged in your CRM.
+> Every morning, you know who's new, who's warm, and who's starting to slip away.
+> AIdeazz AI Lab doesn't sell you another CRM. We install an AI Growth Operator inside the tools you already use — and run it with you.
+> The people in this film are AI. The product screens are real.
+> What does AI see when it looks at your business? Find out free at aideazz dot X-Y-Z slash A-P-I.
+
+### Cast (identity-locked like the yacht film)
+**Her** — Toronto mother, early 40s, elegant, natural, the planner (protagonist) · **the host** — Panamanian man, 40s, owns the villa AND
+the boat (a new face, not the yacht captain) · **the family** — husband, two kids (8–12), grandparents — locked as one group reference.
+
+### Shots (≈10)
+Toronto snowy midnight, kids asleep, she plans on her phone → her ChatGPT question (real recording) → the host at sea on Sunday with
+another family → Wednesday, too late, Panama City marina (real towers footage) → rewind → the real audit → she writes, real replies,
+the host's one tap → **arrival: private boat crossing to Contadora (drone)** → **payoff: the family steps off the boat at the villa beach,
+her face** → New Year's Eve on the villa terrace, fireworks over the bay.
+
+### Spend gates (each one asked before it runs)
+Gate 1 faces: her ×2 + host ×2 + family group ×1 = 5 × $0.128 ≈ **$0.64** → Gate 2 keyframes ≈ $1.3 → Gate 3 motion ≈ $6 → voice ≈ $0.10.
+**Total ≈ $8.**
