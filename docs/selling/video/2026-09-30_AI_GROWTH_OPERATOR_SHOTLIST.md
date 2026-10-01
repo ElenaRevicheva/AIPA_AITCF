@@ -262,3 +262,10 @@ catalogue) is almost all registered. Not-registered, 2026, instrumental by tags:
 4. Sunlit Balearic Downtempo Sunset Lounge — PWLPL · 2:33 · Jun 2026 · Balearic, nylon guitar · pixabay.com/music/latin-sunlit-balearic-downtempo-sunset-lounge-543135/
 5. Modern Deep House — ArtIssizm · 2:54 · 17 Sep 2026 · progressive/melodic deep house · pixabay.com/music/deep-house-modern-deep-house-602927/
 Swap = download + Gemini vocal check + `aigo-promo-music-mix.py <new.mp3>` (≈1 min; picture untouched).
+
+**CUT v3.1 — music = Rockot "Soul Chill House"** (Elena: "DARIOCOIRO or Rockot, they are fine"). **DARIOCOIRO "Gold on the Water" REJECTED:
+it has SUNG LYRICS 0:30–3:53** although Pixabay tags it instrumental — two models transcribed the same chorus ("fire in the sky… slow as the
+tide… hands on your body"). Tags are not evidence; listen. Rockot = no vocals (Gemini). Offset 0 by its structure map: soft intro under the
+NY midnight, bass enters ~0:16–0:19 as the story cuts to sea, breakdown 1:16–1:35 sits under the reveal + end card. **Mixer now level-matches**
+(measured −16.7 LUFS vs BerryDeep −8.7 — a fixed −17 dB would have buried it): bed −25.7 LUFS = v3's approved balance → gain −9.0 dB.
+Final −15.7 LUFS; Gemini listen: every word clear, no vocals, clean fade. Oracle `cut3/AIGO_cut_v3_1.mp4`; v3 BerryDeep kept as `AIGO_cut_v3_berrydeep.mp4`.
