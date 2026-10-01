@@ -5,6 +5,11 @@
 aideazz.xyz/api, WhatsApp, portfolio, AI Ops Wiki). Copies `…_EN.pdf` / `…_ES.pdf` sit in Elena's Desktop `2 Decks 01.10.2026`
 folder; the old 29 Sep 7-slide deck was moved to its `old/` subfolder (not deleted).
 
+**Website (LIVE 1 Oct 2026):** aideazz.xyz/api footer, right under "About": **"AI Growth Operator"** opens
+`aideazz.xyz/AIdeazz_AI_Growth_Operator_2026.pdf` (EN) or `…_ES.pdf` (ES) by page language (`labApi.aigoDeckHref` in the aideazz
+`en.json` / `es.json`, commit `c00d3c9`). **After a rebuild, copy both PDFs to aideazz `public/` too**, or the site keeps serving
+the old deck. Verified: live files byte-identical to the built ones.
+
 **Spanish edition:** `python make-es.py` builds `aigo-es.html` from an explicit EN→ES pair list and FAILS on any untranslated
 string. Formal "usted". "AI Growth Operator" stays the product name. Spanish-only size tweaks live in that script.
 
