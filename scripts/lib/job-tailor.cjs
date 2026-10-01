@@ -9,6 +9,11 @@
  * sentence. Tailoring = which VERIFIED project blocks appear and in what order, the posting's own
  * title as the headline, and which VERIFIED answers from docs/interview/defense-bank.json go in the
  * note. Nothing here can put a claim on a deal that Elena cannot defend.
+ *
+ * ONE EXCEPTION (1 Oct 2026, Elena: "CV summaries should be written per job"): the SUMMARY may be the
+ * 🎯 role defense's one-sentence pitch for this posting. It is not written here — it comes from
+ * generateRoleDefense (dist/cover-letter.js), which already rejects any number not in her verified facts,
+ * any "solo"/team-lead claim, and passes an independent gpt-5 review. No pitch → the lane summary, as before.
  */
 'use strict';
 
@@ -53,7 +58,8 @@ const LANE_ORDER = {
 // only (resume: Deputy CEO & CLO, E-GOV Operator 2011–2018; IT, legal and compliance teams).
 // "Contract" alone is an employment type ("AI Engineer (Contract)"), so only contract-MANAGEMENT titles count.
 const LEGAL_TITLE = /\b(legal|counsel|compliance|regulatory|governance|privacy|paralegal|clm)\b|\bcontracts? (manager|management|specialist|administrat\w*|operations)\b/i;
-const LEGAL_PROFILE = 'Seven years as <b>Deputy CEO and Chief Legal Officer</b> of a state e-government operator: IT, legal and compliance in a heavily regulated environment. Since 2025 I build and run the AI systems behind my own lab\'s operations — agents do the execution, every irreversible step waits for a human, and every claim traces back to a record.';
+const LEGAL_LEAD = 'Seven years as <b>Deputy CEO and Chief Legal Officer</b> of a state e-government operator: IT, legal and compliance in a heavily regulated environment.';
+const LEGAL_PROFILE = LEGAL_LEAD + ' Since 2025 I build and run the AI systems behind my own lab\'s operations — agents do the execution, every irreversible step waits for a human, and every claim traces back to a record.';
 const LEGAL_AVAILABLE = [
   'Legal and compliance operations built as systems: intake, routing, approvals, audit trail',
   'Contract and document workflows with a human sign-off before anything irreversible',
@@ -101,7 +107,7 @@ function slugOf(company, title) {
  * Job spec for build-lane-cv.cjs --job: the lane CV with the posting's title as headline and the
  * three most relevant verified project blocks first. Profile and "available for" stay the lane's.
  */
-function tailorJob({ title, company, jd, lane, laneHeadline }) {
+function tailorJob({ title, company, jd, lane, laneHeadline, summary }) {
   const text = low(`${title}\n${jd}`);
   const base = LANE_ORDER[lane] || LANE_ORDER.default;
   const candidates = Object.keys(PROJECT_TAGS).filter((k) => lane === 'creative' || !CREATIVE_ONLY.has(k));
@@ -118,8 +124,11 @@ function tailorJob({ title, company, jd, lane, laneHeadline }) {
   const tagline = legal ? 'legal, compliance and the AI systems that run them'
     : String(laneHeadline || '').split(' — ').slice(1).join(' — ');
   const head = cleanTitle(title) || String(laneHeadline || '').split(' — ')[0];
+  const pitch = String(summary || '').replace(/\s+/g, ' ').trim();
   return {
     ...(legal ? { executive_first: true, profile: LEGAL_PROFILE, available: LEGAL_AVAILABLE } : {}),
+    // Per-job summary: the checked role-defense pitch. A legal posting keeps the CLO sentence in front of it.
+    ...(pitch ? { profile: legal ? `${LEGAL_LEAD} ${pitch}` : pitch, summary_source: 'role-defense pitch (checked)' } : {}),
     _note: 'Auto-tailored by scripts/lib/job-tailor.cjs (selection only; no generated text).',
     base_lane: lane,
     cv: `CV_Elena_Revicheva_${slugOf(company, title)}.pdf`,
@@ -164,4 +173,4 @@ function renderDefenseHtml({ title, company, entries, frame, cvName, mark }) {
   return parts.filter(Boolean).join('');
 }
 
-module.exports = { tailorJob, pickDefense, renderDefenseHtml, cleanTitle, slugOf, loadBank, PROJECT_TAGS };
+module.exports = { LEGAL_LEAD, tailorJob, pickDefense, renderDefenseHtml, cleanTitle, slugOf, loadBank, PROJECT_TAGS };

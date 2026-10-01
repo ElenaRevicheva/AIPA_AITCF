@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-01 19:45 | CV summary written per job (role-defense pitch) | scripts/hs-fill-apply-kit.cjs, scripts/lib/job-tailor.cjs; 🛡️ CV attachments on the 11 I-Act-TODAY deals | 46772b7 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,15 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 1 Oct — CV SUMMARY IS NOW WRITTEN PER JOB (Elena: "CV summaries should be written per job")
+- **Connected, not built:** the 🎯 role defense already writes a checked one-sentence pitch per posting (numbers must be in
+  her facts, no solo/team-lead claims, gpt-5 review). The kit now runs 🎯 BEFORE the CV and `job-tailor` uses that pitch as
+  the CV summary (legal jobs: CLO sentence + pitch). No pitch → lane summary. Pitch too long for 2 pages → lane summary.
+- **Backfill:** 10 of 11 deals rebuilt from the pitch already on their 🎯 note ($0), NEW names `…_v2.pdf` (HubSpot reuses
+  same-name files), attachment REPLACED on the 🛡️ note (Allied's 📌 note too). Skipped: Senior Video Producer (hand-built CV).
+- **VERIFIED BY:** audit `11 · complete 11 · gaps 0`, every CV column names `_v2` except the hand one; Niuro CV read back.
+  Backups `~/backups/kit-pre-cvsummary-194039/`.
 
 ### ✅ 1 Oct — EVERY [HIRING-*] deal in I Act TODAY gets the full kit + a 📋 Comet prompt. Connected, not rebuilt.
 - **WHAT:** the kit had its own 2-prefix list (VJH, MANUAL) → now uses the shared `lib/hiring-deals.cjs` (any `[HIRING-…]`;

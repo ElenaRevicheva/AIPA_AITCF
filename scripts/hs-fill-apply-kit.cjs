@@ -152,16 +152,28 @@ async function defensePass(d, bodies, title, company, jobUrl) {
   try { jd = await fetchJobDescription(jobUrl); } catch { jd = ''; }
   if (jd.length < 200) jd = (await renderPosting(jobUrl)) || jd;
   const { lane, headline } = laneFor(title);
-  const job = tailor.tailorJob({ title, company, jd, lane, laneHeadline: headline });
+  // Per-job CV summary (1 Oct 2026): the 🎯 pitch written this run, or the one already on the deal.
+  const summary = PITCH.get(String(d.id)) || pitchFromNotes(bodies);
+  let job = tailor.tailorJob({ title, company, jd, lane, laneHeadline: headline, summary });
   fs.mkdirSync(AUTO_DIR, { recursive: true });
   const jobPath = path.join(AUTO_DIR, job.cv.replace(/\.pdf$/, '.json'));
-  fs.writeFileSync(jobPath, JSON.stringify({ ...job, _deal: d.id, _jd_chars: jd.length }, null, 2));
   let cvPath = null, cvWhy = '';
-  try {
+  const build = (spec) => {
+    fs.writeFileSync(jobPath, JSON.stringify({ ...spec, _deal: d.id, _jd_chars: jd.length }, null, 2));
     execFileSync(process.execPath, [BUILDER, `--job=${jobPath}`], {
       env: { ...process.env, NODE_PATH: CV_NODE_PATH, CV_FONT_DIR: CV_FONTS },
       timeout: 120_000, stdio: 'pipe',
     });
+  };
+  try {
+    try { build(job); }
+    catch (e) {
+      // A longer per-job summary must never cost the CV (the builder refuses a 3rd page): fall back to the lane's.
+      if (!job.summary_source) throw e;
+      console.log(`  ↺ ${company.slice(0, 22)} per-job summary did not fit — lane summary instead`);
+      job = tailor.tailorJob({ title, company, jd, lane, laneHeadline: headline });
+      build(job);
+    }
     cvPath = path.join(AUTO_DIR, job.cv);
     if (!fs.existsSync(cvPath)) { cvPath = null; cvWhy = 'builder wrote no file'; }
   } catch (e) {
@@ -189,6 +201,17 @@ async function defensePass(d, bodies, title, company, jobUrl) {
 // from verified facts only (generateRoleDefense rejects any number not in the evidence). It is also the phone card:
 // it opens with the clickable apply link and says where the letter and the tailored CV are. Every job deal, no date gate.
 const ROLE_MARK = '🎯 ROLE DEFENSE';
+// The checked pitch of each deal, handed from rolePass to defensePass in the same run (the CV summary).
+const PITCH = new Map();
+/** The pitch on an EXISTING 🎯 note ("<em>Why you, in one line:</em> …</p>") — '' if none. */
+function pitchFromNotes(bodies) {
+  for (const b of bodies) {
+    if (!String(b).includes(ROLE_MARK)) continue;
+    const m = String(b).match(/Why you, in one line:<\/em>\s*([\s\S]*?)<\/p>/);
+    if (m) return text(m[1]);
+  }
+  return '';
+}
 async function rolePass(d, bodies, title, company, jobUrl) {
   if (bodies.some((b) => text(b).includes(ROLE_MARK))) return 'had';
   if (!jobUrl) return 'nolink';
@@ -200,6 +223,7 @@ async function rolePass(d, bodies, title, company, jobUrl) {
   const r = await generateRoleDefense({ jobTitle: title, company, jd, bank });
   if (!r.defense) { console.log(`  ✖ role ${company.slice(0, 22).padEnd(24)} ${title.slice(0, 40)} — ${r.reason}`); return 'failed'; }
   const { pitch, questions, gaps } = r.defense;
+  if (pitch) PITCH.set(String(d.id), pitch);
   const html = [
     `<strong>${ROLE_MARK} — ${esc(title)} @ ${esc(company)}</strong>`,
     `<p>📱 <a href="${esc(jobUrl)}"><strong>👉 APPLY HERE</strong></a> · letter: the ✅ READY TO SEND note · tailored CV: attached to the 🛡️ note</p>`,
@@ -308,11 +332,12 @@ async function briefPass(d, bodies, title, company) {
       const jobUrl = bodies.filter((b) => !text(b).includes(BRIEF_MARK)).map(jobUrlOf).find(Boolean);
       try { brief[await briefPass(d, bodies, title, company)]++; }
       catch (e) { brief.failed++; console.log(`  ✖ brief ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
-      // Defense first: new deals arrive WITH a letter, so it must not sit behind the letter skip.
-      try { defense[await defensePass(d, bodies, title, company, jobUrl)]++; }
-      catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
+      // Role defense BEFORE the CV (1 Oct 2026): its checked one-sentence pitch is the CV's per-job summary.
+      // Both run before the letter skip: new deals arrive WITH a letter.
       try { role[await rolePass(d, bodies, title, company, jobUrl)]++; }
       catch (e) { role.failed++; console.log(`  ✖ role ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
+      try { defense[await defensePass(d, bodies, title, company, jobUrl)]++; }
+      catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
       if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) {
         ok++;
         try { comet[await cometPass(d, notes, title, company, jobUrl, hadComet)]++; }
