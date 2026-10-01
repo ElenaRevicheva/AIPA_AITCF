@@ -1,7 +1,20 @@
 # Professional Outlook — 8-page pitch deck (October 2026)
 
-**Deliverable:** `Elena_Revicheva_Professional_Outlook_2026.pdf`. It is 16:9, 8 pages and about 3.8 MB, so it fits under the 5 MB
-outreach-attachment cap. The text is real, selectable text, and all five links are clickable.
+**Deliverables:** `Elena_Revicheva_Professional_Outlook_2026.pdf` (English) and `Elena_Revicheva_Professional_Outlook_2026_ES.pdf`
+(Spanish). Each is 16:9, 8 pages and about 3.9 MB, so it fits under the 5 MB outreach-attachment cap. The text is real, selectable
+text, and all five links are clickable.
+
+**Where they live (1 Oct 2026):**
+- **Website:** `aideazz` repo `public/`, served at `aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026{,_ES}.pdf`. The
+  aideazz.xyz/api footer "About" / "Acerca de" opens the deck in the reader's language (`labApi.aboutDeckHref` in `en.json` /
+  `es.json`). **After a rebuild, copy both PDFs there too, or the site keeps serving the old deck.**
+- **Desktop:** Elena's `2 Decks 01.10.2026` folder holds `…_EN.pdf` and `…_ES.pdf` (her request).
+
+**Spanish edition:** `python make-es.py` builds `outlook-es.html` from `outlook.html` with an explicit EN→ES pair list.
+- It **fails** if an English string is not found, so an English edit cannot ship half-translated.
+- Spanish-only size tweaks sit in that script, because Spanish runs about 25% longer. The English layout stays as approved.
+- Role titles on slide 7 stay in English, as LATAM postings write them.
+- The "How I work" sentence reuses Elena's own Spanish from the Marketo letter.
 
 Built from Elena's two drafts of 26–28 Sep / 1 Oct 2026 (the "My Professional Outlook" notes and the first 7-slide outlook PDF).
 It carries:
@@ -39,7 +52,7 @@ Keep it that way: never paste a reference site's image, logo or exact hero layou
 ## Rebuild
 
 ```bash
-python render.py
+python make-es.py && python render.py
 ```
 
 Needs Chrome or Edge, Pillow and PyMuPDF. The fonts are local in `fonts/`, so the render never touches the network.

@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-01 21:10 | Outlook deck ES edition + aideazz.xyz/api footer "About" → deck PDF (EN/ES) | docs/applications/professional-outlook/*; aideazz repo: src/pages/LabApi.tsx, src/i18n/locales/{en,es}.json, public/*.pdf | 44f6e20 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -142,8 +141,10 @@ git log keeps the record.
 
 ### 🎨 1 Oct — Professional Outlook deck: 8-page PDF, nature-tech + HubSpot-UI style · DONE (Elena's to send; nothing sent)
 
-- **File:** `docs/applications/professional-outlook/Elena_Revicheva_Professional_Outlook_2026.pdf` (3.8 MB, under the 5 MB
-  attachment cap). Source `outlook.html`, rebuild `python render.py`; provenance + traps in that folder's `README.md`.
+- **Files:** `docs/applications/professional-outlook/Elena_Revicheva_Professional_Outlook_2026.pdf` + `…_ES.pdf` (Spanish), ~3.9 MB
+  each. Rebuild with `python make-es.py && python render.py`; provenance + traps are in that folder's `README.md`.
+- **LIVE on aideazz.xyz/api:** the footer "About" / "Acerca de" opens the EN / ES deck (aideazz `a49193a`, PDFs in `public/`).
+  **A rebuilt deck must be copied to aideazz `public/` too.** Both PDFs are also in her Desktop `2 Decks 01.10.2026` folder.
 - **Style = Elena's call:** light "naturalistic high-tech" photos + HubSpot UI letters (Lexend Deca, OFL) and components. The
   first dark version (`a5a6db3`) was replaced at her request. **Cover = two shores of Panama** (real Panama City skyline + mountains,
   Nano Banana Pro). It was redesigned so it is not a look-alike of another company's homepage hero. Only slide 1 changed; slides
