@@ -117,3 +117,11 @@ mother B (auburn) · host A (Afro-Caribbean Bocas, 40s–50s) · host B (tanned,
 3 wealthy, polished mothers (C chestnut + camel cashmere · D honey-blonde bob + black turtleneck + pearls · E dark waves + silk + emeralds)
 + 2 kid pairs, a boy (10) and a girl (8) (A: dark-haired boy, light-brown braided girl · B: curly, freckled). +$0.64 → **ledger $1.15 of $12**.
 Sheet `deliverables/VILLA_gate1b_mothers_kids.jpg`. Awaiting her pick of mother + kids.
+
+## Gate 2 (1 Oct) — cast locked: mother **C** (m3 → R1) · kids **B** (k2 → RK) · host **A** (h1 → R2). Elena: "C and B", "Man fine".
+`v_family` (all 6 faces, Bocas resort wardrobe — NOT their Toronto clothes, the yacht lesson) + 9 keyframes k_v1–k_v10 → $1.28.
+Elena: "we need the image of husband too" → hb1 (portrait of the husband already in v_family) + 2 alternatives → $0.38.
+**Ledger $2.82 of $12.** Sheets: `deliverables/VILLA_family.jpg`, `VILLA_gate2_keyframes.jpg`, `VILLA_husbands.jpg`.
+Picking husband A = no regeneration; B or C = re-make v_family + k_v9 + k_v10 (≈ $0.38).
+Keyframe self-check: k_v3 — the host at the wheel turns to camera while pointing to the reef (guiding guests; may read as the
+"wrong-way helm" Elena flagged on the yacht) → offer a re-shoot ($0.128) with him facing the bow.
