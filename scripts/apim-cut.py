@@ -81,7 +81,8 @@ print("starts:", {k: round(v, 2) for k, v in start.items()}, "end:", round(t, 2)
 # B1 — the hook on the v19 mango + the opening title
 clip(f"{V19}/mango.mp4", INTRO + blk["a01"], start=0.3)
 # B2 — Google ranked your page: the v13 pomegranate (72 / 100), then the v19 papaya
-b = blk["a02"]; clip(f"{V13}/split.mp4", 3.1, start=0.5); clip(f"{V19}/papaya.mp4", b - 3.1, start=0.5)
+b = blk["a02"]; clip(f"{V13}/split.mp4", 2.2, start=0.5); clip(f"{V19}/papaya.mp4", 1.75, start=0.5)
+clip(f"{V19}/dragon.mp4", b - 3.95, start=0.5)   # Elena 1 Oct: "add the dragon fruit shot next to the papaya" - three halved fruits on "half the fruit"
 # B3 — your next customer asks ChatGPT first: the yacht guest at midnight -> her real typing -> the real answer (names blurred)
 b = blk["a03"]; clip(f"{B}/clips/G2b__hailuo.mp4", 2.6, qr=False); split_rec(26.0, 24.0, 3.0); split_rec(48.0, 8.5, 2.4); split_still("S1_chatgpt_answer", b - 8.0)
 # B4 — find out free: the live /api, atuona.xyz typed, Audit

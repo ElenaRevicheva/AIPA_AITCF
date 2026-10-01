@@ -1,0 +1,104 @@
+1
+00:00:01,200 --> 00:00:04,020
+¿Puede la IA encontrar y citar tu negocio?
+
+2
+00:00:04,520 --> 00:00:06,170
+Google posicionó tu página.
+
+3
+00:00:06,170 --> 00:00:09,420
+En 2026, eso es solo la mitad de la fruta.
+
+4
+00:00:10,216 --> 00:00:13,166
+Tu próximo cliente le pregunta primero a ChatGPT.
+
+5
+00:00:13,166 --> 00:00:16,246
+Sugiere los negocios que puede entender.
+
+6
+00:00:16,246 --> 00:00:20,416
+Si no entiende tu sitio web, puede que no estés en la lista.
+
+7
+00:00:21,488 --> 00:00:24,938
+Descúbrelo gratis. Abre aideazz.xyz/api.
+
+8
+00:00:24,938 --> 00:00:26,988
+Escribe tu sitio web. Haz clic en auditar.
+
+9
+00:00:27,856 --> 00:00:30,756
+Segundos después: una puntuación sobre cien.
+
+10
+00:00:31,484 --> 00:00:35,084
+Detrás de esa puntuación: 34 señales, en cuatro grupos.
+
+11
+00:00:35,932 --> 00:00:38,372
+Uno: ¿pueden entrar los robots de IA?
+
+12
+00:00:38,372 --> 00:00:42,962
+ChatGPT, Claude, Gemini y Perplexity envían cada uno su propio rastreador.
+
+13
+00:00:42,962 --> 00:00:45,732
+Bloquea uno, y ese asistente nunca te lee.
+
+14
+00:00:46,548 --> 00:00:50,448
+Dos: ¿tu sitio le dice a la IA quién eres y qué vendes,
+
+15
+00:00:50,448 --> 00:00:52,548
+en el formato que leen las máquinas?
+
+16
+00:00:53,348 --> 00:00:54,648
+Tres, el más importante:
+
+17
+00:00:54,648 --> 00:00:58,148
+¿tu página responde las preguntas que hacen tus clientes?
+
+18
+00:00:58,148 --> 00:01:01,518
+Preguntas como títulos. Datos en listas:
+
+19
+00:01:01,518 --> 00:01:03,148
+eso es lo que se cita.
+
+20
+00:01:03,988 --> 00:01:07,838
+Cuatro: ¿es rápido, seguro y legible sin JavaScript?
+
+21
+00:01:08,676 --> 00:01:10,306
+Por cada señal que falla:
+
+22
+00:01:10,306 --> 00:01:13,676
+lo que vimos, por qué importa y la corrección exacta.
+
+23
+00:01:14,716 --> 00:01:16,496
+Ser encontrado es el primer paso.
+
+24
+00:01:16,496 --> 00:01:19,186
+Nuestro AI Growth Operator responde al cliente,
+
+25
+00:01:19,186 --> 00:01:22,216
+redacta tu respuesta y la registra en tu CRM.
+
+26
+00:01:23,200 --> 00:01:26,984
+Haz la tuya gratis: aideazz.xyz/api
+

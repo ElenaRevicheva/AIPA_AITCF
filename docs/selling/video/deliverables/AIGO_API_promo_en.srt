@@ -1,0 +1,104 @@
+1
+00:00:01,200 --> 00:00:04,020
+Can AI find and cite your business?
+
+2
+00:00:04,520 --> 00:00:06,170
+Google ranked your page.
+
+3
+00:00:06,170 --> 00:00:09,420
+In 2026, that is only half the fruit.
+
+4
+00:00:10,216 --> 00:00:13,166
+Your next customer asks ChatGPT first.
+
+5
+00:00:13,166 --> 00:00:16,246
+It suggests the businesses it can understand.
+
+6
+00:00:16,246 --> 00:00:20,416
+If it can't understand your website, you may not make the list.
+
+7
+00:00:21,488 --> 00:00:24,938
+Find out free. Open aideazz.xyz/api.
+
+8
+00:00:24,938 --> 00:00:26,988
+Type your website. Click Audit.
+
+9
+00:00:27,856 --> 00:00:30,756
+Seconds later: one score, out of a hundred.
+
+10
+00:00:31,484 --> 00:00:35,084
+Behind that score: thirty-four checks, in four groups.
+
+11
+00:00:35,932 --> 00:00:38,372
+One. Can the AI robots get in?
+
+12
+00:00:38,372 --> 00:00:42,962
+ChatGPT, Claude, Gemini and Perplexity each send their own crawler.
+
+13
+00:00:42,962 --> 00:00:45,732
+Block one, and that assistant never reads you.
+
+14
+00:00:46,548 --> 00:00:50,448
+Two. Does your site tell AI who you are, and what you sell,
+
+15
+00:00:50,448 --> 00:00:52,548
+in the format machines read?
+
+16
+00:00:53,348 --> 00:00:54,648
+Three, the biggest.
+
+17
+00:00:54,648 --> 00:00:58,148
+Does your page answer the questions customers actually ask?
+
+18
+00:00:58,148 --> 00:01:01,518
+Questions as headings. Facts in lists.
+
+19
+00:01:01,518 --> 00:01:03,148
+That is what gets quoted.
+
+20
+00:01:03,988 --> 00:01:07,838
+Four. Is it fast, secure, and readable without JavaScript?
+
+21
+00:01:08,676 --> 00:01:10,306
+For every check that fails:
+
+22
+00:01:10,306 --> 00:01:13,676
+what we saw, why it matters, and the exact fix.
+
+23
+00:01:14,716 --> 00:01:16,496
+Being found is step one.
+
+24
+00:01:16,496 --> 00:01:19,186
+Our AI Growth Operator answers the guest,
+
+25
+00:01:19,186 --> 00:01:22,216
+drafts your reply, and logs it in your CRM.
+
+26
+00:01:23,200 --> 00:01:26,984
+Run yours free. aideazz.xyz/api
+

@@ -54,3 +54,46 @@ s03 0:15.0, s05 0:28.9, s07 0:45.0, s09 0:58.6, s11 1:14.6).
   WhatsApp automation, HubSpot CRM, AI for service businesses, AIdeazz AI Lab
 - Visibility / schedule: **Elena's call**. Music is NOT Content ID registered → no claim expected.
 - After upload: put the URL in HubSpot (company note) and on `/portfolio`; the 9:16 Short links back to it.
+
+---
+
+# FILM 2 — "Can AI Find and Cite Your Business?" (/api, merged v13 + v19) — APPROVED by Elena for YouTube, 1 Oct 2026
+
+| What | Where |
+|---|---|
+| Master 1080p, 90.6 s, −16.9 LUFS | laptop `deliverables/AIGO_API_FINAL_2026-10-01_1080p.mp4` (untracked, 36.5 MB, md5 `28d5b97174db9989e935f9ece89a8a31`) · Oracle `~/aigo-promo/apim/cut1/` |
+| Captions EN / ES | `deliverables/AIGO_API_promo_en.srt` · `deliverables/AIGO_API_promo_es.srt` |
+| Thumbnail | none yet — YouTube auto-frame, or ask for one (the pomegranate 72/100 frame is the strongest) |
+
+**Title:** `Can AI Find and Cite Your Business? The 34 Signals, Explained | Free AI Visibility Audit` (86 chars)
+
+**Description**
+```
+Google ranked your page. In 2026, that is only half the fruit.
+Your next customer asks ChatGPT first — and it suggests the businesses it can understand.
+
+The free AI Visibility Audit reads your page directly and scores 34 signals in four groups:
+1) AI crawler access (25) — can ChatGPT, Claude, Gemini and Perplexity get in? robots.txt, llms.txt, sitemap, indexable
+2) Structured data / GEO (25) — does your site tell AI who you are and what you sell? schema, identity, Open Graph
+3) Answer-readiness / AEO (30) — does your page answer the questions customers actually ask? question headings, lists
+4) Technical foundation (20) — fast, secure, readable without JavaScript
+For every check that fails: what we saw, why it matters, and the exact fix.
+
+▶ Run yours free (no signup): https://aideazz.xyz/api
+▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio
+
+— ES —
+¿Puede la IA encontrar y citar tu negocio? Auditoría gratis de visibilidad en IA: 34 señales en 4 grupos, y la corrección exacta para cada una que falla. https://aideazz.xyz/api
+
+0:00 Can AI find and cite your business?
+0:10 Your next customer asks ChatGPT first
+0:21 Free audit: one score in seconds
+0:31 34 signals in four groups
+0:46 What fails — and the exact fix
+1:04 Speed, security, top fixes
+1:14 From found to booked
+
+The audit shown is a real, live run on atuona.xyz (93/100, 31 of 34 passed). The guest at midnight is AI-generated; every product screen is real.
+Music: "Modern Deep House" by ArtIssizm (Pixabay Content License — not Content ID registered).
+```
+Chapters ≥ 10 s each (10 / 11 / 10 / 15 / 18 / 10 / 16), first at 0:00. **Altered or synthetic content: YES** (one AI-generated person).
