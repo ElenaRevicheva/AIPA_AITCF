@@ -49,12 +49,18 @@ const tailor = require(path.join(__dirname, 'lib', 'job-tailor.cjs'));
 // gets it as a "🔎 COMPANY BRIEF" note — same research, same cache, so a company is paid for once.
 const { BRIEF_MARK, createResearcher, renderBriefHtml } = require(path.join(__dirname, 'lib', 'company-research.cjs'));
 const researcher = createResearcher(process.env.PERPLEXITY_API_KEY);
+// ONE definition of a job deal for the kit, the morning page and the audit (1 Oct 2026: the kit kept its own
+// two-prefix list, so a [HIRING-MICRO1] deal sat in I Act TODAY for a week with only a letter).
+const { jobDealFilterGroups, isJobDeal } = require(path.join(__dirname, 'lib', 'hiring-deals.cjs'));
+// ── 📋 Comet prompt on the deal (1 Oct 2026, Elena: "usable on the go — laptop or cell"; "we encoded
+// Perplexity - Comet as well"). The same prompt the morning page offers, built by the same code.
+const { COMET_MARK, parseNote, cometPrompt } = require(path.join(__dirname, 'lib', 'comet-prompt.cjs'));
 
 const APPLY = process.argv.includes('--apply');
 // ── Tailored CV + technical-defense note (28 Sep 2026, Elena) ────────────────────────────────
 // Every NEW ACT-TODAY hiring deal gets a CV tailored to its posting and a short defense note, both
-// assembled by SELECTION from verified material (scripts/lib/job-tailor.cjs). Deals created before
-// DEFENSE_SINCE are left alone unless --backfill (or --only=<dealId>) says otherwise.
+// assembled by SELECTION from verified material (scripts/lib/job-tailor.cjs). 1 Oct 2026: no date gate any
+// more — every deal IN I Act TODAY gets it, however old. --backfill is kept as a harmless no-op.
 const DEFENSE_MARK = '🛡️ TECHNICAL DEFENSE';
 // Opt-in for a hand-staged [HIRING-MANUAL] job deal: a note line "📌 JOB POSTING: <code>url</code>".
 const JOB_MARK = '📌 JOB POSTING';
@@ -142,8 +148,6 @@ function laneFor(title) {
  */
 async function defensePass(d, bodies, title, company, jobUrl) {
   if (bodies.some((b) => text(b).includes(DEFENSE_MARK))) return 'had';
-  const created = new Date(d.properties.createdate || 0);
-  if (!BACKFILL && !ONLY && created < DEFENSE_SINCE) return 'old';
   let jd = '';
   try { jd = await fetchJobDescription(jobUrl); } catch { jd = ''; }
   if (jd.length < 200) jd = (await renderPosting(jobUrl)) || jd;
@@ -218,6 +222,38 @@ async function rolePass(d, bodies, title, company, jobUrl) {
   return 'added';
 }
 
+/**
+ * 📋 COMET PROMPT note — the morning page's per-job prompt, written onto the deal so it is there wherever
+ * HubSpot is open. Built from the same letter + link the page would use (newest note first, never the brief),
+ * and the cached Perplexity brief, so it costs $0. A deal whose letter is written this run gets it next run.
+ */
+async function cometPass(d, notes, title, company, jobUrl, hadComet) {
+  if (hadComet) return 'had';
+  const parsed = notes
+    .filter((n) => { const t = text(n.properties.hs_note_body); return !t.includes(BRIEF_MARK) && !t.includes(COMET_MARK); })
+    .sort((a, b) => String(b.properties.hs_timestamp || '').localeCompare(String(a.properties.hs_timestamp || '')))
+    .map((n) => parseNote(n.properties.hs_note_body));
+  const withLetter = parsed.find((p) => p.letter && !p.boilerplate);
+  if (!withLetter) return 'wait';
+  const url = jobUrl || (parsed.find((p) => p.url) || {}).url || '';
+  const research = await researcher.research(company, title);
+  const prompt = cometPrompt({ url, title, company, research, letter: withLetter.letter, boilerplate: false });
+  const html = [
+    `<strong>${COMET_MARK} — ${esc(title)} @ ${esc(company)}</strong>`,
+    '<p><em>Laptop: copy everything under the line into the <b>Comet</b> browser’s assistant. It opens the job and fills the form with your details and letter, then STOPS. Attach the tailored CV (📎 on the 🛡️ note), read every field, click Submit yourself.</em></p>',
+    '<p>──────────</p>',
+    `<p>${esc(prompt).split('\n').join('<br>')}</p>`,
+  ].join('');
+  if (APPLY) {
+    await hs('POST', '/crm/v3/objects/notes', {
+      properties: { hs_note_body: html, hs_timestamp: new Date().toISOString() },
+      associations: [{ to: { id: d.id }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 214 }] }],
+    });
+  }
+  console.log(`  ${APPLY ? '📋 added' : '· would add'} comet ${company.slice(0, 22).padEnd(24)} ${title.slice(0, 40)}`);
+  return 'added';
+}
+
 /** 🔎 COMPANY BRIEF note for one deal. No date gate: briefs are cached and cost ~$0.005 per new company. */
 async function briefPass(d, bodies, title, company) {
   if (bodies.some((b) => text(b).includes(BRIEF_MARK))) return 'had';
@@ -237,10 +273,7 @@ async function briefPass(d, bodies, title, company) {
 (async () => {
   if (!HS) { console.log('ABORT — HUBSPOT_API_KEY missing'); process.exit(1); }
   const search = await hs('POST', '/crm/v3/objects/deals/search', {
-    filterGroups: ['*HIRING-VJH*', '*HIRING-MANUAL*'].map((value) => ({ filters: [
-      { propertyName: 'dealstage', operator: 'EQ', value: STAGE },
-      { propertyName: 'dealname', operator: 'CONTAINS_TOKEN', value },
-    ] })),
+    filterGroups: jobDealFilterGroups(STAGE),
     properties: ['dealname', 'createdate'],
     limit: 100,
   });
@@ -251,6 +284,7 @@ async function briefPass(d, bodies, title, company) {
   const defense = { added: 0, 'added-no-cv': 0, had: 0, old: 0, failed: 0 };
   const brief = { added: 0, had: 0, none: 0, failed: 0 };
   const role = { added: 0, had: 0, nolink: 0, failed: 0 };
+  const comet = { added: 0, had: 0, wait: 0, failed: 0 };
   const cvIds = new Map();
   for (const d of deals) {
     if (ONLY && String(d.id) !== ONLY) continue;
@@ -259,15 +293,16 @@ async function briefPass(d, bodies, title, company) {
       const assoc = await hs('GET', `/crm/v4/objects/deals/${d.id}/associations/notes?limit=50`);
       const ids = (assoc.results || []).map((a) => String(a.toObjectId));
       const notes = ids.length
-        ? (await hs('POST', '/crm/v3/objects/notes/batch/read', { properties: ['hs_note_body'], inputs: ids.map((id) => ({ id })) })).results || []
+        ? (await hs('POST', '/crm/v3/objects/notes/batch/read', { properties: ['hs_note_body', 'hs_timestamp'], inputs: ids.map((id) => ({ id })) })).results || []
         : [];
-      const bodies = notes.map((n) => n.properties.hs_note_body || '');
+      // The 📋 Comet note quotes the letter and lists links — no pass below may read it as the letter or the posting.
+      const bodies = notes.map((n) => n.properties.hs_note_body || '').filter((b) => !text(b).includes(COMET_MARK));
+      const hadComet = notes.some((n) => text(n.properties.hs_note_body).includes(COMET_MARK));
       // A hand-staged job (29 Sep 2026: Allied Revenue was staged by hand and got no CV or defense) joins
       // only when a note carries JOB_MARK. [HIRING-MANUAL] also names recruiter-outreach deals, and a CV
       // headed with a recruiter's name is worse than none. From then on a hand-staged job gets exactly what
       // an automatic one gets — brief, tailored CV, defense AND the letter (Elena, 29 Sep 2026).
-      const manual = /HIRING-MANUAL/.test(d.properties.dealname);
-      if (manual && !bodies.some((b) => text(b).includes(JOB_MARK))) continue;
+      if (!isJobDeal(d.properties.dealname, bodies)) continue;
       // The brief carries no link by design; skipping it here too means a future edit to it can never
       // hand a source page to the letter generator as "the posting".
       const jobUrl = bodies.filter((b) => !text(b).includes(BRIEF_MARK)).map(jobUrlOf).find(Boolean);
@@ -278,7 +313,12 @@ async function briefPass(d, bodies, title, company) {
       catch (e) { defense.failed++; console.log(`  ✖ defense ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
       try { role[await rolePass(d, bodies, title, company, jobUrl)]++; }
       catch (e) { role.failed++; console.log(`  ✖ role ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
-      if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) { ok++; continue; }
+      if (bodies.some((b) => LETTER_RE.test(text(b)) && !STUB_RE.test(b))) {
+        ok++;
+        try { comet[await cometPass(d, notes, title, company, jobUrl, hadComet)]++; }
+        catch (e) { comet.failed++; console.log(`  ✖ comet ${company.slice(0, 22)} ${String(e.message).slice(0, 110)}`); }
+        continue;
+      }
 
       let drafted = await generateCoverLetter({ jobTitle: title, company, jobUrl });
       let via = 'direct';
@@ -321,6 +361,7 @@ async function briefPass(d, bodies, title, company) {
   console.log(`  defense: ${APPLY ? 'added' : 'would add'} ${defense.added} (+${defense['added-no-cv']} without a CV) · already had ${defense.had}`
     + ` · older than ${DEFENSE_SINCE.toISOString().slice(0, 10)} ${defense.old} · failed ${defense.failed}`);
   console.log(`  role defense: ${APPLY ? 'added' : 'would add'} ${role.added} · already had ${role.had} · no apply link ${role.nolink} · failed ${role.failed}`);
+  console.log(`  comet prompt: ${APPLY ? 'added' : 'would add'} ${comet.added} · already had ${comet.had} · waiting for a letter ${comet.wait} · failed ${comet.failed}`);
   researcher.save();
   const rs = researcher.stats;
   console.log(`  brief: ${APPLY ? 'added' : 'would add'} ${brief.added} · already had ${brief.had} · nothing found ${brief.none}`
