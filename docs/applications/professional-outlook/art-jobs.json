@@ -1,0 +1,17 @@
+{
+  "style": "Deep near-black indigo background, palette of electric violet, cyan and a touch of warm amber, cinematic volumetric light, ultra-detailed, premium 2026 tech editorial art direction, subtle film grain. Absolutely no text, no letters, no numbers, no logos, no watermark, no user interface, no people.",
+  "jobs": [
+    { "name": "cover", "ar": "16:9", "engines": ["flux", "seedream", "nanopro", "gpt"],
+      "prompt": "Abstract hero artwork for an AI-systems leader. On the right third of a wide frame: a luminous sphere of liquid glass with a glowing violet-and-cyan plasma core, encircled by thin orbital rings of light carrying eight small glowing satellite nodes, like a tiny solar system of intelligent agents. The left two-thirds of the frame is calm, dark, empty negative space." },
+    { "name": "ops", "ar": "16:9", "engines": ["flux", "seedream"],
+      "prompt": "Macro photograph of an abstract network: glowing violet fiber-optic threads connecting small luminous nodes across black glass, tiny data pulses travelling along the threads, shallow depth of field, soft bokeh. Violet dominant." },
+    { "name": "product", "ar": "16:9", "engines": ["flux", "seedream"],
+      "prompt": "Abstract architecture of floating translucent glass panels stacked in depth in darkness, cyan light refracting through their edges, one soft beam of light passing through every layer, minimal and precise. Cyan dominant." },
+    { "name": "creative", "ar": "16:9", "engines": ["flux", "seedream"],
+      "prompt": "Cinematic abstract: a curling strip of 35mm film dissolving into warm amber and magenta light particles and drifting ink smoke in darkness, luxurious underground aesthetic, moody and poetic. Amber dominant." },
+    { "name": "failure", "ar": "16:9", "engines": ["flux", "seedream"],
+      "prompt": "Kintsugi: a slab of polished black obsidian, fractured, its cracks repaired with molten glowing gold, dramatic low side light; the gold seams sit in the right half of the frame and the left half falls into deep darkness." },
+    { "name": "close", "ar": "16:9", "engines": ["flux", "seedream"],
+      "prompt": "A tall glowing doorway of violet and cyan light standing open in a vast dark minimal space, a mirror-like reflective floor, a warm amber glow on the horizon beyond the door, a sense of arrival and possibility. The doorway stands on the right third of the frame; the left side is dark negative space." }
+  ]
+}
