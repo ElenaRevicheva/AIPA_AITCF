@@ -291,6 +291,15 @@
         "k_g9"
       ],
       "prompt": "Use the reference images as the exact identities of both people: the same woman and the same man, identical faces, do not change their faces. The last reference image is ONLY for the two friends, their wardrobe, the wine glasses and the sunset light; the man's position must be different from it. Sunset sail on the luxury white catamaran, the boat moving toward the LEFT of the frame. The camera is beside the boat, looking across the deck from the side. Foreground, on the front trampoline net: she laughs with her two friends (one with sunglasses and dark hair, one with long brunette hair), clinking glasses of white wine, the cream cashmere wrap on her shoulders, wind in her hair, her face clearly visible. Background, at the raised helm station, the man in the black linen shirt steers the yacht CORRECTLY: he stands BEHIND the wheel in strict SIDE PROFILE, FACING the direction of travel (toward the LEFT of the frame, toward the bow and the open sea ahead), BOTH hands on the wheel, his eyes on the horizon ahead. He does NOT face the camera and does NOT turn toward the women; the wheel is in front of him, between him and the bow. Warm golden light, gentle sea spray, medium-wide shot."
+    },
+    "v_r1_yacht": {
+      "engine": "gpt",
+      "aspect": "2:3",
+      "refs": [
+        "R1",
+        "v_r1_deck"
+      ],
+      "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut - do not change her face. Elena's wardrobe pick B for the yacht (1 Oct 2026): a NEW outfit, nothing from the apartment - no cream wrap, no blanket, no knit. Full-length at golden hour on the teak deck of a luxury white sailing catamaran anchored off a San Blas palm islet, turquoise water all around. She wears an emerald-green silk slip midi dress, bias-cut with thin straps, the silk catching the low sun and moving in the sea breeze; flat gold strappy sandals, gold hoop earrings, one delicate gold necklace, a slim gold watch; hair loose and wind-touched. Relaxed, confident and radiant, a slow smile. Editorial luxury travel photography, quiet wealth, elegant and tasteful."
     }
   },
   "shots": {
