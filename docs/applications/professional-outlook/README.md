@@ -11,7 +11,7 @@ It carries:
 - the three lanes
 - the role list and the role test
 
-**Style (Elena, 1 Oct 2026):** "naturalistic high-tech" like hud.ai / venice.ai: light, airy nature photography. The letters and
+**Style (Elena, 1 Oct 2026):** the 2026 "naturalistic high-tech" trend: light, airy nature photography. The letters and
 components come from the HubSpot UI:
 
 - **Lexend Deca** (HubSpot's UI typeface, OFL)
@@ -22,6 +22,19 @@ components come from the HubSpot UI:
 - a Note activity card for the operating-model quote
 
 The first, dark version is in git at `a5a6db3` (Elena: "good, but…" → this one replaced it).
+
+## Originality: why no one can claim we copied their design
+
+Elena asked for this explicitly (1 Oct 2026). A visual *style* (light nature photos, clean UI type) is not anyone's property. A
+site's specific expression is: its images, logo, and signature hero composition. So:
+
+- **Every image is our own**, generated on the ATUONA engines from our prompts. No third-party photo, logo or asset is used.
+- **Lexend Deca is open-licensed** (SIL OFL). No HubSpot logo or trademark appears; "HubSpot" is only named as a tool she uses.
+- **The cover was redesigned** away from a look-alike of one AI company's homepage hero (floating island + stream, dot
+  dissolve, centred headline over the image, website nav with a dark "book a call" button, stats over the photo). It is now a
+  real Panama landscape, with a left-aligned headline, the deck's own header, and stats as cards.
+
+Keep it that way: never paste a reference site's image, logo or exact hero layout into this deck.
 
 ## Rebuild
 
@@ -55,7 +68,7 @@ the engine whose output was used for each image:
 
 | File | Engine | Slide |
 |---|---|---|
-| `art/l-cover.jpg` | GPT Image 2 | 1: floating island, partly dissolving into dots |
+| `art/l-cover.jpg` | Nano Banana Pro | 1: two shores of Panama: the real Panama City skyline (F&F Tower, Punta Pacífica, Punta Paitilla, Cinta Costera) and the mountains |
 | `art/l-water.jpg` | Flux 2 Max | 2, 4, 5, 6: calm-water canvas |
 | `art/l-river.jpg` | Seedream 5 Pro | 3: braided river under the six-step board |
 | `art/l-ops.jpg` | Seedream 5 Pro | 4: roots and mycelium (AI Operations) |

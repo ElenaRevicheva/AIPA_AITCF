@@ -6,9 +6,10 @@
       "name": "l-cover",
       "ar": "16:9",
       "engines": [
-        "gpt"
+        "nanopro"
       ],
-      "prompt": "A fragment of lush green land floating in a pale misty sky: soft grass, a few wind-shaped trees, a clear stream winding through a small valley toward the viewer, the underside showing layered rock and hanging roots. The island fills the lower half of the frame, centred; the upper half is soft, empty, pale blue-grey sky. A subtle fine halftone dot texture dissolves part of the rock face, as if the land is partly digital."
+      "prompt": "Two shores of Panama facing each other across a calm turquoise bay of the Pacific. On the LEFT shore, low in the frame: the real, recognisable skyline of Panama City seen from the bay — the twisting corkscrew glass skyscraper F&F Tower (El Tornillo), the tall sail-shaped glass tower at Punta Pacifica, the dense cluster of slender white and blue-glass residential towers of Punta Paitilla and Avenida Balboa, and the palm-lined Cinta Costera waterfront promenade curving along the water. On the RIGHT shore: the tall dormant volcano Baru of Chiriqui, slopes covered in green cloud forest, soft clouds wrapping its summit. The calm water fills the lower centre. The upper-left part of the frame is open, soft, pale sky.",
+      "style": "Photoreal, naturalistic, high-key soft morning daylight, lush tropical greens, pale sky blues, soft white clouds and mist, airy haze, premium editorial landscape photography, ultra-detailed. Absolutely no text, no letters, no logos, no signs, no watermark, no people."
     },
     {
       "name": "l-water",

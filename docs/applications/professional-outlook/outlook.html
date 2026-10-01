@@ -52,8 +52,6 @@ html.raster .slide:nth-of-type(7){background-image:url(bg/s7.jpg)} html.raster .
 .brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:19px;color:var(--ink);letter-spacing:-.01em}
 .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff;font-weight:500;font-size:13px;letter-spacing:.02em}
 .pg{font-size:15px;color:var(--muted)} .pg b{color:var(--ink);font-weight:500}
-.links{display:flex;gap:40px;font-size:18px;color:var(--ink)}
-.right{display:flex;align-items:center;gap:26px;font-size:18px;color:var(--ink)}
 .btn{display:inline-flex;align-items:center;gap:10px;background:var(--dark);color:#fff;border-radius:10px;padding:13px 20px;font-size:18px;font-weight:500}
 .btn svg{width:16px;height:16px}
 
@@ -74,15 +72,16 @@ h2 em{font-style:normal;color:var(--moss)}
 .dot{width:8px;height:8px;border-radius:50%;background:#00bda5;flex:none}
 
 /* ---------- 1 · cover ---------- */
-.s1 .hero{text-align:center;margin-top:52px}
-.s1 h1{font-weight:500;font-size:112px;line-height:1;letter-spacing:-.045em;color:#152430;margin-top:22px}
-.s1 .sub{font-size:26px;color:var(--ink);margin-top:20px;letter-spacing:-.01em}
+.s1 .hero{margin-top:28px}
+.s1 h1{font-weight:500;font-size:104px;line-height:1;letter-spacing:-.045em;color:#152430;margin-top:14px}
+.s1 .sub{font-size:26px;color:var(--ink);margin-top:14px;letter-spacing:-.01em}
 .s1 .thesis{font-size:20px;color:var(--text);margin-top:12px}
-.s1 .cta{display:flex;justify-content:center;align-items:center;gap:22px;margin-top:28px}
+.s1 .cta{display:flex;align-items:center;gap:16px;margin-top:20px}
 .s1 .cta .mail{font-size:18px;color:var(--ink);background:rgba(255,255,255,.7);border:1px solid rgba(33,51,67,.12);border-radius:10px;padding:12px 18px}
-.stats{position:absolute;left:0;right:0;bottom:46px;display:grid;grid-template-columns:repeat(4,1fr);text-align:center;color:#fff}
-.stats .l{font-size:17px;font-weight:500;letter-spacing:-.01em;opacity:.95}
-.stats .n{font-size:46px;font-weight:500;letter-spacing:-.03em;margin-top:6px}
+.stats{position:absolute;left:0;right:0;bottom:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stats .card{padding:12px 18px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.stats .l{font-size:15px;color:var(--muted)}
+.stats .n{font-size:34px;font-weight:500;letter-spacing:-.03em;color:var(--ink);line-height:1}
 
 /* ---------- 2 · operating unit ---------- */
 .eq{display:grid;grid-template-columns:1fr 46px 1fr 46px 1fr;align-items:stretch;margin-top:34px}
@@ -208,17 +207,14 @@ h2 em{font-style:normal;color:var(--moss)}
 </defs></svg>
 
 <!-- ============ 1 · COVER ============ -->
+<!-- Two shores of Panama: the real Panama City skyline (F&F Tower, Punta Pacífica, Punta Paitilla, Cinta Costera) and Volcán Barú. Elena's choice, 1 Oct 2026. -->
 <section class="slide s1">
-  <div class="art bake" style="background:#e3e9ec">
-    <img src="art/l-cover.jpg" alt="" style="left:0;top:150px;width:1600px;height:900px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 200px);mask-image:linear-gradient(180deg,transparent 0,#000 200px)">
-    <div class="shade" style="background:linear-gradient(0deg,rgba(18,30,28,.62) 0,rgba(18,30,28,.25) 150px,rgba(18,30,28,0) 260px)"></div>
+  <div class="art bake" style="background:#f3f3ee">
+    <img src="art/l-cover.jpg" alt="" style="left:0;top:30px;width:1600px;height:893px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 140px);mask-image:linear-gradient(180deg,transparent 0,#000 140px)">
+    <div class="shade" style="background:linear-gradient(90deg,rgba(246,247,243,.4) 0,rgba(246,247,243,.15) 35%,rgba(246,247,243,0) 55%)"></div>
   </div>
   <div class="content">
-    <div class="nav">
-      <div class="brand"><span class="av">ER</span>Elena Revicheva</div>
-      <div class="links"><span>Operating model</span><span>Lanes</span><span>Evidence</span><span>Roles</span></div>
-      <div class="right"><a href="https://aideazz.xyz/portfolio">Portfolio</a><a class="btn" href="mailto:aipa@aideazz.xyz">Get in touch</a></div>
-    </div>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>October 2026</b></div></div>
     <div class="hero">
       <span class="tag ok"><span class="dot"></span>Open to remote roles · Panama, UTC−5</span>
       <h1>Elena Revicheva</h1>
@@ -230,10 +226,10 @@ h2 em{font-style:normal;color:var(--moss)}
       </div>
     </div>
     <div class="stats">
-      <div><div class="l">Production services</div><div class="n">15</div></div>
-      <div><div class="l">CRM deals run by agents</div><div class="n">2,800+</div></div>
-      <div><div class="l">Published AI films</div><div class="n">8</div></div>
-      <div><div class="l">Years as Deputy CEO &amp; CLO</div><div class="n">7</div></div>
+      <div class="card"><div class="l">Production services</div><div class="n">15</div></div>
+      <div class="card"><div class="l">CRM deals run by agents</div><div class="n">2,800+</div></div>
+      <div class="card"><div class="l">Published AI films</div><div class="n">8</div></div>
+      <div class="card"><div class="l">Years as Deputy CEO &amp; CLO</div><div class="n">7</div></div>
     </div>
   </div>
 </section>

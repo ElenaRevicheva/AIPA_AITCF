@@ -143,8 +143,10 @@ git log keeps the record.
 
 - **File:** `docs/applications/professional-outlook/Elena_Revicheva_Professional_Outlook_2026.pdf` (3.8 MB, under the 5 MB
   attachment cap). Source `outlook.html`, rebuild `python render.py`; provenance + traps in that folder's `README.md`.
-- **Style = Elena's call:** light "naturalistic high-tech" photos (hud.ai / venice.ai) + HubSpot UI letters (Lexend Deca) and
-  components. The first dark version (`a5a6db3`) was replaced at her request.
+- **Style = Elena's call:** light "naturalistic high-tech" photos + HubSpot UI letters (Lexend Deca, OFL) and components. The
+  first dark version (`a5a6db3`) was replaced at her request. **Cover = two shores of Panama** (real Panama City skyline + mountains,
+  Nano Banana Pro). It was redesigned so it is not a look-alike of another company's homepage hero. Only slide 1 changed; slides
+  2–8 are pixel-identical to her approved version. Do not paste reference-site images, logos or hero layouts in (see the folder README).
 - **Numbers** = CV-verified floors only (`build-lane-cv.cjs` / `build_tailored_cv.py`, 28–29 Sep). Re-count before reuse in Nov.
 - **Art:** all 10 images from the `/imagine` Replicate engines, run as a one-off script on Oracle in `~/outlook-art/` — no service
   touched, nothing restarted. **⚠️ Replicate returned 429 on 12 of 17 parallel requests** = the under-$5 prepaid throttle → her
