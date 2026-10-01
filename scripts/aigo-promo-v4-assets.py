@@ -245,5 +245,24 @@ def title(fn, l1, l2, size, left=60, y=60):
 manifest["titles"].append({"line": "s03", "t0": 6.10, "t1": None, **title("title_s03.png", "Las buenas oportunidades", "se enfrían en silencio.", 80)})
 manifest["titles"].append({"line": "s05", "t0": 1.10, "t1": 3.40, **title("title_s05.png", "Misma clienta.", "Misma pregunta.", 92)})
 
+# ---------- opening title (Elena, 1 Oct): the film's name, large, on the very first shot ----------
+# Left-aligned: through the 3.6 s push-in she sits centre/right, the left (curtain, dark window) stays clear.
+def opening():
+    im = layer()
+    sc_ = Image.new("L", (W, H), 0); sd_ = ImageDraw.Draw(sc_)
+    for x in range(1150): sd_.line([(x, 0), (x, H)], fill=int(175 * (1 - x / 1150) ** 1.4))
+    im.paste(Image.new("RGBA", (W, H), (2, 4, 10, 255)), (0, 0), sc_)
+    X = 92; m = font(MONO, 24)
+    spaced(ImageDraw.Draw(im), X + 4, 150, "AIDEAZZ AI LAB · AI GROWTH OPERATOR", m, GOLD, 6)
+    s, it = font(SERIF, 112), font(ITALIC, 156)
+    halo_runs(im, X, 196, [("She Asked ChatGPT", s, WHITE)], blur=12, alpha=210)
+    halo_runs(im, X, 316, [("Before She Messaged", s, WHITE)], blur=12, alpha=210)
+    halo_runs(im, X - 4, 418, [("Your Yacht", it, GOLD)], blur=14, alpha=220)
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle((X + 4, 628, X + 164, 632), 2, fill=VIOLET); d.rounded_rectangle((X + 204, 628, X + 364, 632), 2, fill=GOLD)
+    return im
+opening().save(f"{OUT}/title_open.png")
+manifest["absolute"] = [{"a": 0.25, "z": 3.55, "file": "title_open.png", "x": 0, "y": 0}]
+
 json.dump(manifest, open(f"{OUT}/manifest.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print(len(manifest["captions"]), "captions,", len(manifest["kinetic"]), "kinetic,", len([f for f in os.listdir(OUT) if f.startswith("split_")]), "split frames ->", OUT)

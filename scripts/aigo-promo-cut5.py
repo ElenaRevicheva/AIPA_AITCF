@@ -135,6 +135,8 @@ for c in man["titles"]:
     items.append((start[c["line"]] + c["t0"], start[c["line"]] + (c["t1"] if c["t1"] is not None else blk[c["line"]]), c))
 for c in man["kinetic"]:
     items.append((start[c["line"]] + c["t0"], start[c["line"]] + blk[c["line"]] - 0.05, c))
+for c in man.get("absolute", []):          # timed to the film clock, not to a voice line (the opening title, the ICP card)
+    items.append((c["a"], c["z"], c))
 args, fc, last = ["-i", pic], [], "0:v"
 for i, (a, z, c) in enumerate(items, 1):
     args += ["-framerate", str(FPS), "-loop", "1", "-t", f"{z + 0.2:.3f}", "-i", f"{V4}/{c['file']}"]
