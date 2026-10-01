@@ -300,6 +300,27 @@
         "v_r1_deck"
       ],
       "prompt": "Use the reference images as her exact identity: the same woman with the identical face, features, skin, hair colour and cut - do not change her face. Elena's wardrobe pick B for the yacht (1 Oct 2026): a NEW outfit, nothing from the apartment - no cream wrap, no blanket, no knit. Full-length at golden hour on the teak deck of a luxury white sailing catamaran anchored off a San Blas palm islet, turquoise water all around. She wears an emerald-green silk slip midi dress, bias-cut with thin straps, the silk catching the low sun and moving in the sea breeze; flat gold strappy sandals, gold hoop earrings, one delicate gold necklace, a slim gold watch; hair loose and wind-touched. Relaxed, confident and radiant, a slow smile. Editorial luxury travel photography, quiet wealth, elegant and tasteful."
+    },
+    "k_g7b": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1",
+        "v_r1_yacht",
+        "R2"
+      ],
+      "prompt": "Use the reference images as the exact identities of both people: the same woman and the same man, identical faces - do not change their faces. She wears EXACTLY the outfit of the second reference: the emerald-green silk slip midi dress with thin straps, gold hoop earrings, a delicate gold necklace - no cream wrap, no shawl, no knit. THE PAYOFF - golden hour in San Blas: she steps from a small wooden tender onto the swim platform of the white catamaran, the emerald silk moving in the breeze and catching the low sun, her face turned toward camera in warm light, looking up at the boat and the palm islet with a slow smile of arrival. The man in the black linen shirt, partly in frame, reaches down to steady her hand. Two friends soft and out of focus behind on the tender. Medium shot framed on her face and shoulders, turquoise water. She must be instantly recognisable as the woman in the first reference."
+    },
+    "k_g9c": {
+      "engine": "gpt",
+      "aspect": "16:9",
+      "refs": [
+        "R1",
+        "v_r1_yacht",
+        "R2",
+        "k_g9b"
+      ],
+      "prompt": "Use the reference images as the exact identities of both people: the same woman and the same man, identical faces - do not change their faces. The LAST reference image is the scene to keep: the same composition, the same two friends and their clothes, the same white catamaran, the same sunset light, and the man EXACTLY as positioned there - at the raised helm, behind the wheel in strict side profile, facing the direction of travel (toward the left of the frame), both hands on the wheel, eyes on the horizon, NOT facing the camera and NOT turned toward the women. Change ONLY her outfit: she now wears the emerald-green silk slip midi dress with thin straps from the second reference, gold hoop earrings, a delicate gold necklace - no cream wrap, no shawl, no knit. Foreground on the front trampoline net: she laughs with her two friends, clinking glasses of white wine, wind in her hair, her face clearly visible. Warm golden light, gentle sea spray, medium-wide shot."
     }
   },
   "shots": {
@@ -427,6 +448,20 @@
       "duration": 6,
       "audio": false,
       "motion": "Sunset sail: she laughs with her two friends as they clink glasses, wind in her hair, light sea spray; behind them he steers in side profile, both hands on the wheel, eyes on the sea ahead, never turning toward the camera. The catamaran glides forward. Slow gentle push-in."
+    },
+    "G7b": {
+      "start": "k_g7b",
+      "engine": "hailuo",
+      "duration": 6,
+      "audio": false,
+      "motion": "THE PAYOFF. She steps from the small wooden tender up onto the swim platform of the catamaran, taking his steadying hand; the emerald silk dress moves in the sea breeze; she looks up at the boat and the palm islet and breaks into a slow, warm smile of arrival. Slow gimbal move that settles on her face."
+    },
+    "G9c": {
+      "start": "k_g9c",
+      "engine": "hailuo",
+      "duration": 6,
+      "audio": false,
+      "motion": "Sunset sail: she laughs with her two friends as they clink glasses, wind in her hair and in the emerald silk, light sea spray; behind them he steers in side profile, both hands on the wheel, eyes on the sea ahead, never turning toward the camera. The catamaran glides forward. Slow gentle push-in."
     }
   },
   "decisions": {

@@ -116,7 +116,9 @@ split_still("S9_hubspot_deal", blk["s09"], zoom=0.00012)
 # steers in side profile, eyes ahead (Elena: "the scene is super, but the captain should drive correctly"); first 2.5 s only -
 # after that the camera drifts behind the women and her face turns away
 b = blk["s10"]; clip("346372", 2.8, start=8.0, qr=True, src=f"{STOCK}/346372_medium.mp4")
-clip("G8b__runway", 1.6, qr=True); clip("G7__venice", 3.3, start=1.7); clip("G9b__hailuo", b - 7.7)
+clip("G8b__runway", 1.6, qr=True); clip("G7b__hailuo", 3.3, start=1.6); clip("G9c__hailuo", b - 7.7)
+# v7 (Elena, 1 Oct): on the yacht she wears her yacht look - emerald silk (wardrobe B, ref v_r1_yacht), not the apartment wrap.
+# G7b from 1.6 s = step aboard -> his hand -> the smile; G9c first 2.5 s only - a made-up "X" logo appears on the hull from ~4.5 s.
 # B11 — the reveal over the real sunset · B12 — split end card, big QR
 reveal(blk["s11"]); card_png("card_s12.png", blk["s12"])
 
