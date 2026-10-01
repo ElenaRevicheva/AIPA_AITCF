@@ -131,3 +131,11 @@ Mother → **E** (m5_gpt, long dark waves, silk, emeralds) as R1; husband → **
 `~/aigo-villa/img/_superseded/` (never deleted). Re-made v_family, k_v1, k_v2, k_v6, k_v9, k_v10 with the new refs (Toronto wardrobe =
 her cream silk shirt, as in her reference) → +$0.77 → **ledger $3.58 of $12**. Sheet `deliverables/VILLA_recast_E_husbandB.jpg`.
 Next: Elena locks narration v2, OK on the k_v3 helm re-shoot ($0.128), then Gate 3 motion.
+
+## Gate 3 — motion (1 Oct). Elena: narration v2 LOCKED · k_v3 re-shoot yes · Kling (via her Replicate) for faces · "make sure charter
+appears and the villa for luxurious guests — not a yacht" · **"charter = a PLANE" → "exactly: charter flight → boat transfer → over-water villa"**
+- k_v3 re-shot: the host steers facing the bow ✓ · k_v12 villa breakfast (first take had the kids twice → re-made, kids only in the pool) ✓
+- NEW k_v14 airstrip arrival: the family down the private turboprop's airstair, the host by a vintage 4×4 ✓ · k_v13 aerial plane: GPT take
+  looked CGI → re-made on Nano Banana Pro as a real air-to-air photo · boat "charter day" (k_v11) dropped — the charter is the flight.
+- Motion running (Hailuo $0.56 each): V3 V4 V6 V7 V8 V12 V14. Pending her budget call: V1, V13 (Hailuo) + V2/V9/V10 (Kling pro $1.12 each)
+  = ≈ $12.90 total vs the $12 cap → A: cap $13 · B: Kling only V9/V10, V2 on Hailuo, drop V1 (≈ $11.80).
