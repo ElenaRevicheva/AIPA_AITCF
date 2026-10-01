@@ -1,0 +1,94 @@
+{
+ "note": "AI Growth Operator deck art (1 Oct 2026). Run on Oracle with ../../applications/professional-outlook/gen-art.cjs (see its header).",
+ "style": "Photoreal, naturalistic, high-key soft daylight, muted sage greens, pale sky blues and warm sand tones, airy haze, premium editorial nature photography with a quiet high-tech feeling, ultra-detailed. Absolutely no text, no letters, no logos, no watermark, no people.",
+ "jobs": [
+  {
+   "name": "a-cover",
+   "ar": "16:9",
+   "engines": [
+    "nanopro"
+   ],
+   "prompt": "A white lighthouse on a calm green headland at soft early-morning light, above a pale turquoise tropical sea; far out on the water a single small white sailing yacht heads toward the shore. The lighthouse and headland sit on the RIGHT third of the frame; the left two-thirds are open calm sea and pale hazy sky, very low contrast, high key."
+  },
+  {
+   "name": "a-fog",
+   "ar": "16:9",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "Several narrow footpaths crossing a pale meadow and fading into soft morning fog, gentle rolling ground, silver dew on the grass; the paths run across the lower half of the frame and the upper half is bright pale mist, minimal, very low contrast."
+  },
+  {
+   "name": "a-canvas",
+   "ar": "16:9",
+   "engines": [
+    "flux"
+   ],
+   "prompt": "Soft pale sand dunes seen from slightly above, delicate wind ripples, warm sand and light sage tones, high key, minimal, abstract and serene texture, very low contrast."
+  },
+  {
+   "name": "a-loop",
+   "ar": "16:9",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "Aerial view of a smooth meandering river forming a long graceful loop through pale green tropical wetlands toward the sea, silver water, minimal, high key; the river runs across the lower half of the frame and the upper half is soft pale haze."
+  },
+  {
+   "name": "a-clinic",
+   "ar": "4:3",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "A serene modern wellness clinic courtyard with white minimalist architecture, a calm reflecting pool and soft palm-leaf shadows on pale stone, bright tropical daylight, empty and calm."
+  },
+  {
+   "name": "a-city",
+   "ar": "4:3",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "A quiet tropical seafront promenade at dawn with tall palm trees and a distant modern skyline across a calm bay, soft pastel light, airy, empty and calm."
+  },
+  {
+   "name": "a-stones",
+   "ar": "4:3",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "Close-up of smooth polished white and pale grey river pebbles resting on fine light sand by calm clear water, soft daylight, clean, minimal, high key, very gentle shadows."
+  },
+  {
+   "name": "a-yacht",
+   "ar": "4:3",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "Aerial view of a white luxury sailing yacht anchored in a clear turquoise lagoon beside a small island with a white sand beach and palms, soft bright light."
+  },
+  {
+   "name": "a-orchard",
+   "ar": "3:4",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "Orderly rows of young fruit trees in a green orchard at soft sunrise, long gentle shadows, light morning haze, calm and abundant, vertical composition."
+  },
+  {
+   "name": "a-pier",
+   "ar": "16:9",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "A long light-wooden pier stretching into a calm pale sea at sunrise, soft pastel sky, perfectly still water; the pier starts at the lower RIGHT and leads toward the horizon, the left half of the frame is open sky and water, high key."
+  },
+  {
+   "name": "a-harbour",
+   "ar": "16:9",
+   "engines": [
+    "seedream"
+   ],
+   "prompt": "A calm tropical harbour at soft golden morning light with a few white sailboats gliding in toward a green shore, gentle reflections on still water; the boats and shore sit in the RIGHT half, the left half is open pale sky and water, high key."
+  }
+ ]
+}
