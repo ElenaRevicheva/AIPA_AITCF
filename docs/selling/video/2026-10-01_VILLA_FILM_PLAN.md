@@ -145,3 +145,13 @@ appears and the villa for luxurious guests — not a yacht" · **"charter = a PL
   jacket, fuchsia sparkle, deep red. Host keeps his natural linen. Re-made v_family, k_v14, k_v9, k_v12, k_v10 ($0.64); bland takes kept in
   `_superseded/`. k_v13 plane (Nano) — 2nd take had the chase-plane window + camera in frame → 3rd take clean ($0.15).
   **Ledger $6.41 of $12.** Sheet `deliverables/VILLA_wardrobe_juicy.jpg`. Remaining motion needs her budget call (A $13.69 / C $12.57 / B $11.45).
+
+## CUT v1 delivered (1 Oct) — Oracle `~/aigo-villa/cut1/VILLA_v1_{A_musinova,B_watermelon}.mp4`, 94.4 s
+Motion done: **ledger $13.69 of $14** (option A). Voice: 4 new MiniMax lines ($0.05, "can't" double-checked by two models) + 8 yacht takes
+reused word-for-word. Story: Toronto midnight (title right) → real ChatGPT → WhatsApp over HubSpot → the host at sea Sunday → real Caribbean
+coast (Pixabay 351939, darkened so the caption reads) → Wednesday too late → rewind → real audit → kids lean in → host taps at dawn → HubSpot
+→ **charter flight → airstrip welcome → boat transfer (ICP card) → payoff on the dock (V9 from 1.9 s, her smile)** → villa morning (reveal
+lower third) → New Year → end card. Fixes in the frame check: question card was on the rewind shot of the host → moved to her still.
+QR decodes on ChatGPT split, waves, plane, drone, end card. −15.7 LUFS, every word clear, no vocals.
+Music (Elena: "super cool electro, latest 2026"): A Musinova "Minimal Techno House" (609083, 23/28 Sep 2026) · B WATERMEL0N "Afro Beat
+Vibes" (587778, Aug 2026) — both NOT Content ID registered, full-track no vocals. Her pick pending.

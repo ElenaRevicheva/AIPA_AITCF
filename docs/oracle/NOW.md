@@ -249,8 +249,8 @@ git log keeps the record.
   Buffer = vertical Shorts only) → YouTube Studio by hand, or via her logged-in Chrome with her go.
 
 - Plan + Elena's decisions: `docs/selling/video/2026-10-01_API_FILM_MERGE_PLAN.md`. Kit: `scripts/apim-*.{py,mjs}`, Oracle `~/aigo-promo/apim/`.
-- **QUEUED NEXT (Elena, 1 Oct):** two more films in the yacht film's approach for her ICP — (1) charters / villas, luxury tourism;
-  (2) immigration lawyers. Plan each with her before any spend.
+- **ICP film #2 villa + charter: CUT v1 delivered** (Oracle `~/aigo-villa/cut1/`, plan `docs/selling/video/2026-10-01_VILLA_FILM_PLAN.md`,
+  ledger $13.69 of $14) — Elena picks music A/B. **NEXT film: immigration lawyers** (plan with her before any spend).
 
 ### 🎬 1 Oct — AI Growth Operator YouTube promo: FILM APPROVED by Elena (cut v7) — not uploaded yet
 
