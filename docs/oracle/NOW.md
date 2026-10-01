@@ -155,8 +155,14 @@ git log keeps the record.
   "Remote (Americas, UTC-3 to UTC-10)", form has NO work-auth question (body text still says US auth). Fits her CLO years.
   Kit via `stage-manual-job.cjs` + `hs-fill-apply-kit.cjs --only` → audit `complete 10 · gaps 0`. Form answers (4 required Qs)
   hand-written from verified facts: note `117817495872` + `docs/applications/2026-10-01_firecrawl_legal_ops_manager_APPLICATION.md`.
-  **Elena's move:** fill the two `[ELENA: …]` E-GOV-era lines, then apply. ⚠️ The kit's generated letter is generic and the
-  CV (automation lane) puts CLO on page 2 — the "quick note" in the answers note replaces the letter. No legal lane exists.
+  **Elena's move:** paste the FINAL section of that file into Ashby, then apply. The kit's generated letter is generic — ignore it.
+- ✅ **1 Oct — CLO on page 1 for every legal/compliance posting (Elena: "put my CLO on the 1st page").** `job-tailor.cjs`: a
+  title matching legal|counsel|compliance|regulatory|governance|privacy|paralegal|CLM|contract-management (NOT bare "Contract")
+  → `executive_first` + CLO-first verified profile + legal "Available for" + blocks loop/evalloop/chain. `build-lane-cv.cjs`:
+  `executive_first` renders E-GOV/Fundery inside Experience, page 1. Non-legal titles unchanged (tested 9 titles).
+  **VERIFIED BY:** Oracle md5 == main before scp (backups `~/backups/*.bak-20261001-150005`); Firecrawl CV rebuilt 2 pages,
+  CLO in Summary + Experience p.1; uploaded NEW name `…_CLO.pdf` (file 223339448658, not reused); 🛡️ note
+  `117783794054` attachment REPLACED (read-back = that id only); audit `complete 10 · gaps 0` naming `_CLO.pdf`.
 - **PII is closed. Do not reopen it.** Listing `5f7b8392…` went live 10 Sep with 18/18 mandatory checks while
   `pii_qc_llm` failed on all 8 — that check has no authority (see memory `project_datavendor_pii_gate`).
 

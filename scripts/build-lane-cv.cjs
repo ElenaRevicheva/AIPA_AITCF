@@ -315,6 +315,14 @@ async function buildLane(lane, job = null) {
     y -= 6;
   };
 
+  const executiveRoles = () => {
+    roleLine(
+      'Deputy CEO & Chief Legal Officer — JSC “E-GOV OPERATOR”  ·  2011–2018',
+      'Seven years at board level on large-scale public-sector digital transformation: IT, legal and compliance in a heavily regulated environment.',
+    );
+    roleLine('Deputy CEO, Business Development — Fundery LLC (fintech)  ·  2017–2018');
+  };
+
   addPage(true);
 
   section('Summary');
@@ -337,6 +345,9 @@ async function buildLane(lane, job = null) {
     for (const k of (job && job.order) || ORDER[lane] || ORDER.default) project(PROJECTS[k]);
   }
   roleLine('Operational Co-Founder — OmniBazaar, decentralised e-commerce  ·  2024–2025');
+  // 1 Oct 2026, Elena: "put my CLO on the 1st page". For legal / compliance / contracts postings
+  // (job-tailor sets executive_first) the executive roles are Experience, not a footnote on page 2.
+  if (cfg.executive_first) executiveRoles();
 
   section('Proof Hub');
   const colW = CONTENT_W / 2;
@@ -367,12 +378,10 @@ async function buildLane(lane, job = null) {
   para(lane === 'language' && cfg.foundation ? plain(cfg.foundation) : STACK[lane] || STACK.default);
   y -= 8;
 
-  section('Earlier');
-  roleLine(
-    'Deputy CEO & Chief Legal Officer — JSC “E-GOV OPERATOR”  ·  2011–2018',
-    'Seven years at board level on large-scale public-sector digital transformation: IT, legal and compliance in a heavily regulated environment.',
-  );
-  roleLine('Deputy CEO, Business Development — Fundery LLC (fintech)  ·  2017–2018');
+  if (!cfg.executive_first) {
+    section('Earlier');
+    executiveRoles();
+  }
 
   section('Education');
   para(

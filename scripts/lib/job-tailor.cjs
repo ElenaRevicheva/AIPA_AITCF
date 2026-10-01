@@ -47,6 +47,22 @@ const LANE_ORDER = {
   default: ['api', 'loop', 'evalloop', 'chain'],
 };
 
+// 1 Oct 2026 (Firecrawl Legal Operations Manager): a legal / compliance posting read "AI Automation
+// Architect" first and found Elena's Chief Legal Officer years under "Earlier" on page 2. For these
+// postings the CLO role moves into Experience on page 1 and the summary leads with it — verified text
+// only (resume: Deputy CEO & CLO, E-GOV Operator 2011–2018; IT, legal and compliance teams).
+// "Contract" alone is an employment type ("AI Engineer (Contract)"), so only contract-MANAGEMENT titles count.
+const LEGAL_TITLE = /\b(legal|counsel|compliance|regulatory|governance|privacy|paralegal|clm)\b|\bcontracts? (manager|management|specialist|administrat\w*|operations)\b/i;
+const LEGAL_PROFILE = 'Seven years as <b>Deputy CEO and Chief Legal Officer</b> of a state e-government operator: IT, legal and compliance in a heavily regulated environment. Since 2025 I build and run the AI systems behind my own lab\'s operations — agents do the execution, every irreversible step waits for a human, and every claim traces back to a record.';
+const LEGAL_AVAILABLE = [
+  'Legal and compliance operations built as systems: intake, routing, approvals, audit trail',
+  'Contract and document workflows with a human sign-off before anything irreversible',
+  'Data-privacy and licensing compliance: personal-data and secrets gates a buyer can verify',
+  'AI-assisted review at volume, with every output checked before it ships',
+];
+// loop = fail-closed send of signed documents + CRM audit · evalloop = rules enforced in code · chain = traceable output
+const LEGAL_ORDER = ['loop', 'evalloop', 'chain'];
+
 const low = (s) => String(s || '').toLowerCase();
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /**
@@ -97,9 +113,13 @@ function tailorJob({ title, company, jd, lane, laneHeadline }) {
   // A creative-lane job is judged on the portfolio, so the films always lead (29 Sep 2026: an "AI Video
   // Producer" posting scored film 1 on narrow tags and the CV shipped without the eight films).
   if (lane === 'creative') order = ['film', ...scored.map((x) => x.k).filter((k) => k !== 'film')].slice(0, 3);
-  const tagline = String(laneHeadline || '').split(' — ').slice(1).join(' — ');
+  const legal = lane !== 'creative' && LEGAL_TITLE.test(String(title || ''));
+  if (legal) order = LEGAL_ORDER;
+  const tagline = legal ? 'legal, compliance and the AI systems that run them'
+    : String(laneHeadline || '').split(' — ').slice(1).join(' — ');
   const head = cleanTitle(title) || String(laneHeadline || '').split(' — ')[0];
   return {
+    ...(legal ? { executive_first: true, profile: LEGAL_PROFILE, available: LEGAL_AVAILABLE } : {}),
     _note: 'Auto-tailored by scripts/lib/job-tailor.cjs (selection only; no generated text).',
     base_lane: lane,
     cv: `CV_Elena_Revicheva_${slugOf(company, title)}.pdf`,
