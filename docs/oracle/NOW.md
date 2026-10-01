@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-01 18:15 | Apply kit for ANY [HIRING-*] deal + Comet prompt on the deal | scripts/lib/hiring-deals.cjs, hs-fill-apply-kit.cjs, apply-queue.cjs, new lib/comet-prompt.cjs; VJH scripts/judge_feedback_sync.py (_KIT_NOTE) | c20b5d5 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 1 Oct — EVERY [HIRING-*] deal in I Act TODAY gets the full kit + a 📋 Comet prompt. Connected, not rebuilt.
+- **WHAT:** the kit had its own 2-prefix list (VJH, MANUAL) → now uses the shared `lib/hiring-deals.cjs` (any `[HIRING-…]`;
+  MANUAL still needs `📌 JOB POSTING`, which `stage-manual-job.cjs` always writes). 28 Sep date cutoff removed. The morning
+  page's Comet prompt (moved unchanged into `lib/comet-prompt.cjs`) is now ALSO a `📋 COMET PROMPT` note on each deal.
+  Kit cron every 10 min (was 2h) under `flock /tmp/apply-kit.lock`. 7 `[HIRING-MICRO1]` deals → Closed Lost (Elena's reason).
+- **VERIFIED BY:** locked dry run then restore; morning page byte-identical before/after the move; live run `comet prompt:
+  added 11 · failed 0`; audit `11 job deals · complete 11 · gaps 0` with new C column; Niuro note read back. VJH `2c317c8`
+  teaches `_KIT_NOTE` the Comet mark (deployed by ff on Oracle). cto-aipa `219308e`.
+- **RISK:** every note reader must skip `📋 COMET PROMPT` (it quotes the letter + plain links). Done in kit, page, audit;
+  VJH sweep reads oldest-first and the Comet link = the job link anyway.
 
 ### 📭 30 Sep — HUD/DataVendor: Megan has NOT replied since 8 Sep. The ball is hers, 20 days. (Elena's move: nudge or wait)
 
