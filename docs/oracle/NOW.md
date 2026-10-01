@@ -130,16 +130,18 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🎨 1 Oct — Professional Outlook deck: 8-page PDF with ATUONA art · DONE (Elena's to send; nothing sent)
+### 🎨 1 Oct — Professional Outlook deck: 8-page PDF, nature-tech + HubSpot-UI style · DONE (Elena's to send; nothing sent)
 
-- **File:** `docs/applications/professional-outlook/Elena_Revicheva_Professional_Outlook_2026.pdf` (4.0 MB, under the 5 MB
+- **File:** `docs/applications/professional-outlook/Elena_Revicheva_Professional_Outlook_2026.pdf` (3.8 MB, under the 5 MB
   attachment cap). Source `outlook.html`, rebuild `python render.py`; provenance + traps in that folder's `README.md`.
+- **Style = Elena's call:** light "naturalistic high-tech" photos (hud.ai / venice.ai) + HubSpot UI letters (Lexend Deca) and
+  components. The first dark version (`a5a6db3`) was replaced at her request.
 - **Numbers** = CV-verified floors only (`build-lane-cv.cjs` / `build_tailored_cv.py`, 28–29 Sep). Re-count before reuse in Nov.
-- **Art:** 14 stills from the `/imagine` Replicate engines (GPT Image 2, Seedream 5 Pro, Flux 2 Max, Nano Banana Pro), run as a
-  one-off script on Oracle in `~/outlook-art/` — no service touched, nothing restarted. 6 used.
-- **TRAP:** CSS gradient text and SVG gradient text print as boxes/hairlines in poppler/MuPDF. Gradients are baked into
-  `bg/*.jpg` while the real text stays vector. **VERIFIED BY:** `pdftoppm` + PyMuPDF renders of all 8 pages; text search finds
-  "Elena Revicheva"; 5 links clickable.
+- **Art:** all 10 images from the `/imagine` Replicate engines, run as a one-off script on Oracle in `~/outlook-art/` — no service
+  touched, nothing restarted. **⚠️ Replicate returned 429 on 12 of 17 parallel requests** = the under-$5 prepaid throttle → her
+  Replicate balance is likely low; top up before the next film.
+- **TRAP:** soft alpha overlays / gradient text print as boxes or hairlines in poppler/MuPDF → baked into `bg/*.jpg`, text stays
+  vector. **VERIFIED BY:** `pdftoppm` + PyMuPDF renders of all 8 pages; text search finds "Elena Revicheva"; 5 links clickable.
 
 ### ✅ 1 Oct — CV SUMMARY IS NOW WRITTEN PER JOB (Elena: "CV summaries should be written per job")
 - **Connected, not built:** the 🎯 role defense already writes a checked one-sentence pitch per posting (numbers must be in

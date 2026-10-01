@@ -30,7 +30,7 @@ for n in range(1, SLIDES + 1):
     run(['--window-size=1600,900', '--force-device-scale-factor=2', f'--screenshot={png}', f'{SRC}?bg={n}'])
     im = Image.open(png).convert('RGB')
     assert im.size == (3200, 1800), f'slide {n}: screenshot is {im.size}'
-    im.save(HERE / 'bg' / f's{n}.jpg', 'JPEG', quality=88, optimize=True)
+    im.save(HERE / 'bg' / f's{n}.jpg', 'JPEG', quality=82, optimize=True)
     png.unlink()
 
 run(['--no-pdf-header-footer', f'--print-to-pdf={OUT}', f'{SRC}?raster=1'])

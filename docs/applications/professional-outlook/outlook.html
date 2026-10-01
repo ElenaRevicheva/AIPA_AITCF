@@ -4,12 +4,14 @@
 <meta charset="utf-8">
 <title>Elena Revicheva — Professional Outlook 2026</title>
 <!--
-  Source of Elena_Revicheva_Professional_Outlook_2026.pdf. Render: node render.cjs
-  Every number on these pages is a floor taken from the CV sources that carry their own
-  verification notes (scripts/build-lane-cv.cjs PROJECTS, scripts/build_tailored_cv.py),
-  counted 28–29 Sep 2026. Do not add a figure here that is not in one of those files.
+  Source of Elena_Revicheva_Professional_Outlook_2026.pdf. Render: python render.py
+  Style (Elena, 1 Oct 2026): naturalistic high-tech (light, airy nature photography) with the
+  type and components of the HubSpot UI — Lexend Deca, white record cards, tags, board columns,
+  dashboard report tiles. The earlier dark version is in git at a5a6db3.
+  Every number is a floor from the CV sources that carry their own verification notes
+  (scripts/build-lane-cv.cjs PROJECTS, scripts/build_tailored_cv.py), counted 28–29 Sep 2026.
 -->
-<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="fonts/lexend.css">
 <script>
   var q = new URLSearchParams(location.search);
   if (q.get('raster')) document.documentElement.classList.add('raster');
@@ -17,315 +19,261 @@
 </script>
 <style>
 :root{
-  --ink:#05060c; --ink2:#0b0d18; --ink3:#11142a;
-  --text:#f3f4fa; --muted:#a4a9bf; --dim:#6b7089; --line:rgba(255,255,255,.09); --card:rgba(255,255,255,.035);
-  --violet:#9b8cff; --violet2:#7c5cff; --cyan:#3ee6f0; --amber:#ffc65c; --pink:#ff6bd6;
-  --grad:linear-gradient(100deg,#c3a8ff 0%,#8f8cff 38%,#3ee6f0 100%);
-  --grad-warm:linear-gradient(100deg,#ffd27a 0%,#ff9ec7 100%);
-  --sans:'Geist',system-ui,sans-serif; --mono:'Geist Mono',ui-monospace,monospace; --serif:'Instrument Serif',Georgia,serif;
+  --bg:#f5f8fa; --ink:#213343; --text:#33475b; --muted:#516f90; --faint:#7c98b6;
+  --line:#dfe3eb; --line2:#cbd6e2; --white:#ffffff;
+  --teal:#0091ae; --green:#00a38d; --moss:#2e6b57; --orange:#ff5c35; --dark:#1d262e;
+  --f:'Lexend Deca',system-ui,sans-serif;
 }
 @page{size:1600px 900px;margin:0}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--ink);color:var(--text);font-family:var(--sans);-webkit-print-color-adjust:exact;print-color-adjust:exact;text-rendering:geometricPrecision}
+html,body{background:var(--bg);color:var(--text);font-family:var(--f);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 a{color:inherit;text-decoration:none}
-/* render.py: ?bg=N screenshots slide N's background + every gradient ([data-g] text, .bake art);
-   ?raster=1 prints over those JPEGs with the gradient text kept as invisible vector text.
-   Raster on purpose: glows, background-clip text and gradient-filled SVG text all export as
-   masked PDF shadings that draw hairlines or solid boxes in poppler / MuPDF. Text, cards and
-   links stay vector, so the PDF is searchable and clickable. */
-.grain{display:none;position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;opacity:.05;pointer-events:none;z-index:1}
-/* ATUONA art (art/*.jpg, made with the bot's own /imagine engines — see README.md) */
-.art{position:absolute;inset:0;z-index:0;overflow:hidden}
-.art img{position:absolute;display:block}
-.art .shade{position:absolute;inset:0}
-html.bgonly .content{visibility:hidden} html.bgonly .grain{display:block}
-html.bgonly [data-g],html.bgonly .bake{visibility:visible}
-html.raster [data-g]{background:none;color:rgba(255,255,255,0)}
+
+/* render.py: ?bg=N screenshots slide N's photographic background (+ .bake layers) at 2x;
+   ?raster=1 prints the deck over those JPEGs. Soft alpha overlays are baked on purpose — they
+   export as masked PDF shadings that draw hairlines in poppler / MuPDF. Text stays vector. */
+html.bgonly .content{visibility:hidden} html.bgonly .bake{visibility:visible}
 html.raster .bake{visibility:hidden}
-html.bgonly .gborder{visibility:visible} html.bgonly .gborder *{visibility:hidden} html.bgonly .gborder [data-g]{visibility:visible}
-html.raster .gborder{background:none;border-color:transparent}
-html.raster .aura{display:none} html.raster .slide{background-size:1600px 900px;background-repeat:no-repeat}
+html.raster .slide{background-size:1600px 900px;background-repeat:no-repeat}
 html.raster .slide:nth-of-type(1){background-image:url(bg/s1.jpg)} html.raster .slide:nth-of-type(2){background-image:url(bg/s2.jpg)}
 html.raster .slide:nth-of-type(3){background-image:url(bg/s3.jpg)} html.raster .slide:nth-of-type(4){background-image:url(bg/s4.jpg)}
 html.raster .slide:nth-of-type(5){background-image:url(bg/s5.jpg)} html.raster .slide:nth-of-type(6){background-image:url(bg/s6.jpg)}
 html.raster .slide:nth-of-type(7){background-image:url(bg/s7.jpg)} html.raster .slide:nth-of-type(8){background-image:url(bg/s8.jpg)}
 
-.slide{width:1600px;height:900px;position:relative;overflow:hidden;break-after:page;padding:56px 88px 0;
-  background:
-    radial-gradient(circle at 1px 1px,rgba(255,255,255,.07) 1px,transparent 1.6px) 0 0/32px 32px,
-    var(--ink);}
+.slide{width:1600px;height:900px;position:relative;overflow:hidden;break-after:page;padding:0 88px;background:var(--bg)}
 .slide:last-child{break-after:auto}
-.aura{position:absolute;inset:0;pointer-events:none}
 .content{position:relative;z-index:2;height:100%}
+.art{position:absolute;inset:0;z-index:0;overflow:hidden}
+.art img{position:absolute;display:block}
+.art .shade{position:absolute;inset:0}
 
-/* chrome */
-.top{display:flex;justify-content:space-between;align-items:center;font:500 13px/1 var(--mono);letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
-.brand{display:flex;align-items:center;gap:12px;color:var(--muted)}
-.mark{width:26px;height:26px;border-radius:8px;background:var(--grad);display:grid;place-items:center;font:700 11px/1 var(--mono);letter-spacing:0;color:#0a0b14}
-.pg b{color:var(--text);font-weight:500}
-.tag{display:inline-flex;align-items:center;gap:10px;margin-top:44px;font:500 14px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--violet)}
-.tag::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
-.tag.c{color:var(--cyan)} .tag.a{color:var(--amber)}
-h2{font-weight:600;font-size:60px;line-height:1.04;letter-spacing:-.035em;margin-top:18px;max-width:1300px}
-.it{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.01em;color:#b9a6ff;padding-right:.08em}
-.it.warm{color:#ffc27a}
-.grad{color:#a99bff}
-.warmn{color:#ffc27a}
-[data-g]{white-space:nowrap;-webkit-background-clip:text;background-clip:text;color:transparent}
-[data-g="cool"]{background-image:var(--grad)}
-[data-g="warm"]{background-image:var(--grad-warm)}
-[data-g="silver"]{background-image:linear-gradient(180deg,#ffffff 30%,#b6bad3 100%)}
-.lede{font-size:23px;line-height:1.45;color:var(--muted);margin-top:18px;max-width:1180px}
-.lede b{color:var(--text);font-weight:500}
-.foot{position:absolute;left:0;right:0;bottom:30px;display:flex;justify-content:space-between;font:400 12px/1 var(--mono);letter-spacing:.08em;color:var(--dim)}
+/* chrome — a web/app header, like the product UIs this borrows from */
+.nav{height:92px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(33,51,67,.10)}
+.brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:19px;color:var(--ink);letter-spacing:-.01em}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:#fff;font-weight:500;font-size:13px;letter-spacing:.02em}
+.pg{font-size:15px;color:var(--muted)} .pg b{color:var(--ink);font-weight:500}
+.links{display:flex;gap:40px;font-size:18px;color:var(--ink)}
+.right{display:flex;align-items:center;gap:26px;font-size:18px;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--dark);color:#fff;border-radius:10px;padding:13px 20px;font-size:18px;font-weight:500}
+.btn svg{width:16px;height:16px}
 
-.card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:26px}
-.gborder{border:1.5px solid transparent;background:linear-gradient(180deg,#15183a,#0c0e1d) padding-box,var(--grad) border-box}
-.label{font:500 13px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.chip{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:16px;color:var(--text);white-space:nowrap}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--violet);flex:none}
-.dot.c{background:var(--cyan)} .dot.a{background:var(--amber)} .dot.g{background:#5cffb0}
-svg.ar{width:18px;height:18px;flex:none}
+h2{font-weight:500;font-size:50px;line-height:1.1;letter-spacing:-.03em;color:var(--ink);margin-top:14px;max-width:1260px}
+h2 em{font-style:normal;color:var(--moss)}
+.eyebrow{margin-top:40px;display:inline-flex;align-items:center;gap:10px;font-size:15px;font-weight:500;color:var(--moss)}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+
+/* HubSpot-style components */
+.card{background:#fff;border:1px solid var(--line);border-radius:12px}
+.tag{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:5px;font-size:15px;font-weight:500;line-height:1.2;white-space:nowrap;
+  background:#eaf0f6;border:1px solid var(--line2);color:var(--text)}
+.tag.ok{background:#e5f8f6;border-color:#00bda5;color:#00806f}
+.tag.info{background:#e5f5f8;border-color:#7fd1de;color:#007a8c}
+.tag.hot{background:var(--orange);border-color:var(--orange);color:#fff}
+.tag.warn{background:#fef8f0;border-color:#f5c26b;color:#a05a00}
+.lbl{font-size:14px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:#00bda5;flex:none}
 
 /* ---------- 1 · cover ---------- */
-.cover .left{width:900px}
-.cover .chips{display:flex;gap:10px;margin-top:70px}
-.cover .chips .chip{font:500 13px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 15px}
-.cover h1{font-weight:600;font-size:150px;line-height:.9;letter-spacing:-.055em;margin-top:34px;color:#eef0f8}
-.cover .role{font-size:29px;color:var(--muted);margin-top:26px;letter-spacing:-.01em}
-.cover .role b{font-weight:500}
-.cover .thesis{font-family:var(--serif);font-style:italic;font-size:40px;line-height:1.18;color:#e9e8ff;margin-top:30px;max-width:860px}
-.orbit{position:absolute;right:0;top:92px;width:580px;height:580px}
-.kpis{position:absolute;left:0;right:0;bottom:64px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);padding-top:26px}
-.kpi{padding-right:28px}
-.kpi+.kpi{padding-left:30px;border-left:1px solid var(--line)}
-.kpi .n{font-weight:600;font-size:54px;letter-spacing:-.04em;line-height:1}
-.kpi .l{font-size:17px;color:var(--muted);margin-top:10px;line-height:1.35}
+.s1 .hero{text-align:center;margin-top:52px}
+.s1 h1{font-weight:500;font-size:112px;line-height:1;letter-spacing:-.045em;color:#152430;margin-top:22px}
+.s1 .sub{font-size:26px;color:var(--ink);margin-top:20px;letter-spacing:-.01em}
+.s1 .thesis{font-size:20px;color:var(--text);margin-top:12px}
+.s1 .cta{display:flex;justify-content:center;align-items:center;gap:22px;margin-top:28px}
+.s1 .cta .mail{font-size:18px;color:var(--ink);background:rgba(255,255,255,.7);border:1px solid rgba(33,51,67,.12);border-radius:10px;padding:12px 18px}
+.stats{position:absolute;left:0;right:0;bottom:46px;display:grid;grid-template-columns:repeat(4,1fr);text-align:center;color:#fff}
+.stats .l{font-size:17px;font-weight:500;letter-spacing:-.01em;opacity:.95}
+.stats .n{font-size:46px;font-weight:500;letter-spacing:-.03em;margin-top:6px}
 
 /* ---------- 2 · operating unit ---------- */
-.eq{display:grid;grid-template-columns:1fr 54px 1fr 54px 1.08fr;align-items:stretch;margin-top:34px}
-.op{display:grid;place-items:center;font-weight:300;font-size:54px;color:var(--dim)}
-.eqc{padding:26px 28px 24px;display:flex;flex-direction:column}
-.eqc .who{font:600 34px/1 var(--sans);letter-spacing:-.03em;margin-top:16px}
-.eqc .what{font-size:18px;color:var(--muted);margin-top:10px;line-height:1.45}
-.eqc .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-.eqc .chips .chip{font-size:15px;padding:8px 13px}
-.eqc.unit .who{font-size:34px}
-.eqc.unit p.big{font-size:23px;line-height:1.4;margin-top:16px;color:var(--text)}
-.quote{display:grid;grid-template-columns:1.55fr 1fr;gap:28px;margin-top:24px}
-.quote .q{padding:24px 34px;position:relative}
-.quote .q .mk{font-family:var(--serif);font-size:110px;line-height:.6;position:absolute;left:28px;top:34px;color:var(--violet2);opacity:.55}
-.quote .q p{font-size:21px;line-height:1.48;color:#dfe1f0;padding-left:64px}
-.quote .q .by{font:500 13px/1 var(--mono);letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-top:16px;padding-left:64px}
-.quote .d{padding:24px 30px;background:linear-gradient(135deg,rgba(255,198,92,.13),rgba(255,107,214,.06));border:1px solid rgba(255,198,92,.28)}
-.quote .d .label{color:var(--amber)}
-.quote .d h3{font-size:28px;font-weight:600;letter-spacing:-.025em;margin-top:14px}
-.quote .d p{font-size:18px;color:var(--muted);margin-top:10px;line-height:1.45}
+.eq{display:grid;grid-template-columns:1fr 46px 1fr 46px 1fr;align-items:stretch;margin-top:34px}
+.op{display:grid;place-items:center}
+.op span{width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line2);display:grid;place-items:center;font-size:24px;color:var(--muted)}
+.rec{padding:24px 26px}
+.rec .hd{display:flex;align-items:center;gap:14px}
+.rec .hd .av{width:52px;height:52px;font-size:18px}
+.rec .hd .av.bot{background:#00a38d}
+.rec .hd .av.unit{background:#2e6b57}
+.rec .t{font-size:24px;font-weight:500;color:var(--ink);letter-spacing:-.02em}
+.rec .st{font-size:15px;color:var(--muted);margin-top:2px}
+.rec .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.rec .tags .tag{font-size:14.5px}
+.rec p{font-size:18px;line-height:1.5;color:var(--text);margin-top:18px}
+.row2{display:grid;grid-template-columns:1.55fr 1fr;gap:24px;margin-top:24px}
+.note .top{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line);font-size:16px;color:var(--ink)}
+.note .top b{font-weight:500}
+.note .top span{color:var(--muted);font-size:15px}
+.note .body{padding:18px 24px 22px;font-size:19.5px;line-height:1.55;color:var(--ink)}
+.callout{padding:22px 26px;border-left:4px solid var(--orange)}
+.callout h3{font-size:25px;font-weight:500;color:var(--ink);letter-spacing:-.02em;margin-top:12px}
+.callout p{font-size:17px;line-height:1.5;color:var(--text);margin-top:8px}
 
-/* ---------- 3 · what I do ---------- */
-.flow{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:18px;margin-top:58px}
-.flow::before{content:"";position:absolute;left:30px;right:30px;top:30px;height:2px;background:linear-gradient(90deg,var(--violet2),var(--cyan) 60%,var(--amber))}
-.step .num{position:relative;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font:600 18px/1 var(--mono);color:#0a0b14;background:var(--grad)}
-.step:nth-child(n+4) .num{background:linear-gradient(120deg,#3ee6f0,#ffd27a)}
-.step .card{margin-top:22px;padding:22px 20px 24px;min-height:208px}
-.step h4{font-size:27px;font-weight:600;letter-spacing:-.025em}
-.step p{font-size:17px;line-height:1.45;color:var(--muted);margin-top:10px}
-.step p b{color:var(--text);font-weight:500}
-.loop{display:flex;align-items:center;gap:12px;margin-top:22px;font:500 14px/1 var(--mono);letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
-.loop .ln{flex:1;height:1px;border-top:1.5px dashed rgba(255,255,255,.16)}
-.formula{margin-top:30px;padding:24px 30px;display:flex;align-items:center;gap:22px}
-.formula .label{color:var(--violet);flex:none;width:150px;line-height:1.5}
-.seg{flex:1;display:flex;align-items:center;gap:14px}
-.seg .s{flex:1;padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:21px;font-weight:600;letter-spacing:-.02em;text-align:center}
-.seg .s:last-child{background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(62,230,240,.18));border-color:rgba(155,140,255,.5)}
-.seg .p{font-size:28px;font-weight:300;color:var(--dim)}
+/* ---------- 3 · board ---------- */
+.board{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:34px}
+.col{background:#eaf0f6;border:1px solid var(--line);border-radius:12px;padding:12px}
+.col .ch{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 12px;font-size:15px;font-weight:600;color:var(--ink);text-transform:uppercase;letter-spacing:.04em}
+.col .ch span{font-weight:500;color:var(--muted);background:#fff;border:1px solid var(--line2);border-radius:999px;padding:1px 9px;font-size:13px;letter-spacing:0}
+.col .card{padding:16px 16px 18px;min-height:178px}
+.col h4{font-size:21px;font-weight:500;color:var(--ink);letter-spacing:-.02em}
+.col p{font-size:16px;line-height:1.48;color:var(--text);margin-top:8px}
+.col p b{font-weight:500;color:var(--ink)}
+.model{margin-top:26px;padding:20px 24px;display:flex;align-items:center;gap:20px}
+.model .lbl{width:130px;flex:none;font-weight:500;line-height:1.35}
+.model .seg{flex:1;display:flex;align-items:center;gap:12px}
+.model .s{flex:1;text-align:center;padding:14px 10px;border-radius:10px;background:#f5f8fa;border:1px solid var(--line);font-size:19px;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.model .s.last{background:#e5f8f6;border-color:#00bda5;color:#00664f}
+.model .p{font-size:22px;color:var(--faint)}
 
 /* ---------- 4 · lanes ---------- */
-.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:34px}
-.lane{padding:28px 30px 26px;display:flex;flex-direction:column;position:relative;overflow:hidden;min-height:486px}
-.lane .ic{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:rgba(155,140,255,.14);border:1px solid rgba(155,140,255,.35)}
-.lane.c .ic{background:rgba(62,230,240,.1);border-color:rgba(62,230,240,.35)}
-.lane.a .ic{background:rgba(255,198,92,.1);border-color:rgba(255,198,92,.35)}
-.lane h3{font-size:30px;font-weight:600;letter-spacing:-.03em;margin-top:18px}
-.lane .hero{position:relative;margin:-28px -30px 0;height:150px;overflow:hidden}
-.lane .hero img{width:100%;height:100%;object-fit:cover;display:block}
-.lane .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,10,20,0) 35%,rgba(9,10,20,.65) 75%,#0b0c17 100%)}
-.lane ul{list-style:none;margin-top:12px}
-.lane li{font-size:18px;color:#d4d6e6;padding:4px 0;display:flex;gap:12px;align-items:center}
-.lane .proof{margin-top:auto;padding-top:16px;border-top:1px solid var(--line)}
-.lane .proof .label{font-size:12px}
-.lane .proof .n{font-weight:600;font-size:44px;letter-spacing:-.04em;line-height:1;margin-top:12px}
-.lane .proof p{font-size:16.5px;color:var(--muted);line-height:1.45;margin-top:8px}
-.lane .glow{position:absolute;right:-120px;top:-120px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,.3),transparent 65%)}
-.lane.c .glow{background:radial-gradient(circle,rgba(62,230,240,.22),transparent 65%)}
-.lane.a .glow{background:radial-gradient(circle,rgba(255,198,92,.22),transparent 65%)}
-.through{margin-top:22px;display:flex;align-items:baseline;gap:22px}
-.through .label{color:var(--amber);flex:none}
-.through p{font-family:var(--serif);font-style:italic;font-size:27px;line-height:1.2;color:#f1eefe;white-space:nowrap}
+.lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:30px}
+.lane{overflow:hidden;display:flex;flex-direction:column}
+.lane img{width:100%;height:178px;object-fit:cover;display:block}
+.lane .bd{padding:20px 24px 22px;display:flex;flex-direction:column;flex:1}
+.lane h3{font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.02em;margin-top:12px}
+.lane ul{list-style:none;margin-top:10px}
+.lane li{font-size:16.5px;color:var(--text);padding:3px 0;display:flex;gap:10px;align-items:center}
+.lane li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--faint);flex:none}
+.lane .pr{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.lane .pr .n{font-size:40px;font-weight:500;letter-spacing:-.03em;color:var(--ink);line-height:1;margin-top:8px}
+.lane .pr p{font-size:15px;line-height:1.45;color:var(--text);margin-top:6px}
+.through{margin-top:22px;font-size:21px;color:var(--ink);letter-spacing:-.01em}
+.through b{font-weight:500;color:var(--moss)}
 
-/* ---------- 5 · evidence bento ---------- */
-.bento{display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr;grid-template-rows:262px 262px;gap:20px;margin-top:36px}
-.tile{padding:26px 26px 24px;display:flex;flex-direction:column;position:relative;overflow:hidden}
-.tile .n{font-weight:600;font-size:66px;letter-spacing:-.05em;line-height:1}
-.tile .t{font-size:19px;font-weight:500;margin-top:14px;letter-spacing:-.01em;line-height:1.3}
-.tile .s{font-size:15.5px;color:var(--muted);line-height:1.45;margin-top:8px}
-.tile .label{margin-top:auto;font-size:11.5px}
-.tile.hero{grid-row:span 2;padding:34px 34px 30px}
-.tile.hero .n{font-size:190px;letter-spacing:-.07em;line-height:.85;margin-top:8px}
-.tile.hero .t{font-size:26px;letter-spacing:-.02em;margin-top:22px}
-.tile.hero .s{font-size:18px}
-.tile.hero .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
-.tile.hero .chip{font-size:14px;padding:7px 12px}
-.tile .bar{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad)}
-.tile.w .bar{background:linear-gradient(180deg,#ffd27a,#ff9ec7)}
-.note{margin-top:16px;font:400 13px/1 var(--mono);letter-spacing:.06em;color:var(--dim)}
+/* ---------- 5 · dashboard ---------- */
+.dash{display:grid;grid-template-columns:400px 1fr 1fr 1fr;grid-template-rows:262px 262px;gap:18px;margin-top:30px}
+.photo{grid-row:span 2;position:relative;border-radius:12px;overflow:hidden}
+.photo .ph{position:absolute;inset:0}
+.photo .ph img{width:100%;height:100%;object-fit:cover}
+.photo .ph .shade{background:linear-gradient(0deg,rgba(14,28,22,.72) 0,rgba(14,28,22,.25) 45%,rgba(14,28,22,0) 70%)}
+.photo .tx{position:absolute;left:26px;right:26px;bottom:24px;color:#fff}
+.photo .tx .n{font-size:118px;font-weight:500;letter-spacing:-.05em;line-height:.9}
+.photo .tx .t{font-size:22px;font-weight:500;margin-top:10px;letter-spacing:-.01em}
+.photo .tx .s{font-size:16px;margin-top:6px;opacity:.92;line-height:1.45}
+.photo .tag{position:absolute;left:24px;top:22px}
+.rep{padding:20px 22px;display:flex;flex-direction:column}
+.rep .rt{font-size:16px;font-weight:500;color:var(--ink)}
+.rep .rs{font-size:13.5px;color:var(--muted);margin-top:3px}
+.rep .n{font-size:54px;font-weight:500;letter-spacing:-.04em;color:var(--ink);line-height:1;margin-top:22px}
+.rep .d{font-size:15px;line-height:1.45;color:var(--text);margin-top:10px}
+.rep .tag{margin-top:auto;align-self:flex-start;font-size:13px;padding:3px 9px}
+.note2{margin-top:14px;font-size:14px;color:var(--muted)}
 
 /* ---------- 6 · failure ---------- */
-.inc{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:36px}
-.ic2{padding:26px 30px 26px;display:grid;grid-template-columns:1fr;position:relative}
-.ic2 .concept{display:inline-flex;align-self:start;justify-self:start;align-items:center;gap:9px;padding:8px 14px;border-radius:999px;font:600 13px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#0a0b14;background:var(--grad)}
-.ic2.w .concept{background:linear-gradient(100deg,#ffd27a,#ff9ec7)}
-.ic2 h4{font-size:28px;font-weight:600;letter-spacing:-.025em;margin-top:16px}
-.ic2 .row{display:grid;grid-template-columns:96px 1fr;gap:14px;margin-top:12px;font-size:17.5px;line-height:1.45}
-.ic2 .row span{font:500 12px/1.9 var(--mono);letter-spacing:.14em;color:var(--dim);text-transform:uppercase}
-.ic2 .row p{color:#cfd2e3}
-.ic2 .row.r p{color:var(--text);font-weight:500}
-.wiki{margin-top:22px;display:flex;align-items:center;gap:14px;font-size:19px;color:var(--muted)}
-.wiki a{color:var(--text);border-bottom:1px solid rgba(155,140,255,.6)}
+.fail{display:grid;grid-template-columns:1fr 1fr 360px;grid-template-rows:1fr 1fr;gap:18px;margin-top:30px;height:572px}
+.inc{padding:20px 24px}
+.inc h4{font-size:23px;font-weight:500;color:var(--ink);letter-spacing:-.02em;margin-top:12px;line-height:1.25}
+.inc .r{display:grid;grid-template-columns:62px 1fr;gap:10px;margin-top:12px;font-size:16.5px;line-height:1.45}
+.inc .r span{font-size:13px;color:var(--muted);line-height:1.75}
+.inc .r p{color:var(--text)}
+.inc .r.did p{color:var(--ink);font-weight:500}
+.stone{grid-column:3;grid-row:1 / span 2;position:relative;border-radius:12px;overflow:hidden}
+.stone .ph{position:absolute;inset:0} .stone .ph img{width:100%;height:100%;object-fit:cover}
+.stone .ph .shade{background:linear-gradient(0deg,rgba(255,255,255,.94) 0,rgba(255,255,255,.8) 27%,rgba(255,255,255,0) 50%)}
+.stone .tx{position:absolute;left:24px;right:24px;bottom:22px}
+.stone .tx h4{font-size:22px;font-weight:500;color:var(--ink);letter-spacing:-.02em}
+.stone .tx p{font-size:15.5px;line-height:1.45;color:var(--text);margin-top:6px}
+.stone .tx a{display:inline-block;margin-top:10px;font-size:15.5px;color:var(--teal);font-weight:500}
 
 /* ---------- 7 · roles ---------- */
-.clusters{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:36px}
-.cl{padding:26px 26px 22px}
-.cl .label{display:flex;align-items:center;gap:10px;color:var(--text);font-size:13.5px}
-.cl .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
-.cl .chip{font-size:16.5px;padding:10px 15px;background:rgba(155,140,255,.08);border-color:rgba(155,140,255,.28)}
-.cl.c .chip{background:rgba(62,230,240,.06);border-color:rgba(62,230,240,.26)}
-.cl.a .chip{background:rgba(255,198,92,.06);border-color:rgba(255,198,92,.26)}
-.test{margin-top:24px;padding:26px 30px;display:grid;grid-template-columns:120px 1fr;row-gap:20px;column-gap:24px;align-items:center}
-.test .label{line-height:1.5}
-.test .good{color:#5cffb0}
-.test .bad{color:#ff8a9a}
-.fl{display:flex;flex-wrap:nowrap;align-items:center;gap:5px}
-.fl .chip{font-size:15px;padding:8px 12px}
-.fl svg.ar{color:var(--dim);width:15px;height:15px}
-.test .no{font-size:19px;color:var(--muted);line-height:1.45}
-.terms{display:flex;gap:10px;margin-top:22px}
-.terms .chip{font:500 13px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:11px 16px}
+.clusters{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:30px}
+.cl{padding:22px 24px}
+.cl .hd{display:flex;align-items:center;justify-content:space-between}
+.cl .hd b{font-size:19px;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.cl .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.fit{margin-top:20px;padding:20px 24px;display:grid;grid-template-columns:110px 1fr;row-gap:14px;column-gap:18px;align-items:center}
+.fit .k{font-size:15px;font-weight:500}
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.flow .tag{font-size:14.5px;padding:5px 10px}
+.flow svg{width:14px;height:14px;color:var(--faint);flex:none}
+.fit .no{font-size:17px;color:var(--text)}
+.terms{display:flex;gap:10px;margin-top:18px}
 
 /* ---------- 8 · close ---------- */
-.close h2{font-size:118px;line-height:.95;letter-spacing:-.055em;margin-top:40px;max-width:1100px}
-.close .sub{font-size:30px;color:var(--muted);margin-top:30px;letter-spacing:-.01em}
-.close .ask{font-size:27px;line-height:1.45;margin-top:22px;max-width:980px;color:#e6e7f3}
-.links{position:absolute;left:0;right:0;bottom:84px;display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-.lk{padding:20px 22px;display:block;background:rgba(9,10,22,.72)}
-.lk .label{font-size:11.5px}
-.lk .v{font-size:18px;font-weight:500;margin-top:12px;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;white-space:nowrap}
-.lk.main{background:linear-gradient(135deg,rgba(124,92,255,.45),rgba(62,230,240,.22));border-color:rgba(155,140,255,.6)}
-.lk.main .label{color:#e2dcff}
+.s8 h2{font-size:92px;line-height:1;letter-spacing:-.045em;margin-top:70px;max-width:none;color:#152430}
+.s8 .sub{font-size:26px;color:var(--ink);margin-top:24px}
+.s8 .ask{font-size:21px;line-height:1.5;color:var(--text);margin-top:14px;max-width:820px}
+.links2{position:absolute;left:0;right:0;bottom:76px;display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr 1fr;gap:14px}
+.lk{padding:16px 20px;display:block;background:#fff}
+.lk .lbl{font-size:13.5px}
+.lk .v{font-size:17px;font-weight:500;color:var(--ink);margin-top:6px;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.lk .v svg{width:13px;height:13px;color:var(--teal)}
+.lk.main{background:var(--dark);border-color:var(--dark)} .lk.main .lbl{color:#b9c6d4} .lk.main .v{color:#fff}
+.foot{position:absolute;left:0;right:0;bottom:30px;display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink)}
 </style>
 </head>
 <body>
-
-<!-- shared defs -->
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <symbol id="arr" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="out" viewBox="0 0 24 24"><path d="M8 16L16 8M9 8h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  </defs>
-</svg>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="arr" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="out" viewBox="0 0 24 24"><path d="M8 16L16 8M9 8h7v7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</defs></svg>
 
 <!-- ============ 1 · COVER ============ -->
-<section class="slide cover">
-  <div class="art bake"><img src="art/cover.jpg" alt="" style="left:64px;top:-34px;width:1600px;height:900px">
-    <div class="shade" style="background:linear-gradient(180deg,rgba(5,6,12,.75) 0,rgba(5,6,12,0) 120px),linear-gradient(90deg,#05060c 0%,#05060c 5%,rgba(5,6,12,.86) 30%,rgba(5,6,12,.3) 50%,rgba(5,6,12,0) 62%),linear-gradient(0deg,#05060c 0%,rgba(5,6,12,.82) 15%,rgba(5,6,12,0) 32%)"></div></div>
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="a1" cx="1240" cy="380" r="560" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".42"/><stop offset=".55" stop-color="#3b2a9e" stop-opacity=".12"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="a2" cx="1480" cy="40" r="420" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3ee6f0" stop-opacity=".28"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="a3" cx="120" cy="980" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffc65c" stop-opacity=".16"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#a1)"/><rect width="1600" height="900" fill="url(#a2)"/><rect width="1600" height="900" fill="url(#a3)"/>
-  </svg>
+<section class="slide s1">
+  <div class="art bake" style="background:#e3e9ec">
+    <img src="art/l-cover.jpg" alt="" style="left:0;top:150px;width:1600px;height:900px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 200px);mask-image:linear-gradient(180deg,transparent 0,#000 200px)">
+    <div class="shade" style="background:linear-gradient(0deg,rgba(18,30,28,.62) 0,rgba(18,30,28,.25) 150px,rgba(18,30,28,0) 260px)"></div>
+  </div>
   <div class="content">
-    <div class="top">
-      <div class="brand"><span class="mark">ER</span>Elena Revicheva</div>
-      <div class="pg">Professional Outlook · <b>October 2026</b></div>
+    <div class="nav">
+      <div class="brand"><span class="av">ER</span>Elena Revicheva</div>
+      <div class="links"><span>Operating model</span><span>Lanes</span><span>Evidence</span><span>Roles</span></div>
+      <div class="right"><a href="https://aideazz.xyz/portfolio">Portfolio</a><a class="btn" href="mailto:aipa@aideazz.xyz">Get in touch</a></div>
     </div>
-
-    <div class="left">
-      <div class="chips">
-        <span class="chip"><span class="dot g"></span>Open to remote roles</span>
-        <span class="chip">Panama · UTC−5</span>
-        <span class="chip">AI-native since May 2025</span>
-      </div>
-      <h1><span data-g="silver">Elena</span><br><span data-g="silver">Revicheva</span></h1>
-      <div class="role"><b class="grad" data-g="cool">AI-native systems operator</b> · product builder · executive leader</div>
+    <div class="hero">
+      <span class="tag ok"><span class="dot"></span>Open to remote roles · Panama, UTC−5</span>
+      <h1>Elena Revicheva</h1>
+      <p class="sub">AI-native systems operator, product builder and executive leader.</p>
       <p class="thesis">I design the system, direct AI-assisted implementation, ship it, operate it — and own the outcome.</p>
+      <div class="cta">
+        <a class="btn" href="https://aideazz.xyz/portfolio">View portfolio <svg><use href="#chev"/></svg></a>
+        <a class="mail" href="mailto:aipa@aideazz.xyz">aipa@aideazz.xyz</a>
+      </div>
     </div>
-    <div class="kpis">
-      <div class="kpi"><div class="n grad" data-g="cool">15</div><div class="l">production services I run, all auto-restart</div></div>
-      <div class="kpi"><div class="n grad" data-g="cool">2,800+</div><div class="l">CRM deals created &amp; attributed by my agents</div></div>
-      <div class="kpi"><div class="n grad" data-g="cool">8</div><div class="l">published AI films from my own creative universe</div></div>
-      <div class="kpi"><div class="n grad" data-g="cool">7 yrs</div><div class="l">Deputy CEO &amp; Chief Legal Officer</div></div>
+    <div class="stats">
+      <div><div class="l">Production services</div><div class="n">15</div></div>
+      <div><div class="l">CRM deals run by agents</div><div class="n">2,800+</div></div>
+      <div><div class="l">Published AI films</div><div class="n">8</div></div>
+      <div><div class="l">Years as Deputy CEO &amp; CLO</div><div class="n">7</div></div>
     </div>
   </div>
 </section>
 
 <!-- ============ 2 · OPERATING UNIT ============ -->
 <section class="slide">
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="b1" cx="1500" cy="560" r="560" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3ee6f0" stop-opacity=".18"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="b2" cx="200" cy="-60" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".26"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#b1)"/><rect width="1600" height="900" fill="url(#b2)"/>
-  </svg>
+  <div class="art bake"><img src="art/l-water.jpg" alt="" style="left:0;top:0;width:1600px;height:900px">
+    <div class="shade" style="background:rgba(245,248,250,.35)"></div></div>
   <div class="content">
-    <div class="top"><div class="brand"><span class="mark">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>02 / 08</b></div></div>
-    <div class="tag">01 · The operating model</div>
-    <h2 style="font-size:57px;max-width:none">Not a candidate plus tools. <span class="it" data-g="cool">One AI-native operating unit.</span></h2>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>02 / 08</b></div></div>
+    <div class="eyebrow">The operating model</div>
+    <h2 style="max-width:none;font-size:48px">Not a candidate plus tools. <em>One AI-native operating unit.</em></h2>
 
     <div class="eq">
-      <div class="card eqc">
-        <div class="label">Elena · owns the decisions</div>
-        <div class="who">Judgment &amp; ownership</div>
-        <div class="what">What should exist, how it must behave, and whether it actually worked.</div>
-        <div class="chips">
-          <span class="chip"><span class="dot"></span>Requirements</span><span class="chip"><span class="dot"></span>Architecture</span>
-          <span class="chip"><span class="dot"></span>Orchestration</span><span class="chip"><span class="dot"></span>Evaluation</span>
-          <span class="chip"><span class="dot"></span>Deployment</span><span class="chip"><span class="dot"></span>Monitoring</span>
-          <span class="chip"><span class="dot"></span>Production decisions</span>
-        </div>
+      <div class="card rec">
+        <div class="hd"><span class="av">ER</span><div><div class="t">Elena</div><div class="st">Owns the decisions</div></div></div>
+        <p>What should exist, how it must behave, and whether it actually worked.</p>
+        <div class="tags"><span class="tag">Requirements</span><span class="tag">Architecture</span><span class="tag">Orchestration</span><span class="tag">Evaluation</span><span class="tag">Deployment</span><span class="tag">Monitoring</span><span class="tag">Production decisions</span></div>
       </div>
-      <div class="op">+</div>
-      <div class="card eqc">
-        <div class="label">AIPA · executes at scale</div>
-        <div class="who">Agents &amp; infrastructure</div>
-        <div class="what">Implementation code, research, drafting, media generation and scheduled operations.</div>
-        <div class="chips">
-          <span class="chip"><span class="dot c"></span>Claude Code</span><span class="chip"><span class="dot c"></span>Cursor</span>
-          <span class="chip"><span class="dot c"></span>Specialised agents</span><span class="chip"><span class="dot c"></span>5-provider LLM fallback</span>
-          <span class="chip"><span class="dot c"></span>15 services · 20 scheduled jobs</span>
-        </div>
+      <div class="op"><span>+</span></div>
+      <div class="card rec">
+        <div class="hd"><span class="av bot">AI</span><div><div class="t">AIPA</div><div class="st">Executes at scale</div></div></div>
+        <p>Implementation code, research, drafting, media generation and scheduled operations.</p>
+        <div class="tags"><span class="tag info">Claude Code</span><span class="tag info">Cursor</span><span class="tag info">Specialised agents</span><span class="tag info">5-provider LLM fallback</span><span class="tag info">15 services · 20 scheduled jobs</span></div>
       </div>
-      <div class="op">=</div>
-      <div class="card eqc unit gborder">
-        <div class="label" style="color:#cfc4ff">The unit · ships and stays accountable</div>
-        <div class="who"><span class="grad" data-g="cool">Shipped, monitored</span><br><span class="grad" data-g="cool">systems</span></div>
-        <p class="big">From an ambiguous problem to a deployed, measurable result — with one named owner who answers for it in production.</p>
+      <div class="op"><span>=</span></div>
+      <div class="card rec">
+        <div class="hd"><span class="av unit">E+A</span><div><div class="t">The unit</div><div class="st">Ships and stays accountable</div></div></div>
+        <div class="tags"><span class="tag ok"><span class="dot"></span>Live in production</span><span class="tag">One named owner</span></div>
+        <p>From an ambiguous problem to a deployed, measurable result — with one named owner who answers for it in production.</p>
       </div>
     </div>
 
-    <div class="quote">
-      <div class="card q">
-        <span class="mk">“</span>
-        <p>I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions.</p>
-        <div class="by">How I work</div>
+    <div class="row2">
+      <div class="card note">
+        <div class="top"><b>Note · How I work</b><span>Elena Revicheva · Oct 1, 2026</span></div>
+        <div class="body">I operate an AI-native development environment where specialized agents handle much of the implementation execution. I own requirements, architecture, orchestration, evaluation, deployment, monitoring and production decisions.</div>
       </div>
-      <div class="card d">
-        <div class="label">The distinction</div>
+      <div class="card callout">
+        <span class="tag hot">The distinction</span>
         <h3>I don’t sell unaided typing speed.</h3>
         <p>I own the decisions that determine what gets built, what ships, how it behaves — and what happens when it fails.</p>
       </div>
@@ -335,39 +283,28 @@ svg.ar{width:18px;height:18px;flex:none}
 
 <!-- ============ 3 · WHAT I DO ============ -->
 <section class="slide">
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="c1" cx="800" cy="1020" r="720" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".3"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="c2" cx="1560" cy="120" r="380" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffc65c" stop-opacity=".14"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#c1)"/><rect width="1600" height="900" fill="url(#c2)"/>
-  </svg>
+  <div class="art bake" style="background:#e9eeee"><img src="art/l-river.jpg" alt="" style="left:0;top:40px;width:1600px;height:900px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 260px);mask-image:linear-gradient(180deg,transparent 0,#000 260px)"></div>
   <div class="content">
-    <div class="top"><div class="brand"><span class="mark">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>03 / 08</b></div></div>
-    <div class="tag c">02 · What I actually do</div>
-    <h2>I turn ambiguous business and creative problems into <span class="it" data-g="cool">working AI-native systems.</span></h2>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>03 / 08</b></div></div>
+    <div class="eyebrow">What I actually do</div>
+    <h2>I turn ambiguous business and creative problems into <em>working AI-native systems.</em></h2>
 
-    <div class="flow">
-      <div class="step"><div class="num">01</div><div class="card"><h4>Define</h4><p>The problem and the <b>measurable outcome</b> it must move.</p></div></div>
-      <div class="step"><div class="num">02</div><div class="card"><h4>Map</h4><p>Workflow, handoffs, controls and <b>failure points</b>.</p></div></div>
-      <div class="step"><div class="num">03</div><div class="card"><h4>Choose</h4><p>Models, APIs, tools, data — and where <b>a human must approve</b>.</p></div></div>
-      <div class="step"><div class="num">04</div><div class="card"><h4>Direct</h4><p>Implementation through AI coding agents: <b>Claude Code, Cursor</b>.</p></div></div>
-      <div class="step"><div class="num">05</div><div class="card"><h4>Evaluate</h4><p>Test behaviour, score outputs, <b>reject changes that make it worse</b>.</p></div></div>
-      <div class="step"><div class="num">06</div><div class="card"><h4>Operate</h4><p>Deploy, monitor, diagnose failures, <b>iterate from production evidence</b>.</p></div></div>
-    </div>
-    <div class="loop">
-      <svg class="ar" style="transform:scaleX(-1);color:var(--cyan)"><use href="#arr"/></svg>
-      <span>Production evidence feeds the next decision</span><span class="ln"></span>
+    <div class="board">
+      <div class="col"><div class="ch">Define <span>01</span></div><div class="card"><h4>The outcome</h4><p>The problem and the <b>measurable result</b> it must move.</p></div></div>
+      <div class="col"><div class="ch">Map <span>02</span></div><div class="card"><h4>The workflow</h4><p>Handoffs, controls and <b>failure points</b>.</p></div></div>
+      <div class="col"><div class="ch">Choose <span>03</span></div><div class="card"><h4>The parts</h4><p>Models, APIs, tools, data — and where <b>a human must approve</b>.</p></div></div>
+      <div class="col"><div class="ch">Direct <span>04</span></div><div class="card"><h4>The build</h4><p>Implementation through AI coding agents: <b>Claude Code, Cursor</b>.</p></div></div>
+      <div class="col"><div class="ch">Evaluate <span>05</span></div><div class="card"><h4>The proof</h4><p>Test behaviour, score outputs, <b>reject changes that make it worse</b>.</p></div></div>
+      <div class="col"><div class="ch">Operate <span>06</span></div><div class="card"><h4>The run</h4><p>Deploy, monitor, diagnose, <b>iterate from production evidence</b>.</p></div></div>
     </div>
 
-    <div class="card formula">
-      <div class="label">My development model</div>
+    <div class="card model">
+      <div class="lbl">My development model</div>
       <div class="seg">
         <div class="s">Technical direction</div><div class="p">+</div>
         <div class="s">Architecture</div><div class="p">+</div>
         <div class="s">AI-assisted implementation</div><div class="p">+</div>
-        <div class="s">Production ownership</div>
+        <div class="s last">Production ownership</div>
       </div>
     </div>
   </div>
@@ -375,280 +312,174 @@ svg.ar{width:18px;height:18px;flex:none}
 
 <!-- ============ 4 · LANES ============ -->
 <section class="slide">
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="d1" cx="-80" cy="420" r="560" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".22"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="d2" cx="1680" cy="760" r="560" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffc65c" stop-opacity=".14"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#d1)"/><rect width="1600" height="900" fill="url(#d2)"/>
-  </svg>
+  <div class="art bake"><img src="art/l-water.jpg" alt="" style="left:0;top:0;width:1600px;height:900px">
+    <div class="shade" style="background:rgba(245,248,250,.58)"></div></div>
   <div class="content">
-    <div class="top"><div class="brand"><span class="mark">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>04 / 08</b></div></div>
-    <div class="tag">03 · Where I create the most value</div>
-    <h2>Three lanes. <span class="it" data-g="cool">One pattern underneath.</span></h2>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>04 / 08</b></div></div>
+    <div class="eyebrow">Where I create the most value</div>
+    <h2>Three lanes. <em>One pattern underneath.</em></h2>
 
     <div class="lanes">
       <div class="card lane">
-        <div class="hero bake"><img src="art/ops.jpg" alt=""></div>
-        <h3>AI Operations</h3>
-        <ul>
-          <li><span class="dot"></span>Workflow discovery &amp; automation</li>
-          <li><span class="dot"></span>Agent orchestration</li>
-          <li><span class="dot"></span>CRM &amp; pipeline operations</li>
-          <li><span class="dot"></span>Monitoring &amp; feedback loops</li>
-        </ul>
-        <div class="proof">
-          <div class="label">Proof in production</div>
-          <div class="n grad" data-g="cool">2,800+</div>
-          <p>deals, 1,300+ contacts and 2,100+ companies attributed by agents in HubSpot — research, qualify, draft, one human tap, send.</p>
+        <img src="art/l-ops.jpg" alt="">
+        <div class="bd">
+          <div><span class="tag">Lane 01</span></div>
+          <h3>AI Operations</h3>
+          <ul><li>Workflow discovery &amp; automation</li><li>Agent orchestration</li><li>CRM &amp; pipeline operations</li><li>Monitoring &amp; feedback loops</li></ul>
+          <div class="pr"><div class="lbl">Proof in production</div><div class="n">2,800+</div>
+            <p>deals, 1,300+ contacts and 2,100+ companies attributed by agents in HubSpot — research, qualify, draft, one human tap, send.</p></div>
         </div>
       </div>
-      <div class="card lane c">
-        <div class="hero bake"><img src="art/product.jpg" alt=""></div>
-        <h3>AI Product &amp; Transformation</h3>
-        <ul>
-          <li><span class="dot c"></span>Prototype the experience</li>
-          <li><span class="dot c"></span>Connect systems &amp; deploy</li>
-          <li><span class="dot c"></span>Organise operations around it</li>
-          <li><span class="dot c"></span>Improve from evidence</li>
-        </ul>
-        <div class="proof">
-          <div class="label">Proof in production</div>
-          <div class="n grad" data-g="cool">420+</div>
-          <p>audits across 210+ sites by my AI Visibility Audit API — a live public product scoring how ChatGPT, Perplexity and Claude see a business.</p>
+      <div class="card lane">
+        <img src="art/l-product.jpg" alt="">
+        <div class="bd">
+          <div><span class="tag">Lane 02</span></div>
+          <h3>AI Product &amp; Transformation</h3>
+          <ul><li>Prototype the experience</li><li>Connect systems &amp; deploy</li><li>Organise operations around it</li><li>Improve from evidence</li></ul>
+          <div class="pr"><div class="lbl">Proof in production</div><div class="n">420+</div>
+            <p>audits across 210+ sites by my AI Visibility Audit API — a live public product scoring how ChatGPT, Perplexity and Claude see a business.</p></div>
         </div>
       </div>
-      <div class="card lane a">
-        <div class="hero bake"><img src="art/creative.jpg" alt=""></div>
-        <h3>Creative AI Systems</h3>
-        <ul>
-          <li><span class="dot a"></span>Concept, narrative &amp; world-building</li>
-          <li><span class="dot a"></span>Image · video · audio model orchestration</li>
-          <li><span class="dot a"></span>Production pipelines</li>
-          <li><span class="dot a"></span>Published experiences</li>
-        </ul>
-        <div class="proof">
-          <div class="label">Proof in production</div>
-          <div class="n warmn" data-g="warm">8 films</div>
-          <p>published from my ATUONA universe — 99 poems in Russian and English, made end to end by my own pipeline.</p>
+      <div class="card lane">
+        <img src="art/l-creative.jpg" alt="">
+        <div class="bd">
+          <div><span class="tag">Lane 03</span></div>
+          <h3>Creative AI Systems</h3>
+          <ul><li>Concept, narrative &amp; world-building</li><li>Image · video · audio orchestration</li><li>Production pipelines</li><li>Published experiences</li></ul>
+          <div class="pr"><div class="lbl">Proof in production</div><div class="n">8 films</div>
+            <p>published from my ATUONA universe — 99 poems in Russian and English, made end to end by my own pipeline.</p></div>
         </div>
       </div>
     </div>
-
-    <div class="through">
-      <div class="label">The through-line</div>
-      <p>I design intelligent systems and the experience around them — from the agents that run a business to the films they make.</p>
-    </div>
+    <p class="through"><b>The through-line:</b> I design intelligent systems and the experience around them — from the agents that run a business to the films they make.</p>
   </div>
 </section>
 
 <!-- ============ 5 · EVIDENCE ============ -->
 <section class="slide">
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="e1" cx="260" cy="620" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".3"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="e2" cx="1500" cy="-40" r="460" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3ee6f0" stop-opacity=".18"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#e1)"/><rect width="1600" height="900" fill="url(#e2)"/>
-  </svg>
+  <div class="art bake"><img src="art/l-water.jpg" alt="" style="left:0;top:0;width:1600px;height:900px;transform:scaleX(-1)">
+    <div class="shade" style="background:rgba(245,248,250,.58)"></div></div>
   <div class="content">
-    <div class="top"><div class="brand"><span class="mark">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>05 / 08</b></div></div>
-    <div class="tag c">04 · Evidence</div>
-    <h2>I operate systems, <span class="it" data-g="cool">not slides.</span></h2>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>05 / 08</b></div></div>
+    <div class="eyebrow">Evidence</div>
+    <h2>I operate systems, <em>not slides.</em></h2>
 
-    <div class="bento">
-      <div class="card tile hero gborder">
-        <div class="label" style="margin-top:0;color:#cfc4ff">Live on one cloud VM · $0/month</div>
-        <div class="n grad" data-g="cool">15</div>
-        <div class="t">long-running production services + 20 scheduled jobs</div>
-        <div class="s">All auto-restart. I am the architect and the on-call.</div>
-        <div class="chips">
-          <span class="chip"><span class="dot"></span>Research</span><span class="chip"><span class="dot c"></span>CRM</span><span class="chip"><span class="dot a"></span>Outreach</span>
-          <span class="chip"><span class="dot"></span>Content</span><span class="chip"><span class="dot c"></span>Evaluation</span><span class="chip"><span class="dot a"></span>Film</span>
-        </div>
+    <div class="dash">
+      <div class="photo">
+        <div class="ph bake"><img src="art/l-terraces.jpg" alt=""><div class="shade" style="position:absolute;inset:0"></div></div>
+        <span class="tag ok"><span class="dot"></span>Live · one cloud VM · $0/month</span>
+        <div class="tx"><div class="n">15</div><div class="t">long-running production services + 20 scheduled jobs</div><div class="s">All auto-restart. I am the architect and the on-call.</div></div>
       </div>
-      <div class="card tile"><span class="bar"></span>
-        <div class="n grad" data-g="cool">11,000+</div>
-        <div class="t">job opportunities processed</div>
-        <div class="s">LangGraph pipeline with human decision gates; learns hourly from my CRM decisions.</div>
-        <div class="label">Discovery &amp; qualification</div>
-      </div>
-      <div class="card tile"><span class="bar"></span>
-        <div class="n grad" data-g="cool">2,800+</div>
-        <div class="t">CRM deals run by agents</div>
-        <div class="s">1,300+ contacts · 2,100+ companies attributed in HubSpot. Sending is fail-closed.</div>
-        <div class="label">AI operations · RevOps</div>
-      </div>
-      <div class="card tile"><span class="bar"></span>
-        <div class="n grad" data-g="cool">420+</div>
-        <div class="t">AI-visibility audits</div>
-        <div class="s">14,000+ signals across 210+ sites. My own hub scores 100/100.</div>
-        <div class="label">GEO · AEO · Tech SEO</div>
-      </div>
-      <div class="card tile w"><span class="bar"></span>
-        <div class="n warmn" data-g="warm">8</div>
-        <div class="t">published AI films</div>
-        <div class="s"><i>Crimson Escape</i>: 3:36, 16 generated shots, mixed to −15.7 LUFS broadcast loudness.</div>
-        <div class="label">Creative AI production</div>
-      </div>
-      <div class="card tile"><span class="bar"></span>
-        <div class="n grad" data-g="cool">600+</div>
-        <div class="t">tests, under a minute</div>
-        <div class="s">Unit, integration and golden-set evals; a 5-provider LLM fallback chain.</div>
-        <div class="label">Reliability &amp; evaluation</div>
-      </div>
-      <div class="card tile w"><span class="bar"></span>
-        <div class="n warmn" data-g="warm">7 yrs</div>
-        <div class="t">Deputy CEO &amp; Chief Legal Officer</div>
-        <div class="s">Government digital-services operator: transformation, IT, governance.</div>
-        <div class="label">Executive foundation</div>
-      </div>
+      <div class="card rep"><div class="rt">Opportunities processed</div><div class="rs">LangGraph pipeline · human decision gates</div><div class="n">11,000+</div><div class="d">Learns hourly from the decisions I record in the CRM.</div><span class="tag">Discovery &amp; qualification</span></div>
+      <div class="card rep"><div class="rt">CRM deals run by agents</div><div class="rs">HubSpot · source attribution</div><div class="n">2,800+</div><div class="d">1,300+ contacts · 2,100+ companies. Sending is fail-closed.</div><span class="tag">AI operations · RevOps</span></div>
+      <div class="card rep"><div class="rt">AI-visibility audits</div><div class="rs">Public API · GEO / AEO</div><div class="n">420+</div><div class="d">14,000+ signals across 210+ sites. My own hub scores 100/100.</div><span class="tag">GEO · AEO · Tech SEO</span></div>
+      <div class="card rep"><div class="rt">Published AI films</div><div class="rs">ATUONA AI Film Studio</div><div class="n">8</div><div class="d"><i>Crimson Escape</i>: 3:36, 16 generated shots, mixed to −15.7 LUFS.</div><span class="tag">Creative AI production</span></div>
+      <div class="card rep"><div class="rt">Automated tests</div><div class="rs">Unit · integration · golden set</div><div class="n">600+</div><div class="d">Run in under a minute; a 5-provider LLM fallback chain.</div><span class="tag">Reliability &amp; evaluation</span></div>
+      <div class="card rep"><div class="rt">Executive foundation</div><div class="rs">Deputy CEO &amp; Chief Legal Officer</div><div class="n">7 yrs</div><div class="d">Government digital-services operator: transformation, IT, governance.</div><span class="tag">Leadership</span></div>
     </div>
-    <div class="note">All figures are floors from production logs and the live CRM API, counted 28–29 September 2026.</div>
+    <div class="note2">All figures are floors from production logs and the live CRM API, counted 28–29 September 2026.</div>
   </div>
 </section>
 
 <!-- ============ 6 · FAILURE ============ -->
 <section class="slide">
-  <div class="art bake"><img src="art/failure.jpg" alt="" style="left:400px;top:-290px;width:1460px;height:822px">
-    <div class="shade" style="background:linear-gradient(180deg,#05060c 0,rgba(5,6,12,.9) 70px,rgba(5,6,12,0) 150px),linear-gradient(180deg,rgba(5,6,12,0) 0%,rgba(5,6,12,.15) 18%,rgba(5,6,12,.9) 34%,#05060c 42%),linear-gradient(90deg,#05060c 0%,rgba(5,6,12,.95) 35%,rgba(5,6,12,.35) 62%,rgba(5,6,12,0) 78%)"></div></div>
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="f1" cx="1560" cy="300" r="560" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff6bd6" stop-opacity=".14"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="f2" cx="80" cy="900" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".24"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#f1)"/><rect width="1600" height="900" fill="url(#f2)"/>
-  </svg>
+  <div class="art bake"><img src="art/l-water.jpg" alt="" style="left:0;top:0;width:1600px;height:900px;transform:scaleY(-1)">
+    <div class="shade" style="background:rgba(245,248,250,.58)"></div></div>
   <div class="content">
-    <div class="top"><div class="brand"><span class="mark">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>06 / 08</b></div></div>
-    <div class="tag a">05 · Ownership under failure</div>
-    <h2>What I do when it breaks — <span class="it warm" data-g="warm">and what it’s called.</span></h2>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>06 / 08</b></div></div>
+    <div class="eyebrow">Ownership under failure</div>
+    <h2>What I do when it breaks — <em>and what it’s called.</em></h2>
 
-    <div class="inc">
-      <div class="card ic2">
-        <span class="concept">Silent failure</span>
+    <div class="fail">
+      <div class="card inc">
+        <span class="tag warn">Silent failure</span>
         <h4>An integration that never said it was broken</h4>
-        <div class="row"><span>Found</span><p>Trial sign-ups had never reached the CRM since launch — while the sender’s log looked healthy.</p></div>
-        <div class="row r"><span>Did</span><p>Audited from the receiving end, root-caused, fixed, and backfilled all 28 lost users.</p></div>
+        <div class="r"><span>Found</span><p>Trial sign-ups had never reached the CRM since launch, while the sender’s log looked healthy.</p></div>
+        <div class="r did"><span>Did</span><p>Audited from the receiving end, root-caused, fixed, backfilled all 28 lost users.</p></div>
       </div>
-      <div class="card ic2 w">
-        <span class="concept">Vacuous guard</span>
+      <div class="card inc">
+        <span class="tag warn">Vacuous guard</span>
         <h4>A spending cap that could never fire</h4>
-        <div class="row"><span>Found</span><p>The pre-render budget guard read a price field the vendor never sends — so every price passed.</p></div>
-        <div class="row r"><span>Did</span><p>Fixed the guard against the vendor’s real response and published the postmortem.</p></div>
+        <div class="r"><span>Found</span><p>The budget guard read a price field the vendor never sends, so every price passed.</p></div>
+        <div class="r did"><span>Did</span><p>Fixed it against the vendor’s real response and published the postmortem.</p></div>
       </div>
-      <div class="card ic2 w">
-        <span class="concept">Evaluation gate</span>
+      <div class="card inc">
+        <span class="tag info">Evaluation gate</span>
         <h4>The more complex model lost</h4>
-        <div class="row"><span>Found</span><p>A RAG upgrade to my screening judge scored lower on an evaluation set built from my own real decisions.</p></div>
-        <div class="row r"><span>Did</span><p>Shipped it switched off. Accuracy beats sophistication.</p></div>
+        <div class="r"><span>Found</span><p>A RAG upgrade to my screening judge scored lower on an evaluation set built from my real decisions.</p></div>
+        <div class="r did"><span>Did</span><p>Shipped it switched off. Accuracy beats sophistication.</p></div>
       </div>
-      <div class="card ic2">
-        <span class="concept">Graceful degradation</span>
+      <div class="card inc">
+        <span class="tag ok">Graceful degradation</span>
         <h4>A provider retired its models. Nothing went down.</h4>
-        <div class="row"><span>Found</span><p>A vendor deprecated the models my agents used.</p></div>
-        <div class="row r"><span>Did</span><p>The five-provider fallback chain kept the fleet serving — a config change, not an outage.</p></div>
+        <div class="r"><span>Found</span><p>A vendor deprecated the models my agents used.</p></div>
+        <div class="r did"><span>Did</span><p>The five-provider fallback chain kept the fleet serving — a config change, not an outage.</p></div>
+      </div>
+      <div class="stone">
+        <div class="ph bake"><img src="art/l-failure.jpg" alt=""><div class="shade" style="position:absolute;inset:0"></div></div>
+        <div class="tx"><h4>Kintsugi, not cover-ups</h4><p>The repair stays visible. Postmortems with named failure modes are published openly.</p><a href="https://aideazz.xyz/ai-ops-wiki.html">aideazz.xyz/ai-ops-wiki.html ↗</a></div>
       </div>
     </div>
-    <div class="wiki"><svg class="ar" style="color:var(--violet)"><use href="#arr"/></svg>Postmortems with named failure modes, published openly at <a href="https://aideazz.xyz/ai-ops-wiki.html">aideazz.xyz/ai-ops-wiki.html</a></div>
   </div>
 </section>
 
 <!-- ============ 7 · ROLES ============ -->
 <section class="slide">
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="g1" cx="800" cy="-140" r="700" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".26"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="g2" cx="1600" cy="900" r="460" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3ee6f0" stop-opacity=".14"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#g1)"/><rect width="1600" height="900" fill="url(#g2)"/>
-  </svg>
+  <div class="art bake" style="background:#eef1ef"><img src="art/l-hills.jpg" alt="" style="left:0;top:0;width:1600px;height:900px">
+    <div class="shade" style="background:rgba(245,248,250,.18)"></div></div>
   <div class="content">
-    <div class="top"><div class="brand"><span class="mark">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>07 / 08</b></div></div>
-    <div class="tag">06 · Where I fit</div>
-    <h2>The roles I’m <span class="it" data-g="cool">built for.</span></h2>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>07 / 08</b></div></div>
+    <div class="eyebrow">Where I fit</div>
+    <h2>The roles I’m <em>built for.</em></h2>
 
     <div class="clusters">
-      <div class="card cl">
-        <div class="label"><span class="dot"></span>AI operations &amp; implementation</div>
-        <div class="chips">
-          <span class="chip">AI Operations Lead</span><span class="chip">AI Implementation Lead</span><span class="chip">AI Automation Lead</span>
-          <span class="chip">AI Workflow Architect</span><span class="chip">AI Systems Operator</span><span class="chip">Agentic Workflow Designer</span>
-        </div>
-      </div>
-      <div class="card cl c">
-        <div class="label"><span class="dot c"></span>AI product &amp; transformation</div>
-        <div class="chips">
-          <span class="chip">AI Product &amp; Automation Lead</span><span class="chip">AI Transformation Lead</span><span class="chip">AI Innovation Lead</span>
-          <span class="chip">AI Adoption Lead</span><span class="chip">Generative AI Product Lead</span><span class="chip">AI Prototyping Lead</span>
-        </div>
-      </div>
-      <div class="card cl a">
-        <div class="label"><span class="dot a"></span>Creative technology</div>
-        <div class="chips">
-          <span class="chip">Creative Technologist — GenAI</span><span class="chip">Generative AI Producer</span>
-          <span class="chip">Creative AI Pipeline Builder</span><span class="chip">GenAI Production Lead</span><span class="chip">AI Innovation Producer</span>
-        </div>
-      </div>
+      <div class="card cl"><div class="hd"><b>AI operations &amp; implementation</b><span class="tag">6</span></div>
+        <div class="tags"><span class="tag">AI Operations Lead</span><span class="tag">AI Implementation Lead</span><span class="tag">AI Automation Lead</span><span class="tag">AI Workflow Architect</span><span class="tag">AI Systems Operator</span><span class="tag">Agentic Workflow Designer</span></div></div>
+      <div class="card cl"><div class="hd"><b>AI product &amp; transformation</b><span class="tag">6</span></div>
+        <div class="tags"><span class="tag">AI Product &amp; Automation Lead</span><span class="tag">AI Transformation Lead</span><span class="tag">AI Innovation Lead</span><span class="tag">AI Adoption Lead</span><span class="tag">Generative AI Product Lead</span><span class="tag">AI Prototyping Lead</span></div></div>
+      <div class="card cl"><div class="hd"><b>Creative technology</b><span class="tag">5</span></div>
+        <div class="tags"><span class="tag">Creative Technologist — GenAI</span><span class="tag">Generative AI Producer</span><span class="tag">Creative AI Pipeline Builder</span><span class="tag">GenAI Production Lead</span><span class="tag">AI Innovation Producer</span></div></div>
     </div>
 
-    <div class="card test">
-      <div class="label good">Good fit</div>
-      <div class="fl">
-        <span class="chip">Business problem</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">Process</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">System design</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">AI &amp; tools</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">Implementation</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">Deployment</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">People</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">Metrics</span><svg class="ar"><use href="#arr"/></svg>
-        <span class="chip">Iteration</span>
+    <div class="card fit">
+      <div class="k" style="color:#00806f">Good fit</div>
+      <div class="flow">
+        <span class="tag ok">Business problem</span><svg><use href="#arr"/></svg><span class="tag ok">Process</span><svg><use href="#arr"/></svg>
+        <span class="tag ok">System design</span><svg><use href="#arr"/></svg><span class="tag ok">AI &amp; tools</span><svg><use href="#arr"/></svg>
+        <span class="tag ok">Implementation</span><svg><use href="#arr"/></svg><span class="tag ok">Deployment</span><svg><use href="#arr"/></svg>
+        <span class="tag ok">People</span><svg><use href="#arr"/></svg><span class="tag ok">Metrics</span><svg><use href="#arr"/></svg><span class="tag ok">Iteration</span>
       </div>
-      <div class="label bad">Not my fit</div>
+      <div class="k" style="color:#c93b2a">Not my fit</div>
       <div class="no">Roles whose core value is unaided coding, algorithm drills or live coding — or proving the work can be done without AI.</div>
     </div>
 
     <div class="terms">
-      <span class="chip"><span class="dot g"></span>Fully remote</span>
-      <span class="chip">Panama · UTC−5 · overlaps US Eastern &amp; Central</span>
-      <span class="chip">LATAM-friendly teams</span>
-      <span class="chip">English · Russian</span>
+      <span class="tag ok"><span class="dot"></span>Fully remote</span>
+      <span class="tag">Panama · UTC−5 · overlaps US Eastern &amp; Central</span>
+      <span class="tag">LATAM-friendly teams</span>
+      <span class="tag">English · Russian</span>
     </div>
   </div>
 </section>
 
 <!-- ============ 8 · CLOSE ============ -->
-<section class="slide close">
-  <div class="art bake"><img src="art/close.jpg" alt="" style="left:175px;top:0;width:1600px;height:900px">
-    <div class="shade" style="background:linear-gradient(90deg,#05060c 0%,#05060c 4%,rgba(5,6,12,.88) 34%,rgba(5,6,12,.35) 56%,rgba(5,6,12,0) 68%),linear-gradient(0deg,#05060c 0%,rgba(5,6,12,.85) 14%,rgba(5,6,12,0) 30%)"></div></div>
-  <svg class="grain"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
-  <svg class="aura" viewBox="0 0 1600 900" preserveAspectRatio="none">
-    <defs>
-      <radialGradient id="h1" cx="1300" cy="200" r="620" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c5cff" stop-opacity=".4"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="h2" cx="1560" cy="760" r="420" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffc65c" stop-opacity=".2"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-      <radialGradient id="h3" cx="900" cy="520" r="520" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3ee6f0" stop-opacity=".1"/><stop offset="1" stop-color="#05060c" stop-opacity="0"/></radialGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#h1)"/><rect width="1600" height="900" fill="url(#h2)"/><rect width="1600" height="900" fill="url(#h3)"/>
-  </svg>
+<section class="slide s8">
+  <div class="art bake" style="background:#e8edee"><img src="art/l-close.jpg" alt="" style="left:0;top:0;width:1600px;height:900px">
+    <div class="shade" style="background:linear-gradient(90deg,rgba(245,248,250,.82) 0,rgba(245,248,250,.55) 38%,rgba(245,248,250,0) 62%),linear-gradient(0deg,rgba(245,248,250,.5) 0,rgba(245,248,250,0) 180px)"></div></div>
   <div class="content">
-    <div class="top"><div class="brand"><span class="mark">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>08 / 08</b></div></div>
-    <h2>AI-native systems <span class="it" data-g="cool">ownership.</span></h2>
-    <div class="sub">Former executive. Hands-on builder. Production operator. Creative technologist.</div>
+    <div class="nav"><div class="brand"><span class="av">ER</span>Elena Revicheva</div><div class="pg">Professional Outlook · <b>08 / 08</b></div></div>
+    <h2>AI-native systems<br><em>ownership.</em></h2>
+    <p class="sub">Former executive. Hands-on builder. Production operator. Creative technologist.</p>
     <p class="ask">I’m looking for a team that wants someone to own the path from an ambiguous problem to a deployed, measurable AI system.</p>
 
-    <div class="links">
-      <a class="card lk main" href="mailto:aipa@aideazz.xyz"><div class="label">Email</div><div class="v">aipa@aideazz.xyz</div></a>
-      <a class="card lk" href="https://aideazz.xyz/portfolio"><div class="label">Portfolio</div><div class="v">aideazz.xyz/portfolio <svg class="ar"><use href="#out"/></svg></div></a>
-      <a class="card lk" href="https://linkedin.com/in/elenarevicheva"><div class="label">LinkedIn</div><div class="v">in/elenarevicheva <svg class="ar"><use href="#out"/></svg></div></a>
-      <a class="card lk" href="https://atuona.xyz/aifilmstudio/"><div class="label">AI films</div><div class="v">atuona.xyz/aifilmstudio <svg class="ar"><use href="#out"/></svg></div></a>
-      <a class="card lk" href="https://aideazz.xyz/ai-ops-wiki.html"><div class="label">Postmortems</div><div class="v">AI Ops Wiki <svg class="ar"><use href="#out"/></svg></div></a>
+    <div class="links2">
+      <a class="card lk main" href="mailto:aipa@aideazz.xyz"><div class="lbl">Email</div><div class="v">aipa@aideazz.xyz</div></a>
+      <a class="card lk" href="https://aideazz.xyz/portfolio"><div class="lbl">Portfolio</div><div class="v">aideazz.xyz/portfolio <svg><use href="#out"/></svg></div></a>
+      <a class="card lk" href="https://linkedin.com/in/elenarevicheva"><div class="lbl">LinkedIn</div><div class="v">in/elenarevicheva <svg><use href="#out"/></svg></div></a>
+      <a class="card lk" href="https://atuona.xyz/aifilmstudio/"><div class="lbl">AI films</div><div class="v">atuona.xyz/aifilmstudio <svg><use href="#out"/></svg></div></a>
+      <a class="card lk" href="https://aideazz.xyz/ai-ops-wiki.html"><div class="lbl">Postmortems</div><div class="v">AI Ops Wiki <svg><use href="#out"/></svg></div></a>
     </div>
-    <div class="foot"><span>Panama · Remote · UTC−5</span><span>Imagery generated on my ATUONA pipeline — GPT Image 2 · Seedream 5 Pro · Flux 2 Max</span></div>
+    <div class="foot"><span>Panama · Remote · UTC−5</span><span>All imagery generated on my ATUONA pipeline — GPT Image 2 · Seedream 5 Pro · Flux 2 Max</span></div>
   </div>
 </section>
 

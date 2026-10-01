@@ -1,17 +1,86 @@
 {
-  "style": "Deep near-black indigo background, palette of electric violet, cyan and a touch of warm amber, cinematic volumetric light, ultra-detailed, premium 2026 tech editorial art direction, subtle film grain. Absolutely no text, no letters, no numbers, no logos, no watermark, no user interface, no people.",
+  "note": "Prompts and the engine whose output was used (1 Oct 2026). Run on Oracle: see gen-art.cjs header.",
+  "style": "Photoreal, naturalistic, high-key soft daylight, muted sage greens, pale sky blues and warm sand tones, airy haze, premium editorial nature photography with a quiet high-tech feeling, ultra-detailed. Absolutely no text, no letters, no logos, no watermark, no people.",
   "jobs": [
-    { "name": "cover", "ar": "16:9", "engines": ["flux", "seedream", "nanopro", "gpt"],
-      "prompt": "Abstract hero artwork for an AI-systems leader. On the right third of a wide frame: a luminous sphere of liquid glass with a glowing violet-and-cyan plasma core, encircled by thin orbital rings of light carrying eight small glowing satellite nodes, like a tiny solar system of intelligent agents. The left two-thirds of the frame is calm, dark, empty negative space." },
-    { "name": "ops", "ar": "16:9", "engines": ["flux", "seedream"],
-      "prompt": "Macro photograph of an abstract network: glowing violet fiber-optic threads connecting small luminous nodes across black glass, tiny data pulses travelling along the threads, shallow depth of field, soft bokeh. Violet dominant." },
-    { "name": "product", "ar": "16:9", "engines": ["flux", "seedream"],
-      "prompt": "Abstract architecture of floating translucent glass panels stacked in depth in darkness, cyan light refracting through their edges, one soft beam of light passing through every layer, minimal and precise. Cyan dominant." },
-    { "name": "creative", "ar": "16:9", "engines": ["flux", "seedream"],
-      "prompt": "Cinematic abstract: a curling strip of 35mm film dissolving into warm amber and magenta light particles and drifting ink smoke in darkness, luxurious underground aesthetic, moody and poetic. Amber dominant." },
-    { "name": "failure", "ar": "16:9", "engines": ["flux", "seedream"],
-      "prompt": "Kintsugi: a slab of polished black obsidian, fractured, its cracks repaired with molten glowing gold, dramatic low side light; the gold seams sit in the right half of the frame and the left half falls into deep darkness." },
-    { "name": "close", "ar": "16:9", "engines": ["flux", "seedream"],
-      "prompt": "A tall glowing doorway of violet and cyan light standing open in a vast dark minimal space, a mirror-like reflective floor, a warm amber glow on the horizon beyond the door, a sense of arrival and possibility. The doorway stands on the right third of the frame; the left side is dark negative space." }
+    {
+      "name": "l-cover",
+      "ar": "16:9",
+      "engines": [
+        "gpt"
+      ],
+      "prompt": "A fragment of lush green land floating in a pale misty sky: soft grass, a few wind-shaped trees, a clear stream winding through a small valley toward the viewer, the underside showing layered rock and hanging roots. The island fills the lower half of the frame, centred; the upper half is soft, empty, pale blue-grey sky. A subtle fine halftone dot texture dissolves part of the rock face, as if the land is partly digital."
+    },
+    {
+      "name": "l-water",
+      "ar": "16:9",
+      "engines": [
+        "flux"
+      ],
+      "prompt": "Calm water surface seen from slightly above, gentle soft ripples, pale silver and light grey-blue tones, high key, minimal, abstract and serene texture, very low contrast."
+    },
+    {
+      "name": "l-river",
+      "ar": "16:9",
+      "engines": [
+        "seedream"
+      ],
+      "prompt": "Aerial view of a braided glacial river flowing through a pale valley toward the sea, silver channels splitting and rejoining across light sand and sage-green banks, minimal, high key; the channels run across the lower half of the frame and the upper half is soft pale haze."
+    },
+    {
+      "name": "l-ops",
+      "ar": "16:9",
+      "engines": [
+        "seedream"
+      ],
+      "prompt": "Macro photograph of a forest-floor cross-section: fine white mycelium threads connecting tree roots through rich dark soil and green moss on top, a natural communication network, soft daylight, shallow depth of field."
+    },
+    {
+      "name": "l-product",
+      "ar": "16:9",
+      "engines": [
+        "flux"
+      ],
+      "prompt": "A minimalist glass pavilion with slim frames standing alone in a misty green meadow in the morning, soft light passing through the glass, clean architectural lines, calm and precise."
+    },
+    {
+      "name": "l-creative",
+      "ar": "16:9",
+      "engines": [
+        "flux"
+      ],
+      "prompt": "The volcanic island of Hiva Oa in the Marquesas at golden hour: dramatic green cliffs and ridges, mist drifting over a quiet bay, the Pacific glowing, cinematic painterly light."
+    },
+    {
+      "name": "l-terraces",
+      "ar": "3:4",
+      "engines": [
+        "seedream"
+      ],
+      "prompt": "Aerial view of emerald rice terraces at dawn, orderly curved lines following the hillside, low mist resting in the valleys, soft light, a sense of a calm system running in harmony."
+    },
+    {
+      "name": "l-failure",
+      "ar": "3:4",
+      "engines": [
+        "seedream"
+      ],
+      "prompt": "A smooth dark river stone repaired with fine gold kintsugi seams, resting in shallow crystal-clear water on pale pebbles, soft natural daylight from above, gentle ripples, calm, light and airy."
+    },
+    {
+      "name": "l-hills",
+      "ar": "16:9",
+      "engines": [
+        "seedream"
+      ],
+      "prompt": "Soft green rolling hills with layers of morning mist receding into the distance, one quiet path crossing the nearest hill, wide panoramic view; the lower third holds the hills and the upper two thirds is soft, empty, pale sky."
+    },
+    {
+      "name": "l-close",
+      "ar": "16:9",
+      "engines": [
+        "seedream"
+      ],
+      "prompt": "Flat stepping stones leading across a calm mirror-like lake toward a misty green island at dawn. The stones start at the bottom centre of the frame and curve toward the island on the right. The upper half of the frame is soft, empty, pale sky."
+    }
   ]
 }
