@@ -113,3 +113,7 @@ Real screens: **reuse the yacht film's** ChatGPT recording, WhatsApp and HubSpot
 no phone tasks. Generator: Oracle `~/aigo-villa/` (gen.mjs copy, own ledger, cap $12). 4 candidates, GPT Image 2 3:4 → **$0.51**
 (first try at 4:5 was rejected by the model before billing). Sheet: `deliverables/VILLA_gate1_faces.jpg` — mother A (olive, dark waves) ·
 mother B (auburn) · host A (Afro-Caribbean Bocas, 40s–50s) · host B (tanned, open linen shirt). **Awaiting Elena's pick.**
+**Host = h1_gpt (Afro-Caribbean Bocas owner)** — Elena: "Man fine." Mothers A/B too plain ("more rich-looking, not like a poor single mom") →
+3 wealthy, polished mothers (C chestnut + camel cashmere · D honey-blonde bob + black turtleneck + pearls · E dark waves + silk + emeralds)
++ 2 kid pairs, a boy (10) and a girl (8) (A: dark-haired boy, light-brown braided girl · B: curly, freckled). +$0.64 → **ledger $1.15 of $12**.
+Sheet `deliverables/VILLA_gate1b_mothers_kids.jpg`. Awaiting her pick of mother + kids.
