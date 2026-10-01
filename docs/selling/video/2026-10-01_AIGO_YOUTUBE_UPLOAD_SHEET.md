@@ -63,7 +63,7 @@ s03 0:15.0, s05 0:28.9, s07 0:45.0, s09 0:58.6, s11 1:14.6).
 |---|---|
 | Master 1080p, 90.6 s, −16.9 LUFS | laptop `deliverables/AIGO_API_FINAL_2026-10-01_1080p.mp4` (untracked, 36.5 MB, md5 `28d5b97174db9989e935f9ece89a8a31`) · Oracle `~/aigo-promo/apim/cut1/` |
 | Captions EN / ES | `deliverables/AIGO_API_promo_en.srt` · `deliverables/AIGO_API_promo_es.srt` |
-| Thumbnail | none yet — YouTube auto-frame, or ask for one (the pomegranate 72/100 frame is the strongest) |
+| Thumbnail | `deliverables/AIGO_API_thumbnail_EN.jpg` / `…_ES.jpg` (pomegranate 100 / 72, made 1 Oct) |
 
 **Title:** `Can AI Find and Cite Your Business? The 34 Signals, Explained | Free AI Visibility Audit` (86 chars)
 
