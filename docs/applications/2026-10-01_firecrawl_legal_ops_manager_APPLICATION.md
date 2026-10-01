@@ -6,6 +6,51 @@ HubSpot deal: 65557225024 · found via X post @v_garg_s (30 Sep)
 Every fact below is from this repo, NOW.md or the verified CV. Nothing is invented.
 `[ELENA: …]` marks the one place only Elena can fill: a real E-GOV-era story.
 
+## ✅ FINAL — paste-ready (1 Oct). The Ashby form has NO separate note box, so the "quick note" is folded into Q1 + Q4.
+
+**Q1.** In September I listed eight private codebases for licence on an AI-lab data marketplace. The licence terms
+promised the buyer no customer personal data. There was no process behind that promise, only my own scanner, and it
+said "clean". It was wrong: pattern bugs hid environment-variable names and exempted whole matches instead of values,
+and it never opened binary files, so 17 résumé files were invisible to every check I owned.
+What I built: a pre-commit gate that blocks any commit containing credentials or personal data; a build step that
+produces the licensed copy from a filtered tree; and a verification pass that reads the same surface the buyer reads,
+including file names and commit messages, not only file contents. It caught a real leak the old checks had missed: a
+national ID number inside a code comment warning that the number must never ship.
+What changed: every commit in history was cleaned, the listing went live with all 18 mandatory checks passing, and it
+is priced at $74,851, inside the platform's own valuation band. The rule I kept: a format your checker cannot open is
+not clean, it is unmeasured.
+
+**Q2.** The rule I work by: the model drafts, the system checks, a human decides anything irreversible.
+I use AI for first-pass work at volume: reading job and partner postings, drafting letters and replies to inbound
+leads, researching a counterparty before a call. Nothing it writes reaches anyone unchecked. My publisher refuses to
+print a number it cannot trace back to a source record; if the model keeps decorating, it falls back to an article
+assembled only from the measured facts.
+Where it helps least: anything irreversible or confidential. My outbound email is drafted by AI and sent only after a
+human confirms it, and the sender refuses the whole send if a promised attachment fails to load, so no letter ever
+claims a document it does not carry. I have also seen an AI checker fail silently: a marketplace's AI privacy scan
+gave my repositories "score 0", and its own record showed the scan had crashed: "the verdict carries no evidence".
+In legal ops that is the risk to design for. An AI verdict without evidence is no verdict.
+
+**Q3.** The same marketplace, a company still building its own vendor tooling: a vendor agreement signed, eight assets
+listed, and a quality-check tool that kept failing with no detail on why.
+Scope: one question per email, each answer deciding an action, e.g. "does a failing repository block only itself, or
+the whole listing?" Communication: every claim I made, they could verify in their own panel in seconds, and I reported
+a defect in their tool with evidence rather than a complaint. Budget: I priced the listing against their own
+estimator, and declined to flatten the codebases' history to pass a check, because an earlier test showed that would
+cut the valuation to about a third.
+What I would do differently: ask first which checks are mandatory. Their written answer, then the live listing, showed
+two days of my fixes had been unnecessary.
+
+**Q4.** Before I built AI systems, I was Deputy CEO and Chief Legal Officer of a state e-government operator for seven
+years, running IT, legal and compliance in a heavily regulated environment. Since 2025 I run my own AI lab's
+operations with AI agents doing most of the execution. This role is where those two halves meet.
+I have also stood on both sides of the trade Firecrawl sits in. My own product reads the web: an audit that scores how
+quotable a website is to ChatGPT, Perplexity and Claude. In September I stood on the other side, listing my own code
+as licensed AI training data. Both times the hard part was not the technology but the rules around the data: what
+may be collected, what must be removed, what a licence actually promises, and how to prove it.
+A company turning the web into AI data at your speed meets those questions daily. I would like to build the machinery
+that answers them, remotely from Panama (UTC-5), as an employee or contractor.
+
 ## Form fields
 
 | Field | Answer |
