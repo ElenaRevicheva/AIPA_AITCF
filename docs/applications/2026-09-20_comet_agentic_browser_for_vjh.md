@@ -114,3 +114,40 @@ screened out before them, and an ATS reads the RESUME, not the cover letter. Tha
 
 Note also what the page does NOT lead with: form-filling. That belongs to the Comet browser, a
 separate product. Aiming at form-filling was aiming at the wrong half.
+
+---
+
+# ADDENDUM 2 — first real use, and the dig (2 Oct 2026)
+
+**Comet's assistant did not fill the form.** Scale Army (Ashby), with the application tab
+open: *"I'm unable to directly enter values into the browser form from this chat."* On the
+Perplexity homepage it also offered "Run task", which hands the job to Perplexity Computer
+(Max plan, which she does not have).
+
+## What was built around a claim nobody tested
+
+| Date | Built | What "verified" actually checked |
+|---|---|---|
+| 20 Sep | Copy Comet prompt per job (`apply-queue.cjs`) | the prompts contain a URL, DO NOT SUBMIT, the no-guess rule |
+| 20 Sep | Perplexity Computer batch work order | nothing; Computer later found to be Max-only |
+| 20 Sep | This evaluation | written from search results; the addendum admits it |
+| 28 Sep | Truthful profile, cleanLetter | 11/11 prompts intact |
+| 1 Oct | `📋 COMET PROMPT` note on every ACT-TODAY deal, kit every 10 min | `comet prompt: added 11 · failed 0` |
+| VJH | `a3a1eda`, `2c317c8`: judge sync skips the kit notes | eval test (correct, and still needed) |
+
+Every check measured **our own output**. No check measured **Comet filling one field**. The
+single test that mattered, one prompt pasted into Comet on one real form, was never run until
+she ran it. On 28 Sep "Comet we encoded should work, do not reinvent" was read as proof it
+worked, so the next session added more on top instead of testing it.
+
+## What still earns its place (nothing deleted)
+
+- **Perplexity API company brief:** measured, cited, about $0.005 a job, cached. Independent of Comet.
+- **`📋 COMET PROMPT` note:** $0. It worked today as the answer sheet: every value for the form was in one place.
+- **VJH guards:** without them, VJH's learning would read the kit's own notes as Elena's words. Keep them.
+
+**Dead:** the Computer work order (Max only). **Unproven:** whether a separate Comet agent mode fills
+forms. Test it once on one form before anyone builds another line for it.
+
+Named failure: **testing the artifact, not the outcome.** A green check proved the prompt was well
+formed. It never proved that anything acted on the prompt.

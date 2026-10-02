@@ -177,6 +177,12 @@ git log keeps the record.
 - **VERIFIED BY:** audit `11 · complete 11 · gaps 0`, every CV column names `_v2` except the hand one; Niuro CV read back.
   Backups `~/backups/kit-pre-cvsummary-194039/`.
 
+### ⚠️ 2 Oct — Comet NEVER FILLED A FORM. First real use (Scale Army, Ashby) failed. Do not extend the Comet path.
+- Its sidebar Assistant refused twice, with the form open: "unable to directly enter values into the browser form".
+  From 20 Sep to 1 Oct, every "verified" line checked the PROMPT TEXT we generate. None checked a filled form.
+- The `📋 COMET PROMPT` note stays: $0, and it served today as the answer sheet. Working path = Ashby "Autofill from
+  resume" + paste. Dig: `docs/applications/2026-09-20_comet_agentic_browser_for_vjh.md` (2 Oct addendum). Nothing deleted.
+
 ### ✅ 1 Oct — EVERY [HIRING-*] deal in I Act TODAY gets the full kit + a 📋 Comet prompt. Connected, not rebuilt.
 - **WHAT:** the kit had its own 2-prefix list (VJH, MANUAL) → now uses the shared `lib/hiring-deals.cjs` (any `[HIRING-…]`;
   MANUAL still needs `📌 JOB POSTING`, which `stage-manual-job.cjs` always writes). 28 Sep date cutoff removed. The morning
