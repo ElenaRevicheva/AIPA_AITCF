@@ -6,7 +6,7 @@ text, and all five links are clickable.
 
 **Where they live (1 Oct 2026):**
 - **Website:** `aideazz` repo `public/`, served at `aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026{,_ES}.pdf`. The
-  aideazz.xyz/api footer "About" / "Acerca de" opens the deck in the reader's language (`labApi.aboutDeckHref` in `en.json` /
+  aideazz.xyz/api footer link "Professional Outlook" / "Perspectiva profesional" (Resources column, above AI Ops Wiki; renamed from "About" 1 Oct) opens the deck in the reader's language (`labApi.aboutDeckHref` in `en.json` /
   `es.json`). **After a rebuild, copy both PDFs there too, or the site keeps serving the old deck.**
 - **Desktop:** Elena's `2 Decks 01.10.2026` folder holds `…_EN.pdf` and `…_ES.pdf` (her request).
 
