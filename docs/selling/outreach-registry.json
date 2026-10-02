@@ -3692,5 +3692,21 @@
         "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
       }
     ]
+  },
+  "quijano-associates": {
+    "phone": "00000000000",
+    "draft": "docs/selling/drafts/quijano-associates.txt",
+    "company": "Quijano & Associates",
+    "email": "quijano@quijano.com",
+    "emailDraft": "docs/selling/drafts/quijano-associates-email.txt",
+    "dealId": "65625582092",
+    "score": 76,
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ]
   }
 }

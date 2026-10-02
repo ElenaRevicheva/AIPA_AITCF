@@ -136,6 +136,10 @@ git log keeps the record.
   Old letters proven byte-identical (6/6 variants, old vs new `buildDraft`). **Blocked only by pii-guard** (86 pre-existing prospect emails in
   the file) — the commit needs `--no-verify`, which Elena must run herself. `wa-link-lib.cjs` (registry cc/attachments pass-through) is committed.
 
+### ⚖️ 2 Oct — Quijano & Associates (law, quijano.com) STAGED · Elena's move
+- Deal `65625582092` `[CLIENT-MANUAL] Quijano & Associates — GEO/AEO fix (audit: 76/B)` · EMAIL-ONLY (only landline published).
+  One-click `quijano-associates` → quijano@quijano.com, Cc her Gmail, ES deck + real-estate/immigration-law film (y1ZhWyqJW0w); confirm page probed.
+
 ### 🚢 2 Oct — Grand Tours (cruises, grandtours.com.pa) STAGED · Elena's move
 - Deal `65653651237` `[CLIENT-MANUAL] Grand Tours — AI Growth Operator (audit: 85/A)` · live audit 85/A (AEO 69) · credential letter.
   WA +507 6379-4392 (plain text in note for her phone) · email one-click `grand-tours` → info@grandtours.com.pa, Cc her Gmail, ES deck attached

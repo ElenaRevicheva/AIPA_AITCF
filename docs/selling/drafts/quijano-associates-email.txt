@@ -1,0 +1,23 @@
+SUBJECT: Auditoría de visibilidad en IA — Quijano & Associates (76/100): 3 arreglos concretos
+
+TO: quijano@quijano.com
+NOTE: EMAIL-PRIMARY — no public WhatsApp on site
+
+Estimado equipo:
+
+¡Un gusto saludarles! 👋 Soy Elena Revicheva, ingeniera de IA aquí en Panamá: https://aideazz.xyz/portfolio.
+
+Primero, felicitaciones — Quijano & Associates combina inmigración, bienes raíces, derecho marítimo y blockchain, con oficinas en Bahamas, Belice, Hong Kong, Nevis, Seychelles, Suiza y Tortola. Les escribo porque analicé quijano.com con mi motor de visibilidad en IA y obtuvo 76/100: cuando un inversionista extranjero que busca abogado para su residencia o inversión en Panamá le pregunta a ChatGPT o Perplexity "¿qué firma de abogados en Panamá me recomiendas para residencia o inversión inmobiliaria?", los asistentes todavía no los pueden recomendar con claridad — el sitio no tiene marcado JSON-LD de organización, el título de la página no nombra lo que ofrecen y faltan las etiquetas og que varios motores de IA usan para leer la página.
+
+Son 3 arreglos concretos. Si les parece bien, con mucho gusto se los muestro en 15 minutos, sin ningún compromiso. La auditoría completa es gratuita aquí: https://aideazz.xyz/api ⚖️
+
+Nuestra presentación (8 páginas): https://aideazz.xyz/AIdeazz_AI_Growth_Operator_2026_ES.pdf
+
+PD: Además de visibilidad en IA, construyo agentes de WhatsApp que califican leads legales 24/7 (EN/ES, conectados a su CRM), automatización de intake de documentos para residencia e inversión, video con IA para marketing, y rescate de sistemas de IA que fallan. Todo con demos en vivo en mi portafolio👆
+
+Y un video corto que hicimos con IA para firmas de inmigración y bienes raíces:
+▶️ https://youtu.be/y1ZhWyqJW0w
+
+¡Que tengan un excelente día!
+Saludos,
+Elena Revicheva✨🌍💫
