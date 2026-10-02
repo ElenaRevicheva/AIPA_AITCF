@@ -137,7 +137,9 @@ git log keeps the record.
   data from the notebook (test-lead names, a named prospect). Art: 11 images, ~$1, Flux false-flagged one → redone on Seedream.
 - **EN + ES done** (`make-es.py`, fails on untranslated text). Desktop `2 Decks 01.10.2026`: `AIdeazz_AI_Growth_Operator_2026_EN/ES.pdf`
   added, old 29 Sep deck moved to `old/` (Elena's OK). **LIVE on aideazz.xyz/api** footer under "About" → "AI Growth Operator"
-  (aideazz `c00d3c9`; live PDFs md5-identical to built). Rebuild ⇒ copy both PDFs to aideazz `public/`. Open: not attached to deals.
+  (aideazz `c00d3c9`; live PDFs md5-identical to built). Rebuild ⇒ copy both PDFs to aideazz `public/`. Outlook link renamed
+  "Founder" / "Fundadora" (Resources column, `d3622e3`). **⏸ PAUSED by Elena:** attaching the deck to the 571 open CLIENT deals —
+  dry run only, 0 written; Google Calendar 2 Oct 10:00 Panama; script `docs/selling/ai-growth-operator-deck/attach-to-client-deals.cjs`.
 
 ### 📨 1 Oct — Megan got a DUPLICATE on 30 Sep; the demand nudge is still UNSENT. Old links disarmed. Firecrawl applied.
 - **What went out:** 30 Sep 23:06 UTC Elena tapped the OLD 10 Sep slug `megan-pii-qc-scan-aborts` (body = the letter she had
