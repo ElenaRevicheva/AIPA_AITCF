@@ -151,7 +151,7 @@ ChatGPT recommendations, WhatsApp automation, HubSpot CRM, AIdeazz AI Lab.
 
 | What | Where |
 |---|---|
-| Master 1080p, 97.75 s | Desktop campaign folder `02.10.26 Relocation - Real Estate + Immigration Lawyers.mp4` · Oracle `~/aigo-reloc/cut1/RELOC_FINAL_2026-10-02_1080p.mp4` |
+| Master 1080p, 97.75 s, −15.7 LUFS, md5 `20c7f5fcdc251295adeedef6e99b8eda` | Desktop campaign folder `02.10.26 Relocation - Real Estate + Immigration Lawyers.mp4` · Oracle `~/aigo-reloc/cut1/RELOC_FINAL_2026-10-02_1080p.mp4` |
 | Captions EN / ES | `Relocation captions EN.srt` · `Relocation captions ES.srt` |
 | Thumbnail | `Relocation thumbnail EN.jpg` / `ES.jpg` — her smile on her own Boquete terrace, "They asked AI first. / Were you on the list?" |
 
