@@ -3660,5 +3660,20 @@
     "emailDraft": "docs/selling/drafts/megan-demand-nudge-email.txt",
     "dealId": "64673099185",
     "cc": "aipa@aideazz.xyz"
+  },
+  "tours-panama-experience-aigo": {
+    "phone": "50769198892",
+    "draft": "docs/selling/drafts/tours-panama-experience-aigo-wa.txt",
+    "company": "Tours Panama Experience (Alquiler de Yates Panamá)",
+    "emailDraft": "docs/selling/drafts/tours-panama-experience-aigo-email.txt",
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ],
+    "dealId": "62792913925",
+    "score": 82
   }
 }
