@@ -151,3 +151,47 @@ forms. Test it once on one form before anyone builds another line for it.
 
 Named failure: **testing the artifact, not the outcome.** A green check proved the prompt was well
 formed. It never proved that anything acted on the prompt.
+
+---
+
+# ADDENDUM 3 — the full timeline, from the session transcripts (2 Oct 2026)
+
+Addendum 2 said "the test was never run". **Wrong. It was run on 21 Sep, it failed, and the result
+was kept only in chat.**
+
+| When | What happened |
+|---|---|
+| 20 Sep, morning | Elena asks: evaluate `perplexity.ai/gen/computer/job-applications` for VJH. |
+| 20 Sep, 12:24–18:07 | The page 403s. The agent reads **search results about Comet** (a different product) and builds per-job Comet prompts. Elena asks "did you use that page?" 3 times. |
+| 20 Sep, 18:14 | Agent learns that Computer is not Comet and builds a Computer batch work order (Max plan only). |
+| 20 Sep, 18:35 | Test 1: mobile Comet offers only Summarize / Translate. Recorded as "desktop only". |
+| 20 Sep, 23:41 | Comet installed (on C:; the Omaha installer cannot target D:). |
+| 21 Sep, 00:08 | The page is finally read: Computer is a **competitor** to VJH; the only real gap is **per-role resume tailoring**. |
+| **21 Sep, 10:52** | **Test 2, desktop Comet, Hilbert on Ashby: "I can't directly interact with the webpage from here."** The agent blames the Free plan (seen on a screenshot; never verified). Session pivots to the tailored CV, and Hilbert is submitted by hand. |
+| 21 Sep → 1 Oct | **Test 2 is written NOWHERE:** not in this doc, NOW.md, memory or code. The doc still says "adopt it for form-filling". |
+| 28 Sep, 20:49 / 22:21 | A new session reads the doc and tells Elena "Comet fills the application form for you" and "Comet works as we built it", with a 9-step guide. She says "keep it". **Her "do not reinvent" was given on a false premise.** |
+| 1 Oct | The Comet prompt is copied onto every ACT-TODAY deal, refreshed every 10 min. |
+| 2 Oct | Test 3, Scale Army on Ashby: same refusal, same words. |
+
+## Root cause
+
+1. **Substitution on day 1.** The question was "evaluate THIS page". The page was blocked, so the
+   agent answered an easier question (what search results say about Comet) and started building.
+   The page itself was read 12 hours and 4 pushes later.
+2. **A negative result lived only in chat.** CLAUDE.md rule 7 exists for exactly this. The failure
+   was observed, explained and acted on, then lost when the tab closed. The next agent trusted the
+   last written word, which was the optimistic one.
+3. **Every later check tested the artifact.** "11/11 prompts intact" is true and irrelevant.
+
+## What was real (the week was not all noise)
+
+- **The 21 Sep pivot to tailored CVs came out of this:** the true gap the page exposed. Tailored CVs now
+  sit on each deal, and Hilbert and Niuro were submitted with them.
+- Retargeting off generic AI-Engineer roles (62% of the queue, 58% of rejections), the same session.
+- Perplexity API company briefs on each deal.
+
+## Unverified, do not repeat as fact
+
+"The Free plan gates form filling" is an inference from a plan badge. Nobody has checked whether a
+paid Comet plan, or a separate agent mode, fills Ashby forms. **Do not build anything on Comet until one
+form is filled in front of Elena.**

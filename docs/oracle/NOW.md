@@ -178,8 +178,8 @@ git log keeps the record.
   Backups `~/backups/kit-pre-cvsummary-194039/`.
 
 ### ⚠️ 2 Oct — Comet NEVER FILLED A FORM. First real use (Scale Army, Ashby) failed. Do not extend the Comet path.
-- Its sidebar Assistant refused twice, with the form open: "unable to directly enter values into the browser form".
-  From 20 Sep to 1 Oct, every "verified" line checked the PROMPT TEXT we generate. None checked a filled form.
+- Same refusal already on **21 Sep** (Hilbert): "I can't directly interact with the webpage". That result stayed in CHAT ONLY,
+  so on 28 Sep an agent told Elena "Comet fills the form" and on 1 Oct the prompt went onto every deal. Free-plan cause = unverified.
 - The `📋 COMET PROMPT` note stays: $0, and it served today as the answer sheet. Working path = Ashby "Autofill from
   resume" + paste. Dig: `docs/applications/2026-09-20_comet_agentic_browser_for_vjh.md` (2 Oct addendum). Nothing deleted.
 
