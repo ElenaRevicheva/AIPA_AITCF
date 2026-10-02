@@ -1,5 +1,6 @@
 # Shell scripts must use LF so they run on Oracle (Linux)
 scripts/oracle-resilience/*.sh text eol=lf
+scripts/aigo-frame-sheet12.sh text eol=lf
 
 # Binary assets — NEVER line-ending-converted. core.autocrlf=true on Windows treats a
 # reportlab PDF as text and would rewrite bytes inside it on the next checkout, producing

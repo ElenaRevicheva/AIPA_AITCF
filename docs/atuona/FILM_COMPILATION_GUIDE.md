@@ -23,6 +23,10 @@ Never re-invent the ffmpeg chains: every setting below was a real iteration. Fil
 `docs/atuona/FILM8_2026-09-22.md`, every prompt in `docs/atuona/film8-plan.json`. Engine pins + which accounts are
 funded: `docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md`.
 
+**To make a client promo film** (the AI Growth Operator series: yacht, /api, villa + charter, relocation, 01–02.10.2026):
+§5f has the 4 films with their scripts, masters and links, plus the pipeline from an 8-agent plan to the YouTube upload. Newest
+reference: `scripts/reloc-*`. Upload sheet: `docs/selling/video/2026-10-01_AIGO_YOUTUBE_UPLOAD_SHEET.md`.
+
 ---
 
 ## 0. Where everything lives
@@ -314,6 +318,94 @@ real." → generate only people and places; every product/app screen is a **real
 cropped or blurred for names, numbers and private chats. Landscapes may be real stock **only if the clip is really that
 place** (see recap 36). The whole first pass (faces → keyframes → 7-engine test → 8 shots → 5 fixes) cost **$19.90**.
 
+## 5f. The AI Growth Operator promo series — the finished machinery (01–02.10.2026)
+
+§5e grown into a series: four client ads, one brand system, one cut engine, a new story per ICP lane — three share one voice
+(MiniMax `English_magnetic_voiced_man`); the /api film keeps the old films' OpenAI onyx. The yacht, villa and relocation films each
+have their own Oracle folder with their own `gen.mjs` copy and `ledger.jsonl`; the /api film is a re-edit in `~/aigo-promo/apim`
+(no new generations, no ledger of its own). **The `reloc-*` scripts are the newest and most
+complete — a new film starts as a copy of them.** Titles, descriptions, chapters, flags and links:
+`docs/selling/video/2026-10-01_AIGO_YOUTUBE_UPLOAD_SHEET.md`.
+
+| Film | Scripts (`scripts/`) | Oracle | Music (Pixabay, not Content ID) | Final |
+|---|---|---|---|---|
+| *She Asked ChatGPT Before She Messaged Your Yacht* (cut v7, 90.2 s) | `aigo-promo-cut5.py` · `aigo-promo-v4-assets.py` · `aigo-promo-music-mix.py` · `aigo-promo-thumbnail.py` | `~/aigo-promo` | "Deep House Track" — cornist | md5 `89e91e420be7f7b767010f048f478f37` |
+| *Can AI Find and Cite Your Business?* (/api, v13 + v19 merged, 90.6 s) | `apim-vo.py` · `apim-rec-groups.mjs` · `apim-assets.py` · `apim-cut.py` · `apim-srt.py` | `~/aigo-promo/apim` | "Modern Deep House" — ArtIssizm | md5 `28d5b97174db9989e935f9ece89a8a31` |
+| *She Asked ChatGPT Before She Booked Your Island* (villa + charter, 94.4 s) | `villa-vo.py` · `villa-assets.py` · `villa-cut.py` · `villa-srt.py` | `~/aigo-villa` | "Afro Beat Vibes" — -WATERMEL0N- | md5 `7253d8df068f8d243cb6ecc3ca0799a5` · ledger $13.69 of $14 |
+| *They Asked ChatGPT Before They Messaged You* (relocation: real estate agencies + immigration lawyers, Panama; 97.75 s, −15.7 LUFS) | `reloc-vo.py` · `reloc-rec-audit.mjs` · `reloc-safe-screens.py` · `reloc-assets.py` · `reloc-cut.py` · `reloc-srt.py` · `reloc-thumbnail.py` | `~/aigo-reloc` | "Deep House" — alexrockbeat | v1 https://youtu.be/f4NHCuLDHa4 (md5 `20c7f5fcdc251295adeedef6e99b8eda`) · v2 https://youtu.be/y1ZhWyqJW0w (md5 `5ab513a8aa24a09bf387deb10fe226b9`) — **both stay live** (Elena) · ledger $12.59 of $13.50 |
+
+Masters, EN + ES SRT, EN + ES thumbnails and the upload sheet live in Elena's Desktop folder `API promo campaign/11.09.2026
+API video for YouTube campaign`. The relocation file there is **v2 under the original name**; v1 sits beside it as `… (v1 - first YouTube upload).mp4`
+(also on Oracle `~/aigo-reloc/cut1/RELOC_FINAL_2026-10-02_1080p.mp4`) — §0: every finished film keeps a local copy.
+
+**The pipeline, in order** (the relocation film is the reference run):
+
+1. **Plan by workflow, never by one draft.** 8 agents: 3 concepts → 3 judges (the two buyers · legal/compliance ·
+   production realism + cost) → synthesis → critic. Every critic issue is checked against the code and the prospect file
+   before it is applied (`docs/selling/video/2026-10-02_RELOCATION_FILM_PLAN.md`). The plan carries the budget by gate and
+   the drop order; a mid-production request is paid from the drop list, never from the reserve.
+2. **Spend is asked per gate, before it runs** (1 faces · 1b relative + wardrobe · 2 keyframes · 3 motion · voice). The
+   film's own `gen.mjs` copy runs with **`BUDGET_USD=13.5` on every call** — the file's default is 30, so a call without it can
+   spend to $30 against the ledger. Deploying a new film folder = `scp scripts/aigo-promo-gen.mjs` and change only line 19 (`BASE`);
+   `scripts/aigo-promo-gen.mjs` stays the one canonical copy.
+   Replicate is prepaid and we cannot see the balance without her sign-in: **Elena reads replicate.com/account/billing
+   before a gate** (below $5 it throttles — 429s on 1 Oct).
+3. **Faces (gate 1).** GPT Image 2 high, $0.128, **3:4 only** (4:5 is rejected). A candidate keeps its candidate name and
+   is `cp`'d to `img/R1.jpg`, `R2.jpg`… only after her pick. Pick sheets: `scripts/aigo-gate-sheet.py` (3:4 tiles, labelled). A relative is generated FROM the picked face, then checked
+   cold ("do they read as mother and son?").
+4. **Wardrobe (gate 1b).** No colour an earlier film wore (the plan lists the yacht and villa palettes); one anchor colour
+   per person, held in every shot.
+5. **Keyframes (gate 2).** The gate-1 prompts and the gate-2 keyframe prompts are each made by a workflow: draft →
+   realism/AI-tells critic + continuity/compliance critic → revise. GPT Image 2 with the locked face passed in; **Nano
+   Banana Pro** ($0.15 + $0.035 per reference) for highland and real-world frames. Posture words: recap 35.
+6. **Motion (gate 3).** Kling 3.0 omni pro, 5 s, the locked face in `reference_images` ($1.12) for face shots; Hailuo
+   2.3, 6 s ($0.56) for the rest. Every clip starts from its approved keyframe and **plays at normal speed** — a held
+   face shot needs a take that long; slow-mo plus a freeze still reads static (recap 57).
+7. **Voice** — `reloc-vo.py`. MiniMax speech-2.8-hd, `English_magnetic_voiced_man`, `emotion: calm` (yacht, villa,
+   relocation; the /api film keeps the old films' `tts-1` / `onyx` / 0.9 — `apim-vo.py`). Record only new lines; a line
+   word-for-word from an earlier film is that film's take, copied ($0). Every take is transcribed by **two** Gemini models
+   (`gemini-2.5-flash` + `gemini-3.5-flash`); a key phrase missing in either = retake. `KEEP=s01,…` re-checks takes on
+   disk without re-billing. Caption chunks are timed by `silencedetect` (−38 dB, d=0.12) on each take.
+8. **Real screens, made safe** — `reloc-safe-screens.py`. A real test inquiry goes through the live aideazz.xyz/portfolio
+   form in a real browser (invisible reCAPTCHA); Elena's phone captures what really happened (ChatGPT recording, WhatsApp
+   bubble, Zoho inquiry copy, Telegram card / draft / SENT, Gmail reply, HubSpot deal). `reloc-safe-screens.py` Gaussian-blurs,
+   then crops, the five stills (Zoho, Telegram card + draft, Telegram SENT, Gmail, HubSpot): emails, her name, lead ids,
+   timestamps, the deal prefix, the bot header, other leads; the WhatsApp bubble is cropped to the bubble with its time blurred.
+   The ChatGPT recording plays to **"Searching 11 websites"** — the first answer paragraph names no firm; names come later.
+9. **A fresh real audit per film** — `reloc-rec-audit.mjs` (Playwright; `playwright-core` from
+   `~/aigo-promo/rec/node_modules`) films the live aideazz.xyz/api auditing an AIdeazz-owned page that really scores 57/C.
+   The audited domain is blurred box by box per segment (`boxblur` in `split_audit`, `reloc-cut.py`).
+10. **Stock with location proof.** Pexels pages 403 to curl from Oracle — read them in the built-in browser. The place is
+    proven by visible landmarks on a frame sheet (`scripts/aigo-frame-sheet12.sh`), not by the page (recap 48): R0 Chicago
+    36244311 · R1/R1b Punta Pacifica 33811915 · Casco Viejo 35257068 (B2) + 29754758 (R2, ICP card) · R3 Chiriquí 38893319 · valley 36770925. Bright aerials are darkened
+    (`eq=brightness=-0.10`, mist `-0.15`) and the caption scrim raised (alpha 150 → 205) so the serif reads.
+11. **Brand system** — `reloc-assets.py` (local Pillow; lineage `aigo-promo-v4-assets.py` → `villa-assets.py`). Spanish
+    captions in Instrument Serif with the key phrase in gold italic, no box · glass title cards · mono chips (scene, day) ·
+    split frames: real screen left, big QR right · ICP card with this film's lanes first, in gold · end card · an opening
+    title that shrinks until it fits (≤ 1100 px). Panama wording: **"abogados de inmigración", never "bufete"**.
+12. **Cut** — `reloc-cut.py`. **One frame clock:** decoded voice length + pauses, `INTRO` 1.5 s (/api 1.2); each shot is a
+    segment of exactly its frame count → concat → **one overlay pass** (captions, titles, chips, cards); the clock is
+    written to `clock.json`. `OVERLAY_ONLY=1` re-runs only the overlay pass; `REBUILD=1,4,…` re-renders only those
+    segments and re-concats (a card baked into a segment is not an overlay — recap 51). Long runs:
+    `setsid nohup … </dev/null >log 2>&1 &`, then wait on a log line (recaps 52–53).
+13. **Music hunt (workflow).** A finder in the browser reads each Pixabay page's JSON-LD and rejects "Content ID
+    Registered" / `hasYoutubeContentId`; one verifier per track: Gemini listens to the whole track + demucs `htdemucs`
+    two-stem vocal ratio. Never a track or artist already used (the plan lists them). **demucs one at a time** (recap 54).
+14. **Mix** — `aigo-promo-music-mix.py <music> [start] [out] [picture] [voice]`. The bed is **measured** to −25.7 LUFS
+    (Pixabay masters differ by 8 dB), sidechain-ducked under the voice, 1 s in / 5 s out, limiter. Finals −15.6 to
+    −16.9 LUFS.
+15. **QA before she sees it.** A frame sheet, one frame per shot · the QR decoded with OpenCV from exported frames — crop,
+    scale 0.25–0.5, threshold sweep · `ebur128` · grep captions, cards and SRT for banned words.
+16. **Deliverables.** `reloc-srt.py` writes EN + ES SRT from the same `clock.json`; `reloc-thumbnail.py` EN + ES (the yacht
+    thumbnail system, on the film's last smile). Master + SRT + thumbnails → the Desktop folder; titles, descriptions,
+    chapters (each ≥ 10 s, first at 0:00) → the upload sheet.
+17. **YouTube upload through her Chrome** (Claude in Chrome, at her request). `file_upload` takes ≤ 10 MB per call → split
+    the master into 9.5 MB parts, load them into hidden inputs, rebuild one `File` from the Blobs in-page, assign it to the
+    `Filedata` input + fire `change`; check the size is byte-exact. Title and description: set the contenteditable's
+    `textContent` + an `InputEvent`, then read the counters (98/100, 1879/5000). Tags: chip input value + Enter. Made for
+    kids NO · altered content YES (radio click) · no CC track (Elena: the ES captions are burned in; YouTube auto-shows CC
+    in muted autoplay). A published video's file cannot be replaced — a fix is a new upload (recap 61).
+
 ## 6. Run, verify, publish
 
 ```bash
@@ -386,7 +478,54 @@ Verification checklist (all against the file in `out/`):
     posture words pass. Re-phrase; never re-route (recap 22).
 36. Stock "San Blas" footage that was filmed elsewhere: Pexels location metadata said Atlanta / Indonesia / Philippines /
     Paris, "Panama" was only an SEO tag; Pixabay's "117+ San Blas" was fuzzy matching (San Francisco, San José). A clip
-    is Panama only if its page says so AND a local confirms it.
+    is that place only if visible landmarks on a frame sheet prove it (the page field is often blank or the uploader's own
+    location; recap 48).
 37. A styled QR (rounded modules, gradient) may not decode with standard readers — threshold it to black/white to verify
     the URL, and test-decode frames from the exported video at the size it plays.
 38. Showing a phone screen recording raw — cut the home screen and any chat list / drawer with private titles before use.
+39. Planning a client film from one draft — the relocation plan came from 8 agents (3 concepts → 3 judges → synthesis →
+    critic); the critic raised 20 issues; each was checked against the code and the prospect file, and only the confirmed ones
+    were applied (§5f.1).
+40. Asking GPT Image 2 for a 4:5 face — it is rejected. Faces are 3:4.
+41. `gemini-2.5-pro` now answers 404 — the take check runs on `gemini-2.5-flash` + `gemini-3.5-flash`.
+42. One of the two transcribers heard "can" for "can't" in line 2 — a take that can be heard as the opposite claim is a
+    retake (line 2 was re-recorded). One model is not a check: a key phrase missing in either model = retake.
+43. Assuming the Replicate credit is there — we cannot see the balance without her sign-in. Elena checks
+    replicate.com/account/billing before each gate.
+44. Scripting the test inquiry — the aideazz.xyz/portfolio form sits behind an invisible reCAPTCHA; only a real browser
+    gets through.
+45. The test inquiry's reply was drafted by the Lead Concierge's OpenAI fallback because the Anthropic credit was empty — a
+    film test is a live system test: note which model drafted, and report an empty credit as a finding.
+46. v1 cut the ChatGPT recording at "Searching the web" — Elena: it looked empty, just her request. Play it to "Searching
+    11 websites": the first answer paragraph names no firm; names appear later.
+47. Pexels pages 403 to curl from Oracle — read them in the built-in browser.
+48. Pexels' `location` field was blank or the uploader's own location for all 6 picks — the place is proven by visible
+    landmarks on a frame sheet (replaces the page test in recap 36).
+49. Serif captions washed out over bright real aerials — darken the clip (`eq=brightness=-0.10` / `-0.15`) and raise the
+    caption scrim (alpha 150 → 205).
+50. "bufete" went into the title, chips, captions, ChatGPT bubble and end card — in Panama the word is "abogados de
+    inmigración". Grep every caption, card and SRT for it.
+51. The "bufete" end card was baked into a segment, so the overlay-only re-run left it in the film — `REBUILD=<n>`
+    re-renders just those segments.
+52. A render tied to the ssh session died at 39 s when the connection dropped — launch long runs with
+    `setsid nohup … </dev/null >log 2>&1 &`.
+53. Waiting with `pgrep -f <name>` — it matched its own bash command line and never ended. Wait on the script's final
+    log line.
+54. Four demucs runs in parallel OOM-killed `openclaw-gateway` (systemd restarted it) — Oracle carries live bots; demucs
+    one at a time.
+55. Tracks were rejected for a spoken producer tag and for sounding "generic" — tags and titles reveal neither. Gemini
+    listens to the whole track and demucs measures the vocal ratio before she hears a candidate.
+56. The v19 /api promo's track was Content ID registered, so the merged film could not keep it — read the Pixabay
+    JSON-LD (`Content ID Registered`, `hasYoutubeContentId`) before a track becomes a candidate.
+57. The mother looked static in v1: the rewind was a zoompan over a still, and the terrace shot was slowed, then frozen —
+    v2 bought new Kling takes (A2b, P2b) played at normal speed. A held face shot needs a take that long; slow-mo plus a
+    freeze still reads static (refines recap 6).
+58. A styled QR does not decode from a raw frame — crop + scale 0.25–0.5 + threshold sweep in OpenCV (extends recap 37).
+59. Claude in Chrome's `file_upload` takes ≤ 10 MB per call; the masters are 36–59 MB — split into 9.5 MB parts, rebuild
+    one `File` from the Blobs in-page, assign it to `Filedata` + `change`, verify the size byte-exact.
+60. With Chrome in the background, CDP typing and `execCommand` did not land in YouTube Studio's fields — set
+    `textContent` + dispatch an `InputEvent`, and trust only the on-page counters.
+61. A published YouTube video's file cannot be replaced — a fix is a new upload. Both relocation versions stay live
+    (Elena: "Do not unlist anything").
+62. v2 was saved to the Desktop under v1's file name, so v1 — still live on YouTube — briefly had no local master (copied
+    back as `… (v1 - first YouTube upload).mp4`). Version the file name everywhere, as Oracle did (`RELOC_FINAL_v2_…`).
