@@ -19,12 +19,27 @@ journey the poem had already made. I cut them. The film now goes from the airstr
 
 What I hate is not the shots. It is that I shipped before I watched it as a stranger would.
 
-## 2. The best idea you ever cut, and why it was right to cut it — ✋ ELENA WRITES THIS ONE
+## 2. The best idea you ever cut, and why it was right to cut it — DRAFT from your own 1–2 Oct decisions (read aloud, change any word that isn't yours)
 
-This one has to be yours; I could not find it in the records. Two honest shapes if either is true for you:
-- a shot, a poem line or a character you loved and removed because the film was better without it;
-- a whole film idea you dropped (and what you made instead).
-Keep it to 3–5 sentences: the idea, why it was good, why the cut was right.
+**Option A — a whole film idea (recommended), 5 sentences:**
+
+My film for immigration lawyers: a retired American couple moving to Boquete, and the lawyer who answers on a Friday wins
+them. It was a clean, tested story — it had beaten two other concepts in my review, and I had already approved it. The
+next day I dropped it, because in Panama almost every move runs through real estate first, and a lawyer-only story showed
+half the market. I rebuilt it as one family with two buyers: a mother moving to the mountains and her son to the city, so
+a real estate agent and a law firm each get their own lost Friday and their own win. It is a better film because the
+people I am selling to can actually find themselves in it.
+
+**Option B — a shot, 4 sentences:**
+
+In my relocation film I had planned two full WhatsApp chats: the client asks, the owner answers on Monday, and the client
+replies, "Thanks — we've already chosen someone." It spelled the loss out perfectly. I cut it to one message — his first —
+and let the silence after it, plus one line on screen ("good opportunities go cold in silence"), do the rest. The empty
+space is the point: the owner never answered in time.
+
+Sources (true, from the records): `docs/selling/video/2026-10-01_IMMIGRATION_FILM_PLAN.md` (SUPERSEDED 2 Oct) →
+`2026-10-02_RELOCATION_FILM_PLAN.md`; her words "everything in the whole country is about buying, selling and
+reselling real estate"; the WhatsApp cut = her "one will be enough" (2 Oct). Live film: https://youtu.be/y1ZhWyqJW0w
 
 ## 3. One thing in culture right now that makes you jealous — DRAFT (change if it isn't true for you)
 
