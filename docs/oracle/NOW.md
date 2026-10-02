@@ -133,9 +133,7 @@ git log keeps the record.
 ### 🛥️ 2 Oct — Tours Panama Experience (= EXISTING deal 62792913925 "Alquiler de Yates Panamá", WA-sent 18 Jul) · Elena's move
 - **Not a new deal** — same site/WhatsApp as the July CLIENT-MANUAL deal; staged as a follow-up ON it. Note `117947980108`
   (WA text for Elena to send from her phone, one-time + email copy, ES deck attached = HubSpot file 223483883387), HIGH task `117928875835`.
-- **Email NOT armed:** no public address (site, logged-out IG), Hunter = 429 quota. Slug `tours-panama-experience-aigo` is in the
-  registry on main AND Oracle (backup `~/backups/outreach-registry.json.bak-*`), Cc her Gmail, deck in `docs/selling/attachments/` (md5 = live
-  aideazz.xyz copy). **To arm:** put `TO: <addr>` in `docs/selling/drafts/tours-panama-experience-aigo-email.txt` + `email` in registry, both sides.
+- **Email ARMED + verified 2 Oct:** info@alquilerdeyatespanama.com (their footer, Cloudflare-obfuscated). Scraper `data-cfemail` decode is written but UNCOMMITTED: pii-guard blocks the whole file on 86 pre-existing prospect emails — Elena to decide. Confirm page = To/Cc/4.8 MB deck correct. Live re-audit 82/B.
 
 ### 🎨 1 Oct — AI Growth Operator client deck: 8 pages, Outlook design, own images · DONE (Elena's to use; nothing sent)
 - **File:** `docs/selling/ai-growth-operator-deck/AIdeazz_AI_Growth_Operator_2026.pdf` (4.8 MB, 5 links). Source + rebuild in that
