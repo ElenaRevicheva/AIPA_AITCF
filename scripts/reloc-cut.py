@@ -91,6 +91,9 @@ L = {k: decoded(f"{VO}/{k}.mp3") for k in PAUSE}; blk = {k: L[k] + PAUSE[k] for 
 start, t = {}, INTRO
 for k in PAUSE: start[k] = t; t += blk[k]
 print("starts:", {k: round(v, 2) for k, v in start.items()}, "end:", round(t, 2))
+# mother takes (Elena 2 Oct: "more natural motion - less like a static face"): new Kling takes A2b / P2b at normal speed
+A2_OPEN, A2_REWIND, A2_REWIND_START = os.environ.get("A2_OPEN", "A2b__kling"), os.environ.get("A2_REWIND", "A2__kling"), float(os.environ.get("A2_REWIND_START", "0.2"))
+P2_CLIP, P2_START = os.environ.get("P2_CLIP", "P2b__kling"), float(os.environ.get("P2_START", "0.7"))
 PP = f"{ST}/pexels_33811915.mp4"   # real Punta Pacifica / Paitilla (the son's condo district)
 BRIGHT = "eq=brightness=-0.10:contrast=1.08:saturation=1.12"   # bright real aerials darkened so the serif captions read (the yacht SURF fix)
 MIST = "eq=brightness=-0.15:contrast=1.12:saturation=1.10"
@@ -98,11 +101,14 @@ MIST = "eq=brightness=-0.15:contrast=1.12:saturation=1.10"
 # B1 - Chicago, Thursday 23:52: the real night aerial (title) -> HER (Kling, first face, Dramatizacion chip) -> her son -> the question
 b = INTRO + blk["s01"]
 shot("R0", clip, "R0", 3.4, start=7.0, src=f"{ST}/pexels_36244311.mp4")
-shot("A2", clip, "A2__kling", 2.25); shot("A1", clip, "A1__hailuo", 1.9)
+shot("A2", clip, A2_OPEN, 2.25); shot("A1", clip, "A1__hailuo", 1.9)
 shot("S1a", split_rec, 2.95, 0.6, b - 7.55)
 # B2 - sent -> thinking -> "Searching the web" (CUT there) -> the businesses it can (or cannot) understand: real Casco Viejo
-b = blk["s02"]; shot("S1b", split_rec, 3.55, 3.70, 4.3)
-shot("CASCO_B2", clip, "CASCO_B2", b - 4.3, start=4.3, qr=True, src=f"{ST}/pexels_35257068.mp4", grade=BRIGHT)
+# Elena 2 Oct (after publishing): "it looks empty - just my request - no response shown". The answer's first paragraph names no firm,
+# no price, no legal claim ("I'd split the work into two real-estate searches ... one strong Panama law firm ..."), then
+# "Searching 11 websites"; firm names only appear later -> play the recording to 12.3 s, still before any company name.
+b = blk["s02"]; shot("S1b", split_rec, 3.55, 8.75, 6.0)
+shot("CASCO_B2", clip, "CASCO_B2", b - 6.0, start=4.3, qr=True, src=f"{ST}/pexels_35257068.mp4", grade=BRIGHT)
 # B3 - the son's real WhatsApp -> Friday: the agent shows a house / the lawyer with another family -> Monday -> too late
 b = blk["s03"]; shot("S2", split_still, "S2_whatsapp", 2.0)
 shot("A3", clip, "A3__hailuo", 1.9); shot("A4", clip, "A4__hailuo", 2.4)
@@ -112,7 +118,7 @@ shot("VALLEY", clip, "VALLEY", b - 7.7, start=0.3, qr=True, src=f"{ST}/pexels_36
 shot("C4", card_png, "card_s04.png", blk["s04"])
 # B5 - REWIND (Monday -> the lawyer -> the agent -> her son, backwards) -> her again, the same question
 b = blk["s05"]; shot("RW1", reverse_src, PP, 4.9, 1.4, 0.6); shot("RW2", reverse, "A4__hailuo", 0.6); shot("RW3", reverse, "A3__hailuo", 0.6)
-shot("RW4", reverse, "A1__hailuo", 0.5); shot("A2s", still, "kA2", b - 2.3)
+shot("RW4", reverse, "A1__hailuo", 0.5); shot("A2s", clip, A2_REWIND, b - 2.3, start=A2_REWIND_START)   # Elena: no static face - real motion, not a still
 # B6 - the fresh real audit: the score appears -> the category bars -> the top fixes (the audited address blurred)
 b = blk["s06"]
 shot("S3a", split_audit, 21.7, 2.3, 2.6, 470, [(160, 128, 340, 52), (318, 382, 350, 46)])
@@ -128,8 +134,8 @@ shot("S5h", split_still, "S5_hubspot_activity", b - 5.6)
 # B9 - every morning: HubSpot + who's new / warm / slipping away
 shot("S9", split_still, "S9_hubspot_deal", blk["s09"], zoom=0.00012)
 # B10 - the ICP card over real Casco Viejo -> P1 the law firm's win (both clients) -> P2 the agency's win, her last smile, held
-b = blk["s10"]; shot("R2", clip, "R2", 4.4, start=9.7, qr=True, src=f"{ST}/pexels_29754758.mp4", grade=BRIGHT)
-shot("P1", clip, "P1__kling", 3.0); shot("P2", clip, "P2__kling", b - 7.4, start=2.0)
+b = blk["s10"]; shot("R2", clip, "R2", 3.9, start=9.7, qr=True, src=f"{ST}/pexels_29754758.mp4", grade=BRIGHT)
+shot("P1", clip, "P1__kling", 2.8); shot("P2", clip, P2_CLIP, b - 6.7, start=P2_START)   # P2b: she looks out at her volcano, then turns back smiling
 # B11 - the reveal over real Chiriqui highlands (car-window edge cropped by a 1.18 zoom) · B12 - Punta Pacifica -> end card
 shot("R3", clip, "R3", blk["s11"], start=1.0, qr=False, src=f"{ST}/pexels_38893319.mp4", zoom=1.18)
 b = blk["s12"]; shot("R1b", clip, "R1b", 1.8, start=8.0, qr=True, src=PP, grade=BRIGHT); shot("END", card_png, "card_s12.png", b - 1.8)
@@ -162,6 +168,7 @@ for c in man.get("absolute", []):
     if c.get("line"):
         a = start[c["line"]] + c["a"]; z = start[c["line"]] + (c["z"] if c.get("z") is not None else blk[c["line"]] - 0.05)
     else: a, z = c["a"], c["z"]
+    if str(c.get("file", "")).startswith("icp_"): z = min(z, SH["R2"][1] - 0.08)   # the ICP card lives on the Casco aerial only
     items.append((max(0.05, a), z, c))
 CH = man["chips"]
 def chip_at(shotname, chipname, where="tl", a=0.15, z=None, dz=0.1):

@@ -155,7 +155,7 @@ ChatGPT recommendations, WhatsApp automation, HubSpot CRM, AIdeazz AI Lab.
 | Captions EN / ES | `Relocation captions EN.srt` · `Relocation captions ES.srt` |
 | Thumbnail | `Relocation thumbnail EN.jpg` / `ES.jpg` — her smile on her own Boquete terrace, "They asked AI first. / Were you on the list?" |
 
-**PUBLISHED 2 Oct 2026, Public: https://youtu.be/f4NHCuLDHa4** (uploaded by Claude via her Chrome at her request; YouTube copyright check: no issues; altered content: YES; not made for kids; custom EN thumbnail; 13 tags; no extra CC track - Elena: the burned-in ES captions are enough).
+**v2 PUBLISHED 2 Oct 2026, Public: https://youtu.be/y1ZhWyqJW0w** (Elena's notes: ChatGPT answer now visible up to "Searching 11 websites" - no firm names; new natural-motion mother takes A2b/P2b; rewind uses real motion, not a still; master md5 `5ab513a8aa24a09bf387deb10fe226b9`). **v1 (https://youtu.be/f4NHCuLDHa4) is still live - removing/unlisting it is Elena's call.** v1 notes: **PUBLISHED 2 Oct 2026, Public: https://youtu.be/f4NHCuLDHa4** (uploaded by Claude via her Chrome at her request; YouTube copyright check: no issues; altered content: YES; not made for kids; custom EN thumbnail; 13 tags; no extra CC track - Elena: the burned-in ES captions are enough).
 
 **One version only** (Elena, 2 Oct: "just one"). Her real ChatGPT recording types the client's own question, which says "crypto software company" once.
 Nobody makes a claim about crypto; the recording is cut at "Searching the web" with zero answer text. **Keep "crypto" out of the title,
