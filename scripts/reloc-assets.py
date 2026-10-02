@@ -1,9 +1,9 @@
 # RELOCATION film (ICP #3, 2 Oct 2026) - "They Asked ChatGPT Before They Messaged Your Real Estate Agency - or Your Law Firm".
 # Assets on the yacht/villa brand system (villa-assets.py): Instrument Serif + gold italic captions, glass cards, split frames
 # (real screen left, big QR right). New for this film: the Chicago opening title (ES large + EN small, upper-left over the real
-# Chicago night aerial), scene chips (TU INMOBILIARIA / TU BUFETE / LUNES ...), the "Dramatizacion con IA" chip, the WhatsApp
+# Chicago night aerial), scene chips (TU INMOBILIARIA / TUS ABOGADOS DE INMIGRACIÓN / LUNES ...), the "Dramatizacion con IA" chip, the WhatsApp
 # "Recreacion" tag, the 5-row ICP card with the relocation lanes first in gold, the A7 decision card, the end-card subline
-# "Para bufetes e inmobiliarias". Captions s01-s03 are timed to the measured pauses of reloc-vo.py's takes (silencedetect).
+# "Para abogados de inmigración e inmobiliarias" (Elena 2 Oct: in Panama "bufete" is not the word - say "abogados de inmigración"). Captions s01-s03 are timed to the measured pauses of reloc-vo.py's takes (silencedetect).
 # Runs LOCALLY (Pillow). usage: python reloc-assets.py <fonts+logo+qr dir> <safe screenshots dir> <out dir>
 import json, os, sys
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -79,7 +79,7 @@ for f in ("safe_S4_zoho_inquiry.jpg", "safe_S4_tg_card_draft.jpg", "safe_S5_tg_s
     shadowed_paste(im, ph, L["cx"] - ph.width // 2, L["top"] + (L["maxh"] - 30 - ph.height) // 2)
     real_line(im); im.convert("RGB").save(f"{OUT}/split_{f[5:-4]}.png")
 
-# S2 - the son's real WhatsApp message (Elena's phone), his face thumbnail + ELL -> BUFETE, tagged Recreacion
+# S2 - the son's real WhatsApp message (Elena's phone), his face thumbnail + ÉL -> ABOGADOS DE INMIGRACIÓN, tagged Recreacion
 im = backdrop(); qr_block(im, 1400, 170, 470)
 bub = Image.open(f"{SAFE}/safe_S2_whatsapp_bubble.png").convert("RGB"); bub = rounded(fit(bub, 1010, 420), 30)
 by = 520; shadowed_paste(im, bub, 90, by, blur=26, alpha=200, dy=18)
@@ -87,7 +87,7 @@ face = Image.open(f"{SAFE}/RS_face.jpg").convert("RGB"); s_ = min(face.size); fa
 fm = Image.new("L", (150, 150), 0); ImageDraw.Draw(fm).ellipse((0, 0, 149, 149), fill=255); face = face.convert("RGBA"); face.putalpha(fm)
 ring = Image.new("RGBA", (162, 162), (0, 0, 0, 0)); ImageDraw.Draw(ring).ellipse((0, 0, 161, 161), outline=GOLD, width=4); ring.alpha_composite(face, (6, 6))
 shadowed_paste(im, ring, 90, by - 200)
-d = ImageDraw.Draw(im); m = font(MONO, 28); spaced(d, 280, by - 160, "ÉL  →  BUFETE", m, GOLD, 8)
+d = ImageDraw.Draw(im); m = font(MONO, 28); spaced(d, 280, by - 160, "ÉL  →  ABOGADOS DE INMIGRACIÓN", m, GOLD, 6)
 t = manrope(30, b"SemiBold"); d.text((280, by - 110), "Su mensaje por WhatsApp, un jueves por la noche", font=t, fill=(220, 223, 232))
 tag = font(MONO, 22); spaced(d, 92, by + bub.height + 44, "RECREACIÓN", tag, (175, 180, 196), 6)
 im.convert("RGB").save(f"{OUT}/split_S2_whatsapp.png")
@@ -171,7 +171,7 @@ def end_card():
     d.rounded_rectangle((x0, y0, x0 + pw, y0 + ph), ph // 2, fill=(11, 16, 32, 255))
     ty = y0 + (ph - (f.getbbox("Ag")[3] - f.getbbox("Ag")[1])) // 2 - f.getbbox("Ag")[1]
     d.text((x0 + 55, ty), label, font=f, fill=WHITE); d.text((x0 + 55 + tw(f, label), ty), arrow, font=f, fill=GOLD)
-    sb = font(ITALIC, 52); t4 = "Para bufetes e inmobiliarias"; d.text((CX - tw(sb, t4) // 2, 828), t4, font=sb, fill=GOLD)
+    sb = font(ITALIC, 52); t4 = "Para abogados de inmigración e inmobiliarias"; d.text((CX - tw(sb, t4) // 2, 828), t4, font=sb, fill=GOLD)
     n = manrope(22, b"Regular"); t3 = "Dramatización: personas generadas con IA."; d.text((CX - tw(n, t3) // 2, 1010), t3, font=n, fill=(140, 140, 150))
     qr_block(im, 1440, 140, 560, eyebrow="ESCANEA CON TU CÁMARA", url=False)
     return im.convert("RGB")
@@ -182,7 +182,7 @@ end_card().save(f"{OUT}/card_s12.png")
 CAPS = {
     "s01": [(0.05, 4.70, "Tus próximos clientes se mudan a Panamá: *una madre a la montaña, su hijo a la ciudad.*"),
             (4.70, 7.45, "No te llaman. *Le preguntan a una IA.*")],
-    "s02": [(0.05, 4.05, "Suele sugerir las inmobiliarias y los bufetes *que puede entender.*"),
+    "s02": [(0.05, 4.05, "Suele sugerir las inmobiliarias y los abogados de inmigración *que puede entender.*"),
             (4.05, 7.45, "Si no entiende tu sitio web, *quizá no estés en la lista.*")],
     "s03": [(0.05, 2.05, "Algunos clientes *te escriben directamente.*"),
             (2.05, 3.86, "Viernes: *estás mostrando una casa…*"),
@@ -236,10 +236,10 @@ for key, chunks in CAPS.items():
         bb = im.getbbox(); im = im.crop(bb); fn = f"cap_{key}_{n}.png"; im.save(f"{OUT}/{fn}")
         manifest["captions"].append({"line": key, "t0": t0, "t1": t1, "file": fn, "x": bb[0], "y": bb[1], "text": text.replace("*", "")})
 sc = Image.new("RGBA", (W, 330), (0, 0, 0, 0)); sd = ImageDraw.Draw(sc)
-for y in range(330): sd.line([(0, y), (1500, y)], fill=(0, 0, 0, int(150 * (y / 329) ** 1.6)))
+for y in range(330): sd.line([(0, y), (1500, y)], fill=(0, 0, 0, int(205 * (y / 329) ** 1.35)))
 for x in range(1500, 1560):
     a = 1 - (x - 1500) / 60
-    for y in range(330): sc.putpixel((x, y), (0, 0, 0, int(150 * (y / 329) ** 1.6 * a)))
+    for y in range(330): sc.putpixel((x, y), (0, 0, 0, int(205 * (y / 329) ** 1.35 * a)))
 sc.save(f"{OUT}/scrim.png"); manifest["scrim"] = {"file": "scrim.png", "x": 0, "y": H - 330}
 
 # ---------- titles over footage (glass card) ----------
@@ -255,7 +255,7 @@ manifest["a7_card"]["x"] = (W - Image.open(f"{OUT}/card_a7.png").width) // 2
 
 def title_question(fn, size=64, left=40, y=40):
     s, it = font(SERIF, size), font(ITALIC, size); r1, r2 = [("Misma familia.", s, WHITE)], [("Misma pregunta a ChatGPT:", it, GOLD)]
-    ql = ["¿Qué agencias inmobiliarias y bufetes", "en Panamá pueden ayudarnos", "y responden rápido en inglés?"]; qf = manrope(30, b"Medium"); qlh = 40
+    ql = ["¿Qué inmobiliarias y abogados de inmigración", "en Panamá pueden ayudarnos", "y responden rápido en inglés?"]; qf = manrope(30, b"Medium"); qlh = 40
     px, py, gap = 52, 30, 8; bw, bh = max(tw(qf, l) for l in ql) + 56, len(ql) * qlh + 30
     cw = max(runs_w(r1), runs_w(r2), bw) + 2 * px; ch = 2 * size + gap + 26 + bh + 2 * py + 10
     im = glass(cw, ch, 200); d = ImageDraw.Draw(im); x0 = 30 + px
@@ -274,14 +274,17 @@ def opening():
     im.paste(Image.new("RGBA", (W, H), (2, 4, 10, 255)), (0, 0), sc_)
     m = font(MONO, 24); LX = 96
     spaced(ImageDraw.Draw(im), LX, 120, "AIDEAZZ AI LAB · AI GROWTH OPERATOR", m, GOLD, 6)
-    s, it = font(SERIF, 104), font(ITALIC, 104)
-    for y, t_, f_, c_ in ((166, "Le preguntaron a ChatGPT", s, WHITE), (276, "antes de escribirle", s, WHITE),
-                          (386, "a tu inmobiliaria", it, GOLD), (490, "o a tu bufete.", it, GOLD)):
-        halo_runs(im, LX, y, [(t_, f_, c_)], blur=12, alpha=215)
-    en = manrope(30, b"Medium")
-    for k, t_ in enumerate(("They asked ChatGPT before they messaged", "your real estate agency — or your law firm.")):
-        halo_runs(im, LX + 4, 632 + k * 42, [(t_, en, (226, 228, 236))], blur=8, alpha=200)
-    d = ImageDraw.Draw(im); d.rounded_rectangle((LX + 4, 740, LX + 164, 744), 2, fill=VIOLET); d.rounded_rectangle((LX + 204, 740, LX + 364, 744), 2, fill=GOLD)
+    LINES = (("Le preguntaron a ChatGPT", False), ("antes de escribirle", False), ("a tu inmobiliaria", True), ("o a tus abogados", True), ("de inmigración.", True))
+    sz = 96
+    while max(tw(font(ITALIC if g else SERIF, sz), t_) for t_, g in LINES) > 1100: sz -= 2
+    s, it = font(SERIF, sz), font(ITALIC, sz); lh = round(sz * 1.02); y = 166
+    for t_, g in LINES:
+        halo_runs(im, LX, y, [(t_, it if g else s, GOLD if g else WHITE)], blur=12, alpha=215); y += lh
+    en = manrope(30, b"Medium"); y += 52
+    for k, t_ in enumerate(("They asked ChatGPT before they messaged", "your real estate agency — or your immigration lawyers.")):
+        halo_runs(im, LX + 4, y + k * 42, [(t_, en, (226, 228, 236))], blur=8, alpha=200)
+    y += 2 * 42 + 22
+    d = ImageDraw.Draw(im); d.rounded_rectangle((LX + 4, y, LX + 164, y + 4), 2, fill=VIOLET); d.rounded_rectangle((LX + 204, y, LX + 364, y + 4), 2, fill=GOLD)
     return im
 opening().save(f"{OUT}/title_open.png")
 
@@ -295,9 +298,9 @@ def chip(fn, text, size=26, tint=GOLD):
     spaced(ImageDraw.Draw(im), 52, 20 + (h_ - size) // 2 - 2, text, f, tint, 5)
     im.save(f"{OUT}/{fn}"); manifest["chips"][fn[:-4]] = {"file": fn, "w": im.width, "h": im.height}
 for fn, t in (("chip_chicago.png", "CHICAGO · JUEVES 23:52"), ("chip_inmob.png", "TU INMOBILIARIA · BOQUETE · VIERNES 10:00"),
-              ("chip_bufete.png", "TU BUFETE · CIUDAD DE PANAMÁ · VIERNES 10:00"), ("chip_lunes.png", "LUNES"),
+              ("chip_bufete.png", "TUS ABOGADOS DE INMIGRACIÓN · CIUDAD DE PANAMÁ · VIERNES 10:00"), ("chip_lunes.png", "LUNES"),
               ("chip_casco.png", "CASCO VIEJO · LA SEMANA SIGUIENTE"), ("chip_boquete.png", "BOQUETE · PRIMAVERA"),
-              ("chip_chiriqui.png", "CHIRIQUÍ"), ("chip_inmob_short.png", "TU INMOBILIARIA · VIERNES"), ("chip_bufete_short.png", "TU BUFETE · VIERNES")):
+              ("chip_chiriqui.png", "CHIRIQUÍ"), ("chip_inmob_short.png", "TU INMOBILIARIA · VIERNES"), ("chip_bufete_short.png", "TUS ABOGADOS DE INMIGRACIÓN · VIERNES")):
     chip(fn, t)
 chip("chip_drama.png", "DRAMATIZACIÓN CON IA", size=22, tint=(220, 223, 232))
 

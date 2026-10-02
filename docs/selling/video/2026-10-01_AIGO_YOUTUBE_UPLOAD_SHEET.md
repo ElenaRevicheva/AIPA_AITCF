@@ -144,3 +144,54 @@ Real Panama footage: Pixabay (Caribbean coast) and Pexels. Music: "Afro Beat Vib
 Chapters ≥ 10 s each (17 / 16 / 16 / 19 / 15 / 11), first at 0:00. **Altered or synthetic content: YES.**
 Tags: AI Growth Operator, luxury villa marketing, charter marketing, Bocas del Toro, Panama, AI visibility audit, GEO, AEO,
 ChatGPT recommendations, WhatsApp automation, HubSpot CRM, AIdeazz AI Lab.
+
+---
+
+# FILM 4 — "They Asked ChatGPT Before They Messaged You" (relocation: real estate agencies + immigration lawyers, Panama) — 2 Oct 2026
+
+| What | Where |
+|---|---|
+| Master 1080p, 97.75 s | Desktop campaign folder `02.10.26 Relocation - Real Estate + Immigration Lawyers.mp4` · Oracle `~/aigo-reloc/cut1/RELOC_FINAL_2026-10-02_1080p.mp4` |
+| Captions EN / ES | `Relocation captions EN.srt` · `Relocation captions ES.srt` |
+| Thumbnail | `Relocation thumbnail EN.jpg` / `ES.jpg` — her smile on her own Boquete terrace, "They asked AI first. / Were you on the list?" |
+
+**One version only** (Elena, 2 Oct: "just one"). Her real ChatGPT recording types the client's own question, which says "crypto software company" once.
+Nobody makes a claim about crypto; the recording is cut at "Searching the web" with zero answer text. **Keep "crypto" out of the title,
+description and tags** (keyword review), and hold comments with links for review.
+
+**Title:** `They Asked ChatGPT Before They Messaged You | AI Growth Operator for Real Estate & Immigration Law` (98 chars)
+
+**Description**
+```
+Your next clients are moving to Panama — a mother to the mountains, her son to the city. They aren't calling you. They're asking an AI.
+It tends to suggest the agencies and law firms it can understand. If it can't understand your website, you may not make the list.
+
+AIdeazz AI Lab doesn't sell you another CRM. We install an AI Growth Operator inside the tools you already use — and run it with you:
+• AI visibility audit — 34 checks, one score, the fixes that matter
+• When a client writes through your website, they hear back right away — and a reply is already drafted on your phone
+• The AI drafts, you decide: one tap to send, and the conversation is logged in your CRM
+• Every morning: who's new, who's warm, and who's starting to slip away
+
+▶ Free AI visibility audit: https://aideazz.xyz/api
+▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio
+
+Built for: relocation, visas & immigration lawyers · real estate — buying, selling & reselling · luxury villas & charters · medical tourism · dental clinics.
+
+— ES —
+Le preguntaron a ChatGPT antes de escribirle a tu inmobiliaria o a tus abogados de inmigración. ¿Estabas en la lista?
+AIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de las herramientas que ya usas, y lo operamos contigo.
+▶ Auditoría de visibilidad en IA, gratis (34 señales): https://aideazz.xyz/api
+
+0:00 They ask ChatGPT at midnight
+0:18 Friday: showing a house, at immigration
+0:35 Rewind — same family, same question
+0:51 Instant reply, one tap, every morning
+1:11 Casco Viejo and Boquete — both win
+1:27 Free AI visibility audit
+
+The people in this film are AI-generated. The product screens are real (private details blurred). Made in our own AI film studio.
+Real footage: Pexels (Chicago, Panama City, Casco Viejo, Chiriquí highlands). Music: "Deep House" by alexrockbeat (Pixabay Content License — not Content ID registered).
+```
+Chapters ≥ 10 s each (18 / 17 / 16 / 20 / 16 / 11), first at 0:00. **Altered or synthetic content: YES.**
+Tags: AI Growth Operator, Panama real estate marketing, immigration lawyer marketing, relocation Panama, Boquete, Casco Viejo,
+AI visibility audit, GEO, AEO, ChatGPT recommendations, WhatsApp automation, HubSpot CRM, AIdeazz AI Lab.

@@ -3,6 +3,11 @@
 > **Supersedes** `2026-10-01_IMMIGRATION_FILM_PLAN.md`. Made by an 8-agent workflow (3 fusions -> 3 judges -> synthesis -> critic). The critic's
 > 20 issues were checked against the code and the prospect file; every confirmed one is applied below.
 
+> **2 Oct, production notes (Elena's calls):** picks = Mother A, Lawyer 2, Agent 3 (younger, 40), Son 1, the braid couple; ONE ChatGPT
+> recording (the crypto wording) -> one film; ONE WhatsApp bubble (the son's); music = "Deep House" by alexrockbeat. **Wording: in Panama
+> say "abogados de inmigración", never "bufete"** (title, chips, captions, ChatGPT bubble, end card all changed). Spent $10.35 of $13.50.
+
+
 This extends the retiree plan you approved on 1 Oct ("sounds good"). It is not a new start. On 2 Oct you asked for three things:
 - Join the retiree story to the Panama City founder story (nomads and crypto, where lawyers are now popular).
 - Add real estate agencies ("everything in the whole country is about buying, selling and reselling real estate").

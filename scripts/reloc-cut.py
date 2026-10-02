@@ -18,6 +18,7 @@ ENC = ["-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420
 FIT = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1"
 man = json.load(open(f"{AS}/manifest.json", encoding="utf-8")); LAY = man["layout"]
 OVERLAY_ONLY = bool(os.environ.get("OVERLAY_ONLY")); segs = []; SH = {}
+REBUILD = {int(x) for x in os.environ.get("REBUILD", "").split(",") if x}   # re-render only these segment numbers (a baked card changed), keep the rest
 
 def ff(args): subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-nostdin"] + args, check=True)
 def dur(p): return float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", p], capture_output=True, text=True).stdout)
@@ -27,10 +28,11 @@ def nframes(d):
     global clock, done
     clock += d; n = round(clock * FPS) - done; done += n; return n
 def run_video(inputs, fc, n):
-    if OVERLAY_ONLY: segs.append(None); return
+    if OVERLAY_ONLY and not REBUILD: segs.append(None); return
     args = []
     for i in inputs: args += i
     p = f"{SEG}/s{len(segs):02d}.mp4"; segs.append(p)
+    if REBUILD and len(segs) - 1 not in REBUILD: return
     ff(args + ["-filter_complex", fc, "-map", "[v]", "-frames:v", str(n)] + ENC + [p])
 def loop(p): return ["-loop", "1", "-i", p]
 def shot(name, fn, *a, **k):   # remember where each shot sits on the film clock (chips are timed to shots)
@@ -90,6 +92,8 @@ start, t = {}, INTRO
 for k in PAUSE: start[k] = t; t += blk[k]
 print("starts:", {k: round(v, 2) for k, v in start.items()}, "end:", round(t, 2))
 PP = f"{ST}/pexels_33811915.mp4"   # real Punta Pacifica / Paitilla (the son's condo district)
+BRIGHT = "eq=brightness=-0.10:contrast=1.08:saturation=1.12"   # bright real aerials darkened so the serif captions read (the yacht SURF fix)
+MIST = "eq=brightness=-0.15:contrast=1.12:saturation=1.10"
 
 # B1 - Chicago, Thursday 23:52: the real night aerial (title) -> HER (Kling, first face, Dramatizacion chip) -> her son -> the question
 b = INTRO + blk["s01"]
@@ -98,12 +102,12 @@ shot("A2", clip, "A2__kling", 2.25); shot("A1", clip, "A1__hailuo", 1.9)
 shot("S1a", split_rec, 2.95, 0.6, b - 7.55)
 # B2 - sent -> thinking -> "Searching the web" (CUT there) -> the businesses it can (or cannot) understand: real Casco Viejo
 b = blk["s02"]; shot("S1b", split_rec, 3.55, 3.70, 4.3)
-shot("CASCO_B2", clip, "CASCO_B2", b - 4.3, start=4.3, qr=True, src=f"{ST}/pexels_35257068.mp4")
+shot("CASCO_B2", clip, "CASCO_B2", b - 4.3, start=4.3, qr=True, src=f"{ST}/pexels_35257068.mp4", grade=BRIGHT)
 # B3 - the son's real WhatsApp -> Friday: the agent shows a house / the lawyer with another family -> Monday -> too late
 b = blk["s03"]; shot("S2", split_still, "S2_whatsapp", 2.0)
 shot("A3", clip, "A3__hailuo", 1.9); shot("A4", clip, "A4__hailuo", 2.4)
-shot("R1", clip, "R1", 1.4, start=4.9, qr=True, src=PP)
-shot("VALLEY", clip, "VALLEY", b - 7.7, start=0.3, qr=True, src=f"{ST}/pexels_36770925.mp4")
+shot("R1", clip, "R1", 1.4, start=4.9, qr=True, src=PP, grade=BRIGHT)
+shot("VALLEY", clip, "VALLEY", b - 7.7, start=0.3, qr=True, src=f"{ST}/pexels_36770925.mp4", grade=MIST)
 # B4 - the thesis
 shot("C4", card_png, "card_s04.png", blk["s04"])
 # B5 - REWIND (Monday -> the lawyer -> the agent -> her son, backwards) -> her again, the same question
@@ -124,15 +128,15 @@ shot("S5h", split_still, "S5_hubspot_activity", b - 5.6)
 # B9 - every morning: HubSpot + who's new / warm / slipping away
 shot("S9", split_still, "S9_hubspot_deal", blk["s09"], zoom=0.00012)
 # B10 - the ICP card over real Casco Viejo -> P1 the law firm's win (both clients) -> P2 the agency's win, her last smile, held
-b = blk["s10"]; shot("R2", clip, "R2", 4.4, start=9.7, qr=True, src=f"{ST}/pexels_29754758.mp4")
+b = blk["s10"]; shot("R2", clip, "R2", 4.4, start=9.7, qr=True, src=f"{ST}/pexels_29754758.mp4", grade=BRIGHT)
 shot("P1", clip, "P1__kling", 3.0); shot("P2", clip, "P2__kling", b - 7.4, start=2.0)
 # B11 - the reveal over real Chiriqui highlands (car-window edge cropped by a 1.18 zoom) · B12 - Punta Pacifica -> end card
 shot("R3", clip, "R3", blk["s11"], start=1.0, qr=False, src=f"{ST}/pexels_38893319.mp4", zoom=1.18)
-b = blk["s12"]; shot("R1b", clip, "R1b", 1.8, start=8.0, qr=True, src=PP); shot("END", card_png, "card_s12.png", b - 1.8)
+b = blk["s12"]; shot("R1b", clip, "R1b", 1.8, start=8.0, qr=True, src=PP, grade=BRIGHT); shot("END", card_png, "card_s12.png", b - 1.8)
 print("shots:", {k: (round(a, 2), round(z, 2)) for k, (a, z) in SH.items()})
 
 pic = f"{OUTD}/picture.mp4"
-if not OVERLAY_ONLY:
+if not OVERLAY_ONLY or REBUILD:
     lst = f"{OUTD}/list.txt"; open(lst, "w").write("".join(f"file '{p}'\n" for p in segs))
     ff(["-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", pic])
 
