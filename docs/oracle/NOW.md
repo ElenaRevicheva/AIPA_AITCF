@@ -130,6 +130,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ⚠️ 2 Oct — `scripts/stage-manual-prospect.cjs` has UNCOMMITTED work on Elena's laptop — do NOT checkout/reset it
+- (1) Cloudflare `data-cfemail` decode in the contact scraper; (2) opt-in AI Growth Operator kit per PROSPECT_META:
+  `deckLine` / `tailLines` (ES deck link + the 2 promo videos) / `cc` / `attachments` (registry + HubSpot note attachment); (3) Grand Tours entry.
+  Old letters proven byte-identical (6/6 variants, old vs new `buildDraft`). **Blocked only by pii-guard** (86 pre-existing prospect emails in
+  the file) — the commit needs `--no-verify`, which Elena must run herself. `wa-link-lib.cjs` (registry cc/attachments pass-through) is committed.
+
+### 🚢 2 Oct — Grand Tours (cruises, grandtours.com.pa) STAGED · Elena's move
+- Deal `65653651237` `[CLIENT-MANUAL] Grand Tours — AI Growth Operator (audit: 85/A)` · live audit 85/A (AEO 69) · credential letter.
+  WA +507 6379-4392 (plain text in note for her phone) · email one-click `grand-tours` → info@grandtours.com.pa, Cc her Gmail, ES deck attached
+  (confirm page probed: To/Cc/4764 KB correct). Registry merged on Oracle (441, backup in `~/backups/`).
+
 ### 🛥️ 2 Oct — Tours Panama Experience (= EXISTING deal 62792913925 "Alquiler de Yates Panamá", WA-sent 18 Jul) · Elena's move
 - **Not a new deal** — same site/WhatsApp as the July CLIENT-MANUAL deal; staged as a follow-up ON it. Note `117947980108`
   (WA text for Elena to send from her phone, one-time + email copy, ES deck attached = HubSpot file 223483883387), HIGH task `117928875835`.

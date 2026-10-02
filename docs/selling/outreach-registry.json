@@ -3676,5 +3676,21 @@
     "dealId": "62792913925",
     "score": 82,
     "email": "info@alquilerdeyatespanama.com"
+  },
+  "grand-tours": {
+    "phone": "50763794392",
+    "draft": "docs/selling/drafts/grand-tours.txt",
+    "company": "Grand Tours",
+    "email": "info@grandtours.com.pa",
+    "emailDraft": "docs/selling/drafts/grand-tours-email.txt",
+    "dealId": "65653651237",
+    "score": 85,
+    "cc": "elena.revicheva2016@gmail.com",
+    "attachments": [
+      {
+        "path": "docs/selling/attachments/AIdeazz_AI_Growth_Operator_2026_ES.pdf",
+        "filename": "AIdeazz_AI_Growth_Operator_2026_ES.pdf"
+      }
+    ]
   }
 }

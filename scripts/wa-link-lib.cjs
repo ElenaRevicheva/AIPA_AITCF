@@ -75,6 +75,8 @@ function registerOutreachSlug(slug, phone, draftRelPath, company, extra = {}) {
       : {}),
     ...(extra.dealId ? { dealId: String(extra.dealId) } : {}),
     ...(extra.score != null ? { score: Number(extra.score) } : {}),
+    ...(extra.cc ? { cc: String(extra.cc) } : {}),
+    ...(extra.attachments && extra.attachments.length ? { attachments: extra.attachments } : {}),
   };
   saveRegistry(reg);
   return slug;
