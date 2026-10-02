@@ -138,7 +138,8 @@ git log keeps the record.
 - **EN + ES done** (`make-es.py`, fails on untranslated text). Desktop `2 Decks 01.10.2026`: `AIdeazz_AI_Growth_Operator_2026_EN/ES.pdf`
   added, old 29 Sep deck moved to `old/` (Elena's OK). **LIVE on aideazz.xyz/api** footer under "About" → "AI Growth Operator"
   (aideazz `c00d3c9`; live PDFs md5-identical to built). Rebuild ⇒ copy both PDFs to aideazz `public/`. Outlook link renamed
-  "Founder" / "Fundadora" (Resources column, `d3622e3`). **⏸ PAUSED by Elena:** attaching the deck to the 571 open CLIENT deals —
+  **"Human-Backed AI" / "IA con respaldo humano"** (Resources column, `8269a5c`; Elena rejected About / Professional Outlook /
+  Founder / AI Leadership — never a solo-founder word). **⏸ PAUSED by Elena:** attaching the deck to the 571 open CLIENT deals —
   dry run only, 0 written; Google Calendar 2 Oct 10:00 Panama; script `docs/selling/ai-growth-operator-deck/attach-to-client-deals.cjs`.
 
 ### 📨 1 Oct — Megan got a DUPLICATE on 30 Sep; the demand nudge is still UNSENT. Old links disarmed. Firecrawl applied.
