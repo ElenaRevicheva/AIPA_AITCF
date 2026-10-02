@@ -1,3 +1,5 @@
+> **SUPERSEDED 2 Oct 2026** by `2026-10-02_RELOCATION_FILM_PLAN.md` (Elena merged this retiree story with the Panama City founder story and added real estate agencies). Kept for the record; do not produce from it.
+
 # ICP film #3 — immigration lawyers (immigration & relocation lane): PLAN for Elena's approval (1 Oct 2026)
 
 Elena: "yeah, go next with immigration lawyers." **Nothing generated, nothing spent.** Every gate waits for her OK.

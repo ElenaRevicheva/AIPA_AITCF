@@ -283,8 +283,9 @@ git log keeps the record.
 
 - Plan + Elena's decisions: `docs/selling/video/2026-10-01_API_FILM_MERGE_PLAN.md`. Kit: `scripts/apim-*.{py,mjs}`, Oracle `~/aigo-promo/apim/`.
 - **ICP film #2 villa + charter: APPROVED FINAL** (afro house; ledger $13.69 of $14). All 3 films + captions + thumbnails + upload sheet
-  are in her Desktop folder `API promo campaign	.09.2026 API video for YouTube campaign`; she uploads. **Immigration lawyers film: PLAN delivered, awaiting her 5 decisions**
-  (`docs/selling/video/2026-10-01_IMMIGRATION_FILM_PLAN.md`; 8-agent workflow: 3 concepts → 3 judges → synthesis → critic; $0 spent). Delete test deal 65538820526 (Andrés Morales) — the villa film does not show it.
+  are in her Desktop folder `Desktop/API promo campaign/11.09.2026 API video for YouTube campaign`; she uploads. **ICP film #3 relocation lane (real estate agencies + law firms; Chicago mother -> Boquete home, founder son -> Panama City): PLAN v2 delivered 2 Oct, awaiting her 5 decisions**
+  (`docs/selling/video/2026-10-02_RELOCATION_FILM_PLAN.md`; supersedes the 1 Oct immigration plan; 8-agent workflow, critic fixes verified against
+  the code; $0 spent; cap $13.50, Replicate top-up >= $19 is hers). Delete test deal 65538820526 (Andrés Morales) — the villa film does not show it.
 
 ### 🎬 1 Oct — AI Growth Operator YouTube promo: FILM APPROVED by Elena (cut v7) — not uploaded yet
 
