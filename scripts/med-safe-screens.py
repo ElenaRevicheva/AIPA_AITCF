@@ -35,7 +35,7 @@ safe("8321e248-image.jpg", "safe_S5_hubspot_activity.jpg", (0, 95, 923, 1395),
 # HubSpot, line 9 ("every morning you know who's new, who's warm..."): the deal header from the SAME screenshot - the
 # stage stays readable ("Sent - passive wait"), only the owner's name inside it, the title prefix and the name are blurred.
 safe("8321e248-image.jpg", "safe_S9_hubspot_deal.jpg", (0, 95, 923, 700),
-     [(130, 140, 795, 200), (556, 452, 702, 498)])
+     [(130, 140, 795, 200), (540, 452, 702, 498)])
 
 # ---- WhatsApp recreation (tagged "Recreación" on screen). Elena sent all five lines to herself, so every bubble is green
 # (outgoing). The clinic's Monday line stays green on the right; the couple's reply and the T3 recovery message become
