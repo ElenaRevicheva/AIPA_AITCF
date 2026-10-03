@@ -7,7 +7,9 @@ scenario." The v13/v19 /api cuts are out. Flow (PATCH 200, `isinvalid: false`, a
 `util:SetVariable2` filmIndex = `parseNumber(formatDate(now; "DDD")) % 4` → `builtin:BasicRouter`, one route per film
 (filter `filmIndex = k`): `http:ActionGetFile` → `youtube:uploadVideo` v4 (conn `5453399`) with that film's own title,
 description and tags from `docs/selling/video/2026-10-01_AIGO_YOUTUBE_UPLOAD_SHEET.md`, public, not for kids,
-`containsSyntheticMedia: true` (ignored if the module lacks the field — check the first upload's "altered content").
+`containsSyntheticMedia: true`. **VERIFIED on the first run, 3 Oct 14:15 UTC:** log status SUCCESS, 3 operations, transfer
+42,844,900 B (= `aigo-film-1-yacht.mp4` 42,838,637 B), public video `RsKJX3SKgiw` published 14:15:19 UTC (channel RSS), and the watch
+page shows "How this was made — Sounds or visuals were altered or fully generated · Made with AI". Next run 4 Oct = filmIndex 1 (/api).
 
 | filmIndex | film | file (`/var/www/influencer-images/youtube/`, public via webhook.aideazz.xyz) | md5 = the published master |
 |---|---|---|---|
