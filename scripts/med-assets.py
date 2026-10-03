@@ -86,7 +86,7 @@ for f in ("safe_S4_inquiry_copy.jpg", "safe_S4_gmail_ack.jpg", "safe_S4_tg_card_
 def wa_thread(src, face_src, label, sub, out):
     im = backdrop(); qr_block(im, 1400, 170, 470)
     bub = Image.open(f"{SAFE}/{src}").convert("RGB"); bub = rounded(fit(bub, 1010, 470), 30)
-    by = 470; shadowed_paste(im, bub, 90, by, blur=26, alpha=200, dy=18)
+    by = 560; shadowed_paste(im, bub, 90, by, blur=26, alpha=200, dy=18)   # below the s03 title card
     face = Image.open(f"{SAFE}/{face_src}").convert("RGB"); s_ = min(face.size); face = face.crop(((face.width - s_) // 2, 0, (face.width + s_) // 2, s_)).resize((150, 150), Image.LANCZOS)
     fm = Image.new("L", (150, 150), 0); ImageDraw.Draw(fm).ellipse((0, 0, 149, 149), fill=255); face = face.convert("RGBA"); face.putalpha(fm)
     ring = Image.new("RGBA", (162, 162), (0, 0, 0, 0)); ImageDraw.Draw(ring).ellipse((0, 0, 161, 161), outline=GOLD, width=4); ring.alpha_composite(face, (6, 6))
@@ -101,7 +101,7 @@ wa_thread("safe_S2b_wa_surgery.jpg", "R1_face.jpg", "ELLA  →  CIRUGÍA PLÁSTI
 # T3 overlay: the coordinator's logistics-only recovery message on his phone (incoming bubble), tagged Recreacion
 def t3_bubble():
     im = layer(); bub = rounded(fit(Image.open(f"{SAFE}/safe_T3_wa_recovery.jpg").convert("RGB"), 760, 300), 26)
-    x, y = W - bub.width - 70, 70; shadowed_paste(im, bub, x, y, blur=24, alpha=190, dy=14)
+    x, y = 70, H - bub.height - 130; shadowed_paste(im, bub, x, y, blur=24, alpha=190, dy=14)   # lower left: the nurse's face is top right in T3
     m = font(MONO, 20); t = "LA COORDINADORA · RECREACIÓN"
     sh = layer(); spaced(ImageDraw.Draw(sh), x + 4 + 2, y + bub.height + 24 + 2, t, m, (0, 0, 0, 220), 5); im.alpha_composite(sh.filter(ImageFilter.GaussianBlur(5)))
     spaced(ImageDraw.Draw(im), x + 4, y + bub.height + 24, t, m, (235, 236, 242), 5)
