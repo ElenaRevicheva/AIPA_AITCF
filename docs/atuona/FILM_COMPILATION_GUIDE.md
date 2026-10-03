@@ -333,6 +333,7 @@ complete — a new film starts as a copy of them.** Titles, descriptions, chapte
 | *Can AI Find and Cite Your Business?* (/api, v13 + v19 merged, 90.6 s) | `apim-vo.py` · `apim-rec-groups.mjs` · `apim-assets.py` · `apim-cut.py` · `apim-srt.py` | `~/aigo-promo/apim` | "Modern Deep House" — ArtIssizm | md5 `28d5b97174db9989e935f9ece89a8a31` |
 | *She Asked ChatGPT Before She Booked Your Island* (villa + charter, 94.4 s) | `villa-vo.py` · `villa-assets.py` · `villa-cut.py` · `villa-srt.py` | `~/aigo-villa` | "Afro Beat Vibes" — -WATERMEL0N- | md5 `7253d8df068f8d243cb6ecc3ca0799a5` · ledger $13.69 of $14 |
 | *They Asked ChatGPT Before They Messaged You* (relocation: real estate agencies + immigration lawyers, Panama; 97.75 s, −15.7 LUFS) | `reloc-vo.py` · `reloc-rec-audit.mjs` · `reloc-safe-screens.py` · `reloc-assets.py` · `reloc-cut.py` · `reloc-srt.py` · `reloc-thumbnail.py` | `~/aigo-reloc` | "Deep House" — alexrockbeat | v1 https://youtu.be/f4NHCuLDHa4 (md5 `20c7f5fcdc251295adeedef6e99b8eda`) · v2 https://youtu.be/y1ZhWyqJW0w (md5 `5ab513a8aa24a09bf387deb10fe226b9`) — **both stay live** (Elena) · ledger $12.59 of $13.50 |
+| *They Asked ChatGPT Before They Messaged Your Clinic* (medical tourism: Colombian dental clinics + plastic-surgery practices; 106.92 s, −16.1 LUFS) | `med-vo.py` · `med-rec-audit.mjs` · `med-safe-screens.py` · `med-assets.py` · `med-cut.py` · `med-srt.py` · `med-thumbnail.py` | `~/aigo-med` | "Fashion Lounge" — TheSilentThunder | https://youtu.be/b4Fg3omBaSk (md5 `daad6e5ec245988e2b26826c54ce6f19`, published 3 Oct) · ledger $11.19 of $13.50 |
 
 Masters, EN + ES SRT, EN + ES thumbnails and the upload sheet live in Elena's Desktop folder `API promo campaign/11.09.2026
 API video for YouTube campaign`. The relocation file there is **v2 under the original name**; v1 sits beside it as `… (v1 - first YouTube upload).mp4`
@@ -529,3 +530,21 @@ Verification checklist (all against the file in `out/`):
     (Elena: "Do not unlist anything").
 62. v2 was saved to the Desktop under v1's file name, so v1 — still live on YouTube — briefly had no local master (copied
     back as `… (v1 - first YouTube upload).mp4`). Version the file name everywhere, as Oracle did (`RELOC_FINAL_v2_…`).
+63. **Medical lanes: the treatment must be EVIDENT, "very polite, very light"** (Elena, film #5). Show planning, consultation and
+    recovery — never an intervention, a result, a price or a credential. A plan that hid the clinic read as a holiday.
+64. **Pixabay has almost no real Cartagena de Indias** — its "Cartagena" clips are Murcia, Spain; Pexels' "Medellín cable car"
+    clips are Bogotá's TransMiCable. Prove every city by a landmark on a frame sheet; the CDNs of both sites download fine from
+    Oracle with a browser User-Agent and the page as Referer.
+65. **Music is the slowest gate:** 13 Pixabay tracks checked for film #5, 1 passed (8 hid vocals — chops, a sung hook, a producer
+    tag — and 4 sounded like stock). Two whole-track listens plus demucs (< −25 dB) catch what tags and titles ("Instrumental")
+    do not. demucs one at a time (`flock /tmp/demucs.lock`).
+66. **A screen composite needs a locked camera:** the dental-chair Hailuo take pushed in and turned the monitor's back to the
+    camera, so the planned scan composite had nowhere to go. The chair, bib, loupes and mask carried the read; decide before
+    paying for the scan still.
+67. **Homophones fail the two-model check:** "patients"/"patience" and "Colombia"/"Columbia" — accept either spelling for that key
+    (the on-screen card settles the meaning) instead of paying for retakes that cannot fix it.
+68. **Crop personal app chrome, not just the status bar:** Elena's ChatGPT recording showed her chat history for 2.5 s and a
+    project name in the header — start after the history slides away, crop the top 11%.
+69. **Overlays must not cover a face:** the recovery WhatsApp bubble sat on the nurse's face top-right; check every overlay on
+    the frame sheet and move it (here: lower left).
+70. **Thumbnails carry the couple** (Elena: "with a couple, not just a husband") — and still say the lane at a glance.

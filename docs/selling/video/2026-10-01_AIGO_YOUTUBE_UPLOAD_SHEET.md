@@ -208,7 +208,7 @@ AI visibility audit, GEO, AEO, ChatGPT recommendations, WhatsApp automation, Hub
 | Captions EN / ES | `~/aigo-med/cut1/MEDTOUR_promo_en.srt` · `MEDTOUR_promo_es.srt` (29 cues each) |
 | Thumbnail | `MEDTOUR_thumbnail_EN.jpg` / `ES.jpg` — the couple together at the consultation (Elena 3 Oct: "with a couple, not just a husband"), "They asked AI first. / Was your clinic on the list?" |
 
-**Status: NOT published.** Upload only with Elena's OK. Her ChatGPT recording is cut at "Searching 9 websites" (zero clinic names).
+**PUBLISHED 3 Oct 2026, Public: https://youtu.be/b4Fg3omBaSk** (Elena: "Publish a full quality movie on youtube"; uploaded by Claude via her Chrome; copyright check: no issues; Community Guidelines check: no issues; altered content YES — the watch page shows "Made with AI"; not made for kids; custom EN couple thumbnail; 14 tags; no CC track). Her ChatGPT recording is cut at "Searching 9 websites" (zero clinic names). NOT yet in the Make daily rotation (Decision 6 open).
 
 **Title:** `They Asked ChatGPT Before They Messaged Your Clinic | AI Growth Operator · Dental & Plastic Surgery` (99 chars)
 
