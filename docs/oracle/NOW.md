@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-03T11:24 | Split PROSPECT_META out of stage-manual-prospect.cjs into docs/selling/ so pii-guard passes | scripts/stage-manual-prospect.cjs, docs/selling/prospect-meta.cjs | 67a4dc0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -131,11 +130,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### ⚠️ 2 Oct — `scripts/stage-manual-prospect.cjs` has UNCOMMITTED work on Elena's laptop — do NOT checkout/reset it
-- (1) Cloudflare `data-cfemail` decode in the contact scraper; (2) opt-in AI Growth Operator kit per PROSPECT_META:
-  `deckLine` / `tailLines` (ES deck link + the 2 promo videos) / `cc` / `attachments` (registry + HubSpot note attachment); (3) Grand Tours entry.
-  Old letters proven byte-identical (6/6 variants, old vs new `buildDraft`). **Blocked only by pii-guard** (86 pre-existing prospect emails in
-  the file) — the commit needs `--no-verify`, which Elena must run herself. `wa-link-lib.cjs` (registry cc/attachments pass-through) is committed.
+### ⚠️ 3 Oct — code/data split of stage-manual-prospect.cjs DONE ON DISK, NOT COMMITTED · Elena's move
+- **DONE:** PROSPECT_META (101 prospects) + AIGO kit constants moved to  (data plane, pii-exempt by design);
+  the script s it (913 lines, was ~2,600). Also holds the 2 Oct Cloudflare  decoder + deck/video/cc/attachments kit.
+- **VERIFIED BY:** old vs new PROSPECT_META  = equal (101);  202/202 letters identical (every prospect × 2 paths).
+- **BLOCKER:** pii-guard's ONE remaining finding = a July code COMMENT quoting a clinic's address (, line ~143).
+  Auto mode refused my edit of it as a guard bypass → Elena edits that comment (or approves) and commits both files.
+- **RISK:** never checkout/reset these two files — this is the only copy of the work.
 
 ### ⚖️ 2 Oct — Quijano & Associates (law, quijano.com) STAGED · Elena's move
 - Deal `65625582092` `[CLIENT-MANUAL] Quijano & Associates — GEO/AEO fix (audit: 76/B)` · EMAIL-ONLY (only landline published).
