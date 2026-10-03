@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-03T11:24 | Split PROSPECT_META out of stage-manual-prospect.cjs into docs/selling/ so pii-guard passes | scripts/stage-manual-prospect.cjs, docs/selling/prospect-meta.cjs | 67a4dc0 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
