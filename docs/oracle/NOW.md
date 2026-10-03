@@ -130,6 +130,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🤝 3 Oct — IntelliOps: Nishant SIGNED the addendum (2 Oct) + added Clause 6 · Elena's move
+- Clauses 1–5 verbatim hers (diffed); he signed; Clause 6 = he contracts personally (trade name), Noida courts. One hole: revenue
+  paid to his future company may fall outside the base → ask **Clause 6A** + his PAN, then she signs. Say yes to his call.
+  Review + DRAFT reply (not sent): `docs/selling/INTELLIOPS_CLAUSE6_REVIEW_2026-10-03.md`; HubSpot note on the BD Expert deal.
+- ⚠️ STRANDED: the whole IntelliOps record (`docs/selling/intelliops/`: evaluation, V1_VS_V2, addendum, v1/v2 PDFs) is only on
+  `origin/cursor/intelliops-addendum-ded9`, never merged to main.
+
 ### ✅ 3 Oct — stage-manual-prospect code/data split LANDED (bbf88c5) · GitHub = laptop = Oracle
 - Prospects now live in `docs/selling/prospect-meta.cjs` (101) — **add new prospects THERE**, not in the script. Script carries no PII; pii-guard passes without override.
 - Includes the Cloudflare `data-cfemail` decoder + deck/video/cc/attachments kit. Oracle: 3 files md5 = main, backups `~/backups/*.bak-20261003-114059`, decoder tested there. No restart (not loaded by any service).
