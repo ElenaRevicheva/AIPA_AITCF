@@ -32,6 +32,11 @@ safe("8321e248-image.jpg", "safe_S5_hubspot_activity.jpg", (0, 95, 923, 1395),
      [(130, 140, 795, 200), (58, 450, 866, 500), (60, 952, 520, 1002), (68, 1010, 368, 1060),
       (205, 1096, 672, 1144)])   # the last box: "good to hear from you again" (the test inbox wrote before)
 
+# HubSpot, line 9 ("every morning you know who's new, who's warm..."): the deal header from the SAME screenshot - the
+# stage stays readable ("Sent - passive wait"), only the owner's name inside it, the title prefix and the name are blurred.
+safe("8321e248-image.jpg", "safe_S9_hubspot_deal.jpg", (0, 95, 923, 700),
+     [(130, 140, 795, 200), (556, 452, 702, 498)])
+
 # ---- WhatsApp recreation (tagged "Recreación" on screen). Elena sent all five lines to herself, so every bubble is green
 # (outgoing). The clinic's Monday line stays green on the right; the couple's reply and the T3 recovery message become
 # INCOMING (white, left) - same words, time and ticks painted out. Nothing is retyped: the text pixels are hers.
