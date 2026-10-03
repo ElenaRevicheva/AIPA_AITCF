@@ -98,6 +98,9 @@ BRIGHT = "eq=brightness=-0.10:contrast=1.08:saturation=1.12"   # bright real aer
 MIST = "eq=brightness=-0.15:contrast=1.12:saturation=1.10"
 SURF = "eq=contrast=1.22:saturation=1.35:gamma=0.97,eq=brightness=-0.10"   # the flat/log Bocagrande clip (verifier's tested grade)
 COLTEJER = f"{ST}/pexels_31563421.mp4"
+# v2 (Elena 3 Oct): the hand-washing scrub-room shot is replaced by the dentist working in his operatory (kA3b, Hailuo).
+# A3_CLIP=A3__hailuo rebuilds v1.
+A3_CLIP = os.environ.get("A3_CLIP", "A3b__hailuo")
 
 # B1 - Dallas, Thursday 23:48: the real Reunion Tower aerial (title) -> HIM ("dental implants for him", first face, Dramatizacion
 # chip, a push-in on the still) -> HER (Kling, "a cosmetic procedure for her") -> her real ChatGPT question
@@ -111,7 +114,7 @@ b = blk["s02"]; shot("S1b", split_rec, 4.0, 5.9, 6.0)
 shot("MED_B2", clip, "MED_B2", b - 6.0, start=1.5, qr=True, src=f"{ST}/pexels_31563691.mp4", grade=BRIGHT)
 # B3 - Friday: the dentist scrubs in for a long surgery / the coordinator with another family -> Monday (real Coltejer) ->
 # the two real WhatsApp threads: the clinics answer Monday, the couple already chose someone else
-b = blk["s03"]; shot("A3", clip, "A3__hailuo", 4.2)
+b = blk["s03"]; shot("A3", clip, A3_CLIP, 4.2, start=0.2)
 shot("A4", clip, "A4__hailuo", 2.35, start=2.2)
 shot("R1", clip, "R1", 1.25, start=1.0, qr=True, src=COLTEJER, grade=BRIGHT)
 shot("S2d", split_still, "S2b_dental", 2.1); shot("S2s", split_still, "S2b_surgery", b - 9.9)
@@ -119,7 +122,7 @@ shot("S2d", split_still, "S2b_dental", 2.1); shot("S2s", split_still, "S2b_surge
 shot("C4", card_png, "card_s04.png", blk["s04"])
 # B5 - REWIND (the threads -> Monday -> the coordinator -> the dentist, backwards) -> her again, live, the same question
 b = blk["s05"]; shot("RW1", reverse_src, COLTEJER, 1.0, 1.25, 0.6); shot("RW2", reverse, "A4__hailuo", 0.6, start=2.2)
-shot("RW3", reverse, "A3__hailuo", 0.6); shot("A2s", clip, "A2__kling", b - 1.8, start=0.6)
+shot("RW3", reverse, A3_CLIP, 0.6); shot("A2s", clip, "A2__kling", b - 1.8, start=0.6)
 # B6 - the fresh real audit of our own page: 93 / A+ -> the category bars -> the three top fixes (the address blurred)
 b = blk["s06"]
 shot("S3a", split_audit, 21.7, 2.3, 2.6, 470, [(184, 132, 236, 44), (326, 398, 280, 42)])

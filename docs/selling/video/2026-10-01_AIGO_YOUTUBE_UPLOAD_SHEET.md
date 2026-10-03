@@ -210,6 +210,8 @@ AI visibility audit, GEO, AEO, ChatGPT recommendations, WhatsApp automation, Hub
 
 **PUBLISHED 3 Oct 2026, Public: https://youtu.be/b4Fg3omBaSk** (Elena: "Publish a full quality movie on youtube"; uploaded by Claude via her Chrome; copyright check: no issues; Community Guidelines check: no issues; altered content YES — the watch page shows "Made with AI"; not made for kids; custom EN couple thumbnail; 14 tags; no CC track). Her ChatGPT recording is cut at "Searching 9 websites" (zero clinic names). NOT yet in the Make daily rotation (Decision 6 open).
 
+**v2 BUILT 3 Oct, NOT yet published** (Elena: "music needs to be changed. It is generic. It needs to be chillout, deephouse latest trends 2026" + the hand-washing dentist shot replaced by the dentist working in his operatory; then "Let us create our own music"): Oracle `~/aigo-med/cut1/MEDTOUR_FINAL_v2_2026-10-03_1080p.mp4`, md5 `34f1ba4326ae71eaefb9ee6cae54fffc`, −16.0 LUFS; Desktop `… (Colombia) v2 - own music, new dentist shot.mp4`. Music = our own ElevenLabs Music track (`music/mus1.mp3`, instrumental, demucs voice stem ~60 dB under the music). If published, the music credit line becomes: "Music: original track generated for AIdeazz AI Lab with ElevenLabs Music."
+
 **Title:** `They Asked ChatGPT Before They Messaged Your Clinic | AI Growth Operator · Dental & Plastic Surgery` (99 chars)
 
 **Description** (the plan §6 disclosure lines FIRST; no banned word: no "new smile", results, safe, best, certified, package, price)

@@ -5,6 +5,7 @@
 //   node gen.mjs image <id>                 render plan.images[id] on its engine (flux | nano | gpt) -> img/<id>.jpg
 //   node gen.mjs video <shot> [engine]      render plan.shots[shot] (engine overrides) -> clips/<shot>__<engine>.mp4
 //   node gen.mjs ledger                     spend so far (estimated from the vendor's per-second prices)
+//   node gen.mjs music <id>                 render plan.music[id] (instrumental) -> music/<id>.mp3 (added 3 Oct 2026, film #5)
 //
 // Money guard: every job is priced BEFORE it is sent and refused if it would push the ledger past BUDGET_USD.
 // Prices = the Replicate model pages on 22 Sep 2026 (docs/atuona/2026-09-22_MODEL_AUDIT_AND_TOPUPS.md).
@@ -247,11 +248,33 @@ async function video(shotId, engineOverride) {
   console.log(`OK ${label} -> ${dest} (~$${usd.toFixed(2)}; spent $${spent().toFixed(2)} of $${BUDGET})`);
 }
 
+// Music (3 Oct 2026, Elena: "Let us create our own music"). ElevenLabs Music on Replicate: up to 300 s, force_instrumental
+// (no vocals by design), commercial use under the ElevenLabs Music Terms. Price found 3 Oct: ~$8.30 per 1,000 s of output; the
+// guard prices it HIGHER ($0.011/s) so it never under-counts. plan.music[id] = { engine, prompt, seconds }.
+const MUSIC_ENGINES = {
+  elevenlabs: { model: 'elevenlabs/music', perSec: 0.011,
+    input: m => ({ prompt: m.prompt, music_length_ms: Math.round(m.seconds * 1000), force_instrumental: true, output_format: 'mp3_high_quality' }) },
+};
+async function music(id) {
+  const m = (PLAN.music || {})[id]; if (!m) throw new Error('no plan.music.' + id);
+  const eng = MUSIC_ENGINES[m.engine || 'elevenlabs']; if (!eng) throw new Error('unknown music engine ' + m.engine);
+  const usd = eng.perSec * m.seconds; guard(usd, `music ${id}`);
+  const p = await predict(eng.model, eng.input(m), `music_${id}`);
+  record({ kind: 'music', id, engine: m.engine || 'elevenlabs', model: eng.model, seconds: m.seconds, status: p.status,
+    usd: p.status === 'succeeded' ? usd : 0, error: p.error || null, prediction: p.id });
+  if (p.status !== 'succeeded') { console.log(`FAIL music ${id}: ${String(p.error).slice(0, 200)}`); process.exitCode = 2; return; }
+  fs.mkdirSync(path.join(BASE, 'music'), { recursive: true });
+  const dest = path.join(BASE, 'music', `${id}.mp3`);
+  await download(outUrl(p.output), dest);
+  console.log(`OK music ${id} -> ${dest} (~$${usd.toFixed(2)}; spent $${spent().toFixed(2)} of $${BUDGET})`);
+}
+
 const [cmd, a, b] = process.argv.slice(2);
 if (cmd === 'image') await image(a);
 else if (cmd === 'video') await video(a, b);
+else if (cmd === 'music') await music(a);
 else if (cmd === 'ledger') {
   const L = ledger();
   for (const e of L) console.log(`${e.ts.slice(5, 16)} ${e.kind.padEnd(5)} ${(e.id + (e.engine ? '/' + e.engine : '')).padEnd(22)} ${e.status.padEnd(9)} $${e.usd.toFixed(2)} ${e.error ? String(e.error).slice(0, 90) : ''}`);
   console.log(`SPENT ~$${spent().toFixed(2)} of $${BUDGET} (${L.filter(e => e.status !== 'succeeded').length} failed/refused, not billed)`);
-} else { console.log('usage: node gen.mjs image <id> | video <shot> [engine] | ledger'); process.exitCode = 1; }
+} else { console.log('usage: node gen.mjs image <id> | video <shot> [engine] | music <id> | ledger'); process.exitCode = 1; }
