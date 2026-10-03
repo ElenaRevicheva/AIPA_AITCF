@@ -1,5 +1,28 @@
 # /api promo → YouTube + social (Make)
 
+## STATE, 3 Oct 2026 — `6263197` Daily YouTube Upload now ROTATES THE 4 AIGO FILMS (Elena's call)
+
+Elena (3 Oct): "promote these 4 new videos rotating them every day … all other older videos should be removed from the
+scenario." The v13/v19 /api cuts are out. Flow (PATCH 200, `isinvalid: false`, active, daily 09:15 Panama = 14:15 UTC):
+`util:SetVariable2` filmIndex = `parseNumber(formatDate(now; "DDD")) % 4` → `builtin:BasicRouter`, one route per film
+(filter `filmIndex = k`): `http:ActionGetFile` → `youtube:uploadVideo` v4 (conn `5453399`) with that film's own title,
+description and tags from `docs/selling/video/2026-10-01_AIGO_YOUTUBE_UPLOAD_SHEET.md`, public, not for kids,
+`containsSyntheticMedia: true` (ignored if the module lacks the field — check the first upload's "altered content").
+
+| filmIndex | film | file (`/var/www/influencer-images/youtube/`, public via webhook.aideazz.xyz) | md5 = the published master |
+|---|---|---|---|
+| 0 | yacht | `aigo-film-1-yacht.mp4` | `89e91e42…` |
+| 1 | /api merged | `aigo-film-2-api.mp4` | `28d5b971…` |
+| 2 | villa + charter | `aigo-film-3-villa.mp4` | `7253d8df…` |
+| 3 | relocation v2 | `aigo-film-4-relocation.mp4` | `5ab513a8…` |
+
+Backup of the previous 2-module blueprint: `docs/selling/video/make/6263197_daily_youtube_upload_BACKUP_2026-10-03.json`;
+the new one: `…_4FILMS_2026-10-03.json`. **⚠️ Risk Elena accepted knowingly:** the channel already holds ~60 near-identical
+daily re-uploads (many "Potential earning limitation") and an active Community Guidelines warning; YouTube's spam policy covers
+repetitive uploads. If a strike arrives, the first lever is to switch this scenario off (Make UI toggle or PATCH
+`/scenarios/6263197/stop`). Custom thumbnails are not set by this module (YouTube auto-picks a frame).
+
+
 ## STATE, 13 Sep 2026
 
 | scenario | state | does |

@@ -1,0 +1,177 @@
+{
+ "blueprint": {
+  "flow": [
+   {
+    "id": 1,
+    "mapper": {
+     "ca": "",
+     "qs": [],
+     "url": "{{if(parseNumber(formatDate(now; \"D\")) % 2 = 0; \"https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v13.mp4\"; \"https://webhook.aideazz.xyz/influencer-images/youtube/can-ai-find-and-cite-you-v19.mp4\")}}",
+     "method": "get",
+     "headers": [],
+     "timeout": "",
+     "useMtls": false,
+     "bodyType": "raw",
+     "serializeUrl": false,
+     "shareCookies": false,
+     "parseResponse": false,
+     "followRedirect": true,
+     "useQuerystring": false,
+     "followAllRedirects": false,
+     "rejectUnauthorized": true
+    },
+    "module": "http:ActionGetFile",
+    "version": 3,
+    "metadata": {
+     "designer": {
+      "x": 0,
+      "y": 0
+     }
+    },
+    "parameters": {}
+   },
+   {
+    "id": 2,
+    "mapper": {
+     "data": "{{1.data}}",
+     "file": {
+      "data": "{{1.data}}",
+      "fileName": "{{1.fileName}}"
+     },
+     "tags": [
+      "AI visibility",
+      "GEO",
+      "AEO",
+      "SEO",
+      "ChatGPT"
+     ],
+     "media": "{{1.data}}",
+     "title": "{{if(parseNumber(formatDate(now; \"D\")) % 2 = 0; \"Can AI find and cite you? The 34-signal AI visibility audit\"; \"Can AI find and cite you? Free AI visibility audit walkthrough\")}}",
+     "video": "{{1.data}}",
+     "fileName": "{{1.fileName}}",
+     "categoryId": "28",
+     "description": "Free AI visibility audit: https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=api-audit-cta\n\nGoogle ranked your page. In 2026 that is only half the fruit. Six crawlers decide whether ChatGPT, Claude, Gemini and Perplexity can quote you.\n\n34 signals across crawler access, structured data (GEO), answer-readiness (AEO) and technical foundation. One score, one grade, and the fix for every check that fails.\n\nFree. No signup. No scraping bill.",
+     "madeForKids": false,
+     "privacyStatus": "public",
+     "notifySubscribers": true,
+     "selfDeclaredMadeForKids": false
+    },
+    "module": "youtube:uploadVideo",
+    "version": 4,
+    "metadata": {
+     "designer": {
+      "x": 300,
+      "y": 0
+     }
+    },
+    "parameters": {
+     "__IMTCONN__": 5453399
+    }
+   }
+  ],
+  "name": "Daily YouTube Upload",
+  "metadata": {
+   "instant": false,
+   "version": 1,
+   "designer": {
+    "orphans": [],
+    "samples": {
+     "1": {
+      "data": "IMTBuffer(27768561, binary, 109ce70e95c791596b2faf350d27085ccefdc1fb): 000000206674797069736f6d00000...",
+      "headers": [
+       {
+        "name": "accept-ranges",
+        "value": "bytes"
+       }
+      ],
+      "fileName": "file.mp4",
+      "fileSize": 27768561,
+      "statusCode": 200,
+      "cookieHeaders": []
+     },
+     "2": {
+      "id": "50fE_LQ3n7g",
+      "status": {
+       "license": "youtube",
+       "embeddable": false,
+       "uploadStatus": "uploaded",
+       "privacyStatus": "public",
+       "publicStatsViewable": false,
+       "selfDeclaredMadeForKids": false
+      },
+      "snippet": {
+       "tags": [
+        "AEO"
+       ],
+       "title": "Can AI find and cite you? The 34-signal AI visibility audit",
+       "channelId": "UCMhNF55kLPSk-tv5CW13VHQ",
+       "localized": {
+        "title": "Can AI find and cite you? The 34-signal AI visibility audit",
+        "description": "Free AI visibility audit: https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=a..."
+       },
+       "categoryId": "28",
+       "thumbnails": {
+        "high": {
+         "url": "https://i.ytimg.com/vi/50fE_LQ3n7g/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/50fE_LQ3n7g/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "default": {
+         "url": "https://i.ytimg.com/vi/50fE_LQ3n7g/default.jpg",
+         "width": 120,
+         "height": 90
+        }
+       },
+       "description": "Free AI visibility audit: https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=a...",
+       "publishedAt": "2026-09-14T16:36:50.000Z",
+       "channelTitle": "AIPA Era is Minted. Crafted AI Agents.",
+       "defaultAudioLanguage": "en-US",
+       "liveBroadcastContent": "none"
+      },
+      "embedHtml": "<iframe width=\"480\" height=\"360\" src=\"//www.youtube.com/embed/50fE_LQ3n7g\" frameborder=\"0\" allow=\"ac...",
+      "contentDetails": {
+       "caption": "false",
+       "duration": "P0D",
+       "dimension": "2d",
+       "definition": "sd",
+       "projection": "rectangular",
+       "contentRating": {},
+       "licensedContent": false,
+       "hasCustomThumbnail": false
+      }
+     }
+    }
+   },
+   "scenario": {
+    "dlq": false,
+    "slots": null,
+    "dataloss": false,
+    "maxErrors": 3,
+    "autoCommit": true,
+    "roundtrips": 1,
+    "sequential": false,
+    "confidential": false,
+    "freshVariables": false,
+    "autoCommitTriggerLast": true
+   }
+  }
+ },
+ "scheduling": {
+  "time": "09:15",
+  "type": "daily"
+ },
+ "concept": false,
+ "created": "2026-09-13T22:54:11.761Z",
+ "last_edit": "2026-09-14T16:41:56.880Z",
+ "metadata": {
+  "input_spec": [],
+  "output_spec": []
+ },
+ "idSequence": 10,
+ "version": 19
+}
