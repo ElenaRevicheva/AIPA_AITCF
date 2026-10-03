@@ -37,3 +37,9 @@ The evidence is strong for Mexico and Colombia: US government data, Mexican and 
 - A dental-tourism guide (SmileJet, 2026) calls Medellín "arguably Colombia's most popular dental tourism city" for
   cosmetic dentistry, and Cartagena the choice to "combine premium dental care with a Caribbean vacation". A vendor
   guide, so use it for direction, never as a number on screen.
+
+**7. Colombia: the crackdown on clandestine aesthetic surgery, 2026** (added 3 Oct; pages opened). Context and selling angle only, never a scare line in a letter.
+- Secretaría de Salud de Antioquia: **17 deaths** in Medellín in two years linked to aesthetic procedures in "clínicas de garaje" (11 in 2024, 5 in 2025, 1 in 2026 to 21 May); **80** inspections, **64** establishments closed. *Infobae, 21 May 2026.* [link](https://www.infobae.com/colombia/2026/05/21/medellin-encabeza-la-lista-de-fallecidos-por-cirugias-esteticas-en-clinicas-de-garaje-van-17-casos-en-dos-anos/)
+- Colegio Médico Colombiano warns about establishments operating without legal authorization or minimum safety conditions; it cites 379 permanent adverse complications in Antioquia and 400 clandestine establishments closed in Bogotá. *La FM, 2026 (undated page).* [link](https://www.lafm.com.co/sociedad/colegio-medico-cirugias-esteticas-clandestinas-colombia-salud-irregularidades-muertes-410159)
+- "Ley Yulixa": announced 29 May 2026 as a bill to be presented (**not a law**), so that only surgeons specialised in aesthetic surgery from accredited universities may operate; earlier attempts did not reach final approval. *Infobae, 29 May 2026.* [link](https://www.infobae.com/colombia/2026/05/29/gobierno-propondra-proyecto-de-ley-yulixa-para-restringir-las-cirugias-esteticas-en-colombia-asi-lo-anuncio-el-presidente-petro/)
+- What it means: licensed clinics want to stand apart from clandestine ones. In the film, her recovery is in the practice's own recovery room, never a "casa de recuperación".
