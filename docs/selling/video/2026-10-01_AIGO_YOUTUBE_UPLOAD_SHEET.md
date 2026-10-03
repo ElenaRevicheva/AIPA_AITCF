@@ -197,3 +197,56 @@ Real footage: Pexels (Chicago, Panama City, Casco Viejo, Chiriquí highlands). M
 Chapters ≥ 10 s each (18 / 17 / 16 / 20 / 16 / 11), first at 0:00. **Altered or synthetic content: YES.**
 Tags: AI Growth Operator, Panama real estate marketing, immigration lawyer marketing, relocation Panama, Boquete, Casco Viejo,
 AI visibility audit, GEO, AEO, ChatGPT recommendations, WhatsApp automation, HubSpot CRM, AIdeazz AI Lab.
+
+---
+
+# FILM 5 — "They Asked ChatGPT Before They Messaged Your Clinic" (medical tourism: Colombian dental clinics + plastic-surgery practices) — 3 Oct 2026
+
+| What | Where |
+|---|---|
+| Master 1080p, ~107 s | Oracle `~/aigo-med/cut1/MEDTOUR_FINAL_v1_2026-10-03_1080p.mp4` (after the music mix; md5 TO FILL) · Desktop campaign folder |
+| Captions EN / ES | `~/aigo-med/cut1/MEDTOUR_promo_en.srt` · `MEDTOUR_promo_es.srt` (29 cues each) |
+| Thumbnail | `MEDTOUR_thumbnail_EN.jpg` / `ES.jpg` — the couple together at the consultation (Elena 3 Oct: "with a couple, not just a husband"), "They asked AI first. / Was your clinic on the list?" |
+
+**Status: NOT published.** Upload only with Elena's OK. Her ChatGPT recording is cut at "Searching 9 websites" (zero clinic names).
+
+**Title:** `They Asked ChatGPT Before They Messaged Your Clinic | AI Growth Operator · Dental & Plastic Surgery` (99 chars)
+
+**Description** (the plan §6 disclosure lines FIRST; no banned word: no "new smile", results, safe, best, certified, package, price)
+```
+Dramatización. Las personas, clínicas y médicos de este video son ficticios y fueron generados con IA. No es consejo médico ni publicidad de ningún prestador de salud. Las pantallas del producto son reales (consulta de prueba en nuestro propio sitio).
+Dramatization. The people, clinics and doctors in this video are fictional and AI-generated. This is not medical advice or advertising for any healthcare provider. The product screens are real (a test inquiry on our own site).
+
+Your next patients are flying to Colombia for treatment — dental implants for him, a cosmetic procedure for her. They aren't calling you. They're asking an AI.
+It tends to suggest the clinics and surgeons it can understand. If it can't understand your website, you may not make the list.
+
+AIdeazz AI Lab doesn't sell you another CRM. We install an AI Growth Operator inside the tools you already use — and run it with you:
+• AI visibility audit — 34 checks, one score, the fixes that matter
+• When a patient writes through your website, they hear back right away — and a reply is already drafted on your phone
+• The AI drafts, your clinic decides: one tap to send, and the conversation is logged in your CRM
+• Every morning: who's new, who's warm, and who's starting to slip away
+
+▶ Free AI visibility audit: https://aideazz.xyz/api
+▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio
+
+Built for: dental clinics (implants & veneers) · plastic-surgery practices with international patients · relocation & immigration · real estate · luxury villas & charters.
+
+— ES —
+Le preguntaron a ChatGPT antes de escribirle a tu clínica. ¿Estaba tu clínica en la lista?
+AIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de las herramientas que ya usas, y lo operamos contigo. Cada respuesta la revisa y aprueba la clínica.
+▶ Auditoría de visibilidad en IA, gratis (34 señales): https://aideazz.xyz/api
+
+0:00 They ask ChatGPT at midnight in Dallas
+0:20 Friday: a long surgery, a coordinator with another family
+0:37 Rewind — same family, same question
+0:53 Instant reply, one tap, every morning
+1:12 Medellín and Cartagena — the treatment trip
+1:31 Free AI visibility audit
+
+The people in this film are AI-generated. The product screens are real (private details blurred). Made in our own AI film studio.
+Real footage: Pexels and Pixabay (Dallas, Medellín, Bogotá, Cartagena). Music: [TRACK] by [ARTIST] (Pixabay Content License — not Content ID registered).
+```
+Chapters ≥ 10 s each (20 / 17 / 16 / 19 / 19 / 16), first at 0:00 — re-check against the final `clock.json`.
+**Altered or synthetic content: YES · Made for kids: NO · no CC track (ES captions are burned in) · any paid boost 18+ only, after reading Meta's and Google's health-ad pages (plan §6).**
+Tags: AI Growth Operator, dental clinic marketing, plastic surgery practice marketing, medical tourism Colombia, Medellín, Cartagena,
+dental implants Colombia, AI visibility audit, GEO, AEO, ChatGPT recommendations, WhatsApp automation, HubSpot CRM, AIdeazz AI Lab.
