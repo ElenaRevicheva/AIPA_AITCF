@@ -37,6 +37,11 @@ safe("8321e248-image.jpg", "safe_S5_hubspot_activity.jpg", (0, 95, 923, 1395),
 safe("8321e248-image.jpg", "safe_S9_hubspot_deal.jpg", (0, 95, 923, 700),
      [(130, 140, 795, 200), (540, 452, 702, 498)])
 
+# HubSpot, line 9 (preferred, Elena 3 Oct): the real deal-stage picker - new (AI working), act today/this week, Sent (ticked),
+# they replied, won, no fit = "who's new, who's warm, who's slipping away". Her name and the job-search wording are blurred.
+safe("b8d65e43-image.jpg", "safe_S9_hubspot_stages.jpg", (0, 100, 923, 1450),
+     [(296, 452, 545, 508), (350, 628, 600, 684), (540, 784, 742, 838), (456, 982, 700, 1038), (192, 1158, 580, 1212)])
+
 # ---- WhatsApp recreation (tagged "Recreación" on screen). Elena sent all five lines to herself, so every bubble is green
 # (outgoing). The clinic's Monday line stays green on the right; the couple's reply and the T3 recovery message become
 # INCOMING (white, left) - same words, time and ticks painted out. Nothing is retyped: the text pixels are hers.
