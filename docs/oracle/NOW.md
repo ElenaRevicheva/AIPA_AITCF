@@ -131,10 +131,10 @@ git log keeps the record.
 ## 🤝 HANDOFF
 
 ### ⚠️ 3 Oct — code/data split of stage-manual-prospect.cjs DONE ON DISK, NOT COMMITTED · Elena's move
-- **DONE:** PROSPECT_META (101 prospects) + AIGO kit constants moved to  (data plane, pii-exempt by design);
-  the script s it (913 lines, was ~2,600). Also holds the 2 Oct Cloudflare  decoder + deck/video/cc/attachments kit.
-- **VERIFIED BY:** old vs new PROSPECT_META  = equal (101);  202/202 letters identical (every prospect × 2 paths).
-- **BLOCKER:** pii-guard's ONE remaining finding = a July code COMMENT quoting a clinic's address (, line ~143).
+- **DONE:** PROSPECT_META (101 prospects) + AIGO kit constants moved to `docs/selling/prospect-meta.cjs` (data plane, pii-exempt by design);
+  the script `require`s it (913 lines, was ~2,600). Also holds the 2 Oct Cloudflare `data-cfemail` decoder + deck/video/cc/attachments kit.
+- **VERIFIED BY:** old vs new PROSPECT_META `deepStrictEqual` = equal (101); `buildDraft` 202/202 letters identical (every prospect × 2 paths).
+- **BLOCKER:** pii-guard's ONE remaining finding = a July code COMMENT in the script quoting a real clinic's contact address (the `unglue` comment, ~line 143).
   Auto mode refused my edit of it as a guard bypass → Elena edits that comment (or approves) and commits both files.
 - **RISK:** never checkout/reset these two files — this is the only copy of the work.
 
