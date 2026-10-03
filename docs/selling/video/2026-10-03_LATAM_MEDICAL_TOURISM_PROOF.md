@@ -25,3 +25,15 @@ Made by a research workflow: 4 searchers (Mexico · Costa Rica · Colombia/ISAPS
 
 **What this means for the film**
 The evidence is strong for Mexico and Colombia: US government data, Mexican and Colombian official counts and surgeon surveys all point the same way. Dental is the safest lead, since the CDC names it the #1 type. Cosmetic surgery rests only on surgeon surveys. The evidence for Panama is thin: its own government calls the sector early-stage and little known, so a Panama film should sell clinics on *becoming* visible, not on an existing boom. For Costa Rica, do not use the chamber's "13% of arrivals" figure. The official airport survey shows health as the main reason for only **0.3%** of visitors.
+
+**6. Colombia by city, Jan–Aug 2026** (added 3 Oct, for the film #5 city choice)
+- Bogotá **7,320** (34.8%) · Cali **5,889** (28%) · Medellín **4,737** (22.5%) · Barranquilla **867** · Cartagena **590**.
+  Average spend **over US$3,200** per trip. *Migración Colombia via ANATO, reported by Colombia One, 29 Sep 2026.*
+  [link](https://colombiaone.com/2026/09/29/colombia-medical-tourism-2026/)
+- ANATO's executive president: the challenge is a chain of services "before, during and after" treatment —
+  accommodation, transport, food and activities. That is the treat-then-travel shape of film version B.
+- Cartagena is a **recovery and leisure** stop, not a treatment hub (590 visitors). It is named in the same article as a
+  2026 leader in **wedding tourism**, which supports the boutique-hotel wedding film as #6.
+- A dental-tourism guide (SmileJet, 2026) calls Medellín "arguably Colombia's most popular dental tourism city" for
+  cosmetic dentistry, and Cartagena the choice to "combine premium dental care with a Caribbean vacation". A vendor
+  guide, so use it for direction, never as a number on screen.
