@@ -1,6 +1,17 @@
 # /api promo → YouTube + social (Make)
 
-## STATE, 3 Oct 2026 — `6263197` Daily YouTube Upload now ROTATES THE 4 AIGO FILMS (Elena's call)
+## STATE, 3 Oct 2026 (evening) — `6263197` now ROTATES 5 FILMS (Elena: "wire this exact video in make com scenario for daily rotación alongside other videos wired today")
+
+PATCH 200, `isinvalid: false`, active, next run 4 Oct 14:15 UTC. `filmIndex = parseNumber(formatDate(now; "DDD")) % 5`; routes 0-3 unchanged
+(yacht · /api · villa · relocation), filters renamed "% 5". **Route 4 (new):** `http:ActionGetFile`
+`https://webhook.aideazz.xyz/influencer-images/youtube/aigo-film-5-medtour.mp4` (= film #5 **v3** master, md5 `3d1849e4f70c45ccd5ad2c55a8497d6d`,
+copied to `/var/www/influencer-images/youtube/`, HTTP 200 video/mp4) → `youtube:uploadVideo` v4 with the film-5 title, the v3 description
+(disclosure lines first, ElevenLabs music credit) and 14 tags; containsSyntheticMedia true, not for kids, public — copied from route 3.
+Day-of-year % 5 order: 4 Oct (277) = villa · 5 Oct = relocation · 6 Oct = medical tourism · 7 Oct = yacht · 8 Oct = /api.
+Backup before the change: `docs/selling/video/make/6263197_daily_youtube_upload_BACKUP_before_5films_2026-10-03.json`; the new one:
+`…_5FILMS_2026-10-03.json`. Same accepted risk as below (repetitive daily uploads); the first lever is still to stop the scenario.
+
+## (superseded) STATE, 3 Oct 2026 — `6263197` Daily YouTube Upload now ROTATES THE 4 AIGO FILMS (Elena's call)
 
 Elena (3 Oct): "promote these 4 new videos rotating them every day … all other older videos should be removed from the
 scenario." The v13/v19 /api cuts are out. Flow (PATCH 200, `isinvalid: false`, active, daily 09:15 Panama = 14:15 UTC):

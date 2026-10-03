@@ -1,0 +1,588 @@
+{
+ "blueprint": {
+  "flow": [
+   {
+    "id": 1,
+    "mapper": {
+     "name": "filmIndex",
+     "scope": "roundtrip",
+     "value": "{{parseNumber(formatDate(now; \"DDD\")) % 5}}"
+    },
+    "module": "util:SetVariable2",
+    "version": 1,
+    "metadata": {
+     "designer": {
+      "x": 0,
+      "y": 0
+     }
+    },
+    "parameters": {}
+   },
+   {
+    "id": 2,
+    "mapper": null,
+    "module": "builtin:BasicRouter",
+    "routes": [
+     {
+      "flow": [
+       {
+        "id": 3,
+        "filter": {
+         "name": "Day % 5 = 0: Yacht",
+         "conditions": [
+          [
+           {
+            "a": "{{1.filmIndex}}",
+            "b": "0",
+            "o": "number:equal"
+           }
+          ]
+         ]
+        },
+        "mapper": {
+         "ca": "",
+         "qs": [],
+         "url": "https://webhook.aideazz.xyz/influencer-images/youtube/aigo-film-1-yacht.mp4",
+         "method": "get",
+         "headers": [],
+         "timeout": "",
+         "useMtls": false,
+         "bodyType": "raw",
+         "serializeUrl": false,
+         "shareCookies": false,
+         "parseResponse": false,
+         "followRedirect": true,
+         "useQuerystring": false,
+         "followAllRedirects": false,
+         "rejectUnauthorized": true
+        },
+        "module": "http:ActionGetFile",
+        "version": 3,
+        "metadata": {
+         "designer": {
+          "x": 600,
+          "y": -450
+         }
+        },
+        "parameters": {}
+       },
+       {
+        "id": 4,
+        "mapper": {
+         "data": "{{3.data}}",
+         "file": {
+          "data": "{{3.data}}",
+          "fileName": "{{3.fileName}}"
+         },
+         "tags": [
+          "AI Growth Operator",
+          "AI visibility audit",
+          "GEO",
+          "AEO",
+          "ChatGPT recommendations",
+          "yacht charter marketing",
+          "Panama",
+          "San Blas",
+          "WhatsApp automation",
+          "HubSpot CRM",
+          "AI for service businesses",
+          "AIdeazz AI Lab"
+         ],
+         "media": "{{3.data}}",
+         "title": "She Asked ChatGPT Before She Messaged Your Yacht | AI Growth Operator by AIdeazz AI Lab",
+         "video": "{{3.data}}",
+         "fileName": "{{3.fileName}}",
+         "categoryId": "28",
+         "description": "She asked ChatGPT before she messaged your yacht. Was your business on the list?\n\nAI Growth Operator by AIdeazz AI Lab. We don't sell you another CRM — we install an AI Growth Operator inside the tools you already use, and run it with you:\n• AI visibility audit — 34 checks, one score, the fixes that matter\n• When a guest writes, she hears back right away — and a reply is already drafted on your phone\n• The AI drafts, you decide: one tap to send, and the conversation is logged in your CRM\n• Every morning: who's new, who's warm, and who's starting to slip away\n\n▶ Free AI visibility audit: https://aideazz.xyz/api\n▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio\n\nBuilt for businesses like: yacht charters & luxury villas · medical tourism & cosmetic surgery · dental clinics (implants & veneers) · relocation, visas & immigration — high-value sales, international clients, conversations on WhatsApp.\n\n— ES —\nElla le preguntó a ChatGPT antes de escribirle a tu yate. ¿Tu negocio estaba en la lista?\nAIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de las herramientas que ya usas, y lo operamos contigo.\n▶ Auditoría de visibilidad en IA, gratis (34 señales): https://aideazz.xyz/api\nPara negocios como: chárter de yates y villas de lujo · turismo médico y cirugía estética · clínicas dentales — implantes y carillas · reubicación, visas e inmigración.\n\n0:00 She asks ChatGPT at midnight\n0:15 Friday at sea, Monday reply\n0:29 Rewind — same guest, same question\n0:45 Instant reply, one tap to send\n0:58 Every morning in your CRM\n1:14 Free AI visibility audit\n\nThe people in this film are AI-generated. The product screens are real (private names and details blurred). Made in our own AI film studio.\nMusic: \"Deep House Track\" by cornist (Pixabay Content License). Panama footage: Pixabay — Bocas del Toro sunset, Panama City.",
+         "madeForKids": false,
+         "privacyStatus": "public",
+         "notifySubscribers": true,
+         "containsSyntheticMedia": true,
+         "selfDeclaredMadeForKids": false
+        },
+        "module": "youtube:uploadVideo",
+        "version": 4,
+        "metadata": {
+         "designer": {
+          "x": 900,
+          "y": -450
+         }
+        },
+        "parameters": {
+         "__IMTCONN__": 5453399
+        }
+       }
+      ]
+     },
+     {
+      "flow": [
+       {
+        "id": 5,
+        "filter": {
+         "name": "Day % 5 = 1: /api audit",
+         "conditions": [
+          [
+           {
+            "a": "{{1.filmIndex}}",
+            "b": "1",
+            "o": "number:equal"
+           }
+          ]
+         ]
+        },
+        "mapper": {
+         "ca": "",
+         "qs": [],
+         "url": "https://webhook.aideazz.xyz/influencer-images/youtube/aigo-film-2-api.mp4",
+         "method": "get",
+         "headers": [],
+         "timeout": "",
+         "useMtls": false,
+         "bodyType": "raw",
+         "serializeUrl": false,
+         "shareCookies": false,
+         "parseResponse": false,
+         "followRedirect": true,
+         "useQuerystring": false,
+         "followAllRedirects": false,
+         "rejectUnauthorized": true
+        },
+        "module": "http:ActionGetFile",
+        "version": 3,
+        "metadata": {
+         "designer": {
+          "x": 600,
+          "y": -150
+         }
+        },
+        "parameters": {}
+       },
+       {
+        "id": 6,
+        "mapper": {
+         "data": "{{5.data}}",
+         "file": {
+          "data": "{{5.data}}",
+          "fileName": "{{5.fileName}}"
+         },
+         "tags": [
+          "AI visibility audit",
+          "GEO",
+          "AEO",
+          "technical SEO",
+          "ChatGPT recommendations",
+          "AI search",
+          "llms.txt",
+          "schema markup",
+          "AI Growth Operator",
+          "AIdeazz AI Lab"
+         ],
+         "media": "{{5.data}}",
+         "title": "Can AI Find and Cite Your Business? The 34 Signals, Explained | Free AI Visibility Audit",
+         "video": "{{5.data}}",
+         "fileName": "{{5.fileName}}",
+         "categoryId": "28",
+         "description": "Google ranked your page. In 2026, that is only half the fruit.\nYour next customer asks ChatGPT first — and it suggests the businesses it can understand.\n\nThe free AI Visibility Audit reads your page directly and scores 34 signals in four groups:\n1) AI crawler access (25) — can ChatGPT, Claude, Gemini and Perplexity get in? robots.txt, llms.txt, sitemap, indexable\n2) Structured data / GEO (25) — does your site tell AI who you are and what you sell? schema, identity, Open Graph\n3) Answer-readiness / AEO (30) — does your page answer the questions customers actually ask? question headings, lists\n4) Technical foundation (20) — fast, secure, readable without JavaScript\nFor every check that fails: what we saw, why it matters, and the exact fix.\n\n▶ Run yours free (no signup): https://aideazz.xyz/api\n▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio\n\n— ES —\n¿Puede la IA encontrar y citar tu negocio? Auditoría gratis de visibilidad en IA: 34 señales en 4 grupos, y la corrección exacta para cada una que falla. https://aideazz.xyz/api\n\n0:00 Can AI find and cite your business?\n0:10 Your next customer asks ChatGPT first\n0:21 Free audit: one score in seconds\n0:31 34 signals in four groups\n0:46 What fails — and the exact fix\n1:04 Speed, security, top fixes\n1:14 From found to booked\n\nThe audit shown is a real, live run on atuona.xyz (93/100, 31 of 34 passed). The guest at midnight is AI-generated; every product screen is real.\nMusic: \"Modern Deep House\" by ArtIssizm (Pixabay Content License — not Content ID registered).",
+         "madeForKids": false,
+         "privacyStatus": "public",
+         "notifySubscribers": true,
+         "containsSyntheticMedia": true,
+         "selfDeclaredMadeForKids": false
+        },
+        "module": "youtube:uploadVideo",
+        "version": 4,
+        "metadata": {
+         "designer": {
+          "x": 900,
+          "y": -150
+         }
+        },
+        "parameters": {
+         "__IMTCONN__": 5453399
+        }
+       }
+      ]
+     },
+     {
+      "flow": [
+       {
+        "id": 7,
+        "filter": {
+         "name": "Day % 5 = 2: Villa + charter",
+         "conditions": [
+          [
+           {
+            "a": "{{1.filmIndex}}",
+            "b": "2",
+            "o": "number:equal"
+           }
+          ]
+         ]
+        },
+        "mapper": {
+         "ca": "",
+         "qs": [],
+         "url": "https://webhook.aideazz.xyz/influencer-images/youtube/aigo-film-3-villa.mp4",
+         "method": "get",
+         "headers": [],
+         "timeout": "",
+         "useMtls": false,
+         "bodyType": "raw",
+         "serializeUrl": false,
+         "shareCookies": false,
+         "parseResponse": false,
+         "followRedirect": true,
+         "useQuerystring": false,
+         "followAllRedirects": false,
+         "rejectUnauthorized": true
+        },
+        "module": "http:ActionGetFile",
+        "version": 3,
+        "metadata": {
+         "designer": {
+          "x": 600,
+          "y": 150
+         }
+        },
+        "parameters": {}
+       },
+       {
+        "id": 8,
+        "mapper": {
+         "data": "{{7.data}}",
+         "file": {
+          "data": "{{7.data}}",
+          "fileName": "{{7.fileName}}"
+         },
+         "tags": [
+          "AI Growth Operator",
+          "luxury villa marketing",
+          "charter marketing",
+          "Bocas del Toro",
+          "Panama",
+          "AI visibility audit",
+          "GEO",
+          "AEO",
+          "ChatGPT recommendations",
+          "WhatsApp automation",
+          "HubSpot CRM",
+          "AIdeazz AI Lab"
+         ],
+         "media": "{{7.data}}",
+         "title": "She Asked ChatGPT Before She Booked Your Island | AI Growth Operator for Villas & Charters",
+         "video": "{{7.data}}",
+         "fileName": "{{7.fileName}}",
+         "categoryId": "28",
+         "description": "Your next guests are planning New Year — three generations, one island. She isn't calling you. She's asking an AI.\nIt suggests the villas and charters it can understand. If it can't understand your website, you may not make the list.\n\nAIdeazz AI Lab doesn't sell you another CRM. We install an AI Growth Operator inside the tools you already use — and run it with you:\n• AI visibility audit — 34 checks, one score, the fixes that matter\n• When a guest writes, she hears back right away — and a reply is already drafted on your phone\n• The AI drafts, you decide: one tap to send, and the conversation is logged in your CRM\n• Every morning: who's new, who's warm, and who's starting to slip away\n\n▶ Free AI visibility audit: https://aideazz.xyz/api\n▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio\n\nBuilt for: luxury villas & charters (flights, boat transfers) · medical tourism & cosmetic surgery · dental clinics · relocation, visas & immigration.\n\n— ES —\nElla le preguntó a ChatGPT antes de reservar tu isla. ¿Tu villa estaba en la lista?\nAIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de las herramientas que ya usas, y lo operamos contigo.\n▶ Auditoría de visibilidad en IA, gratis (34 señales): https://aideazz.xyz/api\n\n0:00 She asks ChatGPT at midnight\n0:17 Sunday at sea, Wednesday reply\n0:33 Rewind — same family, same question\n0:49 Instant reply, one tap, every morning\n1:08 Charter flight, boat transfer, the villa\n1:23 Free AI visibility audit\n\nThe people in this film are AI-generated. The product screens are real (private details blurred). Made in our own AI film studio.\nReal Panama footage: Pixabay (Caribbean coast) and Pexels. Music: \"Afro Beat Vibes\" by -WATERMEL0N- (Pixabay Content License — not Content ID registered).",
+         "madeForKids": false,
+         "privacyStatus": "public",
+         "notifySubscribers": true,
+         "containsSyntheticMedia": true,
+         "selfDeclaredMadeForKids": false
+        },
+        "module": "youtube:uploadVideo",
+        "version": 4,
+        "metadata": {
+         "designer": {
+          "x": 900,
+          "y": 150
+         }
+        },
+        "parameters": {
+         "__IMTCONN__": 5453399
+        }
+       }
+      ]
+     },
+     {
+      "flow": [
+       {
+        "id": 9,
+        "filter": {
+         "name": "Day % 5 = 3: Relocation",
+         "conditions": [
+          [
+           {
+            "a": "{{1.filmIndex}}",
+            "b": "3",
+            "o": "number:equal"
+           }
+          ]
+         ]
+        },
+        "mapper": {
+         "ca": "",
+         "qs": [],
+         "url": "https://webhook.aideazz.xyz/influencer-images/youtube/aigo-film-4-relocation.mp4",
+         "method": "get",
+         "headers": [],
+         "timeout": "",
+         "useMtls": false,
+         "bodyType": "raw",
+         "serializeUrl": false,
+         "shareCookies": false,
+         "parseResponse": false,
+         "followRedirect": true,
+         "useQuerystring": false,
+         "followAllRedirects": false,
+         "rejectUnauthorized": true
+        },
+        "module": "http:ActionGetFile",
+        "version": 3,
+        "metadata": {
+         "designer": {
+          "x": 600,
+          "y": 450
+         }
+        },
+        "parameters": {}
+       },
+       {
+        "id": 10,
+        "mapper": {
+         "data": "{{9.data}}",
+         "file": {
+          "data": "{{9.data}}",
+          "fileName": "{{9.fileName}}"
+         },
+         "tags": [
+          "AI Growth Operator",
+          "Panama real estate marketing",
+          "immigration lawyer marketing",
+          "relocation Panama",
+          "Boquete",
+          "Casco Viejo",
+          "AI visibility audit",
+          "GEO",
+          "AEO",
+          "ChatGPT recommendations",
+          "WhatsApp automation",
+          "HubSpot CRM",
+          "AIdeazz AI Lab"
+         ],
+         "media": "{{9.data}}",
+         "title": "They Asked ChatGPT Before They Messaged You | AI Growth Operator for Real Estate & Immigration Law",
+         "video": "{{9.data}}",
+         "fileName": "{{9.fileName}}",
+         "categoryId": "28",
+         "description": "Your next clients are moving to Panama — a mother to the mountains, her son to the city. They aren't calling you. They're asking an AI.\nIt tends to suggest the agencies and law firms it can understand. If it can't understand your website, you may not make the list.\n\nAIdeazz AI Lab doesn't sell you another CRM. We install an AI Growth Operator inside the tools you already use — and run it with you:\n• AI visibility audit — 34 checks, one score, the fixes that matter\n• When a client writes through your website, they hear back right away — and a reply is already drafted on your phone\n• The AI drafts, you decide: one tap to send, and the conversation is logged in your CRM\n• Every morning: who's new, who's warm, and who's starting to slip away\n\n▶ Free AI visibility audit: https://aideazz.xyz/api\n▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio\n\nBuilt for: relocation, visas & immigration lawyers · real estate — buying, selling & reselling · luxury villas & charters · medical tourism · dental clinics.\n\n— ES —\nLe preguntaron a ChatGPT antes de escribirle a tu inmobiliaria o a tus abogados de inmigración. ¿Estabas en la lista?\nAIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de las herramientas que ya usas, y lo operamos contigo.\n▶ Auditoría de visibilidad en IA, gratis (34 señales): https://aideazz.xyz/api\n\n0:00 They ask ChatGPT at midnight\n0:18 Friday: showing a house, at immigration\n0:35 Rewind — same family, same question\n0:51 Instant reply, one tap, every morning\n1:11 Casco Viejo and Boquete — both win\n1:27 Free AI visibility audit\n\nThe people in this film are AI-generated. The product screens are real (private details blurred). Made in our own AI film studio.\nReal footage: Pexels (Chicago, Panama City, Casco Viejo, Chiriquí highlands). Music: \"Deep House\" by alexrockbeat (Pixabay Content License — not Content ID registered).",
+         "madeForKids": false,
+         "privacyStatus": "public",
+         "notifySubscribers": true,
+         "containsSyntheticMedia": true,
+         "selfDeclaredMadeForKids": false
+        },
+        "module": "youtube:uploadVideo",
+        "version": 4,
+        "metadata": {
+         "designer": {
+          "x": 900,
+          "y": 450
+         }
+        },
+        "parameters": {
+         "__IMTCONN__": 5453399
+        }
+       }
+      ]
+     },
+     {
+      "flow": [
+       {
+        "id": 11,
+        "filter": {
+         "name": "Day % 5 = 4: Medical tourism (Colombia clinics)",
+         "conditions": [
+          [
+           {
+            "a": "{{1.filmIndex}}",
+            "b": "4",
+            "o": "number:equal"
+           }
+          ]
+         ]
+        },
+        "mapper": {
+         "ca": "",
+         "qs": [],
+         "url": "https://webhook.aideazz.xyz/influencer-images/youtube/aigo-film-5-medtour.mp4",
+         "method": "get",
+         "headers": [],
+         "timeout": "",
+         "useMtls": false,
+         "bodyType": "raw",
+         "serializeUrl": false,
+         "shareCookies": false,
+         "parseResponse": false,
+         "followRedirect": true,
+         "useQuerystring": false,
+         "followAllRedirects": false,
+         "rejectUnauthorized": true
+        },
+        "module": "http:ActionGetFile",
+        "version": 3,
+        "metadata": {
+         "designer": {
+          "x": 600,
+          "y": 750
+         }
+        },
+        "parameters": {}
+       },
+       {
+        "id": 12,
+        "mapper": {
+         "data": "{{9.data}}",
+         "file": {
+          "data": "{{9.data}}",
+          "fileName": "{{9.fileName}}"
+         },
+         "tags": [
+          "AI Growth Operator",
+          "dental clinic marketing",
+          "plastic surgery practice marketing",
+          "medical tourism Colombia",
+          "Medellín",
+          "Cartagena",
+          "dental implants Colombia",
+          "AI visibility audit",
+          "GEO",
+          "AEO",
+          "ChatGPT recommendations",
+          "WhatsApp automation",
+          "HubSpot CRM",
+          "AIdeazz AI Lab"
+         ],
+         "media": "{{9.data}}",
+         "title": "They Asked ChatGPT Before They Messaged Your Clinic | AI Growth Operator · Dental & Plastic Surgery",
+         "video": "{{9.data}}",
+         "fileName": "aigo-film-5-medtour.mp4",
+         "categoryId": "28",
+         "description": "Dramatización. Las personas, clínicas y médicos de este video son ficticios y fueron generados con IA. No es consejo médico ni publicidad de ningún prestador de salud. Las pantallas del producto son reales (consulta de prueba en nuestro propio sitio).\nDramatization. The people, clinics and doctors in this video are fictional and AI-generated. This is not medical advice or advertising for any healthcare provider. The product screens are real (a test inquiry on our own site).\n\nYour next patients are flying to Colombia for treatment — dental implants for him, a cosmetic procedure for her. They aren't calling you. They're asking an AI.\nIt tends to suggest the clinics and surgeons it can understand. If it can't understand your website, you may not make the list.\n\nAIdeazz AI Lab doesn't sell you another CRM. We install an AI Growth Operator inside the tools you already use — and run it with you:\n• AI visibility audit — 34 checks, one score, the fixes that matter\n• When a patient writes through your website, they hear back right away — and a reply is already drafted on your phone\n• The AI drafts, your clinic decides: one tap to send, and the conversation is logged in your CRM\n• Every morning: who's new, who's warm, and who's starting to slip away\n\n▶ Free AI visibility audit: https://aideazz.xyz/api\n▶ AIdeazz AI Lab: https://aideazz.xyz/portfolio\n\nBuilt for: dental clinics (implants & veneers) · plastic-surgery practices with international patients · relocation & immigration · real estate · luxury villas & charters.\n\n— ES —\nLe preguntaron a ChatGPT antes de escribirle a tu clínica. ¿Estaba tu clínica en la lista?\nAIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de las herramientas que ya usas, y lo operamos contigo. Cada respuesta la revisa y aprueba la clínica.\n▶ Auditoría de visibilidad en IA, gratis (34 señales): https://aideazz.xyz/api\n\n0:00 They ask ChatGPT at midnight in Dallas\n0:20 Friday: a long surgery, a coordinator with another family\n0:37 Rewind — same family, same question\n0:53 Instant reply, one tap, every morning\n1:12 Medellín and Cartagena — the treatment trip\n1:31 Free AI visibility audit\n\nThe people in this film are AI-generated. The product screens are real (private details blurred). Made in our own AI film studio.\nReal footage: Pexels and Pixabay (Dallas, Medellín, Bogotá, Cartagena). Music: original sunset Afro house track generated for AIdeazz AI Lab with ElevenLabs Music.",
+         "madeForKids": false,
+         "privacyStatus": "public",
+         "notifySubscribers": true,
+         "containsSyntheticMedia": true,
+         "selfDeclaredMadeForKids": false
+        },
+        "module": "youtube:uploadVideo",
+        "version": 4,
+        "metadata": {
+         "designer": {
+          "x": 900,
+          "y": 750
+         }
+        },
+        "parameters": {
+         "__IMTCONN__": 5453399
+        }
+       }
+      ]
+     }
+    ],
+    "version": 1,
+    "metadata": {
+     "designer": {
+      "x": 300,
+      "y": 0
+     }
+    }
+   }
+  ],
+  "name": "Daily YouTube Upload",
+  "metadata": {
+   "instant": false,
+   "version": 1,
+   "designer": {
+    "orphans": [],
+    "samples": {
+     "1": {
+      "data": "IMTBuffer(27768561, binary, 109ce70e95c791596b2faf350d27085ccefdc1fb): 000000206674797069736f6d00000...",
+      "headers": [
+       {
+        "name": "accept-ranges",
+        "value": "bytes"
+       }
+      ],
+      "fileName": "file.mp4",
+      "fileSize": 27768561,
+      "statusCode": 200,
+      "cookieHeaders": []
+     },
+     "2": {
+      "id": "50fE_LQ3n7g",
+      "status": {
+       "license": "youtube",
+       "embeddable": false,
+       "uploadStatus": "uploaded",
+       "privacyStatus": "public",
+       "publicStatsViewable": false,
+       "selfDeclaredMadeForKids": false
+      },
+      "snippet": {
+       "tags": [
+        "AEO"
+       ],
+       "title": "Can AI find and cite you? The 34-signal AI visibility audit",
+       "channelId": "UCMhNF55kLPSk-tv5CW13VHQ",
+       "localized": {
+        "title": "Can AI find and cite you? The 34-signal AI visibility audit",
+        "description": "Free AI visibility audit: https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=a..."
+       },
+       "categoryId": "28",
+       "thumbnails": {
+        "high": {
+         "url": "https://i.ytimg.com/vi/50fE_LQ3n7g/hqdefault.jpg",
+         "width": 480,
+         "height": 360
+        },
+        "medium": {
+         "url": "https://i.ytimg.com/vi/50fE_LQ3n7g/mqdefault.jpg",
+         "width": 320,
+         "height": 180
+        },
+        "default": {
+         "url": "https://i.ytimg.com/vi/50fE_LQ3n7g/default.jpg",
+         "width": 120,
+         "height": 90
+        }
+       },
+       "description": "Free AI visibility audit: https://aideazz.xyz/api?utm_source=youtube&utm_medium=video&utm_campaign=a...",
+       "publishedAt": "2026-09-14T16:36:50.000Z",
+       "channelTitle": "AIPA Era is Minted. Crafted AI Agents.",
+       "defaultAudioLanguage": "en-US",
+       "liveBroadcastContent": "none"
+      },
+      "embedHtml": "<iframe width=\"480\" height=\"360\" src=\"//www.youtube.com/embed/50fE_LQ3n7g\" frameborder=\"0\" allow=\"ac...",
+      "contentDetails": {
+       "caption": "false",
+       "duration": "P0D",
+       "dimension": "2d",
+       "definition": "sd",
+       "projection": "rectangular",
+       "contentRating": {},
+       "licensedContent": false,
+       "hasCustomThumbnail": false
+      }
+     }
+    }
+   },
+   "scenario": {
+    "dlq": false,
+    "slots": null,
+    "dataloss": false,
+    "maxErrors": 3,
+    "autoCommit": true,
+    "roundtrips": 1,
+    "sequential": false,
+    "confidential": false,
+    "freshVariables": false,
+    "autoCommitTriggerLast": true
+   }
+  }
+ },
+ "scheduling": {
+  "time": "09:15",
+  "type": "daily"
+ }
+}
