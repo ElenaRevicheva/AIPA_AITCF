@@ -204,7 +204,7 @@ AI visibility audit, GEO, AEO, ChatGPT recommendations, WhatsApp automation, Hub
 
 | What | Where |
 |---|---|
-| Master 1080p, ~107 s | Oracle `~/aigo-med/cut1/MEDTOUR_FINAL_v1_2026-10-03_1080p.mp4` (after the music mix; md5 TO FILL) · Desktop campaign folder |
+| Master 1080p, 106.92 s, −16.1 LUFS, md5 `daad6e5ec245988e2b26826c54ce6f19` | Desktop campaign folder `03.10.26 Medical Tourism - Dental + Plastic Surgery Clinics (Colombia).mp4` · Oracle `~/aigo-med/cut1/MEDTOUR_FINAL_v1_2026-10-03_1080p.mp4` (phone copy `MEDTOUR_FINAL_v1_720p_phone.mp4`) |
 | Captions EN / ES | `~/aigo-med/cut1/MEDTOUR_promo_en.srt` · `MEDTOUR_promo_es.srt` (29 cues each) |
 | Thumbnail | `MEDTOUR_thumbnail_EN.jpg` / `ES.jpg` — the couple together at the consultation (Elena 3 Oct: "with a couple, not just a husband"), "They asked AI first. / Was your clinic on the list?" |
 
@@ -244,7 +244,7 @@ AIdeazz AI Lab no te vende otro CRM: instalamos un AI Growth Operator dentro de 
 1:31 Free AI visibility audit
 
 The people in this film are AI-generated. The product screens are real (private details blurred). Made in our own AI film studio.
-Real footage: Pexels and Pixabay (Dallas, Medellín, Bogotá, Cartagena). Music: [TRACK] by [ARTIST] (Pixabay Content License — not Content ID registered).
+Real footage: Pexels and Pixabay (Dallas, Medellín, Bogotá, Cartagena). Music: "Fashion Lounge" by TheSilentThunder (Pixabay Content License — not Content ID registered).
 ```
 Chapters ≥ 10 s each (20 / 17 / 16 / 19 / 19 / 16), first at 0:00 — re-check against the final `clock.json`.
 **Altered or synthetic content: YES · Made for kids: NO · no CC track (ES captions are burned in) · any paid boost 18+ only, after reading Meta's and Google's health-ad pages (plan §6).**
