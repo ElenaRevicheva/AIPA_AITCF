@@ -1,6 +1,6 @@
-# MEDICAL-TOURISM film (ICP #5, 3 Oct 2026) - YouTube thumbnail EN + ES on the dental-chair keyframe kT1 (plan §8: the thumbnail
-# must say "medical" at a glance). Copy of reloc-thumbnail.py with the layout flipped: text column LEFT, the dentist and the
-# patient on the RIGHT (the frame is reframed by layout, never mirrored - a mirror moves the wedding bands). Original header:
+# MEDICAL-TOURISM film (ICP #5, 3 Oct 2026) - YouTube thumbnail EN + ES on the consultation keyframe kT2 - the COUPLE together (Elena 3 Oct: "Thumbnails should be with a couple, not just a husband") with the surgeon's white coat at the edge (plan §8: the thumbnail
+# must say "medical" at a glance). Copy of reloc-thumbnail.py with the layout flipped: text column LEFT, the couple on the
+# RIGHT (the frame is reframed by layout, never mirrored - a mirror moves the wedding bands). Original header:
 # AI Growth Operator promo - YouTube thumbnail v2, EN + ES (Elena 30 Sep: "stylish - like HubSpot UI and my own website").
 # Website half: Instrument Serif headline with the gold italic accent, letter-spaced mono eyebrow, dot grid on #030711.
 # HubSpot half: the white rounded status chip (slate text, orange status dot) carrying the hook question.
