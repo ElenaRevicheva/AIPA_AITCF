@@ -210,27 +210,43 @@ async function hs(method: string, p: string, body?: unknown): Promise<unknown> {
  * her note instead of the one holding the audit and the FU buttons. Prefer a note
  * that actually carries outreach content; fall back to newest.
  */
-export async function findOutreachNote(dealId: string): Promise<{ id: string; body: string } | null> {
-  const assoc = (await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes`)) as {
+export async function findOutreachNote(
+  dealId: string,
+  /** The slug this send went out under — its note is where Elena pressed the button. */
+  slug?: string,
+): Promise<{ id: string; body: string } | null> {
+  const assoc = (await hs('GET', `/crm/v4/objects/deals/${dealId}/associations/notes?limit=500`)) as {
     results?: { toObjectId?: string; id?: string }[];
   };
-  const ids = (assoc.results || []).map(r => r.toObjectId || r.id).filter(Boolean) as string[];
+  const ids = (assoc.results || []).map(r => String(r.toObjectId || r.id || '')).filter(Boolean);
   if (!ids.length) return null;
 
+  // Every note, not the first 8. Associations come back OLDEST first, so the old
+  // slice(0, 8) never saw a new send note on a long deal: IntelliOps (5 Sep and again
+  // 4 Oct 2026, 20+ notes) had ENTREGADO land on the 25 Aug letter while the note with
+  // the button Elena pressed stayed blank. Batch read = one call per 100 notes instead
+  // of one per note, so a webhook burst does not trip HubSpot's 10-second limit.
   const notes: { id: string; body: string; ts: string }[] = [];
-  for (const id of ids.slice(0, 8)) {
-    const n = (await hs('GET', `/crm/v3/objects/notes/${id}?properties=hs_note_body,hs_timestamp`)) as {
-      id: string;
-      properties?: { hs_note_body?: string; hs_timestamp?: string };
-    };
-    notes.push({ id: n.id, body: n.properties?.hs_note_body || '', ts: n.properties?.hs_timestamp || '' });
+  for (let i = 0; i < ids.length; i += 100) {
+    const b = (await hs('POST', '/crm/v3/objects/notes/batch/read', {
+      properties: ['hs_note_body', 'hs_timestamp'],
+      inputs: ids.slice(i, i + 100).map(id => ({ id })),
+    })) as { results?: { id: string; properties?: { hs_note_body?: string; hs_timestamp?: string } }[] };
+    for (const n of b.results || []) {
+      notes.push({ id: n.id, body: n.properties?.hs_note_body || '', ts: n.properties?.hs_timestamp || '' });
+    }
   }
   notes.sort((a, b) => (a.ts < b.ts ? 1 : -1)); // newest first
+  // The note carrying THIS send's link wins. Exact link with a right boundary, so
+  // `grand-tours` never matches a note that only holds the `grand-tours-fu` button.
+  const esc = (slug || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const slugRe = slug ? new RegExp(`/outreach-email/${esc}(?![A-Za-z0-9-])`) : null;
+  const slugHit = slugRe ? notes.find(n => slugRe.test(n.body)) : undefined;
   const isOutreach = (b: string) =>
     /FOLLOW-UP|MENSAJE|ENVIAR POR (WHATSAPP|EMAIL)|SEND BY EMAIL|EMAIL FU|WHATSAPP FU|CLIENT-MANUAL|LICENSE|EMAILED|outreach-email/i.test(
       b,
     );
-  const hit = notes.find(n => isOutreach(n.body)) || notes[0];
+  const hit = slugHit || notes.find(n => isOutreach(n.body)) || notes[0];
   return hit ? { id: hit.id, body: hit.body } : null;
 }
 
@@ -398,8 +414,10 @@ export async function applyResendEventToHubSpot(
   engagementId?: string,
   /** False for a Cc bounce — the To may have been delivered. */
   flipEngagement?: boolean,
+  /** Send slug from the ledger — picks the note whose button was pressed. */
+  slug?: string,
 ): Promise<'applied' | 'duplicate' | 'no-note'> {
-  const best = await findOutreachNote(dealId);
+  const best = await findOutreachNote(dealId, slug);
   if (!best) return 'no-note';
 
   // A send that never arrived must not keep showing as SENT in the Emails tab.
@@ -496,6 +514,7 @@ export function registerResendWebhookRoutes(app: Express): void {
         stamp,
         (hit as ResendLedgerEntry).engagementId,
         !(type === 'email.bounced' && isCc),
+        slug,
       );
       console.log(`[resend-webhook] ${type} ${to} deal=${hit.dealId} → ${outcome}`);
     } catch (e) {
