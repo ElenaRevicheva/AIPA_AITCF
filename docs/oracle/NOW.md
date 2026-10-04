@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-04T15:03 | Stamper >8-notes fix (bring 4f7f536 to main) + deploy | src/resend-webhook.ts, src/go-wa.ts, Oracle dist/resend-webhook.js, pm2 cto-aipa | 34bd01c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -154,9 +153,10 @@ git log keeps the record.
 
 ### ✅ 4 Oct — IntelliOps CLOSED: decline SENT (Draft A, reverse-referral offer) · deal Closed Lost with Elena's reason
 - Resend 01a1076b… delivered to Nishant, Natalie, her Gmail. If Nishant replies offering to send work → that is a NEW AIdeazz client conversation.
-- 🐛 **Delivery stamps land on the WRONG note on deals with >8 notes**: `findOutreachNote` (src/resend-webhook.ts, live on Oracle) reads
-  only the OLDEST 8 notes. Cursor fixed it 5 Sep (`4f7f536`) but on branch `cursor/intelliops-addendum-ded9` only. Today's stamps were
-  copied by hand. Permanent fix = bring 4f7f536 to main + deploy dist/resend-webhook.js + pm2 restart → **needs Elena's go** (touches Oracle/PM2).
+- ✅ **Stamper fixed 4 Oct (`8e3a2f7`, live):** `findOutreachNote` reads ALL notes (batch) and prefers the note holding the exact
+  `/outreach-email/<slug>` link. Oracle `dist/resend-webhook.js` md5 = main build (`ddd39a54…`), restarted 15:06:20 > file 15:05:09;
+  read-only check on the IntelliOps deal: `intelliops-decline` → the decline note. `go-wa.ts` deliberately untouched (pii-guard: 3 OLD
+  findings in its comments — placeholders + Elena's own Gmail — not from this change).
 - ⚠️ STRANDED: the whole IntelliOps record (`docs/selling/intelliops/`: evaluation, V1_VS_V2, addendum, v1/v2 PDFs) is only on
   `origin/cursor/intelliops-addendum-ded9`, never merged to main.
 
