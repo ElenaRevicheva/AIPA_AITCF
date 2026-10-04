@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-04T15:03 | Stamper >8-notes fix (bring 4f7f536 to main) + deploy | src/resend-webhook.ts, src/go-wa.ts, Oracle dist/resend-webhook.js, pm2 cto-aipa | 34bd01c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
