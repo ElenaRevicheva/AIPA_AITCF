@@ -347,7 +347,7 @@ API video for YouTube campaign`. The relocation file there is **v2 under the ori
    the drop order; a mid-production request is paid from the drop list, never from the reserve.
 2. **Spend is asked per gate, before it runs** (1 faces · 1b relative + wardrobe · 2 keyframes · 3 motion · voice). The
    film's own `gen.mjs` copy runs with **`BUDGET_USD=13.5` on every call** — the file's default is 30, so a call without it can
-   spend to $30 against the ledger. Deploying a new film folder = `scp scripts/aigo-promo-gen.mjs` and change only line 19 (`BASE`);
+   spend to $30 against the ledger. Deploying a new film folder = `scp scripts/aigo-promo-gen.mjs` and change only the `const BASE` line (line 20 since the 3 Oct music command; all four film folders were re-synced that day);
    `scripts/aigo-promo-gen.mjs` stays the one canonical copy.
    Replicate is prepaid and we cannot see the balance without her sign-in: **Elena reads replicate.com/account/billing
    before a gate** (below $5 it throttles — 429s on 1 Oct).
