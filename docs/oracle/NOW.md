@@ -151,9 +151,11 @@ git log keeps the record.
 - **Elena's move:** ADD (not replace) the bio link `aideazz.xyz/api?utm_source=instagram&utm_medium=bio&utm_campaign=aigo_films`;
   check the first Reel shows Instagram's "AI info" label.
 
-### ⛔ 4 Oct — IntelliOps: ELENA DECLINES the BD role ("I will not bring clients. I need clients myself.") · Elena's move
-- Do NOT sign the addendum; the 3 Oct Clause 6A reply is SUPERSEDED. Decline drafts A (offers reverse referral) / B (plain), NOT sent:
-  `docs/selling/INTELLIOPS_CLAUSE6_REVIEW_2026-10-03.md`. After the send → BD Expert deal Closed Lost with her reason.
+### ✅ 4 Oct — IntelliOps CLOSED: decline SENT (Draft A, reverse-referral offer) · deal Closed Lost with Elena's reason
+- Resend 01a1076b… delivered to Nishant, Natalie, her Gmail. If Nishant replies offering to send work → that is a NEW AIdeazz client conversation.
+- 🐛 **Delivery stamps land on the WRONG note on deals with >8 notes**: `findOutreachNote` (src/resend-webhook.ts, live on Oracle) reads
+  only the OLDEST 8 notes. Cursor fixed it 5 Sep (`4f7f536`) but on branch `cursor/intelliops-addendum-ded9` only. Today's stamps were
+  copied by hand. Permanent fix = bring 4f7f536 to main + deploy dist/resend-webhook.js + pm2 restart → **needs Elena's go** (touches Oracle/PM2).
 - ⚠️ STRANDED: the whole IntelliOps record (`docs/selling/intelliops/`: evaluation, V1_VS_V2, addendum, v1/v2 PDFs) is only on
   `origin/cursor/intelliops-addendum-ded9`, never merged to main.
 
