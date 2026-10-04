@@ -1,0 +1,120 @@
+{
+ "id": 6505010,
+ "blueprint": {
+  "name": "AIGO Films → Instagram Reels",
+  "flow": [
+   {
+    "id": 1,
+    "module": "http:ActionSendData",
+    "version": 3,
+    "parameters": {
+     "handleErrors": false,
+     "useNewZLibDeCompress": true
+    },
+    "mapper": {
+     "ca": "",
+     "qs": [],
+     "gzip": true,
+     "timeout": "",
+     "useMtls": false,
+     "authPass": "",
+     "authUser": "",
+     "serializeUrl": false,
+     "shareCookies": false,
+     "followRedirect": true,
+     "useQuerystring": false,
+     "followAllRedirects": false,
+     "rejectUnauthorized": true,
+     "url": "https://webhook.aideazz.xyz/influencer-images/ig-aigo/posts/{{formatDate(now; \"YYYY-MM-DD\"; \"America/Panama\")}}.json",
+     "method": "get",
+     "headers": [],
+     "bodyType": "",
+     "parseResponse": false
+    },
+    "metadata": {
+     "designer": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": 2,
+    "module": "http:ActionSendData",
+    "version": 3,
+    "parameters": {
+     "handleErrors": true,
+     "useNewZLibDeCompress": true
+    },
+    "filter": {
+     "name": "Post day (today's file exists)",
+     "conditions": [
+      [
+       {
+        "a": "{{1.statusCode}}",
+        "b": "200",
+        "o": "number:equal"
+       }
+      ]
+     ]
+    },
+    "mapper": {
+     "ca": "",
+     "qs": [],
+     "gzip": true,
+     "timeout": "",
+     "useMtls": false,
+     "authPass": "",
+     "authUser": "",
+     "serializeUrl": false,
+     "shareCookies": false,
+     "followRedirect": true,
+     "useQuerystring": false,
+     "followAllRedirects": false,
+     "rejectUnauthorized": true,
+     "url": "https://api.buffer.com",
+     "method": "post",
+     "headers": [
+      {
+       "name": "Authorization",
+       "value": "Bearer [REDACTED - BUFFER_API_TOKEN in ~/cto-aipa/.env]"
+      }
+     ],
+     "bodyType": "raw",
+     "contentType": "application/json",
+     "data": "{{toString(1.data)}}",
+     "parseResponse": true
+    },
+    "metadata": {
+     "designer": {
+      "x": 300,
+      "y": 0
+     }
+    }
+   }
+  ],
+  "metadata": {
+   "instant": false,
+   "version": 1,
+   "designer": {
+    "orphans": []
+   },
+   "scenario": {
+    "dlq": false,
+    "slots": null,
+    "dataloss": false,
+    "maxErrors": 1,
+    "autoCommit": true,
+    "roundtrips": 1,
+    "sequential": true,
+    "confidential": false,
+    "freshVariables": false,
+    "autoCommitTriggerLast": true
+   }
+  }
+ },
+ "scheduling": {
+  "type": "daily",
+  "time": "12:00"
+ }
+}

@@ -130,6 +130,19 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📱 4 Oct — the 5 AIGO films → Instagram Reels: NEW Make scenario `6505010` LIVE · first Reel posted
+- **DONE:** 5 vertical Reels (1080×1920: the 16:9 master on a blurred fill + slogan, hook chip, `aideazz.xyz/api`, per-film AI
+  disclosure) at `webhook.aideazz.xyz/influencer-images/ig-aigo/reel_{yacht,villa,reloc,medtour,api}_v1.mp4` (Oracle `~/aigo-ig/`).
+  Make `6505010` "AIGO Films → Instagram Reels": daily 12:00 Panama, GETs `ig-aigo/posts/<date>.json`, 404 = no post (filter on
+  status 200), else POSTs that file verbatim to Buffer `createPost` (reel, `isAiGenerated: true`). Calendar: 4 Oct yacht
+  **posted** instagram.com/reel/DeErTwenLT7 · 6 villa · 8 relocation · 10 medtour · 12 /api. Everything: `docs/selling/video/AIGO_INSTAGRAM_REELS.md`.
+- **NOT touched (Elena: "Do not touch it"):** every existing scenario — `lastEdit` of all 6 predates 4 Oct 12:51 UTC; YouTube
+  rotation files md5-identical; no nginx change (Buffer accepted the octet-stream Reels).
+- **VERIFY:** 6 Oct ~17:00 UTC Make log of `6505010` = 2 ops + a Buffer post "sent" (a non-post day = 1 op, filtered).
+  Never "Run once" `6505010` on a post day that already posted — it would post the Reel twice.
+- **Elena's move:** ADD (not replace) the bio link `aideazz.xyz/api?utm_source=instagram&utm_medium=bio&utm_campaign=aigo_films`;
+  check the first Reel shows Instagram's "AI info" label.
+
 ### 🤝 3 Oct — IntelliOps: Nishant SIGNED the addendum (2 Oct) + added Clause 6 · Elena's move
 - Clauses 1–5 verbatim hers (diffed); he signed; Clause 6 = he contracts personally (trade name), Noida courts. One hole: revenue
   paid to his future company may fall outside the base → ask **Clause 6A** + his PAN, then she signs. Say yes to his call.

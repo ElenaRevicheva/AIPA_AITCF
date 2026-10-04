@@ -1,5 +1,16 @@
 # /api promo → YouTube + social (Make)
 
+## STATE, 4 Oct 2026 — NEW scenario `6505010` "AIGO Films → Instagram Reels" (6263197 NOT touched)
+
+Elena: "Better create new one for insta". Created via `POST /scenarios?confirmed=true`, activated (`/start`), run once by hand:
+2 ops, Buffer post "sent" → https://www.instagram.com/reel/DeErTwenLT7/ (4 Oct 12:52 UTC). Daily 12:00 Panama (17:00 UTC).
+Module 1 `http:ActionSendData` GET `https://webhook.aideazz.xyz/influencer-images/ig-aigo/posts/{{formatDate(now; "YYYY-MM-DD"; "America/Panama")}}.json`
+(handleErrors off, so a 404 is a normal result) → filter `{{1.statusCode}} = 200` → module 2 POST `https://api.buffer.com`,
+raw JSON body `{{toString(1.data)}}` = the pre-built `createPost` request (Bearer token inline, the Lead Concierge pattern).
+Calendar = the files (6 / 8 / 10 / 12 Oct); posted days are renamed `.json.posted`. Blueprint, token redacted:
+`docs/selling/video/make/6505010_aigo_films_instagram_reels_2026-10-04_REDACTED.json`. Full runbook + captions:
+`docs/selling/video/AIGO_INSTAGRAM_REELS.md`. Stop: toggle off in Make or `POST /scenarios/6505010/stop`.
+
 ## STATE, 3 Oct 2026 (evening) — `6263197` now ROTATES 5 FILMS (Elena: "wire this exact video in make com scenario for daily rotación alongside other videos wired today")
 
 PATCH 200, `isinvalid: false`, active, next run 4 Oct 14:15 UTC. `filmIndex = parseNumber(formatDate(now; "DDD")) % 5`; routes 0-3 unchanged
