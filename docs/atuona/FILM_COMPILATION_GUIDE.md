@@ -318,7 +318,7 @@ real." → generate only people and places; every product/app screen is a **real
 cropped or blurred for names, numbers and private chats. Landscapes may be real stock **only if the clip is really that
 place** (see recap 36). The whole first pass (faces → keyframes → 7-engine test → 8 shots → 5 fixes) cost **$19.90**.
 
-## 5f. The AI Growth Operator promo series — the finished machinery (01–02.10.2026)
+## 5f. The AI Growth Operator promo series — the finished machinery (01–03.10.2026)
 
 §5e grown into a series: four client ads, one brand system, one cut engine, a new story per ICP lane — three share one voice
 (MiniMax `English_magnetic_voiced_man`); the /api film keeps the old films' OpenAI onyx. The yacht, villa and relocation films each
@@ -341,7 +341,7 @@ API video for YouTube campaign`. The relocation file there is **v2 under the ori
 
 **The pipeline, in order** (the relocation film is the reference run):
 
-1. **Plan by workflow, never by one draft.** 8 agents: 3 concepts → 3 judges (the two buyers · legal/compliance ·
+1. **Plan by workflow, never by one draft.** 8 agents (9 with a verify+revise stage that checks each critic point against the files): 3 concepts → 3 judges (the two buyers · legal/compliance ·
    production realism + cost) → synthesis → critic. Every critic issue is checked against the code and the prospect file
    before it is applied (`docs/selling/video/2026-10-02_RELOCATION_FILM_PLAN.md`). The plan carries the budget by gate and
    the drop order; a mid-production request is paid from the drop list, never from the reserve.
@@ -389,23 +389,40 @@ API video for YouTube campaign`. The relocation file there is **v2 under the ori
     written to `clock.json`. `OVERLAY_ONLY=1` re-runs only the overlay pass; `REBUILD=1,4,…` re-renders only those
     segments and re-concats (a card baked into a segment is not an overlay — recap 51). Long runs:
     `setsid nohup … </dev/null >log 2>&1 &`, then wait on a log line (recaps 52–53).
-13. **Music hunt (workflow).** A finder in the browser reads each Pixabay page's JSON-LD and rejects "Content ID
+13. **Music — our own track first (since 3 Oct, Elena: "Let us create our own music").** `node gen.mjs music <id>` renders
+    `plan.music[id] = { engine: "elevenlabs", seconds, prompt }` on ElevenLabs Music (Replicate `elevenlabs/music`,
+    `force_instrumental: true`, up to 300 s, commercial use under the ElevenLabs Music Terms; ~$8.30 per 1,000 s, the guard
+    prices $0.011/s). Write the length to the film's clock (~108 s for a 107 s cut) and describe the structure: a calm groove
+    under narration, a lift exactly where the music plays alone, a soft ending. Her style for the series: **light, chillout,
+    2026 deep house — warm, tropical/organic, sunset Afro house** (film #5's pick: "sunset Afro house", track 2; track 1,
+    melodic deep house with Rhodes, was "generic"). Gate before the mix: two whole-track Gemini listens + demucs voice stem
+    (< −25 dB); demucs breaks a disagreement between the listeners (recap 71). Generate 1-2 tracks, she picks by ear.
+    **Fallback — the Pixabay music hunt (workflow).** A finder in the browser reads each Pixabay page's JSON-LD and rejects "Content ID
     Registered" / `hasYoutubeContentId`; one verifier per track: Gemini listens to the whole track + demucs `htdemucs`
     two-stem vocal ratio. Never a track or artist already used (the plan lists them). **demucs one at a time** (recap 54).
+    Film #5: 1 of 13 tracks passed and she still called it generic (recap 65).
 14. **Mix** — `aigo-promo-music-mix.py <music> [start] [out] [picture] [voice]`. The bed is **measured** to −25.7 LUFS
     (Pixabay masters differ by 8 dB), sidechain-ducked under the voice, 1 s in / 5 s out, limiter. Finals −15.6 to
     −16.9 LUFS.
 15. **QA before she sees it.** A frame sheet, one frame per shot · the QR decoded with OpenCV from exported frames — crop,
     scale 0.25–0.5, threshold sweep · `ebur128` · grep captions, cards and SRT for banned words.
-16. **Deliverables.** `reloc-srt.py` writes EN + ES SRT from the same `clock.json`; `reloc-thumbnail.py` EN + ES (the yacht
-    thumbnail system, on the film's last smile). Master + SRT + thumbnails → the Desktop folder; titles, descriptions,
+16. **Deliverables.** `reloc-srt.py` / `med-srt.py` write EN + ES SRT from the same `clock.json`; `reloc-thumbnail.py` EN + ES
+    (the yacht thumbnail system, on the film's last smile; `med-thumbnail.py` flips it — text left, **the couple** right, recap 70). Master + SRT + thumbnails → the Desktop folder; titles, descriptions,
     chapters (each ≥ 10 s, first at 0:00) → the upload sheet.
 17. **YouTube upload through her Chrome** (Claude in Chrome, at her request). `file_upload` takes ≤ 10 MB per call → split
     the master into 9.5 MB parts, load them into hidden inputs, rebuild one `File` from the Blobs in-page, assign it to the
     `Filedata` input + fire `change`; check the size is byte-exact. Title and description: set the contenteditable's
     `textContent` + an `InputEvent`, then read the counters (98/100, 1879/5000). Tags: chip input value + Enter. Made for
     kids NO · altered content YES (radio click) · no CC track (Elena: the ES captions are burned in; YouTube auto-shows CC
-    in muted autoplay). A published video's file cannot be replaced — a fix is a new upload (recap 61).
+    in muted autoplay). A published video's file cannot be replaced — a fix is a new upload (recap 61). Chrome may be in the
+    background (screenshots fail with "0 width") — drive Studio through the DOM (`Create` → `Upload videos`, `#next-button`,
+    `PUBLIC` radio, `#done-button`); the renderer freezes for ~45 s while it takes the 54 MB file, so re-read state rather than
+    repeat a step; re-check the custom thumbnail took (`ytcp-thumbnail-editor img` is a `data:` URL) before Publish. Verify on
+    the public watch page: `isUnlisted:false`, `lengthSeconds`, "Made with AI", `qualityLabel` 1080p.
+18. **Daily rotation (Make `6263197`).** Copy the exact published master to `/var/www/influencer-images/youtube/aigo-film-N-<slug>.mp4`
+    (check HTTP 200 + md5), back up the live blueprint, then PATCH: `filmIndex = day-of-year % N` and one more route
+    (`http:ActionGetFile` → `youtube:uploadVideo` v4, cloned from the last route: title, description with the disclosure lines
+    first, tags, containsSyntheticMedia true, not for kids). Since 3 Oct evening it rotates 5 films — `docs/oracle/MAKE_API_PROMO_SCENARIO.md`.
 
 ## 6. Run, verify, publish
 
