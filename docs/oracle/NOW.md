@@ -140,6 +140,14 @@ git log keeps the record.
   rotation files md5-identical; no nginx change (Buffer accepted the octet-stream Reels).
 - **VERIFY:** 6 Oct ~17:00 UTC Make log of `6505010` = 2 ops + a Buffer post "sent" (a non-post day = 1 op, filtered).
   Never "Run once" `6505010` on a post day that already posted — it would post the Reel twice.
+- **AUDITED 4 Oct 13:02–13:19 UTC (5 read-only lenses + a skeptic):** all 6 existing scenarios = their newest saved version
+  (blueprint md5 equal), no version/modify/start/stop event after the 12:08 baseline; 5633833 kept polling every 15 min;
+  91 connections, same ids; nginx, pm2, YouTube files unchanged; Buffer: the only new post is the Reel.
+  **One side effect, mine:** the pre-build recon called `POST /connections/{id}/test` — that is NOT read-only; it refreshed
+  the OAuth expiry of the unused SocialBee connection 5489060 (2025-09-23 → 2026-10-05). No scenario uses it.
+  **Open risks (Elena's call):** film days = 3 IG posts (Reel 12:00 + 3044021 ~18:00 + 3543445 ~20:00 Panama) on an account
+  Meta flagged 3 Oct; `6505010` keeps the Buffer token inline in its HTTP header (same pattern as Lead Concierge) and
+  `maxErrors 1` — a rotated token deactivates only this scenario.
 - **Elena's move:** ADD (not replace) the bio link `aideazz.xyz/api?utm_source=instagram&utm_medium=bio&utm_campaign=aigo_films`;
   check the first Reel shows Instagram's "AI info" label.
 

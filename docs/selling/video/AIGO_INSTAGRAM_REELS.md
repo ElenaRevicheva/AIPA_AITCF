@@ -15,7 +15,7 @@ Elena (4 Oct): promote the 5 films on Instagram "without destroying anything tha
   `type: reel`, `shouldShareToFeed: true`, **`isAiGenerated: true`** = Instagram's AI label).
 - The calendar lives in those files, not in Make: change a caption or a date with `scripts/aigo-ig-calendar.py` (it builds
   the files from the caption blocks below). The schedule fires once a day, so a posted file needs no cleanup; only a
-  hand-fired run on a post day does: 4 Oct was fired by hand (Make "Run once"), so its file was renamed
+  hand-fired run on a post day does: 4 Oct was fired once through the Make API (`POST /scenarios/6505010/run`; Make logs it as type `auto`), so its file was renamed
   `2026-10-04.json.posted` before the 12:00 run. The script never rewrites a `.posted` day, so a rerun cannot double-post.
 - After 12 Oct every GET is a 404: the scenario keeps running at 1 op/day and posts nothing. To stop it for good: Make →
   scenario 6505010 → toggle OFF (or `POST /scenarios/6505010/stop`). To add a round: write new date files, nothing in Make.

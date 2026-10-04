@@ -2,7 +2,7 @@
 
 ## STATE, 4 Oct 2026 — NEW scenario `6505010` "AIGO Films → Instagram Reels" (6263197 NOT touched)
 
-Elena: "Better create new one for insta". Created via `POST /scenarios?confirmed=true`, activated (`/start`), run once by hand:
+Elena: "Better create new one for insta". Created via `POST /scenarios?confirmed=true`, activated (`/start`), run once via the API (`POST /run`, logged as type `auto`):
 2 ops, Buffer post "sent" → https://www.instagram.com/reel/DeErTwenLT7/ (4 Oct 12:52 UTC). Daily 12:00 Panama (17:00 UTC).
 Module 1 `http:ActionSendData` GET `https://webhook.aideazz.xyz/influencer-images/ig-aigo/posts/{{formatDate(now; "YYYY-MM-DD"; "America/Panama")}}.json`
 (handleErrors off, so a 404 is a normal result) → filter `{{1.statusCode}} = 200` → module 2 POST `https://api.buffer.com`,
