@@ -94,3 +94,39 @@ https://aideazz.xyz/portfolio
 
 This is a commercial reading by the agent, not an Indian-law opinion. If the first deal is large, a short
 review by an India-qualified lawyer before signing a novation is cheap insurance.
+
+---
+
+## ⛔ 4 Oct 2026 — ELENA'S DECISION: she will NOT bring clients for IntelliOps
+
+Her words: *"I will not bring clients. I need clients myself."* The agreement's whole job (§1, §3) is
+originating clients for IntelliOps on commission. So: **do not sign the addendum, do not send the Clause 6A
+reply above** (superseded). The relationship can only continue the other way round — IntelliOps sends work to
+AIdeazz — and only if Nishant wants that.
+
+### Draft A — decline, door open for the reverse (DRAFT, not sent)
+
+Subject: Re: Revised Business Development Agreement — four remaining items so commission is actually collectable
+
+Hi Nishant,
+
+Thank you for signing, and for being clear in Clause 6. I appreciate the time you have put into this.
+
+Having thought it through, I will not take on the business-development role. My priority now is bringing clients
+into my own practice, and I would not be able to give IntelliOps the origination effort the agreement expects. It
+is fairer to say so now than to sign and under-deliver. So I will not sign the addendum.
+
+If it is ever useful the other way round — your clients needing GEO/AEO (being recommended by ChatGPT and other
+AI assistants), WhatsApp/AI agents, or an AI growth operator — I am glad to discuss a referral fee for work you
+send to AIdeazz.
+
+I wish you every success with the registration and with IntelliOps.
+
+Best regards,
+Elena Revicheva
+AIdeazz AI Lab · Panama City
+https://aideazz.xyz/portfolio
+
+### Draft B — plain decline (DRAFT, not sent)
+
+Same letter without the "other way round" paragraph.

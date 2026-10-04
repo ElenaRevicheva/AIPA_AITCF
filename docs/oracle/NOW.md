@@ -151,10 +151,9 @@ git log keeps the record.
 - **Elena's move:** ADD (not replace) the bio link `aideazz.xyz/api?utm_source=instagram&utm_medium=bio&utm_campaign=aigo_films`;
   check the first Reel shows Instagram's "AI info" label.
 
-### 🤝 3 Oct — IntelliOps: Nishant SIGNED the addendum (2 Oct) + added Clause 6 · Elena's move
-- Clauses 1–5 verbatim hers (diffed); he signed; Clause 6 = he contracts personally (trade name), Noida courts. One hole: revenue
-  paid to his future company may fall outside the base → ask **Clause 6A** + his PAN, then she signs. Say yes to his call.
-  Review + DRAFT reply (not sent): `docs/selling/INTELLIOPS_CLAUSE6_REVIEW_2026-10-03.md`; HubSpot note on the BD Expert deal.
+### ⛔ 4 Oct — IntelliOps: ELENA DECLINES the BD role ("I will not bring clients. I need clients myself.") · Elena's move
+- Do NOT sign the addendum; the 3 Oct Clause 6A reply is SUPERSEDED. Decline drafts A (offers reverse referral) / B (plain), NOT sent:
+  `docs/selling/INTELLIOPS_CLAUSE6_REVIEW_2026-10-03.md`. After the send → BD Expert deal Closed Lost with her reason.
 - ⚠️ STRANDED: the whole IntelliOps record (`docs/selling/intelliops/`: evaluation, V1_VS_V2, addendum, v1/v2 PDFs) is only on
   `origin/cursor/intelliops-addendum-ded9`, never merged to main.
 
