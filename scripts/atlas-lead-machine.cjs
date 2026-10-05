@@ -143,9 +143,29 @@ const SJO = '@9.9281,-84.0907,12z';   // San José, Costa Rica
 const MDE = '@6.2442,-75.5812,12z';   // Medellín, Colombia
 const CTG = '@10.3910,-75.4794,12z';  // Cartagena, Colombia
 const CUN = '@21.1619,-86.8515,12z';  // Cancún, Mexico
+const STE = '@9.6450,-85.1690,12z';   // Santa Teresa, Costa Rica
+const TAM = '@10.2993,-85.8371,12z';  // Tamarindo / Guanacaste, Costa Rica
+const PDS = '@7.5290,-80.0270,12z';   // Pedasí, Panama
+const BOC = '@9.3400,-82.2419,12z';   // Bocas del Toro, Panama
+
+/**
+ * FRESH NICHES (Elena's go, 5 Oct 2026). The same ten queries ran every Monday, so the
+ * money niches got mined out: on 5 Oct the whatsapp lane looked at 31 businesses and 18
+ * were already in the CRM — every medical/dental-tourism query came back mostly worked.
+ * These are the SAME ICP shape (sale > $2k · leads arrive online · owner answers WhatsApp
+ * · international audience · English site) in costumes the machine has never searched.
+ * Tagged tier 'fresh' so they run first; orderTargets() then keeps every lane's list
+ * ordered by measured saturation, so this does not silently go stale again.
+ */
 
 const ICP_BY_LANE = {
   whatsapp_ai_agents: [
+    // ── FRESH NICHES (5 Oct 2026 — never mined) ──
+    { q: 'destination wedding venue', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en', tier: 'fresh' },
+    { q: 'surf and yoga retreat', ll: STE, city: 'Santa Teresa Costa Rica', gl: 'cr', hl: 'en', tier: 'fresh' },
+    { q: 'sport fishing lodge', ll: PDS, city: 'Pedasi Panama', gl: 'pa', hl: 'en', tier: 'fresh' },
+    { q: 'luxury eco lodge', ll: BOC, city: 'Bocas del Toro Panama', gl: 'pa', hl: 'en', tier: 'fresh' },
+    { q: 'luxury travel agency', ll: MDE, city: 'Medellin Colombia', gl: 'co', hl: 'en', tier: 'fresh' },
     // ── HIGH-TICKET ICP (worked first) ──
     { q: 'dental implants clinic', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
     { q: 'dental tourism clinic', ll: SJO, city: 'San Jose Costa Rica', gl: 'cr', hl: 'en' },
@@ -160,6 +180,12 @@ const ICP_BY_LANE = {
     { q: 'taller mecánico', ll: PTY, city: 'Panama City' },
   ],
   ai_automation: [
+    // ── FRESH NICHES (5 Oct 2026 — never mined) ──
+    { q: 'offshore company formation', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', tier: 'fresh' },
+    { q: 'residency by investment', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', tier: 'fresh' },
+    { q: 'pre-construction condo developer', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', tier: 'fresh' },
+    { q: 'vacation rental property management', ll: TAM, city: 'Tamarindo Costa Rica', gl: 'cr', hl: 'en', tier: 'fresh' },
+    { q: 'international moving company', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', tier: 'fresh' },
     // ── HIGH-TICKET ICP (worked first) ──
     { q: 'relocation services company', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
     { q: 'immigration law firm expats', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
@@ -174,6 +200,11 @@ const ICP_BY_LANE = {
     { q: 'empresa de logística', ll: PTY, city: 'Panama City' },
   ],
   geo_aeo_tech_seo_makers: [
+    // ── FRESH NICHES (5 Oct 2026 — never mined) ──
+    { q: 'luxury real estate agency', ll: TAM, city: 'Guanacaste Costa Rica', gl: 'cr', hl: 'en', tier: 'fresh' },
+    { q: 'yacht charter', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', tier: 'fresh' },
+    { q: 'luxury event venue', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en', tier: 'fresh' },
+    { q: 'private chef and villa concierge', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en', tier: 'fresh' },
     // ── HIGH-TICKET ICP (worked first) ──
     { q: 'cosmetic dentistry veneers', ll: PTY, city: 'Panama City', gl: 'pa', hl: 'en' },
     { q: 'luxury villa rental', ll: CTG, city: 'Cartagena Colombia', gl: 'co', hl: 'en' },
@@ -253,6 +284,47 @@ function pickLane() {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Query yield ledger (5 Oct 2026). What each query returned the last time it ran: how
+ * many businesses it looked at, how many were ALREADY in the CRM, how many it staged.
+ * Lives on the box (data/, gitignored) — a measurement, not outreach data.
+ */
+const YIELD_PATH = process.env.LEAD_YIELD_PATH || path.join(ROOT, 'data', 'lead-machine-query-yield.json');
+const yieldKey = (lane, t) => `${lane}|${t.q}|${t.city}`;
+function loadYield() {
+  try {
+    return JSON.parse(fs.readFileSync(YIELD_PATH, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+function saveYield(y) {
+  try {
+    fs.mkdirSync(path.dirname(YIELD_PATH), { recursive: true });
+    fs.writeFileSync(YIELD_PATH, JSON.stringify(y, null, 2) + '\n');
+  } catch (e) {
+    console.warn(`[lead-machine] yield ledger not saved: ${String(e.message).slice(0, 80)}`);
+  }
+}
+/**
+ * Order a lane's queries: fresh → high-ticket → original local set. The ICP tiers stay
+ * intact — a low-ticket local query must never jump ahead just because it is unworked —
+ * and WITHIN a tier, a query whose last run was mostly already-in-CRM goes to the back.
+ * "Mostly" = at least 4 looked at and 60%+ already worked. A query whose search FAILED
+ * (Bright Data error, 0 looked at) is not penalised: a failure is not saturation.
+ */
+function orderTargets(lane, targets, y) {
+  const tierRank = (t) => ({ fresh: 0, high: 1 }[t.tier || (t.hl === 'en' ? 'high' : 'local')] ?? 2);
+  const saturated = (t) => {
+    const r = y[yieldKey(lane, t)];
+    return r && r.seen >= 4 && r.dupe / r.seen >= 0.6 ? 1 : 0;
+  };
+  return targets
+    .map((t, i) => ({ t, i }))
+    .sort((a, b) => tierRank(a.t) - tierRank(b.t) || saturated(a.t) - saturated(b.t) || a.i - b.i)
+    .map((x) => x.t);
+}
+
 async function hs(method, p, body, attempt = 0) {
   const init = { method, headers: { Authorization: `Bearer ${HS}`, 'Content-Type': 'application/json' } };
   if (body) init.body = JSON.stringify(body);
@@ -325,6 +397,9 @@ async function bdSerpBusinesses(target) {
     // has to travel with the query, not be fixed to where Elena happens to live.
     gl: target.gl || 'pa', // without a gl the proxy once exited in South Africa
     hl: target.hl || 'es',
+    // Oct 5 2026: 6 of 10 searches were lost to Bright Data timeouts / proxy refusals
+    // and read as "no businesses". Two paced retries before a query is given up.
+    retries: 2,
     // MUST be empty. bdSerpSearch defaults tbs to 'qdr:w' (indexed in the past
     // week), which is right for the fresh buying-signal queries it was built for
     // and wrong here: a restaurant's site is not news. With the default this
@@ -391,7 +466,7 @@ function pickBestEmail(emails, domain) {
   // Off-domain fallback is only safe for personal/ISP inboxes, which small LATAM
   // businesses genuinely use. An arbitrary OTHER COMPANY's address on the page is
   // a third-party widget, not the prospect — caught live when a Panama dental
-  // clinic yielded contacto@soft99chile.cl, a Chilean company. Emailing that is
+  // clinic yielded a contacto@ address at a Chilean company, a Chilean company. Emailing that is
   // worse than finding nothing: it is a stranger receiving a pitch about someone
   // else's website.
   const PERSONAL = /@(gmail|hotmail|outlook|yahoo|live|icloud|proton(mail)?|cableonda|cwpanama|.*\.movil)\./i;
@@ -413,7 +488,7 @@ function pickBestEmail(emails, domain) {
  * business has no site of its own. That poisons everything downstream: the audit
  * scores INSTAGRAM instead of the clinic (a dental clinic came back 51/D — that was
  * Instagram's score), the domain becomes instagram.com, and the Google-index email
- * fallback duly returned support@instagram.com as the "clinic's" address. One tap
+ * fallback duly returned Instagram's own support address as the "clinic's" address. One tap
  * and Elena would have pitched an AI visibility audit to Instagram's support desk.
  *
  * These businesses are also unsellable for this offer: with no site of their own
@@ -449,7 +524,7 @@ const PLATFORM_DOMAINS = [
  *
  * The maps engine only ever returned businesses, so this never came up. ORGANIC
  * search does return institutional pages that rank for commercial queries — the
- * first Bright Data dry run staged "Inicio JTBR" with dgce@mici.gob.pa, which is
+ * first Bright Data dry run staged "Inicio JTBR" with a Panama ministry address, which is
  * Panama's Ministry of Commerce. The email was not a scraping bug: the page WAS
  * the ministry's, so the address was legitimately on-domain. Pitching a paid
  * AI-visibility audit to a government ministry is the kind of lead that costs
@@ -589,7 +664,10 @@ async function emailFromGoogleIndex(domain) {
       // as SerpAPI's JSON. This is the leg that recovers the crawler-blocked
       // businesses the Aug 4 commit was written to stop discarding.
       const { bdSerpSearch } = require('../dist/brightdata-enrich.js');
-      const results = await bdSerpSearch(q, { num: 10, gl: 'pa', hl: 'es' });
+      // tbs '' (5 Oct 2026): bdSerpSearch defaults to 'qdr:w' — pages indexed in the past
+      // WEEK — the same silent-empty trap documented in bdSerpBusinesses. A business's
+      // contact page is not news, so the email lookup was mostly searching nothing.
+      const results = await bdSerpSearch(q, { num: 10, gl: 'pa', hl: 'es', tbs: '', retries: 1 });
       if (!results || !results.length) return null;
       blob = JSON.stringify(results);
     }
@@ -1106,7 +1184,8 @@ async function telegram(text) {
 // real HubSpot contacts and deals — as an import side effect.
 if (require.main === module) (async () => {
   const picked = pickLane();
-  const TARGETS = ICP_BY_LANE[picked.lane];
+  const yieldLedger = loadYield();
+  const TARGETS = orderTargets(picked.lane, ICP_BY_LANE[picked.lane], yieldLedger);
   const angle = atlasAngle(picked.lane);
   console.log(
     `[lead-machine] start${DRY ? ' (DRY RUN — nothing written)' : ''} · max ${MAX_NEW} · band ${AUDIT_MIN}-${AUDIT_MAX}`,
@@ -1114,6 +1193,7 @@ if (require.main === module) (async () => {
   console.log(
     `[lead-machine] LANE: ${picked.lane}${picked.forced ? ' (forced via LEAD_LANE)' : ` (Atlas score ${picked.score})`}` +
       ` · offer: ${LANE_OFFER[picked.lane].label} · ${TARGETS.length} ICP queries` +
+      ` · order: ${TARGETS.slice(0, 3).map((t) => t.q).join(' → ')} …` +
       (angle ? ` · angle ${angle.angle}` : ' · no fresh angle'),
   );
   const known = await loadKnown();
@@ -1142,6 +1222,7 @@ if (require.main === module) (async () => {
       }
     }
     console.log(`[lead-machine] ${target.city} · "${target.q}" → ${businesses.length} with a website`);
+    const before = { seen: skip.seen, dupe: skip.dupe, staged: staged.length };
 
     for (const b of businesses) {
       // A social profile is not a website: skip before spending an audit on it.
@@ -1220,7 +1301,22 @@ if (require.main === module) (async () => {
       console.log(`   ✅ ${b.company.slice(0, 32)} · ${audit.score}/${audit.grade} · ${email}`);
       await sleep(400);
     }
+    // Record this query's yield so next Monday orders it by measured saturation. Never let a
+    // weaker run erase a real measurement: a failed search (0 found — indistinguishable from
+    // a Bright Data outage) writes nothing, and a run cut short by MAX_NEW or too small to
+    // judge (< 4 looked at) does not overwrite an earlier record that was big enough to.
+    const k = yieldKey(picked.lane, target);
+    const rec = {
+      last: new Date().toISOString().slice(0, 10),
+      found: businesses.length,
+      seen: skip.seen - before.seen,
+      dupe: skip.dupe - before.dupe,
+      staged: staged.length - before.staged,
+    };
+    const prev = yieldLedger[k];
+    if (businesses.length && !(rec.seen < 4 && prev && prev.seen >= 4)) yieldLedger[k] = rec;
   }
+  if (!DRY) saveYield(yieldLedger);
 
   console.log(
     `[lead-machine] done · staged ${staged.length} · looked at ${skip.seen} · ` +

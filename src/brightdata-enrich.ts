@@ -85,13 +85,39 @@ export interface BDSerpResult {
   display_link?: string;
 }
 
-export async function bdSerpSearch(
-  query: string,
-  opts: { site?: string; num?: number; gl?: string; hl?: string; tbs?: string } = {},
-): Promise<BDSerpResult[]> {
+type BDSerpOpts = { site?: string; num?: number; gl?: string; hl?: string; tbs?: string; retries?: number };
+
+/**
+ * `retries` is OPT-IN (default 0 = exactly the old behaviour for every existing caller).
+ * Oct 5 2026: the Atlas lead machine lost 6 of its 10 searches in one run to Bright Data
+ * failing inside its own network — 30 s timeouts, empty bodies, 500 "Proxy request failed"
+ * (ECONNREFUSED on BD's peers) and "query recently failed, try again after 15 seconds".
+ * Each came back as [] and was read as "no businesses exist", the same silent empty this
+ * file already warns about. A failure is now told apart from a genuine zero, and a caller
+ * that asks for it gets a paced second and third attempt.
+ */
+export async function bdSerpSearch(query: string, opts: BDSerpOpts = {}): Promise<BDSerpResult[]> {
+  const n = Number(opts.retries ?? 0);
+  const retries = Number.isFinite(n) ? Math.max(0, Math.min(3, Math.floor(n))) : 0;
+  for (let attempt = 0; ; attempt++) {
+    const r = await bdSerpSearchOnce(query, opts);
+    if (!r.failed || attempt >= retries) {
+      if (r.failed && retries > 0) console.warn(`[BD-SERP] gave up after ${attempt + 1} attempts for "${query.slice(0, 40)}" (${r.reason})`);
+      return r.results;
+    }
+    // Bright Data refuses a just-failed query for 15 s ("recently failed"), so a sooner retry is wasted.
+    const waitMs = r.waitMs ?? 16000;
+    console.log(`[BD-SERP] retry ${attempt + 1}/${retries} in ${waitMs / 1000}s for "${query.slice(0, 40)}" (${r.reason})`);
+    await new Promise(res => setTimeout(res, waitMs));
+  }
+}
+
+type BDSerpAttempt = { results: BDSerpResult[]; failed: boolean; reason?: string | undefined; waitMs?: number | undefined };
+
+async function bdSerpSearchOnce(query: string, opts: BDSerpOpts): Promise<BDSerpAttempt> {
   const token = BD_TOKEN();
   const zone = BD_ZONE();
-  if (!token || !zone) return [];
+  if (!token || !zone) return { results: [], failed: false };
 
   const num = opts.num ?? 10;
   const gl = opts.gl ?? 'us';
@@ -123,7 +149,8 @@ export async function bdSerpSearch(
     if (!res.ok) {
       const txt = await res.text();
       console.warn(`[BD-SERP] ${query.slice(0, 40)} → ${res.status}: ${txt.slice(0, 200)}`);
-      return [];
+      // 5xx / 429 are Bright Data's side and worth another try; 4xx is a request we must not repeat.
+      return { results: [], failed: res.status >= 500 || res.status === 429, reason: `HTTP ${res.status}` };
     }
 
     let text = await res.text();
@@ -141,7 +168,7 @@ export async function bdSerpSearch(
         signal: AbortSignal.timeout(30_000),
       });
       text = retry.ok ? await retry.text() : '';
-      if (text.trim()) console.log(`[BD-SERP] empty body recovered on retry for "${query.slice(0, 40)}"`);
+      if (text.trim()) console.log(`[BD-SERP] inner retry returned ${text.length} bytes for "${query.slice(0, 40)}"`);
     }
 
     // BrightData with brd_json=1 returns JSON; parse defensively.
@@ -150,7 +177,9 @@ export async function bdSerpSearch(
       parsed = JSON.parse(text);
     } catch {
       console.warn(`[BD-SERP] non-JSON after retry for "${query.slice(0, 40)}" — ${text.length} bytes: ${text.slice(0, 120)}`);
-      return [];
+      // "This query recently failed … try again later, after a minimum of 15 seconds."
+      const cooldown = /recently failed|minimum of 15 seconds/i.test(text);
+      return { results: [], failed: true, reason: text.trim() ? 'non-JSON body' : 'empty body', waitMs: cooldown ? 16000 : undefined };
     }
 
     // BrightData SERP JSON: `organic` (some versions) or `organic_results` (Google parity).
@@ -163,10 +192,11 @@ export async function bdSerpSearch(
       display_link: r.display_link || r.displayed_link || undefined,
     })).filter(r => r.link);
 
-    return results;
+    return { results, failed: false };
   } catch (err) {
     console.warn(`[BD-SERP] fetch error for "${query.slice(0, 40)}":`, (err as Error).message);
-    return [];
+    // Timeout, ECONNREFUSED, socket reset: the request never got an answer.
+    return { results: [], failed: true, reason: (err as Error).message.slice(0, 60) };
   }
 }
 
