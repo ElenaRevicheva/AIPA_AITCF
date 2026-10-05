@@ -130,6 +130,17 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔎 5 Oct — Atlas staged 2 leads (not 8): verified causes · today's blog post is PARTLY WRONG · Elena's call on the blog
+- **Causes (atlas-lead-machine.log, lane whatsapp_ai_agents):** 6 of 10 Bright Data SERP queries returned nothing (timeouts, empty bodies,
+  500 "Proxy request failed"/ECONNREFUSED inside BD's network); the 4 that worked were medical/dental tourism — **18 of 31 already in the CRM**
+  (niche saturated), 13 no email, 2 outside band (99/100) → 2 staged. Two causes: supplier failure AND lane saturation.
+- **Blog "proxy-connection-refusal-halts-lead-generation" — FALSE links:** "cto-aipa 183 restarts in the last day" (lifetime count, 0 unstable);
+  "algom-stream 55,193 restarts over 50 days" (50d uptime = no restart in 50 days); GA4 "0 atlas_ rows" (paid-ad web visits, unrelated);
+  "outcomes staged 0 sent 0 confirms" (one lane of 7); "145 They replied" (144, only 5 are client deals). Misses the saturation cause.
+  Also publishes a **port (44445)** + process internals — CLAUDE.md rule 3. Fix/unpublish needs Elena's go (public content).
+- **Lead-machine publish is failing** (4 of 11 runs: push rejected, Oracle diverged from main). Send buttons still work (Oracle disk, probed 200);
+  today's 4 slugs + 8 drafts copied to main by hand. Oracle has 3 local auto-commits not on GitHub — do NOT blind-pull; reconcile deliberately.
+
 ### 🎯 5 Oct — Supabase "Head of AI Native Operations" READY TO APPLY · Elena's move
 - Deal `65696297021`: CV **v3** (`CV_Elena_Revicheva_Supabase_AI_Native_Ops_v3.pdf`) on BOTH the 🛡️ and ✅ notes (replaced the kit CV and a stray
   leadership CV). v3 = ChatGPT structure + Elena's E-GOV facts, after a 3-reviewer check (fact-trace / hiring manager / skeptic): removed
