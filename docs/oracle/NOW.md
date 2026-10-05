@@ -131,6 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🚨 5 Oct — PRIVACY: AIPA_AITCF (= cto-aipa) is a PUBLIC GitHub repo and docs/selling/ is world-readable · Elena decides
+- Verified 5 Oct: GitHub API `private:false`; raw URLs return 200 for docs/selling/outreach-registry.json, drafts, and
+  **docs/selling/datastar/expected-fields.json, which holds Elena's cédula number** (masked check: shape E-#-######). Also prospects'
+  emails/phones (some personal Gmail), Elena's own Gmail, counterparty names. Exposure predates today (data plane on main since Aug).
+- HUD/DataVendor sale is NOT affected: build-license-bundle.cjs DROP_DIRS removes docs/selling/ (and docs/oracle, applications, interview).
+- Removing the file alone would NOT help (git history keeps it). Effective fix = make the repo PRIVATE (account setting → Elena's explicit go
+  or her click). Knock-ons: the Supabase open-source answer names AIPA_AITCF as public; GitHub-raw fallback of the send buttons needs auth
+  (Oracle disk is primary). **Do not ship the lead-machine GitHub-API publish until this is decided** — it would add prospect data weekly.
+
 ### 🔎 5 Oct — Atlas staged 2 leads (not 8): verified causes · today's blog post is PARTLY WRONG · Elena's call on the blog
 - **Causes (atlas-lead-machine.log, lane whatsapp_ai_agents):** 6 of 10 Bright Data SERP queries returned nothing (timeouts, empty bodies,
   500 "Proxy request failed"/ECONNREFUSED inside BD's network); the 4 that worked were medical/dental tourism — **18 of 31 already in the CRM**
