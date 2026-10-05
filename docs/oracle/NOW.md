@@ -141,6 +141,13 @@ git log keeps the record.
 - **VJH a16z boards PROVEN fetching:** first run after restart (RUN 20261005-160143) found all 8 — lovable 77, suno 66, openart 28, zeely 25, gamma 25,
   heygen 22, krea 12, genspark 8. Not yet proven: any of them reaching HubSpot past the gates.
 
+### 🎨 5 Oct — Niio answered the ATUONA Open Call questions · Elena's move: submit
+- `[ATUONA-ART] Niio` deal 65215836735: Xuf (Niio support) — AI-made films welcome to submit; curators pick for Artcasts;
+  no curator call via support; Q2 (sensual) / Q3 (silent loops) unanswered. Full reply + next step = note on the deal.
+- VJH's response_detector misfiled the same reply as a HIRING deal (65742421058, stage read as POSITIVE by the judge sync)
+  → archived before the 06:17 UTC learning run, on Elena's request; backup `~/cto-aipa/backups/hubspot/vjh-niio-misfile-2026-10-05.json`.
+  ⚠️ Open defect class: VJH turns art/partner replies into hiring deals — not fixed.
+
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
 - **DONE:** 3 Make uploads had auto-frames → custom EN thumbnails set in Studio (yacht RsKJX3SKgiw, villa uBziVlmdgSg,
   relocation v_9nawyYfao). New `6518503` sets the thumbnail daily at 09:45 Panama (RSS → title → `youtube:setVideoThumbnail`);
