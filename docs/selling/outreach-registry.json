@@ -3717,5 +3717,41 @@
     "emailDraft": "docs/selling/drafts/intelliops-decline-email.txt",
     "cc": "natalie.adel@intelliopsautomation.com, elena.revicheva2016@gmail.com",
     "dealId": "64302436100"
+  },
+  "plastic-surgeon-medellin-colombia-best-plastic-s-atlas": {
+    "company": "Plastic Surgeon Medellin, Colombia - Best Plastic Surgery",
+    "email": "secretariadrlondo@gmail.com",
+    "score": 96,
+    "dealId": "65698307606",
+    "phone": "573012485010",
+    "emailDraft": "docs/selling/drafts/plastic-surgeon-medellin-colombia-best-plastic-s-atlas-email.txt",
+    "draft": "docs/selling/drafts/plastic-surgeon-medellin-colombia-best-plastic-s-atlas.txt"
+  },
+  "plastic-surgeon-medellin-colombia-best-plastic-s-atlas-fu": {
+    "company": "Plastic Surgeon Medellin, Colombia - Best Plastic Surgery",
+    "email": "secretariadrlondo@gmail.com",
+    "score": 96,
+    "dealId": "65698307606",
+    "phone": "573012485010",
+    "emailDraft": "docs/selling/drafts/plastic-surgeon-medellin-colombia-best-plastic-s-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/plastic-surgeon-medellin-colombia-best-plastic-s-atlas-fu.txt"
+  },
+  "medical-care-cancun-atlas": {
+    "company": "Medical Care Cancun",
+    "email": "contact@medicalcarecancun.com",
+    "score": 88,
+    "dealId": "65689122168",
+    "phone": "5219982257890",
+    "emailDraft": "docs/selling/drafts/medical-care-cancun-atlas-email.txt",
+    "draft": "docs/selling/drafts/medical-care-cancun-atlas.txt"
+  },
+  "medical-care-cancun-atlas-fu": {
+    "company": "Medical Care Cancun",
+    "email": "contact@medicalcarecancun.com",
+    "score": 88,
+    "dealId": "65689122168",
+    "phone": "5219982257890",
+    "emailDraft": "docs/selling/drafts/medical-care-cancun-atlas-fu-email.txt",
+    "draft": "docs/selling/drafts/medical-care-cancun-atlas-fu.txt"
   }
 }
