@@ -141,13 +141,14 @@ git log keeps the record.
 - **VJH a16z boards PROVEN fetching:** first run after restart (RUN 20261005-160143) found all 8 — lovable 77, suno 66, openart 28, zeely 25, gamma 25,
   heygen 22, krea 12, genspark 8. Not yet proven: any of them reaching HubSpot past the gates.
 
-### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · 🐞 6263197 medtour bug awaits Elena's yes
+### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
 - **DONE:** 3 Make uploads had auto-frames → custom EN thumbnails set in Studio (yacht RsKJX3SKgiw, villa uBziVlmdgSg,
   relocation v_9nawyYfao). New `6518503` sets the thumbnail daily at 09:45 Panama (RSS → title → `youtube:setVideoThumbnail`);
   verified 3 ops / status 1. Details: `docs/oracle/MAKE_API_PROMO_SCENARIO.md` (5 Oct section).
-- **🐞 BLOCKER for 6 Oct 09:15:** `6263197` route 4 (medtour) uploads `{{9.data}}` (relocation's download, not run that day)
-  → the first medtour upload will fail. Fix = module 12 → `{{11.data}}`. **Needs Elena's yes** (she said do not touch 6263197).
-- **VERIFY 6 Oct:** 14:15 UTC upload (after the fix) + 14:45 UTC `6518503` = 3 ops and the medtour thumbnail on the new video.
+- **✅ FIXED 19:32 UTC with Elena's yes:** `6263197` lane 5 (medtour) uploaded `{{9.data}}` (relocation's idle download) →
+  now `{{11.data}}`; 6 keys changed, all in module 12; all 5 lanes audited clean. Backup in `docs/selling/video/make/`.
+- **VERIFY 6 Oct:** 14:15 UTC `6263197` = status 1 + ~54.2 MB transfer (medtour v3) + new video in the channel RSS; then
+  14:45 UTC `6518503` = 3 ops and the medtour thumbnail on that video.
 
 ### 📱 4 Oct — the 5 AIGO films → Instagram Reels: NEW Make scenario `6505010` LIVE · first Reel posted
 - **DONE:** 5 vertical Reels (1080×1920: the 16:9 master on a blurred fill + slogan, hook chip, `aideazz.xyz/api`, per-film AI

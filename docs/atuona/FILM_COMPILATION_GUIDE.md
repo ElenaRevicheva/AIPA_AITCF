@@ -423,6 +423,11 @@ API video for YouTube campaign`. The relocation file there is **v2 under the ori
     (check HTTP 200 + md5), back up the live blueprint, then PATCH: `filmIndex = day-of-year % N` and one more route
     (`http:ActionGetFile` → `youtube:uploadVideo` v4, cloned from the last route: title, description with the disclosure lines
     first, tags, containsSyntheticMedia true, not for kids). Since 3 Oct evening it rotates 5 films — `docs/oracle/MAKE_API_PROMO_SCENARIO.md`.
+    ⚠️ **A cloned route still points at the OLD route's download.** Re-point every `{{n.data}}` / `{{n.fileName}}` in the new
+    upload module to the new route's own `http:ActionGetFile` id, then audit: each upload reads only from its own route
+    (`/tmp/yt_fix.cjs` prints the table). Earned 5 Oct: route 5 read `{{9.data}}` (relocation, idle that day) and would have
+    failed on the first medtour day. Thumbnails: Make `6518503` sets them at 09:45 — add the new film's
+    `thumbs/aigo-thumb-<film>-en.jpg` and its title keyword to that scenario's `if(contains(…))` chain.
 
 ## 6. Run, verify, publish
 

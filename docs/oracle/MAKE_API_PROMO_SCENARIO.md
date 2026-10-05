@@ -17,9 +17,13 @@ Backfilled by hand in Studio the same day: RsKJX3SKgiw (yacht), uBziVlmdgSg (vil
 film videos now match a thumbnail design (pixel diff vs the Desktop files < 0.5). Still auto-frame: the old /api-film
 Make uploads before 3 Oct (zFVjImeZgPE, srYiSMVANVU, September).
 
-**🐞 OPEN BUG in 6263197 (mine, 3 Oct 5-film edit), awaiting Elena's yes:** route 4 (medtour) module 12 maps
-`{{9.data}}`/`{{9.fileName}}` — module 9 is the RELOCATION download, which does not run on medtour days. The 6 Oct 14:15
-UTC upload (first medtour day) will fail. One-line fix: module 12 `data/media/video/file.data` → `{{11.data}}`.
+**🐞→✅ FIXED 5 Oct 19:32 UTC (Elena: "Yes, five lanes should work correctly! Do that - scenario should be clean"):** route 5
+(medtour) upload module 12 read `{{9.data}}`/`{{9.fileName}}` — module 9 is the RELOCATION download, idle on medtour days,
+so the 6 Oct upload would have failed (my 3 Oct clone). PATCH 200, exactly 6 keys changed, all in module 12 →
+`{{11.data}}`/`{{11.fileName}}`; schedule `daily 09:15` unchanged; audit: every upload now reads only from its own route,
+lane 5 settings = lane 4's except title/description/tags. Before/after:
+`docs/selling/video/make/6263197_daily_youtube_upload_BACKUP_before_medtour_fix_2026-10-05.json` /
+`…_5FILMS_FIXED_2026-10-05.json` (Oracle backup `~/cto-aipa/backups/make/blueprint-6263197-before-medtour-fix-*.json`).
 
 ## STATE, 4 Oct 2026 — NEW scenario `6505010` "AIGO Films → Instagram Reels" (6263197 NOT touched)
 
