@@ -152,7 +152,7 @@
         "performance"
       ],
       "q": "How do you measure impact?",
-      "a": "I pick the number that tracks money or time, measure it before and after, and keep only changes that move it. A new job source cleared my live filter 76% of the time against about 21% for the others, so it stayed. I also fix the measurement itself: my replay was scoring on blank postings until I stored the real one behind each decision.",
+      "a": "I pick the number that tracks money or time, measure it before and after, and keep only changes that move it. A new job source cleared my live filter 72% of the time, measured across all 345 of its postings, so it stayed. I also fix the measurement itself: my replay was scoring on blank postings until I stored the real one behind each decision.",
       "push": ""
     },
     {

@@ -130,12 +130,16 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🎯 5 Oct — Supabase "Head of AI Native Operations" STAGED (from @v_garg_s X post) · Elena's move: apply
-- Deal `65696297021` in 🔥 I act TODAY; kit audit `complete 7 · gaps 0` (letter, tailored CV, defense, role defense, Perplexity brief, Comet).
-  Posting published 5 Oct, Remote Global. Second option same team (engineering-heavy, open since 31 Jul): AI Platform Engineer — link in the note.
-- **VJH `cd1d1c6` (live, restarted 16:01:43 UTC):** 8 a16z consumer-AI boards added INSIDE the fetched top 40 (zeely, suno, krea, openart,
-  lovable, gamma, genspark; heygen on GH). 19 Ashby + 27 Greenhouse slugs in the old top 40 were board-404 → moved below the slice, none removed.
-  **Not yet proven:** first ATS run after restart had not happened at handoff — grep `[ASHBY][zeely] Found` in `journalctl -u vibejobhunter`.
+### 🎯 5 Oct — Supabase "Head of AI Native Operations" READY TO APPLY · Elena's move
+- Deal `65696297021`: CV **v3** (`CV_Elena_Revicheva_Supabase_AI_Native_Ops_v3.pdf`) on BOTH the 🛡️ and ✅ notes (replaced the kit CV and a stray
+  leadership CV). v3 = ChatGPT structure + Elena's E-GOV facts, after a 3-reviewer check (fact-trace / hiring manager / skeptic): removed
+  "replaces status check-ins" (no meeting ever existed), "Head of" as a held title, slogans, CRM counts; agents "cannot see each other's chats".
+  Async/remote answer (paste as is) + Outlook PDF link: `docs/applications/2026-10-05_supabase_head_ai_native_ops_APPLICATION.md` + deal note.
+- **Interview number fixed everywhere:** defense-bank "kpi" said 76% vs ~21% (unverified) → "72% of the time, measured across all 345 of its postings"
+  (VJH job_monitor, 29 Aug). Updated on main + Oracle (md5 e3eba531…), Niuro prep doc, and 10 existing HubSpot notes (backup ~/backups/kpi-notes-before-20261005.json).
+  VJH's own comments disagree on the comparison baseline (~5.6% vs ~21%) → never quote a baseline until re-measured.
+- **VJH a16z boards PROVEN fetching:** first run after restart (RUN 20261005-160143) found all 8 — lovable 77, suno 66, openart 28, zeely 25, gamma 25,
+  heygen 22, krea 12, genspark 8. Not yet proven: any of them reaching HubSpot past the gates.
 
 ### 📱 4 Oct — the 5 AIGO films → Instagram Reels: NEW Make scenario `6505010` LIVE · first Reel posted
 - **DONE:** 5 vertical Reels (1080×1920: the 16:9 master on a blurred fill + slogan, hook chip, `aideazz.xyz/api`, per-film AI

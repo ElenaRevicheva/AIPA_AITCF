@@ -114,8 +114,8 @@ were silently switched off. It "worked", and it produced junk.
 **90 s:** On one path, a library failed to load on the server's Python, so the code quietly skipped the career filter, my
 lessons, the judge and the evidence store. The failure was logged at a level production never prints. I found it by loading the
 process exactly as production does, not by reading config. After the fix, its first cycle rejected five junk results (news
-articles, social posts) that used to become CRM deals. Another example: a new job source cleared my live filter 76% of the time,
-against about 21% for the other sources, so it earned its place.
+articles, social posts) that used to become CRM deals. Another example: a new job source cleared my live filter 72% of the time,
+measured across all 345 of its postings, so it earned its place.
 
 **Follow-up — "What's the general lesson?"** "It ran" is not "it worked". Always prove a change produced the right output.
 
@@ -128,7 +128,7 @@ data sources, it is the share that passes the filter. For outreach, it is delive
 fix measurement itself: I found my replay had been scoring the judge on blank postings, so its numbers were meaningless until I
 stored the real posting behind each decision.
 
-**Follow-up — "Give me a number."** The new source: 76% versus about 21%. The RAG test: the simple version beat the complex one.
+**Follow-up — "Give me a number."** The new source: 72% of its 345 postings cleared the filter. The RAG test: the simple version beat the complex one.
 The server disk: 95% full down to 69%, with log rotation so it cannot fill again.
 
 ## 10. "Who writes the code?"
