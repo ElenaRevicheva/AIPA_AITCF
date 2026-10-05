@@ -150,6 +150,9 @@ git log keeps the record.
 - **Elena 5 Oct: NEW film "ATUONA" (her poems, ATUONA + LITPROM) made FOR Niio's PRIVATE-viewer programme only** (not the
   hotel loop programme — she keeps the full ATUONA register). Plan in progress (workflow, planning only, NO spend);
   ≥1920×1080 delivery. Fact-checked Niio recon = HubSpot note 118119954506 on deal 65215836735.
+  **PLAN READY 5 Oct:** `docs/atuona/FILM9_ATUONA_NIIO_PLAN_2026-10-05.md` (18 shots, 13 poems verbatim-checked, ~$48
+  expected / $30–62, gates) + `docs/atuona/2026-10-05_READING_ALL_99_POEMS.md`. **Elena's move:** the 7 decisions in §"Decisions
+  that are hers". Nothing generated or spent; the Oracle compile changes (1080p etc.) need her Confirm at Gate 1.
 
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
 - **DONE:** 3 Make uploads had auto-frames → custom EN thumbnails set in Studio (yacht RsKJX3SKgiw, villa uBziVlmdgSg,
