@@ -34,3 +34,15 @@ The AI Visibility Audit at aideazz.xyz/api, which I launched in July 2026. Anyon
 I built it with Claude Code and Cursor as a public API with a web page, running on our own cloud server. I am not in the loop: the logs show 48 audits of 16 different sites from 16 addresses that are not my laptop or our server, most of them through the public page. Our own outreach agents call the same API before each new prospect is contacted, which is where most of its runs come from.
 
 (Evidence, Oracle pm2 logs 19 Mar–5 Oct 2026, `[visibility-lead]` lines: 547 runs; 353 with our own key = staging agents; 194 public (`key=demo`): 133 from Elena's laptop IP, 13 from the Oracle server, **48 from 16 other addresses on 16 sites, 36 via the aideazz.xyz page**. Some of the 16 could be Elena's phone, so the answer says "not my laptop or our server", never "16 customers". 34 checks / 4 weighted categories from the live API response 5 Oct.)
+
+## Q: Have you made any open source contributions in the past that you'd like to share with us?
+
+**FINAL (paste as is):**
+
+Yes. I build in public: 17 of my repositories are public at github.com/ElenaRevicheva, including systems I run in production: VibeJobHunter, an autonomous job-discovery engine with its evaluation suite; AIPA_AITCF, a production AI code-review and web-research agent; Atlas, an autonomous AI marketing strategist; and the AIdeazz site with its public AI Operations Wiki. Codebases I license commercially stay private.
+
+Upstream, I opened a documentation pull request to Hive, a multi-agent harness for production AI with 11,000+ stars: github.com/aden-hive/hive/pull/6667. It documents an architecture pattern drawn from my own production tutor bot: a long-running personal assistant with persistent memory, a judge node that checks every response before delivery, PostgreSQL + pgvector shared memory, deterministic graph pipelines and multi-model routing. It is still open.
+
+I also publish operating knowledge, not only code: 20+ named production postmortems in the AI Operations Wiki (aideazz.xyz/ai-ops-wiki.html).
+
+(Evidence, GitHub API 5 Oct 2026: 17 public repos; the only PR to another owner's repo = aden-hive/hive#6667, opened 20 Mar 2026, still OPEN, 0 comments; hive = 11,090 stars. Never say "merged" or "contributor to Hive" without checking it merged.)
