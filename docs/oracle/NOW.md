@@ -130,6 +130,13 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎯 5 Oct — Supabase "Head of AI Native Operations" STAGED (from @v_garg_s X post) · Elena's move: apply
+- Deal `65696297021` in 🔥 I act TODAY; kit audit `complete 7 · gaps 0` (letter, tailored CV, defense, role defense, Perplexity brief, Comet).
+  Posting published 5 Oct, Remote Global. Second option same team (engineering-heavy, open since 31 Jul): AI Platform Engineer — link in the note.
+- **VJH `cd1d1c6` (live, restarted 16:01:43 UTC):** 8 a16z consumer-AI boards added INSIDE the fetched top 40 (zeely, suno, krea, openart,
+  lovable, gamma, genspark; heygen on GH). 19 Ashby + 27 Greenhouse slugs in the old top 40 were board-404 → moved below the slice, none removed.
+  **Not yet proven:** first ATS run after restart had not happened at handoff — grep `[ASHBY][zeely] Found` in `journalctl -u vibejobhunter`.
+
 ### 📱 4 Oct — the 5 AIGO films → Instagram Reels: NEW Make scenario `6505010` LIVE · first Reel posted
 - **DONE:** 5 vertical Reels (1080×1920: the 16:9 master on a blurred fill + slogan, hook chip, `aideazz.xyz/api`, per-film AI
   disclosure) at `webhook.aideazz.xyz/influencer-images/ig-aigo/reel_{yacht,villa,reloc,medtour,api}_v1.mp4` (Oracle `~/aigo-ig/`).
