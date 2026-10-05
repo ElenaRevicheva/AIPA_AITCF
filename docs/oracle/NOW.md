@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-05T23:04 | Deploy Atlas niches+retry (c947991) to Oracle, Elena go | Oracle scripts/atlas-lead-machine.cjs, dist/brightdata-enrich.js, pm2 cto-aipa restart | 8c82f9d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
