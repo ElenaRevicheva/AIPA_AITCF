@@ -1,5 +1,26 @@
 # /api promo → YouTube + social (Make)
 
+## STATE, 5 Oct 2026 — NEW scenario `6518503` "AIGO YouTube → thumbnails (after the 09:15 upload)" (6263197 NOT touched)
+
+Elena 5 Oct: the 09:15 uploads go out "without thumbnail". `youtube:uploadVideo` cannot set one. Fix = a separate scenario
+(a thumbnail failure can never stop an upload): daily **09:45 Panama** → `http:ActionGetFile` the channel RSS
+(`youtube.com/feeds/videos.xml?channel_id=UCMhNF55kLPSk-tv5CW13VHQ`) → filter: newest entry published today `T14:1x` UTC
+(= the Make upload, not a hand upload) AND title matches a film → `http:ActionGetFile` the EN thumbnail by title keyword
+(`Your Yacht` / `Your Island` / `Your Clinic` / `Messaged You |` / `34 Signals`) from
+`webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-<film>-en.jpg` → **`youtube:setVideoThumbnail` v4**,
+mapper `{videoId, thumbnailData: "{{2.data}}"}`, connection 5453399 (same as the upload; using it changes nothing).
+Found by probe + the Make UI (no public template uses it). Trap: an `http:ActionGetFile` with only `url` fails
+"Validation failed for 1 parameter(s)" — give it the full mapper (`method: get`, `bodyType: raw`, …) like 6263197's.
+VERIFIED 5 Oct 17:53 UTC: run status 1, **3 ops, 220,990 B** = feed + the relocation thumbnail (180,549 B) set on
+`v_9nawyYfao`. Blueprint: `docs/selling/video/make/6518503_aigo_youtube_thumbnails_2026-10-05.json` (no secret in it).
+Backfilled by hand in Studio the same day: RsKJX3SKgiw (yacht), uBziVlmdgSg (villa), v_9nawyYfao (relocation) — all 10
+film videos now match a thumbnail design (pixel diff vs the Desktop files < 0.5). Still auto-frame: the old /api-film
+Make uploads before 3 Oct (zFVjImeZgPE, srYiSMVANVU, September).
+
+**🐞 OPEN BUG in 6263197 (mine, 3 Oct 5-film edit), awaiting Elena's yes:** route 4 (medtour) module 12 maps
+`{{9.data}}`/`{{9.fileName}}` — module 9 is the RELOCATION download, which does not run on medtour days. The 6 Oct 14:15
+UTC upload (first medtour day) will fail. One-line fix: module 12 `data/media/video/file.data` → `{{11.data}}`.
+
 ## STATE, 4 Oct 2026 — NEW scenario `6505010` "AIGO Films → Instagram Reels" (6263197 NOT touched)
 
 Elena: "Better create new one for insta". Created via `POST /scenarios?confirmed=true`, activated (`/start`), run once via the API (`POST /run`, logged as type `auto`):

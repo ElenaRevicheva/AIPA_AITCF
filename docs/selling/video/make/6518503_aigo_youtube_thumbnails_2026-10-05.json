@@ -1,0 +1,124 @@
+{
+ "id": 6518503,
+ "blueprint": {
+  "name": "AIGO YouTube → thumbnails (after the 09:15 upload)",
+  "flow": [
+   {
+    "id": 1,
+    "module": "http:ActionGetFile",
+    "version": 3,
+    "parameters": {},
+    "mapper": {
+     "ca": "",
+     "qs": [],
+     "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCMhNF55kLPSk-tv5CW13VHQ",
+     "method": "get",
+     "headers": [],
+     "timeout": "",
+     "useMtls": false,
+     "bodyType": "raw",
+     "serializeUrl": false,
+     "shareCookies": false,
+     "parseResponse": false,
+     "followRedirect": true,
+     "useQuerystring": false,
+     "followAllRedirects": false,
+     "rejectUnauthorized": true
+    },
+    "metadata": {
+     "designer": {
+      "x": 0,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": 2,
+    "module": "http:ActionGetFile",
+    "version": 3,
+    "parameters": {},
+    "filter": {
+     "name": "Newest video = today's 09:15 Make upload of an AIGO film",
+     "conditions": [
+      [
+       {
+        "a": "{{get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<published>\"); 2); \"</published>\"); 1)}}",
+        "b": "{{formatDate(now; \"YYYY-MM-DD\"; \"UTC\")}}T14:1",
+        "o": "text:contain"
+       },
+       {
+        "a": "{{if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Your Yacht\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-yacht-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Your Island\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-villa-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Your Clinic\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-medtour-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Messaged You |\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-relocation-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"34 Signals\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-api-en.jpg\"; \"none\")))))}}",
+        "b": "none",
+        "o": "text:notequal"
+       }
+      ]
+     ]
+    },
+    "mapper": {
+     "ca": "",
+     "qs": [],
+     "url": "{{if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Your Yacht\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-yacht-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Your Island\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-villa-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Your Clinic\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-medtour-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"Messaged You |\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-relocation-en.jpg\"; if(contains(get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<title>\"); 2); \"</title>\"); 1); \"34 Signals\"); \"https://webhook.aideazz.xyz/influencer-images/youtube/thumbs/aigo-thumb-api-en.jpg\"; \"none\")))))}}",
+     "method": "get",
+     "headers": [],
+     "timeout": "",
+     "useMtls": false,
+     "bodyType": "raw",
+     "serializeUrl": false,
+     "shareCookies": false,
+     "parseResponse": false,
+     "followRedirect": true,
+     "useQuerystring": false,
+     "followAllRedirects": false,
+     "rejectUnauthorized": true
+    },
+    "metadata": {
+     "designer": {
+      "x": 300,
+      "y": 0
+     }
+    }
+   },
+   {
+    "id": 3,
+    "module": "youtube:setVideoThumbnail",
+    "version": 4,
+    "parameters": {
+     "__IMTCONN__": 5453399
+    },
+    "mapper": {
+     "videoId": "{{get(split(get(split(get(split(toString(1.data); \"<entry>\"); 2); \"<yt:videoId>\"); 2); \"</yt:videoId>\"); 1)}}",
+     "thumbnailData": "{{2.data}}"
+    },
+    "metadata": {
+     "designer": {
+      "x": 600,
+      "y": 0
+     }
+    }
+   }
+  ],
+  "metadata": {
+   "instant": false,
+   "version": 1,
+   "designer": {
+    "orphans": []
+   },
+   "scenario": {
+    "dlq": false,
+    "slots": null,
+    "dataloss": false,
+    "maxErrors": 3,
+    "autoCommit": true,
+    "roundtrips": 1,
+    "sequential": true,
+    "confidential": false,
+    "freshVariables": false,
+    "autoCommitTriggerLast": true
+   }
+  }
+ },
+ "scheduling": {
+  "type": "daily",
+  "time": "09:45"
+ }
+}
