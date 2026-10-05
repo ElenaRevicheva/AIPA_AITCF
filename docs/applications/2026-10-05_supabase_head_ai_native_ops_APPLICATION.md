@@ -24,3 +24,13 @@ Challenges that became rules:
 How I operate: https://aideazz.xyz/Elena_Revicheva_Professional_Outlook_2026.pdf
 
 (249 words. Link verified live 5 Oct 2026: HTTP 200, 3.9 MB PDF.)
+
+## Q: What is the last thing you built with AI that other people now use without you?
+
+**FINAL (paste as is):**
+
+The AI Visibility Audit at aideazz.xyz/api, which I launched in July 2026. Anyone pastes a website address and, with no login, gets a score for how well ChatGPT, Perplexity and Claude can find and cite that site: 34 checks in 4 weighted categories, plus the fix for every failed check and why it matters.
+
+I built it with Claude Code and Cursor as a public API with a web page, running on our own cloud server. I am not in the loop: the logs show 48 audits of 16 different sites from 16 addresses that are not my laptop or our server, most of them through the public page. Our own outreach agents call the same API before each new prospect is contacted, which is where most of its runs come from.
+
+(Evidence, Oracle pm2 logs 19 Mar–5 Oct 2026, `[visibility-lead]` lines: 547 runs; 353 with our own key = staging agents; 194 public (`key=demo`): 133 from Elena's laptop IP, 13 from the Oracle server, **48 from 16 other addresses on 16 sites, 36 via the aideazz.xyz page**. Some of the 16 could be Elena's phone, so the answer says "not my laptop or our server", never "16 customers". 34 checks / 4 weighted categories from the live API response 5 Oct.)
