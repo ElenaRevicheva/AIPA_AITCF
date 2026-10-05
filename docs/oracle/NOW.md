@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-05T21:22 | Atlas lead machine: fresher niches + saturation-aware query order + opt-in Bright Data retry | scripts/atlas-lead-machine.cjs, src/brightdata-enrich.ts, Oracle dist/brightdata-enrich.js, pm2 cto-aipa restart | b830a77 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -139,6 +138,18 @@ git log keeps the record.
 - Removing the file alone would NOT help (git history keeps it). Effective fix = make the repo PRIVATE (account setting → Elena's explicit go
   or her click). Knock-ons: the Supabase open-source answer names AIPA_AITCF as public; GitHub-raw fallback of the send buttons needs auth
   (Oracle disk is primary). **Do not ship the lead-machine GitHub-API publish until this is decided** — it would add prospect data weekly.
+
+### ⏸️ 5 Oct — Atlas niches + Bright Data retry: ON MAIN, NOT DEPLOYED · Elena's go needed
+- **DONE (main `c947991`):** 14 fresh-tier ICP niches (wedding venues CTG, surf/yoga Santa Teresa, fishing lodges Pedasí, luxury eco lodge Bocas,
+  offshore formation, residency-by-investment, pre-construction, Tamarindo rentals, yacht charter, luxury event venue …); per-query yield ledger
+  (`data/lead-machine-query-yield.json`, gitignored) pushes saturated queries back within their tier; `bdSerpSearch` opt-in `retries`
+  (default 0 = other 6 callers unchanged), 16 s wait (BD's 15 s cooldown), NaN-safe; email lookup `tbs:''`. Both reviewers' 5 findings applied.
+- **VERIFIED BY:** `tsc` clean · 5/5 mocked-fetch tests (timeout→ok, 500×3 gives up, genuine zero NOT retried, default = 1 call, NaN = 0 retries).
+  Oracle's `scripts/atlas-lead-machine.cjs` == main pre-change (md5 3c553f74); Oracle `dist/brightdata-enrich.js` differs from the new build ONLY by this change.
+- **NEXT (needs Elena's go — deploy was refused without it):** backup both → scp `scripts/atlas-lead-machine.cjs` + `dist/brightdata-enrich.js` →
+  `pm2 restart cto-aipa --update-env` → grep dist for `bdSerpSearchOnce` → `node scripts/atlas-lead-machine.cjs --dry` (real BD searches, writes nothing).
+  Next real run Mon 12 Oct 16:00 UTC — not deploying before then means it runs the OLD niches again.
+- **RISK:** worst-case run length grows (full BD outage ≈ 25 min vs 7.5) — weekly, last job of the Monday chain, cannot overlap. Publish/rebase jam NOT touched (gated on the privacy decision above).
 
 ### 🔎 5 Oct — Atlas staged 2 leads (not 8): verified causes · today's blog post is PARTLY WRONG · Elena's call on the blog
 - **Causes (atlas-lead-machine.log, lane whatsapp_ai_agents):** 6 of 10 Bright Data SERP queries returned nothing (timeouts, empty bodies,

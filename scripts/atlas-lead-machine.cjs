@@ -466,7 +466,7 @@ function pickBestEmail(emails, domain) {
   // Off-domain fallback is only safe for personal/ISP inboxes, which small LATAM
   // businesses genuinely use. An arbitrary OTHER COMPANY's address on the page is
   // a third-party widget, not the prospect — caught live when a Panama dental
-  // clinic yielded a contacto@ address at a Chilean company, a Chilean company. Emailing that is
+  // clinic yielded a contacto@ address at a Chilean company. Emailing that is
   // worse than finding nothing: it is a stranger receiving a pitch about someone
   // else's website.
   const PERSONAL = /@(gmail|hotmail|outlook|yahoo|live|icloud|proton(mail)?|cableonda|cwpanama|.*\.movil)\./i;
