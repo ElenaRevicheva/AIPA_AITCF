@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-05T23:04 | Deploy Atlas niches+retry (c947991) to Oracle, Elena go | Oracle scripts/atlas-lead-machine.cjs, dist/brightdata-enrich.js, pm2 cto-aipa restart | 8c82f9d |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -140,18 +139,13 @@ git log keeps the record.
   or her click). Knock-ons: the Supabase open-source answer names AIPA_AITCF as public; GitHub-raw fallback of the send buttons needs auth
   (Oracle disk is primary). **Do not ship the lead-machine GitHub-API publish until this is decided** — it would add prospect data weekly.
 
-### ⏸️ 5 Oct — Atlas niches + Bright Data retry: ON MAIN, NOT DEPLOYED · Elena's go needed
-- **DONE (main `c947991`):** 14 fresh-tier ICP niches (wedding venues CTG, surf/yoga Santa Teresa, fishing lodges Pedasí, luxury eco lodge Bocas,
-  offshore formation, residency-by-investment, pre-construction, Tamarindo rentals, yacht charter, luxury event venue …); per-query yield ledger
-  (`data/lead-machine-query-yield.json`, gitignored) pushes saturated queries back within their tier; `bdSerpSearch` opt-in `retries`
-  (default 0 = other 6 callers unchanged), 16 s wait (BD's 15 s cooldown), NaN-safe; email lookup `tbs:''`. Both reviewers' 5 findings applied.
-- **VERIFIED BY:** `tsc` clean · 5/5 mocked-fetch tests (timeout→ok, 500×3 gives up, genuine zero NOT retried, default = 1 call, NaN = 0 retries).
-  Oracle's `scripts/atlas-lead-machine.cjs` == main pre-change (md5 3c553f74); Oracle `dist/brightdata-enrich.js` differs from the new build ONLY by this change.
-- **NEXT (needs Elena's go — deploy was refused without it):** backup both → scp `scripts/atlas-lead-machine.cjs` + `dist/brightdata-enrich.js` →
-  `pm2 restart cto-aipa --update-env` → grep dist for `bdSerpSearchOnce` → `node scripts/atlas-lead-machine.cjs --dry` (real BD searches, writes nothing).
-  Next real run Mon 12 Oct 16:00 UTC — not deploying before then means it runs the OLD niches again.
-- **RISK:** worst-case run length grows (full BD outage ≈ 25 min vs 7.5) — weekly, last job of the Monday chain, cannot overlap. Publish/rebase jam NOT touched (gated on the privacy decision above).
-
+### ✅ 5 Oct — Atlas niches + Bright Data retry DEPLOYED (Elena's go) · first real run Mon 12 Oct 16:00 UTC
+- main `c947991`; Oracle files backed up to `~/_session-backups/atlas-retry-20261005/`; `cto-aipa` restarted 23:04:21 UTC (after file mtime), online, 0 unstable.
+- **Dry run on Oracle (LEAD_MAX_NEW=3, `--dry`, nothing written), /tmp/atlas-dry-20261005.log:** order `destination wedding venue → surf and yoga retreat → sport fishing lodge`;
+  BD returned an empty body → `retry 1/2 in 16s` → 9 businesses (retry proven); `staged 3 · looked at 4 · already-in-CRM 1`.
+- ⚠️ **Lead QUALITY open (not fixed — needs Elena's call):** of 3, one is a blog article ("This is how much my destination…", personal gmail), one a hotel
+  chain (Sofitel) — the wedding query pulls content pages, not only venues. Also a `+91…` WhatsApp number scraped from a Cartagena site. Check Monday's 8.
+- Yield ledger is written only on real runs (correctly absent after `--dry`). Rebase jam + GitHub publish still untouched (privacy decision first).
 ### 🔎 5 Oct — Atlas staged 2 leads (not 8): verified causes · today's blog post is PARTLY WRONG · Elena's call on the blog
 - **Causes (atlas-lead-machine.log, lane whatsapp_ai_agents):** 6 of 10 Bright Data SERP queries returned nothing (timeouts, empty bodies,
   500 "Proxy request failed"/ECONNREFUSED inside BD's network); the 4 that worked were medical/dental tourism — **18 of 31 already in the CRM**
