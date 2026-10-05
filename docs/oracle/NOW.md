@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-05T21:22 | Atlas lead machine: fresher niches + saturation-aware query order + opt-in Bright Data retry | scripts/atlas-lead-machine.cjs, src/brightdata-enrich.ts, Oracle dist/brightdata-enrich.js, pm2 cto-aipa restart | b830a77 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
