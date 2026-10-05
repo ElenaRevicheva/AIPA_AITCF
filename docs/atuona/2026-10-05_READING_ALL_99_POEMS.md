@@ -1,5 +1,9 @@
 # Reading all 99 — LITPROM (#001–#046) and ATUONA (#047–#099), 5 Oct 2026
 
+> **Superseded the same day by the close readings** `2026-10-05_CLOSE_READING_LITPROM.md` and
+> `2026-10-05_CLOSE_READING_ATUONA.md`. Elena: *"I see that you again are stuck on lilies, mother death etc. … You made
+> generic superficial analysis."* This table is kept as an index only; its framing overweighted grief.
+
 Elena, 5 Oct: *"You need to take time and read carefully all poems in ATUONA and LITPROM. Each one. You need to feel them all."*
 Read in full, in order, from the source files: LITPROM = `atuona-complete-with-dates.json` (Russian, the canonical text),
 ATUONA = `metadata/NNN.json` (Russian + English). Purpose: the new film **ATUONA** for Niio's private-viewer programme.
@@ -14,9 +18,9 @@ mother, father, a daughter, the grandmother who no longer comes in dreams, the p
 funny and tender while doing it. Underground culture in the literal sense.
 
 **ATUONA is the same woman given a second name — Kira — and sent to the edge of the world** to find a painting that does
-not exist, *«Атуона — Рай на Земле»*. It is a novel in fragments: Kira (34, sober, the Beast kept in a cage for two,
-her mother's suicide and the yellow lilies that keep arriving) and Ule (47, Norwegian, a Russian mother buried in Atuona
-next to Gauguin), bound by a contract of **silence**. The island is not decor: Traitor's Bay, Calvaire with its
+not exist, *«Атуона — Рай на Земле»*. It is a luxury art-noir novel in fragments, funny as often as it is dark: Kira ("Vel", 34, a top PA and
+glossy columnist with a perfect nose for art, sober — the Beast watched in its cage "without blinking") and Ule (47, the
+"Angel-bastard" auction-house owner who announces "I learned how to shut up!"), bound by a contract of **silence**. The island is not decor: Traitor's Bay, Calvaire with its
 frangipani, Brel's grave, Gauguin's stone guarded by a copy of Oviri, black sand the Pacific cannot bleach, tikis
 "overgrown with moss the color of old blood", an island that "doesn't accept guests. It eats them." The search ends in
 the realisation that the painting was never on canvas. Woven through it, a third voice — Paradise.js, the AI co-author
@@ -63,7 +67,7 @@ with Charles Morice's line in which Atuona is a *she*: "The gods have died, and 
 | 030 | Да, мой товарищ | Two spider huts; staying frozen | «Остаюсь я навеки застывшая.» | — |
 | 031 | Сам собою | Burning without burning out | «Лишь горим, не сгораючи» | Stanzas |
 | 032 | На сдачу | Love at the pier; no longer his novice | «Я уже не твоя послушница.» | — |
-| 033 | Муж | The marriage that sold itself — and the daughter | «Целы мы. Только дочь не вернуть.» | — **(her private grief — never use without her explicit choice)** |
+| 033 | Муж | The marriage that sold itself; she doesn't | «Продаешься, я - не продаюсь.» | — |
 | 034 | Давай ебаться! | Comic: Antoshka, the potatoes, Hell and Paradise | «Там - Ад, там - Рай!» | — |
 | 035 | Подмостки | It all ends — and begins — with loneliness | «Выйдешь ты на подмостки / Руки жать Пастернаку.» | — |
 | 036 | Азимут | Fish don't commit suicide; feathers; quiet take-off | «там, где я тихонечко взлетаю.» | — |
@@ -150,4 +154,4 @@ Not yet a plan (that follows, with cost) — the shape the poems themselves ask 
 6. **Coda.** Panama rain — «Ливни, ливни, ливни в Панама сити...» … «Тут Сердце - Театр без зрителей.» (#046) → the title stanza,
    **«Я останусь: ничьей женой, / Атуоной…»** (#003).
 
-Never: #033 (her daughter) unless she chooses it; #098 (explicit). Morice's line (#051) is his, not hers — epigraph only, credited.
+Never in a Niio film: #098 (explicit). Morice's line (#051) is his, not hers — epigraph only, credited.

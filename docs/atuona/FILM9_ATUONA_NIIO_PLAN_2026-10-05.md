@@ -6,7 +6,9 @@ Elena's yes, gate by gate (Teach → Plan → Confirm → Build).
 - **Why this film:** Elena 5 Oct — a new film titled ATUONA, from her poems (ATUONA + LITPROM), made FOR Niio, and only for
   its **private-viewer "Exclusive Art Streaming Program"** ("welcomes more experimental and narrative pieces",
   help.niio.com/en/articles/15346704). Not the hotel programme; no calmed-down cut. Niio recon: HubSpot note 118119954506.
-- **Reading behind it:** `docs/atuona/2026-10-05_READING_ALL_99_POEMS.md` (all 99 read in full, 5 Oct).
+- **Reading behind it:** the close readings `docs/atuona/2026-10-05_CLOSE_READING_LITPROM.md` and
+  `docs/atuona/2026-10-05_CLOSE_READING_ATUONA.md` (every poem, sentence by sentence — Elena: "you again are stuck on
+  lilies, mother death etc."). They supersede the one-line summary in `2026-10-05_READING_ALL_99_POEMS.md`.
 - **How it was planned:** workflow `wf_dd08be1f-3b5` (corpus read, production read, 3 concepts, synthesis, adversarial
   critic). 135/135 quoted lines and the final 13-poem list were re-checked verbatim against the source files.
 
@@ -72,8 +74,9 @@ word is now her own verse, #003. #065 is not used.
 | #046 X CENSORED, l.27 | «Слишком далёкий берег.» | "Too distant a shore." |
 | #003 Atuona, l.45–48 | «Закольцуешься чьим-то мужем. / Я останусь: ничьей женой, / Атуоной, горбатой старушкой / В целом с Богом и чуть - с Сатаной.» | "You'll ring yourself in as someone's husband. / I will remain: nobody's wife, / an Atuona, a hunchbacked little old woman, / on the whole with God, and a little — with Satan." |
 
-**Kira's voice — ATUONA #054, her own English (her choice):** default "And ripples on the water / Glide like a
-pendulum— / They're not my enemies!" · or "One day I'll drown / In cool silence / And drift to sleep. / I'll lower my sail".
+**Kira's voice — ATUONA #054, her own English:** "One day I'll drown / In cool silence / And drift to sleep. / I'll lower my
+sail" — drowning in *silence*, not water; the verse ends as a threat, "I'll have my revenge later", and the ripples are
+allies, "They're not my enemies!" (her choice which lines).
 
 **The island's silent text — her own English, ATUONA chapter:** #047 "Something will happen, spill like ocean over
 granite's endless shore. Something will happen. June will draw you with its scorching sting." · #068 "\"Kaoha nui,\" the
@@ -135,8 +138,9 @@ S01/S07 as still-motion → shorten S03. Replicate is prepaid; she checks the ba
 2. Voice: her own voice for Kira's lines, or an AI voice.
 3. Correct the draft English of #003, #004, #042, #044, #046 (open words: «нагой» naked/bare, «горбатой старушкой»,
    "flopped down", and the ring pun «Закольцуешься»).
-4. #004 — the poem also carries her daughter's birth (only its first four lines are used). OK?
-5. #054 — the safe stanza or "One day I'll drown…" (the prose around it is her mother's death).
+4. #004 — the film uses the game's "one… two…" and the escape from the hook; in the poem the missing "three" is answered
+   by «Доченька родилась». Keep the silence where "three" should be, or let the birth line in?
+5. #054 — which lines of the verse ("One day I'll drown / In cool silence…" and/or "And ripples on the water…").
 6. Is the English of #054, #057, #085 her own? (They are in the ATUONA metadata as English text.)
 7. The budget cap and Gate 2 (~$5 keyframes) to start.
 
