@@ -147,6 +147,9 @@ git log keeps the record.
 - VJH's response_detector misfiled the same reply as a HIRING deal (65742421058, stage read as POSITIVE by the judge sync)
   → archived before the 06:17 UTC learning run, on Elena's request; backup `~/cto-aipa/backups/hubspot/vjh-niio-misfile-2026-10-05.json`.
   ⚠️ Open defect class: VJH turns art/partner replies into hiring deals — not fixed.
+- **Elena 5 Oct: NEW film "ATUONA" (her poems, ATUONA + LITPROM) made FOR Niio's PRIVATE-viewer programme only** (not the
+  hotel loop programme — she keeps the full ATUONA register). Plan in progress (workflow, planning only, NO spend);
+  ≥1920×1080 delivery. Fact-checked Niio recon = HubSpot note 118119954506 on deal 65215836735.
 
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
 - **DONE:** 3 Make uploads had auto-frames → custom EN thumbnails set in Studio (yacht RsKJX3SKgiw, villa uBziVlmdgSg,
