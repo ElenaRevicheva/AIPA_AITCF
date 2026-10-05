@@ -46,3 +46,11 @@ Upstream, I opened a documentation pull request to Hive, a multi-agent harness f
 I also publish operating knowledge, not only code: 20+ named production postmortems in the AI Operations Wiki (aideazz.xyz/ai-ops-wiki.html).
 
 (Evidence, GitHub API 5 Oct 2026: 17 public repos; the only PR to another owner's repo = aden-hive/hive#6667, opened 20 Mar 2026, still OPEN, 0 comments; hive = 11,090 stars. Never say "merged" or "contributor to Hive" without checking it merged.)
+
+## Q: Where did you hear about this vacancy?
+
+**FINAL (paste as is):**
+
+From Veronica (@v_garg_s) on X: her 4 October post that Supabase is hiring across 60 roles, fully remote.
+
+(Source: x.com/v_garg_s/status/2106753133489823846, read 5 Oct via fxtwitter: "Hiring at Supabase !! … 60 open positions … This is a remote company".)
