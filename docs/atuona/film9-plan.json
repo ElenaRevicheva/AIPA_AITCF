@@ -337,6 +337,26 @@
    "aspect": "16:9",
    "prompt": "Macro in low crimson light: a man's large tanned hand holds a woman's pale palm flat against the side of his neck, her fingers spread over his pulse; real skin with pores; no faces in frame.",
    "note": "redesign 6 Oct: GPT Image 2.5 refused the two-face version twice; hands-and-skin macro, no refs"
+  },
+  "ule_boho_a": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same pale blue eyes, same features — restyled as a rich Norwegian art collector with a bohemian poet's look: his ash-blond hair now longer, ash-silver, falling past his jaw, pushed back loosely with a few strands across his forehead; salt-and-pepper stubble; an open white embroidered linen shirt, unbuttoned at the chest, under an unstructured beige tweed jacket; a thin dark cord with a small silver pendant at his throat; a heavy silver ring. Devilishly-angelically beautiful, about 47, at ease, a brooding, sardonic half-smile — wealth worn carelessly, a collector who writes poems at 4 a.m. Soft window light from the left, dark background, sharp focus on the eyes. Athletic, not weathered.",
+   "note": "6 Oct: style-only restyle of the AI Ule (bohemian poet look), Elena's request"
+  },
+  "ule_boho_b": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same pale blue eyes, same features — restyled as a rich Norwegian art collector with a bohemian poet's look: his ash-blond hair now longer, ash-silver, falling past his jaw, pushed back loosely with a few strands across his forehead; salt-and-pepper stubble; an open white embroidered linen shirt, unbuttoned at the chest, under an unstructured beige tweed jacket; a thin dark cord with a small silver pendant at his throat; a heavy silver ring. Devilishly-angelically beautiful, about 47, at ease, a brooding, sardonic half-smile — wealth worn carelessly, a collector who writes poems at 4 a.m. Soft window light from the left, dark background, sharp focus on the eyes. Athletic, not weathered.",
+   "note": "6 Oct: style-only restyle of the AI Ule (bohemian poet look), Elena's request"
   }
  },
  "shots": {},
