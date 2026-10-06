@@ -357,6 +357,26 @@
    "aspect": "3:4",
    "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same pale blue eyes, same features — restyled as a rich Norwegian art collector with a bohemian poet's look: his ash-blond hair now longer, ash-silver, falling past his jaw, pushed back loosely with a few strands across his forehead; salt-and-pepper stubble; an open white embroidered linen shirt, unbuttoned at the chest, under an unstructured beige tweed jacket; a thin dark cord with a small silver pendant at his throat; a heavy silver ring. Devilishly-angelically beautiful, about 47, at ease, a brooding, sardonic half-smile — wealth worn carelessly, a collector who writes poems at 4 a.m. Soft window light from the left, dark background, sharp focus on the eyes. Athletic, not weathered.",
    "note": "6 Oct: style-only restyle of the AI Ule (bohemian poet look), Elena's request"
+  },
+  "kira_words_a": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same woman as in the reference image — same face, same grey-green eyes, the same faint pale hairline scar through her left eyebrow — now with wavy blue-black hair, dense loose curls flowing past her shoulders, one curl falling across her cheek. Her eyes are the portrait: eyes that know how to be silent, how to speak, how to listen, how to understand, how to burn through, melt and cool. Bare shoulders, a thin black silk camisole strap; real skin with pores, a sheen of humid air. She looks straight into the lens, calm, adult, unsmiling, lips slightly parted. Soft window light from the left, dark background, sharp focus on the eyes. About 34, slender and strong.",
+   "note": "6 Oct: Kira restyled from the novel's words (#048 blue-black curls, #086 wavy blue-black hair + eyes)"
+  },
+  "kira_words_b": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same woman as in the reference image — same face, same grey-green eyes, the same faint pale hairline scar through her left eyebrow — now with wavy blue-black hair, dense loose curls flowing past her shoulders, one curl falling across her cheek. Her eyes are the portrait: eyes that know how to be silent, how to speak, how to listen, how to understand, how to burn through, melt and cool. Bare shoulders, a thin black silk camisole strap; real skin with pores, a sheen of humid air. She looks straight into the lens, calm, adult, unsmiling, lips slightly parted. Soft window light from the left, dark background, sharp focus on the eyes. About 34, slender and strong.",
+   "note": "6 Oct: Kira restyled from the novel's words (#048 blue-black curls, #086 wavy blue-black hair + eyes)"
   }
  },
  "shots": {},
