@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 06 Oct 15:35 | Stage Puente Founder's Associate job deal + apply kit + ChatGPT-structure CV v2 (Elena's go) | HubSpot (new deal), Oracle `hs-fill-apply-kit.cjs --only` run, docs/applications/ | 9213236 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
