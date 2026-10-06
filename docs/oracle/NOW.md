@@ -132,10 +132,10 @@ git log keeps the record.
 ## 🤝 HANDOFF
 
 ### 🎯 6 Oct — Puente **AI Operations Lead #2660** staged + full kit · Elena's move: apply today
-- Deal  (🔥 I act TODAY). Audit on Oracle: , 7 deals complete · gaps 0.
-- CV =  (ChatGPT ops structure + the sibling's 3-reviewer-checked facts) on ALL notes; hand-written letter;
-  📝 FORM ANSWERS note (salary $4,000 recommended, current salary blank). Everything: .
-- ⚠️ **Kit bug, NOT fixed (needs Elena's go — Oracle code):**  hard-codes "cleared 72% against ~6% for the rest of the fleet"
+- Deal `[HIRING-MANUAL] AI Operations Lead @ Puente Talent Partners` (🔥 I act TODAY). Audit on Oracle: `✓LINK ✓L ✓CV ✓D ✓R ✓C`, 7 deals complete · gaps 0.
+- CV = `cv-by-job/puente-ai-operations-lead/` (ChatGPT ops structure + the sibling's 3-reviewer-checked facts) on ALL notes; hand-written letter;
+  📝 FORM ANSWERS note (salary $4,000 recommended, current salary blank). Everything: `docs/applications/2026-10-06_puente_ai_operations_lead_APPLICATION.md`.
+- ⚠️ **Kit bug, NOT fixed (needs Elena's go — Oracle code):** `scripts/build-lane-cv.cjs:365` hard-codes "cleared 72% against ~6% for the rest of the fleet"
   — the baseline NOW 5 Oct says never to quote. Every auto-tailored CV carries it. One-sentence fix + scp + no restart (script, not PM2).
 - Role-defense Q1 (kit text) says she tracks "time or money saved before and after" — no hours-saved number exists; don't let her quote hours.
 
