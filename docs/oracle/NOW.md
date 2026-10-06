@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-06 20:15 | voice→Trello: Cyrillic month names misrouted card to ФИН board; STO AIPA repair | src/trello-voice.ts, PM2 cto-aipa | 55c91f9 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
