@@ -174,6 +174,7 @@ const resolveImg = async ref => upload(path.join(BASE, 'img', ref.endsWith('.jpg
 const VENICE_IMAGE = {
   'flux-2-max-edit': n => 0.12 + 0.035 * Math.max(0, n - 1),
   'gpt-image-2-5-flare-edit': n => 0.15 + 0.01 * Math.max(0, n - 1),
+  'nano-banana-pro-edit': () => 0.23, 'flux-3-image-edit': () => 0.145,   // 2K, Venice /models 6 Oct 2026
   'grok-imagine-quality-edit': n => 0.09 + 0.012 * n,
   'qwen-edit-uncensored': () => 0.04,
   'firered-image-edit': () => 0.05,
