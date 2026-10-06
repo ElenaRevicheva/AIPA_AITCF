@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code (laptop) | 2026-10-06T10:17 | Clear Oracle cto-aipa rebase jam (since 7 Sep), Elena go — git refs only, no working-tree change | Oracle ~/cto-aipa/.git (HEAD, main ref, rebase-merge) | 59e1ae2 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -139,6 +138,18 @@ git log keeps the record.
 - Removing the file alone would NOT help (git history keeps it). Effective fix = make the repo PRIVATE (account setting → Elena's explicit go
   or her click). Knock-ons: the Supabase open-source answer names AIPA_AITCF as public; GitHub-raw fallback of the send buttons needs auth
   (Oracle disk is primary). **Do not ship the lead-machine GitHub-API publish until this is decided** — it would add prospect data weekly.
+
+### ✅ 6 Oct — Oracle `cto-aipa` rebase jam (since 7 Sep 16:02) CLEARED · stranded leads NOT pushed (repo stays public ~2 wks, Elena)
+- **Cause:** lead-machine publish = `commit → pull --rebase → push` inside the live checkout; the 7 Sep rebase stopped mid-way (most likely a
+  registry clash with the 4 Sep NDA staging) and logged one warning line; 21 Sep / 28 Sep / 5 Oct auto-commits piled onto a detached HEAD.
+- **Done (git refs only):** `rebase --quit`; `main` → `5325e2c` (the commit HEAD already was); `git status --porcelain` md5 identical before/after
+  (`f8a2b167…`) = zero files changed. Branches `atlas-stranded-20260907` (3d15740) + `atlas-stranded-20261005` (5325e2c) keep every commit.
+  Backup `~/_session-backups/rebase-jam-20261006/` (old HEAD, refs, rebase-merge, bundle); laptop copy `D:/aideazz/_private-backups/atlas-stranded-20261006/` (bundle verified).
+- **NOT done, on purpose:** the ~125 stranded prospect files are NOT on GitHub — Elena keeps AIPA_AITCF public ~2 weeks for employers; pushing
+  prospect emails/phones there is her call. Send buttons unaffected (Oracle disk).
+- ⚠️ **Monday 12 Oct:** publish will commit locally, `pull --rebase` will REFUSE (11 uncommitted live files, no autostash) → push rejected → leads stay
+  on disk, buttons work. That refusal is what stops the robot deploying 633 commits of main onto Oracle's lagging checkout. **Never set
+  rebase.autostash there and never "clean" that tree.** Real fix = publish via GitHub API, not git in the live checkout — after the repo goes private.
 
 ### ✅ 5 Oct — Atlas niches + Bright Data retry DEPLOYED (Elena's go) · first real run Mon 12 Oct 16:00 UTC
 - main `c947991`; Oracle files backed up to `~/_session-backups/atlas-retry-20261005/`; `cto-aipa` restarted 23:04:21 UTC (after file mtime), online, 0 unstable.
