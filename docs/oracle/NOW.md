@@ -130,6 +130,14 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
+- Staged with `stage-manual-prospect.cjs --no-scrape` (the site only publishes info@; the right person's address came from
+  Elena). Letter = Spanish, personal thank-you opener (new optional `greeting`/`opener`/`subject` fields, `ad3a826`), ES AI
+  Growth Operator deck attached, Cc Elena's Gmail. Resend `delivered`; deal ⏳ Sent; EMAILED + entregado stamps; FU task 10 Oct.
+- **PII kept OUT of this public repo on purpose** (repo public until ~20 Nov): its PROSPECT_META entry, drafts and prospect
+  pack live in `D:/aideazz/_private-backups/ford-realty-20261006/` and on Oracle only. **Oracle `outreach-registry.json` has 1 key
+  (`ford-realty`) that `main` lacks — never scp the registry wholesale.** Merge it after the repo goes private.
+
 ### ✅ 6 Oct — Telegram noise cut (Elena: "garbage can") · `952faca`, DEPLOYED 20:57 UTC
 - **DONE:** one morning message, now **8:00 Panama**: the cron said 13:00 under America/Panama, so the "Good morning" arrived at 1 PM. It shows
   Trello due within 3 days plus anything overdue 30 days or less, boards with nothing are left out, and old overdue cards become one count line.
