@@ -689,6 +689,28 @@
    "look": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo. Keep the scene's time of day exactly as written: a night scene is dark night, lit only by the light sources named (lanterns, lamps, moon, streetlight) — never dusk or blue hour unless the scene says so.",
    "prompt": "Full-length fashion photograph, 3:4. Exactly the same woman as in the reference image — same face, same grey-green eyes, the same long, thick, softly wavy true-black hair, here cascading loose and lifting in the storm wind. She wears THAT dress, tailored on her like haute couture: sheer silk chiffon in a lush jungle of green palm and banana leaves with flashes of turquoise, the plunging neckline cut and structured so it sculpts a full, lifted, beautifully shaped décolleté and follows her curvaceous hourglass figure, devastating on her — a real woman, human-beautiful, not a thin model; long sheer billowing sleeves, the gold brooch at the waist, the skirt split to the top of the thigh; elegant, the neckline perfectly in place, nothing exposed. She walks straight toward the camera, cool and unhurried, one long leg stepping through the slit. She looks straight into the lens without blinking: eyes that know how to be silent, how to listen, how to burn through, melt and cool; a woman who sees through everything. Calm, unsmiling, quietly dangerous. Her throat is bare. Pitch-black night sky, no dusk, no blue hour: a small open-air restaurant on a tropical island in the first gust of a storm, palms bending, white tablecloths lifting, rain in the air, lit only by swinging brass lanterns and one fork of lightning. About 34.",
    "note": "6 Oct: dress look rebuilt from the new Kira (kira_ref_v3a) + text only; feeding the old dress image made nano copy its dusk and fit"
+  },
+  "kira_jungle_g": {
+   "engine": "venice",
+   "vmodel": "nano-banana-pro-edit",
+   "refs": [
+    "kira_jungle_e"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Edit this photo and keep everything identical: the same woman, face, eyes, long black wavy windblown hair; the same jungle-print chiffon gown with its deep V, sheer sleeves, gold brooch and slit; the same pose, restaurant, lanterns, lightning and the light on her. Change only the fit of the bodice. Right now the fabric lies flat. Re-tailor it so the two printed panels curve forward over a fuller, rounder, naturally lifted bust, with soft shading under each curve, and the chiffon drapes smoothly into a cinched waist at the brooch. A real woman's figure, confident red-carpet glamour. The panels stay fully covering, and the V shows no more skin than it does now. Deepen the sky to a dark stormy night.",
+   "note": "6 Oct, Elena: 'I like Kira now and dress now but breasts should be better shaped and look more sexy'. Plain, honest edit wording (the moderation-gaming 'garment not body' framing was dropped); one attempt each, a refusal is final on this engine"
+  },
+  "kira_jungle_h": {
+   "engine": "venice",
+   "vmodel": "nano-banana-pro-edit",
+   "refs": [
+    "kira_jungle_e"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Keep the image exactly as it is: same woman, face, eyes, long black wavy hair; same jungle-print chiffon gown, deep V, sheer sleeves, gold brooch and slit; same pose, restaurant, lanterns, storm and light. Only adjust the tailoring of the bodice. Give the gown a shapelier, fuller, more lifted bustline and a cinched waist, so the printed fabric has natural volume and soft shadow rather than lying flat against the chest. A classic red-carpet evening-gown fit, elegant and confident. The fabric stays fully covering and the neckline is unchanged.",
+   "note": "6 Oct, Elena: 'I like Kira now and dress now but breasts should be better shaped and look more sexy'. Plain, honest edit wording (the moderation-gaming 'garment not body' framing was dropped); one attempt each, a refusal is final on this engine"
   }
  },
  "shots": {},
