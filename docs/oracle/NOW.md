@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-06 20:50 | Telegram noise cleanup (Elena approved 4 items) | src/concierge.ts, src/telegram-bot.ts, src/board-briefing.ts, src/outreach.ts, PM2 cto-aipa | 246c29e |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,19 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 6 Oct — Telegram noise cut (Elena: "garbage can") · `952faca`, DEPLOYED 20:57 UTC
+- **DONE:** one morning message, now **8:00 Panama**: the cron said 13:00 under America/Panama, so the "Good morning" arrived at 1 PM. It shows
+  Trello due within 3 days plus anything overdue 30 days or less, boards with nothing are left out, and old overdue cards become one count line.
+  Monday's digest keeps the full view. Self-test card is posted silently and deleted once delivered. Quiet repos are announced once per
+  quiet spell (`data/stale-repos-announced.json`; the first run records the current state without announcing). Fresh-leads cron and
+  Phase 4 outreach post to Telegram only on failure.
+- **VERIFIED BY:** `concierge-selftest.cjs --draft` → PASS 4/4, `tgDelivered:true, tgRemoved:true`, log `SELF-TEST card 7056 delivered, removed=true`.
+  The morning preview generated on Oracle is about 8 lines; the old version was about 50. Process 20:57:21 is newer than the files. The diff of
+  live vs new = only replaced code. Backups `~/_session-backups/tg-noise-20261006/`.
+- **NEXT:** ① Boardy intro emails filed as `[HIRING-VJH-LEAD]` deals (6 at 20:2x UTC). Elena said leave it for now; likely VJH crm-event.
+  ② Old messages: the bot cannot delete them (no stored ids, 48h limit), so Elena uses Telegram ⋮ → Clear history.
+  ③ Elena will list the remaining stuck messages.
 
 ### ✅ 6 Oct — voice→Trello misrouted "Kira октубре" to the ФИН board · fixed `a763969`, DEPLOYED 20:31 UTC
 - **DONE:** `src/trello-voice.ts` — spoken month normalised from Cyrillic/RU/EN (`октубре`, `октябрь`, `October` → octubre); a named month
