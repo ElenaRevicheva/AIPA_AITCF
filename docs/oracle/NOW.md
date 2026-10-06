@@ -250,10 +250,14 @@ git log keeps the record.
   **Keyframes redone 6 Oct with her go:** 17 face frames → sheet `docs/atuona/film9_contact_v4.jpg`. Full-res QA (8 agents) → 6 rerolls on the
   same engine; k07 was refused twice, so its existing frame's hair was recoloured in post. Old frames are in `img/pre_1006/` and `img/qa1_1006/`.
   **Venice $10.14 of $11.17, so ~$1.03 left; motion must go on Replicate ($9.89).** Grok reads "blue-black" as BLUE hair: write "glossy jet-black".
-  k09/k27 have baked letterbox bars: crop at compile. **Elena kept 7: k06 k20 k20b k24 k26 k27 k36.** She rejected the other 10 as
-  "generic, like painted, not human-realistic". Realism bake-off on Replicate (`film9_bakeoff_realism.jpg`, $0.78, plan key `real_look`, no
-  wet-skin line): nano holds Kira's face best, flux keeps the night mood but drifted Kira and added a cheek cut. **Elena's move:** nano or flux →
-  redo the other 8 on it (~$1.7 Replicate). k07 was refused twice on grok, so never re-route it: redesign it without refs or drop it.
+  **Elena kept 7: k06 k20 k20b k24 k26 k27 k36.** The other 10 were redone on Venice `nano-banana-pro-edit` with `real_look_2` (realism
+  bake-off winner), and full-res QA → 5 same-engine rerolls. k17a/k34 navy hair was hue-graded (ungraded originals kept); k07 → `k07m`, a no-ref
+  macro. Sheet `film9_contact_v5.jpg`. THAT dress = `kira_jungle_a`; Elena: "dress is super, faces good".
+  **Elena 6 Oct, open:** reshape the dress fit (couture plunge, #058 'devastating', #078 'human beautiful'); Kira's hair longer, thicker, only
+  softly wavy (#086 'wavy … cascading loose'); Kira's eyes from the text (#086/#061/#063/#065: silent, unblinking, sees through). → new Kira
+  portrait + dress look, then ASK whether it applies to all Kira frames (including the 5 she approved) or only the dress scenes.
+  Venice ~$14.2 left of the $18.05 read via API, Replicate $9.11. Nano drifts night to dusk (say 'pitch-black sky'), and 'blue-black' gives navy hair
+  on every engine (say 'true black, never blue').
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
