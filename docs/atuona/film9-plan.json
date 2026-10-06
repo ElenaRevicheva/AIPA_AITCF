@@ -377,6 +377,106 @@
    "aspect": "3:4",
    "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same woman as in the reference image — same face, same grey-green eyes, the same faint pale hairline scar through her left eyebrow — now with wavy blue-black hair, dense loose curls flowing past her shoulders, one curl falling across her cheek. Her eyes are the portrait: eyes that know how to be silent, how to speak, how to listen, how to understand, how to burn through, melt and cool. Bare shoulders, a thin black silk camisole strap; real skin with pores, a sheen of humid air. She looks straight into the lens, calm, adult, unsmiling, lips slightly parted. Soft window light from the left, dark background, sharp focus on the eyes. About 34, slender and strong.",
    "note": "6 Oct: Kira restyled from the novel's words (#048 blue-black curls, #086 wavy blue-black hair + eyes)"
+  },
+  "kira_v1": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same woman as in the reference image — same face, same eyes, same features — her blue-black hair swept up in a bun, matte crimson lipstick. She wears a checkered Armani pantsuit jacket with matching vest and tie over a lilac silk blouse. Shoulders squared to the camera, grey-green eyes on the lens, a restrained, cynical smile: the composure of a woman about to answer every question most exhaustively. No jewellery. Photoreal, fine check wool and silk texture. Soft window light, dark background, sharp focus on the eyes. About 34, slender and strong.",
+   "note": "6 Oct versions: Vel in Armani check | anchors 053: На Кире был клетчатый брючный костюм; 058: Hair swept up in a bun; 079: Кира сдержанно и цинично улыбнулась.; 053: Господин Гленсдаген, позвольте ответить на ваши"
+  },
+  "kira_v2": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same woman as in the reference image — same face, same eyes, same features — her wavy blue-black hair cascading loose over both shoulders. A long-sleeved silk dress in a lush green tropical-leaf print, high neckline at the collarbone; an almond-shaped necklace of white gold, small diamonds and emeralds at her throat. Camera slightly above: she looks up into the lens without blinking, composed, as if she were the one looking down. Photoreal, glints of emerald. Low-key chiaroscuro, dark background, sharp focus on the eyes. About 34, slender and strong.",
+   "note": "6 Oct versions: Midnight Graff, Jungle Dress | anchors 086: Kira sat in the armchair, legs; 058: clicked an almond-shaped necklace around her; 060: Кира приподнялась, спустила ноги, посмотрела на; 060: Эта женщина, сидя в кресле, смотрит; 061: Так она смотрит уже несколько лет. | 6 Oct: GPT 422 on the first wording (named gown + jeweller); rephrased once on the same engine, no names"
+  },
+  "kira_v3": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same woman as in the reference image — same face, same eyes, same features — her wavy blue-black hair falling in a heavy curtain across one eye, hiding half her face. A crisp white blouse buttoned up to the collar, a single small ruby-red drop earring on a gold hook. Head half-turned, she gives the lens a sideways, appraising look with a slight ironic pout, lips closed — a woman who sees through flattery. Photoreal, starched cotton texture. Soft window light, dark background, sharp focus on the eyes. About 34, slender and strong.",
+   "note": "6 Oct versions: Sees through: white collar, ruby drop | anchors 086: Kira sat in the armchair, legs; 065: Кира - имя для тех, кто; 056: Абсурдность лести вполне ясна тому, кто"
+  },
+  "kira_v4": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, waist-up, 3:4. Exactly the same woman as in the reference image — same face, same eyes, same features — her blue-black hair pulled back into a low, loose knot. She wears a black kimono jacket over bright orange culottes, visible at the waist: today she wanted colour. Caught in a sudden, unguarded laugh, eyes still on the lens. No jewellery. Photoreal, matte black fabric against vivid orange. Soft warm window light, dark background, sharp focus on the eyes. About 34, slender and strong.",
+   "note": "6 Oct versions: Today she wanted colour | anchors 054: Отсекая себя от воспоминаний, Кира попросила; 054: Сегодня ей хотелось красок.; 091: Кира смеётся."
+  },
+  "kira_v5": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same woman as in the reference image — same face, same eyes, same features — her blue-black curls billowing in a biting wind, barely covered by a scarf whose ends fall over her shoulders. Turned three-quarters into the wind, she watches the lens with a guarded wariness, eyes glassy with tears she refuses to show, mascara burning but intact. Iron tenderness, not despair. Photoreal, windblown strands across the frame. Low-key chiaroscuro, cold side light, dark background, sharp focus on the eyes. About 34, slender and strong.",
+   "note": "6 Oct versions: Biting wind, swallowed tears | anchors 048: Колкий ветер впивался в лицо, раздувая; 048: лишь прибавлял ее шагу какой-то болезненной; 055: Кира вдруг почувствовала, как тушь стала; 063: Твоя Кира сильная. Смотрит Зверю"
+  },
+  "ule_v1": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same eyes, same features — his curly ash-gray hair dishevelled. A crisp white cotton shirt, the same as yesterday's, only new, collar open one button — pristine against the dishevelled hair. No jewellery. A direct, tired, unsmiling stare into the lens; something swims in his pale blue eyes — exhaustion, or grief. Cool grey pre-dawn soft window light from the right, dark background, sharp focus on the eyes. Handsome, athletic, about 47.",
+   "note": "6 Oct versions: Insomnia: the same white shirt, only new | anchors #079: Волосы растрепаны.; #079: На нем снова белая рубашка, та; #076: в глазах плавало что-то похожее на; 052: Уле Гленсдаген, курчавое светловолосое Существо, постаревшее; 052: Волосы его со временем из пшенично-золотистых"
+  },
+  "ule_v2": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same eyes, same features — his curly ash-gray hair tied back loosely at the nape, strands escaping around his face. A soft grey V-neck T-shirt; a thin black cord necklace with a small silver pendant. Faint dried white traces of salt on his face where tears were wiped away. He looks straight into the lens for the first time without his usual coldness — unguarded, quiet, unsmiling. Low copper evening light, low-key chiaroscuro, dark background, sharp focus on the eyes. Handsome, athletic, about 47.",
+   "note": "6 Oct versions: Salt maps: the first direct look | anchors #088: Уле вытер лицо. Соль осталась на; #088: Он посмотрел на неё — впервые; 052: Уле Гленсдаген, курчавое светловолосое Существо, постаревшее; 052: Волосы его со временем из пшенично-золотистых"
+  },
+  "ule_v3": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same eyes, same features — the devilishly-angelically beautiful Angel-bastard at midnight: his curly hair, wheat-gold turning ash-gray, falls across his face, one eye clear, a lazy half-smile under it. A white cotton shirt with tone-on-tone floral embroidery, open at the throat. He raises a double whiskey on ice; a Patek Philippe watch on his wrist; smoke from a cigar drifting through the light. Warm amber lamplight, low-key chiaroscuro, dark background, sharp focus on the eyes. Handsome, athletic, about 47.",
+   "note": "6 Oct versions: The Angel-bastard at midnight | anchors 052: к ней навстречу нетвердой походкой вышел; 052: захлопнуло биографию Ван Гога и сотворило; 052: В 47 он был бесовко-ангельски; #079: Как часовой механизм Patek Philippe, который; 052: Волосы его со временем из пшенично-золотистых"
+  },
+  "ule_v4": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same eyes, same features — lit up with a boy's delight, as if he'd cracked the universe: an open smile, the first without irony. Gold-rimmed aviator sunglasses with brown lenses pushed up into his curly hair, wheat-golden giving way to ash-gray. A rumpled white linen shirt, collar open. One hand lifts a hotel room key beside his shoulder like a trophy. Warm hotel-corridor lamplight at night, dark background, sharp focus on the eyes. Handsome, athletic, about 47.",
+   "note": "6 Oct versions: Cracked the universe: the smile without irony | anchors #089: he glowed like a kid who'd; #089: Ule smiled — first time without; #089: Ule announced in the hotel corridor,; #079: Уле садится на пол. Прямо так,; 052: Волосы его со временем из пшенично-золотистых"
+  },
+  "ule_v5": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "3:4",
+   "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same eyes, same features — the collector as pure calculation: his ash-gray hair kept short, in tight natural curls. A beige tweed jacket, buttoned, over a white shirt closed at the collar — benevolent, polite and absolutely sober. He leans back in a dark leather chair, the movement of a predator who knows the prey is already trapped: a level, appraising, unsmiling gaze. A single cold ultramarine side light, low-key chiaroscuro, dark background, sharp focus on the eyes. Handsome, athletic, about 47.",
+   "note": "6 Oct versions: Mr. Calculation: polite, sober, predatory | anchors 060: Господин Гленсдаген и Господин Расчет –; 053: Он был доброжелателен, вежлив и абсолютно; 053: отлично дополнял бежевый твидовый пиджак и; #083: Ole leans back in his chair; 052: Уле Гленсдаген, курчавое светловолосое Существо, постаревшее"
   }
  },
  "shots": {},
