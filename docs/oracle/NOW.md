@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 06 Oct 17:09 | VJH delivery fix + Outlook targeting + Puente source (Elena's go 6 Oct) — diagnosis `docs/oracle/2026-10-06_vjh_no_delivery_diagnosis.md` | VJH `job_monitor.py`, `serpapi_jobs_ingest.py`, `target_lanes.py`, `llm_judge.py`, `founder_finder_v2.py`; cto-aipa `hubspot-client.ts`; restarts vibejobhunter + serpapi-jobs + cto-aipa | 6154277 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
