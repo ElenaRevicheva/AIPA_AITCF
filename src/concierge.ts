@@ -198,9 +198,28 @@ async function sendReplyEmail(d: ConciergeDraft): Promise<string | null> {
 }
 
 /** Raw Bot API send so the HTTP route works without holding the grammY instance. */
+/**
+ * Remove a card the bot itself posted. Used for the daily self-test: the drill
+ * must prove a card CAN be delivered, but the card itself is not for her. It
+ * used to stay in the chat every morning as a fake "New lead" -- the cron line
+ * promised "silent on PASS" and the chat said otherwise (Elena, 6 Oct 2026).
+ */
+async function deleteTelegram(messageId: number): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.CONCIERGE_TG_CHAT?.trim();
+  if (!token || !chatId) return false;
+  const r = await fetch(`https://api.telegram.org/bot${token}/deleteMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: chatId, message_id: messageId }),
+  });
+  return r.ok;
+}
+
 async function sendTelegram(
   text: string,
-  keyboard?: { text: string; callback_data: string }[][]
+  keyboard?: { text: string; callback_data: string }[][],
+  silent = false,
 ): Promise<number | null> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.CONCIERGE_TG_CHAT?.trim();
@@ -219,6 +238,7 @@ async function sendTelegram(
       // lose a lead by trimming a prospect's message at an unlucky offset.
       text: tgSafeText(text, 4090),
       ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}),
+      ...(silent ? { disable_notification: true } : {}),
     }),
   });
   if (!r.ok) {
@@ -614,9 +634,16 @@ export function registerConciergeRoutes(app: Express): void {
           { text: '✏️ Edit', callback_data: `cz:edit:${d.id}` },
           { text: '🗑 Skip', callback_data: `cz:skip:${d.id}` },
         ],
-      ]
+      ],
+      selfTest,
     );
-    if (tgMessageId) d.tgMessageId = tgMessageId;
+    // Self-test: delivery is proven by the message id; then the card goes.
+    let selfTestCardRemoved = false;
+    if (selfTest && tgMessageId) {
+      selfTestCardRemoved = await deleteTelegram(tgMessageId).catch(() => false);
+      console.log(`[concierge] SELF-TEST card ${tgMessageId} delivered, removed=${selfTestCardRemoved}`);
+    }
+    if (tgMessageId && !selfTest) d.tgMessageId = tgMessageId;
     saveDraft(d);
     // Say what actually happened. This line used to claim "TG notify sent"
     // unconditionally, so the day Telegram rejected the card (Aug 15 2026) the log
@@ -660,7 +687,7 @@ export function registerConciergeRoutes(app: Express): void {
       }
     });
 
-    res.json({ ok: true, id: d.id });
+    res.json({ ok: true, id: d.id, ...(selfTest ? { tgDelivered: !!tgMessageId, tgRemoved: selfTestCardRemoved } : {}) });
   });
 }
 

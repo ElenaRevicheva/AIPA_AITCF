@@ -130,12 +130,38 @@ const githubToken = (process.env.GITHUB_TOKEN || process.env.GITHUB_PAT || proce
   .trim();
 const octokit = new Octokit({ auth: githubToken || undefined });
 
-// May 24 2026: dedup state for stale-repo proactive alerts (telegram-bot.ts).
-// Without this, the every-4-hour cron re-alerts about the same stale repo
-// 6 times/day. Now: per-repo last-alerted timestamp; skip if alerted within 24h.
-const lastStaleRepoAlertAt = new Map<string, number>();
-const STALE_REPO_ALERT_COOLDOWN_MS = 24 * 60 * 60 * 1000; // 24h
 const STALE_REPO_THRESHOLD_DAYS = 14; // raised from 5 — only alert on genuinely stale (2+ weeks)
+
+/**
+ * Announce a quiet repo ONCE per quiet spell, not once a day.
+ *
+ * The 24h cooldown above lived in memory, and cto-aipa had restarted 186 times,
+ * so every restart re-armed it -- and the morning briefing listed every dead repo
+ * (pitch deck 470 days, private docs 338) on top, daily, forever. Elena (6 Oct
+ * 2026): "my Telegram looks like a garbage can". A repo is now announced once for
+ * its latest commit sha; the next announcement needs a new commit and a new quiet
+ * spell. With no state file yet, the current state is recorded SILENTLY -- "newly
+ * goes quiet" means after today, not a replay of everything already known.
+ */
+const STALE_ANNOUNCED_PATH = path.join(process.cwd(), 'data', 'stale-repos-announced.json');
+
+function newlyStaleRepos(stale: { repo: string; sha: string }[]): string[] {
+  let seen: Record<string, string> | null = null;
+  try { seen = JSON.parse(fs.readFileSync(STALE_ANNOUNCED_PATH, 'utf8')); } catch { /* first run */ }
+  const firstRun = seen === null;
+  const state: Record<string, string> = seen ?? {};
+  const fresh = stale.filter(({ repo, sha }) => state[repo] !== sha).map(({ repo }) => repo);
+  for (const { repo, sha } of stale) state[repo] = sha;
+  try {
+    fs.mkdirSync(path.dirname(STALE_ANNOUNCED_PATH), { recursive: true });
+    fs.writeFileSync(STALE_ANNOUNCED_PATH, JSON.stringify(state, null, 2));
+  } catch (e) {
+    // Cannot remember what was said -> say nothing rather than repeat it daily.
+    console.error('[health] stale-repo state not writable, suppressing:', (e as Error).message);
+    return [];
+  }
+  return firstRun ? [] : fresh;
+}
 
 // Authorized users (Telegram user IDs) - add your ID for security
 const AUTHORIZED_USERS = process.env.TELEGRAM_AUTHORIZED_USERS?.split(',').map(id => parseInt(id.trim())) || [];
@@ -8780,7 +8806,7 @@ async function checkEcosystemHealth(bot: Bot): Promise<void> {
   
   // Check for stale repos (>5 days)
   const now = new Date();
-  const staleRepos: string[] = [];
+  const staleFound: { repo: string; sha: string; daysAgo: number }[] = [];
   
   for (const repo of ['EspaLuzWhatsApp', 'VibeJobHunterAIPA_AIMCF', 'AIPA_AITCF']) {
     try {
@@ -8796,19 +8822,18 @@ async function checkEcosystemHealth(bot: Bot): Promise<void> {
         const daysAgo = Math.floor((now.getTime() - commitDate.getTime()) / (1000 * 60 * 60 * 24));
         
         if (daysAgo > STALE_REPO_THRESHOLD_DAYS) {
-          // Dedup: skip if we already alerted about this repo in last 24h
-          const lastAlert = lastStaleRepoAlertAt.get(repo) || 0;
-          if (Date.now() - lastAlert >= STALE_REPO_ALERT_COOLDOWN_MS) {
-            staleRepos.push(`${escapeMarkdown(repo)} (${daysAgo} days)`);
-            lastStaleRepoAlertAt.set(repo, Date.now());
-          }
+          staleFound.push({ repo, sha: latestCommit.sha, daysAgo });
         }
       }
     } catch {}
   }
   
+  const announce = new Set(newlyStaleRepos(staleFound));
+  const staleRepos = staleFound
+    .filter(({ repo }) => announce.has(repo))
+    .map(({ repo, daysAgo }) => `${escapeMarkdown(repo)} (${daysAgo} days)`);
   if (staleRepos.length > 0) {
-    alerts.push(`⏰ Repos need attention: ${staleRepos.join(', ')}`);
+    alerts.push(`⏰ Went quiet: ${staleRepos.join(', ')} — told once, not again until the next commit`);
   }
   
   // Send alerts to all registered chats
@@ -9173,96 +9198,46 @@ async function postRadarButtonsOnce(bot: Bot): Promise<void> {
 
 function startScheduledTasks(bot: Bot): void {
   // Daily briefing at 8 AM Panama time (UTC-5) = 13:00 UTC
-  const dailyBriefing = cron.schedule('0 13 * * *', async () => {
-    console.log('☀️ Sending scheduled daily briefings...');
-    
+  // ONE morning message. Until 6 Oct 2026 this sent two "Good morning"s in the
+  // same minute: a status card listing every repo quiet for 14+ days (pitch deck
+  // 470 days, daily, forever) and a Trello card listing all nine boards. Now: one
+  // greeting, what is due within three days, and a problem line only when there
+  // is a real problem. Quiet repos are announced once by the health check.
+  const dailyBriefing = cron.schedule('0 8 * * *', async () => {
+    console.log('☀️ Sending scheduled daily briefing...');
+
+    let cmoDown = false;
+    try {
+      const cmoResponse = await fetch('http://127.0.0.1:8080/health', { signal: AbortSignal.timeout(10000) });
+      cmoDown = !cmoResponse.ok;
+    } catch {
+      cmoDown = true;
+    }
+
+    let trelloBriefing = '';
+    try {
+      trelloBriefing = await generateDailyBriefing();
+    } catch (err) {
+      console.error('[BoardBriefing] Daily briefing error:', err);
+    }
+
+    const briefing = [
+      '☀️ *Good morning, Elena!*',
+      cmoDown ? '🚨 CMO AIPA is not answering its health check — `pm2 logs cmo`' : null,
+      trelloBriefing || null,
+    ].filter(Boolean).join('\n\n');
+
     for (const chatId of alertChatIds) {
       try {
-        // Create a fake context for sending messages
-        const now = new Date();
-        const greeting = now.getUTCHours() >= 10 && now.getUTCHours() < 22 
-          ? '☀️ Good morning, Elena!' 
-          : '🌙 Evening update!';
-        
-        // Generate briefing content
-        let cmoStatus = '❓';
-        try {
-          const cmoResponse = await fetch('http://127.0.0.1:8080/health');
-          cmoStatus = cmoResponse.ok ? '✅' : '⚠️';
-        } catch {
-          cmoStatus = '❌';
-        }
-        
-        // Get recent activity AND detect genuinely stale repos in one GitHub pass
-        // (May 25 2026: walk all AIDEAZZ_REPOS so stale detection is complete;
-        // 'Activity' section still shows only top 3.)
-        const allRepoActivity: { repo: string; daysAgo: number }[] = [];
-        for (const repo of AIDEAZZ_REPOS) {
-          try {
-            const commits = await octokit.repos.listCommits({
-              owner: 'ElenaRevicheva',
-              repo,
-              per_page: 1
-            });
-            const latestCommit = commits.data[0];
-            if (latestCommit) {
-              const date = new Date(latestCommit.commit.author?.date || '');
-              const daysAgo = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-              allRepoActivity.push({ repo, daysAgo });
-            }
-          } catch {}
-        }
-        const recentRepos: string[] = allRepoActivity.slice(0, 3).map(
-          ({ repo, daysAgo }) => `• ${escapeMarkdown(repo)}: ${daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}`
-        );
-
-        // May 25 2026: deterministic, signal-driven 'Today's real issues' section.
-        // Replaces the previous LLM-confabulated 'Today' line that hallucinated the
-        // same EspaLuz focus suggestion every day (content-less prompt → same output).
-        // Only renders when there is a TRUE crucial issue. On clean days, the
-        // entire section is omitted (no '✅ all clear' filler — no noise).
-        // Reuses module-scope STALE_REPO_THRESHOLD_DAYS (14d) — single source of truth
-        // with the stale-repo proactive-alert dedup logic.
-        const realIssues: string[] = [];
-        if (cmoStatus === '❌') {
-          realIssues.push('CMO offline — `pm2 logs cmo` to triage');
-        }
-        for (const { repo, daysAgo } of allRepoActivity) {
-          if (daysAgo > STALE_REPO_THRESHOLD_DAYS) {
-            realIssues.push(`${escapeMarkdown(repo)} stale (${daysAgo} days)`);
-          }
-        }
-        const issuesSection = realIssues.length > 0
-          ? `\n\n🚨 *Today's real issues*\n${realIssues.map((i) => `• ${i}`).join('\n')}`
-          : '';
-        
-        const briefing = `${greeting}
-
-📊 *Status*
-CTO: ✅ | CMO: ${cmoStatus}
-
-📁 *Activity*
-${recentRepos.join('\n')}${issuesSection}
-
-_/daily for full briefing_`;
-
-        // Trello board briefing
-        let trelloBriefing = '';
-        try {
-          trelloBriefing = await generateDailyBriefing();
-        } catch (err) {
-          console.error('[BoardBriefing] Daily briefing error:', err);
-        }
-
         await bot.api.sendMessage(chatId, briefing, { parse_mode: 'Markdown' });
-        if (trelloBriefing) {
-          await bot.api.sendMessage(chatId, trelloBriefing, { parse_mode: 'Markdown' });
-        }
-        console.log(`   Sent daily briefing to ${chatId}`);
-
       } catch (error) {
-        console.error(`Failed to send daily briefing to ${chatId}:`, error);
+        // A card title with a stray * or _ breaks Markdown; deliver it plain
+        // rather than lose the whole morning message.
+        console.warn(`Daily briefing Markdown rejected for ${chatId}, sending plain:`, (error as Error).message);
+        try { await bot.api.sendMessage(chatId, briefing.replace(/[*_`]/g, '')); }
+        catch (e2) { console.error(`Failed to send daily briefing to ${chatId}:`, e2); continue; }
       }
+      console.log(`   Sent daily briefing to ${chatId}`);
     }
   }, {
     timezone: 'America/Panama'
@@ -9307,18 +9282,21 @@ _/daily for full briefing_`;
   const freshLeadsCron = cron.schedule('0 7 * * 2,5', async () => {
     console.log('[cron] Running fresh leads ingestion (HN + GitHub)...');
     try {
-      const result = await runFreshLeadsIngestion(
-        anthropic,
-        ['hn', 'github'],
-        async (msg) => {
-          for (const id of AUTHORIZED_USERS) {
-            try { await bot.api.sendMessage(id, `📬 Fresh leads cron:\n\n${msg}`); } catch {}
-          }
+      // Silent on success (Elena, 6 Oct 2026): "imported 50, already 76" is a log
+      // line, not something she can act on. The leads reach her through HubSpot
+      // and the triage brief. Telegram hears only about failures.
+      const result = await runFreshLeadsIngestion(anthropic, ['hn', 'github']);
+      console.log(`[cron] Fresh leads done: ${result.ingested} ingested, ${result.skipped} skipped, ${result.errors} errors`);
+      if (result.errors > 0) {
+        for (const id of AUTHORIZED_USERS) {
+          try { await bot.api.sendMessage(id, `⚠️ Fresh leads cron had ${result.errors} error(s):\n\n${result.summary}`); } catch {}
         }
-      );
-      console.log(`[cron] Fresh leads done: ${result.ingested} ingested, ${result.skipped} skipped`);
+      }
     } catch (e) {
       console.error('[cron] Fresh leads error:', e);
+      for (const id of AUTHORIZED_USERS) {
+        try { await bot.api.sendMessage(id, `⚠️ Fresh leads cron failed: ${String(e).slice(0, 300)}`); } catch {}
+      }
     }
   }, { timezone: 'America/Panama' });
   cronJobs.push(freshLeadsCron);

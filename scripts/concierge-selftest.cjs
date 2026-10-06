@@ -93,6 +93,10 @@ async function main() {
 
   const j = res.json || {};
   record('a Telegram card was produced', !!j.id, j.id ? `draft ${j.id}` : `response: ${res.text.slice(0, 120)}`);
+  // The server now deletes the self-test card right after posting it (it used to
+  // sit in Elena's chat every morning as a fake lead). Delivery is still proven:
+  // the card had to land before it could be removed.
+  if (j.id && 'tgDelivered' in j) record('Telegram card delivered (then removed)', j.tgDelivered === true, `removed=${j.tgRemoved}`);
   if (j.spam) record('model did NOT rule the canary spam', false, 'rules need softer canary wording');
   if (j.dropped) record('draft not dropped as auto-import noise', false, String(j.dropped));
   if (j.unresolved) record('recipient resolved', false, 'draft arrived but recipient was ambiguous');

@@ -137,64 +137,77 @@ function cardLine(c: CardEntry, showOverdue = false): string {
   return `• [${c.name}](${c.shortUrl})${tag}`;
 }
 
-function boardSection(snap: BoardSnapshot): string {
-  const lines: string[] = [`📋 *${snap.boardName}*`];
+/**
+ * Only what needs her within three days. Earned 6 Oct 2026: the daily briefing
+ * listed all nine boards, "No date: 135 cards", and 31 cards overdue by up to
+ * 564 days -- every morning, as a second "Good morning" right under the first.
+ * Elena: "my Telegram looks like a garbage can". A card a year past its date is
+ * not a task for today; it is an archive decision, and Monday's weekly digest
+ * still lists it. Boards with nothing actionable are left out entirely.
+ */
+export const RECENT_OVERDUE_DAYS = 30;
 
+function boardSection(snap: BoardSnapshot): string | null {
+  const recent = snap.overdue.filter(c => c.daysOverdue <= RECENT_OVERDUE_DAYS);
+  const lines: string[] = [];
+  if (recent.length)        lines.push(`  🚨 Overdue: ${recent.map(c => `${c.name} (+${c.daysOverdue}d)`).join(', ')}`);
+  if (snap.dueToday.length) lines.push(`  📅 Today: ${snap.dueToday.map(c => c.name).join(', ')}`);
+  if (snap.dueSoon.length)  lines.push(`  ⏰ Next 3 days: ${snap.dueSoon.map(c => c.name).join(', ')}`);
+  return lines.length ? [`📋 *${snap.boardName}*`, ...lines].join('\n') : null;
+}
+
+/** Monday's full view: every board, every overdue card, the undated counts. */
+function fullBoardSection(snap: BoardSnapshot): string {
+  const lines: string[] = [`📋 *${snap.boardName}*`];
   if (snap.overdue.length)  lines.push(`  🚨 Overdue (${snap.overdue.length}): ${snap.overdue.map(c => `${c.name} (+${c.daysOverdue}d)`).join(', ')}`);
   if (snap.dueToday.length) lines.push(`  📅 Today (${snap.dueToday.length}): ${snap.dueToday.map(c => c.name).join(', ')}`);
   if (snap.dueSoon.length)  lines.push(`  ⏰ Next 3 days (${snap.dueSoon.length}): ${snap.dueSoon.map(c => c.name).join(', ')}`);
   if (snap.dueWeek.length)  lines.push(`  📆 This week (${snap.dueWeek.length})`);
   if (snap.undated)         lines.push(`  ○ No date: ${snap.undated} cards`);
-
-  if (!snap.overdue.length && !snap.dueToday.length && !snap.dueSoon.length) {
-    lines.push('  ✅ All clear!');
-  }
-
   return lines.join('\n');
 }
 
 // ─── Daily briefing ───────────────────────────────────────────────────────────
 
+/**
+ * The Trello part of the ONE morning message. No greeting -- the caller owns it,
+ * so there is exactly one "Good morning" a day. Empty string = nothing due.
+ */
 export async function generateDailyBriefing(): Promise<string> {
   const snapshots = await fetchActiveBoardSnapshots();
   if (snapshots.length === 0) return '';
 
-  const totalOverdue  = snapshots.reduce((s, b) => s + b.overdue.length, 0);
-  const totalToday    = snapshots.reduce((s, b) => s + b.dueToday.length, 0);
-  const totalSoon     = snapshots.reduce((s, b) => s + b.dueSoon.length, 0);
+  const sections = snapshots.map(boardSection).filter((x): x is string => !!x);
+  const ancient = snapshots.reduce((n, b) => n + b.overdue.filter(c => c.daysOverdue > RECENT_OVERDUE_DAYS).length, 0);
 
-  const boardLines = snapshots.map(boardSection).join('\n\n');
-
-  // Build structured context for Haiku suggestion
-  const overdueNames = snapshots.flatMap(b => b.overdue.map(c => `[${b.boardName}] ${c.name} (+${c.daysOverdue}d)`));
-  const todayNames   = snapshots.flatMap(b => b.dueToday.map(c => `[${b.boardName}] ${c.name}`));
-
+  // The suggestion only sees what is actually live -- fed the 564-day-old cards,
+  // it would nag about a DAO meeting from 2025.
+  const recentNames = snapshots.flatMap(b => b.overdue
+    .filter(c => c.daysOverdue <= RECENT_OVERDUE_DAYS)
+    .map(c => `[${b.boardName}] ${c.name} (+${c.daysOverdue}d)`));
+  const todayNames  = snapshots.flatMap(b => [...b.dueToday, ...b.dueSoon].map(c => `[${b.boardName}] ${c.name}`));
   const suggestionCtx = [
-    overdueNames.length ? `Overdue: ${overdueNames.join('; ')}` : null,
-    todayNames.length   ? `Due today: ${todayNames.join('; ')}` : null,
+    recentNames.length ? `Overdue: ${recentNames.join('; ')}` : null,
+    todayNames.length  ? `Due today / next 3 days: ${todayNames.join('; ')}` : null,
   ].filter(Boolean).join('\n');
 
   let suggestion = '';
   if (suggestionCtx) {
     suggestion = await askHaiku(
       `You are a personal assistant for Elena Revicheva (AI entrepreneur, Panama).
-She uses Trello to manage her life. Here is her board status right now:
+She uses Trello to manage her life. Here is what is due right now:
 
 ${suggestionCtx}
 
 Write ONE short actionable suggestion in 1-2 sentences (max 120 chars).
-Be specific — name the task. Do not repeat the count numbers already shown above.
-Examples of good suggestions: "Start with the car inspection call — it's 5 days overdue and unblocks the court decision."`, 150);
+Be specific — name the task. Do not repeat counts.`, 150);
   }
 
-  const header = totalOverdue > 0
-    ? `🌅 *Good morning, Elena!*\n\n🚨 *${totalOverdue} overdue · ${totalToday} today · ${totalSoon} due soon*`
-    : `🌅 *Good morning, Elena!*\n\n✅ *${totalToday} due today · ${totalSoon} due soon*`;
-
-  const parts = [header, '', boardLines];
-  if (suggestion) parts.push('', `💡 ${suggestion}`);
-
-  return parts.join('\n');
+  const parts: string[] = [];
+  parts.push(sections.length ? sections.join('\n\n') : '✅ Nothing due today or in the next 3 days.');
+  if (suggestion) parts.push(`💡 ${suggestion}`);
+  if (ancient) parts.push(`_🗄 ${ancient} cards overdue ${RECENT_OVERDUE_DAYS}+ days — archive or re-date them; listed in Monday's digest._`);
+  return parts.join('\n\n');
 }
 
 // ─── Weekly digest ────────────────────────────────────────────────────────────
@@ -219,7 +232,7 @@ Overdue (${allOverdue.length}): ${allOverdue.join('; ') || 'none'}
 Due this week (${allWeek.length}): ${allWeek.join('; ') || 'none'}
 Undated cards: ${totalUndated}`, 300);
 
-  const boardLines = snapshots.map(boardSection).join('\n\n');
+  const boardLines = snapshots.map(fullBoardSection).join('\n\n');
 
   return [
     `📊 *Weekly Trello Digest — ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}*`,

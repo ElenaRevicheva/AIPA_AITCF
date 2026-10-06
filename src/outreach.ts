@@ -635,16 +635,19 @@ export async function runDailyOutreachCycle(
     // MAY 25 2026: silent skip on quiet outreach cycle.
     // If nothing happened (no sends, no auto-marked, no real errors), don't
     // pollute Telegram with a "verified=0 / generated=0 / sent=0 / errors=0" report.
+    //
+    // 6 Oct 2026 (Elena: "my Telegram looks like a garbage can"): a NORMAL cycle is
+    // not news either. "10 of 10 sent" every day is a log line. Telegram now hears
+    // only when something is wrong: a send failed, Resend is not configured, or
+    // drafts were written and none went out. Replies surface in the follow-up radar.
     const actionableOutreach =
-      send.sent > 0 ||
-      (send.autoMarkedInvalid && send.autoMarkedInvalid > 0) ||
       send.errors.length > 0 ||
-      gen.generated > 0 ||
-      verify.verified > 0;
+      !resendConfigured ||
+      (gen.generated > 0 && send.sent === 0);
     if (sendTelegram && actionableOutreach) {
       await sendTelegram(lines);
     } else if (!actionableOutreach) {
-      console.log('📧 Phase 4 outreach: quiet cycle (0 actionable signals) — Telegram SUPPRESSED');
+      console.log(`📧 Phase 4 outreach: healthy cycle (sent ${send.sent}, generated ${gen.generated}) — Telegram SUPPRESSED`);
     }
   } catch (e) {
     console.error(`[${tag}] Cycle error:`, e);
