@@ -284,7 +284,9 @@ git log keeps the record.
   transplant kept as `kira_jungle_final_transplant.jpg`. Do NOT re-apply any face swap to this frame. Elena OK'd it.
   **k13/k14 REDONE 6 Oct** with refs `kira_jungle_final` + `ule` (nano, $0.92: k14 1 take; k13 3 — dusk, then Ule doubled, then good).
   Sheet `docs/atuona/film9_k13_k14_dressref.jpg`; old frames `img/pre_jungleref_1006/`, rejected takes `img/k13_dusk_1006.jpg`,
-  `img/k13_twoules_1006.jpg`. **Elena's move:** OK k13/k14. Still PAUSED on motion — no video spend until she says. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
+  `img/k13_twoules_1006.jpg`. **Elena APPROVED k13+k14 ('This is fine') from a screenshot of the FIRST k13 take (dusk)** →
+  `img/k13.jpg` = `k13_dusk_1006.jpg`; the night one-man take is kept as `k13_night_1006.jpg`. Sheet `film9_chosen_tonight.jpg` shows the night
+  take, so it is stale for k13. Still PAUSED on motion — no video spend until she says. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
   Nano drifts night to dusk, and 'blue-black' gives navy hair (say 'true black, never blue'). Plain prompts only: a refusal is final, no wording to beat the filter.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
