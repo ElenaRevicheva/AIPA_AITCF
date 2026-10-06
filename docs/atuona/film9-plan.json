@@ -760,7 +760,20 @@
    "note": "6 Oct, Elena: 'Kira now target is the target. This exact face'. Head-crop face match (face large in frame), pasted back into kira_jungle_k with a feathered mask"
   }
  },
- "shots": {},
+ "shots": {
+  "s13": {
+   "start": "k13",
+   "engine": "wan1080",
+   "mode": "pro",
+   "expand": false,
+   "duration": 5,
+   "duration_by_engine": {
+    "hailuo": 6
+   },
+   "motion": "She walks slowly and steadily toward the camera between the tables, unhurried, eyes on the lens; the storm wind lifts the sheer jungle-print chiffon of her dress and the long sleeves stream sideways; the white tablecloths flap; the lanterns swing and flicker; light rain. The man at the table on the right stays seated, looking at her, the open jewellery box in his hands. Camera dollies back slowly at her walking pace, one continuous take, no cuts.",
+   "note": "6 Oct engine test (Gate 3) on Elena-approved k13 (dusk take): wan1080 / kling pro / hailuo"
+  }
+ },
  "plate_look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo.",
  "real_look": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo.",
  "real_look_2": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo. Keep the scene's time of day exactly as written: a night scene is dark night, lit only by the light sources named (lanterns, lamps, moon, streetlight) — never dusk or blue hour unless the scene says so.",

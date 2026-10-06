@@ -286,7 +286,12 @@ git log keeps the record.
   Sheet `docs/atuona/film9_k13_k14_dressref.jpg`; old frames `img/pre_jungleref_1006/`, rejected takes `img/k13_dusk_1006.jpg`,
   `img/k13_twoules_1006.jpg`. **Elena APPROVED k13+k14 ('This is fine') from a screenshot of the FIRST k13 take (dusk)** →
   `img/k13.jpg` = `k13_dusk_1006.jpg`; the night one-man take is kept as `k13_night_1006.jpg`. Sheet `film9_chosen_tonight.jpg` shows the night
-  take, so it is stale for k13. Still PAUSED on motion — no video spend until she says. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
+  take, so it is stale for k13. **6 Oct Elena: 'Start making it' → Gate 3 engine test on s13 (start k13), $1.68:**
+  Wan 2.7 1080p REFUSED by its output content filter (final, never re-routed; Wan was the plan's main Kira engine);
+  Kling pro 5 s OK ($1.12); Hailuo 2.3 1080p 6 s OK ($0.56). Both hold face + dress; sheet `film9_s13_engine_test.jpg`.
+  `gen.mjs` gained a `wan1080` engine (backup `gen.mjs.bak-pre-wan1080`). Ledger $19.88 of the $30 cap.
+  **BLOCKED on money (Elena's move):** whole film on Hailuo ≈ $28 with rework; room under the cap $10.12; Replicate
+  prepaid ~$7.4 left. She must top up Replicate and raise the cap before Gate 4. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
   Nano drifts night to dusk, and 'blue-black' gives navy hair (say 'true black, never blue'). Plain prompts only: a refusal is final, no wording to beat the filter.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
