@@ -42,20 +42,22 @@
    "engine": "venice",
    "vmodel": "gpt-image-2-5-flare-edit",
    "refs": [
-    "kira",
+    "kira_v1",
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Extreme close-up from behind and slightly to the side: the back of the neck of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), her dark hair pinned up, the collar of a check-wool suit jacket over a lilac silk blouse, a loose dark tie; just behind her shoulder, out of focus, the jaw and golden stubble of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful), so close that his breath stirs the fine hairs at her nape — he does not touch her. Cold blue-white gallery light, darkness around."
+   "prompt": "Extreme close-up from behind and slightly to the side: the back of the neck of the woman from the first reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), her blue-black hair pinned up, the collar of a check-wool suit jacket over a lilac silk blouse, a loose dark tie; just behind her shoulder, out of focus, the jaw and golden stubble of the man from the second reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful), so close that his breath stirs the fine hairs at her nape — he does not touch her. Cold blue-white gallery light, darkness around.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k02": {
    "engine": "venice",
    "vmodel": "gpt-image-2-5-flare-edit",
    "refs": [
-    "kira"
+    "kira_v1"
    ],
    "aspect": "16:9",
-   "prompt": "Night, a tall window furred with frost in a cold northern city, blue-white streetlight behind it. the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) presses her lips to the frosted glass; a small clear oval has melted around her mouth and her breath clouds the pane; eyes closed. She wears a check-wool suit jacket, a lilac silk blouse and a loose dark tie. Close-up in side profile, raw adult emotion."
+   "prompt": "Night, a tall window furred with frost in a cold northern city, blue-white streetlight behind it. the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) presses her lips to the frosted glass; a small clear oval has melted around her mouth and her breath clouds the pane; eyes closed. She wears a check-wool suit jacket, a lilac silk blouse and a loose dark tie. Close-up in side profile, raw adult emotion.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k05": {
    "engine": "venice",
@@ -72,7 +74,8 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "From high above at night: a black, glassy sea under a low full moon. the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) floats on her back on the surface, arms open, eyes open looking up, dark wet hair spread around her like ink, wearing a thin dark silk slip, bare shoulders, moonlight on wet skin, a silver path of moonlight across the water. Still, suspended — the moment before she plunges."
+   "prompt": "From high above at night: a black, glassy sea under a low full moon. the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) floats on her back on the surface, arms open, eyes open looking up, wet blue-black curls spread around her like ink, wearing a thin dark silk slip, bare shoulders, moonlight on wet skin, a silver path of moonlight across the water. Still, suspended — the moment before she plunges.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k07": {
    "engine": "venice",
@@ -81,7 +84,8 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "Night, black sea water up to her waist: the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) rises out of the dark water, seen from behind and slightly to the side, her bare back and shoulder blades wet and glistening, wet white feathers clinging to both shoulder blades exactly where wings would grow; dark hair slicked down her back; her face in profile turned over her shoulder; moonlight. Implied, not explicit; nothing below the waterline."
+   "prompt": "Night, black sea water up to her waist: the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) rises out of the dark water, seen from behind and slightly to the side, her bare back and shoulder blades wet and glistening, wet white feathers clinging to both shoulder blades exactly where wings would grow; blue-black hair slicked down her back; her face in profile turned over her shoulder; moonlight. Implied, not explicit; nothing below the waterline.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k07b": {
    "engine": "venice",
@@ -98,7 +102,8 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "Early morning on a tropical island: close profile of the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), wet dark hair with one fresh white-and-yellow plumeria blossom tucked behind her ear, droplets on her skin, eyes half-closed as she breathes the scent; behind her, out of focus, black volcanic sand steaming after rain and dense green jungle."
+   "prompt": "Early morning on a tropical island: close profile of the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), wet blue-black curls with one fresh white-and-yellow plumeria blossom tucked behind her ear, droplets on her skin, eyes half-closed as she breathes the scent; behind her, out of focus, black volcanic sand steaming after rain and dense green jungle.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k11": {
    "engine": "venice",
@@ -107,28 +112,30 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "A dim tropical bedroom with a tall old mirror with tarnished silver edges. In the foreground the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands perfectly still facing the mirror, seen from behind at the shoulders, dark hair pinned up, in a thin black silk slip. In the mirror her reflection — the same woman, face fully visible, grey-green eyes looking back — has lowered one silk strap off its bare shoulder and is slipping the other, while the real woman's straps stay in place. Honey light, chiaroscuro. Two versions of the same woman. Framed at the collarbone; implied, not explicit."
+   "prompt": "A dim tropical bedroom with a tall old mirror with tarnished silver edges. In the foreground the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands perfectly still facing the mirror, seen from behind at the shoulders, blue-black hair pinned up, in a thin black silk slip. In the mirror her reflection — the same woman, face fully visible, grey-green eyes looking back — has lowered one silk strap off its bare shoulder and is slipping the other, while the real woman's straps stay in place. Honey light, chiaroscuro. Two versions of the same woman. Framed at the collarbone; implied, not explicit.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k13": {
    "engine": "venice",
    "vmodel": "gpt-image-2-5-flare-edit",
    "refs": [
-    "kira",
+    "kira_v2",
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "A small open-air restaurant on a tropical island at night, the first gust of a storm bending the palms and lifting the white tablecloths, lanterns, rain haze. the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) walks toward the camera in a floor-length green jungle-print silk gown, hair swept up in a bun, rain gleaming on her shoulders. At a table behind her the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) waits in a white linen shirt, holding an open necklace of diamonds and emeralds.",
-   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
+   "prompt": "A small open-air restaurant on a tropical island at night, the first gust of a storm bending the palms and lifting the white tablecloths, lanterns, rain haze. the woman from the first reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) walks toward the camera in a floor-length green jungle-print silk gown, hair swept up in a bun, rain gleaming on her shoulders. At a table behind her the man from the second reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful) waits in a white linen shirt, holding an open necklace of diamonds and emeralds. Her throat is bare: no necklace, no jewellery yet.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register | 6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k14": {
    "engine": "venice",
    "vmodel": "gpt-image-2-5-flare-edit",
    "refs": [
-    "kira",
+    "kira_v2",
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Front-on at a restaurant table at night, lanterns, the storm outside: the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stands beside the seated the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) and closes a waterfall necklace of white gold, diamonds and emeralds around her throat, his fingers at the clasp. She looks straight ahead past him, composed, unsmiling, in a green jungle-print silk gown. A transaction, not a romance."
+   "prompt": "Front-on at a restaurant table at night, lanterns, the storm outside: the man from the second reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful) stands beside the seated the woman from the first reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) and closes a waterfall necklace of white gold, diamonds and emeralds around her throat, his fingers at the clasp. She looks straight ahead past him, composed, unsmiling, in a green jungle-print silk gown. A transaction, not a romance.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k16": {
    "engine": "venice",
@@ -148,7 +155,8 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "Hard white noon on a black volcanic sand beach on a tropical island: the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands barefoot in a simple black linen dress, looking down to her right; the harsh overhead sun throws a short black shadow under her; palms and a dark rock throw black shadows; dense jungle and a volcanic ridge behind; heat haze. Leave empty sand to her right."
+   "prompt": "Hard white noon on a black volcanic sand beach on a tropical island: the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands barefoot in a simple black linen dress, looking down to her right; the harsh overhead sun throws a short black shadow under her; palms and a dark rock throw black shadows; dense jungle and a volcanic ridge behind; heat haze. Leave empty sand to her right.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k17b": {
    "engine": "venice",
@@ -179,7 +187,8 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "A dark, private auction room at night: rows of black chairs, white paddles raised in the darkness like birds. In the third row, left of the aisle, the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) sits very still in a black sculptural avant-garde dress, her face lit only by the glow of a price screen out of frame; she does not raise a paddle."
+   "prompt": "A dark, private auction room at night: rows of black chairs, white paddles raised in the darkness like birds. In the third row, left of the aisle, the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) sits very still in a black sculptural avant-garde dress, her face lit only by the glow of a price screen out of frame; she does not raise a paddle.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k20b": {
    "engine": "venice",
@@ -188,7 +197,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "A bare room in an old wooden house on a tropical island, humid afternoon: the man from the reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) in a white linen shirt stands alone before an empty, water-stained white wall, seen from behind at three-quarters, his palm flat against the wall; dust in a shaft of light; frangipani shadows."
+   "prompt": "A bare room in an old wooden house on a tropical island, humid afternoon: the man from the reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful) in a white linen shirt stands alone before an empty, water-stained white wall, seen from behind at three-quarters, his palm flat against the wall; dust in a shaft of light; frangipani shadows.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k21": {
    "engine": "venice",
@@ -204,7 +214,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Night in an old wooden house: the man from the reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stands at an open window looking out at a dark bay, seen from behind at three-quarters, not turning; white linen shirt; his reflection faint in the glass; rain-wet palms outside; one lamp."
+   "prompt": "Night in an old wooden house: the man from the reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful) stands at an open window looking out at a dark bay, seen from behind at three-quarters, not turning; white linen shirt; his reflection faint in the glass; rain-wet palms outside; one lamp.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k24": {
    "engine": "venice",
@@ -213,7 +224,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Night, close-up: the face of the man from the reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful), wet with silent tears — no sobbing, his face still, eyes open and glistening, salt drying in fine white trails on his tanned cheeks; dim warm light; raw, adult, beautiful."
+   "prompt": "Night, close-up: the face of the man from the reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful), wet with silent tears — no sobbing, his face still, eyes open and glistening, salt drying in fine white trails on his tanned cheeks; dim warm light; raw, adult, beautiful.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k25": {
    "engine": "venice",
@@ -234,8 +246,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Night, close: moonlight through a carved wooden window screen falls in curving abstract patterns of light and shadow across the face, neck and white linen shirt of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful); the hand of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) rests flat on his shirt over his heart, the patterns crossing her fingers.",
-   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
+   "prompt": "Night, close: moonlight through a carved wooden window screen falls in curving abstract patterns of light and shadow across the face, neck and white linen shirt of the man from the second reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful); the hand of the woman from the first reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) rests flat on his shirt over his heart, the patterns crossing her fingers.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register | 6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k27": {
    "engine": "venice",
@@ -244,7 +256,8 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "Macro, no face: the top of a woman's bare back between the shoulder blades, pale skin with pores, a faint pale hairline scar, decades old and the same tone as her skin, running a short way along the line of her spine; a man's fingertip resting at the top of the scar; soft honey light from the side; a strand of dark hair at the edge of the frame. Intimate, not explicit."
+   "prompt": "Macro, no face: the top of a woman's bare back between the shoulder blades, pale skin with pores, a faint pale hairline scar, decades old and the same tone as her skin, running a short way along the line of her spine; a man's fingertip resting at the top of the scar; soft honey light from the side; a strand of blue-black hair at the edge of the frame. Intimate, not explicit.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k28": {
    "engine": "venice",
@@ -287,7 +300,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Lilac dawn on a black volcanic sand beach: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) and the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stand apart facing the grey-lilac sea, seen from behind; his palm rests on the small of her back; between them a lean flat-red dog sits on the sand; soft mist; a jungle ridge behind."
+   "prompt": "Lilac dawn on a black volcanic sand beach: the woman from the first reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) and the man from the second reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful) stand apart facing the grey-lilac sea, seen from behind; his palm rests on the small of her back; between them a lean flat-red dog sits on the sand; soft mist; a jungle ridge behind.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k36": {
    "engine": "venice",
@@ -296,7 +310,8 @@
     "kira"
    ],
    "aspect": "16:9",
-   "prompt": "Lilac dawn on black volcanic sand, seen from a high angle: the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), barefoot in a simple dark linen dress, walks up the beach away from the sea toward the jungle; behind her a thin wave has closed a perfect ring of white foam on the empty black sand where she just stood; mist."
+   "prompt": "Lilac dawn on black volcanic sand, seen from a high angle: the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), barefoot in a simple dark linen dress, walks up the beach away from the sea toward the jungle; behind her a thin wave has closed a perfect ring of white foam on the empty black sand where she just stood; mist.",
+   "note": "6 Oct redo: new refs (Kira A blue-black curls; Ule v2 + v1's eyes), descriptors updated"
   },
   "k37": {
    "engine": "venice",
