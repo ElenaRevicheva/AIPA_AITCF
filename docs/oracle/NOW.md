@@ -130,14 +130,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
-### 🟠 6 Oct — voice→Trello misrouted "Kira октубре" to the ФИН board · code on `main`, **NOT deployed** (Elena's go)
+### ✅ 6 Oct — voice→Trello misrouted "Kira октубре" to the ФИН board · fixed `a763969`, DEPLOYED 20:31 UTC
 - **DONE:** `src/trello-voice.ts` — spoken month normalised from Cyrillic/RU/EN (`октубре`, `октябрь`, `October` → octubre); a named month
   resolves to its board or falls back to the enum, never "any Kira board"; word overlap ignores `kira` (it is in every board name);
   `STO AIPA` → `CTO AIPA` repair. The misfiled card has been moved to Kira Octubre 2026 / Надо сделать, renamed CTO AIPA, and given its orange label back.
 - **VERIFIED BY:** live log `cto-aipa-out-9.log:1385` `board from spoken name "Kira октубре" -> Kira ФИН…` (cause); 12/12 routing cases pass
   against the real board names; Trello PUT 200 with the board and list read back. Diff of the live Oracle `dist/trello-voice.js` against the new build = only this change.
-- **NEXT (needs Elena's go — the auto-mode guard blocked the deploy):** scp `dist/trello-voice.js` → Oracle, `pm2 restart cto-aipa --update-env`,
-  grep `spokenMonth` in dist. **RISK:** none known; the live process is still on the old router until deployed.
+- **DEPLOYED (Elena's go):** `dist/trello-voice.js` scp'd 20:31:17 UTC, `pm2 restart cto-aipa` 20:31:20 (newer than file), online;
+  `grep spokenMonth` = 3. Backup `dist/trello-voice.js.bak-20261006`.
+- **NEXT:** Elena will list the stale/stuck Telegram messages for CTO AIPA to clean — that is the actual task on the card.
 
 ### ✅ 6 Oct — VJH DELIVERING AGAIN (Elena's go) · diagnosis `docs/oracle/2026-10-06_vjh_no_delivery_diagnosis.md`
 - **DONE:** VJH `83d8d04` (git pull on Oracle; vibejobhunter + serpapi-jobs restarted 18:19:42 UTC, newer than files) · cto-aipa `6edbd06`
