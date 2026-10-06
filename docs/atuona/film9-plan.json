@@ -477,6 +477,54 @@
    "aspect": "3:4",
    "prompt": "Character reference portrait, head and shoulders, 3:4. Exactly the same man as in the reference image — same face, same eyes, same features — the collector as pure calculation: his ash-gray hair kept short, in tight natural curls. A beige tweed jacket, buttoned, over a white shirt closed at the collar — benevolent, polite and absolutely sober. He leans back in a dark leather chair, the movement of a predator who knows the prey is already trapped: a level, appraising, unsmiling gaze. A single cold ultramarine side light, low-key chiaroscuro, dark background, sharp focus on the eyes. Handsome, athletic, about 47.",
    "note": "6 Oct versions: Mr. Calculation: polite, sober, predatory | anchors 060: Господин Гленсдаген и Господин Расчет –; 053: Он был доброжелателен, вежлив и абсолютно; 053: отлично дополнял бежевый твидовый пиджак и; #083: Ole leans back in his chair; 052: Уле Гленсдаген, курчавое светловолосое Существо, постаревшее"
+  },
+  "ule_m1": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule_boho_a",
+    "ule_v1"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Edit the first image. Keep the man in the first image exactly as he is — same face, same tousled ash-blond hair, same open embroidered white shirt, beige tweed jacket, silver pendant and ring, same pose, light and framing. Change ONLY his eyes and gaze to match the man in the second image: the same pale, piercing blue eyes with that direct, intense, unsmiling stare straight into the lens. Character reference portrait, head and shoulders, 3:4. Handsome, athletic, about 47. His mouth keeps its slight half-smile; his eyes do not smile.",
+   "note": "6 Oct, Elena: 'ule - i like A, v2 and eyes from v1' — AI-to-AI merge, gaze only (all three images are the same AI face)"
+  },
+  "ule_m1g": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "ule_boho_a",
+    "ule_v1"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Edit the first image. Keep the man in the first image exactly as he is — same face, same tousled ash-blond hair, same open embroidered white shirt, beige tweed jacket, silver pendant and ring, same pose, light and framing. Change ONLY his eyes and gaze to match the man in the second image: the same pale, piercing blue eyes with that direct, intense, unsmiling stare straight into the lens. Character reference portrait, head and shoulders, 3:4. Handsome, athletic, about 47. His mouth keeps its slight half-smile; his eyes do not smile.",
+   "note": "6 Oct, Elena: 'ule - i like A, v2 and eyes from v1' — AI-to-AI merge, gaze only (all three images are the same AI face)"
+  },
+  "ule_m2": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule_v2",
+    "ule_v1"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Edit the first image. Keep the man in the first image exactly as he is — same face, same ash-blond hair tied back with loose strands, same grey V-neck T-shirt and thin black cord pendant, same pose, light and framing. Change ONLY his eyes and gaze to match the man in the second image: the same pale, piercing blue eyes with that direct, intense, unsmiling stare straight into the lens. Character reference portrait, head and shoulders, 3:4. Handsome, athletic, about 47.",
+   "note": "6 Oct, Elena: 'ule - i like A, v2 and eyes from v1' — AI-to-AI merge, gaze only (all three images are the same AI face)"
+  },
+  "ule_m2g": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "ule_v2",
+    "ule_v1"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Edit the first image. Keep the man in the first image exactly as he is — same face, same ash-blond hair tied back with loose strands, same grey V-neck T-shirt and thin black cord pendant, same pose, light and framing. Change ONLY his eyes and gaze to match the man in the second image: the same pale, piercing blue eyes with that direct, intense, unsmiling stare straight into the lens. Character reference portrait, head and shoulders, 3:4. Handsome, athletic, about 47.",
+   "note": "6 Oct, Elena: 'ule - i like A, v2 and eyes from v1' — AI-to-AI merge, gaze only (all three images are the same AI face) | grok: the GPT merge barely moved the eyes (close-up check), grok carried them on A"
   }
  },
  "shots": {},

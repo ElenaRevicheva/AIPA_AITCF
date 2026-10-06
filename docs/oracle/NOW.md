@@ -221,7 +221,10 @@ git log keeps the record.
   `film9_ule_versions.jpg` (now/A/B/v1-v5), plus the earlier `film9_ule_boho.jpg`/`film9_kira_words.jpg`. These are the SAME AI faces;
   traits come only from `FILM9_CHARACTER_LINES_2026-10-06.md` (235 verbatim lines from all 99 poems). Her 2016 photos show real people:
   never send them to a model and take no face/body trait from them (classifier-blocked, so do not reopen it). Only styling cues are used.
-  **Elena's move:** pick one Kira + one Ule → swap refs `img/kira.jpg`/`img/ule.jpg` (back up old) → re-run face keyframes ONLY on her go.
+  **6 Oct picks:** Kira = all except v3/v4 (proposed master `kira_words_a`; looks v1 for scenes 1/1b, v2 for 13/14/16, v5 for 2/3).
+  Ule = A + v2 + "eyes from v1" → grok merges `ule_m1g` (master) and `ule_m2g` (scenes 24-32), sheet `film9_ule_eyes.jpg`. The GPT merge
+  barely moved the eyes. Venice now $7.30 of $11.17. **Elena's move:** go/no-go on swapping refs (back up old ones) and redoing the 17 existing
+  face keyframes (~$2.26 Venice, which leaves ~$1.60 there, so motion moves to Replicate).
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
