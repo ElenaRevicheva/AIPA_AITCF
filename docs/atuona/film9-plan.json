@@ -62,7 +62,8 @@
    "vmodel": "seedream-v5-pro",
    "refs": [],
    "aspect": "16:9",
-   "prompt": "A single burnt, curled leaf suspended in pure black air, its edges glowing faintly orange like embers, lit softly from within like a lit airplane window at night; a few tiny drifting sparks; nothing else. Macro, cinematic."
+   "prompt": "Night sky over a sleeping northern city, smoky-grey March clouds: a single dry crimson-gold leaf, just torn from its branch, spirals slowly upward through the dark air, its fine veins and cells glowing from within like the lit windows of a plane taking off; far below, scattered city lights; no fire, no flames, no people. Cinematic, melancholy, weightless.",
+   "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo."
   },
   "k06": {
    "engine": "venice",
@@ -87,7 +88,8 @@
    "vmodel": "seedream-v5-pro",
    "refs": [],
    "aspect": "16:9",
-   "prompt": "Macro at night: silver fish scales scattered and glittering on wet black volcanic sand, beside a single bare human footprint slowly filling with seawater; moonlight. No people."
+   "prompt": "Macro at night: silver fish scales scattered and glittering on wet black volcanic sand, beside a single bare human footprint slowly filling with seawater; moonlight. No people.",
+   "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo."
   },
   "k09": {
    "engine": "venice",
@@ -115,7 +117,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "A small open-air restaurant on a tropical island at night, the first gust of a storm bending the palms and lifting the white tablecloths, lanterns, rain haze. the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) walks toward the camera in a sheer, floor-length green jungle-print silk gown with a deep neckline, hair swept up in a bun, a wet gleam on her shoulders. At a table behind her the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) waits in an open white linen shirt, holding an open necklace of diamonds and emeralds in his hands."
+   "prompt": "A small open-air restaurant on a tropical island at night, the first gust of a storm bending the palms and lifting the white tablecloths, lanterns, rain haze. the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) walks toward the camera in a floor-length green jungle-print silk gown, hair swept up in a bun, rain gleaming on her shoulders. At a table behind her the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) waits in a white linen shirt, holding an open necklace of diamonds and emeralds.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
   },
   "k14": {
    "engine": "venice",
@@ -135,7 +138,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "After the storm, a dark colonial room with one low warm lamp. From behind a low armchair: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) sits with her dark hair just released and falling loose down her back in a backless green jungle-print silk gown; the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stands behind her, his face lowered into her hair at the nape, eyes closed, breathing her in, his fingers fastening the clasp of a diamond-and-emerald necklace at the back of her neck. Her face in profile, eyes open, unsmiling."
+   "prompt": "After the storm, a dark colonial room with one low warm lamp: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) sits in a low armchair in a green jungle-print silk gown, her dark hair just released and falling over her shoulders; the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stands behind the chair and fastens the clasp of a diamond-and-emerald necklace at the back of her neck, his head bowed close to her hair, eyes closed. Her face in profile, eyes open, unsmiling.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
   },
   "k17a": {
    "engine": "venice",
@@ -151,7 +155,8 @@
    "vmodel": "seedream-v5-pro",
    "refs": [],
    "aspect": "16:9",
-   "prompt": "A lean, feral, flat-red dog trotting in strict side profile, painted in flat vermilion like a figure in a Gauguin painting, on a perfectly even flat bright green background for chroma key: no shadow, no ground line, full body in frame."
+   "prompt": "A single lean, feral dog painted entirely in flat vermilion red, like the red dog in a Gauguin painting, trotting in strict side profile, isolated on a perfectly even flat bright chroma-key green background: no shadow, no ground line, no room, full body in frame, nothing else in the image.",
+   "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo."
   },
   "k18": {
    "engine": "venice",
@@ -218,7 +223,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Night, close: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) raises her hand and traces one dried salt trail on the cheek of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) with a single fingertip; his eyes are closed; his white linen shirt hangs open at the chest; her face close to his in profile; crimson-tinted lamplight."
+   "prompt": "Night, close: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) touches the cheek of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) with one fingertip, following the dried trail of a tear; his eyes are closed; white linen shirt; warm crimson lamplight; quiet and tender.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
   },
   "k26": {
    "engine": "venice",
@@ -228,7 +234,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Night, locked-off close-up: moonlight through a carved wooden window screen falls across the bare chest of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) in curving abstract carved patterns of light and shadow; the hand of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) lies flat on his chest over the patterns. Only his chest, shoulder and her hand in frame."
+   "prompt": "Night, close: moonlight through a carved wooden window screen falls in curving abstract patterns of light and shadow across the face, neck and white linen shirt of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful); the hand of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) rests flat on his shirt over his heart, the patterns crossing her fingers.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
   },
   "k27": {
    "engine": "venice",
@@ -247,7 +254,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Night, close two-shot in profile: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) lays two fingers lightly across the lips of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful); their faces a breath apart; his eyes on hers; low crimson light; intimate, silent."
+   "prompt": "Night, close two-shot in profile: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) raises two fingers to the mouth of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) as if asking for silence; their faces close; he is silent, his eyes on hers; warm low light.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
   },
   "k30": {
    "engine": "venice",
@@ -257,7 +265,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Night, close: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) has her face turned into the neck of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful), her lips parted near his throat, eyes closed; his head tilted back slightly, eyes open, perfectly still; her dark hair loose over his bare shoulder; low crimson light. Intimate, not explicit."
+   "prompt": "Night, close: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) rests her forehead against the side of the neck of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful), eyes closed, as if listening; he stands still, eyes open, looking past her; her dark hair loose; warm low crimson light.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
   },
   "k32": {
    "engine": "venice",
@@ -267,7 +276,8 @@
     "ule"
    ],
    "aspect": "16:9",
-   "prompt": "Close-up: the large hand of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) presses the palm of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) flat against his own throat; her fingers spread over his pulse; his face partly in frame, eyes on her; low crimson light."
+   "prompt": "Close-up: the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) takes the hand of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) and holds her palm against the side of his neck, where his pulse is; tender and still; his eyes on her; warm low light.",
+   "note": "rephrased 6 Oct after a GPT Image 2.5 refusal of the first wording; same engine, implied register"
   },
   "k34": {
    "engine": "venice",
@@ -293,8 +303,42 @@
    "vmodel": "seedream-v5-pro",
    "refs": [],
    "aspect": "16:9",
-   "prompt": "Black volcanic sand at lilac dawn, seen from directly above: a thin sheet of white foam spreads over the black sand and is drawing back, the sand dark and wet beneath. No people, no footprints."
+   "prompt": "Seen from directly above at lilac dawn: empty black volcanic sand with a thin sheet of white sea foam spreading over it and drawing back, the wet sand gleaming dark beneath. Only sand and foam — completely empty, no people, no footprints, no objects.",
+   "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo."
+  },
+  "k16m": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Macro after a storm, one low warm lamp: a man's tanned hands fasten the clasp of a diamond-and-emerald necklace at the nape of a woman's neck; her dark hair has just been released and falls loose to one side; fine hairs at her nape, real skin with pores; no faces in frame.",
+   "note": "redesign 6 Oct: GPT Image 2.5 refused the two-face version twice; hands-and-skin macro, no refs"
+  },
+  "k25m": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Macro at night in crimson lamplight: a woman's fingertip touches a man's tanned cheek exactly where a tear has dried into a thin white trail of salt; golden stubble at the edge of frame; no eyes, no full face in frame.",
+   "note": "redesign 6 Oct: GPT Image 2.5 refused the two-face version twice; hands-and-skin macro, no refs"
+  },
+  "k28m": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Macro at night in low crimson light: two of a woman's fingers rest lightly across a man's closed lips; golden stubble, real skin texture, the faint warmth of breath; no eyes in frame.",
+   "note": "redesign 6 Oct: GPT Image 2.5 refused the two-face version twice; hands-and-skin macro, no refs"
+  },
+  "k32m": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Macro in low crimson light: a man's large tanned hand holds a woman's pale palm flat against the side of his neck, her fingers spread over his pulse; real skin with pores; no faces in frame.",
+   "note": "redesign 6 Oct: GPT Image 2.5 refused the two-face version twice; hands-and-skin macro, no refs"
   }
  },
- "shots": {}
+ "shots": {},
+ "plate_look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo."
 }

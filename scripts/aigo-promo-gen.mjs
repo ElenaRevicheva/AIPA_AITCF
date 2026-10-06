@@ -186,12 +186,16 @@ async function veniceImage(id, spec) {
   const priceFn = VENICE_IMAGE[modelId]; if (!priceFn) throw new Error('no Venice price for ' + modelId);
   const usd = priceFn(refs.length), engine = `venice:${modelId}`;
   guard(usd, `image ${id} on ${engine}`, 'venice');
-  const prompt = [spec.prompt, PLAN.look].filter(Boolean).join('\n\n');
+  // spec.look: undefined -> PLAN.look; a string -> that look (e.g. the no-people plate look); false -> none
+  const prompt = [spec.prompt, spec.look === undefined ? PLAN.look : spec.look].filter(Boolean).join('\n\n');
   const b64 = r => fs.readFileSync(path.join(BASE, 'img', r.endsWith('.jpg') || r.endsWith('.png') ? r : `${r}.jpg`)).toString('base64');
   const [W, H] = (spec.aspect || '16:9') === '16:9' ? [1920, 1080] : (spec.aspect === '3:4' ? [1152, 1536] : [1536, 1536]);
   const body = refs.length
     ? { modelId, images: refs.map(b64), prompt, aspect_ratio: spec.aspect || '16:9', resolution: '2K', safe_mode: false, output_format: 'jpeg' }
-    : { model: modelId, prompt, width: W, height: H, safe_mode: false, hide_watermark: true, format: 'jpeg',
+    : { model: modelId, prompt, safe_mode: false, hide_watermark: true, format: 'jpeg',
+        // resolution-tier models (seedream, qwen-image-3, nano, gpt) take aspect_ratio + resolution; width/height caps at 1280
+        ...(/^(seedream|qwen-image|nano|gpt-image|grok-imagine|flux-3)/.test(modelId)
+          ? { aspect_ratio: spec.aspect || '16:9', resolution: '2K' } : { width: W, height: H }),
         ...(spec.negative !== false ? { negative_prompt: PLAN.negative } : {}) };
   const f = path.join(BASE, 'raw', `img_${id}__venice.request.json`); fs.writeFileSync(f, JSON.stringify(body));
   const dest = path.join(BASE, 'img', `${id}.jpg`);
