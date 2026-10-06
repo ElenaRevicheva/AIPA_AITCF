@@ -290,8 +290,12 @@ git log keeps the record.
   Wan 2.7 1080p REFUSED by its output content filter (final, never re-routed; Wan was the plan's main Kira engine);
   Kling pro 5 s OK ($1.12); Hailuo 2.3 1080p 6 s OK ($0.56). Both hold face + dress; sheet `film9_s13_engine_test.jpg`.
   `gen.mjs` gained a `wan1080` engine (backup `gen.mjs.bak-pre-wan1080`). Ledger $19.88 of the $30 cap.
-  **BLOCKED on money (Elena's move):** whole film on Hailuo ≈ $28 with rework; room under the cap $10.12; Replicate
-  prepaid ~$7.4 left. She must top up Replicate and raise the cap before Gate 4. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
+  **Elena: 'highest quality, super realistic only — why lowest price?'** → never choose an engine on price. Top-tier
+  bake-off on s13: Veo 3.1 FLAGGED (E005), Sora 2 Pro failed with an empty API error (treated as refusal, not retried),
+  Luma Ray 3.2 OK ($1.20) but her face drifts by the end. **Winner = Kling v3 omni PRO** (face holds, sharpest, real dolly).
+  Sheet `film9_s13_engine_test.jpg` (kling / luma / hailuo rows). Ledger $21.08 of the $30 cap.
+  **BLOCKED on money (Elena's move):** whole film on Kling pro ≈ $50 clean, ~$67 with re-takes; she tops up Replicate
+  (~$70) and raises the cap (suggest $100) before Gate 4. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
   Nano drifts night to dusk, and 'blue-black' gives navy hair (say 'true black, never blue'). Plain prompts only: a refusal is final, no wording to beat the filter.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 

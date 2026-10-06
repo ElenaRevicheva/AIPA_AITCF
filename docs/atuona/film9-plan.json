@@ -768,10 +768,16 @@
    "expand": false,
    "duration": 5,
    "duration_by_engine": {
-    "hailuo": 6
+    "hailuo": 6,
+    "veo31": 6,
+    "sora": 8,
+    "luma": 5
    },
    "motion": "She walks slowly and steadily toward the camera between the tables, unhurried, eyes on the lens; the storm wind lifts the sheer jungle-print chiffon of her dress and the long sleeves stream sideways; the white tablecloths flap; the lanterns swing and flicker; light rain. The man at the table on the right stays seated, looking at her, the open jewellery box in his hands. Camera dollies back slowly at her walking pace, one continuous take, no cuts.",
-   "note": "6 Oct engine test (Gate 3) on Elena-approved k13 (dusk take): wan1080 / kling pro / hailuo"
+   "note": "6 Oct engine test (Gate 3) on Elena-approved k13 (dusk take): wan1080 / kling pro / hailuo | 6 Oct Elena: highest quality only, never pick on price -> top-tier bake-off veo31 / sora / luma vs kling pro",
+   "start_by_engine": {
+    "sora": "k13_sora"
+   }
   }
  },
  "plate_look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo.",
