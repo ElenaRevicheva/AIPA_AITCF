@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 06 Oct 15:35 | Stage Puente Founder's Associate job deal + apply kit + ChatGPT-structure CV v2 (Elena's go) | HubSpot (new deal), Oracle `hs-fill-apply-kit.cjs --only` run, docs/applications/ | 9213236 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### 🎯 6 Oct — Puente "Founder's Associate" #2679 STAGED + kit complete · Elena's move: apply (resume only)
+- `[HIRING-MANUAL] Founder's Associate @ Puente Talent Partners`, 🔥 I act TODAY. Evaluation said SKIP (3/3 judges: $1,800–2,600 < her $3,000 floor;
+  e-commerce now *required*; same role was $3,000–4,000 in July) — **Elena chose to apply**. `docs/applications/2026-10-06_puente_founders_associate_EVALUATED.md`.
+- **Resume:** `docs/applications/cv-by-job/puente-founders-associate/` — ChatGPT structure + verified facts + her OmniBazaar facts (6 Oct, her words) +
+  links to every live product and the Professional Outlook PDF (19 links, all 200). 3 reviewers (fact-trace / recruiter / skeptic) → fixes applied.
+  On the 📌 🛡️ ✅ notes; HubSpot file md5 = local `2ba959d8…`. Audit on Oracle: `complete 5 · gaps 0`, Puente row ✓ in all 6 columns.
+- Kit notes corrected by hand (backup in session scratchpad): the generated letter claimed "built hiring processes" (false); 🎯 Q2 dodged e-commerce;
+  🛡️/🎯 said "vendor coordination, cost and performance reporting" — not in her own E-GOV words. **defense-bank.json `client` still says it → ask Elena.**
+- Form: LinkedIn + salary expectation (dropdown, required — her call vs the $2,600 top) · Current Salary optional (leave blank) · no letter field · then 3 videos.
+- Same board, at/above floor (read in full): AI Operations Lead #2660 ($3,000–4,000) · Chief of Staff #2663 ($3,500–5,000). Not staged — her call.
 
 ### 🚨 5 Oct — PRIVACY: AIPA_AITCF (= cto-aipa) is a PUBLIC GitHub repo and docs/selling/ is world-readable · Elena decides
 - Verified 5 Oct: GitHub API `private:false`; raw URLs return 200 for docs/selling/outreach-registry.json, drafts, and
