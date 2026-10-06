@@ -540,8 +540,51 @@
    "look": false,
    "prompt": "Edit the first image. Keep the man in the first image exactly as he is — same face, same ash-blond hair tied back with loose strands, same grey V-neck T-shirt and thin black cord pendant, same pose, light and framing. Change ONLY his eyes and gaze to match the man in the second image: the same pale, piercing blue eyes with that direct, intense, unsmiling stare straight into the lens. Character reference portrait, head and shoulders, 3:4. Handsome, athletic, about 47.",
    "note": "6 Oct, Elena: 'ule - i like A, v2 and eyes from v1' — AI-to-AI merge, gaze only (all three images are the same AI face) | grok: the GPT merge barely moved the eyes (close-up check), grok carried them on A"
+  },
+  "bR_k13_nano": {
+   "engine": "nano",
+   "refs": [
+    "kira_v2",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "A small open-air restaurant on a tropical island at night, the first gust of a storm bending the palms and lifting the white tablecloths, lanterns, rain haze. the woman from the first reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) walks toward the camera in a floor-length green jungle-print silk gown, hair swept up in a bun, rain gleaming on her shoulders. At a table behind her the man from the second reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful) waits in a white linen shirt, holding an open necklace of diamonds and emeralds. Her throat is bare: no necklace, no jewellery yet.",
+   "look": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo.",
+   "note": "6 Oct realism bake-off: Elena rejected k13 as 'generic, like painted, not human-realistic'; same prompt, Replicate nano, real_look"
+  },
+  "bR_k13_flux": {
+   "engine": "flux",
+   "refs": [
+    "kira_v2",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "A small open-air restaurant on a tropical island at night, the first gust of a storm bending the palms and lifting the white tablecloths, lanterns, rain haze. the woman from the first reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) walks toward the camera in a floor-length green jungle-print silk gown, hair swept up in a bun, rain gleaming on her shoulders. At a table behind her the man from the second reference image (same face, tanned, ash-blond hair tied back loosely with strands escaping, golden stubble, piercing pale blue eyes, about 47, devilishly beautiful) waits in a white linen shirt, holding an open necklace of diamonds and emeralds. Her throat is bare: no necklace, no jewellery yet.",
+   "look": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo.",
+   "note": "6 Oct realism bake-off: Elena rejected k13 as 'generic, like painted, not human-realistic'; same prompt, Replicate flux, real_look"
+  },
+  "bR_k17a_nano": {
+   "engine": "nano",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Hard white noon on a black volcanic sand beach on a tropical island: the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands barefoot in a simple black linen dress, looking down to her right; the harsh overhead sun throws a short black shadow under her; palms and a dark rock throw black shadows; dense jungle and a volcanic ridge behind; heat haze. Leave empty sand to her right.",
+   "look": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo.",
+   "note": "6 Oct realism bake-off: Elena rejected k17a as 'generic, like painted, not human-realistic'; same prompt, Replicate nano, real_look"
+  },
+  "bR_k17a_flux": {
+   "engine": "flux",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Hard white noon on a black volcanic sand beach on a tropical island: the woman from the reference image (same face, grey-green eyes, wavy blue-black hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands barefoot in a simple black linen dress, looking down to her right; the harsh overhead sun throws a short black shadow under her; palms and a dark rock throw black shadows; dense jungle and a volcanic ridge behind; heat haze. Leave empty sand to her right.",
+   "look": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo.",
+   "note": "6 Oct realism bake-off: Elena rejected k17a as 'generic, like painted, not human-realistic'; same prompt, Replicate flux, real_look"
   }
  },
  "shots": {},
- "plate_look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo."
+ "plate_look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro, deep blacks, humid tropical air, luxurious underground arthouse cinema. No people, no human figures, no body parts, no text, no letters, no watermark, no logo.",
+ "real_look": "An unretouched photograph of real people, as if shot on a Leica SL2 with a 50mm Summilux at f/1.4 on Kodak Vision3 500T film: real human skin with visible pores, fine lines, small imperfections and natural asymmetry; skin is matte and dry unless the scene says it is wet; true-to-life colour; only practical light sources; shallow depth of field; real film grain. Not a painting, not an illustration, not CGI: no glow, no bloom, no HDR, no airbrushing, no beauty retouching, no glossy sheen. Luxurious, sensual underground arthouse cinema, low-key chiaroscuro. No text, no watermark, no logo."
 }

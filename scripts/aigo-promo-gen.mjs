@@ -225,7 +225,7 @@ async function image(id) {
   guard(price, `image ${id} on ${engineId}`);
   const refs = [];
   for (const r of spec.refs || []) refs.push(await resolveImg(r));
-  const prompt = [spec.prompt, PLAN.look].filter(Boolean).join('\n\n');
+  const prompt = [spec.prompt, spec.look === undefined ? PLAN.look : spec.look].filter(Boolean).join('\n\n');   // same spec.look rule as veniceImage
   const p = await predict(model, eng.input(prompt, spec.aspect || '16:9', refs), `img_${id}`);
   const e = { kind: 'image', id, engine: engineId, model, status: p.status, usd: p.status === 'succeeded' ? price : 0, error: p.error || null, prediction: p.id };
   record(e);
