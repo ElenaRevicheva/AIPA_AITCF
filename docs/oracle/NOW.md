@@ -140,7 +140,7 @@ git log keeps the record.
 
 ### ✅ 6 Oct — Telegram noise cut (Elena: "garbage can") · `952faca`, DEPLOYED 20:57 UTC
 - **DONE:** one morning message, now **8:00 Panama**: the cron said 13:00 under America/Panama, so the "Good morning" arrived at 1 PM. It shows
-  Trello due within 3 days plus anything overdue 30 days or less, boards with nothing are left out, and old overdue cards become one count line.
+  Trello **today + next 3 days only** (Elena, `a2af40c`: no overdue, no overdue count), boards with nothing are left out.
   Monday's digest keeps the full view. Self-test card is posted silently and deleted once delivered. Quiet repos are announced once per
   quiet spell (`data/stale-repos-announced.json`; the first run records the current state without announcing). Fresh-leads cron and
   Phase 4 outreach post to Telegram only on failure.
