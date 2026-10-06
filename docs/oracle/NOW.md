@@ -233,14 +233,14 @@ git log keeps the record.
   (`FILM9_ATUONA_SCENARIO_v3_2026-10-06.md`, 5-critic rebuild); Oracle `~/atuona-film9/` — 31 keyframes, contact sheet
   `docs/atuona/film9_contact_v2.jpg`; spend Venice $4.75 of $11.17, Replicate $0 of $9.89 (ledger `~/atuona-film9/ledger.jsonl`).
   She did NOT approve the keyframes ("no") — reason not given yet. NEXT: wait for her; no motion, no spend until she says.
-  **Character versions (6 Oct, Venice now $6.76 of $11.17):** sheets `film9_kira_versions.jpg` (now/A/v1-v5) and
-  `film9_ule_versions.jpg` (now/A/B/v1-v5), plus the earlier `film9_ule_boho.jpg`/`film9_kira_words.jpg`. These are the SAME AI faces;
-  traits come only from `FILM9_CHARACTER_LINES_2026-10-06.md` (235 verbatim lines from all 99 poems). Her 2016 photos show real people:
-  never send them to a model and take no face/body trait from them (classifier-blocked, so do not reopen it). Only styling cues are used.
-  **6 Oct picks:** Kira = all except v3/v4 (proposed master `kira_words_a`; looks v1 for scenes 1/1b, v2 for 13/14/16, v5 for 2/3).
-  **Ule = `ule_m2g` (v2 + v1's eyes), Elena's final pick.** It is now Oracle `img/ule.jpg` (old ref backed up as
-  `img/ule_ref_pre_1006.jpg`). The GPT merge barely moved the eyes; the grok one carried them. Venice now $7.30 of $11.17. **Elena's move:** go/no-go on swapping refs (back up old ones) and redoing the 17 existing
-  face keyframes (~$2.26 Venice, which leaves ~$1.60 there, so motion moves to Replicate).
+  **Cast LOCKED 6 Oct (Elena):** Kira = `kira_words_a` (blue-black curls), with her looks `kira_v1` (Armani: k01b, k02) and
+  `kira_v2` (jungle silk + emeralds: k13, k14). Ule = `ule_m2g` (v2 + v1's eyes). Oracle `img/kira.jpg`/`img/ule.jpg`; old refs are `*_ref_pre_1006.jpg`.
+  Traits come only from `FILM9_CHARACTER_LINES_2026-10-06.md` (235 verbatim lines). Her 2016 photos show real people: never send them to a model
+  and take no face/body trait from them (classifier-blocked, so do not reopen it).
+  **Keyframes redone 6 Oct with her go:** 17 face frames → sheet `docs/atuona/film9_contact_v4.jpg`. Full-res QA (8 agents) → 6 rerolls on the
+  same engine; k07 was refused twice, so its existing frame's hair was recoloured in post. Old frames are in `img/pre_1006/` and `img/qa1_1006/`.
+  **Venice $10.14 of $11.17, so ~$1.03 left; motion must go on Replicate ($9.89).** Grok reads "blue-black" as BLUE hair: write "glossy jet-black".
+  k09/k27 have baked letterbox bars: crop at compile. **Elena's move:** approve `film9_contact_v4.jpg` → then a motion plan on Replicate (her go).
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
