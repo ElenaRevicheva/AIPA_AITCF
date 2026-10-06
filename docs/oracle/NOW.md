@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-06 20:50 | Telegram noise cleanup (Elena approved 4 items) | src/concierge.ts, src/telegram-bot.ts, src/board-briefing.ts, src/outreach.ts, PM2 cto-aipa | 246c29e |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
