@@ -711,6 +711,53 @@
    "look": false,
    "prompt": "Keep the image exactly as it is: same woman, face, eyes, long black wavy hair; same jungle-print chiffon gown, deep V, sheer sleeves, gold brooch and slit; same pose, restaurant, lanterns, storm and light. Only adjust the tailoring of the bodice. Give the gown a shapelier, fuller, more lifted bustline and a cinched waist, so the printed fabric has natural volume and soft shadow rather than lying flat against the chest. A classic red-carpet evening-gown fit, elegant and confident. The fabric stays fully covering and the neckline is unchanged.",
    "note": "6 Oct, Elena: 'I like Kira now and dress now but breasts should be better shaped and look more sexy'. Plain, honest edit wording (the moderation-gaming 'garment not body' framing was dropped); one attempt each, a refusal is final on this engine"
+  },
+  "kira_jungle_i": {
+   "engine": "venice",
+   "vmodel": "nano-banana-pro-edit",
+   "refs": [
+    "kira_jungle_g",
+    "kira"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Edit the first image. Keep it exactly as it is: the long black wavy windblown hair, the jungle-print chiffon gown with its deep V, the reshaped bodice, sheer sleeves, gold brooch and slit, the pose, the restaurant, the lanterns, the lightning and the stormy night sky. Change only her face: give her exactly the face of the woman in the second image, the same person: her face shape, her grey-green eyes with that heavy, intense, unblinking gaze, her strong brows, her nose, her full lips, her freckles and real skin texture, the faint pale hairline scar through her left eyebrow. Same head angle as the first image, calm and unsmiling. A light mist of rain on her skin. Real unretouched photograph.",
+   "note": "6 Oct, Elena: 'bodice reshaped fine and stormy night is good but we need this Kira face' (= Kira-now, img/kira.jpg = kira_words_a). AI-to-AI face match"
+  },
+  "kira_jungle_j": {
+   "engine": "venice",
+   "vmodel": "nano-banana-pro-edit",
+   "refs": [
+    "kira",
+    "kira_jungle_g"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "The woman from the first image, exactly her: her face, her grey-green eyes with that heavy-lidded, intense, unblinking gaze, her strong dark brows, her full lips, her freckles across her nose and cheeks, her real skin texture, the faint pale hairline scar through her left eyebrow. Put her into the second image's scene and outfit, matching it exactly: full-length, walking toward the camera through the small open-air restaurant in the storm, the same jungle-print sheer chiffon gown with its deep V and its fitted, shaped bodice, sheer sleeves, gold brooch and thigh-high slit, her long black wavy hair blowing in the wind, lanterns, lightning, the dark stormy night sky, rain. Her face must be the first image's face, not the second image's. Calm and unsmiling. Real unretouched photograph.",
+   "note": "6 Oct: the face edit on fit-1 was a silent no-op (face unchanged); retried with Kira-now FIRST so nano anchors identity on her"
+  },
+  "kira_jungle_k": {
+   "engine": "venice",
+   "vmodel": "nano-banana-pro-edit",
+   "refs": [
+    "kira_jungle_d"
+   ],
+   "aspect": "3:4",
+   "look": false,
+   "prompt": "Edit this photo and keep everything identical: the same woman, face, eyes, long black wavy windblown hair; the same jungle-print chiffon gown with its deep V, sheer sleeves, gold brooch and slit; the same pose, restaurant, lanterns, lightning and the light on her. Change only the fit of the bodice. Right now the fabric lies flat. Re-tailor it so the two printed panels curve forward over a fuller, rounder, naturally lifted bust, with soft shading under each curve, and the chiffon drapes smoothly into a cinched waist at the brooch. A real woman's figure, confident red-carpet glamour. The panels stay fully covering, and the V shows no more skin than it does now. Deepen the sky to a dark stormy night.",
+   "note": "6 Oct, Elena: 'dress is better here on both images' (dress-now/dress-2 = the airier sheer chiffon) -> fit-1 wording (bodice + stormy night) on dress-2"
+  },
+  "kira_head_fix": {
+   "engine": "venice",
+   "vmodel": "nano-banana-pro-edit",
+   "refs": [
+    "k_head",
+    "kira"
+   ],
+   "aspect": "1:1",
+   "look": false,
+   "prompt": "Edit the first image. Replace only the woman's face with exactly the face of the woman in the second image, the same person: her face shape, her grey-green heavy-lidded eyes and intense, unblinking gaze, her strong dark brows, her nose, her full lips, her freckles and real skin texture, the faint pale hairline scar through her left eyebrow. Keep everything else in the first image exactly as it is: the long black wavy windblown hair, the head position and angle, the size of the head in the frame, the stormy evening light on her, the background, the neckline of the dress. Calm, unsmiling. A light mist of rain on her skin. Real unretouched photograph.",
+   "note": "6 Oct, Elena: 'Kira now target is the target. This exact face'. Head-crop face match (face large in frame), pasted back into kira_jungle_k with a feathered mask"
   }
  },
  "shots": {},

@@ -274,11 +274,12 @@ git log keeps the record.
   **Elena kept 7: k06 k20 k20b k24 k26 k27 k36.** The other 10 were redone on Venice `nano-banana-pro-edit` with `real_look_2` (realism
   bake-off winner), and full-res QA → 5 same-engine rerolls. k17a/k34 navy hair was hue-graded (ungraded originals kept); k07 → `k07m`, a no-ref
   macro. Sheet `film9_contact_v5.jpg`. THAT dress = `kira_jungle_a`; Elena: "dress is super, faces good".
-  **Elena 6 Oct, open:** reshape the dress fit (couture plunge, #058 'devastating', #078 'human beautiful'); Kira's hair longer, thicker, only
-  softly wavy (#086 'wavy … cascading loose'); Kira's eyes from the text (#086/#061/#063/#065: silent, unblinking, sees through). → new Kira
-  portrait + dress look, then ASK whether it applies to all Kira frames (including the 5 she approved) or only the dress scenes.
-  Venice ~$14.2 left of the $18.05 read via API, Replicate $9.11. Nano drifts night to dusk (say 'pitch-black sky'), and 'blue-black' gives navy hair
-  on every engine (say 'true black, never blue').
+  **Kira's face = `img/kira.jpg` (Kira-now) everywhere. Elena: 'this exact face'.** The new-hair portraits (`kira_ref_v3*`) drifted, so they are
+  NOT the face. Dress look → `img/kira_jungle_final.jpg`: her preferred airy dress-2 (`kira_jungle_d`) + fit-1 bodice reshape + storm
+  (`kira_jungle_k`) + the Kira-now face via a head-crop nano edit (`kira_head_fix`) blended back locally (brightness-matched, inner-face mask).
+  Full-frame face edits on nano were SILENT NO-OPS twice (face unchanged): edit the face only where it is large in the frame.
+  **Elena's move:** OK the dress frame → redo k13/k14 with it as Kira's ref. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
+  Nano drifts night to dusk, and 'blue-black' gives navy hair (say 'true black, never blue'). Plain prompts only: a refusal is final, no wording to beat the filter.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
