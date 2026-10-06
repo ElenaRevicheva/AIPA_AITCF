@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code (laptop) | 2026-10-06T10:17 | Clear Oracle cto-aipa rebase jam (since 7 Sep), Elena go — git refs only, no working-tree change | Oracle ~/cto-aipa/.git (HEAD, main ref, rebase-merge) | 59e1ae2 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
