@@ -508,10 +508,6 @@ const KNOWN_LIST_KEYS: ListTarget[] = [
   'just_for_today', 'todo_flow', 'in_process_me', 'in_process_them',
   'not_sure', 'dated', 'rules', 'done',
 ];
-const ALL_MONTHS = [
-  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
-];
 
 /**
  * Resolve the destination board for a MOVE. Handles (in order):
@@ -521,18 +517,54 @@ const ALL_MONTHS = [
  *  3. BOARD_KEYWORDS match
  *  4. best word-overlap (most matching words wins — "kira agosto" beats "kira julio")
  */
-function resolveMoveDestBoard(boards: TrelloBoard[], targetBoard: string): TrelloBoard | undefined {
+/**
+ * The Spanish month a spoken board name refers to, however it was transcribed.
+ *
+ * She SAYS the Spanish name, but Whisper writes what it hears in whichever
+ * alphabet the rest of the sentence is in. "Поставь задачу в Kira октубре"
+ * produced the hint "Kira октубре": no Spanish month matched, the word-overlap
+ * fallback scored every board on "kira" alone, and the first one -- the FINANCE
+ * board -- won. The classifier had even reasoned "October 2026". Found 6 Oct 2026.
+ * Covers Spanish heard in Cyrillic, Russian month names, and English.
+ */
+const MONTH_STEMS: [RegExp, string][] = [
+  [/enero|энер|январ|janu/, 'enero'],
+  [/febrer|феврер|фебрер|феврал|febru/, 'febrero'],
+  [/marzo|марсо|марзо|март|march/, 'marzo'],
+  [/abril|абрил|апрел|april/, 'abril'],
+  [/mayo|майо|мая|(?:^|\s)май(?:\s|$)|\bmay\b/, 'mayo'],
+  [/junio|хунио|июн|\bjune\b/, 'junio'],
+  [/julio|хулио|июл|\bjuly\b/, 'julio'],
+  [/agosto|агост|август|august/, 'agosto'],
+  [/septiembre|setiembre|сеп?т[ьи]?[еэ]мбр|сентябр|septem/, 'septiembre'],
+  [/octubre|октубр|октябр|octob/, 'octubre'],
+  [/noviembre|новиембр|новембр|ноябр|novem/, 'noviembre'],
+  [/diciembre|дисиембр|дисьембр|декабр|decem/, 'diciembre'],
+];
+
+export function spokenMonth(text: string): string | undefined {
+  const t = text.toLowerCase();
+  return MONTH_STEMS.find(([re]) => re.test(t))?.[1];
+}
+
+// Every one of her boards starts with "Kira", so the word carries no signal.
+// Scoring on it is what sent an October task to "Kira ФИН Дисциплина".
+const UNINFORMATIVE_BOARD_WORDS = new Set(['kira', 'кира', 'board', 'доска', 'tablero']);
+
+export function resolveMoveDestBoard(boards: TrelloBoard[], targetBoard: string): TrelloBoard | undefined {
   const tb = targetBoard.toLowerCase().trim();
   if (KNOWN_BOARD_KEYS.includes(tb as BoardTarget)) return resolveBoard(boards, tb as BoardTarget);
 
-  const month = ALL_MONTHS.find((m) => tb.includes(m));
+  const month = spokenMonth(tb);
   if (month) {
     const yr = (tb.match(/20\d\d/) || [])[0];
     const hit = boards.find((b) => {
       const n = b.name.toLowerCase();
       return n.includes(month) && n.includes('kira') && (!yr || n.includes(yr));
     });
-    if (hit) return hit;
+    // She named a month. Its board or nothing -- never "some other Kira board".
+    // undefined lets the caller fall back to the classifier's enum routing.
+    return hit;
   }
 
   for (const key of KNOWN_BOARD_KEYS) {
@@ -542,7 +574,7 @@ function resolveMoveDestBoard(boards: TrelloBoard[], targetBoard: string): Trell
     }
   }
 
-  const hint = tb.split(/\s+/).filter((w) => w.length > 2);
+  const hint = tb.split(/\s+/).filter((w) => w.length > 2 && !UNINFORMATIVE_BOARD_WORDS.has(w));
   let best: TrelloBoard | undefined;
   let bestScore = 0;
   for (const b of boards) {
@@ -784,7 +816,7 @@ Return JSON exactly like this (no markdown, no backticks, raw JSON only):
   "urgency": "urgent_today|soon|dated|not_sure|done",
   "boardTarget": "kira_current_month|kira_future|vibejob|aldeazz|espaluz|algom|kira_habits|kira_finance",
   "listTarget": "just_for_today|todo_flow|in_process_me|in_process_them|not_sure|dated|rules|done",
-  "boardNameHint": "EXACT board the user named out loud (e.g. \"Kira Septiembre\"), else null",
+  "boardNameHint": "board the user named out loud, written as its REAL name in Latin letters (\"Kira октубре\"/\"Кира октябрь\" → \"Kira Octubre\"), else null",
   "listNameHint": "EXACT column the user named out loud (e.g. \"Cita\", \"Датировано\", \"Надо сделать\"), else null",
   "labelColor": "red|orange|purple|green|lime",
   "dueDate": "2026-05-31",
@@ -875,7 +907,9 @@ async function downloadTelegramVoice(fileId: string, botToken: string): Promise<
  * original error because they look deliberate.
  */
 const HEARD_AS: [RegExp, string][] = [
-  [/\bS[T7]O\s+AP+A\b/gi, "CTO AIPA"],
+  // "STO APA" (2 Sep 2026), "STO AIPA" (6 Oct 2026). Whisper hears the C as S.
+  [/\bS[T7]O\s+A[IY]?P+A\b/gi, "CTO AIPA"],
+  [/(^|\s)СТО\s+(?:AIPA|АИПА|АЙПА)(?=\s|$|[.,!?])/gi, "$1CTO AIPA"],
   [/\bC\.?T\.?O\.?\s+A\.?I\.?P\.?A\.?\b/gi, "CTO AIPA"],
   [/\bC[MN]O\s+AP+A\b/gi, "CMO AIPA"],
   [/\b(?:ideas|idears|aideas)\b/gi, "AIdeazz"],
