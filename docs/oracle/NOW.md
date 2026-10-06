@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 06 Oct 17:09 | VJH delivery fix + Outlook targeting + Puente source (Elena's go 6 Oct) — diagnosis `docs/oracle/2026-10-06_vjh_no_delivery_diagnosis.md` | VJH `job_monitor.py`, `serpapi_jobs_ingest.py`, `target_lanes.py`, `llm_judge.py`, `founder_finder_v2.py`; cto-aipa `hubspot-client.ts`; restarts vibejobhunter + serpapi-jobs + cto-aipa | 6154277 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,23 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 6 Oct — VJH DELIVERING AGAIN (Elena's go) · diagnosis `docs/oracle/2026-10-06_vjh_no_delivery_diagnosis.md`
+- **DONE:** VJH `83d8d04` (git pull on Oracle; vibejobhunter + serpapi-jobs restarted 18:19:42 UTC, newer than files) · cto-aipa `6edbd06`
+  (dist/hubspot-client.js + dist/cto-aipa.js scp'd, md5 fa217650… / 7a68bac2…; `pm2 restart cto-aipa` 18:36:13; backups `~/_session-backups/vjh-fix-20261006/`).
+  Fixes: blank company (Lever path) → silent 400; "I Act TODAY" only for a NEW deal; decided deals left alone (no note/letter); seen cache by age;
+  Bright Data retry; Outlook titles in lanes + searches (4 zero-yield paid queries swapped, still 18); AI-evaluation lane DROPPED (Elena);
+  judge: all lanes equal + Outlook good/not-fit; outreach 'str' crash → lead; httpx token leak; NEW source **Puente** (53 jobs/cycle).
+- **VERIFIED BY:** HubSpot — 8 new qualifiedtobuy deals 18:21–18:23 UTC (first since 3 Oct 13:09): Puente ×5 (Impl/Solutions Consultant, TAM,
+  Chief of Staff, RevOps Mgr, PM), Addepto AI Solution Architect, Somnio Head of Innovation, Wellhub AI Ops Sr Mgr. Replay of closed HireLATAM →
+  `{duplicate:true, decided:true, stage:closedlost}` + log "already decided — left alone". Evals on Oracle 862 passed. Journal "❌ Torre.ai: 0 jobs — 3/3 failed".
+- **NEXT (Elena):** Torre — refuses all outside requests since 2 Oct 02:56 UTC (serves only its own client; ToS forbids scraping) → NOT
+  circumvented. Her options: ask Torre for partner/API access · subscribe to Torre job alerts · drop it. Also: Addi (moved back to I act TODAY) +
+  Shortical AI Filmmaker (staged, pay unknown) have full kits.
+- **RISK / open:** Remotive free API = 18 delayed jobs total (near-empty). Judge proof on REAL postings still owed (A/B was synthetic). Airtm
+  vetoed by the judge this run ("hands-on coding"), DEUNA not re-found yet. Boardy intro emails still filed as `[HIRING-VJH-LEAD]` (not fixed).
+  Puente AI Ops Lead / Founder's Associate / FDE are skipped on purpose: Elena listed them as already applied (`scripts/applied_jobs.tsv`, 5 Aug).
+  `CONCIERGE_TEST_EMAILS` now lives ONLY in .env (laptop + Oracle) — a fresh checkout without it treats no inbox as a test inbox.
 
 ### 🎯 6 Oct — Puente **AI Operations Lead #2660** staged + full kit · Elena's move: apply today
 - Deal `[HIRING-MANUAL] AI Operations Lead @ Puente Talent Partners` (🔥 I act TODAY). Audit on Oracle: `✓LINK ✓L ✓CV ✓D ✓R ✓C`, 7 deals complete · gaps 0.
