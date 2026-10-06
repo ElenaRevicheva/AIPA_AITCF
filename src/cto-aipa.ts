@@ -2649,13 +2649,19 @@ async function startCTOAIPA() {
       } = await import('./hubspot-client');
 
       let result: { contactId: string | null; companyId: string | null; dealId: string | null } | null = null;
+      // 2026-10-06 — hiring only: did this job make a NEW card, or match a deal
+      // Elena already has — and has she decided it? VJH logged "I Act TODAY" on
+      // every 200 (26 lines since 29 Sep, 2 real deals); these let it tell apart a
+      // new deal, an open repeat and a tombstone (HireLATAM: closed lost once,
+      // re-sighted 11 times).
+      let hiringDedup: { duplicate: boolean; decided?: boolean; stage?: string } | null = null;
 
       if (pipeline === 'hiring') {
         if (!jobTitle || !company) {
           res.status(400).json({ error: 'jobTitle and company required for hiring pipeline' });
           return;
         }
-        result = await pushHiringDealToHubSpot({
+        const hiring = await pushHiringDealToHubSpot({
           jobTitle,
           company,
           domain,
@@ -2680,6 +2686,16 @@ async function startCTOAIPA() {
             atlas_concept_id: atlas_concept_id ?? null,
           },
         });
+        // 2026-10-06 — no deal id means nothing reached her board: createDeal
+        // returns null on any non-2xx, and the push still answered
+        // {dealId:null, duplicate:false}, which VJH read as "I Act TODAY" and this
+        // handler logged as verified_delivered. Treat it as no HubSpot result.
+        result = hiring?.dealId ? hiring : null;
+        if (result && hiring) {
+          hiringDedup = hiring.duplicate
+            ? { duplicate: true, decided: hiring.decided ?? false, stage: hiring.stage ?? '' }
+            : { duplicate: false };
+        }
 
       } else if (source === 'espaluz_influencer') {
         // [ESPALUZ] Influencer post — date only. Non-[ESPALUZ] names (e.g. CLIENT marketing
@@ -2903,9 +2919,11 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
       }
 
       // Log to Oracle regardless of HubSpot outcome
+      // 2026-10-06 — hiring rows carry duplicate/decided/stage in outcome_detail, so
+      // the audit can tell a new card from a repeat of a job she already closed.
       await saveAgentOutcome(source || 'unknown', type || 'crm_event', {
         pipeline, email, domain, name, company, jobTitle, stage, urgency, ctx,
-      }, result ? 'verified_delivered' : 'pending_verification');
+      }, result ? 'verified_delivered' : 'pending_verification', hiringDedup ?? undefined);
 
       res.json({
         ok: true,
@@ -2913,6 +2931,11 @@ Founders: ${enrichment.founderNames.join(', ') || 'unknown'} | Tech: ${enrichmen
         hubspot: result
           ? { contactId: result.contactId, companyId: result.companyId, dealId: result.dealId }
           : null,
+        // 2026-10-06 — top level, hiring only: {duplicate:true, decided, stage, dealId}
+        // for a deal that already existed, {duplicate:false, dealId} for a new one.
+        // Absent when HubSpot wrote no deal (no key, an exception, or a failed
+        // create) — then hubspot is null too, so VJH must not read it as a deal.
+        ...(hiringDedup && result ? { ...hiringDedup, dealId: result.dealId } : {}),
       });
 
     } catch (e: unknown) {

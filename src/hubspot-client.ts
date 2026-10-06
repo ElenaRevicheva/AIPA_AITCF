@@ -214,12 +214,13 @@ export const AIDEAZZ_FORM_MESSAGE_STAMP = '[AIDEAZZ-FORM]';
  * alert, deal and acknowledgment but no Fable draft, because the contact merely
  * got updated. Never add a real prospect here — their history would be destroyed.
  */
-const DEFAULT_CONCIERGE_TEST_EMAILS = [
-  'adamvelena@gmail.com',
-  'marinakulaginabowen@gmail.com',
-  'kiravelerevich@gmail.com',
-  'espaluztester@gmail.com',
-];
+// 2026-10-06 — the four inboxes now live ONLY in .env as CONCIERGE_TEST_EMAILS
+// (comma-separated, on the laptop and on Oracle). Personal addresses in source are what
+// pii-guard blocks — this file could not be committed while they sat here — and the
+// override below already read that variable first, so behaviour is unchanged.
+// With the variable unset, no address is treated as a test inbox (the safe default:
+// a real prospect is never force-recreated).
+const DEFAULT_CONCIERGE_TEST_EMAILS: string[] = [];
 
 /** Allowlisted test inboxes that may force-recreate the HubSpot contact so Make's Contacts/Created fires. */
 export function isConciergeTestEmail(email?: string | null): boolean {
@@ -1628,14 +1629,52 @@ export interface HiringDealInput {
 }
 
 /**
- * Contact (recruiter) → Company → Deal in Hiring Pipeline → Associations.
- * Falls back gracefully if pipeline not yet configured.
+ * What a hiring push answers (2026-10-06). `duplicate` says whether a NEW card
+ * reached Elena or the job matched a deal she already has; on a duplicate,
+ * `decided` + `stage` say whether she has already ruled on it. /api/crm-event
+ * passes these straight back to VJH, which until now logged "I Act TODAY" for
+ * every push — 26 such lines since 29 Sep produced 2 real deals.
  */
-export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
+export interface HiringDealResult {
   contactId: string | null;
   companyId: string | null;
   dealId: string | null;
-} | null> {
+  duplicate: boolean;
+  /** Duplicates only: true when the existing deal is past triage (Elena decided it). */
+  decided?: boolean;
+  /** Duplicates only: the existing deal's HubSpot stage id. */
+  stage?: string;
+}
+
+/**
+ * Has Elena already decided this hiring deal? (2026-10-06)
+ *
+ * Anything at or past "⚡ I act this week" — Sent, They replied, Won, No fit —
+ * is hers: VJH seeing the job again must not touch it. HireLATAM, closed "not a
+ * fit" on 29 Sep, was re-sighted about every 12h — 11 times by 6 Oct — and each
+ * time got a new note, a queue entry and a cover-letter attempt (usually a paid
+ * LLM call; HireLATAM's own page was too thin, so its attempts ended as stubs),
+ * because the name dedup could tell "seen" but not "decided".
+ * Reads STAGE_PROGRESSION so there is still one place that knows which way is
+ * forward. An unknown stage counts as decided — left alone rather than guessed
+ * at, the same rule markDealsAsSentForContact follows.
+ * Only a RE-SIGHTING is kept quiet by this; a reply or interview event on a
+ * decided deal still lands as a note (see pushHiringDealToHubSpot).
+ */
+export function isDecidedHiringStage(stage: string): boolean {
+  const rank = STAGE_PROGRESSION.indexOf(stage);
+  return rank === -1 || rank >= STAGE_PROGRESSION.indexOf('presentationscheduled');
+}
+
+/**
+ * Contact (recruiter) → Company → Deal in Hiring Pipeline → Associations.
+ * Falls back gracefully if pipeline not yet configured.
+ * 2026-10-06: an existing deal is looked up FIRST. A re-sighting of a decided
+ * deal is left untouched; a re-sighting of an open one drafts no second letter
+ * and adds no note unless it brings a letter of its own. An employer event
+ * (reply / interview / offer) on any existing deal still lands as a note.
+ */
+export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<HiringDealResult | null> {
   if (!HS_KEY()) {
     console.warn('[HubSpot] HUBSPOT_API_KEY not set — skipping hiring push');
     return null;
@@ -1661,6 +1700,42 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
   console.log(`[HubSpot] Hiring deal → pipeline=default stage=${stageId} (hiring stage=${stage})`);
 
   try {
+    // Dedup: if a deal with this exact name already exists, don't create a second
+    // card (now that multiple agents — the bot's Remotive search + Path C — can find
+    // the same job). Returns the existing deal instead of duplicating it.
+    const dealName = `[${input.sourcePrefix || 'HIRING'}] ${input.jobTitle} @ ${input.company}`;
+
+    // 2026-10-06 — look the deal up BEFORE anything is written or paid for. It
+    // used to run after the contact/company upserts and after the paid
+    // cover-letter call, so every repeat of a job already in HubSpot cost a
+    // letter attempt nobody would read.
+    const existing = await findDealByName(dealName);
+    // 2026-10-06 — only a RE-SIGHTING (VJH finding the same posting again) is
+    // quiet on a decided deal. A reply, an interview invite or an offer is new
+    // information about a deal she owns: response_detector.py sends those as
+    // 'recruiter_responded' with the AI summary and any BOOKING LINK in `notes`,
+    // on a deal named after the email subject — which maps to contractsent, a
+    // decided stage, so a second email with the same subject would otherwise
+    // vanish. 'lead_parked' is not in the HiringStage type, but VJH's search
+    // door sends it and stageMap above routes it, hence the string compare.
+    const isResighting = stage === 'applied' || (stage as string) === 'lead_parked';
+    if (existing && isResighting && isDecidedHiringStage(existing.stage)) {
+      // A tombstone, not a fresh lead: no note, no queue entry, no letter, no
+      // association — nothing on the deal changes. Only the audit log records it.
+      console.log(
+        `[HubSpot] Hiring deal already decided (${existing.id}, stage=${existing.stage}) — left alone, no note/queue/letter: ${dealName.slice(0, 64)}`,
+      );
+      const decided: HiringDealResult = {
+        contactId: null, companyId: null, dealId: existing.id,
+        duplicate: true, decided: true, stage: existing.stage,
+      };
+      if (input.crmMeta) {
+        const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
+        attachHubSpotToAtlasLoop('hiring', decided, input.crmMeta, 'skipped');
+      }
+      return decided;
+    }
+
     const contactId = input.recruiterEmail || input.recruiterName
       ? await upsertContact({
           email:     input.recruiterEmail,
@@ -1679,19 +1754,26 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
         : undefined,
     });
 
-    // Dedup: if a deal with this exact name already exists, don't create a second
-    // card (now that multiple agents — the bot's Remotive search + Path C — can find
-    // the same job). Returns the existing deal instead of duplicating it.
-    const dealName = `[${input.sourcePrefix || 'HIRING'}] ${input.jobTitle} @ ${input.company}`;
-
     // Draft a letter for THIS posting when VJH did not supply one — which is
     // every SerpAPI job by design ("No cover letter pre-generated for SerpAPI
     // path") and, in practice, nearly all of them. Never throws: on any failure
     // `letter` is '' and buildHiringActionPackage keeps its existing stub, so
     // the deal, the Note and the apply link are unaffected.
+    // 2026-10-06 — only for a NEW deal. An existing deal already had its letter
+    // attempt on the first sighting, and an employer event (reply / interview)
+    // is not an application; drafting again is usually a paid LLM call for a
+    // second copy of the same letter. The reason does not promise an earlier
+    // letter exists — some first attempts ended as stubs.
     let letterMeta: { tailored: boolean; provider?: string | undefined; reason?: string | undefined } | undefined;
     let draftedLetter = input.coverLetter;
-    if (!draftedLetter?.trim()) {
+    if (existing && !draftedLetter?.trim()) {
+      letterMeta = {
+        tailored: false,
+        reason: isResighting
+          ? 'VJH found this job again, so no new letter was drafted'
+          : 'employer event on an existing deal — no letter drafted',
+      };
+    } else if (!draftedLetter?.trim()) {
       const { generateCoverLetter } = await import('./cover-letter');
       const drafted = await generateCoverLetter({
         jobTitle: input.jobTitle,
@@ -1749,15 +1831,33 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
       }
     };
 
-    const existing = await findDealByName(dealName);
+    // 2026-10-06 — `existing` was looked up at the top; reaching here with it set
+    // means the deal is OPEN, or a reply/interview event on a decided deal —
+    // still lands as a note.
     if (existing) {
-      console.log(`[HubSpot] Hiring deal already exists (${existing.id}) — refresh action note: ${dealName.slice(0, 64)}`);
+      const existingDecided = isDecidedHiringStage(existing.stage);
+      console.log(`[HubSpot] Hiring deal already exists (${existing.id}, stage=${existing.stage}) — ${isResighting ? 're-sighting' : `employer event (${stage})`}: ${dealName.slice(0, 64)}`);
       if (contactId && companyId) await associateContactCompany(contactId, companyId);
       if (existing.id && contactId) await associateDealContact(existing.id, contactId);
       if (existing.id && companyId) await associateDealCompany(existing.id, companyId);
-      if (existing.id) await addNoteToDeal(existing.id, actionPkg);
-      await mirrorToQueue(existing.id);
-      const dup = { contactId, companyId, dealId: existing.id };
+      // 2026-10-06 — a re-sighting with no letter of its own adds NO note. The
+      // package would be the boilerplate stub ("Dear Hiring Manager…", "Rewrite
+      // before sending") posted as the NEWEST note, on top of the real letter,
+      // every 12h. An employer event always gets its note: that note is the
+      // only place the reply's summary and booking link reach HubSpot.
+      if (draftedLetter?.trim() || !isResighting) await addNoteToDeal(existing.id, actionPkg);
+      else console.log(`[HubSpot] repeat with no new letter — earlier note left on top: ${dealName.slice(0, 64)}`);
+      // 2026-10-06 — mirror only when this push carries a letter. The queue's
+      // MERGE overwrites `draft` on any item she has not acted on, so mirroring a
+      // repeat with no letter would replace the first sighting's letter with ''.
+      // Never for a decided deal: the MERGE inserts a missing item as 'new',
+      // which would put a job she already ruled on back in her queue.
+      if (draftedLetter?.trim() && !existingDecided) await mirrorToQueue(existing.id);
+      else console.log(`[daily-queue] ${existingDecided ? 'decided deal' : 'repeat with no new letter'} — queue item left as is: ${dealName.slice(0, 64)}`);
+      const dup: HiringDealResult = {
+        contactId, companyId, dealId: existing.id,
+        duplicate: true, decided: existingDecided, stage: existing.stage,
+      };
       if (input.crmMeta) {
         const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
         attachHubSpotToAtlasLoop('hiring', dup, input.crmMeta, 'duplicate');
@@ -1787,18 +1887,28 @@ export async function pushHiringDealToHubSpot(input: HiringDealInput): Promise<{
     if (dealId) await addNoteToDeal(dealId, actionPkg);
     await mirrorToQueue(dealId);
 
-    console.log(`[HubSpot] ✅ Hiring deal pushed — "${input.jobTitle} @ ${input.company}" contact:${contactId} deal:${dealId}`);
-    const out = { contactId, companyId, dealId };
+    // 2026-10-06 — createDeal returns null on any non-2xx (Oracle's error log
+    // holds a 429 rate-limit on deal create). That used to print "✅ pushed …
+    // deal:null" and audit 'created' for a card that does not exist. Now the
+    // log says so, the audit row says 'failed', and /api/crm-event answers
+    // hubspot:null (cto-aipa.ts) so VJH cannot read it as a new deal.
+    if (dealId) {
+      console.log(`[HubSpot] ✅ Hiring deal pushed — "${input.jobTitle} @ ${input.company}" contact:${contactId} deal:${dealId}`);
+    } else {
+      console.warn(`[HubSpot] ❌ Hiring deal NOT created (HubSpot returned no deal id) — nothing reached the board: ${dealName.slice(0, 64)}`);
+    }
+    const out: HiringDealResult = { contactId, companyId, dealId, duplicate: false }; // 2026-10-06 — a NEW card (or none, when dealId is null)
+    const createdStatus = dealId ? 'created' : 'failed';
     if (input.crmMeta) {
       const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
-      attachHubSpotToAtlasLoop('hiring', out, input.crmMeta, 'created');
+      attachHubSpotToAtlasLoop('hiring', out, input.crmMeta, createdStatus);
     } else {
       const { attachHubSpotToAtlasLoop } = await import('./atlas-crm-bridge');
       attachHubSpotToAtlasLoop('hiring', out, {
         source: input.source || 'VJH',
         pipeline: 'hiring',
         type: 'application',
-      }, 'created');
+      }, createdStatus);
     }
     return out;
   } catch (err) {
