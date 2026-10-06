@@ -279,7 +279,9 @@ git log keeps the record.
   (`kira_jungle_k`) + the Kira-now face via a head-crop nano edit (`kira_head_fix`) blended back locally (brightness-matched, inner-face mask).
   Full-frame face edits on nano were SILENT NO-OPS twice (face unchanged): edit the face only where it is large in the frame.
   Elena then: 'fully restore Kira now face' → the REAL Kira-now face was transplanted (landmark affine + skin mask + relight; method in the
-  plan note on `kira_jungle_k`) → `film9_kira_dress_restored.jpg`. **Elena's move:** OK it → redo k13/k14 with it as Kira's ref. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
+  plan note on `kira_jungle_k`) → `film9_kira_dress_restored.jpg`. **Elena rejected it: 'No. Fully come back to initial face'** →
+  `kira_jungle_final.jpg` = `kira_jungle_k.jpg` byte-for-byte (the frame's own face, no face edit; `film9_kira_dress_initial.jpg`);
+  transplant kept as `kira_jungle_final_transplant.jpg`. Do NOT re-apply any face swap to this frame. **Elena's move:** OK it → redo k13/k14. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
   Nano drifts night to dusk, and 'blue-black' gives navy hair (say 'true black, never blue'). Plain prompts only: a refusal is final, no wording to beat the filter.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
