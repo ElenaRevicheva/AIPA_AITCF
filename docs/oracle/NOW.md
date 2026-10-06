@@ -207,6 +207,10 @@ git log keeps the record.
   (`FILM9_ATUONA_SCENARIO_v3_2026-10-06.md`, 5-critic rebuild); Oracle `~/atuona-film9/` — 31 keyframes, contact sheet
   `docs/atuona/film9_contact_v2.jpg`; spend Venice $4.75 of $11.17, Replicate $0 of $9.89 (ledger `~/atuona-film9/ledger.jsonl`).
   She did NOT approve the keyframes ("no") — reason not given yet. NEXT: wait for her; no motion, no spend until she says.
+  **Character restyle (6 Oct, Venice now $5.26):** Ule candidates `film9_ule_boho.jpg` (bohemian poet), Kira candidates
+  `film9_kira_words.jpg` (#048 blue-black curls, #086 silent eyes). These are the SAME AI faces restyled from the novel's words;
+  her real photos never go to a model (the classifier blocked that, so do not reopen it). **Elena's move:** pick now/A/B for each →
+  then swap refs `img/kira.jpg`/`img/ule.jpg` (back up the old ones) and re-run face keyframes ONLY on her go.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
 ### 🖼️ 5 Oct — YouTube thumbnails: NEW Make scenario `6518503` LIVE · ✅ 6263197 lane-5 bug FIXED (Elena's yes)
