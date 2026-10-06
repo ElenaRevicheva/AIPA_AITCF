@@ -745,7 +745,7 @@
    "aspect": "3:4",
    "look": false,
    "prompt": "Edit this photo and keep everything identical: the same woman, face, eyes, long black wavy windblown hair; the same jungle-print chiffon gown with its deep V, sheer sleeves, gold brooch and slit; the same pose, restaurant, lanterns, lightning and the light on her. Change only the fit of the bodice. Right now the fabric lies flat. Re-tailor it so the two printed panels curve forward over a fuller, rounder, naturally lifted bust, with soft shading under each curve, and the chiffon drapes smoothly into a cinched waist at the brooch. A real woman's figure, confident red-carpet glamour. The panels stay fully covering, and the V shows no more skin than it does now. Deepen the sky to a dark stormy night.",
-   "note": "6 Oct, Elena: 'dress is better here on both images' (dress-now/dress-2 = the airier sheer chiffon) -> fit-1 wording (bodice + stormy night) on dress-2"
+   "note": "6 Oct, Elena: 'dress is better here on both images' (dress-now/dress-2 = the airier sheer chiffon) -> fit-1 wording (bodice + stormy night) on dress-2 | 6 Oct FINAL dress frame = img/kira_jungle_final.jpg: Elena 'fully restore Kira now face' -> the REAL Kira-now face (img/kira.jpg) transplanted, not regenerated: affine on 3 landmarks (A pupils 673,637 / 1035,638, mouth 857,1035 -> K 864.5,513 / 960.5,511.5 / 917,611), skin-only polygon mask, bilateral grain smoothing, luminance relit (frequency separation + ratio, sigma 10), chroma matched to her neck skin, 7px feather. Previous nano-blend kept as kira_jungle_final_nanoblend.jpg"
   },
   "kira_head_fix": {
    "engine": "venice",
