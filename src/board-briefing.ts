@@ -144,13 +144,11 @@ function cardLine(c: CardEntry, showOverdue = false): string {
  * Elena: "my Telegram looks like a garbage can". A card a year past its date is
  * not a task for today; it is an archive decision, and Monday's weekly digest
  * still lists it. Boards with nothing actionable are left out entirely.
+ * Then (same day, Elena): "make it just to next 3 days" -- no overdue at all,
+ * not even recent, and no overdue count line. Overdue lives in Monday's digest.
  */
-export const RECENT_OVERDUE_DAYS = 30;
-
 function boardSection(snap: BoardSnapshot): string | null {
-  const recent = snap.overdue.filter(c => c.daysOverdue <= RECENT_OVERDUE_DAYS);
   const lines: string[] = [];
-  if (recent.length)        lines.push(`  🚨 Overdue: ${recent.map(c => `${c.name} (+${c.daysOverdue}d)`).join(', ')}`);
   if (snap.dueToday.length) lines.push(`  📅 Today: ${snap.dueToday.map(c => c.name).join(', ')}`);
   if (snap.dueSoon.length)  lines.push(`  ⏰ Next 3 days: ${snap.dueSoon.map(c => c.name).join(', ')}`);
   return lines.length ? [`📋 *${snap.boardName}*`, ...lines].join('\n') : null;
@@ -178,18 +176,10 @@ export async function generateDailyBriefing(): Promise<string> {
   if (snapshots.length === 0) return '';
 
   const sections = snapshots.map(boardSection).filter((x): x is string => !!x);
-  const ancient = snapshots.reduce((n, b) => n + b.overdue.filter(c => c.daysOverdue > RECENT_OVERDUE_DAYS).length, 0);
 
-  // The suggestion only sees what is actually live -- fed the 564-day-old cards,
-  // it would nag about a DAO meeting from 2025.
-  const recentNames = snapshots.flatMap(b => b.overdue
-    .filter(c => c.daysOverdue <= RECENT_OVERDUE_DAYS)
-    .map(c => `[${b.boardName}] ${c.name} (+${c.daysOverdue}d)`));
+  // The suggestion sees only the same three-day window the message shows.
   const todayNames  = snapshots.flatMap(b => [...b.dueToday, ...b.dueSoon].map(c => `[${b.boardName}] ${c.name}`));
-  const suggestionCtx = [
-    recentNames.length ? `Overdue: ${recentNames.join('; ')}` : null,
-    todayNames.length  ? `Due today / next 3 days: ${todayNames.join('; ')}` : null,
-  ].filter(Boolean).join('\n');
+  const suggestionCtx = todayNames.length ? `Due today / next 3 days: ${todayNames.join('; ')}` : '';
 
   let suggestion = '';
   if (suggestionCtx) {
@@ -206,7 +196,6 @@ Be specific — name the task. Do not repeat counts.`, 150);
   const parts: string[] = [];
   parts.push(sections.length ? sections.join('\n\n') : '✅ Nothing due today or in the next 3 days.');
   if (suggestion) parts.push(`💡 ${suggestion}`);
-  if (ancient) parts.push(`_🗄 ${ancient} cards overdue ${RECENT_OVERDUE_DAYS}+ days — archive or re-date them; listed in Monday's digest._`);
   return parts.join('\n\n');
 }
 
