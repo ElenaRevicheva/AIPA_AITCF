@@ -110,9 +110,14 @@ const IMAGE_ENGINES = {
 // ------------------------------------------------------------------ ledger (the money guard)
 const ledger = () => fs.existsSync(LEDGER) ? fs.readFileSync(LEDGER, 'utf8').trim().split('\n').filter(Boolean).map(l => JSON.parse(l)) : [];
 const spent = () => ledger().filter(e => e.status === 'succeeded').reduce((s, e) => s + e.usd, 0);
-function guard(usd, what) {
+// Two prepaid wallets (6 Oct 2026, film #9): VENICE_BUDGET_USD / REPLICATE_BUDGET_USD cap each one on top of BUDGET_USD.
+const walletOf = e => (e.engine === 'venice' || String(e.engine || '').startsWith('venice')) ? 'venice' : 'replicate';
+const spentIn = w => ledger().filter(e => e.status === 'succeeded' && walletOf(e) === w).reduce((s, e) => s + e.usd, 0);
+function guard(usd, what, wallet = 'replicate') {
   const s = spent();
   if (s + usd > BUDGET) throw new Error(`BUDGET: ${what} would cost ~$${usd.toFixed(2)}; spent $${s.toFixed(2)} of $${BUDGET}. Refused.`);
+  const cap = Number(process.env[wallet === 'venice' ? 'VENICE_BUDGET_USD' : 'REPLICATE_BUDGET_USD'] || Infinity), w = spentIn(wallet);
+  if (w + usd > cap) throw new Error(`BUDGET(${wallet}): ${what} would cost ~$${usd.toFixed(2)}; ${wallet} spent $${w.toFixed(2)} of $${cap}. Refused.`);
 }
 const record = e => fs.appendFileSync(LEDGER, JSON.stringify({ ts: new Date().toISOString(), ...e }) + '\n');
 
@@ -163,9 +168,53 @@ async function download(url, dest) {
 }
 const resolveImg = async ref => upload(path.join(BASE, 'img', ref.endsWith('.jpg') || ref.endsWith('.png') ? ref : `${ref}.jpg`));
 
+// Venice stills (6 Oct 2026, film #9). With refs -> POST /image/multi-edit {modelId, images[], prompt, safe_mode:false};
+// without refs -> POST /image/generate. Prices = Venice /models pricing read 6 Oct 2026, rounded UP. A Venice 422 is final
+// for that prompt — never re-routed to another vendor.
+const VENICE_IMAGE = {
+  'flux-2-max-edit': n => 0.12 + 0.035 * Math.max(0, n - 1),
+  'gpt-image-2-5-flare-edit': n => 0.15 + 0.01 * Math.max(0, n - 1),
+  'grok-imagine-quality-edit': n => 0.09 + 0.012 * n,
+  'qwen-edit-uncensored': () => 0.04,
+  'firered-image-edit': () => 0.05,
+  'seedream-v5-pro': () => 0.11, 'qwen-image-3-pro': () => 0.09, 'flux-2-max': () => 0.09, 'nano-banana-pro': () => 0.23,
+};
+async function veniceImage(id, spec) {
+  const key = (fs.readFileSync('/home/ubuntu/cto-aipa/.env', 'utf8').match(/^VENICE_API_KEY=(.*)$/m) || [])[1]?.replace(/["\s]/g, '');
+  if (!key) throw new Error('VENICE_API_KEY missing');
+  const refs = spec.refs || [], modelId = spec.vmodel || (refs.length ? 'flux-2-max-edit' : 'seedream-v5-pro');
+  const priceFn = VENICE_IMAGE[modelId]; if (!priceFn) throw new Error('no Venice price for ' + modelId);
+  const usd = priceFn(refs.length), engine = `venice:${modelId}`;
+  guard(usd, `image ${id} on ${engine}`, 'venice');
+  const prompt = [spec.prompt, PLAN.look].filter(Boolean).join('\n\n');
+  const b64 = r => fs.readFileSync(path.join(BASE, 'img', r.endsWith('.jpg') || r.endsWith('.png') ? r : `${r}.jpg`)).toString('base64');
+  const [W, H] = (spec.aspect || '16:9') === '16:9' ? [1920, 1080] : (spec.aspect === '3:4' ? [1152, 1536] : [1536, 1536]);
+  const body = refs.length
+    ? { modelId, images: refs.map(b64), prompt, aspect_ratio: spec.aspect || '16:9', resolution: '2K', safe_mode: false, output_format: 'jpeg' }
+    : { model: modelId, prompt, width: W, height: H, safe_mode: false, hide_watermark: true, format: 'jpeg',
+        ...(spec.negative !== false ? { negative_prompt: PLAN.negative } : {}) };
+  const f = path.join(BASE, 'raw', `img_${id}__venice.request.json`); fs.writeFileSync(f, JSON.stringify(body));
+  const dest = path.join(BASE, 'img', `${id}.jpg`);
+  const { stdout } = await run('curl', ['-s', '-m', '300', '-X', 'POST', '-H', `Authorization: Bearer ${key}`, '-H', 'Content-Type: application/json',
+    '--data-binary', `@${f}`, `https://api.venice.ai/api/v1/image/${refs.length ? 'multi-edit' : 'generate'}`, '-o', dest + '.part', '-w', '%{http_code} %{content_type}'], { maxBuffer: 1 << 20 });
+  const [code, ctype] = stdout.trim().split(' ');
+  let ok = code === '200' && fs.existsSync(dest + '.part');
+  if (ok && /json/.test(ctype || '')) {           // /image/generate answers JSON {images:[base64]}
+    const j = JSON.parse(fs.readFileSync(dest + '.part', 'utf8')); const img = j?.images?.[0];
+    if (img) fs.writeFileSync(dest + '.part', Buffer.from(img, 'base64')); else ok = false;
+  }
+  if (ok && fs.statSync(dest + '.part').size < 5000) ok = false;
+  const err = ok ? null : `HTTP ${code} ${fs.existsSync(dest + '.part') ? fs.readFileSync(dest + '.part', 'utf8').slice(0, 200) : ''}`;
+  record({ kind: 'image', id, engine, model: modelId, status: ok ? 'succeeded' : 'failed', usd: ok ? usd : 0, error: err });
+  if (!ok) { if (fs.existsSync(dest + '.part')) fs.unlinkSync(dest + '.part'); console.log(`FAIL image ${id} (${engine}): ${err}`); process.exitCode = 2; return; }
+  fs.renameSync(dest + '.part', dest);
+  console.log(`OK image ${id} (${engine}) -> ${dest} (~$${usd.toFixed(3)}; venice $${spentIn('venice').toFixed(2)}, total $${spent().toFixed(2)} of $${BUDGET})`);
+}
+
 // ------------------------------------------------------------------ commands
 async function image(id) {
   const spec = PLAN.images[id]; if (!spec) throw new Error('no plan.images.' + id);
+  if (spec.engine === 'venice') return veniceImage(id, spec);
   const engineId = spec.engine || 'flux';
   const eng = IMAGE_ENGINES[engineId]; if (!eng) throw new Error('unknown image engine ' + engineId);
   const price = eng.price((spec.refs || []).length), model = eng.model;
@@ -201,7 +250,7 @@ async function veniceVideo(shotId, shot, o) {
   const q = await post('/video/quote', body);
   const usd = Number((q.stdout.match(/"quote"\s*:\s*([\d.]+)/) || [])[1]);
   if (!Number.isFinite(usd)) throw new Error('Venice gave no quote: ' + q.stdout.slice(0, 200));
-  guard(usd, `video ${shotId} on venice (quoted)`);
+  guard(usd, `video ${shotId} on venice (quoted)`, 'venice');
   const qr = await post('/video/queue', body);
   const qid = (qr.stdout.match(/"queue_id"\s*:\s*"([^"]+)"/) || [])[1];
   if (!qid) { record({ kind: 'video', id: shotId, engine: 'venice', model, status: 'failed', usd: 0, error: qr.stdout.slice(0, 200) });
@@ -276,5 +325,5 @@ else if (cmd === 'music') await music(a);
 else if (cmd === 'ledger') {
   const L = ledger();
   for (const e of L) console.log(`${e.ts.slice(5, 16)} ${e.kind.padEnd(5)} ${(e.id + (e.engine ? '/' + e.engine : '')).padEnd(22)} ${e.status.padEnd(9)} $${e.usd.toFixed(2)} ${e.error ? String(e.error).slice(0, 90) : ''}`);
-  console.log(`SPENT ~$${spent().toFixed(2)} of $${BUDGET} (${L.filter(e => e.status !== 'succeeded').length} failed/refused, not billed)`);
+  console.log(`SPENT ~$${spent().toFixed(2)} of $${BUDGET} (venice $${spentIn('venice').toFixed(2)} · replicate $${spentIn('replicate').toFixed(2)}; ${L.filter(e => e.status !== 'succeeded').length} failed/refused, not billed)`);
 } else { console.log('usage: node gen.mjs image <id> | video <shot> [engine] | music <id> | ledger'); process.exitCode = 1; }

@@ -1,0 +1,300 @@
+{
+ "film": "Atuona film #9 — ATUONA (for Niio's private-viewer programme). Scenario: docs/atuona/FILM9_ATUONA_SCENARIO_v3_2026-10-06.md",
+ "look": "Photoreal 35mm film still, Kodak Vision3 500T grain, low-key chiaroscuro from practical light sources, deep blacks, humid tropical air. Luxurious, sensual underground arthouse cinema in the tradition of Roversi, Saudek and Newton: real skin with pores, sweat and water on skin, silk and linen, raw adult emotion on the face. Super human-realistic people, natural asymmetry, no beauty filter. The bodies stay still; the light moves. No text, no letters, no watermark, no logo.",
+ "motion_look": "Photoreal live-action, 35mm film grain, slow deliberate cinematic camera, natural physics, real breathing, the same people as in the start frame, faces and bodies unchanged, bodies nearly still while light travels over them, no text on screen.",
+ "negative": "cartoon, anime, CGI, 3D render, plastic skin, airbrushed, beauty filter, cute, sweet, deformed hands, extra fingers, morphing face, identity change, extra people, text, subtitles, letters, watermark, logo, brand name, bottle, packaging, fast cuts, blood, bleeding, fresh wound, open cut, red scar, stitches, bruise, injury, elderly, wrinkled, weathered, grey beard, nudity below the shoulders frontal, explicit",
+ "characters": {
+  "kira": "the woman from the reference image (kira): same face, grey-green eyes, dark hair, pale skin, full lips, a faint pale hairline scar through her left eyebrow, decades old, the same tone as her skin; slender and strong; about 34",
+  "ule": "the man from the reference image (ule): same face, tall, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, devilishly-angelically beautiful, about 47, athletic, no lines or jowls"
+ },
+ "images": {
+  "kira": {
+   "note": "locked reference = atuona-film8/img/kira_ref_healed.jpg"
+  },
+  "ule": {
+   "note": "locked reference = atuona-film8/img/ule_ref2.jpg"
+  },
+  "bB1": {
+   "engine": "venice",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Morning in a tropical colonial bedroom. Striped honey-gold light falls through half-open wooden shutters across a white bed. The woman from the reference image (same face, grey-green eyes, dark hair, the faint pale scar through her left eyebrow) lies on her side with her back half to the camera, her face in profile on the pillow, eyes open, lips parted; a white sheet clings damply to her body up to the shoulder blades; bare shoulders and the line of her spine, damp skin with pores and a sheen of sweat; one honey stripe of light lies across her shoulder; a wet white plumeria blossom on the pillow by her hair. Still, intimate, adult, not explicit."
+  },
+  "bB2": {
+   "engine": "venice",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night during a tropical storm in a dark colonial room. The woman from the first reference image (same face, grey-green eyes, dark hair pinned up, the faint pale scar through her left eyebrow) and the man from the second reference image (same face, tanned, light ash-blond hair with silver at the temples, golden stubble, pale blue eyes, about 47, beautiful) sit facing each other very close across a small round wooden table. The shadows of wooden shutter slats fall across both of them like the bars of a cage. She holds a just-struck match close to her own open, unblinking eyes; its flame is the only warm light; cold blue lightning-light from the window behind. She wears a sheer green jungle-print silk dress; he wears an open white linen shirt. They stare at each other without blinking. Tension, desire held back."
+  },
+  "k01a": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "An empty gallery wall at night inside a dark, silent private auction house: one long wall painted off-white — broken white, chalky, slightly warm — lit by a single museum spotlight as if it were a canvas waiting for its first painting. Polished dark concrete floor, deep shadows at the edges. No people, no frame, no art, no text."
+  },
+  "k01b": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Extreme close-up from behind and slightly to the side: the back of the neck of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), her dark hair pinned up, the collar of a check-wool suit jacket over a lilac silk blouse, a loose dark tie; just behind her shoulder, out of focus, the jaw and golden stubble of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful), so close that his breath stirs the fine hairs at her nape — he does not touch her. Cold blue-white gallery light, darkness around."
+  },
+  "k02": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night, a tall window furred with frost in a cold northern city, blue-white streetlight behind it. the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) presses her lips to the frosted glass; a small clear oval has melted around her mouth and her breath clouds the pane; eyes closed. She wears a check-wool suit jacket, a lilac silk blouse and a loose dark tie. Close-up in side profile, raw adult emotion."
+  },
+  "k05": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "A single burnt, curled leaf suspended in pure black air, its edges glowing faintly orange like embers, lit softly from within like a lit airplane window at night; a few tiny drifting sparks; nothing else. Macro, cinematic."
+  },
+  "k06": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "From high above at night: a black, glassy sea under a low full moon. the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) floats on her back on the surface, arms open, eyes open looking up, dark wet hair spread around her like ink, wearing a thin dark silk slip, bare shoulders, moonlight on wet skin, a silver path of moonlight across the water. Still, suspended — the moment before she plunges."
+  },
+  "k07": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night, black sea water up to her waist: the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) rises out of the dark water, seen from behind and slightly to the side, her bare back and shoulder blades wet and glistening, wet white feathers clinging to both shoulder blades exactly where wings would grow; dark hair slicked down her back; her face in profile turned over her shoulder; moonlight. Implied, not explicit; nothing below the waterline."
+  },
+  "k07b": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Macro at night: silver fish scales scattered and glittering on wet black volcanic sand, beside a single bare human footprint slowly filling with seawater; moonlight. No people."
+  },
+  "k09": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Early morning on a tropical island: close profile of the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), wet dark hair with one fresh white-and-yellow plumeria blossom tucked behind her ear, droplets on her skin, eyes half-closed as she breathes the scent; behind her, out of focus, black volcanic sand steaming after rain and dense green jungle."
+  },
+  "k11": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "A dim tropical bedroom with a tall old mirror with tarnished silver edges. In the foreground the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands perfectly still facing the mirror, seen from behind at the shoulders, dark hair pinned up, in a thin black silk slip. In the mirror her reflection — the same woman, face fully visible, grey-green eyes looking back — has lowered one silk strap off its bare shoulder and is slipping the other, while the real woman's straps stay in place. Honey light, chiaroscuro. Two versions of the same woman. Framed at the collarbone; implied, not explicit."
+  },
+  "k13": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "A small open-air restaurant on a tropical island at night, the first gust of a storm bending the palms and lifting the white tablecloths, lanterns, rain haze. the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) walks toward the camera in a sheer, floor-length green jungle-print silk gown with a deep neckline, hair swept up in a bun, a wet gleam on her shoulders. At a table behind her the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) waits in an open white linen shirt, holding an open necklace of diamonds and emeralds in his hands."
+  },
+  "k14": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Front-on at a restaurant table at night, lanterns, the storm outside: the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stands beside the seated the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) and closes a waterfall necklace of white gold, diamonds and emeralds around her throat, his fingers at the clasp. She looks straight ahead past him, composed, unsmiling, in a green jungle-print silk gown. A transaction, not a romance."
+  },
+  "k16": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "After the storm, a dark colonial room with one low warm lamp. From behind a low armchair: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) sits with her dark hair just released and falling loose down her back in a backless green jungle-print silk gown; the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stands behind her, his face lowered into her hair at the nape, eyes closed, breathing her in, his fingers fastening the clasp of a diamond-and-emerald necklace at the back of her neck. Her face in profile, eyes open, unsmiling."
+  },
+  "k17a": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Hard white noon on a black volcanic sand beach on a tropical island: the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) stands barefoot in a simple black linen dress, looking down to her right; the harsh overhead sun throws a short black shadow under her; palms and a dark rock throw black shadows; dense jungle and a volcanic ridge behind; heat haze. Leave empty sand to her right."
+  },
+  "k17b": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "A lean, feral, flat-red dog trotting in strict side profile, painted in flat vermilion like a figure in a Gauguin painting, on a perfectly even flat bright green background for chroma key: no shadow, no ground line, full body in frame."
+  },
+  "k18": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Raking evening light across an abstract Marquesan relief carved deep into dark breadfruit wood: interlocking curved grooves and stylised abstract forms, no figures, no letters; a woman's fingertips resting in the grooves. Macro, warm shadows."
+  },
+  "k19": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Macro of the inside of a woman's pale forearm lying on dark wood in raking light: the blue line of a vein under the skin, fine hairs and pores; nothing else. Cinematic close-up."
+  },
+  "k20": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "A dark, private auction room at night: rows of black chairs, white paddles raised in the darkness like birds. In the third row, left of the aisle, the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) sits very still in a black sculptural avant-garde dress, her face lit only by the glow of a price screen out of frame; she does not raise a paddle."
+  },
+  "k20b": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "A bare room in an old wooden house on a tropical island, humid afternoon: the man from the reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) in a white linen shirt stands alone before an empty, water-stained white wall, seen from behind at three-quarters, his palm flat against the wall; dust in a shaft of light; frangipani shadows."
+  },
+  "k21": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "A dim cellar under an old wooden house: between rotten floorboards a woman's hand pulls out a swollen, water-damaged black notebook with scratched marks on its cover; dust in a shaft of light from above. Macro, chiaroscuro, no face."
+  },
+  "k22": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night in an old wooden house: the man from the reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stands at an open window looking out at a dark bay, seen from behind at three-quarters, not turning; white linen shirt; his reflection faint in the glass; rain-wet palms outside; one lamp."
+  },
+  "k24": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night, close-up: the face of the man from the reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful), wet with silent tears — no sobbing, his face still, eyes open and glistening, salt drying in fine white trails on his tanned cheeks; dim warm light; raw, adult, beautiful."
+  },
+  "k25": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night, close: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) raises her hand and traces one dried salt trail on the cheek of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) with a single fingertip; his eyes are closed; his white linen shirt hangs open at the chest; her face close to his in profile; crimson-tinted lamplight."
+  },
+  "k26": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night, locked-off close-up: moonlight through a carved wooden window screen falls across the bare chest of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) in curving abstract carved patterns of light and shadow; the hand of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) lies flat on his chest over the patterns. Only his chest, shoulder and her hand in frame."
+  },
+  "k27": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Macro, no face: the top of a woman's bare back between the shoulder blades, pale skin with pores, a faint pale hairline scar, decades old and the same tone as her skin, running a short way along the line of her spine; a man's fingertip resting at the top of the scar; soft honey light from the side; a strand of dark hair at the edge of the frame. Intimate, not explicit."
+  },
+  "k28": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night, close two-shot in profile: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) lays two fingers lightly across the lips of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful); their faces a breath apart; his eyes on hers; low crimson light; intimate, silent."
+  },
+  "k30": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Night, close: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) has her face turned into the neck of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful), her lips parted near his throat, eyes closed; his head tilted back slightly, eyes open, perfectly still; her dark hair loose over his bare shoulder; low crimson light. Intimate, not explicit."
+  },
+  "k32": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Close-up: the large hand of the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) presses the palm of the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) flat against his own throat; her fingers spread over his pulse; his face partly in frame, eyes on her; low crimson light."
+  },
+  "k34": {
+   "engine": "venice",
+   "vmodel": "gpt-image-2-5-flare-edit",
+   "refs": [
+    "kira",
+    "ule"
+   ],
+   "aspect": "16:9",
+   "prompt": "Lilac dawn on a black volcanic sand beach: the woman from the first reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow) and the man from the second reference image (same face, tanned, light ash-blond hair with silver only at the temples, golden stubble, pale blue eyes, about 47, devilishly beautiful) stand apart facing the grey-lilac sea, seen from behind; his palm rests on the small of her back; between them a lean flat-red dog sits on the sand; soft mist; a jungle ridge behind."
+  },
+  "k36": {
+   "engine": "venice",
+   "vmodel": "grok-imagine-quality-edit",
+   "refs": [
+    "kira"
+   ],
+   "aspect": "16:9",
+   "prompt": "Lilac dawn on black volcanic sand, seen from a high angle: the woman from the reference image (same face, grey-green eyes, dark hair, pale skin, full lips, the faint pale hairline scar through her left eyebrow), barefoot in a simple dark linen dress, walks up the beach away from the sea toward the jungle; behind her a thin wave has closed a perfect ring of white foam on the empty black sand where she just stood; mist."
+  },
+  "k37": {
+   "engine": "venice",
+   "vmodel": "seedream-v5-pro",
+   "refs": [],
+   "aspect": "16:9",
+   "prompt": "Black volcanic sand at lilac dawn, seen from directly above: a thin sheet of white foam spreads over the black sand and is drawing back, the sand dark and wet beneath. No people, no footprints."
+  }
+ },
+ "shots": {}
+}
