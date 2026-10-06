@@ -273,7 +273,21 @@ function buildDraftEn(ctx) {
   ].join('\n');
 }
 
+/**
+ * Optional per-prospect personal touch (6 Oct 2026, Ford Realty — the realtor who helped Elena's family):
+ * `greeting` replaces the template's first line; `opener` is a personal paragraph right after it. Both
+ * absent → the letter is byte-identical to before.
+ */
 function buildDraft(ctx) {
+  const text = buildDraftCore(ctx);
+  if (!ctx.greeting && !ctx.opener) return text;
+  const lines = text.split(String.fromCharCode(10));
+  if (ctx.greeting) lines[0] = ctx.greeting;
+  if (ctx.opener) lines.splice(1, 0, '', ctx.opener);
+  return lines.join(String.fromCharCode(10));
+}
+
+function buildDraftCore(ctx) {
   if (ctx.lang === 'en') return buildDraftEn(ctx);
   const {
     domain, score, grade, weakName, weakScore, moneyQuery, compliment, pdEmoji, pdLine,
@@ -559,6 +573,8 @@ const PROSPECT_META = require('../docs/selling/prospect-meta.cjs');
     nuance: meta.nuance,
     deckLine: meta.deckLine,
     tailLines: meta.tailLines,
+    greeting: meta.greeting,
+    opener: meta.opener,
   });
 
   const slug = slugify(meta.company);
@@ -575,7 +591,8 @@ const PROSPECT_META = require('../docs/selling/prospect-meta.cjs');
   const emailDraftPath = `docs/selling/drafts/${slug}-email.txt`;
   const prospectPath = `docs/selling/prospects/${meta.company.toUpperCase().replace(/\s+/g, '_')}.md`;
 
-  const emailSubject = buildManualEmailSubject(meta.company, score, {
+  // Optional personal subject (6 Oct 2026, Ford Realty) — absent → the template subject, unchanged.
+  const emailSubject = meta.subject || buildManualEmailSubject(meta.company, score, {
     credential: credentialLetter,
     lang: meta.lang,
   });

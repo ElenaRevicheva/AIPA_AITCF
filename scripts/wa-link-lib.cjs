@@ -182,7 +182,8 @@ function buildManualEmailBody(waDraft, opts = {}) {
     lines.push(rest || draft);
   } else {
     lines.push(
-      'Estimado equipo:',
+      // A named person (PROSPECT_META greetName, 6 Oct 2026) is greeted by name, not as "equipo".
+      opts.greetName ? `Estimado ${opts.greetName}:` : 'Estimado equipo:',
       '',
       draft.replace(
         /^Hola, ¡un gusto saludarles! 👋/,
