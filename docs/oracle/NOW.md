@@ -131,6 +131,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🎯 6 Oct — Puente **AI Operations Lead #2660** staged + full kit · Elena's move: apply today
+- Deal  (🔥 I act TODAY). Audit on Oracle: , 7 deals complete · gaps 0.
+- CV =  (ChatGPT ops structure + the sibling's 3-reviewer-checked facts) on ALL notes; hand-written letter;
+  📝 FORM ANSWERS note (salary $4,000 recommended, current salary blank). Everything: .
+- ⚠️ **Kit bug, NOT fixed (needs Elena's go — Oracle code):**  hard-codes "cleared 72% against ~6% for the rest of the fleet"
+  — the baseline NOW 5 Oct says never to quote. Every auto-tailored CV carries it. One-sentence fix + scp + no restart (script, not PM2).
+- Role-defense Q1 (kit text) says she tracks "time or money saved before and after" — no hours-saved number exists; don't let her quote hours.
+
+
 ### 🎯 6 Oct — Puente "Founder's Associate" #2679 STAGED + kit complete · Elena's move: apply (resume only)
 - `[HIRING-MANUAL] Founder's Associate @ Puente Talent Partners`, 🔥 I act TODAY. Evaluation said SKIP (3/3 judges: $1,800–2,600 < her $3,000 floor;
   e-commerce now *required*; same role was $3,000–4,000 in July) — **Elena chose to apply**. `docs/applications/2026-10-06_puente_founders_associate_EVALUATED.md`.
