@@ -139,13 +139,13 @@ git log keeps the record.
   or her click). Knock-ons: the Supabase open-source answer names AIPA_AITCF as public; GitHub-raw fallback of the send buttons needs auth
   (Oracle disk is primary). **Do not ship the lead-machine GitHub-API publish until this is decided** — it would add prospect data weekly.
 
-### ✅ 6 Oct — Oracle `cto-aipa` rebase jam (since 7 Sep 16:02) CLEARED · stranded leads NOT pushed (repo stays public ~2 wks, Elena)
+### ✅ 6 Oct — Oracle `cto-aipa` rebase jam (since 7 Sep 16:02) CLEARED · stranded leads NOT pushed (repo stays public until ~20 Nov, Elena; Calendar reminder 20 Nov)
 - **Cause:** lead-machine publish = `commit → pull --rebase → push` inside the live checkout; the 7 Sep rebase stopped mid-way (most likely a
   registry clash with the 4 Sep NDA staging) and logged one warning line; 21 Sep / 28 Sep / 5 Oct auto-commits piled onto a detached HEAD.
 - **Done (git refs only):** `rebase --quit`; `main` → `5325e2c` (the commit HEAD already was); `git status --porcelain` md5 identical before/after
   (`f8a2b167…`) = zero files changed. Branches `atlas-stranded-20260907` (3d15740) + `atlas-stranded-20261005` (5325e2c) keep every commit.
   Backup `~/_session-backups/rebase-jam-20261006/` (old HEAD, refs, rebase-merge, bundle); laptop copy `D:/aideazz/_private-backups/atlas-stranded-20261006/` (bundle verified).
-- **NOT done, on purpose:** the ~125 stranded prospect files are NOT on GitHub — Elena keeps AIPA_AITCF public ~2 weeks for employers; pushing
+- **NOT done, on purpose:** the ~125 stranded prospect files are NOT on GitHub — Elena keeps AIPA_AITCF public until ~20 Nov for employers; pushing
   prospect emails/phones there is her call. Send buttons unaffected (Oracle disk).
 - ⚠️ **Monday 12 Oct:** publish will commit locally, `pull --rebase` will REFUSE (11 uncommitted live files, no autostash) → push rejected → leads stay
   on disk, buttons work. That refusal is what stops the robot deploying 633 commits of main onto Oracle's lagging checkout. **Never set
