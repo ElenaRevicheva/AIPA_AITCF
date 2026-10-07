@@ -47,6 +47,7 @@ import {
 import { runAddedImageProviders, runAddedImageProvidersDetailed, persistGeminiStillBytes } from './atuona-image-waterfall';
 import { insertPoemIntoVault, replacePoemCard } from './atuona-vault-tree';
 export { insertPoemIntoVault, replacePoemCard, findCardBounds } from './atuona-vault-tree';
+import { initFactPool, drawFacts, factsPromptBlock, factsFooter } from './atuona-fact-engine';
 import * as fs from 'fs';
 import * as path from 'path';
 import { notifyTechMilestone } from './cto-aipa';
@@ -2057,6 +2058,13 @@ ${KNOWLEDGE_AI_AGENTIC}
 ${EMOTIONAL_INTELLIGENCE}
 `;
 
+// Fact engine (7 Oct 2026): the 10 creative lanes as atomic facts; EMOTIONAL_INTELLIGENCE is guidance, not facts.
+initFactPool({
+  ATU: KNOWLEDGE_ATUONA, GAU: KNOWLEDGE_GAUGUIN, ART: KNOWLEDGE_ART_HISTORY, MOD: KNOWLEDGE_MODERN_ART,
+  AUC: KNOWLEDGE_AUCTION_HOUSES, FAS: KNOWLEDGE_FASHION, VIB: KNOWLEDGE_VIBE_CODING, NFT: KNOWLEDGE_VIBE_NFT_ART_FUSION,
+  ATL: KNOWLEDGE_ATLAS_SHRUGGED, AGT: KNOWLEDGE_AI_AGENTIC,
+});
+
 /**
  * Poems #001–#098 define the underground voice — not “literary AI,” not decorative, not explainer.
  * (Live excerpts from GitHub are appended separately via getUndergroundCanonCorpus.)
@@ -2474,6 +2482,26 @@ FULL EMBEDDED KNOWLEDGE (all domains)
 ═══════════════════════════════════════════════════════════════
 ${FULL_KNOWLEDGE_BASE}
 `;
+}
+
+/**
+ * Fact-engine knowledge block for the creative commands (7 Oct 2026). Instead of all 610 facts + 98 poems,
+ * the prompt carries 4 code-chosen least-used facts (3 art, 1 counterpoint) and 12 rotating canon poems.
+ * The footer names the facts under the Telegram reply.
+ */
+async function buildFactKnowledgeBlock(): Promise<{ block: string; footer: string }> {
+  const canon = await getUndergroundCanonCorpus();
+  const canonSample = sampleCanonExcerpts(canon, 12);
+  const facts = drawFacts(3, 1);
+  const block = `${BOOK_UNDERGROUND_STYLE_CANON}
+${canonSample ? `
+═══════════════════════════════════════════════════════════════
+CANON — 12 OF THE PUBLISHED POEMS #001–#098 (match rhythm, cuts, temperature; never copy-paste)
+═══════════════════════════════════════════════════════════════
+${canonSample}
+` : ''}
+${factsPromptBlock(facts)}`;
+  return { block, footer: factsFooter(facts) };
 }
 
 // =============================================================================
@@ -4235,12 +4263,22 @@ async function createContent(
 
   try {
     try {
-      const response = await anthropic.messages.create({
-        model: AI_CONFIG.primaryModel,
-        max_tokens: maxTokens,
-        temperature: temperature,
-        messages: [{ role: 'user', content: prompt }]
-      });
+      // 7 Oct 2026: Fable 5.1 / Opus 5+ reject `temperature` (400) and always think — thinking spends from max_tokens,
+      // so give room. Fable gets Anthropic's server-side refusal fallback; a refusal that survives it drops to the
+      // DeepSeek/Groq/Grok chain below instead of returning empty text.
+      const model = AI_CONFIG.primaryModel;
+      const noSampling = /^claude-(fable|mythos|opus-5|sonnet-5|opus-4-[78])/.test(model);
+      const serverFallback = /^claude-(fable|mythos)/.test(model);
+      const body: any = { model, max_tokens: noSampling ? Math.max(maxTokens * 4, 8000) : maxTokens,
+        messages: [{ role: 'user', content: prompt }] };
+      if (!noSampling) body.temperature = temperature;
+      if (serverFallback) body.fallbacks = 'default';
+      const response: any = await anthropic.messages.create(body,
+        serverFallback ? { headers: { 'anthropic-beta': 'server-side-fallback-2026-07-01' } } : undefined);
+      console.log(`[atuona/claude] ${response.model} stop=${response.stop_reason} in=${response.usage?.input_tokens} out=${response.usage?.output_tokens}`);
+      if (response.stop_reason === 'refusal') {
+        const e: any = new Error('Claude refusal'); e.status = 400; throw e;
+      }
       return readClaudeText(response);
     } catch (tempErr: any) {
       // Opus 5 400s on temperature — retry the same call without it, then keep the old fallbacks.
@@ -6595,7 +6633,7 @@ _"Paradise is not a place. Paradise is a process."_ 🖤
     try {
       const knowledgeAreas = ALL_KNOWLEDGE_KEYS;
       const randomArea = knowledgeAreas[Math.floor(Math.random() * knowledgeAreas.length)] || 'gauguin';
-      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const fullKnowledgeBlock = kbDraw.block;
       
       // 🎨 Get creative enhancement
       const creativeEnhancement = getCreativeEnhancement(selectedMood);
@@ -6628,7 +6666,7 @@ Your tone should match the ${selectedMood} mood. In Russian with English phrases
       // 🧠 CREATIVE MEMORY: Track creative elements
       extractAndTrackFromResponse(inspiration, 'inspire');
       
-      await ctx.reply(`✨ *Today's Inspiration*\n\n${inspiration}`, { parse_mode: 'Markdown' });
+      await ctx.reply(`✨ *Today's Inspiration*\n\n${inspiration}${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Inspire error:', error);
@@ -8168,7 +8206,7 @@ Next /publish will create this page.`);
       updateWritingStreak();
       const streakMsg = getStreakMessage();
       
-      const ritualKnowledge = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const ritualKnowledge = kbDraw.block;
       
       // Generate recap, inspiration, mood, and prompt in parallel
       const recapPrompt = `${ATUONA_CONTEXT}
@@ -8249,7 +8287,7 @@ ${dailyPrompt}
 
 _Ready to write? /import your text or /collab to write together_ 💜`;
 
-      await ctx.reply(ritualMessage, { parse_mode: 'Markdown' });
+      await ctx.reply(ritualMessage + kbDraw.footer, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Ritual error:', error);
@@ -8331,7 +8369,7 @@ Available: narrator, kira, ule, vibe`);
     await ctx.reply(`🎭 *Generating ${dialogueMood} dialogue...*`, { parse_mode: 'Markdown' });
     
     try {
-      const dialogueKnowledge = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const dialogueKnowledge = kbDraw.block;
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(dialogueMood);
@@ -8393,7 +8431,7 @@ Name: "Dialogue"
         `dialogue: ${context?.substring(0, 30) || 'kira-ule'}`
       );
       
-      await ctx.reply(`🎭 *Dialogue Scene (${dialogueMood})*\n\n${dialogue}`, { parse_mode: 'Markdown' });
+      await ctx.reply(`🎭 *Dialogue Scene (${dialogueMood})*\n\n${dialogue}${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Dialogue error:', error);
@@ -8618,7 +8656,7 @@ _Type /endcollab to finish_`, { parse_mode: 'Markdown' });
       const { externalNote, selectedKeys } = selectKnowledgeForInput(input, creativeSession.collabHistory);
       const staleDetails = extractStaleDetailsFromHistory(creativeSession.collabHistory);
       const avoidanceList = getCreativeAvoidanceList();
-      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const fullKnowledgeBlock = kbDraw.block;
 
       console.log(`✍️ Collab knowledge routing: selected [${selectedKeys.join(', ')}] for input: "${input.slice(0, 80)}..."`);
 
@@ -8673,7 +8711,7 @@ ${collabLang === 'english'
       
       await ctx.reply(`✍️ ${continuation}
 
-_Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
+_Your turn... or /endcollab to finish_${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Collab error:', error);
@@ -8765,7 +8803,7 @@ I'll turn it into a rich, detailed paragraph!`, { parse_mode: 'Markdown' });
     await ctx.reply(`🔍 *Expanding with ${expandMood} tone...*`, { parse_mode: 'Markdown' });
     
     try {
-      const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const relevantKnowledge = kbDraw.block;
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(expandMood);
@@ -8816,7 +8854,7 @@ Keep the style raw and lyrical. 100-200 words. In Russian.`;
 
 ${expanded}
 
-_Use this in your chapter!_ ✨`, { parse_mode: 'Markdown' });
+_Use this in your chapter!_ ✨${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Expand error:', error);
@@ -8853,7 +8891,7 @@ I'll create a full scene!`, { parse_mode: 'Markdown' });
     try {
       const voiceContext = CHARACTER_VOICES[creativeSession.activeVoice as keyof typeof CHARACTER_VOICES] || '';
       
-      const sceneKnowledge = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const sceneKnowledge = kbDraw.block;
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(sceneMood);
@@ -8928,7 +8966,7 @@ Write 300-500 words. In Russian, raw and literary. End on a strong image or ques
 ${scene}
 ━━━━━━━━━━━━━━━━━━━━
 
-_Voice: ${creativeSession.activeVoice}_ 🎭`, { parse_mode: 'Markdown' });
+_Voice: ${creativeSession.activeVoice}_ 🎭${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Scene error:', error);
@@ -8952,7 +8990,7 @@ _Voice: ${creativeSession.activeVoice}_ 🎭`, { parse_mode: 'Markdown' });
     await ctx.reply(`🌙 *Generating ${endingMood} endings...*`, { parse_mode: 'Markdown' });
     
     try {
-      const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const relevantKnowledge = kbDraw.block;
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(endingMood);
@@ -9016,7 +9054,7 @@ Format:
 ${endings}
 ━━━━━━━━━━━━━━━━━━━━
 
-_Choose one or mix elements!_ ✨`, { parse_mode: 'Markdown' });
+_Choose one or mix elements!_ ✨${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Ending error:', error);
@@ -9042,7 +9080,7 @@ _Choose one or mix elements!_ ✨`, { parse_mode: 'Markdown' });
     await ctx.reply(`🔮 *Exploring ${whatifMood} possibilities...*`, { parse_mode: 'Markdown' });
     
     try {
-      const relevantKnowledge = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const relevantKnowledge = kbDraw.block;
       
       // 🧠 Get emotional guidelines
       const emotionalGuidelines = getEmotionalGuidelines(whatifMood);
@@ -9126,7 +9164,7 @@ In Russian, be provocative and SPECIFIC!`;
 ${whatifs}
 ━━━━━━━━━━━━━━━━━━━━
 
-_Which possibility calls to you?_ 💜`, { parse_mode: 'Markdown' });
+_Which possibility calls to you?_ 💜${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Whatif error:', error);
@@ -9786,7 +9824,7 @@ _Panama vibes, añoranza tropical..._ 🌴`, { parse_mode: 'Markdown' });
     await ctx.reply('🇪🇸 *Escribiendo...*', { parse_mode: 'Markdown' });
     
     try {
-      const spanishKnowledge = await buildFullCreativityKnowledgeBlock();
+      const kbDraw = await buildFactKnowledgeBlock(); const spanishKnowledge = kbDraw.block;
       
       let prompt = '';
       
@@ -9835,7 +9873,7 @@ Translate this to Spanish, keeping the emotional quality:
       }
       
       const result = await createContent(prompt, 1000, true);
-      await ctx.reply(`🇪🇸 ${result}`, { parse_mode: 'Markdown' });
+      await ctx.reply(`🇪🇸 ${result}${kbDraw.footer}`, { parse_mode: 'Markdown' });
       
     } catch (error) {
       console.error('Spanish error:', error);
@@ -11743,7 +11781,7 @@ _Check /tech-milestones endpoint for pending announcements_`, { parse_mode: 'Mar
         const { externalNote, selectedKeys } = selectKnowledgeForInput(message, creativeSession.collabHistory);
         const staleDetails = extractStaleDetailsFromHistory(creativeSession.collabHistory);
         const avoidanceList = getCreativeAvoidanceList();
-        const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
+        const kbDraw = await buildFactKnowledgeBlock(); const fullKnowledgeBlock = kbDraw.block;
 
         console.log(`✍️ Collab knowledge routing: selected [${selectedKeys.join(', ')}] for input: "${message.slice(0, 80)}..."`);
 
@@ -11805,7 +11843,7 @@ ${collabLang === 'english'
         
         await ctx.reply(`✍️ ${continuation}
 
-_Your turn... or /endcollab to finish_`, { parse_mode: 'Markdown' });
+_Your turn... or /endcollab to finish_${kbDraw.footer}`, { parse_mode: 'Markdown' });
         return;
         
       } catch (error) {
