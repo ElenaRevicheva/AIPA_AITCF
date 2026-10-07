@@ -195,7 +195,10 @@ git log keeps the record.
   `dist/atuona-creative-ai.js.bak-20261007-pre-factengine`, `.env.bak-20261007-pre-fable`. 10 creative commands draw **2 art + 2** (Elena 7 Oct; redeployed) 
   counterpoint facts + footer; usage lives in the EXISTING memory `creativeMemory.factLedger` → `atuona-state.json` via
   `saveState()` (redeployed 14:27 UTC after Elena: no reinventing — the separate ledger file never got written); translation, /art, /artist, recap, arc, chat UNCHANGED.
-  **Still to prove:** one live `/inspire` → log `[fact-engine] drew …` + `[atuona/claude] claude-fable-5-1 … in=` (tokens).
+  **PROVEN 7 Oct (Elena's /inspire):** `[fact-engine] drew AUC-021 MOD-012 VIB-029 FAS-028` → `[atuona/claude]
+  claude-fable-5-1 stop=end_turn in=3948 out=703` (≈ $0.075; the old 38k-token prompt on Fable ≈ $0.45) → ledger saved in
+  `atuona-state.json` (4 facts, 4 lanes). Canon loaded 98/98. Finding: many KB lines are generic ("Tate Britain: British art
+  from 1500 to today") — phase 2 = verify AND replace generic lines with rare, sourced ones.
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
