@@ -2487,14 +2487,14 @@ ${FULL_KNOWLEDGE_BASE}
 
 /**
  * Fact-engine knowledge block for the creative commands (7 Oct 2026). Instead of all 610 facts + 98 poems,
- * the prompt carries 4 code-chosen least-used facts (3 art, 1 counterpoint) and 12 rotating canon poems.
+ * the prompt carries 4 code-chosen least-used facts (2 art, 2 counterpoint — Elena, 7 Oct) and 12 rotating canon poems.
  * The footer names the facts under the Telegram reply.
  */
 async function buildFactKnowledgeBlock(): Promise<{ block: string; footer: string }> {
   const canon = await getUndergroundCanonCorpus();
   const canonSample = sampleCanonExcerpts(canon, 12);
   if (!creativeMemory.factLedger) creativeMemory.factLedger = { facts: {}, domains: {} };
-  const facts = drawFacts(creativeMemory.factLedger, 3, 1);
+  const facts = drawFacts(creativeMemory.factLedger, 2, 2);
   saveState();
   const block = `${BOOK_UNDERGROUND_STYLE_CANON}
 ${canonSample ? `

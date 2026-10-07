@@ -5,8 +5,8 @@
 // Why: the creative commands pasted all 610 knowledge-base facts into every prompt
 // and ASKED the model to pick obscure ones. A model shown 610 facts picks the most
 // salient ones every time (salience bias). Here the CODE picks: 4 facts per command,
-// 3 from the art lanes (the book is art history + Impressionism first) and 1 from
-// the rest, always the least-used. Usage lives in Atuona's EXISTING memory (creativeMemory.factLedger,
+// 2 from the art lanes (the book is art history + Impressionism first) and 2 from
+// the counterpoint lanes, always the least-used. Usage lives in Atuona's EXISTING memory (creativeMemory.factLedger,
 // persisted by saveState() into atuona-state.json) — this module owns no file.
 // =============================================================================
 import * as crypto from 'crypto';
@@ -61,7 +61,7 @@ function orderDomains(domains: string[], l: FactLedger): string[] {
 }
 
 /** Draws facts and records them in the caller's ledger (Atuona's creativeMemory.factLedger); caller saves. */
-export function drawFacts(l: FactLedger, artCount = 3, otherCount = 1): KbFact[] {
+export function drawFacts(l: FactLedger, artCount = 2, otherCount = 2): KbFact[] {
   if (!POOL.length) return [];
   l.facts = l.facts || {}; l.domains = l.domains || {};
   const picked: KbFact[] = [];
@@ -85,7 +85,7 @@ TODAY'S FACTS — chosen for this piece from the knowledge base (rotated; never 
 ═══════════════════════════════════════════════════════════════
 ${facts.map(f => `[${f.id}] ${f.text}`).join('\n')}
 
-Build the piece on THESE facts — the first three are art history (the book's spine), the fourth is the counterpoint.
+Build the piece on THESE facts — the art-history facts come first (the book's spine), then the counterpoint.
 Use at least three of them, as wounds and images, not as a lecture. Do not add any other historical names, dates,
 prices or numbers that are not in these facts or in the canon poems.
 `;
