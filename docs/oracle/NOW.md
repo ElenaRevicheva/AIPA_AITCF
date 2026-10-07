@@ -221,10 +221,14 @@ git log keeps the record.
   4 NOVEL_CANON kept (GAU-042..045 "The Lost Painting Theory" = Ule's lost Gauguin — fiction by design; an agent tried to "fix" it,
   rejected). Audit: `docs/atuona/KB_VERIFICATION_2026-10-07.md`. Sources: 139 museum/press/scholarly, 133 Wikipedia (agents hit the
   200-search limit). Diff vs live = only the 272 bullet lines; 55 commands; pool 577; backup `.bak-20261007-pre-kbverify`.
-  **IN PROGRESS (Elena: "A and b"):** 9 agents — counterpoint lanes → `FASVIB/NFT/ATL.part1-2/AGT.part1-2 .result.json`
-  (AUTHOR_CANON = her own ideas/products/book, kept verbatim); 133 Wikipedia-only art facts → `WIKI.upgrade.part1-3.json`.
-  Apply: `apply.py --lanes=FAS,VIB,NFT,ATL,AGT --audit=KB_VERIFICATION_COUNTERPOINT_2026-10-07.md` + `apply_upgrade.py`
-  (both refuse on any mismatch), then build, diff vs live, deploy.
+  **ALL DONE + DEPLOYED 19:51 UTC (`e07383f`):** counterpoint lanes (301: 129 author canon kept verbatim, 110 generic → rare
+  sourced, 34 corrected, 20 verified, 8 replaced); 133 Wikipedia-only art facts upgraded (92 stronger source, 20 corrected, 21 still
+  Wikipedia); NEW crypto lane (45 sourced, counterpoint + free chat/voice only); final check of 44 flagged facts (26 confirmed,
+  10 trimmed, 8 fixed). Audits: `KB_VERIFICATION_2026-10-07.md`, `KB_VERIFICATION_COUNTERPOINT_…`, `KB_CRYPTO_LANE_…`,
+  `KB_FINAL_CHECK_…`. Pool 622 facts / 11 lanes; footer uses fact body (Atlas "PART ONE:" headers no longer garble labels).
+  Diff vs live = KB lines + crypto const + extraKnowledge param + 2 chat call sites; 55 commands. Backups `*.bak-20261007-pre-kbfull`.
+  ⚠️ Anthropic OUT of credit again 7 Oct evening (probe 400) and Elena will NOT top up for now → Atuona runs on the fallback chain.
+  Live proof pending: one /inspire → `[fact-engine] drew …` + which fallback answered.
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
