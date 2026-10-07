@@ -194,7 +194,7 @@ git log keeps the record.
 - **VERIFIED BY:** `concierge-selftest.cjs --draft` → PASS 4/4, `tgDelivered:true, tgRemoved:true`, log `SELF-TEST card 7056 delivered, removed=true`.
   The morning preview generated on Oracle is about 8 lines; the old version was about 50. Process 20:57:21 is newer than the files. The diff of
   live vs new = only replaced code. Backups `~/_session-backups/tg-noise-20261006/`.
-- **7 Oct:** follow-up radar: cal.com (36d) + megan@hud.ai (32d) dismissed via `dismissRadarItems` (= the Clean button). The VJH digest `is_hidden`=True for both. micro1 support (12d, interview issue, they wrote last) left ON PURPOSE: income path, Elena decides. Ledger backup `data/radar-dismissed.json.bak-20261007`.
+- **7 Oct:** follow-up radar: cal.com (36d) + megan@hud.ai (32d) dismissed via `dismissRadarItems` (= the Clean button). The VJH digest `is_hidden`=True for both. micro1 support (12d) also dismissed at Elena's request. Radar empty. Ledger backup `data/radar-dismissed.json.bak-20261007`.
 - **NEXT:** ① Boardy intro emails filed as `[HIRING-VJH-LEAD]` deals (6 at 20:2x UTC). Elena said leave it for now; likely VJH crm-event.
   ② Old messages: the bot cannot delete them (no stored ids, 48h limit), so Elena uses Telegram ⋮ → Clear history.
   ③ Elena will list the remaining stuck messages.
