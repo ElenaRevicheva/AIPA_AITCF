@@ -166,7 +166,11 @@ git log keeps the record.
   chars), Q2 = a posting requirement. BUT a fake "💾 saved" (cards folder empty), no proof, and double audio (tts tool + tag). Fixed: cards rebuilt from
   her UUID session files by `skills/interview-spar/references/build-cards.py` (cron */10, `~/logs/interview-cards.log`); ➕ = verbatim line from the deal's
   🛡️ TECHNICAL DEFENSE (verified by grep); tts tool forbidden. Re-test: proof present + verbatim, 0 tts tool calls, 0 "💾".
-- **NEXT:** Elena's next session — check one card + the ➕ line. If her old Telegram session does not pick the skill up, send `/new` once.
+- **Menu (7 Oct, last):** /menu = exact HELP text (menu copied verbatim into IDENTITY.md = always in context; 4/4 runs exact). Telegram "/" list =
+  only /menu /spar /cards /shortlist /linkedin (`commands.native:false`). /cards reads `cards/TOOLS.md` (injected, 2/2 showed her real card).
+  **SYNC VERIFIED 7 Oct:** cto-aipa laptop = GitHub; 7 deployed files identical on Oracle. openclaw repo `docs` = laptop = Oracle workspace/skill files.
+  Full map: openclaw-vibejob-shortlist `docs/openclaw/ORACLE_LIVE_SETUP.md`. Known, not fixed: `oracle-products.conf` openclaw entry is wrong (dir + restart).
+- **NEXT:** Elena pauses. Her next mock interview: check one card in `cards/TOOLS.md` + that the ➕ line is from the deal's 🛡️ defense. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
 - **Arrives:** cron `0 */6` `~/job-list-filter/run_shortlist.sh` exports 20 YC companies → VJH STEP 0 `Priority sync` every cycle
