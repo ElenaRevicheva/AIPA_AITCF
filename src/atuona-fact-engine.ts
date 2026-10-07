@@ -94,9 +94,7 @@ prices or numbers that are not in these facts or in the canon poems.
 /** Footer shown under the Telegram reply. Plain text: no Markdown control characters. */
 export function factsFooter(facts: KbFact[]): string {
   if (!facts.length) return '';
-  const clean = (s: string) => s.replace(/[*_`\[\]]/g, '').replace(/\s+/g, ' ');
-  return '\n\n📚 Facts: ' + facts.map(f => {
-    const body = clean(f.body || f.text);
-    return `${f.id} ${body.length > 70 ? body.slice(0, 69) + '…' : body}`;
-  }).join(' · ');
+  const clean = (t: string) => t.replace(/[*_`\[\]]/g, '').replace(/\s+/g, ' ').trim();
+  // 7 Oct 2026 (Elena): the full fact, one per line — she reads them; no 70-character cut.
+  return '\n\n📚 Facts:\n' + facts.map(f => `• ${f.id} ${clean(f.body || f.text)}`).join('\n');
 }
