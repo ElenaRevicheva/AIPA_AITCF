@@ -133,7 +133,7 @@ git log keeps the record.
 ### ✅ 7 Oct — OpenClaw = interview sparring partner (Elena's design) · live on Oracle, skill `interview-spar` ✓ ready
 - **DONE:** `~/.openclaw/workspace/skills/interview-spar/` (SKILL.md + references/outlook-facts.md + proof-bank.md, a verbatim copy
   of `cto-aipa/docs/interview/defense-bank.json`). HELP.md/IDENTITY.md menu item 4. Repo: openclaw-vibejob-shortlist `docs` branch.
-  Flow: "spar"/"prep me for <role>" → one HR/AI-interviewer-style question → Elena answers in English, her way → ✅ polished /
+  Flow: "spar"/"prep me for <role>" → full MOCK INTERVIEW (8 Qs in real order; "quick"=4, "deep"=10; debrief at the end), each → Elena answers in English, her way → ✅ polished /
   💡 what it means / 🎯 why the role asks it / ➕ proof / 🔧 fixed → card appended to `~/.openclaw/workspace/interview-cards/<role>.md`.
   No VJH, cto-aipa or OpenClaw code touched; no gateway restart. Backups `~/_session-backups/openclaw-spar-20261007/`.
 - **VERIFIED BY:** test sessions via `openclaw agent --session-id` (not delivered). The 1st run INVENTED a defense-bank quote
