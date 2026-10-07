@@ -1,0 +1,402 @@
+[
+ {
+  "id": "ATL-001",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › THE CENTRAL QUESTION: \"Who is John Galt?\" - the question everyone asks but nobody answers",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Part One, Ch. I \"The Theme\" opens with a bum saying \"Who is John Galt?\" to Eddie Willers; Galt's broadcast later begins \"For twelve years, you have been asking: Who is John Galt?\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Novel full text, opening line and speech"
+ },
+ {
+  "id": "ATL-002",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › THE CENTRAL QUESTION: What happens when the creators, the builders, the minds — stop?",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "The idea came in a 1943 phone call with Isabel Paterson, when Rand asked: \"What if all the creative minds of the world went on strike?\" Her working title was The Strike.",
+  "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+  "source_note": "History: context, writing and title"
+ },
+ {
+  "id": "ATL-003",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › THE CENTRAL QUESTION: The strike is not of workers. It's of thinkers. The motor of the world goes silent.",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In his broadcast Galt says: \"I have stopped your motor. I have deprived your world of man's mind.\" (Part Three, Ch. VII)",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech, novel full text"
+ },
+ {
+  "id": "ATL-004",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: The world is collapsing — trains don't run, factories close, lights go out",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In the opening chapter Eddie Willers sees a gigantic calendar the mayor of New York had erected on a rooftop, so citizens could read the date as they read the hour.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. I, calendar passage"
+ },
+ {
+  "id": "ATL-005",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: Dagny Taggart: VP of Taggart Transcontinental railroad — fights to keep it alive",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Dagny's title is \"Vice-President in Charge of Operation\"; an engineer tells a young brakeman: \"That's who runs Taggart Transcontinental.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. I, train scene"
+ },
+ {
+  "id": "ATL-006",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: Her brother James Taggart: president in name, a looter in practice — political connections over competence",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "James Taggart keeps waiting on Orren Boyle's Associated Steel for Rio Norte rail; Eddie Willers tells him they have waited thirteen months for delivery.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. I, Eddie and Jim"
+ },
+ {
+  "id": "ATL-007",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: Hank Rearden: invented Rearden Metal — lighter, stronger, cheaper than steel — the world punishes him for it",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In \"The Chain\" (Part One, Ch. II) Rearden carries a bracelet in the shape of a chain, made from the first poured Rearden Metal, as a gift for his wife.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. II, bracelet passage"
+ },
+ {
+  "id": "ATL-008",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: The Taggart Bridge: Dagny and Hank build the John Galt Line with Rearden Metal — it works, it's magnificent",
+  "verdict": "CORRECTED",
+  "final_text": "Not the Taggart Bridge (that spans the Mississippi): the John Galt Line's first train left Cheyenne on July 22 for Wyatt Junction at 100 mph, over a Rearden Metal bridge across a canyon.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. VIII, The John Galt Line"
+ },
+ {
+  "id": "ATL-009",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: Eddie Willers: Dagny's loyal assistant, talks to a nameless track worker in the cafeteria",
+  "verdict": "CORRECTED",
+  "final_text": "Eddie Willers dines in the underground employees' cafeteria of the Taggart Terminal with a worker whose name he never asked: John Galt, a track laborer there for twelve years.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One cafeteria; Part Three revelation"
+ },
+ {
+  "id": "ATL-010",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: The destroyers: one by one, the great minds vanish — Ellis Wyatt (oil), Ken Danagger (coal), Richard Halley (composer)",
+  "verdict": "CORRECTED",
+  "final_text": "The vanishings are spread out: composer Richard Halley retired eight years before the story opens; Ellis Wyatt vanishes at the end of Part One; Ken Danagger (coal) quits in Part Two.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Halley in Part One; Danagger in 'White Blackmail'"
+ },
+ {
+  "id": "ATL-011",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: Francisco d'Anconia: heir to world's greatest copper fortune, Dagny's first love — seems to be destroying his own empire",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Francisco d'Anconia was \"the copper king of the world\" at twenty-three; at thirty-six he is \"the most spectacularly worthless playboy on earth\".",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One, introduction of Francisco"
+ },
+ {
+  "id": "ATL-012",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: \"Contradiction\" — Francisco's speech at James's wedding: \"Money is the root of all good\"",
+  "verdict": "CORRECTED",
+  "final_text": "The money speech is in Part Two, Ch. II \"The Aristocracy of Pull\", at James Taggart's wedding: \"Until and unless you discover that money is the root of all good, you ask for your own destruction.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Two Ch. II, Francisco's speech"
+ },
+ {
+  "id": "ATL-013",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: Wyatt's Torch: Ellis Wyatt sets his oil fields on fire before vanishing — \"I am leaving it as I found it\"",
+  "verdict": "VERIFIED",
+  "final_text": "Wyatt's Torch: Ellis Wyatt sets his oil fields on fire before vanishing — \"I am leaving it as I found it\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. X 'Wyatt's Torch'"
+ },
+ {
+  "id": "ATL-014",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART ONE: NON-CONTRADICTION: Key theme: A is A — a thing is what it is, reality cannot be faked",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Part Three is titled \"A Is A\" after the law of identity; Galt's speech says: \"A is A. A thing is itself.\" and \"Existence is Identity, Consciousness is Identification.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech; Wikipedia on part titles"
+ },
+ {
+  "id": "ATL-015",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: The looters tighten control — Directive 10-289: freeze all economic activity, nobody can quit, nobody can invent",
+  "verdict": "CORRECTED",
+  "final_text": "Directive 10-289, read by Wesley Mouch in \"Miracle Metal\" (Part Two, Ch. VI), ties every worker to his job, bans new inventions and suspends the Office of Patents and Copyrights.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Directive text, Points One and Four"
+ },
+ {
+  "id": "ATL-016",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Dagny crashes in a hidden valley — Galt's Gulch (Atlantis)",
+  "verdict": "CORRECTED",
+  "final_text": "Dagny crashes at the close of Part Two crying \"Oh hell! Who is John Galt?\"; Part Three, Ch. I \"Atlantis\" opens as she wakes to sunlight, green leaves and a man's face.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "End Part Two; opening of 'Atlantis'"
+ },
+ {
+  "id": "ATL-017",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: John Galt revealed: physicist who invented a motor that runs on static electricity — then walked away",
+  "verdict": "CORRECTED",
+  "final_text": "Galt is unmasked in Part Three, Ch. I \"Atlantis\", when Hugh Akston names him to Dagny as \"the inventor of the motor\" that ran on atmospheric static electricity.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "'Atlantis' chapter; Wikipedia plot on motor"
+ },
+ {
+  "id": "ATL-018",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: The Gulch: all the vanished minds live here — Wyatt farms, Halley composes, Midas Mulligan banks",
+  "verdict": "CORRECTED",
+  "final_text": "In the valley Ellis Wyatt draws oil from shale, Midas Mulligan runs the Mulligan Bank and Mulligan Mint, Lawrence Hammond keeps the grocery, and Halley plays his Fifth Concerto.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. I-II, Gulch tour"
+ },
+ {
+  "id": "ATL-019",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Each resident took an oath: \"I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine\"",
+  "verdict": "CORRECTED",
+  "final_text": "The oath is cut in the granite above the steel door of the building that houses Galt's motor in the valley: \"I SWEAR BY MY LIFE AND MY LOVE OF IT THAT I WILL NEVER LIVE FOR THE SAKE OF ANOTHER MAN...\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three, inscription over motor house"
+ },
+ {
+  "id": "ATL-020",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Dagny falls in love with Galt but returns to the world — she can't abandon her railroad",
+  "verdict": "CORRECTED",
+  "final_text": "At the end of Part Three, Ch. II Galt flies Dagny out blindfolded and says: \"Don't look for me out there. You will not find me—until you want me for what I am.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "End of 'The Utopia of Greed'"
+ },
+ {
+  "id": "ATL-021",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Hank Rearden's trial: he refuses to apologize for creating value — \"I work for nothing but my own profit\"",
+  "verdict": "VERIFIED",
+  "final_text": "Hank Rearden's trial: he refuses to apologize for creating value — \"I work for nothing but my own profit\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Two Ch. IV, 'The Sanction of the Victim'"
+ },
+ {
+  "id": "ATL-022",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Francisco reveals his plan: he's been deliberately destroying d'Anconia Copper to keep it from the looters",
+  "verdict": "CORRECTED",
+  "final_text": "As the act nationalizing d'Anconia Copper is voted (Part Three, Ch. V), every d'Anconia property \"from Chile to Siam to Spain to Pottsville, Montana\" is blown up at the stroke of ten.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "'Their Brothers' Keepers', nationalization scene"
+ },
+ {
+  "id": "ATL-023",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Ragnar Danneskjöld: philosopher turned pirate — steals from the welfare state, returns gold to producers",
+  "verdict": "CORRECTED",
+  "final_text": "Ragnar Danneskjold majored in physics and philosophy with Galt and Francisco; he tells Rearden he will refund his income tax for the last twelve years \"In full and in gold\".",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Stadler's three pupils; Part Two Ch. VII"
+ },
+ {
+  "id": "ATL-024",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: The Wet Nurse: young bureaucrat assigned to Rearden's mill, begins to see truth, dies trying to help",
+  "verdict": "CORRECTED",
+  "final_text": "The Wet Nurse, Tony, is shot in the armed takeover of Rearden's mills (Part Three, \"The Concerto of Deliverance\") and dies in Rearden's arms, asking \"Who's the Wet Nurse now?\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. VI, mill riot"
+ },
+ {
+  "id": "ATL-025",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Cherryl Brooks: James Taggart's innocent wife, discovers his true nature, takes her own life",
+  "verdict": "CORRECTED",
+  "final_text": "Cherryl's death comes in Part Three, \"Anti-Life\": fleeing a social worker, she screams \"No! No! Not your kind of world!\" and runs over a river parapet.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "End of Part Three Ch. IV"
+ },
+ {
+  "id": "ATL-026",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART TWO: EITHER-OR: Key theme: there is no middle ground between creation and destruction",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Galt: \"There are two sides to every issue: one side is right and the other is wrong, but the middle is always evil.\" Part Two \"Either-Or\" is named for the law of excluded middle.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech; part title per Wikipedia"
+ },
+ {
+  "id": "ATL-027",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: The world economy collapses — blackouts, food shortages, transportation halts",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In the last chapter Eddie Willers, on the stalled Comet in the Arizona desert, hears the Taggart Bridge over the Mississippi is gone: \"Blasted to bits. Sound-ray explosion or something.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. X, the Comet"
+ },
+ {
+  "id": "ATL-028",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: John Galt broadcasts his speech to the nation: 3-hour radio address (60 pages in the book)",
+  "verdict": "CORRECTED",
+  "final_text": "Galt tells Mr. Thompson: \"It took me three hours on the radio to tell you why.\" Rand spent over two years on the speech, finishing it on October 13, 1955.",
+  "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+  "source_note": "Wikipedia history; quote checked in novel text"
+ },
+ {
+  "id": "ATL-029",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: THE SPEECH — Core ideas:",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "The speech fills Part Three, Ch. VII, titled \"This Is John Galt Speaking\", and begins: \"For twelve years, you have been asking: Who is John Galt? This is John Galt speaking.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. VII title and opening"
+ },
+ {
+  "id": "ATL-030",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: \"I am the man who loves his life\"",
+  "verdict": "VERIFIED",
+  "final_text": "\"I am the man who loves his life\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Opening of Galt's radio speech"
+ },
+ {
+  "id": "ATL-031",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: The mind is the source of all human value",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Galt: \"Thinking is man's only basic virtue, from which all the others proceed.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech, Part Three Ch. VII"
+ },
+ {
+  "id": "ATL-032",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: \"Man's mind is his basic tool of survival\"",
+  "verdict": "VERIFIED",
+  "final_text": "\"Man's mind is his basic tool of survival\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech, verbatim"
+ },
+ {
+  "id": "ATL-033",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: Reason is absolute — there is no duty higher than truth",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "Galt names man's basic vice \"the act of blanking out, the willful suspension of one's consciousness\".",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech; 'no duty higher' line not found"
+ },
+ {
+  "id": "ATL-034",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: The trader principle: value for value, not sacrifice",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Galt: \"The symbol of all relationships among such men, the moral symbol of respect for human beings, is the trader.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech, trader passage"
+ },
+ {
+  "id": "ATL-035",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: \"I swear by my life and my love of it...\"",
+  "verdict": "VERIFIED",
+  "final_text": "\"I swear by my life and my love of it...\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Oath closes Galt's speech"
+ },
+ {
+  "id": "ATL-036",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: Production, not redistribution, is morality",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Galt: \"Productiveness is your acceptance of morality, your recognition of the fact that you choose to live.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech, virtue of productiveness"
+ },
+ {
+  "id": "ATL-037",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: The sanction of the victim: evil is powerless without the cooperation of the good",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Galt: \"I saw that evil was impotent... and that the only weapon of its triumph was the willingness of the good to serve it.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's speech; Wikipedia 'sanction of the victim'"
+ },
+ {
+  "id": "ATL-038",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: \"Get out of the way\" — let the creators create",
+  "verdict": "CORRECTED",
+  "final_text": "It is Dagny, not Galt, who says it to Mr. Thompson after the broadcast: \"You wish to live, don't you? Get out of the way, if you want a chance. Let those who can, take over.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. VIII 'The Egoist'"
+ },
+ {
+  "id": "ATL-039",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: The government captures and tortures Galt — tries to force him to lead their economy",
+  "verdict": "CORRECTED",
+  "final_text": "Galt is tortured with the \"Ferris Persuader\" in Project F; when its generator fails, Galt himself tells them the fix: \"It's the vibrator that's out of order.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. IX 'The Generator'"
+ },
+ {
+  "id": "ATL-040",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: Dagny, Hank, Francisco, Ragnar — they rescue Galt",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "At Project F Dagny brings down the door guard; Francisco joins her first, then Hank Rearden, then Ragnar Danneskjold (Part Three, Ch. X).",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. X, rescue"
+ },
+ {
+  "id": "ATL-041",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: The lights of New York go out — the motor of the world has stopped",
+  "verdict": "CORRECTED",
+  "final_text": "Flying from the rescue, they see the lights of New York go out; Galt orders \"Don't look down!\", fulfilling his vow that when New York went dark \"our job was done\".",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. X; Francisco's account"
+ },
+ {
+  "id": "ATL-042",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: Final scene: Galt traces the sign of the dollar in the air over the valley",
+  "verdict": "CORRECTED",
+  "final_text": "Last line: \"He raised his hand and over the desolate earth he traced in space the sign of the dollar\", while Wyatt's Torch still burns below.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Final paragraph of the novel"
+ },
+ {
+  "id": "ATL-043",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › PART THREE: A IS A: \"The road is cleared. We are going back to the world.\"",
+  "verdict": "VERIFIED",
+  "final_text": "\"The road is cleared. We are going back to the world.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Galt's last words, final chapter"
+ },
+ {
+  "id": "ATL-044",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › DAGNY TAGGART: VP Operations, Taggart Transcontinental — runs it, her brother just has the title",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In the Terminal concourse Dagny looks at the statue of Nat Taggart and vows: \"I won't surrender it to the men of blood and rust—and I'm the only one left to guard it.\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Two Ch. I, statue of Nat Taggart"
+ },
+ {
+  "id": "ATL-045",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › DAGNY TAGGART: Fierce, brilliant, unstoppable — \"she was twelve when she decided to run the railroad\"",
+  "verdict": "CORRECTED",
+  "final_text": "\"Dagny Taggart was nine years old when she decided that she would run the Taggart Transcontinental Railroad some day\" - nine, not twelve.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. III, Dagny's childhood"
+ },
+ {
+  "id": "ATL-046",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › DAGNY TAGGART: Loves three men: Francisco (youth), Hank (maturity), Galt (destiny)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Dagny tells Rearden her only lover before him came \"When I was seventeen\" (Francisco); in \"Anti-Greed\" she tells Rearden the man she met is \"the love I had wanted to reach\".",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. IX; Part Three Ch. III"
+ },
+ {
+  "id": "ATL-047",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › DAGNY TAGGART: Cannot abandon the world even when she knows it's doomed",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Her break comes in \"The Generator\": crossing the Terminal for the last time, Dagny draws a dollar sign in lipstick on the pedestal of Nathaniel Taggart's statue.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. IX, farewell to Terminal"
+ },
+ {
+  "id": "ATL-048",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › DAGNY TAGGART: She is the bridge between the creators and the dying world",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Before the rescue Dagny swears Galt's oath to Francisco on a New York street corner, taking \"the buildings of the greatest city in the world\" as her witnesses.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part Three Ch. IX, Dagny's oath"
+ },
+ {
+  "id": "ATL-049",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › DAGNY TAGGART: Parallel to Kira: a woman who builds while the world burns around her",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Parallel to Kira: a woman who builds while the world burns around her",
+  "source_url": "",
+  "source_note": "Author's own parallel to her novel"
+ },
+ {
+  "id": "ATL-050",
+  "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › JOHN GALT: Physicist, philosopher, leader of the strike",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Robert Stadler recalls three pupils who majored in \"Physics and philosophy\": Francisco, Ragnar, and a third who vanished, \"probably a second assistant bookkeeper somewhere\": Galt.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Part One Ch. VII, Stadler to Dagny"
+ }
+]

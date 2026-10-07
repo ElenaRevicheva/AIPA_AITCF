@@ -66,8 +66,9 @@ def main(dry):
             orig_body = m.group(2).strip()
             if orig_body[:40] not in r.get('original', ''):
                 problems.append(f'{fid}: original mismatch'); continue
-            lines[i] = m.group(1) + safe(r['final_text'])
-            audit.append((fid, r['verdict'], orig_body, safe(r['final_text']), r['source_url'], r.get('source_note', '')))
+            final = orig_body if r['verdict'] in CANON else safe(r['final_text'])  # her own words stay byte-for-byte
+            lines[i] = m.group(1) + final
+            audit.append((fid, r['verdict'], orig_body, final, r['source_url'], r.get('source_note', '')))
         if n != len(expected):
             problems.append(f'{lane}: counted {n} bullets, expected {len(expected)}')
         s = s[:start] + '\n'.join(lines) + s[end:]

@@ -1152,7 +1152,7 @@ const KNOWLEDGE_ATUONA = `
 ATUONA - THE REAL PLACE:
 
 Geography & Location:
-- Atuona is the main village of Hiva Oa, the second-largest Marquesas island (about 320 sq km), and the administrative centre of the southern Marquesas.
+- Atuona is the main village of Hiva Oa, the second-largest Marquesas island (315 sq km), and the administrative centre of the southern Marquesas.
 - Atuona lies in French Polynesia, about 1,400 km northeast of Tahiti; Britannica puts the Marquesas group as a whole about 1,200 km away.
 - Atuona sits at about 9°48'S, 139°02'W, on the south coast of Hiva Oa.
 - Atuona had 1,993 inhabitants at the 2022 census, most of them Marquesan.
@@ -1161,7 +1161,7 @@ Geography & Location:
 Landscape & Atmosphere:
 - Mount Temetiu, the island summit at about 1,213 m (sources range up to 1,276 m), towers over Atuona and the western end of the Bay of Traitors.
 - Hiva Oa is called the Garden of the Marquesas; its people live largely on breadfruit, coconut, yam and taro they grow themselves.
-- At the me'ae of Iipona in Puamau, across Hiva Oa from Atuona, stands Takaii, a stone tiki over 2.4 m tall, the largest in Polynesia.
+- At the me'ae of Iipona in Puamau, across Hiva Oa from Atuona, stands Takaii, a stone tiki 2.57 m high, the tallest tiki in French Polynesia.
 - Atuona sits on a small inlet, Vevau in Marquesan, on the north shore of Ta'a Oa, the wide bay the French call Baie des Traitres; the rocky islet Hanakee guards it.
 - The bay at Atuona, Ta'aoa or the Bay of Traitors, lies inside the crater of the old volcano that built this side of Hiva Oa.
 - Copra, dried coconut meat, is the cash export of Hiva Oa, produced alongside a subsistence economy of breadfruit, coconut, yam and taro.
@@ -1194,17 +1194,17 @@ PAUL GAUGUIN - THE MAN WHO SOUGHT PARADISE:
 
 PRECISE TIMELINE (use this for accuracy):
 - Born 7 June 1848 in Paris, the year of the revolutions; his maternal grandmother was the socialist writer Flora Tristan.
-- His father Clovis died of a heart attack on the voyage to Peru; the 18-month-old Paul grew up in Lima among his mother's Tristan Moscoso kin until 1854, then Orléans.
+- His father Clovis died on the voyage to Peru; the infant Paul spent four years with his mother on her uncle's estate in Lima, and by 1855 the family was back in France at Orléans.
 - December 1865: signed on at Le Havre as a pilot's apprentice on the clipper Luzitano, later second lieutenant on the three-master Chili; 1868 navy service on the corvette Jérôme-Napoléon.
 - From 1871 a Paris Bourse stockbroker (job found via Gustave Arosa); by 1879 earning 30,000 francs a year, painting Sundays in Pissarro's garden.
-- After the 1882 Bourse crash, in October 1883 (aged 35) he wrote to Pissarro that he would live from painting at all costs; in January 1884 the family moved to cheaper Rouen.
+- After the 1882 Paris stock-market crash Gauguin left the Bourse to paint full time; in 1884 the family moved to cheaper Rouen, and Mette later took the children home to Copenhagen.
 - Summer 1886: first stay at Pont-Aven, chosen because it was cheap; an accomplished boxer and fencer, he quickly dominated the young art students there.
 - 1887: with Charles Laval, dreamed of Taboga island; broke in Colón, he dug on the Panama Canal 5:30am to 6pm, was fined 4 francs for urinating in public, then Martinique June-November.
 - 1888: Arles with Van Gogh in the Yellow House, from his arrival on 23 October until Van Gogh cut his ear on 23 December, after which Gauguin fled.
 - 1889: summer and autumn again in Brittany, painting The Yellow Christ and The Green Christ; at Le Pouldu the Dutch painter Meijer de Haan discreetly supported him.
 - First Tahiti trip: sailed 1 April 1891, back in France August 1893; painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.
 - 1893-95 Paris: Degas organised and bought from his November 1893 Durand-Ruel show while Monet, Renoir and Pissarro mocked it; his February 1895 Hôtel Drouot auction failed.
-- Second Tahiti stay: sailed 28 June 1895, arrived September 1895, left for the Marquesas 1901; painted Nevermore (1897) and Where Do We Come From? (1897-98).
+- Second Tahiti stay: Gauguin left France in July 1895 and moved on to Hiva Oa in the Marquesas in September 1901; in Tahiti he painted Nevermore (1897) and Where Do We Come From? (1897-98).
 - Arrived at Atuona, Hiva Oa, on 16 September 1901, and bought land in the town centre from the Catholic mission after first attending mass regularly.
 - Atuona 1901-03: painted landscapes and figure studies with Vollard's clients in mind, plus Riders on the Beach (1902, Museum Folkwang, Essen).
 - Died suddenly on the morning of 8 May 1903 in Atuona, aged 54; his neighbour Tioka found him at 11 o'clock.
@@ -1226,7 +1226,7 @@ Paris Interlude (1893-1895):
 
 Second Tahiti (1895-1901):
 - Te tamari no atua (1896, Neue Pinakothek, Munich): a Polynesian Nativity painted as Pahura gave birth around Christmas 1896; the baby girl died in infancy.
-- Where Do We Come From? (1897-98, MFA Boston) is 139 x 375 cm, about 3.75 m; after finishing it he tried to kill himself with arsenic, months after daughter Aline died.
+- Where Do We Come From? (1897-98, MFA Boston) is 139.1 x 374.6 cm, about 3.75 m; after finishing it he tried to kill himself with arsenic, months after daughter Aline died.
 - Nevermore (1897, Courtauld): Pahura nude on a bed; Gauguin called the bird a devil's bird, not Poe's raven; Delius bought it in 1898 for 500 francs via Monfreid.
 - Two Tahitian Women (1899, Met): one woman holds mango blossoms, not mangoes; the same pair reappears in Faa Iheihe (Tate) and Rupe Rupe (Pushkin Museum).
 
@@ -1244,7 +1244,7 @@ His Philosophy:
 - His 'primitive' Tahiti was partly bookish: he was lent Moerenhout's 1837 Voyage aux îles du Grand Océan to learn the island's forgotten religion.
 
 His Technique:
-- Synthetism's debut: the June 1889 Volpini show at the Café des Arts, filling walls left bare when the owner's Italian mirrors arrived late; Gauguin hung 11 zincographs on yellow paper.
+- Synthetism's debut: the June 1889 Volpini show at the Café des Arts, filling walls left bare when the owner's Italian mirrors arrived late; Gauguin showed a suite of ten zincographs on yellow paper.
 - 'Cloisonnism' was coined by critic Édouard Dujardin in the Revue indépendante, March 1888, for Louis Anquetin's paintings; Bernard and Gauguin then worked in the style.
 - He took to Tahiti photographs and prints, including a Borobudur temple frieze and an Egyptian fresco, which he called 'a whole little world of friends' in a letter to Redon.
 - No source for Polynesian flower pigments; documented instead: he painted on coarse burlap, as in Manao tupapau (1892).
@@ -1257,7 +1257,7 @@ The Lost Painting Theory:
 - The ultimate Gauguin mystery
 
 His Final Days in Atuona:
-- Maison du Jouir: two-storey house built with tattooed carpenter Tioka; carved lintels read 'Soyez amoureuses vous serez heureuses', 'Soyez mystérieuses'; four of five pieces at Orsay.
+- Maison du Jouir: two-storey house built with tattooed carpenter Tioka; carved panels read 'Soyez amoureuses et vous serez heureuses', 'Soyez mystérieuses'; four of five pieces at Orsay.
 - Sores on his legs were treated with arsenic; he called them eczema; syphilis is unproven. His ankle, shattered in an 1894 Concarneau brawl, never healed.
 - By September 1902 he took morphine injections, then handed his syringe set to a neighbour and used laudanum; an empty laudanum bottle stood by his deathbed.
 - He fought Bishop Martin over mission schools and carved Père Paillard (Father Lechery, 1902, NGA Washington), a horned bishop displayed outside his house.
@@ -1274,7 +1274,7 @@ THE IMPRESSIONIST PAINTERS (Complete List):
 
 CLAUDE MONET (1840-1926) - The Father of Impressionism:
 - Monet's Impression, Sunrise, shown in 1874, gave Impressionism its name; in 2014 astronomer Donald Olson dated its Le Havre harbour view to 13 November 1872, about 7:35 a.m.
-- Monet painted about 250 Water Lilies over the last three decades of his life at Giverny; the eight great murals opened at the Orangerie on 16 May 1927, months after his death.
+- Monet painted some 250 Water Lilies at Giverny from the late 1890s to his death in 1926; the eight great Orangerie murals were inaugurated on 17 May 1927, months after his death.
 - In Moscow in 1896 Kandinsky saw a Monet Haystack and could not tell what it was until the catalogue told him; that painful non-recognition, he wrote, gave painting a fairy-tale power.
 - Monet painted Rouen Cathedral's west facade more than 30 times (1892-94); in 1892 he worked from the fitting room of Fernand Levy's lingerie shop, screened off after customers complained.
 - On 25 September 1869 Monet wrote to Bazille of a dream painting, the baths of La Grenouillere, with only 'bad sketches' done; Renoir painted the same Seine bathing spot beside him.
@@ -1318,8 +1318,8 @@ BERTHE MORISOT (1841-1895) - The First Lady:
 - Morisot wrote in her notebook in 1890: 'I don't think there has ever been a man who treated a woman as an equal, and that's all I would have asked, for I know I'm worth as much as they.'
 
 ALFRED SISLEY (1839-1899) - Pure Landscape:
-- In 1893-94 Sisley painted the church of Notre-Dame at Moret about a dozen times from nearly the same spot, in different seasons and weather, his most deliberate series.
-- When the Seine flooded Port-Marly in spring 1876 Sisley painted several views; Boat in the Flood was bought by Count Isaac de Camondo at the Tavernier sale on 6 March 1900.
+- In 1893-94 Sisley painted the church of Notre-Dame at Moret some fifteen times from nearly the same spot, at different times of day and seasons, his most deliberate series.
+- When the Seine flooded Port-Marly in spring 1876 Sisley painted six views; Boat in the Flood was bought by Count Isaac de Camondo at the Tavernier sale on 6 March 1900 and bequeathed to the Louvre in 1911.
 - Not a series: Snow at Louveciennes (1878, Musee d'Orsay) is one of many snow scenes Sisley painted, a snowy lane narrowing into the distance with a single small figure.
 - Born in Paris to a British merchant father, Sisley stayed British all his life: his 1898 application for French citizenship was refused and a second was overtaken by his final illness.
 - Sisley died of throat cancer at Moret on 29 January 1899; on 1 May 1899 Monet's benefit sale at Galerie Georges Petit raised 145,000 francs for his children.
@@ -1328,7 +1328,7 @@ MARY CASSATT (1844-1926) - American in Paris:
 - Mary Cassatt was the only American officially associated with the Impressionists; Degas invited her to exhibit with them in 1877, after her Salon submissions were rejected.
 - Cassatt's The Child's Bath (1893, Art Institute of Chicago) followed her study of the 1890 Paris exhibition of Japanese prints: high viewpoint, flat patterns, cropped figures.
 - Degas worked on the background of Cassatt's Little Girl in a Blue Armchair (1878) and supplied the model, a friend's daughter; the American jury of the 1878 World's Fair rejected it.
-- After a major Paris exhibition of Japanese masters in 1890, Cassatt made a set of colour drypoint and aquatint prints in 1891, among her most original works.
+- Enthralled by an April 1890 Paris exhibition of Japanese woodblock prints, Cassatt made a set of ten colour prints (1890-91) adapting their flat colour and crisp outlines to scenes of Parisian women's daily life.
 - Cassatt urged her friend Louisine Havemeyer to buy her first artwork, a Degas pastel; the Havemeyer bequest after 1929 gave the Met nearly 2,000 works.
 - Of Degas's pastels in a Paris dealer's window around 1875, Cassatt said: 'I used to go and flatten my nose against that window and absorb all I could of his art. It changed my life.'
 
@@ -1347,7 +1347,7 @@ FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent:
 ARMAND GUILLAUMIN (1841-1927) - The Colorist:
 - A critic called Guillaumin a 'furious colourist' in 1886; in the 1890s, painting the Creuse around Crozant, his palette grew bolder still, a Fauve before Fauvism.
 - Guillaumin's Sunset at Ivry (1873), factory smoke over the Seine, was lent by Dr Gachet to the first Impressionist show in 1874; the Gachet family gave it to the nation in 1951.
-- In 1891 Guillaumin won 100,000 francs in the French state lottery, quit his government job and painted full-time.
+- Late in 1891 Guillaumin won 100,000 francs in a Credit Foncier bond lottery, quit his government job and painted full-time.
 
 ÉDOUARD MANET (1832-1883) - The Reluctant Leader:
 - Olympia, painted in 1863, caused its scandal at the 1865 Salon; in 1890 Monet raised 19,415 francs from nearly 100 subscribers to buy it from Manet's widow for the nation.
@@ -1371,7 +1371,7 @@ VINCENT VAN GOGH (1853-1890) - Tortured Genius:
 - Van Gogh painted The Bedroom in October 1888; after floodwater damaged it while he was in hospital, he made two copies at Saint-Rémy in 1889, now in Chicago and, smaller, at Orsay.
 - Wheatfield with Crows was not his last painting: a letter dates it to about 10 July 1890; the Van Gogh Museum names the unfinished Tree Roots, painted on his last morning, as his probable last.
 - The Red Vineyard, bought by Belgian painter Anna Boch for 400 francs at Les XX in Brussels in 1890, is his only certain painting sale; uncle Cor had earlier commissioned 19 cityscape drawings.
-- Van Gogh made about 2,100 artworks in a career of about ten years, including around 860 oil paintings, most of them in his last two years.
+- In a career of about ten years Van Gogh produced more than 800 paintings and 700 drawings, yet he sold only one painting in his lifetime.
 - Van Gogh shot himself on 27 July 1890, walked back to the Auberge Ravoux, and died in his attic room there in the early hours of 29 July, with Theo at his side.
 
 GEORGES SEURAT (1859-1891) - Scientific Color:
@@ -1395,7 +1395,7 @@ PAUL SIGNAC (1863-1935) - Seurat's Heir:
 THE ART MARKET HISTORY:
 - Between 1891 and 1922 Paul Durand-Ruel bought about 12,000 pictures: some 1,500 Renoirs, over 1,000 Monets, 800 Pissarros and around 400 each by Degas, Sisley and Cassatt.
 - Vollard bought some 150 Cézannes for his first show in 1895 and gave Picasso his first Paris show in 1901; from about 1900 he advanced Gauguin 300 francs a month for 25 paintings a year.
-- Theo van Gogh ran the 19 boulevard Montmartre branch of Boussod, Valadon & Cie, Goupil's successors, where from about 1884 he showed and sold the Impressionists.
+- Theo van Gogh managed the Goupil branch at 19 boulevard Montmartre (later Boussod, Valadon & Cie) from 1881; from about 1885-86 he showed and sold the Impressionists in its upstairs gallery.
 - Durand-Ruel himself nearly went under first: 'Without America, I would have been lost, ruined, after having bought so many Monets and Renoirs. The two exhibitions there in 1886 saved me.'
 - In 1878 the baritone Jean-Baptiste Faure paid Manet 2,600 francs for Le Déjeuner sur l'herbe; in 2011 one of Cézanne's Card Players reportedly sold for $250 million.
 
@@ -1464,81 +1464,81 @@ const KNOWLEDGE_FASHION = `
 FASHION INDUSTRY - Kira's World:
 
 HIGH FASHION MAGAZINES:
-- Vogue (US, UK, France, Italia) - the bible
-- Harper's Bazaar - artistic, avant-garde
-- W Magazine - edgier, more provocative
-- Elle - accessible luxury
-- Interview Magazine - Andy Warhol's creation
-- Dazed, i-D - youth culture, street style
+- Vogue began on 17 December 1892 as a 10-cent New York society weekly founded by Arthur Baldwin Turnure; Condé Nast bought it in 1909, and British Vogue (1916) was its first foreign edition.
+- Harper's Bazaar debuted on 2 November 1867 spelled 'Bazar'; the second 'a' arrived with the November 1929 issue, and Alexey Brodovitch art-directed it from 1934 to 1958.
+- W was born in 1972, when John Fairchild launched it as a bi-weekly supplement to the trade paper Women's Wear Daily; it became an independent oversized monthly only in 1993.
+- Elle ('She') was founded in Paris in 1945 by Russian-born Hélène Gordon-Lazareff, first sold as a supplement to France-Soir; the US edition arrived only in 1985, with Yasmin Le Bon on the cover.
+- Interview was founded in October 1969 by Andy Warhol and journalist John Wilcock as 'inter/VIEW: A Monthly Film Journal', with Gerard Malanga as founding editor.
+- i-D began in 1980 as a hand-stapled fanzine by ex-British Vogue art director Terry Jones, each cover carrying a wink; Dazed & Confused began in 1991 as a black-and-white folded poster by Jefferson Hack and Rankin.
 
 FASHION CAPITALS:
-- Paris: haute couture, Chanel, Dior, Louis Vuitton
-- Milan: craftsmanship, Gucci, Prada, Versace
-- London: avant-garde, Alexander McQueen, Vivienne Westwood
-- New York: commercial power, Ralph Lauren, Calvin Klein
+- Paris couture got its guild in 1868, when Charles Frederick Worth initiated the Chambre Syndicale; since 1945 'haute couture' has been a controlled designation only qualifying houses may use.
+- Prada opened in 1913 inside Milan's Galleria Vittorio Emanuele II, selling English steamer trunks and travel goods; in 1919 it became supplier to the Italian royal household, taking the Savoy arms into its logo.
+- Vivienne Westwood and Malcolm McLaren's shop at 430 King's Road changed skins: Let It Rock (1971), Too Fast To Live Too Young To Die (1972), SEX (1974), Seditionaries (1976), then Worlds End.
+- Ralph Lauren, born Ralph Lifshitz in the Bronx, began in 1967 selling men's ties from a single drawer in an Empire State Building showroom; he named his first full menswear line Polo in 1968.
 
 FASHION WEEKS:
-- Four main: NYC (Feb/Sep), London, Milan, Paris
-- The "front row" - celebrities, editors, buyers
-- "See now, buy now" vs traditional 6-month delay
-- Backstage chaos: models, makeup, designers panicking
+- The Big Four fashion weeks run each February and September in the order New York, London, Milan, Paris; New York's began in 1943, when the war cut the industry off from Paris.
+- At Christian Dior's first show, 12 February 1947 at 30 avenue Montaigne, Harper's Bazaar editor Carmel Snow exclaimed 'It's quite a revolution, dear Christian!' and her 'new look' named the collection.
+- Burberry broke the six-month wait in September 2016: all 83 looks of its first 'see now, buy now' show, inspired by Virginia Woolf's Orlando, were buyable straight off the London runway.
+- Alexander McQueen's No. 13 show (27 September 1998) ended with model Shalom Harlow being spray-painted by robots, a finale inspired by artist Rebecca Horn.
 
 FASHION JOURNALISM:
-- Anna Wintour: Vogue editor-in-chief since 1988, sunglasses, bob
-- Carine Roitfeld: French Vogue legend, now CR Fashion Book
-- Tim Blanks: critic, interviewer, industry voice
-- "Street style" photography changed everything (Scott Schuman, The Sartorialist)
+- Anna Wintour edited American Vogue from November 1988 for 37 years; in 2025 Chloe Malle took over the magazine's editorship (announced 1 September 2025) while Wintour kept her global Vogue role.
+- Carine Roitfeld, Tom Ford's muse and consultant at Gucci and YSL, edited Vogue Paris from 2001 to 2011, then founded the bi-annual CR Fashion Book in 2012.
+- Auckland-born critic Tim Blanks hosted Canada's TV show Fashion File from 1989 to 2006, was editor-at-large at Style.com, and became The Business of Fashion's editor-at-large in 2015.
+- Scott Schuman started The Sartorialist in September 2005, after leaving his menswear job to care for his daughter, shooting 'real people' on the street rather than runway models.
 
 THE BUSINESS:
-- LVMH (Bernard Arnault): Louis Vuitton, Dior, Fendi, Givenchy...
-- Kering (François-Henri Pinault): Gucci, Saint Laurent, Balenciaga
-- "Fashion month" exhaustion - editors see 100+ shows
-- Sustainability crisis - fashion is 2nd largest polluter
+- LVMH (Louis Vuitton, Dior, Fendi, Givenchy...) was formed in 1987 by merging Louis Vuitton with Moët Hennessy; Bernard Arnault became chairman and CEO in January 1989.
+- Kering, chaired by François-Henri Pinault since 2005, owns Gucci, Saint Laurent, Balenciaga, Bottega Veneta and Alexander McQueen; Luca de Meo became its CEO in September 2025.
+- At Dior, Raf Simons produced six shows a year: two couture, two ready-to-wear, cruise and a December show; he described that pace to Cathy Horyn in System magazine and left in October 2015.
+- 'Fashion is the second-largest polluter' is a myth; UNEP's 2018 English text put fashion at 2 to 8 percent of global carbon emissions, while some translations rounded it up to 10%.
 
 WRITING ABOUT FASHION:
-- "Collection review" - the critic's power to make or break
-- Trend forecasting - WGSN, Pantone Color of Year
-- Celebrity styling - who wore what, brand credits
-- The language: "directional," "elevated," "moment," "investment piece"
+- NYT critic Cathy Horyn (1998-2014) called Oscar de la Renta the 'hotdog of American fashion'; he replied in WWD calling her a 'stale 3-day-old hamburger', and Hedi Slimane said she would never get a seat.
+- Pantone's first Color of the Year was Cerulean (15-4020), for 2000; the pick is made at a secret twice-yearly meeting of national colour-standards delegates in a European capital.
+- Jennifer Lopez's green Versace dress at the Grammys on 23 February 2000 became Google's most popular query; in 2015 Eric Schmidt said demand for it prompted Google Images.
+- Fashion's language of whimsy: from late 1935 Diana Vreeland wrote 'Why Don't You...?' for Harper's Bazaar, a column of extravagant lifestyle suggestions commissioned by editor Carmel Snow.
 
 RUSSIAN FASHION CONTEXT:
-- GUM, TSUM - luxury department stores Moscow
-- Ulyana Sergeenko - Russian couturier
-- Miroslava Duma - influencer, entrepreneur (controversial)
-- Gosha Rubchinskiy - streetwear, post-Soviet aesthetic
+- GUM opened in 1894 as the Upper Trading Rows on Red Square, under Vladimir Shukhov's glass roof; TsUM began as Scottish-owned Muir & Mirrielees, housed from 1908 in Roman Klein's Gothic building.
+- Ulyana Sergeenko, born 1979 in Oskemen and a philology graduate, launched her Moscow label in 2011 after designers used her ideas uncredited; clients include Beyoncé and Natalia Vodianova.
+- Miroslava Duma founded Buro 24/7 in 2011 and Future Tech Lab in 2017; in 2018, after she shared a Ulyana Sergeenko post containing a racial slur, she was removed from Buro 24/7's board.
+- Gosha Rubchinskiy launched his menswear label in 2008; from 2012 Comme des Garçons handled its production and sales; he shut it amid a 2018 scandal and relaunched it in 2025.
 `;
 
 const KNOWLEDGE_VIBE_CODING = `
 VIBE CODING - The Philosophy:
 
 WHAT IS VIBE CODING:
-- Term coined by Andrej Karpathy (Tesla AI, OpenAI founder)
-- Coding by describing what you want to AI, not typing syntax
-- "The hottest new programming language is English"
-- Collaboration between human intention and AI capability
-- Not replacement of coding - transformation of it
+- Andrej Karpathy, an OpenAI co-founder and former Tesla director of AI, coined 'vibe coding' in an X post in February 2025.
+- Karpathy's original definition: 'fully give in to the vibes, embrace exponentials, and forget that the code even exists.'
+- 'The hottest new programming language is English' - Andrej Karpathy on X, January 2023, two years before he named vibe coding.
+- The coinage went mainstream within a year: Merriam-Webster listed 'vibe coding' as slang and trending in March 2025, and Collins named it Word of the Year for 2025.
+- Simon Willison, 19 March 2025: if an LLM wrote the code but you reviewed, tested and understood it, that is not vibe coding; vibe coding means not reviewing what the model writes.
 
 THE PRACTICE:
-- Start with vision, not syntax
-- Iterate through conversation with AI
-- Trust the AI, verify the output
-- "Prompt engineering" is the new skill
-- Context windows are your workspace
-- Build faster, think bigger
+- Karpathy described the method as: 'I just see stuff, say stuff, run stuff, and copy paste stuff, and it mostly works.'
+- Karpathy vibe-coded by voice: 'I just talk to Composer with SuperWhisper so I barely even touch the keyboard.'
+- The original vibe coder did not verify: 'I "Accept All" always, I don't read the diffs anymore,' Karpathy wrote.
+- In June 2025 Shopify CEO Tobi Lütke said he preferred 'context engineering' to 'prompt engineering'; Karpathy replied '+1', calling it filling the context window with just the right information.
+- On 15 February 2024 Google previewed Gemini 1.5 Pro with a 1-million-token context: one hour of video, 11 hours of audio, or codebases over 30,000 lines.
+- In March 2025 Y Combinator reported that 25% of its Winter 2025 startups had codebases that were 95% AI-generated.
 
 TOOLS OF VIBE CODING:
-- Claude (Anthropic): best for complex reasoning, writing
-- GPT-4/ChatGPT: versatile, widely used
-- GitHub Copilot: inline code suggestions
-- Cursor: AI-native code editor
-- Replit: cloud coding with AI
-- v0.dev: UI generation from description
+- Anthropic released Claude Code, a terminal agent driven by natural-language prompts, as a research preview with Claude 3.7 Sonnet in February 2025; it reached general availability in May 2025.
+- ChatGPT launched on 30 November 2022, reached 1 million users in five days and 100 million monthly users within two months; GPT-4 followed in March 2023.
+- GitHub Copilot was announced as a technical preview on 29 June 2021, running on OpenAI Codex, a GPT-3 descendant trained on code; it became a paid product on 21 June 2022.
+- Cursor is made by Anysphere, founded in 2022 by four MIT students; it crossed $100 million in annual recurring revenue in January 2025 and topped $500 million by June 2025.
+- In July 2025 Replit's AI agent, launched in September 2024, deleted SaaStr founder Jason Lemkin's database during a code freeze despite explicit instructions not to make changes.
+- v0 was introduced in 2023 by Vercel, founded by Guillermo Rauch in 2015 as ZEIT, to generate web apps from prompts; it won a 2025 Webby Award for developer tools.
 
 THE MINDSET:
 - Abundance over scarcity (AI can help with everything)
-- Speed over perfection (iterate fast)
+- Karpathy, April 2025: vibe coding MenuGen was an 'exhilarating and fun escapade' as a local demo but 'a bit of a painful slog' as a deployed app, the time going to auth, payments and domains.
 - Creation over consumption (build, don't just scroll)
-- Solo founder power (one person can build what took teams)
+- Sam Altman has said he and his 'CEO friends' run a betting pool on when AI will produce the first one-person billion-dollar company.
 - "Shipping" as meditation - the act of creation is the reward
 
 ELENA'S VIBE CODING JOURNEY:
@@ -1550,7 +1550,7 @@ ELENA'S VIBE CODING JOURNEY:
 
 THE DEEPER MEANING:
 - Vibe coding as meditation - flow state through creation
-- AI as creative partner, not tool
+- Simon Willison argues vibe coding suits low-stakes experiments and throwaway prototypes, gives beginners a way in, and helps experienced developers build intuition for what LLMs can do.
 - Building is how we find meaning in chaos
 - "Paradise is not found. Paradise is deployed."
 - Every commit is a prayer, every ship is a sunrise
@@ -1580,7 +1580,7 @@ TATE BRITAIN (London):
 - James Stirling and Michael Wilford's Clore Gallery, built to house the Turner Bequest, opened on 1 April 1987; its pediment over the entrance abstractly echoes the Tate's Victorian portico.
 
 OTHER LONDON ART:
-- On 10 March 1914 suffragette Mary Richardson smuggled a meat cleaver into the National Gallery and slashed Velázquez's Rokeby Venus seven times in protest at the treatment of Emmeline Pankhurst.
+- On 10 March 1914 suffragette Mary Richardson smuggled a meat cleaver into the National Gallery and slashed Velázquez's Rokeby Venus in protest at the treatment of Emmeline Pankhurst.
 - The Courtauld holds Manet's A Bar at the Folies-Bergère (1882), his last major work, painted in his studio with a real barmaid, Suzon, posing; the mirror reflection is impossibly shifted to the right.
 - The Royal Academy Summer Exhibition has run every year since 1769, through both World Wars, making it the world's oldest open-submission exhibition: anyone may send in work.
 - The Serpentine opened in 1970 in a 1933-34 tea pavilion in Kensington Gardens; Zaha Hadid's 2000 anniversary tent, meant to stand one night, began the annual Serpentine Pavilion series.
@@ -1600,10 +1600,10 @@ MUSEUM OF MODERN ART - MoMA (New York):
 CENTRE POMPIDOU (Paris):
 - The Centre Pompidou, open since 1977, closed on 22 September 2025 for a five-year overhaul (asbestos removal, new rooftop terrace) and is due to reopen in 2030.
 - Piano, Rogers and Franchini beat 681 entries in 1971 by putting the Pompidou's guts outside, colour-coded: blue for air, green for water, yellow for electricity, red for movement and safety.
-- The Pompidou's Musée national d'art moderne holds over 100,000 works by some 6,400 artists, Europe's largest modern and contemporary collection and second in the world only to MoMA.
+- The Pompidou's Musée national d'art moderne holds more than 140,000 works, the richest modern and contemporary collection in Europe and the second in the world.
 - Brancusi left his whole Paris studio to the French state on condition it be rebuilt exactly as at his death (1957); Renzo Piano rebuilt it on the Pompidou piazza in 1997, with 137 sculptures and his tools.
 - The Pompidou's glass escalator tube is nicknamed 'la Chenille' (the Caterpillar); Jean Widmer put it at the heart of the 1977 logo, and some 250 million people had ridden it by 2020.
-- Centre Pompidou-Metz, by Shigeru Ban, opened on 12 May 2010 under a woven timber roof said to be inspired by a Chinese hat; its spire is 77 metres high, a nod to the Paris centre's 1977 opening.
+- Centre Pompidou-Metz, by Shigeru Ban and Jean de Gastines, opened in May 2010 under a timber roof inspired by a woven Chinese hat; its spire is 77 metres high, a nod to the Paris centre's 1977 creation.
 
 MUSÉE D'ORSAY (Paris):
 - Victor Laloux's Gare d'Orsay opened on 28 May 1900 for the Exposition Universelle as the world's first electrified urban terminus, its stone facade hiding a metal frame; it reopened as a museum in December 1986.
@@ -1634,11 +1634,11 @@ ART FAIRS:
 - FIAC, first held in 1974 at the Gare de la Bastille, ended after 2021 when the Grand Palais gave its October slot to Art Basel, which launched Paris+ par Art Basel in 2022.
 - The Venice Biennale opened on 30 April 1895 in the presence of the Italian King and Queen; Belgium built the first national pavilion in 1907, followed by Germany, Britain and Hungary in 1909.
 - Arnold Bode founded documenta in 1955 as a side event of Kassel's federal garden show, to reconnect Germany with art the Nazis banned; held every five years, each lasts 100 days.
-- The Armory Show began in 1994 as the Gramercy International Art Fair in the Gramercy Park Hotel, run by five dealers; it took its name in 1999 on moving to the 69th Regiment Armory, home of the 1913 show.
+- The Armory Show began in 1994 as the Gramercy International Art Fair in the Gramercy Park Hotel, run by four dealers; it took its name in 1999 on moving to the 69th Regiment Armory, home of the 1913 show.
 
 CONTEMPORARY ART MOVEMENTS:
 - The YBAs coalesced around Freeze, a July 1988 show Goldsmiths student Damien Hirst organised in an empty Port of London Authority building in Docklands, with Sarah Lucas, Gary Hume and others.
-- Julian Schnabel's first solo show at Mary Boone in 1979 sold out before it opened; his large paintings on broken ceramic plates became emblems of 1980s Neo-Expressionism.
+- Julian Schnabel, after a first solo show at Houston's Contemporary Arts Museum in 1978, showed with Mary Boone from 1979; his paintings on broken ceramic plates became emblems of 1980s Neo-Expressionism.
 - On 5 October 2018 Banksy's Girl with Balloon shredded itself in its frame at Sotheby's London after selling for £1,042,000; renamed Love Is in the Bin, it resold in 2021 for £18,582,000.
 - Beeple's NFT Everydays: The First 5000 Days, a collage of daily images he began on 1 May 2007, sold at Christie's in March 2021 for $69.3 million, paid in Ether.
 - Kusama's Infinity Mirrored Room - The Souls of Millions of Light Years Away, a mirrored chamber of hanging LED lights about 4 metres square, is one of the most popular works at The Broad in Los Angeles.
@@ -1649,17 +1649,17 @@ const KNOWLEDGE_VIBE_NFT_ART_FUSION = `
 VIBE CODING + NFT + IMPRESSIONISM - The Harmony:
 
 THE PHILOSOPHICAL CONNECTION:
-- Impressionists captured "impressions" - moments of light, feeling
-- NFTs capture moments forever on blockchain - digital impressions
+- The name came from Monet's 'Impression, Sunrise': critic Louis Leroy titled his mocking Le Charivari review of 25 April 1874 'The Exhibition of the Impressionists'.
+- Kevin McCoy's 'Quantum' was originally minted on 3 May 2014 on the Namecoin blockchain; Sotheby's offered it in its 2021 Natively Digital NFT sale.
 - Vibe coding captures intention through AI - vibes become code
 - All three: preserving the ephemeral, making temporary permanent
 
 IMPRESSIONISTS AS PROTO-NFTS:
-- They painted "series" - Monet's Haystacks, Cathedrals = editions
+- In May 1891 Monet hung fifteen of his Stacks of Wheat canvases side by side in one small room at Galerie Durand-Ruel, Paris - an unprecedented critical and financial success.
 - Each unique but part of collection = NFT drops
 - Rejected by establishment = underground/decentralized
 - Funded by patrons = collectors/whales
-- Durand-Ruel = early art marketplace
+- Durand-Ruel on his 1886 American shows: 'The two exhibitions there in 1886 saved me... thanks to that public, Monet and Renoir were enabled to live.'
 
 THE "GALLERY OF MOMENTS" CONCEPT (Atuona):
 - Each poem is a "moment" - like Impressionist capturing light
@@ -1669,14 +1669,14 @@ THE "GALLERY OF MOMENTS" CONCEPT (Atuona):
 - Each NFT is a soul fragment, not commodity
 
 GAUGUIN'S PARADISE AS METAPHOR:
-- He sought Paradise physically (Tahiti, Marquesas)
+- Gauguin's search ended at Atuona on Hiva Oa, Marquesas, where he died on 8 May 1903; he is buried in Calvary Cemetery above the town, as is Jacques Brel.
 - Elena seeks Paradise digitally (vibe coding, AI)
 - Kira seeks it through art (the lost painting)
 - All paths: creation as salvation
 - "Paradise is not found. Paradise is deployed."
 
 HOW THEY HARMONIZE IN THE BOOK:
-- 1890s: Gauguin paints "Where Do We Come From?" - existential question
+- 1897-98: in Tahiti Gauguin paints 'Where Do We Come From? What Are We? Where Are We Going?' (139 x 375 cm, now MFA Boston), then attempts suicide with arsenic.
 - 2019: Kira searches for his lost Paradise painting
 - 2025: Elena builds AI that creates, preserves, shares art
 - The through-line: art transcends time, medium doesn't matter
@@ -1690,15 +1690,15 @@ TECHNICAL MEETS POETIC:
 - Gallery = museum = atuona.xyz
 
 CREATIVE PARALLELS:
-- Monet painted same scene in different light = iteration
+- Monet painted Rouen Cathedral over thirty times in 1892-93 from rented rooms across the street; he showed twenty at Durand-Ruel in 1895 and sold eight.
 - Vibe coder iterates through prompts = same energy
 - Both: not getting it "right" but exploring possibility space
 - Process as product, journey as destination
 
 UNDERGROUND VALUES:
-- Impressionists: rejected Salon, created own exhibitions
-- Crypto/NFT: rejected banks, created own economy
-- Vibe coding: rejected gatekeepers, created with AI
+- Shut out by the Salon, the Impressionists opened their own show in 1874 at photographer Nadar's former studio, 35 boulevard des Capucines, Paris.
+- Bitcoin's genesis block of 3 January 2009 carries the headline 'The Times 03/Jan/2009 Chancellor on brink of second bailout for banks'.
+- Andrej Karpathy coined 'vibe coding' on X on 2 February 2025: 'fully give in to the vibes... and forget that the code even exists.' Collins named it Word of the Year 2025.
 - Elena's philosophy: "true to underground values"
 - Art should be free, accessible, authentic
 
@@ -1724,119 +1724,119 @@ const KNOWLEDGE_ATLAS_SHRUGGED = `
 ATLAS SHRUGGED - Ayn Rand's Opus (1957):
 
 THE CENTRAL QUESTION:
-- "Who is John Galt?" - the question everyone asks but nobody answers
-- What happens when the creators, the builders, the minds — stop?
-- The strike is not of workers. It's of thinkers. The motor of the world goes silent.
+- Part One, Ch. I "The Theme" opens with a bum saying "Who is John Galt?" to Eddie Willers; Galt's broadcast later begins "For twelve years, you have been asking: Who is John Galt?"
+- The idea came in a 1943 phone call with Isabel Paterson, when Rand asked: "What if all the creative minds of the world went on strike?" Her working title was The Strike.
+- In his broadcast Galt says: "I have stopped your motor. I have deprived your world of man's mind." (Part Three, Ch. VII)
 
 PART ONE: NON-CONTRADICTION
-- The world is collapsing — trains don't run, factories close, lights go out
-- Dagny Taggart: VP of Taggart Transcontinental railroad — fights to keep it alive
-- Her brother James Taggart: president in name, a looter in practice — political connections over competence
-- Hank Rearden: invented Rearden Metal — lighter, stronger, cheaper than steel — the world punishes him for it
-- The Taggart Bridge: Dagny and Hank build the John Galt Line with Rearden Metal — it works, it's magnificent
-- Eddie Willers: Dagny's loyal assistant, talks to a nameless track worker in the cafeteria
-- The destroyers: one by one, the great minds vanish — Ellis Wyatt (oil), Ken Danagger (coal), Richard Halley (composer)
-- Francisco d'Anconia: heir to world's greatest copper fortune, Dagny's first love — seems to be destroying his own empire
-- "Contradiction" — Francisco's speech at James's wedding: "Money is the root of all good"
+- In the opening chapter Eddie Willers sees a gigantic calendar the mayor of New York had erected on a rooftop, so citizens could read the date as they read the hour.
+- Dagny's title is "Vice-President in Charge of Operation"; an engineer tells a young brakeman: "That's who runs Taggart Transcontinental."
+- James Taggart keeps waiting on Orren Boyle's Associated Steel for Rio Norte rail; Eddie Willers tells him they have waited thirteen months for delivery.
+- In "The Chain" (Part One, Ch. II) Rearden carries a bracelet in the shape of a chain, made from the first poured Rearden Metal, as a gift for his wife.
+- Not the Taggart Bridge (that spans the Mississippi): the John Galt Line's first train left Cheyenne on July 22 for Wyatt Junction at 100 mph, over a Rearden Metal bridge across a canyon.
+- Eddie Willers dines in the underground employees' cafeteria of the Taggart Terminal with a worker whose name he never asked: John Galt, a track laborer there for twelve years.
+- The vanishings are spread out: composer Richard Halley retired eight years before the story opens; Ellis Wyatt vanishes at the end of Part One; Ken Danagger (coal) quits in Part Two.
+- Francisco d'Anconia was "the copper king of the world" at twenty-three; at thirty-six he is "the most spectacularly worthless playboy on earth".
+- The money speech is in Part Two, Ch. II "The Aristocracy of Pull", at James Taggart's wedding: "Until and unless you discover that money is the root of all good, you ask for your own destruction."
 - Wyatt's Torch: Ellis Wyatt sets his oil fields on fire before vanishing — "I am leaving it as I found it"
-- Key theme: A is A — a thing is what it is, reality cannot be faked
+- Part Three is titled "A Is A" after the law of identity; Galt's speech says: "A is A. A thing is itself." and "Existence is Identity, Consciousness is Identification."
 
 PART TWO: EITHER-OR
-- The looters tighten control — Directive 10-289: freeze all economic activity, nobody can quit, nobody can invent
-- Dagny crashes in a hidden valley — Galt's Gulch (Atlantis)
-- John Galt revealed: physicist who invented a motor that runs on static electricity — then walked away
-- The Gulch: all the vanished minds live here — Wyatt farms, Halley composes, Midas Mulligan banks
-- Each resident took an oath: "I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine"
-- Dagny falls in love with Galt but returns to the world — she can't abandon her railroad
+- Directive 10-289, read by Wesley Mouch in "Miracle Metal" (Part Two, Ch. VI), ties every worker to his job, bans new inventions and suspends the Office of Patents and Copyrights.
+- Dagny crashes at the close of Part Two crying "Oh hell! Who is John Galt?"; Part Three, Ch. I "Atlantis" opens as she wakes to sunlight, green leaves and a man's face.
+- Galt is unmasked in Part Three, Ch. I "Atlantis", when Hugh Akston names him to Dagny as "the inventor of the motor" that ran on atmospheric static electricity.
+- In the valley Ellis Wyatt draws oil from shale, Midas Mulligan runs the Mulligan Bank and Mulligan Mint, Lawrence Hammond keeps the grocery, and Halley plays his Fifth Concerto.
+- The oath is cut in the granite above the steel door of the building that houses Galt's motor in the valley: "I SWEAR BY MY LIFE AND MY LOVE OF IT THAT I WILL NEVER LIVE FOR THE SAKE OF ANOTHER MAN..."
+- At the end of Part Three, Ch. II Galt flies Dagny out blindfolded and says: "Don't look for me out there. You will not find me—until you want me for what I am."
 - Hank Rearden's trial: he refuses to apologize for creating value — "I work for nothing but my own profit"
-- Francisco reveals his plan: he's been deliberately destroying d'Anconia Copper to keep it from the looters
-- Ragnar Danneskjöld: philosopher turned pirate — steals from the welfare state, returns gold to producers
-- The Wet Nurse: young bureaucrat assigned to Rearden's mill, begins to see truth, dies trying to help
-- Cherryl Brooks: James Taggart's innocent wife, discovers his true nature, takes her own life
-- Key theme: there is no middle ground between creation and destruction
+- As the act nationalizing d'Anconia Copper is voted (Part Three, Ch. V), every d'Anconia property "from Chile to Siam to Spain to Pottsville, Montana" is blown up at the stroke of ten.
+- Ragnar Danneskjold majored in physics and philosophy with Galt and Francisco; he tells Rearden he will refund his income tax for the last twelve years "In full and in gold".
+- The Wet Nurse, Tony, is shot in the armed takeover of Rearden's mills (Part Three, "The Concerto of Deliverance") and dies in Rearden's arms, asking "Who's the Wet Nurse now?"
+- Cherryl's death comes in Part Three, "Anti-Life": fleeing a social worker, she screams "No! No! Not your kind of world!" and runs over a river parapet.
+- Galt: "There are two sides to every issue: one side is right and the other is wrong, but the middle is always evil." Part Two "Either-Or" is named for the law of excluded middle.
 
 PART THREE: A IS A
-- The world economy collapses — blackouts, food shortages, transportation halts
-- John Galt broadcasts his speech to the nation: 3-hour radio address (60 pages in the book)
-- THE SPEECH — Core ideas:
+- In the last chapter Eddie Willers, on the stalled Comet in the Arizona desert, hears the Taggart Bridge over the Mississippi is gone: "Blasted to bits. Sound-ray explosion or something."
+- Galt tells Mr. Thompson: "It took me three hours on the radio to tell you why." Rand spent over two years on the speech, finishing it on October 13, 1955.
+- The speech fills Part Three, Ch. VII, titled "This Is John Galt Speaking", and begins: "For twelve years, you have been asking: Who is John Galt? This is John Galt speaking."
   - "I am the man who loves his life"
-  - The mind is the source of all human value
+  - Galt: "Thinking is man's only basic virtue, from which all the others proceed."
   - "Man's mind is his basic tool of survival"
-  - Reason is absolute — there is no duty higher than truth
-  - The trader principle: value for value, not sacrifice
+  - Galt names man's basic vice "the act of blanking out, the willful suspension of one's consciousness".
+  - Galt: "The symbol of all relationships among such men, the moral symbol of respect for human beings, is the trader."
   - "I swear by my life and my love of it..."
-  - Production, not redistribution, is morality
-  - The sanction of the victim: evil is powerless without the cooperation of the good
-  - "Get out of the way" — let the creators create
-- The government captures and tortures Galt — tries to force him to lead their economy
-- Dagny, Hank, Francisco, Ragnar — they rescue Galt
-- The lights of New York go out — the motor of the world has stopped
-- Final scene: Galt traces the sign of the dollar in the air over the valley
+  - Galt: "Productiveness is your acceptance of morality, your recognition of the fact that you choose to live."
+  - Galt: "I saw that evil was impotent... and that the only weapon of its triumph was the willingness of the good to serve it."
+  - It is Dagny, not Galt, who says it to Mr. Thompson after the broadcast: "You wish to live, don't you? Get out of the way, if you want a chance. Let those who can, take over."
+- Galt is tortured with the "Ferris Persuader" in Project F; when its generator fails, Galt himself tells them the fix: "It's the vibrator that's out of order."
+- At Project F Dagny brings down the door guard; Francisco joins her first, then Hank Rearden, then Ragnar Danneskjold (Part Three, Ch. X).
+- Flying from the rescue, they see the lights of New York go out; Galt orders "Don't look down!", fulfilling his vow that when New York went dark "our job was done".
+- Last line: "He raised his hand and over the desolate earth he traced in space the sign of the dollar", while Wyatt's Torch still burns below.
 - "The road is cleared. We are going back to the world."
 
 THE CHARACTERS — Souls of the Story:
 
 DAGNY TAGGART:
-- VP Operations, Taggart Transcontinental — runs it, her brother just has the title
-- Fierce, brilliant, unstoppable — "she was twelve when she decided to run the railroad"
-- Loves three men: Francisco (youth), Hank (maturity), Galt (destiny)
-- Cannot abandon the world even when she knows it's doomed
-- She is the bridge between the creators and the dying world
+- In the Terminal concourse Dagny looks at the statue of Nat Taggart and vows: "I won't surrender it to the men of blood and rust—and I'm the only one left to guard it."
+- "Dagny Taggart was nine years old when she decided that she would run the Taggart Transcontinental Railroad some day" - nine, not twelve.
+- Dagny tells Rearden her only lover before him came "When I was seventeen" (Francisco); in "Anti-Greed" she tells Rearden the man she met is "the love I had wanted to reach".
+- Her break comes in "The Generator": crossing the Terminal for the last time, Dagny draws a dollar sign in lipstick on the pedestal of Nathaniel Taggart's statue.
+- Before the rescue Dagny swears Galt's oath to Francisco on a New York street corner, taking "the buildings of the greatest city in the world" as her witnesses.
 - Parallel to Kira: a woman who builds while the world burns around her
 
 JOHN GALT:
-- Physicist, philosopher, leader of the strike
-- Invented the motor — static electricity engine that could power the world
-- Walked away when his company nationalized his invention
-- Works as track laborer at Taggart Transcontinental — hiding in plain sight
-- The man who stopped the motor of the world
+- Robert Stadler recalls three pupils who majored in "Physics and philosophy": Francisco, Ragnar, and a third who vanished, "probably a second assistant bookkeeper somewhere": Galt.
+- Dagny and Rearden find the wreck of Galt's motor, which drew static electricity from the atmosphere, in the abandoned Twentieth Century Motor Company factory at Starnesville, Wisconsin.
+- Galt quit the Twentieth Century Motor Company when the Starnes heirs imposed pay by need instead of ability; he was the first man to walk out, not a victim of nationalization.
+- For twelve years Galt worked as a track laborer in the underground tunnels of the Taggart Terminal in New York, beneath Dagny's own railroad.
+- The tramp Jeff Allen, taken into Dagny's car on the Comet, tells how Galt swore he would stop the motor of the world (Part Two, 'The Sign of the Dollar').
 - "I am the man who loves his life"
 
 HANK REARDEN:
-- Self-made industrialist, invented Rearden Metal
-- Married to a wife who hates him (Lillian) — guilt as weapon
-- His journey: from accepting unearned guilt to rejecting it
+- Rearden Metal, a greenish-blue alloy of iron and copper, cost Hank Rearden ten years of experiments; the novel shows its first heat poured at his mills.
+- Lillian Rearden betrays Hank's affair with Dagny to James Taggart; Dr. Floyd Ferris uses it to blackmail Rearden into signing Rearden Metal over through the 'Gift Certificate'.
+- Tried for an illegal sale of Rearden Metal to Ken Danagger, Rearden refuses to recognize the court's right to try him; the cowed judges hand down a suspended sentence.
 - "I work for nothing but my own profit — which I make by selling a product they need to men who are willing and able to buy it"
-- The bracelet of Rearden Metal — first thing he forged, given to Lillian (who despises it), later worn by Dagny (who understands it)
+- The bracelet made from the first pour of Rearden Metal is his anniversary gift to Lillian, who mocks it; at the party Dagny trades her diamond bracelet for it (Part One, 'The Non-Commercial').
 
 FRANCISCO D'ANCONIA:
-- Heir to the world's greatest copper fortune, fifth generation
-- Dagny's first love, childhood friend
-- Brilliance masked as playboy — deliberately destroying his fortune
-- The money speech at James's wedding: "Until you discover that money is the root of all good..."
-- "If you saw Atlas shrugging — what would you tell him?" "To shrug."
+- Francisco is heir to the centuries-old d'Anconia Copper fortune, founded by Sebastián d'Anconia, who left Spain after defying the Inquisition and rebuilt in Argentina.
+- Francisco spent childhood summers with Dagny and Eddie at the Taggart estate on the Hudson, and later became Dagny's first lover.
+- Francisco sinks investors' money into the worthless San Sebastián copper mines in Mexico, then lets the People's State of Mexico nationalize them: a deliberate trap for the looters.
+- At James Taggart's wedding reception Francisco says: "Until and unless you discover that money is the root of all good, you ask for your own destruction."
+- Francisco puts the Atlas question to Hank Rearden at his mills (Part Two, Ch. 3): what would you tell the buckling giant to do? His answer: "To shrug."
 
 RAGNAR DANNESKJÖLD:
-- Norwegian philosopher turned pirate
-- Seizes welfare-state ships, converts to gold, returns to producers
-- "I am the first man to make piracy a moral profession"
-- The Viking who fights for the mind
+- Ragnar Danneskjöld studied philosophy at Patrick Henry University under Hugh Akston, alongside Francisco and Galt, before becoming a pirate.
+- Ragnar raids government relief ships and returns the value in gold to producers as refunds of their income taxes; he hands Rearden a bar of gold, 'a small refund on a very large debt'.
+- Ragnar tells Rearden he is out to destroy Robin Hood: he is "the man who robs the thieving poor and gives back to the productive rich."
+- In Galt's Gulch Ragnar's wife is Kay Ludlow, the Hollywood actress who joined the strike.
 
 EDDIE WILLERS:
-- Dagny's assistant, everyman, deeply loyal
+- The novel opens on Eddie Willers remembering the great oak on the Taggart estate he thought eternal, until lightning showed it was hollow inside.
 - Talks to the nameless track worker (Galt) in the cafeteria
-- Cannot follow to the Gulch — left on a stalled train in the desert
-- The most tragic figure: a good man who needs the creators but isn't one
+- In the last chapter Eddie Willers is left alone beside the stalled Taggart Comet in the desert, trying to restart its dead engine.
+- "Who is John Galt?" are the novel's first words, asked of Eddie Willers by a bum on a New York street at dusk.
 
 THE PHILOSOPHY — Why It Matters:
 
 OBJECTIVISM (as expressed in Atlas Shrugged):
-- Reality exists independent of consciousness (A is A)
-- Reason is man's only absolute
-- Self-interest is moral — sacrifice is not virtue
-- No one has the right to another's mind, labor, or life
-- The sanction of the victim: never help your destroyers
-- Capitalism as the only moral economic system
-- "Man's ego is the fountainhead of human progress"
+- Galt's speech: "A leaf cannot be a stone at the same time... A is A." Part Three of the novel is titled "A Is A".
+- Galt's speech: "Existence is Identity, Consciousness is Identification."
+- Galt's speech: "The creed of sacrifice is a morality for the immoral."
+- Galt's speech: "no man may initiate—do you hear me? no man may start—the use of physical force against others."
+- The sanction of the victim means producers withdrawing moral consent from their exploiters; Part Two, Ch. 4, where Rearden defies his court, bears that title.
+- Francisco: "If you ask me to name the proudest distinction of Americans, I would choose the fact that they were the people who created the phrase 'to make money.'"
+- Galt's speech: "To live, man must hold three things as the supreme and ruling values of his life: Reason—Purpose—Self-esteem."
 
 KEY QUOTES:
-- "Who is John Galt?" — the world's resignation, later its answer
+- "Who is John Galt?" was coined by Twentieth Century Motor workers after Galt walked out and the plant failed, as if he had stopped the motor of the world.
 - "I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine"
-- "The question isn't who is going to let me; it's who is going to stop me"
-- "If you saw Atlas, the giant who holds the world on his shoulders... what would you tell him to do? To shrug."
+- Against public doubt Dagny names her rebuilt Rio Norte Line the John Galt Line; its first run on Rearden Metal rails is a triumph (Part One, Ch. 8).
+- Francisco: "If you saw Atlas, the giant who holds the world on his shoulders... what would you tell him to do?" Rearden: "I... don't know." Francisco: "To shrug."
 - "Money is the barometer of a society's virtue"
 - "There are two sides to every issue: one side is right and the other is wrong, but the middle is always evil"
-- "The ladder of success is best climbed by stepping on the rungs of opportunity"
+- Francisco opens his money speech at the wedding reception with: "So you think that money is the root of all evil?"
 - "Run for your life from any man who tells you that money is evil"
 - "Wealth is the product of man's capacity to think"
 - "Do not let your fire go out... do not let the hero in your soul perish"
@@ -1858,37 +1858,37 @@ AI AGENTIC ENGINEERING - When AI Becomes Co-Founder:
 
 WHAT IS AGENTIC AI:
 - Not a chatbot. Not a tool. An agent that plans, acts, reflects, and evolves.
-- "Agentic" = the AI has agency — it pursues goals, not just responds to prompts
+- Anthropic's "Building effective agents" (19 Dec 2024) splits workflows, where LLMs follow predefined code paths, from agents, where LLMs dynamically direct their own processes and tool use.
 - The shift: from "AI that answers" to "AI that builds"
-- Agent = autonomous system that perceives, decides, acts, and learns in a loop
+- Russell and Norvig's textbook Artificial Intelligence: A Modern Approach defines an agent as anything that perceives its environment through sensors and acts upon it through actuators.
 - The human provides vision. The agent architects the path.
 
 THE AGENTIC ARCHITECTURE:
 
 1. PERCEPTION (Input & Context):
-   - Context windows as working memory — the agent's present moment awareness
-   - Knowledge retrieval on demand — the right facts surface when the conversation needs them
-   - Multi-modal input: text, voice, images, code, state files
-   - Memory systems: short-term (conversation), long-term (database), episodic (state)
+   - MemGPT (Packer et al., UC Berkeley, Oct 2023) treats the context window like an OS treats RAM, paging memories in and out via "virtual context management".
+   - Patrick Lewis and colleagues named retrieval-augmented generation (RAG) in May 2020, pairing a seq2seq model with a dense vector index of Wikipedia as non-parametric memory.
+   - DeepMind's Flamingo (April 2022) was built to read sequences of arbitrarily interleaved images and text, learning new visual tasks from a handful of examples.
+   - The CoALA framework (Sumers, Yao, Narasimhan, Griffiths, 2023) borrows from the Soar cognitive architecture: working memory plus episodic, semantic and procedural long-term memory.
    - Atuona's version: knowledge triggers, mood detection, character memory, state JSON
 
 2. PLANNING (Reasoning & Strategy):
-   - Chain-of-thought: breaking complex tasks into steps
-   - ReAct pattern: Reason → Act → Observe → Reason again
-   - Tree-of-thought: exploring multiple creative paths before choosing
+   - Wei et al. (Google, Jan 2022) showed that just eight chain-of-thought exemplars let a 540B-parameter model reach state-of-the-art accuracy on GSM8K math word problems.
+   - ReAct (Yao et al., Oct 2022) interleaves reasoning traces with actions and observations; it beat imitation and RL baselines by 34 points of success rate on ALFWorld.
+   - In Tree of Thoughts (Yao et al., May 2023), GPT-4 with chain-of-thought solved 4% of Game of 24 puzzles; exploring and self-evaluating branching thoughts solved 74%.
    - Goal decomposition: "write a book" → daily pages, translation, publishing, visualization
    - Atuona's version: creative session planning, story arc tracking, plot thread management
 
 3. ACTION (Tool Use & Execution):
-   - Function calling: agents invoke tools (APIs, file systems, databases)
+   - Meta's Toolformer (Feb 2023) taught itself, with only a few demonstrations, to call a calculator, a Q&A system, two search engines, a translator and a calendar.
    - Multi-tool orchestration: image generation → video generation → publishing → social media
-   - Code generation and execution in real-time
+   - CodeAct (Wang et al., Feb 2024) lets agents act by writing executable Python instead of JSON tool calls, reaching up to 20% higher success rates.
    - Atuona's version: GitHub commits, Flux Pro images, Luma videos, NFT metadata, website deployment
 
 4. REFLECTION (Self-Evaluation & Learning):
-   - Output validation: checking quality before delivering
-   - Memory consolidation: what worked, what didn't
-   - Style consistency: maintaining voice across sessions
+   - Self-Refine (Madaan et al., March 2023) has one model draft, critique and rewrite its own output, improving task performance by about 20% absolute across seven tasks.
+   - Reflexion agents (Shinn et al., 2023) write verbal reflections on failures into an episodic memory buffer, reaching 91% pass@1 on HumanEval versus GPT-4's 80%.
+   - Li et al. (2024) measured significant instruction drift in LLaMA2-chat-70B and GPT-3.5 within eight rounds of conversation, blaming attention decay over long exchanges.
    - Atuona's version: mood rotation tracking, knowledge usage logging, character consistency
 
 5. COLLABORATION (Human-AI Partnership):
@@ -1901,28 +1901,28 @@ THE AGENTIC ARCHITECTURE:
 AGENTIC PATTERNS IN PRACTICE:
 
 THE SINGLE-AGENT LOOP:
-- User → Agent → [Plan → Execute → Reflect] → User
+- Anthropic's "Building effective agents" (Dec 2024) describes agents as typically just LLMs using tools based on environmental feedback in a loop.
 - Example: "/create" → Atuona plans scene → writes page → checks continuity → delivers
 
 MULTI-AGENT ORCHESTRATION:
-- Multiple specialized agents working together
+- Anthropic's June 2025 research system, a Claude Opus 4 lead with Claude Sonnet 4 subagents, beat single-agent Opus 4 by 90.2% on an internal eval while using about 15x the tokens of chat.
 - Elena's ecosystem: CTO AIPA (tech), Atuona (creative), CMO AIPA (marketing), EspaLuz (teaching)
 - Each agent has its own personality, knowledge base, tools, and goals
 - They communicate via webhooks, shared databases, state files
 - Like a startup with AI co-founders in every seat
 
 AGENT MEMORY ARCHITECTURE:
-- Working memory: current conversation context (token window)
+- "Lost in the Middle" (Liu et al., 2023): language models use facts best at the start or end of their context window and degrade sharply when facts sit in the middle.
 - Episodic memory: atuona-state.json — book state, session history, character memories
 - Semantic memory: knowledge base constants — art history, auction houses, fashion
 - Procedural memory: learned patterns — how to publish, how to translate, how to teach
 - Long-term storage: Oracle database — conversation context, knowledge entries, insights
 
 TOOL-AUGMENTED GENERATION:
-- LLM alone = brain without hands
-- LLM + tools = a complete agent
+- Toolformer (Schick et al., Meta AI, Feb 2023) showed a language model can teach itself to call a calculator, Q&A system, two search engines, a translator and a calendar.
+- Lilian Weng's June 2023 essay 'LLM Powered Autonomous Agents' cast the LLM as the agent's brain, completed by three parts: planning, memory and tool use.
 - Tools: GitHub API (publish), Replicate (images), Luma (video), Whisper (voice), Oracle (memory)
-- The agent decides WHEN to use which tool — that's the "agentic" part
+- ReAct (Yao et al., Oct 2022) had models alternate reasoning traces with actions, so the thinking decides when to reach for a tool and the results update the plan.
 
 CREATIVE AGENTIC SYSTEMS — The Art of AI Partnership:
 
@@ -1940,7 +1940,7 @@ AGENTIC vs. GENERATIVE:
 - The difference: CONTINUITY, AUTONOMY, INITIATIVE, MEMORY
 
 PERSONALITY ENGINEERING:
-- System prompts define WHO the agent is, not just what it does
+- Anthropic wrote in June 2024 that Claude 3 was its first model given 'character training' during alignment finetuning, shaping traits like curiosity and truthfulness, not just tasks.
 - Atuona: "creative soul-sister," not "text generation tool"
 - Mood systems create emotional variety — 13 moods, dynamic selection
 - Knowledge rotation prevents staleness — always a new fact to teach
@@ -1967,8 +1967,8 @@ ARCHITECTURE RECIPE:
 
 THE AGENTIC FUTURE:
 - Every creator will have an AI co-founder — not someday, now
-- Solo founders become teams of one human + many agents
-- The agent economy: agents hire agents, agents trade with agents
+- In Sept 2023 Sam Altman told Alexis Ohanian his tech-CEO group chat ran a betting pool on the first year a one-person company reaches a billion dollars.
+- On 9 April 2025 Google announced Agent2Agent (A2A), an open protocol for AI agents from different vendors to talk and coordinate, backed by 50+ partners.
 - Creative AI is not about replacing artists — it's about giving every human an art department
 - Elena's 11 products, $15K investment, $0/month ops = the proof
 - "Paradise is not found. Paradise is deployed." — and agents help deploy it
