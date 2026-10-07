@@ -178,7 +178,13 @@ git log keeps the record.
   copy constants out instead.
 - **Elena after the blind test: "not so much difference" → wire Fable + fix the knowledge base.** Plan
   `docs/atuona/ATUONA_FACT_ENGINE_PLAN_2026-10-07.md` (code picks 4 least-used facts from 610, ledger, slim prompt; Fable
-  without temperature + refusal fallback). **Awaiting her Confirm — nothing changed on Oracle.**
+  without temperature + refusal fallback). **DEPLOYED 7 Oct 14:24 UTC with her "Yes"** (`0adbefe`): scp'd
+  `dist/atuona-creative-ai.js` + new `dist/atuona-fact-engine.js`, `.env` `ATUONA_TEXT_MODEL=claude-fable-5-1`, `pm2 restart`
+  14:24:11 (newer than files). Log: `[fact-engine] pool: 577 facts in 10 lanes`, `Primary: claude-fable-5-1`. Backups
+  `dist/atuona-creative-ai.js.bak-20261007-pre-factengine`, `.env.bak-20261007-pre-fable`. 10 creative commands draw 3 art + 1
+  counterpoint fact (ledger `data/atuona/fact-ledger.json`) + footer; translation, /art, /artist, recap, arc, chat UNCHANGED.
+  **Still to prove:** one live `/inspire` → log `[fact-engine] drew …` + `[atuona/claude] claude-fable-5-1 … in=` (tokens).
+  Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
 - Staged with `stage-manual-prospect.cjs --no-scrape` (the site only publishes info@; the right person's address came from
