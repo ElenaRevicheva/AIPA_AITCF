@@ -437,7 +437,10 @@ git log keeps the record.
   locally, original kept) · k11 = qwen `k11g` (now `img/k11.jpg`; old `k11_pre_1007.jpg`). Recorded in plan.json `glitch_approved`.
   Everything else rejected. Her earlier "ugly, all rejected" was about the OLD bake-off image she opened, not the qwen set.
   qwen stills are 1352x760 (k11 as a motion start frame may need an upscale). Venice ledger ~$26.
-  **Elena's move:** 4:30 cut + motion plan (4K hero shots + O3 Pro); missing frames 15, 31, 30-redesign.
+  **Elena 7 Oct: 4:30 CUT — YES** (drops 3, 4, 8, 12, 16a, 23, 29, 33). Shots 15, 30, 31 = "adult scenes very hot and sexy
+  with surrealistic stuff in underground aesthetic Atuona style" — within: Kira is a lesbian (no Kira/Ule sex, "recognition not
+  seduction"), no frontal nudity / no sex act. Designing via workflow `wf_2060fb0a-224` (2 designers + 1 judge per shot, $0),
+  then generation on qwen + seedream (her two approved engines). **Open:** motion plan (4K hero + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
   **Erotic glitch inserts (Elena 7 Oct, 'like Crimson Escape'):** proposal `docs/atuona/FILM9_EROTIC_GLITCH_INSERTS_2026-10-07.md`
