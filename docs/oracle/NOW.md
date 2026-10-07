@@ -228,7 +228,10 @@ git log keeps the record.
   `KB_FINAL_CHECK_…`. Pool 622 facts / 11 lanes; footer uses fact body (Atlas "PART ONE:" headers no longer garble labels).
   Diff vs live = KB lines + crypto const + extraKnowledge param + 2 chat call sites; 55 commands. Backups `*.bak-20261007-pre-kbfull`.
   ⚠️ Anthropic OUT of credit again 7 Oct evening (probe 400) and Elena will NOT top up for now → Atuona runs on the fallback chain.
-  Live proof pending: one /inspire → `[fact-engine] drew …` + which fallback answered.
+  **Live /inspire 19:56:** facts drew ATU-006 GAU-041 NFT-008 ATL-037 + footer OK, but the reply was CUT MID-WORD: Claude 400 →
+  DeepSeek empty → **Groq gpt-oss-120b (reasoning) at max_tokens 500** spent the budget thinking. Fixed `af307d3`, deployed 19:59:
+  fallbacks get max(×4, 2000) tokens (Groq capped at 3,000 for its 8k TPM), a Groq reply with finish_reason=length goes to Grok,
+  and `[atuona/generate] Groq … answered` is now logged. Proof pending: Elena's next /inspire.
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
