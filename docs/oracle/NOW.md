@@ -199,6 +199,9 @@ git log keeps the record.
   claude-fable-5-1 stop=end_turn in=3948 out=703` (≈ $0.075; the old 38k-token prompt on Fable ≈ $0.45) → ledger saved in
   `atuona-state.json` (4 facts, 4 lanes). Canon loaded 98/98. Finding: many KB lines are generic ("Tate Britain: British art
   from 1500 to today") — phase 2 = verify AND replace generic lines with rare, sourced ones.
+  **Phase 2 STARTED 7 Oct (Elena: yes):** art lanes exported to `docs/atuona/kb-verify/{ATU,GAU,ART,MOD,AUC}.json` (276 facts);
+  6 research agents write `*.result.json` (verdict VERIFIED / CORRECTED / GENERIC_REPLACED / UNVERIFIABLE_REPLACED + source URL).
+  Next: apply final_text into the KNOWLEDGE_* strings in place (same bullet positions), audit doc, build, diff, deploy.
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
