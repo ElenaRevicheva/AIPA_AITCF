@@ -305,7 +305,9 @@ git log keeps the record.
   (never planned as keyframes). No frame but on the 4:30 cut list: 3, 4, 8, 12, 16a, 23, 29, 33. 1c = text card; 35 = composite.
   Elena decides: make the missing frames (and how 30 is redesigned) or cut to 4:30, before motion starts.
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
-  Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
+  Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
+  **Erotic glitch inserts (Elena 7 Oct, 'like Crimson Escape'):** proposal `docs/atuona/FILM9_EROTIC_GLITCH_INSERTS_2026-10-07.md`
+  — 6 implied-erotic stills G1–G6, ~1.2 s via film #8's `makeGlitch()`, ~$1.40 on nano. Awaiting her OK; not generated. Venice ~$11.6 left of the $18.05 read via API; Replicate $9.11.
   Nano drifts night to dusk, and 'blue-black' gives navy hair (say 'true black, never blue'). Plain prompts only: a refusal is final, no wording to beat the filter.
   RISK: GPT Image 2.5 refuses any touch between the two reference faces (5 beats now hand/skin macros, never re-routed).
 
