@@ -258,10 +258,10 @@
  {
   "id": "GAU-015",
   "current_text": "Died suddenly on the morning of 8 May 1903 in Atuona, aged 54; his neighbour Tioka found him at 11 o'clock.",
-  "status": "CONFIRMED",
-  "new_text": "Died suddenly on the morning of 8 May 1903 in Atuona, aged 54; his neighbour Tioka found him at 11 o'clock.",
-  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
-  "source_note": "Died morning 8 May 1903; Tioka found him at 11"
+  "status": "TRIMMED",
+  "new_text": "Died on 8 May 1903 in Atuona on Hiva Oa, aged 54.",
+  "source_url": "https://janetomlinson.com/blogs/blog/paul-gauguin-death",
+  "source_note": "Date and age confirmed; Tioka/11 o'clock not found"
  },
  {
   "id": "GAU-024",
@@ -275,9 +275,9 @@
   "id": "GAU-051",
   "current_text": "Vollard's deal (from 1900): 300 francs a month against at least 25 paintings a year at 200 francs, plus art materials; Gauguin sent him twenty canvases in April 1902.",
   "status": "TRIMMED",
-  "new_text": "Vollard's deal, made after dealer Chaudet died in 1899: 300 francs a month against at least 25 paintings a year at 200 francs, plus art materials; Gauguin sent him twenty canvases in April 1902.",
-  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
-  "source_note": "Terms and twenty canvases confirmed; start year 1900 not"
+  "new_text": "Vollard's deal, made after dealer Chaudet died in 1899: 300 francs a month against at least 25 paintings a year at 200 francs each, plus artist's materials.",
+  "source_url": "https://onlineonly.christies.com.cn/s/alphabet-genius-important-autograph-letters-manuscripts/paul-gauguin-1848-1903-10/205421",
+  "source_note": "Christie's lot essay confirms terms; April 1902 count unverified"
  },
  {
   "id": "MOD-002",
@@ -307,9 +307,9 @@
   "id": "GAU-010",
   "current_text": "First Tahiti trip: sailed 1 April 1891, back in France August 1893; painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.",
   "status": "FIXED",
-  "new_text": "First Tahiti trip: sailed 1 April 1891, back in France in summer 1893 (sources give July or August); painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.",
-  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
-  "source_note": "Britannica July vs Wikipedia August: both given"
+  "new_text": "First Tahiti trip: sailed from Marseille 1 April 1891, back in France in summer 1893 (sources differ: July or August); painted Spirit of the Dead Watching (Manao tupapau, 1892) on jute.",
+  "source_url": "https://buffaloakg.org/artworks/19651-mana%C3%B2-tupapa%C3%BA-spirit-dead-watching",
+  "source_note": "Buffalo AKG: oil on jute; return month disputed"
  },
  {
   "id": "CRY-018",
@@ -346,9 +346,9 @@
  {
   "id": "CRY-023",
   "current_text": "On 10-11 Oct 2025, after a tariff threat against China, a liquidation cascade forced out 1,618,240 traders and $19.13 billion of positions in 24 hours, a record per CoinGlass.",
-  "status": "CONFIRMED",
-  "new_text": "On 10-11 Oct 2025, after a tariff threat against China, a liquidation cascade forced out 1,618,240 traders and $19.13 billion of positions in 24 hours, a record per CoinGlass.",
-  "source_url": "https://decrypt.co/343941/bitcoin-ethereum-dogecoin-down-record-19-billion-crypto-liquidations",
-  "source_note": "Decrypt quoting CoinGlass: 1,618,240 traders, $19.13B, record"
+  "status": "TRIMMED",
+  "new_text": "On 10-11 Oct 2025, after Trump threatened an extra 100% tariff on China, a cascade liquidated over $19 billion of positions and over 1.6 million traders in 24 hours, a record per CoinGlass.",
+  "source_url": "https://www.globaltrademag.com/crypto-market-sees-historic-19b-liquidation-after-trump-tariffs/",
+  "source_note": "CoinGlass via SCMP: $19bn+, 1.6M+ traders, record"
  }
 ]

@@ -1202,12 +1202,12 @@ PRECISE TIMELINE (use this for accuracy):
 - 1887: with Charles Laval, dreamed of Taboga island; broke in Colón, he dug on the Panama Canal 5:30am to 6pm, was fined 4 francs for urinating in public, then Martinique June-November.
 - 1888: Arles with Van Gogh in the Yellow House, from his arrival on 23 October until Van Gogh cut his ear on 23 December, after which Gauguin fled.
 - 1889: summer and autumn again in Brittany, painting The Yellow Christ and The Green Christ; at Le Pouldu the Dutch painter Meijer de Haan paid for his board and lodging.
-- First Tahiti trip: sailed 1 April 1891, back in France in summer 1893 (sources give July or August); painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.
+- First Tahiti trip: sailed from Marseille 1 April 1891, back in France in summer 1893 (sources differ: July or August); painted Spirit of the Dead Watching (Manao tupapau, 1892) on jute.
 - 1893-95 Paris: Degas organised and bought from his November 1893 Durand-Ruel show while Monet, Renoir and Pissarro mocked it; his February 1895 Hôtel Drouot auction failed.
 - Second Tahiti stay: Gauguin left France in July 1895 and moved on to Hiva Oa in the Marquesas in September 1901; in Tahiti he painted Nevermore (1897) and Where Do We Come From? (1897-98).
 - Arrived at Atuona, Hiva Oa, on 16 September 1901, and bought land in the town centre from the Catholic mission after first attending mass regularly.
 - Atuona 1901-03: painted landscapes and figure studies with Vollard's clients in mind, plus Riders on the Beach (1902, Museum Folkwang, Essen).
-- Died suddenly on the morning of 8 May 1903 in Atuona, aged 54; his neighbour Tioka found him at 11 o'clock.
+- Died on 8 May 1903 in Atuona on Hiva Oa, aged 54.
 
 KEY PAINTINGS BY PERIOD:
 Brittany Period (1886-1890):
@@ -1262,7 +1262,7 @@ His Final Days in Atuona:
 - By September 1902 he took morphine injections, then handed his syringe set to a neighbour and used laudanum; an empty laudanum bottle stood by his deathbed.
 - He fought Bishop Martin over mission schools and carved Père Paillard (Father Lechery, 1902, NGA Washington), a horned bishop displayed outside his house.
 - On 27 March 1903 a local magistrate fined him 500 francs and gave him three months for libelling a gendarme; he appealed to Papeete and died before the hearing.
-- Vollard's deal, made after dealer Chaudet died in 1899: 300 francs a month against at least 25 paintings a year at 200 francs, plus art materials; Gauguin sent him twenty canvases in April 1902.
+- Vollard's deal, made after dealer Chaudet died in 1899: 300 francs a month against at least 25 paintings a year at 200 francs each, plus artist's materials.
 - No deathbed words are recorded; in his last letter to Charles Morice, weeks before death, he wrote: 'I am on the ground, but not yet defeated.'
 - Buried in Atuona's Catholic Calvary Cemetery at 2pm the day after his death; a bronze cast of his Oviri was set on the grave in 1973, as he had wished.
 `;
@@ -2065,7 +2065,7 @@ MARKET MECHANICS:
 - Every 210,000 blocks the miner reward halves: 50 to 25 BTC on 28 Nov 2012, to 12.5 on 9 July 2016, to 6.25 on 11 May 2020.
 - The fourth halving came at block 840,000 on 20 April 2024, about 00:09 UTC, cutting the reward for each new block to 3.125 bitcoins.
 - Bitcoin's supply stops just short of 21 million, about 20,999,999.98 BTC; at constant mining power the last fraction would be mined around 7 May 2140.
-- On 10-11 Oct 2025, after a tariff threat against China, a liquidation cascade forced out 1,618,240 traders and $19.13 billion of positions in 24 hours, a record per CoinGlass.
+- On 10-11 Oct 2025, after Trump threatened an extra 100% tariff on China, a cascade liquidated over $19 billion of positions and over 1.6 million traders in 24 hours, a record per CoinGlass.
 
 INSTITUTIONS & REGULATION:
 - On 17 Sept 2015, in an order against Coinflip over unregistered bitcoin options, the CFTC held for the first time that bitcoin and other virtual currencies are commodities.
