@@ -130,6 +130,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
+- **Arrives:** cron `0 */6` `~/job-list-filter/run_shortlist.sh` exports 20 YC companies → VJH STEP 0 `Priority sync` every cycle
+  (880 lines in 30d, all `0 added, 20 skipped`; last real add `1 added` on 23 Sep).
+- **Never used:** `🎯 PRIORITY BOOST` = **0** in ~9 months of VJH logs (99 file logs + the journal since 18 Sep); `Priority companies loaded` = 0.
+  Cause: `priority_flag` is set ONLY in the legacy `_score_and_route_jobs` (orchestrator.py:615). Since `4f1e2d3` (26 Apr) the LangGraph
+  pipeline replaced it (legacy fallback ran 3× ever), and `runner.py:194` reads a `priority_flag` nobody sets → `is_priority` is always False.
+- **Where it DID count:** CTO AIPA `prospect-ingest.ts` reads `job-list-filter/yc_ai_assistant_companies.json` → 18 `[CLIENT-CTO-INGEST]`
+  deals 9–10 May, all closedlost.
+- **If revived:** set `priority_flag` in the LangGraph path, and make the match exact. The list holds the slug `open`, and the matcher
+  is bidirectional substring, so it would boost every OpenAI/OpenTable job. VJH repo, so it needs Elena's go.
+- **Registry bug:** `scripts/oracle-resilience/oracle-products.conf` openclaw = `DIR ~/openclaw-vibejob-shortlist` (does not exist, and the
+  real `~/job-list-filter` is not git) + `RESTART sudo systemctl restart openclaw-gateway` (it is a `--user` unit). A phone
+  "Deploy → openclaw" would fail. Not changed.
+
 ### ✅ 7 Oct — sync audit laptop / GitHub / Oracle (Elena: "everything in sync")
 - **In sync now:** cto-aipa laptop = GitHub `aca9677`; Oracle **runs** it. All 93 `dist/*.js` match a build of main (the only diffs are CRLF),
   and every script cron runs matches. VJH, EspaLuz_Influencer and whitespace match GitHub on Oracle. Oracle aideazz was ff'd to `347c0cd`.
