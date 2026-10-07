@@ -15,7 +15,7 @@ export interface KbFact { id: string; domain: string; text: string; hash: string
 export interface FactLedger { facts: Record<string, { n: number; last: number }>; domains: Record<string, number>; }
 
 const ART_DOMAINS = ['ATU', 'GAU', 'ART', 'MOD', 'AUC'];   // Atuona, Gauguin, art history, museums, auctions
-const OTHER_DOMAINS = ['FAS', 'VIB', 'NFT', 'ATL', 'AGT']; // fashion, vibe coding, NFT fusion, Atlas, agentic AI
+const OTHER_DOMAINS = ['FAS', 'VIB', 'NFT', 'ATL', 'AGT', 'CRY']; // fashion, vibe coding, NFT fusion, Atlas, agentic AI, crypto trading
 
 let POOL: KbFact[] = [];
 

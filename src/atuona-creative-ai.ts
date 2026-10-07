@@ -2035,6 +2035,67 @@ RESPONSE CALIBRATION:
 `;
 
 // Combine all knowledge for use in prompts (legacy - use getRelevantKnowledge instead)
+const KNOWLEDGE_CRYPTO_TRADING = `
+CRYPTO TRADING - Markets, Speculation, Value (verified 7 Oct 2026; sources: docs/atuona/KB_CRYPTO_LANE_2026-10-07.md):
+
+ORIGINS:
+- On 31 October 2008 a link to Satoshi Nakamoto's paper 'Bitcoin: A Peer-to-Peer Electronic Cash System' was posted to a cryptography mailing list.
+- The genesis block, mined 3 January 2009, carries a newspaper headline in its code: 'The Times 03/Jan/2009 Chancellor on brink of second bailout for banks'.
+- The genesis block paid a 50 BTC reward that can never be spent, a quirk of how the block is written into the code; whether deliberate or accidental is unknown.
+- The first bitcoin transaction, on 12 January 2009 in block 170, sent 10 bitcoins from Satoshi Nakamoto to the cryptographer Hal Finney.
+- The first known bitcoin price, posted by NewLibertyStandard on 5 October 2009, was $1 = 1,309.03 BTC, derived from the cost of the electricity a computer burned mining them.
+- The first recorded bitcoin-for-dollars trade: on 12 October 2009 early developer Martti Malmi sold 5,050 BTC to NewLibertyStandard for $5.02, paid via PayPal.
+- On 18 May 2010 Laszlo Hanyecz offered 10,000 bitcoins for 'a couple of pizzas'; on 22 May he reported the trade done. The coins were then worth around $41.
+- On 15 August 2010 block 74638 held a transaction that conjured about 184.467 billion bitcoins from an overflow bug; a patched client within hours erased it from the chain.
+
+EXCHANGES & COLLAPSES:
+- Mt. Gox stood for 'Magic: The Gathering Online eXchange'; Jed McCaleb bought the domain in 2007, relaunched it as a bitcoin exchange on 18 July 2010, sold it to Mark Karpeles in March 2011.
+- Mt. Gox, once handling over 70% of bitcoin trades, halted withdrawals 7 Feb 2014 and filed for bankruptcy 28 Feb, reporting about 850,000 BTC lost; 199,999.99 BTC turned up in an old wallet.
+- QuadrigaCX founder Gerald Cotten died in Jaipur, India on 9 December 2018; about C$250 million in crypto and cash was owed to some 115,000 customers.
+- In June 2020 Ontario's securities regulator called QuadrigaCX 'a fraud and a Ponzi scheme': Cotten traded against clients from alias accounts credited with fictitious balances.
+- FTX's fall began with a CoinDesk report on 2 Nov 2022 that 40% of Alameda's $14.6 billion in assets was FTX's own FTT token; about $6 billion was withdrawn within 72 hours.
+- FTX and over 100 affiliates filed Chapter 11 on 11 Nov 2022; the new CEO, who had handled Enron, said he had never seen 'such a complete failure of corporate controls'.
+- From 9 May 2022 the 'algorithmic stablecoin' UST broke its dollar peg and fell to about 10 cents within a week, erasing almost $45 billion of Terra market value.
+- In August 2016 hackers took 119,756 bitcoins, about $72 million then, from Bitfinex; customers took a 36% haircut, and coins worth $3.6 billion were seized in 2022.
+
+MARKET MECHANICS:
+- Economist Robert Shiller proposed perpetual futures in 1992 for illiquid assets; the crypto inverse perpetual was first built for the ICBIT exchange in 2011.
+- BitMEX launched its XBTUSD perpetual swap on 13 May 2016, a bitcoin-dollar future with no expiry; perpetuals now carry over 75% of crypto derivatives volume.
+- Perpetuals are tethered to spot by funding: on Binance every 8 hours (00:00, 08:00, 16:00 UTC) longs pay shorts when the rate is positive, trader to trader, no house fee.
+- Every 210,000 blocks the miner reward halves: 50 to 25 BTC on 28 Nov 2012, to 12.5 on 9 July 2016, to 6.25 on 11 May 2020.
+- The fourth halving came at block 840,000 on 20 April 2024, about 00:09 UTC, cutting the reward for each new block to 3.125 bitcoins.
+- Bitcoin's supply stops just short of 21 million, about 20,999,999.98 BTC; at constant mining power the last fraction would be mined around 7 May 2140.
+- On 10-11 Oct 2025, after a tariff threat against China, a liquidation cascade forced out 1,618,240 traders and $19.13 billion of positions in 24 hours, a record per CoinGlass.
+
+INSTITUTIONS & REGULATION:
+- On 17 Sept 2015, in an order against Coinflip over unregistered bitcoin options, the CFTC held for the first time that bitcoin and other virtual currencies are commodities.
+- Cboe listed the first US bitcoin futures, ticker XBT, one bitcoin per contract, on 10 Dec 2017; CME followed on 17 Dec 2017 with ticker BTC, five bitcoins per contract.
+- The day CME futures opened, 17 Dec 2017, bitcoin briefly hit $19,783.06, a peak; by September 2018 cryptocurrencies had fallen 80% from their January 2018 highs.
+- On 10 Jan 2024 the SEC approved US spot bitcoin ETPs after losing the Grayscale case; Chair Gensler added: 'we did not approve or endorse bitcoin'.
+- El Salvador's assembly passed the Bitcoin Law on 9 June 2021 by 62 of 84 votes; bitcoin became legal tender on 7 Sept 2021, with $30 in bitcoin offered to Chivo wallet users.
+- Under a $1.4 billion IMF deal, El Salvador amended its Bitcoin Law in February 2025, ending mandatory acceptance; bitcoin's legal-tender status lasted about three and a half years.
+- MicroStrategy's first treasury buy, on 11 Aug 2020, was 21,454 bitcoins for $250 million including fees; by 14 Sept it held 38,250 bitcoins bought for $425 million.
+
+LANGUAGE & CULTURE:
+- HODL began as a typo: on 18 Dec 2013, as bitcoin fell, BitcoinTalk user GameKyuubi posted 'I AM HODLING', admitting he had typed the title twice and it was still wrong.
+- Ethereum's 2014 token sale raised about 31,000 bitcoin; its network went live as 'Frontier', a barebones release for developers, at 15:26:13 UTC on 30 July 2015.
+- The DAO, a fund run by code, opened a 28-day crowdsale on 30 April 2016 and passed $100 million by 15 May; 11.5 million Ether was committed to it.
+- On 17 June 2016 an attacker drained 3.6 million Ether, about a third of The DAO, worth about $50 million; a hard fork at block 1,920,000 on 20 July 2016 reversed it.
+- Not everyone accepted the DAO rescue fork: users kept running the original, unaltered chain, which became a separate currency, Ethereum Classic.
+- On 25 July 2017 the SEC's report on The DAO concluded that its tokens were securities and therefore subject to the federal securities laws.
+- ICO mania peaked in 2017: China banned domestic ICOs on 4 Sept 2017, and Block.one later paid a $24 million SEC penalty over its $4 billion unregistered EOS sale.
+- The Merge moved Ethereum from mining to staking at 06:42:42 UTC on 15 Sept 2022, block 15,537,394, its biggest upgrade since launch.
+
+ART & CRYPTO CROSSOVER:
+- Beeple's 'Everydays: the First 5000 Days', a collage of daily images begun 1 May 2007, sold at Christie's in March 2021 for $69.3 million, paid in 42,329 Ether.
+- Larva Labs released the 10,000 CryptoPunks in June 2017 free to anyone with an Ethereum wallet who paid the fee; only 9 are Aliens and 24 Apes.
+- In May 2021 Christie's sold nine CryptoPunks consigned by their creators, Larva Labs, for $16.9 million, its first big NFT sale after the Beeple.
+- CryptoPunk 7523, one of nine Aliens and the only one wearing a mask, sold at Sotheby's 'Natively Digital' sale on 10 June 2021 for about $11.8 million, a record for a single Punk.
+- Kevin McCoy's 'Quantum', minted on the Namecoin blockchain in May 2014 and first sold for $4, was billed by Sotheby's as the first NFT and fetched $1.47 million there in June 2021.
+- Only 24 of the 10,000 CryptoPunks were issued as signed paper prints; each came in a wax-sealed envelope holding a 'paper wallet' key to the token.
+- In December 2025 MoMA put eight CryptoPunks and eight Chromie Squiggles into its permanent collection, all donated, in its Media and Performance department.
+`;
+
 const FULL_KNOWLEDGE_BASE = `
 ${KNOWLEDGE_ATUONA}
 
@@ -2063,7 +2124,7 @@ ${EMOTIONAL_INTELLIGENCE}
 initFactPool({
   ATU: KNOWLEDGE_ATUONA, GAU: KNOWLEDGE_GAUGUIN, ART: KNOWLEDGE_ART_HISTORY, MOD: KNOWLEDGE_MODERN_ART,
   AUC: KNOWLEDGE_AUCTION_HOUSES, FAS: KNOWLEDGE_FASHION, VIB: KNOWLEDGE_VIBE_CODING, NFT: KNOWLEDGE_VIBE_NFT_ART_FUSION,
-  ATL: KNOWLEDGE_ATLAS_SHRUGGED, AGT: KNOWLEDGE_AI_AGENTIC,
+  ATL: KNOWLEDGE_ATLAS_SHRUGGED, AGT: KNOWLEDGE_AI_AGENTIC, CRY: KNOWLEDGE_CRYPTO_TRADING,
 });
 
 /**
@@ -2464,7 +2525,8 @@ async function getUndergroundCanonCorpus(): Promise<string> {
 }
 
 /** Full KB + style canon + poems 001–098 excerpts — for major creative generation. */
-async function buildFullCreativityKnowledgeBlock(): Promise<string> {
+/** extraKnowledge: a lane kept OUT of the full KB but wanted by one caller (7 Oct 2026: crypto for free chat + voice). */
+async function buildFullCreativityKnowledgeBlock(extraKnowledge: string = ''): Promise<string> {
   const canon = await getUndergroundCanonCorpus();
   const canonBlock =
     canon.length > 0
@@ -2482,6 +2544,7 @@ ${canonBlock}
 FULL EMBEDDED KNOWLEDGE (all domains)
 ═══════════════════════════════════════════════════════════════
 ${FULL_KNOWLEDGE_BASE}
+${extraKnowledge}
 `;
 }
 
@@ -11362,7 +11425,7 @@ _For now, please type your message..._ 💜`, { parse_mode: 'Markdown' });
       
       const { externalNote, selectedKeys: voiceSelKeys } = selectKnowledgeForInput(text, []);
       console.log(`🎤 Voice knowledge routing: selected [${voiceSelKeys.join(', ')}] for: "${text.slice(0, 80)}..."`);
-      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock(KNOWLEDGE_CRYPTO_TRADING);
       
       // Detect language from transcription
       const voiceLang = /[a-zA-Z]{4,}/.test(text) && !/[а-яА-ЯёЁ]{3,}/.test(text) ? 'english' : 'russian';
@@ -11881,7 +11944,7 @@ _Your turn... or /endcollab to finish_${kbDraw.footer}`, { parse_mode: 'Markdown
       
       const { externalNote, selectedKeys: textSelKeys } = selectKnowledgeForInput(message || '', []);
       console.log(`💬 Text knowledge routing: selected [${textSelKeys.join(', ')}] for: "${(message || '').slice(0, 80)}..."`);
-      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock();
+      const fullKnowledgeBlock = await buildFullCreativityKnowledgeBlock(KNOWLEDGE_CRYPTO_TRADING);
 
       // Detect language Elena is using
       const elenaLang = message && /[a-zA-Z]{4,}/.test(message) && !/[а-яА-ЯёЁ]{3,}/.test(message) ? 'english' : 'russian';

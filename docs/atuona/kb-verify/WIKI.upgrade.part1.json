@@ -1,0 +1,362 @@
+[
+ {
+  "id": "ART-002",
+  "current_text": "Monet painted about 250 Water Lilies over the last three decades of his life at Giverny; the eight great murals opened at the Orangerie on 16 May 1927, months after his death.",
+  "status": "UPGRADED_CORRECTED",
+  "new_text": "Monet painted some 250 Water Lilies at Giverny from the late 1890s to his death in 1926; the eight great Orangerie murals were inaugurated on 17 May 1927, months after his death.",
+  "source_url": "https://www.musee-orangerie.fr/en/node/24",
+  "source_note": "Musée de l'Orangerie gives the inauguration as 17 May 1927 (not 16 May). Britannica (britannica.com/topic/Water-Lilies-Monet-series) gives some 250 paintings, late 1890s to 1926; the National Gallery says 'final two decades', so 'three decades' was dropped."
+ },
+ {
+  "id": "ART-012",
+  "current_text": "In La Loge (1874, Courtauld) the woman is Montmartre model Nini Lopez, nicknamed 'Gueule-de-Raie', the man Renoir's brother Edmond; Renoir sold it to pere Martin for 425 francs.",
+  "status": "UPGRADED",
+  "new_text": "In La Loge (1874, Courtauld) the woman is Montmartre model Nini Lopez, nicknamed 'Gueule-de-Raie', the man Renoir's brother Edmond; Renoir sold it to pere Martin for 425 francs.",
+  "source_url": "https://courtauld.ac.uk/highlights/la-loge-the-theatre-box/",
+  "source_note": "Courtauld confirms Nini Lopez ('Nini gueule en raie'), Edmond Renoir, and the sale to pere Martin for 425 francs to pay rent."
+ },
+ {
+  "id": "ART-030",
+  "current_text": "Berthe Morisot was the only woman in the first Impressionist exhibition of 1874 and showed in seven of the eight, missing only 1879 after the birth of her daughter Julie.",
+  "status": "UPGRADED",
+  "new_text": "Berthe Morisot was the only woman in the first Impressionist exhibition of 1874 and showed in seven of the eight, missing only 1879 after the birth of her daughter Julie.",
+  "source_url": "https://www.nationalgallery.org.uk/artists/berthe-morisot",
+  "source_note": "Confirms only woman at the 1874 show; seven of eight, missing 1879 after Julie's birth (end of 1878)."
+ },
+ {
+  "id": "ART-036",
+  "current_text": "In 1893-94 Sisley painted the church of Notre-Dame at Moret about a dozen times from nearly the same spot, in different seasons and weather, his most deliberate series.",
+  "status": "UPGRADED_CORRECTED",
+  "new_text": "In 1893-94 Sisley painted the church of Notre-Dame at Moret some fifteen times from nearly the same spot, at different times of day and seasons, his most deliberate series.",
+  "source_url": "https://www.petitpalais.paris.fr/en/oeuvre/church-moret-evening",
+  "source_note": "Petit Palais says 'fifteen or so' paintings (Wikipedia: 'some dozen'), painted from the second floor of a house on the square."
+ },
+ {
+  "id": "ART-040",
+  "current_text": "Sisley died of throat cancer at Moret on 29 January 1899; on 1 May 1899 Monet's benefit sale at Galerie Georges Petit raised 145,000 francs for his children.",
+  "status": "UPGRADED",
+  "new_text": "Sisley died of throat cancer at Moret on 29 January 1899; on 1 May 1899 Monet's benefit sale at Galerie Georges Petit raised 145,000 francs for his children.",
+  "source_url": "https://publications.artic.edu/sites/default/files/file_assets/1985%20Wildenstein%20vol%204%20letters_documents_1899-26_OCR_Part1.pdf",
+  "source_note": "Wildenstein Monet catalogue raisonné (vol. 4, via Art Institute of Chicago) confirms the 1 May 1899 Galerie Petit sale for Sisley's children. The 145,000-franc total and throat cancer are not confirmed there."
+ },
+ {
+  "id": "ART-043",
+  "current_text": "Degas worked on the background of Cassatt's Little Girl in a Blue Armchair (1878) and supplied the model, a friend's daughter; the American jury of the 1878 World's Fair rejected it.",
+  "status": "UPGRADED",
+  "new_text": "Degas worked on the background of Cassatt's Little Girl in a Blue Armchair (1878) and supplied the model, a friend's daughter; the American jury of the 1878 World's Fair rejected it.",
+  "source_url": "https://www.nga.gov/features/degas-cassatt/little-girl-in-a-blue-armchair.html",
+  "source_note": "National Gallery of Art quotes Cassatt to Vollard: the child was a friend of Degas's, Degas advised on and worked on the background, and the American section of the 1878 exposition refused it."
+ },
+ {
+  "id": "ART-047",
+  "current_text": "Paris Street; Rainy Day (1877) shows today's Place de Dublin, where rue de Saint-Petersbourg meets rue de Moscou; Caillebotte showed it at the 1877 Impressionist show he helped fund.",
+  "status": "UPGRADED",
+  "new_text": "Paris Street; Rainy Day (1877) shows today's Place de Dublin, where rue de Saint-Petersbourg meets rue de Moscou; Caillebotte showed it at the 1877 Impressionist show he helped fund.",
+  "source_url": "https://www.artic.edu/digital-publications/44/caillebotte-paintings-and-drawings-at-the-art-institute-of-chicago/223/cat-2-paris-street-rainy-day-1877",
+  "source_note": "Art Institute catalogue confirms the 1877 third Impressionist show, Caillebotte's funding role and the rue de Saint-Petersbourg setting; 'Place de Dublin' is not named in the excerpt seen."
+ },
+ {
+  "id": "ART-051",
+  "current_text": "Bazille's Family Reunion (1867-68, Orsay) records a summer 1867 gathering at Méric near Montpellier: eleven relatives under a chestnut tree, eight of them gazing out at the viewer.",
+  "status": "UPGRADED",
+  "new_text": "Bazille's Family Reunion (1867-68, Orsay) records a summer 1867 gathering at Méric near Montpellier: eleven relatives under a chestnut tree, eight of them gazing out at the viewer.",
+  "source_url": "https://www.musee-orsay.fr/fr/oeuvres/59",
+  "source_note": "Orsay confirms Méric near Montpellier, summer 1867, eleven relatives in the shade of a large tree, gazes converging on the viewer. The count of eight gazing out is not stated there."
+ },
+ {
+  "id": "ART-054",
+  "current_text": "In Bazille's Studio (1870, Orsay), set in the rue de la Condamine studio he shared with Renoir, Manet painted Bazille's own tall figure; Edmond Maître sits at the piano.",
+  "status": "UPGRADED",
+  "new_text": "In Bazille's Studio (1870, Orsay), set in the rue de la Condamine studio he shared with Renoir, Manet painted Bazille's own tall figure; Edmond Maître sits at the piano.",
+  "source_url": "https://www.musee-orsay.fr/en/node/26616",
+  "source_note": "Orsay confirms the rue de la Condamine studio, Manet painting Bazille's figure, and Edmond Maître at the piano."
+ },
+ {
+  "id": "ART-058",
+  "current_text": "Olympia, painted in 1863, caused its scandal at the 1865 Salon; in 1890 Monet raised 19,415 francs from nearly 100 subscribers to buy it from Manet's widow for the nation.",
+  "status": "UPGRADED",
+  "new_text": "Olympia, painted in 1863, caused its scandal at the 1865 Salon; in 1890 Monet raised 19,415 francs from nearly 100 subscribers to buy it from Manet's widow for the nation.",
+  "source_url": "https://www.musee-orsay.fr/en/artworks/olympia-712",
+  "source_note": "Orsay confirms the 1865 Salon scandal and Monet's 1890 subscription to buy it from Manet's widow, with nearly a hundred subscribers. The 19,415-franc figure is not on the Orsay excerpt."
+ },
+ {
+  "id": "ART-061",
+  "current_text": "Manet never exhibited in any of the eight Impressionist exhibitions (1874-86), holding to the official Salon, though the younger painters looked to him as their leader.",
+  "status": "UPGRADED",
+  "new_text": "Manet never exhibited in any of the eight Impressionist exhibitions (1874-86), holding to the official Salon, though the younger painters looked to him as their leader.",
+  "source_url": "https://www.metmuseum.org/toah/hd/mane/hd_mane.htm",
+  "source_note": "Met Heilbrunn Timeline: Manet never exhibited with the Impressionists and kept to the Salon."
+ },
+ {
+  "id": "ART-068",
+  "current_text": "The Starry Night (June 1889) shows the pre-dawn view from his east-facing room at the Saint-Rémy asylum, with an invented village; MoMA acquired it in 1941 via the Lillie P. Bliss Bequest.",
+  "status": "UPGRADED",
+  "new_text": "The Starry Night (June 1889) shows the pre-dawn view from his east-facing room at the Saint-Rémy asylum, with an invented village; MoMA acquired it in 1941 via the Lillie P. Bliss Bequest.",
+  "source_url": "https://www.moma.org/collection/works/79802",
+  "source_note": "MoMA confirms Saint-Rémy, June 1889, view from his asylum window before sunrise, and acquisition through the Lillie P. Bliss Bequest (by exchange). The 1941 date and east-facing room are not stated on the excerpt."
+ },
+ {
+  "id": "ART-076",
+  "current_text": "Seurat preferred to call his method 'chromoluminarism'; the critic Félix Fénéon coined 'neo-impressionism' in 1886 after seeing La Grande Jatte at the last Impressionist show.",
+  "status": "UPGRADED",
+  "new_text": "Seurat preferred to call his method 'chromoluminarism'; the critic Félix Fénéon coined 'neo-impressionism' in 1886 after seeing La Grande Jatte at the last Impressionist show.",
+  "source_url": "https://www.metmuseum.org/toah/hd/seni/hd_seni.htm",
+  "source_note": "Met: Fénéon first used 'Neo-Impressionism' at the eighth and last Impressionist exhibition, 1886, where La Grande Jatte debuted. 'Chromoluminarism' is not on the Met page."
+ },
+ {
+  "id": "ART-082",
+  "current_text": "Lautrec's Elles (1896), twelve prints of brothel women waking, washing and dressing, published by Gustave Pellet in 100 copies, flopped because it refused to be erotic.",
+  "status": "UPGRADED",
+  "new_text": "Lautrec's Elles (1896), twelve prints of brothel women waking, washing and dressing, published by Gustave Pellet in 100 copies, flopped because it refused to be erotic.",
+  "source_url": "https://emuseum.cornell.edu/objects/46852/elles",
+  "source_note": "Cornell's Johnson Museum: Elles published by Gustave Pellet in 1896 in an edition of 100 (cover, frontispiece and ten plates = twelve sheets); a commercial failure because it was intimate, not an erotic fantasy."
+ },
+ {
+  "id": "ART-088",
+  "current_text": "Vollard bought some 150 Cézannes for his first show in 1895 and gave Picasso his first Paris show in 1901; from about 1900 he advanced Gauguin 300 francs a month for 25 paintings a year.",
+  "status": "UPGRADED",
+  "new_text": "Vollard bought some 150 Cézannes for his first show in 1895 and gave Picasso his first Paris show in 1901; from about 1900 he advanced Gauguin 300 francs a month for 25 paintings a year.",
+  "source_url": "https://www.metmuseum.org/press/exhibitions/2006/c%C3%A9zanne-to-picasso--ambroise-vollard-patron-of-the-avantgarde",
+  "source_note": "Met press release for 'Cézanne to Picasso' confirms some 150 Cézannes bought for the 1895 show and Picasso's first show in 1901. The Gauguin 300-francs-a-month contract is not confirmed there."
+ },
+ {
+  "id": "ART-091",
+  "current_text": "In 1878 the baritone Jean-Baptiste Faure paid Manet 2,600 francs for Le Déjeuner sur l'herbe; in 2011 one of Cézanne's Card Players reportedly sold for $250 million.",
+  "status": "UPGRADED",
+  "new_text": "In 1878 the baritone Jean-Baptiste Faure paid Manet 2,600 francs for Le Déjeuner sur l'herbe; in 2011 one of Cézanne's Card Players reportedly sold for $250 million.",
+  "source_url": "https://www.musee-orsay.fr/en/artworks/le-dejeuner-sur-lherbe-904",
+  "source_note": "Orsay provenance confirms Faure owned it from 1878 (bought from the artist); the 2,600-franc price is not on the excerpt. Card Players $250m was reported by Vanity Fair in 2012 (e.g. npr.org/transcripts/146424989)."
+ },
+ {
+  "id": "ART-094",
+  "current_text": "The eighth and last Impressionist exhibition ran 15 May-15 June 1886; Seurat's La Grande Jatte made it a watershed, and Fénéon named the new style néo-impressionnisme.",
+  "status": "UPGRADED",
+  "new_text": "The eighth and last Impressionist exhibition ran 15 May-15 June 1886; Seurat's La Grande Jatte made it a watershed, and Fénéon named the new style néo-impressionnisme.",
+  "source_url": "https://www.culture.gouv.fr/en/Thematic/Museums/Les-musees-en-France/Collections-of-museums-in-France/Discover-the-collections/Impressionist-exhibitions",
+  "source_note": "French Ministry of Culture confirms 15 May-15 June 1886 at 1 rue Laffitte. Fénéon naming the style is confirmed by the Met (hd_seni)."
+ },
+ {
+  "id": "ART-097",
+  "current_text": "Gauguin sailed for Tahiti on 1 April 1891, paid for by a February 1891 Hôtel Drouot sale of his works, boosted by two enthusiastic articles by Octave Mirbeau.",
+  "status": "UPGRADED",
+  "new_text": "Gauguin sailed for Tahiti on 1 April 1891, paid for by a February 1891 Hôtel Drouot sale of his works, boosted by two enthusiastic articles by Octave Mirbeau.",
+  "source_url": "https://www.gazette-drouot.com/en/article/gauguin-3A-historical-sales/4934",
+  "source_note": "Gazette Drouot confirms the spring 1891 Tahiti voyage was financed by the February 1891 Drouot sale; Mirbeau's two articles and the exact 1 April date are not confirmed there."
+ },
+ {
+  "id": "ATU-004",
+  "current_text": "Atuona had 1,993 inhabitants at the 2022 census, most of them Marquesan.",
+  "status": "UPGRADED",
+  "new_text": "Atuona had 1,993 inhabitants at the 2022 census, most of them Marquesan.",
+  "source_url": "https://www.insee.fr/fr/statistiques/6690032",
+  "source_note": "INSEE 2022 legal populations of associated communes: Atuona 1,993. 'Mostly Marquesan' is not a census figure."
+ },
+ {
+  "id": "ATU-008",
+  "current_text": "At the me'ae of Iipona in Puamau, across Hiva Oa from Atuona, stands Takaii, a stone tiki over 2.4 m tall, the largest in Polynesia.",
+  "status": "UPGRADED_CORRECTED",
+  "new_text": "At the me'ae of Iipona in Puamau, across Hiva Oa from Atuona, stands Takaii, a stone tiki 2.57 m high, the tallest tiki in French Polynesia.",
+  "source_url": "https://tahititourisme.pf/en-pf/islands-and-archipelagos/marquesas-islands/hiva-oa",
+  "source_note": "Tahiti Tourisme (official) gives 2.57 m and 'tallest tiki in The Islands of Tahiti'; it does not name Takaii in the excerpt. Wikipedia's 'over 2.4 m' and 'largest in Polynesia' replaced."
+ },
+ {
+  "id": "ATU-011",
+  "current_text": "Copra, dried coconut meat, is the cash export of Hiva Oa, produced alongside a subsistence economy of breadfruit, coconut, yam and taro.",
+  "status": "UPGRADED",
+  "new_text": "Copra, dried coconut meat, is the cash export of Hiva Oa, produced alongside a subsistence economy of breadfruit, coconut, yam and taro.",
+  "source_url": "https://www.britannica.com/place/Hiva-Oa",
+  "source_note": "Britannica: copra is the island's only export, shipped from Atuona. Subsistence crops are not listed in the excerpt."
+ },
+ {
+  "id": "ATU-015",
+  "current_text": "Atuona was once the seat of government for all the Marquesas, a role later taken by Taiohae on Nuku Hiva.",
+  "status": "WIKIPEDIA_ONLY",
+  "new_text": "Atuona was once the seat of government for all the Marquesas, a role later taken by Taiohae on Nuku Hiva.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "No stronger source found; Britannica calls Atuona the main village and port but does not mention the former seat of government."
+ },
+ {
+  "id": "ATU-026",
+  "current_text": "Hiva Oa-Atuona airport, also called Jacques Brel airport, sits on the Tepuna plateau above town, with a single asphalt runway 1,215 m long.",
+  "status": "WIKIPEDIA_ONLY",
+  "new_text": "Hiva Oa-Atuona airport, also called Jacques Brel airport, sits on the Tepuna plateau above town, with a single asphalt runway 1,215 m long.",
+  "source_url": "https://en.wikipedia.org/wiki/Hiva_Oa",
+  "source_note": "Aviation databases list NTMN with a 1,215 m runway but could not be fetched to verify; no museum/Britannica-grade source found."
+ },
+ {
+  "id": "AUC-014",
+  "current_text": "Phillips was bought by Bernard Arnault's LVMH in 1999; after heavy losses it became Phillips, de Pury & Luxembourg in 2001, and Moscow's Mercury Group took a majority stake in October 2008.",
+  "status": "UPGRADED",
+  "new_text": "Phillips was bought by Bernard Arnault's LVMH in 1999; after heavy losses it became Phillips, de Pury & Luxembourg in 2001, and Moscow's Mercury Group took a majority stake in October 2008.",
+  "source_url": "https://www.phillips.com/about",
+  "source_note": "Phillips' own history plus ARTnews (artnews.com/2008/10/14/russian-luxury-retailer-acquires-phillips-de-pury-company) confirm LVMH 1999 and Mercury Group's majority stake in October 2008. 'Heavy losses' and the 2001 rename date not confirmed."
+ },
+ {
+  "id": "GAU-001",
+  "current_text": "Born 7 June 1848 in Paris, the year of the revolutions; his maternal grandmother was the socialist writer Flora Tristan.",
+  "status": "UPGRADED",
+  "new_text": "Born 7 June 1848 in Paris, the year of the revolutions; his maternal grandmother was the socialist writer Flora Tristan.",
+  "source_url": "https://www.britannica.com/biography/Paul-Gauguin",
+  "source_note": "Britannica confirms born 7 June 1848 in Paris; the Flora Tristan link was not visible in the excerpt seen."
+ },
+ {
+  "id": "GAU-004",
+  "current_text": "From 1871 a Paris Bourse stockbroker (job found via Gustave Arosa); by 1879 earning 30,000 francs a year, painting Sundays in Pissarro's garden.",
+  "status": "UPGRADED",
+  "new_text": "From 1871 a Paris Bourse stockbroker (job found via Gustave Arosa); by 1879 earning 30,000 francs a year, painting Sundays in Pissarro's garden.",
+  "source_url": "https://www.metmuseum.org/essays/paul-gauguin-1848-1903",
+  "source_note": "Met essay: stockbroker from 1871 via guardian Gustave Arosa; met Pissarro and by 1879 was his pupil and patron. The 30,000-franc income and Sunday painting are not confirmed."
+ },
+ {
+  "id": "GAU-007",
+  "current_text": "1887: with Charles Laval, dreamed of Taboga island; broke in Colón, he dug on the Panama Canal 5:30am to 6pm, was fined 4 francs for urinating in public, then Martinique June-November.",
+  "status": "WIKIPEDIA_ONLY",
+  "new_text": "1887: with Charles Laval, dreamed of Taboga island; broke in Colón, he dug on the Panama Canal 5:30am to 6pm, was fined 4 francs for urinating in public, then Martinique June-November.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "Met essay confirms only that he sailed with Charles Laval in April 1887 and reached Martinique; Panama digging hours, the 4-franc fine and Taboga are Wikipedia only."
+ },
+ {
+  "id": "GAU-011",
+  "current_text": "1893-95 Paris: Degas organised and bought from his November 1893 Durand-Ruel show while Monet, Renoir and Pissarro mocked it; his February 1895 Hôtel Drouot auction failed.",
+  "status": "UPGRADED",
+  "new_text": "1893-95 Paris: Degas organised and bought from his November 1893 Durand-Ruel show while Monet, Renoir and Pissarro mocked it; his February 1895 Hôtel Drouot auction failed.",
+  "source_url": "https://publications.artic.edu/gauguin/reader/gauguinart/section/140629",
+  "source_note": "Art Institute Gauguin catalogue confirms the November 1893 Durand-Ruel show and Degas buying. Monet/Renoir/Pissarro mockery and the February 1895 Drouot failure are not confirmed there."
+ },
+ {
+  "id": "GAU-014",
+  "current_text": "Atuona 1901-03: painted landscapes and figure studies with Vollard's clients in mind, plus Riders on the Beach (1902, Museum Folkwang, Essen).",
+  "status": "UPGRADED",
+  "new_text": "Atuona 1901-03: painted landscapes and figure studies with Vollard's clients in mind, plus Riders on the Beach (1902, Museum Folkwang, Essen).",
+  "source_url": "http://collection-online.museum-folkwang.de/eMuseumPlus?module=collection&objectId=3008&service=ExternalInterface&viewType=detailView",
+  "source_note": "Museum Folkwang confirms 'Cavaliers sur la plage (I)', 1902, acquired 1904. Painting 'with Vollard's clients in mind' is not confirmed."
+ },
+ {
+  "id": "GAU-019",
+  "current_text": "Manao tupapau (1892), on burlap: Teha'amana lies face down, a spirit-woman behind; he wrote Mette on 8 Dec 1892 that the pose was 'on the verge of being indecent'.",
+  "status": "UPGRADED",
+  "new_text": "Manao tupapau (1892), on burlap: Teha'amana lies face down, a spirit-woman behind; he wrote Mette on 8 Dec 1892 that the pose was 'on the verge of being indecent'.",
+  "source_url": "https://buffaloakg.org/artworks/19651-mana%C3%B2-tupapa%C3%BA-spirit-dead-watching",
+  "source_note": "Buffalo AKG confirms 1892, oil on jute, Teha'amana lying on her stomach, the spirit as an old woman behind. The 8 Dec 1892 letter quote is not on the museum page."
+ },
+ {
+  "id": "GAU-023",
+  "current_text": "In Paris he cut the Noa Noa woodcuts (1894) with an experimental technique and fired the stoneware Oviri that winter, showing it at the 1895 Société Nationale salon.",
+  "status": "UPGRADED",
+  "new_text": "In Paris he cut the Noa Noa woodcuts (1894) with an experimental technique and fired the stoneware Oviri that winter, showing it at the 1895 Société Nationale salon.",
+  "source_url": "https://www.musee-orsay.fr/en/artworks/oviri-19409",
+  "source_note": "Orsay: Oviri fired in Chaplet's kiln, December 1894; shown at the 1895 Société nationale des beaux-arts salon. Noa Noa woodcut technique not covered."
+ },
+ {
+  "id": "GAU-026",
+  "current_text": "Nevermore (1897, Courtauld): Pahura nude on a bed; Gauguin called the bird a devil's bird, not Poe's raven; Delius bought it in 1898 for 500 francs via Monfreid.",
+  "status": "UPGRADED",
+  "new_text": "Nevermore (1897, Courtauld): Pahura nude on a bed; Gauguin called the bird a devil's bird, not Poe's raven; Delius bought it in 1898 for 500 francs via Monfreid.",
+  "source_url": "https://courtauld.ac.uk/highlights/nevermore/",
+  "source_note": "Courtauld confirms 1897, Pahura, Gauguin's 'bird of the devil' and denial of Poe; Delius's 1898 purchase via Monfreid for 500 francs came from the same search summary, not separately checked on the page."
+ },
+ {
+  "id": "GAU-036",
+  "current_text": "His 'primitive' Tahiti was partly bookish: he was lent Moerenhout's 1837 Voyage aux îles du Grand Océan to learn the island's forgotten religion.",
+  "status": "UPGRADED",
+  "new_text": "His 'primitive' Tahiti was partly bookish: he was lent Moerenhout's 1837 Voyage aux îles du Grand Océan to learn the island's forgotten religion.",
+  "source_url": "https://www.metmuseum.org/essays/paul-gauguin-1848-1903",
+  "source_note": "Met: his knowledge of Tahitian religion came from reading, chiefly Moerenhout's 1837 Voyages aux îles du Grand Océan. That the book was 'lent' to him is not stated."
+ },
+ {
+  "id": "GAU-039",
+  "current_text": "He took to Tahiti photographs and prints, including a Borobudur temple frieze and an Egyptian fresco, which he called 'a whole little world of friends' in a letter to Redon.",
+  "status": "UPGRADED",
+  "new_text": "He took to Tahiti photographs and prints, including a Borobudur temple frieze and an Egyptian fresco, which he called 'a whole little world of friends' in a letter to Redon.",
+  "source_url": "https://www.brooklynmuseum.org/opencollection/objects/47349",
+  "source_note": "Brooklyn Museum confirms he owned photographs of Borobudur reliefs and drew on Egyptian friezes. The 'little world of friends' letter to Redon is not confirmed."
+ },
+ {
+  "id": "GAU-046",
+  "current_text": "Maison du Jouir: two-storey house built with tattooed carpenter Tioka; carved lintels read 'Soyez amoureuses vous serez heureuses', 'Soyez mystérieuses'; four of five pieces at Orsay.",
+  "status": "UPGRADED_CORRECTED",
+  "new_text": "Maison du Jouir: two-storey house built with tattooed carpenter Tioka; carved panels read 'Soyez amoureuses et vous serez heureuses', 'Soyez mystérieuses'; four of five pieces at Orsay.",
+  "source_url": "https://www.musee-orsay.fr/en/artworks/maison-du-jouir-15286",
+  "source_note": "Orsay gives the inscription as 'Soyez amoureuses ET vous serez heureuses', on the two lower panels (sequoia, 1901-02). Tioka, two storeys and 'four of five' are not on the Orsay excerpt."
+ },
+ {
+  "id": "GAU-050",
+  "current_text": "On 27 March 1903 a local magistrate fined him 500 francs and gave him three months for libelling a gendarme; he appealed to Papeete and died before the hearing.",
+  "status": "WIKIPEDIA_ONLY",
+  "new_text": "On 27 March 1903 a local magistrate fined him 500 francs and gave him three months for libelling a gendarme; he appealed to Papeete and died before the hearing.",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Gauguin",
+  "source_note": "No museum, Britannica or press source found for the 27 March 1903 sentence; Wikipedia only."
+ },
+ {
+  "id": "MOD-001",
+  "current_text": "Tate Modern was opened by the Queen on 11 May 2000 inside Bankside Power Station, Sir Giles Gilbert Scott's power station, which closed in 1981.",
+  "status": "UPGRADED",
+  "new_text": "Tate Modern was opened by the Queen on 11 May 2000 inside Bankside Power Station, Sir Giles Gilbert Scott's power station, which closed in 1981.",
+  "source_url": "https://www.tate.org.uk/press/press-releases/new-tate-modern-opens",
+  "source_note": "Tate confirms opening by the Queen on 11 May 2000 in Giles Gilbert Scott's Bankside Power Station. The 1981 closure is not in the Tate excerpt."
+ },
+ {
+  "id": "MOD-017",
+  "current_text": "On 10 March 1914 suffragette Mary Richardson smuggled a meat cleaver into the National Gallery and slashed Velázquez's Rokeby Venus seven times in protest at the treatment of Emmeline Pankhurst.",
+  "status": "UPGRADED_CORRECTED",
+  "new_text": "On 10 March 1914 suffragette Mary Richardson smuggled a meat cleaver into the National Gallery and slashed Velázquez's Rokeby Venus in protest at the treatment of Emmeline Pankhurst.",
+  "source_url": "https://www.theartnewspaper.com/2023/11/08/how-velazquezs-rokeby-venus-became-a-symbol-of-public-pride-and-then-political-protest",
+  "source_note": "The Art Newspaper confirms date, cleaver and Pankhurst motive. Counts of cuts differ across sources (seven, eight; Richardson herself said five), so the number was dropped."
+ },
+ {
+  "id": "MOD-023",
+  "current_text": "Hauser & Wirth, founded in Zurich in 1992, opened its first London gallery in 2003 inside a former bank on Piccadilly designed by Sir Edwin Lutyens; in 2014 it turned a Somerset farm into a gallery.",
+  "status": "UPGRADED",
+  "new_text": "Hauser & Wirth, founded in Zurich in 1992, opened its first London gallery in 2003 inside a former bank on Piccadilly designed by Sir Edwin Lutyens; in 2014 it turned a Somerset farm into a gallery.",
+  "source_url": "https://www.hauserwirth.com/locations/10056-hauser-wirth-london/",
+  "source_note": "Hauser & Wirth confirms Zurich 1992, first London gallery 2003 in a 1922 Lutyens building on Piccadilly, and the Somerset farm gallery opened 2014. 'Former bank' is not stated in the excerpt."
+ },
+ {
+  "id": "MOD-033",
+  "current_text": "The Pompidou's Musée national d'art moderne holds over 100,000 works by some 6,400 artists, Europe's largest modern and contemporary collection and second in the world only to MoMA.",
+  "status": "UPGRADED_CORRECTED",
+  "new_text": "The Pompidou's Musée national d'art moderne holds more than 140,000 works, the richest modern and contemporary collection in Europe and the second in the world.",
+  "source_url": "https://www.centrepompidou.fr/fr/le-centre-pompidou/qui-sommes-nous",
+  "source_note": "Centre Pompidou now gives more than 140,000 works; the 100,000 works / 6,400 artists figures and the explicit MoMA comparison are not on its site."
+ },
+ {
+  "id": "MOD-048",
+  "current_text": "SFMOMA reopened on 14 May 2016 with Snøhetta's expansion behind Mario Botta's 1995 building, partly to show the Doris and Donald Fisher Collection, lent for 100 years.",
+  "status": "UPGRADED",
+  "new_text": "SFMOMA reopened on 14 May 2016 with Snøhetta's expansion behind Mario Botta's 1995 building, partly to show the Doris and Donald Fisher Collection, lent for 100 years.",
+  "source_url": "https://www.sfmoma.org/press/release/new-san-francisco-museum-modern-art-opens-public/",
+  "source_note": "SFMOMA confirms reopening 14 May 2016, Snøhetta expansion joined to Mario Botta's building, and the 100-year Fisher Collection partnership."
+ },
+ {
+  "id": "MOD-055",
+  "current_text": "Frieze, founded in 2003 by frieze magazine's Amanda Sharp and Matthew Slotover, opened in Regent's Park and grew from 27,700 visitors to 105,000 by 2016; New York came in 2012, LA in 2019, Seoul in 2022.",
+  "status": "UPGRADED",
+  "new_text": "Frieze, founded in 2003 by frieze magazine's Amanda Sharp and Matthew Slotover, opened in Regent's Park and grew from 27,700 visitors to 105,000 by 2016; New York came in 2012, LA in 2019, Seoul in 2022.",
+  "source_url": "https://www.frieze.com/fairs/frieze-london/about",
+  "source_note": "Frieze confirms 2003, Sharp and Slotover, Regent's Park, New York 2012, Los Angeles 2019, and Seoul. The 27,700 to 105,000 visitor figures and the Seoul year are not on the page."
+ },
+ {
+  "id": "MOD-058",
+  "current_text": "Arnold Bode founded documenta in 1955 as a side event of Kassel's federal garden show, to reconnect Germany with art the Nazis banned; held every five years, each lasts 100 days.",
+  "status": "UPGRADED",
+  "new_text": "Arnold Bode founded documenta in 1955 as a side event of Kassel's federal garden show, to reconnect Germany with art the Nazis banned; held every five years, each lasts 100 days.",
+  "source_url": "https://documenta.de/en/retrospective/documenta",
+  "source_note": "documenta confirms Bode, 1955, tied to Kassel's Federal Garden Show, and a five-year cycle. The 100-day length and the Nazi-banned-art motive are not in the excerpt (the first edition ran 16 July-18 September 1955)."
+ },
+ {
+  "id": "MOD-061",
+  "current_text": "Julian Schnabel's first solo show at Mary Boone in 1979 sold out before it opened; his large paintings on broken ceramic plates became emblems of 1980s Neo-Expressionism.",
+  "status": "UPGRADED_CORRECTED",
+  "new_text": "Julian Schnabel, after a first solo show at Houston's Contemporary Arts Museum in 1978, showed with Mary Boone from 1979; his paintings on broken ceramic plates became emblems of 1980s Neo-Expressionism.",
+  "source_url": "https://www.guggenheim.org/artwork/artist/julian-schnabel",
+  "source_note": "Guggenheim: his first one-man show was at the Contemporary Arts Museum, Houston, in 1978, so 'first solo show at Mary Boone' was wrong. The sold-out-before-opening claim could not be confirmed and was dropped."
+ },
+ {
+  "id": "MOD-065",
+  "current_text": "In The Artist Is Present (MoMA, 14 March-31 May 2010) Abramović sat silently for 736 hours 30 minutes as 1,545 people sat opposite her; Ulay appeared on opening night.",
+  "status": "UPGRADED",
+  "new_text": "In The Artist Is Present (MoMA, 14 March-31 May 2010) Abramović sat silently for 736 hours 30 minutes as 1,545 people sat opposite her; Ulay appeared on opening night.",
+  "source_url": "https://www.moma.org/calendar/exhibitions/964",
+  "source_note": "MoMA confirms 14 March-31 May 2010 and silent sitting of 'over 700 hours'. The exact 736h30m, the 1,545 sitters and Ulay on opening night are not on MoMA's page."
+ }
+]

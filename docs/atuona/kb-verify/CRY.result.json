@@ -1,0 +1,362 @@
+[
+ {
+  "id": "CRY-001",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 31 October 2008 a link to Satoshi Nakamoto's paper 'Bitcoin: A Peer-to-Peer Electronic Cash System' was posted to a cryptography mailing list.",
+  "source_url": "https://en.wikipedia.org/wiki/History_of_bitcoin",
+  "source_note": "History of bitcoin, whitepaper posted 31 October 2008"
+ },
+ {
+  "id": "CRY-002",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The genesis block, mined 3 January 2009, carries a newspaper headline in its code: 'The Times 03/Jan/2009 Chancellor on brink of second bailout for banks'.",
+  "source_url": "https://en.bitcoin.it/wiki/Genesis_block",
+  "source_note": "Bitcoin Wiki genesis block page, embedded text quoted"
+ },
+ {
+  "id": "CRY-003",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The genesis block paid a 50 BTC reward that can never be spent, a quirk of how the block is written into the code; whether deliberate or accidental is unknown.",
+  "source_url": "https://en.bitcoin.it/wiki/Genesis_block",
+  "source_note": "Bitcoin Wiki: genesis reward unspendable, intent unknown"
+ },
+ {
+  "id": "CRY-004",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The first bitcoin transaction, on 12 January 2009 in block 170, sent 10 bitcoins from Satoshi Nakamoto to the cryptographer Hal Finney.",
+  "source_url": "https://en.wikipedia.org/wiki/History_of_bitcoin",
+  "source_note": "History of bitcoin, block 170 first transaction"
+ },
+ {
+  "id": "CRY-005",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The first known bitcoin price, posted by NewLibertyStandard on 5 October 2009, was $1 = 1,309.03 BTC, derived from the cost of the electricity a computer burned mining them.",
+  "source_url": "https://www.bullionstar.com/blogs/ronan-manly/dawn-of-bitcoin-price-discovery-2009-2011-the-very-early-bitcoin-exchanges",
+  "source_note": "BullionStar history of early exchanges, NLS formula quoted"
+ },
+ {
+  "id": "CRY-006",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The first recorded bitcoin-for-dollars trade: on 12 October 2009 early developer Martti Malmi sold 5,050 BTC to NewLibertyStandard for $5.02, paid via PayPal.",
+  "source_url": "https://www.bullionstar.com/blogs/ronan-manly/dawn-of-bitcoin-price-discovery-2009-2011-the-very-early-bitcoin-exchanges",
+  "source_note": "BullionStar: first trade 5,050 BTC for $5.02"
+ },
+ {
+  "id": "CRY-007",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 18 May 2010 Laszlo Hanyecz offered 10,000 bitcoins for 'a couple of pizzas'; on 22 May he reported the trade done. The coins were then worth around $41.",
+  "source_url": "https://bitcointalk.org/index.php?topic=137.0",
+  "source_note": "Original BitcoinTalk pizza thread; value per Wikipedia history"
+ },
+ {
+  "id": "CRY-008",
+  "section": "ORIGINS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 15 August 2010 block 74638 held a transaction that conjured about 184.467 billion bitcoins from an overflow bug; a patched client within hours erased it from the chain.",
+  "source_url": "https://en.bitcoin.it/wiki/Value_overflow_incident",
+  "source_note": "Bitcoin Wiki value overflow incident, block 74638"
+ },
+ {
+  "id": "CRY-009",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Mt. Gox stood for 'Magic: The Gathering Online eXchange'; Jed McCaleb bought the domain in 2007, relaunched it as a bitcoin exchange on 18 July 2010, sold it to Mark Karpeles in March 2011.",
+  "source_url": "https://en.wikipedia.org/wiki/Mt._Gox",
+  "source_note": "Wikipedia Mt. Gox: name origin, launch, sale"
+ },
+ {
+  "id": "CRY-010",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Mt. Gox, once handling over 70% of bitcoin trades, halted withdrawals 7 Feb 2014 and filed for bankruptcy 28 Feb, reporting about 850,000 BTC lost; 199,999.99 BTC turned up in an old wallet.",
+  "source_url": "https://en.wikipedia.org/wiki/Mt._Gox",
+  "source_note": "Wikipedia Mt. Gox: halt, bankruptcy, lost and found coins"
+ },
+ {
+  "id": "CRY-011",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "QuadrigaCX founder Gerald Cotten died in Jaipur, India on 9 December 2018; about C$250 million in crypto and cash was owed to some 115,000 customers.",
+  "source_url": "https://en.wikipedia.org/wiki/QuadrigaCX",
+  "source_note": "Wikipedia QuadrigaCX: death, amount owed, customers"
+ },
+ {
+  "id": "CRY-012",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "In June 2020 Ontario's securities regulator called QuadrigaCX 'a fraud and a Ponzi scheme': Cotten traded against clients from alias accounts credited with fictitious balances.",
+  "source_url": "https://en.wikipedia.org/wiki/QuadrigaCX",
+  "source_note": "Wikipedia QuadrigaCX quoting OSC June 2020 report"
+ },
+ {
+  "id": "CRY-013",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "FTX's fall began with a CoinDesk report on 2 Nov 2022 that 40% of Alameda's $14.6 billion in assets was FTX's own FTT token; about $6 billion was withdrawn within 72 hours.",
+  "source_url": "https://en.wikipedia.org/wiki/Bankruptcy_of_FTX",
+  "source_note": "Wikipedia Bankruptcy of FTX: CoinDesk report, withdrawals"
+ },
+ {
+  "id": "CRY-014",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "FTX and over 100 affiliates filed Chapter 11 on 11 Nov 2022; the new CEO, who had handled Enron, said he had never seen 'such a complete failure of corporate controls'.",
+  "source_url": "https://en.wikipedia.org/wiki/Bankruptcy_of_FTX",
+  "source_note": "Wikipedia Bankruptcy of FTX: filing date, John J. Ray quote"
+ },
+ {
+  "id": "CRY-015",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "From 9 May 2022 the 'algorithmic stablecoin' UST broke its dollar peg and fell to about 10 cents within a week, erasing almost $45 billion of Terra market value.",
+  "source_url": "https://en.wikipedia.org/wiki/Terra_(blockchain)",
+  "source_note": "Wikipedia Terra; SEC press release 2023-32 on depeg"
+ },
+ {
+  "id": "CRY-016",
+  "section": "EXCHANGES & COLLAPSES",
+  "verdict": "NEW_SOURCED",
+  "final_text": "In August 2016 hackers took 119,756 bitcoins, about $72 million then, from Bitfinex; customers took a 36% haircut, and coins worth $3.6 billion were seized in 2022.",
+  "source_url": "https://en.wikipedia.org/wiki/2016_Bitfinex_hack",
+  "source_note": "Wikipedia 2016 Bitfinex hack: amount, haircut, seizure"
+ },
+ {
+  "id": "CRY-017",
+  "section": "MARKET MECHANICS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Economist Robert Shiller proposed perpetual futures in 1992 for illiquid assets; the crypto inverse perpetual was first built for the ICBIT exchange in 2011.",
+  "source_url": "https://en.wikipedia.org/wiki/Perpetual_futures",
+  "source_note": "Wikipedia Perpetual futures: Shiller 1992, ICBIT 2011"
+ },
+ {
+  "id": "CRY-018",
+  "section": "MARKET MECHANICS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "BitMEX launched its XBTUSD perpetual swap on 13 May 2016, a bitcoin-dollar future with no expiry; perpetuals now carry over 75% of crypto derivatives volume.",
+  "source_url": "https://www.diariobitcoin.com/exchanges/bitmex-retira-xbtusd-el-contrato-que-transformo-el-trading-de-bitcoin/",
+  "source_note": "DiarioBitcoin: XBTUSD launch date, perpetuals' volume share"
+ },
+ {
+  "id": "CRY-019",
+  "section": "MARKET MECHANICS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Perpetuals are tethered to spot by funding: on Binance every 8 hours (00:00, 08:00, 16:00 UTC) longs pay shorts when the rate is positive, trader to trader, no house fee.",
+  "source_url": "https://www.binance.com/en/support/faq/introduction-to-binance-futures-funding-rates-360033525031",
+  "source_note": "Binance FAQ on funding rates and times"
+ },
+ {
+  "id": "CRY-020",
+  "section": "MARKET MECHANICS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Every 210,000 blocks the miner reward halves: 50 to 25 BTC on 28 Nov 2012, to 12.5 on 9 July 2016, to 6.25 on 11 May 2020.",
+  "source_url": "https://www.kraken.com/learn/bitcoin-halving-history",
+  "source_note": "Kraken halving history; Bitcoin Wiki for 210,000 blocks"
+ },
+ {
+  "id": "CRY-021",
+  "section": "MARKET MECHANICS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The fourth halving came at block 840,000 on 20 April 2024, about 00:09 UTC, cutting the reward for each new block to 3.125 bitcoins.",
+  "source_url": "https://en.wikipedia.org/wiki/Bitcoin_halving",
+  "source_note": "Wikipedia Bitcoin halving; Kraken confirms 00:09 UTC"
+ },
+ {
+  "id": "CRY-022",
+  "section": "MARKET MECHANICS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Bitcoin's supply stops just short of 21 million, about 20,999,999.98 BTC; at constant mining power the last fraction would be mined around 7 May 2140.",
+  "source_url": "https://en.bitcoin.it/wiki/Controlled_supply",
+  "source_note": "Bitcoin Wiki controlled supply, cap and 2140 estimate"
+ },
+ {
+  "id": "CRY-023",
+  "section": "MARKET MECHANICS",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 10-11 Oct 2025, after a tariff threat against China, a liquidation cascade forced out 1,618,240 traders and $19.13 billion of positions in 24 hours, a record per CoinGlass.",
+  "source_url": "https://decrypt.co/343941/bitcoin-ethereum-dogecoin-down-record-19-billion-crypto-liquidations",
+  "source_note": "Decrypt quoting CoinGlass liquidation data"
+ },
+ {
+  "id": "CRY-024",
+  "section": "INSTITUTIONS & REGULATION",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 17 Sept 2015, in an order against Coinflip over unregistered bitcoin options, the CFTC held for the first time that bitcoin and other virtual currencies are commodities.",
+  "source_url": "https://www.cftc.gov/PressRoom/PressReleases/7231-15",
+  "source_note": "CFTC press release 7231-15, Coinflip order"
+ },
+ {
+  "id": "CRY-025",
+  "section": "INSTITUTIONS & REGULATION",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Cboe listed the first US bitcoin futures, ticker XBT, one bitcoin per contract, on 10 Dec 2017; CME followed on 17 Dec 2017 with ticker BTC, five bitcoins per contract.",
+  "source_url": "https://www.fxstreet.com/news/cboe-cme-to-launch-bitcoin-futures-contracts-on-dec-10-dec-17-respectively-201712070730",
+  "source_note": "FXStreet on Cboe and CME contract specs and dates"
+ },
+ {
+  "id": "CRY-026",
+  "section": "INSTITUTIONS & REGULATION",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The day CME futures opened, 17 Dec 2017, bitcoin briefly hit $19,783.06, a peak; by September 2018 cryptocurrencies had fallen 80% from their January 2018 highs.",
+  "source_url": "https://en.wikipedia.org/wiki/Cryptocurrency_bubble",
+  "source_note": "Wikipedia Cryptocurrency bubble timeline"
+ },
+ {
+  "id": "CRY-027",
+  "section": "INSTITUTIONS & REGULATION",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 10 Jan 2024 the SEC approved US spot bitcoin ETPs after losing the Grayscale case; Chair Gensler added: 'we did not approve or endorse bitcoin'.",
+  "source_url": "https://www.sec.gov/newsroom/speeches-statements/gensler-statement-spot-bitcoin-011023",
+  "source_note": "SEC Chair Gensler statement, 10 January 2024"
+ },
+ {
+  "id": "CRY-028",
+  "section": "INSTITUTIONS & REGULATION",
+  "verdict": "NEW_SOURCED",
+  "final_text": "El Salvador's assembly passed the Bitcoin Law on 9 June 2021 by 62 of 84 votes; bitcoin became legal tender on 7 Sept 2021, with $30 in bitcoin offered to Chivo wallet users.",
+  "source_url": "https://en.wikipedia.org/wiki/Bitcoin_in_El_Salvador",
+  "source_note": "Wikipedia Bitcoin in El Salvador: vote, dates, Chivo"
+ },
+ {
+  "id": "CRY-029",
+  "section": "INSTITUTIONS & REGULATION",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Under a $1.4 billion IMF deal, El Salvador amended its Bitcoin Law in February 2025, ending mandatory acceptance; bitcoin's legal-tender status lasted about three and a half years.",
+  "source_url": "https://en.wikipedia.org/wiki/Bitcoin_in_El_Salvador",
+  "source_note": "Wikipedia Bitcoin in El Salvador: IMF deal, 2025 amendment"
+ },
+ {
+  "id": "CRY-030",
+  "section": "INSTITUTIONS & REGULATION",
+  "verdict": "NEW_SOURCED",
+  "final_text": "MicroStrategy's first treasury buy, on 11 Aug 2020, was 21,454 bitcoins for $250 million including fees; by 14 Sept it held 38,250 bitcoins bought for $425 million.",
+  "source_url": "https://www.sec.gov/Archives/edgar/data/1050446/000119312520245835/d42524d8k.htm",
+  "source_note": "MicroStrategy Form 8-K filed with SEC, September 2020"
+ },
+ {
+  "id": "CRY-031",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "HODL began as a typo: on 18 Dec 2013, as bitcoin fell, BitcoinTalk user GameKyuubi posted 'I AM HODLING', admitting he had typed the title twice and it was still wrong.",
+  "source_url": "https://bitcointalk.org/index.php?topic=375643.0",
+  "source_note": "Original BitcoinTalk thread 'I AM HODLING'"
+ },
+ {
+  "id": "CRY-032",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Ethereum's 2014 token sale raised about 31,000 bitcoin; its network went live as 'Frontier', a barebones release for developers, at 15:26:13 UTC on 30 July 2015.",
+  "source_url": "https://ethereum.org/en/ethereum-forks/",
+  "source_note": "ethereum.org forks timeline; ICO figure from Wikipedia ICO"
+ },
+ {
+  "id": "CRY-033",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The DAO, a fund run by code, opened a 28-day crowdsale on 30 April 2016 and passed $100 million by 15 May; 11.5 million Ether was committed to it.",
+  "source_url": "https://en.wikipedia.org/wiki/The_DAO",
+  "source_note": "Wikipedia The DAO: crowdsale dates and totals"
+ },
+ {
+  "id": "CRY-034",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 17 June 2016 an attacker drained 3.6 million Ether, about a third of The DAO, worth about $50 million; a hard fork at block 1,920,000 on 20 July 2016 reversed it.",
+  "source_url": "https://ethereum.org/en/ethereum-forks/",
+  "source_note": "ethereum.org DAO fork; Wikipedia The DAO for attack date"
+ },
+ {
+  "id": "CRY-035",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Not everyone accepted the DAO rescue fork: users kept running the original, unaltered chain, which became a separate currency, Ethereum Classic.",
+  "source_url": "https://en.wikipedia.org/wiki/The_DAO",
+  "source_note": "Wikipedia The DAO, hard fork and Ethereum Classic"
+ },
+ {
+  "id": "CRY-036",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "On 25 July 2017 the SEC's report on The DAO concluded that its tokens were securities and therefore subject to the federal securities laws.",
+  "source_url": "https://www.sec.gov/newsroom/press-releases/2017-131",
+  "source_note": "SEC press release 2017-131, DAO Report"
+ },
+ {
+  "id": "CRY-037",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "ICO mania peaked in 2017: China banned domestic ICOs on 4 Sept 2017, and Block.one later paid a $24 million SEC penalty over its $4 billion unregistered EOS sale.",
+  "source_url": "https://en.wikipedia.org/wiki/Initial_coin_offering",
+  "source_note": "Wikipedia Initial coin offering: China ban, Block.one"
+ },
+ {
+  "id": "CRY-038",
+  "section": "LANGUAGE & CULTURE",
+  "verdict": "NEW_SOURCED",
+  "final_text": "The Merge moved Ethereum from mining to staking at 06:42:42 UTC on 15 Sept 2022, block 15,537,394, its biggest upgrade since launch.",
+  "source_url": "https://ethereum.org/en/ethereum-forks/",
+  "source_note": "ethereum.org forks timeline, Paris (The Merge)"
+ },
+ {
+  "id": "CRY-039",
+  "section": "ART & CRYPTO CROSSOVER",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Beeple's 'Everydays: the First 5000 Days', a collage of daily images begun 1 May 2007, sold at Christie's in March 2021 for $69.3 million, paid in 42,329 Ether.",
+  "source_url": "https://en.wikipedia.org/wiki/Everydays:_the_First_5000_Days",
+  "source_note": "Wikipedia Everydays: price, Ether payment, start date"
+ },
+ {
+  "id": "CRY-040",
+  "section": "ART & CRYPTO CROSSOVER",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Larva Labs released the 10,000 CryptoPunks in June 2017 free to anyone with an Ethereum wallet who paid the fee; only 9 are Aliens and 24 Apes.",
+  "source_url": "https://en.wikipedia.org/wiki/CryptoPunks",
+  "source_note": "Wikipedia CryptoPunks: launch, free claim, trait counts"
+ },
+ {
+  "id": "CRY-041",
+  "section": "ART & CRYPTO CROSSOVER",
+  "verdict": "NEW_SOURCED",
+  "final_text": "In May 2021 Christie's sold nine CryptoPunks consigned by their creators, Larva Labs, for $16.9 million, its first big NFT sale after the Beeple.",
+  "source_url": "https://decrypt.co/70609/cryptopunks-christies-sale",
+  "source_note": "Decrypt report on Christie's CryptoPunks sale"
+ },
+ {
+  "id": "CRY-042",
+  "section": "ART & CRYPTO CROSSOVER",
+  "verdict": "NEW_SOURCED",
+  "final_text": "CryptoPunk 7523, one of nine Aliens and the only one wearing a mask, sold at Sotheby's 'Natively Digital' sale on 10 June 2021 for about $11.8 million, a record for a single Punk.",
+  "source_url": "https://www.sothebys.com/en/press/punks-on-paper",
+  "source_note": "Sotheby's press release; catalogue confirms mask and date"
+ },
+ {
+  "id": "CRY-043",
+  "section": "ART & CRYPTO CROSSOVER",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Kevin McCoy's 'Quantum', minted on the Namecoin blockchain in May 2014 and first sold for $4, was billed by Sotheby's as the first NFT and fetched $1.47 million there in June 2021.",
+  "source_url": "https://www.aljazeera.com/economy/2021/6/10/cryptopunk-alien-nft-sells-for-11-8m-at-sothebys-auction",
+  "source_note": "Al Jazeera on Sotheby's sale; Wikipedia NFT for $4"
+ },
+ {
+  "id": "CRY-044",
+  "section": "ART & CRYPTO CROSSOVER",
+  "verdict": "NEW_SOURCED",
+  "final_text": "Only 24 of the 10,000 CryptoPunks were issued as signed paper prints; each came in a wax-sealed envelope holding a 'paper wallet' key to the token.",
+  "source_url": "https://www.sothebys.com/en/press/punks-on-paper",
+  "source_note": "Sotheby's press release 'Punks on Paper', 2021"
+ },
+ {
+  "id": "CRY-045",
+  "section": "ART & CRYPTO CROSSOVER",
+  "verdict": "NEW_SOURCED",
+  "final_text": "In December 2025 MoMA put eight CryptoPunks and eight Chromie Squiggles into its permanent collection, all donated, in its Media and Performance department.",
+  "source_url": "https://www.theblock.co/post/383446/moma-adds-cryptopunks-and-chromie-squiggles-nfts-to-permanent-collection",
+  "source_note": "The Block, 21 December 2025, MoMA acquisition"
+ }
+]

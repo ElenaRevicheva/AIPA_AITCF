@@ -146,5 +146,33 @@
  {
   "id": "MOD-056",
   "reason": "Gare de la Bastille venue unconfirmed"
+ },
+ {
+  "id": "ART-093",
+  "reason": "CONFLICT: NGA says about 200 works shown vs 165 catalogue count"
+ },
+ {
+  "id": "GAU-010",
+  "reason": "CONFLICT: Britannica July 1893 vs current August 1893 return"
+ },
+ {
+  "id": "CRY-018",
+  "reason": "BitMEX perpetual 13 May 2016 + 75% volume: one trade site only"
+ },
+ {
+  "id": "CRY-042",
+  "reason": "CryptoPunk 7523 exact $11,754,000 snippet only (Sotheby's says $11.8M)"
+ },
+ {
+  "id": "CRY-043",
+  "reason": "Quantum $1.47M (Al Jazeera) + $4 first sale (Wikipedia)"
+ },
+ {
+  "id": "CRY-045",
+  "reason": "MoMA CryptoPunks: 8 vs 10 conflict"
+ },
+ {
+  "id": "CRY-023",
+  "reason": "$19.13bn liquidation record Oct 2025: CoinGlass via Decrypt"
  }
 ]
