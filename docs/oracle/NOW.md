@@ -176,6 +176,9 @@ git log keeps the record.
   ⚠️ Building the prompts by importing `dist/atuona-creative-ai.js` started a 2nd bot instance for seconds: one duplicate radar
   post to her chat + 409s in the live log; live bot verified (2 Telegram connections, 0 pending). Never import that module again —
   copy constants out instead.
+- **Elena after the blind test: "not so much difference" → wire Fable + fix the knowledge base.** Plan
+  `docs/atuona/ATUONA_FACT_ENGINE_PLAN_2026-10-07.md` (code picks 4 least-used facts from 610, ledger, slim prompt; Fable
+  without temperature + refusal fallback). **Awaiting her Confirm — nothing changed on Oracle.**
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
 - Staged with `stage-manual-prospect.cjs --no-scrape` (the site only publishes info@; the right person's address came from
