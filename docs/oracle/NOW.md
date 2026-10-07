@@ -152,6 +152,9 @@ git log keeps the record.
   gateway did 1 attempt; its own runWithModelFallback, called directly, falls through). Claude-first = a dead bot whenever Anthropic is empty.
   Verified: a live gateway run answered on openai/gpt-4.1. Simulated outages step openai→gemini→groq→grok. Upgrade to v2026.9.8 = Elena's call
   (7 months of releases on a running product).
+- **Any-model rule (7 Oct):** on gpt-4.1 the skill was IGNORED (0 tool calls; it asked Elena what the role was). Fix = a "Mock interview — MUST
+  execute" section in `~/.openclaw/workspace/AGENTS.md` (always in context): cat SKILL.md, then hs-deal-prep for a named company, open with "Loaded: …".
+  Verified on gpt-4.1: read SKILL.md → ran hs-deal-prep → "Loaded: AI Video Creator / AI Filmmaker @ Shortical" + voice block. Backup `AGENTS.md.pre-spar-rule`.
 - **NEXT:** Elena's first real session. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
