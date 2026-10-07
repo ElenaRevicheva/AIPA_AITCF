@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-07 20:20 | OpenClaw: live-deals digest injected via bundled bootstrap-extra-files hook (Elena go) | cto-aipa scripts/hs-deal-prep.cjs (new mode), Oracle crontab (+1 line), ~/.openclaw openclaw.json hooks + workspace, user unit openclaw-gateway | 6728e69 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
