@@ -139,6 +139,8 @@ git log keeps the record.
 - **VERIFIED BY:** test sessions via `openclaw agent --session-id` (not delivered). The 1st run INVENTED a defense-bank quote
   (grep = 0), so proofs are now COPY-ONLY from a file the agent must `cat` that turn. The 2nd run's 2 proofs were grep-verified verbatim
   and `💾 saved` was proven by the card file. The test card was deleted.
+- **Deal-aware (7 Oct):** "prep me for <company>" reads the job's HubSpot deal through the NEW read-only `cto-aipa/scripts/hs-deal-prep.cjs`
+  (scp'd to Oracle, a new file; tested on Addepto: brief, technical and role defense, letters). Core questions test that posting's stated requirements.
 - **NEXT:** Elena's first real session. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
