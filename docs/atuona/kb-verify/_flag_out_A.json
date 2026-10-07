@@ -1,0 +1,90 @@
+[
+ {
+  "id": "ATL-056",
+  "current_text": "Rearden Metal, a greenish-blue alloy of iron and copper, cost Hank Rearden ten years of experiments; the novel shows its first heat poured at his mills.",
+  "status": "TRIMMED",
+  "new_text": "Rearden Metal, a greenish-blue alloy, cost Hank Rearden ten years of experiments; the novel shows its first heat poured at his mills.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt1 Ch1-2: ten years, greenish-blue; composition iron-copper not stated"
+ },
+ {
+  "id": "ATL-061",
+  "current_text": "Francisco is heir to the centuries-old d'Anconia Copper fortune, founded by Sebastián d'Anconia, who left Spain after defying the Inquisition and rebuilt in Argentina.",
+  "status": "CONFIRMED",
+  "new_text": "Francisco is heir to the centuries-old d'Anconia Copper fortune, founded by Sebastián d'Anconia, who left Spain after defying the Inquisition and rebuilt in Argentina.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt1 Ch5: wine thrown at Inquisition lord, Argentina mine"
+ },
+ {
+  "id": "ATL-063",
+  "current_text": "Francisco sinks investors' money into the worthless San Sebastián copper mines in Mexico, then lets the People's State of Mexico nationalize them: a deliberate trap for the looters.",
+  "status": "FIXED",
+  "new_text": "Francisco knowingly sinks fifteen million dollars of his own into the worthless San Sebastián Mines in Mexico; nationalized by the People's State of Mexico, they also wipe out Taggart and stockholder millions.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt1 Ch4-6: own $15M; wiped out Taggart, stockholders' millions"
+ },
+ {
+  "id": "ATL-070",
+  "current_text": "The novel opens on Eddie Willers remembering the great oak on the Taggart estate he thought eternal, until lightning showed it was hollow inside.",
+  "status": "CONFIRMED",
+  "new_text": "The novel opens on Eddie Willers remembering the great oak on the Taggart estate he thought eternal, until lightning showed it was hollow inside.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt1 Ch1 opening: oak struck by lightning, empty shell"
+ },
+ {
+  "id": "ATL-072",
+  "current_text": "In the last chapter Eddie Willers is left alone beside the stalled Taggart Comet in the desert, trying to restart its dead engine.",
+  "status": "CONFIRMED",
+  "new_text": "In the last chapter Eddie Willers is left alone beside the stalled Taggart Comet in the desert, trying to restart its dead engine.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt3 Ch10: Comet breaks down in Arizona desert"
+ },
+ {
+  "id": "ATL-058",
+  "current_text": "Tried for an illegal sale of Rearden Metal to Ken Danagger, Rearden refuses to recognize the court's right to try him; the cowed judges hand down a suspended sentence.",
+  "status": "CONFIRMED",
+  "new_text": "Tried for an illegal sale of Rearden Metal to Ken Danagger, Rearden refuses to recognize the court's right to try him; the cowed judges hand down a suspended sentence.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt2 Ch3-4: Danagger sale charge; $5,000 fine suspended"
+ },
+ {
+  "id": "ATL-078",
+  "current_text": "The sanction of the victim means producers withdrawing moral consent from their exploiters; Part Two, Ch. 4, where Rearden defies his court, bears that title.",
+  "status": "CONFIRMED",
+  "new_text": "The sanction of the victim means producers withdrawing moral consent from their exploiters; Part Two, Ch. 4, where Rearden defies his court, bears that title.",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt2 Ch4 titled The Sanction of the Victim; trial inside"
+ },
+ {
+  "id": "ATL-060",
+  "current_text": "The bracelet made from the first pour of Rearden Metal is his anniversary gift to Lillian, who mocks it; at the party Dagny trades her diamond bracelet for it (Part One, 'The Non-Commercial').",
+  "status": "FIXED",
+  "new_text": "The bracelet made from the first heat of Rearden Metal is his gift to Lillian, who mocks it; at their anniversary party Dagny trades her diamond bracelet for it (Part One, 'The Non-Commercial').",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt1 Ch2 gift on pour night; trade Ch6 anniversary party"
+ },
+ {
+  "id": "ATL-083",
+  "current_text": "Against public doubt Dagny names her rebuilt Rio Norte Line the John Galt Line; its first run on Rearden Metal rails is a triumph (Part One, Ch. 8).",
+  "status": "FIXED",
+  "new_text": "Dagny names her rebuilt Rio Norte Line the John Galt Line (Part One, Ch. 7); its first run on Rearden Metal rails is a triumph (Part One, Ch. 8, 'The John Galt Line').",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Naming occurs in Ch7; first run in Ch8"
+ },
+ {
+  "id": "ATL-055",
+  "current_text": "\"I am the man who loves his life\"",
+  "status": "CONFIRMED",
+  "new_text": "\"I am the man who loves his life\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt3 Ch7 Galt's speech: verbatim line found"
+ },
+ {
+  "id": "ATL-090",
+  "current_text": "\"Do not let your fire go out... do not let the hero in your soul perish\"",
+  "status": "CONFIRMED",
+  "new_text": "\"Do not let your fire go out... do not let the hero in your soul perish\"",
+  "source_url": "https://archive.org/details/atlas-shrugged-35th-anniversary-edition-ayn-rand",
+  "source_note": "Pt3 Ch7 Galt's speech: both clauses verbatim"
+ }
+]

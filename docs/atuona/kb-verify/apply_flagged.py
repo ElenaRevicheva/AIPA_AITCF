@@ -22,7 +22,7 @@ def main(dry):
             problems.append(f"{r.get('id')}: incomplete"); continue
         cur, new = safe(r['current_text']), safe(r['new_text'])
         hits = len(re.findall(re.escape('- ' + cur + '\n'), s))
-        if hits != 1:
+        if hits != 1 and not (hits > 1 and new == cur):   # an unchanged CONFIRMED line may legitimately repeat
             problems.append(f"{r['id']}: current text found {hits}x"); continue
         counts[st] = counts.get(st, 0) + 1
         if new != cur:

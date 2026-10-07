@@ -1201,8 +1201,8 @@ PRECISE TIMELINE (use this for accuracy):
 - Summer 1886: first stay at Pont-Aven, chosen because it was cheap; an accomplished boxer and fencer, he quickly dominated the young art students there.
 - 1887: with Charles Laval, dreamed of Taboga island; broke in Colón, he dug on the Panama Canal 5:30am to 6pm, was fined 4 francs for urinating in public, then Martinique June-November.
 - 1888: Arles with Van Gogh in the Yellow House, from his arrival on 23 October until Van Gogh cut his ear on 23 December, after which Gauguin fled.
-- 1889: summer and autumn again in Brittany, painting The Yellow Christ and The Green Christ; at Le Pouldu the Dutch painter Meijer de Haan discreetly supported him.
-- First Tahiti trip: sailed 1 April 1891, back in France August 1893; painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.
+- 1889: summer and autumn again in Brittany, painting The Yellow Christ and The Green Christ; at Le Pouldu the Dutch painter Meijer de Haan paid for his board and lodging.
+- First Tahiti trip: sailed 1 April 1891, back in France in summer 1893 (sources give July or August); painted Spirit of the Dead Watching (Manao tupapau, 1892) on burlap.
 - 1893-95 Paris: Degas organised and bought from his November 1893 Durand-Ruel show while Monet, Renoir and Pissarro mocked it; his February 1895 Hôtel Drouot auction failed.
 - Second Tahiti stay: Gauguin left France in July 1895 and moved on to Hiva Oa in the Marquesas in September 1901; in Tahiti he painted Nevermore (1897) and Where Do We Come From? (1897-98).
 - Arrived at Atuona, Hiva Oa, on 16 September 1901, and bought land in the town centre from the Catholic mission after first attending mass regularly.
@@ -1225,7 +1225,7 @@ Paris Interlude (1893-1895):
 - In Paris he cut the Noa Noa woodcuts (1894) with an experimental technique and fired the stoneware Oviri that winter, showing it at the 1895 Société Nationale salon.
 
 Second Tahiti (1895-1901):
-- Te tamari no atua (1896, Neue Pinakothek, Munich): a Polynesian Nativity painted as Pahura gave birth around Christmas 1896; the baby girl died in infancy.
+- Te tamari no atua (1896, Neue Pinakothek, Munich): a Polynesian Nativity often linked to Pahura, who gave birth around Christmas 1896; the baby girl lived only a few weeks. It may predate the birth.
 - Where Do We Come From? (1897-98, MFA Boston) is 139.1 x 374.6 cm, about 3.75 m; after finishing it he tried to kill himself with arsenic, months after daughter Aline died.
 - Nevermore (1897, Courtauld): Pahura nude on a bed; Gauguin called the bird a devil's bird, not Poe's raven; Delius bought it in 1898 for 500 francs via Monfreid.
 - Two Tahitian Women (1899, Met): one woman holds mango blossoms, not mangoes; the same pair reappears in Faa Iheihe (Tate) and Rupe Rupe (Pushkin Museum).
@@ -1262,7 +1262,7 @@ His Final Days in Atuona:
 - By September 1902 he took morphine injections, then handed his syringe set to a neighbour and used laudanum; an empty laudanum bottle stood by his deathbed.
 - He fought Bishop Martin over mission schools and carved Père Paillard (Father Lechery, 1902, NGA Washington), a horned bishop displayed outside his house.
 - On 27 March 1903 a local magistrate fined him 500 francs and gave him three months for libelling a gendarme; he appealed to Papeete and died before the hearing.
-- Vollard's deal (from 1900): 300 francs a month against at least 25 paintings a year at 200 francs, plus art materials; Gauguin sent him twenty canvases in April 1902.
+- Vollard's deal, made after dealer Chaudet died in 1899: 300 francs a month against at least 25 paintings a year at 200 francs, plus art materials; Gauguin sent him twenty canvases in April 1902.
 - No deathbed words are recorded; in his last letter to Charles Morice, weeks before death, he wrote: 'I am on the ground, but not yet defeated.'
 - Buried in Atuona's Catholic Calvary Cemetery at 2pm the day after his death; a bronze cast of his Oviri was set on the grave in 1973, as he had wished.
 `;
@@ -1293,7 +1293,7 @@ PIERRE-AUGUSTE RENOIR (1841-1919) - Joy and Sensuality:
 
 EDGAR DEGAS (1834-1917) - Movement and Modern Life:
 - Degas's The Dance Class (1874-76) shows the old ballet master Jules Perrot, who had been ballet master of the Imperial Theatres in St Petersburg from 1849 to 1860.
-- Degas's Dans un cafe (1875-76) posed actress Ellen Andree and engraver Marcellin Desboutin at the Nouvelle-Athenes; renamed L'Absinthe in London in 1893, it caused uproar.
+- Degas's Dans un cafe (1875-76) posed actress Ellen Andree and artist Marcellin Desboutin at the Nouvelle-Athenes; shown in London in 1893 as L'Absinthe, it caused renewed uproar.
 - Degas told George Moore his bathing women were 'honest, simple folk' unaware of an audience: 'It is as if you looked through a key-hole' (Impressions and Opinions, 1891).
 - Degas copied horse positions from Muybridge's 1887 Animal Locomotion photographs, counterproofing drawings to see both sides, and used them for his first bronze horses in motion.
 - Little Dancer Aged Fourteen, shown in wax in 1881 with a real tulle tutu, silk ribbon and hair, was modelled by Marie van Goethem; the bronzes were cast only around 1922.
@@ -1334,13 +1334,13 @@ MARY CASSATT (1844-1926) - American in Paris:
 
 GUSTAVE CAILLEBOTTE (1848-1894) - The Collector:
 - Paris Street; Rainy Day (1877) shows today's Place de Dublin, where rue de Saint-Petersbourg meets rue de Moscou; Caillebotte showed it at the 1877 Impressionist show he helped fund.
-- The Floor Scrapers (1875), set in Caillebotte's flat at 77 rue de Miromesnil, was rejected by the 1875 Salon as vulgar, then shown at the 1876 Impressionist exhibition.
+- The Floor Scrapers (1875), probably set in Caillebotte's own studio at 77 rue de Miromesnil, was rejected by the 1875 Salon as vulgar, then shown at the 1876 Impressionist exhibition.
 - Caillebotte bought his first Monet in 1875, paid studio rents for friends, and in 1877 secured the rooms at 6 rue Le Peletier, chose the artists and hung the third Impressionist show himself.
 - Caillebotte left 68 works to the State in 1894, Renoir as executor; after a press row the State took only about 40, shown at the Musée du Luxembourg in 1897 and now at Orsay.
 
 FRÉDÉRIC BAZILLE (1841-1870) - The Lost Talent:
 - Bazille's Family Reunion (1867-68, Orsay) records a summer 1867 gathering at Méric near Montpellier: eleven relatives under a chestnut tree, eight of them gazing out at the viewer.
-- Bazille was killed on 28 November 1870 at Beaune-la-Rolande, hit twice while leading a failed assault after his officer fell; he was 28, days short of his 29th birthday.
+- Bazille was killed on 28 November 1870 at the Battle of Beaune-la-Rolande; he was 28, days short of his 29th birthday.
 - Bazille died in 1870, before any Impressionist show; instead he kept Monet afloat by buying Women in the Garden for 2,500 francs, paid in monthly instalments of 50 francs.
 - In Bazille's Studio (1870, Orsay), set in the rue de la Condamine studio he shared with Renoir, Manet painted Bazille's own tall figure; Edmond Maître sits at the piano.
 
@@ -1400,10 +1400,10 @@ THE ART MARKET HISTORY:
 - In 1878 the baritone Jean-Baptiste Faure paid Manet 2,600 francs for Le Déjeuner sur l'herbe; in 2011 one of Cézanne's Card Players reportedly sold for $250 million.
 
 KEY DATES:
-- In 1863 Napoleon III decreed the Salon des Refusés at the Palais de l'Industrie after the jury refused about 2,217 of over 5,000 paintings; more than a thousand people a day came.
+- In 1863 Napoleon III ordered the Salon des Refusés at the Palais de l'Industrie after the jury refused more than half of some 5,000 submitted works; up to 4,000 people came on free Sundays.
 - The first Impressionist show ran 15 April-15 May 1874 at Nadar's studio, 35 boulevard des Capucines: 30 artists, 165 works, 1 franc entry, about 3,500 visitors.
 - The eighth and last Impressionist exhibition ran 15 May-15 June 1886; Seurat's La Grande Jatte made it a watershed, and Fénéon named the new style néo-impressionnisme.
-- Van Gogh reached Paris in March 1886, shared Theo's flat in rue Laval, moved to 54 rue Lepic in June, met Lautrec, Bernard and Anquetin at Cormon's; he met Gauguin only in November 1887.
+- Van Gogh reached Paris in late February 1886, shared Theo's flat in rue Laval, moved to 54 rue Lepic in June, met Lautrec, Bernard and Anquetin at Cormon's; he met Gauguin only in November 1887.
 - Gauguin reached Arles in late October 1888 and stayed about nine weeks at the Yellow House, leaving after the evening of 23 December, when Vincent cut off his ear.
 - Gauguin sailed for Tahiti on 1 April 1891, paid for by a February 1891 Hôtel Drouot sale of his works, boosted by two enthusiastic articles by Octave Mirbeau.
 `;
@@ -1415,7 +1415,7 @@ CHRISTIE'S:
 - James Christie held his first sale in Pall Mall, London, on 5 December 1766; lot one, 'six breakfast pint basons and plates', was knocked down for 19 shillings.
 - Christie's main salerooms are at 8 King Street, St James's, London, and 20 Rockefeller Plaza in New York's Rockefeller Center.
 - Christie's New York sold Leonardo's Salvator Mundi on 15 November 2017 for $450.3 million with premium, the auction record; it had sold in 2005 at a small US regional sale, reportedly under $10,000.
-- In 1779 James Christie valued Robert Walpole's Houghton pictures; the planned sale was cancelled when Catherine the Great bought all 204 works en bloc for £40,555 and sent a ship to fetch them.
+- In 1779 James Christie arranged the sale of Robert Walpole's Houghton pictures to Catherine the Great: 204 works for £40,555, and she sent a ship to fetch them.
 - A 'white glove' sale means every lot sold; the May 2018 Peggy and David Rockefeller sale at Christie's New York was one, all 1,500+ lots, $832 million, proceeds to charity.
 - On 11 May 2015 Jussi Pylkkanen hammered Picasso's Les Femmes d'Alger (Version O) at Christie's NY after 11.5 minutes of bidding, $179.4M; at $152M he told the room 'We're in new territory'.
 
@@ -1484,7 +1484,7 @@ FASHION WEEKS:
 - Alexander McQueen's No. 13 show (27 September 1998) ended with model Shalom Harlow being spray-painted by robots, a finale inspired by artist Rebecca Horn.
 
 FASHION JOURNALISM:
-- Anna Wintour edited American Vogue from November 1988 for 37 years; in 2025 Chloe Malle took over the magazine's editorship (announced 1 September 2025) while Wintour kept her global Vogue role.
+- Anna Wintour edited American Vogue from its November 1988 issue until 2025; on 2 September 2025 Chloe Malle was named head of editorial content, while Wintour stayed Condé Nast's chief content officer overseeing Vogue globally.
 - Carine Roitfeld, Tom Ford's muse and consultant at Gucci and YSL, edited Vogue Paris from 2001 to 2011, then founded the bi-annual CR Fashion Book in 2012.
 - Auckland-born critic Tim Blanks hosted Canada's TV show Fashion File from 1989 to 2006, was editor-at-large at Style.com, and became The Business of Fashion's editor-at-large in 2015.
 - Scott Schuman started The Sartorialist in September 2005, after leaving his menswear job to care for his daughter, shooting 'real people' on the street rather than runway models.
@@ -1561,7 +1561,7 @@ MODERN ART MUSEUMS - World's Great Collections:
 
 TATE MODERN (London):
 - Tate Modern was opened by the Queen on 11 May 2000 inside Bankside Power Station, Sir Giles Gilbert Scott's power station, which closed in 1981.
-- Herzog & de Meuron kept Scott's 99-metre chimney and added a two-storey glass 'light beam' on the roof; Michael Craig-Martin's Swiss Light glowed atop the chimney until it was dismantled in May 2008.
+- Herzog & de Meuron kept Scott's 99-metre chimney and added a two-storey glass 'light beam' on the roof; Michael Craig-Martin's Swiss Light, a lit box atop the chimney, was removed in 2008.
 - Turbine Hall commissions: Eliasson's The Weather Project (2003), a mist-veiled sun of mono-frequency lamps under a mirrored ceiling; Ai Weiwei's Sunflower Seeds (2010), 100 million porcelain seeds painted in Jingdezhen.
 - The first Turbine Hall commission, on opening day 12 May 2000, was Louise Bourgeois's I Do, I Undo, I Redo: three 9-metre steel towers visitors could climb, guarded by her giant spider Maman, later acquired by Tate.
 - Rothko gave Tate nine of his Seagram murals with exact instructions for wall colour, light and hanging height; they arrived in London on 25 February 1970, the same day he was found dead in his New York studio.
@@ -1690,7 +1690,7 @@ TECHNICAL MEETS POETIC:
 - Gallery = museum = atuona.xyz
 
 CREATIVE PARALLELS:
-- Monet painted Rouen Cathedral over thirty times in 1892-93 from rented rooms across the street; he showed twenty at Durand-Ruel in 1895 and sold eight.
+- Monet painted the west facade of Rouen Cathedral 28 times in the springs of 1892 and 1893, working from rooms across the square; he showed twenty of the canvases at Durand-Ruel in May 1895.
 - Vibe coder iterates through prompts = same energy
 - Both: not getting it "right" but exploring possibility space
 - Process as product, journey as destination
@@ -1793,16 +1793,16 @@ JOHN GALT:
 - "I am the man who loves his life"
 
 HANK REARDEN:
-- Rearden Metal, a greenish-blue alloy of iron and copper, cost Hank Rearden ten years of experiments; the novel shows its first heat poured at his mills.
+- Rearden Metal, a greenish-blue alloy, cost Hank Rearden ten years of experiments; the novel shows its first heat poured at his mills.
 - Lillian Rearden betrays Hank's affair with Dagny to James Taggart; Dr. Floyd Ferris uses it to blackmail Rearden into signing Rearden Metal over through the 'Gift Certificate'.
 - Tried for an illegal sale of Rearden Metal to Ken Danagger, Rearden refuses to recognize the court's right to try him; the cowed judges hand down a suspended sentence.
 - "I work for nothing but my own profit — which I make by selling a product they need to men who are willing and able to buy it"
-- The bracelet made from the first pour of Rearden Metal is his anniversary gift to Lillian, who mocks it; at the party Dagny trades her diamond bracelet for it (Part One, 'The Non-Commercial').
+- The bracelet made from the first heat of Rearden Metal is his gift to Lillian, who mocks it; at their anniversary party Dagny trades her diamond bracelet for it (Part One, 'The Non-Commercial').
 
 FRANCISCO D'ANCONIA:
 - Francisco is heir to the centuries-old d'Anconia Copper fortune, founded by Sebastián d'Anconia, who left Spain after defying the Inquisition and rebuilt in Argentina.
 - Francisco spent childhood summers with Dagny and Eddie at the Taggart estate on the Hudson, and later became Dagny's first lover.
-- Francisco sinks investors' money into the worthless San Sebastián copper mines in Mexico, then lets the People's State of Mexico nationalize them: a deliberate trap for the looters.
+- Francisco knowingly sinks fifteen million dollars of his own into the worthless San Sebastián Mines in Mexico; nationalized by the People's State of Mexico, they also wipe out Taggart and stockholder millions.
 - At James Taggart's wedding reception Francisco says: "Until and unless you discover that money is the root of all good, you ask for your own destruction."
 - Francisco puts the Atlas question to Hank Rearden at his mills (Part Two, Ch. 3): what would you tell the buckling giant to do? His answer: "To shrug."
 
@@ -1832,7 +1832,7 @@ OBJECTIVISM (as expressed in Atlas Shrugged):
 KEY QUOTES:
 - "Who is John Galt?" was coined by Twentieth Century Motor workers after Galt walked out and the plant failed, as if he had stopped the motor of the world.
 - "I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine"
-- Against public doubt Dagny names her rebuilt Rio Norte Line the John Galt Line; its first run on Rearden Metal rails is a triumph (Part One, Ch. 8).
+- Dagny names her rebuilt Rio Norte Line the John Galt Line (Part One, Ch. 7); its first run on Rearden Metal rails is a triumph (Part One, Ch. 8, 'The John Galt Line').
 - Francisco: "If you saw Atlas, the giant who holds the world on his shoulders... what would you tell him to do?" Rearden: "I... don't know." Francisco: "To shrug."
 - "Money is the barometer of a society's virtue"
 - "There are two sides to every issue: one side is right and the other is wrong, but the middle is always evil"
@@ -1967,7 +1967,7 @@ ARCHITECTURE RECIPE:
 
 THE AGENTIC FUTURE:
 - Every creator will have an AI co-founder — not someday, now
-- In Sept 2023 Sam Altman told Alexis Ohanian his tech-CEO group chat ran a betting pool on the first year a one-person company reaches a billion dollars.
+- At a September conference (Fortune, Feb 2024) Sam Altman told Alexis Ohanian his tech-CEO group chat ran a betting pool on the first year a one-person company reaches a billion dollars.
 - On 9 April 2025 Google announced Agent2Agent (A2A), an open protocol for AI agents from different vendors to talk and coordinate, backed by 50+ partners.
 - Creative AI is not about replacing artists — it's about giving every human an art department
 - Elena's 11 products, $15K investment, $0/month ops = the proof
@@ -2060,7 +2060,7 @@ EXCHANGES & COLLAPSES:
 
 MARKET MECHANICS:
 - Economist Robert Shiller proposed perpetual futures in 1992 for illiquid assets; the crypto inverse perpetual was first built for the ICBIT exchange in 2011.
-- BitMEX launched its XBTUSD perpetual swap on 13 May 2016, a bitcoin-dollar future with no expiry; perpetuals now carry over 75% of crypto derivatives volume.
+- BitMEX launched its XBTUSD perpetual swap on 13 May 2016, billed as the world's first: a leveraged bitcoin-dollar contract that never expires.
 - Perpetuals are tethered to spot by funding: on Binance every 8 hours (00:00, 08:00, 16:00 UTC) longs pay shorts when the rate is positive, trader to trader, no house fee.
 - Every 210,000 blocks the miner reward halves: 50 to 25 BTC on 28 Nov 2012, to 12.5 on 9 July 2016, to 6.25 on 11 May 2020.
 - The fourth halving came at block 840,000 on 20 April 2024, about 00:09 UTC, cutting the reward for each new block to 3.125 bitcoins.
@@ -2091,7 +2091,7 @@ ART & CRYPTO CROSSOVER:
 - Larva Labs released the 10,000 CryptoPunks in June 2017 free to anyone with an Ethereum wallet who paid the fee; only 9 are Aliens and 24 Apes.
 - In May 2021 Christie's sold nine CryptoPunks consigned by their creators, Larva Labs, for $16.9 million, its first big NFT sale after the Beeple.
 - CryptoPunk 7523, one of nine Aliens and the only one wearing a mask, sold at Sotheby's 'Natively Digital' sale on 10 June 2021 for about $11.8 million, a record for a single Punk.
-- Kevin McCoy's 'Quantum', minted on the Namecoin blockchain in May 2014 and first sold for $4, was billed by Sotheby's as the first NFT and fetched $1.47 million there in June 2021.
+- Kevin McCoy's 'Quantum', minted on the Namecoin blockchain in May 2014, was billed by Sotheby's as the first NFT and fetched $1.47 million there in June 2021.
 - Only 24 of the 10,000 CryptoPunks were issued as signed paper prints; each came in a wax-sealed envelope holding a 'paper wallet' key to the token.
 - In December 2025 MoMA put eight CryptoPunks and eight Chromie Squiggles into its permanent collection, all donated, in its Media and Performance department.
 `;

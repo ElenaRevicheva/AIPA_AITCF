@@ -1,0 +1,98 @@
+[
+ {
+  "id": "NFT-030",
+  "current_text": "Monet painted Rouen Cathedral over thirty times in 1892-93 from rented rooms across the street; he showed twenty at Durand-Ruel in 1895 and sold eight.",
+  "status": "TRIMMED",
+  "new_text": "Monet painted Rouen Cathedral's west facade in 1892-93 from rooms facing it, 28 or over thirty times (sources differ); he showed twenty at Durand-Ruel in 1895, priced at 15,000 francs, and some sold.",
+  "source_url": "https://museum-essays.getty.edu/paintings/sallan-monet-rouen/",
+  "source_note": "Getty: 28 facades, twenty shown 1895; eight-sold unconfirmed"
+ },
+ {
+  "id": "ART-092",
+  "current_text": "In 1863 Napoleon III decreed the Salon des Refusés at the Palais de l'Industrie after the jury refused about 2,217 of over 5,000 paintings; more than a thousand people a day came.",
+  "status": "FIXED",
+  "new_text": "In 1863 Napoleon III ordered the Salon des Refusés at the Palais de l'Industrie after the jury rejected more than half of some 5,000 works submitted; up to 4,000 people came on free Sundays.",
+  "source_url": "https://www.ebsco.com/research-starters/history/pariss-salon-des-refuses-opens",
+  "source_note": "EBSCO: over half of 5,000 rejected; 2,217 was accepted"
+ },
+ {
+  "id": "AUC-004",
+  "current_text": "In 1779 James Christie valued Robert Walpole's Houghton pictures; the planned sale was cancelled when Catherine the Great bought all 204 works en bloc for £40,555 and sent a ship to fetch them.",
+  "status": "FIXED",
+  "new_text": "In 1779 Catherine the Great bought Robert Walpole's Houghton pictures en bloc, cancelling a planned sale; James Christie had valued them at £40,000, she paid £40,555 for just over 200 works and sent a ship.",
+  "source_url": "https://artlyst.com/?p=171251",
+  "source_note": "Artlyst/Tretyakov: £40,555, ship; Spear's: £40,000 valuation; counts 201-204"
+ },
+ {
+  "id": "ART-009",
+  "current_text": "Renoir's smaller version of Bal du moulin de la Galette (1876) sold at Sotheby's New York on 17 May 1990 for $78.1 million to Ryoei Saito; the large one, Caillebotte's, is in the Orsay.",
+  "status": "CONFIRMED",
+  "new_text": "Renoir's smaller version of Bal du moulin de la Galette (1876) sold at Sotheby's New York on 17 May 1990 for $78.1 million to Ryoei Saito; the large one, Caillebotte's, is in the Orsay.",
+  "source_url": "https://heni.com/news/article/pierre-auguste-renoir-au-moulin-de-la-galette-1990-05-17",
+  "source_note": "HENI: larger Caillebotte version in Orsay; Guinness confirms $78.1m sale"
+ },
+ {
+  "id": "ART-017",
+  "current_text": "Degas's Dans un cafe (1875-76) posed actress Ellen Andree and engraver Marcellin Desboutin at the Nouvelle-Athenes; renamed L'Absinthe in London in 1893, it caused uproar.",
+  "status": "TRIMMED",
+  "new_text": "Degas's Dans un cafe (1875-76) posed actress Ellen Andree and artist Marcellin Desboutin at the Nouvelle-Athenes; shown in London in 1893 as L'Absinthe, it caused renewed uproar.",
+  "source_url": "https://apollo-magazine.com/?p=1009991",
+  "source_note": "Apollo + Orsay loan record: Grafton Galleries 1893, renewed furore"
+ },
+ {
+  "id": "ART-031",
+  "current_text": "The Cradle (1872) shows Morisot's sister Edma watching her baby Blanche; it failed to sell at the 1874 exhibition, stayed in the family, and entered the Louvre in 1930.",
+  "status": "CONFIRMED",
+  "new_text": "The Cradle (1872) shows Morisot's sister Edma watching her baby Blanche; it failed to sell at the 1874 exhibition, stayed in the family, and entered the Louvre in 1930.",
+  "source_url": "https://artsandculture.google.com/asset/WAE_4Ek4Dn6EnA",
+  "source_note": "Google Arts: unsold at 1874 show, family-held, Louvre 1930"
+ },
+ {
+  "id": "ART-048",
+  "current_text": "The Floor Scrapers (1875), set in Caillebotte's flat at 77 rue de Miromesnil, was rejected by the 1875 Salon as vulgar, then shown at the 1876 Impressionist exhibition.",
+  "status": "FIXED",
+  "new_text": "The Floor Scrapers (1875), probably set in Caillebotte's own studio at 77 rue de Miromesnil, was rejected by the 1875 Salon as vulgar, then shown at the 1876 Impressionist exhibition.",
+  "source_url": "https://ego-plone.uni-trier.de/en/mediainfo/raboteurs-de-parquet",
+  "source_note": "EGO: probably his studio at 77 rue de Miromesnil"
+ },
+ {
+  "id": "ART-052",
+  "current_text": "Bazille was killed on 28 November 1870 at Beaune-la-Rolande, hit twice while leading a failed assault after his officer fell; he was 28, days short of his 29th birthday.",
+  "status": "TRIMMED",
+  "new_text": "Bazille was killed on 28 November 1870 at Beaune-la-Rolande, shot twice while leading an assault after his commanding officer was wounded; he was 28, days short of his 29th birthday.",
+  "source_url": "https://www.theartstory.org/artist/bazille-frederic/life-and-legacy/",
+  "source_note": "Art Story: officer injured, led assault, shot twice; 'failed' unconfirmed"
+ },
+ {
+  "id": "ART-059",
+  "current_text": "Manet showed Le Déjeuner sur l'herbe at the 1863 Salon des Refusés as 'Le Bain'; its poses come from Raimondi's engraving after Raphael's Judgment of Paris, Victorine Meurent the nude.",
+  "status": "CONFIRMED",
+  "new_text": "Manet showed Le Déjeuner sur l'herbe at the 1863 Salon des Refusés as 'Le Bain'; its poses come from Raimondi's engraving after Raphael's Judgment of Paris, Victorine Meurent the nude.",
+  "source_url": "https://www.finestresullarte.info/fr/oeuvres-et-artistes/le-dejeuner-sur-l-herbe-l-oeuvre-scandaleuse-d-edouard-manet",
+  "source_note": "Finestre sull'Arte: Le Bain, Raimondi after Raphael, Victorine Meurent"
+ },
+ {
+  "id": "ART-077",
+  "current_text": "Seurat built on Chevreul's 1839 law of simultaneous contrast, found at the Gobelins dye works, and on Ogden Rood's Modern Chromatics, translated into French in 1881.",
+  "status": "CONFIRMED",
+  "new_text": "Seurat built on Chevreul's 1839 law of simultaneous contrast, found at the Gobelins dye works, and on Ogden Rood's Modern Chromatics, translated into French in 1881.",
+  "source_url": "https://www.lindahall.org/about/news/scientist-of-the-day/ogden-rood",
+  "source_note": "Linda Hall Library: Rood translated into French in 1881"
+ },
+ {
+  "id": "ART-095",
+  "current_text": "Van Gogh reached Paris in March 1886, shared Theo's flat in rue Laval, moved to 54 rue Lepic in June, met Lautrec, Bernard and Anquetin at Cormon's; he met Gauguin only in November 1887.",
+  "status": "FIXED",
+  "new_text": "Van Gogh reached Paris in late February 1886, shared Theo's flat in rue Laval, moved to 54 rue Lepic in June, met Lautrec, Bernard and Anquetin at Cormon's; he met Gauguin only in November 1887.",
+  "source_url": "https://catalogues.vangoghmuseum.com/contemporaries-of-van-gogh-1/cat132",
+  "source_note": "Van Gogh Museum: arrived late February; Gauguin met November 1887"
+ },
+ {
+  "id": "ART-093",
+  "current_text": "The first Impressionist show ran 15 April-15 May 1874 at Nadar's studio, 35 boulevard des Capucines: 30 artists, 165 works, 1 franc entry, about 3,500 visitors.",
+  "status": "FIXED",
+  "new_text": "The first Impressionist show opened 15 April 1874 for a month at Nadar's old studio, 35 boulevard des Capucines: 30 artists, 165 catalogued works (sources say up to about 200 shown), 1 franc entry, 3,500-4,000 visitors.",
+  "source_url": "https://www.ebsco.com/research-starters/history/first-impressionist-exhibition",
+  "source_note": "EBSCO 165 works/3,500; WHE 175 works, 1 franc, 4,000"
+ }
+]
