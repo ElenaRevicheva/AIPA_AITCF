@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-07 15:30 | OpenClaw interview-sparring skill (Elena approved) | Oracle ~/.openclaw/workspace (skills, HELP.md), user unit openclaw-gateway. NOT VJH, NOT cto-aipa code | a038b0c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
