@@ -11,18 +11,26 @@ import json, re, sys, pathlib
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 SRC = ROOT / 'src' / 'atuona-creative-ai.ts'
 KV = ROOT / 'docs' / 'atuona' / 'kb-verify'
-LANES = {'ATU': 'KNOWLEDGE_ATUONA', 'GAU': 'KNOWLEDGE_GAUGUIN', 'ART': 'KNOWLEDGE_ART_HISTORY',
-         'MOD': 'KNOWLEDGE_MODERN_ART', 'AUC': 'KNOWLEDGE_AUCTION_HOUSES'}
-VERDICTS = {'VERIFIED', 'CORRECTED', 'GENERIC_REPLACED', 'UNVERIFIABLE_REPLACED', 'NOVEL_CANON'}
+ALL_LANES = {'ATU': 'KNOWLEDGE_ATUONA', 'GAU': 'KNOWLEDGE_GAUGUIN', 'ART': 'KNOWLEDGE_ART_HISTORY',
+             'MOD': 'KNOWLEDGE_MODERN_ART', 'AUC': 'KNOWLEDGE_AUCTION_HOUSES', 'FAS': 'KNOWLEDGE_FASHION',
+             'VIB': 'KNOWLEDGE_VIBE_CODING', 'NFT': 'KNOWLEDGE_VIBE_NFT_ART_FUSION', 'ATL': 'KNOWLEDGE_ATLAS_SHRUGGED',
+             'AGT': 'KNOWLEDGE_AI_AGENTIC'}
+ARG = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--lanes=')), 'ATU,GAU,ART,MOD,AUC')
+LANES = {k: ALL_LANES[k] for k in ARG.split(',')}
+AUDIT = ROOT / 'docs' / 'atuona' / next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--audit=')),
+                                        'KB_VERIFICATION_2026-10-07.md')
+VERDICTS = {'VERIFIED', 'CORRECTED', 'GENERIC_REPLACED', 'UNVERIFIABLE_REPLACED', 'NOVEL_CANON', 'AUTHOR_CANON'}
+CANON = {'NOVEL_CANON', 'AUTHOR_CANON'}
 BULLET = re.compile(r'^(\s*(?:[-•*]|\d+\.)\s+)(.*)$')
 
 
 def load_results(lane):
-    files = sorted(KV.glob(f'{lane}.result*.json'))
-    out = []
-    for f in files:
-        out += json.loads(f.read_text(encoding='utf-8'))
-    return {r['id']: r for r in out}
+    out = {}
+    for f in sorted(KV.glob('*.result*.json')):
+        for r in json.loads(f.read_text(encoding='utf-8')):
+            if r['id'].startswith(lane + '-'):
+                out[r['id']] = r
+    return out
 
 
 def safe(t):  # must live inside a JS template literal
@@ -52,7 +60,7 @@ def main(dry):
             r = res.get(fid)
             if not r:
                 problems.append(f'{fid}: no result'); continue
-            if r.get('verdict') not in VERDICTS or not r.get('final_text') or (not r.get('source_url') and r['verdict'] != 'NOVEL_CANON'):
+            if r.get('verdict') not in VERDICTS or not r.get('final_text') or (not r.get('source_url') and r['verdict'] not in CANON):
                 problems.append(f'{fid}: incomplete result {r.get("verdict")}'); continue
             # the result must describe the same line we are about to replace
             orig_body = m.group(2).strip()
@@ -75,13 +83,13 @@ def main(dry):
     md = ['# Atuona knowledge base — art lanes verified against sources (7 Oct 2026)', '',
           'Each fact was checked against a public source. Verdicts: VERIFIED (kept), CORRECTED (fixed to the source),',
           'GENERIC_REPLACED (true but guidebook-level → replaced by a rare sourced fact on the same subject),',
-          'UNVERIFIABLE_REPLACED (no source → replaced), NOVEL_CANON (the novel own fiction, kept as written). Applied in place in `src/atuona-creative-ai.ts`.', '',
+          'UNVERIFIABLE_REPLACED (no source → replaced), NOVEL_CANON / AUTHOR_CANON (the novel own fiction or the author own ideas, kept as written). Applied in place in `src/atuona-creative-ai.ts`.', '',
           'Counts: ' + ', '.join(f'{k} {v}' for k, v in sorted(counts.items())), '',
           '| id | verdict | before | after | source |', '|---|---|---|---|---|']
     for fid, v, o, f, u, note in audit:
         esc = lambda t: t.replace('|', '/')
         md.append(f'| {fid} | {v} | {esc(o)} | {esc(f)} | ' + (f'[{esc(note) or "source"}]({u})' if u else esc(note)) + ' |')
-    (ROOT / 'docs' / 'atuona' / 'KB_VERIFICATION_2026-10-07.md').write_text('\n'.join(md) + '\n', encoding='utf-8')
+    AUDIT.write_text('\n'.join(md) + '\n', encoding='utf-8')
     print('written: src + audit')
 
 

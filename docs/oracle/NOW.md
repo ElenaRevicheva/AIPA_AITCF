@@ -211,7 +211,10 @@ git log keeps the record.
   4 NOVEL_CANON kept (GAU-042..045 "The Lost Painting Theory" = Ule's lost Gauguin — fiction by design; an agent tried to "fix" it,
   rejected). Audit: `docs/atuona/KB_VERIFICATION_2026-10-07.md`. Sources: 139 museum/press/scholarly, 133 Wikipedia (agents hit the
   200-search limit). Diff vs live = only the 272 bullet lines; 55 commands; pool 577; backup `.bak-20261007-pre-kbverify`.
-  NEXT (offered): the 5 counterpoint lanes (FAS/VIB/NFT/ATL/AGT, 301 facts); upgrade Wikipedia-only art facts to museum sources.
+  **IN PROGRESS (Elena: "A and b"):** 9 agents — counterpoint lanes → `FASVIB/NFT/ATL.part1-2/AGT.part1-2 .result.json`
+  (AUTHOR_CANON = her own ideas/products/book, kept verbatim); 133 Wikipedia-only art facts → `WIKI.upgrade.part1-3.json`.
+  Apply: `apply.py --lanes=FAS,VIB,NFT,ATL,AGT --audit=KB_VERIFICATION_COUNTERPOINT_2026-10-07.md` + `apply_upgrade.py`
+  (both refuse on any mismatch), then build, diff vs live, deploy.
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered

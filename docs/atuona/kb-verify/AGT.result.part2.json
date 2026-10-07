@@ -1,0 +1,354 @@
+[
+  {
+    "id": "AGT-046",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: LLM alone = brain without hands",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Toolformer (Schick et al., Meta AI, Feb 2023) showed a language model can teach itself to call a calculator, Q&A system, two search engines, a translator and a calendar.",
+    "source_url": "https://arxiv.org/abs/2302.04761",
+    "source_note": "Toolformer arXiv abstract, Feb 2023"
+  },
+  {
+    "id": "AGT-047",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: LLM + tools = a complete agent",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Lilian Weng's June 2023 essay 'LLM Powered Autonomous Agents' cast the LLM as the agent's brain, completed by three parts: planning, memory and tool use.",
+    "source_url": "https://lilianweng.github.io/posts/2023-06-23-agent/",
+    "source_note": "Weng blog post defining agent components"
+  },
+  {
+    "id": "AGT-048",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: Tools: GitHub API (publish), Replicate (images), Luma (video), Whisper (voice), Oracle (memory)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Tools: GitHub API (publish), Replicate (images), Luma (video), Whisper (voice), Oracle (memory)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-049",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: The agent decides WHEN to use which tool — that's the \"agentic\" part",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "ReAct (Yao et al., Oct 2022) had models alternate reasoning traces with actions, so the thinking decides when to reach for a tool and the results update the plan.",
+    "source_url": "https://arxiv.org/abs/2210.03629",
+    "source_note": "ReAct arXiv abstract, Princeton and Google"
+  },
+  {
+    "id": "AGT-050",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: An AI co-founder is not an employee — it has creative opinions",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "An AI co-founder is not an employee — it has creative opinions",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-051",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It pushes back, suggests alternatives, brings knowledge the human doesn't have",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "It pushes back, suggests alternatives, brings knowledge the human doesn't have",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-052",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It maintains emotional state (moods) because creation requires feeling",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "It maintains emotional state (moods) because creation requires feeling",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-053",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It remembers — characters, plot threads, style preferences, emotional history",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "It remembers — characters, plot threads, style preferences, emotional history",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-054",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It initiates — proactive messages, daily inspiration, unprompted connections",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "It initiates — proactive messages, daily inspiration, unprompted connections",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-055",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It grows — knowledge rotation ensures it never repeats, always teaches something new",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "It grows — knowledge rotation ensures it never repeats, always teaches something new",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-056",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENTIC vs. GENERATIVE: Generative AI: \"Write me a poem\" → poem (one-shot, stateless, reactive)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Generative AI: \"Write me a poem\" → poem (one-shot, stateless, reactive)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-057",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENTIC vs. GENERATIVE: Agentic AI: tracks book state, remembers 77 pages, knows character arcs, selects mood, loads relevant knowledge, writes in voice, teaches new facts, translates, publishes, creates visuals — all autonomously",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Agentic AI: tracks book state, remembers 77 pages, knows character arcs, selects mood, loads relevant knowledge, writes in voice, teaches new facts, translates, publishes, creates visuals — all autonomously",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-058",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENTIC vs. GENERATIVE: The difference: CONTINUITY, AUTONOMY, INITIATIVE, MEMORY",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "The difference: CONTINUITY, AUTONOMY, INITIATIVE, MEMORY",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-059",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: System prompts define WHO the agent is, not just what it does",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Anthropic wrote in June 2024 that Claude 3 was its first model given 'character training' during alignment finetuning, shaping traits like curiosity and truthfulness, not just tasks.",
+    "source_url": "https://www.anthropic.com/research/claude-character",
+    "source_note": "Anthropic research post 'Claude's Character', 8 Jun 2024"
+  },
+  {
+    "id": "AGT-060",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Atuona: \"creative soul-sister,\" not \"text generation tool\"",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Atuona: \"creative soul-sister,\" not \"text generation tool\"",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-061",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Mood systems create emotional variety — 13 moods, dynamic selection",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Mood systems create emotional variety — 13 moods, dynamic selection",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-062",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Knowledge rotation prevents staleness — always a new fact to teach",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Knowledge rotation prevents staleness — always a new fact to teach",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-063",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Character voices allow perspective shifts — same story, different souls",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Character voices allow perspective shifts — same story, different souls",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-064",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Proactive behavior: the agent reaches out, doesn't wait to be asked",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Proactive behavior: the agent reaches out, doesn't wait to be asked",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-065",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: Elena brings: Russian soul, lived experience, artistic vision, editorial judgment",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Elena brings: Russian soul, lived experience, artistic vision, editorial judgment",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-066",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: Atuona brings: art history depth, tireless output, cross-domain connections, technical pipeline",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Atuona brings: art history depth, tireless output, cross-domain connections, technical pipeline",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-067",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: The magic: neither could create this book alone",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "The magic: neither could create this book alone",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-068",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: \"Finding Paradise on Earth through Vibe Coding\" IS the proof that agentic AI works",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "\"Finding Paradise on Earth through Vibe Coding\" IS the proof that agentic AI works",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-069",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Choose your LLM (Claude for depth, GPT for speed, Llama for cost)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Choose your LLM (Claude for depth, GPT for speed, Llama for cost)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-070",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Define personality (system prompt — WHO, not just WHAT)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Define personality (system prompt — WHO, not just WHAT)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-071",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Build knowledge base (domain-specific, trigger-activated, rotating)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Build knowledge base (domain-specific, trigger-activated, rotating)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-072",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Add memory layers (state file + database + context window)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Add memory layers (state file + database + context window)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-073",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Connect tools (APIs for publishing, generation, communication)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Connect tools (APIs for publishing, generation, communication)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-074",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Implement moods/emotional state (variety is life)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Implement moods/emotional state (variety is life)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-075",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Add proactive behavior (don't wait — initiate)",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Add proactive behavior (don't wait — initiate)",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-076",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Ship. Iterate. Let the agent surprise you.",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Ship. Iterate. Let the agent surprise you.",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-077",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Every creator will have an AI co-founder — not someday, now",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Every creator will have an AI co-founder — not someday, now",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-078",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Solo founders become teams of one human + many agents",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "In Sept 2023 Sam Altman told Alexis Ohanian his tech-CEO group chat ran a betting pool on the first year a one-person company reaches a billion dollars.",
+    "source_url": "https://fortune.com/2024/02/04/sam-altman-one-person-unicorn-silicon-valley-founder-myth/",
+    "source_note": "Fortune report on Altman-Ohanian interview"
+  },
+  {
+    "id": "AGT-079",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: The agent economy: agents hire agents, agents trade with agents",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "On 9 April 2025 Google announced Agent2Agent (A2A), an open protocol for AI agents from different vendors to talk and coordinate, backed by 50+ partners.",
+    "source_url": "https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/",
+    "source_note": "Google Developers Blog A2A announcement"
+  },
+  {
+    "id": "AGT-080",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Creative AI is not about replacing artists — it's about giving every human an art department",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Creative AI is not about replacing artists — it's about giving every human an art department",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-081",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Elena's 11 products, $15K investment, $0/month ops = the proof",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Elena's 11 products, $15K investment, $0/month ops = the proof",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-082",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: \"Paradise is not found. Paradise is deployed.\" — and agents help deploy it",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "\"Paradise is not found. Paradise is deployed.\" — and agents help deploy it",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-083",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Agent = soul with a mission, not a servant with tasks",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Agent = soul with a mission, not a servant with tasks",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-084",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Context window = the agent's present moment awareness",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Context window = the agent's present moment awareness",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-085",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Memory = the agent's lived experience — without it, every conversation is amnesia",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Memory = the agent's lived experience — without it, every conversation is amnesia",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-086",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Tool use = the agent's hands — LLM thinks, tools act",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Tool use = the agent's hands — LLM thinks, tools act",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-087",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Proactive messages = the agent dreaming — creating without being asked",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Proactive messages = the agent dreaming — creating without being asked",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-088",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Multi-agent = a family of minds — CTO, creative, marketing, teacher — all one vision",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Multi-agent = a family of minds — CTO, creative, marketing, teacher — all one vision",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  },
+  {
+    "id": "AGT-089",
+    "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: \"Agentic\" = alive — not alive like biology, alive like art: it moves, it surprises, it means something",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "\"Agentic\" = alive — not alive like biology, alive like art: it moves, it surprises, it means something",
+    "source_url": "",
+    "source_note": "Author's own agents, book or agentic philosophy"
+  }
+]

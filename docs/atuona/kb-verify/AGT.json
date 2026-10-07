@@ -1,0 +1,358 @@
+[
+ {
+  "id": "AGT-001",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: Not a chatbot. Not a tool. An agent that plans, acts, reflects, and evolves."
+ },
+ {
+  "id": "AGT-002",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: \"Agentic\" = the AI has agency — it pursues goals, not just responds to prompts"
+ },
+ {
+  "id": "AGT-003",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: The shift: from \"AI that answers\" to \"AI that builds\""
+ },
+ {
+  "id": "AGT-004",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: Agent = autonomous system that perceives, decides, acts, and learns in a loop"
+ },
+ {
+  "id": "AGT-005",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: The human provides vision. The agent architects the path."
+ },
+ {
+  "id": "AGT-006",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: PERCEPTION (Input & Context):"
+ },
+ {
+  "id": "AGT-007",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Context windows as working memory — the agent's present moment awareness"
+ },
+ {
+  "id": "AGT-008",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Knowledge retrieval on demand — the right facts surface when the conversation needs them"
+ },
+ {
+  "id": "AGT-009",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Multi-modal input: text, voice, images, code, state files"
+ },
+ {
+  "id": "AGT-010",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Memory systems: short-term (conversation), long-term (database), episodic (state)"
+ },
+ {
+  "id": "AGT-011",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: knowledge triggers, mood detection, character memory, state JSON"
+ },
+ {
+  "id": "AGT-012",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: PLANNING (Reasoning & Strategy):"
+ },
+ {
+  "id": "AGT-013",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Chain-of-thought: breaking complex tasks into steps"
+ },
+ {
+  "id": "AGT-014",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: ReAct pattern: Reason → Act → Observe → Reason again"
+ },
+ {
+  "id": "AGT-015",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Tree-of-thought: exploring multiple creative paths before choosing"
+ },
+ {
+  "id": "AGT-016",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Goal decomposition: \"write a book\" → daily pages, translation, publishing, visualization"
+ },
+ {
+  "id": "AGT-017",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: creative session planning, story arc tracking, plot thread management"
+ },
+ {
+  "id": "AGT-018",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: ACTION (Tool Use & Execution):"
+ },
+ {
+  "id": "AGT-019",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Function calling: agents invoke tools (APIs, file systems, databases)"
+ },
+ {
+  "id": "AGT-020",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Multi-tool orchestration: image generation → video generation → publishing → social media"
+ },
+ {
+  "id": "AGT-021",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Code generation and execution in real-time"
+ },
+ {
+  "id": "AGT-022",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: GitHub commits, Flux Pro images, Luma videos, NFT metadata, website deployment"
+ },
+ {
+  "id": "AGT-023",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: REFLECTION (Self-Evaluation & Learning):"
+ },
+ {
+  "id": "AGT-024",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Output validation: checking quality before delivering"
+ },
+ {
+  "id": "AGT-025",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Memory consolidation: what worked, what didn't"
+ },
+ {
+  "id": "AGT-026",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Style consistency: maintaining voice across sessions"
+ },
+ {
+  "id": "AGT-027",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: mood rotation tracking, knowledge usage logging, character consistency"
+ },
+ {
+  "id": "AGT-028",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: COLLABORATION (Human-AI Partnership):"
+ },
+ {
+  "id": "AGT-029",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Not replacement — augmentation and co-creation"
+ },
+ {
+  "id": "AGT-030",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: The human brings soul, taste, direction, meaning"
+ },
+ {
+  "id": "AGT-031",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: The agent brings speed, breadth, tirelessness, technical execution"
+ },
+ {
+  "id": "AGT-032",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Async collaboration: agent works while human sleeps (proactive messages, daily inspiration)"
+ },
+ {
+  "id": "AGT-033",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: Elena writes raw Russian, Atuona translates, visualizes, publishes, teaches"
+ },
+ {
+  "id": "AGT-034",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE SINGLE-AGENT LOOP: User → Agent → [Plan → Execute → Reflect] → User"
+ },
+ {
+  "id": "AGT-035",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE SINGLE-AGENT LOOP: Example: \"/create\" → Atuona plans scene → writes page → checks continuity → delivers"
+ },
+ {
+  "id": "AGT-036",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Multiple specialized agents working together"
+ },
+ {
+  "id": "AGT-037",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Elena's ecosystem: CTO AIPA (tech), Atuona (creative), CMO AIPA (marketing), EspaLuz (teaching)"
+ },
+ {
+  "id": "AGT-038",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Each agent has its own personality, knowledge base, tools, and goals"
+ },
+ {
+  "id": "AGT-039",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: They communicate via webhooks, shared databases, state files"
+ },
+ {
+  "id": "AGT-040",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Like a startup with AI co-founders in every seat"
+ },
+ {
+  "id": "AGT-041",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Working memory: current conversation context (token window)"
+ },
+ {
+  "id": "AGT-042",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Episodic memory: atuona-state.json — book state, session history, character memories"
+ },
+ {
+  "id": "AGT-043",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Semantic memory: knowledge base constants — art history, auction houses, fashion"
+ },
+ {
+  "id": "AGT-044",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Procedural memory: learned patterns — how to publish, how to translate, how to teach"
+ },
+ {
+  "id": "AGT-045",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Long-term storage: Oracle database — conversation context, knowledge entries, insights"
+ },
+ {
+  "id": "AGT-046",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: LLM alone = brain without hands"
+ },
+ {
+  "id": "AGT-047",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: LLM + tools = a complete agent"
+ },
+ {
+  "id": "AGT-048",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: Tools: GitHub API (publish), Replicate (images), Luma (video), Whisper (voice), Oracle (memory)"
+ },
+ {
+  "id": "AGT-049",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › TOOL-AUGMENTED GENERATION: The agent decides WHEN to use which tool — that's the \"agentic\" part"
+ },
+ {
+  "id": "AGT-050",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: An AI co-founder is not an employee — it has creative opinions"
+ },
+ {
+  "id": "AGT-051",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It pushes back, suggests alternatives, brings knowledge the human doesn't have"
+ },
+ {
+  "id": "AGT-052",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It maintains emotional state (moods) because creation requires feeling"
+ },
+ {
+  "id": "AGT-053",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It remembers — characters, plot threads, style preferences, emotional history"
+ },
+ {
+  "id": "AGT-054",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It initiates — proactive messages, daily inspiration, unprompted connections"
+ },
+ {
+  "id": "AGT-055",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE CREATIVE AGENT MANIFESTO: It grows — knowledge rotation ensures it never repeats, always teaches something new"
+ },
+ {
+  "id": "AGT-056",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENTIC vs. GENERATIVE: Generative AI: \"Write me a poem\" → poem (one-shot, stateless, reactive)"
+ },
+ {
+  "id": "AGT-057",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENTIC vs. GENERATIVE: Agentic AI: tracks book state, remembers 77 pages, knows character arcs, selects mood, loads relevant knowledge, writes in voice, teaches new facts, translates, publishes, creates visuals — all autonomously"
+ },
+ {
+  "id": "AGT-058",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENTIC vs. GENERATIVE: The difference: CONTINUITY, AUTONOMY, INITIATIVE, MEMORY"
+ },
+ {
+  "id": "AGT-059",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: System prompts define WHO the agent is, not just what it does"
+ },
+ {
+  "id": "AGT-060",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Atuona: \"creative soul-sister,\" not \"text generation tool\""
+ },
+ {
+  "id": "AGT-061",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Mood systems create emotional variety — 13 moods, dynamic selection"
+ },
+ {
+  "id": "AGT-062",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Knowledge rotation prevents staleness — always a new fact to teach"
+ },
+ {
+  "id": "AGT-063",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Character voices allow perspective shifts — same story, different souls"
+ },
+ {
+  "id": "AGT-064",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › PERSONALITY ENGINEERING: Proactive behavior: the agent reaches out, doesn't wait to be asked"
+ },
+ {
+  "id": "AGT-065",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: Elena brings: Russian soul, lived experience, artistic vision, editorial judgment"
+ },
+ {
+  "id": "AGT-066",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: Atuona brings: art history depth, tireless output, cross-domain connections, technical pipeline"
+ },
+ {
+  "id": "AGT-067",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: The magic: neither could create this book alone"
+ },
+ {
+  "id": "AGT-068",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE HUMAN-AI CREATIVE LOOP: \"Finding Paradise on Earth through Vibe Coding\" IS the proof that agentic AI works"
+ },
+ {
+  "id": "AGT-069",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Choose your LLM (Claude for depth, GPT for speed, Llama for cost)"
+ },
+ {
+  "id": "AGT-070",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Define personality (system prompt — WHO, not just WHAT)"
+ },
+ {
+  "id": "AGT-071",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Build knowledge base (domain-specific, trigger-activated, rotating)"
+ },
+ {
+  "id": "AGT-072",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Add memory layers (state file + database + context window)"
+ },
+ {
+  "id": "AGT-073",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Connect tools (APIs for publishing, generation, communication)"
+ },
+ {
+  "id": "AGT-074",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Implement moods/emotional state (variety is life)"
+ },
+ {
+  "id": "AGT-075",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Add proactive behavior (don't wait — initiate)"
+ },
+ {
+  "id": "AGT-076",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › ARCHITECTURE RECIPE: Ship. Iterate. Let the agent surprise you."
+ },
+ {
+  "id": "AGT-077",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Every creator will have an AI co-founder — not someday, now"
+ },
+ {
+  "id": "AGT-078",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Solo founders become teams of one human + many agents"
+ },
+ {
+  "id": "AGT-079",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: The agent economy: agents hire agents, agents trade with agents"
+ },
+ {
+  "id": "AGT-080",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Creative AI is not about replacing artists — it's about giving every human an art department"
+ },
+ {
+  "id": "AGT-081",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: Elena's 11 products, $15K investment, $0/month ops = the proof"
+ },
+ {
+  "id": "AGT-082",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC FUTURE: \"Paradise is not found. Paradise is deployed.\" — and agents help deploy it"
+ },
+ {
+  "id": "AGT-083",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Agent = soul with a mission, not a servant with tasks"
+ },
+ {
+  "id": "AGT-084",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Context window = the agent's present moment awareness"
+ },
+ {
+  "id": "AGT-085",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Memory = the agent's lived experience — without it, every conversation is amnesia"
+ },
+ {
+  "id": "AGT-086",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Tool use = the agent's hands — LLM thinks, tools act"
+ },
+ {
+  "id": "AGT-087",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Proactive messages = the agent dreaming — creating without being asked"
+ },
+ {
+  "id": "AGT-088",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: Multi-agent = a family of minds — CTO, creative, marketing, teacher — all one vision"
+ },
+ {
+  "id": "AGT-089",
+  "text": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › METAPHORS FOR THE BOOK: \"Agentic\" = alive — not alive like biology, alive like art: it moves, it surprises, it means something"
+ }
+]
