@@ -145,6 +145,13 @@ git log keeps the record.
   with `[[tts:text]]polished answer + next question[[/tts:text]]` → Telegram voice note + full text. Gateway restarted 16:50:15 UTC, health 200,
   telegram provider started; config diff vs `openclaw.json.pre-tts` = only `messages`. **Voice delivery is unproven until her first real session**: check the
   `/tmp/openclaw/openclaw-<date>.log` tts lines.
+- **5-provider waterfall (7 Oct, Elena):** OpenClaw had `fallbacks: []` → Anthropic credit ran out (my test sessions burned the last) → bot dead.
+  Now `openai/gpt-4.1 → google/gemini-2.5-flash → groq/openai/gpt-oss-120b → xai/grok-3 → anthropic/claude-sonnet-4-5`. Keys copied from
+  cto-aipa/.env into ~/.openclaw/.env (backups `openclaw.env.pre-fallbacks`, `openclaw.json.pre-fallbacks`). Every key was probed live (200; Anthropic
+  400 credit). **Why Claude is LAST:** OpenClaw v2026.2.14 returns an Anthropic billing error as a chat REPLY, never a failover (proven: the live
+  gateway did 1 attempt; its own runWithModelFallback, called directly, falls through). Claude-first = a dead bot whenever Anthropic is empty.
+  Verified: a live gateway run answered on openai/gpt-4.1. Simulated outages step openai→gemini→groq→grok. Upgrade to v2026.9.8 = Elena's call
+  (7 months of releases on a running product).
 - **NEXT:** Elena's first real session. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
