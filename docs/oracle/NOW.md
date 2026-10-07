@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-07 20:20 | OpenClaw: live-deals digest injected via bundled bootstrap-extra-files hook (Elena go) | cto-aipa scripts/hs-deal-prep.cjs (new mode), Oracle crontab (+1 line), ~/.openclaw openclaw.json hooks + workspace, user unit openclaw-gateway | 6728e69 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -156,6 +155,12 @@ git log keeps the record.
 - **Any-model rule (7 Oct):** on gpt-4.1 the skill was IGNORED (0 tool calls; it asked Elena what the role was). Fix = a "Mock interview — MUST
   execute" section in `~/.openclaw/workspace/AGENTS.md` (always in context): cat SKILL.md, then hs-deal-prep for a named company, open with "Loaded: …".
   Verified on gpt-4.1: read SKILL.md → ran hs-deal-prep → "Loaded: AI Video Creator / AI Filmmaker @ Shortical" + voice block. Backup `AGENTS.md.pre-spar-rule`.
+- **Deal sheet (7 Oct, Elena go):** gpt-4.1 skipped the HubSpot tool in her chat and INVENTED "AI Product Engineer @ Shortical". Fix = data in context,
+  not a hope that the model calls a tool: cron `*/30` `hs-deal-prep.cjs --digest` → `~/.openclaw/workspace/deals/TOOLS.md` (53 live job deals, 9,640 chars),
+  injected by the BUNDLED hook `bootstrap-extra-files` (`hooks.internal`; the other 3 bundled hooks explicitly disabled; log "loaded 1 internal hook handler").
+  Measured, right role named: live gpt-4.1 **10/10** (was ~2–3 in 4), Gemini 3/3, Grok 3/3. **Groq can never serve OpenClaw**: free-tier 413, TPM limit 8k <
+  OpenClaw's base prompt even for "hello" → chain is now openai/gpt-4.1 → gemini-2.5-flash → grok-3 → groq → claude. Backups `crontab.pre-digest`,
+  `openclaw.json.pre-hook` / `.pre-reorder`, `AGENTS.md.pre-spar-rule` in `~/_session-backups/openclaw-spar-20261007/`. Log `~/logs/deal-digest.log`.
 - **NEXT:** Elena's first real session. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
