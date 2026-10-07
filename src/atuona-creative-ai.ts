@@ -2036,7 +2036,7 @@ RESPONSE CALIBRATION:
 
 // Combine all knowledge for use in prompts (legacy - use getRelevantKnowledge instead)
 const KNOWLEDGE_CRYPTO_TRADING = `
-CRYPTO TRADING - Markets, Speculation, Value (verified 7 Oct 2026; sources: docs/atuona/KB_CRYPTO_LANE_2026-10-07.md):
+CRYPTO TRADING - Markets, Speculation, Value:
 
 ORIGINS:
 - On 31 October 2008 a link to Satoshi Nakamoto's paper 'Bitcoin: A Peer-to-Peer Electronic Cash System' was posted to a cryptography mailing list.

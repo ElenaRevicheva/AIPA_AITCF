@@ -1,0 +1,62 @@
+[
+ {
+  "id": "NFT-030",
+  "reason": "Monet 1895: 20 shown, 8 sold — Wikipedia only",
+  "current_text": "Monet painted Rouen Cathedral over thirty times in 1892-93 from rented rooms across the street; he showed twenty at Durand-Ruel in 1895 and sold eight."
+ },
+ {
+  "id": "ART-092",
+  "reason": "CONFLICT: a source says 3,000 refused vs current 2,217 of 5,000+ — resolve",
+  "current_text": "In 1863 Napoleon III decreed the Salon des Refusés at the Palais de l'Industrie after the jury refused about 2,217 of over 5,000 paintings; more than a thousand people a day came."
+ },
+ {
+  "id": "AUC-004",
+  "reason": "CONFLICT: RA/Hermitage say £40,000 and 209 works vs current £40,555 / 204 — resolve",
+  "current_text": "In 1779 James Christie valued Robert Walpole's Houghton pictures; the planned sale was cancelled when Catherine the Great bought all 204 works en bloc for £40,555 and sent a ship to fetch them."
+ },
+ {
+  "id": "ART-009",
+  "reason": "sub-detail (large version in Orsay) Wikipedia-only",
+  "current_text": "Renoir's smaller version of Bal du moulin de la Galette (1876) sold at Sotheby's New York on 17 May 1990 for $78.1 million to Ryoei Saito; the large one, Caillebotte's, is in the Orsay."
+ },
+ {
+  "id": "ART-017",
+  "reason": "renaming/uproar Wikipedia-only",
+  "current_text": "Degas's Dans un cafe (1875-76) posed actress Ellen Andree and engraver Marcellin Desboutin at the Nouvelle-Athenes; renamed L'Absinthe in London in 1893, it caused uproar."
+ },
+ {
+  "id": "ART-031",
+  "reason": "'failed to sell at 1874 show' unconfirmed",
+  "current_text": "The Cradle (1872) shows Morisot's sister Edma watching her baby Blanche; it failed to sell at the 1874 exhibition, stayed in the family, and entered the Louvre in 1930."
+ },
+ {
+  "id": "ART-048",
+  "reason": "77 rue de Miromesnil unconfirmed",
+  "current_text": "The Floor Scrapers (1875), set in Caillebotte's flat at 77 rue de Miromesnil, was rejected by the 1875 Salon as vulgar, then shown at the 1876 Impressionist exhibition."
+ },
+ {
+  "id": "ART-052",
+  "reason": "'hit twice after his officer fell' unconfirmed",
+  "current_text": "Bazille was killed on 28 November 1870 at Beaune-la-Rolande, hit twice while leading a failed assault after his officer fell; he was 28, days short of his 29th birthday."
+ },
+ {
+  "id": "ART-059",
+  "reason": "Victorine Meurent detail unconfirmed",
+  "current_text": "Manet showed Le Déjeuner sur l'herbe at the 1863 Salon des Refusés as 'Le Bain'; its poses come from Raimondi's engraving after Raphael's Judgment of Paris, Victorine Meurent the nude."
+ },
+ {
+  "id": "ART-077",
+  "reason": "1881 French translation of Rood unconfirmed",
+  "current_text": "Seurat built on Chevreul's 1839 law of simultaneous contrast, found at the Gobelins dye works, and on Ogden Rood's Modern Chromatics, translated into French in 1881."
+ },
+ {
+  "id": "ART-095",
+  "reason": "Nov 1887 Lautrec/Bernard/Anquetin meeting unconfirmed",
+  "current_text": "Van Gogh reached Paris in March 1886, shared Theo's flat in rue Laval, moved to 54 rue Lepic in June, met Lautrec, Bernard and Anquetin at Cormon's; he met Gauguin only in November 1887."
+ },
+ {
+  "id": "ART-093",
+  "reason": "CONFLICT: NGA says about 200 works shown vs 165 catalogue count",
+  "current_text": "The first Impressionist show ran 15 April-15 May 1874 at Nadar's studio, 35 boulevard des Capucines: 30 artists, 165 works, 1 franc entry, about 3,500 visitors."
+ }
+]

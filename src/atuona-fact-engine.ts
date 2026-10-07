@@ -11,7 +11,7 @@
 // =============================================================================
 import * as crypto from 'crypto';
 
-export interface KbFact { id: string; domain: string; text: string; hash: string; }
+export interface KbFact { id: string; domain: string; text: string; body: string; hash: string; }  // body = the fact alone (no lane/section label)
 export interface FactLedger { facts: Record<string, { n: number; last: number }>; domains: Record<string, number>; }
 
 const ART_DOMAINS = ['ATU', 'GAU', 'ART', 'MOD', 'AUC'];   // Atuona, Gauguin, art history, museums, auctions
@@ -37,7 +37,7 @@ export function initFactPool(modules: Record<string, string>): number {
       i += 1;
       const ctx = section && section !== title ? `${title} › ${section}` : title;
       const text = `${ctx}: ${fact}`;
-      pool.push({ id: `${domain}-${String(i).padStart(3, '0')}`, domain, text,
+      pool.push({ id: `${domain}-${String(i).padStart(3, '0')}`, domain, text, body: fact,
         hash: crypto.createHash('sha1').update(fact).digest('hex').slice(0, 12) });
     }
   }
@@ -96,7 +96,7 @@ export function factsFooter(facts: KbFact[]): string {
   if (!facts.length) return '';
   const clean = (s: string) => s.replace(/[*_`\[\]]/g, '').replace(/\s+/g, ' ');
   return '\n\n📚 Facts: ' + facts.map(f => {
-    const body = clean(f.text.split(': ').slice(1).join(': ') || f.text);
+    const body = clean(f.body || f.text);
     return `${f.id} ${body.length > 70 ? body.slice(0, 69) + '…' : body}`;
   }).join(' · ');
 }

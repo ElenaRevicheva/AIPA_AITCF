@@ -1,0 +1,52 @@
+[
+ {
+  "id": "VIB-021",
+  "reason": "Altman one-person billion-dollar company: weak source, unclear date",
+  "current_text": "Sam Altman has said he and his 'CEO friends' run a betting pool on when AI will produce the first one-person billion-dollar company."
+ },
+ {
+  "id": "FAS-021",
+  "reason": "Raf Simons six shows: from search snippets only",
+  "current_text": "At Dior, Raf Simons produced six shows a year: two couture, two ready-to-wear, cruise and a December show; he described that pace to Cathy Horyn in System magazine and left in October 2015."
+ },
+ {
+  "id": "VIB-003",
+  "reason": "'hottest new programming language is English' Jan 2023 date + URL from memory",
+  "current_text": "'The hottest new programming language is English' - Andrej Karpathy on X, January 2023, two years before he named vibe coding."
+ },
+ {
+  "id": "FAS-013",
+  "reason": "Burberry Sept 2016, 83 looks, Orlando: search snippets only",
+  "current_text": "Burberry broke the six-month wait in September 2016: all 83 looks of its first 'see now, buy now' show, inspired by Virginia Woolf's Orlando, were buyable straight off the London runway."
+ },
+ {
+  "id": "FAS-015",
+  "reason": "Wintour current title loosely worded",
+  "current_text": "Anna Wintour edited American Vogue from November 1988 for 37 years; in 2025 Chloe Malle took over the magazine's editorship (announced 1 September 2025) while Wintour kept her global Vogue role."
+ },
+ {
+  "id": "VIB-001",
+  "reason": "Karpathy vibe coding Feb 2025 — confirm exact date 2 Feb 2025",
+  "current_text": "Andrej Karpathy, an OpenAI co-founder and former Tesla director of AI, coined 'vibe coding' in an X post in February 2025."
+ },
+ {
+  "id": "NFT-036",
+  "reason": "Karpathy 2 Feb 2025 + Collins Word of the Year 2025 — check primary",
+  "current_text": "Andrej Karpathy coined 'vibe coding' on X on 2 February 2025: 'fully give in to the vibes... and forget that the code even exists.' Collins named it Word of the Year 2025."
+ },
+ {
+  "id": "AGT-078",
+  "reason": "Altman betting pool quote — Fortune report, check date/context",
+  "current_text": "In Sept 2023 Sam Altman told Alexis Ohanian his tech-CEO group chat ran a betting pool on the first year a one-person company reaches a billion dollars."
+ },
+ {
+  "id": "MOD-002",
+  "reason": "Swiss Light removed May 2008 unconfirmed",
+  "current_text": "Herzog & de Meuron kept Scott's 99-metre chimney and added a two-storey glass 'light beam' on the roof; Michael Craig-Martin's Swiss Light glowed atop the chimney until it was dismantled in May 2008."
+ },
+ {
+  "id": "MOD-056",
+  "reason": "Gare de la Bastille venue unconfirmed",
+  "current_text": "FIAC, first held in 1974 at the Gare de la Bastille, ended after 2021 when the Grand Palais gave its October slot to Art Basel, which launched Paris+ par Art Basel in 2022."
+ }
+]
