@@ -130,6 +130,20 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### ✅ 7 Oct — sync audit laptop / GitHub / Oracle (Elena: "everything in sync")
+- **In sync now:** cto-aipa laptop = GitHub `aca9677`; Oracle **runs** it. All 93 `dist/*.js` match a build of main (the only diffs are CRLF),
+  and every script cron runs matches. VJH, EspaLuz_Influencer and whitespace match GitHub on Oracle. Oracle aideazz was ff'd to `347c0cd`.
+  Laptop aideazz, atlas-captures and whitespace were ff'd. whitespace `7842c75`: Oracle's uncommitted 7 Sep `atlas-capture-cron.sh`
+  (credential-store push + advertiser-contact scrub) is now committed.
+- **Left lagging ON PURPOSE (do not "fix"):**
+  - Oracle `cto-aipa` checkout: 3 stranded Atlas lead commits + 19 dirty files = the pull-refusal guard (see the 6 Oct entry below).
+  - 🚨 **Oracle EspaLuzWhatsApp (−11) / EspaLuzFamilybot (−7) / dragontrade-agent (−3): NEVER `git pull`.** The missing commits are the
+    Sep PII cleanup. They UNTRACK live customer files (subscribers, trials, sessions, the 180 MB WhatsApp session store), and a pull
+    deletes untracked-in-commit files from disk. The code half moves DB creds and subscriber ids to env vars, so deploying it needs those vars
+    in Oracle's `.env` first. Bots run fine on the old code. If it is ever wanted: named-file copy after an env check, with Elena's go.
+  - Laptop `handy_manny-s` (−2): ff refused, the local edits touch the same 2 CONTENT_AUDIT docs. Laptop AILA (1) and aideazz-private-docs (53)
+    have local edits that are not behind. manukora-sop-brief fetch failed. Left for Elena.
+
 ### 🔴 7 Oct — ANTHROPIC CREDIT EXHAUSTED: Atuona text runs on Grok, not Claude · Elena's move: top up Anthropic
 - **Proof:** `cto-aipa-error-9.log` "Your credit balance is too low to access the Anthropic API" (x2) + out-log
   `⚠️ Atuona: Claude unavailable (400), falling back...` (x5) since the 21:01 UTC restart. Community-listener drafts fell to Groq too.
