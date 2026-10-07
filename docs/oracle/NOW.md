@@ -231,7 +231,10 @@ git log keeps the record.
   **Live /inspire 19:56:** facts drew ATU-006 GAU-041 NFT-008 ATL-037 + footer OK, but the reply was CUT MID-WORD: Claude 400 →
   DeepSeek empty → **Groq gpt-oss-120b (reasoning) at max_tokens 500** spent the budget thinking. Fixed `af307d3`, deployed 19:59:
   fallbacks get max(×4, 2000) tokens (Groq capped at 3,000 for its 8k TPM), a Groq reply with finish_reason=length goes to Grok,
-  and `[atuona/generate] Groq … answered` is now logged. Proof pending: Elena's next /inspire.
+  and `[atuona/generate] Groq … answered` is now logged. **PROVEN 20:03:** full reply (DeepSeek 728 chars), facts ART-088 AUC-012
+  AGT-050 CRY-015. Footer now shows FULL facts one per line (`ab25696`, deployed 20:05; max 833 chars). Known limit: DeepSeek
+  also added Vollard "1900 / 300 francs / 25 canvases" — not among the 4 drawn facts; "add no other facts" is a prompt rule,
+  not enforced in code.
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
