@@ -130,6 +130,15 @@ git log keeps the record.
 
 ## 🤝 HANDOFF
 
+### 🔴 7 Oct — ANTHROPIC CREDIT EXHAUSTED: Atuona text runs on Grok, not Claude · Elena's move: top up Anthropic
+- **Proof:** `cto-aipa-error-9.log` "Your credit balance is too low to access the Anthropic API" (x2) + out-log
+  `⚠️ Atuona: Claude unavailable (400), falling back...` (x5) since the 21:01 UTC restart. Community-listener drafts fell to Groq too.
+- Her 5:00 Panama `/inspire` = **Grok (xAI) `grok-4.20-0309-non-reasoning`**: log `Grok (xAI) fallback returned 1163 chars`
+  vs 1154 visible chars (Markdown stripped). Groq `gpt-oss-120b` 413'd first (8,000 TPM limit, 24,850 tokens requested).
+- Atuona waterfall (`createContent`, `src/atuona-creative-ai.ts:4202`): Claude Opus 5 → DeepSeek `deepseek-flash` → Groq
+  `openai/gpt-oss-120b` → Grok. Groq can never carry Atuona's prompts (too big); DeepSeek sometimes returns empty.
+- No code change: the waterfall did its job. Fix = credit. Anthropic billing is Elena's.
+
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
 - Staged with `stage-manual-prospect.cjs --no-scrape` (the site only publishes info@; the right person's address came from
   Elena). Letter = Spanish, personal thank-you opener (new optional `greeting`/`opener`/`subject` fields, `ad3a826`), ES AI
