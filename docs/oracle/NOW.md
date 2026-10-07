@@ -161,7 +161,11 @@ git log keeps the record.
   Measured, right role named: live gpt-4.1 **10/10** (was ~2–3 in 4), Gemini 3/3, Grok 3/3. **Groq can never serve OpenClaw**: free-tier 413, TPM limit 8k <
   OpenClaw's base prompt even for "hello" → chain is now openai/gpt-4.1 → gemini-2.5-flash → grok-3 → groq → claude. Backups `crontab.pre-digest`,
   `openclaw.json.pre-hook` / `.pre-reorder`, `AGENTS.md.pre-spar-rule` in `~/_session-backups/openclaw-spar-20261007/`. Log `~/logs/deal-digest.log`.
-- **NEXT:** Elena's first real session. If her old Telegram session does not pick the skill up, send `/new` once.
+- **Audit of Elena's 1st real session (7 Oct 3:33 PM):** real deal + full kit loaded (posting, 🛡️ tech defense, 🎯 role defense, brief, letter; 9,114
+  chars), Q2 = a posting requirement. BUT a fake "💾 saved" (cards folder empty), no proof, and double audio (tts tool + tag). Fixed: cards rebuilt from
+  her UUID session files by `skills/interview-spar/references/build-cards.py` (cron */10, `~/logs/interview-cards.log`); ➕ = verbatim line from the deal's
+  🛡️ TECHNICAL DEFENSE (verified by grep); tts tool forbidden. Re-test: proof present + verbatim, 0 tts tool calls, 0 "💾".
+- **NEXT:** Elena's next session — check one card + the ➕ line. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
 - **Arrives:** cron `0 */6` `~/job-list-filter/run_shortlist.sh` exports 20 YC companies → VJH STEP 0 `Priority sync` every cycle
