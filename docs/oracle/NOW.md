@@ -138,6 +138,10 @@ git log keeps the record.
 - Atuona waterfall (`createContent`, `src/atuona-creative-ai.ts:4202`): Claude Opus 5 → DeepSeek `deepseek-flash` → Groq
   `openai/gpt-oss-120b` → Grok. Groq can never carry Atuona's prompts (too big); DeepSeek sometimes returns empty.
 - No code change: the waterfall did its job. Fix = credit. Anthropic billing is Elena's.
+- **Scale:** the same key has been out of credit since 17 Aug (memory `project_groq_deprecation_august`); live probe 7 Oct = 400.
+  Atuona answers in the kept logs (29 Sep→7 Oct): Grok 238, DeepSeek 17, Claude 0. Atuona sends temperature 0.9, which Opus 5
+  rejects — the code retries without it, so the "poetry temperature" never applied on Claude. Model choice for the book:
+  `docs/atuona/ATUONA_TEXT_MODEL_DECISION_2026-10-07.md`.
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
 - Staged with `stage-manual-prospect.cjs --no-scrape` (the site only publishes info@; the right person's address came from
