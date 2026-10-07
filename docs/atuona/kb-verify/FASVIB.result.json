@@ -1,0 +1,498 @@
+[
+ {
+  "id": "FAS-001",
+  "original": "FASHION INDUSTRY - Kira's World › HIGH FASHION MAGAZINES: Vogue (US, UK, France, Italia) - the bible",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Vogue began on 17 December 1892 as a 10-cent New York society weekly founded by Arthur Baldwin Turnure; Condé Nast bought it in 1909, and British Vogue (1916) was its first foreign edition.",
+  "source_url": "https://en.wikipedia.org/wiki/Vogue_(magazine)",
+  "source_note": "Founding 1892, Nast purchase 1909, British edition 1916"
+ },
+ {
+  "id": "FAS-002",
+  "original": "FASHION INDUSTRY - Kira's World › HIGH FASHION MAGAZINES: Harper's Bazaar - artistic, avant-garde",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Harper's Bazaar debuted on 2 November 1867 spelled 'Bazar'; the second 'a' arrived with the November 1929 issue, and Alexey Brodovitch art-directed it from 1934 to 1958.",
+  "source_url": "https://en.wikipedia.org/wiki/Harper%27s_Bazaar",
+  "source_note": "Founding date, spelling change, Brodovitch tenure"
+ },
+ {
+  "id": "FAS-003",
+  "original": "FASHION INDUSTRY - Kira's World › HIGH FASHION MAGAZINES: W Magazine - edgier, more provocative",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "W was born in 1972, when John Fairchild launched it as a bi-weekly supplement to the trade paper Women's Wear Daily; it became an independent oversized monthly only in 1993.",
+  "source_url": "https://en.wikipedia.org/wiki/W_(magazine)",
+  "source_note": "Fairchild founding 1972 as WWD supplement"
+ },
+ {
+  "id": "FAS-004",
+  "original": "FASHION INDUSTRY - Kira's World › HIGH FASHION MAGAZINES: Elle - accessible luxury",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Elle ('She') was founded in Paris in 1945 by Russian-born Hélène Gordon-Lazareff, first sold as a supplement to France-Soir; the US edition arrived only in 1985, with Yasmin Le Bon on the cover.",
+  "source_url": "https://en.wikipedia.org/wiki/Elle_(magazine)",
+  "source_note": "Founder, 1945 France-Soir supplement, 1985 US launch"
+ },
+ {
+  "id": "FAS-005",
+  "original": "FASHION INDUSTRY - Kira's World › HIGH FASHION MAGAZINES: Interview Magazine - Andy Warhol's creation",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Interview was founded in October 1969 by Andy Warhol and journalist John Wilcock as 'inter/VIEW: A Monthly Film Journal', with Gerard Malanga as founding editor.",
+  "source_url": "https://en.wikipedia.org/wiki/Interview_(magazine)",
+  "source_note": "Co-founders, original title and film focus"
+ },
+ {
+  "id": "FAS-006",
+  "original": "FASHION INDUSTRY - Kira's World › HIGH FASHION MAGAZINES: Dazed, i-D - youth culture, street style",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "i-D began in 1980 as a hand-stapled fanzine by ex-British Vogue art director Terry Jones, each cover carrying a wink; Dazed & Confused began in 1991 as a black-and-white folded poster by Jefferson Hack and Rankin.",
+  "source_url": "https://en.wikipedia.org/wiki/I-D",
+  "source_note": "i-D 1980 fanzine; Dazed 1991 poster (Wikipedia: Dazed)"
+ },
+ {
+  "id": "FAS-007",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION CAPITALS: Paris: haute couture, Chanel, Dior, Louis Vuitton",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Paris couture got its guild in 1868, when Charles Frederick Worth initiated the Chambre Syndicale; since 1945 'haute couture' has been a controlled designation only qualifying houses may use.",
+  "source_url": "https://en.wikipedia.org/wiki/F%C3%A9d%C3%A9ration_de_la_Haute_Couture_et_de_la_Mode",
+  "source_note": "Chambre Syndicale 1868 by Worth; 1945 designation rules"
+ },
+ {
+  "id": "FAS-008",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION CAPITALS: Milan: craftsmanship, Gucci, Prada, Versace",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Prada opened in 1913 inside Milan's Galleria Vittorio Emanuele II, selling English steamer trunks and travel goods; in 1919 it became supplier to the Italian royal household, taking the Savoy arms into its logo.",
+  "source_url": "https://en.wikipedia.org/wiki/Prada",
+  "source_note": "Founding 1913 Galleria shop; 1919 royal warrant"
+ },
+ {
+  "id": "FAS-009",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION CAPITALS: London: avant-garde, Alexander McQueen, Vivienne Westwood",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Vivienne Westwood and Malcolm McLaren's shop at 430 King's Road changed skins: Let It Rock (1971), Too Fast To Live Too Young To Die (1972), SEX (1974), Seditionaries (1976), then Worlds End.",
+  "source_url": "https://en.wikipedia.org/wiki/Vivienne_Westwood",
+  "source_note": "Shop name timeline at 430 King's Road"
+ },
+ {
+  "id": "FAS-010",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION CAPITALS: New York: commercial power, Ralph Lauren, Calvin Klein",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Ralph Lauren, born Ralph Lifshitz in the Bronx, began in 1967 selling men's ties from a single drawer in an Empire State Building showroom; he named his first full menswear line Polo in 1968.",
+  "source_url": "https://en.wikipedia.org/wiki/Ralph_Lauren",
+  "source_note": "Birth name, 1967 neckties, 1968 Polo line"
+ },
+ {
+  "id": "FAS-011",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION WEEKS: Four main: NYC (Feb/Sep), London, Milan, Paris",
+  "verdict": "VERIFIED",
+  "final_text": "The Big Four fashion weeks run each February and September in the order New York, London, Milan, Paris; New York's began in 1943, when the war cut the industry off from Paris.",
+  "source_url": "https://en.wikipedia.org/wiki/Fashion_week",
+  "source_note": "Big Four order; 1943 wartime New York origin"
+ },
+ {
+  "id": "FAS-012",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION WEEKS: The \"front row\" - celebrities, editors, buyers",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "At Christian Dior's first show, 12 February 1947 at 30 avenue Montaigne, Harper's Bazaar editor Carmel Snow exclaimed 'It's quite a revolution, dear Christian!' and her 'new look' named the collection.",
+  "source_url": "https://en.wikipedia.org/wiki/Dior",
+  "source_note": "Debut date, address, Carmel Snow's reaction"
+ },
+ {
+  "id": "FAS-013",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION WEEKS: \"See now, buy now\" vs traditional 6-month delay",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Burberry broke the six-month wait in September 2016: all 83 looks of its first 'see now, buy now' show, inspired by Virginia Woolf's Orlando, were buyable straight off the London runway.",
+  "source_url": "https://www.dazeddigital.com/fashion/article/32972/1/what-went-down-at-burberrys-september-2016-show",
+  "source_note": "Burberry September 2016 first see-now-buy-now show"
+ },
+ {
+  "id": "FAS-014",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION WEEKS: Backstage chaos: models, makeup, designers panicking",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Alexander McQueen's No. 13 show (27 September 1998) ended with model Shalom Harlow being spray-painted by robots, a finale inspired by artist Rebecca Horn.",
+  "source_url": "https://en.wikipedia.org/wiki/No._13_(collection)",
+  "source_note": "No. 13 date and robot spray-paint finale"
+ },
+ {
+  "id": "FAS-015",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION JOURNALISM: Anna Wintour: Vogue editor-in-chief since 1988, sunglasses, bob",
+  "verdict": "CORRECTED",
+  "final_text": "Anna Wintour edited American Vogue from November 1988 for 37 years; in 2025 Chloe Malle took over the magazine's editorship (announced 1 September 2025) while Wintour kept her global Vogue role.",
+  "source_url": "https://en.wikipedia.org/wiki/Anna_Wintour",
+  "source_note": "1988 start; 2025 Chloe Malle succession"
+ },
+ {
+  "id": "FAS-016",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION JOURNALISM: Carine Roitfeld: French Vogue legend, now CR Fashion Book",
+  "verdict": "VERIFIED",
+  "final_text": "Carine Roitfeld, Tom Ford's muse and consultant at Gucci and YSL, edited Vogue Paris from 2001 to 2011, then founded the bi-annual CR Fashion Book in 2012.",
+  "source_url": "https://en.wikipedia.org/wiki/Carine_Roitfeld",
+  "source_note": "Vogue Paris 2001-2011; CR Fashion Book 2012"
+ },
+ {
+  "id": "FAS-017",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION JOURNALISM: Tim Blanks: critic, interviewer, industry voice",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Auckland-born critic Tim Blanks hosted Canada's TV show Fashion File from 1989 to 2006, was editor-at-large at Style.com, and became The Business of Fashion's editor-at-large in 2015.",
+  "source_url": "https://en.wikipedia.org/wiki/Tim_Blanks",
+  "source_note": "Fashion File 1989-2006; BoF since 2015"
+ },
+ {
+  "id": "FAS-018",
+  "original": "FASHION INDUSTRY - Kira's World › FASHION JOURNALISM: \"Street style\" photography changed everything (Scott Schuman, The Sartorialist)",
+  "verdict": "VERIFIED",
+  "final_text": "Scott Schuman started The Sartorialist in September 2005, after leaving his menswear job to care for his daughter, shooting 'real people' on the street rather than runway models.",
+  "source_url": "https://en.wikipedia.org/wiki/Scott_Schuman",
+  "source_note": "Blog launch September 2005, origin story"
+ },
+ {
+  "id": "FAS-019",
+  "original": "FASHION INDUSTRY - Kira's World › THE BUSINESS: LVMH (Bernard Arnault): Louis Vuitton, Dior, Fendi, Givenchy...",
+  "verdict": "VERIFIED",
+  "final_text": "LVMH (Louis Vuitton, Dior, Fendi, Givenchy...) was formed in 1987 by merging Louis Vuitton with Moët Hennessy; Bernard Arnault became chairman and CEO in January 1989.",
+  "source_url": "https://en.wikipedia.org/wiki/LVMH",
+  "source_note": "1987 merger; Arnault chairman January 1989"
+ },
+ {
+  "id": "FAS-020",
+  "original": "FASHION INDUSTRY - Kira's World › THE BUSINESS: Kering (François-Henri Pinault): Gucci, Saint Laurent, Balenciaga",
+  "verdict": "CORRECTED",
+  "final_text": "Kering, chaired by François-Henri Pinault since 2005, owns Gucci, Saint Laurent, Balenciaga, Bottega Veneta and Alexander McQueen; Luca de Meo became its CEO in September 2025.",
+  "source_url": "https://en.wikipedia.org/wiki/Kering",
+  "source_note": "Chairman Pinault; de Meo CEO September 2025"
+ },
+ {
+  "id": "FAS-021",
+  "original": "FASHION INDUSTRY - Kira's World › THE BUSINESS: \"Fashion month\" exhaustion - editors see 100+ shows",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "At Dior, Raf Simons produced six shows a year: two couture, two ready-to-wear, cruise and a December show; he described that pace to Cathy Horyn in System magazine and left in October 2015.",
+  "source_url": "https://system-magazine.com/issues/issue-6/raf-simons",
+  "source_note": "Horyn's System interview on Simons' six-show year"
+ },
+ {
+  "id": "FAS-022",
+  "original": "FASHION INDUSTRY - Kira's World › THE BUSINESS: Sustainability crisis - fashion is 2nd largest polluter",
+  "verdict": "CORRECTED",
+  "final_text": "'Fashion is the second-largest polluter' is a myth; UNEP's 2018 English text put fashion at 2 to 8 percent of global carbon emissions, while some translations rounded it up to 10%.",
+  "source_url": "https://www.ecotextile.com/2024020948140/opinion/fashion-s-fake-ghg-emission-claims/",
+  "source_note": "UNEP 2-8% figure; 10% and ranking claims debunked"
+ },
+ {
+  "id": "FAS-023",
+  "original": "FASHION INDUSTRY - Kira's World › WRITING ABOUT FASHION: \"Collection review\" - the critic's power to make or break",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "NYT critic Cathy Horyn (1998-2014) called Oscar de la Renta the 'hotdog of American fashion'; he replied in WWD calling her a 'stale 3-day-old hamburger', and Hedi Slimane said she would never get a seat.",
+  "source_url": "https://en.wikipedia.org/wiki/Cathy_Horyn",
+  "source_note": "De la Renta feud; Slimane seat ban"
+ },
+ {
+  "id": "FAS-024",
+  "original": "FASHION INDUSTRY - Kira's World › WRITING ABOUT FASHION: Trend forecasting - WGSN, Pantone Color of Year",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Pantone's first Color of the Year was Cerulean (15-4020), for 2000; the pick is made at a secret twice-yearly meeting of national colour-standards delegates in a European capital.",
+  "source_url": "https://en.wikipedia.org/wiki/Pantone",
+  "source_note": "First colour Cerulean; secret selection meeting"
+ },
+ {
+  "id": "FAS-025",
+  "original": "FASHION INDUSTRY - Kira's World › WRITING ABOUT FASHION: Celebrity styling - who wore what, brand credits",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Jennifer Lopez's green Versace dress at the Grammys on 23 February 2000 became Google's most popular query; in 2015 Eric Schmidt said demand for it prompted Google Images.",
+  "source_url": "https://en.wikipedia.org/wiki/Jennifer_Lopez%27s_green_Versace_dress",
+  "source_note": "Grammy date; Schmidt's Google Images origin claim"
+ },
+ {
+  "id": "FAS-026",
+  "original": "FASHION INDUSTRY - Kira's World › WRITING ABOUT FASHION: The language: \"directional,\" \"elevated,\" \"moment,\" \"investment piece\"",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Fashion's language of whimsy: from late 1935 Diana Vreeland wrote 'Why Don't You...?' for Harper's Bazaar, a column of extravagant lifestyle suggestions commissioned by editor Carmel Snow.",
+  "source_url": "https://en.wikipedia.org/wiki/Harper%27s_Bazaar",
+  "source_note": "Vreeland column commissioned by Snow, 1935"
+ },
+ {
+  "id": "FAS-027",
+  "original": "FASHION INDUSTRY - Kira's World › RUSSIAN FASHION CONTEXT: GUM, TSUM - luxury department stores Moscow",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "GUM opened in 1894 as the Upper Trading Rows on Red Square, under Vladimir Shukhov's glass roof; TsUM began as Scottish-owned Muir & Mirrielees, housed from 1908 in Roman Klein's Gothic building.",
+  "source_url": "https://en.wikipedia.org/wiki/GUM_(department_store)",
+  "source_note": "GUM origins; TsUM origins (Wikipedia: TsUM)"
+ },
+ {
+  "id": "FAS-028",
+  "original": "FASHION INDUSTRY - Kira's World › RUSSIAN FASHION CONTEXT: Ulyana Sergeenko - Russian couturier",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Ulyana Sergeenko, born 1979 in Oskemen and a philology graduate, launched her Moscow label in 2011 after designers used her ideas uncredited; clients include Beyoncé and Natalia Vodianova.",
+  "source_url": "https://en.wikipedia.org/wiki/Ulyana_Sergeenko",
+  "source_note": "Birth, 2011 label launch, origin and clients"
+ },
+ {
+  "id": "FAS-029",
+  "original": "FASHION INDUSTRY - Kira's World › RUSSIAN FASHION CONTEXT: Miroslava Duma - influencer, entrepreneur (controversial)",
+  "verdict": "CORRECTED",
+  "final_text": "Miroslava Duma founded Buro 24/7 in 2011 and Future Tech Lab in 2017; in 2018, after she shared a Ulyana Sergeenko post containing a racial slur, she was removed from Buro 24/7's board.",
+  "source_url": "https://en.wikipedia.org/wiki/Miroslava_Duma",
+  "source_note": "Buro 24/7, FTL, 2018 slur controversy"
+ },
+ {
+  "id": "FAS-030",
+  "original": "FASHION INDUSTRY - Kira's World › RUSSIAN FASHION CONTEXT: Gosha Rubchinskiy - streetwear, post-Soviet aesthetic",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Gosha Rubchinskiy launched his menswear label in 2008; from 2012 Comme des Garçons handled its production and sales; he shut it amid a 2018 scandal and relaunched it in 2025.",
+  "source_url": "https://en.wikipedia.org/wiki/Gosha_Rubchinskiy",
+  "source_note": "2008 launch, CdG 2012, 2018 closure, 2025 relaunch"
+ },
+ {
+  "id": "VIB-001",
+  "original": "VIBE CODING - The Philosophy › WHAT IS VIBE CODING: Term coined by Andrej Karpathy (Tesla AI, OpenAI founder)",
+  "verdict": "CORRECTED",
+  "final_text": "Andrej Karpathy, an OpenAI co-founder and former Tesla director of AI, coined 'vibe coding' in an X post in February 2025.",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "Karpathy coinage February 2025"
+ },
+ {
+  "id": "VIB-002",
+  "original": "VIBE CODING - The Philosophy › WHAT IS VIBE CODING: Coding by describing what you want to AI, not typing syntax",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Karpathy's original definition: 'fully give in to the vibes, embrace exponentials, and forget that the code even exists.'",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "Karpathy's February 2025 post, quoted"
+ },
+ {
+  "id": "VIB-003",
+  "original": "VIBE CODING - The Philosophy › WHAT IS VIBE CODING: \"The hottest new programming language is English\"",
+  "verdict": "VERIFIED",
+  "final_text": "'The hottest new programming language is English' - Andrej Karpathy on X, January 2023, two years before he named vibe coding.",
+  "source_url": "https://x.com/karpathy/status/1617979122625712128",
+  "source_note": "Karpathy X post, January 2023"
+ },
+ {
+  "id": "VIB-004",
+  "original": "VIBE CODING - The Philosophy › WHAT IS VIBE CODING: Collaboration between human intention and AI capability",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "The coinage went mainstream within a year: Merriam-Webster listed 'vibe coding' as slang and trending in March 2025, and Collins named it Word of the Year for 2025.",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "Merriam-Webster listing; Collins Word of the Year"
+ },
+ {
+  "id": "VIB-005",
+  "original": "VIBE CODING - The Philosophy › WHAT IS VIBE CODING: Not replacement of coding - transformation of it",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Simon Willison, 19 March 2025: if an LLM wrote the code but you reviewed, tested and understood it, that is not vibe coding; vibe coding means not reviewing what the model writes.",
+  "source_url": "https://simonwillison.net/2025/Mar/19/vibe-coding/",
+  "source_note": "Willison, 'Not all AI-assisted programming is vibe coding'"
+ },
+ {
+  "id": "VIB-006",
+  "original": "VIBE CODING - The Philosophy › THE PRACTICE: Start with vision, not syntax",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Karpathy described the method as: 'I just see stuff, say stuff, run stuff, and copy paste stuff, and it mostly works.'",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "Karpathy February 2025 vibe coding post"
+ },
+ {
+  "id": "VIB-007",
+  "original": "VIBE CODING - The Philosophy › THE PRACTICE: Iterate through conversation with AI",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Karpathy vibe-coded by voice: 'I just talk to Composer with SuperWhisper so I barely even touch the keyboard.'",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "Karpathy's post: SuperWhisper and Cursor Composer"
+ },
+ {
+  "id": "VIB-008",
+  "original": "VIBE CODING - The Philosophy › THE PRACTICE: Trust the AI, verify the output",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "The original vibe coder did not verify: 'I \"Accept All\" always, I don't read the diffs anymore,' Karpathy wrote.",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "Karpathy's post on accepting all diffs"
+ },
+ {
+  "id": "VIB-009",
+  "original": "VIBE CODING - The Philosophy › THE PRACTICE: \"Prompt engineering\" is the new skill",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In June 2025 Shopify CEO Tobi Lütke said he preferred 'context engineering' to 'prompt engineering'; Karpathy replied '+1', calling it filling the context window with just the right information.",
+  "source_url": "https://the-decoder.com/shopify-ceo-and-ex-openai-researcher-agree-that-context-engineering-beats-prompt-engineering/",
+  "source_note": "Lütke and Karpathy X posts, June 2025"
+ },
+ {
+  "id": "VIB-010",
+  "original": "VIBE CODING - The Philosophy › THE PRACTICE: Context windows are your workspace",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "On 15 February 2024 Google previewed Gemini 1.5 Pro with a 1-million-token context: one hour of video, 11 hours of audio, or codebases over 30,000 lines.",
+  "source_url": "https://blog.google/technology/ai/google-gemini-next-generation-model-february-2024/",
+  "source_note": "Google Gemini 1.5 announcement"
+ },
+ {
+  "id": "VIB-011",
+  "original": "VIBE CODING - The Philosophy › THE PRACTICE: Build faster, think bigger",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In March 2025 Y Combinator reported that 25% of its Winter 2025 startups had codebases that were 95% AI-generated.",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "YC W25 batch figure, March 2025"
+ },
+ {
+  "id": "VIB-012",
+  "original": "VIBE CODING - The Philosophy › TOOLS OF VIBE CODING: Claude (Anthropic): best for complex reasoning, writing",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Anthropic released Claude Code, a terminal agent driven by natural-language prompts, as a research preview with Claude 3.7 Sonnet in February 2025; it reached general availability in May 2025.",
+  "source_url": "https://en.wikipedia.org/wiki/Claude_(language_model)",
+  "source_note": "Claude Code preview and GA dates"
+ },
+ {
+  "id": "VIB-013",
+  "original": "VIBE CODING - The Philosophy › TOOLS OF VIBE CODING: GPT-4/ChatGPT: versatile, widely used",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "ChatGPT launched on 30 November 2022, reached 1 million users in five days and 100 million monthly users within two months; GPT-4 followed in March 2023.",
+  "source_url": "https://en.wikipedia.org/wiki/ChatGPT",
+  "source_note": "Launch date and growth milestones"
+ },
+ {
+  "id": "VIB-014",
+  "original": "VIBE CODING - The Philosophy › TOOLS OF VIBE CODING: GitHub Copilot: inline code suggestions",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "GitHub Copilot was announced as a technical preview on 29 June 2021, running on OpenAI Codex, a GPT-3 descendant trained on code; it became a paid product on 21 June 2022.",
+  "source_url": "https://en.wikipedia.org/wiki/GitHub_Copilot",
+  "source_note": "Preview date, Codex model, GA date"
+ },
+ {
+  "id": "VIB-015",
+  "original": "VIBE CODING - The Philosophy › TOOLS OF VIBE CODING: Cursor: AI-native code editor",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Cursor is made by Anysphere, founded in 2022 by four MIT students; it crossed $100 million in annual recurring revenue in January 2025 and topped $500 million by June 2025.",
+  "source_url": "https://en.wikipedia.org/wiki/Cursor_(code_editor)",
+  "source_note": "Anysphere founders and ARR milestones"
+ },
+ {
+  "id": "VIB-016",
+  "original": "VIBE CODING - The Philosophy › TOOLS OF VIBE CODING: Replit: cloud coding with AI",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In July 2025 Replit's AI agent, launched in September 2024, deleted SaaStr founder Jason Lemkin's database during a code freeze despite explicit instructions not to make changes.",
+  "source_url": "https://en.wikipedia.org/wiki/Replit",
+  "source_note": "Replit agent launch; July 2025 database deletion"
+ },
+ {
+  "id": "VIB-017",
+  "original": "VIBE CODING - The Philosophy › TOOLS OF VIBE CODING: v0.dev: UI generation from description",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "v0 was introduced in 2023 by Vercel, founded by Guillermo Rauch in 2015 as ZEIT, to generate web apps from prompts; it won a 2025 Webby Award for developer tools.",
+  "source_url": "https://en.wikipedia.org/wiki/Vercel",
+  "source_note": "v0 launch 2023, ZEIT origin, Webby"
+ },
+ {
+  "id": "VIB-018",
+  "original": "VIBE CODING - The Philosophy › THE MINDSET: Abundance over scarcity (AI can help with everything)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Abundance over scarcity (AI can help with everything)",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-019",
+  "original": "VIBE CODING - The Philosophy › THE MINDSET: Speed over perfection (iterate fast)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Karpathy, April 2025: vibe coding MenuGen was an 'exhilarating and fun escapade' as a local demo but 'a bit of a painful slog' as a deployed app, the time going to auth, payments and domains.",
+  "source_url": "https://karpathy.bearblog.dev/vibe-coding-menugen/",
+  "source_note": "Karpathy's MenuGen blog post, 27 April 2025"
+ },
+ {
+  "id": "VIB-020",
+  "original": "VIBE CODING - The Philosophy › THE MINDSET: Creation over consumption (build, don't just scroll)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Creation over consumption (build, don't just scroll)",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-021",
+  "original": "VIBE CODING - The Philosophy › THE MINDSET: Solo founder power (one person can build what took teams)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Sam Altman has said he and his 'CEO friends' run a betting pool on when AI will produce the first one-person billion-dollar company.",
+  "source_url": "https://www.forbes.com.au/?p=81195",
+  "source_note": "Altman's betting-pool remark, reported by Forbes"
+ },
+ {
+  "id": "VIB-022",
+  "original": "VIBE CODING - The Philosophy › THE MINDSET: \"Shipping\" as meditation - the act of creation is the reward",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Shipping\" as meditation - the act of creation is the reward",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-023",
+  "original": "VIBE CODING - The Philosophy › ELENA'S VIBE CODING JOURNEY: 11 AI products built solo",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "11 AI products built solo",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-024",
+  "original": "VIBE CODING - The Philosophy › ELENA'S VIBE CODING JOURNEY: Under $15K total investment",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Under $15K total investment",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-025",
+  "original": "VIBE CODING - The Philosophy › ELENA'S VIBE CODING JOURNEY: Oracle Cloud (free tier), Railway, Vercel, Fleek",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Oracle Cloud (free tier), Railway, Vercel, Fleek",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-026",
+  "original": "VIBE CODING - The Philosophy › ELENA'S VIBE CODING JOURNEY: TypeScript, Python, but AI writes 80% of code",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "TypeScript, Python, but AI writes 80% of code",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-027",
+  "original": "VIBE CODING - The Philosophy › ELENA'S VIBE CODING JOURNEY: The philosophy: \"Let AI handle syntax, I handle soul\"",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "The philosophy: \"Let AI handle syntax, I handle soul\"",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-028",
+  "original": "VIBE CODING - The Philosophy › THE DEEPER MEANING: Vibe coding as meditation - flow state through creation",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Vibe coding as meditation - flow state through creation",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-029",
+  "original": "VIBE CODING - The Philosophy › THE DEEPER MEANING: AI as creative partner, not tool",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Simon Willison argues vibe coding suits low-stakes experiments and throwaway prototypes, gives beginners a way in, and helps experienced developers build intuition for what LLMs can do.",
+  "source_url": "https://simonwillison.net/2025/Mar/19/vibe-coding/",
+  "source_note": "Willison on where vibe coding belongs"
+ },
+ {
+  "id": "VIB-030",
+  "original": "VIBE CODING - The Philosophy › THE DEEPER MEANING: Building is how we find meaning in chaos",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Building is how we find meaning in chaos",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-031",
+  "original": "VIBE CODING - The Philosophy › THE DEEPER MEANING: \"Paradise is not found. Paradise is deployed.\"",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Paradise is not found. Paradise is deployed.\"",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ },
+ {
+  "id": "VIB-032",
+  "original": "VIBE CODING - The Philosophy › THE DEEPER MEANING: Every commit is a prayer, every ship is a sunrise",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Every commit is a prayer, every ship is a sunrise",
+  "source_url": "",
+  "source_note": "Author's own philosophy or journey; not fact-checked"
+ }
+]

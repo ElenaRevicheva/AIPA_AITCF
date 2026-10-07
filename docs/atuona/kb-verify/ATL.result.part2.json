@@ -1,0 +1,394 @@
+[
+  {
+    "id": "ATL-051",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › JOHN GALT: Invented the motor — static electricity engine that could power the world",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Dagny and Rearden find the wreck of Galt's motor, which drew static electricity from the atmosphere, in the abandoned Twentieth Century Motor Company factory at Starnesville, Wisconsin.",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Plot: motor found in abandoned factory"
+  },
+  {
+    "id": "ATL-052",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › JOHN GALT: Walked away when his company nationalized his invention",
+    "verdict": "CORRECTED",
+    "final_text": "Galt quit the Twentieth Century Motor Company when the Starnes heirs imposed pay by need instead of ability; he was the first man to walk out, not a victim of nationalization.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/part-2-chapter-10",
+    "source_note": "Jeff Allen's account, Part Two Ch. 10"
+  },
+  {
+    "id": "ATL-053",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › JOHN GALT: Works as track laborer at Taggart Transcontinental — hiding in plain sight",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "For twelve years Galt worked as a track laborer in the underground tunnels of the Taggart Terminal in New York, beneath Dagny's own railroad.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Galt hidden as Taggart laborer"
+  },
+  {
+    "id": "ATL-054",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › JOHN GALT: The man who stopped the motor of the world",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "The tramp Jeff Allen, taken into Dagny's car on the Comet, tells how Galt swore he would stop the motor of the world (Part Two, 'The Sign of the Dollar').",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/part-2-chapter-10",
+    "source_note": "Part Two Chapter 10 summary"
+  },
+  {
+    "id": "ATL-055",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › JOHN GALT: \"I am the man who loves his life\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"I am the man who loves his life\"",
+    "source_url": "https://aynrand.org/novels/atlas-shrugged/",
+    "source_note": "Line from opening of Galt's radio speech"
+  },
+  {
+    "id": "ATL-056",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › HANK REARDEN: Self-made industrialist, invented Rearden Metal",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Rearden Metal, a greenish-blue alloy of iron and copper, cost Hank Rearden ten years of experiments; the novel shows its first heat poured at his mills.",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Rearden Metal development, Part One"
+  },
+  {
+    "id": "ATL-057",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › HANK REARDEN: Married to a wife who hates him (Lillian) — guilt as weapon",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Lillian Rearden betrays Hank's affair with Dagny to James Taggart; Dr. Floyd Ferris uses it to blackmail Rearden into signing Rearden Metal over through the 'Gift Certificate'.",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Government blackmail over the affair"
+  },
+  {
+    "id": "ATL-058",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › HANK REARDEN: His journey: from accepting unearned guilt to rejecting it",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Tried for an illegal sale of Rearden Metal to Ken Danagger, Rearden refuses to recognize the court's right to try him; the cowed judges hand down a suspended sentence.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Part Two Ch. 4, 'The Sanction of the Victim'"
+  },
+  {
+    "id": "ATL-059",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › HANK REARDEN: \"I work for nothing but my own profit — which I make by selling a product they need to men who are willing and able to buy it\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"I work for nothing but my own profit — which I make by selling a product they need to men who are willing and able to buy it\"",
+    "source_url": "http://aynrandlexicon.com/lexicon/profit-motive.html",
+    "source_note": "Rearden's speech at his trial"
+  },
+  {
+    "id": "ATL-060",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › HANK REARDEN: The bracelet of Rearden Metal — first thing he forged, given to Lillian (who despises it), later worn by Dagny (who understands it)",
+    "verdict": "CORRECTED",
+    "final_text": "The bracelet made from the first pour of Rearden Metal is his anniversary gift to Lillian, who mocks it; at the party Dagny trades her diamond bracelet for it (Part One, 'The Non-Commercial').",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Anniversary party scene, Part One Ch. 6"
+  },
+  {
+    "id": "ATL-061",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › FRANCISCO D'ANCONIA: Heir to the world's greatest copper fortune, fifth generation",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "Francisco is heir to the centuries-old d'Anconia Copper fortune, founded by Sebastián d'Anconia, who left Spain after defying the Inquisition and rebuilt in Argentina.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Centuries-old fortune; generation count unsourced"
+  },
+  {
+    "id": "ATL-062",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › FRANCISCO D'ANCONIA: Dagny's first love, childhood friend",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Francisco spent childhood summers with Dagny and Eddie at the Taggart estate on the Hudson, and later became Dagny's first lover.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Childhood friendship and first love"
+  },
+  {
+    "id": "ATL-063",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › FRANCISCO D'ANCONIA: Brilliance masked as playboy — deliberately destroying his fortune",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Francisco sinks investors' money into the worthless San Sebastián copper mines in Mexico, then lets the People's State of Mexico nationalize them: a deliberate trap for the looters.",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Francisco hurting his company intentionally"
+  },
+  {
+    "id": "ATL-064",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › FRANCISCO D'ANCONIA: The money speech at James's wedding: \"Until you discover that money is the root of all good...\"",
+    "verdict": "CORRECTED",
+    "final_text": "At James Taggart's wedding reception Francisco says: \"Until and unless you discover that money is the root of all good, you ask for your own destruction.\"",
+    "source_url": "https://news.bitcoin.com/ayn-rand-francisco-danconias-speech-on-money/",
+    "source_note": "Verbatim text of the money speech"
+  },
+  {
+    "id": "ATL-065",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › FRANCISCO D'ANCONIA: \"If you saw Atlas shrugging — what would you tell him?\" \"To shrug.\"",
+    "verdict": "CORRECTED",
+    "final_text": "Francisco puts the Atlas question to Hank Rearden at his mills (Part Two, Ch. 3): what would you tell the buckling giant to do? His answer: \"To shrug.\"",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/quotes",
+    "source_note": "Francisco to Rearden, Part Two Ch. 3"
+  },
+  {
+    "id": "ATL-066",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › RAGNAR DANNESKJÖLD: Norwegian philosopher turned pirate",
+    "verdict": "CORRECTED",
+    "final_text": "Ragnar Danneskjöld studied philosophy at Patrick Henry University under Hugh Akston, alongside Francisco and Galt, before becoming a pirate.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Akston student turned pirate"
+  },
+  {
+    "id": "ATL-067",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › RAGNAR DANNESKJÖLD: Seizes welfare-state ships, converts to gold, returns to producers",
+    "verdict": "CORRECTED",
+    "final_text": "Ragnar raids government relief ships and returns the value in gold to producers as refunds of their income taxes; he hands Rearden a bar of gold, 'a small refund on a very large debt'.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/part-2-chapter-7",
+    "source_note": "Part Two Ch. 7, 'The Moratorium on Brains'"
+  },
+  {
+    "id": "ATL-068",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › RAGNAR DANNESKJÖLD: \"I am the first man to make piracy a moral profession\"",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "Ragnar tells Rearden he is out to destroy Robin Hood: he is \"the man who robs the thieving poor and gives back to the productive rich.\"",
+    "source_url": "https://www.shmoop.com/study-guides/atlas-shrugged/ragnar-danneskjold.html",
+    "source_note": "Ragnar on Robin Hood, Part Two Ch. 7"
+  },
+  {
+    "id": "ATL-069",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › RAGNAR DANNESKJÖLD: The Viking who fights for the mind",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "In Galt's Gulch Ragnar's wife is Kay Ludlow, the Hollywood actress who joined the strike.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Kay Ludlow joins strike, marries Ragnar"
+  },
+  {
+    "id": "ATL-070",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › EDDIE WILLERS: Dagny's assistant, everyman, deeply loyal",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "The novel opens on Eddie Willers remembering the great oak on the Taggart estate he thought eternal, until lightning showed it was hollow inside.",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Part One Ch. 1 opening image"
+  },
+  {
+    "id": "ATL-071",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › EDDIE WILLERS: Talks to the nameless track worker (Galt) in the cafeteria",
+    "verdict": "VERIFIED",
+    "final_text": "Talks to the nameless track worker (Galt) in the cafeteria",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Eddie confides in unnamed worker"
+  },
+  {
+    "id": "ATL-072",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › EDDIE WILLERS: Cannot follow to the Gulch — left on a stalled train in the desert",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "In the last chapter Eddie Willers is left alone beside the stalled Taggart Comet in the desert, trying to restart its dead engine.",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Part Three Ch. 10 ending"
+  },
+  {
+    "id": "ATL-073",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › EDDIE WILLERS: The most tragic figure: a good man who needs the creators but isn't one",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "\"Who is John Galt?\" are the novel's first words, asked of Eddie Willers by a bum on a New York street at dusk.",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Opening line, Part One Ch. 1"
+  },
+  {
+    "id": "ATL-074",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › OBJECTIVISM (as expressed in Atlas Shrugged): Reality exists independent of consciousness (A is A)",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Galt's speech: \"A leaf cannot be a stone at the same time... A is A.\" Part Three of the novel is titled \"A Is A\".",
+    "source_url": "http://aynrandlexicon.com/lexicon/identity.html",
+    "source_note": "Galt's Speech, law of identity"
+  },
+  {
+    "id": "ATL-075",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › OBJECTIVISM (as expressed in Atlas Shrugged): Reason is man's only absolute",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Galt's speech: \"Existence is Identity, Consciousness is Identification.\"",
+    "source_url": "http://aynrandlexicon.com/lexicon/identity.html",
+    "source_note": "Galt's Speech, For the New Intellectual 125"
+  },
+  {
+    "id": "ATL-076",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › OBJECTIVISM (as expressed in Atlas Shrugged): Self-interest is moral — sacrifice is not virtue",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Galt's speech: \"The creed of sacrifice is a morality for the immoral.\"",
+    "source_url": "http://aynrandlexicon.com/lexicon/sacrifice.html",
+    "source_note": "Galt's Speech, For the New Intellectual 139"
+  },
+  {
+    "id": "ATL-077",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › OBJECTIVISM (as expressed in Atlas Shrugged): No one has the right to another's mind, labor, or life",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Galt's speech: \"no man may initiate—do you hear me? no man may start—the use of physical force against others.\"",
+    "source_url": "http://aynrandlexicon.com/lexicon/physical_force.html",
+    "source_note": "Galt's Speech, For the New Intellectual 133"
+  },
+  {
+    "id": "ATL-078",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › OBJECTIVISM (as expressed in Atlas Shrugged): The sanction of the victim: never help your destroyers",
+    "verdict": "CORRECTED",
+    "final_text": "The sanction of the victim means producers withdrawing moral consent from their exploiters; Part Two, Ch. 4, where Rearden defies his court, bears that title.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/characters",
+    "source_note": "Chapter title and strike principle"
+  },
+  {
+    "id": "ATL-079",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › OBJECTIVISM (as expressed in Atlas Shrugged): Capitalism as the only moral economic system",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "Francisco: \"If you ask me to name the proudest distinction of Americans, I would choose the fact that they were the people who created the phrase 'to make money.'\"",
+    "source_url": "https://news.bitcoin.com/ayn-rand-francisco-danconias-speech-on-money/",
+    "source_note": "Verbatim, money speech"
+  },
+  {
+    "id": "ATL-080",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › OBJECTIVISM (as expressed in Atlas Shrugged): \"Man's ego is the fountainhead of human progress\"",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "Galt's speech: \"To live, man must hold three things as the supreme and ruling values of his life: Reason—Purpose—Self-esteem.\"",
+    "source_url": "http://aynrandlexicon.com/lexicon/reason.html",
+    "source_note": "Ego line not in Atlas; Galt's Speech"
+  },
+  {
+    "id": "ATL-081",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"Who is John Galt?\" — the world's resignation, later its answer",
+    "verdict": "GENERIC_REPLACED",
+    "final_text": "\"Who is John Galt?\" was coined by Twentieth Century Motor workers after Galt walked out and the plant failed, as if he had stopped the motor of the world.",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/part-2-chapter-10",
+    "source_note": "Jeff Allen's account of the phrase's origin"
+  },
+  {
+    "id": "ATL-082",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"I swear by my life and my love of it that I will never live for the sake of another man, nor ask another man to live for mine\"",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/quotes",
+    "source_note": "Galt oath, Part Three Ch. 1"
+  },
+  {
+    "id": "ATL-083",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"The question isn't who is going to let me; it's who is going to stop me\"",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "Against public doubt Dagny names her rebuilt Rio Norte Line the John Galt Line; its first run on Rearden Metal rails is a triumph (Part One, Ch. 8).",
+    "source_url": "https://en.wikipedia.org/wiki/Atlas_Shrugged",
+    "source_note": "Quote is a misattribution; John Galt Line"
+  },
+  {
+    "id": "ATL-084",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"If you saw Atlas, the giant who holds the world on his shoulders... what would you tell him to do? To shrug.\"",
+    "verdict": "CORRECTED",
+    "final_text": "Francisco: \"If you saw Atlas, the giant who holds the world on his shoulders... what would you tell him to do?\" Rearden: \"I... don't know.\" Francisco: \"To shrug.\"",
+    "source_url": "https://www.litcharts.com/lit/atlas-shrugged/quotes",
+    "source_note": "Part Two Ch. 3, Francisco to Rearden"
+  },
+  {
+    "id": "ATL-085",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"Money is the barometer of a society's virtue\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"Money is the barometer of a society's virtue\"",
+    "source_url": "https://news.bitcoin.com/ayn-rand-francisco-danconias-speech-on-money/",
+    "source_note": "Verbatim, money speech"
+  },
+  {
+    "id": "ATL-086",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"There are two sides to every issue: one side is right and the other is wrong, but the middle is always evil\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"There are two sides to every issue: one side is right and the other is wrong, but the middle is always evil\"",
+    "source_url": "https://aynrand.org/novels/atlas-shrugged/",
+    "source_note": "Galt's speech"
+  },
+  {
+    "id": "ATL-087",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"The ladder of success is best climbed by stepping on the rungs of opportunity\"",
+    "verdict": "UNVERIFIABLE_REPLACED",
+    "final_text": "Francisco opens his money speech at the wedding reception with: \"So you think that money is the root of all evil?\"",
+    "source_url": "https://news.bitcoin.com/ayn-rand-francisco-danconias-speech-on-money/",
+    "source_note": "Not Rand; real money-speech opening"
+  },
+  {
+    "id": "ATL-088",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"Run for your life from any man who tells you that money is evil\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"Run for your life from any man who tells you that money is evil\"",
+    "source_url": "https://news.bitcoin.com/ayn-rand-francisco-danconias-speech-on-money/",
+    "source_note": "Verbatim; next: leper's bell of a looter"
+  },
+  {
+    "id": "ATL-089",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"Wealth is the product of man's capacity to think\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"Wealth is the product of man's capacity to think\"",
+    "source_url": "https://news.bitcoin.com/ayn-rand-francisco-danconias-speech-on-money/",
+    "source_note": "Verbatim, money speech"
+  },
+  {
+    "id": "ATL-090",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › KEY QUOTES: \"Do not let your fire go out... do not let the hero in your soul perish\"",
+    "verdict": "VERIFIED",
+    "final_text": "\"Do not let your fire go out... do not let the hero in your soul perish\"",
+    "source_url": "https://aynrand.org/novels/atlas-shrugged/",
+    "source_note": "Close of Galt's speech"
+  },
+  {
+    "id": "ATL-091",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: Dagny = Kira: women who build while empires crumble",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Dagny = Kira: women who build while empires crumble",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-092",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: Galt's Gulch = atuona.xyz: a hidden valley where creators live by their own rules",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Galt's Gulch = atuona.xyz: a hidden valley where creators live by their own rules",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-093",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: The strike = vibe coding: creators stop serving broken systems, build their own",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "The strike = vibe coding: creators stop serving broken systems, build their own",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-094",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: Rearden Metal = AI products: revolutionary inventions the establishment fears",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Rearden Metal = AI products: revolutionary inventions the establishment fears",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-095",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: The motor = Claude, Cursor: engines that could power everything, if the builders are free",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "The motor = Claude, Cursor: engines that could power everything, if the builders are free",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-096",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: Elena = a striker: she left the old world, builds in paradise with AI",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "Elena = a striker: she left the old world, builds in paradise with AI",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-097",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: \"Who is John Galt?\" = \"Who is Atuona?\" — the answer is the same: the one who creates",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "\"Who is John Galt?\" = \"Who is Atuona?\" — the answer is the same: the one who creates",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-098",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: 11 AI products built solo = the Gulch economy: one mind, real value, no parasites",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "11 AI products built solo = the Gulch economy: one mind, real value, no parasites",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  },
+  {
+    "id": "ATL-099",
+    "original": "ATLAS SHRUGGED - Ayn Rand's Opus (1957) › ATLAS SHRUGGED × ATUONA'S WORLD: \"Paradise is not found. Paradise is deployed.\" = \"The road is cleared. We are going back to the world.\"",
+    "verdict": "AUTHOR_CANON",
+    "final_text": "\"Paradise is not found. Paradise is deployed.\" = \"The road is cleared. We are going back to the world.\"",
+    "source_url": "",
+    "source_note": "Elena's own Atuona reading of Rand"
+  }
+]

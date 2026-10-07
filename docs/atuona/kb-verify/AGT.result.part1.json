@@ -1,0 +1,362 @@
+[
+ {
+  "id": "AGT-001",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: Not a chatbot. Not a tool. An agent that plans, acts, reflects, and evolves.",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Not a chatbot. Not a tool. An agent that plans, acts, reflects, and evolves.",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-002",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: \"Agentic\" = the AI has agency — it pursues goals, not just responds to prompts",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Anthropic's \"Building effective agents\" (19 Dec 2024) splits workflows, where LLMs follow predefined code paths, from agents, where LLMs dynamically direct their own processes and tool use.",
+  "source_url": "https://www.anthropic.com/engineering/building-effective-agents",
+  "source_note": "Anthropic post defines workflows versus agents"
+ },
+ {
+  "id": "AGT-003",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: The shift: from \"AI that answers\" to \"AI that builds\"",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "The shift: from \"AI that answers\" to \"AI that builds\"",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-004",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: Agent = autonomous system that perceives, decides, acts, and learns in a loop",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Russell and Norvig's textbook Artificial Intelligence: A Modern Approach defines an agent as anything that perceives its environment through sensors and acts upon it through actuators.",
+  "source_url": "https://en.wikipedia.org/wiki/Intelligent_agent",
+  "source_note": "AIMA agent definition quoted on Wikipedia"
+ },
+ {
+  "id": "AGT-005",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › WHAT IS AGENTIC AI: The human provides vision. The agent architects the path.",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "The human provides vision. The agent architects the path.",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-006",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: PERCEPTION (Input & Context):",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "PERCEPTION (Input & Context):",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-007",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Context windows as working memory — the agent's present moment awareness",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "MemGPT (Packer et al., UC Berkeley, Oct 2023) treats the context window like an OS treats RAM, paging memories in and out via \"virtual context management\".",
+  "source_url": "https://arxiv.org/abs/2310.08560",
+  "source_note": "MemGPT abstract: OS-inspired virtual context management"
+ },
+ {
+  "id": "AGT-008",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Knowledge retrieval on demand — the right facts surface when the conversation needs them",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Patrick Lewis and colleagues named retrieval-augmented generation (RAG) in May 2020, pairing a seq2seq model with a dense vector index of Wikipedia as non-parametric memory.",
+  "source_url": "https://arxiv.org/abs/2005.11401",
+  "source_note": "Lewis et al. 2020 RAG paper abstract"
+ },
+ {
+  "id": "AGT-009",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Multi-modal input: text, voice, images, code, state files",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "DeepMind's Flamingo (April 2022) was built to read sequences of arbitrarily interleaved images and text, learning new visual tasks from a handful of examples.",
+  "source_url": "https://arxiv.org/abs/2204.14198",
+  "source_note": "Flamingo abstract: interleaved visual and textual data"
+ },
+ {
+  "id": "AGT-010",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Memory systems: short-term (conversation), long-term (database), episodic (state)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "The CoALA framework (Sumers, Yao, Narasimhan, Griffiths, 2023) borrows from the Soar cognitive architecture: working memory plus episodic, semantic and procedural long-term memory.",
+  "source_url": "https://arxiv.org/abs/2309.02427",
+  "source_note": "CoALA paper defines four memory types, cites Soar"
+ },
+ {
+  "id": "AGT-011",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: knowledge triggers, mood detection, character memory, state JSON",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Atuona's version: knowledge triggers, mood detection, character memory, state JSON",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-012",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: PLANNING (Reasoning & Strategy):",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "PLANNING (Reasoning & Strategy):",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-013",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Chain-of-thought: breaking complex tasks into steps",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Wei et al. (Google, Jan 2022) showed that just eight chain-of-thought exemplars let a 540B-parameter model reach state-of-the-art accuracy on GSM8K math word problems.",
+  "source_url": "https://arxiv.org/abs/2201.11903",
+  "source_note": "Chain-of-thought prompting paper abstract"
+ },
+ {
+  "id": "AGT-014",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: ReAct pattern: Reason → Act → Observe → Reason again",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "ReAct (Yao et al., Oct 2022) interleaves reasoning traces with actions and observations; it beat imitation and RL baselines by 34 points of success rate on ALFWorld.",
+  "source_url": "https://arxiv.org/abs/2210.03629",
+  "source_note": "ReAct abstract: 34% absolute gain ALFWorld"
+ },
+ {
+  "id": "AGT-015",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Tree-of-thought: exploring multiple creative paths before choosing",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In Tree of Thoughts (Yao et al., May 2023), GPT-4 with chain-of-thought solved 4% of Game of 24 puzzles; exploring and self-evaluating branching thoughts solved 74%.",
+  "source_url": "https://arxiv.org/abs/2305.10601",
+  "source_note": "Tree of Thoughts abstract, Game of 24"
+ },
+ {
+  "id": "AGT-016",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Goal decomposition: \"write a book\" → daily pages, translation, publishing, visualization",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Goal decomposition: \"write a book\" → daily pages, translation, publishing, visualization",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-017",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: creative session planning, story arc tracking, plot thread management",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Atuona's version: creative session planning, story arc tracking, plot thread management",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-018",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: ACTION (Tool Use & Execution):",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "ACTION (Tool Use & Execution):",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-019",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Function calling: agents invoke tools (APIs, file systems, databases)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Meta's Toolformer (Feb 2023) taught itself, with only a few demonstrations, to call a calculator, a Q&A system, two search engines, a translator and a calendar.",
+  "source_url": "https://arxiv.org/abs/2302.04761",
+  "source_note": "Toolformer abstract lists the five tool types"
+ },
+ {
+  "id": "AGT-020",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Multi-tool orchestration: image generation → video generation → publishing → social media",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Multi-tool orchestration: image generation → video generation → publishing → social media",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-021",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Code generation and execution in real-time",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "CodeAct (Wang et al., Feb 2024) lets agents act by writing executable Python instead of JSON tool calls, reaching up to 20% higher success rates.",
+  "source_url": "https://arxiv.org/abs/2402.01030",
+  "source_note": "CodeAct abstract: up to 20% higher success"
+ },
+ {
+  "id": "AGT-022",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: GitHub commits, Flux Pro images, Luma videos, NFT metadata, website deployment",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Atuona's version: GitHub commits, Flux Pro images, Luma videos, NFT metadata, website deployment",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-023",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: REFLECTION (Self-Evaluation & Learning):",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "REFLECTION (Self-Evaluation & Learning):",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-024",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Output validation: checking quality before delivering",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Self-Refine (Madaan et al., March 2023) has one model draft, critique and rewrite its own output, improving task performance by about 20% absolute across seven tasks.",
+  "source_url": "https://arxiv.org/abs/2303.17651",
+  "source_note": "Self-Refine abstract: ~20% gain, 7 tasks"
+ },
+ {
+  "id": "AGT-025",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Memory consolidation: what worked, what didn't",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Reflexion agents (Shinn et al., 2023) write verbal reflections on failures into an episodic memory buffer, reaching 91% pass@1 on HumanEval versus GPT-4's 80%.",
+  "source_url": "https://arxiv.org/abs/2303.11366",
+  "source_note": "Reflexion abstract: episodic buffer, 91% HumanEval"
+ },
+ {
+  "id": "AGT-026",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Style consistency: maintaining voice across sessions",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Li et al. (2024) measured significant instruction drift in LLaMA2-chat-70B and GPT-3.5 within eight rounds of conversation, blaming attention decay over long exchanges.",
+  "source_url": "https://arxiv.org/abs/2402.10962",
+  "source_note": "Instruction (in)stability paper abstract"
+ },
+ {
+  "id": "AGT-027",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: mood rotation tracking, knowledge usage logging, character consistency",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Atuona's version: mood rotation tracking, knowledge usage logging, character consistency",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-028",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: COLLABORATION (Human-AI Partnership):",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "COLLABORATION (Human-AI Partnership):",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-029",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Not replacement — augmentation and co-creation",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Not replacement — augmentation and co-creation",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-030",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: The human brings soul, taste, direction, meaning",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "The human brings soul, taste, direction, meaning",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-031",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: The agent brings speed, breadth, tirelessness, technical execution",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "The agent brings speed, breadth, tirelessness, technical execution",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-032",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Async collaboration: agent works while human sleeps (proactive messages, daily inspiration)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Async collaboration: agent works while human sleeps (proactive messages, daily inspiration)",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-033",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE AGENTIC ARCHITECTURE: Atuona's version: Elena writes raw Russian, Atuona translates, visualizes, publishes, teaches",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Atuona's version: Elena writes raw Russian, Atuona translates, visualizes, publishes, teaches",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-034",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE SINGLE-AGENT LOOP: User → Agent → [Plan → Execute → Reflect] → User",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Anthropic's \"Building effective agents\" (Dec 2024) describes agents as typically just LLMs using tools based on environmental feedback in a loop.",
+  "source_url": "https://www.anthropic.com/engineering/building-effective-agents",
+  "source_note": "Anthropic post: agents as tool loop"
+ },
+ {
+  "id": "AGT-035",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › THE SINGLE-AGENT LOOP: Example: \"/create\" → Atuona plans scene → writes page → checks continuity → delivers",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Example: \"/create\" → Atuona plans scene → writes page → checks continuity → delivers",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-036",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Multiple specialized agents working together",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Anthropic's June 2025 research system, a Claude Opus 4 lead with Claude Sonnet 4 subagents, beat single-agent Opus 4 by 90.2% on an internal eval while using about 15x the tokens of chat.",
+  "source_url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+  "source_note": "Anthropic multi-agent research system engineering post"
+ },
+ {
+  "id": "AGT-037",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Elena's ecosystem: CTO AIPA (tech), Atuona (creative), CMO AIPA (marketing), EspaLuz (teaching)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Elena's ecosystem: CTO AIPA (tech), Atuona (creative), CMO AIPA (marketing), EspaLuz (teaching)",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-038",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Each agent has its own personality, knowledge base, tools, and goals",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Each agent has its own personality, knowledge base, tools, and goals",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-039",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: They communicate via webhooks, shared databases, state files",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "They communicate via webhooks, shared databases, state files",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-040",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › MULTI-AGENT ORCHESTRATION: Like a startup with AI co-founders in every seat",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Like a startup with AI co-founders in every seat",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-041",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Working memory: current conversation context (token window)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "\"Lost in the Middle\" (Liu et al., 2023): language models use facts best at the start or end of their context window and degrade sharply when facts sit in the middle.",
+  "source_url": "https://arxiv.org/abs/2307.03172",
+  "source_note": "Lost in the Middle abstract finding"
+ },
+ {
+  "id": "AGT-042",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Episodic memory: atuona-state.json — book state, session history, character memories",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Episodic memory: atuona-state.json — book state, session history, character memories",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-043",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Semantic memory: knowledge base constants — art history, auction houses, fashion",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Semantic memory: knowledge base constants — art history, auction houses, fashion",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-044",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Procedural memory: learned patterns — how to publish, how to translate, how to teach",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Procedural memory: learned patterns — how to publish, how to translate, how to teach",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ },
+ {
+  "id": "AGT-045",
+  "original": "AI AGENTIC ENGINEERING - When AI Becomes Co-Founder › AGENT MEMORY ARCHITECTURE: Long-term storage: Oracle database — conversation context, knowledge entries, insights",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Long-term storage: Oracle database — conversation context, knowledge entries, insights",
+  "source_url": "",
+  "source_note": "Author's own agents, book or philosophy"
+ }
+]

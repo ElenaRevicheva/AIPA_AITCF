@@ -1,0 +1,410 @@
+[
+ {
+  "id": "NFT-001",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE PHILOSOPHICAL CONNECTION: Impressionists captured \"impressions\" - moments of light, feeling",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "The name came from Monet's 'Impression, Sunrise': critic Louis Leroy titled his mocking Le Charivari review of 25 April 1874 'The Exhibition of the Impressionists'.",
+  "source_url": "https://en.wikipedia.org/wiki/Impression,_Sunrise",
+  "source_note": "Leroy review, Le Charivari, 25 April 1874"
+ },
+ {
+  "id": "NFT-002",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE PHILOSOPHICAL CONNECTION: NFTs capture moments forever on blockchain - digital impressions",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Kevin McCoy's 'Quantum' was originally minted on 3 May 2014 on the Namecoin blockchain; Sotheby's offered it in its 2021 Natively Digital NFT sale.",
+  "source_url": "https://www.sothebys.com/en/buy/auction/2021/natively-digital-a-curated-nft-sale-2/quantum",
+  "source_note": "Sotheby's lot page states Namecoin mint date"
+ },
+ {
+  "id": "NFT-003",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE PHILOSOPHICAL CONNECTION: Vibe coding captures intention through AI - vibes become code",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Vibe coding captures intention through AI - vibes become code",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-004",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE PHILOSOPHICAL CONNECTION: All three: preserving the ephemeral, making temporary permanent",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "All three: preserving the ephemeral, making temporary permanent",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-005",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › IMPRESSIONISTS AS PROTO-NFTS: They painted \"series\" - Monet's Haystacks, Cathedrals = editions",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "In May 1891 Monet hung fifteen of his Stacks of Wheat canvases side by side in one small room at Galerie Durand-Ruel, Paris - an unprecedented critical and financial success.",
+  "source_url": "https://api.artic.edu/api/v1/artworks/64818",
+  "source_note": "Art Institute of Chicago Stacks of Wheat description"
+ },
+ {
+  "id": "NFT-006",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › IMPRESSIONISTS AS PROTO-NFTS: Each unique but part of collection = NFT drops",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Each unique but part of collection = NFT drops",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-007",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › IMPRESSIONISTS AS PROTO-NFTS: Rejected by establishment = underground/decentralized",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Rejected by establishment = underground/decentralized",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-008",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › IMPRESSIONISTS AS PROTO-NFTS: Funded by patrons = collectors/whales",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Funded by patrons = collectors/whales",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-009",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › IMPRESSIONISTS AS PROTO-NFTS: Durand-Ruel = early art marketplace",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Durand-Ruel on his 1886 American shows: 'The two exhibitions there in 1886 saved me... thanks to that public, Monet and Renoir were enabled to live.'",
+  "source_url": "https://en.wikipedia.org/wiki/Paul_Durand-Ruel",
+  "source_note": "Durand-Ruel quoted on 1886 US exhibitions"
+ },
+ {
+  "id": "NFT-010",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE \"GALLERY OF MOMENTS\" CONCEPT (Atuona): Each poem is a \"moment\" - like Impressionist capturing light",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Each poem is a \"moment\" - like Impressionist capturing light",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-011",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE \"GALLERY OF MOMENTS\" CONCEPT (Atuona): Preserved on blockchain - \"принято к публикации\" = accepted for eternity",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Preserved on blockchain - \"принято к публикации\" = accepted for eternity",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-012",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE \"GALLERY OF MOMENTS\" CONCEPT (Atuona): Free to mint = accessible art, underground values",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Free to mint = accessible art, underground values",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-013",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE \"GALLERY OF MOMENTS\" CONCEPT (Atuona): No artificial scarcity - abundance philosophy",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "No artificial scarcity - abundance philosophy",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-014",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE \"GALLERY OF MOMENTS\" CONCEPT (Atuona): Each NFT is a soul fragment, not commodity",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Each NFT is a soul fragment, not commodity",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-015",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › GAUGUIN'S PARADISE AS METAPHOR: He sought Paradise physically (Tahiti, Marquesas)",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Gauguin's search ended at Atuona on Hiva Oa, Marquesas, where he died on 8 May 1903; he is buried in Calvary Cemetery above the town, as is Jacques Brel.",
+  "source_url": "https://en.wikipedia.org/wiki/Atuona",
+  "source_note": "Atuona and Gauguin pages: death, Calvary Cemetery"
+ },
+ {
+  "id": "NFT-016",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › GAUGUIN'S PARADISE AS METAPHOR: Elena seeks Paradise digitally (vibe coding, AI)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Elena seeks Paradise digitally (vibe coding, AI)",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-017",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › GAUGUIN'S PARADISE AS METAPHOR: Kira seeks it through art (the lost painting)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Kira seeks it through art (the lost painting)",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-018",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › GAUGUIN'S PARADISE AS METAPHOR: All paths: creation as salvation",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "All paths: creation as salvation",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-019",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › GAUGUIN'S PARADISE AS METAPHOR: \"Paradise is not found. Paradise is deployed.\"",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Paradise is not found. Paradise is deployed.\"",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-020",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › HOW THEY HARMONIZE IN THE BOOK: 1890s: Gauguin paints \"Where Do We Come From?\" - existential question",
+  "verdict": "CORRECTED",
+  "final_text": "1897-98: in Tahiti Gauguin paints 'Where Do We Come From? What Are We? Where Are We Going?' (139 x 375 cm, now MFA Boston), then attempts suicide with arsenic.",
+  "source_url": "https://en.wikipedia.org/wiki/Where_Do_We_Come_From%3F_What_Are_We%3F_Where_Are_We_Going%3F",
+  "source_note": "Dated 1897-1898, Tahiti; arsenic suicide attempt"
+ },
+ {
+  "id": "NFT-021",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › HOW THEY HARMONIZE IN THE BOOK: 2019: Kira searches for his lost Paradise painting",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "2019: Kira searches for his lost Paradise painting",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-022",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › HOW THEY HARMONIZE IN THE BOOK: 2025: Elena builds AI that creates, preserves, shares art",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "2025: Elena builds AI that creates, preserves, shares art",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-023",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › HOW THEY HARMONIZE IN THE BOOK: The through-line: art transcends time, medium doesn't matter",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "The through-line: art transcends time, medium doesn't matter",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-024",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › HOW THEY HARMONIZE IN THE BOOK: Soul seeks expression through whatever tools exist",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Soul seeks expression through whatever tools exist",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-025",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › TECHNICAL MEETS POETIC: Impressionist brushstroke = pixel = code commit",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Impressionist brushstroke = pixel = code commit",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-026",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › TECHNICAL MEETS POETIC: Canvas = blockchain = deployed product",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Canvas = blockchain = deployed product",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-027",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › TECHNICAL MEETS POETIC: Studio = IDE = conversation with AI",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Studio = IDE = conversation with AI",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-028",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › TECHNICAL MEETS POETIC: Patron = collector = NFT holder",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Patron = collector = NFT holder",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-029",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › TECHNICAL MEETS POETIC: Gallery = museum = atuona.xyz",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Gallery = museum = atuona.xyz",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-030",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › CREATIVE PARALLELS: Monet painted same scene in different light = iteration",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Monet painted Rouen Cathedral over thirty times in 1892-93 from rented rooms across the street; he showed twenty at Durand-Ruel in 1895 and sold eight.",
+  "source_url": "https://en.wikipedia.org/wiki/Rouen_Cathedral_(Monet_series)",
+  "source_note": "Rouen Cathedral series: 30+ canvases, 20 shown 1895"
+ },
+ {
+  "id": "NFT-031",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › CREATIVE PARALLELS: Vibe coder iterates through prompts = same energy",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Vibe coder iterates through prompts = same energy",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-032",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › CREATIVE PARALLELS: Both: not getting it \"right\" but exploring possibility space",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Both: not getting it \"right\" but exploring possibility space",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-033",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › CREATIVE PARALLELS: Process as product, journey as destination",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Process as product, journey as destination",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-034",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › UNDERGROUND VALUES: Impressionists: rejected Salon, created own exhibitions",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Shut out by the Salon, the Impressionists opened their own show in 1874 at photographer Nadar's former studio, 35 boulevard des Capucines, Paris.",
+  "source_url": "https://en.wikipedia.org/wiki/Impression,_Sunrise",
+  "source_note": "1874 exhibition venue, Atelier Nadar"
+ },
+ {
+  "id": "NFT-035",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › UNDERGROUND VALUES: Crypto/NFT: rejected banks, created own economy",
+  "verdict": "UNVERIFIABLE_REPLACED",
+  "final_text": "Bitcoin's genesis block of 3 January 2009 carries the headline 'The Times 03/Jan/2009 Chancellor on brink of second bailout for banks'.",
+  "source_url": "https://en.bitcoin.it/wiki/Genesis_block",
+  "source_note": "Genesis block coinbase text, 3 Jan 2009"
+ },
+ {
+  "id": "NFT-036",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › UNDERGROUND VALUES: Vibe coding: rejected gatekeepers, created with AI",
+  "verdict": "GENERIC_REPLACED",
+  "final_text": "Andrej Karpathy coined 'vibe coding' on X on 2 February 2025: 'fully give in to the vibes... and forget that the code even exists.' Collins named it Word of the Year 2025.",
+  "source_url": "https://en.wikipedia.org/wiki/Vibe_coding",
+  "source_note": "Karpathy X post 2 Feb 2025; Collins WOTY"
+ },
+ {
+  "id": "NFT-037",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › UNDERGROUND VALUES: Elena's philosophy: \"true to underground values\"",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Elena's philosophy: \"true to underground values\"",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-038",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › UNDERGROUND VALUES: Art should be free, accessible, authentic",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Art should be free, accessible, authentic",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-039",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE BOOK AS SYNTHESIS: Russian poetry (soul, tradition) + English (tech, global)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Russian poetry (soul, tradition) + English (tech, global)",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-040",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE BOOK AS SYNTHESIS: 2019 narrative (analog, physical) + 2025 reality (digital, AI)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "2019 narrative (analog, physical) + 2025 reality (digital, AI)",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-041",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE BOOK AS SYNTHESIS: Fine art references (Gauguin, Van Gogh) + crypto culture (NFT, blockchain)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Fine art references (Gauguin, Van Gogh) + crypto culture (NFT, blockchain)",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-042",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE BOOK AS SYNTHESIS: Fashion journalism (surfaces) + philosophical depth (meaning)",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "Fashion journalism (surfaces) + philosophical depth (meaning)",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-043",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › THE BOOK AS SYNTHESIS: The \"Gallery of Moments\" = where all these streams meet",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "The \"Gallery of Moments\" = where all these streams meet",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-044",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Minting a poem\" = publishing, immortalizing",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Minting a poem\" = publishing, immortalizing",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-045",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Smart contract\" = the promise between artist and world",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Smart contract\" = the promise between artist and world",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-046",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Gas fee\" = the effort required for creation",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Gas fee\" = the effort required for creation",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-047",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Blockchain\" = the unbroken chain of human expression",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Blockchain\" = the unbroken chain of human expression",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-048",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Wallet\" = where you keep your collected souls",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Wallet\" = where you keep your collected souls",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-049",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Genesis block\" = the first creation, the origin story",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Genesis block\" = the first creation, the origin story",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-050",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Fork\" = when the story takes a new direction",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Fork\" = when the story takes a new direction",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ },
+ {
+  "id": "NFT-051",
+  "original": "VIBE CODING + NFT + IMPRESSIONISM - The Harmony › METAPHORS TO USE: \"Consensus\" = when art resonates, when truth is recognized",
+  "verdict": "AUTHOR_CANON",
+  "final_text": "\"Consensus\" = when art resonates, when truth is recognized",
+  "source_url": "",
+  "source_note": "Author's own metaphor, concept or book canon"
+ }
+]
