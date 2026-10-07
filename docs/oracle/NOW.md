@@ -203,7 +203,11 @@ git log keeps the record.
   from 1500 to today") — phase 2 = verify AND replace generic lines with rare, sourced ones.
   **Phase 2 STARTED 7 Oct (Elena: yes):** art lanes exported to `docs/atuona/kb-verify/{ATU,GAU,ART,MOD,AUC}.json` (276 facts);
   6 research agents write `*.result.json` (verdict VERIFIED / CORRECTED / GENERIC_REPLACED / UNVERIFIABLE_REPLACED + source URL).
-  Next: apply final_text into the KNOWLEDGE_* strings in place (same bullet positions), audit doc, build, diff, deploy.
+  **DONE + DEPLOYED 16:44 UTC (`f80e966`):** 276 art facts → 90 verified, 63 corrected, 105 generic replaced, 14 unsourced replaced,
+  4 NOVEL_CANON kept (GAU-042..045 "The Lost Painting Theory" = Ule's lost Gauguin — fiction by design; an agent tried to "fix" it,
+  rejected). Audit: `docs/atuona/KB_VERIFICATION_2026-10-07.md`. Sources: 139 museum/press/scholarly, 133 Wikipedia (agents hit the
+  200-search limit). Diff vs live = only the 272 bullet lines; 55 commands; pool 577; backup `.bak-20261007-pre-kbverify`.
+  NEXT (offered): the 5 counterpoint lanes (FAS/VIB/NFT/ATL/AGT, 301 facts); upgrade Wikipedia-only art facts to museum sources.
   Phase 2 open: fact-check the 577 facts (e.g. ART-087 "Durand-Ruel bought 1,500 Monets" is unsourced).
 
 ### 📨 6 Oct — Ford Realty: warm CLIENT-MANUAL letter SENT (deal 65762863272), deck attached, delivered
