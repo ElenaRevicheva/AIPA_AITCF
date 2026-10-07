@@ -20,6 +20,7 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
+| Claude Code | 2026-10-07 21:30 | Stale-brief fixes A–E (Boardy loop, brief 3-day leads, X alert weekly) | VJH src/autonomous/response_detector.py; cto-aipa src/lead-triage.ts + dist/lead-triage.js; Oracle data/reply-radar-ignore.txt; dragontrade-agent .env; 17 Boardy deals in HubSpot | 0b97fd2 |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
