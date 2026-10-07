@@ -4370,10 +4370,13 @@ async function createContent(
       || st === 400 || st === 404 || st === 429 || st === 503 || st === 529;
     if (shouldFallback) {
       console.log('⚠️ Atuona: Claude unavailable (' + (st || errorMessage.slice(0, 40)) + '), falling back...');
+      // 7 Oct 2026: fallbacks get room — gpt-oss-120b (Groq) is a reasoning model that spends the budget thinking, and at
+      // 500 tokens /inspire came back cut mid-word. max_tokens is a ceiling; the prompt still sets the length.
+      const fbTokens = Math.max(maxTokens * 4, 2000);
 
       if (deepseekConfigured()) {
         try {
-          const ds = await deepseekComplete(null, prompt, maxTokens, 'atuona/generate', { temperature });
+          const ds = await deepseekComplete(null, prompt, fbTokens, 'atuona/generate', { temperature });
           if (ds && ds.trim()) return ds;
         } catch (dsErr: any) {
           console.warn('⚠️ Atuona: DeepSeek Flash failed (' + (dsErr?.message || dsErr) + '), trying Groq...');
@@ -4386,20 +4389,22 @@ async function createContent(
         const groqResponse = await groq.chat.completions.create({
           model: AI_CONFIG.fallbackModel,
           messages: [{ role: 'user', content: prompt }],
-          max_tokens: Math.max(maxTokens, 300),
+          // Groq's free tier counts max_tokens against its 8,000 TPM, so keep its ceiling at 3,000 (slim prompts ~4k fit)
+          max_tokens: Math.max(maxTokens, Math.min(fbTokens, 3000)),
           temperature: temperature
         });
 
         const groqText = groqResponse.choices[0]?.message?.content?.trim();
-        if (groqText) return groqText;
-        console.warn('⚠️ Atuona: Groq returned empty, trying Grok...');
+        const groqCut = groqResponse.choices[0]?.finish_reason === 'length';
+        if (groqText && !groqCut) { console.log(`[atuona/generate] Groq ${AI_CONFIG.fallbackModel} answered (${groqText.length} chars)`); return groqText; }
+        console.warn(groqCut ? '⚠️ Atuona: Groq reply was cut at the token limit, trying Grok...' : '⚠️ Atuona: Groq returned empty, trying Grok...');
       } catch (groqError: any) {
         // Tier 3: Grok (xAI). Groq's free tier caps (daily TPD + 12k TPM) can't handle large /create
         // prompts — that 429/413 is what broke page creation. Grok's big context keeps Atuona alive
         // through a Claude credit dip. No new key (XAI_API_KEY already wired in llm-resilience).
         console.warn('⚠️ Atuona: Groq failed (' + (groqError?.message || groqError) + '), trying Grok (xAI)...');
         try {
-          const grokText = await grokComplete(null, prompt, maxTokens, 'atuona/generate');
+          const grokText = await grokComplete(null, prompt, fbTokens, 'atuona/generate');
           if (grokText && grokText.trim()) return grokText;
         } catch (grokError: any) {
           console.error('Atuona Grok fallback error:', grokError?.message || grokError);
@@ -4407,7 +4412,7 @@ async function createContent(
         throw groqError;
       }
       try {
-        const grokText = await grokComplete(null, prompt, maxTokens, 'atuona/generate');
+        const grokText = await grokComplete(null, prompt, fbTokens, 'atuona/generate');
         if (grokText && grokText.trim()) return grokText;
       } catch (grokError: any) {
         console.error('Atuona Grok last-resort error:', grokError?.message || grokError);
