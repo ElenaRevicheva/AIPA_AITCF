@@ -20,7 +20,6 @@ agents keep it honest.
 
 | Agent | Claimed (UTC) | Working on | Touching (files / services) | Last commit |
 |---|---|---|---|---|
-| Claude Code | 2026-10-07 15:30 | OpenClaw interview-sparring skill (Elena approved) | Oracle ~/.openclaw/workspace (skills, HELP.md), user unit openclaw-gateway. NOT VJH, NOT cto-aipa code | a038b0c |
 
 **Rules**
 - **Before editing shared code or restarting a service, add your row.** Commit and push
@@ -130,6 +129,17 @@ git log keeps the record.
 # PART 2 — CURRENT STATE
 
 ## 🤝 HANDOFF
+
+### ✅ 7 Oct — OpenClaw = interview sparring partner (Elena's design) · live on Oracle, skill `interview-spar` ✓ ready
+- **DONE:** `~/.openclaw/workspace/skills/interview-spar/` (SKILL.md + references/outlook-facts.md + proof-bank.md, a verbatim copy
+  of `cto-aipa/docs/interview/defense-bank.json`). HELP.md/IDENTITY.md menu item 4. Repo: openclaw-vibejob-shortlist `docs` branch.
+  Flow: "spar"/"prep me for <role>" → one HR/AI-interviewer-style question → Elena answers in English, her way → ✅ polished /
+  💡 what it means / 🎯 why the role asks it / ➕ proof / 🔧 fixed → card appended to `~/.openclaw/workspace/interview-cards/<role>.md`.
+  No VJH, cto-aipa or OpenClaw code touched; no gateway restart. Backups `~/_session-backups/openclaw-spar-20261007/`.
+- **VERIFIED BY:** test sessions via `openclaw agent --session-id` (not delivered). The 1st run INVENTED a defense-bank quote
+  (grep = 0), so proofs are now COPY-ONLY from a file the agent must `cat` that turn. The 2nd run's 2 proofs were grep-verified verbatim
+  and `💾 saved` was proven by the card file. The test card was deleted.
+- **NEXT:** Elena's first real session. If her old Telegram session does not pick the skill up, send `/new` once.
 
 ### 🔍 7 Oct — OpenClaw → VJH value, proven from LOGS: the data arrives, then nothing uses it (Elena's call)
 - **Arrives:** cron `0 */6` `~/job-list-filter/run_shortlist.sh` exports 20 YC companies → VJH STEP 0 `Priority sync` every cycle
