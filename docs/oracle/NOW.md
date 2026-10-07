@@ -131,8 +131,8 @@ git log keeps the record.
 ## 🤝 HANDOFF
 
 ### ✅ 7 Oct — OpenClaw = interview sparring partner (Elena's design) · live on Oracle, skill `interview-spar` ✓ ready
-- **DONE:** `~/.openclaw/workspace/skills/interview-spar/` (SKILL.md + references/outlook-facts.md + proof-bank.md, a verbatim copy
-  of `cto-aipa/docs/interview/defense-bank.json`). HELP.md/IDENTITY.md menu item 4. Repo: openclaw-vibejob-shortlist `docs` branch.
+- **DONE:** `~/.openclaw/workspace/skills/interview-spar/` (SKILL.md + references/sources.sh, which reads LIVE: `outlook.txt` = a mechanical extract of
+  `docs/applications/professional-outlook/outlook.html` (re-extract when it changes), `cto-aipa/docs/interview/defense-bank.json`, `~/aideazz/content/ai-ops-wiki/incidents/*.md`). HELP.md/IDENTITY.md menu item 4. Repo: openclaw-vibejob-shortlist `docs` branch.
   Flow: "spar"/"prep me for <role>" → full MOCK INTERVIEW (8 Qs in real order; "quick"=4, "deep"=10; debrief at the end), each → Elena answers in English, her way → ✅ polished /
   💡 what it means / 🎯 why the role asks it / ➕ proof / 🔧 fixed → card appended to `~/.openclaw/workspace/interview-cards/<role>.md`.
   No VJH, cto-aipa or OpenClaw code touched; no gateway restart. Backups `~/_session-backups/openclaw-spar-20261007/`.
