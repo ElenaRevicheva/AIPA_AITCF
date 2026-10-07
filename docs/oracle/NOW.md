@@ -422,6 +422,13 @@ git log keeps the record.
   NEVER-CUT shots with no frame — **15 cage, 30 password (refused twice on GPT 2.5, never redesigned), 31 three**; also 10a/10b
   (never planned as keyframes). No frame but on the 4:30 cut list: 3, 4, 8, 12, 16a, 23, 29, 33. 1c = text card; 35 = composite.
   Elena decides: make the missing frames (and how 30 is redesigned) or cut to 4:30, before motion starts.
+  **7 Oct (Venice topped up $77 — her last money; budget every call):** k09 flower removed (nano edit, $0.23; original
+  `img/k09_flower_1007.jpg`). Glitch stills: G1+G4 REJECTED (Kira is a lesbian — no Kira/Ule sex scene). Venice "uncensored"
+  `qwen-edit-uncensored` = porn gloss + wrong cast → REJECTED, never use it for this film. Realism test on G8: nano + grok REFUSED
+  (final), flux-2-max tame, **Seedream V5 Pro edit WINS** ($0.08, real photo look, cast held). G2s G3s G5s G6s G7s G8s k11gs made on
+  Seedream, each with ONE surreal detail (Elena: "always something from another reality"). Sheet is PRIVATE (laptop
+  Pictures/Atuona-film9-private + Oracle img/) — erotic stills never go into the public repo. Ledger Venice $26.02.
+  **Elena's move:** approve/reject the 7 Seedream stills; then 4:30 cut + motion plan (4K hero shots + O3 Pro).
   **Length research 7 Oct:** `docs/atuona/FILM9_LENGTH_DECISION_2026-10-07.md` — Niio has no length rule (HD/4K single channel);
   Runway AIF 3–15 min; <10 min = eligible at 90%+ of festivals. Recommended: the 4:30 cut. Awaiting Elena's choice.
   **Erotic glitch inserts (Elena 7 Oct, 'like Crimson Escape'):** proposal `docs/atuona/FILM9_EROTIC_GLITCH_INSERTS_2026-10-07.md`
